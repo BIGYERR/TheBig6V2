@@ -1,0 +1,8 @@
+# doctrine text is local reference for the coach agent; keep it out of GitHub Pages
+doctrine/*.txt
+# scratch
+.last_diff.txt
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="187"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="190"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -629,6 +629,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .wk-day.pre .wk-day-lbl,.wk-day.pre .wk-day-num,.wk-day.pre .wk-day-top,.wk-day.pre .wk-day-bot{color:var(--muted) !important;}
 .start-resolve{font-size:12px;color:var(--muted);line-height:1.5;margin-top:2px;}
 .start-resolve b{color:var(--text);font-weight:600;}
+/* V188 (D14a): derived, read-only start. Same geometry as the date field, flat fill, no
+   picker affordance, the source of the value named on the right. */
+.input-field.derived{background:var(--surface2);border-color:var(--border);display:flex;justify-content:space-between;align-items:center;cursor:default;}
+.input-field.derived .src{font-family:var(--font-display);font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);}
+.start-pips{display:flex;gap:4px;margin-top:8px;}
+.start-pips i{flex:1;height:6px;border-radius:2px;background:var(--surface3);}
+.start-pips i.behind{background:var(--border2);}
+.start-pips i.open{background:var(--signal);}
+.start-pips i.race{background:var(--text);}
+.start-resolve.warn{color:var(--signal);}
+.start-resolve a{color:var(--text);font-weight:600;text-decoration:underline;cursor:pointer;}
 .wk-day-num .chk{color:var(--run);}
 /* hero */
 .wk-hero{margin:10px 16px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 1px 2px rgba(40,34,22,0.06);}
@@ -1002,6 +1013,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
         <span id="startDateDisplay" class="wk-startdate-txt is-unset">Set date</span>
       </span>
       <input type="date" id="startDateInput" class="wk-startdate-native" onchange="setProgStart(this.value)">
+    </label>
+    <label class="wk-startdate" id="raceDateWrap" aria-label="Race date" style="display:none">
+      <svg class="wk-cal-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4a1 1 0 0 1 1-1h13l-3 4 3 4H5"/></svg>
+      <span class="wk-startdate-stack">
+        <span class="wk-startdate-lbl">Race Day</span>
+        <span id="raceDateDisplay" class="wk-startdate-txt">\u2014</span>
+      </span>
+      <input type="date" id="raceDateInput" class="wk-startdate-native" onchange="setProgRace(this.value)">
     </label>
     <div class="phase-pill" id="phasePill"></div>
   </div>
@@ -1852,11 +1871,52 @@ function startResolveCopy(r){
 }
 // Summary-row value: the resolved start, flagged when the first week is short.
 function startSummaryVal(r){
+  if(r && r.aligned) return _fmtStartDay(r.start, true) + ' \u2014 set by race date';
   return _fmtStartDay(r.start, true) + (r.partial ? ' \u2014 short first week' : '');
+}
+// V188 (D14a): wizard-side alignment (reads WD; the pure helper does the dates).
+function wizardAlignment(){
+  if(!WD || !WD.cardioTypes || !WD.cardioTypes.includes('run') || !WD.cardioGoals || !WD.cardioGoals.run) return null;
+  if(WD.primaryPath !== 'event' && WD.primaryPath !== 'both') return null;
+  return raceAlignment(WD.cardioGoals.run.id, WD.raceDate, WD.eventTargeted !== false);
+}
+const _RACE_NAME = {run_5k:'5K', run_10k:'10K', run_half:'half', run_marathon:'marathon'};
+const _RACE_GOAL_LBL = {run_5k:'5K plan', run_10k:'10K plan', run_half:'half marathon plan', run_marathon:'marathon plan'};
+function alignedStartCopy(al){
+  const g = WD.cardioGoals.run.id, nm = _RACE_NAME[g] || 'race';
+  const dayName = {mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'}[al.raceDay];
+  const raceTxt = '<b>'+_fmtStartDay(al.raceIso)+'</b>, '+al.weeksOut+' week'+(al.weeksOut===1?'':'s')+' out';
+  if(al.futureWeeks){
+    return 'Your '+nm+' is '+raceTxt+'. The '+al.tw+'-week plan starts <b>'+_fmtStartDay(al.start)+'</b> \u2014 '+al.futureWeeks+' week'+(al.futureWeeks===1?'':'s')+' from now \u2014 so it peaks on race week, not early. Until then: run easy three times a week, 30\u201345 minutes, nothing hard.';
+  }
+  let t = 'Your '+nm+' is '+raceTxt+'. The '+al.tw+'-week plan starts <b>'+_fmtStartDay(al.start)+'</b> so race week is week '+al.tw+' \u2014 you open in <b>week '+al.openWeek+'</b>.';
+  if(al.behindWeeks) t += ' Weeks 1\u2013'+al.behindWeeks+' are behind you: shown, not counted, not missed.';
+  t += ' Race day pins to <b>'+dayName+'</b>.';
+  if(al.underFloor){
+    const sh = NRC_SHORTER[g];
+    t += ' I don\u2019t recommend under '+al.floor+' weeks for the '+nm+'.';
+    if(sh) t += ' The <a onclick="offerShorterPlan(\''+sh+'\')">'+_RACE_GOAL_LBL[sh]+'</a> fits this window better.';
+  }
+  return t;
+}
+function alignedPipsHTML(al){
+  if(al.futureWeeks) return '';
+  let h='<div class="start-pips">';
+  for(let w=1;w<=al.tw;w++){ h+='<i class="'+(w<al.openWeek?'behind':w===al.openWeek?'open':w===al.tw?'race':'')+'"></i>'; }
+  return h+'</div>';
+}
+function offerShorterPlan(goalId){
+  const def = (CARDIO_GOALS_BY_TYPE.run || []).find(x=>x.id===goalId);
+  if(!def || !WD.cardioGoals.run) return;
+  WD.cardioGoals.run.id = def.id; WD.cardioGoals.run.label = def.label;
+  renderWizardStep();
+  const f=document.getElementById('raceDateFeedback'); if(f) updateRaceDateFeedback();
+  showToast('Switched to the '+def.label+' plan \u2713');
 }
 // Wizard: repaint only the two dependent nodes on change. A full renderWizardStep here
 // would tear the native date picker down mid-interaction on iOS.
 function updateStartResolve(){
+  if(wizardAlignment()) return;   // V188 (D14a): derived — nothing to resolve from the field
   const r = resolveStartDate(WD.startDate, WD.restDays||[]);
   const a = document.getElementById('startResolve'); if(a) a.innerHTML = startResolveCopy(r);
   const b = document.getElementById('sumStartDate'); if(b) b.textContent = startSummaryVal(r);
@@ -1865,6 +1925,17 @@ function updateStartResolve(){
 // stripped from the stored cfg so buildProgram stays a pure function of the training
 // selections and refresh cannot read a stale copy.
 function _applyWizardStart(prog, wd){
+  // V188 (D14a): a race goal with a race date derives its start from the race — Monday of
+  // race week minus (plan − 1) weeks. Days between that start and today are "behind you";
+  // prog.blockOpen (today) marks where the block actually opened. No race → V174 path.
+  const _al = wd && wd.cardioTypes && wd.cardioTypes.includes('run') && wd.cardioGoals && wd.cardioGoals.run
+    ? raceAlignment(wd.cardioGoals.run.id, wd.raceDate, wd.eventTargeted !== false) : null;
+  if(_al){
+    prog.startDate = _al.start;
+    const t = new Date(); t.setHours(0,0,0,0); prog.blockOpen = _isoOf(t);
+    if(prog.cfg && Object.prototype.hasOwnProperty.call(prog.cfg,'startDate')) delete prog.cfg.startDate;
+    return {start:_al.start, entered:_al.start, mon:_al.start, partial:false, snapped:false, aligned:true, align:_al};
+  }
   const r = resolveStartDate(wd && wd.startDate, (wd && wd.restDays) || []);
   prog.startDate = r.start;
   if(prog.cfg && Object.prototype.hasOwnProperty.call(prog.cfg,'startDate')) delete prog.cfg.startDate;
@@ -2146,6 +2217,16 @@ function updateRaceDateFeedback() {
   }
 
   const card = (color, html) => '<div style="color:'+color+';font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:'+color+'18;border-radius:4px;border:1px solid '+color+'44">'+html+'</div>';
+
+  // V188 (D14a): race goals count back from the race. The card names the derived start,
+  // the opening week, and the floor; the "program stays intact, race lands in week N"
+  // sentence below is NSW's and stays NSW-only.
+  const _al = wizardAlignment();
+  if(_al){
+    const _f = assessRunPaceCeiling();
+    feedback.innerHTML = card(_al.underFloor ? 'var(--signal)' : 'var(--run)', alignedStartCopy(_al)) + (_f ? paceCeilingOfferHTML(_f) : '');
+    return;
+  }
 
   const diff = weeksUntil - recommended;
 
@@ -2754,7 +2835,7 @@ function renderWizardStep() {
             style="width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:4px;color:var(--text);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:0.04em;padding:13px 14px;outline:none;box-sizing:border-box;color-scheme:dark;-webkit-appearance:none;cursor:pointer">
           <div id="raceDateFeedback" style="margin-top:8px"></div>
           <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Tap to open calendar — the final weeks taper so you arrive fresh.</div>
-        </div>` : `<div style="font-size:11px;color:var(--muted);line-height:1.5">${(WD.cardioGoals['run']&&(WD.cardioGoals['run'].id==='run_5k'||WD.cardioGoals['run'].id==='run_10k')) ? 'Runs the full 8-week Nike Run Club plan and finishes with a '+(WD.cardioGoals['run'].id==='run_5k'?'5K':'10K')+' time trial in place of race day.' : 'Program builds to peak fitness and holds. Pick a race when ready.'}</div>`}
+        </div>` : `<div style="font-size:11px;color:var(--muted);line-height:1.5">${(WD.cardioGoals['run']&&(WD.cardioGoals['run'].id==='run_5k'||WD.cardioGoals['run'].id==='run_10k')) ? 'Runs the full 8-week '+(WD.cardioGoals['run'].id==='run_5k'?'5K':'10K')+' plan and finishes with a '+(WD.cardioGoals['run'].id==='run_5k'?'5K':'10K')+' time trial in place of race day.' : 'Program builds to peak fitness and holds. Pick a race when ready.'}</div>`}
       </div>` : ''}
     </div>` : ''}
     `;
@@ -2857,7 +2938,9 @@ function renderWizardStep() {
     body.innerHTML = `<div class="wizard-title">Name your program</div>
     <div class="wizard-subtitle">Give it something you will recognize, and tell it when to begin.</div>
     <div class="input-group"><div class="input-label">Program name</div><input type="text" class="input-field" value="${WD.name}" oninput="WD.name=this.value" maxlength="40"></div>
-    <div class="input-group"><div class="input-label">Start date</div><input type="date" class="input-field" id="wizStartDate" value="${WD.startDate}" onchange="WD.startDate=this.value;updateStartResolve()"><div class="start-resolve" id="startResolve">${startResolveCopy(_sr)}</div></div>
+    ${(()=>{ const _al=wizardAlignment(); return _al
+      ? `<div class="input-group"><div class="input-label">Start date</div><div class="input-field derived"><span>${_fmtStartDay(_al.start,true)}</span><span class="src">set by race date</span></div><div class="start-resolve${_al.underFloor?' warn':''}" id="startResolve">${alignedStartCopy(_al)}</div>${alignedPipsHTML(_al)}</div>`
+      : `<div class="input-group"><div class="input-label">Start date</div><input type="date" class="input-field" id="wizStartDate" value="${WD.startDate}" onchange="WD.startDate=this.value;updateStartResolve()"><div class="start-resolve" id="startResolve">${startResolveCopy(_sr)}</div></div>`; })()}
     <div class="summary-block">
       <div class="summary-block-header">Program Summary</div>
       ${[
@@ -3095,7 +3178,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         // derived from the athlete's base. §3b: it also pins the program length.
         if(NRC_GOALS.has(goalId)) { _nrcPin = needed; _nrcLbl = lbl2; }
         if(needed > 6) warnings.push(NRC_GOALS.has(goalId)
-          ? lbl2 + ' follows the Nike Run Club plan — ' + needed + ' weeks'
+          ? lbl2 + ' plan — ' + needed + ' weeks, fixed'
           : lbl2 + ' needs ' + needed + ' weeks from your current base');
       }
 
@@ -3753,6 +3836,42 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
 // shaped goals and stay on the NSW engine. NRC_GOALS is the single routing set.
 // ════════════════════════════════════════════════════════════════════
 const NRC_GOALS = new Set(['run_5k', 'run_10k', 'run_half', 'run_marathon']);
+// V188 (D14a): race alignment. Count BACK from the race, not forward from today.
+// Plan lengths are the table lengths; floors are the source's own minimums (app copy
+// says "I don't recommend", never names the source — ruled V188).
+const NRC_PLAN_WEEKS = {run_5k:8, run_10k:8, run_half:14, run_marathon:18};
+const NRC_PLAN_FLOOR = {run_5k:4, run_10k:4, run_half:6, run_marathon:12};
+const NRC_SHORTER    = {run_marathon:'run_half', run_half:'run_10k', run_10k:'run_5k'};
+// raceAlignment(goalId, raceIso, eventOn, todayIso?) → null when not an aligned goal, else
+// {tw, raceIso, raceDay (ISO key), raceMon, start (Monday ISO), weeksOut, openWeek,
+//  floor, underFloor, futureWeeks}. Pure: dates in, dates out, no DOM, no WD.
+function raceAlignment(goalId, raceIso, eventOn, todayIso){
+  if(!NRC_GOALS.has(goalId) || eventOn === false || !raceIso) return null;
+  const race = _parseLocalDate(raceIso); if(!race) return null;
+  const tw = NRC_PLAN_WEEKS[goalId];
+  const raceMon = getWeekMonday(raceIso);
+  const start = new Date(raceMon); start.setDate(raceMon.getDate() - (tw-1)*7); start.setHours(0,0,0,0);
+  const today = todayIso ? _parseLocalDate(todayIso) : new Date(); today.setHours(0,0,0,0);
+  const todayMon = getWeekMonday(_isoOf(today));
+  const weeksOut = Math.floor((race - today)/86400000/7);
+  const openWeek = Math.max(1, Math.min(tw, Math.round((todayMon - start)/86400000/7) + 1));
+  const futureWeeks = Math.max(0, Math.round((start - todayMon)/86400000/7));
+  const floor = NRC_PLAN_FLOOR[goalId];
+  return {tw, raceIso, raceDay:_ISO_ORDER[Math.round((race - raceMon)/86400000)], raceMon:_isoOf(raceMon),
+          start:_isoOf(start), weeksOut, openWeek: futureWeeks ? 1 : openWeek, floor, underFloor: weeksOut < floor, futureWeeks,
+          behindWeeks: futureWeeks ? 0 : openWeek - 1};
+}
+// The race-week pin: race day is the entered date's weekday; every train day AFTER it in
+// race week rests; the day that held the race session (found by the cardio engine, by
+// subtype — never by position, which fails under the spacer and in multi-sport) rests
+// too and is appended to `rest` there. Null only when there is no alignment.
+function raceWeekPin(align, trainDays){
+  if(!align) return null;
+  const iso = _ISO_ORDER.filter(d => (trainDays||[]).includes(d));
+  const ri = _ISO_ORDER.indexOf(align.raceDay);
+  const after = iso.filter(d => _ISO_ORDER.indexOf(d) > ri);
+  return {w: align.tw, race: align.raceDay, from: null, rest: after};
+}
 // V171 (D4a): both tables re-transcribed line-for-line against the Nike PDFs after the
 // audit found four half speed sessions stored as titles only, Power Pyramid without its
 // recoveries, Nike's 15:00 recovery run dropped from 12 half weeks, and nine distance-
@@ -3913,7 +4032,7 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
         // V171 (D4e): half wk 5 is "Another 10K Run" — distance held, not cut.
         note = 'HOLD WEEK: Same distance as last week on purpose. Consolidate the last jump before the build resumes — do not add.';
       } else if(L.cutback) {
-        note = 'CUTBACK WEEK: The long run steps back on purpose. Nike builds these in so your body absorbs the prior weeks of load — you come back stronger, not more tired. Do not add distance.';
+        note = 'CUTBACK WEEK: The long run steps back on purpose. These are built in so your body absorbs the prior weeks of load — you come back stronger, not more tired. Do not add distance.';
       } else if(L.peak) {
         note = 'PEAK LONG RUN: Your longest run of the plan. Run it easy and patient — time on feet is the goal, not speed. Everything after this tapers down.';
       } else if(L.taper) {
@@ -4636,6 +4755,12 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   const isBaseCardio = !_perfLiftPaths && !_anyPerfCardio;
 
   let cardioTrainDays = trainDays;
+  // V188 (D14a): weeks are Monday-anchored but trainDays arrives Sunday-first, so the
+  // NRC layout's "long run = last train day" could never land a Sunday — the race showed
+  // up on the FIRST day of race week with a recovery run after it. Race goals lay out
+  // Monday→Sunday. NSW and base cardio keep the file order (byte-identical).
+  { const _rg = cardioTypes.includes('run') && cardioGoals.run && cardioGoals.run.id;
+    if(_rg && NRC_GOALS.has(_rg)) cardioTrainDays = _ISO_ORDER.filter(d => trainDays.includes(d)); }
   // baseCardioPlan, when set, fully predefines the cardio calendar for base-cardio mode:
   // {days:[dayKey,...], dayToSport:[sport,...]} — bypassing sportDayTargets entirely.
   let baseCardioPlan = null;
@@ -5183,6 +5308,41 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       schedule[w][dayKey] = session;
     }
   });
+  // V188 (D14a): race-week pin — the race session moves onto the race weekday, the run
+  // days after it are cleared (rest after the race). Computed once in buildProgram and
+  // handed in on cfg so the lifting layer applies the identical swap.
+  const _pin = cfg && cfg._racePin;
+  if(_pin && schedule[_pin.w]){
+    const wk = schedule[_pin.w];
+    // the race session is the run whose subtype says so — wherever the layout put it
+    const from = Object.keys(wk).find(d => wk[d] && wk[d].type === 'run' && /RACE DAY|TIME TRIAL/.test(wk[d].subtype||'')) || null;
+    if(from && from !== _pin.race){ wk[_pin.race] = wk[from]; delete wk[from]; _pin.from = from; if(!_pin.rest.includes(from)) _pin.rest.push(from); }
+    (_pin.rest||[]).forEach(d => { if(d !== _pin.race) delete wk[d]; });
+    // V189 (D37): the shakeout runs the day before the race. D14a rested the day that held
+    // the race, which left Nike's last recovery run two days out and a full rest day on the
+    // eve. The eve, then two days out, is tried in that order: the first that is a train day
+    // with nothing on it takes the last recovery run before the race, and the day it came
+    // from rests instead. A user rest day is respected (a Mon to Fri athlete racing Sunday
+    // shakes out Friday). A Monday race has no eve inside its week and is left alone.
+    const _ri = _ISO_ORDER.indexOf(_pin.race);
+    // The last run before the race is the shakeout. If the layout dealt Nike's race-week
+    // speed session there and a recovery run sits earlier in the week, they trade days.
+    { const rb = _ISO_ORDER.slice(0,_ri).filter(d => wk[d] && wk[d].type==='run');
+      const last = rb[rb.length-1];
+      if(last && /^speed run/i.test(wk[last].subtype||'')){
+        const rec = rb.filter(d => /^recovery run/i.test(wk[d].subtype||'')).pop();
+        if(rec){ const t = wk[last]; wk[last] = wk[rec]; wk[rec] = t; }
+      } }
+    for(const _k of [1,2]){
+      if(_ri - _k < 0) break;
+      const eve = _ISO_ORDER[_ri-_k];
+      if(!trainDays.includes(eve) || wk[eve]) continue;
+      const before = _ISO_ORDER.slice(0,_ri-_k).filter(d => wk[d] && wk[d].type==='run' && /^recovery run/i.test(wk[d].subtype||''));
+      const sk = before[before.length-1];
+      if(sk){ wk[eve] = wk[sk]; delete wk[sk]; _pin.shakeout = eve; _pin.rest = (_pin.rest||[]).filter(d => d!==eve); if(!_pin.rest.includes(sk)) _pin.rest.push(sk); }
+      break;
+    }
+  }
   return schedule;
 }
 
@@ -5757,17 +5917,41 @@ function preventionDoseSweep(weeks, cfg){
   if((cfg&&cfg.liftingFocus)!=='support_prevention') return;
   Object.keys(weeks||{}).forEach(w=>Object.keys(weeks[w]||{}).forEach(d=>{
     const day=weeks[w][d]; if(!day||!day.sections) return;
-    day.sections.forEach(sec=>(sec.items||[]).forEach((it,ii)=>{
-      if(!it||!it.detail) return;
-      // Mains are excluded by FORM: the caller appends the warmup/rest clause to every
-      // main and to no accessory, so its presence identifies the writer. Without this the
-      // sweep demoted bodyweight-tier MAINS to 2 sets (caught by Gate R first run).
-      if(/warmup|min rest/.test(it.detail)) return;
-      let nd=it.detail;
-      if(/^3×\d.*@ RPE/.test(nd)) nd=nd.replace(/^3×/,'2×');
-      else if(/^3 sets — RPE/.test(nd)) nd=nd.replace(/^3 sets/,'2 sets');
-      if(nd!==it.detail) sec.items[ii]={...it, detail:nd};
-    }));
+    day.sections.forEach(sec=>{
+      // V190 (D39): A SUPERSET'S DOSE LIVES ON THE SECTION. The per-item rewrite below
+      // reached only the members carrying the '@ RPE' grammar and skipped the ballistic
+      // ones (_GRAMMAR_BALLISTIC is exempt from accessoryGrammarSweep, so a ball slam
+      // keeps a bare '3×10' and matched neither regex). Result: one superset, two
+      // different round counts, and the old banner stamped whichever landed in items[0].
+      // Measured 262/6,889 prevention supersets desynced — and 0/42,423 on every other
+      // focus, so this pass was the sole source. The section is halved once; the members
+      // are then normalised TO it, because ruling D39-v leaves item.detail as the data
+      // parseRx and the add-sheet set-count read. The section is the writer, the members
+      // are a kept-in-sync copy — which is what they always were, just not enforced.
+      const _isSS=!!(sec.superset||sec.type==='superset')&&(sec.items||[]).length>1;
+      if(_isSS){
+        if(sec.rounds!==3) return;          // 3→2 only, exactly as before
+        sec.rounds=2;
+        (sec.items||[]).forEach((it,ii)=>{
+          if(!it||!it.detail) return;
+          if(/warmup|min rest/.test(it.detail)) return;
+          const nd=_setLeadingSets(it.detail,2);
+          if(nd!==it.detail) sec.items[ii]={...it, detail:nd};
+        });
+        return;
+      }
+      (sec.items||[]).forEach((it,ii)=>{
+        if(!it||!it.detail) return;
+        // Mains are excluded by FORM: the caller appends the warmup/rest clause to every
+        // main and to no accessory, so its presence identifies the writer. Without this the
+        // sweep demoted bodyweight-tier MAINS to 2 sets (caught by Gate R first run).
+        if(/warmup|min rest/.test(it.detail)) return;
+        let nd=it.detail;
+        if(/^3×\d.*@ RPE/.test(nd)) nd=nd.replace(/^3×/,'2×');
+        else if(/^3 sets — RPE/.test(nd)) nd=nd.replace(/^3 sets/,'2 sets');
+        if(nd!==it.detail) sec.items[ii]={...it, detail:nd};
+      });
+    });
   }));
 }
 function bodyweightSweep(weeks, _bwExp, _bwPrev){
@@ -5916,6 +6100,73 @@ function injectDynamicCore(weekObj, dayRoles, trainDays, week){
 // run progression is doctrine-tabled and must never be reshuffled. Deadlift is cleared first
 // (highest CNS cost), then squat. Adjacency wraps the week. Best-effort: on tight consecutive
 // weeks a full buffer can be impossible — then it flags a note instead. Mutates dayRoles in place.
+// ── V189 (D36): NRC RACE PROGRAMS PLACE THE LEG LIFTS BY THE RUN WEEK'S SHAPE ──────
+// The 48h rule below treats every leg-load run alike, so on a five-day half the deadlift
+// day was pushed off the speed sessions and landed on the recovery run, the day before the
+// long run; the swap that put it there was lateral (Tue was only adjacent to Mon), taken by
+// the same-day fallback because it accepts any non-run day. Measured on V188 across 324 NRC
+// configs: 90 leg-heavy days on the long-run eve, 9 on the long-run day. Doctrine ruled
+// (Mario, concur): hard days hard. On a race program the long run and its eve are OFF
+// LIMITS to the hinge and the squat; a speed day is where the hinge belongs; the squat and
+// armor day (calves, ankles, hips) prefers its own day or the day after a speed session,
+// so the calf work does not stack on the run that already loads the calves.
+// Cost table, per day, lower is better. Forbidden = the long-run day and its eve.
+//   pull: clean 0 · speed same-day 0.5 · recovery-run same-day 1 · day after speed 1 · day before speed 2 · day after long 2
+//   legs: clean 0 · day after speed 1 · recovery-run same-day 1 · speed same-day 1.5 · day before speed 2 · day after long 2
+// "Clean" is a lift-only day: a recovery run is the easy day being protected, not a free slot.
+// Every ordered (pull, legs) pair is scored; min total wins, then the widest spacing between
+// the two axial days, then the earliest legs day. If no pair is finite the layout is too
+// tight and the NSW rule below runs as before. Non-NRC programs never enter here.
+function _nrcRunShape(wk1, trainDays){
+  const iso = d => _ISO_ORDER.indexOf(d);
+  let long = null; const speed = new Set(), easy = new Set();
+  trainDays.forEach(d => { const c = wk1[d]; if(!c || !c.isNRC || c.type!=='run') return;
+    if(/^long run/i.test(c.subtype||'')) long = d; else if(/^speed run/i.test(c.subtype||'')) speed.add(d); else easy.add(d); });
+  if(!long) return null;
+  const eve = _ISO_ORDER[(iso(long)+6)%7], after = _ISO_ORDER[(iso(long)+1)%7];
+  return { long, eve, after, speed, easy, forbidden: new Set([long, eve]) };
+}
+// One cost table, two readers: the placement below and deconflictSameRegion's guard, so a
+// region swap can never undo a placement (it did, before the guard read this table).
+function _nrcLegCost(shape, role, d){
+  if(shape.forbidden.has(d)) return Infinity;
+  const iso = x => _ISO_ORDER.indexOf(x);
+  const prev = _ISO_ORDER[(iso(d)+6)%7], next = _ISO_ORDER[(iso(d)+1)%7];
+  let c = 0;
+  if(shape.speed.has(d)) c += role==='pull' ? 0.5 : 1.5;
+  if(shape.easy.has(d)) c += 1;
+  if(shape.speed.has(prev)) c += 1;
+  if(shape.speed.has(next)) c += 2;
+  if(d===shape.after) c += 2;
+  return c;
+}
+function nrcLegLiftPlacement(dayRoles, trainDays, wk1){
+  const shape = _nrcRunShape(wk1, trainDays); if(!shape) return null;
+  const roles = ['pull','legs'].filter(r => trainDays.some(d => dayRoles[d]===r));
+  if(!roles.length) return null;
+  const iso = d => _ISO_ORDER.indexOf(d);
+  const cost = (role, d) => _nrcLegCost(shape, role, d);
+  const dist = (a,b) => { const r = Math.abs(iso(a)-iso(b)); return Math.min(r, 7-r); };
+  let best = null;
+  if(roles.length===1){
+    trainDays.forEach(d => { const c = cost(roles[0], d); if(c<Infinity && (!best || c<best.c)) best = {c, days:{[roles[0]]:d}}; });
+  } else {
+    trainDays.forEach(p => trainDays.forEach(l => {
+      if(p===l) return;
+      const c = cost('pull',p) + cost('legs',l); if(c===Infinity) return;
+      const sp = dist(p,l);
+      if(!best || c<best.c || (c===best.c && sp>best.sp) || (c===best.c && sp===best.sp && iso(l)<iso(best.days.legs))) best = {c, sp, days:{pull:p, legs:l}};
+    }));
+  }
+  if(!best) return null;
+  // Leg roles take their days; every other role keeps its template order over what is left.
+  const rest = trainDays.filter(d => !roleIsLegHeavy(dayRoles[d])).map(d => dayRoles[d]);
+  const taken = new Set(Object.values(best.days));
+  const open = trainDays.filter(d => !taken.has(d));
+  Object.keys(best.days).forEach(r => { dayRoles[best.days[r]] = r; });
+  open.forEach((d,i) => { dayRoles[d] = rest[i] || 'full'; });
+  return { legRecoveryNote: 'Your hinge day rides a speed session so hard days stay hard. Nothing heavy lands the day before your long run.' };
+}
 function deconflictLegLiftDays(dayRoles, trainDays, cardioSchedule){
   const wk1 = cardioSchedule[1] || {};
   const _i = d => ALL_DAYS_ORDER.indexOf(d);
@@ -5924,6 +6175,8 @@ function deconflictLegLiftDays(dayRoles, trainDays, cardioSchedule){
   const legTaxing = new Set();
   trainDays.forEach(d => { const c = wk1[d]; if(c && c.legLoad) legTaxing.add(d); });
   if(!legTaxing.size) return { legRecoveryNote:null };
+  const _nrc = nrcLegLiftPlacement(dayRoles, trainDays, wk1);   // V189 (D36): race programs place by run shape
+  if(_nrc) return _nrc;
 
   // d conflicts if it sits on, or within 48h of, any leg-taxing cardio day.
   const conflicted = d => legTaxing.has(d) || [...legTaxing].some(t=>_dist(d,t)===1);
@@ -6077,7 +6330,11 @@ function deconflictSameRegion(dayRoles, trainDays, cardioSchedule){
   const wk1 = cardioSchedule[1] || {};
   const legTaxing = new Set(); trainDays.forEach(d => { const c = wk1[d]; if(c && c.legLoad) legTaxing.add(d); });
   const cardioConflicted = d => legTaxing.has(d) || [...legTaxing].some(t => _dist(d,t)===1);
-  const cardioConflicts = dr => ALL.filter(d => roleIsLegHeavy(dr[d]) && cardioConflicted(d)).length;
+  // V189 (D36): on NRC programs the leg roles are scored by the placement's own cost table
+  // (forbidden days weigh 10), so a region swap can never make the placement worse. Off NRC
+  // the count is the V30 one, byte-identical.
+  const _shape = _nrcRunShape(wk1, trainDays);
+  const cardioConflicts = dr => ALL.reduce((n,d) => n + (roleIsLegHeavy(dr[d]) ? (_shape ? Math.min(10, _nrcLegCost(_shape, dr[d], d)) : (cardioConflicted(d) ? 1 : 0)) : 0), 0);
   const regionOf = role => PRESS.has(role) ? 'press' : (role==='full' ? 'full' : null);
   const collisions = dr => {
     let n = 0;
@@ -6409,6 +6666,11 @@ function engineB_cardio(cfg, A){
   // B owns and PUBLISHES the taper window. The cardio schedule built here and the
   // barbell wave (A / C / D) read the same source — they cannot disagree.
   const taper = programTaperWindow({ ...cfg, goal }, cardioTypes, cardioGoals, totalWeeks);
+  // V188 (D14a): the race-week pin is computed here, once, and rides cfg into the cardio
+  // engine; buildProgram's day loop reads the same object off cfg._racePin.
+  const _align = cardioTypes.includes('run') && cardioGoals.run ? raceAlignment(cardioGoals.run.id, cfg.raceDate, cfg.eventTargeted !== false) : null;
+  const _racePin = (_align && _align.tw === totalWeeks) ? raceWeekPin(_align, trainDays) : null;
+  if(_racePin) cfg._racePin = _racePin;
   const cardioSchedule=buildCardioProgression(cardioTypes,cardioGoals,trainDays,{...cfg,goal},totalWeeks);
   // Injury reroute runs AFTER the schedule is built: it substitutes sessions in place
   // rather than rewriting cardioGoals (pace targets are sport-specific; a coach doesn't
@@ -7495,9 +7757,9 @@ function engineC_kinematics(cfg, A, B){
         const lightPress=pick(lightPressPool.length?lightPressPool:[_lpFallback],1,blockSeed(w)+40)[0];
         const lightTri=pick(_bw(['Bench dips (chair)','Close-grip pushups','Diamond pushups'],_gear(EXLIB.triceps)),1,blockSeed(w)+41)[0];
         s.push({label:'Main — '+lightPress,items:[{name:lightPress,detail:vsets(3)+'×12 — RPE 6–7, leave 3+ in reserve'+restNote},{name:ex.shoulder[1],detail:vsets(3)+'×12'}]});
-        s.push({label:'Pump',superset:true,items:[{name:ex.chestAcc[1],detail:vsets(3)+'×15'},{name:lightTri,detail:vsets(3)+'×15'}]});
+        s.push({label:'Pump',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×15'},{name:lightTri,detail:vsets(3)+'×15'}]});
         if((goal==='fatloss'||goal==='athletic')&&!strengthSupport)
-          s.push({label:'Light finisher',optional:true,superset:true,items:[{name:ex.cond[2],detail:vsets(3)+'×15'},{name:ex.cond[3],detail:vsets(3)+'×12'}]});
+          s.push({label:'Light finisher',optional:true,superset:true,rounds:vsets(3),items:[{name:ex.cond[2],detail:vsets(3)+'×15'},{name:ex.cond[3],detail:vsets(3)+'×12'}]});
         else
           s.push({label:'Delt finisher',optional:true,items:[{name:pick(_bw(EXLIB.shoulder_iso_bw,_gear(EXLIB.shoulder_iso)),1,blockSeed(w)+42)[0],detail:vsets(3)+'×20'}]});
         return s;
@@ -7531,20 +7793,20 @@ function engineC_kinematics(cfg, A, B){
         s.push({label:'Secondary compound — '+secondary,items:[{name:secondary,detail:hsets+'×'+repA}]});
         // 3) Hypertrophy/pump accessories (chest angle + 2 delts)
         s.push({label:'Chest volume',items:[{name:chest2[0],detail:hsets+'×'+repB}]});
-        s.push({label:'Delts',superset:true,items:[{name:delts[0],detail:hsets+'×'+repB},{name:delts[1],detail:hsets+'×'+repB}]});
+        s.push({label:'Delts',superset:true,rounds:hsets,items:[{name:delts[0],detail:hsets+'×'+repB},{name:delts[1],detail:hsets+'×'+repB}]});
         // 4) Direct isolation slot (triceps)
-        s.push({label:'Triceps',superset:true,items:[{name:tris[0],detail:hsets+'×'+repA},{name:tris[1],detail:hsets+'×'+repB}]});
+        s.push({label:'Triceps',superset:true,rounds:hsets,items:[{name:tris[0],detail:hsets+'×'+repA},{name:tris[1],detail:hsets+'×'+repB}]});
       } else {
       s.push({label:'Main — '+ex.chestMain,items:[{name:ex.chestMain,detail:det},{name:ex.shoulder[0],detail:vsets(3)+'×8'}]});
-      if((goal==='fatloss'||goal==='athletic')&&!strengthSupport)s.push({label:'Conditioning',optional:true,superset:true,items:[{name:ex.cond[0],detail:vsets(3)+'×12'},{name:ex.cond[1],detail:vsets(3)+'×10'}]});
+      if((goal==='fatloss'||goal==='athletic')&&!strengthSupport)s.push({label:'Conditioning',optional:true,superset:true,rounds:vsets(3),items:[{name:ex.cond[0],detail:vsets(3)+'×12'},{name:ex.cond[1],detail:vsets(3)+'×10'}]});
       else {
         // V164 station rule: b-walk over the unselected shoulder pool (shoulder[0] is
         // the Main pairing at the site above — protected); chestAcc[0..1] are both
         // consumed on this day, so there is no legal a-alternative — demote if pure.
         const _sp=_ssPair(ex.chestAcc[0],ex.shoulder[1],[],shoulderAccPool.filter(n=>n!==ex.shoulder[0]));
-        s.push({label:'Accessory',superset:_sp.ok,items:[{name:_sp.a,detail:vsets(3)+'×10'},{name:_sp.b,detail:vsets(3)+'×15'}]});
+        s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'},{name:_sp.b,detail:vsets(3)+'×15'}]});
       }
-      if(!isBeginner)s.push({label:'Chest + knee',superset:true,items:[{name:ex.chestAcc[1],detail:vsets(3)+'×12'},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
+      if(!isBeginner)s.push({label:'Chest + knee',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×12'},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
       }
     } else if(role==='pull'){
       s.push({label:'Main — '+ex.backMain,items:[{name:ex.backMain,detail:_testWk?_testRx:scheme(_deadRM,w,hasDeadRM,ex.backMain)+warmupNote+', 3 min rest'}]});
@@ -7553,7 +7815,7 @@ function engineC_kinematics(cfg, A, B){
         // one candidate; D3b re-walks the row pool (backRow[1] excluded — Pull B owns
         // it) to keep the superset alive on the pulldown tier before demoting.
         const _sp=_ssPair(ex.backRow[0],ex.backPull,rowPool.filter(n=>n!==ex.backRow[1]),null);
-        s.push({label:'Pull superset A',superset:_sp.ok,items:[{name:_sp.a,detail:vsets(3)+'×8'+(_isUnilateralRow(_sp.a)?' each':'')},{name:_sp.b,detail:vsets(3)+'×5–6'}]});
+        s.push({label:'Pull superset A',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×8'+(_isUnilateralRow(_sp.a)?' each':'')},{name:_sp.b,detail:vsets(3)+'×5–6'}]});
       }
       // "each" follows the MOVEMENT, not the slot. The slot is unilateral by intent
       // and the pool now honours that, but a thin tier can still fall back to a
@@ -7571,7 +7833,7 @@ function engineC_kinematics(cfg, A, B){
       if(goal==='strength'||goal==='hypertrophy'){
         if(ex.backRow[1]) s.push({label:'Row volume',items:[{name:ex.backRow[1],detail:vsets(3)+'×10'+(_isUnilateralRow(ex.backRow[1])?' each':'')}]});
       } else {
-        s.push({label:'Pull superset B',superset:true,items:[
+        s.push({label:'Pull superset B',superset:true,rounds:vsets(3),items:[
           ...(ex.backRow[1]?[{name:ex.backRow[1],detail:vsets(3)+'×10'+(_isUnilateralRow(ex.backRow[1])?' each':'')}]:[]),
           {name:ex.cond[2],detail:vsets(3)+'×10'}]});
       }
@@ -7590,7 +7852,7 @@ function engineC_kinematics(cfg, A, B){
         // V164 station rule: self-pair walk over the full pool (Cable curl + Preacher
         // curl was the live banned pair — STACK×BENCH, two stations for one superset).
         const _sp=_ssPair(bis[0],bis[1],_bicPool,_bicPool);
-        s.push({label:'Biceps',superset:_sp.ok,items:[{name:_sp.a,detail:hsets+'×'+repB},{name:_sp.b,detail:hsets+'×'+repB}]});
+        s.push({label:'Biceps',superset:_sp.ok,rounds:hsets,items:[{name:_sp.a,detail:hsets+'×'+repB},{name:_sp.b,detail:hsets+'×'+repB}]});
       }
     } else if(role==='legs'){
       s.push({label:'Main — '+ex.squat,items:[{name:ex.squat,detail:_testWk?_testRx:scheme(_squatRM,w,hasSquatRM,ex.squat)+warmupNote+', 2–3 min rest'}]});
@@ -7618,7 +7880,7 @@ function engineC_kinematics(cfg, A, B){
         // hipExt (single-leg hip thrust) is the drop: glute-max redundancy with the hinge,
         // and glute-med work is guaranteed by the hip section below. Sets are written at 2
         // directly (D2-by-construction) so the rounds banner derives '2 Rounds' honestly.
-        s.push({label:'Leg circuit — runner armor',superset:true,items:[
+        s.push({label:'Leg circuit — runner armor',superset:true,rounds:2,items:[
           {name:ex.lunge[0],detail:'2×10 each'},
           {name:ex.kneeStab,detail:'2×25 sec'},
           {name:ex.hinge[0],detail:'2×8'}]});
@@ -7634,7 +7896,7 @@ function engineC_kinematics(cfg, A, B){
         }
       } else {
       if(_isRunner){
-        s.push({label:'Leg superset A',superset:true,items:[{name:ex.lunge[0],detail:vsets(3)+'×10 each'},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
+        s.push({label:'Leg superset A',superset:true,rounds:vsets(3),items:[{name:ex.lunge[0],detail:vsets(3)+'×10 each'},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
       } else {
         s.push({label:'Leg superset A',items:[{name:ex.lunge[0],detail:vsets(3)+'×10 each'}]});
         s.push({label:'Knee stability',items:[{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
@@ -7654,7 +7916,7 @@ function engineC_kinematics(cfg, A, B){
         if(_sp.ok){ _lsB[0].name=_sp.a; _lsB.push({name:_sp.b,detail:vsets(3)+'×8'}); _lsBSS=true; }
         else _lsB.push({name:ex.hipExt,detail:vsets(3)+'×8'});
       }
-      s.push({label:'Leg superset B',superset:_lsBSS,items:_lsB});
+      s.push({label:'Leg superset B',superset:_lsBSS,rounds:vsets(3),items:_lsB});
       }
       if(denseHypertrophy){
         // Leg isolation (quad/ham machines) + direct calves — both missing before.
@@ -7666,7 +7928,7 @@ function engineC_kinematics(cfg, A, B){
         // pool has to divert here rather than be filtered. Single-leg off a step is the only
         // bodyweight calf variant that is actually a stimulus.
         const calf=pick(_bw(['Single-leg calf raise (bodyweight)','Calf raise (bodyweight)'],_gear(EXLIB.calves)),1,blockSeed(w)+106)[0];
-        s.push({label:'Leg isolation',superset:true,items:[{name:legIso[0],detail:hsets+'×'+repB},{name:legIso[1],detail:hsets+'×'+repB}]});
+        s.push({label:'Leg isolation',superset:true,rounds:hsets,items:[{name:legIso[0],detail:hsets+'×'+repB},{name:legIso[1],detail:hsets+'×'+repB}]});
         s.push({label:'Calves',items:[{name:calf,detail:hsets+'×15–20'}]});
       }
       if(includeHip)s.push(buildHipSection(seed+w,isBW));
@@ -7726,10 +7988,10 @@ function engineC_kinematics(cfg, A, B){
         const _rdl=pick([...hingePool,...hipExtPool].filter(_noBar),1,blockSeed(w)+31+_fo)[0]||hipExtPool[0];
         const _press=pick(EXLIB.chest_acc.filter(n=>/dumbbell|dips/i.test(n)),1,blockSeed(w)+32+_fo)[0];
         const _row=pick(rowPool.filter(_noBar),1,blockSeed(w)+33+_fo)[0]||rowPool[0];
-        s.push({label:'Lower strength',superset:true,items:[
+        s.push({label:'Lower strength',superset:true,rounds:vsets(3),items:[
           {name:_lead,detail:vsets(3)+'×'+_lo+' each @ RPE '+_rpe},
           {name:_rdl,detail:vsets(3)+'×'+_lo+' @ RPE '+_rpe}]});
-        s.push({label:'Upper superset',superset:true,items:[
+        s.push({label:'Upper superset',superset:true,rounds:vsets(3),items:[
           {name:_press,detail:vsets(3)+'×'+_up+' @ RPE '+_rpe},
           {name:_row,detail:vsets(3)+'×'+_up+' @ RPE '+_rpe}]});
         if(!_longDay){
@@ -7743,7 +8005,7 @@ function engineC_kinematics(cfg, A, B){
           // V164 station rule (arms branch is the live one — Preacher curl×cable work;
           // the delts branch is STACK/PORT-only and always passes through untouched).
           const _sp=_ssPair(_f1,_f2,_fA,_fB);
-          s.push({label:_armsDay?'Arms finisher':'Delts finisher',superset:_sp.ok,items:[
+          s.push({label:_armsDay?'Arms finisher':'Delts finisher',superset:_sp.ok,rounds:vsets(3),items:[
             {name:_sp.a,detail:vsets(3)+'×'+_fin+' @ RPE '+_rpe},
             {name:_sp.b,detail:vsets(3)+'×'+_fin+' @ RPE '+_rpe}]});
         }
@@ -7783,15 +8045,15 @@ function engineC_kinematics(cfg, A, B){
           s.push({label:'Power — lower explosive',items:_pwOn.map(r=>(
             {name:r[0],detail:_powerPrescribe(r[0],r[1],cfg.experience,cfg.ageBracket)}))});
         }
-        s.push({label:'Lower strength',superset:true,items:[{name:lowerLead[0],detail:vsets(3)+'×10 each'},{name:lowerHinge,detail:vsets(3)+'×10'}]});
-        s.push({label:'Hip extension + push',superset:true,items:[{name:lowerHipExt,detail:vsets(3)+'×10'},{name:lowerPush,detail:vsets(3)+'×10–12 @ RPE 7'}]});
+        s.push({label:'Lower strength',superset:true,rounds:vsets(3),items:[{name:lowerLead[0],detail:vsets(3)+'×10 each'},{name:lowerHinge,detail:vsets(3)+'×10'}]});
+        s.push({label:'Hip extension + push',superset:true,rounds:vsets(3),items:[{name:lowerHipExt,detail:vsets(3)+'×10'},{name:lowerPush,detail:vsets(3)+'×10–12 @ RPE 7'}]});
         // Same gate as the Power fallback: this block claims to be explosive work, so it
         // answers to the power axis even though it draws from the conditioning pool.
         // A protect-tier athlete gets no explosive heading at all; the knee-stability hold
         // it supersets with is prehab and survives on its own.
         const _finPower=_powerAllowed(ex.cond[3], cfg.experience, cfg.injury, cfg.ageBracket);
         if(!explosiveLead){
-          if(_finPower) s.push({label:'Explosive finisher',optional:true,superset:true,items:[{name:ex.cond[3],detail:vsets(3)+'×12'},{name:ex.kneeStab,detail:vsets(3)+'×30 sec'}]});
+          if(_finPower) s.push({label:'Explosive finisher',optional:true,superset:true,rounds:vsets(3),items:[{name:ex.cond[3],detail:vsets(3)+'×12'},{name:ex.kneeStab,detail:vsets(3)+'×30 sec'}]});
           else s.push({label:'Knee stability',optional:true,items:[{name:ex.kneeStab,detail:vsets(3)+'×30 sec'}]});
         }
       } else if(explosiveLead && !_powerBlocked && _powerLegal.length){
@@ -7806,9 +8068,9 @@ function engineC_kinematics(cfg, A, B){
         const _pwOn=pwRoles.filter(r=>r[0]);
         s.push({label:'Power — explosive first',items:_pwOn.map(r=>(
           {name:r[0],detail:_powerPrescribe(r[0],r[1],cfg.experience,cfg.ageBracket)}))});
-        s.push({label:'Strength',superset:true,items:[{name:ex.fullPush,detail:vsets(3)+'×10–12 @ RPE 7'},{name:ex.fullPull,detail:vsets(3)+'×8–12'}]});
+        s.push({label:'Strength',superset:true,rounds:vsets(3),items:[{name:ex.fullPush,detail:vsets(3)+'×10–12 @ RPE 7'},{name:ex.fullPull,detail:vsets(3)+'×8–12'}]});
       } else {
-        s.push({label:'Strength',superset:true,items:[{name:ex.fullPush,detail:vsets(3)+'×10–12 @ RPE 7 — full ROM, controlled'},{name:ex.fullPull,detail:vsets(3)+'×8–12'}]});
+        s.push({label:'Strength',superset:true,rounds:vsets(3),items:[{name:ex.fullPush,detail:vsets(3)+'×10–12 @ RPE 7 — full ROM, controlled'},{name:ex.fullPull,detail:vsets(3)+'×8–12'}]});
         // The non-explosiveLead fallback fills a block LABELLED 'Power' from the
         // conditioning pool, which is not gated by _powerLegal. Left ungated it printed a
         // Power block to a protect-tier athlete — 160 of them in the sweep. Filtered on the
@@ -7824,7 +8086,7 @@ function engineC_kinematics(cfg, A, B){
         // Relabelled to match and flagged optional; movements, doses and position unchanged.
         // A true power-first block for body-path strength/hypertrophy is the Tier-3 full-body
         // redesign (§12), not a label edit.
-        if(_condPower.length>=2) s.push({label:'Explosive finisher',optional:true,superset:true,items:[{name:_condPower[0],detail:vsets(3)+'×15'},{name:_condPower[1],detail:vsets(3)+'×10'}]});
+        if(_condPower.length>=2) s.push({label:'Explosive finisher',optional:true,superset:true,rounds:vsets(3),items:[{name:_condPower[0],detail:vsets(3)+'×15'},{name:_condPower[1],detail:vsets(3)+'×10'}]});
       }
       if(opts.wantCarry&&!denseHypertrophy&&!isBW&&_cardioInterference(opts.cardio)<1.0)s.push({label:'Carry',optional:true,items:[{name:ex.carry[0],detail:_carryRx('3×40 yards',ex.carry[0],'')}]});
     } else if(role==='active'){
@@ -8916,7 +9178,13 @@ function engineD_synthesis(cfg, A, B, plan, C){
     const carryHost=_liftDays.find(d=>(dayRoles[d]||'full')==='legs')
                   ||_liftDays.find(d=>(dayRoles[d]||'full')==='full')||null;
     allDaysList.forEach(d=>{
-      if(cfg.restDays.includes(d)){weeks[w][d]={title:'Rest',dot:'rest',tags:['rest'],rest:true};return;}
+      // V188 (D14a): in race week the race weekday trains even if it is a rest day, and
+      // the train days after the race rest. D34 then strips race day to its primer.
+      const _pin=cfg._racePin;
+      const _isRest = (_pin && w===_pin.w)
+        ? (d===_pin.race ? false : (cfg.restDays.includes(d) || _pin.rest.includes(d)))
+        : cfg.restDays.includes(d);
+      if(_isRest){weeks[w][d]={title:'Rest',dot:'rest',tags:['rest'],rest:true};return;}
       const role=dayRoles[d]||'full';
       let fullVariant='upper';
       if(role==='full'){ fullVariant=(fullSeen%2===0)?'upper':'lower'; fullSeen++; }
@@ -9015,7 +9283,9 @@ function engineD_synthesis(cfg, A, B, plan, C){
   // V175 (D28): LAST. Every pass above can remove a superset member; this is the one
   // that notices the section is no longer a superset.
   d18LongRunDayPass(weeks);   // V176 (D18): before the sweep, so demotions it causes are swept
+  raceEveLiftPass(weeks, totalWeeks);   // V189 (D38): no lifting from two days out through the race
   singletonSupersetSweep(weeks);
+  delete cfg._racePin;   // V188 (D14a): derived at build time, never stored — refreshProgram recomputes it
   return {id,name:cfg.name||'My Program',goal,liftingFocus:cfg.liftingFocus,primaryPath:cfg.primaryPath,raceDate:cfg.raceDate||null,raceDateWeeks:cfg.raceDateWeeks||null,legRecoveryNote,liftRecoveryWeeks,taperWeeks,seed,cfg:{...cfg,cardioTypes,cardioGoals,goal,seed},weeks,totalWeeks,created:Date.now(),startDate:null,_swapUniverse:_swapUniverseList(),_swapUniverseByKey:{}};
 }
 
@@ -9046,8 +9316,9 @@ function engineD_synthesis(cfg, A, B, plan, C){
 // ≥75 → A: no lift, post-run mobility only (75 is the number the long-run fuel note
 // already uses — one doctrine line). 45–75 → B: upper and trunk, ≤8 sets, no power,
 // no hinge. <45 → C: the current interference model (with D8). No heavy carries on
-// ANY long-run day regardless of length. Race day untouched; the dress rehearsal is
-// tier A on every row (D34) — you don't lift after simulating the race.
+// ANY long-run day regardless of length. Race day is left to raceEveLiftPass (V189, D38
+// overturned D34's primer); the dress rehearsal is tier A on every row (D34) — you don't
+// lift after simulating the race.
 function _longRunTier(cardio){
   if(!cardio || !cardio.isNRC || !cardio.dose) return null;
   if(!/^long run/i.test(cardio.subtype||'')) return null;
@@ -9100,6 +9371,33 @@ function d18LongRunDayPass(weeks){
       else day.sections=secs;   // tier C: carry ban only; the interference model owns the rest
     });
   });
+}
+// ── V189 (D38): NO LIFTING FROM TWO DAYS OUT THROUGH THE RACE ─────────────────────
+// D34 kept the taper primer on race day; V188 then put a trap bar primer on the day before
+// the shakeout and pushups on race morning. Overturned (Mario, concur): the race and the two
+// days before it carry no lifting at all. Found BY SUBTYPE like the pin, over the last two
+// weeks flattened Monday to Sunday so a race early in its week reaches back into the taper
+// week. The 5K/10K time trial is the race for every reader (V186 S4b) and takes the same
+// pass. A lift-only train day inside the window becomes a rest day; a run day keeps its run,
+// loses its lifting, and is titled for what it is.
+function raceEveLiftPass(weeks, totalWeeks){
+  const flat = [];
+  [totalWeeks-1, totalWeeks].forEach(w => { if(weeks[w]) _ISO_ORDER.forEach(d => flat.push({w,d})); });
+  const ri = flat.findIndex(x => { const day = weeks[x.w][x.d]; return !!(day && day.cardio && /RACE DAY|TIME TRIAL/i.test(day.cardio.subtype||'')); });
+  if(ri < 0) return;
+  // The shakeout is the last run before the race, wherever the rest days put it.
+  let lr = -1; for(let i=ri-1; i>=ri-2 && i>=0; i--){ const d=weeks[flat[i].w][flat[i].d]; if(d && d.cardio && !d.rest){ lr=i; break; } }
+  for(let k=0; k<=2; k++){
+    const x = flat[ri-k]; if(!x) continue;
+    const day = weeks[x.w][x.d]; if(!day || day.rest) continue;
+    if(!day.cardio){ weeks[x.w][x.d] = {title:'Rest',dot:'rest',tags:['rest'],rest:true}; continue; }
+    // Two days out, a tier A post-run mobility block is recovery, not lifting: it stays.
+    const keep = k===2 ? (day.sections||[]).filter(sec => /post-run mobility/i.test(sec.label||'')) : [];
+    day.sections = keep;
+    day.tags = (day.tags||[]).filter(t => t!=='lift' && t!=='hip' && t!=='core');
+    const _rec = /^recovery run/i.test(day.cardio.subtype||'');
+    day.title = k===0 ? 'Race Day' : (_rec && (ri-k)===lr) ? 'Shakeout' : _rec ? 'Easy Run' : keep.length ? day.title : String(day.cardio.subtype||'Run').split(' — ')[0];
+  }
 }
 function singletonSupersetSweep(weeks){
   Object.keys(weeks||{}).forEach(w=>Object.keys(weeks[w]||{}).forEach(d=>{
@@ -9245,10 +9543,10 @@ const RAND_POOLS={
   fatloss:[
     {title:'Cardio Shred',sections:[{label:'Superset A — 4 rounds',superset:true,items:[{name:'Ball slams',detail:'12 reps'},{name:'Burpees',detail:'8 reps'}]},{label:'Superset B — 3 rounds',superset:true,items:[{name:'Jump squats',detail:'15 reps'},{name:'Mountain climbers',detail:'20 reps'}]},{label:'Core',items:[{name:'Ab wheel rollouts',detail:'3×10'},{name:'Dead bugs',detail:'3×12 each'}]}]},
     {title:'The Hurricane',sections:[{label:'Round 1 — 3 sets',superset:true,items:[{name:'Ball slams',detail:'15 reps'},{name:'Burpees',detail:'10 reps'},{name:'Mountain climbers',detail:'20 reps'}]},{label:'Round 2 — 3 sets',superset:true,items:[{name:'Kettlebell swing',detail:'20 reps'},{name:'Broad jumps',detail:'8 reps'},{name:'Plank hold',detail:'30 sec'}]}]},
-    {title:'AMRAP 20 Min',sections:[{label:'As many rounds as possible',superset:true,items:[{name:'Kettlebell swing',detail:'15 reps'},{name:'Pushups',detail:'10 reps'},{name:'Chinups',detail:'5 reps'},{name:'Ball slams',detail:'8 reps'}]}]},
+    {title:'AMRAP 20 Min',sections:[{label:'As many rounds as possible',superset:true,rounds:null,items:[{name:'Kettlebell swing',detail:'15 reps'},{name:'Pushups',detail:'10 reps'},{name:'Chinups',detail:'5 reps'},{name:'Ball slams',detail:'8 reps'}]}]},
     {title:'Sweat Factory',sections:[{label:'5 rounds, 60s rest',superset:true,items:[{name:'Back squat',detail:'10 reps @ RPE 7'},{name:'Barbell row',detail:'10 reps'},{name:'Kettlebell swing',detail:'15 reps'},{name:'Mountain climbers',detail:'20 reps'}]}]},
     {title:'Fight Gone Bad',sections:[{label:'5 stations 1 min each, 3 rounds, 60s rest',superset:true,items:[{name:'Kettlebell swing',detail:'1 min max reps'},{name:'Chinups',detail:'1 min max reps'},{name:'Ball slams',detail:'1 min max reps'},{name:'Pushups',detail:'1 min max reps'},{name:'Jump squats',detail:'1 min max reps'}]}]},
-    {title:'Gut Check',sections:[{label:'EMOM 20 min',superset:true,items:[{name:'Odd min: Kettlebell swings',detail:'15 reps'},{name:'Even min: Pushups',detail:'15 reps'}]},{label:'Finisher — 3 rounds',superset:true,items:[{name:'Ball slams',detail:'12 reps'},{name:'Burpees',detail:'8 reps'}]}]},
+    {title:'Gut Check',sections:[{label:'EMOM 20 min',superset:true,rounds:null,items:[{name:'Odd min: Kettlebell swings',detail:'15 reps'},{name:'Even min: Pushups',detail:'15 reps'}]},{label:'Finisher — 3 rounds',superset:true,items:[{name:'Ball slams',detail:'12 reps'},{name:'Burpees',detail:'8 reps'}]}]},
     {title:'Kettlebell Hell',sections:[{label:'Circuit 4 rounds',superset:true,items:[{name:'Kettlebell swing',detail:'20 reps'},{name:'Kettlebell goblet squat',detail:'15 reps'},{name:'Kettlebell single-arm press',detail:'10 each'},{name:'Ball slams',detail:'10 reps'}]},{label:'Finisher',items:[{name:'Farmer carry',detail:'3×40 yards'},{name:'Plank hold',detail:'3×45 sec'}]}]},
     {title:'1000 Rep Challenge',sections:[{label:'Hit 1000 total reps any order any time',items:[{name:'Pushups',detail:'aim 300'},{name:'Kettlebell swing',detail:'aim 300'},{name:'Chinups',detail:'aim 100'},{name:'Dead bugs or situps',detail:'aim 200'},{name:'Broad jumps',detail:'aim 100'}]}]},
     {title:'Barbell Circuit',sections:[{label:'5 rounds 90s rest — same weight',superset:true,items:[{name:'Deadlift',detail:'8 reps'},{name:'Barbell row',detail:'8 reps'},{name:'Barbell bench press',detail:'8 reps'},{name:'Barbell overhead press',detail:'8 reps'},{name:'Back squat',detail:'8 reps'}]}]},
@@ -9262,12 +9560,12 @@ const RAND_POOLS={
     {title:'Full Body Conditioning',sections:[{label:'4 rounds 90s rest',superset:true,items:[{name:'Deadlift',detail:'8 reps @ RPE 7.5'},{name:'Barbell bench press',detail:'8 reps @ RPE 7.5'},{name:'Chinups',detail:'max reps'},{name:'Ball slams',detail:'10 reps'},{name:'Kettlebell swing',detail:'15 reps'}]}]},
     {title:'Push Pull Shred',sections:[{label:'Push circuit — 3 rounds',superset:true,items:[{name:'Barbell bench press',detail:'10 reps @ RPE 7'},{name:'Diamond pushups',detail:'15 reps'},{name:'Broad jumps',detail:'8 reps'}]},{label:'Pull circuit — 3 rounds',superset:true,items:[{name:'Barbell row',detail:'10 reps'},{name:'Chinups',detail:'max reps'},{name:'Ball slams',detail:'10 reps'}]}]},
     {title:'Hangover Cure',sections:[{label:'Light and easy — just show up',items:[{name:'Barbell bench press',detail:'3×8 @ RPE 7'},{name:'Back squat',detail:'3×8 @ RPE 7'},{name:'Kettlebell swing',detail:'3×15'}]}],note:'Sometimes showing up is the workout.'},
-    {title:'Interval Strength',sections:[{label:'Every 2 min: 5 reps bench + 5 reps squat + 10 swings',superset:true,items:[{name:'Barbell bench press',detail:'5 reps @ RPE 8'},{name:'Back squat',detail:'5 reps @ RPE 8'},{name:'Kettlebell swing',detail:'10 reps'}]},{label:'Do 10 rounds. Rest is whatever is left of the 2 min.',items:[]}]},
+    {title:'Interval Strength',sections:[{label:'Every 2 min: 5 reps bench + 5 reps squat + 10 swings',superset:true,rounds:null,items:[{name:'Barbell bench press',detail:'5 reps @ RPE 8'},{name:'Back squat',detail:'5 reps @ RPE 8'},{name:'Kettlebell swing',detail:'10 reps'}]},{label:'Do 10 rounds. Rest is whatever is left of the 2 min.',items:[]}]},
     {title:'Leg + Cardio Mashup',sections:[{label:'Legs first, then condition',items:[{name:'Back squat',detail:'4×8 @ RPE 7.5'},{name:'Barbell Romanian deadlift',detail:'3×10'},{name:'Kettlebell swing',detail:'5×20'},{name:'Jump squats',detail:'3×15'}]}]},
     {title:'Dumbbell Only Shred',sections:[{label:'Upper lower superset — 4 rounds',superset:true,items:[{name:'Dumbbell bench press',detail:'12 reps'},{name:'Dumbbell row',detail:'12 each'},{name:'Dumbbell goblet squat',detail:'15 reps'},{name:'Dumbbell Romanian deadlift',detail:'12 reps'}]},{label:'Finisher',items:[{name:'Dumbbell curl',detail:'3×15'},{name:'Dumbbell lateral raise',detail:'3×20'}]}]},
-    {title:'EMOM Strength',sections:[{label:'Every min on the min for 20 min',superset:true,items:[{name:'Min 1,4,7,10,13,16,19: Deadlift',detail:'3 heavy reps'},{name:'Min 2,5,8,11,14,17,20: Barbell bench',detail:'5 reps @ RPE 8'},{name:'Min 3,6,9,12,15,18: Kettlebell swings',detail:'15 reps'}]}]},
+    {title:'EMOM Strength',sections:[{label:'Every min on the min for 20 min',superset:true,rounds:null,items:[{name:'Min 1,4,7,10,13,16,19: Deadlift',detail:'3 heavy reps'},{name:'Min 2,5,8,11,14,17,20: Barbell bench',detail:'5 reps @ RPE 8'},{name:'Min 3,6,9,12,15,18: Kettlebell swings',detail:'15 reps'}]}]},
     {title:'Double Kettlebell Complex',sections:[{label:'5 rounds with two KBs — 90s rest',superset:true,items:[{name:'Double kettlebell swing',detail:'10 reps'},{name:'Kettlebell goblet squat',detail:'10 reps'},{name:'Kettlebell single-arm press',detail:'8 each'},{name:'Kettlebell single-arm row',detail:'8 each'},{name:'Farmer carry',detail:'30 yards'}]}]},
-    {title:'The Long Shred',sections:[{label:'30 min AMRAP — pace yourself',superset:true,items:[{name:'Kettlebell swing',detail:'10 reps'},{name:'Pushups',detail:'8 reps'},{name:'Chinups',detail:'4 reps'},{name:'Dumbbell goblet squat',detail:'8 reps'},{name:'Plank hold',detail:'15 sec'}]}]},
+    {title:'The Long Shred',sections:[{label:'30 min AMRAP — pace yourself',superset:true,rounds:null,items:[{name:'Kettlebell swing',detail:'10 reps'},{name:'Pushups',detail:'8 reps'},{name:'Chinups',detail:'4 reps'},{name:'Dumbbell goblet squat',detail:'8 reps'},{name:'Plank hold',detail:'15 sec'}]}]},
     {title:'Oxygen Thief',sections:[{label:'4 rounds — no rest between exercises',superset:true,items:[{name:'Back squat',detail:'15 reps @ RPE 7'},{name:'Barbell row',detail:'15 reps'},{name:'Ball slams',detail:'15 reps'},{name:'Mountain climbers',detail:'20 reps'},{name:'Chinups',detail:'max reps'}]},{label:'90s rest between rounds.',items:[]}]},
     {title:'Staircase Conditioning',sections:[{label:'1 rep → 2 reps → 3 → ... → 10, no rest except at top',items:[{name:'Chinups',detail:'1 rung at a time up to 10'},{name:'Ball slams',detail:'Double the reps each rung: 2,4,6...20'},{name:'Kettlebell swing',detail:'Double: 2,4,6...20'}]}]},
     {title:'Navy Grinder',sections:[{label:'5 rounds, 90s rest',superset:true,items:[{name:'Chinups',detail:'10 reps'},{name:'Pushups',detail:'20 reps'},{name:'Ab wheel rollouts',detail:'10 reps'},{name:'Ball slams',detail:'10 reps'},{name:'Kettlebell swing',detail:'20 reps'}]}]},
@@ -9281,7 +9579,7 @@ const RAND_POOLS={
     {title:'Strongman Saturday',sections:[{label:'Events',items:[{name:'Farmer carry',detail:'5×40 yards, heaviest bells'},{name:'Overhead carry',detail:'3×30 yards each'},{name:'Suitcase carry',detail:'3×40 yards each'}]},{label:'Conditioning',superset:true,items:[{name:'Kettlebell swing',detail:'4×20'},{name:'Ball slams',detail:'4×12'}]}]},
     {title:'Navy Grinder',sections:[{label:'5 rounds 90s rest',superset:true,items:[{name:'Chinups',detail:'10 reps'},{name:'Pushups',detail:'20 reps'},{name:'Ab wheel rollouts',detail:'10 reps'},{name:'Ball slams',detail:'10 reps'},{name:'Kettlebell swing',detail:'20 reps'}]}]},
     {title:'Speed Squat',sections:[{label:'Explosive — jump out of the hole',items:[{name:'Back squat',detail:'8×3, 45s rest — explosive, sub-max (bar speed)'},{name:'Deadlift',detail:'6×2, 45s rest — explosive, sub-max (bar speed)'}]},{label:'Power finish',superset:true,items:[{name:'Broad jumps',detail:'4×6'},{name:'Ball slams',detail:'4×10'}]}]},
-    {title:'Mixed Modal',sections:[{label:'Alternate every 5 min for 30 min',superset:true,items:[{name:'Odd 5 min: Spin bike or run',detail:'Sprint effort'},{name:'Even 5 min: Barbell complex',detail:'DL 5 + Row 5 + Bench 5 + Squat 5 @ RPE 7.5'}]}]},
+    {title:'Mixed Modal',sections:[{label:'Alternate every 5 min for 30 min',superset:true,rounds:null,items:[{name:'Odd 5 min: Spin bike or run',detail:'Sprint effort'},{name:'Even 5 min: Barbell complex',detail:'DL 5 + Row 5 + Bench 5 + Squat 5 @ RPE 7.5'}]}]},
     {title:'Core + Carry Athletic',sections:[{label:'Carry circuit — 3 rounds',items:[{name:'Farmer carry',detail:'50 yards, heavy'},{name:'Suitcase carry',detail:'30 yards each'},{name:'Overhead carry',detail:'30 yards each'}]},{label:'Core — 4 rounds',superset:true,items:[{name:'Ab wheel rollouts',detail:'10 reps'},{name:'Hanging knee raises',detail:'15 reps'},{name:'Plank hold',detail:'45 sec'}]}]},
     {title:'Unilateral Power',sections:[{label:'Single-leg + single-arm',superset:true,items:[{name:'Kettlebell single-leg deadlift',detail:'4×8 each'},{name:'Kettlebell single-arm press',detail:'4×8 each'},{name:'Step-ups (KB)',detail:'4×10 each'}]},{label:'Power',superset:true,items:[{name:'Broad jumps',detail:'4×5'},{name:'Ball slams',detail:'4×10'}]}]},
     {title:'Bodyweight Beast',sections:[{label:'5 rounds',superset:true,items:[{name:'Chinups',detail:'max reps'},{name:'Diamond pushups',detail:'15 reps'},{name:'Dips',detail:'12 reps'},{name:'Hanging knee raises',detail:'15 reps'}]},{label:'Finisher',items:[{name:'L-sit hold',detail:'3×20 sec'},{name:'Plank hold',detail:'3×45 sec'}]}]},
@@ -9296,9 +9594,9 @@ const RAND_POOLS={
     {title:'Triple Threat',sections:[{label:'3 rounds — all heavy, 2 min rest',items:[{name:'Deadlift',detail:'5 reps @ RPE 9'},{name:'Barbell bench press',detail:'5 reps @ RPE 9'},{name:'Back squat',detail:'5 reps @ RPE 8'}]},{label:'Explosive finisher',superset:true,items:[{name:'Broad jumps',detail:'3×5'},{name:'Ball slams',detail:'3×10'}]}]},
     {title:'Active Recovery Athletic',cardio:{type:'run',detail:'2 mi very easy jog'},sections:[{label:'Mobility only',items:[{name:"Worlds greatest stretch",detail:'5 each'},{name:'Hip 90/90 stretch',detail:'10 each'},{name:'Deep squat hold',detail:'3×45 sec'}]}]},
     {title:'Loaded Carries Marathon',sections:[{label:'8 rounds of carry complex',superset:true,items:[{name:'Farmer carry',detail:'40 yards'},{name:'Suitcase carry',detail:'20 yards each'},{name:'Overhead carry',detail:'20 yards each'}]}]},
-    {title:'Power Endurance',sections:[{label:'AMRAP 25 min — pace yourself',superset:true,items:[{name:'Kettlebell swing',detail:'10 reps'},{name:'Chinups',detail:'5 reps'},{name:'Ball slams',detail:'8 reps'},{name:'Broad jumps',detail:'4 reps'}]}]},
+    {title:'Power Endurance',sections:[{label:'AMRAP 25 min — pace yourself',superset:true,rounds:null,items:[{name:'Kettlebell swing',detail:'10 reps'},{name:'Chinups',detail:'5 reps'},{name:'Ball slams',detail:'8 reps'},{name:'Broad jumps',detail:'4 reps'}]}]},
     {title:'Speed + Strength Combo',sections:[{label:'Speed sets (bar moves fast)',items:[{name:'Barbell bench press',detail:'6×3 @ RPE 7 — explosive'},{name:'Back squat',detail:'6×3 @ RPE 7 — explosive'},{name:'Deadlift',detail:'5×2 @ RPE 7 — fast pull'}]},{label:'Power finish',superset:true,items:[{name:'Broad jumps',detail:'4×5'},{name:'Kettlebell swing',detail:'4×10'}]}]},
-    {title:'The Finisher',sections:[{label:'For time — as fast as possible',superset:true,items:[{name:'50 Kettlebell swings',detail:'break as needed'},{name:'40 pushups',detail:'break as needed'},{name:'30 chinups',detail:'break as needed'},{name:'20 broad jumps',detail:'as fast as possible'},{name:'10 ball slams',detail:'as hard as possible'}]}]},
+    {title:'The Finisher',sections:[{label:'For time — as fast as possible',superset:true,rounds:null,items:[{name:'50 Kettlebell swings',detail:'break as needed'},{name:'40 pushups',detail:'break as needed'},{name:'30 chinups',detail:'break as needed'},{name:'20 broad jumps',detail:'as fast as possible'},{name:'10 ball slams',detail:'as hard as possible'}]}]},
     {title:'Weighted Vest Day',cardio:{type:'run',detail:'1.5 mi with weighted vest or rucksack'},sections:[{label:'Bodyweight + load',superset:true,items:[{name:'Pushups',detail:'4×15'},{name:'Chinups',detail:'4×max'},{name:'Dips',detail:'4×12'}]},{label:'Core',items:[{name:'Plank hold',detail:'4×45 sec'},{name:'Hanging knee raises',detail:'4×15'}]}]},
     {title:'Kettlebell Flow',sections:[{label:'4 rounds no rest',superset:true,items:[{name:'Kettlebell clean',detail:'5 each'},{name:'Kettlebell single-arm press',detail:'5 each'},{name:'Kettlebell front squat',detail:'5 each'},{name:'Kettlebell swing',detail:'10 reps'}]},{label:'Core',items:[{name:'Dead bugs',detail:'3×12 each'},{name:'Plank hold',detail:'3×45 sec'}]}]},
     {title:'Threshold Run + Lift',cardio:{type:'run',detail:'1 mi easy + 1 mi tempo + 1 mi easy'},sections:[{label:'Strength post-run',items:[{name:'Back squat',detail:'3×8 @ RPE 7.5'},{name:'Barbell row',detail:'3×10'}]}]},
@@ -9330,7 +9628,7 @@ const RAND_POOLS={
     {title:'Carry Day',sections:[{label:'8 rounds carry complex',superset:true,items:[{name:'Farmer carry',detail:'40 yards'},{name:'Suitcase carry',detail:'20 yards each'},{name:'Overhead carry',detail:'20 yards each'}]},{label:'Core finisher',items:[{name:'Ab wheel rollouts',detail:'3×10'},{name:'Plank hold',detail:'3×45 sec'}]}]},
     {title:'Hinge + Swing Day',sections:[{label:'Hinge work',items:[{name:'Deadlift',detail:'4×5'},{name:'Barbell Romanian deadlift',detail:'3×10'},{name:'Kettlebell single-leg deadlift',detail:'3×8 each'}]},{label:'Swing finisher',items:[{name:'Kettlebell swing',detail:'10×10 — 30s rest between sets'}]}]},
     {title:'Posterior Chain Day',sections:[{label:'All posterior',items:[{name:'Deadlift',detail:'4×5 @ RPE 8'},{name:'Barbell Romanian deadlift',detail:'4×10'},{name:'Kettlebell swing',detail:'5×20'},{name:'Barbell good mornings',detail:'3×12 light'}]}]},
-    {title:'The Grind',sections:[{label:'30 min AMRAP',superset:true,items:[{name:'Barbell bench press',detail:'5 reps @ RPE 7'},{name:'Barbell row',detail:'5 reps'},{name:'Back squat',detail:'5 reps @ RPE 7'},{name:'Kettlebell swing',detail:'10 reps'}]}]},
+    {title:'The Grind',sections:[{label:'30 min AMRAP',superset:true,rounds:null,items:[{name:'Barbell bench press',detail:'5 reps @ RPE 7'},{name:'Barbell row',detail:'5 reps'},{name:'Back squat',detail:'5 reps @ RPE 7'},{name:'Kettlebell swing',detail:'10 reps'}]}]},
     {title:'Arm + Core Day',sections:[{label:'Arms',superset:true,items:[{name:'Chinups',detail:'5×max'},{name:'Dips',detail:'5×max'},{name:'Dumbbell curl',detail:'3×15'},{name:'Close-grip bench press',detail:'3×10'}]},{label:'Core',items:[{name:'Ab wheel rollouts',detail:'4×12'},{name:'Hanging knee raises',detail:'4×15'},{name:'L-sit hold',detail:'3×20 sec'}]}]},
     {title:'Shoulder Day',sections:[{label:'Press volume',items:[{name:'Barbell overhead press',detail:'5×6 @ RPE 8'},{name:'Dumbbell Arnold press',detail:'4×10'},{name:'Barbell push press',detail:'3×8'},{name:'Kettlebell single-arm press',detail:'3×8 each'}]},{label:'Side delt',items:[{name:'Dumbbell lateral raise',detail:'5×20'}]}]},
     {title:'Chaos Workout',sections:[{label:'Pick the next exercise at random — flip a mental coin',superset:true,items:[{name:'Barbell bench OR deadlift',detail:'5×5 @ RPE 8'},{name:'Chinups OR barbell row',detail:'5×6'},{name:'Ball slams OR Kettlebell swings',detail:'5×12'},{name:'Broad jumps OR mountain climbers',detail:'4×10'}]}]},
@@ -9445,7 +9743,12 @@ function dayBeforeStart(prog, week, d){
   if(!prog||!prog.startDate) return false;
   const dt = _progDayDate(prog, week, d); if(!dt) return false;
   const sd = _parseLocalDate(prog.startDate); if(!sd) return false;
-  return dt < sd;
+  if(dt < sd) return true;
+  // V188 (D14a): on a race-aligned program the weeks before the day it was created are
+  // behind the athlete — same cell, same exclusions, not missed. Only alignment writes
+  // blockOpen, so a manual setProgStart back-date keeps V174 behaviour.
+  if(prog.blockOpen){ const bo = _parseLocalDate(prog.blockOpen); if(bo && dt < bo) return true; }
+  return false;
 }
 // D26: a program whose start is not a Monday has a short week 1. Accumulating Progress
 // metrics (sums, maxes) skip it the way they skip the D6 cut week — a 2-day week is not
@@ -9583,9 +9886,14 @@ function sessionTimeEst(day){
     var L=((sec&&sec.label)||'').toLowerCase();
     var isMain=/^main\b|^primer|^power\b|^strength\b/.test(L);
     var isSuper=!!(sec&&sec.superset)||/superset|rounds|circuit|conditioning/.test(L);
+    // V190 (D39): this carried its own copy of the banner's broken regex — same
+    // `^(\d+)×`, same hardcoded 3 — so 21.9% of items were counted as 3 sets when they
+    // were 2 or 4, and 45.7% of days shipped a wrong estimate. Item first (it holds the
+    // true per-item count in BOTH grammars now), then the section, and only then 3.
+    var _secR=_secRounds(sec);
     ((sec&&sec.items)||[]).forEach(function(it){
-      var m=(it.detail||'').match(/^(\d+)\s*[x\u00d7]/);
-      var sets=m?parseInt(m[1]):3;
+      var sets=_itemSets(it.detail);
+      if(sets==null) sets=(_secR!=null?_secR:3);
       var n=(it.name||'').toLowerCase();
       if(/stretch|mobility|90\/90|foam|worlds greatest/.test(n)) mins+=sets*0.75;
       else if(/carry/.test(n)) mins+=sets*1.2;
@@ -9899,6 +10207,13 @@ function renderWeekView(){
     if(activeProg.startDate){ sdd.textContent=new Date(activeProg.startDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); sdd.classList.remove('is-unset'); }
     else { sdd.textContent='Set date'; sdd.classList.add('is-unset'); }
   }
+  // V188 (D14a): on a race-aligned program the start is derived, so the Race Day control
+  // takes the start control's place — the race date is the one field alignment makes
+  // load-bearing (Mario's own Dec 5 → Dec 6 slip is the use case).
+  { const _c=activeProg.cfg||{}; const _al=progAlignment(activeProg);
+    const sw=document.querySelector('.wk-subrow .wk-startdate[aria-label="Program start date"]'); const rw=document.getElementById('raceDateWrap');
+    if(rw){ rw.style.display=_al?'flex':'none'; const ri=document.getElementById('raceDateInput'); if(ri) ri.value=_c.raceDate||''; const rd=document.getElementById('raceDateDisplay'); if(rd&&_al) rd.textContent=_fmtStartDay(_al.raceIso,true); }
+    if(sw) sw.style.display=_al?'none':'flex'; }
 
   const order=['mon','tue','wed','thu','fri','sat','sun'];
   const wkData=activeProg.weeks[currentWeek];
@@ -10032,6 +10347,57 @@ function renderWeekView(){
 function liftRpeKeyHTML(){
   return '<div class="rpe-legend"><i>Rate of Perceived Exertion (RPE) is how hard a set should feel \u2014 10 means all-out, nothing left. Each lift tells you how many reps to keep in the tank.</i></div>';
 }
+// ── V190 (D39): THE SECTION OWNS THE ROUND COUNT ──────────────────────
+// A superset's round count and its members' set count were always ONE number.
+// vsets(3) at the call site means "3 rounds of this pair"; it was stamped onto each
+// member's detail string because the string was the only carrier a section had, and
+// three separate readers then tried to recover it with `^(\d+)×` — a regex that does
+// not know the no-load grammar (`N sets — RPE x`) that bodyweightSweep rewrites 21.9%
+// of items into. All three fell to a hardcoded 3. Measured over 1,260 builds / 85,977
+// superset sections: 41.2% of banners fabricated, 29.5% contradicted their own members;
+// 45.7% of training days shipped a wrong time estimate (mean 4.3 min, worst 6.4).
+// The number now lives on the section, written once by the author.
+// `rounds: null` is an AUTHORED claim that the block has no round count (AMRAP, a 1RM
+// attempt, a pyramid, for-time). OMITTED is the legacy signal — sections built before
+// V190 and restored from ia_hist_ or the creation-day prog.weeks. Legacy recovers the
+// real number from the members: BOTH grammars, and the MIN across them (never items[0],
+// which stamped one member's number over the rest). Nothing parses → no number, and the
+// header falls back to the section's own label rather than inventing one. There is no
+// fallback constant anywhere in this path.
+function _itemSets(d){
+  var s=String(d||''), m=s.match(/^(\d+)\s*[x\u00d7]/);
+  if(m) return parseInt(m[1],10);
+  m=s.match(/^(\d+)\s*sets?\b/i);
+  return m?parseInt(m[1],10):null;
+}
+function _secRounds(sec){
+  if(!sec) return null;
+  if(sec.rounds===null) return null;
+  if(typeof sec.rounds==='number'&&sec.rounds>0) return sec.rounds;
+  var lr=String(sec.label||'').match(/(\d+)\s*round/i);
+  if(lr) return parseInt(lr[1],10);
+  var c=(sec.items||[]).map(function(it){return _itemSets(it&&it.detail);})
+                       .filter(function(v){return v!=null;});
+  return c.length?Math.min.apply(null,c):null;
+}
+// Display-only. The leading count comes OFF the rendered string and stays IN the data:
+// parseRx has five callers, and the add-sheet's day set-count (sessionAddSheet) sums
+// member details and is CORRECT today — it was the banner that was wrong, not them.
+// Stripping the count from the data would break a working reader to fix a broken one.
+function _stripLeadingSets(d){
+  return String(d||'')
+    .replace(/^(\d+)\s*[x\u00d7]\s*/,'')
+    .replace(/^(\d+)\s*sets?\s+of\s+/i,'')
+    .replace(/^(\d+)\s*sets?\s*(?:\u2014|\u2013|-)\s*/i,'')
+    .replace(/^(\d+)\s*sets?\b\s*/i,'');
+}
+function _setLeadingSets(d,n){
+  var s=String(d||''), m=s.match(/^(\d+)\s*[x\u00d7]/);
+  if(m) return n+s.slice(m[1].length);
+  m=s.match(/^(\d+)\s*sets?\b/i);
+  if(m) return n+s.slice(m[1].length);
+  return s;
+}
 function buildSectionsHTML(sections,baseIdx){
   const all=sections||[];
   const _base=baseIdx||0;
@@ -10071,10 +10437,8 @@ function buildSectionsHTML(sections,baseIdx){
       // says. Generation now never emits one, but days frozen into ia_hist_ before V175
       // can still carry the flag; they fall through to straight sets below.
       const labelHasRounds=/round/i.test(sec.label||'');
-      const firstDetail=sec.items?.[0]?.detail||'';
-      const setsMatch=firstDetail.match(/^(\d+)[x\xd7]/);
-      const labelRounds=(sec.label||'').match(/(\d+)\s*round/i);
-      const rounds=labelRounds?parseInt(labelRounds[1]):(setsMatch?parseInt(setsMatch[1]):3);
+      // V190 (D39): one resolver, no regex here, no fallback constant. May be null.
+      const rounds=_secRounds(sec);
       // V162 (rulings R2/D1): the header minus still takes the whole round, and now each
       // row inside carries its own minus too — a skipped member drops out and the round
       // continues with what is left. At ONE survivor the round protocol means nothing,
@@ -10083,7 +10447,10 @@ function buildSectionsHTML(sections,baseIdx){
       const _live=(sec.items||[]).filter(function(it){return it&&!it._skipped;});
       if(_live.length===1&&(sec.items||[]).length>1){
         const _sv=_live[0], _d=_sv.detail||'';
-        const _mapped=/^\d+\s*[x\xd7]/.test(_d)?_d:(_d?(rounds+'\xd7'+_d.replace(/^(\d+)\s*reps?\b/,'$1')):(rounds+' sets'));
+        // V190 (D39): with no honest round count there is nothing to multiply by, so the
+        // survivor keeps its own prescription — which already carries its true set count.
+        const _mapped=(rounds==null||/^\d+\s*[x\xd7]/.test(_d))?_d
+          :(_d?(rounds+'\xd7'+_d.replace(/^(\d+)\s*reps?\b/,'$1')):(rounds+' sets'));
         h+=`<div class="section-label" style="color:var(--muted)">${esc(sec.label||'Round')} \u2014 reduced to straight sets</div><div class="section-block">`;
         sec.items.forEach((i2,_ii)=>{
           if(i2._skipped){h+=buildExItem(i2,_secIdx,_ii);return;}
@@ -10092,10 +10459,16 @@ function buildSectionsHTML(sections,baseIdx){
         h+=`</div></div>`;
         return h;
       }
-      const hdrTxt=labelHasRounds?(sec.label||''):`${rounds} Rounds — no rest between exercises · ${rounds<=2?90:60}s rest between rounds`;
+      // V190 (D39): the header shows the section LABEL; the round-protocol sentence is
+      // synthesized only when there is a real N. A block that cannot state its round
+      // count no longer claims one — it keeps its label and its orange wrap.
+      const hdrTxt=(labelHasRounds||rounds==null)?(sec.label||'')
+        :`${rounds} Rounds — no rest between exercises · ${rounds<=2?90:60}s rest between rounds`;
       h+=`<div class="superset-wrap"><div class="superset-header"><span class="sshdr-txt">${hdrTxt}</span>`
         +`<button class="ss-minus" onclick="skipSuperset(${_secIdx})" aria-label="Skip this round">`+asyIcon('minus',15)+`</button></div>`;
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii);});
+      // The block owns the set dimension, so the rows inside state reps and effort only.
+      // Data is untouched — this is the rendered string.
+      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii,rounds);});
       h+=`</div>`;
     } else {
       h+=`<div class="section-block">`;
@@ -10560,7 +10933,11 @@ function exControlFlags(sec,itemIdx,it){
   const canSkip=!isNote&&!isMainSlot;
   return {isNote:isNote,inSS:inSS,isMainSlot:isMainSlot,canSwap:canSwap,canSkip:canSkip};
 }
-function buildExItem(i,secIdx,itemIdx){
+function buildExItem(i,secIdx,itemIdx,_ssRounds){
+  // V190 (D39): inside a block that draws a round count, the row states reps and effort
+  // only — the count is on the header. `_dispDetail` is the RENDERED string; i.detail is
+  // left alone so parseRx and every one of its five callers see what they always saw.
+  const _dispDetail=(_ssRounds!=null&&!i._skipped)?_stripLeadingSets(i.detail||''):(i.detail||'');
   const exKey=exStoreKey(i.name);
   // A skipped item renders as a struck-through stub instead of a card. It is NOT removed
   // from the day: keeping it visible is what distinguishes "the engine never programmed
@@ -10629,7 +11006,7 @@ function buildExItem(i,secIdx,itemIdx){
     +(_canSwap?'<button type="button" class="ex-swapbtn" aria-label="Swap this exercise" onclick="openSwapSheet('+secIdx+','+itemIdx+')">'+asyIcon('swap',16)+'</button>':'')
     +(_canSkip?'<button type="button" class="ex-skipbtn" aria-label="Skip this exercise" onclick="skipExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\')">'+asyIcon('minus',16)+'</button>':'')
     +'<span class="ex-badge" id="exbadge_'+exKey+'">'+(loggedThisDay?'\u2713':'')+'</span></div>'
-    +(i.detail?'<div class="ex-detail">'+i.detail+'</div>':'')
+    +(_dispDetail?'<div class="ex-detail">'+_dispDetail+'</div>':'')
     +(i._addedByUser?'<div class="ex-swapchip"><span class="ex-swapchip-lbl">YOU ADDED THIS</span> \u00b7 not in the plan'
       +'<button type="button" class="ex-swapundo" onclick="removeAddedExercise(\''+(i.name||'').replace(/'/g,"\\'")+'\')">remove</button></div>':'')
     +(_swappedFrom?'<div class="ex-swapchip"><span class="ex-swapchip-lbl">SWAPPED IN</span> for '+_swappedFrom
@@ -12382,6 +12759,25 @@ function setCardioSwap(sport){
 function copyExport(){
   const txt=document.getElementById('exportText')?.innerText||'';
   navigator.clipboard.writeText(txt).then(()=>showToast('Copied ✓')).catch(()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Copied ✓');});
+}
+// V188 (D14a): alignment of a built program, from its stored cfg.
+function progAlignment(p){
+  const c=p&&p.cfg; if(!c||!c.cardioTypes||!c.cardioTypes.includes('run')||!c.cardioGoals||!c.cardioGoals.run) return null;
+  return raceAlignment(c.cardioGoals.run.id, c.raceDate, c.eventTargeted!==false);
+}
+function setProgRace(dateStr){
+  if(!dateStr||!activeProg||!activeProg.cfg) return;
+  const before=activeProg.cfg.raceDate;
+  activeProg.cfg.raceDate=dateStr;
+  const _al=progAlignment(activeProg);
+  if(!_al){ activeProg.cfg.raceDate=before; showToast('That date didn\u2019t resolve'); return; }
+  activeProg.startDate=_al.start;   // blockOpen stays — the weeks behind you don't move
+  const programs=getPrograms();const idx=programs.findIndex(p=>p.id===activeProgId);
+  if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
+  activeProg=refreshProgram(activeProg);   // untrained weeks re-pin; trained weeks stay frozen
+  currentWeek=calcCurrentWeek();
+  showToast('Race day '+_fmtStartDay(_al.raceIso)+' \u2014 plan starts '+_fmtStartDay(_al.start)+' \u2713');
+  renderWeekView();
 }
 function setProgStart(dateStr){
   if(!dateStr||!activeProg) return;

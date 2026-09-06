@@ -1,0 +1,10 @@
+[
+  {"name": "race pin removed (should trip g000 race-day assertion)",
+   "anchor": "const NRC_GOALS = new Set(['run_5k', 'run_10k', 'run_half', 'run_marathon']);",
+   "replacement": "const NRC_GOALS = new Set([]);",
+   "gate": "gates/g000_boot.js"},
+  {"name": "no-op mutation (must report NOT-APPLIED, not SURVIVED)",
+   "anchor": "THIS ANCHOR DOES NOT EXIST IN THE FILE",
+   "replacement": "x",
+   "gate": "gates/g000_boot.js"}
+]
