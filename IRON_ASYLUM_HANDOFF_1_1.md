@@ -164,6 +164,39 @@ Mario ruled "exclude" for the current week. It does NOT apply uniformly, and app
 A superset section carries `rounds`. It is written at the call site from the SAME expression that writes the members (`vsets(3)`, `hsets`), so the block and its rows can never disagree by construction. `_secRounds(sec)` is the single resolver and has **no fallback constant**: an authored number wins; `rounds: null` is an authored claim that the block has no round count (AMRAP, EMOM, a clock, for-time, a max-effort attempt) and suppresses the banner; then a round count stated in the label; then — for legacy sections restored from `ia_hist_` or the creation-day `prog.weeks`, which predate the field — the **min** across members parsing BOTH grammars (`N×reps` and `N sets — RPE x`); then null. Min, never `items[0]`, because min can only ever under-state and never inflate above a capped member. Measured: 49,281/49,281 legacy generator sections recover their real number, so the null tail is reachable only from the preset library.
 The header shows the section **label**; the "N Rounds — no rest between exercises · Ns rest between rounds" sentence is synthesized only when there is a real N. Member rows render reps and effort only — `_stripLeadingSets` acts on the **rendered** string; `item.detail` is left alone because `parseRx` has five callers and one of them (the add sheet's day set-count) reads the true number off the members and was correct all along. `sessionTimeEst` and the renderer read the same resolver. `preventionDoseSweep` halves `sec.rounds` for a superset and normalises every member to it with `_setLeadingSets`; non-superset accessories keep the original per-item rewrite.
 
+**The V190 defect rates, re-measured against the true previous build (post-ship correction).** The
+figures quoted in the V190 header paragraph, the digest line and §11f were measured model-vs-model on
+an eleven-times-smaller lattice, and three of them do not describe what shipped. Re-run over 9,450
+configs per build against **V189** (`tests/measure/v190_rounds.js`; V189 recovered and now kept in
+`baselines/`), denominators identical on both builds at 560,437 superset sections / 559,140 training
+days — which is itself the finding that D39 changed content and not structure:
+
+| | V189 | V190 |
+|---|---|---|
+| banner sourced from the constant 3 | 203,582 / 560,437 — 36.3% | 0 |
+| FABRICATED (constant landed on a number the athlete could see was wrong) | 141,324 — 25.2% | 0.0% |
+| CONTRADICTED (banner disagrees with its own members) | 146,207 — 26.1% | 0.0% |
+| DESYNCED (members disagree with each other) | 4,883 — 0.9% | 0.0% |
+| WRONG-DURATION, as shipped (`sessionTimeEst` rounds to 5 min) | 152,546 / 559,140 — 27.3%, mean 6.0 min, worst 15 | 0.0% |
+| WRONG-DURATION, model-vs-model unrounded | 268,069 — 47.9%, mean 3.4 min, worst 13.2 | — |
+
+**Read both duration rows or neither.** 47.9% is the honest measure of how broken the logic was;
+27.3% is the honest measure of what the athlete lived with. The originally recorded “45.7% of days,
+mean 4.3 min, worst 6.4” is the unrounded pair and **cannot describe a shipped value** — the estimate
+rounds to 5 minutes, so every error an athlete can see is a multiple of 5 and a 4.3-minute mean is
+arithmetically impossible against it. The true worst case is also uglier than recorded:
+`body_only / support_prevention / beginner / bodyweight` W3 Friday shipped **est=50 against an oracle
+of 35**, not 6.4 on a card reading 75. The desync segmentation reproduces exactly in shape —
+**4,883/81,507 (6.0%) confined to `support_prevention`, 0/469,830 across the other six focuses** — and
+the cause is narrower than §11f states: the sweep’s trigger digit is a hardcoded 3, and only
+`intermediate` authors a base dose of `3×`, so every desync in the file lives in the single cell
+`support_prevention × intermediate`. Beginner (`2×`) and advanced (`4×`) were silent because the sweep
+never fired, not because they were correct.
+
+The V190 code comments at `index.html` ~9891 and ~10357 still carry the old figures. Left alone on
+purpose: editing them is an app change and would need an `ia-version` bump for a comment. Fold into
+the next build that touches the block (§12).
+
 ## 5b. Injury overlays — slot deconfliction & the rehab day (V111)
 Pool overrides substitute at the **pool** level, so several slots can end up pointed at the same narrow pool. Three layers now stop that becoming duplicate output:
 
@@ -800,6 +833,24 @@ Rulings already made, with the reasoning that produced them. Reopening one of th
 
 ## 12. Open / carried forward
 
+- **The V190 gate set exists now, and here is what it does NOT cover.** `tests/gates/g190_rounds.js`
+(12 families, 47 assertions), `tests/sabotage/v190.json` (8 mutations) and `tests/measure/v190_rounds.js`
+were reconstructed and committed after the fact — the originals were never committed, so between V190
+and that session nothing enforced D39. Proven: `PASS 47 FAIL 0` on V190 and an identical `PASS 9 FAIL 38`
+on V187, V188 and V189, which is the isolation proof (three builds differing by D14a/D36/D37/D38, one
+result). Blast radius V189→V190 is 28 hunks +146/−55, **28/28 classified**, and the handoff's "23
+generator call sites" and "9 preset `rounds:null`" both verify exactly. **The holes, all real:**
+(1) the **legacy and `rounds:null` tails of `_secRounds` are never exercised** — across 560,437 swept
+superset sections, 0 carry `rounds:null`, 0 are legacy, 0 state a count in the label, so §5r's
+"49,281/49,281 legacy sections recover their real number" and D39-ii's 9 preset blocks are untested by
+any fresh-build sweep; they need sections restored from `ia_hist_` or a creation-day `prog.weeks`
+snapshot, plus a sweep of the preset library. (2) The `_live.length===1` demote-to-straight-sets branch
+(~`index.html:10450`) needs a synthetic skip to reach. (3) `parseRx`'s five callers, and specifically
+the add-sheet day set-count that D39-v was written to protect, are unmeasured — the argument that
+`item.detail` is untouched is sound but it is an argument, not a measurement. (4) `G11c` in the gate is
+vacuous both ways (no baseline strips, no mutation reaches it) — the weakest row in the file, sharpen
+or delete it. (5) The lattice varies `restDays` only; no 3-day or 6-day `days`, no injury or travel
+overlay, no age bracket but 18-35, no multi-sport `cardioTypes`.
 - **V190 watch items.** (1) **The budget and the dose have to agree, and only one invariant now enforces it.** G12 asserts no member is charged above its section's `rounds`; nothing yet asserts the converse (a member charged BELOW the section, which would under-spend the budget). Not observed — add the assertion if a pass is ever written that lowers a member without lowering the section. (2) `recoveryDeload`'s power cut still uses the bare `^(\d+)×` and silently no-ops on the `N sets` grammar. Currently harmless — `_BW_KEEP_FIXED` exempts jump/bound/pogo so power items never reach the no-load rewrite — but that is a coincidence of two unrelated regexes, not a guarantee. Route it through `_itemSets` next time the power block is touched. (3) The `hsets` sites (Delts, Triceps, Biceps, Leg isolation) are `advanced?4:3` and ignore `volMod` entirely, while every `vsets` site applies experience × age × support modifiers. Both members of each `hsets` section share the expression so nothing desyncs, but a 55+ athlete gets an age-adjusted `vsets` block next to an un-adjusted `hsets` block on the same card. Not ruled. (4) `'Leg circuit — runner armor'` is authored with a literal `'2×10 each'` and now a literal `rounds:2`; it is the one generator site that bypasses `vsets`. Intentional as far as anyone knows, but it will not track a future volume-modifier change.
 - **V190 blast-radius classification (retain until the next prevention build).** 1,080 hunks / 756 configs / 36 differing, all `support_prevention`, three classes one root: **1,075** D2 normalisation (`Ball slams 3×15 → 2×15` — the ballistic members the old per-item regexes could not reach); **4** section-count and **1** item-count, both from `capSessionBudget` totalling `_setCount(it.detail)` — V189 charged the budget 3 sets for a member D2 had refused to prescribe above 2, and paid for it by evicting `Terminal knee extension (band)`, leaving `Chest + knee` a singleton and an orphaned empty-label section behind it. V190 keeps the prehab. Coaching-correct in both directions; the invariant is now G12.
 
