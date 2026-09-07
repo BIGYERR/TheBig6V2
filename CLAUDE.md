@@ -12,17 +12,21 @@ test goals (pace, mile, 1.5-mile, base) and Nike Run Club plans for race goals (
 marathon). Deployed by GitHub Pages at https://bigyerr.github.io/TheBig6V2/ . iOS-only PWA.
 Mario is the sole developer, product owner and primary user.
 
-## Roles (three subagents, see .claude/agents/)
+## Roles (four subagents, see .claude/agents/)
+- **measure** — read-only. Owns the before-picture. Proves a reported bug at the reporter's seed, sweeps a lattice, names the root cause and every other reader of the same value. Reports numbers with denominators. Never rules, never proposes a fix.
 - **coach** — read-only. Owns coaching correctness and doctrine. Rules on WHAT should ship.
 - **builder** — read/write. Owns the edit. Writes anchor-asserted edit scripts. Never invents a ruling.
 - **gatekeeper** — read + bash, never edits. Owns proof. Runs `tests/gate.sh`, sabotage, blast radius, fuzz.
 **Gatekeeper blocks ship.** No version is done until gatekeeper reports ALL GATES PASS on the final
 artifact, every sabotage TRIPPED with 0 NOT-APPLIED / 0 CRASH, and every diff hunk is classified.
-The main session orchestrates and talks to Mario; it does not do the builder's or gatekeeper's job inline.
+The main session orchestrates and talks to Mario; it does not do measure's, builder's or gatekeeper's job inline.
+**coach rules against evidence coach did not gather** — measure runs before the ruling, not inside it.
+Builder is the only agent holding `Edit`/`Write`. coach, measure and gatekeeper are pinned to opus:
+their output is judgement no gate can check (coach), or the judgement that a gate is lying (gatekeeper).
 
 ## Session rhythm (do not skip steps)
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it.
-2. **Measure before designing.** Run the harness across the relevant configs and print the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`).
+2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `v<N>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience.
 4. Builder ships: anchor-asserted edits (every anchor `count==1` before writing), `ia-version` bumped by ONE, exactly when Mario says so.
 5. Gatekeeper proves it: `tests/gate.sh index.html <baseline>` + `tests/sabotage.py` + fuzz. Green or a NAMED failing gate.
