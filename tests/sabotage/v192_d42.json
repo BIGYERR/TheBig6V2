@@ -1,0 +1,50 @@
+[
+ {
+  "name": "M1 -> G1a/G1z/G3 elbow-workaround: classify the press VERTICAL instead of horizontal",
+  "anchor": "/^landmine rotational press$/.test(N)) return 'hpress';",
+  "replacement": "/^landmine rotational press$/.test(N)) return 'vpress';",
+  "gate": "gates/g192_landmine_rotpress.js"
+ },
+ {
+  "name": "M2 -> G4b: move the rule BELOW the core-exempt alternation, where /rotation/ eats it",
+  "anchor": "  if(/^landmine rotational press$/.test(N)) return 'hpress';\n  if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation|curl-up/.test(N)) return null; // core, exempt",
+  "replacement": "  if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation|curl-up/.test(N)) return null; // core, exempt\n  if(/^landmine rotational press$/.test(N)) return 'hpress';",
+  "gate": "gates/g192_landmine_rotpress.js"
+ },
+ {
+  "name": "M3 -> G4c: drop the ^...$ anchors, leaving a loosened substring regex",
+  "anchor": "/^landmine rotational press$/",
+  "replacement": "/landmine rotational press/",
+  "gate": "gates/g192_landmine_rotpress.js"
+ },
+ {
+  "name": "M4 -> G1b: generalise the rule so the rotational CORE drill reaches it",
+  "anchor": "if(/^landmine rotational press$/.test(N))",
+  "replacement": "if(/^landmine rotation/.test(N))",
+  "gate": "gates/g192_landmine_rotpress.js"
+ },
+ {
+  "name": "M5 -> G3 lowback/protect: remove the name filter from the protect tier",
+  "anchor": "|pull through|landmine rotational/i;",
+  "replacement": "|pull through/i;",
+  "gate": "gates/g192_landmine_rotpress.js"
+ },
+ {
+  "name": "M6 -> G3 lowback/workaround: remove the name filter from the workaround tier",
+  "anchor": "swing|pendlay|landmine rotational/i;",
+  "replacement": "swing|pendlay/i;",
+  "gate": "gates/g192_landmine_rotpress.js"
+ },
+ {
+  "name": "M7 -> G2a/G2b: the name never reaches the shoulder pool",
+  "anchor": "'Barbell push press','Landmine rotational press'],",
+  "replacement": "'Barbell push press'],",
+  "gate": "gates/g192_landmine_rotpress.js"
+ },
+ {
+  "name": "M8 -> G6/G4d: name filter written as 'landmine rotation', which collaterally eats the core drill",
+  "anchor": "|pull through|landmine rotational/i;",
+  "replacement": "|pull through|landmine rotation/i;",
+  "gate": "gates/g192_landmine_rotpress.js"
+ }
+]

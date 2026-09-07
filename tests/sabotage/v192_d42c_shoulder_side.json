@@ -1,0 +1,50 @@
+[
+ {
+  "name": "M1 -> g192_shoulder_side S1: heavy push Main pairing loses the suffix",
+  "anchor": "{name:ex.shoulder[0],detail:vsets(3)+'×8'+(_isOneArmPress(ex.shoulder[0])?' each':'')}]});",
+  "replacement": "{name:ex.shoulder[0],detail:vsets(3)+'×8'}]});",
+  "gate": "gates/g192_shoulder_side.js"
+ },
+ {
+  "name": "M2 -> g192_shoulder_side S2: light push Main pairing loses the suffix",
+  "anchor": "{name:ex.shoulder[1],detail:vsets(3)+'×12'+(_isOneArmPress(ex.shoulder[1])?' each':'')}]});",
+  "replacement": "{name:ex.shoulder[1],detail:vsets(3)+'×12'}]});",
+  "gate": "gates/g192_shoulder_side.js"
+ },
+ {
+  "name": "M3 -> g192_shoulder_side S3: Accessory superset loses the suffix",
+  "anchor": "{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});",
+  "replacement": "{name:_sp.b,detail:vsets(3)+'×15'}]});",
+  "gate": "gates/g192_shoulder_side.js"
+ },
+ {
+  "name": "M4 -> g192_shoulder_side S3 negative control: Accessory tests the CHEST leg, not the shoulder pick",
+  "anchor": "{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});",
+  "replacement": "{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.a)?' each':'')}]});",
+  "gate": "gates/g192_shoulder_side.js"
+ },
+ {
+  "name": "M5 -> g192_shoulder_side: the one-hand table forgets the kettlebell press",
+  "anchor": "const _PRESS_PER_SIDE={'Kettlebell single-arm press':1,'Landmine rotational press':1};",
+  "replacement": "const _PRESS_PER_SIDE={'Landmine rotational press':1};",
+  "gate": "gates/g192_shoulder_side.js"
+ },
+ {
+  "name": "M6 -> g192_shoulder_side: the one-hand table forgets the landmine press",
+  "anchor": "const _PRESS_PER_SIDE={'Kettlebell single-arm press':1,'Landmine rotational press':1};",
+  "replacement": "const _PRESS_PER_SIDE={'Kettlebell single-arm press':1};",
+  "gate": "gates/g192_shoulder_side.js"
+ },
+ {
+  "name": "M7 -> g192_shoulder_side negative control: the table swallows two-hand presses too",
+  "anchor": "function _isOneArmPress(name){ return !!_PRESS_PER_SIDE[String(name||'').trim()]; }",
+  "replacement": "function _isOneArmPress(name){ return /press/i.test(String(name||'').trim()); }",
+  "gate": "gates/g192_shoulder_side.js"
+ },
+ {
+  "name": "M8 -> g192_shoulder_side negative control: every shoulder pick claims a side",
+  "anchor": "function _isOneArmPress(name){ return !!_PRESS_PER_SIDE[String(name||'').trim()]; }",
+  "replacement": "function _isOneArmPress(name){ return !!String(name||'').trim(); }",
+  "gate": "gates/g192_shoulder_side.js"
+ }
+]

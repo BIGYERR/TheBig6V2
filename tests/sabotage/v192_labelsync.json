@@ -1,0 +1,44 @@
+[
+ {
+  "name": "M1 -> g192_labelsync: the sync branch can never fire (condition inverted)",
+  "anchor": "      if(name!==it.name && label && label.indexOf(it.name)>=0) label=label.split(it.name).join(name);",
+  "replacement": "      if(name===it.name && label && label.indexOf(it.name)>=0) label=label.split(it.name).join(name);",
+  "gate": "gates/g192_labelsync.js"
+ },
+ {
+  "name": "M2 -> g192_labelsync: the synced heading is computed but never emitted",
+  "anchor": "    if(items.length) out.push(label===s.label?{...s,items}:{...s,label,items});",
+  "replacement": "    if(items.length) out.push({...s,items});",
+  "gate": "gates/g192_labelsync.js"
+ },
+ {
+  "name": "M3 -> g192_labelsync: sync runs backwards (new name replaced by the old one)",
+  "anchor": "      if(name!==it.name && label && label.indexOf(it.name)>=0) label=label.split(it.name).join(name);",
+  "replacement": "      if(name!==it.name && label && label.indexOf(name)>=0) label=label.split(name).join(it.name);",
+  "gate": "gates/g192_labelsync.js"
+ },
+ {
+  "name": "M4 -> g192_labelsync: heading is rewritten on a substring, so a generic heading is mangled",
+  "anchor": "      if(name!==it.name && label && label.indexOf(it.name)>=0) label=label.split(it.name).join(name);",
+  "replacement": "      if(name!==it.name && label) label=(label.split(it.name).join(name))+' — '+name;",
+  "gate": "gates/g192_labelsync.js"
+ },
+ {
+  "name": "M5 -> g192_labelsync: D43 swap map emptied, the shoulder tier stops substituting",
+  "anchor": "      P.swapNames={'Dumbbell bench press':'Dumbbell floor press'};",
+  "replacement": "      P.swapNames=null;",
+  "gate": "gates/g192_labelsync.js"
+ },
+ {
+  "name": "M6 -> g192_labelsync: spine-safe core swap loses the ab wheel row",
+  "anchor": "  const SPINE_SWAP={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs'};",
+  "replacement": "  const SPINE_SWAP={'Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs'};",
+  "gate": "gates/g192_labelsync.js"
+ },
+ {
+  "name": "M7 -> g192_labelsync: the swap leaks into healthy programs (overlay guard removed)",
+  "anchor": "  const inj=cfg&&cfg.injury;\n  if(!inj||!inj.region||!INJURY_REGIONS[inj.region]) return null;",
+  "replacement": "  const inj=(cfg&&cfg.injury)||{region:'shoulder',tier:'workaround'};\n  if(!inj||!inj.region||!INJURY_REGIONS[inj.region]) return null;",
+  "gate": "gates/g192_labelsync.js"
+ }
+]

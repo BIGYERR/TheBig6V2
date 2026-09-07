@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="191"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="192"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1525,13 +1525,17 @@ function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg
 // EXERCISE LIBRARY
 const EXLIB={
   chest_compound:['Barbell bench press','Incline barbell press','Close-grip bench press','Dumbbell bench press'],
-  chest_acc:['Dumbbell incline press','Dumbbell bench press','Dips','Pushups (slow tempo)','Diamond pushups','Dumbbell decline press'],
-  chest_acc_joint:['Dumbbell incline press','Dumbbell bench press','Machine chest press','Cable crossover','Pec deck','Dumbbell decline press'],
+  chest_acc:['Dumbbell incline press','Dumbbell bench press','Dips','Pushups (slow tempo)','Diamond pushups','Dumbbell decline press','Dumbbell floor press'],
+  chest_acc_joint:['Dumbbell incline press','Dumbbell bench press','Machine chest press','Cable crossover','Pec deck','Dumbbell decline press','Dumbbell floor press'],
   back_compound:['Deadlift','Trap bar deadlift','Sumo deadlift','Barbell Romanian deadlift'],
   back_row:['Barbell row','Pendlay row','Kettlebell single-arm row','Dumbbell row'],
   back_pull:['Chinups','Weighted chinups','L-sit chinups','Neutral-grip chinups'],
   back_pull_joint:['Lat pulldown','Assisted pullups','Neutral-grip pulldown','Straight-arm pulldown'],
-  shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press'],
+  // V192 (D42): landmine rotational press — a pressing movement that starts at the
+  // shoulder and finishes forward at chest height, driven by hip rotation. It lives in
+  // the shoulder pool because the pattern is a press, not a core drill; _pattern reads
+  // it as 'hpress' for exactly that reason.
+  shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press','Landmine rotational press'],
   shoulder_iso:['Dumbbell lateral raise','Cable lateral raise','Dumbbell front raise','Dumbbell rear delt fly','Face pull'],
   // BODYWEIGHT DELT ISOLATION (V127). Every entry in shoulder_iso above is a dumbbell or a
   // cable, so once _gearOK gained its dumbbell clause the pool emptied on the bodyweight
@@ -1551,7 +1555,12 @@ const EXLIB={
   // fixed bar path (name says landmine → RACK class, barbell-gated by the pool's own
   // hasBarbell branch). Sliders/gliders are NOT modeled equipment, so the glider lateral
   // lunge was ruled out rather than shipped as a movement nobody can set up.
-  lunge:['Dumbbell Bulgarian split squat','Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Landmine reverse lunge'],
+  // V192 (D41): dumbbell goblet side lunge — the first LOADED frontal-plane movement
+  // in the file. The app trained two planes; NSW asks for three. Goblet, not Zercher:
+  // the anterior counterweight makes the pattern self-coaching and leaves a bail path.
+  // The name deliberately avoids the word 'lateral' — _isCompound's exclusion regex
+  // vetoes any name containing it, which would strip this of compound status.
+  lunge:['Dumbbell Bulgarian split squat','Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Landmine reverse lunge','Dumbbell goblet side lunge'],
   // V178 (D1): standing cable hamstring curl — knee flexion in a running-relevant standing
   // posture. Lives in leg_iso (which is _gear'd, so the cable gate applies) NOT in hinge
   // (which is not). _pattern reads 'hamstring curl' → leg_iso, added the same session.
@@ -1609,6 +1618,18 @@ const _CARRY_PER_SIDE={'Suitcase carry':1,'Overhead carry':1};
 function _carryRx(dist,name,qual){
   return dist + (_CARRY_PER_SIDE[String(name||'').trim()]?' each':'') + (qual?', '+qual:'');
 }
+// ── PRESS SIDE (V192, D42-c) ─────────────────────────────────────────────────
+// The shoulder slot never printed a side. A kettlebell single-arm press shipped as
+// '3×12' with no arm named, so half the prescription was invisible: the athlete
+// either guessed twelve total or twelve per arm, and either way the trunk work an
+// offset press exists for is unspecified. Carries have printed a side since V177
+// D-d and a one-hand press is the same claim, so the same shape settles it.
+// Keyed off the pool, not a regex on the name, because the pool is the only place
+// that knows a press is one-handed. Barbell overhead press, Dumbbell Arnold press,
+// Dumbbell lateral raise and Barbell push press are two-hand or two-side movements
+// and must NOT print 'each'.
+const _PRESS_PER_SIDE={'Kettlebell single-arm press':1,'Landmine rotational press':1};
+function _isOneArmPress(name){ return !!_PRESS_PER_SIDE[String(name||'').trim()]; }
 // ── REP-AFFINITY (V160, D2-b) ────────────────────────────────────────────────────────
 // A movement declares the MAX reps a wave-driven prescription may ask of it.
 // 'Paused back squat' is a positional-strength tool: the dead stop kills the
@@ -5595,7 +5616,10 @@ const _BW_SUBS={
   'Banded side steps':'Side-lying leg raises',
   'Terminal knee extension (band)':'Wall sit',
   'Spanish squat hold (KB)':'Wall sit',
-  'Slow goblet squat (KB)':'Squat (slow 3s tempo)'
+  'Slow goblet squat (KB)':'Squat (slow 3s tempo)',
+  // V192 (D41): keep the PLANE when the bell disappears. The generic _bwFallback reads
+  // the pattern, not the plane, and would land this back in the sagittal plane.
+  'Dumbbell goblet side lunge':'Side lunge (bodyweight)'
 };
 const _BW_GEAR=/kettlebell|dumbbell|barbell|\bKB\b|\bDB\b|medicine ball|ball slam|cable|machine|trap bar|bumper|wall ball|weighted|weight vest|rucksack|sled|bench press|close-grip bench|skullcrush|preacher|lat pull|leg press|leg extension|leg curl|hack squat|pec deck|\bband(?!\s*stretch)/i;
 function _bwFallback(name){
@@ -6875,11 +6899,19 @@ function injuryPlan(cfg){
       // uncapped let the substitute run at full wave intensity — the one lift chosen
       // for being spine-neutral was the only lift not clamped.
       P.cap=new Set(['squat','hip_ext']);
-      P.dropNames=/good morning|swing|deadlift|pendlay|back extension|hyperextension|pull-through|pull through/i;
+      // V192 (D42): the landmine rotational press is dropped by NAME here. Its pattern
+      // is 'hpress', which this plan neither drops nor caps, so pattern gives a low
+      // back no protection at all. And a generated caption cannot guarantee the
+      // athlete rotates from the hip rather than the lumbar spine. Matches
+      // 'landmine rotational', which does not touch 'Landmine rotations' (no 'al')
+      // or 'Landmine reverse lunge'.
+      P.dropNames=/good morning|swing|deadlift|pendlay|back extension|hyperextension|pull-through|pull through|landmine rotational/i;
       P.cardioMode='noimpact_swim';
     } else {
       P.cap=new Set(['hinge','squat','row','hip_ext']);
-      P.dropNames=/good morning|swing|pendlay/i;
+      // V192 (D42): same reason as the protect tier above. 'hpress' is uncapped here
+      // too, so the only lever that reaches this movement is the name.
+      P.dropNames=/good morning|swing|pendlay|landmine rotational/i;
       P.cardioMode='easy';
     }
   } else if(R==='shoulder'){
@@ -6902,6 +6934,11 @@ function injuryPlan(cfg){
       // loaded abduction is the impingement arc, while a front raise in the scapular
       // plane is generally tolerated. Face pulls and rear delt work stay either way.
       P.dropNames=/overhead|arnold|push press|military|pike pushup|pike pushups|handstand|wall walk|\bdips\b|bench dips|lateral raise/i;
+      // V192 (D43): the workaround tier's job is to substitute, not just subtract.
+      // The floor stops the elbow at torso depth — the impingement-adjacent range
+      // the dropNames above already avoid. Runs after dropNames, so nothing here
+      // resurrects a dropped name. The hpress cap adds RPE 7 on top.
+      P.swapNames={'Dumbbell bench press':'Dumbbell floor press'};
       P.cardioMode='swimout';
     }
   } else if(R==='elbow'){
@@ -6937,6 +6974,10 @@ function applyInjuryFilter(sections,cfg){
     if(!s||!Array.isArray(s.items)){out.push(s);return;}
     const seen=new Set();
     const items=[];
+    // Section-local copy of the heading. Rewritten below when a swap renames the
+    // item the heading names; s itself is never mutated (this pass runs several
+    // times per day and must stay idempotent).
+    let label=s.label;
     s.items.forEach(it=>{
       if(!it||!it.name) return;
       let name=it.name, detail=it.detail;
@@ -6954,9 +6995,18 @@ function applyInjuryFilter(sections,cfg){
       if(pat&&P.cap.has(pat)&&detail&&!/RPE/.test(detail)) detail=detail+' — hold RPE 7, two in the tank';
       if(seen.has(name)) return;  // swaps can collide with an existing pick
       seen.add(name);
+      // Labels embed the drawn movement ('Main — Dumbbell bench press'), so a
+      // swapped item used to leave the heading naming a lift the athlete is not
+      // prescribed — and on the no-gear tier, naming a dumbbell he does not own.
+      // §10b: a conditional write with no else branch is a latch. The claim belongs
+      // to the item, so the heading follows the item it describes. Covers both
+      // rename paths above (P.swapNames and SPINE_SWAP); applied only once the item
+      // survives, and only after the collision check, so a dropped swap leaves the
+      // heading alone. bodyweightSweep runs the same sync for its substitutions.
+      if(name!==it.name && label && label.indexOf(it.name)>=0) label=label.split(it.name).join(name);
       items.push({...it,name,detail});
     });
-    if(items.length) out.push({...s,items});
+    if(items.length) out.push(label===s.label?{...s,items}:{...s,label,items});
   });
   return out;
 }
@@ -7276,7 +7326,10 @@ function engineC_kinematics(cfg, A, B){
   let backCompoundPool=hasBarbell?EXLIB.back_compound:_bw(['Inverted row (knees bent, under a table)','Inverted row (under a table)','Feet-elevated inverted row (under a table)'],['Kettlebell single-leg deadlift','Kettlebell swing','Kettlebell single-leg deadlift','Dumbbell Romanian deadlift']);
   let squatPool=hasBarbell?(olderHyp?EXLIB.squat_joint:EXLIB.squat):_bw(['Squat (slow 3s tempo)','Split squat','Bulgarian split squat (foot on chair)','Assisted pistol squat'],['Kettlebell goblet squat','Dumbbell goblet squat','Single-leg squat (assisted)','Step-ups (KB)']);
   let rowPool=hasBarbell?EXLIB.back_row:_bw(['Reverse snow angels','Inverted row (under a table)','Feet-elevated inverted row (under a table)'],['Kettlebell single-arm row','Dumbbell row','Resistance band row','TRX row (if available)']);
-  let lungePool=hasBarbell?EXLIB.lunge:_bw(['Reverse lunge','Walking lunge','Step-ups (chair)','Bulgarian split squat (foot on chair)'],['Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat']);
+  // V192 (D41): the frontal-plane lunge reaches the no-barbell tier through the LOADED
+  // list only. The bodyweight list beside it is a rung ladder (easy->hard, windowed by
+  // _bwRung); a goblet needs a bell, and inserting it there would also shift the window.
+  let lungePool=hasBarbell?EXLIB.lunge:_bw(['Reverse lunge','Walking lunge','Step-ups (chair)','Bulgarian split squat (foot on chair)'],['Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat','Dumbbell goblet side lunge']);
   let hingePool=hasBarbell?EXLIB.hinge.filter(n=>_expOK(n,cfg.experience)):_bw(['Bodyweight back extension','Single-leg glute bridge','Single-leg Romanian deadlift (bodyweight)','Nordic hamstring curl (anchored)'],['Kettlebell single-leg deadlift','Kettlebell swing','Kettlebell Romanian deadlift','Double Kettlebell deadlift']);
   // Loaded posterior-chain / hip-extension pool. Complements the hinge (RDL is hamstring/
   // erector-biased; these are glute- and eccentric-hamstring-biased). GHR/Nordic are the
@@ -7303,7 +7356,12 @@ function engineC_kinematics(cfg, A, B){
   const fullPullPool=hasRack
     ?['Inverted rows (bodyweight)','Feet-elevated inverted rows','Inverted rows (rings)']
     :_bw(['Inverted row (under a table)','Feet-elevated inverted row (under a table)','Inverted row (knees bent, under a table)'],['Resistance band row','Single-arm resistance band row','Band pull-apart']);
-  const shoulderAccPool = _gear(EXLIB.shoulder);
+  // V192 (D42-b): a landmine is a barbell with one end anchored, so it is
+  // barbell-tier equipment. _gearOK has no landmine token, so the name walked
+  // through on every tier including bodyweight. Gated here the way lungePool is
+  // gated one screen above. The no-barbell branch is EXLIB.shoulder minus the
+  // landmine, member for member, so no other tier's shoulder content moves.
+  const shoulderAccPool = _gear(hasBarbell?EXLIB.shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press']);
   const bicepsAccPool   = _gear(EXLIB.biceps);
   // ATHLETIC SUPPORT only: a true explosive/power pool (jumps, throws, triple-extension) that
   // LEADS the full-body day, trained fresh with full recovery. Barbell tiers get power-clean /
@@ -7756,7 +7814,7 @@ function engineC_kinematics(cfg, A, B){
           .filter(x=>x!==ex.chestMain&&x!==ex.chestAcc[0]&&x!==ex.chestAcc[1])[0]||'Pushups (slow tempo)';
         const lightPress=pick(lightPressPool.length?lightPressPool:[_lpFallback],1,blockSeed(w)+40)[0];
         const lightTri=pick(_bw(['Bench dips (chair)','Close-grip pushups','Diamond pushups'],_gear(EXLIB.triceps)),1,blockSeed(w)+41)[0];
-        s.push({label:'Main — '+lightPress,items:[{name:lightPress,detail:vsets(3)+'×12 — RPE 6–7, leave 3+ in reserve'+restNote},{name:ex.shoulder[1],detail:vsets(3)+'×12'}]});
+        s.push({label:'Main — '+lightPress,items:[{name:lightPress,detail:vsets(3)+'×12 — RPE 6–7, leave 3+ in reserve'+restNote},{name:ex.shoulder[1],detail:vsets(3)+'×12'+(_isOneArmPress(ex.shoulder[1])?' each':'')}]});
         s.push({label:'Pump',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×15'},{name:lightTri,detail:vsets(3)+'×15'}]});
         if((goal==='fatloss'||goal==='athletic')&&!strengthSupport)
           s.push({label:'Light finisher',optional:true,superset:true,rounds:vsets(3),items:[{name:ex.cond[2],detail:vsets(3)+'×15'},{name:ex.cond[3],detail:vsets(3)+'×12'}]});
@@ -7797,14 +7855,14 @@ function engineC_kinematics(cfg, A, B){
         // 4) Direct isolation slot (triceps)
         s.push({label:'Triceps',superset:true,rounds:hsets,items:[{name:tris[0],detail:hsets+'×'+repA},{name:tris[1],detail:hsets+'×'+repB}]});
       } else {
-      s.push({label:'Main — '+ex.chestMain,items:[{name:ex.chestMain,detail:det},{name:ex.shoulder[0],detail:vsets(3)+'×8'}]});
+      s.push({label:'Main — '+ex.chestMain,items:[{name:ex.chestMain,detail:det},{name:ex.shoulder[0],detail:vsets(3)+'×8'+(_isOneArmPress(ex.shoulder[0])?' each':'')}]});
       if((goal==='fatloss'||goal==='athletic')&&!strengthSupport)s.push({label:'Conditioning',optional:true,superset:true,rounds:vsets(3),items:[{name:ex.cond[0],detail:vsets(3)+'×12'},{name:ex.cond[1],detail:vsets(3)+'×10'}]});
       else {
         // V164 station rule: b-walk over the unselected shoulder pool (shoulder[0] is
         // the Main pairing at the site above — protected); chestAcc[0..1] are both
         // consumed on this day, so there is no legal a-alternative — demote if pure.
         const _sp=_ssPair(ex.chestAcc[0],ex.shoulder[1],[],shoulderAccPool.filter(n=>n!==ex.shoulder[0]));
-        s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'},{name:_sp.b,detail:vsets(3)+'×15'}]});
+        s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'},{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});
       }
       if(!isBeginner)s.push({label:'Chest + knee',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×12'},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
       }
@@ -8237,6 +8295,20 @@ function _pattern(name){
   const N=(name||'').toLowerCase();
   if(/wall sit|spanish squat|terminal knee/.test(N)) return null;        // isometric hold — not a fatiguing pattern rep
   if(/l-sit chin|l-sit pull/.test(N)) return 'vpull';                    // V162: an L-sit CHINUP is a vertical pull with a core hold riding along. The /l-sit/ token below must not eat it — same one-token-two-meanings class as the V119 incline bug.
+  // V192 (D42): the landmine rotational press is a PRESS, not a rotational core drill.
+  // This line sits ABOVE the core-exempt alternation below on purpose, and it is
+  // exact-anchored (^...$) precisely so that placing it above costs the core drills
+  // nothing: no rotational core movement can reach it. 'Landmine rotations', 'Pallof
+  // press', 'Windshield wipers' and 'Thoracic rotations' all fail the exact match and
+  // classify exactly as they did before this line existed. Do NOT generalise it to
+  // /landmine.*press/ or /rotational press/ — that is the one-token-two-meanings trap
+  // this file has paid for twice (V119 incline, V162 l-sit chinup).
+  // 'hpress', not 'vpress': the bar path finishes FORWARD at chest height, not
+  // overhead. V185 (D1) ruled the horizontal default of the bare /press/ catch-all
+  // deliberate, and this movement is the horizontal case.
+  // Without this classification the movement is _pattern-null: invisible to all three
+  // region caps, and KEPT by applyInjuryFilter even at shoulder/protect.
+  if(/^landmine rotational press$/.test(N)) return 'hpress';
   if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation|curl-up/.test(N)) return null; // core, exempt
   // REHAB DRILLS ARE NOT REGIONAL VOLUME. Wrist/forearm and scapular work is low-load
   // corrective loading; scoring it against a ceiling misreads the day. Without this the

@@ -1,0 +1,62 @@
+[
+ {
+  "name": "S1 -> G1/G7b: remove the hasBarbell gate, landmine walks back onto minimal/home_basic",
+  "anchor": "const shoulderAccPool = _gear(hasBarbell?EXLIB.shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press']);",
+  "replacement": "const shoulderAccPool = _gear(EXLIB.shoulder);",
+  "gate": "gates/g192_floorpress_shoulder_gear.js"
+ },
+ {
+  "name": "S2 -> G6b: invert the gate, the barbell tiers lose the landmine and the light tiers get it",
+  "anchor": "hasBarbell?EXLIB.shoulder:['Barbell overhead press'",
+  "replacement": "!hasBarbell?EXLIB.shoulder:['Barbell overhead press'",
+  "gate": "gates/g192_floorpress_shoulder_gear.js"
+ },
+ {
+  "name": "S3 -> G7a: the no-barbell branch quietly drops a second member (content removal, not a gate)",
+  "anchor": "'Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press']);",
+  "replacement": "'Kettlebell single-arm press','Barbell push press']);",
+  "gate": "gates/g192_floorpress_shoulder_gear.js"
+ },
+ {
+  "name": "S4 -> G0a: the floor press never lands in chest_acc",
+  "anchor": "'Diamond pushups','Dumbbell decline press','Dumbbell floor press'],",
+  "replacement": "'Diamond pushups','Dumbbell decline press'],",
+  "gate": "gates/g192_floorpress_shoulder_gear.js"
+ },
+ {
+  "name": "S5 -> G0b: the floor press never lands in chest_acc_joint (the joint-friendly pool)",
+  "anchor": "'Pec deck','Dumbbell decline press','Dumbbell floor press'],",
+  "replacement": "'Pec deck','Dumbbell decline press'],",
+  "gate": "gates/g192_floorpress_shoulder_gear.js"
+ },
+ {
+  "name": "S6 -> G3b: _D18_LEG_RX learns the floor press and strips it from 45-75 min long-run days",
+  "anchor": "|glute bridge|squat|lunge",
+  "replacement": "|glute bridge|floor press|squat|lunge",
+  "gate": "gates/g192_floorpress_shoulder_gear.js"
+ },
+ {
+  "name": "S7 -> G2a/G2b: the floor press is classified vertical",
+  "anchor": "if(/^landmine rotational press$/.test(N)) return 'hpress';",
+  "replacement": "if(/^landmine rotational press$/.test(N)) return 'hpress';\n  if(/floor press/.test(N)) return 'vpress';",
+  "gate": "gates/g192_floorpress_shoulder_gear.js"
+ },
+ {
+  "name": "S8 -> G4d: the shoulder/workaround dropNames eat the swap target the same tier swaps in",
+  "anchor": "|bench dips|lateral raise/i;",
+  "replacement": "|bench dips|lateral raise|floor press/i;",
+  "gate": "gates/g192_floorpress_shoulder_gear.js"
+ },
+ {
+  "name": "S9 -> G5b: hpress leaves the shoulder/workaround cap, the swapped item prints no RPE clamp",
+  "anchor": "P.cap=new Set(['hpress','vpress','delt_iso']);",
+  "replacement": "P.cap=new Set(['vpress','delt_iso']);",
+  "gate": "gates/g192_floorpress_shoulder_gear.js"
+ },
+ {
+  "name": "S10 -> G4c: the swap sheet chains, floor press onward to a second name",
+  "anchor": "P.swapNames={'Dumbbell bench press':'Dumbbell floor press'};",
+  "replacement": "P.swapNames={'Dumbbell bench press':'Dumbbell floor press','Dumbbell floor press':'Dumbbell incline press'};",
+  "gate": "gates/g192_floorpress_shoulder_gear.js"
+ }
+]
