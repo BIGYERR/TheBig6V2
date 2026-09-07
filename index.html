@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="190"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="191"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -11630,7 +11630,10 @@ function updateDoseDerived(){
   if(d.vol) rows+='<div class="derived"><span class="d-lbl">Work volume — derived</span><span class="d-val">'+(d.dist!=null?d.dist+' mi':'')+'<small>'+d.vol+'</small></span></div>';
   if(d.pace){
     let delta='';
-    if(d.tgt&&d.sec){ const df=Math.round(d.sec-d.tgt); delta=Math.abs(df)<5?'on target':(Math.abs(df)+'s/mi '+(df<0?'faster than target':'slower than target')); }
+    // V191 (D40): a gap of a minute or more prints m:ss. "73s/mi" makes the athlete
+    // do the conversion to see it is over a minute; "1:13/mi" reads as a gap on sight.
+    // Under a minute stays in seconds — that is the runner-native unit at that scale.
+    if(d.tgt&&d.sec){ const df=Math.round(d.sec-d.tgt), ad=Math.abs(df); const mag=ad<60?(ad+'s/mi'):(Math.floor(ad/60)+':'+String(ad%60).padStart(2,'0')+'/mi'); delta=ad<5?'on target':(mag+' '+(df<0?'faster than target':'slower than target')); }
     const note=[d.assumed,delta,(d.workMin?('over '+d.workMin+' work min'):null)].filter(Boolean).join(' · ');
     rows+='<div class="derived"'+(d.vol?' style="border-top:none;padding-top:0"':'')+'><span class="d-lbl">Pace — derived</span><span class="d-val">'+d.pace+(note?'<small>'+note+'</small>':'')+'</span></div>';
   }

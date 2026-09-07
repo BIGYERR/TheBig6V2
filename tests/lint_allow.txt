@@ -1,4 +1,4 @@
 # Known duplicate top-level declarations, one per line. Each entry is debt:
 # remove the duplicate in the next build that touches the file, then delete the line.
-# Found by tests/gate.sh step 2 on V188, still present in V190 (lines 1832 and 13452; identical behaviour, second wins by hoisting).
+# Found by tests/gate.sh step 2 on V188, still present in V191 (lines 1832 and 13452; identical behaviour, second wins by hoisting).
 _isoToday

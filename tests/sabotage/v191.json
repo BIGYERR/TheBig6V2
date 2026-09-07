@@ -1,0 +1,50 @@
+[
+ {
+  "name": "M1 -> G1/G2: raise the m:ss threshold so a 73s gap prints raw seconds again",
+  "anchor": "const mag=ad<60?",
+  "replacement": "const mag=ad<90?",
+  "gate": "gates/g191_pacedelta.js"
+ },
+ {
+  "name": "M2 -> G1/G2c: drop the zero pad, so 69s prints 1:9",
+  "anchor": "String(ad%60).padStart(2,'0')",
+  "replacement": "String(ad%60)",
+  "gate": "gates/g191_pacedelta.js"
+ },
+ {
+  "name": "M3 -> G3: invert the faster / slower wording",
+  "anchor": "(df<0?'faster than target':'slower than target')",
+  "replacement": "(df<0?'slower than target':'faster than target')",
+  "gate": "gates/g191_pacedelta.js"
+ },
+ {
+  "name": "M4 -> G1: widen the on-target band from 5 to 15 s/mi",
+  "anchor": "delta=ad<5?'on target'",
+  "replacement": "delta=ad<15?'on target'",
+  "gate": "gates/g191_pacedelta.js"
+ },
+ {
+  "name": "M5 -> G2b: round the minutes instead of flooring them (100s -> 2:40)",
+  "anchor": "Math.floor(ad/60)",
+  "replacement": "Math.round(ad/60)",
+  "gate": "gates/g191_pacedelta.js"
+ },
+ {
+  "name": "M6 -> G1: change the sub-minute unit that the ruling says must stay",
+  "anchor": "ad<60?(ad+'s/mi')",
+  "replacement": "ad<60?(ad+' sec/mi')",
+  "gate": "gates/g191_pacedelta.js"
+ },
+ {
+  "name": "M7 -> G2b: minutes and seconds swapped in the m:ss build",
+  "anchor": "(Math.floor(ad/60)+':'+String(ad%60).padStart(2,'0')+'/mi')",
+  "replacement": "((ad%60)+':'+String(Math.floor(ad/60)).padStart(2,'0')+'/mi')",
+  "gate": "gates/g191_pacedelta.js"
+ },
+ {
+  "name": "M8 -> G1: magnitude computed off the signed df, so a fast gap prints -1:13",
+  "anchor": "const df=Math.round(d.sec-d.tgt), ad=Math.abs(df);",
+  "replacement": "const df=Math.round(d.sec-d.tgt), ad=df;",
+  "gate": "gates/g191_pacedelta.js"
+ }
+]
