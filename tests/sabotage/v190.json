@@ -1,0 +1,50 @@
+[
+ {
+  "name": "M1 -> G2: reintroduce a hardcoded 3 as the resolver's fallback constant",
+  "anchor": "  return c.length?Math.min.apply(null,c):null;",
+  "replacement": "  return c.length?Math.min.apply(null,c):3;",
+  "gate": "gates/g190_rounds.js"
+ },
+ {
+  "name": "M2 -> G3: resolver reads items[0] instead of MIN across members",
+  "anchor": "Math.min.apply(null,c)",
+  "replacement": "c[0]",
+  "gate": "gates/g190_rounds.js"
+ },
+ {
+  "name": "M3 -> G4: drop the 'N sets' grammar from _itemSets (only N×reps survives)",
+  "anchor": "  m=s.match(/^(\\d+)\\s*sets?\\b/i);\n  return m?parseInt(m[1],10):null;",
+  "replacement": "  return null;",
+  "gate": "gates/g190_rounds.js"
+ },
+ {
+  "name": "M4 -> G11: the member strip mutates item.detail instead of the rendered string",
+  "anchor": "const _dispDetail=(_ssRounds!=null&&!i._skipped)?_stripLeadingSets(i.detail||''):(i.detail||'');",
+  "replacement": "const _dispDetail=(_ssRounds!=null&&!i._skipped)?(i.detail=_stripLeadingSets(i.detail||'')):(i.detail||'');",
+  "gate": "gates/g190_rounds.js"
+ },
+ {
+  "name": "M5 -> G5: collapse the rounds:null / OMITTED distinction (=== becomes ==)",
+  "anchor": "if(sec.rounds===null) return null;",
+  "replacement": "if(sec.rounds==null) return null;",
+  "gate": "gates/g190_rounds.js"
+ },
+ {
+  "name": "M6 -> G6: let the not-a-round-block heuristic beat a label that states its count",
+  "anchor": "{label:'8 rounds each: 20s work / 10s rest',superset:true,items:[",
+  "replacement": "{label:'8 rounds each: 20s work / 10s rest',superset:true,rounds:null,items:[",
+  "gate": "gates/g190_rounds.js"
+ },
+ {
+  "name": "M7 -> G12: D2 halves the section but stops normalising its members",
+  "anchor": "const nd=_setLeadingSets(it.detail,2);",
+  "replacement": "const nd=it.detail;",
+  "gate": "gates/g190_rounds.js"
+ },
+ {
+  "name": "M8 -> G10: sessionTimeEst gets its own hardcoded 3 back",
+  "anchor": "if(sets==null) sets=(_secR!=null?_secR:3);",
+  "replacement": "if(sets==null) sets=3;",
+  "gate": "gates/g190_rounds.js"
+ }
+]
