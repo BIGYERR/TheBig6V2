@@ -75,7 +75,15 @@ their output is judgement no gate can check (coach), or the judgement that a gat
 - Positional-strength lifts (paused, box) cap at 6 reps (`REP_AFFINITY`). Power block reps are a property of cost tier; rest derives from cost.
 - Carries: Farmer / Suitcase / Overhead are three threads; one-hand carries always print a side.
 - Supersets never cross fixed stations (`_stationClass`).
-- Every question to Mario comes with a recommendation. Mario's coaching pushback can override a code-correct recommendation.
+- Mario's coaching pushback can override a code-correct recommendation.
+
+## Answering Mario (standing, applies to every agent and every topic)
+**Every question, issue, risk or decision point put to Mario ships with a stated recommendation.**
+Not a menu of options, not "your call" on its own: say what you would do and why, then the strongest
+counter-argument, then let him choose. This holds for coaching rulings, engineering trade-offs, tooling,
+git, scope and anything else. A decision surfaced without a recommendation is an incomplete answer.
+Flag the ones that are genuinely his to make (publishing, irreversible actions, doctrine) as such —
+and still recommend.
 
 ## Copy rule (Mario, standing)
 No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declarative sentences. The app sounds like a coach at every touchpoint. Spec separators inside a prescription (`4×5 — RPE 8`) are structural and exempt. No user-facing "Nike" strings.
