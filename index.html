@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="192"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="193"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2671,10 +2671,10 @@ function renderWizardStep() {
     <div class="wizard-subtitle">The program only prescribes exercises you can actually do.</div>
     <div style="display:flex;flex-direction:column;gap:10px">
       ${[
-        {id:'home_full', icon:'🏠', label:'Home Gym — Full',    desc:'Barbell, rack, bench, dumbbells, kettlebells, pull-up bar, trap bar'},
+        {id:'home_full', icon:'🏠', label:'Home Gym — Full',    desc:'Barbell, rack, bench, dumbbells, kettlebells, pull-up bar, trap bar, bands'},
         {id:'home_basic',icon:'🏠', label:'Home Gym — Basic',   desc:'Dumbbells, kettlebells, pull-up bar, bands. No barbell.'},
         {id:'commercial',icon:'🏋️', label:'Commercial Gym',     desc:'Full gym — cables, machines, barbells, everything'},
-        {id:'crossfit',  icon:'🤸', label:'CrossFit Box',        desc:'Barbells, rig, bumpers, kettlebells, rower/bike, wall balls'},
+        {id:'crossfit',  icon:'🤸', label:'CrossFit Box',        desc:'Barbells, rig, bumpers, kettlebells, rower/bike, wall balls, bands'},
         {id:'bodyweight',icon:'👤', label:'Bodyweight only',    desc:'You, the floor, and something to pull on. No weights.'},
       ].map(e => `<div class="cardio-type-card${WD.equipment===e.id?' selected':''}" onclick="WD.equipment='${e.id}';renderWizardStep()">
         <div class="cardio-type-icon">${asyIcon(e.icon,26)}</div>
@@ -5558,8 +5558,22 @@ const CORE_PILLARS = {
   },
   anti_rotation: { // Lateral stability — low fatigue, safe before anything
     name: 'Anti-Rotation',
+    // V193 (D49): D46-c's gear gate closed an unnamed leak (the two carries were printing
+    // on the BODYWEIGHT tier through this pillar), which left the pillar with two legal
+    // members there — so it emitted the identical pair {Side plank, Pallof press} on 45 of
+    // 45 occurrences. NSW p.7 ("Choose different variations ... for the same basic movement
+    // on different days") and p.7 item 7 ("For the trunk, use a variety of static as well as
+    // dynamic exercises") both forbid that. A held position still needs a progression
+    // ladder, and two members give none. Two gear-free members are added, both legal on
+    // every tier, both taking the dose of 'Pallof press' from inside this same pillar.
+    // The ladder reads bird dog (contralateral reach, the limb is the load) -> side plank ->
+    // plank shoulder taps (the base narrows under a shifting load) -> Pallof press, and
+    // 'Side plank' sits in three of the four-member pillar's six pairs, so a static hold
+    // still appears in half of all blocks.
     items: [
+      {name:'Bird dogs', detail:'3×12 each'},                   // NSW Table 3 + McGill Big 3
       {name:'Side plank', detail:'3×30–45 sec each'},           // NSW + McGill Big 3
+      {name:'Plank shoulder taps', detail:'3×12 each'},         // V178 _BW_SUBS target, promoted to member; dose from the member it laddered into
       {name:'Pallof press', detail:'3×12 each'},
       {name:'Dumbbell renegade rows', detail:'3×8 each'}, // V178 (D1): anti-rotation plank with a pull riding along; _pattern exempts it from pull volume
       {name:'Farmer carry', detail:'3×40 yd'},
@@ -5581,12 +5595,26 @@ const CORE_PILLARS = {
       {name:'Windshield wipers', detail:'3×16 (180° arc)'},     // NSW "Wipers"
       {name:'Medicine ball rotary toss', detail:'3×8 each'},
       {name:'Cable woodchoppers', detail:'3×12 each'},
-      {name:'Landmine rotations', detail:'3×10 each'}
+      {name:'Landmine rotations', detail:'3×10 each'},
+      // V193 (D46): three of the four members above name an implement, so an honest per-tier
+      // gear gate would leave home_basic / minimal / bodyweight holding ONE member, and a
+      // one-member pillar cannot fill a pair. NSW p.6 rec 2 and p.7 item 2 require movement in
+      // all three planes unconditionally, and p.8 item 7 names the torso rotators a problem
+      // area — so the pillar may not shrink on exactly the tiers with the least other
+      // rotational exposure. Each addition is DERIVED from a member already here, not invented.
+      {name:'Standing torso rotations (slow)', detail:'3×10 each'},  // V178 _BW_SUBS target for Landmine rotations, promoted from substitution target to member; dose from the member it stands in for
+      {name:'Side plank thread-the-needle', detail:'3×10 each'},     // NSW p.7 item 7 asks static AND dynamic trunk work; dynamic rotational form of Side plank, already prescribed from the NSW trunk table
+      {name:'Band woodchopper (door anchor)', detail:'3×12 each'}    // band form of Cable woodchoppers; dose copied from that member exactly
     ]
   }
 };
 // Run session types that heavily tax legs/CNS — mirror of the cardio legLoad speed set.
 const CORE_SPEED_TYPES = new Set(['int','nrc_speed1','nrc_speed2']);
+
+// V193 (D44): which tiers own a barbell. buildProgram computed this inline and the answer
+// was unreachable from week assembly, where the core injector runs — so the one pool that
+// is injected after the pool block had no gear gate at all. One definition, two readers.
+function _tierHasBarbell(equip){ return equip==='home_full'||equip==='commercial'||equip==='crossfit'; }
 
 
 // ── BODYWEIGHT SAFETY SWEEP ───────────────────────────────────────────────────
@@ -6027,16 +6055,81 @@ function bodyweightSweep(weeks, _bwExp, _bwPrev){
 //  role           — today's lift role
 //  isHardRunToday — today carries a speed/interval run
 //  tomorrowHot    — next training day is a speed run or heavy dead/squat day
-function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot){
+function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equip, onCard){
   const P = CORE_PILLARS;
+  // V193 (D44): CORE_PILLARS is injected at WEEK ASSEMBLY, downstream of the pool block,
+  // so _gearOK never saw it and 'Landmine rotations' printed on home_basic and minimal —
+  // tiers whose own wizard copy says "No barbell". Every pillar the rotation reads is
+  // filtered through _pi so one lens answers for all of them.
+  //
+  // V193 (D46-c): the lens is _auxGearOK — the per-tier legality table this file already
+  // carries and the swap sheet already trusts — not a second private list. D44's gate knew
+  // one word, 'landmine', so it answered for one member of one pillar; 'Cable woodchoppers'
+  // (commercial owns the only cable) and 'Medicine ball rotary toss' walked straight past
+  // it onto every tier. One table, THREE readers: draw time here, swap time in
+  // auxSwapCandidates, and the protect-tier upper-limb branch in buildSections, which
+  // builds its own anti-rotation draw and was the reader D46-c missed. A member added to
+  // any pillar later is gated the day it lands, on all three.
+  //
+  // NO FALLBACK TO THE UNFILTERED LIST. A filtered-empty pool that falls back to the raw
+  // one is the V122 _gear trap: it leaks exactly on the tier the gate exists for, and it
+  // leaks silently. The pillars _pi reads hold at least two legal members on every tier
+  // (measured, all six tiers — rotational_power 3/3/4/5/7/6 for bodyweight / minimal /
+  // home_basic / home_full / commercial / crossfit; anti_rotation 3/6/7/7/7/7 after D49
+  // added two gear-free members and tagged the Pallof press as band gear; dynamic_bracing 4
+  // everywhere), so the filter cannot empty a pillar. These are MEASURED, not assumed: run
+  // _auxGearOK over CORE_PILLARS[key].items for each tier and count, which is what the draw
+  // on the line below does. The anti_rotation row is also the AR_LEGAL hand table in
+  // tests/gates/g193_gear_gates.js, derived there from _AUX_GEAR (search '_AUX_GEAR=') and
+  // the tier columns, so the two agree by two independent routes. Re-derive, do not trust
+  // this line. If a
+  // future member list would drop one below two, the pillar must GROW, not the gate soften.
+  //
+  // Bodyweight is gated here too. D44 exempted it because the pillar then held four members
+  // and _BW_SUBS mapped the landmine to 'Standing torso rotations (slow)' while the other
+  // two rotational members both swept to 'Dead bug (slow tempo)' — filtering cost the tier
+  // its third distinct movement and the pair collapsed to a ONE-ITEM block. D46 promoted
+  // that substitution target to a real member and added two more, so bodyweight now draws
+  // three distinct legal names on its own and the sweep no longer has to invent one.
+  //
+  // An undefined equip still means "gear unknown" and leaves the pillars untouched, so no
+  // existing caller is silently narrowed.
+  //
+  // V193 (same-card fix): a SECOND lens, on the same draw. 'Farmer carry' is a member of
+  // anti_rotation and is also the movement the lift day's 'Loaded carry finisher' picks,
+  // and the two never spoke — 16 day-builds printed the identical carry twice on one card,
+  // one per loaded gear tier. The CORE BLOCK yields, not the finisher, because the core
+  // block is the LATER reader: it is injected at week assembly and can see the built card,
+  // while the finisher runs inside buildSections and cannot see a block that does not exist
+  // yet. Same shape as the anti-extension/anti-rotation walk in the protect-tier branch.
+  // The subtraction runs AFTER the gear filter, so it can never widen legality, and the
+  // guard below can only ever hand back a gear-legal list — it is a crash guard, not the
+  // V122 _gear trap. The floor here is an invariant, not a table: under _auxGearOK the
+  // bodyweight-legal set is a SUBSET of the minimal-legal set, so a bodyweight count can
+  // never exceed a minimal count on the same pillar. Counts in comments are claims with no
+  // gate behind them and they go stale silently, so the executable checks own this one:
+  // the anti-rotation floor gate, and tests/measure/v193_d49_antirotation.js.
+  const _onCard = onCard || Object.create(null);
+  const _pi = key => {
+    const g = equip===undefined
+      ? (P[key].items||[])
+      : (P[key].items||[]).filter(it=>_auxGearOK(it.name, equip));
+    const d = g.filter(it=>!_onCard[String(it.name||'').trim().toLowerCase()]);
+    return d.length ? d : g;
+  };
   const R = week + (slot||0); // rotation seed — offset by slot so the week's two core days differ
-  const rot = (arr,n)=>arr[(((R-1+n)%arr.length)+arr.length)%arr.length];
+  // V193 (D46): rotOn takes the rotation CLOCK explicitly. rot() is the same function it
+  // always was — clock R — so every caller below reads identically. A pillar that only turns
+  // on some steps of R passes its OWN turn count instead, which is the whole D46 fix: the
+  // index must count the pillar's turns, not the global step.
+  const rotOn = (clock,arr,n)=>arr[(((clock-1+n)%arr.length)+arr.length)%arr.length];
+  const rot = (arr,n)=>rotOn(R,arr,n);
   let pillar, items;
   if(isHardRunToday){
     // PLACEMENT: hard-run day → low-fatigue STATIC stability to protect the spine.
     // Never loaded (ab wheel) and never hip-flexion grinding right after a speed session.
     pillar='anti_extension';
-    items=[rot(P.anti_extension.static, R), rot(P.anti_rotation.items, R)]; // rotating static brace + low-fatigue anti-rotation
+    items=[rot(P.anti_extension.static, R), rot(_pi('anti_rotation'), R)]; // rotating static brace + low-fatigue anti-rotation
   } else if(tomorrowHot){
     // PRIORITY: tomorrow is a speed run or heavy dead/squat day → low-fatigue pillars ONLY.
     // This branch can never emit ab-wheel/weighted-deadbug or hanging-raises/Garhammer.
@@ -6046,7 +6139,14 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot){
     // plank + Pallof press for 14 weeks and the carries in this pillar were unreachable.
     // Same rotation shape dynamic_bracing already uses; every member of both pillars is
     // low-fatigue by construction, so the PRIORITY guarantee is unchanged.
-    items = [rot(P[pillar].items, R), rot(P[pillar].items, R+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2);
+    // V193 (D46): was rot(...,R) — but this branch alternates its two pillars on R%2, so each
+    // pillar only turns once per TWO steps of R. rot() reads arr[(R-1+n)%len], so n=R made the
+    // index 2R-1 and rotational_power (live on even R only) froze at 2R-1 mod 4 === 3 forever:
+    // Landmine rotations + Windshield wipers, every tier, all 14 weeks. Index by the pillar's
+    // OWN turn count instead. Even R gives R/2, odd R gives (R-1)/2, so one expression is the
+    // correct turn counter for whichever pillar this step selected.
+    const T2 = Math.floor(R/2);
+    items = [rotOn(T2,_pi(pillar),T2), rotOn(T2,_pi(pillar),T2+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2);
   } else {
     // PLACEMENT: clear-runway upper/lighter day → rotate the higher-fatigue pillars in here,
     // and ONLY here. Loaded anti-extension and dynamic bracing are confined to this branch.
@@ -6056,9 +6156,16 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot){
       items=[rot(P.anti_extension.loaded, R), rot(P.anti_extension.static, R)];
     } else {
       pillar=key;
+      // V193 (D46): key cycles three ways on ((R-1)%3), so rotational_power (the index-2 slot)
+      // is live only when (R-1)%3===2. Its own turn counter is therefore Math.floor((R-1)/3),
+      // which advances by exactly one per selection. The old ._pi(key).slice(0,2) was the last
+      // survivor of the pattern V178 (D6) removed from the other pillars: the first two members,
+      // every week, forever — so the members added in D46 could never be reached from here.
+      // Same rotation + dedup shape dynamic_bracing already uses, one line below.
+      const T3 = Math.floor((R-1)/3);
       items = (key==='dynamic_bracing')
-        ? [rot(P.dynamic_bracing.items, R), rot(P.dynamic_bracing.items, R+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2)
-        : P[key].items.slice(0,2);
+        ? [rot(_pi('dynamic_bracing'), R), rot(_pi('dynamic_bracing'), R+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2)
+        : [rotOn(T3,_pi(key),T3), rotOn(T3,_pi(key),T3+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2);
     }
   }
   return {label:'', core:true, pillar, coreHeader:'Core — '+P[pillar].name, items: items.slice(0,2)};
@@ -6080,7 +6187,7 @@ function _coreTomorrowHot(weekObj, dayRoles, orderedTrain, idx){
 }
 
 // Inject up to 2 deconflicted core finishers into one week's day map, in place.
-function injectDynamicCore(weekObj, dayRoles, trainDays, week){
+function injectDynamicCore(weekObj, dayRoles, trainDays, week, equip){
   // The protect-tier rehab day builds its own full trunk block, so it is excluded here
   // rather than receiving a second 2-item finisher on top. Detected off the built
   // sections instead of re-deriving the injury plan, so the two can never disagree.
@@ -6110,7 +6217,15 @@ function injectDynamicCore(weekObj, dayRoles, trainDays, week){
   chosen.slice(0,2).forEach((day,slot)=>{
     const idx=ordered.indexOf(day);
     const hot=_coreTomorrowHot(weekObj,dayRoles,ordered,idx);
-    const block=getDynamicCoreBlock(week, dayRoles[day], isHardRun(day), hot, slot);
+    // V193 (same-card fix): the names this day already prescribes, read off the BUILT
+    // sections rather than re-derived, so the core draw and the section builder can never
+    // disagree about what is on the card. Lowercased on the same axis the bodyweight
+    // dedupe sweep uses.
+    const _onCardNames=Object.create(null);
+    ((weekObj[day]&&weekObj[day].sections)||[]).forEach(function(sec){
+      ((sec&&sec.items)||[]).forEach(function(it){ if(it&&it.name) _onCardNames[String(it.name).trim().toLowerCase()]=1; });
+    });
+    const block=getDynamicCoreBlock(week, dayRoles[day], isHardRun(day), hot, slot, equip, _onCardNames);
     if(block) block.optional=true;
     if(weekObj[day] && Array.isArray(weekObj[day].sections)){
       weekObj[day].sections.push(block);
@@ -7220,7 +7335,7 @@ function engineC_kinematics(cfg, A, B){
   // Equipment-aware exercise selection
   const equip=cfg.equipment||'home_full';
   const isCrossfit=equip==='crossfit';
-  const hasBarbell=equip==='home_full'||equip==='commercial'||isCrossfit;
+  const hasBarbell=_tierHasBarbell(equip);
   const hasCables=equip==='commercial';
   // Every tier the wizard offers lists dumbbells except 'Bodyweight only' ("You, the floor,
   // and something to pull on"). CrossFit's blurb abbreviates to "barbells, rig, bumpers,
@@ -7362,6 +7477,19 @@ function engineC_kinematics(cfg, A, B){
   // gated one screen above. The no-barbell branch is EXLIB.shoulder minus the
   // landmine, member for member, so no other tier's shoulder content moves.
   const shoulderAccPool = _gear(hasBarbell?EXLIB.shoulder:['Barbell overhead press','Dumbbell Arnold press','Kettlebell single-arm press','Dumbbell lateral raise','Barbell push press']);
+  // V193 (same-card, slice 5): the chest-accessory pool was an inline literal at its ONE
+  // draw site, so buildSections had no legal way to re-walk it when the name it was handed
+  // turned out to be the name the day's Main lift already held. It is a named pool now, on
+  // the same line of sight as shoulderAccPool, and it has exactly two readers: the chestAcc
+  // slot in buildEx and the push day's two later sections. Same pool, same lens, same
+  // bodyweight branch — the standing rule is that the pool and the post-filter must reason
+  // about a movement through the same lens, and a second copy of this literal inside
+  // buildSections would have broken that on the bodyweight tier only, which is the tier
+  // where it is hardest to see. No _gear() call: EXLIB.chest_acc names no cable and no
+  // machine, dumbbells are legal on every tier except bodyweight, and bodyweight takes the
+  // _bw branch — so a _gear() here would be a no-op that added the V127 empty-pool latch
+  // for nothing. The chestAcc slot's behaviour is unchanged: _bw and _bwRung are pure.
+  const chestAccPool    = _bw(['Incline pushups (hands on bed)','Wide-stance pushups','Pushups (slow 3s eccentric)','Close-grip pushups','Decline pushups (feet elevated)'],EXLIB.chest_acc);
   const bicepsAccPool   = _gear(EXLIB.biceps);
   // ATHLETIC SUPPORT only: a true explosive/power pool (jumps, throws, triple-extension) that
   // LEADS the full-body day, trained fresh with full recovery. Barbell tiers get power-clean /
@@ -7474,7 +7602,63 @@ function engineC_kinematics(cfg, A, B){
         hingePool = ['Banded hip thrust','Single-leg glute bridge'];
         hipExtPool = ['Single-leg hip thrust','Single-leg glute bridge'];
         squatPool = hasCables?['Leg press','Dumbbell goblet squat']:['Dumbbell goblet squat'];
-        rowPool = ['Straight-arm pulldown'];
+        // V193 (D44): the pulldown is a CABLE movement and this literal never passed
+        // through _gear, so it shipped on minimal, home_basic and bodyweight — a tier
+        // whose copy is "You, the floor, and something to pull on". _gear would not have
+        // saved it either: a one-item pool empties under the filter and falls back to
+        // itself. Cable-less tiers get the hanging vertical pull this branch's own
+        // comment prescribes. Also 'vpull', so P.drop's row rule leaves it alone.
+        //
+        // V193 (same-card fix): D44's replacement was ANOTHER one-item literal, and on
+        // the two cable-less BARBELL tiers it named a movement backCompoundPool already
+        // holds — so 'Assisted pullups' printed as the day's Main AND as Pull superset A
+        // on 128 day-builds. The one-item pool is the defect, not the name inside it.
+        // _slot already refuses a name the day has taken ('_took', active because this
+        // branch dirties the upper domain), but with a single candidate the pool empties
+        // under that guard and _slot takes the repeat instead of short-drawing. So the
+        // branch gets a POOL.
+        // Candidates are the app's own vertical pulls, verified through the real
+        // _pattern: all of them read 'vpull', which P.drop's {hinge,row} does not touch
+        // and P.dropNames does not match. None carries a barbell, cable, machine or
+        // dumbbell token, so _gearOK passes every one on every tier; 'Weighted chinups'
+        // needs something to hang off the athlete, so it is gated on the tier owning an
+        // implement rather than left to a name test that cannot see it.
+        //
+        // V193 (D52): two errors stacked here and both are fixed on this line.
+        // (a) The pool offered a movement its OWN overlay forbids. 'L-sit chinups' is
+        //     loaded lumbar flexion, so this same pass nulls it in SPINE_SWAP — draw it
+        //     and the overlay deletes it with no substitute, singletonSupersetSweep
+        //     collapses the superset, and the athlete gets a lone press. Measured on a
+        //     reconstructed pre-D52 artifact with the SPINE_SWAP null replaced by a
+        //     sentinel, so the deleted item stays visible: 'L-sit chinups' was DRAWN on
+        //     632 day-builds of the 288-cell WIDE lattice and on 1392 of the 864-cell
+        //     FULL lattice. On WIDE those draws sat in Pull superset A 520, Pull 50,
+        //     Pull superset B 44, Upper superset 18. Of them, 18 on WIDE and 27 on FULL
+        //     were Full Body days that lost their LAST pull. Zero-pull Full Body days on
+        //     lowback/protect home_full ran V192 126, pre-D52 144, this candidate 126.
+        //     The earlier "108" in this comment named no lattice and matched none of
+        //     these; a count with no lattice is the same failure one size down.
+        //     The membership is now derived, not
+        //     guessed: EXLIB.back_pull minus the SPINE_SWAP null, plus the assisted
+        //     regression from EXLIB.back_pull_joint. A pool built inside an injury branch
+        //     may not name anything that branch's own filter removes — see
+        //     tests/gates/g193_pool_overlay.js. The gate's reach is narrower than the
+        //     rule it defends, and the difference is the interesting part: it carves the
+        //     injury pool-override chain out of the source at the chain's opening
+        //     _R==='knee' test, then walks ONLY the *Pool assignments made inside that
+        //     carved chain, resolving each across the six gear tiers of its hand table.
+        //     Pools assigned anywhere else in the build are outside the walk entirely.
+        //     Assignments inside the chain whose expression will not resolve from the
+        //     gear predicates are reported UNRESOLVED and asserted on by nothing.
+        //     D44's floor of two survivors is held at that same scope, not wider.
+        // (b) Subtracting the WHOLE backCompoundPool to prevent ONE duplicate is what
+        //     starved home_full down to two members in the first place. Only one name can
+        //     actually collide: the main the day DRAWS. That exclusion moved downstream to
+        //     the row-slot draw site, where backMain exists (see _rowSrc). Nothing here
+        //     narrows the swap universe either: every excluded name is a backCompoundPool
+        //     member, and that pool is registered whole by the backMain slot first.
+        rowPool = hasCables?['Straight-arm pulldown']:['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']
+          .filter(n=>hasDumbbells||!/weighted/i.test(n));
       } else {
         // Deadlift → hip thrust (spine-neutral hip extension). Rows → single-arm
         // dumbbell supported on a bench. Squat drops the bar off the spine.
@@ -7639,7 +7823,7 @@ function engineC_kinematics(cfg, A, B){
     const hipExtSel= hipExtPool.length?(_slot(hipExtPool,1,bs+15,'lower',true)[0]||null):null;
     const kneeStabSel=_slot(_bw(['Wall sit','Single-leg wall sit'],EXLIB.knee_stability),1,bs+9,'lower')[0];
     const chestMain = _slot(_repFit(chestCompoundPool),1,bs,'upper')[0];
-    const chestAcc  = _slot(_bw(['Incline pushups (hands on bed)','Wide-stance pushups','Pushups (slow 3s eccentric)','Close-grip pushups','Decline pushups (feet elevated)'],EXLIB.chest_acc),2,bs+1,'upper');
+    const chestAcc  = _slot(chestAccPool,2,bs+1,'upper');
     const shoulderSel=_slot(_bw(['Pike pushups','Pike pushups (feet elevated)','Wall walks','Prone Y-T-W raises'],shoulderAccPool),2,bs+5,'upper');
     // ── ROW SLOTS: TWO SLOTS, TWO DIFFERENT JOBS ─────────────────────────────
     // The pull day draws two rows and buildSections hardcodes their prescriptions:
@@ -7661,9 +7845,20 @@ function engineC_kinematics(cfg, A, B){
     // the same "short draw beats a duplicate" rule _slot already applies internally.
     // The swap universe is unaffected: the two halves union back to rowPool, and any
     // fallback registers the whole pool anyway.
-    const _rowUni = (rowPool||[]).filter(_isUnilateralRow);
-    const _rowBi  = (rowPool||[]).filter(n=>!_isUnilateralRow(n));
-    const _rowA   = _slot(_rowBi.length?_rowBi:rowPool,1,bs+3,'upper')[0]||null;
+    // V193 (D52): the pull day's MAIN is excluded here, by name, and only here. An
+    // injury branch that rewrites rowPool may legitimately name the same vertical pulls
+    // its main-lift pool holds; the only name that can print twice on the card is the one
+    // backMain actually drew, so that is the only name subtracted. Scoped to a pool the
+    // plan rewrote (V111): on a healthy bodyweight tier backCompoundPool and rowPool share
+    // their inverted-row rungs on purpose, and ungated this would rewrite plans that have
+    // no defect. The swap universe is untouched — backMain belongs to backCompoundPool,
+    // which _slot registered whole three slots earlier. Falls back to the unfiltered pool
+    // rather than emptying, the same rule _slot uses internally.
+    const _rowSrc0 = (_inj&&rowPool!==_preInj.row)?(rowPool||[]).filter(n=>n!==backMain):(rowPool||[]);
+    const _rowSrc  = _rowSrc0.length?_rowSrc0:(rowPool||[]);
+    const _rowUni = _rowSrc.filter(_isUnilateralRow);
+    const _rowBi  = _rowSrc.filter(n=>!_isUnilateralRow(n));
+    const _rowA   = _slot(_rowBi.length?_rowBi:_rowSrc,1,bs+3,'upper')[0]||null;
     // One residual the partition alone cannot close, so close it at the cause. When an
     // INJURY OVERRIDE rewrites rowPool and leaves nothing bilateral, both slots are
     // fighting over the same half and the day prints one lift twice with a different
@@ -7674,7 +7869,7 @@ function engineC_kinematics(cfg, A, B){
     // inverted-row entries are difficulty RUNGS of one movement, and a ladder is a
     // legitimate second slot on the thinnest pulling tier in the app.
     const _rowInjUni=_inj&&rowPool!==_preInj.row&&!_rowBi.length;
-    const _rowBpool=_rowInjUni?[]:(_rowUni.length?_rowUni:(rowPool||[])).filter(n=>n!==_rowA);
+    const _rowBpool=_rowInjUni?[]:(_rowUni.length?_rowUni:_rowSrc).filter(n=>n!==_rowA);
     const _rowB   = _rowBpool.length?(_slot(_rowBpool,1,bs+16,'upper')[0]||null):null;
     const backRow   = [_rowA,_rowB];
     const backPull  = _slot(_bw(['Inverted row (knees bent, under a table)','Inverted row (under a table)','Feet-elevated inverted row (under a table)'],EXLIB.back_pull),1,bs+4,'upper')[0];
@@ -7778,10 +7973,40 @@ function engineC_kinematics(cfg, A, B){
         // demand, which is exactly the wrong bill for a protect-tier shoulder or elbow.
         // (The elbow plan sets noCarry and would have stripped them downstream anyway,
         // leaving that week's section empty instead of correct.)
-        const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name));
+        // V193 (D46-c, slice 4): the gear gate reaches this draw too. This branch was the
+        // THIRD reader of the pillar and the only one with no lens on it, so 'Pallof press'
+        // — tagged band gear in _AUX_GEAR — printed on bodyweight and on minimal, neither of
+        // which owns a band. Same predicate, same table, no second private list. The carry
+        // strip stays: it is this day's own rule, not a gear rule. Legal members after BOTH
+        // filters, measured over the five non-carry members of the pillar against the tier
+        // table: 3 / 4 / 5 / 5 / 5 / 5 for bodyweight / minimal / home_basic / home_full /
+        // commercial / crossfit. So the pair below always has two distinct names to draw and
+        // no fallback is needed. Measured, not assumed: apply the same two predicates on the
+        // line below to CORE_PILLARS.anti_rotation.items and count per tier. Bodyweight is
+        // the floor case at 3 — Bird dogs, Side plank, Plank shoulder taps, the three members
+        // _AUX_GEAR (search '_AUX_GEAR=') leaves untagged. Re-derive, do not trust this line.
+        const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name)&&_auxGearOK(it.name,equip));
         const _ae=CORE_PILLARS.anti_extension.static;
-        s.push({label:'Trunk — anti-rotation',items:[{..._rot(_ar,0)},{..._rot(_ar,1)}]});
-        s.push({label:'Trunk — anti-extension',items:[{..._rot(_ae,0)},{..._rot(_ae,2)}]});
+        // V193 (slice 4): 'Bird dogs' is a member of BOTH pillars — D49 added it to
+        // anti-rotation and anti_extension.static has always held it — and these two sections
+        // draw from two independent rotations, so the same movement could land on both and
+        // print twice on one card. deconflictAdjacentDupes cannot catch it: it compares
+        // ADJACENT DAYS and returns early on core items by design.
+        // Anti-extension keeps the name when they collide. 'Bird dogs' is the anti-extension
+        // member it was written as (contralateral reach against spinal extension), and the
+        // anti-rotation pillar has somewhere else to go on every tier. The anti-rotation
+        // section walks its own rotation forward past any name the anti-extension pair
+        // already took, so an uncontested week draws exactly the pair it drew before.
+        const _aePick=[_rot(_ae,0),_rot(_ae,2)];
+        const _taken=Object.create(null); _aePick.forEach(it=>{_taken[it.name]=1;});
+        const _arPick=[];
+        for(let _k=0;_k<_ar.length&&_arPick.length<2;_k++){
+          const _it=_rot(_ar,_k);
+          if(_taken[_it.name]) continue;
+          _taken[_it.name]=1; _arPick.push(_it);
+        }
+        s.push({label:'Trunk — anti-rotation',items:_arPick.map(it=>({...it}))});
+        s.push({label:'Trunk — anti-extension',items:_aePick.map(it=>({...it}))});
         return s;
       }
       const isLight=role==='push_light';
@@ -7808,18 +8033,63 @@ function engineC_kinematics(cfg, A, B){
         // The fallback has to obey the SAME guard as the pool: a hard-coded incline here
         // walked straight back into the duplicate the filter just removed whenever the
         // filtered pool emptied (acc0=DB bench evicting both bench copies + acc1=incline
-        // left nothing). Slow-tempo pushups is the terminal light-press stimulus every
-        // tier owns, so the chain cannot end empty.
-        const _lpFallback=['Dumbbell incline press','Dumbbell bench press','Pushups (slow tempo)']
-          .filter(x=>x!==ex.chestMain&&x!==ex.chestAcc[0]&&x!==ex.chestAcc[1])[0]||'Pushups (slow tempo)';
+        // left nothing).
+        //
+        // V193 (same-card, slice 5): the chain still ended in a name the guard was not
+        // allowed to see. '||' after a filtered lookup is a fallback to an UNFILTERED value,
+        // which is the V122 _gear trap written small: whenever the three-name chain filtered
+        // to nothing it handed back 'Pushups (slow tempo)' unconditionally, and on the tiers
+        // where that happens chestAcc[1] IS 'Pushups (slow tempo)' — so the day printed it as
+        // the Main press and again in the Pump, 16 day-builds of 59,781, home_full and
+        // crossfit on the two lowback paths. The fix is arithmetic, not a new rule: the guard
+        // can remove at most THREE distinct names, so a chain of five leaves at least two,
+        // and the terminal '||' is deleted rather than replaced. The first three entries are
+        // untouched and in the same order, so every case where the old chain resolved at all
+        // resolves to the same name; only the empty case moves, and it moves to a pushup that
+        // is legal on every tier. On bodyweight the guard holds three pushup names and can
+        // never evict a dumbbell press, so entry 0 survives there exactly as before and this
+        // tier's output is byte-identical.
+        const _lpFallback=['Dumbbell incline press','Dumbbell bench press','Pushups (slow tempo)','Close-grip pushups','Diamond pushups']
+          .filter(x=>x!==ex.chestMain&&x!==ex.chestAcc[0]&&x!==ex.chestAcc[1])[0];
         const lightPress=pick(lightPressPool.length?lightPressPool:[_lpFallback],1,blockSeed(w)+40)[0];
         const lightTri=pick(_bw(['Bench dips (chair)','Close-grip pushups','Diamond pushups'],_gear(EXLIB.triceps)),1,blockSeed(w)+41)[0];
         s.push({label:'Main — '+lightPress,items:[{name:lightPress,detail:vsets(3)+'×12 — RPE 6–7, leave 3+ in reserve'+restNote},{name:ex.shoulder[1],detail:vsets(3)+'×12'+(_isOneArmPress(ex.shoulder[1])?' each':'')}]});
         s.push({label:'Pump',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×15'},{name:lightTri,detail:vsets(3)+'×15'}]});
         if((goal==='fatloss'||goal==='athletic')&&!strengthSupport)
           s.push({label:'Light finisher',optional:true,superset:true,rounds:vsets(3),items:[{name:ex.cond[2],detail:vsets(3)+'×15'},{name:ex.cond[3],detail:vsets(3)+'×12'}]});
-        else
-          s.push({label:'Delt finisher',optional:true,items:[{name:pick(_bw(EXLIB.shoulder_iso_bw,_gear(EXLIB.shoulder_iso)),1,blockSeed(w)+42)[0],detail:vsets(3)+'×20'}]});
+        else {
+          // V193 (same-card, slice 5): the LATER SECTION YIELDS, third use of the shape.
+          // ex.shoulder[1] is printed in the Main pairing two lines up and is drawn from
+          // shoulderAccPool, which shares exactly one name with EXLIB.shoulder_iso —
+          // 'Dumbbell lateral raise'. So the day could headline a lateral raise and then
+          // prescribe it again underneath at a different dose: 636 day-builds of 59,781,
+          // up from 396 on V192 because D47 unprotected the 2-item optional core block and
+          // moved budget-trim pressure off this 1-item section, letting a duplicate the cap
+          // used to hide survive 240 more times. D47 was ruled; this consequence was not.
+          // The pool is registered with the swap universe BEFORE the subtraction, the way
+          // _slot does it, so the swap sheet still offers the full delt inventory — the
+          // subtraction is about what this card prints, not about what the athlete may pick.
+          // Floor after subtracting every name already on the card: 2 on bodyweight (1 on
+          // bodyweight/advanced, the only window that reaches 'Prone Y-T-W raises'), 2 on
+          // minimal / home_basic / home_full / crossfit, 4 on commercial. Never 0, so the
+          // guard below is a crash guard and not a filler — there is no fallback to the
+          // unfiltered pool. If a future pool edit ever did empty it, this OPTIONAL section
+          // is omitted rather than filled illegally.
+          //
+          // OPEN (deferred to §12, Mario's call): the better answer here may be that this
+          // finisher MERGES into the Main block instead of re-drawing. Six sets of lateral
+          // raises is defensible training; the real defect is two headings carrying two
+          // contradictory prescriptions for one movement (3×10–15 @ RPE 8 above, then
+          // 3×15–20 @ RPE 8 here). That is a design question, not a draw question, and this
+          // slice deliberately takes only the mechanical fix.
+          const _dfPool=_bw(EXLIB.shoulder_iso_bw,_gear(EXLIB.shoulder_iso));
+          _swapUniverseAdd(_dfPool);
+          const _dfTaken=Object.create(null);
+          s.forEach(function(sec){((sec&&sec.items)||[]).forEach(function(it){if(it&&it.name)_dfTaken[it.name]=1;});});
+          const _dfFree=_dfPool.filter(function(n){return !_dfTaken[n];});
+          if(_dfFree.length)
+            s.push({label:'Delt finisher',optional:true,items:[{name:pick(_dfFree,1,blockSeed(w)+42)[0],detail:vsets(3)+'×20'}]});
+        }
         return s;
       }
       let det = _testWk ? _testRx : scheme(_benchRM,w,hasBenchRM,ex.chestMain)+warmupNote+', 2–3 min rest'+restNote;
@@ -7855,16 +8125,52 @@ function engineC_kinematics(cfg, A, B){
         // 4) Direct isolation slot (triceps)
         s.push({label:'Triceps',superset:true,rounds:hsets,items:[{name:tris[0],detail:hsets+'×'+repA},{name:tris[1],detail:hsets+'×'+repB}]});
       } else {
+      // V193 (same-card, slice 5): the LATER SECTION YIELDS, fourth use of the shape, and
+      // the only one that needs a helper because TWO later sections on this card draw from
+      // the same pool. chestAccPool and chestCompoundPool overlap by name on every loaded
+      // tier — 'Dumbbell bench press' and 'Dumbbell decline press' are in both — and _slot's
+      // _took guard is deliberately inert on healthy programs, so nothing stopped chestAcc
+      // from being handed the day's own Main lift. 64 day-builds printed 'Dumbbell decline
+      // press' as Main and again as Accessory, 60 did the same with 'Dumbbell bench press',
+      // and 3 more printed 'Dumbbell bench press' as Main and again in 'Chest + knee'.
+      //
+      // The card is read, not re-derived: whatever is already in `s` is taken, which is why
+      // the Conditioning branch and the Accessory branch need no separate handling and why
+      // 'Chest + knee' can never collide with the Accessory the line above just pushed.
+      // Preference order keeps an uncontested day byte-identical — the Accessory still asks
+      // for chestAcc[0] first, 'Chest + knee' still asks for chestAcc[1] first, and only a
+      // day that would have duplicated walks past them into the pool.
+      //
+      // Floors, hand counted. Non-bodyweight: chest_acc holds 7 names, the Main can take at
+      // most 1 of them and the shoulder slot none, so the Accessory sees at least 6 and
+      // 'Chest + knee' at least 5. Bodyweight: _bwRung narrows to a 3-name window, the Main
+      // can take at most 1 and the pike/wall shoulder slot none, so the Accessory sees at
+      // least 2 and 'Chest + knee' at least 1. Never 0, so the omission branches are crash
+      // guards and not fillers. There is no fallback to an unfiltered pool: if a future pool
+      // edit ever did empty this, the section is dropped rather than printed illegally.
+      const _accFresh=function(prefs){
+        const t=Object.create(null);
+        s.forEach(function(sec){((sec&&sec.items)||[]).forEach(function(it){if(it&&it.name)t[it.name]=1;});});
+        for(let i=0;i<prefs.length;i++){ if(prefs[i]&&!t[prefs[i]]) return prefs[i]; }
+        for(let i=0;i<chestAccPool.length;i++){ if(chestAccPool[i]&&!t[chestAccPool[i]]) return chestAccPool[i]; }
+        return null;
+      };
       s.push({label:'Main — '+ex.chestMain,items:[{name:ex.chestMain,detail:det},{name:ex.shoulder[0],detail:vsets(3)+'×8'+(_isOneArmPress(ex.shoulder[0])?' each':'')}]});
       if((goal==='fatloss'||goal==='athletic')&&!strengthSupport)s.push({label:'Conditioning',optional:true,superset:true,rounds:vsets(3),items:[{name:ex.cond[0],detail:vsets(3)+'×12'},{name:ex.cond[1],detail:vsets(3)+'×10'}]});
       else {
         // V164 station rule: b-walk over the unselected shoulder pool (shoulder[0] is
         // the Main pairing at the site above — protected); chestAcc[0..1] are both
         // consumed on this day, so there is no legal a-alternative — demote if pure.
-        const _sp=_ssPair(ex.chestAcc[0],ex.shoulder[1],[],shoulderAccPool.filter(n=>n!==ex.shoulder[0]));
-        s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'},{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});
+        const _accA=_accFresh([ex.chestAcc[0],ex.chestAcc[1]]);
+        if(_accA){
+          const _sp=_ssPair(_accA,ex.shoulder[1],[],shoulderAccPool.filter(n=>n!==ex.shoulder[0]));
+          s.push({label:'Accessory',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×10'},{name:_sp.b,detail:vsets(3)+'×15'+(_isOneArmPress(_sp.b)?' each':'')}]});
+        }
       }
-      if(!isBeginner)s.push({label:'Chest + knee',superset:true,rounds:vsets(3),items:[{name:ex.chestAcc[1],detail:vsets(3)+'×12'},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
+      if(!isBeginner){
+        const _ckA=_accFresh([ex.chestAcc[1],ex.chestAcc[0]]);
+        if(_ckA) s.push({label:'Chest + knee',superset:true,rounds:vsets(3),items:[{name:_ckA,detail:vsets(3)+'×12'},{name:ex.kneeStab,detail:vsets(3)+'×25 sec'}]});
+      }
       }
     } else if(role==='pull'){
       s.push({label:'Main — '+ex.backMain,items:[{name:ex.backMain,detail:_testWk?_testRx:scheme(_deadRM,w,hasDeadRM,ex.backMain)+warmupNote+', 3 min rest'}]});
@@ -8413,10 +8719,18 @@ const _AUX_FAMILY={
   'Garhammer raises':'core','Hanging knee raises':'core','Hanging leg raises':'core','Hanging hold':'core',
   'L-sit hold':'core','McGill curl-up':'core','Pallof press':'core','Plank hold':'core','RKC plank':'core',
   'Side plank':'core','Superman':'core','Toes-to-bar':'core','Windshield wipers':'core',
+  // V193 (D46): every rotational pillar member is family 'core'. Cable woodchoppers and
+  // Landmine rotations were absent from this map entirely, which made them skip-only with
+  // zero swap candidates. Medicine ball rotary toss read 'power', so its only swap candidates
+  // were jumps and olympic derivatives: a swap out of a transverse-plane finisher converted it
+  // into a jump, an exit from the pillar rather than a substitution.
+  'Cable woodchoppers':'core','Landmine rotations':'core','Medicine ball rotary toss':'core',
+  'Standing torso rotations (slow)':'core','Side plank thread-the-needle':'core',
+  'Band woodchopper (door anchor)':'core',
   'Farmer carry':'carry','Suitcase carry':'carry','Overhead carry':'carry',
   'Trap bar farmer carry':'carry',
   'Ball slams':'power','Broad jumps':'power','Dumbbell snatch':'power','Kettlebell clean':'power',
-  'Lateral bounds':'power','Medicine ball rotary toss':'power','Power clean (light & explosive)':'power',
+  'Lateral bounds':'power','Power clean (light & explosive)':'power',
   'Single-arm KB snatch':'power','Skater bounds':'power','Trap bar jump':'power','Tuck jumps':'power',
   'Wall ball shots':'power',
   'Burpees':'cond','High knees':'cond','Mountain climbers':'cond',
@@ -8433,14 +8747,23 @@ const _AUX_FAMILY_LABEL={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLIST
 // on a bodyweight athlete. This sidecar covers ONLY those names. 'Trap bar farmer carry'
 // is deliberately absent: it still names its own implement and the /trap bar/ regex
 // already answers for it, and a second guard over the same name would be untrippable.
-const _AUX_GEAR={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded'};
+// V193 (D49): 'Pallof press' joins the sidecar with the BAND predicate. It is a band or
+// cable anti-rotation press and is undoable with no equipment, but its name says neither
+// word, so every regex below missed it and it fell through to `return true` — legal on a
+// bodyweight athlete. Band, not cable, is the right tag: the band is the looser implement
+// and the movement genuinely runs off one, so the tier set is the /\bband\b/ clause's
+// (everything that owns bands: not bodyweight, not minimal).
+const _AUX_GEAR={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
 function _auxGearOK(name,equip){
-  if(_AUX_GEAR[String(name||'').trim()]==='loaded') return equip!=='bodyweight';
+  const _g=_AUX_GEAR[String(name||'').trim()];
+  if(_g==='loaded') return equip!=='bodyweight';
+  if(_g==='band') return equip!=='bodyweight'&&equip!=='minimal';
   const N=String(name||'').toLowerCase();
   if(/cable|pec deck/.test(N)) return equip==='commercial';
   if(/ball slams|wall ball|medicine ball/.test(N)) return equip==='commercial'||equip==='crossfit';
-  if(/barbell|trap bar|power clean/.test(N)) return equip==='home_full'||equip==='commercial'||equip==='crossfit';
+  if(/barbell|trap bar|power clean|landmine/.test(N)) return equip==='home_full'||equip==='commercial'||equip==='crossfit';  // V193 (D46): 'landmine' — this clause could not see the word, so a landmine read bodyweight legal on the swap sheet
   if(/kettlebell|\(kb|\bkb\b|dumbbell|\(db\b/.test(N)) return equip!=='bodyweight';
+  if(/\bband\b/.test(N)) return equip!=='bodyweight'&&equip!=='minimal';   // V193 (D46): wizard equipment copy gives bands to home_full, home_basic and crossfit
   return true;
 }
 // Candidates for a null-pattern swap: same family, not already on the card, gear-legal,
@@ -9038,7 +9361,73 @@ function capSessionBudget(sections, cardio){
   const cap=Math.max(12, SESSION_SET_BUDGET - Math.round(_cardioInterference(cardio)*2));
   if(_total(sections)<=cap) return sections;
   const out=sections.map(s=>({...s, items:((s&&s.items)||[]).map(it=>({...it}))}));
+  // ── V193 (D50): THE TRUNK FLOOR IS A FLOOR ON THE DAY, NOT ON THE SECTION ────
+  // D48 ruled one thing unconditionally: zero trunk is not a coachable prescription. It
+  // was implemented one level too low — as a floor on the ITEMS INSIDE an optional core
+  // section — so the budget could still delete the whole section out from under the floor
+  // and land the day on zero. The sections that fall through it are the ones the builder
+  // emits WITHOUT optional:true: the protect-tier 'Trunk — anti-rotation' /
+  // 'Trunk — anti-extension' pair on the Rehab + Trunk day is ordinary rank-1 fodder, so
+  // the budget empties it, splices it out, and prints a day named for trunk with no trunk
+  // on it. Nothing about a shoulder restricts anti-rotation, a dead bug or a hollow hold,
+  // and overlay doctrine pierces at DAY level to remove what the INJURY forbids, not what
+  // the budget happens to reach next. D50 is not a new rule. It is D48 applied at the
+  // level D48 was ruled at.
+  //
+  // THE FLOOR IS ONE ITEM ON THE DAY, counted across the `Trunk — *` family with the same
+  // /^Trunk / taxonomy injectDynamicCore already uses to decide a day owns its own trunk
+  // block. Two consequences fall straight out of counting ITEMS instead of SECTION LABELS:
+  //   * Carve-out 1, trunk relocated. Fewer labelled trunk sections with trunk still
+  //     present elsewhere on the card is not a defect and needs no special case. While two
+  //     trunk sections live the count is 2 or more, nothing is protected, and the budget
+  //     trims exactly as it did before. Only the last surviving ITEM is held, wherever it
+  //     ended up sitting.
+  //   * Carve-out 4, the floor is not raised. <=1 is the boundary between nonempty and
+  //     empty, not a chosen number. One hard trunk piece is the target; the second item of
+  //     a pair stays budget fodder, which is why the D51 thin-core share barely moves.
+  const _isTrunkSec=s=>/^Trunk /.test((s&&s.label)||'');
+  const _trunkItems=()=>out.reduce((a,s)=>a+(_isTrunkSec(s)?((s&&s.items)||[]).length:0),0);
+  // CARVE-OUT 2 — THE RUN IS THE DAY. d18LongRunDayPass owns a long-run day (tier A post
+  // run mobility only, tier B upper and trunk capped at 8 sets, tier C carry ban). Tier B
+  // keeps sections that still have items, so a floor that held a trunk section alive here
+  // would hand tier B one more section to spend its eight sets on and rewrite a day the
+  // run already decided. No long-run tier gets the floor. _longRunTier is the same
+  // predicate that pass uses, so the two can never disagree about what a long run is.
+  // CARVE-OUT 3 — RACE WEEK BELONGS TO D37/D38. raceEveLiftPass replaces day.sections
+  // wholesale on the race day, the eve and two days out, and it runs after this pass, so
+  // ordering already makes the window unreachable. Leaning on that alone is the latch
+  // shape §10b bans (a claim that only holds while a LATER pass keeps cleaning up), so the
+  // one day of that window this function can see from its own cardio is refused here by
+  // name. A trunk floor does not outrank the race.
+  const _trunkFloor = !_longRunTier(cardio)
+    && !/race day|time trial/i.test((cardio&&cardio.subtype)||'');
   const _protected=s=>{
+    // V193 (D50): the day's LAST trunk item is not budget fodder. Tested before the D47
+    // optional clause because the floor is a fact about the day, not about who owns the
+    // section — an optional trunk block down to its last item is held for the same reason.
+    if(_trunkFloor && _isTrunkSec(s) && _trunkItems()<=1) return true;
+    // V193 (D47): an OPTIONAL section is never protected. injectDynamicCore pushes the core
+    // finisher with optional:true and s.core:true, and s.core won here — so the budget paid
+    // for a finisher the engine itself called optional by trimming the prehab rail, which
+    // ships under labels like 'Chest + knee' that match no protection and rank 1. Measured on
+    // the D44 artifact: 69/8160 home_basic day-builds lost an item, top losses Dumbbell
+    // lateral raise -14, Spanish squat hold (KB) -9, Wall sit -7 — two knee prehab, three
+    // cuff/scap. _secRank already ranks s.optional at 3 (trimmed first); this clause simply
+    // lets it be reached. Nothing else moves: the budget value, the cost model, the barbell
+    // tier-3 guard and every non-optional protection are untouched.
+    // V193 (D48, amending D47): the bare optional test went too far and deleted 62 of 540
+    // core sections. An optional section is unprotected only while it still has something
+    // to give. Taking from a section with one item left is not trimming it, it is deleting
+    // it, and deleting a training quality is the exact disease D47 was written to cure,
+    // just relocated from prehab to trunk. length>1 is not a tunable: 1 is the boundary
+    // between nonempty and empty, not a chosen constant. A floor expressed in SETS was
+    // considered and rejected as a genuinely invented constant with no table behind it.
+    // Thin core is an acceptable outcome: one hard trunk piece done properly on a tight
+    // day is a coachable prescription. Zero trunk is not.
+    // V193 (D50): "zero trunk is not" is enforced ABOVE this line now, on the day rather
+    // than on the section, because this clause only ever reached sections carrying
+    // optional:true and the builder's own trunk sections do not carry it.
+    if(s && s.optional && ((s.items||[]).length>1)) return false;
     const L=((s&&s.label)||'').toLowerCase();
     return s.core||s.hip||/^main\b|^primer|^power\b|^strength\b/.test(L)||/hip|mobility|stretch/.test(L);
   };
@@ -9301,7 +9690,7 @@ function engineD_synthesis(cfg, A, B, plan, C){
     // Taper weeks strip to the big-3 primer — no core finishers.
     // Recovery weeks skip core finishers too — the deload ruling is main + one
     // accessory + hip prehab, nothing else. Taper already strips to the primer.
-    if(includeCore && !inTaper(w) && !isRecoveryWeek(w)) injectDynamicCore(weeks[w], dayRoles, trainDays, w);
+    if(includeCore && !inTaper(w) && !isRecoveryWeek(w)) injectDynamicCore(weeks[w], dayRoles, trainDays, w, cfg.equipment||'home_full');
     // Dynamic core lands AFTER the per-day injury filter, so injured programs get one
     // more pass over the finished week — spine-safe swaps and drops apply to injected
     // finishers too. applyInjuryFilter is idempotent (RPE-note append is guarded), so

@@ -1,0 +1,30 @@
+[
+ {
+  "name": "W1 -> G1: rehab-day pillar loses its gear lens",
+  "why": "The protect-tier Rehab + Trunk day draws the anti_rotation pillar with no _auxGearOK filter, so band-gated members print on tiers that own no band. INVISIBLE ON THE OLD LATTICE: this whole branch is reachable only under shoulder/protect or elbow/protect, and the old sweep was healthy only. NAMED G1 ONLY, verified rather than assumed: G13a cannot see this. G13a walks sections flagged core:true and the Rehab + Trunk day pushes its trunk work as plain labelled sections, so the item-level G1 table is the assertion that catches it. Measured: 2 new G1 failures.",
+  "anchor": "const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name)&&_auxGearOK(it.name,equip));",
+  "replacement": "const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name));",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "W2 -> trunk_protect: rehab-day trunk section emptied",
+  "why": "The Rehab + Trunk day pushes its anti-rotation section with no items. index.html strips zero-item sections before they reach prog.weeks, so the observable effect is that the section is DELETED, not that it ships empty — which is why this targets the trunk gate and not budget_floor B2. Recorded deliberately: B2 ('zero empty sections') is unfalsifiable by any section-emptying mutation and is a structural tripwire on the strip itself, not on the budget. INVISIBLE ON THE OLD BUDGET LATTICE: shoulder/protect and elbow/protect only.",
+  "anchor": "s.push({label:'Trunk — anti-rotation',items:_arPick.map(it=>({...it}))});",
+  "replacement": "s.push({label:'Trunk — anti-rotation',items:[]});",
+  "gate": "gates/g193_trunk_protect.js"
+ },
+ {
+  "name": "W3 -> G4/G4b: lowback pull becomes a cable movement",
+  "why": "The lowback/protect vertical pull array is replaced by a cable-only name, so cable-less tiers get an illegal implement and, where the gear filter drops it, no pull at all. INVISIBLE ON THE OLD LATTICE on both counts: lowback/protect only, and the old G6 pooled twelve builds per tier so it could not see a per-build hole either. NAMED G4/G4b, verified: G6 does NOT trip, because 'Straight-arm pulldown' still matches the VPULL predicate, so the slot reads as filled even where the implement is illegal. That is the correct division of labour between the two assertions and it is recorded here so nobody 'fixes' G6 to cover it. Measured: 5 new G4 and 5 new G4b failures.",
+  "anchor": ":['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']",
+  "replacement": ":['Straight-arm pulldown']",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "W4 -> B1a: advanced athletes lose every core section",
+  "why": "Core injection is skipped for experience 'advanced'. INVISIBLE ON THE OLD LATTICE: the old B1 counted 90 core sections per tier over experience 'intermediate' only, so an advanced-only deletion scored 90/90 and passed clean. The widened B1a counts every HEALTHY cell across both foci AND both experience levels, so it sees the hole. Chosen over a focus-keyed variant on purpose: the earlier draft keyed on hypertrophy inside regionalOverloadGuard and was a NO-OP, because that pass runs before injectDynamicCore and there are no core sections there yet to remove. A no-op mutation is a mutation defect, so it was rewritten rather than left in as a survivor.",
+  "anchor": "    if(includeCore && !inTaper(w) && !isRecoveryWeek(w)) injectDynamicCore(weeks[w], dayRoles, trainDays, w, cfg.equipment||'home_full');",
+  "replacement": "    if(includeCore && !inTaper(w) && !isRecoveryWeek(w) && (cfg.experience!=='advanced')) injectDynamicCore(weeks[w], dayRoles, trainDays, w, cfg.equipment||'home_full');",
+  "gate": "gates/g193_budget_floor.js"
+ }
+]

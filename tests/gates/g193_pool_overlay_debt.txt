@@ -1,0 +1,33 @@
+# g193_pool_overlay — NAMED DEBT. Every line is a pre-existing trip of the D52 standing
+# assertion, recorded here so it is COUNTED and VISIBLE rather than muted, and so any NEW
+# trip is a hard failure. This file is the §12 item. Deleting a line is only correct when
+# the underlying pool is fixed: the gate FAILS on a listed entry that no longer trips, so
+# the list cannot rot.
+#
+# same-lens: hip/protect assigns hinge and hip-extension pools whose every member its own
+# plan deletes (the branch comment says "hinge/lunge/hip-extension sit out"). Unlike D52
+# the deletion is INTENDED, so the day loses nothing it was meant to keep — the pools are
+# vestigial, not wrong. Count: 3. Triage: delete the two assignments, or keep them and say
+# in the comment that they exist only to be filtered.
+same-lens hip/protect hingePool Bodyweight back extension
+same-lens hip/protect hingePool Barbell Romanian deadlift
+same-lens hip/protect hipExtPool 45° back extension
+#
+# thin-pool: injury pools AUTHORED with fewer than two members. The overlay does not
+# narrow these; they were written that way. D44's floor was ruled on a pool feeding a
+# SUPERSET, where a one-member pool makes _slot repeat a name on one card; a single main
+# slot cannot repeat itself. Whether the floor should extend to them is coach's call, not
+# this gate's. Count: 11 pools. One of them is deliberate and documented in the branch:
+# lowback/protect rowPool on the CABLE tier is the straight-arm pulldown alone, and that
+# branch's own comment says the main pool cannot hold one, so nothing can collide with it.
+thin-pool hip/protect hipExtPool
+thin-pool hip/protect hingePool
+thin-pool lowback/protect rowPool
+thin-pool hip/workaround hingePool
+thin-pool hip/workaround lungePool
+thin-pool hip/workaround squatPool
+thin-pool ankle/workaround squatPool
+thin-pool ankle/workaround lungePool
+thin-pool lowback/protect squatPool
+thin-pool lowback/workaround squatPool
+thin-pool elbow/protect chestCompoundPool

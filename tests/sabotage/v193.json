@@ -1,0 +1,117 @@
+[
+ {
+  "name": "S1 -> G1: the pillar gate is removed, CORE_PILLARS goes back to ungated",
+  "anchor": "  const _pi = key => {\n    const g = equip===undefined\n      ? (P[key].items||[])\n      : (P[key].items||[]).filter(it=>_auxGearOK(it.name, equip));\n    const d = g.filter(it=>!_onCard[String(it.name||'').trim().toLowerCase()]);\n    return d.length ? d : g;\n  };",
+  "replacement": "  const _pi = key => P[key].items;",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S2 -> G1/G2: the gear predicate is inverted, every pillar keeps exactly the members its tier cannot own",
+  "anchor": ": (P[key].items||[]).filter(it=>_auxGearOK(it.name, equip));",
+  "replacement": ": (P[key].items||[]).filter(it=>!_auxGearOK(it.name, equip));",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S3 -> G3b: the filtered pillar is truncated to one member, so the rotated pair collapses to a one-item core block",
+  "anchor": "(P[key].items||[]).filter(it=>_auxGearOK(it.name, equip));",
+  "replacement": "(P[key].items||[]).filter(it=>_auxGearOK(it.name, equip)).slice(0,1);",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S16 -> G11b/G11c: D47+D48 are reverted wholesale, the optional core finisher is protected again and the prehab rail pays",
+  "anchor": "    if(s && s.optional && ((s.items||[]).length>1)) return false;\n",
+  "replacement": "",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S17 -> G11c/G11d: the optional test in the trim ranking is inverted, so the rail ranks last and a fixed core pays",
+  "anchor": "    if(s.optional||/carry|finisher|conditioning|explosive/.test(L)) return 3;",
+  "replacement": "    if(!s.optional||/carry|finisher|conditioning|explosive/.test(L)) return 3;",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S4 -> G1: the hot-tomorrow branch reads the raw pillar again, bypassing the gate",
+  "anchor": "items = [rotOn(T2,_pi(pillar),T2), rotOn(T2,_pi(pillar),T2+1)]",
+  "replacement": "items = [rotOn(T2,P[pillar].items,T2), rotOn(T2,P[pillar].items,T2+1)]",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S5 -> G1: the clear-runway branch reads the raw pillar and takes its tail, landing the landmine on home_basic",
+  "anchor": "        : [rotOn(T3,_pi(key),T3), rotOn(T3,_pi(key),T3+1)].filter((v,i,a)=>a.indexOf(v)===i).slice(0,2);",
+  "replacement": "        : P[key].items.slice(2,4);",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S6 -> G1: the call site stops passing equipment, so the injector never learns the tier",
+  "anchor": "injectDynamicCore(weeks[w], dayRoles, trainDays, w, cfg.equipment||'home_full');",
+  "replacement": "injectDynamicCore(weeks[w], dayRoles, trainDays, w);",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S7 -> G1: the tier table forgets home_basic owns no barbell",
+  "anchor": "function _tierHasBarbell(equip){ return equip==='home_full'||equip==='commercial'||equip==='crossfit'; }",
+  "replacement": "function _tierHasBarbell(equip){ return equip!=='bodyweight'&&equip!=='minimal'; }",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S8 -> G4: the lowback/protect row slot loses its cable branch, the pulldown ships everywhere again",
+  "anchor": "        rowPool = hasCables?['Straight-arm pulldown']:['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']\n          .filter(n=>hasDumbbells||!/weighted/i.test(n));",
+  "replacement": "        rowPool = ['Straight-arm pulldown'];",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S9 -> G5: the cable branch is inverted, commercial loses the pulldown it owns",
+  "anchor": "        rowPool = hasCables?['Straight-arm pulldown']:['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']\n          .filter(n=>hasDumbbells||!/weighted/i.test(n));",
+  "replacement": "        rowPool = hasCables?['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']:['Straight-arm pulldown'];",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S10 -> G6: the cable-less branch empties the slot instead of substituting a vertical pull",
+  "anchor": ":['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']",
+  "replacement": ":['Dumbbell row']",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S11 -> G8/G10: the home_full card stops naming bands while the prehab rail still prescribes them",
+  "anchor": "desc:'Barbell, rack, bench, dumbbells, kettlebells, pull-up bar, trap bar, bands'}",
+  "replacement": "desc:'Barbell, rack, bench, dumbbells, kettlebells, pull-up bar, trap bar'}",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S12 -> G8/G10: the crossfit card stops naming bands",
+  "anchor": "desc:'Barbells, rig, bumpers, kettlebells, rower/bike, wall balls, bands'}",
+  "replacement": "desc:'Barbells, rig, bumpers, kettlebells, rower/bike, wall balls'}",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S13 -> G9: fix 3 is implemented as a prescription strip, the glute-med band drill leaves the rail",
+  "anchor": "\"Banded monster walks\",",
+  "replacement": "\"Monster walks (bodyweight)\",",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S14 -> G10b: an em-dash is introduced into a card D44 rewrote",
+  "anchor": "desc:'Barbells, rig, bumpers, kettlebells, rower/bike, wall balls, bands'",
+  "replacement": "desc:'Barbells, rig, bumpers — kettlebells, rower/bike, wall balls, bands'",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S15 -> G9: the dorsiflexion rail loses its band, which fix 3 explicitly upheld",
+  "anchor": "'Banded dorsiflexion','Single-leg bent-knee soleus raise'",
+  "replacement": "'Ankle dorsiflexion (no band)','Single-leg bent-knee soleus raise'",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "S18 -> g193_budget_floor B1: the D48 floor is deleted, the clause reverts to bare D47 and the budget deletes core sections",
+  "anchor": " && ((s.items||[]).length>1)",
+  "replacement": "",
+  "gate": "gates/g193_budget_floor.js"
+ },
+ {
+  "name": "S19 -> g193_budget_floor B3: the optional term is neutralised, D47 is undone and the prehab rail pays for the core finisher again",
+  "anchor": "if(s && s.optional && ((s.items||[]).length>1)) return false;",
+  "replacement": "if(s && false && ((s.items||[]).length>1)) return false;",
+  "gate": "gates/g193_budget_floor.js",
+  "note": "Literally DELETING the term ('if(s && ((s.items||[]).length>1)) return false;') was tried first and is a behavioural no-op across the whole 2940 day-build sweep: stripping protection from NON-optional multi-item sections changes nothing, because on an over-budget day the trim loop resolves at rank 3 or 2 and never descends to the protected work. A no-op mutation is a mutation defect, not a gate defect (V185), so the same term is broken the other way instead. The inverted form (!s.optional) was measured too and produces byte-identical output to this one."
+ }
+]

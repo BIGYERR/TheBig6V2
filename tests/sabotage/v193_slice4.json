@@ -1,0 +1,44 @@
+[
+ {
+  "name": "M1 -> G1a/G5: the protect-tier anti-rotation draw loses its gear gate again, so the band-only Pallof press returns to bodyweight and minimal",
+  "anchor": "        const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name)&&_auxGearOK(it.name,equip));",
+  "replacement": "        const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name));",
+  "gate": "gates/g193_trunk_protect.js"
+ },
+ {
+  "name": "M2 -> G1c: the day's carry strip is dropped while the gear gate stays, so a protect-tier shoulder is handed a loaded carry",
+  "anchor": "        const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name)&&_auxGearOK(it.name,equip));",
+  "replacement": "        const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>_auxGearOK(it.name,equip));",
+  "gate": "gates/g193_trunk_protect.js"
+ },
+ {
+  "name": "M3 -> G1b: the gear gate is asked about a hardcoded tier instead of the athlete's, deleting the Pallof press from the four tiers that own a band",
+  "anchor": "        const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name)&&_auxGearOK(it.name,equip));",
+  "replacement": "        const _ar=CORE_PILLARS.anti_rotation.items.filter(it=>!/carry/i.test(it.name)&&_auxGearOK(it.name,'bodyweight'));",
+  "gate": "gates/g193_trunk_protect.js"
+ },
+ {
+  "name": "M4 -> G2a/G4c: the anti-extension pair no longer claims its names, so the anti-rotation re-draw has nothing to avoid and 'Bird dogs' prints twice on one card again",
+  "anchor": "        const _taken=Object.create(null); _aePick.forEach(it=>{_taken[it.name]=1;});",
+  "replacement": "        const _taken=Object.create(null);",
+  "gate": "gates/g193_trunk_protect.js"
+ },
+ {
+  "name": "M5 -> G4c: the collision is resolved the wrong way round, the anti-extension section yields and the anti-rotation section keeps the shared movement",
+  "anchor": "        const _aePick=[_rot(_ae,0),_rot(_ae,2)];\n        const _taken=Object.create(null); _aePick.forEach(it=>{_taken[it.name]=1;});\n        const _arPick=[];\n        for(let _k=0;_k<_ar.length&&_arPick.length<2;_k++){\n          const _it=_rot(_ar,_k);\n          if(_taken[_it.name]) continue;\n          _taken[_it.name]=1; _arPick.push(_it);\n        }",
+  "replacement": "        const _arPick=[_rot(_ar,0),_rot(_ar,1)];\n        const _taken=Object.create(null); _arPick.forEach(it=>{_taken[it.name]=1;});\n        const _aePick=[];\n        for(let _k=0;_k<_ae.length&&_aePick.length<2;_k++){\n          const _it=_rot(_ae,_k===0?0:2+_k-1);\n          if(_taken[_it.name]) continue;\n          _taken[_it.name]=1; _aePick.push(_it);\n        }",
+  "gate": "gates/g193_trunk_protect.js"
+ },
+ {
+  "name": "M6 -> G4a: the anti-rotation walk starts one step off, so the section prints a pair the rotation never ordered",
+  "anchor": "          const _it=_rot(_ar,_k);",
+  "replacement": "          const _it=_rot(_ar,_k+1);",
+  "gate": "gates/g193_trunk_protect.js"
+ },
+ {
+  "name": "M7 -> G3d: the re-draw stops after ONE member, so every protect-tier card prints a one-item trunk block instead of a pair",
+  "anchor": "        for(let _k=0;_k<_ar.length&&_arPick.length<2;_k++){",
+  "replacement": "        for(let _k=0;_k<_ar.length&&_arPick.length<1;_k++){",
+  "gate": "gates/g193_trunk_protect.js"
+ }
+]

@@ -1,0 +1,82 @@
+// MEASURE — V193 same-card duplicates + coach's six-item budget bar, on a WIDE lattice.
+//
+// Why this file exists: g193_budget_floor sweeps 6 tiers x 5 seeds of the bare HALF MANNY
+// fixture (30 builds, no injury, one lifting focus, one experience level). The same-card
+// defects all live on injury paths, so the bar has to be re-read on a lattice that contains
+// them before anyone can say the fixes were free. Run it on two artifacts and diff by eye.
+//
+//   node tests/measure/v193_samecard_wide.js <file.html>
+//
+// Reports, with denominators: the duplicate census by movement; the Main-repeat subset;
+// core sections per build; empty sections; thin core; prehab items; non-optional sections.
+const {load, fixtures, DAYS} = require(require('path').join(__dirname, '..', 'harness.js'));
+const IA = load(process.argv[2] || 'index.html');
+const clean = s => String(s || '').replace(/<svg[\s\S]*?<\/svg>\s*/g, '').trim();
+
+const EQUIP  = ['bodyweight','minimal','home_basic','home_full','commercial','crossfit'];
+const FOCUS  = ['support_prevention','hypertrophy'];
+const EXPER  = ['beginner','intermediate','advanced'];
+const SEEDS  = [1013, 3039, 76308];
+const INJ = [
+  {tag:'healthy',            injury:null},
+  {tag:'shoulder/protect',   injury:{region:'shoulder',tier:'protect'}},
+  {tag:'elbow/protect',      injury:{region:'elbow',   tier:'protect'}},
+  {tag:'lowback/protect',    injury:{region:'lowback', tier:'protect'}},
+  {tag:'knee/protect',       injury:{region:'knee',    tier:'protect'}},
+  {tag:'hip/workaround',     injury:{region:'hip',     tier:'workaround'}},
+  {tag:'ankle/workaround',   injury:{region:'ankle',   tier:'workaround'}},
+  {tag:'lowback/workaround', injury:{region:'lowback', tier:'workaround'}},
+];
+
+// O3 of g193_budget_floor, re-typed: the prehab set.
+const PREHAB_POOLS = ['Spanish squat hold (KB)','Wall sit','Terminal knee extension (band)','Single-leg wall sit',
+  'Dumbbell lateral raise','Cable lateral raise','Dumbbell front raise','Dumbbell rear delt fly','Face pull',
+  'Prone Y-T-W raises','Wall slides'];
+
+let builds=0, days=0, coreSections=0, emptySections=0, thinCore=0, prehabItems=0, nonOptSections=0, sections=0;
+const dup={}, mainDup={}, dupByTag={};
+for (const inj of INJ) for (const equipment of EQUIP) for (const liftingFocus of FOCUS)
+for (const experience of EXPER) for (const seed of SEEDS){
+  const cfg = Object.assign({}, fixtures.HALF_MANNY, {equipment, seed, liftingFocus, experience, injury: inj.injury});
+  let prog; try { prog = IA.buildProgram(cfg); builds++; } catch(e){ console.log('THREW', inj.tag, equipment, liftingFocus, experience, seed, e.message); continue; }
+  const weeks = prog.weeks || {};
+  for (const wk of Object.keys(weeks)) for (const d of DAYS){
+    const day = weeks[wk][d]; if (!day || day.rest) continue;
+    const all = day.sections || [];
+    all.forEach(s => {
+      if (!s) return;
+      sections++;
+      const n = (s.items||[]).length;
+      if (n === 0) emptySections++;
+      if (s.core){ coreSections++; if (n === 1) thinCore++; }
+      if (!s.optional) nonOptSections++;
+      (s.items||[]).forEach(it => { if (it && it.name && PREHAB_POOLS.indexOf(clean(it.name)) >= 0) prehabItems++; });
+      if (s.hip) (s.items||[]).forEach(() => prehabItems++);
+    });
+    const secs = all.filter(s => s && (s.items||[]).length);
+    if (!secs.length) continue;
+    days++;
+    const where = {};
+    secs.forEach(s => { const lbl = clean(s.label) || clean(s.coreHeader) || '(unlabelled)';
+      (s.items||[]).forEach(it => { if (it && it.name){ const n = clean(it.name); (where[n] = where[n] || []).push(lbl); } }); });
+    Object.keys(where).forEach(n => {
+      if (where[n].length < 2) return;
+      dup[n] = (dup[n]||0) + 1;
+      dupByTag[inj.tag] = (dupByTag[inj.tag]||0) + 1;
+      if (where[n].some(l => /^Main —/.test(l))) mainDup[n] = (mainDup[n]||0) + 1;
+    });
+  }
+}
+const sum = o => Object.values(o).reduce((a,b)=>a+b,0);
+console.log('FILE            ' + (process.argv[2]||'index.html'));
+console.log('lattice         ' + builds + ' builds / ' + days + ' day-builds / ' + sections + ' sections');
+console.log('ANY same-card duplicate      ' + sum(dup) + ' / ' + days);
+Object.keys(dup).sort((a,b)=>dup[b]-dup[a]).forEach(n => console.log('    ' + String(dup[n]).padStart(5) + '  ' + n));
+console.log('MAIN repeated elsewhere      ' + sum(mainDup) + ' / ' + days);
+Object.keys(mainDup).sort((a,b)=>mainDup[b]-mainDup[a]).forEach(n => console.log('    ' + String(mainDup[n]).padStart(5) + '  ' + n));
+console.log('by injury path               ' + JSON.stringify(dupByTag));
+console.log('B1 core sections             ' + coreSections);
+console.log('B2 empty sections            ' + emptySections);
+console.log('B3 prehab items              ' + prehabItems);
+console.log('B4 non-optional sections     ' + nonOptSections);
+console.log('B5 thin core (1 item)        ' + thinCore + ' / ' + coreSections);

@@ -1,0 +1,38 @@
+[
+ {
+  "name": "M1 -> D52 error (a), same-lens: 'L-sit chinups' is put back into the lowback/protect vertical-pull literal, so the branch offers a movement its own SPINE_SWAP nulls and the drawn pull is deleted with no substitute",
+  "anchor": "['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']\n          .filter(n=>hasDumbbells||!/weighted/i.test(n));",
+  "replacement": "['Assisted pullups','Neutral-grip chinups','Chinups','L-sit chinups','Weighted chinups']\n          .filter(n=>hasDumbbells||!/weighted/i.test(n));",
+  "gate": "gates/g193_pool_overlay.js"
+ },
+ {
+  "name": "M2 -> D52 error (b): the whole-pool subtraction of backCompoundPool is restored, which is the over-subtraction that starved home_full to two members",
+  "anchor": "          .filter(n=>hasDumbbells||!/weighted/i.test(n));",
+  "replacement": "          .filter(n=>hasDumbbells||!/weighted/i.test(n))\n          .filter(n=>backCompoundPool.indexOf(n)<0);",
+  "gate": "gates/g193_pool_overlay.js"
+ },
+ {
+  "name": "M3 -> D52 edit 2b: the single-name backMain exclusion at the row-slot draw site is deleted, so nothing downstream keeps the day's main out of the accessory pool",
+  "anchor": "  const _rowSrc0 = (_inj&&rowPool!==_preInj.row)?(rowPool||[]).filter(n=>n!==backMain):(rowPool||[]);",
+  "replacement": "  const _rowSrc0 = (rowPool||[]);",
+  "gate": "gates/g193_pool_overlay.js"
+ },
+ {
+  "name": "M4 -> standing assertion A reads the CURRENT overlay, not a memory of it: SPINE_SWAP starts nulling 'Chinups' too, so three injury pools now offer a movement their own plan deletes and the pool literals never hear about it",
+  "anchor": "'L-sit chinups':null,",
+  "replacement": "'L-sit chinups':null,'Chinups':null,",
+  "gate": "gates/g193_pool_overlay.js"
+ },
+ {
+  "name": "M5 -> D52 edit 1, the derivation: the vertical-pull literal is cut back to two names, under the four EXLIB.back_pull minus the SPINE_SWAP null plus the assisted regression gives, so the pool is one drawn main away from a single member",
+  "anchor": "['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']\n          .filter(n=>hasDumbbells||!/weighted/i.test(n));",
+  "replacement": "['Chinups','Weighted chinups']\n          .filter(n=>hasDumbbells||!/weighted/i.test(n));",
+  "gate": "gates/g193_pool_overlay.js"
+ },
+ {
+  "name": "M6 -> standing assertion A on another branch: shoulder/protect is given a pull its own plan drops by pattern, proving the assertion is unscoped and not a lowback special case",
+  "anchor": "        chestCompoundPool = hasBarbell?['Barbell row','Dumbbell row']:['Kettlebell single-arm row','Dumbbell row'];",
+  "replacement": "        chestCompoundPool = hasBarbell?['Barbell row','Dips']:['Kettlebell single-arm row','Dips'];",
+  "gate": "gates/g193_pool_overlay.js"
+ }
+]

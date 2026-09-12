@@ -1,0 +1,98 @@
+[
+ {
+  "name": "M1 -> G1/G2a/G4b/G4c: the lowback/protect row pool goes back to the one-item literal that names the day's own main lift, so 'Assisted pullups' prints as Main and again in Pull superset A",
+  "anchor": "        rowPool = hasCables?['Straight-arm pulldown']:['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']\n          .filter(n=>hasDumbbells||!/weighted/i.test(n));",
+  "replacement": "        rowPool = hasCables?['Straight-arm pulldown']:['Assisted pullups'];",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M2 -> g193_pool_overlay assertion C: the single-name backMain exclusion at the row-slot draw site is deleted. No card changes (_slot's _took guard already refuses a taken name), so the structural assertion is its only reader.",
+  "anchor": "  const _rowSrc0 = (_inj&&rowPool!==_preInj.row)?(rowPool||[]).filter(n=>n!==backMain):(rowPool||[]);",
+  "replacement": "  const _rowSrc0 = (rowPool||[]);",
+  "gate": "gates/g193_pool_overlay.js"
+ },
+ {
+  "name": "M3 -> G2a/G4c: a DIFFERENT one-item literal, proving the gate is keyed on the collision and not on the string 'Assisted pullups'",
+  "anchor": "        rowPool = hasCables?['Straight-arm pulldown']:['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']\n          .filter(n=>hasDumbbells||!/weighted/i.test(n));",
+  "replacement": "        rowPool = hasCables?['Straight-arm pulldown']:['Chinups'];",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M4 -> G1/G2a: the injector and the pillar filter stop agreeing on the key axis, so the on-card subtraction looks up a lowercased name against a mixed-case table and silently misses every time",
+  "anchor": "((sec&&sec.items)||[]).forEach(function(it){ if(it&&it.name) _onCardNames[String(it.name).trim().toLowerCase()]=1; });",
+  "replacement": "((sec&&sec.items)||[]).forEach(function(it){ if(it&&it.name) _onCardNames[String(it.name).trim()]=1; });",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M5 -> G1/G2a: the core pillar draw stops subtracting what the card already prescribes, so the anti-rotation block hands back the Farmer carry the day just finished with",
+  "anchor": "    const d = g.filter(it=>!_onCard[String(it.name||'').trim().toLowerCase()]);\n    return d.length ? d : g;",
+  "replacement": "    const d = g;\n    return d.length ? d : g;",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M6 -> G1/G2a: the injector stops telling the core block what is on the card, so the subtraction is wired but blind",
+  "anchor": "    const block=getDynamicCoreBlock(week, dayRoles[day], isHardRun(day), hot, slot, equip, _onCardNames);",
+  "replacement": "    const block=getDynamicCoreBlock(week, dayRoles[day], isHardRun(day), hot, slot, equip);",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M7 -> G5a: the row pool is emptied outright, which removes the duplicate by deleting the training quality instead of selecting a different name",
+  "anchor": "        rowPool = hasCables?['Straight-arm pulldown']:['Assisted pullups','Neutral-grip chinups','Chinups','Weighted chinups']\n          .filter(n=>hasDumbbells||!/weighted/i.test(n));",
+  "replacement": "        rowPool = [];",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M8 -> G1 'Dumbbell lateral raise': the Delt finisher stops subtracting the card, so the day headlines a lateral raise and prescribes it again underneath at a different dose",
+  "anchor": "          const _dfFree=_dfPool.filter(function(n){return !_dfTaken[n];});",
+  "replacement": "          const _dfFree=_dfPool.slice();",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M9 -> G1 'Dumbbell lateral raise': the Delt finisher's taken-map is wired but blind, keyed on the prescription string instead of the movement name",
+  "anchor": "          s.forEach(function(sec){((sec&&sec.items)||[]).forEach(function(it){if(it&&it.name)_dfTaken[it.name]=1;});});",
+  "replacement": "          s.forEach(function(sec){((sec&&sec.items)||[]).forEach(function(it){if(it&&it.name)_dfTaken[it.detail]=1;});});",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M10 -> G5c: the Delt finisher removes the duplicate by deleting the section instead of choosing another delt, which is deletion dressed as selection",
+  "anchor": "          if(_dfFree.length)\n            s.push({label:'Delt finisher',optional:true,",
+  "replacement": "          if(false)\n            s.push({label:'Delt finisher',optional:true,",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M11 -> G1 'Dumbbell decline press': the push Accessory stops subtracting the card, so it re-prints the day's own Main lift",
+  "anchor": "        const _accA=_accFresh([ex.chestAcc[0],ex.chestAcc[1]]);",
+  "replacement": "        const _accA=ex.chestAcc[0];",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M12 -> G1 'Dumbbell bench press': 'Chest + knee' stops subtracting the card, so the second chest accessory can be the Main lift again",
+  "anchor": "        const _ckA=_accFresh([ex.chestAcc[1],ex.chestAcc[0]]);",
+  "replacement": "        const _ckA=ex.chestAcc[1];",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M13 -> G1: _accFresh is wired but reads an empty card, so both push sections believe nothing is taken",
+  "anchor": "        s.forEach(function(sec){((sec&&sec.items)||[]).forEach(function(it){if(it&&it.name)t[it.name]=1;});});",
+  "replacement": "        [].forEach(function(sec){((sec&&sec.items)||[]).forEach(function(it){if(it&&it.name)t[it.name]=1;});});",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M14 -> G1/G2a: the hoisted chest-accessory pool loses its bodyweight branch, so the pool and the post-filter stop reasoning about a movement through the same lens",
+  "anchor": "  const chestAccPool    = _bw(['Incline pushups (hands on bed)','Wide-stance pushups','Pushups (slow 3s eccentric)','Close-grip pushups','Decline pushups (feet elevated)'],EXLIB.chest_acc);",
+  "replacement": "  const chestAccPool    = EXLIB.chest_acc;",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M15 -> O9/G1 'Pushups (slow tempo)': the light-press chain reverts to three names with an unguarded '||' terminal, the V122 trap in miniature",
+  "anchor": "        const _lpFallback=['Dumbbell incline press','Dumbbell bench press','Pushups (slow tempo)','Close-grip pushups','Diamond pushups']\n          .filter(x=>x!==ex.chestMain&&x!==ex.chestAcc[0]&&x!==ex.chestAcc[1])[0];",
+  "replacement": "        const _lpFallback=['Dumbbell incline press','Dumbbell bench press','Pushups (slow tempo)']\n          .filter(x=>x!==ex.chestMain&&x!==ex.chestAcc[0]&&x!==ex.chestAcc[1])[0]||'Pushups (slow tempo)';",
+  "gate": "gates/g193_samecard.js"
+ },
+ {
+  "name": "M16 -> G1 'Pushups (slow tempo)': the chain keeps five names but stops guarding against the Pump slot, proving the gate is keyed on the collision and not on the chain length",
+  "anchor": "          .filter(x=>x!==ex.chestMain&&x!==ex.chestAcc[0]&&x!==ex.chestAcc[1])[0];",
+  "replacement": "          .filter(x=>x!==ex.chestMain&&x!==ex.chestAcc[0])[0];",
+  "gate": "gates/g193_samecard.js"
+ }
+]

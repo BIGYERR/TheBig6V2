@@ -1,0 +1,44 @@
+[
+ {
+  "name": "M1 -> G1: the Pallof press loses its gear tag, so the name falls through to the catch-all and reads bodyweight-legal again",
+  "anchor": "const _AUX_GEAR={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};",
+  "replacement": "const _AUX_GEAR={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded'};",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "M2 -> G1: the band predicate is softened to the loaded predicate, which lets the Pallof press back onto the band-less minimal tier",
+  "anchor": "  if(_g==='band') return equip!=='bodyweight'&&equip!=='minimal';",
+  "replacement": "  if(_g==='band') return equip!=='bodyweight';",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "M3 -> G12b: the band predicate is tightened to the cable predicate, deleting the Pallof press from the three band tiers that are not commercial",
+  "anchor": "  if(_g==='band') return equip!=='bodyweight'&&equip!=='minimal';",
+  "replacement": "  if(_g==='band') return equip==='commercial';",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "M4 -> G14/G2b: 'Bird dogs' is removed from anti_rotation, dropping bodyweight back to two legal members and one frozen pair",
+  "anchor": "      {name:'Bird dogs', detail:'3×12 each'},                   // NSW Table 3 + McGill Big 3\n      {name:'Side plank', detail:'3×30–45 sec each'},           // NSW + McGill Big 3",
+  "replacement": "      {name:'Side plank', detail:'3×30–45 sec each'},           // NSW + McGill Big 3",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "M5 -> G15: the new member is spelled in the singular, coining a second identity for one movement and splitting its ia_exw_ history",
+  "anchor": "      {name:'Plank shoulder taps', detail:'3×12 each'},         // V178 _BW_SUBS target, promoted to member; dose from the member it laddered into",
+  "replacement": "      {name:'Plank shoulder tap', detail:'3×12 each'},         // V178 _BW_SUBS target, promoted to member; dose from the member it laddered into",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "M6 -> G16: the added member invents its own dose instead of inheriting the one already in this pillar",
+  "anchor": "      {name:'Bird dogs', detail:'3×12 each'},                   // NSW Table 3 + McGill Big 3",
+  "replacement": "      {name:'Bird dogs', detail:'3×15 alternating'},                   // NSW Table 3 + McGill Big 3",
+  "gate": "gates/g193_gear_gates.js"
+ },
+ {
+  "name": "M7 -> G13a/G1: the pillar draw stops filtering through _auxGearOK, so every gated member leaks onto every tier",
+  "anchor": "    : (P[key].items||[]).filter(it=>_auxGearOK(it.name, equip));",
+  "replacement": "    : (P[key].items||[]);",
+  "gate": "gates/g193_gear_gates.js"
+ }
+]

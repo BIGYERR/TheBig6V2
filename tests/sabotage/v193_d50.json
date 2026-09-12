@@ -1,0 +1,50 @@
+[
+ {
+  "name": "M1 -> U1/U2/L1: the floor is disarmed at the boundary (<=1 becomes <=0), so the last trunk item is fodder again and a card titled 'Rehab + Trunk' prints no trunk",
+  "anchor": "    if(_trunkFloor && _isTrunkSec(s) && _trunkItems()<=1) return true;",
+  "replacement": "    if(_trunkFloor && _isTrunkSec(s) && _trunkItems()<=0) return true;",
+  "gate": "gates/g193_d50_trunkfloor.js"
+ },
+ {
+  "name": "M2 -> CARVE-OUT 2, U4: the long-run guard is deleted, so the floor fires on an NRC long-run day and hands d18LongRunDayPass a section to spend its eight tier B sets on",
+  "anchor": "  const _trunkFloor = !_longRunTier(cardio)\n    && !/race day|time trial/i.test((cardio&&cardio.subtype)||'');",
+  "replacement": "  const _trunkFloor = true\n    && !/race day|time trial/i.test((cardio&&cardio.subtype)||'');",
+  "gate": "gates/g193_d50_trunkfloor.js"
+ },
+ {
+  "name": "M3 -> CARVE-OUT 3, U5: the race-window guard is deleted, so the floor fires on race day and on the time trial that IS race day, outranking D37/D38",
+  "anchor": "  const _trunkFloor = !_longRunTier(cardio)\n    && !/race day|time trial/i.test((cardio&&cardio.subtype)||'');",
+  "replacement": "  const _trunkFloor = !_longRunTier(cardio)\n    && true;",
+  "gate": "gates/g193_d50_trunkfloor.js"
+ },
+ {
+  "name": "M4 -> CARVE-OUT 3 half-done, U5: only the literal 'race day' subtype is refused and the time trial is forgotten, which is the V186 S4b mistake (the 5K/10K time trial is race day for every other reader)",
+  "anchor": "    && !/race day|time trial/i.test((cardio&&cardio.subtype)||'');",
+  "replacement": "    && !/race day/i.test((cardio&&cardio.subtype)||'');",
+  "gate": "gates/g193_d50_trunkfloor.js"
+ },
+ {
+  "name": "M5 -> CARVE-OUT 4, U2: the floor is raised from one item to two, so the budget can no longer take the second trunk piece and a tight day keeps volume D48 never asked for",
+  "anchor": "    if(_trunkFloor && _isTrunkSec(s) && _trunkItems()<=1) return true;",
+  "replacement": "    if(_trunkFloor && _isTrunkSec(s) && _trunkItems()<=2) return true;",
+  "gate": "gates/g193_d50_trunkfloor.js"
+ },
+ {
+  "name": "M6 -> CARVE-OUT 1, U3: the predicate is rewritten to count SECTION LABELS instead of items, which is the level error D50 exists to correct — it protects a two-item section that is not at the floor and misses a relocated single item",
+  "anchor": "  const _trunkItems=()=>out.reduce((a,s)=>a+(_isTrunkSec(s)?((s&&s.items)||[]).length:0),0);",
+  "replacement": "  const _trunkItems=()=>out.reduce((a,s)=>a+(_isTrunkSec(s)?1:0),0);",
+  "gate": "gates/g193_d50_trunkfloor.js"
+ },
+ {
+  "name": "M7 -> U1/L1: the taxonomy is narrowed to the anti-rotation label alone, so the anti-extension section is invisible to the floor and a day can still land on zero trunk",
+  "anchor": "  const _isTrunkSec=s=>/^Trunk /.test((s&&s.label)||'');",
+  "replacement": "  const _isTrunkSec=s=>/^Trunk — anti-rotation/.test((s&&s.label)||'');",
+  "gate": "gates/g193_d50_trunkfloor.js"
+ },
+ {
+  "name": "M8 -> G3b (gear gates): the core finisher draw is capped at zero members, so a block prints with no items at all — the bar D48 actually set, now that G3b asserts zero instead of a pair",
+  "anchor": "  return {label:'', core:true, pillar, coreHeader:'Core — '+P[pillar].name, items: items.slice(0,2)};",
+  "replacement": "  return {label:'', core:true, pillar, coreHeader:'Core — '+P[pillar].name, items: items.slice(0,0)};",
+  "gate": "gates/g193_gear_gates.js"
+ }
+]
