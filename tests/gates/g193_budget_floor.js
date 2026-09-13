@@ -38,9 +38,24 @@
 //      (see the carve-out note at B1b) — the bar stays live everywhere else.
 //   B2 Zero empty sections anywhere, every section type, optional or not. Direct assertion
 //      of the clause: a budget pass may never render a section with 0 items.
-//   B3 Prehab items vs V192: per-tier delta >= 0, aggregate delta > 0. Aggregate printed.
-//      The aggregate is NOT pinned to a number: a future ruling that legitimately trades
-//      prehab must fail on the per-tier floor, not on a magic constant.
+//   B3 Prehab items vs the V192 census: a FLOOR, per tier and in aggregate. Never a delta.
+//      The claim is "prehab never regresses below V192", which is permanent and holds on
+//      every future version. The old claim was "prehab GREW this release" (aggregate delta
+//      > 0) and that is a change-detector: it can only pass against the one baseline the
+//      D46 expansion was measured against, and V193 against V193 fails it exactly the way
+//      V194 against V193 does. Growth is a per-release measure question and has no business
+//      in a permanent gate. The floor is the hand sum of the transcribed census (22,671
+//      wide / 2,697 narrow); the sum is cross-checked against the table on every run so a
+//      typo in either cannot pass. The AGGREGATE live-baseline delta is REPORTED, never
+//      gated — the same treatment B4d and B5 already carry below. The PER-TIER live-baseline
+//      comparison is a different animal and is GATED: candidate >= baseline on every tier is
+//      a RATCHET, not a change-detector. It costs a version that holds prehab steady nothing
+//      (V193 against V193 passes it; V194 against V193 passes it at +0 on 6/6 tiers), and it
+//      catches a real regression that fits inside the floor's headroom — 168 to 241 items of
+//      slack per wide tier and 0 to 16 per narrow is room enough to lose a whole draw and
+//      still clear the census. Two bars, not one: the census floor is permanent and
+//      version-independent, the ratchet is against the version this one ships after. The
+//      ratchet is DEFERRED BY NAME when no baseline is supplied, never silently passed.
 //   B4 Non-optional sections: no budget deletion worse than V192 per TIER (B4), no class
 //      V192 never emptied (B4c), the budget never ADDS (B4e), trim order unchanged (B4f).
 //      B4b (per CELL) and B4d (per CLASS growth) are REPORTED WITH DENOMINATORS AND NEVER
@@ -95,6 +110,62 @@ const fails = [];
 const ok  = m => { PASS++; console.log('  ok   ' + m); };
 const bad = m => { FAIL++; fails.push(m); console.log('  FAIL ' + m); };
 const info = m => console.log('  --   ' + m);
+
+// ── UNDER-INVOCATION ACCOUNTING ────────────────────────────────────────────
+// This gate used to print the same SHAPE of green whether or not it was handed the baseline
+// it was written to use: `PASS 20 FAIL 0` with no argument, `PASS 30 FAIL 0` with one, and
+// the only trace of the ten missing claims was a single `--` line. A gate that quietly
+// reports green on less work than it was written to do is the one failure mode a gate cannot
+// have. So: every claim that can only be made against a baseline is DEFERRED BY NAME, the
+// names are counted and reprinted as their own block above the summary, and the process
+// exits non-zero (3) in that mode. Nothing is skipped silently any more.
+//
+// REQUIRES_BASELINE is the hard branch. Put a claim's name in it and the gate REFUSES TO RUN
+// without a baseline: exit 2, no PASS/FAIL summary at all, because a refusal that prints a
+// summary is just another way of reading as a pass. As of V194 the list is EMPTY ON PURPOSE,
+// and that is a finding, not an oversight: once B3 became a census floor, every GATED claim
+// in this file stands on a hand table, on doctrine arithmetic or on the candidate alone. A
+// baseline only ever ADDS finer differential claims (per cell instead of per injury path)
+// plus the identity checks on the baseline artifact itself. tests/sabotage.py invokes gates
+// with the mutated file and nothing else, so a hard requirement here would turn every
+// sabotage mutation against this gate into a CRASH, which is not a trip.
+const REQUIRES_BASELINE = [];
+// TWO CATEGORIES, NEVER ONE NUMBER. `defer` and `na` are separate channels with separate
+// counters, separate blocks in the epilogue and distinguishable line prefixes (`DEFER` vs
+// `N/A`). They are never summed: they are not the same fact.
+//   defer() = UNDER-INVOKED. The claim was not made because this run was missing something it
+//             COULD have been handed. Actionable by the operator, so it drives exit 3.
+//   na()    = NOT APPLICABLE BY DESIGN. The claim needs a V192-specific artifact, or the
+//             lattice a hand table was transcribed against, and this run legitimately supplied
+//             something else. Nothing is wrong, nothing is fixable, so it does NOT move the
+//             exit code. It is still announced by name, which is the part that matters: these
+//             claims are not silent in either design, only the exit code differs.
+// PRECEDENCE, enforced below and not left to call sites: with NO baseline at all, every claim
+// that needs one is UNDER-INVOKED — the V192-specific ones included — because supplying a
+// baseline is the fixable step, so that run exits 3. A claim is NOT APPLICABLE only when a
+// baseline WAS supplied and is simply the wrong version or the wrong lattice for that claim.
+let DEFER = 0;
+const defers = [];
+const defer = (claim, why) => { DEFER++; defers.push(claim + ' — ' + why); console.log('  DEFER ' + claim + ' — ' + why); };
+let NA = 0;
+const nas = [];
+const na = (claim, why) => {
+  if (!BASEFILE) return defer(claim, why);   // precedence: no baseline at all is under-invocation
+  NA++; nas.push(claim + ' — ' + why); console.log('  N/A   ' + claim + ' — ' + why);
+};
+if (!BASEFILE && REQUIRES_BASELINE.length){
+  console.error('REFUSING TO RUN: ' + path.basename(__filename) + ' was given no baseline argument and these claims cannot be stated without one:');
+  REQUIRES_BASELINE.forEach(c => console.error('   - ' + c));
+  console.error('usage: node tests/gates/g193_budget_floor.js <candidate.html> <baseline.html>');
+  console.error('No PASS/FAIL summary is printed: this run proved nothing, and must not be readable as a pass.');
+  process.exit(2);
+}
+if (BASEFILE && !fs.existsSync(BASEFILE)){
+  console.error('REFUSING TO RUN: the baseline ' + BASEFILE + ' was named on the command line and does not exist.');
+  console.error('A named baseline that silently falls back to a hand table is the exact defect this guard exists to stop.');
+  console.error('No PASS/FAIL summary is printed.');
+  process.exit(2);
+}
 
 const EQUIP = LAT.EQUIP;
 // OPT-IN WIDER SWEEP. Default is the ruled 288-cell WIDE lattice. IA_LATTICE=full runs the
@@ -257,7 +328,14 @@ if (BASEFILE && fs.existsSync(BASEFILE)){
     BASE_N = census(IB_BASE, false, LAT.NARROW); BASE_N_OFF = census(IB_BASE, true, LAT.NARROW);
   }
 } else {
-  info('no baseline file supplied; B3 and B4 fall back to their hand-transcribed V192 tables');
+  info('no baseline file supplied. The gated claims below stand on the hand-transcribed V192 tables and on the candidate alone. Every claim that needs a live baseline is deferred BY NAME and counted; see the DEFERRED block above the summary.');
+  defer('B6c baseline artifact is self-stable before any diff', 'no baseline file supplied');
+  defer('B1b per-CELL core-section differential vs the live baseline (all ' + CELLS.length + ' cells)', 'no baseline file supplied; the per-injury-path floor against the transcribed V192 census runs in its place, which is coarser');
+  defer('B1b the carve-out covers the same day-builds on both versions', 'no baseline file supplied');
+  defer('B4 baseline-identity cross-check against the transcribed V192 non-optional-deletion tables (wide and narrow)', 'no baseline file supplied');
+  defer('B4b per-CELL non-optional deletions (REPORT ONLY)', 'no baseline file supplied');
+  defer('B4d per-CLASS non-optional deletion growth (REPORT ONLY)', 'no baseline file supplied');
+  defer('B4f trim order for non-optional sections unchanged vs the baseline engine', 'no baseline file supplied; the hand-derived D48 and plain trim orders are still asserted against the candidate');
 }
 
 const CAND = census(IA, false, CELLS);
@@ -320,6 +398,14 @@ else bad('L1 the sweep covered ' + CAND.cellsSwept + '/' + CELLS.length + ' cell
       const mism = INJS.filter(t => bInj[t] !== V192_CORE_NONLR_WIDE[t]);
       if (!mism.length) ok('B1b the transcribed V192 off-long-run core census matches the live V192 baseline on all ' + INJS.length + ' injury paths (' + INJS.map(t => bInj[t]).join('/') + ')');
       else bad('B1b the transcribed V192 off-long-run core census disagrees with the live baseline on: ' + mism.map(t => t + ' live ' + bInj[t] + ' vs table ' + V192_CORE_NONLR_WIDE[t]).join(', '));
+    } else {
+      // A baseline WAS handed in, but not one this claim can be made against. It printed
+      // nothing at all before — no ok, no skip marker, no defer — which is the one thing a
+      // gate may never do with a claim it did not make.
+      na('B1b live-baseline cross-check of the transcribed V192 off-long-run core census',
+        BASE_VER === '192'
+          ? 'the baseline is v192 but the table was transcribed against the ' + LAT.WIDE_N + '-cell lattice and this run uses ' + CELLS.length + ' cells'
+          : 'the baseline supplied is v' + BASE_VER + ', not v192, so nothing on this run confirms the fallback table is still the V192 truth');
     }
     if (CAND.lrDays === BASE.lrDays) ok('B1b the carve-out covers the SAME ' + CAND.lrDays + ' day-builds on both versions — V193 did not move which days the run owns');
     else bad('B1b the carve-out covers ' + CAND.lrDays + ' day-builds on the candidate but ' + BASE.lrDays + ' on V' + BASE_VER + ' — the exclusion set itself moved, so the comparison below is not like for like');
@@ -343,6 +429,8 @@ else bad('L1 the sweep covered ' + CAND.cellsSwept + '/' + CELLS.length + ' cell
     // no mutation can trip is not proof of anything. Same fallback shape B3 and B4 already
     // use: a table transcribed off the V192 artifact, applied only on the lattice it was
     // typed against, and cross-checked against the live baseline whenever one IS supplied.
+    defer('B1b live-baseline cross-check of the transcribed V192 off-long-run core census',
+      'no baseline file supplied; the table is applied as a floor below but nothing on this run confirms it is still the V192 truth');
     if (USE_FULL){
       info('B1b no baseline and IA_LATTICE=full — the V192 fallback table was transcribed against the ' + LAT.WIDE_N + '-cell lattice and cannot be applied to ' + CELLS.length + ' cells; skipped');
     } else {
@@ -372,9 +460,17 @@ else bad('L1 the sweep covered ' + CAND.cellsSwept + '/' + CELLS.length + ' cell
 function prehabClaim(tag, cand, base, handTable, tableApplies){
   const basePrehab = {};
   for (const e of EQUIP) basePrehab[e] = (base && !(!tableApplies && !base)) ? base.tiers[e].prehab : handTable[e];
+  // THE V192-SPECIFIC CROSS-CHECK. This claim needs a baseline that IS V192; it cannot be
+  // made against any other version and it cannot be made with no baseline at all. It used to
+  // print a `--` line in those modes, which reads as commentary next to a wall of `ok`. It
+  // now DEFERS BY NAME on every axis on which it is not made, same mechanism as the
+  // no-baseline block above: a claim that announces nothing is indistinguishable from a claim
+  // that passed, and that is the hole this whole pass exists to close.
+  const XCHK = 'B3 ' + tag + ': live-baseline cross-check of the hand-transcribed V192 prehab census';
   if (base && !tableApplies){
     info('B3 ' + tag + ': hand-table cross-check skipped — the table was transcribed against the ' +
       LAT.WIDE_N + '-cell lattice and this run uses ' + CELLS.length + ' cells. The delta below is taken against the live baseline on the SAME cells, so it stands.');
+    na(XCHK, 'the census was transcribed against the ' + LAT.WIDE_N + '-cell lattice and this run uses ' + CELLS.length + ' cells, so the table is not comparable to this baseline');
   } else if (base && BASE_VER === '192'){
     const mism = EQUIP.filter(e => base.tiers[e].prehab !== handTable[e]);
     if (!mism.length) ok('B3 ' + tag + ': live V192 baseline agrees with the hand-transcribed prehab census on all six tiers');
@@ -382,19 +478,59 @@ function prehabClaim(tag, cand, base, handTable, tableApplies){
       mism.map(e => e+' live '+base.tiers[e].prehab+' vs table '+handTable[e]).join(', '));
   } else if (base){
     info('B3 ' + tag + ': baseline is v' + BASE_VER + ', not v192 — hand-table cross-check skipped');
+    na(XCHK, 'the baseline supplied is v' + BASE_VER + ', not v192, so nothing on this run confirms the hand table is still the V192 truth');
+  } else {
+    defer(XCHK, 'no baseline file supplied; the table is applied as the floor below but nothing on this run confirms it is still the V192 truth');
   }
-  let aggC = 0, aggB = 0, below = [];
+  // THE FLOOR IS THE V192 CENSUS, NEVER THE LIVE BASELINE. FLOOR_AGG is the hand sum of the
+  // transcribed tables at the top of this file and is asserted to equal that sum on every
+  // run, so a typo in the table or in this constant fails rather than lowering the bar.
+  const FLOOR_AGG = { wide: 22671, narrow: 2697 };
+  let aggC = 0, aggT = 0, aggB = 0, below = [], belowBase = [];
   for (const e of EQUIP){
-    const c = cand.tiers[e].prehab, b = basePrehab[e];
-    aggC += c; aggB += b;
-    console.log('       prehab items [' + tag + '] ' + e.padEnd(11) + ' V192 ' + String(b).padStart(5) + ' -> ' + String(c).padStart(5) + '  delta ' + (c-b>=0?'+':'') + (c-b));
-    if (c - b < 0) below.push(e + ' ' + (c-b));
+    const c = cand.tiers[e].prehab, t = handTable[e], b = basePrehab[e];
+    aggC += c; aggT += t; aggB += b;
+    console.log('       prehab items [' + tag + '] ' + e.padEnd(11) + ' V192 census ' + String(t).padStart(5) + '  ->  ' + String(c).padStart(5) +
+      '   vs census ' + (c-t>=0?'+':'') + (c-t) + (base ? '   vs live V' + BASE_VER + ' ' + (c-b>=0?'+':'') + (c-b) : ''));
+    if (c - t < 0) below.push(e + ' ' + c + ' < ' + t);
+    if (base && c - b < 0) belowBase.push(e + ' ' + (c-b));
   }
-  if (!below.length) ok('B3 ' + tag + ': prehab delta >= 0 on 6/6 tiers');
-  else bad('B3 ' + tag + ': prehab LOST items on ' + below.length + '/' + EQUIP.length + ' tiers: ' + below.join(', '));
-  console.log('       prehab aggregate [' + tag + '] ' + aggB + ' -> ' + aggC + ' (delta ' + (aggC-aggB>=0?'+':'') + (aggC-aggB) + ' of ' + aggB + '). Threshold is > 0, never a pinned number.');
-  if (aggC - aggB > 0) ok('B3 ' + tag + ': prehab aggregate delta ' + (aggC-aggB) + ' > 0');
-  else bad('B3 ' + tag + ': prehab aggregate delta ' + (aggC-aggB) + ' is not > 0');
+  if (!tableApplies){
+    defer('B3 ' + tag + ': prehab FLOOR vs the V192 census, per tier and in aggregate',
+      'the census was transcribed against the ' + LAT.WIDE_N + '-cell lattice and this run uses ' + CELLS.length + ' cells. A table applied to the wrong lattice is a lower bar, not a higher one, so it is not applied at all');
+  } else {
+    if (aggT === FLOOR_AGG[tag]) ok('B3 ' + tag + ': the floor constant ' + FLOOR_AGG[tag] + ' is the hand sum of the six transcribed V192 tier censuses (arithmetic cross-check, no engine involved)');
+    else bad('B3 ' + tag + ': the floor constant ' + FLOOR_AGG[tag] + ' does not equal the sum of the transcribed V192 tier censuses (' + aggT + ') \— one of the two was edited without the other and the bar is no longer the number it claims to be');
+    if (!below.length) ok('B3 ' + tag + ': prehab is at or above the V192 census on 6/6 tiers (a floor, not a delta \— holding is a pass, growing is a pass, losing an item is not)');
+    else bad('B3 ' + tag + ': prehab is BELOW the V192 census on ' + below.length + '/' + EQUIP.length + ' tiers: ' + below.join(', '));
+    console.log('       prehab aggregate [' + tag + '] candidate ' + aggC + ' vs V192 census floor ' + FLOOR_AGG[tag] + ' (' + (aggC-aggT>=0?'+':'') + (aggC-aggT) + ' of ' + aggT + ' above the floor).');
+    if (aggC >= FLOOR_AGG[tag]) ok('B3 ' + tag + ': prehab aggregate ' + aggC + ' >= the V192 census floor ' + FLOOR_AGG[tag]);
+    else bad('B3 ' + tag + ': prehab aggregate ' + aggC + ' has fallen BELOW the V192 census floor ' + FLOOR_AGG[tag] + ' (' + (aggC-FLOOR_AGG[tag]) + ')');
+  }
+  // THE LIVE-BASELINE DELTA IS REPORT ONLY. "Prehab grew since the last version" is a
+  // per-release measure question, and a permanent gate that asserts it fails every release
+  // that legitimately holds prehab steady. The per-tier losses vs the live baseline are
+  // printed too, so nothing that used to be visible here stops being visible.
+  if (base){
+    console.log('       REPORT ONLY \— B3 prehab AGGREGATE vs the live baseline [' + tag + '] V' + BASE_VER + ' ' + aggB + ' -> ' + aggC +
+      ' (delta ' + (aggC-aggB>=0?'+':'') + (aggC-aggB) + ' of ' + aggB + '), ' + belowBase.length + '/' + EQUIP.length + ' tiers below the live baseline' +
+      (belowBase.length ? ': ' + belowBase.join(', ') : '') + '. The AGGREGATE is never gated; the PER-TIER ratchet below is.');
+    ok('B3 ' + tag + ': prehab AGGREGATE delta vs the live baseline reported (' + aggB + ' -> ' + aggC + ', ' + belowBase.length + '/' + EQUIP.length + ' tiers down), not gated');
+    // THE PER-TIER RATCHET IS GATED, and it is not the aggregate delta wearing a hat. The
+    // aggregate `delta > 0` was a change-detector: it fails a version that holds prehab
+    // steady, V193 against V193 included. `candidate >= baseline` per tier is a ratchet:
+    // holding passes, growing passes, LOSING AN ITEM ON ANY TIER FAILS. It is not redundant
+    // with the V192 census floor above, because the floor's headroom is the entire V192->V193
+    // growth: a regression that removes fewer items than that slack clears the floor and is
+    // caught only here. tests/sabotage.py hands in no baseline, so this claim DEFERS there.
+    if (!belowBase.length) ok('B3 ' + tag + ': prehab is at or above the live V' + BASE_VER + ' baseline on ' + EQUIP.length + '/' + EQUIP.length + ' tiers (the RATCHET: a loss small enough to fit inside the V192 floor headroom still fails here)');
+    else bad('B3 ' + tag + ': prehab FELL vs the live V' + BASE_VER + ' baseline on ' + belowBase.length + '/' + EQUIP.length + ' tiers: ' + belowBase.join(', ') +
+      ' \— still above the V192 census floor, and still a regression against the version this one ships after');
+  } else {
+    defer('B3 ' + tag + ': prehab AGGREGATE delta vs the live baseline (REPORT ONLY)', 'no baseline file supplied');
+    defer('B3 ' + tag + ': prehab per-tier RATCHET vs the live baseline (candidate >= baseline on all ' + EQUIP.length + ' tiers)',
+      'no baseline file supplied; the V192 census floor above runs in its place, which is coarser by the whole of the V192->V193 growth');
+  }
 }
 prehabClaim(USE_FULL ? 'full' : 'wide', CAND, BASE, V192_PREHAB_WIDE, !USE_FULL);
 prehabClaim('narrow', CAND_N, BASE_N, V192_PREHAB_NARROW, true);
@@ -443,6 +579,8 @@ function tally(offC, onC){
     if (BASE_VER === '192' && USE_FULL){
       info('B4 hand-table cross-check on the wide sweep skipped — the table was transcribed against the ' +
         LAT.WIDE_N + '-cell lattice and this run uses ' + CELLS.length + ' cells. The narrow cross-check below still runs, and the differential is against the live baseline on the same cells.');
+      na('B4 baseline-identity cross-check against the transcribed V192 WIDE non-optional-deletion table',
+        'the table was transcribed against the ' + LAT.WIDE_N + '-cell lattice and this run uses ' + CELLS.length + ' cells; the narrow cross-check below still runs');
       const BN0 = tally(BASE_N_OFF, BASE_N);
       const mismN0 = EQUIP.filter(e => BN0.perTier[e].non !== V192_NONOPT_NARROW[e]);
       if (!mismN0.length) ok('B4 baseline still agrees with the historical NARROW table (the 30-build sweep the old gate used)');
@@ -456,6 +594,12 @@ function tally(offC, onC){
       const mismN = EQUIP.filter(e => BN.perTier[e].non !== V192_NONOPT_NARROW[e]);
       if (!mismN.length) ok('B4 the same baseline still agrees with the historical NARROW table (the 30-build sweep the old gate used)');
       else bad('B4 baseline disagrees with the historical narrow table on: ' + mismN.map(e => e+' live '+BN.perTier[e].non+' vs table '+V192_NONOPT_NARROW[e]).join(', '));
+    } else {
+      // Same hole as B1b above: with a V193 baseline these two cross-checks silently did not
+      // happen and nothing on the run said so. The no-baseline block defers this claim by
+      // name already; the wrong-version axis now uses the identical name and mechanism.
+      na('B4 baseline-identity cross-check against the transcribed V192 non-optional-deletion tables (wide and narrow)',
+        'the baseline supplied is v' + BASE_VER + ', not v192, so nothing on this run confirms either table is still the V192 truth');
     }
   }
   let rose = [], totC = 0, totB = 0;
@@ -623,5 +767,22 @@ const EXPECT_PLAIN = 'Main lift[Back squat] | Accessory A[Dumbbell walking lunge
 }
 
 if (fails.length){ console.log('\nfailures:'); fails.forEach(f => console.log('  ' + f)); }
+if (defers.length){
+  console.log('\nDEFERRED (' + defers.length + ') — UNDER-INVOKED: claims this run did NOT make and COULD have:');
+  defers.forEach(d => console.log('  ' + d));
+  console.log('  This is actionable. ' + (BASEFILE
+    ? 'A baseline WAS supplied (' + path.basename(BASEFILE) + ', v' + BASE_VER + '), so these are not the missing-baseline case: read each reason above and re-invoke accordingly, for example without IA_LATTICE=full.'
+    : 'Hand it a baseline (argv[3]) to make these claims. With no baseline at all, every claim that needs one is under-invoked, the V192-specific ones included.'));
+  console.log('  It is NOT a full pass of this gate and the exit code (3) says so, whatever the PASS line below reads.');
+}
+if (nas.length){
+  console.log('\nNOT APPLICABLE (' + nas.length + ') — BY DESIGN: claims that do not apply to this invocation. Nothing here is a defect and none of it moves the exit code:');
+  nas.forEach(d => console.log('  ' + d));
+  console.log('  A baseline WAS supplied (' + path.basename(BASEFILE) + ', v' + BASE_VER + '); each claim above needs an artifact this run legitimately does not have — a V192 artifact, or the lattice the hand tables were transcribed against. On the ship invocation that is the correct state and will be true of every ship run from now on, so it exits 0. The claims are still named here rather than skipped, and this count is NEVER added to the DEFERRED count above: under-invocation is fixable and this is not.');
+}
+// The summary line itself is byte-shaped for the summary regex in tests/sabotage.py and for
+// tests/gate.sh, which both anchor on the end of that line, so both blocks above go BEFORE it
+// and neither is ever appended to it.
 console.log('\nPASS ' + PASS + ' FAIL ' + FAIL);
-process.exit(0);
+// FAIL wins, then under-invocation (3), then clean (0). NOT APPLICABLE never appears here.
+process.exit(FAIL ? 1 : (defers.length ? 3 : 0));

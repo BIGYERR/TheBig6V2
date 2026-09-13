@@ -1,0 +1,63 @@
+[
+ {
+  "name": "M1 -> D53 reverted: the implement claim is put straight back onto the main-lift progress line, so the app again tells a bodyweight-tier athlete their gain was 'on the bar'",
+  "anchor": "</b>':'')",
+  "replacement": "</b> on the bar':'')",
+  "gate": "gates/g194_implement_and_range.js"
+ },
+ {
+  "name": "M2 -> D53 'fixed' with the thing the ruling forbade: a name-sniffing conditional is added, so the claim returns for anything that looks barbell-ish and the line is deciding equipment off a string again",
+  "anchor": "</b>':'')",
+  "replacement": "</b>'+(/barbell|bench|squat|deadlift/i.test(m.name)?' on the bar':''):'')",
+  "gate": "gates/g194_implement_and_range.js"
+ },
+ {
+  "name": "M3 -> D54 reverted: the travel overlay again promises a 'pair' of implements to an athlete who selected Full gym",
+  "anchor": "Grab the heaviest load you can control and work in the 8 to 12 range.",
+  "replacement": "Grab the heaviest pair they have and work in the 8 to 12 range.",
+  "gate": "gates/g194_implement_and_range.js"
+ },
+ {
+  "name": "M4 -> D54 over-deleted: the single-arm progression is dropped along with the equipment claim, which is a ruling that SELECTS being executed as a ruling that DELETES",
+  "anchor": " If that still feels easy, go single arm.",
+  "replacement": "",
+  "gate": "gates/g194_implement_and_range.js"
+ },
+ {
+  "name": "M5 -> D55 reverted: the range is read strictly off the last session again, so a primer week drops the lift out of the Range Ladder",
+  "anchor": "    let rng=null;\n    for(let i=all.length-1;i>=0&&!rng;i--) rng=_rxRangeFor(hist,name,all[i]);",
+  "replacement": "    const rng=_rxRangeFor(hist,name,last);",
+  "gate": "gates/g194_implement_and_range.js"
+ },
+ {
+  "name": "M6 -> D55 walks the wrong way: the loop scans oldest-first, so the lift is judged by the range it was given in week 1 and never hears about the block it is actually in",
+  "anchor": "for(let i=all.length-1;i>=0&&!rng;i--)",
+  "replacement": "for(let i=0;i<all.length&&!rng;i++)",
+  "gate": "gates/g194_implement_and_range.js"
+ },
+ {
+  "name": "M7 -> D55 redirects the wrong value: the set performance follows the range lookup instead of staying on the last session, so a primer week is scored 'ready' against reps it never prescribed",
+  "anchor": "    const sets=_setsOf(last);",
+  "replacement": "    const sets=_setsOf(all[0]);",
+  "gate": "gates/g194_implement_and_range.js"
+ },
+ {
+  "name": "M8 -> D55's precondition is broken underneath it: the entry sort is flipped to descending, so index length-1 is the OLDEST session and both `last` and the backwards walk quietly mean the opposite of what they say",
+  "anchor": ".sort((a,b)=>(a.week-b.week)||((a.ts||0)-(b.ts||0)));",
+  "replacement": ".sort((a,b)=>(b.week-a.week)||((b.ts||0)-(a.ts||0)));",
+  "gate": "gates/g194_implement_and_range.js"
+ },
+ {
+  "name": "M9 -> g193_budget_floor B3: the hip stability draw is cut from two glute-med drills to one, so every leg day loses a prehab item and the prehab aggregate falls under the V192 census floor",
+  "anchor": "const stab=pick(stabPool,2,seed);",
+  "replacement": "const stab=pick(stabPool,1,seed);",
+  "gate": "gates/g193_budget_floor.js"
+ },
+ {
+  "name": "M10 -> B3 per-tier RATCHET: hip mobility draw dropped on 1-in-29 seeds, bodyweight exempt, -32 prehab per wide tier on 5 of 6 tiers",
+  "why": "The regression fits INSIDE the V192 census floor headroom (168 to 241 items per wide tier, 0 to 16 per narrow), so every floor claim stays green and only the live-baseline per-tier ratchet catches it. That is what makes this mutation a proof the ratchet is load-bearing and not redundant with the floor. Bodyweight is exempt in the mutation because narrow bodyweight sits exactly ON the floor (425 = 425) and any loss there would trip the floor instead. The named gate is the probe, not g193_budget_floor directly: tests/sabotage.py invokes gates with no baseline, and with no baseline this regression is invisible (PASS 22 FAIL 0). Measured with a V193 baseline: PASS 29 FAIL 2.",
+  "anchor": "const mob=pick(EXLIB.hip_mobility,1,seed+7);",
+  "replacement": "const mob=(!bodyweight&&seed%29===0)?[]:pick(EXLIB.hip_mobility,1,seed+7);",
+  "gate": "sabotage/g194_b3_ratchet_probe.js"
+ }
+]

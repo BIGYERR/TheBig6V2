@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="193"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="194"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -14018,7 +14018,7 @@ function _renderTravelTab(){
     // working rather than the app breaking.
     const holds = _ovDraft.equipment==='bodyweight'
       ? 'Lifting holds steady while you\u2019re away. Reps are yours: three sets, stop two short of failure. Run past 25 and it is time for a harder variant. Your running keeps building. That only needs shoes.'
-      : 'Lifting holds steady while you\u2019re away. Grab the heaviest pair they have and work in the 8 to 12 range. If that still feels easy, go single arm. Your running keeps building. That only needs shoes.';
+      : 'Lifting holds steady while you\u2019re away. Grab the heaviest load you can control and work in the 8 to 12 range. If that still feels easy, go single arm. Your running keeps building. That only needs shoes.';
     effect='<div class="ov-effect"><div class="ov-effect-ttl">Takes effect '+span+'</div><div class="ov-effect-sub">'+priorFrozen+back+'</div><div class="ov-effect-sub" style="margin-top:6px">'+holds+'</div></div>';
   } else {
     effect='<div class="ov-effect"><div class="ov-effect-sub" style="color:var(--muted)">That range falls outside your program. Pick dates inside it.</div></div>';
@@ -15451,7 +15451,13 @@ function ledgerModel(exw, hist){
     const wt=+last.weight||0;
     if(!(wt>0)){ unloaded.push({name, sessions:all.length,
       reps: all.reduce((s,en)=>s+_setsOf(en).reduce((a,b)=>a+b,0),0)}); return; }
-    const rng=_rxRangeFor(hist,name,last);
+    // V194 D55: the range that decides Range Ladder vs Other Accessory Work is read from
+    // the most recent session that CARRIES one, not strictly the last. A primer or taper
+    // week is prescribed fixed low reps, so reading only `last` let the least
+    // representative session in the block silently move a lift between two cards and
+    // back again, on nothing but which session was logged most recently.
+    let rng=null;
+    for(let i=all.length-1;i>=0&&!rng;i--) rng=_rxRangeFor(hist,name,all[i]);
     if(rng&&sets.length){
       // step-ups: how many times the working weight rose across the block
       let ups=0, prev=null;
@@ -15510,7 +15516,7 @@ function buildMainLiftBlock(m, unit){
     +'<div style="font-size:13px;color:var(--text);font-weight:600;line-height:1.3">'+m.name+'</div>'
     +'<div style="font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--lift);white-space:nowrap">'+hLbl+'</div></div>'
     +'<div style="font-size:11px;color:var(--muted);margin:2px 0 8px">Opened at <b style="color:var(--text)">'+fLbl+'</b>'
-    +(gain>0?' · up <b style="color:var(--lift)">'+gain+' '+u+'</b> on the bar':'')
+    +(gain>0?' · up <b style="color:var(--lift)">'+gain+' '+u+'</b>':'')
     +' · heaviest in week '+hv.week+'</div>'+chart+'</div>';
 }
 
