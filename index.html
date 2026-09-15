@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="194"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="195"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -641,6 +641,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .start-resolve.warn{color:var(--signal);}
 .start-resolve a{color:var(--text);font-weight:600;text-decoration:underline;cursor:pointer;}
 .wk-day-num .chk{color:var(--run);}
+.wk-day-num .wc-mark{color:var(--signal);}
+.wc-mark{display:inline-flex;align-items:center;gap:1px;color:var(--signal);line-height:1;}
+.wc-mark-w{font-family:var(--font-display);font-weight:800;font-size:11px;letter-spacing:0;}
+.wc-tag{display:flex;align-items:center;gap:10px;margin:0 16px 12px;padding:10px 12px;background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--signal);border-radius:4px;}
+.wc-tag-txt{min-width:0;}
+.wc-tag-lbl{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--signal);margin-bottom:3px;}
+.wc-tag-sub{font-size:12px;color:var(--muted);line-height:1.5;}
 /* hero */
 .wk-hero{margin:10px 16px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 1px 2px rgba(40,34,22,0.06);}
 .wk-hero.is-today{border-color:rgba(24,23,18,0.45);}
@@ -10112,10 +10119,11 @@ function openRandom(){
 }
 
 function buildRandFilterBar(){
-  const goal=activeProg?.goal||'balanced';
-  const labels={strength:'Strength',hypertrophy:'Size',fatloss:'Fat Loss',athletic:'Athletic',balanced:'Balanced',endurance:'Endurance'};
+  // V195 (D64): the parenthetical named a pool that does not exist. getActivePool falls
+  // back to RAND_POOLS.balanced for every goal RAND_POOLS has no key for, so the label
+  // was describing a draw the athlete was not getting. The pool gap itself is D66.
   document.getElementById('randFilterBar').innerHTML=[
-    {id:'mine',label:'My Goal ('+labels[goal]+')'},
+    {id:'mine',label:'My Goal'},
     {id:'all',label:'See All'},
   ].map(f=>`<button class="rand-filter-btn${randFilter===f.id?' active':''}" onclick="setRandFilter('${f.id}')">${f.label}</button>`).join('');
 }
@@ -10153,12 +10161,83 @@ function reroll(){
   document.getElementById('randBody').innerHTML=html;
 }
 
+// ── V195 (D64/D71): A WILDCARD IS A SUBSTITUTE, NOT A COMPLETION ─────────────
+// Until V194 completeWildcard called markDayComplete, which wrote a `complete` record
+// into ia_comp_ and froze the day into ia_hist_. Three consequences, all wrong: a rest
+// day was marked trained, a prescribed session the athlete never did was marked done,
+// and openDetail renamed that day's header to the Wildcard's title forever. The stamp
+// also landed on `currentWeek` (the week being VIEWED) paired with today's weekday, so
+// browsing week 11 in week 9 wrote the record two months out.
+// The record now lives in ia_wild_ only. ia_comp_ has three readers that treat the mere
+// EXISTENCE of a record as "this day was touched" (refreshProgram freezes it,
+// restMoveCandidates disqualifies it as a rest-move target, maybeShowReminder suppresses
+// the next-day nudge). None of those were ruled, so nothing on this path writes there.
+// The day is resolved from the DATE, with the same arithmetic scheduledDays uses. Off
+// the calendar of the block, the Wildcard still logs to the counter and refuses to stamp
+// any day at all rather than stamping the wrong one.
+function wildcardDayFor(now){
+  if(!activeProg||!activeProg.startDate||!activeProg.weeks) return null;
+  const d=new Date(now||new Date()); d.setHours(0,0,0,0);
+  const mon=getWeekMonday(activeProg.startDate);
+  const diff=Math.round((d.getTime()-mon.getTime())/86400000);   // round: DST-safe day count
+  if(diff<0) return null;
+  const week=Math.floor(diff/7)+1;
+  const tw=activeProg.totalWeeks||Object.keys(activeProg.weeks).length;
+  if(week<1||week>tw) return null;
+  const dayKey=['mon','tue','wed','thu','fri','sat','sun'][diff%7];
+  if(!activeProg.weeks[week]||!activeProg.weeks[week][dayKey]) return null;
+  if(dayBeforeStart(activeProg,week,dayKey)) return null;        // V174 (D24): outside the block
+  return {week:week,dayKey:dayKey};
+}
+// ia_wild_ entries are deduped by title by the surface itself (a title already done shows
+// the done block, never the Complete button), so one title carries at most one day stamp.
+// Pre-V195 entries have no week/dayKey and simply render no mark.
+function wildcardDaySet(){
+  const m={};
+  getWildcardDone().forEach(x=>{ if(x&&x.week&&x.dayKey) m[completedKey(x.week,x.dayKey)]=x; });
+  return m;
+}
+function wildcardOn(week,dayKey){
+  if(!week||!dayKey) return null;
+  return wildcardDaySet()[completedKey(week,dayKey)]||null;
+}
+// Flame plus a W, signal orange, inline SVG from the icon table. Never emoji.
+function wildcardMarkHTML(size){
+  size=size||14;
+  return '<span class="wc-mark" aria-label="Wildcard done">'+asyIcon('flame',size)+'<span class="wc-mark-w">W</span></span>';
+}
+// The tag names the prescribed session out loud. That is the guardrail: the athlete has
+// to be able to see that the session they were given is still waiting.
+function wildcardTagHTML(week,dayKey){
+  const wc=wildcardOn(week,dayKey); if(!wc) return '';
+  const day=activeProg&&activeProg.weeks&&activeProg.weeks[week]?activeProg.weeks[week][dayKey]:null;
+  const sub=(day&&day.rest)
+    ? 'Rest day. The streak sits this one out.'
+    : ((day&&day.title)||'Your session')+' is still on the board.';
+  return '<div class="wc-tag">'+wildcardMarkHTML(16)
+    +'<div class="wc-tag-txt"><div class="wc-tag-lbl">WILDCARD DONE</div>'
+    +'<div class="wc-tag-sub">'+esc(sub)+'</div></div></div>';
+}
+// Its own dispatcher. fireCompletionPopup escalates to the season banner on the final
+// scheduled day, and that banner claims the block is finished — a Wildcard may never
+// say that, claim a PR, or claim progress.
+function fireWildcardPopup(isTraining){
+  popFire('workout',{
+    kicker:'WILDCARD DONE',
+    msg:'You showed up. That is the whole game.',
+    sub:isTraining?('Streak: '+computeStreak()+'.'):'Streak holds.'
+  });
+}
 function completeWildcard(title){
   const done=getWildcardDone();
-  if(!done.some(d=>d.title===title)) done.push({title,ts:Date.now()});
+  const slot=wildcardDayFor(new Date());
+  if(!done.some(d=>d.title===title)) done.push({title,ts:Date.now(),week:slot?slot.week:null,dayKey:slot?slot.dayKey:null});
   saveWildcardDone(done);
-  markDayComplete(currentWeek,currentRandDayKey,title);
+  const day=(slot&&activeProg&&activeProg.weeks&&activeProg.weeks[slot.week])?activeProg.weeks[slot.week][slot.dayKey]:null;
+  const isTraining=!!(day&&!day.rest);
   updateRandCounter();showToast(title+' logged ✓');closeRandom();
+  if(activeProg) renderWeekView();
+  setTimeout(()=>fireWildcardPopup(isTraining),380);
 }
 function closeRandom(){document.getElementById('randOverlay').classList.remove('open');}
 
@@ -10705,6 +10784,7 @@ function renderWeekView(){
     const dnum=dd?dd.getDate():'';
     let center=dnum;
     if(st==='complete'||st==='partial') center='<span class="chk">\u2713</span>';   // V181 (D1): legacy partial reads as done
+    else if(wildcardOn(currentWeek,d)) center=wildcardMarkHTML(14);                  // V195 (D64): a Wildcard is marked, never checked
     const dimCls=(!isToday&&(isPast||!day||day.rest))?' dim':'';
     const code=dayCode(day);
     const dim=dimCls!=='';
@@ -10799,7 +10879,8 @@ function renderWeekView(){
     leg='<div style="background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:4px;padding:10px 12px;margin:0 16px 12px;font-size:12px;color:var(--muted);line-height:1.5">\u267b\ufe0f <b style="color:var(--text)">Recovery spacing:</b> '+activeProg.legRecoveryNote+'</div>';
   }
 
-  list.innerHTML=strip+hero+stats+leg;
+  const _wcTag=wildcardTagHTML(currentWeek,heroKey);   // V195 (D64)
+  list.innerHTML=strip+hero+_wcTag+stats+leg;
 }
 
 // DETAIL VIEW
@@ -12667,6 +12748,7 @@ function openDetail(dayKey,day){
     : buildCardioHTML(day.cardio) + (_secs.length ? liftHTML : '');
   if(day.note) html+='<div class="note-block">'+day.note+'</div>';
   const _rtNudge=rangeTopNudgeHTML(day); if(_rtNudge) html=_rtNudge+html;
+  const _wcTag=wildcardTagHTML(currentWeek,dayKey); if(_wcTag) html=_wcTag+html;   // V195 (D64)
   html+=buildLogHTML(dayKey, day.cardio);
   const curStatus=comp?(comp.status||'complete'):null;
   const escTitle=(day.title||'').replace(/'/g,"\\'");
@@ -16225,14 +16307,23 @@ function scheduledDays(cutoff){
   out.sort((a,b)=>a.date-b.date); return out;
 }
 function statusOf(week,d){ const c=getCompleted()[completedKey(week,d)]; if(!c) return null; const s=c.status||'complete'; return s==='partial'?'complete':s; }   // V181 (D1): legacy partial → complete
-// Streak: trailing run of scheduled days; complete OR partial extends, skipped breaks, pending is transparent.
+// Streak: trailing run of scheduled days. Precedence, highest first (V195 D71b):
+//   complete / partial -> counts (a day holding BOTH a completion and a Wildcard counts ONCE)
+//   Wildcard           -> counts, even when the day is marked skipped
+//   skipped            -> breaks
+//   pending            -> transparent, keep walking
+// The skip is a fact about the PRESCRIBED SESSION. The Wildcard is a fact about what the
+// athlete actually did. The streak measures attendance, and a Wildcard is attendance.
+// Rest days never reach here: scheduledDays drops them before any status lookup, so a
+// rest-day Wildcard still neither extends the streak nor breaks it.
 function computeStreak(){
   const today=new Date(); today.setHours(0,0,0,0);
   const days=scheduledDays(today); let n=0;
   for(let i=days.length-1;i>=0;i--){
     const st=statusOf(days[i].week,days[i].d);
-    if(st==='skipped') break;
-    if(st==='complete'||st==='partial') n++;
+    if(st==='complete'||st==='partial'){ n++; continue; }                          // V195 (D71): short-circuit, so both facts on one day count once
+    if(wildcardOn(days[i].week,days[i].d)){ n++; continue; }                       // V195 (D71b): a Wildcard rescues a skipped day
+    if(st==='skipped') break;                                                      // a skip with no Wildcard still breaks
     // pending -> transparent, keep walking
   }
   return n;

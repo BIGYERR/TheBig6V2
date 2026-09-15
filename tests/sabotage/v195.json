@@ -1,0 +1,98 @@
+[
+ {
+  "name": "M1 -> D64 reverted: completeWildcard calls markDayComplete again, so a Wildcard writes a `complete` record into ia_comp_ and freezes the day into ia_hist_",
+  "anchor": "  saveWildcardDone(done);\n  const day=(slot&&activeProg",
+  "replacement": "  saveWildcardDone(done);\n  markDayComplete(slot?slot.week:currentWeek,slot?slot.dayKey:currentRandDayKey,title);\n  const day=(slot&&activeProg",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M2 -> D64 date resolution reverted: the stamp goes back to the week being VIEWED paired with today's weekday, so browsing week 11 in week 9 lands the record two months out",
+  "anchor": "  const slot=wildcardDayFor(new Date());",
+  "replacement": "  const slot={week:currentWeek,dayKey:currentRandDayKey};",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M3 -> D71 rest-day half broken underneath the streak: scheduledDays stops excluding rest days, so a rest-day Wildcard extends the streak",
+  "anchor": "ALL_DAYS_ORDER.forEach(d=>{ const day=wk[d]; if(!day||day.rest) return;",
+  "replacement": "ALL_DAYS_ORDER.forEach(d=>{ const day=wk[d]; if(!day) return;",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M4 -> D64 stat leak: completedCount counts Wildcards, so the season card's 'Workouts' inflates on work the athlete was never prescribed",
+  "anchor": "function completedCount(){\n  let n=0; const c=getCompleted();",
+  "replacement": "function completedCount(){\n  let n=0; const c=getCompleted(); getWildcardDone().forEach(()=>n++);",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M5 -> D64 celebration escalates: the Wildcard popup routes through fireCompletionPopup, which can fire the season banner claiming the block is finished",
+  "anchor": "function fireWildcardPopup(isTraining){\n  popFire('workout',{",
+  "replacement": "function fireWildcardPopup(isTraining){\n  if(isTraining){ fireCompletionPopup(currentWeek,currentDayKey); return; }\n  popFire('workout',{",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M6 -> the W never reaches the week strip: the mark branch is dropped, so the Wildcard is recorded but invisible on the day it was done",
+  "anchor": "\n    else if(wildcardOn(currentWeek,d)) center=wildcardMarkHTML(14);                  // V195 (D64): a Wildcard is marked, never checked",
+  "replacement": "",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M7 -> the day tag stops naming the prescribed session, which is the guardrail the ruling called not optional",
+  "anchor": "((day&&day.title)||'Your session')+' is still on the board.'",
+  "replacement": "'Your session is still on the board.'",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M8 -> the widened record is reverted: ia_wild_ goes back to {title, ts} with no week and no day, so nothing can render the W",
+  "anchor": "done.push({title,ts:Date.now(),week:slot?slot.week:null,dayKey:slot?slot.dayKey:null});",
+  "replacement": "done.push({title,ts:Date.now()});",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M9 -> off the calendar the Wildcard stamps the wrong day instead of refusing: the week is clamped into the block rather than rejected",
+  "anchor": "  const week=Math.floor(diff/7)+1;",
+  "replacement": "  const week=Math.min(Math.floor(diff/7)+1,(activeProg.totalWeeks||Object.keys(activeProg.weeks).length));",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M10 -> D64 label lie restored: the filter bar names a pool RAND_POOLS has no key for, so it describes a draw the athlete is not getting",
+  "anchor": "{id:'mine',label:'My Goal'},",
+  "replacement": "{id:'mine',label:'My Goal (Endurance)'},",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M11 (gk P1) -> the W never reaches the strip while every identifier survives: the mark branch renders the date number instead, which is exactly what the first cut of the gate could not see",
+  "anchor": "else if(wildcardOn(currentWeek,d)) center=wildcardMarkHTML(14);",
+  "replacement": "else if(wildcardOn(currentWeek,d)) center=(false?wildcardMarkHTML(14):dnum);",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M12 (gk P2) -> the week-view tag is dropped out of the innerHTML concatenation while the _wcTag variable stays declared, so the athlete never sees which session is still waiting",
+  "anchor": "list.innerHTML=strip+hero+_wcTag+stats+leg;",
+  "replacement": "list.innerHTML=strip+hero+stats+leg;",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M13 (gk P3) -> the day-detail tag is never prepended, so opening the session shows no sign that a Wildcard was done in its place",
+  "anchor": "const _wcTag=wildcardTagHTML(currentWeek,dayKey); if(_wcTag) html=_wcTag+html;",
+  "replacement": "const _wcTag=wildcardTagHTML(currentWeek,dayKey); if(false) html=_wcTag+html;",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M14 (gk P4) -> the DST guard is removed: Math.round becomes Math.floor, so after a spring-forward every remaining day of the block stamps one day early",
+  "anchor": "const diff=Math.round((d.getTime()-mon.getTime())/86400000);",
+  "replacement": "const diff=Math.floor((d.getTime()-mon.getTime())/86400000);",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M15 -> D71b reverted: the skip break moves back ahead of the Wildcard clause, so a day marked skipped that also carries a Wildcard sets the streak to 0 again",
+  "anchor": "    if(wildcardOn(days[i].week,days[i].d)){ n++; continue; }                       // V195 (D71b): a Wildcard rescues a skipped day\n    if(st==='skipped') break;",
+  "replacement": "    if(st==='skipped') break;\n    if(wildcardOn(days[i].week,days[i].d)){ n++; continue; }",
+  "gate": "gates/g195_wildcard.js"
+ },
+ {
+  "name": "M16 -> the D71b control is destroyed: the skip stops breaking at all, so a skipped day with no Wildcard reads as transparent and the streak walks straight through an absence",
+  "anchor": "    if(st==='skipped') break;                                                      // a skip with no Wildcard still breaks",
+  "replacement": "",
+  "gate": "gates/g195_wildcard.js"
+ }
+]
