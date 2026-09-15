@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="195"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="196"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -12935,13 +12935,18 @@ function openSwapSheet(secIdx,itemIdx){
     hpress:'HORIZONTAL PRESS',vpress:'VERTICAL PRESS',bi_iso:'BICEPS',tri_iso:'TRICEPS',delt_iso:'DELTS',
     leg_iso:'LEG ISOLATION',calf_iso:'CALVES'}[p]||'LIFT');
   const regionOf=r=>({push:'PUSH DAY',pull:'PULL DAY',legs:'LEG DAY'}[r]||'TODAY');
-  const isMain=(itemIdx===0&&!(sec.superset||sec.type==='superset')&&/^main/i.test(sec.label||''))||_compoundTier(item.name)>=3;
+  // V196 D56: two arms, two meanings. MAIN LIFT is reserved for the SLOT test — item 0
+  // of a /^main/i section, the same test _slotOfEntry freezes into the ledger. The tier
+  // arm is a heavy compound caution and says so. With the Progress card keeping the name
+  // MAIN LIFTS, one tag for both tests made the app contradict itself in the athlete's hand.
+  const isMainSlot=(itemIdx===0&&!(sec.superset||sec.type==='superset')&&/^main/i.test(sec.label||''));
+  const isHeavyCompound=!isMainSlot&&_compoundTier(item.name)>=3;
   document.getElementById('swapOutName').textContent=item.name;
   const rxs=_rxShort(_swapCtx.detail);
   document.getElementById('swapTags').innerHTML=
     '<span class="swap-tag">'+(_fam?_AUX_FAMILY_LABEL[_fam]:tagOf(c.pattern))+'</span>'
     +'<span class="swap-tag">'+regionOf(c.region)+'</span>'
-    +(isMain?'<span class="swap-tag">MAIN LIFT</span>':'')
+    +(isMainSlot?'<span class="swap-tag">MAIN LIFT</span>':(isHeavyCompound?'<span class="swap-tag">HEAVY COMPOUND</span>':''))
     +(rxs?'<div class="swap-keeps">Whatever you pick keeps '+rxs+'.</div>':'');
   let h='';
   if(c.tier1.length){
@@ -15517,16 +15522,47 @@ function ledgerModel(exw, hist){
     if(!all.length) return;
     const mainEns=all.filter(en=>_slotOfEntry(hist,name,en)==='main');
     if(mainEns.length){
+      // V196 D57: an unloaded main lift is still a main lift. The old code returned
+      // here whenever no main-slot session carried a weight, which dropped the movement
+      // out of EVERY card — measured at 30,018 of 105,280 (config, movement) pairs, and
+      // on a bodyweight program it dropped the whole ledger to zero characters from a
+      // fully populated store. The slot is never reclassified: the chart is a load chart
+      // only in its UNIT, and with no loads written it plots the top set in reps.
+      // V196 D58: every session this key owns lands in exactly one of three numbers —
+      // plotted + accessoryDay + noLoad == entries — so the footer can account for all
+      // of them. `hidden: all.length-mainEns.length` could not see the sessions the
+      // return above had already discarded.
       const loaded=mainEns.filter(en=>+en.weight>0);
-      if(!loaded.length) return;
-      const first=loaded[0];
-      const heavy=loaded.reduce((a,b)=>(+b.weight>+a.weight?b:a),loaded[0]);
-      const hs=_setsOf(heavy), fs=_setsOf(first);
-      mains.push({name, series:loaded.map(en=>({w:en.week, wt:+en.weight})),
-        heavy:{wt:+heavy.weight, reps:hs.length?Math.max.apply(null,hs):null, week:heavy.week},
-        first:{wt:+first.weight, reps:fs.length?Math.max.apply(null,fs):null},
-        hidden: all.length-mainEns.length});
-      return;
+      const accessoryDay=all.length-mainEns.length;
+      const topOf=en=>{const s=_setsOf(en); return s.length?Math.max.apply(null,s):0;};
+      if(loaded.length){
+        // V196 D59: a blank Load box costs the POINT, not the session. Nothing is
+        // carried forward — a repeated weight draws a flat segment the athlete never
+        // earned and makes a missed entry read as a plateau (V167 killed e1RM off this
+        // card for the same reason). The blank sessions are disclosed in the footer.
+        const first=loaded[0];
+        const heavy=loaded.reduce((a,b)=>(+b.weight>+a.weight?b:a),loaded[0]);
+        mains.push({name, mode:'load', series:loaded.map(en=>({w:en.week, v:+en.weight})),
+          heavy:{v:+heavy.weight, reps:topOf(heavy)||null, week:heavy.week},
+          first:{v:+first.weight, reps:topOf(first)||null, week:first.week},
+          plotted:loaded.length, accessoryDay:accessoryDay,
+          noLoad:mainEns.length-loaded.length, entries:all.length});
+        return;
+      }
+      const repEns=mainEns.filter(en=>topOf(en)>0);
+      if(repEns.length){
+        const first=repEns[0];
+        const heavy=repEns.reduce((a,b)=>(topOf(b)>topOf(a)?b:a),repEns[0]);
+        mains.push({name, mode:'reps', series:repEns.map(en=>({w:en.week, v:topOf(en)})),
+          heavy:{v:topOf(heavy), reps:null, week:heavy.week},
+          first:{v:topOf(first), reps:null, week:first.week},
+          plotted:repEns.length, accessoryDay:accessoryDay,
+          noLoad:mainEns.length-repEns.length, entries:all.length});
+        return;
+      }
+      // Main-slot sessions carrying neither a load nor a rep count have nothing to
+      // plot in either unit. They fall through to the routing below rather than
+      // returning, so a populated store key always lands in exactly one bucket.
     }
     const last=all[all.length-1];
     const sets=_setsOf(last);
@@ -15559,18 +15595,24 @@ function ledgerModel(exw, hist){
   return {mains, ladder, plain, unloaded};
 }
 
-// ── main lift block: heaviest set, then real working weight ────────────────
+// ── main lift block: the top set, in whichever unit was written down ───────
+// V196 D57: one block, one geometry, two units. `m.mode` decides whether the y axis
+// carries load or the top set in reps; the padding, the gridline step and the
+// series>=2 rule are the SAME expressions in both modes. Reps are never unit
+// converted — `disp` is the identity on a reps block.
 function buildMainLiftBlock(m, unit){
-  const disp=w=>(unit==='kg')?Math.round(w*0.453592*2)/2:Math.round(w);
-  const u=(unit==='kg')?'kg':'lbs';
+  const isReps=(m.mode==='reps');
+  const disp=w=>isReps?w:((unit==='kg')?Math.round(w*0.453592*2)/2:Math.round(w));
+  const u=isReps?'reps':((unit==='kg')?'kg':'lbs');
   const hv=m.heavy, fs=m.first;
-  const hLbl=disp(hv.wt)+(hv.reps?'×'+hv.reps:'');
-  const fLbl=disp(fs.wt)+(fs.reps?'×'+fs.reps:'');
+  const lblOf=p=>isReps?(p.v+' reps'):(disp(p.v)+(p.reps?'×'+p.reps:''));
+  const hLbl=lblOf(hv);
+  const fLbl=lblOf(fs);
   let chart='';
   if(m.series.length>=2){
     const W=320,H=108,padL=34,padR=10,padT=14,padB=20;
     const plotW=W-padL-padR, plotH=H-padT-padB;
-    const ws=m.series.map(p=>p.wt);
+    const ws=m.series.map(p=>p.v);
     let lo=Math.min.apply(null,ws), hi=Math.max.apply(null,ws);
     const pad=Math.max((hi-lo)*0.25,10); lo-=pad; hi+=pad;
     const xs=plotW/(m.series.length-1);
@@ -15582,24 +15624,27 @@ function buildMainLiftBlock(m, unit){
       s+=_axTx(padL-5, cy+3, disp(v));
     }
     let d='';
-    m.series.forEach((p,i)=>{ d+=(i?' L':'M')+(padL+i*xs).toFixed(1)+','+yof(p.wt).toFixed(1); });
+    m.series.forEach((p,i)=>{ d+=(i?' L':'M')+(padL+i*xs).toFixed(1)+','+yof(p.v).toFixed(1); });
     s+='<path d="'+d+'" stroke="var(--lift)" stroke-width="1.5" fill="none" opacity="0.55"/>';
     m.series.forEach((p,i)=>{
-      const top=(p.wt===hv.wt&&p.w===hv.week);
-      s+='<circle cx="'+(padL+i*xs).toFixed(1)+'" cy="'+yof(p.wt).toFixed(1)+'" r="'+(top?4.5:3.2)+'" fill="var(--lift)" opacity="'+(top?1:0.72)+'"/>';
+      const top=(p.v===hv.v&&p.w===hv.week);
+      s+='<circle cx="'+(padL+i*xs).toFixed(1)+'" cy="'+yof(p.v).toFixed(1)+'" r="'+(top?4.5:3.2)+'" fill="var(--lift)" opacity="'+(top?1:0.72)+'"/>';
     });
     const lblStep=Math.max(1,Math.ceil(m.series.length/6));
     m.series.forEach((p,i)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-4, 'W'+p.w, 8, 'middle'); });
     chart='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+s+'</svg>';
   }
-  const gain=disp(hv.wt)-disp(fs.wt);
+  const gain=disp(hv.v)-disp(fs.v);
+  // V196 D59 honesty rider: "Opened at" names the week of the FIRST PLOTTED session.
+  // An athlete who trained from week 1 and first wrote a weight in week 6 must not be
+  // told they opened in week 6 with no week on the number to say otherwise.
   return '<div style="padding:12px 0;border-bottom:1px solid var(--border)">'
     +'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">'
     +'<div style="font-size:13px;color:var(--text);font-weight:600;line-height:1.3">'+m.name+'</div>'
     +'<div style="font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--lift);white-space:nowrap">'+hLbl+'</div></div>'
-    +'<div style="font-size:11px;color:var(--muted);margin:2px 0 8px">Opened at <b style="color:var(--text)">'+fLbl+'</b>'
+    +'<div style="font-size:11px;color:var(--muted);margin:2px 0 8px">Opened at <b style="color:var(--text)">'+fLbl+'</b> in week '+fs.week
     +(gain>0?' · up <b style="color:var(--lift)">'+gain+' '+u+'</b>':'')
-    +' · heaviest in week '+hv.week+'</div>'+chart+'</div>';
+    +' · '+(isReps?'best':'heaviest')+' in week '+hv.week+'</div>'+chart+'</div>';
 }
 
 // ── accessory range ladder ─────────────────────────────────────────────────
@@ -15644,12 +15689,23 @@ function buildLedgerCards(model, unit){
   const u=(unit==='kg')?'kg':'lbs';
   let html='';
   if(model.mains.length){
-    const hidden=model.mains.reduce((a,m)=>a+m.hidden,0);
+    // V196 D58: the footer must account for every session, in TWO clauses and never one
+    // number. They ask different things of the athlete. The first is the app's own
+    // decision and is unactionable; the second is the athlete's gap and one tap fixes
+    // it. plotted + accessoryDay + noLoad == entries, per movement and in the sum.
+    // V196 D56: the title keeps the name MAIN LIFTS (Mario: "Top Lifts" is misleading),
+    // so the disambiguation line in this footer does that work alone.
+    const accDay=model.mains.reduce((a,m)=>a+m.accessoryDay,0);
+    const noLoad=model.mains.reduce((a,m)=>a+m.noLoad,0);
     html+=_iaCard(asyIcon('🏋',15)+' Main Lifts','var(--lift)',
       model.mains.map(m=>buildMainLiftBlock(m,unit)).join(''),
-      'The heaviest set you actually did, and the working weight behind it. No estimated maxes: a formula that '
+      'The top set you actually did. No estimated maxes: a formula that '
       +'inflates with reps would rank a heavy single below a lighter double.'
-      +(hidden?' '+hidden+' session'+(hidden===1?'':'s')+' where these ran as accessories are kept out of the line so it reads clean.':''));
+      +' This is the lift each day was built around. Everything else you loaded is in the ladder below.'
+      +(accDay?' '+accDay+(accDay===1?' session':' sessions')+' where this ran as an accessory '+(accDay===1?'is':'are')
+        +' kept off the line. The lighter sets would make the climb look like something it was not.':'')
+      +(noLoad?' '+noLoad+(noLoad===1?' session':' sessions')+' had no load written down. Add the weight and '
+        +(noLoad===1?'it joins':'they join')+' the line.':''));
   }
   const L=model.ladder;
   if(L.length){
@@ -15660,9 +15716,9 @@ function buildLedgerCards(model, unit){
       +(ready?'var(--signal)':'var(--muted)')+';line-height:1.05">'+ready+'</div>'
       +'<div style="font-size:13px;color:var(--text);font-weight:600">ready to move up</div></div>'
       +'<div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px">'
-      +(ups?'You have stepped the weight up <b style="color:var(--text)">'+ups+' time'+(ups===1?'':'s')+'</b> across your accessories this block. ':'')
+      +(ups?'You have stepped the weight up <b style="color:var(--text)">'+ups+' time'+(ups===1?'':'s')+'</b> across these lifts this block. ':'')
       +'Hit the top of the range on every set, then add weight and start back at the bottom.</div>';
-    html+=_iaCard(asyIcon('🏋',15)+' Accessories — Range Ladder','var(--lift)',
+    html+=_iaCard(asyIcon('🏋',15)+' Range Ladder','var(--lift)',
       head+L.map(r=>_ladderRow(r,unit)).join(''),
       'Each track is the rep range your session was written with. Dots are that session’s sets. When every set '
       +'reaches the top, the movement is ready for more weight.');

@@ -20,10 +20,12 @@
 // ORACLES — none of these asks the engine what it did and then agrees with it.
 //
 //   O1  THE HAND-RENDERED LINE. The expected progress line is typed here by hand from the
-//       ruling's after-grid: "Opened at 60×12 · up 20 lbs · heaviest in week 3". The kg
-//       variant is computed by hand off the file's own rounding rule (round(w*0.453592*2)/2:
-//       80 lbs -> 36.5 kg, 60 lbs -> 27 kg, gain 9.5 kg) and typed as a literal, not read
-//       back out of disp().
+//       ruling's after-grid: "Opened at 60×12 in week 1 · up 20 lbs · heaviest in week 3".
+//       The "in week 1" is V196 D59's honesty rider: "Opened at" must name the week of the
+//       FIRST PLOTTED session, so an athlete who trained from week 1 and first wrote a
+//       weight in week 6 is never told they opened in week 6. The kg variant is computed by
+//       hand off the file's own rounding rule (round(w*0.453592*2)/2: 80 lbs -> 36.5 kg,
+//       60 lbs -> 27 kg, gain 9.5 kg) and typed as a literal, not read back out of disp().
 //
 //   O2  THE COPY RULE (CLAUDE.md, standing). The app sounds like a coach and never asserts
 //       equipment it does not know. The banned vocabulary below is an implement list, not a
@@ -72,21 +74,22 @@ const implementClaims = s => IMPLEMENT_WORDS.filter(w => s.toLowerCase().include
 // Hand-built model. Nothing here came out of buildProgram.
 const MODEL = {
   name: 'Bench press',
-  series: [{ w: 1, wt: 60 }, { w: 3, wt: 80 }],
-  heavy: { wt: 80, reps: 12, week: 3 },
-  first: { wt: 60, reps: 12 },
-  hidden: 0
+  mode: 'load',
+  series: [{ w: 1, v: 60 }, { w: 3, v: 80 }],
+  heavy: { v: 80, reps: 12, week: 3 },
+  first: { v: 60, reps: 12, week: 1 },
+  plotted: 2, accessoryDay: 0, noLoad: 0, entries: 2
 };
 let d53Lbs = '', d53Kg = '', d53Flat = '';
 {
   d53Lbs = text(buildMainLiftBlock(MODEL, 'lbs'));
   // O1, typed by hand from the ruling's after-grid.
-  const want = 'Bench press 80×12 Opened at 60×12 · up 20 lbs · heaviest in week 3';
+  const want = 'Bench press 80×12 Opened at 60×12 in week 1 · up 20 lbs · heaviest in week 3';
   if (d53Lbs.startsWith(want)) ok();
   else bad(`D53 lbs line: expected to start "${want}", got "${d53Lbs.slice(0, 90)}"`);
 
   d53Kg = text(buildMainLiftBlock(MODEL, 'kg'));
-  const wantKg = 'Bench press 36.5×12 Opened at 27×12 · up 9.5 kg · heaviest in week 3';
+  const wantKg = 'Bench press 36.5×12 Opened at 27×12 in week 1 · up 9.5 kg · heaviest in week 3';
   if (d53Kg.startsWith(wantKg)) ok();
   else bad(`D53 kg line: expected to start "${wantKg}", got "${d53Kg.slice(0, 90)}"`);
 
@@ -96,8 +99,10 @@ let d53Lbs = '', d53Kg = '', d53Flat = '';
   else bad(`D53 implement claim survives in the rendered progress line: ${JSON.stringify(cl)}`);
 
   // O4 negative control: no gain -> the clause is absent entirely, not empty-rendered.
-  const flat = { name: 'Bench press', series: [{ w: 1, wt: 60 }, { w: 2, wt: 60 }],
-                 heavy: { wt: 60, reps: 10, week: 2 }, first: { wt: 60, reps: 10 }, hidden: 0 };
+  const flat = { name: 'Bench press', mode: 'load',
+                 series: [{ w: 1, v: 60 }, { w: 2, v: 60 }],
+                 heavy: { v: 60, reps: 10, week: 2 }, first: { v: 60, reps: 10, week: 1 },
+                 plotted: 2, accessoryDay: 0, noLoad: 0, entries: 2 };
   d53Flat = text(buildMainLiftBlock(flat, 'lbs'));
   if (!d53Flat.includes(' up ') && d53Flat.includes('heaviest in week 2')) ok();
   else bad(`D53 no-gain control: got "${d53Flat.slice(0, 90)}"`);

@@ -1,0 +1,62 @@
+[
+ {
+  "name": "M1 -> D57 reverted: ledgerModel returns again when no main-slot session carries a weight, so a bodyweight program's whole ledger disappears from a populated store",
+  "anchor": "      const loaded=mainEns.filter(en=>+en.weight>0);\n      const accessoryDay=all.length-mainEns.length;",
+  "replacement": "      const loaded=mainEns.filter(en=>+en.weight>0);\n      if(!loaded.length) return;\n      const accessoryDay=all.length-mainEns.length;",
+  "gate": "gates/g196_ledger.js"
+ },
+ {
+  "name": "M2 -> D58 under-report restored: the footer can no longer see the blank sessions, so it states one number (the accessory count) and 5 logged sessions are in no number anywhere",
+  "anchor": "          noLoad:mainEns.length-loaded.length, entries:all.length});",
+  "replacement": "          noLoad:0, entries:all.length});",
+  "gate": "gates/g196_ledger.js"
+ },
+ {
+  "name": "M3 -> D59 violated: the last written weight is carried across a blank Load box, so a missed entry draws a flat segment the athlete never earned",
+  "anchor": "      const loaded=mainEns.filter(en=>+en.weight>0);\n      const accessoryDay=all.length-mainEns.length;",
+  "replacement": "      const _seed=+((mainEns.filter(en=>+en.weight>0)[0]||{}).weight)||0;\n      let _lw=_seed;\n      const loaded=_seed?mainEns.map(function(en){ if(+en.weight>0) _lw=+en.weight; var c=JSON.parse(JSON.stringify(en)); c.weight=_lw; return c; }):[];\n      const accessoryDay=all.length-mainEns.length;",
+  "gate": "gates/g196_ledger.js"
+ },
+ {
+  "name": "M4 -> D59 honesty rider broken: Opened at reads the first ENTRY instead of the first PLOTTED session, so an athlete who first wrote a weight in week 6 is told they opened in week 1 at nothing",
+  "anchor": "        const first=loaded[0];\n        const heavy=loaded",
+  "replacement": "        const first=mainEns[0];\n        const heavy=loaded",
+  "gate": "gates/g196_ledger.js"
+ },
+ {
+  "name": "M5 -> D56 reverted: the ladder card calls the athlete's heaviest lifts Accessories again, and puts an em-dash back in the middle of the title",
+  "anchor": "asyIcon('🏋',15)+' Range Ladder','var(--lift)',",
+  "replacement": "asyIcon('🏋',15)+' Accessories — Range Ladder','var(--lift)',",
+  "gate": "gates/g196_ledger.js"
+ },
+ {
+  "name": "M6 -> D56 reverted on the ladder head line: the step-ups sentence calls them accessories again",
+  "anchor": "</b> across these lifts this block. '",
+  "replacement": "</b> across your accessories this block. '",
+  "gate": "gates/g196_ledger.js"
+ },
+ {
+  "name": "M7 -> D56 reverted on the swap sheet: the heavy-compound tier arm prints MAIN LIFT again, so the sheet contradicts the Progress card in the athlete's hand",
+  "anchor": "    +(isMainSlot?'<span class=\"swap-tag\">MAIN LIFT</span>':(isHeavyCompound?'<span class=\"swap-tag\">HEAVY COMPOUND</span>':''))",
+  "replacement": "    +((isMainSlot||isHeavyCompound)?'<span class=\"swap-tag\">MAIN LIFT</span>':'')",
+  "gate": "gates/g196_ledger.js"
+ },
+ {
+  "name": "M8 -> D58 copy reverted: the card claims the heaviest set and the working weight behind it, which a reps block cannot back",
+  "anchor": "      'The top set you actually did. No estimated maxes: a formula that '",
+  "replacement": "      'The heaviest set you actually did, and the working weight behind it. No estimated maxes: a formula that '",
+  "gate": "gates/g196_ledger.js"
+ },
+ {
+  "name": "M9 -> D56 disambiguation line dropped, leaving the card called MAIN LIFTS with nothing telling the athlete what that means",
+  "anchor": "      +' This is the lift each day was built around. Everything else you loaded is in the ladder below.'\n",
+  "replacement": "",
+  "gate": "gates/g196_ledger.js"
+ },
+ {
+  "name": "M10 -> D57 unit leak: the gain on a reps block is labelled in load units, so the app tells a bodyweight athlete they added pounds",
+  "anchor": "  const u=isReps?'reps':((unit==='kg')?'kg':'lbs');",
+  "replacement": "  const u=(unit==='kg')?'kg':'lbs';",
+  "gate": "gates/g196_ledger.js"
+ }
+]
