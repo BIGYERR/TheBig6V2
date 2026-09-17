@@ -1,0 +1,74 @@
+[
+  {
+    "name": "M1 -> D70b reverted: the _gear fallback is back, so a pool that filters to nothing is handed back whole and the equipment question is advisory again (crossfit draws leg presses)",
+    "anchor": "    return true;\n  };\n  const _gear = pool => (pool||[]).filter(_gearOK);",
+    "replacement": "    return true;\n  };\n  const _gear = pool => { const f=(pool||[]).filter(_gearOK); return f.length ? f : pool; };",
+    "gate": "gates/g197_leg_accessory.js"
+  },
+  {
+    "name": "M2 -> D75 undone: the pool is re-emptied to the five machine names, so with the fallback gone every gear-free tier gets a nameless item and the week view stops drawing",
+    "anchor": "  leg_accessory:['Leg extension','Lying leg curl','Seated leg curl','Leg press','Standing cable hamstring curl','Nordic hamstring curl (anchored)','Single-leg glute bridge','Single-leg hip thrust','Wall sit'],",
+    "replacement": "  leg_accessory:['Leg extension','Lying leg curl','Seated leg curl','Leg press','Standing cable hamstring curl'],",
+    "gate": "gates/g197_leg_accessory.js"
+  },
+  {
+    "name": "M3 -> the 8302 guard removed, modelled at its live shape: the slot short-draws (one gear-legal member) and writes legIso[1] anyway, which is exactly V196 with an honest _gear — the superset's second item has no name and the week view does not draw",
+    "anchor": "        const _laItems=[{name:legIso[0],detail:_laDose(legIso[0])}];\n        if(legIso[1])_laItems.push({name:legIso[1],detail:_laDose(legIso[1])});",
+    "replacement": "        const _laShort=legIso.slice(0,1);\n        const _laItems=[{name:_laShort[0],detail:_laDose(_laShort[0])},{name:_laShort[1],detail:_laDose(_laShort[1])}];",
+    "gate": "gates/g197_leg_accessory.js"
+  },
+  {
+    "name": "M4 -> D76 dropped: the same-card subtraction is gone, so Wall sit prints under Knee stability and again under Leg isolation on the same card, six sets of one isometric",
+    "anchor": "        const legIso=pick(_laLeft.length>=2?_laLeft:_laGear,2,blockSeed(w)+105);",
+    "replacement": "        const legIso=pick(_laGear,2,blockSeed(w)+105);",
+    "gate": "gates/g197_leg_accessory.js"
+  },
+  {
+    "name": "M5 -> coach's exclusion ignored: Dumbbell Bulgarian split squat is put back in the pool, so the hardest unilateral leg movement in the file is prescribed as the day's THIRD leg block",
+    "anchor": "'Single-leg glute bridge','Single-leg hip thrust','Wall sit'],",
+    "replacement": "'Single-leg glute bridge','Single-leg hip thrust','Wall sit','Dumbbell Bulgarian split squat'],",
+    "gate": "gates/g197_leg_accessory.js"
+  },
+  {
+    "name": "M6 -> the hold dose reverted: Wall sit is prescribed in reps again, so the card reads 'Wall sit 3x12' and the athlete cannot execute it",
+    "anchor": "        const _laDose=n=>hsets+'×'+(_auxFamily(n)==='hold'?'25 sec':repB);",
+    "replacement": "        const _laDose=n=>hsets+'×'+repB;",
+    "gate": "gates/g197_leg_accessory.js"
+  },
+  {
+    "name": "M7 -> D76 subtraction widened into a legality hole: it runs BEFORE the gear filter, so the restore can hand back a machine name on a tier that owns no machines",
+    "anchor": "        const _laGear=_gear(EXLIB.leg_accessory);\n        const _laOn=Object.create(null);",
+    "replacement": "        const _laGear=EXLIB.leg_accessory;\n        const _laOn=Object.create(null);",
+    "gate": "gates/g197_leg_accessory.js"
+  },
+  {
+    "name": "M8 -> D75 rename half-applied: the pool keeps the four harvested names but loses the five machines, so commercial stops owning its own machines",
+    "anchor": "  leg_accessory:['Leg extension','Lying leg curl','Seated leg curl','Leg press','Standing cable hamstring curl','Nordic",
+    "replacement": "  leg_accessory:['Nordic",
+    "gate": "gates/g197_leg_accessory.js"
+  },
+  {
+    "name": "M9 -> the session budget is tightened from 20 to 18, so the trim runs one notch past the ruled isolation band and eats non-optional work on every tier (retuned from 14, which tripped ten claims at once)",
+    "anchor": "const SESSION_SET_BUDGET = 20;",
+    "replacement": "const SESSION_SET_BUDGET = 18;",
+    "gate": "gates/g193_budget_floor.js"
+  },
+  {
+    "name": "M10 -> D81 abused: the ruled-deletable isolation band is made PROTECTED, so the trim it was ruled to absorb falls back onto the leg compounds instead",
+    "anchor": "    return s.core||s.hip||/^main\\b|^primer|^power\\b|^strength\\b/.test(L)||/hip|mobility|stretch/.test(L);",
+    "replacement": "    return s.core||s.hip||/isolation/.test(L)||/^main\\b|^primer|^power\\b|^strength\\b/.test(L)||/hip|mobility|stretch/.test(L);",
+    "gate": "gates/g193_budget_floor.js"
+  },
+  {
+    "name": "M11 -> D84 reverted: the two pushes are swapped back, so the budget evicts Calves again",
+    "anchor": "        s.push({label:'Calves',items:[{name:calf,detail:hsets+'×15–20'}]});\n        s.push({label:'Leg isolation',superset:_laItems.length>1,rounds:hsets,items:_laItems});\n",
+    "replacement": "        s.push({label:'Leg isolation',superset:_laItems.length>1,rounds:hsets,items:_laItems});\n        s.push({label:'Calves',items:[{name:calf,detail:hsets+'×15–20'}]});\n",
+    "gate": "gates/g197_leg_accessory.js"
+  },
+  {
+    "name": "M12 -> D84 half-done: the Calves push is deleted outright, so the section can never reach a card",
+    "anchor": "        s.push({label:'Calves',items:[{name:calf,detail:hsets+'×15–20'}]});\n",
+    "replacement": "",
+    "gate": "gates/g197_leg_accessory.js"
+  }
+]

@@ -1,0 +1,15 @@
+# format: <epoch> <step> <start|end> <note>
+# NOTE: the measure and coach passes that fed V197 ran BEFORE instrumentation began.
+# Their pairs below are RECONSTRUCTED from subagent duration_ms, not observed live.
+1789528324 measure start pool-fallback-noop RECONSTRUCTED
+1789529732 measure end agent=measure model=opus tool_calls=69 ok RECONSTRUCTED dur=1408s
+1789529732 coach start re-rule-inventory-cluster RECONSTRUCTED
+1789530373 coach end agent=coach model=opus tool_calls=38 ok RECONSTRUCTED dur=641s
+1789530373 builder-slice-1 start D75-harvest+rename+D76-subtraction+8302-guard+D70b-fallback
+1789530603 builder-slice-1 end D75-harvest+rename+D76-subtraction+8302-guard syntax
+1789530603 builder-slice-2 start D70b-fallback-removal+version-bump
+1789530654 builder-slice-2 end D70b-fallback-removal+version-bump syntax
+1789530654 builder-slice-3 start gate+sabotage+verification
+1789531532 builder-slice-3 end gate+sabotage+verification syntax BLOCKED-by-g193-B4
+1789531600 coach start B4-budget-ruling blocker-from-builder-slice-2
+1789531943 coach end agent=coach model=opus tool_calls=unknown result=killed late session-ended-before-return-no-ruling-produced

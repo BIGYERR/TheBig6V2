@@ -43,7 +43,7 @@
 // clean up a leak on most days, which is precisely why the guard must not be left to them.
 // The program-level statement — long-run tier days and race-window days byte-identical to
 // the pre-D50 artifact across all 288 cells — is a blast-radius claim and is proved by
-// tests/measure/v193_d50_trunkfloor.js, not asserted twice here.
+// tests/measure/answered/v193_d50_trunkfloor.js, not asserted twice here.
 
 const path = require('path');
 const { load, fixtures, DAYS } = require(path.join(__dirname, '..', 'harness.js'));

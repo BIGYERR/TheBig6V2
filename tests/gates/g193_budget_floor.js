@@ -228,6 +228,67 @@ const V192_NONOPT_CLASSES_WIDE = {
   'Delts finisher': 36, 'Arms finisher': 18,
 };
 
+// ── COACH-RULED-DELETABLE CLASSES (D81) ────────────────────────────────────
+// THIS IS A RULING, NOT A FUDGE, AND EVERY MEMBER CARRIES ITS D-CODE. A class named
+// here is excluded from B4's per-tier ratchet ON BOTH SIDES — candidate and baseline,
+// never one — because coach has ruled that capSessionBudget is CONTRACTUALLY ALLOWED to
+// trim it. It is not excluded from B4b, B4c or B4d, which still report it.
+//   'Leg isolation'  D81. capSessionBudget's docstring has stated the trim order since it
+//                    was written: carries -> optional/finisher/conditioning -> PUMP/
+//                    ISOLATION -> remaining accessories, latest first. 'Leg isolation' IS
+//                    the isolation band. The V192 count of 432 was never a coaching floor:
+//                    four of V196's five pool names were already tier 0, only 'Leg press'
+//                    reached the tier-3 exemption, and the permissive _gear fallback handed
+//                    the all-machine pool back whole on bodyweight/minimal/home_basic/
+//                    home_full, so a leg press sat on a hotel-room card as an untouchable
+//                    barbell compound. Two defects were propping the number up. D81
+//                    ratifies the contract; V197 removed the accident blocking it.
+// A SECOND MEMBER APPEARING HERE WITHOUT A D-CODE IS A WEAKENING. It must be obvious on
+// sight, which is why this list is one line and the reasoning is above it.
+const RULED_DELETABLE = ['Leg isolation'];                 // D81
+// V192 non-optional deletions OF THE RULED-DELETABLE CLASSES ONLY, per tier, on the
+// 288-cell WIDE lattice, transcribed off the V192 artifact (git show V192:index.html).
+// B4's fallback baseline is the hand table V192_NONOPT_WIDE, whose per-tier totals
+// INCLUDE these deletions. Subtracting a candidate-side class from an untouched baseline
+// would be exactly the one-sided exclusion this ruling forbids, so the baseline side gets
+// its own transcription. Each tier must equal V192_NONOPT_CLASSES_WIDE['Leg isolation']
+// (432) divided over the six tiers, which is asserted PER TIER on every run below.
+const V192_RULED_DEL_WIDE = { bodyweight:72, minimal:72, home_basic:72, home_full:72, commercial:72, crossfit:72 };
+// ── THE GUARD IS PER TIER, NOT A SUM (V197 slice 5, gatekeeper) ──────────────────────
+// It used to compare the SUM of the map above against the class census and nothing else.
+// A sum check passes a COMPENSATING PAIR of typos: 71 on one tier and 73 on another still
+// sums to 432, and B4 would then hold two tiers to numbers no one transcribed. Gatekeeper
+// hand-verified the live values (72 on every one of the six tiers on the V192 artifact),
+// so the table is right today; the guard is what stops it drifting.
+// THE PER-TIER EXPECTATION IS DERIVED, AND THE DERIVATION IS WHY THIS IS NOT A SELF-CHECK:
+//   (a) the WIDE lattice is BALANCED — 288 cells over 6 tiers, 48 apiece (asserted at L0);
+//   (b) on V192 the leg_accessory pool was TIER-INVARIANT. The permissive _gear fallback
+//       handed the all-machine pool back WHOLE on every tier — that is the accident D81's
+//       note above names — so no tier could empty more or fewer 'Leg isolation' sections
+//       than any other tier.
+// Uniformity is therefore a FACT ABOUT V192, not an average taken over the table it is
+// checking, and the per-tier value is the class total over the tier count. The derivation
+// holds only while RULED_DELETABLE is the single D81 member; a second class has its own
+// per-tier shape, so this block FAILS CLOSED until someone transcribes it per tier.
+// Failure behaviour is unchanged: exit 2 with no PASS/FAIL summary, which sabotage.py
+// reads as CRASH. A gate that cannot trust its oracle must not report a pass.
+{
+  const T = Object.keys(V192_RULED_DEL_WIDE);
+  const miss = T.filter(k => typeof V192_RULED_DEL_WIDE[k] !== 'number');
+  if (miss.length) { console.error('ORACLE INCOMPLETE: V192_RULED_DEL_WIDE has no number for ' + miss.join(', ')); process.exit(2); }
+  const short = EQUIP.filter(e => T.indexOf(e) < 0);
+  const extra = T.filter(k => EQUIP.indexOf(k) < 0);
+  if (short.length || extra.length) { console.error('ORACLE INCOMPLETE: V192_RULED_DEL_WIDE must carry one number per lattice tier and no others — missing [' + short.join(', ') + '], unknown [' + extra.join(', ') + ']. A tier with no transcription cannot be subtracted from the baseline side.'); process.exit(2); }
+  if (RULED_DELETABLE.length !== 1 || RULED_DELETABLE[0] !== 'Leg isolation') { console.error('ORACLE DERIVATION VOID: the per-tier expectation below is derived for the single D81 member \'Leg isolation\', whose V192 pool was tier-invariant. RULED_DELETABLE is now [' + RULED_DELETABLE.join(', ') + ']. Transcribe V192_RULED_DEL_WIDE per tier against the V192 artifact and re-derive this guard before any claim uses it.'); process.exit(2); }
+  const t = RULED_DELETABLE.reduce((a,k)=>a+(V192_NONOPT_CLASSES_WIDE[k]||0), 0);
+  if (t % EQUIP.length !== 0) { console.error('ORACLE TYPO: V192_NONOPT_CLASSES_WIDE says ' + t + ' for [' + RULED_DELETABLE.join(', ') + '], which does not divide evenly across the ' + EQUIP.length + ' tiers of a balanced lattice. One of the two transcriptions of the same V192 fact is wrong and neither may be used.'); process.exit(2); }
+  const per = t / EQUIP.length;
+  const wrong = EQUIP.filter(e => V192_RULED_DEL_WIDE[e] !== per);
+  if (wrong.length) { console.error('ORACLE TYPO (PER TIER): ' + wrong.map(e => e + '=' + V192_RULED_DEL_WIDE[e]).join(', ') + ' but V192_NONOPT_CLASSES_WIDE says ' + t + ' for [' + RULED_DELETABLE.join(', ') + '] over ' + EQUIP.length + ' uniform tiers, i.e. ' + per + ' each. A SUM check let a compensating pair of typos through here; this one does not. The two transcriptions of the same V192 fact disagree; one of them is wrong and neither may be used.'); process.exit(2); }
+  const s = T.reduce((a,k)=>a+V192_RULED_DEL_WIDE[k], 0);
+  if (s !== t) { console.error('ORACLE TYPO: V192_RULED_DEL_WIDE sums to ' + s + ' but V192_NONOPT_CLASSES_WIDE says ' + t + ' for [' + RULED_DELETABLE.join(', ') + ']. The two transcriptions of the same V192 fact disagree; one of them is wrong and neither may be used.'); process.exit(2); }
+}
+
 const secKey = s => [clean(s.label), clean(s.coreHeader), s.pillar||'', s.core?'C':'', s.hip?'H':'', s.optional?'O':''].join('|');
 
 // census over an arbitrary lattice. Returns per-tier rollups, per-cell rollups and the
@@ -544,7 +605,7 @@ const count = arr => arr.reduce((m,k)=>(m[k]=(m[k]||0)+1,m),{});
 function tally(offC, onC){
   const perTier = {}, perTierInj = {}, perCell = {}, kinds = {};
   let added = 0, days = 0;
-  for (const e of EQUIP) perTier[e] = { opt:0, non:0 };
+  for (const e of EQUIP) perTier[e] = { opt:0, non:0, nonEx:0, ruled:0 };
   for (const dk of Object.keys(offC.byDay)){
     days++;
     const p = dk.split('|');
@@ -556,10 +617,14 @@ function tally(offC, onC){
       if (d > 0){
         if (/\|O$/.test(k)) perTier[tier].opt += d;
         else {
+          const lbl = k.split('|')[0] || k.split('|')[1] || '(no label)';
           perTier[tier].non += d;
+          // D81: the ex-class total is what B4's ratchet runs on. The gross total is still
+          // accumulated one line above and still printed, ungated, so the raw shape of the
+          // change never disappears behind the exclusion.
+          if (RULED_DELETABLE.indexOf(lbl) < 0) perTier[tier].nonEx += d; else perTier[tier].ruled += d;
           perTierInj[tier+'|'+inj] = (perTierInj[tier+'|'+inj]||0) + d;
           perCell[cellKey] += d;
-          const lbl = k.split('|')[0] || k.split('|')[1] || '(no label)';
           kinds[lbl] = (kinds[lbl]||0) + d;
         }
       }
@@ -571,10 +636,13 @@ function tally(offC, onC){
 {
   const C = tally(CANDOFF, CAND);
   const CN = tally(CAND_N_OFF, CAND_N);
-  let baseNon = V192_NONOPT_WIDE, baseKinds = null, basePerCell = null, baseSrc = 'hand-transcribed V192 wide table';
+  let baseNon = V192_NONOPT_WIDE, baseNonEx = null, baseKinds = null, basePerCell = null, baseSrc = 'hand-transcribed V192 wide table';
   if (BASE_OFF && BASE){
     const B = tally(BASE_OFF, BASE);
     baseNon = {}; for (const e of EQUIP) baseNon[e] = B.perTier[e].non;
+    // D81: BOTH SIDES OR NEITHER. The baseline's own ex-class total is measured by the same
+    // tally() on the same lattice, so the exclusion cannot quietly become one-sided.
+    baseNonEx = {}; for (const e of EQUIP) baseNonEx[e] = B.perTier[e].nonEx;
     baseKinds = B.kinds; basePerCell = B.perCell; baseSrc = 'live baseline ' + path.basename(BASEFILE);
     if (BASE_VER === '192' && USE_FULL){
       info('B4 hand-table cross-check on the wide sweep skipped — the table was transcribed against the ' +
@@ -602,20 +670,49 @@ function tally(offC, onC){
         'the baseline supplied is v' + BASE_VER + ', not v192, so nothing on this run confirms either table is still the V192 truth');
     }
   }
+  // D81 AMENDMENT. The per-tier RATCHET now runs on non-optional deletions EXCLUDING the
+  // coach-ruled-deletable classes, on BOTH sides. The GROSS per-tier numbers are still
+  // computed and still printed on every run, ungated, so nobody loses the raw shape behind
+  // the exclusion — but the gross total is NOT what fails the build, because coach has
+  // ruled the excluded class deletable by contract. The per-tier ratchet was NOT relaxed
+  // from 792 to 861 or to any other number: V194 refused that weakening on B3 and it is
+  // refused here too. The bar is still "no tier rises", on a narrower and named base.
+  let roseEx = [], totCEx = 0, totBEx = 0;
+  if (!baseNonEx){
+    // No live baseline (every sabotage run). Fall back to the hand tables, subtracting the
+    // TRANSCRIBED V192 ruled-class deletions from the TRANSCRIBED V192 totals — the same
+    // exclusion on the same side of the ledger, never the candidate alone.
+    baseNonEx = {}; for (const e of EQUIP) baseNonEx[e] = V192_NONOPT_WIDE[e] - V192_RULED_DEL_WIDE[e];
+  }
   let rose = [], totC = 0, totB = 0;
   for (const e of EQUIP){
     totC += C.perTier[e].non; totB += baseNon[e];
+    totCEx += C.perTier[e].nonEx; totBEx += baseNonEx[e];
+    if (C.perTier[e].nonEx > baseNonEx[e]) roseEx.push(e + ' ' + C.perTier[e].nonEx + ' > ' + baseNonEx[e]);
     console.log('       budget-deleted sections ' + e.padEnd(11) + ' optional ' + String(C.perTier[e].opt).padStart(4) +
-      '   non-optional ' + String(C.perTier[e].non).padStart(4) + '/' + baseNon[e] + ' (V192)');
+      '   non-optional ' + String(C.perTier[e].non).padStart(4) + '/' + baseNon[e] + ' (V192)' +
+      '   ex-ruled ' + String(C.perTier[e].nonEx).padStart(4) + '   ruled-deletable ' + String(C.perTier[e].ruled).padStart(4));
     if (C.perTier[e].non > baseNon[e]) rose.push(e + ' ' + C.perTier[e].non + ' > ' + baseNon[e]);
   }
+  console.log('       EX-CLASS per-tier deletion table (the ratchet B4 gates on), excluding [' + RULED_DELETABLE.join(', ') + ']:');
+  for (const e of EQUIP)
+    console.log('         ' + e.padEnd(11) + ' candidate ' + String(C.perTier[e].nonEx).padStart(5) +
+      '   baseline ' + String(baseNonEx[e]).padStart(5) + '   delta ' + ((C.perTier[e].nonEx - baseNonEx[e]) >= 0 ? '+' : '') + (C.perTier[e].nonEx - baseNonEx[e]));
+  console.log('         aggregate    candidate ' + String(totCEx).padStart(5) + '   baseline ' + String(totBEx).padStart(5) +
+    '   delta ' + ((totCEx - totBEx) >= 0 ? '+' : '') + (totCEx - totBEx));
+  console.log('       REPORT ONLY — GROSS (ruled-deletable classes INCLUDED) aggregate ' + totB + ' -> ' + totC +
+    ' (delta ' + ((totC - totB) >= 0 ? '+' : '') + (totC - totB) + '), rose on ' + rose.length + '/' + EQUIP.length +
+    ' tiers' + (rose.length ? ': ' + rose.join(', ') : '') + '. Ungated by D81, printed so the raw shape stays visible.');
   for (const t of INJS){
     const line = EQUIP.map(e => e.slice(0,4) + ' ' + String(C.perTierInj[e+'|'+t]||0).padStart(4)).join('  ');
     console.log('         by injury ' + t.padEnd(18) + line);
   }
   console.log('       source of the V192 numbers: ' + baseSrc + '. Day-builds swept ' + C.days + ' (wide), ' + CN.days + ' (narrow).');
-  if (!rose.length) ok('B4 non-optional section deletions ' + totC + '/' + totB + ' vs V192 — no tier rose (6/6 tiers)');
-  else bad('B4 non-optional section deletions ROSE vs V192 on ' + rose.length + '/' + EQUIP.length + ' tiers: ' + rose.join(', '));
+  if (!roseEx.length) ok('B4 non-optional section deletions EXCLUDING the coach-ruled-deletable classes [' + RULED_DELETABLE.join(', ') +
+    '] ' + totCEx + '/' + totBEx + ' vs ' + baseSrc + ' — no tier rose (' + EQUIP.length + '/' + EQUIP.length + ' tiers). Gross, ungated: ' + totC + '/' + totB + '.');
+  else bad('B4 non-optional section deletions EXCLUDING [' + RULED_DELETABLE.join(', ') + '] ROSE vs ' + baseSrc + ' on ' +
+    roseEx.length + '/' + EQUIP.length + ' tiers: ' + roseEx.join(', ') +
+    ' \— this is NOT the ruled class being trimmed, it is work nobody ruled deletable going missing');
 
   // per CELL — REPORTED WITH ITS DENOMINATOR AND THE REPRO CELL, NEVER GATED.
   // Coach filed this to §12 as explicitly non-blocking. The rise sits on
@@ -666,6 +763,27 @@ function tally(offC, onC){
     console.log('       V193 ' + JSON.stringify(C.kinds));
     console.log('       V192 ' + JSON.stringify(baseKinds));
   }
+  // ── B4g (D81, GATED): the ruling's POSITIVE claim ──────────────────────────
+  // D81 does not only permit a deletion, it asserts a gain: with the isolation band taking
+  // the trim the way the docstring always said it would, the LEG COMPOUNDS are better
+  // protected than they were. 'Leg superset A' is the lunge/knee-stability pair and
+  // 'Leg superset B' is the second compound pair; both are the day's real leg work. This is
+  // STRICT inequality on purpose. `<=` would pass on a version that changed nothing, and no
+  // engine satisfies a strict fall by accident — it is the one claim here that cannot be met
+  // by the budget simply doing less.
+  const LEG_COMPOUND_CLASSES = ['Leg superset A', 'Leg superset B'];   // D81
+  {
+    const cSum = LEG_COMPOUND_CLASSES.reduce((a,k) => a + (C.kinds[k]||0), 0);
+    const bSum = LEG_COMPOUND_CLASSES.reduce((a,k) => a + ((baseKinds ? baseKinds[k] : V192_NONOPT_CLASSES_WIDE[k])||0), 0);
+    const bWho = baseKinds ? baseSrc : 'hand-transcribed V192 wide class census';
+    const per = LEG_COMPOUND_CLASSES.map(k => k + ' ' + ((baseKinds ? baseKinds[k] : V192_NONOPT_CLASSES_WIDE[k])||0) + ' -> ' + (C.kinds[k]||0)).join(', ');
+    console.log('       B4g leg-compound deletions: ' + per);
+    if (cSum < bSum) ok('B4g leg-compound section deletions FELL strictly vs ' + bWho + ': ' + bSum + ' -> ' + cSum +
+      ' (' + (cSum - bSum) + '). D81\'s positive claim: the compounds are better protected than they were.');
+    else bad('B4g leg-compound section deletions did not fall strictly vs ' + bWho + ': ' + bSum + ' -> ' + cSum +
+      '. D81 claims the isolation band takes the trim SO THAT the compounds stop taking it; ' + per);
+  }
+
   if (C.added === 0) ok('B4e the budget pass only removes, never adds (0 sections appeared in ' + C.days + ' day-builds)');
   else bad('B4e ' + C.added + ' sections appeared post-budget — the B4 differential is not a clean subsequence');
 }

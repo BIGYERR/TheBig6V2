@@ -253,7 +253,7 @@ else bad("O9 the light-press chain still ends in an unguarded '||' fallback, whi
 // WIDENED IN SLICE 5, on purpose. The old lattice could not see the beginner experience
 // level or the knee / hip / ankle injury paths, which is where the fifth duplicate class
 // lives — so that class could only be recorded in a comment, where no run can check it.
-// This is now the same lattice tests/measure/v193_slice5_dupclasses.js reports on, so the
+// This is now the same lattice tests/measure/answered/v193_slice5_dupclasses.js reports on, so the
 // register below is a live tripwire on every class that still exists rather than on four of
 // five. Cost measured: about 8 seconds.
 const INJ = [

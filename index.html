@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="196"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="197"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1569,9 +1569,24 @@ const EXLIB={
   // vetoes any name containing it, which would strip this of compound status.
   lunge:['Dumbbell Bulgarian split squat','Reverse lunge (KB)','Walking lunge (KB)','Step-ups (KB)','Landmine reverse lunge','Dumbbell goblet side lunge'],
   // V178 (D1): standing cable hamstring curl — knee flexion in a running-relevant standing
-  // posture. Lives in leg_iso (which is _gear'd, so the cable gate applies) NOT in hinge
-  // (which is not). _pattern reads 'hamstring curl' → leg_iso, added the same session.
-  leg_iso:['Leg extension','Lying leg curl','Seated leg curl','Leg press','Standing cable hamstring curl'],
+  // posture. Lives in leg_accessory (which is _gear'd, so the cable gate applies) NOT in
+  // hinge (which is not). _pattern reads 'hamstring curl' → leg_iso, added the same session.
+  // V197 (D75): renamed from leg_iso and four gear-free names harvested. The old pool was
+  // five machine/cable names: ZERO legal members on every tier but commercial. It only ever
+  // printed because _gear's fallback handed the illegal pool straight back. The slot's job
+  // is direct low-cost quad and hamstring volume AFTER the compounds, not "single-joint",
+  // so the key no longer makes a _pattern claim the slot never asked for. Commercial keeps
+  // all five machine names: it owns the machines. _pattern and _PATTERN_REGION are NOT
+  // touched — leg_iso, hip_ext and lunge all map to 'legs' (9255), so volume accounting is
+  // identical, and the knee/protect drop at 6981 is already right (a glute bridge and a hip
+  // thrust are the safest loaded movements an angry knee can do, and P.dropNames at 6976
+  // name-catches nordic / wall sit / spanish squat anyway).
+  // Excluded by ruling, do not add back: 'Spanish squat hold (KB)' (a hold, needs a KB,
+  // _compoundTier 2, kneeStabSel already draws it), 'Step-ups (KB)' (loaded unilateral
+  // compound, already in EXLIB.lunge which feeds Leg superset A on the same card),
+  // 'Dumbbell Bulgarian split squat' (_compoundTier 2, the hardest unilateral leg movement
+  // in the file — the day's THIRD leg block is not where it belongs).
+  leg_accessory:['Leg extension','Lying leg curl','Seated leg curl','Leg press','Standing cable hamstring curl','Nordic hamstring curl (anchored)','Single-leg glute bridge','Single-leg hip thrust','Wall sit'],
   // V178 (D1/D4): two unilateral hinges. Split-stance DL is the entry rung — stance, not
   // balance, is the limiter. Zercher single-leg DL is EX_MIN_EXP advanced: front-loaded
   // in the elbow crooks on one leg is a positional skill, not a caption you follow.
@@ -7365,11 +7380,14 @@ function engineC_kinematics(cfg, A, B){
   // tricep extension' and 'Face pull' are cable movements, and 'Machine seated calf raise' is a
   // machine, none of which say "cable" or "machine".
   //
-  // The non-empty fallback is load-bearing: EXLIB.leg_iso is four machine movements, so
-  // filtering it on a cable-less tier would empty the pool and starve a pick(...,2). Rather
-  // than invent substitutes here — swapping an isolation for a compound changes the
-  // character of the day and is a coaching call, not a mechanical one — an all-illegal pool
-  // passes through untouched and is logged as a known gap.
+  // V197 (D70b): the non-empty fallback is GONE. It used to be justified by EXLIB.leg_iso
+  // being all machine movements, so filtering it on a cable-less tier emptied the pool and
+  // starved a pick(...,2). That justification made the whole filter advisory: every pool
+  // that emptied was handed back whole, so withholding gear withheld nothing — crossfit
+  // drew 428 machine items, home_basic 716. The substitutes are no longer invented here,
+  // they were harvested into the pool itself (V197 D75, EXLIB.leg_accessory), which is the
+  // coaching call this comment said it would not make mechanically. The denial now lands:
+  // an all-illegal pool returns EMPTY, and the one live consumer guards its second index.
   const _gearOK = n => {
     const N=String(n||'');
     // V113: '^(overhead|push) press$' and '^good mornings?$' retired. Those names existed
@@ -7384,7 +7402,8 @@ function engineC_kinematics(cfg, A, B){
     // cable or machine ('Rope tricep extension', 'Face pull', 'Pec deck').
     if(!hasCables && /cable|\brope\b|face pull|pulldown|pec deck|\bleg press\b|leg extension|lying leg curl|seated leg curl|hack squat|\bsmith\b|preacher|\bmachine\b/i.test(N)) return false;
     // THE DUMBBELL AXIS (V127). Attempted in V122 and reverted the same session, because
-    // _gear falls back to the RAW pool when filtering empties it:
+    // _gear USED TO fall back to the RAW pool when filtering emptied it (removed V197,
+    // D70b — the quote below is history, not the current line):
     //   const _gear = pool => { const f=(pool||[]).filter(_gearOK); return f.length ? f : pool; };
     // So tightening this gate LOOSENED the result: EXLIB.shoulder_iso is five dumbbells and
     // cables, it emptied on the bodyweight tier, and the fallback handed that tier a cable
@@ -7397,7 +7416,7 @@ function engineC_kinematics(cfg, A, B){
     if(!hasDumbbells && /\bdumbbell|\bdb\b|goblet/i.test(N)) return false;
     return true;
   };
-  const _gear = pool => { const f=(pool||[]).filter(_gearOK); return f.length ? f : pool; };
+  const _gear = pool => (pool||[]).filter(_gearOK);
   // ── BODYWEIGHT TIER ("Room only") ──────────────────────────────────────────
   // A hotel room with nothing in it. The existing `minimal` tier still leans on
   // kettlebells and dumbbells, so it is NOT a true no-equipment option. This tier
@@ -8290,17 +8309,54 @@ function engineC_kinematics(cfg, A, B){
       s.push({label:'Leg superset B',superset:_lsBSS,rounds:vsets(3),items:_lsB});
       }
       if(denseHypertrophy){
-        // Leg isolation (quad/ham machines) + direct calves — both missing before.
+        // Leg accessory — direct quad/ham volume after the compounds — plus direct calves.
         const isOlder=(cfg.ageBracket==='55+'||cfg.ageBracket==='36-54');
         const hsets=cfg.experience==='advanced'?4:3;
         const repB=isOlder?'15':'12';
-        const legIso=pick(_gear(EXLIB.leg_iso),2,blockSeed(w)+105);
+        // V197 (D76): same-card subtraction, in _pi's exact shape (index.html:6119-6126).
+        // The gear filter runs FIRST so the subtraction can never widen legality, and the
+        // whole gear-filtered list is restored if fewer than TWO names survive, because
+        // this slot picks two — one honest duplicate beats one undefined. Without it a
+        // card prints the same movement under two headings: Wall sit is also drawn by
+        // kneeStabSel (7831), and the harvested hip-extension names also live in
+        // hipExtPool and in the bodyweight hingePool. NSW p.7 item 6 forbids it directly,
+        // and _itemCost charges holds at 0.5× so capSessionBudget never catches it.
+        // The subject is `s` itself: every name already written onto THIS day's card,
+        // which is exactly ex.lunge, ex.hinge, ex.kneeStab and ex.hipExt as they were
+        // actually pushed, including the _ssPair rewrite of Leg superset B.
+        const _laGear=_gear(EXLIB.leg_accessory);
+        const _laOn=Object.create(null);
+        s.forEach(sec=>((sec&&sec.items)||[]).forEach(it=>{const nm=String((it&&it.name)||'').trim().toLowerCase();if(nm)_laOn[nm]=1;}));
+        const _laLeft=_laGear.filter(n=>!_laOn[String(n||'').trim().toLowerCase()]);
+        // V197 (D75): the slot writes hsets+'×'+repB and "3×12" is unexecutable for an
+        // isometric. 25 sec is the number the file already carries for a hold in the
+        // ACCESSORY position (ex.kneeStab at 8179/8256/8270/8273). The finisher position
+        // is 30 sec and this is not the finisher. No new constant, no new predicate.
+        const _laDose=n=>hsets+'×'+(_auxFamily(n)==='hold'?'25 sec':repB);
+        const legIso=pick(_laLeft.length>=2?_laLeft:_laGear,2,blockSeed(w)+105);
         // Room Only owns no dumbbells, and neither _gearOK clause blocks a DB name, so the
         // pool has to divert here rather than be filtered. Single-leg off a step is the only
         // bodyweight calf variant that is actually a stimulus.
         const calf=pick(_bw(['Single-leg calf raise (bodyweight)','Calf raise (bodyweight)'],_gear(EXLIB.calves)),1,blockSeed(w)+106)[0];
-        s.push({label:'Leg isolation',superset:true,rounds:hsets,items:[{name:legIso[0],detail:hsets+'×'+repB},{name:legIso[1],detail:hsets+'×'+repB}]});
+        // V197: legIso[1] was written unconditionally. _gear's fallback used to guarantee
+        // five members, so it always existed; with the fallback honest (D70b) a one-member
+        // pool would print a superset whose second item is {name:undefined}, and
+        // buildSectionsHTML, sessionLogProgress, sessionTimeEst and buildHeroPreview ALL
+        // throw on that with no try on the path — the week view does not draw. Only this
+        // site: the other 23 unguarded index sites are latent, not live.
+        const _laItems=[{name:legIso[0],detail:_laDose(legIso[0])}];
+        if(legIso[1])_laItems.push({name:legIso[1],detail:_laDose(legIso[1])});
+        // V197 (D84): Calves is pushed BEFORE Leg isolation. capSessionBudget's trim
+        // tie-break compares (_secRank, _itemRank) and both of these sections score
+        // 2 / 0, so the tie resolves to the LATER push and the second one written is
+        // the first one evicted. Calves used to be last, so on a tight day the card
+        // dropped its only loaded plantarflexion to keep an isolation slot that in
+        // 126 of 126 measured cells was a THIRD repetition of a pattern the card had
+        // already run twice (Main + Leg superset B): four posterior-chain pieces and
+        // zero calf work. Unscoped on purpose — a healthy runner has the same defect.
+        // Order is the whole edit: the picks above are unchanged, seeds included.
         s.push({label:'Calves',items:[{name:calf,detail:hsets+'×15–20'}]});
+        s.push({label:'Leg isolation',superset:_laItems.length>1,rounds:hsets,items:_laItems});
       }
       if(includeHip)s.push(buildHipSection(seed+w,isBW));
       // V178 (D3): foot & ankle rides with hip stability for runners. An ankle-region injury

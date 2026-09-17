@@ -1,0 +1,225 @@
+=== v197_timing.sh  2026-09-16T03:16:07Z  (measure only, nothing is written to the app) ===
+
+== STEP 1  machine
+cpus            8
+cpu_brand       Apple M1 Pro
+node            v26.8.1
+python3         Python 3.14.4
+bash            3.2.57(1)-release
+index.html      1184688 bytes   ia-version 196
+baseline        /tmp/base_V195.html  1180549 bytes   ia-version 195
+gate files      17
+newest spec     v196.json  10 mutations
+git HEAD        3f5d792  tags: V196 
+
+== STEP 2  one VM boot (harness load of index.html)
+[vm_boot] real=0.05s rc=0 stdout_bytes=48 status=OK
+vm_boot ok ia-version 196 buildProgram function
+[node_floor] real=0.03s rc=0 stdout_bytes=6 status=OK
+[vm_boot_split] real=0.24s rc=0 stdout_bytes=66 status=OK
+require_ms 1  vm_load_ms 12  build+digest+grid_ms_per_config 9.40
+
+== STEP 3  each gate alone — candidate (/Users/CanasBangin/Desktop/TheBig6V2/index.html)
+gate                               PASS/FAIL          real_s  exit
+[gate_candidate_g000_boot] real=0.09s rc=0 stdout_bytes=243 status=OK
+g000_boot                          PASS 10 FAIL 0        0.09  0  OK
+[gate_candidate_g190_rounds] real=4.59s rc=0 stdout_bytes=2306 status=OK
+g190_rounds                        PASS 47 FAIL 0        4.59  0  OK
+[gate_candidate_g191_pacedelta] real=0.07s rc=0 stdout_bytes=1336 status=OK
+g191_pacedelta                     PASS 26 FAIL 0        0.07  0  OK
+[gate_candidate_g192_floorpress_shoulder_gear] real=0.33s rc=0 stdout_bytes=1781 status=OK
+g192_floorpress_shoulder_gear      PASS 29 FAIL 0        0.33  0  OK
+[gate_candidate_g192_labelsync] real=0.45s rc=0 stdout_bytes=408 status=OK
+g192_labelsync                     PASS 26 FAIL 0        0.45  0  OK
+[gate_candidate_g192_landmine_rotpress] real=0.06s rc=0 stdout_bytes=1803 status=OK
+g192_landmine_rotpress             PASS 34 FAIL 0        0.06  0  OK
+[gate_candidate_g192_shoulder_side] real=5.77s rc=0 stdout_bytes=471 status=OK
+g192_shoulder_side                 PASS 29 FAIL 0        5.77  0  OK
+[gate_candidate_g193_budget_floor] real=5.26s rc=3 stdout_bytes=11635 status=OK
+g193_budget_floor                  PASS 22 FAIL 0        5.26  3  OK
+[gate_candidate_g193_d50_trunkfloor] real=2.56s rc=0 stdout_bytes=1826 status=OK
+g193_d50_trunkfloor                PASS 17 FAIL 0        2.56  0  OK
+[gate_candidate_g193_gear_gates] real=6.82s rc=0 stdout_bytes=18150 status=OK
+g193_gear_gates                    PASS 168 FAIL 0       6.82  0  OK
+[gate_candidate_g193_pool_overlay] real=0.06s rc=0 stdout_bytes=1296 status=OK
+g193_pool_overlay                  PASS 219 FAIL 0       0.06  0  OK
+[gate_candidate_g193_rotation_reach] real=0.29s rc=0 stdout_bytes=2452 status=OK
+g193_rotation_reach                PASS 24 FAIL 0        0.29  0  OK
+[gate_candidate_g193_samecard] real=7.41s rc=0 stdout_bytes=5661 status=OK
+g193_samecard                      PASS 53 FAIL 0        7.41  0  OK
+[gate_candidate_g193_trunk_protect] real=0.72s rc=0 stdout_bytes=4067 status=OK
+g193_trunk_protect                 PASS 38 FAIL 0        0.72  0  OK
+[gate_candidate_g194_implement_and_range] real=0.05s rc=0 stdout_bytes=546 status=OK
+g194_implement_and_range           PASS 19 FAIL 0        0.05  0  OK
+[gate_candidate_g195_wildcard] real=0.60s rc=0 stdout_bytes=8801 status=OK
+g195_wildcard                      PASS 298 FAIL 0       0.60  0  OK
+[gate_candidate_g196_ledger] real=0.10s rc=0 stdout_bytes=3628 status=OK
+g196_ledger                        PASS 55 FAIL 0        0.10  0  OK
+
+== STEP 3  each gate alone — baseline (/tmp/base_V195.html)
+gate                               PASS/FAIL          real_s  exit
+[gate_baseline_g000_boot] real=0.09s rc=0 stdout_bytes=243 status=OK
+g000_boot                          PASS 10 FAIL 0        0.09  0  OK
+[gate_baseline_g190_rounds] real=4.58s rc=0 stdout_bytes=2306 status=OK
+g190_rounds                        PASS 47 FAIL 0        4.58  0  OK
+[gate_baseline_g191_pacedelta] real=0.07s rc=0 stdout_bytes=1336 status=OK
+g191_pacedelta                     PASS 26 FAIL 0        0.07  0  OK
+[gate_baseline_g192_floorpress_shoulder_gear] real=0.33s rc=0 stdout_bytes=1781 status=OK
+g192_floorpress_shoulder_gear      PASS 29 FAIL 0        0.33  0  OK
+[gate_baseline_g192_labelsync] real=0.45s rc=0 stdout_bytes=408 status=OK
+g192_labelsync                     PASS 26 FAIL 0        0.45  0  OK
+[gate_baseline_g192_landmine_rotpress] real=0.06s rc=0 stdout_bytes=1803 status=OK
+g192_landmine_rotpress             PASS 34 FAIL 0        0.06  0  OK
+[gate_baseline_g192_shoulder_side] real=5.71s rc=0 stdout_bytes=471 status=OK
+g192_shoulder_side                 PASS 29 FAIL 0        5.71  0  OK
+[gate_baseline_g193_budget_floor] real=5.14s rc=3 stdout_bytes=11607 status=OK
+g193_budget_floor                  PASS 22 FAIL 0        5.14  3  OK
+[gate_baseline_g193_d50_trunkfloor] real=2.61s rc=0 stdout_bytes=1826 status=OK
+g193_d50_trunkfloor                PASS 17 FAIL 0        2.61  0  OK
+[gate_baseline_g193_gear_gates] real=6.83s rc=0 stdout_bytes=18150 status=OK
+g193_gear_gates                    PASS 168 FAIL 0       6.83  0  OK
+[gate_baseline_g193_pool_overlay] real=0.06s rc=0 stdout_bytes=1268 status=OK
+g193_pool_overlay                  PASS 219 FAIL 0       0.06  0  OK
+[gate_baseline_g193_rotation_reach] real=0.28s rc=0 stdout_bytes=2452 status=OK
+g193_rotation_reach                PASS 24 FAIL 0        0.28  0  OK
+[gate_baseline_g193_samecard] real=7.24s rc=0 stdout_bytes=5661 status=OK
+g193_samecard                      PASS 53 FAIL 0        7.24  0  OK
+[gate_baseline_g193_trunk_protect] real=0.72s rc=0 stdout_bytes=4067 status=OK
+g193_trunk_protect                 PASS 38 FAIL 0        0.72  0  OK
+[gate_baseline_g194_implement_and_range] real=0.05s rc=1 stdout_bytes=882 status=OK
+g194_implement_and_range           PASS 17 FAIL 2        0.05  1  OK
+[gate_baseline_g195_wildcard] real=0.60s rc=0 stdout_bytes=8805 status=OK
+g195_wildcard                      PASS 298 FAIL 0       0.60  0  OK
+[gate_baseline_g196_ledger] real=0.10s rc=1 stdout_bytes=6581 status=OK
+g196_ledger                        PASS 22 FAIL 33       0.10  1  OK
+
+== STEP 4  tests/gate.sh end to end (candidate vs V195 baseline)
+[gate_sh_e2e] real=40.57s rc=0 stdout_bytes=1305 status=OK
+   g195_wildcard.js: PASS 298 FAIL 0
+   g196_ledger.js: PASS 55 FAIL 0
+== 5. blast-radius diff vs base_V195.html
+   7 hunks, +85/-29 lines. Every hunk must be classified in the D-code before ship.
+   full diff -> .last_diff.txt
+ALL GATES PASS
+
+== STEP 5  tests/sabotage.py end to end (v196.json, 10 mutations)
+[sabotage_e2e] real=1.14s rc=0 stdout_bytes=2548 status=OK
+TRIPPED      M8 -> D58 copy reverted: the card claims the heaviest set and the working weight behind it, which a reps block cannot back                                                                       g196_ledger.js PASS 53 FAIL 2
+TRIPPED      M9 -> D56 disambiguation line dropped, leaving the card called MAIN LIFTS with nothing telling the athlete what that means                                                                       g196_ledger.js PASS 54 FAIL 1
+TRIPPED      M10 -> D57 unit leak: the gain on a reps block is labelled in load units, so the app tells a bodyweight athlete they added pounds                                                                g196_ledger.js PASS 53 FAIL 2
+
+SABOTAGE tripped=10 survived=0 not_applied=0 crash=0 of 10
+WARNING: every mutation tripped. Confirm at least one mutation targets ONLY one gate and that the others stayed green (V185).
+NOTE: sabotage.py prints status/name/gate-summary per mutation and NO per-mutation
+      wall clock. It was NOT modified to add one. Per-mutation cost below is the
+      e2e total divided by 10, which is an average, not a measurement.
+
+== STEP 6  identity fuzz lattice (tests/measure/v195_gk_identity_fuzz.js), index.html on both sides
+      self-identity run: candidate == baseline == index.html, which is also the
+      'prove the baseline equals itself' step the real gatekeeper run does first.
+[fuzz_lattice] real=381.64s rc=0 stdout_bytes=382 status=OK
+# baseline self-identity: 54/54 cells reproduce themselves
+# cfg purity: 9/9 goal shapes leave cfg untouched on BOTH versions
+# 34020 configs / 2548980 day-builds / 13701182 prescription keys compared
+# violations: digest=0 grid=0 keyed=0 weeks=0 build-errors=0 pre=0
+FUZZTOTAL configs=34020 sessions=2548980 keys=13701182 violations=0
+PASS 1 FAIL 0
+
+== STEP 7  deploy loop probes (read only — nothing is pushed, nothing is built)
+[pages_api_call] real=0.51s rc=0 stdout_bytes=47 status=OK
+built
+3f5d792d40b503bcfe123ddd9fb9f98e3541f6d4
+[live_curl] real=0.11s rc=0 stdout_bytes=14 status=OK
+content="196"
+
+== RAW SUMMARY (label  real_s  rc  stdout_bytes  status  user/sys)
+vm_boot	0.05	0	48	OK	0.04/0.01
+node_floor	0.03	0	6	OK	0.02/0.00
+vm_boot_split	0.24	0	66	OK	0.27/0.02
+gate_candidate_g000_boot	0.09	0	243	OK	0.08/0.01
+gate_candidate_g190_rounds	4.59	0	2306	OK	5.05/0.07
+gate_candidate_g191_pacedelta	0.07	0	1336	OK	0.06/0.01
+gate_candidate_g192_floorpress_shoulder_gear	0.33	0	1781	OK	0.38/0.02
+gate_candidate_g192_labelsync	0.45	0	408	OK	0.51/0.02
+gate_candidate_g192_landmine_rotpress	0.06	0	1803	OK	0.04/0.01
+gate_candidate_g192_shoulder_side	5.77	0	471	OK	6.38/0.09
+gate_candidate_g193_budget_floor	5.26	3	11635	OK	5.93/0.10
+gate_candidate_g193_d50_trunkfloor	2.56	0	1826	OK	2.84/0.05
+gate_candidate_g193_gear_gates	6.82	0	18150	OK	7.32/0.11
+gate_candidate_g193_pool_overlay	0.06	0	1296	OK	0.04/0.01
+gate_candidate_g193_rotation_reach	0.29	0	2452	OK	0.32/0.02
+gate_candidate_g193_samecard	7.41	0	5661	OK	8.28/0.13
+gate_candidate_g193_trunk_protect	0.72	0	4067	OK	0.80/0.03
+gate_candidate_g194_implement_and_range	0.05	0	546	OK	0.04/0.01
+gate_candidate_g195_wildcard	0.60	0	8801	OK	0.52/0.10
+gate_candidate_g196_ledger	0.10	0	3628	OK	0.09/0.01
+gate_baseline_g000_boot	0.09	0	243	OK	0.08/0.01
+gate_baseline_g190_rounds	4.58	0	2306	OK	5.04/0.08
+gate_baseline_g191_pacedelta	0.07	0	1336	OK	0.06/0.01
+gate_baseline_g192_floorpress_shoulder_gear	0.33	0	1781	OK	0.38/0.02
+gate_baseline_g192_labelsync	0.45	0	408	OK	0.51/0.02
+gate_baseline_g192_landmine_rotpress	0.06	0	1803	OK	0.04/0.01
+gate_baseline_g192_shoulder_side	5.71	0	471	OK	6.31/0.10
+gate_baseline_g193_budget_floor	5.14	3	11607	OK	5.74/0.09
+gate_baseline_g193_d50_trunkfloor	2.61	0	1826	OK	2.89/0.05
+gate_baseline_g193_gear_gates	6.83	0	18150	OK	7.36/0.11
+gate_baseline_g193_pool_overlay	0.06	0	1268	OK	0.04/0.01
+gate_baseline_g193_rotation_reach	0.28	0	2452	OK	0.31/0.02
+gate_baseline_g193_samecard	7.24	0	5661	OK	7.88/0.11
+gate_baseline_g193_trunk_protect	0.72	0	4067	OK	0.81/0.03
+gate_baseline_g194_implement_and_range	0.05	1	882	OK	0.04/0.01
+gate_baseline_g195_wildcard	0.60	0	8805	OK	0.53/0.10
+gate_baseline_g196_ledger	0.10	1	6581	OK	0.09/0.01
+gate_sh_e2e	40.57	0	1305	OK	44.26/1.22
+sabotage_e2e	1.14	0	2548	OK	1.01/0.18
+fuzz_lattice	381.64	0	382	OK	388.89/3.77
+pages_api_call	0.51	0	47	OK	0.06/0.05
+live_curl	0.11	0	14	OK	0.02/0.01
+
+=== done  2026-09-16T03:24:23Z ===
+1789532228 coach end agent=coach model=opus tool_calls=34 ok D81/D82/D83 no-code-change
+1789532554 builder-slice-4 start g193-B4-amendment+B4g+sabotage D81/D83-concurred
+1789533436 builder-slice-4 end g193-B4-D81-amend+B4g+M9/M10-sabotage ok gate.sh-green sabotage-10/10 index.html-untouched-md5-45a938ab coach-M9-SURVIVED-rewritten
+1789533503 builder-slice-4 end gate-amend+B4g+sabotage syntax ok stop-condition-CLEARED
+1789533503 gatekeeper-full start V197-final
+1789533574 gatekeeper-version-syntax-boot start baseline-md5-071d860e-matches-builder
+1789533646 gatekeeper-version-syntax-boot end meta=197 syntax-ok dupes-0-new boot-ok self-stable-yes digest-6e32421331693437
+1789533646 gatekeeper-gates-candidate end 18-gates-all-PASS-FAIL0
+1789533646 gatekeeper-gates-baseline start V196-vacuity-sweep
+1789533804 gatekeeper-gates-baseline end V196:17-gates-pass g197=PASS32/FAIL37-discriminates b4-headroom-quantified
+1789533804 gatekeeper-sabotage start v197.json
+1789534246 gatekeeper-sabotage end v197.json 10/10-TRIPPED M10-ratchet-silent-nobase FINDING
+1789534246 gatekeeper-blast start
+1789534493 gatekeeper-blast end 6-hunks-+61/-14 14-removals-accounted engine-fns-byte-identical
+1789534493 gatekeeper-fuzz start wide-lattice-differential
+1789534815 gatekeeper-sabotage start all-specs-sweep
+1789535035 gatekeeper-confine start cardio-engine-byte-identity
+1789535428 gatekeeper-confine end run-engine-byte-identical 432/432 digest-ddbf5e3576829b92
+1789535428 gatekeeper-fuzz end 2016cfg/141120cells self-identity-0 undef-0 + builder-lattice-3024/115668 reproduced-849/3984 commercial-84/318
+1789535428 gatekeeper-sabotage end all-specs 171/172-TRIPPED 0-survived 0-crash 1-not-applied=example.json-selftest
+1789535428 gatekeeper-full end VERDICT-RED named=unruled-Calves-deletion-knee/protect-hypertrophy-293to68
+1789564442 coach start calves-knee-protect-ruling blocker-from-gatekeeper
+1789595354 coach end agent=coach model=opus tool_calls=36 ok D84-protect-reorder-unscoped D85-filed-V198
+1789595354 builder-slice-5 start small-fixes M9-retune+C1C2-repoint+per-tier-oracle-check
+1789596491 builder-slice-5 end M9-retuned-20to18 C1-C2-repointed-twice per-tier-oracle-guard index.html-untouched
+1789597737 builder-slice-6 start D84-calves-reorder-unscoped
+1789599214 builder-slice-6 end D84-calves-before-legiso-unscoped gate-E-added-2sided-injury-lattice sabotage-M11-M12 all-gates-pass
+1789599286 coach start D84-allowlist-shape family-predicate-vs-four-keys
+1789599546 coach end agent=coach model=opus tool_calls=15 ok D86-predicate+ratchet D87-delta-ceiling no-ship-change
+1789599546 builder-slice-7 start D86-ratchet+D87-derived-ceiling gate-only
+1789600568 builder-slice-7 end D86-ratchet-4-consts D87-derived-ceiling-4 gate-95to109 index.html-untouched-md5-6e9f47e3 all-gates-pass sabotage-12/12
+1789600628 builder-slice-7 end D86-ratchet+D87-ceiling syntax ok 109-assertions
+1789600628 gatekeeper-full start V197-final-slices-1-7
+1789600679 gatekeeper-version-syntax-boot start slice1-7-final-verdict
+1789600818 gatekeeper-version-syntax-boot end meta197 syntax-ok 0-new-dupes self-stable-yes digest-6e32421331693437
+1789600818 gatekeeper-gates-candidate end 18-gates-all-pass g197-109/0
+1789600818 gatekeeper-gates-baseline start vacuity-sweep
+1789600878 gatekeeper-gates-baseline end g197-45/58-not-vacuous budgetfloor-23/0
+1789600878 gatekeeper-sabotage start all-specs
+1789602445 gatekeeper-sabotage end all-specs-20 tripped=173 survived=0 not_applied=1(example-selftest) crash=0 of 174
+1789602445 gatekeeper-blast end 6-hunks +70/-14 all-classified 14-removals-accounted budget-machinery-byte-identical-6/6
+1789602445 gatekeeper-fuzz start identity-lattice-self-first
+1789603941 gatekeeper-fuzz end 20412cfg/4616722rows self-identity-0-BASELINE-FIRST undef-0 liftdiff-3263cfg/18226cells all-classified
+1789603941 gatekeeper-confine end cardio-engine-0-diff-of-20412 swapuniverse-5832-classified-D70b+D75 MANNY-identical
+1789604047 gatekeeper-full end VERDICT-GREEN 18-gates-PASS-FAIL0 sabotage-173/174-0survived-0crash blast-6hunks-100pct fuzz-20412cfg-0unclassified digest-6e32421331693437 3-findings-for-handoff
+1789604411 handoff-update end V197 seven-elements-verified
