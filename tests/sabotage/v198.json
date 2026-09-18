@@ -1,0 +1,44 @@
+[
+  {
+    "name": "M1 -> D85 reverted: the posterior floor never engages, so the budget spends the day's last hinge again and a leg day ships with no hip extension on it",
+    "anchor": "        if(_postLeft<=1 && _isPost(it.name)) return;       // V198 (D85): the day's LAST hinge/hip_ext is not budget fodder",
+    "replacement": "        if(false && _postLeft<=1 && _isPost(it.name)) return;       // V198 (D85): the day's LAST hinge/hip_ext is not budget fodder",
+    "gate": "gates/g198_posterior_floor.js",
+    "note": "A1a/A1b name the symptom directly: the day's only hinge is gone from the hand-computed after-list. A4, A5b/A5c and B3 also see it."
+  },
+  {
+    "name": "M2 -> the floor is raised from 1 to 2: a second posterior item is protected too, which is a volume decision nobody ruled and is not the nonempty/empty boundary",
+    "anchor": "        if(_postLeft<=1 && _isPost(it.name)) return;",
+    "replacement": "        if(_postLeft<=2 && _isPost(it.name)) return;",
+    "gate": "gates/g198_posterior_floor.js",
+    "note": "A2a/A2c: with two hinges on the day the later one must still be ordinary budget fodder."
+  },
+  {
+    "name": "M3 -> leg_iso folded into the posterior set: 'Leg extension', a pure quad movement that shares EXLIB.leg_accessory with Leg press, is now defended as posterior chain",
+    "anchor": "  const _isPost=n=>{ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; };",
+    "replacement": "  const _isPost=n=>{ const p=_pattern(n); return p==='hinge'||p==='hip_ext'||p==='leg_iso'; };",
+    "gate": "gates/g198_posterior_floor.js",
+    "note": "A3a/A3b, the leg_iso control. This is the defect coach flagged in the measure pass's own E_POSTERIOR oracle."
+  },
+  {
+    "name": "M4 -> the count is precomputed before the trim loop instead of re-read inside it: the stale count still reads 2 after the first removal, so the second pass eats the day's last hinge anyway",
+    "anchor": "  let guard=0;\n  while(_total(out)>cap && guard++<16){\n    const _postLeft=_postItems();                          // live, re-read every iteration",
+    "replacement": "  let guard=0;\n  const _postLeft0=_postItems();\n  while(_total(out)>cap && guard++<16){\n    const _postLeft=_postLeft0;",
+    "gate": "gates/g198_posterior_floor.js",
+    "note": "A2b/A2c, the live-count proof: the day starts with two hinges and must finish with exactly one."
+  },
+  {
+    "name": "M5 -> the floor is implemented on the SECTION LABEL instead of on the day's items, the D50 failure repeated: a day whose posterior work sits under any other label is left unprotected",
+    "anchor": "  const _postItems=()=>out.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+(_isPost(it&&it.name)?1:0),0),0);",
+    "replacement": "  const _postItems=()=>out.reduce((a,s)=>a+(/hinge|posterior|hamstring|glute/i.test((s&&s.label)||'')?((s&&s.items)||[]).length:0),0);",
+    "gate": "gates/g198_posterior_floor.js",
+    "note": "A2a/A2c. A label-keyed count reads 0 on the hand-built days (their hinge sits under 'Finisher', which is exactly the case a label floor cannot see), so 0<=1 protects EVERY posterior item and the two-hinge day refuses to give one up. Verified: M5 trips A2a and A2c."
+  },
+  {
+    "name": "M6 -> the rank-2 label set gains 'delt', so the shoulder prehab section becomes early fodder and the D85 trim lands OUTSIDE the four names the licence covers",
+    "anchor": "    if(/superset b|isolation|calves|pump|accessory/.test(L)) return 2;",
+    "replacement": "    if(/superset b|isolation|calves|pump|accessory|delt/.test(L)) return 2;",
+    "gate": "gates/g193_budget_floor.js",
+    "note": "B3 wide (D85 CONFINEMENT, no-baseline floor) is the named trip: off-licence prehab falls 330/426/394/333/333/291 -> 174/282/283/231/231/195, a loss of 711 on 6/6 tiers, while the four licensed names still fall exactly 661. That is the shape the licence exists to catch - a second, unruled regression walking in behind a ruled one. The V192 census floor does NOT catch it (every tier stays above 3711-3867), which is why the transcribed V197 off-licence table had to exist for sabotage to reach this claim at all."
+  }
+]

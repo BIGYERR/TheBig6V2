@@ -32,12 +32,28 @@
 // run, so both still see all 95,232 day-cells. Workers ALWAYS exit 0 and are graded from
 // their result files; a dead, empty or short worker prints FAIL E-shard by name.
 //
+// BASELINE-AWARENESS (V198, tests only). Two of the five comparison assertions had a
+// premise that only held against one particular pair of artifacts, and both were found
+// by running the gate outside that pair:
+//   E1h ('Calves rises somewhere') is D84's own footprint. It is satisfiable ONLY against
+//   a pre-D84 baseline, and it FAILED when V197 was compared to itself. It is now
+//   baseline-version-aware. On a baseline it cannot be satisfied against it does not
+//   quietly skip — a no-op assertion is the vacuity defect this repo keeps paying for —
+//   it prints a named REFUSE line and is counted in the REFUSED bucket, which is NOT a
+//   pass and is printed beside the PASS/FAIL summary.
+//   E5 capSessionBudget was pinned to the baseline under the premise that D84 touched no
+//   budget machinery. D85 (V198) deliberately edits that function, so that comparison
+//   fails by construction. The confinement is RE-PINNED to the D85-licensed TEXT rather
+//   than deleted: deleting it is an unruled removal, and it is the one assertion in the
+//   suite that sees the D85 edit as an EDIT rather than as an outcome.
+//
 // Usage: node tests/gates/g197d_d84_base.js <candidate.html> [baseline.html]
 // Internal: --shard i/N --out <json>   worker mode, never called by hand.
 const fs   = require('fs');
 const os   = require('os');
 const path = require('path');
 const cp   = require('child_process');
+const crypto = require('crypto');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
 
 var SHARD_I = null, SHARD_N = 0, OUT = '';
@@ -57,10 +73,18 @@ const IA   = load(FILE);
 if (WORKER) console.log = function () {};   // a worker writes counters, never a verdict
 const BASE_HTML = POS[1] && fs.existsSync(POS[1]) ? POS[1] : null;
 
-let pass = 0, fail = 0;
+let pass = 0, fail = 0, refused = 0;
 function ok(name, cond, detail) {
   if (cond) { pass++; console.log('ok   ' + name); }
   else { fail++; console.log('FAIL ' + name + (detail !== undefined ? '  -> ' + detail : '')); }
+}
+// A refusal is an assertion that COULD NOT BE PUT, announced by name. It is not a pass,
+// it is not silence, and it is echoed next to the summary so it cannot read as green.
+function refuse(name, why) { refused++; console.log('REFUSE ' + name + '  -> ' + why); }
+
+function iaVersion(src) {
+  const m = /<meta name="ia-version" content="(\d+)"/.exec(String(src || ''));
+  return m ? parseInt(m[1], 10) : null;
 }
 
 // ── retaining DOM stub (the V195 lesson): the harness hands out a FRESH element per
@@ -85,7 +109,12 @@ try { IA.eval(DOM_STUB); } catch (e) { console.log('FAIL dom-stub install -> ' +
 var SCRATCH = '';
 function cleanup() { try { if (SCRATCH) fs.rmSync(SCRATCH, { recursive: true, force: true }); } catch (e) {} SCRATCH = ''; }
 process.on('exit', cleanup);
-function done() { cleanup(); console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); }
+function done() {
+  cleanup();
+  if (refused) console.log('\nREFUSED ' + refused + ' assertion(s) — see the REFUSE lines above. A REFUSED assertion was NOT run and is NOT a pass.');
+  console.log('\nPASS ' + pass + ' FAIL ' + fail);
+  process.exit(fail ? 1 : 0);
+}
 
 // ── the lattice: every tier, every injury state. lattice193.WIDE carries no injured
 // athlete at all, and section B above is healthy-only, which is exactly how a regression
@@ -219,23 +248,69 @@ function afterSweep(bCells, bFell, bRose, bEg) {
   if (BASE_HTML) {
     ok('E1g vs ' + path.basename(BASE_HTML) + ': Calves falls on zero day-cells (' + bCells + ' compared)',
        bCells > 0 && bFell === 0, bFell + ' e.g. ' + bEg.join(' ; '));
-    ok('E1h vs ' + path.basename(BASE_HTML) + ': Calves rises somewhere', bRose > 0, bRose);
+    // E1h is D84's own footprint: Calves must appear on cells where the baseline had none.
+    // D84 shipped IN V197, so only a baseline built before it can show the rise. Against a
+    // V197-or-later baseline the claim is unsatisfiable by construction (it FAILED on
+    // V197-vs-itself) and the honest answer is a refusal, not a pass and not a skip.
+    const BV = iaVersion(fs.readFileSync(BASE_HTML, 'utf8'));
+    if (BV !== null && BV < 197) {
+      ok('E1h vs ' + path.basename(BASE_HTML) + ': Calves rises somewhere', bRose > 0, bRose);
+    } else {
+      refuse('E1h vs ' + path.basename(BASE_HTML) + ': Calves rises somewhere',
+        'NOT RUN: this claim needs a pre-D84 baseline (ia-version < 197); this baseline reads '
+        + (BV === null ? 'no ia-version meta' : 'ia-version ' + BV)
+        + '. D84 landed in V197, so a V197-or-later baseline already carries the rise and the claim '
+        + 'cannot be satisfied against it. Re-run with base_V196.html to put this assertion.');
+    }
   } else {
     console.log('   -- E1g/E1h not run: no baseline argv[3] (gate.sh passes one; sabotage.py does not)');
   }
-// byte-identity of the machinery D84 must not have touched, against the shipped baseline
+// ── E5: CONFINEMENT OF THE BUDGET MACHINERY. One claim, two mechanisms: nothing has
+// edited budget machinery since D85 without a ruling.
+//   capSessionBudget is PINNED TO ITS LICENSED TEXT by sha256. Until V198 it was pinned
+//   to the shipped baseline under D84's premise that no budget machinery moved; D85
+//   (V198) edits this function on purpose, so a baseline comparison now fails by
+//   construction. Re-pinning keeps the confinement instead of deleting it — a deletion
+//   would be an unruled removal, and this is the only assertion in the suite that sees
+//   the D85 edit as an EDIT rather than as an outcome. Narrowing E5 to _itemCost/
+//   _setCount was the other candidate mechanism and was REJECTED for the same reason:
+//   it would leave the function D85 actually touched with no confinement at all.
+//   _itemCost and _setCount are NOT D85's, so they keep the baseline byte comparison.
 if (BASE_HTML) {
   const B = fs.readFileSync(BASE_HTML, 'utf8');
   const slice = (src, start, end) => { const a = src.indexOf(start); if (a < 0) return null;
     const b = src.indexOf(end, a); return b < 0 ? null : src.slice(a, b); };
+
+  // PROVENANCE OF THE PINS. sha256 of the bytes from `function capSessionBudget(sections,
+  // cardio){` up to (not including) `\nfunction capRegionalFatigue`.
+  //   CSB_D85  — V198, the text LICENSED BY RULING D85: the {hinge, hip_ext} floor that
+  //              makes the day's last posterior chain item ineligible for the trim loop.
+  //   CSB_PRE  — the pre-D85 text. V196 and V197 carry it byte-for-byte identically, which
+  //              is why one digest covers both and why this gate still answers V197-vs-V196.
+  // A DIGEST IS REFRESHED ONLY BY A RULING. If this assertion fails, the question is not
+  // 'what is the new digest' — it is 'which ruling licensed that edit to the budget'.
+  const CSB_D85 = 'fb16df9c8a6798937d3e0a9904f23944bf3f68cac258a21ef772ccf9040357c3';
+  const CSB_PRE = 'c8064f3cc1989cd5f60f308bc2644119162238c4946843ee3b9ccea8ebe06a5f';
+  const csb = slice(RAW, 'function capSessionBudget(sections, cardio){', '\nfunction capRegionalFatigue');
+  const cv  = iaVersion(RAW);
+  const pre = cv !== null && cv < 198;           // a pre-D85 artifact is allowed the pre-D85 text
+  const want = pre ? CSB_PRE : CSB_D85;
+  const era  = pre ? 'pre-D85' : 'D85 (V198)';
+  const dig  = csb === null ? null : crypto.createHash('sha256').update(csb).digest('hex');
+  ok('E5 capSessionBudget is byte-for-byte the ' + era + ' licensed text '
+     + '(licensing ruling D85; nothing since D85 has edited budget machinery)',
+     dig !== null && dig === want,
+     dig === null ? 'not found in candidate'
+       : 'ia-version ' + cv + ' digest ' + dig.slice(0, 16) + ' != licensed ' + want.slice(0, 16)
+         + ' — capSessionBudget was edited; name the ruling');
+
   const PARTS = [
-    ['capSessionBudget', 'function capSessionBudget(sections, cardio){', '\nfunction capRegionalFatigue'],
     ['_itemCost',        'function _itemCost(it, sectionRegion){',       '\n// ── RECOVERY-WEEK VOLUME DELOAD'],
     ['_setCount',        'function _setCount(detail){',                  '\nfunction _itemCost'],
   ];
   PARTS.forEach(([nm, a, b]) => {
     const x = slice(RAW, a, b), y = slice(B, a, b);
-    ok('E5 ' + nm + ' is byte-identical to the baseline (D84 touched no budget machinery)',
+    ok('E5 ' + nm + ' is byte-identical to the baseline (D85 owns the capSessionBudget trim loop and nothing else)',
        !!x && !!y && x === y, x === null ? 'not found in candidate' : (y === null ? 'not found in baseline' : 'differs'));
   });
 } else {
