@@ -12,6 +12,16 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
+# GATE_JOBS: empty or unset means 8. Only a POSITIVE integer is accepted. 0 is NOT
+# clamped and NOT allowed — BSD xargs reads `-P 0` as UNBOUNDED, which would spawn
+# every gate at once; a clamp would silently hide the typo instead. Negative and
+# non-numeric are rejected the same way. This is a CONFIGURATION error, not a gate
+# result, and it fires before gate 0 so no work is done on a bad value.
+JOBS="${GATE_JOBS:-8}"
+if ! printf '%s' "$JOBS" | grep -qE '^[0-9]+$' || [ "$JOBS" -lt 1 ]; then
+  echo "FAIL: CONFIG: GATE_JOBS must be a positive integer, or empty/unset which means 8; got '$GATE_JOBS'"; exit 1
+fi
+
 echo "== 0. version / filename invariant"
 META="$(grep -oE '<meta name="ia-version" content="[0-9]+"' "$CAND" | grep -oE '[0-9]+' | tail -1)"
 FNV="$(basename "$CAND" | grep -o 'V[0-9]*' | tr -d V || true)"
@@ -43,16 +53,36 @@ echo "== 4. behavioral gates (tests/gates/*.js)"
 shopt -s nullglob
 GATES=("$HERE"/gates/*.js)
 if [ ${#GATES[@]} -eq 0 ]; then echo "   (no gates yet)"; fi
-for g in "${GATES[@]}"; do
-  rm -f "$TMP/gate.out"
-  node "$g" "$CAND" ${BASE:+"$BASE"} > "$TMP/gate.out" 2>&1 || true
-  [ -s "$TMP/gate.out" ] || { echo "FAIL: $(basename "$g") printed nothing"; exit 1; }
-  SUMMARY="$(grep -E '^PASS [0-9]+ FAIL [0-9]+' "$TMP/gate.out" || true)"
-  [ -n "$SUMMARY" ] || { echo "FAIL: $(basename "$g") printed no PASS/FAIL summary (crash?)"; tail -20 "$TMP/gate.out"; exit 1; }
-  echo "   $(basename "$g"): $SUMMARY"
-  FAILS="$(echo "$SUMMARY" | awk '{print $4}')"
-  [ "$FAILS" = "0" ] || { grep -E '^FAIL' "$TMP/gate.out" | head -40; exit 1; }
-done
+if [ ${#GATES[@]} -gt 0 ]; then
+  # Run the gates across cores, then GRADE THEM SEQUENTIALLY in glob order.
+  # One result file per gate, so nothing interleaves and the grader reads files,
+  # not a live pipe: printed order, stop-at-first-red and exit codes are identical
+  # to the serial run. Workers ALWAYS exit 0 — a red gate must reach the grader,
+  # and any nonzero worker makes xargs return 1, which `set -e` would abort on
+  # before a single result was read.
+  rm -rf "$TMP/gateout" "$TMP/gatelist" "$TMP/rungate.sh"   # delete artifacts before regenerating them
+  mkdir -p "$TMP/gateout"
+  cat > "$TMP/rungate.sh" <<'WORKER'
+#!/usr/bin/env bash
+set -eo pipefail
+node "$1" "$GATE_CAND" ${GATE_BASE:+"$GATE_BASE"} > "$GATE_OUT/$(basename "$1").out" 2>&1 || true
+exit 0
+WORKER
+  chmod +x "$TMP/rungate.sh"
+  for g in "${GATES[@]}"; do printf '%s\0' "$g" >> "$TMP/gatelist"; done   # temp file, not <(...) — standing rule
+  GATE_CAND="$CAND" GATE_BASE="$BASE" GATE_OUT="$TMP/gateout" \
+    xargs -0 -n 1 -P "$JOBS" "$TMP/rungate.sh" < "$TMP/gatelist"
+
+  for g in "${GATES[@]}"; do
+    GOUT="$TMP/gateout/$(basename "$g").out"
+    [ -s "$GOUT" ] || { echo "FAIL: $(basename "$g") printed nothing"; exit 1; }
+    SUMMARY="$(grep -E '^PASS [0-9]+ FAIL [0-9]+' "$GOUT" || true)"
+    [ -n "$SUMMARY" ] || { echo "FAIL: $(basename "$g") printed no PASS/FAIL summary (crash?)"; tail -20 "$GOUT"; exit 1; }
+    echo "   $(basename "$g"): $SUMMARY"
+    FAILS="$(echo "$SUMMARY" | awk '{print $4}')"
+    [ "$FAILS" = "0" ] || { grep -E '^FAIL' "$GOUT" | head -40; exit 1; }
+  done
+fi
 
 if [ -n "$BASE" ]; then
   echo "== 5. blast-radius diff vs $(basename "$BASE")"

@@ -15,11 +15,35 @@ Standing rules the runner enforces:
     every mutation "trip" via MODULE_NOT_FOUND)
   - anchors are read from the JSON file, never from a shell string (V169: "\\n"
     in double quotes arrives as literal backslash-n)
+  - mutations run JOBS-wide (SABOTAGE_JOBS, default 8) but are REPORTED in spec
+    order, so the report and the exit code do not depend on completion order;
+    SABOTAGE_JOBS=1 reproduces the serial run exactly. Empty or unset means 8
+    (matching `${GATE_JOBS:-8}` in gate.sh); 0, negative or non-numeric is a
+    CONFIGURATION error and exits 2 before any mutation runs, never clamped
+  - a worker that raises is reported as a CRASH row for that mutation only: the
+    report, the summary line and the exit code survive it
   - a sweep where every mutation trips is reported with a warning — that is as
     suspicious as a survivor (V185)
 Exit code: 0 only when every mutation TRIPPED and none was NOT-APPLIED or CRASHED.
 """
-import json, os, re, subprocess, sys, tempfile
+import concurrent.futures, json, os, re, subprocess, sys, tempfile
+
+def jobs_from_env(var, default=8):
+    """Empty or unset means `default` — exported-but-empty must behave as unset,
+    exactly as `${GATE_JOBS:-8}` does in gate.sh. Only a POSITIVE integer is
+    accepted: 0, negative and non-numeric are rejected, NEVER clamped, because a
+    silent clamp hides a typo and `-P 0` means unbounded to BSD xargs. This is a
+    configuration error, so it exits 2 (the usage-error code) — rc=1 must keep
+    meaning "the sweep ran and something was not TRIPPED"."""
+    raw = os.environ.get(var, '')
+    if raw == '':
+        return default
+    if not re.match(r'^[0-9]+$', raw) or int(raw) < 1:
+        print(f'FAIL: CONFIG: {var} must be a positive integer, or empty/unset which means {default}; got {raw!r}')
+        sys.exit(2)
+    return int(raw)
+
+JOBS = jobs_from_env('SABOTAGE_JOBS')  # SABOTAGE_JOBS=1 reproduces the serial run exactly
 
 def run_gate(gate, html):
     gate = os.path.abspath(gate)
@@ -37,22 +61,45 @@ def main():
     src = open(cand, encoding='utf-8').read()
     muts = json.load(open(spec, encoding='utf-8'))
     here = os.path.dirname(os.path.abspath(__file__))
-    results = []
-    with tempfile.TemporaryDirectory() as td:
-        for m in muts:
+    # Mutations are independent: each writes its own mutated copy and runs one gate
+    # in its own node process. They are fanned out JOBS-wide and the results are
+    # collected into an index-keyed slot, then printed in SPEC ORDER below — so the
+    # report, the counts and the exit code are identical to the serial run.
+    # The work is entirely subprocess-bound, so threads (not processes) are enough:
+    # subprocess.run drops the GIL while node is running.
+    # `src` is read-only here; str.count and str.replace are pure. The only writes
+    # are to a per-mutation path, which carries the index so that two mutation names
+    # that sanitise to the same string cannot race for one file.
+    # A raising worker must never kill the whole report. Every exception below —
+    # a bad spec row, an unwritable temp path, a failure to spawn node — becomes a
+    # CRASH row for THIS mutation, so its slot still fills, the row still prints in
+    # SPEC ORDER, the SABOTAGE summary line still prints with it counted in crash,
+    # and the process still exits 1. `name` is seeded from the index BEFORE m is
+    # read, so a row is always emitted even if m['name'] itself raises.
+    def run_one(i, m, td):
+        name = f'mutation #{i}'
+        try:
+            name = m.get('name', name)   # bind the real name FIRST: the unpack below evaluates its whole RHS before binding anything
             name, anchor, repl = m['name'], m['anchor'], m['replacement']
             gate = m['gate'] if os.path.isabs(m['gate']) else os.path.join(here, m['gate'])
             n = src.count(anchor)
             if n != 1:
-                results.append((name, 'NOT-APPLIED', f'anchor count={n}')); continue
+                return (i, name, 'NOT-APPLIED', f'anchor count={n}')
             mutated = src.replace(anchor, repl)
             if mutated == src:
-                results.append((name, 'NOT-APPLIED', 'replacement identical to anchor')); continue
-            path = os.path.join(td, f'sab_{re.sub(r"[^A-Za-z0-9]+","_",name)}.html')
+                return (i, name, 'NOT-APPLIED', 'replacement identical to anchor')
+            path = os.path.join(td, f'sab_{i:04d}_{re.sub(r"[^A-Za-z0-9]+","_",name)}.html')
             open(path, 'w', encoding='utf-8').write(mutated)
             status, p, f, out = run_gate(gate, path)
             detail = f'PASS {p} FAIL {f}' if p is not None else 'no summary: ' + out.strip().splitlines()[-1] if out.strip() else 'no output'
-            results.append((name, status, f'{os.path.basename(gate)} {detail}'))
+            return (i, name, status, f'{os.path.basename(gate)} {detail}')
+        except Exception as e:
+            return (i, name, 'CRASH', 'exception: ' + ' '.join(f'{type(e).__name__}: {e}'.split()))
+
+    with tempfile.TemporaryDirectory() as td:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=JOBS) as pool:
+            done = [fu.result() for fu in [pool.submit(run_one, i, m, td) for i, m in enumerate(muts)]]
+    results = [(name, status, detail) for _, name, status, detail in sorted(done, key=lambda r: r[0])]
 
     width = max(len(r[0]) for r in results) if results else 10
     for name, status, detail in results:
