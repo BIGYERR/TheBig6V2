@@ -26,7 +26,7 @@ Standing rules the runner enforces:
     suspicious as a survivor (V185)
 Exit code: 0 only when every mutation TRIPPED and none was NOT-APPLIED or CRASHED.
 """
-import concurrent.futures, json, os, re, subprocess, sys, tempfile
+import concurrent.futures, hashlib, json, os, re, subprocess, sys, tempfile
 
 def jobs_from_env(var, default=8):
     """Empty or unset means `default` — exported-but-empty must behave as unset,
@@ -44,6 +44,53 @@ def jobs_from_env(var, default=8):
     return int(raw)
 
 JOBS = jobs_from_env('SABOTAGE_JOBS')  # SABOTAGE_JOBS=1 reproduces the serial run exactly
+
+# Filesystem limits the mutant path has to live inside. NAME_MAX is per path
+# COMPONENT; PATH_MAX is the whole path. A path can be legal while its basename
+# is not, and a basename can be legal while the path it hangs off is not, so the
+# clamp below budgets against both.
+NAME_MAX = 255    # bytes in one component (APFS, HFS+, ext4) — probed: 255 writes, 256 is errno 63
+PATH_MAX = 1016   # bytes in a WHOLE path. darwin declares 1024 in sys/syslimits.h, but APFS
+                  # here refuses at 1017 (probed, V198). Budget against the number that is
+                  # actually true, not the number in the header.
+
+def mutant_path(td, i, name, name_max=NAME_MAX, path_max=PATH_MAX):
+    """Temp path for mutation `i`, clamped so no mutation NAME can be unwritable.
+
+    V194, V197 and V197-again each lost a sweep to OSError 63 ENAMETOOLONG here:
+    the mutant filename was built straight from the mutation name, a 364-byte
+    name is legal JSON and not a legal filename, and the crash landed BEFORE the
+    mutation ran, so the whole sweep died reporting nothing. Worked around three
+    times by shortening names in the spec. Clamped in the runner instead.
+
+    The budget is taken on the FULL PATH, not just the name fragment: the tempdir
+    prefix counts, and short names under a long prefix are exactly what blew up.
+    Both limits bind: the component limit is what fires under a normal /var/folders
+    tempdir, the whole-path limit is what fires under a deep one.
+
+    The digest is what makes truncation safe. Truncating turns two long names
+    that share a prefix into ONE filename, and two mutations writing the same
+    temp file is a worse defect than the crash it replaces: they would race, and
+    a gate would silently score the wrong mutant. Appending 8 hex of the FULL
+    original name makes the clamped stem a function of the whole name again, and
+    keeps it traceable back to the row it came from. (The `sab_%04d_` index
+    prefix already makes the path unique within one sweep; the digest keeps the
+    guarantee from depending on that prefix, and survives it being changed.) It
+    is appended ALWAYS, not only when truncating, so the disambiguator is on the
+    hot path of every sweep and cannot rot as never-executed code.
+
+    Only the PATH is clamped. The caller's `name` is untouched, so the
+    TRIPPED / NOT-APPLIED report still prints the full original name verbatim.
+    """
+    stem = 'sab_%04d_' % i
+    tag = '_' + hashlib.sha1(name.encode('utf-8')).hexdigest()[:8]
+    ext = '.html'
+    slug = re.sub(r'[^A-Za-z0-9]+', '_', name)            # ASCII after this, so len == bytes
+    fixed = len(stem) + len(tag) + len(ext)
+    room = min(name_max, path_max - (len(td.encode('utf-8')) + 1)) - fixed
+    if room < 0:
+        room = 0
+    return os.path.join(td, stem + slug[:room] + tag + ext)
 
 def run_gate(gate, html):
     gate = os.path.abspath(gate)
@@ -68,8 +115,10 @@ def main():
     # The work is entirely subprocess-bound, so threads (not processes) are enough:
     # subprocess.run drops the GIL while node is running.
     # `src` is read-only here; str.count and str.replace are pure. The only writes
-    # are to a per-mutation path, which carries the index so that two mutation names
-    # that sanitise to the same string cannot race for one file.
+    # are to a per-mutation path from mutant_path(), which carries the index and a
+    # digest of the full name so that two mutation names that sanitise, or clamp,
+    # to the same string cannot race for one file. See mutant_path for why the
+    # path is length-clamped and why the report is not.
     # A raising worker must never kill the whole report. Every exception below —
     # a bad spec row, an unwritable temp path, a failure to spawn node — becomes a
     # CRASH row for THIS mutation, so its slot still fills, the row still prints in
@@ -88,7 +137,7 @@ def main():
             mutated = src.replace(anchor, repl)
             if mutated == src:
                 return (i, name, 'NOT-APPLIED', 'replacement identical to anchor')
-            path = os.path.join(td, f'sab_{i:04d}_{re.sub(r"[^A-Za-z0-9]+","_",name)}.html')
+            path = mutant_path(td, i, name)   # clamped: a long name must never kill a sweep (V194/V197/V197)
             open(path, 'w', encoding='utf-8').write(mutated)
             status, p, f, out = run_gate(gate, path)
             detail = f'PASS {p} FAIL {f}' if p is not None else 'no summary: ' + out.strip().splitlines()[-1] if out.strip() else 'no output'
