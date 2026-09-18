@@ -1,0 +1,104 @@
+001	A_STATIC	A1 EXLIB.leg_accessory exists (D75 rename landed)
+002	A_STATIC	A2 old key EXLIB.leg_iso is gone from EXLIB
+003	A_STATIC	A3 harvested: Nordic hamstring curl (anchored)
+004	A_STATIC	A3 harvested: Single-leg glute bridge
+005	A_STATIC	A3 harvested: Single-leg hip thrust
+006	A_STATIC	A3 harvested: Wall sit
+007	A_STATIC	A4 commercial keeps its machine: Leg extension
+008	A_STATIC	A4 commercial keeps its machine: Lying leg curl
+009	A_STATIC	A4 commercial keeps its machine: Seated leg curl
+010	A_STATIC	A4 commercial keeps its machine: Leg press
+011	A_STATIC	A4 commercial keeps its machine: Standing cable hamstring curl
+012	A_STATIC	A5 coach EXCLUDED, not in pool: Spanish squat hold (KB)
+013	A_STATIC	A5 coach EXCLUDED, not in pool: Step-ups (KB)
+014	A_STATIC	A5 coach EXCLUDED, not in pool: Dumbbell Bulgarian split squat
+015	A_STATIC	A6 pool is exactly 9 names (5 machine + 4 harvested)
+016	A_STATIC	A7 commercial: gear-legal members >= 2 (slot picks two)
+017	A_STATIC	A7 home_full: gear-legal members >= 2 (slot picks two)
+018	A_STATIC	A7 crossfit: gear-legal members >= 2 (slot picks two)
+019	A_STATIC	A7 home_basic: gear-legal members >= 2 (slot picks two)
+020	A_STATIC	A7 bodyweight: gear-legal members >= 2 (slot picks two)
+021	A_STATIC	A7 minimal: gear-legal members >= 2 (slot picks two)
+022	A_STATIC	A7 travel_room_only: gear-legal members >= 2 (slot picks two)
+023	A_STATIC	A8 gear-free floor is the four harvested names
+024	A_STATIC	A9 D70b: _gear no longer falls back to the raw pool
+025	A_STATIC	A10 _gear still filters (it was not deleted)
+026	A_STATIC	A11 _BW_GEAR found
+027	A_STATIC	A12 D78: _BW_GEAR does NOT match Nordic hamstring curl (anchored)
+028	A_STATIC	A12 D78: _BW_GEAR does NOT match Single-leg glute bridge
+029	A_STATIC	A12 D78: _BW_GEAR does NOT match Single-leg hip thrust
+030	A_STATIC	A12 D78: _BW_GEAR does NOT match Wall sit
+031	A_STATIC	A13 _BW_SUBS parsed
+032	A_STATIC	A14 D78: not a _BW_SUBS key: Nordic hamstring curl (anchored)
+033	A_STATIC	A14 D78: not a _BW_SUBS key: Single-leg glute bridge
+034	A_STATIC	A14 D78: not a _BW_SUBS key: Single-leg hip thrust
+035	A_STATIC	A14 D78: not a _BW_SUBS key: Wall sit
+036	B_SWEEP	B0 every config built
+037	B_SWEEP	B1 UNDEFINED items across every build and every tier == 0
+038	B_SWEEP	B2 the section still exists (the harvest did not delete it)
+039	B_SWEEP	B3 every "Leg isolation" section carries a harvested name somewhere in the sweep
+040	B4_CENSUS_ASSERTS	B4a crossfit machine items == 0 (was 428)
+041	B4_CENSUS_ASSERTS	B4b crossfit cable items == 0 (was 36)
+042	B4_CENSUS_ASSERTS	B4c home_basic machine items == 0 (was 716)
+043	B4_CENSUS_ASSERTS	B4d home_basic cable items == 0 (was 12)
+044	B4_CENSUS_ASSERTS	B4e bodyweight machine+cable == 0
+045	B4_CENSUS_ASSERTS	B4f travel Room-only machine+cable == 0
+046	B4_CENSUS_ASSERTS	B4g minimal machine+cable == 0 (was 762/12)
+047	B4_CENSUS_ASSERTS	B4h commercial owns machines and cables: 0 denials
+048	B4_CENSUS_ASSERTS	B4i home_full machine items == 200 exactly (was 628; the raw-EXLIB Preacher curl, out of scope)
+049	B4_CENSUS_ASSERTS	B4j all 200 home_full machine survivors are Preacher curl
+050	B4_CENSUS_ASSERTS	B4k home_full cable items == 13 exactly (was 49)
+051	B4_CENSUS_ASSERTS	B4l the 13 home_full cable survivors are the Arms/Delts finisher pair
+052	B4_CENSUS_ASSERTS	B4m no leg machine reaches a cable-less tier
+053	B4_CENSUS_ASSERTS	B5a a harvested name NEVER prints twice on one card (D76 subtraction)
+054	B4_CENSUS_ASSERTS	B5b total same-card duplicates did not grow past the ruling ceiling of 415
+055	B4_CENSUS_ASSERTS	B5c same-card duplicates == 240 (V196 baseline; D76 absorbs the whole +175 harvest cost)
+056	B4_CENSUS_ASSERTS	B5d nowhere near 955 (that number means the three exclusions did not land)
+057	B4_CENSUS_ASSERTS	B6a Wall sit actually reaches the section (the assertion is not vacuous)
+058	B4_CENSUS_ASSERTS	B6b every Wall sit renders n×25 sec, never a rep count
+059	B4_CENSUS_ASSERTS	B7a bodyweight section is populated
+060	B4_CENSUS_ASSERTS	B7b leg movement only: Wall sit
+061	B4_CENSUS_ASSERTS	B7b leg movement only: Single-leg glute bridge
+062	B4_CENSUS_ASSERTS	B7b leg movement only: Single-leg hip thrust
+063	B4_CENSUS_ASSERTS	B7b leg movement only: Nordic hamstring curl (anchored)
+064	B4_CENSUS_ASSERTS	B7c the _bwFallback substitutes are gone from this section
+065	C_RENDER	C1 every rendered row carries a name the athlete can read, and no item loses its row
+066	C_RENDER	C2 the blank-row detector is not blind: a nameless second item is harvested as a blank row
+067	C_RENDER	C3 at least one rendered card shows the 25-second hold
+068	D_FIXTURE	D1 HALF_MANNY digest is 6e32421331693437
+069	D_FIXTURE	D2 "Leg isolation" never opens on his program (denseHypertrophy gate)
+070	D_FIXTURE	D3 no harvested name reaches his card through the leg_accessory slot
+071	E_STATIC	E0a the Calves push exists exactly once
+072	E_STATIC	E0b the Leg isolation push exists exactly once
+073	E_STATIC	E0c D84 order: Calves is pushed BEFORE Leg isolation
+074	E_STATIC	E0d a comparison artifact could be derived by swapping the two pushes
+075	E_STATIC	E3a detector probe: a card with squat + press + calf raise reads as posterior-free
+076	E_STATIC	E3a detector probe: adding a Nordic makes the same card read as posterior-covered
+077	E_STATIC	E4h the hsets table parses and every site agrees (the ceiling has a source)
+078	E_STATIC	E4i the Calves section is exactly one item, dosed off hsets
+079	E_STATIC	E4j the derived one-slot ceiling is a positive number of sets
+080	E_STATIC	E4k the cap value parses out of the file (not typed here)
+081	E_POST_CMP	E1a the sweep ran and covers day-cells
+082	E_POST_CMP	E1b all four injury states built
+083	E_POST_CMP	E1c all six equipment tiers built
+084	E_POST_CMP	E1d no build threw
+085	E_POST_CMP	E1e Calves FALLS on zero day-cells (the side a "it rose" assertion cannot see)
+086	E_POST_CMP	E1f Calves RISES somewhere: D84 is actually in the artifact
+087	E_TAIL_ASSERTS	E2a exactly two section labels move
+088	E_TAIL_ASSERTS	E2b the two are Calves and Leg isolation
+089	E_TAIL_ASSERTS	E2c Calves rises and Leg isolation falls (the ruled direction)
+090	E_TAIL_ASSERTS	E3b every posterior-free cell the reorder creates is bodyweight + hypertrophy + lowback/protect (D85 owns the fix)
+091	E_TAIL_ASSERTS	E3c ratchet: cells the reorder makes posterior-free <= 120 (down-only)
+092	E_TAIL_ASSERTS	E3d ratchet: config keys the reorder makes posterior-free <= 18 (down-only)
+093	E_TAIL_ASSERTS	E3e every posterior-free leg cell in the artifact, caused or pre-existing, carries lowback/protect (the mechanism)
+094	E_TAIL_ASSERTS	E3f ratchet: total posterior-free leg cells <= 186 (down-only)
+095	E_TAIL_ASSERTS	E3g ratchet: total posterior-free leg config keys <= 33 (down-only)
+096	E_TAIL_ASSERTS	E4a SESSION_SET_BUDGET is still declared exactly once
+097	E_TAIL_ASSERTS	E4b SESSION_SET_BUDGET is still 20
+098	E_TAIL_ASSERTS	E4c the trim tie-break still resolves a tie to the LATER position (that is what D84 uses)
+099	E_TAIL_ASSERTS	E4d no changed day-cell costs more than one derived accessory slot (Δ <= 4, from hsets 4 × 1 item)
+100	E_TAIL_ASSERTS	E4l no changed day-cell moves DOWN (Δ >= 0: one direction, so this is a residual and not a redistribution)
+101	E_TAIL_ASSERTS	E4m the trim is a threshold loop, not a minimiser: while(_total(out)>cap && guard++<16)
+102	E_TAIL_ASSERTS	E4n the trim bails out when only protected work is left: if(!best) break
+103	E_TAIL_ASSERTS	E4o over-cap day-cells are PRE-EXISTING: some sit over the cap and are byte-identical to the pre-D84 artifact
+104	E_TAIL_ASSERTS	E4p over-cap is not a D84 artifact: over-cap cells outnumber every cell D84 changed
