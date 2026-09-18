@@ -1,6 +1,7 @@
 // g197d_d84_base — V197 D84, the BASELINE half of section E: the candidate is swept
 // against the SHIPPED baseline (E1g / E1h) and the budget machinery is proved byte-
-// identical to it (E5 × 3). Five assertions, every one of them baseline-only.
+// identical to it (E5 × 3). Six assertions: those five, which are baseline-only, plus E0,
+// a guard that needs no baseline and runs on every invocation.
 //
 // SPLIT NOTE (V198, tests only). This file was section E (the baseline sweep) of g197_leg_accessory.js. That
 // gate ran 58.9s and was 93% of gate.sh's wall time, and an 8-wide fan-out is bounded by
@@ -11,15 +12,23 @@
 // their own section, IA.window.__SEC/__DAY have no reader anywhere, and localStorage is
 // empty at every boundary — so there is no ordering constraint between the four files.
 //
-// WITH NO BASELINE THIS FILE ASSERTS NOTHING, ON PURPOSE. tests/sabotage.py runs
-// `node <gate> mutated.html` with no argv[3], so under sabotage this file prints its two
-// "not run" lines and `PASS 0 FAIL 0`. That is a valid summary, not a crash — gate.sh
-// reads a MISSING summary as a crash, and this file must never produce one. It therefore
-// has zero sabotage coverage by construction; every mutation that used to trip section E
-// is re-pointed at g197c_d84_cmp.js.
+// WITH NO BASELINE THE FIVE COMPARISON ASSERTIONS DO NOT RUN, ON PURPOSE. tests/sabotage.py
+// runs `node <gate> mutated.html` with no argv[3], so under sabotage this file prints its
+// two "not run" lines and E1g/E1h/E5 are skipped. Every mutation that used to trip
+// section E is re-pointed at g197c_d84_cmp.js, so this file still carries no sabotage
+// coverage of the app.
+//
+// WHAT IT MUST NEVER PRINT IS `PASS 0 FAIL 0`. gate.sh reads a MISSING summary as a crash,
+// but it reads a summary of zero as green, and a zero summary is indistinguishable from a
+// gate whose body was deleted. E0 therefore runs on every invocation, with or without a
+// baseline: it needs no second artifact, it is answered by the lattice this file builds
+// for itself, and it fails loudly if that enumeration is ever cut down. Under sabotage
+// this file prints PASS 1 FAIL 0.
 //
 // INTERNAL FAN-OUT. 1,728 configs built twice (candidate + baseline). Fanned by CONFIG
-// INDEX across G197_SHARDS workers (default 4) and aggregated IN FULL before E1g and E1h
+// INDEX across G197_SHARDS workers (default 2, because gate.sh already runs eight gates at
+// once on 8 cores and more workers here only oversubscribe them) and aggregated IN FULL
+// before E1g and E1h
 // run, so both still see all 95,232 day-cells. Workers ALWAYS exit 0 and are graded from
 // their result files; a dead, empty or short worker prints FAIL E-shard by name.
 //
@@ -126,9 +135,9 @@ function eScan(IA_, cfg) {
 // ── THE BASELINE SWEEP. Fanned across workers, aggregated in full, then asserted. ─────
 function shardCount() {
   const raw = process.env.G197_SHARDS === undefined ? '' : String(process.env.G197_SHARDS);
-  if (raw === '') return 4;
+  if (raw === '') return 2;
   if (!/^[0-9]+$/.test(raw) || parseInt(raw, 10) < 1) {
-    fail++; console.log("FAIL: CONFIG: G197_SHARDS must be a positive integer, or empty/unset which means 4; got '" + raw + "'");
+    fail++; console.log("FAIL: CONFIG: G197_SHARDS must be a positive integer, or empty/unset which means 2; got '" + raw + "'");
     return 0;
   }
   return parseInt(raw, 10);
@@ -205,6 +214,8 @@ function runParent() {
 }
 
 function afterSweep(bCells, bFell, bRose, bEg) {
+  ok('E0 lattice enumeration is the full tier × focus × experience × goal × injury × rest × seed product',
+     E_L.length === 1728, E_L.length);
   if (BASE_HTML) {
     ok('E1g vs ' + path.basename(BASE_HTML) + ': Calves falls on zero day-cells (' + bCells + ' compared)',
        bCells > 0 && bFell === 0, bFell + ' e.g. ' + bEg.join(' ; '));

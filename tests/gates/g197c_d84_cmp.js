@@ -12,8 +12,11 @@
 //
 // INTERNAL FAN-OUT, AND WHY IT CHANGES NOTHING. The sweep is 1,728 configs built twice —
 // once on the candidate, once on the swapped-back comparison artifact. It is fanned by
-// CONFIG INDEX across G197_SHARDS worker processes (default 4, not 8: this gate already
-// runs inside gate.sh's own 8-wide fan-out) and EVERY counter is aggregated back into this
+// CONFIG INDEX across G197_SHARDS worker processes (default 2, not 8: this gate already
+// runs inside gate.sh's own 8-wide fan-out, and two of those eight fork workers of their
+// own, so on 8 cores a wider fan-out only buys oversubscription. Measured in-suite: 4
+// shards 24.96-25.11s, 2 shards 21.38s, at the same total CPU) and EVERY counter is
+// aggregated back into this
 // process BEFORE the first assertion runs. Nothing is apportioned: the exact counts, the
 // four down-only ratchets, the E4p ratio and the existentials all still see the complete
 // lattice and keep the exact meaning they had. A shard is a way to spend four cores on one
@@ -241,15 +244,15 @@ console.log('   derived: hsets max ' + HSETS_MAX + ' × ' + CALF_ITEMS + ' Calve
   + E_SLOT_MAX + ' sets; cap read from the file = ' + E_CAP);
 
 // ── THE SWEEP. Fanned across workers, aggregated in full, and only then asserted. ─────
-// G197_SHARDS: empty or unset means 4. Only a POSITIVE integer is accepted — 0, negative
+// G197_SHARDS: empty or unset means 2. Only a POSITIVE integer is accepted — 0, negative
 // and non-numeric are rejected, never clamped, exactly as GATE_JOBS and FUZZ_SHARDS are.
 // A bad value is a CONFIGURATION error and it is reported as a FAIL with a summary line,
 // because gate.sh reads a missing summary as a crash.
 function shardCount() {
   const raw = process.env.G197_SHARDS === undefined ? '' : String(process.env.G197_SHARDS);
-  if (raw === '') return 4;
+  if (raw === '') return 2;
   if (!/^[0-9]+$/.test(raw) || parseInt(raw, 10) < 1) {
-    fail++; console.log("FAIL: CONFIG: G197_SHARDS must be a positive integer, or empty/unset which means 4; got '" + raw + "'");
+    fail++; console.log("FAIL: CONFIG: G197_SHARDS must be a positive integer, or empty/unset which means 2; got '" + raw + "'");
     return 0;
   }
   return parseInt(raw, 10);
