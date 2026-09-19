@@ -94,6 +94,7 @@ and still recommend.
 No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declarative sentences. The app sounds like a coach at every touchpoint. Spec separators inside a prescription (`4×5 — RPE 8`) are structural and exempt. No user-facing "Nike" strings.
 
 ## Token discipline
+**The orchestrator does not run commands longer than a minute in the main session; delegate them.** **Subagents already have CLAUDE.md in context; do not `Read` it.**
 `index.html` is ~250K tokens. Never read it wholesale. `grep -n` the symbol and its consumers first, read wide at the seam, `str_replace` narrowly, let the gates be the backstop. Do not re-read the doctrine text mid-session unless verifying a transcription.
 
 ## Files

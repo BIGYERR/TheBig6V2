@@ -38,4 +38,5 @@ Rules that bite:
 You are done when the edit script exists, the artifact boots, the gate and sabotage spec exist, and you have written the handoff line describing the hunks you produced. You are not done until gatekeeper says green; if gatekeeper names a failing gate, fix the build, not the gate, unless the gate's oracle is provably wrong (then say which line of the oracle and why).
 
 ## Shell discipline
+**Never run the full `gate.sh` or a full sabotage sweep.** Run `node --check` and the single gate you are editing. The suite is gatekeeper's. **Do not set `SABOTAGE_JOBS` or `GATE_JOBS`; the defaults are ruled.**
 Do not investigate one command at a time. Write a single script that gathers everything you need, run it once, then read the output. A turn that only runs echo, grep, sed, cat or ls is a wasted turn. Target under 20 tool calls per task.
