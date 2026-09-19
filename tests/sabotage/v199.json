@@ -1,0 +1,58 @@
+[
+  {
+    "name": "M1 -> D91 reverted: the pre-pass never finds a posterior block, so pickIdx stays -1 and the surviving accessory block is chosen by PUSH ORDER again. Leg superset A wins every deload leg day and the chain dies by arithmetic",
+    "anchor": "    if((s.items||[]).some(it=>it&&_isPostChain(it.name))){ pickIdx=i; break; }    // first posterior accessory block wins",
+    "replacement": "    if(false && (s.items||[]).some(it=>it&&_isPostChain(it.name))){ pickIdx=i; break; }    // first posterior accessory block wins",
+    "gate": "gates/g199_deload_arbitration.js",
+    "note": "D91-ONLY, proved distinct: g198_posterior_floor is green on this mutant (capSessionBudget is untouched). Named trips in g199: C1 zero-posterior weeks 372 -> 746, C2 deload zero-weeks 0 -> 374, C4 wrong-way 0 -> 334, C6 the protection claim inverts, E3 stage-local killed days 60 -> 2220, F1/F2 the swap unwinds to 16704/13560, G5 the killed-day holder census gains Leg superset B and Leg isolation, H5 the swap population collapses to 0."
+  },
+  {
+    "name": "M2 -> the pre-pass scans MAIN sections too (the exact regression coach named): a posterior 'Main - Deadlift' wins the arbitration, pickIdx lands on a section the keep loop handles in its main branch, and the card is left with NO accessory block at all",
+    "anchor": "    if(/^main\\b|^primer|^power\\b|^strength\\b/.test(L)) continue;               // main work: never a candidate",
+    "replacement": "    if(false) continue;               // main work: never a candidate",
+    "gate": "gates/g199_deload_arbitration.js",
+    "note": "D91-ONLY. Named trips: F4 (exactly one accessory block survives wherever one was available) and H3 (on the 2,160 trap cards exactly one still survives). This is why main/primer/power/strength are SKIPPED AND NOT SCORED, and why H1/H2 count the trap population instead of implementing it."
+  },
+  {
+    "name": "M3 -> the hoisted posterior lens is narrowed to hinge alone, so hip_ext stops counting as posterior chain for BOTH recoveryDeload's arbitration and capSessionBudget's floor",
+    "anchor": "function _isPostChain(n){ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; }",
+    "replacement": "function _isPostChain(n){ const p=_pattern(n); return p==='hinge'; }",
+    "gate": "gates/g199_deload_arbitration.js",
+    "note": "DELIBERATELY DOUBLE-TRIPPING, and recorded as such: hoisting the lens to one writer means a mutation here is visible to D85's gate and D91's at once. g199 is the named trip (the arbitration stops seeing hip_ext blocks, so F1/F2 and the C series move); g198_posterior_floor A4a/B3 see the same edit. All-trip is as suspicious as a survivor, so M1, M2 and M6 exist to hit D91 alone and M4 to hit D85 alone."
+  },
+  {
+    "name": "M4 -> D85's posterior floor is raised from 1 to 2: a second posterior item is protected, which is a volume decision nobody ruled and is not the nonempty/empty boundary",
+    "anchor": "        if(_postLeft<=1 && _isPost(it.name)) return;",
+    "replacement": "        if(_postLeft<=2 && _isPost(it.name)) return;",
+    "gate": "gates/g198_posterior_floor.js",
+    "note": "D85-ONLY IN THE SENSE THAT MATTERS, measured not assumed: on this mutant g199_deload_arbitration reports PASS 53 FAIL 1 and the single mover is E6, the assertion explicitly labelled END-TO-END because it folds capSessionBudget in (36 -> 96). Every stage-local D91 claim - C, E1-E5, F, G, H, I1 - is green, so the deload's arbitration is provably untouched by a budget-floor edit. Named trip: g198 A2a/A2c, the two-hinge hand table. Conversely M1 (D91 reverted) leaves g198 at PASS 29 FAIL 0, so the two rulings' gates are proved distinct in both directions."
+  },
+  {
+    "name": "M5 -> the one-block limit is dropped: EVERY accessory block with a lift survives the deload, so a recovery week quietly becomes a normal week",
+    "anchor": "    if(hasLift&&!accessoryKept&&(pickIdx<0||i===pickIdx)){ accessoryKept=true; keep.push(s); return; }",
+    "replacement": "    if(hasLift){ accessoryKept=true; keep.push(s); return; }",
+    "gate": "gates/g199_deload_arbitration.js",
+    "note": "Named trips: F3 accessory-block conservation (A + B stops being 30,264), F4 and F5 (7,942 deload cards ship more than one surviving block). MEASURED CAVEAT, recorded so the next session does not over-read coach's rationale: an UNCONFINED keep-both also moves B1 (HALF_MANNY), C1, C2, D2, E1b, G1, G2, H3, H5, I2 and I3 - 17 assertions in all. Coach's claim that a keep-both slips past Mario's six criteria holds in the CONFINED form, which is M8."
+  },
+  {
+    "name": "M6 -> the deload's fluff rule is widened: a finisher or explosive section is kept whenever it holds posterior chain work, so the ruled 60 stops being a ceiling bound to one label",
+    "anchor": "    if(s.optional||/carry|finisher|conditioning|explosive/.test(L)) return;       // fluff drops on a deload",
+    "replacement": "    if(s.optional||/carry|finisher|conditioning|explosive/.test(L)){ if((s.items||[]).some(it=>it&&_isPostChain(it.name))) keep.push(s); return; }       // fluff drops on a deload",
+    "gate": "gates/g199_deload_arbitration.js",
+    "note": "The guard for coach's addition 3: the 60 is a CEILING BY LABEL. Named trips: E3 and E4 (the days the deload empties stop being 60 and stop being held by Explosive finisher), G3 and G4b, G5 (the killed-day holder census stops being exactly {Explosive finisher: 60}), E1b (the deload cuts less than 9,771). TWO EARLIER VERSIONS OF M6 WERE NO-OPS and were rewritten rather than explained away, per the standing rule: widening the PRE-PASS past fluff changed nothing (a section the keep loop drops unconditionally can win the arbitration without changing a card), and widening the KEEP loop's label regex changed nothing either, because finisher items are conditioning movements whose _pattern is null, so hasLift is false and they drop as unclassified anyway. Only a rule that keeps fluff BECAUSE it holds posterior chain reaches this claim."
+  },
+  {
+    "name": "M7 -> recoveryDeload returns its input unchanged: the deload stops cutting anything at all while every other pass still runs",
+    "anchor": "  if(typeof globalThis!=='undefined' && (globalThis.__CAP_OFF || globalThis.__DELOAD_OFF)) return sections;",
+    "replacement": "  if(true) return sections;",
+    "gate": "gates/g199_deload_arbitration.js",
+    "note": "The guard for coach's addition 2. Named trips: E1b (posterior items leaving the deload stop being 9,771 and become the 12,477 that entered), C2 (deload zero-weeks 0 -> 40, the __DELOAD_OFF figure), D2/D3 (every deload week becomes byte-identical with the pass off). A deload that stops deleting is the likeliest regression this ruling can cause and nothing else in the suite asserts the pass still deletes."
+  },
+  {
+    "name": "M8 -> the keep-both defect in the form coach actually warned about: the posterior pick is kept IN ADDITION to the first-come block, so on the 2,160 swap cells the card ships BOTH Leg superset A and Leg superset B and a recovery week quietly gains a block",
+    "anchor": "    if(hasLift&&!accessoryKept&&(pickIdx<0||i===pickIdx)){ accessoryKept=true; keep.push(s); return; }",
+    "replacement": "    if(hasLift&&(!accessoryKept||i===pickIdx)){ accessoryKept=true; keep.push(s); return; }",
+    "gate": "gates/g199_deload_arbitration.js",
+    "note": "THE MUTATION COACH'S ADDITION 1 EXISTS FOR, confined exactly as described: posterior rises, card order is preserved, the trap is intact (H3 green), HALF_MANNY is untouched (B1 green), J1-J3 green, E3/E4/E5 green - the defect is invisible to Mario's criteria 3, 4, 5 and 6. Named trip: F3, the only assertion that says the ruling ADDS NO SETS (A + B after the deload 30,264 -> 32,424), with F4/F5 naming the 2,160 cards that ship two blocks. C1/C2 also move on this lattice, which is a second line of defence, not the one that names the defect."
+  }
+]

@@ -15,10 +15,10 @@
   },
   {
     "name": "M3 -> leg_iso folded into the posterior set: 'Leg extension', a pure quad movement that shares EXLIB.leg_accessory with Leg press, is now defended as posterior chain",
-    "anchor": "  const _isPost=n=>{ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; };",
-    "replacement": "  const _isPost=n=>{ const p=_pattern(n); return p==='hinge'||p==='hip_ext'||p==='leg_iso'; };",
+    "anchor": "function _isPostChain(n){ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; }",
+    "replacement": "function _isPostChain(n){ const p=_pattern(n); return p==='hinge'||p==='hip_ext'||p==='leg_iso'; }",
     "gate": "gates/g198_posterior_floor.js",
-    "note": "A3a/A3b, the leg_iso control. This is the defect coach flagged in the measure pass's own E_POSTERIOR oracle."
+    "note": "A3a/A3b, the leg_iso control. This is the defect coach flagged in the measure pass's own E_POSTERIOR oracle. V199 (D91) RE-ANCHOR: the lens moved to module level as _isPostChain, so the V198 anchor read count 0 and this mutation would have been NOT-APPLIED. Same edit, new address."
   },
   {
     "name": "M4 -> the count is precomputed before the trim loop instead of re-read inside it: the stale count still reads 2 after the first removal, so the second pass eats the day's last hinge anyway",

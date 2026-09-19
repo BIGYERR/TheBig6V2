@@ -224,12 +224,12 @@ ok('B4m no leg machine reaches a cable-less tier',
      .every(t => MACHINES.every(m => !census[t].names[m])),
    JSON.stringify(TIERS_PLUS.map(t => t + ':' + Object.keys(census[t].names).join('/'))));
 
-// ── D76: same-card duplicates (count re-pinned by D85, V198) ───────────────────────
+// ── D76: same-card duplicates (count re-pinned by D85, V198; again by D91, V199) ───
 console.log('\n-- B5. same-card duplicates --');
 console.log('   duplicate-name-on-one-card items: ' + dup + '  (of which a harvested name: ' + harvestedDup + ')');
 ok('B5a a harvested name NEVER prints twice on one card (D76 subtraction)', harvestedDup === 0, harvestedDup);
 ok('B5b total same-card duplicates did not grow past the ruling ceiling of 415', dup <= 415, dup);
-ok('B5c same-card duplicates == 235 (240 at V196/V197; D76 absorbs the whole +175 harvest cost, then D85 licenses the 5 that left: on 5 home_basic/advanced/run_half seed-11 Tuesday legs cards the posterior floor refuses the last hinge, so the trim takes the duplicate Step-ups (KB) instead, 7 items in and 7 items out)', dup === 235, dup);
+ok('B5c same-card duplicates == 187 (240 at V196/V197; D76 absorbs the whole +175 harvest cost, then D85 licenses 5 and D91 licenses 48 more: on 48 deload leg cards — W12 TUE, run_half, seed 11, home_basic 24 + minimal 24 — recoveryDeload now keeps its surviving accessory block by PATTERN, so Leg superset B (hinge) survives where Leg superset A did, and the Step-ups (KB) that Leg superset A repeated from the Main slot leaves the card. Item count per card is unchanged on all 48 (46 at 8 items, 2 at 7): the repeat was replaced, not dropped. Every duplicate this assertion has ever counted is Step-ups (KB))', dup === 187, dup);
 ok('B5d nowhere near 955 (that number means the three exclusions did not land)', dup < 955, dup);
 
 // ── D75: the hold dose ─────────────────────────────────────────────────────────────

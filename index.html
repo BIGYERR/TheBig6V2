@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="198"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="199"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -9366,6 +9366,22 @@ function _itemCost(it, sectionRegion){
 // nothing else. Carries, finishers, conditioning, and extra supersets sit out.
 // Runs BEFORE capRegionalFatigue so the slimmed day is still sanity-checked, and
 // dynamic core injection is gated off recovery weeks at week assembly.
+
+// ── POSTERIOR-CHAIN LENS (single writer) ────────────────────────────────────
+// D85 shipped this lens inside capSessionBudget; D91 needs the same lens in
+// recoveryDeload. It is HOISTED, not copied — two in-app copies of "what counts as
+// posterior chain" is exactly the desync §10b warns about. THE SET IS {hinge,
+// hip_ext} AND NOTHING ELSE; leg_iso is deliberately outside it (EXLIB
+// .leg_accessory mixes 'Leg extension' and 'Leg press' in with 'Lying leg curl').
+// _pattern is called directly so this lens and the region caps can never disagree.
+// PLACED BELOW THE RECOVERY-WEEK BANNER ON PURPOSE (V199, D91 amendment): g197d E5
+// confines _itemCost by slicing from its header up to that banner line, so a
+// declaration above the banner lands INSIDE a confined slice and reads as an unruled
+// edit to budget machinery. The placement is inert: a top-level function declaration
+// hoists, and both callers (recoveryDeload below, capSessionBudget further down) sit
+// after this point in source order anyway.
+function _isPostChain(n){ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; }
+
 function recoveryDeload(sections){
   // Test-only bypass. Per-pass since V123 — __CAP_OFF used to gate THREE passes at once
   // (this one, capSessionBudget and capRegionalFatigue), so any harness that toggled it to
@@ -9374,7 +9390,28 @@ function recoveryDeload(sections){
   if(typeof globalThis!=='undefined' && (globalThis.__CAP_OFF || globalThis.__DELOAD_OFF)) return sections;
   if(!Array.isArray(sections)||!sections.length) return sections;
   const keep=[]; let accessoryKept=false;
-  sections.forEach(s=>{
+  // D91: the surviving accessory block is chosen by PATTERN, not by push order. The
+  // builder pushes 'Leg superset A' (lunge + knee hold, a unilateral SQUAT pattern) before
+  // 'Leg superset B' (the day's hinge/hip_ext), so first-come cost every deload leg day its
+  // posterior chain by arithmetic. This pre-pass runs the loop's OWN four tests, in the
+  // loop's own order, so an index can only be picked if the loop below would also have
+  // reached its accessory branch — that is what guarantees exactly one block still survives.
+  // MAIN/PRIMER/POWER/STRENGTH ARE SKIPPED, NOT SCORED. A posterior 'Main — Deadlift' must
+  // not influence the arbitration: 14.10% of cards carry a posterior main and no posterior
+  // accessory, and a naive all-sections pre-pass would leave those cards no accessory at all.
+  // Prehab is never a candidate (always kept by the loop); fluff is never a candidate
+  // (always dropped). NOTHING IS REORDERED — keep.push order stays forEach order.
+  let pickIdx=-1;
+  for(let i=0;i<sections.length;i++){
+    const s=sections[i]; if(!s) continue;
+    const L=(s.label||'').toLowerCase();
+    if(/^main\b|^primer|^power\b|^strength\b/.test(L)) continue;               // main work: never a candidate
+    if(s.hip||/hip|mobility|stretch/.test(L)) continue;                          // prehab: always kept anyway
+    if(s.optional||/carry|finisher|conditioning|explosive/.test(L)) continue;     // fluff: always dropped anyway
+    if(!(s.items||[]).some(it=>it&&_pattern(it.name))) continue;                  // the loop's own hasLift test
+    if((s.items||[]).some(it=>it&&_isPostChain(it.name))){ pickIdx=i; break; }    // first posterior accessory block wins
+  }
+  sections.forEach((s,i)=>{
     if(!s) return;
     const L=(s.label||'').toLowerCase();
     if(/^main\b|^primer|^power\b|^strength\b/.test(L)){
@@ -9395,7 +9432,7 @@ function recoveryDeload(sections){
     if(s.hip||/hip|mobility|stretch/.test(L)){ keep.push(s); return; }            // prehab stays — injury-prevention backbone
     if(s.optional||/carry|finisher|conditioning|explosive/.test(L)) return;       // fluff drops on a deload
     const hasLift=(s.items||[]).some(it=>it&&_pattern(it.name));
-    if(hasLift&&!accessoryKept){ accessoryKept=true; keep.push(s); return; }      // exactly ONE accessory block survives
+    if(hasLift&&!accessoryKept&&(pickIdx<0||i===pickIdx)){ accessoryKept=true; keep.push(s); return; }  // exactly ONE accessory block survives; D91 picks the posterior one when the card has one
     // additional accessory blocks and anything unclassified drop
   });
   return keep.length?keep:sections; // never empty a day — fallback guard for exotic builders (travel bodyweight tier)
@@ -9545,7 +9582,7 @@ function capSessionBudget(sections, cardio){
   // that this cap has never been hard, and 63 of the affected cells were over cap before
   // this change. Follow-ons, not this build: D88 (draw-side zero-posterior weeks) and
   // D89 (re-sourcing the tier-3 skip).
-  const _isPost=n=>{ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; };
+  const _isPost=_isPostChain;                            // D91: hoisted above recoveryDeload — ONE writer for the lens
   const _postItems=()=>out.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+(_isPost(it&&it.name)?1:0),0),0);
   let guard=0;
   while(_total(out)>cap && guard++<16){

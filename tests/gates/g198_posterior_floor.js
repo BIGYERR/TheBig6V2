@@ -174,7 +174,12 @@ if(anchorN===1){
 // change puts one in front of the trim, A6b goes red, and the answer is to RE-DERIVE this
 // record against the new lattice, never to relax the claim to 'zero or more'.
 console.log('── A6. the leg_iso exclusion, swept ──');
-const ISO_A="  const _isPost=n=>{ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; };";
+// V199 (D91) RE-ANCHOR: the lens was HOISTED out of capSessionBudget to module level as the
+// single writer _isPostChain, so the old in-function arrow no longer exists and this anchor
+// read count 0 — A6a went red on a build that changed nothing about leg_iso. The claim is
+// unchanged; only the address of the fold moved. Folding leg_iso in here now reaches
+// recoveryDeload's arbitration as well, which is the point of having one writer.
+const ISO_A="function _isPostChain(n){ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; }";
 const isoN=RAW.split(ISO_A).length-1;
 ok(isoN===1, 'A6a the _isPost anchor the fold is built from is unique (count '+isoN+')');
 // HAND TABLE, not a filter over the engine. Doctrine: a knee-extension machine and the two
@@ -191,7 +196,7 @@ ok(B_iso===0, 'A6b '+B_iso+'/'+B_cells+' budget invocations on the swept lattice
 let A6_cells=0, A6_diff=0, A6_ex=[];
 if(isoN===1){
   const tmpI=path.join(os.tmpdir(),'g198_legiso_'+process.pid+'.html');
-  fs.writeFileSync(tmpI, RAW.replace(ISO_A, "  const _isPost=n=>{ const p=_pattern(n); return p==='hinge'||p==='hip_ext'||p==='leg_iso'; };"));
+  fs.writeFileSync(tmpI, RAW.replace(ISO_A, "function _isPostChain(n){ const p=_pattern(n); return p==='hinge'||p==='hip_ext'||p==='leg_iso'; }"));
   const IV=load(tmpI);
   const TIERS_I=['commercial','home_full','home_basic','bodyweight','crossfit','minimal'];
   const INJ_I=[null,{region:'lowback',tier:'protect'},{region:'shoulder',tier:'protect'},{region:'knee',tier:'protect'}];

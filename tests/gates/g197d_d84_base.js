@@ -360,22 +360,34 @@ function afterSweep(bCells, bFell, bRose, bEg, rCells) {
 
   // PROVENANCE OF THE PINS. sha256 of the bytes from `function capSessionBudget(sections,
   // cardio){` up to (not including) `\nfunction capRegionalFatigue`.
+  //   CSB_D91  — V199, the text LICENSED BY RULING D91 (amendment to D85): D91 hoisted
+  //              the {hinge, hip_ext} lens to a top-level _isPostChain so recoveryDeload
+  //              and capSessionBudget read ONE writer; capSessionBudget's in-function
+  //              copy became the alias `const _isPost=_isPostChain;`. Ruling D91 is what
+  //              licenses that edit to the budget text — this is a RE-PIN, not a delete.
   //   CSB_D85  — V198, the text LICENSED BY RULING D85: the {hinge, hip_ext} floor that
   //              makes the day's last posterior chain item ineligible for the trim loop.
+  //              Kept accepted under ia-version < 199 so V198-vs-V197 stays answerable.
   //   CSB_PRE  — the pre-D85 text. V196 and V197 carry it byte-for-byte identically, which
   //              is why one digest covers both and why this gate still answers V197-vs-V196.
   // A DIGEST IS REFRESHED ONLY BY A RULING. If this assertion fails, the question is not
   // 'what is the new digest' — it is 'which ruling licensed that edit to the budget'.
+  const CSB_D91 = '36b5b8efdfa1d3d86e235654d17b3c28e5fd2161520901c9acc4ed02a0b80fc5';
   const CSB_D85 = 'fb16df9c8a6798937d3e0a9904f23944bf3f68cac258a21ef772ccf9040357c3';
   const CSB_PRE = 'c8064f3cc1989cd5f60f308bc2644119162238c4946843ee3b9ccea8ebe06a5f';
   const csb = slice(RAW, 'function capSessionBudget(sections, cardio){', '\nfunction capRegionalFatigue');
   const cv  = iaVersion(RAW);
-  const pre = cv !== null && cv < 198;           // a pre-D85 artifact is allowed the pre-D85 text
-  const want = pre ? CSB_PRE : CSB_D85;
-  const era  = pre ? 'pre-D85' : 'D85 (V198)';
+  // Era predicate, oldest first, newest era as the fallthrough. Each older digest stays
+  // ACCEPTED for the versions that shipped it, so this gate keeps answering V198-vs-V197
+  // and V197-vs-V196 after the re-pin. An unknown ia-version is held to the newest text.
+  const preD85 = cv !== null && cv < 198;        // pre-D85 artifact: allowed the pre-D85 text
+  const preD91 = cv !== null && cv < 199;        // V198: allowed the D85 text
+  const want = preD85 ? CSB_PRE : (preD91 ? CSB_D85 : CSB_D91);
+  const era  = preD85 ? 'pre-D85' : (preD91 ? 'D85 (V198)' : 'D91 (V199)');
+  const rule = preD91 ? 'D85' : 'D91';           // the ruling that licenses THIS era's text
   const dig  = csb === null ? null : crypto.createHash('sha256').update(csb).digest('hex');
   ok('E5 capSessionBudget is byte-for-byte the ' + era + ' licensed text '
-     + '(licensing ruling D85; nothing since D85 has edited budget machinery)',
+     + '(licensing ruling ' + rule + '; nothing since ' + rule + ' has edited budget machinery)',
      dig !== null && dig === want,
      dig === null ? 'not found in candidate'
        : 'ia-version ' + cv + ' digest ' + dig.slice(0, 16) + ' != licensed ' + want.slice(0, 16)
