@@ -171,10 +171,19 @@ const E_PAT = [
   ['hinge',    /deadlift|\brdl\b|romanian|good morning|\bswing\b|\bclean\b|\bsnatch\b|hinge|rack pull/i],
 ];
 const ePat = n => { const t = String(n||''); for (const [p,r] of E_PAT) if (r.test(t)) return p; return null; };
-const E_POSTERIOR = new Set(['hinge','hip_ext','leg_iso']);
+// THE SHIPPED LENS, and nothing wider. index.html:9523 (D85, V198) tests
+// {hinge, hip_ext} and states the exclusion in terms: leg_iso is DELIBERATELY EXCLUDED
+// because EXLIB.leg_accessory holds 'Leg extension' and 'Leg press' alongside
+// 'Lying leg curl'. leg_iso is a SLOT, not a muscle — it carries pure quad movements, so
+// it is not a posterior signal. This gate read {hinge, hip_ext, leg_iso} until V198
+// tooling slice D, which made it count a leg extension as posterior chain and so let a
+// card the engine calls posterior-free read as covered. A gate whose lens is wider than
+// the guard's cannot see the guard's own boundary.
+const E_POSTERIOR = new Set(['hinge','hip_ext']);
 // one copy of the predicate, shared by the CAUSED census (E3b) and the TOTAL census
 // (E3e-E3g). A leg cell is one carrying either leg accessory label; it is posterior-free
-// when no name on the card reads as hinge, hip extension or leg isolation.
+// when no name on the card reads as hinge or hip extension (the shipped lens; leg
+// isolation is not posterior, see above).
 const eLegCell = o => o.labels.indexOf('Calves') >= 0 || o.labels.indexOf('Leg isolation') >= 0;
 const eZeroP   = o => eLegCell(o) && !o.names.some(n => E_POSTERIOR.has(ePat(n)));
 // the budget's own cost rule, hand-transcribed: stretch is free, holds and carries are
@@ -198,6 +207,17 @@ const D85_KEYS = [
   const zero = eZeroP;   // the function the sweep actually uses, not a re-typed copy
   ok('E3a detector probe: a card with squat + press + calf raise reads as posterior-free', zero(blind));
   ok('E3a detector probe: adding a Nordic makes the same card read as posterior-covered', !zero(seeing));
+  // E3a lens probe (V198 tooling slice E). The ONLY assertion of the shipped lens that
+  // exists. index.html:9523 (D85, V198) tests {hinge, hip_ext} and excludes leg_iso in
+  // terms: EXLIB.leg_accessory holds 'Leg extension' and 'Leg press' beside 'Lying leg
+  // curl', so leg_iso is a SLOT, not a muscle, and a quad movement is not a posterior
+  // signal (Mario, V198 ruling). Why a hand card and not a sweep: gatekeeper's full
+  // lattice probe read 2879 leg cells, 31 naming leg_iso, and all 31 ALSO named
+  // hinge/hip_ext — 0 cells can distinguish the narrow lens from the wide one, so no
+  // lattice sweep and no app mutation can ever red a widening. This line can.
+  const lens = { labels:['Leg isolation'], names:['Back squat','Leg extension'], items:[] };
+  ok('E3a lens probe: a card with squat + leg extension reads as posterior-free (leg_iso is a slot, not a muscle)',
+     zero(lens));
 }
 
 // ── the sweep ───────────────────────────────────────────────────────────────────────

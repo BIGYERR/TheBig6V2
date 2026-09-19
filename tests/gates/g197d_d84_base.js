@@ -1,7 +1,9 @@
 // g197d_d84_base — V197 D84, the BASELINE half of section E: the candidate is swept
 // against the SHIPPED baseline (E1g / E1h) and the budget machinery is proved byte-
-// identical to it (E5 × 3). Six assertions: those five, which are baseline-only, plus E0,
-// a guard that needs no baseline and runs on every invocation.
+// identical to it (E5 × 2). Six assertions. FOUR need a baseline: E1g, E1h and the two
+// E5 byte-identity parts. TWO need none and run on every invocation: E0, the liveness
+// guard, and the E5 sha256 pin on capSessionBudget's own slice, which reads the candidate
+// alone and is this file's only sabotage coverage of the app.
 //
 // SPLIT NOTE (V198, tests only). This file was section E (the baseline sweep) of g197_leg_accessory.js. That
 // gate ran 58.9s and was 93% of gate.sh's wall time, and an 8-wide fan-out is bounded by
@@ -12,20 +14,41 @@
 // their own section, IA.window.__SEC/__DAY have no reader anywhere, and localStorage is
 // empty at every boundary — so there is no ordering constraint between the four files.
 //
-// WITH NO BASELINE THE FIVE COMPARISON ASSERTIONS DO NOT RUN, ON PURPOSE. tests/sabotage.py
-// runs `node <gate> mutated.html` with no argv[3], so under sabotage this file prints its
-// two "not run" lines and E1g/E1h/E5 are skipped. Every mutation that used to trip
-// section E is re-pointed at g197c_d84_cmp.js, so this file still carries no sabotage
-// coverage of the app.
+// WITH NO BASELINE THE FOUR COMPARISON ASSERTIONS DO NOT RUN, ON PURPOSE. tests/sabotage.py
+// runs `node <gate> mutated.html` with no argv[3], so under sabotage E1g, E1h and the two
+// E5 byte-identity parts are skipped and this file prints their "not run" lines. The
+// mutations that used to trip section E's comparisons stay pointed at g197c_d84_cmp.js.
+//
+// THE E5 DIGEST PIN IS NOT ONE OF THEM (V198 tooling, item 3 of 3). It stopped needing a
+// baseline when D85 re-pinned it to LICENSED TEXT: it is a sha256 of capSessionBudget's
+// own slice, answered by the candidate alone. It is therefore OUTSIDE the baseline branch
+// and runs on every invocation, which closes a real hole — until this change every
+// app-grading assertion in this file sat behind if (BASE_HTML), so under sabotage the file
+// graded nothing and printed a green summary no matter what the mutation did. The move is
+// PAIRED with a mutation, because coverage that is assumed is not coverage:
+// tests/sabotage/v198.json M7 is a COMMENT-ONLY edit inside capSessionBudget that trips E5
+// by name. Comment-only on purpose — it proves E5 sees an EDIT to the licensed text rather
+// than a change in behaviour, under the harness that could not reach it at all before.
 //
 // WHAT IT MUST NEVER PRINT IS `PASS 0 FAIL 0`. gate.sh reads a MISSING summary as a crash,
 // but it reads a summary of zero as green, and a zero summary is indistinguishable from a
 // gate whose body was deleted. E0 therefore runs on every invocation, with or without a
 // baseline: it needs no second artifact, it is answered by the lattice this file builds
-// for itself, and it fails loudly if that enumeration is ever cut down. Under sabotage
-// this file prints PASS 1 FAIL 0.
+// for itself, and it fails loudly if that enumeration is ever cut down.
 //
-// INTERNAL FAN-OUT. 1,728 configs built twice (candidate + baseline). Fanned by CONFIG
+// E0 IS NOW TWO PARTS, because moving E5 out took the no-baseline count from 1 to 2 and a
+// changing PASS count is exactly what once masked a dead gate body. The number is not
+// relaxed, it is ASSERTED: done() computes how many assertions were actually PUT (passed,
+// failed or refused) and fails by name if that is below NOBASE_MIN, the two that need no
+// baseline (E0 and the E5 digest pin). A body that stops executing anywhere above done()
+// now produces a NAMED red instead of a shorter green, whichever assertions went missing —
+// including the case E0's own lattice claim cannot see, where E0 passes and everything
+// after it is gone. Under sabotage this file prints PASS 2 FAIL 0; PASS 1, PASS 0 and a
+// missing summary are all red.
+//
+// INTERNAL FAN-OUT. 1,728 configs built against the candidate, the moving release
+// baseline (E1g) and the fixed V196 artifact (E1h) — twice per config when the release
+// baseline IS V196, since then one load and one scan serve both. Fanned by CONFIG
 // INDEX across G197_SHARDS workers (default 2, because gate.sh already runs eight gates at
 // once on 8 cores and more workers here only oversubscribe them) and aggregated IN FULL
 // before E1g and E1h
@@ -36,11 +59,17 @@
 // premise that only held against one particular pair of artifacts, and both were found
 // by running the gate outside that pair:
 //   E1h ('Calves rises somewhere') is D84's own footprint. It is satisfiable ONLY against
-//   a pre-D84 baseline, and it FAILED when V197 was compared to itself. It is now
-//   baseline-version-aware. On a baseline it cannot be satisfied against it does not
-//   quietly skip — a no-op assertion is the vacuity defect this repo keeps paying for —
-//   it prints a named REFUSE line and is counted in the REFUSED bucket, which is NOT a
-//   pass and is printed beside the PASS/FAIL summary.
+//   a pre-D84 baseline, and it FAILED when V197 was compared to itself. It was first made
+//   baseline-version-aware, which was only half the fix: every release chain from V199 on
+//   carries a baseline >= 197, so E1h refused on every healthy run, forever. A FIXED
+//   historical claim needs a FIXED artifact, so E1h is now RE-POINTED at
+//   baselines/V196.html (the last release before D84) and no longer reads the moving
+//   release baseline at all. E1g keeps that baseline: 'Calves falls nowhere since the last
+//   release' is a regression guard and is SUPPOSED to move.
+//   The refusal MACHINERY stays and still blocks (gate.sh greps REFUSED): it now fires
+//   only when no pre-D84 artifact exists, which is a broken checkout and not a healthy
+//   run. A no-op assertion is the vacuity defect this repo keeps paying for, so a claim
+//   that cannot be put is still named, counted and red — never quietly skipped.
 //   E5 capSessionBudget was pinned to the baseline under the premise that D84 touched no
 //   budget machinery. D85 (V198) deliberately edits that function, so that comparison
 //   fails by construction. The confinement is RE-PINNED to the D85-licensed TEXT rather
@@ -56,13 +85,14 @@ const cp   = require('child_process');
 const crypto = require('crypto');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
 
-var SHARD_I = null, SHARD_N = 0, OUT = '';
+var SHARD_I = null, SHARD_N = 0, OUT = '', V196_ARG = '';
 const POS = [];
 {
   const a = process.argv.slice(2);
   for (let i = 0; i < a.length; i++) {
     if (a[i] === '--shard') { const m = String(a[++i] || '').split('/'); SHARD_I = parseInt(m[0], 10); SHARD_N = parseInt(m[1], 10); }
     else if (a[i] === '--out') OUT = a[++i];
+    else if (a[i] === '--v196') V196_ARG = a[++i];
     else POS.push(a[i]);
   }
 }
@@ -73,7 +103,27 @@ const IA   = load(FILE);
 if (WORKER) console.log = function () {};   // a worker writes counters, never a verdict
 const BASE_HTML = POS[1] && fs.existsSync(POS[1]) ? POS[1] : null;
 
+// ── E1h's FIXED artifact. D84's footprint is a historical claim, so it is compared against
+// a pinned pre-D84 release and never against the moving release baseline. baselines/V196.html
+// is the committed copy of V196 (`git show V196:index.html`); it is preferred over extracting
+// the tag at gate time because a gate must not depend on a .git directory, on a tag that can
+// be moved, or on a subprocess per worker — and because this repo's rule is that when file and
+// tag disagree, the file wins. The parent resolves the path once and hands it to every worker,
+// so a worker never re-resolves and cannot disagree with its parent.
+const V196_PATH = path.join(__dirname, '..', '..', 'baselines', 'V196.html');
+function resolveV196() {
+  if (BASE_HTML && iaVersion(fs.readFileSync(BASE_HTML, 'utf8')) === 196) return BASE_HTML;
+  if (fs.existsSync(V196_PATH) && iaVersion(fs.readFileSync(V196_PATH, 'utf8')) === 196) return V196_PATH;
+  return null;
+}
+const V196_HTML = WORKER ? (V196_ARG && fs.existsSync(V196_ARG) ? V196_ARG : null)
+                         : (BASE_HTML ? resolveV196() : null);
+
 let pass = 0, fail = 0, refused = 0;
+// The number of assertions this file puts with NO baseline at all: E0 (the lattice
+// enumeration) and the E5 sha256 pin on capSessionBudget. Both are answered by the
+// candidate alone. done() enforces it as a floor; see the E0 note in the header.
+const NOBASE_MIN = 2;
 function ok(name, cond, detail) {
   if (cond) { pass++; console.log('ok   ' + name); }
   else { fail++; console.log('FAIL ' + name + (detail !== undefined ? '  -> ' + detail : '')); }
@@ -111,6 +161,18 @@ function cleanup() { try { if (SCRATCH) fs.rmSync(SCRATCH, { recursive: true, fo
 process.on('exit', cleanup);
 function done() {
   cleanup();
+  // E0, second part: the LIVENESS FLOOR. A summary is only worth reading if the body that
+  // produced it ran. This file always PUTS at least NOBASE_MIN assertions, because neither
+  // of them needs a second artifact, so a shorter count means assertions stopped executing.
+  // That is the failure a summary of zero cannot express on its own, and the failure a
+  // count that is merely adjusted upward would hide.
+  const putN = pass + fail + refused;
+  if (putN < NOBASE_MIN) {
+    fail++;
+    console.log('FAIL E0 liveness floor: only ' + putN + ' assertion(s) were put, minimum '
+      + NOBASE_MIN + ' (E0 lattice enumeration, E5 capSessionBudget digest pin) — neither '
+      + 'needs a baseline, so the gate body stopped executing');
+  }
   if (refused) console.log('\nREFUSED ' + refused + ' assertion(s) — see the REFUSE lines above. A REFUSED assertion was NOT run and is NOT a pass.');
   console.log('\nPASS ' + pass + ' FAIL ' + fail);
   process.exit(fail ? 1 : 0);
@@ -173,26 +235,36 @@ function shardCount() {
 }
 
 function runShard() {
-  let bFell = 0, bRose = 0, bCells = 0; const bEg = [];
+  let bFell = 0, bRose = 0, bCells = 0, rCells = 0; const bEg = [];
   var walked = 0;
   try {
     if (!BASE_HTML) throw new Error('worker started with no baseline');
     const IA_B = load(BASE_HTML);
+    // E1g reads the moving release baseline, E1h the fixed V196 artifact. When they are the
+    // same file (a V197-vs-V196 run) one load and one scan serve both.
+    const IA_R = !V196_HTML ? null : (V196_HTML === BASE_HTML ? IA_B : load(V196_HTML));
     for (let _ci = 0; _ci < E_L.length; _ci++) {
       if (_ci % SHARD_N !== SHARD_I) continue;
       const c = E_L[_ci];
       walked++;
-      let A1s, B1s;
-      try { A1s = eScan(IA, c.cfg); B1s = eScan(IA_B, c.cfg); } catch (e) { continue; }
+      let A1s, B1s, R1s = null;
+      try {
+        A1s = eScan(IA, c.cfg); B1s = eScan(IA_B, c.cfg);
+        if (IA_R) R1s = (IA_R === IA_B) ? B1s : eScan(IA_R, c.cfg);
+      } catch (e) { continue; }
+      const hasL = (o,l) => o.labels.indexOf(l) >= 0;
       for (const dk of Object.keys(A1s)) {
-        const A1 = A1s[dk], B1 = B1s[dk]; if (!B1) continue;
-        bCells++;
-        const hasL = (o,l) => o.labels.indexOf(l) >= 0;
-        if (!hasL(A1,'Calves') && hasL(B1,'Calves')) { bFell++; if (bEg.length < 5) bEg.push(c.key + ' ' + dk); }
-        if (hasL(A1,'Calves') && !hasL(B1,'Calves')) bRose++;
+        const A1 = A1s[dk], B1 = B1s[dk];
+        if (B1) {
+          bCells++;
+          if (!hasL(A1,'Calves') && hasL(B1,'Calves')) { bFell++; if (bEg.length < 5) bEg.push(c.key + ' ' + dk); }
+        }
+        const R1 = R1s ? R1s[dk] : null;
+        if (R1) { rCells++; if (hasL(A1,'Calves') && !hasL(R1,'Calves')) bRose++; }
       }
     }
-    fs.writeFileSync(OUT, JSON.stringify({ ok: true, n: walked, bFell: bFell, bRose: bRose, bCells: bCells, bEg: bEg }));
+    fs.writeFileSync(OUT, JSON.stringify({ ok: true, n: walked, bFell: bFell, bRose: bRose,
+                                           bCells: bCells, rCells: rCells, bEg: bEg }));
   } catch (e) {
     try { fs.writeFileSync(OUT, JSON.stringify({ ok: false, n: walked, err: String((e && e.message) || e) })); } catch (e2) {}
   }
@@ -200,7 +272,7 @@ function runShard() {
 }
 
 function mergeShards(outs, errs, N) {
-  let bFell = 0, bRose = 0, bCells = 0, walked = 0; let bEg = [];
+  let bFell = 0, bRose = 0, bCells = 0, rCells = 0, walked = 0; let bEg = [];
   for (let i = 0; i < N; i++) {
     let j = null;
     try { const t = fs.readFileSync(outs[i], 'utf8'); if (t) j = JSON.parse(t); } catch (e) {}
@@ -211,20 +283,21 @@ function mergeShards(outs, errs, N) {
       continue;
     }
     if (!j.n) { fail++; console.log('FAIL E-shard ' + i + '/' + N + ' walked 0 configs'); }
-    walked += j.n; bFell += j.bFell; bRose += j.bRose; bCells += j.bCells; bEg = bEg.concat(j.bEg);
+    walked += j.n; bFell += j.bFell; bRose += j.bRose; bCells += j.bCells;
+    rCells += (j.rCells || 0); bEg = bEg.concat(j.bEg);
   }
   if (bEg.length > 5) bEg.length = 5;
   if (walked !== E_L.length) {
     fail++;
     console.log('FAIL E-shard union walked ' + walked + ' of ' + E_L.length + ' configs (the lattice was not covered)');
   }
-  afterSweep(bCells, bFell, bRose, bEg);
+  afterSweep(bCells, bFell, bRose, bEg, rCells);
 }
 
 function runParent() {
-  if (!BASE_HTML) return afterSweep(0, 0, 0, []);
+  if (!BASE_HTML) return afterSweep(0, 0, 0, [], 0);
   const N = shardCount();
-  if (!N) return afterSweep(0, 0, 0, []);
+  if (!N) return afterSweep(0, 0, 0, [], 0);
   SCRATCH = fs.mkdtempSync(path.join(os.tmpdir(), 'g197base-'));
   const outs = [], errs = [];
   let live = N;
@@ -232,7 +305,8 @@ function runParent() {
     const of = path.join(SCRATCH, 'shard_' + i + '.json');
     outs.push(of); errs.push('');
     const ch = cp.spawn(process.execPath,
-      [__filename, FILE, BASE_HTML, '--shard', i + '/' + N, '--out', of],
+      [__filename, FILE, BASE_HTML, '--shard', i + '/' + N, '--out', of]
+        .concat(V196_HTML ? ['--v196', V196_HTML] : []),
       { stdio: ['ignore', 'ignore', 'pipe'] });
     let fired = false;
     const fin = function () { if (fired) return; fired = true; if (--live === 0) mergeShards(outs, errs, N); };
@@ -242,25 +316,26 @@ function runParent() {
   }
 }
 
-function afterSweep(bCells, bFell, bRose, bEg) {
+function afterSweep(bCells, bFell, bRose, bEg, rCells) {
   ok('E0 lattice enumeration is the full tier × focus × experience × goal × injury × rest × seed product',
      E_L.length === 1728, E_L.length);
   if (BASE_HTML) {
     ok('E1g vs ' + path.basename(BASE_HTML) + ': Calves falls on zero day-cells (' + bCells + ' compared)',
        bCells > 0 && bFell === 0, bFell + ' e.g. ' + bEg.join(' ; '));
-    // E1h is D84's own footprint: Calves must appear on cells where the baseline had none.
-    // D84 shipped IN V197, so only a baseline built before it can show the rise. Against a
-    // V197-or-later baseline the claim is unsatisfiable by construction (it FAILED on
-    // V197-vs-itself) and the honest answer is a refusal, not a pass and not a skip.
-    const BV = iaVersion(fs.readFileSync(BASE_HTML, 'utf8'));
-    if (BV !== null && BV < 197) {
-      ok('E1h vs ' + path.basename(BASE_HTML) + ': Calves rises somewhere', bRose > 0, bRose);
+    // E1h is D84's own footprint: Calves must appear on cells where a PRE-D84 artifact had
+    // none. D84 shipped IN V197, so the comparison is FIXED at V196 and does NOT read the
+    // moving release baseline — pointed there it became unsatisfiable from V197 on and
+    // refused forever. The claim is unchanged and still true; only its second artifact was
+    // wrong. It now runs on every invocation that has a baseline at all.
+    if (V196_HTML) {
+      ok('E1h vs ' + path.basename(V196_HTML) + ' (fixed pre-D84 artifact, ia-version 196): '
+         + 'Calves rises somewhere (' + rCells + ' day-cells compared)',
+         rCells > 0 && bRose > 0, rCells + ' cells compared, ' + bRose + ' rises');
     } else {
-      refuse('E1h vs ' + path.basename(BASE_HTML) + ': Calves rises somewhere',
-        'NOT RUN: this claim needs a pre-D84 baseline (ia-version < 197); this baseline reads '
-        + (BV === null ? 'no ia-version meta' : 'ia-version ' + BV)
-        + '. D84 landed in V197, so a V197-or-later baseline already carries the rise and the claim '
-        + 'cannot be satisfied against it. Re-run with base_V196.html to put this assertion.');
+      refuse('E1h vs a fixed pre-D84 artifact: Calves rises somewhere',
+        'NOT RUN: no pre-D84 artifact to compare against. E1h needs baselines/V196.html '
+        + '(ia-version 196, the last release before D84); it is missing or carries another '
+        + 'version. Restore it with: git show V196:index.html > baselines/V196.html');
     }
   } else {
     console.log('   -- E1g/E1h not run: no baseline argv[3] (gate.sh passes one; sabotage.py does not)');
@@ -276,8 +351,10 @@ function afterSweep(bCells, bFell, bRose, bEg) {
 //   _setCount was the other candidate mechanism and was REJECTED for the same reason:
 //   it would leave the function D85 actually touched with no confinement at all.
 //   _itemCost and _setCount are NOT D85's, so they keep the baseline byte comparison.
-if (BASE_HTML) {
-  const B = fs.readFileSync(BASE_HTML, 'utf8');
+  // NO BASELINE BRANCH AROUND THE DIGEST PIN. The sha256 below is answered by the
+  // candidate alone, so it runs on every invocation — including sabotage.py's
+  // `node <gate> mutated.html`, which passes no argv[3]. This is the one app-grading
+  // assertion in this file a mutation can reach.
   const slice = (src, start, end) => { const a = src.indexOf(start); if (a < 0) return null;
     const b = src.indexOf(end, a); return b < 0 ? null : src.slice(a, b); };
 
@@ -304,6 +381,11 @@ if (BASE_HTML) {
        : 'ia-version ' + cv + ' digest ' + dig.slice(0, 16) + ' != licensed ' + want.slice(0, 16)
          + ' — capSessionBudget was edited; name the ruling');
 
+  // The remaining two E5 parts DO need a second artifact: they are byte comparisons
+  // against the shipped baseline, so they stay behind BASE_HTML and stay unreachable
+  // from sabotage.py by construction.
+  if (BASE_HTML) {
+  const B = fs.readFileSync(BASE_HTML, 'utf8');
   const PARTS = [
     ['_itemCost',        'function _itemCost(it, sectionRegion){',       '\n// ── RECOVERY-WEEK VOLUME DELOAD'],
     ['_setCount',        'function _setCount(detail){',                  '\nfunction _itemCost'],
@@ -314,7 +396,8 @@ if (BASE_HTML) {
        !!x && !!y && x === y, x === null ? 'not found in candidate' : (y === null ? 'not found in baseline' : 'differs'));
   });
 } else {
-  console.log('   -- E5 not run: no baseline argv[3]');
+  console.log('   -- E5 _itemCost/_setCount byte-identity not run: no baseline argv[3] '
+    + '(the E5 capSessionBudget digest pin above needs none and DID run)');
 }
 
   done();

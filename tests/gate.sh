@@ -78,9 +78,26 @@ WORKER
     [ -s "$GOUT" ] || { echo "FAIL: $(basename "$g") printed nothing"; exit 1; }
     SUMMARY="$(grep -E '^PASS [0-9]+ FAIL [0-9]+' "$GOUT" || true)"
     [ -n "$SUMMARY" ] || { echo "FAIL: $(basename "$g") printed no PASS/FAIL summary (crash?)"; tail -20 "$GOUT"; exit 1; }
-    echo "   $(basename "$g"): $SUMMARY"
+    # A REFUSED assertion is one that could not be PUT, announced by name. Mario ruled
+    # (V198) that a refusal BLOCKS: a claim that did not run is not a pass, which is the
+    # whole reason the refusal bucket is printed loudly instead of swallowed. It is echoed
+    # beside the summary and it exits 1, exactly like a FAIL. Do not soften it to a warning.
+    REFUSED="$(grep -cE '^REFUSED' "$GOUT" || true)"
+    if [ "$REFUSED" != "0" ]; then
+      echo "   $(basename "$g"): $SUMMARY  REFUSED (blocking)"
+    else
+      echo "   $(basename "$g"): $SUMMARY"
+    fi
     FAILS="$(echo "$SUMMARY" | awk '{print $4}')"
-    [ "$FAILS" = "0" ] || { grep -E '^FAIL' "$GOUT" | head -40; exit 1; }
+    # Gates print FAIL at column 0 (13 of them) or indented as `  FAIL ` (10 of them). An
+    # anchored `^FAIL` read only the first kind, so half the suite could exit 1 with no
+    # detail printed at all.
+    [ "$FAILS" = "0" ] || { grep -E '^[[:space:]]*FAIL' "$GOUT" | head -40; exit 1; }
+    if [ "$REFUSED" != "0" ]; then
+      echo "FAIL: $(basename "$g") REFUSED an assertion: a claim that did not run is not a pass (ruled, V198)"
+      grep -E '^REFUSE' "$GOUT" | head -20
+      exit 1
+    fi
   done
 fi
 

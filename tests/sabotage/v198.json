@@ -40,5 +40,12 @@
     "replacement": "    if(/superset b|isolation|calves|pump|accessory|delt/.test(L)) return 2;",
     "gate": "gates/g193_budget_floor.js",
     "note": "B3 wide (D85 CONFINEMENT, no-baseline floor) is the named trip: off-licence prehab falls 330/426/394/333/333/291 -> 174/282/283/231/231/195, a loss of 711 on 6/6 tiers, while the four licensed names still fall exactly 661. That is the shape the licence exists to catch - a second, unruled regression walking in behind a ruled one. The V192 census floor does NOT catch it (every tier stays above 3711-3867), which is why the transcribed V197 off-licence table had to exist for sabotage to reach this claim at all."
+  },
+  {
+    "name": "M7 -> D85's <=1 rationale is rewritten IN COMMENT to call the posterior floor a tunable, licensing a raise nobody ruled. Comment-only: behaviour is byte-identical, so only an assertion that reads capSessionBudget's licensed TEXT can see it",
+    "anchor": "  // <=1 IS NOT A TUNING CONSTANT. It is the boundary between nonempty and empty, the",
+    "replacement": "  // <=1 IS A TUNING CONSTANT. Raise it whenever a leg day reads light; the floor is a",
+    "gate": "gates/g197d_d84_base.js",
+    "note": "E5 capSessionBudget digest pin is the named trip, and this is the FIRST mutation ever to reach g197d_d84_base: until V198's tooling pass every app-grading assertion in that file sat behind if (BASE_HTML) and sabotage.py passes no argv[3], so the file printed PASS 1 FAIL 0 and graded nothing. E5 is a sha256 of the function's D85-licensed slice and needs no baseline, so it now runs on every invocation. Comment-only by design: no outcome gate in the suite can see this edit, which is exactly the point - E5 is the one assertion that sees an EDIT to the budget rather than an outcome of it."
   }
 ]
