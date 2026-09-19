@@ -21,8 +21,10 @@ Mario is the sole developer, product owner and primary user.
 artifact, every sabotage TRIPPED with 0 NOT-APPLIED / 0 CRASH, and every diff hunk is classified.
 The main session orchestrates and talks to Mario; it does not do measure's, builder's or gatekeeper's job inline.
 **coach rules against evidence coach did not gather** — measure runs before the ruling, not inside it.
-Builder is the only agent holding `Edit`/`Write`. coach, measure and gatekeeper are pinned to opus:
+Builder is the only agent holding `Edit`/`Write`. coach, measure and gatekeeper never run below opus:
 their output is judgement no gate can check (coach), or the judgement that a gate is lying (gatekeeper).
+Coach runs on fable from V200 as a measured experiment; compare its rulings against V198 and V199
+(retractions, reds, and whether measure refutes a premise) before deciding whether it stays.
 
 ## Session rhythm (do not skip steps)
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it.
