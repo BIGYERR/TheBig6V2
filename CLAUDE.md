@@ -67,7 +67,11 @@ without new evidence that contradicts the ruling itself.
    the watchdog kills.
 7. **When measure refutes a ruling's premise, it goes back to coach before builder — always.** A premise
    that did not survive the measure is a hypothesis, not a ruling, and building on it ships the wrong
-   thing twice. Coach may retract; that is the system working, not a failure.
+   thing twice. Coach may retract; that is the system working, not a failure. **If the refutation lands
+   mid-slice, builder PARKS the slice** — leaves it in the scratchpad, commits nothing, hands nothing to
+   gatekeeper — coach re-rules, and the parked slice is resumed as-is if the re-ruling leaves it intact,
+   or discarded if it does not. Finishing a slice against a refuted premise is never the cheaper path,
+   because gatekeeper would prove it against a ruling that no longer exists.
 
 **Mario is asked only for doctrine calls:** which pattern or quality survives, ship or hold, and anything
 that changes his own program. Siting, form, gate scope, agent order and tooling shape are the session's to
