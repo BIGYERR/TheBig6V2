@@ -37,7 +37,7 @@
 // env:   G200_SHARDS (default min(4, cpus))
 const path=require('path'), fs=require('fs'), os=require('os');
 const {fork}=require('child_process');
-const {load, fixtures, progDigest}=require(path.join(__dirname,'..','harness.js'));
+const {load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION}=require(path.join(__dirname,'..','harness.js'));
 const PINS=require(path.join(__dirname,'..','measure','v200_g200_pins.js'));
 const {MINI_LATTICE, miniLattice}=PINS;
 const ART=path.resolve(process.argv[2]||path.join(__dirname,'..','..','index.html'));
@@ -262,7 +262,8 @@ ok(clsBad.length===0,'A5 SPLIT-LENS GUARD: the four candidacy tests carried here
 
 console.log('── B. the fixture boots and builds ──');
 const fdig=progDigest(IP.buildProgram(fixtures.HALF_MANNY));
-ok(fdig==='6e32421331693437','B1 HALF_MANNY progDigest is 6e32421331693437, byte-identical to V198 (got '+fdig+'). D93 is a gate-only ruling: 0 hunks in index.html, so this must not move');
+const MANNY_DIGEST=MANNY_DIGEST_BY_VERSION[IP.version];             // era row, not a literal (D89)
+ok(!!MANNY_DIGEST&&fdig===MANNY_DIGEST,'B1 HALF_MANNY progDigest matches the V'+IP.version+' row of MANNY_DIGEST_BY_VERSION ('+(MANNY_DIGEST||'NO ROW')+') (got '+fdig+')'+(MANNY_DIGEST?'':' — no MANNY_DIGEST_BY_VERSION row for V'+IP.version+': an unruled digest move'));
 
 const SH=Math.max(1,parseInt(process.env.G200_SHARDS||String(Math.min(4,os.cpus().length)),10));
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'g200-'));

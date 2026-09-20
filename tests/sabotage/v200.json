@@ -33,5 +33,33 @@
     "replacement": "{name:'Kettlebell swing',detail:vsets(3)+'×10'}]});",
     "gate": "gates/g199_deload_arbitration.js",
     "note": "NAMED TRIP: g199 P0 (recorded blindness). P0 pins enterPostB === 0 of 1,440 both-enter cards, which is the statement that g199 CANNOT see the pull swap; this mutation makes the swap visible there and P0 goes red by design. THAT IS THE POINT: P0 is a self-expiring blindness claim, and a red P0 is a re-siting question, not an engine defect. Without this mutation the removal of P1/P2 from g199 would leave the pull census with zero mutation coverage in that file. EXPECT g200 P2c to trip too (the positive limb widens past 150)."
+  },
+  {
+    "name": "M6 -> the D89 family-core clause is deleted outright, so _compoundTier falls through to the unqualified-name return 3 again and `Pallof press` reads as a barbell compound. This is the exact V199 behaviour, which is the point: a gate that cannot tell V200 from V199 is not testing the ruling",
+    "anchor": "  if(_auxFamily(name)==='core') return 0;\n",
+    "replacement": "",
+    "gate": "gates/g200_core_tier.js",
+    "note": "NAMED TRIPS: g200_core_tier A1 (the 23-name family sweep: 1 of 23 returns 3), A2 (Pallof press tier), D1b (R5 swapLoadNote returns the V199 sentence instead of ''), E1 (R6 HEAVY COMPOUND predicate true), F4a (the ruled cell stops changing: 0 of 1798), F4b, F4c and F1b (the after-digest reverts to 6e32421331693437). EXPECTED COLLATERAL: C2a/C2b/F0 also go red because the clause is the thing they count; that is the mutation being the mutation, not a gate defect. This mutation is the acceptance test for the gate as a whole and reproduces exactly the V199 failure set."
+  },
+  {
+    "name": "M7 -> the clause returns 2 instead of 0, the 'it is not barbell tier' token model coach rejected. Pallof press stops reading as barbell but still carries a two-tier load gap, so R5 still prints the lighter-than sentence against a tier-0 candidate",
+    "anchor": "  if(_auxFamily(name)==='core') return 0;\n",
+    "replacement": "  if(_auxFamily(name)==='core') return 2;\n",
+    "gate": "gates/g200_core_tier.js",
+    "note": "NAMED TRIPS: g200_core_tier A1 (all 23 declared-core names now return 2, so the sweep reads 23 of 23 nonzero) and D1b. D1b IS THE POINT: swapLoadNote(Pallof press, Plank shoulder taps) computes d = 2 - 0 = 2, which does NOT clear `d<2`, so the athlete still reads 'Much lighter than pallof press.' against a plank variation. D1a pins that the probe candidate is tier 0 and not family core, which is what keeps D1b sensitive here; a family-core probe candidate would move with the mutation and D1b would pass. E1 does NOT trip (2 >= 3 is false) and that is expected and disclosed: this mutation separates the R5 claim from the R6 claim."
+  },
+  {
+    "name": "M8 -> the clause is planted in _isCompound instead of _compoundTier, the placement coach forbade. Tier still reads 0 by the !_isCompound gate, so the family sweep is satisfied, but _itemCost now prices Pallof press at sets x 1.0 rather than sets x 1.5 and V200 has silently shipped the _itemCost change that was ruled OUT",
+    "anchor": "function _isCompound(name){\n  return /bench|squat|deadlift|press|row|pull|clean|snatch|lunge|dip|chinup|pullup|hinge|romanian|thruster/.test((name||'').toLowerCase())",
+    "replacement": "function _isCompound(name){\n  if(_auxFamily(name)==='core') return false;\n  return /bench|squat|deadlift|press|row|pull|clean|snatch|lunge|dip|chinup|pullup|hinge|romanian|thruster/.test((name||'').toLowerCase())",
+    "gate": "gates/g200_core_tier.js",
+    "note": "NAMED TRIPS: g200_core_tier C1 (_isCompound(Pallof press) must still be TRUE) and C2c (_isCompound's body must not mention _auxFamily at all). C1 is the whole reason the ruling names a function and not a value: the tier-0 result is identical either way, so nothing in sections A, D or E can tell the two placements apart. EXPECTED COLLATERAL: F4a/F4b/F1b may move because _itemCost changes the budget arithmetic; that is the ruled-out second edit becoming visible, which is the finding. GATEKEEPER: the trip must be C1 BY NAME."
+  },
+  {
+    "name": "M9 -> _auxFamily stops finding its own keys (the no-trim failure mode, here forced with a trailing space on the lookup key), so every family question in the app answers null and the D89 clause can never fire even though its source line is still present and reads correct",
+    "anchor": "function _auxFamily(name){return _AUX_FAMILY[String(name||'').trim()]||null;}",
+    "replacement": "function _auxFamily(name){return _AUX_FAMILY[String(name||'')+' ']||null;}",
+    "gate": "gates/g200_core_tier.js",
+    "note": "NAMED TRIPS: g200_core_tier A1 (the family sweep: Pallof press returns 3 again, 1 of 23 nonzero), A2, D1b, E1 and F4a. This is the mutation that proves the sweep tests the ACCESSOR and not the source line: M6 deletes the clause and C2a/C2b catch it on sight, whereas here the clause survives every source-text check and only the behavioural sweep can see it. EXPECTED COLLATERAL: _auxFamily has six readers in the artifact (the hold dose at :8335, auxSwapCandidates at :8837, this clause at :9344, canSwap at :11619, the swap-sheet family tag at :13064), so collateral in the swap-sheet and aux-pool gates is expected and disclosed."
   }
 ]

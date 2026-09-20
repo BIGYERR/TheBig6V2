@@ -39,7 +39,7 @@
 // Usage: node tests/gates/g197a_pool_static.js <candidate.html>
 const fs   = require('fs');
 const path = require('path');
-const { load, fixtures, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 
 const FILE = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const RAW  = fs.readFileSync(FILE, 'utf8');
@@ -95,7 +95,7 @@ const TIERS_PLUS  = TIERS.concat(['travel_room_only']);
 const HARVESTED = ['Nordic hamstring curl (anchored)','Single-leg glute bridge','Single-leg hip thrust','Wall sit'];
 const EXCLUDED  = ['Spanish squat hold (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat'];
 const MACHINES  = ['Leg extension','Lying leg curl','Seated leg curl','Leg press','Standing cable hamstring curl'];
-const MANNY_DIGEST = '6e32421331693437';
+const MANNY_DIGEST = MANNY_DIGEST_BY_VERSION[IA.version];   // era row, not a literal (D89)
 const HOLD_DOSE_SEC = 25;               // the ACCESSORY hold dose the file already carries
 const SECTION = 'Leg isolation';        // athlete-facing label; D75 renamed the KEY, not this
 
@@ -353,7 +353,9 @@ console.log('\n-- D. HALF_MANNY --');
 {
   const p = IA.buildProgram(fixtures.HALF_MANNY);
   const d = progDigest(p);
-  ok('D1 HALF_MANNY digest is ' + MANNY_DIGEST, d === MANNY_DIGEST, d);
+  ok('D1 HALF_MANNY digest matches the V' + IA.version + ' row (' + (MANNY_DIGEST || 'NO ROW') + ')',
+     !!MANNY_DIGEST && d === MANNY_DIGEST,
+     d + (MANNY_DIGEST ? '' : ' — no MANNY_DIGEST_BY_VERSION row for V' + IA.version + ': an unruled digest move'));
   let li = 0;
   cells(p).forEach(c => (c.day.sections||[]).forEach(s => { if ((s.label||'') === SECTION) li++; }));
   ok('D2 "' + SECTION + '" never opens on his program (denseHypertrophy gate)', li === 0, li);

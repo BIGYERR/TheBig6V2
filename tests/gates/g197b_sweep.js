@@ -39,7 +39,7 @@
 // Usage: node tests/gates/g197b_sweep.js <candidate.html>
 const fs   = require('fs');
 const path = require('path');
-const { load, fixtures, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 
 const FILE = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const RAW  = fs.readFileSync(FILE, 'utf8');
@@ -95,7 +95,7 @@ const TIERS_PLUS  = TIERS.concat(['travel_room_only']);
 const HARVESTED = ['Nordic hamstring curl (anchored)','Single-leg glute bridge','Single-leg hip thrust','Wall sit'];
 const EXCLUDED  = ['Spanish squat hold (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat'];
 const MACHINES  = ['Leg extension','Lying leg curl','Seated leg curl','Leg press','Standing cable hamstring curl'];
-const MANNY_DIGEST = '6e32421331693437';
+const MANNY_DIGEST = MANNY_DIGEST_BY_VERSION[IA.version];   // era row, not a literal (D89)
 const HOLD_DOSE_SEC = 25;               // the ACCESSORY hold dose the file already carries
 const SECTION = 'Leg isolation';        // athlete-facing label; D75 renamed the KEY, not this
 
@@ -248,6 +248,17 @@ bwKeys.forEach(n => ok('B7b leg movement only: ' + n, LEG_WORDS.test(n)));
 ok('B7c the _bwFallback substitutes are gone from this section',
    !bwKeys.some(n => /pushup|inverted row|burpee|y-t-w/i.test(n)), JSON.stringify(bwKeys));
 
+
+// ── D89: this sweep's fixture family needs an identity pin of its own ──────────────
+// MANNY_DIGEST sat here unread for three passes. g197b sweeps the family HALF_MANNY
+// belongs to, so it was the one sweep gate over that fixture with no identity check.
+console.log('\n-- B8. HALF_MANNY identity --');
+{
+  const d = progDigest(IA.buildProgram(fixtures.HALF_MANNY));
+  ok('B8a HALF_MANNY digest matches the V' + IA.version + ' row (' + (MANNY_DIGEST || 'NO ROW') + ')',
+     !!MANNY_DIGEST && d === MANNY_DIGEST,
+     d + (MANNY_DIGEST ? '' : ' — no MANNY_DIGEST_BY_VERSION row for V' + IA.version + ': an unruled digest move'));
+}
 
 console.log('\nPASS ' + pass + ' FAIL ' + fail);
 process.exit(fail ? 1 : 0);

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="199"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="200"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -9337,6 +9337,11 @@ function _isCompound(name){
 // carry a bar, and demoting them would make real leg work trimmable.
 function _compoundTier(name){
   if(!_isCompound(name)) return 0;
+  // V200 (D89): a drill declared family 'core' in _AUX_FAMILY is a core drill, never a loaded
+  // compound. `Pallof press` cleared _isCompound on the bare substring `press` and then fell
+  // through to the unqualified-name `return 3` below, reading as barbell-tier. It was the only
+  // one of the 23 declared-core names to do so. The map is the authority on what a core drill is.
+  if(_auxFamily(name)==='core') return 0;
   const N=(name||'').toLowerCase();
   if(/dumbbell|kettlebell|\bdb\b|\bkb\b/.test(N)) return 2;
   if(/machine|cable|smith|assisted|pushup|push-up|bodyweight/.test(N)) return 1;

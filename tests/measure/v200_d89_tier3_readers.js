@@ -1,6 +1,8 @@
 // ════════════════════════════════════════════════════════════════════════════════════
 // v200_d89_tier3_readers.js — MEASURE PASS (read-only, rules nothing)
 //
+// READ THIS BEFORE QUOTING ANY NUMBER BELOW. The "D89 DELTA" figures in this file (R1 2,773 · R3 58,992 · R4 135,956) are the MODEL A / MODEL B COUNTERFACTUALS measured to CHOOSE a model, NOT the shipped V200 delta: shipped D89 moved R1 through R4 by 0 and moved R7 by the Pallof-only shape, which is pinned in tests/gates/g200_core_tier.js.
+//
 // v199_d89_tier3.js instrumented ONE reader of _compoundTier (the capSessionBudget
 // tier-3 skip, V198 :9558) and said so. There are SEVEN. This pass measures the other
 // six, at the same lattice, with the same oracle.

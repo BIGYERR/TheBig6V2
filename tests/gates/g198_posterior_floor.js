@@ -22,7 +22,7 @@
 //
 // usage: node tests/gates/g198_posterior_floor.js <candidate.html> [baseline.html]
 const fs=require('fs'), os=require('os'), path=require('path');
-const {load, fixtures, progDigest}=require(path.join(__dirname,'..','harness.js'));
+const {load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION}=require(path.join(__dirname,'..','harness.js'));
 
 const ART=process.argv[2]||path.join(__dirname,'..','..','index.html');
 let PASS=0, FAIL=0;
@@ -217,7 +217,9 @@ if(isoN===1){
 
 console.log('── C. Mario\'s live program is untouched ──');
 const dig=progDigest(IA.buildProgram(fixtures.HALF_MANNY));
-ok(dig==='6e32421331693437', 'C1 HALF_MANNY digest is 6e32421331693437 (got '+dig+')');
+const MANNY_DIGEST=MANNY_DIGEST_BY_VERSION[IA.version];   // era row, not a literal (D89)
+ok(!!MANNY_DIGEST && dig===MANNY_DIGEST,
+   'C1 HALF_MANNY digest matches the V'+IA.version+' row ('+(MANNY_DIGEST||'NO ROW — no MANNY_DIGEST_BY_VERSION entry for this version: an unruled digest move')+') (got '+dig+')');
 
 console.log('PASS '+PASS+' FAIL '+FAIL);
 process.exit(FAIL?1:0);

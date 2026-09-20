@@ -196,7 +196,29 @@ function progDigest(prog){
   return crypto.createHash('sha256').update(JSON.stringify(clone)).digest('hex').slice(0,16);
 }
 
-module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES };
+// ── HALF_MANNY digest, keyed by the ia-version of the artifact under test ──────────
+// gate.sh runs every gate against the PREVIOUS artifact first, so a bare literal pin
+// makes unrelated gates red on the old build for a reason none of them tests. A row
+// per era keeps them green on BOTH artifacts for the right reason, and an artifact
+// whose version has NO row fails loudly: the lookup is undefined and the consuming
+// gate asserts the row exists before it compares. An unruled digest move is exactly
+// what this table is here to catch.
+// These tables are also the record of which ruling changed Mario's program and when.
+// Two tables, never one: the deload-off digest is a COUNTERFACTUAL oracle (the engine
+// with recoveryDeload suppressed) and must not share a row with the shipped program.
+const MANNY_DIGEST_BY_VERSION = {
+  198: '6e32421331693437',
+  199: '6e32421331693437',
+  200: 'd4364dd3fa63a3a1',   // D89 re-pin: the ruled digest move
+};
+
+const MANNY_DELOAD_OFF_DIGEST_BY_VERSION = {
+  199: '75ae3d256b642a9d',
+  200: '5fe2c6bb32c76498',   // D89 re-pin: the ruled digest move
+};
+
+module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
+                   MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION };
 
 if(require.main === module){
   const file = process.argv[2];

@@ -34,7 +34,7 @@
 // env:   G199_SHARDS (default min(4, cpus))
 const path=require('path'), fs=require('fs'), os=require('os'), crypto=require('crypto');
 const {fork}=require('child_process');
-const {load, fixtures, progDigest}=require(path.join(__dirname,'..','harness.js'));
+const {load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION}=require(path.join(__dirname,'..','harness.js'));
 const ART=path.resolve(process.argv[2]||path.join(__dirname,'..','..','index.html'));
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
@@ -332,8 +332,10 @@ const dig=progDigest(IP.buildProgram(fixtures.HALF_MANNY));
 IP.eval("globalThis.__DELOAD_OFF=true;");
 const digOff=progDigest(IP.buildProgram(fixtures.HALF_MANNY));
 IP.eval("globalThis.__DELOAD_OFF=false;");
-ok(dig==='6e32421331693437','B1 HALF_MANNY progDigest is 6e32421331693437, byte-identical to V198 (got '+dig+')');
-ok(digOff==='75ae3d256b642a9d','B2 with __DELOAD_OFF the same fixture moves to 75ae3d256b642a9d (got '+digOff+'): B1 is MEANINGFUL, the fixture does pass through the deload (B1 would be vacuous if the two digests were equal)');
+const MANNY_DIGEST=MANNY_DIGEST_BY_VERSION[IP.version];             // era row, not a literal (D89)
+const MANNY_OFF=MANNY_DELOAD_OFF_DIGEST_BY_VERSION[IP.version];     // era row, not a literal (D89)
+ok(!!MANNY_DIGEST&&dig===MANNY_DIGEST,'B1 HALF_MANNY progDigest matches the V'+IP.version+' row of MANNY_DIGEST_BY_VERSION ('+(MANNY_DIGEST||'NO ROW')+') (got '+dig+')'+(MANNY_DIGEST?'':' — no MANNY_DIGEST_BY_VERSION row for V'+IP.version+': an unruled digest move'));
+ok(!!MANNY_OFF&&digOff===MANNY_OFF,'B2 with __DELOAD_OFF the same fixture matches the V'+IP.version+' row of MANNY_DELOAD_OFF_DIGEST_BY_VERSION ('+(MANNY_OFF||'NO ROW')+') (got '+digOff+'): B1 is MEANINGFUL, the fixture does pass through the deload (B1 would be vacuous if the two digests were equal)'+(MANNY_OFF?'':' — no MANNY_DELOAD_OFF_DIGEST_BY_VERSION row for V'+IP.version+': an unruled digest move'));
 ok(dig!==digOff,'B3 the two fixture digests differ');
 
 const SH=Math.max(1,parseInt(process.env.G199_SHARDS||String(Math.min(4,os.cpus().length)),10));
