@@ -45,10 +45,13 @@ const E_PAT=[
   ['hinge',    /deadlift|\brdl\b|romanian|good morning|\bswing\b|\bclean\b|\bsnatch\b|hinge|rack pull/i]];
 const ePat=n=>{const t=String(n||'');for(const [p,r] of E_PAT) if(r.test(t)) return p; return null;};
 const isPost=n=>{const p=ePat(n);return p==='hinge'||p==='hip_ext';};   // {hinge, hip_ext} and nothing else
+// 17-name blindness probe, expected column hand-typed from the doctrine movement names.
+// Ten negatives (four of them pull-side, because this is the pull gate) and seven positives.
 const PROBE=[['Back squat',0],['Leg extension',0],['Lying leg curl',0],['Leg press',0],
-  ['Dumbbell standing calf raise',0],['Dumbbell Bulgarian split squat',0],['Wall sit',0],
-  ['Nordic hamstring curl (anchored)',1],['Single-leg glute bridge',1],['Single-leg hip thrust',1],
-  ['Barbell Romanian deadlift',1],['Banded hip thrust',1],['45° back extension',1],['Kettlebell swing',1]];
+  ['Dumbbell standing calf raise',0],['Wall sit',0],['Barbell row',0],['Lat pulldown',0],
+  ['Chin-up',0],['Face pull',0],
+  ['Nordic hamstring curl (anchored)',1],['Single-leg glute bridge',1],['Barbell Romanian deadlift',1],
+  ['45° back extension',1],['Kettlebell swing',1],['Dumbbell split-stance deadlift',1],['Barbell hip thrust',1]];
 
 // ── LATTICE (1,728 keys; identical to tests/measure/v199_d91_deload_arbitration.js) ──
 const E_TIERS=['commercial','home_full','crossfit','home_basic','bodyweight','minimal'];
@@ -111,11 +114,40 @@ function cls(s){
   if(!(s.p||[]).some(p=>p)) return 'none';
   return 'cand';
 }
+// A5 probe, carried from g200_pull_arbitration.js byte-identical: hand-typed sections,
+// hand-typed expected class. Every one of the four candidacy tests is exercised in both
+// directions, and the three PULL FAMILY labels are shown to land on 'cand'. SPLIT-LENS
+// GUARD: g199 and g200 both run this same array against the same cls(), so the two files
+// cannot drift into two different notions of what an accessory candidate is. Nothing here
+// touches the engine.
+const CLS_PROBE=[
+  [{l:'Pull superset A',p:['pull']},'cand'],
+  [{l:'Pull superset B',p:['pull','hinge']},'cand'],
+  [{l:'Pull',p:['hinge']},'cand'],
+  [{l:'Main strength',p:['squat']},'main'],
+  [{l:'Primer',p:['power']},'main'],
+  [{l:'Power block',p:['power']},'main'],
+  [{l:'Strength block',p:['press']},'main'],
+  [{l:'Hip mobility',p:['hinge']},'prehab'],
+  [{l:'Pull superset A',hip:true,p:['pull']},'prehab'],
+  [{l:'Explosive finisher',p:['power']},'fluff'],
+  [{l:'Loaded carry',p:['carry']},'fluff'],
+  [{l:'Pull superset B',opt:true,p:['pull']},'fluff'],
+  [{l:'Pull superset A',p:[null,null]},'none'],
+  [{l:'Pull superset B',p:[]},'none']];
 const secPost=s=>(s.n||[]).reduce((a,n)=>a+(isPost(n)?1:0),0);
 const cardPost=c=>(c||[]).reduce((a,s)=>a+secPost(s),0);
 const hasLab=(c,lab)=>(c||[]).some(s=>s.l===lab&&(s.n||[]).length);
 const sha=s=>crypto.createHash('sha256').update(s).digest('hex').slice(0,16);
 const LABELS=['Leg superset A','Leg superset B','Leg isolation','Explosive finisher'];
+// D93 (V200) — PULL SIDE. Its OWN list and its OWN counters: LABELS drives lblP1all/
+// lblP2all, which F1-F3c, G1-G5, H5 and I3 are pinned to, so adding a pull label there
+// would silently move every one of those numbers. Three labels, not two: the bare `Pull`
+// is what singletonSupersetSweep (index.html:10010) leaves when a superset is trimmed to
+// one item and loses its partner. That sweep runs POST-BUILD over weeks (index.html:9895),
+// downstream of p1/p2/p3, so `Pull` is expected to read 0 in the STAGE census and to be
+// the only place it appears is the SHIPPED-card census. Both are captured below.
+const PLABELS=['Pull superset A','Pull superset B','Pull'];
 const bump=(o,k)=>{o[k]=(o[k]||0)+1;};
 
 function blank(){return {configs:0,weeks:0,dayCells:0,dlDayBuilds:0,deloadWeeks:0,nonDeloadWeeks:0,
@@ -125,6 +157,7 @@ function blank(){return {configs:0,weeks:0,dayCells:0,dlDayBuilds:0,deloadWeeks:
   lblP1all:{},lblP2all:{},killHold:{},reBudLost:{},reBudShip:{},reBudNonMob:0,reBudTier:{},reBudRename:{},lensOnlyHand:{},lensOnlyEng:{},swapReBudgetWeekZero:0,
   trapAnyE:0,trapCandE:0,trapNoCandE:0,trapSurvViolE:0,trapNoCandSurvViolE:0,
   swapPop:0,swapBoth:0,swapReCap:0,swapReBudget:0,capLSBin:0,capLSBkilled:0,
+  pullP1all:{},pullP2all:{},pullShipAll:{},pullP1:{},pullP2:{},pullBothP1:0,pullSwapCensus:{},
   orderViol:0,orderNonVac:0,legAfterHipViol:0,trapAndSwap:0};}
 
 function sweep(mine,instrFile){
@@ -155,6 +188,27 @@ function sweep(mine,instrFile){
         // denominator coach's conservation total is stated on. The deload-only census is kept
         // separately below; the two are different denominators and never interchangeable.
         LABELS.forEach(lb=>{ if(hasLab(r.p1,lb)) bump(S.lblP1all,lb); if(hasLab(r.p2,lb)) bump(S.lblP2all,lb); });
+        // ── D93 pull-side plumbing (no assertion in this slice) ──
+        // pullP1all/pullP2all: the STAGE record, all day builds — the same denominator and
+        // the same shape as lblP1all/lblP2all, kept in separate maps.
+        // pullShipAll: the SHIPPED card, all day builds. This is the only census that can
+        // see the bare `Pull` rename, and g193_samecard.js:374 already rules that the
+        // `Pull superset A` LABEL is not asserted to survive to the card, so P2 must ask
+        // its p1-vs-p2 question of the stage record and never of the shipped card.
+        // pullP1/pullP2/pullBothP1/pullSwapCensus: DELOAD cards only, a second denominator.
+        PLABELS.forEach(lb=>{ if(hasLab(r.p1,lb)) bump(S.pullP1all,lb); if(hasLab(r.p2,lb)) bump(S.pullP2all,lb); });
+        { const SL=shipLab[r.w+'|'+r.d]||[]; PLABELS.forEach(lb=>{ if(SL.indexOf(lb)>=0) bump(S.pullShipAll,lb); }); }
+        if(r.dl){
+          PLABELS.forEach(lb=>{ if(hasLab(r.p1,lb)) bump(S.pullP1,lb); if(hasLab(r.p2,lb)) bump(S.pullP2,lb); });
+          // raw facts only, no oracle: which pull block ENTERED holding posterior (hand
+          // table), and which pull block came OUT. P2/P2b in slice 2 turn this into an
+          // expected-survivor claim; slice 1 only records it.
+          if(hasLab(r.p1,'Pull superset A')&&hasLab(r.p1,'Pull superset B')){ S.pullBothP1++;
+            const pst=(lb)=>(r.p1||[]).some(s=>s.l===lb&&secPost(s)>0);
+            const srv=(lb)=>hasLab(r.p2,lb);
+            bump(S.pullSwapCensus,'enterPost='+((pst('Pull superset A')?'A':'')+(pst('Pull superset B')?'B':'')||'none')
+              +' surv='+((srv('Pull superset A')?'A':'')+(srv('Pull superset B')?'B':'')||'none')); }
+        }
         // lens census: names the hand table calls posterior and the engine's _pattern does not,
         // and the reverse. A nonempty first list is why a hand-oracle count can exceed an
         // engine-lens count on the same cards.
@@ -265,8 +319,13 @@ LAT.filter((_,i)=>i%211===0).forEach(L=>{ inertN++; if(progDigest(IP.buildProgra
 ok(inert===inertN,'A2 the instrumented copy is inert: '+inert+'/'+inertN+' lattice configs keep the pristine program digest');
 ok(LAT.length===1728,'A3 lattice is the ruling\'s 1,728 config keys (got '+LAT.length+')');
 let probeBad=PROBE.filter(([n,e])=>(isPost(n)?1:0)!==e);
-ok(probeBad.length===0,'A4 hand posterior oracle passes its blindness probe on all '+PROBE.length+' names'
+ok(probeBad.length===0,'A4 hand posterior oracle passes its blindness probe on all '+PROBE.length+' names, '
+  +PROBE.filter(x=>x[1]===1).length+' positives and '+PROBE.filter(x=>x[1]===0).length+' negatives, four of the negatives pull-side. '
+  +'SHARED ORACLE: this probe body and E_PAT are byte-identical to tests/gates/g200_pull_arbitration.js, and both files assert them'
   +(probeBad.length?' — misreads '+probeBad.map(x=>x[0]).join(', '):''));
+const clsBad=CLS_PROBE.filter(([s,e])=>cls(s)!==e);
+ok(clsBad.length===0,'A5 SPLIT-LENS GUARD: the four candidacy tests pass a hand-typed probe on all '+CLS_PROBE.length+' sections, and the three pull-family labels land on cand. cls() here is byte-identical to the copy in tests/gates/g200_pull_arbitration.js and BOTH files assert it against this same array, so neither can drift into its own private notion of an accessory candidate'
+  +(clsBad.length?' — misreads '+clsBad.map(x=>x[0].l+'=>'+cls(x[0])+' want '+x[1]).join(', '):''));
 
 console.log('── B. HALF_MANNY, and the proof the fixture is not blind to the deload ──');
 const dig=progDigest(IP.buildProgram(fixtures.HALF_MANNY));
@@ -326,6 +385,35 @@ function report(){
   ok(g(N.lblP2,'Leg superset A')+g(N.lblP2,'Leg superset B')===2880,'F3c on DELOAD cards alone the same two blocks survive '+g(N.lblP2,'Leg superset A')+' + '+g(N.lblP2,'Leg superset B')+' == 2,880 times, one per card. A second, smaller denominator, stated so F1-F3 cannot be misread as a deload-only census');
   ok(N.survCandViol===0,'F4 per-card: exactly one accessory block survives wherever one was available, zero where none was ('+N.survCandViol+' violations of '+D_DAY+' deload day builds)');
   ok(N.survCandGt1===0,'F5 no deload card ever ships two surviving accessory blocks ('+N.survCandGt1+' cards with more than one, of '+D_DAY+')');
+
+  // ══ D93 (V200, AMENDED) PULL SIDE — P0, g199's OWN BLINDNESS, RECORDED ══════════
+  // RULED REMOVAL, NOT A CLEANUP. The P1 (pull-block conservation) and P2 (per-card expected
+  // survivor) rows that stood here through slices 1 and 2 are OUT under D93 AMENDED. On this
+  // gate's 1,728-key lattice they were VACUOUS: all 1,440 deload day builds that offer both
+  // Pull superset A and Pull superset B enter with NEITHER block holding an E_PAT posterior
+  // item, so the positive limb of the iff was never exercised, and both rows read identically
+  // on V198 and V199 — a change-detector that cannot detect the change it names. Coverage of
+  // the D93 pull swap now lives in tests/gates/g200_pull_arbitration.js (P1, P2, P2c, P2c-floor,
+  // P4) on a mini-lattice built to CONTAIN the positive limb: 150 swap cards of 1,120 deload
+  // day builds, red on V198 and green on V199. Do not re-add a pull-swap assertion to this
+  // file without re-reading that one.
+  //
+  // P0 IS WHAT REPLACES THEM, and it is not a coverage claim. It is a BLINDNESS claim: it pins
+  // the exact shape of this gate's inability to see the swap, so a silent vacuous PASS becomes
+  // a RECORDED one. If the lattice, the pull pool or the conditioning draw ever changes such
+  // that a Pull superset B enters a g199 deload card holding posterior work, P0 TRIPS and the
+  // re-siting question comes back on the record instead of sliding through green. A TRIP HERE
+  // IS A RE-SITING QUESTION, NOT AN ENGINE DEFECT.
+  // PLABELS and the pull* counters above are kept precisely because P0 reads them.
+  const enterPostB = Object.keys(N.pullSwapCensus||{})
+    .reduce((a,k) => a + (/enterPost=\S*B/.test(String(k)) ? N.pullSwapCensus[k] : 0), 0);
+  const PFAM_P2ALL = g(N.pullP2all,'Pull superset A') + g(N.pullP2all,'Pull superset B') + g(N.pullP2all,'Pull');
+  ok(N.pullBothP1===1440 && enterPostB===0,
+    'P0 RECORDED BLINDNESS: this gate CANNOT SEE the D93 pull swap. THE REAL ORACLE IS tests/gates/g200_pull_arbitration.js. '
+    + 'BOTH POPULATIONS, WITH DENOMINATORS: deload day builds offering BOTH pull blocks at p1 == ' + N.pullBothP1 + ' (want 1,440) of ' + D_DAY + ' deload day builds, themselves of ' + N.dayCells + ' day builds across ' + N.configs + ' configs; of those both-enter cards, those whose Pull superset B holds an E_PAT posterior item at p1 == ' + enterPostB + ' (want 0). '
+    + 'CENSUS ' + JSON.stringify(N.pullSwapCensus) + ' (want {"enterPost=none surv=A":1440}). STAGE pull-family census after the deload: A ' + g(N.pullP2all,'Pull superset A') + ' + B ' + g(N.pullP2all,'Pull superset B') + ' + bare Pull ' + g(N.pullP2all,'Pull') + ' = ' + PFAM_P2ALL + '. Bare `Pull` reads 0 at the stage BY CONSTRUCTION: singletonSupersetSweep (index.html:10010) runs post-build, downstream of p1/p2/p3. '
+    + 'THE ZERO CARRIES ITS DENOMINATOR: 0 of ' + N.pullBothP1 + ', and that is the finding, not an omission. The positive limb of the D93 iff has population zero on this lattice, so nothing here distinguishes the V199 arbitration from V198 push order on the pull side; both artifacts read these same two numbers. g200 exercises that limb 150 times. '
+    + 'STRUCTURAL REASON, not a shortfall: E_FOCUS here is [hypertrophy, balanced], and Pull superset B exists only on the else branch of the goal===strength || goal===hypertrophy guard at index.html:8223, so hypertrophy configs label the section Row volume and cannot contribute a B at all. B enters on only ' + g(N.pullP1all,'Pull superset B') + ' of ' + N.dayCells + ' day builds.');
 
   console.log('── G. Leg isolation and Explosive finisher, BOTH denominators pinned ──');
   ok(g(N.dropped,'Leg isolation')===1350,'G1 Leg isolation DROPPED by the deload == 1,350. DENOMINATOR: deload day builds (n='+D_DAY+'), of which '+g(N.lblP1,'Leg isolation')+' carried the block in. It only ever drops on a deload card, so the all-day-builds census moves by the same 1,350 ('+g(N.lblP1all,'Leg isolation')+' -> '+g(N.lblP2all,'Leg isolation')+'); got '+g(N.dropped,'Leg isolation'));

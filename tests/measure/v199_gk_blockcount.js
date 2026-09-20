@@ -12,7 +12,12 @@ function cfg(t,f,x,g,r,seed){const isRace=!!g.id&&/5k|10k|half|marathon/.test(g.
     eventTargeted:isRace,raceDate:isRace?'2026-12-06':null,liftingFocus:f,experience:x,ageBracket:'18-35',
     equipment:t,unit:'lbs',restDays:r.v.slice(),days:['sun','mon','tue','wed','thu','fri','sat'],bench:135,squat:155,deadlift:185,seed};}
 const LAT=[];for(const t of TIERS)for(const f of FOCUS)for(const x of EXPS)for(const g of GOALS)for(const r of RESTS)for(const sd of SEEDS)LAT.push({t,cfg:cfg(t,f,x,g,r,sd)});
-const ACC=/^(Leg superset [AB]|Leg|Leg isolation|Pull superset [AB]|Push superset [AB])$/;
+// D93: the bare `Pull` and `Push` alternatives are singletonSupersetSweep's renames of a
+// superset trimmed to one item (index.html:10010). Without them this lens reported 90
+// spurious GAINS of 145,152 cards, all 90 on shoulder/protect — a 1-block card read as
+// 1 block before and 1 after, but the LABEL had left the family. With them the same
+// lattice reads 60,333 -> 60,333: 0 gained, 0 lost, 3,807 swapped.
+const ACC=/^(Leg superset [AB]|Leg|Leg isolation|Pull superset [AB]|Pull|Push superset [AB]|Push)$/;
 function census(V,c){const p=V.buildProgram(JSON.parse(JSON.stringify(c)));const W=p.weeks||{};const out=[];
   Object.keys(W).forEach(wi=>Object.keys(W[wi]||{}).forEach(di=>{const d=W[wi][di];
     const labs=((d&&d.sections)||[]).map(s=>String((s&&s.label)||''));

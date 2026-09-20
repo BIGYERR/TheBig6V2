@@ -1,0 +1,37 @@
+[
+  {
+    "name": "M1 -> the `break` is removed, so the LAST posterior accessory block wins the arbitration instead of the first. D93's rule is FIRST-posterior-wins; on a pull card where Pull superset B holds the hinge and a later section also holds one, the pick moves off B and the swap silently does not happen",
+    "anchor": "    if((s.items||[]).some(it=>it&&_isPostChain(it.name))){ pickIdx=i; break; }    // first posterior accessory block wins",
+    "replacement": "    if((s.items||[]).some(it=>it&&_isPostChain(it.name))){ pickIdx=i; }",
+    "gate": "gates/g199_deload_arbitration.js",
+    "note": "NAMED TRIPS: g199_deload_arbitration.js G1 AND G2. RE-DECLARED IN SLICE 5, AND THIS IS NOT RELABELLING A HOLE. M1 was first declared against g200 and it SURVIVED: with the break removed at index.html:9412 so the LAST posterior block wins, g200 still read PASS 14 FAIL 0. Measure established the cause and it is STRUCTURAL: a pull card holds at most ONE posterior candidate block by construction. Pull superset A is row plus vertical pull; Pull superset B has exactly one posterior-capable slot, the ex.cond[2] draw; Row volume is one row; Main backMain is skipped as a main; the rest are optional or fluff. With one posterior-holding block per card, first-wins and last-wins select identically and the break is unobservable there. Over 217,728 deload day builds, 10,443 (4.80%) carry 2+ posterior-holding candidate blocks and 0 of them involve the pull family; eleven lattice extensions were costed and the two that contain the population contain it as LEG cards g200 FAM does not read, so NO LATTICE CHANGE can give g200 coverage of this clause. g199 DOES test the clause, on real two-posterior LEG cards: under M1 it reads PASS 46 FAIL 10, and measure's independent census found 1,776 M1-observable cards of 15,360 deload day builds (11.6%), of which the 1,350 containing Leg isolation reconcile G1's hand pin as 1,080 + 240 + 30, derived without touching G1. GATEKEEPER: the trip must be G1 and G2 BY NAME, not \"some gate went red\". Collateral elsewhere in g199's F series is expected and disclosed."
+  },
+  {
+    "name": "M2 -> the pull arbitration is reverted to V198 PUSH ORDER: the posterior pre-pass never picks anything, pickIdx stays -1, and the first accessory block in push order survives every deload. Pull superset A wins every deload pull day and the day's hinge dies by arithmetic",
+    "anchor": "    if((s.items||[]).some(it=>it&&_isPostChain(it.name))){ pickIdx=i; break; }    // first posterior accessory block wins",
+    "replacement": "    if(false){ pickIdx=i; break; }",
+    "gate": "gates/g200_pull_arbitration.js",
+    "note": "NAMED TRIPS: g200 P2 (exactly 150 violations of 210 both-enter deload pull cards) AND g200 P4 (0 of 150 reaching the shipped card). M2 is the mutation that proves the DIRECTION of the arbitration; M4 below is the one that proves the positive limb is ALIVE. Both are required. This is measure's M3, and it is the exact predecessor behaviour: g200 records that V198 reads census {\"enterPost=B exp=B surv=A\":150,\"enterPost=none exp=A surv=A\":60} through this same instrument, so P2 must go RED with exactly 150 violations of 210 both-enter cards. A PASS here would mean g200 cannot tell V199 from V198, which is the single thing this gate exists to prove. EXPECT heavy collateral in g199 (the leg-side D91 claims share this line: C1, C2, C4, E3, F1, F2, G5, H5), which is why M1 above exists as the narrower probe of the same gate."
+  },
+  {
+    "name": "M3 -> the one-accessory latch is dropped in the form coach warned about: the posterior pick is kept IN ADDITION to the first accessory block, so a deload pull card ships BOTH Pull superset A and Pull superset B and the recovery week quietly becomes a normal week",
+    "anchor": "    if(hasLift&&!accessoryKept&&(pickIdx<0||i===pickIdx)){ accessoryKept=true; keep.push(s); return; }",
+    "replacement": "    if(hasLift&&(!accessoryKept||i===pickIdx)){ accessoryKept=true; keep.push(s); return; }",
+    "gate": "gates/g200_pull_arbitration.js",
+    "note": "NAMED TRIPS: g200 P1 (pull-block family conservation; the family at p2 rises above 1,470 because the 150 swap cards now ship two pull blocks instead of one) AND g199 F5 (no deload card ever ships two surviving accessory blocks). This is the CONFINED keep-both, v199.json's M8 form, not the unconfined M5 form: coach's claim is that a confined keep-both slips past the six criteria, so this is the shape worth testing. EXPECT g200 P2 to trip too (surv=AB is scored a violation by construction) - that is a property of the mutation, not a defect in the split between P1 and P2."
+  },
+  {
+    "name": "M4 -> the Pull superset B conditioning slot stops drawing from the conditioning pool and repeats the day's first row instead, so no Pull superset B anywhere ever holds posterior-chain work and the POSITIVE LIMB of the D93 iff empties",
+    "anchor": "{name:ex.cond[2],detail:vsets(3)+'×10'}]});",
+    "replacement": "{name:ex.backRow[0],detail:vsets(3)+'×10'}]});",
+    "gate": "gates/g200_pull_arbitration.js",
+    "note": "NAMED TRIPS: g200 P2c (positive-limb population, 150 -> 0), g200 P6 (the one-name limb census equality, {\"Kettlebell swing\":150} -> {}) AND g200 P2c-floor (the separate hard floor swapCards >= 1). WHY M4 EXISTS ALONGSIDE M2: M4 is the mutation that proves the positive limb is ALIVE, M2 proves the direction. A gate whose only mutation is the revert would pass a candidate that had quietly emptied the population, which is the E0 defect again. The floor exists precisely for this failure mode: with the limb empty, P2's iff would still be satisfiable by its else limb alone and an equality-only gate could report PASS. Measure found ONE movement carries the whole limb (Kettlebell swing, 150 of 150), so this is the minimum edit that empties it. EXPECT P2 and P4 to trip as well. The section stays a lift candidate (a row carries a _pattern), so this does NOT silently reclassify the section to 'none' and move g199's cls() census. GATEKEEPER: if this reads NOT-APPLIED or CRASH, that is a mutation defect - rewrite it, do not accept it."
+  },
+  {
+    "name": "M5 -> the Pull superset B conditioning slot is pinned to a hinge on every tier and every goal, so pull cards on g199's own 1,728-key lattice start entering the deload with a posterior-holding Pull superset B",
+    "anchor": "{name:ex.cond[2],detail:vsets(3)+'×10'}]});",
+    "replacement": "{name:'Kettlebell swing',detail:vsets(3)+'×10'}]});",
+    "gate": "gates/g199_deload_arbitration.js",
+    "note": "NAMED TRIP: g199 P0 (recorded blindness). P0 pins enterPostB === 0 of 1,440 both-enter cards, which is the statement that g199 CANNOT see the pull swap; this mutation makes the swap visible there and P0 goes red by design. THAT IS THE POINT: P0 is a self-expiring blindness claim, and a red P0 is a re-siting question, not an engine defect. Without this mutation the removal of P1/P2 from g199 would leave the pull census with zero mutation coverage in that file. EXPECT g200 P2c to trip too (the positive limb widens past 150)."
+  }
+]
