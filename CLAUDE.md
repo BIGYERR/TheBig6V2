@@ -39,6 +39,41 @@ Coach runs on fable from V200 as a measured experiment; compare its rulings agai
    - the live URL serves it: `curl -s "https://bigyerr.github.io/TheBig6V2/?cb=$(date +%s)" | grep -oE 'content="[0-9]+"'`. Cache-bust the query string; `cache-control` is `max-age=600`, so an unbusted fetch can lie for ten minutes.
    Only then is the version shipped. Tell Mario the live number you read back, not the number you pushed.
 
+## Standing rulings (settled — do not re-ask, do not re-derive)
+Each of these was paid for in a session. They are not open questions, and no agent reopens one
+without new evidence that contradicts the ruling itself.
+
+1. **A tests-only pass is not a version.** `ia-version` does not move, so nothing shipped: commit as
+   `tests: Post-V<N> tooling pass`, cut **no tag** (tags track `ia-version`; a tag on an unmoved artifact
+   points at a lie), run **no deploy proof** (rhythm step 7 does not apply — nothing reaches the phone),
+   and give it a digest line named for what it was, `- **Post-V<N> … — no build.**`, **never a V-number**.
+2. **A licence is a predicate, never prose.** An assertion pinning a direction a ruling has already found
+   wrong carries a real predicate keyed on `ia-version` that REFUSES above its era and blocks `gate.sh`.
+   A comment telling a future reader "a trip here is expected after D<N>" expires never and trips never.
+   Key it on a number that exists today, never on the version an unbuilt ruling will ship on.
+3. **A declared constant nothing reads gets its assertion wired, not deleted** — unless the claim itself
+   is unruled, in which case the constant goes. A dead pin looks maintained and defends nothing, and
+   **re-pointing one is worse than either**: it makes a vacuous line look freshly maintained. Before
+   repointing any pin, `grep -c` the symbol and require more than the declaration.
+4. **Gate and spec files are keyed to the RULING they defend, not the version being built.** A gate's
+   premise is scoped to its own build and its predicate must say so. An assertion that means "MY build
+   changed nothing" with no version predicate will fire on somebody else's build and read as a regression.
+5. **`HALF_MANNY` moves only by ruling.** The new digest is printed by coach from a source-surgery copy
+   **before** the build, recorded as an era-table row (`MANNY_DIGEST_BY_VERSION`) anchored to a
+   counterfactual digest, and **every changed card is printed before and after**. Row existence is a
+   conjunct so an absent row fails loudly. A digest read off the built artifact after the fact is never a pin.
+6. **Any builder brief over four edits is sliced before dispatch.** The cap binds the brief I write, not
+   just the agent. A long brief invites a long silent phase before the first tool call, and that is what
+   the watchdog kills.
+7. **When measure refutes a ruling's premise, it goes back to coach before builder — always.** A premise
+   that did not survive the measure is a hypothesis, not a ruling, and building on it ships the wrong
+   thing twice. Coach may retract; that is the system working, not a failure.
+
+**Mario is asked only for doctrine calls:** which pattern or quality survives, ship or hold, and anything
+that changes his own program. Siting, form, gate scope, agent order and tooling shape are the session's to
+decide and to record. This narrows WHAT reaches him; it does not soften the rule below that everything
+which does reach him arrives with a recommendation.
+
 ## Versioning (hard)
 - `<meta name="ia-version" content="N">` is the ground truth. Bump by one per release, in build order, never out of order, never two sessions on one number. Mario owns the bump.
 - In this repo the only HTML is `index.html` (Pages serves it). The previous build for blast-radius is `git show HEAD:index.html > /tmp/base.html`. Tag each release: `git tag V<N>`.
