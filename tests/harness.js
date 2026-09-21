@@ -206,16 +206,27 @@ function progDigest(prog){
 // These tables are also the record of which ruling changed Mario's program and when.
 // Two tables, never one: the deload-off digest is a COUNTERFACTUAL oracle (the engine
 // with recoveryDeload suppressed) and must not share a row with the shipped program.
+// CONVENTION (D94-t). A row records a CLAIM, not a value.
+//   A row written as a LITERAL asserts a RULED MOVE. It must cite the D-code and the
+//   counterfactual oracle that rescues its provenance: the model is g200_core_tier F1a,
+//   which pins the counterfactual to a digest two earlier versions independently
+//   shipped (see the handoff §12 provenance entry).
+//   A row written as a REFERENCE to V(N-1) asserts RULED UNMOVED. Its proof is the
+//   two-artifact run gate.sh already performs: the same digest read off V(N-1) and V(N).
+//   A MISSING row still fails loudly and cannot be satisfied by accident. Someone has
+//   to type the version number either way.
 const MANNY_DIGEST_BY_VERSION = {
   198: '6e32421331693437',
   199: '6e32421331693437',
   200: 'd4364dd3fa63a3a1',   // D89 re-pin: the ruled digest move
 };
+MANNY_DIGEST_BY_VERSION[201] = MANNY_DIGEST_BY_VERSION[200];              // D94: ruled UNMOVED (pull deload cards only; HALF_MANNY's cond[2] draws are never a hinge)
 
 const MANNY_DELOAD_OFF_DIGEST_BY_VERSION = {
   199: '75ae3d256b642a9d',
   200: '5fe2c6bb32c76498',   // D89 re-pin: the ruled digest move
 };
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[201] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[200];   // D94: ruled UNMOVED
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
                    MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION };

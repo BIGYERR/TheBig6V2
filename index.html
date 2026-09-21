@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="200"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="201"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -9401,13 +9401,24 @@ function recoveryDeload(sections){
   // posterior chain by arithmetic. This pre-pass runs the loop's OWN four tests, in the
   // loop's own order, so an index can only be picked if the loop below would also have
   // reached its accessory branch — that is what guarantees exactly one block still survives.
-  // MAIN/PRIMER/POWER/STRENGTH ARE SKIPPED, NOT SCORED. A posterior 'Main — Deadlift' must
-  // not influence the arbitration: 14.10% of cards carry a posterior main and no posterior
-  // accessory, and a naive all-sections pre-pass would leave those cards no accessory at all.
+  // MAIN/PRIMER/POWER/STRENGTH ARE SKIPPED AS CANDIDATES, AND A POSTERIOR MAIN SUPPRESSES
+  // THE PRE-PASS ENTIRELY (V201, D94). Those are two different claims and both are load-bearing.
+  // Skipped as candidates is D91: a posterior 'Main — Deadlift' must not WIN the arbitration,
+  // because 14.10% of cards carry a posterior main and no posterior accessory, and a naive
+  // all-sections pre-pass would leave those cards no accessory at all. But it must still be
+  // SEEN, which is D94: on a deload PULL day the Main is a deadlift variant by construction,
+  // so the day's hip extension is already on the card and is the heaviest thing on it. Scoring
+  // an accessory block up for a stray conditioning 'Kettlebell swing' then deleted the day's
+  // only vertical pull on 135/135 measured L-healthy cards. When __mainPost is true the loop
+  // never runs, pickIdx stays -1, and the forEach below falls back to push order — exactly one
+  // accessory block still survives, so the zero-posterior trap D91 closed stays closed.
+  // SAME LENS (_isPostChain) ON BOTH SIDES, per the pool/post-filter rule: the test that makes
+  // a block a candidate and the test that suppresses the pre-pass can never disagree.
   // Prehab is never a candidate (always kept by the loop); fluff is never a candidate
   // (always dropped). NOTHING IS REORDERED — keep.push order stays forEach order.
   let pickIdx=-1;
-  for(let i=0;i<sections.length;i++){
+  const __mainPost=sections.some(s=>s&&/^main\b|^primer|^power\b|^strength\b/.test((s.label||'').toLowerCase())&&(s.items||[]).some(it=>it&&_isPostChain(it.name)));
+  for(let i=0;i<sections.length&&!__mainPost;i++){
     const s=sections[i]; if(!s) continue;
     const L=(s.label||'').toLowerCase();
     if(/^main\b|^primer|^power\b|^strength\b/.test(L)) continue;               // main work: never a candidate

@@ -28,10 +28,21 @@
 // THERE IS NO BASELINE-RELATIVE ASSERTION IN THIS FILE. tests/sabotage.py passes no argv[3].
 // Every number is an absolute count with its denominator printed beside it (D95).
 //
-// ACCEPTANCE PROPERTY — this gate must be RED on the predecessor. Against
-// `git show V198:index.html` it MUST read P1 PASS, P2c PASS, P4 FAIL (0 of 150) and P2 FAIL
-// with exactly 150 violations. Against shipped V199 all four PASS. If it is green on BOTH
-// artifacts it is not testing what it claims and it must be rewritten, not re-pinned.
+// ACCEPTANCE PROPERTY, RE-PINNED BY D94 (V201). There is no longer an ia-version licence in
+// this file. It was deleted rather than re-keyed to 201: no ruling is queued that reverses
+// D94, and §10b keys an expiry to the artifact only when an era is known to end. THE PROOF
+// BELOW REPLACES IT, and it must hold on all four artifacts:
+//   V201 (D94 shipped)      all green.
+//   V200                    P2 FAIL with EXACTLY 150 violations, P4 FAIL 0 of 150,
+//                           P7 FAIL 0 of 150 (the artifact ships no vertical pull on them).
+//   V199                    P2 FAIL with EXACTLY 150 violations, P4 FAIL 0 of 150,
+//                           P7 FAIL 0 of 150.
+//   V198                    GREEN, AND THAT IS CORRECT. V198 predates D91, A survives there,
+//                           and the D94 rule predicts A there too. Do not "fix" this green:
+//                           the suite still separates V198 from the rest because V198 is red
+//                           on g199_deload_arbitration.js, D91's leg family.
+// If P2 is GREEN on V200 the re-pin has failed and this file is to be rewritten, not adjusted.
+// FAIL-by-150 on the predecessor is the whole proof a prose licence could never give.
 //
 // usage: node tests/gates/g200_pull_arbitration.js <candidate.html> [ignored]
 // env:   G200_SHARDS (default min(4, cpus))
@@ -59,6 +70,21 @@ const PROBE=[['Back squat',0],['Leg extension',0],['Lying leg curl',0],['Leg pre
   ['Chin-up',0],['Face pull',0],
   ['Nordic hamstring curl (anchored)',1],['Single-leg glute bridge',1],['Barbell Romanian deadlift',1],
   ['45° back extension',1],['Kettlebell swing',1],['Dumbbell split-stance deadlift',1],['Barbell hip thrust',1]];
+
+// ── HAND ORACLE 2: vertical pull. LIFTED VERBATIM from tests/measure/v201_d94_population.js,
+// where the D94 population was measured. Typed from the movement names, never from an engine
+// predicate: this file calls neither _isPostChain nor _pattern nor any classifier of the app's.
+// A vertical pull loads the lat from overhead — bar, ring or rope above the shoulder, elbow
+// travelling from overhead to the ribs. Rows are HORIZONTAL and must read 0; face pulls and
+// pullovers are neither and must read 0. Those four negatives are what make the table an
+// oracle rather than a substring search for the word "pull".
+const V_PULL=/pull-?down|pull-?up|pullup|chin-?up|chinup|lat prayer|muscle-?up|\bhang(ing)? row\b(?!)|kneeling.*pulldown|straight-?arm pulldown|\bpull-?ups?\b/i;
+const isVPull=n=>V_PULL.test(String(n||''));
+// A6 probe: 14 names, seven positives and seven negatives, expected column hand-typed.
+const VPROBE=[['Lat pulldown',1],['Neutral-grip pulldown',1],['Chinups',1],['Pull-ups',1],
+  ['Assisted pull-up',1],['Kneeling band pulldown',1],['Straight-arm pulldown',1],
+  ['Barbell row',0],['Pendlay row',0],['Chest-supported row',0],['Face pull',0],
+  ['Dumbbell pullover',0],['Inverted row (supinated, under a table)',0],['Kettlebell swing',0]];
 
 // ── the deload loop's four candidacy tests. Byte-identical to g199's cls() ─────────────
 const KMAIN=/^main\b|^primer|^power\b|^strength\b/, KPREHAB=/hip|mobility|stretch/, KFLUFF=/carry|finisher|conditioning|explosive/;
@@ -124,8 +150,9 @@ const bump=(o,k)=>{o[k]=(o[k]||0)+1;};
 
 function blank(){return{configs:0,dayCells:0,dlDayBuilds:0,
   famP2:0,famP2Cards:0,famP2ByLabel:{},famP1:0,famP1ByLabel:{},
-  bothEnter:0,swapCards:0,swapItems:{},swapByGoal:{},swapByTier:{},swapByExp:{},swapByRest:{},
+  bothEnter:0,mainPostCards:0,swapCards:0,swapItems:{},swapByGoal:{},swapByTier:{},swapByExp:{},swapByRest:{},
   census:{},viol:0,violShape:{},
+  mainPostSwap:0,p7VPull:0,p7Names:{},p7Miss:[],
   p4Survive:0,p4Loss:{},p4Examples:[]};}
 
 function sweep(mine,instFile){
@@ -150,23 +177,43 @@ function sweep(mine,instFile){
       S.dlDayBuilds++;
       const aPost=labPost(r.p1,'Pull superset A');
       const bPost=labPost(r.p1,'Pull superset B');
+      // D94: a Main-class section holding a posterior item at p1 SUPPRESSES the pre-pass.
+      // SAME LENS BOTH SIDES, which is the pool/post-filter rule: the app tests KMAIN on the
+      // section label and _isPostChain on the item name; this gate tests the same KMAIN (via
+      // cls(), whose 'main' limb is label-only, so a __SNAP section suffices) and E_PAT on the
+      // item name (via isPost()). Neither _pattern nor _isPostChain is called from this file.
+      const mainPost=(r.p1||[]).some(s=>cls(s)==='main'&&(s.n||[]).some(isPost));
       const bothEnter=hasLab(r.p1,'Pull superset A')&&hasLab(r.p1,'Pull superset B');
       if(!bothEnter) return;
       S.bothEnter++;
+      if(mainPost) S.mainPostCards++;
       // ── P2: expected survivor at p2. STAGE record, never the shipped card ──
-      const exp=bPost?'B':'A';
+      const exp=(bPost&&!mainPost)?'B':'A';
+      const ep=((aPost?'A':'')+(bPost?'B':''))||'none';
       const act=((hasLab(r.p2,'Pull superset A')?'A':'')+(hasLab(r.p2,'Pull superset B')?'B':''))||'none';
-      bump(S.census,'enterPost='+((aPost?'A':'')+(bPost?'B':'')||'none')+' exp='+exp+' surv='+act);
-      if(act!==exp){S.viol++;bump(S.violShape,'exp='+exp+' got='+act+' (Bpost='+bPost+')');}
+      bump(S.census,'enterPost='+ep+(ep==='none'?'':' mainPost='+(mainPost?'yes':'no'))+' exp='+exp+' surv='+act);
+      if(act!==exp){S.viol++;bump(S.violShape,'exp='+exp+' got='+act+' (Bpost='+bPost+' mainPost='+mainPost+')');}
       if(!bPost) return;
       // ── P2c: the positive limb ──
       S.swapCards++;
       bump(S.swapByGoal,L.g);bump(S.swapByTier,L.t);bump(S.swapByExp,L.x);bump(S.swapByRest,L.r);
       secOf(r.p1,'Pull superset B').forEach(s=>s.n.forEach(n=>{if(isPost(n))bump(S.swapItems,n);}));
-      // ── P4: does B reach the SHIPPED card (past capRegionalFatigue and capSessionBudget)? ──
-      const bItems=[].concat(...secOf(r.p1,'Pull superset B').map(s=>s.n));
-      const intact=(ship||[]).some(s=>(s.l==='Pull superset B')
-        ||(s.l==='Pull'&&(s.n||[]).length&&s.n.every(n=>bItems.includes(n))));
+      // ── P2d: does the D94 conjunct actually FIRE on this positive-limb card? Read off p1,
+      //    the deload's INPUT, with the same cls() 'main' limb and the same E_PAT the app's
+      //    own __mainPost uses on its side of the seam. ──
+      if(mainPost) S.mainPostSwap++;
+      // ── P7: the vertical pull, read off the SHIPPED card. This is the only other pin in
+      //    this file that reads a shipped card (P4 is the first), and it is deliberate: P7
+      //    asserts what the athlete ends up holding, not what the arbitration selected. ──
+      const vp=[].concat(...(ship||[]).map(s=>s.n||[])).filter(isVPull);
+      if(vp.length){S.p7VPull++;vp.forEach(n=>bump(S.p7Names,n));}
+      else if(S.p7Miss.length<3)S.p7Miss.push({cfg:L.key,card:'w'+r.w+' '+r.d,
+        shipped:(ship||[]).map(s=>s.l+' ['+s.n.join(' + ')+']')});
+      // ── P4 (D94): does A reach the SHIPPED card (past capRegionalFatigue and
+      //    capSessionBudget)? The block D94 keeps is A, so A is the one tracked end to end. ──
+      const aItems=[].concat(...secOf(r.p1,'Pull superset A').map(s=>s.n));
+      const intact=(ship||[]).some(s=>(s.l==='Pull superset A')
+        ||(s.l==='Pull'&&(s.n||[]).length&&s.n.every(n=>aItems.includes(n))));
       if(intact) S.p4Survive++;
       else{
         const at2=(r.p2||[]).filter(s=>FAM.includes(s.l)).map(s=>s.l).join(',')||'none';
@@ -174,7 +221,7 @@ function sweep(mine,instFile){
         const atS=(ship||[]).filter(s=>FAM.includes(s.l)).map(s=>s.l).join(',')||'none';
         bump(S.p4Loss,'p2='+at2+' p3(capRegional)='+at3+' shipped='+atS);
         if(S.p4Examples.length<3)S.p4Examples.push({cfg:L.key,card:'w'+r.w+' '+r.d,
-          p1_B:bItems,p2:at2,p3:at3,shipped:(ship||[]).map(s=>s.l+' ['+s.n.join(' + ')+']')});
+          p1_A:aItems,p2:at2,p3:at3,shipped:(ship||[]).map(s=>s.l+' ['+s.n.join(' + ')+']')});
       }
     });
   });
@@ -198,16 +245,19 @@ if(process.env.G200SHARD!==undefined){
 }
 
 // ── parent ────────────────────────────────────────────────────────────────────────────
-let PASS=0,FAIL=0,REFUSED=0;
+let PASS=0,FAIL=0;
 const ok=(c,m)=>{ if(c){PASS++;console.log('  ok   '+m);} else {FAIL++;console.log('  FAIL '+m);} };
-// REFUSAL MACHINERY, lifted from g197d_d84_base.js:133 (the E1h shape, ruled V198). A refused
-// assertion was NOT put and is NOT a pass. gate.sh:85 greps ^REFUSED beside the summary and
-// blocks on it, so a refusal here stops the suite even though the exit code stays 0.
-const refuse=(n,why)=>{ REFUSED++; console.log('REFUSE '+n+'  -> '+why); };
-// pinned() is the D94 re-pin predicate applied to ONE assertion: armed at or below
-// ia-version 200, refused above it. The predicate itself is in section A, off the artifact.
-const pinned=(code,c,m)=>{ if(D91_ERA) ok(c,m); else refuse(code+' (D91-era pull-shape pin)',REFUSE_WHY); };
-const done=()=>{ if(REFUSED) console.log('REFUSED '+REFUSED+' assertion(s) — see the REFUSE lines above. A REFUSED assertion was NOT run and is NOT a pass.'); console.log('PASS '+PASS+' FAIL '+FAIL); process.exit(FAIL?1:0); };
+// THE ia-version LICENCE IS GONE (V201, D94). P2, P2c, P4 and P6 used to run through a
+// licence wrapper that armed them at or below ia-version 200 and REFUSED them above it. That
+// predicate did its one job: it fired on V201, the build D94 was ruled for, and forced this
+// re-pin instead of letting D94 inherit a green pin. It is deleted rather than re-keyed to 201
+// because no ruling is queued that reverses D94, and §10b keys an expiry to the artifact only
+// when an era is known to END. A >= 201 arm was considered and rejected: a stray V200 candidate
+// reading REFUSED is weaker than the same candidate reading FAIL by exactly 150, and that FAIL
+// is the proof the rule wants. The four pins are plain ok() rows now, like P1 and the floor.
+// The 'REFUSED A2-P4' line further down is NOT this machinery: it reports an instrument that
+// could not be placed, which is a real did-not-run, and it stays.
+const done=()=>{ console.log('PASS '+PASS+' FAIL '+FAIL); process.exit(FAIL?1:0); };
 const g=(o,k)=>(o&&o[k])||0;
 // Hard floor in the shape the baseline-free gates use: an equality pin alone cannot stop a
 // future lattice edit from silently returning this gate to the else-limb-only state that
@@ -216,28 +266,12 @@ const NOBASE_MIN=1;
 
 console.log('── A. instrument sanity and oracle sanity (every number below is void without these) ──');
 const RAW=fs.readFileSync(ART,'utf8');
-// ── THE D94 RE-PIN PREDICATE. This REPLACES the prose licence that used to sit above P2 ──
-// Prose is not a licence. A comment saying "a trip here is expected once D94 ships" expires
-// nothing and trips nothing; §10b rules that a licence is an equality that self-expires.
-// D94 is unbuilt and its version number DOES NOT EXIST, so this predicate cannot key on "the
-// version D94 ships on" — a predicate on a number that does not exist is prose with extra
-// steps. It keys on the ARTIFACT instead:
-//   ia-version <= 200 : arm the D91-era pull shape (P2, P2c 150, P4 150/150, P6 swing 150).
-//   ia-version >  200 : REFUSE all four, loudly, in the g197d E1h shape. gate.sh greps
-//                       ^REFUSED and blocks.
-// CONSEQUENCE, RULED AND INTENDED: the FIRST V201 build is red whether or not D94 is in it.
-// That is the point. D94 must bring its own after-grid and RE-PIN these four rather than
-// inherit a green gate asserting a survivor coach has already ruled coaching-wrong.
-const IAV_M=/<meta\s+name="ia-version"\s+content="(\d+)"/.exec(RAW);
-const IAV=IAV_M?parseInt(IAV_M[1],10):NaN;
-const D91_ERA=Number.isFinite(IAV)&&IAV<=200;
-const REFUSE_WHY=(IAV_M
-  ?'NOT RUN: this candidate reads ia-version '+IAV+', past 200, and these four pins describe the D91-era pull shape only. '
-  :'NOT RUN: this candidate carries no readable ia-version meta, so this gate cannot tell whether D94 has re-ruled the pull arbitration. ')
-  +'P2, P2c, P4 and P6 pin the D91 pull shape: on a both-enter deload pull card the survivor is Pull superset B if and only if B holds an E_PAT posterior item at p1, the positive limb is exactly 150 cards, and one movement carries all of it. '
-  +'Coach has ruled that direction COACHING-WRONG on pull days: the deload keeps a hinge drawn from the conditioning pool while the Main is already a deadlift variant, and deletes the day\'s only vertical pull. D94 IS THE RULING THAT RE-PINS THESE FOUR. '
-  +'D94 must re-rule and re-pin before this gate runs on V201 or later. A claim that did not run is NOT a pass.';
-console.log('   ia-version read off the candidate: '+(IAV_M?IAV:'UNREADABLE')+'  ->  D91-era pins '+(D91_ERA?'ARMED':'REFUSED'));
+// D94 SHIPPED, SO THE PREDICATE THAT GUARDED THE D91-ERA PINS IS GONE, NOT RE-KEYED. What
+// stood here read ia-version off the candidate and refused P2, P2c, P4 and P6 above 200. It
+// fired exactly once, on V201, which is what forced this re-pin. Keeping a mirrored >= 201
+// arm would only make a stray V200 candidate read REFUSED instead of FAIL, and FAIL by exactly
+// 150 on the predecessor is strictly the better signal. The acceptance table at the head of
+// this file is the replacement, and it is checked by running this gate on four artifacts.
 const anchorN=RAW.split(A_PIPE).length-1;
 ok(anchorN===1,'A1 week-assembly instrumentation anchor is unique (count '+anchorN+')');
 if(anchorN!==1){ console.log('REFUSED A2-P4: the p1/p2/p3 instrument could not be placed, so nothing about the pull arbitration was measured. A claim that did not run is not a pass.'); done(); }
@@ -259,6 +293,10 @@ ok(probeBad.length===0,'A4 the hand posterior oracle passes its blindness probe 
 const clsBad=CLS_PROBE.filter(([s,e])=>cls(s)!==e);
 ok(clsBad.length===0,'A5 SPLIT-LENS GUARD: the four candidacy tests carried here byte-identical from g199 pass a hand-typed probe on all '+CLS_PROBE.length+' sections, and the three pull-family labels land on cand'
   +(clsBad.length?' — misreads '+clsBad.map(x=>x[0].l+'=>'+cls(x[0])+' want '+x[1]).join(', '):''));
+const vprobeBad=VPROBE.filter(([n,e])=>(isVPull(n)?1:0)!==e);
+ok(vprobeBad.length===0,'A6 the hand VERTICAL-PULL oracle passes its blindness probe on all '+VPROBE.length+' names, '
+  +VPROBE.filter(x=>x[1]===1).length+' positives and '+VPROBE.filter(x=>x[1]===0).length+' negatives. The negatives are the load-bearing half: three horizontal rows, a face pull and a pullover must all read 0, so P7 cannot be satisfied by a section that merely has the word pull in a movement name. P7 is void without this row'
+  +(vprobeBad.length?' — misreads '+vprobeBad.map(x=>x[0]).join(', '):''));
 
 console.log('── B. the fixture boots and builds ──');
 const fdig=progDigest(IP.buildProgram(fixtures.HALF_MANNY));
@@ -303,28 +341,28 @@ function report(){
     + 'got '+R.famP2+' (A '+g(R.famP2ByLabel,'Pull superset A')+' + B '+g(R.famP2ByLabel,'Pull superset B')+' + bare Pull '+g(R.famP2ByLabel,'Pull')+'), p1 INPUT '+R.famP1);
 
   console.log('── P2. the per-card expected survivor, read off the p1/p2 STAGE record ──');
-  // ── P2 SITS UNDER THE D94 RE-PIN PREDICATE, NOT UNDER A PROSE LICENCE ───────────────
-  // What stood here was a comment telling a future reader that a trip after D94 was expected.
-  // It expired nothing and it tripped nothing, and coach ruled that prose is not a licence.
-  // The licence is now the ia-version predicate in section A, and P2 is put through pinned():
-  // armed at or below 200, REFUSED above it. P2 is a correct description of the engine at V199
-  // and it is NOT a coaching endorsement. Until D94 ships, a trip here is a real defect.
+  // ── P2 IS NARROWED BY D94, NOT REVERSED ────────────────────────────────────────────
+  // D91's iff is still here. D94 adds ONE conjunct to its positive limb: B wins only when no
+  // Main-class section already holds a posterior item at p1. On a deload pull day the Main is
+  // a deadlift variant by construction, so that conjunct is false on all 150 positive-limb
+  // cards and every one of them keeps A. The else limb of D91 is untouched.
   //
   // Keyed on the p1/p2 STAGE record and never on the shipped card: g193_samecard.js:374 already
   // rules that the Pull superset A label is not asserted to survive to the card, and P2 must not
   // collide with that ruling. P4 below is the one that reads the shipped card, by design.
-  pinned('P2',R.viol===0&&R.bothEnter===210&&R.swapCards>0,
-    'P2 WHICH BLOCK SURVIVES (D93 amended, re-pinned by D94): on every deload day build where BOTH Pull superset A and Pull superset B enter p1, exactly one survives to p2, and the survivor is B if and only if B holds an E_PAT posterior item on p1, else A. THAT WHICH-BLOCK RULE IS THE WHOLE OF WHAT P2 CLAIMS: it claims NOTHING about the FIRST-posterior-wins clause, for the measured reason in the SCOPE paragraph below. '
+  ok(R.viol===0&&R.bothEnter===210&&R.swapCards>0,
+    'P2 WHICH BLOCK SURVIVES (D93 amended, NARROWED by D94 V201): on every deload day build where BOTH Pull superset A and Pull superset B enter p1, exactly one survives to p2, and the survivor is Pull superset B if and only if B holds an E_PAT posterior item on p1 AND no Main-class section holds one on p1; else Pull superset A. D94 ADDED THE SECOND CONJUNCT AND NOTHING ELSE: D91\'s rule is narrowed, not reversed, and the else limb is byte-unchanged. THAT WHICH-BLOCK RULE IS THE WHOLE OF WHAT P2 CLAIMS: it claims NOTHING about the FIRST-posterior-wins clause, for the measured reason in the SCOPE paragraph below. '
     + 'VIOLATIONS '+R.viol+' of '+R.bothEnter+' both-enter deload day builds (want 0 of 210). The denominator is stated because a zero with no denominator is the vacuity defect this repo has caught three times; surv=AB and surv=none are BOTH scored as violations, so the exactly-one-survives claim sits inside this same number. '
-    + 'THE POSITIVE LIMB IS EXERCISED '+R.swapCards+' TIMES (want 150): '+R.swapCards+' of the '+R.bothEnter+' cards enter with B holding a posterior item, and the remaining '+(R.bothEnter-R.swapCards)+' enter with neither block holding one and must keep A. Both limbs are live here, which is precisely what was NOT true when these pins sat in g199 on a lattice where all 1,440 both-enter cards read enterPost=none. '
-    + 'CENSUS '+JSON.stringify(R.census)+'. V198 reads {"enterPost=B exp=B surv=A":150,"enterPost=none exp=A surv=A":60} through this same gate, so P2 is RED on the predecessor with exactly 150 violations and the 60 no-posterior cards survive as A on BOTH versions: the oracle is not trivially satisfiable. '
+    + 'THE MAIN CLAUSE FIRES ON '+R.mainPostCards+' of the '+R.bothEnter+' both-enter cards (want 210, i.e. ALL of them), which is the coaching fact D94 rests on: a deload PULL day draws its Main from the deadlift family by construction, so the day\'s hip extension is already on the card and is the heaviest thing on it. Keeping a conditioning-pool swing on top of it and deleting the day\'s only vertical pull is the defect D94 removes. '
+    + 'THE POSITIVE LIMB OF D91 IS STILL EXERCISED '+R.swapCards+' TIMES (want 150): '+R.swapCards+' of the '+R.bothEnter+' cards enter with B holding a posterior item, and the remaining '+(R.bothEnter-R.swapCards)+' enter with neither block holding one. Under D94 all 210 keep A, but by TWO DIFFERENT ROUTES, and both routes are live: 150 by the Main clause and 60 by the plain no-posterior else limb. That is why P2 is not the same assertion as "A always survives" and why the 150 must stay visible in the census. '
+    + 'CENSUS '+JSON.stringify(R.census)+' (want {"enterPost=B mainPost=yes exp=A surv=A":150,"enterPost=none exp=A surv=A":60}). SEPARATION, AND IT IS NOT SYMMETRIC: V200 and V199 both read enterPost=B surv=B on those 150 cards, so P2 FAILS on each of them with EXACTLY 150 violations, which is the whole re-pin proof. V198 predates D91, keeps A on all 210, and is GREEN here — correct and expected, not a hole: the suite separates V198 from the rest on g199_deload_arbitration.js, D91\'s leg family. '
     + 'SCOPE — MEASURED, DO NOT RE-DERIVE THIS, IT COST A FULL MEASURE PASS: the FIRST-wins clause (the `break` in the posterior pre-pass, index.html:9412) is STRUCTURALLY UNOBSERVABLE ON ANY PULL LATTICE. A pull card holds at most ONE posterior-candidate block by construction: Pull superset A is row plus vertical pull; Pull superset B has exactly one posterior-capable slot, the ex.cond[2] draw; Row volume is one row; Main backMain is skipped as a main; the rest are optional or fluff. With one posterior-holding block per card, first-wins and last-wins select IDENTICALLY, so removing the break changes nothing this gate can see. '
     + 'THE NUMBERS: over 217,728 deload day builds, 10,443 (4.80%) carry 2+ posterior-holding candidate blocks, and 0 of those involve the pull family. Eleven lattice extensions were costed; only two contain the population at all and both contain it as LEG cards, which this gate\'s FAM does not read. NO LATTICE CHANGE CAN FIX THIS and MINI_LATTICE must not be widened in an attempt to. '
     + 'THE FIRST-WINS CLAUSE IS COVERED ELSEWHERE, BY NAME: g199_deload_arbitration.js G1/G2/F3c/H5, on 1,776 M1-observable cards of 15,360 deload day builds (11.6%), of which the 1,350 containing Leg isolation reconcile G1\'s hand pin independently as 1,080 + 240 + 30. tests/sabotage/v200.json M1 is declared against g199 for exactly that reason. '
-    + 'D94 REVERSES THE DIRECTION THIS PINS, and the ia-version predicate in section A REFUSES this assertion on any candidate past 200 rather than let D94 inherit a green pin.');
+    + 'THERE IS NO LICENCE ON THIS ASSERTION ANY MORE. The ia-version predicate that refused it above 200 fired on V201, forced this re-pin, and was deleted rather than re-keyed. If a future ruling moves the pull arbitration again, re-derive this census from that ruling\'s after-grid; do not adjust a number to make a red go green.');
 
   console.log('── P2c. the positive-limb population, read off p1, the deload\'s INPUT ──');
-  pinned('P2c',R.swapCards===150,
+  ok(R.swapCards===150,
     'P2c POSITIVE-LIMB POPULATION: both-enter deload pull cards whose Pull superset B holds an E_PAT posterior item at p1 == 150 of '+R.dlDayBuilds+' deload day builds ('+R.bothEnter+' of which offer both blocks); got '+R.swapCards+'. '
     + 'THIS IS A LEGITIMATE PIN BECAUSE IT IS READ OFF p1, THE DELOAD\'S INPUT, NOT ITS OUTPUT: V198 reads 150 and V199 reads 150, identical, so it is a property of the program builder UPSTREAM of the arbitration, which the arbitration cannot move. It is the denominator P2\'s positive limb and P4 are quoted against, and it is why a change to the pull pool shows up here first. '
     + 'ONE MOVEMENT CARRIES THE ENTIRE POSITIVE LIMB: Kettlebell swing, 150 of 150, identical on both artifacts. Segments: goal '+JSON.stringify(R.swapByGoal)+' (want half 60, marathon 90), tier '+JSON.stringify(R.swapByTier)+' (want 30 each across commercial, home_full, crossfit, home_basic, minimal), exp '+JSON.stringify(R.swapByExp)+' (want 75 each), rest '+JSON.stringify(R.swapByRest)+' (want 50 each). items '+JSON.stringify(R.swapItems));
@@ -332,21 +370,39 @@ function report(){
     'P2c-floor HARD FLOOR, separate from the equality above: the positive limb is exercised at least '+NOBASE_MIN+' time (got '+R.swapCards+'). '
     + 'A future edit to the shared lattice in tests/measure/v200_g200_pins.js that emptied this population would leave P2 asserting only its else limb and still reporting PASS. That is the exact failure this whole file exists to correct, and an equality pin alone does not name it.');
 
+  console.log('── P2d. the D94 conjunct is EXERCISED on the positive limb, not merely asserted ──');
+  ok(R.mainPostSwap===150&&R.swapCards===150,
+    'P2d THE NEW CONJUNCT FIRES ON EVERY CARD IT DECIDES: of the '+R.swapCards+' both-enter deload pull cards whose Pull superset B holds an E_PAT posterior item at p1 — D91\'s positive limb, which is exactly the set of cards D94 changes the answer on — '+R.mainPostSwap+' ALSO carry a Main-class section holding an E_PAT posterior item at p1. WANT 150 OF 150. '
+    + 'WHY THIS IS A SEPARATE ASSERTION FROM P2: P2 reads 0 violations of 210, and a clause that never fired would produce that same 0 on the 60 no-posterior cards while quietly leaving the other 150 selecting B — except it would not, because those 150 would then be violations. What P2 cannot show on its own is that all 210 reach A by the TWO different routes it claims. P2d pins the route: if this count were 149, one card would keep B, D94 would decide nothing there, and the conjunct would be carrying less than the ruling says it carries. The equality is what makes P2\'s green a consequence of D94 rather than an arithmetic coincidence. '
+    + 'CONTEXT, PRINTED AND DELIBERATELY NOT PINNED: across ALL '+R.bothEnter+' both-enter cards the Main-class posterior count reads '+R.mainPostCards+' (measured 210 of 210 — a superset of the 150, because the 60 cards that enter with NO posterior accessory still carry a posterior Main). Coach ruled 150 of 150. 210 of 210 is a STRONGER claim than the one ruled, and a stronger claim than the ruling is still an unruled claim, so it is printed here for drift and pinned nowhere. '
+    + 'THIS IS A LEGITIMATE PIN FOR THE SAME REASON P2c IS: it is read off p1, the deload\'s INPUT, so it is a property of the program builder UPSTREAM of the arbitration and the arbitration cannot move it. It therefore reads 150 on all four artifacts and SEPARATES NOTHING. That is correct and intended: separation is P2, P4 and P7. P2d\'s job is to stop the positive limb being declared decisive without being shown decisive.');
+
   console.log('── P6. the whole positive limb is ONE NAME, now said out loud as an equality ──');
   const P6N=Object.keys(R.swapItems||{}).sort();
   const P6OK=P6N.length===1&&P6N[0]==='Kettlebell swing'&&R.swapItems['Kettlebell swing']===150;
-  pinned('P6',P6OK,
-    'P6 ONE-NAME LIMB CENSUS, AS AN EQUALITY: the E_PAT posterior-name census held by Pull superset B at p1 on this lattice == {"Kettlebell swing":150} — one name, that count, and nothing else in the object; got '+JSON.stringify(R.swapItems)+'. '
-    + 'WHY THIS IS ITS OWN ASSERTION: the ENTIRE positive limb of P2 and P4 rests on a single movement, and until now it rested there silently. Pull superset B\'s only posterior-capable slot is one draw off EXLIB.conditioning (index.html:1626) = [Ball slams, Kettlebell swing, Burpees, Broad jumps, Mountain climbers, Jump squats], of which EXACTLY ONE is E_PAT posterior. On bodyweight, _bwFlat (index.html:7922) substitutes six names of which ZERO are, which is why the bodyweight tier is excluded from this lattice. '
+  ok(P6OK,
+    'P6 ONE-NAME LIMB CENSUS, AS AN EQUALITY: the E_PAT posterior-name census held by Pull superset B at p1 on this lattice == {"Kettlebell swing":150} — one name, that count, and nothing else in the object; got '+JSON.stringify(R.swapItems)+'. THE NUMBER IS UNCHANGED BY D94 AND THE MEANING IS INVERTED. '
+    + 'THIS IS NOW THE MOVEMENT THE FIX DECLINES TO KEEP. Until D94 the swing was the movement that WON the arbitration: it was the posterior item that lifted Pull superset B over A and cost the day its vertical pull. D94 does not remove it from the pool and does not stop it being drawn; it stops it OUTSCORING the block it was beating, because the Main on that day is already a deadlift variant. So the 150 is still the exact population under discussion, and it is now the population where the swing loses. Read it beside P2\'s Main-clause count, which is the reason it loses. '
+    + 'WHY THIS IS ITS OWN ASSERTION: the entire positive limb of P2 rests on a single movement, and before this pin it rested there silently. Pull superset B\'s only posterior-capable slot is one draw off EXLIB.conditioning (index.html:1626) = [Ball slams, Kettlebell swing, Burpees, Broad jumps, Mountain climbers, Jump squats], of which EXACTLY ONE is E_PAT posterior. On bodyweight, _bwFlat (index.html:7922) substitutes six names of which ZERO are, which is why the bodyweight tier is excluded from this lattice. '
     + 'Over the wide lattice the same census reads {"Kettlebell swing":7200} — 7,200 of 7,200, 100%, one name — and no other posterior name appears anywhere in that section\'s 15-name occupancy census. '
     + 'A POOL EDIT THAT ADDS OR REMOVES A POSTERIOR NAME IN THAT LIST RE-PINS P6 AND P2c TOGETHER: P2c moves off 150 and P6 moves off the single name. Re-derive BOTH from the new pool; never relax one to match the other. This converts a silent single point of failure into a named one. tests/sabotage/v200.json M4 removes exactly this name and must trip P6, P2c and P2c-floor by name.');
 
   console.log('── P4. survival of the newly selected block all the way to the shipped card ──');
-  pinned('P4',R.p4Survive===150&&R.swapCards===150,
-    'P4 END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): of the '+R.swapCards+' cards where Pull superset B holds the hinge at p1, '+R.p4Survive+' arrive at the SHIPPED card with Pull superset B or its bare rename intact (want 150 of 150, zero losses). '
-    + 'This pin READS THE SHIPPED CARD BY DESIGN, which is what separates it from P2: P2 proves the arbitration selected B, P4 proves nothing downstream quietly took it back. '
-    + 'V199 is 150 of 150 with zero losses at capRegionalFatigue and capSessionBudget. V198 is 0 of 150, every one of them in the single shape p2/p3/shipped = Pull superset A, because V198 never selected B at all. P4 is therefore RED on the predecessor with the whole population lost. '
+  ok(R.p4Survive===150&&R.swapCards===150,
+    'P4 END-TO-END, FLIPPED BY D94 (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): of the '+R.swapCards+' cards where Pull superset B holds the hinge at p1, '+R.p4Survive+' arrive at the SHIPPED CARD with PULL SUPERSET A or its bare rename intact (want 150 of 150, zero losses). This pinned B before D94; A is now the block the arbitration keeps, so A is the block that has to survive the trip. '
+    + 'This pin READS THE SHIPPED CARD BY DESIGN, which is what separates it from P2: P2 proves the arbitration kept A, P4 proves nothing downstream quietly took it back. The two are not redundant, and P4 is the only place in this file that reads a shipped card. '
+    + 'COUNTERFACTUAL, MEASURED, NOT INFERRED: the revert is 150 of 150 and there are ZERO losses at capRegionalFatigue or capSessionBudget on the shipped card, so the block the arbitration selects is exactly the block the athlete reads. V200 and V199 are 0 of 150 here, every one of them in the single shape where A is gone by p2, because those artifacts select B. P4 is therefore RED on both predecessors with the whole population lost, and GREEN on V198, which never selected B at all. '
     + 'loss shapes '+JSON.stringify(R.p4Loss));
+
+  console.log('── P7. the vertical pull: what D94 is FOR, read off the shipped card ──');
+  console.log('     CENSUS vertical-pull names on the shipped positive-limb cards '+JSON.stringify(R.p7Names));
+  (R.p7Miss||[]).forEach((e,i)=>console.log('     P7 MISS EX '+(i+1)+' '+JSON.stringify(e)));
+  ok(R.p7VPull===150&&R.swapCards===150,
+    'P7 THE DAY KEEPS ITS VERTICAL PULL: of the '+R.swapCards+' positive-limb deload pull cards, '+R.p7VPull+' ship a card carrying at least one VERTICAL PULL by the V_PULL hand table (want 150 of 150). This is the assertion that says what D94 is FOR. P2 proves WHICH BLOCK the arbitration selected and P4 proves the block survived the trip; neither of them says a word about what is IN it, and the defect D94 removes is not a label going missing, it is a MOVEMENT going missing. '
+    + 'THE DEFECT, MEASURED: on the L-healthy lattice 135 of 135 cards shipped with ZERO vertical pull. The movements deleted were L-sit chinups on 90 of them and Neutral-grip chinups on 45. The day\'s only overhead pull was being thrown away to keep a conditioning-pool Kettlebell swing on a card whose Main is already a deadlift variant. On THIS mini lattice under D94 the census reads {"Weighted chinups":90,"L-sit chinups":60}; the names are printed above as context and are NOT pinned, because the ruled claim is that the vertical pull is THERE, not which one was drawn. '
+    + 'ORACLE INDEPENDENCE: V_PULL is a hand table typed from the movement names and proved by A6\'s 14-name blindness probe, seven positives and seven negatives, the negatives including three horizontal rows, a face pull and a pullover. It is NEVER a call into the engine\'s classifier — this file calls neither _isPostChain nor _pattern, and P7 adds no exception to that. '
+    + 'P7 READS THE SHIPPED CARD BY DESIGN, which is the point and which is what distinguishes it from P2: P2 keys on the p1/p2 stage record because g193_samecard.js:374 rules that the Pull superset A LABEL is not asserted to survive to the card. P7 asserts no label. It asserts that an overhead pull is on the card the athlete holds, by whatever label it ends up under, so it does not collide with that ruling. '
+    + 'SEPARATION: V200 and V199 select Pull superset B on all 150 of these cards, and Pull superset B is a row-family accessory plus the ex.cond[2] conditioning draw — neither is a vertical pull — so P7 reads 0 of 150 and is RED on both. V198 never selects B, keeps A, and is GREEN here, correct and expected. IF P7 IS GREEN ON V200 IT IS NOT MEASURING WHAT IT CLAIMS: report that, do not adjust the pin.');
 
   console.log('── SCOPE NOTE ──');
   console.log('  P3 (shipped bare `Pull` carrying exactly one item, that item posterior) is deliberately');
