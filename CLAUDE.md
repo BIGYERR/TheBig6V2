@@ -103,7 +103,7 @@ which does reach him arrives with a recommendation.
 - Python edit scripts use literal bytes (real em-dashes, real `×`), never escapes.
 
 ## Architecture invariants
-- `prog.weeks` is a build artifact, not a record. `refreshProgram` rebuilds from `cfg + seed` on every boot and never reads `prog.weeks` back from storage. Anything that needs what the athlete actually saw reads `ia_hist_`.
+- `prog.weeks` is rebuilt from `cfg + seed` on every boot AND persisted: `ia_programs` carries the whole grid (58,478 bytes for one 11-week program) and `refreshProgram` reads it back, load-bearing — strip the stored grid and 9 of 9 logged run sessions flip off target (measured V202). The persisted grid is the freeze's source; it holds no overlays, so anything that needs what the athlete actually SAW still reads `ia_hist_`.
 - Week freeze is per-DAY. Injury overlays pierce untrained days only; trained days stay byte-identical.
 - `exStoreKey()` / `EX_KEY_ALIAS` is the single writer of `ia_exw_` slug keys.
 - `cfg` is never mutated by the engine; `buildProgram` is a pure function of `cfg`. Anything computed for one build (`cfg._racePin`) is deleted before the cfg is stored.

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="201"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="202"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -3006,6 +3006,35 @@ function renderWizardStep() {
 
 // CARDIO PROGRESSIONS
 
+// ── PACE-GOAL TARGET: the single reader of what the athlete entered ──
+// D100 (V202). Two readers need this number: calcProgramLength sizes the block on it and
+// buildRunSession paces the weeks on it. When they each computed it, a km athlete got a block
+// sized on one target and paced on another. The km conversion lives HERE and nowhere else on
+// this path. Pure: reads the goal object, mutates nothing.
+function parseTimeToSecs(txt) {
+  if(!txt) return null;
+  var parts = txt.split(':').map(Number);
+  if(parts.length === 2) return parts[0]*60 + parts[1];
+  if(parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
+  return null;
+}
+function paceGoalTarget(g) {
+  g = g || {};
+  var rawDist = parseFloat(g.targetDist) || 1.5;
+  var tDist = (g.paceUnit === 'km') ? rawDist * 0.621 : rawDist;
+  var tTotalSecs = null;
+  if(g.targetMins !== undefined && g.targetMins !== '') {
+    tTotalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+  } else if(g.targetTime) {
+    tTotalSecs = parseTimeToSecs(g.targetTime);
+  }
+  return {
+    tDist: tDist,
+    tTotalSecs: tTotalSecs,
+    tPacePerMile: (tTotalSecs && tDist > 0) ? (tTotalSecs / tDist) : null
+  };
+}
+
 // ── DYNAMIC PROGRAM LENGTH CALCULATOR ──
 function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
   if(!cardioTypes || !cardioTypes.length) return {weeks:6, warning:null};
@@ -3058,14 +3087,6 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
     var m2 = txt.match(/([0-9]+)/); if(m2) return parseInt(m2[1]);
     return null;
   }
-  function parseTimeToSecs(txt) {
-    if(!txt) return null;
-    var parts = txt.split(':').map(Number);
-    if(parts.length === 2) return parts[0]*60 + parts[1];
-    if(parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
-    return null;
-  }
-
   // Core distance-build calculator with correct deload logic
   // Short goals (<=6.2mi, <=1760yd, <=90min) use faster progression
   function weeksToReach(current, target, pct, isShortGoal, absStep) {
@@ -3112,15 +3133,12 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
       var distTargets = {run_5k:3.1, run_10k:6.2, run_half:13.1, run_marathon:26.2, run_base:5.0};
 
       if(goalId === 'run_pace_goal') {
-        var rawDist = parseFloat(goal.targetDist) || 1.5;
-        var tDist = (goal.paceUnit === 'km') ? rawDist * 0.621 : rawDist;
-        var tTotalSecs = null;
-        if(goal.targetMins !== undefined && goal.targetMins !== '') {
-          tTotalSecs = (+goal.targetMins||0)*60 + (+goal.targetSecs||0);
-        } else if(goal.targetTime) {
-          tTotalSecs = parseTimeToSecs(goal.targetTime);
-        }
-        var tPacePerMile = (tTotalSecs && tDist > 0) ? (tTotalSecs / tDist) : null;
+        // D100 (V202): one reader, so the block size and the weekly pace targets come
+        // from the identical number for mi and km athletes alike.
+        var _pgT = paceGoalTarget(goal);
+        var tDist = _pgT.tDist;
+        var tTotalSecs = _pgT.tTotalSecs;
+        var tPacePerMile = _pgT.tPacePerMile;
         // Use the user's actual mile time if entered, otherwise fall back to experience default.
         // This makes program length consistent with the pace targets shown in sessions.
         var _mileBestSecs = (experience !== 'beginner' && goal.mileBestMins !== undefined && goal.mileBestMins !== '')
@@ -3515,15 +3533,27 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
     // fall back to safe defaults if not present so the function stays self-contained.
     const expPaceDefaults = {beginner:690, intermediate:570, advanced:450};   // V176 (D9)
     const initialPace  = buildRunProgressionForLength._initialPace  || expPaceDefaults[exp] || 570;
-    const targetPace   = buildRunProgressionForLength._targetPace   || initialPace * 0.85;
+    // E7 (V202): THE CLOCK HOLDS AT CURRENT, IT NEVER DROPS TO A SLOWER GOAL.
+    // An athlete whose entered goal is at or slower than the pace they already run AT THE
+    // GOAL DISTANCE used to have the whole block parked on the GOAL, which prescribed them
+    // slower work than they already do (beginner/km, mile 11:30, goal 2 km in 16:00 read
+    // 772.9 s/mi for all six weeks against an anchor of 698.6). The working target is the
+    // faster of the two. The ENTERED goal is kept separately so copy can still name it.
+    const enteredTarget  = buildRunProgressionForLength._targetPace   || initialPace * 0.85;
+    const goalAlreadyMet = enteredTarget >= initialPace;
+    const targetPace   = Math.min(enteredTarget, initialPace);
 
     // Raw linear improvement per week over the full build block (not total — taper doesn't improve pace)
     const rawImprovement = (initialPace - targetPace) / Math.max(buildWeeks, 1);
 
-    // Adaptation dampener: physiology caps pace gains, further reduced by age bracket
+    // Adaptation dampener: physiology caps pace gains, further reduced by age bracket.
+    // D101 (V202): ONE safe rate. The age-scaled table value set at the call site IS the cap.
+    // The old ceiling of 12 s/mi/wk and the x2.5 multiplier had no source and let a compressed
+    // timeline promise 30 s/mi in a week. Fallback mirrors expPaceDefaults above: the same
+    // hand table, unscaled, for the case where the call site did not set the property.
+    const expPaceImprove = {beginner:3, intermediate:5, advanced:7};   // V176 (D9)
     const maxPaceImprovementPerWeek = buildRunProgressionForLength._paceImprovePerWeek
-      ? Math.min(12, buildRunProgressionForLength._paceImprovePerWeek * 2.5)
-      : 12;
+      || expPaceImprove[exp] || 5;
     const weeklyImprovement = Math.min(rawImprovement, maxPaceImprovementPerWeek);
 
     // Realistic achievable target pace given this timeline
@@ -3544,7 +3574,8 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
     paceProgression._dampened        = weeklyImprovement < rawImprovement;
     paceProgression._weeklyGain      = +weeklyImprovement.toFixed(1);
     paceProgression._realisticTarget = +realisticTargetPace.toFixed(1);
-    paceProgression._originalTarget  = +targetPace.toFixed(1);
+    paceProgression._originalTarget  = +enteredTarget.toFixed(1);
+    paceProgression._goalMet         = goalAlreadyMet;
   }
 
   return {easy:easyArr, interval:intervalArr, tempo:tempoArr, long:longArr, paceProgression};
@@ -3577,7 +3608,13 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
     const rawTargetDist = parseFloat(arguments[9]) || 1.5;
     const ageBracket = arguments[11] || '18-35';
     const baseImprove = expPaceImprove[experience||'intermediate'] || 5;
-    buildRunProgressionForLength._initialPace  = expPaceDefaults[experience||'intermediate'] || 570;
+    // D100 (V202): the pace clock starts where the athlete actually is AT THE DISTANCE THEY
+    // ENTERED. Anchoring on the mile pace itself started a 1.5-mile goal at a pace the athlete
+    // only holds for a mile, so the goal read "slower" than the anchor and the clock parked flat.
+    // _chartRow is already the athlete's own row (entered mile for non-beginners, the V172
+    // experience default of 690 for beginners, gated at the anchor above); rowPaceAt reads that
+    // row at the goal distance, so the beginner's default row converts on the same terms.
+    buildRunProgressionForLength._initialPace  = rowPaceAt(_chartRow, rawTargetDist);
     buildRunProgressionForLength._targetPace   = rawTargetSecs
       ? (rawTargetSecs / rawTargetDist)
       : buildRunProgressionForLength._initialPace * 0.85;
@@ -3811,6 +3848,36 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
     }
   } else if(sType === 'int') {
     subtype = 'Interval (INT)' + (isTaperWeek ? ' — Taper' : '');
+    // ── V202 D105: RECOVERY IS 2 TO 2.5 x THE WORK INTERVAL, NOT A FIXED 200m ──
+    // Guide A is explicit twice. A 248-249: "allowing a recovery period of 2-2.5 times
+    // the amount of time it takes to perform the work interval". A 268-270: "Allow
+    // enough recovery time after each interval to maintain the proper work intensity
+    // (2-2.5 x the work time). To promote faster, more complete recovery, use active
+    // recovery." Both Short Interval table headers say the same thing
+    // (doctrine/ptg2020_tables_p13_14_16_17.txt lines 9 and 41 — those tables are
+    // HAND-TRANSCRIBED from screenshots of p13 and p16, not OCR).
+    // The old fixed "walk or jog 200m" measured 0.685x the work time across 11,880 of
+    // 11,880 INT sessions: about a third of the doctrine MINIMUM. A recovery that short
+    // turns speed work into a threshold session run on incomplete rest.
+    // 1609.344 is the metres in a mile. It is a unit, not a coaching number.
+    const _M_PER_MILE = 1609.344;
+    const _intClk = t => Math.floor(t/60) + ':' + String(Math.round(t%60)).padStart(2,'0');
+    // tgt is the session's OWN prescribed pace in s/mi, so the recovery, the printed pace
+    // and the logged dose all read off one number.
+    const _intRec = (tgt, metres) => {
+      const work = tgt * metres / _M_PER_MILE;
+      const lo = Math.round(work * 2), hi = Math.round(work * 2.5);
+      return { lo, hi, txt: 'Recovery: ' + _intClk(lo) + ' to ' + _intClk(hi) + ' of easy jogging or walking. Keep moving.' };
+    };
+    // ── V202: WARM-UP COMES FROM GUIDE B, NOT GUIDE A ──────────────────────────
+    // D112 limb 2: guide A says nothing about warming up for a Short Interval session,
+    // so guide B fills the silence. B p8 (doctrine/nsw_ptg_sealswcc_11pg.txt): "For CHI
+    // and INT workouts, you should warm up for 10-15 minutes or more. Gradually build
+    // intensity from an easy jog or stroke for several minutes. Then add 4-5
+    // high-intensity bursts lasting from 15 to 30 seconds." Cool-down, same page: extend
+    // "until you are breathing easily". The old "5 min easy warmup + cooldown" was a
+    // third of what B asks for and is in neither guide.
+    const _INT_WARMUP = 'Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy.';
     if(isMilGoal) {
       if(goalId === 'run_pace_goal') {
         // Pull week-specific pace directly from the dampened progression array.
@@ -3819,15 +3886,33 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
         const pp = prog.paceProgression;
         const _cb = isCardioCutbackWeek(week, tw);
         const weekPace   = pp ? pp[(_cb && _ppIdx > 0) ? _ppIdx - 1 : _ppIdx] : null;  // D2b: effective index
-        const intPace    = weekPace ? Math.max(pp._realisticTarget * 0.95, weekPace * 0.95) : null;
+        // ── V202 D111: A's SUBTRACTION, NOT A PROPORTION ───────────────────────
+        // A 251-252: "For running, your 400m interval pace should be about 4 seconds
+        // faster than your base pace". 400m is A's own quarter mile, so 4 s per 400m is
+        // a flat 16 s per mile. The old x0.95 was a proportion nobody wrote down: at a
+        // 5:00 mile it takes off 3.75 s per 400 (A asks 4), but at a 12:00 mile it takes
+        // off 9 s per 400, more than twice A's rule, and the slow end is the population
+        // this guide serves. The CHI branch keeps its x1.08 — that multiplier IS A's own
+        // worked example for Long Intervals, a different rule for a different session.
+        const INT_PACE_GAIN_SEC_PER_MILE = 16;   // 4 s per 400m x 4 quarters
+        const intPace    = weekPace ? Math.max(pp._realisticTarget - INT_PACE_GAIN_SEC_PER_MILE, weekPace - INT_PACE_GAIN_SEC_PER_MILE) : null;
         if(pp && weekPace && intPace) {
           const fmt = s => `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
+          const _intTgt = Math.round(intPace);
+          const _rec = _intRec(_intTgt, 400);
+          // The recovery band prints as a clock in both limbs, so the sentence coach ruled
+          // is written out verbatim rather than assembled from _rec.txt.
+          const lo = _intClk(_rec.lo), hi = _intClk(_rec.hi);
           detail = _cb
-            ? `${intReps}x400m at ${fmt(intPace)}/mi (cutback — holding last week's target). Recovery: walk or jog 200m between reps. 5 min easy warmup + cooldown.`
-            : `${intReps}x400m at ${fmt(intPace)}/mi (week ${week} interval target — slightly faster than this week's goal of ${fmt(weekPace)}/mi). Recovery: walk or jog 200m between reps. 5 min easy warmup + cooldown.`;
-          _dose = {k:'reps_dist', reps:intReps, m:400, tgt:Math.round(intPace)};
+            ? `${intReps}x400m at ${fmt(intPace)}/mi. Cutback week. Same target as last week, fewer reps. Recovery: ${lo} to ${hi} of easy jogging or walking. Keep moving. ${_INT_WARMUP}`
+            : `${intReps}x400m at ${fmt(intPace)}/mi. This week's goal pace is ${fmt(weekPace)}/mi. Recovery: ${lo} to ${hi} of easy jogging or walking. Keep moving. ${_INT_WARMUP}`;
+          // rec is ADDITIVE on the dose: {lo,hi} in seconds, so the log form and any later
+          // reader can see the prescribed recovery band without re-parsing the sentence.
+          _dose = {k:'reps_dist', reps:intReps, m:400, tgt:_intTgt, rec:{lo:_rec.lo, hi:_rec.hi}};
           if(_cb) {
             note = 'CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.';
+          } else if(pp._goalMet) {
+            note = 'Your goal pace is already within your current pace. This block holds your pace and builds your reps.';
           } else if(pp._dampened || _psShift > 0) {
             // D2b-iii (V142): with a shift, quoting the unshifted _realisticTarget is a
             // lie — the block now ends before the clock gets there. The honest reachable
@@ -3836,31 +3921,39 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
             const goalFmt = fmt(pp._originalTarget);
             const _reachIdx = _psShift > 0 ? Math.max(0, (tw - taperWks - 1) - (_psTap || _psShift)) : null;
             const reachFmt = fmt(_reachIdx != null && pp[_reachIdx] != null ? pp[_reachIdx] : pp._realisticTarget);
-            note = `INT — Interval: Pace capped at +${pp._weeklyGain}s/mi/week (physiological safety limit). Full goal of ${goalFmt}/mi requires more time — realistic target for this block is ${reachFmt}/mi. Hit the prescribed pace precisely.`;
-            if(_psShift > 0) note += ' PACE CLOCK: Injury time froze your targets. This week resumes from the last pace you trained, not the calendar week.';
+            note = `INT — Interval: Pace moves ${pp._weeklyGain} seconds per mile each week. That is the safe rate for your experience and age. Your full goal of ${goalFmt}/mi needs more weeks than this block has. The target for this block is ${reachFmt}/mi. Hit the prescribed pace precisely.`;
           } else {
-            note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All-out on each rep, full recovery between. Build from 4 reps to 10 — hard cap at 10. Quality over quantity — if pace drops, stop.';
+            note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
           }
+          // D2b-iii (V142), re-sited V202 (S1): this appendix is about the SHIFT, not about
+          // which class of note fired. It only ever sat inside the dampened limb because that
+          // limb happened to be the one that also fired on the shift; once a goal-met limb was
+          // added above it (V202 slice 5) a goal-met athlete under an injury shift silently
+          // lost the sentence. ONE predicate at ONE site, appended to whichever INT note fires,
+          // rather than the same predicate copied into every limb to drift apart later.
+          if(_psShift > 0) note += ' PACE CLOCK: Injury time froze your targets. This week resumes from the last pace you trained, not the calendar week.';
         } else {
           // Fallback: use chart 5K pace for interval target
           const intChartPace = _fmtPace(_chartRow.fiveK);
-          detail = intReps + 'x400m at 5K Pace: ' + intChartPace + '. Recovery: walk or jog 200m between each rep. 5 min easy warmup + cooldown.';
-          _dose = {k:'reps_dist', reps:intReps, m:400, tgt:Math.round(_chartRow.fiveK)};
-          note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All-out on each rep, full recovery between. Build from 4 reps to 10 — hard cap at 10. Quality over quantity — if pace drops, stop.';
+          const _intTgtF = Math.round(_chartRow.fiveK);
+          const _recF = _intRec(_intTgtF, 400);
+          detail = intReps + 'x400m at 5K Pace: ' + intChartPace + '. ' + _recF.txt + ' ' + _INT_WARMUP;
+          _dose = {k:'reps_dist', reps:intReps, m:400, tgt:_intTgtF, rec:{lo:_recF.lo, hi:_recF.hi}};
+          note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
         }
       } else {
         // run_15_under10, run_mile_time — use chart 5K pace for interval pace
         const intChartPace = _fmtPace(_chartRow.fiveK);
         detail = intReps + 'x400m at 5K Pace: ' + intChartPace + '. Recovery: walk or jog 200m between each (2-2.5x work time). 5 min easy warmup + cooldown.';
         _dose = {k:'reps_dist', reps:intReps, m:400, tgt:Math.round(_chartRow.fiveK)};
-        note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All-out on each rep, full recovery between. Build from 4 reps to 10 — hard cap at 10. Quality over quantity — if pace drops, stop.';
+        note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
       }
     } else {
       // 5K, 10K, base, half, marathon — use chart 5K pace for interval pace
       const intChartPace = _fmtPace(_chartRow.fiveK);
       detail = intReps + 'x800m at 5K Pace: ' + intChartPace + ' (RPE 8, hard sustainable effort). Recovery: 90s walk/jog between reps. Keep moving. 5 min warmup + cooldown.';
       _dose = {k:'reps_dist', reps:intReps, m:800, tgt:Math.round(_chartRow.fiveK)};
-      note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All-out on each rep, full recovery between. Build from 4 reps to 10 — hard cap at 10. Quality over quantity — if pace drops, stop.';
+      note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
     }
   }
   return {type:'run', subtype, detail, note, week, goalId, dose:_dose||undefined};
@@ -4604,6 +4697,42 @@ function paceChartLookup(anchorType, anchorSec) {
   return Object.assign({}, rows[rows.length-1]);
 }
 
+// ── ROW → GOAL DISTANCE (D100, V202) ─────────────────────────────────────────
+// PACE_CHART tabulates, for one fitness row, the average mile pace to train each RACE
+// distance at. A pace goal is entered at a distance the table has no column for (1.5 mi,
+// 2 km, 5 mi), so the row is READ at that distance:
+//   * columns sit at their true distances in miles (unit conversions, not coaching numbers);
+//   * interpolation is in LOG distance between the two bracketing columns — fitted over all
+//     15 rows, log beat linear in 15/15, pooled RMSE 5.46 s vs 17.75 s;
+//   * a running maximum runs across the columns in distance order, because a longer distance
+//     is never a faster pace. That is the definition of what the chart tabulates, and it is
+//     reachable: row 15 (mile 12:00) inverts, half 845 → marathon 825, and the goal-distance
+//     input carries min="0.1" with no max;
+//   * outside the table the value clamps to the table's own bounds at both ends.
+// rowPaceAt(row, 1.0) returns the mile column exactly.
+var ROW_PACE_COLS = [
+  {d:1,      k:'mile'},
+  {d:3.107,  k:'fiveK'},
+  {d:6.214,  k:'tenK'},
+  {d:13.109, k:'half'},
+  {d:26.219, k:'marathon'},
+];
+function rowPaceAt(row, distMiles) {
+  var run = -Infinity;
+  var v = ROW_PACE_COLS.map(function(c){ run = Math.max(run, +row[c.k]); return {d:c.d, p:run}; });
+  var d = +distMiles;
+  if (!(d > 0))            return v[0].p;                 // no distance → the mile column
+  if (d <= v[0].d)         return v[0].p;                 // below the table → clamp low
+  if (d >= v[v.length-1].d) return v[v.length-1].p;       // above the table → clamp high
+  for (var i = 0; i < v.length - 1; i++) {
+    if (d >= v[i].d && d <= v[i+1].d) {
+      var f = (Math.log(d) - Math.log(v[i].d)) / (Math.log(v[i+1].d) - Math.log(v[i].d));
+      return v[i].p + (v[i+1].p - v[i].p) * f;
+    }
+  }
+  return v[v.length-1].p;
+}
+
 function isSpeedGoal(goalId) {
   return goalId === 'run_pace_goal' || goalId === 'run_5k' || goalId === 'run_10k'
       || goalId === 'swim_500_time' || goalId === 'swim_100_time';
@@ -5326,11 +5455,15 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
           // NSW engine: pace goals, 1.5-mile, mile time, base (V186: test → NSW)
           const forceType = assignedType === 'lsd_long' ? 'long' : null;
           const sessionOverride = forceType ? null : assignedType;
+          // D100 (V202): the entered goal reaches the pace progression. Same reader as the
+          // program-length sizer, so the block is sized and paced on one target. Read only
+          // by the run_pace_goal branch of buildRunSession; every other run goal ignores it.
+          const _pgT = paceGoalTarget(goal);
           session = buildRunSession(
             _runGoalId, w, dayIdx, tw,
             baselineMiles, cfg.experience||'intermediate',
             forceType, cfg.eventTargeted !== false, sessionOverride,
-            null, null, null, _mileBestSecs, isBaseCardio, _qPhase, _tap,
+            _pgT.tDist, _pgT.tTotalSecs, cfg.ageBracket||'18-35', _mileBestSecs, isBaseCardio, _qPhase, _tap,
             cfg._paceShift || null,  // D2b (V142): pace-shift map, arguments[16]
             (w >= 2 && dayIdx === _lastEasyFor(w)),  // V157/V159: strides flag, arguments[17], week-aware under the frequency plan. Deliberately UNSCOPED by goal and session type: the ONLY consumer is the run_base sub-branch of lsd_easy, which is the single guard (proven by sabotage)
             ((w === 1 || w === tw) && dayIdx === _benchDayFor(w)),  // V158: benchmark flag, arguments[18]. Same single-guard doctrine as [17]: goal scoping lives only at the buildRunSession render branch
@@ -13557,16 +13690,18 @@ function runAnchorChips(a){
 function runAnchorSentence(a){
   const m = _fmtMileAnchor(a.anchorSec);
   const art = /^(8|11|18):/.test(m) ? 'an' : 'a';
-  const tail = ' Every pace in this program comes from this row.';
+  const tail = (a.goalId === 'run_pace_goal')
+    ? ' Week 1 runs off this row. Every week after it moves toward your goal.'
+    : ' Every pace in this program comes from this row.';
   if(a.clamped){
     const raw = a.rawSec > 0 ? `the ${_fmtMileAnchor(a.rawSec)} you entered` : 'the mile time you entered';
     const why = a.rawSec > 0 ? (a.clamped==='fast' ? 'is faster than the chart goes' : 'is slower than the chart goes') : 'is not a valid time';
-    return `Anchored on ${art} <b>${m} mile</b> — ${raw} ${why}, so its ${a.clamped==='fast'?'fastest':'slowest'} row is used.` + tail;
+    return `Anchored on ${art} <b>${m} mile</b>, ${raw} ${why}, so its ${a.clamped==='fast'?'fastest':'slowest'} row is used.` + tail;
   }
-  if(a.kind === 'seeded')   return `Anchored on ${art} <b>${m} mile</b> — worked back from ${a.n>0?a.n:'the'} recovery run${a.n===1?'':'s'} you logged in ${a.prog||'your last program'}.` + tail;
-  if(a.kind === 'entered')  return `Anchored on ${art} <b>${m} mile</b> — the time you entered.` + tail;
-  if(a.kind === 'beginner') return `Anchored on ${art} <b>${m} mile</b> — the beginner default. A mile time starts being used at intermediate.`;
-  return `Anchored on ${art} <b>${m} mile</b> — estimated from experience; no mile time was entered.` + tail;
+  if(a.kind === 'seeded')   return `Anchored on ${art} <b>${m} mile</b>, worked back from ${a.n>0?a.n:'the'} recovery run${a.n===1?'':'s'} you logged in ${a.prog||'your last program'}.` + tail;
+  if(a.kind === 'entered')  return `Anchored on ${art} <b>${m} mile</b>, the time you entered.` + tail;
+  if(a.kind === 'beginner') return `Anchored on ${art} <b>${m} mile</b>, the beginner default. A mile time starts being used at intermediate.`;
+  return `Anchored on ${art} <b>${m} mile</b>, estimated from experience; no mile time was entered.` + tail;
 }
 function runAnchorLine(a){
   const m = _fmtMileAnchor(a.anchorSec);
@@ -13574,7 +13709,8 @@ function runAnchorLine(a){
              : a.kind==='seeded' ? `seeded from ${a.prog||'previous block'}, ${a.n} logged recovery run${a.n===1?'':'s'}`
              : a.kind==='entered' ? 'entered' : a.kind==='beginner' ? 'beginner default' : 'est. from experience';
   const chips = runAnchorChips(a).slice(1).map(c=>`${c.k.toLowerCase()} ${c.v}`).join(' / ');
-  return `Run anchor: ${m} mile (${prov}) → ${chips}`;
+  const scope = (a.goalId === 'run_pace_goal' && a.kind !== 'beginner') ? ' | Week 1 runs off this row. Every week after it moves toward your goal.' : '';
+  return `Run anchor: ${m} mile (${prov}) → ${chips}${scope}`;
 }
 function progSelData(p){
   const c=p.cfg||{};
@@ -14519,12 +14655,43 @@ function refreshProgram(prog){
           const _diff = Math.floor((_today - _mon)/86400000);
           _curWk = _diff < 0 ? 1 : Math.min(_tw, Math.floor(_diff/7)+1);
         }
-        // "Touched" = any completion OR any log in that week. Both stores use the
-        // same 'w<N>_<day>' key shape. Checking logs too is deliberately
-        // conservative: a logged-but-unmarked day still counts as trained.
+        // "Touched" = a day the athlete has SEEN, proved by ANY of the four stores
+        // (V202 D108). It used to read ia_comp_ and ia_logs_ only, and the cut derived
+        // from those two alone. Two stores that also prove the day happened were left
+        // out: ia_exw_ is a load the athlete wrote against a prescription, and ia_hist_
+        // is the snapshot of the prescription they were shown. Measured on the 11->5
+        // compression fixture with weeks 1-3 logged: with only ia_exw_ present, 7 of 15
+        // logged days were REWRITTEN, and with only ia_hist_ present, the same 7 of 15.
+        // ia_hist_ was doubly wrong: it is consulted only INSIDE the w < _cut loop, so a
+        // snapshot could not save its own day. The exw-only path is reachable in the
+        // shipped app — selectKBSize calls logExerciseWeight and nothing else, so tapping
+        // a kettlebell size kept the load and left the prescription rewritable.
+        // selectKBSize is deliberately NOT changed: tapping a bell size must not have to
+        // write a completion record to be safe.
+        //
+        // KEY SHAPE. ia_comp_, ia_logs_ and ia_hist_ all key 'w<N>_<day>', so they merge
+        // directly. ia_exw_ does NOT: it keys by exercise SLUG (exStoreKey), and each
+        // entry carries {week, day, ...}, so its day keys are DERIVED from the entries
+        // through entryDay() — the app's single reader of an entry's day, which falls
+        // back to the timestamp's weekday for pre-V117 rows. An entry that yields no day
+        // at all still contributes 'w<N>_', which raises _maxTouched (the regex below
+        // matches it) but can never equal a real _dk(w,d) key, so it moves the frontier
+        // without ever falsely freezing a named day.
         const _touched = {};
         try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_comp_'+prog.id)||'{}')); }catch(e){}
         try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_logs_'+prog.id)||'{}')); }catch(e){}
+        try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_hist_'+prog.id)||'{}')); }catch(e){}
+        try{
+          const _exw = JSON.parse(localStorage.getItem('ia_exw_'+prog.id)||'{}');
+          Object.keys(_exw).forEach(_slug=>{
+            const _ents = (_exw[_slug] && _exw[_slug].entries) || [];
+            _ents.forEach(_e=>{
+              const _wn = +(_e && _e.week);
+              if(!(_wn > 0)) return;
+              _touched['w'+_wn+'_'+(entryDay(_e)||'')] = true;
+            });
+          });
+        }catch(e){}
         const _pfx = 'w'+_curWk+'_';
         const _curTouched = Object.keys(_touched).some(k => k.indexOf(_pfx) === 0);
         // Date-derived cut, from the current week.

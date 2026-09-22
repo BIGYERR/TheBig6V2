@@ -221,12 +221,23 @@ const MANNY_DIGEST_BY_VERSION = {
   200: 'd4364dd3fa63a3a1',   // D89 re-pin: the ruled digest move
 };
 MANNY_DIGEST_BY_VERSION[201] = MANNY_DIGEST_BY_VERSION[200];              // D94: ruled UNMOVED (pull deload cards only; HALF_MANNY's cond[2] draws are never a hinge)
+// V202: ruled UNMOVED, and written as a REFERENCE for that reason — under this file's D94-t
+// convention a LITERAL row asserts a ruled MOVE and a REFERENCE row asserts a ruled UNMOVED.
+// Every V202 ruling lands on NSW test-goal run work: D100/D101 move run_pace_goal anchors and
+// the weekly rate, D111/D112 move INT pace, recovery and warm-up, D2b-iii re-sites the pace
+// clock appendix, and the generic INT note copy changed. HALF_MANNY is an NRC half-marathon
+// fixture: no pace-goal progression, no NSW INT session, no card touched.
+MANNY_DIGEST_BY_VERSION[202] = MANNY_DIGEST_BY_VERSION[201];
 
 const MANNY_DELOAD_OFF_DIGEST_BY_VERSION = {
   199: '75ae3d256b642a9d',
   200: '5fe2c6bb32c76498',   // D89 re-pin: the ruled digest move
 };
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[201] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[200];   // D94: ruled UNMOVED
+// V202: ruled UNMOVED for the same reason — a reference row, not a literal. The deload-off
+// variant of HALF_MANNY is the same NRC fixture with the deload pre-pass disabled; V202 moves
+// nothing it draws from.
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[202] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[201];
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
                    MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION };
