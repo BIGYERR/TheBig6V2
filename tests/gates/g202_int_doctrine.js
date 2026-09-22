@@ -36,6 +36,11 @@
 //     write; the gate then computes what the pace SHOULD do and compares.
 //   * every expected sentence is typed verbatim from coach's ruling.
 //
+// V204 slice 7 (D126): the lattice gains ONE named config, a 6:46 mile at seed 76308, and
+// D10 at the foot of this file. Until that config existed nothing here reached a goal pace
+// that carries across the minute, so this gate could not fail on the ":60" defect D126
+// fixed. It fails on V203 now, which is the point of the row.
+//
 // Usage: node tests/gates/g202_int_doctrine.js [artifact]
 // Prints PASS n FAIL n. Expected to FAIL on V201 and on the slice-2 artifact: neither
 // carries E8-E11.
@@ -61,7 +66,7 @@ const REC_LO_X = 2, REC_HI_X = 2.5;           // A 248-249 and the two table hea
 const REPS_CEILING = 8;                       // A 259-263
 const WARMUP = 'Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy.';
 
-const clk = t => Math.floor(t/60) + ':' + String(Math.round(t%60)).padStart(2,'0');
+const clk = t => { const v = Math.round(t); return Math.floor(v/60) + ':' + String(v%60).padStart(2,'0'); };
 const handRec = tgt => {
   const work = tgt * 400 / METRES_PER_MILE;
   return { lo: Math.round(work * REC_LO_X), hi: Math.round(work * REC_HI_X), work };
@@ -119,6 +124,22 @@ for(const [mm,ss] of [['5','30'],['6','30'],['8','15'],['9','30'],['11','00'],['
       LAT.push(paceGoal({ targetDist:dist, targetMins:'10', targetSecs:'30', targetTime:'10:30',
         mileBestMins:mm, mileBestSecs:ss, mileBestSrc:{kind:'entered'} }, { seed }));
 
+// ── the fractional-pace row (D126, V204 slice 7) ─────────────────────────────
+// COVERAGE, stated out loud rather than smuggled in as one more lattice point. Every
+// config above lands on a goal pace a whole second away from the minute, so a formatter
+// that splits the minutes off BEFORE it rounds the seconds prints exactly what one that
+// rounds first prints. That is why the ":60" defect D126 names survived this gate on
+// V203: not because a row was wrong, but because nothing here could reach the carry.
+// This config reaches it. A 6:46 mile (406 s) at seed 76308 walks the INT goal pace onto
+// 419.5 s/mi. Rounded first, 419.5 -> 420 s/mi -> "7:00/mi". Split first, it prints
+// floor(419.5/60) = 6 and round(59.5) = 60, which is "6:60/mi" — the string V203 shipped
+// on this very config, and not a time at all.
+// Its purpose is written down in D10 at the foot of this file, and D10c fails loudly if
+// the config ever stops reaching the carry.
+const FRACTIONAL = paceGoal({ targetDist:'1.5', targetMins:'10', targetSecs:'30', targetTime:'10:30',
+  mileBestMins:'6', mileBestSecs:'46', mileBestSrc:{kind:'entered'} }, { seed:76308 });
+LAT.push(FRACTIONAL);
+
 // ═════════════════════════════════════════════════════════════════════════════
 // D1 — the subtraction IS A's, and it is not a proportion
 // ═════════════════════════════════════════════════════════════════════════════
@@ -128,12 +149,12 @@ for(const [mm,ss] of [['5','30'],['6','30'],['8','15'],['9','30'],['11','00'],['
 // printed numbers must be exactly INT_SUB, whatever the athlete's speed. A proportion
 // cannot hold a constant gap across a 5:30 mile and a 12:00 mile; that is the whole
 // reason D111 replaced it.
-const toSec = p => { const m = /^(\d+):(\d\d)$/.exec(p); return m ? +m[1]*60 + +m[2] : null; };
+const toSec = p => { const m = /^(\d+):([0-5]\d)$/.exec(p); return m ? +m[1]*60 + +m[2] : null; };
 let d1bad = [], d1n = 0, d1spanLo = 1e9, d1spanHi = -1e9;
 for(const cfg of LAT){
   let prog; try { prog = IA.buildProgram(cfg); } catch(e){ d1bad.push('build crash: ' + e.message); continue; }
   for(const r of ints(prog)){
-    const m = /at (\d+:\d\d)\/mi\. This week's goal pace is (\d+:\d\d)\/mi\./.exec(r.detail);
+    const m = /at (\d+:[0-5]\d)\/mi\. This week's goal pace is (\d+:[0-5]\d)\/mi\./.exec(r.detail);
     if(!m) continue;                       // cutback cards quote no goal; covered by D3
     d1n++;
     const got = toSec(m[1]), goal = toSec(m[2]);
@@ -193,7 +214,7 @@ for(const cfg of LAT){
   d3blocks++;
   for(let i = 0; i < cards.length; i++){
     const c = cards[i]; d3cards++;
-    const m = /This week's goal pace is (\d+:\d\d)\/mi/.exec(c.detail);
+    const m = /This week's goal pace is (\d+:[0-5]\d)\/mi/.exec(c.detail);
     if(m){
       const goal = toSec(m[1]);
       if(Math.abs(c.dose.tgt - (goal - INT_SUB)) > 1)
@@ -422,6 +443,54 @@ const latMaxReps = LAT.reduce((mx, cfg) => Math.max(mx, ints(IA.buildProgram(JSO
 ok(latMaxReps > 0 && latMaxReps <= REPS_CEILING && RULED_INT_NOTE.indexOf('Hard cap at ' + latMaxReps) >= 0,
   `D9d the cap the note STATES (${REPS_CEILING}) is the cap the engine PRESCRIBES: the highest rep count `
   + `across ${LAT.length} blocks is ${latMaxReps}, and A 259-260 allows no more than ${REPS_CEILING}`);
+
+// ═════════════════════════════════════════════════════════════════════════════
+// D10 — the fractional-pace row: the seconds limb and the parser are load-bearing
+// ═════════════════════════════════════════════════════════════════════════════
+// ORACLE — the clock contract, TYPED HERE and read from no formatter in the app: an m:ss
+// clock carries a seconds limb of exactly two digits in 00..59. "6:60" is not a time.
+// That contract plus the 16 s/mi hand arithmetic already typed at the top of this file is
+// the whole oracle below.
+//   D10a makes the parser at line 131 load-bearing on EVERY artifact, well-formed or not.
+//   D10b/D10c/D10d make the config above load-bearing, and go red if it drifts off the carry.
+const D10_MAL = '6:60', D10_GOOD = '7:00';
+ok(toSec(D10_MAL) === null && toSec(D10_GOOD) === 420 && toSec('6:59') === 419 && toSec('6:5') === null,
+  `D10a the goal-pace parser REJECTS "${D10_MAL}" instead of normalising it to 420 s: a clock's seconds limb `
+  + `is two digits in 00..59, so "${D10_MAL}" is not a time and must not parse (got ${toSec(D10_MAL)}), while `
+  + `"${D10_GOOD}" parses to ${toSec(D10_GOOD)} s and the one-digit "6:5" does not (got ${toSec('6:5')})`);
+
+const CLOCK_TOK = /(\d+):(\d+)/g;
+const fCards = ints(IA.buildProgram(JSON.parse(JSON.stringify(FRACTIONAL))));
+let d10bad = [], d10carry = 0, d10goals = 0;
+for(const c of fCards){
+  CLOCK_TOK.lastIndex = 0; let m;
+  while((m = CLOCK_TOK.exec(c.detail)))
+    if(m[2].length !== 2 || +m[2] > 59) d10bad.push(`W${c.w} token "${m[0]}" in |${c.detail.slice(0,62)}|`);
+  const g = /This week's goal pace is (\d+:\d\d)\/mi/.exec(c.detail);
+  if(g){
+    d10goals++;
+    if(toSec(g[1]) === null) d10bad.push(`W${c.w} goal pace "${g[1]}" does not parse as a clock`);
+    if(/:00$/.test(g[1])) d10carry++;
+  }
+}
+ok(fCards.length > 0 && d10bad.length === 0,
+  `D10b every clock printed on all ${fCards.length} INT cards of the 6:46 mile / seed 76308 config has a `
+  + `two-digit seconds limb in 00..59; V203 printed "6:60/mi" on this config`
+  + (d10bad.length ? ' — first miss: ' + d10bad[0] : ''));
+ok(d10carry > 0,
+  `D10c the config still REACHES the carry: ${d10carry} of its ${d10goals} goal-pace sentences land on the `
+  + `minute, which is the one place split-then-round prints ":60". A zero here means this row went vacuous `
+  + `and the lattice stopped covering the defect D126 names`);
+
+const D10_TGT = 404, D10_GOAL = D10_TGT + INT_SUB;   // hand: 404 + 16 = 420 s/mi
+const f1 = fCards[0];
+ok(!!(f1 && f1.dose && f1.dose.tgt === D10_TGT
+     && f1.detail.indexOf(`at ${clk(D10_TGT)}/mi`) >= 0
+     && f1.detail.indexOf(`This week's goal pace is ${clk(D10_GOAL)}/mi`) >= 0),
+  `D10d the reproducing card itself: its first INT week logs ${D10_TGT} s/mi and prints `
+  + `"at ${clk(D10_TGT)}/mi. This week's goal pace is ${clk(D10_GOAL)}/mi." by hand, since ${D10_TGT} + `
+  + `${INT_SUB} = ${D10_GOAL} s/mi and ${D10_GOAL} s is ${clk(D10_GOAL)} (got tgt `
+  + `${f1 && f1.dose && f1.dose.tgt}, detail |${f1 ? f1.detail.slice(0,60) : 'no card'}|)`);
 
 console.log(`PASS ${PASS} FAIL ${FAIL}`);
 process.exit(FAIL ? 1 : 0);

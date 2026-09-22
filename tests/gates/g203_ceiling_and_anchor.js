@@ -88,7 +88,7 @@ const ROWS = [
 ];
 // D117's formula, written out here: the midpoint of Tempo and Recovery Pace.
 function capOf(row){ return Math.round((row.tempo + row.recovery) / 2); }
-function paceStr(sec){ return Math.floor(sec/60) + ':' + String(Math.round(sec%60)).padStart(2,'0') + '/mi'; }
+function paceStr(sec){ const t = Math.round(sec); return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0') + '/mi'; }
 ROWS.forEach(r => { r.cap = capOf(r); r.capStr = paceStr(r.cap); });
 
 console.log('\n1. D117 oracle: the hand table agrees with PACE_CHART, and the ceiling is the midpoint');
@@ -171,18 +171,18 @@ SWEEP.forEach(S => {
      speed.every(c => !c.dose || c.dose.cap === undefined),
      JSON.stringify(speed.filter(c => c.dose && c.dose.cap !== undefined).map(c => c.subtype)));
   ok('NO speed run prints a ceiling sentence',
-     speed.every(c => !/faster than \d+:\d\d\/mi\./.test(String(c.detail))),
-     JSON.stringify((speed.find(c => /faster than \d+:\d\d\/mi\./.test(String(c.detail))) || {}).subtype));
+     speed.every(c => !/faster than \d+:[0-5]\d\/mi\./.test(String(c.detail))),
+     JSON.stringify((speed.find(c => /faster than \d+:[0-5]\d\/mi\./.test(String(c.detail))) || {}).subtype));
   ok('NO race day or time trial carries dose.cap',
      hardLong.every(c => !c.dose || c.dose.cap === undefined),
      JSON.stringify(hardLong.map(c => [c.subtype, c.dose && c.dose.cap])));
   ok('NO race day or time trial prints a ceiling sentence',
-     hardLong.every(c => !/faster than \d+:\d\d\/mi\./.test(String(c.detail)) && !/no faster than/.test(String(c.detail))),
+     hardLong.every(c => !/faster than \d+:[0-5]\d\/mi\./.test(String(c.detail)) && !/no faster than/.test(String(c.detail))),
      JSON.stringify(hardLong.map(c => c.subtype)));
   // the ceiling must be THIS row's, not some other row's
   ok('no card anywhere prints a ceiling that is not ' + S.row.capStr,
-     all.every(c => { const m = String(c.detail).match(/faster than (\d+:\d\d\/mi)\./); return !m || m[1] === S.row.capStr; }),
-     JSON.stringify(all.map(c => String(c.detail).match(/faster than (\d+:\d\d\/mi)\./)).filter(Boolean).map(m => m[1])));
+     all.every(c => { const m = String(c.detail).match(/faster than (\d+:[0-5]\d\/mi)\./); return !m || m[1] === S.row.capStr; }),
+     JSON.stringify(all.map(c => String(c.detail).match(/faster than (\d+:[0-5]\d\/mi)\./)).filter(Boolean).map(m => m[1])));
 });
 
 console.log('\n2b. D117 non-vacuity: the sweep actually reached every card class');
@@ -240,8 +240,8 @@ function baseCards(row){
 const IS_L_SITE = c => /This is the longest run of your week/.test(String(c.detail));            // _steadySecL
 const IS_E_SITE = c => /Distance is not the goal; time on feet is\./.test(String(c.detail));     // _steadySec
 const BASE_TAIL = cap => 'do not run faster than ' + cap + '.';
-const AROUND    = c => (String(c.detail).match(/Around (\d+:\d\d\/mi) is right for you/) || [])[1];
-const CAPSTR    = c => (String(c.detail).match(/do not run faster than (\d+:\d\d\/mi)\./) || [])[1];
+const AROUND    = c => (String(c.detail).match(/Around (\d+:[0-5]\d\/mi) is right for you/) || [])[1];
+const CAPSTR    = c => (String(c.detail).match(/do not run faster than (\d+:[0-5]\d\/mi)\./) || [])[1];
 
 const baseCaps = [];
 [ROWS[0], ROWS[1]].forEach(r => {

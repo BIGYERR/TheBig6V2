@@ -44,7 +44,7 @@ const MI_PER_KM   = 0.621;                                                  // t
 const hand = {
   secs: (mm, ss) => (+mm) * 60 + (+ss),
   miles: (dist, unit) => (unit === 'km') ? (+dist) * MI_PER_KM : (+dist),
-  clock: s => Math.floor(s/60) + ':' + String(Math.round(s % 60)).padStart(2, '0'),
+  clock: s => { const t = Math.round(s); return Math.floor(t/60) + ':' + String(t % 60).padStart(2, '0'); },
 };
 
 // The five distance columns of the pace chart, transcribed by hand. Columns sit at their true

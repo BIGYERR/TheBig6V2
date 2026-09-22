@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="203"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="204"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2182,12 +2182,17 @@ function wizardNext() {
   }
 }
 
+// D126 (V204): _clkMS is the SINGLE OWNER of the seconds limb. It rounds the WHOLE value before
+// splitting, so a ':60' limb is structurally impossible rather than corrected after the fact
+// (the technique _fmtHMS already uses). Suffixes belong to the caller: '/mi', '/100', or bare.
+function _clkMS(sec){
+  const t = Math.round(sec);
+  return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0');
+}
 function formatPacePerMile(totalSecs, distMiles) {
   if(!totalSecs || !distMiles || distMiles <= 0) return '';
   const paceSecPerMile = totalSecs / distMiles;
-  const pm = Math.floor(paceSecPerMile / 60);
-  const ps = Math.round(paceSecPerMile % 60);
-  return pm + ':' + String(ps).padStart(2,'0') + '/mi';
+  return _clkMS(paceSecPerMile) + '/mi';
 }
 // ── 1RM CALCULATOR FUNCTIONS ──
 function runCalc(){
@@ -2364,9 +2369,7 @@ function setSwimUnit(unit) {
 function formatPacePer100(totalSecs, dist) {
   if(!totalSecs || !dist || dist <= 0) return '';
   const per100 = totalSecs / (dist / 100);
-  const m = Math.floor(per100 / 60);
-  const s = Math.round(per100 % 60);
-  return m + ':' + String(s).padStart(2, '0') + '/100';
+  return _clkMS(per100) + '/100';
 }
 function updateSwimPaceDisplay() {
   const el = document.getElementById('swimPaceLine');
@@ -3625,7 +3628,7 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
   const _mileBestSecs = (experience !== 'beginner' && arguments[12]) ? arguments[12] : null;
   const _anchorSec = _mileBestSecs || _expCurrentPace;
   const _chartRow = paceChartLookup('mile', _anchorSec);
-  const _fmtPace = s => `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}/mi`;
+  const _fmtPace = s => _clkMS(s) + '/mi';   // D126 (V204): seconds limb owned by _clkMS
 
   // Inject pace params onto function for run_pace_goal before calling progression builder
   if(goalId === 'run_pace_goal') {
@@ -3889,7 +3892,7 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
     // turns speed work into a threshold session run on incomplete rest.
     // 1609.344 is the metres in a mile. It is a unit, not a coaching number.
     const _M_PER_MILE = 1609.344;
-    const _intClk = t => Math.floor(t/60) + ':' + String(Math.round(t%60)).padStart(2,'0');
+    const _intClk = t => _clkMS(t);   // D126 (V204): seconds limb owned by _clkMS. Bare, no suffix.
     // tgt is the session's OWN prescribed pace in s/mi, so the recovery, the printed pace
     // and the logged dose all read off one number.
     const _intRec = (tgt, metres) => {
@@ -3925,7 +3928,7 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
         const INT_PACE_GAIN_SEC_PER_MILE = 16;   // 4 s per 400m x 4 quarters
         const intPace    = weekPace ? Math.max(pp._realisticTarget - INT_PACE_GAIN_SEC_PER_MILE, weekPace - INT_PACE_GAIN_SEC_PER_MILE) : null;
         if(pp && weekPace && intPace) {
-          const fmt = s => `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
+          const fmt = s => _clkMS(s);   // D126 (V204): seconds limb owned by _clkMS. Bare; callers append '/mi'.
           const _intTgt = Math.round(intPace);
           const _rec = _intRec(_intTgt, 400);
           // The recovery band prints as a clock in both limbs, so the sentence coach ruled
@@ -4132,7 +4135,7 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
   const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[experience||'intermediate'] || 570;
   const anchorSec = (experience !== 'beginner' && mileBestSecs) ? mileBestSecs : expCurrentPace;
   const chartRow = paceChartLookup('mile', anchorSec);
-  const fmt = s => `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}/mi`;
+  const fmt = s => _clkMS(s) + '/mi';   // D126 (V204): seconds limb owned by _clkMS. Suffix stays here.
   // V171 (D1): {mile} is Nike's first chart column — the row anchor itself. Every "Mile
   // Pace" in both tables printed with no number before this because the key did not exist.
   const paces = { mile:fmt(chartRow.mile), fiveK:fmt(chartRow.fiveK), tenK:fmt(chartRow.tenK), tempo:fmt(chartRow.tempo),
@@ -4614,7 +4617,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
       const wIdx = Math.min(week-1, tw-1);
       const weekPace = swimPace[wIdx];
       const intPace = Math.max(swimPace._realisticTarget * 0.97, weekPace * 0.97); // slightly faster than goal
-      const fmt = s => `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
+      const fmt = s => _clkMS(s);   // D126 (V204): seconds limb owned by _clkMS. Bare; callers append '/100'.
       const u = swimPace._unit;
       detail = `${intReps} x 100${u} at ${fmt(intPace)}/100 (week ${week} target — slightly faster than this week's goal split of ${fmt(weekPace)}/100). Recovery: 2-3 min easy stroke between reps. 200${u} warmup + 100${u} cooldown.`;
       // V141: the 100s and their split are the pace engine's output — preserved exactly.
@@ -12047,7 +12050,7 @@ function _benchmarkEntryFor(weekWanted){
 }
 function _benchStripHTML(cardio){
   if(!/^Benchmark Run — Retest/.test(String(cardio.subtype||''))) return '';
-  const fmt=s=>Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0');
+  const fmt=s=>_clkMS(s);   // D126 (V204): logged dist/duration is an open domain; _clkMS owns the limb
   const base=_benchmarkEntryFor(1);
   if(!base){
     return '<div class="cardio-note">No week 1 benchmark was logged — today\u2019s result becomes your baseline for the next block. Run it exactly as written.</div>';
@@ -12415,7 +12418,7 @@ const CARDIO_WORD={run:'Run',bike:'Bike',swim:'Swim'};
 let _curLogDose=null;      // dose for the sport currently being logged (null when swapped)
 let _curLogDoseFull=null;  // dose of the PLANNED sport, so swapping back restores the form
 let _curLogSub='';         // planned subtype, for the strip label
-function _fmtPaceMi(sec){ if(!isFinite(sec)||sec<=0) return null; const m=Math.floor(sec/60), s=Math.round(sec%60); return m+':'+String(s).padStart(2,'0'); }
+function _fmtPaceMi(sec){ if(!isFinite(sec)||sec<=0) return null; return _clkMS(sec); }   // D126 (V204)
 function _parseClock(t){ // "2:04" or bare seconds -> seconds
   if(!t) return null; t=String(t).trim();
   if(t.indexOf(':')>=0){ const q=t.split(':'); if(q.length===2&&q[0]!==''&&isFinite(+q[0])&&isFinite(+q[1])) return (+q[0])*60+(+q[1]); return null; }
@@ -13708,7 +13711,7 @@ function runAnchorInfo(cfg){
     ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
   return {anchorSec, rawSec, clamped, row, kind, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
 }
-function _fmtMileAnchor(sec){ return `${Math.floor(sec/60)}:${String(Math.round(sec%60)).padStart(2,'0')}`; }
+function _fmtMileAnchor(sec){ return _clkMS(sec); }   // D126 (V204)
 function runAnchorChips(a){
   const r = a.row;
   const list = [['Mile',r.mile],['5K',r.fiveK],['10K',r.tenK],['Tempo',r.tempo]];
@@ -15116,7 +15119,7 @@ function recoveryPaceWeekly(logs, hist, totalWeeks){
 // pace needs an inverted axis (up = faster), a non-zero floor and m:ss labels, and
 // threading three options through shared code puts four existing charts in the blast
 // radius for zero visual gain. Same card chrome, same dot/dash grammar.
-function _fmtPaceShort(sec){ const mn=Math.floor(sec/60), ss=Math.round(sec%60); return mn+':'+String(ss).padStart(2,'0'); }
+function _fmtPaceShort(sec){ return _clkMS(sec); }   // D126 (V204)
 function buildPaceChart(title, weeks, data, tgt, color){
   const valid=data.filter(v=>v!==null);
   if(valid.length<2) return '';                 // one dot is not a trend

@@ -235,6 +235,12 @@ MANNY_DIGEST_BY_VERSION[202] = MANNY_DIGEST_BY_VERSION[201];
 // carrying D117 slice 1 BEFORE this build, on a run that reproduced the V202 rows above.
 // It is not a digest read back off the artifact.
 MANNY_DIGEST_BY_VERSION[203] = '7d4f7ed45cc5bd53';   // D117: the ruled digest move
+// V204: ruled UNMOVED, and written as a REFERENCE for that reason. D126 is string
+// formatting and gate work only: it changes how already-computed numbers are rendered
+// and what the gates assert about them. It moves no pool, no draw, no dose and no card,
+// so HALF_MANNY cannot move. The reference makes that claim structurally: if V203's row
+// is ever re-pinned, this one follows it instead of quietly disagreeing.
+MANNY_DIGEST_BY_VERSION[204] = MANNY_DIGEST_BY_VERSION[203];   // D126: ruled UNMOVED
 
 const MANNY_DELOAD_OFF_DIGEST_BY_VERSION = {
   199: '75ae3d256b642a9d',
@@ -250,6 +256,10 @@ MANNY_DELOAD_OFF_DIGEST_BY_VERSION[202] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[201
 // long-run cards it draws from on both arms. Counterfactual anchor, printed with the
 // row above from the same pre-build source-surgery copy.
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[203] = '8fe23ae9eadde78c';   // D117: the ruled digest move
+// V204: ruled UNMOVED, so a REFERENCE row. The deload-off variant is the same NRC
+// fixture with the deload pre-pass disabled; D126 is string-and-gate only and touches
+// nothing either arm draws from.
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[204] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[203];   // D126: ruled UNMOVED
 
 // D120. The THIRD counterfactual oracle, on the same D94-t convention as the two above:
 // HALF_MANNY built from the candidate with the V200 declared-core clause line stripped.
@@ -267,6 +277,10 @@ const MANNY_CORE_OFF_DIGEST_BY_VERSION = {
 MANNY_CORE_OFF_DIGEST_BY_VERSION[201] = MANNY_CORE_OFF_DIGEST_BY_VERSION[200];   // D94: ruled UNMOVED
 MANNY_CORE_OFF_DIGEST_BY_VERSION[202] = MANNY_CORE_OFF_DIGEST_BY_VERSION[201];   // V202: UNMOVED
 MANNY_CORE_OFF_DIGEST_BY_VERSION[203] = '658ad56c903ad829';   // D117 moved both arms; D120
+// V204: ruled UNMOVED, so a REFERENCE row. D126 is string-and-gate only; the
+// declared-core clause and everything the stripped-clause counterfactual draws are
+// untouched.
+MANNY_CORE_OFF_DIGEST_BY_VERSION[204] = MANNY_CORE_OFF_DIGEST_BY_VERSION[203];   // D126: ruled UNMOVED
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
                    MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION,
