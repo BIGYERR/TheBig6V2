@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="202"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="203"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1144,6 +1144,34 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     <button class="back-btn" onclick="closeGoalSheet()">← Back</button>
   </div>
   <div class="rand-body" id="goalBody"></div>
+</div>
+
+<!-- D116 (V203): the mile pencil. Two sheets, one pencil. mileOverlay edits the
+     anchor; mileLockOverlay is what the last three weeks of a program show
+     instead. The lock is evaluated at tap in openMileSheet, never at render. -->
+<div class="rand-overlay" id="mileOverlay">
+  <div class="rand-header">
+    <button class="back-btn" onclick="closeMileSheet()">← Back</button>
+  </div>
+  <div class="rand-body">
+    <div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.03em;color:var(--text)">YOUR MILE</div>
+    <div id="mileSheetIntro" style="font-size:13px;color:var(--text);line-height:1.5;margin-top:6px"></div>
+    <div style="display:flex;gap:6px;margin-top:12px">
+      <input type="number" class="input-field" id="mileSheetMins" style="flex:1;text-align:center" placeholder="min" min="0" max="99">
+      <input type="number" class="input-field" id="mileSheetSecs" style="flex:1;text-align:center" placeholder="sec" min="0" max="59">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button id="mileCommitBtn" class="prog-action-btn primary" style="flex:1" onclick="commitMileChange()">Update my mile</button>
+      <button class="prog-action-btn" style="flex:1" onclick="closeMileSheet()">Keep what I have</button>
+    </div>
+  </div>
+</div>
+
+<div class="rand-overlay" id="mileLockOverlay">
+  <div class="rand-header">
+    <button class="back-btn" onclick="closeMileSheet()">← Back</button>
+  </div>
+  <div class="rand-body" id="mileLockBody"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -3743,7 +3771,7 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
       // the lsd_easy branch for the full doctrine note. Same conversion, same ceiling;
       // this is simply the week's LONGER easy run. run_base never tapers (V157), so no
       // taper text here by construction.
-      const _steadySecL = Math.round((_row.tempo + _row.recovery)/2);
+      const _steadySecL = steadyCapSec(_row);
       const _minsL = Math.max(15, Math.round((dist * _row.recovery / 60) / 5) * 5);
       subtype = 'Easy Run — Long';
       detail = _minsL + ' min easy — conversational (RPE 3-4 out of 10). Around ' + recPace + ' is right for you — do not run faster than ' + _fmtPace(_steadySecL) + '. This is the longest run of your week — time on feet is the goal. Log the distance you covered.';
@@ -3773,7 +3801,7 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
       // "slightly faster than easy": anything quicker than steady IS the quality
       // session, so an easy run capped at steady can never silently become one.
       // Single-clock rule holds: everything still derives from one chart row.
-      const _steadySec = Math.round((_row.tempo + _row.recovery)/2);
+      const _steadySec = steadyCapSec(_row);
       // V159: the scheduler's weekly-budget split arrives as arguments[19] and wins over
       // the dist-derived minutes (which remain the unfrozen path's source). A budgeted
       // session past 40 min is the block's designated long run — label it so.
@@ -4154,11 +4182,11 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
       // V171 (D6): Nike's progression-run definition — start slower than Recovery Pace,
       // finish faster than it, AVERAGE Recovery Pace. The old copy built to race pace on
       // every long run; Nike never puts race pace in a long run before race day.
-      detail = `${L.label}: ${distStr}, run as a progression — start slower than Recovery Pace, finish faster than it, and average Recovery Pace (${paces.recovery}) across the run. Comfortable the whole way.`;
+      detail = `${L.label}: ${distStr}, run as a progression — start slower than Recovery Pace, finish faster than it, and average Recovery Pace (${paces.recovery}) across the run. Comfortable the whole way. Average no faster than ${fmt(steadyCapSec(chartRow))}.`;
       // The average is a real number now, so the log readout shows a delta against it.
       // Progress modules filter by subtype before reading tgt, so long runs stay out of
       // the recovery-pace and drift charts.
-      _dose = L.unit === 'min' ? {k:'time', mins:L.val, tgt:Math.round(chartRow.recovery)} : {k:'dist', mi:L.val, tgt:Math.round(chartRow.recovery)};
+      _dose = L.unit === 'min' ? {k:'time', mins:L.val, tgt:Math.round(chartRow.recovery), cap:steadyCapSec(chartRow)} : {k:'dist', mi:L.val, tgt:Math.round(chartRow.recovery), cap:steadyCapSec(chartRow)};
       if(L.rehearsal) {
         // V187 (F6): Nike's "13.1K Dress Rehearsal" rehearses the ROUTINE, not the race —
         // it is listed as a long run and the pace stays the progression. The distance
@@ -4217,12 +4245,12 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
     const _prog = 'Start a touch slower than that, finish a touch faster.';
     if(_pick && typeof _pick === 'object') {
       const _mi = +_pick.mi || 0;
-      detail = `${_pick.label} recovery run — ${_mi} mi at Recovery Pace (${paces.recovery}). 4–5/10 effort — easy enough to talk, laugh, or argue freely. ${_prog}`;
-      _dose = {k:'dist', mi:_mi, tgt:Math.round(chartRow.recovery)};
+      detail = `${_pick.label} recovery run — ${_mi} mi at Recovery Pace (${paces.recovery}). 4–5/10 effort — easy enough to talk, laugh, or argue freely. ${_prog} Do not run faster than ${fmt(steadyCapSec(chartRow))}.`;
+      _dose = {k:'dist', mi:_mi, tgt:Math.round(chartRow.recovery), cap:steadyCapSec(chartRow)};
     } else {
       const recMin = +_pick || 30;
-      detail = `${recMin}-minute recovery run at Recovery Pace (${paces.recovery}). 4–5/10 effort — easy enough to talk, laugh, or argue freely. ${_prog}`;
-      _dose = {k:'time', mins:recMin, tgt:Math.round(chartRow.recovery)};
+      detail = `${recMin}-minute recovery run at Recovery Pace (${paces.recovery}). 4–5/10 effort — easy enough to talk, laugh, or argue freely. ${_prog} Do not run faster than ${fmt(steadyCapSec(chartRow))}.`;
+      _dose = {k:'time', mins:recMin, tgt:Math.round(chartRow.recovery), cap:steadyCapSec(chartRow)};
     }
     note = 'RECOVERY RUN: Just as important as the hard days. This is where your body absorbs the training. Going too fast here steals from your speed and long runs.';
   }
@@ -4674,6 +4702,11 @@ const PACE_CHART = [
   {mile:690, fiveKbest:2280, fiveK:735, tenKbest:4710, tenK:755, tempo:780, halfBest:10500,half:795, marBest:21000, marathon:800, recovery:845},
   {mile:720, fiveKbest:2370, fiveK:760, tenKbest:4890, tenK:785, tempo:815, halfBest:11100,half:845, marBest:21600, marathon:825, recovery:870},
 ];
+
+// V203 (D117): the single owner of the steady ceiling. Easy days never run faster than
+// the midpoint of Tempo and Recovery Pace; every easy-run cap in the app reads this and
+// nothing else, so there is exactly one place the ceiling can be wrong.
+function steadyCapSec(row){ return Math.round((row.tempo + row.recovery)/2); }
 
 // Find the row from any anchor and interpolate between bracketing rows.
 // anchorType: 'mile' | 'fiveKbest' | 'tenKbest' | 'halfBest' | 'marBest'
@@ -6709,9 +6742,12 @@ function showLengthWarning(msg, weeks, onConfirm){
 // impossible entries are rejected here, and out-of-chart entries are told what the
 // clamp will do BEFORE the build. Beginners never see the field; their entry is
 // ignored by every consumer, so they pass clean.
-function _mileEntryState(){
-  const g=WD.cardioGoals&&WD.cardioGoals.run;
-  if(!g||WD.experience==='beginner') return {ok:true};
+function _mileEntryState(g, exp){
+  // V203 (D116): (g, exp) default to the wizard draft so the mid-program mile
+  // sheet and the wizard share ONE validator and one set of strings.
+  if(g===undefined) g=(typeof WD!=='undefined'&&WD.cardioGoals)?WD.cardioGoals.run:null;
+  if(exp===undefined) exp=(typeof WD!=='undefined')?WD.experience:'';
+  if(!g||exp==='beginner') return {ok:true};
   if(g.mileBestMins===undefined||g.mileBestMins==='') return {ok:true};
   const mm=+g.mileBestMins, ss=+(g.mileBestSecs||0);
   const sec=mm*60+ss;
@@ -13664,13 +13700,13 @@ function runAnchorInfo(cfg){
   const anchorSec = row.mile;
   const clamped = (exp !== 'beginner' && !!entered && Math.round(row.mile) !== Math.round(rawSec)) ? (rawSec < row.mile ? 'fast' : 'slow') : null;
   const src = g.mileBestSrc || null;
-  const kind = exp === 'beginner' ? 'beginner' : !entered ? 'default' : (src && src.kind === 'seeded') ? 'seeded' : 'entered';
+  const kind = exp === 'beginner' ? 'beginner' : !entered ? 'default' : (src && src.kind === 'seeded') ? 'seeded' : (src && src.kind === 'edited') ? 'edited' : 'entered';
   const race = g.id === 'run_half' ? 'half' : g.id === 'run_marathon' ? 'marathon' : null;
   // V176 (D10): the fixed target for pace-goal programs. The chip is the prescription;
   // the measure of progress is the projection card walking toward it.
   const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
     ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
-  return {anchorSec, rawSec, clamped, row, kind, prog:(src && src.prog) || '', n:(src && +src.n) || 0, race, goalId:g.id, goalT};
+  return {anchorSec, rawSec, clamped, row, kind, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
 }
 function _fmtMileAnchor(sec){ return `${Math.floor(sec/60)}:${String(Math.round(sec%60)).padStart(2,'0')}`; }
 function runAnchorChips(a){
@@ -13699,7 +13735,12 @@ function runAnchorSentence(a){
     return `Anchored on ${art} <b>${m} mile</b>, ${raw} ${why}, so its ${a.clamped==='fast'?'fastest':'slowest'} row is used.` + tail;
   }
   if(a.kind === 'seeded')   return `Anchored on ${art} <b>${m} mile</b>, worked back from ${a.n>0?a.n:'the'} recovery run${a.n===1?'':'s'} you logged in ${a.prog||'your last program'}.` + tail;
-  if(a.kind === 'entered')  return `Anchored on ${art} <b>${m} mile</b>, the time you entered.` + tail;
+  if(a.kind === 'edited' && a.from){
+    const from = a.from.kind === 'default' ? 'estimated from experience'
+               : _fmtMileAnchor((+a.from.mins||0)*60 + (+a.from.secs||0));
+    return `Anchored on ${art} <b>${m} mile</b>, the time you entered in week ${a.wk}. Before that it was ${from}.` + tail;
+  }
+  if(a.kind === 'entered' || a.kind === 'edited')  return `Anchored on ${art} <b>${m} mile</b>, the time you entered.` + tail;
   if(a.kind === 'beginner') return `Anchored on ${art} <b>${m} mile</b>, the beginner default. A mile time starts being used at intermediate.`;
   return `Anchored on ${art} <b>${m} mile</b>, estimated from experience; no mile time was entered.` + tail;
 }
@@ -13707,6 +13748,7 @@ function runAnchorLine(a){
   const m = _fmtMileAnchor(a.anchorSec);
   const prov = a.clamped ? `entry ${a.rawSec>0?_fmtMileAnchor(a.rawSec):'invalid'} clamped to the chart's ${a.clamped==='fast'?'fastest':'slowest'} row`
              : a.kind==='seeded' ? `seeded from ${a.prog||'previous block'}, ${a.n} logged recovery run${a.n===1?'':'s'}`
+             : a.kind==='edited' ? `edited in week ${a.wk}`
              : a.kind==='entered' ? 'entered' : a.kind==='beginner' ? 'beginner default' : 'est. from experience';
   const chips = runAnchorChips(a).slice(1).map(c=>`${c.k.toLowerCase()} ${c.v}`).join(' / ');
   const scope = (a.goalId === 'run_pace_goal' && a.kind !== 'beginner') ? ' | Week 1 runs off this row. Every week after it moves toward your goal.' : '';
@@ -13762,7 +13804,7 @@ function progDetailHTML(p){
       <div class="det-group"><div class="det-label">Profile</div>${row('Experience',s.experience)}${row('Age range',s.ageBracket)}${row('Equipment',s.equipLabel)}${row('Units',s.unit)}</div>
       <div class="det-group"><div class="det-label">Schedule</div>${row('Train days',days)}${row('Rest days',rest)}${row('Length',s.length+' weeks')}</div>
       <div class="det-group"><div class="det-label">Starting 1RM${estNote}</div><div class="det-lifts">${chip('Squat',s.lifts.squat)}${chip('Bench',s.lifts.bench)}${chip('Deadlift',s.lifts.deadlift)}</div></div>${s.runAnchor?`
-      <div class="det-group"><div class="det-label">Run paces</div><div class="det-paces">${runAnchorChips(s.runAnchor).map(c=>`<div class="lift-chip"><div class="lc-k">${c.k}</div><div class="lc-v">${c.v}</div><div class="lc-u">${c.u}</div></div>`).join('')}</div><div class="det-src">${runAnchorSentence(s.runAnchor)}</div></div>`:''}
+      <div class="det-group"><div class="det-label" style="display:inline-flex;align-items:center;gap:7px">Run paces${s.runAnchor.kind!=='beginner'?`<button onclick="event.stopPropagation();openMileSheet('${p.id}')" aria-label="Change mile time" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:2px;display:flex;align-items:center">${asyIcon('pencil',14)}</button>`:''}</div><div class="det-paces">${runAnchorChips(s.runAnchor).map(c=>`<div class="lift-chip"><div class="lc-k">${c.k}</div><div class="lc-v">${c.v}</div><div class="lc-u">${c.u}</div></div>`).join('')}</div><div class="det-src">${runAnchorSentence(s.runAnchor)}</div></div>`:''}
       <div class="det-group"><div class="det-label">Cardio</div>${cardioRows}</div>
       ${eventGroup}
       <div class="det-foot"><span class="det-seed">${s.seed!=null?'seed '+s.seed:''}</span><button class="copy-icon-btn" onclick="event.stopPropagation();copyProgSel('${p.id}')" aria-label="Copy program selections for troubleshooting" title="Copy for troubleshooting">${asyIcon('copy',15)}</button></div>
@@ -13884,7 +13926,10 @@ function commitGoalChange(){
   const sport=_goalDraft.sport;
   const opts=CARDIO_GOALS_BY_TYPE[sport]||[];
   const g=opts.find(o=>o.id===_goalDraft.sel); if(!g) return;
-  const next={id:g.id,label:g.label,baseline:''};
+  const prev=((programs[pi].cfg.cardioGoals||{})[sport])||{};
+  const next={id:g.id,label:g.label,baseline:'',
+    ...(sport==='run'&&prev.mileBestMins!==undefined&&prev.mileBestMins!==''
+        ?{mileBestMins:prev.mileBestMins,mileBestSecs:prev.mileBestSecs,...(prev.mileBestSrc?{mileBestSrc:prev.mileBestSrc}:{})}:{})};
   if(_GOAL_REQ_INPUTS.has(g.id)){
     const i=_goalDraft.inputs;
     const mins=+i.targetMins||0, secs=+i.targetSecs||0;
@@ -13903,6 +13948,84 @@ function commitGoalChange(){
   closeGoalSheet();
   renderProgList();
   showToast('Goal switched. Program rebuilt from this week.');
+}
+// ── D116 (V203): THE MILE PENCIL ──────────────────────────────────────────────
+// Same architecture as D5: the cfg edit IS the feature. mileBestMins/Secs go in
+// as typed and interpolate through paceChartLookup exactly as a wizard entry
+// does — no snap to a chart row, no cap on the move, no cooldown. The per-day
+// freeze protects every trained day; untrained days rebuild off the new row.
+// mileBestSrc.from is ALWAYS written, including when the prior anchor was the
+// experience default, so runAnchorSentence can name what it replaced.
+var _mileDraft=null;
+function openMileSheet(progId){
+  const p=getPrograms().find(x=>x.id===progId); if(!p) return;
+  const tw=p.totalWeeks||6;
+  const curWk=_goalCurWeek(p);
+  // Evaluated AT TAP, never at render: a program that crosses into the window
+  // while the Programs tab is open still locks.
+  if(curWk >= tw - 2){
+    const c=p.cfg||{};
+    let facts='';
+    if(c.raceDate){
+      let rd=null; try{ rd=new Date(c.raceDate); }catch(_){ rd=null; }
+      if(rd && !isNaN(rd.getTime())){
+        const today=new Date(); today.setHours(0,0,0,0);
+        const rdm=new Date(rd.getTime()); rdm.setHours(0,0,0,0);
+        let rs=''; try{ rs=rd.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(_){ rs=String(c.raceDate); }
+        facts+='<div class="det-row"><span class="k">Days out</span><span class="v">'+Math.round((rdm-today)/86400000)+'</span></div>';
+        facts+='<div class="det-row"><span class="k">Race day</span><span class="v">'+rs+'</span></div>';
+      }
+    }
+    facts+='<div class="det-row"><span class="k">Week</span><span class="v">'+curWk+' of '+tw+'</span></div>';
+    const lb=document.getElementById('mileLockBody');
+    if(lb) lb.innerHTML='<div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.03em;color:var(--accent)">THE ROW HOLDS</div>'
+      +'<div class="det-group" style="margin-top:10px">'+facts+'</div>'
+      +'<div style="font-size:13px;color:var(--text);line-height:1.5;margin-top:12px">You are too close to the race. Three weeks out the work is done. Changing your mile now would reset the pace of every session left, and those sessions have one job. Get you to the line fresh.</div>'
+      +'<div style="display:flex;gap:8px;margin-top:14px"><button class="prog-action-btn primary" style="flex:1" onclick="closeMileSheet()">Got it</button></div>';
+    const lo=document.getElementById('mileLockOverlay'); if(lo){ lo.classList.add('open'); lo.scrollTop=0; }
+    return;
+  }
+  const g=((p.cfg&&p.cfg.cardioGoals)||{}).run||{};
+  _mileDraft={progId:progId};
+  const mEl=document.getElementById('mileSheetMins'), sEl=document.getElementById('mileSheetSecs');
+  if(mEl) mEl.value=(g.mileBestMins!==undefined?g.mileBestMins:'');
+  if(sEl) sEl.value=(g.mileBestSecs!==undefined?g.mileBestSecs:'');
+  const intro=document.getElementById('mileSheetIntro');
+  if(intro) intro.textContent='Put in the mile you can run today. Every run still ahead of you rebuilds off it. Weeks you have already trained stand as they are.';
+  const o=document.getElementById('mileOverlay'); if(o){ o.classList.add('open'); o.scrollTop=0; }
+}
+function closeMileSheet(){
+  const o=document.getElementById('mileOverlay'); if(o) o.classList.remove('open');
+  const l=document.getElementById('mileLockOverlay'); if(l) l.classList.remove('open');
+}
+function commitMileChange(){
+  if(!_mileDraft) return;
+  const programs=getPrograms();
+  const pi=programs.findIndex(x=>x.id===_mileDraft.progId); if(pi<0) return;
+  const p=programs[pi];
+  const mEl=document.getElementById('mileSheetMins'), sEl=document.getElementById('mileSheetSecs');
+  const mRaw=mEl?String(mEl.value).trim():'', sRaw=sEl?String(sEl.value).trim():'';
+  // A blank field blocks the commit. A pencil changes a number; it never un-anchors.
+  if(mRaw===''||sRaw===''){ showToast('Put in both the minutes and the seconds.'); return; }
+  const mm=+mRaw, ss=+sRaw;
+  const st=_mileEntryState({mileBestMins:mRaw,mileBestSecs:sRaw},(p.cfg&&p.cfg.experience)||'intermediate');
+  if(!st.ok){ showToast(st.msg); return; }
+  const prev=((p.cfg.cardioGoals||{}).run)||{};
+  const next={...prev, mileBestMins:String(mm), mileBestSecs:String(ss),
+    mileBestSrc:{kind:'edited', at:new Date().toISOString().slice(0,10), wk:_goalCurWeek(p),
+      from:{mins:prev.mileBestMins||'', secs:prev.mileBestSecs||'',
+            kind:(prev.mileBestSrc&&prev.mileBestSrc.kind)||(prev.mileBestMins?'entered':'default')}}};
+  p.cfg={...p.cfg,cardioGoals:{...(p.cfg.cardioGoals||{}),run:next}};
+  savePrograms(programs);
+  if(activeProgId===_mileDraft.progId){
+    activeProg=refreshProgram(programs[pi]);
+    currentWeek=calcCurrentWeek();
+    try{ if(document.getElementById('screenWeek').classList.contains('active')) renderWeekView(); }catch(e){}
+  }
+  closeMileSheet();
+  renderProgList();
+  // Out-of-chart entries commit and are told what the clamp does, same as the wizard.
+  showToast('Mile updated. Every run still ahead of you now reads from your new row.'+(st.adv?' '+st.adv:''));
 }
 function toggleProgCard(id){
   const card=document.getElementById('pcard_'+id);if(!card)return;
@@ -15630,11 +15753,16 @@ function buildLedgerCard(led, unit){
 // sits at fewer seconds than `tgt` = recovery. The ceiling is therefore the FAST edge
 // and the violation is coming in UNDER it.
 //
-// Ceiling coverage: `dose.cap` is only written by the run_base time-dosed branch, so a
-// distance-dosed easy run (every event program) carries `tgt` alone and would render
-// with no ceiling — the one element the chart exists for. Derived instead from the
-// app's own formula at the steady-pace site, read off PACE_CHART's tempo column. No
-// invented constant: this is the number the engine itself would have written.
+// Ceiling coverage: this is a FALLBACK for history, not a second source of truth.
+// steadyCapSec() is the single owner of the steady ceiling for anything the engine
+// builds — every easy and recovery card, NSW and NRC, distance-dosed and time-dosed,
+// writes `dose.cap` from it. The only doses that reach this function are `ia_hist_`
+// snapshots frozen before V203 landed that writer: they carry `tgt` alone and would
+// otherwise render with no ceiling, the one element the chart exists for. That makes
+// the fallback self-expiring — no snapshot written from V203 on lacks a `cap`, so the
+// set of rows needing it is closed and only shrinks as old history ages out.
+// It reproduces steadyCapSec's own formula off PACE_CHART's tempo column rather than
+// inventing a constant: the number the engine itself would have written at the time.
 function _steadyCeilingFor(recSec){
   const rows=(typeof PACE_CHART!=='undefined')?PACE_CHART:null;
   if(!rows||!rows.length||!(recSec>0)) return null;

@@ -24,9 +24,14 @@
 //      use, the way tests/measure/v200_d89_tier3_readers.js does. The threshold is never
 //      retyped.
 //   F/G the counterfactual is the CANDIDATE with the one clause line removed. F1 proves
-//      that counterfactual IS V199 (HALF_MANNY digest 6e32421331693437, the value V198
-//      and V199 shipped and four other gates pin). Every before/after number is measured
-//      against it on a stated lattice, and every population is printed with a denominator.
+//      that counterfactual matches its era row in MANNY_CORE_OFF_DIGEST_BY_VERSION, the
+//      harness table that records the clause-off HALF_MANNY digest per version, and that
+//      the shipped arm matches its row in MANNY_DIGEST_BY_VERSION. Row existence is a
+//      conjunct, so a missing row fails loudly. On V200 to V202 the clause-off row is
+//      6e32421331693437, the digest V198 and V199 shipped and four other gates pin; D117
+//      moved BOTH arms on V203, which is why neither arm is a literal here any more (D120).
+//      Every before/after number is measured against the counterfactual on a stated
+//      lattice, and every population is printed with a denominator.
 //
 // LATTICE (stated, fixed, deterministic)
 //   HALF_MANNY  +  6 equipment x 2 liftingFocus x 2 experience x 2 seeds = 48
@@ -38,7 +43,8 @@
 // usage: node tests/gates/g200_core_tier.js <candidate.html> [baseline.html — ignored]
 // ════════════════════════════════════════════════════════════════════════════════════
 const fs=require('fs'), os=require('os'), path=require('path');
-const {load, fixtures, weekGrid, progDigest, DAYS}=require(path.join(__dirname,'..','harness.js'));
+const {load, fixtures, weekGrid, progDigest, DAYS,
+       MANNY_DIGEST_BY_VERSION, MANNY_CORE_OFF_DIGEST_BY_VERSION}=require(path.join(__dirname,'..','harness.js'));
 
 const ART=process.argv[2]||path.join(__dirname,'..','..','index.html');
 let PASS=0, FAIL=0;
@@ -141,8 +147,10 @@ const MLN=MO.eval('__LN'), MT=MO.eval('__T');
 
 const digC=progDigest(IA.buildProgram(JSON.parse(JSON.stringify(fixtures.HALF_MANNY))));
 const digM=progDigest(MO.buildProgram(JSON.parse(JSON.stringify(fixtures.HALF_MANNY))));
-ok(digM==='6e32421331693437', 'F1a the counterfactual IS V199: HALF_MANNY digest 6e32421331693437 (got '+digM+')');
-ok(digC==='d4364dd3fa63a3a1', 'F1b the candidate ships the ruling\'s after-digest d4364dd3fa63a3a1 (got '+digC+')');
+const CORE_OFF_ROW=MANNY_CORE_OFF_DIGEST_BY_VERSION[IA.version];   // era row, not a literal (D89)
+ok(!!CORE_OFF_ROW&&digM===CORE_OFF_ROW, 'F1a the counterfactual matches the V'+IA.version+' row of MANNY_CORE_OFF_DIGEST_BY_VERSION ('+(CORE_OFF_ROW||'NO ROW')+') (got '+digM+')'+(CORE_OFF_ROW?'':' — no MANNY_CORE_OFF_DIGEST_BY_VERSION row for V'+IA.version+': an unruled counterfactual digest move'));
+const SHIPPED_ROW=MANNY_DIGEST_BY_VERSION[IA.version];   // era row, not a literal (D89)
+ok(!!SHIPPED_ROW&&digC===SHIPPED_ROW, 'F1b the candidate ships the V'+IA.version+' row of MANNY_DIGEST_BY_VERSION ('+(SHIPPED_ROW||'NO ROW')+') (got '+digC+')'+(SHIPPED_ROW?'':' — no MANNY_DIGEST_BY_VERSION row for V'+IA.version+': an unruled digest move'));
 
 // D3 / E-non-vacuity: the V199 sentence and the V199 tag, read back from real calls on
 // the counterfactual. Without these, D1 and E1 would also pass on a build where

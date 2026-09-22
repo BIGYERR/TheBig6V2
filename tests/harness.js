@@ -228,6 +228,13 @@ MANNY_DIGEST_BY_VERSION[201] = MANNY_DIGEST_BY_VERSION[200];              // D94
 // clock appendix, and the generic INT note copy changed. HALF_MANNY is an NRC half-marathon
 // fixture: no pace-goal progression, no NSW INT session, no card touched.
 MANNY_DIGEST_BY_VERSION[202] = MANNY_DIGEST_BY_VERSION[201];
+// V203: ruled MOVE, and written as a LITERAL for that reason. D117 gives the easy-day
+// ceiling a single owner: the ceiling sentence plus dose.cap rewrite every NRC recovery
+// and long-run card, and HALF_MANNY is an NRC half-marathon fixture built of exactly
+// those days. The counterfactual anchor was printed by coach from a source-surgery copy
+// carrying D117 slice 1 BEFORE this build, on a run that reproduced the V202 rows above.
+// It is not a digest read back off the artifact.
+MANNY_DIGEST_BY_VERSION[203] = '7d4f7ed45cc5bd53';   // D117: the ruled digest move
 
 const MANNY_DELOAD_OFF_DIGEST_BY_VERSION = {
   199: '75ae3d256b642a9d',
@@ -238,9 +245,32 @@ MANNY_DELOAD_OFF_DIGEST_BY_VERSION[201] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[200
 // variant of HALF_MANNY is the same NRC fixture with the deload pre-pass disabled; V202 moves
 // nothing it draws from.
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[202] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[201];
+// V203: ruled MOVE for the same reason, so a LITERAL row. The deload-off variant is the
+// same NRC fixture with the deload pre-pass disabled; D117 moves the recovery and
+// long-run cards it draws from on both arms. Counterfactual anchor, printed with the
+// row above from the same pre-build source-surgery copy.
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[203] = '8fe23ae9eadde78c';   // D117: the ruled digest move
+
+// D120. The THIRD counterfactual oracle, on the same D94-t convention as the two above:
+// HALF_MANNY built from the candidate with the V200 declared-core clause line stripped.
+// Its consumer is g200_core_tier F1a, which until V203 pinned a literal. D117 moved both
+// arms of that gate, so the literal was a lie on the candidate and green-for-the-wrong-
+// reason on the baseline; an era row is green on BOTH artifacts for the right reason.
+// The table starts at 200 and has NO 199 row on purpose: on V199 the clause does not
+// exist, the counterfactual is not constructible, and a 199 row would be a dead pin
+// dressed as a maintained one. Every value below was printed by coach from source-surgery
+// copies of the V199..V202 tag artifacts and the V203 working copy, reproducing the
+// earlier rows on the same run so the new one is anchored. Not read off gate output.
+const MANNY_CORE_OFF_DIGEST_BY_VERSION = {
+  200: '6e32421331693437',   // D89: V200 with the clause stripped is V199's shipped digest
+};
+MANNY_CORE_OFF_DIGEST_BY_VERSION[201] = MANNY_CORE_OFF_DIGEST_BY_VERSION[200];   // D94: ruled UNMOVED
+MANNY_CORE_OFF_DIGEST_BY_VERSION[202] = MANNY_CORE_OFF_DIGEST_BY_VERSION[201];   // V202: UNMOVED
+MANNY_CORE_OFF_DIGEST_BY_VERSION[203] = '658ad56c903ad829';   // D117 moved both arms; D120
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
-                   MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION };
+                   MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION,
+                   MANNY_CORE_OFF_DIGEST_BY_VERSION };
 
 if(require.main === module){
   const file = process.argv[2];
