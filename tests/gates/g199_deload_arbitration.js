@@ -103,6 +103,7 @@ DELOAD_ARB_BY_VERSION[205] = {
 // two-artifact run: the same five counts read off V205 and V206.
 DELOAD_ARB_BY_VERSION[206] = DELOAD_ARB_BY_VERSION[205];   // V206 D109/D137: ruled UNMOVED
 DELOAD_ARB_BY_VERSION[207] = DELOAD_ARB_BY_VERSION[206];   // D106a: ruled UNMOVED (test-week pin and NSW trial; no section arbitration)
+DELOAD_ARB_BY_VERSION[208] = DELOAD_ARB_BY_VERSION[207];   // V208 D103a/D104a: ruled UNMOVED (NSW keys, labels and placement; no section arbitration)
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[

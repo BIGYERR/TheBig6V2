@@ -261,6 +261,11 @@ MANNY_DIGEST_BY_VERSION[206] = '0ac7da6b1691a8e1';   // D109: the ruled digest m
 // V207: ruled UNMOVED, so a REFERENCE row. Coach printed it on the V206 tag and a slice-A copy,
 // identical to [206]. D106a touches the NSW test-goal path only.
 MANNY_DIGEST_BY_VERSION[207] = MANNY_DIGEST_BY_VERSION[206];   // D106a: ruled UNMOVED (NSW test-goal path only; NRC reads none of it)
+// V208: ruled UNMOVED, so a REFERENCE row. V208 stamps and renames NSW run sessions
+// (D103a), re-keys halfstep/protect (D103a slice 2), places run_base by shape (D104a)
+// and fixes the D106a shakeout; NRC reads none of it. Printed by coach from the slice
+// 0–5c working tree with this gate's own method: 0ac7da6b1691a8e1 on this run.
+MANNY_DIGEST_BY_VERSION[208] = MANNY_DIGEST_BY_VERSION[207];   // V208: ruled UNMOVED
 
 const MANNY_DELOAD_OFF_DIGEST_BY_VERSION = {
   199: '75ae3d256b642a9d',
@@ -294,6 +299,7 @@ MANNY_DELOAD_OFF_DIGEST_BY_VERSION[205] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[204
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[206] = '1069cd7f86eed204';   // D109: the ruled digest move
 // V207: ruled UNMOVED, so a REFERENCE row (coach printed it on the V206 tag and a slice-A copy).
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[207] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[206];   // D106a: ruled UNMOVED
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[208] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[207];   // V208: ruled UNMOVED (1069cd7f86eed204 printed by g199's method)
 
 // D120. The THIRD counterfactual oracle, on the same D94-t convention as the two above:
 // HALF_MANNY built from the candidate with the V200 declared-core clause line stripped.
@@ -325,6 +331,7 @@ MANNY_CORE_OFF_DIGEST_BY_VERSION[205] = MANNY_CORE_OFF_DIGEST_BY_VERSION[204];  
 MANNY_CORE_OFF_DIGEST_BY_VERSION[206] = '9d14801a63111081';   // D109: the ruled digest move (copy only, 53/98 days text-only)
 // V207: ruled UNMOVED, so a REFERENCE row (coach printed it on the V206 tag and a slice-A copy).
 MANNY_CORE_OFF_DIGEST_BY_VERSION[207] = MANNY_CORE_OFF_DIGEST_BY_VERSION[206];   // D106a: ruled UNMOVED
+MANNY_CORE_OFF_DIGEST_BY_VERSION[208] = MANNY_CORE_OFF_DIGEST_BY_VERSION[207];   // V208: ruled UNMOVED (9d14801a63111081 printed by g200's method)
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
                    MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION,

@@ -74,6 +74,38 @@ if(VER >= 205){
   console.log('NOTE ia-version ' + VER + ' with the D125 routing present: pre-bump working artifact, rows RUN');
 }
 
+// ── ERA ROWS: how a run card names its quality session (standing ruling 4) ───────────
+// Keyed to the RULING, D103a, which ships on ia-version 208, not to the version this gate
+// shipped on. Through 207 the two NSW quality runs are named "Interval (INT)" and
+// "Continuous High Intensity (CHI)" and carry no key, so a card is read by its name.
+// From 208 the same two cards are named "Short Interval (SI)" and "Long Interval (LI)" and
+// every NSW run card carries dose.key; a card is read by its key (int / chi), and E1
+// requires its NSW name to agree with that key on every run card read, so every claim
+// below is still about the named card the athlete sees. D103a moved words, not days: no
+// expectation in this file changes with the era. A version with no row is a named FAIL.
+const RUN_CARD_ERAS = [
+  { hi: 207, name: { int: /^Interval/, chi: /^Continuous High Intensity/ }, key: null },
+  { lo: 208, name: { int: /^Short Interval \(SI\)/, chi: /^Long Interval \(LI\)/ }, key: { int: 'int', chi: 'chi' } }
+];
+const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || VER >= r.lo) && (r.hi === undefined || VER <= r.hi));
+if(CARD_ROWS.length !== 1){
+  ok('E0 ia-version ' + VER + ' reads its run cards through exactly one era row', false, CARD_ROWS.length + ' rows match');
+  summary(1);
+}
+const CARD = CARD_ROWS[0];
+console.log('NOTE run cards read through the ' + (CARD.key ? '208+ row (D103a names, dose.key)' : '207- row (INT / CHI names)'));
+let cardsRead = 0, cardSplit = 0; const cardSplitAt = [];
+function runQuality(c){
+  const s = String(c.subtype || '');
+  const byName = CARD.name.int.test(s) ? 'int' : CARD.name.chi.test(s) ? 'chi' : null;
+  if(!CARD.key) return byName;
+  const k = c.dose && c.dose.key;
+  const byKey = k === CARD.key.int ? 'int' : k === CARD.key.chi ? 'chi' : null;
+  cardsRead++;
+  if(byKey !== byName){ cardSplit++; if(cardSplitAt.length < 4) cardSplitAt.push(s + ' key=' + k); }
+  return byKey;
+}
+
 // ── the calendar, written here ──────────────────────────────────────────────────
 const DAYS = ['sun','mon','tue','wed','thu','fri','sat'];
 const pos = d => DAYS.indexOf(d);
@@ -328,8 +360,8 @@ function runLayout(w){
     (Array.isArray(c) ? c : [c]).forEach(s => {
       if(s.type !== 'run') return;
       const st = s.subtype || '';
-      if(/^Interval/.test(st)) out[d] = 'int';
-      else if(/^Continuous High Intensity/.test(st)) out[d] = 'chi';
+      const q = runQuality(s);
+      if(q) out[d] = q;
       else if(/^Long Slow Distance/.test(st)) out[d] = s.legLoad ? 'lsd_long' : 'lsd_easy';
     });
   });
@@ -423,4 +455,7 @@ ok('P8b the chooser plan outranks the last-day long-run default in the NSW type 
   ok('P9b run_base carries no INT or CHI (Lydiard block)', !days.some(d => lay[d] === 'int' || lay[d] === 'chi'),
      days.map(d=>d+':'+lay[d]).join(' '));
 }
+// ── E1 the 208+ row reads the key, and the key must say what the name says ──────────
+if(CARD.key) ok('E1 every run card read at ia-version ' + VER + ' names the same quality session in its NSW name and its dose.key (' + cardsRead + ' run cards)',
+  cardsRead > 0 && cardSplit === 0, cardSplit + ' disagree: ' + cardSplitAt.join(' | '));
 summary(fail ? 1 : 0);

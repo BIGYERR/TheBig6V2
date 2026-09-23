@@ -1,0 +1,30 @@
+[
+  {
+    "name": "S1 -> the steady override is dropped: run_base's Steady Aerobic Run keeps the branch key it was dealt on (chi), so D104a's speed day and every key-first reader would read a gentle aerobic run as a threshold session",
+    "anchor": "      subtype = 'Steady Aerobic Run';\n      _key = 'steady';\n",
+    "replacement": "      subtype = 'Steady Aerobic Run';\n",
+    "gate": "gates/g208_d103a_key.js",
+    "note": "NAMED TRIP: K2 goes red on every Steady Aerobic Run (key chi, label steady), and K0 goes red because `steady` is no longer reached. K1 stays green (the card is still keyed), K3-K5 stay green. EXPECTED: K0 K2."
+  },
+  {
+    "name": "S2 -> the trial stamp is dropped: the pin post-pass emits the test card with an unkeyed dose, so the one card the test week exists for is the one NSW run a key-first reader cannot classify",
+    "anchor": "const _dz = {k:'dist', mi: +_pt.tDist.toFixed(2), key:'trial'};",
+    "replacement": "const _dz = {k:'dist', mi: +_pt.tDist.toFixed(2)};",
+    "gate": "gates/g208_d103a_key.js",
+    "note": "NAMED TRIP: K1 goes red (144 trial cards unkeyed), K2 goes red on the same cards, K0 goes red because `trial` is no longer reached. EXPECTED: K0 K1 K2."
+  },
+  {
+    "name": "S3 -> the budgeted easy run past 40 min loses its long key (coach, D104a): the frequency-plan run_base week's designated long run is keyed easy, so D104a's run_base arm and D140's NSW long-run tier cannot see it",
+    "anchor": "      if(_minsOv && _minsOv > 40) _key = 'long';\n",
+    "replacement": "      // (sabotage: the budgeted-easy long key is dropped)\n",
+    "gate": "gates/g208_d103a_key.js",
+    "note": "NAMED TRIP: K2 goes red on the 72 budgeted `Easy Run — Long` cards (key easy, label long), and K0 goes red because the budgeted-easy long card is no longer reached as long. EXPECTED: K0 K2."
+  },
+  {
+    "name": "S4 -> the dose.key table swaps int and chi: every Short Interval (SI) card is stamped chi and every Long Interval (LI) card int, so every key-first reader sees the pace week's quality pair backwards",
+    "anchor": "{lsd_long:'long', lsd_easy:'easy', chi:'chi', int:'int'}[sType]",
+    "replacement": "{lsd_long:'long', lsd_easy:'easy', chi:'int', int:'chi'}[sType]",
+    "gate": "gates/g205_d125_ceiling.js",
+    "note": "NAMED TRIP (forced 208): P5 goes red (Mario reads mon:chi thu:int), P4 and P6b go red (462 untolerated: the session on the long run's eve now reads as INT), P4b goes red (0 tolerated), E1 goes red (5,387 of 10,977 run cards: name and key disagree). EXPECTED: P4 P4b P5 P6b E1. COLLATERAL, same mutation: g205_d125_spaced P7 P7b P8 E1; g205_d130_typed D12c D12d D12f E1; g205_d132_walkweek W5 E1; g207_test_week D8a D8b E1. Needs ia-version >= 208: below 208 the g205 era row reads cards by name and this mutation is invisible to it."
+  }
+]

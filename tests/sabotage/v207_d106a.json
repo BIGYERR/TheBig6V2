@@ -57,17 +57,17 @@
   },
   {
     "name": "M9 (slice B, coach) -> the eve title regex is reverted to recovery run only. NSW's easy run is a long slow distance card, so the NSW eve reads its subtype instead of Shakeout",
-    "anchor": "    const _rec = /^recovery run/i.test(day.cardio.subtype||'') || (day.cardio.type === 'run' && /^long slow distance/i.test(day.cardio.subtype||''));",
+    "anchor": "    const _rec = /^recovery run/i.test(day.cardio.subtype||'') || (day.cardio.type === 'run' && !day.cardio.legLoad && /^long slow distance/i.test(day.cardio.subtype||''));",
     "replacement": "    const _rec = /^recovery run/i.test(day.cardio.subtype||'');",
     "gate": "gates/g207_test_week.js",
-    "note": "NAMED TRIP: D3 goes red (W4 Sat is not Shakeout), D7a goes red (the Tuesday test's Monday is not Shakeout). NRC rows stay green. EXPECTED: D3 D7a."
+    "note": "NAMED TRIP: D3 goes red (W4 Sat is not Shakeout), D7a goes red (the Tuesday test's Monday is not Shakeout). NRC rows stay green. EXPECTED: D3 D7a. V208 UPKEEP (D103a/D104a/D106a-fix): the eve line now carries the !legLoad guard (the D106a shakeout fix); the regex is reverted to recovery run only, as before. EXPECTED unchanged: D3 D7a."
   },
   {
     "name": "M10 (slice B, coach) -> the B4 replacement is removed: a hard run the day before the test or two days out stays where it was dealt",
-    "anchor": "        if(_e) schedule[x.w][x.d] = {..._e, dose: _e.dose ? {..._e.dose} : _e.dose}; else delete schedule[x.w][x.d];",
+    "anchor": "        if(_e) schedule[x.w][x.d] = {..._e, dose: _e.dose ? {..._e.dose, key:'easy'} : _e.dose}; else delete schedule[x.w][x.d];",
     "replacement": "        void _e;",
     "gate": "gates/g207_test_week.js",
-    "note": "NAMED TRIP: D7a and D7b go red (Monday before a Tuesday test holds the INT Taper 3 x 400). The Saturday and Monday tests have nothing hard in the window and stay green. EXPECTED: D7a D7b."
+    "note": "NAMED TRIP: D7a and D7b go red (Monday before a Tuesday test holds the INT Taper 3 x 400). The Saturday and Monday tests have nothing hard in the window and stay green. EXPECTED: D7a D7b. V208 UPKEEP (D103a/D104a/D106a-fix): the B4 replacement copy now stamps key:'easy' (D103a slice 1); the replacement is removed as before. Observed on V208: D7a D7b and NEW collateral D3. Without the B4 copy, W4 Sat keeps the dealt long LSD (legLoad), and the D106a-fix guard on the eve line (!legLoad) no longer retitles a long LSD Shakeout. On V207 the same mutation tripped D7a D7b only. EXPECTED: D3 D7a D7b."
   },
   {
     "name": "M11 (slice B, builder) -> the INT fallback is removed: the trial skips from the CHI straight to the long LSD. A three-run block at one or two weeks still deals the INT, so its test week prints no trial at all and keeps the INT (re-anchored at slice E: the hierarchy line replaced the CHI/INT line it first named)",
@@ -85,10 +85,10 @@
   },
   {
     "name": "M13 (slice B, builder) -> the eve regex drops the run-card guard (the bare form the brief first named). A bike LSD on an NRC multi-sport eve is retitled Shakeout or Easy Run, which moved 124 of 384 NRC builds when measured",
-    "anchor": "    const _rec = /^recovery run/i.test(day.cardio.subtype||'') || (day.cardio.type === 'run' && /^long slow distance/i.test(day.cardio.subtype||''));",
-    "replacement": "    const _rec = /^(recovery run|long slow distance)/i.test(day.cardio.subtype||'');",
+    "anchor": "    const _rec = /^recovery run/i.test(day.cardio.subtype||'') || (day.cardio.type === 'run' && !day.cardio.legLoad && /^long slow distance/i.test(day.cardio.subtype||''));",
+    "replacement": "    const _rec = /^recovery run/i.test(day.cardio.subtype||'') || (!day.cardio.legLoad && /^long slow distance/i.test(day.cardio.subtype||''));",
     "gate": "gates/g207_test_week.js",
-    "note": "NAMED TRIP: D11 goes red (the bike LSD on the NRC 5K + bike eve window is retitled). D12 would also go red with a baseline, but sabotage runs without one. NSW rows stay green. EXPECTED: D11 only."
+    "note": "NAMED TRIP: D11 goes red (the bike LSD on the NRC 5K + bike eve window is retitled). D12 would also go red with a baseline, but sabotage runs without one. NSW rows stay green. EXPECTED: D11 only. V208 UPKEEP (D103a/D104a/D106a-fix): the eve line now carries the !legLoad guard (the D106a shakeout fix). Only the run-card guard is dropped and !legLoad stays, so this still tests the run-card guard: a bike LSD without legLoad on an NRC multi-sport eve is retitled. EXPECTED unchanged: D11 only."
   },
   {
     "name": "M14 (slice C, coach) -> the backfill predicate is inverted: it runs only on programs that already carry the key, so a stored pre-V207 test goal is never repaired and keeps its 11-week grid with no test week",

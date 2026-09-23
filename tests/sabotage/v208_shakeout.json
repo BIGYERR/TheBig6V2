@@ -1,0 +1,23 @@
+[
+  {
+    "name": "S1 -> B4 drops the long-LSD limb (V207 behaviour): only INT and CHI at T-1 and T-2 take the easy LSD, so the Taper-tagged long LSD survives the day before the test or two days out with legLoad true",
+    "anchor": "(r.t === 'int' || r.t === 'chi' || r.t === 'lsd_long') && r !== _q",
+    "replacement": "(r.t === 'int' || r.t === 'chi') && r !== _q",
+    "gate": "gates/g207_gk_trial_present.js",
+    "note": "NAMED TRIP: Q1 and Q3 go red on run-only and run+swim for both goals (15 and 6 long LSDs survive at T-1/T-2 per goal), and Q4 goes red on the stand-in (W4 Sat 3.5 mi LSD Taper, legLoad true). Q2 stays GREEN by design: the card-keyed title (S2's line) no longer calls the surviving long card Shakeout, so the two defences are independent. Q5 stays green. EXPECTED: Q1 Q3 Q4."
+  },
+  {
+    "name": "S2 -> the Shakeout title keys on the slot again: raceEveLiftPass's LSD limb drops the legLoad test, so any LSD run card that is the last run before the test is titled Shakeout, long card included",
+    "anchor": "(day.cardio.type === 'run' && !day.cardio.legLoad && /^long slow distance/i.test(day.cardio.subtype||''))",
+    "replacement": "(day.cardio.type === 'run' && /^long slow distance/i.test(day.cardio.subtype||''))",
+    "gate": "gates/g207_gk_trial_present.js",
+    "note": "NAMED TRIP: Q5 row 1 goes red (the hand-built legLoad-true LSD on the eve is titled Shakeout). No built program reaches it once B4 takes the long card off T-1 and T-2, which is why Q1-Q4 stay green: the synthetic row is the only lens on the title rule alone. EXPECTED: Q5 (legLoad-true row) only."
+  },
+  {
+    "name": "S3 -> B4 keeps only the long-LSD limb: INT and CHI at T-1 and T-2 no longer take the easy LSD, so a quality session survives the day before the test or two days out",
+    "anchor": "(r.t === 'int' || r.t === 'chi' || r.t === 'lsd_long') && r !== _q",
+    "replacement": "(r.t === 'lsd_long') && r !== _q",
+    "gate": "gates/g207_gk_trial_present.js",
+    "note": "NAMED TRIP (forced 208): P5 goes red on 6 rows (run only, rest sun+wed and sat+sun, tw 3, 6 and 9, Tuesday test: the Short Interval survives on Monday, T-1), and Q1 goes red for run_pace_goal and run_mile_time (12 of 42 eve run cards each: the surviving Short Interval (SI) — Taper at T-1 carries legLoad true). The long-LSD limb is intact, so the long card still moves off the eve. EXPECTED: P5 Q1. COLLATERAL, same mutation: g207_test_week D7a D7b (Tuesday test: Monday keeps the Short Interval instead of the shakeout)."
+  }
+]

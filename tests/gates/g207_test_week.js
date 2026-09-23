@@ -81,6 +81,44 @@ if(VER < D106A_ERA){
   summary();
 }
 
+// ── ERA ROWS: how a run card names its quality session (standing ruling 4) ───────────
+// Keyed to the RULING, D103a, which ships on ia-version 208, not to the version this gate
+// shipped on. Through 207 the two NSW quality runs are named "Interval (INT)" and
+// "Continuous High Intensity (CHI)" and carry no key, so a card is read by its name.
+// From 208 the same two cards are named "Short Interval (SI)" and "Long Interval (LI)" and
+// every NSW run card carries dose.key; a card is read by its key (int / chi), and E1
+// requires its NSW name to agree with that key on every run card read, so every claim
+// below is still about the named card the athlete sees. D103a moved words, not days: no
+// expectation in this file changes with the era. A version with no row is a named FAIL.
+const RUN_CARD_ERAS = [
+  { hi: 207, name: { int: /^Interval \(INT\)/, chi: /^Continuous High Intensity \(CHI\)/ }, key: null },
+  { lo: 208, name: { int: /^Short Interval \(SI\)/, chi: /^Long Interval \(LI\)/ }, key: { int: 'int', chi: 'chi' } }
+];
+const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || VER >= r.lo) && (r.hi === undefined || VER <= r.hi));
+if(CARD_ROWS.length !== 1){
+  ok('E0 ia-version ' + VER + ' reads its run cards through exactly one era row', false, CARD_ROWS.length + ' rows match');
+  summary();
+}
+const CARD = CARD_ROWS[0];
+console.log('NOTE run cards read through the ' + (CARD.key ? '208+ row (D103a names, dose.key)' : '207- row (INT / CHI names)'));
+let cardsRead = 0, cardSplit = 0; const cardSplitAt = [];
+function runQuality(c){
+  const s = String(c.subtype || '');
+  const byName = CARD.name.int.test(s) ? 'int' : CARD.name.chi.test(s) ? 'chi' : null;
+  if(!CARD.key) return byName;
+  const k = c.dose && c.dose.key;
+  const byKey = k === CARD.key.int ? 'int' : k === CARD.key.chi ? 'chi' : null;
+  cardsRead++;
+  if(byKey !== byName){ cardSplit++; if(cardSplitAt.length < 4) cardSplitAt.push(s + ' key=' + k); }
+  return byKey;
+}
+// Bike and swim cards were not renamed by D103a and carry no key; they keep the names they
+// have always had, in every era. Run cards go through the era row.
+const BIKE_SWIM_CARD = { int: /^Interval \(INT\)/, chi: /^Continuous High Intensity \(CHI\)/ };
+const cardQuality = c => !c ? null : c.type === 'run' ? runQuality(c)
+  : BIKE_SWIM_CARD.int.test(String(c.subtype || '')) ? 'int'
+  : BIKE_SWIM_CARD.chi.test(String(c.subtype || '')) ? 'chi' : null;
+
 const DAYS = ['mon','tue','wed','thu','fri','sat','sun'];
 const B = 2.5;
 function pinned(over){
@@ -188,7 +226,7 @@ else {
 const TRIAL_DETAIL = '1.5 mi. Goal 11:00 (7:20/mi).';
 const TRIAL_NOTE = 'TEST DAY: Run it like the real thing. Warm up fully. Log your time. It anchors your next block.';
 const isTrial = c => !!c && c.type === 'run' && /TIME TRIAL/.test(String(c.subtype || ''));
-const isHard = c => !!c && /^(Interval \(INT\)|Continuous High Intensity \(CHI\))/.test(String(c.subtype || ''));
+const isHard = c => { const q = cardQuality(c); return q === 'int' || q === 'chi'; };   // era rows, top of file
 function trials(p){ const t = []; for(let w = 1; w <= p.totalWeeks; w++) for(const d of DAYS){ const c = p.weeks[w] && p.weeks[w][d] && p.weeks[w][d].cardio; if(isTrial(c)) t.push(w + d); } return t; }
 function runCells(p, w){ return DAYS.filter(d => { const x = p.weeks[w][d]; return x && !x.rest && x.cardio && x.cardio.type === 'run'; }); }
 const tpin = over => pinned(Object.assign({_raceDateCappedWeeks:5, _testWeek:5}, over || {}));
@@ -237,10 +275,11 @@ for(const [lab, tw, date] of [['D8a three-run tw1', 1, '2026-09-27'], ['D8b thre
   const pre = build(pinned({restDays:rest3, _raceDateCappedWeeks:tw, raceDate:date}));
   if(p.crash || pre.crash){ ok(lab + ' builds', false, p.crash || pre.crash); continue; }
   const preSub = DAYS.map(d => pre.weeks[tw][d] && pre.weeks[tw][d].cardio ? pre.weeks[tw][d].cardio.subtype : null);
+  const preQ = DAYS.map(d => pre.weeks[tw][d] && pre.weeks[tw][d].cardio ? cardQuality(pre.weeks[tw][d].cardio) : null);
   const wk = p.weeks[tw];
   const lsd = DAYS.filter(d => wk[d] && !wk[d].rest && wk[d].cardio && /^Long Slow Distance/.test(wk[d].cardio.subtype || ''));
   ok(lab + ' Sunday test: premise holds (no CHI dealt, INT on Mon); the trial is on Sun, Mon rests, no INT left, both LSDs kept',
-     !preSub.some(s => /^Continuous High/.test(s || '')) && /^Interval/.test(preSub[0] || '')
+     !preQ.some(q => q === 'chi') && preQ[0] === 'int'
        && JSON.stringify(trials(p)) === JSON.stringify([tw + 'sun']) && !!wk.mon && !!wk.mon.rest
        && !DAYS.some(d => wk[d] && isHard(wk[d].cardio)) && JSON.stringify(lsd) === '["wed","fri"]',
      JSON.stringify({pre: preSub, trials: trials(p), mon: wk.mon && wk.mon.title, lsd}));
@@ -332,4 +371,7 @@ if(gOk){
     before = r.n;
   }
 }
+// ── E1 the 208+ row reads the key, and the key must say what the name says ──────────
+if(CARD.key) ok('E1 every run card read at ia-version ' + VER + ' names the same quality session in its NSW name and its dose.key (' + cardsRead + ' run cards)',
+  cardsRead > 0 && cardSplit === 0, cardSplit + ' disagree: ' + cardSplitAt.join(' | '));
 summary();

@@ -2,6 +2,8 @@
 // No mid-sentence em-dash and no letter-hyphen-letter compound in anything the four cardio
 // session builders put in front of the athlete. Coach ruled label dashes IN ("INT — Interval:"
 // becomes "INT:", "CHI — Continuous High Intensity:" becomes "CHI:").
+// D103a (V208) renamed the RUN builder's heads again ("CHI:" is "LI:", "INT:" is "SI:");
+// see SUPERSEDED ENTRIES. The ruled table file is not edited.
 //
 // ORACLES, all independent of the engine:
 //   * The COPY RULE itself (CLAUDE.md, Mario standing): no mid-sentence hyphens or em-dashes in
@@ -170,6 +172,40 @@ else {
   }
 }
 
+// ── SUPERSEDED ENTRIES (standing ruling 4) ───────────────────────────────────
+// The table file is D109's ruled record and its sha256 stays pinned: it is never edited. A
+// later ruling that rewrites a string the table sited supersedes that entry HERE, keyed on
+// the ia-version the later ruling ships on, and only in the builder it names. Below the row's
+// version the table text stands. At and above it the superseding text must sit in the body
+// exactly "@@ n" times, and both older texts (the table's old AND its D109 new) 0 times.
+// D103a (V208, coach-ruled) renamed the NSW run heads: "CHI:" is "LI:" and "INT:" is "SI:",
+// bodies unchanged. Bike and swim keep CHI: and INT:, so no bike or swim entry moves here.
+// A row whose "was" is not the table's own new text is a named FAIL on that builder's T row:
+// the table and the supersession would no longer describe the same string.
+const TABLE_SUPERSEDED = [
+  { from: 208, ruling: 'D103a', builder: 'run', entry: 20,
+    was: 'CHI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace.',
+    now: 'LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace.' },
+  { from: 208, ruling: 'D103a', builder: 'run', entry: 21,
+    was: 'INT: Pace moves ${pp._weeklyGain} seconds per mile each week.',
+    now: 'SI: Pace moves ${pp._weeklyGain} seconds per mile each week.' },
+  { from: 208, ruling: 'D103a', builder: 'run', entry: 22,
+    was: 'INT: Zone 5 (95%+ max HR) on work efforts.',
+    now: 'SI: Zone 5 (95%+ max HR) on work efforts.' }
+];
+const SUP_BAD = {};
+if(ents){
+  for(const s of TABLE_SUPERSEDED){
+    if(!(VER >= s.from)) continue;
+    const e = ents[s.entry - 1], rg = TABLE_RANGE[s.builder];
+    if(!e || !rg || s.entry < rg[0] || s.entry > rg[1] || e.neu !== s.was){
+      (SUP_BAD[s.builder] = SUP_BAD[s.builder] || []).push('#' + s.entry + ' (' + s.ruling + ') supersedes text the table does not hold');
+      continue;
+    }
+    ents[s.entry - 1] = { n: e.n, old: e.old, neu: s.now, gone: [s.was], by: s.ruling };
+  }
+}
+
 // ── S and T rows ─────────────────────────────────────────────────────────────
 for(const key of Object.keys(BUILDERS)){
   const fn = BUILDERS[key], b = body(fn);
@@ -195,9 +231,12 @@ for(const key of Object.keys(BUILDERS)){
   for(let k = lo; k <= hi; k++){
     const e = ents[k-1];
     const nNew = b.text.split(e.neu).length - 1, nOld = b.text.split(e.old).length - 1;
+    const nGone = (e.gone || []).reduce((a, g) => a + b.text.split(g).length - 1, 0);
     want += e.n;
-    if(nNew !== e.n || nOld !== 0) tBad.push('#' + k + ' new ' + nNew + '/' + e.n + ' old ' + nOld);
+    if(nNew !== e.n || nOld !== 0 || nGone !== 0)
+      tBad.push('#' + k + (e.by ? ' (' + e.by + ')' : '') + ' new ' + nNew + '/' + e.n + ' old ' + nOld + (e.gone ? ' superseded ' + nGone : ''));
   }
+  (SUP_BAD[key] || []).forEach(x => tBad.push(x));
   row('T-' + key + ' entries ' + lo + '-' + hi + ' of coach\'s table: each new text sits in ' + fn
       + ' exactly "@@ n" times and its old text 0 times (' + want + ' sites)',
     tBad.length === 0, tBad.length ? tBad.length + ' entries off; first: ' + tBad.slice(0, 4).join(', ') : '');

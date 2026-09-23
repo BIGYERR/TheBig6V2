@@ -67,9 +67,22 @@ const HAND_REACH  = +(HAND_ANCHOR - HAND_GAIN * 9).toFixed(1);             // 46
 // V202 row holds on 202..205 and REFUSES above 205. An artifact no row covers fails loudly.
 const PACE_NOTE_BY_VERSION = [
   { from: 202, to: 205,      ruling: 'E4 (V202)',   head: 'INT — Interval: ', labelExempt: true  },
-  { from: 206, to: Infinity, ruling: 'D109 (V206)', head: 'INT: ',            labelExempt: false },
+  { from: 206, to: 207,      ruling: 'D109 (V206)', head: 'INT: ',            labelExempt: false },
+  { from: 208, to: Infinity, ruling: 'D103a (V208)', head: 'SI: ',            labelExempt: false },   // the INT is the Short Interval
 ];
 const IAV = +IA.version;
+// ── D103a (V208) ERA ROWS for the run builder's quality labels (standing ruling 4) ──
+// Every row below that finds a run card by its label reads this table. The CHI and the INT were
+// renamed Long Interval (LI) and Short Interval (SI) at V208 (coach, D103a slice 4). An artifact no
+// row covers fails loudly, and its matchers match nothing, so every row that reads them goes red.
+const RUN_LABEL_BY_VERSION = [
+  { from: 202, to: 207,      ruling: 'pre-D103a',    int: /Interval \(INT\)/,      chi: /Continuous High Intensity \(CHI\)/ },
+  { from: 208, to: Infinity, ruling: 'D103a (V208)', int: /Short Interval \(SI\)/, chi: /Long Interval \(LI\)/ },
+];
+const LBL = RUN_LABEL_BY_VERSION.filter(r => +IA.version >= r.from && +IA.version <= r.to)[0]
+  || { ruling: 'NO ROW', int: /(?!)/, chi: /(?!)/ };
+if(LBL.ruling === 'NO ROW'){ FAIL++; console.log('  FAIL LABEL-ERA no RUN_LABEL_BY_VERSION row covers ia-version ' + IA.version
+  + ': the run quality labels have no ruled text at this version, so every row that finds a card by label is void'); }
 const COPY_ERA = PACE_NOTE_BY_VERSION.filter(r => IAV >= r.from && IAV <= r.to)[0] || null;
 if(!COPY_ERA){
   FAIL++;
@@ -112,7 +125,7 @@ Object.keys(prog.weeks||{}).sort((a,b)=>+a-+b).forEach(w => DAYS.forEach(d => {
     if(s && s.type === 'run' && s.note) notes.push({ w:+w, st:s.subtype||'', note:s.note });
   });
 }));
-const damp = notes.filter(n => /Interval/.test(n.st) && /Pace moves|Pace capped/.test(n.note));
+const damp = notes.filter(n => LBL.int.test(n.st) && /Pace moves|Pace capped/.test(n.note));
 ok(damp.length > 0, `C1a the dampened pace-clock note still fires on the pinned PRT TING cfg (${damp.length} sessions). `
   + `A zero here makes every other C row vacuous`);
 const cBad = damp.filter(n => n.note !== RULED_NOTE);
@@ -222,7 +235,7 @@ function intNotes(cfg){
   Object.keys(p.weeks||{}).sort((a,b)=>+a-+b).forEach(w => DAYS.forEach(d => {
     const day = p.weeks[w][d]; if(!day || !day.cardio) return;
     (Array.isArray(day.cardio)?day.cardio:[day.cardio]).forEach(s => {
-      if(s && s.type === 'run' && /Interval/.test(s.subtype||'')) out.push({ w:+w, note:String(s.note||'') });
+      if(s && s.type === 'run' && LBL.int.test(s.subtype||'')) out.push({ w:+w, note:String(s.note||'') });
     });
   }));
   return out;

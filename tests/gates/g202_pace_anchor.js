@@ -141,6 +141,19 @@ function runSessions(prog){
 
 console.log('g202 pace anchor — artifact ia-version ' + IA.version);
 
+// ── D103a (V208) ERA ROWS for the run builder's quality labels (standing ruling 4) ──
+// Every row below that finds a run card by its label reads this table. The CHI and the INT were
+// renamed Long Interval (LI) and Short Interval (SI) at V208 (coach, D103a slice 4). An artifact no
+// row covers fails loudly, and its matchers match nothing, so every row that reads them goes red.
+const RUN_LABEL_BY_VERSION = [
+  { from: 202, to: 207,      ruling: 'pre-D103a',    int: /Interval \(INT\)/,      chi: /Continuous High Intensity \(CHI\)/ },
+  { from: 208, to: Infinity, ruling: 'D103a (V208)', int: /Short Interval \(SI\)/, chi: /Long Interval \(LI\)/ },
+];
+const LBL = RUN_LABEL_BY_VERSION.filter(r => +IA.version >= r.from && +IA.version <= r.to)[0]
+  || { ruling: 'NO ROW', int: /(?!)/, chi: /(?!)/ };
+if(LBL.ruling === 'NO ROW'){ FAIL++; console.log('  FAIL LABEL-ERA no RUN_LABEL_BY_VERSION row covers ia-version ' + IA.version
+  + ': the run quality labels have no ruled text at this version, so every row that finds a card by label is void'); }
+
 // ═════════════════════════════════════════════════════════════════════════════
 // SWEEP: entered mile best x entered goal x experience x age x unit
 // ═════════════════════════════════════════════════════════════════════════════
@@ -340,7 +353,7 @@ const E12 = 'Your goal pace is already within your current pace. This block hold
 let e12seen = 0, e12bad = [], e12tot = 0, e12damp = 0, e12gen = 0;
 for(const r of p5cls){
   for(const s of runSessions(r.prog)){
-    if(!/Interval/i.test(s.st)) continue;
+    if(!LBL.int.test(s.st)) continue;
     // A cutback week owns its own note by an older ruling and is not E12's business.
     if(/^CUTBACK WEEK:/.test(s.note)) continue;
     e12tot++;
@@ -358,7 +371,7 @@ ok(e12bad.length === 0 && e12seen > 0, `P5f E12 — every non-cutback interval w
   + (e12bad.length ? ' — first miss: ' + e12bad[0] : (e12seen ? '' : ' — the sentence never appeared')));
 // The copy rule, applied to the string the athlete actually reads, not to the literal above.
 const E12_SEEN = (() => { for(const r of p5cls) for(const s of runSessions(r.prog))
-  if(/Interval/i.test(s.st) && !/^CUTBACK WEEK:/.test(s.note)) return s.note; return ''; })();
+  if(LBL.int.test(s.st) && !/^CUTBACK WEEK:/.test(s.note)) return s.note; return ''; })();
 const MIDDASH = /\s[—–-]\s/;
 ok(E12_SEEN !== '' && !MIDDASH.test(E12_SEEN) && E12_SEEN === E12,
   `P5g E12 obeys the standing copy rule: no mid-sentence hyphen or dash in the sentence this class `
@@ -385,9 +398,9 @@ const PIN = {
   // PIN.arr[5] is PIN.arr[0] less five weeks of the 5 s/mi/wk gain: 509.3 - 25 = 484.3.
   // Both rows are hand arithmetic on the array above, not a reading of the artifact.
   // The doctrine derivation and the recovery band live in tests/gates/g202_int_doctrine.js.
-  cards: [ { w:1,  st:/Interval/,                tgt:493, pace:'8:13/mi'  },
-           { w:6,  st:/Interval/,                tgt:468, pace:'7:48/mi'  },
-           { w:10, st:/Continuous High Intensity/, tgt:501, pace:'8:21/mi' },
+  cards: [ { w:1,  st:LBL.int,                   tgt:493, pace:'8:13/mi'  },
+           { w:6,  st:LBL.int,                   tgt:468, pace:'7:48/mi'  },
+           { w:10, st:LBL.chi,                   tgt:501, pace:'8:21/mi' },
            { w:1,  st:/Long Slow Distance/,      tgt:659, pace:'10:59/mi' } ],
 };
 // the same number, derived here instead of quoted: the mile and 5K columns of the 8:15 row,

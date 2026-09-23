@@ -1,0 +1,51 @@
+[
+  {
+    "name": "S1 -> the LI fallback is dropped from runSessionCode: an unkeyed or frozen \"Long Interval (LI)\" falls to the generic interval test and wears INT, so a CHI renamed at slice 4 changes chip in the same program's history",
+    "anchor": "  if(s.indexOf('long interval')>=0||s.indexOf('(li)')>=0) return 'LI';\n",
+    "replacement": "",
+    "gate": "gates/g208_d103a_chip.js",
+    "note": "Re-anchored at slice 4f on slice 4a's line. NAMED TRIP: A1 CHI goes red (\"Long Interval (LI)\" and its forms read INT). A1 INT stays green (the SI line is intact), keyed rows read the key first, A3 reads bike and swim. EXPECTED: A1 CHI only."
+  },
+  {
+    "name": "S1b -> the run guard on a frozen CHI is dropped: every \"continuous high\" reads LI, so a bike or swim CHI wears the run's new chip",
+    "anchor": "  if(s.indexOf('continuous high')>=0) return run?'LI':'CHI';\n",
+    "replacement": "  if(s.indexOf('continuous high')>=0) return 'LI';\n",
+    "gate": "gates/g208_d103a_chip.js",
+    "note": "Added at slice 4f. NAMED TRIP: A3 goes red on the four bike and swim CHI labels. A1 stays green (an untyped or run CHI already reads LI). C2 needs a baseline and prints SKIP under sabotage.py. EXPECTED: A3 only."
+  },
+  {
+    "name": "S1c -> a frozen run's \"(int)\" token is no longer mapped: the V207 \"Interval (INT)\" falls to the bare interval test and wears INT, so an old INT and its renamed Short Interval (SI) wear two chips",
+    "anchor": "  if(s.indexOf('(int)')>=0) return run?'SI':'INT';\n",
+    "replacement": "",
+    "gate": "gates/g208_d103a_chip.js",
+    "note": "Added at slice 4f. NAMED TRIP: A1 INT goes red (the V207 era forms read INT). A3 stays green (a bike or swim INT reads INT through the bare interval test). EXPECTED: A1 INT only."
+  },
+  {
+    "name": "S2 -> _runClass tests run in the old order again (the CHI's rename tokens after the interval test): \"Long Interval (LI)\" classes as Interval while the CHI it replaces is Tempo, so one program's history splits across the rename",
+    "anchor": "  if(/\\(LI\\)|long interval/i.test(s)) return 'Tempo';\n  if(/interval|\\(INT\\)|\\(SI\\)|short interval|speed/i.test(s)) return 'Interval';\n",
+    "replacement": "  if(/interval|\\(INT\\)|\\(SI\\)|short interval|speed/i.test(s)) return 'Interval';\n  if(/\\(LI\\)|long interval/i.test(s)) return 'Tempo';\n",
+    "gate": "gates/g208_d103a_chip.js",
+    "note": "NAMED TRIP: A2 CHI goes red (the LI forms class Interval). Every label printed today keeps its class, so D1 stays green. EXPECTED: A2 CHI only."
+  },
+  {
+    "name": "S3 -> dayCode stops passing the key: the day chip falls back to the label, the test wears RUN again and a keyed CHI or INT relabelled to the other quality run's name wears the wrong chip",
+    "anchor": "  else if(c){ bot=runSessionCode(c.subtype||'', c.dose&&c.dose.key, c.type); botColor=topColor; }\n",
+    "replacement": "  else if(c){ bot=runSessionCode(c.subtype||'', undefined, c.type); botColor=topColor; }\n",
+    "gate": "gates/g208_d103a_chip.js",
+    "note": "Re-anchored at slice 4f on slice 4a's line (the card's type is still passed; only the key is dropped). NAMED TRIP: B1 goes red (test cards read RUN), B4 goes red on the day chip. B2 (the strip) stays green. B3 needs a baseline and prints SKIP under sabotage.py. EXPECTED: B1 B4."
+  },
+  {
+    "name": "S4 -> _doseStripHTML stops passing the key: the planned strip on the log sheet names the test RUN (suppressed) and a relabelled keyed run loses its code",
+    "anchor": "  const code=runSessionCode(sub||'', dose&&dose.key, sport);\n",
+    "replacement": "  const code=runSessionCode(sub||'', undefined, sport);\n",
+    "gate": "gates/g208_d103a_chip.js",
+    "note": "Re-anchored at slice 4f on slice 4a's line (the sport is still passed; only the key is dropped). NAMED TRIP: B2 goes red (test strips carry no code), B4 goes red on the strip. B1 reads the day chip and stays green. EXPECTED: B2 B4."
+  },
+  {
+    "name": "S5 -> the keyed chip map keeps the slice 3 codes: a keyed CHI prints CHI and a keyed INT prints INT under their new names",
+    "anchor": "  var K={int:'SI', chi:'LI', steady:'STDY', bench:'TEST', trial:'TEST'};\n",
+    "replacement": "  var K={int:'INT', chi:'CHI', steady:'STDY', bench:'TEST', trial:'TEST'};\n",
+    "gate": "gates/g208_d103a_chip.js",
+    "note": "Added at slice 4f. NAMED TRIP: B1 and B2 go red on every keyed CHI and INT, B4 on every relabel. A rows read unkeyed strings and stay green. EXPECTED: B1 B2 B4."
+  }
+]

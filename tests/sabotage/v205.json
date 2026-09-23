@@ -50,23 +50,23 @@
   },
   {
     "name": "M8 -> INT is dropped from the pace family's speed set, so only CHI counts as a speed day. The long run and its eve are still forbidden, so nothing lands on the eve and every doctrine row stays green. Only the COST of the surviving days is wrong: the hinge no longer prefers to ride the interval session, which is the 'hard days hard' half of D36. (The mirror mutation, dropping CHI, is a deliberate NO-OP and is not shipped: week 1 of a pace block always carries INT, never CHI, and the placement reads week 1 only. That reachability fact is pinned by P6e instead.)",
-    "anchor": "      if(/^(Interval \\(INT\\)|Continuous High Intensity \\(CHI\\))/.test(_st)) speed.add(d);",
-    "replacement": "      if(/^Continuous High Intensity \\(CHI\\)/.test(_st)) speed.add(d);",
+    "anchor": "      if(_k ? (_k === 'int' || _k === 'chi') : /^(Interval \\(INT\\)|Continuous High Intensity \\(CHI\\))/.test(_st)) speed.add(d);",
+    "replacement": "      if(_k ? (_k === 'chi') : /^Continuous High Intensity \\(CHI\\)/.test(_st)) speed.add(d);",
     "gate": "gates/g205_pace_eve.js",
-    "note": "NAMED TRIP (verified): P2 goes red on the placements that now cost more than the hand-table minimum, because the gate's own transcription of the D36 table counts INT as a speed day. P6e goes red because the speed arm no longer names both INT and CHI. P14 and P1e also go red at 4 training days, where losing the only speed day makes a forbidden day look cheapest. EXPECTED: P14, P1e, P2, P6e."
+    "note": "NAMED TRIP (verified): P2 goes red on the placements that now cost more than the hand-table minimum, because the gate's own transcription of the D36 table counts INT as a speed day. P6e goes red because the speed arm no longer names both INT and CHI. P14 and P1e also go red at 4 training days, where losing the only speed day makes a forbidden day look cheapest. EXPECTED: P14, P1e, P2, P6e. V208 UPKEEP (D103a/D104a/D106a-fix): the speed set is key-first at V208 (D103a slice 2) and the label regex is the frozen-card fallback no fresh build reaches, so a mutation on the regex alone would be a no-op. INT is dropped from BOTH arms, which is the claim. EXPECTED unchanged: P14 P1e P2 P6e (P6e on the label arm, the others on the key arm)."
   },
   {
     "name": "M9 -> the recovery-spacing note is re-worded with a mid-sentence em-dash, the exact copy-rule violation Mario has standing. The placement is untouched and correct; only the sentence the athlete reads is wrong",
-    "anchor": "  return { legRecoveryNote: 'Your hinge day rides a speed session so hard days stay hard. Nothing heavy lands the day before your long run.' };",
-    "replacement": "  return { legRecoveryNote: 'Your hinge day rides a speed session \\u2014 so hard days stay hard. Nothing heavy lands the day before your long run.' };",
+    "anchor": "    : 'Your hinge day rides a speed session so hard days stay hard. Nothing heavy lands the day before your long run.' };",
+    "replacement": "    : 'Your hinge day rides a speed session \\u2014 so hard days stay hard. Nothing heavy lands the day before your long run.' };",
     "gate": "gates/g205_pace_eve.js",
-    "note": "NAMED TRIP (verified): P3a goes red on all three pace ids, because the D36 note is the placement's signature and the mutated sentence is no longer it; P4a goes red naming the em-dash. EXPECTED: P3a x3, P4a. P4b is the pin on the ruled string and stays green by construction."
+    "note": "NAMED TRIP (verified): P3a goes red on all three pace ids, because the D36 note is the placement's signature and the mutated sentence is no longer it; P4a goes red naming the em-dash. EXPECTED: P3a x3, P4a. P4b is the pin on the ruled string and stays green by construction. V208 UPKEEP (D103a/D104a/D106a-fix): the pace note is now the second arm of the run_base ternary (D104a); the em-dash goes into that arm. EXPECTED unchanged: P3a x3 P4a."
   },
   {
     "name": "M10 -> the eve is quietly dropped from the forbidden set, leaving only the long-run day itself off limits. The cost table, the tiebreaks, the note and the routing are all untouched, so the pace family still takes the D36 path and still gets the note. Only the 'nothing heavy the day before your long run' half of the doctrine is gone, which is the exact defect D127 was ruled to remove",
-    "anchor": "  return { long, eve, after, speed, easy, forbidden: new Set([long, eve]) };",
-    "replacement": "  return { long, eve, after, speed, easy, forbidden: new Set([long]) };",
+    "anchor": "  return { long, eve, after, speed, easy, forbidden: new Set([long, eve]), base };",
+    "replacement": "  return { long, eve, after, speed, easy, forbidden: new Set([long]), base };",
     "gate": "gates/g205_pace_eve.js",
-    "note": "NAMED TRIP (verified): P14, P15, P16 and P17 all go red naming the eve hits at every day count; P2 goes red on 34 of 128 placements because the hand table still forbids the eve and the engine's placement now scores Infinity against a finite minimum. P1e stays GREEN: the long-run DAY is still forbidden, so only the eve half of the doctrine is gone. EXPECTED: P14, P15, P16, P17, P2."
+    "note": "NAMED TRIP (verified): P14, P15, P16 and P17 all go red naming the eve hits at every day count; P2 goes red on 34 of 128 placements because the hand table still forbids the eve and the engine's placement now scores Infinity against a finite minimum. P1e stays GREEN: the long-run DAY is still forbidden, so only the eve half of the doctrine is gone. EXPECTED: P14, P15, P16, P17, P2. V208 UPKEEP (D103a/D104a/D106a-fix): the shape return now carries `base` (D104a); the eve is dropped from the forbidden set as before. Observed on V208: P14 P15 P16 P2. P17 stays green, and it stays green on V207 with the original anchor too (the 7-day lattice is 22 weeks with no eve hit), so the P17 in the line above was stale before V208. EXPECTED: P14 P15 P16 P2."
   }
 ]

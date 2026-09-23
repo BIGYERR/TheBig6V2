@@ -61,6 +61,22 @@ if(!HAS && VER < D128_ERA){
   summary(0);
 }
 
+// ── D103a (V208) ERA ROWS for the run builder's quality labels (standing ruling 4) ──
+// The CHI and the INT were renamed Long Interval (LI) and Short Interval (SI) at V208 (coach,
+// D103a slice 4a). Bike and swim keep CHI and INT, so no bike or swim matcher reads this table.
+// An artifact no row covers fails the ERA row below, and its matchers match nothing, so every
+// row that finds a card by label goes red with it.
+// chiCardsOf reads it (T11, T13). The pre-D103a row is the old matcher byte for byte. The swim
+// matcher in T12 is not on this table: the swim CHI kept its name.
+const RUN_LABEL_BY_VERSION = [
+  { from: 204, to: 207,      ruling: 'pre-D103a',    chi: /CHI|Continuous High/i },
+  { from: 208, to: Infinity, ruling: 'D103a (V208)', chi: /Long Interval \(LI\)/ },
+];
+const LBL = RUN_LABEL_BY_VERSION.filter(r => +VER >= r.from && +VER <= r.to)[0]
+  || { ruling: 'NO ROW', chi: /(?!)/ };
+ok('ERA a RUN_LABEL_BY_VERSION row covers ia-version ' + VER + ' (' + LBL.ruling + ')', LBL.ruling !== 'NO ROW',
+   'the run CHI label has no ruled text at this version, so T11 and T13 are void');
+
 // ── THE HAND TABLE. Typed from doctrine/nsw_ptg_sealswcc_11pg.txt:35-60. ─────────
 // wk 1-2 1x15 | 3-4 1x16 | 5-6 1x17 | 7-8 1x18 | 9-10 1x19 | 11-12 1x20
 // wk 13-15 2x12 | 16-18 2x14 | 19-21 2x16 | 22-24 2x18 | 25-26 2x20
@@ -240,7 +256,7 @@ function chiCardsOf(p){
   Object.keys(p.weeks).sort((a,b)=>+a-+b).forEach(w => ALL.forEach(d => {
     const day = p.weeks[w][d]; if(!day || day.rest || !day.cardio) return;
     (Array.isArray(day.cardio) ? day.cardio : [day.cardio]).forEach(c => {
-      if(!/CHI|Continuous High/i.test(String(c.subtype || c.type || ''))) return;
+      if(!LBL.chi.test(String(c.subtype || c.type || ''))) return;
       out.push({w:+w, detail:String(c.detail || '').replace(/\s+/g, ' ')});
     });
   }));

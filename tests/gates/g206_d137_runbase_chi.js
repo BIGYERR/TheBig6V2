@@ -54,6 +54,22 @@ if(VER < D137_ERA){
   summary();
 }
 
+// ── D103a (V208) ERA ROWS for the run builder's quality labels (standing ruling 4) ──
+// The CHI and the INT were renamed Long Interval (LI) and Short Interval (SI) at V208 (coach,
+// D103a slice 4a). Bike and swim keep CHI and INT, so no bike or swim matcher reads this table.
+// An artifact no row covers fails the ERA row below, and its matchers match nothing, so every
+// row that finds a card by label goes red with it.
+// isRunCHI reads it (S4a, S4b, S4c). The Steady Aerobic Run matcher (S1, S3) is not on this
+// table: run_base's quality card kept its name. The pre-D103a row is the old matcher byte for byte.
+const RUN_LABEL_BY_VERSION = [
+  { from: 206, to: 207,      ruling: 'pre-D103a',    chi: /Continuous High/i },
+  { from: 208, to: Infinity, ruling: 'D103a (V208)', chi: /Long Interval \(LI\)/ },
+];
+const LBL = RUN_LABEL_BY_VERSION.filter(r => VER >= r.from && VER <= r.to)[0]
+  || { ruling: 'NO ROW', chi: /(?!)/ };
+ok('ERA a RUN_LABEL_BY_VERSION row covers ia-version ' + VER + ' (' + LBL.ruling + ')', LBL.ruling !== 'NO ROW',
+   'the run CHI label has no ruled text at this version, so S4a, S4b and S4c are void');
+
 const DAYS = ['sun','mon','tue','wed','thu','fri','sat'];
 function cardsOf(p, pred){
   const out = {};
@@ -139,7 +155,7 @@ function prt(over){
     bench:185, squat:255, deadlift:315, name:'PRT TING', startDate:'2026-09-21', seed:24865
   }, over || {});
 }
-const isRunCHI = c => c.type === 'run' && /Continuous High/i.test(String(c.subtype || ''));
+const isRunCHI = c => c.type === 'run' && LBL.chi.test(String(c.subtype || ''));
 const chiDose = d => { const m = d.match(/^(?:(\d+)\s*x\s*)?(\d+)\s*min/); return m ? (m[1] ? m[1] + 'x' + m[2] : m[2]) : '?'; };
 
 // S4a — unmoved against the baseline, scoped to the D137 build pair only.

@@ -62,6 +62,23 @@ if(VER >= 205){
   console.log('NOTE ia-version ' + VER + ' with the D127 branch present: pre-bump working artifact, rows RUN');
 }
 
+// ── D103a (V208) ERA ROWS for the run builder's quality labels (standing ruling 4) ──
+// The CHI and the INT were renamed Long Interval (LI) and Short Interval (SI) at V208 (coach,
+// D103a slice 4a). Bike and swim keep CHI and INT, so no bike or swim matcher reads this table.
+// An artifact no row covers fails the ERA row below, and its matchers match nothing, so every
+// row that finds a card by label goes red with it.
+// handShape, P2z, P6f, P6g and P6h read it. Both matchers anchor at the start of the subtype and
+// admit the ' — Taper' suffix. The first row opens at 204, the pre-bump artifact the predicate
+// above lets run.
+const RUN_LABEL_BY_VERSION = [
+  { from: 204, to: 207,      ruling: 'pre-D103a',    int: /^Interval \(INT\)/,      chi: /^Continuous High Intensity \(CHI\)/ },
+  { from: 208, to: Infinity, ruling: 'D103a (V208)', int: /^Short Interval \(SI\)/, chi: /^Long Interval \(LI\)/ },
+];
+const LBL = RUN_LABEL_BY_VERSION.filter(r => VER >= r.from && VER <= r.to)[0]
+  || { ruling: 'NO ROW', int: /(?!)/, chi: /(?!)/ };
+ok('P-ERA a RUN_LABEL_BY_VERSION row covers ia-version ' + VER + ' (' + LBL.ruling + ')', LBL.ruling !== 'NO ROW',
+   'the run quality labels have no ruled text at this version, so every row that finds a card by label is void');
+
 // ── the calendar, written here, not read from the engine ────────────────────────
 const ISO = ['mon','tue','wed','thu','fri','sat','sun'];
 const DAYS = ['sun','mon','tue','wed','thu','fri','sat'];
@@ -106,7 +123,7 @@ function handShape(week){
     cs.forEach(c => {
       if(c.type !== 'run') return;
       const st = c.subtype || '';
-      if(/^(Interval \(INT\)|Continuous High Intensity \(CHI\))/.test(st)) speed.add(d);
+      if(LBL.int.test(st) || LBL.chi.test(st)) speed.add(d);
       else if(/^Long Slow Distance \(LSD\)/.test(st)){ if(c.legLoad) long = d; else easy.add(d); }
     });
   });
@@ -137,6 +154,7 @@ const byDays = {}; let eveHits = 0, dayHits = 0, weeks = 0;
 const eveDetail = [];
 let costRows = 0, costBad = 0; const costDetail = [];
 let couldHaveHit = 0;
+let shaped = 0, speedless = 0;
 
 [3, 2, 1, 0].forEach(nRest => combos(DAYS, nRest).forEach(rest => {
   const nTrain = 7 - nRest;
@@ -148,6 +166,7 @@ let couldHaveHit = 0;
       const sh = handShape(w);
       weeks++; byDays[nTrain].weeks++;
       if(!sh) return;
+      shaped++; if(!sh.speed.size) speedless++;
       const roleAt = d => ROLE_OF[(w[d] && w[d].title) || ''] || null;
       const leg = d => roleAt(d) === 'pull' || roleAt(d) === 'legs';
       const train = DAYS.filter(d => w[d] && !w[d].rest);
@@ -191,6 +210,12 @@ if(eveDetail.length) eveDetail.forEach(x => console.log('     ' + x));
 ok('P2 every pace-family placement is cost-minimal under the hand-transcribed D36 table (' + costRows + ' placements)',
    costRows > 0 && costBad === 0, costBad + ' of ' + costRows + ' off the minimum');
 if(costDetail.length) costDetail.forEach(x => console.log('     ' + x));
+// P2z the vacuity guard for the hand shape (D103a slice 4d). P2's speed terms exist only if
+// handShape can SEE a speed session. Under the V208 rename the old label regex saw none, the
+// shape went speedless, and P2 still passed. Every shaped pace week carries INT and CHI (1408 of
+// 1408 on V207), so a shaped week with no speed day means the matcher is blind.
+ok('P2z the hand shape (' + LBL.ruling + ') sees a speed session in every one of the ' + shaped + ' shaped weeks, so P2 prices real speed days',
+   shaped > 0 && speedless === 0, speedless + ' of ' + shaped + ' shaped weeks with no speed day');
 
 // ── P3 the scope row ────────────────────────────────────────────────────────────
 const D36 = 'Your hinge day rides a speed session so hard days stay hard. Nothing heavy lands the day before your long run.';
@@ -198,13 +223,38 @@ const carries = cfg => { const p = IA.buildProgram(cfg); return !!(p.legRecovery
 ['run_pace_goal', 'run_mile_time', 'run_15_under10'].forEach(id => {
   ok('P3a ' + id + ' takes the D36 cost table', carries(paceCfg(['sun','wed'], 1001, id)));
 });
-let baseSeen = 0, baseTot = 0;
+// P3b ERA ROWS (standing ruling 4). D104a (V208) moved run_base onto the run shape: at 208 and
+// above a program with a long-keyed run in any week prints coach's run_base note, and only a program
+// with no long-keyed run reaches the 48h branch. Both strings typed here from the rulings.
+const D104A_BASE = 'Nothing heavy lands on your long run or the day before it. Your lifting days were placed around it.';
+const TIER48_OPEN = ['Your training days are tightly packed', 'Your heavy lifting was kept off the same day as your hardest runs', 'Your heavy lifting was spaced out from your hardest runs'];
+const P3B_BY_VERSION = [
+  { from: 204, to: 207,      ruling: 'D127 (V205)' },
+  { from: 208, to: Infinity, ruling: 'D104a (V208)' },
+];
+const P3B = P3B_BY_VERSION.filter(r => VER >= r.from && VER <= r.to)[0] || null;
+let baseSeen = 0, baseTot = 0, baseLong = 0, baseShaped = 0, base48 = 0; const baseBad = [];
 [3, 2].forEach(nRest => combos(DAYS, nRest).forEach(rest => SEEDS.forEach(seed => {
   const c = paceCfg(rest, seed);
   c.cardioGoals = { run:{ id:'run_base', label:'Base', baselineDist:'3', baseline:'3mi', mileBestMins:'8', mileBestSecs:'30' } };
-  baseTot++; if(carries(c)) baseSeen++;
+  baseTot++;
+  const p = IA.buildProgram(c), n = p.legRecoveryNote;
+  if(n && n.indexOf(D36) >= 0) baseSeen++;
+  const hasLong = Object.keys(p.weeks).some(w => DAYS.some(d => { const x = p.weeks[w][d];
+    return !!x && [].concat(x.cardio || []).some(k => !!k && k.type === 'run' && !!k.dose && k.dose.key === 'long'); }));
+  const via48 = n == null || TIER48_OPEN.some(t => n.startsWith(t));
+  const viaShape = typeof n === 'string' && (n === D104A_BASE || n.startsWith(D104A_BASE + ' '));
+  if(hasLong){ baseLong++; if(viaShape) baseShaped++; else baseBad.push('rest=[' + rest + '] seed=' + seed + ' long-keyed, note ' + JSON.stringify(n)); }
+  else { if(via48) base48++; else baseBad.push('rest=[' + rest + '] seed=' + seed + ' no long key, note ' + JSON.stringify(n)); }
 })));
-ok('P3b run_base keeps the 48h branch on every layout (' + baseTot + ' programs)', baseSeen === 0, baseSeen + ' carried the D36 note');
+if(!P3B) ok('P3b-ERA a P3B_BY_VERSION row covers ia-version ' + VER, false, 'no ruled P3b text at this version');
+else if(P3B.to === 207) ok('P3b run_base keeps the 48h branch on every layout (' + baseTot + ' programs)', baseSeen === 0, baseSeen + ' carried the D36 note');
+else {
+  ok('P3b run_base places by the run shape (D104a); the 48h branch is reached only by a program with no long-keyed run in any week.',
+     baseLong > 0 && baseSeen === 0 && baseBad.length === 0, baseBad.length + ' off the ruling, D36 note ' + baseSeen + ', long-keyed ' + baseLong + ': ' + baseBad.slice(0, 3).join('; '));
+  console.log('     P3b ' + baseTot + ' run_base programs: ' + baseLong + ' with a long-keyed run (' + baseShaped + ' placed by the shape), '
+    + (baseTot - baseLong) + ' without (' + base48 + ' on the 48h branch); D36 note ' + baseSeen);
+}
 const bike = paceCfg(['sun','wed'], 1001);
 bike.cardioTypes = ['bike']; bike.cardioGoals = { bike:{ id:'bike_base', label:'Base', baselineDist:'10', baseline:'10mi' } };
 ok('P3c a bike goal never produces a run shape: its LSD and CHI cards are not run sessions', !carries(bike));
@@ -245,7 +295,7 @@ let chiWk1 = 0;
   const w = IA.buildProgram(paceCfg(rest, seed)).weeks['1'];
   DAYS.forEach(d => { const day = w[d]; if(!day || !day.cardio) return;
     const cs = Array.isArray(day.cardio) ? day.cardio : [day.cardio];
-    cs.forEach(c => { if(c.type === 'run' && /^Continuous High Intensity/.test(c.subtype||'')) chiWk1++; }); });
+    cs.forEach(c => { if(c.type === 'run' && LBL.chi.test(c.subtype||'')) chiWk1++; }); });
 }));
 // P6f, BEHAVIOURAL (V205, D125 amended). The CHI arm must be REACHED, and then it must be
 // treated as a speed day. Oracle is the D36/D127 doctrine text, not the engine: the hinge
@@ -265,8 +315,8 @@ let hingeOnRun = 0, hingeOnSlow = 0, hingeOnChi = 0;
       if(c.type !== 'run') return;
       const s = String(c.subtype || '');
       hingeOnRun++;
-      if(/^Continuous High Intensity/.test(s)) hingeOnChi++;
-      else if(!/^Interval/.test(s)) hingeOnSlow++;
+      if(LBL.chi.test(s)) hingeOnChi++;
+      else if(!LBL.int.test(s)) hingeOnSlow++;
     });
   });
 }));

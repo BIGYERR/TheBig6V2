@@ -1,0 +1,37 @@
+[
+  {
+    "name": "M1 -> the run_base arm is dropped from _nrcRunShape: run_base gets a null shape again and every program falls back to the 48h rule, so Legs lands on the long run's eve and the note is null or a 48h tier",
+    "anchor": "    } else if(c.goalId === 'run_base'){\n      // D104a (V208): run_base reads its keys only. The long run is the long-keyed run (the V159\n      // budgeted \"Easy Run — Long\" is keyed long and carries no legLoad); every other run is easy.\n      // No speed day: no measured lattice puts a steady run in the placement week, so the steady\n      // arm is not built (coach; reinstate with a measure that reaches it).\n      base = true;\n      if(c.dose && c.dose.key === 'long') long = d; else easy.add(d);\n    } });\n",
+    "replacement": "    } });\n",
+    "gate": "gates/g208_d104a_runbase.js",
+    "note": "Re-anchored at slice 5c on the long-only arm. NAMED TRIP: R1 (lower Main on the long run or its eve) and R2 (the run_base note). R0, R0b, R3-R6 and M1 stay green. EXPECTED: R1 R2."
+  },
+  {
+    "name": "M2 -> the placement reads week 1 only again: a run_base program whose first long-keyed run is in week 6 has no long run in week 1, gets a null shape and stays on the 48h rule",
+    "anchor": "  const wk1 = cardioSchedule[_lw || 1] || {};\n",
+    "replacement": "  const wk1 = cardioSchedule[1] || {};\n",
+    "gate": "gates/g208_d104a_runbase.js",
+    "note": "NAMED TRIP: R2 on the 270 programs whose first long-keyed run is after week 1, and R1 where their lifts land on it. EXPECTED: R1 R2."
+  },
+  {
+    "name": "M3 -> the legLoad early exit runs before the placement again (the parked build): a placement week whose long run carries no legLoad exits with a null note before the shape is read",
+    "anchor": "  const _nrc = nrcLegLiftPlacement(dayRoles, trainDays, wk1);\n  if(_nrc) return _nrc;\n  const legTaxing = new Set();\n  trainDays.forEach(d => { const c = wk1[d]; if(c && c.legLoad) legTaxing.add(d); });\n  if(!legTaxing.size) return { legRecoveryNote:null };\n",
+    "replacement": "  const legTaxing = new Set();\n  trainDays.forEach(d => { const c = wk1[d]; if(c && c.legLoad) legTaxing.add(d); });\n  if(!legTaxing.size) return { legRecoveryNote:null };\n  const _nrc = nrcLegLiftPlacement(dayRoles, trainDays, wk1);\n  if(_nrc) return _nrc;\n",
+    "gate": "gates/g208_d104a_runbase.js",
+    "note": "NAMED TRIP: R2 (null note on the 270 programs whose placement week has no legLoad card) and R1 (their Legs day lands on the long run's eve). EXPECTED: R1 R2."
+  },
+  {
+    "name": "M4 -> the dead steady copy comes back as the run_base note: every placed run_base program tells the athlete his hinge rides a steady run his placement week does not have",
+    "anchor": "  return { legRecoveryNote: shape.base ? 'Nothing heavy lands on your long run or the day before it. Your lifting days were placed around it.'\n",
+    "replacement": "  return { legRecoveryNote: shape.base ? 'Your hinge day rides your steady run so hard days stay hard. Nothing heavy lands on your long run or the day before it.'\n",
+    "gate": "gates/g208_d104a_runbase.js",
+    "note": "NAMED TRIP: R2 (the note is not coach's run_base string) and R5 (the dead steady text is printed and back in the source). R1 stays green: placement is untouched. EXPECTED: R2 R5."
+  },
+  {
+    "name": "M5 -> the no-lift-day guard is removed: a 1-2 week dated test program with no lifting day again prints a lift-placement note (the 48h tier or the speed-session sentence) about lifting it does not have",
+    "anchor": "raceDateWeeks:cfg.raceDateWeeks||null,legRecoveryNote:_liftDay ? legRecoveryNote : null,liftRecoveryWeeks,",
+    "replacement": "raceDateWeeks:cfg.raceDateWeeks||null,legRecoveryNote,liftRecoveryWeeks,",
+    "gate": "gates/g208_d104a_runbase.js",
+    "note": "Added at the V208 close (coach). NAMED TRIP: R8a (lift-free programs carry a note again). R8b needs a same-version baseline and prints SKIP under sabotage.py; every other row reads programs with lift days and stays green. EXPECTED: R8a only."
+  }
+]

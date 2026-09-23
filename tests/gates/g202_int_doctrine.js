@@ -62,6 +62,19 @@ function ok(cond, msg){ if(cond){ PASS++; console.log('  ok   ' + msg); } else {
 
 console.log('g202 INT doctrine — artifact ia-version ' + IA.version);
 
+// ── D103a (V208) ERA ROWS for the run builder's quality labels (standing ruling 4) ──
+// Every row below that finds a run card by its label reads this table. The CHI and the INT were
+// renamed Long Interval (LI) and Short Interval (SI) at V208 (coach, D103a slice 4). An artifact no
+// row covers fails loudly, and its matchers match nothing, so every row that reads them goes red.
+const RUN_LABEL_BY_VERSION = [
+  { from: 202, to: 207,      ruling: 'pre-D103a',    int: /Interval \(INT\)/,      chi: /Continuous High Intensity \(CHI\)/ },
+  { from: 208, to: Infinity, ruling: 'D103a (V208)', int: /Short Interval \(SI\)/, chi: /Long Interval \(LI\)/ },
+];
+const LBL = RUN_LABEL_BY_VERSION.filter(r => +IA.version >= r.from && +IA.version <= r.to)[0]
+  || { ruling: 'NO ROW', int: /(?!)/, chi: /(?!)/ };
+if(LBL.ruling === 'NO ROW'){ FAIL++; console.log('  FAIL LABEL-ERA no RUN_LABEL_BY_VERSION row covers ia-version ' + IA.version
+  + ': the run quality labels have no ruled text at this version, so every row that finds a card by label is void'); }
+
 // ── the doctrine constants, typed ────────────────────────────────────────────
 const SEC_PER_400_FASTER = 4;                 // A 251-252
 const QUARTERS_PER_MILE  = 4;                 // A's own "400m (1/4 mile)"
@@ -199,7 +212,7 @@ function runSessions(prog){
   }));
   return out;
 }
-const ints = prog => runSessions(prog).filter(r => /Interval \(INT\)/.test(r.st));
+const ints = prog => runSessions(prog).filter(r => LBL.int.test(r.st));
 
 const LAT = [];
 for(const [mm,ss] of [['5','30'],['6','30'],['8','15'],['9','30'],['11','00'],['12','00']])
@@ -440,10 +453,10 @@ ok(d6n > 0 && d6bad.length === 0,
 //   * a build whose weeks are neither uniformly four-run nor uniformly three-run is NOT
 //     skipped. It is a named miss, so an unclassified shape cannot pass quietly.
 //
-// THE THREE-RUN ARM IS A LICENCE, AND IT REFUSES ABOVE ia-version 207 (renewed from 206 by D142 at V207).
+// THE THREE-RUN ARM IS A LICENCE, AND IT REFUSES ABOVE ia-version 208 (renewed from 207 by D142 at V208).
 // D113 and D122 have already ruled the crossover RETIRED on the pace family, and slice 7c
 // which retires it is PARKED. So the three-run arm below pins THE ARTIFACT AS SHIPPED,
-// NOT THE DOCTRINE AS RULED. It is keyed on 207, a number that exists today, and the
+// NOT THE DOCTRINE AS RULED. It is keyed on 208, a number that exists today, and the
 // build that ships D113/D122 must re-pin it as "one INT and one CHI every week at three
 // runs" or fail here by name. It does not expire quietly and it does not expire never.
 //
@@ -459,20 +472,20 @@ const INT_MECHANISM_BY_VERSION = [
     // four weeks and diverge at week 5. D7c below asserts that divergence out loud so
     // this sentence cannot rot into decoration.
     note: 'V115 position ramp over intSpan; six cards; NOT Table 6' },
-  { upTo: 207, arm: 'four-run', reps: 'table6',
+  { upTo: 208, arm: 'four-run', reps: 'table6',
     // ELEVEN cards on the same cfg: the INT slot is weekly, and Table 6 is read on the
     // CALENDAR week, through the cutback branch at weeks 4 and 8 and the taper branch at
     // weeks 10 and 11. That is the second mechanism.
     //
     // The THIRD mechanism is the three-run arm as it still stands on this same artifact:
     // where a pace build still lands on three run days the card count is still the V115
-    // crossover's cross - 1, and that arm is LICENSED TO 207 and no further (D142 renewal at V207).
+    // crossover's cross - 1, and that arm is LICENSED TO 208 and no further (D142 renewal at V208).
     note: 'Table 6 on the calendar week through the cutback and taper branches; the '
-        + 'three-run arm still runs the V115 crossover and is licensed to 207 (D142 renewal at V207; D113a ruled, unbuilt)' }
+        + 'three-run arm still runs the V115 crossover and is licensed to 208 (D142 renewal at V208; D113a ruled, builds at V212)' }
 ];
 const IAV = +IA.version;
 const INT_ERA = INT_MECHANISM_BY_VERSION.filter(r => IAV <= r.upTo)[0] || null;
-const THREE_RUN_LICENCE_TO = 207; // V207 renewal (D142): D113a ruled by Mario with the fallback, builds after V207. Renew by one per build until D113a ships.
+const THREE_RUN_LICENCE_TO = 208; // V208 renewal (D142): D113a ruled by Mario with the fallback, builds at V212. Renew by one per build until D113a ships.
 if(IAV > THREE_RUN_LICENCE_TO){
   FAIL++;
   console.log('  FAIL D7-LICENCE the three-run INT card rule in this file pins cross - 1 cards, which is '
@@ -677,7 +690,7 @@ ok(d7bad.length === 0 && (d7four + d7three) === D7_POP.length && !!INT_ERA,
 // pinned by hand in g202_pace_anchor.js; repeated here as literals so a stray edit to the
 // shared clock inside the INT branch cannot pass this gate quietly.
 const pAll = runSessions(IA.buildProgram(PINNED));
-const chi10 = pAll.filter(r => r.w === 10 && /Continuous High Intensity/.test(r.st))[0];
+const chi10 = pAll.filter(r => r.w === 10 && LBL.chi.test(r.st))[0];
 const lsd1  = pAll.filter(r => r.w === 1  && /Long Slow Distance/.test(r.st))[0];
 ok(chi10 && chi10.dose && chi10.dose.tgt === 501 && chi10.detail.indexOf('8:21/mi') >= 0,
   `D8 W10 CHI still reads 501 s/mi (8:21/mi): the x1.08 Long Interval multiplier is A's own worked example and D111 `
@@ -712,8 +725,10 @@ const RULED_INT_TAIL = ' All out on each rep. '
 const INT_NOTE_BY_VERSION = [
   { from: 202, to: 205, ruling: 'D9 (V202)', head: 'INT — Interval: Zone 5 (95%+ max HR) on work efforts.',
     label: /^INT — Interval:/ },                         // the structural label was exempt
-  { from: 206, to: Infinity, ruling: 'D109 (V206)', head: 'INT: Zone 5 (95%+ max HR) on work efforts.',
+  { from: 206, to: 207, ruling: 'D109 (V206)', head: 'INT: Zone 5 (95%+ max HR) on work efforts.',
     label: null },                                       // D109: no label exemption
+  { from: 208, to: Infinity, ruling: 'D103a (V208)', head: 'SI: Zone 5 (95%+ max HR) on work efforts.',
+    label: null },                                       // D103a: the INT is the Short Interval; body unchanged
 ];
 const D9_ERA = INT_NOTE_BY_VERSION.filter(r => IAV >= r.from && IAV <= r.to)[0] || null;
 if(!D9_ERA){
@@ -738,7 +753,7 @@ function notesOf(cfg){
   Object.keys(wks).sort((a,b)=>+a-+b).forEach(w => DAYS.forEach(dd => {
     const day = wks[w][dd]; if(!day || !day.cardio) return;
     (Array.isArray(day.cardio)?day.cardio:[day.cardio]).forEach(s => {
-      if(s && s.type === 'run' && /Interval \(INT\)/.test(s.subtype||''))
+      if(s && s.type === 'run' && LBL.int.test(s.subtype||''))
         out.push({ w:+w, note:String(s.note||''), dose:s.dose||null });
     });
   }));

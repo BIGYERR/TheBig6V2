@@ -54,6 +54,21 @@ ok('T1 NSW_TABLE6_INT and intFromTable6 both exist (D114 requires them at ia-ver
    + D114_ERA + '; this artifact is ' + VER + ')', HAS, String(HAS));
 if(!HAS) summary(1);
 
+// ── D103a (V208) ERA ROWS for the run builder's quality labels (standing ruling 4) ──
+// The CHI and the INT were renamed Long Interval (LI) and Short Interval (SI) at V208 (coach,
+// D103a slice 4a). Bike and swim keep CHI and INT, so no bike or swim matcher reads this table.
+// An artifact no row covers fails the ERA row below, and its matchers match nothing, so every
+// row that finds a card by label goes red with it.
+// T8a, T8 and T9 find Mario's INT cards by it. The pre-D103a row is the old matcher byte for byte.
+const RUN_LABEL_BY_VERSION = [
+  { from: 204, to: 207,      ruling: 'pre-D103a',    int: /INT/ },
+  { from: 208, to: Infinity, ruling: 'D103a (V208)', int: /Short Interval \(SI\)/ },
+];
+const LBL = RUN_LABEL_BY_VERSION.filter(r => +VER >= r.from && +VER <= r.to)[0]
+  || { ruling: 'NO ROW', int: /(?!)/ };
+ok('ERA a RUN_LABEL_BY_VERSION row covers ia-version ' + VER + ' (' + LBL.ruling + ')', LBL.ruling !== 'NO ROW',
+   'the run INT label has no ruled text at this version, so T8a, T8 and T9 are void');
+
 // ── T2: the column, typed by hand from Table 6, INT header "Run/Swim (reps)" ──────
 // wk 1..26. Raw, UNCAPPED — the cap is Guide A's and is applied by the reader, not stored.
 const HAND = [null,
@@ -154,7 +169,7 @@ const cardReps = [];
 for(const wk of wks){
   for(const d of DAYS){
     const c = prog.weeks[wk][d] && prog.weeks[wk][d].cardio;
-    if(c && /INT/.test(c.subtype || '')) cardReps.push({ wk, reps: c.dose && c.dose.reps, detail: String(c.detail || '') });
+    if(c && LBL.int.test(c.subtype || '')) cardReps.push({ wk, reps: c.dose && c.dose.reps, detail: String(c.detail || '') });
   }
 }
 ok('T8a Mario\'s block is 11 weeks with one INT card per week', tw === 11 && cardReps.length === 11,

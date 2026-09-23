@@ -27,6 +27,8 @@
 //   * W1 reads the SOURCE, not the engine: the predicate exists and names both modes.
 //   * W2 is the RULING'S PROSE, quoted above, evaluated on built weeks by CONTENT. The
 //     card is identified by its NSW subtype text, which is doctrine, not engine state.
+//     From ia-version 208 (D103a) a RUN card is read by its dose.key and E1 holds its NSW
+//     name to that key; bike and swim cards keep their names. See ERA ROWS below.
 //   * W3 is the RULING'S AFTER-GRID typed in as literals: on the pace family a walking
 //     week carries exactly three cardio sessions and a quality-carrying week exactly four,
 //     uniformly, across all 64 rest-day calendars and both seeds.
@@ -78,6 +80,42 @@ if(VER >= 205){
   console.log('NOTE ia-version ' + VER + ' with the D132 predicate present: pre-bump working artifact, rows RUN');
 }
 
+// ── ERA ROWS: how a run card names its quality session (standing ruling 4) ───────────
+// Keyed to the RULING, D103a, which ships on ia-version 208, not to the version this gate
+// shipped on. Through 207 the two NSW quality runs are named "Interval (INT)" and
+// "Continuous High Intensity (CHI)" and carry no key, so a card is read by its name.
+// From 208 the same two cards are named "Short Interval (SI)" and "Long Interval (LI)" and
+// every NSW run card carries dose.key; a card is read by its key (int / chi), and E1
+// requires its NSW name to agree with that key on every run card read, so every claim
+// below is still about the named card the athlete sees. D103a moved words, not days: no
+// expectation in this file changes with the era. A version with no row is a named FAIL.
+const RUN_CARD_ERAS = [
+  { hi: 207, name: { int: /Interval \(INT\)/, chi: /Continuous High Intensity \(CHI\)/ }, key: null },
+  { lo: 208, name: { int: /Short Interval \(SI\)/, chi: /Long Interval \(LI\)/ }, key: { int: 'int', chi: 'chi' } }
+];
+const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || VER >= r.lo) && (r.hi === undefined || VER <= r.hi));
+if(CARD_ROWS.length !== 1){
+  ok('E0 ia-version ' + VER + ' reads its run cards through exactly one era row', false, CARD_ROWS.length + ' rows match');
+  summary(1);
+}
+const CARD = CARD_ROWS[0];
+console.log('NOTE run cards read through the ' + (CARD.key ? '208+ row (D103a names, dose.key)' : '207- row (INT / CHI names)'));
+let cardsRead = 0, cardSplit = 0; const cardSplitAt = [];
+function runQuality(c){
+  const s = String(c.subtype || '');
+  const byName = CARD.name.int.test(s) ? 'int' : CARD.name.chi.test(s) ? 'chi' : null;
+  if(!CARD.key) return byName;
+  const k = c.dose && c.dose.key;
+  const byKey = k === CARD.key.int ? 'int' : k === CARD.key.chi ? 'chi' : null;
+  cardsRead++;
+  if(byKey !== byName){ cardSplit++; if(cardSplitAt.length < 4) cardSplitAt.push(s + ' key=' + k); }
+  return byKey;
+}
+
+// Bike and swim cards were not renamed by D103a and carry no key; they keep the
+// names they have always had, in every era.
+const BIKE_SWIM_CARD = { int: /Interval \(INT\)/, chi: /Continuous High Intensity \(CHI\)/ };
+
 // ── the calendar, the doctrine and the lattice, all written here ──────────────────────
 const DAYS = ['sun','mon','tue','wed','thu','fri','sat'];
 function combos(arr, k){
@@ -115,7 +153,8 @@ function paceCfg(rest, seed, inj, types, goalId){
 }
 // Read a built week's CARDIO by content. The NSW card names are doctrine text: an
 // Interval card says "Interval (INT)" and a continuous high-intensity card says
-// "Continuous High Intensity (CHI)". A walking week says neither.
+// "Continuous High Intensity (CHI)". A walking week says neither. From 208 the run cards
+// say "Short Interval (SI)" and "Long Interval (LI)" and are read through the era row.
 function scanWeek(w){
   let n = 0, hasInt = false, hasChi = false;
   DAYS.forEach(d => {
@@ -124,8 +163,10 @@ function scanWeek(w){
     cs.forEach(c => {
       n++;
       const s = String(c.subtype || '');
-      if(/Interval \(INT\)/.test(s)) hasInt = true;
-      if(/Continuous High Intensity \(CHI\)/.test(s)) hasChi = true;
+      const q = c.type === 'run' ? runQuality(c)
+              : BIKE_SWIM_CARD.int.test(s) ? 'int' : BIKE_SWIM_CARD.chi.test(s) ? 'chi' : null;
+      if(q === 'int') hasInt = true;
+      if(q === 'chi') hasChi = true;
     });
   });
   return { n, hasInt, hasChi };
@@ -138,8 +179,8 @@ function runLayout(w){
     cs.forEach(c => {
       if(c.type !== 'run') return;
       const s = String(c.subtype || '');
-      if(/Interval \(INT\)/.test(s)) lay[d] = 'int';
-      else if(/Continuous High Intensity \(CHI\)/.test(s)) lay[d] = 'chi';
+      const q = runQuality(c);
+      if(q) lay[d] = q;
       else if(/Long Slow Distance \(LSD\)/.test(s)) lay[d] = c.legLoad ? 'lsd_long' : 'lsd_easy';
       else lay[d] = 'other';
     });
@@ -233,4 +274,7 @@ OUT_OF_SCOPE.forEach(row => {
      !s.hasInt && !s.hasChi, 'INT=' + s.hasInt + ' CHI=' + s.hasChi);
 }
 
+// ── E1 the 208+ row reads the key, and the key must say what the name says ──────────
+if(CARD.key) ok('E1 every run card read at ia-version ' + VER + ' names the same quality session in its NSW name and its dose.key (' + cardsRead + ' run cards)',
+  cardsRead > 0 && cardSplit === 0, cardSplit + ' disagree: ' + cardSplitAt.join(' | '));
 summary(fail ? 1 : 0);

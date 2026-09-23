@@ -1,10 +1,10 @@
 [
   {
     "name": "M1 -> one of the four generic INT notes takes the old label back: the test goal copy (mile and 1.5 mile under ten) reads 'INT — Interval: Zone 5' again. The other three read the D109 head, and D9b's generic pace cfg never reaches this limb, so only a source count can see it",
-    "anchor": "m:400, tgt:Math.round(_chartRow.fiveK)};\n        note = 'INT: Zone 5 (95%+ max HR) on work efforts.",
+    "anchor": "m:400, tgt:Math.round(_chartRow.fiveK)};\n        note = 'SI: Zone 5 (95%+ max HR) on work efforts.",
     "replacement": "m:400, tgt:Math.round(_chartRow.fiveK)};\n        note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts.",
     "gate": "gates/g202_int_doctrine.js",
-    "note": "NAMED TRIP: g202_int_doctrine D9. The source count falls 4 -> 3 on the D109 head, and 0 -> 1 in another era's form (the V202 head plus the ruled tail). That second count is the reason the D9 era row carries srcOther, and this mutation is what proves it. D9b, D9c and D9d stay GREEN: the generic pace cfg renders the progression path copy (the one v202 M24 mutates), not this one. EXPECTED: D9 only. OUTSIDE THE NAMED GATE (the sweep does not run it): g206_d109_copy S-run and T-run (#22 new 3/4, old 1) would also go red. The sweep does not run that gate, so this is disclosed, not proven."
+    "note": "NAMED TRIP: g202_int_doctrine D9. The source count falls 4 -> 3 on the D109 head, and 0 -> 1 in another era's form (the V202 head plus the ruled tail). That second count is the reason the D9 era row carries srcOther, and this mutation is what proves it. D9b, D9c and D9d stay GREEN: the generic pace cfg renders the progression path copy (the one v202 M24 mutates), not this one. EXPECTED: D9 only. OUTSIDE THE NAMED GATE (the sweep does not run it): g206_d109_copy S-run and T-run (#22 new 3/4, old 1) would also go red. The sweep does not run that gate, so this is disclosed, not proven. V208 UPKEEP (D103a/D104a/D106a-fix): re-anchored on the SI head of the fiveK copy. The replacement stays a PREVIOUS ERA's ruled head (D9, V202), because D9's srcOther counts era-row heads only and this is the mutation that proves srcOther: D9 now reads 3 ruled (D103a head) and 1 in another era's form. EXPECTED unchanged: D9 only."
   },
   {
     "name": "M2 -> new copy puts an em-dash back into a run note without touching any table text: the run_base cutback easy run note gains 'Trust the cutback — it is the plan.' after the ruled sentence. Every table entry still sits its @@ n times and no old text returns, so the T row cannot see it",
@@ -22,9 +22,9 @@
   },
   {
     "name": "M4 -> the pace clock note keeps D101's sentence and restores only the old head: 'INT — Interval: Pace moves ...'. The body is still E4's ruled sentence and it is still a rate, not a cap, so a partial revert of D109 leaves nothing wrong except the label dash",
-    "anchor": "note = `INT: Pace moves ${pp._weeklyGain} seconds per mile each week.",
-    "replacement": "note = `INT — Interval: Pace moves ${pp._weeklyGain} seconds per mile each week.",
+    "anchor": "note = `SI: Pace moves ${pp._weeklyGain} seconds per mile each week.",
+    "replacement": "note = `SI — Short Interval: Pace moves ${pp._weeklyGain} seconds per mile each week.",
     "gate": "gates/g202_pace_copy.js",
-    "note": "NAMED TRIP: C1. At ia-version 206 the era row's ruled head is 'INT: ', so every dampened note misses and the first miss reads |INT — Interval: Pace moves|. C3 goes red with it because V206 retires the label exemption and the note now carries a dash. C1a stays GREEN (the regex still matches 'Pace moves', so the branch is still exercised), and C2 stays GREEN (no physiological claim). That is what separates this from v202 M7, which reverts the whole sentence and reddens C2. The limb classes stay GREEN, because limbOf still reads 'dampened'. EXPECTED: C1, C3."
+    "note": "NAMED TRIP: C1. At ia-version 206 the era row's ruled head is 'INT: ', so every dampened note misses and the first miss reads |INT — Interval: Pace moves|. C3 goes red with it because V206 retires the label exemption and the note now carries a dash. C1a stays GREEN (the regex still matches 'Pace moves', so the branch is still exercised), and C2 stays GREEN (no physiological claim). That is what separates this from v202 M7, which reverts the whole sentence and reddens C2. The limb classes stay GREEN, because limbOf still reads 'dampened'. EXPECTED: C1, C3. V208 UPKEEP (D103a/D104a/D106a-fix): re-anchored on the SI head; the D109 revert is written in its SI form ('SI — Short Interval: Pace moves'). At ia-version 208 C1's era row reads 'SI: ', so every dampened note misses with the first miss |SI — Short Interval: Pace moves|, and C3 names the dash. EXPECTED unchanged: C1 C3."
   }
 ]

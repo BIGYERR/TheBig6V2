@@ -1,0 +1,44 @@
+[
+  {
+    "name": "M1 -> _nrcRunShape goes back to label-only: the pace arm reads the INT/CHI label and legLoad, so a renamed quality label drops out of the speed days and the test is read as the week-1 long run",
+    "anchor": "      const _st = c.subtype||'', _k = c.dose && c.dose.key;\n      if(_k ? (_k === 'int' || _k === 'chi') : /^(Interval \\(INT\\)|Continuous High Intensity \\(CHI\\))/.test(_st)) speed.add(d);\n      else if(_k === 'trial') return;\n",
+    "replacement": "      const _st = c.subtype||'';\n      if(/^(Interval \\(INT\\)|Continuous High Intensity \\(CHI\\))/.test(_st)) speed.add(d);\n",
+    "gate": "gates/g208_d103a_readers.js",
+    "note": "NAMED TRIP: all four R rows go red (the swapped label leaves the speed set and legLoad makes it the long run), S1, S1b and S1c go red. EXPECTED: R x4, S1, S1b, S1c."
+  },
+  {
+    "name": "M2 -> _cardioInterference goes back to label-only: a keyed CHI renamed Long Interval scans as an interval and reads 1.4, not 1.05",
+    "anchor": "  let inten = _k === 'int' ? 1.4 : _k === 'chi' ? 1.05 : _sc(sub);\n",
+    "replacement": "  let inten = _sc(sub);\n",
+    "gate": "gates/g208_d103a_readers.js",
+    "note": "NAMED TRIP: I4 goes red (a keyed CHI named Long Interval scans as an interval, 1.4; a keyed INT named like a recovery run scans 0.55). The four R rows stay green: in this lattice 1.05 against 1.4 moves no section (the set cap and the carry threshold absorb it), which is why I4 reads the value directly. Slice 4f: since the slice 4a rename every real CHI card IS named Long Interval (LI), so the label-only scan reads it 1.4 against the hand 1.05 and I1 goes red with I4. I2 and I3 need a baseline and print SKIP under sabotage.py. EXPECTED: I1 I4."
+  },
+  {
+    "name": "M3 -> the injury sweep goes back to label-only (legLoad or a hard word in the copy): 'Not a tempo' reads the easy run as hard again, the test and the benchmark are halved, the benchmark on an easy day runs through easy mode",
+    "anchor": "  const _hardBy=(s,keys)=>{const k=s.dose&&s.dose.key;return k?keys.has(k):!!(s.legLoad||HARD.test((s.subtype||'')+' '+(s.detail||'')));};\n",
+    "replacement": "  const _hardBy=(s,keys)=>!!(s.legLoad||HARD.test((s.subtype||'')+' '+(s.detail||'')));\n",
+    "gate": "gates/g208_d103a_readers.js",
+    "note": "NAMED TRIP: H1, H2, H3 go red (easy runs, tests and benchmarks half-stepped), E1 and E3 go red (easy runs parked, benchmarks on easy days not parked). H4, E2, E4 stay green. EXPECTED: H1 H2 H3 E1 E3."
+  },
+  {
+    "name": "M4 -> the two named sets are swapped: halfstep halves the test and the benchmark, and easy mode parks by the halfstep set, so an injured athlete runs the test",
+    "anchor": "  const _HALFSTEP_HARD_KEYS=new Set(['int','chi','long','steady']);\n  const _PROTECT_PARK_KEYS=new Set(['int','chi','long','steady','bench','trial']);\n",
+    "replacement": "  const _HALFSTEP_HARD_KEYS=new Set(['int','chi','long','steady','bench','trial']);\n  const _PROTECT_PARK_KEYS=new Set(['int','chi','long','steady']);\n",
+    "gate": "gates/g208_d103a_readers.js",
+    "note": "NAMED TRIP: H1 and H3 go red (test and benchmark halved), E1 and E2 go red (test and benchmark not parked; TIME TRIAL cards survive in easy mode). H2, H4, E3, E4 stay green. EXPECTED: H1 H3 E1 E2."
+  },
+  {
+    "name": "M5 -> E4 is dropped: the 'Easy Run (protected)' rewrite keeps the int, chi or long key of the run it parked, so every key-first reader reads the parked run as hard",
+    "anchor": "        if(s.dose&&s.dose.key) s.dose.key='easy';   // D103a: the key describes the card it now is\n",
+    "replacement": "",
+    "gate": "gates/g208_d103a_readers.js",
+    "note": "NAMED TRIP: E4 goes red (protected cards keyed int, chi, long, steady, bench, trial). Every other row compares like with like and stays green. EXPECTED: E4 only."
+  },
+  {
+    "name": "M6 -> the strides block is restored (slice 2b reverted): in the knee-workaround easy sweep an easy run keeps its 4 x 20 sec strides at 90% speed",
+    "anchor": "        if(!isHard&&mode==='easy'){ s.detail=(s.detail||'').replace(/\\nFinish with 4 x 20 sec strides\\.[\\s\\S]*?while the engine builds\\./,''); s.subtype=(s.subtype||'').replace(' + Strides',''); return; }\n",
+    "replacement": "        if(!isHard&&mode==='easy') return;\n",
+    "gate": "gates/g208_d103a_readers.js",
+    "note": "NAMED TRIP: E5 goes red (easy-mode runs mention strides and end + Strides) and E3 goes red (the kept easy run is not the dealt card with the 2b text rule applied). E6 and E7 stay green (minutes, dose and the no-injury strides do not move). EXPECTED: E3 E5."
+  }
+]

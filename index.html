@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="207"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="208"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -3805,6 +3805,9 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
   const isMilGoal = goalId === 'run_pace_goal';
   const sTypes = ['lsd_easy','int','chi','lsd_long','lsd_easy','int','chi'];
   const sType = forceType === 'long' ? 'lsd_long' : (sessionOverride || sTypes[dayIdx % sTypes.length]);
+  // D103a (V208): the session class key, stamped on the dose at the return below. It starts
+  // from the branch this builder takes; the branches that print a different session say so.
+  let _key = {lsd_long:'long', lsd_easy:'easy', chi:'chi', int:'int'}[sType] || null;
 
   // ── PACE CHART ANCHOR ──
   // Derive training paces from the NRC pace chart using the user's mile best if provided,
@@ -3946,6 +3949,7 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
   if(_bench) {
     const _retest = week === tw && tw > 1;
     subtype = _retest ? 'Benchmark Run — Retest' : 'Benchmark Run';
+    _key = 'bench';
     if(_retest) {
       detail = '20 min at a steady RPE 6 out of 10. Comfortably hard, a short sentence between breaths. This is the SAME run you did in week 1. Hold the effort dead even from first minute to last. No surging, no fading. Log the distance you covered.';
       note = 'BENCHMARK RETEST: Further than week 1 at the same effort = faster pace = the aerobic engine grew. This is the block\u2019s report card. No pace is prescribed on purpose. The pace is the measurement.';
@@ -4001,6 +4005,7 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
       const _mins = _minsOv || Math.max(15, Math.round((dist * _row.recovery / 60) / 5) * 5);
       const _strides = arguments[17] === true;
       subtype = 'Easy Run' + ((_minsOv && _minsOv > 40) ? ' — Long' : '') + (_strides ? ' + Strides' : '');
+      if(_minsOv && _minsOv > 40) _key = 'long';
       detail = _mins + ' min easy and conversational (RPE 3-4 out of 10). Around ' + recPace + ' is right for you. Do not run faster than ' + _fmtPace(_steadySec) + '. Distance is not the goal; time on feet is. Log the distance you covered.';
       // Below ~14:00/mi continuous running mechanics genuinely degrade — doctrine's
       // answer (Galloway, NRC beginner audio runs) is run/walk, not a faster easy pace.
@@ -4047,27 +4052,28 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
       // from one anchor and can no longer disagree about which week it is.
       if(_wkT){ tempoPace = _fmtPace(_wkT * 1.08); _tempoSec = _wkT * 1.08; }
     }
-    subtype = 'Continuous High Intensity (CHI)' + (isTaperWeek ? ' — Taper' : '');
+    subtype = 'Long Interval (LI)' + (isTaperWeek ? ' — Taper' : '');
     if(goalId === 'run_base') {
       // Base-building: the one quality day is a GENTLE aerobic-threshold effort, not a
       // hard lactate-threshold grind. Slightly faster than easy, still controlled. The
       // goal of a base block is the aerobic engine, not threshold punishment.
       const steadyPace = _fmtPace(Math.round((_row.tempo + _row.recovery)/2));
       subtype = 'Steady Aerobic Run';
+      _key = 'steady';
       detail = chiMins + ' min steady at ' + steadyPace + ' (RPE 6 out of 10). Comfortably hard. You can speak a short sentence between breaths. This is aerobic threshold work, not a sprint.';
       note = 'STEADY AEROBIC: A controlled effort just above easy pace. Builds aerobic capacity without the recovery cost of hard intervals. If you finish feeling you could do more, that is correct for a base block.';
       _dose = {k:'time', mins:chiMins, tgt:Math.round((_row.tempo + _row.recovery)/2)};
     } else if(chiReps === 1) {
       detail = chiMins + ' min continuous at Tempo Pace: ' + tempoPace + ' (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation.';
       _dose = {k:'time', mins:chiMins, tgt:Math.round(_tempoSec)};
-      note = 'CHI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.';
+      note = 'LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.';
     } else {
       detail = chiReps + ' x ' + chiMins + ' min at Tempo Pace: ' + tempoPace + ' (RPE 8-9 out of 10). Recovery: ' + Math.round(chiMins/2) + ' min easy jog between reps. Keep moving. Do not stop.';
       _dose = {k:'reps_time', reps:chiReps, mins:chiMins, tgt:Math.round(_tempoSec)};
-      note = 'CHI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.';
+      note = 'LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.';
     }
   } else if(sType === 'int') {
-    subtype = 'Interval (INT)' + (isTaperWeek ? ' — Taper' : '');
+    subtype = 'Short Interval (SI)' + (isTaperWeek ? ' — Taper' : '');
     // ── V202 D105: RECOVERY IS 2 TO 2.5 x THE WORK INTERVAL, NOT A FIXED 200m ──
     // Guide A is explicit twice. A 248-249: "allowing a recovery period of 2-2.5 times
     // the amount of time it takes to perform the work interval". A 268-270: "Allow
@@ -4141,9 +4147,9 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
             const goalFmt = fmt(pp._originalTarget);
             const _reachIdx = _psShift > 0 ? Math.max(0, (tw - taperWks - 1) - (_psTap || _psShift)) : null;
             const reachFmt = fmt(_reachIdx != null && pp[_reachIdx] != null ? pp[_reachIdx] : pp._realisticTarget);
-            note = `INT: Pace moves ${pp._weeklyGain} seconds per mile each week. That is the safe rate for your experience and age. Your full goal of ${goalFmt}/mi needs more weeks than this block has. The target for this block is ${reachFmt}/mi. Hit the prescribed pace precisely.`;
+            note = `SI: Pace moves ${pp._weeklyGain} seconds per mile each week. That is the safe rate for your experience and age. Your full goal of ${goalFmt}/mi needs more weeks than this block has. The target for this block is ${reachFmt}/mi. Hit the prescribed pace precisely.`;
           } else {
-            note = 'INT: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
+            note = 'SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
           }
           // D2b-iii (V142), re-sited V202 (S1): this appendix is about the SHIFT, not about
           // which class of note fired. It only ever sat inside the dampened limb because that
@@ -4159,23 +4165,24 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
           const _recF = _intRec(_intTgtF, 400);
           detail = intReps + 'x400m at 5K Pace: ' + intChartPace + '. ' + _recF.txt + ' ' + _INT_WARMUP;
           _dose = {k:'reps_dist', reps:intReps, m:400, tgt:_intTgtF, rec:{lo:_recF.lo, hi:_recF.hi}};
-          note = 'INT: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
+          note = 'SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
         }
       } else {
         // run_15_under10, run_mile_time — use chart 5K pace for interval pace
         const intChartPace = _fmtPace(_chartRow.fiveK);
         detail = intReps + 'x400m at 5K Pace: ' + intChartPace + '. Recovery: walk or jog 200m between each (2-2.5x work time). 5 min easy warmup + cooldown.';
         _dose = {k:'reps_dist', reps:intReps, m:400, tgt:Math.round(_chartRow.fiveK)};
-        note = 'INT: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
+        note = 'SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
       }
     } else {
       // 5K, 10K, base, half, marathon — use chart 5K pace for interval pace
       const intChartPace = _fmtPace(_chartRow.fiveK);
       detail = intReps + 'x800m at 5K Pace: ' + intChartPace + ' (RPE 8, hard sustainable effort). Recovery: 90s walk/jog between reps. Keep moving. 5 min warmup + cooldown.';
       _dose = {k:'reps_dist', reps:intReps, m:800, tgt:Math.round(_chartRow.fiveK)};
-      note = 'INT: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
+      note = 'SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
     }
   }
+  if(_dose && _key) _dose.key = _key;   // D103a: readers go key first; NRC, bike and swim carry none
   return {type:'run', subtype, detail, note, week, goalId, dose:_dose||undefined};
 }
 
@@ -5974,7 +5981,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       if(_q && wk[_q.d]){
         const _g = cardioGoals.run || {}, _pt = paceGoalTarget(_g), _u = _g.paceUnit === 'km' ? 'km' : 'mi';
         const _raw = parseFloat(_g.targetDist) || 1.5;
-        const _dz = {k:'dist', mi: +_pt.tDist.toFixed(2)}; if(_pt.tPacePerMile) _dz.tgt = Math.round(_pt.tPacePerMile);
+        const _dz = {k:'dist', mi: +_pt.tDist.toFixed(2), key:'trial'}; if(_pt.tPacePerMile) _dz.tgt = Math.round(_pt.tPacePerMile);
         wk[_q.d] = {type:'run', subtype: _raw + (_u === 'km' ? ' km' : ' Mile') + ' Test — TIME TRIAL',
           detail: _raw + ' ' + _u + '.' + (_pt.tTotalSecs ? ' Goal ' + _clkMS(_pt.tTotalSecs) + ' (' + _clkMS(_pt.tTotalSecs / _raw) + '/' + _u + ').' : ''),
           note: 'TEST DAY: Run it like the real thing. Warm up fully. Log your time. It anchors your next block.',
@@ -5983,16 +5990,17 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       // D106a (V207, B4): nothing hard the day before the test or two days out (D38's window,
       // read across the week boundary like raceEveLiftPass). A hard run there becomes that
       // week's untagged easy LSD as it was dealt, captured here before the pin moves anything.
-      // A week with no easy LSD rests the day instead.
+      // A week with no easy LSD rests the day instead. V208: the long LSD is hard here too
+      // (legLoad), so it takes the easy dose by the same slot rule as INT and CHI.
       const _ez = {}; _sl.forEach(s => { if(s.t === 'lsd_easy' && s !== _q && !_ez[s.w] && schedule[s.w][s.d]) _ez[s.w] = schedule[s.w][s.d]; });
       const _fl = []; [_pin.w - 1, _pin.w].forEach(w => { if(schedule[w]) _ISO_ORDER.forEach(d => _fl.push({w, d})); });
       const _ti = _fl.findIndex(x => x.w === _pin.w && x.d === _pin.race);
       for(const _k of [1, 2]){
         const x = _ti - _k >= 0 ? _fl[_ti - _k] : null; if(!x) continue;
-        const _h = _sl.find(r => r.w === x.w && r.d === x.d && (r.t === 'int' || r.t === 'chi') && r !== _q);
+        const _h = _sl.find(r => r.w === x.w && r.d === x.d && (r.t === 'int' || r.t === 'chi' || r.t === 'lsd_long') && r !== _q);
         if(!_h || !schedule[x.w][x.d]) continue;
         const _e = _ez[x.w];
-        if(_e) schedule[x.w][x.d] = {..._e, dose: _e.dose ? {..._e.dose} : _e.dose}; else delete schedule[x.w][x.d];
+        if(_e) schedule[x.w][x.d] = {..._e, dose: _e.dose ? {..._e.dose, key:'easy'} : _e.dose}; else delete schedule[x.w][x.d];
       }
     }
     // the race session is the run whose subtype says so — wherever the layout put it
@@ -6916,8 +6924,8 @@ function injectDynamicCore(weekObj, dayRoles, trainDays, week, equip){
 // Every ordered (pull, legs) pair is scored; min total wins, then the widest spacing between
 // the two axial days, then the earliest legs day. If no pair is finite the layout is too
 // tight and the NSW rule below runs as before. D127 (V205) widened the door: NRC race
-// programs and the NSW pace family enter here; run_base and every other NSW goal do not,
-// because _nrcRunShape returns null for them and the 48h rule runs unchanged.
+// programs and the NSW pace family enter here. D104a (V208): so does run_base, by its keys.
+// Every other NSW goal gets a null shape and the 48h rule runs unchanged.
 function _nrcRunShape(wk1, trainDays){
   const iso = d => _ISO_ORDER.indexOf(d);
   // D127 (V205): the pace family reaches this same shape through its own lens. The NSW
@@ -6925,22 +6933,32 @@ function _nrcRunShape(wk1, trainDays){
   // BOTH of its easy runs `Long Slow Distance (LSD)`, so the long run is told from the
   // easy one by legLoad — the flag the scheduler already sets from assignedType
   // (lsd_long true, lsd_easy false). INT and CHI are the speed days. Scoped to
-  // run_pace_goal and its two V126 aliases; run_base and every other NSW goal fall
-  // through with a null shape and keep the 48h rule below.
+  // run_pace_goal and its two V126 aliases. run_base has its own arm below (D104a); every
+  // other NSW goal falls through with a null shape and keeps the 48h rule below.
   const _paceFam = g => g==='run_pace_goal' || g==='run_mile_time' || g==='run_15_under10';
-  let long = null; const speed = new Set(), easy = new Set();
+  let long = null, base = false; const speed = new Set(), easy = new Set();
   trainDays.forEach(d => { const c = wk1[d]; if(!c || c.type!=='run') return;
     if(c.isNRC){
       if(/^long run/i.test(c.subtype||'')) long = d; else if(/^speed run/i.test(c.subtype||'')) speed.add(d); else easy.add(d);
     } else if(_paceFam(c.goalId)){
-      const _st = c.subtype||'';
-      if(/^(Interval \(INT\)|Continuous High Intensity \(CHI\))/.test(_st)) speed.add(d);
+      // D103a (V208): a keyed session reads its key, never its label; a test is neither the
+      // speed day nor the long run, so it never enters the shape. Unkeyed: the label, as before.
+      const _st = c.subtype||'', _k = c.dose && c.dose.key;
+      if(_k ? (_k === 'int' || _k === 'chi') : /^(Interval \(INT\)|Continuous High Intensity \(CHI\))/.test(_st)) speed.add(d);
+      else if(_k === 'trial') return;
       else if(c.legLoad) long = d;
       else easy.add(d);
+    } else if(c.goalId === 'run_base'){
+      // D104a (V208): run_base reads its keys only. The long run is the long-keyed run (the V159
+      // budgeted "Easy Run — Long" is keyed long and carries no legLoad); every other run is easy.
+      // No speed day: no measured lattice puts a steady run in the placement week, so the steady
+      // arm is not built (coach; reinstate with a measure that reaches it).
+      base = true;
+      if(c.dose && c.dose.key === 'long') long = d; else easy.add(d);
     } });
   if(!long) return null;
   const eve = _ISO_ORDER[(iso(long)+6)%7], after = _ISO_ORDER[(iso(long)+1)%7];
-  return { long, eve, after, speed, easy, forbidden: new Set([long, eve]) };
+  return { long, eve, after, speed, easy, forbidden: new Set([long, eve]), base };
 }
 // One cost table, two readers: the placement below and deconflictSameRegion's guard, so a
 // region swap can never undo a placement (it did, before the guard read this table).
@@ -6981,22 +6999,31 @@ function nrcLegLiftPlacement(dayRoles, trainDays, wk1){
   const open = trainDays.filter(d => !taken.has(d));
   Object.keys(best.days).forEach(r => { dayRoles[best.days[r]] = r; });
   open.forEach((d,i) => { dayRoles[d] = rest[i] || 'full'; });
-  return { legRecoveryNote: 'Your hinge day rides a speed session so hard days stay hard. Nothing heavy lands the day before your long run.' };
+  // D104a (V208): run_base speaks of its own week.
+  return { legRecoveryNote: shape.base ? 'Nothing heavy lands on your long run or the day before it. Your lifting days were placed around it.'
+    : 'Your hinge day rides a speed session so hard days stay hard. Nothing heavy lands the day before your long run.' };
 }
 function deconflictLegLiftDays(dayRoles, trainDays, cardioSchedule){
-  const wk1 = cardioSchedule[1] || {};
+  // D104a (V208): the placement reads the FIRST week whose runs carry a `long` key, on every NSW
+  // arm (a test is not the long run, so the placement reads the next real one). NRC, bike and
+  // swim carry no key, so they keep week 1, as does a program with no long-keyed run.
+  const _lw = Object.keys(cardioSchedule).map(Number).filter(n => n >= 1).sort((a,b) => a-b)
+    .find(n => trainDays.some(d => { const c = (cardioSchedule[n] || {})[d]; return !!(c && c.dose && c.dose.key === 'long'); }));
+  const wk1 = cardioSchedule[_lw || 1] || {};
   const _i = d => ALL_DAYS_ORDER.indexOf(d);
   const _dist = (a,b)=>{ const r=Math.abs(_i(a)-_i(b)); return Math.min(r,7-r); };
 
+  // V189 (D36): race programs place by run shape. D127 (V205): so does the pace family —
+  // routing is by the shape, not by a second goal test here, so there is exactly one place
+  // that decides who takes the cost table. D104a (V208): run_base takes it too, and the
+  // placement runs BEFORE the leg-load exit below: run_base's long run is the long-keyed run,
+  // which carries no legLoad, so a week with no legLoad card still has a long run to place
+  // around. A null shape (every other NSW goal, any program with no long run) falls through.
+  const _nrc = nrcLegLiftPlacement(dayRoles, trainDays, wk1);
+  if(_nrc) return _nrc;
   const legTaxing = new Set();
   trainDays.forEach(d => { const c = wk1[d]; if(c && c.legLoad) legTaxing.add(d); });
   if(!legTaxing.size) return { legRecoveryNote:null };
-  // V189 (D36): race programs place by run shape. D127 (V205): so does the pace family —
-  // routing is by the shape, not by a second goal test here, so there is exactly one place
-  // that decides who takes the cost table. A null shape (run_base, every other NSW goal,
-  // any week with no long run) falls straight through to the 48h branch below.
-  const _nrc = nrcLegLiftPlacement(dayRoles, trainDays, wk1);
-  if(_nrc) return _nrc;
 
   // d conflicts if it sits on, or within 48h of, any leg-taxing cardio day.
   const conflicted = d => legTaxing.has(d) || [...legTaxing].some(t=>_dist(d,t)===1);
@@ -7535,6 +7562,14 @@ function injurySweepCardio(schedule,cfg){
   const pickAlt=prefer=>prefer.find(t=>types.includes(t))||null;
   const minsOf=s=>{const m=/(\d{1,3})\s*[-–]?\s*min/i.exec(s.detail||'');const v=m?+m[1]:0;return (v>=10&&v<=180)?v:35;};
   const HARD=/interval|tempo|speed|hill|fartlek|repeat|race pace|threshold/i;
+  // D103a (V208): a keyed NSW run is judged by its key, never by a word in its copy ("Not a
+  // tempo" read every NSW easy run as hard). Two sets, two jobs. Halfstep halves the quality
+  // work; the test and the benchmark are measurements and are never halved. The easy and reduce
+  // sweep parks everything above easy effort while the injury heals, the test included.
+  // Unkeyed sessions (NRC, bike, frozen pre-V208 days) keep legLoad or the scan exactly.
+  const _HALFSTEP_HARD_KEYS=new Set(['int','chi','long','steady']);
+  const _PROTECT_PARK_KEYS=new Set(['int','chi','long','steady','bench','trial']);
+  const _hardBy=(s,keys)=>{const k=s.dose&&s.dose.key;return k?keys.has(k):!!(s.legLoad||HARD.test((s.subtype||'')+' '+(s.detail||'')));};
   Object.keys(schedule).forEach(w=>{
     const wk=schedule[w]; if(!wk) return;
     Object.keys(wk).forEach(d=>{
@@ -7556,7 +7591,7 @@ function injurySweepCardio(schedule,cfg){
       // grammar matches, the session is left intact and the note tells the athlete
       // to self-cut: a wrong prescription is worse than an honest instruction.
       if(mode==='halfstep'){
-        const isHardH=s.legLoad||HARD.test((s.subtype||'')+' '+(s.detail||''));
+        const isHardH=_hardBy(s,_HALFSTEP_HARD_KEYS);
         if(!isHardH) return;
         let d=s.detail||'', changed=false;
         d=d.replace(/(\d{1,2})(\s*x\s*)(?=\d)/i,function(m,n,x){changed=true;return Math.max(2,Math.round(+n*0.55))+x;});
@@ -7573,13 +7608,16 @@ function injurySweepCardio(schedule,cfg){
         return;
       }
       if(mode==='easy'||mode==='reduce'){
-        const isHard=s.legLoad||HARD.test((s.subtype||'')+' '+(s.detail||''));
+        const isHard=_hardBy(s,_PROTECT_PARK_KEYS);
         const outMins=mode==='reduce'?Math.max(15,Math.round(mins*0.6)):mins;
-        if(!isHard&&mode==='easy') return;   // already easy, leave it alone
+        // already easy, leave it alone. V208 (2b): except its strides finisher, which is speed work
+        // and is parked with the rest: the block goes whole, the minutes stay.
+        if(!isHard&&mode==='easy'){ s.detail=(s.detail||'').replace(/\nFinish with 4 x 20 sec strides\.[\s\S]*?while the engine builds\./,''); s.subtype=(s.subtype||'').replace(' + Strides',''); return; }
         s.subtype='Easy Run (protected)';
         s.detail='Easy '+outMins+' minutes, fully conversational. Pain free the whole way or you shut it down.';
         s.note='Hard running is parked while this heals. Easy volume keeps the engine without poking the injury.';
         s.legLoad=false;
+        if(s.dose&&s.dose.key) s.dose.key='easy';   // D103a: the key describes the card it now is
         return;
       }
       // noimpact / noimpact_swim — the run is replaced, the slot is not.
@@ -7619,7 +7657,8 @@ function planCalendar(cfg, A, B){
   // Keep heavy lower-body LIFTS (squat day + deadlift day) off days that carry a leg-taxing
   // cardio session and off days calendar-adjacent to one, so heavy legs and the hard/long run
   // never land within 48h (cooks the lower-body joints, blunts speed work). Moves the lift, never
-  // the cardio. Session types repeat weekly, so week 1 is representative. See deconflictLegLiftDays.
+  // the cardio. Session types repeat weekly, so one week is representative: the first with a
+  // long-keyed run (D104a), week 1 otherwise. See deconflictLegLiftDays.
   const { legRecoveryNote } = deconflictLegLiftDays(dayRoles, trainDays, cardioSchedule);
   // SAME-REGION LIFT SPACING -- runs after the cardio buffer and never re-breaks it.
   const { regionRecoveryNote } = deconflictSameRegion(dayRoles, trainDays, cardioSchedule);
@@ -9274,7 +9313,10 @@ function _cardioInterference(cardio){
     if(/long run|peak|long slow|\blsd\b|steady|zone 2/.test(t))                              return 0.85;  // long steady
     return null;
   };
-  let inten = _sc(sub);
+  // D103a (V208): a keyed NSW interval or CHI reads its key, so a renamed label cannot move
+  // it. Every other key falls through to the scan: keying long or easy here is unruled.
+  const _k = cardio.dose && cardio.dose.key;
+  let inten = _k === 'int' ? 1.4 : _k === 'chi' ? 1.05 : _sc(sub);
   if(inten == null) inten = _sc(s);
   if(inten == null) inten = 0.75;   // unlabelled default
   // Distance/duration: miles past 3, or minutes past 45, add a little leg fatigue.
@@ -10590,7 +10632,12 @@ function engineD_synthesis(cfg, A, B, plan, C){
   raceEveLiftPass(weeks, totalWeeks);   // V189 (D38): no lifting from two days out through the race
   singletonSupersetSweep(weeks);
   delete cfg._racePin;   // V188 (D14a): derived at build time, never stored — refreshProgram recomputes it
-  return {id,name:cfg.name||'My Program',goal,liftingFocus:cfg.liftingFocus,primaryPath:cfg.primaryPath,raceDate:cfg.raceDate||null,raceDateWeeks:cfg.raceDateWeeks||null,legRecoveryNote,liftRecoveryWeeks,taperWeeks,seed,cfg:{...cfg,cardioTypes,cardioGoals,goal,seed},weeks,totalWeeks,created:Date.now(),startDate:null,_swapUniverse:_swapUniverseList(),_swapUniverseByKey:{}};
+  // V208 (coach): a program with no lifting day prints no lift-placement note, on every arm. Read after
+  // the last pass that can strip a section; a lifting day is the week strip's (dayCode): a non-rest day
+  // with a section that has items and is neither core nor hip.
+  const _liftDay = Object.keys(weeks).some(w => _ISO_ORDER.some(d => { const x = weeks[w] && weeks[w][d];
+    return !!x && !x.rest && (x.sections||[]).some(s => !s.core && !s.hip && (s.items||[]).length); }));
+  return {id,name:cfg.name||'My Program',goal,liftingFocus:cfg.liftingFocus,primaryPath:cfg.primaryPath,raceDate:cfg.raceDate||null,raceDateWeeks:cfg.raceDateWeeks||null,legRecoveryNote:_liftDay ? legRecoveryNote : null,liftRecoveryWeeks,taperWeeks,seed,cfg:{...cfg,cardioTypes,cardioGoals,goal,seed},weeks,totalWeeks,created:Date.now(),startDate:null,_swapUniverse:_swapUniverseList(),_swapUniverseByKey:{}};
 }
 
 // ── SINGLETON SUPERSET SWEEP (V175, D28) ─────────────────────────────────────
@@ -10701,8 +10748,9 @@ function raceEveLiftPass(weeks, totalWeeks){
     day.tags = (day.tags||[]).filter(t => t!=='lift' && t!=='hip' && t!=='core');
     // D106a (V207): NSW's easy run is the long slow distance card, so it shakes out too. Run
     // cards only: a bike or swim LSD on an NRC multi-sport eve keeps its title. A test goal's
-    // marker day is Test Day; NRC keeps Race Day.
-    const _rec = /^recovery run/i.test(day.cardio.subtype||'') || (day.cardio.type === 'run' && /^long slow distance/i.test(day.cardio.subtype||''));
+    // marker day is Test Day; NRC keeps Race Day. V208: the claim is on the card, never the
+    // slot: only the EASY LSD (legLoad false) is the easy run, so a long card is never Shakeout.
+    const _rec = /^recovery run/i.test(day.cardio.subtype||'') || (day.cardio.type === 'run' && !day.cardio.legLoad && /^long slow distance/i.test(day.cardio.subtype||''));
     day.title = k===0 ? (PACE_GOALS.has(day.cardio.goalId) ? 'Test Day' : 'Race Day') : (_rec && (ri-k)===lr) ? 'Shakeout' : _rec ? 'Easy Run' : keep.length ? day.title : String(day.cardio.subtype||'Run').split(' — ')[0];
   }
 }
@@ -11343,10 +11391,23 @@ function liftFocusCode(t){
   var w=(t.replace(/[^a-z ]/g,' ').trim().split(/\s+/)[0]||'lift');
   return w.slice(0,5).toUpperCase();
 }
-function runSessionCode(sub){
-  var s=(sub||'').toLowerCase();
+function runSessionCode(sub, key, type){
+  // D103a (V208): a keyed NSW session wears the chip of its key, whatever its label says. The
+  // CHI is the Long Interval (LI) and the INT the Short Interval (SI). long and easy have no row:
+  // their chip is the label's (LSD on the pace family, EASY on run_base). The test wears TEST, as
+  // the benchmark does.
+  var K={int:'SI', chi:'LI', steady:'STDY', bench:'TEST', trial:'TEST'};
+  if(key && K[key]) return K[key];
+  var s=(sub||'').toLowerCase(), run=!type||type==='run';
+  // Unkeyed and frozen strings, before the generic interval test ("long interval" contains
+  // "interval"): both names of each run class wear one chip. A frozen run's old names read LI and
+  // SI; bike and swim keep their own CHI and INT names, so their chips keep CHI and INT. A bare
+  // "interval" with no parenthetical (Nike's "Speed Run — Intervals") keeps INT.
+  if(s.indexOf('long interval')>=0||s.indexOf('(li)')>=0) return 'LI';
+  if(s.indexOf('short interval')>=0||s.indexOf('(si)')>=0) return 'SI';
+  if(s.indexOf('continuous high')>=0) return run?'LI':'CHI';
+  if(s.indexOf('(int)')>=0) return run?'SI':'INT';
   if(s.indexOf('interval')>=0) return 'INT';
-  if(s.indexOf('continuous high')>=0) return 'CHI';
   if(s.indexOf('steady aerobic')>=0) return 'STDY';
   if(s.indexOf('easy run')>=0) return 'EASY';
   if(s.indexOf('benchmark')>=0) return 'TEST';
@@ -11361,7 +11422,7 @@ function dayCode(day){
   var topColor=ctype==='run'?'#5e8c54':(ctype==='bike'||ctype==='swim')?'#3f6e96':'#5f5f62';
   var bot, botColor;
   if(liftSections){ bot=liftFocusCode(day.title); botColor='#bc6a43'; }
-  else if(c){ bot=runSessionCode(c.subtype||''); botColor=topColor; }
+  else if(c){ bot=runSessionCode(c.subtype||'', c.dose&&c.dose.key, c.type); botColor=topColor; }
   else { bot=liftFocusCode(day.title); botColor='#bc6a43'; }
   return {top:top,topColor:topColor,bot:bot,botColor:botColor};
 }
@@ -12991,7 +13052,7 @@ function doseDerived(dose, v){
   return null;
 }
 function _doseStripHTML(sport, dose, sub){
-  const code=runSessionCode(sub||'');
+  const code=runSessionCode(sub||'', dose&&dose.key, sport);
   let v='';
   if(dose.k==='time') v=dose.mins+' min';
   else if(dose.k==='dist') v=dose.mi+' mi';
@@ -15834,7 +15895,13 @@ function _runClass(subtype){
   if(!s) return null;
   if(/benchmark/i.test(s)) return null;
   if(/recovery/i.test(s)) return 'Recovery';
-  if(/interval|\(INT\)|speed/i.test(s)) return 'Interval';
+  // D103a (V208): ORDER IS LOAD-BEARING. "Long Interval (LI)" is the CHI renamed and contains
+  // "interval", so its tokens class it as Tempo BEFORE the interval test; the INT's new name joins
+  // the interval test. One program's history never splits across the rename. Only the rename
+  // tokens move ahead: every label printed today keeps its class (NRC "Speed Run — Tempo" stays
+  // Interval).
+  if(/\(LI\)|long interval/i.test(s)) return 'Tempo';
+  if(/interval|\(INT\)|\(SI\)|short interval|speed/i.test(s)) return 'Interval';
   if(/CHI|high intensity|tempo|threshold|steady/i.test(s)) return 'Tempo';
   if(/long|LSD/i.test(s)) return 'Long';
   if(/easy/i.test(s)) return 'Easy';
