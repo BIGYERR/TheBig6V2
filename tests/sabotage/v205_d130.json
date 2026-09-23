@@ -1,0 +1,44 @@
+[
+  {
+    "name": "S1 -> the tolerance never fires. Every line that computes it survives: _longD is still found, the typed directional predicate is still written out, _tol is still declared, carried on the candidate and still rank 1b. Only the branch that feeds it is dead, so CHI on the long run's eve is scored as an untolerated collision again and the split collapses back to the pre-D130 total",
+    "anchor": "          if(_chiEve) _tol++; else _untol++;",
+    "replacement": "          if(false && _chiEve) _tol++; else _untol++;",
+    "gate": "gates/g205_d130_typed.js",
+    "note": "NAMED TRIP: D2 goes red naming each of the 14 calendars now carrying untol=1 at a four-run ceiling. D4 goes red because none of the 14 reaches (0,1). D5 goes red with an empty tolerated set. D3 goes red on the 8 calendars whose winner is no longer the split maximum. D12b goes red with 1,386 weeks off four runs, because the ceiling re-fires on the 14. D12d goes red at 0. EXPECTED: D2, D3, D4, D5, D12b, D12d."
+  },
+  {
+    "name": "S2 -> rank 1b is voided while everything that computes it stays. Untolerated is still rank 1 and still zero everywhere, the tolerance still fires, tol is still carried on the candidate; the rank vector simply reads a constant in slot 2, so a layout paying two tolerated adjacencies ties one paying one and enumeration order decides",
+    "anchor": "        const _rank = c => [-c.untol, -c.tol, c.longLast,",
+    "replacement": "        const _rank = c => [-c.untol, 0, c.longLast,",
+    "gate": "gates/g205_d130_typed.js",
+    "note": "NAMED TRIP: D3 goes red naming the calendars whose built layout is no longer the lexicographic maximum of the split objective. D4 goes red on any of the 14 that leaves the (0,1) floor for (0,2). The ruling says tolerated is MINIMISED, never merely permitted, and this is the mutation that tells the two apart. EXPECTED: D3, D4."
+  },
+  {
+    "name": "S3 -> the D125 conditional ceiling goes back to reading the TOTAL adjacency count. The split survives intact upstream, the chooser still returns the same layout with the same untol and tol, and every one of the 64 four-run layouts is unchanged; only the ceiling cannot tell a tolerated CHI-on-eve from a real collision, so the 14 fall back to three runs exactly as they did before D130",
+    "anchor": "      if(_paceCapped && capDays > 3 && (!_pick || _pick.untol > 0)){",
+    "replacement": "      if(_paceCapped && capDays > 3 && (!_pick || _pick.coll > 0)){",
+    "gate": "gates/g205_d130_typed.js",
+    "note": "NAMED TRIP: D10 goes red (the ceiling no longer reads _pick.untol) and D10b goes red (the total key is back in live code). D12b goes red with 1,386 weeks off four runs. D12d goes red at 0 tolerated weeks, because a three-run week has no CHI beside the long. The 64-calendar rows D2-D9 all SURVIVE, which is the point: this mutation isolates the ceiling from the objective. EXPECTED: D10, D10b, D12b, D12d."
+  },
+  {
+    "name": "S4 -> the tolerance loses its DIRECTION. It is still typed on CHI and still keyed to the long run, but it now accepts CHI on either adjacent day, so a quality session the day AFTER the long run is tolerated too. The ruling names that pair untolerated explicitly",
+    "anchor": "          const _chiEve = !!_longD && ((typeOf[_x]===T.s2 && _y===_longD && _x===prevDay(_longD))\n                                    || (typeOf[_y]===T.s2 && _x===_longD && _y===prevDay(_longD)));",
+    "replacement": "          const _chiEve = !!_longD && ((typeOf[_x]===T.s2 && _y===_longD && circ(_x,_longD)===1)\n                                    || (typeOf[_y]===T.s2 && _x===_longD && circ(_y,_longD)===1));",
+    "gate": "gates/g205_d130_typed.js",
+    "note": "NAMED TRIP: D3 goes red naming the calendars whose built layout is no longer the split maximum, because a CHI-after-long candidate now scores (0,1) instead of (1,0) and can win. D4 and D8b go red on the calendars among the 14 whose printed layout moves. D5 goes red if the tolerated set widens past the 14. EXPECTED: D3, D4, D8b."
+  },
+  {
+    "name": "S5 -> the split stops being pace-only and goes live on the NRC arm. The pace behaviour is untouched; the NRC chooser now scores a speed2 session on the eve of its long run as tolerated rather than as a collision, which is a re-ruling of NRC layout that nobody issued. NRC sessions are Nike-verbatim and its subset and permutation pins are doctrine",
+    "anchor": "        const untol = paceFam ? _untol : coll;",
+    "replacement": "        const untol = _untol;",
+    "gate": "gates/g205_d130_typed.js",
+    "note": "NAMED TRIP: D10d goes red (the pace-only fallback line is gone from source). D11 goes red naming the NRC goal, ceiling and calendar on every row where untol no longer equals coll. EXPECTED: D10d, D11."
+  },
+  {
+    "name": "S6 -> the tolerance is typed on the WRONG session. It is still directional, still keyed to prevDay of the long run, still minimised at rank 1b; it simply forgives INT on the eve instead of CHI. INT is the harder session and the one the ruling keeps untolerated, and CHI on the eve loses the tolerance the ruling grants it",
+    "anchor": "          const _chiEve = !!_longD && ((typeOf[_x]===T.s2 && _y===_longD && _x===prevDay(_longD))\n                                    || (typeOf[_y]===T.s2 && _x===_longD && _y===prevDay(_longD)));",
+    "replacement": "          const _chiEve = !!_longD && ((typeOf[_x]===T.s1 && _y===_longD && _x===prevDay(_longD))\n                                    || (typeOf[_y]===T.s1 && _x===_longD && _y===prevDay(_longD)));",
+    "gate": "gates/g205_d130_typed.js",
+    "note": "NAMED TRIP: D3 goes red naming every calendar whose winner flips from a CHI eve to an INT eve. D4 goes red on the 14, which now score (1,0) where the CHI eve is forced. D8b goes red on the named four. D12c goes red on the built weeks now carrying an untolerated INT-beside-long adjacency. EXPECTED: D3, D4, D8b, D12c."
+  }
+]

@@ -1,0 +1,9 @@
+[
+ {
+  "name": "S4 -> the quality crossover moves from 0.55 to 0.6, which is the three-run arm the LICENCE covers. Applies to the <=204 artifact only; on V205 the pace lattice is four-run and this anchor changes no INT card, so run this mutation against the V204 baseline",
+  "anchor": "    return Math.max(3, Math.ceil((totalWeeks||6) * 0.55));",
+  "replacement": "    return Math.max(3, Math.ceil((totalWeeks||6) * 0.6));",
+  "gate": "gates/g202_int_doctrine.js",
+  "note": "RUN THIS FILE AGAINST THE V204 BASELINE, NOT index.html. NAMED TRIP on V204: D7, first miss '9wk three-run build carries INT cards in weeks 1,2,3,4,5 but the rule says 1,2,3,4'. On V205 the same anchor is a NO-OP for INT and would read as SURVIVED, because V205's pace family is four-run and the crossover no longer governs its INT card count. That is the D113/D122 finding, not a gate defect: it is why the three-run arm is a LICENCE pinned to the artifact as shipped rather than a doctrine claim, and it is why the arm needs its own baseline-scoped sabotage file instead of a survivor in the V205 sweep."
+ }
+]

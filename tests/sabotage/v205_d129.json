@@ -1,0 +1,65 @@
+[
+  {
+    "name": "S1 -> the pace family loses its corrected lens and goes back to reading a circular week through the Sunday-first day list. The fork survives, the comment survives, prevDay is still defined and still circular-correct — only the pace arm's predicate reverts, so a Sunday easy run scores again as padding a Saturday long run, the day AFTER it",
+    "anchor": "          ? d===prevDay(longDay)",
+    "replacement": "          ? (circ(d,longDay)===1 && pos(d)<pos(longDay))",
+    "gate": "gates/g205_d129_tiebreak.js",
+    "note": "NAMED TRIP: P1 goes red on the pace rows whose layout is no longer a lexicographic maximum of the corrected objective, naming the rank vector chosen against the ruled one. P1b goes red on the rows that keep a day-after pad over a true eve. P6 goes red because the engine now agrees with its own control and the displacement count collapses from 24 toward 0. EXPECTED: P1, P1b, P6."
+  },
+  {
+    "name": "S2 -> the identity term stops being pace-family-only and goes live on the NRC arm as well. NRC still has both long-run pins, still reads the shipped eve predicate, still takes its sessions verbatim from the tables; the only change is that a tiebreak written to protect an even-spread incumbent NRC never had now reorders NRC day sets",
+    "anchor": "        const identity = (paceFam && idxs.join(',') === _evenKey) ? 1 : 0;",
+    "replacement": "        const identity = (idxs.join(',') === _evenKey) ? 1 : 0;",
+    "gate": "gates/g205_d129_tiebreak.js",
+    "note": "NAMED TRIP: P2 goes red on the NRC rows that are no longer a maximum of the five ruled terms alone, naming goal, calendar and ceiling. Measured population before the paceFam gate went in: 168 of 804 rows moved. EXPECTED: P2. CLOSED AT SLICE 7E. This row SURVIVED at PASS 109 FAIL 0 and the reason was a real coverage hole, not a no-op: P2 asserts NRC picks a MAXIMUM of the five ruled terms, and identity only ever reorders layouts INSIDE that maximum, so P2 stays green while 129 of 800 NRC rows move. P2c now owns the claim. Its oracle is the definition of rank 6 plus the gate's own exhaustive search: with identity live on NRC, every row whose five-term tie set spans more than one day set and contains the even-spread subset must return that subset, so the 129 rows where the engine declines it become 0. NAMED TRIP: P2c, measured PASS 110 FAIL 1 against a baseline of PASS 111 FAIL 0 (the second of P2c's two assertions; the 445/357 population assertion is pure oracle and stays green, which is how the row shows it is the engine that moved and not the population)."
+  },
+  {
+    "name": "S3 -> identity is voided while every line that computes it stays in place. _evenKey is still built, the term is still scored, still carried on every candidate and still commented; the rank vector reads a constant in its slot. Spread still runs at rank 7, so most calendars still look spaced and only the ties that contained the athlete's own days change hands",
+    "anchor": "        const _rank = c => [-c.untol, -c.tol, c.longLast, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualRest, c.qualFirst];",
+    "replacement": "        const _rank = c => [-c.untol, -c.tol, c.longLast, c.speedsAfterRest, c.recBeforeLong, c.canonical, 0, c.spread, c.qualRest, c.qualFirst];",
+    "gate": "gates/g205_d129_tiebreak.js",
+    "note": "NAMED TRIP: P3 goes red naming each calendar where the incumbent even-spread subset ties at the top of the ruled objective and the chooser moved off it anyway. 43 rows are in that population. EXPECTED: P3. RE-ANCHORED AT SLICE 7E. The anchor above used to quote the pre-D130 nine-term key `[-c.coll, c.longLast, ...]` and read anchor count=0: NOT-APPLIED, which is not a pass and is not a survivor either. D130 split rank 1 into untolerated and tolerated, so the live key carries ten terms and opens `[-c.untol, -c.tol, ...]`. The mutation itself is unchanged in kind: c.identity is still the only slot voided, every line that computes identity still stands, and _evenKey is still built. The faithful re-anchor was RUN, not assumed, because a re-anchor that lands on a term the rest of the build has made inert is a no-op wearing a trip's clothes (see S2 in v205_d125_ceiling.json for the case where that is exactly what happened). MEASURED AT SLICE 7E after the re-anchor: PASS 96 FAIL 15 against a baseline of PASS 111 FAIL 0. EXPECTED, corrected from the pre-D130 note above: P1 on 14 of the pace rows (the engine's own pick loses the identity term it used to win on, so it stops being a lexicographic maximum of the hand-scored vector) AND P3, the identity row itself, on 15 named calendars including rest fri cap3 (incumbent sun,wed,sat, engine picked mon,wed,sat). The original note named P3 alone."
+  },
+  {
+    "name": "S4 -> spread is voided the same way. The longest run-free stretch is still measured, still negated, still carried; rank 7 reads a constant, so ties that the incumbent subset is not in fall through to enumeration order — which is exactly the state D129 exists to end",
+    "anchor": "        const spread = paceFam ? -_longestFree : 0;",
+    "replacement": "        const spread = 0;",
+    "gate": "gates/g205_d129_tiebreak.js",
+    "note": "NAMED TRIP: P4 goes red naming the rows that took a looser week than the tie set allowed, printing the longest run-free stretch taken against the one available. 50 rows are decided by spread. EXPECTED: P4."
+  },
+  {
+    "name": "S5 -> spread inverts. The metric is still a metric and still circular, but the sign flips, so the LOOSEST week wins a tie instead of the tightest: the chooser starts preferring layouts that bunch runs together and leave a long empty stretch. Collisions still rule at rank 1, so the week never goes back to back and the defect hides behind a clean collision count",
+    "anchor": "        const spread = paceFam ? -_longestFree : 0;",
+    "replacement": "        const spread = paceFam ? _longestFree : 0;",
+    "gate": "gates/g205_d129_tiebreak.js",
+    "note": "NAMED TRIP: P4 goes red on the spread-decided rows, naming the loose layout against the tight one. P5 goes red if Mario's row is among them. EXPECTED: P4."
+  },
+  {
+    "name": "S6 -> the circular wrap is dropped from the run-free stretch: the last gap of the week is measured to the end of Saturday instead of round to the next Sunday run. The metric still exists, still ranks, still prefers tighter weeks inside the week — it just cannot see the gap that spans the weekend boundary, which is the same lens defect D129 corrected one term above",
+    "anchor": "          const nxt = (i+1<_p.length) ? _p[i+1] : _p[0]+7;",
+    "replacement": "          const nxt = (i+1<_p.length) ? _p[i+1] : 7;",
+    "gate": "gates/g205_d129_tiebreak.js",
+    "note": "NAMED TRIP: P4 goes red on the rows whose tie set is separated only by the wrap-around gap. EXPECTED: P4."
+  },
+  {
+    "name": "S7 -> rank 8 is voided while every line that computes it stays. The backward distance from the long run to the last quality session is still measured, still carried on the candidate; the rank slot reads a constant. The five-way tie at rest=fri falls back to enumeration order and the athlete gets whichever layout the loop reached first",
+    "anchor": "        const qualRest = paceFam ? _qualRest : 0;",
+    "replacement": "        const qualRest = 0;",
+    "gate": "gates/g205_d129_tiebreak.js",
+    "note": "NAMED TRIP: P8 goes red because rest=fri cap 4 no longer resolves to the layout the ruling names. P1 goes red on the rows whose pick is no longer a maximum of the nine-term objective. P7 goes red because the residual tie count rises above the pinned 2. EXPECTED: P1, P7, P8."
+  },
+  {
+    "name": "S8 -> rank 8 inverts. The term is still a metric, still circular, still pace-family-only, but the sign flips: the layout whose last quality session sits CLOSEST to the long run wins, so the athlete runs quality the day before his longest run and the week still scores a clean collision count because collisions rule at rank 1",
+    "anchor": "        const qualRest = paceFam ? _qualRest : 0;",
+    "replacement": "        const qualRest = paceFam ? -_qualRest : 0;",
+    "gate": "gates/g205_d129_tiebreak.js",
+    "note": "NAMED TRIP: P8 goes red naming the layout taken against the ruling's, and its rest-into-the-long-run distance. P1 goes red on every row rank 8 decides. EXPECTED: P1, P8."
+  },
+  {
+    "name": "S9 -> rank 9 inverts. The first quality day is still found, still pace-family-only, but the sign flips so the LATEST first quality day wins instead of the earliest. Voiding this term is a behavioural no-op on both rows it decides — its winner is also the candidate enumeration order reaches first — so the mutation inverts it, which moves both rows off the ruled layout",
+    "anchor": "        const qualFirst = (paceFam && _firstQual) ? -pos(_firstQual) : 0;",
+    "replacement": "        const qualFirst = (paceFam && _firstQual) ? pos(_firstQual) : 0;",
+    "gate": "gates/g205_d129_tiebreak.js",
+    "note": "NAMED TRIP: P1 goes red on the two rows rank 9 decides, printing the nine-term rank taken against the ruled maximum. EXPECTED: P1. Voiding the term instead (qualFirst = 0) was measured first and is a behavioural no-op across all 93 pace rows; a no-op mutation is a mutation defect, not a gate defect."
+  }
+]

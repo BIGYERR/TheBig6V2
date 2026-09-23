@@ -1,0 +1,44 @@
+[
+  {
+    "name": "M1 -> the ceiling is made unreachable again: Table 6 rows 9 and 10 are re-typed as 7 instead of 8. The table still exists, the reader still reads it by calendar week, the >26 clamp is untouched and 24 of the 26 rows are still correct. The only thing wrong is that the progression now tops out at SEVEN, which is the EXACT regression D114 was ruled to remove and the exact thing g202's D3b was reporting",
+    "anchor": "  8, 8,                       // wk 9-10",
+    "replacement": "  7, 7,                       // wk 9-10",
+    "gate": "gates/g205_d114_int_table6.js",
+    "note": "VERIFIED TRIPPED: T2, T4c, T6, T8, T9 (5 rows). T2c stays GREEN BY DESIGN and this is not a hole: T2c compares the gate's hand transcription against the doctrine FILE, so it validates the ORACLE rather than the artifact and is deliberately insensitive to any mutation of index.html. T2 is the row that sees the table. EXPECTED: T2, T4c, T6, T8, T9."
+  },
+  {
+    "name": "M2 -> the >26 clamp is deleted from the INT reader. Math.min(week, 26) becomes a bare index, so week 27 and beyond run off the end of NSW_TABLE6_INT. Every week 1..26 is exactly right, so Mario's 11-week block is byte-identical and every end-to-end row stays green. This is the guide's own tail rule -- '>26: do not increase INT or CHI distances' -- being deleted silently. FIRST DRAFT OF THIS MUTATION WAS A NO-OP and is recorded here so it is not re-attempted: falling back to a literal 8 is indistinguishable from the clamp, because Guide A's ceiling caps rows 13-26 to 8 anyway, so no value past week 26 can differ. The clamp can only be observed by removing it outright.",
+    "anchor": "  var _w = Math.max(1, Math.min(Math.round(week) || 1, 26));\n  return Math.min(8, NSW_TABLE6_INT[_w]);",
+    "replacement": "  var _w = Math.max(1, Math.round(week) || 1);\n  return Math.min(8, NSW_TABLE6_INT[_w]);",
+    "gate": "gates/g205_d114_int_table6.js",
+    "note": "NAMED TRIP: T3 goes red on wk27/28/30/40/52/104/1000, every one of them returning NaN instead of row 26's 8. VERIFIED TRIPPED against the built artifact. Nothing else moves, which is correct: no block this app can build reaches week 27 (run_pace_goal caps at Math.min(26, ...), swim at 18, bike at 20), so T3 is the ONLY row that can see this and it is the only row that should. EXPECTED: T3."
+  },
+  {
+    "name": "M3 -> the V115 leak comes back: the reader's ceiling becomes Math.min(10, row) instead of Math.min(8, row). Guide A's 8 is replaced by the 10 that used to leak out of the beyond-26-week military branch, which is the defect V115 was written to fix and which D114 inherits the fix for. The table is untouched and verbatim, the calendar indexing is untouched, the >26 clamp is untouched. Only the guide the ceiling comes from is wrong",
+    "anchor": "  return Math.min(8, NSW_TABLE6_INT[_w]);",
+    "replacement": "  return Math.min(10, NSW_TABLE6_INT[_w]);",
+    "gate": "gates/g205_d114_int_table6.js",
+    "note": "VERIFIED TRIPPED: T3, T4a, T4c, T6, T7, T8 (6 rows). T4a names the max of 10; T3 names the >26 rows now returning 10; T4c names week 26; T7 names Mario's final week printing 9. T2 and T2c stay GREEN by design, because the stored column is the raw transcription and is genuinely untouched -- that is what makes this a real test of the CAP rather than of the table. EXPECTED: T3, T4a, T4c, T6, T7, T8."
+  },
+  {
+    "name": "M4 -> the reader goes back to POSITION. The V115 hand ramp is restored verbatim on top of the table, so getINTReps once again spreads 4 -> 8 across `rampSpan` instead of reading Table 6 by calendar week. NSW_TABLE6_INT and intFromTable6 both still exist, still carry their D114 comments and still return correct values when called directly, so any gate that tested the TABLE rather than the CALLER stays green. This is the precise under-dose D125/D130 exposed: over 11 weeks the last rung lands on the final week",
+    "anchor": "  const ramp = w => intFromTable6(w);",
+    "replacement": "  const _span = Math.max(2, rampSpan || totalWeeks || 6);\n  const ramp = w => Math.min(8, 4 + Math.floor((w-1) * 4 / Math.max(_span-1,1)));",
+    "gate": "gates/g205_d114_int_table6.js",
+    "note": "VERIFIED TRIPPED: T5, T6, T8, T9 (4 rows). T5 names the tw/wk/span triples where rampSpan starts moving weeks again; T9 is the headline -- the 11-week block reaches 8 only in the final week, which IS the regression. T1, T2, T2b, T2c, T3, T4* all stay GREEN by design: the table is intact and only the CALLER is wrong, which is exactly why T5 and T6 exist alongside T2. EXPECTED: T5, T6, T8, T9."
+  },
+  {
+    "name": "M5 -> the cutback stops cutting back properly: the interval volume step-back moves from ~40% off the prior build week to ~25% off. The cutback still fires on exactly the same weeks, still holds pace, still never progresses and still respects the floor of 3, so the cadence and every structural claim about deload weeks stays true. Only the DOSE on the recovery week is wrong, in the direction of too much",
+    "anchor": "  // prescription; a rep or pace PR during a recovery week is a planning error.\n  if(isCardioCutbackWeek(week, totalWeeks)) return Math.max(3, Math.round(ramp(week-1) * 0.6));",
+    "replacement": "  // prescription; a rep or pace PR during a recovery week is a planning error.\n  if(isCardioCutbackWeek(week, totalWeeks)) return Math.max(3, Math.round(ramp(week-1) * 0.75));",
+    "gate": "gates/g205_d114_int_table6.js",
+    "note": "VERIFIED TRIPPED: T6, T7, T8 (3 rows). T7 names wk4 (4 instead of 3) and wk8 (5 instead of 4). This mutation is the reason T6 re-implements the cutback from the branch's own prose instead of trusting the engine. EXPECTED: T6, T7, T8."
+  },
+  {
+    "name": "M6 -> the block no longer OPENS where the guide says it opens: Table 6 rows 1 and 2 are re-typed as 3 instead of 4. Everything above week 2 is correct, the ceiling is still 8, it is still reached at week 9, and the 11-week block still tops out exactly right -- so every row about the CEILING stays green. Only the floor is wrong, and it is wrong by one rep in the two weeks an athlete is least likely to question",
+    "anchor": "  4, 4,                       // wk 1-2",
+    "replacement": "  3, 3,                       // wk 1-2",
+    "gate": "gates/g205_d114_int_table6.js",
+    "note": "VERIFIED TRIPPED: T2, T4d, T6, T8 (4 rows). T4d names the opening rep count. T9 stays GREEN by design -- the ceiling is untouched -- which is precisely why T4d exists separately from T4a. T2c stays green for the same oracle-validation reason given under M1. EXPECTED: T2, T4d, T6, T8."
+  }
+]

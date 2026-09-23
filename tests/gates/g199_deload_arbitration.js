@@ -6,7 +6,8 @@
 // chain". THERE IS NO BASELINE-RELATIVE ASSERTION IN THIS FILE: tests/sabotage.py passes no
 // argv[3], so an assertion that needs a baseline has zero mutation coverage (that is what
 // hollowed out g197d before V198). "Better than V198" is never asserted; "zero-posterior
-// deload weeks == 0" and "zero-posterior weeks == 372" are.
+// deload weeks == 0" and "zero-posterior weeks == the candidate's DELOAD_ARB_BY_VERSION
+// row" are (D133: the five arbitration counts are era rows, never bare literals).
 //
 // ORACLE INDEPENDENCE. Posterior chain is the hand table E_PAT below, typed from the
 // doctrine movement names, with a blindness probe (A4). The engine's _isPostChain is NEVER
@@ -21,7 +22,8 @@
 //   - END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget):
 //     builder's after-check. Days >0 -> 0 == 36. Reported by E6, never mixed into E3.
 //   - Deload weeks by isRecoveryWeek == 2,880. Deload weeks that actually DIFFER with the
-//     pass off == 2,859, because 21 of them are byte-identical either way (D2).
+//     pass off == 2,880 minus the era row's dlIdentical, because that many are byte-
+//     identical either way (D2). V198-V204: 21 identical, 2,859 differ. V205: 19 and 2,861.
 // An unlabelled number in this file is a defect. Label it or delete it.
 //
 // THE TRAP AND THE SWAP ARE DISJOINT. The naive-pre-pass population (a posterior MAIN and
@@ -36,6 +38,63 @@ const path=require('path'), fs=require('fs'), os=require('os'), crypto=require('
 const {fork}=require('child_process');
 const {load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION}=require(path.join(__dirname,'..','harness.js'));
 const ART=path.resolve(process.argv[2]||path.join(__dirname,'..','..','index.html'));
+
+// ── ERA ROWS: the five arbitration counts, keyed by ia-version (D133) ──────────────
+// Same D94-t convention as harness.js's digest tables. A row records a CLAIM, not a
+// value: a LITERAL row asserts a RULED MOVE and cites its attribution; a REFERENCE row
+// asserts RULED UNMOVED and is proved by gate.sh running this file on V(N-1) and V(N);
+// a MISSING row fails loudly, because every consumer below asserts the row exists as a
+// CONJUNCT before it compares. These five were bare literals until V205, which made
+// them red on the candidate for a reason this gate does not test.
+//
+// THE CAP ITSELF IS PROVABLY UNCHANGED BY V205. On the 10,698 cells where
+// capRegionalFatigue was handed identical input, its verdict differs on 0 and its output
+// label list differs on 0. Every move in the V205 row below is an INPUT move: V205
+// legitimately reaches capRegionalFatigue, which reads _cardioInterference(cardio) at
+// index.html:10170 — the same call the session budget makes at :9986. recoveryDeload
+// does NOT read cardio; C1/C3/C5 and D2 move because they count posterior sections
+// AFTER the regional cap has run.
+const DELOAD_ARB_BY_VERSION = {
+  // V198/V199: the counts D91 was ruled against. Literal rows: this is the origin.
+  198: { capLSBkilled: 714, zeroWeeks: 372, zeroWeeksNonDeload: 372, zeroWeeksDeloadOff: 40, dlIdentical: 21 },
+};
+DELOAD_ARB_BY_VERSION[199] = DELOAD_ARB_BY_VERSION[198];   // D91: ruled UNMOVED
+DELOAD_ARB_BY_VERSION[200] = DELOAD_ARB_BY_VERSION[199];   // D89: ruled UNMOVED (core-tier clause, not the arbitration)
+DELOAD_ARB_BY_VERSION[201] = DELOAD_ARB_BY_VERSION[200];   // D94: ruled UNMOVED
+DELOAD_ARB_BY_VERSION[202] = DELOAD_ARB_BY_VERSION[201];   // V202: ruled UNMOVED (NSW run work only)
+DELOAD_ARB_BY_VERSION[203] = DELOAD_ARB_BY_VERSION[202];   // D117: ruled UNMOVED (NRC dose copy, no section arbitration)
+DELOAD_ARB_BY_VERSION[204] = DELOAD_ARB_BY_VERSION[203];   // D126: ruled UNMOVED (string-and-gate only)
+// V205: ruled MOVE, so a LITERAL row, one attribution per number. Every figure below is
+// measure's attribution pass, which reproduced all five V204 literals on the V204
+// baseline FIRST (I3 714, C1 372, C3 372, C5 40, D2 21) before reading the candidate:
+// the instrument was proved before it was used. These are not numbers copied out of a
+// failure message.
+DELOAD_ARB_BY_VERSION[205] = {
+  // I3. 714 -> 496. "The cap trims less" is true of 44 cells ONLY: 44 cells where the cap
+  // reads interference 0.75 -> 0 (the Incline Walk leaving the legs day). The remaining
+  // net 174 comes from a 3,168-cell reshuffle of WHICH days are offered Leg superset B at
+  // all, because 11,616 pace day-builds changed role under D127. Entering the cap is
+  // unmoved at 15,720 (F2, untouched).
+  capLSBkilled: 496,
+  // C1. 372 -> 364 of 17,856 weeks. Same reader, opposite directions: +24 where the cap
+  // KEEPS Leg superset B on a legs day whose interference dropped, -16 where the legs day
+  // relocated onto Monday's INT at interference 1.40 with legLoad false -> true and the
+  // cap kills it there.
+  zeroWeeks: 364,
+  // C3. 372 -> 364, the same weeks as C1. Deload zeros remain 0 (C2), so the claim the
+  // gate exists to make survives the move intact.
+  zeroWeeksNonDeload: 364,
+  // C5. 40 -> 32 in the __DELOAD_OFF arm: +12 week-4 lowback/protect, -4 week-8
+  // bodyweight. The C1 and C5 sets are DISJOINT — no week is counted by both.
+  zeroWeeksDeloadOff: 32,
+  // D2. 21 -> 19, so differing deload weeks go 2,859 -> 2,861 of 2,880. NOTE THE
+  // DIRECTION: this went UP, not down. 2 deload weeks where interference 0.75 -> 0 makes
+  // the cap spare Leg superset B in the __DELOAD_OFF arm only, while recoveryDeload still
+  // drops it in the ON arm. The reader is capRegionalFatigue, not a next-day pass:
+  // measure excluded index.html:6454, :7698/:8440, :10351 and :6689 by printed hotNext
+  // and legLoad values on both weeks.
+  dlIdentical: 19,
+};
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[
@@ -351,22 +410,27 @@ function report(){
   let R={}; outs.forEach(o=>R=merge(R,JSON.parse(fs.readFileSync(o,'utf8'))));
   try{ outs.forEach(o=>fs.unlinkSync(o)); fs.rmdirSync(tmp); }catch(e){}
   const N=R.on, F=R.off;
+  // D133. The era row, looked up ONCE. Its existence is a conjunct in every assertion
+  // that reads it, so an artifact with no row fails loudly instead of skipping.
+  const ERA=DELOAD_ARB_BY_VERSION[IP.version]||null;
+  const ERAv=k=>(ERA?ERA[k]:'NO ROW');
+  const NOROW=(ERA?'':' — no DELOAD_ARB_BY_VERSION row for V'+IP.version+': an unpinned arbitration count (D133)');
   const g=(o,k)=>(o&&o[k])||0;
   const topn=(o,n)=>Object.keys(o||{}).sort((a,b)=>o[b]-o[a]).slice(0,n).map(k=>k+' '+o[k]).join(' | ');
   const D_DAY=N.dlDayBuilds, D_WK=N.deloadWeeks, ALLWK=N.weeks;
 
   console.log('── C. headline, shipped card, absolute counts (no baseline) ──');
-  ok(N.zeroWeeks===372,'C1 zero-posterior weeks on the SHIPPED card == 372 of '+ALLWK+' weeks (1,728 configs); got '+N.zeroWeeks);
+  ok(!!ERA&&N.zeroWeeks===ERA.zeroWeeks,'C1 zero-posterior weeks on the SHIPPED card == '+ERAv('zeroWeeks')+' (the V'+IP.version+' DELOAD_ARB_BY_VERSION row) of '+ALLWK+' weeks (1,728 configs); got '+N.zeroWeeks+NOROW);
   ok(N.zeroWeeksDeload===0,'C2 zero-posterior DELOAD weeks == 0 of '+D_WK+' deload weeks; got '+N.zeroWeeksDeload);
-  ok(N.zeroWeeksNonDeload===372,'C3 the surviving 372 are all NON-deload weeks (denominator '+N.nonDeloadWeeks+'); got '+N.zeroWeeksNonDeload);
+  ok(!!ERA&&N.zeroWeeksNonDeload===ERA.zeroWeeksNonDeload,'C3 the surviving '+ERAv('zeroWeeksNonDeload')+' (the V'+IP.version+' row) are all NON-deload weeks (denominator '+N.nonDeloadWeeks+'), so C2\'s zero holds: got '+N.zeroWeeksNonDeload+NOROW);
   ok(R.wrongWay===0,'C4 weeks going the WRONG way == 0: no week ships zero posterior that would ship posterior with the deload off (got '+R.wrongWay+' of '+ALLWK+')');
-  ok(F.zeroWeeksDeload===40,'C5 __DELOAD_OFF comparator: with the pass disabled, 40 deload weeks ship zero posterior (got '+F.zeroWeeksDeload+')');
+  ok(!!ERA&&F.zeroWeeksDeload===ERA.zeroWeeksDeloadOff,'C5 __DELOAD_OFF comparator: with the pass disabled, '+ERAv('zeroWeeksDeloadOff')+' deload weeks (the V'+IP.version+' row) ship zero posterior. This set and C1\'s are DISJOINT; got '+F.zeroWeeksDeload+NOROW);
   ok(N.zeroWeeksDeload<=F.zeroWeeksDeload,'C6 shipped ('+N.zeroWeeksDeload+') <= __DELOAD_OFF ('+F.zeroWeeksDeload+'): arbitrated correctly the deload PROTECTS the chain rather than deleting it');
 
   console.log('── D. denominators, the conflict resolved rather than papered over ──');
   ok(D_WK===2880,'D1a deload weeks by isRecoveryWeek == 2,880 (got '+D_WK+')');
   ok(N.nonDeloadWeeks===14976,'D1b non-deload weeks == 14,976 (got '+N.nonDeloadWeeks+'); 2,880 + 14,976 == '+ALLWK);
-  ok(R.dlIdentical===21,'D2 21 deload weeks are byte-identical with the deload off, so the sha-method deload count is 2,859 ('+(R.dlTotal-R.dlIdentical)+' differ of '+R.dlTotal+'). 2,880 and 2,859 are two measurements, not a disagreement');
+  ok(!!ERA&&R.dlIdentical===ERA.dlIdentical,'D2 '+ERAv('dlIdentical')+' deload weeks (the V'+IP.version+' row) are byte-identical with the deload off, so the sha-method deload count is '+(ERA?R.dlTotal-ERA.dlIdentical:'NO ROW')+' ('+(R.dlTotal-R.dlIdentical)+' differ of '+R.dlTotal+'). '+R.dlTotal+' and '+(R.dlTotal-R.dlIdentical)+' are two measurements, not a disagreement; got '+R.dlIdentical+NOROW);
   ok(R.ndIdentical===R.ndTotal&&R.ndTotal===14976,'D3 non-deload weeks are byte-identical with the pass on and off: '+R.ndIdentical+'/'+R.ndTotal+' (week-level identity, not just HALF_MANNY)');
 
   console.log('── E. THE DELOAD MUST STILL CUT ──');
@@ -450,7 +514,7 @@ function report(){
     'I2c and the cause is named, once, for all '+N.swapReBudget+': a POST-BUILD RENAMER rewrites the item after capSessionBudget. The section survives in place, its content does not: '+topn(N.reBudRename,2));
   ok(g(N.reBudTier,'bodyweight')===N.swapReBudget,'I2d every one of them is on the bodyweight tier ('+JSON.stringify(N.reBudTier)+'). This is a RENAME-SURFACE defect that predates D91 and is only made visible by it: the tier renamer does not read the posterior-chain lens that capSessionBudget and recoveryDeload both defend. NOT fixed here, and not fixable in a gate — it needs a ruling');
   ok(N.swapReBudgetWeekZero===0,'I2b and not one of those '+N.swapReBudget+' cells leaves its WEEK without posterior ('+N.swapReBudgetWeekZero+'): the coaching claim behind criterion 2 holds at the level it is made');
-  ok(N.capLSBkilled===714,'I3 capRegionalFatigue still kills exactly 714 Leg superset B sections, the same count V198 killed, out of '+N.capLSBin+' entering the cap (all day builds, n='+N.dayCells+'); got '+N.capLSBkilled);
+  ok(!!ERA&&N.capLSBkilled===ERA.capLSBkilled,'I3 capRegionalFatigue kills exactly '+ERAv('capLSBkilled')+' Leg superset B sections (the V'+IP.version+' row), out of '+N.capLSBin+' entering the cap (all day builds, n='+N.dayCells+'); got '+N.capLSBkilled+NOROW);
 
   console.log('── J. card order preserved IN PLACE ──');
   ok(N.orderViol===0,'J1 the surviving sections are a subsequence of the entering sections on every deload card: nothing reordered, nothing appended ('+N.orderViol+' violations of '+D_DAY+')');

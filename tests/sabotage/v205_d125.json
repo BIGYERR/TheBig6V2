@@ -1,0 +1,44 @@
+[
+  {
+    "name": "S1 -> the subset pin comes back for the pace family: the chooser may once again only pick day sets that END on the last training day. Every other term of the objective is untouched, the NRC path is untouched, and the pace family still gets a spacing-aware layout on most calendars — this is the HALF of the D125 relaxation that buys the five-training-day calendars, deleted on its own",
+    "anchor": "      if(acc.length===capDays){ if(paceFam || acc[acc.length-1]===n-1) subsets.push(acc.slice()); return; }",
+    "replacement": "      if(acc.length===capDays){ if(acc[acc.length-1]===n-1) subsets.push(acc.slice()); return; }",
+    "gate": "gates/g205_d129_tiebreak.js",
+    "note": "NAMED TRIP: P1 goes red naming the calendars whose layout is no longer a lexicographic maximum of the objective space. P3b goes red because mon+tue, mon+thu and wed+thu stop being rescued (rescued set drops from five to two). P8 goes red on the built weeks that lost their optimum. EXPECTED: P1, P3b, P8. RE-POINTED AT SLICE 7E, and the row's own premise corrected with it. This row used to name gates/g205_d125_spaced.js and it SURVIVED there at PASS 19 FAIL 0, which is not a gate hole and not a no-op either. Measured: restoring the subset pin moves the engine on exactly ONE of 157 pace rows, rest wed+thu at a four-run ceiling, and that row TIES on all six terms the spaced gate scores and loses at RANK 9 (qualFirst, -2 against 0). The spaced gate's oracle stops at rank 6 by design, so it cannot see the difference and no honest row in that file can be made to. g205_d129_tiebreak.js carries all nine terms and already catches it: measured PASS 110 FAIL 1 in the slice 7e sweep, P1 naming rest wed+thu cap4 (it read 108 when first measured; P2c added two passing rows to that gate in the same slice). NAMED TRIP: P1, one row. The claim in this row's name that the subset relaxation is what buys the five-training-day calendars is WRONG and is corrected by P3c/P3d in g205_d125_spaced.js: the subset half rescues ZERO calendars (50 of 64 either way), the permutation half alone rescues two (48 of 64), and 45 -> 50 is the two pins relaxed together. The subset half buys a tiebreak, not a calendar."
+  },
+  {
+    "name": "S2 -> the permutation pin comes back: the long run must again be the LAST chosen run day. The subset rule stays relaxed, so the five-day calendars still get their escape and only the four-training-day weeks — where the day set is forced and the long run's slot is the only lever left — lose their collision-free layout",
+    "anchor": "        if(!paceFam && p.includes(T.long) && p[p.length-1] !== T.long) continue;",
+    "replacement": "        if(p.includes(T.long) && p[p.length-1] !== T.long) continue;",
+    "gate": "gates/g205_d125_spaced.js",
+    "note": "NAMED TRIP: P2 goes red (21/35 falls to 19/35 at four training days). P2b goes red because the loser list grows past fourteen. P3b goes red: mon+tue+thu and mon+wed+thu stop being rescued. P1 goes red on those same calendars. EXPECTED: P1, P2, P2b, P3b."
+  },
+  {
+    "name": "S3 -> the long-run PREFERENCE is voided while the code that computes it stays in place: longLast is still calculated, still commented, still carried on every candidate, but the rank vector reads a constant instead of it. Collisions still rule, speed-after-rest and the recovery pad still rank, so most calendars are unchanged and the long run still usually lands late by accident",
+    "anchor": "        const _rank = c => [-c.untol, -c.tol, c.longLast, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualRest, c.qualFirst];",
+    "replacement": "        const _rank = c => [-c.untol, -c.tol, 1, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualRest, c.qualFirst];",
+    "gate": "gates/g205_d125_spaced.js",
+    "note": "NAMED TRIP: P1 goes red on 125 of 157 calendar x ceiling rows, naming the rank vector the engine chose against the one the ruling orders. P8 goes red on 20 of 29 built rows. P8c goes red with 37 calendars putting the long run mid-week. EXPECTED: P1, P8, P8c -- 3 FAIL of 19. RE-ANCHORED AT SLICE 7D: the old form quoted the pre-D130 key [-c.coll, c.longLast, ...], which D130 split into [-c.untol, -c.tol, c.longLast, ...]: NOT-APPLIED. The mutation is unchanged in kind -- rank 2 reads a constant instead of longLast -- and it still trips P1/P8 as written."
+  },
+  {
+    "name": "S4 -> the long run stops counting as a hard day in the chooser's own collision term. INT and CHI are still spaced from each other, the objective still runs, and spaceHardCardio downstream still sees the long run as hard, so the week is still repaired often enough to look healthy. This is the collision-blindness D125 exists to remove, narrowed to one token",
+    "anchor": "    const HARD = new Set([T.s1, T.s2, T.long]);",
+    "replacement": "    const HARD = new Set([T.s1, T.s2]);",
+    "gate": "gates/g205_d125_spaced.js",
+    "note": "NAMED TRIP: P1 goes red because the chosen layout is no longer collision-minimal under the gate's own hand-scored space. P2 goes red on the four-run ceiling grid. P8 goes red on the built weeks. EXPECTED: P1, P2, P8."
+  },
+  {
+    "name": "S5 -> the pace family stops entering the chooser at all and silently falls back to even spread. PACE_GOALS still exists, the chooser still exists, the NRC path still routes, and the DAY COUNT is unchanged, so the week still looks like a pace week. Only the DAY CHOICE regresses, which is precisely the thing even spread cannot reason about: spaceHardCardio can permute types within whatever days even spread happened to pick, but it cannot pick different days.",
+    "anchor": "    const _paceCapped = PACE_GOALS.has(_soloRunGoal) && capDays<=nCardio && capDays>=2;",
+    "replacement": "    const _paceCapped = false;",
+    "gate": "gates/g205_d125_spaced.js",
+    "note": "NAMED TRIP: P6c goes red naming the routing predicate. P7 goes red with 88 untolerated hard-run adjacencies across 704 built weeks, and P7b goes red with 220 tolerated adjacencies across 20 calendars that are not among the 14 the ruling names. P8 goes red on 24 of 29 built rows. EXPECTED: P6c, P7, P7b, P8 -- 4 FAIL of 19. RE-ANCHORED AT SLICE 7D: the old form quoted `capDays<nCardio`, which slice 6 widened to `capDays<=nCardio`: NOT-APPLIED. The old note also predicted P7 would stay green by design; that expired with D130. P7 now asks whether a BUILT week carries an untolerated adjacency, and even spread does not reach it."
+  },
+  {
+    "name": "S6 -> the chooser's plan is computed and then quietly overruled on one day: the last chosen run day takes the long run back, ahead of the plan. This is the real defect found while building D125. Every calendar where the plan already put the long run last is unaffected, so most of the lattice is clean and the day CHOICE is still the new one",
+    "anchor": "        let st = _planned || (isLastSportDay ? 'lsd_long' : (types[sportIdx] || 'lsd_easy'));",
+    "replacement": "        let st = isLastSportDay ? 'lsd_long' : (_planned || types[sportIdx] || 'lsd_easy');",
+    "gate": "gates/g205_d125_spaced.js",
+    "note": "NAMED TRIP: P8 goes red on the built weeks where the plan put the long run mid-week and the last-day default took it back, naming the day set and the rank it fell to. EXPECTED: P8. P1 stays green because the chooser itself is untouched — the defect is entirely in the consumer, which is why the gate reads built output and not just the function."
+  }
+]

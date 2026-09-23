@@ -1,0 +1,23 @@
+[
+ {
+  "name": "S1 -> the bike INT caller is re-pointed back at the run/swim reader. The fork still EXISTS and getINTBike is still declared, so nothing about the declaration is wrong; the bike simply stops calling it and starts reading a table headed \"Run/Swim (reps)\" again. This is the exact defect D135 was ruled to remove: bike_century held EIGHT max-effort intervals for twelve straight weeks",
+  "anchor": "  let intReps = getINTBike(week, tw);   // D135 (V205): bike keeps the V115 INT hand ramp",
+  "replacement": "  let intReps = getINTReps(week, tw, false);   // D135 (V205): bike keeps the V115 INT hand ramp",
+  "gate": "gates/g205_bike_unmoved.js",
+  "note": "NAMED TRIP: B6b goes red naming the weeks (W3 prints 5 where the V115 ramp says 4, W9 prints 8 where it says 6), and the source census goes red on B8a (0 call sites name getINTBike), B8b (getINTReps called from three places, not two) and B8c (the bike call string is back). EXPECTED: B6b, B8a, B8b, B8c. B5 stays green by construction, which is the point: a declaration census alone cannot see this."
+ },
+ {
+  "name": "S2 -> the fork is left standing and its BODY is swapped for the table read. Every census row still passes: getINTBike is declared once, called once, and the bike builder names no other reader. Only the prescription is wrong. This is the mutation a source-level gate cannot catch and the reason B6b builds cards instead of grepping",
+  "anchor": "  const ramp = w => Math.min(8, 4 + Math.floor((w-1) * 4 / Math.max(_span-1,1)));\n  // Cutback week: interval VOLUME steps back ~40% off the prior build week and never\n  // progresses. Byte-identical to the rule getINTReps still states.",
+  "replacement": "  const ramp = w => intFromTable6(w);\n  // Cutback week: interval VOLUME steps back ~40% off the prior build week and never\n  // progresses. Byte-identical to the rule getINTReps still states.",
+  "gate": "gates/g205_bike_unmoved.js",
+  "note": "NAMED TRIP: B6b alone. B5, B8a, B8b and B8c all stay green because the fork's SHAPE is untouched. EXPECTED: B6b only. If B8 rows move, the mutation was applied in the wrong place."
+ },
+ {
+  "name": "S3 -> the cutback branch inside the bike INT reader is short-circuited, so a deload week progresses like a build week. The ramp is otherwise byte-identical to V115, so only the four cutback weeks of a 17-week block are wrong",
+  "anchor": "  // progresses. Byte-identical to the rule getINTReps still states.\n  if(isCardioCutbackWeek(week, totalWeeks)) return Math.max(3, Math.round(ramp(week-1) * 0.6));",
+  "replacement": "  // progresses. Byte-identical to the rule getINTReps still states.\n  if(false && isCardioCutbackWeek(week, totalWeeks)) return Math.max(3, Math.round(ramp(week-1) * 0.6));",
+  "gate": "gates/g205_bike_unmoved.js",
+  "note": "NAMED TRIP: B6b on the cutback weeks of bike_century (W4, W8, W12, W16 print the build-week count instead of the stepped-back one). EXPECTED: B6b only. B7's divergence count is unaffected because both oracles keep their cutback rule."
+ }
+]

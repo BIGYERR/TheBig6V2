@@ -1,0 +1,72 @@
+[
+  {
+    "name": "M1 -> the table is re-typed with the V115 ceiling smuggled back in: Table 6 rows 25 and 26 become 3 x 20 instead of 2 x 20. The table still exists, the reader still reads it, the comment still cites the doctrine file and line range, and 24 of the 26 rows are still correct. Only the top of the ramp is wrong, which is the exact defect D128 was ruled to remove. A gate that only checked 'a table exists and the reader reads it' would ship this",
+    "anchor": "  {reps:2, minPerRep:20}, {reps:2, minPerRep:20}                            // wk 25-26",
+    "replacement": "  {reps:3, minPerRep:20}, {reps:3, minPerRep:20}                            // wk 25-26",
+    "gate": "gates/g205_chi_table6.js",
+    "note": "NAMED TRIP: T2 goes red naming wk25 and wk26 against the hand transcription. T4a goes red (heaviest cell is 60, not 40) and T4b goes red (3 reps, not 2). T3 goes red because the >26 clamp now lands on a 3 x 20 row. T7 goes red across every tw in the lattice. EXPECTED: T2, T3, T4a, T4b, T7."
+  },
+  {
+    "name": "M2 -> the >26 clamp is removed from the reader. Math.min(week, 26) becomes a bare index, so week 27 and beyond read past the end of the table. The table is untouched and every week 1..26 is still exactly right, so Mario's 11-week block is unchanged and every end-to-end row stays green. This is the doctrine tail rule ('>26: do not increase') being deleted silently",
+    "anchor": "  var _w = Math.max(1, Math.min(Math.round(week) || 1, 26));\n  var _row = NSW_TABLE6_CHI[_w];",
+    "replacement": "  var _w = Math.max(1, Math.round(week) || 1);\n  if(!NSW_TABLE6_CHI[_w]) return { reps: 3, minPerRep: 20 };\n  var _row = NSW_TABLE6_CHI[_w];",
+    "gate": "gates/g205_chi_table6.js",
+    "note": "NAMED TRIP: T3 goes red on wk27/28/30/40/52/104/1000, every one of them returning 3 x 20 instead of row 26. T8a goes red naming the reappearance of the deleted {reps:3,minPerRep:20} literal. T7 goes red for tw 40 and 52 where weeks past 26 are walked. EXPECTED: T3, T7, T8a."
+  },
+  {
+    "name": "M3 -> the run reader goes back to re-basing on the CHI phase window: instead of indexing Table 6 by the calendar week it indexes by the week's position inside phaseFrom..phaseTo, rescaled onto 1..26. Every value still comes out of Table 6, so no invented number appears anywhere and the ceiling still holds. Only WHICH row a given week reads is wrong, which is the V115 behaviour D128 replaced",
+    "anchor": "  const at = w => chiFromTable6(w);",
+    "replacement": "  const _pF = phaseFrom || 1, _pT = Math.max(_pF+1, phaseTo || totalWeeks || 6);\n  const at = w => chiFromTable6(1 + Math.round(Math.max(0, Math.min(1, (w - _pF) / Math.max(_pT - _pF, 1))) * 25));",
+    "gate": "gates/g205_chi_table6.js",
+    "note": "NAMED TRIP: T5 goes red on every phase window that is not [1, tw], naming tw/wk/phase triples where the returned row is not row `week`. T11b goes red because Mario's CHI phase runs weeks 7-11 and the cards no longer print 18/13/19/19/20. T11c goes red on the 89-minute total. T7 goes red because the rescale reaches row 26 early. EXPECTED: T5, T7, T11b, T11c."
+  },
+  {
+    "name": "M4 -> the fork by caller collapses: the bike caller is re-pointed at getCHI, so cycling starts reading a run/swim table neither guide applies to it. getCHIBike still exists, still carries its D128 comment, and still returns the V115 ramp when called directly, so any gate that tested the FUNCTION rather than the CALLER stays green",
+    "anchor": "  let chi = getCHIBike(week, tw);   // D128 (V205): bike keeps the V115 CHI hand ramp",
+    "replacement": "  let chi = getCHI(week, tw, false);   // D128 (V205): bike keeps the V115 CHI hand ramp",
+    "gate": "gates/g205_bike_unmoved.js",
+    "note": "NAMED TRIP: B2 goes red on bike_50, bike_century and bike_base, each naming the week whose Sweet Spot (CHI) minutes no longer match the re-implemented V115 ramp. B3 goes red because the built bike block's CHI minutes now track Table 6. NOTE g205_chi_table6.js T9a stays GREEN by design: it tests getCHIBike, which is untouched. That is why the caller-level gate exists."
+  },
+  {
+    "name": "M5 -> swim starts importing Table 6's MINUTES as well as its rep tier, so the swim session is prescribed in two dimensions at once. The rep tier is still exactly right, chiYards is still untouched, and the printed yard cards are unchanged, so every rep-count and yardage row stays green. Only the minutes the swim reader carries are wrong",
+    "anchor": "    return { reps: chiFromTable6(w).reps, minPerRep: Math.round(15 + pct * 5) };",
+    "replacement": "    return { reps: chiFromTable6(w).reps, minPerRep: chiFromTable6(w).minPerRep };",
+    "gate": "gates/g205_chi_table6.js",
+    "note": "NAMED TRIP: T10a goes red naming the weeks whose minPerRep left the V115 ramp (wk 13 onward diverge hardest: 12 against the ramp's 19-20). EXPECTED: T10a. T10b and T10c stay green because the tier is untouched, which is what makes this mutation a real test of the 'rep tier ONLY' half of D128."
+  },
+  {
+    "name": "M6 -> the swim rep tier silently keeps the V115 three-rep ladder for long blocks: the tier reads Table 6 but is then bumped to 3 in the last third of the block. Weeks 1-12 are untouched so the single-rep tier rows stay green, and the yardage is untouched so every yard row stays green. This is the 60-minute-equivalent overreach D128 removed, reappearing on the swim side only",
+    "anchor": "    return { reps: chiFromTable6(w).reps, minPerRep: Math.round(15 + pct * 5) };",
+    "replacement": "    return { reps: pct >= 0.70 ? 3 : chiFromTable6(w).reps, minPerRep: Math.round(15 + pct * 5) };",
+    "gate": "gates/g205_chi_table6.js",
+    "note": "NAMED TRIP: T10a goes red naming the late-block weeks whose swim reps are 3 against the tier's 2, including the explicit 'exceeds the tier ceiling of 2' row. T12b goes red because the swim_mile W13-W16 cards print 3 x NNN yd against the tier's 2. EXPECTED: T10a, T12b."
+  },
+  {
+    "name": "M7 -> the long/easy discriminator is inverted: the LSD that carries legLoad is treated as the EASY run and the easy one as the long run. The pace family still enters the D36 placement, still gets the D36 note, and the forbidden set is still exactly two days wide, so every structural and census row stays green. Only WHICH two days are forbidden is wrong, and the real long run's eve becomes fair game for the hinge",
+    "anchor": "      else if(c.legLoad) long = d;",
+    "replacement": "      else if(!c.legLoad) long = d;",
+    "gate": "gates/g205_pace_eve.js",
+    "note": "NAMED TRIP (verified): P15, P16 and P17 go red naming the day counts where a leg role now sits on the real long-run eve; P1e goes red on 726 hits because the real long-run DAY is no longer forbidden at all; P2 goes red on 92 of 128 placements because the gate derives the shape itself and disagrees about which LSD is the long one. P14 stays GREEN: at 4 training days the inverted shape happens to keep the eve clear, which is exactly why the gate segments by day count instead of asserting one total. EXPECTED: P15, P16, P17, P1e, P2."
+  },
+  {
+    "name": "M8 -> INT is dropped from the pace family's speed set, so only CHI counts as a speed day. The long run and its eve are still forbidden, so nothing lands on the eve and every doctrine row stays green. Only the COST of the surviving days is wrong: the hinge no longer prefers to ride the interval session, which is the 'hard days hard' half of D36. (The mirror mutation, dropping CHI, is a deliberate NO-OP and is not shipped: week 1 of a pace block always carries INT, never CHI, and the placement reads week 1 only. That reachability fact is pinned by P6e instead.)",
+    "anchor": "      if(/^(Interval \\(INT\\)|Continuous High Intensity \\(CHI\\))/.test(_st)) speed.add(d);",
+    "replacement": "      if(/^Continuous High Intensity \\(CHI\\)/.test(_st)) speed.add(d);",
+    "gate": "gates/g205_pace_eve.js",
+    "note": "NAMED TRIP (verified): P2 goes red on the placements that now cost more than the hand-table minimum, because the gate's own transcription of the D36 table counts INT as a speed day. P6e goes red because the speed arm no longer names both INT and CHI. P14 and P1e also go red at 4 training days, where losing the only speed day makes a forbidden day look cheapest. EXPECTED: P14, P1e, P2, P6e."
+  },
+  {
+    "name": "M9 -> the recovery-spacing note is re-worded with a mid-sentence em-dash, the exact copy-rule violation Mario has standing. The placement is untouched and correct; only the sentence the athlete reads is wrong",
+    "anchor": "  return { legRecoveryNote: 'Your hinge day rides a speed session so hard days stay hard. Nothing heavy lands the day before your long run.' };",
+    "replacement": "  return { legRecoveryNote: 'Your hinge day rides a speed session \\u2014 so hard days stay hard. Nothing heavy lands the day before your long run.' };",
+    "gate": "gates/g205_pace_eve.js",
+    "note": "NAMED TRIP (verified): P3a goes red on all three pace ids, because the D36 note is the placement's signature and the mutated sentence is no longer it; P4a goes red naming the em-dash. EXPECTED: P3a x3, P4a. P4b is the pin on the ruled string and stays green by construction."
+  },
+  {
+    "name": "M10 -> the eve is quietly dropped from the forbidden set, leaving only the long-run day itself off limits. The cost table, the tiebreaks, the note and the routing are all untouched, so the pace family still takes the D36 path and still gets the note. Only the 'nothing heavy the day before your long run' half of the doctrine is gone, which is the exact defect D127 was ruled to remove",
+    "anchor": "  return { long, eve, after, speed, easy, forbidden: new Set([long, eve]) };",
+    "replacement": "  return { long, eve, after, speed, easy, forbidden: new Set([long]) };",
+    "gate": "gates/g205_pace_eve.js",
+    "note": "NAMED TRIP (verified): P14, P15, P16 and P17 all go red naming the eve hits at every day count; P2 goes red on 34 of 128 placements because the hand table still forbids the eve and the engine's placement now scores Infinity against a finite minimum. P1e stays GREEN: the long-run DAY is still forbidden, so only the eve half of the doctrine is gone. EXPECTED: P14, P15, P16, P17, P2."
+  }
+]

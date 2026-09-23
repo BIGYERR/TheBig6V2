@@ -1,0 +1,23 @@
+[
+  {
+    "name": "T1 -> the D132 condition is reverted outright. _walkOnly is still computed and the cardioMode still crosses the call, but the ceiling stops consulting it, so the solo-run pace family goes back to a flat four and a noimpact week deals a FOURTH INCLINE WALK. This is the exact line D132 ships and the exact behaviour it was written to remove",
+    "anchor": "    const _ceil = (PACE_GOALS.has(goalId) && (cardioTypes.length !== 1 || _walkOnly)) ? Math.min(ceiling, 3) : ceiling;",
+    "replacement": "    const _ceil = (PACE_GOALS.has(goalId) && (cardioTypes.length !== 1)) ? Math.min(ceiling, 3) : ceiling;",
+    "gate": "gates/g205_d132_walkweek.js",
+    "note": "NAMED TRIP: W0 goes red by name at ia-version 205 -- the licence requires the pace join to carry _walkOnly and it no longer does -- and the gate exits on the licence, which is the ruled shape for a missing-feature mutation. EXPECTED: W0."
+  },
+  {
+    "name": "T2 -> the ceiling's D132 clause survives untouched in the source, and the CALLER stops feeding it. injuryPlan is still called, _walkOnly is still written, the predicate still reads exactly as shipped; only the value crossing the call becomes null, so cardioMode is never 'noimpact' and the walking week silently reclaims its fourth session. This is the mutation a source-shaped licence cannot see, and it is the one the property-of-the-week assertion exists for",
+    "anchor": "cfg.goal, _d132Plan && _d132Plan.cardioMode);",
+    "replacement": "cfg.goal, null);",
+    "gate": "gates/g205_d132_walkweek.js",
+    "note": "NAMED TRIP: W2 goes red by name, naming the four-session pace weeks that carry no INT card and no CHI card -- every lowback/protect and knee/protect week in the sweep. W3 goes red twice, on lowback/protect and on knee/protect, which read 4 where the after-grid says 3. W6 goes red on Mario's protected knee, which reads 4 sessions. EXPECTED: W2, W3 lowback/protect, W3 knee/protect, W6 -- 4 FAIL of 15, MEASURED. W0 and W1 stay GREEN, which is the point of the row: the source licence is satisfied and the week is still wrong. W6b also stays GREEN, correctly -- a four-WALK week still carries no INT and no CHI card, so the card claim is untouched and it is the COUNT that is wrong, which is exactly why W6 carries the count as its own assertion instead of folding it into W6b."
+  },
+  {
+    "name": "T3 -> the key is over-applied instead of reverted. The caller hands the ceiling a constant walking mode, so the clause fires on every solo pace week including the healthy one, and an athlete with a working knee loses the fourth run D125 granted him. The ruling is a NARROWING, not a repeal, and a gate that only proved the walking week would call this correct",
+    "anchor": "cfg.goal, _d132Plan && _d132Plan.cardioMode);",
+    "replacement": "cfg.goal, 'noimpact');",
+    "gate": "gates/g205_d132_walkweek.js",
+    "note": "NAMED TRIP: W3 goes red on healthy and on shoulder/protect, which read 3 where the after-grid says 4 -- shoulder/protect swims out, it does not walk, and it keeps its quality. W5 goes red on Mario, whose four-run row collapses to three. EXPECTED: W3 healthy, W3 shoulder/protect, W5 -- 3 FAIL of 15. W2 stays GREEN because a three-session week cannot violate a claim about four-session weeks, which is why W3 and W5 carry the after-grid separately."
+  }
+]

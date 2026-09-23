@@ -1,0 +1,23 @@
+[
+ {
+  "name": "S1 -> the taper's INT volume cut is loosened from 55% to 75%. The CARD COUNT is untouched, so a gate that pinned a scalar card count would stay green; only the dose is wrong, and only on taper weeks. This is the class of defect D122 says a scalar pin cannot see",
+  "anchor": "  if(isTaperWeek){\n    intReps = Math.max(2, Math.round(intReps * 0.55));\n    chi = {reps: Math.max(1, chi.reps - 1), minPerRep: Math.max(8, Math.round(chi.minPerRep * 0.6)), note: chi.note};",
+  "replacement": "  if(isTaperWeek){\n    intReps = Math.max(2, Math.round(intReps * 0.75));\n    chi = {reps: Math.max(1, chi.reps - 1), minPerRep: Math.max(8, Math.round(chi.minPerRep * 0.6)), note: chi.note};",
+  "gate": "gates/g202_int_doctrine.js",
+  "note": "NAMED TRIP: D7 alone, first miss on the 6-week block (reps 4,4,5,5,5,5 against the hand row 4,4,5,5,3,3). EXPECTED: D7 only. NOTE FOR THE NEXT AUTHOR: 0.55 -> 0.5 is a NO-OP mutation here and must not be used — round(8*0.5) == round(8*0.55) == 4 on every taper week this lattice reaches, so it is a mutation defect, not a gate defect."
+ },
+ {
+  "name": "S2 -> ONE cell of the Table 6 transcription is bumped, week 5 from 6 repeats to 7. The table still exists, the reader still reads it, the card count is identical and every sentence still parses. Only the prescription on one calendar row is wrong",
+  "anchor": "  4, 4,                       // wk 1-2\n  5, 5,                       // wk 3-4\n  6, 6,                       // wk 5-6",
+  "replacement": "  4, 4,                       // wk 1-2\n  5, 5,                       // wk 3-4\n  7, 6,                       // wk 5-6",
+  "gate": "gates/g202_int_doctrine.js",
+  "note": "NAMED TRIP: D7 alone. The gate's own transcription of the column is typed in T6_INT_RAW, so the app's copy and the gate's copy move independently and the comparison goes red. EXPECTED: D7 only."
+ },
+ {
+  "name": "S3 -> the cutback cadence moves from every 4th week to every 5th. The card COUNT is unchanged at every block length, which is exactly why a scalar count pin survives this; the cutback weeks land in the wrong places and both the reps and the held pace targets move with them",
+  "anchor": "  return (totalWeeks||0) >= 10 && week % 4 === 0 && week !== totalWeeks;",
+  "replacement": "  return (totalWeeks||0) >= 10 && week % 5 === 0 && week !== totalWeeks;",
+  "gate": "gates/g202_int_doctrine.js",
+  "note": "NAMED TRIP: D7 (15-week reps row moves) and D3 (the cutback sentence's 'same target as last week' no longer lands on the week that holds). EXPECTED: D7 and D3. If only D3 moves, the reps arm of D7 has gone vacuous."
+ }
+]

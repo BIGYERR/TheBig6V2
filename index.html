@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="204"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="205"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -3401,27 +3401,79 @@ function isCardioCutbackWeek(week, totalWeeks){
   return (totalWeeks||0) >= 10 && week % 4 === 0 && week !== totalWeeks;
 }
 
+// ── D114 (ruled V202, built V205): NSW GUIDE B, TABLE 6 — THE INT PROGRESSION ─────
+// Source: doctrine/nsw_ptg_sealswcc_11pg.txt, the "INT" column of Table 6, headed
+// "Run/Swim (reps)" — 400 m repeats for the run, 100 yd repeats for the swim.
+// Transcribed verbatim, 26 rows, week 1 through week 26:
+//   4 4 5 5 6 6 7 7 8 8 9 9 then 10 from week 13 to week 26.
+// Line 61 of that file is the table's own tail rule: ">26: do not increase INT or CHI
+// distances. Focus on increasing intensity." That rule is implemented by the
+// Math.min(week, 26) clamp in the reader below and by nothing else — past week 26 the
+// athlete keeps reading row 26 forever, which IS "do not increase".
+//
+// THE CEILING IS 8, AND IT COMES FROM THE OTHER GUIDE. Guide A is explicit that a Short
+// Interval session should not exceed 8 repeats: start at 4, build progressively to 8, and
+// once you can hold 8 at high intensity you work on PACE, not more reps. Past 8 x 400 m on
+// 2 to 2.5x recovery the session stops being speed work and becomes a threshold session
+// run at interval pace on incomplete rest, which trains neither. Table 6's raw column
+// climbs to 9 at week 11 and 10 at week 13; Guide A's cap is applied over the top of it,
+// so the prescription reaches 8 at week 9 and then holds 8 forever. The table is stored
+// RAW and the cap lives in the reader on purpose: the transcription stays checkable
+// against the page, and the doctrine that overrides it stays visible as an override.
+//
+// What this replaces: the V115 hand ramp, which spread 4 -> 8 across a `rampSpan` window
+// by POSITION. Table 6 is a CALENDAR progression keyed on the training week, not a
+// phase-relative ramp, which is the same thing D128 found for the CHI column.
+var NSW_TABLE6_INT = [
+  null,                       // index 0 unused: weeks are 1-based
+  4, 4,                       // wk 1-2
+  5, 5,                       // wk 3-4
+  6, 6,                       // wk 5-6
+  7, 7,                       // wk 7-8
+  8, 8,                       // wk 9-10
+  9, 9,                       // wk 11-12
+  10, 10, 10, 10, 10, 10, 10, // wk 13-19
+  10, 10, 10, 10, 10, 10, 10  // wk 20-26
+];
+// The reader. Returns a plain rep COUNT — INT's prescription is a number of repeats, so
+// unlike chiFromTable6 there is no object to hand back and nothing a caller could mutate.
+// Math.min(week, 26) is load-bearing doctrine, not defensive clamping: it is Table 6's
+// ">26" row. Math.min(8, row) is Guide A's ceiling.
+function intFromTable6(week){
+  var _w = Math.max(1, Math.min(Math.round(week) || 1, 26));
+  return Math.min(8, NSW_TABLE6_INT[_w]);
+}
+
 function getINTReps(week, totalWeeks, isMilGoal, rampSpan) {
-  // ── V115: NSW'S CEILING IS 8, NOT 10 ────────────────────────────────────────
-  // The PTG is explicit that a Short Interval session should not exceed 8 repeats:
-  // start at 4, build progressively to 8, and once you can hold 8 at high intensity you
-  // work on PACE, not more reps. The 10 here leaked out of the `isMilGoal && week > 26`
-  // branch — the beyond-26-week military case — into the general ramp's Math.min, and
-  // the old comment ("hard cap: 10") hardened the leak into a stated rule.
-  // Past 8x400m on 2-2.5x recovery the session stops being speed work and becomes a
-  // threshold session run at interval pace on incomplete rest, which trains neither.
-  // The >26wk branch returns 8 for the same reason: NSW says do not add interval VOLUME
-  // beyond 26 weeks, get faster instead — which is what getCHI's sibling branch says too.
-  if(isMilGoal && week > 26) return 8;
-  // `rampSpan` is the window the 4->8 build is spread across. It defaults to the whole
-  // block, which is the un-periodized case. When the compressed quality slot splits the
-  // block into an INT phase and a CHI phase (V115), the caller passes the INT phase
-  // length instead — otherwise a 6-week interval phase inside a 12-week block would
-  // ramp only halfway and top out at 5 repeats, under-dosing the exact thing NSW says
-  // to build to 8. The CUTBACK branch deliberately still reads the real calendar week:
-  // deloads are calendar-aligned and must not shift with the phase.
-  const _span = Math.max(2, rampSpan || totalWeeks || 6);
-  const ramp = w => Math.min(8, 4 + Math.floor((w-1) * 4 / Math.max(_span-1,1)));
+  // D114 (V205): the `isMilGoal && week > 26` limb that used to sit here returned a
+  // hardcoded 8, and it was ALREADY UNREACHABLE. calcProgramLength caps run_pace_goal at
+  // Math.min(26, ...) — its own comment calls that the doctrine 26-week ceiling — with
+  // paceCap topping out at 21; the swim military goals cap at 18 and 16; the bike caps at
+  // 20. Weeks run 1..totalWeeks, so nothing this app can build ever hands week 27 to this
+  // function. Deleted rather than re-pointed, which is the identical move D128 made on
+  // getCHI's sibling limb in slice 1, and for the identical reason: the Math.min(week, 26)
+  // clamp inside intFromTable6 IS the ">26: do not increase" rule, so row 26 is read
+  // forever and nothing increases.
+  //
+  // Be precise about what the deletion changed, because it is not nothing. The old limb
+  // returned BEFORE the cutback check, so it short-circuited it. Called directly with a
+  // week past 26 that happens to be a multiple of 4 — getINTReps(400, 30, true) — the old
+  // code returned 8 and this one returns the cutback value, 5. No build reaches that call;
+  // only a harness can. It is written down here so the next reader does not rediscover it
+  // as a surprise.
+  // `rampSpan` is kept in the signature and is no longer read, for the same reason
+  // getCHI still takes `phaseFrom`/`phaseTo` after D128: the run and swim callers still
+  // hand down the periodized INT window, and the parameter is left in place so those
+  // call sites need no edit. It no longer RE-BASES anything. Table 6 is indexed on the
+  // training week itself, so an INT phase that opens in week 7 opens on week 7's row
+  // (7 repeats) instead of restarting the build at its first rung.
+  //
+  // This is what fixes the ramp. The V115 position-based build spread 4 -> 8 across
+  // `_span`; when D125/D130 made the INT slot weekly across an 11-week block, the final
+  // rung landed on the taper week and the athlete topped out at SEVEN repeats, never
+  // reaching the eight Guide A tells him to build to. On the calendar table he reaches
+  // 8 in week 9 and holds it, which is the progression as written.
+  const ramp = w => intFromTable6(w);
   // Cutback week: interval VOLUME steps back ~40% off the prior build week and never
   // progresses. Callers hold pace — fewer reps at the same target is the cutback
   // prescription; a rep or pace PR during a recovery week is a planning error.
@@ -3429,17 +3481,89 @@ function getINTReps(week, totalWeeks, isMilGoal, rampSpan) {
   return ramp(week);
 }
 
+// ── D135 (V205): THE BIKE KEEPS THE V115 INT HAND RAMP, BYTE-IDENTICAL ───────
+// Table 6's rep column is headed "Run/Swim (reps)" — 400 m repeats for the run, 100 yd
+// repeats for the swim. SWIM IS NAMED IN THAT HEADER AND MOVES ONTO THE TABLE. The bike
+// is not named and does not: a table that counts 400 m repeats does not claim cycling,
+// and prescribing its rep counts on a bike would be an invention, not a transcription.
+// Left unforked, a 17-week bike_century read row 9 onward and held EIGHT max-effort
+// intervals for twelve straight weeks, because the calendar table has no bike ceiling in
+// it to stop at.
+//
+// BE HONEST ABOUT WHAT THIS IS. The hand ramp below is not doctrine either. It is the
+// UNRULED STATE, held rather than replaced by a table that does not claim the sport.
+// Holding an unruled ramp is the smaller error than importing a source that is silent.
+// Cycling intervals and cycling tempo are ONE open ruling, not two: when cycling is ruled
+// on, this reader and getCHIBike are replaced together, and neither replacement touches
+// Table 6 or the run path. That is why both forks are BY CALLER and not a flag inside the
+// shared reader.
+//
+// The body is the V115 ramp unchanged except that the `isMilGoal && week > 26` limb is not
+// carried over — the bike caller passed `false` literally, so that limb was already
+// unreachable from here and dropping it moves no byte of bike output. `isMilGoal` is gone
+// from the signature for the same reason. `rampSpan` is kept and IS read here, unlike in
+// getINTReps: this ramp is position-based, so the span is the whole of its meaning. The
+// bike caller passes no span, so it defaults to the block length, which is exactly what
+// the old three-argument bike call into the shared reader resolved to.
+function getINTBike(week, totalWeeks, rampSpan) {
+  const _span = Math.max(2, rampSpan || totalWeeks || 6);
+  const ramp = w => Math.min(8, 4 + Math.floor((w-1) * 4 / Math.max(_span-1,1)));
+  // Cutback week: interval VOLUME steps back ~40% off the prior build week and never
+  // progresses. Byte-identical to the rule getINTReps still states.
+  if(isCardioCutbackWeek(week, totalWeeks)) return Math.max(3, Math.round(ramp(week-1) * 0.6));
+  return ramp(week);
+}
+
+// ── D128 (V205): NSW GUIDE B, TABLE 6 — THE CHI PROGRESSION, AS DATA ─────────
+// Source: doctrine/nsw_ptg_sealswcc_11pg.txt lines 35-60, the "CHI min" column of
+// Table 6 ("Run/Swim (minutes)"), transcribed verbatim. Line 61 of that file is the
+// table's own tail rule: ">26: do not increase INT or CHI distances. Focus on
+// increasing intensity."
+// That tail rule is implemented by the Math.min(week, 26) clamp in the reader below
+// and by nothing else. Past week 26 the athlete keeps reading row 26 forever, which
+// IS "do not increase" — so there is no >26 branch to write, and the hardcoded one
+// that used to sit at the top of getCHI is gone (see D128 note there).
+// What this replaces: the V115 hand ramp, which set reps 1/2/3 by position inside the
+// CHI phase and 15-20 minutes per rep, topping out at 3 x 20 = 60 minutes of work.
+// Neither the third rep nor the 60 has a source in either guide. Table 6's ceiling is
+// 2 x 20 = 40. The table is a CALENDAR progression keyed on the training week, not a
+// phase-relative ramp.
+var NSW_TABLE6_CHI = [
+  null,                                             // index 0 unused: weeks are 1-based
+  {reps:1, minPerRep:15}, {reps:1, minPerRep:15},   // wk 1-2
+  {reps:1, minPerRep:16}, {reps:1, minPerRep:16},   // wk 3-4
+  {reps:1, minPerRep:17}, {reps:1, minPerRep:17},   // wk 5-6
+  {reps:1, minPerRep:18}, {reps:1, minPerRep:18},   // wk 7-8
+  {reps:1, minPerRep:19}, {reps:1, minPerRep:19},   // wk 9-10
+  {reps:1, minPerRep:20}, {reps:1, minPerRep:20},   // wk 11-12
+  {reps:2, minPerRep:12}, {reps:2, minPerRep:12}, {reps:2, minPerRep:12},   // wk 13-15
+  {reps:2, minPerRep:14}, {reps:2, minPerRep:14}, {reps:2, minPerRep:14},   // wk 16-18
+  {reps:2, minPerRep:16}, {reps:2, minPerRep:16}, {reps:2, minPerRep:16},   // wk 19-21
+  {reps:2, minPerRep:18}, {reps:2, minPerRep:18}, {reps:2, minPerRep:18},   // wk 22-24
+  {reps:2, minPerRep:20}, {reps:2, minPerRep:20}                            // wk 25-26
+];
+// The reader. Math.min(week, 26) is load-bearing doctrine, not defensive clamping:
+// it is Table 6's ">26" row. Returns a fresh object every call so no caller can
+// mutate the table.
+function chiFromTable6(week){
+  var _w = Math.max(1, Math.min(Math.round(week) || 1, 26));
+  var _row = NSW_TABLE6_CHI[_w];
+  return { reps: _row.reps, minPerRep: _row.minPerRep };
+}
+
 function getCHI(week, totalWeeks, isMilGoal, phaseFrom, phaseTo) {
-  if(isMilGoal && week > 26) return {reps:3, minPerRep:20, note:'Maintain intensity — increase pace, not volume'};
-  // `phaseFrom`/`phaseTo` bound the window this progression is spread across, defaulting
-  // to the whole block. When the compressed quality slot puts CHI in the BACK half only
-  // (V115), the caller passes that window so threshold work still enters at 1 rep and
-  // builds to 3 across the weeks it actually occupies, rather than starting mid-ramp.
-  const _pFrom = phaseFrom || 1, _pTo = Math.max(_pFrom+1, phaseTo || totalWeeks || 6);
-  const at = w => {
-    const pct = Math.max(0, Math.min(1, (w - _pFrom) / Math.max(_pTo - _pFrom, 1)));
-    return { reps: pct < 0.35 ? 1 : pct < 0.70 ? 2 : 3, minPerRep: Math.round(15 + pct * 5) };
-  };
+  // D128 (V205): the `isMilGoal && week > 26` limb that used to sit here returned a
+  // hardcoded {reps:3, minPerRep:20} — 60 minutes of threshold work against Table 6's
+  // 40 at the same week. Its replacement already exists: chiFromTable6 clamps at
+  // Math.min(week, 26), so week 27 and week 400 both read row 26 and nothing
+  // increases. Deleted, not re-pointed, because the clamp IS the >26 rule.
+  // D128 (V205): this is the RUN reader, and it reads Table 6 by calendar week.
+  // `phaseFrom`/`phaseTo` are kept in the signature because the run and swim callers
+  // still pass the periodized CHI window, but they no longer re-base the progression:
+  // Table 6 is indexed on the training week itself, so a CHI phase that opens in week 7
+  // opens on week 7's row (1 x 18) instead of restarting the ramp at its first rung.
+  // The V115 phase-relative pct ramp is gone with the 1/2/3 rep ladder it fed.
+  const at = w => chiFromTable6(w);
   // Cutback week: one rep off the prior build week; single-rep sessions cut duration
   // ~30% instead. Intensity target is unchanged — the dose steps back, not the touch.
   if(isCardioCutbackWeek(week, totalWeeks)){
@@ -3449,6 +3573,52 @@ function getCHI(week, totalWeeks, isMilGoal, phaseFrom, phaseTo) {
       : { reps: 1, minPerRep: Math.max(10, Math.round(prev.minPerRep * 0.7)) };
   }
   return at(week);
+}
+
+// ── D128 (V205): THE BIKE KEEPS THE V115 HAND RAMP, BYTE-IDENTICAL ───────────
+// Table 6 is a run/swim table. Neither the NSW guide nor the NRC plans cover cycling,
+// so prescribing the table's minutes on a bike would be an invention, not a
+// transcription. This is a fork BY CALLER, not a flag inside getCHI: when cycling is
+// ruled on, this reader is replaced on its own without touching the table or the run
+// path. The body below is the V115 ramp unchanged except that the `isMilGoal && week > 26`
+// limb is not carried over — the bike caller passes `false` literally, so that limb was
+// already unreachable from here and dropping it moves no byte of bike output.
+function getCHIBike(week, totalWeeks, phaseFrom, phaseTo) {
+  const _pFrom = phaseFrom || 1, _pTo = Math.max(_pFrom+1, phaseTo || totalWeeks || 6);
+  const atBike = w => {
+    const pct = Math.max(0, Math.min(1, (w - _pFrom) / Math.max(_pTo - _pFrom, 1)));
+    return { reps: pct < 0.35 ? 1 : pct < 0.70 ? 2 : 3, minPerRep: Math.round(15 + pct * 5) };
+  };
+  if(isCardioCutbackWeek(week, totalWeeks)){
+    const prev = atBike(week-1);
+    return prev.reps > 1
+      ? { reps: prev.reps - 1, minPerRep: prev.minPerRep }
+      : { reps: 1, minPerRep: Math.max(10, Math.round(prev.minPerRep * 0.7)) };
+  }
+  return atBike(week);
+}
+
+// ── D128 (V205): SWIM TAKES THE REP TIER FROM TABLE 6 AND NOTHING ELSE ───────
+// Table 6's minutes column is titled "Run/Swim (minutes)", but this app prescribes the
+// swim CHI session in YARDS (`chiYards`, built from its own ramp), and prescription owns
+// ONE fixed dimension. Importing the table's minutes here would prescribe two. So swim
+// reads only the REP TIER — 1 rep through week 12, 2 from week 13 on, never 3 — which is
+// the part of Table 6 that is a rep count rather than a distance. `minPerRep` stays on
+// the V115 ramp for the taper branch that rewrites it; nothing downstream of swim prints
+// it. `chiYards` is untouched by D128.
+function getCHISwim(week, totalWeeks, isMilGoal, phaseFrom, phaseTo) {
+  const _pFrom = phaseFrom || 1, _pTo = Math.max(_pFrom+1, phaseTo || totalWeeks || 6);
+  const atSwim = w => {
+    const pct = Math.max(0, Math.min(1, (w - _pFrom) / Math.max(_pTo - _pFrom, 1)));
+    return { reps: chiFromTable6(w).reps, minPerRep: Math.round(15 + pct * 5) };
+  };
+  if(isCardioCutbackWeek(week, totalWeeks)){
+    const prev = atSwim(week-1);
+    return prev.reps > 1
+      ? { reps: prev.reps - 1, minPerRep: prev.minPerRep }
+      : { reps: 1, minPerRep: Math.max(10, Math.round(prev.minPerRep * 0.7)) };
+  }
+  return atSwim(week);
 }
 
 
@@ -4003,6 +4173,12 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
 // shaped goals and stay on the NSW engine. NRC_GOALS is the single routing set.
 // ════════════════════════════════════════════════════════════════════
 const NRC_GOALS = new Set(['run_5k', 'run_10k', 'run_half', 'run_marathon']);
+// V205 (D125): the NSW pace family — the test goals whose weekly shape is INT + CHI +
+// long + easy. The wizard aliases run_mile_time / run_15_under10 to run_pace_goal before
+// the engine sees a cfg (_GOAL_ALIAS, V126); both legacy ids are listed anyway so this
+// set answers the question for a cfg from any era. run_base is NOT here: a Lydiard block
+// has no hard day to space, so the spacing chooser has nothing to choose.
+const PACE_GOALS = new Set(['run_pace_goal', 'run_mile_time', 'run_15_under10']);
 // V188 (D14a): race alignment. Count BACK from the race, not forward from today.
 // Plan lengths are the table lengths; floors are the source's own minimums (app copy
 // says "I don't recommend", never names the source — ruled V188).
@@ -4322,8 +4498,8 @@ function buildBikeSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   // every session to LSD, cap duration at 30–45 min, low-to-moderate resistance. No
   // intervals, no hill/resistance work — legs stay fresh for squats and leg growth.
   if(recoveryMode) sType = 'lsd';
-  let intReps = getINTReps(week, tw, false);
-  let chi = getCHI(week, tw, false);
+  let intReps = getINTBike(week, tw);   // D135 (V205): bike keeps the V115 INT hand ramp
+  let chi = getCHIBike(week, tw);   // D128 (V205): bike keeps the V115 CHI hand ramp
   // ── V116: BIKE TAPER ────────────────────────────────────────────────────────
   // Before this the bike had no taper of any kind: a 12-week bike_50 build rode 96 -> 106
   // -> 117 -> 128 min, putting the single largest ride of the block in race week. The
@@ -4456,7 +4632,8 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   // {intSpan, chiFrom, chiTo}. Absent => the un-periodized ramps, unchanged.
   const _qph = qPhase || null;
   let intReps = getINTReps(week, tw, isMilGoal, _qph && _qph.intSpan);
-  let chi = getCHI(week, tw, isMilGoal, _qph && _qph.chiFrom, _qph && _qph.chiTo);
+  // D128 (V205): swim takes the Table 6 rep TIER only; yards are unchanged.
+  let chi = getCHISwim(week, tw, isMilGoal, _qph && _qph.chiFrom, _qph && _qph.chiTo);
   // V116: swim taper — same shape as bike and run. Volume down, intensity held. Swim had
   // no taper for the same reason bike had none: the whole computation lived inside
   // buildRunSession and was never handed to anyone else.
@@ -4854,7 +5031,7 @@ function programTaperWindow(cfg, cardioTypes, cardioGoals, totalWeeks){
 // Single source of truth for how many day-slots each sport gets. Used by both the
 // allocation engine and the rest-days nudge so the warning can never disagree with
 // what the engine actually builds. Returns {primary, targets:{sport:count}}.
-function sportDayTargets(cardioTypes, cardioGoals, totalDays, liftGoal) {
+function sportDayTargets(cardioTypes, cardioGoals, totalDays, liftGoal, cardioMode) {
   if(!cardioTypes || !cardioTypes.length || totalDays <= 0) return {primary:null, targets:{}};
   // V187 (F2, ruled "Easy day concur"): Nike's week is FIVE runs on all four plans and
   // every half/marathon ever built was four — the >=5 layouts in getNRCSessionTypes had
@@ -4874,7 +5051,14 @@ function sportDayTargets(cardioTypes, cardioGoals, totalDays, liftGoal) {
     // slot, which makes the V158 benchmark steady-slot obligation reachable and gated.
     // run_5k / run_10k: 4 (V186) — they ride the NRC tables now, same compression as the
     // half (Nike prescribes 5; F2's ceiling-5-under-endurance is a separate ruling).
-    run_5k: 4, run_10k: 4, run_base: 4, run_pace_goal: 3, run_mile_time: 3, run_15_under10: 3,
+    // run_pace_goal: 4 (V205, D125 amended) — was 3. NSW Table 7 scales a pace block by
+    // adding aerobic volume, and the fourth run is that volume: easy / INT / CHI / long.
+    // The fourth run is CONDITIONAL on the spacing chooser returning a collision-free
+    // layout; where it cannot, the consumer below and the caller in buildProgram fall the
+    // week back to three. run_mile_time and run_15_under10 are aliased to run_pace_goal by
+    // _GOAL_ALIAS before the engine reads a goal id, so these two rows are never consulted
+    // — they move with it so the table cannot read as a contradiction.
+    run_5k: 4, run_10k: 4, run_base: 4, run_pace_goal: 4, run_mile_time: 4, run_15_under10: 4,
     run_half: 4, run_marathon: 4,
     bike_base: 3, bike_ftp: 3, bike_cals: 3, bike_50: 3, bike_century: 4,
     swim_base: 3, swim_100_time: 3, swim_500_time: 3, swim_mile: 4, swim_tri: 4
@@ -4883,8 +5067,28 @@ function sportDayTargets(cardioTypes, cardioGoals, totalDays, liftGoal) {
   cardioTypes.forEach(t => {
     const goalId = cardioGoals[t]?.id;
     const ceiling = (_nrcFive && t === 'run' && NRC_GOALS.has(goalId)) ? 5 : (SPORT_CEILINGS[goalId] || 3);   // V187 (F2)
+    // V205 (D125 amended): the pace family's fourth run is conditional on the spacing
+    // chooser returning a collision-free layout, and that chooser only runs on a SOLO
+    // cardio week. A multi-sport week never reaches it, so there is no coll==0 to key on
+    // and the ruling's own fallback applies: the pace ceiling stays 3 there. Bike and swim
+    // are untouched on both paths. Both callers (wizard nudge and engine) read this, so
+    // the nudge cannot promise a fourth run the engine will not deal.
+    // V205 (D132): THE FOURTH RUN IS GRANTED TO A WEEK THAT CARRIES QUALITY. D125's
+    // argument for the fourth run was the guide's four-session week: two LSDs, an SI and
+    // an LI. On a noimpact or noimpact_swim week with no bike or swim to fall back on,
+    // the sweep rewrites every run to a pain-free incline walk. No SI, no LI, no long
+    // run, no shape to protect. A fourth walk is not that week, so the ceiling is 3.
+    // ON THE KEY, AND WHY IT IS THE CAUSE AND NOT THE EFFECT. This ceiling is read
+    // BEFORE the sweep runs, so "speedless" is not knowable at the decision point and
+    // cardioMode is. With a bike or swim present the sweep reroutes rather than walks,
+    // and such a week is multi-sport, already held at 3 by the consumer clause beside it.
+    // The two keys are therefore deliberately different, and g205_d132_walkweek asserts
+    // the property of the WEEK rather than mirroring this line, so that a future
+    // divergence between cause and effect fails by name instead of shipping quietly.
+    const _walkOnly = (cardioMode === 'noimpact' || cardioMode === 'noimpact_swim');
+    const _ceil = (PACE_GOALS.has(goalId) && (cardioTypes.length !== 1 || _walkOnly)) ? Math.min(ceiling, 3) : ceiling;
     // Cap sport days to its specific structural ceiling
-    targets[t] = Math.min(ceiling, totalDays);
+    targets[t] = Math.min(_ceil, totalDays);
   });
   return { primary: cardioTypes[0], targets };
 }
@@ -5155,7 +5359,11 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // ── DAY ALLOCATION (goal-aware) ──
   // Counts come from the shared sportDayTargets helper (same one the nudge uses).
   // A speed/pace run goal makes 'run' primary so it can claim its interval block.
-  const _alloc = sportDayTargets(cardioTypes, cardioGoals, cardioTrainDays.length, cfg.goal);   // V187 (F2): resolved lift goal
+  // V205 (D132): the injury plan is read here, once, and only its cardioMode crosses the
+  // call. injuryPlan is a pure function of cfg and builds a fresh object every time, so
+  // this reads cfg and mutates nothing.
+  const _d132Plan = injuryPlan(cfg);
+  const _alloc = sportDayTargets(cardioTypes, cardioGoals, cardioTrainDays.length, cfg.goal, _d132Plan && _d132Plan.cardioMode);   // V187 (F2): resolved lift goal; V205 (D132): cardioMode
   const primarySport = _alloc.primary;
 
   // dayToSport is the single source of truth — both the per-sport day lists AND the
@@ -5174,16 +5382,53 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // and leave the remaining training days cardio-free → they render as lift-only days.
     const solo = cardioTypes[0];
     const nCardio = cardioTrainDays.length;
-    const capDays = Math.min(_alloc.targets[solo] || nCardio, nCardio);
+    let capDays = Math.min(_alloc.targets[solo] || nCardio, nCardio);
     const chosen = new Set();
     // V153 (F1): NRC run goals route through the spacing-aware chooser whenever the day
     // count is capped below the week — the only case where a choice exists at all.
     const _soloRunGoal = solo==='run' && cardioGoals['run'] && cardioGoals['run'].id;
     const _nrcCapped = NRC_GOALS.has(_soloRunGoal) && capDays<nCardio && capDays>=2;   // V186: all four NRC goals
-    if(_nrcCapped){
-      const _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal);
-      _pick.idxs.forEach(i=>chosen.add(i));
-      _nrcPlan = _pick.typeOf;   // read by the NRC type-assignment loop below
+    // V205 (D125): same gate for the NSW pace family. Capped below the week is still the
+    // only case where a choice exists; run_base and every bike/swim goal keep the
+    // even-spread fallback below, untouched.
+    // V205 (D125 amended): the pace gate is <= nCardio, not < nCardio. With the ceiling
+    // at 4 a four-training-day week has capDays === nCardio and its day SET is forced, but
+    // the long run's slot is not, and on a forced day set that permutation is the only
+    // lever that reaches coll==0. Routing it to the even-spread fallback instead would
+    // deal the table row blind and ship the collisions D125 exists to remove. NRC keeps
+    // the strict < nCardio gate above: its subset and permutation pins leave a forced day
+    // set with nothing to choose.
+    const _paceCapped = PACE_GOALS.has(_soloRunGoal) && capDays<=nCardio && capDays>=2;
+    if(_nrcCapped || _paceCapped){
+      let _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal, _paceCapped);
+      // V205 (D125 amended, RE-KEYED BY D130): THE CONDITIONAL CEILING, DECIDED HERE.
+      // Four runs ship only where the chooser hands back a layout with zero UNTOLERATED
+      // hard-day adjacencies. Where it cannot, the week drops to three runs and is re-laid
+      // at three. The shape of the ruling is unchanged — a crowded four-run week is worse
+      // coaching than a clean three-run one — but D130 says what crowded means: a CHI on
+      // the long run's eve is not crowding, and the total this line used to read could not
+      // tell the two apart. Keyed on the chooser's return alone; there is no day-count
+      // conjunct, and every count from 4 to 7 is asked the same question.
+      // HISTORY, AND IT MATTERS. Under the unsplit total, 50 of the 64 rest-day calendars
+      // reached coll==0 at four and 14 fell through here to three runs. Under the split,
+      // untolerated is 0 on ALL 64 and the fallback fires on NONE of them: the 14 now ship
+      // four runs paying exactly one tolerated CHI-on-eve, and the 50 are byte-identical
+      // to what they shipped before, because {coll==0} and {untol==0 and tol==0} select
+      // the same candidate. The branch stays live — it still guards a chooser that returns
+      // nothing and any future calendar shape that cannot reach untol==0.
+      if(_paceCapped && capDays > 3 && (!_pick || _pick.untol > 0)){
+        capDays = 3;
+        _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal, _paceCapped);
+      }
+      if(_pick){
+        _pick.idxs.forEach(i=>chosen.add(i));
+        _nrcPlan = _pick.typeOf;   // read by the NRC type-assignment loop below
+      } else {
+        // Unreachable on the pace arm (every subset is legal there, so `best` is always
+        // set) and unreachable on NRC at capDays>=2. Kept so a future arm that can return
+        // null degrades to the even-spread fallback instead of throwing.
+        for(let k = 0; k < capDays; k++) chosen.add(Math.round(k * (nCardio - 1) / (capDays - 1)));
+      }
     } else if(capDays >= nCardio) {
       cardioTrainDays.forEach((_, i) => chosen.add(i));
     } else if(capDays === 1) {
@@ -5244,26 +5489,65 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // only WHICH weekday carries which slot changes. Deterministic: fixed enumeration order,
   // no seed. Returns null when no layout beats a collision-free bar is not required —
   // the best layout is returned even if imperfect, since it is never worse than even-spread.
-  // NON-NRC PATHS ARE DELIBERATELY NOT ROUTED HERE: their types come from the NSW smart
-  // assignment, which already spaces quality, and widening this chooser would move day
-  // placement on every capped solo-sport config for no measured defect.
-  function _nrcSpacedRunDays(cardioTrainDays, capDays, goalId){
-    const types = getNRCSessionTypes(capDays, goalId);
-    const HARD = new Set(['nrc_speed1','nrc_speed2','nrc_long']);
+  // V205 (D125): THE PACE FAMILY IS NOW ROUTED HERE TOO. V153 withheld this chooser from
+  // non-NRC goals "for no measured defect". There is one. The even-spread chooser picks
+  // days by spacing alone and never revisits the choice, so at a four-day ceiling 5,775
+  // of 5,775 four- and five-day weeks put two hard sessions back to back, and the
+  // permutation oracle proves 0 of them are fixable by re-ordering types on the same
+  // days — spaceHardCardio is handed a board with no legal move. The pace family takes
+  // the FULL objective, not a collision-only variant: types come from getSessionTypes
+  // (the NSW table) instead of the NRC tables, and the four scored terms below read the
+  // NSW tokens. Lift cost does not enter here; the shape is run layout first, lift
+  // placement second, which is what the NRC path already does.
+  //
+  // ONE DIFFERENCE, AND IT IS DOCTRINE. For NRC the long run is PINNED to the last
+  // training day of the week: a race plan has a race day and the long run rehearses it.
+  // A test goal has no race day, and a long run followed by two rest days is coaching-
+  // good, so for the pace family the long run is a PREFERENCE ranked second, under
+  // collisions. That relaxation is what buys a collision-free week on the mon+tue,
+  // mon+thu, wed+thu, mon+tue+thu and mon+wed+thu calendars. NRC behaviour is unchanged:
+  // its subset and permutation constraints still force longLast to 1 on every candidate,
+  // so the new term is constant there and cannot reorder an NRC choice.
+  function _nrcSpacedRunDays(cardioTrainDays, capDays, goalId, paceFam){
+    const types = paceFam ? getSessionTypes(capDays, isSpeedGoal(goalId), false, false)
+                          : getNRCSessionTypes(capDays, goalId);
+    // The objective is written once, in tokens. The NSW table's quality pair is INT then
+    // CHI, which is the same sequence NRC prints as speed1 then speed2.
+    const T = paceFam
+      ? {long:'lsd_long', rec:'lsd_easy',       s1:'int',        s2:'chi'}
+      : {long:'nrc_long', rec:'nrc_recovery',   s1:'nrc_speed1', s2:'nrc_speed2'};
+    const HARD = new Set([T.s1, T.s2, T.long]);
     const pos = d => ALL_DAYS_ORDER.indexOf(d);
     const circ = (a,b)=>{ const r=Math.abs(pos(a)-pos(b)); return Math.min(r,7-r); };
     const prevDay = d => ALL_DAYS_ORDER[(pos(d)+6)%7];
     const inTrain = new Set(cardioTrainDays);
     const n = cardioTrainDays.length;
+    // V205 (D129): THE EVEN-SPREAD SUBSET, RECOMPUTED HERE VERBATIM. This is the exact
+    // arithmetic the fallback chooser in the caller runs when a goal is not routed here.
+    // It is not a tiebreak the athlete can see; it is the layout he ALREADY HAS. Routing
+    // the pace family through this chooser (D125) replaced a pure spacing rule with a
+    // four-term objective, and the spacing term went implicit. Rank 6 puts it back as
+    // identity: when several layouts tie on every ruled term, the one already on his
+    // calendar wins, so a tie never moves a live week. Rank 7 below scores spread as a
+    // metric for the ties this subset is not in. Keep the two arms in this order.
+    const _evenIdx = (function(){
+      const s = new Set();
+      if(capDays <= 1) s.add(n - 1);
+      else for(let k = 0; k < capDays; k++) s.add(Math.round(k * (n - 1) / (capDays - 1)));
+      return Array.from(s).sort((a,b)=>a-b);
+    })();
+    const _evenKey = _evenIdx.join(',');
     // subsets of size capDays (indices into cardioTrainDays), lexicographic.
     // THE LAST TRAIN DAY IS ALWAYS IN THE SUBSET: the long run lives late in the week
     // (engine convention, NRC convention, race-day rhythm) — the chooser may not trade
     // the weekend long away to buy a tiebreak. Measured before this constraint: a
     // marathon-on-5-days config moved its long run to Friday to put speed after a rest
     // day, which is the wrong trade.
+    // V205 (D125): the pin above is NRC-only. For the pace family every subset is legal
+    // and "long on the last training day" is scored instead (longLast, rank 2).
     const subsets = [];
     (function sub(start, acc){
-      if(acc.length===capDays){ if(acc[acc.length-1]===n-1) subsets.push(acc.slice()); return; }
+      if(acc.length===capDays){ if(paceFam || acc[acc.length-1]===n-1) subsets.push(acc.slice()); return; }
       for(let i=start;i<n;i++){ acc.push(i); sub(i+1,acc); acc.pop(); }
     })(0,[]);
     // permutations of types
@@ -5279,25 +5563,134 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       for(const p of perms){
         // long run must be the LAST run day — which the subset constraint above pins to
         // the last TRAIN day of the week.
-        if(p.includes('nrc_long') && p[p.length-1] !== 'nrc_long') continue;
+        // V205 (D125): NRC pins the long run to the last CHOSEN run day, which the subset
+        // rule above pins in turn to the last training day. The pace family carries neither
+        // pin. Both were one constraint doing one job — put the long at the end of the week —
+        // and a test goal has no race day to end the week on. Dropping the permutation rule
+        // as well as the subset rule is what reaches coll=0 on a four-training-day week,
+        // where the day set is forced and the long run's slot is the only lever left. The
+        // preference is scored below as longLast, at rank 2, under collisions.
+        if(!paceFam && p.includes(T.long) && p[p.length-1] !== T.long) continue;
         const typeOf = {}; days.forEach((d,i)=>typeOf[d]=p[i]);
         const hardDays = days.filter(d=>HARD.has(typeOf[d]));
-        let coll = 0;
-        for(let a=0;a<hardDays.length;a++) for(let b=a+1;b<hardDays.length;b++)
-          if(circ(hardDays[a],hardDays[b])===1) coll++;
-        const speeds = days.filter(d=>typeOf[d]==='nrc_speed1'||typeOf[d]==='nrc_speed2');
+        // V205 (D130 amended): RANK 1 IS SPLIT, AND ON THE PACE FAMILY ONLY. Two hard
+        // days on adjacent days are not one thing. CHI on the EVE of the long LSD is
+        // TOLERATED: the long run is relative recovery under Guide A p.11 and not a hard
+        // day, which is this engine's own earlier ruling, so a tempo the day before it is
+        // a legal pairing and not a collision to design out. Every other adjacency stays
+        // UNTOLERATED and must be ZERO — INT beside CHI, INT beside the long either way,
+        // and any quality session the day AFTER the long run. Untolerated is rank 1;
+        // tolerated is rank 1b, minimised and never traded for a worse untolerated count.
+        // Measured on the counterfactual: untolerated reaches 0 on all 64 rest-day
+        // calendars, 14 of them pay exactly one tolerated CHI-on-eve, and (0,1) is the
+        // FLOOR on those 14 — not an aspiration. The other 50 land (0,0).
+        // NRC IS UNTOUCHED BY CONSTRUCTION: off the pace arm untol is coll and tol is a
+        // constant 0, so the rank key below is the shipped key with a constant spliced in.
+        const _longD = days.find(d=>typeOf[d]===T.long);
+        let coll = 0, _untol = 0, _tol = 0;
+        for(let a=0;a<hardDays.length;a++) for(let b=a+1;b<hardDays.length;b++){
+          if(circ(hardDays[a],hardDays[b])!==1) continue;
+          coll++;
+          const _x = hardDays[a], _y = hardDays[b];
+          // Tolerated is a TYPED pair, not a position: s2 (CHI) sitting on prevDay of the
+          // long run. prevDay is circular, so a Saturday CHI into a Sunday long counts and
+          // a Sunday CHI after a Saturday long does not.
+          const _chiEve = !!_longD && ((typeOf[_x]===T.s2 && _y===_longD && _x===prevDay(_longD))
+                                    || (typeOf[_y]===T.s2 && _x===_longD && _y===prevDay(_longD)));
+          if(_chiEve) _tol++; else _untol++;
+        }
+        const untol = paceFam ? _untol : coll;
+        const tol   = paceFam ? _tol   : 0;
+        const speeds = days.filter(d=>typeOf[d]===T.s1||typeOf[d]===T.s2);
         const speedsAfterRest = speeds.filter(d=>!inTrain.has(prevDay(d))).length;
-        const longDay = days.find(d=>typeOf[d]==='nrc_long');
-        const recBeforeLong = longDay && days.some(d=>typeOf[d]==='nrc_recovery' && circ(d,longDay)===1 && pos(d)<pos(longDay)) ? 1 : 0;
-        const s1 = days.find(d=>typeOf[d]==='nrc_speed1'), s2 = days.find(d=>typeOf[d]==='nrc_speed2');
+        const longDay = days.find(d=>typeOf[d]===T.long);
+        // V205 (D129): THE LENS IS FORKED, AND ONLY THE PACE ARM IS CORRECTED.
+        // `pos(d)<pos(longDay)` reads a CIRCULAR week through a Sunday-first linear list,
+        // so a Sunday easy run scores as padding a Saturday long run — the day AFTER it.
+        // prevDay above is circular-correct, and `d===prevDay(longDay)` is what "a recovery
+        // run the day before the long" actually means. NRC KEEPS THE SHIPPED PREDICATE by
+        // ruling: the term decides 593 of 804 NRC chooser rows, and correcting it there
+        // moves 182 of 804 rows and 54 of 112 built programs, 3 of which relocate the long
+        // run itself. That is a re-ruling of NRC layout, not a bug fix, and it is unruled.
+        const recBeforeLong = longDay && days.some(d=>typeOf[d]===T.rec && (paceFam
+          ? d===prevDay(longDay)
+          : (circ(d,longDay)===1 && pos(d)<pos(longDay)))) ? 1 : 0;
+        // Rank 2. Always 1 on the NRC path (the subset and permutation rules above make
+        // it so), a real preference on the pace family.
+        const longLast = (!longDay || longDay===cardioTrainDays[n-1]) ? 1 : 0;
+        const s1 = days.find(d=>typeOf[d]===T.s1), s2 = days.find(d=>typeOf[d]===T.s2);
+        // UNMEASURED, UNRULED, DELIBERATELY LEFT ALONE (V205, D129). This line is a
+        // SIBLING of the recBeforeLong lens defect corrected above: `pos(s1)<pos(s2)` also
+        // reads a circular week through the Sunday-first ALL_DAYS_ORDER, so "speed1 comes
+        // before speed2" is measured from Sunday rather than from the athlete's own week.
+        // Nobody has measured what correcting it would move on either arm. Do not read its
+        // survival here as evidence it was considered and cleared. It was not.
         const canonical = (s1 && s2 && pos(s1)<pos(s2)) ? 1 : 0;
-        const cand = {idxs, typeOf, coll, speedsAfterRest, recBeforeLong, canonical};
-        if(!best
-          || cand.coll < best.coll
-          || (cand.coll===best.coll && cand.speedsAfterRest > best.speedsAfterRest)
-          || (cand.coll===best.coll && cand.speedsAfterRest===best.speedsAfterRest && cand.recBeforeLong > best.recBeforeLong)
-          || (cand.coll===best.coll && cand.speedsAfterRest===best.speedsAfterRest && cand.recBeforeLong===best.recBeforeLong && cand.canonical > best.canonical)
-        ) best = cand;
+        // V205 (D129), rank 6 — IDENTITY. The subset the even-spread fallback would have
+        // picked. Below every ruled term, so it can never buy a worse week; above spread,
+        // so a tie never moves days an athlete is already training on.
+        // paceFam-gated, and that is the whole point: identity protects the layout the
+        // even-spread fallback gave THIS athlete, and only the pace family ever had one.
+        // Left live on the NRC arm it moved 168 of 804 NRC chooser rows (measured).
+        const identity = (paceFam && idxs.join(',') === _evenKey) ? 1 : 0;
+        // V205 (D129), rank 7 — SPREAD, as a metric and not a constant. The longest
+        // run-free stretch on the real circular week, negated so shorter wins. This is the
+        // term that decides ties the athlete's current subset is not in, and it is what
+        // keeps enumeration order out of the decision.
+        const _p = days.map(pos).sort((a,b)=>a-b);
+        let _longestFree = 0;
+        for(let i=0;i<_p.length;i++){
+          const nxt = (i+1<_p.length) ? _p[i+1] : _p[0]+7;
+          const gap = nxt - _p[i] - 1;
+          if(gap > _longestFree) _longestFree = gap;
+        }
+        // paceFam-gated for the same reason: NRC's subset and permutation pins already
+        // fix its day set, and a spread term there is a new preference nobody ruled on.
+        const spread = paceFam ? -_longestFree : 0;
+        // V205 (D129 addendum), rank 8 — REST INTO THE LONG RUN. Among layouts still
+        // tied after spread, the one whose LAST quality session sits furthest before the
+        // long run wins. The reason is coaching, not tidiness: freshest legs into the
+        // week's longest run. Read circularly, backwards from the long day, so the LAST
+        // quality session is the one with the smallest backward distance, and the term
+        // maximises that distance. This is what "earliest quality day" was reaching for,
+        // stated on the session that actually matters.
+        let _qualRest = 0;
+        if(longDay){
+          let _nearest = 7;
+          days.forEach(d=>{
+            if(typeOf[d]!==T.s1 && typeOf[d]!==T.s2) return;
+            const back = (pos(longDay)-pos(d)+7)%7;
+            if(back < _nearest) _nearest = back;
+          });
+          if(_nearest < 7) _qualRest = _nearest;
+        }
+        // paceFam-gated like ranks 6 and 7: NRC's subset and permutation pins already fix
+        // its layout, and a new preference there is unruled.
+        const qualRest = paceFam ? _qualRest : 0;
+        // V205 (D129 addendum), rank 9 — EARLIEST FIRST QUALITY DAY. Below rank 8, and
+        // already implied by canonical; written out so it is a rank rather than an
+        // accident of enumeration. days ascends in week order, so the first quality
+        // session in it is the earliest one. Negated so earlier wins. paceFam-gated.
+        const _firstQual = days.find(d=>typeOf[d]===T.s1||typeOf[d]===T.s2);
+        const qualFirst = (paceFam && _firstQual) ? -pos(_firstQual) : 0;
+        const cand = {idxs, typeOf, coll, untol, tol, longLast, speedsAfterRest, recBeforeLong, canonical, identity, spread, qualRest, qualFirst};
+        // Objective order, highest first: fewest collisions, long on the last training
+        // day, speeds after a rest day, a recovery run padding the long, canonical
+        // speed order, the athlete's existing even-spread subset, the tightest spread,
+        // the longest rest into the long run, then the earliest first quality day.
+        // Ties keep the incumbent, so enumeration order is the last tiebreak and the
+        // chooser stays deterministic with no seed — but ranks 6 and 7 pin the DAY SET
+        // and ranks 8 and 9 pin the types on it, so enumeration order never decides
+        // which days an athlete trains on.
+        // V205 (D130 amended): rank 1 is -untol, rank 1b is -tol. Ranks 2..9 are
+        // unchanged and keep their shipped order. -c.coll is GONE from the key: a
+        // total that mixes a tolerated pair with an untolerated one cannot rank them.
+        const _rank = c => [-c.untol, -c.tol, c.longLast, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualRest, c.qualFirst];
+        if(!best) best = cand;
+        else {
+          const ka = _rank(cand), kb = _rank(best);
+          for(let i=0;i<ka.length;i++){ if(ka[i]!==kb[i]){ if(ka[i]>kb[i]) best = cand; break; } }
+        }
       }
     }
     return best; // {idxs:[...], typeOf:{dayKey:type}, ...} — never null for capDays≥1
@@ -5364,7 +5757,13 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
                                  && (protectInt || _perfRun);
       sportDays.forEach((globalDayIdx, sportIdx) => {
         const isLastSportDay = sportIdx === sportDays.length - 1;
-        let st = isLastSportDay ? 'lsd_long' : (types[sportIdx] || 'lsd_easy');
+        // V205 (D125): the chooser's joint day+type plan wins OUTRIGHT when it ran —
+        // including over the last-day default. That default is the old pin restated, and
+        // under D125 the pace family's long run may sit mid-week to buy a collision-free
+        // one. Where the chooser did not run (run_base, bike, swim, uncapped weeks) the
+        // default stands untouched and the long run is still the last session of the week.
+        const _planned = _nrcPlan && _nrcPlan[cardioTrainDays[globalDayIdx]];
+        let st = _planned || (isLastSportDay ? 'lsd_long' : (types[sportIdx] || 'lsd_easy'));
         // BODY-COMP GOVERNOR: force every cardio session to easy steady-state. No int,
         // no chi, no long-run leg fatigue — keep cardio purely as easy active recovery
         // so it never competes with hypertrophy. Even the "long" slot becomes easy.
@@ -6446,12 +6845,29 @@ function injectDynamicCore(weekObj, dayRoles, trainDays, week, equip){
 // "Clean" is a lift-only day: a recovery run is the easy day being protected, not a free slot.
 // Every ordered (pull, legs) pair is scored; min total wins, then the widest spacing between
 // the two axial days, then the earliest legs day. If no pair is finite the layout is too
-// tight and the NSW rule below runs as before. Non-NRC programs never enter here.
+// tight and the NSW rule below runs as before. D127 (V205) widened the door: NRC race
+// programs and the NSW pace family enter here; run_base and every other NSW goal do not,
+// because _nrcRunShape returns null for them and the 48h rule runs unchanged.
 function _nrcRunShape(wk1, trainDays){
   const iso = d => _ISO_ORDER.indexOf(d);
+  // D127 (V205): the pace family reaches this same shape through its own lens. The NSW
+  // engine sets no isNRC (that flag means Nike-verbatim and is not faked here) and names
+  // BOTH of its easy runs `Long Slow Distance (LSD)`, so the long run is told from the
+  // easy one by legLoad — the flag the scheduler already sets from assignedType
+  // (lsd_long true, lsd_easy false). INT and CHI are the speed days. Scoped to
+  // run_pace_goal and its two V126 aliases; run_base and every other NSW goal fall
+  // through with a null shape and keep the 48h rule below.
+  const _paceFam = g => g==='run_pace_goal' || g==='run_mile_time' || g==='run_15_under10';
   let long = null; const speed = new Set(), easy = new Set();
-  trainDays.forEach(d => { const c = wk1[d]; if(!c || !c.isNRC || c.type!=='run') return;
-    if(/^long run/i.test(c.subtype||'')) long = d; else if(/^speed run/i.test(c.subtype||'')) speed.add(d); else easy.add(d); });
+  trainDays.forEach(d => { const c = wk1[d]; if(!c || c.type!=='run') return;
+    if(c.isNRC){
+      if(/^long run/i.test(c.subtype||'')) long = d; else if(/^speed run/i.test(c.subtype||'')) speed.add(d); else easy.add(d);
+    } else if(_paceFam(c.goalId)){
+      const _st = c.subtype||'';
+      if(/^(Interval \(INT\)|Continuous High Intensity \(CHI\))/.test(_st)) speed.add(d);
+      else if(c.legLoad) long = d;
+      else easy.add(d);
+    } });
   if(!long) return null;
   const eve = _ISO_ORDER[(iso(long)+6)%7], after = _ISO_ORDER[(iso(long)+1)%7];
   return { long, eve, after, speed, easy, forbidden: new Set([long, eve]) };
@@ -6505,7 +6921,11 @@ function deconflictLegLiftDays(dayRoles, trainDays, cardioSchedule){
   const legTaxing = new Set();
   trainDays.forEach(d => { const c = wk1[d]; if(c && c.legLoad) legTaxing.add(d); });
   if(!legTaxing.size) return { legRecoveryNote:null };
-  const _nrc = nrcLegLiftPlacement(dayRoles, trainDays, wk1);   // V189 (D36): race programs place by run shape
+  // V189 (D36): race programs place by run shape. D127 (V205): so does the pace family —
+  // routing is by the shape, not by a second goal test here, so there is exactly one place
+  // that decides who takes the cost table. A null shape (run_base, every other NSW goal,
+  // any week with no long run) falls straight through to the 48h branch below.
+  const _nrc = nrcLegLiftPlacement(dayRoles, trainDays, wk1);
   if(_nrc) return _nrc;
 
   // d conflicts if it sits on, or within 48h of, any leg-taxing cardio day.
@@ -6661,8 +7081,10 @@ function deconflictSameRegion(dayRoles, trainDays, cardioSchedule){
   const legTaxing = new Set(); trainDays.forEach(d => { const c = wk1[d]; if(c && c.legLoad) legTaxing.add(d); });
   const cardioConflicted = d => legTaxing.has(d) || [...legTaxing].some(t => _dist(d,t)===1);
   // V189 (D36): on NRC programs the leg roles are scored by the placement's own cost table
-  // (forbidden days weigh 10), so a region swap can never make the placement worse. Off NRC
-  // the count is the V30 one, byte-identical.
+  // (forbidden days weigh 10), so a region swap can never make the placement worse. D127
+  // (V205): the pace family now produces a shape too, so the same guard holds there and the
+  // long-run eve stays forbidden through the region pass. Where _nrcRunShape is null the
+  // count is the V30 one, byte-identical.
   const _shape = _nrcRunShape(wk1, trainDays);
   const cardioConflicts = dr => ALL.reduce((n,d) => n + (roleIsLegHeavy(dr[d]) ? (_shape ? Math.min(10, _nrcLegCost(_shape, dr[d], d)) : (cardioConflicted(d) ? 1 : 0)) : 0), 0);
   const regionOf = role => PRESS.has(role) ? 'press' : (role==='full' ? 'full' : null);
