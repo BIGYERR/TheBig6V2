@@ -1,0 +1,44 @@
+[
+  {
+    "name": "S1 -> the NSW limb is dropped: _longRunTier returns null for every non-NRC card, so an NSW long run of any length keeps the whole interference-model day (V208 behaviour)",
+    "anchor": "  } else if(cardio.type!=='run' || cardio.dose.key!=='long') return null;   // D140 (V209): the NSW long run, by its key\n",
+    "replacement": "  } else return null;\n",
+    "gate": "gates/g209_d140_tier.js",
+    "note": "NAMED TRIP: T1. Measured on a forced-209 copy of the V209 build, gate run without a baseline (as sabotage.py runs it): PASS 4 FAIL 9. EXPECTED: T1 A1 A2 B1 B2 B3 B5 K0 K1. Needs ia-version >= 209: below 209 the gate is NOT APPLICABLE and every mutation survives."
+  },
+  {
+    "name": "S2 -> F1 reverts to /power/: tier B keeps an Explosive finisher, so burpees, mountain climbers and ball slams ride a 45 to 75 minute long run",
+    "anchor": "secs=secs.filter(sec=>!/power|explosive/i.test(sec.label||''));",
+    "replacement": "secs=secs.filter(sec=>!/power/i.test(sec.label||''));",
+    "gate": "gates/g209_d140_tier.js",
+    "note": "NAMED TRIP: B2. Measured on a forced-209 copy of the V209 build, gate run without a baseline (as sabotage.py runs it): PASS 12 FAIL 1. EXPECTED: B2. Needs ia-version >= 209: below 209 the gate is NOT APPLICABLE and every mutation survives."
+  },
+  {
+    "name": "S3 -> F2 reverts to the N×-only counter: \"3 sets — RPE 7\" counts as one set again, so a tier B day keeps up to 8 prescriptions of 3 sets",
+    "anchor": "        const _n=det=>{let m=/^(\\d+)\\s*[x×]/.exec(det||'');if(m)return +m[1];m=/\\b(\\d+)\\s*sets?\\b/i.exec(det||'');return m?+m[1]:1;};\n",
+    "replacement": "        const _n=det=>{const m=/^(\\d+)\\s*[x×]/.exec(det||'');return m?+m[1]:1;};\n",
+    "gate": "gates/g209_d140_tier.js",
+    "note": "NAMED TRIP: B3. Measured on a forced-209 copy of the V209 build, gate run without a baseline (as sabotage.py runs it): PASS 12 FAIL 1. EXPECTED: B3. Needs ia-version >= 209: below 209 the gate is NOT APPLICABLE and every mutation survives."
+  },
+  {
+    "name": "S4 -> the carry ban reads the section label only (V208 behaviour): a Farmer or Suitcase carry dealt into the empty-label core section (coreHeader 'Core — …') survives the long-run day",
+    "anchor": "      // No heavy carries on ANY long-run day, regardless of length. D140 (V209): the ban reads\n      // the ITEM, because a carry rides sections whose label never says so (the core section\n      // is label '' with coreHeader 'Core — …'). Farmer, Suitcase and Overhead carry are the\n      // three threads, and every carry the engine names says carry. The label and coreHeader\n      // tests stay as belt. A section the ban empties drops; an untouched one is kept as is.\n      const _isCarry=it=>/carry/i.test((it&&it.name)||'');\n      let secs=[];\n      day.sections.forEach(sec=>{\n        if(/carry/i.test(sec.label||'')||/carry/i.test(sec.coreHeader||'')) return;\n        const its=sec.items||[], kept=its.filter(it=>!_isCarry(it));\n        if(its.length&&!kept.length) return;\n        secs.push(kept.length===its.length?sec:{...sec, items:kept});\n      });\n",
+    "replacement": "      // No heavy carries on ANY long-run day, regardless of length.\n      let secs=day.sections.filter(sec=>!/carry/i.test(sec.label||''));\n",
+    "gate": "gates/g209_d140_tier.js",
+    "note": "NAMED TRIP: K0. Measured on a forced-209 copy of the V209 build, gate run without a baseline (as sabotage.py runs it): PASS 11 FAIL 2. EXPECTED: K0 K1. Needs ia-version >= 209: below 209 the gate is NOT APPLICABLE and every mutation survives."
+  },
+  {
+    "name": "S5 -> the tier thresholds swap: everything from 45 minutes is tier A and nothing is tier B, so a 48 minute long run becomes a mobility-only day",
+    "anchor": "return m>=75 ? 'A' : m>=45 ? 'B' : 'C';",
+    "replacement": "return m>=45 ? 'A' : m>=75 ? 'B' : 'C';",
+    "gate": "gates/g209_d140_tier.js",
+    "note": "NAMED TRIP: T1. Measured on a forced-209 copy of the V209 build, gate run without a baseline (as sabotage.py runs it): PASS 9 FAIL 4. EXPECTED: T1 B1 K1 M1. Needs ia-version >= 209: below 209 the gate is NOT APPLICABLE and every mutation survives."
+  },
+  {
+    "name": "S6 -> the power core returns to tier B: a Rotational Power core section (coreHeader 'Core — Rotational Power', label '') rides a 45 to 75 minute long run again, so a medicine ball rotary toss or landmine rotation survives it",
+    "anchor": "        secs=secs.filter(sec=>!/power|explosive/i.test(sec.coreHeader||''));\n",
+    "replacement": "",
+    "gate": "gates/g209_d140_tier.js",
+    "note": "NAMED TRIP: B5. Measured on a forced-209 copy of the V209 build, gate run without a baseline (as sabotage.py runs it): PASS 12 FAIL 1. EXPECTED: B5. Needs ia-version >= 209: below 209 the gate is NOT APPLICABLE and every mutation survives."
+  }
+]

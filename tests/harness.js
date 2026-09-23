@@ -332,6 +332,14 @@ MANNY_CORE_OFF_DIGEST_BY_VERSION[206] = '9d14801a63111081';   // D109: the ruled
 // V207: ruled UNMOVED, so a REFERENCE row (coach printed it on the V206 tag and a slice-A copy).
 MANNY_CORE_OFF_DIGEST_BY_VERSION[207] = MANNY_CORE_OFF_DIGEST_BY_VERSION[206];   // D106a: ruled UNMOVED
 MANNY_CORE_OFF_DIGEST_BY_VERSION[208] = MANNY_CORE_OFF_DIGEST_BY_VERSION[207];   // V208: ruled UNMOVED (9d14801a63111081 printed by g200's method)
+// V209: ruled UNMOVED, so a REFERENCE row. D140 tiers NSW long-run days and F1/F2 and
+// the item carry ban run in the shared pass, but HALF_MANNY's three NRC tier B days were
+// already at or under eight sets by doctrine count and carry no explosive, power-core or
+// carry item. Printed by coach on the final tree: 0ac7da6b1691a8e1 / 1069cd7f86eed204 /
+// 9d14801a63111081 on this run.
+MANNY_DIGEST_BY_VERSION[209] = MANNY_DIGEST_BY_VERSION[208];   // D140: ruled UNMOVED
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[209] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[208];   // D140: ruled UNMOVED
+MANNY_CORE_OFF_DIGEST_BY_VERSION[209] = MANNY_CORE_OFF_DIGEST_BY_VERSION[208];   // D140: ruled UNMOVED
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
                    MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION,

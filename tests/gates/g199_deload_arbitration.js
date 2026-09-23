@@ -20,7 +20,8 @@
 // disagreement; each assertion below names its own:
 //   - STAGE-LOCAL (p1 -> p2, the deload's own arbitration): coach's grid. Days >0 -> 0 == 60.
 //   - END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget):
-//     builder's after-check. Days >0 -> 0 == 36. Reported by E6, never mixed into E3.
+//     builder's after-check. Days >0 -> 0 == the E6_BY_VERSION row (36 through V208, 28 from
+//     V209 under D140). Reported by E6, never mixed into E3.
 //   - Deload weeks by isRecoveryWeek == 2,880. Deload weeks that actually DIFFER with the
 //     pass off == 2,880 minus the era row's dlIdentical, because that many are byte-
 //     identical either way (D2). V198-V204: 21 identical, 2,859 differ. V205: 19 and 2,861.
@@ -104,6 +105,18 @@ DELOAD_ARB_BY_VERSION[205] = {
 DELOAD_ARB_BY_VERSION[206] = DELOAD_ARB_BY_VERSION[205];   // V206 D109/D137: ruled UNMOVED
 DELOAD_ARB_BY_VERSION[207] = DELOAD_ARB_BY_VERSION[206];   // D106a: ruled UNMOVED (test-week pin and NSW trial; no section arbitration)
 DELOAD_ARB_BY_VERSION[208] = DELOAD_ARB_BY_VERSION[207];   // V208 D103a/D104a: ruled UNMOVED (NSW keys, labels and placement; no section arbitration)
+DELOAD_ARB_BY_VERSION[209] = DELOAD_ARB_BY_VERSION[208];   // D140: ruled UNMOVED (C1 364, C3 364, C5 32, D2 19, I3 496 printed identical; 0 zero-posterior flips in 17,856 weeks)
+
+// E6 counts deload day builds where the shipped card has zero posterior and the
+// __DELOAD_OFF control has some. D140 (V209) moves it 36 -> 28: eight NSW pace tier B
+// long-run days in deload weeks 4 and 8 whose control-arm posterior item is now stripped
+// by the tier. The shipped card was already zero on both builds; nothing an athlete
+// sees changed. A bare literal here was a V208 pin dressed as a claim.
+const E6_BY_VERSION = { 208: 36 }; E6_BY_VERSION[209] = 28;   // D140: ruled MOVE
+// Row lookup. This gate has no top-level version predicate: the bare 36 ran on EVERY artifact it
+// was ever pointed at. So the 208 row is read for every ia-version at or below 208 (older runs keep
+// reading 36 and do not newly fail), and from 209 each version needs its own row. No row -> E6 FAILS.
+const E6_ROW_FOR = v => E6_BY_VERSION[(+v <= 208) ? 208 : +v];
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[
@@ -449,7 +462,8 @@ function report(){
   ok(N.killedByDeload===60,'E3 STAGE-LOCAL (p1 -> p2): deload day builds taken from >0 posterior to 0 == 60 of '+D_DAY+'; got '+N.killedByDeload+'. This is coach\'s ruled CEILING, not a floor');
   ok(N.killedHeldByFinisher===60,'E4 on all 60, every section that held the dropped posterior is labelled Explosive finisher (got '+N.killedHeldByFinisher+'): the ceiling is BY LABEL, and a future widening into optional/fluff sections moves this number');
   ok(N.killedKeepsMain===60,'E5 all 60 still keep their main/strength section (got '+N.killedKeepsMain+')');
-  ok(R.endToEnd===36,'E6 END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): '+R.endToEnd+' deload day builds ship zero posterior where __DELOAD_OFF ships some. Reported beside E3\'s stage-local 60, never mixed into it');
+  const E6_ROW=E6_ROW_FOR(IP.version);
+  ok(E6_ROW!==undefined&&R.endToEnd===E6_ROW,'E6 END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): '+R.endToEnd+' deload day builds ship zero posterior where __DELOAD_OFF ships some == '+(E6_ROW===undefined?'NO ROW':E6_ROW)+' (the V'+IP.version+' E6_BY_VERSION row'+(E6_ROW===undefined?': no E6_BY_VERSION row covers this ia-version':'')+'). Reported beside E3\'s stage-local 60, never mixed into it');
 
   console.log('── F. ACCESSORY-BLOCK CONSERVATION (the ruling adds no sets) ──');
   ok(g(N.lblP2all,'Leg superset A')===14544,'F1 Leg superset A present after the deload == 14,544. DENOMINATOR: all '+N.dayCells+' day builds (non-deload cards pass through recoveryDeload untouched, so they belong in this total); got '+g(N.lblP2all,'Leg superset A'));

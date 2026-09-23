@@ -29,6 +29,11 @@
 //
 // VERSION PREDICATE (standing ruling 4): ships on ia-version 208. Below 208 every row prints SKIP.
 // Rows reading a baseline (argv[3]) run when the baseline is V207 or the V208 pre-slice tree.
+// B3 needs more than the version: its premise is a baseline whose chip reader PREDATES slice 3, so it
+// runs only when the baseline's source still carries slice 3's own E1 anchor, the one-argument
+// `function runSessionCode(sub){` (V207, or the V208 pre-slice tree). Against a baseline that already
+// carries slice 3 (the shipped V208) the baseline reads every frozen INT/CHI as SI/LI itself and only
+// the trial moves, so B3 SKIPs by name there (V209 UPKEEP, gatekeeper).
 'use strict';
 const path = require('path');
 const { load, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
@@ -44,6 +49,9 @@ if(VER < ERA){ ['A','B','C','D','M'].forEach(r => skip(r + ' rows: ia-version ' 
 const IB = BASEFILE ? load(BASEFILE) : null;
 const BASE_OK = !!IB && VER === ERA && (+IB.version === 207 || +IB.version === 208);
 const BASE_WHY = !IB ? 'no baseline passed as argv[3]' : 'baseline ia-version ' + IB.version + ' is neither V207 nor the V208 pre-slice tree';
+const BASE_PRE_S3 = !!BASEFILE && /function runSessionCode\(sub\)\{/.test(require('fs').readFileSync(BASEFILE, 'utf8'));
+const B3_OK = BASE_OK && BASE_PRE_S3;
+const B3_WHY = !BASE_OK ? BASE_WHY : 'baseline ia-version ' + IB.version + ' already carries slice 3\'s runSessionCode(sub, key), so it is not the pre-slice tree B3 was written against';
 const clone = v => JSON.parse(JSON.stringify(v));
 const DAYS = ['mon','tue','wed','thu','fri','sat','sun'], ALL = ['sun','mon','tue','wed','thu','fri','sat'];
 const CODE = IA.eval('runSessionCode'), RC = IA.eval('_runClass'), DAYCODE = IA.eval('dayCode'), STRIP = IA.eval('_doseStripHTML');
@@ -122,7 +130,7 @@ const want = c => KEYCHIP[keyOf(c)] || todayChip(c.subtype);
     if(a !== want(c)) bad1.push(k + ' "' + c.subtype + '" ' + a + ' want ' + want(c)); if(b !== want(c)) bad2.push(k + ' "' + c.subtype + '" ' + b + ' want ' + want(c)); });
   ok(`B1 the day chip of every keyed NSW run is its ruled code, chi LI, int SI, the test TEST, every other key its label's V207 code (${Object.keys(byKey).sort().map(k => k + ' ' + byKey[k]).join(', ')})`, bad1.length === 0, bad1.length + ': ' + bad1.slice(0, 3).join('; '));
   ok(`B2 the planned dose strip names the same code (${nsw.length} cards)`, bad2.length === 0, bad2.length + ': ' + bad2.slice(0, 3).join('; '));
-  if(!BASE_OK) skip('B3 ' + BASE_WHY);
+  if(!B3_OK) skip('B3 ' + B3_WHY);
   else { const CB = IB.eval('runSessionCode'); const moved = {}; let n = 0;
     nsw.forEach(({c}) => { const a = chipDay(c), b = CB(V207_LABEL(c.subtype)); if(a !== b){ n++; const k = keyOf(c) + ': ' + b + ' -> ' + a; moved[k] = (moved[k] || 0) + 1; } });
     const RULED = ['trial: RUN -> TEST', 'chi: CHI -> LI', 'int: INT -> SI'];

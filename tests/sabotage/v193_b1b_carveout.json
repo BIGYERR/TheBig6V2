@@ -8,8 +8,8 @@
  },
  {
   "name": "S21 -> g193_budget_floor B1b: _longRunTier claims every day is a long run, so the carve-out swallows the whole assertion",
-  "why": "The carve-out is only as honest as the predicate behind it. B1b excludes days the engine's own _longRunTier calls a long-run tier, and reads that predicate out of the file under test rather than keeping a second private copy — which means widening the predicate is a way to make B1b vacuous without touching B1b. This mutation does exactly that: every day classifies as tier B, the excluded set becomes 28224/28224 day-builds, and every off-long-run core count falls to zero against the transcribed V192 census. B1b names it. Recorded deliberately: this is the mutation that proves the carve-out cannot be widened silently, which is the new risk this amendment introduced.",
-  "anchor": "  if(!cardio || !cardio.isNRC || !cardio.dose) return null;\n  if(!/^long run/i.test(cardio.subtype||'')) return null;",
+  "why": "The carve-out is only as honest as the predicate behind it. B1b excludes days the engine's own _longRunTier calls a long-run tier, and reads that predicate out of the file under test rather than keeping a second private copy — which means widening the predicate is a way to make B1b vacuous without touching B1b. This mutation does exactly that: every day classifies as tier B, the excluded set becomes 28224/28224 day-builds, and every off-long-run core count falls to zero against the transcribed V192 census. B1b names it. Recorded deliberately: this is the mutation that proves the carve-out cannot be widened silently, which is the new risk this amendment introduced. V209 UPKEEP (D140): D140's NSW limb rewrote _longRunTier's two-line NRC-only guard, so the old anchor went NOT-APPLIED. Re-anchored on the new first guard, `  if(!cardio || !cardio.dose) return null;`, with the same `return 'B'` intent: every day is still a long run and B1b must still go red.",
+  "anchor": "  if(!cardio || !cardio.dose) return null;",
   "replacement": "  return 'B';",
   "gate": "gates/g193_budget_floor.js"
  }

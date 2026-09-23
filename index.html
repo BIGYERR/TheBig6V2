@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="208"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="209"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -10660,10 +10660,11 @@ function engineD_synthesis(cfg, A, B, plan, C){
 // construction (the V174 E10 rule). Runs LAST so it judges the settled day on every tier.
 // ── V176 (D18, D33, D34): THE RUN IS THE DAY — tiered by time on feet ─────────
 // "After 6, maybe even 8 miles that's the whole workout — just stretch and call it
-// a day." NRC long runs only (D33): keyed off the session's own dose (`mins`, or
+// a day." Keyed off the session's own dose (`mins`, or
 // `mi × chartRow.recovery`), so the tier scales with the athlete — 6 mi is 80 min
-// on a 13:20 row and 60 on a 7:30. run_base's designated long run and NSW lsd_long
-// stay under the interference model until their doses are measured (§12).
+// on a 13:20 row and 60 on a 7:30. NRC long runs are found by subtype (D33). From V209
+// (D140) the NSW long run is tiered too, found by its dose.key 'long' (lsd_long and
+// run_base's budgeted long easy run); a test day is keyed 'trial' and never enters.
 // ≥75 → A: no lift, post-run mobility only (75 is the number the long-run fuel note
 // already uses — one doctrine line). 45–75 → B: upper and trunk, ≤8 sets, no power,
 // no hinge. <45 → C: the current interference model (with D8). No heavy carries on
@@ -10671,10 +10672,12 @@ function engineD_synthesis(cfg, A, B, plan, C){
 // overturned D34's primer); the dress rehearsal is tier A on every row (D34) — you don't
 // lift after simulating the race.
 function _longRunTier(cardio){
-  if(!cardio || !cardio.isNRC || !cardio.dose) return null;
-  if(!/^long run/i.test(cardio.subtype||'')) return null;
-  if(/race day|time trial/i.test(cardio.subtype||'')) return null;   // V186: the 5K/10K time trial is race day (D34)
-  if(/rehearsal/i.test(cardio.detail||'')) return 'A';
+  if(!cardio || !cardio.dose) return null;
+  if(cardio.isNRC){
+    if(!/^long run/i.test(cardio.subtype||'')) return null;
+    if(/race day|time trial/i.test(cardio.subtype||'')) return null;   // V186: the 5K/10K time trial is race day (D34)
+    if(/rehearsal/i.test(cardio.detail||'')) return 'A';
+  } else if(cardio.type!=='run' || cardio.dose.key!=='long') return null;   // D140 (V209): the NSW long run, by its key
   const d = cardio.dose;
   const m = d.k==='time' ? (+d.mins||0) : (+d.mi||0) * (+d.tgt||0) / 60;
   if(!m) return null;
@@ -10700,8 +10703,19 @@ function d18LongRunDayPass(weeks){
     Object.keys(wk).forEach(dk=>{
       const day=wk[dk]; if(!day||!day.cardio||!Array.isArray(day.sections)) return;
       const t=_longRunTier(day.cardio); if(!t) return;
-      // No heavy carries on ANY long-run day, regardless of length.
-      let secs=day.sections.filter(sec=>!/carry/i.test(sec.label||''));
+      // No heavy carries on ANY long-run day, regardless of length. D140 (V209): the ban reads
+      // the ITEM, because a carry rides sections whose label never says so (the core section
+      // is label '' with coreHeader 'Core — …'). Farmer, Suitcase and Overhead carry are the
+      // three threads, and every carry the engine names says carry. The label and coreHeader
+      // tests stay as belt. A section the ban empties drops; an untouched one is kept as is.
+      const _isCarry=it=>/carry/i.test((it&&it.name)||'');
+      let secs=[];
+      day.sections.forEach(sec=>{
+        if(/carry/i.test(sec.label||'')||/carry/i.test(sec.coreHeader||'')) return;
+        const its=sec.items||[], kept=its.filter(it=>!_isCarry(it));
+        if(its.length&&!kept.length) return;
+        secs.push(kept.length===its.length?sec:{...sec, items:kept});
+      });
       if(t==='A'){
         // The run was the workout. Informational taper notes survive; lifting does not.
         const keep=secs.filter(sec=>/taper/i.test(sec.label||''));
@@ -10710,10 +10724,16 @@ function d18LongRunDayPass(weeks){
         return;
       }
       if(t==='B'){
-        secs=secs.filter(sec=>!/power/i.test(sec.label||''));
+        secs=secs.filter(sec=>!/power|explosive/i.test(sec.label||''));   // D140 (V209) F1: an explosive finisher is power work
+        // D140 (V209, coach): "no power" reaches the core header too. A core section is label ''
+        // with its pillar in coreHeader; a Rotational Power pillar goes whole and is not refilled
+        // (a power header over a plank is the incomplete-superset shape). Other pillars stay.
+        secs=secs.filter(sec=>!/power|explosive/i.test(sec.coreHeader||''));
         secs=secs.map(sec=>({...sec, items:(sec.items||[]).filter(it=>!_D18_LEG_RX.test(it.name||''))}));
         // ≤8 working sets: keep in document order (mains first), stretches are free.
-        const _n=det=>{const m=/^(\d+)\s*[x×]/.exec(det||'');return m?+m[1]:1;};
+        // D140 (V209) F2: "3 sets — RPE 7" is three sets. The counter used to read only the N× form
+        // and counted every "N sets" prescription as one, so a tier B day could keep 12.
+        const _n=det=>{let m=/^(\d+)\s*[x×]/.exec(det||'');if(m)return +m[1];m=/\b(\d+)\s*sets?\b/i.exec(det||'');return m?+m[1]:1;};
         const _isStr=nm=>/stretch|mobility|90\/90|foam|worlds greatest/i.test(nm||'');
         let budget=8;
         secs.forEach(sec=>{ sec.items=(sec.items||[]).filter(it=>{ if(_isStr(it.name)) return true; const c=_n(it.detail); if(budget-c<0) return false; budget-=c; return true; }); });
