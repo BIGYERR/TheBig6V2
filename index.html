@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="206"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="207"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2288,7 +2288,10 @@ function updateRaceDateFeedback() {
     return;
   }
   if(weeksUntil < 1) {
-    feedback.innerHTML = '<div style="color:var(--red);font-size:12px;margin-top:6px">'+asyIcon('⚠',13)+' Less than a week away — not enough time to train.</div>';
+    // D106a (V207): a test goal under a week out still builds: the test week alone. The card
+    // stays red and says what the athlete gets. Every other goal keeps its own sentence.
+    const _tg1 = (WD.cardioTypes||[]).includes('run') && WD.cardioGoals && WD.cardioGoals.run && PACE_GOALS.has(WD.cardioGoals.run.id);
+    feedback.innerHTML = '<div style="color:var(--red);font-size:12px;margin-top:6px">'+asyIcon('⚠',13)+(_tg1 ? ' Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test.' : ' Less than a week away — not enough time to train.')+'</div>';
     return;
   }
 
@@ -2326,9 +2329,15 @@ function updateRaceDateFeedback() {
 
   // ── NOT ENOUGH TIME (race lands inside the program, before peak) ──
   const color = diff >= -2 ? 'var(--accent)' : 'var(--red)';
+  // D106a (V207): a test goal whose date falls inside its goal length ends on the test, so
+  // "stays intact" would be false for it. Same week and null rules as the writer in
+  // doGenerate. NRC never reaches here (aligned above); every other goal keeps its sentence.
+  const _twz = ((WD.cardioTypes||[]).includes('run') && WD.cardioGoals.run && PACE_GOALS.has(WD.cardioGoals.run.id))
+    ? testWeekIndex(resolveStartDate(WD.startDate, WD.restDays||[]).start, WD.raceDate) : null;
+  const _tw = (_twz >= 1 && _twz <= recommended) ? _twz : null;
   let html =
     '<div style="font-weight:600">'+weeksUntil+' weeks isn\'t enough time to hit this pace safely. Recommended: at least '+recommended+' weeks.</div>'+
-    '<div style="margin-top:5px;opacity:0.9">Your full '+recommended+'-week program stays intact — your race simply lands in week '+weeksUntil+'.</div>';
+    '<div style="margin-top:5px;opacity:0.9">'+(_tw ? 'Your program ends on your test. ' + _tw + (_tw === 1 ? ' week.' : ' weeks.') + ' The taper lands in front of it.' : 'Your full '+recommended+'-week program stays intact — your race simply lands in week '+weeksUntil+'.')+'</div>';
 
   // ── PACE-GOAL OFFER: fastest pace reachable in the available window ──
   const runGoal = WD.cardioGoals['run'];
@@ -3634,7 +3643,10 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
   // weeks with isTaperWeek false, so the user watched volume drop 19% off peak with
   // the note still reading "base building" and no taper label anywhere. Every other
   // goal keeps the eventTargeted taper exactly as before.
-  const taperWeeks = (goalId !== 'run_base' && eventTargeted) ? Math.min(Math.max(2, Math.round(totalWeeks * 0.12)), totalWeeks - 4) : 0;
+  // D106a (V207): the array reads the published window, the one buildRunSession labels
+  // from, so a block under six weeks never prints Taper on an undipped long run. The old
+  // tw-4 clamp never bound at six weeks or more, so no longer program moves.
+  const taperWeeks = taperWeeksFor(goalId !== 'run_base' && eventTargeted, false, totalWeeks);
   const buildWeeks = totalWeeks - taperWeeks;
   function build10pct(startMiles, maxMiles) {
     const weeks = [];
@@ -3666,7 +3678,11 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
         lastBuildVal = next;
       }
     }
-    const peak = Math.max(...weeks);
+    // D106a (V207): at one or two weeks the block IS the test week and tapers by race-week
+    // doctrine, so there are no build weeks. The taper then steps down from startMiles (the
+    // athlete's baseline or the experience default this array climbs from), never from
+    // Math.max() of nothing, which is -Infinity.
+    const peak = weeks.length ? Math.max(...weeks) : startMiles;
     for (let t = 0; t < taperWeeks; t++) {
       const taperPct = 1 - ((t + 1) / (taperWeeks + 1)) * 0.4;
       weeks.push(+(peak * taperPct).toFixed(1));
@@ -4206,6 +4222,17 @@ function raceAlignment(goalId, raceIso, eventOn, todayIso){
   return {tw, raceIso, raceDay:_ISO_ORDER[Math.round((race - raceMon)/86400000)], raceMon:_isoOf(raceMon),
           start:_isoOf(start), weeksOut, openWeek: futureWeeks ? 1 : openWeek, floor, underFloor: weeksOut < floor, futureWeeks,
           behindWeeks: futureWeeks ? 0 : openWeek - 1};
+}
+// D106a (V207): the program week that holds a test date. Same Monday arithmetic as
+// _progDayDate / getWeekMonday: week N runs from Mon(start) + 7(N-1) days to the Sunday
+// after. Pure: dates in, a week number out, no DOM, no WD. Local dates only (no UTC parse),
+// and the day count is rounded so a DST change inside the span cannot move the week.
+// Null when a date is unreadable or the test falls before the start.
+function testWeekIndex(startIso, raceIso){
+  const s = _parseLocalDate(startIso), t = _parseLocalDate(raceIso);
+  if(!s || !t || t < s) return null;
+  const days = Math.round((getWeekMonday(_isoOf(t)) - getWeekMonday(_isoOf(s))) / 86400000);
+  return Math.floor(days / 7) + 1;   // week 1 is the week holding the start
 }
 // The race-week pin: race day is the entered date's weekday; every train day AFTER it in
 // race week rests; the day that held the race session (found by the cardio engine, by
@@ -5920,6 +5947,11 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
         session.legLoad = (type !== 'swim') && (assignedType === 'int' || assignedType === 'chi' || assignedType === 'lsd_long' || assignedType === 'nrc_long' || assignedType === 'nrc_speed1' || assignedType === 'nrc_speed2');
       }
       schedule[w][dayKey] = session;
+      // D106a (V207): on a test pin, remember the run slots dealt in the test week and the week
+      // before, by SLOT (assignedType), never by the card's name. The pin post-pass below puts
+      // the trial in the quality slot and finds the easy run through these records.
+      if(session && type === 'run' && cfg && cfg._racePin && cfg._racePin.test && w >= cfg._racePin.w - 1)
+        (cfg._racePin.slots = cfg._racePin.slots || []).push({w, d: dayKey, t: assignedType});
     }
   });
   // V188 (D14a): race-week pin — the race session moves onto the race weekday, the run
@@ -5928,6 +5960,41 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   const _pin = cfg && cfg._racePin;
   if(_pin && schedule[_pin.w]){
     const wk = schedule[_pin.w];
+    if(_pin.test){
+      // D106a (V207): the test takes the week's HARDEST run, by one hierarchy: the CHI, else the
+      // INT (a three-run block at one or two weeks still deals the INT), else the long LSD (a
+      // multi-sport week deals no quality run), else the only LSD. The long card, never the easy
+      // one: the easy LSD stays free to be the shakeout. Tied to the slot, not the name. The card
+      // is the goal's own trial: distance fixed, the log takes the time, the pace derives. TIME
+      // TRIAL in the subtype is what the finder below moves onto the test weekday.
+      const _sl = _pin.slots || [];
+      const _inW = t => _sl.find(s => s.w === _pin.w && s.t === t);
+      const _lsdW = _sl.filter(s => s.w === _pin.w && s.t === 'lsd_easy');
+      const _q = _inW('chi') || _inW('int') || _inW('lsd_long') || (_lsdW.length === 1 ? _lsdW[0] : null);
+      if(_q && wk[_q.d]){
+        const _g = cardioGoals.run || {}, _pt = paceGoalTarget(_g), _u = _g.paceUnit === 'km' ? 'km' : 'mi';
+        const _raw = parseFloat(_g.targetDist) || 1.5;
+        const _dz = {k:'dist', mi: +_pt.tDist.toFixed(2)}; if(_pt.tPacePerMile) _dz.tgt = Math.round(_pt.tPacePerMile);
+        wk[_q.d] = {type:'run', subtype: _raw + (_u === 'km' ? ' km' : ' Mile') + ' Test — TIME TRIAL',
+          detail: _raw + ' ' + _u + '.' + (_pt.tTotalSecs ? ' Goal ' + _clkMS(_pt.tTotalSecs) + ' (' + _clkMS(_pt.tTotalSecs / _raw) + '/' + _u + ').' : ''),
+          note: 'TEST DAY: Run it like the real thing. Warm up fully. Log your time. It anchors your next block.',
+          week: _pin.w, goalId: wk[_q.d].goalId, dose: _dz, legLoad: true};
+      }
+      // D106a (V207, B4): nothing hard the day before the test or two days out (D38's window,
+      // read across the week boundary like raceEveLiftPass). A hard run there becomes that
+      // week's untagged easy LSD as it was dealt, captured here before the pin moves anything.
+      // A week with no easy LSD rests the day instead.
+      const _ez = {}; _sl.forEach(s => { if(s.t === 'lsd_easy' && s !== _q && !_ez[s.w] && schedule[s.w][s.d]) _ez[s.w] = schedule[s.w][s.d]; });
+      const _fl = []; [_pin.w - 1, _pin.w].forEach(w => { if(schedule[w]) _ISO_ORDER.forEach(d => _fl.push({w, d})); });
+      const _ti = _fl.findIndex(x => x.w === _pin.w && x.d === _pin.race);
+      for(const _k of [1, 2]){
+        const x = _ti - _k >= 0 ? _fl[_ti - _k] : null; if(!x) continue;
+        const _h = _sl.find(r => r.w === x.w && r.d === x.d && (r.t === 'int' || r.t === 'chi') && r !== _q);
+        if(!_h || !schedule[x.w][x.d]) continue;
+        const _e = _ez[x.w];
+        if(_e) schedule[x.w][x.d] = {..._e, dose: _e.dose ? {..._e.dose} : _e.dose}; else delete schedule[x.w][x.d];
+      }
+    }
     // the race session is the run whose subtype says so — wherever the layout put it
     const from = Object.keys(wk).find(d => wk[d] && wk[d].type === 'run' && /RACE DAY|TIME TRIAL/.test(wk[d].subtype||'')) || null;
     if(from && from !== _pin.race){ wk[_pin.race] = wk[from]; delete wk[from]; _pin.from = from; if(!_pin.rest.includes(from)) _pin.rest.push(from); }
@@ -7204,10 +7271,19 @@ function doGenerate(){
   const _previewGoals={...WD.cardioGoals,_experience:WD.experience||'intermediate',_ageBracket:WD.ageBracket||'18-35',_eventTargeted:WD.eventTargeted};
   let totalWeeksPreview=calcProgramLength(WD.cardioTypes||[],_previewGoals,LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks;
 
-  // Program length is goal-driven only. A race date never compresses it — the user
-  // is warned at the race-date step if their date is too soon, but the full program
-  // is always built. The race simply lands on whatever week it falls on.
-  WD._raceDateCappedWeeks = totalWeeksPreview;
+  // D106a (V207): a test goal with a test date ends on the test week. The pin is written
+  // here, once, from the RESOLVED start (the value _applyWizardStart stores below), so
+  // buildProgram stays a pure function of cfg and never sees a date. A test before the
+  // start, or beyond the goal length (D138), pins nothing and the program keeps its goal
+  // length. Race goals align through raceAlignment; run_base has no test. Both pins are
+  // written on every generate, so a pin from an earlier build cannot survive into this one.
+  const _tg = (WD.cardioTypes||[]).includes('run') && WD.cardioGoals && WD.cardioGoals.run;
+  let _testWeek = (_tg && PACE_GOALS.has(_tg.id) && WD.eventTargeted !== false && WD.raceDate)
+    ? testWeekIndex(resolveStartDate(WD.startDate, WD.restDays || []).start, WD.raceDate) : null;
+  if(!(_testWeek >= 1 && _testWeek <= totalWeeksPreview)) _testWeek = null;
+  WD._testWeek = _testWeek;
+  WD._raceDateCappedWeeks = _testWeek || totalWeeksPreview;
+  totalWeeksPreview = WD._raceDateCappedWeeks;   // the screen names the length that builds
   document.getElementById('generateSub').textContent='Building your '+totalWeeksPreview+'-week program...';
   const msgs=['Analyzing your goals...','Building cardio progressions...','Selecting exercises...','Calculating weights...','Assembling '+totalWeeksPreview+' weeks...','Almost done...'];
   let i=0;const sub=document.getElementById('generateSub');
@@ -7427,7 +7503,14 @@ function engineB_cardio(cfg, A){
   // V188 (D14a): the race-week pin is computed here, once, and rides cfg into the cardio
   // engine; buildProgram's day loop reads the same object off cfg._racePin.
   const _align = cardioTypes.includes('run') && cardioGoals.run ? raceAlignment(cardioGoals.run.id, cfg.raceDate, cfg.eventTargeted !== false) : null;
-  const _racePin = (_align && _align.tw === totalWeeks) ? raceWeekPin(_align, trainDays) : null;
+  // D106a (V207): a test goal pinned to its test week (cfg._testWeek, written by doGenerate)
+  // takes the same race-week pin. The test weekday is a function of the test date alone, read
+  // as a local date, so buildProgram stays pure. `test` tells the cardio post-pass to put the
+  // goal's own trial in the week's quality slot.
+  const _tRun = (!_align && cardioTypes.includes('run') && cardioGoals.run && PACE_GOALS.has(cardioGoals.run.id)
+    && cfg._testWeek && cfg._testWeek === totalWeeks) ? _parseLocalDate(cfg.raceDate) : null;
+  const _racePin = (_align && _align.tw === totalWeeks) ? raceWeekPin(_align, trainDays)
+    : _tRun ? Object.assign(raceWeekPin({tw: totalWeeks, raceDay: _ISO_ORDER[(_tRun.getDay() + 6) % 7]}, trainDays), {test: true}) : null;
   if(_racePin) cfg._racePin = _racePin;
   const cardioSchedule=buildCardioProgression(cardioTypes,cardioGoals,trainDays,{...cfg,goal},totalWeeks);
   // Injury reroute runs AFTER the schedule is built: it substitutes sessions in place
@@ -10616,8 +10699,11 @@ function raceEveLiftPass(weeks, totalWeeks){
     const keep = k===2 ? (day.sections||[]).filter(sec => /post-run mobility/i.test(sec.label||'')) : [];
     day.sections = keep;
     day.tags = (day.tags||[]).filter(t => t!=='lift' && t!=='hip' && t!=='core');
-    const _rec = /^recovery run/i.test(day.cardio.subtype||'');
-    day.title = k===0 ? 'Race Day' : (_rec && (ri-k)===lr) ? 'Shakeout' : _rec ? 'Easy Run' : keep.length ? day.title : String(day.cardio.subtype||'Run').split(' — ')[0];
+    // D106a (V207): NSW's easy run is the long slow distance card, so it shakes out too. Run
+    // cards only: a bike or swim LSD on an NRC multi-sport eve keeps its title. A test goal's
+    // marker day is Test Day; NRC keeps Race Day.
+    const _rec = /^recovery run/i.test(day.cardio.subtype||'') || (day.cardio.type === 'run' && /^long slow distance/i.test(day.cardio.subtype||''));
+    day.title = k===0 ? (PACE_GOALS.has(day.cardio.goalId) ? 'Test Day' : 'Race Day') : (_rec && (ri-k)===lr) ? 'Shakeout' : _rec ? 'Easy Run' : keep.length ? day.title : String(day.cardio.subtype||'Run').split(' — ')[0];
   }
 }
 function singletonSupersetSweep(weeks){
@@ -14083,13 +14169,30 @@ function setProgRace(dateStr){
   showToast('Race day '+_fmtStartDay(_al.raceIso)+' \u2014 plan starts '+_fmtStartDay(_al.start)+' \u2713');
   renderWeekView();
 }
+// D106a (V207): a stored program's test week from a given start. The same rules as the
+// writer in doGenerate: a run_pace_goal-family goal with a test date and eventTargeted; the
+// week holding the test, null before the start or past the goal length (D138). Returns the
+// week and the goal length (sized the way buildProgram sizes it), or null for any other program.
+function progTestPin(cfg, startIso){
+  const c = cfg || {}, g = c.cardioGoals && c.cardioGoals.run;
+  if(!(c.cardioTypes||[]).includes('run') || !g || !PACE_GOALS.has(g.id) || c.eventTargeted === false || !c.raceDate) return null;
+  const len = calcProgramLength(c.cardioTypes, {...c.cardioGoals, _experience:c.experience||'intermediate', _ageBracket:c.ageBracket||'18-35', _eventTargeted:c.eventTargeted},
+    LIFTING_FOCUS_TO_GOAL[c.liftingFocus]||c.liftingFocus||'balanced').weeks;
+  const tw = testWeekIndex(startIso, c.raceDate);
+  return {tw: (tw >= 1 && tw <= len) ? tw : null, len};
+}
 function setProgStart(dateStr){
   if(!dateStr||!activeProg) return;
   // V174: same resolver as the wizard, so the D25 guard and the D21 statement hold here too.
   const _r=resolveStartDate(dateStr,(activeProg.cfg&&activeProg.cfg.restDays)||[]);
   activeProg.startDate=_r.start;
+  // D106a (V207): a dated test goal re-pins its test week from the new start. Untrained
+  // weeks re-pin; trained weeks stay frozen (refreshProgram), the same as setProgRace.
+  const _tp=progTestPin(activeProg.cfg,_r.start);
+  if(_tp){ activeProg.cfg._testWeek=_tp.tw; activeProg.cfg._raceDateCappedWeeks=_tp.tw||_tp.len; }
   const programs=getPrograms();const idx=programs.findIndex(p=>p.id===activeProgId);
   if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
+  if(_tp) activeProg=refreshProgram(activeProg);   // untrained weeks re-pin; trained weeks stay frozen
   currentWeek=calcCurrentWeek();
   showToast(_r.snapped ? 'Nothing to train that week — starts '+_fmtStartDay(_r.start)+' ✓' : (_r.partial ? 'Start date set ✓ — short first week' : 'Start date set ✓'));
   renderWeekView();
@@ -15145,6 +15248,21 @@ function refreshProgram(prog){
     if(prog.seed == null) return prog; // truly seedless → leave baked
     prog.cfg.seed = prog.seed;
     try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,seed:prog.seed}; savePrograms(_ps); } }catch(e){}
+  }
+  // D106a (V207): ONE-TIME BACKFILL. A dated test goal stored before V207 has no _testWeek.
+  // Its test week is derived once from the program's own start and persisted, so the key
+  // exists and this never runs again. A test that is past, before the start or beyond the
+  // goal length writes the key null and the stored length stands. Untrained weeks re-pin;
+  // the freeze below keeps every trained day byte-identical.
+  if(prog.cfg._testWeek === undefined){
+    const _tp = progTestPin(prog.cfg, prog.startDate);
+    if(_tp){
+      const _rd = _parseLocalDate(prog.cfg.raceDate), _td = _parseLocalDate(_isoToday());
+      const _tw = (_rd && _td && _rd < _td) ? null : _tp.tw;   // a past test pins nothing
+      prog.cfg._testWeek = _tw;
+      prog.cfg._raceDateCappedWeeks = _tw || prog.cfg._raceDateCappedWeeks || _tp.len;
+      try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,_testWeek:prog.cfg._testWeek,_raceDateCappedWeeks:prog.cfg._raceDateCappedWeeks}; savePrograms(_ps); } }catch(e){}
+    }
   }
   let _swapCut=null;
   // ── D2b (V142): derive the pace-shift map BEFORE the rebuild ──

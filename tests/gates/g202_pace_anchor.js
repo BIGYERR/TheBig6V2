@@ -394,7 +394,7 @@ const PIN = {
 // read at 1.5 miles in log distance. Two independent routes to one pin.
 const PIN_HAND = handRowPaceAt(handRow(495), 1.5);
 const pProg = build(PINNED_CFG), pPP = progression(pProg, PINNED_CFG);
-ok(pProg.totalWeeks === PIN.weeks, `Q1 the pinned PRT TING cfg still sizes to ${PIN.weeks} weeks (got ${pProg.totalWeeks})`);
+ok(pProg.totalWeeks === PIN.weeks, `Q1 the PRT TING cfg with no test pin sizes to its goal length, ${PIN.weeks} weeks (got ${pProg.totalWeeks}); the test-pinned shape is g207_test_week's`);
 ok(Math.abs(pPP.ip - PIN.initial) < 1e-9,
   `Q2 pinned anchor ${PIN.initial.toFixed(4)} s/mi = the 8:15 mile's chart row read at 1.5 mi `
   + `(got ${pPP.ip})`);

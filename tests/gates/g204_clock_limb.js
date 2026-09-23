@@ -434,8 +434,22 @@ ok('C8 the one survivor is the applySeedData mile-anchor site, not a formatter (
 const nextLine = (CENSUS.srcLines[survivor.line] || '').replace(/\s/g, '');
 ok('C8 the survivor carries its own ss===60 correction on the following line' + FIXIT,
    nextLine.indexOf('if(ss===60){mm++;ss=0;}') !== -1, nextLine.slice(0, 110));
-ok('C8 exactly 11 _clkMS call sites and 1 declaration (found ' + CENSUS.clkCalls.length + ' and ' + CENSUS.clkDecls.length + ')' + FIXIT,
-   CENSUS.clkCalls.length === 11 && CENSUS.clkDecls.length === 1,
+// The call-site count is ERA-KEYED (standing ruling 4): the count is a property of the build
+// that shipped it, so a gate row keyed to D126 alone would fire on somebody else's build.
+//   204..206: 11, D126's inventory.
+//   207 on:   13. D106a (V207) adds the NSW test-card detail in index.html (the trial card
+//             built in buildCardioProgression's race-pin post-pass, `detail:` line): the goal
+//             time and its pace, two calls, both through the one owner as D126 requires.
+// A version with no row fails loudly. It never falls back to a neighbouring row.
+const CLK_CALLS_BY_ERA = [
+  { from: 204, to: 206,      calls: 11, why: 'D126 inventory' },
+  { from: 207, to: Infinity, calls: 13, why: 'D106a (V207) test-card detail adds 2' },
+];
+const CLK_ROW = CLK_CALLS_BY_ERA.find(r => +VER >= r.from && +VER <= r.to) || null;
+ok('C8 CLK_CALLS_BY_ERA has a row for ia-version ' + VER + (CLK_ROW ? ' (' + CLK_ROW.why + ')' : ' (NO ROW)') + FIXIT,
+   !!CLK_ROW, 'no row');
+ok('C8 exactly ' + (CLK_ROW ? CLK_ROW.calls : '?') + ' _clkMS call sites and 1 declaration at ia-version ' + VER + ' (found ' + CENSUS.clkCalls.length + ' and ' + CENSUS.clkDecls.length + ')' + FIXIT,
+   !!CLK_ROW && CENSUS.clkCalls.length === CLK_ROW.calls && CENSUS.clkDecls.length === 1,
    CENSUS.clkCalls.map(h => h.line).join(','));
 ok('C8 exactly 2 round-OUTSIDE Math.round(x) % 60 sites, both the known-correct safeTotal pair' + FIXIT,
    CENSUS.roundOutside.length === 2 && CENSUS.roundOutside.every(h => /Math\.round\(safeTotal\)\s*%\s*60/.test(h.text)),

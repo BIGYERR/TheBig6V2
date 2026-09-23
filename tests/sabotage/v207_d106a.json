@@ -1,0 +1,149 @@
+[
+  {
+    "name": "M1 -> testWeekIndex is off by one: the week holding the start is counted as week 0. A Mon 2026-09-21 start with a Mon 2026-10-19 test pins a 4-week program and the test lands one week after the block ends",
+    "anchor": "  return Math.floor(days / 7) + 1;   // week 1 is the week holding the start",
+    "replacement": "  return Math.floor(days / 7);   // week 1 is the week holding the start",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: the hand date table goes red on every non-null row (H1 5->4, H2 4->3, H3 1->0, H6 5->4, H7 5->4, H8 2->1), and the doGenerate rows G1 and G5 store the wrong pin. EXPECTED: H1 H2 H3 H6 H7 H8 G1 G5."
+  },
+  {
+    "name": "M2 -> the second taper formula gets its tw-4 clamp back (V206). Nothing at six weeks or more moves, which is why B6-B11 stay green, but every block under six weeks labels Taper on a long run that never dips: tw5 prints 4.5 mi under a Taper label in week 4",
+    "anchor": "  const taperWeeks = taperWeeksFor(goalId !== 'run_base' && eventTargeted, false, totalWeeks);",
+    "replacement": "  const taperWeeks = (goalId !== 'run_base' && eventTargeted) ? Math.min(Math.max(2, Math.round(totalWeeks * 0.12)), totalWeeks - 4) : 0;",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: the dip rows T1c-T5c go red (tw5 dips [5] against the window [4,5]; tw1-tw4 dip nowhere), the hand series T1a-T5a go red, and T1f/T2f go red because the long run no longer sits below B. T6-T8 and B stay green. EXPECTED: T1a-T5a, T1c-T5c, T1f, T2f."
+  },
+  {
+    "name": "M3 -> the empty-peak guard is removed. At one and two weeks there are no build weeks, Math.max() of nothing is -Infinity, and every LSD card prints '-Infinity mi at Recovery Pace' (the form builder's premise stop measured before the re-ruling)",
+    "anchor": "    const peak = weeks.length ? Math.max(...weeks) : startMiles;",
+    "replacement": "    const peak = Math.max(...weeks);",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: T1f and T2f go red on non-finite cards, T1a and T2a go red on the hand series. tw3 and up still have a build week, so T3-T8 stay green. EXPECTED: T1a, T1f, T2a, T2f (T1c/T2c may also go red)."
+  },
+  {
+    "name": "M4 -> the writer reads the raw wizard start instead of the RESOLVED start. A Sunday start with Sunday rest snaps to the next Monday (D25), so the stored program starts a week after the Monday the pin counted from and the test lands in week 4 of a 5-week block",
+    "anchor": "testWeekIndex(resolveStartDate(WD.startDate, WD.restDays || []).start, WD.raceDate)",
+    "replacement": "testWeekIndex(WD.startDate, WD.raceDate)",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: G5 goes red (stored _testWeek 5 and a 5-week program, want 4 from Mon 2026-09-28). Every Monday-start row agrees with the raw field and stays green, which is what isolates the resolved-start claim to G5. EXPECTED: G5 only."
+  },
+  {
+    "name": "M5 -> the test-week pin becomes a latch: it is written only when there is a test week, so a later undated build on the same wizard draft stores the old pin",
+    "anchor": "  WD._testWeek = _testWeek;",
+    "replacement": "  if(_testWeek) WD._testWeek = _testWeek;",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: G2 goes red (stored _testWeek 5 on an undated 11-week build), and G3, G4, G6, G7 go red the same way. G1 and G5 set the pin and stay green. EXPECTED: G2 G3 G4 G6 G7."
+  },
+  {
+    "name": "M6 -> the helper parses ISO dates with new Date(iso), the UTC trap: 'YYYY-MM-DD' is UTC midnight, which is the evening before in America/New_York, so the start Monday and the test Monday can land in different weeks and an unreadable date returns NaN instead of null",
+    "anchor": "  const s = _parseLocalDate(startIso), t = _parseLocalDate(raceIso);",
+    "replacement": "  const s = new Date(startIso), t = new Date(raceIso);",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: H3 goes red (a Monday start shifts to the previous week, so a same-week Thursday test reads week 2), and H9 goes red (NaN, not null). EXPECTED: H3, H9 at least."
+  },
+  {
+    "name": "M7 (slice B, coach) -> the test pin ignores the entered date and always pins Monday. The fixture's own test is a Monday, so D1-D4 stay green; every other weekday prints the trial on Monday and rests the week after it",
+    "anchor": "raceDay: _ISO_ORDER[(_tRun.getDay() + 6) % 7]",
+    "replacement": "raceDay: 'mon'",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: D5a, D5b, D5c go red (the only trial sits on W5 mon), D7a and D7b go red (Tue is no longer the test day), D8a and D8b go red (the Sunday test lands on Monday). D7c stays green: a Monday pin still rests Wednesday to Sunday. EXPECTED: D5a D5b D5c D7a D7b D8a D8b."
+  },
+  {
+    "name": "M8 (slice B, coach) -> the trial's marker is lowercased. The pin finder reads /RACE DAY|TIME TRIAL/ with no i flag, so it misses the card: the trial is never moved onto the test weekday and stays in the CHI slot, and the case-sensitive subtype check fails everywhere",
+    "anchor": "' Test — TIME TRIAL'",
+    "replacement": "' Test — time trial'",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: D1 and D4 go red (W5 Mon keeps the INT), D3 goes red (the eve pass, which reads the marker with the i flag, now finds the unmoved trial on Thursday, so W4 Sat is no longer T-2), D5a-D5c, D7a and D8a/D8b go red. EXPECTED: D1 D3 D4 D5a D5b D5c D7a D8a D8b."
+  },
+  {
+    "name": "M9 (slice B, coach) -> the eve title regex is reverted to recovery run only. NSW's easy run is a long slow distance card, so the NSW eve reads its subtype instead of Shakeout",
+    "anchor": "    const _rec = /^recovery run/i.test(day.cardio.subtype||'') || (day.cardio.type === 'run' && /^long slow distance/i.test(day.cardio.subtype||''));",
+    "replacement": "    const _rec = /^recovery run/i.test(day.cardio.subtype||'');",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: D3 goes red (W4 Sat is not Shakeout), D7a goes red (the Tuesday test's Monday is not Shakeout). NRC rows stay green. EXPECTED: D3 D7a."
+  },
+  {
+    "name": "M10 (slice B, coach) -> the B4 replacement is removed: a hard run the day before the test or two days out stays where it was dealt",
+    "anchor": "        if(_e) schedule[x.w][x.d] = {..._e, dose: _e.dose ? {..._e.dose} : _e.dose}; else delete schedule[x.w][x.d];",
+    "replacement": "        void _e;",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: D7a and D7b go red (Monday before a Tuesday test holds the INT Taper 3 x 400). The Saturday and Monday tests have nothing hard in the window and stay green. EXPECTED: D7a D7b."
+  },
+  {
+    "name": "M11 (slice B, builder) -> the INT fallback is removed: the trial skips from the CHI straight to the long LSD. A three-run block at one or two weeks still deals the INT, so its test week prints no trial at all and keeps the INT (re-anchored at slice E: the hierarchy line replaced the CHI/INT line it first named)",
+    "anchor": "_inW('chi') || _inW('int') ||",
+    "replacement": "_inW('chi') ||",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: D8a and D8b go red (the three-run tw 1-2 week draws the trial from its long LSD, so the INT survives on Mon and one LSD is lost). Every four-run fixture has a CHI and stays green. EXPECTED: D8a D8b only."
+  },
+  {
+    "name": "M12 (slice B, builder) -> Test Day is keyed on the marker instead of the goal: every TIME TRIAL day is titled Test Day, including the NRC 5K and 10K time trials, which must keep Race Day",
+    "anchor": "(PACE_GOALS.has(day.cardio.goalId) ? 'Test Day' : 'Race Day')",
+    "replacement": "'Test Day'",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: D10 goes red (the NRC 5K time trial reads Test Day) and D9 goes red (HALF_MANNY is a run_half program; its race day is retitled, so the digest moves). NSW rows stay green. EXPECTED: D9 D10."
+  },
+  {
+    "name": "M13 (slice B, builder) -> the eve regex drops the run-card guard (the bare form the brief first named). A bike LSD on an NRC multi-sport eve is retitled Shakeout or Easy Run, which moved 124 of 384 NRC builds when measured",
+    "anchor": "    const _rec = /^recovery run/i.test(day.cardio.subtype||'') || (day.cardio.type === 'run' && /^long slow distance/i.test(day.cardio.subtype||''));",
+    "replacement": "    const _rec = /^(recovery run|long slow distance)/i.test(day.cardio.subtype||'');",
+    "gate": "gates/g207_test_week.js",
+    "note": "NAMED TRIP: D11 goes red (the bike LSD on the NRC 5K + bike eve window is retitled). D12 would also go red with a baseline, but sabotage runs without one. NSW rows stay green. EXPECTED: D11 only."
+  },
+  {
+    "name": "M14 (slice C, coach) -> the backfill predicate is inverted: it runs only on programs that already carry the key, so a stored pre-V207 test goal is never repaired and keeps its 11-week grid with no test week",
+    "anchor": "  if(prog.cfg._testWeek === undefined){",
+    "replacement": "  if(prog.cfg._testWeek !== undefined){",
+    "gate": "gates/g207_test_calendar.js",
+    "note": "NAMED TRIP: C3a (no key, 11 weeks), C3c (no trial on W5 Mon), C3d (key absent after the second refresh), C3g and C3h (no null key written). EXPECTED: C3a C3c C3d C3g C3h."
+  },
+  {
+    "name": "M15 (slice C, coach) -> the backfill runs on every refresh instead of once: the stored start moving a week later re-derives the test week from it",
+    "anchor": "  if(prog.cfg._testWeek === undefined){",
+    "replacement": "  if(true){",
+    "gate": "gates/g207_test_calendar.js",
+    "note": "NAMED TRIP: C3d goes red (the second refresh derives 4 from the moved start; the ruled once-only backfill keeps 5). C3a-C3c, C3e-C3h stay green: a first run is identical. EXPECTED: C3d only."
+  },
+  {
+    "name": "M16 (slice C, coach) -> setProgStart does not re-pin: it still refreshes, but with the old test week, so a start moved a week later leaves the test in the wrong week and the block a week too long",
+    "anchor": "  if(_tp){ activeProg.cfg._testWeek=_tp.tw; activeProg.cfg._raceDateCappedWeeks=_tp.tw||_tp.len; }",
+    "replacement": "  void _tp;",
+    "gate": "gates/g207_test_calendar.js",
+    "note": "NAMED TRIP: C1a goes red (_testWeek 5 and 5 weeks, want 4). C1b stays green (the freeze still holds W1). EXPECTED: C1a only."
+  },
+  {
+    "name": "M17 (slice C, builder) -> the backfill's past rule is removed: a stored program whose test already happened is compressed onto a test week that is behind the athlete",
+    "anchor": "      const _tw = (_rd && _td && _rd < _td) ? null : _tp.tw;   // a past test pins nothing",
+    "replacement": "      const _tw = _tp.tw;",
+    "gate": "gates/g207_test_calendar.js",
+    "note": "NAMED TRIP: C3g goes red (key 5 and 5 weeks, want null and 11). EXPECTED: C3g only."
+  },
+  {
+    "name": "M18 (slice C, builder) -> the wizard sentence is reverted: a test goal inside its goal length is still told its full program stays intact, which slice A made false",
+    "anchor": "  const _tw = (_twz >= 1 && _twz <= recommended) ? _twz : null;",
+    "replacement": "  const _tw = null;",
+    "gate": "gates/g207_test_calendar.js",
+    "note": "NAMED TRIP: C4a and C4b go red, and C4f goes red because the A4 sentence no longer renders. C4c stays green. EXPECTED: C4a C4b C4f."
+  },
+  {
+    "name": "M19 (slice C, builder) -> the red card loses its test-goal branch: a test goal under a week out is told there is not enough time to train, while the program still builds the test week",
+    "anchor": "+(_tg1 ? ' Your test is less than a week away.",
+    "replacement": "+(false ? ' Your test is less than a week away.",
+    "gate": "gates/g207_test_calendar.js",
+    "note": "NAMED TRIP: C4d goes red, and C4f goes red because the red-card sentence no longer renders. C4e stays green. EXPECTED: C4d C4f."
+  },
+  {
+    "name": "M20 (slice E, coach) -> the long-LSD limb is dropped from the trial hierarchy: a multi-sport week with no quality run falls to the only-LSD limb, so a week holding the long card alone prints no trial and a week holding two LSDs draws the easy one",
+    "anchor": "_inW('int') || _inW('lsd_long') ||",
+    "replacement": "_inW('int') ||",
+    "gate": "gates/g207_gk_trial_present.js",
+    "note": "NAMED TRIP: on the single-run multi-sport weeks (rest sun/tue/thu/sat, the long card alone) there is no trial at all, so P1, P2 and P3 go red (9 run+bike and 9 run+swim each); on the two-LSD weeks the easy LSD is drawn and the long card survives, so P4 goes red (18 run+bike, 18 run+swim). Run-only rows stay green. EXPECTED: multi-sport P1 P2 P3 P4 (90 rows)."
+  },
+  {
+    "name": "M21 (slice E, coach) -> the hierarchy picks the easy LSD before the long card: the trial is drawn from the easy run, the long run survives into the test week, and the shakeout loses its source",
+    "anchor": "_inW('int') || _inW('lsd_long') || (_lsdW.length === 1 ? _lsdW[0] : null)",
+    "replacement": "_inW('int') || (_lsdW.length === 1 ? _lsdW[0] : null) || _inW('lsd_long')",
+    "gate": "gates/g207_gk_trial_present.js",
+    "note": "NAMED TRIP: P4 goes red on the two-LSD multi-sport weeks only (a long card survives next to the trial; 9 run+bike, 9 run+swim). Single-run weeks still draw the long card and stay green, which is what separates this from M20. EXPECTED: multi-sport P4 (18 rows)."
+  }
+]

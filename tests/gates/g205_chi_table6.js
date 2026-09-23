@@ -248,7 +248,7 @@ function chiCardsOf(p){
 }
 const mp = IA.buildProgram(Object.assign({}, marioCfg));
 const mCards = chiCardsOf(mp);
-ok('T11a Mario\'s 11-week pace block still builds CHI cards', mp.totalWeeks === 11 && mCards.length > 0, mp.totalWeeks + 'wk, ' + mCards.length + ' cards');
+ok('T11a the goal-length 11-week pace block (no test pin) still builds CHI cards', mp.totalWeeks === 11 && mCards.length > 0, mp.totalWeeks + 'wk, ' + mCards.length + ' cards');
 const bad11 = [];
 let totalMin = 0;
 for(const c of mCards){

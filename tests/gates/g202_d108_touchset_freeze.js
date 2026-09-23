@@ -65,7 +65,12 @@ const CFG = {
   cardioGoals:{run:{id:'run_pace_goal', label:'Hit a Pace / Time Goal',
     targetDist:'1.5', paceUnit:'mi', targetMins:'10', targetSecs:'30', targetTime:'10:30',
     mileBestMins:'8', mileBestSecs:'15', mileBestSrc:{kind:'entered'},
-    baselineDist:'3', baseline:'3mi'}}
+    baselineDist:'3', baseline:'3mi'}},
+  // D106a (V207, ruled literal): the fixture is the 11-week program as stored with no test week.
+  // With the key present, the one-time test-week backfill in refreshProgram does not fire, so
+  // this gate never compresses the fixture onto its race date from a start of "today" (an
+  // outcome that would depend on the date the gate runs). The D108 claim is unchanged.
+  _testWeek:null, _raceDateCappedWeeks:11
 };
 
 const W      = 4;        // a FUTURE week: start date is this week, so _curWk === 1
