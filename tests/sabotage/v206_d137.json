@@ -1,0 +1,30 @@
+[
+  {
+    "name": "M1 -> the cap goes to the WEEK argument instead of the row reader: run_base calls getCHI with Math.min(week, 12). Weeks 13 and on now sit on the cutback clock's week 12, so every one of them prints week 12's cutback dose (14) instead of holding the 20 minute row. This is the form measure found wrong on 70/1,836 before the ruling",
+    "anchor": "  let chi = getCHI(week, tw, isMilGoal, _qph && _qph.chiFrom, _qph && _qph.chiTo, goalId === 'run_base' ? 12 : 0);",
+    "replacement": "  let chi = getCHI(goalId === 'run_base' ? Math.min(week, 12) : week, tw, isMilGoal, _qph && _qph.chiFrom, _qph && _qph.chiTo, 0);",
+    "gate": "gates/g206_d137_runbase_chi.js",
+    "note": "NAMED TRIP: S1c and S1d go red (weeks 13-15 read 14 14 8 evented, 14 14 14 without an event). S3 goes red naming 'the week argument was clamped'. S2c goes red because the call site no longer carries the row cap literal. EXPECTED: S1c, S1d, S2c, S3."
+  },
+  {
+    "name": "M2 -> the row reader drops the cap. The signature still takes _rowCap and the call site still passes 12, so every source-level check of the call site is satisfied, but getCHI reads Table 6 by the raw week. run_base falls back to V205: weeks 13-15 print the two-piece rows' per-piece 12 minutes as one continuous piece",
+    "anchor": "  const at = w => chiFromTable6(_rowCap ? Math.min(w, _rowCap) : w);",
+    "replacement": "  const at = w => chiFromTable6(w);",
+    "gate": "gates/g206_d137_runbase_chi.js",
+    "note": "NAMED TRIP: S1c and S1d go red (weeks 13-15 read 12 12 8 evented, 12 12 12 without an event). S3 goes red naming 'per-piece minutes printed as one continuous piece (V205)'. S2c stays green: the call-site literal is untouched, which is what separates this mutation from M1. EXPECTED: S1c, S1d, S3."
+  },
+  {
+    "name": "M3 -> the cap leaks off run_base: every run goal passes 12. PRT TING is 11 weeks and never reaches the capped rows, so a pace control built on it alone would pass. A pace goal with bike_50 runs 14 weeks, and its weeks 13-14 now print 20 minutes continuous instead of Table 6's 2 x 12",
+    "anchor": "goalId === 'run_base' ? 12 : 0);",
+    "replacement": "12);",
+    "gate": "gates/g206_d137_runbase_chi.js",
+    "note": "NAMED TRIP: S4c goes red (weeks 13-14 read 20 20, want 2x12 2x12). S2c goes red because the goal-scoped literal is gone. Every run_base row stays green, because run_base still reads a cap of 12. EXPECTED: S2c, S4c."
+  },
+  {
+    "name": "M4 -> the cap literal drifts from 12 to 11. Table 6 rows 11 and 12 both read 20, so every card the athlete sees is byte-identical: the cutback at week 12 still reads 20*0.7=14 and weeks 13 on still hold 20. Only the doctrine derivation can see it: the last single-piece row is 12, not 11. This is the mutation that proves S2c is the only defender of the literal",
+    "anchor": "goalId === 'run_base' ? 12 : 0);",
+    "replacement": "goalId === 'run_base' ? 11 : 0);",
+    "gate": "gates/g206_d137_runbase_chi.js",
+    "note": "NAMED TRIP: S2c goes red (literal 11, doctrine-derived cap 12). S1, S3 and S4 stay green because the printed dose does not move. EXPECTED: S2c only."
+  }
+]

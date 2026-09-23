@@ -1,0 +1,224 @@
+@@ 1
+20 min at a steady RPE 6 out of 10 — comfortably hard, a short sentence between breaths. This is the SAME run you did in week 1. Hold the effort dead even from first minute to last — no surging, no fading. Log the distance you covered.
+--
+20 min at a steady RPE 6 out of 10. Comfortably hard, a short sentence between breaths. This is the SAME run you did in week 1. Hold the effort dead even from first minute to last. No surging, no fading. Log the distance you covered.
+@@ 1
+20 min at a steady RPE 6 out of 10 — comfortably hard, a short sentence between breaths. Hold the effort dead even from first minute to last — no surging, no fading. Log the distance you covered.
+--
+20 min at a steady RPE 6 out of 10. Comfortably hard, a short sentence between breaths. Hold the effort dead even from first minute to last. No surging, no fading. Log the distance you covered.
+@@ 1
+No pace is prescribed on purpose — the pace is the measurement.
+--
+No pace is prescribed on purpose. The pace is the measurement.
+@@ 1
+the distance difference is your fitness gain — measured, not promised. No pace is prescribed on purpose: run by effort and let the distance tell the story.
+--
+the distance difference is your fitness gain. Measured, not promised. No pace is prescribed on purpose. Run by effort and let the distance tell the story.
+@@ 2
+' min easy — conversational (RPE 3-4 out of 10). Around '
+--
+' min easy and conversational (RPE 3-4 out of 10). Around '
+@@ 2
+' is right for you — do not run faster than '
+--
+' is right for you. Do not run faster than '
+@@ 1
+'. This is the longest run of your week — time on feet is the goal. Log the distance you covered.'
+--
+'. This is the longest run of your week. Time on feet is the goal. Log the distance you covered.'
+@@ 2
+EASY RUN: The aerobic engine builds at conversational effort — time in the zone is the dose, not miles and not speed.
+--
+EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed.
+@@ 2
+so the training absorbs. Same effort — do not add minutes.
+--
+so the training absorbs. Same effort. Do not add minutes.
+@@ 2
+' mi — Recovery Pace: '
+--
+' mi at Recovery Pace: '
+@@ 1
+' Taper week — distance reduced intentionally.'
+--
+' Taper week. Distance reduced intentionally.'
+@@ 1
+Finish with 4 x 20 sec strides — fast but relaxed, about 90% speed
+--
+Finish with 4 x 20 sec strides. Fast but relaxed, about 90% speed
+@@ 1
+This is your recovery run — not a tempo, not a push.
+--
+This is your recovery run. Not a tempo, not a push.
+@@ 1
+These runs feel almost too easy — that is correct.
+--
+These runs feel almost too easy. That is correct.
+@@ 1
+Show up to the start line fresh — not tired from one last big effort.
+--
+Show up to the start line fresh, not tired from one last big effort.
+@@ 1
+LSD: The foundation of endurance. Go easy — the aerobic engine builds here, not in the fast runs.
+--
+LSD: The foundation of endurance. Go easy. The aerobic engine builds here, not in the fast runs.
+@@ 1
+(RPE 6 out of 10). Comfortably hard — you can speak a short sentence between breaths. This is aerobic-threshold work, not a sprint.
+--
+(RPE 6 out of 10). Comfortably hard. You can speak a short sentence between breaths. This is aerobic threshold work, not a sprint.
+@@ 1
+Hard but controlled — labored breathing, short phrases only.
+--
+Hard but controlled. Labored breathing, short phrases only.
+@@ 1
+min easy jog between reps. Keep moving — do not stop.
+--
+min easy jog between reps. Keep moving. Do not stop.
+@@ 2
+CHI — Continuous High Intensity: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace.
+--
+CHI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace.
+@@ 1
+INT — Interval: Pace moves ${pp._weeklyGain} seconds per mile each week.
+--
+INT: Pace moves ${pp._weeklyGain} seconds per mile each week.
+@@ 4
+INT — Interval: Zone 5 (95%+ max HR) on work efforts.
+--
+INT: Zone 5 (95%+ max HR) on work efforts.
+@@ 1
+${_raceName} time trial — ${L.val} miles at race effort.
+--
+${_raceName} time trial. ${L.val} miles at race effort.
+@@ 1
+Log the time — it is the honest measure of the last 8 weeks
+--
+Log the time. It is the honest measure of the last 8 weeks
+@@ 1
+${L.val} miles — ${_raceName} race day.
+--
+${L.val} miles. ${_raceName} race day.
+@@ 1
+run as a progression — start slower than Recovery Pace
+--
+run as a progression. Start slower than Recovery Pace
+@@ 1
+Pace stays the progression — this rehearses the routine, not the race.
+--
+Pace stays the progression. This rehearses the routine, not the race.
+@@ 1
+Consolidate the last jump before the build resumes — do not add.
+--
+Consolidate the last jump before the build resumes. Do not add.
+@@ 1
+absorbs the prior weeks of load — you come back stronger, not more tired.
+--
+absorbs the prior weeks of load. You come back stronger, not more tired.
+@@ 1
+Run it easy and patient — time on feet is the goal, not speed.
+--
+Run it easy and patient. Time on feet is the goal, not speed.
+@@ 1
+Resist adding miles — the work is done. Arrive at the start line fresh.
+--
+Resist adding miles. The work is done. Arrive at the start line fresh.
+@@ 1
+Each pace is the middle of a range — slightly faster or slower is fine, you are not a robot.
+--
+Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot.
+@@ 1
+TEMPO: A hard but controlled pace — "comfortably uncomfortable."
+--
+TEMPO: A hard but controlled pace, "comfortably uncomfortable."
+@@ 1
+Effort-based, not pace-based — uphills feel harder at the same pace.
+--
+Go by effort, not pace. Uphills feel harder at the same pace.
+@@ 1
+ Best Pace is your call — the pace where you feel at your best; at the top of a ladder that means faster than Mile.
+--
+ Best Pace is your call. It is the pace where you feel at your best. At the top of a ladder that means faster than Mile.
+@@ 1
+${_pick.label} recovery run — ${_mi} mi at Recovery Pace (${paces.recovery}). 4–5/10 effort — easy enough to talk, laugh, or argue freely.
+--
+${_pick.label} recovery run. ${_mi} mi at Recovery Pace (${paces.recovery}). 4–5/10 effort, easy enough to talk, laugh, or argue freely.
+@@ 1
+${recMin}-minute recovery run at Recovery Pace (${paces.recovery}). 4–5/10 effort — easy enough to talk, laugh, or argue freely.
+--
+${recMin} min recovery run at Recovery Pace (${paces.recovery}). 4–5/10 effort, easy enough to talk, laugh, or argue freely.
+@@ 1
+min easy spin, low-to-moderate resistance. Zone 1–2, light and smooth. This is recovery — keep the legs fresh for lifting, do not chase intensity.
+--
+min easy spin, low to moderate resistance. Zone 1–2, light and smooth. This is recovery. Keep the legs fresh for lifting, do not chase intensity.
+@@ 1
+Eat and drink on the bike from 60 min onward — 40–60g carbs and one bottle per hour.
+--
+Eat and drink on the bike from 60 min onward: 40–60g carbs and one bottle per hour.
+@@ 1
+Fitness is already banked — the only thing left to gain is freshness.
+--
+Fitness is already banked. The only thing left to gain is freshness.
+@@ 1
+Zone 2 the whole way — going harder here costs you next week. Time in the saddle, fueling practice, and contact-point tolerance are the adaptations
+--
+Zone 2 the whole way. Going harder here costs you next week. Time in the saddle, fueling practice, and contact point tolerance are the adaptations
+@@ 1
+LSD — Long Slow Distance: Zone 2 (60-70% max HR). Easy, conversational pace.
+--
+LSD: Zone 2 (60-70% max HR). Easy, conversational pace.
+@@ 1
+min easy spin between reps. Keep pedaling — do not stop.
+--
+min easy spin between reps. Keep pedaling. Do not stop.
+@@ 1
+CHI — Continuous High Intensity: Zone 3-4 (85-95% max HR). High resistance, sustained hard effort.
+--
+CHI: Zone 3-4 (85-95% max HR). High resistance, sustained hard effort.
+@@ 1
+INT: Max effort on work intervals — legs should burn.
+--
+INT: Max effort on work intervals. Legs should burn.
+@@ 1
+' yards easy — relaxed stroke, focus on technique and breathing.
+--
+' yards easy. Relaxed stroke, focus on technique and breathing.
+@@ 1
+Keep it short and smooth — your pressing and pulling lifts come first.
+--
+Keep it short and smooth. Your pressing and pulling lifts come first.
+@@ 1
+' yards continuous — easy stroke, comfortable breathing. Zone 2 effort. Brief wall rest allowed — keep it short.'
+--
+' yards continuous. Easy stroke, comfortable breathing. Zone 2 effort. Brief wall rest allowed. Keep it short.'
+@@ 2
+' Taper week — yardage cut on purpose. The work is done, resist adding laps.'
+--
+' Taper week. Yardage cut on purpose. The work is done, resist adding laps.'
+@@ 1
+LSD — Long Slow Distance: Zone 2. Easy, relaxed stroke.
+--
+LSD: Zone 2. Easy, relaxed stroke.
+@@ 1
+CHI — Continuous High Intensity: Zone 3-4. Hard sustained effort in the water — breathing labored, push the pace.
+--
+CHI: Zone 3-4. Hard sustained effort in the water. Breathing labored, push the pace.
+@@ 1
+(week ${week} target — slightly faster than this week's goal split of ${fmt(weekPace)}/100)
+--
+(week ${week} target, slightly faster than this week's goal split of ${fmt(weekPace)}/100)
+@@ 1
+INT — Interval: Split capped at +${swimPace._weeklyGain}s/100/week (safe progression limit). Full goal of ${fmt(swimPace._originalTarget)}/100 needs more time — realistic target for this block is
+--
+INT: Split capped at +${swimPace._weeklyGain}s/100/week (safe progression limit). Full goal of ${fmt(swimPace._originalTarget)}/100 needs more time. The realistic target for this block is
+@@ 1
+INT — Interval: 100 repeats at your target split. Start at 4, build to 10 — hard cap at 10.
+--
+INT: 100 repeats at your target split. Start at 4, build to 10. Hard cap at 10.
+@@ 1
+INT: 100 yard repeats. Start at 4, build to 10 — hard cap at 10.
+--
+INT: 100 yard repeats. Start at 4, build to 10. Hard cap at 10.
+@@ 1
+{n:'catch-up drill', c:'Slow and deliberate. Full extension before the pull.'}
+--
+{n:'catch up drill', c:'Slow and deliberate. Full extension before the pull.'}

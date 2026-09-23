@@ -440,10 +440,10 @@ ok(d6n > 0 && d6bad.length === 0,
 //   * a build whose weeks are neither uniformly four-run nor uniformly three-run is NOT
 //     skipped. It is a named miss, so an unclassified shape cannot pass quietly.
 //
-// THE THREE-RUN ARM IS A LICENCE, AND IT REFUSES ABOVE ia-version 205.
+// THE THREE-RUN ARM IS A LICENCE, AND IT REFUSES ABOVE ia-version 206 (renewed from 205 by D142).
 // D113 and D122 have already ruled the crossover RETIRED on the pace family, and slice 7c
 // which retires it is PARKED. So the three-run arm below pins THE ARTIFACT AS SHIPPED,
-// NOT THE DOCTRINE AS RULED. It is keyed on 205, a number that exists today, and the
+// NOT THE DOCTRINE AS RULED. It is keyed on 206, a number that exists today, and the
 // build that ships D113/D122 must re-pin it as "one INT and one CHI every week at three
 // runs" or fail here by name. It does not expire quietly and it does not expire never.
 //
@@ -459,20 +459,20 @@ const INT_MECHANISM_BY_VERSION = [
     // four weeks and diverge at week 5. D7c below asserts that divergence out loud so
     // this sentence cannot rot into decoration.
     note: 'V115 position ramp over intSpan; six cards; NOT Table 6' },
-  { upTo: 205, arm: 'four-run', reps: 'table6',
+  { upTo: 206, arm: 'four-run', reps: 'table6',
     // ELEVEN cards on the same cfg: the INT slot is weekly, and Table 6 is read on the
     // CALENDAR week, through the cutback branch at weeks 4 and 8 and the taper branch at
     // weeks 10 and 11. That is the second mechanism.
     //
     // The THIRD mechanism is the three-run arm as it still stands on this same artifact:
     // where a pace build still lands on three run days the card count is still the V115
-    // crossover's cross - 1, and that arm is LICENSED TO 205 and no further.
+    // crossover's cross - 1, and that arm is LICENSED TO 206 and no further (D142 renewal).
     note: 'Table 6 on the calendar week through the cutback and taper branches; the '
-        + 'three-run arm still runs the V115 crossover and is licensed to 205' }
+        + 'three-run arm still runs the V115 crossover and is licensed to 206' }
 ];
 const IAV = +IA.version;
 const INT_ERA = INT_MECHANISM_BY_VERSION.filter(r => IAV <= r.upTo)[0] || null;
-const THREE_RUN_LICENCE_TO = 205;
+const THREE_RUN_LICENCE_TO = 206; // V206 renewal (D142): D113 parked by Mario at V205, routed through the spacing chooser this session, not in V206. Renew by one per build until D113 ships.
 if(IAV > THREE_RUN_LICENCE_TO){
   FAIL++;
   console.log('  FAIL D7-LICENCE the three-run INT card rule in this file pins cross - 1 cards, which is '
@@ -698,15 +698,39 @@ ok(!(chi10 && chi10.dose && chi10.dose.rec) && !(lsd1 && lsd1.dose && lsd1.dose.
 // one replacement string and ruled that the four sites be replaced AS A SET, so the edit is
 // provably complete rather than four anchors that drift. The oracle here is that ruled
 // string, typed, plus REPS_CEILING, typed above from A.
-const RULED_INT_NOTE = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All out on each rep. '
+//
+// V206 (D109, amended, coach-ruled) re-rules the HEAD of this sentence only. The "INT — Interval:"
+// label dash is IN the copy rule from V206 on, so the head reads "INT:" (coach's replacement
+// table, tests/measure/v206_d109_table.txt entry 22, typed below). The tail is D9's and does not
+// move. ERA ROWS, keyed on ia-version (standing rulings 2 and 4): the V202 head holds on
+// 202..205 and REFUSES above 205, the D109 head holds from 206, and an artifact no row covers
+// fails loudly. Each row also asserts the OTHER era's head is absent from source, so a meta
+// number that disagrees with the copy it ships is a named failure, never a quiet pass.
+const RULED_INT_TAIL = ' All out on each rep. '
   + 'Take the full recovery. Build from 4 reps to ' + REPS_CEILING + '. Hard cap at ' + REPS_CEILING + '. '
   + 'Quality over quantity. If pace drops, stop.';
+const INT_NOTE_BY_VERSION = [
+  { from: 202, to: 205, ruling: 'D9 (V202)', head: 'INT — Interval: Zone 5 (95%+ max HR) on work efforts.',
+    label: /^INT — Interval:/ },                         // the structural label was exempt
+  { from: 206, to: Infinity, ruling: 'D109 (V206)', head: 'INT: Zone 5 (95%+ max HR) on work efforts.',
+    label: null },                                       // D109: no label exemption
+];
+const D9_ERA = INT_NOTE_BY_VERSION.filter(r => IAV >= r.from && IAV <= r.to)[0] || null;
+if(!D9_ERA){
+  FAIL++;
+  console.log(`  FAIL D9-ERA no INT_NOTE_BY_VERSION row covers ia-version ${IAV}: the generic INT note has `
+    + `no ruled text at this version, so D9, D9b, D9c and D9d below cannot mean anything`);
+}
+const RULED_INT_NOTE = D9_ERA ? D9_ERA.head + RULED_INT_TAIL : '';
 const SRC = fs.readFileSync(ART, 'utf8');
-const srcNew = SRC.split(RULED_INT_NOTE).length - 1;
+const srcNew = RULED_INT_NOTE ? SRC.split(RULED_INT_NOTE).length - 1 : 0;
 const srcOld = SRC.split('Build from 4 reps to 10').length - 1;
-ok(srcNew === 4 && srcOld === 0,
-  `D9 all four copies of the generic INT note read coach's ruled sentence and none still claims a `
-  + `cap of 10 (found ${srcNew} ruled, ${srcOld} legacy). Replaced as a SET, so completeness is provable`);
+const srcOther = INT_NOTE_BY_VERSION.filter(r => r !== D9_ERA)
+  .reduce((n, r) => n + SRC.split(r.head + RULED_INT_TAIL).length - 1, 0);
+ok(!!D9_ERA && srcNew === 4 && srcOld === 0 && srcOther === 0,
+  `D9 all four copies of the generic INT note read coach's ruled sentence for ia-version ${IAV} `
+  + `(${D9_ERA ? D9_ERA.ruling : 'NO ERA ROW'}) and none still claims a cap of 10 (found ${srcNew} ruled, `
+  + `${srcOld} legacy, ${srcOther} in another era's form). Replaced as a SET, so completeness is provable`);
 
 function notesOf(cfg){
   const p = IA.buildProgram(JSON.parse(JSON.stringify(cfg)));
@@ -729,9 +753,14 @@ ok(gNotes.length > 0 && gNotes.every(n => n.note === RULED_INT_NOTE),
   `D9b the generic note as RENDERED equals the ruled string verbatim on ${gNotes.length} INT cards `
   + `(a source match alone would pass on a string nothing reaches)`
   + (gNotes.length && gNotes[0].note !== RULED_INT_NOTE ? ` — got |${gNotes[0].note}|` : ''));
-ok(gNotes.length > 0 && !MID_DASH.test(gNotes[0].note.replace(/^INT — Interval:/, '')),
-  `D9c the ruled note carries no mid-sentence dash once the structural "INT — Interval:" label is `
-  + `removed: four sentences, no em-dash, Mario's copy rule`);
+const d9cText = gNotes.length && D9_ERA
+  ? (D9_ERA.label ? gNotes[0].note.replace(D9_ERA.label, '') : gNotes[0].note) : '';
+ok(gNotes.length > 0 && !!D9_ERA && !MID_DASH.test(d9cText) && (!!D9_ERA.label || d9cText.indexOf('—') < 0),
+  D9_ERA && !D9_ERA.label
+    ? `D9c the ruled note carries no dash at all: D109 (V206) ruled the label dash IN, so there is no `
+      + `structural exemption to strip (audited |${d9cText.slice(0, 40)}|)`
+    : `D9c the ruled note carries no mid-sentence dash once the structural "INT — Interval:" label is `
+      + `removed: four sentences, no em-dash, Mario's copy rule`);
 // the number the athlete is told and the number the engine will actually prescribe
 const latMaxReps = LAT.reduce((mx, cfg) => Math.max(mx, ints(IA.buildProgram(JSON.parse(JSON.stringify(cfg))))
   .reduce((m, r) => Math.max(m, (r.dose && r.dose.reps) || 0), 0)), 0);

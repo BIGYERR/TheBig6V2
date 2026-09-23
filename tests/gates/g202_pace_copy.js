@@ -36,9 +36,12 @@ function ok(cond, msg){ if(cond){ PASS++; console.log('  ok   ' + msg); } else {
 // ── the copy rule, as a predicate ────────────────────────────────────────────
 const MID_DASH = /\s[—–-]\s/g;                       // hyphen, en dash, em dash, space-flanked
 const LABEL_PREFIX = /^[A-Z]{3} — [A-Z][a-z]/;       // "INT — Interval:", "CHI — Continuous ..."
+// The exemption is an ERA, not a constant. V206 (D109, amended, coach-ruled) put the label dash
+// IN the copy rule: "INT — Interval:" becomes "INT:" and "CHI — Continuous High Intensity:"
+// becomes "CHI:". From ia-version 206 no label is exempt and every space-flanked dash counts.
 function dashAudit(s){
   const t = String(s || '');
-  const pfx = LABEL_PREFIX.test(t) ? 1 : 0;
+  const pfx = (COPY_ERA && COPY_ERA.labelExempt && LABEL_PREFIX.test(t)) ? 1 : 0;
   const hits = t.match(MID_DASH) || [];
   return { prefix: pfx, mid: hits.length - pfx, text: t };
 }
@@ -58,8 +61,23 @@ const HAND_REACH  = +(HAND_ANCHOR - HAND_GAIN * 9).toFixed(1);             // 46
                                                         // D101 realistic target, pinned by g202_pace_anchor Q5
 
 // ── coach's ruled strings, VERBATIM ──────────────────────────────────────────
-const RULED_NOTE =
-  `INT — Interval: Pace moves ${HAND_GAIN} seconds per mile each week. That is the safe rate for your `
+// ERA ROWS, keyed on ia-version (standing rulings 2 and 4). E4's sentence body is V202's and does
+// not move. D109 (V206) re-rules its HEAD only, from "INT — Interval: " to "INT: " (coach's table,
+// tests/measure/v206_d109_table.txt entry 21, typed below), and retires the label exemption. The
+// V202 row holds on 202..205 and REFUSES above 205. An artifact no row covers fails loudly.
+const PACE_NOTE_BY_VERSION = [
+  { from: 202, to: 205,      ruling: 'E4 (V202)',   head: 'INT — Interval: ', labelExempt: true  },
+  { from: 206, to: Infinity, ruling: 'D109 (V206)', head: 'INT: ',            labelExempt: false },
+];
+const IAV = +IA.version;
+const COPY_ERA = PACE_NOTE_BY_VERSION.filter(r => IAV >= r.from && IAV <= r.to)[0] || null;
+if(!COPY_ERA){
+  FAIL++;
+  console.log(`  FAIL C-ERA no PACE_NOTE_BY_VERSION row covers ia-version ${IAV}: the dampened note has no `
+    + `ruled text at this version, so C1 and C3 below cannot mean anything`);
+}
+const RULED_NOTE = (COPY_ERA ? COPY_ERA.head : 'NO ERA ROW ')
+  + `Pace moves ${HAND_GAIN} seconds per mile each week. That is the safe rate for your `
   + `experience and age. Your full goal of ${clock(HAND_GOAL)}/mi needs more weeks than this block has. `
   + `The target for this block is ${clock(HAND_REACH)}/mi. Hit the prescribed pace precisely.`;
 const RULED_PACE_TAIL  = ' Week 1 runs off this row. Every week after it moves toward your goal.';
@@ -110,15 +128,23 @@ ok(damp.length > 0 && !damp.some(n => /physiolog/i.test(n.note)),
 // mid-sentence em-dashes at this version; no ruling has replacement text for them, so gating them
 // here would fail on unruled ground. They are PRINTED as a standing debt line instead, so the
 // number is visible and cannot quietly grow.
-const dampBad = damp.map(n => ({ n, a: dashAudit(n.note) })).filter(x => x.a.mid > 0);
-ok(damp.length > 0 && dampBad.length === 0,
-  `C3 the E4 note carries no mid-sentence dash; its one dash is the exempt "INT — Interval:" `
-  + `structural prefix (${damp.length} notes audited, ${damp.filter(n=>dashAudit(n.note).prefix).length} prefixed)`
+const noExempt = !!COPY_ERA && !COPY_ERA.labelExempt;
+const dampBad = damp.map(n => ({ n, a: dashAudit(n.note) }))
+  .filter(x => x.a.mid > 0 || (noExempt && x.n.note.indexOf('—') >= 0));
+ok(!!COPY_ERA && damp.length > 0 && dampBad.length === 0,
+  (noExempt
+    ? `C3 the E4 note carries no dash at all: D109 (V206) ruled the "INT — Interval:" label dash IN, so `
+      + `the V202 structural exemption no longer applies (${damp.length} notes audited)`
+    : `C3 the E4 note carries no mid-sentence dash; its one dash is the exempt "INT — Interval:" `
+      + `structural prefix (${damp.length} notes audited, ${damp.filter(n=>dashAudit(n.note).prefix).length} prefixed)`)
   + (dampBad.length ? ` — W${dampBad[0].n.w}: |${dampBad[0].n.note}|` : ''));
 const debt = notes.filter(n => dashAudit(n.note).mid > 0);
 const debtKinds = Array.from(new Set(debt.map(n => String(n.st).replace(/\s*\(.*/, ''))));
-console.log(`  note  UNRULED COPY DEBT: ${debt.length} of ${notes.length} run notes on this program still `
-  + `carry a mid-sentence dash (${debtKinds.join(', ') || 'none'}). No ruling covers them; not gated.`);
+console.log(noExempt
+  ? `  note  COPY DEBT: ${debt.length} of ${notes.length} run notes on this program still carry a `
+    + `space-flanked dash (${debtKinds.join(', ') || 'none'}). D109 rules them; g206_d109_copy.js gates them.`
+  : `  note  UNRULED COPY DEBT: ${debt.length} of ${notes.length} run notes on this program still `
+    + `carry a mid-sentence dash (${debtKinds.join(', ') || 'none'}). No ruling covers them; not gated.`);
 
 // ── E5: the anchor sentence, both goal classes ───────────────────────────────
 const pv = say(PINNED);

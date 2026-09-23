@@ -15,10 +15,10 @@
   },
   {
     "name": "M3 -> the run reader goes back to re-basing on the CHI phase window: instead of indexing Table 6 by the calendar week it indexes by the week's position inside phaseFrom..phaseTo, rescaled onto 1..26. Every value still comes out of Table 6, so no invented number appears anywhere and the ceiling still holds. Only WHICH row a given week reads is wrong, which is the V115 behaviour D128 replaced",
-    "anchor": "  const at = w => chiFromTable6(w);",
+    "anchor": "  const at = w => chiFromTable6(_rowCap ? Math.min(w, _rowCap) : w);",
     "replacement": "  const _pF = phaseFrom || 1, _pT = Math.max(_pF+1, phaseTo || totalWeeks || 6);\n  const at = w => chiFromTable6(1 + Math.round(Math.max(0, Math.min(1, (w - _pF) / Math.max(_pT - _pF, 1))) * 25));",
     "gate": "gates/g205_chi_table6.js",
-    "note": "NAMED TRIP: T5 goes red on every phase window that is not [1, tw], naming tw/wk/phase triples where the returned row is not row `week`. T11b goes red because Mario's CHI phase runs weeks 7-11 and the cards no longer print 18/13/19/19/20. T11c goes red on the 89-minute total. T7 goes red because the rescale reaches row 26 early. EXPECTED: T5, T7, T11b, T11c."
+    "note": "NAMED TRIP: T5 goes red on every phase window that is not [1, tw], naming tw/wk/phase triples where the returned row is not row `week`. T11b goes red because Mario's CHI phase runs weeks 7-11 and the cards no longer print 18/13/19/19/20. T11c goes red on the 89-minute total. T7 goes red because the rescale reaches row 26 early. EXPECTED: T5, T7, T11b, T11c. V206 UPKEEP (D137, not a change to D128): the anchor is re-sited on the D137 reader line (_rowCap ? Math.min(w, _rowCap) : w). The replacement is unchanged, so the mutant still puts back the V115 phase-window rescale D128 removed, and the named trips are the same."
   },
   {
     "name": "M4 -> the fork by caller collapses: the bike caller is re-pointed at getCHI, so cycling starts reading a run/swim table neither guide applies to it. getCHIBike still exists, still carries its D128 comment, and still returns the V115 ramp when called directly, so any gate that tested the FUNCTION rather than the CALLER stays green",

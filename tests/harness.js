@@ -249,6 +249,15 @@ MANNY_DIGEST_BY_VERSION[204] = MANNY_DIGEST_BY_VERSION[203];   // D126: ruled UN
 // V205 ruling touches an NRC pool, draw, dose or card. D113 was pulled from this
 // version by Mario and ships on its own, so nothing it would have moved is here.
 MANNY_DIGEST_BY_VERSION[205] = MANNY_DIGEST_BY_VERSION[204];   // V205: ruled UNMOVED
+// V206: ruled MOVE, and written as a LITERAL for that reason. D109 (amended) sweeps the
+// mid-sentence dashes out of the four cardio builders' athlete copy, and HALF_MANNY is an
+// NRC half-marathon fixture whose recovery, long-run and easy cards print that copy. Copy
+// only, 53/98 days text-only: no pool, draw, dose or lift moves. D137 is scoped to run_base
+// and does not reach this fixture. The counterfactual anchor was printed by coach from a
+// source-surgery copy of V205 carrying the whole D109 table plus D137
+// (tests/measure/v206_d109_d137_surgery.js) BEFORE this build, with every changed card
+// printed before and after. It is not a digest read back off the artifact.
+MANNY_DIGEST_BY_VERSION[206] = '0ac7da6b1691a8e1';   // D109: the ruled digest move (copy only, 53/98 days text-only)
 
 const MANNY_DELOAD_OFF_DIGEST_BY_VERSION = {
   199: '75ae3d256b642a9d',
@@ -271,6 +280,15 @@ MANNY_DELOAD_OFF_DIGEST_BY_VERSION[204] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[203
 // V205: ruled UNMOVED, so a REFERENCE row. The deload-off variant is the same NRC
 // fixture with the deload pre-pass disabled; V205 moves nothing either arm draws from.
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[205] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[204];   // V205: ruled UNMOVED
+// V206: ruled MOVE for the same reason, so a LITERAL row. The deload-off variant is the
+// same NRC fixture with the deload pre-pass disabled; D109 rewrites the copy on the cardio
+// cards it prints on both arms. Counterfactual anchor, printed by coach from the same
+// pre-build source-surgery copy (tests/measure/v206_d109_d137_surgery.js) with g199's own
+// method (A_PIPE -> A_PIPE_R instrument, __DELOAD_OFF=true, progDigest of HALF_MANNY),
+// reproducing the V205 row 8fe23ae9eadde78c on the same run
+// (tests/measure/v206_manny_deload_off.js). Coach's first literal, fd8b9ebe4264b8b4, came
+// from a cfg-field counterfactual rather than this row's method, and was re-ruled.
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[206] = '1069cd7f86eed204';   // D109: the ruled digest move
 
 // D120. The THIRD counterfactual oracle, on the same D94-t convention as the two above:
 // HALF_MANNY built from the candidate with the V200 declared-core clause line stripped.
@@ -295,6 +313,11 @@ MANNY_CORE_OFF_DIGEST_BY_VERSION[204] = MANNY_CORE_OFF_DIGEST_BY_VERSION[203];  
 // V205: ruled UNMOVED, so a REFERENCE row. The declared-core clause and everything the
 // stripped-clause counterfactual draws are untouched by V205.
 MANNY_CORE_OFF_DIGEST_BY_VERSION[205] = MANNY_CORE_OFF_DIGEST_BY_VERSION[204];   // V205: ruled UNMOVED
+// V206: ruled MOVE, so a LITERAL row. The declared-core clause is untouched, but the
+// stripped-clause counterfactual still prints the same cardio cards D109 rewrites, so its
+// digest moves with the copy. Printed by coach from the same pre-build source-surgery copy
+// (tests/measure/v206_d109_d137_surgery.js). Not read off gate output.
+MANNY_CORE_OFF_DIGEST_BY_VERSION[206] = '9d14801a63111081';   // D109: the ruled digest move (copy only, 53/98 days text-only)
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
                    MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION,

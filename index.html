@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="205"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="206"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -3551,7 +3551,7 @@ function chiFromTable6(week){
   return { reps: _row.reps, minPerRep: _row.minPerRep };
 }
 
-function getCHI(week, totalWeeks, isMilGoal, phaseFrom, phaseTo) {
+function getCHI(week, totalWeeks, isMilGoal, phaseFrom, phaseTo, _rowCap) {
   // D128 (V205): the `isMilGoal && week > 26` limb that used to sit here returned a
   // hardcoded {reps:3, minPerRep:20} — 60 minutes of threshold work against Table 6's
   // 40 at the same week. Its replacement already exists: chiFromTable6 clamps at
@@ -3563,7 +3563,7 @@ function getCHI(week, totalWeeks, isMilGoal, phaseFrom, phaseTo) {
   // Table 6 is indexed on the training week itself, so a CHI phase that opens in week 7
   // opens on week 7's row (1 x 18) instead of restarting the ramp at its first rung.
   // The V115 phase-relative pct ramp is gone with the 1/2/3 rep ladder it fed.
-  const at = w => chiFromTable6(w);
+  const at = w => chiFromTable6(_rowCap ? Math.min(w, _rowCap) : w);
   // Cutback week: one rep off the prior build week; single-rep sessions cut duration
   // ~30% instead. Intensity target is unchanged — the dose steps back, not the touch.
   if(isCardioCutbackWeek(week, totalWeeks)){
@@ -3857,7 +3857,10 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
   // {intSpan, chiFrom, chiTo}. Absent => the un-periodized ramps, unchanged.
   const _qph = arguments[14] || null;
   let intReps = getINTReps(week, tw, isMilGoal, _qph && _qph.intSpan);
-  let chi = getCHI(week, tw, isMilGoal, _qph && _qph.chiFrom, _qph && _qph.chiTo);
+  // D137 (V206): 12 is Table 6's last single-piece CHI row. From week 13 the rows are
+  // two-piece, and the base limb prints one continuous piece, so run_base holds on row 12.
+  // The cap goes to the row reader, never to `week`: the cutback clock keeps the real week.
+  let chi = getCHI(week, tw, isMilGoal, _qph && _qph.chiFrom, _qph && _qph.chiTo, goalId === 'run_base' ? 12 : 0);
   let detail = '', note = '', subtype = '';
   // V148: structured dose. The prescription's fixed dimension, in numbers, so the log
   // form can key on it instead of regexing prose. Text is presentation; dose is data.
@@ -3928,11 +3931,11 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
     const _retest = week === tw && tw > 1;
     subtype = _retest ? 'Benchmark Run — Retest' : 'Benchmark Run';
     if(_retest) {
-      detail = '20 min at a steady RPE 6 out of 10 — comfortably hard, a short sentence between breaths. This is the SAME run you did in week 1. Hold the effort dead even from first minute to last — no surging, no fading. Log the distance you covered.';
-      note = 'BENCHMARK RETEST: Further than week 1 at the same effort = faster pace = the aerobic engine grew. This is the block\u2019s report card. No pace is prescribed on purpose — the pace is the measurement.';
+      detail = '20 min at a steady RPE 6 out of 10. Comfortably hard, a short sentence between breaths. This is the SAME run you did in week 1. Hold the effort dead even from first minute to last. No surging, no fading. Log the distance you covered.';
+      note = 'BENCHMARK RETEST: Further than week 1 at the same effort = faster pace = the aerobic engine grew. This is the block\u2019s report card. No pace is prescribed on purpose. The pace is the measurement.';
     } else {
-      detail = '20 min at a steady RPE 6 out of 10 — comfortably hard, a short sentence between breaths. Hold the effort dead even from first minute to last — no surging, no fading. Log the distance you covered.';
-      note = 'BENCHMARK: Your baseline. The final week repeats this exact run, and the distance difference is your fitness gain — measured, not promised. No pace is prescribed on purpose: run by effort and let the distance tell the story.';
+      detail = '20 min at a steady RPE 6 out of 10. Comfortably hard, a short sentence between breaths. Hold the effort dead even from first minute to last. No surging, no fading. Log the distance you covered.';
+      note = 'BENCHMARK: Your baseline. The final week repeats this exact run, and the distance difference is your fitness gain. Measured, not promised. No pace is prescribed on purpose. Run by effort and let the distance tell the story.';
     }
     _dose = {k:'time', mins:20};
   } else if(sType === 'lsd_long') {
@@ -3947,13 +3950,13 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
       const _steadySecL = steadyCapSec(_row);
       const _minsL = Math.max(15, Math.round((dist * _row.recovery / 60) / 5) * 5);
       subtype = 'Easy Run — Long';
-      detail = _minsL + ' min easy — conversational (RPE 3-4 out of 10). Around ' + recPace + ' is right for you — do not run faster than ' + _fmtPace(_steadySecL) + '. This is the longest run of your week — time on feet is the goal. Log the distance you covered.';
+      detail = _minsL + ' min easy and conversational (RPE 3-4 out of 10). Around ' + recPace + ' is right for you. Do not run faster than ' + _fmtPace(_steadySecL) + '. This is the longest run of your week. Time on feet is the goal. Log the distance you covered.';
       if(_row.recovery > 840) detail += ' Walk breaks are fine and smart: run 3 min, walk 1 min, repeat. Effort stays conversational either way.';
-      note = 'EASY RUN: The aerobic engine builds at conversational effort — time in the zone is the dose, not miles and not speed. If it feels almost too easy, it is working.' + (isCardioCutbackWeek(week, tw) ? ' CUTBACK WEEK: less time on purpose this week so the training absorbs. Same effort — do not add minutes.' : '');
+      note = 'EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it feels almost too easy, it is working.' + (isCardioCutbackWeek(week, tw) ? ' CUTBACK WEEK: less time on purpose this week so the training absorbs. Same effort. Do not add minutes.' : '');
       _dose = {k:'time', mins:_minsL, tgt:Math.round(_row.recovery), cap:_steadySecL};
     } else {
-      detail = dist + ' mi — Recovery Pace: ' + recPace + ' (Zone 2).' + (isTaperWeek ? ' Taper week — distance reduced intentionally.' : '') + '\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.';
-      note = isTaperWeek ? 'TAPER: Your body is absorbing weeks of training. Resist the urge to add miles. Show up to the start line fresh — not tired from one last big effort.' : 'LSD: The foundation of endurance. Go easy — the aerobic engine builds here, not in the fast runs.';
+      detail = dist + ' mi at Recovery Pace: ' + recPace + ' (Zone 2).' + (isTaperWeek ? ' Taper week. Distance reduced intentionally.' : '') + '\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.';
+      note = isTaperWeek ? 'TAPER: Your body is absorbing weeks of training. Resist the urge to add miles. Show up to the start line fresh, not tired from one last big effort.' : 'LSD: The foundation of endurance. Go easy. The aerobic engine builds here, not in the fast runs.';
       _dose = {k:'dist', mi:dist, tgt:Math.round(_row.recovery)};
     }
   } else if(sType === 'lsd_easy') {
@@ -3982,16 +3985,16 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
       const _mins = _minsOv || Math.max(15, Math.round((dist * _row.recovery / 60) / 5) * 5);
       const _strides = arguments[17] === true;
       subtype = 'Easy Run' + ((_minsOv && _minsOv > 40) ? ' — Long' : '') + (_strides ? ' + Strides' : '');
-      detail = _mins + ' min easy — conversational (RPE 3-4 out of 10). Around ' + recPace + ' is right for you — do not run faster than ' + _fmtPace(_steadySec) + '. Distance is not the goal; time on feet is. Log the distance you covered.';
+      detail = _mins + ' min easy and conversational (RPE 3-4 out of 10). Around ' + recPace + ' is right for you. Do not run faster than ' + _fmtPace(_steadySec) + '. Distance is not the goal; time on feet is. Log the distance you covered.';
       // Below ~14:00/mi continuous running mechanics genuinely degrade — doctrine's
       // answer (Galloway, NRC beginner audio runs) is run/walk, not a faster easy pace.
       if(_row.recovery > 840) detail += ' Walk breaks are fine and smart: run 3 min, walk 1 min, repeat. Effort stays conversational either way.';
-      if(_strides) detail += '\nFinish with 4 x 20 sec strides — fast but relaxed, about 90% speed, walk back for full recovery. Strides keep your legs fast while the engine builds.';
-      note = 'EASY RUN: The aerobic engine builds at conversational effort — time in the zone is the dose, not miles and not speed. If it feels almost too easy, it is working.' + (isCardioCutbackWeek(week, tw) ? ' CUTBACK WEEK: less time on purpose this week so the training absorbs. Same effort — do not add minutes.' : '');
+      if(_strides) detail += '\nFinish with 4 x 20 sec strides. Fast but relaxed, about 90% speed, walk back for full recovery. Strides keep your legs fast while the engine builds.';
+      note = 'EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it feels almost too easy, it is working.' + (isCardioCutbackWeek(week, tw) ? ' CUTBACK WEEK: less time on purpose this week so the training absorbs. Same effort. Do not add minutes.' : '');
       _dose = {k:'time', mins:_mins, tgt:Math.round(_row.recovery), cap:_steadySec};
     } else {
-      detail = dist + ' mi — Recovery Pace: ' + recPace + ' (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run — not a tempo, not a push. If in doubt, go slower.';
-      note = 'LSD: Recovery and base building. These runs feel almost too easy — that is correct. Do not push the pace here.';
+      detail = dist + ' mi at Recovery Pace: ' + recPace + ' (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower.';
+      note = 'LSD: Recovery and base building. These runs feel almost too easy. That is correct. Do not push the pace here.';
       _dose = {k:'dist', mi:dist, tgt:Math.round(_row.recovery)};
     }
   } else if(sType === 'chi') {
@@ -4035,17 +4038,17 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
       // goal of a base block is the aerobic engine, not threshold punishment.
       const steadyPace = _fmtPace(Math.round((_row.tempo + _row.recovery)/2));
       subtype = 'Steady Aerobic Run';
-      detail = chiMins + ' min steady at ' + steadyPace + ' (RPE 6 out of 10). Comfortably hard — you can speak a short sentence between breaths. This is aerobic-threshold work, not a sprint.';
+      detail = chiMins + ' min steady at ' + steadyPace + ' (RPE 6 out of 10). Comfortably hard. You can speak a short sentence between breaths. This is aerobic threshold work, not a sprint.';
       note = 'STEADY AEROBIC: A controlled effort just above easy pace. Builds aerobic capacity without the recovery cost of hard intervals. If you finish feeling you could do more, that is correct for a base block.';
       _dose = {k:'time', mins:chiMins, tgt:Math.round((_row.tempo + _row.recovery)/2)};
     } else if(chiReps === 1) {
-      detail = chiMins + ' min continuous at Tempo Pace: ' + tempoPace + ' (RPE 8-9 out of 10). Hard but controlled — labored breathing, short phrases only. You should NOT be able to hold a conversation.';
+      detail = chiMins + ' min continuous at Tempo Pace: ' + tempoPace + ' (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation.';
       _dose = {k:'time', mins:chiMins, tgt:Math.round(_tempoSec)};
-      note = 'CHI — Continuous High Intensity: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.';
+      note = 'CHI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.';
     } else {
-      detail = chiReps + ' x ' + chiMins + ' min at Tempo Pace: ' + tempoPace + ' (RPE 8-9 out of 10). Recovery: ' + Math.round(chiMins/2) + ' min easy jog between reps. Keep moving — do not stop.';
+      detail = chiReps + ' x ' + chiMins + ' min at Tempo Pace: ' + tempoPace + ' (RPE 8-9 out of 10). Recovery: ' + Math.round(chiMins/2) + ' min easy jog between reps. Keep moving. Do not stop.';
       _dose = {k:'reps_time', reps:chiReps, mins:chiMins, tgt:Math.round(_tempoSec)};
-      note = 'CHI — Continuous High Intensity: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.';
+      note = 'CHI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.';
     }
   } else if(sType === 'int') {
     subtype = 'Interval (INT)' + (isTaperWeek ? ' — Taper' : '');
@@ -4122,9 +4125,9 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
             const goalFmt = fmt(pp._originalTarget);
             const _reachIdx = _psShift > 0 ? Math.max(0, (tw - taperWks - 1) - (_psTap || _psShift)) : null;
             const reachFmt = fmt(_reachIdx != null && pp[_reachIdx] != null ? pp[_reachIdx] : pp._realisticTarget);
-            note = `INT — Interval: Pace moves ${pp._weeklyGain} seconds per mile each week. That is the safe rate for your experience and age. Your full goal of ${goalFmt}/mi needs more weeks than this block has. The target for this block is ${reachFmt}/mi. Hit the prescribed pace precisely.`;
+            note = `INT: Pace moves ${pp._weeklyGain} seconds per mile each week. That is the safe rate for your experience and age. Your full goal of ${goalFmt}/mi needs more weeks than this block has. The target for this block is ${reachFmt}/mi. Hit the prescribed pace precisely.`;
           } else {
-            note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
+            note = 'INT: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
           }
           // D2b-iii (V142), re-sited V202 (S1): this appendix is about the SHIFT, not about
           // which class of note fired. It only ever sat inside the dampened limb because that
@@ -4140,21 +4143,21 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
           const _recF = _intRec(_intTgtF, 400);
           detail = intReps + 'x400m at 5K Pace: ' + intChartPace + '. ' + _recF.txt + ' ' + _INT_WARMUP;
           _dose = {k:'reps_dist', reps:intReps, m:400, tgt:_intTgtF, rec:{lo:_recF.lo, hi:_recF.hi}};
-          note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
+          note = 'INT: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
         }
       } else {
         // run_15_under10, run_mile_time — use chart 5K pace for interval pace
         const intChartPace = _fmtPace(_chartRow.fiveK);
         detail = intReps + 'x400m at 5K Pace: ' + intChartPace + '. Recovery: walk or jog 200m between each (2-2.5x work time). 5 min easy warmup + cooldown.';
         _dose = {k:'reps_dist', reps:intReps, m:400, tgt:Math.round(_chartRow.fiveK)};
-        note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
+        note = 'INT: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
       }
     } else {
       // 5K, 10K, base, half, marathon — use chart 5K pace for interval pace
       const intChartPace = _fmtPace(_chartRow.fiveK);
       detail = intReps + 'x800m at 5K Pace: ' + intChartPace + ' (RPE 8, hard sustainable effort). Recovery: 90s walk/jog between reps. Keep moving. 5 min warmup + cooldown.';
       _dose = {k:'reps_dist', reps:intReps, m:800, tgt:Math.round(_chartRow.fiveK)};
-      note = 'INT — Interval: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
+      note = 'INT: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
     }
   }
   return {type:'run', subtype, detail, note, week, goalId, dose:_dose||undefined};
@@ -4349,11 +4352,11 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
     const phaseTag = L.race ? (_tt ? ' — TIME TRIAL' : ' — RACE DAY') : L.rehearsal ? ' — Dress Rehearsal' : L.peak ? ' — Peak' : L.taper ? ' — Taper' : L.cutback ? ' — Cutback' : '';   // V187 (F6)
     subtype = 'Long Run' + phaseTag;
     if(_tt) {
-      detail = `${_raceName} time trial — ${L.val} miles at race effort. Target ${racePace}. Warm up 10 minutes easy, then run it like a race: controlled start, even middle, everything you have in the last third.`;
-      note = 'TIME TRIAL: No race on the calendar, so this is your race. Log the time — it is the honest measure of the last 8 weeks and the anchor for your next block.';
+      detail = `${_raceName} time trial. ${L.val} miles at race effort. Target ${racePace}. Warm up 10 minutes easy, then run it like a race: controlled start, even middle, everything you have in the last third.`;
+      note = 'TIME TRIAL: No race on the calendar, so this is your race. Log the time. It is the honest measure of the last 8 weeks and the anchor for your next block.';
       _dose = {k:'dist', mi:L.val, tgt:Math.round(chartRow[_raceKey])};
     } else if(L.race) {
-      detail = `${L.val} miles — ${_raceName} race day. Target pace ${racePace}. Trust your training, start controlled, finish strong.`;
+      detail = `${L.val} miles. ${_raceName} race day. Target pace ${racePace}. Trust your training, start controlled, finish strong.`;
       note = 'RACE DAY: This is what every week built toward. Hold your goal pace, fuel early and often, and run your own race.';
       _dose = {k:'dist', mi:L.val, tgt:Math.round(chartRow[_raceKey])};
     } else {
@@ -4361,7 +4364,7 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
       // V171 (D6): Nike's progression-run definition — start slower than Recovery Pace,
       // finish faster than it, AVERAGE Recovery Pace. The old copy built to race pace on
       // every long run; Nike never puts race pace in a long run before race day.
-      detail = `${L.label}: ${distStr}, run as a progression — start slower than Recovery Pace, finish faster than it, and average Recovery Pace (${paces.recovery}) across the run. Comfortable the whole way. Average no faster than ${fmt(steadyCapSec(chartRow))}.`;
+      detail = `${L.label}: ${distStr}, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (${paces.recovery}) across the run. Comfortable the whole way. Average no faster than ${fmt(steadyCapSec(chartRow))}.`;
       // The average is a real number now, so the log readout shows a delta against it.
       // Progress modules filter by subtype before reading tgt, so long runs stay out of
       // the recovery-pace and drift charts.
@@ -4370,16 +4373,16 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
         // V187 (F6): Nike's "13.1K Dress Rehearsal" rehearses the ROUTINE, not the race —
         // it is listed as a long run and the pace stays the progression. The distance
         // steps back the same week (cutback:true still set); this note wins the card.
-        note = 'DRESS REHEARSAL: Run this at your race start time, in the shoes and kit you will race in, with the breakfast and fueling you plan to use. Pace stays the progression — this rehearses the routine, not the race. Distance steps back on purpose this week.';
+        note = 'DRESS REHEARSAL: Run this at your race start time, in the shoes and kit you will race in, with the breakfast and fueling you plan to use. Pace stays the progression. This rehearses the routine, not the race. Distance steps back on purpose this week.';
       } else if(L.hold) {
         // V171 (D4e): half wk 5 is "Another 10K Run" — distance held, not cut.
-        note = 'HOLD WEEK: Same distance as last week on purpose. Consolidate the last jump before the build resumes — do not add.';
+        note = 'HOLD WEEK: Same distance as last week on purpose. Consolidate the last jump before the build resumes. Do not add.';
       } else if(L.cutback) {
-        note = 'CUTBACK WEEK: The long run steps back on purpose. These are built in so your body absorbs the prior weeks of load — you come back stronger, not more tired. Do not add distance.';
+        note = 'CUTBACK WEEK: The long run steps back on purpose. These are built in so your body absorbs the prior weeks of load. You come back stronger, not more tired. Do not add distance.';
       } else if(L.peak) {
-        note = 'PEAK LONG RUN: Your longest run of the plan. Run it easy and patient — time on feet is the goal, not speed. Everything after this tapers down.';
+        note = 'PEAK LONG RUN: Your longest run of the plan. Run it easy and patient. Time on feet is the goal, not speed. Everything after this tapers down.';
       } else if(L.taper) {
-        note = 'TAPER: Distance reduced intentionally. Resist adding miles — the work is done. Arrive at the start line fresh.';
+        note = 'TAPER: Distance reduced intentionally. Resist adding miles. The work is done. Arrive at the start line fresh.';
       } else {
         note = 'LONG RUN: Easy start, controlled build. This is your most important session of the week. Bring fuel/water for anything over ~75 minutes.';
       }
@@ -4393,14 +4396,14 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
     // V171 (D1b): Nike's own framing — each pace is the middle of a range — replaces
     // "hit the prescribed paces precisely". Mile/Best are defined where they are used.
     const noteByType = {
-      Intervals: 'INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range — slightly faster or slower is fine, you are not a robot. If a pace won\'t hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort).',
-      Tempo: 'TEMPO: A hard but controlled pace — "comfortably uncomfortable." Builds the lactate threshold that lets you hold race pace longer.',
+      Intervals: 'INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won\'t hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort).',
+      Tempo: 'TEMPO: A hard but controlled pace, "comfortably uncomfortable." Builds the lactate threshold that lets you hold race pace longer.',
       Fartlek: 'FARTLEK: Swedish for "speed play." Unstructured surges build speed and strength through natural variation. Let effort, not the watch, guide you.',
-      Hills: 'HILLS: Develops speed, strength, and form with minimal pounding. Effort-based, not pace-based — uphills feel harder at the same pace. Chin up, slight lean.',
+      Hills: 'HILLS: Develops speed, strength, and form with minimal pounding. Go by effort, not pace. Uphills feel harder at the same pace. Chin up, slight lean.',
     };
     note = noteByType[sp.type] || 'SPEED RUN: Quality over quantity. Nail the prescribed efforts.';
     if(/\bBest (Pace|Effort)\b/.test(detail)) {
-      note += ' Best Pace is your call — the pace where you feel at your best; at the top of a ladder that means faster than Mile.';
+      note += ' Best Pace is your call. It is the pace where you feel at your best. At the top of a ladder that means faster than Mile.';
     }
 
   } else if(_type === 'nrc_recovery') {
@@ -4424,11 +4427,11 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
     const _prog = 'Start a touch slower than that, finish a touch faster.';
     if(_pick && typeof _pick === 'object') {
       const _mi = +_pick.mi || 0;
-      detail = `${_pick.label} recovery run — ${_mi} mi at Recovery Pace (${paces.recovery}). 4–5/10 effort — easy enough to talk, laugh, or argue freely. ${_prog} Do not run faster than ${fmt(steadyCapSec(chartRow))}.`;
+      detail = `${_pick.label} recovery run. ${_mi} mi at Recovery Pace (${paces.recovery}). 4–5/10 effort, easy enough to talk, laugh, or argue freely. ${_prog} Do not run faster than ${fmt(steadyCapSec(chartRow))}.`;
       _dose = {k:'dist', mi:_mi, tgt:Math.round(chartRow.recovery), cap:steadyCapSec(chartRow)};
     } else {
       const recMin = +_pick || 30;
-      detail = `${recMin}-minute recovery run at Recovery Pace (${paces.recovery}). 4–5/10 effort — easy enough to talk, laugh, or argue freely. ${_prog} Do not run faster than ${fmt(steadyCapSec(chartRow))}.`;
+      detail = `${recMin} min recovery run at Recovery Pace (${paces.recovery}). 4–5/10 effort, easy enough to talk, laugh, or argue freely. ${_prog} Do not run faster than ${fmt(steadyCapSec(chartRow))}.`;
       _dose = {k:'time', mins:recMin, tgt:Math.round(chartRow.recovery), cap:steadyCapSec(chartRow)};
     }
     note = 'RECOVERY RUN: Just as important as the hard days. This is where your body absorbs the training. Going too fast here steals from your speed and long runs.';
@@ -4574,7 +4577,7 @@ function buildBikeSession(goalId, week, dayIdx, totalWeeks, experience, assigned
         note = 'STEADY BURN: Total work is the goal. Zone 2 keeps it repeatable and keeps your legs fresh for lifting. Do not chase intensity. Chase the clock.';
       } else {
       subtype = 'Active Recovery Spin';
-      detail = lsdMins + ' min easy spin, low-to-moderate resistance. Zone 1–2, light and smooth. This is recovery — keep the legs fresh for lifting, do not chase intensity.';
+      detail = lsdMins + ' min easy spin, low to moderate resistance. Zone 1–2, light and smooth. This is recovery. Keep the legs fresh for lifting, do not chase intensity.';
       note = 'ACTIVE RECOVERY: Easy spinning to promote blood flow and recovery without taxing the legs. Should feel almost too easy. Your squats and leg growth come first.';
       }
     } else {
@@ -4582,15 +4585,15 @@ function buildBikeSession(goalId, week, dayIdx, totalWeeks, experience, assigned
       // /\blsd\b/ and would fall through to a generic code without it.
       subtype = (_isLongRide ? 'Long Ride (LSD)' : 'Long Slow Distance (LSD)') + (_bikeCutback ? ' — Cutback' : (_tapStep ? ' — Taper' : ''));
       detail = _isLongRide
-        ? lsdMins + ' min continuous, Zone 2, rolling or flat terrain. Stay seated on the climbs. Eat and drink on the bike from 60 min onward — 40–60g carbs and one bottle per hour. This is the ride the event is built on.'
+        ? lsdMins + ' min continuous, Zone 2, rolling or flat terrain. Stay seated on the climbs. Eat and drink on the bike from 60 min onward: 40–60g carbs and one bottle per hour. This is the ride the event is built on.'
         : lsdMins + ' min steady state, moderate resistance. Zone 2 effort. Talk Test: you should be able to hold a full conversation throughout.';
       note = _tapStep
-        ? 'TAPER: The ride is short on purpose. Fitness is already banked — the only thing left to gain is freshness. Hold Zone 2, keep the legs turning, and arrive rested.'
+        ? 'TAPER: The ride is short on purpose. Fitness is already banked. The only thing left to gain is freshness. Hold Zone 2, keep the legs turning, and arrive rested.'
         : _bikeCutback
         ? 'CUTBACK WEEK: The ride steps back on purpose so the prior weeks of load can sink in. Hold Zone 2 and resist adding minutes. You come back stronger next week.'
         : _isLongRide
-        ? 'LONG RIDE: The single most important cardio session of your week. Zone 2 the whole way — going harder here costs you next week. Time in the saddle, fueling practice, and contact-point tolerance are the adaptations; average speed is not.'
-        : 'LSD — Long Slow Distance: Zone 2 (60-70% max HR). Easy, conversational pace. Builds aerobic base and fat metabolism. Do not go harder than Zone 2 here.';
+        ? 'LONG RIDE: The single most important cardio session of your week. Zone 2 the whole way. Going harder here costs you next week. Time in the saddle, fueling practice, and contact point tolerance are the adaptations; average speed is not.'
+        : 'LSD: Zone 2 (60-70% max HR). Easy, conversational pace. Builds aerobic base and fat metabolism. Do not go harder than Zone 2 here.';
     }
   } else if(sType === 'chi') {
     const chiMins = chi.minPerRep;
@@ -4599,13 +4602,13 @@ function buildBikeSession(goalId, week, dayIdx, totalWeeks, experience, assigned
     if(chiReps === 1) {
       detail = chiMins + ' min sustained hard effort, high resistance. RPE 8-9 out of 10. Consistent cadence throughout. You should NOT be able to hold a conversation.';
     } else {
-      detail = chiReps + ' x ' + chiMins + ' min at RPE 8-9, high resistance. Recovery: ' + Math.round(chiMins/2) + ' min easy spin between reps. Keep pedaling — do not stop.';
+      detail = chiReps + ' x ' + chiMins + ' min at RPE 8-9, high resistance. Recovery: ' + Math.round(chiMins/2) + ' min easy spin between reps. Keep pedaling. Do not stop.';
     }
-    note = 'CHI — Continuous High Intensity: Zone 3-4 (85-95% max HR). High resistance, sustained hard effort. Breathing labored, short phrases only. RPE 8-9. Add reps as fitness improves.';
+    note = 'CHI: Zone 3-4 (85-95% max HR). High resistance, sustained hard effort. Breathing labored, short phrases only. RPE 8-9. Add reps as fitness improves.';
   } else if(sType === 'int') {
     subtype = 'Interval (INT)' + (_tapStep ? ' — Taper' : '');
     detail = intReps + ' x ' + intWork + ' max effort / ' + intRecov + ' easy spin recovery (RPE 9+ on work intervals). 3 min easy warmup + 2 min cooldown.';
-    note = 'INT: Max effort on work intervals — legs should burn. Full recovery between reps. Hard cap: 8 reps. Quality over volume.';
+    note = 'INT: Max effort on work intervals. Legs should burn. Full recovery between reps. Hard cap: 8 reps. Quality over volume.';
   }
   // V148: structured dose. Bike keeps its single minutes input; the dose only feeds
   // the planned strip. INT deliberately emits none — 45s reps have no honest minutes box.
@@ -4724,7 +4727,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   let segments = null;
   const _blk = Math.floor((week-1)/4); // drill rotation rides the existing 4-week cutback clock
   const _GEN_DRILLS = [
-    {n:'catch-up drill', c:'Slow and deliberate. Full extension before the pull.'},
+    {n:'catch up drill', c:'Slow and deliberate. Full extension before the pull.'},
     {n:'fingertip drag', c:'High elbow on recovery. Fingertips trace the water.'},
     {n:'fist drill', c:'Closed fists the whole length. Feel the forearm catch.'},
     {n:'6-kick switch', c:'Six kicks on your side, then switch. Balance and rotation.'}
@@ -4746,12 +4749,12 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
       // Keeps the shoulders/lats fresh for lifting — this is active recovery, not training.
       yards = 600;
       subtype = 'Recovery Swim';
-      detail = yards + ' yards easy — relaxed stroke, focus on technique and breathing. Zone 1–2, fully conversational rests at the wall. This is active recovery, not a workout.';
-      note = 'RECOVERY SWIM: Light aerobic laps to flush the upper body without taxing the shoulders or lats. Keep it short and smooth — your pressing and pulling lifts come first.';
+      detail = yards + ' yards easy. Relaxed stroke, focus on technique and breathing. Zone 1–2, fully conversational rests at the wall. This is active recovery, not a workout.';
+      note = 'RECOVERY SWIM: Light aerobic laps to flush the upper body without taxing the shoulders or lats. Keep it short and smooth. Your pressing and pulling lifts come first.';
     } else {
       subtype = 'Long Slow Distance (LSD)' + (_tapStep ? ' — Taper' : '');
-      detail = yards + ' yards continuous — easy stroke, comfortable breathing. Zone 2 effort. Brief wall rest allowed — keep it short.' + (_tapStep ? ' Taper week — yardage cut on purpose. The work is done, resist adding laps.' : '');
-      note = 'LSD — Long Slow Distance: Zone 2. Easy, relaxed stroke. Focus on form and breathing. Should feel sustainable indefinitely. Build to 3,500-4,000 yards before diminishing returns.';
+      detail = yards + ' yards continuous. Easy stroke, comfortable breathing. Zone 2 effort. Brief wall rest allowed. Keep it short.' + (_tapStep ? ' Taper week. Yardage cut on purpose. The work is done, resist adding laps.' : '');
+      note = 'LSD: Zone 2. Easy, relaxed stroke. Focus on form and breathing. Should feel sustainable indefinitely. Build to 3,500-4,000 yards before diminishing returns.';
       // V141: long days carve WU/CD out of the dose (it is all Zone 2 anyway) so the
       // total is conserved EXACTLY. No drill set here by design — the long swim is the
       // point of the session and carving it up would gut the endurance stimulus. Doses
@@ -4759,7 +4762,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
       if(_segGoal && yards >= 600) {
         segments = [
           {label:'Warm up',   yd:200, text:'200 yd easy. Mix strokes. Loosen up.'},
-          {label:'Main set',  yd:yards-300, text:(yards-300)+' yd continuous freestyle. Zone 2. Easy stroke, comfortable breathing. Brief wall rest allowed. Keep it short.'+(_tapStep?' Taper week — yardage cut on purpose. The work is done, resist adding laps.':'')},
+          {label:'Main set',  yd:yards-300, text:(yards-300)+' yd continuous freestyle. Zone 2. Easy stroke, comfortable breathing. Brief wall rest allowed. Keep it short.'+(_tapStep?' Taper week. Yardage cut on purpose. The work is done, resist adding laps.':'')},
           {label:'Cool down', yd:100, text:'100 yd easy.'}
         ];
       }
@@ -4771,7 +4774,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
     } else {
       detail = chiReps + ' x ' + chiYards + ' yards at 90-95% pace. Recovery: ' + Math.round(chiYards/2) + ' yards easy stroke between reps. Keep moving. 200 yard warmup + 100 yard cooldown.';
     }
-    note = 'CHI — Continuous High Intensity: Zone 3-4. Hard sustained effort in the water — breathing labored, push the pace. Add reps before adding yards as fitness improves.';
+    note = 'CHI: Zone 3-4. Hard sustained effort in the water. Breathing labored, push the pace. Add reps before adding yards as fitness improves.';
     // V141: quality work preserved exactly (rounded to pool-legal 25s); drill set is a
     // bounded addition (4 x 25 = 100 yd, well under the 25%-of-session cap).
     if(_segGoal) {
@@ -4796,7 +4799,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
       const intPace = Math.max(swimPace._realisticTarget * 0.97, weekPace * 0.97); // slightly faster than goal
       const fmt = s => _clkMS(s);   // D126 (V204): seconds limb owned by _clkMS. Bare; callers append '/100'.
       const u = swimPace._unit;
-      detail = `${intReps} x 100${u} at ${fmt(intPace)}/100 (week ${week} target — slightly faster than this week's goal split of ${fmt(weekPace)}/100). Recovery: 2-3 min easy stroke between reps. 200${u} warmup + 100${u} cooldown.`;
+      detail = `${intReps} x 100${u} at ${fmt(intPace)}/100 (week ${week} target, slightly faster than this week's goal split of ${fmt(weekPace)}/100). Recovery: 2-3 min easy stroke between reps. 200${u} warmup + 100${u} cooldown.`;
       // V141: the 100s and their split are the pace engine's output — preserved exactly.
       // Drill set shrinks to 4 x 25 whenever reps are cut (taper or early ramp) so it
       // never exceeds 25% of session volume.
@@ -4810,13 +4813,13 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
         ];
       }
       if(swimPace._dampened) {
-        note = `INT — Interval: Split capped at +${swimPace._weeklyGain}s/100/week (safe progression limit). Full goal of ${fmt(swimPace._originalTarget)}/100 needs more time — realistic target for this block is ${fmt(swimPace._realisticTarget)}/100. Hit the prescribed split precisely.`;
+        note = `INT: Split capped at +${swimPace._weeklyGain}s/100/week (safe progression limit). Full goal of ${fmt(swimPace._originalTarget)}/100 needs more time. The realistic target for this block is ${fmt(swimPace._realisticTarget)}/100. Hit the prescribed split precisely.`;
       } else {
-        note = 'INT — Interval: 100 repeats at your target split. Start at 4, build to 10 — hard cap at 10. If your split slips, end the session. Consistency between reps matters.';
+        note = 'INT: 100 repeats at your target split. Start at 4, build to 10. Hard cap at 10. If your split slips, end the session. Consistency between reps matters.';
       }
     } else {
       detail = intReps + ' x 100 yards at 90% effort, slightly faster than recent 500yd pace. Recovery: 2-3 min easy stroke between reps (2-2.5x work time). 200 yard warmup + 100 yard cooldown.';
-      note = 'INT: 100 yard repeats. Start at 4, build to 10 — hard cap at 10. If pace drops significantly, end the session. Consistency between reps matters.';
+      note = 'INT: 100 yard repeats. Start at 4, build to 10. Hard cap at 10. If pace drops significantly, end the session. Consistency between reps matters.';
       if(_segGoal) {
         const _dr = (_tapStep || intReps < 4) ? 25 : 50;
         segments = [

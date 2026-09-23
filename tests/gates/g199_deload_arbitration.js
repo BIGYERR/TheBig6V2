@@ -95,6 +95,13 @@ DELOAD_ARB_BY_VERSION[205] = {
   // and legLoad values on both weeks.
   dlIdentical: 19,
 };
+// V206: ruled UNMOVED, a REFERENCE row (D94-t). D109 rewrites cardio note and detail
+// text only; _cardioInterference classifies on subtype first and its minute/mile parsers
+// read "25 min" exactly as "25-minute", so no interference value moves. D137 moves a
+// run_base Steady card 12 -> 20 min on weeks 13-15; the cap reads minutes only past 45
+// and the 'steady' token is unchanged. No posterior-section count can move. Proof is the
+// two-artifact run: the same five counts read off V205 and V206.
+DELOAD_ARB_BY_VERSION[206] = DELOAD_ARB_BY_VERSION[205];   // V206 D109/D137: ruled UNMOVED
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[

@@ -239,9 +239,33 @@ function baseCards(row){
 // past 40 min, so subtype cannot separate them and a site-level claim needs to.
 const IS_L_SITE = c => /This is the longest run of your week/.test(String(c.detail));            // _steadySecL
 const IS_E_SITE = c => /Distance is not the goal; time on feet is\./.test(String(c.detail));     // _steadySec
-const BASE_TAIL = cap => 'do not run faster than ' + cap + '.';
+// D109 UPKEEP (V206), not a change to D117. The run_base ceiling sentence was typed at V203 as
+// the lowercase tail of "Around X is right for you — do not run faster than Y." D109 (amended,
+// coach-ruled; tests/measure/v206_d109_table.txt, the "is right for you" entry) swept that dash
+// out, so from ia-version 206 the sentence reads "Around X is right for you. Do not run faster
+// than Y." The ceiling number, dose.cap and the Around pace do not move; only the form does.
+// ERA ROWS, keyed on ia-version (standing ruling 4): the D117 form holds up to 205 (from 0, so
+// the pre-bump working-artifact branch above still runs) and the D109 form from 206. Each row
+// types its own tail and its own reader. An artifact no row covers fails loudly instead of
+// reading null on every card. Never one case-blind regex: that passes either form on either
+// artifact, so a reverted sweep would sail through.
+const BASE_TAIL_BY_VERSION = [
+  { from: 0,   to: 205,      ruling: 'D117 (V203)',
+    tail: cap => 'do not run faster than ' + cap + '.',
+    read: /do not run faster than (\d+:[0-5]\d\/mi)\./ },
+  { from: 206, to: Infinity, ruling: 'D109 (V206)',
+    tail: cap => 'is right for you. Do not run faster than ' + cap + '.',
+    read: /is right for you\. Do not run faster than (\d+:[0-5]\d\/mi)\./ },
+];
+const BASE_ERA = BASE_TAIL_BY_VERSION.filter(r => artifactV >= r.from && artifactV <= r.to)[0] || null;
+if(!BASE_ERA){
+  fail++;
+  console.log('  FAIL D109-ERA no BASE_TAIL_BY_VERSION row covers ia-version ' + artifactV + ': the run_base '
+    + 'ceiling sentence has no ruled form at this version, so every 2d tail and cap reader below is meaningless');
+}
+const BASE_TAIL = cap => BASE_ERA ? BASE_ERA.tail(cap) : '\u0000NO ERA ROW';
 const AROUND    = c => (String(c.detail).match(/Around (\d+:[0-5]\d\/mi) is right for you/) || [])[1];
-const CAPSTR    = c => (String(c.detail).match(/do not run faster than (\d+:[0-5]\d\/mi)\./) || [])[1];
+const CAPSTR    = c => BASE_ERA ? (String(c.detail).match(BASE_ERA.read) || [])[1] : undefined;
 
 const baseCaps = [];
 [ROWS[0], ROWS[1]].forEach(r => {
