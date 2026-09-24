@@ -179,7 +179,8 @@ else {
 // version the table text stands. At and above it the superseding text must sit in the body
 // exactly "@@ n" times, and both older texts (the table's old AND its D109 new) 0 times.
 // D103a (V208, coach-ruled) renamed the NSW run heads: "CHI:" is "LI:" and "INT:" is "SI:",
-// bodies unchanged. Bike and swim keep CHI: and INT:, so no bike or swim entry moves here.
+// bodies unchanged. Bike and swim keep CHI: and INT:, so no bike or swim entry moves for D103a.
+// D110a (V212) supersedes swim entries 53, 54 and 55 (rows below).
 // A row whose "was" is not the table's own new text is a named FAIL on that builder's T row:
 // the table and the supersession would no longer describe the same string.
 const TABLE_SUPERSEDED = [
@@ -191,7 +192,20 @@ const TABLE_SUPERSEDED = [
     now: 'SI: Pace moves ${pp._weeklyGain} seconds per mile each week.' },
   { from: 208, ruling: 'D103a', builder: 'run', entry: 22,
     was: 'INT: Zone 5 (95%+ max HR) on work efforts.',
-    now: 'SI: Zone 5 (95%+ max HR) on work efforts.' }
+    now: 'SI: Zone 5 (95%+ max HR) on work efforts.' },
+  // D110a (V212, coach-ruled) rewrites three swim INT notes: the dampened note quotes the
+  // sizer's rate and a split the athlete is handed, and Guide A's cap of 8 intervals replaces
+  // 10 on both rep notes. Swim keeps the INT: head (D103a renamed the run heads only). D144
+  // (same build) names the goal through _goalPhrase ("1:20 for 100yd" on the 100 goal).
+  { from: 212, ruling: 'D110a', builder: 'swim', entry: 53,
+    was: 'INT: Split capped at +${swimPace._weeklyGain}s/100/week (safe progression limit). Full goal of ${fmt(swimPace._originalTarget)}/100 needs more time. The realistic target for this block is',
+    now: 'INT: Split moves ${swimPace._weeklyGain} seconds per 100 each week. That is the safe rate for your experience and age. Your full goal of ${_goalPhrase} needs more weeks than this block has. The target for this block is' },
+  { from: 212, ruling: 'D110a', builder: 'swim', entry: 54,
+    was: 'INT: 100 repeats at your target split. Start at 4, build to 10. Hard cap at 10.',
+    now: 'INT: 100 repeats at your target split. Start at 4, build to 8. Hard cap at 8.' },
+  { from: 212, ruling: 'D110a', builder: 'swim', entry: 55,
+    was: 'INT: 100 yard repeats. Start at 4, build to 10. Hard cap at 10.',
+    now: 'INT: 100 yard repeats. Start at 4, build to 8. Hard cap at 8.' }
 ];
 const SUP_BAD = {};
 if(ents){

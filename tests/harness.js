@@ -353,6 +353,9 @@ MANNY_CORE_OFF_DIGEST_BY_VERSION[210] = MANNY_CORE_OFF_DIGEST_BY_VERSION[209];  
 MANNY_DIGEST_BY_VERSION[211] = MANNY_DIGEST_BY_VERSION[210];   // D153/D155: ruled UNMOVED (printed by coach on the V211 tree)
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[211] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[210];   // D153/D155: ruled UNMOVED (printed by coach on the V211 tree)
 MANNY_CORE_OFF_DIGEST_BY_VERSION[211] = MANNY_CORE_OFF_DIGEST_BY_VERSION[210];   // D153/D155: ruled UNMOVED (printed by coach on the V211 tree)
+MANNY_DIGEST_BY_VERSION[212] = MANNY_DIGEST_BY_VERSION[211];   // D110a/M2/D144: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V212 tree with g199's and g200's methods; swim only, HALF_MANNY holds 0 swim sessions)
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[212] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[211];   // D110a/M2/D144: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V212 tree with g199's and g200's methods; swim only, HALF_MANNY holds 0 swim sessions)
+MANNY_CORE_OFF_DIGEST_BY_VERSION[212] = MANNY_CORE_OFF_DIGEST_BY_VERSION[211];   // D110a/M2/D144: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V212 tree with g199's and g200's methods; swim only, HALF_MANNY holds 0 swim sessions)
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
                    MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION,

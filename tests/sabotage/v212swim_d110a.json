@@ -1,0 +1,121 @@
+[
+  {
+    "name": "S1-D110a -> the 2.5x rate and its 6 s ceiling come back: the split outruns the sizer's 4/3/2 x age rate",
+    "anchor": "const maxImprove = baseImprove;",
+    "replacement": "const maxImprove = Math.min(6, baseImprove * 2.5); // physiological ceiling",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: N1 (no dampened note where the hand model expects one), R3a (a step above rate + 1), R3b (hand model), R3c (the out of reach drop is not the table rate). Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 44 FAIL 8. EXPECTED: R3a, R3b, R3c, N1, D4, D7, D8, D8."
+  },
+  {
+    "name": "S2-D110a -> the INT rep split goes back to x0.97 of the goal split instead of Guide A p12's minus 2 s",
+    "anchor": "const intPace = weekPace - 2;",
+    "replacement": "const intPace = Math.max(swimPace._realisticTarget * 0.97, weekPace * 0.97); // slightly faster than goal",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: R2 (rep split is clock(split - 2)), R4 (goal met rep is clock(E - 2)), R1k (Guide A worked example prints 2:04). Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 43 FAIL 9. EXPECTED: R2, R4, R1k, D4, SH4, SH5, D1, FL1, FL1."
+  },
+  {
+    "name": "S3-D110a -> the E7 mirror is deleted: a goal slower than the current split is prescribed as the split",
+    "anchor": "targetPace100 = Math.min(enteredTarget100, initialPace100);",
+    "replacement": "",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: R1 (week 1 is clock(E) on slower goals), R3b (hand model holds at E), R4 (goal met holds at E). Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 47 FAIL 5. EXPECTED: R1, R3b, R4, D4, D2."
+  },
+  {
+    "name": "S4-D110a notes -> the dampened note quotes _realisticTarget again, a split no INT card prints",
+    "anchor": "The target for this block is ${fmt(_reachSplit)}/100.",
+    "replacement": "The target for this block is ${fmt(swimPace._realisticTarget)}/100.",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: N1. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 49 FAIL 3. EXPECTED: N1, D4, D8."
+  },
+  {
+    "name": "S5-D110a notes -> the distance goal INT note builds to 10 again (one site)",
+    "anchor": "note = 'INT: 100 yard repeats. Start at 4, build to 8.",
+    "replacement": "note = 'INT: 100 yard repeats. Start at 4, build to 10.",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: N4 (build to 10) and P1n (distance note text). Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 50 FAIL 2. EXPECTED: N4, P1n."
+  },
+  {
+    "name": "S6-D110a notes -> the no current time line is dropped: a default split is quoted as if it were the athlete's own",
+    "anchor": "const _anchorLine = swimPace._baseEntered ? '' : ",
+    "replacement": "const _anchorLine = true ? '' : ",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: N3. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 45 FAIL 7. EXPECTED: N3, D4, SH3, D3, D3, FL1, FL1."
+  },
+  {
+    "name": "S7-D110a notes -> _baseEntered keys on the minutes box again: a 0:00 entry counts as a current time and the athlete is not told",
+    "anchor": "swimPace._baseEntered = _baseTotal > 0;",
+    "replacement": "swimPace._baseEntered = swimGoal.baseMins !== undefined && swimGoal.baseMins !== '';",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: N3, SO1, D3. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 47 FAIL 5. EXPECTED: N3, SO1, D3, FL1, FL1."
+  },
+  {
+    "name": "S8-D110a sheet -> the unit spread is dropped: a goal switch resets a metres swimmer to yards",
+    "anchor": "    if(prev.swimUnit) next.swimUnit=prev.swimUnit;\n",
+    "replacement": "",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: SH1, SH2, SH4, SH5. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 47 FAIL 5. EXPECTED: SH1, SH2, SH4, SH5, SO2."
+  },
+  {
+    "name": "S9-D110a sheet -> the base carries across distances: a 500 time lands in a 100 goal's current 100 field",
+    "anchor": "if(g.id==='swim_100_time'&&_t500) _put('base500',_t500);",
+    "replacement": "if(g.id==='swim_100_time'&&_t500) _put('base',_t500);",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: SH2. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 50 FAIL 2. EXPECTED: SH2, M2c."
+  },
+  {
+    "name": "S10-D110a M2 -> the doGenerate swim check is removed: a swim time goal with no current time builds on the default",
+    "anchor": "  const _sv=_swimEntryState(WD.cardioGoals&&WD.cardioGoals.swim); if(!_sv.ok){ showToast(_sv.msg); showScreen('screenWizard'); renderWizardStep(); return; }\n",
+    "replacement": "",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: M2b, M2d. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 50 FAIL 2. EXPECTED: M2b, M2d."
+  },
+  {
+    "name": "S11-D110a M2 -> the validator returns ok on a blank 500: the requirement is advisory only",
+    "anchor": "if(!(t500>0)) return {ok:false,blank:true,msg:'Required. Enter your most recent timed 500'+unit+'.'};",
+    "replacement": "if(!(t500>0)) return {ok:true};",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: M2a, M2d, M2f. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 49 FAIL 3. EXPECTED: M2a, M2d, M2f."
+  },
+  {
+    "name": "S12-D110a M2 -> the 100 goal's 500 input block is dropped from the wizard: the 500 the validator requires cannot be entered",
+    "anchor": "${g.id==='swim_100_time' ? `\n            <div style=\"margin-top:8px\">\n              <div class=\"input-label\" style=\"margin-bottom:6px\">Your most recent timed 500${g.swimUnit||'yd'}</div>\n              <div style=\"font-size:11px;line-height:1.45;color:var(--muted);margin-bottom:6px\">Your repeats key off your 500 pace. Your 100 time sets the goal.</div>\n              <div style=\"display:flex;align-items:center;gap:6px\">\n                <input type=\"number\" class=\"input-field\" style=\"text-align:center;flex:1\" placeholder=\"min\" value=\"${g.base500Mins||''}\" oninput=\"WD.cardioGoals['swim'].base500Mins=this.value;updateSwimAdvisory()\" min=\"0\" max=\"99\">\n                <div style=\"font-size:20px;color:var(--muted);font-weight:300;flex-shrink:0\">:</div>\n                <input type=\"number\" class=\"input-field\" style=\"text-align:center;flex:1\" placeholder=\"sec\" value=\"${g.base500Secs||''}\" oninput=\"WD.cardioGoals['swim'].base500Secs=this.value;updateSwimAdvisory()\" min=\"0\" max=\"59\">\n              </div>\n            </div>` : ''}",
+    "replacement": "",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: M2c, M2e. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 50 FAIL 2. EXPECTED: M2c, M2e."
+  },
+  {
+    "name": "S13-D110a 5b -> the swim base reader keys on the minutes box again: a seconds-only time (a 0:58 100) is ignored",
+    "anchor": "const _swimTot = (m, s) => (+m||0)*60 + (+s||0);",
+    "replacement": "const _swimTot = (m, s) => (m !== undefined && m !== '') ? (+m||0)*60 + (+s||0) : 0;",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: R1, R3b, R4, N2, N3, SO1. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 45 FAIL 7. EXPECTED: R1, R3b, R4, N2, N3, SO1, GT1."
+  },
+  {
+    "name": "S14-D144 -> the 100 goal anchors on its current 100 again, not on the 500",
+    "anchor": "const _baseTotal = _is100 ? _swimTot(swimGoal.base500Mins, swimGoal.base500Secs) : _swimTot(swimGoal.baseMins, swimGoal.baseSecs);",
+    "replacement": "const _baseTotal = _swimTot(swimGoal.baseMins, swimGoal.baseSecs);",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: R1, R3b, R4, N3, SO1, D1, D1, D2, D3. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 34 FAIL 18. EXPECTED: R1, R3b, R3c, R4, N1, N2, N3, SO1, D1, D1, D2, D3, D7, D8, D8, FL1, FL1, GT1."
+  },
+  {
+    "name": "S15-D144 -> the 100 gap is dropped: every 100 goal holds at its 500 pace",
+    "anchor": ": initialPace100 - gap100;",
+    "replacement": ": initialPace100;",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: R3b, R3c, N1, N2, SO1, D1, D7, D8, D8, GT1. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 42 FAIL 10. EXPECTED: R3b, R3c, N1, N2, SO1, D1, D7, D8, D8, GT1."
+  },
+  {
+    "name": "S16-D144 -> _dist goes back to fixedDist: a 100 program with no 500 is told it has no current 100",
+    "anchor": "swimPace._dist = 500;",
+    "replacement": "swimPace._dist = fixedDist;",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: N3, D3, D3. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 47 FAIL 5. EXPECTED: N3, D3, D3, FL1, FL1."
+  },
+  {
+    "name": "S17-D144 floor removed: a stored 100 program whose gap reaches the anchor pace gets a target of zero or less",
+    "anchor": "targetPace100 = gap100 >= initialPace100 ? initialPace100 : initialPace100 - gap100;",
+    "replacement": "targetPace100 = initialPace100 - gap100;",
+    "gate": "gates/g212_d110a_swim.js",
+    "note": "NAMED TRIP: FL1, FL1. Needs ia-version >= 212: below 212 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-212 copy until Mario bumps. Measured on a forced-212 copy of the V212 slice 1+2+3+5+5b+6+6b build, gate run without a baseline as sabotage.py runs it (V211 read from git 6adba21): PASS 50 FAIL 2. EXPECTED: FL1, FL1."
+  }
+]

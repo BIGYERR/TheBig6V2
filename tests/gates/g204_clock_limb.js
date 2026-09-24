@@ -355,12 +355,23 @@ ok('C7b the NRC formatter domain is still integer over 461 anchors (a fraction h
 //   maxGain  = min(6, 3 s/wk x age scale 1.0 x 2.5) = 6 s per 100 per week
 //   weekPace(w) = initial - 6(w-1), floored at the realistic target
 //   intPace(w)  = weekPace(w) x 0.97
+// ERA-KEYED (standing ruling 4). D110a (coach ruled, ships on ia-version 212) replaces two
+// of these terms, so from 212 on the SAME re-derivation runs with the ruled terms:
+//   maxGain  = 3 s/wk x age scale 1.0 = 3 s per 100 per week (the sizer's rate, no 2.5x, no 6)
+//   intPace(w)  = weekPace(w) - 2        (Guide A p12)
+// and the carrying killer is re-sited, because 123.2 - 2 = 121.2 is whole-ish and no longer
+// carries: 10:08 for 500 yd = 121.6 s per 100, minus 2 = 119.6 -> "2:00" (the idiom: 1:60).
+//   ia-version <= 211: maxGain 6, x0.97, week 1 2:00 at a 2:03 split.
+//   ia-version  > 211: maxGain 3, -2 s, week 1 2:01 at 2:03, week 6 1:46 at 1:48 (123.2 - 15).
+const SWIM_D110A = +VER > 211;
 const SWIM_BASE_SEC = 10*60 + 16;     // 10:16 for 500 yd
 const SWIM_GOAL_SEC = 4*60 + 0;       // 4:00 for 500 yd
 const SWIM_FIXED_DIST = 500;
 const SWIM_INITIAL = SWIM_BASE_SEC / (SWIM_FIXED_DIST/100);   // 123.2
 const SWIM_TARGET  = SWIM_GOAL_SEC / (SWIM_FIXED_DIST/100);   // 48
-const SWIM_MAX_GAIN = 6;
+const SWIM_MAX_GAIN = SWIM_D110A ? 3 : 6;
+const swimIntOf = wp => SWIM_D110A ? wp - 2 : wp * 0.97;
+const SWIM_INT_RULE = SWIM_D110A ? 'weekPace - 2' : 'weekPace x 0.97';
 function mkSwimCfg(){
   const c = JSON.parse(JSON.stringify(fixtures.HALF_MANNY));
   c.cardioTypes = ['swim'];
@@ -388,11 +399,11 @@ for(const wk of Object.keys(SWIM.weeks || {})){
       swimInts++;
       const w = +wk;
       const weekPace = Math.max(swimRealistic, SWIM_INITIAL - SWIM_MAX_GAIN * (w - 1));
-      const wantInt = handClock(weekPace * 0.97);
+      const wantInt = handClock(swimIntOf(weekPace));
       const wantWeek = handClock(weekPace);
       const mM = det.match(SWIM_MAIN), mS = det.match(SWIM_SPLIT);
       if((!mM || mM[1] !== wantInt) && swimBad.length < 5)
-        swimBad.push('W' + wk + ' printed ' + (mM ? mM[1] : 'NONE') + ' want ' + wantInt + ' (weekPace ' + weekPace.toFixed(1) + ' x 0.97 = ' + (weekPace*0.97).toFixed(3) + ')');
+        swimBad.push('W' + wk + ' printed ' + (mM ? mM[1] : 'NONE') + ' want ' + wantInt + ' (weekPace ' + weekPace.toFixed(1) + ', ' + SWIM_INT_RULE + ' = ' + swimIntOf(weekPace).toFixed(3) + ')');
       if((!mS || mS[1] !== wantWeek) && swimSplitBad.length < 5)
         swimSplitBad.push('W' + wk + ' split ' + (mS ? mS[1] : 'NONE') + ' want ' + wantWeek);
       for(const m of (det + ' ' + nte).match(/\d+:\d+/g) || [])
@@ -401,7 +412,7 @@ for(const wk of Object.keys(SWIM.weeks || {})){
   }
 }
 ok('C7c the swim config produced INT cards to test', swimInts >= 4, String(swimInts));
-ok('C7c every swim INT prints weekPace x 0.97 as the clock this gate computes (' + swimInts + ' cards)', swimBad.length === 0, swimBad.join(' | '));
+ok('C7c every swim INT prints ' + SWIM_INT_RULE + ' as the clock this gate computes (' + swimInts + ' cards, ia-version ' + VER + (SWIM_D110A ? ', D110a era' : ', pre-D110a era') + ')', swimBad.length === 0, swimBad.join(' | '));
 ok("C7c every swim INT prints this week's goal split as the clock of weekPace", swimSplitBad.length === 0, swimSplitBad.join(' | '));
 ok('C7c every clock on a swim INT card has a seconds limb in 00..59', swimWell.length === 0, swimWell.join(' | '));
 // C7c KILLER — week 1. 123.2 x 0.97 = 119.504. Round the whole value: 120 -> "2:00".
@@ -411,9 +422,29 @@ for(const day of Object.keys(SWIM.weeks['1'] || SWIM.weeks[1] || {}))
   for(const s of sessionsOf(SWIM, 1, day))
     if(s.type === 'swim' && /Interval/.test(String(s.subtype || ''))) swimW1 = String(s.detail || '');
 ok('C7c week 1 swim INT card exists', !!swimW1, swimW1.slice(0, 40));
-eq('C7c week 1 swim INT prints 123.2 x 0.97 = 119.504 as the carried clock (the idiom prints 1:60 here)',
-   (swimW1.match(SWIM_MAIN) || [])[1], '2:00');
-eq("C7c week 1 swim INT prints the goal split 123.2 as 2:03", (swimW1.match(SWIM_SPLIT) || [])[1], '2:03');
+if(!SWIM_D110A){
+  eq('C7c week 1 swim INT prints 123.2 x 0.97 = 119.504 as the carried clock (the idiom prints 1:60 here)',
+     (swimW1.match(SWIM_MAIN) || [])[1], '2:00');
+  eq("C7c week 1 swim INT prints the goal split 123.2 as 2:03", (swimW1.match(SWIM_SPLIT) || [])[1], '2:03');
+} else {
+  // D110a era: the fixture's hand rows, then the carrying killer re-sited to 10:08 / 500 yd.
+  const firstInt = (prog, wk) => { let t = '';
+    for(const day of Object.keys(prog.weeks[String(wk)] || prog.weeks[wk] || {}))
+      for(const s of sessionsOf(prog, wk, day))
+        if(s.type === 'swim' && /Interval/.test(String(s.subtype || '')) && !t) t = String(s.detail || '');
+    return t; };
+  eq('C7c week 1 swim INT prints 123.2 - 2 = 121.2 as 2:01 (D110a, Guide A p12)', (swimW1.match(SWIM_MAIN) || [])[1], '2:01');
+  eq("C7c week 1 swim INT prints the goal split 123.2 as 2:03", (swimW1.match(SWIM_SPLIT) || [])[1], '2:03');
+  const swimW6 = firstInt(SWIM, 6);
+  ok('C7c week 6 swim INT card exists', !!swimW6, swimW6.slice(0, 40));
+  eq('C7c week 6 swim INT prints 123.2 - 3x5 - 2 = 106.2 as 1:46 (D110a rate 3)', (swimW6.match(SWIM_MAIN) || [])[1], '1:46');
+  eq('C7c week 6 swim INT prints the goal split 123.2 - 3x5 = 108.2 as 1:48', (swimW6.match(SWIM_SPLIT) || [])[1], '1:48');
+  const killCfg = mkSwimCfg(); killCfg.cardioGoals.swim.baseMins = '10'; killCfg.cardioGoals.swim.baseSecs = '8';
+  const killW1 = firstInt(IA.buildProgram(killCfg), 1);
+  ok('C7c the re-sited killer (10:08 / 500 yd) builds a week 1 swim INT card', !!killW1, killW1.slice(0, 40));
+  eq('C7c week 1 swim INT prints 608/5 - 2 = 119.6 as the carried clock (the idiom prints 1:60 here)',
+     (killW1.match(SWIM_MAIN) || [])[1], '2:00');
+}
 
 // ── C8 — the SOURCE census. One helper, eleven call sites, one survivor ──────
 // Not a build check. This re-derives the idiom inventory from the artifact TEXT and

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="211"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="212"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2817,13 +2817,22 @@ function renderWizardStep() {
               <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(g.targetMins!==undefined&&g.targetMins!=='')?'block':'none'}">${asyIcon('🎯',13)} ${g.targetMins||''}:${String(g.targetSecs||0).padStart(2,'0')} — ${formatPacePer100(((+g.targetMins||0)*60)+(+g.targetSecs||0),SWIM_GOAL_DIST[g.id])||''} (${g.swimUnit||'yd'})</div>
             </div>
             <div style="margin-top:8px">
-              <div class="input-label" style="margin-bottom:6px">Your current ${SWIM_GOAL_DIST[g.id]}${g.swimUnit||'yd'} time? (optional)</div>
+              <div class="input-label" style="margin-bottom:6px">Your most recent timed ${SWIM_GOAL_DIST[g.id]}${g.swimUnit||'yd'}</div>
               <div style="display:flex;align-items:center;gap:6px">
-                <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="min" value="${g.baseMins||''}" oninput="WD.cardioGoals['swim'].baseMins=this.value" min="0" max="99">
+                <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="min" value="${g.baseMins||''}" oninput="WD.cardioGoals['swim'].baseMins=this.value;updateSwimAdvisory()" min="0" max="99">
                 <div style="font-size:20px;color:var(--muted);font-weight:300;flex-shrink:0">:</div>
-                <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="sec" value="${g.baseSecs||''}" oninput="WD.cardioGoals['swim'].baseSecs=this.value" min="0" max="59">
+                <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="sec" value="${g.baseSecs||''}" oninput="WD.cardioGoals['swim'].baseSecs=this.value;updateSwimAdvisory()" min="0" max="59">
+              </div>${_swimAdvisoryHTML()}
+            </div>${g.id==='swim_100_time' ? `
+            <div style="margin-top:8px">
+              <div class="input-label" style="margin-bottom:6px">Your most recent timed 500${g.swimUnit||'yd'}</div>
+              <div style="font-size:11px;line-height:1.45;color:var(--muted);margin-bottom:6px">Your repeats key off your 500 pace. Your 100 time sets the goal.</div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="min" value="${g.base500Mins||''}" oninput="WD.cardioGoals['swim'].base500Mins=this.value;updateSwimAdvisory()" min="0" max="99">
+                <div style="font-size:20px;color:var(--muted);font-weight:300;flex-shrink:0">:</div>
+                <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="sec" value="${g.base500Secs||''}" oninput="WD.cardioGoals['swim'].base500Secs=this.value;updateSwimAdvisory()" min="0" max="59">
               </div>
-            </div>` : g.id==='run_pace_goal' ? `
+            </div>` : ''}` : g.id==='run_pace_goal' ? `
             <div style="margin-top:10px">
               <div class="input-label" style="margin-bottom:6px">Target distance</div>
               <div style="display:flex;gap:0;align-items:stretch">
@@ -4693,18 +4702,36 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
     const fixedDist = goalId === 'swim_500_time' ? 500 : 100;
     const expPace100 = {beginner:150, intermediate:120, advanced:95}[exp] || 120; // sec/100
     let targetPace100 = null, initialPace100 = expPace100;
-    if(swimGoal.targetMins !== undefined && swimGoal.targetMins !== '') {
-      const tTotal = (+swimGoal.targetMins||0)*60 + (+swimGoal.targetSecs||0);
-      if(tTotal > 0) targetPace100 = tTotal / (fixedDist / 100);
-    }
-    if(swimGoal.baseMins !== undefined && swimGoal.baseMins !== '') {
-      const bTotal = (+swimGoal.baseMins||0)*60 + (+swimGoal.baseSecs||0);
-      if(bTotal > 0) initialPace100 = bTotal / (fixedDist / 100);
+    // D110a (V212, coach): the minutes box is a limb, not the time. A time is entered when its total
+    // (minutes*60 + seconds, a missing limb as 0) is above 0, never by the minutes box. The goal time
+    // and every current time read through _swimTot.
+    // D157 (queued, measure first): the SIZER (calcProgramLength's swim branch) still reads the goal
+    // and the current time by the minutes box. The two readers differ ON PURPOSE until D157, so a
+    // seconds-only entry changes the cards here and never the program length.
+    const _swimTot = (m, s) => (+m||0)*60 + (+s||0);
+    const _tgtTotal = _swimTot(swimGoal.targetMins, swimGoal.targetSecs);
+    if(_tgtTotal > 0) targetPace100 = _tgtTotal / (fixedDist / 100);
+    // D144 (V212, coach): the anchor is always a 500. The 500 goal reads its current 500
+    // (baseMins/baseSecs); the 100 goal reads base500Mins/base500Secs. E = the 500 total / 5.
+    const _is100 = goalId === 'swim_100_time';
+    const _baseTotal = _is100 ? _swimTot(swimGoal.base500Mins, swimGoal.base500Secs) : _swimTot(swimGoal.baseMins, swimGoal.baseSecs);
+    if(_baseTotal > 0) initialPace100 = _baseTotal / 5;
+    // D144: the 100 goal's target is the 500 pace moved by the 100 gap. The current 100 is used for
+    // this gap, the E7 hold (gap <= 0) and the sizer, nothing else. No current 100 means no gap.
+    let _goal100 = null;
+    if(_is100 && targetPace100) {
+      const tgt100 = targetPace100, cur100 = _swimTot(swimGoal.baseMins, swimGoal.baseSecs);
+      const gap100 = cur100 > 0 ? cur100 - tgt100 : 0;
+      // D144 floor (coach, V212): a 100 gap at or past the anchor pace would put the target at or
+      // below zero. A card never carries a target that is not a swim, so hold at E (goal met).
+      targetPace100 = gap100 >= initialPace100 ? initialPace100 : initialPace100 - gap100;
+      _goal100 = tgt100;
     }
     if(targetPace100) {
+      const enteredTarget100 = targetPace100; const goalAlreadyMet = enteredTarget100 >= initialPace100; targetPace100 = Math.min(enteredTarget100, initialPace100);
       const agePaceScale = {'55+':0.65, '36-54':0.85, '18-35':1.0}[ageBracket] || 1.0;
       const baseImprove = ({beginner:4, intermediate:3, advanced:2}[exp] || 3) * agePaceScale; // sec/100/wk
-      const maxImprove = Math.min(6, baseImprove * 2.5); // physiological ceiling
+      const maxImprove = baseImprove;
       const rawImprove = (initialPace100 - targetPace100) / Math.max(tw, 1);
       const weeklyImprove = Math.min(rawImprove, maxImprove);
       const realisticTarget = initialPace100 - weeklyImprove * tw;
@@ -4715,7 +4742,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
       swimPace._dampened       = weeklyImprove < rawImprove - 0.05;
       swimPace._weeklyGain     = +weeklyImprove.toFixed(1);
       swimPace._realisticTarget = +realisticTarget.toFixed(1);
-      swimPace._originalTarget = +targetPace100.toFixed(1);
+      swimPace._originalTarget = +enteredTarget100.toFixed(1); swimPace._goalMet = goalAlreadyMet; swimPace._baseEntered = _baseTotal > 0; swimPace._expDefault = expPace100; swimPace._dist = 500; swimPace._goal100 = _goal100;
       swimPace._unit           = swimGoal.swimUnit || 'yd';
     }
   }
@@ -4830,10 +4857,14 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
     if(swimPace) {
       const wIdx = Math.min(week-1, tw-1);
       const weekPace = swimPace[wIdx];
-      const intPace = Math.max(swimPace._realisticTarget * 0.97, weekPace * 0.97); // slightly faster than goal
+      const intPace = weekPace - 2;
       const fmt = s => _clkMS(s);   // D126 (V204): seconds limb owned by _clkMS. Bare; callers append '/100'.
       const u = swimPace._unit;
-      detail = `${intReps} x 100${u} at ${fmt(intPace)}/100 (week ${week} target, slightly faster than this week's goal split of ${fmt(weekPace)}/100). Recovery: 2-3 min easy stroke between reps. 200${u} warmup + 100${u} cooldown.`;
+      // D144 (V212): on the 100 goal the rep is keyed to the 500 pace, and the card says so.
+      const _is100c = goalId === 'swim_100_time';
+      detail = _is100c
+        ? `${intReps} x 100${u} at ${fmt(intPace)}/100 (week ${week} target, two seconds under this week's 500 pace of ${fmt(weekPace)}/100). Recovery: 2-3 min easy stroke between reps. 200${u} warmup + 100${u} cooldown.`
+        : `${intReps} x 100${u} at ${fmt(intPace)}/100 (week ${week} target, slightly faster than this week's goal split of ${fmt(weekPace)}/100). Recovery: 2-3 min easy stroke between reps. 200${u} warmup + 100${u} cooldown.`;
       // V141: the 100s and their split are the pace engine's output — preserved exactly.
       // Drill set shrinks to 4 x 25 whenever reps are cut (taper or early ramp) so it
       // never exceeds 25% of session volume.
@@ -4842,18 +4873,26 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
         segments = [
           {label:'Warm up',   yd:200, text:`200${u} easy, last 2 x 25 building speed.`},
           {label:'Drill set', yd:4*_dr, text:`4 x ${_dr}${u} ${_drill.n}. ${_drill.c}`},
-          {label:'Main set',  yd:intReps*100, text:`${intReps} x 100${u} at ${fmt(intPace)}/100. Slightly faster than this week's goal split of ${fmt(weekPace)}/100. Rest 2 to 3 min easy between reps. If the split slips, end the set.`},
+          {label:'Main set',  yd:intReps*100, text:_is100c
+            ? `${intReps} x 100${u} at ${fmt(intPace)}/100. Two seconds under this week's 500 pace of ${fmt(weekPace)}/100. Rest 2 to 3 min easy between reps. If the split slips, end the set.`
+            : `${intReps} x 100${u} at ${fmt(intPace)}/100. Slightly faster than this week's goal split of ${fmt(weekPace)}/100. Rest 2 to 3 min easy between reps. If the split slips, end the set.`},
           {label:'Cool down', yd:100, text:`100${u} easy.`}
         ];
       }
-      if(swimPace._dampened) {
-        note = `INT: Split capped at +${swimPace._weeklyGain}s/100/week (safe progression limit). Full goal of ${fmt(swimPace._originalTarget)}/100 needs more time. The realistic target for this block is ${fmt(swimPace._realisticTarget)}/100. Hit the prescribed split precisely.`;
+      const _anchorLine = swimPace._baseEntered ? '' : `No current ${swimPace._dist}${u} time was entered. This split starts from the ${exp} default of ${fmt(swimPace._expDefault)}/100, not from your own time. `;
+      const _reachSplit = (_qph && _qph.intSpan) ? swimPace[Math.min(_qph.intSpan, tw) - 1] : swimPace._realisticTarget;
+      const _goalPhrase = goalId === 'swim_100_time' ? fmt(swimPace._goal100) + ' for 100' + u : fmt(swimPace._originalTarget) + '/100';
+      if(swimPace._goalMet) {
+        note = _anchorLine + 'INT: Your goal split is already within your current split. This block holds your split and builds your reps.';
+      } else if(swimPace._dampened) {
+        note = _anchorLine + `INT: Split moves ${swimPace._weeklyGain} seconds per 100 each week. That is the safe rate for your experience and age. Your full goal of ${_goalPhrase} needs more weeks than this block has. The target for this block is ${fmt(_reachSplit)}/100. Hit the prescribed split precisely.`;
       } else {
-        note = 'INT: 100 repeats at your target split. Start at 4, build to 10. Hard cap at 10. If your split slips, end the session. Consistency between reps matters.';
+        note = _anchorLine;
+        note += 'INT: 100 repeats at your target split. Start at 4, build to 8. Hard cap at 8. If your split slips, end the session. Consistency between reps matters.';
       }
     } else {
       detail = intReps + ' x 100 yards at 90% effort, slightly faster than recent 500yd pace. Recovery: 2-3 min easy stroke between reps (2-2.5x work time). 200 yard warmup + 100 yard cooldown.';
-      note = 'INT: 100 yard repeats. Start at 4, build to 10. Hard cap at 10. If pace drops significantly, end the session. Consistency between reps matters.';
+      note = 'INT: 100 yard repeats. Start at 4, build to 8. Hard cap at 8. If pace drops significantly, end the session. Consistency between reps matters.';
       if(_segGoal) {
         const _dr = (_tapStep || intReps < 4) ? 25 : 50;
         segments = [
@@ -7290,10 +7329,42 @@ function updateMileAdvisory(){
   el.textContent=t; el.style.display=t?'block':'none';
   el.style.color=st.msg?'var(--signal)':'var(--muted)';
 }
+// D110a M2 (V212, Mario: make it required): a swim time goal needs a real current time. One
+// validator in the D9 shape, shared by the advisory and the doGenerate refusal. The 500 goal reads
+// baseMins/baseSecs; the 100 goal reads baseMins/baseSecs (the 100) and base500Mins/base500Secs.
+function _swimEntryState(g){
+  if(g===undefined) g=(typeof WD!=='undefined'&&WD.cardioGoals)?WD.cardioGoals.swim:null;
+  if(!g||(g.id!=='swim_500_time'&&g.id!=='swim_100_time')) return {ok:true};
+  const unit=g.swimUnit||'yd', is100=g.id==='swim_100_time';
+  const num=v=>(v===undefined||v===null||v==='')?0:+v;
+  const fields=is100?['baseMins','baseSecs','base500Mins','base500Secs']:['baseMins','baseSecs'];
+  for(const k of fields){ const v=num(g[k]); if(!isFinite(v)||(/Secs$/.test(k)&&v>=60)) return {ok:false,msg:'That is not a real time. Check the minutes and seconds.'}; }
+  const tot=(m,s)=>num(g[m])*60+num(g[s]);
+  const t500=is100?tot('base500Mins','base500Secs'):tot('baseMins','baseSecs');
+  if(!(t500>0)) return {ok:false,blank:true,msg:'Required. Enter your most recent timed 500'+unit+'.'};
+  if(is100){
+    const t100=tot('baseMins','baseSecs');
+    if(!(t100>0)) return {ok:false,blank:true,msg:'Required. Enter your most recent timed 100'+unit+'.'};
+    if(t500/5<t100) return {ok:false,msg:'Your 500 pace is faster than your 100 time. Check both entries.'};
+  }
+  return {ok:true};
+}
+function _swimAdvisoryHTML(){
+  const st=_swimEntryState(); const t=st.ok?'':(st.msg||'');
+  return '<div id="swimAdvisory" style="font-size:11px;line-height:1.45;margin-top:6px;display:'+(t?'block':'none')+';color:'+(st.blank?'var(--muted)':'var(--signal)')+'">'+t+'</div>';
+}
+function updateSwimAdvisory(){
+  const el=document.getElementById('swimAdvisory'); if(!el) return;
+  const st=_swimEntryState(); const t=st.ok?'':(st.msg||'');
+  el.textContent=t; el.style.display=t?'block':'none';
+  el.style.color=st.blank?'var(--muted)':'var(--signal)';
+}
 function doGenerate(){
   // V176 (D9): impossible mile entries stop here, before anything builds.
   const _mv=_mileEntryState();
   if(!_mv.ok){ showToast(_mv.msg); showScreen('screenWizard'); renderWizardStep(); return; }
+  // D110a M2 (V212): a swim time goal with no real current time stops here too.
+  const _sv=_swimEntryState(WD.cardioGoals&&WD.cardioGoals.swim); if(!_sv.ok){ showToast(_sv.msg); showScreen('screenWizard'); renderWizardStep(); return; }
   showScreen('screenGenerate');
   const _previewGoals={...WD.cardioGoals,_experience:WD.experience||'intermediate',_ageBracket:WD.ageBracket||'18-35',_eventTargeted:WD.eventTargeted};
   let totalWeeksPreview=calcProgramLength(WD.cardioTypes||[],_previewGoals,LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks;
@@ -14585,6 +14656,21 @@ function commitGoalChange(){
   const next={id:g.id,label:g.label,baseline:'',
     ...(sport==='run'&&prev.mileBestMins!==undefined&&prev.mileBestMins!==''
         ?{mileBestMins:prev.mileBestMins,mileBestSecs:prev.mileBestSecs,...(prev.mileBestSrc?{mileBestSrc:prev.mileBestSrc}:{})}:{})};
+  // D110a (V212, coach ruled, D144 aware): a swim goal switch keeps the pool unit and every current
+  // time that still means something. A 500 time carries to wherever a 500 lives (the 500 goal's
+  // base, or a 100 goal's base500); a current 100 carries only to a 100 goal. Absent is not written.
+  if(sport==='swim'){
+    const _has=(m,s)=>((+m||0)*60+(+s||0))>0;
+    const _put=(k,t)=>{ if(t[0]!==undefined) next[k+'Mins']=t[0]; if(t[1]!==undefined) next[k+'Secs']=t[1]; };
+    if(prev.swimUnit) next.swimUnit=prev.swimUnit;
+    let _t500=null, _t100=null;
+    if(prev.id==='swim_500_time'&&_has(prev.baseMins,prev.baseSecs)) _t500=[prev.baseMins,prev.baseSecs];
+    if(prev.id==='swim_100_time'&&_has(prev.base500Mins,prev.base500Secs)) _t500=[prev.base500Mins,prev.base500Secs];
+    if(prev.id==='swim_100_time'&&_has(prev.baseMins,prev.baseSecs)) _t100=[prev.baseMins,prev.baseSecs];
+    if(g.id==='swim_500_time'&&_t500) _put('base',_t500);
+    if(g.id==='swim_100_time'&&_t500) _put('base500',_t500);
+    if(g.id==='swim_100_time'&&_t100) _put('base',_t100);
+  }
   if(_GOAL_REQ_INPUTS.has(g.id)){
     const i=_goalDraft.inputs;
     const mins=+i.targetMins||0, secs=+i.targetSecs||0;
