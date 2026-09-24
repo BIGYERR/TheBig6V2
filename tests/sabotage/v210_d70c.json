@@ -1,0 +1,93 @@
+[
+  {
+    "name": "S1-A2 -> the older hypertrophy chest compound skips the lens again: Machine chest press is the Main and the Primer on crossfit and home_full",
+    "anchor": "let chestCompoundPool=hasBarbell?_gear(olderHyp?['Dumbbell bench press','Dumbbell incline press','Machine chest press','Close-grip bench press']:EXLIB.chest_compound):",
+    "replacement": "let chestCompoundPool=hasBarbell?(olderHyp?['Dumbbell bench press','Dumbbell incline press','Machine chest press','Close-grip bench press']:EXLIB.chest_compound):",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O3n Machine chest press. Measured on a forced-210 copy of the slice 3 build, gate run without a baseline (as sabotage.py runs it): PASS 95 FAIL 5. EXPECTED: O3a crossfit MACHINE (687), O3a home_full MACHINE (687), O3n Machine chest press (crossfit=687 home_full=687), O5d crossfit and home_full Close-grip bench press (0: the machine takes the slot back). Needs ia-version >= 210: below 210 the gate is NOT APPLICABLE and every mutation survives."
+  },
+  {
+    "name": "S1-A3 -> the squat pool skips the lens again: squat_joint hands crossfit and home_full older hypertrophy a Leg press and a Hack squat (machine)",
+    "anchor": "let squatPool=hasBarbell?_gear(olderHyp?EXLIB.squat_joint:EXLIB.squat):",
+    "replacement": "let squatPool=hasBarbell?(olderHyp?EXLIB.squat_joint:EXLIB.squat):",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O3n Leg press and O3n Hack squat (machine). Measured on a forced-210 copy of the slice 3 build, gate run without a baseline (as sabotage.py runs it): PASS 96 FAIL 4. EXPECTED: O3a crossfit MACHINE (411), O3a home_full MACHINE (411), O3n Leg press (158 per tier), O3n Hack squat (machine) (253 per tier). Needs ia-version >= 210."
+  },
+  {
+    "name": "S1-A4 -> the hypertrophy chest accessory pool skips the lens again: chest_acc_joint deals Cable crossover, Pec deck and Machine chest press to Chest volume off commercial",
+    "anchor": "const chestPoolRaw=isBW?(isOlder?EXLIB.chest_acc_joint:EXLIB.chest_acc):_gear(isOlder?EXLIB.chest_acc_joint:EXLIB.chest_acc);",
+    "replacement": "const chestPoolRaw=isOlder?EXLIB.chest_acc_joint:EXLIB.chest_acc;",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O3n Pec deck and O3n Cable crossover. Measured on a forced-210 copy of the slice 3 build, gate run without a baseline (as sabotage.py runs it): PASS 91 FAIL 9. EXPECTED: O3a CABLE and MACHINE on crossfit (86, 255), home_full (86, 255), home_basic (215, 141); O3n Machine chest press (crossfit=255 home_full=255 home_basic=105), O3n Pec deck (home_basic 36), O3n Cable crossover (crossfit=86 home_full=86 home_basic=215). Needs ia-version >= 210."
+  },
+  {
+    "name": "S2-A1a -> the barbell clause is prefix-anchored again (^barbell ): Incline barbell press passes the lens into the home_basic Secondary compound",
+    "anchor": "if(!hasBarbell && /\\bbarbell\\b|^trap bar",
+    "replacement": "if(!hasBarbell && /^barbell |^trap bar",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O3b home_basic. Measured on a forced-210 copy of the slice 3 build, gate run without a baseline (as sabotage.py runs it): PASS 95 FAIL 5. EXPECTED: O3b home_basic (213 Incline barbell press in the Secondary compound), O4a home_basic (54), O4b home_basic (21), O4t home_basic (3), O5e (87 of 213 not a dumbbell press). The O4 trips prove the universe lens is the SAME predicate as the pools'. The anchor stops before the clause's tail so slice 4 (D149 removes '|glute-ham') leaves it count==1. Needs ia-version >= 210."
+  },
+  {
+    "name": "S2-A1b -> the barbell clause loses close-grip bench: Close-grip bench press passes the lens into the home_basic Secondary compound",
+    "anchor": "^bench press$|close-grip bench",
+    "replacement": "^bench press$",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O3b home_basic. Measured on a forced-210 copy of the slice 3 build, gate run without a baseline (as sabotage.py runs it): PASS 96 FAIL 4. EXPECTED: O3b home_basic (18 Close-grip bench press in the Secondary compound), O4a home_basic (54), O4b home_basic (24), O4t home_basic (3). Survives slice 4's tail edit (anchor is '^bench press$|close-grip bench'). Needs ia-version >= 210."
+  },
+  {
+    "name": "S2-B1 -> the Secondary compound skips the lens again: Machine chest press on crossfit and home_full, barbell presses on home_basic",
+    "anchor": "          _gear(isOlder?['Dumbbell incline press','Machine chest press','Dumbbell bench press','Dumbbell decline press']\n                 :['Incline barbell press','Dumbbell bench press','Close-grip bench press','Dumbbell incline press'])\n        ).filter(x=>x!==ex.chestMain);",
+    "replacement": "          isOlder?['Dumbbell incline press','Machine chest press','Dumbbell bench press','Dumbbell decline press']\n                 :['Incline barbell press','Dumbbell bench press','Close-grip bench press','Dumbbell incline press']\n        ).filter(x=>x!==ex.chestMain);",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O3b on crossfit, home_full and home_basic. Measured on a forced-210 copy of the slice 3 build, gate run without a baseline (as sabotage.py runs it): PASS 96 FAIL 4. EXPECTED: O3b crossfit (269 Machine chest press), O3b home_full (269), O3b home_basic (656: Machine chest press, Incline barbell press, Close-grip bench press), O5e (213 of 213). Needs ia-version >= 210."
+  },
+  {
+    "name": "S2-B2a -> the finisher's first pick skips the lens again: Cable curl, Preacher curl, Cable lateral raise and Face pull close a home_full day",
+    "anchor": "const _fA=_armsDay?(isBW?EXLIB.biceps:bicepsAccPool).filter(_noBar):(isBW?EXLIB.shoulder_iso:_gear(EXLIB.shoulder_iso));",
+    "replacement": "const _fA=_armsDay?EXLIB.biceps.filter(_noBar):EXLIB.shoulder_iso;",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O3b home_full. Measured on a forced-210 copy of the slice 3 build, gate run without a baseline (as sabotage.py runs it): PASS 99 FAIL 1. EXPECTED: O3b home_full (204: Cable curl, Preacher curl, Cable lateral raise, Face pull in the Arms/Delts finisher; 325 before slice 3, the lensed universe changes what the adjacent-day deconflict can swap in). No O4 trip, by design: the universe lens cleans the harvest after pick(). Needs ia-version >= 210."
+  },
+  {
+    "name": "S2-B2b -> the finisher's second pick skips the lens again: Cable pushdown, Rope tricep extension and the cable delt pair close a home_full day",
+    "anchor": "const _fB=_armsDay?(isBW?EXLIB.triceps:_gear(EXLIB.triceps)):(isBW?EXLIB.shoulder_iso:_gear(EXLIB.shoulder_iso));",
+    "replacement": "const _fB=_armsDay?EXLIB.triceps:EXLIB.shoulder_iso;",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O3b home_full. Measured on a forced-210 copy of the slice 3 build, gate run without a baseline (as sabotage.py runs it): PASS 99 FAIL 1. EXPECTED: O3b home_full (194: Cable pushdown, Rope tricep extension, Cable lateral raise, Face pull in the Arms/Delts finisher; 347 before slice 3). No O4 trip, by design. Needs ia-version >= 210."
+  },
+  {
+    "name": "S2b-branch -> the advanced 55+ branch is dropped: older hypertrophy on crossfit and home_full is goblet only again, the front squat never drawn",
+    "anchor": "    else if(olderHyp&&hasBarbell&&!hasCables&&cfg.experience==='advanced'&&cfg.ageBracket==='55+') squatPool=squatPool.concat(['Front squat']); }",
+    "replacement": "    }",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O5d' crossfit and home_full advanced 55+. Measured on a forced-210 copy of the slice 2b build, gate run without a baseline (as sabotage.py runs it): PASS 108 FAIL 2. EXPECTED: O5d' crossfit advanced 55+ ({Dumbbell goblet squat: 8}), O5d' home_full advanced 55+ (same). Needs ia-version >= 210."
+  },
+  {
+    "name": "S2b-draw -> the draw-level front rack withhold is dropped: a shoulder or elbow plan draws the front squat, and the name net then deletes the day's main squat",
+    "anchor": "if(_noRack) squatPool=squatPool.filter(n=>n!=='Front squat');",
+    "replacement": "if(_noRack);",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O5d' slot never lost. Measured on a forced-210 copy of the slice 2b build, gate run without a baseline (as sabotage.py runs it): PASS 108 FAIL 2. EXPECTED: O5d' the squat slot is never lost (204 of 384 programs: the name net deletes the drawn front squat and the day's main with it), O5d' no front squat in the swap universe (288 of 384). Needs ia-version >= 210."
+  },
+  {
+    "name": "S2b-name -> the name-level front rack withhold is dropped: the swap sheet's injury test offers a front squat to a shoulder or elbow plan",
+    "anchor": "  if(R==='shoulder'||R==='elbow') P.dropNames=new RegExp((P.dropNames?P.dropNames.source+'|':'')+'^front squat$','i');\n",
+    "replacement": "",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O5g. Measured on a forced-210 copy of the slice 2b build, gate run without a baseline (as sabotage.py runs it): PASS 109 FAIL 1. EXPECTED: O5g (crossfit strength seed 1234, main Back squat: the swap sheet offers Front squat under all four shoulder and elbow plans). The draw-level withhold alone cannot defend the sheet, which is why the name net exists. Needs ia-version >= 210."
+  },
+  {
+    "name": "S3-C1c -> the universe filter is dropped: every program carries the raw pick() harvest, so the swap sheet and the adjacent-day deconflict read denied names again",
+    "anchor": "  { const _isBW=cfg.equipment==='bodyweight'; const _u=_swapUniverseList().filter(n=>gearOK(n)&&!(_isBW&&(_BW_SUBS[n]||_BW_GEAR.test(n)))); _swapUniverseReset(); _swapUniverseAdd(_u); }\n  deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks);",
+    "replacement": "  deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks);",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O4a, O4b and O4t bodyweight. Measured on a forced-210 copy of the slice 3 build, gate run without a baseline (as sabotage.py runs it): PASS 97 FAIL 3. EXPECTED: O4a bodyweight (1,677 denied entries of 33,479: Weighted 90/90 hip switch, Dumbbell incline press, Dumbbell bench press...), O4b bodyweight (631 denied offers in 15,625 candidates over 5,840 calls), O4t bodyweight (65 of 942). Byte-for-byte the slice 2 numbers. After slices 1 and 2 the other tiers' harvests are already lens-clean on this lattice except GHD, which O4g holds for slice 4. Needs ia-version >= 210."
+  },
+  {
+    "name": "S3-BW -> the bodyweight clause is dropped: the universe passes _gearOK only, so kettlebell, band and medicine ball names reach a bodyweight swap sheet",
+    "anchor": "_swapUniverseList().filter(n=>gearOK(n)&&!(_isBW&&(_BW_SUBS[n]||_BW_GEAR.test(n))))",
+    "replacement": "_swapUniverseList().filter(n=>gearOK(n))",
+    "gate": "gates/g210_equipment_denials.js",
+    "note": "NAMED TRIP: O4a and O4t bodyweight. Measured on a forced-210 copy of the slice 3 build, gate run without a baseline (as sabotage.py runs it): PASS 98 FAIL 2. EXPECTED: O4a bodyweight (648 denied entries of 32,450: Weighted 90/90 hip switch, Banded hip thrust...), O4t bodyweight (16 of 893). O4b stays green: swapCandidates offers only patterned lifts, and the names only the bodyweight clause catches are holds and mobility drills. Needs ia-version >= 210."
+  }
+]

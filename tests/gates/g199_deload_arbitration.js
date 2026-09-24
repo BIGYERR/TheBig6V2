@@ -106,6 +106,7 @@ DELOAD_ARB_BY_VERSION[206] = DELOAD_ARB_BY_VERSION[205];   // V206 D109/D137: ru
 DELOAD_ARB_BY_VERSION[207] = DELOAD_ARB_BY_VERSION[206];   // D106a: ruled UNMOVED (test-week pin and NSW trial; no section arbitration)
 DELOAD_ARB_BY_VERSION[208] = DELOAD_ARB_BY_VERSION[207];   // V208 D103a/D104a: ruled UNMOVED (NSW keys, labels and placement; no section arbitration)
 DELOAD_ARB_BY_VERSION[209] = DELOAD_ARB_BY_VERSION[208];   // D140: ruled UNMOVED (C1 364, C3 364, C5 32, D2 19, I3 496 printed identical; 0 zero-posterior flips in 17,856 weeks)
+DELOAD_ARB_BY_VERSION[210] = DELOAD_ARB_BY_VERSION[209];   // D70c/D150: ruled UNMOVED (C1 364, C3 364, C5 32, D2 19, I3 496 identical; 0 zero-posterior flips in 17,856 + 17,280 weeks)
 
 // E6 counts deload day builds where the shipped card has zero posterior and the
 // __DELOAD_OFF control has some. D140 (V209) moves it 36 -> 28: eight NSW pace tier B
@@ -113,6 +114,7 @@ DELOAD_ARB_BY_VERSION[209] = DELOAD_ARB_BY_VERSION[208];   // D140: ruled UNMOVE
 // by the tier. The shipped card was already zero on both builds; nothing an athlete
 // sees changed. A bare literal here was a V208 pin dressed as a claim.
 const E6_BY_VERSION = { 208: 36 }; E6_BY_VERSION[209] = 28;   // D140: ruled MOVE
+E6_BY_VERSION[210] = E6_BY_VERSION[209];   // D70c/D150: ruled UNMOVED (28; posterior items identical 51,722 / 47,494)
 // Row lookup. This gate has no top-level version predicate: the bare 36 ran on EVERY artifact it
 // was ever pointed at. So the 208 row is read for every ia-version at or below 208 (older runs keep
 // reading 36 and do not newly fail), and from 209 each version needs its own row. No row -> E6 FAILS.

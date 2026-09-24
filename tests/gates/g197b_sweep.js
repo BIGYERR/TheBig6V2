@@ -209,16 +209,27 @@ ok('B4f travel Room-only machine+cable == 0',      census.travel_room_only.machi
 ok('B4g minimal machine+cable == 0 (was 762/12)',  census.minimal.machine === 0 && census.minimal.cable === 0,
    census.minimal.machine + '/' + census.minimal.cable);
 ok('B4h commercial owns machines and cables: 0 denials', census.commercial.machine === 0 && census.commercial.cable === 0);
-// home_full: the 200 survivors are OUT OF SCOPE for V197 and PINNED so they cannot grow.
-ok('B4i home_full machine items == 200 exactly (was 628; the raw-EXLIB Preacher curl, out of scope)',
-   census.home_full.machine === 200, census.home_full.machine);
-ok('B4j all 200 home_full machine survivors are Preacher curl',
-   census.home_full.names['Preacher curl'] === 200 && Object.keys(census.home_full.names).filter(n => needs(n).indexOf('machine') >= 0).length === 1,
-   JSON.stringify(census.home_full.names));
-ok('B4k home_full cable items == 13 exactly (was 49)', census.home_full.cable === 13, census.home_full.cable);
-ok('B4l the 13 home_full cable survivors are the Arms/Delts finisher pair',
-   census.home_full.names['Cable lateral raise'] === 6 && census.home_full.names['Face pull'] === 7,
-   JSON.stringify(census.home_full.names));
+// B4i-B4l era table. The 200 Preacher curls and 13 finisher cables were V197's out-of-scope
+// leak, PINNED so they could not grow. D70c closes them (finisher through _gear; universe
+// through D150). A LITERAL row asserts a ruled MOVE; <=209 keeps the pin. Row existence is a conjunct.
+const HF_LEAK_BY_VERSION = { 209: { machine:200, cable:13, names:{ 'Preacher curl':200, 'Cable lateral raise':6, 'Face pull':7 } } };
+HF_LEAK_BY_VERSION[210] = { machine:0, cable:0, names:{} };   // D70c: the ruled MOVE
+const HF_LEAK = HF_LEAK_BY_VERSION[(+IA.version <= 209) ? 209 : +IA.version];
+// Survivors of one kind, read off the census and off the row through the same needs() table,
+// compared name for name and count for count: no extras, no missing.
+const hfOfKind = (names, kind) => { const o = {}; Object.keys(names || {}).filter(n => needs(n).indexOf(kind) >= 0).forEach(n => { o[n] = names[n]; }); return o; };
+const hfSame = (a, b) => { const ka = Object.keys(a).sort(), kb = Object.keys(b).sort(); return ka.length === kb.length && ka.every((k, i) => k === kb[i] && a[k] === b[k]); };
+const hfRowTxt = HF_LEAK ? '' : ' (NO ERA ROW for ia-version ' + IA.version + ')';
+ok('B4i home_full machine items == the era row (V209 pin 200, the raw-EXLIB Preacher curl; V210 D70c 0)' + hfRowTxt,
+   !!HF_LEAK && census.home_full.machine === HF_LEAK.machine, census.home_full.machine);
+ok('B4j home_full machine survivors are exactly the era row\'s names and counts' + hfRowTxt,
+   !!HF_LEAK && hfSame(hfOfKind(census.home_full.names, 'machine'), hfOfKind(HF_LEAK.names, 'machine')),
+   JSON.stringify(hfOfKind(census.home_full.names, 'machine')) + ' vs row ' + JSON.stringify(HF_LEAK ? hfOfKind(HF_LEAK.names, 'machine') : null));
+ok('B4k home_full cable items == the era row (V209 pin 13; V210 D70c 0)' + hfRowTxt,
+   !!HF_LEAK && census.home_full.cable === HF_LEAK.cable, census.home_full.cable);
+ok('B4l home_full cable survivors are exactly the era row\'s names and counts' + hfRowTxt,
+   !!HF_LEAK && hfSame(hfOfKind(census.home_full.names, 'cable'), hfOfKind(HF_LEAK.names, 'cable')),
+   JSON.stringify(hfOfKind(census.home_full.names, 'cable')) + ' vs row ' + JSON.stringify(HF_LEAK ? hfOfKind(HF_LEAK.names, 'cable') : null));
 ok('B4m no leg machine reaches a cable-less tier',
    ['crossfit','home_basic','home_full','bodyweight','minimal','travel_room_only']
      .every(t => MACHINES.every(m => !census[t].names[m])),

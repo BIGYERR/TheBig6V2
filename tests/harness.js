@@ -340,6 +340,14 @@ MANNY_CORE_OFF_DIGEST_BY_VERSION[208] = MANNY_CORE_OFF_DIGEST_BY_VERSION[207];  
 MANNY_DIGEST_BY_VERSION[209] = MANNY_DIGEST_BY_VERSION[208];   // D140: ruled UNMOVED
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[209] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[208];   // D140: ruled UNMOVED
 MANNY_CORE_OFF_DIGEST_BY_VERSION[209] = MANNY_CORE_OFF_DIGEST_BY_VERSION[208];   // D140: ruled UNMOVED
+// V210: ruled UNMOVED, written as a REFERENCE. D70c/D150 touch only pools HALF_MANNY never
+// draws from (0 machine, cable or GHD names on 388/388 items) and the swap universe, which
+// progDigest strips; 2b adds Front squat to the older advanced pool and withholds it under
+// shoulder/elbow plans, neither of which is this fixture. Printed by coach from the source-
+// surgery copy BEFORE the build: 0ac7da6b1691a8e1, universe 86 -> 86, nothing removed.
+MANNY_DIGEST_BY_VERSION[210] = MANNY_DIGEST_BY_VERSION[209];   // D70c/D150/2b: ruled UNMOVED
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[210] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[209];   // ruled UNMOVED
+MANNY_CORE_OFF_DIGEST_BY_VERSION[210] = MANNY_CORE_OFF_DIGEST_BY_VERSION[209];   // ruled UNMOVED
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
                    MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION,

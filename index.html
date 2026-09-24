@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="209"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="210"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -7813,6 +7813,10 @@ function injuryPlan(cfg){
       P.swapNames={'Dumbbell skullcrushers':'Cable pushdown','Barbell curl':'Dumbbell hammer curl','Preacher curl':'Cable curl'};
     }
   }
+  // V210 (2b): the front rack is withheld under every shoulder and elbow plan. The draw never
+  // deals it (buildProgram's squat pool); this is the name-level net the swap sheet's injury
+  // test (_swapInjuryOK) reads, and it catches any path that reaches a card without that pool.
+  if(R==='shoulder'||R==='elbow') P.dropNames=new RegExp((P.dropNames?P.dropNames.source+'|':'')+'^front squat$','i');
   return P;
 }
 // Section post-filter — runs AFTER buildSections, BEFORE capRegionalFatigue, so the
@@ -8112,7 +8116,7 @@ function engineC_kinematics(cfg, A, B){
     // V113: '^(overhead|push) press$' and '^good mornings?$' retired. Those names existed
     // ONLY to catch barbell movements whose name did not say barbell. They now do, so
     // '^barbell ' covers them. Back/front squat stay bare by lifting convention.
-    if(!hasBarbell && /^barbell |^trap bar|^power clean|^hang clean|^rack pull|^back squat|^front squat|^bench press$|glute-ham/i.test(N)) return false;
+    if(!hasBarbell && /\bbarbell\b|^trap bar|^power clean|^hang clean|^rack pull|^back squat|^front squat|^bench press$|close-grip bench|glute-ham/i.test(N)) return false;
     // V114: 'machine seated calf raise' was named literally, which meant every OTHER
     // machine-named movement walked straight through. `\bmachine\b` is the general form.
     // Full machine-named inventory in EXLIB at time of writing: 'Machine chest press',
@@ -8182,9 +8186,17 @@ function engineC_kinematics(cfg, A, B){
   // variants (dumbbell/machine over heavy barbell). Same growth, far less connective-
   // tissue stress. Only applies on the hypertrophy path with equipment that supports it.
   const olderHyp=(goal==='hypertrophy')&&(cfg.ageBracket==='55+'||cfg.ageBracket==='36-54');
-  let chestCompoundPool=hasBarbell?(olderHyp?['Dumbbell bench press','Dumbbell incline press','Machine chest press','Close-grip bench press']:EXLIB.chest_compound):_bw(['Incline pushups (hands on bed)','Pushups (slow 3s eccentric)','Decline pushups (feet elevated)','Diamond pushups','Archer pushups'],['Dumbbell bench press','Dumbbell incline press','Dumbbell decline press','Pushup variation (weighted)']);
+  let chestCompoundPool=hasBarbell?_gear(olderHyp?['Dumbbell bench press','Dumbbell incline press','Machine chest press','Close-grip bench press']:EXLIB.chest_compound):_bw(['Incline pushups (hands on bed)','Pushups (slow 3s eccentric)','Decline pushups (feet elevated)','Diamond pushups','Archer pushups'],['Dumbbell bench press','Dumbbell incline press','Dumbbell decline press','Pushup variation (weighted)']);
   let backCompoundPool=hasBarbell?EXLIB.back_compound:_bw(['Inverted row (knees bent, under a table)','Inverted row (under a table)','Feet-elevated inverted row (under a table)'],['Kettlebell single-leg deadlift','Kettlebell swing','Kettlebell single-leg deadlift','Dumbbell Romanian deadlift']);
-  let squatPool=hasBarbell?(olderHyp?EXLIB.squat_joint:EXLIB.squat):_bw(['Squat (slow 3s tempo)','Split squat','Bulgarian split squat (foot on chair)','Assisted pistol squat'],['Kettlebell goblet squat','Dumbbell goblet squat','Single-leg squat (assisted)','Step-ups (KB)']);
+  let squatPool=hasBarbell?_gear(olderHyp?EXLIB.squat_joint:EXLIB.squat):_bw(['Squat (slow 3s tempo)','Split squat','Bulgarian split squat (foot on chair)','Assisted pistol squat'],['Kettlebell goblet squat','Dumbbell goblet squat','Single-leg squat (assisted)','Step-ups (KB)']);
+  // V210 (2b): advanced 55+ older hypertrophy on crossfit or home_full draws goblet OR front
+  // squat, once, for the whole program (hypertrophy is locked; the lock outranks alternation).
+  // Under any shoulder or elbow plan the front rack is withheld on every tier: it loads wrist
+  // extension, elbow flexion and shoulder rotation at once. The goblet stays. Set here, before
+  // _preInj, so the injury guard does not read the withhold as a redirect.
+  { const _ip=injuryPlan(cfg), _noRack=!!(_ip&&_ip.tier!=='halfstep'&&(_ip.region==='shoulder'||_ip.region==='elbow'));
+    if(_noRack) squatPool=squatPool.filter(n=>n!=='Front squat');
+    else if(olderHyp&&hasBarbell&&!hasCables&&cfg.experience==='advanced'&&cfg.ageBracket==='55+') squatPool=squatPool.concat(['Front squat']); }
   let rowPool=hasBarbell?EXLIB.back_row:_bw(['Reverse snow angels','Inverted row (under a table)','Feet-elevated inverted row (under a table)'],['Kettlebell single-arm row','Dumbbell row','Resistance band row','TRX row (if available)']);
   // V192 (D41): the frontal-plane lunge reaches the no-barbell tier through the LOADED
   // list only. The bodyweight list beside it is a rung ladder (easy->hard, windowed by
@@ -8843,15 +8855,15 @@ function engineC_kinematics(cfg, A, B){
         // + direct arm isolation, reaching 12–15 sets/muscle/wk. Older tiers get joint-
         // friendly (dumbbell/machine/cable) variants and higher reps, not a volume cut.
         const isOlder=(cfg.ageBracket==='55+'||cfg.ageBracket==='36-54');
-        const chestPoolRaw=isOlder?EXLIB.chest_acc_joint:EXLIB.chest_acc;
+        const chestPoolRaw=isBW?(isOlder?EXLIB.chest_acc_joint:EXLIB.chest_acc):_gear(isOlder?EXLIB.chest_acc_joint:EXLIB.chest_acc);
         // Secondary compound = a distinct heavy-ish press, NOT the main and NOT isolation.
         // Equipment-gated like every other pool on this day: without the _bw() gate the
         // no-load tiers were handed a barbell press ("Close-grip bench press") that no
         // gear regex catches, because the name never says "barbell".
         const secondaryPool=_bw(
           ['Incline pushups (hands on bed)','Pushups (slow 3s eccentric)','Decline pushups (feet elevated)','Diamond pushups','Archer pushups'],
-          isOlder?['Dumbbell incline press','Machine chest press','Dumbbell bench press','Dumbbell decline press']
-                 :['Incline barbell press','Dumbbell bench press','Close-grip bench press','Dumbbell incline press']
+          _gear(isOlder?['Dumbbell incline press','Machine chest press','Dumbbell bench press','Dumbbell decline press']
+                 :['Incline barbell press','Dumbbell bench press','Close-grip bench press','Dumbbell incline press'])
         ).filter(x=>x!==ex.chestMain);
         const chestPool=chestPoolRaw.filter(x=>x!==ex.chestMain);
         const repA=isOlder?'12':'10', repB=isOlder?'15':'12';
@@ -9143,8 +9155,8 @@ function engineC_kinematics(cfg, A, B){
         if(!_longDay){
           // Delts or arms close the day, alternating by seed so two programs differ.
           const _armsDay=((seed+_fo)%2)===0;
-          const _fA=_armsDay?EXLIB.biceps.filter(_noBar):EXLIB.shoulder_iso;
-          const _fB=_armsDay?EXLIB.triceps:EXLIB.shoulder_iso;
+          const _fA=_armsDay?(isBW?EXLIB.biceps:bicepsAccPool).filter(_noBar):(isBW?EXLIB.shoulder_iso:_gear(EXLIB.shoulder_iso));
+          const _fB=_armsDay?(isBW?EXLIB.triceps:_gear(EXLIB.triceps)):(isBW?EXLIB.shoulder_iso:_gear(EXLIB.shoulder_iso));
           const _f1=pick(_fA,1,blockSeed(w)+34+_fo)[0];
           const _f2=_armsDay?pick(_fB,1,blockSeed(w)+35+_fo)[0]
                             :pick(_fB.filter(n=>n!==_f1),1,blockSeed(w)+35+_fo)[0];
@@ -9243,7 +9255,7 @@ function engineC_kinematics(cfg, A, B){
   }
 
   // Build cardio schedule
-  return { buildSections };
+  return { buildSections, gearOK:_gearOK };
 }
 
 // ── REGIONAL FATIGUE CAP ────────────────────────────────────────────────────
@@ -9663,9 +9675,12 @@ function _repFloor(name){
 //   3. nothing else — deliberately not offered. A curl does not replace a main
 //                     deadlift; that is abandoning the day, not swapping it.
 //
-// Candidates come from the harvested pick() universe, so they are equipment-legal
-// by construction, and are then run through applyInjuryFilter so an active injury
-// plan governs the swap sheet exactly as it governs generation.
+// Candidates come from the harvested pick() universe. V210 (D150) passes that universe
+// through the build's own gear lens (_gearOK, and on the bodyweight tier the sweep's own
+// test) before anyone reads it, so they are equipment-legal; travel variants are built by
+// the same buildProgram, so their keyed universes are too. They are then run through
+// applyInjuryFilter so an active injury plan governs the swap sheet exactly as it
+// governs generation.
 function swapUniverseFor(prog,week,day){
   if(!prog) return [];
   // V175 (D27): keyed by the DAY's overlay stamp, not by week — a one-day trip leaves
@@ -10506,7 +10521,7 @@ function engineD_synthesis(cfg, A, B, plan, C){
           cardioTypes, cardioGoals, isRecoveryWeek } = A;
   const { cardioSchedule, includeHip, inTaper } = B;
   const { dayRoles, legRecoveryNote } = plan;
-  const { buildSections } = C;
+  const { buildSections, gearOK } = C;
   const includeCore=true;
   const weeks={};
   for(let w=1;w<=totalWeeks;w++){
@@ -10613,6 +10628,7 @@ function engineD_synthesis(cfg, A, B, plan, C){
   // or substitute a movement (core injection, injury refilter, session budget, swap prefs)
   // so it sees the settled block, and BEFORE bodyweightSweep so its substitutions are swept
   // by the same gear catch-all as everything else.
+  { const _isBW=cfg.equipment==='bodyweight'; const _u=_swapUniverseList().filter(n=>gearOK(n)&&!(_isBW&&(_BW_SUBS[n]||_BW_GEAR.test(n)))); _swapUniverseReset(); _swapUniverseAdd(_u); }
   deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks);
   // Final catch-all for the "Room only" tier — see bodyweightSweep. Runs AFTER core/hip
   // injection so it catches gear arriving from those subsystems too.
