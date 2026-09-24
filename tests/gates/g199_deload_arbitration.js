@@ -146,6 +146,9 @@ DELOAD_HINGE_BY_VERSION[214] = DELOAD_HINGE_BY_VERSION[213];   // D158: ruled UN
 DELOAD_ARB_BY_VERSION[215] = DELOAD_ARB_BY_VERSION[214];   // D149: ruled UNMOVED (printed: C1 364 C3 364 C5 32 D2 19 I3 496)
 E6_BY_VERSION[215] = E6_BY_VERSION[214];   // D149: ruled UNMOVED (28 printed)
 DELOAD_HINGE_BY_VERSION[215] = { E1b: 9319, E3: 44, G5: {'Explosive finisher': 44}, E1a: 12384, G1: 1290 };   // D149: ruled MOVE. Glute-ham raise and 45° back extension are posterior items and leave home_full, so fewer enter the deload (12,477 -> 12,384), fewer leave (9,334 -> 9,319) and fewer Leg isolation blocks drop (1,350 -> 1,290). E1a, G1 and G2 lose their bare literals and read this row; rows <= 214 carry E1a 12477, G1 1350. E2 follows E1a.
+DELOAD_ARB_BY_VERSION[216] = DELOAD_ARB_BY_VERSION[215];   // D154/D156: ruled UNMOVED (C1 364, C5 32, D2 19, I3 496 printed identical)
+E6_BY_VERSION[216] = E6_BY_VERSION[215];   // D154/D156: ruled UNMOVED (28 printed)
+DELOAD_HINGE_BY_VERSION[216] = DELOAD_HINGE_BY_VERSION[215];   // D154/D156: ruled UNMOVED (E1a 12384, E1b 9319, E3 44, G1 1290, G5 44 printed; a Delts finisher is not posterior and a triceps rename is not a hinge)
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[

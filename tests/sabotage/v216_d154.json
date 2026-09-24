@@ -1,0 +1,23 @@
+[
+ {
+  "name": "S1-D154 -> the lens is dropped on the TARGET: a legal source renames straight into its target again, so Cable pushdown prints on crossfit, home_full and home_basic",
+  "anchor": "name=_gOK(to)?to:(SWAP_GEAR_FALLBACK[to]||to);",
+  "replacement": "name=to;",
+  "gate": "gates/g216_d154_swap_lens.js",
+  "note": "NAMED TRIP in g216_d154_swap_lens.js. Needs ia-version >= 216: below 216 the gate is NOT APPLICABLE and every mutation survives. EXPECTED: U2 and U3 on crossfit/home_full/home_basic (Dumbbell skullcrushers -> Cable pushdown), P1 and P2 on the same three tiers."
+ },
+ {
+  "name": "S2-D154 -> an ALREADY-ILLEGAL source is renamed again: the source check is removed, so bodyweight's Dumbbell bench press becomes Dumbbell floor press before the sweep and home_basic's Barbell curl becomes a hammer curl",
+  "anchor": "if(_gOK(name)){ const to=P.swapNames[name];",
+  "replacement": "if(true){ const to=P.swapNames[name];",
+  "gate": "gates/g216_d154_swap_lens.js",
+  "note": "NAMED TRIP in g216_d154_swap_lens.js row U2 (bodyweight: every source renamed; home_basic: Barbell curl; crossfit/home_full/home_basic: Preacher curl -> Cable curl, which also fails U3). Programs stay byte-identical on bodyweight (bodyweightSweep's keyword fallback maps each source and its target to the same name), so Q1 does not see it; the unit row is the one that does."
+ },
+ {
+  "name": "S3-D154 -> the elbow/workaround copy reverts to its V215 bytes",
+  "anchor": "elbow:{workaround:'Straight bar work moves to neutral grips. Skullcrushers become pushdowns, or close grip pushups where there is no cable. Dips and carries are out. Pressing holds RPE 7.',",
+  "replacement": "elbow:{workaround:'Straight bar work moves to neutral grips, skullcrushers become pushdowns, dips and carries are out, pressing holds RPE 7.',",
+  "gate": "gates/g216_d154_swap_lens.js",
+  "note": "NAMED TRIP in g216_d154_swap_lens.js row C1."
+ }
+]

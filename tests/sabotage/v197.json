@@ -1,8 +1,8 @@
 [
   {
     "name": "M1 -> D70b reverted: the _gear fallback is back, so a pool that filters to nothing is handed back whole and the equipment question is advisory again (crossfit draws leg presses)",
-    "anchor": "    return true;\n  };\n  const _gear = pool => (pool||[]).filter(_gearOK);",
-    "replacement": "    return true;\n  };\n  const _gear = pool => { const f=(pool||[]).filter(_gearOK); return f.length ? f : pool; };",
+    "anchor": "  const _gear = pool => (pool||[]).filter(_gearOK);",
+    "replacement": "  const _gear = pool => { const f=(pool||[]).filter(_gearOK); return f.length ? f : pool; };",
     "gate": "gates/g197a_pool_static.js"
   },
   {

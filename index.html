@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="215"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="216"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -6431,6 +6431,45 @@ const CORE_SPEED_TYPES = new Set(['int','nrc_speed1','nrc_speed2']);
 // was unreachable from week assembly, where the core injector runs — so the one pool that
 // is injected after the pool block had no gear gate at all. One definition, two readers.
 function _tierHasBarbell(equip){ return equip==='home_full'||equip==='commercial'||equip==='crossfit'; }
+// V216 (D154): THE GEAR LENS, one predicate for every reader. Engine C's pools read it as _gearOK;
+// applyInjuryFilter reads it for the build's own equipment, so an injury rename is judged by the
+// same lens the draw was. The four flags derive from the tier exactly as Engine C derives its own.
+// A pure function of the tier name; the body below moved here verbatim from Engine C.
+function _gearLens(equip){
+  const hasBarbell=_tierHasBarbell(equip);
+  const hasCables=equip==='commercial';
+  const hasGHD=equip==='commercial'||equip==='crossfit';
+  const hasDumbbells=equip!=='bodyweight';
+  return n => {
+    const N=String(n||'');
+    // V113: '^(overhead|push) press$' and '^good mornings?$' retired. Those names existed
+    // ONLY to catch barbell movements whose name did not say barbell. They now do, so
+    // '^barbell ' covers them. Back/front squat stay bare by lifting convention.
+    if(!hasBarbell && /\bbarbell\b|^trap bar|^power clean|^hang clean|^rack pull|^back squat|^front squat|^bench press$|close-grip bench/i.test(N)) return false;
+    if(!hasGHD && /glute-ham|\bghr\b|45° back extension/i.test(N)) return false;
+    // V114: 'machine seated calf raise' was named literally, which meant every OTHER
+    // machine-named movement walked straight through. `\bmachine\b` is the general form.
+    // Full machine-named inventory in EXLIB at time of writing: 'Machine chest press',
+    // 'Machine seated calf raise', 'Hack squat (machine)' — the last already blocked by
+    // 'hack squat'. Named-implement entries below stay because their names never say
+    // cable or machine ('Rope tricep extension', 'Face pull', 'Pec deck').
+    if(!hasCables && /cable|\brope\b|face pull|pulldown|pec deck|\bleg press\b|leg extension|lying leg curl|seated leg curl|hack squat|\bsmith\b|preacher|\bmachine\b/i.test(N)) return false;
+    // THE DUMBBELL AXIS (V127). Attempted in V122 and reverted the same session, because
+    // _gear USED TO fall back to the RAW pool when filtering emptied it (removed V197,
+    // D70b — the quote below is history, not the current line):
+    //   const _gear = pool => { const f=(pool||[]).filter(_gearOK); return f.length ? f : pool; };
+    // So tightening this gate LOOSENED the result: EXLIB.shoulder_iso is five dumbbells and
+    // cables, it emptied on the bodyweight tier, and the fallback handed that tier a cable
+    // Face pull. The prerequisite — a bodyweight-legal member in every pool this clause can
+    // empty, routed through _bw() the way the calf pool already was — landed first in V127
+    // as EXLIB.shoulder_iso_bw. Harvested, not guessed: shoulder_iso and calves are the only
+    // two pools that empty once the dumbbell and cable/machine clauses both apply.
+    // 'kettlebell' and '(kb)' are deliberately NOT here — kettlebell ownership is asked
+    // separately and hasEquip already answers for them.
+    if(!hasDumbbells && /\bdumbbell|\bdb\b|goblet/i.test(N)) return false;
+    return true;
+  };
+}
 
 
 // ── BODYWEIGHT SAFETY SWEEP ───────────────────────────────────────────────────
@@ -8031,7 +8070,15 @@ function applyInjuryFilter(sections,cfg){
         if(!sw) return;
         name=sw; detail=it.detail;
       }
-      if(P.swapNames&&P.swapNames[name]) name=P.swapNames[name];
+      // V216 (D154): the swap reads the build's gear lens (_gearLens, the predicate the pools use).
+      // A source the tier does not own is not renamed: bodyweightSweep converts it exactly as
+      // before. A target the tier does not own falls to its family's gear legal member, so the
+      // swap the copy promises still lands. A target with no fallback row renames as it always did.
+      if(P.swapNames&&P.swapNames[name]){
+        const _gOK=_gearLens((cfg&&cfg.equipment)||'home_full');
+        const SWAP_GEAR_FALLBACK={'Cable pushdown':'Close-grip pushups'};
+        if(_gOK(name)){ const to=P.swapNames[name]; name=_gOK(to)?to:(SWAP_GEAR_FALLBACK[to]||to); }
+      }
       if(pat&&P.cap.has(pat)&&detail&&!/RPE/.test(detail)) detail=detail+' — hold RPE 7, two in the tank';
       if(seen.has(name)) return;  // swaps can collide with an existing pick
       seen.add(name);
@@ -8292,35 +8339,9 @@ function engineC_kinematics(cfg, A, B){
   // they were harvested into the pool itself (V197 D75, EXLIB.leg_accessory), which is the
   // coaching call this comment said it would not make mechanically. The denial now lands:
   // an all-illegal pool returns EMPTY, and the one live consumer guards its second index.
-  const _gearOK = n => {
-    const N=String(n||'');
-    // V113: '^(overhead|push) press$' and '^good mornings?$' retired. Those names existed
-    // ONLY to catch barbell movements whose name did not say barbell. They now do, so
-    // '^barbell ' covers them. Back/front squat stay bare by lifting convention.
-    if(!hasBarbell && /\bbarbell\b|^trap bar|^power clean|^hang clean|^rack pull|^back squat|^front squat|^bench press$|close-grip bench/i.test(N)) return false;
-    if(!hasGHD && /glute-ham|\bghr\b|45° back extension/i.test(N)) return false;
-    // V114: 'machine seated calf raise' was named literally, which meant every OTHER
-    // machine-named movement walked straight through. `\bmachine\b` is the general form.
-    // Full machine-named inventory in EXLIB at time of writing: 'Machine chest press',
-    // 'Machine seated calf raise', 'Hack squat (machine)' — the last already blocked by
-    // 'hack squat'. Named-implement entries below stay because their names never say
-    // cable or machine ('Rope tricep extension', 'Face pull', 'Pec deck').
-    if(!hasCables && /cable|\brope\b|face pull|pulldown|pec deck|\bleg press\b|leg extension|lying leg curl|seated leg curl|hack squat|\bsmith\b|preacher|\bmachine\b/i.test(N)) return false;
-    // THE DUMBBELL AXIS (V127). Attempted in V122 and reverted the same session, because
-    // _gear USED TO fall back to the RAW pool when filtering emptied it (removed V197,
-    // D70b — the quote below is history, not the current line):
-    //   const _gear = pool => { const f=(pool||[]).filter(_gearOK); return f.length ? f : pool; };
-    // So tightening this gate LOOSENED the result: EXLIB.shoulder_iso is five dumbbells and
-    // cables, it emptied on the bodyweight tier, and the fallback handed that tier a cable
-    // Face pull. The prerequisite — a bodyweight-legal member in every pool this clause can
-    // empty, routed through _bw() the way the calf pool already was — landed first in V127
-    // as EXLIB.shoulder_iso_bw. Harvested, not guessed: shoulder_iso and calves are the only
-    // two pools that empty once the dumbbell and cable/machine clauses both apply.
-    // 'kettlebell' and '(kb)' are deliberately NOT here — kettlebell ownership is asked
-    // separately and hasEquip already answers for them.
-    if(!hasDumbbells && /\bdumbbell|\bdb\b|goblet/i.test(N)) return false;
-    return true;
-  };
+  // V216 (D154): the predicate body lives in _gearLens (top level) so applyInjuryFilter can ask
+  // the same question of an injury rename, for the equipment of the build it filters.
+  const _gearOK = _gearLens(equip);
   const _gear = pool => (pool||[]).filter(_gearOK);
   // V215 (D149 floors, coach): APPEND ONLY WHEN SHORT. A pool left with fewer than `min` names
   // gets ONE named member appended; a pool that is long enough comes back untouched, so a floor
@@ -9317,7 +9338,10 @@ function engineC_kinematics(cfg, A, B){
         // harvested from the live engines: run 'Long Run*', bike 'Long Ride*', and swim's
         // LSD slot (the swim engine's long session IS its LSD).
         const _c=opts.cardio;
-        const _longDay=!!(_c&&_c.subtype&&(
+        // V216 (D156): the long day is a CLASS, the day that carries the long run. An NSW run card
+        // has no Long Run subtype; it says so on its dose (key 'long'), the contract _longRunTier
+        // reads. NRC, bike and swim keep their subtype tests below.
+        const _longDay=!!(_c&&_c.dose&&_c.dose.key==='long')||!!(_c&&_c.subtype&&(
           (_c.type==='run'&&/^Long Run/.test(_c.subtype))||
           (_c.type==='bike'&&/^Long Ride/.test(_c.subtype))||
           (_c.type==='swim'&&/^Long Slow Distance/.test(_c.subtype))));
@@ -15346,7 +15370,7 @@ const _INJ_EFFECT={
         protect:'Nothing loads the spine. Hinges and rows sit out, legs go machine based, core stays anti extension only. Cardio is easy swimming and walking.'},
   shoulder:{workaround:'Overhead work and dips are out. Pressing stays flat and neutral, held at RPE 7. Face pulls stay, they help. Swims become runs or rides.',
         protect:'All pressing sits out. Push day becomes a pull volume day. Swims become runs or rides. Pull day trains normally.'},
-  elbow:{workaround:'Straight bar work moves to neutral grips, skullcrushers become pushdowns, dips and carries are out, pressing holds RPE 7.',
+  elbow:{workaround:'Straight bar work moves to neutral grips. Skullcrushers become pushdowns, or close grip pushups where there is no cable. Dips and carries are out. Pressing holds RPE 7.',
         protect:'Direct arm work and pressing sit out. The day leans legs and core. Cardio is untouched.'}
 };
 const _INJ_SAFETY='If it is sharp, swollen, numb, or no better in two weeks, that is a job for a professional, not an app.';

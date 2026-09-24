@@ -1,0 +1,9 @@
+[
+ {
+  "name": "S1-D156 -> the dose key test is dropped: _longDay reads the NRC, bike and swim subtypes only again, so an NSW long run day on the loaded full body day draws the Arms or Delts finisher",
+  "anchor": "const _longDay=!!(_c&&_c.dose&&_c.dose.key==='long')||!!(_c&&_c.subtype&&(",
+  "replacement": "const _longDay=!!(_c&&_c.subtype&&(",
+  "gate": "gates/g216_d156_longday.js",
+  "note": "NAMED TRIP in g216_d156_longday.js rows F1 (every NSW lattice), F2 and K1. Needs ia-version >= 216: below 216 the gate is NOT APPLICABLE and the mutation survives. The pair rows read V215 from git 7474f06 when no baseline is passed, as sabotage.py runs it. g216_d154_swap_lens.js Q2/Q3 also see it (their baseline is V215 with this predicate grafted), which is expected."
+ }
+]

@@ -72,9 +72,10 @@
 //   S1  everything else (slice 1)
 //
 // D154 LICENCE (standing ruling 2, a predicate, not prose). While ia-version <= D154_SCOPED_TO
-// (212, renewed at V212) the R bucket is SCOPED OUT: O3r prints SCOPED OUT with its live count
-// (never PASS) and O3z leaves R out of its total. Above it the licence expires, O3r enforces and
-// O3z counts R, so the gap stays loud on the first build after it unless D154 has shipped.
+// (215) the R bucket is SCOPED OUT: O3r prints SCOPED OUT with its live count (never PASS) and
+// O3z leaves R out of its total. RETIRED AT V216: D154 ships on 216 (the renamer reads the gear
+// lens; a denied target falls to Close-grip pushups; its own rows are tests/gates/g216_d154_swap_lens.js),
+// so from 216 O3r enforces and asserts 0 and O3z counts R. The boundary is fixed. It is never renewed.
 //
 // D149 LICENCE (standing ruling 2, a predicate, not prose). D149 is HELD out of V210 by coach:
 // slice 4 met its lens targets but lost home_full sections on long-run tier B days and injured
@@ -98,7 +99,7 @@ const D70C_ERA = 210;
 const SLICES_BUILT = 3;          // slices 1 (D70c-A1..A4), 2 (D70c-B1, B2), 2b, 3 (D150): V210's whole scope. D149 is HELD (licence below).
 const FINAL = 3;                 // V210's scope ends at slice 3: O3z and O6r enforce now
 const EXPIRED = VER > D70C_ERA;  // a later build runs this gate: no row may hide as NOT YET BUILT
-const D154_SCOPED_TO = 215; // D154 queued
+const D154_SCOPED_TO = 215; // D154 ships on 216: the licence is retired, never renewed. O3r and O3z enforce from 216.
 const D149_SHIPS = 215;   // D149 shipped on V215: the licence is retired, never renewed
 const D154_SCOPED = VER <= D154_SCOPED_TO;  // the D154 licence: the elbow renamer is out of scope through D154_SCOPED_TO only
 const D149_HELD = VER < D149_SHIPS;         // the D149 licence, retired: <= 214 the GHD station is HELD, from 215 its rows enforce.
