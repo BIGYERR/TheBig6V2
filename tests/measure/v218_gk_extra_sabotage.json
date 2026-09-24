@@ -1,0 +1,26 @@
+[
+ {
+  "name": "GK5 live pace line gate reverts to minutes box",
+  "anchor": "  if(!(totalSecs > 0)) { el.style.display = 'none'; return; }",
+  "replacement": "  if(g.targetMins === undefined || g.targetMins === '') { el.style.display = 'none'; return; }",
+  "gate": "gates/g218_d157_swim_sizer.js"
+ },
+ {
+  "name": "GK6 live pace line label reverts to raw boxes",
+  "anchor": "' ' + _clkMS(totalSecs) + ' — '",
+  "replacement": "' ' + (g.targetMins||0) + ':' + String(g.targetSecs||0).padStart(2,'0') + ' — '",
+  "gate": "gates/g218_d157_swim_sizer.js"
+ },
+ {
+  "name": "GK7 initial render label reverts to raw boxes",
+  "anchor": "${asyIcon('🎯',13)} ${_clkMS(((+g.targetMins||0)*60)+(+g.targetSecs||0))} — ",
+  "replacement": "${asyIcon('🎯',13)} ${g.targetMins||''}:${String(g.targetSecs||0).padStart(2,'0')} — ",
+  "gate": "gates/g218_d157_swim_sizer.js"
+ },
+ {
+  "name": "GK8 sizer rounds label by floor (off-by-one on fractional totals)",
+  "anchor": "var sTimeLbl = _clkMS(tTotal);",
+  "replacement": "var sTimeLbl = _clkMS(Math.floor(tTotal));",
+  "gate": "gates/g218_d157_swim_sizer.js"
+ }
+]

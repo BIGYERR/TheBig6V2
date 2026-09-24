@@ -474,7 +474,8 @@ ok('C8 the survivor carries its own ss===60 correction on the following line' + 
 // A version with no row fails loudly. It never falls back to a neighbouring row.
 const CLK_CALLS_BY_ERA = [
   { from: 204, to: 206,      calls: 11, why: 'D126 inventory' },
-  { from: 207, to: Infinity, calls: 13, why: 'D106a (V207) test-card detail adds 2' },
+  { from: 207, to: 217,      calls: 13, why: 'D106a (V207) test-card detail adds 2' },
+  { from: 218, to: Infinity, calls: 16, why: 'D157 (V218) three swim labels read the total through _clkMS: pace line 2393, initial render 2817, sizer label 3330' },
 ];
 const CLK_ROW = CLK_CALLS_BY_ERA.find(r => +VER >= r.from && +VER <= r.to) || null;
 ok('C8 CLK_CALLS_BY_ERA has a row for ia-version ' + VER + (CLK_ROW ? ' (' + CLK_ROW.why + ')' : ' (NO ROW)') + FIXIT,

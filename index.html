@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="217"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="218"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2384,13 +2384,13 @@ function updateSwimPaceDisplay() {
   const el = document.getElementById('swimPaceLine');
   const g = WD.cardioGoals['swim'];
   if(!el || !g) return;
-  if(g.targetMins === undefined || g.targetMins === '') { el.style.display = 'none'; return; }
+  const totalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0);   // V218 (D157): the target is its total, the engine's parse
+  if(!(totalSecs > 0)) { el.style.display = 'none'; return; }
   const dist = SWIM_GOAL_DIST[g.id] || 500;
   const unit = g.swimUnit || 'yd';
-  const totalSecs = (+(g.targetMins||0)*60) + (+(g.targetSecs||0));
   const pace = formatPacePer100(totalSecs, dist);
   if(!pace) { el.style.display = 'none'; return; }
-  el.innerHTML = asyIcon('🎯',13)+' ' + (g.targetMins||0) + ':' + String(g.targetSecs||0).padStart(2,'0') + ' — ' + pace + ' (' + unit + ')';
+  el.innerHTML = asyIcon('🎯',13)+' ' + _clkMS(totalSecs) + ' — ' + pace + ' (' + unit + ')';   // V218 (D157): label from the total
   el.style.display = 'block';
 }
 function updatePaceTime(type) {
@@ -2814,7 +2814,7 @@ function renderWizardStep() {
                   <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
                 </div>
               </div>
-              <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(g.targetMins!==undefined&&g.targetMins!=='')?'block':'none'}">${asyIcon('🎯',13)} ${g.targetMins||''}:${String(g.targetSecs||0).padStart(2,'0')} — ${formatPacePer100(((+g.targetMins||0)*60)+(+g.targetSecs||0),SWIM_GOAL_DIST[g.id])||''} (${g.swimUnit||'yd'})</div>
+              <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(((+g.targetMins||0)*60)+(+g.targetSecs||0))>0?'block':'none'}">${asyIcon('🎯',13)} ${_clkMS(((+g.targetMins||0)*60)+(+g.targetSecs||0))} — ${formatPacePer100(((+g.targetMins||0)*60)+(+g.targetSecs||0),SWIM_GOAL_DIST[g.id])||''} (${g.swimUnit||'yd'})</div>
             </div>
             <div style="margin-top:8px">
               <div class="input-label" style="margin-bottom:6px">Your most recent timed ${SWIM_GOAL_DIST[g.id]}${g.swimUnit||'yd'}</div>
@@ -3304,7 +3304,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
       // Time goals (500/100): if a target time is entered, size by the PER-100 PACE GAP
       // (mirrors run_pace_goal) rather than volume. Fall back to volume if no time given.
       var isSwimTimeGoal = (goalId === 'swim_500_time' || goalId === 'swim_100_time');
-      var swimTimeEntered = isSwimTimeGoal && goal.targetMins !== undefined && goal.targetMins !== '';
+      var swimTimeEntered = isSwimTimeGoal && ((+goal.targetMins||0)*60 + (+goal.targetSecs||0)) > 0;
       if(swimTimeEntered) {
         var fixedDist = (goalId === 'swim_500_time') ? 500 : 100; // in the chosen unit
         var tTotal = (+goal.targetMins||0)*60 + (+goal.targetSecs||0);
@@ -3312,7 +3312,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         // Current per-100 pace: from entered baseline time, else an experience default
         var expSwimPace = {beginner:150, intermediate:120, advanced:95}[sTier] || 120; // sec/100
         var curPace100 = expSwimPace;
-        if(goal.baseMins !== undefined && goal.baseMins !== '') {
+        {
           var bTotal = (+goal.baseMins||0)*60 + (+goal.baseSecs||0);
           if(bTotal > 0) curPace100 = bTotal / (fixedDist / 100);
         }
@@ -3327,7 +3327,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         }
         needed = Math.round(needed * ageMult);
         if(swimLbl) {
-          var sTimeLbl = (goal.targetMins||0)+':'+(String(goal.targetSecs||0).padStart(2,'0'));
+          var sTimeLbl = _clkMS(tTotal);   // V218 (D157): label from the total the sizer just read
           warnings.push(swimLbl + ' (' + sTimeLbl + '/' + fixedDist + (goal.swimUnit||'yd') + ') needs ' + Math.max(sFloor, Math.min(sCap, needed)) + ' weeks');
         }
       } else {

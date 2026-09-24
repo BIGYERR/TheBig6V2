@@ -152,6 +152,9 @@ DELOAD_HINGE_BY_VERSION[216] = DELOAD_HINGE_BY_VERSION[215];   // D154/D156: rul
 DELOAD_ARB_BY_VERSION[217] = DELOAD_ARB_BY_VERSION[216];   // D160: ruled UNMOVED (C1 364 C3 364 C5 32 D2 19 I3 496 printed)
 E6_BY_VERSION[217] = E6_BY_VERSION[216];   // D160: ruled UNMOVED (28 printed)
 DELOAD_HINGE_BY_VERSION[217] = DELOAD_HINGE_BY_VERSION[216];   // D160: ruled UNMOVED (E1a 12384 E1b 9319 E3 44 G1 1290 G5 44 printed; a like-for-like hinge revert in a Conditioning slot is not a posterior count)
+DELOAD_ARB_BY_VERSION[218] = DELOAD_ARB_BY_VERSION[217];   // D157: ruled UNMOVED (C1 364 C3 364 C5 32 D2 19 I3 496 printed; swim sizer length and labels, no lift section touched)
+E6_BY_VERSION[218] = E6_BY_VERSION[217];   // D157: ruled UNMOVED (28 printed)
+DELOAD_HINGE_BY_VERSION[218] = DELOAD_HINGE_BY_VERSION[217];   // D157: ruled UNMOVED (E1a 12384 E1b 9319 E3 44 G1 1290 G5 44 printed)
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[

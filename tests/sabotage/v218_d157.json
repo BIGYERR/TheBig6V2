@@ -1,0 +1,30 @@
+[
+ {
+  "name": "S1-D157 -> the sizer's target gate keys on the minutes box again: a seconds-only target (_:55) sizes on the volume path, the unit entry drops to 7 weeks with no warning, and a typed \"0\" minutes box with 0 seconds takes the time path",
+  "anchor": "var swimTimeEntered = isSwimTimeGoal && ((+goal.targetMins||0)*60 + (+goal.targetSecs||0)) > 0;",
+  "replacement": "var swimTimeEntered = isSwimTimeGoal && goal.targetMins !== undefined && goal.targetMins !== '';",
+  "gate": "gates/g218_d157_swim_sizer.js",
+  "note": "NAMED TRIP in g218_d157_swim_sizer.js rows U1 (unit entry 7 weeks vs twin 8), L1 and L2 (seconds-only targets off their twins), Z1 and Z2 (a \"0\" minutes box with 0 seconds sizes on the time path), U2 and ST1 (a fresh generate sizes 7, so the pin holds nothing). Needs ia-version >= 218: below 218 the gate is NOT APPLICABLE and the mutation survives. Pair rows read V217 from git 7af6ad9 when no baseline is passed, as sabotage.py runs it."
+ },
+ {
+  "name": "S2-D157 -> the sizer's current gate keys on the minutes box again: a seconds-only current time (_:59) is ignored and the sizer reads the experience default pace",
+  "anchor": "        {\n          var bTotal = (+goal.baseMins||0)*60 + (+goal.baseSecs||0);",
+  "replacement": "        if(goal.baseMins !== undefined && goal.baseMins !== '') {\n          var bTotal = (+goal.baseMins||0)*60 + (+goal.baseSecs||0);",
+  "gate": "gates/g218_d157_swim_sizer.js",
+  "note": "NAMED TRIP in g218_d157_swim_sizer.js rows U1 (the unit entry sizes off the advanced default 95 s/100, not 59), L1 and L2 (seconds-only current times off their twins), U2 and ST1. Z1 does not trip: a 0:00 current falls to the default on both. Needs ia-version >= 218."
+ },
+ {
+  "name": "S3-D157 -> the sizer warning label is concatenated from the boxes again: a seconds-only 75 s target prints \"(0:75/100yd)\" where its twin prints \"(1:15/100yd)\", and \"01:15\" prints \"01:15\"",
+  "anchor": "var sTimeLbl = _clkMS(tTotal);",
+  "replacement": "var sTimeLbl = (goal.targetMins||0)+':'+(String(goal.targetSecs||0).padStart(2,'0'));",
+  "gate": "gates/g218_d157_swim_sizer.js",
+  "note": "NAMED TRIP in g218_d157_swim_sizer.js rows L1 (warnings compared byte for byte; the label row counts the >= 60 s targets) and OT1 (sizer label of the odd typed forms). Reverts slice 2a E6. Needs ia-version >= 218."
+ },
+ {
+  "name": "S4-D157 -> the initial render's pace line display keys on the minutes box again: a seconds-only target renders hidden, and a typed \"0\" minutes box with 0 seconds renders \"0:00\"",
+  "anchor": "display:${(((+g.targetMins||0)*60)+(+g.targetSecs||0))>0?'block':'none'}",
+  "replacement": "display:${(g.targetMins!==undefined&&g.targetMins!=='')?'block':'none'}",
+  "gate": "gates/g218_d157_swim_sizer.js",
+  "note": "NAMED TRIP in g218_d157_swim_sizer.js rows LB1 (initial render display differs from the twin) and Z2 (a \"0\" minutes box renders the line). OT1 does not trip: every odd typed form fills the minutes box, so the reverted gate still shows it. Reverts slice 2a E5's display gate only; the label half of E5 stays. Needs ia-version >= 218."
+ }
+]

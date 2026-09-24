@@ -359,18 +359,21 @@ MANNY_DIGEST_BY_VERSION[214] = MANNY_DIGEST_BY_VERSION[213];   // D158: ruled UN
 MANNY_DIGEST_BY_VERSION[215] = MANNY_DIGEST_BY_VERSION[214];   // D149: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V215 tree; HALF_MANNY draws no GHD name)
 MANNY_DIGEST_BY_VERSION[216] = MANNY_DIGEST_BY_VERSION[215];   // D154/D156: ruled UNMOVED (printed by coach on the V216 tree)
 MANNY_DIGEST_BY_VERSION[217] = MANNY_DIGEST_BY_VERSION[216];   // D160: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V217-stamped tree with g199's and g200's methods; 0/98 days; every phantom D160 removes is NSW support_athletic, NRC printed 0 phantoms on 3,600 + 600 configs)
+MANNY_DIGEST_BY_VERSION[218] = MANNY_DIGEST_BY_VERSION[217];   // D157: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V218-stamped tree with g199's and g200's methods; 0/98 days; D157 is swim sizer length and three swim labels, HALF_MANNY holds 0 swim sessions)
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[212] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[211];   // D110a/M2/D144: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V212 tree with g199's and g200's methods; swim only, HALF_MANNY holds 0 swim sessions)
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[213] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[212];   // D113a/D146/injury key: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V213 tree with g199's and g200's methods; HALF_MANNY is a solo NRC half, and neither the pace routing, the NRC multi-sport arm nor the injury key reaches a solo uninjured week)
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[214] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[213];   // D158: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V214 tree with g199's and g200's methods; HALF_MANNY is an NRC race program and the eve rule is NSW dated only, NRC race pins 0/792 moved)
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[215] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[214];   // D149: ruled UNMOVED
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[216] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[215];   // D154/D156: ruled UNMOVED
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[217] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[216];   // D160: ruled UNMOVED
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[218] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[217];   // D157: ruled UNMOVED (1069cd7f86eed204 printed by coach on the V218-stamped tree)
 MANNY_CORE_OFF_DIGEST_BY_VERSION[212] = MANNY_CORE_OFF_DIGEST_BY_VERSION[211];   // D110a/M2/D144: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V212 tree with g199's and g200's methods; swim only, HALF_MANNY holds 0 swim sessions)
 MANNY_CORE_OFF_DIGEST_BY_VERSION[213] = MANNY_CORE_OFF_DIGEST_BY_VERSION[212];   // D113a/D146/injury key: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V213 tree with g199's and g200's methods; HALF_MANNY is a solo NRC half, and neither the pace routing, the NRC multi-sport arm nor the injury key reaches a solo uninjured week)
 MANNY_CORE_OFF_DIGEST_BY_VERSION[214] = MANNY_CORE_OFF_DIGEST_BY_VERSION[213];   // D158: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V214 tree with g199's and g200's methods; HALF_MANNY is an NRC race program and the eve rule is NSW dated only, NRC race pins 0/792 moved)
 MANNY_CORE_OFF_DIGEST_BY_VERSION[215] = MANNY_CORE_OFF_DIGEST_BY_VERSION[214];   // D149: ruled UNMOVED
 MANNY_CORE_OFF_DIGEST_BY_VERSION[216] = MANNY_CORE_OFF_DIGEST_BY_VERSION[215];   // D154/D156: ruled UNMOVED
 MANNY_CORE_OFF_DIGEST_BY_VERSION[217] = MANNY_CORE_OFF_DIGEST_BY_VERSION[216];   // D160: ruled UNMOVED
+MANNY_CORE_OFF_DIGEST_BY_VERSION[218] = MANNY_CORE_OFF_DIGEST_BY_VERSION[217];   // D157: ruled UNMOVED (9d14801a63111081 printed by coach on the V218-stamped tree)
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
                    MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION,

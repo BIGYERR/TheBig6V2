@@ -99,8 +99,11 @@ const D160_MULTI_BY_VERSION = { 217: {
   phantoms: { 'gk pace+bike':[124,0], 'NSW pace+bike':[163,0], 'NSW pace+swim':[141,0], 'NSW pace+bike+swim':[59,0], 'NSW base+bike':[0,0] },
   events: { gk:{P:124,A:18,B:8,C:16,D:0}, multi:{P:363,A:8,B:30,C:58,D:0} },
   repeats: { gk:[28,17], multi:[78,16] } } };
+D160_MULTI_BY_VERSION[218] = D160_MULTI_BY_VERSION[217];   // D157: ruled UNMOVED (phantoms 124/163/141/59/0 -> 0, events gk P124 A18 B8 C16 D0 multi P363 A8 B30 C58 D0, repeats gk 28->17 multi 78->16 printed by coach on the V218-stamped tree against V216)
 const SAMEDAY_TWIN_BY_VERSION = {}; SAMEDAY_TWIN_BY_VERSION[217] = { gk:{add:1,remove:3}, multi:{add:4,remove:0} };   // D168: the 5 added twins accepted for V217, pinned by literal
+SAMEDAY_TWIN_BY_VERSION[218] = SAMEDAY_TWIN_BY_VERSION[217];   // D157: ruled UNMOVED (gk add 1 remove 3, multi add 4 remove 0 printed)
 const FWD_MAIN_BY_VERSION = {}; FWD_MAIN_BY_VERSION[217] = 609;   // gk: accessory today == Main tomorrow, pre-existing (V216 607), handed to D167
+FWD_MAIN_BY_VERSION[218] = FWD_MAIN_BY_VERSION[217];   // D157: ruled UNMOVED (609 printed)
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = l => { skip++; console.log('SKIP ' + l); };
