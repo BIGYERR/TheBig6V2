@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="213"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="214"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -6157,6 +6157,26 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       const sk = before[before.length-1];
       if(sk){ wk[eve] = wk[sk]; delete wk[sk]; _pin.shakeout = eve; _pin.rest = (_pin.rest||[]).filter(d => d!==eve); if(!_pin.rest.includes(sk)) _pin.rest.push(sk); }
       break;
+    }
+    // V214 (D158): THE TEST EVE CARRIES A SHAKEOUT. A training-day eve before an NSW test, read
+    // across the week boundary, gets a shakeout from the easy-run builder at the eve's own week,
+    // so it is that week's easy run and dose. It replaces whatever sat there, a bike or a swim
+    // included. A rest-day eve stays rest. B4's T-2 step above is unchanged. It runs last in the
+    // pin block, after the trial has moved, and clears the eve from _pin.rest, because the trial's
+    // origin day enters _pin.rest and the lift layer rests every day listed there (as D37 does).
+    // V214 (coach, fix): not under the protect-park modes (the D113a exclusion key: noimpact,
+    // noimpact_swim, easy, reduce). A parked test has no race week, so the eve keeps V213's handling.
+    if(_pin.test && cardioGoals.run && !_d113Excl){
+      const _efl = []; [_pin.w - 1, _pin.w].forEach(w => { if(schedule[w]) _ISO_ORDER.forEach(d => _efl.push({w, d})); });
+      const _eti = _efl.findIndex(x => x.w === _pin.w && x.d === _pin.race); const _ev = _eti >= 1 ? _efl[_eti - 1] : null;
+      if(_ev && trainDays.includes(_ev.d)){
+        const _g = cardioGoals.run, _pg = paceGoalTarget(_g);
+        const _rbm = parseFloat((_g.baselineDist||'').toString()) || parseFloat((_g.baseline||'').match(/([0-9.]+)/)?.[1]) || ({beginner:1, intermediate:2, advanced:4}[cfg.experience||'intermediate'] || 2);
+        const _mbs = (_g.mileBestMins !== undefined && _g.mileBestMins !== '') ? (+_g.mileBestMins||0)*60 + (+_g.mileBestSecs||0) : null;
+        const _sh = buildRunSession(_g.id, _ev.w, Math.max(0, cardioTrainDays.indexOf(_ev.d)), tw, _rbm, cfg.experience||'intermediate', null, cfg.eventTargeted !== false, 'lsd_easy',
+          _pg.tDist, _pg.tTotalSecs, cfg.ageBracket||'18-35', _mbs, isBaseCardio, null, _taperFor(_ev.w), cfg._paceShift || null, false, false, null);
+        if(_sh){ _sh.legLoad = false; schedule[_ev.w][_ev.d] = _sh; if(_ev.w === _pin.w) _pin.rest = (_pin.rest||[]).filter(d => d !== _ev.d); }
+      }
     }
   }
   return schedule;

@@ -52,6 +52,11 @@ const { load } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
 const VER = +IA.version, ERA = 207;
+// V214 (D158, coach re-pins; standing ruling 4): from ia-version 214 the test eve (T-1) carries a
+// shakeout from the easy-run builder at the week's easy duration and replaces whatever sat there.
+// P6 then reads every day before the test except the eve, and Q3's T-1 half asserts the shakeout.
+// Below 214 both rows read exactly as they did. D158's own rows live in g214_d158_eve.js.
+const ERA214 = 214;
 let pass = 0, fail = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
@@ -116,17 +121,18 @@ for(const mk of Object.keys(MIX)) for(const rest of [['sun','wed'], ['sat','sun'
   const eveHard = [1, 2].map(k => flat[ti - k]).filter(Boolean).filter(x => { const c = p.weeks[x.w][x.d] && p.weeks[x.w][x.d].cardio; return c && c.type === 'run' && HARD.test(c.subtype || ''); }).map(x => 'W' + x.w + ' ' + x.d);
   ok(`P5 ${tag}: no INT or CHI run at T-1 or T-2`, eveHard.length === 0, eveHard.join(','));
   const moved = [];
-  flat.slice(0, ti).forEach(x => { const a = pre.weeks[x.w] && pre.weeks[x.w][x.d] && pre.weeks[x.w][x.d].cardio;
+  flat.slice(0, ti).forEach((x, i) => { if(VER >= ERA214 && i === ti - 1) return;   // D158: the eve is the shakeout's
+    const a = pre.weeks[x.w] && pre.weeks[x.w][x.d] && pre.weeks[x.w][x.d].cardio;
     if(a && a.type !== 'run'){ const b = p.weeks[x.w][x.d] && p.weeks[x.w][x.d].cardio; if(canon(a) !== canon(b)) moved.push('W' + x.w + ' ' + x.d + ' ' + a.type); } });
   const notRest = DAYS.slice(wd + 1).filter(d => !(p.weeks[tw][d] && p.weeks[tw][d].rest));
-  ok(`P6 ${tag}: bike and swim cards before the test day untouched, every day after it rests`, moved.length === 0 && notRest.length === 0,
+  ok(`P6 ${tag}: bike and swim cards before the test day untouched${VER >= ERA214 ? ' except the eve (D158)' : ''}, every day after it rests`, moved.length === 0 && notRest.length === 0,
      'moved ' + (moved.join(',') || 'none') + '; not resting ' + (notRest.join(',') || 'none'));
 }
 
 ok(`P5z the quality-run matcher (${HARD_ROW ? HARD_ROW.ruling : 'NO ROW'}) sees ${hardSeen} INT/CHI runs in the pre-pin weeks tw-1 and tw, ${p5reach} of them at T-1 or T-2 before the pin, so P4 and P5 read real cards`, hardSeen > 0 && p5reach > 0, hardSeen + ' / ' + p5reach);
 
 // ══ V208 slice 0: Q0-Q7 (see header) ═════════════════════════════════════════════════
-const ERA208 = 208, QROWS = ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8'];
+const ERA208 = 208, QROWS = ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9','Q9x'];
 if(VER < ERA208){ QROWS.forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates the D106a fix-forward (V' + ERA208 + ')')); done(); }
 const { progDigest } = require(path.join(__dirname, '..', 'harness.js'));
 const EASY = c => !!c && c.type === 'run' && !c.legLoad && /^Long Slow Distance/.test(c.subtype || '');
@@ -164,7 +170,17 @@ for(const gk of Object.keys(QGOALS)) for(const mk of Object.keys(QMIX)){
       A.reach++;
       // Q3 oracle: the pre-pin week's easy LSD as dealt, whole card (subtype, dose, detail, legLoad false).
       const ez = [...new Set(DAYS.map(d => runOf(pre.weeks[x.w][d])).filter(EASY).map(canon))];
-      if(c){ A.repl++; if(!ez.includes(canon(c))) A.replBad.push(lab + ' got ' + c.subtype + ' ' + canon(c.dose) + ' want one of ' + ez.length + ' pre-pin easy LSD'); }
+      if(VER >= ERA214 && k === 1){
+        // D158: the eve is the shakeout from the easy-run builder at the week's easy duration. The pre-pin
+        // long card proves the eve is a training day, so it never rests. Oracle: the card text (plain LSD,
+        // legLoad false, a distance dose keyed easy) and the pre-pin week's easy LSD distance when that
+        // week dealt one; the dose on weeks that dealt none is g214_d158_eve.js D2's.
+        const ezMi = [...new Set(DAYS.map(d => runOf(pre.weeks[x.w][d])).filter(EASY).map(e => e.dose && e.dose.mi))];
+        if(c){ A.repl++; if(!(EASY(c) && c.subtype === 'Long Slow Distance (LSD)' && !!c.dose && c.dose.k === 'dist' && c.dose.key === 'easy' && (ezMi.length === 0 || (ezMi.length === 1 && c.dose.mi === ezMi[0]))))
+          A.replBad.push(lab + ' got ' + c.subtype + ' ' + canon(c.dose) + ' legLoad ' + c.legLoad + ', want the shakeout at ' + (ezMi.join('/') || "the week's easy") + ' mi'); }
+        else { A.rest++; A.replBad.push(lab + ' rests, but D158 puts the shakeout on a training-day eve'); }
+      }
+      else if(c){ A.repl++; if(!ez.includes(canon(c))) A.replBad.push(lab + ' got ' + c.subtype + ' ' + canon(c.dose) + ' want one of ' + ez.length + ' pre-pin easy LSD'); }
       else { A.rest++; if(ez.length && !(x.w === tw && !preHardInTest)) A.replBad.push(lab + ' rests, but the pre-pin week dealt an easy LSD and the long card was not the trial source'); }
     }
     for(const w of Object.keys(p.weeks)) for(const d of DAYS){ const day = p.weeks[w][d];
@@ -174,7 +190,7 @@ for(const gk of Object.keys(QGOALS)) for(const mk of Object.keys(QMIX)){
   ok(`Q0 ${L}: builds, and the lattice reaches the case (a pre-pin long LSD at T-1 or T-2)`, A.crash.length === 0 && A.reach > 0, 'crash ' + A.crash.slice(0, 2).join('; ') + ' reach ' + A.reach);
   ok(`Q1 ${L}: no run card at T-1 or T-2 has legLoad true (${A.eveRuns} eve run cards)`, A.llEve.length === 0, A.llEve.length + ': ' + A.llEve.slice(0, 3).join('; '));
   ok(`Q2 ${L}: every Shakeout day's run card is the easy LSD, legLoad false (${A.shk} Shakeout days)`, A.shk > 0 && A.shkBad.length === 0, A.shkBad.length + '/' + A.shk + ': ' + A.shkBad.slice(0, 3).join('; '));
-  ok(`Q3 ${L}: a long LSD dealt at T-1 or T-2 became the week's pre-pin easy LSD card, dose and all (${A.repl} replaced, ${A.rest} rest, of ${A.reach})`,
+  ok(`Q3 ${L}: ${VER >= ERA214 ? "a long LSD dealt at T-1 became the shakeout from the easy-run builder at the week's easy duration; at T-2 it became" : 'a long LSD dealt at T-1 or T-2 became'} the week's pre-pin easy LSD card, dose and all (${A.repl} replaced, ${A.rest} rest, of ${A.reach})`,
      A.reach > 0 && A.replBad.length === 0, A.replBad.length + ': ' + A.replBad.slice(0, 3).join('; '));
   ok(`Q8 ${L}: T-1 and T-2 carry no lift section (${A.eveDays} eve days; coach: the 1-2 week lift re-deal is a ruled consequence, only this is asserted)`, A.eveDays > 0 && A.liftEve.length === 0, A.liftEve.length + ': ' + A.liftEve.slice(0, 3).join('; '));
 }
@@ -240,4 +256,43 @@ for(const gk of Object.keys(QGOALS)) for(const mk of Object.keys(QMIX)){
 // Q7: HALF_MANNY is an NRC fixture; the fix-forward touches the NSW test pin and the LSD limb only.
 { let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
   ok('Q7 HALF_MANNY digest is 0ac7da6b1691a8e1 (ruled unmoved: no NRC card moves)', hm === '0ac7da6b1691a8e1', hm); }
+// ══ V214 close C: Q9 / Q9x, B4's T-2 limb (from ia-version 214) ═══════════════════════════════
+// From 214 the eve is D158's shakeout, so B4 (D106a) acts only at T-2, and no row from 214 up reached
+// a calendar where B4 fires there (sabotage v208_shakeout S3, B4 keeping only its long-LSD limb,
+// survived the V214 proof). Q9: wherever the pre-pin week dealt an INT or CHI at T-2 (read across the
+// week boundary), the pinned T-2 carries no hard run (INT or CHI by the era label, an LSD with legLoad
+// true, a TIME TRIAL). The lattice adds week-1 tests and a Wed/Thu/Fri rest calendar, where B4 fires.
+// Q9x: gatekeeper's example, typed: training Mon, Tue, Sat, Sun; test Thursday of week 1; T-2 is W1
+// Tue, dealt an INT or CHI before the pin; it prints the week's easy LSD and nothing hard.
+if(VER < ERA214) ['Q9','Q9x'].forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates D158 (V' + ERA214 + '); B4 owned T-1 as well there'));
+else {
+  const HARDC = c => !!c && c.type === 'run' && (HARD.test(c.subtype || '') || /TIME TRIAL/.test(c.subtype || '') || (!!c.legLoad && /^Long Slow Distance/.test(c.subtype || '')));
+  const cardsOf = x => [].concat((x && x.cardio) || []).filter(Boolean);
+  const B4REST = [[], ['sun'], ['sun','wed'], ['sat','sun'], ['mon','thu'], ['sun','tue','thu','sat'], ['fri'], ['wed','thu','fri']];
+  const mkQ = (mk, rest, tw, wd) => ({name:'GK', primaryPath:'event', eventTargeted:true, raceDate:isoOff(7 * (tw - 1) + wd), _testWeek:tw, _raceDateCappedWeeks:tw,
+    cardioTypes:MIX[mk].types.slice(), cardioGoals:clone(MIX[mk].goals), liftingFocus:'balanced', experience:'intermediate',
+    ageBracket:'18-35', equipment:'home_full', unit:'lbs', restDays:rest.slice(), days:['sun','mon','tue','wed','thu','fri','sat'],
+    bench:185, squat:255, deadlift:315, startDate:isoOff(0), seed:24865});
+  let n = 0, reach = 0; const bad = [], crash = [];
+  for(const mk of Object.keys(MIX)) for(const rest of B4REST) for(const tw of [1, 2, 5]) for(let wd = 0; wd < 7; wd++){
+    const cfg = mkQ(mk, rest, tw, wd), tag = `${mk} rest ${rest.join('') || 'none'} tw ${tw} test ${cfg.raceDate} (${DAYS[wd]})`;
+    let p, pre; try { p = clone(IA.buildProgram(clone(cfg))); const pc = clone(cfg); delete pc._testWeek; pre = clone(IA.buildProgram(pc)); } catch(e){ crash.push(tag + ': ' + e.message); continue; }
+    const flat = []; [tw - 1, tw].forEach(w => { if(p.weeks[w]) DAYS.forEach(d => flat.push({w, d})); });
+    const ti = flat.findIndex(x => x.w === tw && x.d === DAYS[wd]); const x = ti >= 2 ? flat[ti - 2] : null; if(!x) continue;
+    n++;
+    if(cardsOf(pre.weeks[x.w] && pre.weeks[x.w][x.d]).some(c => c.type === 'run' && HARD.test(c.subtype || ''))) reach++;
+    const h = cardsOf(p.weeks[x.w][x.d]).filter(HARDC);
+    if(h.length) bad.push(tag + ' T-2 W' + x.w + ' ' + x.d + ': ' + h.map(c => c.subtype + ' legLoad ' + c.legLoad).join(' + '));
+  }
+  ok(`Q9 B4 at T-2: ${n} dated programs (3 mixes x ${B4REST.length} rest sets x tw 1,2,5 x 7 test weekdays), ${reach} with an INT or CHI dealt at T-2 before the pin: no hard run at T-2`,
+     crash.length === 0 && reach > 0 && bad.length === 0, 'crash ' + crash.length + ', reach ' + reach + ', ' + bad.length + ': ' + bad.slice(0, 3).join('; '));
+  const cfg = mkQ('run', ['wed','thu','fri'], 1, 3);
+  let p, pre; try { p = clone(IA.buildProgram(clone(cfg))); const pc = clone(cfg); delete pc._testWeek; pre = clone(IA.buildProgram(pc)); } catch(e){ p = null; ok('Q9x example builds', false, e.message); }
+  if(p){
+    const preTue = cardsOf(pre.weeks[1] && pre.weeks[1].tue), tue = p.weeks[1] && p.weeks[1].tue, cs = cardsOf(tue);
+    ok('Q9x gatekeeper\'s example (train Mon Tue Sat Sun, test Thu of week 1): W1 Tue held an INT or CHI before the pin, and now carries one run card, the easy LSD, nothing hard',
+       preTue.some(c => c.type === 'run' && HARD.test(c.subtype || '')) && !!tue && cs.length === 1 && EASY(cs[0]) && !HARDC(cs[0]),
+       'pre-pin ' + (preTue.map(c => c.subtype).join('|') || 'none') + ' / pinned ' + (tue ? tue.title + ' ' + cs.map(c => c.subtype + ' legLoad ' + c.legLoad).join('|') : 'no day'));
+  }
+}
 done();

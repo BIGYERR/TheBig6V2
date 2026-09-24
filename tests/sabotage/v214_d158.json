@@ -1,0 +1,30 @@
+[
+  {
+    "name": "S1-D158 -> the shakeout is built but never placed: the eve keeps whatever the layout dealt (bike, swim, lift-only, or rests)",
+    "anchor": "if(_sh){ _sh.legLoad = false; schedule[_ev.w][_ev.d] = _sh; ",
+    "replacement": "if(_sh){ _sh.legLoad = false; ",
+    "gate": "gates/g214_d158_eve.js",
+    "note": "NAMED TRIP: D1 (training-day eves lacking the shakeout). Needs ia-version >= 214: below 214 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-214 copy until Mario bumps. The pair rows D5/D6 read V213 from git bc3cccc when no baseline is passed, as sabotage.py runs it. Measured on a forced-214 copy of the slice 1 tree, gate run without a baseline as sabotage.py runs it (V213 read from git bc3cccc): PASS 7 FAIL 2. EXPECTED: D1 (468/592 eves) and D2 (284/336)."
+  },
+  {
+    "name": "S2-D158 -> the eve that holds the shakeout is left in _pin.rest: when the trial moved off the eve, the lift layer rests the day and the shakeout never prints",
+    "anchor": " if(_ev.w === _pin.w) _pin.rest = (_pin.rest||[]).filter(d => d !== _ev.d); }",
+    "replacement": " }",
+    "gate": "gates/g214_d158_eve.js",
+    "note": "NAMED TRIP: D1 (training-day eves titled Rest with no card; measure's first surgery pass left 1,122/5,985 so). Needs ia-version >= 214; run on a forced-214 copy until Mario bumps. Measured on a forced-214 copy of the slice 1 tree, gate run without a baseline: PASS 7 FAIL 2. EXPECTED: D1 (104/592 eves) and D2 (68/336)."
+  },
+  {
+    "name": "S3-D158 -> the shakeout is built from the long LSD branch instead of the easy-run builder",
+    "anchor": "cfg.eventTargeted !== false, 'lsd_easy',\n          _pg.tDist, _pg.tTotalSecs",
+    "replacement": "cfg.eventTargeted !== false, 'lsd_long',\n          _pg.tDist, _pg.tTotalSecs",
+    "gate": "gates/g214_d158_eve.js",
+    "note": "NAMED TRIP: D1 (dose key long, not easy) and D2 (the week's long distance, not its easy distance). Needs ia-version >= 214; run on a forced-214 copy until Mario bumps. Measured on a forced-214 copy of the slice 1 tree, gate run without a baseline: PASS 7 FAIL 2. EXPECTED: D1 (592/592 eves) and D2 (336/336, e.g. 2.2 mi where the week's easy LSD is shorter)."
+  },
+  {
+    "name": "S4-D158 fix -> the eve insert ignores the exclusion key: under noimpact / noimpact_swim / easy / reduce a parked test's eve gets the shakeout and leaves _pin.rest, so it gains a lift role",
+    "anchor": "    if(_pin.test && cardioGoals.run && !_d113Excl){",
+    "replacement": "    if(_pin.test && cardioGoals.run){",
+    "gate": "gates/g214_d158_eve.js",
+    "note": "NAMED TRIP: D7 (pair 214/213: lift-role changes on T-2/T-1/T0) and D8 (ruling-level: an excluded-mode eve differs from V213's handling). The gate reads V213 from git bc3cccc when no baseline is passed, as sabotage.py runs it. Measured on the real 214 tree via sabotage.py (no baseline passed): PASS 9 FAIL 2. EXPECTED: D7 (38 lift-role changes, all T-1 under easy / reduce / noimpact / noimpact_swim) and D8 (168/264 excluded-mode eves)."
+  }
+]

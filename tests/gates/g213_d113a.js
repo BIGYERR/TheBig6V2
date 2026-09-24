@@ -44,6 +44,10 @@
 //        build byte-identical to V212. PAIR. R3v: all four modes reached, each with multi-sport builds.
 //   R3n  the same claim on NRC multi-sport (slice 2c): run_5k + bike and run_half + swim under one
 //        state per excluded mode, every calendar, byte-identical to V212. PAIR.
+//   R8   RULING-LEVEL, from 213 up (V214 close C): pace multi-sport under the four excluded modes keeps
+//        V212's day-by-day sport layout (the chooser does not route). R8n: the same on NRC multi-sport.
+//        R8v: the lattice reaches every excluded mode, and the uninjured twins ARE routed (their layout
+//        differs from V212), so R8 and R8n can fail. Not a pair row: V212 is the ruling's named oracle.
 //   R4   the 7 spacer calendars at tw 6/9/11/15: three runs a week, one quality a week, INT weeks
 //        1..cross-1, CHI weeks cross..tw. R4p: cardio byte-identical to V212 on every day. PAIR.
 //   R5   the 28 spaceable three-day calendars at tw 6/9/11/15: three runs, one INT, one CHI and
@@ -92,7 +96,7 @@ function summary(){
 }
 if(!(VER >= ERA)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D113a/D146 (V' + ERA + ').');
-  ['HF','R0','R1','R1v','R2','R2v','R3','R3v','R3n','R4','R4p','R5','R6','R7','R7v','HM'].forEach(r => skipRow(r + ' skipped below the D113a/D146 era'));
+  ['HF','R0','R1','R1v','R2','R2v','R3','R3v','R3n','R8','R8n','R8v','R4','R4p','R5','R6','R7','R7v','HM'].forEach(r => skipRow(r + ' skipped below the D113a/D146 era'));
   summary();
 }
 
@@ -281,6 +285,49 @@ const maxRuns = p => Math.max(0, ...weeksOf(p).map(w => runsOf(p.weeks[w]).lengt
     })));
     pairRow('R3n NRC multi-sport under the excluded modes (run_5k + bike, run_half + swim): every build byte-identical to V212 (' + n + ' builds, ' + JSON.stringify(reach) + ')',
       crash === 0 && [...MODES].every(m => reach[m] > 0) && mv === 0, mv + ' moved, first ' + ex + ', crash ' + crash);
+  }
+}
+
+// ── R8 / R8n / R8v: the exclusion key keeps the chooser off (RULING-LEVEL, from 213 up) ─────────
+// D113a amended and D146 slice 2c: under noimpact, noimpact_swim, easy and reduce the multi-sport week
+// is not routed through the spacing chooser; it keeps the layout V212 dealt it. R3 / R3n proved that
+// as byte identity for the 213/212 pair only, so from 214 nothing guarded the two exclusion conjuncts
+// (sabotage v213_d113a S5 and S6 survived the V214 proof). These rows are the ruling's own claim:
+// every week's day-by-day SPORT LAYOUT (which days carry a run, bike or swim card, by type and goal)
+// equals V212's for the same cfg. Card content is not compared, so a later ruling that rewrites
+// injured cards does not trip them; one that re-sites injured multi-sport days must re-pin them.
+// The candidate's own injuryPlan picks the population. Calendars with 0 to 2 rest days: the ones with
+// enough runs to route (pace from three runs, NRC from two).
+{
+  const MODES = new Set(['noimpact','noimpact_swim','easy','reduce']);
+  const INJ = [{region:'knee',tier:'protect'},{region:'hip',tier:'protect'},{region:'knee',tier:'workaround'},{region:'ankle',tier:'workaround'}];
+  const C02 = CALS.filter(r => r.length <= 2);
+  const lay = p => Object.keys(p.weeks).map(w => DAYS.map(d => cards(p.weeks[w][d]).map(c => c.type + ':' + (c.goalId || '')).sort().join('+') || '-').join(',')).join('|');
+  const POP = { R8: [['run_pace_goal', {bike:'bike_base'}], ['run_pace_goal', {swim:'swim_base'}], ['run_pace_goal', {bike:'bike_ftp', swim:'swim_mile'}]],
+                R8n: [['run_5k', {bike:'bike_base'}], ['run_half', {swim:'swim_base'}]] };
+  if(!BASE){ ['R8','R8n','R8v'].forEach(r => ok(r + ' the exclusion-key layout rows need V212, the ruling\'s named oracle', false, baseWhy)); }
+  else {
+    const plan = IA.eval('injuryPlan'); const R = {};
+    Object.keys(POP).forEach(row => {
+      const A = {n:0, mv:0, ex:null, crash:0, reach:{}, twins:0, twinMoved:0};
+      POP[row].forEach(([g, e], j) => C02.forEach((rest, i) => {
+        const foc = FOCI[(i + j) % 3];
+        const twin = mkCfg(g, e, rest, foc);
+        try { A.twins++; if(lay(build(IA, twin)) !== lay(build(BASE, twin))) A.twinMoved++; } catch(err) { A.crash++; }
+        INJ.forEach(inj => {
+          const cfg = mkCfg(g, e, rest, foc, {injury:inj});
+          const mode = (plan(cl(cfg)) || {}).cardioMode || 'none'; if(!MODES.has(mode)) return;
+          let a, b; try { a = build(IA, cfg); b = build(BASE, cfg); } catch(err) { A.crash++; return; }
+          A.n++; A.reach[mode] = (A.reach[mode] || 0) + 1;
+          if(lay(a) !== lay(b)){ A.mv++; if(!A.ex) A.ex = g + ' ' + JSON.stringify(e) + ' ' + mode + ' ' + inj.region + '/' + inj.tier + ' rest=' + (rest.join('') || 'none'); }
+        });
+      }));
+      R[row] = A;
+    });
+    ok('R8 pace multi-sport under the excluded modes keeps V212\'s day-by-day sport layout, every week (' + R.R8.n + ' builds)', R.R8.n > 0 && R.R8.crash === 0 && R.R8.mv === 0, R.R8.mv + ' re-sited, first ' + R.R8.ex + ', crash ' + R.R8.crash);
+    ok('R8n NRC multi-sport under the excluded modes keeps V212\'s day-by-day sport layout, every week (' + R.R8n.n + ' builds)', R.R8n.n > 0 && R.R8n.crash === 0 && R.R8n.mv === 0, R.R8n.mv + ' re-sited, first ' + R.R8n.ex + ', crash ' + R.R8n.crash);
+    ok('R8v reach: every excluded mode (pace ' + JSON.stringify(R.R8.reach) + ', NRC ' + JSON.stringify(R.R8n.reach) + '), and the uninjured twins are routed (pace ' + R.R8.twinMoved + '/' + R.R8.twins + ', NRC ' + R.R8n.twinMoved + '/' + R.R8n.twins + ' differ from V212), so R8 and R8n can fail',
+      [...MODES].every(m => R.R8.reach[m] > 0 && R.R8n.reach[m] > 0) && R.R8.twinMoved > 0 && R.R8n.twinMoved > 0, JSON.stringify({pace:R.R8.twinMoved, nrc:R.R8n.twinMoved}));
   }
 }
 

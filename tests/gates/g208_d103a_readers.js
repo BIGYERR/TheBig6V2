@@ -172,6 +172,13 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
   const STRIDES_BLOCK = '\nFinish with 4 x 20 sec strides. Fast but relaxed, about 90% speed, walk back for full recovery. Strides keep your legs fast while the engine builds.';
   const ruled2b = c => { const x = clone(c); x.detail = String(x.detail || '').split(STRIDES_BLOCK).join(''); x.subtype = String(x.subtype || '').split(' + Strides').join(''); return x; };
   let stridesDealt = 0, stridesLeft = [], plusLeft = [], doseBad = [];
+  // V214 (D158 + coach's fix, close D): from 214 the uninjured dated test eve (T-1, date arithmetic from
+  // raceDate) carries D158's shakeout and easy mode keeps V213's handling there, so that cell leaves the E3
+  // pairing and E3e asserts the ruling in its place. Below 214 nothing is excluded.
+  const ERA214 = 214, eveOf = cfg => { if(!cfg.raceDate) return null; const [y, m, dd] = cfg.raceDate.split('-').map(Number); const e = new Date(y, m - 1, dd - 1);
+    return {w: Math.floor(Math.round((e - START) / 864e5) / 7) + 1, d: ALL[e.getDay()]}; };
+  const d158Eve = (b, w, d) => { if(VER < ERA214 || !b.dated) return false; const e = eveOf(b.cfg); return !!e && +w === e.w && d === e.d; };
+  let eveOut = 0;
   BASECFG.forEach((b, i) => {
     const pre = get(b.fam, i, 'none'), p = get(b.fam, i, 'easy');
     if(b.dated) datedProgs++;
@@ -180,7 +187,8 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
       total[k] = (total[k] || 0) + 1; const isP = !!after && /^Easy Run \(protected\)/.test(after.subtype || '');
       if(isP) parked[k] = (parked[k] || 0) + 1;
       if(PARK_SET.has(k) !== isP) bad.push(b.fam + ' #' + i + ' W' + w + ' ' + d + ' key ' + k + (isP ? ' parked' : ' not parked'));
-      if(!PARK_SET.has(k) && canon(after) !== canon(ruled2b(c))) keptBad.push(b.fam + ' #' + i + ' W' + w + ' ' + d + ' key ' + k);
+      if(!PARK_SET.has(k) && d158Eve(b, w, d)) eveOut++;
+      else if(!PARK_SET.has(k) && canon(after) !== canon(ruled2b(c))) keptBad.push(b.fam + ' #' + i + ' W' + w + ' ' + d + ' key ' + k);
       if(!PARK_SET.has(k) && String(c.detail || '').includes(STRIDES_BLOCK)){ stridesDealt++; const m0 = /(\d+) min/.exec(c.detail || ''), m1 = after && /(\d+) min/.exec(after.detail || '');
         if(!after || canon(after.dose) !== canon(c.dose) || !m0 || !m1 || m0[1] !== m1[1]) doseBad.push(b.fam + ' #' + i + ' W' + w + ' ' + d); } });
     cardsOf(p).forEach(({w, d, c}) => { if(c.type !== 'run') return; if(/strides/i.test((c.subtype || '') + ' ' + (c.detail || ''))) stridesLeft.push(b.fam + ' #' + i + ' W' + w + ' ' + d); if(/ \+ Strides$/.test(c.subtype || '')) plusLeft.push(b.fam + ' #' + i + ' W' + w + ' ' + d); });
@@ -195,7 +203,22 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
   ok(`E2 an injured athlete in easy mode runs no test: 0 TIME TRIAL cards survive across ${datedProgs} dated programs (${parked.trial || 0}/${total.trial || 0} tests parked)`, datedProgs > 0 && trialsLeft.length === 0 && (total.trial || 0) > 0, trialsLeft.length + ': ' + trialsLeft.slice(0, 3).join('; '));
   ok(`E5 easy mode parks the strides finisher: ${stridesDealt} easy runs left standing carried it, 0 run cards mention strides and 0 subtypes end " + Strides"`, stridesDealt > 0 && stridesLeft.length === 0 && plusLeft.length === 0, stridesLeft.length + ' mention strides, ' + plusLeft.length + ' end + Strides: ' + stridesLeft.concat(plusLeft).slice(0, 3).join('; '));
   ok(`E6 an easy run whose strides were parked keeps its minutes and its dose (${stridesDealt} cards)`, stridesDealt > 0 && doseBad.length === 0, doseBad.length + ': ' + doseBad.slice(0, 3).join('; '));
-  ok(`E3 every keyed easy run is left exactly as dealt in easy mode, strides finisher aside (the 2b text rule) (${(total.easy || 0) - (parked.easy || 0)}/${total.easy || 0})`, keptBad.length === 0 && (total.easy || 0) > 0, keptBad.length + ': ' + keptBad.slice(0, 3).join('; '));
+  if(VER < ERA214) skip('E3e ia-version ' + VER + ' predates D158 (V' + ERA214 + '); no test eve leaves the E3 pairing');
+  else {
+    let B213 = (IB && +IB.version === 213) ? IB : null, why = B213 ? 'argv' : '';
+    if(!B213){ try { const f = path.join(os.tmpdir(), 'g208r_v213_' + process.pid + '.html');
+      fs.writeFileSync(f, require('child_process').execFileSync('git', ['-C', path.join(__dirname, '..', '..'), 'show', 'bc3cccce3f048a9e0e4e45846bfe8315635c8430:index.html'], {maxBuffer: 1 << 27}));
+      const x = load(f); try { fs.unlinkSync(f); } catch(e){} if(+x.version === 213){ B213 = x; why = 'git bc3cccc'; } else why = 'git copy reads ' + x.version; } catch(e){ why = 'git show failed: ' + String(e.message).slice(0, 80); } }
+    const isLift = s => !!s && (s.items || []).length && !/mobility|stretch|taper/i.test(s.label || '');
+    const sig = x => canon({rest: !x || !!x.rest, lift: !!(x && !x.rest && (x.sections || []).some(isLift)), cards: [].concat((x && x.cardio) || []).filter(Boolean).map(c => c.type + ':' + (c.subtype || '')).sort()});
+    let n = 0; const eBad = [];
+    if(B213) BASECFG.forEach((b, i) => { if(!b.dated) return; const e = eveOf(b.cfg); if(!e || e.w < 1 || (b.cfg.restDays || []).includes(e.d)) return;
+      const p = get(b.fam, i, 'easy'), q = build(B213, withInj(b.cfg, 'easy')); n++;
+      const sa = sig(p.weeks[e.w] && p.weeks[e.w][e.d]), sb = sig(q.weeks[e.w] && q.weeks[e.w][e.d]); if(sa !== sb) eBad.push(b.fam + ' #' + i + ' W' + e.w + ' ' + e.d + ': V213 ' + sb + ' now ' + sa); });
+    ok(`E3e easy mode handles the training-day test eve as V213's rule does: no shakeout card, same lift presence, same rest flag (${n} dated eves, V213 from ${why || 'nowhere'}; ${eveOut} eve cells left the E3 pairing)`,
+       !!B213 && n > 0 && eBad.length === 0, (B213 ? '' : 'V213 unavailable: ' + why + '; ') + eBad.length + ': ' + eBad.slice(0, 2).join(' || '));
+  }
+  ok(`E3 every keyed easy run is left exactly as dealt in easy mode, strides finisher aside (the 2b text rule) (${(total.easy || 0) - (parked.easy || 0)}/${total.easy || 0}${VER >= ERA214 ? '; from 214 the D158 test eve is E3e\'s' : ''})`, keptBad.length === 0 && (total.easy || 0) > 0, keptBad.length + ': ' + keptBad.slice(0, 3).join('; '));
   ok('E4 every "Easy Run (protected)" card that carries a key carries `easy` (easy and reduce)', e4.length === 0, e4.length + ': ' + e4.slice(0, 3).join('; '));
   // E7: outside the injury modes the strides are untouched
   let sN = 0; const sBad = []; BASECFG.forEach((b, i) => cardsOf(get(b.fam, i, 'none')).forEach(({w, d, c}) => { if(!/ \+ Strides$/.test(c.subtype || '')) return; sN++; if(!String(c.detail || '').endsWith(STRIDES_BLOCK)) sBad.push(b.fam + ' #' + i + ' W' + w + ' ' + d); }));
