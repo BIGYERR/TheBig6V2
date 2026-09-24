@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="210"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="211"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -10124,7 +10124,7 @@ function _itemCost(it, sectionRegion){
 // after this point in source order anyway.
 function _isPostChain(n){ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; }
 
-function recoveryDeload(sections){
+function recoveryDeload(sections, cardio){
   // Test-only bypass. Per-pass since V123 — __CAP_OFF used to gate THREE passes at once
   // (this one, capSessionBudget and capRegionalFatigue), so any harness that toggled it to
   // isolate one of them silently measured all three. That produced a false reading of the
@@ -10163,6 +10163,29 @@ function recoveryDeload(sections){
     if(s.optional||/carry|finisher|conditioning|explosive/.test(L)) continue;     // fluff: always dropped anyway
     if(!(s.items||[]).some(it=>it&&_pattern(it.name))) continue;                  // the loop's own hasLift test
     if((s.items||[]).some(it=>it&&_isPostChain(it.name))){ pickIdx=i; break; }    // first posterior accessory block wins
+  }
+  // D155 (V211): THE TIER PICKS ON A TIER B LONG-RUN DAY. _longRunTier is the predicate
+  // d18LongRunDayPass reads, so both passes agree on which day this is. D91's posterior block is
+  // exactly what tier B strips, which left the loaded full-body long day in a recovery week with
+  // no lifting at all. Here the surviving accessory block is the first one the tier admits: no
+  // item tier B drops (_D18_LEG_RX, or hinge/hip_ext by _pattern under D153) and no power or
+  // explosive label or core header. The code tests _D18_LEG_RX alone: a hinge test here changed
+  // 0 of 56,688 measured programs, so it was dead and went (coach). D153 strips any hinge after
+  // this pick, and g211 proves the outcome. A posterior Main does not suppress this pick, because
+  // tier B strips the Main's hinge too. Candidacy is D91's own four tests in the loop's order. If
+  // no block is admitted, D91's pick stands. Every other day never enters this branch.
+  if(_longRunTier(cardio)==='B'){
+    const _tierAdmits=s=>!/power|explosive/i.test(s.label||'')&&!/power|explosive/i.test(s.coreHeader||'')
+      &&!(s.items||[]).some(it=>it&&_D18_LEG_RX.test(it.name||''));
+    for(let i=0;i<sections.length;i++){
+      const s=sections[i]; if(!s) continue;
+      const L=(s.label||'').toLowerCase();
+      if(/^main\b|^primer|^power\b|^strength\b/.test(L)) continue;
+      if(s.hip||/hip|mobility|stretch/.test(L)) continue;
+      if(s.optional||/carry|finisher|conditioning|explosive/.test(L)) continue;
+      if(!(s.items||[]).some(it=>it&&_pattern(it.name))) continue;
+      if(_tierAdmits(s)){ pickIdx=i; break; }    // first block the tier admits wins
+    }
   }
   sections.forEach((s,i)=>{
     if(!s) return;
@@ -10577,7 +10600,7 @@ function engineD_synthesis(cfg, A, B, plan, C){
       const _nw=_di===ALL_DAYS_ORDER.length-1?w+1:w, _ndk=ALL_DAYS_ORDER[(_di+1)%7];
       const _nc=cardioSchedule[_nw]?.[_ndk]||null;
       const hotNext=!!(_nc&&_nc.legLoad);
-      weeks[w][d]={title,dot:cardio?cardio.type:'lift',tags,cardio,sections:capRegionalFatigue((_s=>isRecoveryWeek(w)?recoveryDeload(_s):_s)(applyInjuryFilter(buildSections(role,w,{fullVariant,wantCarry:d===carryHost,cardio,hotNext}),cfg)),role,cardio,goal)};
+      weeks[w][d]={title,dot:cardio?cardio.type:'lift',tags,cardio,sections:capRegionalFatigue((_s=>isRecoveryWeek(w)?recoveryDeload(_s,cardio):_s)(applyInjuryFilter(buildSections(role,w,{fullVariant,wantCarry:d===carryHost,cardio,hotNext}),cfg)),role,cardio,goal)};
       if(_twTag && goal==='strength'){
         weeks[w][d].testLift = role==='push'?'bench':role==='legs'?'squat':'deadlift';
         weeks[w][d].note='This is what the block built toward. Test it, log it, and the next block anchors off the number you hit.';
@@ -10745,7 +10768,11 @@ function d18LongRunDayPass(weeks){
         // with its pillar in coreHeader; a Rotational Power pillar goes whole and is not refilled
         // (a power header over a plank is the incomplete-superset shape). Other pillars stay.
         secs=secs.filter(sec=>!/power|explosive/i.test(sec.coreHeader||''));
-        secs=secs.map(sec=>({...sec, items:(sec.items||[]).filter(it=>!_D18_LEG_RX.test(it.name||''))}));
+        // D153 (V211): tier B bans the pattern, not the load. An item _pattern() calls hinge or hip_ext
+        // goes (Cable pull-through, Bodyweight back extension), the same lens the deload and the caps
+        // read. _D18_LEG_RX stays the belt for squat, lunge, calf and jump. Every refill runs before
+        // this pass, so a refilled item answers to this filter and to the 8-set budget below.
+        secs=secs.map(sec=>({...sec, items:(sec.items||[]).filter(it=>!_D18_LEG_RX.test(it.name||'')&&!/^(hinge|hip_ext)$/.test(_pattern(it.name||'')||''))}));
         // ≤8 working sets: keep in document order (mains first), stretches are free.
         // D140 (V209) F2: "3 sets — RPE 7" is three sets. The counter used to read only the N× form
         // and counted every "N sets" prescription as one, so a tier B day could keep 12.

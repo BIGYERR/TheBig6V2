@@ -214,6 +214,7 @@ ok('B4h commercial owns machines and cables: 0 denials', census.commercial.machi
 // through D150). A LITERAL row asserts a ruled MOVE; <=209 keeps the pin. Row existence is a conjunct.
 const HF_LEAK_BY_VERSION = { 209: { machine:200, cable:13, names:{ 'Preacher curl':200, 'Cable lateral raise':6, 'Face pull':7 } } };
 HF_LEAK_BY_VERSION[210] = { machine:0, cable:0, names:{} };   // D70c: the ruled MOVE
+HF_LEAK_BY_VERSION[211] = HF_LEAK_BY_VERSION[210];   // D153/D155: ruled UNMOVED (both only remove or choose among already-drawn items; neither draws a machine or cable item)
 const HF_LEAK = HF_LEAK_BY_VERSION[(+IA.version <= 209) ? 209 : +IA.version];
 // Survivors of one kind, read off the census and off the row through the same needs() table,
 // compared name for name and count for count: no extras, no missing.

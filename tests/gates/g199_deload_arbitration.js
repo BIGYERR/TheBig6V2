@@ -119,6 +119,21 @@ E6_BY_VERSION[210] = E6_BY_VERSION[209];   // D70c/D150: ruled UNMOVED (28; post
 // was ever pointed at. So the 208 row is read for every ia-version at or below 208 (older runs keep
 // reading 36 and do not newly fail), and from 209 each version needs its own row. No row -> E6 FAILS.
 const E6_ROW_FOR = v => E6_BY_VERSION[(+v <= 208) ? 208 : +v];
+// V211 (D155): on a tier B long-run day the deload's one-accessory pick yields to the
+// long-run tier, so the hinge leaves that day by ruling, not by the deload. E1b/E3/G5
+// assert the deload's own behaviour and exclude tier B long-run days (_longRunTier, the
+// predicate D18/D155 read) from 211 on. Rows ≥211 were printed on the V210 tag under the
+// same exclusion: an oracle rerun, not a readback of the candidate. Rows ≤210 keep the
+// unexcluded values.
+// The 210 row is the three literals E1b/E3/G5 carried from V199 through V210 (G5 was
+// {Explosive finisher: E3}, and E3 was 60 on every one of those artifacts).
+const DELOAD_HINGE_BY_VERSION = {};
+DELOAD_HINGE_BY_VERSION[210] = { E1b: 9771, E3: 60, G5: {'Explosive finisher': 60} };
+DELOAD_HINGE_BY_VERSION[211] = { E1b: 9334, E3: 44, G5: {'Explosive finisher': 44} };   // D155: ruled scope change
+const DELOAD_HINGE_ROW_FOR = v => DELOAD_HINGE_BY_VERSION[(+v <= 210) ? 210 : +v];   // no row -> E1b/E3/G5 FAIL
+const DELOAD_HINGE_EXCLUDES_TIER_B = v => +v >= 211;
+DELOAD_ARB_BY_VERSION[211] = DELOAD_ARB_BY_VERSION[210];   // D153/D155: ruled UNMOVED
+E6_BY_VERSION[211] = E6_BY_VERSION[210]; // D155: ruled UNMOVED (28 printed)
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[
@@ -178,12 +193,19 @@ const SNAP_FN="globalThis.__SNAP=function(a){return (a||[]).map(function(s){var 
  +"l:String((s&&s.label)||''),hip:!!(s&&s.hip),opt:!!(s&&s.optional),"
  +"n:it.map(function(i){return String((i&&i.name)||'');}),"
  +"p:it.map(function(i){var q=null;try{q=_pattern(i&&i.name);}catch(e){q=null;}return q?String(q):null;})};});};";
+// V211 (D155): recoveryDeload reads the day's long-run tier, so the call site passes cardio. The
+// instrument follows whichever call-site form the artifact carries; the V211 split passes cardio
+// too, so the instrumented copy stays inert (A2). A_PIPE and A_PIPE_R above are unchanged.
+const A_PIPE_D155=A_PIPE.replace('recoveryDeload(_s):_s','recoveryDeload(_s,cardio):_s');
+const A_PIPE_R_D155=A_PIPE_R.replace('recoveryDeload(__p1):__p1','recoveryDeload(__p1,cardio):__p1');
+function pipeFor(RAW){ return RAW.split(A_PIPE_D155).length-1===1?[A_PIPE_D155,A_PIPE_R_D155]:[A_PIPE,A_PIPE_R]; }
 function instrument(art,tag){
   const RAW=fs.readFileSync(art,'utf8');
-  const n=RAW.split(A_PIPE).length-1;
+  const [AP,APR]=pipeFor(RAW);
+  const n=RAW.split(AP).length-1;
   if(n!==1) return {err:n};
   const out=path.join(os.tmpdir(),'g199_'+tag+'_'+process.pid+'.html');
-  fs.writeFileSync(out,RAW.replace(A_PIPE,A_PIPE_R));
+  fs.writeFileSync(out,RAW.replace(AP,APR));
   return {file:out};
 }
 
@@ -246,6 +268,7 @@ function blank(){return {configs:0,weeks:0,dayCells:0,dlDayBuilds:0,deloadWeeks:
 function sweep(mine,instrFile){
   const IA=load(instrFile);
   IA.eval(SNAP_FN+"globalThis.__G199=[];globalThis.__DELOAD_OFF=false;");
+  const LT=IA.eval("typeof _longRunTier==='function'?_longRunTier:null");   // V211 (D155): the predicate D18/D155 read
   const R={on:blank(),off:blank(),wrongWay:0,endToEnd:0,ndIdentical:0,ndTotal:0,dlIdentical:0,dlTotal:0};
   mine.forEach(L=>{
     const arms={};
@@ -304,6 +327,11 @@ function sweep(mine,instrFile){
           if(hasLab(r.p1,lb)&&!hasLab(r.p2,lb)){ bump(S.dropped,lb);
             if((r.p1||[]).some(s=>s.l===lb&&secPost(s)>0)) bump(S.droppedPost,lb); } });
         const killed=(a1>0&&a2===0);
+        // V211 (D155): E1b/E3/G5 again with tier B long-run days excluded (DELOAD_HINGE_BY_VERSION).
+        { const _day=W[r.w]&&W[r.w][r.d], _tb=!!(LT&&_day&&LT(_day.cardio)==='B');
+          S.tierBDl=(S.tierBDl||0)+(_tb?1:0); S.postInP1X=(S.postInP1X||0)+(_tb?0:a1); S.postOutP2X=(S.postOutP2X||0)+(_tb?0:a2);
+          S.killedByDeloadX=(S.killedByDeloadX||0)+((killed&&!_tb)?1:0); S.killHoldX=S.killHoldX||{};
+          if(killed&&!_tb) (r.p1||[]).forEach(s=>{ if(secPost(s)>0) bump(S.killHoldX, s.l||'(nolabel)'); }); }
         if(killed){ S.killedByDeload++;
           if((r.p1||[]).filter(s=>secPost(s)>0).every(s=>s.l==='Explosive finisher')) S.killedHeldByFinisher++;
           if((r.p2||[]).some(s=>KMAIN.test(String(s.l||'').toLowerCase()))) S.killedKeepsMain++;
@@ -391,7 +419,7 @@ const done=()=>{ console.log('PASS '+PASS+' FAIL '+FAIL); process.exit(FAIL?1:0)
 
 console.log('── A. instrument sanity (every number below is void without these) ──');
 const RAW=fs.readFileSync(ART,'utf8');
-const anchorN=RAW.split(A_PIPE).length-1;
+const anchorN=RAW.split(pipeFor(RAW)[0]).length-1;
 ok(anchorN===1,'A1 week-assembly instrumentation anchor is unique (count '+anchorN+')');
 if(anchorN!==1){ console.log('REFUSED A2-J3: the p1/p2/p3 instrument could not be placed, so nothing about the deload stage was measured. A claim that did not run is not a pass.'); done(); }
 const ins=instrument(ART,'p');
@@ -459,13 +487,17 @@ function report(){
 
   console.log('── E. THE DELOAD MUST STILL CUT ──');
   ok(N.postInP1===12477,'E1a posterior items entering the deload == 12,477 across '+D_DAY+' deload day builds (got '+N.postInP1+')');
-  ok(N.postOutP2===9771,'E1b posterior items leaving the deload == 9,771, a cut of '+(N.postInP1-N.postOutP2)+' ('+(100*(N.postInP1-N.postOutP2)/N.postInP1).toFixed(1)+'%); got '+N.postOutP2);
+  const HROW=DELOAD_HINGE_ROW_FOR(IP.version), HX=DELOAD_HINGE_EXCLUDES_TIER_B(IP.version);
+  const HNOROW=(HROW?'':' — no DELOAD_HINGE_BY_VERSION row for V'+IP.version);
+  const HSCOPE=(HX?' (tier B long-run days excluded by _longRunTier: '+(N.tierBDl||0)+' deload day builds)':'');
+  const hIn=HX?N.postInP1X:N.postInP1, hOut=HX?N.postOutP2X:N.postOutP2, hKill=HX?N.killedByDeloadX:N.killedByDeload, hHold=(HX?N.killHoldX:N.killHold)||{};
+  ok(!!HROW&&hOut===HROW.E1b,'E1b posterior items leaving the deload == '+(HROW?HROW.E1b:'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+', a cut of '+(hIn-hOut)+' ('+(100*(hIn-hOut)/hIn).toFixed(1)+'%); got '+hOut+HNOROW);
   ok(F.postInP1===12477&&F.postOutP2===12477,'E2 __DELOAD_OFF control cuts nothing: '+F.postInP1+' -> '+F.postOutP2+'. E1b is a real deletion, not an accounting artefact');
-  ok(N.killedByDeload===60,'E3 STAGE-LOCAL (p1 -> p2): deload day builds taken from >0 posterior to 0 == 60 of '+D_DAY+'; got '+N.killedByDeload+'. This is coach\'s ruled CEILING, not a floor');
+  ok(!!HROW&&hKill===HROW.E3,'E3 STAGE-LOCAL (p1 -> p2): deload day builds taken from >0 posterior to 0 == '+(HROW?HROW.E3:'NO ROW')+' of '+D_DAY+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+'; got '+hKill+'. This is coach\'s ruled CEILING, not a floor'+HNOROW);
   ok(N.killedHeldByFinisher===60,'E4 on all 60, every section that held the dropped posterior is labelled Explosive finisher (got '+N.killedHeldByFinisher+'): the ceiling is BY LABEL, and a future widening into optional/fluff sections moves this number');
   ok(N.killedKeepsMain===60,'E5 all 60 still keep their main/strength section (got '+N.killedKeepsMain+')');
   const E6_ROW=E6_ROW_FOR(IP.version);
-  ok(E6_ROW!==undefined&&R.endToEnd===E6_ROW,'E6 END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): '+R.endToEnd+' deload day builds ship zero posterior where __DELOAD_OFF ships some == '+(E6_ROW===undefined?'NO ROW':E6_ROW)+' (the V'+IP.version+' E6_BY_VERSION row'+(E6_ROW===undefined?': no E6_BY_VERSION row covers this ia-version':'')+'). Reported beside E3\'s stage-local 60, never mixed into it');
+  ok(E6_ROW!==undefined&&R.endToEnd===E6_ROW,'E6 END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): '+R.endToEnd+' deload day builds ship zero posterior where __DELOAD_OFF ships some == '+(E6_ROW===undefined?'NO ROW':E6_ROW)+' (the V'+IP.version+' E6_BY_VERSION row'+(E6_ROW===undefined?': no E6_BY_VERSION row covers this ia-version':'')+'). Reported beside E3\'s stage-local '+(HROW?HROW.E3:'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row), never mixed into it');
 
   console.log('── F. ACCESSORY-BLOCK CONSERVATION (the ruling adds no sets) ──');
   ok(g(N.lblP2all,'Leg superset A')===14544,'F1 Leg superset A present after the deload == 14,544. DENOMINATOR: all '+N.dayCells+' day builds (non-deload cards pass through recoveryDeload untouched, so they belong in this total); got '+g(N.lblP2all,'Leg superset A'));
@@ -513,11 +545,12 @@ function report(){
   ok(g(N.dropped,'Explosive finisher')===1744,'G3 Explosive finisher DROPPED == 1,744 of the '+g(N.lblP1,'Explosive finisher')+' entering on deload cards (same denominator as G1); got '+g(N.dropped,'Explosive finisher'));
   ok(g(N.droppedPost,'Explosive finisher')===84,'G4 of those, POSTERIOR-HOLDING == 84 (dropped-block denominator, as G2); got '+g(N.droppedPost,'Explosive finisher'));
   ok(g(N.killHold,'Explosive finisher')===60,'G4b on KILLED days it holds the dropped posterior 60 times (killed-day denominator, as G2b). 84 and 60 are different questions: on 24 of the 84 the day kept posterior elsewhere; got '+g(N.killHold,'Explosive finisher'));
-  ok(Object.keys(N.killHold).length===1&&g(N.killHold,'Explosive finisher')===N.killedByDeload,
-    'G5 the killed-day holder census is EXACTLY {Explosive finisher: '+N.killedByDeload+'}: no other label ever holds the posterior on a day the deload empties, so the 60 is a CEILING BY LABEL and a widening into optional or fluff sections would move it (got '+JSON.stringify(N.killHold)+')');
+  ok(!!HROW&&JSON.stringify(hHold)===JSON.stringify(HROW.G5)&&g(hHold,'Explosive finisher')===hKill,
+    'G5 the killed-day holder census is EXACTLY '+(HROW?JSON.stringify(HROW.G5):'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+' and equals E3: no other label ever holds the posterior on a day the deload empties, so E3 is a CEILING BY LABEL and a widening into optional or fluff sections would move it (got '+JSON.stringify(hHold)+')'+HNOROW);
 
   console.log('     CENSUS lblP1all '+JSON.stringify(N.lblP1all)+' lblP2all '+JSON.stringify(N.lblP2all));
   console.log('     CENSUS killHold '+JSON.stringify(N.killHold));
+  console.log('     CENSUS deload-hinge excluding tier B long-run days (_longRunTier): E1b '+N.postOutP2X+' E3 '+N.killedByDeloadX+' G5 '+JSON.stringify(N.killHoldX||{})+' | tier B deload day builds '+(N.tierBDl||0));
   console.log('     CENSUS lens hand-only: '+topn(N.lensOnlyHand,10));
   console.log('     CENSUS lens engine-only: '+topn(N.lensOnlyEng,10));
   console.log('     CENSUS trapE any '+N.trapAnyE+' cand '+N.trapCandE+' nocand '+N.trapNoCandE+' viol '+N.trapSurvViolE+'/'+N.trapNoCandSurvViolE);

@@ -71,16 +71,16 @@
 //       biceps pool, so only Cable pushdown is bucketed here; a Cable curl lands in S1 and fails.
 //   S1  everything else (slice 1)
 //
-// D154 LICENCE (standing ruling 2, a predicate, not prose). While ia-version <= 210 the R bucket
-// is SCOPED OUT: O3r prints SCOPED OUT with its live count (never PASS) and O3z leaves R out of
-// its total. Above 210 the licence expires, O3r enforces and O3z counts R, so the gap stays loud
-// on the first build after V210 unless D154 has shipped.
+// D154 LICENCE (standing ruling 2, a predicate, not prose). While ia-version <= D154_SCOPED_TO
+// (211, renewed at V211) the R bucket is SCOPED OUT: O3r prints SCOPED OUT with its live count
+// (never PASS) and O3z leaves R out of its total. Above it the licence expires, O3r enforces and
+// O3z counts R, so the gap stays loud on the first build after it unless D154 has shipped.
 //
 // D149 LICENCE (standing ruling 2, a predicate, not prose). D149 is HELD out of V210 by coach:
 // slice 4 met its lens targets but lost home_full sections on long-run tier B days and injured
-// cells (O5b); it is parked for a ruling. While ia-version <= 210 the GHD rows (O3g, O3g5, O4g)
-// print SCOPED OUT (D149 held) with their live counts, never PASS, and O3z leaves the GHD share
-// out of its total. Above 210 they enforce and fail loudly. RENEW BY ONE PER BUILD until D149
+// cells (O5b); it is parked for a ruling. While ia-version <= D149_HELD_TO (211, renewed at V211)
+// the GHD rows (O3g, O3g5, O4g) print SCOPED OUT (D149 held) with their live counts, never PASS,
+// and O3z leaves the GHD share out of its total. Above it they enforce and fail loudly. RENEW BY ONE PER BUILD until D149
 // ships (g202's D142 pattern), always keyed on a number that exists today.
 //
 // VERSION PREDICATE (standing ruling 4). D70c ships on ia-version 210.
@@ -97,8 +97,10 @@ const D70C_ERA = 210;
 const SLICES_BUILT = 3;          // slices 1 (D70c-A1..A4), 2 (D70c-B1, B2), 2b, 3 (D150): V210's whole scope. D149 is HELD (licence below).
 const FINAL = 3;                 // V210's scope ends at slice 3: O3z and O6r enforce now
 const EXPIRED = VER > D70C_ERA;  // a later build runs this gate: no row may hide as NOT YET BUILT
-const D154_SCOPED = VER <= 210;  // the D154 licence: the elbow renamer is out of scope through V210 only
-const D149_HELD = VER <= 210;    // the D149 licence: the GHD station is HELD out of V210. Renew by one per build until D149 ships.
+const D154_SCOPED_TO = 211; // D154 queued
+const D149_HELD_TO = 211; // D149 waits on D153+D155, both ship in V211; builds next
+const D154_SCOPED = VER <= D154_SCOPED_TO;  // the D154 licence: the elbow renamer is out of scope through D154_SCOPED_TO only
+const D149_HELD = VER <= D149_HELD_TO;      // the D149 licence: the GHD station is HELD. Renew by one per build until D149 ships.
 
 let pass = 0, fail = 0, skip = 0, nyb = 0, fixt = 0, scoped = 0, held = 0;
 function ok(label, cond, got){
@@ -111,11 +113,11 @@ function owned(slice, label, cond, got){
 }
 function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function heldRow(label, cond, got){
-  if(D149_HELD){ held++; console.log('SCOPED OUT (D149 held) ' + label + ' [D149 licence, ia-version <= 210] (now ' + got + ')'); return; }
+  if(D149_HELD){ held++; console.log('SCOPED OUT (D149 held) ' + label + ' [D149 licence, ia-version <= ' + D149_HELD_TO + '] (now ' + got + ')'); return; }
   ok(label, cond, got);
 }
 function summary(){
-  console.log('\nNOT YET BUILT ' + nyb + ' (SLICES_BUILT ' + SLICES_BUILT + ' of ' + FINAL + ')  SCOPED OUT ' + scoped + ' (D154 licence, ia-version <= 210)  SCOPED OUT (D149 held) ' + held + ' (D149 licence, ia-version <= 210)  SKIP ' + skip + '  fixture guards ' + fixt);
+  console.log('\nNOT YET BUILT ' + nyb + ' (SLICES_BUILT ' + SLICES_BUILT + ' of ' + FINAL + ')  SCOPED OUT ' + scoped + ' (D154 licence, ia-version <= ' + D154_SCOPED_TO + ')  SCOPED OUT (D149 held) ' + held + ' (D149 licence, ia-version <= ' + D149_HELD_TO + ')  SKIP ' + skip + '  fixture guards ' + fixt);
   console.log('PASS ' + pass + ' FAIL ' + fail);
   process.exit(fail ? 1 : 0);
 }
@@ -282,7 +284,7 @@ DENIED_TIERS.filter(t => den(t, 'GHD')).forEach(t => heldRow('O3g ' + t + ' prin
 DENIED_TIERS.filter(t => den(t, 'GHD')).forEach(t => heldRow('O3g5 ' + t + ' prints no GHD station item on an ankle/protect or hip/protect day (D149 literals)', g('G5', t + '|GHD') === 0, g('G5', t + '|GHD')));
 const rOf = t => CLASSES.reduce((a, c) => a + g('R', t + '|' + c), 0);
 DENIED_TIERS.forEach(t => { const got = rOf(t), label = 'O3r ' + t + ': the elbow workaround renamer prints no denied item (D154)';
-  if(D154_SCOPED){ scoped++; console.log('SCOPED OUT ' + label + ' [D154 licence, ia-version <= 210] (now ' + got + ')'); }
+  if(D154_SCOPED){ scoped++; console.log('SCOPED OUT ' + label + ' [D154 licence, ia-version <= ' + D154_SCOPED_TO + '] (now ' + got + ')'); }
   else ok(label, got === 0, got); });
 const ghdOf = t => g('G', t + '|GHD') + g('G5', t + '|GHD');
 DENIED_TIERS.forEach(t => { const got = (B.ALL[t] || 0) - (D154_SCOPED ? rOf(t) : 0) - (D149_HELD ? ghdOf(t) : 0);

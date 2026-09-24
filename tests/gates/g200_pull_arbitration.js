@@ -130,12 +130,19 @@ const A_PIPE_R=[
 "      weeks[w][d]={title,dot:cardio?cardio.type:'lift',tags,cardio,sections:__p3};"].join("\n");
 const SNAP_FN="globalThis.__SNAP=function(a){return (a||[]).map(function(s){var it=((s&&s.items)||[]);return {"
  +"l:String((s&&s.label)||''),n:it.map(function(i){return String((i&&i.name)||'');})};});};";
+// V211 (D155): recoveryDeload reads the day's long-run tier, so the call site passes cardio. The
+// instrument follows whichever call-site form the artifact carries; the V211 split passes cardio
+// too, so the instrumented copy stays inert (A2). A_PIPE and A_PIPE_R above are unchanged.
+const A_PIPE_D155=A_PIPE.replace('recoveryDeload(_s):_s','recoveryDeload(_s,cardio):_s');
+const A_PIPE_R_D155=A_PIPE_R.replace('recoveryDeload(__p1):__p1','recoveryDeload(__p1,cardio):__p1');
+function pipeFor(RAW){ return RAW.split(A_PIPE_D155).length-1===1?[A_PIPE_D155,A_PIPE_R_D155]:[A_PIPE,A_PIPE_R]; }
 function instrument(art,tag){
   const RAW=fs.readFileSync(art,'utf8');
-  const n=RAW.split(A_PIPE).length-1;
+  const [AP,APR]=pipeFor(RAW);
+  const n=RAW.split(AP).length-1;
   if(n!==1) return {err:n};
   const out=path.join(os.tmpdir(),'g200_'+tag+'_'+process.pid+'.html');
-  fs.writeFileSync(out,RAW.replace(A_PIPE,A_PIPE_R));
+  fs.writeFileSync(out,RAW.replace(AP,APR));
   return {file:out};
 }
 
@@ -272,7 +279,7 @@ const RAW=fs.readFileSync(ART,'utf8');
 // arm would only make a stray V200 candidate read REFUSED instead of FAIL, and FAIL by exactly
 // 150 on the predecessor is strictly the better signal. The acceptance table at the head of
 // this file is the replacement, and it is checked by running this gate on four artifacts.
-const anchorN=RAW.split(A_PIPE).length-1;
+const anchorN=RAW.split(pipeFor(RAW)[0]).length-1;
 ok(anchorN===1,'A1 week-assembly instrumentation anchor is unique (count '+anchorN+')');
 if(anchorN!==1){ console.log('REFUSED A2-P4: the p1/p2/p3 instrument could not be placed, so nothing about the pull arbitration was measured. A claim that did not run is not a pass.'); done(); }
 const ins=instrument(ART,'p');

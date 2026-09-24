@@ -1,0 +1,23 @@
+[
+  {
+    "name": "S1-D153 -> tier B drops the _pattern clause: a hinge or hip_ext the leg regex does not name (Cable pull-through, Bodyweight back extension) prints on a tier B long-run day again",
+    "anchor": "&&!/^(hinge|hip_ext)$/.test(_pattern(it.name||'')||'')",
+    "replacement": "",
+    "gate": "gates/g211_d153_d155.js",
+    "note": "NAMED TRIP: G2 (hand-list hinges on tier B days). Needs ia-version >= 211: below 211 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-211 copy until Mario bumps. Measured on a forced-211 copy of the V211 A+B build, gate run without a baseline as sabotage.py runs it (V210 read from git d8d2f5b): PASS 60 FAIL 3. EXPECTED: NRC G2 (Bodyweight back extension 26), NSW G2 (Bodyweight back extension 761), D153 G2 (Cable pull-through 372)."
+  },
+  {
+    "name": "S2-D155 -> the tier branch never runs: recoveryDeload keeps D91's posterior block on a tier B long-run day, and d18LongRunDayPass strips it to nothing",
+    "anchor": "  if(_longRunTier(cardio)==='B'){\n    const _tierAdmits=",
+    "replacement": "  if(false){\n    const _tierAdmits=",
+    "gate": "gates/g211_d153_d155.js",
+    "note": "NAMED TRIP: G1 (zero-lift tier B days) and G6 (Upper superset). Needs ia-version >= 211. Measured on a forced-211 copy of the V211 A+B build, gate run without a baseline as sabotage.py runs it (V210 read from git d8d2f5b): PASS 57 FAIL 6. EXPECTED: G1 and G6 on NRC (124), NSW (280) and D153 (138)."
+  },
+  {
+    "name": "S3-D155 -> the tier branch picks Lower strength (the D91 choice on the loaded full-body day), which tier B then strips to nothing",
+    "anchor": "      if(_tierAdmits(s)){ pickIdx=i; break; }    // first block the tier admits wins\n",
+    "replacement": "      if(/^lower strength$/i.test(s.label||'')){ pickIdx=i; break; }    // first block the tier admits wins\n",
+    "gate": "gates/g211_d153_d155.js",
+    "note": "NAMED TRIP: G1 (zero-lift tier B days) and G6 (Upper superset). Needs ia-version >= 211. Measured on a forced-211 copy of the V211 A+B build, gate run without a baseline as sabotage.py runs it (V210 read from git d8d2f5b): PASS 57 FAIL 6. EXPECTED: G1 and G6 on NRC (124), NSW (280) and D153 (138)."
+  }
+]

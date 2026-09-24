@@ -453,10 +453,10 @@ ok(d6n > 0 && d6bad.length === 0,
 //   * a build whose weeks are neither uniformly four-run nor uniformly three-run is NOT
 //     skipped. It is a named miss, so an unclassified shape cannot pass quietly.
 //
-// THE THREE-RUN ARM IS A LICENCE, AND IT REFUSES ABOVE ia-version 210 (renewed from 209 by D142 at V210).
+// THE THREE-RUN ARM IS A LICENCE, AND IT REFUSES ABOVE ia-version 211 (renewed from 210 by D142 at V211).
 // D113 and D122 have already ruled the crossover RETIRED on the pace family, and slice 7c
 // which retires it is PARKED. So the three-run arm below pins THE ARTIFACT AS SHIPPED,
-// NOT THE DOCTRINE AS RULED. It is keyed on 210, a number that exists today, and the
+// NOT THE DOCTRINE AS RULED. It is keyed on 211, a number that exists today, and the
 // build that ships D113/D122 must re-pin it as "one INT and one CHI every week at three
 // runs" or fail here by name. It does not expire quietly and it does not expire never.
 //
@@ -472,20 +472,20 @@ const INT_MECHANISM_BY_VERSION = [
     // four weeks and diverge at week 5. D7c below asserts that divergence out loud so
     // this sentence cannot rot into decoration.
     note: 'V115 position ramp over intSpan; six cards; NOT Table 6' },
-  { upTo: 210, arm: 'four-run', reps: 'table6',
+  { upTo: 211, arm: 'four-run', reps: 'table6',
     // ELEVEN cards on the same cfg: the INT slot is weekly, and Table 6 is read on the
     // CALENDAR week, through the cutback branch at weeks 4 and 8 and the taper branch at
     // weeks 10 and 11. That is the second mechanism.
     //
     // The THIRD mechanism is the three-run arm as it still stands on this same artifact:
     // where a pace build still lands on three run days the card count is still the V115
-    // crossover's cross - 1, and that arm is LICENSED TO 210 and no further (D142 renewal at V210).
+    // crossover's cross - 1, and that arm is LICENSED TO 211 and no further (D142 renewal at V211).
     note: 'Table 6 on the calendar week through the cutback and taper branches; the '
-        + 'three-run arm still runs the V115 crossover and is licensed to 210 (D142 renewal at V210; D113a ruled, builds at V213)' }
+        + 'three-run arm still runs the V115 crossover and is licensed to 211 (D142 renewal at V211; D113a ruled, builds at V213)' }
 ];
 const IAV = +IA.version;
 const INT_ERA = INT_MECHANISM_BY_VERSION.filter(r => IAV <= r.upTo)[0] || null;
-const THREE_RUN_LICENCE_TO = 210; // V210 renewal (D142): D113a ruled by Mario with the fallback, builds at V213 (queue re-ordered at V210). Renew by one per build until D113a ships.
+const THREE_RUN_LICENCE_TO = 211; // V211 renewal (D142): D113a ruled by Mario with the fallback, builds at V213. Renew by one per build until D113a ships.
 if(IAV > THREE_RUN_LICENCE_TO){
   FAIL++;
   console.log('  FAIL D7-LICENCE the three-run INT card rule in this file pins cross - 1 cards, which is '
