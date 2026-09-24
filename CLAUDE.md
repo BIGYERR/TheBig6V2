@@ -25,8 +25,15 @@ Builder is the only agent holding `Edit`/`Write`. coach, measure and gatekeeper 
 their output is judgement no gate can check (coach), or the judgement that a gate is lying (gatekeeper).
 Coach runs on fable from V200 as a measured experiment; compare its rulings against V198 and V199
 (retractions, reds, and whether measure refutes a premise) before deciding whether it stays.
+**Coach is spawned fresh for each ruling, with a tight brief:** the question, measure's numbers, and the handoff lines
+it needs, nothing else. Never resume a coach (`SendMessage`) after it has gone idle. A follow-up or a re-ruling is a
+new spawn whose brief carries the prior ruling's text.
 
 ## Session rhythm (do not skip steps)
+**One build per chat.** Each version starts in a fresh chat. A chat never carries past one build, and never past a
+compaction: if it compacts mid-build, stop at the next safe point (a builder slice either landed whole or stays parked
+in `tests/edits/`; nothing is committed that gatekeeper has not proved), tell Mario where the build stands, and
+continue in a fresh chat.
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it.
 2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `v<N>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience.
@@ -135,8 +142,28 @@ and still recommend.
 No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declarative sentences. The app sounds like a coach at every touchpoint. Spec separators inside a prescription (`4×5 — RPE 8`) are structural and exempt. No user-facing "Nike" strings.
 
 ## Token discipline
-**The orchestrator does not run commands longer than a minute in the main session; delegate them.** **Subagents already have CLAUDE.md in context; do not `Read` it.**
+**The orchestrator does not run commands longer than a minute in the main session; delegate them.** **coach and measure already have CLAUDE.md in context; do not `Read` it. builder and gatekeeper run with `omitClaudeMd: true`: they never see this file, so every brief to them carries what they need (Delegation carry, below).**
 `index.html` is ~250K tokens. Never read it wholesale. `grep -n` the symbol and its consumers first, read wide at the seam, `str_replace` narrowly, let the gates be the backstop. Do not re-read the doctrine text mid-session unless verifying a transcription.
+
+## Delegation carry (builder and gatekeeper do not load this file)
+Every brief to either carries the per-build items, then the standing lines for that role, pasted, not paraphrased.
+- **Builder, per build:** the ruling verbatim (D-code, what changes, what deliberately does not, the after-grid); the slice
+  (≤4 edits) and what earlier slices landed; the baseline path; whether this slice bumps `ia-version` and to what; the
+  diff classes the ruling licenses.
+- **Gatekeeper, per build:** every ruling in the build, verbatim; the version Mario named; the baseline path; the edit
+  scripts, gates and sabotage specs; the diff classes builder declared; whether `HALF_MANNY` may move and to what digest.
+- **Both, standing:** gate runs are `bash -c 'set -eo pipefail; …'`, no `<(...)`; every gate prints `PASS n FAIL n` and a
+  missing summary is a crash; oracles never ask the engine; strip comments before any token-gone scan; pin `cfg.seed`,
+  strip clock fields and prove a baseline equals itself before diffing; an empty diff is a failure. Standing rulings 2
+  (a licence is a predicate on today's `ia-version`), 3 (wire a dead pin, never re-point it), 4 (a gate is keyed to the
+  ruling it defends) and 5 (`HALF_MANNY` moves only by a ruling that printed the digest first). NRC sessions are
+  verbatim; no harness asserts taper, volume or rep shape on them.
+- **Builder, standing:** standing ruling 7 (a premise refuted mid-slice PARKS the slice: script stays in `tests/edits/`,
+  nothing committed); pool and post-filter reason through one lens, so grep the other half; a conditional write with no
+  else is a latch; `exStoreKey` is the only `ia_exw_` writer; race day is found by subtype.
+- **Gatekeeper, standing:** run every gate against the previous version too; a sabotage anchor that is not `count==1`
+  is NOT-APPLIED and a no-op mutation is a mutation defect; all-trip is as suspicious as a survivor; 100% of blast-radius
+  hunks are classified, and an unruled removal is a regression.
 
 ## Files
 - `index.html` — the app. `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).
