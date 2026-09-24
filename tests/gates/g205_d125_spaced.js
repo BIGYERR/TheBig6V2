@@ -118,7 +118,17 @@ function perms(a){ if(!a.length) return [[]]; const o=[]; a.forEach((x,i)=>perms
 // 4 sessions = 2 LSD + 1 long interval + 1 short interval → easy, INT, CHI, long.
 // 3 sessions sits below the template floor: one quality slot survives, and on a speed
 // goal that slot is the interval. 2 sessions keep the aerobic pair.
-const NSW_TYPES = { 2:['lsd_easy','lsd_long'], 3:['lsd_easy','int','lsd_long'], 4:['lsd_easy','int','chi','lsd_long'] };
+// V213 (D113a) ERA ROWS (standing ruling 4). From 213 the pace family's three-run week is
+// INT / CHI / long (D113a, coach): both qualities every week, the easy run is what yields. Where
+// no layout of those three reaches zero untolerated adjacencies, the week keeps easy / INT / long
+// (the spacer fallback), typed as NSW_FALLBACK3 and applied inside space() below. The <=212 row is
+// the table exactly as it stood.
+const NSW_TYPES_BY_ERA = [
+  { hi: 212, t: { 2:['lsd_easy','lsd_long'], 3:['lsd_easy','int','lsd_long'], 4:['lsd_easy','int','chi','lsd_long'] } },
+  { lo: 213, t: { 2:['lsd_easy','lsd_long'], 3:['int','chi','lsd_long'],      4:['lsd_easy','int','chi','lsd_long'] } }
+];
+const NSW_TYPES = (NSW_TYPES_BY_ERA.filter(r => (r.lo === undefined || VER >= r.lo) && (r.hi === undefined || VER <= r.hi))[0] || {}).t;
+const NSW_FALLBACK3 = ['lsd_easy','int','lsd_long'];
 const TP = { long:'lsd_long', rec:'lsd_easy', s1:'int', s2:'chi' };
 const TN = { long:'nrc_long', rec:'nrc_recovery', s1:'nrc_speed1', s2:'nrc_speed2' };
 
@@ -148,7 +158,7 @@ try {
   CH = ctx.out.c; GN = ctx.out.gn;
   // the engine's own NSW table must agree with the hand transcription above
   Object.keys(NSW_TYPES).forEach(k => {
-    const got = ctx.out.gs(Number(k), true, false, false);
+    const got = ctx.out.gs(Number(k), true, false, false, VER >= 213 ? true : undefined);   // V213: the pace flag D113a added
     if(got.join() !== NSW_TYPES[k].join()) SURGERY += ' nDays=' + k + ' engine=' + got.join('/');
   });
 } catch(e){ SURGERY = ' EXTRACTION FAILED: ' + e.message; CH = null; }
@@ -156,8 +166,8 @@ ok('P0b the chooser extracts and the NSW table matches the hand transcription', 
 if(!CH) summary(1);
 
 // ── the hand oracle: exhaustive, scored by the ruling's objective ───────────────
-function space(train, capDays, T, pinned){
-  const types = T === TP ? NSW_TYPES[capDays] : GN(capDays, arguments[4]);
+function spaceRaw(train, capDays, T, pinned, _g, _types){
+  const types = _types || (T === TP ? NSW_TYPES[capDays] : GN(capDays, _g));
   const inTrain = new Set(train), last = train[train.length-1], out = [];
   combos(train, capDays).forEach(days => {
     if(pinned && days[days.length-1] !== last) return;
@@ -199,6 +209,15 @@ function space(train, capDays, T, pinned){
     });
   });
   return out;
+}
+// V213 (D113a): THE SPACER FALLBACK, as the ruling states it: a three-run pace week whose best
+// INT / CHI / long layout still carries an untolerated adjacency is laid out as easy / INT / long.
+// Below 213 space() is spaceRaw() unchanged.
+function space(train, capDays, T, pinned, g){
+  const all = spaceRaw(train, capDays, T, pinned, g);
+  if(VER >= 213 && T === TP && capDays === 3 && all.length && Math.min(...all.map(c => c.untol)) > 0)
+    return spaceRaw(train, capDays, T, pinned, g, NSW_FALLBACK3);
+  return all;
 }
 const cmpRank = (a,b) => { for(let i=0;i<a.length;i++){ if(a[i]!==b[i]) return a[i]-b[i]; } return 0; };
 const maxRank = list => list.reduce((m,c)=>cmpRank(c.rank,m)>0?c.rank:m, list[0].rank);
@@ -432,15 +451,27 @@ ok('P8 the built week the athlete gets is rank-optimal (' + p8rows + ' calendars
 ok('P8b the chooser plan outranks the last-day long-run default in the NSW type loop',
    /let st = _planned \|\| \(isLastSportDay \? 'lsd_long' : \(types\[sportIdx\] \|\| 'lsd_easy'\)\);/.test(SRC));
 {
-  let off = 0, rows = 0;
+  let off = 0, rows = 0, mid = 0;
   CAL.forEach(({train}) => {
     if(train.length <= 3) return;
     rows++;
     const p = CH(train, 3, 'run_pace_goal', true);
     const days = p.idxs.map(i => train[i]);
-    if(days.find(d => p.typeOf[d] === 'lsd_long') !== days[days.length-1]) off++;
+    if(days.find(d => p.typeOf[d] === 'lsd_long') !== days[days.length-1]){
+      mid++;
+      if(VER < 213) off++;
+      else {
+        // V213 (D113a): the pace arm's long run is a PREFERENCE ranked under the adjacency terms
+        // (D125). A mid-week long run is allowed only where the objective chose it: every layout
+        // whose long run is the last run ranks below the best.
+        const all = space(train, 3, TP, false);
+        const lastL = all.filter(c => c.typeOf[c.days[c.days.length-1]] === 'lsd_long');
+        if(lastL.length && cmpRank(maxRank(lastL), maxRank(all)) === 0) off++;
+      }
+    }
   });
-  ok('P8c at the three-run ceiling the long run is still the last run of the week (' + rows + ' calendars)', off === 0, off + ' mid-week');
+  if(VER < 213) ok('P8c at the three-run ceiling the long run is still the last run of the week (' + rows + ' calendars)', off === 0, off + ' mid-week');
+  else ok('P8c at the three-run ceiling (D113a, INT / CHI / long) a mid-week long run ships only where the D125 objective ranks every long-last layout below it (' + rows + ' calendars, ' + mid + ' mid-week)', off === 0, off + ' mid-week with a long-last layout tied at the top');
 }
 
 // ── P9 run_base and bike keep the fallback: their layout must NOT be the chooser's ──

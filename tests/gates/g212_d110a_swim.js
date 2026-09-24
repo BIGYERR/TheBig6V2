@@ -388,9 +388,9 @@ ok('N5 no swim note carries "—", "–" or letter-hyphen-letter (' + N.swimNote
 
 // ── the V211 baseline (build-pair rows only) ─────────────────────────────────────────────
 // (D4 and D5 run after the baseline loads; see below.)
-let BASE = null, baseWhy = '';
+let BASE = null, baseWhy = '', ARGV_BASE_VER = null;
 if(PAIR){
-  if(BASEFILE && fs.existsSync(BASEFILE)){ const b = load(BASEFILE); if(+b.version === 211){ BASE = b; baseWhy = 'argv baseline ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 211; '; }
+  if(BASEFILE && fs.existsSync(BASEFILE)){ const b = load(BASEFILE); ARGV_BASE_VER = +b.version; if(+b.version === 211){ BASE = b; baseWhy = 'argv baseline ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 211; '; }
   if(!BASE){
     try {
       const repo = path.join(__dirname, '..', '..');
@@ -445,6 +445,11 @@ const WN = (I, c, audit) => { const w = I.buildProgram(cl(c)).weeks;
     for(const [lbl, c] of P1){ p1++; if(WN(IA, c, true) !== WN(BASE, c, false) && p1bad.length < 8) p1bad.push(lbl + ' ' + c.experience + ' seed ' + c.seed); }
   }
   pairRow('P0 identity fuzz: V211 built twice from one cfg is byte-identical (' + g0 + ' cfgs)', !!BASE && g0 >= 12 && g0bad.length === 0, BASE ? g0bad.join(' | ') : 'NO BASELINE');
+  // V213 (standing ruling 4): P1 is the 212-vs-211 pair. A baseline that reads the candidate's own
+  // version says the candidate is a later build before its bump (its ruled moves reach run_pace_goal
+  // and NRC), so P1 SKIPs by name there. The other pair rows are untouched.
+  if(PAIR && ARGV_BASE_VER === VER) skipRow('P1 scoped to the D110a build pair (212 vs 211): the baseline passed reads ' + ARGV_BASE_VER + ', the candidate\'s own version, so this candidate is a later build before its bump');
+  else
   pairRow('P1 run_pace_goal, NRC, bike and untimed swim goals byte-identical to V211 apart from the swim INT note (' + p1 + ' builds)', !!BASE && p1 >= 60 && p1bad.length === 0, BASE ? p1bad.join(' | ') : 'NO BASELINE');
   pairRow('P1n every swim INT note on those builds opens with the typed D110a distance note, build to 8 (' + p1n + ' cards)', !!BASE && p1n >= 20 && p1nBad.length === 0, BASE ? p1nBad.join(' | ') : 'NO BASELINE');
 }

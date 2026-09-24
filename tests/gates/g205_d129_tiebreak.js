@@ -108,6 +108,25 @@ function longestFree(days){ const P=days.map(pos).sort((a,b)=>a-b); let lf=0;
 
 const TP={long:'lsd_long',rec:'lsd_easy',s1:'int',s2:'chi'};
 const TN={long:'nrc_long',rec:'nrc_recovery',s1:'nrc_speed1',s2:'nrc_speed2'};
+// V213 (D113a) ERA ROWS (standing ruling 4) for the rows that score the lifted chooser (P1, P1b,
+// P3, P4). Through 212 the three-run type set is the engine's own table read, as it always was.
+// From 213 it is typed: INT / CHI / long, and where no layout of those three on the row's days
+// avoids an untolerated pair under D130 (CHI on the eve of the long is the one tolerated pair),
+// the spacer fallback's easy / INT / long. P6 and P7 pin D129's after-grid on the type set D129
+// was ruled on and read no engine pick, so they keep the engine-table read at every version.
+const PACE3_BY_ERA=[{hi:212,three:null},{lo:213,three:['int','chi','lsd_long'],fallback:['lsd_easy','int','lsd_long']}];
+const PACE3=PACE3_BY_ERA.filter(r=>(r.lo===undefined||VER>=r.lo)&&(r.hi===undefined||VER<=r.hi))[0];
+function d130untol(days,typeOf){
+  const hd=days.filter(d=>['int','chi','lsd_long'].indexOf(typeOf[d])>=0), L=days.find(d=>typeOf[d]==='lsd_long'); let u=0;
+  for(let a=0;a<hd.length;a++) for(let b=a+1;b<hd.length;b++){ const x=hd[a],y=hd[b]; if(circ(x,y)!==1) continue;
+    const tol=!!L&&((typeOf[x]==='chi'&&y===L&&x===prevDay(L))||(typeOf[y]==='chi'&&x===L&&y===prevDay(L))); if(!tol) u++; }
+  return u;
+}
+function paceTypes(train,cap){
+  if(!PACE3.three||cap!==3) return E.gs(cap,E.sp('run_pace_goal'),false,false);
+  const clean=combos(train,3).some(days=>perms(PACE3.three).some(p=>{ const t={}; days.forEach((d,i)=>t[d]=p[i]); return d130untol(days,t)===0; }));
+  return clean?PACE3.three:PACE3.fallback;
+}
 
 // opts: {pace:bool}. NRC keeps the shipped predicate AND the two long-run pins.
 function space(train, cap, types, T, pace){
@@ -130,7 +149,10 @@ function space(train, cap, types, T, pace){
       const ll=(!longDay||longDay===last)?1:0;
       const s1=days.find(d=>typeOf[d]===T.s1), s2=days.find(d=>typeOf[d]===T.s2);
       const can=(s1&&s2&&pos(s1)<pos(s2))?1:0;
-      const ruled=[-coll,ll,sar,rbl,can];
+      // V213 (D113a) era: the pace head is D130's split, -(10 x untol + tol); tol = coll - untol on the
+      // pace template. Through 212 and on NRC it is -coll, as it always was.
+      const _u=(pace&&PACE3.three)?d130untol(days,typeOf):0;
+      const ruled=[(pace&&PACE3.three)?-(10*_u+(coll-_u)):-coll,ll,sar,rbl,can];
       const ident=pace&&idxs.join(',')===evk?1:0;
       const spread=pace?-longestFree(days):0;
       // ranks 8 and 9, retyped from the addendum's prose. The LAST quality session before
@@ -165,7 +187,7 @@ const PACE_ROWS=[];
 console.log('P1 pace arm lex-optimal under the corrected recBeforeLong (' + PACE_ROWS.length + ' rows)');
 let p1bad=0;
 PACE_ROWS.forEach(r=>{
-  const types=E.gs(r.cap, E.sp('run_pace_goal'), false, false);
+  const types=paceTypes(r.train,r.cap);   // V213 era row
   const all=space(r.train,r.cap,types,TP,true);
   const pick=E.c(r.train,r.cap,'run_pace_goal',true);
   const got=engIn(all,pick,r.train);
@@ -190,9 +212,10 @@ PACE_ROWS.forEach(r=>{
   // an easy run the day after the long is legal; what is illegal is that layout WINNING
   // over one with a true eve that ties on ranks 1 to 3.
   if(padsAfterOnly){
-    const types=E.gs(r.cap,E.sp('run_pace_goal'),false,false);
+    const types=paceTypes(r.train,r.cap);   // V213 era row
     const all=space(r.train,r.cap,types,TP,true);
     const got=engIn(all,pick,r.train);
+    if(!got){ p1b++; console.log('  FAIL P1b rest '+r.nm+' cap'+r.cap+' engine layout '+lay(r.train,pick)+' is not in the era type space'); return; }
     const better=all.find(c=>cmp(c.ruled.slice(0,3),got.ruled.slice(0,3))===0 && c.ruled[3]>got.ruled[3]);
     if(better){ p1b++; console.log('  FAIL P1b rest '+r.nm+' cap'+r.cap+' kept a day-after pad over '+
       better.days.map(d=>d.toUpperCase()+':'+better.typeOf[d]).join(' ')); }
@@ -269,7 +292,7 @@ console.log('P2c identity is pace-family-only: NRC declines the even-spread subs
 console.log('P3 identity: the incumbent even-spread subset wins every tie it is in');
 let p3n=0,p3bad=0;
 PACE_ROWS.forEach(r=>{
-  const types=E.gs(r.cap,E.sp('run_pace_goal'),false,false);
+  const types=paceTypes(r.train,r.cap);   // V213 era row
   const all=space(r.train,r.cap,types,TP,true);
   const tied=topBy(all,'ruled');
   const ev=evenIdx(r.train.length,r.cap).join(',');
@@ -287,7 +310,7 @@ console.log('  rows where the incumbent subset ties at the top: '+p3n);
 console.log('P4 spread: among ties without the incumbent, the tightest week wins');
 let p4n=0,p4bad=0;
 PACE_ROWS.forEach(r=>{
-  const types=E.gs(r.cap,E.sp('run_pace_goal'),false,false);
+  const types=paceTypes(r.train,r.cap);   // V213 era row
   const all=space(r.train,r.cap,types,TP,true);
   const tied=topBy(all,'ruled');
   const ev=evenIdx(r.train.length,r.cap).join(',');

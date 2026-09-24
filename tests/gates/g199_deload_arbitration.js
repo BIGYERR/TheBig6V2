@@ -135,8 +135,11 @@ const DELOAD_HINGE_EXCLUDES_TIER_B = v => +v >= 211;
 DELOAD_ARB_BY_VERSION[211] = DELOAD_ARB_BY_VERSION[210];   // D153/D155: ruled UNMOVED
 E6_BY_VERSION[211] = E6_BY_VERSION[210]; // D155: ruled UNMOVED (28 printed)
 DELOAD_ARB_BY_VERSION[212] = DELOAD_ARB_BY_VERSION[211];   // D110a: ruled UNMOVED, no lift section touched
+DELOAD_ARB_BY_VERSION[213] = DELOAD_ARB_BY_VERSION[212];   // D113a: ruled UNMOVED, no lift section touched (printed: C1 364 C3 364 C5 32 D2 19 I3 496; E6 28; E1b 9334 E3 44 G5 44)
 E6_BY_VERSION[212] = E6_BY_VERSION[211];   // D110a: ruled UNMOVED, no lift section touched
+E6_BY_VERSION[213] = E6_BY_VERSION[212];   // D113a: ruled UNMOVED, no lift section touched (printed: C1 364 C3 364 C5 32 D2 19 I3 496; E6 28; E1b 9334 E3 44 G5 44)
 DELOAD_HINGE_BY_VERSION[212] = DELOAD_HINGE_BY_VERSION[211];   // D110a: ruled UNMOVED, no lift section touched
+DELOAD_HINGE_BY_VERSION[213] = DELOAD_HINGE_BY_VERSION[212];   // D113a: ruled UNMOVED, no lift section touched (printed: C1 364 C3 364 C5 32 D2 19 I3 496; E6 28; E1b 9334 E3 44 G5 44)
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[

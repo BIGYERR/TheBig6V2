@@ -97,8 +97,8 @@ const D70C_ERA = 210;
 const SLICES_BUILT = 3;          // slices 1 (D70c-A1..A4), 2 (D70c-B1, B2), 2b, 3 (D150): V210's whole scope. D149 is HELD (licence below).
 const FINAL = 3;                 // V210's scope ends at slice 3: O3z and O6r enforce now
 const EXPIRED = VER > D70C_ERA;  // a later build runs this gate: no row may hide as NOT YET BUILT
-const D154_SCOPED_TO = 212; // D154 queued
-const D149_HELD_TO = 212; // D149 builds after V213
+const D154_SCOPED_TO = 213; // D154 queued
+const D149_HELD_TO = 213; // D149 builds next
 const D154_SCOPED = VER <= D154_SCOPED_TO;  // the D154 licence: the elbow renamer is out of scope through D154_SCOPED_TO only
 const D149_HELD = VER <= D149_HELD_TO;      // the D149 licence: the GHD station is HELD. Renew by one per build until D149 ships.
 

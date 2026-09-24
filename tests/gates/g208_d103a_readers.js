@@ -248,6 +248,9 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
     const ser = x => x ? JSON.stringify({long:x.long, eve:x.eve, after:x.after, speed:[...x.speed].sort(), easy:[...x.easy].sort()}) : 'null';
     ok('S2 unkeyed path: with the keys stripped, the shape equals the baseline\'s on both hand grids', ser(sa) === ser(sb) && ser(sc) === ser(sd), ser(sa) + ' vs ' + ser(sb)); }
   if(!(IB && +IB.version === VER)) skip('S3 runs only against the pre-slice tree at the same ia-version; ' + (IB ? 'this pair is ' + VER + ' vs ' + IB.version : 'no baseline'));
+  // V213 (standing ruling 4): S3 is V208's own build pair. A later build before its bump also reads the
+  // same version as its baseline, and its ruled moves are not S3's business.
+  else if(VER !== ERA) skip('S3 scoped to the D103a slice 2 build pair (candidate 208 against its 208 pre-slice tree); this pair is ' + VER + ' vs ' + IB.version + ', a later build before its bump');
   else { const moved = [], expect = [];
     // Non-vacuity only for the slice 2 pair: a baseline whose shape reader still takes the test as the long run.
     const bLabel = (() => { const x = IB.eval('_nrcRunShape')(clone(wk), td); return !!x && x.long === 'sat'; })();

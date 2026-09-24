@@ -481,12 +481,26 @@ const INT_MECHANISM_BY_VERSION = [
     // where a pace build still lands on three run days the card count is still the V115
     // crossover's cross - 1, and that arm is LICENSED TO 212 and no further (D142 renewal at V212).
     note: 'Table 6 on the calendar week through the cutback and taper branches; the '
-        + 'three-run arm still runs the V115 crossover and is licensed to 212 (D142 renewal at V212; D113a builds at V213)' }
+        + 'three-run arm still runs the V115 crossover and is licensed to 212 (D142 renewal at V212; D113a builds at V213)' },
+  { upTo: Infinity, arm: 'd113a', reps: 'table6',
+    // V213 (D113a, coach). ONE ROW, THREE SHAPES, and the shape is read off the build, never
+    // assumed. A four-run build is unchanged from the 212 row. A three-run build on a calendar
+    // that can space INT / CHI / long carries ONE INT AND ONE CHI EVERY WEEK. A three-run build
+    // on one of the 7 SPACER calendars (typed below) keeps easy / INT / long and its one quality
+    // slot crosses: INT in weeks 1..cross-1, CHI in weeks cross..tw. Reps are Table 6 on the
+    // calendar week in every shape (measured on the D113a tree: the spacer INT weeks print
+    // 4,4,5,3,6,6 at 11 weeks, which is Table 6, not the V115 ramp's 4,4,5,3,7,8).
+    note: 'D113a: four-run as the 212 row; three-run two-quality = one INT + one CHI every week; '
+        + 'three-run spacer = INT 1..cross-1 then CHI cross..tw; reps Table 6' }
 ];
 const IAV = +IA.version;
 const INT_ERA = INT_MECHANISM_BY_VERSION.filter(r => IAV <= r.upTo)[0] || null;
-const THREE_RUN_LICENCE_TO = 212; // V212 renewal (D142): D113a builds at V213. Renew by one per build until D113a ships.
-if(IAV > THREE_RUN_LICENCE_TO){
+// V213 (D113a): THE LICENCE IS RETIRED, NOT RENEWED. D113a ships the rule this licence was
+// waiting for, as the era row above, so from 213 the three-run arm is judged by the rule and the
+// crossover pin lives only in the <=212 rows. The constant stays because it is still read: an
+// artifact above 212 that no D113a rule row covers is refused exactly as before.
+const THREE_RUN_LICENCE_TO = 212; // RETIRED at V213 by D113a: the refusal below now fires only when no D113a rule row covers the artifact.
+if(IAV > THREE_RUN_LICENCE_TO && !(INT_ERA && INT_ERA.arm === 'd113a')){
   FAIL++;
   console.log('  FAIL D7-LICENCE the three-run INT card rule in this file pins cross - 1 cards, which is '
     + 'THE ARTIFACT AS SHIPPED AT ia-version ' + THREE_RUN_LICENCE_TO + ' AND NOT THE DOCTRINE AS RULED. '
@@ -496,6 +510,28 @@ if(IAV > THREE_RUN_LICENCE_TO){
 }
 const PINNED = paceGoal({ targetDist:'1.5', targetMins:'10', targetSecs:'30', targetTime:'10:30',
   mileBestMins:'8', mileBestSecs:'15', mileBestSrc:{kind:'entered'} });
+
+// V213 (D113a): THE 7 SPACER CALENDARS, typed. They are the three-training-day calendars on which
+// no order of INT / CHI / long avoids an untolerated hard pair under D130 (two hard runs on
+// neighbouring days of the circular week; the one tolerated pair is CHI on the eve of the long).
+// D7a re-derives the list from that sentence before D7b may use it.
+const D7_WEEK = ['sun','mon','tue','wed','thu','fri','sat'];
+const SPACER7 = ['sun+mon+tue','sun+mon+sat','sun+fri+sat','mon+tue+wed','tue+wed+thu','wed+thu+fri','thu+fri+sat'];
+function d7combos(a, k){ if(k === 0) return [[]]; if(a.length < k) return []; const [h, ...t] = a; return d7combos(t, k - 1).map(c => [h, ...c]).concat(d7combos(t, k)); }
+function d7untol(slots){
+  const at = d => D7_WEEK.indexOf(d), nb = (a, b) => { const r = Math.abs(at(a) - at(b)); return Math.min(r, 7 - r) === 1; };
+  const L = slots.find(s => s.t === 'long'); let u = 0;
+  for(let i = 0; i < slots.length; i++) for(let j = i + 1; j < slots.length; j++){
+    const x = slots[i], y = slots[j]; if(!nb(x.d, y.d)) continue;
+    const eve = L ? D7_WEEK[(at(L.d) + 6) % 7] : null;
+    if(!((x.t === 'chi' && y === L && x.d === eve) || (y.t === 'chi' && x === L && y.d === eve))) u++;
+  }
+  return u;
+}
+// The population that REACHES the three-run arm at >= 213: the 35 three-training-day solo pace
+// calendars, PINNED's athlete on each. Below 213 it is not built, so the <=212 rows run unchanged.
+const THREE35 = d7combos(D7_WEEK, 3).map(c => paceGoal({ targetDist:'1.5', targetMins:'10', targetSecs:'30', targetTime:'10:30',
+  mileBestMins:'8', mileBestSecs:'15', mileBestSrc:{kind:'entered'} }, { restDays: D7_WEEK.filter(d => c.indexOf(d) < 0) }));
 
 // The hand rows. REPS first: a pure function of the week and the block length, so these
 // four rows are derived here and typed here as the answer the function must give.
@@ -555,12 +591,23 @@ function armOf(prog){
   }
   if(!per.length) return { arm:'none', tw, per };
   if(per.every(n => n >= 4)) return { arm:'four-run', tw, per, want: Array.from({length:tw}, (_,i) => i+1) };
-  if(per.every(n => n === 3)) return { arm:'three-run', tw, per,
-    want: Array.from({length: handCrossover(tw) - 1}, (_,i) => i+1) };
+  if(per.every(n => n === 3)){
+    // V213 (D113a): the shape is read off the build's own week-1 run days against SPACER7.
+    if(INT_ERA && INT_ERA.arm === 'd113a'){
+      const run1 = runSessions(prog).filter(r => r.w === 1).map(r => r.d);
+      const cal = D7_WEEK.filter(d => run1.indexOf(d) >= 0).join('+'), cr = handCrossover(tw);
+      if(SPACER7.indexOf(cal) >= 0) return { arm:'three-run', shape:'spacer', cal, tw, per,
+        want: Array.from({length: cr - 1}, (_,i) => i+1), wantChi: Array.from({length: tw - cr + 1}, (_,i) => cr + i) };
+      return { arm:'three-run', shape:'two-quality', cal, tw, per,
+        want: Array.from({length: tw}, (_,i) => i+1), wantChi: Array.from({length: tw}, (_,i) => i+1) };
+    }
+    return { arm:'three-run', tw, per,
+      want: Array.from({length: handCrossover(tw) - 1}, (_,i) => i+1) };
+  }
   return { arm:'mixed', tw, per };
 }
 
-let d7bad = [], d7four = 0, d7three = 0, d7lens = {};
+let d7bad = [], d7four = 0, d7three = 0, d7lens = {}, d7spacer = 0, d7twoq = 0;
 
 // D7a — the hand functions reproduce the typed rows. The oracle checks itself before it
 // is allowed to judge anything: a hand row and a hand function that disagree means the
@@ -578,8 +625,14 @@ PACE_REPS.forEach(r => {
 if(!INT_ERA) d7bad.push(`no INT_MECHANISM_BY_VERSION row covers ia-version ${IAV}: the era table must name `
   + `this artifact's mechanism before any grid below can mean anything`);
 
-// D7b — THE RULE, on every build in the lattice plus the pinned cfg.
-const D7_POP = LAT.concat([PINNED]);
+// D7a (V213) — the typed spacer set is what the D130 sentence derives, before D7b may read it.
+{ const P = [['int','chi','long'],['int','long','chi'],['chi','int','long'],['chi','long','int'],['long','int','chi'],['long','chi','int']];
+  const got = d7combos(D7_WEEK, 3).filter(c => Math.min(...P.map(p => d7untol(c.map((d, i) => ({d, t:p[i]})))) ) > 0).map(c => c.join('+'));
+  if(JSON.stringify(got) !== JSON.stringify(SPACER7)) d7bad.push(`the D130 enumeration derives spacer calendars ${got.join(' ')} but SPACER7 is typed ${SPACER7.join(' ')}`); }
+
+// D7b — THE RULE, on every build in the lattice plus the pinned cfg (plus, from 213, the 35
+// three-training-day calendars, so the three-run arm is actually reached).
+const D7_POP = LAT.concat([PINNED]).concat(INT_ERA && INT_ERA.arm === 'd113a' ? THREE35 : []);
 for(const cfg of D7_POP){
   let prog; try { prog = IA.buildProgram(JSON.parse(JSON.stringify(cfg))); }
   catch(e){ d7bad.push('build crash: ' + e.message); continue; }
@@ -591,12 +644,12 @@ for(const cfg of D7_POP){
   }
   if(a.arm === 'three-run'){
     d7three++;
-    if(INT_ERA && INT_ERA.arm !== 'three-run')
+    if(INT_ERA && INT_ERA.arm !== 'three-run' && INT_ERA.arm !== 'd113a')
       d7bad.push(`${a.tw}wk build is three-run but the era row for ia-version ${IAV} names the `
         + `${INT_ERA.arm} arm as this artifact's mechanism`);
   } else {
     d7four++;
-    if(INT_ERA && INT_ERA.arm !== 'four-run')
+    if(INT_ERA && INT_ERA.arm !== 'four-run' && INT_ERA.arm !== 'd113a')
       d7bad.push(`${a.tw}wk build is four-run but the era row for ia-version ${IAV} names the `
         + `${INT_ERA.arm} arm as this artifact's mechanism`);
   }
@@ -608,6 +661,15 @@ for(const cfg of D7_POP){
       + `but the rule says ${a.want.join(',')}`
       + (a.arm === 'four-run' ? ' (one every week, cutback and taper included)'
                               : ` (cross - 1 = ${handCrossover(a.tw) - 1} cards, cross = ${handCrossover(a.tw)})`));
+  // V213 (D113a): the CHI weeks, where the era row names them.
+  if(a.wantChi){
+    if(a.shape === 'spacer') d7spacer++; else d7twoq++;
+    const chiW = runSessions(prog).filter(r => LBL.chi.test(r.st)).map(r => r.w);
+    if(JSON.stringify(chiW) !== JSON.stringify(a.wantChi))
+      d7bad.push(`${a.tw}wk three-run ${a.shape} build on ${a.cal} carries CHI cards in weeks ${chiW.join(',') || '(none)'} `
+        + `but the D113a rule says ${a.wantChi.join(',')}`
+        + (a.shape === 'spacer' ? ` (tw - cross + 1 = ${a.wantChi.length}, cross = ${handCrossover(a.tw)})` : ' (one every week)'));
+  }
   // reps, by the era's mechanism
   const span = handCrossover(a.tw) - 1;
   const wantReps = a.want.map(w => (INT_ERA && INT_ERA.reps === 'v115')
@@ -671,7 +733,14 @@ PACE_REPS.forEach(r => {
     d7bad.push(`pace rep "${r.tag}" logs ${got.join(',')} but the D101/D111 clock derives ${want.join(',')}`);
 });
 
-const d7arms = `${d7four} four-run and ${d7three} three-run of ${D7_POP.length}`;
+// V213 (D113a): a population that reaches no three-run build proves nothing about the three-run
+// arm, so from 213 it fails loudly unless all 35 calendars land where the rule says they must.
+if(INT_ERA && INT_ERA.arm === 'd113a' && !(d7three === 35 && d7spacer === 7 && d7twoq === 28))
+  d7bad.push(`the D113a population must reach 35 three-run builds, 7 spacer and 28 two-quality; it reached `
+    + `${d7three} three-run, ${d7spacer} spacer, ${d7twoq} two-quality`);
+const d7arms = `${d7four} four-run and ${d7three} three-run of ${D7_POP.length}`
+  + (INT_ERA && INT_ERA.arm === 'd113a' ? ` (D113a: ${d7twoq} two-quality with one INT and one CHI every week, `
+    + `${d7spacer} spacer with cross - 1 INT weeks then tw - cross + 1 CHI weeks)` : '');
 ok(d7bad.length === 0 && (d7four + d7three) === D7_POP.length && !!INT_ERA,
   `D7 the INT card count is a FUNCTION, not a scalar: across ${d7arms} builds at block lengths `
   + `${Object.keys(d7lens).sort((a,b)=>a-b).map(k=>k+'wk x'+d7lens[k]).join(', ')} every four-run week carries `

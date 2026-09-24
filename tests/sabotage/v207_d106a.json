@@ -74,7 +74,7 @@
     "anchor": "_inW('chi') || _inW('int') ||",
     "replacement": "_inW('chi') ||",
     "gate": "gates/g207_test_week.js",
-    "note": "NAMED TRIP: D8a and D8b go red (the three-run tw 1-2 week draws the trial from its long LSD, so the INT survives on Mon and one LSD is lost). Every four-run fixture has a CHI and stays green. EXPECTED: D8a D8b only."
+    "note": "NAMED TRIP: D8a and D8b go red (the three-run tw 1-2 week draws the trial from its long LSD, so the INT survives on Mon and one LSD is lost). Every four-run fixture has a CHI and stays green. EXPECTED: D8a D8b only. At ia-version >= 213 (D113a) the tw 1-2 fixture deals INT + CHI + long and the trial takes the CHI, so D8a/D8b never reach the INT fallback; the named trip there is D8c and D8d, the spacer calendar Mon/Tue/Wed whose fallback week still deals easy / INT / long: the INT survives on Mon. EXPECTED at >= 213: D8c D8d only."
   },
   {
     "name": "M12 (slice B, builder) -> Test Day is keyed on the marker instead of the goal: every TIME TRIAL day is titled Test Day, including the NRC 5K and 10K time trials, which must keep Race Day",

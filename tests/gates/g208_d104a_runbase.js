@@ -197,6 +197,9 @@ else { const IB = load(BASEFILE);
   if(!BASEFILE) skip('R8b no baseline passed as argv[3]');
   else { const IB = load(BASEFILE);
     if(+IB.version !== VER) skip('R8b runs only against the pre-edit tree at the same ia-version (build proof for the V208 close guard); this pair is ' + VER + ' vs ' + IB.version);
+    // V213 (standing ruling 4): R8b is the V208 close pair. A later build before its bump also reads the
+    // same version as its baseline, and its ruled moves are not R8b's business.
+    else if(VER !== ERA) skip('R8b scoped to the V208 close build pair (candidate 208 against its 208 pre-edit tree); this pair is ' + VER + ' vs ' + IB.version + ', a later build before its bump');
     else { const strip = p => { const q = clone(p); delete q.created; delete q.id; return JSON.stringify(q); }; const moved = [];
       withLift.forEach(i => { if(strip(IA.buildProgram(clone(CF[i].cfg))) !== strip(IB.buildProgram(clone(CF[i].cfg)))) moved.push(CF[i].fam + ' race ' + CF[i].cfg.raceDate); });
       ok(`R8b the ${withLift.length} programs with a lift day are byte-identical to the pre-edit tree`, withLift.length > 0 && moved.length === 0, moved.length + ' moved: ' + moved.slice(0, 3).join('; ')); } } }

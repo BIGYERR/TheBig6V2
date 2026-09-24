@@ -216,6 +216,7 @@ const HF_LEAK_BY_VERSION = { 209: { machine:200, cable:13, names:{ 'Preacher cur
 HF_LEAK_BY_VERSION[210] = { machine:0, cable:0, names:{} };   // D70c: the ruled MOVE
 HF_LEAK_BY_VERSION[211] = HF_LEAK_BY_VERSION[210];   // D153/D155: ruled UNMOVED (both only remove or choose among already-drawn items; neither draws a machine or cable item)
 HF_LEAK_BY_VERSION[212] = HF_LEAK_BY_VERSION[211];   // D110a: ruled UNMOVED, no lift section touched
+HF_LEAK_BY_VERSION[213] = HF_LEAK_BY_VERSION[212];   // D113a: ruled UNMOVED (0/0 printed)
 const HF_LEAK = HF_LEAK_BY_VERSION[(+IA.version <= 209) ? 209 : +IA.version];
 // Survivors of one kind, read off the census and off the row through the same needs() table,
 // compared name for name and count for count: no extras, no missing.

@@ -140,6 +140,9 @@ if(!BASEFILE) console.log('SKIP K4 no baseline passed as argv[3]; the inertness 
 else {
   const IB = load(BASEFILE);
   if(+IB.version !== VER) console.log('SKIP K4 runs only against the pre-slice tree at the same ia-version (build-time proof for D103a slices 1-3); this pair is ' + VER + ' vs ' + IB.version);
+  // V213 (standing ruling 4): K4 is V208's own build pair. A later build before its bump also reads the
+  // same version as its baseline, and its ruled moves are not K4's business.
+  else if(VER !== ERA) console.log('SKIP K4 scoped to the D103a build pair (candidate 208 against its 208 pre-slice tree); this pair is ' + VER + ' vs ' + IB.version + ', a later build before its bump');
   else {
     const strip = p => { cardsOf(p).forEach(({c}) => { if(c.dose) delete c.dose.key; }); delete p.created; delete p.id; return canon(p); };
     const moved = [];

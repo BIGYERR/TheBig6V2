@@ -1,0 +1,44 @@
+[
+  {
+    "name": "S1-D113a -> the multi-sport greedy tail no longer routes a pace week through the spacing chooser: the D113 row is dealt blind onto the greedy days",
+    "anchor": "(_msPace && !_d113Excl && _k >= 3) || ",
+    "replacement": "",
+    "gate": "gates/g213_d113a.js",
+    "note": "NAMED TRIP: R1 (untolerated hard run pairs on multi-sport pace weeks). Needs ia-version >= 213: below 213 the gate is NOT APPLICABLE and every mutation survives, so run it on a forced-213 copy until Mario bumps. Measured on a forced-213 copy of the slice-2b tree, gate run without a baseline as sabotage.py runs it (V212 read from git 169537c): PASS 27 FAIL 1. EXPECTED: R1 (239 weeks)."
+  },
+  {
+    "name": "S2-D146 -> spaceHardCardio no longer skips the run sport on a chooser-planned multi-sport week, and swaps the planned run types",
+    "anchor": "    if(sp === _skipSport) continue;   // V213 (D146): chooser-planned run week, left as planned\n",
+    "replacement": "",
+    "gate": "gates/g213_d113a.js",
+    "note": "NAMED TRIP: R2 (NRC long run not the last run of its ISO week). Needs ia-version >= 213; run on a forced-213 copy until Mario bumps. Measured on a forced-213 copy of the slice-2b tree, gate run without a baseline as sabotage.py runs it (V212 read from git 169537c): PASS 26 FAIL 2. EXPECTED: R2 untolerated (11 weeks) and R2 long-run-last (250 weeks)."
+  },
+  {
+    "name": "S3-D113a -> the spacer fallback never fires: the 7 spacer calendars ship INT / CHI / long with an untolerated pair",
+    "anchor": "    if(paceFam && capDays === 3 && !_fb && best && best.untol > 0){",
+    "replacement": "    if(false){",
+    "gate": "gates/g213_d113a.js",
+    "note": "NAMED TRIP: R4 (the 7 spacer calendars lose the one-quality V115 shape). Needs ia-version >= 213; run on a forced-213 copy until Mario bumps. Measured on a forced-213 copy of the slice-2b tree, gate run without a baseline as sabotage.py runs it (V212 read from git 169537c): PASS 25 FAIL 3. EXPECTED: R4 (84 builds), R4p (1,530 day-cells) and R1 (77 weeks)."
+  },
+  {
+    "name": "S4-D113a -> the fallback week loses the V115 crossover: _d113Fb dropped from _compressedQuality, so easy / INT / long prints INT every week and never CHI",
+    "anchor": "&& (!_paceSession || _d113Fb) && (protectInt || _perfRun);",
+    "replacement": "&& !_paceSession && (protectInt || _perfRun);",
+    "gate": "gates/g213_d113a.js",
+    "note": "NAMED TRIP: R4 (CHI weeks cross..tw missing on the 7 spacer calendars). Needs ia-version >= 213; run on a forced-213 copy until Mario bumps. Measured on a forced-213 copy of the slice-2b tree, gate run without a baseline as sabotage.py runs it (V212 read from git 169537c): PASS 26 FAIL 2. EXPECTED: R4 (84 builds, CHI weeks empty) and R4p (420 day-cells)."
+  },
+  {
+    "name": "S5-D113a -> the exclusion key leaves the routing gate: a multi-sport pace week under noimpact / noimpact_swim / easy / reduce is re-placed by the chooser",
+    "anchor": "(_msPace && !_d113Excl && _k >= 3)",
+    "replacement": "(_msPace && _k >= 3)",
+    "gate": "gates/g213_d113a.js",
+    "note": "NAMED TRIP: R3 (excluded modes no longer byte-identical to V212). R3 is a build-pair row, so it runs only on a candidate reading ia-version 213; run on a forced-213 copy until Mario bumps. Measured on a forced-213 copy of the slice-2b tree, gate run without a baseline as sabotage.py runs it (V212 read from git 169537c): PASS 27 FAIL 1. EXPECTED: R3 (88 builds, first noimpact knee/protect with bike_base)."
+  },
+  {
+    "name": "S6-D146 (slice 2c) -> the NRC arm of the multi-sport routing ignores the exclusion key: an NRC multi-sport week under noimpact / noimpact_swim / easy / reduce is re-placed by the chooser",
+    "anchor": "(NRC_GOALS.has(_msG) && !_d113Excl && _k >= 2)",
+    "replacement": "(NRC_GOALS.has(_msG) && _k >= 2)",
+    "gate": "gates/g213_d113a.js",
+    "note": "NAMED TRIP: R3n (NRC multi-sport excluded modes no longer byte-identical to V212). R3n is a build-pair row, so it runs only on a candidate reading ia-version 213."
+  }
+]

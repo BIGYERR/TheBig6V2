@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="212"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="213"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -5391,13 +5391,28 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // single slot is INT early and CHI late rather than one or the other for 12 weeks.
   // `qualityCrossoverWeek` is the crossover; the swap happens per-week at the call site,
   // because sportSessionTypes is built once and read inside the week loop.
+  //
+  // V205 (D122): THE CROSSOVER NO LONGER REACHES THE PACE FAMILY. The paragraph above is
+  // NRC reasoning, and it leaked onto an NSW goal. Guide B is explicit that CHI and INT
+  // both begin at Week 1, and Guide A's p.13 and p.16 tables both start at week 1: on a
+  // test goal there is no phase split to periodize. The compression existed only because
+  // three run days left room for exactly ONE quality slot; D113 above gives the three-run
+  // week both, so on this goal the compression has nothing left to compress and the
+  // `_compressedQuality` seam is gated off it below.
+  //
+  // The machinery is FORKED, not deleted, and its remaining job is not NRC. NRC run goals
+  // never reach `_compressedQuality` at all — `isNRC` takes them down the getNRCSessionTypes
+  // branch before this table is consulted, so no NRC program has ever set `_qslot`. What is
+  // left is swim_500_time and swim_100_time at exactly three swim days: `isSpeedGoal`
+  // carries both, neither is in PACE_GOALS, and neither ruling touches swimming. That is
+  // the live consumer, and it is why this function stays.
   function qualityCrossoverWeek(totalWeeks){
     // First CHI week. NRC 5K crosses at 5-of-8 (62%), 10K at 4-of-8 (50%); 0.55 splits
     // them. A 12-week block runs INT weeks 1-6, CHI weeks 7-12. Floor of 3 so a short
     // block still gets a real interval phase before the switch.
     return Math.max(3, Math.ceil((totalWeeks||6) * 0.55));
   }
-  function getSessionTypes(nDays, protectInt, baseMode, thresholdGoal) {
+  function getSessionTypes(nDays, protectInt, baseMode, thresholdGoal, paceFam) {
     if(nDays <= 0) return [];
     // AEROBIC BASE MODE (run_base): true base-building is ~80%+ easy aerobic volume.
     // No hard interval work, no double hard days. The aerobic engine is built on easy
@@ -5422,7 +5437,20 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // the long ride is the aerobic anchor and giving that up to buy intervals trades the
     // base away for the quality it is supposed to support. (Mario's call, V122.)
     if(nDays === 2) return thresholdGoal ? ['int','lsd_long'] : ['lsd_easy','lsd_long'];
-    if(nDays === 3) return protectInt ? ['lsd_easy','int','lsd_long'] : ['lsd_easy','chi','lsd_long'];
+    // V205 (D113): THE THREE-RUN PACE WEEK IS INT / CHI / LONG. Under D125's amended
+    // ceiling three runs is no longer the pace family's only shape, it is the FALLBACK
+    // shape for the 14 four-training-day calendars that cannot hold four runs without a
+    // collision. Those athletes must not also lose the second quality session, so the
+    // easy LSD yields the slot rather than one of the two qualities. Guide B: "You should
+    // always begin CHI and INT portions of the program at Week 1" — both run every week,
+    // from week 1, at every day count the pace family can reach. The easy run is aerobic
+    // volume and is the cheapest thing in the week to drop; dropping a quality day is
+    // what the old row did and it is what D122 retires. Non-pace goals keep the old
+    // protectInt coin flip: swim_500_time and swim_100_time are the only other goals that
+    // reach the protectInt arm, they are outside both rulings, and their single quality
+    // slot is still periodized by the crossover below.
+    if(nDays === 3) return paceFam ? ['int','chi','lsd_long']
+                   : (protectInt ? ['lsd_easy','int','lsd_long'] : ['lsd_easy','chi','lsd_long']);
     if(nDays === 4) return ['lsd_easy','int','chi','lsd_long'];
     // NSW doctrine: exactly 1 INT + 1 CHI per week — extra days add LSD VOLUME, not more
     // quality (Table 7 scales up by adding easy/long mileage). INT and CHI are spaced by
@@ -5439,6 +5467,13 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // call. injuryPlan is a pure function of cfg and builds a fresh object every time, so
   // this reads cfg and mutates nothing.
   const _d132Plan = injuryPlan(cfg);
+  // V213 (D113a amended): THE EXCLUSION KEY, READ ONCE. These four cardio modes are the
+  // injury sweeps that rewrite every run in the week (injuryPlan / injurySweepCardio), so
+  // no run keeps its quality and there is nothing for the D113 row or the placement
+  // chooser to space. Excluded builds keep the V212 layout byte for byte. halfstep and
+  // swimout rewrite some runs, not all, and stay routed. Passed to the chooser as a
+  // parameter, never read from a closure.
+  const _d113Excl = !!(_d132Plan && ['noimpact','noimpact_swim','easy','reduce'].includes(_d132Plan.cardioMode));
   const _alloc = sportDayTargets(cardioTypes, cardioGoals, cardioTrainDays.length, cfg.goal, _d132Plan && _d132Plan.cardioMode);   // V187 (F2): resolved lift goal; V205 (D132): cardioMode
   const primarySport = _alloc.primary;
 
@@ -5448,6 +5483,12 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   const dayToSport = [];
   // V153 (F1): when the spacing-aware chooser ran, it fixes type→day; null otherwise.
   let _nrcPlan = null;
+  // V213 (D146): true when the multi-sport placement below handed the run days to the
+  // spacing chooser. spaceHardCardio reads it and leaves that run layout alone.
+  let _msFlag = false;
+  // V213 (D113a): true when the chooser's three-run fallback fired (easy / INT / long).
+  // Read by _compressedQuality so the fallback week keeps the V115 crossover.
+  let _d113Fb = false;
   if(baseCardioPlan) {
     // Base cardio: use the hand-built map directly. No sportDayTargets, no greedy loop.
     baseCardioPlan.dayToSport.forEach(sport => dayToSport.push(sport));
@@ -5476,7 +5517,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // set with nothing to choose.
     const _paceCapped = PACE_GOALS.has(_soloRunGoal) && capDays<=nCardio && capDays>=2;
     if(_nrcCapped || _paceCapped){
-      let _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal, _paceCapped);
+      let _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal, _paceCapped, undefined, _d113Excl);
       // V205 (D125 amended, RE-KEYED BY D130): THE CONDITIONAL CEILING, DECIDED HERE.
       // Four runs ship only where the chooser hands back a layout with zero UNTOLERATED
       // hard-day adjacencies. Where it cannot, the week drops to three runs and is re-laid
@@ -5494,11 +5535,12 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       // nothing and any future calendar shape that cannot reach untol==0.
       if(_paceCapped && capDays > 3 && (!_pick || _pick.untol > 0)){
         capDays = 3;
-        _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal, _paceCapped);
+        _pick = _nrcSpacedRunDays(cardioTrainDays, capDays, _soloRunGoal, _paceCapped, undefined, _d113Excl);
       }
       if(_pick){
         _pick.idxs.forEach(i=>chosen.add(i));
         _nrcPlan = _pick.typeOf;   // read by the NRC type-assignment loop below
+        _d113Fb = !!_pick._fbFired;   // V213 (D113a): the fallback week keeps the V115 crossover
       } else {
         // Unreachable on the pace arm (every subset is legal there, so `best` is always
         // set) and unreachable on NRC at capDays>=2. Kept so a future arm that can return
@@ -5538,6 +5580,18 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       if(!pick) { dayToSport.push(null); continue; }
       dayToSport.push(pick); assigned[pick]++;
     }
+    // V213 (D113a amended / D146): THE RUN DAYS ARE PLACED BY THE SPACING CHOOSER. The
+    // greedy spread above counts sessions per sport and is blind to which run is hard, so
+    // on a multi-sport week it could put the long run beside a quality run. The quota it
+    // dealt is kept: the same number of run days, re-sited by _nrcSpacedRunDays, and every
+    // other sport keeps its order across the days the runs did not take. Pace routes from
+    // three runs up, NRC from two runs up, and neither under an exclusion-key injury (V213
+    // slice 2c, coach: those modes rewrite every run, so there is nothing left to space).
+    { const _msG = cardioTypes.includes('run') && cardioGoals.run && cardioGoals.run.id; const _msPace = PACE_GOALS.has(_msG);
+      const _k = dayToSport.filter(s => s === 'run').length;
+      if(((_msPace && !_d113Excl && _k >= 3) || (NRC_GOALS.has(_msG) && !_d113Excl && _k >= 2)) && !isBaseCardio){ const _pk = _nrcSpacedRunDays(cardioTrainDays, _k, _msG, _msPace);
+        if(_pk){ const _oth = dayToSport.filter(s => s !== 'run'); const _ix = new Set(_pk.idxs); let _o = 0;
+          for(let i = 0; i < dayToSport.length; i++) dayToSport[i] = _ix.has(i) ? 'run' : _oth[_o++]; _nrcPlan = _pk.typeOf; _msFlag = true; _d113Fb = !!_pk._fbFired; } } }
   }
 
   // Derive per-sport day lists from the authoritative allocation
@@ -5584,8 +5638,12 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // mon+thu, wed+thu, mon+tue+thu and mon+wed+thu calendars. NRC behaviour is unchanged:
   // its subset and permutation constraints still force longLast to 1 on every candidate,
   // so the new term is constant there and cannot reorder an NRC choice.
-  function _nrcSpacedRunDays(cardioTrainDays, capDays, goalId, paceFam){
-    const types = paceFam ? getSessionTypes(capDays, isSpeedGoal(goalId), false, false)
+  // V213 (D113a): `_fb` asks for the fallback three-run row (easy / INT / long) and is only
+  // ever passed by the chooser's own fallback below. `_excl` is the exclusion key read once
+  // in buildCardioProgression (`_d113Excl`); under it the pace arm reads the V212 row, not
+  // the D113 row.
+  function _nrcSpacedRunDays(cardioTrainDays, capDays, goalId, paceFam, _fb, _excl){
+    const types = paceFam ? (_fb ? ['lsd_easy','int','lsd_long'] : getSessionTypes(capDays, isSpeedGoal(goalId), false, false, !_excl))
                           : getNRCSessionTypes(capDays, goalId);
     // The objective is written once, in tokens. The NSW table's quality pair is INT then
     // CHI, which is the same sequence NRC prints as speed1 then speed2.
@@ -5769,6 +5827,12 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
         }
       }
     }
+    // V213 (D113a): THE SPACER FALLBACK. Three pace runs as INT / CHI / long need three
+    // days no two of which put hard beside hard, and 7 of the 35 three-day calendars have
+    // no such layout. There the week keeps the V212 shape, easy / INT / long, and the one
+    // quality slot crosses INT to CHI at the V115 crossover. The flag rides on the RETURNED
+    // object, never on a closure, so a gate that lifts this function into a bare VM runs it.
+    if(paceFam && capDays === 3 && !_fb && best && best.untol > 0){ const _alt = _nrcSpacedRunDays(cardioTrainDays, capDays, goalId, paceFam, true, _excl); if(_alt){ _alt._fbFired = true; return _alt; } }
     return best; // {idxs:[...], typeOf:{dayKey:type}, ...} — never null for capDays≥1
   }
 
@@ -5810,7 +5874,15 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       // would reach all of them and would also flip the 3-day bike answer. This is the
       // narrow statement: bike_ftp is a threshold goal, and that fact is needed HERE only.
       const thresholdGoal = goalId === 'bike_ftp';
-      const types = getSessionTypes(sportDays.length, protectInt, baseMode, thresholdGoal);
+      // V205 (D113/D122): the NSW pace family, named by the same set the ceiling and the
+      // chooser gate read, so the table row, the conditional fourth run and the spacing
+      // chooser cannot disagree about who is a pace athlete. run_mile_time and
+      // run_15_under10 are aliased to run_pace_goal before the engine sees a goal id; the
+      // set carries all three so a future un-aliasing cannot silently drop them.
+      // V213 (D113a): not a pace session for the D113 row under the exclusion key. Those
+      // weeks keep the V212 row and the V115 crossover.
+      const _paceSession = type === 'run' && PACE_GOALS.has(goalId) && !_d113Excl;
+      const types = getSessionTypes(sportDays.length, protectInt, baseMode, thresholdGoal, _paceSession);
       // V115: mark the ONE quality slot that exists only because 3 days forced a
       // compression. Tagged here, resolved per-week in the loop below. Deliberately NOT
       // set for baseMode (Lydiard block wants no hard work at all) or isBaseCardio (the
@@ -5829,8 +5901,17 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       // exception that used to sit here is gone. Kept as a single term so the reason this
       // predicate exists at all is still legible.
       const _perfRun = type === 'run' && protectInt;
+      // V205 (D122): `!_paceSession` is the fork. Without it the D113 row would be read
+      // by the compression below and both quality days would collapse back to INT, which
+      // is the phase split this ruling retires, restated. The conjunct is placed on the
+      // FLAG rather than on the two reads of it downstream so there is one statement of
+      // who is compressed, not two that can drift.
+      // V213 (D113a): `|| _d113Fb` re-opens the fork for the chooser's fallback week. That
+      // week is easy / INT / long with one quality slot, which is exactly what the V115
+      // crossover exists to periodize, so the slot crosses INT to CHI there. This supersedes
+      // the V205 notes that say `_qslot` is never set on a pace goal: it is, on a fallback week.
       const _compressedQuality = sportDays.length === 3 && !baseMode && !isBaseCardio
-                                 && (protectInt || _perfRun);
+                                 && (!_paceSession || _d113Fb) && (protectInt || _perfRun);
       sportDays.forEach((globalDayIdx, sportIdx) => {
         const isLastSportDay = sportIdx === sportDays.length - 1;
         // V205 (D125): the chooser's joint day+type plan wins OUTRIGHT when it ran —
@@ -5857,7 +5938,9 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // V115: space hard cardio days. Runs after every sport has its slots and before any
   // session is built, so the rewrite is invisible downstream — legLoad, freeze snapshots
   // and the lift deconflict passes all read the resulting sessions, not this map.
-  spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, dayToSport);
+  // V213 (D146): a run week the chooser planned is already spaced on the real calendar.
+  // Swapping its types here would undo the plan, so the run sport is skipped.
+  spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, dayToSport, _msFlag ? 'run' : null);
 
   // ── V116: THE TAPER IS COMPUTED HERE, ONCE, FOR EVERY SPORT ─────────────────
   // §5 has claimed since V95 that taperWeeksFor is the single source of truth for taper
@@ -5930,6 +6013,11 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     for(let w = 1; w <= tw; w++) {
       // V115: the compressed single quality slot flips INT -> CHI at the crossover.
       // Everything downstream reads `assignedType` exactly as before, including legLoad.
+      // V205 (D122): `_qslot` is never set on a pace goal now, so this line is a no-op
+      // there and every pace week reads `assignedTypeBase` for all tw weeks. It still
+      // fires for a three-day swim_500_time / swim_100_time block.
+      // V213 (D113a): and for a pace week the chooser's spacer fallback laid out as easy /
+      // INT / long, and for a pace week under the exclusion key. Both set `_qslot` again.
       const _cross = qualityCrossoverWeek(tw);
       const assignedType = (_qslot && w >= _cross) ? 'chi' : assignedTypeBase;
       // Each phase gets its own dose ramp. Without this the INT phase (weeks 1..cross-1)
@@ -6089,7 +6177,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
 //
 // Adjacency is CIRCULAR. Sunday and Monday are adjacent. This is the same trap that
 // scored Sun+Sat as maximum separation in the base-cardio placer.
-function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, dayToSport){
+function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, dayToSport, _skipSport){
   const HARD = new Set(['int','chi','lsd_long','nrc_long','nrc_speed1','nrc_speed2']);
   const N = cardioTrainDays.length;
   if(N < 3) return 0; // nothing to space
@@ -6121,6 +6209,7 @@ function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, da
   const sports = Object.keys(sportDayIndices).sort((a,b)=>(a==='run')-(b==='run'));
   let guard = 0;
   for(const sp of sports){
+    if(sp === _skipSport) continue;   // V213 (D146): chooser-planned run week, left as planned
     const days = sportDayIndices[sp] || [];
     for(let x = 0; x < days.length; x++) for(let y = x+1; y < days.length; y++){
       if(++guard > 400) return before - collisions();

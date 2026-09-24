@@ -278,11 +278,53 @@ for(const [lab, tw, date] of [['D8a three-run tw1', 1, '2026-09-27'], ['D8b thre
   const preQ = DAYS.map(d => pre.weeks[tw][d] && pre.weeks[tw][d].cardio ? cardQuality(pre.weeks[tw][d].cardio) : null);
   const wk = p.weeks[tw];
   const lsd = DAYS.filter(d => wk[d] && !wk[d].rest && wk[d].cardio && /^Long Slow Distance/.test(wk[d].cardio.subtype || ''));
+  // V213 (D113a) ERA ROWS (standing ruling 4). Through 212 the three-run week is easy / INT / long and
+  // the row below is the one D106a shipped. From 213 it is INT / CHI / long, so the premise is gone by
+  // ruling and the row asserts what D106a's hierarchy does with the new week.
+  if(VER <= 212)
   ok(lab + ' Sunday test: premise holds (no CHI dealt, INT on Mon); the trial is on Sun, Mon rests, no INT left, both LSDs kept',
      !preQ.some(q => q === 'chi') && preQ[0] === 'int'
        && JSON.stringify(trials(p)) === JSON.stringify([tw + 'sun']) && !!wk.mon && !!wk.mon.rest
        && !DAYS.some(d => wk[d] && isHard(wk[d].cardio)) && JSON.stringify(lsd) === '["wed","fri"]',
      JSON.stringify({pre: preSub, trials: trials(p), mon: wk.mon && wk.mon.title, lsd}));
+  else {
+    const preW = pre.weeks[tw];
+    const preLong = DAYS.some(d => preW[d] && preW[d].cardio && /^Long Slow Distance/.test(preW[d].cardio.subtype || '') && !!preW[d].cardio.legLoad);
+    const TI = DAYS.indexOf('sun');
+    const intLeft = DAYS.filter(d => wk[d] && !wk[d].rest && cardQuality(wk[d].cardio) === 'int');
+    const chiLeft = DAYS.filter(d => wk[d] && !wk[d].rest && cardQuality(wk[d].cardio) === 'chi');
+    const hardAt = d => { const x = wk[d]; const c = x && !x.rest && x.cardio; return !!c && (isHard(c) || isTrial(c) || (/^Long Slow Distance/.test(c.subtype || '') && !!c.legLoad)); };
+    const hard12 = ['fri','sat'].filter(hardAt);   // T-2 and T-1 of a Sunday test, same ISO week
+    ok(lab + ' Sunday test (D113a era): premise INT + CHI + long dealt; the trial takes the CHI slot on Sun and nowhere else, no CHI left, '
+       + 'any INT left sits 3 or more days before the trial, 0 hard runs at T-1/T-2',
+       preQ.includes('int') && preQ.includes('chi') && preLong
+         && JSON.stringify(trials(p)) === JSON.stringify([tw + 'sun']) && chiLeft.length === 0
+         && intLeft.every(d => TI - DAYS.indexOf(d) >= 3) && hard12.length === 0,
+       JSON.stringify({pre: preSub, trials: trials(p), intLeft, chiLeft, hard12}));
+  }
+}
+// D8c / D8d (V213, D113a era): a SPACER calendar keeps the fallback week, easy / INT / long, and deals no
+// CHI, so D106a's hierarchy puts the trial in the INT slot. Mon/Tue/Wed training, Thursday test. The
+// calendar is one of D113a's 7 spacer calendars (g213 derives them from the D130 text); the premise is
+// asserted in the row, so a week that stops dealing the fallback fails here by name.
+for(const [lab, tw, date] of [['D8c spacer Mon/Tue/Wed tw1', 1, '2026-09-24'], ['D8d spacer Mon/Tue/Wed tw2', 2, '2026-10-01']]){
+  if(VER < 213){ skipRow(lab + ' is a D113a-era row (the spacer fallback ships on ia-version 213)'); continue; }
+  const restS = ['thu','fri','sat','sun'];
+  const p = build(pinned({restDays:restS, _raceDateCappedWeeks:tw, _testWeek:tw, raceDate:date}));
+  const pre = build(pinned({restDays:restS, _raceDateCappedWeeks:tw, raceDate:date}));
+  if(p.crash || pre.crash){ ok(lab + ' builds', false, p.crash || pre.crash); continue; }
+  const preW = pre.weeks[tw], wk = p.weeks[tw];
+  const q = (W, d) => W[d] && !W[d].rest && W[d].cardio ? cardQuality(W[d].cardio) : null;
+  const isLongLSD = c => !!c && /^Long Slow Distance/.test(c.subtype || '') && !!c.legLoad;
+  const preQ = DAYS.map(d => q(preW, d));
+  const preLong = DAYS.some(d => preW[d] && !preW[d].rest && isLongLSD(preW[d].cardio));
+  const intLeft = DAYS.filter(d => q(wk, d) === 'int'), chiLeft = DAYS.filter(d => q(wk, d) === 'chi');
+  const hard12 = ['tue','wed'].filter(d => { const x = wk[d]; const c = x && !x.rest && x.cardio; return !!c && (isHard(c) || isTrial(c) || isLongLSD(c)); });
+  ok(lab + ' Thursday test (D113a spacer fallback): premise easy + INT + long dealt with no CHI; the trial takes the INT slot on Thu and nowhere else, '
+     + 'no INT or CHI left in the test week, 0 hard runs at T-1/T-2',
+     preQ.filter(x => x === 'int').length === 1 && !preQ.includes('chi') && preLong
+       && JSON.stringify(trials(p)) === JSON.stringify([tw + 'thu']) && intLeft.length === 0 && chiLeft.length === 0 && hard12.length === 0,
+     JSON.stringify({pre: DAYS.map(d => preW[d] && preW[d].cardio ? String(preW[d].cardio.subtype).slice(0, 22) : null), trials: trials(p), intLeft, chiLeft, hard12}));
 }
 let hm; try { hm = progDigest(IA.buildProgram(JSON.parse(JSON.stringify(IA.fixtures.HALF_MANNY)))); } catch(e){ hm = 'CRASH ' + e.message; }
 eq('D9 HALF_MANNY digest is V206\'s shipped digest (D106a moves no NRC card)', hm, '0ac7da6b1691a8e1');
