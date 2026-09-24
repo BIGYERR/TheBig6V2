@@ -220,6 +220,7 @@ HF_LEAK_BY_VERSION[213] = HF_LEAK_BY_VERSION[212];   // D113a: ruled UNMOVED (0/
 HF_LEAK_BY_VERSION[214] = HF_LEAK_BY_VERSION[213];   // D158: ruled UNMOVED (0/0 printed)
 HF_LEAK_BY_VERSION[215] = HF_LEAK_BY_VERSION[214];   // D149: ruled UNMOVED (0/0 printed by coach on the V215 tree)
 HF_LEAK_BY_VERSION[216] = HF_LEAK_BY_VERSION[215];   // D154/D156: ruled UNMOVED (D154 swaps to a pushup, D156 draws less; neither adds a machine or cable item)
+HF_LEAK_BY_VERSION[217] = HF_LEAK_BY_VERSION[216];   // D160: ruled UNMOVED (0/0 printed; the dedupe draws only from the swap universe the tier already owns)
 const HF_LEAK = HF_LEAK_BY_VERSION[(+IA.version <= 209) ? 209 : +IA.version];
 // Survivors of one kind, read off the census and off the row through the same needs() table,
 // compared name for name and count for count: no extras, no missing.

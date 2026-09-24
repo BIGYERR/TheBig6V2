@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="216"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="217"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -7280,6 +7280,13 @@ function _adjDayPairs(totalWeeks){
   }
   return out;
 }
+// V217 (D160): the previous day as it will ship past d18LongRunDayPass, read off a deep copy — the live week is never touched.
+function _d18View(A, wA, dA){
+  if(!A) return A;
+  const o={}; o[wA]={}; o[wA][dA]=JSON.parse(JSON.stringify(A));
+  d18LongRunDayPass(o);
+  return o[wA][dA];
+}
 function deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks){
   const universe=(typeof _swapUniverseList==='function')?_swapUniverseList():[];
   if(!universe.length) return 0;
@@ -7299,7 +7306,7 @@ function deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks){
     const wA=pair[0], dA=pair[1], wB=pair[2], dB=pair[3];
     const A=weeks[wA]&&weeks[wA][dA], B=weeks[wB]&&weeks[wB][dB];
     if(!A||!B||A.rest||B.rest||!Array.isArray(A.sections)||!Array.isArray(B.sections)) return;
-    const inA=nameSet(A);
+    const inA=nameSet(_d18View(A, wA, dA));   // V217 (D160): a name D18 strips from A is not yesterday's work
     B.sections.forEach(function(sec){
       if(!sec||!Array.isArray(sec.items)) return;
       // The day's MAIN lift is never rewritten. Repeating a main across a heavy/light pair

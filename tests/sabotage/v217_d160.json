@@ -1,0 +1,16 @@
+[
+ {
+  "name": "S1-D160 -> the trigger set reads the live previous day again (nameSet(A)): the dedupe renames a swing to dodge a name D18 strips from the NSW long run day, the 102 phantom renames return",
+  "anchor": "const inA=nameSet(_d18View(A, wA, dA));",
+  "replacement": "const inA=nameSet(A);",
+  "gate": "gates/g217_d160_dedupe_view.js",
+  "note": "NAMED TRIP in g217_d160_dedupe_view.js rows P1 NSW (102 phantoms), W1 (helper never called), and on candidate 217 the pair rows R1 NSW, R2, D1, E1. Needs ia-version >= 217: below 217 the gate is NOT APPLICABLE and the mutation survives. The pair rows read V216 from git 3dc0146 when no baseline is passed, as sabotage.py runs it."
+ },
+ {
+  "name": "S2-D160 -> the view is not a copy: d18LongRunDayPass runs on the live previous day during the dedupe, stripping the long run day before the passes that run between the dedupe and D18",
+  "anchor": "  const o={}; o[wA]={}; o[wA][dA]=JSON.parse(JSON.stringify(A));\n",
+  "replacement": "  const o={}; o[wA]={}; o[wA][dA]=A;\n",
+  "gate": "gates/g217_d160_dedupe_view.js",
+  "note": "NAMED TRIP in g217_d160_dedupe_view.js rows W1 (the live previous day is mutated and the input object is returned), U1 (the view is the input) and U2 (the hand day is mutated). Needs ia-version >= 217."
+ }
+]

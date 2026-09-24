@@ -149,6 +149,9 @@ DELOAD_HINGE_BY_VERSION[215] = { E1b: 9319, E3: 44, G5: {'Explosive finisher': 4
 DELOAD_ARB_BY_VERSION[216] = DELOAD_ARB_BY_VERSION[215];   // D154/D156: ruled UNMOVED (C1 364, C5 32, D2 19, I3 496 printed identical)
 E6_BY_VERSION[216] = E6_BY_VERSION[215];   // D154/D156: ruled UNMOVED (28 printed)
 DELOAD_HINGE_BY_VERSION[216] = DELOAD_HINGE_BY_VERSION[215];   // D154/D156: ruled UNMOVED (E1a 12384, E1b 9319, E3 44, G1 1290, G5 44 printed; a Delts finisher is not posterior and a triceps rename is not a hinge)
+DELOAD_ARB_BY_VERSION[217] = DELOAD_ARB_BY_VERSION[216];   // D160: ruled UNMOVED (C1 364 C3 364 C5 32 D2 19 I3 496 printed)
+E6_BY_VERSION[217] = E6_BY_VERSION[216];   // D160: ruled UNMOVED (28 printed)
+DELOAD_HINGE_BY_VERSION[217] = DELOAD_HINGE_BY_VERSION[216];   // D160: ruled UNMOVED (E1a 12384 E1b 9319 E3 44 G1 1290 G5 44 printed; a like-for-like hinge revert in a Conditioning slot is not a posterior count)
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[
