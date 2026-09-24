@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="214"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="215"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -8262,6 +8262,7 @@ function engineC_kinematics(cfg, A, B){
   const isCrossfit=equip==='crossfit';
   const hasBarbell=_tierHasBarbell(equip);
   const hasCables=equip==='commercial';
+  const hasGHD=equip==='commercial'||isCrossfit;
   // Every tier the wizard offers lists dumbbells except 'Bodyweight only' ("You, the floor,
   // and something to pull on"). CrossFit's blurb abbreviates to "barbells, rig, bumpers,
   // kettlebells, wall balls" but a box has dumbbells and the engine already prescribes
@@ -8296,7 +8297,8 @@ function engineC_kinematics(cfg, A, B){
     // V113: '^(overhead|push) press$' and '^good mornings?$' retired. Those names existed
     // ONLY to catch barbell movements whose name did not say barbell. They now do, so
     // '^barbell ' covers them. Back/front squat stay bare by lifting convention.
-    if(!hasBarbell && /\bbarbell\b|^trap bar|^power clean|^hang clean|^rack pull|^back squat|^front squat|^bench press$|close-grip bench|glute-ham/i.test(N)) return false;
+    if(!hasBarbell && /\bbarbell\b|^trap bar|^power clean|^hang clean|^rack pull|^back squat|^front squat|^bench press$|close-grip bench/i.test(N)) return false;
+    if(!hasGHD && /glute-ham|\bghr\b|45° back extension/i.test(N)) return false;
     // V114: 'machine seated calf raise' was named literally, which meant every OTHER
     // machine-named movement walked straight through. `\bmachine\b` is the general form.
     // Full machine-named inventory in EXLIB at time of writing: 'Machine chest press',
@@ -8320,6 +8322,10 @@ function engineC_kinematics(cfg, A, B){
     return true;
   };
   const _gear = pool => (pool||[]).filter(_gearOK);
+  // V215 (D149 floors, coach): APPEND ONLY WHEN SHORT. A pool left with fewer than `min` names
+  // gets ONE named member appended; a pool that is long enough comes back untouched, so a floor
+  // can only fire where its list is actually short. Never a fallback to the raw pool (V197 D70b).
+  const _floorPool = (pool,min,add) => pool.length>=min ? pool : pool.concat([add]);
   // ── BODYWEIGHT TIER ("Room only") ──────────────────────────────────────────
   // A hotel room with nothing in it. The existing `minimal` tier still leans on
   // kettlebells and dumbbells, so it is NOT a true no-equipment option. This tier
@@ -8486,7 +8492,9 @@ function engineC_kinematics(cfg, A, B){
       if(_T==='protect'){
         // Leg day becomes a posterior-chain day: hip extension replaces knee flexion
         // under load. Nordic/GHR (eccentric knee flexion) filtered from hipExtPool.
-        squatPool = hasBarbell?_gear(['Barbell hip thrust','45° back extension','Cable pull-through']):['Banded hip thrust','Single-leg glute bridge','Bodyweight back extension'];
+        // V215 (D149 floor a): home_full owns neither the GHD station nor cables, so the gear
+        // gate leaves this list one name long. A second member is appended only when short.
+        squatPool = hasBarbell?_floorPool(_gear(['Barbell hip thrust','45° back extension','Cable pull-through']),2,'Single-leg glute bridge'):['Banded hip thrust','Single-leg glute bridge','Bodyweight back extension'];
         lungePool = ['Single-leg hip thrust','Single-leg glute bridge','Bodyweight back extension'];
         hipExtPool = hipExtPool.filter(n=>!/nordic|glute-ham|\bghr\b/i.test(n));
         if(!hipExtPool.length) hipExtPool=['Single-leg glute bridge','Bodyweight back extension'];
@@ -8497,7 +8505,7 @@ function engineC_kinematics(cfg, A, B){
       }
     } else if(_R==='ankle'){
       if(_T==='protect'){
-        squatPool = hasCables?['Leg press','Dumbbell goblet squat']:hasBarbell?['Barbell hip thrust','45° back extension']:['Banded hip thrust','Single-leg glute bridge'];
+        squatPool = hasCables?['Leg press','Dumbbell goblet squat']:hasBarbell?_gear(['Barbell hip thrust','45° back extension']):['Banded hip thrust','Single-leg glute bridge'];
         lungePool = ['Single-leg hip thrust','Single-leg glute bridge'];
       } else {
         // Box bias trims dorsiflexion demand; Bulgarians keep single-leg work with
@@ -8520,7 +8528,7 @@ function engineC_kinematics(cfg, A, B){
         // hold rather than printing a second copy of it.
         if(hasCables) lungePool = ['Leg extension','Lying leg curl'];
         hingePool = hasBarbell?['Barbell Romanian deadlift']:['Bodyweight back extension'];
-        hipExtPool = ['45° back extension'];
+        hipExtPool = hasGHD?['45° back extension']:['Bodyweight back extension'];
       } else {
         hingePool = hingePool.filter(n=>!/swing/i.test(n));
         if(!hingePool.length) hingePool=['Barbell Romanian deadlift'];
@@ -8645,7 +8653,11 @@ function engineC_kinematics(cfg, A, B){
       // move the duplicate one slot over. An emptied pool DROPS the slot instead: the
       // injury plan deliberately put hip extension somewhere else on this day, so the
       // day already has its dose and does not need a near-copy underneath it.
-      hipExtPool = _left;
+      // V215 (D149 floor b): knee/protect no longer empties the reservation. home_full lost
+      // 45° back extension to the GHD station, which left nothing here and dropped the slot.
+      // Bodyweight back extension is appended only when the remainder is empty. The lunge
+      // literal holds it too, so _slot's drop still removes it on a same-day collision.
+      hipExtPool = (_R==='knee'&&_T==='protect') ? _floorPool(_left,1,'Bodyweight back extension') : _left;
     }
   }
 
@@ -9736,6 +9748,7 @@ function _auxGearOK(name,equip){
   if(_g==='loaded') return equip!=='bodyweight';
   if(_g==='band') return equip!=='bodyweight'&&equip!=='minimal';
   const N=String(name||'').toLowerCase();
+  if(/glute-ham|\bghr\b|45° back extension/.test(N)) return equip==='commercial'||equip==='crossfit';
   if(/cable|pec deck/.test(N)) return equip==='commercial';
   if(/ball slams|wall ball|medicine ball/.test(N)) return equip==='commercial'||equip==='crossfit';
   if(/barbell|trap bar|power clean|landmine/.test(N)) return equip==='home_full'||equip==='commercial'||equip==='crossfit';  // V193 (D46): 'landmine' — this clause could not see the word, so a landmine read bodyweight legal on the swap sheet

@@ -128,8 +128,8 @@ const E6_ROW_FOR = v => E6_BY_VERSION[(+v <= 208) ? 208 : +v];
 // The 210 row is the three literals E1b/E3/G5 carried from V199 through V210 (G5 was
 // {Explosive finisher: E3}, and E3 was 60 on every one of those artifacts).
 const DELOAD_HINGE_BY_VERSION = {};
-DELOAD_HINGE_BY_VERSION[210] = { E1b: 9771, E3: 60, G5: {'Explosive finisher': 60} };
-DELOAD_HINGE_BY_VERSION[211] = { E1b: 9334, E3: 44, G5: {'Explosive finisher': 44} };   // D155: ruled scope change
+DELOAD_HINGE_BY_VERSION[210] = { E1b: 9771, E3: 60, G5: {'Explosive finisher': 60}, E1a: 12477, G1: 1350 };
+DELOAD_HINGE_BY_VERSION[211] = { E1b: 9334, E3: 44, G5: {'Explosive finisher': 44}, E1a: 12477, G1: 1350 };   // D155: ruled scope change. E1a and G1 added at V215 (D149): the bare literals' values on 210 to 214
 const DELOAD_HINGE_ROW_FOR = v => DELOAD_HINGE_BY_VERSION[(+v <= 210) ? 210 : +v];   // no row -> E1b/E3/G5 FAIL
 const DELOAD_HINGE_EXCLUDES_TIER_B = v => +v >= 211;
 DELOAD_ARB_BY_VERSION[211] = DELOAD_ARB_BY_VERSION[210];   // D153/D155: ruled UNMOVED
@@ -143,6 +143,9 @@ E6_BY_VERSION[214] = E6_BY_VERSION[213];   // D158: ruled UNMOVED, no lift secti
 DELOAD_HINGE_BY_VERSION[212] = DELOAD_HINGE_BY_VERSION[211];   // D110a: ruled UNMOVED, no lift section touched
 DELOAD_HINGE_BY_VERSION[213] = DELOAD_HINGE_BY_VERSION[212];   // D113a: ruled UNMOVED, no lift section touched (printed: C1 364 C3 364 C5 32 D2 19 I3 496; E6 28; E1b 9334 E3 44 G5 44)
 DELOAD_HINGE_BY_VERSION[214] = DELOAD_HINGE_BY_VERSION[213];   // D158: ruled UNMOVED, no lift section touched (printed: C1 364 C3 364 C5 32 D2 19 I3 496; E6 28; E1b 9334 E3 44 G5 44)
+DELOAD_ARB_BY_VERSION[215] = DELOAD_ARB_BY_VERSION[214];   // D149: ruled UNMOVED (printed: C1 364 C3 364 C5 32 D2 19 I3 496)
+E6_BY_VERSION[215] = E6_BY_VERSION[214];   // D149: ruled UNMOVED (28 printed)
+DELOAD_HINGE_BY_VERSION[215] = { E1b: 9319, E3: 44, G5: {'Explosive finisher': 44}, E1a: 12384, G1: 1290 };   // D149: ruled MOVE. Glute-ham raise and 45° back extension are posterior items and leave home_full, so fewer enter the deload (12,477 -> 12,384), fewer leave (9,334 -> 9,319) and fewer Leg isolation blocks drop (1,350 -> 1,290). E1a, G1 and G2 lose their bare literals and read this row; rows <= 214 carry E1a 12477, G1 1350. E2 follows E1a.
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[
@@ -495,13 +498,13 @@ function report(){
   ok(R.ndIdentical===R.ndTotal&&R.ndTotal===14976,'D3 non-deload weeks are byte-identical with the pass on and off: '+R.ndIdentical+'/'+R.ndTotal+' (week-level identity, not just HALF_MANNY)');
 
   console.log('── E. THE DELOAD MUST STILL CUT ──');
-  ok(N.postInP1===12477,'E1a posterior items entering the deload == 12,477 across '+D_DAY+' deload day builds (got '+N.postInP1+')');
   const HROW=DELOAD_HINGE_ROW_FOR(IP.version), HX=DELOAD_HINGE_EXCLUDES_TIER_B(IP.version);
   const HNOROW=(HROW?'':' — no DELOAD_HINGE_BY_VERSION row for V'+IP.version);
+  ok(!!HROW&&N.postInP1===HROW.E1a,'E1a posterior items entering the deload == '+(HROW?HROW.E1a:'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row) across '+D_DAY+' deload day builds (got '+N.postInP1+')'+HNOROW);
   const HSCOPE=(HX?' (tier B long-run days excluded by _longRunTier: '+(N.tierBDl||0)+' deload day builds)':'');
   const hIn=HX?N.postInP1X:N.postInP1, hOut=HX?N.postOutP2X:N.postOutP2, hKill=HX?N.killedByDeloadX:N.killedByDeload, hHold=(HX?N.killHoldX:N.killHold)||{};
   ok(!!HROW&&hOut===HROW.E1b,'E1b posterior items leaving the deload == '+(HROW?HROW.E1b:'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+', a cut of '+(hIn-hOut)+' ('+(100*(hIn-hOut)/hIn).toFixed(1)+'%); got '+hOut+HNOROW);
-  ok(F.postInP1===12477&&F.postOutP2===12477,'E2 __DELOAD_OFF control cuts nothing: '+F.postInP1+' -> '+F.postOutP2+'. E1b is a real deletion, not an accounting artefact');
+  ok(!!HROW&&F.postInP1===HROW.E1a&&F.postOutP2===HROW.E1a,'E2 __DELOAD_OFF control cuts nothing (both ends == the row\'s E1a, '+(HROW?HROW.E1a:'NO ROW')+'): '+F.postInP1+' -> '+F.postOutP2+'. E1b is a real deletion, not an accounting artefact');
   ok(!!HROW&&hKill===HROW.E3,'E3 STAGE-LOCAL (p1 -> p2): deload day builds taken from >0 posterior to 0 == '+(HROW?HROW.E3:'NO ROW')+' of '+D_DAY+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+'; got '+hKill+'. This is coach\'s ruled CEILING, not a floor'+HNOROW);
   ok(N.killedHeldByFinisher===60,'E4 on all 60, every section that held the dropped posterior is labelled Explosive finisher (got '+N.killedHeldByFinisher+'): the ceiling is BY LABEL, and a future widening into optional/fluff sections moves this number');
   ok(N.killedKeepsMain===60,'E5 all 60 still keep their main/strength section (got '+N.killedKeepsMain+')');
@@ -548,8 +551,8 @@ function report(){
     + 'STRUCTURAL REASON, not a shortfall: E_FOCUS here is [hypertrophy, balanced], and Pull superset B exists only on the else branch of the goal===strength || goal===hypertrophy guard at index.html:8223, so hypertrophy configs label the section Row volume and cannot contribute a B at all. B enters on only ' + g(N.pullP1all,'Pull superset B') + ' of ' + N.dayCells + ' day builds.');
 
   console.log('── G. Leg isolation and Explosive finisher, BOTH denominators pinned ──');
-  ok(g(N.dropped,'Leg isolation')===1350,'G1 Leg isolation DROPPED by the deload == 1,350. DENOMINATOR: deload day builds (n='+D_DAY+'), of which '+g(N.lblP1,'Leg isolation')+' carried the block in. It only ever drops on a deload card, so the all-day-builds census moves by the same 1,350 ('+g(N.lblP1all,'Leg isolation')+' -> '+g(N.lblP2all,'Leg isolation')+'); got '+g(N.dropped,'Leg isolation'));
-  ok(g(N.droppedPost,'Leg isolation')===1350,'G2 of those dropped Leg isolation blocks, POSTERIOR-HOLDING == 1,350. SECOND DENOMINATOR: dropped blocks, not killed days. Every Leg isolation block the deload drops was carrying hinge or hip_ext work; got '+g(N.droppedPost,'Leg isolation'));
+  ok(!!HROW&&g(N.dropped,'Leg isolation')===HROW.G1,'G1 Leg isolation DROPPED by the deload == '+(HROW?HROW.G1:'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row). DENOMINATOR: deload day builds (n='+D_DAY+'), of which '+g(N.lblP1,'Leg isolation')+' carried the block in. It only ever drops on a deload card, so the all-day-builds census moves by the same '+(HROW?HROW.G1:'NO ROW')+' ('+g(N.lblP1all,'Leg isolation')+' -> '+g(N.lblP2all,'Leg isolation')+'); got '+g(N.dropped,'Leg isolation'));
+  ok(!!HROW&&g(N.droppedPost,'Leg isolation')===HROW.G1,'G2 of those dropped Leg isolation blocks, POSTERIOR-HOLDING == '+(HROW?HROW.G1:'NO ROW')+' (the row\'s G1). SECOND DENOMINATOR: dropped blocks, not killed days. Every Leg isolation block the deload drops was carrying hinge or hip_ext work; got '+g(N.droppedPost,'Leg isolation'));
   ok(g(N.killHold,'Leg isolation')===0,'G2b THIRD DENOMINATOR, and the one that moved: on days the deload takes from >0 posterior to 0, Leg isolation holds the dropped posterior '+g(N.killHold,'Leg isolation')+' times. V198\'s census put it at 1,080 of 2,220 such days; that 1,080 is a V198-arm number and this baseline-free gate asserts the candidate\'s 0 instead. Do not read 1,350, 1,350 and 0 as three readings of one quantity');
   ok(g(N.dropped,'Explosive finisher')===1744,'G3 Explosive finisher DROPPED == 1,744 of the '+g(N.lblP1,'Explosive finisher')+' entering on deload cards (same denominator as G1); got '+g(N.dropped,'Explosive finisher'));
   ok(g(N.droppedPost,'Explosive finisher')===84,'G4 of those, POSTERIOR-HOLDING == 84 (dropped-block denominator, as G2); got '+g(N.droppedPost,'Explosive finisher'));

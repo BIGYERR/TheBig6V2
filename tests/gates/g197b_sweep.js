@@ -218,6 +218,7 @@ HF_LEAK_BY_VERSION[211] = HF_LEAK_BY_VERSION[210];   // D153/D155: ruled UNMOVED
 HF_LEAK_BY_VERSION[212] = HF_LEAK_BY_VERSION[211];   // D110a: ruled UNMOVED, no lift section touched
 HF_LEAK_BY_VERSION[213] = HF_LEAK_BY_VERSION[212];   // D113a: ruled UNMOVED (0/0 printed)
 HF_LEAK_BY_VERSION[214] = HF_LEAK_BY_VERSION[213];   // D158: ruled UNMOVED (0/0 printed)
+HF_LEAK_BY_VERSION[215] = HF_LEAK_BY_VERSION[214];   // D149: ruled UNMOVED (0/0 printed by coach on the V215 tree)
 const HF_LEAK = HF_LEAK_BY_VERSION[(+IA.version <= 209) ? 209 : +IA.version];
 // Survivors of one kind, read off the census and off the row through the same needs() table,
 // compared name for name and count for count: no extras, no missing.

@@ -15,8 +15,8 @@
 //
 // ORACLES, both independent of the engine's own selection:
 //   * the pool MEMBERSHIP is read out of the source text of index.html, not from a build.
-//   * the gear predicates are a hand table transcribed from the four one-line definitions
-//     (_tierHasBarbell, hasCables, hasDumbbells, isCrossfit). If someone changes a tier
+//   * the gear predicates are a hand table transcribed from the five one-line definitions
+//     (_tierHasBarbell, hasCables, hasDumbbells, isCrossfit, and hasGHD from V215 D149). If someone changes a tier
 //     definition this table must be edited by hand, deliberately.
 //   * survival is asked of applyInjuryFilter itself, which is a DIFFERENT part of the
 //     program from the pool literal. Neither side is asserting it equals itself.
@@ -41,21 +41,42 @@ const pass = m => { PASS++; if (process.env.VERBOSE) console.log('  ok ' + m); }
 // rather than muted, and anything NOT listed is a hard failure. A listed entry that stops
 // tripping is ALSO a failure, so the list cannot rot into a permanent excuse.
 const DEBT_FILE = path.join(__dirname, 'g193_pool_overlay_debt.txt');
+// V215: a line may open with an ia-version predicate, '>=N ' or '<=N ' (standing ruling 4: an entry is
+// keyed to the build whose code creates the trip). A line whose predicate does not hold for this
+// artifact is not listed for it, so it can neither excuse a trip nor fail as stale on it.
 const DEBT = fs.readFileSync(DEBT_FILE, 'utf8').split('\n')
-  .map(l => l.trim()).filter(l => l && l[0] !== '#');
+  .map(l => l.trim()).filter(l => l && l[0] !== '#')
+  .map(l => { const m = l.match(/^(>=|<=)(\d+)\s+(.*)$/); if (!m) return l;
+    const v = +IA.version, n = +m[2]; return (m[1] === '>=' ? v >= n : v <= n) ? m[3] : null; })
+  .filter(Boolean);
 const DEBT_HIT = Object.create(null);
 function isDebt(key){ if (DEBT.indexOf(key) >= 0){ DEBT_HIT[key] = 1; return true; } return false; }
 
 // ── HAND TABLE: gear predicates per tier. Transcribed, not computed. ─────────
 const EQUIP = ['bodyweight','minimal','home_basic','home_full','commercial','crossfit'];
 const GEAR = {
-  bodyweight: { hasBarbell:false, hasCables:false, hasDumbbells:false, isCrossfit:false, isBW:true  },
-  minimal:    { hasBarbell:false, hasCables:false, hasDumbbells:true,  isCrossfit:false, isBW:false },
-  home_basic: { hasBarbell:false, hasCables:false, hasDumbbells:true,  isCrossfit:false, isBW:false },
-  home_full:  { hasBarbell:true,  hasCables:false, hasDumbbells:true,  isCrossfit:false, isBW:false },
-  commercial: { hasBarbell:true,  hasCables:true,  hasDumbbells:true,  isCrossfit:false, isBW:false },
-  crossfit:   { hasBarbell:true,  hasCables:false, hasDumbbells:true,  isCrossfit:true,  isBW:false },
+  bodyweight: { hasBarbell:false, hasCables:false, hasDumbbells:false, isCrossfit:false, hasGHD:false, isBW:true  },
+  minimal:    { hasBarbell:false, hasCables:false, hasDumbbells:true,  isCrossfit:false, hasGHD:false, isBW:false },
+  home_basic: { hasBarbell:false, hasCables:false, hasDumbbells:true,  isCrossfit:false, hasGHD:false, isBW:false },
+  home_full:  { hasBarbell:true,  hasCables:false, hasDumbbells:true,  isCrossfit:false, hasGHD:false, isBW:false },
+  commercial: { hasBarbell:true,  hasCables:true,  hasDumbbells:true,  isCrossfit:false, hasGHD:true , isBW:false },
+  crossfit:   { hasBarbell:true,  hasCables:false, hasDumbbells:true,  isCrossfit:true,  hasGHD:true , isBW:false },
 };
+
+// ── HAND TABLE: the implement a pool member needs, typed from its NAME. Only _gear() and
+// _floorPool() consult it, because they are the two pool forms whose output depends on the tier.
+// GHD names are a station from ia-version 215 (D149: commercial and crossfit own one). Through 214
+// a Glute-ham raise needed the barbell tier and a 45° back extension needed nothing.
+const GEAR_VER = +IA.version;
+function gearOK(nm, g){
+  const n = String(nm).toLowerCase();
+  if (/glute[- ]ham|\bghr\b|45° back extension/.test(n))
+    return GEAR_VER >= 215 ? g.hasGHD : (/glute[- ]ham|\bghr\b/.test(n) ? g.hasBarbell : true);
+  if (/\bbarbell\b|^trap bar|^power clean|^hang clean|^rack pull|^back squat|^front squat|^bench press$|close-grip bench/.test(n)) return g.hasBarbell;
+  if (/cable|\brope\b|face pull|pulldown|pec deck|\bleg press\b|leg extension|leg curl|hack squat|\bsmith\b|preacher|\bmachine\b/.test(n)) return g.hasCables;
+  if (/\bdumbbell|\bdb\b|goblet/.test(n)) return g.hasDumbbells;
+  return true;
+}
 
 // ── 1. Carve the injury pool-override chain out of the source. ───────────────
 const START = SRC.indexOf("if(_R==='knee'){");
@@ -90,8 +111,8 @@ for (let i = 0; i < LINES.length; i++){
 }
 
 // ── 3. Resolve each assignment to a concrete member list per gear tier. ──────
-// Only expressions built out of gear predicates, array literals, _gear and _bw are
-// resolvable. Anything else (a reference to another pool, a .filter on a live value) is
+// Only expressions built out of gear predicates, array literals, _gear (filtered by tier), _floorPool
+// (V215) and _bw are resolvable. Anything else (a reference to another pool, a .filter on a live value) is
 // reported as UNRESOLVED and counted, so a shrinking sweep cannot hide here.
 const unresolved = [];
 function resolve(expr, equip){
@@ -101,14 +122,15 @@ function resolve(expr, equip){
   const skeleton = src.replace(/'[^']*'/g, "''").replace(/"[^"]*"/g, '""')
                       .replace(/\/[^\/\n]+\/[a-z]*/g, 'RX');
   const foreign = (skeleton.match(/[A-Za-z_][A-Za-z0-9_]*/g) || []).filter(id =>
-    !['hasBarbell','hasCables','hasDumbbells','isCrossfit','isBW','_gear','_bw','filter','test','n','i','indexOf','length','RX','slice'].includes(id));
+    !['hasBarbell','hasCables','hasDumbbells','isCrossfit','hasGHD','isBW','_gear','_floorPool','_bw','filter','test','n','i','indexOf','length','RX','slice'].includes(id));
   if (foreign.length) return null;
-  const _gear = a => a;                       // gear legality is checked separately
+  const _gear = a => a.filter(nm => gearOK(nm, g));   // the tier's gear gate (hand table above)
+  const _floorPool = (p, min, add) => p.length >= min ? p : p.concat([add]);   // V215 D149: append when short
   const _bw = (bw, other) => (g.isBW ? bw : other);
   try {
-    const f = new Function('hasBarbell','hasCables','hasDumbbells','isCrossfit','isBW','_gear','_bw',
+    const f = new Function('hasBarbell','hasCables','hasDumbbells','isCrossfit','hasGHD','isBW','_gear','_floorPool','_bw',
       'return (' + src + ');');
-    const v = f(g.hasBarbell, g.hasCables, g.hasDumbbells, g.isCrossfit, g.isBW, _gear, _bw);
+    const v = f(g.hasBarbell, g.hasCables, g.hasDumbbells, g.isCrossfit, g.hasGHD, g.isBW, _gear, _floorPool, _bw);
     return Array.isArray(v) ? v.filter(x => typeof x === 'string') : null;
   } catch (e){ return null; }
 }

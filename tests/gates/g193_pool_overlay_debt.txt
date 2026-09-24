@@ -7,11 +7,16 @@
 # same-lens: hip/protect assigns hinge and hip-extension pools whose every member its own
 # plan deletes (the branch comment says "hinge/lunge/hip-extension sit out"). Unlike D52
 # the deletion is INTENDED, so the day loses nothing it was meant to keep — the pools are
-# vestigial, not wrong. Count: 3. Triage: delete the two assignments, or keep them and say
-# in the comment that they exist only to be filtered.
+# vestigial, not wrong. Count: 3 through V214, 4 from V215. Triage: delete the two assignments,
+# or keep them and say in the comment that they exist only to be filtered.
+# V215 (D149-D4b): hipExtPool reads the GHD station, hasGHD?['45° back extension']:['Bodyweight back
+# extension']. The plan removes both names, so the second is a new same-lens trip from 215. The pool is
+# still one member on every tier, so its thin-pool line below stays live. Removing the vestigial
+# assignment is an engine change, queued for coach.
 same-lens hip/protect hingePool Bodyweight back extension
 same-lens hip/protect hingePool Barbell Romanian deadlift
 same-lens hip/protect hipExtPool 45° back extension
+>=215 same-lens hip/protect hipExtPool Bodyweight back extension
 #
 # thin-pool: injury pools AUTHORED with fewer than two members. The overlay does not
 # narrow these; they were written that way. D44's floor was ruled on a pool feeding a
@@ -31,3 +36,8 @@ thin-pool ankle/workaround lungePool
 thin-pool lowback/protect squatPool
 thin-pool lowback/workaround squatPool
 thin-pool elbow/protect chestCompoundPool
+# V215 (D149): a gear-accurate resolver shows ankle/protect squatPool is ONE name on home_full. D149-D4a
+# gear-gates the literal and home_full owns neither the GHD station nor cables, so Barbell hip thrust is
+# left alone. Coach ruled no floor here (2b dropped: the day's main is still a barbell hip thrust).
+# Count: 12 pools from V215.
+>=215 thin-pool ankle/protect squatPool

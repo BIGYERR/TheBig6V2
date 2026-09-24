@@ -78,10 +78,11 @@
 //
 // D149 LICENCE (standing ruling 2, a predicate, not prose). D149 is HELD out of V210 by coach:
 // slice 4 met its lens targets but lost home_full sections on long-run tier B days and injured
-// cells (O5b); it is parked for a ruling. While ia-version <= D149_HELD_TO (212, renewed at V212)
-// the GHD rows (O3g, O3g5, O4g) print SCOPED OUT (D149 held) with their live counts, never PASS,
-// and O3z leaves the GHD share out of its total. Above it they enforce and fail loudly. RENEW BY ONE PER BUILD until D149
-// ships (g202's D142 pattern), always keyed on a number that exists today.
+// cells (O5b); it was parked for a ruling. While ia-version < D149_SHIPS (215) the GHD rows
+// (O3g, O3g5, O4g) print SCOPED OUT (D149 held) with their live counts, never PASS, and O3z leaves
+// the GHD share out of its total. RETIRED AT V215: D149 ships on 215 (coach's ruling with two
+// knee/protect floors; its own rows are tests/gates/g215_d149_ghd.js), so from 215 the GHD rows
+// enforce and assert 0. The boundary is fixed. It is never renewed again.
 //
 // VERSION PREDICATE (standing ruling 4). D70c ships on ia-version 210.
 //   below 210: NOT APPLICABLE, every row skipped by name, clean exit.
@@ -97,10 +98,10 @@ const D70C_ERA = 210;
 const SLICES_BUILT = 3;          // slices 1 (D70c-A1..A4), 2 (D70c-B1, B2), 2b, 3 (D150): V210's whole scope. D149 is HELD (licence below).
 const FINAL = 3;                 // V210's scope ends at slice 3: O3z and O6r enforce now
 const EXPIRED = VER > D70C_ERA;  // a later build runs this gate: no row may hide as NOT YET BUILT
-const D154_SCOPED_TO = 214; // D154 queued
-const D149_HELD_TO = 214; // D149 builds after V214
+const D154_SCOPED_TO = 215; // D154 queued
+const D149_SHIPS = 215;   // D149 shipped on V215: the licence is retired, never renewed
 const D154_SCOPED = VER <= D154_SCOPED_TO;  // the D154 licence: the elbow renamer is out of scope through D154_SCOPED_TO only
-const D149_HELD = VER <= D149_HELD_TO;      // the D149 licence: the GHD station is HELD. Renew by one per build until D149 ships.
+const D149_HELD = VER < D149_SHIPS;         // the D149 licence, retired: <= 214 the GHD station is HELD, from 215 its rows enforce.
 
 let pass = 0, fail = 0, skip = 0, nyb = 0, fixt = 0, scoped = 0, held = 0;
 function ok(label, cond, got){
@@ -113,11 +114,11 @@ function owned(slice, label, cond, got){
 }
 function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function heldRow(label, cond, got){
-  if(D149_HELD){ held++; console.log('SCOPED OUT (D149 held) ' + label + ' [D149 licence, ia-version <= ' + D149_HELD_TO + '] (now ' + got + ')'); return; }
+  if(D149_HELD){ held++; console.log('SCOPED OUT (D149 held) ' + label + ' [D149 licence, ia-version < ' + D149_SHIPS + '] (now ' + got + ')'); return; }
   ok(label, cond, got);
 }
 function summary(){
-  console.log('\nNOT YET BUILT ' + nyb + ' (SLICES_BUILT ' + SLICES_BUILT + ' of ' + FINAL + ')  SCOPED OUT ' + scoped + ' (D154 licence, ia-version <= ' + D154_SCOPED_TO + ')  SCOPED OUT (D149 held) ' + held + ' (D149 licence, ia-version <= ' + D149_HELD_TO + ')  SKIP ' + skip + '  fixture guards ' + fixt);
+  console.log('\nNOT YET BUILT ' + nyb + ' (SLICES_BUILT ' + SLICES_BUILT + ' of ' + FINAL + ')  SCOPED OUT ' + scoped + ' (D154 licence, ia-version <= ' + D154_SCOPED_TO + ')  SCOPED OUT (D149 held) ' + held + ' (D149 licence, ia-version < ' + D149_SHIPS + ')  SKIP ' + skip + '  fixture guards ' + fixt);
   console.log('PASS ' + pass + ' FAIL ' + fail);
   process.exit(fail ? 1 : 0);
 }

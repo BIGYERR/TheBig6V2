@@ -1,0 +1,30 @@
+[
+  {
+    "name": "S1-D149 -> the GHD tokens go back into the barbell clause (D149-D2 reverted to its V214 bytes): a barbell tier without the station owns the GHD again",
+    "anchor": "|close-grip bench/i.test(N)) return false;\n    if(!hasGHD && /glute-ham|\\bghr\\b|45° back extension/i.test(N)) return false;",
+    "replacement": "|close-grip bench|glute-ham/i.test(N)) return false;",
+    "gate": "gates/g215_d149_ghd.js",
+    "note": "NAMED TRIP in g215_d149_ghd.js. Needs ia-version >= 215: below 215 the gate is NOT APPLICABLE and every mutation survives (the close bumped index.html to 215). The pair rows read V214 from git 978b0b5 when no baseline is passed, as sabotage.py runs it. Measured on a forced-215 copy of the slice 2 tree, no baseline passed: PASS 59 FAIL 9. EXPECTED: G1 home_full (509 GHD items + 91 travel), G2 home_full (264 universe names), G3 home_full (301 offers), G4 home_full, F1 home_full (floor a stops firing: 0 of 126 differ), F1o home_full x2 (45° back extension back in Main, Single-leg glute bridge never), F2 home_full (floor b stops firing), F2o home_full (45° back extension back in Leg superset B). g210 O3g/O3g5/O4g trip on it too from 215 (collateral, not the named gate)."
+  },
+  {
+    "name": "S2-D149 -> the sidecar lens loses its GHD clause (D149-D3 dropped): _auxGearOK passes a GHD name on every tier",
+    "anchor": "  if(/glute-ham|\\bghr\\b|45° back extension/.test(N)) return equip==='commercial'||equip==='crossfit';\n  if(/cable|pec deck/.test(N)) return equip==='commercial';",
+    "replacement": "  if(/cable|pec deck/.test(N)) return equip==='commercial';",
+    "gate": "gates/g215_d149_ghd.js",
+    "note": "NAMED TRIP in g215_d149_ghd.js. Needs ia-version >= 215: below 215 the gate is NOT APPLICABLE and every mutation survives (the close bumped index.html to 215). The pair rows read V214 from git 978b0b5 when no baseline is passed, as sabotage.py runs it. Measured on a forced-215 copy of the slice 2 tree, no baseline passed: PASS 65 FAIL 3. EXPECTED: L1 home_full, home_basic, bodyweight (the aux lens answers true for Glute-ham raise and 45° back extension). This is the only observation: no aux family or core pillar holds a GHD name today, so no card, universe or swap offer changes (the rest of g215 passes)."
+  },
+  {
+    "name": "S3-D149 floor (a) dropped -> the knee/protect squat pool on home_full is one name long again (Barbell hip thrust only)",
+    "anchor": "_floorPool(_gear(['Barbell hip thrust','45° back extension','Cable pull-through']),2,'Single-leg glute bridge')",
+    "replacement": "_gear(['Barbell hip thrust','45° back extension','Cable pull-through'])",
+    "gate": "gates/g215_d149_ghd.js",
+    "note": "NAMED TRIP in g215_d149_ghd.js. Needs ia-version >= 215: below 215 the gate is NOT APPLICABLE and every mutation survives (the close bumped index.html to 215). The pair rows read V214 from git 978b0b5 when no baseline is passed, as sabotage.py runs it. Measured on a forced-215 copy of the slice 2 tree, no baseline passed: PASS 61 FAIL 7. EXPECTED: F1 on all five tiers (floor a not in the candidate as ruled, anchor count 0), F1o home_full reach (Single-leg glute bridge never the legs Main), K1 home_full (115 sections lost vs V214, Calves on knee/protect legs days: floor a is what holds them)."
+  },
+  {
+    "name": "S4-D149 floor (b) dropped -> the knee/protect hip-extension reservation empties on home_full and the slot vanishes",
+    "anchor": "(_R==='knee'&&_T==='protect') ? _floorPool(_left,1,'Bodyweight back extension') : _left",
+    "replacement": "_left",
+    "gate": "gates/g215_d149_ghd.js",
+    "note": "NAMED TRIP in g215_d149_ghd.js. Needs ia-version >= 215: below 215 the gate is NOT APPLICABLE and every mutation survives (the close bumped index.html to 215). The pair rows read V214 from git 978b0b5 when no baseline is passed, as sabotage.py runs it. Measured on a forced-215 copy of the slice 2 tree, no baseline passed: PASS 61 FAIL 7. EXPECTED: F2 on all five tiers (floor b not in the candidate as ruled, anchor count 0), F2o home_full reach (Leg superset B two-item 0 of 825), P1 home_full (reservation empty on 6,301 of 6,301 reads)."
+  }
+]
