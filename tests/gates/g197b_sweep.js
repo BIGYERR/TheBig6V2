@@ -222,7 +222,12 @@ HF_LEAK_BY_VERSION[215] = HF_LEAK_BY_VERSION[214];   // D149: ruled UNMOVED (0/0
 HF_LEAK_BY_VERSION[216] = HF_LEAK_BY_VERSION[215];   // D154/D156: ruled UNMOVED (D154 swaps to a pushup, D156 draws less; neither adds a machine or cable item)
 HF_LEAK_BY_VERSION[217] = HF_LEAK_BY_VERSION[216];   // D160: ruled UNMOVED (0/0 printed; the dedupe draws only from the swap universe the tier already owns)
 HF_LEAK_BY_VERSION[218] = HF_LEAK_BY_VERSION[217];   // D157: ruled UNMOVED (0/0 printed; the swim sizer and three labels draw no lift item)
+HF_LEAK_BY_VERSION[219] = HF_LEAK_BY_VERSION[218];   // V219 (D167/D171/D159/D164/D170/D165/D166): ruled UNMOVED (0/0 printed at measure's step 7; every V219 draw picks from the tier's own pool)
 const HF_LEAK = HF_LEAK_BY_VERSION[(+IA.version <= 209) ? 209 : +IA.version];
+// B5c's same-card duplicate count, keyed by ia-version (D133). 187 through V218 (the bare literal B5c read until V219).
+const B5C_BY_VERSION = { 218: 187 };
+B5C_BY_VERSION[219] = 0;   // D170 then D165: ruled MOVE. D170 (cf170b) 187 -> 185 printed; D165 (cf165b) redraws the lunge slot when it collides with a step-up Main, 185 -> 0
+const B5C_ROW = B5C_BY_VERSION[(+IA.version <= 218) ? 218 : +IA.version];   // no row -> B5c FAILS
 // Survivors of one kind, read off the census and off the row through the same needs() table,
 // compared name for name and count for count: no extras, no missing.
 const hfOfKind = (names, kind) => { const o = {}; Object.keys(names || {}).filter(n => needs(n).indexOf(kind) >= 0).forEach(n => { o[n] = names[n]; }); return o; };
@@ -248,7 +253,7 @@ console.log('\n-- B5. same-card duplicates --');
 console.log('   duplicate-name-on-one-card items: ' + dup + '  (of which a harvested name: ' + harvestedDup + ')');
 ok('B5a a harvested name NEVER prints twice on one card (D76 subtraction)', harvestedDup === 0, harvestedDup);
 ok('B5b total same-card duplicates did not grow past the ruling ceiling of 415', dup <= 415, dup);
-ok('B5c same-card duplicates == 187 (240 at V196/V197; D76 absorbs the whole +175 harvest cost, then D85 licenses 5 and D91 licenses 48 more: on 48 deload leg cards — W12 TUE, run_half, seed 11, home_basic 24 + minimal 24 — recoveryDeload now keeps its surviving accessory block by PATTERN, so Leg superset B (hinge) survives where Leg superset A did, and the Step-ups (KB) that Leg superset A repeated from the Main slot leaves the card. Item count per card is unchanged on all 48 (46 at 8 items, 2 at 7): the repeat was replaced, not dropped. Every duplicate this assertion has ever counted is Step-ups (KB))', dup === 187, dup);
+ok('B5c same-card duplicates == ' + B5C_ROW + ' (the V' + IA.version + ' row; 187 through V218, 240 at V196/V197; D76 absorbs the whole +175 harvest cost, then D85 licenses 5 and D91 licenses 48 more: on 48 deload leg cards — W12 TUE, run_half, seed 11, home_basic 24 + minimal 24 — recoveryDeload now keeps its surviving accessory block by PATTERN, so Leg superset B (hinge) survives where Leg superset A did, and the Step-ups (KB) that Leg superset A repeated from the Main slot leaves the card. Item count per card is unchanged on all 48 (46 at 8 items, 2 at 7): the repeat was replaced, not dropped. Every duplicate this assertion has ever counted is Step-ups (KB))', B5C_ROW !== undefined && dup === B5C_ROW, dup);
 ok('B5d nowhere near 955 (that number means the three exclusions did not land)', dup < 955, dup);
 
 // ── D75: the hold dose ─────────────────────────────────────────────────────────────

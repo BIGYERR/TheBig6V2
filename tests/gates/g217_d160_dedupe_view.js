@@ -83,6 +83,13 @@
 //   R1, R2, D1 and E1 say "this build moved only what D160 moves", so they run only on candidate 217 against
 //   baseline 216
 //   and SKIPs by name on every other pair. Every other row is ruling-level from 217 up.
+//   V219 RESCOPE (standing ruling 4; session decision, coach concurred): K2, K3, K4, K5, K6 and K1's V216 ->
+//   candidate delta are D160's build-scoped pair claims. For a candidate above 218 each prints
+//   "SKIP pair row: candidate <v> is not D160's pair (217/218)" and does not count: from D170 on, later rulings
+//   move V216-era cards by ruling, and D167's own class is asserted in its own gate. Durable on every build: I0,
+//   F0 (a fixture of V216 itself), P1, W1, U1, U2, C1, K0 and K1's candidate side (0 phantoms). From 219 the
+//   dedupe pairs by calendar (D167), so the candidate's previous day is the calendar previous day by
+//   Monday-start date arithmetic (calPrev), never the pair the engine logged.
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const { load, progDigest, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
@@ -107,6 +114,11 @@ FWD_MAIN_BY_VERSION[218] = FWD_MAIN_BY_VERSION[217];   // D157: ruled UNMOVED (6
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = l => { skip++; console.log('SKIP ' + l); };
+const PAIR_SCOPE = VER <= 218;   // D160's own pair (217/218); above it the pair rows SKIP (V219 rescope)
+const skipPair = r => skipRow('pair row: candidate ' + VER + ' is not D160\'s pair (217/218): ' + r);
+const CALPREV = VER >= 219;   // D167: the candidate's dedupe pairs by calendar
+const ISO7 = ['mon','tue','wed','thu','fri','sat','sun'];
+const calPrev = (w, d) => { const i = ISO7.indexOf(d); return i > 0 ? { w:+w, d:ISO7[i - 1] } : { w:+w - 1, d:'sun' }; };   // Monday-start date arithmetic
 const done = () => { if(TMP) try { fs.rmSync(TMP, { recursive:true, force:true }); } catch(e){}
   console.log('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
 if(VER < ERA){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D160 (V' + ERA + ').'); ROWS.forEach(r => skipRow(r + ' below the D160 era')); done(); }
@@ -145,7 +157,7 @@ const tierOf = y => { const c = card(y); return c ? (tierFn(c) || null) : null; 
 const names = y => [].concat(...((y && y.sections) || []).map(s => (s.items || []).map(i => String((i && i.name) || ''))));
 const dayOf = (p, w, d) => (p && p.weeks && p.weeks[w]) ? p.weeks[w][d] : undefined;
 const bump = (o, k, n = 1) => { o[k] = (o[k] || 0) + n; };
-const classify = (p, r) => { const P = dayOf(p, r.pw, r.pd); const ph = !names(P).map(n => n.toLowerCase()).includes(String(r.was).toLowerCase());
+const classify = (p, r, cal) => { const pv = cal ? calPrev(r.w, r.d) : { w:r.pw, d:r.pd }, P = dayOf(p, pv.w, pv.d); const ph = !names(P).map(n => n.toLowerCase()).includes(String(r.was).toLowerCase());
   const t = tierOf(P); return { ph, t, scope: ph && !!t }; };
 const rkey = r => r.w + '|' + r.d + '|' + r.pw + '|' + r.pd + '|' + r.was + '>' + r.to;
 function build(X, c){ X.window.__DD = []; const p = X.buildProgram(c); const dd = X.window.__DD; X.window.__DD = []; return { p, dd }; }
@@ -217,7 +229,7 @@ L.forEach(x => {
   Object.keys(C.p.weeks).forEach(w => WD.forEach(d => { const y = dayOf(C.p, w, d); if(!y || y.rest || !Array.isArray(y.sections)) return;
     const t = tierOf(y) || (card(y) ? 'none' : null); if(t && !EX[t] && (t !== 'none' || y.sections.length)) EX[t] = { p:C.p, w, d, c:card(y) }; }));
   s.cRen += C.dd.length;
-  C.dd.forEach(r => { if(!names(dayOf(C.p, r.w, r.d)).includes(r.to)) s.cUn++; const k = classify(C.p, r); if(k.scope){ bump(s.cPh, k.t); if(!s.ex) s.ex = x.lat + ' ' + x.c.equipment + '/' + x.c.liftingFocus + ' W' + r.w + ' ' + r.d + ' "' + r.was + '" -> "' + r.to + '" against W' + r.pw + ' ' + r.pd + ' (tier ' + k.t + ') shipping [' + names(dayOf(C.p, r.pw, r.pd)).join(', ') + ']'; } else if(k.ph) s.cOut++; });
+  C.dd.forEach(r => { if(!names(dayOf(C.p, r.w, r.d)).includes(r.to)) s.cUn++; const k = classify(C.p, r, CALPREV); if(k.scope){ bump(s.cPh, k.t); if(!s.ex) s.ex = x.lat + ' ' + x.c.equipment + '/' + x.c.liftingFocus + ' W' + r.w + ' ' + r.d + ' "' + r.was + '" -> "' + r.to + '" against W' + r.pw + ' ' + r.pd + ' (tier ' + k.t + ') shipping [' + names(dayOf(C.p, r.pw, r.pd)).join(', ') + ']'; } else if(k.ph) s.cOut++; });
   if(B){ s.bRen += B.dd.length;
     const kept = [];
     B.dd.forEach(r => { if(!names(dayOf(B.p, r.w, r.d)).includes(r.to)) s.bUn++; const k = classify(B.p, r); if(k.scope){ bump(s.bPh, k.t); bump(TRIG, r.was); bump(TO, r.to); } else { if(k.ph) s.bOut++; kept.push(rkey(r)); } });
@@ -305,7 +317,7 @@ ok('C1 buildProgram leaves every lattice cfg byte-identical', cfgMut === 0, cfgM
     .replace(KREN, () => KREN + '        __e.to=to;\n');
   let KO6 = null, KO7 = null, kErr = '', kMode = '';
   if(!BASE) kErr = 'no V216 baseline: ' + baseErr;
-  else if(!KROW && !TWIN && FWD === undefined) kErr = 'NO ROW for ia-version ' + VER + ' in D160_MULTI_BY_VERSION, SAMEDAY_TWIN_BY_VERSION and FWD_MAIN_BY_VERSION (rulings 2/4)';
+  else if(PAIR_SCOPE && !KROW && !TWIN && FWD === undefined) kErr = 'NO ROW for ia-version ' + VER + ' in D160_MULTI_BY_VERSION, SAMEDAY_TWIN_BY_VERSION and FWD_MAIN_BY_VERSION (rulings 2/4)';
   else { const h6 = fs.readFileSync(path.join(TMP, 'v216_raw.html'), 'utf8'), h7 = RAW.html;
     const i7 = cnt(h7, IN7) === 1 ? [IN7, VIEW7] : cnt(h7, IN6) === 1 ? [IN6, VIEW6] : null;
     kMode = !i7 ? '' : i7[0] === IN7 ? 'candidate trigger reads the D18 view' : 'candidate trigger reads the raw day';
@@ -361,7 +373,7 @@ ok('C1 buildProgram leaves every lattice cfg byte-identical', cfgMut === 0, cfgM
       const kex = m => { if(!s.ex) s.ex = x.mix + ' ' + x.c.equipment + '/' + x.c.liftingFocus + '/' + x.c.experience + '/' + x.c.restDays.join('') + ': ' + m; };
       const P = PH[x.mix] || (PH[x.mix] = [0, 0, 0, 0]), G = GAP[x.mix] || (GAP[x.mix] = {});
       [[a, 0], [b, 1]].forEach(([r, k]) => r.tr.forEach(e => { if(!e.to) return;
-        if(!nK(dayOf(r.p, e.pw, e.pd)).map(lc).includes(lc(e.was))) P[k]++;
+        { const pv = (k && CALPREV) ? calPrev(e.w, e.d) : { w:e.pw, d:e.pd }; if(!nK(dayOf(r.p, pv.w, pv.d)).map(lc).includes(lc(e.was))) P[k]++; }
         if(e.pre && !e.vw) P[k + 2]++;
         const gk = (k ? 'cand' : 'V216') + ' gap ' + (dix(e.w, e.d) - dix(e.pw, e.pd)); G[gk] = (G[gk] || 0) + 1; }));
       if(idx % 97 === 0 && x.c.startDate){ const pp = {startDate:x.c.startDate}, mon0 = gd(pp, 1, 'mon');
@@ -394,6 +406,13 @@ ok('C1 buildProgram leaves every lattice cfg byte-identical', cfgMut === 0, cfgM
     Object.keys(GAP).forEach(m => console.log('  INFO ' + m + ' renames by dedupe-pair calendar gap (8 = W(w) sat -> W(w+1) sun, D167, not asserted): ' + JSON.stringify(GAP[m])));
     const noRow = r => ok(r + ' NO ROW for ia-version ' + VER + ' (standing rulings 2/4: add the ruled row)', false);
     ok('K0 knock-on instrument inert: V216 HALF_MANNY instrumented ' + dig6 + ' == raw ' + BASE_RAW_DIGEST + ', candidate instrumented ' + dig7 + ' == raw ' + raw7 + ' [' + kMode + ']', dig6 === BASE_RAW_DIGEST && dig7 === raw7);
+    if(!PAIR_SCOPE){ const K1MIX = Object.keys(D160_MULTI_BY_VERSION[217].phantoms);
+      LIMS.forEach(l => { const s = kz(l), mixes = K1MIX.filter(m => (/^gk /.test(m) ? 'gk' : 'multi') === l);
+        ok('K1 ' + l + ' candidate phantoms == 0, trigger absent from the calendar previous shipped day (' + s.cfg + '/' + KCOUNT[l] + ' configs, ' + s.crash + ' crashed): ' + mixes.map(m => m + ' ' + (PH[m] || ['-', '-'])[1]).join(', '),
+          s.cfg === KCOUNT[l] && s.crash === 0 && mixes.length > 0 && mixes.every(m => PH[m] && PH[m][1] === 0));
+        skipPair('K1 ' + l + ' V216 -> candidate delta'); });
+      ['K2 gk','K2 multi','K3','K4 gk','K4 multi','K5 gk','K5 multi','K6'].forEach(skipPair);
+    } else {
     LIMS.forEach(l => { if(!KROW) return noRow('K1 ' + l); const s = kz(l), T = KROW.phantoms, mixes = Object.keys(T).filter(m => (/^gk /.test(m) ? 'gk' : 'multi') === l);
       const good = s.cfg === KCOUNT[l] && s.crash === 0 && mixes.length > 0 && mixes.every(m => PH[m] && PH[m][0] === T[m][0] && PH[m][1] === T[m][1]);
       ok('K1 ' + l + ' phantoms V216 -> candidate, trigger absent from the shipped previous day (' + s.cfg + '/' + KCOUNT[l] + ' configs, ' + s.crash + ' crashed): ' + mixes.map(m => m + ' ' + (PH[m] || ['-'])[0] + '->' + (PH[m] || ['-', '-'])[1] + ' (' + T[m][0] + '->' + T[m][1] + ')').join(', '), good); });
@@ -408,5 +427,6 @@ ok('C1 buildProgram leaves every lattice cfg byte-identical', cfgMut === 0, cfgM
     LIMS.forEach(l => { if(!TWIN) return noRow('K5 ' + l); const s = kz(l), T = TWIN[l];
       ok('K5 ' + l + ' same-day twins the candidate adds ' + s.add + ' (' + T.add + '), removes ' + s.rem + ' (' + T.remove + ')', s.add === T.add && s.rem === T.remove); });
     if(FWD === undefined) noRow('K6'); else ok('K6 gk accessory today == Main tomorrow: candidate ' + FWDN[1] + ' (' + FWD + '), V216 ' + FWDN[0], FWDN[1] === FWD);
+    }
   } }
 done();

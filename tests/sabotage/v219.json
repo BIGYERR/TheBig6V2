@@ -1,0 +1,86 @@
+[
+ {
+  "name": "S1-D167 -> each dedupe pair takes the seed index of its position in the walk again, not the index its A day held on V218",
+  "anchor": "seededRand(seed+wB*97+(pair.length>4?pair[4]:pi)*13+ii)",
+  "replacement": "seededRand(seed+wB*97+pi*13+ii)",
+  "gate": "gates/g219_d167_pairs.js",
+  "note": "NAMED TRIP in g219_d167_pairs.js rows K2a.H (3,410 card events vs 859), K2a.P (888 vs 370), K2a.Z (205 Sunday-rest programs), D167a (2,384 mid-week days) and K2b.N/K2b.T. The seed line rides into the XP transplant. Needs ia-version 219: pair rows run only on 219 (SKIP above), every row is REFUSED below. Pair rows read V218 from git 44fd483 when no baseline is passed, as sabotage.py runs it."
+ },
+ {
+  "name": "S2-D167a -> the dedupe walks the calendar backwards, so a Monday rename lands after Tuesday already read Monday",
+  "anchor": "if(w<totalWeeks) out.push([w,'sun',w+1,'mon',(w-1)*7+6]);\n  }\n  return out;",
+  "replacement": "if(w<totalWeeks) out.push([w,'sun',w+1,'mon',(w-1)*7+6]);\n  }\n  return out.reverse();",
+  "gate": "gates/g219_d167_pairs.js",
+  "note": "NAMED TRIP in g219_d167_pairs.js row D167a (122 mid-week days, 118 not cascades), plus K2a.H (991), K2a.P, K2a.Z, R2 (34/12) and the durable D1 (164 renames whose name is not on the calendar-previous card). Needs ia-version 219: pair rows run only on 219 (SKIP above), every row is REFUSED below. Pair rows read V218 from git 44fd483 when no baseline is passed, as sabotage.py runs it."
+ },
+ {
+  "name": "S3-D171 -> the hinge clamp sweep reads tomorrow in Sun..Sat order again, so the final Saturday never sees the final Sunday",
+  "anchor": "      const _di=_ISO_ORDER.indexOf(d);\n      const _nw=_di===_last?(+w+1):+w, _ndk=_ISO_ORDER[(_di+1)%7];",
+  "replacement": "      const _di=ALL_DAYS_ORDER.indexOf(d);\n      const _nw=_di===_last?(+w+1):+w, _ndk=ALL_DAYS_ORDER[(_di+1)%7];",
+  "gate": "gates/g219_d167_pairs.js",
+  "note": "NAMED TRIP in g219_d167_pairs.js rows K2b.N (0 detail-only days vs 157) and K2b.T only. This is hotNextHingeClampSweep. The other D171 site (buildProgram's inline hotNext, _ISO_ORDER.length-1 form) is UNDEFENDED: reverting it is inert on all 15,180 lattice configs. Needs ia-version 219: pair rows run only on 219 (SKIP above), every row is REFUSED below. Pair rows read V218 from git 44fd483 when no baseline is passed, as sabotage.py runs it."
+ },
+ {
+  "name": "S4-D167 -> the dedupe gives up whenever fewer than two swaps are legal, leaving calendar repeats standing",
+  "anchor": "if(!cands.length) return;",
+  "replacement": "if(cands.length<2) return;",
+  "gate": "gates/g219_d167_pairs.js",
+  "note": "NAMED TRIP in g219_d167_pairs.js row R2 only (sat>sun/sun>mon 92/14 vs 28/6). The loop body is not transplanted, so K2a stays green. Needs ia-version 219: pair rows run only on 219 (SKIP above), every row is REFUSED below. Pair rows read V218 from git 44fd483 when no baseline is passed, as sabotage.py runs it."
+ },
+ {
+  "name": "S5-D167 durable -> the A day of a pair is read from B's week, so W sun -> W+1 mon compares Monday against the Sunday six days AFTER it",
+  "anchor": "const A=weeks[wA]&&weeks[wA][dA], B=weeks[wB]&&weeks[wB][dB];",
+  "replacement": "const A=weeks[wB]&&weeks[wB][dA], B=weeks[wB]&&weeks[wB][dB];",
+  "gate": "gates/g219_d167_pairs.js",
+  "note": "NAMED TRIP in g219_d167_pairs.js row D1 (27 renames whose name is not on the calendar-previous card), a durable row that trips on every build >= 219, plus pair row R2 (sun>mon 42). Needs ia-version 219: pair rows run only on 219 (SKIP above), every row is REFUSED below. Pair rows read V218 from git 44fd483 when no baseline is passed, as sabotage.py runs it."
+ },
+ {
+  "name": "S6-D159 -> Leg isolation falls back to the full gear pool when one name is left, redrawing a name already on the card",
+  "anchor": "const legIso=pick(_laLeft.length>=2?_laLeft:(_laLeft.length?_laLeft:_laGear),2",
+  "replacement": "const legIso=pick(_laLeft.length>=2?_laLeft:_laGear,2",
+  "gate": "gates/g219_samecard_draws.js",
+  "note": "G4 mutation (D159), verbatim from the G4 brief. Gatekeeper proves the trip in g219_samecard_draws.js."
+ },
+ {
+  "name": "S7-D164 slice 1 -> the chest pool drops only the literal main, not a name the injury view renders as the main",
+  "anchor": "const chestPool=chestPoolRaw.filter(x=>x!==ex.chestMain&&_injViewName(x,cfg)!==_injViewName(ex.chestMain,cfg));",
+  "replacement": "const chestPool=chestPoolRaw.filter(x=>x!==ex.chestMain);",
+  "gate": "gates/g219_samecard_draws.js",
+  "note": "G4 mutation (D164 s1), verbatim from the G4 brief. Gatekeeper proves the trip in g219_samecard_draws.js."
+ },
+ {
+  "name": "S8-D164 slice 2 -> the second biceps pick is never redrawn when the injury view renders it as the first",
+  "anchor": "if(bis[1]&&_injViewName(bis[1],cfg)===_injViewName(bis[0],cfg)){",
+  "replacement": "if(false&&bis[1]&&_injViewName(bis[1],cfg)===_injViewName(bis[0],cfg)){",
+  "gate": "gates/g219_samecard_draws.js",
+  "note": "G4 mutation (D164 s2), verbatim from the G4 brief. Gatekeeper proves the trip in g219_samecard_draws.js."
+ },
+ {
+  "name": "S9-D165 -> the lunge slot may draw the squat main again",
+  "anchor": "if(lungeSel[0]===squatSel) lungeSel=pick(",
+  "replacement": "if(false&&lungeSel[0]===squatSel) lungeSel=pick(",
+  "gate": "gates/g219_samecard_draws.js",
+  "note": "G4 mutation (D165), verbatim from the G4 brief. Gatekeeper proves the trip in g219_samecard_draws.js."
+ },
+ {
+  "name": "S10-D166 -> Pull superset B prints the back main as its third conditioning item again",
+  "anchor": "...(ex.cond[2]===ex.backMain?[]:[{name:ex.cond[2]",
+  "replacement": "...(false?[]:[{name:ex.cond[2]",
+  "gate": "gates/g219_samecard_draws.js",
+  "note": "G4 mutation (D166), verbatim from the G4 brief. Gatekeeper proves the trip in g219_samecard_draws.js."
+ },
+ {
+  "name": "S11-D170 -> the day's last hinge/hip_ext on a legs day is regional fodder again",
+  "anchor": "if(role==='legs' && _postLeft<=1 && _isPostChain(it.name)) return;",
+  "replacement": "if(false&&role==='legs' && _postLeft<=1 && _isPostChain(it.name)) return;",
+  "gate": "gates/g199_deload_arbitration.js",
+  "note": "D170 legs-only floor line in capRegionalFatigue (after the protKey guard). Expected to trip g199 C1/C3/C5/I3 on 219 (coordinator); gatekeeper proves it."
+ },
+ {
+  "name": "S12-D160 durable -> the dedupe reads the previous day before d18LongRunDayPass strips it",
+  "anchor": "const inA=nameSet(_d18View(A, wA, dA));",
+  "replacement": "const inA=nameSet(A);",
+  "gate": "gates/g217_d160_dedupe_view.js",
+  "note": "D160 durable mutation, targets g217_d160_dedupe_view.js; gatekeeper proves the trip."
+ }
+]

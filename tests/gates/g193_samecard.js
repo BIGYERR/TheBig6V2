@@ -301,9 +301,12 @@ const SEEDS = [1013, 3039, 76308];
 // shared across days, so it needs its own before-picture before anything subtracts from it —
 // which is a slice of its own, not a rider on a slice with no ruling for it. REGISTERED
 // rather than fixed so that any growth in it fails this gate.
-const OPEN_UNRULED = {
-  'Kettlebell swing': 28,
-};
+// Keyed by ia-version (D133). V219 D166 (cf166c): when ex.cond[2] is the Main, Pull superset B prints the row
+// alone, so the swing class is a RULED 0 and any recurrence fails G3a by name. No other class SHRANK at step 7.
+const OPEN_UNRULED_BY_VERSION = { 218: { 'Kettlebell swing': 28 } };
+OPEN_UNRULED_BY_VERSION[219] = { 'Kettlebell swing': 0 };   // D166: ruled MOVE (28 -> 0)
+const OPEN_UNRULED = OPEN_UNRULED_BY_VERSION[(+IA.version <= 218) ? 218 : +IA.version];
+if (!OPEN_UNRULED) throw new Error('g193: no OPEN_UNRULED_BY_VERSION row for V' + IA.version + ': an unruled register (D133)');
 
 const dupByName = Object.create(null);   // name -> day-build count
 const dupPairs  = Object.create(null);   // 'labelA ++ labelB' -> count

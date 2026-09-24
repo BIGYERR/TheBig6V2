@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="218"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="219"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -6798,8 +6798,8 @@ function hotNextHingeClampSweep(weeks){
   Object.keys(weeks||{}).forEach(w=>{
     Object.keys(weeks[w]||{}).forEach(d=>{
       const day=weeks[w][d]; if(!day||!day.sections) return;
-      const _di=ALL_DAYS_ORDER.indexOf(d);
-      const _nw=_di===_last?(+w+1):+w, _ndk=ALL_DAYS_ORDER[(_di+1)%7];
+      const _di=_ISO_ORDER.indexOf(d);
+      const _nw=_di===_last?(+w+1):+w, _ndk=_ISO_ORDER[(_di+1)%7];
       const nx=weeks[_nw]&&weeks[_nw][_ndk];
       if(!(nx&&nx.cardio&&nx.cardio.legLoad)) return;
       day.sections.forEach(sec=>(sec.items||[]).forEach((it,ii)=>{
@@ -7275,8 +7275,8 @@ function _adjDayPairs(totalWeeks){
   // compared against week w+1's Sunday, never against week w's own Sunday.
   const out=[];
   for(let w=1;w<=totalWeeks;w++){
-    for(let i=1;i<ALL_DAYS_ORDER.length;i++) out.push([w,ALL_DAYS_ORDER[i-1],w,ALL_DAYS_ORDER[i]]);
-    if(w<totalWeeks) out.push([w,'sat',w+1,'sun']);
+    for(let i=1;i<_ISO_ORDER.length;i++) out.push([w,_ISO_ORDER[i-1],w,_ISO_ORDER[i],(w-1)*7+(i<6?i:0)]);
+    if(w<totalWeeks) out.push([w,'sun',w+1,'mon',(w-1)*7+6]);
   }
   return out;
 }
@@ -7341,7 +7341,7 @@ function deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks){
         // to swap to, but reaching outside the legal universe to avoid it is worse than both.
         if(!cands.length) return;
         const top=cands.slice(0,3);
-        const to=top[Math.floor(seededRand(seed+wB*97+pi*13+ii)*top.length)]||top[0];
+        const to=top[Math.floor(seededRand(seed+wB*97+(pair.length>4?pair[4]:pi)*13+ii)*top.length)]||top[0];
         const was=it.name;
         it.name=to;
         if(sec.label&&sec.label.indexOf(was)>=0) sec.label=sec.label.split(was).join(to);
@@ -8050,6 +8050,7 @@ function injuryPlan(cfg){
 // pattern and by name, swaps variants, appends the RPE 7 coach note to fixed-detail
 // accessories on capped patterns (wave lifts are clamped inside scheme() instead,
 // so their printed RPE is already correct and gets no note).
+function _injViewName(n,cfg){ if(!cfg||!cfg.injury) return n; const P=injuryPlan(cfg); if(!P||!P.swapNames||!P.swapNames[n]) return n; const g=_gearLens((cfg&&cfg.equipment)||'home_full'); if(!g(n)) return n; const to=P.swapNames[n]; const FB={'Cable pushdown':'Close-grip pushups'}; return g(to)?to:(FB[to]||to); }
 function applyInjuryFilter(sections,cfg){
   const P=injuryPlan(cfg);
   if(!P||!Array.isArray(sections)) return sections;
@@ -8795,7 +8796,7 @@ function engineC_kinematics(cfg, A, B){
     // and the accessories yield rather than the other way round.
     const backMain = _slot(_repFit(backCompoundPool),1,bs+2,['lower','upper'])[0];
     const squatSel = _slot(_repFit(squatPool),1,bs+6,'lower')[0];
-    const lungeSel = _slot(lungePool,2,bs+7,'lower');
+    let lungeSel = _slot(lungePool,2,bs+7,'lower'); if(lungeSel[0]===squatSel) lungeSel=pick(lungePool.filter(n=>n!==squatSel),2,bs+7);
     const hingeSel = _slot(hingePool,2,bs+8,'lower');
     const hipExtSel= hipExtPool.length?(_slot(hipExtPool,1,bs+15,'lower',true)[0]||null):null;
     const kneeStabSel=_slot(_bw(['Wall sit','Single-leg wall sit'],EXLIB.knee_stability),1,bs+9,'lower')[0];
@@ -9085,11 +9086,11 @@ function engineC_kinematics(cfg, A, B){
           _gear(isOlder?['Dumbbell incline press','Machine chest press','Dumbbell bench press','Dumbbell decline press']
                  :['Incline barbell press','Dumbbell bench press','Close-grip bench press','Dumbbell incline press'])
         ).filter(x=>x!==ex.chestMain);
-        const chestPool=chestPoolRaw.filter(x=>x!==ex.chestMain);
+        const chestPool=chestPoolRaw.filter(x=>x!==ex.chestMain&&_injViewName(x,cfg)!==_injViewName(ex.chestMain,cfg));
         const repA=isOlder?'12':'10', repB=isOlder?'15':'12';
         const hsets=cfg.experience==='advanced'?4:3;
         const secondary=pick(secondaryPool,1,blockSeed(w)+100)[0];
-        const chest2=pick(chestPool.filter(x=>x!==secondary),2,blockSeed(w)+101);
+        const chest2=pick(chestPool.filter(x=>x!==secondary&&_injViewName(x,cfg)!==_injViewName(secondary,cfg)),2,blockSeed(w)+101);
         const delts=pick(_bw(EXLIB.shoulder_iso_bw,_gear(EXLIB.shoulder_iso)),2,blockSeed(w)+102);
         const tris=pick(_bw(['Bench dips (chair)','Close-grip pushups','Diamond pushups'],_gear(EXLIB.triceps)),2,blockSeed(w)+103);
         // 1) Primary heavy compound (3–4 sets, prescribed weight)
@@ -9127,9 +9128,10 @@ function engineC_kinematics(cfg, A, B){
       // edit ever did empty this, the section is dropped rather than printed illegally.
       const _accFresh=function(prefs){
         const t=Object.create(null);
-        s.forEach(function(sec){((sec&&sec.items)||[]).forEach(function(it){if(it&&it.name)t[it.name]=1;});});
-        for(let i=0;i<prefs.length;i++){ if(prefs[i]&&!t[prefs[i]]) return prefs[i]; }
-        for(let i=0;i<chestAccPool.length;i++){ if(chestAccPool[i]&&!t[chestAccPool[i]]) return chestAccPool[i]; }
+        s.forEach(function(sec){((sec&&sec.items)||[]).forEach(function(it){if(it&&it.name){t[it.name]=1;t[_injViewName(it.name,cfg)]=1;}});});
+        const _fr=function(n){return n&&!t[n]&&!t[_injViewName(n,cfg)];};
+        for(let i=0;i<prefs.length;i++){ if(_fr(prefs[i])) return prefs[i]; }
+        for(let i=0;i<chestAccPool.length;i++){ if(_fr(chestAccPool[i])) return chestAccPool[i]; }
         return null;
       };
       s.push({label:'Main — '+ex.chestMain,items:[{name:ex.chestMain,detail:det},{name:ex.shoulder[0],detail:vsets(3)+'×8'+(_isOneArmPress(ex.shoulder[0])?' each':'')}]});
@@ -9176,7 +9178,7 @@ function engineC_kinematics(cfg, A, B){
       } else {
         s.push({label:'Pull superset B',superset:true,rounds:vsets(3),items:[
           ...(ex.backRow[1]?[{name:ex.backRow[1],detail:vsets(3)+'×10'+(_isUnilateralRow(ex.backRow[1])?' each':'')}]:[]),
-          {name:ex.cond[2],detail:vsets(3)+'×10'}]});
+          ...(ex.cond[2]===ex.backMain?[]:[{name:ex.cond[2],detail:vsets(3)+'×10'}])]});
       }
       if(denseHypertrophy){
         // Direct biceps — compounds alone under-stimulate arms for growth.
@@ -9190,9 +9192,10 @@ function engineC_kinematics(cfg, A, B){
         // pick(...,2) so the superset can never print the same movement twice.
         const _bicPool=_bw(['Chinups','Inverted row (supinated, under a table)'],bicepsAccPool);
         const bis=pick(_bicPool,2,blockSeed(w)+104);
+        if(bis[1]&&_injViewName(bis[1],cfg)===_injViewName(bis[0],cfg)){ const _alt=_bicPool.filter(n=>n!==bis[0]&&_injViewName(n,cfg)!==_injViewName(bis[0],cfg)); if(_alt.length) bis[1]=pick(_alt,1,blockSeed(w)+104)[0]; }
         // V164 station rule: self-pair walk over the full pool (Cable curl + Preacher
         // curl was the live banned pair — STACK×BENCH, two stations for one superset).
-        const _sp=_ssPair(bis[0],bis[1],_bicPool,_bicPool);
+        const _sp=_ssPair(bis[0],bis[1],_bicPool,_bicPool.filter(n=>_injViewName(n,cfg)!==_injViewName(bis[0],cfg)));
         s.push({label:'Biceps',superset:_sp.ok,rounds:hsets,items:[{name:_sp.a,detail:hsets+'×'+repB},{name:_sp.b,detail:hsets+'×'+repB}]});
       }
     } else if(role==='legs'){
@@ -9284,7 +9287,7 @@ function engineC_kinematics(cfg, A, B){
         // ACCESSORY position (ex.kneeStab at 8179/8256/8270/8273). The finisher position
         // is 30 sec and this is not the finisher. No new constant, no new predicate.
         const _laDose=n=>hsets+'×'+(_auxFamily(n)==='hold'?'25 sec':repB);
-        const legIso=pick(_laLeft.length>=2?_laLeft:_laGear,2,blockSeed(w)+105);
+        const legIso=pick(_laLeft.length>=2?_laLeft:(_laLeft.length?_laLeft:_laGear),2,blockSeed(w)+105);
         // Room Only owns no dumbbells, and neither _gearOK clause blocks a DB name, so the
         // pool has to divert here rather than be filtered. Single-leg off a step is the only
         // bodyweight calf variant that is actually a stimulus.
@@ -10733,6 +10736,7 @@ function capRegionalFatigue(sections, role, cardio, goal){
         if(r===region && pat) patCount[pat]=(patCount[pat]||0)+1;
       });
     });
+    const _postLeft=out.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+(_isPostChain(it&&it.name)?1:0),0),0);
     // Every trimmable item in the region: rank>0, has a pattern, not the protected compound.
     const cands=[];
     out.forEach((s,si)=>{
@@ -10743,6 +10747,7 @@ function capRegionalFatigue(sections, role, cardio, goal){
         const pat=_pattern(it.name);
         if(r!==region || !pat || rk===0) return; // off-region / holds / the main lift itself
         if(si*100+ii===protKey) return;          // the protected heaviest compound
+        if(role==='legs' && _postLeft<=1 && _isPostChain(it.name)) return;   // cf170: the day's LAST hinge/hip_ext is not regional fodder (cf170b: legs role only)
         cands.push({si,ii,rk,sat:patCount[pat]||1,pos:si*100+ii});
       });
     });
@@ -10820,8 +10825,8 @@ function engineD_synthesis(cfg, A, B, plan, C){
       // governed by the same load manager as a healthy one.
       // V153 (F2): tomorrow's cardio decides the hinge clamp. Saturday reads next week's
       // Sunday; the final Saturday reads nothing and stays unclamped (post-block, no run).
-      const _di=ALL_DAYS_ORDER.indexOf(d);
-      const _nw=_di===ALL_DAYS_ORDER.length-1?w+1:w, _ndk=ALL_DAYS_ORDER[(_di+1)%7];
+      const _di=_ISO_ORDER.indexOf(d);
+      const _nw=_di===_ISO_ORDER.length-1?w+1:w, _ndk=_ISO_ORDER[(_di+1)%7];
       const _nc=cardioSchedule[_nw]?.[_ndk]||null;
       const hotNext=!!(_nc&&_nc.legLoad);
       weeks[w][d]={title,dot:cardio?cardio.type:'lift',tags,cardio,sections:capRegionalFatigue((_s=>isRecoveryWeek(w)?recoveryDeload(_s,cardio):_s)(applyInjuryFilter(buildSections(role,w,{fullVariant,wantCarry:d===carryHost,cardio,hotNext}),cfg)),role,cardio,goal)};

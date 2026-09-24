@@ -155,6 +155,9 @@ DELOAD_HINGE_BY_VERSION[217] = DELOAD_HINGE_BY_VERSION[216];   // D160: ruled UN
 DELOAD_ARB_BY_VERSION[218] = DELOAD_ARB_BY_VERSION[217];   // D157: ruled UNMOVED (C1 364 C3 364 C5 32 D2 19 I3 496 printed; swim sizer length and labels, no lift section touched)
 E6_BY_VERSION[218] = E6_BY_VERSION[217];   // D157: ruled UNMOVED (28 printed)
 DELOAD_HINGE_BY_VERSION[218] = DELOAD_HINGE_BY_VERSION[217];   // D157: ruled UNMOVED (E1a 12384 E1b 9319 E3 44 G1 1290 G5 44 printed)
+DELOAD_ARB_BY_VERSION[219] = { capLSBkilled: 18, zeroWeeks: 264, zeroWeeksNonDeload: 264, zeroWeeksDeloadOff: 0, dlIdentical: 19 };   // D170 (cf170b): ruled MOVE. capRegionalFatigue no longer trims a legs day's last hinge or hip extension, so C1 364 -> 264, C3 364 -> 264, C5 32 -> 0 and I3 496 -> 18 (Leg superset B killed). D2 19 printed unmoved
+E6_BY_VERSION[219] = E6_BY_VERSION[218];   // V219: ruled UNMOVED (28 printed at step 7)
+DELOAD_HINGE_BY_VERSION[219] = { E1b: 9319, E3: 44, G5: {'Explosive finisher': 44}, E1a: 12369, G1: 1275 };   // D159 (cfA): ruled MOVE. E1a 12,384 -> 12,369 and G1 1,290 -> 1,275: all 15 of 15 are the duplicate Leg isolation Single-leg glute bridge beside the same Main, which now leaves before the deload; the shipped deload card is byte-identical (/tmp/v219_fu_g199.txt). E1b 9319, E3 44, G5 44 printed unmoved
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[
