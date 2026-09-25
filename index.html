@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="220"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="221"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -662,6 +662,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .wk-presc-name{font-size:15px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .wk-presc-det{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--accent);white-space:nowrap;flex-shrink:0;}
 .wk-hero-cta-wrap{padding:14px 16px 18px;}
+/* V221 (D179): the hero's status line on a closed out day, quiet text above the CTA. */
+.wk-hero-status{padding:14px 20px 0;font-size:13px;line-height:1.5;color:var(--muted);}
 .wk-hero-cta{background:var(--signal);border-radius:4px;text-align:center;padding:15px;font-family:var(--font-display);font-size:16px;font-weight:700;letter-spacing:0.1em;color:var(--on-signal);cursor:pointer;border:none;width:100%;}
 .wk-hero-cta:active{filter:brightness(0.92);}
 /* rest-day hero + tip */
@@ -1327,7 +1329,7 @@ function snapshotDay(week,dayKey){
 // ── REST-DAY SHEET ───────────────────────────────────────────────────────────
 const _restDraft={w:null,day:null,view:'menu',pick:null,type:null,mins:30,dist:'',rpe:5};
 function openRestSheet(w,dayKey,view){
-  if(!activeProg){showToast('Open a program first');return;}
+  if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}
   if(!restDayEligible(w,dayKey)){showToast('That rest day has not come around yet');return;}
   _restDraft.w=w; _restDraft.day=dayKey; _restDraft.view=view||'menu'; _restDraft.pick=null;
   const types=(activeProg.cfg&&activeProg.cfg.cardioTypes)||[];
@@ -1551,7 +1553,7 @@ function updateTabBar(id){
 function tabGo(target){
   if(target==='screenHome'){showScreen('screenHome');renderProgList();return;}
   if(target==='screenBugs'){showScreen('screenBugs');return;}
-  if(!activeProg){showToast('Open or build a program first');return;}
+  if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}
   if(target==='screenWeek'){showScreen('screenWeek');renderWeekView();return;}
   if(target==='screenProgress'){showProgressScreen();return;}
 }
@@ -3019,7 +3021,7 @@ function renderWizardStep() {
     const internalGoal = LIFTING_FOCUS_TO_GOAL[WD.liftingFocus] || WD.liftingFocus;
     const liftLabel = ({strength:'Strength',hypertrophy:'Size',fatloss:'Fat Loss',balanced:'Balanced',support_strength:'Strength Support',support_athletic:'Athletic Support',support_prevention:'Injury Prevention'})[WD.liftingFocus]||WD.liftingFocus;
     const cardioSummary = WD.cardioTypes.length
-      ? WD.cardioTypes.map(t => asyIcon(({run:'🏃',bike:'🚴',swim:'🏊'})[t],15)+' '+({run:'Run',bike:'Bike',swim:'Swim'})[t] + (WD.cardioGoals[t]?.label?' — '+WD.cardioGoals[t].label:'')).join(' + ')
+      ? WD.cardioTypes.map(t => asyIcon(({run:'🏃',bike:'🚴',swim:'🏊'})[t],15)+' '+({run:'Run',bike:'Bike',swim:'Swim'})[t] + (WD.cardioGoals[t]?.label?': '+WD.cardioGoals[t].label:'')).join(' + ')
       : 'Lift only';
     const trainDays = ALL_DAYS_ORDER.filter(d => !WD.restDays.includes(d));
     const _nameGoalsExp={...WD.cardioGoals,_experience:WD.experience,_ageBracket:WD.ageBracket,_eventTargeted:WD.eventTargeted};
@@ -7558,7 +7560,10 @@ function doGenerate(){
     // and can't get permanently stuck the way ia_rt_seen / ia_rt_intro2 did.
     _rtIntroPending=(programs.length===0);
     programs.push(prog);savePrograms(programs);
-    setActiveProgId(prog.id);activeProgId=prog.id;activeProg=prog;
+    // V221 D178: the wizard commits through the loader; the program is stored on the line
+    // above, so the loader reads it. The wizard still lands on week 1: calcCurrentWeek() is
+    // later than 1 for a back-dated start (race-aligned NRC), and the landing does not move.
+    loadActiveProgram(prog.id);
     currentWeek=1;
     // Update generate screen to show actual week count
     document.getElementById('generateSub').textContent='Your '+prog.totalWeeks+'-week program is ready!';
@@ -9874,7 +9879,9 @@ const _REP_FLOOR=[
   [/straight-arm pulldown/i,                        [8,12]],  // isolation on a stack
   [/kettlebell swing|\bswing\b/i,                   [10,15]], // ballistic — a triple is not a swing
   [/hip thrust/i,                                    [6,10]], // lockout-limited; triples fail into lumbar extension
-  [/split squat|step-?up|single-leg|single leg|pistol/i, [6,10]], // balance caps expressible load
+  [/split squat|step-?up|single-leg|single leg|pistol|landmine (reverse lunge|rotational press)/i, [6,10]], // balance caps expressible load
+  // V221 D177 (RR2, RR4): the two loaded landmine lifts, by name. Not a bare `landmine` token:
+  // Landmine rotations is core and has no load window. A future landmine lift is added here on entry.
   [/\brow\b/i,                                       [6,10]], // DB / KB single-arm row — position-limited
   [/dumbbell|kettlebell|\bdb\b|\bkb\b/i,             [5,8]],  // generic loaded non-barbell
   [/leg press|hack squat|machine|pulldown/i,         [5,8]],  // loads fine, but no reason to triple a machine
@@ -10079,9 +10086,30 @@ function swapLoadNote(outName,candName){
 // the same conversion bodyweightSweep runs, reached from the swap sheet instead of from
 // the config. (V119. §12 records the general case: 58.7% of unloadable-movement
 // prescriptions still arrive from generation with a fixed rep target on every other tier.)
-function _swapDetailFor(name,detail){
+function _swapDetailFor(name,detail,out){
   if(!name||!detail) return detail;
   const fl=(typeof _repFloor==='function')?_repFloor(name):null;
+  // V221 D177 (R1, R2). A swapped Main is prescribed the way the engine would have
+  // prescribed the candidate in that slot: scheme()'s floor branch, on the wave Main
+  // grammar and nothing else. The detail must start `S×R — RPE ` with R a number or a
+  // lo–hi range, and the low end is compared exactly as scheme() compares it. Under the
+  // window's low end the rep token becomes the window; sets, RPE, note, ramp-up and rest
+  // carry byte for byte. At or above it the donor carries verbatim. The null row never
+  // gets here with a window, so barbell compounds carry verbatim too.
+  // This sits BEFORE the _BW_KEEP_FIXED test on purpose: that regex holds `rotational`,
+  // which would shut out Landmine rotational press, a loaded lift the unilateral row windows.
+  // `out` is optional. A caller that passes one learns the window fired (the swap toast).
+  if(fl&&fl[1]!==0){
+    const m=/^(\d+×)(\d+(?:–\d+)?)( — RPE )/.exec(detail);
+    if(m){
+      const lo=parseInt(m[2],10);
+      if(!(lo>=fl[0])){
+        if(out) out.win=[fl[0],fl[1]];
+        return m[1]+fl[0]+'–'+fl[1]+detail.slice(m[1].length+m[2].length);
+      }
+    }
+    return detail;
+  }
   if(!(fl&&fl[1]===0)) return detail;                 // movement can express a rep target
   if(_BW_KEEP_FIXED.test(name)) return detail;        // holds, plyos, carries, core
   // TWO SYSTEMS HAVE TO AGREE. _repFloor's unloadable clause is a broad regex
@@ -10208,10 +10236,17 @@ function pruneDayEdits(pid,cutWeek){
 function swapStoreKey(pid){return 'ia_swaps_'+pid;}
 function getSwaps(pid){try{return JSON.parse(localStorage.getItem(swapStoreKey(pid))||'{}');}catch(e){return {};}}
 function saveSwaps(pid,v){try{localStorage.setItem(swapStoreKey(pid),JSON.stringify(v));}catch(e){}}
-function recordSwap(pid,week,dayKey,from,to){
+function recordSwap(pid,week,dayKey,from,to,rx){
   const s=getSwaps(pid),k='w'+week+'_'+dayKey;
+  // V221 D177 (R4). `rx` is optional: [{s,i,d}], section index, item index and detail of
+  // every item named `from` before the rename. It is for undoSwap and nothing else; every
+  // other reader takes .from/.to only, and a record without it is read exactly as before.
+  // Re-tapping the same pair on the same day keeps the earlier tap's items it did not see.
+  const was=(s[k]||[]).filter(e=>e&&e.from===from&&e.to===to&&Array.isArray(e.rx))[0];
   const list=(s[k]||[]).filter(e=>e&&e.from!==from);
-  list.push({from:from,to:to,ts:Date.now()});
+  const ent={from:from,to:to,ts:Date.now()};
+  if(Array.isArray(rx)&&rx.length) ent.rx=(was?was.rx.filter(p=>!rx.some(q=>q.s===p.s&&q.i===p.i)):[]).concat(rx);
+  list.push(ent);
   s[k]=list; saveSwaps(pid,s); return s;
 }
 function clearSwap(pid,week,dayKey,from){
@@ -11977,6 +12012,7 @@ function renderWeekView(){
     let center=dnum;
     if(st==='complete'||st==='partial') center='<span class="chk">\u2713</span>';   // V181 (D1): legacy partial reads as done
     else if(wildcardOn(currentWeek,d)) center=wildcardMarkHTML(14);                  // V195 (D64): a Wildcard is marked, never checked
+    else if(st==='skipped') center='✕';   // V221 (D179): a skipped day is marked, bare glyph in the cell's own number colour; a Wildcard outranks it (D71b)
     const dimCls=(!isToday&&(isPast||!day||day.rest))?' dim':'';
     const code=dayCode(day);
     const dim=dimCls!=='';
@@ -12039,7 +12075,10 @@ function renderWeekView(){
     }).join('');
     const summ=heroSummary(day);
     const est=sessionTimeEst(day);
-    const cta=heroMode==='today'?'START SESSION':'OPEN SESSION';
+    // V221 (D179): a day with a status is closed out. The hero says so in one line and its CTA
+    // takes the open label (undo lives in the day's footer); a pending today keeps the start label.
+    const _heroSt=({complete:'Done ✓ Closed out. Open the session to undo.',skipped:'Skipped ✕ The week moves on. Open the session to undo.'})[statusOf(currentWeek,heroKey)]||'';
+    const cta=(heroMode==='today'&&!_heroSt)?'START SESSION':'OPEN SESSION';
     hero='<div class="wk-hero'+(heroMode==='today'?' is-today':'')+'">'
       +'<div class="wk-hero-pad">'
         +'<div class="wk-hero-over">'+over+'</div>'
@@ -12047,6 +12086,7 @@ function renderWeekView(){
         +'<div class="wk-hero-tags"><span class="wk-tag wk-time">~'+est+' MIN</span>'+tags+travelTagHTML(day)+'</div>'
       +'</div>'
       +(summ?'<div class="wk-hero-summary">'+summ+'</div>':'')
+      +(_heroSt?'<div class="wk-hero-status">'+_heroSt+'</div>':'')
       +'<div class="wk-hero-cta-wrap"><button class="wk-hero-cta" onclick="openDayKey(\''+heroKey+'\')">'+cta+'</button></div>'
       +'</div>';
   } else {
@@ -13513,6 +13553,16 @@ function _iawCommit(w){
   h.value=next;
   h.dispatchEvent(new Event('input',{bubbles:true}));
 }
+// V221 (D179): a status-setting tap closes the day. A wheel still coasting inside its 90 ms
+// settle window has not written its hidden node yet, so every PENDING settle runs now,
+// before persistLogFields reads the nodes, and its timer is cleared so nothing commits once
+// the overlay is gone. A live _iawT means scrolled and not yet committed (the settle clears
+// it); an untouched or already settled wheel is left alone and never writes.
+function iaWheelFlush(root){
+  var cols=(root||document).querySelectorAll('.iaw-col');
+  for(var i=0;i<cols.length;i++){ var c=cols[i];
+    if(c._iawT&&c._iawSettle){ clearTimeout(c._iawT); c._iawSettle(); } }
+}
 // Idempotent: safe to call after any re-render. Seeds each column from the hidden
 // input's current value and paints the selected row without committing.
 function iaWheelInit(root){
@@ -13526,10 +13576,12 @@ function iaWheelInit(root){
     var cols=w.querySelectorAll('.iaw-col');
     for(var i=0;i<cols.length;i++){ (function(col,ci){
       var raf=0;
+      // V221 (D179): the settle is a named step so iaWheelFlush can run a pending one early.
+      col._iawSettle=function(){ col._iawT=0; _iawRecenter(col); _iawShape(col); _iawCommit(w); };
       col.addEventListener('scroll',function(){
         if(!raf) raf=(window.requestAnimationFrame||setTimeout)(function(){ raf=0; _iawShape(col); });
         clearTimeout(col._iawT);
-        col._iawT=setTimeout(function(){ _iawRecenter(col); _iawShape(col); _iawCommit(w); },90);
+        col._iawT=setTimeout(col._iawSettle,90);
       },{passive:true});
       // Seed into the MIDDLE copy so there is runway in both directions before the
       // first recentre; on a non-wrapping column _iawHome is 0 and this is unchanged.
@@ -14167,18 +14219,32 @@ function applySwapChoice(to){
   // re-prescription pass to run and no chance of a stale percentage following the swap.
   // The ONE exception is a swap onto a movement with no load to move, where a rep target
   // is a guess rather than an instruction; _swapDetailFor converts those and only those.
+  // V221 D177 (R1): the second is a wave Main whose reps sit under the candidate's load
+  // window; _swapDetailFor raises the rep token to the window and reports it in _rx.win.
+  // V221 D177 (R4): the donor's own prescription, by position, taken before anything is
+  // renamed. Every item named `from` is kept, because undo is name keyed and the reboot
+  // path renames them all. undoSwap writes these back; nothing replays them on a build.
+  const _undoRx=[];
+  (day.sections||[]).forEach(function(s,si){((s&&s.items)||[]).forEach(function(it,ii){
+    if(it&&it.name===from&&typeof it.detail==='string') _undoRx.push({s:si,i:ii,d:it.detail});
+  });});
   item.name=to;
   const _wasDetail=item.detail;
-  item.detail=_swapDetailFor(to,item.detail);
+  const _rx={};
+  item.detail=_swapDetailFor(to,item.detail,_rx);
   const _reRx=(item.detail!==_wasDetail);
   if(sec.label&&sec.label.indexOf(from)>=0) sec.label=sec.label.split(from).join(to);
-  recordSwap(activeProgId,currentWeek,currentDayKey,from,to);
+  recordSwap(activeProgId,currentWeek,currentDayKey,from,to,_undoRx);
   const nudge=bumpSwapCount(activeProgId,from,to);
   closeSwapSheet();
   openDetail(currentDayKey,day);
   // "Same numbers" is a promise the app has to keep. When the reps came off because the
   // movement cannot express them, say so instead.
-  showToast(_reRx
+  // V221 D177 (R5): the third branch fires only when the window branch moved the reps.
+  // Never on the unloadable branch, which keeps its V119 copy, never on a verbatim pair.
+  showToast(_rx.win
+    ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Same sets, same effort. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'.'
+    : _reRx
     ? to+' in, '+from.toLowerCase()+' out. No load to add here, so take the sets to the same effort.'
     : to+' in, '+from.toLowerCase()+' out. Same job, same numbers.');
   if(nudge) setTimeout(()=>showSwapNudge(from,to),1400);
@@ -14304,6 +14370,21 @@ function undoSwap(from){
   if(!hit) return;
   const back={}; back[hit.to]=from;
   applySwapPrefs(day.sections,back);
+  // V221 D177 (R4): the name is back; now the donor's own detail. Each stored detail goes
+  // to the item at its stored position if that item carries `from` again, else to the
+  // first `from` item not yet written. A record from before V221 has no rx, so the name
+  // alone comes back, exactly as before. No migration.
+  if(Array.isArray(hit.rx)){
+    const _put=[];
+    hit.rx.forEach(function(p){
+      if(!p||typeof p.d!=='string') return;
+      const ps=day.sections[p.s], at=ps&&ps.items&&ps.items[p.i];
+      let it=(at&&at.name===from&&_put.indexOf(at)<0)?at:null;
+      if(!it) (day.sections||[]).some(function(s){return ((s&&s.items)||[]).some(function(x){
+        if(x&&x.name===from&&_put.indexOf(x)<0){it=x;return true;} return false;});});
+      if(it){it.detail=p.d;_put.push(it);}
+    });
+  }
   clearSwap(activeProgId,currentWeek,currentDayKey,from);
   openDetail(currentDayKey,day);
   showToast(from+' is back on the card.');
@@ -14367,6 +14448,10 @@ function markDayComplete(wk,dayKey,title){
 // block-end banner. Legacy `partial` records (pre-V181) read as complete everywhere.
 function handleDayStatus(dayKey,title,status){
   snapshotDay(currentWeek,dayKey);
+  // V221 (D179): a status-setting tap closes the day, so a run wheel still settling commits
+  // first; the saved log at the moment of close is the log. statusOf===status is the undo
+  // tap (wasSame below), which stays on the day and keeps the wheel's own settle.
+  if(statusOf(currentWeek,dayKey)!==status) iaWheelFlush(document.getElementById('detailOverlay'));
   persistLogFields(dayKey);
   const c=getCompleted();const k=completedKey(currentWeek,dayKey);
   const wasSame=!!c[k]&&statusOf(currentWeek,dayKey)===status;
@@ -14384,9 +14469,16 @@ function handleDayStatus(dayKey,title,status){
   c[k]={title:title||null,ts:Date.now(),status};
   saveCompleted(c);renderWeekView();
   renderStatusFoot(dayKey,title);
-  const labels={complete:'Done ✓',skipped:'Skipped ✕ — the week moves on'};
-  showToast(labels[status]||'Updated ✓');
+  const labels={complete:'Done ✓',skipped:'Skipped ✕ The week moves on'};
+  // V221 (D179): setting a status closes the session. The rest clock stops and zeroes (‹ Back
+  // and tab moves are navigation and keep it running, see ruResetIfIdle); the overlay closes
+  // through ‹ Back's own exit, so the day lands on This Week; the pop-up sits over the week.
+  // The toast prints only when no pop-up covers it: Done always raises one and prints none,
+  // Skip raises none and keeps its toast.
+  ruReset();
+  closeDetail();
   if(status==='complete') fireCompletionPopup(currentWeek,dayKey);
+  if(!document.getElementById('popOverlay').classList.contains('show')) showToast(labels[status]||'Updated ✓');
 }
 // The footer is rebuilt wholesale on every status change: the primary button always
 // carries the CURRENT state (and toggles it off), the small button beneath is always
@@ -14974,8 +15066,7 @@ function _progActionsHTML(p,isActive){
     </div>`;
   }
   return `<div class="prog-card-actions">
-        <button class="prog-action-btn primary" onclick="openProg('${p.id}')">Open</button>
-        ${!isActive?`<button class="prog-action-btn" onclick="setActive('${p.id}')">Set Active</button>`:'<button class="prog-action-btn" style="opacity:0.4;cursor:default">Active \u2713</button>'}
+        ${!isActive?`<button class="prog-action-btn primary" onclick="setActive('${p.id}')">Set Active</button>`:'<button class="prog-action-btn" style="opacity:0.4;cursor:default">Active \u2713</button>'}
         <button class="prog-action-btn danger" onclick="askArchive('${p.id}')">Archive</button>
       </div>`;
 }
@@ -14993,7 +15084,7 @@ function renderProgList(){
     const isActive=p.id===getActiveProgId();
     const _cts=p.cfg?.cardioTypes||[];
     const cardioSummary=_cts.length
-      ? _cts.map(t=>asyIcon(({run:'🏃',bike:'🚴',swim:'🏊'})[t],13)+(p.cfg?.cardioGoals?.[t]?.label?' — '+p.cfg.cardioGoals[t].label:'')).join(' + ')
+      ? _cts.map(t=>asyIcon(({run:'🏃',bike:'🚴',swim:'🏊'})[t],13)+(p.cfg?.cardioGoals?.[t]?.label?' '+p.cfg.cardioGoals[t].label:'')).join(' + ')
       : 'Lift only';
     const goals='';
     const trainDays=(p.cfg?.days||[]).filter(d=>!(p.cfg?.restDays||[]).includes(d));
@@ -15312,7 +15403,7 @@ function _isoToday(){const d=new Date();return d.getFullYear()+'-'+String(d.getM
 function _addDaysIso(iso,n){const d=_parseLocalDate(iso)||new Date();d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function _fmtDate(iso){return iso?new Date(iso+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Set date';}
 function openOverlaySheet(){
-  if(!activeProg){showToast('Open a program first');return;}
+  if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}
   _ovDraft.type='substitute';
   _ovDraft.tab='travel';
   _ovDraft.from=_ovDraft.from||_isoToday();
@@ -15326,7 +15417,7 @@ function openOverlaySheet(){
 // and a permanently visible button is more discoverable than a tab nobody opens the
 // sheet to find. If an injury is already live, this jumps straight to managing it.
 function openInjurySheet(){
-  if(!activeProg){showToast('Open a program first');return;}
+  if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}
   const live=_liveInjuryOverlay();
   if(live){ _ovDraft.injRegion=live.patch.injury.region; _ovDraft.injTier=live.patch.injury.tier; }
   else { _ovDraft.injRegion=null; _ovDraft.injTier='workaround'; }
@@ -15469,7 +15560,7 @@ function _renderInjuryTab(){
     +(R?'<button class="ov-apply" onclick="applyInjuryDraft()">Apply change</button>':'');
 }
 function applyInjuryDraft(){
-  if(!activeProg){showToast('Open a program first');return;}
+  if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}
   const R=_ovDraft.injRegion, T=_ovDraft.injTier||'workaround';
   if(!R||!INJURY_REGIONS[R]){showToast('Pick a region');return;}
   const from=_ovDraft.from||_isoToday();
@@ -15579,7 +15670,7 @@ function _saveOverlays(){
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
 }
 function applyOverlayDraft(){
-  if(!activeProg){showToast('Open a program first');return;}
+  if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}
   // Guard: a full-gym trip creates nothing (see renderOverlaySheet). Reachable only if the
   // button is somehow triggered for that tier, so just dismiss rather than save a no-op.
   if(_ovDraft.equipment==='commercial'){ closeOverlaySheet(); return; }
@@ -15642,6 +15733,8 @@ function refreshProgram(prog){
     rebuilt.name = prog.name;
     rebuilt.created = prog.created;
     rebuilt.startDate = prog.startDate;
+    // D180 (V221): blockOpen is where the block opened (D14a §2); a rebuild keeps pre-signup days outside.
+    rebuilt.blockOpen = prog.blockOpen;
     rebuilt.seed = prog.seed;
     rebuilt.overlays = Array.isArray(prog.overlays) ? prog.overlays : [];
 
@@ -15857,8 +15950,17 @@ function refreshProgram(prog){
     return prog;
   }
 }
-function openProg(id){const programs=getPrograms();const stored=programs.find(p=>p.id===id);if(!stored)return;activeProgId=id;activeProg=refreshProgram(stored);currentWeek=calcCurrentWeek();showScreen('screenWeek');renderWeekView();}
-function setActive(id){const _p=getPrograms().find(x=>x.id===id);if(_p&&_p.archived){showToast('Restore this program first');return;}setActiveProgId(id);renderProgList();showToast('Active program updated');}
+// V221 D178: the one loader. Every switch of the active program writes ia_active and the
+// three globals together, so ia_active === activeProgId === activeProg.id holds after it.
+// Archived never loads (restore first); an unknown id is refused. It does not render or
+// navigate; callers do. currentWeek is computed as boot computes it.
+// S4: loadActiveProgram(null) is the one clear (ia_active removed, both globals null, week 1,
+// no day). It is checked before the lookup, so the archived and unknown refusals cannot fire
+// on it. beforeRefresh, when given, runs once the globals name the new id and before
+// refreshProgram (boot passes its ex-weight alias fold there, the order boot always had).
+function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');activeProgId=null;activeProg=null;currentDayKey=null;currentWeek=1;return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);activeProgId=id;if(beforeRefresh)beforeRefresh();activeProg=refreshProgram(stored);currentWeek=calcCurrentWeek();currentDayKey=null;return true;}
+// V221 D178: Set Active is the one switch; a switch is complete when This Week shows the new block.
+function setActive(id){if(!loadActiveProgram(id))return;renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
 function startRename(id){editProgId=id;renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
 function cancelRename(){editProgId=null;renderProgList();}
 function commitRename(id){
@@ -15884,8 +15986,11 @@ function purgeProgData(id){['ia_logs_','ia_comp_','ia_hist_','ia_wild_','ia_exw_
 function _handoffActiveFrom(id,programs){
   if(getActiveProgId()===id||activeProgId===id){
     const nx=programs.find(p=>p.id!==id&&!p.archived);
-    if(nx){setActiveProgId(nx.id);activeProgId=nx.id;activeProg=refreshProgram(nx);currentWeek=calcCurrentWeek();currentDayKey=null;}
-    else{localStorage.removeItem('ia_active');activeProgId=null;activeProg=null;currentDayKey=null;currentWeek=1;}
+    // V221 D178: both arms switch through the loader. Next program: the loader sets
+    // currentWeek=calcCurrentWeek() and currentDayKey=null, the values this arm set. None left:
+    // the loader's null clear removes ia_active and nulls activeProgId and activeProg.
+    if(nx)loadActiveProgram(nx.id);
+    else loadActiveProgram(null);
   }
 }
 function archiveProg(id){
@@ -15908,8 +16013,10 @@ function cancelConfirm(){confirmProgId=null;confirmTier=0;renderProgList();}
 // behaviour is byte-identical to V168.
 function deleteProg(id,fromProgress){
   let programs=getPrograms();
-  _handoffActiveFrom(id,programs);
+  // V221 D178: save before the handoff (archiveProg's order). The loader persists the next
+  // program's backfill; saving the stale array after it would overwrite that write.
   programs=programs.filter(p=>p.id!==id);savePrograms(programs);
+  _handoffActiveFrom(id,programs);
   purgeProgData(id);
   confirmProgId=null;confirmTier=0;
   if(progressViewId===id)progressViewId=null;
@@ -17537,7 +17644,13 @@ function init(){
   const _bv=document.getElementById('bugVersion'); if(_bv) _bv.textContent='BUILD v'+IA_VERSION;
   renderProgList();
   const aid=getActiveProgId();const programs=getPrograms();
-  if(aid&&programs.length){const stored=programs.find(p=>p.id===aid&&!p.archived)||programs.find(p=>!p.archived);if(stored){activeProgId=stored.id;try{const _x=getExWeights();if(foldExAliasKeys(_x))saveExWeights(_x);}catch(e){}activeProg=refreshProgram(stored);currentWeek=calcCurrentWeek();showScreen('screenWeek');renderWeekView();setTimeout(maybeShowReminder,600);return;}}
+  // V221 D178: boot switches through the loader, so a fallback pick is written back to ia_active.
+  // The alias fold rides in as the loader's pre-refresh step: after activeProgId, before refreshProgram.
+  if(aid&&programs.length){const stored=programs.find(p=>p.id===aid&&!p.archived)||programs.find(p=>!p.archived);if(stored&&loadActiveProgram(stored.id,()=>{try{const _x=getExWeights();if(foldExAliasKeys(_x))saveExWeights(_x);}catch(e){}})){showScreen('screenWeek');renderWeekView();setTimeout(maybeShowReminder,600);return;}}
+  // V221 D178: a pointer that resolved to nothing loadable (every program archived, or none
+  // stored) is cleared through the loader before Home, so ia_active never names a program that
+  // is not loaded. No pointer at all: this line is skipped and nothing is written, as before.
+  if(aid)loadActiveProgram(null);
   showScreen('screenHome');
 }
 /* ===== REINFORCEMENT POPUPS ===== */

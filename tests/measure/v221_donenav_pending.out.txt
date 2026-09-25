@@ -1,0 +1,239 @@
+########## v221_donenav_pending.js on V220 (HEAD 8ee4385), prev=V219
+artifact /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/e027169a-4735-433b-869c-f16dba0d4f36/scratchpad/m_done/v220.html ia-version 220
+
+== STRINGS (source, both artifacts) ==
+  Done \u2713 <small>tap to undo</small>: now count=1 lines 14405 | prev count=1
+  Skipped \u2715 <small>tap to undo</small>: now count=1 lines 14400 | prev count=1
+  Mark Done \u2713</button>: now count=1 lines 13944 | prev count=1
+  'START SESSION': now count=1 lines 12042 | prev count=1
+  'OPEN SESSION': now count=1 lines 12042 | prev count=1
+  showToast labels complete: now count=1 lines 14387 | prev count=1
+  log-nudge line now: html+='<div class="log-nudge"><span>'+asyIcon('notebook',14)+' You logged this one but never marked it.</span><button class="log-nudge-btn" onclick="handleDayStatus(\''+dayKey+'\',\''+escTitle+'\',\'complete\')">Mark Done \u2713</button></d
+
+== (a) STRIP CELL + TODAY HERO after status tap then closeDetail() ==
+lattice: fixtures=1 (HALF_MANNY) cases=224 crash=0 | hero in "Today" mode: 224/224
+  today/complete cell.class: {"wk-day today":56}
+  today/complete cell.center: {"<span class=\"chk\">✓</span>":56}
+  today/complete hero.over: {"Today · <day>":56}
+  today/complete hero.cta: {"START SESSION":56}
+  today/complete hero.statusWord: {"false":56}
+  today/complete hero.cls: {"wk-hero is-today":56}
+  today/complete heroKey==tapped day?: {"true":56}
+  today/complete DONE tile: {"# /# DONE":56}
+  today/skipped cell.class: {"wk-day today":56}
+  today/skipped cell.center: {"1":2,"2":1,"3":3,"4":1,"5":2,"6":2,"7":1,"8":2,"9":1,"10":3,"11":1,"12":2,"13":2,"14":1,"15":2,"16":1,"17":3,"18":1,"19":2,"20":2,"21":1,"22":3,"23":1,"24":4,"25":1,"26":3,"27":3,"28":1,"29":2,"30":1,"31":1}
+  today/skipped hero.over: {"Today · <day>":56}
+  today/skipped hero.cta: {"START SESSION":56}
+  today/skipped hero.statusWord: {"false":56}
+  today/skipped hero.cls: {"wk-hero is-today":56}
+  today/skipped heroKey==tapped day?: {"true":56}
+  today/skipped DONE tile: {"# /# DONE":56}
+  past/complete cell.class: {"wk-day dim":56}
+  past/complete cell.center: {"<span class=\"chk\">✓</span>":56}
+  past/complete hero.over: {"Today · <day>":56}
+  past/complete hero.cta: {"START SESSION":56}
+  past/complete hero.statusWord: {"false":56}
+  past/complete hero.cls: {"wk-hero is-today":56}
+  past/complete heroKey==tapped day?: {"false":56}
+  past/complete DONE tile: {"# /# DONE":56}
+  past/skipped cell.class: {"wk-day dim":56}
+  past/skipped cell.center: {"1":2,"2":2,"3":2,"4":1,"5":2,"6":2,"7":1,"8":2,"9":2,"10":2,"11":1,"12":2,"13":2,"14":1,"15":2,"16":2,"17":2,"18":1,"19":2,"20":2,"21":2,"22":3,"23":2,"24":3,"25":1,"26":3,"27":2,"28":1,"29":2,"30":2}
+  past/skipped hero.over: {"Today · <day>":56}
+  past/skipped hero.cta: {"START SESSION":56}
+  past/skipped hero.statusWord: {"false":56}
+  past/skipped hero.cls: {"wk-hero is-today":56}
+  past/skipped heroKey==tapped day?: {"false":56}
+  past/skipped DONE tile: {"# /# DONE":56}
+  Skipped cell byte-identical to the same cell unmarked (pending): 112/112
+  examples:
+   today/complete wk1 tapped=tue today=tue: cell={"cls":"wk-day today","center":"<span class=\"chk\">✓</span>","top":"—","bot":"LEGS"} | hero{over:"Today · Tuesday",title:"Leg Strength + Mobility",cta:"START SESSION",cls:"wk-hero is-today"} | tile="1 /5 DONE"
+   today/skipped wk1 tapped=tue today=tue: cell={"cls":"wk-day today","center":"22","top":"—","bot":"LEGS"} | hero{over:"Today · Tuesday",title:"Leg Strength + Mobility",cta:"START SESSION",cls:"wk-hero is-today"} | tile="0 /5 DONE"
+   past/complete wk1 tapped=mon today=tue: cell={"cls":"wk-day dim","center":"<span class=\"chk\">✓</span>","top":"RUN","bot":"STREN"} | hero{over:"Today · Tuesday",title:"Leg Strength + Mobility",cta:"START SESSION",cls:"wk-hero is-today"} | tile="1 /5 DONE"
+   past/skipped wk1 tapped=mon today=tue: cell={"cls":"wk-day dim","center":"21","top":"RUN","bot":"STREN"} | hero{over:"Today · Tuesday",title:"Leg Strength + Mobility",cta:"START SESSION",cls:"wk-hero is-today"} | tile="0 /5 DONE"
+
+== (b) REST TIMER across Done + closeDetail ==
+  {"lbl":"day open, timer idle","restFloat":"block","rtTab":"flex","rtCard":"none","running":false,"ruId":null,"idLive":false,"intervalsLive":0,"mini":"0:00","big":"0:00","overlay":true,"screen":"screenWeek","pop":false}
+  {"lbl":"rtToggleBtn() -> started","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:00","big":"0:00","overlay":true,"screen":"screenWeek","pop":false}
+  {"lbl":"+12 s on the day","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:11","big":"0:11","overlay":true,"screen":"screenWeek","pop":false}
+  {"lbl":"Done tapped (overlay still open today)","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:11","big":"0:11","overlay":true,"screen":"screenWeek","pop":true}
+  {"lbl":"closeDetail() [the ruling's close path]","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:11","big":"0:11","overlay":false,"screen":"screenWeek","pop":true}
+  {"lbl":"+12 s on This Week, pop still up","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:23","big":"0:23","overlay":false,"screen":"screenWeek","pop":true}
+  {"lbl":"popClose + 8 s","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:31","big":"0:31","overlay":false,"screen":"screenWeek","pop":false}
+  {"lbl":"reopen the day (ruResetIfIdle)","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:31","big":"0:31","overlay":true,"screen":"screenWeek","pop":false}
+  {"lbl":"tabGo('screenHome')","restFloat":"none","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:31","big":"0:31","overlay":true,"screen":"screenHome","pop":false}
+  {"lbl":"+5 s on Programs","restFloat":"none","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:36","big":"0:36","overlay":true,"screen":"screenHome","pop":false}
+  handle identical across closeDetail: true | ticks advanced across close: 0:11 -> 0:23 | does closeDetail/handleDayStatus/popFire/fireCompletionPopup/showScreen reference _ru*/restFloat? closeDetail=false handleDayStatus=false popFire=false fireCompletionPopup=false showScreen=true renderWeekView=false tabGo=false
+  z-index: .overlay 200 | #restFloat 240 | .pop-overlay 2000 | .tabbar 150
+
+== (c) TOAST vs COMPLETION POP-UP ==
+  .toast css: .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--run);color:#0a0a0a;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.06em;padding:10px 20px;border-radius:4px;z-index:999;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;}
+  .pop-overlay css: .pop-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;}
+  anim lines: .pop-overlay.show{display:flex;} || .toast.show{opacity:1;} || .pop-overlay.show{animation:fadeBg .22s ease;} || .pop-overlay.show>*{animation:popIn .28s cubic-bezier(.34,1.56,.64,1);}
+  #toast parents: body | #popOverlay parents: body
+  Done taps=70 | pop shown=70 {"WORKOUT COMPLETE":64,"3-DAY STREAK 🔥":1,"7-DAY STREAK 🔥":1,"14-DAY STREAK 🔥":1,"30-DAY STREAK 🔥":1,"60-DAY STREAK 🔥":1,"SEASON COMPLETE":1} | toast already .show at the instant pop gets .show: 70/70 | toast show precedes-or-equals pop show (same virtual ms): 70/70
+  toast hide at (ms after tap): {"2200":70} | pop still up (no dismiss) when toast hid: 70/70
+  showToast body: function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+DONE
+
+########## v221_donenav_pending.js on V219
+artifact /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/e027169a-4735-433b-869c-f16dba0d4f36/scratchpad/m_done/v219.html ia-version 219
+
+== STRINGS (source, both artifacts) ==
+  Done \u2713 <small>tap to undo</small>: now count=1 lines 14411
+  Skipped \u2715 <small>tap to undo</small>: now count=1 lines 14406
+  Mark Done \u2713</button>: now count=1 lines 13950
+  'START SESSION': now count=1 lines 12042
+  'OPEN SESSION': now count=1 lines 12042
+  showToast labels complete: now count=1 lines 14393
+  log-nudge line now: html+='<div class="log-nudge">\ud83d\udccb You logged this one but never marked it.<button class="log-nudge-btn" onclick="handleDayStatus(\''+dayKey+'\',\''+escTitle+'\',\'complete\')">Mark Done \u2713</button></div>';
+
+== (a) STRIP CELL + TODAY HERO after status tap then closeDetail() ==
+lattice: fixtures=1 (HALF_MANNY) cases=224 crash=0 | hero in "Today" mode: 224/224
+  today/complete cell.class: {"wk-day today":56}
+  today/complete cell.center: {"<span class=\"chk\">✓</span>":56}
+  today/complete hero.over: {"Today · <day>":56}
+  today/complete hero.cta: {"START SESSION":56}
+  today/complete hero.statusWord: {"false":56}
+  today/complete hero.cls: {"wk-hero is-today":56}
+  today/complete heroKey==tapped day?: {"true":56}
+  today/complete DONE tile: {"# /# DONE":56}
+  today/skipped cell.class: {"wk-day today":56}
+  today/skipped cell.center: {"1":2,"2":1,"3":3,"4":1,"5":2,"6":2,"7":1,"8":2,"9":1,"10":3,"11":1,"12":2,"13":2,"14":1,"15":2,"16":1,"17":3,"18":1,"19":2,"20":2,"21":1,"22":3,"23":1,"24":4,"25":1,"26":3,"27":3,"28":1,"29":2,"30":1,"31":1}
+  today/skipped hero.over: {"Today · <day>":56}
+  today/skipped hero.cta: {"START SESSION":56}
+  today/skipped hero.statusWord: {"false":56}
+  today/skipped hero.cls: {"wk-hero is-today":56}
+  today/skipped heroKey==tapped day?: {"true":56}
+  today/skipped DONE tile: {"# /# DONE":56}
+  past/complete cell.class: {"wk-day dim":56}
+  past/complete cell.center: {"<span class=\"chk\">✓</span>":56}
+  past/complete hero.over: {"Today · <day>":56}
+  past/complete hero.cta: {"START SESSION":56}
+  past/complete hero.statusWord: {"false":56}
+  past/complete hero.cls: {"wk-hero is-today":56}
+  past/complete heroKey==tapped day?: {"false":56}
+  past/complete DONE tile: {"# /# DONE":56}
+  past/skipped cell.class: {"wk-day dim":56}
+  past/skipped cell.center: {"1":2,"2":2,"3":2,"4":1,"5":2,"6":2,"7":1,"8":2,"9":2,"10":2,"11":1,"12":2,"13":2,"14":1,"15":2,"16":2,"17":2,"18":1,"19":2,"20":2,"21":2,"22":3,"23":2,"24":3,"25":1,"26":3,"27":2,"28":1,"29":2,"30":2}
+  past/skipped hero.over: {"Today · <day>":56}
+  past/skipped hero.cta: {"START SESSION":56}
+  past/skipped hero.statusWord: {"false":56}
+  past/skipped hero.cls: {"wk-hero is-today":56}
+  past/skipped heroKey==tapped day?: {"false":56}
+  past/skipped DONE tile: {"# /# DONE":56}
+  Skipped cell byte-identical to the same cell unmarked (pending): 112/112
+  examples:
+   today/complete wk1 tapped=tue today=tue: cell={"cls":"wk-day today","center":"<span class=\"chk\">✓</span>","top":"—","bot":"LEGS"} | hero{over:"Today · Tuesday",title:"Leg Strength + Mobility",cta:"START SESSION",cls:"wk-hero is-today"} | tile="1 /5 DONE"
+   today/skipped wk1 tapped=tue today=tue: cell={"cls":"wk-day today","center":"22","top":"—","bot":"LEGS"} | hero{over:"Today · Tuesday",title:"Leg Strength + Mobility",cta:"START SESSION",cls:"wk-hero is-today"} | tile="0 /5 DONE"
+   past/complete wk1 tapped=mon today=tue: cell={"cls":"wk-day dim","center":"<span class=\"chk\">✓</span>","top":"RUN","bot":"STREN"} | hero{over:"Today · Tuesday",title:"Leg Strength + Mobility",cta:"START SESSION",cls:"wk-hero is-today"} | tile="1 /5 DONE"
+   past/skipped wk1 tapped=mon today=tue: cell={"cls":"wk-day dim","center":"21","top":"RUN","bot":"STREN"} | hero{over:"Today · Tuesday",title:"Leg Strength + Mobility",cta:"START SESSION",cls:"wk-hero is-today"} | tile="0 /5 DONE"
+
+== (b) REST TIMER across Done + closeDetail ==
+  {"lbl":"day open, timer idle","restFloat":"block","rtTab":"flex","rtCard":"none","running":false,"ruId":null,"idLive":false,"intervalsLive":0,"mini":"0:00","big":"0:00","overlay":true,"screen":"screenWeek","pop":false}
+  {"lbl":"rtToggleBtn() -> started","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:00","big":"0:00","overlay":true,"screen":"screenWeek","pop":false}
+  {"lbl":"+12 s on the day","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:11","big":"0:11","overlay":true,"screen":"screenWeek","pop":false}
+  {"lbl":"Done tapped (overlay still open today)","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:11","big":"0:11","overlay":true,"screen":"screenWeek","pop":true}
+  {"lbl":"closeDetail() [the ruling's close path]","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:11","big":"0:11","overlay":false,"screen":"screenWeek","pop":true}
+  {"lbl":"+12 s on This Week, pop still up","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:23","big":"0:23","overlay":false,"screen":"screenWeek","pop":true}
+  {"lbl":"popClose + 8 s","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:31","big":"0:31","overlay":false,"screen":"screenWeek","pop":false}
+  {"lbl":"reopen the day (ruResetIfIdle)","restFloat":"block","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:31","big":"0:31","overlay":true,"screen":"screenWeek","pop":false}
+  {"lbl":"tabGo('screenHome')","restFloat":"none","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:31","big":"0:31","overlay":true,"screen":"screenHome","pop":false}
+  {"lbl":"+5 s on Programs","restFloat":"none","rtTab":"flex","rtCard":"none","running":true,"ruId":337,"idLive":true,"intervalsLive":1,"mini":"0:36","big":"0:36","overlay":true,"screen":"screenHome","pop":false}
+  handle identical across closeDetail: true | ticks advanced across close: 0:11 -> 0:23 | does closeDetail/handleDayStatus/popFire/fireCompletionPopup/showScreen reference _ru*/restFloat? closeDetail=false handleDayStatus=false popFire=false fireCompletionPopup=false showScreen=true renderWeekView=false tabGo=false
+  z-index: .overlay 200 | #restFloat 240 | .pop-overlay 2000 | .tabbar 150
+
+== (c) TOAST vs COMPLETION POP-UP ==
+  .toast css: .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--run);color:#0a0a0a;font-family:var(--font-display);font-size:14px;font-weight:700;letter-spacing:0.06em;padding:10px 20px;border-radius:4px;z-index:999;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;}
+  .pop-overlay css: .pop-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px;}
+  anim lines: .pop-overlay.show{display:flex;} || .toast.show{opacity:1;} || .pop-overlay.show{animation:fadeBg .22s ease;} || .pop-overlay.show>*{animation:popIn .28s cubic-bezier(.34,1.56,.64,1);}
+  #toast parents: body | #popOverlay parents: body
+  Done taps=70 | pop shown=70 {"WORKOUT COMPLETE":64,"3-DAY STREAK 🔥":1,"7-DAY STREAK 🔥":1,"14-DAY STREAK 🔥":1,"30-DAY STREAK 🔥":1,"60-DAY STREAK 🔥":1,"SEASON COMPLETE":1} | toast already .show at the instant pop gets .show: 70/70 | toast show precedes-or-equals pop show (same virtual ms): 70/70
+  toast hide at (ms after tap): {"2200":70} | pop still up (no dismiss) when toast hid: 70/70
+  showToast body: function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+DONE
+
+########## v212_done_nav.js (unmodified) on V220
+artifact /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/e027169a-4735-433b-869c-f16dba0d4f36/scratchpad/m_done/v220.html ia-version 220
+
+== 3. HOME ==
+screens in markup: screenHome,screenWizard,screenGenerate,screenWeek,screenProgress,screenBugs
+TAB_MAP: {"screenHome":"tabHome","screenWeek":"tabWeek","screenProgress":"tabProgress","screenBugs":"tabBugs"} | tab buttons lines 17963,17964,17965,17966
+tab labels: tabHome=Programs | tabWeek=This Week | tabProgress=Progress | tabBugs=Bugs
+init() lines 17536 | closeDetail lines 14349 | Back button 1048
+.overlay css 283 | .pop-overlay css 449 | popOverlay markup 17970 | tabBar css 46,47,48
+tabBar z-index / position: .tabbar{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:430px;background:var(--surface);border-top:1px solid var(--border);z-index:150;padding-bottom:env(
+screenHome renders renderProgList (program list); screenWeek renders renderWeekView (Today hero at openDayKey(heroKey)) lines 664,665
+boot, no programs -> screenHome
+boot, stored active program -> screenWeek | active-id key read by getActiveProgId: function getActiveProgId(){return localStorage.getItem('ia_active')||null;}
+
+== 1/2. CONTROLS (fixture HALF_MANNY week 1, first training day) ==
+callers of markDayComplete(: 14359 | toggleComplete(: 14354 | handleDayStatus(: 13944,14368,14397
+"Partial" in any status markup: 11978,17772,17781 | "Mark Complete" strings: none | "Finish" button: none
+Done (footer, statusBtn_complete):  writes[ia_comp_,ia_hist_,ia_logs_,ia_pop_dismiss_,ia_pop_idx_] toast=["Done ✓"] status=complete
+   before{overlay:true,screen:screenWeek} after{overlay:true,screen:screenWeek,active:screenWeek,tabBar:true,pop:true(WORKOUT COMPLETE)} timersRan=0 afterFlush{overlay:true,screen:screenWeek,pop:true}
+Done again (tap to undo):  writes[ia_comp_,ia_logs_] toast=["Unmarked"] status=null
+   before{overlay:true,screen:screenWeek} after{overlay:true,screen:screenWeek,active:screenWeek,tabBar:true,pop:false} timersRan=0 afterFlush{overlay:true,screen:screenWeek,pop:false}
+Skip (footer, statusBtn_skipped):  writes[ia_comp_,ia_logs_] toast=["Skipped ✕ — the week moves on"] status=skipped
+   before{overlay:true,screen:screenWeek} after{overlay:true,screen:screenWeek,active:screenWeek,tabBar:true,pop:false} timersRan=0 afterFlush{overlay:true,screen:screenWeek,pop:false}
+Skipped again (tap to undo):  writes[ia_comp_,ia_logs_] toast=["Unmarked"] status=null
+   before{overlay:true,screen:screenWeek} after{overlay:true,screen:screenWeek,active:screenWeek,tabBar:true,pop:false} timersRan=0 afterFlush{overlay:true,screen:screenWeek,pop:false}
+Mark Done ✓ (log-nudge, same handler):  writes[ia_comp_,ia_logs_,ia_pop_idx_] toast=["Done ✓"] status=complete
+   before{overlay:true,screen:screenWeek} after{overlay:true,screen:screenWeek,active:screenWeek,tabBar:true,pop:true(WORKOUT COMPLETE)} timersRan=0 afterFlush{overlay:true,screen:screenWeek,pop:true}
+markDayComplete (legacy, any caller?):  writes[ia_comp_] toast=[] status=complete
+   before{overlay:true,screen:screenWeek} after{overlay:true,screen:screenWeek,active:screenWeek,tabBar:true,pop:false} timersRan=0 afterFlush{overlay:true,screen:screenWeek,pop:false}
+toggleComplete (legacy, any caller?):  writes[ia_comp_] toast=[] status=complete
+   before{overlay:true,screen:screenWeek} after{overlay:true,screen:screenWeek,active:screenWeek,tabBar:true,pop:false} timersRan=0 afterFlush{overlay:true,screen:screenWeek,pop:false}
+‹ Back:  writes[] toast=[] status=null
+   before{overlay:true,screen:screenWeek} after{overlay:false,screen:screenWeek,active:screenWeek,tabBar:true,pop:false} timersRan=0 afterFlush{overlay:false,screen:screenWeek,pop:false}
+per-exercise log buttons (onclick targets in card markup): onclick="saveExWeight(
+
+== 2b. LATTICE: Done tapped on every training day, every week, every fixture ==
+fixtures=1 taps=70 crash=0 | overlay still open on screenWeek after Done: 70/70 | left: 0/70 | popOverlay shown: 70/70 {"WORKOUT COMPLETE":68,"3-DAY STREAK 🔥":1,"SEASON COMPLETE":1}
+
+== 4. POP-UP SURVIVES NAVIGATION? ==
+after Done pop=true(WORKOUT COMPLETE); after closeDetail pop=true screen=screenWeek overlay=false; after tabGo(screenHome) pop=true screen=screenHome
+popClose body: function popClose(){ document.getElementById('popOverlay').classList.remove('show'); }
+does showScreen/closeDetail/tabGo touch popOverlay? false
+injury check-in popFire sites (not on completion path): 15518,15543,15554,15562 | reachable from handleDayStatus/fireCompletionPopup? false
+
+== 5. INPUT THAT LIVES ON THE DAY SCREEN ==
+log field listeners wired: log_rpe=80 log_notes=80 log_run_dist=80
+notes after input event, before any tap: "typed, input event fired"
+notes after ‹ Back with no input event: "typed, input event fired"
+wheel commit path: _iawCommit = var next=_iawFormat(kind,vals); if(h.value===next) return; h.value=next; h.dispatchEvent(new Event('input',{bubbles:true})); }
+wheel debounce ms: 90
+set inputs: oninput handlers oninput="setDelta( oninput="onSetWeight( oninput="cascadeSetWeights( oninput="updateRPEDisplay( oninput="e1rmCalcUpdate( oninput="_goalSetInput( oninput="runCalc( | autoSaveSets→writeSetDraft synchronous: true
+writeSetDraft body has timer/debounce: false
+showToast duration: 2200 ms; undo toast/action? false | footer "tap to undo" is the only undo, lines 14400,14405
+rest timer float shown on screens: _curScreen==='screenWeek' _curScreen==='screenProgress' _curScreen==='screenBugs'
+DONE
+
+########## diff v212_done_nav.js V219 -> V220
+1c1
+< artifact /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/e027169a-4735-433b-869c-f16dba0d4f36/scratchpad/m_done/v219.html ia-version 219
+---
+> artifact /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/e027169a-4735-433b-869c-f16dba0d4f36/scratchpad/m_done/v220.html ia-version 220
+5c5
+< TAB_MAP: {"screenHome":"tabHome","screenWeek":"tabWeek","screenProgress":"tabProgress","screenBugs":"tabBugs"} | tab buttons lines 17939,17940,17941,17942
+---
+> TAB_MAP: {"screenHome":"tabHome","screenWeek":"tabWeek","screenProgress":"tabProgress","screenBugs":"tabBugs"} | tab buttons lines 17963,17964,17965,17966
+7,8c7,8
+< init() lines 17542 | closeDetail lines 14355 | Back button 1048
+< .overlay css 283 | .pop-overlay css 449 | popOverlay markup 17946 | tabBar css 46,47,48
+---
+> init() lines 17536 | closeDetail lines 14349 | Back button 1048
+> .overlay css 283 | .pop-overlay css 449 | popOverlay markup 17970 | tabBar css 46,47,48
+15,16c15,16
+< callers of markDayComplete(: 14365 | toggleComplete(: 14360 | handleDayStatus(: 13950,14374,14403
+< "Partial" in any status markup: 11978,17751,17760 | "Mark Complete" strings: none | "Finish" button: none
+---
+> callers of markDayComplete(: 14359 | toggleComplete(: 14354 | handleDayStatus(: 13944,14368,14397
+> "Partial" in any status markup: 11978,17772,17781 | "Mark Complete" strings: none | "Finish" button: none
+42c42
+< injury check-in popFire sites (not on completion path): 15524,15549,15560,15568 | reachable from handleDayStatus/fireCompletionPopup? false
+---
+> injury check-in popFire sites (not on completion path): 15518,15543,15554,15562 | reachable from handleDayStatus/fireCompletionPopup? false
+52c52
+< showToast duration: 2200 ms; undo toast/action? false | footer "tap to undo" is the only undo, lines 14406,14411
+---
+> showToast duration: 2200 ms; undo toast/action? false | footer "tap to undo" is the only undo, lines 14400,14405

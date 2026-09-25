@@ -1,0 +1,23 @@
+[
+ {
+  "name": "S8-D180 B1 -> the copy-back line is dropped: refreshProgram loses blockOpen again (the V188 to V220 latch)",
+  "anchor": "rebuilt.blockOpen = prog.blockOpen;",
+  "replacement": "",
+  "gate": "gates/g221_d180_blockopen.js",
+  "note": "NAMED TRIP: I1a (0/365 carry), I1c (0/209 moving rows), I2a I2b I2c (setters and reboots destroy the stored flag), I3b I3c I3d (landing no longer the wizard's own prog), I4 (More than a week off at boot), T1 T2 T3 T4 T5 T6 T8 T9, P1 (aligned JSON no longer differs from V220), P2 (landing is not V220's :1964 picture). Stays green on purpose: I1b, I3a (landing equals reboot on both sides, the builder's finding), I5, T7, T10, P3."
+ },
+ {
+  "name": "S8-D180 B1 -> the copy-back writes the wrong day: blockOpen takes the counted-back start, so no day is ever held outside",
+  "anchor": "rebuilt.blockOpen = prog.blockOpen;",
+  "replacement": "rebuilt.blockOpen = prog.startDate;",
+  "gate": "gates/g221_d180_blockopen.js",
+  "note": "NAMED TRIP: I1a (out != input), I1b (non-aligned programs gain the key), I1c, I2a I2b I2c, I3b I3c I3d, I4, T1 T2 T3 T4 T5 T6 T8 T9, P1, P2."
+ },
+ {
+  "name": "S8-D180 B1 -> a second writer: a program without the flag is stamped with its start on every rebuild (D14a §2 reserves the flag to alignment)",
+  "anchor": "rebuilt.blockOpen = prog.blockOpen;",
+  "replacement": "rebuilt.blockOpen = prog.blockOpen || prog.startDate;",
+  "gate": "gates/g221_d180_blockopen.js",
+  "note": "NAMED TRIP: I1b (non-aligned JSON carries blockOpen), I3c (activeProg gains a key the wizard never wrote), P1 (non-aligned JSON no longer byte-identical to V220). Aligned rows and every render stay green: the start as a flag holds no extra day outside, so only the key claims catch it."
+ }
+]

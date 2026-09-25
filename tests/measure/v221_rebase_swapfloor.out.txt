@@ -1,0 +1,611 @@
+# Re-baseline P-SWAPFLOOR, V219 (git show V219) vs V220 (8ee4385). Script: tests/measure/v212_swapfloor_counterfactual.js, unmodified, flags --r3=alt --r4 (copy3). diff after normalising ia-version: 0 lines.
+########## sf_v219.out
+base ia-version 219 | copy ia-version 219
+
+== Q1 PREMISE commercial|support_strength|beginner|liftonly|knee/workaround seed 76308 W5 thu
+  HEAD donor Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+   -> goblet :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | FAIL
+  COPY donor Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+   -> goblet :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | PASS
+
+== LATTICE builds 4320 of 4320 crash {"HEAD":0,"COPY":0}
+== Q3 ENGINE cards compared 1201231 | changed 0 | builds with digest moved 0
+  HALF_MANNY digest HEAD 0ac7da6b1691a8e1 (self stable ) COPY 0ac7da6b1691a8e1 UNMOVED
+== Q2 SPREAD Main (item,candidate) pairs 1753581 | changed by R1/R3 54313 | changed outside the rep token 0 | landing under HAND window 0
+   changed 7623 Kettlebell swing
+   changed 5712 Kettlebell single-leg deadlift
+   changed 5484 Landmine reverse lunge
+   changed 3987 Landmine rotational press
+   changed 3756 Dumbbell goblet squat
+   changed 3238 Dumbbell split-stance deadlift
+   changed 2340 Dumbbell bench press
+   changed 2211 Dumbbell floor press
+   changed 2007 Dumbbell incline press
+   changed 1862 Dumbbell goblet side lunge
+   changed 1831 Zercher single-leg deadlift
+   changed 1653 Kettlebell single-arm press
+   changed 1425 Barbell hip thrust
+   changed 1163 Dumbbell decline press
+   changed 1134 Kettlebell goblet squat
+   changed 1116 Dumbbell Bulgarian split squat
+   changed 1080 Dumbbell Arnold press
+   changed 1008 Cable lateral raise
+   changed 891 Cable pull-through
+   changed 888 Single-leg hip thrust
+   changed 761 Dumbbell front raise
+   changed 655 Machine chest press
+   changed 489 Leg press
+   changed 351 Kettlebell single-arm row
+   changed 261 Reverse lunge (KB)
+   changed 219 Cable pushdown
+   changed 183 Cable curl
+   changed 149 Dumbbell curl
+   changed 138 Lat pulldown
+   changed 123 Dumbbell seated calf raise
+   changed 120 Dumbbell hammer curl
+   changed 105 Dumbbell rear delt fly
+   changed 92 Dumbbell skullcrushers
+   changed 90 Incline dumbbell curl
+   changed 81 Split squat
+   changed 36 Dumbbell row
+   changed 36 Dumbbell standing calf raise
+   changed 6 Standing cable hamstring curl
+   changed 6 Step-ups (KB)
+   changed 3 Machine seated calf raise
+  pairs at <=5 on COPY 119044 by candidate:
+    5503 Dumbbell floor press -> 5 hand=[5,8]
+    4856 Dumbbell incline press -> 5 hand=[5,8]
+    4826 Dumbbell split-stance deadlift -> 5 hand=[5,8]
+    4532 Dumbbell bench press -> 5 hand=[5,8]
+    3395 Kettlebell single-arm press -> 5 hand=[5,8]
+    3096 Dumbbell Arnold press -> 5 hand=[5,8]
+    3036 Bench dips -> 5 hand=unlisted
+    2738 Dumbbell front raise -> 5 hand=[5,8]
+    2559 Dumbbell decline press -> 5 hand=[5,8]
+    2559 Deadlift -> 5 hand=unlisted
+    2559 Sumo deadlift -> 5 hand=unlisted
+    2346 Trap bar deadlift -> 3 hand=unlisted
+    2160 Barbell bench press -> 5 hand=null
+    2160 Barbell overhead press -> 5 hand=null
+    2157 Jump squats -> 5 hand=unlisted
+    2019 Trap bar deadlift -> 5 hand=unlisted
+    1959 Barbell Romanian deadlift -> 3 hand=null
+    1914 Deadlift -> 3 hand=unlisted
+    1869 Barbell box squat -> 5 hand=null
+    1845 Jump squats -> 3 hand=unlisted
+    1827 Barbell box squat -> 3 hand=null
+    1773 Incline barbell press -> 5 hand=unlisted
+    1764 Back squat -> 5 hand=unlisted
+    1698 Sumo deadlift -> 3 hand=unlisted
+    1608 Deadlift -> 2 hand=unlisted
+    1608 Sumo deadlift -> 2 hand=unlisted
+    1608 Trap bar deadlift -> 2 hand=unlisted
+    1512 Barbell push press -> 5 hand=null
+    1512 Barbell good mornings -> 5 hand=null
+    1429 Machine chest press -> 5 hand=unlisted
+    1419 Barbell Romanian deadlift -> 5 hand=null
+    1404 Barbell good mornings -> 3 hand=null
+    1386 Back squat -> 3 hand=unlisted
+    1326 Dumbbell skullcrushers -> 5 hand=[5,8]
+    1305 Barbell box squat -> 2 hand=null
+    1293 Dumbbell rear delt fly -> 5 hand=[5,8]
+    1137 Jump squats -> 2 hand=unlisted
+    1134 Back squat -> 2 hand=unlisted
+    1020 Reverse lunge (KB) -> 5 hand=[5,8]
+    1008 Pushup variation (weighted) -> 5 hand=unlisted
+    990 Close-grip bench press -> 5 hand=unlisted
+    981 Paused back squat -> 5 hand=unlisted
+    972 Barbell overhead press -> 2 hand=null
+    972 Barbell push press -> 2 hand=null
+    972 Barbell bench press -> 2 hand=null
+    972 Barbell good mornings -> 2 hand=null
+    972 Double Kettlebell deadlift -> 5 hand=[5,8]
+    972 Kettlebell Romanian deadlift -> 5 hand=[5,8]
+    927 Paused back squat -> 3 hand=unlisted
+    891 Deadlift -> 4 hand=unlisted
+    891 Sumo deadlift -> 4 hand=unlisted
+    825 Bench dips -> 2 hand=unlisted
+    783 Trap bar deadlift -> 4 hand=unlisted
+    756 Barbell push press -> 3 hand=null
+    756 Barbell bench press -> 3 hand=null
+    756 Incline barbell press -> 2 hand=unlisted
+    738 Leg press -> 5 hand=[5,8]
+    711 Jump squats -> 4 hand=unlisted
+    702 Barbell box squat -> 4 hand=null
+    630 Back squat -> 4 hand=unlisted
+    627 Paused back squat -> 2 hand=unlisted
+    621 Front squat -> 3 hand=null
+    540 Front squat -> 5 hand=null
+    540 Barbell bench press -> 4 hand=null
+    540 Barbell overhead press -> 4 hand=null
+    540 Barbell push press -> 4 hand=null
+    540 Barbell good mornings -> 4 hand=null
+    495 Bench dips -> 4 hand=unlisted
+    489 Barbell Romanian deadlift -> 2 hand=null
+    448 Dumbbell lateral raise -> 5 hand=[5,8]
+    432 Close-grip bench press -> 3 hand=unlisted
+    432 Incline barbell press -> 4 hand=unlisted
+    375 Barbell Romanian deadlift -> 4 hand=null
+    348 Deadlift -> 1 hand=unlisted
+    348 Sumo deadlift -> 1 hand=unlisted
+    348 Trap bar deadlift -> 1 hand=unlisted
+    342 Incline barbell press -> 3 hand=unlisted
+    327 Paused back squat -> 4 hand=unlisted
+    324 Barbell overhead press -> 3 hand=null
+    306 Barbell box squat -> 1 hand=null
+    297 Front squat -> 2 hand=null
+    297 Bench dips -> 3 hand=unlisted
+    282 Jump squats -> 1 hand=unlisted
+    252 Back squat -> 1 hand=unlisted
+    222 Lat pulldown -> 5 hand=unlisted
+    219 Dumbbell seated calf raise -> 5 hand=[5,8]
+    216 Close-grip bench press -> 2 hand=unlisted
+    216 Barbell bench press -> 1 hand=null
+    216 Barbell overhead press -> 1 hand=null
+    216 Barbell push press -> 1 hand=null
+    216 Incline barbell press -> 1 hand=unlisted
+    216 Barbell good mornings -> 1 hand=null
+    203 Dumbbell curl -> 5 hand=[5,8]
+    198 Bench dips -> 1 hand=unlisted
+    172 Chinups -> 5 hand=unlisted
+    171 Dumbbell hammer curl -> 5 hand=[5,8]
+    162 Front squat -> 4 hand=null
+    153 Neutral-grip chinups -> 5 hand=unlisted
+    126 Paused back squat -> 1 hand=unlisted
+    125 Incline dumbbell curl -> 5 hand=[5,8]
+    114 Weighted chinups -> 5 hand=unlisted
+    108 Neutral-grip chinups -> 2 hand=unlisted
+    91 Overhead dumbbell extension -> 5 hand=[5,8]
+    90 Barbell Romanian deadlift -> 1 hand=null
+    89 Assisted pullups -> 5 hand=unlisted
+    84 Glute-ham raise -> 5 hand=unlisted
+    83 Chinups -> 2 hand=unlisted
+    81 Reverse lunge -> 5 hand=unlisted
+    78 Glute-ham raise -> 3 hand=unlisted
+    72 Neutral-grip chinups -> 3 hand=unlisted
+    69 Dumbbell standing calf raise -> 5 hand=[5,8]
+    66 Walking lunge (KB) -> 5 hand=[5,8]
+    65 Chinups -> 3 hand=unlisted
+    60 Glute-ham raise -> 2 hand=unlisted
+    57 Weighted chinups -> 3 hand=unlisted
+    54 Front squat -> 1 hand=null
+    54 Assisted pullups -> 2 hand=unlisted
+    53 Chinups -> 4 hand=unlisted
+    51 Neutral-grip chinups -> 4 hand=unlisted
+    36 Barbell curl -> 5 hand=null
+    30 Glute-ham raise -> 4 hand=unlisted
+    30 Assisted pullups -> 3 hand=unlisted
+    29 Assisted pullups -> 4 hand=unlisted
+    27 Preacher curl -> 5 hand=unlisted
+    27 Weighted chinups -> 2 hand=unlisted
+    26 Barbell curl -> 3 hand=null
+    24 Leg extension -> 5 hand=unlisted
+    24 Neutral-grip chinups -> 1 hand=unlisted
+    21 Weighted chinups -> 4 hand=unlisted
+    21 Preacher curl -> 2 hand=unlisted
+    18 Barbell curl -> 4 hand=null
+    18 Barbell curl -> 2 hand=null
+    18 Chinups -> 1 hand=unlisted
+    15 Preacher curl -> 4 hand=unlisted
+    14 Face pull -> 5 hand=unlisted
+    12 Glute-ham raise -> 1 hand=unlisted
+    12 Assisted pullups -> 1 hand=unlisted
+    9 Preacher curl -> 3 hand=unlisted
+    8 Face pull -> 3 hand=unlisted
+    6 Machine seated calf raise -> 5 hand=unlisted
+    6 Lying leg curl -> 5 hand=unlisted
+    6 Leg extension -> 2 hand=unlisted
+    6 Preacher curl -> 1 hand=unlisted
+    6 Weighted chinups -> 1 hand=unlisted
+    6 Single-leg glute bridge (weighted) -> 5 hand=unlisted
+    3 Leg extension -> 4 hand=unlisted
+    1 Seated leg curl -> 5 hand=unlisted
+    1 Seated leg curl -> 4 hand=unlisted
+  exceptions (<=5, not exactly 5 on a hand [5,8], excluding hand-null barbell):
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 mon Close-grip bench press -> Bench dips :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 mon Close-grip bench press -> Machine chest press :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 mon Close-grip bench press -> Incline barbell press :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 tue Barbell Romanian deadlift -> Deadlift :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 tue Barbell Romanian deadlift -> Sumo deadlift :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 tue Barbell Romanian deadlift -> Trap bar deadlift :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 tue Barbell Romanian deadlift -> Back squat :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 tue Barbell Romanian deadlift -> Jump squats :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 thu Front squat -> Back squat :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 thu Front squat -> Jump squats :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 thu Front squat -> Paused back squat :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 thu Front squat -> Deadlift :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  candidates not in HAND table: {"Landmine rotational press":30847,"Bench dips":60499,"Dips":56923,"Machine chest press":4721,"Incline barbell press":36084,"Deadlift":23332,"Sumo deadlift":21921,"Trap bar deadlift":19816,"Back squat":11925,"Jump squats":36990,"Decline pushups":50277,"Pushups (slow tempo)":50312,"Cable lateral raise":5448,"Cable pushdown":5098,"Close-grip bench press":28050,"Diamond pushups":46014,"Cable pull-through":2127,"45° back extension":3694,"Bodyweight back extension":19219,"Single-leg glute bridge":10772,"Single-leg hip thrust":6201,"Machine seated calf raise":282,"Chinups":2182,"Neutral-grip chinups":1120,"Lat pulldown":624,"Cable curl":303,"Preacher curl":195,"Assisted pullups":608,"Weighted chinups":600,"Banded hip thrust":15255,"Feet-elevated inverted rows":1044,"Inverted rows (bodyweight)":1740,"Inverted rows (rings)":1044,"Face pull":994,"Rope tricep extension":68,"Glute-ham raise":1098,"Lying leg curl":270,"Seated leg curl":121,"Standing cable hamstring curl":62,"Leg extension":88,"Zercher single-leg deadlift":4920,"Paused back squat":3987,"Nordic hamstring curl (anchored)":11949,"Pushup variation (weighted)":29808,"Single-leg squat (assisted)":5290,"Pike pushups":63282,"Reverse lunge":4155,"Split squat":3374,"Squat (slow 3s tempo)":6966,"Step-ups (chair)":5784,"Bulgarian split squat (foot on chair)":4415,"Single-leg glute bridge (weighted)":1084,"Close-grip pushups":19820,"Pushups (slow 3s eccentric)":14032,"Wide-stance pushups":12794,"Pike pushups (feet elevated)":17726,"Wall walks":11624,"Feet-elevated inverted row (under a table)":3040,"Walking lunge":4288,"Single-leg Romanian deadlift (bodyweight)":5936,"Calf raise (bodyweight)":4514,"Decline pushups (feet elevated)":24126,"Prone Y-T-W raises":21234,"Bench dips (chair)":3108,"Inverted row (knees bent, under a table)":6512,"Wall slides":20724,"Incline pushups (hands on bed)":8864,"Single-leg calf raise (bodyweight)":1848,"Single-leg hip thrust (shoulders on bed)":1216,"Inverted row (supinated, under a table)":1354,"Inverted row (under a table)":184,"Assisted pistol squat":1260,"Archer pushups":7292}
+== Q2b CHEST-scope (v212 spread) pairs 797254 | <=5 38480
+    5503 Dumbbell floor press -> 5 hand=[5,8]
+    4856 Dumbbell incline press -> 5 hand=[5,8]
+    4826 Dumbbell split-stance deadlift -> 5 hand=[5,8]
+    4532 Dumbbell bench press -> 5 hand=[5,8]
+    3395 Kettlebell single-arm press -> 5 hand=[5,8]
+    3096 Dumbbell Arnold press -> 5 hand=[5,8]
+    2738 Dumbbell front raise -> 5 hand=[5,8]
+    2559 Dumbbell decline press -> 5 hand=[5,8]
+    1326 Dumbbell skullcrushers -> 5 hand=[5,8]
+    1293 Dumbbell rear delt fly -> 5 hand=[5,8]
+    1020 Reverse lunge (KB) -> 5 hand=[5,8]
+    972 Double Kettlebell deadlift -> 5 hand=[5,8]
+    972 Kettlebell Romanian deadlift -> 5 hand=[5,8]
+    448 Dumbbell lateral raise -> 5 hand=[5,8]
+    219 Dumbbell seated calf raise -> 5 hand=[5,8]
+    203 Dumbbell curl -> 5 hand=[5,8]
+    171 Dumbbell hammer curl -> 5 hand=[5,8]
+    125 Incline dumbbell curl -> 5 hand=[5,8]
+    91 Overhead dumbbell extension -> 5 hand=[5,8]
+    69 Dumbbell standing calf raise -> 5 hand=[5,8]
+    66 Walking lunge (KB) -> 5 hand=[5,8]
+  CHEST exceptions (<=5 and not exactly 5 on a hand [5,8]): 0
+== LANDMINE census. _repFloor HEAD vs COPY:
+    Landmine reverse lunge null -> [6,10]
+    Landmine rotational press null -> [6,10]
+    Landmine rotations null -> null
+  engine cards by name {"Landmine rotations":3020,"Landmine rotational press":1121} | changed {}
+    card 1816 Landmine rotations @  :: 3×8–12 each @ RPE 8
+    card 709 Landmine rotations @  :: 2×8–12 each @ RPE 7
+    card 324 Landmine rotational press @ Accessory :: 2×15 each
+    card 301 Landmine rotations @  :: 3×8–12 each @ RPE 6–7
+    card 243 Landmine rotational press @ Main :: 2×12 each
+    card 162 Landmine rotational press @ Main :: 3×12 each
+    card 101 Landmine rotations @  :: 2×8–12 each @ RPE 6–7
+    card 93 Landmine rotations @  :: 3×8–12 each @ RPE 7
+    card 81 Landmine rotational press @ Accessory :: 4×15 each
+    card 81 Landmine rotational press @ Main :: 4×12 each
+    card 81 Landmine rotational press @ Accessory :: 3×15 each
+    card 36 Landmine rotational press @ Accessory :: 2×15 each — hold RPE 7, two in the tank
+  _swapDetailFor(COPY) on Landmine rotations distinct engine details 5 | changed 0
+  _swapDetailFor(COPY) on Landmine rotational press distinct engine details 20 | changed 0
+  as swap candidate (Main/Power donors) {"Landmine rotational press same":26860,"Landmine reverse lunge same":11309,"Landmine rotational press CHANGED":3987,"Landmine reverse lunge CHANGED":5484} | as swap donor {"Landmine rotational press":6984}
+== Q4 POWER items 24148 | with S×R — RPE grammar 0 | power swap pairs 25922 | of which donor RPE 0 | changed base->copy 0
+== PIN null-_pattern items 519688 | _swapDetailFor changes on COPY 27000 | on HEAD 27000
+     8910 Banded side steps :: 2×15–20 each @ RPE 8
+     8910 Banded monster walks :: 2×12–15 each @ RPE 8
+     5130 Banded monster walks :: 2×12–15 each @ RPE 7
+     4050 Banded side steps :: 2×15–20 each @ RPE 7
+   named Dumbbell renegade rows _pattern=null _repFloor COPY=[5,8]
+   named Kettlebell windmill _pattern=null _repFloor COPY=[5,8]
+   named Suitcase carry _pattern=null _repFloor COPY=null
+   named on engine cards {"Suitcase carry | changed=false":7394,"Dumbbell renegade rows | changed=false":4936}
+== DUP days with a repeated item name where it is swappable 0
+
+== Q5 UNDO
+  unloadable pick: commercial|support_prevention|beginner|liftonly|healthy W1 mon Close-grip bench press -> Dips
+     record carried detail: false 
+   HEAD unloadable 
+     before: Close-grip bench press :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form 
+     swap  : Dips :: 3 sets — RPE 6 (leave 3 or more in reserve) 
+     undo  : Close-grip bench press :: 3 sets — RPE 6 (leave 3 or more in reserve) | detail NOT restored
+     record carried detail: false 
+   HEAD goblet (repro) 
+     before: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     swap  : Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     undo  : Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | detail RESTORED
+     record carried detail: false (stripped: legacy)
+   HEAD goblet LEGACY record (detail field deleted before undo) 
+     before: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     swap  : Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     undo  : Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | detail RESTORED
+     record carried detail: true 
+   COPY unloadable 
+     before: Close-grip bench press :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form 
+     swap  : Dips :: 3 sets — RPE 6 (leave 3 or more in reserve) 
+     undo  : Close-grip bench press :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form | detail RESTORED
+     record carried detail: true 
+   COPY goblet (repro) 
+     before: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     swap  : Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     undo  : Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | detail RESTORED
+     record carried detail: true (stripped: legacy)
+   COPY goblet LEGACY record (detail field deleted before undo) 
+     before: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     swap  : Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     undo  : Barbell box squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | detail NOT restored
+DONE
+EXIT219=0
+########## sf_v220.out
+base ia-version 220 | copy ia-version 220
+
+== Q1 PREMISE commercial|support_strength|beginner|liftonly|knee/workaround seed 76308 W5 thu
+  HEAD donor Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+   -> goblet :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | FAIL
+  COPY donor Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+   -> goblet :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | PASS
+
+== LATTICE builds 4320 of 4320 crash {"HEAD":0,"COPY":0}
+== Q3 ENGINE cards compared 1201231 | changed 0 | builds with digest moved 0
+  HALF_MANNY digest HEAD 0ac7da6b1691a8e1 (self stable ) COPY 0ac7da6b1691a8e1 UNMOVED
+== Q2 SPREAD Main (item,candidate) pairs 1753581 | changed by R1/R3 54313 | changed outside the rep token 0 | landing under HAND window 0
+   changed 7623 Kettlebell swing
+   changed 5712 Kettlebell single-leg deadlift
+   changed 5484 Landmine reverse lunge
+   changed 3987 Landmine rotational press
+   changed 3756 Dumbbell goblet squat
+   changed 3238 Dumbbell split-stance deadlift
+   changed 2340 Dumbbell bench press
+   changed 2211 Dumbbell floor press
+   changed 2007 Dumbbell incline press
+   changed 1862 Dumbbell goblet side lunge
+   changed 1831 Zercher single-leg deadlift
+   changed 1653 Kettlebell single-arm press
+   changed 1425 Barbell hip thrust
+   changed 1163 Dumbbell decline press
+   changed 1134 Kettlebell goblet squat
+   changed 1116 Dumbbell Bulgarian split squat
+   changed 1080 Dumbbell Arnold press
+   changed 1008 Cable lateral raise
+   changed 891 Cable pull-through
+   changed 888 Single-leg hip thrust
+   changed 761 Dumbbell front raise
+   changed 655 Machine chest press
+   changed 489 Leg press
+   changed 351 Kettlebell single-arm row
+   changed 261 Reverse lunge (KB)
+   changed 219 Cable pushdown
+   changed 183 Cable curl
+   changed 149 Dumbbell curl
+   changed 138 Lat pulldown
+   changed 123 Dumbbell seated calf raise
+   changed 120 Dumbbell hammer curl
+   changed 105 Dumbbell rear delt fly
+   changed 92 Dumbbell skullcrushers
+   changed 90 Incline dumbbell curl
+   changed 81 Split squat
+   changed 36 Dumbbell row
+   changed 36 Dumbbell standing calf raise
+   changed 6 Standing cable hamstring curl
+   changed 6 Step-ups (KB)
+   changed 3 Machine seated calf raise
+  pairs at <=5 on COPY 119044 by candidate:
+    5503 Dumbbell floor press -> 5 hand=[5,8]
+    4856 Dumbbell incline press -> 5 hand=[5,8]
+    4826 Dumbbell split-stance deadlift -> 5 hand=[5,8]
+    4532 Dumbbell bench press -> 5 hand=[5,8]
+    3395 Kettlebell single-arm press -> 5 hand=[5,8]
+    3096 Dumbbell Arnold press -> 5 hand=[5,8]
+    3036 Bench dips -> 5 hand=unlisted
+    2738 Dumbbell front raise -> 5 hand=[5,8]
+    2559 Dumbbell decline press -> 5 hand=[5,8]
+    2559 Deadlift -> 5 hand=unlisted
+    2559 Sumo deadlift -> 5 hand=unlisted
+    2346 Trap bar deadlift -> 3 hand=unlisted
+    2160 Barbell bench press -> 5 hand=null
+    2160 Barbell overhead press -> 5 hand=null
+    2157 Jump squats -> 5 hand=unlisted
+    2019 Trap bar deadlift -> 5 hand=unlisted
+    1959 Barbell Romanian deadlift -> 3 hand=null
+    1914 Deadlift -> 3 hand=unlisted
+    1869 Barbell box squat -> 5 hand=null
+    1845 Jump squats -> 3 hand=unlisted
+    1827 Barbell box squat -> 3 hand=null
+    1773 Incline barbell press -> 5 hand=unlisted
+    1764 Back squat -> 5 hand=unlisted
+    1698 Sumo deadlift -> 3 hand=unlisted
+    1608 Deadlift -> 2 hand=unlisted
+    1608 Sumo deadlift -> 2 hand=unlisted
+    1608 Trap bar deadlift -> 2 hand=unlisted
+    1512 Barbell push press -> 5 hand=null
+    1512 Barbell good mornings -> 5 hand=null
+    1429 Machine chest press -> 5 hand=unlisted
+    1419 Barbell Romanian deadlift -> 5 hand=null
+    1404 Barbell good mornings -> 3 hand=null
+    1386 Back squat -> 3 hand=unlisted
+    1326 Dumbbell skullcrushers -> 5 hand=[5,8]
+    1305 Barbell box squat -> 2 hand=null
+    1293 Dumbbell rear delt fly -> 5 hand=[5,8]
+    1137 Jump squats -> 2 hand=unlisted
+    1134 Back squat -> 2 hand=unlisted
+    1020 Reverse lunge (KB) -> 5 hand=[5,8]
+    1008 Pushup variation (weighted) -> 5 hand=unlisted
+    990 Close-grip bench press -> 5 hand=unlisted
+    981 Paused back squat -> 5 hand=unlisted
+    972 Barbell overhead press -> 2 hand=null
+    972 Barbell push press -> 2 hand=null
+    972 Barbell bench press -> 2 hand=null
+    972 Barbell good mornings -> 2 hand=null
+    972 Double Kettlebell deadlift -> 5 hand=[5,8]
+    972 Kettlebell Romanian deadlift -> 5 hand=[5,8]
+    927 Paused back squat -> 3 hand=unlisted
+    891 Deadlift -> 4 hand=unlisted
+    891 Sumo deadlift -> 4 hand=unlisted
+    825 Bench dips -> 2 hand=unlisted
+    783 Trap bar deadlift -> 4 hand=unlisted
+    756 Barbell push press -> 3 hand=null
+    756 Barbell bench press -> 3 hand=null
+    756 Incline barbell press -> 2 hand=unlisted
+    738 Leg press -> 5 hand=[5,8]
+    711 Jump squats -> 4 hand=unlisted
+    702 Barbell box squat -> 4 hand=null
+    630 Back squat -> 4 hand=unlisted
+    627 Paused back squat -> 2 hand=unlisted
+    621 Front squat -> 3 hand=null
+    540 Front squat -> 5 hand=null
+    540 Barbell bench press -> 4 hand=null
+    540 Barbell overhead press -> 4 hand=null
+    540 Barbell push press -> 4 hand=null
+    540 Barbell good mornings -> 4 hand=null
+    495 Bench dips -> 4 hand=unlisted
+    489 Barbell Romanian deadlift -> 2 hand=null
+    448 Dumbbell lateral raise -> 5 hand=[5,8]
+    432 Close-grip bench press -> 3 hand=unlisted
+    432 Incline barbell press -> 4 hand=unlisted
+    375 Barbell Romanian deadlift -> 4 hand=null
+    348 Deadlift -> 1 hand=unlisted
+    348 Sumo deadlift -> 1 hand=unlisted
+    348 Trap bar deadlift -> 1 hand=unlisted
+    342 Incline barbell press -> 3 hand=unlisted
+    327 Paused back squat -> 4 hand=unlisted
+    324 Barbell overhead press -> 3 hand=null
+    306 Barbell box squat -> 1 hand=null
+    297 Front squat -> 2 hand=null
+    297 Bench dips -> 3 hand=unlisted
+    282 Jump squats -> 1 hand=unlisted
+    252 Back squat -> 1 hand=unlisted
+    222 Lat pulldown -> 5 hand=unlisted
+    219 Dumbbell seated calf raise -> 5 hand=[5,8]
+    216 Close-grip bench press -> 2 hand=unlisted
+    216 Barbell bench press -> 1 hand=null
+    216 Barbell overhead press -> 1 hand=null
+    216 Barbell push press -> 1 hand=null
+    216 Incline barbell press -> 1 hand=unlisted
+    216 Barbell good mornings -> 1 hand=null
+    203 Dumbbell curl -> 5 hand=[5,8]
+    198 Bench dips -> 1 hand=unlisted
+    172 Chinups -> 5 hand=unlisted
+    171 Dumbbell hammer curl -> 5 hand=[5,8]
+    162 Front squat -> 4 hand=null
+    153 Neutral-grip chinups -> 5 hand=unlisted
+    126 Paused back squat -> 1 hand=unlisted
+    125 Incline dumbbell curl -> 5 hand=[5,8]
+    114 Weighted chinups -> 5 hand=unlisted
+    108 Neutral-grip chinups -> 2 hand=unlisted
+    91 Overhead dumbbell extension -> 5 hand=[5,8]
+    90 Barbell Romanian deadlift -> 1 hand=null
+    89 Assisted pullups -> 5 hand=unlisted
+    84 Glute-ham raise -> 5 hand=unlisted
+    83 Chinups -> 2 hand=unlisted
+    81 Reverse lunge -> 5 hand=unlisted
+    78 Glute-ham raise -> 3 hand=unlisted
+    72 Neutral-grip chinups -> 3 hand=unlisted
+    69 Dumbbell standing calf raise -> 5 hand=[5,8]
+    66 Walking lunge (KB) -> 5 hand=[5,8]
+    65 Chinups -> 3 hand=unlisted
+    60 Glute-ham raise -> 2 hand=unlisted
+    57 Weighted chinups -> 3 hand=unlisted
+    54 Front squat -> 1 hand=null
+    54 Assisted pullups -> 2 hand=unlisted
+    53 Chinups -> 4 hand=unlisted
+    51 Neutral-grip chinups -> 4 hand=unlisted
+    36 Barbell curl -> 5 hand=null
+    30 Glute-ham raise -> 4 hand=unlisted
+    30 Assisted pullups -> 3 hand=unlisted
+    29 Assisted pullups -> 4 hand=unlisted
+    27 Preacher curl -> 5 hand=unlisted
+    27 Weighted chinups -> 2 hand=unlisted
+    26 Barbell curl -> 3 hand=null
+    24 Leg extension -> 5 hand=unlisted
+    24 Neutral-grip chinups -> 1 hand=unlisted
+    21 Weighted chinups -> 4 hand=unlisted
+    21 Preacher curl -> 2 hand=unlisted
+    18 Barbell curl -> 4 hand=null
+    18 Barbell curl -> 2 hand=null
+    18 Chinups -> 1 hand=unlisted
+    15 Preacher curl -> 4 hand=unlisted
+    14 Face pull -> 5 hand=unlisted
+    12 Glute-ham raise -> 1 hand=unlisted
+    12 Assisted pullups -> 1 hand=unlisted
+    9 Preacher curl -> 3 hand=unlisted
+    8 Face pull -> 3 hand=unlisted
+    6 Machine seated calf raise -> 5 hand=unlisted
+    6 Lying leg curl -> 5 hand=unlisted
+    6 Leg extension -> 2 hand=unlisted
+    6 Preacher curl -> 1 hand=unlisted
+    6 Weighted chinups -> 1 hand=unlisted
+    6 Single-leg glute bridge (weighted) -> 5 hand=unlisted
+    3 Leg extension -> 4 hand=unlisted
+    1 Seated leg curl -> 5 hand=unlisted
+    1 Seated leg curl -> 4 hand=unlisted
+  exceptions (<=5, not exactly 5 on a hand [5,8], excluding hand-null barbell):
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 mon Close-grip bench press -> Bench dips :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 mon Close-grip bench press -> Machine chest press :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 mon Close-grip bench press -> Incline barbell press :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 tue Barbell Romanian deadlift -> Deadlift :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 tue Barbell Romanian deadlift -> Sumo deadlift :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 tue Barbell Romanian deadlift -> Trap bar deadlift :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 tue Barbell Romanian deadlift -> Back squat :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 tue Barbell Romanian deadlift -> Jump squats :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 thu Front squat -> Back squat :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 thu Front squat -> Jump squats :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 thu Front squat -> Paused back squat :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+   EXC commercial|support_strength|beginner|liftonly|healthy W2 thu Front squat -> Deadlift :: 4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  candidates not in HAND table: {"Landmine rotational press":30847,"Bench dips":60499,"Dips":56923,"Machine chest press":4721,"Incline barbell press":36084,"Deadlift":23332,"Sumo deadlift":21921,"Trap bar deadlift":19816,"Back squat":11925,"Jump squats":36990,"Decline pushups":50277,"Pushups (slow tempo)":50312,"Cable lateral raise":5448,"Cable pushdown":5098,"Close-grip bench press":28050,"Diamond pushups":46014,"Cable pull-through":2127,"45° back extension":3694,"Bodyweight back extension":19219,"Single-leg glute bridge":10772,"Single-leg hip thrust":6201,"Machine seated calf raise":282,"Chinups":2182,"Neutral-grip chinups":1120,"Lat pulldown":624,"Cable curl":303,"Preacher curl":195,"Assisted pullups":608,"Weighted chinups":600,"Banded hip thrust":15255,"Feet-elevated inverted rows":1044,"Inverted rows (bodyweight)":1740,"Inverted rows (rings)":1044,"Face pull":994,"Rope tricep extension":68,"Glute-ham raise":1098,"Lying leg curl":270,"Seated leg curl":121,"Standing cable hamstring curl":62,"Leg extension":88,"Zercher single-leg deadlift":4920,"Paused back squat":3987,"Nordic hamstring curl (anchored)":11949,"Pushup variation (weighted)":29808,"Single-leg squat (assisted)":5290,"Pike pushups":63282,"Reverse lunge":4155,"Split squat":3374,"Squat (slow 3s tempo)":6966,"Step-ups (chair)":5784,"Bulgarian split squat (foot on chair)":4415,"Single-leg glute bridge (weighted)":1084,"Close-grip pushups":19820,"Pushups (slow 3s eccentric)":14032,"Wide-stance pushups":12794,"Pike pushups (feet elevated)":17726,"Wall walks":11624,"Feet-elevated inverted row (under a table)":3040,"Walking lunge":4288,"Single-leg Romanian deadlift (bodyweight)":5936,"Calf raise (bodyweight)":4514,"Decline pushups (feet elevated)":24126,"Prone Y-T-W raises":21234,"Bench dips (chair)":3108,"Inverted row (knees bent, under a table)":6512,"Wall slides":20724,"Incline pushups (hands on bed)":8864,"Single-leg calf raise (bodyweight)":1848,"Single-leg hip thrust (shoulders on bed)":1216,"Inverted row (supinated, under a table)":1354,"Inverted row (under a table)":184,"Assisted pistol squat":1260,"Archer pushups":7292}
+== Q2b CHEST-scope (v212 spread) pairs 797254 | <=5 38480
+    5503 Dumbbell floor press -> 5 hand=[5,8]
+    4856 Dumbbell incline press -> 5 hand=[5,8]
+    4826 Dumbbell split-stance deadlift -> 5 hand=[5,8]
+    4532 Dumbbell bench press -> 5 hand=[5,8]
+    3395 Kettlebell single-arm press -> 5 hand=[5,8]
+    3096 Dumbbell Arnold press -> 5 hand=[5,8]
+    2738 Dumbbell front raise -> 5 hand=[5,8]
+    2559 Dumbbell decline press -> 5 hand=[5,8]
+    1326 Dumbbell skullcrushers -> 5 hand=[5,8]
+    1293 Dumbbell rear delt fly -> 5 hand=[5,8]
+    1020 Reverse lunge (KB) -> 5 hand=[5,8]
+    972 Double Kettlebell deadlift -> 5 hand=[5,8]
+    972 Kettlebell Romanian deadlift -> 5 hand=[5,8]
+    448 Dumbbell lateral raise -> 5 hand=[5,8]
+    219 Dumbbell seated calf raise -> 5 hand=[5,8]
+    203 Dumbbell curl -> 5 hand=[5,8]
+    171 Dumbbell hammer curl -> 5 hand=[5,8]
+    125 Incline dumbbell curl -> 5 hand=[5,8]
+    91 Overhead dumbbell extension -> 5 hand=[5,8]
+    69 Dumbbell standing calf raise -> 5 hand=[5,8]
+    66 Walking lunge (KB) -> 5 hand=[5,8]
+  CHEST exceptions (<=5 and not exactly 5 on a hand [5,8]): 0
+== LANDMINE census. _repFloor HEAD vs COPY:
+    Landmine reverse lunge null -> [6,10]
+    Landmine rotational press null -> [6,10]
+    Landmine rotations null -> null
+  engine cards by name {"Landmine rotations":3020,"Landmine rotational press":1121} | changed {}
+    card 1816 Landmine rotations @  :: 3×8–12 each @ RPE 8
+    card 709 Landmine rotations @  :: 2×8–12 each @ RPE 7
+    card 324 Landmine rotational press @ Accessory :: 2×15 each
+    card 301 Landmine rotations @  :: 3×8–12 each @ RPE 6–7
+    card 243 Landmine rotational press @ Main :: 2×12 each
+    card 162 Landmine rotational press @ Main :: 3×12 each
+    card 101 Landmine rotations @  :: 2×8–12 each @ RPE 6–7
+    card 93 Landmine rotations @  :: 3×8–12 each @ RPE 7
+    card 81 Landmine rotational press @ Accessory :: 4×15 each
+    card 81 Landmine rotational press @ Main :: 4×12 each
+    card 81 Landmine rotational press @ Accessory :: 3×15 each
+    card 36 Landmine rotational press @ Accessory :: 2×15 each — hold RPE 7, two in the tank
+  _swapDetailFor(COPY) on Landmine rotations distinct engine details 5 | changed 0
+  _swapDetailFor(COPY) on Landmine rotational press distinct engine details 20 | changed 0
+  as swap candidate (Main/Power donors) {"Landmine rotational press same":26860,"Landmine reverse lunge same":11309,"Landmine rotational press CHANGED":3987,"Landmine reverse lunge CHANGED":5484} | as swap donor {"Landmine rotational press":6984}
+== Q4 POWER items 24148 | with S×R — RPE grammar 0 | power swap pairs 25922 | of which donor RPE 0 | changed base->copy 0
+== PIN null-_pattern items 519688 | _swapDetailFor changes on COPY 27000 | on HEAD 27000
+     8910 Banded side steps :: 2×15–20 each @ RPE 8
+     8910 Banded monster walks :: 2×12–15 each @ RPE 8
+     5130 Banded monster walks :: 2×12–15 each @ RPE 7
+     4050 Banded side steps :: 2×15–20 each @ RPE 7
+   named Dumbbell renegade rows _pattern=null _repFloor COPY=[5,8]
+   named Kettlebell windmill _pattern=null _repFloor COPY=[5,8]
+   named Suitcase carry _pattern=null _repFloor COPY=null
+   named on engine cards {"Suitcase carry | changed=false":7394,"Dumbbell renegade rows | changed=false":4936}
+== DUP days with a repeated item name where it is swappable 0
+
+== Q5 UNDO
+  unloadable pick: commercial|support_prevention|beginner|liftonly|healthy W1 mon Close-grip bench press -> Dips
+     record carried detail: false 
+   HEAD unloadable 
+     before: Close-grip bench press :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form 
+     swap  : Dips :: 3 sets — RPE 6 (leave 3 or more in reserve) 
+     undo  : Close-grip bench press :: 3 sets — RPE 6 (leave 3 or more in reserve) | detail NOT restored
+     record carried detail: false 
+   HEAD goblet (repro) 
+     before: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     swap  : Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     undo  : Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | detail RESTORED
+     record carried detail: false (stripped: legacy)
+   HEAD goblet LEGACY record (detail field deleted before undo) 
+     before: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     swap  : Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     undo  : Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | detail RESTORED
+     record carried detail: true 
+   COPY unloadable 
+     before: Close-grip bench press :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form 
+     swap  : Dips :: 3 sets — RPE 6 (leave 3 or more in reserve) 
+     undo  : Close-grip bench press :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form | detail RESTORED
+     record carried detail: true 
+   COPY goblet (repro) 
+     before: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     swap  : Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     undo  : Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | detail RESTORED
+     record carried detail: true (stripped: legacy)
+   COPY goblet LEGACY record (detail field deleted before undo) 
+     before: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     swap  : Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 
+     undo  : Barbell box squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | detail NOT restored
+DONE
+EXIT220=0

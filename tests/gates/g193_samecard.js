@@ -306,6 +306,7 @@ const SEEDS = [1013, 3039, 76308];
 const OPEN_UNRULED_BY_VERSION = { 218: { 'Kettlebell swing': 28 } };
 OPEN_UNRULED_BY_VERSION[219] = { 'Kettlebell swing': 0 };   // D166: ruled MOVE (28 -> 0)
 OPEN_UNRULED_BY_VERSION[220] = OPEN_UNRULED_BY_VERSION[219];   // V220 (D173/D174/D175/D176): ruled UNMOVED (zero-engine build: display, copy and pop-up only; no hunk reaches buildProgram or anything it calls; the swing class stays a ruled 0)
+OPEN_UNRULED_BY_VERSION[221] = OPEN_UNRULED_BY_VERSION[220];   // V221 (D177/D178/D179/D180): ruled UNMOVED (D177 adds a _REP_FLOOR row that scheme() reads and 0 engine cards change: measure 0/1,201,231, tests/measure/v221_rebase_swapfloor.out.txt; D178/D179/D180 are zero-engine: no hunk reaches buildProgram or anything it calls; the swing class stays a ruled 0)
 const OPEN_UNRULED = OPEN_UNRULED_BY_VERSION[(+IA.version <= 218) ? 218 : +IA.version];
 if (!OPEN_UNRULED) throw new Error('g193: no OPEN_UNRULED_BY_VERSION row for V' + IA.version + ': an unruled register (D133)');
 

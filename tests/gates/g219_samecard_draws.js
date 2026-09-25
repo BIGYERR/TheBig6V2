@@ -139,6 +139,7 @@ const ERA = {
          c165:0, c166:0,
          fx:{ exact:'Pec deck 3×12–15 @ RPE 6–7', noDup:true } } };
 ERA[220] = ERA[219];   // V220 (D173/D174/D175/D176): ruled UNMOVED (zero-engine build: display, copy and pop-up only; no hunk reaches buildProgram or anything it calls; the D164 R4/R5 EQUALITY still expires on D169, not shipped here)
+ERA[221] = ERA[220];   // V221 (D177/D178/D179/D180): ruled UNMOVED (D177 adds a _REP_FLOOR row read by scheme(), and 0 engine cards change: measure 0/1,201,231, builder 0/903,969; D178/D179/D180 are zero-engine: Programs/loader, day-close UI, refreshProgram copy-back of a display flag; gatekeeper pre-flight 2026-09-24: g219 15/0 on the candidate stamped 220)
 function shardCount(){ const raw = process.env.G219_SHARDS === undefined ? '' : String(process.env.G219_SHARDS);
   if(raw === '') return 4;
   if(!/^[0-9]+$/.test(raw) || parseInt(raw, 10) < 1){ fail++; console.log("FAIL: CONFIG: G219_SHARDS must be a positive integer, or empty/unset which means 4; got '" + raw + "'"); return 0; }

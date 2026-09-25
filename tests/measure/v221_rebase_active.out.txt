@@ -1,0 +1,91 @@
+== PART A: v212_open_vs_active.js unmodified ==
+  same PASS SET ACTIVE: ia_active==P1                                                   | 
+  same PASS SET ACTIVE: card list repainted, check on P1                                | 
+  same FAIL SET ACTIVE: This Week global activeProgId==P1                               | 
+  same FAIL SET ACTIVE: renderWeekView called                                           | 
+  same PASS OPEN: This Week shows P1                                                    | 
+  same FAIL OPEN: ia_active persisted as P1                                             | 
+  same FAIL OPEN: card check follows opened program                                     | 
+  same REBOOT after OPEN P1 (no Set Active)                                             | 
+  same FAIL OPEN survives reboot                                                        | 
+  same SPLIT after setActive(P1): writes keyed on activeProgId = P0 while card shows P1 | 
+  same PASS 3 FAIL 5                                                                    | 
+  same PASS P0: all 4 families under P0                                                 | 
+  same PASS P0: nothing under P1                                                        | 
+  same PASS P0: ia_comp_ title == P0's own card title                                   | 
+  same PASS P0: ia_hist_ snapshot == P0's own day                                       | 
+  same REBOOT -> This Week shows P1; its ia_comp_ has 0 entries; logged session lives u | 
+  same PASS P1: all 4 families under P1                                                 | 
+  same PASS P1: nothing under P0                                                        | 
+  same PASS P1: ia_comp_ title == P1's own card title                                   | 
+  same PASS P1: ia_hist_ snapshot == P1's own day                                       | 
+  same REBOOT -> This Week shows P0; its ia_comp_ has 0 entries; logged session lives u | 
+  same PART2 PASS 8 FAIL 0                                                              | 
+
+== PART B: invariant census (oracle: ia_active===activeProgId===activeProg.id, or all null) ==
+-- V219
+  path                                      ia_active  activeProgId  activeProg.id  invariant  note
+  boot, ia_active=P0 (live)                 P0         P0            P0             HOLDS      
+  boot, ia_active missing                   null       null          null           HOLDS      
+  boot, ia_active=PX stale (fallback)       PX         P0            P0             BROKEN     
+  boot, ia_active=P2 archived (fallback)    P2         P0            P0             BROKEN     
+  wizard commit (doGenerate, flushed)       prog_1790311627610prog_1790311627610prog_1790311627610HOLDS      
+  setActive(P1)                             P1         P0            P0             BROKEN     
+  openProg(P1)                              P0         P1            P1             BROKEN     
+  openProg(P2 archived)                     P0         P2            P2             BROKEN     
+  setActive(P2 archived)                    P0         P0            P0             HOLDS      
+  archive active P0 (handoff to P1)         P1         P1            P1             HOLDS      
+  delete active P0 (handoff to P1)          P1         P1            P1             HOLDS      
+  archive active P0, none left (null arm)   null       null          null           HOLDS      
+  delete active P0, none left (null arm)    null       null          null           HOLDS      
+  setActive(P1) then reboot                 P1         P1            P1             HOLDS      
+  openProg(P1) then reboot                  P0         P0            P0             HOLDS      
+  split: setActive(P1) then archive P1      P0         P0            P0             HOLDS      
+  split: openProg(P1) then archive P0       P1         P1            P1             HOLDS      
+  V219 invariant HOLDS 12 BROKEN 5 of 17 paths
+-- V220
+  path                                      ia_active  activeProgId  activeProg.id  invariant  note
+  boot, ia_active=P0 (live)                 P0         P0            P0             HOLDS      
+  boot, ia_active missing                   null       null          null           HOLDS      
+  boot, ia_active=PX stale (fallback)       PX         P0            P0             BROKEN     
+  boot, ia_active=P2 archived (fallback)    P2         P0            P0             BROKEN     
+  wizard commit (doGenerate, flushed)       prog_1790311628467prog_1790311628467prog_1790311628467HOLDS      
+  setActive(P1)                             P1         P0            P0             BROKEN     
+  openProg(P1)                              P0         P1            P1             BROKEN     
+  openProg(P2 archived)                     P0         P2            P2             BROKEN     
+  setActive(P2 archived)                    P0         P0            P0             HOLDS      
+  archive active P0 (handoff to P1)         P1         P1            P1             HOLDS      
+  delete active P0 (handoff to P1)          P1         P1            P1             HOLDS      
+  archive active P0, none left (null arm)   null       null          null           HOLDS      
+  delete active P0, none left (null arm)    null       null          null           HOLDS      
+  setActive(P1) then reboot                 P1         P1            P1             HOLDS      
+  openProg(P1) then reboot                  P0         P0            P0             HOLDS      
+  split: setActive(P1) then archive P1      P0         P0            P0             HOLDS      
+  split: openProg(P1) then archive P0       P1         P1            P1             HOLDS      
+  V220 invariant HOLDS 12 BROKEN 5 of 17 paths
+
+== PART C: copy sites (source text) ==
+  OPEN button: V219 n=1 :14983  V220 n=1 :14977  text IDENTICAL
+    <button class="prog-action-btn primary" onclick="openProg('${p.id}')">Open</button>
+  SET ACTIVE button: V219 n=1 :14984  V220 n=1 :14978  text IDENTICAL
+    onclick="setActive('${p.id}')">Set Active</button>
+  Active check label: V219 n=1 :14984  V220 n=1 :14978  text IDENTICAL
+    cursor:default">Active \u2713</button>
+  card goal line: V219 n=1 :15002  V220 n=1 :14996  text IDENTICAL
+    _cts.map(t=>asyIcon(({run:'🏃',bike:'🚴',swim:'🏊'})[t],13)+(p.cfg?.cardioGoals?.[t]?.label?' — '+p.cfg.cardioGoals[t].label:'')).join(' + ')
+  wizard review line: V219 n=1 :3022  V220 n=1 :3022  text IDENTICAL
+    WD.cardioTypes.map(t => asyIcon(({run:'🏃',bike:'🚴',swim:'🏊'})[t],15)+' '+({run:'Run',bike:'Bike',swim:'Swim'})[t] + (WD.cardioGoals[t]?.label?' — '+WD.cardioGoals[t].label:'')).join(' + ')
+  setActive body: V219 n=1 :15867  V220 n=1 :15861  text IDENTICAL
+    function setActive(id){const _p=getPrograms().find(x=>x.id===id);if(_p&&_p.archived){showToast('Restore this program first');return;}setActiveProgId(id);renderProgList();showToast('Active program updated');}
+  openProg body: V219 n=1 :15866  V220 n=1 :15860  text IDENTICAL
+    function openProg(id){const programs=getPrograms();const stored=programs.find(p=>p.id===id);if(!stored)return;activeProgId=id;activeProg=refreshProgram(stored);currentWeek=calcCurrentWeek();showScreen('screenWeek');renderWeekView();}
+  boot resolver: V219 n=1 :17545  V220 n=1 :17539  text IDENTICAL
+    const aid=getActiveProgId();const programs=getPrograms();
+  if(aid&&programs.length){const stored=programs.find(p=>p.id===aid&&!p.archived)||programs.find(p=>!p.archived);if(stored){activeProgId=stored.id;try{const _x=getExWeights();if(foldExAliasKeys(_x))save
+  wizard commit: V219 n=1 :7561  V220 n=1 :7561  text IDENTICAL
+    setActiveProgId(prog.id);activeProgId=prog.id;activeProg=prog;
+
+== PART D: progDigest, all fixtures ==
+  HALF_MANNY                  0ac7da6b1691a8e1  0ac7da6b1691a8e1  same
+  fixtures identical 1 of 1; HALF_MANNY V220=0ac7da6b1691a8e1 expect 0ac7da6b1691a8e1 -> PASS
+DONE

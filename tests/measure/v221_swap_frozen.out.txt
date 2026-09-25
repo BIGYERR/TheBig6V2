@@ -1,0 +1,399 @@
+SELFCHECK V220 identical: true
+
+RUNS 1008  crashes/errors 0
+
+-- durable by tree (survived/total)
+  D177                                                          190/504
+  V220                                                          190/504
+
+-- durable by tree|clock (reboot same day) (survived/total)
+  D177|future_prevwk                                            24/56
+  D177|future_samewk                                            22/56
+  D177|past_nextwk                                              20/56
+  D177|past_samewk                                              22/56
+  D177|today                                                    22/56
+  V220|future_prevwk                                            24/56
+  V220|future_samewk                                            22/56
+  V220|past_nextwk                                              20/56
+  V220|past_samewk                                              22/56
+  V220|today                                                    22/56
+  ~                                                             160/448
+
+-- durable by tree|dated|clock|touch|order (reboot same day, no other-day touch, goblet) (survived/total)
+  D177|dated|future_prevwk|done|swap_then_touch                 1/1
+  D177|dated|future_prevwk|done|touch_then_swap                 0/1
+  D177|dated|future_prevwk|draft|swap_then_touch                1/1
+  D177|dated|future_prevwk|draft|touch_then_swap                0/1
+  D177|dated|future_prevwk|none|-                               1/1
+  D177|dated|future_prevwk|tick|swap_then_touch                 0/1
+  D177|dated|future_prevwk|tick|touch_then_swap                 0/1
+  D177|dated|future_samewk|done|swap_then_touch                 1/1
+  D177|dated|future_samewk|done|touch_then_swap                 0/1
+  D177|dated|future_samewk|draft|swap_then_touch                1/1
+  D177|dated|future_samewk|draft|touch_then_swap                0/1
+  D177|dated|future_samewk|none|-                               1/1
+  D177|dated|future_samewk|tick|swap_then_touch                 0/1
+  D177|dated|future_samewk|tick|touch_then_swap                 0/1
+  D177|dated|past_nextwk|done|swap_then_touch                   1/1
+  D177|dated|past_nextwk|done|touch_then_swap                   0/1
+  D177|dated|past_nextwk|draft|swap_then_touch                  1/1
+  D177|dated|past_nextwk|draft|touch_then_swap                  0/1
+  D177|dated|past_nextwk|none|-                                 0/1
+  D177|dated|past_nextwk|tick|swap_then_touch                   0/1
+  D177|dated|past_nextwk|tick|touch_then_swap                   0/1
+  D177|dated|past_samewk|done|swap_then_touch                   1/1
+  D177|dated|past_samewk|done|touch_then_swap                   0/1
+  D177|dated|past_samewk|draft|swap_then_touch                  1/1
+  D177|dated|past_samewk|draft|touch_then_swap                  0/1
+  D177|dated|past_samewk|none|-                                 1/1
+  D177|dated|past_samewk|tick|swap_then_touch                   0/1
+  D177|dated|past_samewk|tick|touch_then_swap                   0/1
+  D177|dated|today|done|swap_then_touch                         1/1
+  D177|dated|today|done|touch_then_swap                         0/1
+  D177|dated|today|draft|swap_then_touch                        1/1
+  D177|dated|today|draft|touch_then_swap                        0/1
+  D177|dated|today|none|-                                       1/1
+  D177|dated|today|tick|swap_then_touch                         0/1
+  D177|dated|today|tick|touch_then_swap                         0/1
+  D177|dateless|future_prevwk|done|swap_then_touch              1/1
+  D177|dateless|future_prevwk|done|touch_then_swap              0/1
+  D177|dateless|future_prevwk|draft|swap_then_touch             1/1
+  D177|dateless|future_prevwk|draft|touch_then_swap             0/1
+  D177|dateless|future_prevwk|none|-                            1/1
+  D177|dateless|future_prevwk|tick|swap_then_touch              0/1
+  D177|dateless|future_prevwk|tick|touch_then_swap              0/1
+  D177|dateless|future_samewk|done|swap_then_touch              1/1
+  D177|dateless|future_samewk|done|touch_then_swap              0/1
+  D177|dateless|future_samewk|draft|swap_then_touch             1/1
+  D177|dateless|future_samewk|draft|touch_then_swap             0/1
+  D177|dateless|future_samewk|none|-                            1/1
+  D177|dateless|future_samewk|tick|swap_then_touch              0/1
+  D177|dateless|future_samewk|tick|touch_then_swap              0/1
+  D177|dateless|past_nextwk|done|swap_then_touch                1/1
+  D177|dateless|past_nextwk|done|touch_then_swap                0/1
+  D177|dateless|past_nextwk|draft|swap_then_touch               1/1
+  D177|dateless|past_nextwk|draft|touch_then_swap               0/1
+  D177|dateless|past_nextwk|none|-                              1/1
+  D177|dateless|past_nextwk|tick|swap_then_touch                0/1
+  D177|dateless|past_nextwk|tick|touch_then_swap                0/1
+  D177|dateless|past_samewk|done|swap_then_touch                1/1
+  D177|dateless|past_samewk|done|touch_then_swap                0/1
+  D177|dateless|past_samewk|draft|swap_then_touch               1/1
+  D177|dateless|past_samewk|draft|touch_then_swap               0/1
+  D177|dateless|past_samewk|none|-                              1/1
+  D177|dateless|past_samewk|tick|swap_then_touch                0/1
+  D177|dateless|past_samewk|tick|touch_then_swap                0/1
+  D177|dateless|today|done|swap_then_touch                      1/1
+  D177|dateless|today|done|touch_then_swap                      0/1
+  D177|dateless|today|draft|swap_then_touch                     1/1
+  D177|dateless|today|draft|touch_then_swap                     0/1
+  D177|dateless|today|none|-                                    1/1
+  D177|dateless|today|tick|swap_then_touch                      0/1
+  D177|dateless|today|tick|touch_then_swap                      0/1
+  V220|dated|future_prevwk|done|swap_then_touch                 1/1
+  V220|dated|future_prevwk|done|touch_then_swap                 0/1
+  V220|dated|future_prevwk|draft|swap_then_touch                1/1
+  V220|dated|future_prevwk|draft|touch_then_swap                0/1
+  V220|dated|future_prevwk|none|-                               1/1
+  V220|dated|future_prevwk|tick|swap_then_touch                 0/1
+  V220|dated|future_prevwk|tick|touch_then_swap                 0/1
+  V220|dated|future_samewk|done|swap_then_touch                 1/1
+  V220|dated|future_samewk|done|touch_then_swap                 0/1
+  V220|dated|future_samewk|draft|swap_then_touch                1/1
+  V220|dated|future_samewk|draft|touch_then_swap                0/1
+  V220|dated|future_samewk|none|-                               1/1
+  V220|dated|future_samewk|tick|swap_then_touch                 0/1
+  V220|dated|future_samewk|tick|touch_then_swap                 0/1
+  V220|dated|past_nextwk|done|swap_then_touch                   1/1
+  V220|dated|past_nextwk|done|touch_then_swap                   0/1
+  V220|dated|past_nextwk|draft|swap_then_touch                  1/1
+  V220|dated|past_nextwk|draft|touch_then_swap                  0/1
+  V220|dated|past_nextwk|none|-                                 0/1
+  V220|dated|past_nextwk|tick|swap_then_touch                   0/1
+  V220|dated|past_nextwk|tick|touch_then_swap                   0/1
+  V220|dated|past_samewk|done|swap_then_touch                   1/1
+  V220|dated|past_samewk|done|touch_then_swap                   0/1
+  V220|dated|past_samewk|draft|swap_then_touch                  1/1
+  V220|dated|past_samewk|draft|touch_then_swap                  0/1
+  V220|dated|past_samewk|none|-                                 1/1
+  V220|dated|past_samewk|tick|swap_then_touch                   0/1
+  V220|dated|past_samewk|tick|touch_then_swap                   0/1
+  V220|dated|today|done|swap_then_touch                         1/1
+  V220|dated|today|done|touch_then_swap                         0/1
+  V220|dated|today|draft|swap_then_touch                        1/1
+  V220|dated|today|draft|touch_then_swap                        0/1
+  V220|dated|today|none|-                                       1/1
+  V220|dated|today|tick|swap_then_touch                         0/1
+  V220|dated|today|tick|touch_then_swap                         0/1
+  V220|dateless|future_prevwk|done|swap_then_touch              1/1
+  V220|dateless|future_prevwk|done|touch_then_swap              0/1
+  V220|dateless|future_prevwk|draft|swap_then_touch             1/1
+  V220|dateless|future_prevwk|draft|touch_then_swap             0/1
+  V220|dateless|future_prevwk|none|-                            1/1
+  V220|dateless|future_prevwk|tick|swap_then_touch              0/1
+  V220|dateless|future_prevwk|tick|touch_then_swap              0/1
+  V220|dateless|future_samewk|done|swap_then_touch              1/1
+  V220|dateless|future_samewk|done|touch_then_swap              0/1
+  V220|dateless|future_samewk|draft|swap_then_touch             1/1
+  V220|dateless|future_samewk|draft|touch_then_swap             0/1
+  V220|dateless|future_samewk|none|-                            1/1
+  V220|dateless|future_samewk|tick|swap_then_touch              0/1
+  V220|dateless|future_samewk|tick|touch_then_swap              0/1
+  V220|dateless|past_nextwk|done|swap_then_touch                1/1
+  V220|dateless|past_nextwk|done|touch_then_swap                0/1
+  V220|dateless|past_nextwk|draft|swap_then_touch               1/1
+  V220|dateless|past_nextwk|draft|touch_then_swap               0/1
+  V220|dateless|past_nextwk|none|-                              1/1
+  V220|dateless|past_nextwk|tick|swap_then_touch                0/1
+  V220|dateless|past_nextwk|tick|touch_then_swap                0/1
+  V220|dateless|past_samewk|done|swap_then_touch                1/1
+  V220|dateless|past_samewk|done|touch_then_swap                0/1
+  V220|dateless|past_samewk|draft|swap_then_touch               1/1
+  V220|dateless|past_samewk|draft|touch_then_swap               0/1
+  V220|dateless|past_samewk|none|-                              1/1
+  V220|dateless|past_samewk|tick|swap_then_touch                0/1
+  V220|dateless|past_samewk|tick|touch_then_swap                0/1
+  V220|dateless|today|done|swap_then_touch                      1/1
+  V220|dateless|today|done|touch_then_swap                      0/1
+  V220|dateless|today|draft|swap_then_touch                     1/1
+  V220|dateless|today|draft|touch_then_swap                     0/1
+  V220|dateless|today|none|-                                    1/1
+  V220|dateless|today|tick|swap_then_touch                      0/1
+  V220|dateless|today|tick|touch_then_swap                      0/1
+  ~                                                             322/868
+
+-- durable by other-day touch in the clock week (dated, reboot same day, touch none) (survived/total)
+  D177|future_prevwk|other=false                                2/2
+  D177|future_prevwk|other=true                                 2/2
+  D177|future_samewk|other=false                                2/2
+  D177|future_samewk|other=true                                 0/2
+  D177|past_nextwk|other=false                                  0/2
+  D177|past_nextwk|other=true                                   0/2
+  D177|past_samewk|other=false                                  2/2
+  D177|past_samewk|other=true                                   0/2
+  D177|today|other=false                                        2/2
+  D177|today|other=true                                         0/2
+  V220|future_prevwk|other=false                                2/2
+  V220|future_prevwk|other=true                                 2/2
+  V220|future_samewk|other=false                                2/2
+  V220|future_samewk|other=true                                 0/2
+  V220|past_nextwk|other=false                                  0/2
+  V220|past_nextwk|other=true                                   0/2
+  V220|past_samewk|other=false                                  2/2
+  V220|past_samewk|other=true                                   0/2
+  V220|today|other=false                                        2/2
+  V220|today|other=true                                         0/2
+  ~                                                             360/968
+
+-- durable by reboot next week (dated, W6 Tue), by act clock|touch (survived/total)
+  D177|future_prevwk|done|swap_then_touch                       1/1
+  D177|future_prevwk|done|touch_then_swap                       0/1
+  D177|future_prevwk|draft|swap_then_touch                      1/1
+  D177|future_prevwk|draft|touch_then_swap                      0/1
+  D177|future_prevwk|none|-                                     0/1
+  D177|future_prevwk|tick|swap_then_touch                       0/1
+  D177|future_prevwk|tick|touch_then_swap                       0/1
+  D177|future_samewk|done|swap_then_touch                       1/1
+  D177|future_samewk|done|touch_then_swap                       0/1
+  D177|future_samewk|draft|swap_then_touch                      1/1
+  D177|future_samewk|draft|touch_then_swap                      0/1
+  D177|future_samewk|none|-                                     0/1
+  D177|future_samewk|tick|swap_then_touch                       0/1
+  D177|future_samewk|tick|touch_then_swap                       0/1
+  D177|past_samewk|done|swap_then_touch                         1/1
+  D177|past_samewk|done|touch_then_swap                         0/1
+  D177|past_samewk|draft|swap_then_touch                        1/1
+  D177|past_samewk|draft|touch_then_swap                        0/1
+  D177|past_samewk|none|-                                       0/1
+  D177|past_samewk|tick|swap_then_touch                         0/1
+  D177|past_samewk|tick|touch_then_swap                         0/1
+  D177|today|done|swap_then_touch                               1/1
+  D177|today|done|touch_then_swap                               0/1
+  D177|today|draft|swap_then_touch                              1/1
+  D177|today|draft|touch_then_swap                              0/1
+  D177|today|none|-                                             0/1
+  D177|today|tick|swap_then_touch                               0/1
+  D177|today|tick|touch_then_swap                               0/1
+  V220|future_prevwk|done|swap_then_touch                       1/1
+  V220|future_prevwk|done|touch_then_swap                       0/1
+  V220|future_prevwk|draft|swap_then_touch                      1/1
+  V220|future_prevwk|draft|touch_then_swap                      0/1
+  V220|future_prevwk|none|-                                     0/1
+  V220|future_prevwk|tick|swap_then_touch                       0/1
+  V220|future_prevwk|tick|touch_then_swap                       0/1
+  V220|future_samewk|done|swap_then_touch                       1/1
+  V220|future_samewk|done|touch_then_swap                       0/1
+  V220|future_samewk|draft|swap_then_touch                      1/1
+  V220|future_samewk|draft|touch_then_swap                      0/1
+  V220|future_samewk|none|-                                     0/1
+  V220|future_samewk|tick|swap_then_touch                       0/1
+  V220|future_samewk|tick|touch_then_swap                       0/1
+  V220|past_samewk|done|swap_then_touch                         1/1
+  V220|past_samewk|done|touch_then_swap                         0/1
+  V220|past_samewk|draft|swap_then_touch                        1/1
+  V220|past_samewk|draft|touch_then_swap                        0/1
+  V220|past_samewk|none|-                                       0/1
+  V220|past_samewk|tick|swap_then_touch                         0/1
+  V220|past_samewk|tick|touch_then_swap                         0/1
+  V220|today|done|swap_then_touch                               1/1
+  V220|today|done|touch_then_swap                               0/1
+  V220|today|draft|swap_then_touch                              1/1
+  V220|today|draft|touch_then_swap                              0/1
+  V220|today|none|-                                             0/1
+  V220|today|tick|swap_then_touch                               0/1
+  V220|today|tick|touch_then_swap                               0/1
+  ~                                                             364/952
+
+-- durable by pair (survived/total)
+  D177|goblet                                                   95/252
+  D177|verbatim                                                 95/252
+  V220|goblet                                                   95/252
+  V220|verbatim                                                 95/252
+
+REVERTED 628/1008; of those: record pruned 628, hist holds donor 288, no hist 340, logs orphaned against the card (records exist, none keyed to the card name) 144, stored grid ever carries target 0/1008
+DURABLE 380/1008; of those record kept 92, hist holds target 288
+
+== STATE TABLE (goblet pair, dated, reboot same clock, no other-day touch) ==
+  V220|future_prevwk|none|-                      live=Dumbbell goblet squat | BOOT wk4 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|future_prevwk|draft|swap_then_touch       live=Dumbbell goblet squat | BOOT wk4 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|future_prevwk|draft|touch_then_swap       live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|future_prevwk|tick|swap_then_touch        live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|future_prevwk|tick|touch_then_swap        live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|future_prevwk|done|swap_then_touch        live=Dumbbell goblet squat | BOOT wk4 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|future_prevwk|done|touch_then_swap        live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|future_samewk|none|-                      live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|future_samewk|draft|swap_then_touch       live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|future_samewk|draft|touch_then_swap       live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|future_samewk|tick|swap_then_touch        live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|future_samewk|tick|touch_then_swap        live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|future_samewk|done|swap_then_touch        live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|future_samewk|done|touch_then_swap        live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|today|none|-                              live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|today|draft|swap_then_touch               live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|today|draft|touch_then_swap               live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|today|tick|swap_then_touch                live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|today|tick|touch_then_swap                live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|today|done|swap_then_touch                live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|today|done|touch_then_swap                live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|past_samewk|none|-                        live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|past_samewk|draft|swap_then_touch         live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|past_samewk|draft|touch_then_swap         live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|past_samewk|tick|swap_then_touch          live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|past_samewk|tick|touch_then_swap          live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|past_samewk|done|swap_then_touch          live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|past_samewk|done|touch_then_swap          live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|past_nextwk|none|-                        live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|past_nextwk|draft|swap_then_touch         live=Dumbbell goblet squat | BOOT wk6 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|past_nextwk|draft|touch_then_swap         live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|past_nextwk|tick|swap_then_touch          live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|past_nextwk|tick|touch_then_swap          live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|past_nextwk|done|swap_then_touch          live=Dumbbell goblet squat | BOOT wk6 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|past_nextwk|done|touch_then_swap          live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  D177|future_prevwk|none|-                      live=Dumbbell goblet squat | BOOT wk4 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  D177|future_prevwk|draft|swap_then_touch       live=Dumbbell goblet squat | BOOT wk4 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  D177|future_prevwk|draft|touch_then_swap       live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  D177|future_prevwk|tick|swap_then_touch        live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  D177|future_prevwk|tick|touch_then_swap        live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  D177|future_prevwk|done|swap_then_touch        live=Dumbbell goblet squat | BOOT wk4 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  D177|future_prevwk|done|touch_then_swap        live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  D177|future_samewk|none|-                      live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  D177|future_samewk|draft|swap_then_touch       live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  D177|future_samewk|draft|touch_then_swap       live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  D177|future_samewk|tick|swap_then_touch        live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  D177|future_samewk|tick|touch_then_swap        live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  D177|future_samewk|done|swap_then_touch        live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  D177|future_samewk|done|touch_then_swap        live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  D177|today|none|-                              live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  D177|today|draft|swap_then_touch               live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  D177|today|draft|touch_then_swap               live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  D177|today|tick|swap_then_touch                live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  D177|today|tick|touch_then_swap                live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  D177|today|done|swap_then_touch                live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  D177|today|done|touch_then_swap                live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  D177|past_samewk|none|-                        live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  D177|past_samewk|draft|swap_then_touch         live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  D177|past_samewk|draft|touch_then_swap         live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  D177|past_samewk|tick|swap_then_touch          live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  D177|past_samewk|tick|touch_then_swap          live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  D177|past_samewk|done|swap_then_touch          live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  D177|past_samewk|done|touch_then_swap          live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  D177|past_nextwk|none|-                        live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  D177|past_nextwk|draft|swap_then_touch         live=Dumbbell goblet squat | BOOT wk6 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  D177|past_nextwk|draft|touch_then_swap         live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  D177|past_nextwk|tick|swap_then_touch          live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  D177|past_nextwk|tick|touch_then_swap          live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  D177|past_nextwk|done|swap_then_touch          live=Dumbbell goblet squat | BOOT wk6 SURVIVES card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  D177|past_nextwk|done|touch_then_swap          live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+
+== SAME, other-day touch in the clock week (Mon draft) ==
+  V220|future_prevwk|none|-                      live=Dumbbell goblet squat | BOOT wk4 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|future_prevwk|draft|swap_then_touch       live=Dumbbell goblet squat | BOOT wk4 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|future_prevwk|draft|touch_then_swap       live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|future_prevwk|tick|swap_then_touch        live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|future_prevwk|tick|touch_then_swap        live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|future_prevwk|done|swap_then_touch        live=Dumbbell goblet squat | BOOT wk4 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|future_prevwk|done|touch_then_swap        live=Dumbbell goblet squat | BOOT wk4 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|future_samewk|none|-                      live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|future_samewk|draft|swap_then_touch       live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|future_samewk|draft|touch_then_swap       live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|future_samewk|tick|swap_then_touch        live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|future_samewk|tick|touch_then_swap        live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|future_samewk|done|swap_then_touch        live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|future_samewk|done|touch_then_swap        live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|today|none|-                              live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|today|draft|swap_then_touch               live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|today|draft|touch_then_swap               live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|today|tick|swap_then_touch                live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|today|tick|touch_then_swap                live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|today|done|swap_then_touch                live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|today|done|touch_then_swap                live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|past_samewk|none|-                        live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|past_samewk|draft|swap_then_touch         live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|past_samewk|draft|touch_then_swap         live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|past_samewk|tick|swap_then_touch          live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|past_samewk|tick|touch_then_swap          live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|past_samewk|done|swap_then_touch          live=Dumbbell goblet squat | BOOT wk5 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|past_samewk|done|touch_then_swap          live=Dumbbell goblet squat | BOOT wk5 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|past_nextwk|none|-                        live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|past_nextwk|draft|swap_then_touch         live=Dumbbell goblet squat | BOOT wk6 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|past_nextwk|draft|touch_then_swap         live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|past_nextwk|tick|swap_then_touch          live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|past_nextwk|tick|touch_then_swap          live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|past_nextwk|done|swap_then_touch          live=Dumbbell goblet squat | BOOT wk6 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|past_nextwk|done|touch_then_swap          live=Dumbbell goblet squat | BOOT wk6 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+
+== DATELESS (builder G7-2 construction), V220 ==
+  V220|today|none|-                              live=Dumbbell goblet squat | BOOT wk1 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none | exw=- drafts=- onCard=null orphan=- comp=false
+  V220|today|draft|swap_then_touch               live=Dumbbell goblet squat | BOOT wk1 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=dumbbell_goblet_squat onCard=true orphan=- comp=false
+  V220|today|draft|touch_then_swap               live=Dumbbell goblet squat | BOOT wk1 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=barbell_box_squat onCard=true orphan=- comp=false
+  V220|today|tick|swap_then_touch                live=Dumbbell goblet squat | BOOT wk1 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=dumbbell_goblet_squat drafts=- onCard=false orphan=dumbbell_goblet_squat comp=false
+  V220|today|tick|touch_then_swap                live=Dumbbell goblet squat | BOOT wk1 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none | exw=barbell_box_squat drafts=- onCard=true orphan=- comp=false
+  V220|today|done|swap_then_touch                live=Dumbbell goblet squat | BOOT wk1 SURVIVES card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+  V220|today|done|touch_then_swap                live=Dumbbell goblet squat | BOOT wk1 REVERTS  card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | exw=- drafts=- onCard=null orphan=- comp=true
+
+== UNDO on W5 Thu, today, dated, goblet, reboot same day ==
+  V220|none|-                        afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo SURVIVES) rec=none hist=none
+  V220|draft|swap_then_touch         afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo LOST) rec=none hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  V220|draft|touch_then_swap         afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo SURVIVES) rec=none hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  V220|tick|swap_then_touch          afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo SURVIVES) rec=none hist=none
+  V220|tick|touch_then_swap          afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo SURVIVES) rec=none hist=none
+  V220|done|swap_then_touch          afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo LOST) rec=none hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  V220|done|touch_then_swap          afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo SURVIVES) rec=none hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  D177|none|-                        afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo SURVIVES) rec=none hist=none
+  D177|draft|swap_then_touch         afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo LOST) rec=none hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  D177|draft|touch_then_swap         afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo SURVIVES) rec=none hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  D177|tick|swap_then_touch          afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo SURVIVES) rec=none hist=none
+  D177|tick|touch_then_swap          afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo SURVIVES) rec=none hist=none
+  D177|done|swap_then_touch          afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo LOST) rec=none hist=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  D177|done|touch_then_swap          afterSwap=Dumbbell goblet squat afterUndo=Barbell box squat | BOOT card=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest (undo SURVIVES) rec=none hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+
+== MARIO: act on V220 today, carry localStorage to D177 tree, reboot (dated) ==
+  none|-                     V220 boot: Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest  ||  D177 boot: Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=Barbell box squat->Dumbbell goblet squat | hist=none
+  draft|swap_then_touch      V220 boot: Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest  ||  D177 boot: Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  tick|swap_then_touch       V220 boot: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest  ||  D177 boot: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=none
+  done|swap_then_touch       V220 boot: Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest  ||  D177 boot: Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Dumbbell goblet squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  draft|touch_then_swap      V220 boot: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest  ||  D177 boot: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  done|touch_then_swap       V220 boot: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest  ||  D177 boot: Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | rec=none | hist=Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+  D177 fresh swap, untouched: live=Dumbbell goblet squat boot=Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+
+DONE

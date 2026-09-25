@@ -1,0 +1,100 @@
+[
+ {
+  "name": "S3-D178 loader -> drops the persist: setActiveProgId is gone, ia_active never moves on a switch",
+  "anchor": "setActiveProgId(id);activeProgId=id;if(beforeRefresh)beforeRefresh();",
+  "replacement": "activeProgId=id;if(beforeRefresh)beforeRefresh();",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: S1a (ia_active stays P0 after setActive(P1)); also A03 A04 (boot fallback not written back) A05 A06 A10 A11 A14 A17 Ba3 Bc Bd L1 L2 W1 H1 H2."
+ },
+ {
+  "name": "S3-D178 loader -> drops the global set: activeProgId is not written, activeProg moves alone",
+  "anchor": "setActiveProgId(id);activeProgId=id;if(beforeRefresh)beforeRefresh();",
+  "replacement": "setActiveProgId(id);if(beforeRefresh)beforeRefresh();",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: A01 (boot of a live P0 leaves activeProgId null); also A03 to A11, A14 to A17, S1a, Ba3, Bc, Bd, Be, L1, L2, W1, H1, H2."
+ },
+ {
+  "name": "S3-D178 loader -> drops the archived guard: an archived program loads",
+  "anchor": "if(stored.archived){showToast('Restore this program first');return false;}",
+  "replacement": "",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: S2 (setActive(P2 archived) moves, no refusal toast) and A09 (the census names P2, not P0). Nothing else."
+ },
+ {
+  "name": "S4-D178 R3 -> drops the boot fallthrough clear: a pointer that resolves to nothing survives boot",
+  "anchor": "  if(aid)loadActiveProgram(null);\n",
+  "replacement": "",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: Ba (ia_active stays A1), Ba2 (the restored card shows the Active label, no Set Active), Bb and Bb2 (ia_active stays GONE). Nothing else."
+ },
+ {
+  "name": "S4-D178 re-ruling 4 -> deleteProg lines swapped back: the stale array is saved after the handoff",
+  "anchor": "  programs=programs.filter(p=>p.id!==id);savePrograms(programs);\n  _handoffActiveFrom(id,programs);\n",
+  "replacement": "  _handoffActiveFrom(id,programs);\n  programs=programs.filter(p=>p.id!==id);savePrograms(programs);\n",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: L1 (stored cfg.seed 4242 lost) and L2 (stored cfg.seed 4343 and _testWeek 7 lost). Nothing else: V220 order, which survives on V220 only because its handoff mutated the same array object."
+ },
+ {
+  "name": "S5b-D178 amendment -> one toast literal reverted: openInjurySheet says 'Open a program first' again",
+  "anchor": "function openInjurySheet(){\n  if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}",
+  "replacement": "function openInjurySheet(){\n  if(!activeProg){showToast('Open a program first');return;}",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: Y3d (runtime toast) and Y4a ('Open a program' back to 1 in comment-stripped code). Nothing else."
+ },
+ {
+  "name": "S5a-D178 call 5 -> the card goal line gets its dash back: icon, ' — ', label",
+  "anchor": "(p.cfg?.cardioGoals?.[t]?.label?' '+p.cfg.cardioGoals[t].label:'')",
+  "replacement": "(p.cfg?.cardioGoals?.[t]?.label?' — '+p.cfg.cardioGoals[t].label:'')",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: Y1 only."
+ },
+ {
+  "name": "S5a-D178 call 5 sibling -> the wizard review line reads 'Run — Label' again",
+  "anchor": "(WD.cardioGoals[t]?.label?': '+WD.cardioGoals[t].label:'')",
+  "replacement": "(WD.cardioGoals[t]?.label?' — '+WD.cardioGoals[t].label:'')",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: Y2 only."
+ },
+ {
+  "name": "S3-D178 call 1 -> Set Active persists and loads but does not land on This Week",
+  "anchor": "renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}",
+  "replacement": "renderProgList();showToast('Active program updated');}",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: S1b (no showScreen(screenWeek), no renderWeekView) and Ba3 (the tap after unarchive stays on Home). The switch itself is whole, so S1a, S1c and the census stay green."
+ },
+ {
+  "name": "S3-D178 call 1 -> the Open button comes back on the card",
+  "anchor": "  return `<div class=\"prog-card-actions\">\n        ${!isActive?",
+  "replacement": "  return `<div class=\"prog-card-actions\">\n        <button class=\"prog-action-btn\" onclick=\"openProg('${p.id}')\">Open</button>\n        ${!isActive?",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: K1 only (rendered Open button, and an openProg token in comment-stripped code)."
+ },
+ {
+  "name": "S3-D178 loader -> an unknown id is refused out loud instead of silently",
+  "anchor": "const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;",
+  "replacement": "const stored=getPrograms().find(p=>p.id===id);if(!stored){showToast('Restore this program first');return false;}",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: S3 only."
+ },
+ {
+  "name": "S4-D178 R1 -> the next arm of _handoffActiveFrom bypasses the loader: globals move, ia_active stays on the old id",
+  "anchor": "    if(nx)loadActiveProgram(nx.id);\n",
+  "replacement": "    if(nx){activeProgId=nx.id;activeProg=refreshProgram(nx);currentWeek=calcCurrentWeek();currentDayKey=null;}\n",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: A10, A11, A16, A17 (ia_active names the archived or deleted id), L1, L2 (successor not persisted as active), H1, H2 (pair: stores differ from V220)."
+ },
+ {
+  "name": "S4-D178 loader null arm -> the clear keeps ia_active: both globals null, the pointer survives",
+  "anchor": "if(id===null){localStorage.removeItem('ia_active');activeProgId=null;",
+  "replacement": "if(id===null){activeProgId=null;",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: A12, A13 (null arm keeps P0), Ba, Ba2, Bb, Bb2 (boot clear leaves the pointer), H3, H4 (pair)."
+ },
+ {
+  "name": "S4-D178 R2 -> the wizard lands on calcCurrentWeek instead of week 1",
+  "anchor": "    loadActiveProgram(prog.id);\n    currentWeek=1;\n",
+  "replacement": "    loadActiveProgram(prog.id);\n",
+  "gate": "gates/g221_d178_active.js",
+  "note": "NAMED TRIP: W1 (back-dated and race-aligned rows land past week 1) and W2 (pair: landing week differs from V220). W2 needs the pair live."
+ }
+]

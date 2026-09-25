@@ -1,0 +1,128 @@
+TODAY 2026-09-24
+
+=== 1. blockOpen sites, per artifact (comment-stripped count / raw count)
+base blockOpen code refs 5 raw 8 | dayBeforeStart( call sites 9
+s1_s3 blockOpen code refs 5 raw 8 | dayBeforeStart( call sites 9
+s4 blockOpen code refs 5 raw 8 | dayBeforeStart( call sites 9
+
+=== 2. persistence: stored ia_programs[].blockOpen / activeProg.blockOpen
+[base] HALF_MANNY as-is (start 2026-08-31):
+   commit: stored=2026-09-24 mem=2026-09-24 saves=[2026-09-24]
+   in-session setProgRace(same): stored=2026-09-24 mem=absent saves=[2026-09-24]
+   reboot1: stored=2026-09-24 mem=absent saves=[none]
+   Done tap W4 mon: stored=2026-09-24 mem=absent saves=[none]
+   swap: stored=2026-09-24 mem=absent saves=[none]
+   reboot2: stored=2026-09-24 mem=absent saves=[none]
+   post-reboot setProgRace(same): stored=absent mem=absent saves=[absent]
+   reboot3: stored=absent mem=absent saves=[none]
+[base] run_half race +6w (start 2026-08-03):
+   commit: stored=2026-09-24 mem=2026-09-24 saves=[2026-09-24]
+   in-session setProgRace(same): stored=2026-09-24 mem=absent saves=[2026-09-24]
+   reboot1: stored=2026-09-24 mem=absent saves=[none]
+   Done tap W8 mon: stored=2026-09-24 mem=absent saves=[none]
+   swap: stored=2026-09-24 mem=absent saves=[none]
+   reboot2: stored=2026-09-24 mem=absent saves=[none]
+   post-reboot setProgRace(same): stored=absent mem=absent saves=[absent]
+   reboot3: stored=absent mem=absent saves=[none]
+[s1_s3] HALF_MANNY as-is (start 2026-08-31):
+   commit: stored=2026-09-24 mem=2026-09-24 saves=[2026-09-24]
+   in-session setProgRace(same): stored=2026-09-24 mem=absent saves=[2026-09-24]
+   reboot1: stored=2026-09-24 mem=absent saves=[none]
+   Done tap W4 mon: stored=2026-09-24 mem=absent saves=[none]
+   swap: stored=2026-09-24 mem=absent saves=[none]
+   reboot2: stored=2026-09-24 mem=absent saves=[none]
+   post-reboot setProgRace(same): stored=absent mem=absent saves=[absent]
+   reboot3: stored=absent mem=absent saves=[none]
+[s1_s3] run_half race +6w (start 2026-08-03):
+   commit: stored=2026-09-24 mem=2026-09-24 saves=[2026-09-24]
+   in-session setProgRace(same): stored=2026-09-24 mem=absent saves=[2026-09-24]
+   reboot1: stored=2026-09-24 mem=absent saves=[none]
+   Done tap W8 mon: stored=2026-09-24 mem=absent saves=[none]
+   swap: stored=2026-09-24 mem=absent saves=[none]
+   reboot2: stored=2026-09-24 mem=absent saves=[none]
+   post-reboot setProgRace(same): stored=absent mem=absent saves=[absent]
+   reboot3: stored=absent mem=absent saves=[none]
+[s4] HALF_MANNY as-is (start 2026-08-31):
+   commit: stored=2026-09-24 mem=absent saves=[2026-09-24]
+   in-session setProgRace(same): stored=absent mem=absent saves=[absent]
+   reboot1: stored=2026-09-24 mem=absent saves=[none]
+   Done tap W4 mon: stored=2026-09-24 mem=absent saves=[none]
+   swap: stored=2026-09-24 mem=absent saves=[none]
+   reboot2: stored=2026-09-24 mem=absent saves=[none]
+   post-reboot setProgRace(same): stored=absent mem=absent saves=[absent]
+   reboot3: stored=absent mem=absent saves=[none]
+[s4] run_half race +6w (start 2026-08-03):
+   commit: stored=2026-09-24 mem=absent saves=[2026-09-24]
+   in-session setProgRace(same): stored=absent mem=absent saves=[absent]
+   reboot1: stored=2026-09-24 mem=absent saves=[none]
+   Done tap W8 mon: stored=2026-09-24 mem=absent saves=[none]
+   swap: stored=2026-09-24 mem=absent saves=[none]
+   reboot2: stored=2026-09-24 mem=absent saves=[none]
+   post-reboot setProgRace(same): stored=absent mem=absent saves=[absent]
+   reboot3: stored=absent mem=absent saves=[none]
+
+=== 3. lattice: blockOpen set / effective, and surface deltas with vs without the flag (base)
+run_half HALF_MANNY as-is    {"n":1,"set":1,"effective":1,"days":24,"trainDays":17,"restDays":7,"weeksAffected":4,"stripWeeksDiff":4,"heroWeeksDiff":3,"statsWeeksDiff":4,"tapToast_with":24,"tapToast_without":0,"restEligible_with":0,"restEligible_without":7,"scheduledPast_with":1,"scheduledPast_without":18,"reminderDiffers":1}
+run_5k race                  {"n":91,"set":91,"effective":25,"days":306,"trainDays":215,"restDays":91,"weeksAffected":58,"stripWeeksDiff":58,"heroWeeksDiff":33,"statsWeeksDiff":58,"tapToast_with":306,"tapToast_without":0,"restEligible_with":0,"restEligible_without":91,"scheduledPast_with":25,"scheduledPast_without":240,"reminderDiffers":25}
+run_10k race                 {"n":91,"set":91,"effective":25,"days":306,"trainDays":215,"restDays":91,"weeksAffected":58,"stripWeeksDiff":58,"heroWeeksDiff":33,"statsWeeksDiff":58,"tapToast_with":306,"tapToast_without":0,"restEligible_with":0,"restEligible_without":91,"scheduledPast_with":25,"scheduledPast_without":240,"reminderDiffers":25}
+run_half race                {"n":91,"set":91,"effective":67,"days":2217,"trainDays":1574,"restDays":643,"weeksAffected":355,"stripWeeksDiff":355,"heroWeeksDiff":288,"statsWeeksDiff":355,"tapToast_with":2217,"tapToast_without":0,"restEligible_with":0,"restEligible_without":643,"scheduledPast_with":67,"scheduledPast_without":1641,"reminderDiffers":67}
+run_marathon race            {"n":91,"set":91,"effective":91,"days":4459,"trainDays":3172,"restDays":1287,"weeksAffected":689,"stripWeeksDiff":689,"heroWeeksDiff":598,"statsWeeksDiff":689,"tapToast_with":4459,"tapToast_without":0,"restEligible_with":0,"restEligible_without":1287,"scheduledPast_with":91,"scheduledPast_without":3263,"reminderDiffers":91}
+run_5k no race date          {"n":1}
+run_5k event off             {"n":3}
+run_10k no race date         {"n":1}
+run_10k event off            {"n":3}
+run_half no race date        {"n":1}
+run_half event off           {"n":3}
+run_marathon no race date    {"n":1}
+run_marathon event off       {"n":3}
+run_pace_goal test dated     {"n":16}
+run_pace_goal no test date   {"n":1}
+run_base base                {"n":3}
+lift lift only               {"n":1}
+TOTAL                        {"n":402,"set":365,"effective":209,"days":7312,"trainDays":5193,"restDays":2119,"weeksAffected":1164,"stripWeeksDiff":1164,"heroWeeksDiff":955,"statsWeeksDiff":1164,"tapToast_with":7312,"tapToast_without":0,"restEligible_with":0,"restEligible_without":2119,"scheduledPast_with":209,"scheduledPast_without":5402,"reminderDiffers":209}
+
+HALF_MANNY as-is: start 2026-08-31 blockOpen 2026-09-24 flipped days: W1mon W1tue W1wed W1thu W1fri W1sat W1sun W2mon W2tue W2wed W2thu W2fri W2sat W2sun W3mon W3tue W3wed W3thu W3fri W3sat W3sun W4mon W4tue W4wed
+  W1 stats with:    wk-stats"> 0 /0 DONE 0 MILES 0 DAY STREAK 
+  W1 stats without: wk-stats"> 0 /5 DONE 0 MILES 0 DAY STREAK   strip DIFF hero DIFF
+  W2 stats with:    wk-stats"> 0 /0 DONE 0 MILES 0 DAY STREAK 
+  W2 stats without: wk-stats"> 0 /5 DONE 0 MILES 0 DAY STREAK   strip DIFF hero DIFF
+  W3 stats with:    wk-stats"> 0 /0 DONE 0 MILES 0 DAY STREAK 
+  W3 stats without: wk-stats"> 0 /5 DONE 0 MILES 0 DAY STREAK   strip DIFF hero DIFF
+  W4 stats with:    wk-stats"> 0 /3 DONE 0 MILES 0 DAY STREAK 
+  W4 stats without: wk-stats"> 0 /5 DONE 0 MILES 0 DAY STREAK   strip DIFF hero same
+  reminder with: (none) | without: reminder:{"msg":"More than a week off. Mark what happened, then ease back in. First sessi
+  scheduledDays(today) with 1 without 18 | streak 0 0 | tap toast 24 0 | restEligible 0 7
+
+=== 4. boot with stale ia_active
+base   a all archived                 ia_active=A1 activeProgId=null activeProg.id=null screen=screenHome invariant=BROKEN
+base   b programs empty               ia_active=GONE activeProgId=null activeProg.id=null screen=screenHome invariant=BROKEN
+base   b2 programs key missing        ia_active=GONE activeProgId=null activeProg.id=null screen=screenHome invariant=BROKEN
+base   c ia_active deleted, live L1   ia_active=GONE activeProgId=L1 activeProg.id=L1 screen=screenWeek invariant=BROKEN
+base   d ia_active archived, live L1  ia_active=A1 activeProgId=L1 activeProg.id=L1 screen=screenWeek invariant=BROKEN
+base   e control, ia_active L1        ia_active=L1 activeProgId=L1 activeProg.id=L1 screen=screenWeek invariant=HOLDS
+s1_s3  a all archived                 ia_active=A1 activeProgId=null activeProg.id=null screen=screenHome invariant=BROKEN
+s1_s3  b programs empty               ia_active=GONE activeProgId=null activeProg.id=null screen=screenHome invariant=BROKEN
+s1_s3  b2 programs key missing        ia_active=GONE activeProgId=null activeProg.id=null screen=screenHome invariant=BROKEN
+s1_s3  c ia_active deleted, live L1   ia_active=GONE activeProgId=L1 activeProg.id=L1 screen=screenWeek invariant=BROKEN
+s1_s3  d ia_active archived, live L1  ia_active=A1 activeProgId=L1 activeProg.id=L1 screen=screenWeek invariant=BROKEN
+s1_s3  e control, ia_active L1        ia_active=L1 activeProgId=L1 activeProg.id=L1 screen=screenWeek invariant=HOLDS
+s4     a all archived                 ia_active=A1 activeProgId=null activeProg.id=null screen=screenHome invariant=BROKEN
+s4     b programs empty               ia_active=GONE activeProgId=null activeProg.id=null screen=screenHome invariant=BROKEN
+s4     b2 programs key missing        ia_active=GONE activeProgId=null activeProg.id=null screen=screenHome invariant=BROKEN
+s4     c ia_active deleted, live L1   ia_active=L1 activeProgId=L1 activeProg.id=L1 screen=screenWeek invariant=HOLDS
+s4     d ia_active archived, live L1  ia_active=L1 activeProgId=L1 activeProg.id=L1 screen=screenWeek invariant=HOLDS
+s4     e control, ia_active L1        ia_active=L1 activeProgId=L1 activeProg.id=L1 screen=screenWeek invariant=HOLDS
+
+=== 5. delete active program whose successor is legacy (cfg.seed absent, prog.seed present)
+base   legacy seed                              deleteProg  stored cfg.seed=4242 _testWeek=undefined | mem cfg.seed=4242 digest=678f0b45770efc2d | reboot stored cfg.seed=4242 _testWeek=undefined digest=678f0b45770efc2d same=true
+base   legacy seed                              archiveProg stored cfg.seed=4242 _testWeek=undefined | mem cfg.seed=4242 digest=678f0b45770efc2d | reboot stored cfg.seed=4242 _testWeek=undefined digest=678f0b45770efc2d same=true
+base   legacy seed + dated test, no _testWeek   deleteProg  stored cfg.seed=4343 _testWeek=7 | mem cfg.seed=4343 digest=e89d5146bb4cab1a | reboot stored cfg.seed=4343 _testWeek=7 digest=e89d5146bb4cab1a same=true
+base   legacy seed + dated test, no _testWeek   archiveProg stored cfg.seed=4343 _testWeek=7 | mem cfg.seed=4343 digest=e89d5146bb4cab1a | reboot stored cfg.seed=4343 _testWeek=7 digest=e89d5146bb4cab1a same=true
+s1_s3  legacy seed                              deleteProg  stored cfg.seed=4242 _testWeek=undefined | mem cfg.seed=4242 digest=678f0b45770efc2d | reboot stored cfg.seed=4242 _testWeek=undefined digest=678f0b45770efc2d same=true
+s1_s3  legacy seed                              archiveProg stored cfg.seed=4242 _testWeek=undefined | mem cfg.seed=4242 digest=678f0b45770efc2d | reboot stored cfg.seed=4242 _testWeek=undefined digest=678f0b45770efc2d same=true
+s1_s3  legacy seed + dated test, no _testWeek   deleteProg  stored cfg.seed=4343 _testWeek=7 | mem cfg.seed=4343 digest=e89d5146bb4cab1a | reboot stored cfg.seed=4343 _testWeek=7 digest=e89d5146bb4cab1a same=true
+s1_s3  legacy seed + dated test, no _testWeek   archiveProg stored cfg.seed=4343 _testWeek=7 | mem cfg.seed=4343 digest=e89d5146bb4cab1a | reboot stored cfg.seed=4343 _testWeek=7 digest=e89d5146bb4cab1a same=true
+s4     legacy seed                              deleteProg  stored cfg.seed=undefined _testWeek=undefined | mem cfg.seed=4242 digest=678f0b45770efc2d | reboot stored cfg.seed=4242 _testWeek=undefined digest=678f0b45770efc2d same=true
+s4     legacy seed                              archiveProg stored cfg.seed=4242 _testWeek=undefined | mem cfg.seed=4242 digest=678f0b45770efc2d | reboot stored cfg.seed=4242 _testWeek=undefined digest=678f0b45770efc2d same=true
+s4     legacy seed + dated test, no _testWeek   deleteProg  stored cfg.seed=undefined _testWeek=undefined | mem cfg.seed=4343 digest=e89d5146bb4cab1a | reboot stored cfg.seed=4343 _testWeek=7 digest=e89d5146bb4cab1a same=true
+s4     legacy seed + dated test, no _testWeek   archiveProg stored cfg.seed=4343 _testWeek=7 | mem cfg.seed=4343 digest=e89d5146bb4cab1a | reboot stored cfg.seed=4343 _testWeek=7 digest=e89d5146bb4cab1a same=true

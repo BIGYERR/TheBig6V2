@@ -1,0 +1,93 @@
+[
+ {
+  "name": "S1-D177 RR4 -> the landmine literal is dropped from the unilateral [6,10] row: Landmine reverse lunge and Landmine rotational press fall back to no floor",
+  "anchor": "[/split squat|step-?up|single-leg|single leg|pistol|landmine (reverse lunge|rotational press)/i, [6,10]], // balance caps expressible load",
+  "replacement": "[/split squat|step-?up|single-leg|single leg|pistol/i, [6,10]], // balance caps expressible load",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G2 (Landmine reverse lunge want [6,10] got null; Landmine rotational press want [6,10] got null)."
+ },
+ {
+  "name": "S1-D177 RR4 -> the literal widens back to a bare `landmine` token: Landmine rotations (core, _pattern null) gets a [6,10] floor",
+  "anchor": "pistol|landmine (reverse lunge|rotational press)/i, [6,10]]",
+  "replacement": "pistol|landmine/i, [6,10]]",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G2 (Landmine rotations want null got [6,10]). RR4's latch: grammar alone keeps its cards unchanged, so G4b is expected to stay green; the table row is the claim."
+ },
+ {
+  "name": "S1-D177 R1 -> the window branch never fires: a donor under the candidate's window carries verbatim (the V220 swap)",
+  "anchor": "      if(!(lo>=fl[0])){",
+  "replacement": "      if(false){",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G1a (4×3 on the goblet), G3f (every under-window pair verbatim), G6a (third toast never fires), G7-1a, G7-2a."
+ },
+ {
+  "name": "S1-D177 R1 -> the window fires AT the floor too (>= becomes >): a 4×6 donor on a [6,10] candidate is rewritten to 6–10",
+  "anchor": "      if(!(lo>=fl[0])){",
+  "replacement": "      if(!(lo>fl[0])){",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G3d (donors at or above the floor stay verbatim) and G6c (Dumbbell Romanian deadlift 4×6 -> Kettlebell single-leg deadlift)."
+ },
+ {
+  "name": "S1-D177 R2 -> the grammar test is dropped: any `S×R` donor under a window is rewritten, power `S×R — <cue>` included",
+  "anchor": "const m=/^(\\d+×)(\\d+(?:–\\d+)?)( — RPE )/.exec(detail);",
+  "replacement": "const m=/^(\\d+×)(\\d+(?:–\\d+)?)()/.exec(detail);",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G3c (power pairs and off-grammar Main donors change; V170 D7 by construction is exactly this claim) and G4a (pair: _pattern-null items now differ under _swapDetailFor vs V220, the RR5 class pin). G4a needs the pair live: candidate 221 (or IA_ASSUME_VERSION=221 on a 220 stamp) with V220 from argv[3] or git 8ee4385."
+ },
+ {
+  "name": "S1-D177 R2 -> the grammar test widens to accessory `@ RPE` details: accessory donors under a window are rewritten, on the add path too",
+  "anchor": "const m=/^(\\d+×)(\\d+(?:–\\d+)?)( — RPE )/.exec(detail);",
+  "replacement": "const m=/^(\\d+×)(\\d+(?:–\\d+)?)( — RPE |[^0-9]*@ RPE )/.exec(detail);",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G8a (pair: add-path details change vs V220; the add path runs its accessory donor through _swapDetailFor) and G3c (off-grammar Main donors change). G4a stays green on purpose: no _pattern-null accessory sits under its window, so the grammar is not what holds that class; see M05. G8a needs the pair live."
+ },
+ {
+  "name": "S2-D177 R4 -> recordSwap stops storing rx: undo restores the name only (the V220 undo)",
+  "anchor": "if(Array.isArray(rx)&&rx.length) ent.rx=",
+  "replacement": "if(false) ent.rx=",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G5a (window and [0,0] pairs not byte-identical after undo), G5b (Close-grip bench press -> Dips leaves open sets), G5c."
+ },
+ {
+  "name": "S2-D177 R4 -> undoSwap finds the stored item but never writes the detail back",
+  "anchor": "if(it){it.detail=p.d;_put.push(it);}",
+  "replacement": "if(it){_put.push(it);}",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G5a, G5b, G5c. The record still carries rx, so only the restore is under test."
+ },
+ {
+  "name": "S1-D177 R5 -> the third toast branch is dropped: a windowed swap says 'No load to add here'",
+  "anchor": "showToast(_rx.win",
+  "replacement": "showToast(false",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G1b (toast), G6a (third toast 0 vs hand window), G7-2a."
+ },
+ {
+  "name": "S1-D177 R5 -> out.win is set whenever the candidate has any floor row: the third toast fires on [0,0] and at-floor pairs",
+  "anchor": "const fl=(typeof _repFloor==='function')?_repFloor(name):null;",
+  "replacement": "const fl=(typeof _repFloor==='function')?_repFloor(name):null; if(out&&fl) out.win=[fl[0],fl[1]];",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G6b (Dips: 'Reps move to 0 to 0.'), G6c (at-floor pair), G6a."
+ },
+ {
+  "name": "S1-D177 RR3 -> the build-time pref pass (applySwapPrefs) skips the window: cfg.exSwapPrefs prints the donor reps",
+  "anchor": "      it.detail=_swapDetailFor(to,it.detail);",
+  "replacement": "      it.detail=(function(f){return (f&&f[1]!==0)?it.detail:_swapDetailFor(to,it.detail);})(_repFloor(to));",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G7-1a (W1 4×6, W2 4×5, W5/W6 4×3 goblet). The live tap keeps its own call, so G1 stays green."
+ },
+ {
+  "name": "G8b -> addedDetailFor's fallback drops to 3×8: under the swing window, so the add path could be re-prescribed",
+  "anchor": "return '3\\u00d710 \\u2014 RPE 7';",
+  "replacement": "return '3\\u00d78 \\u2014 RPE 7';",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G8b (fallback literal, low 8 under max window low 10, Kettlebell swing probe moves). Not D177 code: it pins the premise G8b states."
+ },
+ {
+  "name": "S1-D177 RR4 -> the authored literal in the unilateral [6,10] row loosens to `landmine.*press`: the G4c licence must not cover it",
+  "anchor": "pistol|landmine (reverse lunge|rotational press)/i, [6,10]], // balance caps expressible load",
+  "replacement": "pistol|landmine.*press/i, [6,10]], // balance caps expressible load",
+  "gate": "gates/g192_landmine_rotpress.js",
+  "note": "NAMED TRIP: G4c (no loosened landmine-press regex anywhere in live code; the loosened row regex is listed). The V221 licence exempts only the literal `landmine (reverse lunge|rotational press)` as one whole alternative of a _REP_FLOOR regex, so any other landmine-press spelling in the same row still fails. Bycatch: Landmine reverse lunge also loses its floor (g221 G2), not the named gate."
+ }
+]

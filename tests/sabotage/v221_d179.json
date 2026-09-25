@@ -1,0 +1,114 @@
+[
+ {
+  "name": "S6-D179 wheel flush -> the flush call is dropped: a wheel still inside its 90 ms settle window is not committed before persistLogFields",
+  "anchor": "if(statusOf(currentWeek,dayKey)!==status) iaWheelFlush(document.getElementById('detailOverlay'));",
+  "replacement": ";",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: W1 (ia_logs_ reads 9:30 at the tap)."
+ },
+ {
+  "name": "S6-D179 (b) -> ruReset() is dropped from the set branch: a running rest timer keeps ticking over This Week",
+  "anchor": "  ruReset();\n  closeDetail();\n",
+  "replacement": "  closeDetail();\n",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: B1d, B1s, B1m."
+ },
+ {
+  "name": "S6-D179 close -> closeDetail() is dropped from the set branch: Done, Skip and Mark Done ✓ stay on the day (the V220 behaviour)",
+  "anchor": "  closeDetail();\n  if(status==='complete') fireCompletionPopup(currentWeek,dayKey);",
+  "replacement": "  if(status==='complete') fireCompletionPopup(currentWeek,dayKey);",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: C1, C2, C3."
+ },
+ {
+  "name": "S6-D179 (c) -> the toast guard is dropped: the Done toast is restored under the pop-up",
+  "anchor": "if(!document.getElementById('popOverlay').classList.contains('show')) showToast(labels[status]||'Updated ✓');",
+  "replacement": "showToast(labels[status]||'Updated ✓');",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: T1 (toast `Done ✓` shows under the veil). The amendment's named sabotage for (c1)."
+ },
+ {
+  "name": "S6-D179 (c) copy -> the Skip label reverts to the em-dash line",
+  "anchor": "const labels={complete:'Done ✓',skipped:'Skipped ✕ The week moves on'};",
+  "replacement": "const labels={complete:'Done ✓',skipped:'Skipped ✕ — the week moves on'};",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: T2 (label), K1 (em-dash line count 2), K2 (handleDayStatus label)."
+ },
+ {
+  "name": "S7-D179 (a3) -> the skipped strip branch is dropped: a skipped cell prints its date",
+  "anchor": "    else if(st==='skipped') center='✕';",
+  "replacement": "",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: A3a. The line's trailing comment stays behind as a comment line. The amendment's named sabotage for (a3)."
+ },
+ {
+  "name": "S7-D179 (a1) -> the CTA condition reverts: today's hero reads START SESSION whatever its status",
+  "anchor": "const cta=(heroMode==='today'&&!_heroSt)?'START SESSION':'OPEN SESSION';",
+  "replacement": "const cta=heroMode==='today'?'START SESSION':'OPEN SESSION';",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: A1a, A1b (cta START SESSION). K3 stays green on purpose: OPEN SESSION is still one token. The amendment's named sabotage for (a1)."
+ },
+ {
+  "name": "S6-D179 wheel flush -> the flush runs on undo taps too: an undo tap commits a coasting wheel early",
+  "anchor": "if(statusOf(currentWeek,dayKey)!==status) iaWheelFlush(",
+  "replacement": "if(true) iaWheelFlush(",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: W2 (ia_logs_ reads 10:30 at the undo tap)."
+ },
+ {
+  "name": "S6-D179 undo stays -> an undo tap also closes the day",
+  "anchor": "    showToast('Unmarked');\n    return;",
+  "replacement": "    closeDetail();showToast('Unmarked');\n    return;",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: C4 (overlay closed on undo), W2 and B2u (their own day-open checks)."
+ },
+ {
+  "name": "S6-D179 (b2) -> an undo tap also resets the rest timer",
+  "anchor": "    showToast('Unmarked');\n    return;",
+  "replacement": "    ruReset();showToast('Unmarked');\n    return;",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: B2u (timer stopped on undo)."
+ },
+ {
+  "name": "S6-D179 (b2) premise -> ‹ Back resets the rest timer: navigation no longer keeps a running rest",
+  "anchor": "function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');renderWeekView();}",
+  "replacement": "function closeDetail(){ruReset();document.getElementById('detailOverlay').classList.remove('open');renderWeekView();}",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: B2b. Not D179 code: it pins the ruResetIfIdle contract the amendment keeps (‹ Back is navigation)."
+ },
+ {
+  "name": "S6-D179 pop-up -> Skip raises the completion pop-up too",
+  "anchor": "  if(status==='complete') fireCompletionPopup(currentWeek,dayKey);",
+  "replacement": "  fireCompletionPopup(currentWeek,dayKey);",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: C6 (pop-up after Skip), T2 (Skip toast held back by the guard)."
+ },
+ {
+  "name": "S6-D179 pop-up -> Done raises no pop-up",
+  "anchor": "  if(status==='complete') fireCompletionPopup(currentWeek,dayKey);",
+  "replacement": "",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: C5 (no pop-up after Done or Mark Done ✓), T1 (the guard now lets the Done toast through)."
+ },
+ {
+  "name": "S7-D179 (a3) precedence -> skipped outranks the Wildcard mark: a Wildcard plus skipped day prints ✕",
+  "anchor": "    else if(wildcardOn(currentWeek,d)) center=wildcardMarkHTML(14);                  // V195 (D64): a Wildcard is marked, never checked\n    else if(st==='skipped') center='✕';",
+  "replacement": "    else if(st==='skipped') center='✕';\n    else if(wildcardOn(currentWeek,d)) center=wildcardMarkHTML(14);",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: A3d (D71b: a Wildcard rescues a skipped day)."
+ },
+ {
+  "name": "S7-D179 (a1) -> the hero status line is never printed",
+  "anchor": "+(_heroSt?'<div class=\"wk-hero-status\">'+_heroSt+'</div>':'')",
+  "replacement": "+''",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: A1a, A1b (status null). The CTA still reads OPEN SESSION, so the line itself is under test."
+ },
+ {
+  "name": "S6-D179 wheel flush -> the flush runs the settle but leaves its timer armed: a late settle commits after the overlay is gone",
+  "anchor": "if(c._iawT&&c._iawSettle){ clearTimeout(c._iawT); c._iawSettle(); }",
+  "replacement": "if(c._iawT&&c._iawSettle){ c._iawSettle(); }",
+  "gate": "gates/g221_d179_donenav.js",
+  "note": "NAMED TRIP: W1 (layout loss on close: the late settle reads scrollTop 0 and overwrites 10:30)."
+ }
+]

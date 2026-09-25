@@ -134,8 +134,27 @@ else bad('G4a the exact-anchored rule is present in live code (not only in a com
 if(iNew >= 0 && iCore >= 0 && iNew < iCore) ok('G4b the rule sits ABOVE the core-exempt alternation');
 else bad('G4b the rule sits ABOVE the core-exempt alternation', 'new@' + iNew + ' core@' + iCore);
 // Exactness: it must be anchored both ends. A loosened regex is the whole risk.
-const loose = (noComments.match(/\/[^\/\n]*landmine[^\/\n]*press[^\/\n]*\//gi) || [])
-  .filter(function(r){ return r !== '/^landmine rotational press$/'; });
+// LICENCE (standing ruling 2: a predicate on today's ia-version). D177 RR4 (p_swapfloor_ruling.md): from ia-version
+// 221 the _REP_FLOOR unilateral [6,10] row carries the AUTHORED literal alternation `landmine (reverse lunge|rotational
+// press)`, deliberately NOT the loose `landmine` token. It is exempt only as one whole alternative of a regex that sits
+// inside the _REP_FLOOR table, and only while that regex's other alternatives carry no landmine or press token. The
+// same literal outside the table, the literal on a file below 221, and any other loosened landmine-press regex still
+// fail G4c. The scan itself is unchanged: it sees only regex literals carrying both landmine and press.
+const VER = +IA.version;
+const RR4_LIT = 'landmine (reverse lunge|rotational press)';
+const RF_AT = noComments.indexOf('const _REP_FLOOR=['), RF_END = RF_AT < 0 ? -1 : noComments.indexOf('\n];', RF_AT);
+function rr4Licensed(r, at){
+  if(!(VER >= 221) || RF_AT < 0 || RF_END < 0 || !(at > RF_AT && at < RF_END)) return false;
+  const side = r.slice(1, -1).split(RR4_LIT);
+  if(side.length !== 2) return false;
+  if(!(side[0] === '' || side[0].slice(-1) === '|') || !(side[1] === '' || side[1].charAt(0) === '|')) return false;
+  return !/landmine|press/i.test(side[0] + side[1]);
+}
+const loose = [], LOOSE_RE = /\/[^\/\n]*landmine[^\/\n]*press[^\/\n]*\//gi;
+for(let m; (m = LOOSE_RE.exec(noComments)); ){
+  if(m[0] === '/^landmine rotational press$/' || rr4Licensed(m[0], m.index)) continue;
+  loose.push(m[0]);
+}
 if(!loose.length) ok('G4c no loosened landmine-press regex anywhere in live code');
 else bad('G4c no loosened landmine-press regex anywhere in live code', loose.slice(0,3).join(' | '));
 const dropAdds = (noComments.match(/\|landmine rotational\//g) || []).length;
