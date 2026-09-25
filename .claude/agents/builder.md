@@ -16,7 +16,7 @@ This is not a style preference, and **it is not specific to builder**: across V1
 
 Procedure for every build:
 1. Confirm the target version with Mario (`ia-version` bumps by exactly one, only when he says).
-2. Save the baseline: `git show HEAD:index.html > /tmp/base_V<N-1>.html` (or copy the current file before touching it).
+2. Save the baseline: `git show HEAD:index.html > <scratch>/base_V<N-1>.html` (`<scratch>` = the session scratch path your brief names; never bare `/tmp`) (or copy the current file before touching it).
 3. Write the edit as a Python script in `tests/edits/v<N>_edit.py`:
    - literal bytes for em-dashes, `×`, `≥` (no escapes)
    - every replacement anchor asserted `count==1` before writing; abort the whole script on the first miss

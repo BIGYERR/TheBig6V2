@@ -45,6 +45,6 @@ UNKNOWN  <what this pass did NOT measure and would need to>
 ```
 
 ## Shell discipline
-**Lattice sweeps and fuzz runs write their output to files under `/tmp`** (`… > /tmp/v<N>_<step>.out 2>&1`). Read back only summaries, failures and diffs (the counts with their denominators, the segment table, the failing cases, `diff | head`), never a full report. A report in context is tokens nothing reads.
+**Lattice sweeps and fuzz runs write their output to files under the scratch path your brief names, never bare `/tmp`** (`… > <scratch>/v<N>_<step>.out 2>&1`). Read back only summaries, failures and diffs (the counts with their denominators, the segment table, the failing cases, `diff | head`), never a full report. A report in context is tokens nothing reads.
 The script stays in `tests/measure/`; its output does not.
 Do not investigate one command at a time. Write a single script that gathers everything you need, run it once, then read the output. A turn that only runs echo, grep, sed, cat or ls is a wasted turn. Target under 20 tool calls per task.

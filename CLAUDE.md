@@ -27,18 +27,22 @@ Coach runs on fable from V200 as a measured experiment; compare its rulings agai
 (retractions, reds, and whether measure refutes a premise) before deciding whether it stays.
 **Coach is spawned fresh for each ruling, with a tight brief:** the question, measure's numbers, and the handoff lines
 it needs, nothing else. Never resume a coach (`SendMessage`) after it has gone idle. A follow-up or a re-ruling is a
-new spawn whose brief carries the prior ruling's text.
+new spawn whose brief carries the prior ruling's text. **Coach is read-only, so the main session saves every coach return
+into its ruling file before briefing builder**, and every brief cites only what the saved file says, never a line from
+the return that was not saved.
 
 ## Session rhythm (do not skip steps)
 **One build per chat.** Each version starts in a fresh chat. A chat never carries past one build, and never past a
 compaction: if it compacts mid-build, stop at the next safe point (a builder slice either landed whole or stays parked
 in `tests/edits/`; nothing is committed that gatekeeper has not proved), tell Mario where the build stands, and
-continue in a fresh chat.
+continue in a fresh chat. **A chat ends by handing Mario the next chat's prompt:** one line naming the build and its target
+version, plus anything he has already decided for it. Standing rules live in this file, never in the prompt; per-build
+scope lives in handoff §12.
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it.
 2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `v<N>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience.
-4. Builder ships: anchor-asserted edits (every anchor `count==1` before writing), `ia-version` bumped by ONE, exactly when Mario says so.
-5. Gatekeeper proves it: `tests/gate.sh index.html <baseline>` + `tests/sabotage.py` + fuzz. Green or a NAMED failing gate.
+4. Builder ships: anchor-asserted edits (every anchor `count==1` before writing), `ia-version` bumped by ONE, exactly when Mario says so. **Right before every builder dispatch**, re-read HEAD against `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
+5. Gatekeeper proves it: `tests/gate.sh index.html <baseline>` + `tests/sabotage.py` + fuzz. Green or a NAMED failing gate. The sabotage sweep runs **every** spec in `tests/sabotage/`, old ones included, not just this build's (V221: three V219 mutations had survived unseen since V220).
 6. `handoff-update` skill: the seven-element session entry. Then `git add -A && git commit -m "V<N>: <one line>" && git push && git tag V<N> && git push --tags`.
 7. **A push is not a deploy. "Push" means Mario's phone gets the new version, and it is not done until you have proved that.** Pages can report its last build as `built` with no error while sitting several commits behind — it silently did not fire on V192 or V193. So after pushing, confirm all three, in this order, and never infer a later one from an earlier one:
    - the remote has it: `git rev-parse main` == `git rev-parse origin/main`, and `git show origin/main:index.html | grep -oE 'content="[0-9]+"'` reads the new version (read it out of `origin/main`, not the working copy);
@@ -71,14 +75,16 @@ without new evidence that contradicts the ruling itself.
    conjunct so an absent row fails loudly. A digest read off the built artifact after the fact is never a pin.
 6. **Any builder brief over four edits is sliced before dispatch.** The cap binds the brief I write, not
    just the agent. A long brief invites a long silent phase before the first tool call, and that is what
-   the watchdog kills.
+   the watchdog kills. Re-read tree state between slices instead of trusting the previous slice's report.
 7. **When measure refutes a ruling's premise, it goes back to coach before builder — always.** A premise
    that did not survive the measure is a hypothesis, not a ruling, and building on it ships the wrong
    thing twice. Coach may retract; that is the system working, not a failure. **If the refutation lands
    mid-slice, builder PARKS the slice** — leaves it in the scratchpad, commits nothing, hands nothing to
    gatekeeper — coach re-rules, and the parked slice is resumed as-is if the re-ruling leaves it intact,
    or discarded if it does not. Finishing a slice against a refuted premise is never the cheaper path,
-   because gatekeeper would prove it against a ruling that no longer exists.
+   because gatekeeper would prove it against a ruling that no longer exists. **A gate row that cannot pass
+   is a measure too:** when writing a gate shows a ruling's claim is false, the row is parked (never written
+   as a pass or a skip), measure quantifies it, and a fresh coach re-rules (V221: D177's frozen-day re-swap).
 
 **Mario is asked only for doctrine calls:** which pattern or quality survives, ship or hold, and anything
 that changes his own program. Siting, form, gate scope, agent order and tooling shape are the session's to
@@ -87,7 +93,7 @@ which does reach him arrives with a recommendation.
 
 ## Versioning (hard)
 - `<meta name="ia-version" content="N">` is the ground truth. Bump by one per release, in build order, never out of order, never two sessions on one number. Mario owns the bump.
-- In this repo the only HTML is `index.html` (Pages serves it). The previous build for blast-radius is `git show HEAD:index.html > /tmp/base.html`. Tag each release: `git tag V<N>`.
+- In this repo the only HTML is `index.html` (Pages serves it). The previous build for blast-radius is `git show HEAD:index.html > <scratchpad>/base_v<N-1>.html`. Tag each release: `git tag V<N>`.
 - A file version with no digest line in the handoff means a build was dropped. Stop and tell Mario.
 - **Grep the file, never trust a label.** Filename, chat title, memory and handoff can all lag the artifact.
 
@@ -107,7 +113,8 @@ which does reach him arrives with a recommendation.
 - Strip comments before any "is this token gone" scan.
 - Prove a reported bug at the reporter's seed before touching anything.
 - `let`/`const` at top level do not land on the VM context; test-injectable globals are `var`. `navigator` needs `defineProperty`.
-- Python edit scripts use literal bytes (real em-dashes, real `×`), never escapes.
+- Python edit scripts use literal bytes (real em-dashes, real `×`), never escapes. Any `\uXXXX` text that must land in a file is built in code with `chr(92)`, never typed.
+- Every agent writes temp files under the session's own scratchpad (a subfolder per agent), never bare `/tmp`; parallel agents never share a scratch path.
 
 ## Architecture invariants
 - `prog.weeks` is rebuilt from `cfg + seed` on every boot AND persisted: `ia_programs` carries the whole grid (58,478 bytes for one 11-week program) and `refreshProgram` reads it back, load-bearing — strip the stored grid and 9 of 9 logged run sessions flip off target (measured V202). The persisted grid is the freeze's source; it holds no overlays, so anything that needs what the athlete actually SAW still reads `ia_hist_`.
@@ -136,7 +143,8 @@ Not a menu of options, not "your call" on its own: say what you would do and why
 counter-argument, then let him choose. This holds for coaching rulings, engineering trade-offs, tooling,
 git, scope and anything else. A decision surfaced without a recommendation is an incomplete answer.
 Flag the ones that are genuinely his to make (publishing, irreversible actions, doctrine) as such —
-and still recommend.
+and still recommend. Refer to his decisions by ruling name (P-ACTIVE, D177), never by a bare number: with builds and
+decisions both numbered in one message, he read decision "#4" as "build 4" (V220).
 
 ## Copy rule (Mario, standing)
 No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declarative sentences. The app sounds like a coach at every touchpoint. Spec separators inside a prescription (`4×5 — RPE 8`) are structural and exempt. No user-facing "Nike" strings.
@@ -157,13 +165,15 @@ Every brief to either carries the per-build items, then the standing lines for t
   strip clock fields and prove a baseline equals itself before diffing; an empty diff is a failure. Standing rulings 2
   (a licence is a predicate on today's `ia-version`), 3 (wire a dead pin, never re-point it), 4 (a gate is keyed to the
   ruling it defends) and 5 (`HALF_MANNY` moves only by a ruling that printed the digest first). NRC sessions are
-  verbatim; no harness asserts taper, volume or rep shape on them.
+  verbatim; no harness asserts taper, volume or rep shape on them. Temp files go only under the scratch path the brief
+  names, never bare `/tmp`.
 - **Builder, standing:** standing ruling 7 (a premise refuted mid-slice PARKS the slice: script stays in `tests/edits/`,
-  nothing committed); pool and post-filter reason through one lens, so grep the other half; a conditional write with no
-  else is a latch; `exStoreKey` is the only `ia_exw_` writer; race day is found by subtype.
-- **Gatekeeper, standing:** run every gate against the previous version too; a sabotage anchor that is not `count==1`
-  is NOT-APPLIED and a no-op mutation is a mutation defect; all-trip is as suspicious as a survivor; 100% of blast-radius
-  hunks are classified, and an unruled removal is a regression.
+  nothing committed; a gate row that cannot pass parks the same way); pool and post-filter reason through one lens, so
+  grep the other half; a conditional write with no else is a latch; `exStoreKey` is the only `ia_exw_` writer; race day
+  is found by subtype; any `\uXXXX` text that must land is built with `chr(92)`, never typed.
+- **Gatekeeper, standing:** run every gate against the previous version too; the sabotage sweep runs every spec, old
+  ones included; a sabotage anchor that is not `count==1` is NOT-APPLIED and a no-op mutation is a mutation defect;
+  all-trip is as suspicious as a survivor; 100% of blast-radius hunks are classified, and an unruled removal is a regression.
 
 ## Files
 - `index.html` — the app. `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).
