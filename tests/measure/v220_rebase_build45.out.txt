@@ -1,0 +1,773 @@
+# v220 re-baseline, HEAD 920fa0a ia-version 219
+## surgery
+literal {beginner:3, intermediate:5, advanced:7} count in base: 5
+T1 anchor achievablePacePerMile      count 1
+T1 anchor assessRunPaceCeiling       count 1
+T1 anchor calcProgramLength          count 1
+T1 anchor D101 clock cap fallback    count 1
+T1 anchor buildRunSession table      count 1
+T1 anchor buildRunSession fallback   count 1
+T1 old literal left: 0 | new literal count: 5 | bytes changed: 0
+T2 anchor achievablePacePerMile      count 1
+T2 anchor assessRunPaceCeiling       count 1
+T2 anchor calcProgramLength          count 1
+T2 anchor D101 clock cap fallback    count 1
+T2 anchor buildRunSession table      count 1
+T2 anchor buildRunSession fallback   count 1
+T2 old literal left: 0 | new literal count: 7 | bytes changed: 0
+## summarize
+M2 lattice cells 10080 (x3 builds = 30240 ) errors 0 | per-cell record: /Users/CanasBangin/Desktop/TheBig6V2/tests/measure/v220_rebase_pacerate.out.txt
+
+== M2 changes vs base (n | length moved T1/T2 | realisticTarget moved T1/T2 | digest moved T1/T2 | ceiling banner fires base/T1/T2)
+  ALL                            n 10080 | L 1040 / 1430 | rt 5918 / 8788 | dg 6014 / 8914 | ceil 1280 / 1440 / 1440
+  exp beginner                   n  3360 | L 0 / 390 | rt 0 / 2870 | dg 0 / 2900 | ceil 480 / 480 / 480
+  exp/age beginner 18-35         n  1120 | L 0 / 180 | rt 0 / 930 | dg 0 / 950 | ceil 160 / 160 / 160
+  dist 1                         n  2520 | L 60 / 60 | rt 1160 / 1670 | dg 1220 / 1730 | ceil 360 / 360 / 360
+  dated none                     n  2520 | L 610 / 860 | rt 1392 / 2052 | dg 1454 / 2144 | ceil 320 / 360 / 360
+  off -20                        n  1440 | L 0 / 0 | rt 476 / 706 | dg 476 / 706 | ceil 0 / 0 / 0
+  off 10                         n  1440 | L 400 / 580 | rt 776 / 1146 | dg 860 / 1250 | ceil 0 / 0 / 0
+  off 15                         n  1440 | L 280 / 380 | rt 858 / 1248 | dg 868 / 1268 | ceil 0 / 0 / 0
+  off 20                         n  1440 | L 210 / 280 | rt 928 / 1368 | dg 930 / 1370 | ceil 0 / 0 / 0
+  off 30                         n  1440 | L 100 / 130 | rt 960 / 1440 | dg 960 / 1440 | ceil 0 / 0 / 0
+  off 45                         n  1440 | L 50 / 60 | rt 960 / 1440 | dg 960 / 1440 | ceil 0 / 0 / 0
+  off 100                        n  1440 | L 0 / 0 | rt 960 / 1440 | dg 960 / 1440 | ceil 1280 / 1440 / 1440
+  exp/age beginner 36-54         n  1120 | L 0 / 110 | rt 0 / 950 | dg 0 / 960 | ceil 160 / 160 / 160
+  exp/age beginner 55+           n  1120 | L 0 / 100 | rt 0 / 990 | dg 0 / 990 | ceil 160 / 160 / 160
+  exp intermediate               n  3360 | L 440 / 440 | rt 2888 / 2888 | dg 2944 / 2944 | ceil 440 / 480 / 480
+  exp/age intermediate 18-35     n  1120 | L 230 / 230 | rt 934 / 934 | dg 978 / 978 | ceil 120 / 160 / 160
+  exp/age intermediate 36-54     n  1120 | L 140 / 140 | rt 954 / 954 | dg 966 / 966 | ceil 160 / 160 / 160
+  exp/age intermediate 55+       n  1120 | L 70 / 70 | rt 1000 / 1000 | dg 1000 / 1000 | ceil 160 / 160 / 160
+  exp advanced                   n  3360 | L 600 / 600 | rt 3030 / 3030 | dg 3070 / 3070 | ceil 360 / 480 / 480
+  exp/age advanced 18-35         n  1120 | L 260 / 260 | rt 1000 / 1000 | dg 1020 / 1020 | ceil 80 / 160 / 160
+  exp/age advanced 36-54         n  1120 | L 210 / 210 | rt 1000 / 1000 | dg 1020 / 1020 | ceil 120 / 160 / 160
+  exp/age advanced 55+           n  1120 | L 130 / 130 | rt 1030 / 1030 | dg 1030 / 1030 | ceil 160 / 160 / 160
+  dist 1.5                       n  2520 | L 200 / 280 | rt 1402 / 2092 | dg 1438 / 2158 | ceil 360 / 360 / 360
+  dist 3.1                       n  2520 | L 360 / 490 | rt 1676 / 2506 | dg 1676 / 2506 | ceil 320 / 360 / 360
+  dist 6.2                       n  2520 | L 420 / 600 | rt 1680 / 2520 | dg 1680 / 2520 | ceil 240 / 360 / 360
+  dated +4w                      n  2520 | L 0 / 0 | rt 1560 / 2340 | dg 1560 / 2340 | ceil 320 / 360 / 360
+  dated +8w                      n  2520 | L 0 / 0 | rt 1490 / 2220 | dg 1490 / 2220 | ceil 320 / 360 / 360
+  dated +12w                     n  2520 | L 430 / 570 | rt 1476 / 2176 | dg 1510 / 2210 | ceil 320 / 360 / 360
+
+== M2 realistic-target shift vs base, s/mi slower (undated, goal not met in base) mean [min,max] n
+  beginner 18-35 off+10              T1 0.0 [0.0,0.0]        T2 -3.0 [-6.0,0.0]      n 40
+  beginner 18-35 off+15              T1 0.0 [0.0,0.0]        T2 -3.5 [-7.0,0.0]      n 40
+  beginner 18-35 off+20              T1 0.0 [0.0,0.0]        T2 -1.8 [-3.1,0.0]      n 40
+  beginner 18-35 off+30              T1 0.0 [0.0,0.0]        T2 -8.8 [-15.0,-3.0]    n 40
+  beginner 18-35 off+45              T1 0.0 [0.0,0.0]        T2 -13.0 [-17.0,-9.0]   n 40
+  beginner 18-35 off+100             T1 0.0 [0.0,0.0]        T2 -14.0 [-21.0,-9.0]   n 40
+  beginner 36-54 off+10              T1 0.0 [0.0,0.0]        T2 -3.0 [-6.0,0.0]      n 40
+  beginner 36-54 off+15              T1 0.0 [0.0,0.0]        T2 -2.6 [-5.1,0.0]      n 40
+  beginner 36-54 off+20              T1 0.0 [0.0,0.0]        T2 -4.8 [-6.8,0.0]      n 40
+  beginner 36-54 off+30              T1 0.0 [0.0,0.0]        T2 -8.2 [-13.6,-4.3]    n 40
+  beginner 36-54 off+45              T1 0.0 [0.0,0.0]        T2 -12.8 [-18.7,-8.5]   n 40
+  beginner 36-54 off+100             T1 0.0 [0.0,0.0]        T2 -12.8 [-18.7,-8.5]   n 40
+  beginner 55+ off+10                T1 0.0 [0.0,0.0]        T2 0.1 [-0.7,0.6]       n 40
+  beginner 55+ off+15                T1 0.0 [0.0,0.0]        T2 -4.3 [-5.9,0.0]      n 40
+  beginner 55+ off+20                T1 0.0 [0.0,0.0]        T2 -5.3 [-11.1,-0.5]    n 40
+  beginner 55+ off+30                T1 0.0 [0.0,0.0]        T2 -9.8 [-13.0,-6.5]    n 40
+  beginner 55+ off+45                T1 0.0 [0.0,0.0]        T2 -10.4 [-15.6,-6.5]   n 40
+  beginner 55+ off+100               T1 0.0 [0.0,0.0]        T2 -10.4 [-15.6,-6.5]   n 40
+  intermediate 18-35 off+10          T1 5.0 [0.0,10.0]       T2 5.0 [0.0,10.0]       n 40
+  intermediate 18-35 off+15          T1 6.0 [0.0,12.0]       T2 6.0 [0.0,12.0]       n 40
+  intermediate 18-35 off+20          T1 4.5 [0.0,8.0]        T2 4.5 [0.0,8.0]        n 40
+  intermediate 18-35 off+30          T1 11.5 [3.0,20.0]      T2 11.5 [3.0,20.0]      n 40
+  intermediate 18-35 off+45          T1 21.8 [17.0,30.0]     T2 21.8 [17.0,30.0]     n 40
+  intermediate 18-35 off+100         T1 28.0 [18.0,42.0]     T2 28.0 [18.0,42.0]     n 40
+  intermediate 36-54 off+10          T1 7.3 [0.0,14.5]       T2 7.3 [0.0,14.5]       n 40
+  intermediate 36-54 off+15          T1 6.0 [0.0,11.0]       T2 6.0 [0.0,11.0]       n 40
+  intermediate 36-54 off+20          T1 7.5 [0.0,12.8]       T2 7.5 [0.0,12.8]       n 40
+  intermediate 36-54 off+30          T1 16.0 [7.0,25.5]      T2 16.0 [7.0,25.5]      n 40
+  intermediate 36-54 off+45          T1 22.7 [15.2,31.5]     T2 22.7 [15.2,31.5]     n 40
+  intermediate 36-54 off+100         T1 23.8 [15.2,35.7]     T2 23.8 [15.2,35.7]     n 40
+  intermediate 55+ off+10            T1 4.1 [0.0,6.5]        T2 4.1 [0.0,6.5]        n 40
+  intermediate 55+ off+15            T1 7.6 [0.0,13.0]       T2 7.6 [0.0,13.0]       n 40
+  intermediate 55+ off+20            T1 11.6 [2.4,19.5]      T2 11.6 [2.4,19.5]      n 40
+  intermediate 55+ off+30            T1 18.2 [11.6,27.3]     T2 18.2 [11.6,27.3]     n 40
+  intermediate 55+ off+45            T1 18.2 [11.6,27.3]     T2 18.2 [11.6,27.3]     n 40
+  intermediate 55+ off+100           T1 18.2 [11.6,27.3]     T2 18.2 [11.6,27.3]     n 40
+  advanced 18-35 off+10              T1 16.0 [0.0,34.0]      T2 16.0 [0.0,34.0]      n 40
+  advanced 18-35 off+15              T1 16.2 [0.0,33.0]      T2 16.2 [0.0,33.0]      n 40
+  advanced 18-35 off+20              T1 17.6 [2.0,33.0]      T2 17.6 [2.0,33.0]      n 40
+  advanced 18-35 off+30              T1 27.3 [12.0,44.9]     T2 27.3 [12.0,44.9]     n 40
+  advanced 18-35 off+45              T1 43.7 [27.0,59.7]     T2 43.7 [27.0,59.7]     n 40
+  advanced 18-35 off+100             T1 70.0 [45.0,105.0]    T2 70.0 [45.0,105.0]    n 40
+  advanced 36-54 off+10              T1 13.0 [0.0,23.8]      T2 13.0 [0.0,23.8]      n 40
+  advanced 36-54 off+15              T1 17.5 [0.0,34.0]      T2 17.5 [0.0,34.0]      n 40
+  advanced 36-54 off+20              T1 21.1 [4.7,39.4]      T2 21.1 [4.7,39.4]      n 40
+  advanced 36-54 off+30              T1 33.1 [14.7,49.4]     T2 33.1 [14.7,49.4]     n 40
+  advanced 36-54 off+45              T1 47.1 [29.7,63.7]     T2 47.1 [29.7,63.7]     n 40
+  advanced 36-54 off+100             T1 59.5 [38.2,89.2]     T2 59.5 [38.2,89.2]     n 40
+  advanced 55+ off+10                T1 14.8 [0.0,26.0]      T2 14.8 [0.0,26.0]      n 40
+  advanced 55+ off+15                T1 17.8 [3.3,30.5]      T2 17.8 [3.3,30.5]      n 40
+  advanced 55+ off+20                T1 24.5 [8.3,39.6]      T2 24.5 [8.3,39.6]      n 40
+  advanced 55+ off+30                T1 35.3 [18.3,48.7]     T2 35.3 [18.3,48.7]     n 40
+  advanced 55+ off+45                T1 45.5 [29.2,68.2]     T2 45.5 [29.2,68.2]     n 40
+  advanced 55+ off+100               T1 45.5 [29.2,68.2]     T2 45.5 [29.2,68.2]     n 40
+  beginner 18-35 off+-20             T1 0.0 [0.0,0.0]        T2 -4.5 [-9.0,0.0]      n 20
+  beginner 36-54 off+-20             T1 0.0 [0.0,0.0]        T2 -4.9 [-7.7,-2.0]     n 20
+  beginner 55+ off+-20               T1 0.0 [0.0,0.0]        T2 -5.9 [-5.9,-5.9]     n 20
+  intermediate 18-35 off+-20         T1 8.3 [0.0,12.0]       T2 8.3 [0.0,12.0]       n 20
+  intermediate 36-54 off+-20         T1 8.4 [0.0,10.2]       T2 8.4 [0.0,10.2]       n 20
+  intermediate 55+ off+-20           T1 7.3 [3.2,7.8]        T2 7.3 [3.2,7.8]        n 20
+  advanced 18-35 off+-20             T1 17.3 [2.9,30.0]      T2 17.3 [2.9,30.0]      n 20
+  advanced 36-54 off+-20             T1 17.4 [4.7,25.5]      T2 17.4 [4.7,25.5]      n 20
+  advanced 55+ off+-20               T1 15.8 [7.1,19.5]      T2 15.8 [7.1,19.5]      n 20
+
+== M2 dampened INT note (pp._dampened) cells, undated, by exp x off: base/T1/T2 of n
+  beginner     off  -20 50/50/40 of 120
+  beginner     off   10 70/70/60 of 120
+  beginner     off   15 80/80/60 of 120
+  beginner     off   20 100/100/70 of 120
+  beginner     off   30 120/120/100 of 120
+  beginner     off   45 120/120/120 of 120
+  beginner     off  100 120/120/120 of 120
+  intermediate off  -20 38/56/56 of 120
+  intermediate off   10 60/70/70 of 120
+  intermediate off   15 60/78/78 of 120
+  intermediate off   20 66/98/98 of 120
+  intermediate off   30 78/120/120 of 120
+  intermediate off   45 110/120/120 of 120
+  intermediate off  100 120/120/120 of 120
+  advanced     off  -20 20/60/60 of 120
+  advanced     off   10 42/90/90 of 120
+  advanced     off   15 40/100/100 of 120
+  advanced     off   20 40/120/120 of 120
+  advanced     off   30 36/120/120 of 120
+  advanced     off   45 64/120/120 of 120
+  advanced     off  100 120/120/120 of 120
+
+== P-CLOCKEND(a) undated not-met cells: rt printed by no week 2340 / 2340 | last-week minus rt s/mi max 7
+   T1 arm: 2340 / 2340
+   dated pinned cells whose held tail value is first printed one step after a decrease (held tail = a new, faster pace): 5390 / 5630
+
+== M3 cap-bound (undated, rec == distance cap; beginner: rec == 26) base/T1/T2, and hand-oracle agreement (non-beginner)
+  beginner 18-35         0/0/0 of 280
+  beginner 36-54         0/0/0 of 280
+  beginner 55+           0/0/0 of 280
+  intermediate 18-35     110/160/160 of 280
+  intermediate 36-54     150/190/190 of 280
+  intermediate 55+       190/220/220 of 280
+  advanced 18-35         100/200/200 of 280
+  advanced 36-54         120/210/210 of 280
+  advanced 55+           160/230/230 of 280
+  hand oracle == engine rec: {"base":[1680,1680],"t1":[1680,1680],"t2":[1680,1680]}
+
+== M3 undated length (rec) by exp/age/dist/gap, base -> T1 -> T2 (distinct values over mile x rest)
+  beginner     18-35 1  mi off  -20 9->9->9 
+  beginner     18-35 1  mi off   10 9->9->9 
+  beginner     18-35 1  mi off   15 9->9->9 
+  beginner     18-35 1  mi off   20 9->9->9 
+  beginner     18-35 1  mi off   30 9->9->9 
+  beginner     18-35 1  mi off   45 9->9->9 
+  beginner     18-35 1  mi off  100 9->9->9 
+  beginner     36-54 1  mi off  -20 9->9->9 
+  beginner     36-54 1  mi off   10 10->10->10 
+  beginner     36-54 1  mi off   15 10->10->10 
+  beginner     36-54 1  mi off   20 10->10->10 
+  beginner     36-54 1  mi off   30 10->10->10 
+  beginner     36-54 1  mi off   45 10->10->10 
+  beginner     36-54 1  mi off  100 10->10->10 
+  beginner     55+   1  mi off  -20 9->9->9 
+  beginner     55+   1  mi off   10 10->10->10 
+  beginner     55+   1  mi off   15 10->10->10 
+  beginner     55+   1  mi off   20 10->10->10 
+  beginner     55+   1  mi off   30 10->10->10 
+  beginner     55+   1  mi off   45 10->10->10 
+  beginner     55+   1  mi off  100 10->10->10 
+  intermediate 18-35 1  mi off  -20 6->6->6 
+  intermediate 18-35 1  mi off   10 8->9->9   <- moves
+  intermediate 18-35 1  mi off   15 9->9->9 
+  intermediate 18-35 1  mi off   20 9->9->9 
+  intermediate 18-35 1  mi off   30 9->9->9 
+  intermediate 18-35 1  mi off   45 9->9->9 
+  intermediate 18-35 1  mi off  100 9->9->9 
+  intermediate 36-54 1  mi off  -20 6->6->6 
+  intermediate 36-54 1  mi off   10 9->9->9 
+  intermediate 36-54 1  mi off   15 9->9->9 
+  intermediate 36-54 1  mi off   20 9->9->9 
+  intermediate 36-54 1  mi off   30 9->9->9 
+  intermediate 36-54 1  mi off   45 9->9->9 
+  intermediate 36-54 1  mi off  100 9->9->9 
+  intermediate 55+   1  mi off  -20 6->6->6 
+  intermediate 55+   1  mi off   10 9->9->9 
+  intermediate 55+   1  mi off   15 9->9->9 
+  intermediate 55+   1  mi off   20 9->9->9 
+  intermediate 55+   1  mi off   30 9->9->9 
+  intermediate 55+   1  mi off   45 9->9->9 
+  intermediate 55+   1  mi off  100 9->9->9 
+  advanced     18-35 1  mi off  -20 6->6->6 
+  advanced     18-35 1  mi off   10 8->9->9   <- moves
+  advanced     18-35 1  mi off   15 9->9->9 
+  advanced     18-35 1  mi off   20 9->9->9 
+  advanced     18-35 1  mi off   30 9->9->9 
+  advanced     18-35 1  mi off   45 9->9->9 
+  advanced     18-35 1  mi off  100 9->9->9 
+  advanced     36-54 1  mi off  -20 6->6->6 
+  advanced     36-54 1  mi off   10 8->9->9   <- moves
+  advanced     36-54 1  mi off   15 9->9->9 
+  advanced     36-54 1  mi off   20 9->9->9 
+  advanced     36-54 1  mi off   30 9->9->9 
+  advanced     36-54 1  mi off   45 9->9->9 
+  advanced     36-54 1  mi off  100 9->9->9 
+  advanced     55+   1  mi off  -20 6->6->6 
+  advanced     55+   1  mi off   10 9->9->9 
+  advanced     55+   1  mi off   15 9->9->9 
+  advanced     55+   1  mi off   20 9->9->9 
+  advanced     55+   1  mi off   30 9->9->9 
+  advanced     55+   1  mi off   45 9->9->9 
+  advanced     55+   1  mi off  100 9->9->9 
+  beginner     18-35 1.5mi off  -20 9->9->9 
+  beginner     18-35 1.5mi off   10 10->10->9   <- moves
+  beginner     18-35 1.5mi off   15 11->11->10   <- moves
+  beginner     18-35 1.5mi off   20 11->11->11 
+  beginner     18-35 1.5mi off   30 11->11->11 
+  beginner     18-35 1.5mi off   45 11->11->11 
+  beginner     18-35 1.5mi off  100 11->11->11 
+  beginner     36-54 1.5mi off  -20 9->9->9 
+  beginner     36-54 1.5mi off   10 11->11->10   <- moves
+  beginner     36-54 1.5mi off   15 12->12->12 
+  beginner     36-54 1.5mi off   20 12->12->12 
+  beginner     36-54 1.5mi off   30 12->12->12 
+  beginner     36-54 1.5mi off   45 12->12->12 
+  beginner     36-54 1.5mi off  100 12->12->12 
+  beginner     55+   1.5mi off  -20 9->9->9 
+  beginner     55+   1.5mi off   10 13->13->11   <- moves
+  beginner     55+   1.5mi off   15 13->13->13 
+  beginner     55+   1.5mi off   20 13->13->13 
+  beginner     55+   1.5mi off   30 13->13->13 
+  beginner     55+   1.5mi off   45 13->13->13 
+  beginner     55+   1.5mi off  100 13->13->13 
+  intermediate 18-35 1.5mi off  -20 6->6->6 
+  intermediate 18-35 1.5mi off   10 8->10->10   <- moves
+  intermediate 18-35 1.5mi off   15 9->11->11   <- moves
+  intermediate 18-35 1.5mi off   20 10->11->11   <- moves
+  intermediate 18-35 1.5mi off   30 11->11->11 
+  intermediate 18-35 1.5mi off   45 11->11->11 
+  intermediate 18-35 1.5mi off  100 11->11->11 
+  intermediate 36-54 1.5mi off  -20 6->6->6 
+  intermediate 36-54 1.5mi off   10 10->11->11   <- moves
+  intermediate 36-54 1.5mi off   15 11->11->11 
+  intermediate 36-54 1.5mi off   20 11->11->11 
+  intermediate 36-54 1.5mi off   30 11->11->11 
+  intermediate 36-54 1.5mi off   45 11->11->11 
+  intermediate 36-54 1.5mi off  100 11->11->11 
+  intermediate 55+   1.5mi off  -20 6->6->6 
+  intermediate 55+   1.5mi off   10 11->11->11 
+  intermediate 55+   1.5mi off   15 11->11->11 
+  intermediate 55+   1.5mi off   20 11->11->11 
+  intermediate 55+   1.5mi off   30 11->11->11 
+  intermediate 55+   1.5mi off   45 11->11->11 
+  intermediate 55+   1.5mi off  100 11->11->11 
+  advanced     18-35 1.5mi off  -20 6->6->6 
+  advanced     18-35 1.5mi off   10 8->11->11   <- moves
+  advanced     18-35 1.5mi off   15 9->11->11   <- moves
+  advanced     18-35 1.5mi off   20 9->11->11   <- moves
+  advanced     18-35 1.5mi off   30 11->11->11 
+  advanced     18-35 1.5mi off   45 11->11->11 
+  advanced     18-35 1.5mi off  100 11->11->11 
+  advanced     36-54 1.5mi off  -20 6->6->6 
+  advanced     36-54 1.5mi off   10 8->11->11   <- moves
+  advanced     36-54 1.5mi off   15 10->11->11   <- moves
+  advanced     36-54 1.5mi off   20 11->11->11 
+  advanced     36-54 1.5mi off   30 11->11->11 
+  advanced     36-54 1.5mi off   45 11->11->11 
+  advanced     36-54 1.5mi off  100 11->11->11 
+  advanced     55+   1.5mi off  -20 6->6->6 
+  advanced     55+   1.5mi off   10 10->11->11   <- moves
+  advanced     55+   1.5mi off   15 11->11->11 
+  advanced     55+   1.5mi off   20 11->11->11 
+  advanced     55+   1.5mi off   30 11->11->11 
+  advanced     55+   1.5mi off   45 11->11->11 
+  advanced     55+   1.5mi off  100 11->11->11 
+  beginner     18-35 3.1mi off  -20 9->9->9 
+  beginner     18-35 3.1mi off   10 10->10->9   <- moves
+  beginner     18-35 3.1mi off   15 11->11->10   <- moves
+  beginner     18-35 3.1mi off   20 14->14->11   <- moves
+  beginner     18-35 3.1mi off   30 15->15->15 
+  beginner     18-35 3.1mi off   45 15->15->15 
+  beginner     18-35 3.1mi off  100 15->15->15 
+  beginner     36-54 3.1mi off  -20 9->9->9 
+  beginner     36-54 3.1mi off   10 11->11->10   <- moves
+  beginner     36-54 3.1mi off   15 14->14->12   <- moves
+  beginner     36-54 3.1mi off   20 16->16->14   <- moves
+  beginner     36-54 3.1mi off   30 16->16->16 
+  beginner     36-54 3.1mi off   45 16->16->16 
+  beginner     36-54 3.1mi off  100 16->16->16 
+  beginner     55+   3.1mi off  -20 9->9->9 
+  beginner     55+   3.1mi off   10 15->15->11   <- moves
+  beginner     55+   3.1mi off   15 17->17->15   <- moves
+  beginner     55+   3.1mi off   20 17->17->17 
+  beginner     55+   3.1mi off   30 17->17->17 
+  beginner     55+   3.1mi off   45 17->17->17 
+  beginner     55+   3.1mi off  100 17->17->17 
+  intermediate 18-35 3.1mi off  -20 6->6->6 
+  intermediate 18-35 3.1mi off   10 8->10->10   <- moves
+  intermediate 18-35 3.1mi off   15 9->11->11   <- moves
+  intermediate 18-35 3.1mi off   20 10->14->14   <- moves
+  intermediate 18-35 3.1mi off   30 13->15->15   <- moves
+  intermediate 18-35 3.1mi off   45 15->15->15 
+  intermediate 18-35 3.1mi off  100 15->15->15 
+  intermediate 36-54 3.1mi off  -20 6->6->6 
+  intermediate 36-54 3.1mi off   10 10->11->11   <- moves
+  intermediate 36-54 3.1mi off   15 11->14->14   <- moves
+  intermediate 36-54 3.1mi off   20 12->15->15   <- moves
+  intermediate 36-54 3.1mi off   30 15->15->15 
+  intermediate 36-54 3.1mi off   45 15->15->15 
+  intermediate 36-54 3.1mi off  100 15->15->15 
+  intermediate 55+   3.1mi off  -20 6->6->6 
+  intermediate 55+   3.1mi off   10 11->15->15   <- moves
+  intermediate 55+   3.1mi off   15 13->15->15   <- moves
+  intermediate 55+   3.1mi off   20 15->15->15 
+  intermediate 55+   3.1mi off   30 15->15->15 
+  intermediate 55+   3.1mi off   45 15->15->15 
+  intermediate 55+   3.1mi off  100 15->15->15 
+  advanced     18-35 3.1mi off  -20 6->6->6 
+  advanced     18-35 3.1mi off   10 8->11->11   <- moves
+  advanced     18-35 3.1mi off   15 9->15->15   <- moves
+  advanced     18-35 3.1mi off   20 9->15->15   <- moves
+  advanced     18-35 3.1mi off   30 11->15->15   <- moves
+  advanced     18-35 3.1mi off   45 14->15->15   <- moves
+  advanced     18-35 3.1mi off  100 15->15->15 
+  advanced     36-54 3.1mi off  -20 6->6->6 
+  advanced     36-54 3.1mi off   10 8->14->14   <- moves
+  advanced     36-54 3.1mi off   15 10->15->15   <- moves
+  advanced     36-54 3.1mi off   20 11->15->15   <- moves
+  advanced     36-54 3.1mi off   30 14->15->15   <- moves
+  advanced     36-54 3.1mi off   45 15->15->15 
+  advanced     36-54 3.1mi off  100 15->15->15 
+  advanced     55+   3.1mi off  -20 6->6->6 
+  advanced     55+   3.1mi off   10 10->15->15   <- moves
+  advanced     55+   3.1mi off   15 11->15->15   <- moves
+  advanced     55+   3.1mi off   20 13->15->15   <- moves
+  advanced     55+   3.1mi off   30 15->15->15 
+  advanced     55+   3.1mi off   45 15->15->15 
+  advanced     55+   3.1mi off  100 15->15->15 
+  beginner     18-35 6.2mi off  -20 9->9->9 
+  beginner     18-35 6.2mi off   10 10->10->9   <- moves
+  beginner     18-35 6.2mi off   15 11->11->10   <- moves
+  beginner     18-35 6.2mi off   20 14->14->11   <- moves
+  beginner     18-35 6.2mi off   30 18->18->15   <- moves
+  beginner     18-35 6.2mi off   45 21->21->20   <- moves
+  beginner     18-35 6.2mi off  100 21->21->21 
+  beginner     36-54 6.2mi off  -20 9->9->9 
+  beginner     36-54 6.2mi off   10 11->11->10   <- moves
+  beginner     36-54 6.2mi off   15 14->14->12   <- moves
+  beginner     36-54 6.2mi off   20 16->16->14   <- moves
+  beginner     36-54 6.2mi off   30 21->21->17   <- moves
+  beginner     36-54 6.2mi off   45 22->22->22 
+  beginner     36-54 6.2mi off  100 22->22->22 
+  beginner     55+   6.2mi off  -20 9->9->9 
+  beginner     55+   6.2mi off   10 15->15->11   <- moves
+  beginner     55+   6.2mi off   15 17->17->15   <- moves
+  beginner     55+   6.2mi off   20 22->22->17   <- moves
+  beginner     55+   6.2mi off   30 24->24->23   <- moves
+  beginner     55+   6.2mi off   45 24->24->24 
+  beginner     55+   6.2mi off  100 24->24->24 
+  intermediate 18-35 6.2mi off  -20 6->6->6 
+  intermediate 18-35 6.2mi off   10 8->10->10   <- moves
+  intermediate 18-35 6.2mi off   15 9->11->11   <- moves
+  intermediate 18-35 6.2mi off   20 10->14->14   <- moves
+  intermediate 18-35 6.2mi off   30 13->18->18   <- moves
+  intermediate 18-35 6.2mi off   45 16->21->21   <- moves
+  intermediate 18-35 6.2mi off  100 21->21->21 
+  intermediate 36-54 6.2mi off  -20 6->6->6 
+  intermediate 36-54 6.2mi off   10 10->11->11   <- moves
+  intermediate 36-54 6.2mi off   15 11->14->14   <- moves
+  intermediate 36-54 6.2mi off   20 12->16->16   <- moves
+  intermediate 36-54 6.2mi off   30 16->21->21   <- moves
+  intermediate 36-54 6.2mi off   45 20->21->21   <- moves
+  intermediate 36-54 6.2mi off  100 21->21->21 
+  intermediate 55+   6.2mi off  -20 6->6->6 
+  intermediate 55+   6.2mi off   10 11->15->15   <- moves
+  intermediate 55+   6.2mi off   15 13->17->17   <- moves
+  intermediate 55+   6.2mi off   20 16->21->21   <- moves
+  intermediate 55+   6.2mi off   30 21->21->21 
+  intermediate 55+   6.2mi off   45 21->21->21 
+  intermediate 55+   6.2mi off  100 21->21->21 
+  advanced     18-35 6.2mi off  -20 6->6->6 
+  advanced     18-35 6.2mi off   10 8->11->11   <- moves
+  advanced     18-35 6.2mi off   15 9->15->15   <- moves
+  advanced     18-35 6.2mi off   20 9->18->18   <- moves
+  advanced     18-35 6.2mi off   30 11->21->21   <- moves
+  advanced     18-35 6.2mi off   45 14->21->21   <- moves
+  advanced     18-35 6.2mi off  100 21->21->21 
+  advanced     36-54 6.2mi off  -20 6->6->6 
+  advanced     36-54 6.2mi off   10 8->14->14   <- moves
+  advanced     36-54 6.2mi off   15 10->17->17   <- moves
+  advanced     36-54 6.2mi off   20 11->21->21   <- moves
+  advanced     36-54 6.2mi off   30 14->21->21   <- moves
+  advanced     36-54 6.2mi off   45 16->21->21   <- moves
+  advanced     36-54 6.2mi off  100 21->21->21 
+  advanced     55+   6.2mi off  -20 6->6->6 
+  advanced     55+   6.2mi off   10 10->17->17   <- moves
+  advanced     55+   6.2mi off   15 11->21->21   <- moves
+  advanced     55+   6.2mi off   20 13->21->21   <- moves
+  advanced     55+   6.2mi off   30 16->21->21   <- moves
+  advanced     55+   6.2mi off   45 21->21->21 
+  advanced     55+   6.2mi off  100 21->21->21 
+
+== M4 beginner cells: digest diffs T1 0 / 3360 | T2 2900 / 3360
+  beginner dampened cells (base) weeklyGain base -> T2: 18-35 3->3.3 ; 18-35 3->4 ; 36-54 2.5->3 ; 36-54 2.5->3.4 ; 55+ 1.9->2 ; 55+ 1.9->2.6 ; 36-54 2.5->2.6 ; 55+ 1.9->2.4 ; 36-54 2.5->2.8 ; 36-54 2.5->3.3 ; 55+ 1.9->2.5 ; 18-35 3->3.7 ; 18-35 3->3.8 ; 36-54 2.5->3.1 ; 18-35 3->3.6 n 2870
+
+== dated cells pinned to test week (base): 5630 | length moved T1 0 T2 50 | pin state changed T1 220 T2 270
+  dated feedback card text moved T1 3020 T2 4650 of 7560
+
+== §3 spot cells (undated, sun/wed, mile 8:00 for non-beginner)
+  1.5mi beg 18-35 mile none off -20 undated sun/wed gap -20 | rec 9 9 9 | L 9 9 9 | anchor@dist 11:46 | rt 11:46 11:46 11:46 | goal 11:50 | g 0 0 0 | ceil - - -
+  1.5mi beg 18-35 mile none off +10 undated sun/wed gap 10 | rec 10 10 9 | L 10 10 9 | anchor@dist 11:46 | rt 11:20 11:20 11:20 | goal 11:20 | g 2.6 2.6 2.9 | ceil - - -
+  1.5mi beg 18-35 mile none off +15 undated sun/wed gap 14.67 | rec 11 11 10 | L 11 11 10 | anchor@dist 11:46 | rt 11:15 11:15 11:15 | goal 11:15 | g 2.8 2.8 3.1 | ceil - - -
+  1.5mi beg 18-35 mile none off +20 undated sun/wed gap 20 | rec 11 11 11 | L 11 11 11 | anchor@dist 11:46 | rt 11:13 11:13 11:10 | goal 11:10 | g 3 3 3.3 | ceil - - -
+  1.5mi beg 18-35 mile none off +30 undated sun/wed gap 30 | rec 11 11 11 | L 11 11 11 | anchor@dist 11:46 | rt 11:13 11:13 11:02 | goal 11:00 | g 3 3 4 | ceil - - -
+  1.5mi beg 18-35 mile none off +45 undated sun/wed gap 44.67 | rec 11 11 11 | L 11 11 11 | anchor@dist 11:46 | rt 11:13 11:13 11:02 | goal 10:45 | g 3 3 4 | ceil - - -
+  1.5mi beg 18-35 mile none off +100 undated sun/wed gap 100 | rec 11 11 11 | L 11 11 11 | anchor@dist 11:46 | rt 11:13 11:13 11:02 | goal 9:50 | g 3 3 4 | ceil 11:16 11:16 11:11
+  1.5mi int 18-35 mile 8:00 off -20 undated sun/wed gap -20 | rec 6 6 6 | L 6 6 6 | anchor@dist 8:14 | rt 8:14 8:14 8:14 | goal 8:20 | g 0 0 0 | ceil - - -
+  1.5mi int 18-35 mile 8:00 off +10 undated sun/wed gap 10 | rec 8 10 10 | L 8 10 10 | anchor@dist 8:14 | rt 7:50 7:50 7:50 | goal 7:50 | g 3 2.4 2.4 | ceil - - -
+  1.5mi int 18-35 mile 8:00 off +15 undated sun/wed gap 14.67 | rec 9 11 11 | L 9 11 11 | anchor@dist 8:14 | rt 7:45 7:45 7:45 | goal 7:45 | g 3.2 2.6 2.6 | ceil - - -
+  1.5mi int 18-35 mile 8:00 off +20 undated sun/wed gap 20 | rec 10 11 11 | L 10 11 11 | anchor@dist 8:14 | rt 7:40 7:41 7:41 | goal 7:40 | g 3.4 3 3 | ceil - - -
+  1.5mi int 18-35 mile 8:00 off +30 undated sun/wed gap 30 | rec 11 11 11 | L 11 11 11 | anchor@dist 8:14 | rt 7:30 7:41 7:41 | goal 7:30 | g 4 3 3 | ceil - - -
+  1.5mi int 18-35 mile 8:00 off +45 undated sun/wed gap 44.67 | rec 11 11 11 | L 11 11 11 | anchor@dist 8:14 | rt 7:19 7:41 7:41 | goal 7:15 | g 5 3 3 | ceil - - -
+  1.5mi int 18-35 mile 8:00 off +100 undated sun/wed gap 100 | rec 11 11 11 | L 11 11 11 | anchor@dist 8:14 | rt 7:19 7:41 7:41 | goal 6:20 | g 5 3 3 | ceil 7:36 7:46 7:46
+  1.5mi adv 18-35 mile 8:00 off -20 undated sun/wed gap -20 | rec 6 6 6 | L 6 6 6 | anchor@dist 8:14 | rt 8:14 8:14 8:14 | goal 8:20 | g 0 0 0 | ceil - - -
+  1.5mi adv 18-35 mile 8:00 off +10 undated sun/wed gap 10 | rec 8 11 11 | L 8 11 11 | anchor@dist 8:14 | rt 7:50 7:52 7:52 | goal 7:50 | g 3 2 2 | ceil - - -
+  1.5mi adv 18-35 mile 8:00 off +15 undated sun/wed gap 14.67 | rec 9 11 11 | L 9 11 11 | anchor@dist 8:14 | rt 7:45 7:52 7:52 | goal 7:45 | g 3.2 2 2 | ceil - - -
+  1.5mi adv 18-35 mile 8:00 off +20 undated sun/wed gap 20 | rec 9 11 11 | L 9 11 11 | anchor@dist 8:14 | rt 7:40 7:52 7:52 | goal 7:40 | g 3.8 2 2 | ceil - - -
+  1.5mi adv 18-35 mile 8:00 off +30 undated sun/wed gap 30 | rec 11 11 11 | L 11 11 11 | anchor@dist 8:14 | rt 7:30 7:52 7:52 | goal 7:30 | g 4 2 2 | ceil - - -
+  1.5mi adv 18-35 mile 8:00 off +45 undated sun/wed gap 44.67 | rec 11 11 11 | L 11 11 11 | anchor@dist 8:14 | rt 7:15 7:52 7:52 | goal 7:15 | g 5.4 2 2 | ceil - - -
+  1.5mi adv 18-35 mile 8:00 off +100 undated sun/wed gap 100 | rec 11 11 11 | L 11 11 11 | anchor@dist 8:14 | rt 6:57 7:52 7:52 | goal 6:20 | g 7 2 2 | ceil 7:26 7:50 7:50
+## then->now
+then->now per-cell (V209 out vs HEAD out): cells matched 10080 of 10080 (HEAD has 10080 ) missing 0 | B arm differ 0 | T1 differ 0 | T2 differ 0
+## M6 mario
+
+######## M6 V202 as recorded (goal 1.5mi 10:30, test 2026-10-19) | seed 24865 intermediate 18-35 rest sun/wed mile 8:15
+-- base: length 5 (rec 11, test week 5) | clock W1 8:29 realistic 8:14 goal 7:00 gain 5 dampened true | ceiling 7:51 | digest 241b8da0806ae0ff
+   feedback: 3 weeks isn't enough time to hit this pace safely. Recommended: at least 11 weeks. Your program ends on your test. 5 weeks. The taper lands in front of it. In 3 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits. Use this pace instead
+   clock by week: 8:29 8:24 8:19 8:14 8:14
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:14/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:08/mi. This week's goal pace is 8:24/mi. Recovery: 4:03 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:14/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:03/mi. This week's goal pace is 8:19/mi. Recovery: 4:00 to 5:00 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:14/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:14/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:05/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 8:59/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 10 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+-- T1: length 5 (rec 11, test week 5) | clock W1 8:29 realistic 8:20 goal 7:00 gain 3 dampened true | ceiling 8:01 | digest 22cb9e717b4d29fb
+   feedback: 3 weeks isn't enough time to hit this pace safely. Recommended: at least 11 weeks. Your program ends on your test. 5 weeks. The taper lands in front of it. In 3 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits. Use this pace instead
+   clock by week: 8:29 8:26 8:23 8:20 8:20
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:10/mi. This week's goal pace is 8:26/mi. Recovery: 4:04 to 5:04 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:07/mi. This week's goal pace is 8:23/mi. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 8:04/mi. This week's goal pace is 8:20/mi. Recovery: 4:01 to 5:01 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:07/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 10 min continuous at Tempo Pace: 9:00/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+-- T2: length 5 (rec 11, test week 5) | clock W1 8:29 realistic 8:20 goal 7:00 gain 3 dampened true | ceiling 8:01 | digest 22cb9e717b4d29fb
+   feedback: 3 weeks isn't enough time to hit this pace safely. Recommended: at least 11 weeks. Your program ends on your test. 5 weeks. The taper lands in front of it. In 3 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits. Use this pace instead
+   clock by week: 8:29 8:26 8:23 8:20 8:20
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:10/mi. This week's goal pace is 8:26/mi. Recovery: 4:04 to 5:04 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:07/mi. This week's goal pace is 8:23/mi. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 8:04/mi. This week's goal pace is 8:20/mi. Recovery: 4:01 to 5:01 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:07/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 10 min continuous at Tempo Pace: 9:00/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+
+######## M6 same, undated | seed 24865 intermediate 18-35 rest sun/wed mile 8:15
+-- base: length 11 (rec 11, test week null) | clock W1 8:29 realistic 7:34 goal 7:00 gain 5 dampened true | ceiling 7:51 | digest d7e45aa0bd199146
+   clock by week: 8:29 8:24 8:19 8:14 8:09 8:04 7:59 7:54 7:49 7:44 7:39
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:34/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:08/mi. This week's goal pace is 8:24/mi. Recovery: 4:03 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:34/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:03/mi. This week's goal pace is 8:19/mi. Recovery: 4:00 to 5:00 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:34/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 8:03/mi. Cutback week. Same target as last week, fewer reps. Recovery: 4:00 to 5:00 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W5 mon 6x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:34/mi. Hit the prescribed pace precisely.
+   INT W6 mon 6x400m at 7:48/mi. This week's goal pace is 8:04/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:34/mi. Hit the prescribed pace precisely.
+   INT W7 mon 7x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:34/mi. Hit the prescribed pace precisely.
+   INT W8 mon 4x400m at 7:43/mi. Cutback week. Same target as last week, fewer reps. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W9 mon 8x400m at 7:33/mi. This week's goal pace is 7:49/mi. Recovery: 3:45 to 4:41 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:34/mi. Hit the prescribed pace precisely.
+   INT W10 mon 8x400m at 7:28/mi. This week's goal pace is 7:44/mi. Recovery: 3:43 to 4:38 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:34/mi. Hit the prescribed pace precisely.
+   INT W11 mon 8x400m at 7:23/mi. This week's goal pace is 7:39/mi. Recovery: 3:40 to 4:35 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:34/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:05/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 8:59/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 11 min continuous at Tempo Pace: 8:59/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W5 thu 17 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W6 thu 17 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W7 thu 18 min continuous at Tempo Pace: 8:38/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W8 thu 13 min continuous at Tempo Pace: 8:38/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W9 thu 19 min continuous at Tempo Pace: 8:27/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W10 thu 19 min continuous at Tempo Pace: 8:21/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W11 thu 20 min continuous at Tempo Pace: 8:16/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+-- T1: length 11 (rec 11, test week null) | clock W1 8:29 realistic 7:56 goal 7:00 gain 3 dampened true | ceiling 8:01 | digest c83bf2140a686b0a
+   clock by week: 8:29 8:26 8:23 8:20 8:17 8:14 8:11 8:08 8:05 8:02 7:59
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:10/mi. This week's goal pace is 8:26/mi. Recovery: 4:04 to 5:04 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:07/mi. This week's goal pace is 8:23/mi. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 8:07/mi. Cutback week. Same target as last week, fewer reps. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W5 mon 6x400m at 8:01/mi. This week's goal pace is 8:17/mi. Recovery: 3:59 to 4:59 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W6 mon 6x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W7 mon 7x400m at 7:55/mi. This week's goal pace is 8:11/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W8 mon 4x400m at 7:55/mi. Cutback week. Same target as last week, fewer reps. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W9 mon 8x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W10 mon 8x400m at 7:46/mi. This week's goal pace is 8:02/mi. Recovery: 3:52 to 4:50 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W11 mon 8x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:07/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 11 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W5 thu 17 min continuous at Tempo Pace: 8:57/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W6 thu 17 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W7 thu 18 min continuous at Tempo Pace: 8:51/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W8 thu 13 min continuous at Tempo Pace: 8:51/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W9 thu 19 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W10 thu 19 min continuous at Tempo Pace: 8:41/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W11 thu 20 min continuous at Tempo Pace: 8:38/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+-- T2: length 11 (rec 11, test week null) | clock W1 8:29 realistic 7:56 goal 7:00 gain 3 dampened true | ceiling 8:01 | digest c83bf2140a686b0a
+   clock by week: 8:29 8:26 8:23 8:20 8:17 8:14 8:11 8:08 8:05 8:02 7:59
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:10/mi. This week's goal pace is 8:26/mi. Recovery: 4:04 to 5:04 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:07/mi. This week's goal pace is 8:23/mi. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 8:07/mi. Cutback week. Same target as last week, fewer reps. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W5 mon 6x400m at 8:01/mi. This week's goal pace is 8:17/mi. Recovery: 3:59 to 4:59 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W6 mon 6x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W7 mon 7x400m at 7:55/mi. This week's goal pace is 8:11/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W8 mon 4x400m at 7:55/mi. Cutback week. Same target as last week, fewer reps. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W9 mon 8x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W10 mon 8x400m at 7:46/mi. This week's goal pace is 8:02/mi. Recovery: 3:52 to 4:50 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W11 mon 8x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:07/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 11 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W5 thu 17 min continuous at Tempo Pace: 8:57/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W6 thu 17 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W7 thu 18 min continuous at Tempo Pace: 8:51/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W8 thu 13 min continuous at Tempo Pace: 8:51/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W9 thu 19 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W10 thu 19 min continuous at Tempo Pace: 8:41/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W11 thu 20 min continuous at Tempo Pace: 8:38/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+
+######## M6 coach's §3 reading (goal 7:44/mi = 1.5mi 11:36), undated | seed 24865 intermediate 18-35 rest sun/wed mile 8:15
+-- base: length 11 (rec 11, test week null) | clock W1 8:29 realistic 7:44 goal 7:44 gain 4.1 dampened false | ceiling - | digest 0b7aa8e02032ac8e
+   clock by week: 8:29 8:25 8:21 8:17 8:13 8:09 8:05 8:01 7:56 7:52 7:48
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+   INT W2 mon 4x400m at 8:09/mi. This week's goal pace is 8:25/mi. Recovery: 4:03 to 5:04 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+   INT W3 mon 5x400m at 8:05/mi. This week's goal pace is 8:21/mi. Recovery: 4:01 to 5:01 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+   INT W4 mon 3x400m at 8:05/mi. Cutback week. Same target as last week, fewer reps. Recovery: 4:01 to 5:01 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W5 mon 6x400m at 7:57/mi. This week's goal pace is 8:13/mi. Recovery: 3:57 to 4:56 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+   INT W6 mon 6x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+   INT W7 mon 7x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+   INT W8 mon 4x400m at 7:49/mi. Cutback week. Same target as last week, fewer reps. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W9 mon 8x400m at 7:40/mi. This week's goal pace is 7:56/mi. Recovery: 3:49 to 4:46 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+   INT W10 mon 8x400m at 7:36/mi. This week's goal pace is 7:52/mi. Recovery: 3:47 to 4:43 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+   INT W11 mon 8x400m at 7:32/mi. This week's goal pace is 7:48/mi. Recovery: 3:45 to 4:41 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:06/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 9:01/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 11 min continuous at Tempo Pace: 9:01/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W5 thu 17 min continuous at Tempo Pace: 8:52/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W6 thu 17 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W7 thu 18 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W8 thu 13 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W9 thu 19 min continuous at Tempo Pace: 8:35/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W10 thu 19 min continuous at Tempo Pace: 8:30/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W11 thu 20 min continuous at Tempo Pace: 8:26/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+-- T1: length 11 (rec 11, test week null) | clock W1 8:29 realistic 7:56 goal 7:44 gain 3 dampened true | ceiling - | digest 2add403a714b2e6a
+   clock by week: 8:29 8:26 8:23 8:20 8:17 8:14 8:11 8:08 8:05 8:02 7:59
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:10/mi. This week's goal pace is 8:26/mi. Recovery: 4:04 to 5:04 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:07/mi. This week's goal pace is 8:23/mi. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 8:07/mi. Cutback week. Same target as last week, fewer reps. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W5 mon 6x400m at 8:01/mi. This week's goal pace is 8:17/mi. Recovery: 3:59 to 4:59 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W6 mon 6x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W7 mon 7x400m at 7:55/mi. This week's goal pace is 8:11/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W8 mon 4x400m at 7:55/mi. Cutback week. Same target as last week, fewer reps. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W9 mon 8x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W10 mon 8x400m at 7:46/mi. This week's goal pace is 8:02/mi. Recovery: 3:52 to 4:50 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W11 mon 8x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:07/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 11 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W5 thu 17 min continuous at Tempo Pace: 8:57/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W6 thu 17 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W7 thu 18 min continuous at Tempo Pace: 8:51/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W8 thu 13 min continuous at Tempo Pace: 8:51/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W9 thu 19 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W10 thu 19 min continuous at Tempo Pace: 8:41/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W11 thu 20 min continuous at Tempo Pace: 8:38/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+-- T2: length 11 (rec 11, test week null) | clock W1 8:29 realistic 7:56 goal 7:44 gain 3 dampened true | ceiling - | digest 2add403a714b2e6a
+   clock by week: 8:29 8:26 8:23 8:20 8:17 8:14 8:11 8:08 8:05 8:02 7:59
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:10/mi. This week's goal pace is 8:26/mi. Recovery: 4:04 to 5:04 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:07/mi. This week's goal pace is 8:23/mi. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 8:07/mi. Cutback week. Same target as last week, fewer reps. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W5 mon 6x400m at 8:01/mi. This week's goal pace is 8:17/mi. Recovery: 3:59 to 4:59 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W6 mon 6x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W7 mon 7x400m at 7:55/mi. This week's goal pace is 8:11/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W8 mon 4x400m at 7:55/mi. Cutback week. Same target as last week, fewer reps. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE CUTBACK WEEK: Same target pace as last week, fewer reps. The reduced dose is the plan working, not a soft day. Absorb the block and do not add reps.
+   INT W9 mon 8x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W10 mon 8x400m at 7:46/mi. This week's goal pace is 8:02/mi. Recovery: 3:52 to 4:50 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   INT W11 mon 8x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 7:56/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:07/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 11 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W5 thu 17 min continuous at Tempo Pace: 8:57/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W6 thu 17 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W7 thu 18 min continuous at Tempo Pace: 8:51/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W8 thu 13 min continuous at Tempo Pace: 8:51/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W9 thu 19 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W10 thu 19 min continuous at Tempo Pace: 8:41/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W11 thu 20 min continuous at Tempo Pace: 8:38/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+
+######## M6 coach's §3 reading, test 2026-10-19 | seed 24865 intermediate 18-35 rest sun/wed mile 8:15
+-- base: length 5 (rec 11, test week 5) | clock W1 8:29 realistic 8:14 goal 7:44 gain 5 dampened true | ceiling - | digest 183d0fb3f602aa2e
+   feedback: 3 weeks isn't enough time to hit this pace safely. Recommended: at least 11 weeks. Your program ends on your test. 5 weeks. The taper lands in front of it. In 3 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits. Use this pace instead
+   clock by week: 8:29 8:24 8:19 8:14 8:14
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:14/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:08/mi. This week's goal pace is 8:24/mi. Recovery: 4:03 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:14/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:03/mi. This week's goal pace is 8:19/mi. Recovery: 4:00 to 5:00 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:14/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:14/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:05/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 8:59/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 10 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+-- T1: length 5 (rec 11, test week 5) | clock W1 8:29 realistic 8:20 goal 7:44 gain 3 dampened true | ceiling - | digest 5b11ed5d9389b818
+   feedback: 3 weeks isn't enough time to hit this pace safely. Recommended: at least 11 weeks. Your program ends on your test. 5 weeks. The taper lands in front of it. In 3 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits. Use this pace instead
+   clock by week: 8:29 8:26 8:23 8:20 8:20
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:10/mi. This week's goal pace is 8:26/mi. Recovery: 4:04 to 5:04 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:07/mi. This week's goal pace is 8:23/mi. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 8:04/mi. This week's goal pace is 8:20/mi. Recovery: 4:01 to 5:01 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:07/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 10 min continuous at Tempo Pace: 9:00/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+-- T2: length 5 (rec 11, test week 5) | clock W1 8:29 realistic 8:20 goal 7:44 gain 3 dampened true | ceiling - | digest 5b11ed5d9389b818
+   feedback: 3 weeks isn't enough time to hit this pace safely. Recommended: at least 11 weeks. Your program ends on your test. 5 weeks. The taper lands in front of it. In 3 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits. Use this pace instead
+   clock by week: 8:29 8:26 8:23 8:20 8:20
+   INT W1 mon 4x400m at 8:13/mi. This week's goal pace is 8:29/mi. Recovery: 4:05 to 5:06 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W2 mon 4x400m at 8:10/mi. This week's goal pace is 8:26/mi. Recovery: 4:04 to 5:04 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W3 mon 5x400m at 8:07/mi. This week's goal pace is 8:23/mi. Recovery: 4:02 to 5:03 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   INT W4 mon 3x400m at 8:04/mi. This week's goal pace is 8:20/mi. Recovery: 4:01 to 5:01 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || NOTE SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:44/mi needs more weeks than this block has. The target for this block is 8:20/mi. Hit the prescribed pace precisely.
+   CHI W1 thu 15 min continuous at Tempo Pace: 9:10/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W2 thu 15 min continuous at Tempo Pace: 9:07/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W3 thu 16 min continuous at Tempo Pace: 9:04/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+   CHI W4 thu 10 min continuous at Tempo Pace: 9:00/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || NOTE LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace.
+## disclosure HEAD
+ia-version 219
+
+== 1. program-card sentence, no mile ==
+run_pace_goal beginner kind=beginner anchor=11:30 hand=11:30 | Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate.
+run_pace_goal intermediate kind=default anchor=9:30 hand=9:30 | Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Week 1 runs off this row. Every week after it moves toward your goal.
+run_pace_goal advanced kind=default anchor=7:30 hand=7:30 | Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Week 1 runs off this row. Every week after it moves toward your goal.
+run_5k beginner kind=beginner anchor=11:30 hand=11:30 | Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate.
+run_5k intermediate kind=default anchor=9:30 hand=9:30 | Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row.
+run_5k advanced kind=default anchor=7:30 hand=7:30 | Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row.
+run_base beginner runAnchorInfo=null -> no Run paces block
+run_base intermediate runAnchorInfo=null -> no Run paces block
+run_base advanced runAnchorInfo=null -> no Run paces block
+run_half beginner kind=beginner anchor=11:30 hand=11:30 | Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate.
+run_half intermediate kind=default anchor=9:30 hand=9:30 | Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row.
+run_half advanced kind=default anchor=7:30 hand=7:30 | Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row.
+
+== 2. run-card disclosure scan, no mile, seeds 1..20 ==
+run_pace_goal  beginner     builds 20 crash 0 runCards 880 disclosureTokenCards 0  cardsPrintingAnchorClock(11:30) 20
+run_pace_goal  intermediate builds 20 crash 0 runCards 880 disclosureTokenCards 0  cardsPrintingAnchorClock(9:30) 20
+run_pace_goal  advanced     builds 20 crash 0 runCards 480 disclosureTokenCards 0  cardsPrintingAnchorClock(7:30) 0
+run_5k         beginner     builds 20 crash 0 runCards 640 disclosureTokenCards 0  cardsPrintingAnchorClock(11:30) 180
+run_5k         intermediate builds 20 crash 0 runCards 640 disclosureTokenCards 0  cardsPrintingAnchorClock(9:30) 180
+run_5k         advanced     builds 20 crash 0 runCards 640 disclosureTokenCards 0  cardsPrintingAnchorClock(7:30) 180
+run_base       beginner     builds 20 crash 0 runCards 540 disclosureTokenCards 0  cardsPrintingAnchorClock(11:30) 0
+run_base       intermediate builds 20 crash 0 runCards 560 disclosureTokenCards 0  cardsPrintingAnchorClock(9:30) 0
+run_base       advanced     builds 20 crash 0 runCards 360 disclosureTokenCards 0  cardsPrintingAnchorClock(7:30) 0
+
+== 3. beginner no-mile, seed 1000, W1 and last week run cards ==
+-- run_pace_goal weeks 11
+ W1 mon Short Interval (SI) :: 4x400m at 11:30/mi. This week's goal pace is 11:46/mi. Recovery: 5:43 to 7:09 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 8:00/mi needs more weeks than this block has. The target for
+ W1 thu Long Interval (LI) :: 15 min continuous at Tempo Pace: 12:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace. || run_pace_goal
+ W1 fri Long Slow Distance (LSD) :: 1.5 mi at Recovery Pace: 14:18/mi (Zone 2).
+60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower. || LSD: Recovery and base building. These runs feel almost too easy. That is correct. Do not push the pace here. || run_pace_goal
+ W1 sat Long Slow Distance (LSD) :: 2 mi at Recovery Pace: 14:18/mi (Zone 2).
+60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles. || run_pace_goal
+ W11 mon Short Interval (SI) — Taper :: 4x400m at 11:03/mi. This week's goal pace is 11:19/mi. Recovery: 5:30 to 6:52 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy. || SI: Pace moves 3 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 8:00/mi needs more weeks than this block has. The target for
+ W11 thu Long Interval (LI) — Taper :: 12 min continuous at Tempo Pace: 12:13/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tempo pace. As fitness improves, add reps before adding pace. || run_pace_goal
+ W11 fri Long Slow Distance (LSD) :: 3.3 mi at Recovery Pace: 13:58/mi (Zone 2).
+60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower. || LSD: Recovery and base building. These runs feel almost too easy. That is correct. Do not push the pace here. || run_pace_goal
+ W11 sat Long Slow Distance (LSD) — Taper :: 3.7 mi at Recovery Pace: 13:58/mi (Zone 2). Taper week. Distance reduced intentionally.
+60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles. || TAPER: Your body is absorbing weeks of training. Resist the urge to add miles. Show up to the start line fresh, not tired from one last big effort. || run_pace_goal
+-- run_5k weeks 8
+ W1 mon Speed Run — Intervals :: 8 × 1:00 at 5K Pace — 8:00 of work
+5:00 warm up
+8 × 1:00 at 5K Pace (12:15/mi)
+1:00 easy recovery between every effort || INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort).
+ W1 thu Speed Run — Intervals :: Mixed-pace ladder down to Best — 10:00 of work, 10 efforts
+5:00 warm up
+1:00 at 5K Pace (12:15/mi)
+2:00 at 10K Pace (12:35/mi)
+1:00 at 5K Pace (12:15/mi)
+2 × 0:45 at Mile Pace (11:30/mi)
+2:00 at 10K Pace (12:35/mi)
+1:00 at 5K Pace (12:15/mi)
+0:45 at Mile Pace (11:30/mi)
+0:30 at Best Pace
+0:15 at Best Pace
+1:00 easy recovery between every effort || INTERVALS: Hard efforts, easy running between. Each pace is the middle
+ W1 fri Recovery Run :: 7 min recovery run at Recovery Pace (14:05/mi). 4–5/10 effort, easy enough to talk, laugh, or argue freely. Start a touch slower than that, finish a touch faster. Do not run faster than 13:33/mi.
+ W1 sat Long Run :: One Mile Run: 1 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (14:05/mi) across the run. Comfortable the whole way. Average no faster than 13:33/mi.
+ W8 sun Long Run — RACE DAY :: 3.1 miles. 5K race day. Target pace 12:15/mi. Trust your training, start controlled, finish strong. || RACE DAY: This is what every week built toward. Hold your goal pace, fuel early and often, and run your own race.
+ W8 mon Speed Run — Tempo :: 15:00 progression tempo — Recovery Pace down to Best
+5:00 warm up
+Run the next 15:00 as one continuous progression:
+5:00 at Recovery Pace (14:05/mi)
+4:00 at 10K Pace (12:35/mi)
+3:00 at 5K Pace (12:15/mi)
+2:00 at Mile Pace (11:30/mi)
+1:00 at Best Pace || TEMPO: A hard but controlled pace, "comfortably uncomfortable." Builds the lactate threshold that lets you hold race pace longer. Best Pace is your call. It is the pa
+ W8 thu Recovery Run :: 25 min recovery run at Recovery Pace (14:05/mi). 4–5/10 effort, easy enough to talk, laugh, or argue freely. Start a touch slower than that, finish a touch faster. Do not run faster than 13:33/mi.
+ W8 sat Recovery Run :: 1K recovery run. 0.62 mi at Recovery Pace (14:05/mi). 4–5/10 effort, easy enough to talk, laugh, or argue freely. Start a touch slower than that, finish a touch faster. Do not run faster than 13:33/mi.
+-- run_base weeks 9
+ W1 mon Benchmark Run :: BENCHMARK: Your baseline. The final week repeats this exact run, and the distance difference is your fitness gain. Measured, not promised. No pace is prescribed on purpose. Run by effort and let the distance tell the story.
+ W1 sat Easy Run :: 25 min easy and conversational (RPE 3-4 out of 10). Around 14:05/mi is right for you. Do not run faster than 13:33/mi. Distance is not the goal; time on feet is. Log the distance you covered. Walk breaks are fine and smart: run 3 min, walk 1 min, repeat. Effort stays conversational either way. || EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it
+ W9 mon Easy Run :: 40 min easy and conversational (RPE 3-4 out of 10). Around 14:05/mi is right for you. Do not run faster than 13:33/mi. Distance is not the goal; time on feet is. Log the distance you covered. Walk breaks are fine and smart: run 3 min, walk 1 min, repeat. Effort stays conversational either way. || EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it
+ W9 tue Easy Run :: 40 min easy and conversational (RPE 3-4 out of 10). Around 14:05/mi is right for you. Do not run faster than 13:33/mi. Distance is not the goal; time on feet is. Log the distance you covered. Walk breaks are fine and smart: run 3 min, walk 1 min, repeat. Effort stays conversational either way. || EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it
+ W9 fri Easy Run :: 40 min easy and conversational (RPE 3-4 out of 10). Around 14:05/mi is right for you. Do not run faster than 13:33/mi. Distance is not the goal; time on feet is. Log the distance you covered. Walk breaks are fine and smart: run 3 min, walk 1 min, repeat. Effort stays conversational either way. || EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it
+ W9 sat Benchmark Run — Retest :: BENCHMARK RETEST: Further than week 1 at the same effort = faster pace = the aerobic engine grew. This is the block’s report card. No pace is prescribed on purpose. The pace is the measurement.
+
+== 4. entered mile vs none, seed 1000, run-card text differs? ==
+run_pace_goal beginner self-stable true mile 8:00 changes run cards false
+run_pace_goal intermediate self-stable true mile 8:00 changes run cards true
+run_5k beginner self-stable true mile 8:00 changes run cards false
+run_5k intermediate self-stable true mile 8:00 changes run cards true
+run_base beginner self-stable true mile 8:00 changes run cards false
+run_base intermediate self-stable true mile 8:00 changes run cards true
+
+== 5. source scan: strings mentioning default/estimated mile, comments stripped ==
+js+6272 if(sec>1500) return {ok:false,msg:'Over 25:00 reads as a walk, not a run — leave it blank and the program anchors on your experience level instead.'};
+js+13423 const from = a.from.kind === 'default' ? 'estimated from experience'
+js+13428 if(a.kind === 'beginner') return `Anchored on ${art} <b>${m} mile</b>, the beginner default. A mile time starts being used at intermediate.`;
+js+13429 return `Anchored on ${art} <b>${m} mile</b>, estimated from experience; no mile time was entered.` + tail;
+js+13436 : a.kind==='entered' ? 'entered' : a.kind==='beginner' ? 'beginner default' : 'est. from experience';
+js+13745 'Starting 1RM'+(s.lifts.estimated?' (est. from experience)':'')+': squat '+s.lifts.squat+' / bench '+s.lifts.bench+' / deadlift '+s.lifts.deadlift+' '+s.unit,
+
+DONE
+## disclosure V209 vs HEAD diff
+1c1
+< ia-version 209
+---
+> ia-version 219
+89,94c89,94
+< js+6078 if(sec>1500) return {ok:false,msg:'Over 25:00 reads as a walk, not a run — leave it blank and the program anchors on your experience level instead.'};
+< js+13151 const from = a.from.kind === 'default' ? 'estimated from experience'
+< js+13156 if(a.kind === 'beginner') return `Anchored on ${art} <b>${m} mile</b>, the beginner default. A mile time starts being used at intermediate.`;
+< js+13157 return `Anchored on ${art} <b>${m} mile</b>, estimated from experience; no mile time was entered.` + tail;
+< js+13164 : a.kind==='entered' ? 'entered' : a.kind==='beginner' ? 'beginner default' : 'est. from experience';
+< js+13458 'Starting 1RM'+(s.lifts.estimated?' (est. from experience)':'')+': squat '+s.lifts.squat+' / bench '+s.lifts.bench+' / deadlift '+s.lifts.deadlift+' '+s.unit,
+---
+> js+6272 if(sec>1500) return {ok:false,msg:'Over 25:00 reads as a walk, not a run — leave it blank and the program anchors on your experience level instead.'};
+> js+13423 const from = a.from.kind === 'default' ? 'estimated from experience'
+> js+13428 if(a.kind === 'beginner') return `Anchored on ${art} <b>${m} mile</b>, the beginner default. A mile time starts being used at intermediate.`;
+> js+13429 return `Anchored on ${art} <b>${m} mile</b>, estimated from experience; no mile time was entered.` + tail;
+> js+13436 : a.kind==='entered' ? 'entered' : a.kind==='beginner' ? 'beginner default' : 'est. from experience';
+> js+13745 'Starting 1RM'+(s.lifts.estimated?' (est. from experience)':'')+': squat '+s.lifts.squat+' / bench '+s.lifts.bench+' / deadlift '+s.lifts.deadlift+' '+s.unit,

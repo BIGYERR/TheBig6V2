@@ -406,11 +406,17 @@ function main(){
     }));
     return diffs.length === 0 ? true : 'the render mutated the data: ' + diffs.join(', ');
   });
-  tryCheck('G11b rendered rows lose the leading count', () => {
+  // ERA (standing rulings 2/4). G11b is the pre-D176 contract: a round block's row is the bare remainder
+  // refStrip leaves. D176 (V220, P-BARERX) appends ' reps' to a bare remainder, so from ia-version 220 G11b
+  // SKIPs by name and G11f carries the row. An ia-version that is not an integer FAILS both; it never skips.
+  const D176_ERA = 220, VER_OK = /^\d+$/.test(String(IA.version)), VER = VER_OK ? parseInt(IA.version, 10) : NaN;
+  if(!VER_OK) check('G11b era: ia-version is readable', false, 'ia-version ' + JSON.stringify(IA.version) + ' is missing or not an integer, so G11b cannot be keyed');
+  else if(VER < D176_ERA) tryCheck('G11b rendered rows lose the leading count', () => {
     const d = details(renderSecs([SS3]));
     const want = SS3.items.map(i => refStrip(i.detail));
     return JSON.stringify(d) === JSON.stringify(want) ? true : 'want ' + JSON.stringify(want) + ' got ' + JSON.stringify(d);
   });
+  else console.log("SKIP G11b: pre-D176 era; D176 appends ' reps' to a bare remainder, see G11f");
   tryCheck('G11c a rounds:null block keeps its rows intact', () => {
     const d = details(renderSecs([SSNULL]));
     const want = SSNULL.items.map(i => i.detail);
@@ -434,6 +440,45 @@ function main(){
     if(hn !== SSNULL.label) return 'rounds=null must show the label ' + JSON.stringify(SSNULL.label) + ', got ' + JSON.stringify(hn);
     return true;
   });
+
+  // ══ G11f — D176 (V220, P-BARERX): a bare remainder in a round block reads "N reps" ══
+  // Oracle: refStrip (this file's reference parser, written from §5r) plus this gate's OWN literal copy of the
+  // ruled bare shape, applied over refStrip and never over the app's _stripLeadingSets (the ruling says so).
+  // Two populations: a HAND TABLE typed out below, and every numeric-rounds superset on the lattice, rendered
+  // one section at a time (an identical section is rendered once). Floor: the lattice must show at least one
+  // bare and at least one non-bare row, else FAIL; a population with no bare row cannot catch a lost ' reps'.
+  const BARE_D176 = /^\d+(\s*[–-]\s*\d+)?$/;
+  const wantD176 = d => { const r = refStrip(d); return r + (BARE_D176.test(r) ? ' reps' : ''); };
+  if(!VER_OK) check('G11f era: ia-version is readable', false, 'ia-version ' + JSON.stringify(IA.version) + ' is missing or not an integer, so G11f cannot be keyed');
+  else if(VER < D176_ERA) console.log('SKIP G11f: ia-version ' + VER + ' predates D176 (V' + D176_ERA + '); G11b carries the row');
+  else {
+    const SSF = { label:'Pump', superset:true, rounds:3, items:[
+      { name:'Kettlebell swing', detail:'3×10' }, { name:'Goblet squat', detail:'3×8–12' },
+      { name:'Pushups', detail:'3×12 each side' }, { name:'Plank', detail:'3×30 sec' },
+      { name:'Dumbbell row', detail:'3 sets — RPE 8' } ] };
+    const HAND = ['10 reps', '8–12 reps', '12 each side', '30 sec', 'RPE 8'];
+    tryCheck('G11f hand table: a bare count or range gains " reps", every other remainder is untouched', () => {
+      const f = SSF.items.map(i => wantD176(i.detail));
+      if(JSON.stringify(f) !== JSON.stringify(HAND)) return 'oracle self-check: refStrip + BARE gives ' + JSON.stringify(f) + ', the hand table says ' + JSON.stringify(HAND);
+      const d = details(renderSecs([SSF]));
+      return JSON.stringify(d) === JSON.stringify(HAND) ? true : 'want ' + JSON.stringify(HAND) + ' got ' + JSON.stringify(d);
+    });
+    const seen = new Set(), ex = [];
+    let secs = 0, rows = 0, bare = 0, nonBare = 0, mism = 0, rErr = 0;
+    const lat = eachSection(LATTICE, (sec, where) => {
+      if(!isSuperset(sec) || typeof sec.rounds !== 'number') return;
+      const k = JSON.stringify(sec); if(seen.has(k)) return; seen.add(k); secs++;
+      const want = (sec.items || []).map(i => wantD176(i && i.detail));
+      (sec.items || []).forEach(i => { rows++; if(BARE_D176.test(refStrip(i && i.detail))) bare++; else nonBare++; });
+      let d; try { d = details(renderSecs([sec])); } catch(e){ rErr++; if(ex.length < 3) ex.push(where + ' "' + sec.label + '" render threw ' + e.message); return; }
+      if(JSON.stringify(d) !== JSON.stringify(want)){ mism++; if(ex.length < 3) ex.push(where + ' "' + sec.label + '" want ' + JSON.stringify(want) + ' got ' + JSON.stringify(d)); }
+    });
+    check('G11f lattice: every numeric-rounds superset row reads refStrip + " reps" iff the remainder is bare (' + secs + ' unique sections, '
+          + rows + ' rows, ' + lat.built + ' builds)', mism === 0 && rErr === 0,
+          mism + ' sections disagree, ' + rErr + ' render throws' + (ex.length ? ': ' + ex.join(' | ') : ''));
+    check('G11f floor: the lattice shows at least one bare and one non-bare round-block row (' + bare + ' bare, ' + nonBare + ' non-bare)',
+          bare >= 1 && nonBare >= 1, bare + ' bare, ' + nonBare + ' non-bare: the population cannot fail both ways');
+  }
 
   // ══ G12 — preventionDoseSweep owns the section and keeps the members in sync (D39-iv) ══
   // Scope: 3->2 only, supersets only. Non-superset accessories keep the per-item rewrite.

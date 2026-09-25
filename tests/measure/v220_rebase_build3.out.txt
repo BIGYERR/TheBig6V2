@@ -1,0 +1,1678 @@
+# v220 rebase build3 — HEAD 920fa0a ia-version 219 — scripts run unmodified
+
+######## /tmp/v220_rdtz.out (HEAD)
+artifact /Users/CanasBangin/Desktop/TheBig6V2/index.html host TZ env (unset)
+harness pins TZ? NO (Date passed through from host)
+
+== 1. REPRO HALF_MANNY raceDate=2026-12-06, oracle {"card":"Dec 6, 2026","header":"Sun, Dec 6, 2026","wd":0}
+realclk America/New_York     vmTZ=America/New_York today=2026-09-24 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=72 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+realclk America/Los_Angeles  vmTZ=America/Los_Angeles today=2026-09-24 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=72 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+realclk UTC                  vmTZ=UTC today=2026-09-25 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=72 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+realclk Asia/Tokyo           vmTZ=Asia/Tokyo today=2026-09-25 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=72 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+pinned  America/New_York     vmTZ=America/New_York today=2026-09-22 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=74 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+pinned  America/Los_Angeles  vmTZ=America/Los_Angeles today=2026-09-22 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=74 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+pinned  UTC                  vmTZ=UTC today=2026-09-22 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=75 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+   stored: {"top":"2026-12-06","cfg":"2026-12-06","typeofCfg":"string","weeksField":null}
+pinned  Asia/Tokyo           vmTZ=Asia/Tokyo today=2026-09-22 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=75 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+
+== 3. SWEEP every day 2026-11-01..2027-10-31, clock pinned
+dates 365 x TZ 4 = 1460 builds; crashes 0
+America/New_York     surfaces disagree 365/365 | card!=oracle 365/365 header!=oracle 0/365 milesheet!=oracle 365/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {"Sun":53,"Mon":52,"Tue":52,"Wed":52,"Thu":52,"Fri":52,"Sat":52}
+   e.g. 2026-11-01 card "Oct 31, 2026" header "Sun, Nov 1, 2026"
+America/Los_Angeles  surfaces disagree 365/365 | card!=oracle 365/365 header!=oracle 0/365 milesheet!=oracle 365/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {"Sun":53,"Mon":52,"Tue":52,"Wed":52,"Thu":52,"Fri":52,"Sat":52}
+   e.g. 2026-11-01 card "Oct 31, 2026" header "Sun, Nov 1, 2026"
+UTC                  surfaces disagree 0/365 | card!=oracle 0/365 header!=oracle 0/365 milesheet!=oracle 0/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {}
+Asia/Tokyo           surfaces disagree 0/365 | card!=oracle 0/365 header!=oracle 0/365 milesheet!=oracle 0/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {}
+  DST 2026-11-01 New_York:Oct 31, 2026|W14 sun  Los_Angeles:Oct 31, 2026|W14 sun  UTC:Nov 1, 2026|W14 sun  Tokyo:Nov 1, 2026|W14 sun
+  DST 2026-11-08 New_York:Nov 7, 2026|W14 sun  Los_Angeles:Nov 7, 2026|W14 sun  UTC:Nov 8, 2026|W14 sun  Tokyo:Nov 8, 2026|W14 sun
+  DST 2027-03-14 New_York:Mar 13, 2027|W14 sun  Los_Angeles:Mar 13, 2027|W14 sun  UTC:Mar 14, 2027|W14 sun  Tokyo:Mar 14, 2027|W14 sun
+  DST 2027-03-21 New_York:Mar 20, 2027|W14 sun  Los_Angeles:Mar 20, 2027|W14 sun  UTC:Mar 21, 2027|W14 sun  Tokyo:Mar 21, 2027|W14 sun
+baseline==itself (5 dates): true
+race placement spread (UTC): {"W14 sun":53,"W14 mon":52,"W14 tue":52,"W14 wed":52,"W14 thu":52,"W14 fri":52,"W14 sat":52}
+
+== PART 2: real renderers; wizard day 2026-08-31, race 2026-12-06, setProgRace -> 2026-12-13 on 2026-09-22
+-- America/New_York
+   wizard {"date":"2026-08-31","WD_raceDateWeeks":13,"review":"Race date Dec 5, 2026 (13 weeks away) Li"}
+   stored ia_programs {"raceDate":"2026-12-06","raceDateWeeks":13,"cfg_raceDate":"2026-12-06","cfg_raceDateWeeks":13}
+   setProgRace toast: Race day Sun, Dec 13 — plan starts Mon, Sep 7 ✓
+   [built @2026-08-31] {"tag":"built","day":"2026-08-31","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":13,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 5, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 5, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":1,"mileSheet":"(unlocked branch: no race date on sheet, curWk 1 < tw-2)"}
+   [today @2026-09-22] {"tag":"today","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":10,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 5, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 5, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":4,"mileSheet":"(unlocked branch: no race date on sheet, curWk 4 < tw-2)"}
+   [lockwin @2026-11-20] {"tag":"lockwin","day":"2026-11-20","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":2,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 5, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 5, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":12,"mileSheet":"Days out 15 Race day Dec 5, 2026 Week 12 of 14 You are too c"}
+   [afterSet @2026-09-22] {"tag":"afterSet","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":11,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 12, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 12, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":3,"mileSheet":"(unlocked branch: no race date on sheet, curWk 3 < tw-2)"}
+   [afterSet-lockwin @2026-11-27] {"tag":"afterSet-lockwin","day":"2026-11-27","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":2,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 12, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 12, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":12,"mileSheet":"Days out 15 Race day Dec 12, 2026 Week 12 of 14 You are too "}
+-- UTC
+   wizard {"date":"2026-08-31","WD_raceDateWeeks":13,"review":"Race date Dec 6, 2026 (13 weeks away) Li"}
+   stored ia_programs {"raceDate":"2026-12-06","raceDateWeeks":13,"cfg_raceDate":"2026-12-06","cfg_raceDateWeeks":13}
+   setProgRace toast: Race day Sun, Dec 13 — plan starts Mon, Sep 7 ✓
+   [built @2026-08-31] {"tag":"built","day":"2026-08-31","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":13,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 6, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 6, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":1,"mileSheet":"(unlocked branch: no race date on sheet, curWk 1 < tw-2)"}
+   [today @2026-09-22] {"tag":"today","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":10,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 6, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 6, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":4,"mileSheet":"(unlocked branch: no race date on sheet, curWk 4 < tw-2)"}
+   [lockwin @2026-11-20] {"tag":"lockwin","day":"2026-11-20","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":2,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 6, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 6, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":12,"mileSheet":"Days out 16 Race day Dec 6, 2026 Week 12 of 14 You are too c"}
+   [afterSet @2026-09-22] {"tag":"afterSet","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":11,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 13, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 13, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":3,"mileSheet":"(unlocked branch: no race date on sheet, curWk 3 < tw-2)"}
+   [afterSet-lockwin @2026-11-27] {"tag":"afterSet-lockwin","day":"2026-11-27","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":2,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 13, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 13, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":12,"mileSheet":"Days out 16 Race day Dec 13, 2026 Week 12 of 14 You are too "}
+EXIT 0
+
+######## /tmp/v220_wo.out (HEAD)
+artifact /Users/CanasBangin/Desktop/TheBig6V2/index.html ia-version 219 | flooring line 4234
+
+== TZ America/New_York | pairs 42420 | weeksOut != oracle: 1330/42420
+   segments {"all:none":26007,"all:fall":6683,"all:both":21,"all:spring":9709,"bad:spring":1311,"bad:mod7=0":1330,"bad:none":19}
+   underFloor flips (oracle vs engine) per goal over the flagged pairs: {"run_5k":28,"run_10k":28,"run_half":42,"run_marathon":84}
+   today=2026-09-22 row: 0/140
+   first flagged: [{"a":"2026-11-02","b":"2027-03-15","days":133,"exp":19,"got":18},{"a":"2026-11-03","b":"2027-03-16","days":133,"exp":19,"got":18},{"a":"2026-11-04","b":"2027-03-17","days":133,"exp":19,"got":18}]
+
+== TZ UTC | pairs 42420 | weeksOut != oracle: 0/42420
+   segments {"all:none":26007,"all:fall":6683,"all:both":21,"all:spring":9709}
+   underFloor flips (oracle vs engine) per goal over the flagged pairs: {"run_5k":0,"run_10k":0,"run_half":0,"run_marathon":0}
+   today=2026-09-22 row: 0/140
+   first flagged: []
+
+== FOOTPRINT builds: NY 10640 UTC 10640 | (pair,goal) rows 5320 | build errors 0
+NY artifact vs NY counterfactual: rows differing 5320/5320 by field {"weeksOut":5320,"copy":5320,"underFloor":182}
+NY artifact vs UTC artifact:      rows differing 5320/5320 by field {"weeksOut":5320,"copy":5320,"underFloor":182}
+NY counterfactual vs UTC artifact: rows differing 0/5320 by field {}
+underFloor flips in built programs by goal: {"run_marathon":84,"run_half":42,"run_5k":28,"run_10k":28}
+EXAMPLE {
+ "a": "2026-11-02",
+ "b": "2027-03-15",
+ "g": "run_5k",
+ "before": "Your 5K is <b>Mon, Mar 15</b>, 18 weeks out. The 8-week plan starts <b>Mon, Jan 25</b> — 12 weeks from now — so it peaks on race week, not early. Until then: run easy three times a week, 30–45 minutes, nothing hard.",
+ "after": "Your 5K is <b>Mon, Mar 15</b>, 19 weeks out. The 8-week plan starts <b>Mon, Jan 25</b> — 12 weeks from now — so it peaks on race week, not early. Until then: run easy three times a week, 30–45 minutes, nothing hard.",
+ "ufB": false,
+ "ufA": false
+}
+
+PASS-ish summary: pairs 42420 flagged 1330 UTC flagged 0
+EXIT 0
+
+######## /tmp/v220_wu.out (HEAD)
+
+== WU America/New_York | pairs 42420 | daysUntil != oracle 9709/42420 {"days:spring":9570,"days:none":139} | weeksUntil != oracle 1330/42420
+   offer rows (flagged pairs x 3 exp x 3 age x 4 dist): 47880 | shown engine 22946 oracle 19971 | gate flips 3479 | both shown 19719 | printed pace differs 16191 {"beginner":6069,"intermediate":5061,"advanced":5061}
+   EXAMPLE {"a":"2026-11-23","b":"2027-03-15","exp":"beginner","age":"55+","dist":"3mi","rec":17,"engineWeeks":15,"oracleWeeks":16,"before":"In 15 weeks you can safely reach 33:52 (11:17/mi)","after":"In 16 weeks you can safely reach 33:48 (11:16/mi)"}
+   click reach: unique (cfg, click) pairs 245 | builds 490 | errors 0  | calcProgramLength differs 62 | totalWeeks differs 62 | progDigest differs 245
+   BUILD EXAMPLE {"cfg":"beginner/55+/3mi","clickE":"33:52","clickO":"33:48","weeksE":16,"weeksO":17,"LE":16,"LO":17}
+
+== WU UTC | pairs 42420 | daysUntil != oracle 0/42420 {} | weeksUntil != oracle 0/42420
+   offer rows (flagged pairs x 3 exp x 3 age x 4 dist): 0 | shown engine 0 oracle 0 | gate flips 0 | both shown 0 | printed pace differs 0 {}
+   click reach: unique (cfg, click) pairs 0 | builds 0 | errors 0  | calcProgramLength differs 0 | totalWeeks differs 0 | progDigest differs 0
+
+WU DONE
+EXIT 0
+
+######## /tmp/v220_spo.out (HEAD)
+artifact index.html ia-version 219 today 2026-09-22 21:16 local TZ America/Los_Angeles
+oracle daysUntil(2026-10-20)= 28 -> floor/7 = 4
+
+== PART 0  goal-time sweep, 1.5mi, mile 8:00, intermediate 18-35, run only
+blank 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:00 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:15 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:30 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:45 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:00 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:15 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:30 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:45 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:00 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:15 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:30 10 10 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:45 8 8 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+16:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+
+== PART 1  lattice
+builds (screens) 2592 | offer shown 2592 | rec weeks RISE after tap 248/2592 | header!=callout after tap 0/2592 | offer identical after tap 2592/2592
+  offer:advanced 864
+  offer:beginner 864
+  offer:intermediate 864
+  offerMile:420 432
+  offerMile:480 432
+  offerMile:540 432
+  offerMile:600 432
+  offerMile:660 432
+  offerMile:none 432
+  offerSlowerThanCurrentMile:advanced 144
+  offerSlowerThanCurrentMile:beginner 720
+  offerSlowerThanCurrentMile:intermediate 432
+  worse:advanced 200
+  worse:intermediate 48
+  worse:mile480 96
+  worse:mile540 56
+  worse:mile600 48
+  worse:mile660 48
+
+== PART 2  reporter screen (goal 12:00 = 8:00/mi, mile 8:00)
+S1 {"hdr":6,"rec":6,"wk":4,"offer":"14:15","card":"var(--accent)","btnBg":"var(--accent)","btnFg":"#0a0a0a","intact":false,"endsOnTest":true}
+S1 text: 4 weeks isn't enough time to hit this pace safely. Recommended: at least 6 weeks.Your program ends on your test. 5 weeks. The taper lands in front of it.In 4 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits.[BTN:Use this pace instead]
+S2 {"hdr":6,"rec":6,"wk":4,"offer":"14:15","card":"var(--accent)","btnBg":"var(--accent)","btnFg":"#0a0a0a","intact":false,"endsOnTest":true}
+S2 text: 4 weeks isn't enough time to hit this pace safely. Recommended: at least 6 weeks.Your program ends on your test. 5 weeks. The taper lands in front of it.In 4 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits.[BTN:Use this pace instead]
+S2 after 80ms timer flush: rec 6 offer 14:15
+WD diff across tap: WD.cardioGoals.run.targetMins: "12" -> 14 ; WD.cardioGoals.run.targetSecs: "00" -> 15 ; WD.cardioGoals.run.targetTime: "12:00" -> "14:15" ; WD._testWeek: undefined -> 5 ; WD._raceDateCappedWeeks: undefined -> 5
+original 12:00 still anywhere in WD after tap: false | localStorage keys holding "12:00": none
+build before tap {"totalWeeks":5,"testWeek":5,"digest":"e8364b168bb4137b","w1paces":["mon:Short Interval (SI):7:58/mi|8:14/mi","thu:Long Interval (LI):8:54/mi","fri:Long Slow Distance (LSD):10:44/mi","sat:Long Slow Distance (LSD):10:44/mi"],"finalWeekTypes":["Long Slow Distance (LSD)","1.5 Mile Test — TIME TRIAL"]}
+build after tap  {"totalWeeks":5,"testWeek":5,"digest":"2259ff98d3e26d8b","w1paces":["mon:Short Interval (SI):7:58/mi|8:14/mi","thu:Long Interval (LI):8:54/mi","fri:Long Slow Distance (LSD):10:44/mi","sat:Long Slow Distance (LSD):10:44/mi"],"finalWeekTypes":["Long Slow Distance (LSD)","1.5 Mile Test — TIME TRIAL"]}
+
+== PART 3  un-click paths
+tap again: goal 14:15 rec 6 offer 14:15
+renderWizardStep: goal 14:15 rec 6
+functions named *undo/revert/restore*Pace*: 0 | writers of targetMins in source: 8
+  js:1053 WD.cardioGoals['run'].targetMins = mins;
+  js:1608 <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['swim'].targetMins=this
+  js:1650 <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['run'].targetMins=this.
+  js:13635 next.targetMins=i.targetMins; next.targetSecs=i.targetSecs;
+
+== PART 4  mile re-entry
+mile-min oninput: WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updatePaceFeasibility();updateMileAdvisory()
+ mile="7": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 6
+ mile="10": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 11
+ mile="": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 6
+ mile="8": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 6
+callers of updateRaceDateFeedback in source:
+  js:784 const f=document.getElementById('raceDateFeedback'); if(f) updateRaceDateFeedback();
+  js:1059 // updateRaceDateFeedback() re-runs calcProgramLength() against the freshly-applied pace
+  js:1062 updateRaceDateFeedback();
+  js:1472 setTimeout(() => updateRaceDateFeedback(), 80);
+  js:1726 oninput="WD.raceDate=this.value;updateRaceDateFeedback()"
+goal-min oninput: WD.cardioGoals['run'].targetMins=this.value;updatePaceTime('run');updatePaceDisplay()
+
+== PART 4b  post-tap edit -> callout-only repaint, search for the 21:17 screen (hdr 6, rec 11, red, offer 14:15)
+sequences 168 | reproduce 21:17: 45
+  blank then mileBestMins="10" -> goal 14:15 mile 10:00
+  blank then mileBestMins="11" -> goal 14:15 mile 11:00
+  blank then mileBestMins="12" -> goal 14:15 mile 12:00
+  blank then mileBestMins="13" -> goal 14:15 mile 13:00
+  blank then mileBestMins="14" -> goal 14:15 mile 14:00
+  blank then mileBestMins="30" -> goal 14:15 mile 30:00
+  blank then mileBestMins="45" -> goal 14:15 mile 45:00
+  blank then targetMins="0" -> goal 0:15 mile 8:00
+  blank then targetMins="1" -> goal 1:15 mile 8:00
+  blank then targetMins="5" -> goal 5:15 mile 8:00
+  blank then targetMins="7" -> goal 7:15 mile 8:00
+  blank then targetMins="8" -> goal 8:15 mile 8:00
+  blank then targetMins="9" -> goal 9:15 mile 8:00
+  blank then targetMins="10" -> goal 10:15 mile 8:00
+  blank then targetMins="11" -> goal 11:15 mile 8:00
+  12:00 then mileBestMins="10" -> goal 14:15 mile 10:00
+  12:00 then mileBestMins="11" -> goal 14:15 mile 11:00
+  12:00 then mileBestMins="12" -> goal 14:15 mile 12:00
+  12:00 then mileBestMins="13" -> goal 14:15 mile 13:00
+  12:00 then mileBestMins="14" -> goal 14:15 mile 14:00
+  12:00 then mileBestMins="30" -> goal 14:15 mile 30:00
+  12:00 then mileBestMins="45" -> goal 14:15 mile 45:00
+  12:00 then targetMins="0" -> goal 0:15 mile 8:00
+  12:00 then targetMins="1" -> goal 1:15 mile 8:00
+  12:00 then targetMins="5" -> goal 5:15 mile 8:00
+  12:00 then targetMins="7" -> goal 7:15 mile 8:00
+  12:00 then targetMins="8" -> goal 8:15 mile 8:00
+  12:00 then targetMins="9" -> goal 9:15 mile 8:00
+  12:00 then targetMins="10" -> goal 10:15 mile 8:00
+  12:00 then targetMins="11" -> goal 11:15 mile 8:00
+  13:00 then mileBestMins="10" -> goal 14:15 mile 10:00
+  13:00 then mileBestMins="11" -> goal 14:15 mile 11:00
+  13:00 then mileBestMins="12" -> goal 14:15 mile 12:00
+  13:00 then mileBestMins="13" -> goal 14:15 mile 13:00
+  13:00 then mileBestMins="14" -> goal 14:15 mile 14:00
+  13:00 then mileBestMins="30" -> goal 14:15 mile 30:00
+  13:00 then mileBestMins="45" -> goal 14:15 mile 45:00
+  13:00 then targetMins="0" -> goal 0:15 mile 8:00
+  13:00 then targetMins="1" -> goal 1:15 mile 8:00
+  13:00 then targetMins="5" -> goal 5:15 mile 8:00
+  13:00 then targetMins="7" -> goal 7:15 mile 8:00
+  13:00 then targetMins="8" -> goal 8:15 mile 8:00
+  13:00 then targetMins="9" -> goal 9:15 mile 8:00
+  13:00 then targetMins="10" -> goal 10:15 mile 8:00
+  13:00 then targetMins="11" -> goal 11:15 mile 8:00
+
+== PART 5  button colours
+--accent #181712 --red #9e3328 --signal #CF4E1A --on-ink #F4F1E8
+S1 btn bg var(--accent) fg #0a0a0a contrast 1.10 : 1
+S2 (post-tap, same screen) btn bg var(--accent) fg #0a0a0a | red-card button (diff<=-3) #0a0a0a on --red contrast 2.79 : 1
+paceCeilingOffer btn bg var(--accent) fg var(--on-ink) contrast 15.89 : 1
+
+== PART 6  em-dashes in athlete-visible text of this screen
+count 11
+ 1. … goal for each. Running Outdoor or treadmill — pace, distance, race goals ✓ Run …
+ 2. …1 miles without stopping Run a 10K 6.2 miles — solid aerobic base Half Marathon …
+ 3. … solid aerobic base Half Marathon 13.1 miles — serious endurance Full Marathon 2…
+ 4. …— serious endurance Full Marathon 26.2 miles — the full distance Hit a Pace / Ti…
+ 5. …it a Pace / Time Goal Target distance + time — 1.5mi under 10 min, mile under 6,…
+ 6. …[BTN:km] Target time minutes : seconds 12:00 — 8:00/mi per mile How far can you …
+ 7. …n? (optional) mi Current mile time (optional — personalizes your training paces)…
+ 8. … seconds Cycling / Spin Spin bike or outdoor — intervals, FTP, distance ✓ Swimmi…
+ 9. …, distance ✓ Swimming Lap pool or open water — structured sets ✓ Program length:…
+ 10. … — structured sets ✓ Program length: 6 weeks — based on your longest cardio goal…
+ 11. …:Use this pace instead] Tap to open calendar — the final weeks taper so you arri…
+(for the 4-weeks NSW sentence pre-D106a see "stays intact" in S1 text above)
+EXIT 0
+
+######## /tmp/v220_spm.out (HEAD)
+artifact index.html ia-version 219 TZ America/New_York
+
+=== M1  goal time -> engine, dated run_pace_goal (1.5mi)
+-- static readers (base.html line : enclosing function : text)
+  :2283 updateRaceDateFeedback | const recommended = calcProgramLength(WD.cardioTypes||[], _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks
+  :2387 updateSwimPaceDisplay | const totalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0); // V218 (D157): the target is its total, the engine's pars
+  :2398 updatePaceTime | const mins = WD.cardioGoals[type].targetMins || 0;
+  :2406 updatePaceDisplay | if(!g || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) {
+  :2410 updatePaceDisplay | const totalSecs = (+(g.targetMins||0)*60) + (+(g.targetSecs||0));
+  :2413 updatePaceDisplay | el.innerHTML = asyIcon('🎯',13)+' ' + g.targetMins + ':' + String(g.targetSecs||0).padStart(2,'0') + ' — ' + pace + ' pe
+  :2429 assessRunPaceCeiling | if(!g || g.id !== 'run_pace_goal' || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) return null;
+  :2434 assessRunPaceCeiling | const tTotal = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+  :2449 assessRunPaceCeiling | const L = calcProgramLength(['run'], _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus] || 'balanced').weeks;
+  :2763 renderWizardStep | previewWeeks = calcProgramLength(WD.cardioTypes, _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks;
+  :2808 renderWizardStep | <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput
+  :2817 renderWizardStep | <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(((+g.targetMins||0)*60)+(+g.t
+  :2850 renderWizardStep | <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput
+  :2859 renderWizardStep | <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(WD.cardioGoals['run']?.tar
+  :3026 renderWizardStep | const programWeeks = WD.cardioTypes.length ? calcProgramLength(WD.cardioTypes,_nameGoalsExp,internalGoal).weeks : 6;
+  :3075 paceGoalTarget | if(g.targetMins !== undefined && g.targetMins !== '') {
+  :3076 paceGoalTarget | tTotalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+  :3077 paceGoalTarget | } else if(g.targetTime) {
+  :3078 paceGoalTarget | tTotalSecs = parseTimeToSecs(g.targetTime);
+  :3187 weeksToPace | var _pgT = paceGoalTarget(goal);
+  :3219 weeksToPace | var timeLabel = goal.targetMins ? goal.targetMins+':'+(String(goal.targetSecs||0).padStart(2,'0')) : '';
+  :3307 weeksToPace | var swimTimeEntered = isSwimTimeGoal && ((+goal.targetMins||0)*60 + (+goal.targetSecs||0)) > 0;
+  :3310 weeksToPace | var tTotal = (+goal.targetMins||0)*60 + (+goal.targetSecs||0);
+  :4712 buildSwimSession | const _tgtTotal = _swimTot(swimGoal.targetMins, swimGoal.targetSecs);
+  :6060 _nrcSpacedRunDays | const _pgT = paceGoalTarget(goal);
+  :6109 _nrcSpacedRunDays | const _g = cardioGoals.run || {}, _pt = paceGoalTarget(_g), _u = _g.paceUnit === 'km' ? 'km' : 'mi';
+  :6173 _nrcSpacedRunDays | const _g = cardioGoals.run, _pg = paceGoalTarget(_g);
+  :7422 generateProgram | const lengthResult=calcProgramLength(WD.cardioTypes||[],_wdGoalsExp,_wdInternalGoal);
+  :7525 doGenerate | let totalWeeksPreview=calcProgramLength(WD.cardioTypes||[],_previewGoals,LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanc
+  :7628 engineA_timeline | const cardioLength=calcProgramLength(cardioTypes,_goalsWithExp,goal);
+  :14532 progTestPin | const len = calcProgramLength(c.cardioTypes, {...c.cardioGoals, _experience:c.experience||'intermediate', _ageBracket:c.
+  :14591 runAnchorInfo | const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
+  :14592 runAnchorInfo | ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
+  :14733 _goalInputsValid | const hasTime=(+i.targetMins>0)||(+i.targetSecs>0);
+  :14780 renderGoalSheet | +'<input type="number" class="input-field" style="flex:0 0 58px;text-align:center" placeholder="min" min="0" max="99" va
+  :14786 renderGoalSheet | +'<input type="number" class="input-field" style="flex:1;text-align:center" placeholder="min" min="0" max="99" value="'+
+  :14834 commitGoalChange | const mins=+i.targetMins||0, secs=+i.targetSecs||0;
+  :14835 commitGoalChange | next.targetMins=i.targetMins; next.targetSecs=i.targetSecs;
+  goal blank | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest 93378da9beac9976
+  goal 9:00 | hdr 11 rec 11 | _testWeek 5 totalWeeks 5 | digest 8d9f7162db7921c9
+  goal 10:30 | hdr 11 rec 11 | _testWeek 5 totalWeeks 5 | digest 6facd0e42065055a
+  goal 12:00 | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest c1afd207853839c7
+  goal 14:15 | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest a37f6c3c2519c962
+-- diff goal 12:00 vs 10:30 : 14 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":473,"rec":{"lo":235,"hi":294},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":528,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":639,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":639,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:48/mi. This week's goal pace is 8:04/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":468,"rec":{"lo":233,"hi":291},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":523,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":634,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":634,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":463,"rec":{"lo":230,"hi":288},"key":"int"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":629,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:29/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":629,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":629,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi. Goal 10:30 (7:00/mi)."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial","tgt":420}
+-- diff goal 12:00 vs 14:15 : 15 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":478,"rec":{"lo":238,"hi":297},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":534,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":644,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":644,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":478,"rec":{"lo":238,"hi":297},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":534,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":644,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":644,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":478,"rec":{"lo":238,"hi":297},"key":"int"}
+    W4/thu/Long Interval (LI) — Taper fields detail,dose
+       detail: "10 min continuous at Tempo Pace: 8:38/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "10 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":10,"tgt":518,"key":"chi"}
+             {"k":"time","mins":10,"tgt":534,"key":"chi"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":644,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:44/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":644,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":644,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi. Goal 14:15 (9:30/mi)."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial","tgt":570}
+-- diff goal 12:00 vs 9:00 : 14 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":473,"rec":{"lo":235,"hi":294},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":528,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":639,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":639,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:48/mi. This week's goal pace is 8:04/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":468,"rec":{"lo":233,"hi":291},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":523,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":634,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":634,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":463,"rec":{"lo":230,"hi":288},"key":"int"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":629,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:29/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":629,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":629,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi. Goal 9:00 (6:00/mi)."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial","tgt":360}
+-- diff goal 12:00 vs blank : 14 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":473,"rec":{"lo":235,"hi":294},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":528,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":639,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":639,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:48/mi. This week's goal pace is 8:04/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":468,"rec":{"lo":233,"hi":291},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":523,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":634,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":634,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":463,"rec":{"lo":230,"hi":288},"key":"int"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":629,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:29/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":629,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":629,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial"}
+-- paired lattice: exp x mile x testOffset(days) x goal pair; everything else pinned
+  pairs 243 | totalWeeks differs 20 | _testWeek differs 8 | same-length pairs with >=1 run session changed 218 | run sessions changed 1788/5267
+    field detail 804
+    field dose 804
+    field note 1140
+    lenDiff advanced/mile480 5
+    lenDiff advanced/milenone 5
+    lenDiff intermediate/mile480 5
+    lenDiff intermediate/milenone 5
+    lenDiff off104 4
+    lenDiff off140 4
+    lenDiff off41 4
+    lenDiff off55 4
+    lenDiff off76 4
+    sessDiff advanced 66
+    sessDiff beginner 81
+    sessDiff intermediate 71
+   ex intermediate mile none test +41d: goal 12:00 -> 7 wk tw 7 | goal 14:15 -> 6 wk tw null
+   ex intermediate mile none test +55d: goal 12:00 -> 9 wk tw 9 | goal 14:15 -> 6 wk tw null
+   ex intermediate mile none test +76d: goal 12:00 -> 11 wk tw null | goal 14:15 -> 6 wk tw null
+   ex intermediate mile none test +104d: goal 12:00 -> 11 wk tw null | goal 14:15 -> 6 wk tw null
+
+=== M2  caller counts (base.html + tests/)
+  applySuggestedPace       raw 3 | non-comment 3 | def 1 | call sites 2 | inside on*="" attrs 2
+  achievablePacePerMile    raw 4 | non-comment 2 | def 1 | call sites 1 | inside on*="" attrs 0
+  paceCeilingOfferHTML     raw 5 | non-comment 5 | def 1 | call sites 4 | inside on*="" attrs 0
+  updatePaceFeasibility    raw 9 | non-comment 9 | def 1 | call sites 7 | inside on*="" attrs 4
+  updateRaceDateFeedback   raw 6 | non-comment 5 | def 1 | call sites 4 | inside on*="" attrs 1
+  assessRunPaceCeiling     raw 6 | non-comment 5 | def 1 | call sites 4 | inside on*="" attrs 0
+  previewWeeks             raw 3 | non-comment 3 | def 0 | call sites 0 | inside on*="" attrs 0
+  updatePaceDisplay        raw 4 | non-comment 4 | def 1 | call sites 3 | inside on*="" attrs 3
+  updatePaceTime           raw 6 | non-comment 6 | def 1 | call sites 5 | inside on*="" attrs 4
+  paceFeasLine             raw 4 | non-comment 2 | def 0 | call sites 0 | inside on*="" attrs 0
+  raceDateFeedback         raw 4 | non-comment 3 | def 0 | call sites 0 | inside on*="" attrs 0
+  80ms timer sites: 1
+    js:784 updateRaceDateFeedback <- offerShorterPlan
+    js:1062 updateRaceDateFeedback <- applySuggestedPace
+    js:1105 assessRunPaceCeiling <- updateRaceDateFeedback
+    js:1106 paceCeilingOfferHTML <- updateRaceDateFeedback
+    js:1116 assessRunPaceCeiling <- updateRaceDateFeedback
+    js:1119 paceCeilingOfferHTML <- updateRaceDateFeedback
+    js:1123 assessRunPaceCeiling <- updateRaceDateFeedback
+    js:1126 paceCeilingOfferHTML <- updateRaceDateFeedback
+    js:1148 achievablePacePerMile <- updateRaceDateFeedback
+    js:1156 applySuggestedPace <- updateRaceDateFeedback
+    js:1215 updatePaceFeasibility <- updatePaceDisplay
+    js:1274 applySuggestedPace <- paceCeilingOfferHTML
+    js:1285 assessRunPaceCeiling <- updatePaceFeasibility
+    js:1287 paceCeilingOfferHTML <- updatePaceFeasibility
+    js:1452 updatePaceFeasibility <- applySeedData
+    js:1472 updateRaceDateFeedback <- renderWizardStep
+    js:1673 updatePaceFeasibility <- renderWizardStep
+    js:1678 updatePaceFeasibility <- renderWizardStep
+    js:1694 updatePaceFeasibility <- renderWizardStep
+    js:1699 updatePaceFeasibility <- renderWizardStep
+    js:1726 updateRaceDateFeedback <- renderWizardStep
+    js:1734 updatePaceFeasibility <- renderWizardStep
+  tests: applySuggestedPace       2 files {"measure":8} 
+  tests: achievablePacePerMile    3 files {"measure":6} 
+  tests: paceCeilingOfferHTML     1 files {"measure":1} 
+  tests: updatePaceFeasibility    1 files {"measure":1} 
+  tests: updateRaceDateFeedback   6 files {"gates":1,"measure":11} gates/g207_test_calendar.js:1
+  tests: assessRunPaceCeiling     2 files {"measure":4} 
+  tests: previewWeeks             0 files {} 
+  tests: updatePaceDisplay        0 files {} 
+  tests: updatePaceTime           0 files {} 
+
+=== M3  test under a week away: daysUntil 0..7 x 7 weekdays x rest patterns
+  builds 392 | _testWeek != UTC-Monday oracle (oracle<=6) 0
+  -- daysUntil x tw x totalWeeks (count over 7 weekdays x 7 rest patterns = 49 per du)
+    du0 tw=1 total=1 38
+    du0 tw=null total=6 11
+    du1 tw=1 total=1 41
+    du1 tw=2 total=2 2
+    du1 tw=null total=6 6
+    du2 tw=1 total=1 40
+    du2 tw=2 total=2 6
+    du2 tw=null total=6 3
+    du3 tw=1 total=1 37
+    du3 tw=2 total=2 11
+    du3 tw=null total=6 1
+    du4 tw=1 total=1 32
+    du4 tw=2 total=2 17
+    du5 tw=1 total=1 25
+    du5 tw=2 total=2 24
+    du6 tw=1 total=1 18
+    du6 tw=2 total=2 31
+    du7 tw=1 total=1 11
+    du7 tw=2 total=2 38
+  -- tw/total vs card sentence (du 0..7)
+    tw=1 total=1 weeksUntil=0 -> TESTWEEK-ONLY 231
+    tw=1 total=1 weeksUntil=1 -> ENDS-ON-TEST 11
+    tw=2 total=2 weeksUntil=0 -> TESTWEEK-ONLY 91
+    tw=2 total=2 weeksUntil=1 -> ENDS-ON-TEST 38
+    tw=null total=6 weeksUntil=0 -> TESTWEEK-ONLY 21
+  ex tw=2 with test-week-only card: 2026-09-22(tue) test 2026-09-28 rest none: start 2026-09-22, tw 2, totalWeeks 2; card: "Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test."
+  ex tw=null under a week: 2026-09-24(thu) test 2026-09-25 rest thu..sun: start 2026-09-28, tw null, totalWeeks 6; card: "Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test."
+
+=== M5  wizard header "Program length" vs built totalWeeks
+  [name-step sample, weeks mentions] nd tell it when to begin. Program name Start date Week 1 is short — you’ll train Tue || ep 24 , Fri, Sep 25 and Sat, Sep 26 , then a full week from Mon, Sep 28 . Program Su || njury Prevention Cardio Run — x Program length 11 weeks Start date Tue, Sep 22, 2026  || — short first week Training days MO · TU · TH · 
+  builds 1080 | header != built 249/1080 | name-step "N weeks" != built 249/1080
+    base/dated n 96
+    base/undated n 12
+    race/dated n 384
+    race/undated n 48
+    test/dated DIS 249
+    test/dated NAME-DIS 249
+    test/dated n 480
+    test/dated tw-pinned DIS 249
+    test/undated n 60
+   ex test/dated | run_pace_goal "12:00" beginner mile none run test 2026-09-27: header 11, callout rec null, weeksUntil 0, _testWeek 1, built 1
+   ex name test/dated | run_pace_goal beginner mile none run test 2026-09-27: name step 11, header 11, built 1
+
+DONE
+EXIT 0
+
+######## /tmp/v220_m7.out (HEAD)
+anchor count 1
+base ia-version 219 surgery ia-version 219 TZ America/Los_Angeles
+
+=== 1  _testWeek - recommended   (lattice 4320 builds, errors 0 , pinned _testWeek != date oracle: 0)
+classes: inside = test before goal length end; equal; beyond = rec < tw <= 26; beyond26 = tw > 26 and > rec; nullTW = test before start
+-- all
+    all            n 4320 | inside 1161 | equal 144 | beyond<=26 2439 | beyond26 576 | null 0
+-- by experience
+    advanced       n 1440 | inside 329 | equal 48 | beyond<=26 871 | beyond26 192 | null 0
+    beginner       n 1440 | inside 472 | equal 48 | beyond<=26 728 | beyond26 192 | null 0
+    intermediate   n 1440 | inside 360 | equal 48 | beyond<=26 840 | beyond26 192 | null 0
+-- by weeks-to-test
+    a 1-4          n 576 | inside 576 | equal 0 | beyond<=26 0 | beyond26 0 | null 0
+    b 5-8          n 576 | inside 448 | equal 44 | beyond<=26 84 | beyond26 0 | null 0
+    c 9-12         n 576 | inside 137 | equal 92 | beyond<=26 347 | beyond26 0 | null 0
+    d 13-16        n 576 | inside 0 | equal 8 | beyond<=26 568 | beyond26 0 | null 0
+    e 17-20        n 576 | inside 0 | equal 0 | beyond<=26 576 | beyond26 0 | null 0
+    f 21-26        n 864 | inside 0 | equal 0 | beyond<=26 864 | beyond26 0 | null 0
+    g 27-30        n 576 | inside 0 | equal 0 | beyond<=26 0 | beyond26 576 | null 0
+-- by age
+    18-35          n 1440 | inside 373 | equal 48 | beyond<=26 827 | beyond26 192 | null 0
+    36-54          n 1440 | inside 389 | equal 48 | beyond<=26 811 | beyond26 192 | null 0
+    55+            n 1440 | inside 399 | equal 48 | beyond<=26 801 | beyond26 192 | null 0
+-- by goal / mile
+    1.5mi +mile    n 1080 | inside 312 | equal 36 | beyond<=26 588 | beyond26 144 | null 0
+    1.5mi nomile   n 1080 | inside 320 | equal 36 | beyond<=26 580 | beyond26 144 | null 0
+    1mi +mile      n 1080 | inside 260 | equal 36 | beyond<=26 640 | beyond26 144 | null 0
+    1mi nomile     n 1080 | inside 269 | equal 36 | beyond<=26 631 | beyond26 144 | null 0
+-- delta histogram {"0":144,"<=-10":72,"-9..-1":1089,"+1..+5":720,"+6..+10":720,"+11..+15":720,">+15":855}
+
+=== 2  P-TESTLEN surgery
+  builds changing totalWeeks 2439/4320 | largest extension 20 (1.5mi 12:30 intermediate 18-35 mile 8:00 test wk 26: 6 -> 26) | changed builds landing on 26 144 | unpinned -> pinned 2439 | changed build whose new length != date-oracle test week 0
+  unchanged-length builds whose digest moved anyway 0 | extension histogram {"+1..3":432,"+4..6":432,"+7..10":576,"+11..15":696,"+16..":303}
+
+=== 3  what the extra weeks contain (over 2439 changed builds)
+  run weeks 1..old identical to old program (extra weeks appended after) 0 | whole week objects identical 0 | old run weeks reappear as the LAST weeks (base prepended) 0 | neither (re-spread) 2439
+  example: 1mi 6:00 beginner 18-35 mile none test 2027-02-04 rec 9 | before 9 wk tw null | after 20 wk tw 20
+-- BEFORE
+  W 1  mon Short Interval 4x400m@11:14 | thu Long Interval @12:25 | fri Long Slow Distance @14:05 | sat Long Slow Distance @14:05   [lift: Strength Support, Leg Strength + Mobility]
+  W 2  mon Short Interval 4x400m@11:11 | thu Long Interval @12:22 | fri Long Slow Distance @14:03 | sat Long Slow Distance @14:03   [lift: Strength Support, Leg Strength + Mobility]
+  W 3  mon Short Interval 5x400m@11:08 | thu Long Interval @12:19 | fri Long Slow Distance @14:01 | sat Long Slow Distance @14:01   [lift: Strength Support, Leg Strength + Mobility]
+  W 4  mon Short Interval 5x400m@11:05 | thu Long Interval @12:15 | fri Long Slow Distance @13:59 | sat Long Slow Distance @13:59   [lift: Strength Support, Leg Strength + Mobility]
+  W 5  mon Short Interval 6x400m@11:02 | thu Long Interval @12:12 | fri Long Slow Distance @13:57 | sat Long Slow Distance @13:57   [lift: Strength Support, Leg Strength + Mobility]
+  W 6  mon Short Interval 6x400m@10:59 | thu Long Interval @12:09 | fri Long Slow Distance @13:55 | sat Long Slow Distance @13:55   [lift: Strength Support, Leg Strength + Mobility]
+  W 7  mon Short Interval 7x400m@10:56 | thu Long Interval @12:06 | fri Long Slow Distance @13:53 | sat Long Slow Distance @13:53   [lift: Strength Support, Leg Strength + Mobility]
+  W 8  mon Short Interval — Taper 4x400m@10:53 | thu Long Interval — Taper @12:03 | fri Long Slow Distance @13:51 | sat Long Slow Distance — Taper @13:51   [lift: Strength Support, Leg Strength + Mobility]
+  W 9  mon Short Interval — Taper 4x400m@10:53 | thu Long Interval — Taper @12:03 | fri Long Slow Distance @13:51 | sat Long Slow Distance — Taper @13:51   [lift: Strength Support, Leg Strength + Mobility]
+-- AFTER
+  W 1  mon Short Interval 4x400m@11:14 | thu Long Interval @12:25 | fri Long Slow Distance @14:05 | sat Long Slow Distance @14:05   [lift: Strength Support, Leg Strength + Mobility]
+  W 2  mon Short Interval 4x400m@11:11 | thu Long Interval @12:22 | fri Long Slow Distance @14:03 | sat Long Slow Distance @14:03   [lift: Strength Support, Leg Strength + Mobility]
+  W 3  mon Short Interval 5x400m@11:08 | thu Long Interval @12:19 | fri Long Slow Distance @14:01 | sat Long Slow Distance @14:01   [lift: Strength Support, Leg Strength + Mobility]
+  W 4  mon Short Interval 3x400m@11:08 | thu Long Interval @12:19 | fri Long Slow Distance @14:01 | sat Long Slow Distance @14:01   [lift: Strength Support, Leg Strength + Mobility]
+  W 5  mon Short Interval 6x400m@11:02 | thu Long Interval @12:12 | fri Long Slow Distance @13:57 | sat Long Slow Distance @13:57   [lift: Strength Support, Leg Strength + Mobility]
+  W 6  mon Short Interval 6x400m@10:59 | thu Long Interval @12:09 | fri Long Slow Distance @13:55 | sat Long Slow Distance @13:55   [lift: Strength Support, Leg Strength + Mobility]
+  W 7  mon Short Interval 7x400m@10:56 | thu Long Interval @12:06 | fri Long Slow Distance @13:53 | sat Long Slow Distance @13:53   [lift: Strength Support, Leg Strength + Mobility]
+  W 8  mon Short Interval 4x400m@10:56 | thu Long Interval @12:06 | fri Long Slow Distance @13:53 | sat Long Slow Distance @13:53   [lift: Strength Support, Leg Strength + Mobility]
+  W 9  mon Short Interval 8x400m@10:50 | thu Long Interval @11:59 | fri Long Slow Distance @13:49 | sat Long Slow Distance @13:49   [lift: Strength Support, Leg Strength + Mobility]
+  W10  mon Short Interval 8x400m@10:47 | thu Long Interval @11:56 | fri Long Slow Distance @13:47 | sat Long Slow Distance @13:47   [lift: Strength Support, Leg Strength + Mobility]
+  W11  mon Short Interval 8x400m@10:44 | thu Long Interval @11:53 | fri Long Slow Distance @13:45 | sat Long Slow Distance @13:45   [lift: Strength Support, Leg Strength + Mobility]
+  W12  mon Short Interval 5x400m@10:44 | thu Long Interval @11:53 | fri Long Slow Distance @13:45 | sat Long Slow Distance @13:45   [lift: Strength Support, Leg Strength + Mobility]
+  W13  mon Short Interval 8x400m@10:38 | thu Long Interval 2x@11:46 | fri Long Slow Distance @13:40 | sat Long Slow Distance @13:40   [lift: Strength Support, Leg Strength + Mobility]
+  W14  mon Short Interval 8x400m@10:35 | thu Long Interval 2x@11:43 | fri Long Slow Distance @13:38 | sat Long Slow Distance @13:38   [lift: Strength Support, Leg Strength + Mobility]
+  W15  mon Short Interval 8x400m@10:32 | thu Long Interval 2x@11:40 | fri Long Slow Distance @13:35 | sat Long Slow Distance @13:35   [lift: Strength Support, Leg Strength + Mobility]
+  W16  mon Short Interval 5x400m@10:32 | thu Long Interval @11:40 | fri Long Slow Distance @13:35 | sat Long Slow Distance @13:35   [lift: Strength Support, Leg Strength + Mobility]
+  W17  mon Short Interval 8x400m@10:26 | thu Long Interval 2x@11:33 | fri Long Slow Distance @13:30 | sat Long Slow Distance @13:30   [lift: Strength Support, Leg Strength + Mobility]
+  W18  mon Short Interval 8x400m@10:23 | thu Long Interval 2x@11:30 | fri Long Slow Distance @13:28 | sat Long Slow Distance @13:28   [lift: Strength Support, Leg Strength + Mobility]
+  W19  mon Short Interval — Taper 4x400m@10:20 | thu Long Interval — Taper @11:27 | fri Long Slow Distance @13:25 | sat Long Slow Distance — Taper @13:25   [lift: Strength Support, Leg Strength + Mobility]
+  W20  mon Short Interval — Taper 4x400m@10:20 | thu 1 Mile Test — TIME TRIAL @6:00   [lift: Strength Support, Test Day]
+  full grids: /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/2ef6b80b-284e-4663-8193-3a4cf2293a53/scratchpad/m7/testlen_example_{before,after}.txt
+
+=== 4  HALF_MANNY and non-test goals
+  HALF_MANNY base 0ac7da6b1691a8e1 self-stable true | surgery 0ac7da6b1691a8e1 | equal true | era row 207 0ac7da6b1691a8e1
+  race + run_base dated builds 210 errors 0 | digest changed 0 {}
+DONE
+EXIT 0
+
+######## /tmp/v220_sgf.out (HEAD)
+artifact ia-version 219
+curWk=2 curTouched | a past-week untrained W1 mon -> KEPT (stored)
+curWk=2 curTouched | a2 past-week hist-only W1 tue -> KEPT (stored)
+curWk=2 curTouched | b cur trained (comp) W2 mon -> KEPT (stored)
+curWk=2 curTouched | b2 cur trained (hist snap) W2 tue -> KEPT (stored)
+curWk=2 curTouched | c cur untrained W2 thu -> REBUILT (live)
+curWk=2 curTouched | d next week W3 mon -> REBUILT (live)
+curWk=2 curTouched | e +4 weeks W6 mon -> REBUILT (live)
+curWk=2 curUntouched | a past-week untrained W1 mon -> KEPT (stored)
+curWk=2 curUntouched | a2 past-week hist-only W1 tue -> KEPT (stored)
+curWk=2 curUntouched | c cur untrained W2 thu -> REBUILT (live)
+curWk=2 curUntouched | d next week W3 mon -> REBUILT (live)
+curWk=2 curUntouched | e +4 weeks W6 mon -> REBUILT (live)
+curWk=4 curTouched | a past-week untrained W3 mon -> KEPT (stored)
+curWk=4 curTouched | a2 past-week hist-only W3 tue -> KEPT (stored)
+curWk=4 curTouched | b cur trained (comp) W4 mon -> KEPT (stored)
+curWk=4 curTouched | b2 cur trained (hist snap) W4 tue -> KEPT (stored)
+curWk=4 curTouched | c cur untrained W4 thu -> REBUILT (live)
+curWk=4 curTouched | d next week W5 mon -> REBUILT (live)
+curWk=4 curTouched | e +4 weeks W8 mon -> REBUILT (live)
+curWk=4 curUntouched | a past-week untrained W3 mon -> KEPT (stored)
+curWk=4 curUntouched | a2 past-week hist-only W3 tue -> KEPT (stored)
+curWk=4 curUntouched | c cur untrained W4 thu -> REBUILT (live)
+curWk=4 curUntouched | d next week W5 mon -> REBUILT (live)
+curWk=4 curUntouched | e +4 weeks W8 mon -> REBUILT (live)
+curWk=7 curTouched | a past-week untrained W6 mon -> KEPT (stored)
+curWk=7 curTouched | a2 past-week hist-only W6 tue -> KEPT (stored)
+curWk=7 curTouched | b cur trained (comp) W7 mon -> KEPT (stored)
+curWk=7 curTouched | b2 cur trained (hist snap) W7 tue -> KEPT (stored)
+curWk=7 curTouched | c cur untrained W7 thu -> REBUILT (live)
+curWk=7 curTouched | d next week W8 mon -> REBUILT (live)
+curWk=7 curTouched | e +4 weeks W11 mon -> REBUILT (live)
+curWk=7 curUntouched | a past-week untrained W6 mon -> KEPT (stored)
+curWk=7 curUntouched | a2 past-week hist-only W6 tue -> KEPT (stored)
+curWk=7 curUntouched | c cur untrained W7 thu -> REBUILT (live)
+curWk=7 curUntouched | d next week W8 mon -> REBUILT (live)
+curWk=7 curUntouched | e +4 weeks W11 mon -> REBUILT (live)
+
+SUMMARY kept 18 / 36
+  case a kept 6 / 6
+  case a2 kept 6 / 6
+  case b kept 3 / 3
+  case b2 kept 3 / 3
+  case c kept 0 / 6
+  case d kept 0 / 6
+  case e kept 0 / 6
+PROGRAM top-level keys: id,name,goal,liftingFocus,primaryPath,raceDate,raceDateWeeks,legRecoveryNote,liftRecoveryWeeks,taperWeeks,seed,cfg,totalWeeks,created,startDate,_swapUniverse,_swapUniverseByKey
+  created 1790305243322 | startDate null | blockOpen undefined | version-like legRecoveryNote,liftRecoveryWeeks,_swapUniverse,_swapUniverseByKey
+DONE
+EXIT 0
+
+######## /tmp/v220_sgr.out (HEAD)
+surgery anchor count 1
+probe week W2, days carrying the knee_stability marker: mon,tue | later today = W4
+STEP1 today=W2 engine A: shown as mon=A-live(saw) tue=A-live(saw)
+STEP2 today=W4 engine B, stored=creation, never trained: W2 shows mon=CREATION tue=CREATION
+STEP3 same, but stored grid rewritten at STEP1 by a full-object saver: W2 shows mon=A-live(saw) tue=A-live(saw)
+STEP4 today=W5 engine B, all non-rest days: {"past:creation":15,"past:live":5,"current:live":5,"future:live":45}
+STEP5 startDate=null engine B, all non-rest days: {"live":70}
+DONE
+EXIT 0
+
+######## then_rdtz.out (ruling baseline tag)
+artifact /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/2ef6b80b-284e-4663-8193-3a4cf2293a53/scratchpad/V206.html host TZ env (unset)
+harness pins TZ? NO (Date passed through from host)
+
+== 1. REPRO HALF_MANNY raceDate=2026-12-06, oracle {"card":"Dec 6, 2026","header":"Sun, Dec 6, 2026","wd":0}
+realclk America/New_York     vmTZ=America/New_York today=2026-09-24 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=72 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+realclk America/Los_Angeles  vmTZ=America/Los_Angeles today=2026-09-24 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=72 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+realclk UTC                  vmTZ=UTC today=2026-09-25 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=72 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+realclk Asia/Tokyo           vmTZ=Asia/Tokyo today=2026-09-25 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=72 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+pinned  America/New_York     vmTZ=America/New_York today=2026-09-22 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=74 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+pinned  America/Los_Angeles  vmTZ=America/Los_Angeles today=2026-09-22 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=74 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+pinned  UTC                  vmTZ=UTC today=2026-09-22 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=75 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+   stored: {"top":"2026-12-06","cfg":"2026-12-06","typeofCfg":"string","weeksField":null}
+pinned  Asia/Tokyo           vmTZ=Asia/Tokyo today=2026-09-22 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=75 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+
+== 3. SWEEP every day 2026-11-01..2027-10-31, clock pinned
+dates 365 x TZ 4 = 1460 builds; crashes 0
+America/New_York     surfaces disagree 365/365 | card!=oracle 365/365 header!=oracle 0/365 milesheet!=oracle 365/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {"Sun":53,"Mon":52,"Tue":52,"Wed":52,"Thu":52,"Fri":52,"Sat":52}
+   e.g. 2026-11-01 card "Oct 31, 2026" header "Sun, Nov 1, 2026"
+America/Los_Angeles  surfaces disagree 365/365 | card!=oracle 365/365 header!=oracle 0/365 milesheet!=oracle 365/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {"Sun":53,"Mon":52,"Tue":52,"Wed":52,"Thu":52,"Fri":52,"Sat":52}
+   e.g. 2026-11-01 card "Oct 31, 2026" header "Sun, Nov 1, 2026"
+UTC                  surfaces disagree 0/365 | card!=oracle 0/365 header!=oracle 0/365 milesheet!=oracle 0/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {}
+Asia/Tokyo           surfaces disagree 0/365 | card!=oracle 0/365 header!=oracle 0/365 milesheet!=oracle 0/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {}
+  DST 2026-11-01 New_York:Oct 31, 2026|W14 sun  Los_Angeles:Oct 31, 2026|W14 sun  UTC:Nov 1, 2026|W14 sun  Tokyo:Nov 1, 2026|W14 sun
+  DST 2026-11-08 New_York:Nov 7, 2026|W14 sun  Los_Angeles:Nov 7, 2026|W14 sun  UTC:Nov 8, 2026|W14 sun  Tokyo:Nov 8, 2026|W14 sun
+  DST 2027-03-14 New_York:Mar 13, 2027|W14 sun  Los_Angeles:Mar 13, 2027|W14 sun  UTC:Mar 14, 2027|W14 sun  Tokyo:Mar 14, 2027|W14 sun
+  DST 2027-03-21 New_York:Mar 20, 2027|W14 sun  Los_Angeles:Mar 20, 2027|W14 sun  UTC:Mar 21, 2027|W14 sun  Tokyo:Mar 21, 2027|W14 sun
+baseline==itself (5 dates): true
+race placement spread (UTC): {"W14 sun":53,"W14 mon":52,"W14 tue":52,"W14 wed":52,"W14 thu":52,"W14 fri":52,"W14 sat":52}
+
+== PART 2: real renderers; wizard day 2026-08-31, race 2026-12-06, setProgRace -> 2026-12-13 on 2026-09-22
+-- America/New_York
+   wizard {"date":"2026-08-31","WD_raceDateWeeks":13,"review":"Race date Dec 5, 2026 (13 weeks away) Li"}
+   stored ia_programs {"raceDate":"2026-12-06","raceDateWeeks":13,"cfg_raceDate":"2026-12-06","cfg_raceDateWeeks":13}
+   setProgRace toast: Race day Sun, Dec 13 — plan starts Mon, Sep 7 ✓
+   [built @2026-08-31] {"tag":"built","day":"2026-08-31","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":13,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 5, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 5, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":1,"mileSheet":"(unlocked branch: no race date on sheet, curWk 1 < tw-2)"}
+   [today @2026-09-22] {"tag":"today","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":10,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 5, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 5, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":4,"mileSheet":"(unlocked branch: no race date on sheet, curWk 4 < tw-2)"}
+   [lockwin @2026-11-20] {"tag":"lockwin","day":"2026-11-20","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":2,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 5, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 5, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":12,"mileSheet":"Days out 15 Race day Dec 5, 2026 Week 12 of 14 You are too c"}
+   [afterSet @2026-09-22] {"tag":"afterSet","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":11,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 12, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 12, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":3,"mileSheet":"(unlocked branch: no race date on sheet, curWk 3 < tw-2)"}
+   [afterSet-lockwin @2026-11-27] {"tag":"afterSet-lockwin","day":"2026-11-27","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":2,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 12, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 12, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":12,"mileSheet":"Days out 15 Race day Dec 12, 2026 Week 12 of 14 You are too "}
+-- UTC
+   wizard {"date":"2026-08-31","WD_raceDateWeeks":13,"review":"Race date Dec 6, 2026 (13 weeks away) Li"}
+   stored ia_programs {"raceDate":"2026-12-06","raceDateWeeks":13,"cfg_raceDate":"2026-12-06","cfg_raceDateWeeks":13}
+   setProgRace toast: Race day Sun, Dec 13 — plan starts Mon, Sep 7 ✓
+   [built @2026-08-31] {"tag":"built","day":"2026-08-31","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":13,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 6, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 6, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":1,"mileSheet":"(unlocked branch: no race date on sheet, curWk 1 < tw-2)"}
+   [today @2026-09-22] {"tag":"today","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":10,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 6, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 6, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":4,"mileSheet":"(unlocked branch: no race date on sheet, curWk 4 < tw-2)"}
+   [lockwin @2026-11-20] {"tag":"lockwin","day":"2026-11-20","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":2,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 6, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 6, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":12,"mileSheet":"Days out 16 Race day Dec 6, 2026 Week 12 of 14 You are too c"}
+   [afterSet @2026-09-22] {"tag":"afterSet","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":11,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 13, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 13, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":3,"mileSheet":"(unlocked branch: no race date on sheet, curWk 3 < tw-2)"}
+   [afterSet-lockwin @2026-11-27] {"tag":"afterSet-lockwin","day":"2026-11-27","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":2,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 13, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 13, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":12,"mileSheet":"Days out 16 Race day Dec 13, 2026 Week 12 of 14 You are too "}
+
+######## then_spo.out (ruling baseline tag)
+artifact V207.html ia-version 207 today 2026-09-22 21:16 local TZ America/Los_Angeles
+oracle daysUntil(2026-10-20)= 28 -> floor/7 = 4
+
+== PART 0  goal-time sweep, 1.5mi, mile 8:00, intermediate 18-35, run only
+blank 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:00 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:15 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:30 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:45 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:00 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:15 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:30 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:45 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:00 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:15 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:30 10 10 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:45 8 8 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+16:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+
+== PART 1  lattice
+builds (screens) 2592 | offer shown 2592 | rec weeks RISE after tap 248/2592 | header!=callout after tap 0/2592 | offer identical after tap 2592/2592
+  offer:advanced 864
+  offer:beginner 864
+  offer:intermediate 864
+  offerMile:420 432
+  offerMile:480 432
+  offerMile:540 432
+  offerMile:600 432
+  offerMile:660 432
+  offerMile:none 432
+  offerSlowerThanCurrentMile:advanced 144
+  offerSlowerThanCurrentMile:beginner 720
+  offerSlowerThanCurrentMile:intermediate 432
+  worse:advanced 200
+  worse:intermediate 48
+  worse:mile480 96
+  worse:mile540 56
+  worse:mile600 48
+  worse:mile660 48
+
+== PART 2  reporter screen (goal 12:00 = 8:00/mi, mile 8:00)
+S1 {"hdr":6,"rec":6,"wk":4,"offer":"14:15","card":"var(--accent)","btnBg":"var(--accent)","btnFg":"#0a0a0a","intact":false,"endsOnTest":true}
+S1 text: 4 weeks isn't enough time to hit this pace safely. Recommended: at least 6 weeks.Your program ends on your test. 5 weeks. The taper lands in front of it.In 4 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits.[BTN:Use this pace instead]
+S2 {"hdr":6,"rec":6,"wk":4,"offer":"14:15","card":"var(--accent)","btnBg":"var(--accent)","btnFg":"#0a0a0a","intact":false,"endsOnTest":true}
+S2 text: 4 weeks isn't enough time to hit this pace safely. Recommended: at least 6 weeks.Your program ends on your test. 5 weeks. The taper lands in front of it.In 4 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits.[BTN:Use this pace instead]
+S2 after 80ms timer flush: rec 6 offer 14:15
+WD diff across tap: WD.cardioGoals.run.targetMins: "12" -> 14 ; WD.cardioGoals.run.targetSecs: "00" -> 15 ; WD.cardioGoals.run.targetTime: "12:00" -> "14:15" ; WD._testWeek: undefined -> 5 ; WD._raceDateCappedWeeks: undefined -> 5
+original 12:00 still anywhere in WD after tap: false | localStorage keys holding "12:00": none
+build before tap {"totalWeeks":5,"testWeek":5,"digest":"fce833db3c3849ae","w1paces":["mon:Interval (INT):7:58/mi|8:14/mi","thu:Continuous High Intensity (CHI):8:54/mi","fri:Long Slow Distance (LSD):10:44/mi","sat:Long Slow Distance (LSD):10:44/mi"],"finalWeekTypes":["Long Slow Distance (LSD)","1.5 Mile Test — TIME TRIAL"]}
+build after tap  {"totalWeeks":5,"testWeek":5,"digest":"dc45da1a924e36ca","w1paces":["mon:Interval (INT):7:58/mi|8:14/mi","thu:Continuous High Intensity (CHI):8:54/mi","fri:Long Slow Distance (LSD):10:44/mi","sat:Long Slow Distance (LSD):10:44/mi"],"finalWeekTypes":["Long Slow Distance (LSD)","1.5 Mile Test — TIME TRIAL"]}
+
+== PART 3  un-click paths
+tap again: goal 14:15 rec 6 offer 14:15
+renderWizardStep: goal 14:15 rec 6
+functions named *undo/revert/restore*Pace*: 0 | writers of targetMins in source: 10
+  js:1053 WD.cardioGoals['run'].targetMins = mins;
+  js:1608 <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['swim'].targetMins=this
+  js:1641 <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['run'].targetMins=this.
+  js:13267 next.targetMins=i.targetMins; next.targetSecs=i.targetSecs;
+
+== PART 4  mile re-entry
+mile-min oninput: WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updatePaceFeasibility();updateMileAdvisory()
+ mile="7": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 6
+ mile="10": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 11
+ mile="": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 6
+ mile="8": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 6
+callers of updateRaceDateFeedback in source:
+  js:784 const f=document.getElementById('raceDateFeedback'); if(f) updateRaceDateFeedback();
+  js:1059 // updateRaceDateFeedback() re-runs calcProgramLength() against the freshly-applied pace
+  js:1062 updateRaceDateFeedback();
+  js:1472 setTimeout(() => updateRaceDateFeedback(), 80);
+  js:1717 oninput="WD.raceDate=this.value;updateRaceDateFeedback()"
+goal-min oninput: WD.cardioGoals['run'].targetMins=this.value;updatePaceTime('run');updatePaceDisplay()
+
+== PART 4b  post-tap edit -> callout-only repaint, search for the 21:17 screen (hdr 6, rec 11, red, offer 14:15)
+sequences 168 | reproduce 21:17: 45
+  blank then mileBestMins="10" -> goal 14:15 mile 10:00
+  blank then mileBestMins="11" -> goal 14:15 mile 11:00
+  blank then mileBestMins="12" -> goal 14:15 mile 12:00
+  blank then mileBestMins="13" -> goal 14:15 mile 13:00
+  blank then mileBestMins="14" -> goal 14:15 mile 14:00
+  blank then mileBestMins="30" -> goal 14:15 mile 30:00
+  blank then mileBestMins="45" -> goal 14:15 mile 45:00
+  blank then targetMins="0" -> goal 0:15 mile 8:00
+  blank then targetMins="1" -> goal 1:15 mile 8:00
+  blank then targetMins="5" -> goal 5:15 mile 8:00
+  blank then targetMins="7" -> goal 7:15 mile 8:00
+  blank then targetMins="8" -> goal 8:15 mile 8:00
+  blank then targetMins="9" -> goal 9:15 mile 8:00
+  blank then targetMins="10" -> goal 10:15 mile 8:00
+  blank then targetMins="11" -> goal 11:15 mile 8:00
+  12:00 then mileBestMins="10" -> goal 14:15 mile 10:00
+  12:00 then mileBestMins="11" -> goal 14:15 mile 11:00
+  12:00 then mileBestMins="12" -> goal 14:15 mile 12:00
+  12:00 then mileBestMins="13" -> goal 14:15 mile 13:00
+  12:00 then mileBestMins="14" -> goal 14:15 mile 14:00
+  12:00 then mileBestMins="30" -> goal 14:15 mile 30:00
+  12:00 then mileBestMins="45" -> goal 14:15 mile 45:00
+  12:00 then targetMins="0" -> goal 0:15 mile 8:00
+  12:00 then targetMins="1" -> goal 1:15 mile 8:00
+  12:00 then targetMins="5" -> goal 5:15 mile 8:00
+  12:00 then targetMins="7" -> goal 7:15 mile 8:00
+  12:00 then targetMins="8" -> goal 8:15 mile 8:00
+  12:00 then targetMins="9" -> goal 9:15 mile 8:00
+  12:00 then targetMins="10" -> goal 10:15 mile 8:00
+  12:00 then targetMins="11" -> goal 11:15 mile 8:00
+  13:00 then mileBestMins="10" -> goal 14:15 mile 10:00
+  13:00 then mileBestMins="11" -> goal 14:15 mile 11:00
+  13:00 then mileBestMins="12" -> goal 14:15 mile 12:00
+  13:00 then mileBestMins="13" -> goal 14:15 mile 13:00
+  13:00 then mileBestMins="14" -> goal 14:15 mile 14:00
+  13:00 then mileBestMins="30" -> goal 14:15 mile 30:00
+  13:00 then mileBestMins="45" -> goal 14:15 mile 45:00
+  13:00 then targetMins="0" -> goal 0:15 mile 8:00
+  13:00 then targetMins="1" -> goal 1:15 mile 8:00
+  13:00 then targetMins="5" -> goal 5:15 mile 8:00
+  13:00 then targetMins="7" -> goal 7:15 mile 8:00
+  13:00 then targetMins="8" -> goal 8:15 mile 8:00
+  13:00 then targetMins="9" -> goal 9:15 mile 8:00
+  13:00 then targetMins="10" -> goal 10:15 mile 8:00
+  13:00 then targetMins="11" -> goal 11:15 mile 8:00
+
+== PART 5  button colours
+--accent #181712 --red #9e3328 --signal #CF4E1A --on-ink #F4F1E8
+S1 btn bg var(--accent) fg #0a0a0a contrast 1.10 : 1
+S2 (post-tap, same screen) btn bg var(--accent) fg #0a0a0a | red-card button (diff<=-3) #0a0a0a on --red contrast 2.79 : 1
+paceCeilingOffer btn bg var(--accent) fg var(--on-ink) contrast 15.89 : 1
+
+== PART 6  em-dashes in athlete-visible text of this screen
+count 11
+ 1. … goal for each. Running Outdoor or treadmill — pace, distance, race goals ✓ Run …
+ 2. …1 miles without stopping Run a 10K 6.2 miles — solid aerobic base Half Marathon …
+ 3. … solid aerobic base Half Marathon 13.1 miles — serious endurance Full Marathon 2…
+ 4. …— serious endurance Full Marathon 26.2 miles — the full distance Hit a Pace / Ti…
+ 5. …it a Pace / Time Goal Target distance + time — 1.5mi under 10 min, mile under 6,…
+ 6. …[BTN:km] Target time minutes : seconds 12:00 — 8:00/mi per mile How far can you …
+ 7. …n? (optional) mi Current mile time (optional — personalizes your training paces)…
+ 8. … seconds Cycling / Spin Spin bike or outdoor — intervals, FTP, distance ✓ Swimmi…
+ 9. …, distance ✓ Swimming Lap pool or open water — structured sets ✓ Program length:…
+ 10. … — structured sets ✓ Program length: 6 weeks — based on your longest cardio goal…
+ 11. …:Use this pace instead] Tap to open calendar — the final weeks taper so you arri…
+(for the 4-weeks NSW sentence pre-D106a see "stays intact" in S1 text above)
+
+######## then_spm.out (ruling baseline tag)
+artifact V209.html ia-version 209 TZ America/New_York
+
+=== M1  goal time -> engine, dated run_pace_goal (1.5mi)
+-- static readers (base.html line : enclosing function : text)
+  :2283 updateRaceDateFeedback | const recommended = calcProgramLength(WD.cardioTypes||[], _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks
+  :2387 updateSwimPaceDisplay | if(g.targetMins === undefined || g.targetMins === '') { el.style.display = 'none'; return; }
+  :2390 updateSwimPaceDisplay | const totalSecs = (+(g.targetMins||0)*60) + (+(g.targetSecs||0));
+  :2393 updateSwimPaceDisplay | el.innerHTML = asyIcon('🎯',13)+' ' + (g.targetMins||0) + ':' + String(g.targetSecs||0).padStart(2,'0') + ' — ' + pace +
+  :2398 updatePaceTime | const mins = WD.cardioGoals[type].targetMins || 0;
+  :2406 updatePaceDisplay | if(!g || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) {
+  :2410 updatePaceDisplay | const totalSecs = (+(g.targetMins||0)*60) + (+(g.targetSecs||0));
+  :2413 updatePaceDisplay | el.innerHTML = asyIcon('🎯',13)+' ' + g.targetMins + ':' + String(g.targetSecs||0).padStart(2,'0') + ' — ' + pace + ' pe
+  :2429 assessRunPaceCeiling | if(!g || g.id !== 'run_pace_goal' || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) return null;
+  :2434 assessRunPaceCeiling | const tTotal = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+  :2449 assessRunPaceCeiling | const L = calcProgramLength(['run'], _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus] || 'balanced').weeks;
+  :2763 renderWizardStep | previewWeeks = calcProgramLength(WD.cardioTypes, _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks;
+  :2808 renderWizardStep | <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput
+  :2817 renderWizardStep | <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(g.targetMins!==undefined&&g.t
+  :2841 renderWizardStep | <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput
+  :2850 renderWizardStep | <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(WD.cardioGoals['run']?.tar
+  :3017 renderWizardStep | const programWeeks = WD.cardioTypes.length ? calcProgramLength(WD.cardioTypes,_nameGoalsExp,internalGoal).weeks : 6;
+  :3066 paceGoalTarget | if(g.targetMins !== undefined && g.targetMins !== '') {
+  :3067 paceGoalTarget | tTotalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+  :3068 paceGoalTarget | } else if(g.targetTime) {
+  :3069 paceGoalTarget | tTotalSecs = parseTimeToSecs(g.targetTime);
+  :3178 weeksToPace | var _pgT = paceGoalTarget(goal);
+  :3210 weeksToPace | var timeLabel = goal.targetMins ? goal.targetMins+':'+(String(goal.targetSecs||0).padStart(2,'0')) : '';
+  :3298 weeksToPace | var swimTimeEntered = isSwimTimeGoal && goal.targetMins !== undefined && goal.targetMins !== '';
+  :3301 weeksToPace | var tTotal = (+goal.targetMins||0)*60 + (+goal.targetSecs||0);
+  :3321 weeksToPace | var sTimeLbl = (goal.targetMins||0)+':'+(String(goal.targetSecs||0).padStart(2,'0'));
+  :4696 buildSwimSession | if(swimGoal.targetMins !== undefined && swimGoal.targetMins !== '') {
+  :4697 buildSwimSession | const tTotal = (+swimGoal.targetMins||0)*60 + (+swimGoal.targetSecs||0);
+  :5933 _nrcSpacedRunDays | const _pgT = paceGoalTarget(goal);
+  :5982 _nrcSpacedRunDays | const _g = cardioGoals.run || {}, _pt = paceGoalTarget(_g), _u = _g.paceUnit === 'km' ? 'km' : 'mi';
+  :7228 generateProgram | const lengthResult=calcProgramLength(WD.cardioTypes||[],_wdGoalsExp,_wdInternalGoal);
+  :7299 doGenerate | let totalWeeksPreview=calcProgramLength(WD.cardioTypes||[],_previewGoals,LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanc
+  :7402 engineA_timeline | const cardioLength=calcProgramLength(cardioTypes,_goalsWithExp,goal);
+  :14260 progTestPin | const len = calcProgramLength(c.cardioTypes, {...c.cardioGoals, _experience:c.experience||'intermediate', _ageBracket:c.
+  :14319 runAnchorInfo | const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
+  :14320 runAnchorInfo | ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
+  :14461 _goalInputsValid | const hasTime=(+i.targetMins>0)||(+i.targetSecs>0);
+  :14508 renderGoalSheet | +'<input type="number" class="input-field" style="flex:0 0 58px;text-align:center" placeholder="min" min="0" max="99" va
+  :14514 renderGoalSheet | +'<input type="number" class="input-field" style="flex:1;text-align:center" placeholder="min" min="0" max="99" value="'+
+  :14547 commitGoalChange | const mins=+i.targetMins||0, secs=+i.targetSecs||0;
+  :14548 commitGoalChange | next.targetMins=i.targetMins; next.targetSecs=i.targetSecs;
+  goal blank | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest 93378da9beac9976
+  goal 9:00 | hdr 11 rec 11 | _testWeek 5 totalWeeks 5 | digest 8d9f7162db7921c9
+  goal 10:30 | hdr 11 rec 11 | _testWeek 5 totalWeeks 5 | digest 6facd0e42065055a
+  goal 12:00 | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest c1afd207853839c7
+  goal 14:15 | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest a37f6c3c2519c962
+-- diff goal 12:00 vs 10:30 : 14 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":473,"rec":{"lo":235,"hi":294},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":528,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":639,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":639,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:48/mi. This week's goal pace is 8:04/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":468,"rec":{"lo":233,"hi":291},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":523,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":634,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":634,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":463,"rec":{"lo":230,"hi":288},"key":"int"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":629,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:29/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":629,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":629,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi. Goal 10:30 (7:00/mi)."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial","tgt":420}
+-- diff goal 12:00 vs 14:15 : 15 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":478,"rec":{"lo":238,"hi":297},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":534,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":644,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":644,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":478,"rec":{"lo":238,"hi":297},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":534,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":644,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":644,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":478,"rec":{"lo":238,"hi":297},"key":"int"}
+    W4/thu/Long Interval (LI) — Taper fields detail,dose
+       detail: "10 min continuous at Tempo Pace: 8:38/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "10 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":10,"tgt":518,"key":"chi"}
+             {"k":"time","mins":10,"tgt":534,"key":"chi"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":644,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:44/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":644,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":644,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi. Goal 14:15 (9:30/mi)."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial","tgt":570}
+-- diff goal 12:00 vs 9:00 : 14 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":473,"rec":{"lo":235,"hi":294},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":528,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":639,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":639,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:48/mi. This week's goal pace is 8:04/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":468,"rec":{"lo":233,"hi":291},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":523,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":634,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":634,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":463,"rec":{"lo":230,"hi":288},"key":"int"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":629,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:29/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":629,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":629,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi. Goal 9:00 (6:00/mi)."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial","tgt":360}
+-- diff goal 12:00 vs blank : 14 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":473,"rec":{"lo":235,"hi":294},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":528,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":639,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":639,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:48/mi. This week's goal pace is 8:04/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":468,"rec":{"lo":233,"hi":291},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":523,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":634,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":634,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":463,"rec":{"lo":230,"hi":288},"key":"int"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":629,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:29/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":629,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":629,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial"}
+-- paired lattice: exp x mile x testOffset(days) x goal pair; everything else pinned
+  pairs 243 | totalWeeks differs 20 | _testWeek differs 8 | same-length pairs with >=1 run session changed 218 | run sessions changed 1788/5240
+    field detail 804
+    field dose 804
+    field note 1140
+    lenDiff advanced/mile480 5
+    lenDiff advanced/milenone 5
+    lenDiff intermediate/mile480 5
+    lenDiff intermediate/milenone 5
+    lenDiff off104 4
+    lenDiff off140 4
+    lenDiff off41 4
+    lenDiff off55 4
+    lenDiff off76 4
+    sessDiff advanced 66
+    sessDiff beginner 81
+    sessDiff intermediate 71
+   ex intermediate mile none test +41d: goal 12:00 -> 7 wk tw 7 | goal 14:15 -> 6 wk tw null
+   ex intermediate mile none test +55d: goal 12:00 -> 9 wk tw 9 | goal 14:15 -> 6 wk tw null
+   ex intermediate mile none test +76d: goal 12:00 -> 11 wk tw null | goal 14:15 -> 6 wk tw null
+   ex intermediate mile none test +104d: goal 12:00 -> 11 wk tw null | goal 14:15 -> 6 wk tw null
+
+=== M2  caller counts (base.html + tests/)
+  applySuggestedPace       raw 3 | non-comment 3 | def 1 | call sites 2 | inside on*="" attrs 2
+  achievablePacePerMile    raw 4 | non-comment 2 | def 1 | call sites 1 | inside on*="" attrs 0
+  paceCeilingOfferHTML     raw 5 | non-comment 5 | def 1 | call sites 4 | inside on*="" attrs 0
+  updatePaceFeasibility    raw 9 | non-comment 9 | def 1 | call sites 7 | inside on*="" attrs 4
+  updateRaceDateFeedback   raw 6 | non-comment 5 | def 1 | call sites 4 | inside on*="" attrs 1
+  assessRunPaceCeiling     raw 6 | non-comment 5 | def 1 | call sites 4 | inside on*="" attrs 0
+  previewWeeks             raw 3 | non-comment 3 | def 0 | call sites 0 | inside on*="" attrs 0
+  updatePaceDisplay        raw 4 | non-comment 4 | def 1 | call sites 3 | inside on*="" attrs 3
+  updatePaceTime           raw 6 | non-comment 6 | def 1 | call sites 5 | inside on*="" attrs 4
+  paceFeasLine             raw 4 | non-comment 2 | def 0 | call sites 0 | inside on*="" attrs 0
+  raceDateFeedback         raw 4 | non-comment 3 | def 0 | call sites 0 | inside on*="" attrs 0
+  80ms timer sites: 1
+    js:784 updateRaceDateFeedback <- offerShorterPlan
+    js:1062 updateRaceDateFeedback <- applySuggestedPace
+    js:1105 assessRunPaceCeiling <- updateRaceDateFeedback
+    js:1106 paceCeilingOfferHTML <- updateRaceDateFeedback
+    js:1116 assessRunPaceCeiling <- updateRaceDateFeedback
+    js:1119 paceCeilingOfferHTML <- updateRaceDateFeedback
+    js:1123 assessRunPaceCeiling <- updateRaceDateFeedback
+    js:1126 paceCeilingOfferHTML <- updateRaceDateFeedback
+    js:1148 achievablePacePerMile <- updateRaceDateFeedback
+    js:1156 applySuggestedPace <- updateRaceDateFeedback
+    js:1215 updatePaceFeasibility <- updatePaceDisplay
+    js:1274 applySuggestedPace <- paceCeilingOfferHTML
+    js:1285 assessRunPaceCeiling <- updatePaceFeasibility
+    js:1287 paceCeilingOfferHTML <- updatePaceFeasibility
+    js:1452 updatePaceFeasibility <- applySeedData
+    js:1472 updateRaceDateFeedback <- renderWizardStep
+    js:1664 updatePaceFeasibility <- renderWizardStep
+    js:1669 updatePaceFeasibility <- renderWizardStep
+    js:1685 updatePaceFeasibility <- renderWizardStep
+    js:1690 updatePaceFeasibility <- renderWizardStep
+    js:1717 updateRaceDateFeedback <- renderWizardStep
+    js:1725 updatePaceFeasibility <- renderWizardStep
+  tests: applySuggestedPace       2 files {"measure":8} 
+  tests: achievablePacePerMile    5 files {"measure":10} 
+  tests: paceCeilingOfferHTML     1 files {"measure":1} 
+  tests: updatePaceFeasibility    1 files {"measure":1} 
+  tests: updateRaceDateFeedback   7 files {"gates":1,"measure":12} gates/g207_test_calendar.js:1
+  tests: assessRunPaceCeiling     4 files {"measure":9} 
+  tests: previewWeeks             0 files {} 
+  tests: updatePaceDisplay        0 files {} 
+  tests: updatePaceTime           0 files {} 
+
+=== M3  test under a week away: daysUntil 0..7 x 7 weekdays x rest patterns
+  builds 392 | _testWeek != UTC-Monday oracle (oracle<=6) 0
+  -- daysUntil x tw x totalWeeks (count over 7 weekdays x 7 rest patterns = 49 per du)
+    du0 tw=1 total=1 38
+    du0 tw=null total=6 11
+    du1 tw=1 total=1 41
+    du1 tw=2 total=2 2
+    du1 tw=null total=6 6
+    du2 tw=1 total=1 40
+    du2 tw=2 total=2 6
+    du2 tw=null total=6 3
+    du3 tw=1 total=1 37
+    du3 tw=2 total=2 11
+    du3 tw=null total=6 1
+    du4 tw=1 total=1 32
+    du4 tw=2 total=2 17
+    du5 tw=1 total=1 25
+    du5 tw=2 total=2 24
+    du6 tw=1 total=1 18
+    du6 tw=2 total=2 31
+    du7 tw=1 total=1 11
+    du7 tw=2 total=2 38
+  -- tw/total vs card sentence (du 0..7)
+    tw=1 total=1 weeksUntil=0 -> TESTWEEK-ONLY 231
+    tw=1 total=1 weeksUntil=1 -> ENDS-ON-TEST 11
+    tw=2 total=2 weeksUntil=0 -> TESTWEEK-ONLY 91
+    tw=2 total=2 weeksUntil=1 -> ENDS-ON-TEST 38
+    tw=null total=6 weeksUntil=0 -> TESTWEEK-ONLY 21
+  ex tw=2 with test-week-only card: 2026-09-22(tue) test 2026-09-28 rest none: start 2026-09-22, tw 2, totalWeeks 2; card: "Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test."
+  ex tw=null under a week: 2026-09-24(thu) test 2026-09-25 rest thu..sun: start 2026-09-28, tw null, totalWeeks 6; card: "Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test."
+
+=== M5  wizard header "Program length" vs built totalWeeks
+  [name-step sample, weeks mentions] nd tell it when to begin. Program name Start date Week 1 is short — you’ll train Tue || ep 24 , Fri, Sep 25 and Sat, Sep 26 , then a full week from Mon, Sep 28 . Program Su || njury Prevention Cardio Run — x Program length 11 weeks Start date Tue, Sep 22, 2026  || — short first week Training days MO · TU · TH · 
+  builds 1080 | header != built 249/1080 | name-step "N weeks" != built 249/1080
+    base/dated n 96
+    base/undated n 12
+    race/dated n 384
+    race/undated n 48
+    test/dated DIS 249
+    test/dated NAME-DIS 249
+    test/dated n 480
+    test/dated tw-pinned DIS 249
+    test/undated n 60
+   ex test/dated | run_pace_goal "12:00" beginner mile none run test 2026-09-27: header 11, callout rec null, weeksUntil 0, _testWeek 1, built 1
+   ex name test/dated | run_pace_goal beginner mile none run test 2026-09-27: name step 11, header 11, built 1
+
+DONE
+
+######## then_m7.out (ruling baseline tag)
+anchor count 1
+base ia-version 209 surgery ia-version 209 TZ America/Los_Angeles
+
+=== 1  _testWeek - recommended   (lattice 4320 builds, errors 0 , pinned _testWeek != date oracle: 0)
+classes: inside = test before goal length end; equal; beyond = rec < tw <= 26; beyond26 = tw > 26 and > rec; nullTW = test before start
+-- all
+    all            n 4320 | inside 1161 | equal 144 | beyond<=26 2439 | beyond26 576 | null 0
+-- by experience
+    advanced       n 1440 | inside 329 | equal 48 | beyond<=26 871 | beyond26 192 | null 0
+    beginner       n 1440 | inside 472 | equal 48 | beyond<=26 728 | beyond26 192 | null 0
+    intermediate   n 1440 | inside 360 | equal 48 | beyond<=26 840 | beyond26 192 | null 0
+-- by weeks-to-test
+    a 1-4          n 576 | inside 576 | equal 0 | beyond<=26 0 | beyond26 0 | null 0
+    b 5-8          n 576 | inside 448 | equal 44 | beyond<=26 84 | beyond26 0 | null 0
+    c 9-12         n 576 | inside 137 | equal 92 | beyond<=26 347 | beyond26 0 | null 0
+    d 13-16        n 576 | inside 0 | equal 8 | beyond<=26 568 | beyond26 0 | null 0
+    e 17-20        n 576 | inside 0 | equal 0 | beyond<=26 576 | beyond26 0 | null 0
+    f 21-26        n 864 | inside 0 | equal 0 | beyond<=26 864 | beyond26 0 | null 0
+    g 27-30        n 576 | inside 0 | equal 0 | beyond<=26 0 | beyond26 576 | null 0
+-- by age
+    18-35          n 1440 | inside 373 | equal 48 | beyond<=26 827 | beyond26 192 | null 0
+    36-54          n 1440 | inside 389 | equal 48 | beyond<=26 811 | beyond26 192 | null 0
+    55+            n 1440 | inside 399 | equal 48 | beyond<=26 801 | beyond26 192 | null 0
+-- by goal / mile
+    1.5mi +mile    n 1080 | inside 312 | equal 36 | beyond<=26 588 | beyond26 144 | null 0
+    1.5mi nomile   n 1080 | inside 320 | equal 36 | beyond<=26 580 | beyond26 144 | null 0
+    1mi +mile      n 1080 | inside 260 | equal 36 | beyond<=26 640 | beyond26 144 | null 0
+    1mi nomile     n 1080 | inside 269 | equal 36 | beyond<=26 631 | beyond26 144 | null 0
+-- delta histogram {"0":144,"<=-10":72,"-9..-1":1089,"+1..+5":720,"+6..+10":720,"+11..+15":720,">+15":855}
+
+=== 2  P-TESTLEN surgery
+  builds changing totalWeeks 2439/4320 | largest extension 20 (1.5mi 12:30 intermediate 18-35 mile 8:00 test wk 26: 6 -> 26) | changed builds landing on 26 144 | unpinned -> pinned 2439 | changed build whose new length != date-oracle test week 0
+  unchanged-length builds whose digest moved anyway 0 | extension histogram {"+1..3":432,"+4..6":432,"+7..10":576,"+11..15":696,"+16..":303}
+
+=== 3  what the extra weeks contain (over 2439 changed builds)
+  run weeks 1..old identical to old program (extra weeks appended after) 0 | whole week objects identical 0 | old run weeks reappear as the LAST weeks (base prepended) 0 | neither (re-spread) 2439
+  example: 1mi 6:00 beginner 18-35 mile none test 2027-02-04 rec 9 | before 9 wk tw null | after 20 wk tw 20
+-- BEFORE
+  W 1  mon Short Interval 4x400m@11:14 | thu Long Interval @12:25 | fri Long Slow Distance @14:05 | sat Long Slow Distance @14:05   [lift: Strength Support, Leg Strength + Mobility]
+  W 2  mon Short Interval 4x400m@11:11 | thu Long Interval @12:22 | fri Long Slow Distance @14:03 | sat Long Slow Distance @14:03   [lift: Strength Support, Leg Strength + Mobility]
+  W 3  mon Short Interval 5x400m@11:08 | thu Long Interval @12:19 | fri Long Slow Distance @14:01 | sat Long Slow Distance @14:01   [lift: Strength Support, Leg Strength + Mobility]
+  W 4  mon Short Interval 5x400m@11:05 | thu Long Interval @12:15 | fri Long Slow Distance @13:59 | sat Long Slow Distance @13:59   [lift: Strength Support, Leg Strength + Mobility]
+  W 5  mon Short Interval 6x400m@11:02 | thu Long Interval @12:12 | fri Long Slow Distance @13:57 | sat Long Slow Distance @13:57   [lift: Strength Support, Leg Strength + Mobility]
+  W 6  mon Short Interval 6x400m@10:59 | thu Long Interval @12:09 | fri Long Slow Distance @13:55 | sat Long Slow Distance @13:55   [lift: Strength Support, Leg Strength + Mobility]
+  W 7  mon Short Interval 7x400m@10:56 | thu Long Interval @12:06 | fri Long Slow Distance @13:53 | sat Long Slow Distance @13:53   [lift: Strength Support, Leg Strength + Mobility]
+  W 8  mon Short Interval — Taper 4x400m@10:53 | thu Long Interval — Taper @12:03 | fri Long Slow Distance @13:51 | sat Long Slow Distance — Taper @13:51   [lift: Strength Support, Leg Strength + Mobility]
+  W 9  mon Short Interval — Taper 4x400m@10:53 | thu Long Interval — Taper @12:03 | fri Long Slow Distance @13:51 | sat Long Slow Distance — Taper @13:51   [lift: Strength Support, Leg Strength + Mobility]
+-- AFTER
+  W 1  mon Short Interval 4x400m@11:14 | thu Long Interval @12:25 | fri Long Slow Distance @14:05 | sat Long Slow Distance @14:05   [lift: Strength Support, Leg Strength + Mobility]
+  W 2  mon Short Interval 4x400m@11:11 | thu Long Interval @12:22 | fri Long Slow Distance @14:03 | sat Long Slow Distance @14:03   [lift: Strength Support, Leg Strength + Mobility]
+  W 3  mon Short Interval 5x400m@11:08 | thu Long Interval @12:19 | fri Long Slow Distance @14:01 | sat Long Slow Distance @14:01   [lift: Strength Support, Leg Strength + Mobility]
+  W 4  mon Short Interval 3x400m@11:08 | thu Long Interval @12:19 | fri Long Slow Distance @14:01 | sat Long Slow Distance @14:01   [lift: Strength Support, Leg Strength + Mobility]
+  W 5  mon Short Interval 6x400m@11:02 | thu Long Interval @12:12 | fri Long Slow Distance @13:57 | sat Long Slow Distance @13:57   [lift: Strength Support, Leg Strength + Mobility]
+  W 6  mon Short Interval 6x400m@10:59 | thu Long Interval @12:09 | fri Long Slow Distance @13:55 | sat Long Slow Distance @13:55   [lift: Strength Support, Leg Strength + Mobility]
+  W 7  mon Short Interval 7x400m@10:56 | thu Long Interval @12:06 | fri Long Slow Distance @13:53 | sat Long Slow Distance @13:53   [lift: Strength Support, Leg Strength + Mobility]
+  W 8  mon Short Interval 4x400m@10:56 | thu Long Interval @12:06 | fri Long Slow Distance @13:53 | sat Long Slow Distance @13:53   [lift: Strength Support, Leg Strength + Mobility]
+  W 9  mon Short Interval 8x400m@10:50 | thu Long Interval @11:59 | fri Long Slow Distance @13:49 | sat Long Slow Distance @13:49   [lift: Strength Support, Leg Strength + Mobility]
+  W10  mon Short Interval 8x400m@10:47 | thu Long Interval @11:56 | fri Long Slow Distance @13:47 | sat Long Slow Distance @13:47   [lift: Strength Support, Leg Strength + Mobility]
+  W11  mon Short Interval 8x400m@10:44 | thu Long Interval @11:53 | fri Long Slow Distance @13:45 | sat Long Slow Distance @13:45   [lift: Strength Support, Leg Strength + Mobility]
+  W12  mon Short Interval 5x400m@10:44 | thu Long Interval @11:53 | fri Long Slow Distance @13:45 | sat Long Slow Distance @13:45   [lift: Strength Support, Leg Strength + Mobility]
+  W13  mon Short Interval 8x400m@10:38 | thu Long Interval 2x@11:46 | fri Long Slow Distance @13:40 | sat Long Slow Distance @13:40   [lift: Strength Support, Leg Strength + Mobility]
+  W14  mon Short Interval 8x400m@10:35 | thu Long Interval 2x@11:43 | fri Long Slow Distance @13:38 | sat Long Slow Distance @13:38   [lift: Strength Support, Leg Strength + Mobility]
+  W15  mon Short Interval 8x400m@10:32 | thu Long Interval 2x@11:40 | fri Long Slow Distance @13:35 | sat Long Slow Distance @13:35   [lift: Strength Support, Leg Strength + Mobility]
+  W16  mon Short Interval 5x400m@10:32 | thu Long Interval @11:40 | fri Long Slow Distance @13:35 | sat Long Slow Distance @13:35   [lift: Strength Support, Leg Strength + Mobility]
+  W17  mon Short Interval 8x400m@10:26 | thu Long Interval 2x@11:33 | fri Long Slow Distance @13:30 | sat Long Slow Distance @13:30   [lift: Strength Support, Leg Strength + Mobility]
+  W18  mon Short Interval 8x400m@10:23 | thu Long Interval 2x@11:30 | fri Long Slow Distance @13:28 | sat Long Slow Distance @13:28   [lift: Strength Support, Leg Strength + Mobility]
+  W19  mon Short Interval — Taper 4x400m@10:20 | thu Long Interval — Taper @11:27 | fri Long Slow Distance @13:25 | sat Long Slow Distance — Taper @13:25   [lift: Strength Support, Leg Strength + Mobility]
+  W20  mon Short Interval — Taper 4x400m@10:20 | thu 1 Mile Test — TIME TRIAL @6:00   [lift: Strength Support, Test Day]
+  full grids: /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/2ef6b80b-284e-4663-8193-3a4cf2293a53/scratchpad/m7b/testlen_example_{before,after}.txt
+
+=== 4  HALF_MANNY and non-test goals
+  HALF_MANNY base 0ac7da6b1691a8e1 self-stable true | surgery 0ac7da6b1691a8e1 | equal true | era row 207 0ac7da6b1691a8e1
+  race + run_base dated builds 210 errors 0 | digest changed 0 {}
+DONE
+
+######## then_sgf.out (ruling baseline tag)
+artifact ia-version 209
+curWk=2 curTouched | a past-week untrained W1 mon -> KEPT (stored)
+curWk=2 curTouched | a2 past-week hist-only W1 tue -> KEPT (stored)
+curWk=2 curTouched | b cur trained (comp) W2 mon -> KEPT (stored)
+curWk=2 curTouched | b2 cur trained (hist snap) W2 tue -> KEPT (stored)
+curWk=2 curTouched | c cur untrained W2 thu -> REBUILT (live)
+curWk=2 curTouched | d next week W3 mon -> REBUILT (live)
+curWk=2 curTouched | e +4 weeks W6 mon -> REBUILT (live)
+curWk=2 curUntouched | a past-week untrained W1 mon -> KEPT (stored)
+curWk=2 curUntouched | a2 past-week hist-only W1 tue -> KEPT (stored)
+curWk=2 curUntouched | c cur untrained W2 thu -> REBUILT (live)
+curWk=2 curUntouched | d next week W3 mon -> REBUILT (live)
+curWk=2 curUntouched | e +4 weeks W6 mon -> REBUILT (live)
+curWk=4 curTouched | a past-week untrained W3 mon -> KEPT (stored)
+curWk=4 curTouched | a2 past-week hist-only W3 tue -> KEPT (stored)
+curWk=4 curTouched | b cur trained (comp) W4 mon -> KEPT (stored)
+curWk=4 curTouched | b2 cur trained (hist snap) W4 tue -> KEPT (stored)
+curWk=4 curTouched | c cur untrained W4 thu -> REBUILT (live)
+curWk=4 curTouched | d next week W5 mon -> REBUILT (live)
+curWk=4 curTouched | e +4 weeks W8 mon -> REBUILT (live)
+curWk=4 curUntouched | a past-week untrained W3 mon -> KEPT (stored)
+curWk=4 curUntouched | a2 past-week hist-only W3 tue -> KEPT (stored)
+curWk=4 curUntouched | c cur untrained W4 thu -> REBUILT (live)
+curWk=4 curUntouched | d next week W5 mon -> REBUILT (live)
+curWk=4 curUntouched | e +4 weeks W8 mon -> REBUILT (live)
+curWk=7 curTouched | a past-week untrained W6 mon -> KEPT (stored)
+curWk=7 curTouched | a2 past-week hist-only W6 tue -> KEPT (stored)
+curWk=7 curTouched | b cur trained (comp) W7 mon -> KEPT (stored)
+curWk=7 curTouched | b2 cur trained (hist snap) W7 tue -> KEPT (stored)
+curWk=7 curTouched | c cur untrained W7 thu -> REBUILT (live)
+curWk=7 curTouched | d next week W8 mon -> REBUILT (live)
+curWk=7 curTouched | e +4 weeks W11 mon -> REBUILT (live)
+curWk=7 curUntouched | a past-week untrained W6 mon -> KEPT (stored)
+curWk=7 curUntouched | a2 past-week hist-only W6 tue -> KEPT (stored)
+curWk=7 curUntouched | c cur untrained W7 thu -> REBUILT (live)
+curWk=7 curUntouched | d next week W8 mon -> REBUILT (live)
+curWk=7 curUntouched | e +4 weeks W11 mon -> REBUILT (live)
+
+SUMMARY kept 18 / 36
+  case a kept 6 / 6
+  case a2 kept 6 / 6
+  case b kept 3 / 3
+  case b2 kept 3 / 3
+  case c kept 0 / 6
+  case d kept 0 / 6
+  case e kept 0 / 6
+PROGRAM top-level keys: id,name,goal,liftingFocus,primaryPath,raceDate,raceDateWeeks,legRecoveryNote,liftRecoveryWeeks,taperWeeks,seed,cfg,totalWeeks,created,startDate,_swapUniverse,_swapUniverseByKey
+  created 1790305545226 | startDate null | blockOpen undefined | version-like legRecoveryNote,liftRecoveryWeeks,_swapUniverse,_swapUniverseByKey
+DONE

@@ -1,0 +1,9 @@
+[
+ {
+  "name": "S1-D176 -> the ' reps' append is dropped: a bare count inside a round block renders as a bare number again (the V219 _dispDetail line)",
+  "anchor": "const _dispDetail=(_ssRounds!=null&&!i._skipped)?_stripLeadingSets(i.detail||'').replace(/^\\d+(\\s*[–-]\\s*\\d+)?$/,'$& reps'):(i.detail||'');",
+  "replacement": "const _dispDetail=(_ssRounds!=null&&!i._skipped)?_stripLeadingSets(i.detail||''):(i.detail||'');",
+  "gate": "gates/g190_rounds.js",
+  "note": "NAMED TRIP in g190_rounds.js rows G11f hand table (want 10 reps / 8–12 reps, got 10 / 8–12) and G11f lattice (348 of 1,468 unique numeric-rounds sections disagree on the V220 tree copy); G11f floor keeps passing, it counts the population, not the render. Builder saw PASS 47 FAIL 2 on a scratch tree stamped 220. Needs ia-version >= 220: below 220 G11f SKIPs and G11b (the pre-D176 contract) runs, so the mutation survives by design. The anchor is the same line sabotage/v190.json M4 anchors; the two mutations never apply together."
+ }
+]

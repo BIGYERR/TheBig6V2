@@ -1,0 +1,1530 @@
+######## rb_main.out  (HEAD 920fa0a ia-version 219; V206/V207/V209 from git tags)
+ia-version HEAD 219 V209 209
+
+=== P-RECOVBANNER anchors
+ANCHOR RB | OK | V209 1 HEAD 1 (want 1) | L12068 | E1 comment
+ANCHOR RB | OK | V209 1 HEAD 1 (want 1) | L12069 | E1 let
+ANCHOR RB | GONE | V209 0 HEAD 0 (want 1) | L | E1 if
+ANCHOR RB | OK | V209 1 HEAD 1 (want 1) | L12070 | E1 if (bare)
+ANCHOR RB | OK | V209 1 HEAD 1 (want 1) | L12071 | E1 glyph escape
+ANCHOR RB | OK | V209 1 HEAD 1 (want 1) | L12075 | E2 join
+ANCHOR RB | OK | V209 1 HEAD 1 (want 1) | L10908 | field write
+RB comment-stripped HEAD: "Recovery spacing" 1 | activeProg.legRecoveryNote 2 | ♻ literal 0 + \u267b 1 | legRecoveryNote total 11
+RB comment-stripped V209: "Recovery spacing" 1 | activeProg.legRecoveryNote 2 | ♻ literal 0 + \u267b 1 | legRecoveryNote total 11
+RB comment-stripped V207: "Recovery spacing" 1 | activeProg.legRecoveryNote 2 | ♻ literal 0 + \u267b 1 | legRecoveryNote total 10
+RB legRecoveryNote HEAD sites:
+   L7190: return { legRecoveryNote: shape.base ? 'Nothing heavy lands on your long run or the day before it. Your lifting days were placed around it.'
+   L7213: if(!legTaxing.size) return { legRecoveryNote:null };
+   L7242: return { legRecoveryNote: note };
+   L7888: const { legRecoveryNote } = deconflictLegLiftDays(dayRoles, trainDays, cardioSchedule);
+   L7891: const recoveryNote = [legRecoveryNote, regionRecoveryNote].filter(Boolean).join(' ') || null;
+   L7892: return { dayRoles, legRecoveryNote: recoveryNote };
+   L10775: const { dayRoles, legRecoveryNote } = plan;
+   L10908: return {id,name:cfg.name||'My Program',goal,liftingFocus:cfg.liftingFocus,primaryPath:cfg.primaryPath,raceDate:cfg.raceDate||null,raceDateWeeks:cfg.ra
+   L12070: if(activeProg.legRecoveryNote){
+   L12071: leg='<div style="background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:4px;padding:10px 12px;mar
+RB legRecoveryNote V209 sites: L7003,7026,7055,7662,7665,7666,10508,10640,10640,11798,11799
+
+=== P-EMOJI anchors (pool dash strings, rider, inline chrome, pop icons)
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17554 | §2 pool 1: Congrats... you actually showed up. Just
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17556 | §2 pool 2: Look at you — vertical, sweaty, and usef
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17561 | §2 pool 3: Sweat now or be wheezing on the way up t
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17572 | §2 pool 4: Quit looking for a medal — it's under yo
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17579 | §2 pool 5: You did the whole thing — looked dead ug
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17580 | §2 pool 6: ten minutes lifting. But okay — 
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17587 | §2 pool 7: You disappeared on a workout. Your recor
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17600 | §2 pool 8: You saw it through. Rare as fuck — most 
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17604 | §2 pool 9: You outlasted every weak-ass excuse your
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17837 | §3 rider >=7
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17838 | §3 rider <7
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L2627 | §4 wizard caption line (Estimated from)
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L2632 | §4 wizard header (Seed from)
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L13950 | §4 log nudge 📋 escape
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L16091 | §4 progress chip 🗄 escape
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17610 | §5 POP_CFG.reminder icon
+ANCHOR EM | OK | V209 2 HEAD 2 (want 2) | L15524,15549 | §5 BACK IN shield (x2 by design)
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L15524 | §5 BACK IN one-week msg
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L15549 | §5 BACK IN two-week msg
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L15560 | §5 CHECK IN better
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L15568 | §5 CHECK IN worse
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17665 | §5 popIcon slot textContent
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17777 | §1 streak kicker
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L17609 | §1 POP_CFG.workout 🎉
+ANCHOR EM | OK | V209 1 HEAD 1 (want 1) | L456 | .pop-icon css font-size 52
+   css: .pop-icon{font-size:52px;line-height:1;margin-bottom:6px;position:relative;display:inline-block;animation:popBounce .6s .12s both cubic-bezier(.16,1.4,.4,1);}
+EM ASY_ICON_PATHS key notebook: true
+EM ASY_ICON_PATHS key shield: true
+EM ASY_ICON_PATHS key warning: true
+EM ASY_ICON_PATHS key chart: true
+EM ASY_ICON_PATHS key history: true
+
+=== P-POPCOND anchors
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17636 | function popContext(){
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17641 | function popEligible(e,ctx){
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17648 | function popPick(tier){
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17662 | function popFire(tier,opts){
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17717 | function dayDateFor(
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17763 | function fireWorkoutPopup(
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17798 | function fireCompletionPopup(
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17813 | function maybeShowReminder(
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17849 | function resolveReminder(
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17746 | function computeStreak(
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L14374 | function handleDayStatus(
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17836 | const _remMsg=
+ANCHOR PC | GONE | V209 0 HEAD 0 (want 1) | L | _gap<7
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17836 | _gap>=7
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17644 | if(when==='weekend') return ctx.weekend;
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L17650 | const ctx=popContext();
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L11711 | var liftSections=(day.sections||[]).some(
+ANCHOR PC | DOUBLED | V209 2 HEAD 2 (want 1) | L10989,11012 | /taper/i.test(sec.label
+ANCHOR PC | OK | V209 1 HEAD 1 (want 1) | L10957 | label:'Post-run mobility'
+PC POP_POOLS HEAD sizes: workout 27 / reminder 5 / streak 5 / season 9
+PC POP_POOLS V207 sizes: workout 27 / reminder 5 / streak 5 / season 9
+   [1] {"when":"weekend"} Hangover said stay down. You told it to go fuck itself. Respect. 🍺🪦
+   [3] {"when":"morning"} Another one done while half the city's still asleep. 🛏️😭
+   [4] untagged Go ahead, keep flexing in the mirror... THEY see it too. 🪞
+   [8] {"when":"weekend"} Cardio's done. You earned the right to talk all the shit you want at b
+   [12] untagged You vs. the couch: couch lost again. Fuck that couch... or sit on it l
+   [15] untagged Showed up hungover, didn't die. Take your victory shower. 🍻💪
+   [18] untagged Quit looking for a medal — it's under your tetas, find it later. 🥇
+   [19] untagged You suffered on purpose. Stay safe, take a shot later. 😈
+   [25] untagged You did the whole thing — looked dead ugly on that last set, but you f
+   [26] untagged Por favor! Twenty minutes finding the right playlist, ten minutes lift
+   reminder pool: ip. 👀 | ah? 👇 | up. 🧾 | it. ✍️ | it. 📋
+PC POP_POOLS identical V207->HEAD: true
+PC popFire callers V207: {"workout":6,"streak":1,"season":1,"reminder":1}
+PC popFire callers V209: {"workout":6,"streak":1,"season":1,"reminder":1}
+PC popFire callers HEAD: {"workout":6,"streak":1,"season":1,"reminder":1}
+PC calls fireCompletionPopup( V207: 3
+PC calls fireCompletionPopup( HEAD: 3
+PC calls fireWorkoutPopup( V207: 2
+PC calls fireWorkoutPopup( HEAD: 2
+PC calls maybeShowReminder( V207: 1
+PC calls maybeShowReminder( HEAD: 1
+PC calls popPick( V207: 2
+PC calls popPick( HEAD: 2
+PC calls popContext( V207: 2
+PC calls popContext( HEAD: 2
+
+=== P-BARERX anchors
+ANCHOR BX | OK | V209 1 HEAD 1 (want 1) | L12674 | _dispDetail line (v190 M4 anchor)
+ANCHOR BX | OK | V209 1 HEAD 1 (want 1) | L12670 | buildExItem signature
+ANCHOR BX | OK | V209 1 HEAD 1 (want 1) | L12121 | _stripLeadingSets def
+ANCHOR BX | OK | V209 1 HEAD 1 (want 1) | L9227 | Leg circuit writer label
+ANCHOR BX | DOUBLED | V209 7 HEAD 7 (want 1) | L11191,11196,11202,11206,11212,11212,11232 | preset library 12 reps
+   leg circuit block: label:'Leg circuit — runner armor',superset:true,rounds:2,items:[ {name:ex.lunge[0],detail:'2×10 each'}, {name:ex.kneeStab,detail:'2×25 sec'}, {name:ex.hinge[0],detail:'2×8'}]}); // V154 (D4): the calf/achilles guarantee — the most-injured tissue in distance // runners had ZERO work anywhere in the prevention template. Run-goal builds only; // eccentric emphasis c
+BX JUMPS HEAD L8058,8074
+BX noJumps HEAD L7928,7933,7937,7939,7953,8074
+
+=== tests side: gates and sabotage anchors on HEAD
+SAB v190.json | OK | M4 -> G11: the member strip mutates item.detail instead of t | gate gates/g190_rounds.js
+SAB v192_d42c_shoulder_side.json | OK | M1 -> g192_shoulder_side S1: heavy push Main pairing loses t | gate gates/g192_shoulder_side.js
+SAB v192_d42c_shoulder_side.json | OK | M2 -> g192_shoulder_side S2: light push Main pairing loses t | gate gates/g192_shoulder_side.js
+SAB v192_d42c_shoulder_side.json | OK | M3 -> g192_shoulder_side S3: Accessory superset loses the su | gate gates/g192_shoulder_side.js
+SAB v192_d42c_shoulder_side.json | OK | M4 -> g192_shoulder_side S3 negative control: Accessory test | gate gates/g192_shoulder_side.js
+SAB v201.json | OK | M3 -> the vertical pull is emptied out of Pull superset A at | gate gates/g200_pull_arbitration.js
+SAB v201.json | COUNT 0 | M4 -> the candidate declares ia-version 202, a version no er | gate gates/g199_deload_arbitration.js
+SAB v205.json | OK | M9 -> the recovery-spacing note is re-worded with a mid-sent | gate gates/g205_pace_eve.js
+SAB v208_d104a.json | OK | M3 -> the legLoad early exit runs before the placement again | gate gates/g208_d104a_runbase.js
+SAB v208_d104a.json | OK | M4 -> the dead steady copy comes back as the run_base note:  | gate gates/g208_d104a_runbase.js
+SAB v208_d104a.json | OK | M5 -> the no-lift-day guard is removed: a 1-2 week dated tes | gate gates/g208_d104a_runbase.js
+G190 G11b at L409; version predicate in file: false
+G205 ok('P3a L224
+G205 ok('P4a L267
+G205 ok('P4b L268
+G205 ok('P4c L269
+G208 ok(`R2 L141
+G208 ok(`R3 L142
+G208 ok(`R8a L196
+GATE-READS g190_rounds.js: _stripLeadingSets, reps'
+GATE-READS g191_pacedelta.js: reps'
+GATE-READS g196_ledger.js: reps'
+GATE-READS g205_chi_table6.js: reps'
+GATE-READS g205_pace_eve.js: legRecoveryNote
+GATE-READS g208_d104a_runbase.js: legRecoveryNote
+SAB-READS v190.json: _dispDetail, _stripLeadingSets
+SAB-READS v196.json: reps'
+SAB-READS v208_d104a.json: legRecoveryNote
+
+=== HALF_MANNY
+HALF_MANNY HEAD digest 0ac7da6b1691a8e1 self-equal true | table[219] 0ac7da6b1691a8e1 | table[207] 0ac7da6b1691a8e1 | rulings record 0ac7da6b1691a8e1 -> true
+MANNY table versions: 198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219
+######## rb_run_recov.out  (HEAD 920fa0a ia-version 219; V206/V207/V209 from git tags)
+builds 2970 crash 0 banner shown 2190 (73.7%)
+Mario text (leg tier1 + region spaced): 18 / 2970
+shown notes with em-dash: 90 / 2190  with spaced hyphen: 36 / 2190
+NSW test               n  810 shown  810 crash 0 {"D36nrc":810}
+goal:pace              n  270 shown  270 crash 0 {"D36nrc":270}
+focus:balanced         n  990 shown  690 crash 0 {"D36nrc":630,"D36base":60,"none":300}
+rest:sun/wed           n  594 shown  438 crash 0 {"D36nrc":378,"D36base":42,"none":156,"leg1+regOK":18}
+rest:sat/sun           n  594 shown  438 crash 0 {"D36nrc":378,"D36base":42,"none":156,"leg2+regOK":18}
+rest:mon/thu/sun       n  594 shown  438 crash 0 {"D36nrc":378,"D36base":42,"none":156,"leg3":18}
+rest:sun               n  594 shown  438 crash 0 {"D36nrc":378,"D36base":42,"none":156,"leg1":18}
+rest:wed/sat/sun       n  594 shown  438 crash 0 {"D36nrc":378,"D36base":42,"none":156,"leg3":18}
+focus:strength         n  990 shown  690 crash 0 {"D36nrc":630,"D36base":60,"none":300}
+focus:support_prevention n  990 shown  810 crash 0 {"D36nrc":630,"D36base":90,"leg1+regOK":18,"leg2+regOK":18,"leg3":36,"leg1":18,"none":180}
+goal:mile              n  270 shown  270 crash 0 {"D36nrc":270}
+goal:u10               n  270 shown  270 crash 0 {"D36nrc":270}
+run_base               n  270 shown  210 crash 0 {"D36base":210,"none":60}
+goal:base              n  270 shown  210 crash 0 {"D36base":210,"none":60}
+NRC race               n 1080 shown 1080 crash 0 {"D36nrc":1080}
+goal:5k                n  270 shown  270 crash 0 {"D36nrc":270}
+goal:10k               n  270 shown  270 crash 0 {"D36nrc":270}
+goal:half              n  270 shown  270 crash 0 {"D36nrc":270}
+goal:mara              n  270 shown  270 crash 0 {"D36nrc":270}
+bike/swim              n  540 shown   90 crash 0 {"none":450,"leg1+regOK":18,"leg2+regOK":18,"leg3":36,"leg1":18}
+goal:bike              n  270 shown   90 crash 0 {"none":180,"leg1+regOK":18,"leg2+regOK":18,"leg3":36,"leg1":18}
+goal:swim              n  270 shown    0 crash 0 {"none":270}
+lift-only              n  270 shown    0 crash 0 {"none":270}
+goal:lift              n  270 shown    0 crash 0 {"none":270}
+placement phrases found elsewhere in built program (builds containing): {}
+HALF_MANNY legRecoveryNote: "Your hinge day rides a speed session so hard days stay hard. Nothing heavy lands the day before your long run."
+EXIT 0
+######## rb_run_popv.out  (HEAD 920fa0a ia-version 219; V206/V207/V209 from git tags)
+ia-version 219
+raceAlignment {"tw":14,"raceIso":"2026-12-06","raceDay":"sun","raceMon":"2026-11-30","start":"2026-08-31","weeksOut":18,"openWeek":1,"floor":6,"underFloor":false,"futureWeeks":5,"behindWeeks":0}
+startDate 2026-08-31 totalWeeks 14 raceDate 2026-12-06
+non-rest by weekday (all): {"mon":14,"tue":14,"thu":14,"fri":13,"sat":14,"sun":1}
+non-rest by weekday (on/after startDate): {"mon":14,"tue":14,"thu":14,"fri":13,"sat":14,"sun":1}
+sunday entries: [[14,"2026-12-06","Race Day | Long Run — RACE DAY"]]
+last dated non-rest day: [14,"2026-12-06","sun","Race Day | Long Run — RACE DAY"] == raceDate? true
+engine finalScheduledDay: 14 sun Sun Dec 06 2026 00:00:00 GMT-0800 (Pacific Standard Time)
+engine scheduledDays n 70 by weekday {"mon":14,"tue":14,"thu":14,"fri":13,"sat":14,"sun":1}
+popContext() at Sun 2026-09-06 10:00 (marking any day, e.g. wk1 sat): {"weekend":true,"morning":false}
+wk1 sat is final day? false
+EXIT 0
+######## rb_run_popc.out  (HEAD 920fa0a ia-version 219; V206/V207/V209 from git tags)
+artifact index.html ia-version 219
+popBlock(a0effa9 V50) === popBlock(artifact): true | lens 6317 6317
+
+LATTICE workout: 134400 fires (7 dow x 24 h x 2 modes x 400), non-workout kicker 0
+
+PER-ENTRY TABLE (workout pool; window = cells where the real dispatcher produced it)
+idx | tag | text[0:40] | intended (record) | actual window marking today | same, marking yesterday | cells today/168 | mismatch | text implies
+0 | - | "Congrats... you actually showed up. Just" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+1 | weekend | "Hangover said stay down. You told it to " | handoff :322 + a0effa9 comment: Sat/Sun | sun sat | sun sat | 48 | ok | time:Hangover
+2 | - | "Look at you — vertical, sweaty, and usef" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+3 | morning | "Another one done while half the city's s" | handoff :322 + a0effa9 comment: before 9am | sun[0-8h] mon[0-8h] tue[0-8h] wed[0-8h] thu[0-8h] fri[0-8h] sat[0-8h] | sun[0-8h] mon[0-8h] tue[0-8h] wed[0-8h] thu[0-8h] fri[0-8h] sat[0-8h] | 63 | ok | time:asleep
+4 | - | "Go ahead, keep flexing in the mirror... " | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok |  type:flex
+5 | - | "Ayoooo, your mom's third husband couldn'" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+6 | - | "You showed up. The bums in the group cha" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+7 | - | "Sweat now or be wheezing on the way up t" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+8 | weekend | "Cardio's done. You earned the right to t" | handoff :322 + a0effa9 comment: Sat/Sun | sun sat | sun sat | 48 | ok | time:brunch type:Cardio
+9 | - | "One more session toward not dropping dea" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+10 | - | "Well, look who decided not to be useless" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+11 | - | "Sweaty, gross, and one step less gordito" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+12 | - | "You vs. the couch: couch lost again. Fuc" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | time:late
+13 | - | "Knocked it out while your excuses were s" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+14 | - | "Body's pissed, you did it anyway. That's" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+15 | - | "Showed up hungover, didn't die. Take you" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | time:hungover
+16 | - | "Done. Go shower... please. 🚿🤢" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+17 | - | "One more W! Stack 'em up. 🏙️📚" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+18 | - | "Quit looking for a medal — it's under yo" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | time:late
+19 | - | "You suffered on purpose. Stay safe, take" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | time:late
+20 | - | "Deadass, I've seen people move faster ch" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+21 | - | "Diantreeeeeee, you actually activated to" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+22 | - | "Abusador! You murdered that session. Go " | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+23 | - | "Ay, I don't care what literally everybod" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+24 | - | "You burned enough calories to justify on" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok | 
+25 | - | "You did the whole thing — looked dead ug" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok |  type:last set
+26 | - | "Por favor! Twenty minutes finding the ri" | no recorded intent (untagged) | sun mon tue wed thu fri sat | sun mon tue wed thu fri sat | 168 | ok |  type:lifting
+entries whose window differs between marking today and marking yesterday: 0 / 27
+freq sat 10:30 n=20000 eligible=26 hungover=687 hangover=763 asleep=0
+freq sun 10:30 n=20000 eligible=26 hungover=728 hangover=787 asleep=0
+freq mon 10:30 n=20000 eligible=24 hungover=866 hangover=0 asleep=0
+freq mon 7:30 n=20000 eligible=25 hungover=781 hangover=0 asleep=781
+freq wed 20:30 n=20000 eligible=24 hungover=847 hangover=0 asleep=0
+rotation Wed 12:30, 50000 draws: back-to-back repeats 0 | distinct 24 | min 2002 max 2166
+stale weekend idx in ia_pop_idx_, weekday draw x2000: all returned text = true
+
+TEXT IMPLIES A CONDITION (all pools + dismiss):
+  workout[1] tag=weekend implies=Hangover :: Hangover said stay down. You told it to go fuck itself. Resp
+  workout[3] tag=morning implies=asleep :: Another one done while half the city's still asleep. 🛏️😭
+  workout[4] tag=none implies= type:flex :: Go ahead, keep flexing in the mirror... THEY see it too. 🪞
+  workout[8] tag=weekend implies=brunch type:Cardio :: Cardio's done. You earned the right to talk all the shit you
+  workout[12] tag=none implies=late :: You vs. the couch: couch lost again. Fuck that couch... or s
+  workout[15] tag=none implies=hungover :: Showed up hungover, didn't die. Take your victory shower. 🍻
+  workout[18] tag=none implies=late :: Quit looking for a medal — it's under your tetas, find it la
+  workout[19] tag=none implies=late :: You suffered on purpose. Stay safe, take a shot later. 😈
+  workout[25] tag=none implies= type:last set :: You did the whole thing — looked dead ugly on that last set,
+  workout[26] tag=none implies= type:lifting :: Por favor! Twenty minutes finding the right playlist, ten mi
+tag census {"workout:none":24,"workout:weekend":2,"workout:morning":1,"reminder:none":5,"streak:none":5,"season:none":9}
+
+STREAK: scheduled days 70, final 14/sun
+streak popup fired at n = [3,7,14,30,60] | record 3/7/14/30/+30 within range = [3,7,14,30,60] | distinct streak lines seen 4 / 5
+streak 3 re-fired on 5 repeated completion calls: 5 /5
+SEASON kickers [first, repeat, after release, all-skipped-but-final, final logged next day, penultimate]: ["SEASON COMPLETE","WORKOUT COMPLETE","SEASON COMPLETE","SEASON COMPLETE","SEASON COMPLETE","WORKOUT COMPLETE"]
+distinct season lines over 400 fires: 9 / 9
+REMINDER fresh day+1(tue): sub="Monday, Wk 1 · Strength Support" msg="This one got away from you. Ma"
+REMINDER fresh day+3(thu): sub="Tuesday, Wk 1 · Leg Strength + Mobility" msg="This one got away from you. Ma"
+REMINDER fresh day+8(tue): sub="Monday, Wk 2 · Strength Support" msg="This one got away from you. Ma"
+REMINDER fresh day+15(tue): sub="Monday, Wk 3 · Strength Support" msg="More than a week off. Mark wha"
+REMINDER daily sequence (2 boots/day): ["mon->Saturday, Wk 2 · Full Body Support","tue->Monday, Wk 3 · Strength Support","wed->Tuesday, Wk 3 · Leg Strength + Mobility","thu->Friday, Wk 2 · Recovery Lift","fri->Thursday, Wk 3 · Posterior Chain","sat->Friday, Wk 3 · Recovery Lift","sun->Saturday, Wk 3 · Full Body Support","mon->Thursday, Wk 2 · Posterior Chain","tue->Monday, Wk 4 · Strength Support","wed->Tuesday, Wk 4 · Leg Strength + Mobility"]
+WILDCARD kicker "WILDCARD DONE" msg "You showed up. That is the whole game."
+popPick tier requests during streak/season/reminder/wildcard section: {"workout":66,"streak":10,"season":404}
+DISMISS 365 days x 4 fires: held all day=true, same as yesterday=0/364, reachable=7/7
+selector reach streak: 5/5 over 3000 draws
+selector reach season: 9/9 over 3000 draws
+selector reach reminder: 5/5 over 3000 draws
+popFire caller tier=workout jsline=10204 fixedMsg=true
+popFire caller tier=workout jsline=14324 fixedMsg=true
+popFire caller tier=workout jsline=14349 fixedMsg=true
+popFire caller tier=workout jsline=14360 fixedMsg=true
+popFire caller tier=workout jsline=14368 fixedMsg=true
+popFire caller tier=workout jsline=16564 fixedMsg=false
+popFire caller tier=streak jsline=16576 fixedMsg=false
+popFire caller tier=season jsline=16589 fixedMsg=false
+popFire caller tier=reminder jsline=16639 fixedMsg=true
+working-tree index.html ia-version 219: pop region identical to artifact = true (len 16742)
+  wildcard popup region identical = true
+
+DONE
+EXIT 0
+######## rb_run_emojiH.out  (HEAD 920fa0a ia-version 219; V206/V207/V209 from git tags)
+FILE index.html  ia-version 219
+DENOM lines 17961  literal tokens 11447 {"literals":11447,"jsStr":10266,"jsTpl":719,"jsRe":372,"css":72,"html":18,"codeTokens":17141}  comment chars stripped 451333
+TOTALS by class {"C":1161,"B":104,"A":170,"A2":14}
+A by encoding {"literal":162,"js-escape":8}
+A by disposition {"LOOKUP KEY (asyIcon map, not displayed)":27,"via asyIcon -> SVG":64,"WIZARD seed banner raw":2,"WEEK VIEW recovery-spacing banner raw":1,"DAY CARD log-nudge raw (innerHTML)":1,"POP-UP raw (textContent)":68,"POP-UP msg pool (DEAD: only caller passes msg)":5,"POP-UP stat label via asyIcon (innerHTML) -> SVG":1,"POP-UP raw (static default, overwritten each fire)":1}
+A2 by disposition {"LOOKUP KEY (asyIcon map, not displayed)":5,"via asyIcon -> SVG":8,"PROGRESS program chip raw":1}
+A by token {"str":167,"tpl":2,"html":1}
+ASY_ICON_PATHS @1204 (51): trash medal growth barbell lightbulb brain scale warning siren kettlebell flagFinish lock notebook calculator home dumbbell chart user play pause check plus minus x chevronRight chevronLeft chevronDown clock flame trophy bell arrowRight more target zap calendar history sliders skip run bike swim shield sprout flag dice backpack pencil copy bandage swap
+ASY_EMOJI @1205 (32): 🏅>medal 🏆>trophy 💪>growth 🏋>barbell 🦾>dumbbell ⚡>zap 🔥>flame ⚖>scale 🛡>shield 🌱>sprout 🧠>brain 💡>lightbulb 🏠>home 🎒>backpack 🤸>kettlebell 👤>user 🎯>target 🏁>flagFinish 🔒>lock ⚠>warning 🚨>siren ✅>check 📓>notebook 🧮>calculator 🏃>run 🚴>bike 🏊>swim 📅>calendar 📈>chart 📊>chart 🎲>dice ⏱>clock
+
+=== CLASS A (170) ===
+1205	🏅	U+1F3C5	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏅
+1205	🏆	U+1F3C6	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏆
+1205	💪	U+1F4AA	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 💪
+1205	🦾	U+1F9BE	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🦾
+1205	⚡	U+26A1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⚡
+1205	🔥	U+1F525	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🔥
+1205	🌱	U+1F331	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🌱
+1205	🧠	U+1F9E0	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🧠
+1205	💡	U+1F4A1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 💡
+1205	🏠	U+1F3E0	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏠
+1205	🎒	U+1F392	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🎒
+1205	🤸	U+1F938	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🤸
+1205	👤	U+1F464	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 👤
+1205	🎯	U+1F3AF	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🎯
+1205	🏁	U+1F3C1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏁
+1205	🔒	U+1F512	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🔒
+1205	🚨	U+1F6A8	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🚨
+1205	✅	U+2705	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ✅
+1205	📓	U+1F4D3	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📓
+1205	🧮	U+1F9EE	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🧮
+1205	🏃	U+1F3C3	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏃
+1205	🚴	U+1F6B4	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🚴
+1205	🏊	U+1F3CA	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏊
+1205	📅	U+1F4C5	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📅
+1205	📈	U+1F4C8	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📈
+1205	📊	U+1F4CA	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📊
+1205	🎲	U+1F3B2	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🎲
+2111	🏋️	U+1F3CB	str	literal	body				via asyIcon -> SVG	| 🏋️
+2112	💪	U+1F4AA	str	literal	body				via asyIcon -> SVG	| 💪
+2113	🔥	U+1F525	str	literal	body				via asyIcon -> SVG	| 🔥
+2114	⚖️	U+2696	str	literal	body				via asyIcon -> SVG	| ⚖️
+2117	🦾	U+1F9BE	str	literal	event				via asyIcon -> SVG	| 🦾
+2118	⚡	U+26A1	str	literal	event				via asyIcon -> SVG	| ⚡
+2119	🛡️	U+1F6E1	str	literal	event				via asyIcon -> SVG	| 🛡️
+2361	🚨	U+1F6A8	str	literal	distLabel	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🚨
+2393	🎯	U+1F3AF	str	literal	pace	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🎯
+2413	🎯	U+1F3AF	str	literal	pace	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🎯
+2472	🚨	U+1F6A8	str	literal	paceCeilingOfferHTML	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🚨
+2523	🏃	U+1F3C3	str	literal	sportIcon				via asyIcon -> SVG	| 🏃
+2523	🚴	U+1F6B4	str	literal	sportIcon				via asyIcon -> SVG	| 🚴
+2523	🏊	U+1F3CA	str	literal	sportIcon				via asyIcon -> SVG	| 🏊
+2627	📈	U+1F4C8	tpl	js-escape	s				WIZARD seed banner raw	| ze:11px;color:var(--muted);margin:2px 0 8px">📈 Estimated from “
+2632	📈	U+1F4C8	tpl	js-escape	distLine				WIZARD seed banner raw	| percase;color:var(--text);margin-bottom:4px">📈 Seed from “
+2680	🏅	U+1F3C5	str	literal	t				via asyIcon -> SVG	| 🏅
+2681	💪	U+1F4AA	str	literal	t				via asyIcon -> SVG	| 💪
+2682	⚡	U+26A1	str	literal	t				via asyIcon -> SVG	| ⚡
+2705	🌱	U+1F331	str	literal	ageHints				via asyIcon -> SVG	| 🌱
+2706	💪	U+1F4AA	str	literal	ageHints				via asyIcon -> SVG	| 💪
+2707	🔥	U+1F525	str	literal	ageHints				via asyIcon -> SVG	| 🔥
+2715	⚡	U+26A1	str	literal	ageHints				via asyIcon -> SVG	| ⚡
+2715	💡	U+1F4A1	str	literal	ageHints				via asyIcon -> SVG	| 💡
+2715	🧠	U+1F9E0	str	literal	ageHints				via asyIcon -> SVG	| 🧠
+2736	🏠	U+1F3E0	str	literal	ageHints				via asyIcon -> SVG	| 🏠
+2737	🏠	U+1F3E0	str	literal	ageHints				via asyIcon -> SVG	| 🏠
+2738	🏋️	U+1F3CB	str	literal	ageHints				via asyIcon -> SVG	| 🏋️
+2739	🤸	U+1F938	str	literal	ageHints				via asyIcon -> SVG	| 🤸
+2740	👤	U+1F464	str	literal	ageHints				via asyIcon -> SVG	| 👤
+2749	🏃	U+1F3C3	str	literal	sportIcons				via asyIcon -> SVG	| 🏃
+2749	🚴	U+1F6B4	str	literal	sportIcons				via asyIcon -> SVG	| 🚴
+2749	🏊	U+1F3CA	str	literal	sportIcons				via asyIcon -> SVG	| 🏊
+2817	🎯	U+1F3AF	str	literal	g	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🎯
+2859	🎯	U+1F3AF	str	literal	g	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🎯
+2955	🏃	U+1F3C3	str	literal	icons				via asyIcon -> SVG	| 🏃
+2955	🚴	U+1F6B4	str	literal	icons				via asyIcon -> SVG	| 🚴
+2955	🏊	U+1F3CA	str	literal	icons				via asyIcon -> SVG	| 🏊
+2991	🔒	U+1F512	str	literal	_floorBanner	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🔒
+3012	🔒	U+1F512	str	literal	opacity	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🔒
+3022	🏃	U+1F3C3	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏃
+3022	🚴	U+1F6B4	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🚴
+3022	🏊	U+1F3CA	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏊
+11339	✅	U+2705	str	literal	labelCls	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| ✅
+11875	🏁	U+1F3C1	str	literal	_rl	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🏁
+11875	🏁	U+1F3C1	str	literal	_rl	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🏁
+12071	♻️	U+267B	str	js-escape	leg				WEEK VIEW recovery-spacing banner raw	| ize:12px;color:var(--muted);line-height:1.5">♻️ <b style="color:var(--text)">Rec
+13950	📋	U+1F4CB	str	js-escape	_hasLog				DAY CARD log-nudge raw (innerHTML)	| <div class="log-nudge">📋 You logged this one but never ma
+15002	🏃	U+1F3C3	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏃
+15002	🚴	U+1F6B4	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🚴
+15002	🏊	U+1F3CA	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏊
+15524	🛡️	U+1F6E1	str	js-escape	lbl			popFire	POP-UP raw (textContent)	| 🛡️
+15549	🛡️	U+1F6E1	str	js-escape	_n			popFire	POP-UP raw (textContent)	| 🛡️
+15560	🛡️	U+1F6E1	str	js-escape	ov			popFire	POP-UP raw (textContent)	| 🛡️
+15568	⚠️	U+26A0	str	js-escape	ov			popFire	POP-UP raw (textContent)	| ⚠️
+16415	🏃	U+1F3C3	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16458	🏃	U+1F3C3	str	literal	gap	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16501	🏃	U+1F3C3	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16506	🏃	U+1F3C3	str	literal	need	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16564	🏁	U+1F3C1	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏁
+16609	🏃	U+1F3C3	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16780	🏃	U+1F3C3	str	literal	headHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16820	🏃	U+1F3C3	str	literal	headHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+17192	📊	U+1F4CA	str	literal	hasAnyData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 📊
+17219	🏃	U+1F3C3	str	literal	runData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+17244	🏃	U+1F3C3	str	literal	rpData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+17255	🏊	U+1F3CA	str	literal	swimData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏊
+17261	🚴	U+1F6B4	str	literal	bikeData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🚴
+17268	💡	U+1F4A1	str	literal	rpeData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 💡
+17333	📓	U+1F4D3	str	literal	n	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 📓
+17343	🧮	U+1F9EE	str	literal	estimatorHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🧮
+17356	📊	U+1F4CA	str	literal	estimatorHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 📊
+17554	🎉	U+1F389	str	literal	workout				POP-UP raw (textContent)	| howed up. Just, you know — faster next time. 🎉
+17555	🍺	U+1F37A	str	literal	workout				POP-UP raw (textContent)	| own. You told it to go fuck itself. Respect. 🍺🪦
+17555	🪦	U+1FAA6	str	literal	workout				POP-UP raw (textContent)	| n. You told it to go fuck itself. Respect. 🍺🪦
+17556	🫡	U+1FAE1	str	literal	workout				POP-UP raw (textContent)	| rtical, sweaty, and useful. Goddamn miracle. 🫡
+17557	🛏️	U+1F6CF	str	literal	workout				POP-UP raw (textContent)	| one done while half the city's still asleep. 🛏️😭
+17557	😭	U+1F62D	str	literal	workout				POP-UP raw (textContent)	|  done while half the city's still asleep. 🛏️😭
+17558	🪞	U+1FA9E	str	literal	workout				POP-UP raw (textContent)	| ep flexing in the mirror... THEY see it too. 🪞
+17559	💪	U+1F4AA	str	literal	workout				POP-UP raw (textContent)	| usband couldn't have done what you just did. 💪
+17560	🔥	U+1F525	str	literal	workout				POP-UP raw (textContent)	|  The bums in the group chat didn't. You lit! 🔥
+17561	🚶	U+1F6B6	str	literal	workout				POP-UP raw (textContent)	| ezing on the way up to your 8-story walk-up. 🚶😤
+17561	😤	U+1F624	str	literal	workout				POP-UP raw (textContent)	| ing on the way up to your 8-story walk-up. 🚶😤
+17562	🥂	U+1F942	str	literal	workout				POP-UP raw (textContent)	| ght to talk all the shit you want at brunch. 🥂
+17563	⚰️	U+26B0	str	literal	workout				POP-UP raw (textContent)	| d not dropping dead at 50... You're welcome. ⚰️❌
+17563	❌	U+274C	str	literal	workout				POP-UP raw (textContent)	| not dropping dead at 50... You're welcome. ⚰️❌
+17564	🛋️	U+1F6CB	str	literal	workout				POP-UP raw (textContent)	| l, look who decided not to be useless today. 🛋️🔥
+17564	🔥	U+1F525	str	literal	workout				POP-UP raw (textContent)	| look who decided not to be useless today. 🛋️🔥
+17565	📈	U+1F4C8	str	literal	workout				POP-UP raw (textContent)	| ss, and one step less gordito. Growth, baby. 📈
+17566	🛋️	U+1F6CB	str	literal	workout				POP-UP raw (textContent)	| gain. Fuck that couch... or sit on it later. 🛋️💀
+17566	💀	U+1F480	str	literal	workout				POP-UP raw (textContent)	| n. Fuck that couch... or sit on it later. 🛋️💀
+17567	⏳	U+23F3	str	literal	workout				POP-UP raw (textContent)	| t out while your excuses were still loading. ⏳🖕
+17567	🖕	U+1F595	str	literal	workout				POP-UP raw (textContent)	|  out while your excuses were still loading. ⏳🖕
+17568	😤	U+1F624	str	literal	workout				POP-UP raw (textContent)	|  did it anyway. That's the whole damn point. 😤
+17569	🍻	U+1F37B	str	literal	workout				POP-UP raw (textContent)	| gover, didn't die. Take your victory shower. 🍻💪
+17569	💪	U+1F4AA	str	literal	workout				POP-UP raw (textContent)	| ver, didn't die. Take your victory shower. 🍻💪
+17570	🚿	U+1F6BF	str	literal	workout				POP-UP raw (textContent)	| Done. Go shower... please. 🚿🤢
+17570	🤢	U+1F922	str	literal	workout				POP-UP raw (textContent)	| Done. Go shower... please. 🚿🤢
+17571	🏙️	U+1F3D9	str	literal	workout				POP-UP raw (textContent)	| One more W! Stack 'em up. 🏙️📚
+17571	📚	U+1F4DA	str	literal	workout				POP-UP raw (textContent)	| One more W! Stack 'em up. 🏙️📚
+17572	🥇	U+1F947	str	literal	workout				POP-UP raw (textContent)	| edal — it's under your tetas, find it later. 🥇
+17573	😈	U+1F608	str	literal	workout				POP-UP raw (textContent)	| ed on purpose. Stay safe, take a shot later. 😈
+17574	🏃	U+1F3C3	str	literal	workout				POP-UP raw (textContent)	| ter chasing their ex... but good job anyway. 🏃
+17575	👀	U+1F440	str	literal	workout				POP-UP raw (textContent)	|  actually activated today. Who inspired you? 👀
+17576	💦	U+1F4A6	str	literal	workout				POP-UP raw (textContent)	| ou murdered that session. Go get some water! 💦
+17577	🐕	U+1F415	str	literal	workout				POP-UP raw (textContent)	|  everybody says... you got that dawg in you! 🐕
+17578	🥟	U+1F95F	str	literal	workout				POP-UP raw (textContent)	| lories to justify one pastelito... just one. 🥟
+17579	💀	U+1F480	str	literal	workout				POP-UP raw (textContent)	| ead ugly on that last set, but you finished. 💀
+17580	🎧	U+1F3A7	str	literal	workout				POP-UP raw (textContent)	| utes lifting. But okay — "workout complete." 🎧
+17583	👀	U+1F440	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	|  ghosted a session. Mark it or own the skip. 👀
+17584	👇	U+1F447	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	|  day hanging unmarked. Did you train or nah? 👇
+17585	🧾	U+1F9FE	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	| usiness sitting on your calendar. Settle up. 🧾
+17586	✍️	U+270D	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	| t log itself, champ. Complete it or call it. ✍️
+17587	📋	U+1F4CB	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	|  a workout. Your record, your call — fix it. 📋
+17590	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	|  break this now, you've got something going. 🔥
+17591	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	|  Most people fold by now like wet cardboard. 🔥💀
+17591	💀	U+1F480	str	literal	streak				POP-UP raw (textContent)	| ost people fold by now like wet cardboard. 🔥💀
+17592	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| cy. Who replaced you with someone competent? 🔥
+17593	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| nd so are you. Keep it that way, you maniac. 🔥
+17594	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| ng it now would be a crime against yourself. 🔥🚔
+17594	🚔	U+1F694	str	literal	streak				POP-UP raw (textContent)	|  it now would be a crime against yourself. 🔥🚔
+17597	🏆	U+1F3C6	str	literal	season				POP-UP raw (textContent)	| nd what'd you do with the lazy prick I knew. 🏆
+17598	💪	U+1F4AA	str	literal	season				POP-UP raw (textContent)	| n step and STILL pulled it off. Legend shit. 💪
+17599	🗽	U+1F5FD	str	literal	season				POP-UP raw (textContent)	| ets are proud. Your knees filed a complaint. 🗽🦴
+17599	🦴	U+1F9B4	str	literal	season				POP-UP raw (textContent)	| s are proud. Your knees filed a complaint. 🗽🦴
+17600	🐔	U+1F414	str	literal	season				POP-UP raw (textContent)	| — most quit at week two like little bitches. 🐔
+17601	🔥	U+1F525	str	literal	season				POP-UP raw (textContent)	| ses, no crying. Go be insufferable about it. 🔥
+17602	🧾	U+1F9FE	str	literal	season				POP-UP raw (textContent)	| arned its keep instead of robbing you blind. 🧾😮‍💨
+17602	😮‍💨	U+1F62E	str	literal	season				POP-UP raw (textContent)	| ned its keep instead of robbing you blind. 🧾😮‍💨
+17603	🏆	U+1F3C6	str	literal	season				POP-UP raw (textContent)	|  halfway like a coward. I'm fuckin' shocked. 🏆
+17604	🧠	U+1F9E0	str	literal	season				POP-UP raw (textContent)	| cuse your brain coughed up. Respect, animal. 🧠❌
+17604	❌	U+274C	str	literal	season				POP-UP raw (textContent)	| se your brain coughed up. Respect, animal. 🧠❌
+17605	💪	U+1F4AA	str	literal	season				POP-UP raw (textContent)	| iss themselves at and bail. Built different. 💪
+17609	🎉	U+1F389	str	literal	workout				POP-UP raw (textContent)	| 🎉
+17610	👀	U+1F440	str	literal	reminder				POP-UP raw (textContent)	| 👀
+17611	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| 🔥
+17612	🏆	U+1F3C6	str	literal	season				POP-UP raw (textContent)	| 🏆
+17619	😒	U+1F612	str	literal	POP_DISMISS				POP-UP raw (textContent)	| good looks 😒
+17623	🫳	U+1FAF3	str	literal	POP_DISMISS				POP-UP raw (textContent)	| save it 🫳
+17700	🏆	U+1F3C6	str	literal	p			textContent	POP-UP raw (textContent)	| 🏆
+17765	🔥	U+1F525	str	literal	fireWorkoutPopup	VIA_ASYICON		asyIcon	POP-UP stat label via asyIcon (innerHTML) -> SVG	| 🔥
+17777	🔥	U+1F525	str	literal	fireStreakPopup				POP-UP raw (textContent)	| -DAY STREAK 🔥
+17948	🎉	U+1F389	html	literal	remote				POP-UP raw (static default, overwritten each fire)	| ()"> <span class="pop-icon" id="popIcon">🎉</span> <div class="pop-kicke
+
+=== CLASS A2 (14) ===
+1205	🏋	U+1F3CB	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏋
+1205	⚖	U+2696	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⚖
+1205	🛡	U+1F6E1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🛡
+1205	⚠	U+26A0	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⚠
+1205	⏱	U+23F1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⏱
+2287	⚠	U+26A0	str	literal	recommended	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| ⚠
+2294	⚠	U+26A0	str	literal	_tg1	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| ⚠
+2535	⏱	U+23F1	str	literal	fix			asyIcon	via asyIcon -> SVG	| ⏱
+2589	⚠	U+26A0	str	literal	minDays	VIA_ASYICON		showToast,asyIcon	via asyIcon -> SVG	| ⚠
+16091	🗄	U+1F5C4	str	js-escape	label				PROGRESS program chip raw	| 🗄 
+16660	🏋	U+1F3CB	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+17071	🏋	U+1F3CB	str	literal	noLoad	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+17092	🏋	U+1F3CB	str	literal	head	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+17110	🏋	U+1F3CB	str	literal	lo	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+
+=== CLASS B (104) ===
+926	✕	U+2715	html	literal	?				via asyIcon -> SVG	| ="event.stopPropagation();iaDismissUpdate()">✕</span> </div> 
+950	←	U+2190	html	literal	?				via asyIcon -> SVG	| n class="wizard-back" onclick="wizardBack()">← Back</button> <div class="wiz
+955	→	U+2192	html	literal	?				via asyIcon -> SVG	| "wizardNext" onclick="wizardNext()">Continue →</button> </div> 
+1121	←	U+2190	html	literal	?				via asyIcon -> SVG	| ton class="back-btn" onclick="closeRandom()">← Back</button> <div class="ran
+1123	↺	U+21BA	html	literal	?				via asyIcon -> SVG	| card counter" title="Reset wildcard counter">↺ Reset</button> </div> <div cl
+1130	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeRestSheet()">← Back</button> </div> <div cla
+1137	←	U+2190	html	literal	?				via asyIcon -> SVG	| ass="back-btn" onclick="closeOverlaySheet()">← Back</button> </div> <div cla
+1144	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeGoalSheet()">← Back</button> </div> <div cla
+1154	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeMileSheet()">← Back</button> </div> <div cla
+1172	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeMileSheet()">← Back</button> </div> <div cla
+1363	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+1415	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	|  is your rest now ✓
+1432	✓	U+2713	str	js-escape	d			showToast	via asyIcon -> SVG	|  min logged ✓
+1985	✓	U+2713	str	js-escape	f			showToast	via asyIcon -> SVG	|  plan ✓
+2318	✓	U+2713	str	literal	_f				via asyIcon -> SVG	| ✓ Your 
+2325	✓	U+2713	str	literal	_f				via asyIcon -> SVG	| ✓ Perfect timing — your 
+2664	→	U+2192	str	literal	step			textContent	via asyIcon -> SVG	| Generate Program →
+2664	→	U+2192	str	literal	step			textContent	via asyIcon -> SVG	| Continue →
+2744	✓	U+2713	tpl	literal	ageHints				via asyIcon -> SVG	| ">✓</div> </div>
+2783	✓	U+2713	tpl	literal	g				via asyIcon -> SVG	| ">✓</div> </div> 
+2918	✓	U+2713	tpl	literal	g				via asyIcon -> SVG	| ">✓ I have a race date</button> 
+2919	✕	U+2715	tpl	literal	g				via asyIcon -> SVG	| ">✕ Just building fitness</button> 
+2961	✓	U+2713	tpl	literal	sel				via asyIcon -> SVG	| ">✓</div> </div>
+2967	✓	U+2713	tpl	literal	sel				via asyIcon -> SVG	| ">✓</div> </div> </div>
+3012	✕	U+2715	str	literal	opacity			asyIcon	via asyIcon -> SVG	| e="font-size:9px;margin-top:2px;opacity:0.5">✕</div>
+4286	→	U+2192	str	literal	NRC_MARATHON_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 wa
+4286	→	U+2192	str	literal	NRC_MARATHON_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 warm up
+4306	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 0 warm upn4:00 at Recovery Pace ({recovery}) → straight into 1:00 at Mile Pace (
+4306	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| then 1:00 recoveryn3:00 at 10K Pace ({tenK}) → straight into 1:00 at Mile Pace (
+4306	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| then 1:30 recoveryn2:00 at 5K Pace ({fiveK}) → straight into 1:00 at Mile Pace (
+4306	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| hen 2:00 recoveryn1:00 at Mile Pace ({mile}) → straight into 1:00 at Best Pace
+4309	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 5K → 10K → Mile — 13:30 of workn5:00 w
+4309	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 5K → 10K → Mile — 13:30 of workn5:00 warm up
+4311	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 wa
+4311	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 warm up
+4327	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| Go Fast — Mile reps growing 0:30 → 1:30, each chased by 0:15 at Best
+4327	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| workn5:00 warm upn0:30 at Mile Pace ({mile}) → 0:15 at Best Pace — 0:30 recovery
+4327	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 0:30 recoveryn0:45 at Mile Pace ({mile}) → 0:15 at Best Pace — 0:45 recovery
+4327	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 0:45 recoveryn1:00 at Mile Pace ({mile}) → 0:15 at Best Pace — 1:00 recovery
+4327	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 1:00 recoveryn1:15 at Mile Pace ({mile}) → 0:15 at Best Pace — 1:15 recovery
+4327	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 1:15 recoveryn1:30 at Mile Pace ({mile}) → 0:15 at Best PacenRecovery grows 
+4338	→	U+2192	str	literal	NRC_10K_TABLE				via asyIcon -> SVG	| low Down to Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work, 
+4338	→	U+2192	str	literal	NRC_10K_TABLE				via asyIcon -> SVG	| own to Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work, 7 eff
+4338	→	U+2192	str	literal	NRC_10K_TABLE				via asyIcon -> SVG	| Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work, 7 effortsn5:
+11217	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest ex
+11217	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest except at t
+11217	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest except at top
+11217	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest except at top
+11327	✓	U+2713	str	literal	html				via asyIcon -> SVG	| Done Before ✓
+11338	✓	U+2713	tpl	literal	labelCls				via asyIcon -> SVG	| <div class="wildcard-done-block">✓ You've done this one before</div>
+11417	✓	U+2713	str	literal	isTraining			showToast	via asyIcon -> SVG	|  logged ✓
+11431	✓	U+2713	str	literal	rb			showToast	via asyIcon -> SVG	| Wildcard counter reset ✓
+11439	↺	U+21BA	str	literal	el			textContent	via asyIcon -> SVG	| ↺ Reset
+11878	↓	U+2193	str	literal	_rl			textContent	via asyIcon -> SVG	| ↓ Recovery Week
+11921	✦	U+2726	str	js-escape	_r				via asyIcon -> SVG	|  ✦
+11923	●	U+25CF	str	js-escape	_r			textContent	via asyIcon -> SVG	|  ●
+11978	✓	U+2713	str	js-escape	center				via asyIcon -> SVG	| <span class="chk">✓</span>
+12742	✓	U+2713	str	js-escape	html				via asyIcon -> SVG	| ✓
+12862	↺	U+21BA	str	js-escape	rec				via asyIcon -> SVG	| <span class="ex-reuse-ico">↺</span>
+12866	△	U+25B3	str	js-escape	rec				via asyIcon -> SVG	| <div class="ex-stale-warn"><i>△</i><span>That 
+12878	↺	U+21BA	str	js-escape	rec				via asyIcon -> SVG	| <span class="ex-reuse-ico">↺</span>
+13950	✓	U+2713	str	js-escape	_hasLog				DAY CARD log-nudge raw (innerHTML)	| ','complete')">Mark Done ✓</button></div>
+13973	✓	U+2713	str	literal	selectKBSize			showToast	via asyIcon -> SVG	|  bell logged ✓
+14047	✓	U+2713	str	js-escape	top			showToast	via asyIcon -> SVG	|  logged ✓
+14047	✓	U+2713	str	js-escape	top			showToast	via asyIcon -> SVG	| Logged ✓
+14050	✓	U+2713	str	js-escape	_bdg			textContent	via asyIcon -> SVG	| ✓
+14393	✓	U+2713	str	literal	labels				via asyIcon -> SVG	| Done ✓
+14393	✕	U+2715	str	literal	labels				via asyIcon -> SVG	| Skipped ✕ — the week moves on
+14394	✓	U+2713	str	literal	labels			showToast	via asyIcon -> SVG	| Updated ✓
+14406	✕	U+2715	str	js-escape	call				via asyIcon -> SVG	| ">Skipped ✕ <small>tap to undo</small></butto
+14411	✓	U+2713	str	js-escape	call				via asyIcon -> SVG	| Done ✓ <small>tap to undo</small>
+14504	✓	U+2713	str	literal	txt			showToast,clipboard	via asyIcon -> SVG	| Copied ✓
+14504	✓	U+2713	str	literal	txt			showToast,clipboard	via asyIcon -> SVG	| Copied ✓
+14522	✓	U+2713	str	js-escape	programs			showToast	via asyIcon -> SVG	|  ✓
+14550	✓	U+2713	str	literal	programs			showToast	via asyIcon -> SVG	|  ✓
+14550	✓	U+2713	str	literal	programs			showToast	via asyIcon -> SVG	| Start date set ✓ — short first week
+14550	✓	U+2713	str	literal	programs			showToast	via asyIcon -> SVG	| Start date set ✓
+14639	→	U+2192	tpl	literal	scope				via asyIcon -> SVG	| ) → 
+14956	✓	U+2713	str	literal	done			showToast	via asyIcon -> SVG	| Selections copied ✓
+14984	✓	U+2713	str	js-escape	_progActionsHTML				via asyIcon -> SVG	| n" style="opacity:0.4;cursor:default">Active ✓</button>
+15271	✕	U+2715	str	js-escape	_backBtn			innerHTML	via asyIcon -> SVG	| ">✕</div>
+15304	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Change removed ✓
+15429	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+15445	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+15447	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+15462	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+15491	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Protected. Train around it ✓
+15491	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Working around it ✓
+15605	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Change applied ✓
+15878	✓	U+2713	str	literal	nn			showToast	via asyIcon -> SVG	| Renamed ✓
+16481	↑	U+2191	str	literal	cy				via asyIcon -> SVG	| ↑ faster
+16562	→	U+2192	str	literal	foot				via asyIcon -> SVG	| Read off the app’s own pace table: easy pace → mile equivalent → half finish. An
+16562	→	U+2192	str	literal	foot				via asyIcon -> SVG	|  own pace table: easy pace → mile equivalent → half finish. An estimate from tra
+16643	→	U+2192	str	literal	setStr				via asyIcon -> SVG	| )</span> → <b style="color:var(--text)">
+16807	←	U+2190	str	js-escape	s				WIZARD seed banner raw	| ← faster
+16808	→	U+2192	str	js-escape	s				WIZARD seed banner raw	| slower →
+17054	↑	U+2191	str	literal	status				via asyIcon -> SVG	|  · ↑
+17318	→	U+2192	tpl	literal	headMb			asyIcon	via asyIcon -> SVG	|  → 
+17532	✓	U+2713	str	literal	j			showToast,textContent	via asyIcon -> SVG	| Sent ✓ — thanks, I got it.
+17532	✓	U+2713	str	literal	j			showToast,textContent	via asyIcon -> SVG	| Bug sent ✓
+17843	✓	U+2713	str	literal	_remMsg				via asyIcon -> SVG	| ✓ Done
+17844	✕	U+2715	str	literal	_remMsg				via asyIcon -> SVG	| ✕ Skip
+17855	✓	U+2713	str	literal	labels				via asyIcon -> SVG	| Locked in ✓
+17855	✕	U+2715	str	literal	labels				via asyIcon -> SVG	| Skipped ✕ — the week moves on
+
+=== CLASS C by char {"—":491,"×":670}
+EXIT 0
+######## rb_run_emoji209.out  (HEAD 920fa0a ia-version 219; V206/V207/V209 from git tags)
+FILE /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/2ef6b80b-284e-4663-8193-3a4cf2293a53/scratchpad/rb_v209.html  ia-version 209
+DENOM lines 17674  literal tokens 11296 {"literals":11296,"jsStr":10148,"jsTpl":696,"jsRe":362,"css":72,"html":18,"codeTokens":16835}  comment chars stripped 438125
+TOTALS by class {"C":1161,"B":104,"A":170,"A2":14}
+A by encoding {"literal":162,"js-escape":8}
+A by disposition {"LOOKUP KEY (asyIcon map, not displayed)":27,"via asyIcon -> SVG":64,"WIZARD seed banner raw":2,"WEEK VIEW recovery-spacing banner raw":1,"DAY CARD log-nudge raw (innerHTML)":1,"POP-UP raw (textContent)":68,"POP-UP msg pool (DEAD: only caller passes msg)":5,"POP-UP stat label via asyIcon (innerHTML) -> SVG":1,"POP-UP raw (static default, overwritten each fire)":1}
+A2 by disposition {"LOOKUP KEY (asyIcon map, not displayed)":5,"via asyIcon -> SVG":8,"PROGRESS program chip raw":1}
+A by token {"str":167,"tpl":2,"html":1}
+ASY_ICON_PATHS @1204 (51): trash medal growth barbell lightbulb brain scale warning siren kettlebell flagFinish lock notebook calculator home dumbbell chart user play pause check plus minus x chevronRight chevronLeft chevronDown clock flame trophy bell arrowRight more target zap calendar history sliders skip run bike swim shield sprout flag dice backpack pencil copy bandage swap
+ASY_EMOJI @1205 (32): 🏅>medal 🏆>trophy 💪>growth 🏋>barbell 🦾>dumbbell ⚡>zap 🔥>flame ⚖>scale 🛡>shield 🌱>sprout 🧠>brain 💡>lightbulb 🏠>home 🎒>backpack 🤸>kettlebell 👤>user 🎯>target 🏁>flagFinish 🔒>lock ⚠>warning 🚨>siren ✅>check 📓>notebook 🧮>calculator 🏃>run 🚴>bike 🏊>swim 📅>calendar 📈>chart 📊>chart 🎲>dice ⏱>clock
+
+=== CLASS A (170) ===
+1205	🏅	U+1F3C5	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏅
+1205	🏆	U+1F3C6	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏆
+1205	💪	U+1F4AA	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 💪
+1205	🦾	U+1F9BE	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🦾
+1205	⚡	U+26A1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⚡
+1205	🔥	U+1F525	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🔥
+1205	🌱	U+1F331	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🌱
+1205	🧠	U+1F9E0	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🧠
+1205	💡	U+1F4A1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 💡
+1205	🏠	U+1F3E0	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏠
+1205	🎒	U+1F392	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🎒
+1205	🤸	U+1F938	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🤸
+1205	👤	U+1F464	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 👤
+1205	🎯	U+1F3AF	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🎯
+1205	🏁	U+1F3C1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏁
+1205	🔒	U+1F512	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🔒
+1205	🚨	U+1F6A8	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🚨
+1205	✅	U+2705	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ✅
+1205	📓	U+1F4D3	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📓
+1205	🧮	U+1F9EE	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🧮
+1205	🏃	U+1F3C3	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏃
+1205	🚴	U+1F6B4	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🚴
+1205	🏊	U+1F3CA	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏊
+1205	📅	U+1F4C5	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📅
+1205	📈	U+1F4C8	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📈
+1205	📊	U+1F4CA	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📊
+1205	🎲	U+1F3B2	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🎲
+2111	🏋️	U+1F3CB	str	literal	body				via asyIcon -> SVG	| 🏋️
+2112	💪	U+1F4AA	str	literal	body				via asyIcon -> SVG	| 💪
+2113	🔥	U+1F525	str	literal	body				via asyIcon -> SVG	| 🔥
+2114	⚖️	U+2696	str	literal	body				via asyIcon -> SVG	| ⚖️
+2117	🦾	U+1F9BE	str	literal	event				via asyIcon -> SVG	| 🦾
+2118	⚡	U+26A1	str	literal	event				via asyIcon -> SVG	| ⚡
+2119	🛡️	U+1F6E1	str	literal	event				via asyIcon -> SVG	| 🛡️
+2361	🚨	U+1F6A8	str	literal	distLabel	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🚨
+2393	🎯	U+1F3AF	str	literal	pace	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🎯
+2413	🎯	U+1F3AF	str	literal	pace	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🎯
+2472	🚨	U+1F6A8	str	literal	paceCeilingOfferHTML	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🚨
+2523	🏃	U+1F3C3	str	literal	sportIcon				via asyIcon -> SVG	| 🏃
+2523	🚴	U+1F6B4	str	literal	sportIcon				via asyIcon -> SVG	| 🚴
+2523	🏊	U+1F3CA	str	literal	sportIcon				via asyIcon -> SVG	| 🏊
+2627	📈	U+1F4C8	tpl	js-escape	s				WIZARD seed banner raw	| ze:11px;color:var(--muted);margin:2px 0 8px">📈 Estimated from “
+2632	📈	U+1F4C8	tpl	js-escape	distLine				WIZARD seed banner raw	| percase;color:var(--text);margin-bottom:4px">📈 Seed from “
+2680	🏅	U+1F3C5	str	literal	t				via asyIcon -> SVG	| 🏅
+2681	💪	U+1F4AA	str	literal	t				via asyIcon -> SVG	| 💪
+2682	⚡	U+26A1	str	literal	t				via asyIcon -> SVG	| ⚡
+2705	🌱	U+1F331	str	literal	ageHints				via asyIcon -> SVG	| 🌱
+2706	💪	U+1F4AA	str	literal	ageHints				via asyIcon -> SVG	| 💪
+2707	🔥	U+1F525	str	literal	ageHints				via asyIcon -> SVG	| 🔥
+2715	⚡	U+26A1	str	literal	ageHints				via asyIcon -> SVG	| ⚡
+2715	💡	U+1F4A1	str	literal	ageHints				via asyIcon -> SVG	| 💡
+2715	🧠	U+1F9E0	str	literal	ageHints				via asyIcon -> SVG	| 🧠
+2736	🏠	U+1F3E0	str	literal	ageHints				via asyIcon -> SVG	| 🏠
+2737	🏠	U+1F3E0	str	literal	ageHints				via asyIcon -> SVG	| 🏠
+2738	🏋️	U+1F3CB	str	literal	ageHints				via asyIcon -> SVG	| 🏋️
+2739	🤸	U+1F938	str	literal	ageHints				via asyIcon -> SVG	| 🤸
+2740	👤	U+1F464	str	literal	ageHints				via asyIcon -> SVG	| 👤
+2749	🏃	U+1F3C3	str	literal	sportIcons				via asyIcon -> SVG	| 🏃
+2749	🚴	U+1F6B4	str	literal	sportIcons				via asyIcon -> SVG	| 🚴
+2749	🏊	U+1F3CA	str	literal	sportIcons				via asyIcon -> SVG	| 🏊
+2817	🎯	U+1F3AF	str	literal	g	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🎯
+2850	🎯	U+1F3AF	str	literal	g	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🎯
+2946	🏃	U+1F3C3	str	literal	icons				via asyIcon -> SVG	| 🏃
+2946	🚴	U+1F6B4	str	literal	icons				via asyIcon -> SVG	| 🚴
+2946	🏊	U+1F3CA	str	literal	icons				via asyIcon -> SVG	| 🏊
+2982	🔒	U+1F512	str	literal	_floorBanner	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🔒
+3003	🔒	U+1F512	str	literal	opacity	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🔒
+3013	🏃	U+1F3C3	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏃
+3013	🚴	U+1F6B4	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🚴
+3013	🏊	U+1F3CA	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏊
+11067	✅	U+2705	str	literal	labelCls	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| ✅
+11603	🏁	U+1F3C1	str	literal	_rl	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🏁
+11603	🏁	U+1F3C1	str	literal	_rl	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🏁
+11799	♻️	U+267B	str	js-escape	leg				WEEK VIEW recovery-spacing banner raw	| ize:12px;color:var(--muted);line-height:1.5">♻️ <b style="color:var(--text)">Rec
+13678	📋	U+1F4CB	str	js-escape	_hasLog				DAY CARD log-nudge raw (innerHTML)	| <div class="log-nudge">📋 You logged this one but never ma
+14715	🏃	U+1F3C3	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏃
+14715	🚴	U+1F6B4	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🚴
+14715	🏊	U+1F3CA	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏊
+15237	🛡️	U+1F6E1	str	js-escape	lbl			popFire	POP-UP raw (textContent)	| 🛡️
+15262	🛡️	U+1F6E1	str	js-escape	_n			popFire	POP-UP raw (textContent)	| 🛡️
+15273	🛡️	U+1F6E1	str	js-escape	ov			popFire	POP-UP raw (textContent)	| 🛡️
+15281	⚠️	U+26A0	str	js-escape	ov			popFire	POP-UP raw (textContent)	| ⚠️
+16128	🏃	U+1F3C3	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16171	🏃	U+1F3C3	str	literal	gap	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16214	🏃	U+1F3C3	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16219	🏃	U+1F3C3	str	literal	need	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16277	🏁	U+1F3C1	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏁
+16322	🏃	U+1F3C3	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16493	🏃	U+1F3C3	str	literal	headHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16533	🏃	U+1F3C3	str	literal	headHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16905	📊	U+1F4CA	str	literal	hasAnyData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 📊
+16932	🏃	U+1F3C3	str	literal	runData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16957	🏃	U+1F3C3	str	literal	rpData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16968	🏊	U+1F3CA	str	literal	swimData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏊
+16974	🚴	U+1F6B4	str	literal	bikeData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🚴
+16981	💡	U+1F4A1	str	literal	rpeData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 💡
+17046	📓	U+1F4D3	str	literal	n	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 📓
+17056	🧮	U+1F9EE	str	literal	estimatorHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🧮
+17069	📊	U+1F4CA	str	literal	estimatorHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 📊
+17267	🎉	U+1F389	str	literal	workout				POP-UP raw (textContent)	| howed up. Just, you know — faster next time. 🎉
+17268	🍺	U+1F37A	str	literal	workout				POP-UP raw (textContent)	| own. You told it to go fuck itself. Respect. 🍺🪦
+17268	🪦	U+1FAA6	str	literal	workout				POP-UP raw (textContent)	| n. You told it to go fuck itself. Respect. 🍺🪦
+17269	🫡	U+1FAE1	str	literal	workout				POP-UP raw (textContent)	| rtical, sweaty, and useful. Goddamn miracle. 🫡
+17270	🛏️	U+1F6CF	str	literal	workout				POP-UP raw (textContent)	| one done while half the city's still asleep. 🛏️😭
+17270	😭	U+1F62D	str	literal	workout				POP-UP raw (textContent)	|  done while half the city's still asleep. 🛏️😭
+17271	🪞	U+1FA9E	str	literal	workout				POP-UP raw (textContent)	| ep flexing in the mirror... THEY see it too. 🪞
+17272	💪	U+1F4AA	str	literal	workout				POP-UP raw (textContent)	| usband couldn't have done what you just did. 💪
+17273	🔥	U+1F525	str	literal	workout				POP-UP raw (textContent)	|  The bums in the group chat didn't. You lit! 🔥
+17274	🚶	U+1F6B6	str	literal	workout				POP-UP raw (textContent)	| ezing on the way up to your 8-story walk-up. 🚶😤
+17274	😤	U+1F624	str	literal	workout				POP-UP raw (textContent)	| ing on the way up to your 8-story walk-up. 🚶😤
+17275	🥂	U+1F942	str	literal	workout				POP-UP raw (textContent)	| ght to talk all the shit you want at brunch. 🥂
+17276	⚰️	U+26B0	str	literal	workout				POP-UP raw (textContent)	| d not dropping dead at 50... You're welcome. ⚰️❌
+17276	❌	U+274C	str	literal	workout				POP-UP raw (textContent)	| not dropping dead at 50... You're welcome. ⚰️❌
+17277	🛋️	U+1F6CB	str	literal	workout				POP-UP raw (textContent)	| l, look who decided not to be useless today. 🛋️🔥
+17277	🔥	U+1F525	str	literal	workout				POP-UP raw (textContent)	| look who decided not to be useless today. 🛋️🔥
+17278	📈	U+1F4C8	str	literal	workout				POP-UP raw (textContent)	| ss, and one step less gordito. Growth, baby. 📈
+17279	🛋️	U+1F6CB	str	literal	workout				POP-UP raw (textContent)	| gain. Fuck that couch... or sit on it later. 🛋️💀
+17279	💀	U+1F480	str	literal	workout				POP-UP raw (textContent)	| n. Fuck that couch... or sit on it later. 🛋️💀
+17280	⏳	U+23F3	str	literal	workout				POP-UP raw (textContent)	| t out while your excuses were still loading. ⏳🖕
+17280	🖕	U+1F595	str	literal	workout				POP-UP raw (textContent)	|  out while your excuses were still loading. ⏳🖕
+17281	😤	U+1F624	str	literal	workout				POP-UP raw (textContent)	|  did it anyway. That's the whole damn point. 😤
+17282	🍻	U+1F37B	str	literal	workout				POP-UP raw (textContent)	| gover, didn't die. Take your victory shower. 🍻💪
+17282	💪	U+1F4AA	str	literal	workout				POP-UP raw (textContent)	| ver, didn't die. Take your victory shower. 🍻💪
+17283	🚿	U+1F6BF	str	literal	workout				POP-UP raw (textContent)	| Done. Go shower... please. 🚿🤢
+17283	🤢	U+1F922	str	literal	workout				POP-UP raw (textContent)	| Done. Go shower... please. 🚿🤢
+17284	🏙️	U+1F3D9	str	literal	workout				POP-UP raw (textContent)	| One more W! Stack 'em up. 🏙️📚
+17284	📚	U+1F4DA	str	literal	workout				POP-UP raw (textContent)	| One more W! Stack 'em up. 🏙️📚
+17285	🥇	U+1F947	str	literal	workout				POP-UP raw (textContent)	| edal — it's under your tetas, find it later. 🥇
+17286	😈	U+1F608	str	literal	workout				POP-UP raw (textContent)	| ed on purpose. Stay safe, take a shot later. 😈
+17287	🏃	U+1F3C3	str	literal	workout				POP-UP raw (textContent)	| ter chasing their ex... but good job anyway. 🏃
+17288	👀	U+1F440	str	literal	workout				POP-UP raw (textContent)	|  actually activated today. Who inspired you? 👀
+17289	💦	U+1F4A6	str	literal	workout				POP-UP raw (textContent)	| ou murdered that session. Go get some water! 💦
+17290	🐕	U+1F415	str	literal	workout				POP-UP raw (textContent)	|  everybody says... you got that dawg in you! 🐕
+17291	🥟	U+1F95F	str	literal	workout				POP-UP raw (textContent)	| lories to justify one pastelito... just one. 🥟
+17292	💀	U+1F480	str	literal	workout				POP-UP raw (textContent)	| ead ugly on that last set, but you finished. 💀
+17293	🎧	U+1F3A7	str	literal	workout				POP-UP raw (textContent)	| utes lifting. But okay — "workout complete." 🎧
+17296	👀	U+1F440	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	|  ghosted a session. Mark it or own the skip. 👀
+17297	👇	U+1F447	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	|  day hanging unmarked. Did you train or nah? 👇
+17298	🧾	U+1F9FE	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	| usiness sitting on your calendar. Settle up. 🧾
+17299	✍️	U+270D	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	| t log itself, champ. Complete it or call it. ✍️
+17300	📋	U+1F4CB	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	|  a workout. Your record, your call — fix it. 📋
+17303	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	|  break this now, you've got something going. 🔥
+17304	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	|  Most people fold by now like wet cardboard. 🔥💀
+17304	💀	U+1F480	str	literal	streak				POP-UP raw (textContent)	| ost people fold by now like wet cardboard. 🔥💀
+17305	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| cy. Who replaced you with someone competent? 🔥
+17306	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| nd so are you. Keep it that way, you maniac. 🔥
+17307	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| ng it now would be a crime against yourself. 🔥🚔
+17307	🚔	U+1F694	str	literal	streak				POP-UP raw (textContent)	|  it now would be a crime against yourself. 🔥🚔
+17310	🏆	U+1F3C6	str	literal	season				POP-UP raw (textContent)	| nd what'd you do with the lazy prick I knew. 🏆
+17311	💪	U+1F4AA	str	literal	season				POP-UP raw (textContent)	| n step and STILL pulled it off. Legend shit. 💪
+17312	🗽	U+1F5FD	str	literal	season				POP-UP raw (textContent)	| ets are proud. Your knees filed a complaint. 🗽🦴
+17312	🦴	U+1F9B4	str	literal	season				POP-UP raw (textContent)	| s are proud. Your knees filed a complaint. 🗽🦴
+17313	🐔	U+1F414	str	literal	season				POP-UP raw (textContent)	| — most quit at week two like little bitches. 🐔
+17314	🔥	U+1F525	str	literal	season				POP-UP raw (textContent)	| ses, no crying. Go be insufferable about it. 🔥
+17315	🧾	U+1F9FE	str	literal	season				POP-UP raw (textContent)	| arned its keep instead of robbing you blind. 🧾😮‍💨
+17315	😮‍💨	U+1F62E	str	literal	season				POP-UP raw (textContent)	| ned its keep instead of robbing you blind. 🧾😮‍💨
+17316	🏆	U+1F3C6	str	literal	season				POP-UP raw (textContent)	|  halfway like a coward. I'm fuckin' shocked. 🏆
+17317	🧠	U+1F9E0	str	literal	season				POP-UP raw (textContent)	| cuse your brain coughed up. Respect, animal. 🧠❌
+17317	❌	U+274C	str	literal	season				POP-UP raw (textContent)	| se your brain coughed up. Respect, animal. 🧠❌
+17318	💪	U+1F4AA	str	literal	season				POP-UP raw (textContent)	| iss themselves at and bail. Built different. 💪
+17322	🎉	U+1F389	str	literal	workout				POP-UP raw (textContent)	| 🎉
+17323	👀	U+1F440	str	literal	reminder				POP-UP raw (textContent)	| 👀
+17324	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| 🔥
+17325	🏆	U+1F3C6	str	literal	season				POP-UP raw (textContent)	| 🏆
+17332	😒	U+1F612	str	literal	POP_DISMISS				POP-UP raw (textContent)	| good looks 😒
+17336	🫳	U+1FAF3	str	literal	POP_DISMISS				POP-UP raw (textContent)	| save it 🫳
+17413	🏆	U+1F3C6	str	literal	p			textContent	POP-UP raw (textContent)	| 🏆
+17478	🔥	U+1F525	str	literal	fireWorkoutPopup	VIA_ASYICON		asyIcon	POP-UP stat label via asyIcon (innerHTML) -> SVG	| 🔥
+17490	🔥	U+1F525	str	literal	fireStreakPopup				POP-UP raw (textContent)	| -DAY STREAK 🔥
+17661	🎉	U+1F389	html	literal	remote				POP-UP raw (static default, overwritten each fire)	| ()"> <span class="pop-icon" id="popIcon">🎉</span> <div class="pop-kicke
+
+=== CLASS A2 (14) ===
+1205	🏋	U+1F3CB	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏋
+1205	⚖	U+2696	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⚖
+1205	🛡	U+1F6E1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🛡
+1205	⚠	U+26A0	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⚠
+1205	⏱	U+23F1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⏱
+2287	⚠	U+26A0	str	literal	recommended	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| ⚠
+2294	⚠	U+26A0	str	literal	_tg1	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| ⚠
+2535	⏱	U+23F1	str	literal	fix			asyIcon	via asyIcon -> SVG	| ⏱
+2589	⚠	U+26A0	str	literal	minDays	VIA_ASYICON		showToast,asyIcon	via asyIcon -> SVG	| ⚠
+15804	🗄	U+1F5C4	str	js-escape	label				PROGRESS program chip raw	| 🗄 
+16373	🏋	U+1F3CB	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+16784	🏋	U+1F3CB	str	literal	noLoad	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+16805	🏋	U+1F3CB	str	literal	head	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+16823	🏋	U+1F3CB	str	literal	lo	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+
+=== CLASS B (104) ===
+926	✕	U+2715	html	literal	?				via asyIcon -> SVG	| ="event.stopPropagation();iaDismissUpdate()">✕</span> </div> 
+950	←	U+2190	html	literal	?				via asyIcon -> SVG	| n class="wizard-back" onclick="wizardBack()">← Back</button> <div class="wiz
+955	→	U+2192	html	literal	?				via asyIcon -> SVG	| "wizardNext" onclick="wizardNext()">Continue →</button> </div> 
+1121	←	U+2190	html	literal	?				via asyIcon -> SVG	| ton class="back-btn" onclick="closeRandom()">← Back</button> <div class="ran
+1123	↺	U+21BA	html	literal	?				via asyIcon -> SVG	| card counter" title="Reset wildcard counter">↺ Reset</button> </div> <div cl
+1130	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeRestSheet()">← Back</button> </div> <div cla
+1137	←	U+2190	html	literal	?				via asyIcon -> SVG	| ass="back-btn" onclick="closeOverlaySheet()">← Back</button> </div> <div cla
+1144	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeGoalSheet()">← Back</button> </div> <div cla
+1154	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeMileSheet()">← Back</button> </div> <div cla
+1172	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeMileSheet()">← Back</button> </div> <div cla
+1363	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+1415	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	|  is your rest now ✓
+1432	✓	U+2713	str	js-escape	d			showToast	via asyIcon -> SVG	|  min logged ✓
+1985	✓	U+2713	str	js-escape	f			showToast	via asyIcon -> SVG	|  plan ✓
+2318	✓	U+2713	str	literal	_f				via asyIcon -> SVG	| ✓ Your 
+2325	✓	U+2713	str	literal	_f				via asyIcon -> SVG	| ✓ Perfect timing — your 
+2664	→	U+2192	str	literal	step			textContent	via asyIcon -> SVG	| Generate Program →
+2664	→	U+2192	str	literal	step			textContent	via asyIcon -> SVG	| Continue →
+2744	✓	U+2713	tpl	literal	ageHints				via asyIcon -> SVG	| ">✓</div> </div>
+2783	✓	U+2713	tpl	literal	g				via asyIcon -> SVG	| ">✓</div> </div> 
+2909	✓	U+2713	tpl	literal	g				via asyIcon -> SVG	| ">✓ I have a race date</button> 
+2910	✕	U+2715	tpl	literal	g				via asyIcon -> SVG	| ">✕ Just building fitness</button> 
+2952	✓	U+2713	tpl	literal	sel				via asyIcon -> SVG	| ">✓</div> </div>
+2958	✓	U+2713	tpl	literal	sel				via asyIcon -> SVG	| ">✓</div> </div> </div>
+3003	✕	U+2715	str	literal	opacity			asyIcon	via asyIcon -> SVG	| e="font-size:9px;margin-top:2px;opacity:0.5">✕</div>
+4277	→	U+2192	str	literal	NRC_MARATHON_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 wa
+4277	→	U+2192	str	literal	NRC_MARATHON_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 warm up
+4297	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 0 warm upn4:00 at Recovery Pace ({recovery}) → straight into 1:00 at Mile Pace (
+4297	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| then 1:00 recoveryn3:00 at 10K Pace ({tenK}) → straight into 1:00 at Mile Pace (
+4297	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| then 1:30 recoveryn2:00 at 5K Pace ({fiveK}) → straight into 1:00 at Mile Pace (
+4297	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| hen 2:00 recoveryn1:00 at Mile Pace ({mile}) → straight into 1:00 at Best Pace
+4300	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 5K → 10K → Mile — 13:30 of workn5:00 w
+4300	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 5K → 10K → Mile — 13:30 of workn5:00 warm up
+4302	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 wa
+4302	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 warm up
+4318	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| Go Fast — Mile reps growing 0:30 → 1:30, each chased by 0:15 at Best
+4318	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| workn5:00 warm upn0:30 at Mile Pace ({mile}) → 0:15 at Best Pace — 0:30 recovery
+4318	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 0:30 recoveryn0:45 at Mile Pace ({mile}) → 0:15 at Best Pace — 0:45 recovery
+4318	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 0:45 recoveryn1:00 at Mile Pace ({mile}) → 0:15 at Best Pace — 1:00 recovery
+4318	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 1:00 recoveryn1:15 at Mile Pace ({mile}) → 0:15 at Best Pace — 1:15 recovery
+4318	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 1:15 recoveryn1:30 at Mile Pace ({mile}) → 0:15 at Best PacenRecovery grows 
+4329	→	U+2192	str	literal	NRC_10K_TABLE				via asyIcon -> SVG	| low Down to Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work, 
+4329	→	U+2192	str	literal	NRC_10K_TABLE				via asyIcon -> SVG	| own to Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work, 7 eff
+4329	→	U+2192	str	literal	NRC_10K_TABLE				via asyIcon -> SVG	| Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work, 7 effortsn5:
+10945	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest ex
+10945	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest except at t
+10945	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest except at top
+10945	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest except at top
+11055	✓	U+2713	str	literal	html				via asyIcon -> SVG	| Done Before ✓
+11066	✓	U+2713	tpl	literal	labelCls				via asyIcon -> SVG	| <div class="wildcard-done-block">✓ You've done this one before</div>
+11145	✓	U+2713	str	literal	isTraining			showToast	via asyIcon -> SVG	|  logged ✓
+11159	✓	U+2713	str	literal	rb			showToast	via asyIcon -> SVG	| Wildcard counter reset ✓
+11167	↺	U+21BA	str	literal	el			textContent	via asyIcon -> SVG	| ↺ Reset
+11606	↓	U+2193	str	literal	_rl			textContent	via asyIcon -> SVG	| ↓ Recovery Week
+11649	✦	U+2726	str	js-escape	_r				via asyIcon -> SVG	|  ✦
+11651	●	U+25CF	str	js-escape	_r			textContent	via asyIcon -> SVG	|  ●
+11706	✓	U+2713	str	js-escape	center				via asyIcon -> SVG	| <span class="chk">✓</span>
+12470	✓	U+2713	str	js-escape	html				via asyIcon -> SVG	| ✓
+12590	↺	U+21BA	str	js-escape	rec				via asyIcon -> SVG	| <span class="ex-reuse-ico">↺</span>
+12594	△	U+25B3	str	js-escape	rec				via asyIcon -> SVG	| <div class="ex-stale-warn"><i>△</i><span>That 
+12606	↺	U+21BA	str	js-escape	rec				via asyIcon -> SVG	| <span class="ex-reuse-ico">↺</span>
+13678	✓	U+2713	str	js-escape	_hasLog				DAY CARD log-nudge raw (innerHTML)	| ','complete')">Mark Done ✓</button></div>
+13701	✓	U+2713	str	literal	selectKBSize			showToast	via asyIcon -> SVG	|  bell logged ✓
+13775	✓	U+2713	str	js-escape	top			showToast	via asyIcon -> SVG	|  logged ✓
+13775	✓	U+2713	str	js-escape	top			showToast	via asyIcon -> SVG	| Logged ✓
+13778	✓	U+2713	str	js-escape	_bdg			textContent	via asyIcon -> SVG	| ✓
+14121	✓	U+2713	str	literal	labels				via asyIcon -> SVG	| Done ✓
+14121	✕	U+2715	str	literal	labels				via asyIcon -> SVG	| Skipped ✕ — the week moves on
+14122	✓	U+2713	str	literal	labels			showToast	via asyIcon -> SVG	| Updated ✓
+14134	✕	U+2715	str	js-escape	call				via asyIcon -> SVG	| ">Skipped ✕ <small>tap to undo</small></butto
+14139	✓	U+2713	str	js-escape	call				via asyIcon -> SVG	| Done ✓ <small>tap to undo</small>
+14232	✓	U+2713	str	literal	txt			showToast,clipboard	via asyIcon -> SVG	| Copied ✓
+14232	✓	U+2713	str	literal	txt			showToast,clipboard	via asyIcon -> SVG	| Copied ✓
+14250	✓	U+2713	str	js-escape	programs			showToast	via asyIcon -> SVG	|  ✓
+14278	✓	U+2713	str	literal	programs			showToast	via asyIcon -> SVG	|  ✓
+14278	✓	U+2713	str	literal	programs			showToast	via asyIcon -> SVG	| Start date set ✓ — short first week
+14278	✓	U+2713	str	literal	programs			showToast	via asyIcon -> SVG	| Start date set ✓
+14367	→	U+2192	tpl	literal	scope				via asyIcon -> SVG	| ) → 
+14669	✓	U+2713	str	literal	done			showToast	via asyIcon -> SVG	| Selections copied ✓
+14697	✓	U+2713	str	js-escape	_progActionsHTML				via asyIcon -> SVG	| n" style="opacity:0.4;cursor:default">Active ✓</button>
+14984	✕	U+2715	str	js-escape	_backBtn			innerHTML	via asyIcon -> SVG	| ">✕</div>
+15017	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Change removed ✓
+15142	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+15158	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+15160	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+15175	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+15204	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Protected. Train around it ✓
+15204	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Working around it ✓
+15318	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Change applied ✓
+15591	✓	U+2713	str	literal	nn			showToast	via asyIcon -> SVG	| Renamed ✓
+16194	↑	U+2191	str	literal	cy				via asyIcon -> SVG	| ↑ faster
+16275	→	U+2192	str	literal	foot				via asyIcon -> SVG	| Read off the app’s own pace table: easy pace → mile equivalent → half finish. An
+16275	→	U+2192	str	literal	foot				via asyIcon -> SVG	|  own pace table: easy pace → mile equivalent → half finish. An estimate from tra
+16356	→	U+2192	str	literal	setStr				via asyIcon -> SVG	| )</span> → <b style="color:var(--text)">
+16520	←	U+2190	str	js-escape	s				WIZARD seed banner raw	| ← faster
+16521	→	U+2192	str	js-escape	s				WIZARD seed banner raw	| slower →
+16767	↑	U+2191	str	literal	status				via asyIcon -> SVG	|  · ↑
+17031	→	U+2192	tpl	literal	headMb			asyIcon	via asyIcon -> SVG	|  → 
+17245	✓	U+2713	str	literal	j			showToast,textContent	via asyIcon -> SVG	| Sent ✓ — thanks, I got it.
+17245	✓	U+2713	str	literal	j			showToast,textContent	via asyIcon -> SVG	| Bug sent ✓
+17556	✓	U+2713	str	literal	_remMsg				via asyIcon -> SVG	| ✓ Done
+17557	✕	U+2715	str	literal	_remMsg				via asyIcon -> SVG	| ✕ Skip
+17568	✓	U+2713	str	literal	labels				via asyIcon -> SVG	| Locked in ✓
+17568	✕	U+2715	str	literal	labels				via asyIcon -> SVG	| Skipped ✕ — the week moves on
+
+=== CLASS C by char {"—":491,"×":670}
+EXIT 0
+######## rb_run_emoji206.out  (HEAD 920fa0a ia-version 219; V206/V207/V209 from git tags)
+FILE /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/2ef6b80b-284e-4663-8193-3a4cf2293a53/scratchpad/rb_v206.html  ia-version 206
+DENOM lines 17469  literal tokens 11190 {"literals":11190,"jsStr":10049,"jsTpl":696,"jsRe":355,"css":72,"html":18,"codeTokens":16619}  comment chars stripped 428965
+TOTALS by class {"C":1160,"B":104,"A":170,"A2":14}
+A by encoding {"literal":162,"js-escape":8}
+A by disposition {"LOOKUP KEY (asyIcon map, not displayed)":27,"via asyIcon -> SVG":64,"WIZARD seed banner raw":2,"WEEK VIEW recovery-spacing banner raw":1,"DAY CARD log-nudge raw (innerHTML)":1,"POP-UP raw (textContent)":68,"POP-UP msg pool (DEAD: only caller passes msg)":5,"POP-UP stat label via asyIcon (innerHTML) -> SVG":1,"POP-UP raw (static default, overwritten each fire)":1}
+A2 by disposition {"LOOKUP KEY (asyIcon map, not displayed)":5,"via asyIcon -> SVG":8,"PROGRESS program chip raw":1}
+A by token {"str":167,"tpl":2,"html":1}
+ASY_ICON_PATHS @1204 (51): trash medal growth barbell lightbulb brain scale warning siren kettlebell flagFinish lock notebook calculator home dumbbell chart user play pause check plus minus x chevronRight chevronLeft chevronDown clock flame trophy bell arrowRight more target zap calendar history sliders skip run bike swim shield sprout flag dice backpack pencil copy bandage swap
+ASY_EMOJI @1205 (32): 🏅>medal 🏆>trophy 💪>growth 🏋>barbell 🦾>dumbbell ⚡>zap 🔥>flame ⚖>scale 🛡>shield 🌱>sprout 🧠>brain 💡>lightbulb 🏠>home 🎒>backpack 🤸>kettlebell 👤>user 🎯>target 🏁>flagFinish 🔒>lock ⚠>warning 🚨>siren ✅>check 📓>notebook 🧮>calculator 🏃>run 🚴>bike 🏊>swim 📅>calendar 📈>chart 📊>chart 🎲>dice ⏱>clock
+
+=== CLASS A (170) ===
+1205	🏅	U+1F3C5	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏅
+1205	🏆	U+1F3C6	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏆
+1205	💪	U+1F4AA	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 💪
+1205	🦾	U+1F9BE	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🦾
+1205	⚡	U+26A1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⚡
+1205	🔥	U+1F525	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🔥
+1205	🌱	U+1F331	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🌱
+1205	🧠	U+1F9E0	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🧠
+1205	💡	U+1F4A1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 💡
+1205	🏠	U+1F3E0	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏠
+1205	🎒	U+1F392	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🎒
+1205	🤸	U+1F938	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🤸
+1205	👤	U+1F464	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 👤
+1205	🎯	U+1F3AF	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🎯
+1205	🏁	U+1F3C1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏁
+1205	🔒	U+1F512	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🔒
+1205	🚨	U+1F6A8	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🚨
+1205	✅	U+2705	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ✅
+1205	📓	U+1F4D3	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📓
+1205	🧮	U+1F9EE	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🧮
+1205	🏃	U+1F3C3	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏃
+1205	🚴	U+1F6B4	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🚴
+1205	🏊	U+1F3CA	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏊
+1205	📅	U+1F4C5	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📅
+1205	📈	U+1F4C8	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📈
+1205	📊	U+1F4CA	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 📊
+1205	🎲	U+1F3B2	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🎲
+2111	🏋️	U+1F3CB	str	literal	body				via asyIcon -> SVG	| 🏋️
+2112	💪	U+1F4AA	str	literal	body				via asyIcon -> SVG	| 💪
+2113	🔥	U+1F525	str	literal	body				via asyIcon -> SVG	| 🔥
+2114	⚖️	U+2696	str	literal	body				via asyIcon -> SVG	| ⚖️
+2117	🦾	U+1F9BE	str	literal	event				via asyIcon -> SVG	| 🦾
+2118	⚡	U+26A1	str	literal	event				via asyIcon -> SVG	| ⚡
+2119	🛡️	U+1F6E1	str	literal	event				via asyIcon -> SVG	| 🛡️
+2352	🚨	U+1F6A8	str	literal	distLabel	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🚨
+2384	🎯	U+1F3AF	str	literal	pace	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🎯
+2404	🎯	U+1F3AF	str	literal	pace	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🎯
+2463	🚨	U+1F6A8	str	literal	paceCeilingOfferHTML	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🚨
+2514	🏃	U+1F3C3	str	literal	sportIcon				via asyIcon -> SVG	| 🏃
+2514	🚴	U+1F6B4	str	literal	sportIcon				via asyIcon -> SVG	| 🚴
+2514	🏊	U+1F3CA	str	literal	sportIcon				via asyIcon -> SVG	| 🏊
+2618	📈	U+1F4C8	tpl	js-escape	s				WIZARD seed banner raw	| ze:11px;color:var(--muted);margin:2px 0 8px">📈 Estimated from “
+2623	📈	U+1F4C8	tpl	js-escape	distLine				WIZARD seed banner raw	| percase;color:var(--text);margin-bottom:4px">📈 Seed from “
+2671	🏅	U+1F3C5	str	literal	t				via asyIcon -> SVG	| 🏅
+2672	💪	U+1F4AA	str	literal	t				via asyIcon -> SVG	| 💪
+2673	⚡	U+26A1	str	literal	t				via asyIcon -> SVG	| ⚡
+2696	🌱	U+1F331	str	literal	ageHints				via asyIcon -> SVG	| 🌱
+2697	💪	U+1F4AA	str	literal	ageHints				via asyIcon -> SVG	| 💪
+2698	🔥	U+1F525	str	literal	ageHints				via asyIcon -> SVG	| 🔥
+2706	⚡	U+26A1	str	literal	ageHints				via asyIcon -> SVG	| ⚡
+2706	💡	U+1F4A1	str	literal	ageHints				via asyIcon -> SVG	| 💡
+2706	🧠	U+1F9E0	str	literal	ageHints				via asyIcon -> SVG	| 🧠
+2727	🏠	U+1F3E0	str	literal	ageHints				via asyIcon -> SVG	| 🏠
+2728	🏠	U+1F3E0	str	literal	ageHints				via asyIcon -> SVG	| 🏠
+2729	🏋️	U+1F3CB	str	literal	ageHints				via asyIcon -> SVG	| 🏋️
+2730	🤸	U+1F938	str	literal	ageHints				via asyIcon -> SVG	| 🤸
+2731	👤	U+1F464	str	literal	ageHints				via asyIcon -> SVG	| 👤
+2740	🏃	U+1F3C3	str	literal	sportIcons				via asyIcon -> SVG	| 🏃
+2740	🚴	U+1F6B4	str	literal	sportIcons				via asyIcon -> SVG	| 🚴
+2740	🏊	U+1F3CA	str	literal	sportIcons				via asyIcon -> SVG	| 🏊
+2808	🎯	U+1F3AF	str	literal	g	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🎯
+2841	🎯	U+1F3AF	str	literal	g	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🎯
+2937	🏃	U+1F3C3	str	literal	icons				via asyIcon -> SVG	| 🏃
+2937	🚴	U+1F6B4	str	literal	icons				via asyIcon -> SVG	| 🚴
+2937	🏊	U+1F3CA	str	literal	icons				via asyIcon -> SVG	| 🏊
+2973	🔒	U+1F512	str	literal	_floorBanner	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🔒
+2994	🔒	U+1F512	str	literal	opacity	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🔒
+3004	🏃	U+1F3C3	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏃
+3004	🚴	U+1F6B4	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🚴
+3004	🏊	U+1F3CA	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏊
+10913	✅	U+2705	str	literal	labelCls	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| ✅
+11436	🏁	U+1F3C1	str	literal	_rl	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🏁
+11436	🏁	U+1F3C1	str	literal	_rl	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| 🏁
+11632	♻️	U+267B	str	js-escape	leg				WEEK VIEW recovery-spacing banner raw	| ize:12px;color:var(--muted);line-height:1.5">♻️ <b style="color:var(--text)">Rec
+13511	📋	U+1F4CB	str	js-escape	_hasLog				DAY CARD log-nudge raw (innerHTML)	| <div class="log-nudge">📋 You logged this one but never ma
+14531	🏃	U+1F3C3	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏃
+14531	🚴	U+1F6B4	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🚴
+14531	🏊	U+1F3CA	str	literal	cardioSummary			asyIcon	via asyIcon -> SVG	| 🏊
+15053	🛡️	U+1F6E1	str	js-escape	lbl			popFire	POP-UP raw (textContent)	| 🛡️
+15078	🛡️	U+1F6E1	str	js-escape	_n			popFire	POP-UP raw (textContent)	| 🛡️
+15089	🛡️	U+1F6E1	str	js-escape	ov			popFire	POP-UP raw (textContent)	| 🛡️
+15097	⚠️	U+26A0	str	js-escape	ov			popFire	POP-UP raw (textContent)	| ⚠️
+15923	🏃	U+1F3C3	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+15966	🏃	U+1F3C3	str	literal	gap	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16009	🏃	U+1F3C3	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16014	🏃	U+1F3C3	str	literal	need	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16072	🏁	U+1F3C1	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏁
+16117	🏃	U+1F3C3	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16288	🏃	U+1F3C3	str	literal	headHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16328	🏃	U+1F3C3	str	literal	headHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16700	📊	U+1F4CA	str	literal	hasAnyData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 📊
+16727	🏃	U+1F3C3	str	literal	runData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16752	🏃	U+1F3C3	str	literal	rpData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏃
+16763	🏊	U+1F3CA	str	literal	swimData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏊
+16769	🚴	U+1F6B4	str	literal	bikeData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🚴
+16776	💡	U+1F4A1	str	literal	rpeData	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 💡
+16841	📓	U+1F4D3	str	literal	n	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 📓
+16851	🧮	U+1F9EE	str	literal	estimatorHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🧮
+16864	📊	U+1F4CA	str	literal	estimatorHtml	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 📊
+17062	🎉	U+1F389	str	literal	workout				POP-UP raw (textContent)	| howed up. Just, you know — faster next time. 🎉
+17063	🍺	U+1F37A	str	literal	workout				POP-UP raw (textContent)	| own. You told it to go fuck itself. Respect. 🍺🪦
+17063	🪦	U+1FAA6	str	literal	workout				POP-UP raw (textContent)	| n. You told it to go fuck itself. Respect. 🍺🪦
+17064	🫡	U+1FAE1	str	literal	workout				POP-UP raw (textContent)	| rtical, sweaty, and useful. Goddamn miracle. 🫡
+17065	🛏️	U+1F6CF	str	literal	workout				POP-UP raw (textContent)	| one done while half the city's still asleep. 🛏️😭
+17065	😭	U+1F62D	str	literal	workout				POP-UP raw (textContent)	|  done while half the city's still asleep. 🛏️😭
+17066	🪞	U+1FA9E	str	literal	workout				POP-UP raw (textContent)	| ep flexing in the mirror... THEY see it too. 🪞
+17067	💪	U+1F4AA	str	literal	workout				POP-UP raw (textContent)	| usband couldn't have done what you just did. 💪
+17068	🔥	U+1F525	str	literal	workout				POP-UP raw (textContent)	|  The bums in the group chat didn't. You lit! 🔥
+17069	🚶	U+1F6B6	str	literal	workout				POP-UP raw (textContent)	| ezing on the way up to your 8-story walk-up. 🚶😤
+17069	😤	U+1F624	str	literal	workout				POP-UP raw (textContent)	| ing on the way up to your 8-story walk-up. 🚶😤
+17070	🥂	U+1F942	str	literal	workout				POP-UP raw (textContent)	| ght to talk all the shit you want at brunch. 🥂
+17071	⚰️	U+26B0	str	literal	workout				POP-UP raw (textContent)	| d not dropping dead at 50... You're welcome. ⚰️❌
+17071	❌	U+274C	str	literal	workout				POP-UP raw (textContent)	| not dropping dead at 50... You're welcome. ⚰️❌
+17072	🛋️	U+1F6CB	str	literal	workout				POP-UP raw (textContent)	| l, look who decided not to be useless today. 🛋️🔥
+17072	🔥	U+1F525	str	literal	workout				POP-UP raw (textContent)	| look who decided not to be useless today. 🛋️🔥
+17073	📈	U+1F4C8	str	literal	workout				POP-UP raw (textContent)	| ss, and one step less gordito. Growth, baby. 📈
+17074	🛋️	U+1F6CB	str	literal	workout				POP-UP raw (textContent)	| gain. Fuck that couch... or sit on it later. 🛋️💀
+17074	💀	U+1F480	str	literal	workout				POP-UP raw (textContent)	| n. Fuck that couch... or sit on it later. 🛋️💀
+17075	⏳	U+23F3	str	literal	workout				POP-UP raw (textContent)	| t out while your excuses were still loading. ⏳🖕
+17075	🖕	U+1F595	str	literal	workout				POP-UP raw (textContent)	|  out while your excuses were still loading. ⏳🖕
+17076	😤	U+1F624	str	literal	workout				POP-UP raw (textContent)	|  did it anyway. That's the whole damn point. 😤
+17077	🍻	U+1F37B	str	literal	workout				POP-UP raw (textContent)	| gover, didn't die. Take your victory shower. 🍻💪
+17077	💪	U+1F4AA	str	literal	workout				POP-UP raw (textContent)	| ver, didn't die. Take your victory shower. 🍻💪
+17078	🚿	U+1F6BF	str	literal	workout				POP-UP raw (textContent)	| Done. Go shower... please. 🚿🤢
+17078	🤢	U+1F922	str	literal	workout				POP-UP raw (textContent)	| Done. Go shower... please. 🚿🤢
+17079	🏙️	U+1F3D9	str	literal	workout				POP-UP raw (textContent)	| One more W! Stack 'em up. 🏙️📚
+17079	📚	U+1F4DA	str	literal	workout				POP-UP raw (textContent)	| One more W! Stack 'em up. 🏙️📚
+17080	🥇	U+1F947	str	literal	workout				POP-UP raw (textContent)	| edal — it's under your tetas, find it later. 🥇
+17081	😈	U+1F608	str	literal	workout				POP-UP raw (textContent)	| ed on purpose. Stay safe, take a shot later. 😈
+17082	🏃	U+1F3C3	str	literal	workout				POP-UP raw (textContent)	| ter chasing their ex... but good job anyway. 🏃
+17083	👀	U+1F440	str	literal	workout				POP-UP raw (textContent)	|  actually activated today. Who inspired you? 👀
+17084	💦	U+1F4A6	str	literal	workout				POP-UP raw (textContent)	| ou murdered that session. Go get some water! 💦
+17085	🐕	U+1F415	str	literal	workout				POP-UP raw (textContent)	|  everybody says... you got that dawg in you! 🐕
+17086	🥟	U+1F95F	str	literal	workout				POP-UP raw (textContent)	| lories to justify one pastelito... just one. 🥟
+17087	💀	U+1F480	str	literal	workout				POP-UP raw (textContent)	| ead ugly on that last set, but you finished. 💀
+17088	🎧	U+1F3A7	str	literal	workout				POP-UP raw (textContent)	| utes lifting. But okay — "workout complete." 🎧
+17091	👀	U+1F440	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	|  ghosted a session. Mark it or own the skip. 👀
+17092	👇	U+1F447	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	|  day hanging unmarked. Did you train or nah? 👇
+17093	🧾	U+1F9FE	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	| usiness sitting on your calendar. Settle up. 🧾
+17094	✍️	U+270D	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	| t log itself, champ. Complete it or call it. ✍️
+17095	📋	U+1F4CB	str	literal	reminder				POP-UP msg pool (DEAD: only caller passes msg)	|  a workout. Your record, your call — fix it. 📋
+17098	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	|  break this now, you've got something going. 🔥
+17099	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	|  Most people fold by now like wet cardboard. 🔥💀
+17099	💀	U+1F480	str	literal	streak				POP-UP raw (textContent)	| ost people fold by now like wet cardboard. 🔥💀
+17100	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| cy. Who replaced you with someone competent? 🔥
+17101	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| nd so are you. Keep it that way, you maniac. 🔥
+17102	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| ng it now would be a crime against yourself. 🔥🚔
+17102	🚔	U+1F694	str	literal	streak				POP-UP raw (textContent)	|  it now would be a crime against yourself. 🔥🚔
+17105	🏆	U+1F3C6	str	literal	season				POP-UP raw (textContent)	| nd what'd you do with the lazy prick I knew. 🏆
+17106	💪	U+1F4AA	str	literal	season				POP-UP raw (textContent)	| n step and STILL pulled it off. Legend shit. 💪
+17107	🗽	U+1F5FD	str	literal	season				POP-UP raw (textContent)	| ets are proud. Your knees filed a complaint. 🗽🦴
+17107	🦴	U+1F9B4	str	literal	season				POP-UP raw (textContent)	| s are proud. Your knees filed a complaint. 🗽🦴
+17108	🐔	U+1F414	str	literal	season				POP-UP raw (textContent)	| — most quit at week two like little bitches. 🐔
+17109	🔥	U+1F525	str	literal	season				POP-UP raw (textContent)	| ses, no crying. Go be insufferable about it. 🔥
+17110	🧾	U+1F9FE	str	literal	season				POP-UP raw (textContent)	| arned its keep instead of robbing you blind. 🧾😮‍💨
+17110	😮‍💨	U+1F62E	str	literal	season				POP-UP raw (textContent)	| ned its keep instead of robbing you blind. 🧾😮‍💨
+17111	🏆	U+1F3C6	str	literal	season				POP-UP raw (textContent)	|  halfway like a coward. I'm fuckin' shocked. 🏆
+17112	🧠	U+1F9E0	str	literal	season				POP-UP raw (textContent)	| cuse your brain coughed up. Respect, animal. 🧠❌
+17112	❌	U+274C	str	literal	season				POP-UP raw (textContent)	| se your brain coughed up. Respect, animal. 🧠❌
+17113	💪	U+1F4AA	str	literal	season				POP-UP raw (textContent)	| iss themselves at and bail. Built different. 💪
+17117	🎉	U+1F389	str	literal	workout				POP-UP raw (textContent)	| 🎉
+17118	👀	U+1F440	str	literal	reminder				POP-UP raw (textContent)	| 👀
+17119	🔥	U+1F525	str	literal	streak				POP-UP raw (textContent)	| 🔥
+17120	🏆	U+1F3C6	str	literal	season				POP-UP raw (textContent)	| 🏆
+17127	😒	U+1F612	str	literal	POP_DISMISS				POP-UP raw (textContent)	| good looks 😒
+17131	🫳	U+1FAF3	str	literal	POP_DISMISS				POP-UP raw (textContent)	| save it 🫳
+17208	🏆	U+1F3C6	str	literal	p			textContent	POP-UP raw (textContent)	| 🏆
+17273	🔥	U+1F525	str	literal	fireWorkoutPopup	VIA_ASYICON		asyIcon	POP-UP stat label via asyIcon (innerHTML) -> SVG	| 🔥
+17285	🔥	U+1F525	str	literal	fireStreakPopup				POP-UP raw (textContent)	| -DAY STREAK 🔥
+17456	🎉	U+1F389	html	literal	remote				POP-UP raw (static default, overwritten each fire)	| ()"> <span class="pop-icon" id="popIcon">🎉</span> <div class="pop-kicke
+
+=== CLASS A2 (14) ===
+1205	🏋	U+1F3CB	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🏋
+1205	⚖	U+2696	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⚖
+1205	🛡	U+1F6E1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| 🛡
+1205	⚠	U+26A0	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⚠
+1205	⏱	U+23F1	str	literal	ASY_EMOJI				LOOKUP KEY (asyIcon map, not displayed)	| ⏱
+2287	⚠	U+26A0	str	literal	recommended	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| ⚠
+2291	⚠	U+26A0	str	literal	recommended	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| ⚠
+2526	⏱	U+23F1	str	literal	fix			asyIcon	via asyIcon -> SVG	| ⏱
+2580	⚠	U+26A0	str	literal	minDays	VIA_ASYICON		showToast,asyIcon	via asyIcon -> SVG	| ⚠
+15605	🗄	U+1F5C4	str	js-escape	label				PROGRESS program chip raw	| 🗄 
+16168	🏋	U+1F3CB	str	literal	foot	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+16579	🏋	U+1F3CB	str	literal	noLoad	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+16600	🏋	U+1F3CB	str	literal	head	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+16618	🏋	U+1F3CB	str	literal	lo	VIA_ASYICON		asyIcon	via asyIcon -> SVG	| 🏋
+
+=== CLASS B (104) ===
+926	✕	U+2715	html	literal	?				via asyIcon -> SVG	| ="event.stopPropagation();iaDismissUpdate()">✕</span> </div> 
+950	←	U+2190	html	literal	?				via asyIcon -> SVG	| n class="wizard-back" onclick="wizardBack()">← Back</button> <div class="wiz
+955	→	U+2192	html	literal	?				via asyIcon -> SVG	| "wizardNext" onclick="wizardNext()">Continue →</button> </div> 
+1121	←	U+2190	html	literal	?				via asyIcon -> SVG	| ton class="back-btn" onclick="closeRandom()">← Back</button> <div class="ran
+1123	↺	U+21BA	html	literal	?				via asyIcon -> SVG	| card counter" title="Reset wildcard counter">↺ Reset</button> </div> <div cl
+1130	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeRestSheet()">← Back</button> </div> <div cla
+1137	←	U+2190	html	literal	?				via asyIcon -> SVG	| ass="back-btn" onclick="closeOverlaySheet()">← Back</button> </div> <div cla
+1144	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeGoalSheet()">← Back</button> </div> <div cla
+1154	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeMileSheet()">← Back</button> </div> <div cla
+1172	←	U+2190	html	literal	?				via asyIcon -> SVG	|  class="back-btn" onclick="closeMileSheet()">← Back</button> </div> <div cla
+1363	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+1415	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	|  is your rest now ✓
+1432	✓	U+2713	str	js-escape	d			showToast	via asyIcon -> SVG	|  min logged ✓
+1985	✓	U+2713	str	js-escape	f			showToast	via asyIcon -> SVG	|  plan ✓
+2315	✓	U+2713	str	literal	_f				via asyIcon -> SVG	| ✓ Your 
+2322	✓	U+2713	str	literal	_f				via asyIcon -> SVG	| ✓ Perfect timing — your 
+2655	→	U+2192	str	literal	step			textContent	via asyIcon -> SVG	| Generate Program →
+2655	→	U+2192	str	literal	step			textContent	via asyIcon -> SVG	| Continue →
+2735	✓	U+2713	tpl	literal	ageHints				via asyIcon -> SVG	| ">✓</div> </div>
+2774	✓	U+2713	tpl	literal	g				via asyIcon -> SVG	| ">✓</div> </div> 
+2900	✓	U+2713	tpl	literal	g				via asyIcon -> SVG	| ">✓ I have a race date</button> 
+2901	✕	U+2715	tpl	literal	g				via asyIcon -> SVG	| ">✕ Just building fitness</button> 
+2943	✓	U+2713	tpl	literal	sel				via asyIcon -> SVG	| ">✓</div> </div>
+2949	✓	U+2713	tpl	literal	sel				via asyIcon -> SVG	| ">✓</div> </div> </div>
+2994	✕	U+2715	str	literal	opacity			asyIcon	via asyIcon -> SVG	| e="font-size:9px;margin-top:2px;opacity:0.5">✕</div>
+4243	→	U+2192	str	literal	NRC_MARATHON_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 wa
+4243	→	U+2192	str	literal	NRC_MARATHON_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 warm up
+4263	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 0 warm upn4:00 at Recovery Pace ({recovery}) → straight into 1:00 at Mile Pace (
+4263	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| then 1:00 recoveryn3:00 at 10K Pace ({tenK}) → straight into 1:00 at Mile Pace (
+4263	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| then 1:30 recoveryn2:00 at 5K Pace ({fiveK}) → straight into 1:00 at Mile Pace (
+4263	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| hen 2:00 recoveryn1:00 at Mile Pace ({mile}) → straight into 1:00 at Best Pace
+4266	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 5K → 10K → Mile — 13:30 of workn5:00 w
+4266	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 5K → 10K → Mile — 13:30 of workn5:00 warm up
+4268	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 wa
+4268	→	U+2192	str	literal	NRC_HALF_TABLE				via asyIcon -> SVG	| 3 rounds of 10K → 5K → Mile — 42:00 of workn5:00 warm up
+4284	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| Go Fast — Mile reps growing 0:30 → 1:30, each chased by 0:15 at Best
+4284	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| workn5:00 warm upn0:30 at Mile Pace ({mile}) → 0:15 at Best Pace — 0:30 recovery
+4284	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 0:30 recoveryn0:45 at Mile Pace ({mile}) → 0:15 at Best Pace — 0:45 recovery
+4284	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 0:45 recoveryn1:00 at Mile Pace ({mile}) → 0:15 at Best Pace — 1:00 recovery
+4284	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 1:00 recoveryn1:15 at Mile Pace ({mile}) → 0:15 at Best Pace — 1:15 recovery
+4284	→	U+2192	str	literal	NRC_5K_TABLE				via asyIcon -> SVG	| e — 1:15 recoveryn1:30 at Mile Pace ({mile}) → 0:15 at Best PacenRecovery grows 
+4295	→	U+2192	str	literal	NRC_10K_TABLE				via asyIcon -> SVG	| low Down to Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work, 
+4295	→	U+2192	str	literal	NRC_10K_TABLE				via asyIcon -> SVG	| own to Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work, 7 eff
+4295	→	U+2192	str	literal	NRC_10K_TABLE				via asyIcon -> SVG	| Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work, 7 effortsn5:
+10791	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest ex
+10791	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest except at t
+10791	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest except at top
+10791	→	U+2192	str	literal	fatloss				via asyIcon -> SVG	| 1 rep → 2 reps → 3 → ... → 10, no rest except at top
+10901	✓	U+2713	str	literal	html				via asyIcon -> SVG	| Done Before ✓
+10912	✓	U+2713	tpl	literal	labelCls				via asyIcon -> SVG	| <div class="wildcard-done-block">✓ You've done this one before</div>
+10991	✓	U+2713	str	literal	isTraining			showToast	via asyIcon -> SVG	|  logged ✓
+11005	✓	U+2713	str	literal	rb			showToast	via asyIcon -> SVG	| Wildcard counter reset ✓
+11013	↺	U+21BA	str	literal	el			textContent	via asyIcon -> SVG	| ↺ Reset
+11439	↓	U+2193	str	literal	_rl			textContent	via asyIcon -> SVG	| ↓ Recovery Week
+11482	✦	U+2726	str	js-escape	_r				via asyIcon -> SVG	|  ✦
+11484	●	U+25CF	str	js-escape	_r			textContent	via asyIcon -> SVG	|  ●
+11539	✓	U+2713	str	js-escape	center				via asyIcon -> SVG	| <span class="chk">✓</span>
+12303	✓	U+2713	str	js-escape	html				via asyIcon -> SVG	| ✓
+12423	↺	U+21BA	str	js-escape	rec				via asyIcon -> SVG	| <span class="ex-reuse-ico">↺</span>
+12427	△	U+25B3	str	js-escape	rec				via asyIcon -> SVG	| <div class="ex-stale-warn"><i>△</i><span>That 
+12439	↺	U+21BA	str	js-escape	rec				via asyIcon -> SVG	| <span class="ex-reuse-ico">↺</span>
+13511	✓	U+2713	str	js-escape	_hasLog				DAY CARD log-nudge raw (innerHTML)	| ','complete')">Mark Done ✓</button></div>
+13534	✓	U+2713	str	literal	selectKBSize			showToast	via asyIcon -> SVG	|  bell logged ✓
+13608	✓	U+2713	str	js-escape	top			showToast	via asyIcon -> SVG	|  logged ✓
+13608	✓	U+2713	str	js-escape	top			showToast	via asyIcon -> SVG	| Logged ✓
+13611	✓	U+2713	str	js-escape	_bdg			textContent	via asyIcon -> SVG	| ✓
+13954	✓	U+2713	str	literal	labels				via asyIcon -> SVG	| Done ✓
+13954	✕	U+2715	str	literal	labels				via asyIcon -> SVG	| Skipped ✕ — the week moves on
+13955	✓	U+2713	str	literal	labels			showToast	via asyIcon -> SVG	| Updated ✓
+13967	✕	U+2715	str	js-escape	call				via asyIcon -> SVG	| ">Skipped ✕ <small>tap to undo</small></butto
+13972	✓	U+2713	str	js-escape	call				via asyIcon -> SVG	| Done ✓ <small>tap to undo</small>
+14065	✓	U+2713	str	literal	txt			showToast,clipboard	via asyIcon -> SVG	| Copied ✓
+14065	✓	U+2713	str	literal	txt			showToast,clipboard	via asyIcon -> SVG	| Copied ✓
+14083	✓	U+2713	str	js-escape	programs			showToast	via asyIcon -> SVG	|  ✓
+14094	✓	U+2713	str	literal	programs			showToast	via asyIcon -> SVG	|  ✓
+14094	✓	U+2713	str	literal	programs			showToast	via asyIcon -> SVG	| Start date set ✓ — short first week
+14094	✓	U+2713	str	literal	programs			showToast	via asyIcon -> SVG	| Start date set ✓
+14183	→	U+2192	tpl	literal	scope				via asyIcon -> SVG	| ) → 
+14485	✓	U+2713	str	literal	done			showToast	via asyIcon -> SVG	| Selections copied ✓
+14513	✓	U+2713	str	js-escape	_progActionsHTML				via asyIcon -> SVG	| n" style="opacity:0.4;cursor:default">Active ✓</button>
+14800	✕	U+2715	str	js-escape	_backBtn			innerHTML	via asyIcon -> SVG	| ">✕</div>
+14833	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Change removed ✓
+14958	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+14974	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+14976	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+14991	✓	U+2713	str	js-escape	sel				via asyIcon -> SVG	| <span class="ov-eq-chk">✓</span>
+15020	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Protected. Train around it ✓
+15020	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Working around it ✓
+15134	✓	U+2713	str	js-escape	progs			showToast	via asyIcon -> SVG	| Change applied ✓
+15392	✓	U+2713	str	literal	nn			showToast	via asyIcon -> SVG	| Renamed ✓
+15989	↑	U+2191	str	literal	cy				via asyIcon -> SVG	| ↑ faster
+16070	→	U+2192	str	literal	foot				via asyIcon -> SVG	| Read off the app’s own pace table: easy pace → mile equivalent → half finish. An
+16070	→	U+2192	str	literal	foot				via asyIcon -> SVG	|  own pace table: easy pace → mile equivalent → half finish. An estimate from tra
+16151	→	U+2192	str	literal	setStr				via asyIcon -> SVG	| )</span> → <b style="color:var(--text)">
+16315	←	U+2190	str	js-escape	s				WIZARD seed banner raw	| ← faster
+16316	→	U+2192	str	js-escape	s				WIZARD seed banner raw	| slower →
+16562	↑	U+2191	str	literal	status				via asyIcon -> SVG	|  · ↑
+16826	→	U+2192	tpl	literal	headMb			asyIcon	via asyIcon -> SVG	|  → 
+17040	✓	U+2713	str	literal	j			showToast,textContent	via asyIcon -> SVG	| Sent ✓ — thanks, I got it.
+17040	✓	U+2713	str	literal	j			showToast,textContent	via asyIcon -> SVG	| Bug sent ✓
+17351	✓	U+2713	str	literal	_remMsg				via asyIcon -> SVG	| ✓ Done
+17352	✕	U+2715	str	literal	_remMsg				via asyIcon -> SVG	| ✕ Skip
+17363	✓	U+2713	str	literal	labels				via asyIcon -> SVG	| Locked in ✓
+17363	✕	U+2715	str	literal	labels				via asyIcon -> SVG	| Skipped ✕ — the week moves on
+
+=== CLASS C by char {"—":490,"×":670}
+######## rb_run_barerx.out  (HEAD 920fa0a ia-version 219; V206/V207/V209 from git tags)
+artifact index.html ia-version 219
+
+== REPRO HALF_MANNY: bare rendered lines 11 / 380
+    "N" e.g. HALF_MANNY W1 thu [superset swap minus] :: Ball slams :: "10"
+
+== LATTICE builds 0 crashes 0 renderFail 0
+
+== GRAMMAR (engine raw) top 4 shapes per section kind
+ [core]
+    16 "N×N each" e.g. Bird dogs :: 3×12 each
+    5 "N×N–N each @ RPE N" e.g. Landmine rotations :: 2×8–12 each @ RPE 7
+    3 "N×N yd each" e.g. Suitcase carry :: 3×40 yd each
+    3 "N×N–N sec each" e.g. Side plank :: 3×30–45 sec each
+ [hip]
+    15 "N×N each" e.g. Seated banded hip flexion :: 2×15 each
+    12 "N×N each, slow" e.g. Hip airplane (light KB) :: 2×6 each, slow
+    12 "N×N–N each @ RPE N" e.g. Standing band hip abduction :: 2×12–15 each @ RPE 7
+    8 "N×N each direction" e.g. Standing ankle CARs :: 2×5 each direction
+ [main]
+    18 "N×N–N @ RPE N" e.g. Dumbbell Arnold press :: 2×6–10 @ RPE 7
+    15 "N×N — RPE N.N (leave ~N reps in reserve), ramp up with N–N warmup sets" e.g. Close-grip bench press :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+    12 "N×N — RPE N (leave ~N reps in reserve), ramp up with N–N warmup sets, " e.g. Dumbbell bench press :: 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+    10 "N×N — RPE N–N, leave N+ in reserve" e.g. Dumbbell bench press :: 3×12 — RPE 6–7, leave 3+ in reserve
+ [primer]
+    7 "N×N — RPE N–N (primer — light and crisp, well short of failure), N–N m" e.g. Dumbbell bench press :: 3×12 — RPE 5–6 (primer — light and crisp, well short of failure), 2–3 min rest
+ [straight:Calf]
+    9 "N×N–N each, slow N-sec lower" e.g. Dumbbell seated calf raise :: 2×12–15 each, slow 3-sec lower
+ [straight:Chest]
+    8 "N×N sec" e.g. Spanish squat hold (KB) :: 3×25 sec
+ [straight:Delt]
+    1 "N×N–N @ RPE N" e.g. Dumbbell front raise :: 2×15–20 @ RPE 7
+ [straight:Loaded]
+    7 "N×N yards each, heavy" e.g. Suitcase carry :: 3×40 yards each, heavy
+    2 "N×N yards, heavy" e.g. Farmer carry :: 3×40 yards, heavy
+ [straight:Post]
+    9 "N×N sec each side — knee straight, then bent" e.g. Standing calf stretch :: 2×45 sec each side — knee straight, then bent
+    9 "N×N sec each side — hip flexors; squeeze the trailing glute" e.g. Couch stretch :: 2×45 sec each side — hip flexors; squeeze the trailing glute
+    9 "N×N sec each side" e.g. Hip 90/90 stretch :: 2×45 sec each side
+    9 "N×N sec — thread the needle, reach long" e.g. T-spine mobility :: 2×45 sec — thread the needle, reach long
+ [straight:Power]
+    1 "N×N — fast and crisp, Ns rest" e.g. Kettlebell swing :: 4×10 — fast and crisp, 60s rest
+ [straight:Pull]
+    2 "N×N–N each @ RPE N" e.g. Dumbbell row :: 2×8–12 each @ RPE 7
+ [superset]
+    59 "N×N–N @ RPE N" e.g. Dumbbell decline press :: 2×8–12 @ RPE 7
+    26 "N sets — RPE N (leave N or more in reserve)" e.g. Diamond pushups :: 2 sets — RPE 7 (leave 3 or more in reserve)
+    21 "N×N–N each @ RPE N" e.g. Kettlebell single-arm press :: 2×12–15 each @ RPE 7
+    13 "N×N sec" e.g. Spanish squat hold (KB) :: 2×25 sec
+
+== bare RENDERED lines: movement | raw data shape -> shown (top 20)
+    4 Kettlebell swing | raw "N×N" -> shown "8"
+    2 Ball slams | raw "N×N" -> shown "10"
+    2 Kettlebell swing | raw "N×N" -> shown "10"
+    1 Broad jumps | raw "N×N" -> shown "10"
+    1 Burpees | raw "N×N" -> shown "10"
+    1 Jump squats | raw "N×N" -> shown "10"
+
+== Kettlebell swing examples
+    HALF_MANNY W3 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W4 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W5 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W5 thu [Pull superset B] raw="2×10" shown="10" swap=true minus=true
+    HALF_MANNY W6 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W6 thu [Pull superset B] raw="2×10" shown="10" swap=true minus=true
+node:internal/errors:547
+      throw error;
+      ^
+
+TypeError [ERR_INVALID_ARG_TYPE]: The "paths[0]" argument must be of type string. Received undefined
+    at Object.resolve (node:path:1257:7)
+    at load (/Users/CanasBangin/Desktop/TheBig6V2/tests/harness.js:136:20)
+    at Object.<anonymous> (/Users/CanasBangin/Desktop/TheBig6V2/tests/measure/v212_bare_rx.js:108:11)
+    at Module._compile (node:internal/modules/cjs/loader:1934:14)
+    at Object..js (node:internal/modules/cjs/loader:2074:10)
+    at Module.load (node:internal/modules/cjs/loader:1656:32)
+    at Module._load (node:internal/modules/cjs/loader:1448:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+
+Node.js v26.8.1
+EXIT 1
+######## rb_bx_18-35.out  (HEAD 920fa0a ia-version 219; V206/V207/V209 from git tags)
+AGE 18-35
+artifact index.html ia-version 219
+
+== REPRO HALF_MANNY: bare rendered lines 11 / 380
+    "N" e.g. HALF_MANNY W1 thu [superset swap minus] :: Ball slams :: "10"
+
+== LATTICE builds 0 crashes 0 renderFail 0
+
+== GRAMMAR (engine raw) top 4 shapes per section kind
+ [core]
+    16 "N×N each" e.g. Bird dogs :: 3×12 each
+    5 "N×N–N each @ RPE N" e.g. Landmine rotations :: 2×8–12 each @ RPE 7
+    3 "N×N yd each" e.g. Suitcase carry :: 3×40 yd each
+    3 "N×N–N sec each" e.g. Side plank :: 3×30–45 sec each
+ [hip]
+    15 "N×N each" e.g. Seated banded hip flexion :: 2×15 each
+    12 "N×N each, slow" e.g. Hip airplane (light KB) :: 2×6 each, slow
+    12 "N×N–N each @ RPE N" e.g. Standing band hip abduction :: 2×12–15 each @ RPE 7
+    8 "N×N each direction" e.g. Standing ankle CARs :: 2×5 each direction
+ [main]
+    18 "N×N–N @ RPE N" e.g. Dumbbell Arnold press :: 2×6–10 @ RPE 7
+    15 "N×N — RPE N.N (leave ~N reps in reserve), ramp up with N–N warmup sets" e.g. Close-grip bench press :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+    12 "N×N — RPE N (leave ~N reps in reserve), ramp up with N–N warmup sets, " e.g. Dumbbell bench press :: 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+    10 "N×N — RPE N–N, leave N+ in reserve" e.g. Dumbbell bench press :: 3×12 — RPE 6–7, leave 3+ in reserve
+ [primer]
+    7 "N×N — RPE N–N (primer — light and crisp, well short of failure), N–N m" e.g. Dumbbell bench press :: 3×12 — RPE 5–6 (primer — light and crisp, well short of failure), 2–3 min rest
+ [straight:Calf]
+    9 "N×N–N each, slow N-sec lower" e.g. Dumbbell seated calf raise :: 2×12–15 each, slow 3-sec lower
+ [straight:Chest]
+    8 "N×N sec" e.g. Spanish squat hold (KB) :: 3×25 sec
+ [straight:Delt]
+    1 "N×N–N @ RPE N" e.g. Dumbbell front raise :: 2×15–20 @ RPE 7
+ [straight:Loaded]
+    7 "N×N yards each, heavy" e.g. Suitcase carry :: 3×40 yards each, heavy
+    2 "N×N yards, heavy" e.g. Farmer carry :: 3×40 yards, heavy
+ [straight:Post]
+    9 "N×N sec each side — knee straight, then bent" e.g. Standing calf stretch :: 2×45 sec each side — knee straight, then bent
+    9 "N×N sec each side — hip flexors; squeeze the trailing glute" e.g. Couch stretch :: 2×45 sec each side — hip flexors; squeeze the trailing glute
+    9 "N×N sec each side" e.g. Hip 90/90 stretch :: 2×45 sec each side
+    9 "N×N sec — thread the needle, reach long" e.g. T-spine mobility :: 2×45 sec — thread the needle, reach long
+ [straight:Power]
+    1 "N×N — fast and crisp, Ns rest" e.g. Kettlebell swing :: 4×10 — fast and crisp, 60s rest
+ [straight:Pull]
+    2 "N×N–N each @ RPE N" e.g. Dumbbell row :: 2×8–12 each @ RPE 7
+ [superset]
+    59 "N×N–N @ RPE N" e.g. Dumbbell decline press :: 2×8–12 @ RPE 7
+    26 "N sets — RPE N (leave N or more in reserve)" e.g. Diamond pushups :: 2 sets — RPE 7 (leave 3 or more in reserve)
+    21 "N×N–N each @ RPE N" e.g. Kettlebell single-arm press :: 2×12–15 each @ RPE 7
+    13 "N×N sec" e.g. Spanish squat hold (KB) :: 2×25 sec
+
+== bare RENDERED lines: movement | raw data shape -> shown (top 20)
+    4 Kettlebell swing | raw "N×N" -> shown "8"
+    2 Ball slams | raw "N×N" -> shown "10"
+    2 Kettlebell swing | raw "N×N" -> shown "10"
+    1 Broad jumps | raw "N×N" -> shown "10"
+    1 Burpees | raw "N×N" -> shown "10"
+    1 Jump squats | raw "N×N" -> shown "10"
+
+== Kettlebell swing examples
+    HALF_MANNY W3 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W4 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W5 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W5 thu [Pull superset B] raw="2×10" shown="10" swap=true minus=true
+    HALF_MANNY W6 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W6 thu [Pull superset B] raw="2×10" shown="10" swap=true minus=true
+
+==== PHASE 2  base 219 surgery /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/2ef6b80b-284e-4663-8193-3a4cf2293a53/scratchpad/rb_surg.html ia-version 219
+HALF_MANNY progDigest base 0ac7da6b1691a8e1 surgery 0ac7da6b1691a8e1 MANNY_DIGEST_BY_VERSION[207] 0ac7da6b1691a8e1
+  W5 tue [Leg circuit — runner armor] rounds=2
+      Dumbbell Bulgarian split squat | data "2×8–12 each @ RPE 7" | V207 shows "8–12 each @ RPE 7" | surgery "8–12 each @ RPE 7"
+      Spanish squat hold (KB) | data "2×25 sec" | V207 shows "25 sec" | surgery "25 sec"
+      Kettlebell swing | data "2×8" | V207 shows "8" | surgery "8 reps"
+  W5 thu [Pull superset A] rounds=2
+      Barbell row | data "2×6–10 @ RPE 7" | V207 shows "6–10 @ RPE 7" | surgery "6–10 @ RPE 7"
+      L-sit chinups | data "2 sets — RPE 7 (leave 3 or more in reserve)" | V207 shows "RPE 7 (leave 3 or more in reserve)" | surgery "RPE 7 (leave 3 or more in reserve)"
+  W5 thu [Pull superset B] rounds=2
+      Dumbbell row | data "2×8–12 each @ RPE 7" | V207 shows "8–12 each @ RPE 7" | surgery "8–12 each @ RPE 7"
+      Kettlebell swing | data "2×10" | V207 shows "10" | surgery "10 reps"
+  W6 tue [Leg circuit — runner armor] rounds=2
+      Dumbbell Bulgarian split squat | data "2×8–12 each @ RPE 7" | V207 shows "8–12 each @ RPE 7" | surgery "8–12 each @ RPE 7"
+      Spanish squat hold (KB) | data "2×25 sec" | V207 shows "25 sec" | surgery "25 sec"
+      Kettlebell swing | data "2×8" | V207 shows "8" | surgery "8 reps"
+  W6 thu [Pull superset A] rounds=2
+      Barbell row | data "2×6–10 @ RPE 7" | V207 shows "6–10 @ RPE 7" | surgery "6–10 @ RPE 7"
+      L-sit chinups | data "2 sets — RPE 7 (leave 3 or more in reserve)" | V207 shows "RPE 7 (leave 3 or more in reserve)" | surgery "RPE 7 (leave 3 or more in reserve)"
+  W6 thu [Pull superset B] rounds=2
+      Dumbbell row | data "2×8–12 each @ RPE 7" | V207 shows "8–12 each @ RPE 7" | surgery "8–12 each @ RPE 7"
+      Kettlebell swing | data "2×10" | V207 shows "10" | surgery "10 reps"
+BARE BY NAME (ruling regex) [["Kettlebell swing",7412],["Mountain climbers",7252],["Ball slams",6070],["Burpees",5197],["High knees",3244],["Prone Y-T-W raises",2512],["Reverse snow angels",2424],["Wall slides",2320],["Broad jumps",1484],["Jump squats",667],["Skater bounds",200]]
+PHASE2 counts {"builds":4321,"dataDiff":0,"cards":1179339,"ssCards":373696,"bare":38782,"bareSingle":38782,"bareRange":0,"bareOutside":0,"expectOK":373696,"expectBad":0,"nonBareSS":334914,"nonBareSSchanged":0,"nonSSchanged":0,"rxCalls":1201619,"rxDiff":0,"swapCards":17954,"swapBare":785,"swapRange":0,"swapOutside":0,"swapOK":17954,"swapBad":0}
+bare outside ruling regex: {}
+mismatches: []
+samples:
+    nb:N–N @ RPE N :: Dumbbell decline press "8–12 @ RPE 7" -> "8–12 @ RPE 7"
+    nb:N–N each @ RPE N :: Kettlebell single-arm press "12–15 each @ RPE 7" -> "12–15 each @ RPE 7"
+    nb:N sec :: Spanish squat hold (KB) "25 sec" -> "25 sec"
+    Ball slams :: HALF_MANNY W1 thu [Pull superset B] "10" -> "10 reps"
+    nb:RPE N (leave N or more in reserve) :: Diamond pushups "RPE 7 (leave 3 or more in reserve)" -> "RPE 7 (leave 3 or more in reserve)"
+    Kettlebell swing :: HALF_MANNY W3 tue [Leg circuit — runner armor] "8" -> "8 reps"
+    Broad jumps :: HALF_MANNY W3 thu [Pull superset B] "10" -> "10 reps"
+    Burpees :: HALF_MANNY W7 thu [Pull superset B] "10" -> "10 reps"
+    nb:N each :: Landmine rotational press "15 each" -> "15 each"
+    Jump squats :: HALF_MANNY W11 thu [Pull superset B] "10" -> "10 reps"
+    nb:N–N @ RPE N–N :: Dumbbell rear delt fly "10–15 @ RPE 6–7" -> "10–15 @ RPE 6–7"
+    Mountain climbers :: commercial|support_prevention|beginner|liftonly|healthy W1 sat [Explosive finisher] "10" -> "10 reps"
+    Wall slides :: bodyweight|support_prevention|beginner|liftonly|healthy W1 mon [Delts] "12" -> "12 reps"
+    Prone Y-T-W raises :: bodyweight|support_prevention|beginner|liftonly|healthy W1 mon [Delts] "12" -> "12 reps"
+    Reverse snow angels :: bodyweight|support_prevention|beginner|liftonly|healthy W1 tue [Pull superset A] "8" -> "8 reps"
+    High knees :: bodyweight|support_prevention|beginner|liftonly|healthy W1 sat [Explosive finisher] "15" -> "15 reps"
+    Skater bounds :: bodyweight|support_prevention|beginner|liftonly|healthy W1 sat [Explosive finisher] "10" -> "10 reps"
+swap sample: HALF_MANNY W3 tue [Leg circuit — runner armor] Kettlebell swing -> Barbell good mornings data="2×8" "8" -> "8 reps"
+EXIT 0
+######## rb_bx_55+.out  (HEAD 920fa0a ia-version 219; V206/V207/V209 from git tags)
+AGE 55+
+artifact index.html ia-version 219
+
+== REPRO HALF_MANNY: bare rendered lines 11 / 380
+    "N" e.g. HALF_MANNY W1 thu [superset swap minus] :: Ball slams :: "10"
+
+== LATTICE builds 0 crashes 0 renderFail 0
+
+== GRAMMAR (engine raw) top 4 shapes per section kind
+ [core]
+    16 "N×N each" e.g. Bird dogs :: 3×12 each
+    5 "N×N–N each @ RPE N" e.g. Landmine rotations :: 2×8–12 each @ RPE 7
+    3 "N×N yd each" e.g. Suitcase carry :: 3×40 yd each
+    3 "N×N–N sec each" e.g. Side plank :: 3×30–45 sec each
+ [hip]
+    15 "N×N each" e.g. Seated banded hip flexion :: 2×15 each
+    12 "N×N each, slow" e.g. Hip airplane (light KB) :: 2×6 each, slow
+    12 "N×N–N each @ RPE N" e.g. Standing band hip abduction :: 2×12–15 each @ RPE 7
+    8 "N×N each direction" e.g. Standing ankle CARs :: 2×5 each direction
+ [main]
+    18 "N×N–N @ RPE N" e.g. Dumbbell Arnold press :: 2×6–10 @ RPE 7
+    15 "N×N — RPE N.N (leave ~N reps in reserve), ramp up with N–N warmup sets" e.g. Close-grip bench press :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+    12 "N×N — RPE N (leave ~N reps in reserve), ramp up with N–N warmup sets, " e.g. Dumbbell bench press :: 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+    10 "N×N — RPE N–N, leave N+ in reserve" e.g. Dumbbell bench press :: 3×12 — RPE 6–7, leave 3+ in reserve
+ [primer]
+    7 "N×N — RPE N–N (primer — light and crisp, well short of failure), N–N m" e.g. Dumbbell bench press :: 3×12 — RPE 5–6 (primer — light and crisp, well short of failure), 2–3 min rest
+ [straight:Calf]
+    9 "N×N–N each, slow N-sec lower" e.g. Dumbbell seated calf raise :: 2×12–15 each, slow 3-sec lower
+ [straight:Chest]
+    8 "N×N sec" e.g. Spanish squat hold (KB) :: 3×25 sec
+ [straight:Delt]
+    1 "N×N–N @ RPE N" e.g. Dumbbell front raise :: 2×15–20 @ RPE 7
+ [straight:Loaded]
+    7 "N×N yards each, heavy" e.g. Suitcase carry :: 3×40 yards each, heavy
+    2 "N×N yards, heavy" e.g. Farmer carry :: 3×40 yards, heavy
+ [straight:Post]
+    9 "N×N sec each side — knee straight, then bent" e.g. Standing calf stretch :: 2×45 sec each side — knee straight, then bent
+    9 "N×N sec each side — hip flexors; squeeze the trailing glute" e.g. Couch stretch :: 2×45 sec each side — hip flexors; squeeze the trailing glute
+    9 "N×N sec each side" e.g. Hip 90/90 stretch :: 2×45 sec each side
+    9 "N×N sec — thread the needle, reach long" e.g. T-spine mobility :: 2×45 sec — thread the needle, reach long
+ [straight:Power]
+    1 "N×N — fast and crisp, Ns rest" e.g. Kettlebell swing :: 4×10 — fast and crisp, 60s rest
+ [straight:Pull]
+    2 "N×N–N each @ RPE N" e.g. Dumbbell row :: 2×8–12 each @ RPE 7
+ [superset]
+    59 "N×N–N @ RPE N" e.g. Dumbbell decline press :: 2×8–12 @ RPE 7
+    26 "N sets — RPE N (leave N or more in reserve)" e.g. Diamond pushups :: 2 sets — RPE 7 (leave 3 or more in reserve)
+    21 "N×N–N each @ RPE N" e.g. Kettlebell single-arm press :: 2×12–15 each @ RPE 7
+    13 "N×N sec" e.g. Spanish squat hold (KB) :: 2×25 sec
+
+== bare RENDERED lines: movement | raw data shape -> shown (top 20)
+    4 Kettlebell swing | raw "N×N" -> shown "8"
+    2 Ball slams | raw "N×N" -> shown "10"
+    2 Kettlebell swing | raw "N×N" -> shown "10"
+    1 Broad jumps | raw "N×N" -> shown "10"
+    1 Burpees | raw "N×N" -> shown "10"
+    1 Jump squats | raw "N×N" -> shown "10"
+
+== Kettlebell swing examples
+    HALF_MANNY W3 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W4 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W5 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W5 thu [Pull superset B] raw="2×10" shown="10" swap=true minus=true
+    HALF_MANNY W6 tue [Leg circuit — runner armor] raw="2×8" shown="8" swap=true minus=true
+    HALF_MANNY W6 thu [Pull superset B] raw="2×10" shown="10" swap=true minus=true
+
+==== PHASE 2  base 219 surgery /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/2ef6b80b-284e-4663-8193-3a4cf2293a53/scratchpad/rb_surg.html ia-version 219
+HALF_MANNY progDigest base 0ac7da6b1691a8e1 surgery 0ac7da6b1691a8e1 MANNY_DIGEST_BY_VERSION[207] 0ac7da6b1691a8e1
+  W5 tue [Leg circuit — runner armor] rounds=2
+      Dumbbell Bulgarian split squat | data "2×8–12 each @ RPE 7" | V207 shows "8–12 each @ RPE 7" | surgery "8–12 each @ RPE 7"
+      Spanish squat hold (KB) | data "2×25 sec" | V207 shows "25 sec" | surgery "25 sec"
+      Kettlebell swing | data "2×8" | V207 shows "8" | surgery "8 reps"
+  W5 thu [Pull superset A] rounds=2
+      Barbell row | data "2×6–10 @ RPE 7" | V207 shows "6–10 @ RPE 7" | surgery "6–10 @ RPE 7"
+      L-sit chinups | data "2 sets — RPE 7 (leave 3 or more in reserve)" | V207 shows "RPE 7 (leave 3 or more in reserve)" | surgery "RPE 7 (leave 3 or more in reserve)"
+  W5 thu [Pull superset B] rounds=2
+      Dumbbell row | data "2×8–12 each @ RPE 7" | V207 shows "8–12 each @ RPE 7" | surgery "8–12 each @ RPE 7"
+      Kettlebell swing | data "2×10" | V207 shows "10" | surgery "10 reps"
+  W6 tue [Leg circuit — runner armor] rounds=2
+      Dumbbell Bulgarian split squat | data "2×8–12 each @ RPE 7" | V207 shows "8–12 each @ RPE 7" | surgery "8–12 each @ RPE 7"
+      Spanish squat hold (KB) | data "2×25 sec" | V207 shows "25 sec" | surgery "25 sec"
+      Kettlebell swing | data "2×8" | V207 shows "8" | surgery "8 reps"
+  W6 thu [Pull superset A] rounds=2
+      Barbell row | data "2×6–10 @ RPE 7" | V207 shows "6–10 @ RPE 7" | surgery "6–10 @ RPE 7"
+      L-sit chinups | data "2 sets — RPE 7 (leave 3 or more in reserve)" | V207 shows "RPE 7 (leave 3 or more in reserve)" | surgery "RPE 7 (leave 3 or more in reserve)"
+  W6 thu [Pull superset B] rounds=2
+      Dumbbell row | data "2×8–12 each @ RPE 7" | V207 shows "8–12 each @ RPE 7" | surgery "8–12 each @ RPE 7"
+      Kettlebell swing | data "2×10" | V207 shows "10" | surgery "10 reps"
+BARE BY NAME (ruling regex) [["Kettlebell swing",8634],["Mountain climbers",7344],["Ball slams",6496],["Burpees",5395],["High knees",3276],["Prone Y-T-W raises",3040],["Reverse snow angels",2616],["Wall slides",2104],["Broad jumps",1737],["Jump squats",851],["Skater bounds",200]]
+PHASE2 counts {"builds":4321,"dataDiff":0,"cards":1235865,"ssCards":424876,"bare":41693,"bareSingle":41693,"bareRange":0,"bareOutside":0,"expectOK":424876,"expectBad":0,"nonBareSS":383183,"nonBareSSchanged":0,"nonSSchanged":0,"rxCalls":1258273,"rxDiff":0,"swapCards":18928,"swapBare":937,"swapRange":0,"swapOutside":0,"swapOK":18928,"swapBad":0}
+bare outside ruling regex: {}
+mismatches: []
+samples:
+    nb:N–N @ RPE N :: Dumbbell decline press "8–12 @ RPE 7" -> "8–12 @ RPE 7"
+    nb:N–N each @ RPE N :: Kettlebell single-arm press "12–15 each @ RPE 7" -> "12–15 each @ RPE 7"
+    nb:N sec :: Spanish squat hold (KB) "25 sec" -> "25 sec"
+    Ball slams :: HALF_MANNY W1 thu [Pull superset B] "10" -> "10 reps"
+    nb:RPE N (leave N or more in reserve) :: Diamond pushups "RPE 7 (leave 3 or more in reserve)" -> "RPE 7 (leave 3 or more in reserve)"
+    Kettlebell swing :: HALF_MANNY W3 tue [Leg circuit — runner armor] "8" -> "8 reps"
+    Broad jumps :: HALF_MANNY W3 thu [Pull superset B] "10" -> "10 reps"
+    Burpees :: HALF_MANNY W7 thu [Pull superset B] "10" -> "10 reps"
+    nb:N each :: Landmine rotational press "15 each" -> "15 each"
+    Jump squats :: HALF_MANNY W11 thu [Pull superset B] "10" -> "10 reps"
+    nb:N–N @ RPE N–N :: Dumbbell rear delt fly "12–15 @ RPE 6–7" -> "12–15 @ RPE 6–7"
+    Mountain climbers :: commercial|support_prevention|beginner|liftonly|healthy W1 sat [Explosive finisher] "10" -> "10 reps"
+    Wall slides :: bodyweight|support_prevention|beginner|liftonly|healthy W1 mon [Delts] "15" -> "15 reps"
+    Prone Y-T-W raises :: bodyweight|support_prevention|beginner|liftonly|healthy W1 mon [Delts] "15" -> "15 reps"
+    Reverse snow angels :: bodyweight|support_prevention|beginner|liftonly|healthy W1 tue [Pull superset A] "8" -> "8 reps"
+    High knees :: bodyweight|support_prevention|beginner|liftonly|healthy W1 sat [Explosive finisher] "15" -> "15 reps"
+    Skater bounds :: bodyweight|support_prevention|beginner|liftonly|healthy W1 sat [Explosive finisher] "10" -> "10 reps"
+swap sample: HALF_MANNY W3 tue [Leg circuit — runner armor] Kettlebell swing -> Barbell good mornings data="2×8" "8" -> "8 reps"
+EXIT 0
+######## emoji table diff V206 vs HEAD (line col stripped)
+8c8
+< === CLASS C by char {"—":490,"×":670}
+---
+> === CLASS C by char {"—":491,"×":670}
+15,17c15,17
+< DENOM lines 17469  literal tokens 11190 {"literals":11190,"jsStr":10049,"jsTpl":696,"jsRe":355,"css":72,"html":18,"codeTokens":16619}  comment chars stripped 428965
+< FILE /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/2ef6b80b-284e-4663-8193-3a4cf2293a53/scratchpad/rb_v206.html  ia-version 206
+< TOTALS by class {"C":1160,"B":104,"A":170,"A2":14}
+---
+> DENOM lines 17961  literal tokens 11447 {"literals":11447,"jsStr":10266,"jsTpl":719,"jsRe":372,"css":72,"html":18,"codeTokens":17141}  comment chars stripped 451333
+> FILE index.html  ia-version 219
+> TOTALS by class {"C":1161,"B":104,"A":170,"A2":14}
+73a74
+> ⚠	U+26A0	str	literal	_tg1	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| ⚠
+76d76
+< ⚠	U+26A0	str	literal	recommended	VIA_ASYICON		innerHTML,asyIcon	via asyIcon -> SVG	| ⚠

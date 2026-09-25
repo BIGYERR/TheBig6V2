@@ -265,8 +265,15 @@ ok('P3d a swim goal never produces a run shape', !carries(swim));
 // ── P4 the copy rule ────────────────────────────────────────────────────────────
 const noteOut = IA.buildProgram(paceCfg(['sun','wed'], 76308)).legRecoveryNote || '';
 ok('P4a the pace family prints the ruled note verbatim', noteOut.indexOf(D36) >= 0, JSON.stringify(noteOut));
-ok('P4b no mid-sentence hyphen or em-dash in the note Mario reads', !/\S\s*[–—]\s*\S/.test(D36) && !/[a-z] - [a-z]/.test(D36), JSON.stringify(D36));
-ok('P4c the note is short declarative sentences, no user-facing brand', !/Nike/i.test(D36) && D36.split('.').filter(s => s.trim()).length >= 2);
+// P-RECOVBANNER §5 (standing ruling 2): P4b/P4c are copy rules on a note Mario READS, so they are licensed by a
+// SOURCE predicate, not a version number. The week view shows the note only while the comment-stripped source
+// (SRC above) still reads activeProg.legRecoveryNote; once the banner is gone the string is an engine trace (the
+// placement's branch marker, standing ruling 3) and P4b/P4c SKIP by name. P4a keeps running either way.
+const ON_SCREEN = /activeProg\.legRecoveryNote/.test(SRC);
+if(ON_SCREEN){
+  ok('P4b no mid-sentence hyphen or em-dash in the note Mario reads', !/\S\s*[–—]\s*\S/.test(D36) && !/[a-z] - [a-z]/.test(D36), JSON.stringify(D36));
+  ok('P4c the note is short declarative sentences, no user-facing brand', !/Nike/i.test(D36) && D36.split('.').filter(s => s.trim()).length >= 2);
+} else { skip += 2; console.log('SKIP P4b/P4c: the note left the week view (P-RECOVBANNER); the string is an engine trace'); }
 
 // ── P5 the vacuity guard ────────────────────────────────────────────────────────
 ok('P5 the lattice contains weeks where the eve was a training day and both leg roles existed, so P1 could have failed',

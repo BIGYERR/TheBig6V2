@@ -1,0 +1,37 @@
+[
+ {
+  "name": "S1-D175 -> [8] loses type:'cardio': the brunch line is weekend-only again, so a lift-only Saturday or Sunday draws \"Cardio's done\"",
+  "anchor": "when:'weekend', type:'cardio'}",
+  "replacement": "when:'weekend'}",
+  "gate": "gates/g220_d175_popcond.js",
+  "note": "NAMED TRIP in g220_d175_popcond.js rows E1 liftOnly sat/sun today/past 07h/10h (8 cells, +[8]) and E2c (lift-only Saturday draws [8]). Needs ia-version >= 220: below 220 the gate REFUSES (every row FAILS by name), so the trip is only meaningful on 220+."
+ },
+ {
+  "name": "S2-D175 -> popContext reads the tap-time weekday (new Date().getDay()) instead of the trained day from dayDateFor, so a Monday mark of Saturday's long run loses the weekend lines and a Saturday mark of a Wednesday gains them",
+  "anchor": "  const dow=dt.getDay();",
+  "replacement": "  const dow=new Date().getDay();",
+  "gate": "gates/g220_d175_popcond.js",
+  "note": "NAMED TRIP in g220_d175_popcond.js row E2b (Monday mark of the HALF_MANNY W4 sat long run, -[1,8,15]) and every past cell: E1 x/wed|sat|sun past 07h/10h (24 cells) and E1r HALF_MANNY runMob/runOnly past 07h/10h (4 cells). Needs ia-version >= 220: below 220 the gate REFUSES (every row FAILS by name), so the trip is only meaningful on 220+."
+ },
+ {
+  "name": "S3-D175 -> morning passes on a past day: the trained-day-is-today conjunct is dropped, so marking yesterday at 7am draws \"half the city's still asleep\"",
+  "anchor": "morning:(now.getHours()<9&&dt.getTime()===today.getTime()),",
+  "replacement": "morning:(now.getHours()<9),",
+  "gate": "gates/g220_d175_popcond.js",
+  "note": "NAMED TRIP in g220_d175_popcond.js rows E1 <every shape> wed/sat/sun past 07h (12 cells, +[3]) and E1r HALF_MANNY <every shape> past 07h (4 cells). Needs ia-version >= 220: below 220 the gate REFUSES (every row FAILS by name), so the trip is only meaningful on 220+."
+ },
+ {
+  "name": "S4-D175 -> the /mobility|taper/i label matcher is removed from the lift lens, so a Post-run mobility long run counts as lifting and draws [25] and [26]",
+  "anchor": "(s.items||[]).length&&!/mobility|taper/i.test(s.label||''))",
+  "replacement": "(s.items||[]).length)",
+  "gate": "gates/g220_d175_popcond.js",
+  "note": "NAMED TRIP in g220_d175_popcond.js rows E1 runMob wed/sat/sun today/past 07h/10h (12 cells, +[25,26]), E1r HALF_MANNY runMob (the real W4 sat Post-run mobility long run) today/past 07h/10h (4 cells) and E2b. Needs ia-version >= 220: below 220 the gate REFUSES (every row FAILS by name), so the trip is only meaningful on 220+."
+ },
+ {
+  "name": "S5-D175 -> the reminder's short-gap branch passes a fixed msg instead of popPick('reminder',...), so the reminder pool is dead again",
+  "anchor": "    : popPick('reminder',target.week,target.d);",
+  "replacement": "    : 'This one got away from you. Mark it and move on. Never cram a missed session back in.';",
+  "gate": "gates/g220_d175_popcond.js",
+  "note": "NAMED TRIP in g220_d175_popcond.js rows E3a (gap 3 msg is not a reminder-pool line) and E3b (gap 3 does not rotate: 1 distinct line, ia_pop_idx_.reminder never written). Needs ia-version >= 220: below 220 the gate REFUSES (every row FAILS by name), so the trip is only meaningful on 220+."
+ }
+]

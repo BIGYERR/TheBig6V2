@@ -289,6 +289,7 @@ const IP=load(ART), II=load(ins.file);
 // no longer enters p1 beside a swing Main (census enterPost=none 60 -> 72). No row -> all five FAIL.
 const SWAP_BY_VERSION = { 218: 150 };
 SWAP_BY_VERSION[219] = 138;   // D166: ruled MOVE (150 -> 138)
+SWAP_BY_VERSION[220] = SWAP_BY_VERSION[219];   // V220 (D173/D174/D175/D176): ruled UNMOVED (zero-engine build: display, copy and pop-up only; no hunk reaches buildProgram or the pull-day swap draw, so the p1 population stays 138)
 const SWAP_N = SWAP_BY_VERSION[(+IP.version <= 218) ? 218 : +IP.version];
 II.eval(SNAP_FN+"globalThis.__G200=null;");
 let inert=0,inertN=0;

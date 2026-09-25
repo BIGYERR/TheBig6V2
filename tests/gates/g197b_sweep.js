@@ -223,10 +223,12 @@ HF_LEAK_BY_VERSION[216] = HF_LEAK_BY_VERSION[215];   // D154/D156: ruled UNMOVED
 HF_LEAK_BY_VERSION[217] = HF_LEAK_BY_VERSION[216];   // D160: ruled UNMOVED (0/0 printed; the dedupe draws only from the swap universe the tier already owns)
 HF_LEAK_BY_VERSION[218] = HF_LEAK_BY_VERSION[217];   // D157: ruled UNMOVED (0/0 printed; the swim sizer and three labels draw no lift item)
 HF_LEAK_BY_VERSION[219] = HF_LEAK_BY_VERSION[218];   // V219 (D167/D171/D159/D164/D170/D165/D166): ruled UNMOVED (0/0 printed at measure's step 7; every V219 draw picks from the tier's own pool)
+HF_LEAK_BY_VERSION[220] = HF_LEAK_BY_VERSION[219];   // V220 (D173/D174/D175/D176): ruled UNMOVED (zero-engine build: display, copy and pop-up only; no hunk reaches buildProgram or anything it calls; the [219] 0/0 carries)
 const HF_LEAK = HF_LEAK_BY_VERSION[(+IA.version <= 209) ? 209 : +IA.version];
 // B5c's same-card duplicate count, keyed by ia-version (D133). 187 through V218 (the bare literal B5c read until V219).
 const B5C_BY_VERSION = { 218: 187 };
 B5C_BY_VERSION[219] = 0;   // D170 then D165: ruled MOVE. D170 (cf170b) 187 -> 185 printed; D165 (cf165b) redraws the lunge slot when it collides with a step-up Main, 185 -> 0
+B5C_BY_VERSION[220] = B5C_BY_VERSION[219];   // V220 (D173/D174/D175/D176): ruled UNMOVED (zero-engine build: display, copy and pop-up only; no hunk reaches buildProgram or anything it calls; the [219] 0 carries)
 const B5C_ROW = B5C_BY_VERSION[(+IA.version <= 218) ? 218 : +IA.version];   // no row -> B5c FAILS
 // Survivors of one kind, read off the census and off the row through the same needs() table,
 // compared name for name and count for count: no extras, no missing.

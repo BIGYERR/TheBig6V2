@@ -1,0 +1,44 @@
+[
+ {
+  "name": "P2-D174 -> the clipboard emoji is re-inserted in the day-card log nudge (as V219 stored it, lower-case backslash-u escape text) in place of the notebook icon",
+  "anchor": "'<div class=\"log-nudge\"><span>'+asyIcon('notebook',14)+' You logged this one but never marked it.</span>",
+  "replacement": "'<div class=\"log-nudge\"><span>\\ud83d\\udccb You logged this one but never marked it.</span>",
+  "gate": "gates/g220_d174_emoji.js",
+  "note": "NAMED TRIP in g220_d174_emoji.js rows A1 (raw clipboard pictograph outside the allowlist) and D4c (the nudge renders no SVG); E1 and E2 also fail by construction (E1 needs row A green on the copy, E2 loses its anchor). The gate REFUSES below ia-version 220 (every row FAILS by name as REFUSED), so the mutation is only meaningful on a 220+ artifact."
+ },
+ {
+  "name": "P3-D174 -> the em-dash is restored in POP_POOLS.workout[0] (\"you know, faster\" back to \"you know -- faster\")",
+  "anchor": "Just, you know, faster next time.",
+  "replacement": "Just, you know \u2014 faster next time.",
+  "gate": "gates/g220_d174_emoji.js",
+  "note": "NAMED TRIP in g220_d174_emoji.js rows B1 (After text gone), B11 (a Before text is back) and C3 (workout[0] differs from the hand table). The gate REFUSES below ia-version 220 (every row FAILS by name as REFUSED), so the mutation is only meaningful on a 220+ artifact."
+ },
+ {
+  "name": "P4-D174 -> \"8-story walk-up\" is restored in POP_POOLS.workout[7]",
+  "anchor": "wheezing up eight flights of stairs later.",
+  "replacement": "wheezing on the way up to your 8-story walk-up.",
+  "gate": "gates/g220_d174_emoji.js",
+  "note": "NAMED TRIP in g220_d174_emoji.js rows B3 (After text gone), B11 (a Before text is back) and C3 (workout[7] differs from the hand table). The gate REFUSES below ia-version 220 (every row FAILS by name as REFUSED), so the mutation is only meaningful on a 220+ artifact."
+ },
+ {
+  "name": "P5-D174 -> the eyes emoji is re-inserted as POP_CFG.reminder icon (literal glyph, as V219 stored it) in place of the notebook icon name",
+  "anchor": "reminder:{icon:'notebook',",
+  "replacement": "reminder:{icon:'\ud83d\udc40',",
+  "gate": "gates/g220_d174_emoji.js",
+  "note": "NAMED TRIP in g220_d174_emoji.js rows A1 (POP_CFG.reminder is not allowlisted), D1 (icon is not notebook) and D3a (popFire writes the emoji as text, no SVG); E1 also fails by construction (it needs row A green on the copy). The gate REFUSES below ia-version 220 (every row FAILS by name as REFUSED), so the mutation is only meaningful on a 220+ artifact."
+ },
+ {
+  "name": "P6-D174 -> the CHECK IN worse injury call gets its warning-sign emoji back (backslash-u escape text, as V219 stored it) in place of the warning icon name",
+  "anchor": "{icon:'warning',kicker:'CHECK IN',msg:'Two weeks and trending worse.',",
+  "replacement": "{icon:'\\u26A0\\uFE0F',kicker:'CHECK IN',msg:'Two weeks and trending worse.',",
+  "gate": "gates/g220_d174_emoji.js",
+  "note": "NAMED TRIP in g220_d174_emoji.js rows A1 (injury icons are not allowlisted) and D2d (icon read from source is not warning); E1 also fails by construction (it needs row A green on the copy). The gate REFUSES below ia-version 220 (every row FAILS by name as REFUSED), so the mutation is only meaningful on a 220+ artifact."
+ },
+ {
+  "name": "P7-D174 -> popFire routes any ASY_EMOJI-mapped emoji through asyIcon, so the streak fire and season trophy celebration icons render as SVG against Mario's call",
+  "anchor": "if(Object.prototype.hasOwnProperty.call(ASY_ICON_PATHS,ic)) icEl.innerHTML=asyIcon(ic,52);",
+  "replacement": "if(Object.prototype.hasOwnProperty.call(ASY_ICON_PATHS,ic)||ASY_EMOJI[ic]) icEl.innerHTML=asyIcon(ic,52);",
+  "gate": "gates/g220_d174_emoji.js",
+  "note": "NAMED TRIP in g220_d174_emoji.js row D3c only (streak and season popIcon get innerHTML SVG instead of the emoji as text, and an emoji reaches asyIcon). The gate REFUSES below ia-version 220 (every row FAILS by name as REFUSED), so the mutation is only meaningful on a 220+ artifact."
+ }
+]

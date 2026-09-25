@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="219"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="220"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2624,12 +2624,12 @@ function _seedBannerHTML(){
   if(WD._seed===undefined){ try{WD._seed=seedFromPriorPrograms();}catch(e){WD._seed=null;} }
   const s=WD._seed; if(!s) return '';
   if(WD._seedApplied){
-    return `<div style="font-size:11px;color:var(--muted);margin:2px 0 8px">\uD83D\uDCC8 Estimated from \u201C${s.progName}\u201D \u2014 edit if you know better.</div>`;
+    return `<div style="font-size:11px;color:var(--muted);margin:2px 0 8px">${asyIcon('chart',12)} Estimated from \u201C${s.progName}\u201D. Edit if you know better.</div>`;
   }
   const pace=_fmtPaceMi(s.avgRecSec)||'';
   const distLine=s.maxDist?`, longest run ${s.maxDist} mi`:'';
   return `<div style="background:var(--surface);border:1px solid var(--accent);border-radius:4px;padding:12px 14px;margin-bottom:12px">
-    <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--text);margin-bottom:4px">\uD83D\uDCC8 Seed from \u201C${s.progName}\u201D?</div>
+    <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--text);margin-bottom:4px">${asyIcon('chart',13)} Seed from \u201C${s.progName}\u201D?</div>
     <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px">Recent logs found: ${s.n} recovery runs, avg ${pace}/mi${distLine} over your last 3 weeks.</div>
     <div style="display:flex;gap:8px">
       <button class="prog-action-btn primary" style="flex:1" onclick="applySeedData()">Use this data</button>
@@ -12065,14 +12065,8 @@ function renderWeekView(){
     +'<div class="wk-stat"><div class="wk-stat-num" style="color:var(--accent)">'+streak+'</div><div class="wk-stat-lbl">DAY STREAK</div></div>'
     +'</div>';
 
-  // ── leg-recovery note (kept) ──
-  let leg='';
-  if(activeProg.legRecoveryNote){
-    leg='<div style="background:var(--surface);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:4px;padding:10px 12px;margin:0 16px 12px;font-size:12px;color:var(--muted);line-height:1.5">\u267b\ufe0f <b style="color:var(--text)">Recovery spacing:</b> '+activeProg.legRecoveryNote+'</div>';
-  }
-
   const _wcTag=wildcardTagHTML(currentWeek,heroKey);   // V195 (D64)
-  list.innerHTML=strip+hero+_wcTag+stats+leg;
+  list.innerHTML=strip+hero+_wcTag+stats;
 }
 
 // DETAIL VIEW
@@ -12671,7 +12665,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
   // V190 (D39): inside a block that draws a round count, the row states reps and effort
   // only — the count is on the header. `_dispDetail` is the RENDERED string; i.detail is
   // left alone so parseRx and every one of its five callers see what they always saw.
-  const _dispDetail=(_ssRounds!=null&&!i._skipped)?_stripLeadingSets(i.detail||''):(i.detail||'');
+  const _dispDetail=(_ssRounds!=null&&!i._skipped)?_stripLeadingSets(i.detail||'').replace(/^\d+(\s*[–-]\s*\d+)?$/,'$& reps'):(i.detail||'');   // V220 (D176) a bare count reads as reps
   const exKey=exStoreKey(i.name);
   // A skipped item renders as a struck-through stub instead of a card. It is NOT removed
   // from the day: keeping it visible is what distinguishes "the engine never programmed
@@ -13947,7 +13941,7 @@ function openDetail(dayKey,day){
   const _le=getLogs()[logKey(currentWeek,dayKey)];
   const _hasLog=_le&&((_le.notes&&_le.notes.trim())||_le.run_dist||_le.run_pace||_le.run_mins||_le.run_reps||_le.run_rep_time||_le.bike_mins||_le.swim_yards);
   if(!curStatus && _hasLog){
-    html+='<div class="log-nudge">\ud83d\udccb You logged this one but never marked it.<button class="log-nudge-btn" onclick="handleDayStatus(\''+dayKey+'\',\''+escTitle+'\',\'complete\')">Mark Done \u2713</button></div>';
+    html+='<div class="log-nudge"><span>'+asyIcon('notebook',14)+' You logged this one but never marked it.</span><button class="log-nudge-btn" onclick="handleDayStatus(\''+dayKey+'\',\''+escTitle+'\',\'complete\')">Mark Done \u2713</button></div>';
   }
   document.getElementById('detailBody').innerHTML=html;
 
@@ -15521,7 +15515,7 @@ function imBackFromInjury(id){
   renderWeekView();
   const lbl=(INJURY_REGIONS[region]||{}).label||'injury';
   if(!_hadRunSuppression){
-    popFire('workout',{icon:'\uD83D\uDEE1\uFE0F',kicker:'BACK IN',msg:'Good. One week to prove it.',
+    popFire('workout',{icon:'shield',kicker:'BACK IN',msg:'Good. One week to prove it.',
       sub:'The '+lbl.toLowerCase()+' work comes back light this week, held at RPE 7. Full send next week.',dismiss:'LET\u2019S GO'});
     return;
   }
@@ -15546,7 +15540,7 @@ function imBackFromInjury(id){
       }
     }
   }catch(e){}
-  popFire('workout',{icon:'\uD83D\uDEE1\uFE0F',kicker:'BACK IN',msg:'Good. Two weeks to full send.',
+  popFire('workout',{icon:'shield',kicker:'BACK IN',msg:'Good. Two weeks to full send.',
     sub:_sub,dismiss:'LET\u2019S GO'});
 }
 // 14-day reassess: pain-gated injuries get a check-in card on This Week, not a
@@ -15557,7 +15551,7 @@ function injReassess(id,ans){
   const ov=activeProg.overlays.find(o=>o&&o.id===id);
   if(!ov) return;
   if(ans==='better'){
-    popFire('workout',{icon:'\uD83D\uDEE1\uFE0F',kicker:'CHECK IN',msg:'Good sign.',
+    popFire('workout',{icon:'shield',kicker:'CHECK IN',msg:'Good sign.',
       sub:'Ready to bring it back, or give it more time? Coming back starts with one light week.',
       actions:[{label:'I\u2019M BACK',cls:'go',onclick:"popClose();imBackFromInjury('"+id+"')"},
                {label:'MORE TIME',cls:'skip',onclick:"popClose();injSnooze('"+id+"')"}]});
@@ -15565,7 +15559,7 @@ function injReassess(id,ans){
   }
   if(ans==='worse'){
     ov.lastAsk=Date.now(); _saveOverlays();
-    popFire('workout',{icon:'\u26A0\uFE0F',kicker:'CHECK IN',msg:'Two weeks and trending worse.',
+    popFire('workout',{icon:'warning',kicker:'CHECK IN',msg:'Two weeks and trending worse.',
       sub:'That is a job for a professional, not an app. Get it looked at. The plan keeps protecting it in the meantime.',dismiss:'UNDERSTOOD'});
     renderWeekView();
     return;
@@ -16088,7 +16082,7 @@ function _progChipsHTML(programs, vid){
   });
   const chips=order.map(p=>{
     const sel=p.id===vid;
-    const label=(p.archived?'\uD83D\uDDC4 ':'')+(p.name||'Program');
+    const label=(p.archived?asyIcon('history',13)+' ':'')+(p.name||'Program');
     return `<button onclick="setProgressView('${p.id}')" style="flex:0 0 auto;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.04em;padding:8px 12px;border-radius:16px;cursor:pointer;white-space:nowrap;border:1px solid ${sel?'var(--accent)':'var(--border)'};background:${sel?'var(--accent)':'var(--surface)'};color:${sel?'var(--on-ink)':'var(--muted)'}">${label}</button>`;
   }).join('');
   const viewed=programs.find(p=>p.id===vid);
@@ -17551,40 +17545,40 @@ function init(){
    are staged for the next batch (no trigger fires them yet). */
 const POP_POOLS={
   workout:[
-    "Congrats... you actually showed up. Just, you know — faster next time. 🎉",
+    "Congrats... you actually showed up. Just, you know, faster next time. 🎉",
     {t:"Hangover said stay down. You told it to go fuck itself. Respect. 🍺🪦", when:'weekend'},
-    "Look at you — vertical, sweaty, and useful. Goddamn miracle. 🫡",
+    "Look at you. Vertical, sweaty, and useful. Goddamn miracle. 🫡",
     {t:"Another one done while half the city's still asleep. 🛏️😭", when:'morning'},
     "Go ahead, keep flexing in the mirror... THEY see it too. 🪞",
     "Ayoooo, your mom's third husband couldn't have done what you just did. 💪",
     "You showed up. The bums in the group chat didn't. You lit! 🔥",
-    "Sweat now or be wheezing on the way up to your 8-story walk-up. 🚶😤",
-    {t:"Cardio's done. You earned the right to talk all the shit you want at brunch. 🥂", when:'weekend'},
+    "Sweat now or be wheezing up eight flights of stairs later. 🚶😤",
+    {t:"Cardio's done. You earned the right to talk all the shit you want at brunch. 🥂", when:'weekend', type:'cardio'},
     "One more session toward not dropping dead at 50... You're welcome. ⚰️❌",
     "Well, look who decided not to be useless today. 🛋️🔥",
     "Sweaty, gross, and one step less gordito. Growth, baby. 📈",
     "You vs. the couch: couch lost again. Fuck that couch... or sit on it later. 🛋️💀",
     "Knocked it out while your excuses were still loading. ⏳🖕",
     "Body's pissed, you did it anyway. That's the whole damn point. 😤",
-    "Showed up hungover, didn't die. Take your victory shower. 🍻💪",
+    {t:"Showed up hungover, didn't die. Take your victory shower. 🍻💪", when:'weekend'},
     "Done. Go shower... please. 🚿🤢",
     "One more W! Stack 'em up. 🏙️📚",
-    "Quit looking for a medal — it's under your tetas, find it later. 🥇",
+    "Quit looking for a medal. It's under your tetas, find it later. 🥇",
     "You suffered on purpose. Stay safe, take a shot later. 😈",
     "Deadass, I've seen people move faster chasing their ex... but good job anyway. 🏃",
     "Diantreeeeeee, you actually activated today. Who inspired you? 👀",
     "Abusador! You murdered that session. Go get some water! 💦",
     "Ay, I don't care what literally everybody says... you got that dawg in you! 🐕",
     "You burned enough calories to justify one pastelito... just one. 🥟",
-    "You did the whole thing — looked dead ugly on that last set, but you finished. 💀",
-    "Por favor! Twenty minutes finding the right playlist, ten minutes lifting. But okay — \"workout complete.\" 🎧"
+    {t:"You did the whole thing. Looked dead ugly on that last set, but you finished. 💀", type:'lift'},
+    {t:"Por favor! Twenty minutes finding the right playlist, ten minutes lifting. But okay, \"workout complete.\" 🎧", type:'lift'}
   ],
   reminder:[
-    "Yo, you ghosted a session. Mark it or own the skip. 👀",
-    "Left a day hanging unmarked. Did you train or nah? 👇",
-    "Unfinished business sitting on your calendar. Settle up. 🧾",
-    "That day didn't log itself, champ. Complete it or call it. ✍️",
-    "You disappeared on a workout. Your record, your call — fix it. 📋"
+    "Yo, you ghosted a session. Mark it or own the skip.",
+    "Left a day hanging unmarked. Did you train or nah?",
+    "Unfinished business sitting on your calendar. Settle up.",
+    "That day didn't log itself, champ. Complete it or call it.",
+    "You disappeared on a workout. Your record, your call. Fix it."
   ],
   streak:[
     "Don't you DARE break this now, you've got something going. 🔥",
@@ -17597,17 +17591,17 @@ const POP_POOLS={
     "You finished the WHOLE fuckin' thing?? Who are you and what'd you do with the lazy prick I knew. 🏆",
     "Done. You bitched every goddamn step and STILL pulled it off. Legend shit. 💪",
     "Program complete. The streets are proud. Your knees filed a complaint. 🗽🦴",
-    "You saw it through. Rare as fuck — most quit at week two like little bitches. 🐔",
+    "You saw it through. Rare as fuck. Most quit at week two like little bitches. 🐔",
     "Full block. No shortcuts, no excuses, no crying. Go be insufferable about it. 🔥",
     "Your membership finally earned its keep instead of robbing you blind. 🧾😮‍💨",
     "Whole program, finished, no quitting halfway like a coward. I'm fuckin' shocked. 🏆",
-    "You outlasted every weak-ass excuse your brain coughed up. Respect, animal. 🧠❌",
+    "You outlasted every weak ass excuse your brain coughed up. Respect, animal. 🧠❌",
     "You crossed the line most people piss themselves at and bail. Built different. 💪"
   ]
 };
 const POP_CFG={
   workout: {icon:'🎉',kicker:'WORKOUT COMPLETE',kClass:'',glow:'rgba(24,23,18,0.35)',confetti:72,shake:false},
-  reminder:{icon:'👀',kicker:'UNFINISHED BUSINESS',kClass:'',glow:'rgba(24,23,18,0.30)',confetti:0,shake:false},
+  reminder:{icon:'notebook',kicker:'UNFINISHED BUSINESS',kClass:'',glow:'rgba(24,23,18,0.30)',confetti:0,shake:false},
   streak:  {icon:'🔥',kicker:'STREAK ALIVE',kClass:'streak',glow:'rgba(166,130,47,0.4)',confetti:100,shake:false},
   season:  {icon:'🏆',kicker:'SEASON COMPLETE',kClass:'',glow:'rgba(24,23,18,0.55)',confetti:200,shake:true}
 };
@@ -17631,23 +17625,45 @@ function popDismissText(){
   try{ localStorage.setItem(key,JSON.stringify({date:today,idx:i})); }catch{}
   return POP_DISMISS[i];
 }
-// Pool entries may be a plain string, or {t, when} where `when` gates eligibility
-// by context ('weekend' = Sat/Sun, 'morning' = before 9am, evaluated at fire time).
-function popContext(){
-  const now=new Date(); const dow=now.getDay();
-  return { weekend:(dow===0||dow===6), morning:(now.getHours()<9) };
+// Pool entries may be a plain string, or {t, when, type}; a tag gates eligibility on the
+// TRAINED day, read from activeProg.weeks the way maybeShowReminder reads it. V220 (D175):
+//   when:'weekend'  the trained day is a Saturday or Sunday (dayDateFor, not the tap clock)
+//   when:'morning'  before 9am on the clock AND the trained day is today; a past-day mark
+//                   never draws a morning line (the record carries the tap time, not the hour)
+//   type:'cardio'   the day has cardio (!!day.cardio, the dayCode lens)
+//   type:'lift'     dayCode's lift-section test minus sections labelled mobility or taper
+//                   (D18's vocabulary: a Post-run mobility day is not lifting, a Primer is)
+// Both tags must pass. With no resolvable day (no week/dayKey, no startDate, no day object)
+// the context is unknown: every tagged entry sits out, untagged entries stay eligible.
+function popContext(week,dayKey){
+  const day=(week!=null&&dayKey&&activeProg?.weeks)?activeProg.weeks[week]?.[dayKey]:null;
+  const dt=day?dayDateFor(week,dayKey):null;
+  if(!dt) return { known:false };
+  const now=new Date(); const today=new Date(now); today.setHours(0,0,0,0);
+  const dow=dt.getDay();
+  return {
+    known:true,
+    weekend:(dow===0||dow===6),
+    morning:(now.getHours()<9&&dt.getTime()===today.getTime()),
+    cardio:!!day.cardio,
+    lift:(day.sections||[]).some(s=>!s.core&&!s.hip&&(s.items||[]).length&&!/mobility|taper/i.test(s.label||''))
+  };
 }
 function popText(e){ return (e&&typeof e==='object')?e.t:e; }
 function popEligible(e,ctx){
-  const when=(e&&typeof e==='object')?e.when:null;
-  if(!when) return true;
-  if(when==='weekend') return ctx.weekend;
-  if(when==='morning') return ctx.morning;
+  const tag=(e&&typeof e==='object')?e:null;
+  const when=tag?tag.when:null, type=tag?tag.type:null;
+  if(!when&&!type) return true;
+  if(!ctx||!ctx.known) return false;
+  if(when==='weekend'&&!ctx.weekend) return false;
+  if(when==='morning'&&!ctx.morning) return false;
+  if(type==='cardio'&&!ctx.cardio) return false;
+  if(type==='lift'&&!ctx.lift) return false;
   return true;
 }
-function popPick(tier){
+function popPick(tier,week,dayKey){
   const pool=POP_POOLS[tier]; if(!pool||!pool.length) return '';
-  const ctx=popContext();
+  const ctx=popContext(week,dayKey);
   const elig=[]; pool.forEach((e,idx)=>{ if(popEligible(e,ctx)) elig.push(idx); });
   if(!elig.length) return popText(pool[0]);
   if(elig.length===1) return popText(pool[elig[0]]);
@@ -17662,9 +17678,14 @@ function popPick(tier){
 function popFire(tier,opts){
   opts=opts||{};
   const cfg=POP_CFG[tier]||POP_CFG.workout;
-  document.getElementById('popIcon').textContent=opts.icon||cfg.icon;
+  // V220 (D174): an ASY_ICON_PATHS name ('notebook', 'shield', 'warning') renders as SVG at the
+  // .pop-icon size; anything else, i.e. the celebration emoji, is written as text exactly as
+  // before. An emoji never goes through asyIcon: ASY_EMOJI maps the fire and trophy to SVG.
+  const ic=opts.icon||cfg.icon; const icEl=document.getElementById('popIcon');
+  if(Object.prototype.hasOwnProperty.call(ASY_ICON_PATHS,ic)) icEl.innerHTML=asyIcon(ic,52);
+  else icEl.textContent=ic;
   const k=document.getElementById('popKicker'); k.textContent=opts.kicker||cfg.kicker; k.className='pop-kicker '+(cfg.kClass||'');
-  document.getElementById('popMsg').textContent=opts.msg||popPick(tier);
+  document.getElementById('popMsg').textContent=opts.msg||popPick(tier,opts.week,opts.dayKey);   // V220 (D175) the trained day
   const sub=document.getElementById('popSub'); sub.textContent=opts.sub||''; sub.style.display=opts.sub?'block':'none';
   const row=document.getElementById('popStatRow'); const stats=opts.stats||[];
   row.innerHTML=stats.map(s=>`<div class="pop-stat"><div class="pop-stat-num ${s.cls||''}">${s.n}</div><div class="pop-stat-lbl">${s.l}</div></div>`).join('');
@@ -17760,8 +17781,8 @@ function completedCount(){
   Object.values(c).forEach(v=>{ const s=v?.status||'complete'; if(s==='complete'||s==='partial') n++; });
   return n;
 }
-function fireWorkoutPopup(){
-  popFire('workout',{ stats:[   // V181 (D4): block tally dropped — a raw count next to a streak said nothing the streak didn't
+function fireWorkoutPopup(week,dayKey){
+  popFire('workout',{ week:week, dayKey:dayKey, stats:[   // V181 (D4): block tally dropped — a raw count next to a streak said nothing the streak didn't
     {n:String(computeStreak()), l:'Day Streak '+asyIcon('🔥',12), cls:'streak'}
   ]});
 }
@@ -17804,7 +17825,7 @@ function fireCompletionPopup(week,dayKey){
   }
   const streak=computeStreak();
   if(streakMilestone(streak)){ fireStreakPopup(streak); return; }
-  fireWorkoutPopup();
+  fireWorkoutPopup(week,dayKey);
 }
 // Day-after reminder: most recent strictly-past pending non-rest day not yet reminded.
 function remindedSet(){ try{return JSON.parse(localStorage.getItem('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
@@ -17833,12 +17854,15 @@ function maybeShowReminder(){
   // guidance instead of guilt. No volume is changed here — the program stays as
   // written; the copy just tells the truth about how to come back.
   let _gap=0; for(let i=days.length-1;i>=0;i--){ if(statusOf(days[i].week,days[i].d)) break; _gap++; }
+  // V220 (D175, P-POPCOND 1b): a short gap draws a reminder-pool line and the sub carries the
+  // doctrine; a week or more keeps the fixed re-entry guidance whole.
   const _remMsg=_gap>=7
-    ? 'More than a week off. Mark what happened, then ease back in — first sessions back at reduced effort. Never chase missed work.'
-    : 'This one got away from you. Mark it and move on — the week ahead stays as written. Never cram a missed session back in.';
+    ? 'More than a week off. Mark what happened, then ease back in. First sessions back at reduced effort. Never chase missed work.'
+    : popPick('reminder',target.week,target.d);
+  const _remSub=DAY_FULL[target.d]+', Wk '+target.week+' · '+(day.title||'Workout');
   popFire('reminder',{
     msg:_remMsg,
-    sub:DAY_FULL[target.d]+', Wk '+target.week+' · '+(day.title||'Workout'),
+    sub:_gap>=7?_remSub:_remSub+'. The week ahead stays as written.',
     actions:[
       {label:'✓ Done', cls:'go', onclick:`resolveReminder(${target.week},'${target.d}','${esc}','complete')`},
       {label:'✕ Skip', cls:'skip', onclick:`resolveReminder(${target.week},'${target.d}','${esc}','skipped')`}

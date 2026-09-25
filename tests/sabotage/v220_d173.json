@@ -1,0 +1,23 @@
+[
+ {
+  "name": "S1-D173 -> the week view re-appends the recovery banner (the P-EMOJI form, bold label, no glyph) under the stats block",
+  "anchor": "list.innerHTML=strip+hero+_wcTag+stats;",
+  "replacement": "list.innerHTML=strip+hero+_wcTag+stats+(activeProg.legRecoveryNote?'<div class=\"leg-note\"><b>Recovery spacing:</b> '+activeProg.legRecoveryNote+'</div>':'');",
+  "gate": "gates/g220_d173_recovbanner.js",
+  "note": "NAMED TRIP in g220_d173_recovbanner.js rows B1 (Recovery spacing 1), B2 (activeProg.legRecoveryNote 2) and both B5 arms (HALF_MANNY and NSW test W1 leak the banner and the D36 sentences). B3 stays green by design: the glyph is S3's. Needs ia-version >= 220: below 220 every row of the gate is REFUSED and fails by name."
+ },
+ {
+  "name": "S2-D173 -> the program stops carrying the placement trace: legRecoveryNote is written null on every build",
+  "anchor": "legRecoveryNote:_liftDay ? legRecoveryNote : null,",
+  "replacement": "legRecoveryNote:null,",
+  "gate": "gates/g220_d173_recovbanner.js",
+  "note": "NAMED TRIP in g220_d173_recovbanner.js row B4 (HALF_MANNY legRecoveryNote null, not the hand-typed D36 string) and both B5 arms (the program carries no note, so the render check refuses to pass vacuously). The ruling (p_recovbanner_ruling.md section 6) predicts g205_pace_eve.js P3a/P4a and g208_d104a_runbase.js R2 also trip, which is expected: the field is their branch signature (standing ruling 3). Needs ia-version >= 220: below 220 every row of the gate is REFUSED and fails by name."
+ },
+ {
+  "name": "S3-D173 -> the recycle glyph comes back as escape text at the head of the wk-stats block",
+  "anchor": "const stats='<div class=\"wk-stats\">'",
+  "replacement": "const stats='<div class=\"wk-stats\">\\u267b\\ufe0f '",
+  "gate": "gates/g220_d173_recovbanner.js",
+  "note": "NAMED TRIP in g220_d173_recovbanner.js row B3 (escape text count 1, stored the way V219 stored it) and both B5 arms (the rendered week carries the glyph). The replacement holds literal backslash-u text, not the glyph. Needs ia-version >= 220: below 220 every row of the gate is REFUSED and fails by name."
+ }
+]

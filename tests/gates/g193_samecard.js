@@ -305,6 +305,7 @@ const SEEDS = [1013, 3039, 76308];
 // alone, so the swing class is a RULED 0 and any recurrence fails G3a by name. No other class SHRANK at step 7.
 const OPEN_UNRULED_BY_VERSION = { 218: { 'Kettlebell swing': 28 } };
 OPEN_UNRULED_BY_VERSION[219] = { 'Kettlebell swing': 0 };   // D166: ruled MOVE (28 -> 0)
+OPEN_UNRULED_BY_VERSION[220] = OPEN_UNRULED_BY_VERSION[219];   // V220 (D173/D174/D175/D176): ruled UNMOVED (zero-engine build: display, copy and pop-up only; no hunk reaches buildProgram or anything it calls; the swing class stays a ruled 0)
 const OPEN_UNRULED = OPEN_UNRULED_BY_VERSION[(+IA.version <= 218) ? 218 : +IA.version];
 if (!OPEN_UNRULED) throw new Error('g193: no OPEN_UNRULED_BY_VERSION row for V' + IA.version + ': an unruled register (D133)');
 

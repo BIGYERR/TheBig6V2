@@ -1,0 +1,194 @@
+baseline self-equal true 0ac7da6b1691a8e1
+HEAD ia-version 219: 360 builds, 0 errors
+V207 ia-version 207: 360 builds, 0 errors
+
+=== RULING REPLICA (HALF_MANNY-derived, intermediate, sun+wed, seed 76308): V207 then HEAD  [n: lift-only/run+lift/run+mob/run-only/UNPL]
+  half plain           ruling 70: 14/45/9/2 | V207 70: 14/45/9/2/0        | HEAD 70: 14/45/9/2/0
+  marathon plain       ruling 90: 18/54/16/2 | V207 90: 18/54/16/2/0       | HEAD 90: 18/54/16/2/0
+  10k plain            ruling 40: 8/27/3/2 | V207 40: 8/27/3/2/0         | HEAD 40: 8/27/3/2/0
+  10k undated          ruling -              | V207 40: 8/26/3/3/0         | HEAD 40: 8/26/3/3/0
+  5k plain             ruling 40: 8/30/0/2 | V207 40: 8/30/0/2/0         | HEAD 40: 8/30/0/2/0
+  5k undated           ruling -              | V207 40: 8/29/0/3/0         | HEAD 40: 8/29/0/3/0
+  mile plain           ruling 30: 12/18/0/0 | V207 45: 9/36/0/0/0         | HEAD 45: 9/33/3/0/0
+  mile dated-sat       ruling -              | V207 44: 9/33/0/2/0         | HEAD 44: 9/32/1/2/0
+  mile dated-tue       ruling -              | V207 42: 8/32/0/2/0         | HEAD 42: 8/31/1/2/0
+  mile dated-mon       ruling -              | V207 41: 8/31/0/2/0         | HEAD 41: 8/30/1/2/0
+  1.5mi plain          ruling -              | V207 55: 11/44/0/0/0        | HEAD 55: 11/41/3/0/0
+  1.5mi dated-sat      ruling -              | V207 54: 11/41/0/2/0        | HEAD 54: 11/40/1/2/0
+  1.5mi dated-tue      ruling -              | V207 52: 10/40/0/2/0        | HEAD 52: 10/39/1/2/0
+  1.5mi dated-mon      ruling -              | V207 51: 10/39/0/2/0        | HEAD 51: 10/38/1/2/0
+  pace plain           ruling 30: 12/18/0/0 | V207 75: 15/60/0/0/0        | HEAD 75: 15/54/6/0/0
+  pace dated-sat       ruling -              | V207 74: 15/57/0/2/0        | HEAD 74: 15/52/5/2/0
+  pace dated-tue       ruling -              | V207 72: 14/56/0/2/0        | HEAD 72: 14/51/5/2/0
+  pace dated-mon       ruling -              | V207 71: 14/55/0/2/0        | HEAD 71: 14/51/4/2/0
+  base plain           ruling 30: 6/24/0/0 | V207 30: 6/24/0/0/0         | HEAD 30: 6/23/1/0/0
+  liftonly plain       ruling 30: 30/0/0/0 | V207 30: 30/0/0/0/0         | HEAD 30: 30/0/0/0/0
+
+=== FULL LATTICE: totals per (goal, mode) over exp x rest x seed (18 configs each)
+ V207
+  half|plain         cfgs 18 days 1344 | lift-only 252 | run+lift 894 | run+mob 162 | run-only 36 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  marathon|plain     cfgs 18 days 1728 | lift-only 324 | run+lift 1080 | run+mob 288 | run-only 36 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  10k|plain          cfgs 18 days 768 | lift-only 144 | run+lift 534 | run+mob 54 | run-only 36 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  10k|undated        cfgs 18 days 762 | lift-only 138 | run+lift 522 | run+mob 54 | run-only 48 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  5k|plain           cfgs 18 days 768 | lift-only 144 | run+lift 588 | run+mob 0 | run-only 36 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  5k|undated         cfgs 18 days 762 | lift-only 138 | run+lift 576 | run+mob 0 | run-only 48 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  mile|plain         cfgs 18 days 864 | lift-only 216 | run+lift 648 | run+mob 0 | run-only 0 | UNPLACEABLE 0 | progs with >=1 run-only 0/18
+  mile|dated         cfgs 54 days 2436 | lift-only 594 | run+lift 1734 | run+mob 0 | run-only 108 | UNPLACEABLE 0 | progs with >=1 run-only 54/54
+  1.5mi|plain        cfgs 18 days 1056 | lift-only 264 | run+lift 792 | run+mob 0 | run-only 0 | UNPLACEABLE 0 | progs with >=1 run-only 0/18
+  1.5mi|dated        cfgs 54 days 3012 | lift-only 738 | run+lift 2166 | run+mob 0 | run-only 108 | UNPLACEABLE 0 | progs with >=1 run-only 54/54
+  pace|plain         cfgs 18 days 1440 | lift-only 360 | run+lift 1080 | run+mob 0 | run-only 0 | UNPLACEABLE 0 | progs with >=1 run-only 0/18
+  pace|dated         cfgs 54 days 4164 | lift-only 1026 | run+lift 3030 | run+mob 0 | run-only 108 | UNPLACEABLE 0 | progs with >=1 run-only 54/54
+  base|plain         cfgs 18 days 576 | lift-only 144 | run+lift 432 | run+mob 0 | run-only 0 | UNPLACEABLE 0 | progs with >=1 run-only 0/18
+  liftonly|plain     cfgs 18 days 576 | lift-only 576 | run+lift 0 | run+mob 0 | run-only 0 | UNPLACEABLE 0 | progs with >=1 run-only 0/18
+ HEAD
+  half|plain         cfgs 18 days 1344 | lift-only 252 | run+lift 894 | run+mob 162 | run-only 36 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  marathon|plain     cfgs 18 days 1728 | lift-only 324 | run+lift 1080 | run+mob 288 | run-only 36 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  10k|plain          cfgs 18 days 768 | lift-only 144 | run+lift 534 | run+mob 54 | run-only 36 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  10k|undated        cfgs 18 days 762 | lift-only 138 | run+lift 522 | run+mob 54 | run-only 48 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  5k|plain           cfgs 18 days 768 | lift-only 144 | run+lift 588 | run+mob 0 | run-only 36 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  5k|undated         cfgs 18 days 762 | lift-only 138 | run+lift 576 | run+mob 0 | run-only 48 | UNPLACEABLE 0 | progs with >=1 run-only 18/18
+  mile|plain         cfgs 18 days 864 | lift-only 216 | run+lift 588 | run+mob 60 | run-only 0 | UNPLACEABLE 0 | progs with >=1 run-only 0/18
+  mile|dated         cfgs 54 days 2436 | lift-only 594 | run+lift 1648 | run+mob 86 | run-only 108 | UNPLACEABLE 0 | progs with >=1 run-only 54/54
+  1.5mi|plain        cfgs 18 days 1056 | lift-only 264 | run+lift 732 | run+mob 60 | run-only 0 | UNPLACEABLE 0 | progs with >=1 run-only 0/18
+  1.5mi|dated        cfgs 54 days 3012 | lift-only 738 | run+lift 2080 | run+mob 86 | run-only 108 | UNPLACEABLE 0 | progs with >=1 run-only 54/54
+  pace|plain         cfgs 18 days 1440 | lift-only 360 | run+lift 966 | run+mob 114 | run-only 0 | UNPLACEABLE 0 | progs with >=1 run-only 0/18
+  pace|dated         cfgs 54 days 4164 | lift-only 1026 | run+lift 2754 | run+mob 276 | run-only 108 | UNPLACEABLE 0 | progs with >=1 run-only 54/54
+  base|plain         cfgs 18 days 576 | lift-only 144 | run+lift 408 | run+mob 24 | run-only 0 | UNPLACEABLE 0 | progs with >=1 run-only 0/18
+  liftonly|plain     cfgs 18 days 576 | lift-only 576 | run+lift 0 | run+mob 0 | run-only 0 | UNPLACEABLE 0 | progs with >=1 run-only 0/18
+
+=== RUN-ONLY / UNPLACEABLE / role days, by identity (HEAD), aggregated over lattice
+ V207
+     6  1.5mi|dated|run+lift|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|Primer — Dips|Taper
+     6  1.5mi|dated|run-only|-|workout/streak|Long Slow Distance (LSD)|
+    54  1.5mi|dated|run-only|TEST DAY|season|N Mile Test — TIME TRIAL|
+    18  1.5mi|dated|run-only|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|
+    30  1.5mi|dated|run-only|test-eve|workout/streak|Long Slow Distance (LSD)|
+    18  10k|plain|run-only|RACE DAY|season|Long Run — RACE DAY|
+    18  10k|plain|run-only|race-eve|workout/streak|Recovery Run|
+    12  10k|undated|run-only|-|workout/streak|Recovery Run|
+    18  10k|undated|run-only|TEST DAY|season|Long Run — TIME TRIAL|
+    18  10k|undated|run-only|test-eve|workout/streak|Recovery Run|
+    18  5k|plain|run-only|RACE DAY|season|Long Run — RACE DAY|
+    18  5k|plain|run-only|race-eve|workout/streak|Recovery Run|
+    12  5k|undated|run-only|-|workout/streak|Recovery Run|
+    18  5k|undated|run-only|TEST DAY|season|Long Run — TIME TRIAL|
+    18  5k|undated|run-only|test-eve|workout/streak|Recovery Run|
+    18  half|plain|run-only|RACE DAY|season|Long Run — RACE DAY|
+    18  half|plain|run-only|race-eve|workout/streak|Recovery Run|
+    18  marathon|plain|run-only|RACE DAY|season|Long Run — RACE DAY|
+    18  marathon|plain|run-only|race-eve|workout/streak|Recovery Run|
+     3  mile|dated|run+lift|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|Primer — Decline pushups|Taper
+     3  mile|dated|run+lift|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|Primer — Pushups (slow tempo)|Taper
+     6  mile|dated|run-only|-|workout/streak|Long Slow Distance (LSD)|
+    54  mile|dated|run-only|TEST DAY|season|N Mile Test — TIME TRIAL|
+    18  mile|dated|run-only|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|
+    30  mile|dated|run-only|test-eve|workout/streak|Long Slow Distance (LSD)|
+     6  pace|dated|run+lift|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|Primer — Diamond pushups|Taper
+     6  pace|dated|run-only|-|workout/streak|Long Slow Distance (LSD)|
+    54  pace|dated|run-only|TEST DAY|season|N Mile Test — TIME TRIAL|
+    18  pace|dated|run-only|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|
+    30  pace|dated|run-only|test-eve|workout/streak|Long Slow Distance (LSD)|
+ HEAD
+     4  1.5mi|dated|run+lift|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|Primer — Dips|Taper
+     2  1.5mi|dated|run+mob|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|Post-run mobility|Taper
+     6  1.5mi|dated|run-only|-|workout/streak|Long Slow Distance (LSD)|
+    54  1.5mi|dated|run-only|TEST DAY|season|N Mile Test — TIME TRIAL|
+    48  1.5mi|dated|run-only|test-eve|workout/streak|Long Slow Distance (LSD)|
+    18  10k|plain|run-only|RACE DAY|season|Long Run — RACE DAY|
+    18  10k|plain|run-only|race-eve|workout/streak|Recovery Run|
+    12  10k|undated|run-only|-|workout/streak|Recovery Run|
+    18  10k|undated|run-only|TEST DAY|season|Long Run — TIME TRIAL|
+    18  10k|undated|run-only|test-eve|workout/streak|Recovery Run|
+    18  5k|plain|run-only|RACE DAY|season|Long Run — RACE DAY|
+    18  5k|plain|run-only|race-eve|workout/streak|Recovery Run|
+    12  5k|undated|run-only|-|workout/streak|Recovery Run|
+    18  5k|undated|run-only|TEST DAY|season|Long Run — TIME TRIAL|
+    18  5k|undated|run-only|test-eve|workout/streak|Recovery Run|
+    18  half|plain|run-only|RACE DAY|season|Long Run — RACE DAY|
+    18  half|plain|run-only|race-eve|workout/streak|Recovery Run|
+    18  marathon|plain|run-only|RACE DAY|season|Long Run — RACE DAY|
+    18  marathon|plain|run-only|race-eve|workout/streak|Recovery Run|
+     2  mile|dated|run+lift|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|Primer — Decline pushups|Taper
+     2  mile|dated|run+lift|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|Primer — Pushups (slow tempo)|Taper
+     2  mile|dated|run+mob|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|Post-run mobility|Taper
+     6  mile|dated|run-only|-|workout/streak|Long Slow Distance (LSD)|
+    54  mile|dated|run-only|TEST DAY|season|N Mile Test — TIME TRIAL|
+    48  mile|dated|run-only|test-eve|workout/streak|Long Slow Distance (LSD)|
+     6  pace|dated|run+mob|test-eve|workout/streak|Long Slow Distance (LSD) — Taper|Post-run mobility|Taper
+     6  pace|dated|run-only|-|workout/streak|Long Slow Distance (LSD)|
+    54  pace|dated|run-only|TEST DAY|season|N Mile Test — TIME TRIAL|
+    48  pace|dated|run-only|test-eve|workout/streak|Long Slow Distance (LSD)|
+
+=== DAY IDENTITY at the ruling-replica config, HEAD, test goals + races (run-only, unplaceable, test/race and eves)
+ half|intermediate|sun+wed|76308|plain final=14/sun
+   W14 sat run-only    race-eve     tier=workout/streak title="Shakeout" cardio="Recovery Run" secs=
+   W14 sun run-only    RACE DAY     tier=season title="Race Day" cardio="Long Run — RACE DAY" secs=
+ marathon|intermediate|sun+wed|76308|plain final=18/sun
+   W18 sat run-only    race-eve     tier=workout/streak title="Shakeout" cardio="Recovery Run" secs=
+   W18 sun run-only    RACE DAY     tier=season title="Race Day" cardio="Long Run — RACE DAY" secs=
+ 10k|intermediate|sun+wed|76308|plain final=8/sun
+   W8 sat run-only    race-eve     tier=workout/streak title="Shakeout" cardio="Recovery Run" secs=
+   W8 sun run-only    RACE DAY     tier=season title="Race Day" cardio="Long Run — RACE DAY" secs=
+ 10k|intermediate|sun+wed|76308|undated final=8/sat
+   W8 thu run-only                 tier=workout/streak title="Easy Run" cardio="Recovery Run" secs=
+   W8 fri run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Recovery Run" secs=
+   W8 sat run-only    TEST DAY     tier=season title="Race Day" cardio="Long Run — TIME TRIAL" secs=
+ 5k|intermediate|sun+wed|76308|plain final=8/sun
+   W8 sat run-only    race-eve     tier=workout/streak title="Shakeout" cardio="Recovery Run" secs=
+   W8 sun run-only    RACE DAY     tier=season title="Race Day" cardio="Long Run — RACE DAY" secs=
+ 5k|intermediate|sun+wed|76308|undated final=8/sat
+   W8 thu run-only                 tier=workout/streak title="Easy Run" cardio="Recovery Run" secs=
+   W8 fri run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Recovery Run" secs=
+   W8 sat run-only    TEST DAY     tier=season title="Race Day" cardio="Long Run — TIME TRIAL" secs=
+ mile|intermediate|sun+wed|76308|dated-sat final=9/sat
+   W9 fri run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Long Slow Distance (LSD)" secs=
+   W9 sat run-only    TEST DAY     tier=season title="Test Day" cardio="1 Mile Test — TIME TRIAL" secs=
+ mile|intermediate|sun+wed|76308|dated-tue final=9/tue
+   W9 mon run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Long Slow Distance (LSD)" secs=
+   W9 tue run-only    TEST DAY     tier=season title="Test Day" cardio="1 Mile Test — TIME TRIAL" secs=
+ mile|intermediate|sun+wed|76308|dated-mon final=9/mon
+   W8 sat run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Long Slow Distance (LSD)" secs=
+   W9 mon run-only    TEST DAY     tier=season title="Test Day" cardio="1 Mile Test — TIME TRIAL" secs=
+ 1.5mi|intermediate|sun+wed|76308|dated-sat final=11/sat
+   W11 fri run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Long Slow Distance (LSD)" secs=
+   W11 sat run-only    TEST DAY     tier=season title="Test Day" cardio="1.5 Mile Test — TIME TRIAL" secs=
+ 1.5mi|intermediate|sun+wed|76308|dated-tue final=11/tue
+   W11 mon run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Long Slow Distance (LSD)" secs=
+   W11 tue run-only    TEST DAY     tier=season title="Test Day" cardio="1.5 Mile Test — TIME TRIAL" secs=
+ 1.5mi|intermediate|sun+wed|76308|dated-mon final=11/mon
+   W10 sat run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Long Slow Distance (LSD)" secs=
+   W11 mon run-only    TEST DAY     tier=season title="Test Day" cardio="1.5 Mile Test — TIME TRIAL" secs=
+ pace|intermediate|sun+wed|76308|dated-sat final=15/sat
+   W15 fri run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Long Slow Distance (LSD)" secs=
+   W15 sat run-only    TEST DAY     tier=season title="Test Day" cardio="3 Mile Test — TIME TRIAL" secs=
+ pace|intermediate|sun+wed|76308|dated-tue final=15/tue
+   W15 mon run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Long Slow Distance (LSD)" secs=
+   W15 tue run-only    TEST DAY     tier=season title="Test Day" cardio="3 Mile Test — TIME TRIAL" secs=
+ pace|intermediate|sun+wed|76308|dated-mon final=15/mon
+   W14 sat run-only    test-eve     tier=workout/streak title="Shakeout" cardio="Long Slow Distance (LSD)" secs=
+   W15 mon run-only    TEST DAY     tier=season title="Test Day" cardio="3 Mile Test — TIME TRIAL" secs=
+
+=== DAY SHAPES on HEAD not present on V207 (class#corehip#section-labels), same lattice key
+ distinct shapes V207 178, HEAD 175, HEAD-only 6
+     6 lift-only#ch#Main — Dumbbell bench press|Pump|Delt finisher|Core — Anti-Rotation(core)  e.g. base|beginner|sun|76308|plain
+     4 lift-only#ch#Main — Dumbbell incline press|Pump|Delt finisher|Core — Anti-Rotation(core)  e.g. base|beginner|sun|1013|plain
+     3 lift-only#ch#Main — Dumbbell bench press|Pump|Core — Anti-Rotation(core)  e.g. base|advanced|sun|76308|plain
+     2 lift-only#ch#Main — Pushups (slow tempo)|Pump|Delt finisher|Core — Anti-Rotation(core)  e.g. base|beginner|sun|76308|plain
+     2 lift-only#ch#Main — Dumbbell incline press|Pump|Core — Anti-Rotation(core)  e.g. base|advanced|sun|1013|plain
+     1 lift-only#ch#Main — Pushups (slow tempo)|Pump|Core — Anti-Rotation(core)  e.g. base|advanced|sun|76308|plain
+ HEAD-only shape days by class {"lift-only":18}
+
+=== POOL: raw workout tags on HEAD
+  [1] when=weekend type=- :: Hangover said stay down. You told it to go fuck it
+  [3] when=morning type=- :: Another one done while half the city's still aslee
+  [8] when=weekend type=- :: Cardio's done. You earned the right to talk all th
+  workout pool size 27 | V207 size 27 | identical true
+  ruled tags applied: [["1",{"when":"weekend","type":null}],["3",{"when":"morning","type":null}],["8",{"when":"weekend","type":"cardio"}],["15",{"when":"weekend","type":null}],["25",{"when":null,"type":"lift"}],["26",{"when":null,"type":"lift"}]]
+  class        wkday>=9h wkday<9h wkend>=9h wkend<9h
+  lift-only          23       24       25       26
+  run+lift           23       24       26       27
+  run+mob            21       22       24       25
+  run-only           21       22       24       25
+  UNPLACEABLE        21       22       23       24
+
+DONE

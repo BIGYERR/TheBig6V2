@@ -19,8 +19,8 @@
  },
  {
   "name": "M4 -> G11: the member strip mutates item.detail instead of the rendered string",
-  "anchor": "const _dispDetail=(_ssRounds!=null&&!i._skipped)?_stripLeadingSets(i.detail||''):(i.detail||'');",
-  "replacement": "const _dispDetail=(_ssRounds!=null&&!i._skipped)?(i.detail=_stripLeadingSets(i.detail||'')):(i.detail||'');",
+  "anchor": "const _dispDetail=(_ssRounds!=null&&!i._skipped)?_stripLeadingSets(i.detail||'').replace(/^\\d+(\\s*[–-]\\s*\\d+)?$/,'$& reps'):(i.detail||'');",
+  "replacement": "const _dispDetail=(_ssRounds!=null&&!i._skipped)?(i.detail=_stripLeadingSets(i.detail||'').replace(/^\\d+(\\s*[–-]\\s*\\d+)?$/,'$& reps')):(i.detail||'');",
   "gate": "gates/g190_rounds.js"
  },
  {

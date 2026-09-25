@@ -138,6 +138,7 @@ const ERA = {
          bic1:412,            // D164 slice 2: 456 -> 412, the 44 days measure printed as "single4 | WIDE | days with more items: 44"
          c165:0, c166:0,
          fx:{ exact:'Pec deck 3×12–15 @ RPE 6–7', noDup:true } } };
+ERA[220] = ERA[219];   // V220 (D173/D174/D175/D176): ruled UNMOVED (zero-engine build: display, copy and pop-up only; no hunk reaches buildProgram or anything it calls; the D164 R4/R5 EQUALITY still expires on D169, not shipped here)
 function shardCount(){ const raw = process.env.G219_SHARDS === undefined ? '' : String(process.env.G219_SHARDS);
   if(raw === '') return 4;
   if(!/^[0-9]+$/.test(raw) || parseInt(raw, 10) < 1){ fail++; console.log("FAIL: CONFIG: G219_SHARDS must be a positive integer, or empty/unset which means 4; got '" + raw + "'"); return 0; }
