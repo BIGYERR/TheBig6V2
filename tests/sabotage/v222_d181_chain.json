@@ -1,0 +1,30 @@
+[
+ {
+  "name": "S1-D181 R4' -> the parked MAP shape: one composed name map (each record's from resolved to its chain end), one applySwapPrefs call",
+  "anchor": "    let hit=false;\n    list.forEach(e=>{\n      const m1=Object.create(null); m1[e.from]=e.to;\n      if(applySwapPrefs(day.sections,m1)) hit=true;\n    });\n",
+  "replacement": "    let hit=false;\n    const map=Object.create(null);\n    list.forEach(r=>{let cur=r.from;list.forEach(e=>{if(e.from===cur)cur=e.to;});map[r.from]=cur;});\n    if(applySwapPrefs(day.sections,map)) hit=true;\n",
+  "gate": "gates/g222_d181_chain.js",
+  "note": "NAMED TRIP: row 5 (boots Leg press 4×5–8 against live 4×8–12), row 5c (composes box->box, no hit: boots box 4×3 against live 4×8–12), row 5L (detail!=live 550/5,088, licence 70; ruling MAP 1,229/15,545). Also trips 5X (collide2 787/809, exch3 578/716; ruling MAP u|collide2 48, u|exch3 209). Rows 8, 8d, 9a, 9b stay green: R5 still withholds hist-restored days. Printed 2026-09-25 on the V222 artifact."
+ },
+ {
+  "name": "S2-D181 R4' -> the V221 plain assign: map[e.from]=e.to, no chain, one applySwapPrefs call",
+  "anchor": "    let hit=false;\n    list.forEach(e=>{\n      const m1=Object.create(null); m1[e.from]=e.to;\n      if(applySwapPrefs(day.sections,m1)) hit=true;\n    });\n",
+  "replacement": "    let hit=false;\n    const map=Object.create(null);\n    list.forEach(e=>{ map[e.from]=e.to; });\n    if(applySwapPrefs(day.sections,map)) hit=true;\n",
+  "gate": "gates/g222_d181_chain.js",
+  "note": "NAMED TRIP: row 5 (boots Dumbbell goblet squat 4×8–12, the V221 before-number), row 5L (name!=live 5,088/5,088; ruling V221 14,706/15,545). Also trips 5c (goblet) and 5X (exch3 0/716). Rows 8, 8d, 9a, 9b stay green."
+ },
+ {
+  "name": "S3-D181 R4' -> records replay in reverse array order (newest first), one per pass",
+  "anchor": "    list.forEach(e=>{\n      const m1=Object.create(null); m1[e.from]=e.to;",
+  "replacement": "    list.slice().reverse().forEach(e=>{\n      const m1=Object.create(null); m1[e.from]=e.to;",
+  "gate": "gates/g222_d181_chain.js",
+  "note": "NAMED TRIP: row 5 (goblet->Leg press finds no goblet, then box->goblet: boots goblet 4×8–12). Also trips 5c, 5L (name!=live 5,088/5,088) and 5X (collide2 0/809, exch3 0/716): every multi-record untouched day replays out of recording order. Rows 8, 8d, 9a, 9b stay green."
+ },
+ {
+  "name": "S4-D181 R5 dropped -> session swaps re-applied onto days the freeze restored from ia_hist_",
+  "anchor": "      Object.keys(_sw).forEach(k=>{ if(!_histRestored.has(k)) _swLive[k]=_sw[k]; });",
+  "replacement": "      Object.keys(_sw).forEach(k=>{ _swLive[k]=_sw[k]; });",
+  "gate": "gates/g222_d181_chain.js",
+  "note": "NAMED TRIP: row 8 (rewrites 1,756/4,070 across t1 t2 up_st up_bt up_ts; ruling STEP-without-R5 t1|collide2 1,287, t1|exch3 1,035, up_bt|hop2 8,005), row 8d (duplicate name on 424/4,070 booted hist-restored cards, HALF_MANNY collide2 {X,A} -> {X,X}), row 9a (232/814 byte-equal to V221's boot: the V221 records are replayed over the donor snapshot). Row 9b also FAILs, through its empty-diff guard (the boot already replayed the chain, so 0 re-taps moved the card), not through a lost hold. Rows 5, 5c, 5L, 5X stay green: R4' is intact."
+ }
+]

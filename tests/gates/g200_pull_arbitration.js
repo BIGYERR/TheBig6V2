@@ -291,6 +291,7 @@ const SWAP_BY_VERSION = { 218: 150 };
 SWAP_BY_VERSION[219] = 138;   // D166: ruled MOVE (150 -> 138)
 SWAP_BY_VERSION[220] = SWAP_BY_VERSION[219];   // V220 (D173/D174/D175/D176): ruled UNMOVED (zero-engine build: display, copy and pop-up only; no hunk reaches buildProgram or the pull-day swap draw, so the p1 population stays 138)
 SWAP_BY_VERSION[221] = SWAP_BY_VERSION[220];   // V221 (D177/D178/D179/D180): ruled UNMOVED (D177 widens the _REP_FLOOR balance row [6,10] to the two loaded landmine lifts, read by scheme() and _swapDetailFor(), no draw, and moves 0 engine cards, 0/1,201,231 printed by measure and 0/903,969 by builder; D178, D179 and D180 are zero-engine; the rep floor sets reps, not which item Pull superset B holds at p1; 138 printed by gatekeeper pre-flight on the V221 candidate, so the p1 population stays 138)
+SWAP_BY_VERSION[222] = SWAP_BY_VERSION[221];   // V222 (D181): ruled UNMOVED (D181 P-SWAPDURABLE is session-store only: nothing in buildProgram, 0 engine cards change; the ruling states HALF_MANNY 0ac7da6b1691a8e1 unchanged; the athlete session swap store is not the pull-day swap draw, so the p1 population stays 138)
 const SWAP_N = SWAP_BY_VERSION[(+IP.version <= 218) ? 218 : +IP.version];
 II.eval(SNAP_FN+"globalThis.__G200=null;");
 let inert=0,inertN=0;

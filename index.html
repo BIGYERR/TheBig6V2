@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="221"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="222"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1302,7 +1302,8 @@ function saveDayHist(h){try{localStorage.setItem('ia_hist_'+activeProgId,JSON.st
 // edits. If the day is edited after first touch, the snapshot must absorb that edit or
 // the freeze will restore a day missing it — the exact shape of the V103→V104 bug, since
 // ia_hist_ is the record and prog.weeks is only a build. This re-snapshots the day while
-// preserving nothing else: it is called ONLY from the add/skip handlers, never from the
+// preserving nothing else: it is
+// called only from the athlete's own edit handlers: add, skip, swap, undo, never from the
 // five normal hook points, so an untouched prescription can still never be rewritten.
 function resnapshotDayEdit(week,dayKey){
   try{
@@ -10147,8 +10148,9 @@ function applySwapPrefs(sections,map){
 // rebuilds from cfg on every boot, and the week freeze only protects weeks that
 // have already been touched. Swap a lift, walk to the rack, and iOS evicts the PWA
 // out of your pocket — reopening between sets would rebuild and show the old lift
-// while you are standing over the new one. The store covers exactly that window,
-// from the swap until the first logged set, and prunes itself once the week freezes.
+// while you are standing over the new one. A record lives until the athlete undoes it
+// (V222 D181); it is replayed in recording order on days the freeze did not restore
+// from ia_hist_ and left alone on days it did.
 // ── DAY EDITS: ADD / SKIP (V109) ─────────────────────────────────────────────
 // Session-scoped edits to a single day, stored per program and keyed the same way as
 // swaps. Nothing here touches cfg, goal or periodization: a program stays deterministic
@@ -10226,8 +10228,13 @@ function applyDayEdits(prog,store){
     }
   });
 }
-// Same rationale as pruneSwaps: once a week is frozen the edit is baked into the stored
-// week, so keeping the record risks re-applying it against a week the engine reshaped.
+// Session swaps are never applied to a day restored from ia_hist_ (V222 D181 R5), because
+// the snapshot carries the athlete's swaps by construction (R1) and re-applying a record
+// onto it rewrites the day whenever one record's `to` is another's `from`. applyDayEdits
+// has no such exclusion and is not idempotent (it rewrites every item's _skipped from the
+// store and pushes adds deduped by name only), so on a touched week this prune is what
+// keeps the store from arguing with a record resnapshotDayEdit has already folded the
+// edit into.
 function pruneDayEdits(pid,cutWeek){
   const s=getDayEdits(pid); let changed=false;
   Object.keys(s).forEach(function(k){const m=/^w(\d+)_/.exec(k);if(m&&+m[1]<cutWeek){delete s[k];changed=true;}});
@@ -10258,8 +10265,10 @@ function clearSwap(pid,week,dayKey,from){
 }
 // Re-applied at the very end of refreshProgram, after the freeze, alongside rest-day
 // moves — both are the athlete's own edits, so nothing the engine does should undo
-// them. Idempotent: a frozen week already carrying the swap has no name left to
-// match, so a second pass is a no-op rather than a double-apply.
+// them. V222 D181 (R4'): a day's records replay in recording order (array order, which
+// recordSwap keeps by push) through the same _swapDetailFor the sheet used, so the booted
+// card is the card the athlete built. Days the freeze restored from ia_hist_ never reach
+// this function (R5).
 function applySessionSwaps(prog,store){
   if(!prog||!prog.weeks||!store) return;
   Object.keys(store).forEach(k=>{
@@ -10267,20 +10276,18 @@ function applySessionSwaps(prog,store){
     const w=+m[1],d=m[2];
     const day=prog.weeks[w]&&prog.weeks[w][d];
     if(!day||!Array.isArray(day.sections)) return;
-    const map=Object.create(null);
-    (store[k]||[]).forEach(e=>{if(e&&e.from&&e.to)map[e.from]=e.to;});
-    if(applySwapPrefs(day.sections,map) && prog.cfg && prog.cfg.injury){
+    // V222 D181 (R4'). Records replay in recording order, one per pass, through the same
+    // _swapDetailFor the sheet used, so each hop's detail comes from the hop before it.
+    const list=(store[k]||[]).filter(e=>e&&e.from&&e.to);
+    let hit=false;
+    list.forEach(e=>{
+      const m1=Object.create(null); m1[e.from]=e.to;
+      if(applySwapPrefs(day.sections,m1)) hit=true;
+    });
+    if(hit && prog.cfg && prog.cfg.injury){
       day.sections=applyInjuryFilter(day.sections,prog.cfg);
     }
   });
-}
-// Prune swaps for weeks that have gone frozen — the swap is baked into the stored
-// week at that point, so keeping the record risks re-applying it against a week the
-// engine has since reshaped.
-function pruneSwaps(pid,cutWeek){
-  const s=getSwaps(pid); let changed=false;
-  Object.keys(s).forEach(k=>{const m=/^w(\d+)_/.exec(k);if(m&&+m[1]<cutWeek){delete s[k];changed=true;}});
-  if(changed) saveSwaps(pid,s);
 }
 // ── COACH NUDGE ──────────────────────────────────────────────────────────────
 // Trading the same lift off once is a bad night's sleep. Three sessions running is
@@ -13209,6 +13216,11 @@ function logExerciseWeight(exName, weight, setsReps, week, setsDone, setsW, dayK
   if(!store[key]) store[key] = {name:exName, entries:[]};
   const w = week||currentWeek;
   const dk = dayKey||(typeof currentDayKey!=='undefined'?currentDayKey:'')||'';
+  // V222 D181 (R2). The per-exercise Log is a first touch. D108 counts this ia_exw_ write
+  // as touching the day, so without a snapshot the day freezes with no record of what it
+  // was frozen ON. snapshotDay is first-touch-wins, so this is a no-op on a day already
+  // snapshotted, and it returns without writing when the day is not in the week.
+  if(dk) snapshotDay(w, dk);
   const entries = store[key].entries;
   // ONE entry per exercise per week PER DAY (V117). Re-logging the same exercise on
   // the same day (e.g. correcting a typo — clear the field, type a new number)
@@ -14237,6 +14249,7 @@ function applySwapChoice(to){
   recordSwap(activeProgId,currentWeek,currentDayKey,from,to,_undoRx);
   const nudge=bumpSwapCount(activeProgId,from,to);
   closeSwapSheet();
+  resnapshotDayEdit(currentWeek,currentDayKey);
   openDetail(currentDayKey,day);
   // "Same numbers" is a promise the app has to keep. When the reps came off because the
   // movement cannot express them, say so instead.
@@ -14250,10 +14263,11 @@ function applySwapChoice(to){
   if(nudge) setTimeout(()=>showSwapNudge(from,to),1400);
 }
 // ── ADD / SKIP HANDLERS (V109) ───────────────────────────────────────────────
-// Every mutation follows the same three steps as the swap handlers: mutate the live day,
-// write the store, re-render. The extra step here is resnapshotDayEdit — if the athlete
-// has already logged something, ia_hist_ holds the snapshot and the freeze restores from
-// it, so an edit that is not folded into the snapshot silently vanishes on the next boot.
+// Every mutation follows the same steps as the swap handlers: mutate the live day, write
+// the store, resnapshotDayEdit, re-render. Add, skip, swap and undo all take the resnapshot
+// step — if the athlete has already logged something, ia_hist_ holds the snapshot and the
+// freeze restores from it, so an edit that is not folded into the snapshot silently vanishes
+// on the next boot.
 function _liveDay(){return activeProg&&activeProg.weeks&&activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];}
 function _afterEdit(day,msg){
   resnapshotDayEdit(currentWeek,currentDayKey);
@@ -14386,6 +14400,7 @@ function undoSwap(from){
     });
   }
   clearSwap(activeProgId,currentWeek,currentDayKey,from);
+  resnapshotDayEdit(currentWeek,currentDayKey);
   openDetail(currentDayKey,day);
   showToast(from+' is back on the card.');
 }
@@ -15718,6 +15733,7 @@ function refreshProgram(prog){
     }
   }
   let _swapCut=null;
+  const _histRestored=new Set();   // V222 D181 (R5): day keys the freeze restored from ia_hist_ this boot
   // ── D2b (V142): derive the pace-shift map BEFORE the rebuild ──
   // Set on cfg so both the base build and every overlay VARIANT build (which spread
   // prog.cfg) read the same map: spliced weeks and base weeks agree on the clock.
@@ -15828,7 +15844,7 @@ function refreshProgram(prog){
         let _maxTouched = 0;
         Object.keys(_touched).forEach(k=>{ const m=/^w(\d+)_/.exec(k); if(m){ const n=+m[1]; if(n>_maxTouched) _maxTouched=n; } });
         const _cut = Math.max(_dateCut, _maxTouched + 1);
-        _swapCut = _cut;   // frozen weeks bake the swap in; the record is then dead weight
+        _swapCut = _cut;   // carries the freeze cut to pruneDayEdits at the end of refreshProgram, and nothing else
         // ── THE FREEZE IS PER-DAY, NOT PER-WEEK (V133) ─────────────────────────
         // The freeze protects training HISTORY: what was actually prescribed on a day
         // the athlete trained. It used to restore the whole stored week as a unit, on
@@ -15895,7 +15911,7 @@ function refreshProgram(prog){
             const k = _dk(w,d);
             // 1. Snapshot = what was actually on screen. Always wins, every week.
             const _snap = _hist[k];
-            if(_snap){ _merged[d] = _snap; return; }
+            if(_snap){ _merged[d] = _snap; _histRestored.add(k); return; }
             // 2. Touched with no snapshot = trained before snapshots shipped, so what
             //    was on screen is unrecoverable. LEGACY CARVE-OUT: on an injury-covered
             //    week take the live (already injury-applied) day, because showing
@@ -15928,12 +15944,16 @@ function refreshProgram(prog){
     // Session swaps re-apply alongside the rest-day moves, for the same reason: they
     // are the athlete's own edit to today, and a rebuild triggered by an app eviction
     // mid-session must not put the old lift back while they are standing over the new
-    // one. Idempotent by name match — a frozen week already carrying the swap has no
-    // name left to match, so this is a no-op rather than a double-apply.
+    // one. V222 D181 (R5): session swaps are never re-applied to a day the freeze
+    // restored from ia_hist_, because that snapshot already carries them (R1). Those
+    // keys are left out of a shallow copy handed to applySessionSwaps; the store is
+    // neither changed nor saved, so the record stays for undo on that day. Days the
+    // freeze took from the stored grid (touched with no snapshot, or past and
+    // untouched) still get the replay.
     try{
-      if(typeof _swapCut==='number') pruneSwaps(prog.id,_swapCut);
-      const _sw=getSwaps(prog.id);
-      if(_sw&&Object.keys(_sw).length) applySessionSwaps(rebuilt,_sw);
+      const _sw=getSwaps(prog.id)||{}, _swLive={};
+      Object.keys(_sw).forEach(k=>{ if(!_histRestored.has(k)) _swLive[k]=_sw[k]; });
+      if(Object.keys(_swLive).length) applySessionSwaps(rebuilt,_swLive);
     }catch(e){}
     // Adds and skips run LAST, after swaps. Order matters: a swap rewrites an item's
     // name, so a skip recorded against the post-swap name would find nothing if it ran

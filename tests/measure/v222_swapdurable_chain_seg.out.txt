@@ -1,0 +1,110 @@
+== 1. untouched (u), slot detail != live, by cause (hop2+cyc2+hop3+cyc3) ==
+  MAP      1320/16341  {"live carries a D177 window from a middle hop; boot does not":89,"other rep/effort token":40,"live carries unloadable \"N sets\" from a middle hop; boot re-derives from engine rx":1117,"one is a prefix of the other (suffix added/dropped)":74}
+  STEP     83/16341  {"one is a prefix of the other (suffix added/dropped)":74,"live carries unloadable \"N sets\" from a middle hop; boot re-derives from engine rx":6,"other rep/effort token":3}
+  SKIPHIST 1320/16341  {"live carries a D177 window from a middle hop; boot does not":89,"other rep/effort token":40,"live carries unloadable \"N sets\" from a middle hop; boot re-derives from engine rx":1117,"one is a prefix of the other (suffix added/dropped)":74}
+  BASE     1670/16341  {"name differs too":1620,"live carries a D177 window from a middle hop; boot does not":3,"live carries unloadable \"N sets\" from a middle hop; boot re-derives from engine rx":44,"other rep/effort token":3}
+
+== 2. STEP untouched residue (whole day != live), by config x class; first diffs ==
+  {"mario|hop2":68,"mario|hop3":12,"manny|hop2":61,"manny|cyc2":4,"manny|collide2":2,"manny|exch3":2,"manny|hop3":8}
+  mario W5 thu hop2 rec=Kettlebell swing->Dumbbell split-stance deadlift,Dumbbell split-stance deadlift->Dumbbell goblet squat
+    live: Leg superset B{Dumbbell goblet squat|2×8;Single-leg hip thrust|2×6–10 @ RPE 8}
+    boot: Leg superset B{Dumbbell goblet squat|2×8 — hold RPE 7, two in the tank;Single-leg hip thrust|2×6–10 @ RPE 8}
+  mario W5 thu hop2 rec=Kettlebell swing->Dumbbell split-stance deadlift,Dumbbell split-stance deadlift->Reverse lunge (KB)
+    live: Leg superset B{Reverse lunge (KB)|2×8;Single-leg hip thrust|2×6–10 @ RPE 8}
+    boot: Leg superset B{Reverse lunge (KB)|2×8 — hold RPE 7, two in the tank;Single-leg hip thrust|2×6–10 @ RPE 8}
+  mario W5 thu hop2 rec=Kettlebell swing->Dumbbell split-stance deadlift,Dumbbell split-stance deadlift->Leg press
+    live: Leg superset B{Leg press|2×8;Single-leg hip thrust|2×6–10 @ RPE 8}
+    boot: Leg superset B{Leg press|2×8 — hold RPE 7, two in the tank;Single-leg hip thrust|2×6–10 @ RPE 8}
+  mario W5 thu hop2 rec=Kettlebell swing->Kettlebell single-leg deadlift,Kettlebell single-leg deadlift->Dumbbell goblet squat
+    live: Leg superset B{Dumbbell goblet squat|2×8;Single-leg hip thrust|2×6–10 @ RPE 8}
+    boot: Leg superset B{Dumbbell goblet squat|2×8 — hold RPE 7, two in the tank;Single-leg hip thrust|2×6–10 @ RPE 8}
+  STEP residue rows whose boot equals MAP boot: 157/157
+
+== 3. MAP snapshotted rewrite, t1, hop2/cyc2/hop3 (boot != hist), by config x week; first diffs ==
+  {"manny|W7|cyc2":3,"manny|W7|hop2":20,"manny|W5|hop2":38,"manny|W5|cyc2":1,"manny|W5|hop3":6,"manny|W7|hop3":1}
+  manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Suitcase carry
+    hist: {Overhead carry|3×40 yd;Suitcase carry|3×40 yd each}
+    boot: {Suitcase carry|3×40 yd;Suitcase carry|3×40 yd each}
+  manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Trap bar farmer carry
+    hist: {Overhead carry|3×40 yd;Trap bar farmer carry|3×40 yd each}
+    boot: {Trap bar farmer carry|3×40 yd;Trap bar farmer carry|3×40 yd each}
+  manny W7 mon rec=Overhead carry->Trap bar farmer carry,Trap bar farmer carry->Suitcase carry
+    hist: {Overhead carry|3×40 yd;Suitcase carry|3×40 yd each}
+    boot: {Suitcase carry|3×40 yd;Suitcase carry|3×40 yd each}
+
+== 4. MAP t1 collide2 / exch3 rewrites: slot i (first hop) and slot j names, boot vs hist ==
+  collide2 1289: {"slot i same, slot j renamed, duplicate name on booted card true":1126,"slot i same, slot j renamed, duplicate name on booted card false":78,"slot i renamed, slot j renamed, duplicate name on booted card false":83,"slot i renamed, slot j same, duplicate name on booted card true":2}
+  exch3 1037: {"slot i renamed, slot j renamed, duplicate name on booted card false":997,"slot i renamed, slot j same, duplicate name on booted card true":20,"slot i same, slot j renamed, duplicate name on booted card true":20}
+
+== 5. F1 rows (mario W5 thu): slot live vs boot per tree x mode ==
+  box>goblet>LP|u       BASE DB goblet squat 4×8–12 !=live(4×8–12) | MAP Leg press 4×5–8 !=live(4×8–12) | STEP Leg press 4×8–12 =live | SKIPHIST Leg press 4×5–8 !=live(4×8–12)
+  box>goblet>LP|t1      BASE BB box squat 4×3 !=live(4×8–12) | MAP Leg press 4×8–12 =live | STEP Leg press 4×8–12 =live | SKIPHIST Leg press 4×8–12 =live
+  box>goblet>LP|t2      BASE Leg press 4×8–12 =live | MAP Leg press 4×8–12 =live | STEP Leg press 4×8–12 =live | SKIPHIST Leg press 4×8–12 =live
+  box>goblet>LP|up_ts   BASE BB box squat 4×3 !=live(4×8–12) | MAP Leg press 4×5–8 !=live(4×8–12) | STEP Leg press 4×8–12 =live | SKIPHIST BB box squat 4×3 !=live(4×8–12)
+  box>goblet>LP|up_st   BASE Leg press 4×8–12 =live | MAP Leg press 4×8–12 =live | STEP Leg press 4×8–12 =live | SKIPHIST Leg press 4×8–12 =live
+  box>goblet>LP|up_bt   BASE DB goblet squat 4×8–12 =live | MAP Leg press 4×8–12 !=live(4×8–12) | STEP Leg press 4×8–12 !=live(4×8–12) | SKIPHIST DB goblet squat 4×8–12 =live
+  box>goblet>box|u      BASE DB goblet squat 4×8–12 !=live(4×8–12) | MAP BB box squat 4×3 !=live(4×8–12) | STEP BB box squat 4×8–12 =live | SKIPHIST BB box squat 4×3 !=live(4×8–12)
+  box>goblet>box|t1     BASE BB box squat 4×3 !=live(4×8–12) | MAP BB box squat 4×8–12 =live | STEP BB box squat 4×8–12 =live | SKIPHIST BB box squat 4×8–12 =live
+  box>goblet>box|t2     BASE BB box squat 4×8–12 =live | MAP BB box squat 4×8–12 =live | STEP BB box squat 4×8–12 =live | SKIPHIST BB box squat 4×8–12 =live
+  box>goblet>box|up_ts  BASE BB box squat 4×3 !=live(4×8–12) | MAP BB box squat 4×3 !=live(4×8–12) | STEP BB box squat 4×8–12 =live | SKIPHIST BB box squat 4×3 !=live(4×8–12)
+  box>goblet>box|up_st  BASE BB box squat 4×8–12 =live | MAP BB box squat 4×8–12 =live | STEP BB box squat 4×8–12 =live | SKIPHIST BB box squat 4×8–12 =live
+  box>goblet>box|up_bt  BASE DB goblet squat 4×8–12 =live | MAP BB box squat 4×8–12 !=live(4×8–12) | STEP BB box squat 4×8–12 !=live(4×8–12) | SKIPHIST DB goblet squat 4×8–12 =live
+
+== 6. C4 roll-up: whole day boot == last live card, hop2+cyc2 (untouched u; snapshotted t1 and t2) ==
+  u  BASE 839/15666   MAP 14374/15666   STEP 15533/15666   SKIPHIST 14374/15666
+  t1 BASE 999/15666   MAP 15604/15666   STEP 15604/15666   SKIPHIST 15666/15666
+  t2 BASE 15666/15666   MAP 15604/15666   STEP 15604/15666   SKIPHIST 15666/15666
+  2-cycles reachable through the sheet: mario 474, manny 664 (of hop2+cyc2 6999 / 8667)
+
+== 7. REACHABLE ONLY (unreach == 0 at replay). cells: slot detail!=live / slot name!=live / whole day!=live ; snapshot rewrite = boot!=hist ==
+  u|hop2         BASE 1531/14063/14083 of 14411  MAP 1115/0/1135 of 14413  STEP 70/0/90 of 14413  SKIPHIST 1115/0/1135 of 14413
+  u|cyc2         BASE 41/643/684 of 1132  MAP 114/0/115 of 1132  STEP 0/0/1 of 1132  SKIPHIST 114/0/115 of 1132
+  u|hop3         BASE 95/567/574 of 640  MAP 86/0/86 of 635  STEP 13/0/13 of 635  SKIPHIST 86/0/86 of 635
+  u|cyc3         BASE 3/16/17 of 32  MAP 5/0/5 of 32  STEP 0/0/0 of 32  SKIPHIST 5/0/5 of 32
+  u|collide2     BASE 33/540/559 of 1326  MAP 0/0/48 of 1327  STEP 0/0/0 of 1327  SKIPHIST 0/0/48 of 1327
+  u|exch3        BASE 122/1035/1035 of 1035  MAP 126/0/209 of 1035  STEP 0/0/0 of 1035  SKIPHIST 126/0/209 of 1035
+  t1|hop2        BASE 2354/14376/14376 rw 0 of 14412  MAP 0/0/19 rw 19 of 14412  STEP 0/0/19 rw 19 of 14412  SKIPHIST 0/0/0 rw 0 of 14412
+  t1|cyc2        BASE 114/57/171 rw 0 of 1132  MAP 0/0/1 rw 1 of 1132  STEP 0/0/1 rw 1 of 1132  SKIPHIST 0/0/0 rw 0 of 1132
+  t1|hop3        BASE 130/634/634 rw 0 of 635  MAP 0/0/0 rw 0 of 635  STEP 0/0/0 rw 0 of 635  SKIPHIST 0/0/0 rw 0 of 635
+  t1|cyc3        BASE 5/1/6 rw 0 of 32  MAP 0/0/0 rw 0 of 32  STEP 0/0/0 rw 0 of 32  SKIPHIST 0/0/0 rw 0 of 32
+  t1|collide2    BASE 88/1326/1326 rw 0 of 1326  MAP 240/1287/1287 rw 1287 of 1326  STEP 240/1287/1287 rw 1287 of 1326  SKIPHIST 0/0/0 rw 0 of 1326
+  t1|exch3       BASE 200/1035/1035 rw 0 of 1035  MAP 0/1016/1035 rw 1035 of 1035  STEP 0/1016/1035 rw 1035 of 1035  SKIPHIST 0/0/0 rw 0 of 1035
+  t2|hop2        BASE 0/0/0 rw 0 of 14412  MAP 0/0/19 rw 19 of 14412  STEP 0/0/19 rw 19 of 14412  SKIPHIST 0/0/0 rw 0 of 14412
+  t2|cyc2        BASE 0/0/0 rw 0 of 1132  MAP 0/0/1 rw 1 of 1132  STEP 0/0/1 rw 1 of 1132  SKIPHIST 0/0/0 rw 0 of 1132
+  t2|hop3        BASE 0/0/0 rw 0 of 635  MAP 0/0/0 rw 0 of 635  STEP 0/0/0 rw 0 of 635  SKIPHIST 0/0/0 rw 0 of 635
+  t2|cyc3        BASE 0/0/0 rw 0 of 32  MAP 0/0/0 rw 0 of 32  STEP 0/0/0 rw 0 of 32  SKIPHIST 0/0/0 rw 0 of 32
+  t2|collide2    BASE 0/0/0 rw 0 of 1326  MAP 240/1287/1287 rw 1287 of 1326  STEP 240/1287/1287 rw 1287 of 1326  SKIPHIST 0/0/0 rw 0 of 1326
+  t2|exch3       BASE 0/0/0 rw 0 of 1035  MAP 0/1016/1035 rw 1035 of 1035  STEP 0/1016/1035 rw 1035 of 1035  SKIPHIST 0/0/0 rw 0 of 1035
+  up_ts|hop2     BASE 2354/14376/14376 rw 0 of 14412  MAP 1113/0/1132 rw 14376 of 14412  STEP 68/0/87 rw 14376 of 14412  SKIPHIST 2354/14376/14376 rw 0 of 14412
+  up_ts|cyc2     BASE 114/57/171 rw 0 of 1132  MAP 114/0/115 rw 57 of 1132  STEP 0/0/1 rw 171 of 1132  SKIPHIST 114/57/171 rw 0 of 1132
+  up_ts|hop3     BASE 130/634/634 rw 0 of 635  MAP 86/0/86 rw 634 of 635  STEP 13/0/13 rw 634 of 635  SKIPHIST 130/634/634 rw 0 of 635
+  up_ts|cyc3     BASE 5/1/6 rw 0 of 32  MAP 5/0/5 rw 1 of 32  STEP 0/0/0 rw 6 of 32  SKIPHIST 5/1/6 rw 0 of 32
+  up_ts|collide2 BASE 88/1326/1326 rw 0 of 1326  MAP 0/0/48 rw 1326 of 1326  STEP 0/0/0 rw 1326 of 1326  SKIPHIST 88/1326/1326 rw 0 of 1326
+  up_ts|exch3    BASE 200/1035/1035 rw 0 of 1035  MAP 126/0/209 rw 1035 of 1035  STEP 0/0/0 rw 1035 of 1035  SKIPHIST 200/1035/1035 rw 0 of 1035
+  up_st|hop2     BASE 0/0/0 rw 0 of 14412  MAP 0/0/19 rw 19 of 14412  STEP 0/0/19 rw 19 of 14412  SKIPHIST 0/0/0 rw 0 of 14412
+  up_st|cyc2     BASE 0/0/0 rw 0 of 1132  MAP 0/0/1 rw 1 of 1132  STEP 0/0/1 rw 1 of 1132  SKIPHIST 0/0/0 rw 0 of 1132
+  up_st|hop3     BASE 0/0/0 rw 0 of 635  MAP 0/0/0 rw 0 of 635  STEP 0/0/0 rw 0 of 635  SKIPHIST 0/0/0 rw 0 of 635
+  up_st|cyc3     BASE 0/0/0 rw 0 of 32  MAP 0/0/0 rw 0 of 32  STEP 0/0/0 rw 0 of 32  SKIPHIST 0/0/0 rw 0 of 32
+  up_st|collide2 BASE 0/0/0 rw 0 of 1326  MAP 240/1287/1287 rw 1287 of 1326  STEP 240/1287/1287 rw 1287 of 1326  SKIPHIST 0/0/0 rw 0 of 1326
+  up_st|exch3    BASE 0/0/0 rw 0 of 1035  MAP 0/1016/1035 rw 1035 of 1035  STEP 0/1016/1035 rw 1035 of 1035  SKIPHIST 0/0/0 rw 0 of 1035
+  up_bt|hop2     BASE 0/0/0 rw 0 of 14411  MAP 702/7986/8005 rw 8005 of 14411  STEP 702/7986/8005 rw 8005 of 14411  SKIPHIST 0/0/0 rw 0 of 14411
+  up_bt|cyc2     BASE 0/0/0 rw 0 of 1132  MAP 0/643/643 rw 643 of 1132  STEP 0/643/643 rw 643 of 1132  SKIPHIST 0/0/0 rw 0 of 1132
+  up_bt|hop3     BASE 0/0/0 rw 0 of 640  MAP 24/312/312 rw 312 of 640  STEP 51/312/316 rw 316 of 640  SKIPHIST 0/0/0 rw 0 of 640
+  up_bt|cyc3     BASE 0/0/0 rw 0 of 32  MAP 0/16/16 rw 16 of 32  STEP 2/16/16 rw 16 of 32  SKIPHIST 0/0/0 rw 0 of 32
+  up_bt|collide2 BASE 0/0/0 rw 0 of 1326  MAP 138/747/747 rw 747 of 1326  STEP 138/747/747 rw 747 of 1326  SKIPHIST 0/0/0 rw 0 of 1326
+  up_bt|exch3    BASE 0/0/0 rw 0 of 1035  MAP 66/610/610 rw 610 of 1035  STEP 66/610/610 rw 610 of 1035  SKIPHIST 0/0/0 rw 0 of 1035
+  unreach rows dropped per mode (MAP): u 200, t1 202, t2 202
+
+== 8. manny: same cfg, same clock, 3 fresh setups+boots: day item names identical? true
+  boot0 5.fri Pushups (slow tempo);Barbell push press | Dumbbell incline press;Bench dips | Band woodchopper (door anchor);Windshield wipers
+  boot0 7.mon Dumbbell bench press;Dumbbell Arnold press | Diamond pushups;Dumbbell lateral raise | Wall sit | Farmer carry;Suitcase carry
+  boot0 7.fri Dumbbell incline press;Dumbbell lateral raise | Dumbbell decline press;Bench dips | Medicine ball rotary toss;Landmine rotations
+  boot0 5.mon Dumbbell bench press;Kettlebell single-arm press | Dumbbell decline press;Barbell push press | Spanish squat hold (KB) | Pallof press
+  boot1 5.fri Pushups (slow tempo);Barbell push press | Dumbbell incline press;Bench dips | Band woodchopper (door anchor);Windshield wipers
+  boot1 7.mon Dumbbell bench press;Dumbbell Arnold press | Diamond pushups;Dumbbell lateral raise | Wall sit | Farmer carry;Suitcase carry
+  boot1 7.fri Dumbbell incline press;Dumbbell lateral raise | Dumbbell decline press;Bench dips | Medicine ball rotary toss;Landmine rotations
+  boot1 5.mon Dumbbell bench press;Kettlebell single-arm press | Dumbbell decline press;Barbell push press | Spanish squat hold (KB) | Pallof press
+  boot2 5.fri Pushups (slow tempo);Barbell push press | Dumbbell incline press;Bench dips | Band woodchopper (door anchor);Windshield wipers
+  boot2 7.mon Dumbbell bench press;Dumbbell Arnold press | Diamond pushups;Dumbbell lateral raise | Wall sit | Farmer carry;Suitcase carry
+  boot2 7.fri Dumbbell incline press;Dumbbell lateral raise | Dumbbell decline press;Bench dips | Medicine ball rotary toss;Landmine rotations
+  boot2 5.mon Dumbbell bench press;Kettlebell single-arm press | Dumbbell decline press;Barbell push press | Spanish squat hold (KB) | Pallof press

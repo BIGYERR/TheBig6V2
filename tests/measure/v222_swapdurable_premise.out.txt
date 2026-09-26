@@ -1,0 +1,394 @@
+SURGERY ok: COPY -234 bytes, COPYa 98 bytes; COPY `_swapCut` tokens left 2
+versions: V220=220 V221=221 COPY=221 COPYa=221
+SELFCHECK V221 identical: true
+
+== M0 LATTICE ==  cells 2016, crashes/errors 0
+  V220+V221    DURABLE 380/1008 (rec kept 92, hist holds target 288) | REVERTED 628/1008 (rec pruned 628, hist donor 288, no hist 340, orphaned logs 144) | orphaned logs all cells 144/1008 | stored grid carries target 0/1008
+  V220         DURABLE 190/504 (rec kept 46, hist holds target 144) | REVERTED 314/504 (rec pruned 314, hist donor 144, no hist 170, orphaned logs 72) | orphaned logs all cells 72/504 | stored grid carries target 0/504
+  V221         DURABLE 190/504 (rec kept 46, hist holds target 144) | REVERTED 314/504 (rec pruned 314, hist donor 144, no hist 170, orphaned logs 72) | orphaned logs all cells 72/504 | stored grid carries target 0/504
+  COPY         DURABLE 504/504 (rec kept 504, hist holds target 432) | REVERTED 0/504 (rec pruned 0, hist donor 0, no hist 0, orphaned logs 0) | orphaned logs all cells 144/504 | stored grid carries target 0/504
+  COPYa        DURABLE 504/504 (rec kept 504, hist holds target 432) | REVERTED 0/504 (rec pruned 0, hist donor 0, no hist 0, orphaned logs 0) | orphaned logs all cells 144/504 | stored grid carries target 0/504
+  -- per tree x touch|order (survived/total)
+    none|-                V220 46/72   V221 46/72   COPY 72/72   COPYa 72/72
+    draft|swap_then_touch V220 72/72   V221 72/72   COPY 72/72   COPYa 72/72
+    draft|touch_then_swap V220 0/72   V221 0/72   COPY 72/72   COPYa 72/72
+    tick|swap_then_touch  V220 0/72   V221 0/72   COPY 72/72   COPYa 72/72
+    tick|touch_then_swap  V220 0/72   V221 0/72   COPY 72/72   COPYa 72/72
+    done|swap_then_touch  V220 72/72   V221 72/72   COPY 72/72   COPYa 72/72
+    done|touch_then_swap  V220 0/72   V221 0/72   COPY 72/72   COPYa 72/72
+  -- COPY reverted cells (first 12):
+  neg-control (a) V221: swap on untouched day wrote ia_hist_ before boot 0/36
+  neg-control (a) COPY: swap on untouched day wrote ia_hist_ before boot 0/36
+  neg-control (a) COPYa: swap on untouched day wrote ia_hist_ before boot 0/36
+  orphaned-log cells by touch|order V221: {"tick|swap_then_touch":72}
+  orphaned-log cells by touch|order COPY: {"draft|touch_then_swap":72,"tick|touch_then_swap":72}
+  exw slug count equal across reboot V220: 504/504
+  exw slug count equal across reboot V221: 504/504
+  exw slug count equal across reboot COPY: 504/504
+  exw slug count equal across reboot COPYa: 504/504
+
+== M2 UNDO AFTER REBOOT (dated, clock today, goblet; act, reboot, undo, reboot, reboot) ==
+  V220|none|-                    boot1=Dumbbell goblet squat 4×3 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  V220|draft|swap_then_touch     boot1=Dumbbell goblet squat 4×3 chip=- | undo-> Dumbbell goblet squat 4×3 rec=none hist=Dumbbell goblet squat 4×3 | boot2=Dumbbell goblet squat 4×3 hist=Dumbbell goblet squat 4×3 rec=none | boot3=Dumbbell goblet squat 4×3
+  V220|draft|touch_then_swap     boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  V220|tick|swap_then_touch      boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  V220|tick|touch_then_swap      boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  V220|done|swap_then_touch      boot1=Dumbbell goblet squat 4×3 chip=- | undo-> Dumbbell goblet squat 4×3 rec=none hist=Dumbbell goblet squat 4×3 | boot2=Dumbbell goblet squat 4×3 hist=Dumbbell goblet squat 4×3 rec=none | boot3=Dumbbell goblet squat 4×3
+  V220|done|touch_then_swap      boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  V221|none|-                    boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  V221|draft|swap_then_touch     boot1=Dumbbell goblet squat 4×8–12 chip=- | undo-> Dumbbell goblet squat 4×8–12 rec=none hist=Dumbbell goblet squat 4×8–12 | boot2=Dumbbell goblet squat 4×8–12 hist=Dumbbell goblet squat 4×8–12 rec=none | boot3=Dumbbell goblet squat 4×8–12
+  V221|draft|touch_then_swap     boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  V221|tick|swap_then_touch      boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  V221|tick|touch_then_swap      boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  V221|done|swap_then_touch      boot1=Dumbbell goblet squat 4×8–12 chip=- | undo-> Dumbbell goblet squat 4×8–12 rec=none hist=Dumbbell goblet squat 4×8–12 | boot2=Dumbbell goblet squat 4×8–12 hist=Dumbbell goblet squat 4×8–12 rec=none | boot3=Dumbbell goblet squat 4×8–12
+  V221|done|touch_then_swap      boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPY|none|-                    boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  COPY|draft|swap_then_touch     boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPY|draft|touch_then_swap     boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPY|tick|swap_then_touch      boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPY|tick|touch_then_swap      boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPY|done|swap_then_touch      boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPY|done|touch_then_swap      boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPYa|none|-                   boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  COPYa|draft|swap_then_touch    boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPYa|draft|touch_then_swap    boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPYa|tick|swap_then_touch     boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPYa|tick|touch_then_swap     boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPYa|done|swap_then_touch     boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  COPYa|done|touch_then_swap     boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+
+== M3 ADD/SKIP x SWAP on W5 Thu (dated, clock today, reboot same day, then a second reboot at past_nextwk) ==
+  V220   live==boot 13/42  live==next-week boot 13/42  double-apply 0/42
+    V220|draft|touch>add>swap                      LIVE Dumbbell goblet squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1 rec=none edits=null
+    V220|draft|add>touch>swap                      LIVE Dumbbell goblet squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1 rec=none edits=null
+    V220|draft|touch>skipslot>swap                 LIVE Dumbbell goblet squat 4×3[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3[x] | skip=Barbell box squat | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3[x] | skip=Barbell box squat | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|draft|skipslot>touch>swap                 LIVE Dumbbell goblet squat 4×3[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3[x] | skip=Barbell box squat | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3[x] | skip=Barbell box squat | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|draft|touch>skipother>swap                LIVE Dumbbell goblet squat 4×3 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=Step-ups (KB) | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=Step-ups (KB) | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|draft|skipother>touch>swap                LIVE Dumbbell goblet squat 4×3 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=Step-ups (KB) | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=Step-ups (KB) | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|draft|touch>add>swapadded                 LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1  (addedCanSwap=true) rec=none edits=null
+    V220|draft|add>touch>swapadded                 LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1  (addedCanSwap=true) rec=none edits=null
+    V220|draft|add>swapadded>touch OK addedCanSwap=true
+    V220|tick|touch>swap>add                       LIVE Dumbbell goblet squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|swap>touch>add                       LIVE Dumbbell goblet squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|swap>add>touch                       LIVE Dumbbell goblet squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|touch>add>swap                       LIVE Dumbbell goblet squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|add>touch>swap                       LIVE Dumbbell goblet squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|add>swap>touch                       LIVE Dumbbell goblet squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|touch>swap>skipslot                  LIVE Dumbbell goblet squat 4×3[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|swap>touch>skipslot                  LIVE Dumbbell goblet squat 4×3[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|swap>skipslot>touch                  LIVE Dumbbell goblet squat 4×3[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|touch>skipslot>swap                  LIVE Dumbbell goblet squat 4×3[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|skipslot>touch>swap                  LIVE Dumbbell goblet squat 4×3[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|skipslot>swap>touch                  LIVE Dumbbell goblet squat 4×3[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|touch>swap>skipother                 LIVE Dumbbell goblet squat 4×3 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|swap>touch>skipother                 LIVE Dumbbell goblet squat 4×3 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|swap>skipother>touch                 LIVE Dumbbell goblet squat 4×3 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|touch>skipother>swap                 LIVE Dumbbell goblet squat 4×3 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|skipother>touch>swap                 LIVE Dumbbell goblet squat 4×3 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|skipother>swap>touch                 LIVE Dumbbell goblet squat 4×3 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V220|tick|touch>add>swapadded                  LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1  (addedCanSwap=true) rec=none edits=null
+    V220|tick|add>touch>swapadded                  LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1  (addedCanSwap=true) rec=none edits=null
+    V220|tick|add>swapadded>touch                  LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1  (addedCanSwap=true) rec=none edits=null
+  V221   live==boot 13/42  live==next-week boot 13/42  double-apply 0/42
+    V221|draft|touch>add>swap                      LIVE Dumbbell goblet squat 4×8–12 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1 rec=none edits=null
+    V221|draft|add>touch>swap                      LIVE Dumbbell goblet squat 4×8–12 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1 rec=none edits=null
+    V221|draft|touch>skipslot>swap                 LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3[x] | skip=Barbell box squat | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3[x] | skip=Barbell box squat | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|draft|skipslot>touch>swap                 LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3[x] | skip=Barbell box squat | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3[x] | skip=Barbell box squat | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|draft|touch>skipother>swap                LIVE Dumbbell goblet squat 4×8–12 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=Step-ups (KB) | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=Step-ups (KB) | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|draft|skipother>touch>swap                LIVE Dumbbell goblet squat 4×8–12 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=Step-ups (KB) | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=Step-ups (KB) | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|draft|touch>add>swapadded                 LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1  (addedCanSwap=true) rec=none edits=null
+    V221|draft|add>touch>swapadded                 LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell hammer curl | nGob=0 nDonor=1  (addedCanSwap=true) rec=none edits=null
+    V221|draft|add>swapadded>touch OK addedCanSwap=true
+    V221|tick|touch>swap>add                       LIVE Dumbbell goblet squat 4×8–12 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|swap>touch>add                       LIVE Dumbbell goblet squat 4×8–12 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|swap>add>touch                       LIVE Dumbbell goblet squat 4×8–12 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|touch>add>swap                       LIVE Dumbbell goblet squat 4×8–12 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|add>touch>swap                       LIVE Dumbbell goblet squat 4×8–12 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|add>swap>touch                       LIVE Dumbbell goblet squat 4×8–12 | skip=- | add=Dumbbell hammer curl | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|touch>swap>skipslot                  LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|swap>touch>skipslot                  LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|swap>skipslot>touch                  LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|touch>skipslot>swap                  LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|skipslot>touch>swap                  LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|skipslot>swap>touch                  LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|touch>swap>skipother                 LIVE Dumbbell goblet squat 4×8–12 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|swap>touch>skipother                 LIVE Dumbbell goblet squat 4×8–12 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|swap>skipother>touch                 LIVE Dumbbell goblet squat 4×8–12 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|touch>skipother>swap                 LIVE Dumbbell goblet squat 4×8–12 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|skipother>touch>swap                 LIVE Dumbbell goblet squat 4×8–12 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|skipother>swap>touch                 LIVE Dumbbell goblet squat 4×8–12 | skip=Step-ups (KB) | add=- | nGob=1 nDonor=0
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1 rec=none edits=null
+    V221|tick|touch>add>swapadded                  LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1  (addedCanSwap=true) rec=none edits=null
+    V221|tick|add>touch>swapadded                  LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1  (addedCanSwap=true) rec=none edits=null
+    V221|tick|add>swapadded>touch                  LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=- | nGob=0 nDonor=1  (addedCanSwap=true) rec=none edits=null
+  COPY   live==boot 30/42  live==next-week boot 30/42  double-apply 6/42
+    COPY|draft|touch>skipslot>swap                 LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0
+                                                    NXWK Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0 rec=Barbell box squat->Dumbbell goblet squat edits={"add":[],"skip":["Barbell box squat"]}
+    COPY|draft|skipslot>touch>swap                 LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0
+                                                    NXWK Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0 rec=Barbell box squat->Dumbbell goblet squat edits={"add":[],"skip":["Barbell box squat"]}
+    COPY|draft|skipslot>swap>touch                 LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0
+                                                    NXWK Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0 rec=Barbell box squat->Dumbbell goblet squat edits={"add":[],"skip":["Barbell box squat"]}
+    COPY|draft|touch>add>swapadded                 LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1  (addedCanSwap=true) rec=Dumbbell hammer curl->Dumbbell biceps curl edits={"add":[{"name":"Dumbbell hammer curl","detail":"3×10–12 @ RPE 8","ts":1790276400000}],"skip":[]}
+    COPY|draft|add>touch>swapadded                 LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1  (addedCanSwap=true) rec=Dumbbell hammer curl->Dumbbell biceps curl edits={"add":[{"name":"Dumbbell hammer curl","detail":"3×10–12 @ RPE 8","ts":1790276400000}],"skip":[]}
+    COPY|draft|add>swapadded>touch                 LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1  (addedCanSwap=true) rec=Dumbbell hammer curl->Dumbbell biceps curl edits={"add":[{"name":"Dumbbell hammer curl","detail":"3×10–12 @ RPE 8","ts":1790276400000}],"skip":[]}
+    COPY|tick|touch>skipslot>swap                  LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0
+                                                    NXWK Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0 rec=Barbell box squat->Dumbbell goblet squat edits={"add":[],"skip":["Barbell box squat"]}
+    COPY|tick|skipslot>touch>swap                  LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0
+                                                    NXWK Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0 rec=Barbell box squat->Dumbbell goblet squat edits={"add":[],"skip":["Barbell box squat"]}
+    COPY|tick|skipslot>swap>touch                  LIVE Dumbbell goblet squat 4×8–12[x] | skip=Dumbbell goblet squat | add=- | nGob=1 nDonor=0
+                                                    BOOT Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0
+                                                    NXWK Dumbbell goblet squat 4×8–12 | skip=- | add=- | nGob=1 nDonor=0 rec=Barbell box squat->Dumbbell goblet squat edits={"add":[],"skip":["Barbell box squat"]}
+    COPY|tick|touch>add>swapadded                  LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1  (addedCanSwap=true) rec=Dumbbell hammer curl->Dumbbell biceps curl edits={"add":[{"name":"Dumbbell hammer curl","detail":"3×10–12 @ RPE 8","ts":1790276400000}],"skip":[]}
+    COPY|tick|add>touch>swapadded                  LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1  (addedCanSwap=true) rec=Dumbbell hammer curl->Dumbbell biceps curl edits={"add":[{"name":"Dumbbell hammer curl","detail":"3×10–12 @ RPE 8","ts":1790276400000}],"skip":[]}
+    COPY|tick|add>swapadded>touch                  LIVE Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl | nGob=0 nDonor=1
+                                                    BOOT Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1
+                                                    NXWK Barbell box squat 4×3 | skip=- | add=Dumbbell biceps curl,Dumbbell hammer curl | nGob=0 nDonor=1  (addedCanSwap=true) rec=Dumbbell hammer curl->Dumbbell biceps curl edits={"add":[{"name":"Dumbbell hammer curl","detail":"3×10–12 @ RPE 8","ts":1790276400000}],"skip":[]}
+  COPYa  live==boot 42/42  live==next-week boot 42/42  double-apply 0/42
+    COPYa|draft|touch>add>swapadded OK addedCanSwap=true
+    COPYa|draft|add>touch>swapadded OK addedCanSwap=true
+    COPYa|draft|add>swapadded>touch OK addedCanSwap=true
+    COPYa|tick|touch>add>swapadded OK addedCanSwap=true
+    COPYa|tick|add>touch>swapadded OK addedCanSwap=true
+    COPYa|tick|add>swapadded>touch OK addedCanSwap=true
+
+== M4 SECOND SWAP box->goblet->X, then undo X, undo goblet (dated, clock today) ==
+  second-swap target: Leg press (of 7 candidates)
+  V220|none|-            live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Dumbbell goblet squat 4×3 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=none chip=Barbell box squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×3 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  V220|draft|first       live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 chip=-
+                          undo(goblet)->Barbell box squat BOOT2 Barbell box squat 4×3 rec=none chip=-
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  V220|draft|between     live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Dumbbell goblet squat 4×3 rec=none hist=Dumbbell goblet squat 4×3 chip=-
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×3 rec=none chip=-
+                          undo(box)->Dumbbell goblet squat 4×3 BOOT3 Dumbbell goblet squat 4×3 rec=none
+  V220|draft|last        live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×3 rec=none hist=Leg press 4×3 chip=-
+                          undo(goblet)->Leg press BOOT2 Leg press 4×3 rec=none chip=-
+                          undo(box)->Leg press 4×3 BOOT3 Leg press 4×3 rec=none
+  V221|none|-            live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=none chip=Barbell box squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  V221|draft|first       live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 chip=-
+                          undo(goblet)->Barbell box squat BOOT2 Barbell box squat 4×3 rec=none chip=-
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  V221|draft|between     live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Dumbbell goblet squat 4×8–12 rec=none hist=Dumbbell goblet squat 4×8–12 chip=-
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=none chip=-
+                          undo(box)->Dumbbell goblet squat 4×8–12 BOOT3 Dumbbell goblet squat 4×8–12 rec=none
+  V221|draft|last        live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=none hist=Leg press 4×8–12 chip=-
+                          undo(goblet)->Leg press BOOT2 Leg press 4×8–12 rec=none chip=-
+                          undo(box)->Leg press 4×8–12 BOOT3 Leg press 4×8–12 rec=none
+  COPY|none|-            live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=none chip=Barbell box squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  COPY|draft|first       live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  COPY|draft|between     live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  COPY|draft|last        live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  COPYa|none|-           live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=none chip=Barbell box squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  COPYa|draft|first      live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  COPYa|draft|between    live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  COPYa|draft|last       live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  -- applySessionSwaps with both records injected, W5 Thu untouched vs hist-restored
+    V220|hist=none                               boot W5 Thu slot=Barbell box squat rec=none
+    V220|hist=Barbell box squat                  boot W5 Thu slot=Barbell box squat rec=none
+    V220|hist=Dumbbell goblet squat              boot W5 Thu slot=Dumbbell goblet squat rec=none
+    V220|hist=Leg press                          boot W5 Thu slot=Leg press rec=none
+    V221|hist=none                               boot W5 Thu slot=Barbell box squat rec=none
+    V221|hist=Barbell box squat                  boot W5 Thu slot=Barbell box squat rec=none
+    V221|hist=Dumbbell goblet squat              boot W5 Thu slot=Dumbbell goblet squat rec=none
+    V221|hist=Leg press                          boot W5 Thu slot=Leg press rec=none
+    COPY|hist=none                               boot W5 Thu slot=Dumbbell goblet squat rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    COPY|hist=Barbell box squat                  boot W5 Thu slot=Dumbbell goblet squat rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    COPY|hist=Dumbbell goblet squat              boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    COPY|hist=Leg press                          boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    COPYa|hist=none                              boot W5 Thu slot=Dumbbell goblet squat rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    COPYa|hist=Barbell box squat                 boot W5 Thu slot=Dumbbell goblet squat rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    COPYa|hist=Dumbbell goblet squat             boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    COPYa|hist=Leg press                         boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+
+== M5 STALE GRID: stored W5 Thu slot renamed to Barbell back squat; swap made live at W5, reboot at W6 with W6 touched ==
+  V220|stale=false   shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell box squat 4×3 rec=none hist=none
+  V220|stale=true    shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell back squat 4×3 rec=none hist=none
+  V221|stale=false   shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell box squat 4×3 rec=none hist=none
+  V221|stale=true    shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell back squat 4×3 rec=none hist=none
+  COPY|stale=false   shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat hist=none
+  COPY|stale=true    shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell back squat 4×3 rec=Barbell box squat->Dumbbell goblet squat hist=none
+  COPYa|stale=false  shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat hist=none
+  COPYa|stale=true   shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell back squat 4×3 rec=Barbell box squat->Dumbbell goblet squat hist=none
+
+== M6 SWAP STORE READERS (V221, comments stripped) ==
+  ia_swaps_                  code sites 2: 9034,14778
+  swapStoreKey(              code sites 3: 9034,9035,9036
+  getSwaps(                  code sites 7: 9035,9038,9051,9079,12916,13166,14733
+  saveSwaps(                 code sites 4: 9036,9048,9055,9081
+  ia_swapct_                 code sites 2: 9089,14778
+  getSwapCounts(             code sites 3: 9090,9093,9102
+  ia_edits_                  code sites 2: 8956,14778
+  getDayEdits(               code sites 7: 8957,8961,8966,8972,8977,9030,14742
+  localStorage.length        code sites 0: 
+  localStorage.key(          code sites 0: 
+  Object.keys(localStorage   code sites 0: 
+  'ia_'                      code sites 0: 
+  JSON.stringify(localStorage code sites 0: 
+  (line numbers above are inline-JS lines, not index.html lines)
+  V221  weeks=6 lifting days with a swappable item=30 swaps made=124 (max/day 6) | records 124, ia_swaps_ 17269 bytes, one record avg 175 bytes | one swap per day = 30 records ~5246 bytes | after boot at program end: 0 records kept | ia_programs 25763 bytes
+  COPY  weeks=6 lifting days with a swappable item=30 swaps made=124 (max/day 6) | records 124, ia_swaps_ 17269 bytes, one record avg 175 bytes | one swap per day = 30 records ~5246 bytes | after boot at program end: 124 records kept | ia_programs 25763 bytes

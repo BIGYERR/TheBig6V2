@@ -1,0 +1,51 @@
+[
+ {
+  "name": "D181 R1 dropped in applySwapChoice: a swap no longer folds into an existing ia_hist_ snapshot",
+  "anchor": "  closeSwapSheet();\n  resnapshotDayEdit(currentWeek,currentDayKey);\n  openDetail(currentDayKey,day);\n",
+  "replacement": "  closeSwapSheet();\n  openDetail(currentDayKey,day);\n",
+  "gate": "gates/g222_d181_durable.js",
+  "note": "NAMED TRIP: row 1 (draft|touch_then_swap, tick|touch_then_swap, done|touch_then_swap: the snapshot holds the box squat and R5 withholds the record), row 10 (touch_then_swap shapes boot the donor), row 5s (touch first), row 4 (touch>swap orderings)."
+ },
+ {
+  "name": "D181 R1 dropped in undoSwap: an undo no longer folds into an existing ia_hist_ snapshot",
+  "anchor": "  clearSwap(activeProgId,currentWeek,currentDayKey,from);\n  resnapshotDayEdit(currentWeek,currentDayKey);\n",
+  "replacement": "  clearSwap(activeProgId,currentWeek,currentDayKey,from);\n",
+  "gate": "gates/g222_d181_durable.js",
+  "note": "NAMED TRIP: row 2 (six touched orderings: the snapshot still holds the goblet, boot2 shows it), row 5s (undo walk on the snapshotted day)."
+ },
+ {
+  "name": "D181 R2 dropped: the per-exercise Log is no longer a first touch (no snapshot before the ia_exw_ write)",
+  "anchor": "  if(dk) snapshotDay(w, dk);\n",
+  "replacement": "",
+  "gate": "gates/g222_d181_durable.js",
+  "note": "NAMED TRIP: row 1 tick cells (no ia_hist_ carries the last choice; the name alone survives through the branch 2 replay), row 4 tick cells (adds and skips pruned with no snapshot to fold into), rows 2 and 10 tick shapes. Row 3 may stay green: with the prune gone the branch 2 replay puts the goblet back."
+ },
+ {
+  "name": "D181 R3' reverted: the V221 pruneSwaps call AND function restored together (records below the freeze cut deleted at boot)",
+  "anchor": "    try{\n      const _sw=getSwaps(prog.id)||{}, _swLive={};\n",
+  "replacement": "    try{\n      function pruneSwaps(pid,cutWeek){\n        const s=getSwaps(pid); let changed=false;\n        Object.keys(s).forEach(k=>{const m=/^w(\\d+)_/.exec(k);if(m&&+m[1]<cutWeek){delete s[k];changed=true;}});\n        if(changed) saveSwaps(pid,s);\n      }\n      if(typeof _swapCut==='number') pruneSwaps(prog.id,_swapCut);\n      const _sw=getSwaps(prog.id)||{}, _swLive={};\n",
+  "gate": "gates/g222_d181_durable.js",
+  "note": "The V221 function text, byte-exact from base_v221.html, declared inside the same try block ahead of the V221 call, so nothing throws and applySessionSwaps still runs. NAMED TRIP: row 1 (none|- with another day touched in the week: the W5 record is pruned), row 2 (chip absent after reboot), row 5s, row 10 (record pruned)."
+ },
+ {
+  "name": "D181 R3' over-deleted (the COPY shape): the `_swapCut = _cut` writer removed, so pruneDayEdits never runs again",
+  "anchor": "        _swapCut = _cut;   // carries the freeze cut to pruneDayEdits at the end of refreshProgram, and nothing else\n",
+  "replacement": "",
+  "gate": "gates/g222_d181_durable.js",
+  "note": "NAMED TRIP: row 4d (double-apply, the COPY measure read 6/42) and row 4 (the COPY measure read 30/42)."
+ },
+ {
+  "name": "D181 R5 S5: the boot deletes and saves the record of a hist-restored day instead of skipping it",
+  "anchor": "      Object.keys(_sw).forEach(k=>{ if(!_histRestored.has(k)) _swLive[k]=_sw[k]; });",
+  "replacement": "      Object.keys(_sw).forEach(k=>{ if(!_histRestored.has(k)) _swLive[k]=_sw[k]; else{ delete _sw[k]; saveSwaps(prog.id,_sw); } });",
+  "gate": "gates/g222_d181_durable.js",
+  "note": "NAMED TRIP: row 2 (chip absent after reboot on the six touched orderings), row 10 (record gone), row 5s."
+ },
+ {
+  "name": "D181 R5 S6: the boot withholds every key, so no session swap is ever replayed",
+  "anchor": "      Object.keys(_sw).forEach(k=>{ if(!_histRestored.has(k)) _swLive[k]=_sw[k]; });",
+  "replacement": "      Object.keys(_sw).forEach(k=>{ if(false) _swLive[k]=_sw[k]; });",
+  "gate": "gates/g222_d181_durable.js",
+  "note": "NAMED TRIP: row 1 (none|- 0/72: an untouched day boots the donor), row 2 (none|- ordering)."
+ }
+]

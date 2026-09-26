@@ -1,0 +1,973 @@
+versions: BASE=221 MAP=222 STEP=222 SKIPHIST=222 | STEP/SKIPHIST surgery anchors 1/1 each
+pruneSwaps call tokens (comments stripped): BASE=1 MAP=0 STEP=0 SKIPHIST=0
+SELFCHECK MAP boot==boot W5 thu: true
+ENUM mario weeks 3,5,7: {"days":10,"slots":52,"hop1":552,"hop2":6999,"cyc2":474,"hop3all":101865,"collide2":507,"exch3":376,"dup1":0,"dupDays":0} | chains by class {"cyc2":474,"hop2":6525,"collide2":507,"exch3":376,"hop3":258,"cyc3":12}
+ENUM manny weeks 3,5,7: {"days":15,"slots":74,"hop1":719,"hop2":8667,"cyc2":664,"hop3all":121084,"collide2":845,"exch3":705,"dup1":0,"dupDays":0} | chains by class {"cyc2":664,"hop2":8003,"collide2":845,"exch3":705,"hop3":385,"cyc3":20}
+
+workers 48/48 wrote results
+
+== C1/C4: boot vs last live card (u = untouched, t1 = touched then chain, t2 = chain then touched) ==
+   cell: slot detail != live / slot name != live / whole day != live   over n (unreach = hops not offered at replay)
+  u|hop2        BASE 1531/14101/14140 of 14528 unreach 117   MAP 1115/0/1174 of 14528 unreach 115   STEP 70/0/129 of 14528 unreach 115   SKIPHIST 1115/0/1174 of 14528 unreach 115
+  u|cyc2        BASE 41/645/687 of 1138 unreach 6   MAP 114/0/118 of 1138 unreach 6   STEP 0/0/4 of 1138 unreach 6   SKIPHIST 114/0/118 of 1138 unreach 6
+  u|hop3        BASE 95/570/577 of 643 unreach 3   MAP 86/0/93 of 643 unreach 8   STEP 13/0/20 of 643 unreach 8   SKIPHIST 86/0/93 of 643 unreach 8
+  u|cyc3        BASE 3/16/17 of 32   MAP 5/0/5 of 32   STEP 0/0/0 of 32   SKIPHIST 5/0/5 of 32
+  u|collide2    BASE 33/540/560 of 1352 unreach 26   MAP 0/0/50 of 1352 unreach 25   STEP 0/0/2 of 1352 unreach 25   SKIPHIST 0/0/50 of 1352 unreach 25
+  u|exch3       BASE 122/1055/1056 of 1081 unreach 46   MAP 126/0/211 of 1081 unreach 46   STEP 0/0/2 of 1081 unreach 46   SKIPHIST 126/0/211 of 1081 unreach 46
+  u|dup1        BASE -   MAP -   STEP -   SKIPHIST -
+  t1|hop2       BASE 2354/14492/14492 of 14528 unreach 116   MAP 0/0/58 of 14528 unreach 116   STEP 0/0/58 of 14528 unreach 116   SKIPHIST 0/0/0 of 14528 unreach 116
+  t1|cyc2       BASE 114/61/175 of 1138 unreach 6   MAP 0/0/4 of 1138 unreach 6   STEP 0/0/4 of 1138 unreach 6   SKIPHIST 0/0/0 of 1138 unreach 6
+  t1|hop3       BASE 130/642/642 of 643 unreach 8   MAP 0/0/7 of 643 unreach 8   STEP 0/0/7 of 643 unreach 8   SKIPHIST 0/0/0 of 643 unreach 8
+  t1|cyc3       BASE 5/1/6 of 32   MAP 0/0/0 of 32   STEP 0/0/0 of 32   SKIPHIST 0/0/0 of 32
+  t1|collide2   BASE 88/1330/1351 of 1352 unreach 26   MAP 240/1287/1289 of 1352 unreach 26   STEP 240/1287/1289 of 1352 unreach 26   SKIPHIST 0/0/0 of 1352 unreach 26
+  t1|exch3      BASE 200/1081/1081 of 1081 unreach 46   MAP 0/1017/1037 of 1081 unreach 46   STEP 0/1017/1037 of 1081 unreach 46   SKIPHIST 0/0/0 of 1081 unreach 46
+  t1|dup1       BASE -   MAP -   STEP -   SKIPHIST -
+  t2|hop2       BASE 0/0/0 of 14528 unreach 116   MAP 0/0/58 of 14528 unreach 116   STEP 0/0/58 of 14528 unreach 116   SKIPHIST 0/0/0 of 14528 unreach 116
+  t2|cyc2       BASE 0/0/0 of 1138 unreach 6   MAP 0/0/4 of 1138 unreach 6   STEP 0/0/4 of 1138 unreach 6   SKIPHIST 0/0/0 of 1138 unreach 6
+  t2|hop3       BASE 0/0/0 of 643 unreach 8   MAP 0/0/7 of 643 unreach 8   STEP 0/0/7 of 643 unreach 8   SKIPHIST 0/0/0 of 643 unreach 8
+  t2|cyc3       BASE 0/0/0 of 32   MAP 0/0/0 of 32   STEP 0/0/0 of 32   SKIPHIST 0/0/0 of 32
+  t2|collide2   BASE 0/0/0 of 1352 unreach 26   MAP 240/1287/1289 of 1352 unreach 26   STEP 240/1287/1289 of 1352 unreach 26   SKIPHIST 0/0/0 of 1352 unreach 26
+  t2|exch3      BASE 0/0/0 of 1081 unreach 46   MAP 0/1017/1037 of 1081 unreach 46   STEP 0/1017/1037 of 1081 unreach 46   SKIPHIST 0/0/0 of 1081 unreach 46
+  t2|dup1       BASE -   MAP -   STEP -   SKIPHIST -
+
+== C1 segmented (whole day != live), by config x week, class hop2+cyc2 ==
+  u|mario|W3      BASE 3170/3370   MAP 303/3370   STEP 0/3370   SKIPHIST 303/3370
+  u|mario|W5      BASE 3629/3629   MAP 431/3629   STEP 68/3629   SKIPHIST 431/3629
+  u|mario|W7      BASE 0/0   MAP 0/0   STEP 0/0   SKIPHIST 0/0
+  u|manny|W3      BASE 2948/3177   MAP 136/3177   STEP 0/3177   SKIPHIST 136/3177
+  u|manny|W5      BASE 2638/3018   MAP 201/3018   STEP 40/3018   SKIPHIST 201/3018
+  u|manny|W7      BASE 2442/2472   MAP 221/2472   STEP 25/2472   SKIPHIST 221/2472
+  t1|mario|W3     BASE 3170/3370   MAP 0/3370   STEP 0/3370   SKIPHIST 0/3370
+  t1|mario|W5     BASE 3413/3629   MAP 0/3629   STEP 0/3629   SKIPHIST 0/3629
+  t1|mario|W7     BASE 0/0   MAP 0/0   STEP 0/0   SKIPHIST 0/0
+  t1|manny|W3     BASE 2948/3177   MAP 0/3177   STEP 0/3177   SKIPHIST 0/3177
+  t1|manny|W5     BASE 2835/3018   MAP 39/3018   STEP 39/3018   SKIPHIST 0/3018
+  t1|manny|W7     BASE 2301/2472   MAP 23/2472   STEP 23/2472   SKIPHIST 0/2472
+  t2|mario|W3     BASE 0/3370   MAP 0/3370   STEP 0/3370   SKIPHIST 0/3370
+  t2|mario|W5     BASE 0/3629   MAP 0/3629   STEP 0/3629   SKIPHIST 0/3629
+  t2|mario|W7     BASE 0/0   MAP 0/0   STEP 0/0   SKIPHIST 0/0
+  t2|manny|W3     BASE 0/3177   MAP 0/3177   STEP 0/3177   SKIPHIST 0/3177
+  t2|manny|W5     BASE 0/3018   MAP 39/3018   STEP 39/3018   SKIPHIST 0/3018
+  t2|manny|W7     BASE 0/2472   MAP 23/2472   STEP 23/2472   SKIPHIST 0/2472
+
+== C2: snapshot rewrite at boot (whole day != ia_hist_ record), snapshot modes ==
+  t1|hop2       BASE 0/14528 (hist!=live 14492)   MAP 58/14528 (hist!=live 0)   STEP 58/14528 (hist!=live 0)   SKIPHIST 0/14528 (hist!=live 0)
+  t1|cyc2       BASE 0/1138 (hist!=live 175)   MAP 4/1138 (hist!=live 0)   STEP 4/1138 (hist!=live 0)   SKIPHIST 0/1138 (hist!=live 0)
+  t1|hop3       BASE 0/643 (hist!=live 642)   MAP 7/643 (hist!=live 0)   STEP 7/643 (hist!=live 0)   SKIPHIST 0/643 (hist!=live 0)
+  t1|cyc3       BASE 0/32 (hist!=live 6)   MAP 0/32 (hist!=live 0)   STEP 0/32 (hist!=live 0)   SKIPHIST 0/32 (hist!=live 0)
+  t1|collide2   BASE 0/1352 (hist!=live 1351)   MAP 1289/1352 (hist!=live 0)   STEP 1289/1352 (hist!=live 0)   SKIPHIST 0/1352 (hist!=live 0)
+  t1|exch3      BASE 0/1081 (hist!=live 1081)   MAP 1037/1081 (hist!=live 0)   STEP 1037/1081 (hist!=live 0)   SKIPHIST 0/1081 (hist!=live 0)
+  t1|dup1       BASE 0/0 (hist!=live 0)   MAP 0/0 (hist!=live 0)   STEP 0/0 (hist!=live 0)   SKIPHIST 0/0 (hist!=live 0)
+  t2|hop2       BASE 0/14528 (hist!=live 0)   MAP 58/14528 (hist!=live 0)   STEP 58/14528 (hist!=live 0)   SKIPHIST 0/14528 (hist!=live 0)
+  t2|cyc2       BASE 0/1138 (hist!=live 0)   MAP 4/1138 (hist!=live 0)   STEP 4/1138 (hist!=live 0)   SKIPHIST 0/1138 (hist!=live 0)
+  t2|hop3       BASE 0/643 (hist!=live 0)   MAP 7/643 (hist!=live 0)   STEP 7/643 (hist!=live 0)   SKIPHIST 0/643 (hist!=live 0)
+  t2|cyc3       BASE 0/32 (hist!=live 0)   MAP 0/32 (hist!=live 0)   STEP 0/32 (hist!=live 0)   SKIPHIST 0/32 (hist!=live 0)
+  t2|collide2   BASE 0/1352 (hist!=live 0)   MAP 1289/1352 (hist!=live 0)   STEP 1289/1352 (hist!=live 0)   SKIPHIST 0/1352 (hist!=live 0)
+  t2|exch3      BASE 0/1081 (hist!=live 0)   MAP 1037/1081 (hist!=live 0)   STEP 1037/1081 (hist!=live 0)   SKIPHIST 0/1081 (hist!=live 0)
+  t2|dup1       BASE 0/0 (hist!=live 0)   MAP 0/0 (hist!=live 0)   STEP 0/0 (hist!=live 0)   SKIPHIST 0/0 (hist!=live 0)
+  up_ts|hop2    BASE 0/14528 (hist!=live 14492)   MAP 14492/14528 (hist!=live 14492)   STEP 14492/14528 (hist!=live 14492)   SKIPHIST 0/14528 (hist!=live 14492)
+  up_ts|cyc2    BASE 0/1138 (hist!=live 175)   MAP 63/1138 (hist!=live 175)   STEP 177/1138 (hist!=live 175)   SKIPHIST 0/1138 (hist!=live 175)
+  up_ts|hop3    BASE 0/643 (hist!=live 642)   MAP 642/643 (hist!=live 642)   STEP 642/643 (hist!=live 642)   SKIPHIST 0/643 (hist!=live 642)
+  up_ts|cyc3    BASE 0/32 (hist!=live 6)   MAP 1/32 (hist!=live 6)   STEP 6/32 (hist!=live 6)   SKIPHIST 0/32 (hist!=live 6)
+  up_ts|collide2BASE 0/1352 (hist!=live 1351)   MAP 1351/1352 (hist!=live 1351)   STEP 1351/1352 (hist!=live 1351)   SKIPHIST 0/1352 (hist!=live 1351)
+  up_ts|exch3   BASE 0/1081 (hist!=live 1081)   MAP 1081/1081 (hist!=live 1081)   STEP 1081/1081 (hist!=live 1081)   SKIPHIST 0/1081 (hist!=live 1081)
+  up_ts|dup1    BASE 0/0 (hist!=live 0)   MAP 0/0 (hist!=live 0)   STEP 0/0 (hist!=live 0)   SKIPHIST 0/0 (hist!=live 0)
+  up_st|hop2    BASE 0/14528 (hist!=live 0)   MAP 58/14528 (hist!=live 0)   STEP 58/14528 (hist!=live 0)   SKIPHIST 0/14528 (hist!=live 0)
+  up_st|cyc2    BASE 0/1138 (hist!=live 0)   MAP 4/1138 (hist!=live 0)   STEP 4/1138 (hist!=live 0)   SKIPHIST 0/1138 (hist!=live 0)
+  up_st|hop3    BASE 0/643 (hist!=live 0)   MAP 7/643 (hist!=live 0)   STEP 7/643 (hist!=live 0)   SKIPHIST 0/643 (hist!=live 0)
+  up_st|cyc3    BASE 0/32 (hist!=live 0)   MAP 0/32 (hist!=live 0)   STEP 0/32 (hist!=live 0)   SKIPHIST 0/32 (hist!=live 0)
+  up_st|collide2BASE 0/1352 (hist!=live 0)   MAP 1289/1352 (hist!=live 0)   STEP 1289/1352 (hist!=live 0)   SKIPHIST 0/1352 (hist!=live 0)
+  up_st|exch3   BASE 0/1081 (hist!=live 0)   MAP 1037/1081 (hist!=live 0)   STEP 1037/1081 (hist!=live 0)   SKIPHIST 0/1081 (hist!=live 0)
+  up_st|dup1    BASE 0/0 (hist!=live 0)   MAP 0/0 (hist!=live 0)   STEP 0/0 (hist!=live 0)   SKIPHIST 0/0 (hist!=live 0)
+  up_bt|hop2    BASE 0/14528 (hist!=live 0)   MAP 8043/14528 (hist!=live 0)   STEP 8043/14528 (hist!=live 0)   SKIPHIST 0/14528 (hist!=live 0)
+  up_bt|cyc2    BASE 0/1138 (hist!=live 0)   MAP 645/1138 (hist!=live 0)   STEP 645/1138 (hist!=live 0)   SKIPHIST 0/1138 (hist!=live 0)
+  up_bt|hop3    BASE 0/643 (hist!=live 0)   MAP 315/643 (hist!=live 0)   STEP 319/643 (hist!=live 0)   SKIPHIST 0/643 (hist!=live 0)
+  up_bt|cyc3    BASE 0/32 (hist!=live 0)   MAP 16/32 (hist!=live 0)   STEP 16/32 (hist!=live 0)   SKIPHIST 0/32 (hist!=live 0)
+  up_bt|collide2BASE 0/1352 (hist!=live 0)   MAP 748/1352 (hist!=live 0)   STEP 748/1352 (hist!=live 0)   SKIPHIST 0/1352 (hist!=live 0)
+  up_bt|exch3   BASE 0/1081 (hist!=live 0)   MAP 631/1081 (hist!=live 0)   STEP 631/1081 (hist!=live 0)   SKIPHIST 0/1081 (hist!=live 0)
+  up_bt|dup1    BASE 0/0 (hist!=live 0)   MAP 0/0 (hist!=live 0)   STEP 0/0 (hist!=live 0)   SKIPHIST 0/0 (hist!=live 0)
+
+== C3 upgrade: V221 device state booted by each tree; boot vs last card seen live on V221 (whole day) ==
+   up_ts = V221 touch, chain, no V221 boot; up_st = V221 chain, touch, no boot; up_bt = V221 chain, V221 boot, touch
+  up_ts|hop2     BASE boot!=live 14492/14528 (days carrying a record at upgrade 14528)   MAP boot!=live 1171/14528 (days carrying a record at upgrade 14528)   STEP boot!=live 126/14528 (days carrying a record at upgrade 14528)   SKIPHIST boot!=live 14492/14528 (days carrying a record at upgrade 14528)
+  up_ts|cyc2     BASE boot!=live 175/1138 (days carrying a record at upgrade 1138)   MAP boot!=live 118/1138 (days carrying a record at upgrade 1138)   STEP boot!=live 4/1138 (days carrying a record at upgrade 1138)   SKIPHIST boot!=live 175/1138 (days carrying a record at upgrade 1138)
+  up_ts|collide2 BASE boot!=live 1351/1352 (days carrying a record at upgrade 1352)   MAP boot!=live 50/1352 (days carrying a record at upgrade 1352)   STEP boot!=live 2/1352 (days carrying a record at upgrade 1352)   SKIPHIST boot!=live 1351/1352 (days carrying a record at upgrade 1352)
+  up_ts|exch3    BASE boot!=live 1081/1081 (days carrying a record at upgrade 1081)   MAP boot!=live 211/1081 (days carrying a record at upgrade 1081)   STEP boot!=live 2/1081 (days carrying a record at upgrade 1081)   SKIPHIST boot!=live 1081/1081 (days carrying a record at upgrade 1081)
+  up_ts|dup1     BASE boot!=live 0/0 (days carrying a record at upgrade 0)   MAP boot!=live 0/0 (days carrying a record at upgrade 0)   STEP boot!=live 0/0 (days carrying a record at upgrade 0)   SKIPHIST boot!=live 0/0 (days carrying a record at upgrade 0)
+  up_st|hop2     BASE boot!=live 0/14528 (days carrying a record at upgrade 14528)   MAP boot!=live 58/14528 (days carrying a record at upgrade 14528)   STEP boot!=live 58/14528 (days carrying a record at upgrade 14528)   SKIPHIST boot!=live 0/14528 (days carrying a record at upgrade 14528)
+  up_st|cyc2     BASE boot!=live 0/1138 (days carrying a record at upgrade 1138)   MAP boot!=live 4/1138 (days carrying a record at upgrade 1138)   STEP boot!=live 4/1138 (days carrying a record at upgrade 1138)   SKIPHIST boot!=live 0/1138 (days carrying a record at upgrade 1138)
+  up_st|collide2 BASE boot!=live 0/1352 (days carrying a record at upgrade 1352)   MAP boot!=live 1289/1352 (days carrying a record at upgrade 1352)   STEP boot!=live 1289/1352 (days carrying a record at upgrade 1352)   SKIPHIST boot!=live 0/1352 (days carrying a record at upgrade 1352)
+  up_st|exch3    BASE boot!=live 0/1081 (days carrying a record at upgrade 1081)   MAP boot!=live 1037/1081 (days carrying a record at upgrade 1081)   STEP boot!=live 1037/1081 (days carrying a record at upgrade 1081)   SKIPHIST boot!=live 0/1081 (days carrying a record at upgrade 1081)
+  up_st|dup1     BASE boot!=live 0/0 (days carrying a record at upgrade 0)   MAP boot!=live 0/0 (days carrying a record at upgrade 0)   STEP boot!=live 0/0 (days carrying a record at upgrade 0)   SKIPHIST boot!=live 0/0 (days carrying a record at upgrade 0)
+  up_bt|hop2     BASE boot!=live 0/14528 (days carrying a record at upgrade 8451)   MAP boot!=live 8043/14528 (days carrying a record at upgrade 8451)   STEP boot!=live 8043/14528 (days carrying a record at upgrade 8451)   SKIPHIST boot!=live 0/14528 (days carrying a record at upgrade 8451)
+  up_bt|cyc2     BASE boot!=live 0/1138 (days carrying a record at upgrade 668)   MAP boot!=live 645/1138 (days carrying a record at upgrade 668)   STEP boot!=live 645/1138 (days carrying a record at upgrade 668)   SKIPHIST boot!=live 0/1138 (days carrying a record at upgrade 668)
+  up_bt|collide2 BASE boot!=live 0/1352 (days carrying a record at upgrade 812)   MAP boot!=live 748/1352 (days carrying a record at upgrade 812)   STEP boot!=live 748/1352 (days carrying a record at upgrade 812)   SKIPHIST boot!=live 0/1352 (days carrying a record at upgrade 812)
+  up_bt|exch3    BASE boot!=live 0/1081 (days carrying a record at upgrade 656)   MAP boot!=live 631/1081 (days carrying a record at upgrade 656)   STEP boot!=live 631/1081 (days carrying a record at upgrade 656)   SKIPHIST boot!=live 0/1081 (days carrying a record at upgrade 656)
+  up_bt|dup1     BASE boot!=live 0/0 (days carrying a record at upgrade 0)   MAP boot!=live 0/0 (days carrying a record at upgrade 0)   STEP boot!=live 0/0 (days carrying a record at upgrade 0)   SKIPHIST boot!=live 0/0 (days carrying a record at upgrade 0)
+
+== EXAMPLES (first 2 per tree x mode x class where boot != live) ==
+  BASE|u|hop2 mario W3 tue rec=Trap bar deadlift->Barbell Romanian deadlift,Barbell Romanian deadlift->Deadlift
+      live slot Deadlift :: 4×5 — RPE 7 (leave ~3 reps in reserve), 
+      boot slot Trap bar deadlift :: 4×5 — RPE 7 (leave ~3 reps in reserve), 
+  BASE|u|hop2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Barbell box squat->Leg press
+      live slot Leg press :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+  MAP|u|hop2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell Romanian deadlift
+      live slot Barbell Romanian deadlift :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell Romanian deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  MAP|u|hop2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Deadlift
+      live slot Deadlift :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  STEP|u|hop2 mario W5 thu rec=Kettlebell swing->Dumbbell split-stance deadlift,Dumbbell split-stance deadlift->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×8
+      boot slot Dumbbell goblet squat :: 2×8 — hold RPE 7, two in the tank
+  STEP|u|hop2 mario W5 thu rec=Kettlebell swing->Dumbbell split-stance deadlift,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 2×8
+      boot slot Reverse lunge (KB) :: 2×8 — hold RPE 7, two in the tank
+  SKIPHIST|u|hop2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell Romanian deadlift
+      live slot Barbell Romanian deadlift :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell Romanian deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  SKIPHIST|u|hop2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Deadlift
+      live slot Deadlift :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  BASE|u|cyc2 mario W5 mon rec=Dumbbell bench press->Dumbbell decline press,Dumbbell decline press->Dumbbell bench press
+      live slot Dumbbell bench press :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Dumbbell decline press :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+  BASE|u|cyc2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell box squat
+      live slot Barbell box squat :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Leg press :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+  MAP|u|cyc2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell box squat
+      live slot Barbell box squat :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  MAP|u|cyc2 mario W5 thu rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Barbell box squat
+      live slot Barbell box squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  STEP|u|cyc2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+  STEP|u|cyc2 manny W7 mon rec=Overhead carry->Trap bar farmer carry,Trap bar farmer carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+  SKIPHIST|u|cyc2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell box squat
+      live slot Barbell box squat :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  SKIPHIST|u|cyc2 mario W5 thu rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Barbell box squat
+      live slot Barbell box squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  BASE|u|hop3 mario W3 sat rec=Decline pushups->Dumbbell decline press,Dumbbell decline press->Landmine rotational press,Landmine rotational press->Incline barbell press
+      live slot Incline barbell press :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Decline pushups :: 2 sets — RPE 7 (leave 3 or more in reser
+  BASE|u|hop3 mario W3 sat rec=Feet-elevated inverted rows->Barbell row,Barbell row->Inverted rows (bodyweight),Inverted rows (bodyweight)->Pendlay row
+      live slot Pendlay row :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Feet-elevated inverted rows :: 2 sets — RPE 7 (leave 3 or more in reser
+  MAP|u|hop3 mario W3 thu rec=Glute-ham raise->Cable pull-through,Cable pull-through->45° back extension,45° back extension->Lying leg curl
+      live slot Lying leg curl :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Lying leg curl :: 2×6–10 @ RPE 7
+  MAP|u|hop3 mario W3 thu rec=Nordic hamstring curl (anchored)->Glute-ham raise,Glute-ham raise->Barbell hip thrust
+      live slot Barbell hip thrust :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Barbell hip thrust :: 2×6–10 @ RPE 7
+  STEP|u|hop3 mario W3 thu rec=Nordic hamstring curl (anchored)->Glute-ham raise,Glute-ham raise->Barbell hip thrust
+      live slot Barbell hip thrust :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Barbell hip thrust :: 2×6–10 @ RPE 7
+  STEP|u|hop3 mario W3 thu rec=45° back extension->Kettlebell swing,Kettlebell swing->Kettlebell single-leg deadlift
+      live slot Kettlebell single-leg deadlift :: 2 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Kettlebell single-leg deadlift :: 2×8
+  SKIPHIST|u|hop3 mario W3 thu rec=Glute-ham raise->Cable pull-through,Cable pull-through->45° back extension,45° back extension->Lying leg curl
+      live slot Lying leg curl :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Lying leg curl :: 2×6–10 @ RPE 7
+  SKIPHIST|u|hop3 mario W3 thu rec=Nordic hamstring curl (anchored)->Glute-ham raise,Glute-ham raise->Barbell hip thrust
+      live slot Barbell hip thrust :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Barbell hip thrust :: 2×6–10 @ RPE 7
+  BASE|u|cyc3 mario W5 thu rec=Barbell box squat->Deadlift,Deadlift->Kettlebell single-leg deadlift,Kettlebell single-leg deadlift->Barbell box squat
+      live slot Barbell box squat :: 4×6–10 — RPE 7 (leave ~3 reps in reserve
+      boot slot Deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  BASE|u|cyc3 mario W3 tue rec=Weighted chinups->Inverted rows (rings),Inverted rows (rings)->L-sit chinups,L-sit chinups->Weighted chinups
+      live slot Weighted chinups :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Weighted chinups :: 2×5–6 @ RPE 7
+  MAP|u|cyc3 mario W5 thu rec=Barbell box squat->Deadlift,Deadlift->Kettlebell single-leg deadlift,Kettlebell single-leg deadlift->Barbell box squat
+      live slot Barbell box squat :: 4×6–10 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  MAP|u|cyc3 mario W3 tue rec=Weighted chinups->Inverted rows (rings),Inverted rows (rings)->L-sit chinups,L-sit chinups->Weighted chinups
+      live slot Weighted chinups :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Weighted chinups :: 2×5–6 @ RPE 7
+  SKIPHIST|u|cyc3 mario W5 thu rec=Barbell box squat->Deadlift,Deadlift->Kettlebell single-leg deadlift,Kettlebell single-leg deadlift->Barbell box squat
+      live slot Barbell box squat :: 4×6–10 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+  SKIPHIST|u|cyc3 mario W3 tue rec=Weighted chinups->Inverted rows (rings),Inverted rows (rings)->L-sit chinups,L-sit chinups->Weighted chinups
+      live slot Weighted chinups :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Weighted chinups :: 2×5–6 @ RPE 7
+  BASE|u|collide2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Reverse lunge (KB) :: 2×10 each — hold RPE 7, two in the tank
+  BASE|u|collide2 mario W3 thu rec=Dumbbell goblet squat->Leg press,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Reverse lunge (KB) :: 2×10 each — hold RPE 7, two in the tank
+  MAP|u|collide2 mario W3 fri rec=Dumbbell Arnold press->Dumbbell incline press,Machine chest press->Dumbbell Arnold press
+      live slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+      boot slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+  MAP|u|collide2 mario W3 fri rec=Dumbbell Arnold press->Kettlebell single-arm press,Machine chest press->Dumbbell Arnold press
+      live slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+      boot slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+  STEP|u|collide2 manny W5 fri rec=Band woodchopper (door anchor)->Garhammer raises,Garhammer raises->Windshield wipers
+      live slot Windshield wipers :: 2×10–15 each @ RPE 7
+      boot slot Windshield wipers :: 2×10–15 each @ RPE 7
+  STEP|u|collide2 manny W7 fri rec=Landmine rotations->Garhammer raises,Garhammer raises->Landmine rotations
+      live slot Landmine rotations :: 2×6–10 each @ RPE 7
+      boot slot Landmine rotations :: 2×6–10 each @ RPE 7
+  SKIPHIST|u|collide2 mario W3 fri rec=Dumbbell Arnold press->Dumbbell incline press,Machine chest press->Dumbbell Arnold press
+      live slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+      boot slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+  SKIPHIST|u|collide2 mario W3 fri rec=Dumbbell Arnold press->Kettlebell single-arm press,Machine chest press->Dumbbell Arnold press
+      live slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+      boot slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+  BASE|u|exch3 mario W3 thu rec=Dumbbell goblet squat->Dumbbell split-stance deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+  BASE|u|exch3 mario W3 thu rec=Dumbbell goblet squat->Kettlebell single-leg deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Kettlebell single-leg deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+  MAP|u|exch3 mario W3 thu rec=Kettlebell swing->45° back extension,Glute-ham raise->Kettlebell swing,45° back extension->Glute-ham raise
+      live slot Glute-ham raise :: 2 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Glute-ham raise :: 2×8
+  MAP|u|exch3 mario W3 thu rec=Kettlebell swing->Nordic hamstring curl (anchored),Glute-ham raise->Kettlebell swing,Nordic hamstring curl (anchored)->Glute-ham raise
+      live slot Glute-ham raise :: 2 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Glute-ham raise :: 2×8
+  STEP|u|exch3 manny W5 fri rec=Windshield wipers->Garhammer raises,Garhammer raises->Band woodchopper (door anchor)
+      live slot Band woodchopper (door anchor) :: 3×16 (180° arc)
+      boot slot Band woodchopper (door anchor) :: 3×16 (180° arc)
+  STEP|u|exch3 manny W7 fri rec=Landmine rotations->Garhammer raises,Garhammer raises->Medicine ball rotary toss
+      live slot Medicine ball rotary toss :: 2×8–12 each @ RPE 7
+      boot slot Medicine ball rotary toss :: 2×8–12 each @ RPE 7
+  SKIPHIST|u|exch3 mario W3 thu rec=Kettlebell swing->45° back extension,Glute-ham raise->Kettlebell swing,45° back extension->Glute-ham raise
+      live slot Glute-ham raise :: 2 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Glute-ham raise :: 2×8
+  SKIPHIST|u|exch3 mario W3 thu rec=Kettlebell swing->Nordic hamstring curl (anchored),Glute-ham raise->Kettlebell swing,Nordic hamstring curl (anchored)->Glute-ham raise
+      live slot Glute-ham raise :: 2 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Glute-ham raise :: 2×8
+  BASE|t1|hop2 mario W3 tue rec=Trap bar deadlift->Barbell Romanian deadlift,Barbell Romanian deadlift->Deadlift
+      live slot Deadlift :: 4×5 — RPE 7 (leave ~3 reps in reserve), 
+      boot slot Trap bar deadlift :: 4×5 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  BASE|t1|hop2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Barbell box squat->Leg press
+      live slot Leg press :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live false boot==hist true
+  MAP|t1|hop2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Trap bar farmer carry
+      live slot Trap bar farmer carry :: 3×40 yd each
+      boot slot Trap bar farmer carry :: 3×40 yd each
+      hist==live true boot==hist false
+  MAP|t1|hop2 manny W5 fri rec=Garhammer raises->Ab wheel rollouts,Ab wheel rollouts->Hanging hold
+      live slot Hanging hold :: 3×16 (180° arc)
+      boot slot Hanging hold :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  STEP|t1|hop2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Trap bar farmer carry
+      live slot Trap bar farmer carry :: 3×40 yd each
+      boot slot Trap bar farmer carry :: 3×40 yd each
+      hist==live true boot==hist false
+  STEP|t1|hop2 manny W5 fri rec=Garhammer raises->Ab wheel rollouts,Ab wheel rollouts->Hanging hold
+      live slot Hanging hold :: 3×16 (180° arc)
+      boot slot Hanging hold :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  BASE|t1|cyc2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell box squat
+      live slot Barbell box squat :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  BASE|t1|cyc2 mario W5 thu rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Barbell box squat
+      live slot Barbell box squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  MAP|t1|cyc2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  MAP|t1|cyc2 manny W7 mon rec=Overhead carry->Trap bar farmer carry,Trap bar farmer carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  STEP|t1|cyc2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  STEP|t1|cyc2 manny W7 mon rec=Overhead carry->Trap bar farmer carry,Trap bar farmer carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  BASE|t1|hop3 mario W3 sat rec=Decline pushups->Dumbbell decline press,Dumbbell decline press->Landmine rotational press,Landmine rotational press->Incline barbell press
+      live slot Incline barbell press :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Decline pushups :: 2 sets — RPE 7 (leave 3 or more in reser
+      hist==live false boot==hist true
+  BASE|t1|hop3 mario W3 sat rec=Feet-elevated inverted rows->Barbell row,Barbell row->Inverted rows (bodyweight),Inverted rows (bodyweight)->Pendlay row
+      live slot Pendlay row :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Feet-elevated inverted rows :: 2 sets — RPE 7 (leave 3 or more in reser
+      hist==live false boot==hist true
+  MAP|t1|hop3 manny W5 fri rec=Plank hold->Garhammer raises,Garhammer raises->Dead bug (slow tempo),Dead bug (slow tempo)->Pallof press
+      live slot Pallof press :: 3×16 (180° arc)
+      boot slot Pallof press :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  MAP|t1|hop3 manny W5 fri rec=Dead bug (slow tempo)->Side plank thread-the-needle,Side plank thread-the-needle->Garhammer raises,Garhammer raises->Superman
+      live slot Superman :: 3×16 (180° arc)
+      boot slot Superman :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  STEP|t1|hop3 manny W5 fri rec=Plank hold->Garhammer raises,Garhammer raises->Dead bug (slow tempo),Dead bug (slow tempo)->Pallof press
+      live slot Pallof press :: 3×16 (180° arc)
+      boot slot Pallof press :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  STEP|t1|hop3 manny W5 fri rec=Dead bug (slow tempo)->Side plank thread-the-needle,Side plank thread-the-needle->Garhammer raises,Garhammer raises->Superman
+      live slot Superman :: 3×16 (180° arc)
+      boot slot Superman :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  BASE|t1|cyc3 mario W5 thu rec=Barbell box squat->Deadlift,Deadlift->Kettlebell single-leg deadlift,Kettlebell single-leg deadlift->Barbell box squat
+      live slot Barbell box squat :: 4×6–10 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  BASE|t1|cyc3 mario W3 tue rec=Weighted chinups->Inverted rows (rings),Inverted rows (rings)->L-sit chinups,L-sit chinups->Weighted chinups
+      live slot Weighted chinups :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Weighted chinups :: 2×5–6 @ RPE 7
+      hist==live false boot==hist true
+  BASE|t1|collide2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Reverse lunge (KB) :: 2×10 each — hold RPE 7, two in the tank
+      hist==live false boot==hist true
+  BASE|t1|collide2 mario W3 thu rec=Dumbbell goblet squat->Leg press,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Reverse lunge (KB) :: 2×10 each — hold RPE 7, two in the tank
+      hist==live false boot==hist true
+  MAP|t1|collide2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Barbell box squat :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  MAP|t1|collide2 mario W3 thu rec=Dumbbell goblet squat->Leg press,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Leg press :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  STEP|t1|collide2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Barbell box squat :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  STEP|t1|collide2 mario W3 thu rec=Dumbbell goblet squat->Leg press,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Leg press :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  BASE|t1|exch3 mario W3 thu rec=Dumbbell goblet squat->Dumbbell split-stance deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live false boot==hist true
+  BASE|t1|exch3 mario W3 thu rec=Dumbbell goblet squat->Kettlebell single-leg deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Kettlebell single-leg deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live false boot==hist true
+  MAP|t1|exch3 mario W3 thu rec=Dumbbell goblet squat->Dumbbell split-stance deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  MAP|t1|exch3 mario W3 thu rec=Dumbbell goblet squat->Kettlebell single-leg deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Kettlebell single-leg deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  STEP|t1|exch3 mario W3 thu rec=Dumbbell goblet squat->Dumbbell split-stance deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  STEP|t1|exch3 mario W3 thu rec=Dumbbell goblet squat->Kettlebell single-leg deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Kettlebell single-leg deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  MAP|t2|hop2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Trap bar farmer carry
+      live slot Trap bar farmer carry :: 3×40 yd each
+      boot slot Trap bar farmer carry :: 3×40 yd each
+      hist==live true boot==hist false
+  MAP|t2|hop2 manny W5 fri rec=Garhammer raises->Ab wheel rollouts,Ab wheel rollouts->Hanging hold
+      live slot Hanging hold :: 3×16 (180° arc)
+      boot slot Hanging hold :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  STEP|t2|hop2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Trap bar farmer carry
+      live slot Trap bar farmer carry :: 3×40 yd each
+      boot slot Trap bar farmer carry :: 3×40 yd each
+      hist==live true boot==hist false
+  STEP|t2|hop2 manny W5 fri rec=Garhammer raises->Ab wheel rollouts,Ab wheel rollouts->Hanging hold
+      live slot Hanging hold :: 3×16 (180° arc)
+      boot slot Hanging hold :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  MAP|t2|cyc2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  MAP|t2|cyc2 manny W7 mon rec=Overhead carry->Trap bar farmer carry,Trap bar farmer carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  STEP|t2|cyc2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  STEP|t2|cyc2 manny W7 mon rec=Overhead carry->Trap bar farmer carry,Trap bar farmer carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  MAP|t2|hop3 manny W5 fri rec=Plank hold->Garhammer raises,Garhammer raises->Dead bug (slow tempo),Dead bug (slow tempo)->Pallof press
+      live slot Pallof press :: 3×16 (180° arc)
+      boot slot Pallof press :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  MAP|t2|hop3 manny W5 fri rec=Dead bug (slow tempo)->Side plank thread-the-needle,Side plank thread-the-needle->Garhammer raises,Garhammer raises->Superman
+      live slot Superman :: 3×16 (180° arc)
+      boot slot Superman :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  STEP|t2|hop3 manny W5 fri rec=Plank hold->Garhammer raises,Garhammer raises->Dead bug (slow tempo),Dead bug (slow tempo)->Pallof press
+      live slot Pallof press :: 3×16 (180° arc)
+      boot slot Pallof press :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  STEP|t2|hop3 manny W5 fri rec=Dead bug (slow tempo)->Side plank thread-the-needle,Side plank thread-the-needle->Garhammer raises,Garhammer raises->Superman
+      live slot Superman :: 3×16 (180° arc)
+      boot slot Superman :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  MAP|t2|collide2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Barbell box squat :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  MAP|t2|collide2 mario W3 thu rec=Dumbbell goblet squat->Leg press,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Leg press :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  STEP|t2|collide2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Barbell box squat :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  STEP|t2|collide2 mario W3 thu rec=Dumbbell goblet squat->Leg press,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Leg press :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  MAP|t2|exch3 mario W3 thu rec=Dumbbell goblet squat->Dumbbell split-stance deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  MAP|t2|exch3 mario W3 thu rec=Dumbbell goblet squat->Kettlebell single-leg deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Kettlebell single-leg deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  STEP|t2|exch3 mario W3 thu rec=Dumbbell goblet squat->Dumbbell split-stance deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  STEP|t2|exch3 mario W3 thu rec=Dumbbell goblet squat->Kettlebell single-leg deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Kettlebell single-leg deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  BASE|up_ts|hop2 mario W3 tue rec=Trap bar deadlift->Barbell Romanian deadlift,Barbell Romanian deadlift->Deadlift
+      live slot Deadlift :: 4×5 — RPE 7 (leave ~3 reps in reserve), 
+      boot slot Trap bar deadlift :: 4×5 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  BASE|up_ts|hop2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Barbell box squat->Leg press
+      live slot Leg press :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live false boot==hist true
+  MAP|up_ts|hop2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell Romanian deadlift
+      live slot Barbell Romanian deadlift :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell Romanian deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist false
+  MAP|up_ts|hop2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Deadlift
+      live slot Deadlift :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist false
+  STEP|up_ts|hop2 mario W5 thu rec=Kettlebell swing->Dumbbell split-stance deadlift,Dumbbell split-stance deadlift->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×8
+      boot slot Dumbbell goblet squat :: 2×8 — hold RPE 7, two in the tank
+      hist==live false boot==hist false
+  STEP|up_ts|hop2 mario W5 thu rec=Kettlebell swing->Dumbbell split-stance deadlift,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 2×8
+      boot slot Reverse lunge (KB) :: 2×8 — hold RPE 7, two in the tank
+      hist==live false boot==hist false
+  SKIPHIST|up_ts|hop2 mario W3 tue rec=Trap bar deadlift->Barbell Romanian deadlift,Barbell Romanian deadlift->Deadlift
+      live slot Deadlift :: 4×5 — RPE 7 (leave ~3 reps in reserve), 
+      boot slot Trap bar deadlift :: 4×5 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  SKIPHIST|up_ts|hop2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Barbell box squat->Leg press
+      live slot Leg press :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live false boot==hist true
+  BASE|up_ts|cyc2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell box squat
+      live slot Barbell box squat :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  BASE|up_ts|cyc2 mario W5 thu rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Barbell box squat
+      live slot Barbell box squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  MAP|up_ts|cyc2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell box squat
+      live slot Barbell box squat :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  MAP|up_ts|cyc2 mario W5 thu rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Barbell box squat
+      live slot Barbell box squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  STEP|up_ts|cyc2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  STEP|up_ts|cyc2 manny W7 mon rec=Overhead carry->Trap bar farmer carry,Trap bar farmer carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live false boot==hist false
+  SKIPHIST|up_ts|cyc2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell box squat
+      live slot Barbell box squat :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  SKIPHIST|up_ts|cyc2 mario W5 thu rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Barbell box squat
+      live slot Barbell box squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  BASE|up_ts|hop3 mario W3 sat rec=Decline pushups->Dumbbell decline press,Dumbbell decline press->Landmine rotational press,Landmine rotational press->Incline barbell press
+      live slot Incline barbell press :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Decline pushups :: 2 sets — RPE 7 (leave 3 or more in reser
+      hist==live false boot==hist true
+  BASE|up_ts|hop3 mario W3 sat rec=Feet-elevated inverted rows->Barbell row,Barbell row->Inverted rows (bodyweight),Inverted rows (bodyweight)->Pendlay row
+      live slot Pendlay row :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Feet-elevated inverted rows :: 2 sets — RPE 7 (leave 3 or more in reser
+      hist==live false boot==hist true
+  MAP|up_ts|hop3 mario W3 thu rec=Glute-ham raise->Cable pull-through,Cable pull-through->45° back extension,45° back extension->Lying leg curl
+      live slot Lying leg curl :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Lying leg curl :: 2×6–10 @ RPE 7
+      hist==live false boot==hist false
+  MAP|up_ts|hop3 mario W3 thu rec=Nordic hamstring curl (anchored)->Glute-ham raise,Glute-ham raise->Barbell hip thrust
+      live slot Barbell hip thrust :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Barbell hip thrust :: 2×6–10 @ RPE 7
+      hist==live false boot==hist false
+  STEP|up_ts|hop3 mario W3 thu rec=Nordic hamstring curl (anchored)->Glute-ham raise,Glute-ham raise->Barbell hip thrust
+      live slot Barbell hip thrust :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Barbell hip thrust :: 2×6–10 @ RPE 7
+      hist==live false boot==hist false
+  STEP|up_ts|hop3 mario W3 thu rec=45° back extension->Kettlebell swing,Kettlebell swing->Kettlebell single-leg deadlift
+      live slot Kettlebell single-leg deadlift :: 2 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Kettlebell single-leg deadlift :: 2×8
+      hist==live false boot==hist false
+  SKIPHIST|up_ts|hop3 mario W3 sat rec=Decline pushups->Dumbbell decline press,Dumbbell decline press->Landmine rotational press,Landmine rotational press->Incline barbell press
+      live slot Incline barbell press :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Decline pushups :: 2 sets — RPE 7 (leave 3 or more in reser
+      hist==live false boot==hist true
+  SKIPHIST|up_ts|hop3 mario W3 sat rec=Feet-elevated inverted rows->Barbell row,Barbell row->Inverted rows (bodyweight),Inverted rows (bodyweight)->Pendlay row
+      live slot Pendlay row :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Feet-elevated inverted rows :: 2 sets — RPE 7 (leave 3 or more in reser
+      hist==live false boot==hist true
+  BASE|up_ts|cyc3 mario W5 thu rec=Barbell box squat->Deadlift,Deadlift->Kettlebell single-leg deadlift,Kettlebell single-leg deadlift->Barbell box squat
+      live slot Barbell box squat :: 4×6–10 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  BASE|up_ts|cyc3 mario W3 tue rec=Weighted chinups->Inverted rows (rings),Inverted rows (rings)->L-sit chinups,L-sit chinups->Weighted chinups
+      live slot Weighted chinups :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Weighted chinups :: 2×5–6 @ RPE 7
+      hist==live false boot==hist true
+  MAP|up_ts|cyc3 mario W5 thu rec=Barbell box squat->Deadlift,Deadlift->Kettlebell single-leg deadlift,Kettlebell single-leg deadlift->Barbell box squat
+      live slot Barbell box squat :: 4×6–10 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  MAP|up_ts|cyc3 mario W3 tue rec=Weighted chinups->Inverted rows (rings),Inverted rows (rings)->L-sit chinups,L-sit chinups->Weighted chinups
+      live slot Weighted chinups :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Weighted chinups :: 2×5–6 @ RPE 7
+      hist==live false boot==hist true
+  SKIPHIST|up_ts|cyc3 mario W5 thu rec=Barbell box squat->Deadlift,Deadlift->Kettlebell single-leg deadlift,Kettlebell single-leg deadlift->Barbell box squat
+      live slot Barbell box squat :: 4×6–10 — RPE 7 (leave ~3 reps in reserve
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live false boot==hist true
+  SKIPHIST|up_ts|cyc3 mario W3 tue rec=Weighted chinups->Inverted rows (rings),Inverted rows (rings)->L-sit chinups,L-sit chinups->Weighted chinups
+      live slot Weighted chinups :: 2 sets — RPE 7 (leave 3 or more in reser
+      boot slot Weighted chinups :: 2×5–6 @ RPE 7
+      hist==live false boot==hist true
+  BASE|up_ts|collide2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Reverse lunge (KB) :: 2×10 each — hold RPE 7, two in the tank
+      hist==live false boot==hist true
+  BASE|up_ts|collide2 mario W3 thu rec=Dumbbell goblet squat->Leg press,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Reverse lunge (KB) :: 2×10 each — hold RPE 7, two in the tank
+      hist==live false boot==hist true
+  MAP|up_ts|collide2 mario W3 fri rec=Dumbbell Arnold press->Dumbbell incline press,Machine chest press->Dumbbell Arnold press
+      live slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+      boot slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+      hist==live false boot==hist false
+  MAP|up_ts|collide2 mario W3 fri rec=Dumbbell Arnold press->Kettlebell single-arm press,Machine chest press->Dumbbell Arnold press
+      live slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+      boot slot Dumbbell Arnold press :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+      hist==live false boot==hist false
+  STEP|up_ts|collide2 manny W5 fri rec=Band woodchopper (door anchor)->Garhammer raises,Garhammer raises->Windshield wipers
+      live slot Windshield wipers :: 2×10–15 each @ RPE 7
+      boot slot Windshield wipers :: 2×10–15 each @ RPE 7
+      hist==live false boot==hist false
+  STEP|up_ts|collide2 manny W7 fri rec=Landmine rotations->Garhammer raises,Garhammer raises->Landmine rotations
+      live slot Landmine rotations :: 2×6–10 each @ RPE 7
+      boot slot Landmine rotations :: 2×6–10 each @ RPE 7
+      hist==live false boot==hist false
+  SKIPHIST|up_ts|collide2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Reverse lunge (KB) :: 2×10 each — hold RPE 7, two in the tank
+      hist==live false boot==hist true
+  SKIPHIST|up_ts|collide2 mario W3 thu rec=Dumbbell goblet squat->Leg press,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Reverse lunge (KB) :: 2×10 each — hold RPE 7, two in the tank
+      hist==live false boot==hist true
+  BASE|up_ts|exch3 mario W3 thu rec=Dumbbell goblet squat->Dumbbell split-stance deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live false boot==hist true
+  BASE|up_ts|exch3 mario W3 thu rec=Dumbbell goblet squat->Kettlebell single-leg deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Kettlebell single-leg deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live false boot==hist true
+  MAP|up_ts|exch3 mario W3 thu rec=Kettlebell swing->45° back extension,Glute-ham raise->Kettlebell swing,45° back extension->Glute-ham raise
+      live slot Glute-ham raise :: 2 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Glute-ham raise :: 2×8
+      hist==live false boot==hist false
+  MAP|up_ts|exch3 mario W3 thu rec=Kettlebell swing->Nordic hamstring curl (anchored),Glute-ham raise->Kettlebell swing,Nordic hamstring curl (anchored)->Glute-ham raise
+      live slot Glute-ham raise :: 2 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Glute-ham raise :: 2×8
+      hist==live false boot==hist false
+  STEP|up_ts|exch3 manny W5 fri rec=Garhammer raises->Band woodchopper (door anchor)
+      live slot Band woodchopper (door anchor) :: 3×16 (180° arc)
+      boot slot Band woodchopper (door anchor) :: 3×16 (180° arc)
+      hist==live false boot==hist false
+  STEP|up_ts|exch3 manny W7 fri rec=Landmine rotations->Garhammer raises,Garhammer raises->Medicine ball rotary toss
+      live slot Medicine ball rotary toss :: 2×8–12 each @ RPE 7
+      boot slot Medicine ball rotary toss :: 2×8–12 each @ RPE 7
+      hist==live false boot==hist false
+  SKIPHIST|up_ts|exch3 mario W3 thu rec=Dumbbell goblet squat->Dumbbell split-stance deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live false boot==hist true
+  SKIPHIST|up_ts|exch3 mario W3 thu rec=Dumbbell goblet squat->Kettlebell single-leg deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Kettlebell single-leg deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live false boot==hist true
+  MAP|up_st|hop2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Trap bar farmer carry
+      live slot Trap bar farmer carry :: 3×40 yd each
+      boot slot Trap bar farmer carry :: 3×40 yd each
+      hist==live true boot==hist false
+  MAP|up_st|hop2 manny W5 fri rec=Garhammer raises->Ab wheel rollouts,Ab wheel rollouts->Hanging hold
+      live slot Hanging hold :: 3×16 (180° arc)
+      boot slot Hanging hold :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  STEP|up_st|hop2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Trap bar farmer carry
+      live slot Trap bar farmer carry :: 3×40 yd each
+      boot slot Trap bar farmer carry :: 3×40 yd each
+      hist==live true boot==hist false
+  STEP|up_st|hop2 manny W5 fri rec=Garhammer raises->Ab wheel rollouts,Ab wheel rollouts->Hanging hold
+      live slot Hanging hold :: 3×16 (180° arc)
+      boot slot Hanging hold :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  MAP|up_st|cyc2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  MAP|up_st|cyc2 manny W7 mon rec=Overhead carry->Trap bar farmer carry,Trap bar farmer carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  STEP|up_st|cyc2 manny W7 mon rec=Suitcase carry->Overhead carry,Overhead carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  STEP|up_st|cyc2 manny W7 mon rec=Overhead carry->Trap bar farmer carry,Trap bar farmer carry->Suitcase carry
+      live slot Suitcase carry :: 3×40 yd each
+      boot slot Suitcase carry :: 3×40 yd each
+      hist==live true boot==hist false
+  MAP|up_st|hop3 manny W5 fri rec=Plank hold->Garhammer raises,Garhammer raises->Dead bug (slow tempo),Dead bug (slow tempo)->Pallof press
+      live slot Pallof press :: 3×16 (180° arc)
+      boot slot Pallof press :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  MAP|up_st|hop3 manny W5 fri rec=Dead bug (slow tempo)->Side plank thread-the-needle,Side plank thread-the-needle->Garhammer raises,Garhammer raises->Superman
+      live slot Superman :: 3×16 (180° arc)
+      boot slot Superman :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  STEP|up_st|hop3 manny W5 fri rec=Plank hold->Garhammer raises,Garhammer raises->Dead bug (slow tempo),Dead bug (slow tempo)->Pallof press
+      live slot Pallof press :: 3×16 (180° arc)
+      boot slot Pallof press :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  STEP|up_st|hop3 manny W5 fri rec=Dead bug (slow tempo)->Side plank thread-the-needle,Side plank thread-the-needle->Garhammer raises,Garhammer raises->Superman
+      live slot Superman :: 3×16 (180° arc)
+      boot slot Superman :: 3×16 (180° arc)
+      hist==live true boot==hist false
+  MAP|up_st|collide2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Barbell box squat :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  MAP|up_st|collide2 mario W3 thu rec=Dumbbell goblet squat->Leg press,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Leg press :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  STEP|up_st|collide2 mario W3 thu rec=Dumbbell goblet squat->Barbell box squat,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Barbell box squat :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  STEP|up_st|collide2 mario W3 thu rec=Dumbbell goblet squat->Leg press,Reverse lunge (KB)->Dumbbell goblet squat
+      live slot Dumbbell goblet squat :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Leg press :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  MAP|up_st|exch3 mario W3 thu rec=Dumbbell goblet squat->Dumbbell split-stance deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  MAP|up_st|exch3 mario W3 thu rec=Dumbbell goblet squat->Kettlebell single-leg deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Kettlebell single-leg deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  STEP|up_st|exch3 mario W3 thu rec=Dumbbell goblet squat->Dumbbell split-stance deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Dumbbell split-stance deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  STEP|up_st|exch3 mario W3 thu rec=Dumbbell goblet squat->Kettlebell single-leg deadlift,Reverse lunge (KB)->Dumbbell goblet squat,Kettlebell single-leg deadlift->Reverse lunge (KB)
+      live slot Reverse lunge (KB) :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      boot slot Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  MAP|up_bt|hop2 mario W5 tue rec=Sumo deadlift->Barbell Romanian deadlift,Barbell Romanian deadlift->Deadlift
+      live slot Barbell Romanian deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      boot slot Deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live true boot==hist false
+  MAP|up_bt|hop2 mario W5 fri rec=Machine chest press->Bench dips,Bench dips->Dips
+      live slot Bench dips :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+      boot slot Dips :: 2 sets — RPE 6 (leave 3 or more in reser
+      hist==live true boot==hist false
+  STEP|up_bt|hop2 mario W5 tue rec=Sumo deadlift->Barbell Romanian deadlift,Barbell Romanian deadlift->Deadlift
+      live slot Barbell Romanian deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      boot slot Deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live true boot==hist false
+  STEP|up_bt|hop2 mario W5 fri rec=Machine chest press->Bench dips,Bench dips->Dips
+      live slot Bench dips :: 2×12 — RPE 6–7, leave 3+ in reserve — 3 
+      boot slot Dips :: 2 sets — RPE 6 (leave 3 or more in reser
+      hist==live true boot==hist false
+  MAP|up_bt|cyc2 mario W5 mon rec=Dumbbell bench press->Dumbbell decline press,Dumbbell decline press->Dumbbell bench press
+      live slot Dumbbell decline press :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Dumbbell bench press :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      hist==live true boot==hist false
+  MAP|up_bt|cyc2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell box squat
+      live slot Leg press :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell box squat :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      hist==live true boot==hist false
+  STEP|up_bt|cyc2 mario W5 mon rec=Dumbbell bench press->Dumbbell decline press,Dumbbell decline press->Dumbbell bench press
+      live slot Dumbbell decline press :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Dumbbell bench press :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      hist==live true boot==hist false
+  STEP|up_bt|cyc2 mario W5 thu rec=Barbell box squat->Leg press,Leg press->Barbell box squat
+      live slot Leg press :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      boot slot Barbell box squat :: 4×5–8 — RPE 7 (leave ~3 reps in reserve)
+      hist==live true boot==hist false
+  MAP|up_bt|hop3 mario W5 thu rec=Kettlebell swing->Trap bar deadlift,Trap bar deadlift->Barbell good mornings,Barbell good mornings->Deadlift
+      live slot Trap bar deadlift :: 2×8
+      boot slot Deadlift :: 2×8
+      hist==live true boot==hist false
+  MAP|up_bt|hop3 mario W5 thu rec=Step-ups (KB)->Dumbbell standing calf raise,Dumbbell standing calf raise->Machine seated calf raise,Machine seated calf raise->Dumbbell seated calf raise
+      live slot Dumbbell standing calf raise :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Dumbbell seated calf raise :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  STEP|up_bt|hop3 mario W5 thu rec=Kettlebell swing->Trap bar deadlift,Trap bar deadlift->Barbell good mornings,Barbell good mornings->Deadlift
+      live slot Trap bar deadlift :: 2×8
+      boot slot Deadlift :: 2×8
+      hist==live true boot==hist false
+  STEP|up_bt|hop3 mario W5 thu rec=Step-ups (KB)->Dumbbell standing calf raise,Dumbbell standing calf raise->Machine seated calf raise,Machine seated calf raise->Dumbbell seated calf raise
+      live slot Dumbbell standing calf raise :: 2×10 each — hold RPE 7, two in the tank
+      boot slot Dumbbell seated calf raise :: 2×10 each — hold RPE 7, two in the tank
+      hist==live true boot==hist false
+  MAP|up_bt|cyc3 mario W5 thu rec=Barbell box squat->Deadlift,Deadlift->Kettlebell single-leg deadlift,Kettlebell single-leg deadlift->Barbell box squat
+      live slot Deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      boot slot Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      hist==live true boot==hist false
+  MAP|up_bt|cyc3 mario W5 tue rec=Incline dumbbell curl->Inverted rows (rings),Inverted rows (rings)->Barbell curl,Barbell curl->Incline dumbbell curl
+      live slot Inverted rows (rings) :: 3 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Incline dumbbell curl :: 3 sets — RPE 8 (stop 2 reps short of fai
+      hist==live true boot==hist false
+  STEP|up_bt|cyc3 mario W5 thu rec=Barbell box squat->Deadlift,Deadlift->Kettlebell single-leg deadlift,Kettlebell single-leg deadlift->Barbell box squat
+      live slot Deadlift :: 4×3 — RPE 7 (leave ~3 reps in reserve), 
+      boot slot Barbell box squat :: 4×6–10 — RPE 7 (leave ~3 reps in reserve
+      hist==live true boot==hist false
+  STEP|up_bt|cyc3 mario W5 tue rec=Incline dumbbell curl->Inverted rows (rings),Inverted rows (rings)->Barbell curl,Barbell curl->Incline dumbbell curl
+      live slot Inverted rows (rings) :: 3 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Incline dumbbell curl :: 3 sets — RPE 8 (stop 2 reps short of fai
+      hist==live true boot==hist false
+  MAP|up_bt|collide2 mario W5 thu rec=Kettlebell swing->Barbell good mornings,Single-leg hip thrust->Kettlebell swing
+      live slot Kettlebell swing :: 2×6–10 @ RPE 8
+      boot slot (none) :: 
+      hist==live true boot==hist false
+  MAP|up_bt|collide2 mario W5 thu rec=Kettlebell swing->Dumbbell split-stance deadlift,Single-leg hip thrust->Kettlebell swing
+      live slot Kettlebell swing :: 2×6–10 @ RPE 8
+      boot slot (none) :: 
+      hist==live true boot==hist false
+  STEP|up_bt|collide2 mario W5 thu rec=Kettlebell swing->Barbell good mornings,Single-leg hip thrust->Kettlebell swing
+      live slot Kettlebell swing :: 2×6–10 @ RPE 8
+      boot slot (none) :: 
+      hist==live true boot==hist false
+  STEP|up_bt|collide2 mario W5 thu rec=Kettlebell swing->Dumbbell split-stance deadlift,Single-leg hip thrust->Kettlebell swing
+      live slot Kettlebell swing :: 2×6–10 @ RPE 8
+      boot slot (none) :: 
+      hist==live true boot==hist false
+  MAP|up_bt|exch3 mario W5 thu rec=Kettlebell swing->45° back extension,Single-leg hip thrust->Kettlebell swing,45° back extension->Single-leg hip thrust
+      live slot 45° back extension :: 2 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Single-leg hip thrust :: 2 sets — RPE 8 (stop 2 reps short of fai
+      hist==live true boot==hist false
+  MAP|up_bt|exch3 mario W5 thu rec=Kettlebell swing->Barbell hip thrust,Single-leg hip thrust->Kettlebell swing,Barbell hip thrust->Single-leg hip thrust
+      live slot Barbell hip thrust :: 2×8
+      boot slot Single-leg hip thrust :: 2×8
+      hist==live true boot==hist false
+  STEP|up_bt|exch3 mario W5 thu rec=Kettlebell swing->45° back extension,Single-leg hip thrust->Kettlebell swing,45° back extension->Single-leg hip thrust
+      live slot 45° back extension :: 2 sets — RPE 8 (stop 2 reps short of fai
+      boot slot Single-leg hip thrust :: 2 sets — RPE 8 (stop 2 reps short of fai
+      hist==live true boot==hist false
+  STEP|up_bt|exch3 mario W5 thu rec=Kettlebell swing->Barbell hip thrust,Single-leg hip thrust->Kettlebell swing,Barbell hip thrust->Single-leg hip thrust
+      live slot Barbell hip thrust :: 2×8
+      boot slot Single-leg hip thrust :: 2×8
+      hist==live true boot==hist false
+
+== C1 detail cause, u|hop2+cyc2, MAP rows with slot detail != live: live detail != direct-hop detail ==
+    194  hop2 live 2 boot 2×12–15
+    135  hop2 live 2 boot 2×6–10
+    114  hop2 live 2 boot 2×8–12
+     66  hop2 live 2 boot 2×12
+     57  hop2 live 2 boot 2×15–20
+     54  hop2 live 3 boot 3×10–15
+     48  hop2 live 2×10 boot 2×10
+     40  hop2 live 3 boot 3×10
+     39  hop2 live 3 boot 3×10–12
+     36  hop2 live 2 boot 2×8
+     36  hop2 live 2 boot 2×5–6
+     31  hop2 live 2 boot 2×10
+     27  hop2 live 3 boot 3×8
+     27  hop2 live 2 boot 2×10–15
+     21  cyc2 live 2 boot 2×6–10
+
+== C3 PREMISE LATTICE on V221 / MAP / STEP / SKIPHIST (full output /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/230f3429-c216-4917-8a68-4a430008aedd/scratchpad/measure2/premise_4trees.out, exit 0) ==
+versions: V221=221 MAP=222 STEP=222 SKIPHIST=222
+SELFCHECK V221 identical: true
+  V220+V221    DURABLE 190/504 (rec kept 46, hist holds target 144) | REVERTED 314/504 (rec pruned 314, hist donor 144, no hist 170, orphaned logs 72) | orphaned logs all cells 72/504 | stored grid carries target 0/504
+  V221         DURABLE 190/504 (rec kept 46, hist holds target 144) | REVERTED 314/504 (rec pruned 314, hist donor 144, no hist 170, orphaned logs 72) | orphaned logs all cells 72/504 | stored grid carries target 0/504
+  MAP          DURABLE 504/504 (rec kept 504, hist holds target 432) | REVERTED 0/504 (rec pruned 0, hist donor 0, no hist 0, orphaned logs 0) | orphaned logs all cells 144/504 | stored grid carries target 0/504
+  STEP         DURABLE 504/504 (rec kept 504, hist holds target 432) | REVERTED 0/504 (rec pruned 0, hist donor 0, no hist 0, orphaned logs 0) | orphaned logs all cells 144/504 | stored grid carries target 0/504
+  SKIPHIST     DURABLE 504/504 (rec kept 504, hist holds target 432) | REVERTED 0/504 (rec pruned 0, hist donor 0, no hist 0, orphaned logs 0) | orphaned logs all cells 144/504 | stored grid carries target 0/504
+  neg-control (a) V221: swap on untouched day wrote ia_hist_ before boot 0/36
+  neg-control (a) MAP: swap on untouched day wrote ia_hist_ before boot 0/36
+  neg-control (a) STEP: swap on untouched day wrote ia_hist_ before boot 0/36
+  neg-control (a) SKIPHIST: swap on untouched day wrote ia_hist_ before boot 0/36
+  orphaned-log cells by touch|order V221: {"tick|swap_then_touch":72}
+  orphaned-log cells by touch|order MAP: {"draft|touch_then_swap":72,"tick|touch_then_swap":72}
+  orphaned-log cells by touch|order STEP: {"draft|touch_then_swap":72,"tick|touch_then_swap":72}
+  orphaned-log cells by touch|order SKIPHIST: {"draft|touch_then_swap":72,"tick|touch_then_swap":72}
+  exw slug count equal across reboot V221: 504/504
+  exw slug count equal across reboot MAP: 504/504
+  exw slug count equal across reboot STEP: 504/504
+  exw slug count equal across reboot SKIPHIST: 504/504
+  V221|none|-                    boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  V221|draft|swap_then_touch     boot1=Dumbbell goblet squat 4×8–12 chip=- | undo-> Dumbbell goblet squat 4×8–12 rec=none hist=Dumbbell goblet squat 4×8–12 | boot2=Dumbbell goblet squat 4×8–12 hist=Dumbbell goblet squat 4×8–12 rec=none | boot3=Dumbbell goblet squat 4×8–12
+  V221|draft|touch_then_swap     boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  V221|tick|swap_then_touch      boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  V221|tick|touch_then_swap      boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  V221|done|swap_then_touch      boot1=Dumbbell goblet squat 4×8–12 chip=- | undo-> Dumbbell goblet squat 4×8–12 rec=none hist=Dumbbell goblet squat 4×8–12 | boot2=Dumbbell goblet squat 4×8–12 hist=Dumbbell goblet squat 4×8–12 rec=none | boot3=Dumbbell goblet squat 4×8–12
+  V221|done|touch_then_swap      boot1=Barbell box squat 4×3 chip=- | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  MAP|none|-                     boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  MAP|draft|swap_then_touch      boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  MAP|draft|touch_then_swap      boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  MAP|tick|swap_then_touch       boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  MAP|tick|touch_then_swap       boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  MAP|done|swap_then_touch       boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  MAP|done|touch_then_swap       boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  STEP|none|-                    boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  STEP|draft|swap_then_touch     boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  STEP|draft|touch_then_swap     boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  STEP|tick|swap_then_touch      boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  STEP|tick|touch_then_swap      boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  STEP|done|swap_then_touch      boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  STEP|done|touch_then_swap      boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  SKIPHIST|none|-                boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=none | boot2=Barbell box squat 4×3 hist=none rec=none | boot3=Barbell box squat 4×3
+  SKIPHIST|draft|swap_then_touch boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  SKIPHIST|draft|touch_then_swap boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  SKIPHIST|tick|swap_then_touch  boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  SKIPHIST|tick|touch_then_swap  boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  SKIPHIST|done|swap_then_touch  boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  SKIPHIST|done|touch_then_swap  boot1=Dumbbell goblet squat 4×8–12 chip=Barbell box squat | undo-> Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 | boot2=Barbell box squat 4×3 hist=Barbell box squat 4×3 rec=none | boot3=Barbell box squat 4×3
+  V221   live==boot 13/42  live==next-week boot 13/42  double-apply 0/42
+  MAP    live==boot 42/42  live==next-week boot 42/42  double-apply 0/42
+  STEP   live==boot 42/42  live==next-week boot 42/42  double-apply 0/42
+  SKIPHIST live==boot 42/42  live==next-week boot 42/42  double-apply 0/42
+  second-swap target: Leg press (of 7 candidates)
+  V221|none|-            live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=none chip=Barbell box squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  V221|draft|first       live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Barbell box squat 4×3 rec=none hist=Barbell box squat 4×3 chip=-
+                          undo(goblet)->Barbell box squat BOOT2 Barbell box squat 4×3 rec=none chip=-
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  V221|draft|between     live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Dumbbell goblet squat 4×8–12 rec=none hist=Dumbbell goblet squat 4×8–12 chip=-
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=none chip=-
+                          undo(box)->Dumbbell goblet squat 4×8–12 BOOT3 Dumbbell goblet squat 4×8–12 rec=none
+  V221|draft|last        live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=none hist=Leg press 4×8–12 chip=-
+                          undo(goblet)->Leg press BOOT2 Leg press 4×8–12 rec=none chip=-
+                          undo(box)->Leg press 4×8–12 BOOT3 Leg press 4×8–12 rec=none
+  MAP|none|-             live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×5–8 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=none chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  MAP|draft|first        live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  MAP|draft|between      live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  MAP|draft|last         live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  STEP|none|-            live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=none chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  STEP|draft|first       live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  STEP|draft|between     live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  STEP|draft|last        live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  SKIPHIST|none|-        live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×5–8 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=none chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  SKIPHIST|draft|first   live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  SKIPHIST|draft|between live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+  SKIPHIST|draft|last    live=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+                          BOOT1 Leg press 4×8–12 rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press hist=Leg press 4×8–12 chip=Dumbbell goblet squat
+                          undo(goblet)->Dumbbell goblet squat BOOT2 Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat chip=Barbell box squat
+                          undo(box)->Barbell box squat 4×3 BOOT3 Barbell box squat 4×3 rec=none
+    V221|hist=none                               boot W5 Thu slot=Barbell box squat rec=none
+    V221|hist=Barbell box squat                  boot W5 Thu slot=Barbell box squat rec=none
+    V221|hist=Dumbbell goblet squat              boot W5 Thu slot=Dumbbell goblet squat rec=none
+    V221|hist=Leg press                          boot W5 Thu slot=Leg press rec=none
+    MAP|hist=none                                boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    MAP|hist=Barbell box squat                   boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    MAP|hist=Dumbbell goblet squat               boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    MAP|hist=Leg press                           boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    STEP|hist=none                               boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    STEP|hist=Barbell box squat                  boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    STEP|hist=Dumbbell goblet squat              boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    STEP|hist=Leg press                          boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    SKIPHIST|hist=none                           boot W5 Thu slot=Barbell box squat rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    SKIPHIST|hist=Barbell box squat              boot W5 Thu slot=Barbell box squat rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    SKIPHIST|hist=Dumbbell goblet squat          boot W5 Thu slot=Dumbbell goblet squat rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+    SKIPHIST|hist=Leg press                      boot W5 Thu slot=Leg press rec=Barbell box squat->Dumbbell goblet squat,Dumbbell goblet squat->Leg press
+  V221|stale=false   shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell box squat 4×3 rec=none hist=none
+  V221|stale=true    shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell back squat 4×3 rec=none hist=none
+  MAP|stale=false    shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat hist=none
+  MAP|stale=true     shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell back squat 4×3 rec=Barbell box squat->Dumbbell goblet squat hist=none
+  STEP|stale=false   shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat hist=none
+  STEP|stale=true    shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell back squat 4×3 rec=Barbell box squat->Dumbbell goblet squat hist=none
+  SKIPHIST|stale=false shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Dumbbell goblet squat 4×8–12 rec=Barbell box squat->Dumbbell goblet squat hist=none
+  SKIPHIST|stale=true shown at W5=Barbell box squat live=Dumbbell goblet squat | W6 boot: slot=Barbell back squat 4×3 rec=Barbell box squat->Dumbbell goblet squat hist=none
