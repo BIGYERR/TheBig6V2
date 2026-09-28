@@ -35,6 +35,15 @@
 //        (D25), so the same test is week 4 from the RESOLVED start and would be 5 from the
 //        raw field. The undated case runs on the SAME WD after the dated one, so a pin
 //        that is only written when set would survive into it (the latch rule).
+//        D184 (P-TESTLEN, V223; tests/measure/v223_rulings/p_testlen_d184_ruling.md Q1, Q5)
+//        re-keys G4 and adds G4b and G4c, with no licence predicate (the ruling keeps no row's
+//        old direction): a dated test goal pins to its test week whenever that week is 1 to 26,
+//        the rows of Table 6. Hand weeks from Mon 2026-09-21: Mon 2026-12-28 is week 15 (14
+//        Mondays later), Mon 2027-03-15 is week 26 (25 Mondays later), Mon 2027-03-22 is week
+//        27; both long spans cross the 2026-11-01 fall-back and the 2027-03-14 spring-forward.
+//        G4 and G4b fail on V222, whose pin stopped at the 11-week goal length. G4c, week 27,
+//        pins nothing on either version (a control) and runs right after G4b on the same WD,
+//        so a 26 pin that survived into it would fail it.
 //   * D  is SLICE B, the test week (limbs ii and iii; gaps 1 and 2 and the run-card guard
 //        ruled by coach). Test weekdays are calendar facts: 2026-10-19 Mon, 10-20 Tue,
 //        10-22 Thu, 10-24 Sat, 10-04 and 09-27 Sun. The trial is found by SUBTYPE (the
@@ -74,7 +83,7 @@ function summary(){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exi
 const ROWS = ['Z0','H1','H2','H3','H4','H5','H6','H7','H8','H9','F1','F2','F3',
   'T1..T8 (a hand series, b Taper set, c dip set, f finite)','B6','B7','B8','B11',
   'D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','D12',
-  'G1','G2','G3','G4','G5','G6','G7'];
+  'G1','G2','G3','G4','G4b','G4c','G5','G6','G7'];
 if(VER < D106A_ERA){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D106a (V' + D106A_ERA + ').');
   for(const r of ROWS) skipRow(r + ' skipped below the D106a era');
@@ -383,7 +392,9 @@ if(gOk){
     ['G1 dated test goal, start Mon 2026-09-21, test Mon 2026-10-19', Object.assign({}, base, {seed:24865}), 5, 5, '2026-09-21', 'Building your 5-week program...'],
     ['G2 same WD, no date (a pin from G1 must not survive)', {eventTargeted:false, raceDate:''}, null, 11, '2026-09-21', 'Building your 11-week program...'],
     ['G3 test before the start', {eventTargeted:true, raceDate:'2026-09-14'}, null, 11, '2026-09-21', null],
-    ['G4 test past the goal length (D138, out of scope)', {eventTargeted:true, raceDate:'2026-12-28'}, null, 11, '2026-09-21', null],
+    ['G4 test past the goal length pins its test week (D184): Mon 2026-12-28 is week 15 of an 11-week goal', {eventTargeted:true, raceDate:'2026-12-28'}, 15, 15, '2026-09-21', 'Building your 15-week program...'],
+    ['G4b boundary (D184): Mon 2027-03-15 is week 26, the last row of Table 6, and pins', {eventTargeted:true, raceDate:'2027-03-15'}, 26, 26, '2026-09-21', 'Building your 26-week program...'],
+    ['G4c control (D184): Mon 2027-03-22 is week 27, past Table 6, pins nothing and keeps the 11-week goal length', {eventTargeted:true, raceDate:'2027-03-22'}, null, 11, '2026-09-21', 'Building your 11-week program...'],
     ['G5 snapped start: Sun 2026-09-27 with Sunday rest resolves to Mon 2026-09-28, test is week 4', {eventTargeted:true, raceDate:'2026-10-19', startDate:'2026-09-27'}, 4, 4, '2026-09-28', 'Building your 4-week program...'],
   ];
   let before = IA.eval('getPrograms().length');

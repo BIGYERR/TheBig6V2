@@ -1,0 +1,37 @@
+[
+ {
+  "name": "D182 (i) reverted in progSelData: raceStr is new Date(c.raceDate) (UTC parse, bare month/day/year) again",
+  "anchor": "if(c.raceDate){try{raceStr=String(_fmtStartDay(c.raceDate, true));}",
+  "replacement": "if(c.raceDate){try{raceStr=new Date(c.raceDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}",
+  "gate": "gates/g223_d182_racedate.js",
+  "note": "The V222 expression, byte-exact from base_v222.html. NAMED TRIP: R1a (card Race date, NY: the day before and no weekday; UTC: no weekday) and R1b (copy text Event line), both zones; R4 (moved race card and copy) rides along. R1c (sheet) and R1d (review) read their own parse and stay green."
+ },
+ {
+  "name": "D182 (ii) reverted on the card: raceOut reads the stored raceDateWeeks, not the live countdown",
+  "anchor": "raceOut:raceCountdownWords(c.raceDate ? raceCountdown(c.raceDate) : null),",
+  "replacement": "raceOut:((c.raceDateWeeks||p.raceDateWeeks) ? {card:(c.raceDateWeeks||p.raceDateWeeks)+' weeks', copy:(c.raceDateWeeks||p.raceDateWeeks)+' weeks out'} : null),",
+  "gate": "gates/g223_d182_racedate.js",
+  "note": "The V222 read (c.raceDateWeeks||p.raceDateWeeks) in the D182 shape. NAMED TRIP: R4 (raceDateWeeks 3 prints '3 weeks', the moved race prints '13 weeks' against 11), both zones. R2a and R2b also trip (the fixture carries no raceDateWeeks, so the Time out row vanishes)."
+ },
+ {
+  "name": "D182 (ii) the < 0 branch dropped from raceCountdownWords: past the race returns nothing",
+  "anchor": "  return {card:'Behind you', copy:'behind you'};",
+  "replacement": "",
+  "gate": "gates/g223_d182_racedate.js",
+  "note": "NAMED TRIP: R2a (card: the Time out row is gone on 2026-12-07 and 2026-12-20 where 'Behind you' is ruled), both zones. R2b (copy), R2c (sheet: raceCountdownWords(cd).card throws) and R2d (review: no phrase) trip on the same two cells."
+ },
+ {
+  "name": "D182 (v) reverted in raceAlignment: weeksOut is the raw floor Math.floor((race - today)/86400000/7) again",
+  "anchor": "  const weeksOut = raceCountdown(raceIso, todayIso).weeks;   // D182: one day-count in the file",
+  "replacement": "  const weeksOut = Math.floor((race - today)/86400000/7);",
+  "gate": "gates/g223_d182_racedate.js",
+  "note": "The V222 line, byte-exact from base_v222.html. NAMED TRIP: R3 [NY] (5 of 8 cells lose a week across the 2027-03-14 spring-forward: 2026-11-16 -> 2027-03-15 reads 16 against 17). R3 [UTC] is a CONTROL and stays green; nothing else reads raceAlignment's weeksOut in this gate. This is the single-row mutation of the sweep."
+ },
+ {
+  "name": "D182 amendment (a) Q3 reverted: the wizard review row prints no phrase past the race (cd.days<0 ? '')",
+  "anchor": "return !w ? '' : cd.days<=0 ? ' ('+w.copy+')' : ' ('+w.card+' away)';",
+  "replacement": "return !w||cd.days<0 ? '' : cd.days===0 ? ' ('+w.copy+')' : ' ('+w.card+' away)';",
+  "gate": "gates/g223_d182_racedate.js",
+  "note": "The S2 expression the amendment replaced, byte-exact from tests/edits/v223_s3p_d182_review_past.py OLD. NAMED TRIP: R2d (2026-12-07 and 2026-12-20 print no phrase where '(behind you)' is ruled), both zones. Nothing else moves."
+ }
+]

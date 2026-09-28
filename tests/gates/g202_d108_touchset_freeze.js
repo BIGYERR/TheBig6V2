@@ -57,7 +57,7 @@ const clone = v => JSON.parse(JSON.stringify(v));
 const SEED = 24865;
 const CFG = {
   name:'PRT TING', primaryPath:'event', cardioTypes:['run'],
-  eventTargeted:true, raceDate:'2026-10-19',
+  eventTargeted:false, raceDate:'',
   liftingFocus:'support_prevention', experience:'intermediate', ageBracket:'18-35',
   equipment:'full_gym', unit:'lbs',
   restDays:['sun','wed'], days:['sun','mon','tue','wed','thu','fri','sat'],
@@ -66,11 +66,13 @@ const CFG = {
     targetDist:'1.5', paceUnit:'mi', targetMins:'10', targetSecs:'30', targetTime:'10:30',
     mileBestMins:'8', mileBestSecs:'15', mileBestSrc:{kind:'entered'},
     baselineDist:'3', baseline:'3mi'}},
-  // D106a (V207, ruled literal): the fixture is the 11-week program as stored with no test week.
-  // With the key present, the one-time test-week backfill in refreshProgram does not fire, so
-  // this gate never compresses the fixture onto its race date from a start of "today" (an
-  // outcome that would depend on the date the gate runs). The D108 claim is unchanged.
-  _testWeek:null, _raceDateCappedWeeks:11
+  // D184 (P-TESTLEN, V223; tests/measure/v223_rulings/p_testlen_d184_ruling.md Q1): the fixture
+  // is UNDATED (eventTargeted false, no raceDate, no pin keys), so progTestPin returns null on
+  // every version and every run date and the test-week backfill in refreshProgram never touches
+  // it. Through V222 it escaped the backfill with _testWeek:null; D184 re-pins exactly that shape,
+  // which moved the control day, and a dated fixture would re-enter the past-test branch after
+  // its race date and tie the outcome to the date the gate runs. The D108 claim is unchanged:
+  // R1c and R2c keep their text and are D108 controls on every version.
 };
 
 const W      = 4;        // a FUTURE week: start date is this week, so _curWk === 1

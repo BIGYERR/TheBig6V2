@@ -1,0 +1,79 @@
+[
+ {
+  "name": "D184 (a) reverted in progTestPin: the pin gate is week <= len again (the goal length, not Table 6's last row)",
+  "anchor": "  return {tw: (week >= 1 && week <= cap) ? week : null, len, week, cap};",
+  "replacement": "  return {tw: (week >= 1 && week <= len) ? week : null, len, week, cap};",
+  "gate": "gates/g223_d184_testlen.js",
+  "note": "The V222 predicate in the D184 shape. NAMED TRIP: RD (9 weeks, no trial, against the ruling's 20) and B1248 (827 cells where the test week is past the goal length build the goal length), both zones. P1 rides along (a `<= len` gate is back in code). g207_test_week G4 trips once the re-key lands (not run here)."
+ },
+ {
+  "name": "D184 (b1) reverted in wizardTestPin: the wizard carries its own gate again and nulls tw when week > len",
+  "anchor": "  const p = progTestPin(WD, r.start);\n",
+  "replacement": "  const p = progTestPin(WD, r.start);\n  if(p && p.week > p.len) p.tw = null;\n",
+  "gate": "gates/g223_d184_testlen.js",
+  "note": "A second gate beside the owner, spelled so P1's token scan cannot see it. NAMED TRIP: B1248 only (the header and name step print the goal length while doGenerate builds the test week), both zones. RD reads doGenerate, K27 is past 26 where tw is null either way, P1 sees no `<= len`: they stay green. The single-row mutation of the sweep. Re-anchored in the (c') gate pass: (c1) rewrote wizardTestPin to call the resolver once with _rsRace, so the V223 pass 1 anchor no longer occurs; the mutation is the same second gate on the pin it returns."
+ },
+ {
+  "name": "D184 (b2) a second copy of the predicate: the interim card inlines NSW_TABLE6_INT.length - 1 instead of reading p.cap",
+  "anchor": "'. The test block is '+p.cap+' weeks.",
+  "replacement": "'. The test block is '+(NSW_TABLE6_INT.length - 1)+' weeks.",
+  "gate": "gates/g223_d184_testlen.js",
+  "note": "Same value, second owner. NAMED TRIP: P1 (two occurrences in code, one outside progTestPin), both zones. K27 prints the same sentence and stays green."
+ },
+ {
+  "name": "D184 Q3 interim sentence reads the raw test week where Table 6's cap belongs",
+  "anchor": "' now. Start a test block when the test is '+p.cap+' weeks out.'",
+  "replacement": "' now. Start a test block when the test is '+p.week+' weeks out.'",
+  "gate": "gates/g223_d184_testlen.js",
+  "note": "NAMED TRIP: K27 (all 193 cells: 'when the test is 27 weeks out' against the typed 26), both zones. Nothing else reads the sentence."
+ },
+ {
+  "name": "D184 (a) backfill guard reverted to === undefined: a stored _testWeek:null never re-pins",
+  "anchor": "  if(prog.cfg._testWeek == null){",
+  "replacement": "  if(prog.cfg._testWeek === undefined){",
+  "gate": "gates/g207_test_calendar.js",
+  "note": "The V222 guard. NAMED TRIP: C3i (the V209 shape _testWeek:null with the test in week 14 of 11 stays null instead of re-pinning to 14). Target row written by the build-3 re-key of g207_test_calendar."
+ },
+ {
+  "name": "D184 (a) backfill writes when nothing pins: a past or beyond-26 test writes the key null again",
+  "anchor": "    if(_tp && _tp.tw){\n      const _rd = _parseLocalDate(prog.cfg.raceDate), _td = _parseLocalDate(_isoToday());\n      if(!(_rd && _td && _rd < _td)){   // a past test pins nothing and writes nothing\n        prog.cfg._testWeek = _tp.tw;\n        prog.cfg._raceDateCappedWeeks = _tp.tw;",
+  "replacement": "    if(_tp){\n      const _rd = _parseLocalDate(prog.cfg.raceDate), _td = _parseLocalDate(_isoToday());\n      {\n        prog.cfg._testWeek = (_rd && _td && _rd < _td) ? null : _tp.tw;\n        prog.cfg._raceDateCappedWeeks = prog.cfg._testWeek || prog.cfg._raceDateCappedWeeks || _tp.len;",
+  "gate": "gates/g207_test_calendar.js",
+  "note": "The V222 write-null backfill under the D184 guard. NAMED TRIP: C3g only (a past test writes _testWeek null where the key must stay absent). C3j cannot see it: its stored cfg already holds _testWeek:null with the test in week 28, where tw is null, so the old write-null rewrites the same null and the same length 11 (_raceDateCappedWeeks null || 11) and the bytes C3j checks are unchanged. Target row written by the build-3 re-key of g207_test_calendar."
+ },
+ {
+  "name": "D184 (c) resolver: the _rt >= d conjunct dropped, so a test earlier in the entered week than the entered day also holds it",
+  "anchor": "const holdsTest = !!(partial && week1Train.length === 0 && _rt && _rt >= d && _rt <= _sun);",
+  "replacement": "const holdsTest = !!(partial && week1Train.length === 0 && _rt && _rt <= _sun);",
+  "gate": "gates/g223_d184_testlen.js",
+  "note": "NAMED TRIP: R1 (non-(c) lattice points with the test from Monday of the entered week up to the day before the entered day now carry holdsTest and keep the entered start: holdsTest on a non-(c) point, moved-not-(c) > 0, and the blast radius against V222), both zones. R2, R3, R4 read (c) cells only; R6 cells have the test on or after the entered day; R5 reads HALF_MANNY and g203 only: all stay green."
+ },
+ {
+  "name": "D184 (c) Q2 name step: the withdrawn \"today\" sentence restored in startResolveCopy's holdsTest branch",
+  "anchor": "    return 'That week holds your test, so this starts <b>'+_fmtStartDay(r.start)+'</b>. Nothing is left to train before it. Week 1 is the test week.';",
+  "replacement": "    return 'This week holds your test, so this starts today. Week 1 is the test week.';",
+  "gate": "gates/g223_d184_testlen.js",
+  "note": "The prior ruling's text (p_testlen_d184_ruling.md Q2, withdrawn by (c') Q2). NAMED TRIP: R3 (all 603 cells: not the Q2 string, and \"today\" / \"this week\" in the text), both zones. R3S is the snap branch and stays green; the toast never reads startResolveCopy."
+ },
+ {
+  "name": "D184 (c1) setProgStart: the test date dropped from the resolver call, so a re-date into the test week snaps past the test",
+  "anchor": "  const _r=resolveStartDate(dateStr,(activeProg.cfg&&activeProg.cfg.restDays)||[],_rsRace(activeProg.cfg));",
+  "replacement": "  const _r=resolveStartDate(dateStr,(activeProg.cfg&&activeProg.cfg.restDays)||[]);",
+  "gate": "gates/g223_d184_testlen.js",
+  "note": "The pre-(c) call. NAMED TRIP: R6 (all 3 cells snap to the next Monday, the test falls before the start, _testWeek null, the snap toast in place of Q4), both zones. R6S snaps either way; R6N gets null from the guard either way; doGenerate and the wizard keep their own call: all else green."
+ },
+ {
+  "name": "D184 (c) _rsRace: the PACE_GOALS guard dropped, so a race goal's race date reaches the resolver and its race week stops snapping",
+  "anchor": "  return (c && (c.cardioTypes||[]).includes('run') && g && PACE_GOALS.has(g.id) && c.eventTargeted !== false && c.raceDate) ? c.raceDate : null;",
+  "replacement": "  return (c && (c.cardioTypes||[]).includes('run') && g && c.eventTargeted !== false && c.raceDate) ? c.raceDate : null;",
+  "gate": "gates/g223_d184_testlen.js",
+  "note": "NAMED TRIP: R6N (HALF_MANNY's run_half re-dated to Thu 2026-12-03 keeps Thursday and toasts Q4 instead of snapping to Mon 2026-12-07), both zones. The NRC builds of NRC0 start Tue 2026-09-22 with training left in that week and never reach the (c) branch; every other row reads a dated test goal: all else green. The single-row mutation of the (c') set."
+ },
+ {
+  "name": "D184 (c2) callout: the holdsTest branch moved below the p.tw === 1 row, so the primer and shakeout sentence wins",
+  "anchor": "    else if(p.tw === 1 && p.holdsTest) feedback.innerHTML = card('var(--signal)', 'Your test is in week 1. Nothing is left to train before it. You get the test week only.'+reach);\n    else if(p.tw === 1) feedback.innerHTML = card('var(--accent)', 'Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.'+reach);\n",
+  "replacement": "    else if(p.tw === 1) feedback.innerHTML = card('var(--accent)', 'Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.'+reach);\n    else if(p.tw === 1 && p.holdsTest) feedback.innerHTML = card('var(--signal)', 'Your test is in week 1. Nothing is left to train before it. You get the test week only.'+reach);\n",
+  "gate": "gates/g223_d184_testlen.js",
+  "note": "NAMED TRIP: R4 (all 603 cells print \"Primer lifts, a shakeout, then the test.\" in var(--accent)), both zones. R4D is not holdsTest and prints the same row either way; R4B is week 3: they stay green."
+ }
+]

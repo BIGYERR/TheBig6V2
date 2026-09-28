@@ -47,7 +47,8 @@
 //                  every record below _cut before any re-apply); sabotage S4 (drop R5) is what proves them.
 //   5L licence     slot detail != live is licensed up to LIC5L_MAX (70, the residue STEP printed over 15,545 chains, the
 //                  boot-side injury re-filter of section 12 (C)), each residue row's boot equal to the MAP boot. The licence
-//                  is a predicate on ia-version == 222: above 222 it is REFUSED and 5L demands a residue of 0 until re-ruled.
+//                  is a predicate on ia-version, LIC5L_ERAS.includes(VER): eras 222, 223 (each added by a re-ruling that
+//                  printed the same 68 rows); above the last listed era REFUSED, residue 0 until re-ruled.
 //   IA_ASSUME_VERSION=222 lifts a file stamped exactly 221 to 222 for a discrimination run. It is announced, and ignored
 //   on any other file. gate.sh never sets it.
 //   V221 tree      the up_ modes of rows 8 and 8d, and row 9, load the baseline from argv[3] when it reads 221, else from
@@ -82,7 +83,7 @@ const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const ERA = 222, BASE_ERA = 221, V221_COMMIT = '57b9dee80269743a40b350aa399351661dd9c06b';
-const LIC5L_ERA = 222, LIC5L_MAX = 70, LIC5L_OF = 15545;
+const LIC5L_ERAS = [222, 223], LIC5L_MAX = 70, LIC5L_OF = 15545;
 const NU = 40, N8 = 6;
 let pass = 0, fail = 0;
 const t0 = Date.now();
@@ -92,7 +93,7 @@ const done = () => { try { if(TMPD) fs.rmSync(TMPD, { recursive:true, force:true
 const R = {
   R5:  "row 5  untouched MARIO W5 Thu box->goblet->Leg press: boot = last live card in name AND detail (Leg press 4×8–12), chip offers goblet, two undos reach Barbell box squat 4×3 with the store empty",
   R5c: "row 5c untouched MARIO W5 Thu 2-cycle box->goblet->box: boots 1 and 2 = last live card (Barbell box squat 4×8–12)",
-  R5L: "row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the V222 residue licence; every residue row boots equal to the composed-map boot",
+  R5L: "row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras 222, 223); every residue row boots equal to the composed-map boot",
   R5X: "row 5X untouched reachable collide2 and exch3: whole day == live, all of them",
   R8:  "row 8  CONTROL hist-restored day boots byte-equal to its ia_hist_ record, every class x t1 t2 up_st up_bt up_ts",
   R8d: "row 8d CONTROL no duplicate item name on a booted hist-restored card (undercounts on injured MARIO; row 8 is the byte check)",
@@ -178,8 +179,8 @@ if(!(VER >= ERA)){
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();
 }
-const LIC5L = VER === LIC5L_ERA;
-console.log('  5L licence: ' + (LIC5L ? 'GRANTED at ia-version ' + VER + ' (residue <= ' + LIC5L_MAX + ', each residue row = MAP boot)' : 'REFUSED at ia-version ' + VER + ' (keyed on ' + LIC5L_ERA + ' only, standing ruling 2): residue must be 0 until re-ruled'));
+const LIC5L = LIC5L_ERAS.includes(VER);
+console.log('  5L licence: ' + (LIC5L ? 'GRANTED at ia-version ' + VER + ' (eras ' + LIC5L_ERAS.join(', ') + '; residue <= ' + LIC5L_MAX + ', each residue row = MAP boot)' : 'REFUSED at ia-version ' + VER + ' (eras ' + LIC5L_ERAS.join(', ') + ' only, standing ruling 2; above the last listed era ' + LIC5L_ERAS[LIC5L_ERAS.length - 1] + '): residue must be 0 until re-ruled'));
 // V221 baseline for the up_ modes and row 9
 let B = null, baseWhy = '';
 try {
@@ -334,12 +335,16 @@ console.log('  u rows ' + U.length + ' | ' + ((Date.now() - t0) / 1000).toFixed(
     if(r.slotBoot.n !== r.slotLive.n) o.name++; if(r.slotBoot.d !== r.slotLive.d){ o.det++; if(r.mapBoot === r.boot) o.resMap++; } });
   Object.keys(seg).sort().forEach(k => console.log('    5L ' + k.padEnd(10) + ' n ' + seg[k].n + '  name!=live ' + seg[k].name + '  detail!=live ' + seg[k].det + '  residue boot==MAP ' + seg[k].resMap + '/' + seg[k].det));
   const name = reach.filter(r => r.slotBoot.n !== r.slotLive.n), det = reach.filter(r => r.slotBoot.d !== r.slotLive.d), resOff = det.filter(r => r.mapBoot !== r.boot);
+  { const pr = {}; det.forEach(r => { const k = r.slotLive.d + ' -> ' + r.slotBoot.d; pr[k] = (pr[k] || 0) + 1; });
+    const ks = Object.keys(pr).sort((a, b) => pr[b] - pr[a] || (a < b ? -1 : a > b ? 1 : 0));
+    console.log('    5L residue pairs (live detail -> boot detail): ' + (ks.length ? ks.length + ' unique' : 'none'));
+    ks.forEach(k => console.log('      ' + pr[k] + '× ' + k)); }
   const moved = reach.filter(r => r.live !== r.pre).length, replayed = reach.filter(r => r.boot !== r.pre).length, multi = reach.filter(r => r.rec >= 2).length;
   console.log('    5L guard: chains that moved the live card ' + moved + ', boots that replayed a record ' + replayed + ', days booted with >=2 records ' + multi + ', hops not offered at replay (dropped) ' + (rows.length - reach.length));
   [name, resOff].forEach(l => l.slice(0, 3).forEach(r => console.log('      ' + tag(r) + '\n        live ' + r.slotLive.n + ' :: ' + r.slotLive.d.slice(0, 50) + '\n        boot ' + r.slotBoot.n + ' :: ' + r.slotBoot.d.slice(0, 50) + (r.mapBoot !== undefined ? '  (boot==MAP ' + (r.mapBoot === r.boot) + ')' : ''))));
   const cap = LIC5L ? LIC5L_MAX : 0;
   ok(R.R5L, SELF && mapLive && reach.length > 0 && moved > 0 && replayed > 0 && multi > 0 && name.length === 0 && det.length <= cap && resOff.length === 0,
-    'name!=live ' + name.length + '/' + reach.length + ', detail!=live ' + det.length + '/' + reach.length + ' (licence ' + (LIC5L ? '<= ' + LIC5L_MAX + ' of ' + LIC5L_OF + ' at 222' : 'REFUSED above 222: 0') + '), residue rows unlike the MAP boot ' + resOff.length);
+    'name!=live ' + name.length + '/' + reach.length + ', detail!=live ' + det.length + '/' + reach.length + ' (licence ' + (LIC5L ? '<= ' + LIC5L_MAX + ' of ' + LIC5L_OF + ', eras ' + LIC5L_ERAS.join(', ') : 'REFUSED above ' + LIC5L_ERAS[LIC5L_ERAS.length - 1] + ': 0') + '), residue rows unlike the MAP boot ' + resOff.length);
 }
 {
   const rows = U.filter(r => r.cls === 'collide2' || r.cls === 'exch3'), reach = rows.filter(r => !r.unreach);

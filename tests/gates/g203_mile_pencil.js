@@ -15,7 +15,8 @@
 //     pace chart gets exactly one pencil, run_base gets none because it has no
 //     runAnchor at all, and a beginner gets none because the beginner default is
 //     not a number the athlete owns.
-//   * the six mile-validation strings are the V176 (D9) literals, retyped here.
+//   * the mile-validation strings are typed here, one pair per era: the V176 (D9)
+//     literals at ia-version <= 222, D183's (P-SAFEPACE amendment 2 (e)) at >= 223.
 //     D116 reuses the wizard's validator; if anyone rewords one, this trips.
 //
 // VERSION PREDICATE (standing ruling 4 — a gate is keyed to the RULING it defends,
@@ -31,6 +32,16 @@
 //     would hide the only build that can exercise it.
 // The teeth are not lost. Stamp a copy of the V202 artifact to content="203" and
 // every D116 row fails on it, which is the proof that this predicate hides nothing.
+//
+// SECOND PREDICATE, the two race-date rows of section 3 (re-keyed V223 for D182 P-RACEDATE,
+// tests/edits/v223_t1_d182_g203_rekey.py). D182 changed what the lock sheet's "Days out" and
+// "Race day" rows print. The V203 rows are licensed at ia-version <= 222 (their era) and do not
+// run above it; the D182 rows run at >= 223. The summary names the era that ran.
+// The same predicate keys section 6's two refusal strings (re-keyed V223 for D183 P-SAFEPACE
+// amendment 2 (e), tests/edits/v223_t2_d183_rekey_g207_g218_g203.py): the V176 (D9) strings at
+// ia-version <= 222 (their era), D183's at >= 223. Both splits read one version, eraV:
+// IA_ASSUME_VERSION=223 lifts a file stamped exactly 222 to 223 for a discrimination run; it is
+// announced, ignored on any other stamp, and gate.sh never sets it.
 
 const path = require('path');
 const H = require(path.join(__dirname, '..', 'harness.js'));
@@ -52,9 +63,13 @@ const LOCK_BODY = 'You are too close to the race. Three weeks out the work is do
 const LOCK_BTN = 'Got it';
 const COMMIT_TOAST = 'Mile updated. Every run still ahead of you now reads from your new row.';
 
-// V176 (D9) literals. Retyped; the app must still carry these exact strings.
-const MSG_UNDER_3 = 'Under 3:00 isn’t a mile time — the world record is 3:43. Check the entry.';
-const MSG_OVER_25 = 'Over 25:00 reads as a walk, not a run — leave it blank and the program anchors on your experience level instead.';
+// The mile validator's two refusal strings, one pair per era (the predicate is eraV, section 0).
+// V176 (D9) literals, licensed at ia-version <= 222 (their era). Retyped.
+const MSG_UNDER_3_D9 = 'Under 3:00 isn’t a mile time — the world record is 3:43. Check the entry.';
+const MSG_OVER_25_D9 = 'Over 25:00 reads as a walk, not a run — leave it blank and the program anchors on your experience level instead.';
+// D183 (P-SAFEPACE amendment 2 (e), tests/measure/v223_rulings/p_safepace_ruling.md) at ia-version >= 223. Typed from the ruling.
+const MSG_UNDER_3_D183 = 'Under 3:00 is not a mile time. The world record is 3:43. Check the entry.';
+const MSG_OVER_25_D183 = 'Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead.';
 
 // D116 lock predicate, hand table: {totalWeeks, week, locked}
 const LOCK_TABLE = [
@@ -126,6 +141,20 @@ console.log('g203_mile_pencil  (D116 — the mile pencil)  artifact ia-version '
 // ── 0. the version predicate ──────────────────────────────────────────────────
 const RULING_V = 203;
 const artifactV = +IA.version;
+// ERA PREDICATE for the re-keyed rows (standing rulings 2 and 4): section 3's D182 race-date rows and
+// section 6's D183 refusal strings read one version, eraV. IA_ASSUME_VERSION=223 lifts a file stamped
+// exactly 222 to 223 for a discrimination run; it is announced and ignored on any other stamp. The D116
+// predicate and the era-row digest read the stamp, never eraV.
+const REKEY_ASSUME = 223;
+const eraV = (process.env.IA_ASSUME_VERSION === String(REKEY_ASSUME) && artifactV === REKEY_ASSUME - 1) ? REKEY_ASSUME : artifactV;
+if(eraV !== artifactV) console.log('ASSUMED ia-version ' + eraV + ' on a file stamped ' + artifactV + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
+const D183_ERA = 223;
+const MILE_MSG_TAG = eraV >= D183_ERA ? 'D183' : 'D9';
+const MILE_MSG_ERA = eraV >= D183_ERA
+  ? 'D183 era (ia-version ' + eraV + ' >= ' + D183_ERA + '): P-SAFEPACE amendment 2 (e) strings'
+  : 'D9 era (ia-version ' + eraV + ' <= ' + (D183_ERA - 1) + '): V176 (D9) strings';
+const MSG_UNDER_3 = eraV >= D183_ERA ? MSG_UNDER_3_D183 : MSG_UNDER_3_D9;
+const MSG_OVER_25 = eraV >= D183_ERA ? MSG_OVER_25_D183 : MSG_OVER_25_D9;
 const SURFACE = {
   'openMileSheet declared':      typeof IA.eval('typeof openMileSheet === "function" ? openMileSheet : undefined') === 'function',
   'commitMileChange declared':   typeof IA.eval('typeof commitMileChange === "function" ? commitMileChange : undefined') === 'function',
@@ -185,14 +214,44 @@ ok('body is the D116 text, verbatim', lock.indexOf(LOCK_BODY) >= 0, JSON.stringi
 ok('button is ' + JSON.stringify(LOCK_BTN), lock[lock.length-1] === LOCK_BTN, JSON.stringify(lock[lock.length-1]));
 ok('no re-paced draft wording survives', !/re-pace/i.test(doc.getElementById('mileLockBody').innerHTML));
 
-// facts block: days out computed HERE from the fixture race date
+// facts block. TWO ERAS, each licensed by a predicate on the artifact's ia-version (standing
+// rulings 2 and 4):
+//   pre-D182 (ia-version <= 222): the V203 rows, written when the sheet parsed the race date as
+//     UTC midnight and printed a bare "Dec 6, 2026". Their oracle does the same parse because that
+//     was the shipped behaviour of their era. Above 222 these two rows do not run.
+//   D182 (ia-version >= 223, P-RACEDATE, tests/measure/v223_rulings/p_racedate_ruling.md (i), (ii)
+//     and amendment (a) Q2): "Race day" prints the weekday date ("Sun, Dec 6, 2026") from a local
+//     parse; "Days out" is the day count while days >= 1, "Race day" at 0, "Behind you" below. The
+//     oracle is y/m/d integers only: weekday by Sakamoto's algorithm, month from a typed table, days
+//     by days-from-civil. The host clock supplies today's local y/m/d and nothing else.
 const raceDate = IA.fixtures.HALF_MANNY.raceDate;
-const rd = new Date(raceDate); rd.setHours(0,0,0,0);
-const t0 = new Date(); t0.setHours(0,0,0,0);
-const wantDaysOut = String(Math.round((rd - t0) / MS_DAY));
-const wantRaceStr = new Date(raceDate).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
-ok('days out line = ' + wantDaysOut, lock.indexOf(wantDaysOut) >= 0, JSON.stringify(lock));
-ok('race day line = ' + wantRaceStr, lock.indexOf(wantRaceStr) >= 0, JSON.stringify(lock));
+const D182_ERA = 223;
+const RACEDATE_ERA = eraV >= D182_ERA
+  ? 'D182 era (ia-version ' + eraV + ' >= ' + D182_ERA + '): hand y/m/d oracle, weekday date, local-parse Days out'
+  : 'pre-D182 era (ia-version ' + eraV + ' <= ' + (D182_ERA - 1) + '): UTC-parse oracle, bare month/day/year';
+if(eraV < D182_ERA){
+  const rd = new Date(raceDate); rd.setHours(0,0,0,0);
+  const t0 = new Date(); t0.setHours(0,0,0,0);
+  const wantDaysOut = String(Math.round((rd - t0) / MS_DAY));
+  const wantRaceStr = new Date(raceDate).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  ok('pre-D182 era: days out line = ' + wantDaysOut, lock.indexOf(wantDaysOut) >= 0, JSON.stringify(lock));
+  ok('pre-D182 era: race day line = ' + wantRaceStr, lock.indexOf(wantRaceStr) >= 0, JSON.stringify(lock));
+} else {
+  console.log('  n/a  the two pre-D182 race-date rows are licensed at ia-version <= ' + (D182_ERA - 1) + ' only; ia-version ' + eraV + ' runs the D182 rows in their place');
+  const WD3 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const MON3 = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const sakamoto = (y, m, d) => { const t = [0,3,2,5,0,3,5,1,4,6,2,4]; if(m < 3) y -= 1; return (y + Math.floor(y/4) - Math.floor(y/100) + Math.floor(y/400) + t[m-1] + d) % 7; };
+  const civ = (y, m, d) => { y -= m <= 2 ? 1 : 0; const era = Math.floor(y/400), yoe = y - era*400;
+    const doy = Math.floor((153*(m + (m > 2 ? -3 : 9)) + 2)/5) + d - 1;
+    return era*146097 + yoe*365 + Math.floor(yoe/4) - Math.floor(yoe/100) + doy - 719468; };
+  const [ry, rm, rdd] = raceDate.split('-').map(Number);
+  const now = new Date();
+  const days = civ(ry, rm, rdd) - civ(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  const wantDaysOut = days >= 1 ? String(days) : days === 0 ? 'Race day' : 'Behind you';
+  const wantRaceStr = WD3[sakamoto(ry, rm, rdd)] + ', ' + MON3[rm - 1] + ' ' + rdd + ', ' + ry;
+  ok('D182 era: days out line = ' + wantDaysOut + ' (' + days + ' days by hand)', lock[lock.indexOf('Days out') + 1] === wantDaysOut, JSON.stringify(lock));
+  ok('D182 era: race day line = ' + wantRaceStr, lock[lock.lastIndexOf('Race day') + 1] === wantRaceStr, JSON.stringify(lock));
+}
 ok('week line reads "Week 12 of 14"', /Week[\s\S]{0,40}?12 of 14/.test(lock.join(' ')), JSON.stringify(lock));
 
 console.log('\n3b. no raceDate omits the two date lines, keeps the week line');
@@ -271,10 +330,10 @@ g = commit('', '30');
 eq('blank minutes BLOCKS the commit', g.mileBestMins, '10');
 g = commit('2', '30');
 eq('2:30 rejected, value unchanged', g.mileBestMins + ':' + g.mileBestSecs, '10:30');
-eq('2:30 uses the D9 under-3:00 string', toasts[0], MSG_UNDER_3);
+eq('2:30 uses the ' + MILE_MSG_TAG + ' under-3:00 string', toasts[0], MSG_UNDER_3);
 g = commit('26', '00');
 eq('26:00 rejected, value unchanged', g.mileBestMins + ':' + g.mileBestSecs, '10:30');
-eq('26:00 uses the D9 over-25:00 string', toasts[0], MSG_OVER_25);
+eq('26:00 uses the ' + MILE_MSG_TAG + ' over-25:00 string', toasts[0], MSG_OVER_25);
 g = commit('4', '10');
 eq('4:10 advises but COMMITS', g.mileBestMins + ':' + g.mileBestSecs, '4:10');
 ok('4:10 toast leads with the ruled sentence', toasts[0].indexOf(COMMIT_TOAST) === 0, toasts[0]);
@@ -332,5 +391,7 @@ const cfgBefore = JSON.stringify(IA.fixtures.HALF_MANNY);
 IA.buildProgram(IA.fixtures.HALF_MANNY);
 eq('buildProgram left cfg byte-identical (no _racePin, no scratch)', JSON.stringify(IA.fixtures.HALF_MANNY), cfgBefore);
 
-console.log('\nPASS ' + pass + ' FAIL ' + fail);
+console.log('\nERA race-date rows: ' + RACEDATE_ERA);
+console.log('ERA mile validator strings: ' + MILE_MSG_ERA);
+console.log('PASS ' + pass + ' FAIL ' + fail);
 process.exit(fail ? 1 : 0);

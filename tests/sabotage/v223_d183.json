@@ -1,0 +1,93 @@
+[
+ {
+  "name": "D183 G3-1 (R1) the button is back on the dated card: the reach row carries \"Use this pace instead\"",
+  "anchor": "paceCeilingSentence(_f)+'</div>' : '';",
+  "replacement": "paceCeilingSentence(_f)+'<button onclick=\"applySuggestedPace(0,0)\" style=\"display:block;width:100%;margin-top:8px\">Use this pace instead</button></div>' : '';",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Plan G3 #1, the V222 button label. NAMED TRIP: B1 (a <button in #raceDateFeedback on every dated tw card with a ceiling, and \"Use this pace\" and applySuggestedPace back in the comment-stripped source), both zones. H168, S1, S2, S3, S5 and S9 ride: the button text sits inside every tw card that carries a reach, so each row reading the exact card text or asserting no button sees them."
+ },
+ {
+  "name": "D183 G3-2 (R2) the 80 ms timer is back: the step template repaints the card on a timer, not in this tick",
+  "anchor": "    updateRaceDateFeedback(); // D183 (P-SAFEPACE R2): the one repaint, in this tick",
+  "replacement": "    setTimeout(() => updateRaceDateFeedback(), 80); // D183 (P-SAFEPACE R2): the one repaint, in this tick",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Plan G3 #2. The call-site count stays 13, so M2 is not the trip. NAMED TRIP: T1 (renderWizardStep queues a timer; the stripped source holds the 80 ms timer), both zones. T2 rides (the unflushed render leaves the sentinels)."
+ },
+ {
+  "name": "D183 G3-3 (R1) the ceiling seeds from the experience default even when a mile is entered",
+  "anchor": "  const currentPace = mileBest || expCurrentPace;",
+  "replacement": "  const currentPace = expCurrentPace;",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Plan G3 #3. NAMED TRIP: S1 (mile 8:00 prints \"Your mile is 9:30.\" and the 570 s/mi reach), both zones. S4 rides (goal 12:00 from 9:30 now clears 45 s/mi, so a reach prints where none is ruled). S5, S8, S9 and L1 ride: every other mile 8:00 case prints 9:30 and its reach from 570 s/mi."
+ },
+ {
+  "name": "D183 G3-4 (R3) the test card prints weeksUntil (raceCountdown's weeks) instead of the pin's test week",
+  "anchor": "'Your test is in week '+p.tw+'.",
+  "replacement": "'Your test is in week '+cd.weeks+'.",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Plan G3 #4. The D184 beyond 26 row reads p.week, a different string, so the anchor is count 1 on the D184 tree. NAMED TRIP: H168 (card \"week 4\" against header \"5 weeks\", Mario's 21:16 clock), both zones. S1, S2, S3, S4 and S9 ride: each is a dated tw 5 card at the same clock, so each prints week 4."
+ },
+ {
+  "name": "D183 G3-5 (amendment 2 (f)) the ceiling reads a run-only L again, not the program length the caller passes",
+  "anchor": "  const improvingWeeks = Math.max(0, ((L - 1) / ageMult - 4) / 1.25);",
+  "replacement": "  L = calcProgramLength(['run'], {run:g,_experience:exp,_ageBracket:age,_eventTargeted:WD.eventTargeted}, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks;\n  const improvingWeeks = Math.max(0, ((L - 1) / ageMult - 4) / 1.25);",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Plan G3 #5, the plan's replacement verbatim. NAMED TRIP: L1 (\"In N weeks\" is 11, run-only, against the header 5 and 12; L1C proves they differ), both zones. S1, S2, S3, S5 and S9 ride: their reach numbers are typed at the pin's L, and L 11 moves them."
+ },
+ {
+  "name": "D183 G3-6 (amendment 2 (d)) the swim pace line drops its unit word",
+  "anchor": "' per 100 ' + unit + '.'",
+  "replacement": "' per 100.'",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Plan G3 #6. NAMED TRIP: SW1 (updateSwimPaceDisplay prints \"per 100.\" for yd and m; the inline template cells stay green), both zones."
+ },
+ {
+  "name": "D183 G3-7 (amendment 4) the run baseline handler loses its repaint",
+  "anchor": "WD.cardioGoals['run'].baseline=this.value+(WD.cardioGoals['run']?.paceUnit||'mi');updateRaceDateFeedback()\"",
+  "replacement": "WD.cardioGoals['run'].baseline=this.value+(WD.cardioGoals['run']?.paceUnit||'mi')\"",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Plan G3 #7, on the handler BL1 lifts (the pace goal's baseline input, V222's bytes). NAMED TRIP: BL1 (sentinel unreplaced, header stuck), both zones. M2 rides (updateRaceDateFeedback call sites 12, not 13)."
+ },
+ {
+  "name": "D183 G3-8 (amendment 2 brought in (2)) updatePaceDisplay divides the total by the raw targetDist again",
+  "anchor": "_clkMS(_t.tPacePerMile) + ' per mile.'",
+  "replacement": "_clkMS(_t.tTotalSecs / (parseFloat(g.targetDist)||1.5)) + ' per mile.'",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Plan G3 #8. 2 km in 12:00 reads 6:00 per mile, not 9:40; 1.5 mi still reads 8:00. NAMED TRIP: K1 (the repainted and after-handler 2 km cells), both zones."
+ },
+ {
+  "name": "D183 G3-9 (amendment 2 (e)) the Tap line gets its em dash back",
+  "anchor": "Tap to open the calendar. The final weeks taper so you arrive fresh.",
+  "replacement": "Tap to open calendar — the final weeks taper so you arrive fresh.",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Plan G3 #9, the V222 text byte-exact (base_v222.html). NAMED TRIP: M6 (a U+2014 in the rendered text of every dated state), both zones."
+ },
+ {
+  "name": "D183 G3-10 (R3) the name step drops the pin: Program length reads the goal length on a dated test",
+  "anchor": "const programWeeks = (wizardTestPin()||{}).tw || ",
+  "replacement": "const programWeeks = ",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Plan G3 #10. The anchor is the name step's own line, not wizardTestPin. NAMED TRIP: NS1 (Mario's WD reads the goal length, not \"5 weeks\"; tw 1 not \"1 week\"), both zones."
+ },
+ {
+  "name": "D183 A3-1 (amendment 3) the undated frame gets its heading back",
+  "anchor": "border:1px solid var(--accent)44\">'+",
+  "replacement": "border:1px solid var(--accent)44\">'+' <span style=\"font-weight:600\">That pace is faster than safe progression allows from your current fitness.</span>'+",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Amendment 3 sabotage 1, the V222 heading string byte-exact (no siren, so A3F is not the trip). NAMED TRIP: A3S (\"safe progression\" in the rendered step), both zones. S8 rides (its \"no safe\" clause, same frames)."
+ },
+ {
+  "name": "D183 A3-2 (amendment 3) the siren is back in paceCeilingOfferHTML",
+  "anchor": "    paceCeilingSentence(f)+",
+  "replacement": "    asyIcon('🚨',14)+' '+paceCeilingSentence(f)+",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Amendment 3 sabotage 2, V222's asyIcon('🚨',14) call. NAMED TRIP: A3F (an <svg in the framed #paceFeasLine frame), both zones."
+ },
+ {
+  "name": "D183 A3-3 (amendment 3) the past-date line flips to --accent",
+  "anchor": "<div style=\"color:var(--red);font-size:12px;margin-top:6px\">'+asyIcon('⚠',13)+' That date has already passed.",
+  "replacement": "<div style=\"color:var(--accent);font-size:12px;margin-top:6px\">'+asyIcon('⚠',13)+' That date has already passed.",
+  "gate": "gates/g223_d183_safepace.js",
+  "note": "Amendment 3 sabotage 3. NAMED TRIP: A3E (the past-date line, test and non-test, lacks var(--red)), both zones."
+ }
+]

@@ -22,17 +22,17 @@
   },
   {
     "name": "M4 -> the writer reads the raw wizard start instead of the RESOLVED start. A Sunday start with Sunday rest snaps to the next Monday (D25), so the stored program starts a week after the Monday the pin counted from and the test lands in week 4 of a 5-week block",
-    "anchor": "testWeekIndex(resolveStartDate(WD.startDate, WD.restDays || []).start, WD.raceDate)",
-    "replacement": "testWeekIndex(WD.startDate, WD.raceDate)",
+    "anchor": "progTestPin(WD, resolveStartDate(WD.startDate, WD.restDays || [], _rsRace(WD)).start)",
+    "replacement": "progTestPin(WD, WD.startDate)",
     "gate": "gates/g207_test_week.js",
-    "note": "NAMED TRIP: G5 goes red (stored _testWeek 5 and a 5-week program, want 4 from Mon 2026-09-28). Every Monday-start row agrees with the raw field and stays green, which is what isolates the resolved-start claim to G5. EXPECTED: G5 only."
+    "note": "RE-KEYED V223 (D184 (a)/(c): doGenerate's pin is progTestPin(WD, resolveStartDate(..., _rsRace(WD)).start); the V207 testWeekIndex(resolveStartDate(...).start, ...) anchor is gone). The mutated pin counts from the raw wizard field while _applyWizardStart still stores the resolved start. NAMED TRIP: G5 goes red twice (stored _testWeek 5 and a 5-week program, want 4 from Mon 2026-09-28; the generate screen names 5 weeks, want 4). Every Monday-start row agrees with the raw field and stays green, which is what isolates the resolved-start claim to G5. EXPECTED: G5 only."
   },
   {
     "name": "M5 -> the test-week pin becomes a latch: it is written only when there is a test week, so a later undated build on the same wizard draft stores the old pin",
-    "anchor": "  WD._testWeek = _testWeek;",
-    "replacement": "  if(_testWeek) WD._testWeek = _testWeek;",
+    "anchor": "  WD._testWeek = (_tp && _tp.tw) || null;",
+    "replacement": "  if(_tp && _tp.tw) WD._testWeek = _tp.tw;",
     "gate": "gates/g207_test_week.js",
-    "note": "NAMED TRIP: G2 goes red (stored _testWeek 5 on an undated 11-week build), and G3, G4, G6, G7 go red the same way. G1 and G5 set the pin and stay green. EXPECTED: G2 G3 G4 G6 G7."
+    "note": "RE-KEYED V223 (D184 (a)/(b): doGenerate's pin is progTestPin's, written as WD._testWeek = (_tp && _tp.tw) || null; the V207 _testWeek local is gone). NAMED TRIP: G2 goes red (stored _testWeek 5 on an undated 11-week build), and G3 (stale 5), G4c (stale 26 from G4b), G6 and G7 (stale 4 from G5) go red the same way. G1, G4, G4b and G5 set the pin and stay green; at 223 G4 pins week 15, so the null-pin row past the goal is G4c, week 27. EXPECTED: G2 G3 G4c G6 G7."
   },
   {
     "name": "M6 -> the helper parses ISO dates with new Date(iso), the UTC trap: 'YYYY-MM-DD' is UTC midnight, which is the evening before in America/New_York, so the start Monday and the test Monday can land in different weeks and an unreadable date returns NaN instead of null",
@@ -92,17 +92,17 @@
   },
   {
     "name": "M14 (slice C, coach) -> the backfill predicate is inverted: it runs only on programs that already carry the key, so a stored pre-V207 test goal is never repaired and keeps its 11-week grid with no test week",
-    "anchor": "  if(prog.cfg._testWeek === undefined){",
-    "replacement": "  if(prog.cfg._testWeek !== undefined){",
+    "anchor": "  if(prog.cfg._testWeek == null){",
+    "replacement": "  if(prog.cfg._testWeek != null){",
     "gate": "gates/g207_test_calendar.js",
-    "note": "NAMED TRIP: C3a (no key, 11 weeks), C3c (no trial on W5 Mon), C3d (key absent after the second refresh), C3g and C3h (no null key written). EXPECTED: C3a C3c C3d C3g C3h."
+    "note": "RE-KEYED V223 (D184 (a): the backfill guard is == null, absent or null re-derives until it pins; the === undefined anchor is gone). Inverted, it runs only on programs that already carry a pin. NAMED TRIP: C3a (no key, 11 weeks), C3c (no trial on W5 Mon), C3d (key absent after the second refresh), C3h (week 15 never pinned), C3i (the V209 null never re-pins). C3g and C3j stay green: at 223 a past or beyond-26 test writes nothing, which the inverted guard also does. EXPECTED: C3a C3c C3d C3h C3i."
   },
   {
     "name": "M15 (slice C, coach) -> the backfill runs on every refresh instead of once: the stored start moving a week later re-derives the test week from it",
-    "anchor": "  if(prog.cfg._testWeek === undefined){",
+    "anchor": "  if(prog.cfg._testWeek == null){",
     "replacement": "  if(true){",
     "gate": "gates/g207_test_calendar.js",
-    "note": "NAMED TRIP: C3d goes red (the second refresh derives 4 from the moved start; the ruled once-only backfill keeps 5). C3a-C3c, C3e-C3h stay green: a first run is identical. EXPECTED: C3d only."
+    "note": "RE-KEYED V223 (D184 (a): the backfill guard is == null, and it stops once the key is numeric; the === undefined anchor is gone). NAMED TRIP: C3d goes red (the second refresh derives 4 from the moved start; the ruled backfill stops at the pinned 5). C3a to C3c and C3e to C3j stay green: a first run is identical. EXPECTED: C3d only."
   },
   {
     "name": "M16 (slice C, coach) -> setProgStart does not re-pin: it still refreshes, but with the old test week, so a start moved a week later leaves the test in the wrong week and the block a week too long",
@@ -113,24 +113,24 @@
   },
   {
     "name": "M17 (slice C, builder) -> the backfill's past rule is removed: a stored program whose test already happened is compressed onto a test week that is behind the athlete",
-    "anchor": "      const _tw = (_rd && _td && _rd < _td) ? null : _tp.tw;   // a past test pins nothing",
-    "replacement": "      const _tw = _tp.tw;",
+    "anchor": "      if(!(_rd && _td && _rd < _td)){   // a past test pins nothing and writes nothing",
+    "replacement": "      if(true){   // a past test pins nothing and writes nothing",
     "gate": "gates/g207_test_calendar.js",
-    "note": "NAMED TRIP: C3g goes red (key 5 and 5 weeks, want null and 11). EXPECTED: C3g only."
+    "note": "RE-KEYED V223 (D184 (a): the past rule wraps the write, a past test writes nothing; the _tw ternary is gone). NAMED TRIP: C3g goes red (key 5, cap 5 and 5 weeks written and persisted, want no key, cfg bytes unchanged, 11). C3a to C3f and C3h to C3j are not past and stay green. EXPECTED: C3g only."
   },
   {
-    "name": "M18 (slice C, builder) -> the wizard sentence is reverted: a test goal inside its goal length is still told its full program stays intact, which slice A made false",
-    "anchor": "  const _tw = (_twz >= 1 && _twz <= recommended) ? _twz : null;",
-    "replacement": "  const _tw = null;",
+    "name": "M18 (slice C, builder) -> the wizard's test pin is dropped: a test goal inside its goal length is not told the week its program ends on",
+    "anchor": "  return {tw: (week >= 1 && week <= cap) ? week : null, len, week, cap};",
+    "replacement": "  return {tw: null, len, week, cap};",
     "gate": "gates/g207_test_calendar.js",
-    "note": "NAMED TRIP: C4a and C4b go red, and C4f goes red because the A4 sentence no longer renders. C4c stays green. EXPECTED: C4a C4b C4f."
+    "note": "RE-KEYED V223: D183 S4 deleted the wizard's own _tw expression and D184 (b1) made progTestPin the one owner of the dated pin (wizardTestPin returns it), so the pin's tw is where the wizard's week now comes from. At 223 a null tw sends the card to the D184 beyond 26 row. NAMED TRIP: C4a (week 5 sentence gone), C4b (tw 1 sentence gone), C4d (week 1 or 2 sentence gone), C4f (the typed sentences no longer render). C4c (week null) and C4e (NRC) stay green. C1a, C3a, C3c, C3d, C3h and C3i ride: progTestPin is the one owner, so doGenerate and setProgStart store no pin either. EXPECTED: C4a C4b C4d C4f."
   },
   {
-    "name": "M19 (slice C, builder) -> the red card loses its test-goal branch: a test goal under a week out is told there is not enough time to train, while the program still builds the test week",
-    "anchor": "+(_tg1 ? ' Your test is less than a week away.",
-    "replacement": "+(false ? ' Your test is less than a week away.",
+    "name": "M19 (slice C, builder) -> the card loses its test-week-one branch: a test goal in the start week is not told it gets the test week only, while the program still builds the test week",
+    "anchor": "    else if(p.tw === 1) feedback.innerHTML = card(",
+    "replacement": "    else if(false) feedback.innerHTML = card(",
     "gate": "gates/g207_test_calendar.js",
-    "note": "NAMED TRIP: C4d goes red, and C4f goes red because the red-card sentence no longer renders. C4e stays green. EXPECTED: C4d C4f."
+    "note": "RE-KEYED V223: D183 S4 deleted the red card's _tg1 branch; at 223 a test under a week out is never red and its tw 1 row is R3's this-week sentence (C4b, C4d). NAMED TRIP: C4b (the tw 1 sentence gone) and C4f (it no longer renders). C4d rides when the run date gives tw 1 by hand (today + 3 in the start week, D25 snap included) and stays green when it gives tw 2. C4e stays green. EXPECTED: C4b C4f (C4d on tw 1 days)."
   },
   {
     "name": "M20 (slice E, coach) -> the long-LSD limb is dropped from the trial hierarchy: a multi-sport week with no quality run falls to the only-LSD limb, so a week holding the long card alone prints no trial and a week holding two LSDs draws the easy one",

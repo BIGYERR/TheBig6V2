@@ -468,14 +468,21 @@ ok('C8 the survivor carries its own ss===60 correction on the following line' + 
 // The call-site count is ERA-KEYED (standing ruling 4): the count is a property of the build
 // that shipped it, so a gate row keyed to D126 alone would fire on somebody else's build.
 //   204..206: 11, D126's inventory.
-//   207 on:   13. D106a (V207) adds the NSW test-card detail in index.html (the trial card
+//   207..217: 13. D106a (V207) adds the NSW test-card detail in index.html (the trial card
 //             built in buildCardioProgression's race-pin post-pass, `detail:` line): the goal
 //             time and its pace, two calls, both through the one owner as D126 requires.
+//   218..222: 16. D157 (V218) three swim labels read the total through _clkMS.
+//   223 on:   27, and round-OUTSIDE 2 -> 0. D183 (V223) amendment 2 (a)/(b) and (d), R5's
+//             pace-line shapes and brought-in (2) the km lens: every time in the R1 sentence
+//             and on both pace lines goes through _clkMS (+11). R1 retired the offer
+//             (achievablePacePerMile / applySuggestedPace), which held the safeTotal pair.
+// `outside` is the round-OUTSIDE Math.round(x) % 60 count for the era; it was a flat 2 until V223.
 // A version with no row fails loudly. It never falls back to a neighbouring row.
 const CLK_CALLS_BY_ERA = [
-  { from: 204, to: 206,      calls: 11, why: 'D126 inventory' },
-  { from: 207, to: 217,      calls: 13, why: 'D106a (V207) test-card detail adds 2' },
-  { from: 218, to: Infinity, calls: 16, why: 'D157 (V218) three swim labels read the total through _clkMS: pace line 2393, initial render 2817, sizer label 3330' },
+  { from: 204, to: 206,      calls: 11, outside: 2, why: 'D126 inventory' },
+  { from: 207, to: 217,      calls: 13, outside: 2, why: 'D106a (V207) test-card detail adds 2' },
+  { from: 218, to: 222,      calls: 16, outside: 2, why: 'D157 (V218) three swim labels read the total through _clkMS: pace line 2393, initial render 2817, sizer label 3330' },
+  { from: 223, to: Infinity, calls: 27, outside: 0, why: 'D183 (V223) amendment 2 (a)/(b)/(d), R5, brought-in (2) add 11: paceCeilingSentence 5 (2456 x2, 2457, 2458, 2459), updatePaceDisplay 2 (2407), paceDisplayLine initial render 2 (2844), swim pace line per100 +1 (2386), swim initial render per100 +1 (2802); R1 retired the offer and its Math.round(safeTotal) % 60 pair' },
 ];
 const CLK_ROW = CLK_CALLS_BY_ERA.find(r => +VER >= r.from && +VER <= r.to) || null;
 ok('C8 CLK_CALLS_BY_ERA has a row for ia-version ' + VER + (CLK_ROW ? ' (' + CLK_ROW.why + ')' : ' (NO ROW)') + FIXIT,
@@ -483,8 +490,10 @@ ok('C8 CLK_CALLS_BY_ERA has a row for ia-version ' + VER + (CLK_ROW ? ' (' + CLK
 ok('C8 exactly ' + (CLK_ROW ? CLK_ROW.calls : '?') + ' _clkMS call sites and 1 declaration at ia-version ' + VER + ' (found ' + CENSUS.clkCalls.length + ' and ' + CENSUS.clkDecls.length + ')' + FIXIT,
    !!CLK_ROW && CENSUS.clkCalls.length === CLK_ROW.calls && CENSUS.clkDecls.length === 1,
    CENSUS.clkCalls.map(h => h.line).join(','));
-ok('C8 exactly 2 round-OUTSIDE Math.round(x) % 60 sites, both the known-correct safeTotal pair' + FIXIT,
-   CENSUS.roundOutside.length === 2 && CENSUS.roundOutside.every(h => /Math\.round\(safeTotal\)\s*%\s*60/.test(h.text)),
+const OUT_N = CLK_ROW ? CLK_ROW.outside : NaN;
+ok('C8 exactly ' + (CLK_ROW ? OUT_N : '?') + ' round-OUTSIDE Math.round(x) % 60 sites at ia-version ' + VER
+     + (OUT_N === 2 ? ', both the known-correct safeTotal pair' : OUT_N === 0 ? ' (D183 R1 retired the safeTotal pair with the offer)' : '') + FIXIT,
+   !!CLK_ROW && CENSUS.roundOutside.length === OUT_N && CENSUS.roundOutside.every(h => /Math\.round\(safeTotal\)\s*%\s*60/.test(h.text)),
    CENSUS.roundOutside.map(h => 'line ' + h.line + ': ' + h.text.slice(0, 50)).join(' | '));
 console.log('C8 CENSUS ' + ART + ': roundInside=' + CENSUS.roundInside.length + ' (line ' + survivor.line + ')'
   + ' clkCalls=' + CENSUS.clkCalls.length + ' [' + CENSUS.clkCalls.map(h => h.line).join(',') + ']'

@@ -1,0 +1,1599 @@
+# v223 rebase build3 — HEAD 2694374 ia-version 222 (== origin/main) vs V219 920fa0a; v212 scripts run UNMODIFIED on both; TZ per section header
+# spo TZ=America/Los_Angeles, spm TZ=America/New_York, m7/m8 TZ=America/Los_Angeles, rdtz/wo/wu spawn their own TZ children; clocks pinned by each script (2026-09-22)
+
+######## V222 rdtz
+######## rdtz rc-follows
+artifact /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0f257927-9d1c-4e52-aa95-54774c4b9ec8/scratchpad/measure/head_v222.html host TZ env (unset)
+harness pins TZ? NO (Date passed through from host)
+
+== 1. REPRO HALF_MANNY raceDate=2026-12-06, oracle {"card":"Dec 6, 2026","header":"Sun, Dec 6, 2026","wd":0}
+realclk America/New_York     vmTZ=America/New_York today=2026-09-27 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=69 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+realclk America/Los_Angeles  vmTZ=America/Los_Angeles today=2026-09-27 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=69 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+realclk UTC                  vmTZ=UTC today=2026-09-27 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=70 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+realclk Asia/Tokyo           vmTZ=Asia/Tokyo today=2026-09-28 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=69 | raceDay=sun start=2026-08-31 weeksOut=9 race@W14 sun weeks=14
+pinned  America/New_York     vmTZ=America/New_York today=2026-09-22 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=74 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+pinned  America/Los_Angeles  vmTZ=America/Los_Angeles today=2026-09-22 | CARD "Dec 5, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 5, 2026" daysOut=74 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+pinned  UTC                  vmTZ=UTC today=2026-09-22 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=75 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+   stored: {"top":"2026-12-06","cfg":"2026-12-06","typeofCfg":"string","weeksField":null}
+pinned  Asia/Tokyo           vmTZ=Asia/Tokyo today=2026-09-22 | CARD "Dec 6, 2026" timeOut=null | HEADER "Sun, Dec 6, 2026" | MILESHEET "Dec 6, 2026" daysOut=75 | raceDay=sun start=2026-08-31 weeksOut=10 race@W14 sun weeks=14
+
+== 3. SWEEP every day 2026-11-01..2027-10-31, clock pinned
+dates 365 x TZ 4 = 1460 builds; crashes 0
+America/New_York     surfaces disagree 365/365 | card!=oracle 365/365 header!=oracle 0/365 milesheet!=oracle 365/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {"Sun":53,"Mon":52,"Tue":52,"Wed":52,"Thu":52,"Fri":52,"Sat":52}
+   e.g. 2026-11-01 card "Oct 31, 2026" header "Sun, Nov 1, 2026"
+America/Los_Angeles  surfaces disagree 365/365 | card!=oracle 365/365 header!=oracle 0/365 milesheet!=oracle 365/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {"Sun":53,"Mon":52,"Tue":52,"Wed":52,"Thu":52,"Fri":52,"Sat":52}
+   e.g. 2026-11-01 card "Oct 31, 2026" header "Sun, Nov 1, 2026"
+UTC                  surfaces disagree 0/365 | card!=oracle 0/365 header!=oracle 0/365 milesheet!=oracle 0/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {}
+Asia/Tokyo           surfaces disagree 0/365 | card!=oracle 0/365 header!=oracle 0/365 milesheet!=oracle 0/365 | ENGINE vs UTC: raceDayIdx 0/365 weeks 0/365 startDate 0/365 raceDayKey 0/365 digest 0/365 | race card not on oracle weekday 0/365 | card-wrong by weekday {}
+  DST 2026-11-01 New_York:Oct 31, 2026|W14 sun  Los_Angeles:Oct 31, 2026|W14 sun  UTC:Nov 1, 2026|W14 sun  Tokyo:Nov 1, 2026|W14 sun
+  DST 2026-11-08 New_York:Nov 7, 2026|W14 sun  Los_Angeles:Nov 7, 2026|W14 sun  UTC:Nov 8, 2026|W14 sun  Tokyo:Nov 8, 2026|W14 sun
+  DST 2027-03-14 New_York:Mar 13, 2027|W14 sun  Los_Angeles:Mar 13, 2027|W14 sun  UTC:Mar 14, 2027|W14 sun  Tokyo:Mar 14, 2027|W14 sun
+  DST 2027-03-21 New_York:Mar 20, 2027|W14 sun  Los_Angeles:Mar 20, 2027|W14 sun  UTC:Mar 21, 2027|W14 sun  Tokyo:Mar 21, 2027|W14 sun
+baseline==itself (5 dates): true
+race placement spread (UTC): {"W14 sun":53,"W14 mon":52,"W14 tue":52,"W14 wed":52,"W14 thu":52,"W14 fri":52,"W14 sat":52}
+
+== PART 2: real renderers; wizard day 2026-08-31, race 2026-12-06, setProgRace -> 2026-12-13 on 2026-09-22
+-- America/New_York
+   wizard {"date":"2026-08-31","WD_raceDateWeeks":13,"review":"Race date Dec 5, 2026 (13 weeks away) Li"}
+   stored ia_programs {"raceDate":"2026-12-06","raceDateWeeks":13,"cfg_raceDate":"2026-12-06","cfg_raceDateWeeks":13}
+   setProgRace toast: Race day Sun, Dec 13 — plan starts Mon, Sep 7 ✓
+   [built @2026-08-31] {"tag":"built","day":"2026-08-31","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":13,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 5, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 5, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":1,"mileSheet":"(unlocked branch: no race date on sheet, curWk 1 < tw-2)"}
+   [today @2026-09-22] {"tag":"today","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":10,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 5, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 5, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":4,"mileSheet":"(unlocked branch: no race date on sheet, curWk 4 < tw-2)"}
+   [lockwin @2026-11-20] {"tag":"lockwin","day":"2026-11-20","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":2,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 5, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 5, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":12,"mileSheet":"Days out 15 Race day Dec 5, 2026 Week 12 of 14 You are too c"}
+   [afterSet @2026-09-22] {"tag":"afterSet","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":11,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 12, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 12, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":3,"mileSheet":"(unlocked branch: no race date on sheet, curWk 3 < tw-2)"}
+   [afterSet-lockwin @2026-11-27] {"tag":"afterSet-lockwin","day":"2026-11-27","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":2,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 12, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 12, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":12,"mileSheet":"Days out 15 Race day Dec 12, 2026 Week 12 of 14 You are too "}
+-- UTC
+   wizard {"date":"2026-08-31","WD_raceDateWeeks":13,"review":"Race date Dec 6, 2026 (13 weeks away) Li"}
+   stored ia_programs {"raceDate":"2026-12-06","raceDateWeeks":13,"cfg_raceDate":"2026-12-06","cfg_raceDateWeeks":13}
+   setProgRace toast: Race day Sun, Dec 13 — plan starts Mon, Sep 7 ✓
+   [built @2026-08-31] {"tag":"built","day":"2026-08-31","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":13,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 6, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 6, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":1,"mileSheet":"(unlocked branch: no race date on sheet, curWk 1 < tw-2)"}
+   [today @2026-09-22] {"tag":"today","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":10,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 6, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 6, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":4,"mileSheet":"(unlocked branch: no race date on sheet, curWk 4 < tw-2)"}
+   [lockwin @2026-11-20] {"tag":"lockwin","day":"2026-11-20","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-06","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-08-31","engine_weeksOut":2,"engine_raceIso":"2026-12-06","card_race":"Race date Dec 6, 2026 ","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 6, 2026 (13 wks out)","header":"Sun, Dec 6, 2026","curWk":12,"mileSheet":"Days out 16 Race day Dec 6, 2026 Week 12 of 14 You are too c"}
+   [afterSet @2026-09-22] {"tag":"afterSet","day":"2026-09-22","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":11,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 13, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 13, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":3,"mileSheet":"(unlocked branch: no race date on sheet, curWk 3 < tw-2)"}
+   [afterSet-lockwin @2026-11-27] {"tag":"afterSet-lockwin","day":"2026-11-27","top_raceDate":"2026-12-06","cfg_raceDate":"2026-12-13","top_raceDateWeeks":13,"cfg_raceDateWeeks":13,"totalWeeks":14,"startDate":"2026-09-07","engine_weeksOut":2,"engine_raceIso":"2026-12-13","card_race":"Race date Dec 13, 2026","card_timeOut":"Time out 13 weeks ","copy_event":"Event: Dec 13, 2026 (13 wks out)","header":"Sun, Dec 13, 2026","curWk":12,"mileSheet":"Days out 16 Race day Dec 13, 2026 Week 12 of 14 You are too "}
+## EXIT 0
+######## V219 rdtz vs V222 rdtz: diff lines after stripping artifact path, ia-version, line numbers, timing, clock:        0
+
+######## V222 wo
+######## wo rc-follows
+artifact /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0f257927-9d1c-4e52-aa95-54774c4b9ec8/scratchpad/measure/head_v222.html ia-version 222 | flooring line 4237
+
+== TZ America/New_York | pairs 42420 | weeksOut != oracle: 1330/42420
+   segments {"all:none":26007,"all:fall":6683,"all:both":21,"all:spring":9709,"bad:spring":1311,"bad:mod7=0":1330,"bad:none":19}
+   underFloor flips (oracle vs engine) per goal over the flagged pairs: {"run_5k":28,"run_10k":28,"run_half":42,"run_marathon":84}
+   today=2026-09-22 row: 0/140
+   first flagged: [{"a":"2026-11-02","b":"2027-03-15","days":133,"exp":19,"got":18},{"a":"2026-11-03","b":"2027-03-16","days":133,"exp":19,"got":18},{"a":"2026-11-04","b":"2027-03-17","days":133,"exp":19,"got":18}]
+
+== TZ UTC | pairs 42420 | weeksOut != oracle: 0/42420
+   segments {"all:none":26007,"all:fall":6683,"all:both":21,"all:spring":9709}
+   underFloor flips (oracle vs engine) per goal over the flagged pairs: {"run_5k":0,"run_10k":0,"run_half":0,"run_marathon":0}
+   today=2026-09-22 row: 0/140
+   first flagged: []
+
+== FOOTPRINT builds: NY 10640 UTC 10640 | (pair,goal) rows 5320 | build errors 0
+NY artifact vs NY counterfactual: rows differing 5320/5320 by field {"weeksOut":5320,"copy":5320,"underFloor":182}
+NY artifact vs UTC artifact:      rows differing 5320/5320 by field {"weeksOut":5320,"copy":5320,"underFloor":182}
+NY counterfactual vs UTC artifact: rows differing 0/5320 by field {}
+underFloor flips in built programs by goal: {"run_marathon":84,"run_half":42,"run_5k":28,"run_10k":28}
+EXAMPLE {
+ "a": "2026-11-02",
+ "b": "2027-03-15",
+ "g": "run_5k",
+ "before": "Your 5K is <b>Mon, Mar 15</b>, 18 weeks out. The 8-week plan starts <b>Mon, Jan 25</b> — 12 weeks from now — so it peaks on race week, not early. Until then: run easy three times a week, 30–45 minutes, nothing hard.",
+ "after": "Your 5K is <b>Mon, Mar 15</b>, 19 weeks out. The 8-week plan starts <b>Mon, Jan 25</b> — 12 weeks from now — so it peaks on race week, not early. Until then: run easy three times a week, 30–45 minutes, nothing hard.",
+ "ufB": false,
+ "ufA": false
+}
+
+PASS-ish summary: pairs 42420 flagged 1330 UTC flagged 0
+## EXIT 0
+######## V219 wo vs V222 wo: diff lines after stripping artifact path, ia-version, line numbers, timing, clock:        0
+
+######## V222 wu
+######## wu rc-follows
+
+== WU America/New_York | pairs 42420 | daysUntil != oracle 9709/42420 {"days:spring":9570,"days:none":139} | weeksUntil != oracle 1330/42420
+   offer rows (flagged pairs x 3 exp x 3 age x 4 dist): 47880 | shown engine 22946 oracle 19971 | gate flips 3479 | both shown 19719 | printed pace differs 16191 {"beginner":6069,"intermediate":5061,"advanced":5061}
+   EXAMPLE {"a":"2026-11-23","b":"2027-03-15","exp":"beginner","age":"55+","dist":"3mi","rec":17,"engineWeeks":15,"oracleWeeks":16,"before":"In 15 weeks you can safely reach 33:52 (11:17/mi)","after":"In 16 weeks you can safely reach 33:48 (11:16/mi)"}
+   click reach: unique (cfg, click) pairs 245 | builds 490 | errors 0  | calcProgramLength differs 62 | totalWeeks differs 62 | progDigest differs 245
+   BUILD EXAMPLE {"cfg":"beginner/55+/3mi","clickE":"33:52","clickO":"33:48","weeksE":16,"weeksO":17,"LE":16,"LO":17}
+
+== WU UTC | pairs 42420 | daysUntil != oracle 0/42420 {} | weeksUntil != oracle 0/42420
+   offer rows (flagged pairs x 3 exp x 3 age x 4 dist): 0 | shown engine 0 oracle 0 | gate flips 0 | both shown 0 | printed pace differs 0 {}
+   click reach: unique (cfg, click) pairs 0 | builds 0 | errors 0  | calcProgramLength differs 0 | totalWeeks differs 0 | progDigest differs 0
+
+WU DONE
+## EXIT 0
+######## V219 wu vs V222 wu: diff lines after stripping artifact path, ia-version, line numbers, timing, clock:        0
+
+######## V222 spo
+######## spo rc-follows
+artifact head_v222.html ia-version 222 today 2026-09-22 21:16 local TZ America/Los_Angeles
+oracle daysUntil(2026-10-20)= 28 -> floor/7 = 4
+
+== PART 0  goal-time sweep, 1.5mi, mile 8:00, intermediate 18-35, run only
+blank 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:00 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:15 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:30 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+9:45 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:00 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:15 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:30 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+10:45 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:00 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:15 11 11 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:30 10 10 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+11:45 8 8 4 14:15 var(--red) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+12:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+13:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+14:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:15 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:30 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+15:45 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+16:00 6 6 4 14:15 var(--accent) | after tap: hdr 6 rec 6 var(--accent) offer 14:15
+
+== PART 1  lattice
+builds (screens) 2592 | offer shown 2592 | rec weeks RISE after tap 248/2592 | header!=callout after tap 0/2592 | offer identical after tap 2592/2592
+  offer:advanced 864
+  offer:beginner 864
+  offer:intermediate 864
+  offerMile:420 432
+  offerMile:480 432
+  offerMile:540 432
+  offerMile:600 432
+  offerMile:660 432
+  offerMile:none 432
+  offerSlowerThanCurrentMile:advanced 144
+  offerSlowerThanCurrentMile:beginner 720
+  offerSlowerThanCurrentMile:intermediate 432
+  worse:advanced 200
+  worse:intermediate 48
+  worse:mile480 96
+  worse:mile540 56
+  worse:mile600 48
+  worse:mile660 48
+
+== PART 2  reporter screen (goal 12:00 = 8:00/mi, mile 8:00)
+S1 {"hdr":6,"rec":6,"wk":4,"offer":"14:15","card":"var(--accent)","btnBg":"var(--accent)","btnFg":"#0a0a0a","intact":false,"endsOnTest":true}
+S1 text: 4 weeks isn't enough time to hit this pace safely. Recommended: at least 6 weeks.Your program ends on your test. 5 weeks. The taper lands in front of it.In 4 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits.[BTN:Use this pace instead]
+S2 {"hdr":6,"rec":6,"wk":4,"offer":"14:15","card":"var(--accent)","btnBg":"var(--accent)","btnFg":"#0a0a0a","intact":false,"endsOnTest":true}
+S2 text: 4 weeks isn't enough time to hit this pace safely. Recommended: at least 6 weeks.Your program ends on your test. 5 weeks. The taper lands in front of it.In 4 weeks you can safely reach 1.5mi in 14:15 (9:30/mi) without exceeding safe progression limits.[BTN:Use this pace instead]
+S2 after 80ms timer flush: rec 6 offer 14:15
+WD diff across tap: WD.cardioGoals.run.targetMins: "12" -> 14 ; WD.cardioGoals.run.targetSecs: "00" -> 15 ; WD.cardioGoals.run.targetTime: "12:00" -> "14:15" ; WD._testWeek: undefined -> 5 ; WD._raceDateCappedWeeks: undefined -> 5
+original 12:00 still anywhere in WD after tap: false | localStorage keys holding "12:00": none
+build before tap {"totalWeeks":5,"testWeek":5,"digest":"e8364b168bb4137b","w1paces":["mon:Short Interval (SI):7:58/mi|8:14/mi","thu:Long Interval (LI):8:54/mi","fri:Long Slow Distance (LSD):10:44/mi","sat:Long Slow Distance (LSD):10:44/mi"],"finalWeekTypes":["Long Slow Distance (LSD)","1.5 Mile Test — TIME TRIAL"]}
+build after tap  {"totalWeeks":5,"testWeek":5,"digest":"2259ff98d3e26d8b","w1paces":["mon:Short Interval (SI):7:58/mi|8:14/mi","thu:Long Interval (LI):8:54/mi","fri:Long Slow Distance (LSD):10:44/mi","sat:Long Slow Distance (LSD):10:44/mi"],"finalWeekTypes":["Long Slow Distance (LSD)","1.5 Mile Test — TIME TRIAL"]}
+
+== PART 3  un-click paths
+tap again: goal 14:15 rec 6 offer 14:15
+renderWizardStep: goal 14:15 rec 6
+functions named *undo/revert/restore*Pace*: 0 | writers of targetMins in source: 8
+  js:1054 WD.cardioGoals['run'].targetMins = mins;
+  js:1609 <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['swim'].targetMins=this
+  js:1651 <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['run'].targetMins=this.
+  js:13734 next.targetMins=i.targetMins; next.targetSecs=i.targetSecs;
+
+== PART 4  mile re-entry
+mile-min oninput: WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updatePaceFeasibility();updateMileAdvisory()
+ mile="7": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 6
+ mile="10": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 11
+ mile="": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 6
+ mile="8": callout byte-identical after oninput: true | goal still 14:15 | hdr 6 | rec shown 6 | rec the date-field recompute would show 6
+callers of updateRaceDateFeedback in source:
+  js:785 const f=document.getElementById('raceDateFeedback'); if(f) updateRaceDateFeedback();
+  js:1060 // updateRaceDateFeedback() re-runs calcProgramLength() against the freshly-applied pace
+  js:1063 updateRaceDateFeedback();
+  js:1473 setTimeout(() => updateRaceDateFeedback(), 80);
+  js:1727 oninput="WD.raceDate=this.value;updateRaceDateFeedback()"
+goal-min oninput: WD.cardioGoals['run'].targetMins=this.value;updatePaceTime('run');updatePaceDisplay()
+
+== PART 4b  post-tap edit -> callout-only repaint, search for the 21:17 screen (hdr 6, rec 11, red, offer 14:15)
+sequences 168 | reproduce 21:17: 45
+  blank then mileBestMins="10" -> goal 14:15 mile 10:00
+  blank then mileBestMins="11" -> goal 14:15 mile 11:00
+  blank then mileBestMins="12" -> goal 14:15 mile 12:00
+  blank then mileBestMins="13" -> goal 14:15 mile 13:00
+  blank then mileBestMins="14" -> goal 14:15 mile 14:00
+  blank then mileBestMins="30" -> goal 14:15 mile 30:00
+  blank then mileBestMins="45" -> goal 14:15 mile 45:00
+  blank then targetMins="0" -> goal 0:15 mile 8:00
+  blank then targetMins="1" -> goal 1:15 mile 8:00
+  blank then targetMins="5" -> goal 5:15 mile 8:00
+  blank then targetMins="7" -> goal 7:15 mile 8:00
+  blank then targetMins="8" -> goal 8:15 mile 8:00
+  blank then targetMins="9" -> goal 9:15 mile 8:00
+  blank then targetMins="10" -> goal 10:15 mile 8:00
+  blank then targetMins="11" -> goal 11:15 mile 8:00
+  12:00 then mileBestMins="10" -> goal 14:15 mile 10:00
+  12:00 then mileBestMins="11" -> goal 14:15 mile 11:00
+  12:00 then mileBestMins="12" -> goal 14:15 mile 12:00
+  12:00 then mileBestMins="13" -> goal 14:15 mile 13:00
+  12:00 then mileBestMins="14" -> goal 14:15 mile 14:00
+  12:00 then mileBestMins="30" -> goal 14:15 mile 30:00
+  12:00 then mileBestMins="45" -> goal 14:15 mile 45:00
+  12:00 then targetMins="0" -> goal 0:15 mile 8:00
+  12:00 then targetMins="1" -> goal 1:15 mile 8:00
+  12:00 then targetMins="5" -> goal 5:15 mile 8:00
+  12:00 then targetMins="7" -> goal 7:15 mile 8:00
+  12:00 then targetMins="8" -> goal 8:15 mile 8:00
+  12:00 then targetMins="9" -> goal 9:15 mile 8:00
+  12:00 then targetMins="10" -> goal 10:15 mile 8:00
+  12:00 then targetMins="11" -> goal 11:15 mile 8:00
+  13:00 then mileBestMins="10" -> goal 14:15 mile 10:00
+  13:00 then mileBestMins="11" -> goal 14:15 mile 11:00
+  13:00 then mileBestMins="12" -> goal 14:15 mile 12:00
+  13:00 then mileBestMins="13" -> goal 14:15 mile 13:00
+  13:00 then mileBestMins="14" -> goal 14:15 mile 14:00
+  13:00 then mileBestMins="30" -> goal 14:15 mile 30:00
+  13:00 then mileBestMins="45" -> goal 14:15 mile 45:00
+  13:00 then targetMins="0" -> goal 0:15 mile 8:00
+  13:00 then targetMins="1" -> goal 1:15 mile 8:00
+  13:00 then targetMins="5" -> goal 5:15 mile 8:00
+  13:00 then targetMins="7" -> goal 7:15 mile 8:00
+  13:00 then targetMins="8" -> goal 8:15 mile 8:00
+  13:00 then targetMins="9" -> goal 9:15 mile 8:00
+  13:00 then targetMins="10" -> goal 10:15 mile 8:00
+  13:00 then targetMins="11" -> goal 11:15 mile 8:00
+
+== PART 5  button colours
+--accent #181712 --red #9e3328 --signal #CF4E1A --on-ink #F4F1E8
+S1 btn bg var(--accent) fg #0a0a0a contrast 1.10 : 1
+S2 (post-tap, same screen) btn bg var(--accent) fg #0a0a0a | red-card button (diff<=-3) #0a0a0a on --red contrast 2.79 : 1
+paceCeilingOffer btn bg var(--accent) fg var(--on-ink) contrast 15.89 : 1
+
+== PART 6  em-dashes in athlete-visible text of this screen
+count 11
+ 1. … goal for each. Running Outdoor or treadmill — pace, distance, race goals ✓ Run …
+ 2. …1 miles without stopping Run a 10K 6.2 miles — solid aerobic base Half Marathon …
+ 3. … solid aerobic base Half Marathon 13.1 miles — serious endurance Full Marathon 2…
+ 4. …— serious endurance Full Marathon 26.2 miles — the full distance Hit a Pace / Ti…
+ 5. …it a Pace / Time Goal Target distance + time — 1.5mi under 10 min, mile under 6,…
+ 6. …[BTN:km] Target time minutes : seconds 12:00 — 8:00/mi per mile How far can you …
+ 7. …n? (optional) mi Current mile time (optional — personalizes your training paces)…
+ 8. … seconds Cycling / Spin Spin bike or outdoor — intervals, FTP, distance ✓ Swimmi…
+ 9. …, distance ✓ Swimming Lap pool or open water — structured sets ✓ Program length:…
+ 10. … — structured sets ✓ Program length: 6 weeks — based on your longest cardio goal…
+ 11. …:Use this pace instead] Tap to open calendar — the final weeks taper so you arri…
+(for the 4-weeks NSW sentence pre-D106a see "stays intact" in S1 text above)
+## EXIT 0
+######## V219 spo vs V222 spo: diff lines after stripping artifact path, ia-version, line numbers, timing, clock:        0
+
+######## V222 spm
+######## spm rc-follows
+artifact head_v222.html ia-version 222 TZ America/New_York
+
+=== M1  goal time -> engine, dated run_pace_goal (1.5mi)
+-- static readers (base.html line : enclosing function : text)
+  :2286 updateRaceDateFeedback | const recommended = calcProgramLength(WD.cardioTypes||[], _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks
+  :2390 updateSwimPaceDisplay | const totalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0); // V218 (D157): the target is its total, the engine's pars
+  :2401 updatePaceTime | const mins = WD.cardioGoals[type].targetMins || 0;
+  :2409 updatePaceDisplay | if(!g || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) {
+  :2413 updatePaceDisplay | const totalSecs = (+(g.targetMins||0)*60) + (+(g.targetSecs||0));
+  :2416 updatePaceDisplay | el.innerHTML = asyIcon('🎯',13)+' ' + g.targetMins + ':' + String(g.targetSecs||0).padStart(2,'0') + ' — ' + pace + ' pe
+  :2432 assessRunPaceCeiling | if(!g || g.id !== 'run_pace_goal' || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) return null;
+  :2437 assessRunPaceCeiling | const tTotal = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+  :2452 assessRunPaceCeiling | const L = calcProgramLength(['run'], _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus] || 'balanced').weeks;
+  :2766 renderWizardStep | previewWeeks = calcProgramLength(WD.cardioTypes, _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks;
+  :2811 renderWizardStep | <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput
+  :2820 renderWizardStep | <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(((+g.targetMins||0)*60)+(+g.t
+  :2853 renderWizardStep | <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput
+  :2862 renderWizardStep | <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(WD.cardioGoals['run']?.tar
+  :3029 renderWizardStep | const programWeeks = WD.cardioTypes.length ? calcProgramLength(WD.cardioTypes,_nameGoalsExp,internalGoal).weeks : 6;
+  :3078 paceGoalTarget | if(g.targetMins !== undefined && g.targetMins !== '') {
+  :3079 paceGoalTarget | tTotalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+  :3080 paceGoalTarget | } else if(g.targetTime) {
+  :3081 paceGoalTarget | tTotalSecs = parseTimeToSecs(g.targetTime);
+  :3190 weeksToPace | var _pgT = paceGoalTarget(goal);
+  :3222 weeksToPace | var timeLabel = goal.targetMins ? goal.targetMins+':'+(String(goal.targetSecs||0).padStart(2,'0')) : '';
+  :3310 weeksToPace | var swimTimeEntered = isSwimTimeGoal && ((+goal.targetMins||0)*60 + (+goal.targetSecs||0)) > 0;
+  :3313 weeksToPace | var tTotal = (+goal.targetMins||0)*60 + (+goal.targetSecs||0);
+  :4715 buildSwimSession | const _tgtTotal = _swimTot(swimGoal.targetMins, swimGoal.targetSecs);
+  :6063 _nrcSpacedRunDays | const _pgT = paceGoalTarget(goal);
+  :6112 _nrcSpacedRunDays | const _g = cardioGoals.run || {}, _pt = paceGoalTarget(_g), _u = _g.paceUnit === 'km' ? 'km' : 'mi';
+  :6176 _nrcSpacedRunDays | const _g = cardioGoals.run, _pg = paceGoalTarget(_g);
+  :7425 generateProgram | const lengthResult=calcProgramLength(WD.cardioTypes||[],_wdGoalsExp,_wdInternalGoal);
+  :7528 doGenerate | let totalWeeksPreview=calcProgramLength(WD.cardioTypes||[],_previewGoals,LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanc
+  :7634 engineA_timeline | const cardioLength=calcProgramLength(cardioTypes,_goalsWithExp,goal);
+  :14633 progTestPin | const len = calcProgramLength(c.cardioTypes, {...c.cardioGoals, _experience:c.experience||'intermediate', _ageBracket:c.
+  :14692 runAnchorInfo | const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
+  :14693 runAnchorInfo | ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
+  :14834 _goalInputsValid | const hasTime=(+i.targetMins>0)||(+i.targetSecs>0);
+  :14881 renderGoalSheet | +'<input type="number" class="input-field" style="flex:0 0 58px;text-align:center" placeholder="min" min="0" max="99" va
+  :14887 renderGoalSheet | +'<input type="number" class="input-field" style="flex:1;text-align:center" placeholder="min" min="0" max="99" value="'+
+  :14935 commitGoalChange | const mins=+i.targetMins||0, secs=+i.targetSecs||0;
+  :14936 commitGoalChange | next.targetMins=i.targetMins; next.targetSecs=i.targetSecs;
+  goal blank | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest 7df7a6035b7d1cc0
+  goal 9:00 | hdr 11 rec 11 | _testWeek 5 totalWeeks 5 | digest 36f61bb8ed62839f
+  goal 10:30 | hdr 11 rec 11 | _testWeek 5 totalWeeks 5 | digest 82000618af64115a
+  goal 12:00 | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest 90370ff0d8eceaaa
+  goal 14:15 | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest 712e95427c3ebbba
+-- diff goal 12:00 vs 10:30 : 14 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":473,"rec":{"lo":235,"hi":294},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":528,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":639,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":639,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:48/mi. This week's goal pace is 8:04/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":468,"rec":{"lo":233,"hi":291},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":523,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":634,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":634,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":463,"rec":{"lo":230,"hi":288},"key":"int"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":629,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:29/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":629,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":629,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi. Goal 10:30 (7:00/mi)."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial","tgt":420}
+-- diff goal 12:00 vs 14:15 : 15 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":478,"rec":{"lo":238,"hi":297},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":534,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":644,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":644,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":478,"rec":{"lo":238,"hi":297},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":534,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":644,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":644,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:58/mi. This week's goal pace is 8:14/mi. Recovery: 3:58 to 4:57 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "Your goal pace is already within your current pace. This block holds your pace and builds your reps."
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":478,"rec":{"lo":238,"hi":297},"key":"int"}
+    W4/thu/Long Interval (LI) — Taper fields detail,dose
+       detail: "10 min continuous at Tempo Pace: 8:38/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "10 min continuous at Tempo Pace: 8:54/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":10,"tgt":518,"key":"chi"}
+             {"k":"time","mins":10,"tgt":534,"key":"chi"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":644,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:44/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":644,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:44/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":644,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi. Goal 14:15 (9:30/mi)."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial","tgt":570}
+-- diff goal 12:00 vs 9:00 : 14 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":473,"rec":{"lo":235,"hi":294},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":528,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":639,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":639,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:48/mi. This week's goal pace is 8:04/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":468,"rec":{"lo":233,"hi":291},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":523,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":634,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":634,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 6:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":463,"rec":{"lo":230,"hi":288},"key":"int"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":629,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:29/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":629,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":629,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi. Goal 9:00 (6:00/mi)."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial","tgt":360}
+-- diff goal 12:00 vs blank : 14 of 18 run sessions differ
+    W1/mon/Short Interval (SI) fields note
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+    W2/mon/Short Interval (SI) fields detail,note,dose
+       detail: "4x400m at 7:54/mi. This week's goal pace is 8:10/mi. Recovery: 3:56 to 4:55 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "4x400m at 7:53/mi. This week's goal pace is 8:09/mi. Recovery: 3:55 to 4:54 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":4,"m":400,"tgt":474,"rec":{"lo":236,"hi":295},"key":"int"}
+             {"k":"reps_dist","reps":4,"m":400,"tgt":473,"rec":{"lo":235,"hi":294},"key":"int"}
+    W2/thu/Long Interval (LI) fields detail,dose
+       detail: "15 min continuous at Tempo Pace: 8:49/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "15 min continuous at Tempo Pace: 8:48/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":15,"tgt":529,"key":"chi"}
+             {"k":"time","mins":15,"tgt":528,"key":"chi"}
+    W2/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.6 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.6 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.6,"tgt":640,"key":"easy"}
+             {"k":"dist","mi":2.6,"tgt":639,"key":"easy"}
+    W2/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:40/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+               "3.5 mi at Recovery Pace: 10:39/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 
+       dose: {"k":"dist","mi":3.5,"tgt":640,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":639,"key":"long"}
+    W3/mon/Short Interval (SI) fields detail,note,dose
+       detail: "5x400m at 7:49/mi. This week's goal pace is 8:05/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "5x400m at 7:48/mi. This week's goal pace is 8:04/mi. Recovery: 3:53 to 4:51 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":5,"m":400,"tgt":469,"rec":{"lo":233,"hi":291},"key":"int"}
+             {"k":"reps_dist","reps":5,"m":400,"tgt":468,"rec":{"lo":233,"hi":291},"key":"int"}
+    W3/thu/Long Interval (LI) fields detail,dose
+       detail: "16 min continuous at Tempo Pace: 8:44/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+               "16 min continuous at Tempo Pace: 8:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation."
+       dose: {"k":"time","mins":16,"tgt":524,"key":"chi"}
+             {"k":"time","mins":16,"tgt":523,"key":"chi"}
+    W3/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "3.1 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "3.1 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":3.1,"tgt":635,"key":"easy"}
+             {"k":"dist","mi":3.1,"tgt":634,"key":"easy"}
+    W3/sat/Long Slow Distance (LSD) fields detail,dose
+       detail: "4 mi at Recovery Pace: 10:35/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+               "4 mi at Recovery Pace: 10:34/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 mi
+       dose: {"k":"dist","mi":4,"tgt":635,"key":"long"}
+             {"k":"dist","mi":4,"tgt":634,"key":"long"}
+    W4/mon/Short Interval (SI) — Taper fields detail,note,dose
+       detail: "3x400m at 7:44/mi. This week's goal pace is 8:00/mi. Recovery: 3:51 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+               "3x400m at 7:43/mi. This week's goal pace is 7:59/mi. Recovery: 3:50 to 4:48 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Ad
+       note: "SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.
+             "SI: Pace moves 5 seconds per mile each week. That is the safe rate for your experience and age. Your full goal of 7:00/mi needs more weeks than this block has. The targe
+       dose: {"k":"reps_dist","reps":3,"m":400,"tgt":464,"rec":{"lo":231,"hi":288},"key":"int"}
+             {"k":"reps_dist","reps":3,"m":400,"tgt":463,"rec":{"lo":230,"hi":288},"key":"int"}
+    W4/fri/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.7 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.7 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.7,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.7,"tgt":629,"key":"easy"}
+    W4/sat/Long Slow Distance (LSD) — Taper fields detail,dose
+       detail: "3.5 mi at Recovery Pace: 10:30/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+               "3.5 mi at Recovery Pace: 10:29/mi (Zone 2). Taper week. Distance reduced intentionally.\n60–70% max HR. You must be able to speak in full sentences the entire time. If y
+       dose: {"k":"dist","mi":3.5,"tgt":630,"key":"long"}
+             {"k":"dist","mi":3.5,"tgt":629,"key":"long"}
+    W5/mon/Long Slow Distance (LSD) fields detail,dose
+       detail: "2.3 mi at Recovery Pace: 10:30/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+               "2.3 mi at Recovery Pace: 10:29/mi (Zone 2).\n60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower."
+       dose: {"k":"dist","mi":2.3,"tgt":630,"key":"easy"}
+             {"k":"dist","mi":2.3,"tgt":629,"key":"easy"}
+    W5/tue/1.5 Mile Test — TIME TRIAL fields detail,dose
+       detail: "1.5 mi. Goal 12:00 (8:00/mi)."
+               "1.5 mi."
+       dose: {"k":"dist","mi":1.5,"key":"trial","tgt":480}
+             {"k":"dist","mi":1.5,"key":"trial"}
+-- paired lattice: exp x mile x testOffset(days) x goal pair; everything else pinned
+  pairs 243 | totalWeeks differs 20 | _testWeek differs 8 | same-length pairs with >=1 run session changed 218 | run sessions changed 1788/5267
+    field detail 804
+    field dose 804
+    field note 1140
+    lenDiff advanced/mile480 5
+    lenDiff advanced/milenone 5
+    lenDiff intermediate/mile480 5
+    lenDiff intermediate/milenone 5
+    lenDiff off104 4
+    lenDiff off140 4
+    lenDiff off41 4
+    lenDiff off55 4
+    lenDiff off76 4
+    sessDiff advanced 66
+    sessDiff beginner 81
+    sessDiff intermediate 71
+   ex intermediate mile none test +41d: goal 12:00 -> 7 wk tw 7 | goal 14:15 -> 6 wk tw null
+   ex intermediate mile none test +55d: goal 12:00 -> 9 wk tw 9 | goal 14:15 -> 6 wk tw null
+   ex intermediate mile none test +76d: goal 12:00 -> 11 wk tw null | goal 14:15 -> 6 wk tw null
+   ex intermediate mile none test +104d: goal 12:00 -> 11 wk tw null | goal 14:15 -> 6 wk tw null
+
+=== M2  caller counts (base.html + tests/)
+  applySuggestedPace       raw 3 | non-comment 3 | def 1 | call sites 2 | inside on*="" attrs 2
+  achievablePacePerMile    raw 4 | non-comment 2 | def 1 | call sites 1 | inside on*="" attrs 0
+  paceCeilingOfferHTML     raw 5 | non-comment 5 | def 1 | call sites 4 | inside on*="" attrs 0
+  updatePaceFeasibility    raw 9 | non-comment 9 | def 1 | call sites 7 | inside on*="" attrs 4
+  updateRaceDateFeedback   raw 6 | non-comment 5 | def 1 | call sites 4 | inside on*="" attrs 1
+  assessRunPaceCeiling     raw 6 | non-comment 5 | def 1 | call sites 4 | inside on*="" attrs 0
+  previewWeeks             raw 3 | non-comment 3 | def 0 | call sites 0 | inside on*="" attrs 0
+  updatePaceDisplay        raw 4 | non-comment 4 | def 1 | call sites 3 | inside on*="" attrs 3
+  updatePaceTime           raw 6 | non-comment 6 | def 1 | call sites 5 | inside on*="" attrs 4
+  paceFeasLine             raw 4 | non-comment 2 | def 0 | call sites 0 | inside on*="" attrs 0
+  raceDateFeedback         raw 4 | non-comment 3 | def 0 | call sites 0 | inside on*="" attrs 0
+  80ms timer sites: 1
+    js:785 updateRaceDateFeedback <- offerShorterPlan
+    js:1063 updateRaceDateFeedback <- applySuggestedPace
+    js:1106 assessRunPaceCeiling <- updateRaceDateFeedback
+    js:1107 paceCeilingOfferHTML <- updateRaceDateFeedback
+    js:1117 assessRunPaceCeiling <- updateRaceDateFeedback
+    js:1120 paceCeilingOfferHTML <- updateRaceDateFeedback
+    js:1124 assessRunPaceCeiling <- updateRaceDateFeedback
+    js:1127 paceCeilingOfferHTML <- updateRaceDateFeedback
+    js:1149 achievablePacePerMile <- updateRaceDateFeedback
+    js:1157 applySuggestedPace <- updateRaceDateFeedback
+    js:1216 updatePaceFeasibility <- updatePaceDisplay
+    js:1275 applySuggestedPace <- paceCeilingOfferHTML
+    js:1286 assessRunPaceCeiling <- updatePaceFeasibility
+    js:1288 paceCeilingOfferHTML <- updatePaceFeasibility
+    js:1453 updatePaceFeasibility <- applySeedData
+    js:1473 updateRaceDateFeedback <- renderWizardStep
+    js:1674 updatePaceFeasibility <- renderWizardStep
+    js:1679 updatePaceFeasibility <- renderWizardStep
+    js:1695 updatePaceFeasibility <- renderWizardStep
+    js:1700 updatePaceFeasibility <- renderWizardStep
+    js:1727 updateRaceDateFeedback <- renderWizardStep
+    js:1735 updatePaceFeasibility <- renderWizardStep
+  tests: applySuggestedPace       3 files {"measure":18} 
+  tests: achievablePacePerMile    6 files {"measure":16} 
+  tests: paceCeilingOfferHTML     3 files {"measure":18} 
+  tests: updatePaceFeasibility    2 files {"measure":25} 
+  tests: updateRaceDateFeedback   8 files {"gates":1,"measure":54} gates/g207_test_calendar.js:1
+  tests: assessRunPaceCeiling     5 files {"measure":27} 
+  tests: previewWeeks             1 files {"measure":6} 
+  tests: updatePaceDisplay        1 files {"measure":14} 
+  tests: updatePaceTime           1 files {"measure":8} 
+
+=== M3  test under a week away: daysUntil 0..7 x 7 weekdays x rest patterns
+  builds 392 | _testWeek != UTC-Monday oracle (oracle<=6) 0
+  -- daysUntil x tw x totalWeeks (count over 7 weekdays x 7 rest patterns = 49 per du)
+    du0 tw=1 total=1 38
+    du0 tw=null total=6 11
+    du1 tw=1 total=1 41
+    du1 tw=2 total=2 2
+    du1 tw=null total=6 6
+    du2 tw=1 total=1 40
+    du2 tw=2 total=2 6
+    du2 tw=null total=6 3
+    du3 tw=1 total=1 37
+    du3 tw=2 total=2 11
+    du3 tw=null total=6 1
+    du4 tw=1 total=1 32
+    du4 tw=2 total=2 17
+    du5 tw=1 total=1 25
+    du5 tw=2 total=2 24
+    du6 tw=1 total=1 18
+    du6 tw=2 total=2 31
+    du7 tw=1 total=1 11
+    du7 tw=2 total=2 38
+  -- tw/total vs card sentence (du 0..7)
+    tw=1 total=1 weeksUntil=0 -> TESTWEEK-ONLY 231
+    tw=1 total=1 weeksUntil=1 -> ENDS-ON-TEST 11
+    tw=2 total=2 weeksUntil=0 -> TESTWEEK-ONLY 91
+    tw=2 total=2 weeksUntil=1 -> ENDS-ON-TEST 38
+    tw=null total=6 weeksUntil=0 -> TESTWEEK-ONLY 21
+  ex tw=2 with test-week-only card: 2026-09-22(tue) test 2026-09-28 rest none: start 2026-09-22, tw 2, totalWeeks 2; card: "Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test."
+  ex tw=null under a week: 2026-09-24(thu) test 2026-09-25 rest thu..sun: start 2026-09-28, tw null, totalWeeks 6; card: "Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test."
+
+=== M5  wizard header "Program length" vs built totalWeeks
+  [name-step sample, weeks mentions] nd tell it when to begin. Program name Start date Week 1 is short — you’ll train Tue || ep 24 , Fri, Sep 25 and Sat, Sep 26 , then a full week from Mon, Sep 28 . Program Su || Injury Prevention Cardio Run: x Program length 11 weeks Start date Tue, Sep 22, 2026  || — short first week Training days MO · TU · TH · 
+  builds 1080 | header != built 249/1080 | name-step "N weeks" != built 249/1080
+    base/dated n 96
+    base/undated n 12
+    race/dated n 384
+    race/undated n 48
+    test/dated DIS 249
+    test/dated NAME-DIS 249
+    test/dated n 480
+    test/dated tw-pinned DIS 249
+    test/undated n 60
+   ex test/dated | run_pace_goal "12:00" beginner mile none run test 2026-09-27: header 11, callout rec null, weeksUntil 0, _testWeek 1, built 1
+   ex name test/dated | run_pace_goal beginner mile none run test 2026-09-27: name step 11, header 11, built 1
+
+DONE
+## EXIT 0
+######## V219 spm vs V222 spm: diff lines after stripping artifact path, ia-version, line numbers, timing, clock:       16
+
+######## V222 m7
+######## m7 rc-follows
+anchor count 1
+base ia-version 222 surgery ia-version 222 TZ America/Los_Angeles
+
+=== 1  _testWeek - recommended   (lattice 4320 builds, errors 0 , pinned _testWeek != date oracle: 0)
+classes: inside = test before goal length end; equal; beyond = rec < tw <= 26; beyond26 = tw > 26 and > rec; nullTW = test before start
+-- all
+    all            n 4320 | inside 1161 | equal 144 | beyond<=26 2439 | beyond26 576 | null 0
+-- by experience
+    advanced       n 1440 | inside 329 | equal 48 | beyond<=26 871 | beyond26 192 | null 0
+    beginner       n 1440 | inside 472 | equal 48 | beyond<=26 728 | beyond26 192 | null 0
+    intermediate   n 1440 | inside 360 | equal 48 | beyond<=26 840 | beyond26 192 | null 0
+-- by weeks-to-test
+    a 1-4          n 576 | inside 576 | equal 0 | beyond<=26 0 | beyond26 0 | null 0
+    b 5-8          n 576 | inside 448 | equal 44 | beyond<=26 84 | beyond26 0 | null 0
+    c 9-12         n 576 | inside 137 | equal 92 | beyond<=26 347 | beyond26 0 | null 0
+    d 13-16        n 576 | inside 0 | equal 8 | beyond<=26 568 | beyond26 0 | null 0
+    e 17-20        n 576 | inside 0 | equal 0 | beyond<=26 576 | beyond26 0 | null 0
+    f 21-26        n 864 | inside 0 | equal 0 | beyond<=26 864 | beyond26 0 | null 0
+    g 27-30        n 576 | inside 0 | equal 0 | beyond<=26 0 | beyond26 576 | null 0
+-- by age
+    18-35          n 1440 | inside 373 | equal 48 | beyond<=26 827 | beyond26 192 | null 0
+    36-54          n 1440 | inside 389 | equal 48 | beyond<=26 811 | beyond26 192 | null 0
+    55+            n 1440 | inside 399 | equal 48 | beyond<=26 801 | beyond26 192 | null 0
+-- by goal / mile
+    1.5mi +mile    n 1080 | inside 312 | equal 36 | beyond<=26 588 | beyond26 144 | null 0
+    1.5mi nomile   n 1080 | inside 320 | equal 36 | beyond<=26 580 | beyond26 144 | null 0
+    1mi +mile      n 1080 | inside 260 | equal 36 | beyond<=26 640 | beyond26 144 | null 0
+    1mi nomile     n 1080 | inside 269 | equal 36 | beyond<=26 631 | beyond26 144 | null 0
+-- delta histogram {"0":144,"<=-10":72,"-9..-1":1089,"+1..+5":720,"+6..+10":720,"+11..+15":720,">+15":855}
+
+=== 2  P-TESTLEN surgery
+  builds changing totalWeeks 2439/4320 | largest extension 20 (1.5mi 12:30 intermediate 18-35 mile 8:00 test wk 26: 6 -> 26) | changed builds landing on 26 144 | unpinned -> pinned 2439 | changed build whose new length != date-oracle test week 0
+  unchanged-length builds whose digest moved anyway 0 | extension histogram {"+1..3":432,"+4..6":432,"+7..10":576,"+11..15":696,"+16..":303}
+
+=== 3  what the extra weeks contain (over 2439 changed builds)
+  run weeks 1..old identical to old program (extra weeks appended after) 0 | whole week objects identical 0 | old run weeks reappear as the LAST weeks (base prepended) 0 | neither (re-spread) 2439
+  example: 1mi 6:00 beginner 18-35 mile none test 2027-02-04 rec 9 | before 9 wk tw null | after 20 wk tw 20
+-- BEFORE
+  W 1  mon Short Interval 4x400m@11:14 | thu Long Interval @12:25 | fri Long Slow Distance @14:05 | sat Long Slow Distance @14:05   [lift: Strength Support, Leg Strength + Mobility]
+  W 2  mon Short Interval 4x400m@11:11 | thu Long Interval @12:22 | fri Long Slow Distance @14:03 | sat Long Slow Distance @14:03   [lift: Strength Support, Leg Strength + Mobility]
+  W 3  mon Short Interval 5x400m@11:08 | thu Long Interval @12:19 | fri Long Slow Distance @14:01 | sat Long Slow Distance @14:01   [lift: Strength Support, Leg Strength + Mobility]
+  W 4  mon Short Interval 5x400m@11:05 | thu Long Interval @12:15 | fri Long Slow Distance @13:59 | sat Long Slow Distance @13:59   [lift: Strength Support, Leg Strength + Mobility]
+  W 5  mon Short Interval 6x400m@11:02 | thu Long Interval @12:12 | fri Long Slow Distance @13:57 | sat Long Slow Distance @13:57   [lift: Strength Support, Leg Strength + Mobility]
+  W 6  mon Short Interval 6x400m@10:59 | thu Long Interval @12:09 | fri Long Slow Distance @13:55 | sat Long Slow Distance @13:55   [lift: Strength Support, Leg Strength + Mobility]
+  W 7  mon Short Interval 7x400m@10:56 | thu Long Interval @12:06 | fri Long Slow Distance @13:53 | sat Long Slow Distance @13:53   [lift: Strength Support, Leg Strength + Mobility]
+  W 8  mon Short Interval — Taper 4x400m@10:53 | thu Long Interval — Taper @12:03 | fri Long Slow Distance @13:51 | sat Long Slow Distance — Taper @13:51   [lift: Strength Support, Leg Strength + Mobility]
+  W 9  mon Short Interval — Taper 4x400m@10:53 | thu Long Interval — Taper @12:03 | fri Long Slow Distance @13:51 | sat Long Slow Distance — Taper @13:51   [lift: Strength Support, Leg Strength + Mobility]
+-- AFTER
+  W 1  mon Short Interval 4x400m@11:14 | thu Long Interval @12:25 | fri Long Slow Distance @14:05 | sat Long Slow Distance @14:05   [lift: Strength Support, Leg Strength + Mobility]
+  W 2  mon Short Interval 4x400m@11:11 | thu Long Interval @12:22 | fri Long Slow Distance @14:03 | sat Long Slow Distance @14:03   [lift: Strength Support, Leg Strength + Mobility]
+  W 3  mon Short Interval 5x400m@11:08 | thu Long Interval @12:19 | fri Long Slow Distance @14:01 | sat Long Slow Distance @14:01   [lift: Strength Support, Leg Strength + Mobility]
+  W 4  mon Short Interval 3x400m@11:08 | thu Long Interval @12:19 | fri Long Slow Distance @14:01 | sat Long Slow Distance @14:01   [lift: Strength Support, Leg Strength + Mobility]
+  W 5  mon Short Interval 6x400m@11:02 | thu Long Interval @12:12 | fri Long Slow Distance @13:57 | sat Long Slow Distance @13:57   [lift: Strength Support, Leg Strength + Mobility]
+  W 6  mon Short Interval 6x400m@10:59 | thu Long Interval @12:09 | fri Long Slow Distance @13:55 | sat Long Slow Distance @13:55   [lift: Strength Support, Leg Strength + Mobility]
+  W 7  mon Short Interval 7x400m@10:56 | thu Long Interval @12:06 | fri Long Slow Distance @13:53 | sat Long Slow Distance @13:53   [lift: Strength Support, Leg Strength + Mobility]
+  W 8  mon Short Interval 4x400m@10:56 | thu Long Interval @12:06 | fri Long Slow Distance @13:53 | sat Long Slow Distance @13:53   [lift: Strength Support, Leg Strength + Mobility]
+  W 9  mon Short Interval 8x400m@10:50 | thu Long Interval @11:59 | fri Long Slow Distance @13:49 | sat Long Slow Distance @13:49   [lift: Strength Support, Leg Strength + Mobility]
+  W10  mon Short Interval 8x400m@10:47 | thu Long Interval @11:56 | fri Long Slow Distance @13:47 | sat Long Slow Distance @13:47   [lift: Strength Support, Leg Strength + Mobility]
+  W11  mon Short Interval 8x400m@10:44 | thu Long Interval @11:53 | fri Long Slow Distance @13:45 | sat Long Slow Distance @13:45   [lift: Strength Support, Leg Strength + Mobility]
+  W12  mon Short Interval 5x400m@10:44 | thu Long Interval @11:53 | fri Long Slow Distance @13:45 | sat Long Slow Distance @13:45   [lift: Strength Support, Leg Strength + Mobility]
+  W13  mon Short Interval 8x400m@10:38 | thu Long Interval 2x@11:46 | fri Long Slow Distance @13:40 | sat Long Slow Distance @13:40   [lift: Strength Support, Leg Strength + Mobility]
+  W14  mon Short Interval 8x400m@10:35 | thu Long Interval 2x@11:43 | fri Long Slow Distance @13:38 | sat Long Slow Distance @13:38   [lift: Strength Support, Leg Strength + Mobility]
+  W15  mon Short Interval 8x400m@10:32 | thu Long Interval 2x@11:40 | fri Long Slow Distance @13:35 | sat Long Slow Distance @13:35   [lift: Strength Support, Leg Strength + Mobility]
+  W16  mon Short Interval 5x400m@10:32 | thu Long Interval @11:40 | fri Long Slow Distance @13:35 | sat Long Slow Distance @13:35   [lift: Strength Support, Leg Strength + Mobility]
+  W17  mon Short Interval 8x400m@10:26 | thu Long Interval 2x@11:33 | fri Long Slow Distance @13:30 | sat Long Slow Distance @13:30   [lift: Strength Support, Leg Strength + Mobility]
+  W18  mon Short Interval 8x400m@10:23 | thu Long Interval 2x@11:30 | fri Long Slow Distance @13:28 | sat Long Slow Distance @13:28   [lift: Strength Support, Leg Strength + Mobility]
+  W19  mon Short Interval — Taper 4x400m@10:20 | thu Long Interval — Taper @11:27 | fri Long Slow Distance @13:25 | sat Long Slow Distance — Taper @13:25   [lift: Strength Support, Leg Strength + Mobility]
+  W20  mon Short Interval — Taper 4x400m@10:20 | thu 1 Mile Test — TIME TRIAL @6:00   [lift: Strength Support, Test Day]
+  full grids: /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0f257927-9d1c-4e52-aa95-54774c4b9ec8/scratchpad/measure/h/m7s/testlen_example_{before,after}.txt
+
+=== 4  HALF_MANNY and non-test goals
+  HALF_MANNY base 0ac7da6b1691a8e1 self-stable true | surgery 0ac7da6b1691a8e1 | equal true | era row 207 0ac7da6b1691a8e1
+  race + run_base dated builds 210 errors 0 | digest changed 0 {}
+DONE
+## EXIT 0
+######## V219 m7 vs V222 m7: diff lines after stripping artifact path, ia-version, line numbers, timing, clock:        0
+
+######## V222 m8
+######## m8 rc-follows
+anchor counts 1 1 1
+versions base=222 S1=222 S2=222 S3=222 TZ America/Los_Angeles
+
+=== 1  rest patterns (S1 vs base, paired). test on Thu and Sat of program week k, k=1..30
+-- sun (6 train)        builds 5760 err 0 | changed 3256 | changed not ending on oracle test week 0 | pinned!=oracle 0 | unpinned->pinned 3256 | oracle tw>26 768 | same-length digest moved 0
+   ext {"+1..5":960,"+6..10":960,"+11..15":928,"+16..":408} | last-week run on test weekday: {"1.5 Mile Test — TIME TRIAL":1556,"1 Mile Test — TIME TRIAL":1700} | changed builds with training after the test day 0 | W1-3 run subtypes equal 3256/3256
+-- sat,sun (5)          builds 5760 err 0 | changed 3256 | changed not ending on oracle test week 0 | pinned!=oracle 0 | unpinned->pinned 3256 | oracle tw>26 768 | same-length digest moved 0
+   ext {"+1..5":960,"+6..10":960,"+11..15":928,"+16..":408} | last-week run on test weekday: {"1.5 Mile Test — TIME TRIAL":1556,"1 Mile Test — TIME TRIAL":1700} | changed builds with training after the test day 0 | W1-3 run subtypes equal 3256/3256
+-- mon,fri (5)          builds 5760 err 0 | changed 3256 | changed not ending on oracle test week 0 | pinned!=oracle 0 | unpinned->pinned 3256 | oracle tw>26 768 | same-length digest moved 0
+   ext {"+1..5":960,"+6..10":960,"+11..15":928,"+16..":408} | last-week run on test weekday: {"1.5 Mile Test — TIME TRIAL":1556,"1 Mile Test — TIME TRIAL":1700} | changed builds with training after the test day 0 | W1-3 run subtypes equal 3256/3256
+-- fri,sat,sun (4)      builds 5760 err 0 | changed 3256 | changed not ending on oracle test week 0 | pinned!=oracle 0 | unpinned->pinned 3256 | oracle tw>26 768 | same-length digest moved 0
+   ext {"+1..5":960,"+6..10":960,"+11..15":928,"+16..":408} | last-week run on test weekday: {"1.5 Mile Test — TIME TRIAL":1556,"1 Mile Test — TIME TRIAL":1700} | changed builds with training after the test day 0 | W1-3 run subtypes equal 3256/3256
+-- mon,wed,fri,sun (3)  builds 5760 err 0 | changed 3256 | changed not ending on oracle test week 0 | pinned!=oracle 0 | unpinned->pinned 3256 | oracle tw>26 768 | same-length digest moved 0
+   ext {"+1..5":960,"+6..10":960,"+11..15":928,"+16..":408} | last-week run on test weekday: {"1.5 Mile Test — TIME TRIAL":1556,"1 Mile Test — TIME TRIAL":1700} | changed builds with training after the test day 0 | W1-3 run subtypes equal 3256/3256
+-- sun,wed (5, M7)      builds 5760 err 0 | changed 3256 | changed not ending on oracle test week 0 | pinned!=oracle 0 | unpinned->pinned 3256 | oracle tw>26 768 | same-length digest moved 0
+   ext {"+1..5":960,"+6..10":960,"+11..15":928,"+16..":408} | last-week run on test weekday: {"1.5 Mile Test — TIME TRIAL":1556,"1 Mile Test — TIME TRIAL":1700} | changed builds with training after the test day 0 | W1-3 run subtypes equal 3256/3256
+   TOTAL builds 34560 err 0 changed 19536 changed-not-on-test 0 examples: []
+   t 0 s
+
+=== 2  stored V209 program, _testWeek null, trained days, boot the copy (refreshProgram) and setProgStart
+   stored programs 120 x 2 cfg shapes; stored cfg carries _testWeek key as written by V209: {"has":true,"val":null,"cap":9,"tot":9}
+   base asStored(null)       test<=26:true {"n":96,"ext":0,"endOnTest":9,"trainedDays":1688,"trainedMoved":0,"persistTW":{"10":9,"null":87},"firstChangedWeek":{"cw2:W-":32,"cw4:W-":32,"cw7:W-":32},"changedBeforeCw":0}
+   S1   asStored(null)       test<=26:true {"n":96,"ext":0,"endOnTest":9,"trainedDays":1688,"trainedMoved":0,"persistTW":{"10":9,"null":87},"firstChangedWeek":{"cw2:W-":32,"cw4:W-":32,"cw7:W-":32},"changedBeforeCw":0}
+   S1 setProgStart asStored(null) test<=26:true {"n":16,"len":{"k10:10->10 tw 10":2,"k14:11->11 tw null":2,"k20:11->11 tw null":2,"k26:11->11 tw null":2,"k10:9->9 tw null":2,"k14:9->9 tw null":2,"k20:9->9 tw null":2,"k26:9->9 tw null":2}}
+   S2   asStored(null)       test<=26:true {"n":96,"ext":0,"endOnTest":9,"trainedDays":1688,"trainedMoved":0,"persistTW":{"10":9,"null":87},"firstChangedWeek":{"cw2:W-":32,"cw4:W-":32,"cw7:W-":32},"changedBeforeCw":0}
+   S2 setProgStart asStored(null) test<=26:true {"n":16,"len":{"k10:10->10 tw 10":2,"k14:11->14 tw 14":2,"k20:11->20 tw 20":2,"k26:11->26 tw 26":2,"k10:9->10 tw 10":2,"k14:9->14 tw 14":2,"k20:9->20 tw 20":2,"k26:9->26 tw 26":2}}
+   S3   asStored(null)       test<=26:true {"n":96,"ext":87,"endOnTest":96,"trainedDays":1688,"trainedMoved":0,"persistTW":{"10":24,"14":24,"20":24,"26":24},"firstChangedWeek":{"cw2:W-":3,"cw4:W-":3,"cw7:W-":3,"cw2:W3":18,"cw4:W5":7,"cw7:W9":7,"cw2:W2":3,"cw4:W4":22,"cw7:W7":22,"cw2:W4":8},"changedBeforeCw":0}
+   S3 setProgStart asStored(null) test<=26:true {"n":16,"len":{"k10:10->10 tw 10":2,"k14:11->14 tw 14":2,"k20:11->20 tw 20":2,"k26:11->26 tw 26":2,"k10:9->10 tw 10":2,"k14:9->14 tw 14":2,"k20:9->20 tw 20":2,"k26:9->26 tw 26":2}}
+   base pre-V207(undefined)  test<=26:true {"n":96,"ext":0,"endOnTest":9,"trainedDays":1688,"trainedMoved":0,"persistTW":{"10":9,"null":87},"firstChangedWeek":{"cw2:W-":32,"cw4:W-":32,"cw7:W-":32},"changedBeforeCw":0}
+   S1   pre-V207(undefined)  test<=26:true {"n":96,"ext":0,"endOnTest":9,"trainedDays":1688,"trainedMoved":0,"persistTW":{"10":9,"null":87},"firstChangedWeek":{"cw2:W-":32,"cw4:W-":32,"cw7:W-":32},"changedBeforeCw":0}
+   S1 setProgStart pre-V207(undefined) test<=26:true {"n":16,"len":{"k10:10->10 tw 10":2,"k14:11->11 tw null":2,"k20:11->11 tw null":2,"k26:11->11 tw null":2,"k10:9->9 tw null":2,"k14:9->9 tw null":2,"k20:9->9 tw null":2,"k26:9->9 tw null":2}}
+   S2   pre-V207(undefined)  test<=26:true {"n":96,"ext":87,"endOnTest":96,"trainedDays":1688,"trainedMoved":0,"persistTW":{"10":24,"14":24,"20":24,"26":24},"firstChangedWeek":{"cw2:W-":3,"cw4:W-":3,"cw7:W-":3,"cw2:W3":18,"cw4:W5":7,"cw7:W9":7,"cw2:W2":3,"cw4:W4":22,"cw7:W7":22,"cw2:W4":8},"changedBeforeCw":0}
+   S2 setProgStart pre-V207(undefined) test<=26:true {"n":16,"len":{"k10:10->10 tw 10":2,"k14:11->14 tw 14":2,"k20:11->20 tw 20":2,"k26:11->26 tw 26":2,"k10:9->10 tw 10":2,"k14:9->14 tw 14":2,"k20:9->20 tw 20":2,"k26:9->26 tw 26":2}}
+   S3   pre-V207(undefined)  test<=26:true {"n":96,"ext":87,"endOnTest":96,"trainedDays":1688,"trainedMoved":0,"persistTW":{"10":24,"14":24,"20":24,"26":24},"firstChangedWeek":{"cw2:W-":3,"cw4:W-":3,"cw7:W-":3,"cw2:W3":18,"cw4:W5":7,"cw7:W9":7,"cw2:W2":3,"cw4:W4":22,"cw7:W7":22,"cw2:W4":8},"changedBeforeCw":0}
+   S3 setProgStart pre-V207(undefined) test<=26:true {"n":16,"len":{"k10:10->10 tw 10":2,"k14:11->14 tw 14":2,"k20:11->20 tw 20":2,"k26:11->26 tw 26":2,"k10:9->10 tw 10":2,"k14:9->14 tw 14":2,"k20:9->20 tw 20":2,"k26:9->26 tw 26":2}}
+   base asStored(null)       test<=26:false {"n":24,"ext":0,"endOnTest":0,"trainedDays":422,"trainedMoved":0,"persistTW":{"null":24},"firstChangedWeek":{"cw2:W-":8,"cw4:W-":8,"cw7:W-":8},"changedBeforeCw":0}
+   S1   asStored(null)       test<=26:false {"n":24,"ext":0,"endOnTest":0,"trainedDays":422,"trainedMoved":0,"persistTW":{"null":24},"firstChangedWeek":{"cw2:W-":8,"cw4:W-":8,"cw7:W-":8},"changedBeforeCw":0}
+   S1 setProgStart asStored(null) test<=26:false {"n":4,"len":{"k28:11->11 tw null":2,"k28:9->9 tw null":2}}
+   S2   asStored(null)       test<=26:false {"n":24,"ext":0,"endOnTest":0,"trainedDays":422,"trainedMoved":0,"persistTW":{"null":24},"firstChangedWeek":{"cw2:W-":8,"cw4:W-":8,"cw7:W-":8},"changedBeforeCw":0}
+   S2 setProgStart asStored(null) test<=26:false {"n":4,"len":{"k28:11->11 tw null":2,"k28:9->9 tw null":2}}
+   S3   asStored(null)       test<=26:false {"n":24,"ext":0,"endOnTest":0,"trainedDays":422,"trainedMoved":0,"persistTW":{"null":24},"firstChangedWeek":{"cw2:W-":8,"cw4:W-":8,"cw7:W-":8},"changedBeforeCw":0}
+   S3 setProgStart asStored(null) test<=26:false {"n":4,"len":{"k28:11->11 tw null":2,"k28:9->9 tw null":2}}
+   base pre-V207(undefined)  test<=26:false {"n":24,"ext":0,"endOnTest":0,"trainedDays":422,"trainedMoved":0,"persistTW":{"null":24},"firstChangedWeek":{"cw2:W-":8,"cw4:W-":8,"cw7:W-":8},"changedBeforeCw":0}
+   S1   pre-V207(undefined)  test<=26:false {"n":24,"ext":0,"endOnTest":0,"trainedDays":422,"trainedMoved":0,"persistTW":{"null":24},"firstChangedWeek":{"cw2:W-":8,"cw4:W-":8,"cw7:W-":8},"changedBeforeCw":0}
+   S1 setProgStart pre-V207(undefined) test<=26:false {"n":4,"len":{"k28:11->11 tw null":2,"k28:9->9 tw null":2}}
+   S2   pre-V207(undefined)  test<=26:false {"n":24,"ext":0,"endOnTest":0,"trainedDays":422,"trainedMoved":0,"persistTW":{"null":24},"firstChangedWeek":{"cw2:W-":8,"cw4:W-":8,"cw7:W-":8},"changedBeforeCw":0}
+   S2 setProgStart pre-V207(undefined) test<=26:false {"n":4,"len":{"k28:11->11 tw null":2,"k28:9->9 tw null":2}}
+   S3   pre-V207(undefined)  test<=26:false {"n":24,"ext":0,"endOnTest":0,"trainedDays":422,"trainedMoved":0,"persistTW":{"null":24},"firstChangedWeek":{"cw2:W-":8,"cw4:W-":8,"cw7:W-":8},"changedBeforeCw":0}
+   S3 setProgStart pre-V207(undefined) test<=26:false {"n":4,"len":{"k28:11->11 tw null":2,"k28:9->9 tw null":2}}
+   ex S3   asStored(null)       test<=26:true | 1.5mi 9:30 beginner test wk 14 cw 2: stored 11wk key null -> 14wk, changed weeks 3,5,6,7,9,10,11,12,13,14
+   ex S2   pre-V207(undefined)  test<=26:true | 1.5mi 9:30 beginner test wk 14 cw 2: stored 11wk key null -> 14wk, changed weeks 3,5,6,7,9,10,11,12,13,14
+   ex S3   pre-V207(undefined)  test<=26:true | 1.5mi 9:30 beginner test wk 14 cw 2: stored 11wk key null -> 14wk, changed weeks 3,5,6,7,9,10,11,12,13,14
+   t 0 s
+
+=== 3  D25 snap: test 0..7 days out x 7 weekdays x 7 rest patterns, base vs S1
+   builds 392 | base vs S1 digest differs 0
+    TEST BEFORE START tw=null built=6 21
+    pinned tw=1 built=1 242
+    pinned tw=2 built=2 129
+   ex 2026-09-24(thu) rest thu..sun test 2026-09-24(thu) +0d: start 2026-09-28, built 6 wk, generate screen "Your 6-week program is ready!", callout "Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test."
+   ex 2026-09-24(thu) rest thu..sun test 2026-09-25(fri) +1d: start 2026-09-28, built 6 wk, generate screen "Your 6-week program is ready!", callout "Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test."
+   ex 2026-09-24(thu) rest thu..sun test 2026-09-26(sat) +2d: start 2026-09-28, built 6 wk, generate screen "Your 6-week program is ready!", callout "Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test."
+
+=== 4/5  copy vs built length on S1 (rest sun,wed; clock 2026-09-22; test Thu of week k)
+   unchanged        n 421 | header==built 48 | name-step==built 48 | generate screen==built 421 | header==recommended 421 | callout N-week: {"eqBuilt":0,"eqRec":0,"none":421}
+        callout x373: N weeks isn't enough time to hit this pace safely. Recommended: at least N weeks. Your program ends on your test. N week
+        callout x48: Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test.
+   changed          n 827 | header==built 0 | name-step==built 0 | generate screen==built 827 | header==recommended 827 | callout N-week: {"eqBuilt":0,"eqRec":827,"none":0}
+        callout x379: ✓ Your N-week program finishes N weeks before race day — use the extra time to stay sharp. That pace is faster than safe
+        callout x352: ✓ Your N-week program finishes N weeks before race day — use the extra time to stay sharp.
+        callout x27: ✓ Perfect timing — your N-week program peaks right at race day. That pace is faster than safe progression allows from yo
+        callout x27: ✓ Your N-week program finishes N week before race day — use the extra time to stay sharp. That pace is faster than safe 
+   beyond26         n 192 | header==built 192 | name-step==built 192 | generate screen==built 192 | header==recommended 192 | callout N-week: {"eqBuilt":192,"eqRec":0,"none":0}
+        callout x108: ✓ Your N-week program finishes N weeks before race day — use the extra time to stay sharp. That pace is faster than safe
+        callout x84: ✓ Your N-week program finishes N weeks before race day — use the extra time to stay sharp.
+   ex unchanged | 1.5mi 9:30 beginner mile none test wk 1 (2026-09-24): rec 11, built 1, _testWeek 1, header "11 weeks", name step "11 weeks", generate "Your 1-week program is ready!", callout "Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test."
+   ex changed | 1.5mi 9:30 beginner mile none test wk 12 (2026-12-10): rec 11, built 12, _testWeek 12, header "11 weeks", name step "11 weeks", generate "Your 12-week program is ready!", callout "✓ Perfect timing — your 11-week program peaks right at race day. That pace is faster than safe progression allows from your current fitness. Over a realistic 11-week build, the fastest you can safely "
+   ex beyond26 | 1.5mi 9:30 beginner mile none test wk 27 (2027-03-25): rec 11, built 11, _testWeek null, header "11 weeks", name step "11 weeks", generate "Your 11-week program is ready!", callout "✓ Your 11-week program finishes 15 weeks before race day — use the extra time to stay sharp. That pace is faster than safe progression allows from your current fitness. Over a realistic 11-week build,"
+   ex b30 | k30: builds 11 wk, ends 2026-09-22 + 11 wks; weeks between program end and test week (oracle 30): 19; last-week Thu run: ["Long Interval (LI) — Taper"]
+
+=== HALF_MANNY and race/run_base
+   HALF_MANNY 0ac7da6b1691a8e1 0ac7da6b1691a8e1 0ac7da6b1691a8e1 0ac7da6b1691a8e1 0ac7da6b1691a8e1 | era row 209 0ac7da6b1691a8e1
+   race + run_base dated builds 210 errors 0 | digest changed {"S1":0,"S2":0,"S3":0}
+t 0 s  DONE
+## EXIT 0
+######## V219 m8 vs V222 m8: diff lines after stripping artifact path, ia-version, line numbers, timing, clock:        0
+
+######## V222 sgf
+######## sgf rc-follows
+artifact ia-version 222
+curWk=2 curTouched | a past-week untrained W1 mon -> KEPT (stored)
+curWk=2 curTouched | a2 past-week hist-only W1 tue -> KEPT (stored)
+curWk=2 curTouched | b cur trained (comp) W2 mon -> KEPT (stored)
+curWk=2 curTouched | b2 cur trained (hist snap) W2 tue -> KEPT (stored)
+curWk=2 curTouched | c cur untrained W2 thu -> REBUILT (live)
+curWk=2 curTouched | d next week W3 mon -> REBUILT (live)
+curWk=2 curTouched | e +4 weeks W6 mon -> REBUILT (live)
+curWk=2 curUntouched | a past-week untrained W1 mon -> KEPT (stored)
+curWk=2 curUntouched | a2 past-week hist-only W1 tue -> KEPT (stored)
+curWk=2 curUntouched | c cur untrained W2 thu -> REBUILT (live)
+curWk=2 curUntouched | d next week W3 mon -> REBUILT (live)
+curWk=2 curUntouched | e +4 weeks W6 mon -> REBUILT (live)
+curWk=4 curTouched | a past-week untrained W3 mon -> KEPT (stored)
+curWk=4 curTouched | a2 past-week hist-only W3 tue -> KEPT (stored)
+curWk=4 curTouched | b cur trained (comp) W4 mon -> KEPT (stored)
+curWk=4 curTouched | b2 cur trained (hist snap) W4 tue -> KEPT (stored)
+curWk=4 curTouched | c cur untrained W4 thu -> REBUILT (live)
+curWk=4 curTouched | d next week W5 mon -> REBUILT (live)
+curWk=4 curTouched | e +4 weeks W8 mon -> REBUILT (live)
+curWk=4 curUntouched | a past-week untrained W3 mon -> KEPT (stored)
+curWk=4 curUntouched | a2 past-week hist-only W3 tue -> KEPT (stored)
+curWk=4 curUntouched | c cur untrained W4 thu -> REBUILT (live)
+curWk=4 curUntouched | d next week W5 mon -> REBUILT (live)
+curWk=4 curUntouched | e +4 weeks W8 mon -> REBUILT (live)
+curWk=7 curTouched | a past-week untrained W6 mon -> KEPT (stored)
+curWk=7 curTouched | a2 past-week hist-only W6 tue -> KEPT (stored)
+curWk=7 curTouched | b cur trained (comp) W7 mon -> KEPT (stored)
+curWk=7 curTouched | b2 cur trained (hist snap) W7 tue -> KEPT (stored)
+curWk=7 curTouched | c cur untrained W7 thu -> REBUILT (live)
+curWk=7 curTouched | d next week W8 mon -> REBUILT (live)
+curWk=7 curTouched | e +4 weeks W11 mon -> REBUILT (live)
+curWk=7 curUntouched | a past-week untrained W6 mon -> KEPT (stored)
+curWk=7 curUntouched | a2 past-week hist-only W6 tue -> KEPT (stored)
+curWk=7 curUntouched | c cur untrained W7 thu -> REBUILT (live)
+curWk=7 curUntouched | d next week W8 mon -> REBUILT (live)
+curWk=7 curUntouched | e +4 weeks W11 mon -> REBUILT (live)
+
+SUMMARY kept 18 / 36
+  case a kept 6 / 6
+  case a2 kept 6 / 6
+  case b kept 3 / 3
+  case b2 kept 3 / 3
+  case c kept 0 / 6
+  case d kept 0 / 6
+  case e kept 0 / 6
+PROGRAM top-level keys: id,name,goal,liftingFocus,primaryPath,raceDate,raceDateWeeks,legRecoveryNote,liftRecoveryWeeks,taperWeeks,seed,cfg,totalWeeks,created,startDate,_swapUniverse,_swapUniverseByKey
+  created 1790541744389 | startDate null | blockOpen undefined | version-like legRecoveryNote,liftRecoveryWeeks,_swapUniverse,_swapUniverseByKey
+DONE
+## EXIT 0
+######## V219 sgf vs V222 sgf: diff lines after stripping artifact path, ia-version, line numbers, timing, clock:        4
+######## spm residual diff (non-line-number)
+44,48c44,48
+<   goal blank | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest 93378da9beac9976
+<   goal 9:00 | hdr 11 rec 11 | _testWeek 5 totalWeeks 5 | digest 8d9f7162db7921c9
+<   goal 10:30 | hdr 11 rec 11 | _testWeek 5 totalWeeks 5 | digest 6facd0e42065055a
+<   goal 12:00 | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest c1afd207853839c7
+<   goal 14:15 | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest a37f6c3c2519c962
+---
+>   goal blank | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest 7df7a6035b7d1cc0
+>   goal 9:00 | hdr 11 rec 11 | _testWeek 5 totalWeeks 5 | digest 36f61bb8ed62839f
+>   goal 10:30 | hdr 11 rec 11 | _testWeek 5 totalWeeks 5 | digest 82000618af64115a
+>   goal 12:00 | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest 90370ff0d8eceaaa
+>   goal 14:15 | hdr 6 rec 6 | _testWeek 5 totalWeeks 5 | digest 712e95427c3ebbba
+453c453
+<   [name-step sample, weeks mentions] nd tell it when to begin. Program name Start date Week 1 is short — you’ll train Tue || ep 24 , Fri, Sep 25 and Sat, Sep 26 , then a full week from Mon, Sep 28 . Program Su || njury Prevention Cardio Run — x Program length 11 weeks Start date Tue, Sep 22, 2026  || — short first week Training days MO · TU · TH · 
+---
+>   [name-step sample, weeks mentions] nd tell it when to begin. Program name Start date Week 1 is short — you’ll train Tue || ep 24 , Fri, Sep 25 and Sat, Sep 26 , then a full week from Mon, Sep 28 . Program Su || Injury Prevention Cardio Run: x Program length 11 weeks Start date Tue, Sep 22, 2026  || — short first week Training days MO · TU · TH · 
+
+######## probe.out
+920fa0a ia-version 219 | digest activeProg 30af36c61a17d4e5 stored 30af36c61a17d4e5 direct buildProgram 585330213b35f398 | weeks activeProg==direct true
+   activeProg vs direct: keys differing ["startDate"] | activeProg vs stored: []
+      startDate activeProg= "2026-09-22" | direct= null
+8ee4385 ia-version 220 | digest activeProg 30af36c61a17d4e5 stored 30af36c61a17d4e5 direct buildProgram 585330213b35f398 | weeks activeProg==direct true
+   activeProg vs direct: keys differing ["startDate"] | activeProg vs stored: []
+      startDate activeProg= "2026-09-22" | direct= null
+933a4af ia-version 221 | digest activeProg 2b711b9745c8d2e4 stored 30af36c61a17d4e5 direct buildProgram 585330213b35f398 | weeks activeProg==direct true
+   activeProg vs direct: keys differing ["overlays","startDate"] | activeProg vs stored: ["overlays"]
+      overlays activeProg= [] | direct= undefined
+      startDate activeProg= "2026-09-22" | direct= null
+2694374 ia-version 222 | digest activeProg 2b711b9745c8d2e4 stored 30af36c61a17d4e5 direct buildProgram 585330213b35f398 | weeks activeProg==direct true
+   activeProg vs direct: keys differing ["overlays","startDate"] | activeProg vs stored: ["overlays"]
+      overlays activeProg= [] | direct= undefined
+      startDate activeProg= "2026-09-22" | direct= null
+DONE
+
+######## anchors.out
+old /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0f257927-9d1c-4e52-aa95-54774c4b9ec8/scratchpad/measure/base_v219.html ia-version 219 | new index.html ia-version 222
+
+=== A. ANCHORS (raw count old/new | code-only count old/new | lines old -> new)
+P-RACEDATE    COUNT1 raw 1/1 code 1/1 | cited :4202 | old 4234 -> new 4237 | raceAlignment weeksOut raw floor
+P-RACEDATE    COUNT1 raw 1/1 code 1/1 | cited :4207 | old 4239 -> new 4242 | underFloor field
+P-RACEDATE    COUNT1 raw 1/1 code 1/1 | cited :4194 | old 4226 -> new 4229 | raceAlignment fn (helper sites beside it)
+P-RACEDATE    MULTI  raw 2/2 code 2/2 | cited :1959 | old 1959 -> new 1962 | aligned-start sentence al.weeksOut
+P-RACEDATE    COUNT1 raw 1/1 code 1/1 | cited :14199/:14477 | old 14655 -> new 14756 | progSelData raceStr UTC parse (copy + card)
+P-RACEDATE    COUNT1 raw 1/1 code 1/1 | cited :14213 | old 14669 -> new 14770 | raceWeeks read (card Time out)
+P-RACEDATE    COUNT1 raw 1/1 code 1/1 | cited :14398-14402 | old 14869 -> new 14970 | mile lock sheet UTC parse
+P-RACEDATE    MULTI  raw 4/4 code 4/4 | cited :14398-14402 | old 14683,14949 -> new 14784,15050 | mile sheet s.raceWeeks guard
+P-RACEDATE    COUNT1 raw 1/1 code 1/1 | cited :3022 | old 3040 -> new 3043 | wizard review UTC parse
+P-RACEDATE    COUNT1 raw 1/1 code 1/1 | cited :10510 | old 10908 -> new 10950 | program literal raceDate/raceDateWeeks
+P-RACEDATE    COUNT1 raw 1/1 code 1/1 | cited :2284 | old 2284 -> new 2287 | WD.raceDateWeeks writer in updateRaceDateFeedback
+P-RACEDATE    MULTI  raw 3/3 code 3/3 | cited :11508 | old 1959,11947,14522 -> new 1962,11989,14623 | header _fmtStartDay(<alignment>.raceIso, withYear)
+P-RACEDATE    MULTI  raw 3/3 code 3/3 | cited - | old 3040,14655,14869 -> new 3043,14756,14970 | any new Date(<x>.raceDate) UTC parse
+P-RACEDATE    COUNT1 raw 1/1 code 1/1 | cited :setProgRace | old 14522 -> new 14623 | setProgRace toast dash
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2229 | old 2229 -> new 2232 | function achievablePacePerMile
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2251 | old 2251 -> new 2254 | function applySuggestedPace
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2276 | old 2265 -> new 2268 | function updateRaceDateFeedback
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2279 | old 2279 -> new 2282 | daysUntil raw day count
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2280 | old 2280 -> new 2283 | weeksUntil raw floor
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2339 | old 2348 -> new 2351 | achievablePacePerMile(weeksUntil call
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2333 | old 2336 -> new 2339 | _twz/_tw in callout (testWeekIndex)
+P-SAFEPACE    MULTI  raw 2/2 code 2/2 | cited :2356/:2470 | old 2356,2474 -> new 2359,2477 | Use this pace instead button (any case)
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2427 | old 2427 -> new 2430 | function assessRunPaceCeiling
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2470 | old 2470 -> new 2473 | function paceCeilingOfferHTML
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2484 | old 2480 -> new 2483 | function updatePaceFeasibility
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2413 | old 2402 -> new 2405 | function updatePaceDisplay
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2672 | old 2672 -> new 2675 | 80 ms timer
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2760/:2903 | old 2912 -> new 2915 | header "Program length:"
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :3052 | old 3070 -> new 3073 | function paceGoalTarget
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :3208 | old 3088 -> new 3091 | function calcProgramLength
+P-SAFEPACE    MULTI  raw 10/10 code 10/10 | cited :2236 | old 2236,2241,2441,2445,3109,3196,3825,3827,4357,4358 -> new 2239,2244,2444,2448,3112,3199,3828,3830,4360,4361 | function expCurrentPace / expCurrentPace reads
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :1949 | old 1949 -> new 1952 | function wizardAlignment
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :1984 | old 1979 -> new 1982 | function offerShorterPlan
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :2652 | old 2640 -> new 2643 | function applySeedData
+P-SAFEPACE    COUNT1 raw 1/1 code 1/1 | cited :3017/:3034 | old 3029 -> new 3032 | name step resolveStartDate (_sr)
+P-SAFEPACE R5 COUNT1 raw 1/1 code 1/1 | cited :2753 | old 2753 -> new 2756 | run desc dash
+P-SAFEPACE R5 COUNT1 raw 1/1 code 1/1 | cited :2754 | old 2754 -> new 2757 | bike desc dash
+P-SAFEPACE R5 COUNT1 raw 1/1 code 1/1 | cited :2755 | old 2755 -> new 2758 | swim desc dash
+P-SAFEPACE R5 COUNT1 raw 1/1 code 1/1 | cited :2043 | old 2043 -> new 2046 | 10K desc
+P-SAFEPACE R5 COUNT1 raw 1/1 code 1/1 | cited :2044 | old 2044 -> new 2047 | half desc
+P-SAFEPACE R5 COUNT1 raw 1/1 code 1/1 | cited :2045 | old 2045 -> new 2048 | full desc
+P-SAFEPACE R5 MULTI  raw 2/2 code 1/1 | cited :2046 | old 2046,7590 -> new 2049,7596 | pace desc
+P-SAFEPACE R5 MULTI  raw 2/2 code 2/2 | cited :2861/:2882 | old 2870,2891 -> new 2873,2894 | optional personalizes
+P-SAFEPACE R5 COUNT1 raw 1/1 code 1/1 | cited :2903 | old 2912 -> new 2915 | based on your longest
+P-SAFEPACE R5 COUNT1 raw 1/1 code 1/1 | cited :2904 | old 2913 -> new 2916 | sessions rotate
+P-SAFEPACE R5 COUNT1 raw 1/1 code 1/1 | cited :2920 | old 2929 -> new 2932 | tap to open calendar
+P-SAFEPACE R5 COUNT1 raw 1/1 code 1/1 | cited :2413 | old 2413 -> new 2416 | paceDisplayLine dash + double unit
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited :7283/:7310 | old 7536 -> new 7539 | doGenerate D106a gate (M7/M8 ANC1)
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited :7308 | old 7535 -> new 7538 | doGenerate _testWeek derivation
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited :14266 | old 14535 -> new 14636 | progTestPin predicate (ANC2)
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited :14266 | old 14529 -> new 14630 | function progTestPin
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited :15338 | old 15625 -> new 15725 | backfill guard (ANC3)
+P-TESTLEN     COUNT1 raw 1/1 code 0/0 | cited :15333 | old 15620 -> new 15720 | backfill "ONE-TIME" comment
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited :3436 | old 3445 -> new 3448 | var NSW_TABLE6_INT
+P-TESTLEN     GONE   raw 0/0 code 0/0 | cited - | old - -> new - | NSW_TABLE6_INT.length - 1 (must be 0 before build)
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited :1910 | old 1912 -> new 1915 | resolveStartDate D25 snap
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited - | old 1904 -> new 1907 | function resolveStartDate
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited :11074 | old 11498 -> new 11540 | calcCurrentWeek diff<0 -> 1
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited :4234 | old 4250 -> new 4253 | testWeekIndex rounds
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited - | old 14544 -> new 14645 | setProgStart calls progTestPin
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited - | old 7538 -> new 7541 | D106a writer _raceDateCappedWeeks
+P-TESTLEN     COUNT1 raw 1/1 code 1/1 | cited - | old 7764 -> new 7770 | buildProgram test-date reader cfg._testWeek === totalWeeks
+D163          MULTI  raw 13/13 code 13/13 | cited L2406,2429,2859,3075,3219,14579 | old 2406,2429,2442,2859,3075,3193,6039,6175,7467,14577,14591,14815,14890 -> new 2409,2432,2445,2862,3078,3196,6042,6178,7470,14678,14692,14916,14991 | minutes-box readers (targetMins|mileBestMins undefined test)
+D163          MULTI  raw 4/4 code 4/4 | cited L3075 | old 2400,3077,3078,14836 -> new 2403,3080,3081,14937 | targetTime fallback
+
+=== B. FUNCTION SPANS old -> new
+   achievablePacePerMile    [2229,2243] -> [2232,2246] len 14 -> 14
+   applySuggestedPace       [2251,2263] -> [2254,2266] len 12 -> 12
+   updateRaceDateFeedback   [2265,2362] -> [2268,2365] len 97 -> 97
+   updatePaceTime           [2396,2401] -> [2399,2404] len 5 -> 5
+   updatePaceDisplay        [2402,2416] -> [2405,2419] len 14 -> 14
+   assessRunPaceCeiling     [2427,2468] -> [2430,2471] len 41 -> 41
+   paceCeilingOfferHTML     [2470,2476] -> [2473,2479] len 6 -> 6
+   updatePaceFeasibility    [2480,2489] -> [2483,2492] len 9 -> 9
+   paceGoalTarget           [3070,3085] -> [3073,3088] len 15 -> 15
+   calcProgramLength        [3088,3388] -> [3091,3391] len 300 -> 300
+   raceAlignment            [4226,4241] -> [4229,4244] len 15 -> 15
+   testWeekIndex            [4247,4252] -> [4250,4255] len 5 -> 5
+   resolveStartDate         [1904,1920] -> [1907,1923] len 16 -> 16
+   progTestPin              [14529,14536] -> [14630,14637] len 7 -> 7
+   setProgStart             [14537,14552] -> [14638,14653] len 15 -> 15
+   setProgRace              [14511,14524] -> [14612,14625] len 13 -> 13
+   progSelData              [14641,14673] -> [14742,14774] len 32 -> 32
+   refreshProgram           [15607,15865] -> [15707,15972] len 258 -> 265
+   doGenerate               [7517,7567] -> [7520,7573] len 50 -> 53
+   renderWizardStep         [2655,3053] -> [2658,3056] len 398 -> 398
+   calcCurrentWeek          [11492,11501] -> [11534,11543] len 9 -> 9
+   raceEveLiftPass          [11026,11048] -> [11068,11090] len 22 -> 22
+   wizardAlignment          [1949,1953] -> [1952,1956] len 4 -> 4
+   _applyWizardStart        [1998,2014] -> [2001,2017] len 16 -> 16
+
+=== C. FUNCTION BODY IDENTITY old vs new (text of the span)
+   achievablePacePerMile    IDENTICAL
+   applySuggestedPace       IDENTICAL
+   updateRaceDateFeedback   IDENTICAL
+   updatePaceTime           IDENTICAL
+   updatePaceDisplay        IDENTICAL
+   assessRunPaceCeiling     IDENTICAL
+   paceCeilingOfferHTML     IDENTICAL
+   updatePaceFeasibility    IDENTICAL
+   paceGoalTarget           IDENTICAL
+   calcProgramLength        IDENTICAL
+   raceAlignment            IDENTICAL
+   testWeekIndex            IDENTICAL
+   resolveStartDate         IDENTICAL
+   progTestPin              IDENTICAL
+   setProgStart             IDENTICAL
+   setProgRace              IDENTICAL
+   progSelData              IDENTICAL
+   refreshProgram           CHANGED
+   doGenerate               CHANGED
+   renderWizardStep         CHANGED
+   calcCurrentWeek          IDENTICAL
+   raceEveLiftPass          IDENTICAL
+   wizardAlignment          IDENTICAL
+   _applyWizardStart        IDENTICAL
+
+=== D. READERS: every line holding the token (raw / code-only) old -> new; full line list for NEW, code-only, each tagged with its enclosing ruled function
+-- raceDate\b: lines raw 34 -> 34 | code-only 32 -> 32
+   1955 [wizardAlignment] return raceAlignment(WD.cardioGoals.run.id, WD.raceDate, WD.eventTargeted !== false);
+   2006 [_applyWizardStart] ? raceAlignment(wd.cardioGoals.run.id, wd.raceDate, wd.eventTargeted !== false) : null;
+   2273 [updateRaceDateFeedback] if(input && input.value) WD.raceDate = input.value;
+   2274 [updateRaceDateFeedback] if(!WD.raceDate) {
+   2280 [updateRaceDateFeedback] const [ry,rm,rd] = WD.raceDate.split('-').map(Number);
+   2339 [updateRaceDateFeedback] ? testWeekIndex(resolveStartDate(WD.startDate, WD.restDays||[]).start, WD.raceDate) : null;
+   2487 [updatePaceFeasibility] if(WD.primaryPath === 'event' && WD.eventTargeted && WD.raceDate) return hide();
+   2671 [renderWizardStep] if(!WD.raceDate) {
+   2673 [renderWizardStep] WD.raceDate = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+   2921 [renderWizardStep] <button onclick="WD.eventTargeted=true;if(!WD.raceDate){const t=new Date();WD.raceDate=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).…
+   2922 [renderWizardStep] <button onclick="WD.eventTargeted=false;WD.raceDate='';WD.raceDateWeeks=null;renderWizardStep()" style="flex:1;font-family:var(--font-display);font-size:12px;font-weight:…
+   2927 [renderWizardStep] value="${WD.raceDate || (()=>{const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');})()}"
+   2929 [renderWizardStep] oninput="WD.raceDate=this.value;updateRaceDateFeedback()"
+   3043 [renderWizardStep] ...(WD.primaryPath==='event'&&WD.raceDate?[['Race date', new Date(WD.raceDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+(WD.raceDateWeeks?…
+   7537 [doGenerate] let _testWeek = (_tg && PACE_GOALS.has(_tg.id) && WD.eventTargeted !== false && WD.raceDate)
+   7538 [doGenerate] ? testWeekIndex(resolveStartDate(WD.startDate, WD.restDays || []).start, WD.raceDate) : null;
+   7764 [-] const _align = cardioTypes.includes('run') && cardioGoals.run ? raceAlignment(cardioGoals.run.id, cfg.raceDate, cfg.eventTargeted !== false) : null;
+   7770 [-] && cfg._testWeek && cfg._testWeek === totalWeeks) ? _parseLocalDate(cfg.raceDate) : null;
+   10950 [-] return {id,name:cfg.name||'My Program',goal,liftingFocus:cfg.liftingFocus,primaryPath:cfg.primaryPath,raceDate:cfg.raceDate||null,raceDateWeeks:cfg.raceDateWeeks||null,le…
+   11989 [-] if(rw){ rw.style.display=_al?'flex':'none'; const ri=document.getElementById('raceDateInput'); if(ri) ri.value=_c.raceDate||''; const rd=document.getElementById('raceDate…
+   14610 [-] return raceAlignment(c.cardioGoals.run.id, c.raceDate, c.eventTargeted!==false);
+   14614 [setProgRace] const before=activeProg.cfg.raceDate;
+   14615 [setProgRace] activeProg.cfg.raceDate=dateStr;
+   14617 [setProgRace] if(!_al){ activeProg.cfg.raceDate=before; showToast('That date didn\u2019t resolve'); return; }
+   14632 [progTestPin] if(!(c.cardioTypes||[]).includes('run') || !g || !PACE_GOALS.has(g.id) || c.eventTargeted === false || !c.raceDate) return null;
+   14635 [progTestPin] const tw = testWeekIndex(startIso, c.raceDate);
+   14756 [progSelData] if(c.raceDate){try{raceStr=new Date(c.raceDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch(_){raceStr=String(c.raceDate);}}
+   14969 [-] if(c.raceDate){
+   14970 [-] let rd=null; try{ rd=new Date(c.raceDate); }catch(_){ rd=null; }
+   14974 [-] let rs=''; try{ rs=rd.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(_){ rs=String(c.raceDate); }
+   15643 [-] _sub+=(_cfg.raceDate&&_cfg.eventTargeted!==false)
+   15728 [refreshProgram] const _rd = _parseLocalDate(prog.cfg.raceDate), _td = _parseLocalDate(_isoToday());
+-- raceDateWeeks: lines raw 7 -> 7 | code-only 6 -> 6
+   2287 [updateRaceDateFeedback] WD.raceDateWeeks = weeksUntil;
+   2769 [renderWizardStep] if(!WD.eventTargeted) WD.raceDateWeeks = null;
+   2922 [renderWizardStep] <button onclick="WD.eventTargeted=false;WD.raceDate='';WD.raceDateWeeks=null;renderWizardStep()" style="flex:1;font-family:var(--font-display);font-size:12px;font-weight:…
+   3043 [renderWizardStep] ...(WD.primaryPath==='event'&&WD.raceDate?[['Race date', new Date(WD.raceDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+(WD.raceDateWeeks?…
+   10950 [-] return {id,name:cfg.name||'My Program',goal,liftingFocus:cfg.liftingFocus,primaryPath:cfg.primaryPath,raceDate:cfg.raceDate||null,raceDateWeeks:cfg.raceDateWeeks||null,le…
+   14770 [progSelData] raceStr, raceWeeks:(c.raceDateWeeks||p.raceDateWeeks||null),
+-- raceStr: lines raw 5 -> 5 | code-only 5 -> 5
+   14755 [progSelData] let raceStr='';
+   14756 [progSelData] if(c.raceDate){try{raceStr=new Date(c.raceDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch(_){raceStr=String(c.raceDate);}}
+   14770 [progSelData] raceStr, raceWeeks:(c.raceDateWeeks||p.raceDateWeeks||null),
+   14784 [-] const eventGroup=s.eventTargeted?`<div class="det-group"><div class="det-label">Event target</div>${row('Race date',s.raceStr||'No date set')}${s.raceWeeks?row('Time out'…
+   15050 [-] if(s.eventTargeted)lines.push('Event: '+(s.raceStr||'no date')+(s.raceWeeks?' ('+s.raceWeeks+' wks out)':''));
+-- raceWeeks: lines raw 3 -> 3 | code-only 3 -> 3
+   14770 [progSelData] raceStr, raceWeeks:(c.raceDateWeeks||p.raceDateWeeks||null),
+   14784 [-] const eventGroup=s.eventTargeted?`<div class="det-group"><div class="det-label">Event target</div>${row('Race date',s.raceStr||'No date set')}${s.raceWeeks?row('Time out'…
+   15050 [-] if(s.eventTargeted)lines.push('Event: '+(s.raceStr||'no date')+(s.raceWeeks?' ('+s.raceWeeks+' wks out)':''));
+-- weeksOut: lines raw 4 -> 4 | code-only 3 -> 3
+   1962 [-] const raceTxt = '<b>'+_fmtStartDay(al.raceIso)+'</b>, '+al.weeksOut+' week'+(al.weeksOut===1?'':'s')+' out';
+   4237 [raceAlignment] const weeksOut = Math.floor((race - today)/86400000/7);
+   4242 [raceAlignment] start:_isoOf(start), weeksOut, openWeek: futureWeeks ? 1 : openWeek, floor, underFloor: weeksOut < floor, futureWeeks,
+-- underFloor: lines raw 5 -> 5 | code-only 4 -> 4
+   1969 [-] if(al.underFloor){
+   2309 [updateRaceDateFeedback] feedback.innerHTML = card(_al.underFloor ? 'var(--signal)' : 'var(--run)', alignedStartCopy(_al)) + (_f ? paceCeilingOfferHTML(_f) : '');
+   3037 [renderWizardStep] ? `<div class="input-group"><div class="input-label">Start date</div><div class="input-field derived"><span>${_fmtStartDay(_al.start,true)}</span><span class="src">set by…
+   4242 [raceAlignment] start:_isoOf(start), weeksOut, openWeek: futureWeeks ? 1 : openWeek, floor, underFloor: weeksOut < floor, futureWeeks,
+-- _testWeek: lines raw 11 -> 11 | code-only 9 -> 9
+   7537 [doGenerate] let _testWeek = (_tg && PACE_GOALS.has(_tg.id) && WD.eventTargeted !== false && WD.raceDate)
+   7539 [doGenerate] if(!(_testWeek >= 1 && _testWeek <= totalWeeksPreview)) _testWeek = null;
+   7540 [doGenerate] WD._testWeek = _testWeek;
+   7541 [doGenerate] WD._raceDateCappedWeeks = _testWeek || totalWeeksPreview;
+   7770 [-] && cfg._testWeek && cfg._testWeek === totalWeeks) ? _parseLocalDate(cfg.raceDate) : null;
+   14646 [setProgStart] if(_tp){ activeProg.cfg._testWeek=_tp.tw; activeProg.cfg._raceDateCappedWeeks=_tp.tw||_tp.len; }
+   15725 [refreshProgram] if(prog.cfg._testWeek === undefined){
+   15730 [refreshProgram] prog.cfg._testWeek = _tw;
+   15732 [refreshProgram] try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,_testWeek:prog.cfg._testWeek,_raceDateCappedWeeks:p…
+-- _raceDateCappedWeeks: lines raw 6 -> 6 | code-only 6 -> 6
+   7541 [doGenerate] WD._raceDateCappedWeeks = _testWeek || totalWeeksPreview;
+   7542 [doGenerate] totalWeeksPreview = WD._raceDateCappedWeeks;   // the screen names the length that builds
+   7636 [-] const totalWeeks = cfg._raceDateCappedWeeks || cardioLength.weeks;
+   14646 [setProgStart] if(_tp){ activeProg.cfg._testWeek=_tp.tw; activeProg.cfg._raceDateCappedWeeks=_tp.tw||_tp.len; }
+   15731 [refreshProgram] prog.cfg._raceDateCappedWeeks = _tw || prog.cfg._raceDateCappedWeeks || _tp.len;
+   15732 [refreshProgram] try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,_testWeek:prog.cfg._testWeek,_raceDateCappedWeeks:p…
+-- progTestPin: lines raw 3 -> 3 | code-only 3 -> 3
+   14630 [progTestPin] function progTestPin(cfg, startIso){
+   14645 [setProgStart] const _tp=progTestPin(activeProg.cfg,_r.start);
+   15726 [refreshProgram] const _tp = progTestPin(prog.cfg, prog.startDate);
+-- testWeekIndex: lines raw 4 -> 4 | code-only 4 -> 4
+   2339 [updateRaceDateFeedback] ? testWeekIndex(resolveStartDate(WD.startDate, WD.restDays||[]).start, WD.raceDate) : null;
+   4250 [testWeekIndex] function testWeekIndex(startIso, raceIso){
+   7538 [doGenerate] ? testWeekIndex(resolveStartDate(WD.startDate, WD.restDays || []).start, WD.raceDate) : null;
+   14635 [progTestPin] const tw = testWeekIndex(startIso, c.raceDate);
+-- resolveStartDate: lines raw 7 -> 7 | code-only 7 -> 7
+   1907 [resolveStartDate] function resolveStartDate(dateStr, restDays){
+   1994 [-] const r = resolveStartDate(WD.startDate, WD.restDays||[]);
+   2013 [_applyWizardStart] const r = resolveStartDate(wd && wd.startDate, (wd && wd.restDays) || []);
+   2339 [updateRaceDateFeedback] ? testWeekIndex(resolveStartDate(WD.startDate, WD.restDays||[]).start, WD.raceDate) : null;
+   3032 [renderWizardStep] const _sr = resolveStartDate(WD.startDate, WD.restDays||[]);            // V174 (D21/D24/D25)
+   7538 [doGenerate] ? testWeekIndex(resolveStartDate(WD.startDate, WD.restDays || []).start, WD.raceDate) : null;
+   14641 [setProgStart] const _r=resolveStartDate(dateStr,(activeProg.cfg&&activeProg.cfg.restDays)||[]);
+-- achievablePacePerMile: lines raw 4 -> 4 | code-only 2 -> 2
+   2232 [achievablePacePerMile] function achievablePacePerMile(weeksAvail, tDist, experience, ageBracket) {
+   2351 [updateRaceDateFeedback] const safePace = achievablePacePerMile(weeksUntil, tDist, WD.experience, WD.ageBracket);
+-- applySuggestedPace: lines raw 3 -> 3 | code-only 3 -> 3
+   2254 [applySuggestedPace] function applySuggestedPace(mins, secs) {
+   2359 [updateRaceDateFeedback] '<button onclick="applySuggestedPace('+tm+','+ts+')" style="display:block;width:100%;margin-top:8px;font-family:var(--font-display);font-size:12px;font-weight:700;letter-…
+   2477 [paceCeilingOfferHTML] '<button onclick="applySuggestedPace('+f.tm+','+f.ts+')" style="display:block;width:100%;margin-top:8px;font-family:var(--font-display);font-size:12px;font-weight:700;let…
+-- assessRunPaceCeiling: lines raw 6 -> 6 | code-only 5 -> 5
+   2308 [updateRaceDateFeedback] const _f = assessRunPaceCeiling();
+   2319 [updateRaceDateFeedback] const _f = assessRunPaceCeiling();
+   2326 [updateRaceDateFeedback] const _f = assessRunPaceCeiling();
+   2430 [assessRunPaceCeiling] function assessRunPaceCeiling() {
+   2488 [updatePaceFeasibility] const f = assessRunPaceCeiling();
+-- paceGoalTarget: lines raw 5 -> 5 | code-only 5 -> 5
+   3073 [paceGoalTarget] function paceGoalTarget(g) {
+   3190 [calcProgramLength] var _pgT = paceGoalTarget(goal);
+   6063 [-] const _pgT = paceGoalTarget(goal);
+   6112 [-] const _g = cardioGoals.run || {}, _pt = paceGoalTarget(_g), _u = _g.paceUnit === 'km' ? 'km' : 'mi';
+   6176 [-] const _g = cardioGoals.run, _pg = paceGoalTarget(_g);
+-- updatePaceDisplay: lines raw 4 -> 4 | code-only 4 -> 4
+   2405 [updatePaceDisplay] function updatePaceDisplay() {
+   2842 [renderWizardStep] <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1" placeholder="e.g. 1.5" value="${g.targetDist||''}" oninput="WD.cardioGoals['run'].target…
+   2853 [renderWizardStep] <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['run'].targetMins=this.value;upda…
+   2858 [renderWizardStep] <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.targetSecs||''}" oninput="WD.cardioGoals['run'].targetSecs=this.value;upda…
+-- updatePaceFeasibility: lines raw 8 -> 8 | code-only 8 -> 8
+   2418 [updatePaceDisplay] updatePaceFeasibility();
+   2483 [updatePaceFeasibility] function updatePaceFeasibility() {
+   2655 [-] try{ if(typeof updatePaceFeasibility==='function') updatePaceFeasibility(); }catch(e){}
+   2876 [renderWizardStep] <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;…
+   2881 [renderWizardStep] <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.mileBestSecs||''}" oninput="WD.cardioGoals['run'].mileBestSecs=this.value;…
+   2897 [renderWizardStep] <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;…
+   2902 [renderWizardStep] <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.mileBestSecs||''}" oninput="WD.cardioGoals['run'].mileBestSecs=this.value;…
+   2937 [renderWizardStep] updatePaceFeasibility(); // sync: body.innerHTML is set, so #paceFeasLine exists if rendered
+-- updateRaceDateFeedback: lines raw 6 -> 6 | code-only 5 -> 5
+   1987 [-] const f=document.getElementById('raceDateFeedback'); if(f) updateRaceDateFeedback();
+   2265 [applySuggestedPace] updateRaceDateFeedback();
+   2268 [updateRaceDateFeedback] function updateRaceDateFeedback() {
+   2675 [renderWizardStep] setTimeout(() => updateRaceDateFeedback(), 80);
+   2929 [renderWizardStep] oninput="WD.raceDate=this.value;updateRaceDateFeedback()"
+-- paceCeilingOfferHTML: lines raw 5 -> 5 | code-only 5 -> 5
+   2309 [updateRaceDateFeedback] feedback.innerHTML = card(_al.underFloor ? 'var(--signal)' : 'var(--run)', alignedStartCopy(_al)) + (_f ? paceCeilingOfferHTML(_f) : '');
+   2322 [updateRaceDateFeedback] + (_f ? paceCeilingOfferHTML(_f) : '');
+   2329 [updateRaceDateFeedback] + (_f ? paceCeilingOfferHTML(_f) : '');
+   2473 [paceCeilingOfferHTML] function paceCeilingOfferHTML(f) {
+   2490 [updatePaceFeasibility] el.innerHTML = paceCeilingOfferHTML(f);
+-- expCurrentPace: lines raw 10 -> 10 | code-only 10 -> 10
+   2239 [achievablePacePerMile] const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[experience] || 570;   // V176 (D9): one beginner default, the engine's 690
+   2244 [achievablePacePerMile] const achievable = expCurrentPace - gap;
+   2444 [assessRunPaceCeiling] const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[exp] || 570;   // V176 (D9)
+   2448 [assessRunPaceCeiling] const currentPace = mileBest || expCurrentPace;
+   3112 [calcProgramLength] const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[experience] || 570;   // V176 (D9): one beginner default, the engine's 690
+   3199 [calcProgramLength] var currentPaceForCalc = _mileBestSecs || expCurrentPace;
+   3828 [-] const _expCurrentPace = {beginner:690, intermediate:570, advanced:450}[experience||'intermediate'] || 570;
+   3830 [-] const _anchorSec = _mileBestSecs || _expCurrentPace;
+   4360 [-] const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[experience||'intermediate'] || 570;
+   4361 [-] const anchorSec = (experience !== 'beginner' && mileBestSecs) ? mileBestSecs : expCurrentPace;
+-- targetTime: lines raw 4 -> 4 | code-only 4 -> 4
+   2403 [updatePaceTime] WD.cardioGoals[type].targetTime = mins + ':' + String(secs).padStart(2,'0');
+   3080 [paceGoalTarget] } else if(g.targetTime) {
+   3081 [paceGoalTarget] tTotalSecs = parseTimeToSecs(g.targetTime);
+   14937 [-] next.targetTime=mins+':'+String(secs).padStart(2,'0');
+-- targetMins: lines raw 25 -> 25 | code-only 25 -> 25
+   2256 [applySuggestedPace] WD.cardioGoals['run'].targetMins = mins;
+   2390 [-] const totalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0);   // V218 (D157): the target is its total, the engine's parse
+   2401 [updatePaceTime] const mins = WD.cardioGoals[type].targetMins || 0;
+   2409 [updatePaceDisplay] if(!g || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) {
+   2413 [updatePaceDisplay] const totalSecs = (+(g.targetMins||0)*60) + (+(g.targetSecs||0));
+   2416 [updatePaceDisplay] el.innerHTML = asyIcon('🎯',13)+' ' + g.targetMins + ':' + String(g.targetSecs||0).padStart(2,'0') + ' — ' + pace + ' per mile';
+   2432 [assessRunPaceCeiling] if(!g || g.id !== 'run_pace_goal' || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) return null;
+   2437 [assessRunPaceCeiling] const tTotal = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+   2811 [renderWizardStep] <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['swim'].targetMins=this.value;upd…
+   2820 [renderWizardStep] <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(((+g.targetMins||0)*60)+(+g.targetSecs||0))>0?'block':'none'}">${asyIcon('🎯',1…
+   2853 [renderWizardStep] <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['run'].targetMins=this.value;upda…
+   2862 [renderWizardStep] <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(WD.cardioGoals['run']?.targetMins!==undefined&&WD.cardioGoals['run']?.target…
+   3078 [paceGoalTarget] if(g.targetMins !== undefined && g.targetMins !== '') {
+   3079 [paceGoalTarget] tTotalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+   3222 [calcProgramLength] var timeLabel = goal.targetMins ? goal.targetMins+':'+(String(goal.targetSecs||0).padStart(2,'0')) : '';
+   3310 [calcProgramLength] var swimTimeEntered = isSwimTimeGoal && ((+goal.targetMins||0)*60 + (+goal.targetSecs||0)) > 0;
+   3313 [calcProgramLength] var tTotal = (+goal.targetMins||0)*60 + (+goal.targetSecs||0);
+   4715 [-] const _tgtTotal = _swimTot(swimGoal.targetMins, swimGoal.targetSecs);
+   14692 [-] const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
+   14693 [-] ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
+   14834 [-] const hasTime=(+i.targetMins>0)||(+i.targetSecs>0);
+   14881 [-] +'<input type="number" class="input-field" style="flex:0 0 58px;text-align:center" placeholder="min" min="0" max="99" value="'+(i.targetMins||'')+'" oninput="_goalSetInpu…
+   14887 [-] +'<input type="number" class="input-field" style="flex:1;text-align:center" placeholder="min" min="0" max="99" value="'+(i.targetMins||'')+'" oninput="_goalSetInput(\'tar…
+   14935 [-] const mins=+i.targetMins||0, secs=+i.targetSecs||0;
+   14936 [-] next.targetMins=i.targetMins; next.targetSecs=i.targetSecs;
+-- mileBestMins: lines raw 23 -> 23 | code-only 21 -> 21
+   2445 [assessRunPaceCeiling] const mileBest = (exp !== 'beginner' && g.mileBestMins !== undefined && g.mileBestMins !== '')
+   2446 [assessRunPaceCeiling] ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0)
+   2649 [-] g.mileBestMins=String(mm); g.mileBestSecs=String(ss);
+   2876 [renderWizardStep] <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;…
+   2897 [renderWizardStep] <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;…
+   3196 [calcProgramLength] var _mileBestSecs = (experience !== 'beginner' && goal.mileBestMins !== undefined && goal.mileBestMins !== '')
+   3197 [calcProgramLength] ? (+goal.mileBestMins||0)*60 + (+goal.mileBestSecs||0)
+   6042 [-] const _mileBestSecs = (goal?.mileBestMins !== undefined && goal?.mileBestMins !== '')
+   6043 [-] ? (+goal.mileBestMins||0)*60 + (+goal.mileBestSecs||0)
+   6178 [-] const _mbs = (_g.mileBestMins !== undefined && _g.mileBestMins !== '') ? (+_g.mileBestMins||0)*60 + (+_g.mileBestSecs||0) : null;
+   7470 [-] if(g.mileBestMins===undefined||g.mileBestMins==='') return {ok:true};
+   7471 [-] const mm=+g.mileBestMins, ss=+(g.mileBestSecs||0);
+   14678 [-] const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0) : 0;
+   14916 [-] ...(sport==='run'&&prev.mileBestMins!==undefined&&prev.mileBestMins!==''
+   14917 [-] ?{mileBestMins:prev.mileBestMins,mileBestSecs:prev.mileBestSecs,...(prev.mileBestSrc?{mileBestSrc:prev.mileBestSrc}:{})}:{})};
+   14991 [-] if(mEl) mEl.value=(g.mileBestMins!==undefined?g.mileBestMins:'');
+   15011 [-] const st=_mileEntryState({mileBestMins:mRaw,mileBestSecs:sRaw},(p.cfg&&p.cfg.experience)||'intermediate');
+   15014 [-] const next={...prev, mileBestMins:String(mm), mileBestSecs:String(ss),
+   15016 [-] from:{mins:prev.mileBestMins||'', secs:prev.mileBestSecs||'',
+   15017 [-] kind:(prev.mileBestSrc&&prev.mileBestSrc.kind)||(prev.mileBestMins?'entered':'default')}}};
+   17359 [-] const _mile = _mg ? ((+_mg.mileBestMins||0)*60 + (+_mg.mileBestSecs||0)) : 0;
+-- NSW_TABLE6_INT: lines raw 2 -> 2 | code-only 2 -> 2
+   3448 [-] var NSW_TABLE6_INT = [
+   3465 [-] return Math.min(8, NSW_TABLE6_INT[_w]);
+-- calcCurrentWeek: lines raw 13 -> 13 | code-only 10 -> 8
+   11534 [calcCurrentWeek] function calcCurrentWeek(){
+   11950 [-] const actualWeek=calcCurrentWeek();
+   14622 [setProgRace] currentWeek=calcCurrentWeek();
+   14650 [setProgStart] currentWeek=calcCurrentWeek();
+   14945 [-] currentWeek=calcCurrentWeek();
+   15022 [-] currentWeek=calcCurrentWeek();
+   15494 [-] const curWk=(typeof calcCurrentWeek==='function')?calcCurrentWeek():1;
+   15981 [-] function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');activeProgId=null;activeProg=null;currentDayKey=null;currentWeek=1;return …
+-- _fmtStartDay: lines raw 13 -> 13 | code-only 13 -> 13
+   1924 [-] function _fmtStartDay(iso, withYear){
+   1937 [-] return 'Nothing left to train that week, so this starts <b>'+_fmtStartDay(r.start)+'</b>. Week 1 runs <b>'+_fmtSpan(r.start, sunOf(r.start))+'</b>.';
+   1940 [-] const days = r.week1Train.map(k => '<b>'+_fmtStartDay(_isoOf((()=>{ const m=_parseLocalDate(r.mon); const x=new Date(m); x.setDate(m.getDate()+_ISO_ORDER.indexOf(k)); ret…
+   1942 [-] return 'Week 1 is short \u2014 you\u2019ll train '+list+', then a full week from <b>'+_fmtStartDay(r.nextMon)+'</b>.';
+   1948 [-] if(r && r.aligned) return _fmtStartDay(r.start, true) + ' \u2014 set by race date';
+   1949 [-] return _fmtStartDay(r.start, true) + (r.partial ? ' \u2014 short first week' : '');
+   1962 [-] const raceTxt = '<b>'+_fmtStartDay(al.raceIso)+'</b>, '+al.weeksOut+' week'+(al.weeksOut===1?'':'s')+' out';
+   1964 [-] return 'Your '+nm+' is '+raceTxt+'. The '+al.tw+'-week plan starts <b>'+_fmtStartDay(al.start)+'</b> \u2014 '+al.futureWeeks+' week'+(al.futureWeeks===1?'':'s')+' from no…
+   1966 [-] let t = 'Your '+nm+' is '+raceTxt+'. The '+al.tw+'-week plan starts <b>'+_fmtStartDay(al.start)+'</b> so race week is week '+al.tw+' \u2014 you open in <b>week '+al.openW…
+   3037 [renderWizardStep] ? `<div class="input-group"><div class="input-label">Start date</div><div class="input-field derived"><span>${_fmtStartDay(_al.start,true)}</span><span class="src">set by…
+   11989 [-] if(rw){ rw.style.display=_al?'flex':'none'; const ri=document.getElementById('raceDateInput'); if(ri) ri.value=_c.raceDate||''; const rd=document.getElementById('raceDate…
+   14623 [setProgRace] showToast('Race day '+_fmtStartDay(_al.raceIso)+' \u2014 plan starts '+_fmtStartDay(_al.start)+' \u2713');
+   14651 [setProgStart] showToast(_r.snapped ? 'Nothing to train that week — starts '+_fmtStartDay(_r.start)+' ✓' : (_r.partial ? 'Start date set ✓ — short first week' : 'Start date set ✓'));
+-- toLocaleDateString: lines raw 8 -> 8 | code-only 8 -> 8
+   1926 [-] return d.toLocaleDateString('en-US', withYear ? {weekday:'short',month:'short',day:'numeric',year:'numeric'} : {weekday:'short',month:'short',day:'numeric'});
+   1930 [-] return a.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' \u2013 '+b.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+   3043 [renderWizardStep] ...(WD.primaryPath==='event'&&WD.raceDate?[['Race date', new Date(WD.raceDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+(WD.raceDateWeeks?…
+   11981 [-] if(activeProg.startDate){ sdd.textContent=new Date(activeProg.startDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); sdd.classLi…
+   14756 [progSelData] if(c.raceDate){try{raceStr=new Date(c.raceDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch(_){raceStr=String(c.raceDate);}}
+   14974 [-] let rs=''; try{ rs=rd.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(_){ rs=String(c.raceDate); }
+   15313 [-] function _fmtDateWd(iso){ return iso?new Date(iso+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}).replace(',',''):''; }
+   15419 [-] function _fmtDate(iso){return iso?new Date(iso+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}):'Set date';}
+-- futureWeeks: lines raw 7 -> 7 | code-only 6 -> 6
+   1963 [-] if(al.futureWeeks){
+   1964 [-] return 'Your '+nm+' is '+raceTxt+'. The '+al.tw+'-week plan starts <b>'+_fmtStartDay(al.start)+'</b> \u2014 '+al.futureWeeks+' week'+(al.futureWeeks===1?'':'s')+' from no…
+   1977 [-] if(al.futureWeeks) return '';
+   4239 [raceAlignment] const futureWeeks = Math.max(0, Math.round((start - todayMon)/86400000/7));
+   4242 [raceAlignment] start:_isoOf(start), weeksOut, openWeek: futureWeeks ? 1 : openWeek, floor, underFloor: weeksOut < floor, futureWeeks,
+   4243 [raceAlignment] behindWeeks: futureWeeks ? 0 : openWeek - 1};
+-- wizardAlignment: lines raw 4 -> 4 | code-only 4 -> 4
+   1952 [wizardAlignment] function wizardAlignment(){
+   1993 [-] if(wizardAlignment()) return;   // V188 (D14a): derived — nothing to resolve from the field
+   2306 [updateRaceDateFeedback] const _al = wizardAlignment();
+   3036 [renderWizardStep] ${(()=>{ const _al=wizardAlignment(); return _al
+-- raceCountdown: lines raw 0 -> 0 | code-only 0 -> 0
+-- wizardTestPin: lines raw 0 -> 0 | code-only 0 -> 0
+-- paintRunGoalPanel: lines raw 0 -> 0 | code-only 0 -> 0
+
+=== E. tests/ files calling ruled functions (gates + harness; measure excluded)
+   achievablePacePerMile    0 files
+   applySuggestedPace       0 files
+   updatePaceFeasibility    0 files
+   updateRaceDateFeedback   gates/g207_test_calendar.js:1
+   assessRunPaceCeiling     0 files
+   paceCeilingOfferHTML     0 files
+   updatePaceDisplay        0 files
+   paceGoalTarget           gates/g202_pace_anchor.js:4
+   progTestPin              0 files
+   resolveStartDate         gates/g202_d108_touchset_freeze.js:1 harness.js:1
+   testWeekIndex            gates/g207_test_week.js:5
+   raceAlignment            gates/g000_boot.js:2 gates/g207_test_week.js:1 harness.js:1
+   progSelData              0 files
+   calcCurrentWeek          gates/g222_d181_chain.js:1 gates/g222_d181_durable.js:1 harness.js:1
+
+=== F. D163 minutes-box lines (NEW) vs P-SAFEPACE sites
+   D163 pattern old lines 2406,2429,2442,2859,3075,3193,6039,6175,7467,14577,14591,14815,14890 | new lines 2409,2432,2445,2862,3078,3196,6042,6178,7470,14678,14692,14916,14991
+   2409 in [updatePaceDisplay] P-SAFEPACE-owned fn: YES | if(!g || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) {
+        ctx 2413: const totalSecs = (+(g.targetMins||0)*60) + (+(g.targetSecs||0));
+   2432 in [assessRunPaceCeiling] P-SAFEPACE-owned fn: YES | if(!g || g.id !== 'run_pace_goal' || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) return null;
+   2445 in [assessRunPaceCeiling] P-SAFEPACE-owned fn: YES | const mileBest = (exp !== 'beginner' && g.mileBestMins !== undefined && g.mileBestMins !== '')
+        ctx 2446: ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0)
+        ctx 2448: const currentPace = mileBest || expCurrentPace;
+   2862 in [renderWizardStep] P-SAFEPACE-owned fn: YES | <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(WD.cardioGoals['run']?.targetMins!==undefined&&WD.cardioGoals['run']?.targetMins!==''&&WD.cardioGoals['run
+        ctx 2858: <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.targetSecs||''}" oninput="WD.cardioGoals['run'].targetSecs=this.value;upda
+   3078 in [paceGoalTarget] P-SAFEPACE-owned fn: YES | if(g.targetMins !== undefined && g.targetMins !== '') {
+        ctx 3079: tTotalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+        ctx 3080: } else if(g.targetTime) {
+        ctx 3081: tTotalSecs = parseTimeToSecs(g.targetTime);
+   3196 in [calcProgramLength] P-SAFEPACE-owned fn: YES | var _mileBestSecs = (experience !== 'beginner' && goal.mileBestMins !== undefined && goal.mileBestMins !== '')
+        ctx 3197: ? (+goal.mileBestMins||0)*60 + (+goal.mileBestSecs||0)
+        ctx 3199: var currentPaceForCalc = _mileBestSecs || expCurrentPace;
+   6042 in [-] P-SAFEPACE-owned fn: no | const _mileBestSecs = (goal?.mileBestMins !== undefined && goal?.mileBestMins !== '')
+        ctx 6041: // Pre-convert mileBestMins/Secs to total seconds for the pace chart anchor
+        ctx 6043: ? (+goal.mileBestMins||0)*60 + (+goal.mileBestSecs||0)
+   6178 in [-] P-SAFEPACE-owned fn: no | const _mbs = (_g.mileBestMins !== undefined && _g.mileBestMins !== '') ? (+_g.mileBestMins||0)*60 + (+_g.mileBestSecs||0) : null;
+   7470 in [-] P-SAFEPACE-owned fn: no | if(g.mileBestMins===undefined||g.mileBestMins==='') return {ok:true};
+        ctx 7471: const mm=+g.mileBestMins, ss=+(g.mileBestSecs||0);
+   14678 in [-] P-SAFEPACE-owned fn: no | const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0) : 0;
+   14692 in [-] P-SAFEPACE-owned fn: no | const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
+        ctx 14693: ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
+   14916 in [-] P-SAFEPACE-owned fn: no | ...(sport==='run'&&prev.mileBestMins!==undefined&&prev.mileBestMins!==''
+        ctx 14917: ?{mileBestMins:prev.mileBestMins,mileBestSecs:prev.mileBestSecs,...(prev.mileBestSrc?{mileBestSrc:prev.mileBestSrc}:{})}:{})};
+   14991 in [-] P-SAFEPACE-owned fn: no | if(mEl) mEl.value=(g.mileBestMins!==undefined?g.mileBestMins:'');
+        ctx 14992: if(sEl) sEl.value=(g.mileBestSecs!==undefined?g.mileBestSecs:'');
+   D163 cited L3219 (calcProgramLength body?) and L14579 (run_pace_goal): see lines above; handoff cites V217 line numbers.
+
+DONE
+
+######## m9.out
+versions base=222 Sa=222 Sc=222 TZ America/Los_Angeles clock local 21:16 on each "today"
+
+=== 1  class table (TEST BEFORE START = oracle test week null from the built start; pinned = WD._testWeek set)
+   M8cell base    n 392 err 0 {"pinned":371,"TEST BEFORE START":21}
+   M8cell Sa      n 392 err 0 {"pinned":371,"TEST BEFORE START":21}
+   M8cell Sc      n 392 err 0 {"pinned":392}
+   wide   base    n 1960 err 0 {"pinned":1855,"TEST BEFORE START":105}
+   wide   Sa      n 1960 err 0 {"pinned":1855,"TEST BEFORE START":105}
+   wide   Sc      n 1960 err 0 {"pinned":1960}
+
+=== 2  Sc (no-snap) on the oracle snap cases vs everything else
+   M8cell snapCase=false  {"n":371,"startIsToday":0,"tot1":0,"tw1":0,"trialOnWeekday":0,"trainBefore0":0,"trainAfter":{},"testOnRestWeekday":0,"digestSaEqSc":371,"fbSays":{},"srSays":{},"nameEqBuilt":0,"subSays":{},"baseEqSc":371}
+   M8cell snapCase=true   {"n":21,"startIsToday":21,"tot1":21,"tw1":21,"trialOnWeekday":21,"trainBefore0":21,"trainAfter":{"0":21},"testOnRestWeekday":21,"digestSaEqSc":0,"fbSays":{"Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test.":21},"srSays":{"":21},"nameEqBuilt":0,"subSays":{"Your N-week program is ready!":21}}
+   wide   snapCase=false  {"n":1855,"startIsToday":0,"tot1":0,"tw1":0,"trialOnWeekday":0,"trainBefore0":0,"trainAfter":{},"testOnRestWeekday":0,"digestSaEqSc":1855,"fbSays":{},"srSays":{},"nameEqBuilt":0,"subSays":{},"baseEqSc":1855}
+   wide   snapCase=true   {"n":105,"startIsToday":105,"tot1":105,"tw1":105,"trialOnWeekday":105,"trainBefore0":105,"trainAfter":{"0":105},"testOnRestWeekday":105,"digestSaEqSc":0,"fbSays":{"Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test.":105},"srSays":{"":105},"nameEqBuilt":0,"subSays":{"Your N-week program is ready!":105}}
+   ex 1.5mi 12:00 mile 8:00 intermediate today 2026-09-24(thu) rest thu..sun test 2026-09-24(thu) +0d | base start 2026-09-28 tot 6 tw null | Sc start 2026-09-24 tot 1 tw 1 | W1 mon:R tue:Long Slow Distance wed:Long Slow Distance thu:1.5 Mile Test — TI fri:R sat:R sun:R
+   ex 1.5mi 12:00 mile 8:00 intermediate today 2026-09-24(thu) rest thu..sun test 2026-09-25(fri) +1d | base start 2026-09-28 tot 6 tw null | Sc start 2026-09-24 tot 1 tw 1 | W1 mon:R tue:Long Slow Distance[L2] wed:Long Slow Distance thu:R fri:1.5 Mile Test — TI sat:R sun:R
+   ex 1.5mi 12:00 mile 8:00 intermediate today 2026-09-24(thu) rest thu..sun test 2026-09-26(sat) +2d | base start 2026-09-28 tot 6 tw null | Sc start 2026-09-24 tot 1 tw 1 | W1 mon:R tue:Long Slow Distance[L3] wed:Long Slow Distance[L2] thu:R fri:R sat:1.5 Mile Test — TI sun:R
+   ex 1.5mi 12:00 mile 8:00 intermediate today 2026-09-24(thu) rest thu..sun test 2026-09-27(sun) +3d | base start 2026-09-28 tot 6 tw null | Sc start 2026-09-24 tot 1 tw 1 | W1 mon:R tue:Long Slow Distance[L3] wed:Long Slow Distance[L2] thu:R fri:R sat:R sun:1.5 Mile Test — TI
+
+=== 3  gates that name D21/D25/snap, run on base / Sa / Sc (their own PASS/FAIL summary; crash = no summary)
+   g203_mile_pencil.js          base exit 0 | PASS 98 FAIL 0 
+   g203_mile_pencil.js          Sa   exit 0 | PASS 98 FAIL 0 
+   g203_mile_pencil.js          Sc   exit 0 | PASS 98 FAIL 0 
+   g207_test_week.js            base exit 0 | PASS 74 FAIL 0 
+   g207_test_week.js            Sa   exit 1 | PASS 73 FAIL 1 | FAIL G4 test past the goal length (D138, out of scope): stored cfg carries _testWeek=null and _raceDateCappedWeeks=11, totalWeeks 11, start 2026-09-21 (got {"_t
+   g207_test_week.js            Sc   exit 1 | PASS 73 FAIL 1 | FAIL G4 test past the goal length (D138, out of scope): stored cfg carries _testWeek=null and _raceDateCappedWeeks=11, totalWeeks 11, start 2026-09-21 (got {"_t
+
+DONE
+
+######## m10.out
+versions base=222 Sa=222 S26=222 TZ America/Los_Angeles
+
+=== 0  control: k<=26, S26 digest == Sa digest: 1728/1728 | errors {}
+
+=== 1  built program, k>26 (test week 27..35 from today's start); oracle start = Mon(test week) - 25 weeks
+   base {"n":5184,"startEqOracle":0,"tot26":0,"tw26":0,"trialOnTestDay":0,"testInside":0,"lenHist":{"6":1512,"8":108,"9":1836,"11":1728},"futureWeeksHist":{"0":5184}}
+   Sa   {"n":5184,"startEqOracle":0,"tot26":0,"tw26":0,"trialOnTestDay":0,"testInside":0,"lenHist":{"6":1512,"8":108,"9":1836,"11":1728},"futureWeeksHist":{"0":5184}}
+   S26  {"n":5184,"startEqOracle":5184,"tot26":5184,"tw26":5184,"trialOnTestDay":5184,"testInside":5184,"lenHist":{"26":5184},"futureWeeksHist":{"1":576,"2":576,"3":576,"4":576,"5":576,"6":576,"7":576,"8":576,"9":576}}
+
+=== 2  calcCurrentWeek() and currentWeek after generate, today 2026-09-22 (k>26)
+   base {"calcCurrentWeek=1 currentWeek=1":5184}
+   Sa   {"calcCurrentWeek=1 currentWeek=1":5184}
+   S26  {"calcCurrentWeek=1 currentWeek=1":5184}
+
+=== 3  D14a futureWeeks path: alignment objects exist?
+   base {"progAlignment=null wizardAlignment=null":5184}
+   Sa   {"progAlignment=null wizardAlignment=null":5184}
+   S26  {"progAlignment=null wizardAlignment=null":5184}
+
+=== 4  freeze (sentinel planted on stored W1 first training day, nothing trained)
+   base {"today(before start): sentinel rebuilt | totalWeeks same | _testWeek null":5184,"start+10d: sentinel KEPT (stored day served) | totalWeeks same | _testWeek null":5184}
+   Sa   {"today(before start): sentinel rebuilt | totalWeeks same | _testWeek null":5184,"start+10d: sentinel KEPT (stored day served) | totalWeeks same | _testWeek null":5184}
+   S26  {"today(before start): sentinel rebuilt | totalWeeks same | _testWeek 26":5184,"start+10d: sentinel KEPT (stored day served) | totalWeeks same | _testWeek 26":5184}
+
+=== 5  Programs card (progSelData / progDetailHTML)
+   base {"length ==built | raceStr set raceWeeks null | detail mentions start/begins: yes":48,"length ==built | raceStr set raceWeeks 26 | detail mentions start/begins: yes":528,"length ==built | raceStr set raceWeeks 27 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 28 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 29 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 30 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 31 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 32 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 33 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 34 | detail mentions start/begins: yes":576}
+   Sa   {"length ==built | raceStr set raceWeeks null | detail mentions start/begins: yes":48,"length ==built | raceStr set raceWeeks 26 | detail mentions start/begins: yes":528,"length ==built | raceStr set raceWeeks 27 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 28 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 29 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 30 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 31 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 32 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 33 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 34 | detail mentions start/begins: yes":576}
+   S26  {"length ==built | raceStr set raceWeeks null | detail mentions start/begins: yes":48,"length ==built | raceStr set raceWeeks 26 | detail mentions start/begins: yes":528,"length ==built | raceStr set raceWeeks 27 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 28 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 29 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 30 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 31 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 32 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 33 | detail mentions start/begins: yes":576,"length ==built | raceStr set raceWeeks 34 | detail mentions start/begins: yes":576}
+   detail text ex base | Focus Goal endurance Lift emphasis Injury Prevention Path Race / Event Profile Experience beginner Age range 18-35 Equipment CrossFit Box Units lbs Schedule Train days Mon · Tue · Wed · Thu · Fri · Sat Rest days Sun Length 11 weeks Starting 1RM (est.) Squat 75 lbs Bench 65 lbs Deadlift 95 lbs Run paces Goal 9:30 1.5 mi Mile 11:30 /mi 5K 12:15 /mi 10K 12:35 /mi Tempo 13:00 /mi Recovery 14:05 /mi An
+   detail text ex S26 | Focus Goal endurance Lift emphasis Injury Prevention Path Race / Event Profile Experience beginner Age range 18-35 Equipment CrossFit Box Units lbs Schedule Train days Mon · Tue · Wed · Thu · Fri · Sat Rest days Sun Length 26 weeks Starting 1RM (est.) Squat 75 lbs Bench 65 lbs Deadlift 95 lbs Run paces Goal 9:30 1.5 mi Mile 11:30 /mi 5K 12:15 /mi 10K 12:35 /mi Tempo 13:00 /mi Recovery 14:05 /mi An
+
+=== 6  wizard callout on the date step (k>26), distinct strings
+   base
+      x2916 ✓ Your N-week program finishes N weeks before race day — use the extra time to stay sharp. That pace is faster than safe progression allows from your current fitness. Over a realistic N-week build, th
+      x2268 ✓ Your N-week program finishes N weeks before race day — use the extra time to stay sharp.
+   Sa
+      x2916 ✓ Your N-week program finishes N weeks before race day — use the extra time to stay sharp. That pace is faster than safe progression allows from your current fitness. Over a realistic N-week build, th
+      x2268 ✓ Your N-week program finishes N weeks before race day — use the extra time to stay sharp.
+   S26
+      x2916 ✓ Your N-week program finishes N weeks before race day — use the extra time to stay sharp. That pace is faster than safe progression allows from your current fitness. Over a realistic N-week build, th
+      x2268 ✓ Your N-week program finishes N weeks before race day — use the extra time to stay sharp.
+
+DONE
+
+######## d158.out
+versions base=222 Sa=222 TZ America/Los_Angeles
+
+=== 1  athlete population through doGenerate: builds 34560 errors 0
+     11396 no test in program  ->  training eve: SHAKEOUT
+      8140 no test in program  ->  rest-day eve
+      6076 training eve: SHAKEOUT  ->  training eve: SHAKEOUT
+      4608 no test in program  ->  no test in program
+      4340 rest-day eve  ->  rest-day eve
+   builds whose eve state moved 19536/34560 | builds carrying the D158 shakeout: base 6076/34560 -> Sa 17472/34560
+   moved, by rest pattern {"sun (6 train)":3256,"sat,sun (5)":3256,"mon,fri (5)":3256,"fri,sat,sun (4)":3256,"mon,wed,fri,sun (3)":3256,"sun,wed (5, M7)":3256}
+   moved, by test week {"k 9-16":7344,"k 17-26":11520,"k 1-8":672}
+   moved, by experience {"beginner":5856,"intermediate":6720,"advanced":6960}
+   ex sun (6 train) 1.5mi 9:30 beginner 18-35 k12 test 2026-12-10(thu): base 11wk tw null [no test in program] -> Sa 12wk tw 12 [training eve: SHAKEOUT]
+   ex sun (6 train) 1.5mi 9:30 beginner 18-35 k13 test 2026-12-17(thu): base 11wk tw null [no test in program] -> Sa 13wk tw 13 [training eve: SHAKEOUT]
+   ex sun (6 train) 1.5mi 9:30 beginner 18-35 k14 test 2026-12-24(thu): base 11wk tw null [no test in program] -> Sa 14wk tw 14 [training eve: SHAKEOUT]
+
+=== 2  the D158 gate's own population (g214_d158_eve.js, no baseline arg: D5/D6 pair rows skip by name)
+   base exit 0 | PASS 8 FAIL 0 | PASS D0 784 dated NSW test programs (pace + mile x 4 mixes x 7 rest sets x tw 2,5 x 7 test weekdays): all build; reach: 592 training-day eves (48 in week tw-1), 192 rest-day eves; pre-pin eve content bike 52, swim 112, run 264, lift-only 164
+   Sa   exit 0 | PASS 8 FAIL 0 | PASS D0 784 dated NSW test programs (pace + mile x 4 mixes x 7 rest sets x tw 2,5 x 7 test weekdays): all build; reach: 592 training-day eves (48 in week tw-1), 192 rest-day eves; pre-pin eve content bike 52, swim 112, run 264, lift-only 164
+   (full gate outputs in the scratch dir; the two are diffed below, PASS lines only)
+   gate output identical base vs Sa: true
+
+DONE
+
+######## gs.out
+same   g000_boot.js                      base 0 PASS 10 FAIL 0 | Sa 0 PASS 10 FAIL 0 | Sc 0 PASS 10 FAIL 0 | S26 0 PASS 10 FAIL 0
+same   g190_rounds.js                    base 0 PASS 49 FAIL 0 | Sa 0 PASS 49 FAIL 0 | Sc 0 PASS 49 FAIL 0 | S26 0 PASS 49 FAIL 0
+same   g191_pacedelta.js                 base 0 PASS 26 FAIL 0 | Sa 0 PASS 26 FAIL 0 | Sc 0 PASS 26 FAIL 0 | S26 0 PASS 26 FAIL 0
+same   g192_floorpress_shoulder_gear.js  base 0 PASS 29 FAIL 0 | Sa 0 PASS 29 FAIL 0 | Sc 0 PASS 29 FAIL 0 | S26 0 PASS 29 FAIL 0
+same   g192_labelsync.js                 base 0 PASS 26 FAIL 0 | Sa 0 PASS 26 FAIL 0 | Sc 0 PASS 26 FAIL 0 | S26 0 PASS 26 FAIL 0
+same   g192_landmine_rotpress.js         base 0 PASS 34 FAIL 0 | Sa 0 PASS 34 FAIL 0 | Sc 0 PASS 34 FAIL 0 | S26 0 PASS 34 FAIL 0
+same   g192_shoulder_side.js             base 0 PASS 29 FAIL 0 | Sa 0 PASS 29 FAIL 0 | Sc 0 PASS 29 FAIL 0 | S26 0 PASS 29 FAIL 0
+same   g193_budget_floor.js              base 3 PASS 27 FAIL 0 | Sa 3 PASS 27 FAIL 0 | Sc 3 PASS 27 FAIL 0 | S26 3 PASS 27 FAIL 0
+same   g193_d50_trunkfloor.js            base 0 PASS 17 FAIL 0 | Sa 0 PASS 17 FAIL 0 | Sc 0 PASS 17 FAIL 0 | S26 0 PASS 17 FAIL 0
+same   g193_gear_gates.js                base 0 PASS 168 FAIL 0 | Sa 0 PASS 168 FAIL 0 | Sc 0 PASS 168 FAIL 0 | S26 0 PASS 168 FAIL 0
+same   g193_pool_overlay.js              base 0 PASS 220 FAIL 0 | Sa 0 PASS 220 FAIL 0 | Sc 0 PASS 220 FAIL 0 | S26 0 PASS 220 FAIL 0
+same   g193_rotation_reach.js            base 0 PASS 24 FAIL 0 | Sa 0 PASS 24 FAIL 0 | Sc 0 PASS 24 FAIL 0 | S26 0 PASS 24 FAIL 0
+same   g193_samecard.js                  base 0 PASS 53 FAIL 0 | Sa 0 PASS 53 FAIL 0 | Sc 0 PASS 53 FAIL 0 | S26 0 PASS 53 FAIL 0
+same   g193_trunk_protect.js             base 0 PASS 38 FAIL 0 | Sa 0 PASS 38 FAIL 0 | Sc 0 PASS 38 FAIL 0 | S26 0 PASS 38 FAIL 0
+same   g194_implement_and_range.js       base 0 PASS 19 FAIL 0 | Sa 0 PASS 19 FAIL 0 | Sc 0 PASS 19 FAIL 0 | S26 0 PASS 19 FAIL 0
+same   g195_wildcard.js                  base 0 PASS 298 FAIL 0 | Sa 0 PASS 298 FAIL 0 | Sc 0 PASS 298 FAIL 0 | S26 0 PASS 298 FAIL 0
+same   g196_ledger.js                    base 0 PASS 55 FAIL 0 | Sa 0 PASS 55 FAIL 0 | Sc 0 PASS 55 FAIL 0 | S26 0 PASS 55 FAIL 0
+same   g197a_pool_static.js              base 0 PASS 41 FAIL 0 | Sa 0 PASS 41 FAIL 0 | Sc 0 PASS 41 FAIL 0 | S26 0 PASS 41 FAIL 0
+same   g197b_sweep.js                    base 0 PASS 30 FAIL 0 | Sa 0 PASS 30 FAIL 0 | Sc 0 PASS 30 FAIL 0 | S26 0 PASS 30 FAIL 0
+same   g197c_d84_cmp.js                  base 0 PASS 35 FAIL 0 | Sa 0 PASS 35 FAIL 0 | Sc 0 PASS 35 FAIL 0 | S26 0 PASS 35 FAIL 0
+same   g197d_d84_base.js                 base 0 PASS 2 FAIL 0 | Sa 0 PASS 2 FAIL 0 | Sc 0 PASS 2 FAIL 0 | S26 0 PASS 2 FAIL 0
+same   g198_posterior_floor.js           base 0 PASS 29 FAIL 0 | Sa 0 PASS 29 FAIL 0 | Sc 0 PASS 29 FAIL 0 | S26 0 PASS 29 FAIL 0
+same   g199_deload_arbitration.js        base 0 PASS 56 FAIL 0 | Sa 0 PASS 56 FAIL 0 | Sc 0 PASS 56 FAIL 0 | S26 0 PASS 56 FAIL 0
+same   g200_core_tier.js                 base 0 PASS 43 FAIL 0 | Sa 0 PASS 43 FAIL 0 | Sc 0 PASS 43 FAIL 0 | S26 0 PASS 43 FAIL 0
+same   g200_pull_arbitration.js          base 0 PASS 18 FAIL 0 | Sa 0 PASS 18 FAIL 0 | Sc 0 PASS 18 FAIL 0 | S26 0 PASS 18 FAIL 0
+DIFFER g202_d108_touchset_freeze.js      base 0 PASS 10 FAIL 0 | Sa 1 PASS 8 FAIL 2 | Sc 1 PASS 8 FAIL 2 | S26 1 PASS 8 FAIL 2
+         Sa new: FAIL R1c  CONTROL day w4_thu in the exw scenario has no record and was REBUILT to the live build
+         Sa new: FAIL R2c  CONTROL day w4_thu in the hist scenario has no record and was REBUILT to the live build
+         Sc new: FAIL R1c  CONTROL day w4_thu in the exw scenario has no record and was REBUILT to the live build
+         Sc new: FAIL R2c  CONTROL day w4_thu in the hist scenario has no record and was REBUILT to the live build
+         S26 new: FAIL R1c  CONTROL day w4_thu in the exw scenario has no record and was REBUILT to the live build
+         S26 new: FAIL R2c  CONTROL day w4_thu in the hist scenario has no record and was REBUILT to the live build
+same   g202_int_doctrine.js              base 0 PASS 27 FAIL 0 | Sa 0 PASS 27 FAIL 0 | Sc 0 PASS 27 FAIL 0 | S26 0 PASS 27 FAIL 0
+same   g202_pace_anchor.js               base 0 PASS 33 FAIL 0 | Sa 0 PASS 33 FAIL 0 | Sc 0 PASS 33 FAIL 0 | S26 0 PASS 33 FAIL 0
+same   g202_pace_copy.js                 base 0 PASS 16 FAIL 0 | Sa 0 PASS 16 FAIL 0 | Sc 0 PASS 16 FAIL 0 | S26 0 PASS 16 FAIL 0
+same   g203_ceiling_and_anchor.js        base 0 PASS 151 FAIL 0 | Sa 0 PASS 151 FAIL 0 | Sc 0 PASS 151 FAIL 0 | S26 0 PASS 151 FAIL 0
+same   g203_mile_pencil.js               base 0 PASS 98 FAIL 0 | Sa 0 PASS 98 FAIL 0 | Sc 0 PASS 98 FAIL 0 | S26 0 PASS 98 FAIL 0
+same   g204_clock_limb.js                base 0 PASS 71 FAIL 0 | Sa 0 PASS 71 FAIL 0 | Sc 0 PASS 71 FAIL 0 | S26 0 PASS 71 FAIL 0
+same   g205_bike_unmoved.js              base 0 PASS 15 FAIL 0 | Sa 0 PASS 15 FAIL 0 | Sc 0 PASS 15 FAIL 0 | S26 0 PASS 15 FAIL 0
+same   g205_chi_table6.js                base 0 PASS 29 FAIL 0 | Sa 0 PASS 29 FAIL 0 | Sc 0 PASS 29 FAIL 0 | S26 0 PASS 29 FAIL 0
+same   g205_d114_int_table6.js           base 0 PASS 18 FAIL 0 | Sa 0 PASS 18 FAIL 0 | Sc 0 PASS 18 FAIL 0 | S26 0 PASS 18 FAIL 0
+same   g205_d125_ceiling.js              base 0 PASS 22 FAIL 0 | Sa 0 PASS 22 FAIL 0 | Sc 0 PASS 22 FAIL 0 | S26 0 PASS 22 FAIL 0
+same   g205_d125_spaced.js               base 0 PASS 23 FAIL 0 | Sa 0 PASS 23 FAIL 0 | Sc 0 PASS 23 FAIL 0 | S26 0 PASS 23 FAIL 0
+same   g205_d129_tiebreak.js             base 0 PASS 111 FAIL 0 | Sa 0 PASS 111 FAIL 0 | Sc 0 PASS 111 FAIL 0 | S26 0 PASS 111 FAIL 0
+same   g205_d130_typed.js                base 0 PASS 24 FAIL 0 | Sa 0 PASS 24 FAIL 0 | Sc 0 PASS 24 FAIL 0 | S26 0 PASS 24 FAIL 0
+same   g205_d132_walkweek.js             base 0 PASS 16 FAIL 0 | Sa 0 PASS 16 FAIL 0 | Sc 0 PASS 16 FAIL 0 | S26 0 PASS 16 FAIL 0
+same   g205_pace_eve.js                  base 0 PASS 25 FAIL 0 | Sa 0 PASS 25 FAIL 0 | Sc 0 PASS 25 FAIL 0 | S26 0 PASS 25 FAIL 0
+same   g206_d109_copy.js                 base 0 PASS 13 FAIL 0 | Sa 0 PASS 13 FAIL 0 | Sc 0 PASS 13 FAIL 0 | S26 0 PASS 13 FAIL 0
+same   g206_d137_runbase_chi.js          base 0 PASS 11 FAIL 0 | Sa 0 PASS 11 FAIL 0 | Sc 0 PASS 11 FAIL 0 | S26 0 PASS 11 FAIL 0
+same   g207_gk_trial_present.js          base 0 PASS 651 FAIL 0 | Sa 0 PASS 651 FAIL 0 | Sc 0 PASS 651 FAIL 0 | S26 0 PASS 651 FAIL 0
+DIFFER g207_test_calendar.js             base 0 PASS 17 FAIL 0 | Sa 1 PASS 15 FAIL 2 | Sc 1 PASS 15 FAIL 2 | S26 1 PASS 15 FAIL 2
+         Sa new: FAIL C3g a past test (start 2026-08-17, test 2026-09-14, week 5 but before today) writes the key null and keeps 11 weeks (got {"cap":11,"weeks":11})
+         Sa new: FAIL C3h a test beyond the goal length (2027-01-04, week 15 of 11) writes the key null and keeps 11 weeks (got {"tw":15,"cap":15,"weeks":15})
+         Sc new: FAIL C3g a past test (start 2026-08-17, test 2026-09-14, week 5 but before today) writes the key null and keeps 11 weeks (got {"cap":11,"weeks":11})
+         Sc new: FAIL C3h a test beyond the goal length (2027-01-04, week 15 of 11) writes the key null and keeps 11 weeks (got {"tw":15,"cap":15,"weeks":15})
+         S26 new: FAIL C3g a past test (start 2026-08-17, test 2026-09-14, week 5 but before today) writes the key null and keeps 11 weeks (got {"cap":11,"weeks":11})
+         S26 new: FAIL C3h a test beyond the goal length (2027-01-04, week 15 of 11) writes the key null and keeps 11 weeks (got {"tw":15,"cap":15,"weeks":15})
+DIFFER g207_test_week.js                 base 0 PASS 74 FAIL 0 | Sa 1 PASS 73 FAIL 1 | Sc 1 PASS 73 FAIL 1 | S26 1 PASS 73 FAIL 1
+         Sa new: FAIL G4 test past the goal length (D138, out of scope): stored cfg carries _testWeek=null and _raceDateCappedWeeks=11, totalWeeks 11, start 2026-09-21 (got {"_testWeek":15,"capped":15,"totalWeeks":15,
+         Sc new: FAIL G4 test past the goal length (D138, out of scope): stored cfg carries _testWeek=null and _raceDateCappedWeeks=11, totalWeeks 11, start 2026-09-21 (got {"_testWeek":15,"capped":15,"totalWeeks":15,
+         S26 new: FAIL G4 test past the goal length (D138, out of scope): stored cfg carries _testWeek=null and _raceDateCappedWeeks=11, totalWeeks 11, start 2026-09-21 (got {"_testWeek":15,"capped":15,"totalWeeks":15,
+same   g208_d103a_chip.js                base 0 PASS 12 FAIL 0 | Sa 0 PASS 12 FAIL 0 | Sc 0 PASS 12 FAIL 0 | S26 0 PASS 12 FAIL 0
+same   g208_d103a_key.js                 base 0 PASS 6 FAIL 0 | Sa 0 PASS 6 FAIL 0 | Sc 0 PASS 6 FAIL 0 | S26 0 PASS 6 FAIL 0
+same   g208_d103a_readers.js             base 0 PASS 21 FAIL 0 | Sa 0 PASS 21 FAIL 0 | Sc 0 PASS 21 FAIL 0 | S26 0 PASS 21 FAIL 0
+same   g208_d104a_runbase.js             base 0 PASS 10 FAIL 0 | Sa 0 PASS 10 FAIL 0 | Sc 0 PASS 10 FAIL 0 | S26 0 PASS 10 FAIL 0
+same   g209_d140_tier.js                 base 0 PASS 13 FAIL 0 | Sa 0 PASS 13 FAIL 0 | Sc 0 PASS 13 FAIL 0 | S26 0 PASS 13 FAIL 0
+same   g210_equipment_denials.js         base 0 PASS 128 FAIL 0 | Sa 0 PASS 128 FAIL 0 | Sc 0 PASS 128 FAIL 0 | S26 0 PASS 128 FAIL 0
+same   g211_d153_d155.js                 base 0 PASS 48 FAIL 0 | Sa 0 PASS 48 FAIL 0 | Sc 0 PASS 48 FAIL 0 | S26 0 PASS 48 FAIL 0
+same   g212_d110a_swim.js                base 0 PASS 42 FAIL 0 | Sa 0 PASS 42 FAIL 0 | Sc 0 PASS 42 FAIL 0 | S26 0 PASS 42 FAIL 0
+same   g213_d113a.js                     base 0 PASS 25 FAIL 0 | Sa 0 PASS 25 FAIL 0 | Sc 0 PASS 25 FAIL 0 | S26 0 PASS 25 FAIL 0
+same   g214_d158_eve.js                  base 0 PASS 8 FAIL 0 | Sa 0 PASS 8 FAIL 0 | Sc 0 PASS 8 FAIL 0 | S26 0 PASS 8 FAIL 0
+same   g215_d149_ghd.js                  base 0 PASS 61 FAIL 0 | Sa 0 PASS 61 FAIL 0 | Sc 0 PASS 61 FAIL 0 | S26 0 PASS 61 FAIL 0
+same   g216_d154_swap_lens.js            base 0 PASS 25 FAIL 0 | Sa 0 PASS 25 FAIL 0 | Sc 0 PASS 25 FAIL 0 | S26 0 PASS 25 FAIL 0
+same   g216_d156_longday.js              base 0 PASS 6 FAIL 0 | Sa 0 PASS 6 FAIL 0 | Sc 0 PASS 6 FAIL 0 | S26 0 PASS 6 FAIL 0

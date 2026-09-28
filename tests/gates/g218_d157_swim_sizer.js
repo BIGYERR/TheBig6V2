@@ -41,8 +41,12 @@
 //   LB1  pace line (updateSwimPaceDisplay) and initial render (renderWizardStep, swimPaceLine): every seconds-only
 //        target (minutes box untouched or "", 30 s to 900 s, >= 60 s included) x 100 / 500 x yd / m shows the m:ss
 //        twin's display and text.
-//   LB2  HAND m:ss oracle (the gate's own formatter, never _clkMS): each twin's pace line and initial render read
-//        "<m:ss total> — <m:ss total*100/dist>/100 (<unit>)"; its sizer warning carries " (<m:ss total>/<dist><unit>) needs ".
+//   LB2  HAND m:ss oracle (the gate's own formatter, never _clkMS): each twin's pace line and initial render read,
+//        by era (standing rulings 2 and 4): at ia-version <= 222 (D157, their era) "<m:ss total> — <m:ss total*100/dist>/100 (<unit>)";
+//        at >= 223 (D183 P-SAFEPACE amendment 2 (d)) "<m:ss total> is <m:ss total*100/dist> per 100 <unit>.". Its sizer
+//        warning carries " (<m:ss total>/<dist><unit>) needs " in both eras. OT1 reads the same era's text; LB1 is twin
+//        against twin and has no era. IA_ASSUME_VERSION=223 lifts a file stamped exactly 222 to 223 for a
+//        discrimination run; it is announced, ignored on any other stamp, and gate.sh never sets it.
 //   OT1  CLASS (coach, accepted in slice 2a, one class with "0:75"): typed forms that are not canonical m:ss print their
 //        TOTAL at all three sites, where V217 echoed the raw boxes: "01:15" -> 1:15, "00:55" -> 0:55, "1.5:00" -> 1:30,
 //        "1:30.5" -> 1:31, "1:75" -> 2:15. Program length is unchanged by the label.
@@ -75,6 +79,8 @@ const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const C = load(ART);
 const VER = +C.version, ERA = 218, V217_COMMIT = '7af6ad9d46f17e216e26901f3e0812797171fa9f';
+const D183_ERA = 223, ERA_V = (process.env.IA_ASSUME_VERSION === String(D183_ERA) && VER === D183_ERA - 1) ? D183_ERA : VER;
+if(ERA_V !== VER) console.log('ASSUMED ia-version ' + ERA_V + ' on a file stamped ' + VER + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 const ROWS = ['U1','L1','L2','Z1','ST1','LB1','LB2','OT1','Z2','F0','U2','C1','C2','ST2','HM','LB3'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
@@ -230,7 +236,14 @@ if(PAIR){ let n = 0, bad = 0, ex = [], crash = 0;
     IA.eval('WD={primaryPath:"goal",cardioTypes:["swim"],experience:"advanced",ageBracket:"18-35",eventTargeted:false,liftingFocus:"support_prevention",equipment:"crossfit",restDays:["sun","wed"],unit:"lbs",seed:76308,name:"S",cardioGoals:{swim:JSON.parse(JSON.stringify(__G))}}; wizardStep=WIZARD_STEPS.indexOf("cardio_goal"); renderWizardStep();');
     const m = String(IA.els.get('wizardBody').innerHTML || '').match(/<div id="swimPaceLine"[^>]*display:([a-z]+)[^>]*>([\s\S]*?)<\/div>/);
     return m ? { disp:m[1], raw:m[0], txt:strip(m[2]) } : { disp:'MISSING', raw:'', txt:'' }; };
-  const expTxt = (t, goal, unit) => hand(t) + ' — ' + hand(t * 100 / DIST[goal]) + '/100 (' + unit + ')';
+  // the pace line text, one shape per era (standing rulings 2 and 4): D157's at ia-version <= 222 (their era),
+  // D183's (P-SAFEPACE amendment 2 (d), "<time> is <pace> per 100 <unit>.") at >= 223
+  const LB_ERA = ERA_V >= D183_ERA ? 'D183 era (ia-version ' + ERA_V + ' >= ' + D183_ERA + '): "<t> is <pace> per 100 <unit>."'
+    : 'D157 era (ia-version ' + ERA_V + ' <= ' + (D183_ERA - 1) + '): "<t> — <pace>/100 (<unit>)"';
+  const expTxt = ERA_V >= D183_ERA
+    ? (t, goal, unit) => hand(t) + ' is ' + hand(t * 100 / DIST[goal]) + ' per 100 ' + unit + '.'
+    : (t, goal, unit) => hand(t) + ' — ' + hand(t * 100 / DIST[goal]) + '/100 (' + unit + ')';
+  console.log('  pace line text: ' + LB_ERA);
   const expLbl = (t, goal, unit) => ' (' + hand(t) + '/' + DIST[goal] + unit + ') needs ';
   const ex = (o, s) => { if(o.ex.length < 3) o.ex.push(s); };
   // LB1 + LB2: seconds-only targets against their twins; twins against the hand formatter
@@ -244,7 +257,7 @@ if(PAIR){ let n = 0, bad = 0, ex = [], crash = 0;
     for(const form of ['undef','empty']) for(const s of ['W','R']){ A.n++; const x = (s === 'W' ? W : R)(CL, mk(form));
       if(!(x.disp === tw[s].disp && x.txt === tw[s].txt)){ A.bad++; ex(A, s + ' ' + goal + ' ' + unit + ' ' + t + 's ' + form + ' ' + x.disp + ' "' + x.txt + '" vs twin ' + tw[s].disp + ' "' + tw[s].txt + '"'); } } }
   ok('LB1 pace line + initial render: ' + (A.n - A.bad) + '/' + A.n + ' seconds-only targets (>= 60 s included, box untouched or "") show the m:ss twin\'s display and text' + (A.ex.length ? ' e.g. ' + A.ex.join('; ') : ''), A.n === 160 && A.bad === 0);
-  ok('LB2 hand m:ss oracle: ' + (K.n - K.bad) + '/' + K.n + ' twin labels (pace line, initial render, sizer warning) read hand(total) and hand(pace)/100' + (K.ex.length ? ' e.g. ' + K.ex.join('; ') : ''), K.n === 120 && K.bad === 0);
+  ok('LB2 hand m:ss oracle: ' + (K.n - K.bad) + '/' + K.n + ' twin labels (pace line, initial render, sizer warning) read hand(total) and hand(pace), ' + LB_ERA + (K.ex.length ? ' e.g. ' + K.ex.join('; ') : ''), K.n === 120 && K.bad === 0);
   // OT1: odd typed forms print their total (coach accepted, slice 2a)
   const OT = [['01','15'],['00','55'],['1.5','0'],['1','30.5'],['1','75']], O = { n:0, bad:0, ex:[] };
   for(const goal of Object.keys(DIST)) for(const [m, s] of OT){ const g = Object.assign({ id:goal, label:goal, swimUnit:'yd', targetMins:m, targetSecs:s }, CUR[goal]);

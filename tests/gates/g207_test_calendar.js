@@ -1,9 +1,12 @@
 // g207_test_calendar.js — the gate for D106a slice C (coach, Mario concurred): the calendar
 // controls and the copy around a test goal's test week.
-//   C3 one-time backfill in refreshProgram: a STORED dated test goal with no _testWeek key gets
-//      one from its stored start (null when the test is past, before the start, or beyond the
-//      goal length), persisted, so the key exists and it never runs again. Trained days stay
-//      byte-identical through the per-day freeze.
+//   C3 the backfill in refreshProgram (D106a; C3g to C3j re-keyed V223 for D184 P-TESTLEN,
+//      tests/measure/v223_rulings/p_testlen_d184_ruling.md Q1): a STORED dated test goal whose
+//      _testWeek is absent or null re-derives its test week from its stored start each boot
+//      until it pins. It pins when the test is in weeks 1 to 26 (the rows of Table 6) and not
+//      past, and persists both pins, so the key is numeric and it stops running. Otherwise it
+//      writes nothing: the key stays as it was (absent or null) and the stored length stands.
+//      Trained days stay byte-identical through the per-day freeze.
 //   C1 setProgStart re-pins a dated test goal from the new start and refreshes (setProgRace's
 //      shape: untrained weeks re-pin, trained weeks stay frozen).
 //   C2 / A4 coach's verbatim copy: the red card under a week, and the wizard sentence.
@@ -25,9 +28,22 @@
 //   * RUNS ONCE: after the backfill, the stored start is moved a week later and the program
 //     refreshed again. A backfill that re-ran would now derive week 4; the key keeps 5.
 //   * COPY: coach's strings verbatim, and no dash in either new sentence.
+//   * D184 ROWS, no licence predicate (the ruling keeps no row's old direction): C3g, C3h and C3i
+//     fail on V222 and pass on V223; C3j and C3d are controls and pass on both. Weeks are Monday
+//     arithmetic from S: S + 7(k - 1) days is week k, so S + 91 is week 14, S + 98 is week 15 and
+//     S + 189 is week 28 (past Table 6's 26 rows). "Writes nothing" is proved against the
+//     fixture's OWN stored cfg bytes in ia_programs, read before the refresh (canon, keys sorted).
 //
 // VERSION PREDICATE (standing ruling 4). D106a ships on ia-version 207. Below 207 every row is
 // NOT APPLICABLE and skipped, never a bare PASS.
+//
+// SECOND PREDICATE, the C4 copy rows (re-keyed V223 for D183 P-SAFEPACE R3 and amendments 2 and 3,
+// tests/measure/v223_rulings/p_safepace_ruling.md; tests/edits/v223_t2_d183_rekey_g207_g218_g203.py).
+// Standing rulings 2 and 4: the D106a C4 rows are licensed at ia-version <= 222 (their era) and do
+// not run above it; the D183 C4 rows run at >= 223 and assert R3's card copy and colour, typed from
+// the ruling. C4d derives its test week by hand (Monday weeks, the D25 start snap, rest sun/wed).
+// IA_ASSUME_VERSION=223 lifts a file stamped exactly 222 to 223 for a discrimination run; it is
+// announced, ignored on any other stamp, and gate.sh never sets it.
 'use strict';
 process.env.TZ = 'America/New_York';
 const path = require('path');
@@ -36,6 +52,9 @@ const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA0 = H.load(ART);
 const VER = +IA0.version;
 const D106A_ERA = 207;
+const D183_ERA = 223;
+const ERA_V = (process.env.IA_ASSUME_VERSION === String(D183_ERA) && VER === D183_ERA - 1) ? D183_ERA : VER;
+if(ERA_V !== VER) console.log('ASSUMED ia-version ' + ERA_V + ' on a file stamped ' + VER + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 
 let pass = 0, fail = 0, skip = 0;
 function ok(label, cond, got){
@@ -44,7 +63,7 @@ function ok(label, cond, got){
 }
 function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function summary(){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); }
-const ROWS = ['C3a','C3b','C3c','C3d','C3e','C3f','C3g','C3h','C1a','C1b','C1c','C4a','C4b','C4c','C4d','C4e','C4f'];
+const ROWS = ['C3a','C3b','C3c','C3d','C3e','C3f','C3g','C3h','C3i','C3j','C1a','C1b','C1c','C4a','C4b','C4c','C4d','C4e','C4f'];
 if(VER < D106A_ERA){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D106a (V' + D106A_ERA + ').');
   for(const r of ROWS) skipRow(r + ' skipped below the D106a era');
@@ -125,18 +144,48 @@ function tryRefresh(V, prog){ try { return V.refreshProgram(prog); } catch(e){ r
   const u = tryRefresh(U.V, U.read());
   ok('C3f a stored pace program without a test date is untouched: no _testWeek key, 11 weeks',
      !u.crash && !own(u.cfg, '_testWeek') && !own(U.read().cfg, '_testWeek') && u.totalWeeks === 11, u.crash || JSON.stringify({key: own(u.cfg, '_testWeek'), weeks: u.totalWeeks}));
+  // D184 (P-TESTLEN, V223): the backfill writes nothing unless the test pins. cfgBytes is the
+  // fixture's own stored cfg in ia_programs; read before the refresh, it is the "no write" oracle.
+  const cfgBytes = X => canon(X.read().cfg);
+  const DOW = ['sun','mon','tue','wed','thu','fri','sat'];   // Date.getDay() order
   const pStart = iso(addDays(S, -42)), pTest = iso(addDays(S, -14));   // week 5 of that start, and in the past
   const P = stored(pace({raceDate:pTest, _raceDateCappedWeeks:11}), pStart, 'p_c3_past');
+  const pBytes = cfgBytes(P);
   const q = tryRefresh(P.V, P.read());
-  ok('C3g a past test (start ' + pStart + ', test ' + pTest + ', week 5 but before today) writes the key null and keeps 11 weeks',
-     !q.crash && own(q.cfg, '_testWeek') && q.cfg._testWeek === null && q.cfg._raceDateCappedWeeks === 11 && q.totalWeeks === 11 && P.read().cfg._testWeek === null,
-     q.crash || JSON.stringify({tw: q.cfg._testWeek, cap: q.cfg._raceDateCappedWeeks, weeks: q.totalWeeks}));
-  const far = iso(addDays(S, 7 * 14));   // week 15 > the 11-week goal length (D138)
+  ok('C3g a past test (start ' + pStart + ', test ' + pTest + ', week 5 but before today) writes nothing (D184): no _testWeek key in memory or in ia_programs, the stored cfg bytes unchanged, cap 11, 11 weeks',
+     !q.crash && !own(q.cfg, '_testWeek') && !own(P.read().cfg, '_testWeek') && cfgBytes(P) === pBytes
+       && q.cfg._raceDateCappedWeeks === 11 && q.totalWeeks === 11,
+     q.crash || JSON.stringify({memKey: own(q.cfg, '_testWeek'), storeKey: own(P.read().cfg, '_testWeek'), tw: q.cfg._testWeek, cap: q.cfg._raceDateCappedWeeks, weeks: q.totalWeeks, bytesEqual: cfgBytes(P) === pBytes}));
+  const farD = addDays(S, 7 * 14), far = iso(farD), farDay = DOW[farD.getDay()];   // week 15 of the 11-week goal
   const F = stored(pace({raceDate:far, _raceDateCappedWeeks:11}), S_ISO, 'p_c3_far');
   const f = tryRefresh(F.V, F.read());
-  ok('C3h a test beyond the goal length (' + far + ', week 15 of 11) writes the key null and keeps 11 weeks',
-     !f.crash && own(f.cfg, '_testWeek') && f.cfg._testWeek === null && f.cfg._raceDateCappedWeeks === 11 && f.totalWeeks === 11,
-     f.crash || JSON.stringify({tw: f.cfg._testWeek, cap: f.cfg._raceDateCappedWeeks, weeks: f.totalWeeks}));
+  const fp = F.read().cfg, fDay = !f.crash && f.weeks && f.weeks[15] && f.weeks[15][farDay];
+  ok('C3h a test past the goal length (' + far + ', week 15 of 11) pins it (D184): _testWeek 15, _raceDateCappedWeeks 15, 15 weeks, both persisted, and the trial sits in W15 on the test weekday (' + farDay + ')',
+     !f.crash && f.cfg._testWeek === 15 && f.cfg._raceDateCappedWeeks === 15 && f.totalWeeks === 15
+       && fp._testWeek === 15 && fp._raceDateCappedWeeks === 15 && isTrial(fDay && fDay.cardio),
+     f.crash || JSON.stringify({tw: f.cfg._testWeek, cap: f.cfg._raceDateCappedWeeks, weeks: f.totalWeeks, persisted: [fp._testWeek, fp._raceDateCappedWeeks], w15: fDay && fDay.cardio && fDay.cardio.subtype}));
+  // C3i: the population the D184 backfill exists for, the V209 shape the ruling names (_testWeek
+  // stored null because the old gate stopped at the goal length; the test in week 14 of 11, M8 S3's
+  // example). It re-pins and persists, and the trained W1 Mon holds through the re-pin.
+  const i14 = iso(addDays(S, 7 * 13));
+  const I = stored(pace({raceDate:i14, _testWeek:null, _raceDateCappedWeeks:11}), S_ISO, 'p_c3_v209');
+  const ii = tryRefresh(I.V, I.read());
+  const ip = I.read().cfg, iW1 = !ii.crash && ii.weeks && ii.weeks[1] && ii.weeks[1].mon;
+  const iFresh = I.V.buildProgram(clone(pace({raceDate:i14, _testWeek:14, _raceDateCappedWeeks:14})));
+  ok('C3i the V209 shape (_testWeek null, test ' + i14 + ', week 14 of 11) re-pins (D184): _testWeek 14, _raceDateCappedWeeks 14, 14 weeks, both persisted, and the trained W1 Mon is byte-identical to the sentinel (a fresh build of it differs)',
+     !ii.crash && ii.cfg._testWeek === 14 && ii.cfg._raceDateCappedWeeks === 14 && ii.totalWeeks === 14
+       && ip._testWeek === 14 && ip._raceDateCappedWeeks === 14
+       && !!iW1 && canon(iW1) === canon(I.SENT) && iFresh.weeks[1].mon.title !== I.SENT.title,
+     ii.crash || JSON.stringify({tw: ii.cfg._testWeek, cap: ii.cfg._raceDateCappedWeeks, weeks: ii.totalWeeks, persisted: [ip._testWeek, ip._raceDateCappedWeeks], w1mon: iW1 && iW1.title}));
+  // C3j (control, passes on both): _testWeek null with the test in week 28, past Table 6. No pin, no write.
+  const j28 = iso(addDays(S, 7 * 27));
+  const J = stored(pace({raceDate:j28, _testWeek:null, _raceDateCappedWeeks:11}), S_ISO, 'p_c3_w28');
+  const jBytes = cfgBytes(J);
+  const jj = tryRefresh(J.V, J.read());
+  ok('C3j control: _testWeek null with the test in week 28 (' + j28 + ') stays null in memory and in ia_programs, the stored cfg bytes unchanged, cap 11, 11 weeks',
+     !jj.crash && own(jj.cfg, '_testWeek') && jj.cfg._testWeek === null && J.read().cfg._testWeek === null && cfgBytes(J) === jBytes
+       && jj.cfg._raceDateCappedWeeks === 11 && jj.totalWeeks === 11,
+     jj.crash || JSON.stringify({tw: jj.cfg._testWeek, stored: J.read().cfg._testWeek, cap: jj.cfg._raceDateCappedWeeks, weeks: jj.totalWeeks, bytesEqual: cfgBytes(J) === jBytes}));
 }
 
 // ── C1 — setProgStart re-pins ─────────────────────────────────────────────────────────
@@ -175,7 +224,11 @@ function feedback(wd){
 }
 const wdPace = over => Object.assign({cardioTypes:['run'], cardioGoals:pace().cardioGoals, experience:'intermediate', ageBracket:'18-35',
   liftingFocus:'balanced', eventTargeted:true, primaryPath:'event', restDays:['sun','wed']}, over || {});
-{
+const C4_ERA = ERA_V >= D183_ERA
+  ? 'D183 era (ia-version ' + ERA_V + ' >= ' + D183_ERA + '): R3 card copy and colour'
+  : 'D106a era (ia-version ' + ERA_V + ' <= ' + (D183_ERA - 1) + '): A4 sentence and the red card';
+console.log('# C4 rows: ' + C4_ERA);
+if(ERA_V < D183_ERA){
   const h5 = feedback(wdPace({startDate:S_ISO, raceDate:R_ISO}));
   ok('C4a wizard, test inside the goal length (start ' + S_ISO + ', test ' + R_ISO + '): coach\'s sentence verbatim, and "stays intact" is gone',
      h5.includes(A4_5) && !h5.includes(INTACT), h5.slice(0, 160));
@@ -191,5 +244,41 @@ const wdPace = over => Object.assign({cardioTypes:['run'], cardioGoals:pace().ca
   const hn = feedback(wdPace({startDate:iso(TODAY), raceDate:soon, cardioGoals:{run:{id:'run_5k', label:'5K'}}}));
   ok('C4e red card, NRC 5K under a week out: the existing sentence stands', hn.includes(RED_OLD) && !hn.includes(RED), hn.slice(0, 200));
   ok('C4f no dash in either new sentence', ![A4_5, A4_1, RED].some(s => /[-‐-―]/.test(s)) && h5.includes(A4_5) && hr.includes(RED));
+} else {
+  console.log('  n/a  the D106a C4 rows are licensed at ia-version <= ' + (D183_ERA - 1) + ' only; ia-version ' + ERA_V + ' runs the D183 C4 rows in their place');
+  // R3's card sentences, typed from the ruling (never read from the app).
+  const T_W5 = 'Your test is in week 5. The program ends on it. The taper lands in front of it.';
+  const T_TW1 = 'Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.';
+  const T_NULL = 'Your test is before your first training day. This program starts after it and does not include it.';
+  const T_WK = n => 'Your test is in week ' + n + '. The program ends on it. The taper lands in front of it.';
+  const NT_1WK = 'Less than a week away. Not enough time to train.';
+  const h5 = feedback(wdPace({startDate:S_ISO, raceDate:R_ISO}));
+  ok('C4a D183 era, test in week 5 (start ' + S_ISO + ', test ' + R_ISO + '): the R3 sentence verbatim, and "stays intact" is gone',
+     h5.includes(T_W5) && !h5.includes(INTACT), h5.slice(0, 200));
+  const s1 = iso(addDays(S, 7)), t1 = iso(addDays(S, 10));   // test on the Thursday of the start week
+  const h1 = feedback(wdPace({startDate:s1, raceDate:t1}));
+  ok('C4b D183 era, test in the start week (start ' + s1 + ', test ' + t1 + '): the R3 tw 1 sentence verbatim', h1.includes(T_TW1), h1.slice(0, 200));
+  const bs = iso(addDays(S, 35));
+  const hb = feedback(wdPace({startDate:bs, raceDate:R_ISO}));
+  ok('C4c D183 era, test before the start (start ' + bs + ', test ' + R_ISO + '): the --signal null row verbatim, neither "stays intact" nor "Your test is in week"',
+     hb.includes('var(--signal)') && hb.includes(T_NULL) && !hb.includes(INTACT) && !hb.includes('Your test is in week'), hb.slice(0, 200));
+  // The test week by hand: week 1 is the Monday week holding the start; a start whose remaining days of
+  // that week are all rest (sun/wed here) snaps to the next Monday (D25). The test is today + 3.
+  const ISO7 = ['mon','tue','wed','thu','fri','sat','sun'], REST = ['sun','wed'];
+  const soonD = addDays(TODAY, 3), soon = iso(soonD);
+  const off = (TODAY.getDay() + 6) % 7;                                   // 0 Mon .. 6 Sun
+  const snapped = off > 0 && ISO7.slice(off).filter(k => !REST.includes(k)).length === 0;
+  const startMon = addDays(TODAY, snapped ? 7 - off : -off);
+  const testMon = addDays(soonD, -((soonD.getDay() + 6) % 7));
+  const twHand = Math.round((testMon - startMon) / 86400000) / 7 + 1;
+  const T_D = twHand === 1 ? T_TW1 : T_WK(twHand);
+  const hr = feedback(wdPace({startDate:iso(TODAY), raceDate:soon}));
+  ok('C4d D183 era, test goal under a week out (start ' + iso(TODAY) + ', test ' + soon + ', week ' + twHand + ' by hand' + (snapped ? ', D25 start snap to ' + iso(startMon) : '') + '): the matching R3 sentence verbatim, and never red',
+     (twHand === 1 || twHand === 2) && hr.includes(T_D) && !hr.includes('var(--red)'), hr.slice(0, 200));
+  const hn = feedback(wdPace({startDate:iso(TODAY), raceDate:soon, cardioGoals:{run:{id:'run_5k', label:'5K'}}}));
+  ok('C4e D183 era, NRC 5K under a week out: the R3 sentence verbatim, and not the dashed text', hn.includes(NT_1WK) && !hn.includes(RED_OLD), hn.slice(0, 200));
+  const NEW = [T_W5, T_TW1, T_NULL, T_WK(2), NT_1WK];
+  ok('C4f D183 era, no dash in any typed sentence, and each renders on its case',
+     !NEW.some(s => /[-‐-―]/.test(s)) && h5.includes(T_W5) && h1.includes(T_TW1) && hb.includes(T_NULL) && hr.includes(T_D) && hn.includes(NT_1WK));
 }
 summary();

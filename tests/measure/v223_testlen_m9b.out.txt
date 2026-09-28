@@ -1,0 +1,85 @@
+versions base=222 Sc2=222 TZ America/New_York clock local 21:16 on each today (Mon 2026-09-21 .. Sun 2026-09-27)
+
+=== A  resolver sweep: lattice points 120050 (2 goals x 7 todays x 35 entered x 7 rest x 35 test dates)
+   oracle (c)-cases 1206 | resolver start moved by Sc2 AND oracle (c): 1206 | moved but NOT (c): 0 | (c) but not moved: 0
+      entered<today startDow=fri             12
+      entered<today startDow=sat             6
+      entered<today startDow=thu             12
+      entered==today startDow=fri            12
+      entered==today startDow=sat            12
+      entered==today startDow=sun            10
+      entered==today startDow=thu            8
+      entered>today startDow=fri             324
+      entered>today startDow=sat             324
+      entered>today startDow=sun             270
+      entered>today startDow=thu             216
+      rest=fri,sat,sun                       344
+      rest=sat,sun                           170
+      rest=sun                               56
+      rest=sun,wed                           56
+      rest=thu..sun                          580
+    entered<today                            30
+    entered==today                           42
+    entered>today                            1134
+
+=== B  (c)-case builds (goal 1.5mi 12:00, x3 experience) under Sc2, segmented by entered vs today
+  entered>today n 1701 err 0
+         0/1701 claim "starts today" TRUE (start==today)
+       288/1701 claim "This week holds your test" TRUE (test in today's Mon..Sun)
+      1701/1701 claim "Week 1 is the test week" TRUE (oracle tw==1)
+      1701/1701 built tw==1 (WD._testWeek)
+      1701/1701 totalWeeks==1
+      1701/1701 trial on test weekday (subtype TIME TRIAL)
+      1701/1701 Q3 train days start..test-1 == 0
+      1701/1701 train days after test in W1 == 0 ("ends on the test")
+      1701/1701 days today..start-1 OUTSIDE program > 0
+      1701/1701 rendered D21 sentence non-empty
+      base outcome {"next Monday tot6 twnull":1134,"next Monday tot11 twnull":567}
+      Sc2 start {"=entered thu":324,"=entered fri":486,"=entered sat":486,"=entered sun":405}
+       {"start is +0 calendar weeks from today":288,"start is +1 calendar weeks from today":441,"start is +2 calendar weeks from today":441,"start is +3 calendar weeks from today":441,"start is +4 calendar weeks from today":90}
+      Sc2 D21 sentence {"This week holds your test, so this starts today. Week N is the test week.":1701}
+      cardio_goal callout (rendered from WD.startDate at that step) {"Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.":1134,"Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test. Your paces start from the b":567}
+  entered==today n 63 err 0
+        63/63 claim "starts today" TRUE (start==today)
+        63/63 claim "This week holds your test" TRUE (test in today's Mon..Sun)
+        63/63 claim "Week 1 is the test week" TRUE (oracle tw==1)
+        63/63 built tw==1 (WD._testWeek)
+        63/63 totalWeeks==1
+        63/63 trial on test weekday (subtype TIME TRIAL)
+        63/63 Q3 train days start..test-1 == 0
+        63/63 train days after test in W1 == 0 ("ends on the test")
+         0/63 days today..start-1 OUTSIDE program > 0
+        63/63 rendered D21 sentence non-empty
+      base outcome {"next Monday tot6 twnull":42,"next Monday tot11 twnull":21}
+      Sc2 start {"=entered thu":12,"=entered fri":18,"=entered sat":18,"=entered sun":15}
+       {"start is +0 calendar weeks from today":63}
+      Sc2 D21 sentence {"This week holds your test, so this starts today. Week N is the test week.":63}
+      cardio_goal callout (rendered from WD.startDate at that step) {"Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.":42,"Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test. Your paces start from the b":21}
+  entered<today n 45 err 0
+         0/45 claim "starts today" TRUE (start==today)
+        45/45 claim "This week holds your test" TRUE (test in today's Mon..Sun)
+        45/45 claim "Week 1 is the test week" TRUE (oracle tw==1)
+        45/45 built tw==1 (WD._testWeek)
+        45/45 totalWeeks==1
+        45/45 trial on test weekday (subtype TIME TRIAL)
+        45/45 Q3 train days start..test-1 == 0
+        45/45 train days after test in W1 == 0 ("ends on the test")
+         0/45 days today..start-1 OUTSIDE program > 0
+        45/45 rendered D21 sentence non-empty
+      base outcome {"next Monday tot6 twnull":30,"next Monday tot11 twnull":15}
+      Sc2 start {"=entered thu":18,"=entered fri":18,"=entered sat":9}
+       {"start is +0 calendar weeks from today":45}
+      Sc2 D21 sentence {"This week holds your test, so this starts today. Week N is the test week.":45}
+      cardio_goal callout (rendered from WD.startDate at that step) {"Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.":30,"Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test. Your paces start from the b":15}
+   ex entered>today today 2026-09-21(mon) entered 2026-09-24(thu) rest thu..sun test 2026-09-24(thu) intermediate | base start 2026-09-28 tot 6 tw null | Sc2 start 2026-09-24 tot 1 tw 1 | base sr "Nothing left to train that week, so this starts Mon, Sep 28 . Week 1 runs Sep 28 – Oct 4 ." | Sc2 sr "This week holds your test, so this starts today. Week 1 is the test week." | callout "Your test is this week. You get the test week only. Primer lifts, a shakeout, then the tes"
+   ex entered>today today 2026-09-21(mon) entered 2026-09-24(thu) rest thu..sun test 2026-09-24(thu) beginner | base start 2026-09-28 tot 11 tw null | Sc2 start 2026-09-24 tot 1 tw 1 | base sr "Nothing left to train that week, so this starts Mon, Sep 28 . Week 1 runs Sep 28 – Oct 4 ." | Sc2 sr "This week holds your test, so this starts today. Week 1 is the test week." | callout "Your test is this week. You get the test week only. Primer lifts, a shakeout, then the tes"
+   ex entered>today today 2026-09-21(mon) entered 2026-09-24(thu) rest thu..sun test 2026-09-24(thu) advanced | base start 2026-09-28 tot 6 tw null | Sc2 start 2026-09-24 tot 1 tw 1 | base sr "Nothing left to train that week, so this starts Mon, Sep 28 . Week 1 runs Sep 28 – Oct 4 ." | Sc2 sr "This week holds your test, so this starts today. Week 1 is the test week." | callout "Your test is this week. You get the test week only. Primer lifts, a shakeout, then the tes"
+   ex entered<today today 2026-09-25(fri) entered 2026-09-24(thu) rest thu..sun test 2026-09-25(fri) intermediate | base start 2026-09-28 tot 6 tw null | Sc2 start 2026-09-24 tot 1 tw 1 | base sr "Nothing left to train that week, so this starts Mon, Sep 28 . Week 1 runs Sep 28 – Oct 4 ." | Sc2 sr "This week holds your test, so this starts today. Week 1 is the test week." | callout "Your test is this week. You get the test week only. Primer lifts, a shakeout, then the tes"
+   ex entered<today today 2026-09-25(fri) entered 2026-09-24(thu) rest thu..sun test 2026-09-25(fri) beginner | base start 2026-09-28 tot 11 tw null | Sc2 start 2026-09-24 tot 1 tw 1 | base sr "Nothing left to train that week, so this starts Mon, Sep 28 . Week 1 runs Sep 28 – Oct 4 ." | Sc2 sr "This week holds your test, so this starts today. Week 1 is the test week." | callout "Your test is this week. You get the test week only. Primer lifts, a shakeout, then the tes"
+   ex entered<today today 2026-09-25(fri) entered 2026-09-24(thu) rest thu..sun test 2026-09-25(fri) advanced | base start 2026-09-28 tot 6 tw null | Sc2 start 2026-09-24 tot 1 tw 1 | base sr "Nothing left to train that week, so this starts Mon, Sep 28 . Week 1 runs Sep 28 – Oct 4 ." | Sc2 sr "This week holds your test, so this starts today. Week 1 is the test week." | callout "Your test is this week. You get the test week only. Primer lifts, a shakeout, then the tes"
+
+=== C  base startResolveCopy on a snap (today Thu 2026-09-24, entered = today, rest thu..sun)
+    Nothing left to train that week, so this starts Mon, Sep 28 . Week 1 runs Sep 28 – Oct 4 .
+   setProgStart toast string (base, snap): Nothing to train that week — starts Mon, Sep 28 ✓
+
+DONE

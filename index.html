@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="222"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="223"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1901,10 +1901,20 @@ const WIZARD_STEPS = ['primary','profile','equipment','cardio_goal','lifting_foc
 //     Sunday; the days before it are OUTSIDE the block (dayBeforeStart), not missed.
 //   • snapped=true when that short week would hold ZERO training days (D25) — the start
 //     moves to the next Monday and the copy says so. The one case "start now" is empty.
+//   • holdsTest=true (D184 c) when that short week holds the test of a dated test goal: the
+//     test date (from _rsRace) falls from the entered day through that Sunday. That week is
+//     not empty, so it does not snap: the start stays the entered day and week 1 is the test week.
 const _ISO_ORDER = ['mon','tue','wed','thu','fri','sat','sun'];
 function _isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function _isoToday(){ const t=new Date(); t.setHours(0,0,0,0); return _isoOf(t); }
-function resolveStartDate(dateStr, restDays){
+// D184 (c): the test date the resolver is given, or null. Only a dated test goal has one (the
+// run_pace_goal family, PACE_GOALS); race goals, run_base, undated goals and non run programs get
+// null, so the D25 snap is unchanged for them.
+function _rsRace(c){
+  const g = c && c.cardioGoals && c.cardioGoals.run;
+  return (c && (c.cardioTypes||[]).includes('run') && g && PACE_GOALS.has(g.id) && c.eventTargeted !== false && c.raceDate) ? c.raceDate : null;
+}
+function resolveStartDate(dateStr, restDays, raceIso){
   const rest = new Set(Array.isArray(restDays) ? restDays : []);
   let d = _parseLocalDate(dateStr);
   if(!d){ d = new Date(); d.setHours(0,0,0,0); }
@@ -1912,14 +1922,21 @@ function resolveStartDate(dateStr, restDays){
   const offset = Math.round((d - mon)/86400000);          // 0 = Monday … 6 = Sunday
   const partial = offset > 0;
   const week1Train = _ISO_ORDER.slice(offset).filter(k => !rest.has(k));
-  if(partial && week1Train.length === 0){
+  // D184 (c): a short week with no training day left holds the test when the test date _rt
+  // falls from the entered day d through that week's Sunday. It keeps the entered start (no
+  // snap) and is week 1, the test week. Without raceIso nothing here changes.
+  const _rt = raceIso ? _parseLocalDate(raceIso) : null;
+  const _sun = new Date(mon); _sun.setDate(mon.getDate()+6); _sun.setHours(0,0,0,0);
+  const holdsTest = !!(partial && week1Train.length === 0 && _rt && _rt >= d && _rt <= _sun);
+  if(partial && week1Train.length === 0 && !holdsTest){
     const nm = new Date(mon); nm.setDate(mon.getDate()+7); nm.setHours(0,0,0,0);
     return {start:_isoOf(nm), entered:_isoOf(d), mon:_isoOf(nm), partial:false, snapped:true,
             week1Train:_ISO_ORDER.filter(k=>!rest.has(k)), nextMon:_isoOf(nm)};
   }
   const nm = new Date(mon); nm.setDate(mon.getDate()+7); nm.setHours(0,0,0,0);
-  return {start:_isoOf(d), entered:_isoOf(d), mon:_isoOf(mon), partial, snapped:false,
+  const r = {start:_isoOf(d), entered:_isoOf(d), mon:_isoOf(mon), partial, snapped:false,
           week1Train, nextMon:_isoOf(nm)};
+  return holdsTest ? {...r, holdsTest:true} : r;   // the key exists only when true: every other return is unchanged
 }
 function _fmtStartDay(iso, withYear){
   const d=_parseLocalDate(iso); if(!d) return iso;
@@ -1929,10 +1946,13 @@ function _fmtSpan(isoFrom, isoTo){
   const a=_parseLocalDate(isoFrom), b=_parseLocalDate(isoTo); if(!a||!b) return '';
   return a.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' \u2013 '+b.toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
-// The one sentence under the picker (D21/D25). Same function feeds the wizard and the
-// setProgStart toast so the two surfaces cannot disagree.
+// The one sentence under the picker (D21/D25, D184 c). The setProgStart toast never called
+// this function; the two surfaces agree because both read the same resolveStartDate return.
 function startResolveCopy(r){
   const sunOf = iso => { const m=_parseLocalDate(iso); const s=new Date(m); s.setDate(m.getDate()+6); return _isoOf(s); };
+  if(r.holdsTest){
+    return 'That week holds your test, so this starts <b>'+_fmtStartDay(r.start)+'</b>. Nothing is left to train before it. Week 1 is the test week.';
+  }
   if(r.snapped){
     return 'Nothing left to train that week, so this starts <b>'+_fmtStartDay(r.start)+'</b>. Week 1 runs <b>'+_fmtSpan(r.start, sunOf(r.start))+'</b>.';
   }
@@ -1954,6 +1974,28 @@ function wizardAlignment(){
   if(WD.primaryPath !== 'event' && WD.primaryPath !== 'both') return null;
   return raceAlignment(WD.cardioGoals.run.id, WD.raceDate, WD.eventTargeted !== false);
 }
+// D183 (P-SAFEPACE R3), D184 (P-TESTLEN b1, c): the wizard's dated test pin. It is progTestPin's answer
+// from the resolved start, the same calls doGenerate makes, so the header, the card, the fold and the
+// name step print the length that builds: tw when the test pins, else len. The resolver is called once,
+// with the test date (_rsRace), and its holdsTest is copied onto the pin, so the callout reads the
+// resolver's own answer and carries no second predicate. Returns progTestPin's {tw, len, week, cap},
+// with holdsTest:true added when the entered week holds the test, or null when the goal is not a dated
+// test goal.
+function wizardTestPin(){
+  if(!WD) return null;
+  const r = resolveStartDate(WD.startDate, WD.restDays||[], _rsRace(WD));
+  const p = progTestPin(WD, r.start);
+  return (p && r.holdsTest) ? {...p, holdsTest:true} : p;
+}
+// D183 (P-SAFEPACE R3/R5): the header sentence on the cardio goal step. A dated test goal prints its
+// test week, which is the length that builds; every other goal prints its goal length. The repaint
+// passes the pin and the length it already computed; the template calls it bare.
+function progLenLineHTML(p, len){
+  if(p === undefined) p = wizardTestPin();
+  if(len === undefined) len = p ? p.len : ((WD.cardioTypes||[]).length ? calcProgramLength(WD.cardioTypes, {...WD.cardioGoals, _experience:WD.experience||'intermediate', _ageBracket:WD.ageBracket||'18-35', _eventTargeted:WD.eventTargeted}, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks : 6);
+  const n = (p && p.tw) || len;
+  return '<b style="color:var(--accent)">Program length: '+n+(n === 1 ? ' week.' : ' weeks.')+'</b> '+((p && p.tw) ? 'Your test sets it.' : 'Set by your longest cardio goal and your experience.');
+}
 const _RACE_NAME = {run_5k:'5K', run_10k:'10K', run_half:'half', run_marathon:'marathon'};
 const _RACE_GOAL_LBL = {run_5k:'5K plan', run_10k:'10K plan', run_half:'half marathon plan', run_marathon:'marathon plan'};
 function alignedStartCopy(al){
@@ -1961,9 +2003,9 @@ function alignedStartCopy(al){
   const dayName = {mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'}[al.raceDay];
   const raceTxt = '<b>'+_fmtStartDay(al.raceIso)+'</b>, '+al.weeksOut+' week'+(al.weeksOut===1?'':'s')+' out';
   if(al.futureWeeks){
-    return 'Your '+nm+' is '+raceTxt+'. The '+al.tw+'-week plan starts <b>'+_fmtStartDay(al.start)+'</b> \u2014 '+al.futureWeeks+' week'+(al.futureWeeks===1?'':'s')+' from now \u2014 so it peaks on race week, not early. Until then: run easy three times a week, 30\u201345 minutes, nothing hard.';
+    return 'Your '+nm+' is '+raceTxt+'. The '+al.tw+'-week plan starts <b>'+_fmtStartDay(al.start)+'</b>, '+al.futureWeeks+' week'+(al.futureWeeks===1?'':'s')+' from now, so it peaks on race week and not early. Until then: run easy three times a week, 30\u201345 minutes, nothing hard.';
   }
-  let t = 'Your '+nm+' is '+raceTxt+'. The '+al.tw+'-week plan starts <b>'+_fmtStartDay(al.start)+'</b> so race week is week '+al.tw+' \u2014 you open in <b>week '+al.openWeek+'</b>.';
+  let t = 'Your '+nm+' is '+raceTxt+'. The '+al.tw+'-week plan starts <b>'+_fmtStartDay(al.start)+'</b> so race week is week '+al.tw+'. You open in <b>week '+al.openWeek+'</b>.';
   if(al.behindWeeks) t += ' Weeks 1\u2013'+al.behindWeeks+' are behind you: shown, not counted, not missed.';
   t += ' Race day pins to <b>'+dayName+'</b>.';
   if(al.underFloor){
@@ -1991,7 +2033,7 @@ function offerShorterPlan(goalId){
 // would tear the native date picker down mid-interaction on iOS.
 function updateStartResolve(){
   if(wizardAlignment()) return;   // V188 (D14a): derived — nothing to resolve from the field
-  const r = resolveStartDate(WD.startDate, WD.restDays||[]);
+  const r = resolveStartDate(WD.startDate, WD.restDays||[], _rsRace(WD));   // D184 (c): given the test date
   const a = document.getElementById('startResolve'); if(a) a.innerHTML = startResolveCopy(r);
   const b = document.getElementById('sumStartDate'); if(b) b.textContent = startSummaryVal(r);
 }
@@ -2010,7 +2052,7 @@ function _applyWizardStart(prog, wd){
     if(prog.cfg && Object.prototype.hasOwnProperty.call(prog.cfg,'startDate')) delete prog.cfg.startDate;
     return {start:_al.start, entered:_al.start, mon:_al.start, partial:false, snapped:false, aligned:true, align:_al};
   }
-  const r = resolveStartDate(wd && wd.startDate, (wd && wd.restDays) || []);
+  const r = resolveStartDate(wd && wd.startDate, (wd && wd.restDays) || [], _rsRace(wd));   // D184 (c): the start the pin was taken from
   prog.startDate = r.start;
   if(prog.cfg && Object.prototype.hasOwnProperty.call(prog.cfg,'startDate')) delete prog.cfg.startDate;
   return r;
@@ -2043,10 +2085,10 @@ let WD = {
 const CARDIO_GOALS_BY_TYPE = {
   run: [
     {id:'run_5k',        label:'Run a 5K',              desc:'3.1 miles without stopping'},
-    {id:'run_10k',       label:'Run a 10K',             desc:'6.2 miles — solid aerobic base'},
-    {id:'run_half',      label:'Half Marathon',         desc:'13.1 miles — serious endurance'},
-    {id:'run_marathon',  label:'Full Marathon',         desc:'26.2 miles — the full distance'},
-    {id:'run_pace_goal', label:'Hit a Pace / Time Goal',desc:'Target distance + time — 1.5mi under 10 min, mile under 6, etc.'},
+    {id:'run_10k',       label:'Run a 10K',             desc:'6.2 miles. A solid aerobic base.'},
+    {id:'run_half',      label:'Half Marathon',         desc:'13.1 miles. Serious endurance.'},
+    {id:'run_marathon',  label:'Full Marathon',         desc:'26.2 miles. The full distance.'},
+    {id:'run_pace_goal', label:'Hit a Pace / Time Goal',desc:'A distance and a time. 1.5 miles under 10 minutes. A mile under 6.'},
     {id:'run_base',      label:'Build Running Base',    desc:'Get consistent, increase mileage safely'},
   ],
   bike: [
@@ -2057,7 +2099,7 @@ const CARDIO_GOALS_BY_TYPE = {
     {id:'bike_base',     label:'Build Cycling Base',    desc:'Consistency and aerobic capacity'},
   ],
   swim: [
-    {id:'swim_tri',      label:'Triathlon Swim',        desc:'Open water race — 750m to 1.9km'},
+    {id:'swim_tri',      label:'Triathlon Swim',        desc:'Open water race. 750 m to 1.9 km.'},
     {id:'swim_mile',     label:'Swim a Mile',           desc:'1,650 yards continuous'},
     {id:'swim_100_time', label:'Improve 100 Time',     desc:'Speed-focused lap swimming'},
     {id:'swim_500_time', label:'Improve 500 Time',     desc:'Mid-distance swim performance'},
@@ -2224,144 +2266,93 @@ function setUnit(u){
 
 // ── RACE DATE FUNCTIONS ──
 
-// Reverse of the run_pace_goal math in calcProgramLength: given how many weeks the
-// athlete actually has, returns the fastest per-mile pace (sec/mi) they can reach
-// WITHOUT exceeding safe progression. Inverts the core build relationship directly
-// (ignoring the artificial distance caps, which only ever shorten — they'd otherwise
-// let the math claim impossible paces for longer windows).
-function achievablePacePerMile(weeksAvail, tDist, experience, ageBracket) {
-  experience = experience || 'intermediate';
-  ageBracket = ageBracket || '18-35';
-  const paceImprove = {beginner:3, intermediate:5, advanced:7}[experience] || 4;
-  const agePaceScale = {'55+':0.65, '36-54':0.85, '18-35':1.0}[ageBracket] || 1.0;
-  const ageSafePaceImprove = +(paceImprove * agePaceScale).toFixed(2);
-  const ageMult = {'55+':1.15, '36-54':1.07, '18-35':1.0}[ageBracket] || 1.0;
-  const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[experience] || 570;   // V176 (D9): one beginner default, the engine's 690
-  // Undo the forward pipeline:  needed = round(raw*1.25 + 4) * ageMult + 1 grace
-  const wForImprove   = (weeksAvail - 1) / ageMult;        // undo +1 grace & age multiplier
-  const improvingWeeks = Math.max(0, (wForImprove - 4) / 1.25); // undo result = raw*1.25 + 4
-  const gap = improvingWeeks * ageSafePaceImprove;
-  const achievable = expCurrentPace - gap;
-  return Math.max(achievable, 240); // 4:00/mi hard sanity floor
-}
-function secsToMMSS(totalSecs) {
-  totalSecs = Math.round(totalSecs);
-  const m = Math.floor(totalSecs / 60);
-  const s = totalSecs % 60;
-  return m + ':' + String(s).padStart(2,'0');
-}
-// Apply the suggested pace to the run goal, then re-render so feedback turns green
-function applySuggestedPace(mins, secs) {
-  if(!WD.cardioGoals['run']) WD.cardioGoals['run'] = {};
-  WD.cardioGoals['run'].targetMins = mins;
-  WD.cardioGoals['run'].targetSecs = secs;
-  updatePaceTime('run');
-  renderWizardStep();
-  // Recompute the advisory synchronously in the same click tick. renderWizardStep()
-  // rebuilds the DOM synchronously, so #raceDateInput / #raceDateFeedback already exist;
-  // updateRaceDateFeedback() re-runs calcProgramLength() against the freshly-applied pace
-  // and repaints the badge. (Async setTimeout here raced the re-render and could leave the
-  // advisory stuck on the stale error — same desync class as the §8 race-date toggle bug.)
-  updateRaceDateFeedback();
-}
-
 function updateRaceDateFeedback() {
+  // D183 (P-SAFEPACE R2): the one repaint for the cardio goal step. It computes the test pin, the
+  // length and the pace ceiling once from WD, then repaints the header, the pace line, the
+  // feasibility line and this card synchronously, in one tick. updatePaceDisplay and
+  // updatePaceFeasibility are its internals. No timer.
   const input = document.getElementById('raceDateInput');
-  const feedback = document.getElementById('raceDateFeedback');
-  if(!feedback) return;
   // Sync WD.raceDate from input if present
   if(input && input.value) WD.raceDate = input.value;
+  const p = wizardTestPin();
+  const len = p ? p.len : ((WD.cardioTypes||[]).length ? calcProgramLength(WD.cardioTypes, {...WD.cardioGoals, _experience:WD.experience||'intermediate', _ageBracket:WD.ageBracket||'18-35', _eventTargeted:WD.eventTargeted}, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks : 6);
+  const _f = assessRunPaceCeiling((p && p.tw) || len);   // D183 amendment 2 (f): L is the program's length, the test week when one pins, else the header's len
+  const _ll = document.getElementById('progLenLine');
+  if(_ll) _ll.innerHTML = progLenLineHTML(p, len);
+  updatePaceDisplay();
+  updatePaceFeasibility(_f);
+  const feedback = document.getElementById('raceDateFeedback');
+  if(!feedback) return;
   if(!WD.raceDate) {
     feedback.innerHTML = '';
     return;
   }
-  const today = new Date(); today.setHours(0,0,0,0);
-  // Parse date string as local time to avoid UTC timezone shift
-  const [ry,rm,rd] = WD.raceDate.split('-').map(Number);
-  const race = new Date(ry, rm-1, rd); race.setHours(0,0,0,0);
-  const daysUntil = Math.floor((race - today) / 86400000);
-  const weeksUntil = Math.floor(daysUntil / 7);
-  // Recommended program length — goal-driven, never compressed by the race date
-  const _pg = {...WD.cardioGoals, _experience:WD.experience||'intermediate', _ageBracket:WD.ageBracket||'18-35', _eventTargeted:WD.eventTargeted};
-  const recommended = calcProgramLength(WD.cardioTypes||[], _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks;
-  WD.raceDateWeeks = weeksUntil;
-
-  if(daysUntil < 0) {
-    feedback.innerHTML = '<div style="color:var(--red);font-size:12px;margin-top:6px">'+asyIcon('⚠',13)+' That date has already passed.</div>';
+  // D182 (P-RACEDATE) handoff: one countdown, raceCountdown's (days rounded before weeks floor, so a
+  // DST change inside the span cannot lose a week). A date it cannot read prints nothing.
+  const cd = raceCountdown(WD.raceDate);
+  if(!cd) {
+    feedback.innerHTML = '';
     return;
   }
-  if(weeksUntil < 1) {
-    // D106a (V207): a test goal under a week out still builds: the test week alone. The card
-    // stays red and says what the athlete gets. Every other goal keeps its own sentence.
-    const _tg1 = (WD.cardioTypes||[]).includes('run') && WD.cardioGoals && WD.cardioGoals.run && PACE_GOALS.has(WD.cardioGoals.run.id);
-    feedback.innerHTML = '<div style="color:var(--red);font-size:12px;margin-top:6px">'+asyIcon('⚠',13)+(_tg1 ? ' Your test is less than a week away. You get the test week only. Primer lifts, a shakeout, then the test.' : ' Less than a week away — not enough time to train.')+'</div>';
+  WD.raceDateWeeks = cd.weeks;   // unread since D182 (P-RACEDATE): the review row and the card read raceCountdown; still written, removal is §12 debt
+
+  // D183 amendment 3 F4(ii): a past date is an entry error, not a coaching state. Red with the
+  // warning icon on every goal, test included.
+  if(cd.days < 0) {
+    feedback.innerHTML = '<div style="color:var(--red);font-size:12px;margin-top:6px">'+asyIcon('⚠',13)+' That date has already passed.</div>';
     return;
   }
 
   const card = (color, html) => '<div style="color:'+color+';font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:'+color+'18;border-radius:4px;border:1px solid '+color+'44">'+html+'</div>';
+
+  // D183 (P-SAFEPACE R3, first amendment's null rows, amendment 3 F4(i)): a dated test goal. Every week
+  // number is the pin's. Never red (the weeks are not his to change) and no glyph on a framed row. The
+  // reach sentence attaches only where tw is set (amendment 2 (c)), never when the test falls before
+  // the first training day or past the program's end.
+  if(p) {
+    const reach = _f ? '<div style="margin-top:5px">'+paceCeilingSentence(_f)+'</div>' : '';
+    if(p.tw >= 2) feedback.innerHTML = card(_f ? 'var(--accent)' : 'var(--run)', 'Your test is in week '+p.tw+'. The program ends on it. The taper lands in front of it.'+reach);
+    // D184 (P-TESTLEN c' Q3): the entered week holds the test (the resolver's holdsTest, carried by
+    // wizardTestPin), so week 1 has no training day before it. Ordered before the tw 1 row, whose
+    // primer and shakeout sentence is false here. "In week 1", not "this week": true for a future start.
+    else if(p.tw === 1 && p.holdsTest) feedback.innerHTML = card('var(--signal)', 'Your test is in week 1. Nothing is left to train before it. You get the test week only.'+reach);
+    else if(p.tw === 1) feedback.innerHTML = card('var(--accent)', 'Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.'+reach);
+    else if(p.week === null) feedback.innerHTML = card('var(--signal)', 'Your test is before your first training day. This program starts after it and does not include it.');
+    // D184 (P-TESTLEN Q3): the test is past Table 6's last row, so nothing pins and the goal length
+    // builds. Numbers: the raw test week, the Table 6 cap, the goal length.
+    else feedback.innerHTML = card('var(--accent)', 'Your test is in week '+p.week+'. The test block is '+p.cap+' weeks. This program builds '+p.len+(p.len === 1 ? ' week' : ' weeks')+' now. Start a test block when the test is '+p.cap+' weeks out.');
+    return;
+  }
+
+  // Dated non-test goals keep their sentences, dashes removed (R3). Under a week out is an entry
+  // error like the past date: red with the warning icon (amendment 3 F4(ii)).
+  if(cd.weeks < 1) {
+    feedback.innerHTML = '<div style="color:var(--red);font-size:12px;margin-top:6px">'+asyIcon('⚠',13)+' Less than a week away. Not enough time to train.</div>';
+    return;
+  }
 
   // V188 (D14a): race goals count back from the race. The card names the derived start,
   // the opening week, and the floor; the "program stays intact, race lands in week N"
   // sentence below is NSW's and stays NSW-only.
   const _al = wizardAlignment();
   if(_al){
-    const _f = assessRunPaceCeiling();
-    feedback.innerHTML = card(_al.underFloor ? 'var(--signal)' : 'var(--run)', alignedStartCopy(_al)) + (_f ? paceCeilingOfferHTML(_f) : '');
+    feedback.innerHTML = card(_al.underFloor ? 'var(--signal)' : 'var(--run)', alignedStartCopy(_al));
     return;
   }
 
-  const diff = weeksUntil - recommended;
-
-  // ── ENOUGH TIME (race at or beyond program end) ──
-  // Enough TIME doesn't mean the pace is reachable — an intrinsically impossible target
-  // still needs flagging. assessRunPaceCeiling() returns the offer (or null if reachable).
+  // len is the fold's: the goal-driven length, never compressed by the race date.
+  const diff = cd.weeks - len;
   if(diff > 0) {
-    const _f = assessRunPaceCeiling();
-    feedback.innerHTML = card('var(--run)',
-      '✓ Your '+recommended+'-week program finishes '+diff+' week'+(diff>1?'s':'')+' before race day — use the extra time to stay sharp.')
-      + (_f ? paceCeilingOfferHTML(_f) : '');
+    feedback.innerHTML = card('var(--run)', 'Your '+len+'-week program finishes '+diff+' week'+(diff>1?'s':'')+' before race day. Use the extra time to stay sharp.');
     return;
   }
   if(diff === 0) {
-    const _f = assessRunPaceCeiling();
-    feedback.innerHTML = card('var(--run)',
-      '✓ Perfect timing — your '+recommended+'-week program peaks right at race day.')
-      + (_f ? paceCeilingOfferHTML(_f) : '');
+    feedback.innerHTML = card('var(--run)', 'Perfect timing. Your '+len+'-week program peaks on race day.');
     return;
   }
-
-  // ── NOT ENOUGH TIME (race lands inside the program, before peak) ──
+  // The race lands inside the program, before peak.
   const color = diff >= -2 ? 'var(--accent)' : 'var(--red)';
-  // D106a (V207): a test goal whose date falls inside its goal length ends on the test, so
-  // "stays intact" would be false for it. Same week and null rules as the writer in
-  // doGenerate. NRC never reaches here (aligned above); every other goal keeps its sentence.
-  const _twz = ((WD.cardioTypes||[]).includes('run') && WD.cardioGoals.run && PACE_GOALS.has(WD.cardioGoals.run.id))
-    ? testWeekIndex(resolveStartDate(WD.startDate, WD.restDays||[]).start, WD.raceDate) : null;
-  const _tw = (_twz >= 1 && _twz <= recommended) ? _twz : null;
-  let html =
-    '<div style="font-weight:600">'+weeksUntil+' weeks isn\'t enough time to hit this pace safely. Recommended: at least '+recommended+' weeks.</div>'+
-    '<div style="margin-top:5px;opacity:0.9">'+(_tw ? 'Your program ends on your test. ' + _tw + (_tw === 1 ? ' week.' : ' weeks.') + ' The taper lands in front of it.' : 'Your full '+recommended+'-week program stays intact — your race simply lands in week '+weeksUntil+'.')+'</div>';
-
-  // ── PACE-GOAL OFFER: fastest pace reachable in the available window ──
-  const runGoal = WD.cardioGoals['run'];
-  if(runGoal && runGoal.id === 'run_pace_goal' && runGoal.targetDist) {
-    const rawDist = parseFloat(runGoal.targetDist) || 1.5;
-    const tDist = (runGoal.paceUnit === 'km') ? rawDist * 0.621 : rawDist;
-    if(tDist > 0) {
-      const safePace = achievablePacePerMile(weeksUntil, tDist, WD.experience, WD.ageBracket);
-      const safeTotal = safePace * tDist;        // total time over their target distance
-      const tm = Math.floor(Math.round(safeTotal) / 60);
-      const ts = Math.round(safeTotal) % 60;
-      const distLabel = (runGoal.targetDist||'1.5') + (runGoal.paceUnit||'mi');
-      html +=
-        '<div style="margin-top:9px;padding-top:9px;border-top:1px solid '+color+'33">'+
-          'In '+weeksUntil+' weeks you can safely reach <b>'+distLabel+' in '+secsToMMSS(safeTotal)+'</b> ('+secsToMMSS(safePace)+'/mi) without exceeding safe progression limits.'+
-          '<button onclick="applySuggestedPace('+tm+','+ts+')" style="display:block;width:100%;margin-top:8px;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:9px;border-radius:4px;border:1px solid '+color+';background:'+color+';color:#0a0a0a;cursor:pointer">Use this pace instead</button>'+
-        '</div>';
-    }
-  }
-
-  feedback.innerHTML = card(color, asyIcon('🚨',14)+' '+html);
+  feedback.innerHTML = card(color, cd.weeks+(cd.weeks === 1 ? ' week' : ' weeks')+' is short for this goal. The floor is '+len+'. Your full '+len+'-week program stays intact. Your race lands in week '+cd.weeks+'.');
 }
 
 function setPaceUnit(unit) {
@@ -2391,9 +2382,8 @@ function updateSwimPaceDisplay() {
   if(!(totalSecs > 0)) { el.style.display = 'none'; return; }
   const dist = SWIM_GOAL_DIST[g.id] || 500;
   const unit = g.swimUnit || 'yd';
-  const pace = formatPacePer100(totalSecs, dist);
-  if(!pace) { el.style.display = 'none'; return; }
-  el.innerHTML = asyIcon('🎯',13)+' ' + _clkMS(totalSecs) + ' — ' + pace + ' (' + unit + ')';   // V218 (D157): label from the total
+  // D183 (P-SAFEPACE R5, amendment 2 (d)): '<time> is <pace> per 100 <unit>.' One unit word, once.
+  el.innerHTML = asyIcon('🎯',13)+' ' + _clkMS(totalSecs) + ' is ' + _clkMS(totalSecs/(dist/100)) + ' per 100 ' + unit + '.';   // V218 (D157): label from the total
   el.style.display = 'block';
 }
 function updatePaceTime(type) {
@@ -2410,24 +2400,21 @@ function updatePaceDisplay() {
     el.style.display = 'none';
     return;
   }
-  const totalSecs = (+(g.targetMins||0)*60) + (+(g.targetSecs||0));
-  const pace = formatPacePerMile(totalSecs, +(g.targetDist||1.5));
-  if(!pace) { el.style.display='none'; return; }
-  el.innerHTML = asyIcon('🎯',13)+' ' + g.targetMins + ':' + String(g.targetSecs||0).padStart(2,'0') + ' — ' + pace + ' per mile';
+  // D183 (P-SAFEPACE R5, amendment 2 brought in (2)): the engine's lens. A km target reads as its pace per
+  // mile, because sessions print /mi. '<time> is <pace> per mile.' One unit word, once.
+  const _t = paceGoalTarget(g);
+  if(!_t.tPacePerMile) { el.style.display='none'; return; }
+  el.innerHTML = asyIcon('🎯',13)+' ' + _clkMS(_t.tTotalSecs) + ' is ' + _clkMS(_t.tPacePerMile) + ' per mile.';
   el.style.display = 'block';
-  updatePaceFeasibility();
 }
-// Race-INDEPENDENT pace-feasibility advisory for run_pace_goal. The race-date panel only
-// flags pace problems when there isn't enough time before a race; users on the "just
-// building fitness" / body path never set a date, so an intrinsically unreachable pace
-// (one the safe-progression caps in calcProgramLength silently clamp) went unflagged.
-// This surfaces it. Uses the same authorities as everything else: calcProgramLength for the
-// real run-program length, achievablePacePerMile for the fastest pace that length supports.
-// Single source of truth for run pace-goal feasibility, used by BOTH the no-race advisory
-// (#paceFeasLine) and the race-date panel's enough-time branches. Returns null when the
-// target is reachable / not applicable, or {L, achievable, safeTotal, tm, ts, distLabel}
-// when the target is more than ~45s/mi beyond what a full safe build can reach.
-function assessRunPaceCeiling() {
+// D183 (P-SAFEPACE R1, amendment 2 (f)): the one pace ceiling for run_pace_goal. Both surfaces read
+// it: the undated #paceFeasLine frame and the dated card's reach sentence. L is the program's length and
+// the caller passes it: updateRaceDateFeedback hands in the test week when one pins, else the header's
+// all-sports length, because the engine ramps over totalWeeks and never over the run alone. Returns null
+// when the goal is not a run pace goal, when the target is no faster than the current pace, or when it
+// sits within ~45 s/mi of what L weeks reach; otherwise {L, achievable, safeTotal, tTotal, cur, fromMile,
+// exp, distLabel}, which paceCeilingSentence reads.
+function assessRunPaceCeiling(L) {
   const g = WD.cardioGoals['run'];
   if(!g || g.id !== 'run_pace_goal' || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) return null;
   const exp = WD.experience || 'intermediate';
@@ -2447,45 +2434,46 @@ function assessRunPaceCeiling() {
     : null;
   const currentPace = mileBest || expCurrentPace;
   if(tPacePerMile >= currentPace) return null; // target slower than current → reachable
-  // Real program length the engine will build for THIS run goal in isolation.
-  const _pg = {run: g, _experience: exp, _ageBracket: age, _eventTargeted: WD.eventTargeted};
-  const L = calcProgramLength(['run'], _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus] || 'balanced').weeks;
-  // Fastest pace reachable in L weeks FROM THE USER'S ACTUAL CURRENT PACE. Same inversion as
-  // achievablePacePerMile(), seeded with currentPace so it stays consistent with how L was computed.
+  // Fastest pace reachable in L weeks FROM THE USER'S ACTUAL CURRENT PACE: the length engine's
+  // forward pipeline inverted (undo the +1 grace, the age multiplier and raw*1.25 + 4).
   const paceImprove = {beginner:3, intermediate:5, advanced:7}[exp] || 4;
   const agePaceScale = {'55+':0.65, '36-54':0.85, '18-35':1.0}[age] || 1.0;
   const ageSafePaceImprove = +(paceImprove * agePaceScale).toFixed(2);
   const ageMult = {'55+':1.15, '36-54':1.07, '18-35':1.0}[age] || 1.0;
   const improvingWeeks = Math.max(0, ((L - 1) / ageMult - 4) / 1.25);
   const achievable = Math.max(currentPace - improvingWeeks * ageSafePaceImprove, 240);
-  // Only flag a MEANINGFUL shortfall. Targets within ~45s/mi of what a full safe build
+  // Only flag a MEANINGFUL shortfall. Targets within ~45s/mi of what the full build
   // reaches are "ambitious but you'll get close" — flagging those is nagging.
   if(achievable - tPacePerMile < 45) return null;
   const safeTotal = achievable * tDist;
-  return {
-    L, achievable, safeTotal,
-    tm: Math.floor(Math.round(safeTotal) / 60),
-    ts: Math.round(safeTotal) % 60,
-    distLabel: (g.targetDist || '1.5') + (g.paceUnit || 'mi')
-  };
+  return {L, achievable, safeTotal, tTotal, cur: currentPace, fromMile: !!mileBest, exp, distLabel: (g.targetDist || '1.5') + ' ' + (g.paceUnit || 'mi')};
 }
-// Self-contained advisory card for an out-of-reach pace, shared by both surfaces.
+// D183 (P-SAFEPACE R1, amendment 2 (a)/(b)): the one sentence that reads the athlete. Digits, every time
+// through _clkMS, singular at 1 week. It says what L weeks reach from where he is and leaves the goal his.
+// It prints inside the undated frame below and on the dated card's tw rows (amendment 2 (c)).
+function paceCeilingSentence(f) {
+  const wk = f.L + (f.L === 1 ? ' week' : ' weeks');
+  const reach = ' In '+wk+' that reaches about '+f.distLabel+' in '+_clkMS(f.safeTotal)+'. Your goal is '+_clkMS(f.tTotal)+'.';
+  if(f.fromMile) return 'Your mile is '+_clkMS(f.cur)+'.'+reach+' Keep it or change it above.';
+  if(f.exp === 'beginner') return 'Your paces start from the beginner default of '+_clkMS(f.cur)+' per mile.'+reach+' Keep it or change it above.';
+  return 'You have not entered a mile time. The '+f.exp+' default is '+_clkMS(f.cur)+' per mile.'+reach+' Enter your mile above and this updates.';
+}
+// D183 (amendment 3): the undated #paceFeasLine frame. The accent frame around the R1 sentence and nothing
+// else: no icon, no heading, no button. The dated card prints the same sentence inside its own row.
 function paceCeilingOfferHTML(f) {
   return '<div style="color:var(--accent);font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:var(--accent)18;border-radius:4px;border:1px solid var(--accent)44">'+
-    asyIcon('🚨',14)+' <span style="font-weight:600">That pace is faster than safe progression allows from your current fitness.</span>'+
-    '<div style="margin-top:4px;opacity:0.92">Over a realistic '+f.L+'-week build, the fastest you can safely reach is <b>'+f.distLabel+' in '+secsToMMSS(f.safeTotal)+'</b> ('+secsToMMSS(f.achievable)+'/mi).</div>'+
-    '<button onclick="applySuggestedPace('+f.tm+','+f.ts+')" style="display:block;width:100%;margin-top:8px;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;padding:9px;border-radius:4px;border:1px solid var(--accent);background:var(--accent);color:var(--on-ink);cursor:pointer">Use this pace instead</button>'+
+    paceCeilingSentence(f)+
     '</div>';
 }
 // No-race surface for the pace ceiling. When event+dated, the race-date panel owns pace
-// messaging (it appends the same offer to its own card), so this stays hidden to avoid a
-// double offer.
-function updatePaceFeasibility() {
+// messaging (the card carries the sentence), so this stays hidden to avoid a
+// double sentence. D183 (R2): an internal of updateRaceDateFeedback, which passes the ceiling
+// it computed once; this line never computes its own.
+function updatePaceFeasibility(f) {
   const el = document.getElementById('paceFeasLine');
   if(!el) return;
   const hide = () => { el.style.display = 'none'; el.innerHTML = ''; };
   if(WD.primaryPath === 'event' && WD.eventTargeted && WD.raceDate) return hide();
-  const f = assessRunPaceCeiling();
   if(!f) return hide();
   el.innerHTML = paceCeilingOfferHTML(f);
   el.style.display = 'block';
@@ -2652,7 +2640,7 @@ function applySeedData(){
   if(s.maxDist){ g.baselineDist=String(s.maxDist); g.baseline=s.maxDist+(g.paceUnit||'mi'); }
   WD._seedApplied=true;
   renderWizardStep();
-  try{ if(typeof updatePaceFeasibility==='function') updatePaceFeasibility(); }catch(e){}
+  try{ updateRaceDateFeedback(); }catch(e){}
 }
 function dismissSeedData(){ WD._seedDismissed=true; renderWizardStep(); }
 function renderWizardStep() {
@@ -2665,14 +2653,13 @@ function renderWizardStep() {
   const body = document.getElementById('wizardBody');
   const step = WIZARD_STEPS[wizardStep];
   document.getElementById('wizardNext').textContent = step === 'name' ? 'Generate Program →' : 'Continue →';
-  // Re-trigger race date feedback if returning to this step
+  // Default raceDate to today on the cardio goal step if not set, so the card shows on first open.
+  // D183 (P-SAFEPACE R2): the repaint runs synchronously from this step's tail below; no timer.
   if(step === 'cardio_goal' && WD.eventTargeted) {
-    // Default raceDate to today if not set, so feedback shows on first open
     if(!WD.raceDate) {
       const t = new Date();
       WD.raceDate = t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
     }
-    setTimeout(() => updateRaceDateFeedback(), 80);
   }
 
   if(step === 'primary') {
@@ -2753,18 +2740,13 @@ function renderWizardStep() {
     const sportNames = {run:'Running', bike:'Cycling / Spin', swim:'Swimming'};
     const sportColors = {run:'var(--run)', bike:'var(--bike)', swim:'var(--swim)'};
     const sportDescs = {
-      run:'Outdoor or treadmill — pace, distance, race goals',
-      bike:'Spin bike or outdoor — intervals, FTP, distance',
-      swim:'Lap pool or open water — structured sets'
+      run:'Outdoor or treadmill. Pace, distance and race goals.',
+      bike:'Spin bike or outdoor. Intervals, FTP and distance.',
+      swim:'Lap pool or open water. Structured sets.'
     };
-    // Calculate longest required timeline across selected sports.
-    // Program length is driven ONLY by the goal + experience — the race date never
-    // compresses it. If the race is too soon we warn the user instead of cutting weeks.
-    let previewWeeks = 6;
-    if(WD.cardioTypes.length) {
-      const _pg = {...WD.cardioGoals, _experience:WD.experience||'intermediate', _ageBracket:WD.ageBracket||'18-35', _eventTargeted:WD.eventTargeted};
-      previewWeeks = calcProgramLength(WD.cardioTypes, _pg, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks;
-    }
+    // D183 (P-SAFEPACE R3): the program length header below prints progLenLineHTML(). A dated test
+    // goal prints its test week (wizardTestPin().tw), the length that builds; every other goal prints
+    // calcProgramLength's length for the goal and experience. updateRaceDateFeedback repaints it.
     // Clear raceDateWeeks when not event targeted so it never bleeds in elsewhere
     if(!WD.eventTargeted) WD.raceDateWeeks = null;
     // HYBRID: drop any previously-selected taper-dependent race goal (e.g. chosen on the Event
@@ -2817,7 +2799,7 @@ function renderWizardStep() {
                   <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
                 </div>
               </div>
-              <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(((+g.targetMins||0)*60)+(+g.targetSecs||0))>0?'block':'none'}">${asyIcon('🎯',13)} ${_clkMS(((+g.targetMins||0)*60)+(+g.targetSecs||0))} — ${formatPacePer100(((+g.targetMins||0)*60)+(+g.targetSecs||0),SWIM_GOAL_DIST[g.id])||''} (${g.swimUnit||'yd'})</div>
+              <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(((+g.targetMins||0)*60)+(+g.targetSecs||0))>0?'block':'none'}">${asyIcon('🎯',13)} ${_clkMS(((+g.targetMins||0)*60)+(+g.targetSecs||0))} is ${_clkMS((((+g.targetMins||0)*60)+(+g.targetSecs||0))/(SWIM_GOAL_DIST[g.id]/100))} per 100 ${g.swimUnit||'yd'}.</div>
             </div>
             <div style="margin-top:8px">
               <div class="input-label" style="margin-bottom:6px">Your most recent timed ${SWIM_GOAL_DIST[g.id]}${g.swimUnit||'yd'}</div>
@@ -2839,7 +2821,7 @@ function renderWizardStep() {
             <div style="margin-top:10px">
               <div class="input-label" style="margin-bottom:6px">Target distance</div>
               <div style="display:flex;gap:0;align-items:stretch">
-                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1" placeholder="e.g. 1.5" value="${g.targetDist||''}" oninput="WD.cardioGoals['run'].targetDist=this.value;updatePaceDisplay()" min="0.1" step="0.1">
+                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1" placeholder="e.g. 1.5" value="${g.targetDist||''}" oninput="WD.cardioGoals['run'].targetDist=this.value;updateRaceDateFeedback()" min="0.1" step="0.1">
                 <div style="display:flex;gap:0;border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;overflow:hidden;flex-shrink:0">
                   <button onclick="setPaceUnit('mi')" style="font-family:var(--font-display);font-size:12px;font-weight:700;padding:0 12px;border:none;cursor:pointer;background:${(WD.cardioGoals['run']?.paceUnit||'mi')==='mi'?'var(--accent)':'var(--surface2)'};color:${(WD.cardioGoals['run']?.paceUnit||'mi')==='mi'?'var(--on-ink)':'var(--muted)'}">mi</button>
                   <button onclick="setPaceUnit('km')" style="font-family:var(--font-display);font-size:12px;font-weight:700;padding:0 12px;border:none;border-left:1px solid var(--border2);cursor:pointer;background:${(WD.cardioGoals['run']?.paceUnit||'mi')==='km'?'var(--accent)':'var(--surface2)'};color:${(WD.cardioGoals['run']?.paceUnit||'mi')==='km'?'var(--on-ink)':'var(--muted)'}">km</button>
@@ -2850,35 +2832,35 @@ function renderWizardStep() {
               <div class="input-label" style="margin-bottom:6px">Target time</div>
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="flex:1;text-align:center">
-                  <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['run'].targetMins=this.value;updatePaceTime('run');updatePaceDisplay()" min="0" max="99">
+                  <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.targetMins||''}" oninput="WD.cardioGoals['run'].targetMins=this.value;updatePaceTime('run');updateRaceDateFeedback()" min="0" max="99">
                   <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">minutes</div>
                 </div>
                 <div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div>
                 <div style="flex:1;text-align:center">
-                  <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.targetSecs||''}" oninput="WD.cardioGoals['run'].targetSecs=this.value;updatePaceTime('run');updatePaceDisplay()" min="0" max="59">
+                  <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.targetSecs||''}" oninput="WD.cardioGoals['run'].targetSecs=this.value;updatePaceTime('run');updateRaceDateFeedback()" min="0" max="59">
                   <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
                 </div>
               </div>
-              <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(WD.cardioGoals['run']?.targetMins!==undefined&&WD.cardioGoals['run']?.targetMins!==''&&WD.cardioGoals['run']?.targetDist)?'block':'none'}">${asyIcon('🎯',13)} ${WD.cardioGoals['run']?.targetMins||''}:${String(WD.cardioGoals['run']?.targetSecs||0).padStart(2,'0')} — ${formatPacePerMile(((+WD.cardioGoals['run']?.targetMins||0)*60)+(+WD.cardioGoals['run']?.targetSecs||0),+(WD.cardioGoals['run']?.targetDist||1.5))||''} per mile</div>
+              <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(WD.cardioGoals['run']?.targetMins!==undefined&&WD.cardioGoals['run']?.targetMins!==''&&WD.cardioGoals['run']?.targetDist)?'block':'none'}">${asyIcon('🎯',13)} ${(()=>{ const _t=paceGoalTarget(WD.cardioGoals['run']); return _t.tPacePerMile ? _clkMS(_t.tTotalSecs)+' is '+_clkMS(_t.tPacePerMile)+' per mile.' : ''; })()}</div>
               <div id="paceFeasLine" style="display:none"></div>
             </div>
             ${_seedBannerHTML()}<div class="input-group" style="margin-top:8px">
               <div class="input-label">How far can you currently run? (optional)</div>
               <div style="display:flex;gap:8px;align-items:center">
-                <input type="number" class="input-field" style="flex:1" placeholder="e.g. 1.5" value="${g.baselineDist||''}" oninput="WD.cardioGoals['run'].baselineDist=this.value;WD.cardioGoals['run'].baseline=this.value+(WD.cardioGoals['run']?.paceUnit||'mi')" min="0" step="0.1">
+                <input type="number" class="input-field" style="flex:1" placeholder="e.g. 1.5" value="${g.baselineDist||''}" oninput="WD.cardioGoals['run'].baselineDist=this.value;WD.cardioGoals['run'].baseline=this.value+(WD.cardioGoals['run']?.paceUnit||'mi');updateRaceDateFeedback()" min="0" step="0.1">
                 <span style="font-size:13px;color:var(--muted);flex-shrink:0">${WD.cardioGoals['run']?.paceUnit||'mi'}</span>
               </div>
             </div>
             ${WD.experience !== 'beginner' ? `<div class="input-group" style="margin-top:8px">
-              <div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400">(optional — personalizes your training paces)</span></div>
+              <div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400">Optional. It sets your training paces.</span></div>
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="flex:1;text-align:center">
-                  <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updatePaceFeasibility();updateMileAdvisory()" min="3" max="20">
+                  <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updateRaceDateFeedback();updateMileAdvisory()" min="3" max="20">
                   <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">minutes</div>
                 </div>
                 <div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div>
                 <div style="flex:1;text-align:center">
-                  <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.mileBestSecs||''}" oninput="WD.cardioGoals['run'].mileBestSecs=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updatePaceFeasibility();updateMileAdvisory()" min="0" max="59">
+                  <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.mileBestSecs||''}" oninput="WD.cardioGoals['run'].mileBestSecs=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updateRaceDateFeedback();updateMileAdvisory()" min="0" max="59">
                   <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
                 </div>
               </div>${_mileAdvisoryHTML()}
@@ -2886,20 +2868,20 @@ function renderWizardStep() {
             ${t==='run'?_seedBannerHTML():''}<div class="input-group" style="margin-top:10px">
               <div class="input-label">${t==='run'?'How far can you currently run?':t==='bike'?'How long can you currently ride?':'How far can you currently swim?'} (optional)</div>
               <div style="display:flex;gap:8px;align-items:center">
-                <input type="number" class="input-field" style="flex:1" placeholder="${t==='run'?'e.g. 3':t==='bike'?'e.g. 20':'e.g. 400'}" value="${g.baselineDist||''}" oninput="WD.cardioGoals['${t}'].baselineDist=this.value;WD.cardioGoals['${t}'].baseline=this.value+'${t==='run'?' mi':t==='bike'?' min':' yd'}'" min="0" step="${t==='swim'?'50':'0.5'}">
+                <input type="number" class="input-field" style="flex:1" placeholder="${t==='run'?'e.g. 3':t==='bike'?'e.g. 20':'e.g. 400'}" value="${g.baselineDist||''}" oninput="WD.cardioGoals['${t}'].baselineDist=this.value;WD.cardioGoals['${t}'].baseline=this.value+'${t==='run'?' mi':t==='bike'?' min':' yd'}'${t==='run'?';updateRaceDateFeedback()':''}" min="0" step="${t==='swim'?'50':'0.5'}">
                 <span style="font-size:13px;color:var(--muted);flex-shrink:0">${t==='run'?'mi':t==='bike'?'min':'yards'}</span>
               </div>
             </div>
             ${(t==='run' && WD.experience !== 'beginner') ? `<div class="input-group" style="margin-top:8px">
-              <div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400">(optional — personalizes your training paces)</span></div>
+              <div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400">Optional. It sets your training paces.</span></div>
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="flex:1;text-align:center">
-                  <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updatePaceFeasibility();updateMileAdvisory()" min="3" max="20">
+                  <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updateRaceDateFeedback();updateMileAdvisory()" min="3" max="20">
                   <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">minutes</div>
                 </div>
                 <div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div>
                 <div style="flex:1;text-align:center">
-                  <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.mileBestSecs||''}" oninput="WD.cardioGoals['run'].mileBestSecs=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updatePaceFeasibility();updateMileAdvisory()" min="0" max="59">
+                  <input type="number" class="input-field" style="text-align:center" placeholder="sec" value="${g.mileBestSecs||''}" oninput="WD.cardioGoals['run'].mileBestSecs=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updateRaceDateFeedback();updateMileAdvisory()" min="0" max="59">
                   <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
                 </div>
               </div>${_mileAdvisoryHTML()}
@@ -2912,8 +2894,8 @@ function renderWizardStep() {
     ${WD.cardioTypes.length && Object.keys(WD.cardioGoals).length ? `
     <div style="background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:12px 14px;margin-top:4px">
       <div style="font-size:12px;color:var(--muted);line-height:1.6">
-        <b style="color:var(--accent)">Program length: ${previewWeeks} weeks</b> — based on your longest cardio goal and experience level.
-        ${WD.cardioTypes.length > 1 ? '<br>Sessions rotate across training days — each sport gets dedicated days.' : ''}
+        <span id="progLenLine">${progLenLineHTML()}</span>
+        ${WD.cardioTypes.length > 1 ? '<br>Sessions rotate across training days. Each sport gets its own days.' : ''}
       </div>
       ${WD.primaryPath==='event' ? `<div style="margin-top:10px">
         <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Race date</div>
@@ -2929,12 +2911,12 @@ function renderWizardStep() {
             oninput="WD.raceDate=this.value;updateRaceDateFeedback()"
             style="width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:4px;color:var(--text);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:0.04em;padding:13px 14px;outline:none;box-sizing:border-box;color-scheme:dark;-webkit-appearance:none;cursor:pointer">
           <div id="raceDateFeedback" style="margin-top:8px"></div>
-          <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Tap to open calendar — the final weeks taper so you arrive fresh.</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Tap to open the calendar. The final weeks taper so you arrive fresh.</div>
         </div>` : `<div style="font-size:11px;color:var(--muted);line-height:1.5">${(WD.cardioGoals['run']&&(WD.cardioGoals['run'].id==='run_5k'||WD.cardioGoals['run'].id==='run_10k')) ? 'Runs the full 8-week '+(WD.cardioGoals['run'].id==='run_5k'?'5K':'10K')+' plan and finishes with a '+(WD.cardioGoals['run'].id==='run_5k'?'5K':'10K')+' time trial in place of race day.' : 'Program builds to peak fitness and holds. Pick a race when ready.'}</div>`}
       </div>` : ''}
     </div>` : ''}
     `;
-    updatePaceFeasibility(); // sync: body.innerHTML is set, so #paceFeasLine exists if rendered
+    updateRaceDateFeedback(); // D183 (P-SAFEPACE R2): the one repaint, in this tick: body.innerHTML is set, so every node it paints exists if rendered
 
   } else if(step === 'lifting_focus') {
     const isEvent = WD.primaryPath === 'event';
@@ -3026,10 +3008,10 @@ function renderWizardStep() {
       : 'Lift only';
     const trainDays = ALL_DAYS_ORDER.filter(d => !WD.restDays.includes(d));
     const _nameGoalsExp={...WD.cardioGoals,_experience:WD.experience,_ageBracket:WD.ageBracket,_eventTargeted:WD.eventTargeted};
-    const programWeeks = WD.cardioTypes.length ? calcProgramLength(WD.cardioTypes,_nameGoalsExp,internalGoal).weeks : 6;
+    const programWeeks = (wizardTestPin()||{}).tw || (WD.cardioTypes.length ? calcProgramLength(WD.cardioTypes,_nameGoalsExp,internalGoal).weeks : 6);   // D183 (P-SAFEPACE R3): a dated test pins the length
     if(!WD.name) WD.name = liftLabel + ' Block ' + (getPrograms().length+1);
     if(!WD.startDate) WD.startDate = _isoToday();                         // V174 (D20): never empty
-    const _sr = resolveStartDate(WD.startDate, WD.restDays||[]);            // V174 (D21/D24/D25)
+    const _sr = resolveStartDate(WD.startDate, WD.restDays||[], _rsRace(WD));   // V174 (D21/D24/D25), D184 (c)
     body.innerHTML = `<div class="wizard-title">Name your program</div>
     <div class="wizard-subtitle">Give it something you will recognize, and tell it when to begin.</div>
     <div class="input-group"><div class="input-label">Program name</div><input type="text" class="input-field" value="${WD.name}" oninput="WD.name=this.value" maxlength="40"></div>
@@ -3040,10 +3022,10 @@ function renderWizardStep() {
       <div class="summary-block-header">Program Summary</div>
       ${[
         ['Path', ({event:'Race / Event',body:'Strength / Physique',both:'Hybrid'})[WD.primaryPath]],
-        ...(WD.primaryPath==='event'&&WD.raceDate?[['Race date', new Date(WD.raceDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+(WD.raceDateWeeks?' ('+WD.raceDateWeeks+' weeks away)':'')]]:WD.primaryPath==='event'?[['Race date','No date set — no taper']]:[] ),
+        ...(WD.primaryPath==='event'&&WD.raceDate?[['Race date', _fmtStartDay(WD.raceDate, true)+(()=>{ /* D182 (V223): the number is raceCountdown's, so this row and the card cannot drift; past the race, "behind you" */ const cd=raceCountdown(WD.raceDate), w=raceCountdownWords(cd); return !w ? '' : cd.days<=0 ? ' ('+w.copy+')' : ' ('+w.card+' away)'; })()]]:WD.primaryPath==='event'?[['Race date','No date set — no taper']]:[] ),
         ['Lifting', liftLabel],
         ['Cardio', cardioSummary],
-        ['Program length', programWeeks + ' weeks'],
+        ['Program length', programWeeks + (programWeeks === 1 ? ' week' : ' weeks')],
         ['Start date', '<span id="sumStartDate">'+startSummaryVal(_sr)+'</span>'],
         ['Training days', trainDays.map(d=>DAY_SHORT[d]).join(' · ')],
         ['Rest days', WD.restDays.length?WD.restDays.map(d=>DAY_SHORT[d]).join(' · '):'None'],
@@ -4223,6 +4205,30 @@ const PACE_GOALS = new Set(['run_pace_goal', 'run_mile_time', 'run_15_under10'])
 const NRC_PLAN_WEEKS = {run_5k:8, run_10k:8, run_half:14, run_marathon:18};
 const NRC_PLAN_FLOOR = {run_5k:4, run_10k:4, run_half:6, run_marathon:12};
 const NRC_SHORTER    = {run_marathon:'run_half', run_half:'run_10k', run_10k:'run_5k'};
+// D182 (V223): raceCountdown(raceIso, todayIso?) → {days, weeks} from local midnight today
+// to the race, or null when a date is unreadable. Pure like raceAlignment: dates in, numbers
+// out, no DOM, no WD, no program object. It takes the ISO, not an alignment, so a test goal
+// carrying a date (D106a) counts down too. Days are rounded BEFORE weeks are floored, so a
+// span across a DST change still counts whole days (a raw floor of ms/7 days loses a week).
+function raceCountdown(raceIso, todayIso){
+  const race = _parseLocalDate(raceIso); if(!race) return null;
+  const today = todayIso ? _parseLocalDate(todayIso) : new Date(); if(!today) return null;
+  today.setHours(0,0,0,0);
+  const days = Math.round((race - today)/86400000);
+  return {days, weeks: Math.floor(days/7)};
+}
+// D182 (V223): raceCountdownWords(cd) → {card, copy} for a raceCountdown result, null on null.
+// Pure: it takes the countdown, never the program. The ruling's table, key stays "Time out":
+// 7 or more days counts weeks (the unit a plan is built in), race week counts days, day 0 is
+// the header's own "Race day", and past the race is "Behind you" (neutral on whether he ran it).
+function raceCountdownWords(cd){
+  if(!cd || !isFinite(cd.days)) return null;
+  const d = cd.days, w = cd.weeks;
+  if(d >= 7){ const n = w+' week'+(w===1?'':'s'); return {card:n, copy:n+' out'}; }
+  if(d >= 1){ const n = d+' day'+(d===1?'':'s');  return {card:n, copy:n+' out'}; }
+  if(d === 0) return {card:'Race day', copy:'race day'};
+  return {card:'Behind you', copy:'behind you'};
+}
 // raceAlignment(goalId, raceIso, eventOn, todayIso?) → null when not an aligned goal, else
 // {tw, raceIso, raceDay (ISO key), raceMon, start (Monday ISO), weeksOut, openWeek,
 //  floor, underFloor, futureWeeks}. Pure: dates in, dates out, no DOM, no WD.
@@ -4234,7 +4240,7 @@ function raceAlignment(goalId, raceIso, eventOn, todayIso){
   const start = new Date(raceMon); start.setDate(raceMon.getDate() - (tw-1)*7); start.setHours(0,0,0,0);
   const today = todayIso ? _parseLocalDate(todayIso) : new Date(); today.setHours(0,0,0,0);
   const todayMon = getWeekMonday(_isoOf(today));
-  const weeksOut = Math.floor((race - today)/86400000/7);
+  const weeksOut = raceCountdown(raceIso, todayIso).weeks;   // D182: one day-count in the file
   const openWeek = Math.max(1, Math.min(tw, Math.round((todayMon - start)/86400000/7) + 1));
   const futureWeeks = Math.max(0, Math.round((start - todayMon)/86400000/7));
   const floor = NRC_PLAN_FLOOR[goalId];
@@ -7470,11 +7476,12 @@ function _mileEntryState(g, exp){
   if(g.mileBestMins===undefined||g.mileBestMins==='') return {ok:true};
   const mm=+g.mileBestMins, ss=+(g.mileBestSecs||0);
   const sec=mm*60+ss;
-  if(!(mm>=0)||!(ss>=0)||ss>=60||!isFinite(sec)) return {ok:false,msg:'That mile time isn\u2019t a real time — check the minutes and seconds.'};
-  if(sec<180) return {ok:false,msg:'Under 3:00 isn\u2019t a mile time — the world record is 3:43. Check the entry.'};
-  if(sec>1500) return {ok:false,msg:'Over 25:00 reads as a walk, not a run — leave it blank and the program anchors on your experience level instead.'};
-  if(sec<300) return {ok:true,adv:'At '+_fmtMileAnchor(sec)+' your paces come from the chart\u2019s fastest row (5:00) — it tops out there.'};
-  if(sec>720) return {ok:true,adv:'At '+_fmtMileAnchor(sec)+' your paces come from the 12:00 row — the chart\u2019s slowest. Consider a base-building block first.'};
+  // D183 (P-SAFEPACE amendment 2 (e)): no mid-sentence dashes; the D116 mile sheet shares these strings.
+  if(!(mm>=0)||!(ss>=0)||ss>=60||!isFinite(sec)) return {ok:false,msg:'That mile time is not a real time. Check the minutes and seconds.'};
+  if(sec<180) return {ok:false,msg:'Under 3:00 is not a mile time. The world record is 3:43. Check the entry.'};
+  if(sec>1500) return {ok:false,msg:'Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead.'};
+  if(sec<300) return {ok:true,adv:'At '+_fmtMileAnchor(sec)+' your paces come from the chart\u2019s fastest row, 5:00. It tops out there.'};
+  if(sec>720) return {ok:true,adv:'At '+_fmtMileAnchor(sec)+' your paces come from the 12:00 row, the chart\u2019s slowest. Consider a base block first.'};
   return {ok:true};
 }
 function _mileAdvisoryHTML(){
@@ -7527,18 +7534,16 @@ function doGenerate(){
   const _previewGoals={...WD.cardioGoals,_experience:WD.experience||'intermediate',_ageBracket:WD.ageBracket||'18-35',_eventTargeted:WD.eventTargeted};
   let totalWeeksPreview=calcProgramLength(WD.cardioTypes||[],_previewGoals,LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks;
 
-  // D106a (V207): a test goal with a test date ends on the test week. The pin is written
-  // here, once, from the RESOLVED start (the value _applyWizardStart stores below), so
-  // buildProgram stays a pure function of cfg and never sees a date. A test before the
-  // start, or beyond the goal length (D138), pins nothing and the program keeps its goal
-  // length. Race goals align through raceAlignment; run_base has no test. Both pins are
-  // written on every generate, so a pin from an earlier build cannot survive into this one.
-  const _tg = (WD.cardioTypes||[]).includes('run') && WD.cardioGoals && WD.cardioGoals.run;
-  let _testWeek = (_tg && PACE_GOALS.has(_tg.id) && WD.eventTargeted !== false && WD.raceDate)
-    ? testWeekIndex(resolveStartDate(WD.startDate, WD.restDays || []).start, WD.raceDate) : null;
-  if(!(_testWeek >= 1 && _testWeek <= totalWeeksPreview)) _testWeek = null;
-  WD._testWeek = _testWeek;
-  WD._raceDateCappedWeeks = _testWeek || totalWeeksPreview;
+  // D106a (V207), D184 (V223): a test goal with a test date ends on the test week. The pin is
+  // progTestPin's, taken here once from the RESOLVED start (the value _applyWizardStart stores
+  // below), so buildProgram stays a pure function of cfg and never sees a date. The resolver is
+  // given the test date (_rsRace, D184 c), so a short week that holds the test keeps the entered
+  // day and pins week 1. A test before the start, or past week 26, pins nothing and the program
+  // keeps its goal length. Race goals align through raceAlignment; run_base has no test. Both
+  // pins are written on every generate, so a pin from an earlier build cannot survive into this one.
+  const _tp = progTestPin(WD, resolveStartDate(WD.startDate, WD.restDays || [], _rsRace(WD)).start);
+  WD._testWeek = (_tp && _tp.tw) || null;
+  WD._raceDateCappedWeeks = WD._testWeek || totalWeeksPreview;
   totalWeeksPreview = WD._raceDateCappedWeeks;   // the screen names the length that builds
   document.getElementById('generateSub').textContent='Building your '+totalWeeksPreview+'-week program...';
   const msgs=['Analyzing your goals...','Building cardio progressions...','Selecting exercises...','Calculating weights...','Assembling '+totalWeeksPreview+' weeks...','Almost done...'];
@@ -14623,22 +14628,28 @@ function setProgRace(dateStr){
   showToast('Race day '+_fmtStartDay(_al.raceIso)+' \u2014 plan starts '+_fmtStartDay(_al.start)+' \u2713');
   renderWeekView();
 }
-// D106a (V207): a stored program's test week from a given start. The same rules as the
-// writer in doGenerate: a run_pace_goal-family goal with a test date and eventTargeted; the
-// week holding the test, null before the start or past the goal length (D138). Returns the
-// week and the goal length (sized the way buildProgram sizes it), or null for any other program.
+// D106a (V207), D184 (V223): the one owner of the dated test pin. A run_pace_goal-family goal
+// with a test date and eventTargeted pins to the week holding its test whenever that week is a
+// row of Table 6 (rows 1 to 26; index 0 is unused). A test before the start, or past week 26,
+// pins nothing. doGenerate, setProgStart and the boot backfill read this predicate; none of them
+// carries its own. Returns {tw, len, week, cap}: tw the pinned week or null, len the goal length
+// (sized the way buildProgram sizes it), week the raw test week (null before the start), cap the
+// last row of Table 6 (26), the one place that number is taken, which the wizard's beyond 26 card
+// prints; null for any other program.
 function progTestPin(cfg, startIso){
   const c = cfg || {}, g = c.cardioGoals && c.cardioGoals.run;
   if(!(c.cardioTypes||[]).includes('run') || !g || !PACE_GOALS.has(g.id) || c.eventTargeted === false || !c.raceDate) return null;
   const len = calcProgramLength(c.cardioTypes, {...c.cardioGoals, _experience:c.experience||'intermediate', _ageBracket:c.ageBracket||'18-35', _eventTargeted:c.eventTargeted},
     LIFTING_FOCUS_TO_GOAL[c.liftingFocus]||c.liftingFocus||'balanced').weeks;
-  const tw = testWeekIndex(startIso, c.raceDate);
-  return {tw: (tw >= 1 && tw <= len) ? tw : null, len};
+  const week = testWeekIndex(startIso, c.raceDate), cap = NSW_TABLE6_INT.length - 1;
+  return {tw: (week >= 1 && week <= cap) ? week : null, len, week, cap};
 }
 function setProgStart(dateStr){
   if(!dateStr||!activeProg) return;
   // V174: same resolver as the wizard, so the D25 guard and the D21 statement hold here too.
-  const _r=resolveStartDate(dateStr,(activeProg.cfg&&activeProg.cfg.restDays)||[]);
+  // D184 (c): it is given the test date (_rsRace), so a re-date into a short week that holds
+  // the test keeps the entered day and pins week 1; NRC and undated goals get null and snap as before.
+  const _r=resolveStartDate(dateStr,(activeProg.cfg&&activeProg.cfg.restDays)||[],_rsRace(activeProg.cfg));
   activeProg.startDate=_r.start;
   // D106a (V207): a dated test goal re-pins its test week from the new start. Untrained
   // weeks re-pin; trained weeks stay frozen (refreshProgram), the same as setProgRace.
@@ -14648,7 +14659,11 @@ function setProgStart(dateStr){
   if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
   if(_tp) activeProg=refreshProgram(activeProg);   // untrained weeks re-pin; trained weeks stay frozen
   currentWeek=calcCurrentWeek();
-  showToast(_r.snapped ? 'Nothing to train that week — starts '+_fmtStartDay(_r.start)+' ✓' : (_r.partial ? 'Start date set ✓ — short first week' : 'Start date set ✓'));
+  // D184 (c) Q4: the holdsTest arm is first (a holdsTest return is also partial). Both surfaces read
+  // the same resolver return; the toast never went through startResolveCopy. No dashes in the arms.
+  showToast(_r.holdsTest ? 'That week holds your test. Nothing left to train before it ✓'
+    : (_r.snapped ? 'Nothing to train that week. Starts '+_fmtStartDay(_r.start)+' ✓'
+    : (_r.partial ? 'Start date set. Short first week ✓' : 'Start date set ✓')));
   renderWeekView();
 }
 
@@ -14753,7 +14768,9 @@ function progSelData(p){
   const order=(typeof ALL_DAYS_ORDER!=='undefined')?ALL_DAYS_ORDER:['sun','mon','tue','wed','thu','fri','sat'];
   const rest=c.restDays||[];
   let raceStr='';
-  if(c.raceDate){try{raceStr=new Date(c.raceDate).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch(_){raceStr=String(c.raceDate);}}
+  // D182 (V223): _fmtStartDay is _parseLocalDate underneath, the parser the engine and the header
+  // use; an unreadable date prints as stored rather than as a wrong day.
+  if(c.raceDate){try{raceStr=String(_fmtStartDay(c.raceDate, true));}catch(_){raceStr=String(c.raceDate);}}
   return {
     name:p.name||'My Program',
     goal:(p.goal||c.goal||''),
@@ -14767,7 +14784,7 @@ function progSelData(p){
     length:(p.totalWeeks||c.totalWeeks||6),
     cardio:(c.cardioTypes||[]).map(t=>({type:t,label:_CARDIO_LABELS[t]||t,goal:(c.cardioGoals&&c.cardioGoals[t]&&c.cardioGoals[t].label)||''})),
     eventTargeted:(c.primaryPath==='event'),
-    raceStr, raceWeeks:(c.raceDateWeeks||p.raceDateWeeks||null),
+    raceStr, raceOut:raceCountdownWords(c.raceDate ? raceCountdown(c.raceDate) : null),   // D182: live at render, never the stored raceDateWeeks
     seed:(c.seed!=null?c.seed:(p.seed!=null?p.seed:null)),
     runAnchor:runAnchorInfo(c)   // V172 (D7): null unless the run goal reads the pace chart
   };
@@ -14781,7 +14798,7 @@ function progDetailHTML(p){
   // rename pencil in the card header — opening the mid-program goal change sheet for
   // that sport. Lift-only programs have no cardio to edit, so no pencil.
   const cardioRows=s.cardio.length?s.cardio.map(c=>`<div class="det-row"><span class="k">${c.label}</span><span class="v" style="display:inline-flex;align-items:center;gap:7px">${c.goal||'General fitness'}<button onclick="event.stopPropagation();openGoalSheet('${p.id}','${c.type}')" aria-label="Change ${c.label} goal" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:2px;display:flex;align-items:center">${asyIcon('pencil',14)}</button></span></div>`).join(''):row('Cardio','Lift only');
-  const eventGroup=s.eventTargeted?`<div class="det-group"><div class="det-label">Event target</div>${row('Race date',s.raceStr||'No date set')}${s.raceWeeks?row('Time out',s.raceWeeks+' weeks'):''}</div>`:'';
+  const eventGroup=s.eventTargeted?`<div class="det-group"><div class="det-label">Event target</div>${row('Race date',s.raceStr||'No date set')}${s.raceOut?row('Time out',s.raceOut.card):''}</div>`:'';
   const estNote=s.lifts.estimated?` <span style="font-weight:400;color:var(--muted);font-size:9px;letter-spacing:0">(est.)</span>`:'';
   const chip=(k,v)=>`<div class="lift-chip"><div class="lc-k">${k}</div><div class="lc-v">${v}</div><div class="lc-u">${s.unit}</div></div>`;
   return `<div class="prog-detail">
@@ -14967,12 +14984,15 @@ function openMileSheet(progId){
     const c=p.cfg||{};
     let facts='';
     if(c.raceDate){
-      let rd=null; try{ rd=new Date(c.raceDate); }catch(_){ rd=null; }
-      if(rd && !isNaN(rd.getTime())){
-        const today=new Date(); today.setHours(0,0,0,0);
-        const rdm=new Date(rd.getTime()); rdm.setHours(0,0,0,0);
-        let rs=''; try{ rs=rd.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); }catch(_){ rs=String(c.raceDate); }
-        facts+='<div class="det-row"><span class="k">Days out</span><span class="v">'+Math.round((rdm-today)/86400000)+'</span></div>';
+      // D182 (V223): one local parse through raceCountdown, the helper the card's "Time out" row
+      // reads, so the popup and the card agree (V203). Days at every horizon (D116: three weeks
+      // out the taper is lived in days); at 0 and below, the formatter's own words. A null
+      // countdown is an unreadable date: no date rows, as before.
+      const cd=raceCountdown(c.raceDate);
+      if(cd && isFinite(cd.days)){
+        const out=cd.days>=1 ? String(cd.days) : raceCountdownWords(cd).card;
+        let rs=''; try{ rs=_fmtStartDay(c.raceDate, true); }catch(_){ rs=String(c.raceDate); }
+        facts+='<div class="det-row"><span class="k">Days out</span><span class="v">'+out+'</span></div>';
         facts+='<div class="det-row"><span class="k">Race day</span><span class="v">'+rs+'</span></div>';
       }
     }
@@ -15047,7 +15067,7 @@ function progSelLines(p){
     'Cardio: '+(s.cardio.length?s.cardio.map(c=>c.type+'='+(c.goal||'general')).join(', '):'lift only')
   ];
   if(s.runAnchor)lines.push(runAnchorLine(s.runAnchor));   // V172 (D7c)
-  if(s.eventTargeted)lines.push('Event: '+(s.raceStr||'no date')+(s.raceWeeks?' ('+s.raceWeeks+' wks out)':''));
+  if(s.eventTargeted)lines.push('Event: '+(s.raceStr||'no date')+(s.raceOut?' ('+s.raceOut.copy+')':''));
   if(s.seed!=null)lines.push('Seed: '+s.seed);
   return lines;
 }
@@ -15717,19 +15737,22 @@ function refreshProgram(prog){
     prog.cfg.seed = prog.seed;
     try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,seed:prog.seed}; savePrograms(_ps); } }catch(e){}
   }
-  // D106a (V207): ONE-TIME BACKFILL. A dated test goal stored before V207 has no _testWeek.
-  // Its test week is derived once from the program's own start and persisted, so the key
-  // exists and this never runs again. A test that is past, before the start or beyond the
-  // goal length writes the key null and the stored length stands. Untrained weeks re-pin;
-  // the freeze below keeps every trained day byte-identical.
-  if(prog.cfg._testWeek === undefined){
+  // D106a (V207), D184 (V223): BACKFILL. A stored program whose _testWeek is null or absent
+  // re-derives its test week from its own start (progTestPin) each boot until it pins; it
+  // writes nothing otherwise. It pins when the test is in weeks 1 to 26 and not past: the
+  // week and the length are set and persisted, so the key is numeric and this stops running.
+  // A test that is past, before the start or past week 26 leaves the key and the stored
+  // length as they were. Untrained weeks re-pin; the freeze below keeps every trained day
+  // byte-identical.
+  if(prog.cfg._testWeek == null){
     const _tp = progTestPin(prog.cfg, prog.startDate);
-    if(_tp){
+    if(_tp && _tp.tw){
       const _rd = _parseLocalDate(prog.cfg.raceDate), _td = _parseLocalDate(_isoToday());
-      const _tw = (_rd && _td && _rd < _td) ? null : _tp.tw;   // a past test pins nothing
-      prog.cfg._testWeek = _tw;
-      prog.cfg._raceDateCappedWeeks = _tw || prog.cfg._raceDateCappedWeeks || _tp.len;
-      try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,_testWeek:prog.cfg._testWeek,_raceDateCappedWeeks:prog.cfg._raceDateCappedWeeks}; savePrograms(_ps); } }catch(e){}
+      if(!(_rd && _td && _rd < _td)){   // a past test pins nothing and writes nothing
+        prog.cfg._testWeek = _tp.tw;
+        prog.cfg._raceDateCappedWeeks = _tp.tw;
+        try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,_testWeek:prog.cfg._testWeek,_raceDateCappedWeeks:prog.cfg._raceDateCappedWeeks}; savePrograms(_ps); } }catch(e){}
+      }
     }
   }
   let _swapCut=null;

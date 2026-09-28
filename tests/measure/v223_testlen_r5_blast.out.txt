@@ -1,0 +1,31 @@
+# 2026-09-27 21:11:54 EDT  node tests/measure/v223_testlen_r5_blast.js <cand223.html> <tree_post_d184ab_as223.html>
+# cand223.html re-copied from index.html (ia-version 223) before this run; cmp index.html cand223.html: identical
+# index.html sha256 aa951df10c10f0f9e49ae6c7ae0cf505d161826475d23e11e4f122a16dcba8b4
+# pre-(c) tree: the D184 tree with (a)(b) landed and (c) not, stamped 223 (build-3 session scratch, gate184/tree_post_d184ab_as223.html)
+
+v223 R5 blast radius | candidate /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0f257927-9d1c-4e52-aa95-54774c4b9ec8/scratchpad/gate184d/cand223.html ia-version 223 sha256 aa951df10c10f0f9e49ae6c7ae0cf505d161826475d23e11e4f122a16dcba8b4
+                     | pre-(c)   /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0f257927-9d1c-4e52-aa95-54774c4b9ec8/scratchpad/gate184/tree_post_d184ab_as223.html ia-version 223 sha256 af5beb52c57fc95c6bb69f4305253a5801a332b1d664febbf708d89555509185
+PASS both files read ia-version 223 (the build pair this proof is scoped to)
+
+-- TZ=America/New_York [NY] --
+PASS [NY] Z0 CONTROL: the child runs in the zone the parent asked for (1/1; TZ=America/New_York)
+PASS [NY] PAIR CONTROL: cell A snaps to Mon 2026-09-28 on the pre-(c) tree and holds Thu 2026-09-24 on the candidate (2/2)
+PASS [NY] COUNT the (c) oracle splits M9 into the ruling's typed counts (2,352 = 371 + 1,855 non-(c) + 21 + 105 (c)) (1/1; M9 2352: non-(c) 371 + 1855, (c) 21 + 105)
+PASS [NY] M9N every non-(c) M9 build (371 on M8's cell + 1,855 wide) is digest-identical to the pre-(c) tree (2226/2226; M8 cell 371/371, wide 1855/1855; pre-(c) self-equal 2226/2226, 2034 distinct digests)
+PASS [NY] SEE CONTROL: every (c) M9 build (21 + 105) differs from the pre-(c) tree, so the digest sees (c) (126/126; differ 126/126)
+PASS [NY] NRC M7's 210 race and run_base builds are digest-identical to the pre-(c) tree (210/210; identical 210/210; pre-(c) self-equal 210/210, 210 distinct digests)
+PASS [NY] child under TZ=America/New_York ran every row and printed its CHILD summary (exit 0, 39.3 s)
+
+-- TZ=UTC [UTC] --
+PASS [UTC] Z0 CONTROL: the child runs in the zone the parent asked for (1/1; TZ=UTC)
+PASS [UTC] PAIR CONTROL: cell A snaps to Mon 2026-09-28 on the pre-(c) tree and holds Thu 2026-09-24 on the candidate (2/2)
+PASS [UTC] COUNT the (c) oracle splits M9 into the ruling's typed counts (2,352 = 371 + 1,855 non-(c) + 21 + 105 (c)) (1/1; M9 2352: non-(c) 371 + 1855, (c) 21 + 105)
+PASS [UTC] M9N every non-(c) M9 build (371 on M8's cell + 1,855 wide) is digest-identical to the pre-(c) tree (2226/2226; M8 cell 371/371, wide 1855/1855; pre-(c) self-equal 2226/2226, 2034 distinct digests)
+PASS [UTC] SEE CONTROL: every (c) M9 build (21 + 105) differs from the pre-(c) tree, so the digest sees (c) (126/126; differ 126/126)
+PASS [UTC] NRC M7's 210 race and run_base builds are digest-identical to the pre-(c) tree (210/210; identical 210/210; pre-(c) self-equal 210/210, 210 distinct digests)
+PASS [UTC] child under TZ=UTC ran every row and printed its CHILD summary (exit 0, 46.6 s)
+
+PASS 15 FAIL 0
+real 86.14
+user 66.82
+sys 0.73
