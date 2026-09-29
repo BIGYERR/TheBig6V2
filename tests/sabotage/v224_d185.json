@@ -1,0 +1,16 @@
+[
+ {
+  "name": "D185 (a) the new today-cell fold-in rule is dropped entirely: both glyphs go back to orange-on-orange / green-on-orange",
+  "anchor": ".wk-day.today .chk,.wk-day.today .wc-mark{color:var(--on-signal);}\n",
+  "replacement": "",
+  "gate": "gates/g224_d185_wctoday.js",
+  "note": "The full revert. NAMED TRIP: 'today + wc-mark resolves color to --on-signal', 'today + wc-mark cascade winner is the D185 rule', 'today + chk resolves color to --on-signal', 'today + chk cascade winner is the D185 rule', both contrast-equals-baseline rows, and both AA-floor rows (mark falls back to CR 1.00, chk to CR 1.13, both < 3). Line-646/647 identity rows also trip since the new line is gone."
+ },
+ {
+  "name": "D185 (b) only the .chk half of the fold-in is dropped: the tick stays green-on-orange while the Wildcard mark is fixed",
+  "anchor": ".wk-day.today .chk,.wk-day.today .wc-mark{color:var(--on-signal);}",
+  "replacement": ".wk-day.today .wc-mark{color:var(--on-signal);}",
+  "gate": "gates/g224_d185_wctoday.js",
+  "note": "Proves the .chk fold-in is asserted, not incidental. NAMED TRIP: 'today + chk resolves color to --on-signal' (falls back to --run via :643), 'today + chk cascade winner is the D185 rule' (falls back to .wk-day-num .chk), 'today + chk contrast now equals the ✕-today baseline' (stays at ~1.13), 'today + chk contrast clears WCAG AA large-text/UI floor' (1.13 < 3). The wc-mark rows stay green, isolating the mutation to the .chk half exactly as intended."
+ }
+]
