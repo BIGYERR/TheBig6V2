@@ -1,0 +1,37 @@
+[
+  {
+    "name": "M1 -> D186 E1 reverted: rawImprovement divides by buildWeeks again instead of buildWeeks - 1, so N build weeks are treated as N steps instead of N-1, and the last build week no longer lands on the entered goal for un-dampened not-met cells",
+    "anchor": "Math.max(buildWeeks - 1, 1)",
+    "replacement": "Math.max(buildWeeks, 1)",
+    "gate": "gates/g225_d186_clockend.js",
+    "note": "NAMED TRIP: G3 (un-dampened not-met: last build week lands ON the entered goal). Verified: FAIL G3 (SAMEFMT(coach ex), undamp-undated-1, undamp-undated-2 all miss by exactly the one-step-short amount D186 exists to close). G1a/G1b/G2/G4/COPY_GUARD/TAPER CONTROL/MET CONTROL stay GREEN because they check internal consistency (last build week == _realisticTarget, taper holds it) which this one-line revert does not itself break -- only the comparison against the ENTERED goal (G3) sees it, which is exactly the metric the ruling's amendment says separates a correct two-line fix from a broken one-line fix. EXPECTED: G3 only."
+  },
+  {
+    "name": "M2 -> D186 E2 reverted: realisticTargetPace multiplies by plain buildWeeks again instead of Math.max(buildWeeks - 1, 0), reintroducing the pre-ruling off-by-one: the taper (and the printed note) land one step FASTER than the last week the block actually built",
+    "anchor": "weeklyImprovement * Math.max(buildWeeks - 1, 0)",
+    "replacement": "weeklyImprovement * buildWeeks",
+    "gate": "gates/g225_d186_clockend.js",
+    "note": "NAMED TRIP: G1a, G1b, G2, and COPY_GUARD (broader than the single G1 row named in the brief, verified directly rather than assumed). G1a fails because the last build week no longer equals the reverted (now one-step-fast) _realisticTarget; G1b fails because the printed note names a pace no build week prints; G2 fails because the taper no longer holds the last build week's own value; COPY_GUARD fails because the SAMEFMT cell's sameFmt-vs-note-form relationship inverts once _realisticTarget moves off the last build week. G3 and G4 stay GREEN (G3's un-dampened cells happen to still read correctly since E1's divisor is untouched by this mutation alone; G4's goal-met cells are unaffected by construction, gap 0 either way). TAPER CONTROL and MET CONTROL stay GREEN (both are oracle-consistency checks on taper length and goal-met classification, neither of which this mutation touches). EXPECTED: G1a, G1b, G2, COPY_GUARD."
+  },
+  {
+    "name": "M3 -> D187's ruled rate table reverted on advanced only: PACE_IMPROVE.advanced goes back to the old unsourced 7 s/mi/wk instead of Mario's ruled 2 (T1, 2026-09-23), leaving beginner and intermediate at their already-ruled values so only the rate-correctness deep-equal sees it",
+    "anchor": "const PACE_IMPROVE = {beginner:3, intermediate:3, advanced:2};",
+    "replacement": "const PACE_IMPROVE = {beginner:3, intermediate:3, advanced:7};",
+    "gate": "gates/g225_d187_pacerate.js",
+    "note": "NAMED TRIP: RATE (PACE_IMPROVE deep-equals {beginner:3, intermediate:3, advanced:2}). Verified: FAIL RATE, got {\"beginner\":3,\"intermediate\":3,\"advanced\":7}. Every CENSUS row stays GREEN (the declaration is still exactly one, the old {3,5,7} LITERAL table still appears 0 times since this mutation writes a different literal {3,3,7} not the retired {3,5,7} shape, and reader-site count is untouched). COPY, MILE-REQUIRED and CONFINEMENT all stay GREEN (this mutation touches only the rate value, not copy, the mile gate, or any non-pace-goal build). EXPECTED: RATE only."
+  },
+  {
+    "name": "M4 -> D187 R4's copy deletion reverted on the run note: 'That is the safe rate for your experience and age.' is re-inserted into the long-form branch (the one the note-template extraction and every dampened, not-sameFmt cell actually reads)",
+    "anchor": "mile each week. Your full goal of",
+    "replacement": "mile each week. That is the safe rate for your experience and age. Your full goal of",
+    "gate": "gates/g225_d187_pacerate.js",
+    "note": "NAMED TRIP: COPY run SI note template. Verified: FAIL, 'template contains a banned phrase' (after widening this gate's own extraction regex from a 400- to an 800-char bound in this same build, so a sabotage mutation that LENGTHENS the template is caught as a banned phrase rather than accidentally breaking the extraction itself and reporting the less-informative 'template not found' -- both are a correct FAIL on this row, but the wider bound names the real reason). COPY swim INT note template stays GREEN (this anchor is 'mile each week', unique to the run note; swim's is '100 each week' and is untouched). CENSUS, RATE, MILE-REQUIRED and CONFINEMENT all stay GREEN. EXPECTED: COPY run only."
+  },
+  {
+    "name": "M5 -> D187 R3's goal-scoping dropped: the g.id==='run_pace_goal' condition is removed from the blank-mile refusal, so EVERY non-beginner run goal with a blank mile refuses, not just run_pace_goal -- a run_5k athlete with no mile entered now wrongly gets turned away at a gate that was ruled specific to the pace-goal anchor problem",
+    "anchor": "if(g.id==='run_pace_goal') return {ok:false, blank:true, msg:'Required. Enter your most recent timed mile.'};",
+    "replacement": "return {ok:false, blank:true, msg:'Required. Enter your most recent timed mile.'};",
+    "gate": "gates/g225_d187_pacerate.js",
+    "note": "NAMED TRIP: MILE-REQUIRED non-beginner NON-pace run goal, blank mile: unaffected. Verified: FAIL, got {\"ok\":false,\"blank\":true,...} where {\"ok\":true} was wanted -- exactly the run_5k-wrongly-refused case the brief named. The other two MILE-REQUIRED rows stay GREEN (run_pace_goal still correctly refuses; beginner run_pace_goal still correctly passes, since the beginner check sits one line above and is untouched). CENSUS, RATE and COPY all stay GREEN. CONFINEMENT also stays GREEN in this run because none of its 7 built goal cfgs (swim_100_time, swim_500_time, bike_ftp, run_base, run_5k, run_half, run_marathon) leave the mile field blank in this gate's confinement cfgs, so the digest-identity check itself does not exercise the broken gate -- MILE-REQUIRED is the row built specifically to catch this, and does. EXPECTED: MILE-REQUIRED non-beginner NON-pace run goal only."
+  }
+]

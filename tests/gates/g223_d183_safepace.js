@@ -90,17 +90,23 @@
 // applied), and A3E's entry-error lines.
 // Every non-CONTROL row FAILS on V222 (IA_ASSUME_VERSION=223 base_v222.html) and PASSES on the D183 tree.
 'use strict';
-const path = require('path'), cp = require('child_process');
+const path = require('path'), cp = require('child_process'), fs = require('fs');
 const H = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 223;
+// D187 (V225): the rate table this file's handReach() inverts is read live by assessRunPaceCeiling
+// (R1's own "3/5/7 s/mi/week paceImprove table") -- the same function backing every R1 sentence
+// this gate pins. D187 moved it to {3,3,2} at V225. Read the artifact's REAL stamped ia-version
+// directly from its text (independent of the D183 ERA/IA_ASSUME_VERSION machinery below, which is
+// a different, unrelated predicate) so IMPROVE stays the rate the artifact under test actually runs.
+const RATE_STAMP = +((fs.readFileSync(ART, 'utf8').match(/<meta name="ia-version" content="(\d+)"/) || [])[1] || NaN);
 const ZONES = [['NY', 'America/New_York'], ['UTC', 'UTC']];
 const ZONE_ENV = 'G223_D183_ZONE';
 
 const ROWS = {
   Z0: 'Z0 CONTROL: the child runs in the zone the parent asked for, and the clock pin (2026-09-22 21:16 local) reaches the VM',
-  Z1: 'Z1 CONTROL: the hand oracles reproduce the ruling\'s printed numbers (week 5, weeksUntil 4, 12:00, 14:15, 17:15, 11:18, 11:24, 13:39, 16:53, 9:40, 1:24) and coach\'s sentences',
+  Z1: 'Z1 CONTROL: the hand oracles reproduce the ruling\'s printed numbers (week 5, weeksUntil 4, 12:00, 14:15, 17:15, 11:35, 11:38, 13:53, 16:53, 9:40, 1:24; L12/A2/A3 re-derived for D187\'s rate, V225) and coach\'s sentences',
   T1: 'T1 renderWizardStep on Mario\'s dated WD queues 0 timers, and the source (comments stripped) holds no updateRaceDateFeedback 80 ms timer',
   T2: 'T2 the same render, unflushed, paints #progLenLine, #raceDateFeedback and #paceDisplayLine over seeded sentinels',
   H168: 'H168 168 edit sequences, field handler then date handler lifted from the rendered HTML: header "Program length: 5 weeks. Your test sets it." == card "Your test is in week 5." after each, no Recommended, red or button; the 21:17 screen 0/168',
@@ -197,8 +203,13 @@ const WEEKDAY_TABLE = { '2026-09-21':'Mon', '2026-09-22':'Tue', '2026-09-25':'Fr
 
 // mm:ss, whole value rounded first (typed here; the engine's _clkMS is never called).
 const clk = sec => { const t = Math.round(sec); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
-// R1 inversion, typed from the ruling.
-const IMPROVE = { beginner: 3, intermediate: 5, advanced: 7 };            // "the 3/5/7 s/mi/week paceImprove table"
+// R1 inversion, typed from the ruling. D187 (V225): Mario ruled T1 {3,3,2} on 2026-09-23; the
+// old {3,5,7} (V176 D9, R1's own "3/5/7 s/mi/week paceImprove table") is the ruled rate on every
+// artifact BEFORE that ship. Era-gated by the artifact's REAL stamp, exactly as
+// g202_pace_anchor.js's EXP_IMPROVE_BY_VERSION and g202_pace_copy.js's RATE_BY_VERSION are.
+const IMPROVE = RATE_STAMP >= 225
+  ? { beginner: 3, intermediate: 3, advanced: 2 }    // D187 (V225)
+  : { beginner: 3, intermediate: 5, advanced: 7 };   // V176 (D9), pre-D187
 const AGE_SCALE = { '18-35': 1.0, '36-54': 0.85, '55+': 0.65 };           // "the 0.65/0.85 age scalers"
 const DEFAULT_MILE = { beginner: 690, intermediate: 570, advanced: 450 }; // D9 (R1: "690/570/450")
 const TOLERANCE = 45;                                                     // R1: "the 45 s/mi tolerance ... stays as is"
@@ -228,8 +239,8 @@ const V = {
   S1: 'Your mile is 8:00. In 5 weeks that reaches about 1.5 mi in 12:00. Your goal is 10:30. Keep it or change it above.',                                              // amendment 2 (a)
   S2: 'You have not entered a mile time. The intermediate default is 9:30 per mile. In 5 weeks that reaches about 1.5 mi in 14:15. Your goal is 12:00. Enter your mile above and this updates.',   // amendment 2 (a)
   S3: 'Your paces start from the beginner default of 11:30 per mile. In 5 weeks that reaches about 1.5 mi in 17:15. Your goal is 12:00. Keep it or change it above.',   // amendment 2 (b)
-  A2: 'Your mile is 8:00. In 11 weeks that reaches about 1.5 mi in 11:24. Your goal is 9:30. Keep it or change it above.',                                              // amendment 3 After A2
-  A3: 'You have not entered a mile time. The intermediate default is 9:30 per mile. In 11 weeks that reaches about 1.5 mi in 13:39. Your goal is 10:30. Enter your mile above and this updates.', // A3
+  A2: 'Your mile is 8:00. In 11 weeks that reaches about 1.5 mi in 11:38. Your goal is 9:30. Keep it or change it above.',                                              // amendment 3 After A2, re-derived for D187 (V225): intermediate rate 5 -> 3 s/mi/wk
+  A3: 'You have not entered a mile time. The intermediate default is 9:30 per mile. In 11 weeks that reaches about 1.5 mi in 13:53. Your goal is 10:30. Enter your mile above and this updates.', // A3, re-derived for D187 (V225): intermediate rate 5 -> 3 s/mi/wk
   A4: 'Your paces start from the beginner default of 11:30 per mile. In 11 weeks that reaches about 1.5 mi in 16:53. Your goal is 12:00. Keep it or change it above.',  // A4
 };
 const CARD_TW = w => 'Your test is in week ' + w + '. The program ends on it. The taper lands in front of it.';                       // R3 _tw >= 2
@@ -369,12 +380,12 @@ function runHandler(code, thisObj){ IA.ctx.__G223_THIS = thisObj; IA.eval('(func
   const r3 = handReach(5, 'beginner', '18-35', 480, 1.5, 'mi', 720);
   eq('beginner L5 reach (mile ignored)', clk(r3.total), '17:15'); eq('gap', Math.round(r3.gap), 210); eq('S3 sentence', handSentence(r3), V.S3);
   eq('tw 1 L1 reach', clk(handReach(1, 'intermediate', '18-35', 480, 1.5, 'mi', 630).total), '12:00');
-  eq('L12 goal 9:30', clk(handReach(12, 'intermediate', '18-35', 480, 1.5, 'mi', 570).total), '11:18');
+  eq('L12 goal 9:30', clk(handReach(12, 'intermediate', '18-35', 480, 1.5, 'mi', 570).total), '11:35');   // D187 (V225): was 11:18 at rate 5, re-derived at rate 3
   const a2 = handReach(11, 'intermediate', '18-35', 480, 1.5, 'mi', 570), a3 = handReach(11, 'intermediate', '18-35', null, 1.5, 'mi', 630), a4 = handReach(11, 'beginner', '18-35', null, 1.5, 'mi', 720);
-  eq('A2 L11 goal 9:30', clk(a2.total), '11:24'); eq('A2 sentence', handSentence(a2), V.A2);
-  eq('A3 L11 no mile 10:30', clk(a3.total), '13:39'); eq('A3 sentence', handSentence(a3), V.A3);
+  eq('A2 L11 goal 9:30', clk(a2.total), '11:38'); eq('A2 sentence', handSentence(a2), V.A2);
+  eq('A3 L11 no mile 10:30', clk(a3.total), '13:53'); eq('A3 sentence', handSentence(a3), V.A3);
   eq('A4 L11 beginner 12:00', clk(a4.total), '16:53'); eq('A4 sentence', handSentence(a4), V.A4);
-  eq('amendment 3 safeTotals 684/819/1013', [a2, a3, a4].map(r => Math.round(r.total)).join('/'), '684/819/1013');
+  eq('amendment 3 safeTotals 698/833/1013 (D187 V225, was 684/819/1013)', [a2, a3, a4].map(r => Math.round(r.total)).join('/'), '698/833/1013');
   eq('Mario 12:00 no gap', handReach(5, 'intermediate', '18-35', 480, 1.5, 'mi', 720).shows, false);
   eq('km label 2 km in 12:00', clk(720 / (2 * KM_MI)), '9:40');
   eq('swim label 500 yd in 7:00', clk(420 / (500 / 100)), '1:24');

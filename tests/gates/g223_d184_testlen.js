@@ -348,28 +348,55 @@ const V = mkVM(ART);
   row('RD', bad, 1, 'hand week ' + tw); }
 
 // ── B1248 / K27 M8's 4/5 cell ──
+// D186/D187 amendment 3 item 3 (coach 2026-09-29): DIFFERENT MECHANISM from g202/g204/g209's
+// Class E -- this is D187 R3 (the mile-required gate) doing its job correctly on an older, unrelated
+// gate's test cells, not a clock drift. From ia-version 225, every cell in this lattice where
+// experience !== 'beginner' and no mile is entered on a run_pace_goal correctly REFUSES at
+// doGenerate (D187 R3, _mileEntryState): 2 of 3 experiences x 1 of 2 mile states x 8 goals = 16
+// combos, x 26 B1248 weeks = 416, x 4 K27 weeks = 64 -- both counts re-derived independently from
+// this lattice's own shape before landing, matching the ruling's target exactly. The fix is NOT to
+// supply a mile (that would duplicate the cells that already have one and hide that R3 correctly
+// blocks a real, anchor-less state); it is to assert the refusal itself as the correct outcome on
+// exactly that population, from 225 only. Below 225 every cell in this lattice, including these,
+// keeps asserting D184's original length/pin claim exactly as before.
+const R225_R3 = +V.IA.version >= 225;
 { const fmt = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
   const GOALS = [];
   for(const t of [570, 660, 750, 855]) GOALS.push(['1.5mi ' + fmt(t), { id:'run_pace_goal', label:'x', targetDist:'1.5', paceUnit:'mi', targetMins:String(Math.floor(t / 60)), targetSecs:String(t % 60), targetTime:fmt(t) }]);
   for(const t of [360, 420, 480, 570]) GOALS.push(['1mi ' + fmt(t), { id:'run_pace_goal', label:'x', targetDist:'1', paceUnit:'mi', targetMins:String(Math.floor(t / 60)), targetSecs:String(t % 60), targetTime:fmt(t) }]);
-  const bIn = [], bOut = []; let nIn = 0, nOut = 0;
+  const bIn = [], bOut = []; let nIn = 0, nOut = 0, nR3In = 0, nR3Out = 0;
   for(const [gl, run] of GOALS) for(const exp of ['beginner', 'intermediate', 'advanced']) for(const mile of [null, 480]){
     const base = { primaryPath:'event', cardioTypes:['run'], experience:exp, ageBracket:'18-35', eventTargeted:true, liftingFocus:'support_prevention',
       equipment:'crossfit', restDays:['sun','wed'], unit:'lbs', seed:4242, name:'M', cardioGoals:{ run:Object.assign({}, run, mile ? { mileBestMins:'8', mileBestSecs:'00' } : {}) } };
     const tag0 = gl + ' ' + exp + ' mile ' + (mile ? '8:00' : 'none');
     // the goal length for K27: the same inputs with no test date
     setWD(V, Object.assign({}, base, { raceDate:'' })); const u = gen(V); const L = u.err ? null : u.p.totalWeeks;
+    // D187 R3 (from 225 only): a non-beginner run_pace_goal with no mile has no anchor and
+    // doGenerate correctly refuses, date-independent (dated and undated both refuse identically).
+    const r3Refuses = R225_R3 && exp !== 'beginner' && !mile;
     for(let k = 1; k <= 30; k++){
       const o = Object.assign({}, base, { raceDate: thuOfWeek(k) }), tag = tag0 + ' k' + k;
       setWD(V, o); const c = copy(V); setWD(V, o); const g = gen(V);
       if(k <= TABLE6_LAST){
         nIn++;
+        if(r3Refuses){
+          nR3In++;
+          if(!(g.err === 'no program' && !c.err && u.err === 'no program'))
+            bIn.push(tag + ': expected R3 refusal (no program), wizard rendered, undated sibling also refuses; got g.err=' + J(g.err) + ' c.err=' + J(c.err) + ' u.err=' + J(u.err));
+          continue;
+        }
         if(c.err || g.err){ bIn.push(tag + ' ' + (c.err || g.err)); continue; }
         const ow = handWeek(g.p.startDate, o.raceDate), subN = +((String(g.sub).match(/Building your (\d+)-week program/) || [])[1]);
         const got = [c.hdr, c.name, subN, g.p.totalWeeks];
         if(!(ow === k && got.every(x => x === ow))) bIn.push(tag + ': hdr/name/sub/built ' + J(got) + ' hand week ' + ow + ' (start ' + g.p.startDate + ')');
       } else {
         nOut++;
+        if(r3Refuses){
+          nR3Out++;
+          if(!(g.err === 'no program' && !c.err && u.err === 'no program'))
+            bOut.push(tag + ': expected R3 refusal (no program), wizard rendered, undated sibling also refuses; got g.err=' + J(g.err) + ' c.err=' + J(c.err) + ' u.err=' + J(u.err));
+          continue;
+        }
         if(c.err || g.err || L === null){ bOut.push(tag + ' ' + (c.err || g.err || 'undated sibling ' + u.err)); continue; }
         const ow = handWeek(g.p.startDate, o.raceDate), subN = +((String(g.sub).match(/Building your (\d+)-week program/) || [])[1]);
         const got = [c.hdr, c.name, subN, g.p.totalWeeks], tr = trials(g.p), w = interim(ow, L);
@@ -389,8 +416,15 @@ const V = mkVM(ART);
     else if(!(c.fb === INTERIM_TYPED && c.hdr === 11 && c.name === 11 && g.sub === 'Building your 11-week program...' && g.p.totalWeeks === 11 && trials(g.p).length === 0))
       bOut.push('PRT TING 2027-03-25: card ' + J(c.fb) + ' hdr/name/sub/built ' + J([c.hdr, c.name, g.sub, g.p.totalWeeks]) + ' trials ' + trials(g.p).length);
   }
-  row('B1248', bIn, nIn, 'test weeks 1..26');
-  row('K27', bOut, nOut, 'test weeks 27..30 + the typed PRT TING anchor'); }
+  // D186/D187 amendment 3 item 3: the R3-refusal population must be EXACTLY 416 (B1248) and 64
+  // (K27) -- 2 non-beginner experiences x 1 no-mile state x 8 goals x 26/4 weeks -- re-derived
+  // from this lattice's own shape, not assumed. A count off either way means the population this
+  // fix targets is not exactly what the ruling scoped, and is a named failure, never silently
+  // absorbed into the pass/fail tally above.
+  if(R225_R3 && nR3In !== 416) bIn.push('R3-refusal population is ' + nR3In + ' of ' + nIn + ', want exactly 416');
+  if(R225_R3 && nR3Out !== 64) bOut.push('R3-refusal population is ' + nR3Out + ' of ' + nOut + ', want exactly 64');
+  row('B1248', bIn, nIn, 'test weeks 1..26' + (R225_R3 ? '; R3 refusal population ' + nR3In + '/416' : ''));
+  row('K27', bOut, nOut, 'test weeks 27..30 + the typed PRT TING anchor' + (R225_R3 ? '; R3 refusal population ' + nR3Out + '/64' : '')); }
 
 // ── P1 source scan, comments stripped ──
 { const bad = [];

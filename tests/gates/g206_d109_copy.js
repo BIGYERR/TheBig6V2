@@ -205,7 +205,22 @@ const TABLE_SUPERSEDED = [
     now: 'INT: 100 repeats at your target split. Start at 4, build to 8. Hard cap at 8.' },
   { from: 212, ruling: 'D110a', builder: 'swim', entry: 55,
     was: 'INT: 100 yard repeats. Start at 4, build to 10. Hard cap at 10.',
-    now: 'INT: 100 yard repeats. Start at 4, build to 8. Hard cap at 8.' }
+    now: 'INT: 100 yard repeats. Start at 4, build to 8. Hard cap at 8.' },
+  // D186 (V225, coach's amendment item 2): the copy guard drops the "needs more weeks" sentence
+  // when the goal and the block target round to the identical m:ss, printing whichever of two
+  // branches applies. Both branches OPEN with the exact same text as entry 21's D103a "now"
+  // ("SI: Pace moves ${pp._weeklyGain} seconds per mile each week."), so the text itself is
+  // unchanged (was === now) -- but it is now written ONCE PER BRANCH in the source, so the count
+  // moves from 1 to 2. n is explicit here because e.n would otherwise silently keep 1.
+  { from: 225, ruling: 'D186', builder: 'run', entry: 21, n: 2,
+    was: 'SI: Pace moves ${pp._weeklyGain} seconds per mile each week.',
+    now: 'SI: Pace moves ${pp._weeklyGain} seconds per mile each week.' },
+  // D187 R5 (V225, D110a copy amendment inside P-PACERATE): the swim dampened note drops "That is
+  // the safe rate for your experience and age. " -- a pure deletion, no branching, so the count
+  // this entry already carries (1) is untouched; only the text moves.
+  { from: 225, ruling: 'D187', builder: 'swim', entry: 53,
+    was: 'INT: Split moves ${swimPace._weeklyGain} seconds per 100 each week. That is the safe rate for your experience and age. Your full goal of ${_goalPhrase} needs more weeks than this block has. The target for this block is',
+    now: 'INT: Split moves ${swimPace._weeklyGain} seconds per 100 each week. Your full goal of ${_goalPhrase} needs more weeks than this block has. The target for this block is' }
 ];
 const SUP_BAD = {};
 if(ents){
@@ -216,7 +231,14 @@ if(ents){
       (SUP_BAD[s.builder] = SUP_BAD[s.builder] || []).push('#' + s.entry + ' (' + s.ruling + ') supersedes text the table does not hold');
       continue;
     }
-    ents[s.entry - 1] = { n: e.n, old: e.old, neu: s.now, gone: [s.was], by: s.ruling };
+    // A supersession normally retires the OLD text (pushed onto `gone`, asserted 0 occurrences)
+    // in favor of NEW text. D186 (V225)'s copy guard duplicates entry 21's text unchanged across
+    // two ternary branches: was === now, the count moves (1 -> 2), the text is not gone. An
+    // explicit `n` override on the TABLE_SUPERSEDED row carries that count; `was === now` is
+    // never pushed onto `gone`, since the text plainly still appears.
+    const n = (s.n !== undefined) ? s.n : e.n;
+    const gone = (s.was === s.now) ? (e.gone || []) : (e.gone || []).concat([s.was]);
+    ents[s.entry - 1] = { n, old: e.old, neu: s.now, gone, by: s.ruling };
   }
 }
 

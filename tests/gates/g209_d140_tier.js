@@ -141,20 +141,39 @@ const RESTS = [['sun','wed'], ['sat','sun']];
 // ── T: the stand-in, the ruling's own before/after grid ─────────────────────────────────
 {
   const p = IA.buildProgram(cl(STAND));
-  const WANT_MIN = [33.0, 38.1, 43.3, 30.3, 47.9, 52.8, 57.7, 39.8, 61.8, 67.3, 73.7];
-  const WANT_T = 'CCCCBBBCBBB';
+  // D187 amendment 2 (Class E, coach 2026-09-29, MARIO CONCURRED): the stand-in's minute/tier
+  // literals are a V209 snapshot of the pace clock D186/D187 moved (5 -> 3 s/mi/wk for this
+  // athlete, D186's buildWeeks - 1 steps), not D140's own claim (the dose arithmetic and A/B/C
+  // rules are unchanged). Era-table on ia-version, standing rule 4: <= 224 keeps the old row,
+  // >= 225 uses the amendment's hand-verified row (W1 = the 8:15 mile's recovery column 659,
+  // each non-cutback week steps PACE_IMPROVE.intermediate (3) x agePaceScale['18-35'] (1.0) = 3 s
+  // further down the chart's recovery column; cutback weeks W4/W8 hold; minutes = mi x tgt / 60
+  // on the unchanged ladder 3 3.5 4 2.8 4.5 5 5.5 3.8 6 6.6 7.3). W11 crosses 75 minutes: B -> A.
+  const WANT_MIN = VER >= 225
+    ? [33.0, 38.3, 43.5, 30.5, 48.5, 53.7, 58.8, 40.6, 63.5, 69.5, 76.5]
+    : [33.0, 38.1, 43.3, 30.3, 47.9, 52.8, 57.7, 39.8, 61.8, 67.3, 73.7];
+  const WANT_T = VER >= 225 ? 'CCCCBBBCBBA' : 'CCCCBBBCBBB';
   const gotMin = [], gotT = [];
   for(let w = 1; w <= 11; w++){ const c = p.weeks[w] && p.weeks[w].sat && p.weeks[w].sat.cardio; gotMin.push(+minutesOf(c && c.dose).toFixed(1)); gotT.push(handTier(c) || '-'); }
   ok('T0 stand-in Saturdays: long-run minutes by dose arithmetic and the hand tier are the ruling\'s (' + WANT_MIN.join(' ') + ' / ' + WANT_T + ')',
      p.totalWeeks === 11 && JSON.stringify(gotMin) === JSON.stringify(WANT_MIN) && gotT.join('') === WANT_T,
      p.totalWeeks + ' weeks, ' + gotMin.join(' ') + ' / ' + gotT.join(''));
   const DIPS = 'Dips', PUSH = 'Pushups (slow tempo)', ROWR = 'Inverted rows (rings)', ROWB = 'Inverted rows (bodyweight)';
-  const B_AFTER = { 5:[DIPS, ROWR], 6:[DIPS, ROWR], 7:[PUSH, ROWB], 9:[PUSH, ROWR], 10:[PUSH, ROWR], 11:[DIPS, ROWR] };
+  // D187 amendment 2: from 225, W11 flips tier B -> A (76.5 min crosses 75), so it drops out of
+  // the tier-B Saturday set entirely; T1b below asserts its new shape instead.
+  const B_AFTER = Object.assign({ 5:[DIPS, ROWR], 6:[DIPS, ROWR], 7:[PUSH, ROWB], 9:[PUSH, ROWR], 10:[PUSH, ROWR] },
+    VER >= 225 ? {} : { 11:[DIPS, ROWR] });
   const bBad = [];
   Object.keys(B_AFTER).forEach(w => { const d = p.weeks[w].sat; const want = '[Strength] ' + B_AFTER[w].join(', ');
     if(shape(d) !== want || daySets(d) !== 6) bBad.push('W' + w + ' ' + shape(d) + ' (' + daySets(d) + ' sets)'); });
-  ok('T1 stand-in tier B Saturdays (W5 W6 W7 W9 W10 W11): the explosive finisher is gone and the strength pair stays, 6 sets',
+  ok('T1 stand-in tier B Saturdays (' + (VER >= 225 ? 'W5 W6 W7 W9 W10' : 'W5 W6 W7 W9 W10 W11') + '): the explosive finisher is gone and the strength pair stays, 6 sets',
      bBad.length === 0, bBad.join(' | '));
+  if(VER >= 225){
+    const d11 = p.weeks[11].sat, wantShape11 = '[Post-run mobility] Standing calf stretch, Couch stretch, Hip 90/90 stretch, T-spine mobility, Foam roll';
+    ok('T1b (D187 amendment 2, Class E, from 225) stand-in W11 flips B -> A: tier A, titled Post-Run Mobility, the mobility shape',
+       handTier(d11 && d11.cardio) === 'A' && d11 && d11.title === 'Post-Run Mobility' && shape(d11) === wantShape11,
+       'tier ' + handTier(d11 && d11.cardio) + ', title "' + (d11 && d11.title) + '", shape "' + (d11 && shape(d11)) + '"');
+  }
   const EXP = 'Explosive finisher';
   const C_KEEP = { 1:'[Strength] ' + DIPS + ', ' + ROWB + ' ; [' + EXP + '] Ball slams, Kettlebell swing',
                    2:'[Strength] ' + DIPS + ', ' + ROWB + ' ; [' + EXP + '] Ball slams, Kettlebell swing',

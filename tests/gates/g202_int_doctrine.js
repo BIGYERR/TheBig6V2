@@ -137,21 +137,32 @@ const handRepsV115 = (w, tw, span) => {
   return handIsTaper(w, tw) ? Math.max(2, Math.round(b * 0.55)) : b;
 };
 
-// PACE, the D101/D111 clock. D101: one safe rate, the age-scaled table value IS the cap,
-// so an intermediate at 18-35 walks 5 s/mi/wk and never faster. D111: the INT target is
-// that week's goal pace less A's 16 s/mi. Three limbs, and all three are load-bearing:
+// PACE, the D101/D111 clock. D101: one planning rate, the age-scaled table value IS the cap,
+// so an intermediate at 18-35 walks PACE_CAP_INT_18_35 s/mi/wk and never faster. D111: the INT
+// target is that week's goal pace less A's 16 s/mi. Three limbs, and all three are load-bearing:
 //   * the build weeks step by the gain;
-//   * THE TAPER HOLDS. Taper weeks freeze at the realistic target, which is one whole
-//     step BELOW the last build week and is then repeated. Extending the ramp linearly
-//     through the taper is wrong: measure's own first pass did exactly that and produced
-//     443 for an 11-week W11 where the engine and the ruling both say 448.
+//   * THE TAPER HOLDS. Taper weeks freeze at the realistic target, which from D186 (V225) EQUALS
+//     the last build week (not one step below it: D186 P-CLOCKEND divides the gap over
+//     buildWeeks - 1 steps, not buildWeeks, so week N of an N-build-week walk lands exactly on
+//     the realistic target). Below 225 the pre-D186 arithmetic stands (one whole step below the
+//     last build week, repeated in the taper): measure's own first pass at THAT arithmetic did
+//     it linearly through the taper instead and produced 443 for an 11-week W11 where the engine
+//     and the ruling both said 448 -- the taper HOLDS, it does not keep stepping.
 //   * a cutback week holds the PRIOR card's target, which is the sentence it prints.
-const PACE_CAP_INT_18_35 = 5;                 // D101, intermediate x age scale 1.0
+// D187 (V225): the rate itself moved, T1 {beginner:3, intermediate:3, advanced:2} (Mario,
+// 2026-09-23), hoisted to PACE_IMPROVE. This gate's oracle was not on the dispatch list's pin
+// sweep when D186/D187 shipped, so both the rate AND the step divisor/multiplier are era-tabled
+// here on ia-version, standing rule 4: below 225 today's values, from 225 D186+D187's.
+const PACE_CAP_INT_18_35 = (+IA.version >= 225) ? 3 : 5;   // D101 x D187: intermediate x age scale 1.0 (was 5, D187 T1 moves it to 3)
 const handPaceRow = (anchor, goalPace, tw) => {
   const target = Math.min(goalPace, anchor);  // a goal already met parks the clock flat
   const bw     = handBuildWks(tw);
-  const gain   = Math.min((anchor - target) / Math.max(bw, 1), PACE_CAP_INT_18_35);
-  const real   = +(anchor - gain * bw).toFixed(1);
+  // D186 (V225): N build weeks are N - 1 steps between week 1 and week N, so the gap divides
+  // over max(bw - 1, 1) and the realistic target multiplies by max(bw - 1, 0), not bw. Below 225
+  // the pre-D186 (one-step-off) arithmetic stands, byte-identical to before this era-table.
+  const steps  = (+IA.version >= 225) ? Math.max(bw - 1, 1) : Math.max(bw, 1);
+  const gain   = Math.min((anchor - target) / steps, PACE_CAP_INT_18_35);
+  const real   = +(anchor - gain * ((+IA.version >= 225) ? Math.max(bw - 1, 0) : bw)).toFixed(1);
   const tgt = [];
   for(let w = 1; w <= tw; w++){
     const a = (w > bw) ? real : +(Math.max(anchor - gain * bw, anchor - gain * (w - 1))).toFixed(1);
@@ -546,32 +557,52 @@ const HAND_REPS_ROWS = { 6:  [4,4,5,5,3,3],
 //
 // PACE next. Five representative athletes, one per shape the clock can take, each with a
 // hand anchor and a hand goal; the row itself is derived by handPaceRow.
+// D186/D187 amendment 3 item 1 (coach 2026-09-29): this gate's oracle was not on the dispatch
+// list's pin sweep, so its own hand rate and step formula (above) were stale, not just its
+// literal rows. Era-table every row too, standing rule 4: below 225 today's values (verified
+// unchanged), from 225 the D186+D187 values, hand-verified against the real V225 engine (both
+// buildProgram directly and handPaceRow agree, byte for byte, on all six rows below).
+const R225 = +IA.version >= 225;
 const PACE_REPS = [
   { tag: '8:15 mile, 1.5 mi goal',  anchor: 509.3064395186472, goal: 630/1.5, tw: 11,
     cfg: paceGoal({ targetDist:'1.5', targetMins:'10', targetSecs:'30', targetTime:'10:30',
       mileBestMins:'8', mileBestSecs:'15', mileBestSrc:{kind:'entered'} }),
-    row: [493,488,483,483,473,468,463,463,453,448,448] },
+    row: R225 ? [493,490,487,487,481,478,475,475,469,469,469] : [493,488,483,483,473,468,463,463,453,448,448] },
   { tag: '5:30 mile, 3 mi goal',    anchor: handRowPaceAt3mi(CHART_ROW_5_30), goal: 630/3, tw: 15,
     cfg: paceGoal({ targetDist:'3', targetMins:'10', targetSecs:'30', targetTime:'10:30',
       mileBestMins:'5', mileBestSecs:'30', mileBestSrc:{kind:'entered'} }),
-    row: [343,338,333,333,323,318,313,313,303,298,293,293,283,278,278] },
+    row: R225 ? [343,340,337,337,331,328,325,325,319,316,313,313,307,307,307] : [343,338,333,333,323,318,313,313,303,298,293,293,283,278,278] },
   { tag: '12:00 mile, 1 mi goal',   anchor: 720, goal: 630, tw: 9,
     cfg: paceGoal({ targetDist:'1', targetMins:'10', targetSecs:'30', targetTime:'10:30',
       mileBestMins:'12', mileBestSecs:'00', mileBestSrc:{kind:'entered'} }),
-    row: [704,699,694,689,684,679,674,669,669] },
-  // BELOW the D101 cap: the gap is 30 s/mi over 7 build weeks, so the clock walks
-  // 30/7 = 4.286 s/mi/wk and the cap never binds. The row is not a multiple of 5.
+    row: R225 ? [704,701,698,695,692,689,686,686,686] : [704,699,694,689,684,679,674,669,669] },
+  // BELOW the D101 cap, below 225: bw = 7 build weeks (tw 9, taper 2), the gap is 30 s/mi, the
+  // clock walks 30/7 = 4.286 s/mi/wk and the cap (5) never binds; that row is not a multiple of 5.
+  // FROM 225 this is NO LONGER a below-the-cap example: D186 divides the gap over bw - 1 = 6
+  // STEPS, not 7, so the raw walk is 30/6 = 5.0 s/mi/wk, and D187 also drops the cap to 3 -- so
+  // the (now steeper) raw walk is capped at 3 and this row walks flat at 3 s/mi/wk instead of its
+  // own uncapped rate. See the new sixth cell below for a from-225 cell that IS still below the
+  // (lower) cap.
   { tag: '11:00 mile, 1 mi goal',   anchor: 660, goal: 630, tw: 9,
     cfg: paceGoal({ targetDist:'1', targetMins:'10', targetSecs:'30', targetTime:'10:30',
       mileBestMins:'11', mileBestSecs:'00', mileBestSrc:{kind:'entered'} }),
-    row: [644,640,635,631,627,623,618,614,614] },
+    row: R225 ? [644,641,638,635,632,629,626,626,626] : [644,640,635,631,627,623,618,614,614] },
   // GOAL ALREADY MET: a 5:30 miler asked for 10:30 over a mile is already faster than the
   // goal, so the working target is his own anchor, the gain is zero and the clock parks.
+  // Unchanged on both eras: a met goal never reaches the rate or step math at all.
   { tag: '5:30 mile, 1 mi goal',    anchor: 330, goal: 630, tw: 6,
     cfg: paceGoal({ targetDist:'1', targetMins:'10', targetSecs:'30', targetTime:'10:30',
       mileBestMins:'5', mileBestSecs:'30', mileBestSrc:{kind:'entered'} }),
     row: [314,314,314,314,314,314] }
 ];
+// NEW from 225 only (not added below 225): the gap is 15 s/mi over 6 steps (bw - 1 = 6 for a
+// 7-build-week block), 15/6 = 2.5 < the new cap of 3, so this cell is what "below the cap" now
+// looks like, keeping D7's "one below the cap" narrative true on both eras. W7 (614) = goal - 16:
+// the last build week lands ON the goal, D186 G3 visible in this gate for free.
+if(R225) PACE_REPS.push({ tag: '10:45 mile, 1 mi goal 10:30', anchor: 645, goal: 630, tw: 9,
+  cfg: paceGoal({ targetDist:'1', targetMins:'10', targetSecs:'30', targetTime:'10:30',
+    mileBestMins:'10', mileBestSecs:'45', mileBestSrc:{kind:'entered'} }),
+  row: [629,627,624,622,619,617,614,614,614] });
 
 const ruledDetail = g => g.cb
   ? `${g.reps}x400m at ${clk(g.tgt)}/mi. Cutback week. Same target as last week, fewer reps. `
@@ -748,7 +779,7 @@ ok(d7bad.length === 0 && (d7four + d7three) === D7_POP.length && !!INT_ERA,
   + `cross - 1 cards with cross = max(3, ceil(tw x 0.55)); the era row for ia-version ${IAV} names the `
   + `${INT_ERA ? INT_ERA.arm + '/' + INT_ERA.reps : 'MISSING'} mechanism; reps come from `
   + `${INT_ERA && INT_ERA.reps === 'v115' ? 'the V115 position ramp' : 'raw Table 6 under A\'s ceiling of ' + REPS_CEILING}`
-  + ` through the cutback and taper branches; and five hand pace rows, including one below the `
+  + ` through the cutback and taper branches; and ${PACE_REPS.length} hand pace rows, including one below the `
   + `${PACE_CAP_INT_18_35} s/mi/wk cap and one already-met goal, land on the second`
   + (d7bad.length ? ' — first miss: ' + d7bad[0] : ''));
 
@@ -761,9 +792,15 @@ ok(d7bad.length === 0 && (d7four + d7three) === D7_POP.length && !!INT_ERA,
 const pAll = runSessions(IA.buildProgram(PINNED));
 const chi10 = pAll.filter(r => r.w === 10 && LBL.chi.test(r.st))[0];
 const lsd1  = pAll.filter(r => r.w === 1  && /Long Slow Distance/.test(r.st))[0];
-ok(chi10 && chi10.dose && chi10.dose.tgt === 501 && chi10.detail.indexOf('8:21/mi') >= 0,
-  `D8 W10 CHI still reads 501 s/mi (8:21/mi): the x1.08 Long Interval multiplier is A's own worked example and D111 `
-  + `does not touch it (got ${chi10 && chi10.dose && chi10.dose.tgt})`);
+// D186/D187 amendment 3 item 1: PINNED's own clock moved (the taper/realistic value is now
+// 485.3, not 464.3, D186's two-line fix), so W10 CHI's x1.08 multiplier lands on a new number
+// from 225: 485.3 x 1.08 = 524.12 -> 524, "8:44/mi". Below 225 the pre-D186 value stands.
+// The x1.08 multiplier ITSELF is untouched either way -- this is Class E's mechanism at the CHI
+// column, not a new rule.
+const D8_CHI_TGT = R225 ? 524 : 501, D8_CHI_TXT = R225 ? '8:44/mi' : '8:21/mi';
+ok(chi10 && chi10.dose && chi10.dose.tgt === D8_CHI_TGT && chi10.detail.indexOf(D8_CHI_TXT) >= 0,
+  `D8 W10 CHI still reads ${D8_CHI_TGT} s/mi (${D8_CHI_TXT}): the x1.08 Long Interval multiplier is A's own worked `
+  + `example and D111 does not touch it (got ${chi10 && chi10.dose && chi10.dose.tgt})`);
 ok(lsd1 && lsd1.dose && lsd1.dose.tgt === 659 && lsd1.detail.indexOf('10:59/mi') >= 0,
   `D8b W1 LSD still reads 659 s/mi (10:59/mi): the recovery clock is INT-branch business only `
   + `(got ${lsd1 && lsd1.dose && lsd1.dose.tgt})`);
@@ -830,8 +867,17 @@ function notesOf(cfg){
 }
 // A cfg whose goal is reachable inside the block and is not already met: the one class that
 // still reads the generic note at zero shift.
-const GENERIC_CFG = paceGoal({ targetDist:'1.5', targetMins:'12', targetSecs:'30', targetTime:'12:30',
-  mileBestMins:'8', mileBestSecs:'15', mileBestSrc:{kind:'entered'} });
+// D186/D187 amendment 3 item 1 (f): below 225 the old GENERIC_CFG (8:15 mile, 1.5 mi in 12:30)
+// stays the D9b/D9c cell. From 225 that SAME cfg crosses the D101/D187 cap (gap 9.3 s/mi over
+// bw 4 = 3 steps, 9.3/3 = 3.10 > the new cap of 3) and becomes DAMPENED, printing D186's SI note
+// instead of the generic Zone 5 note -- so D9b/D9c swap to the same new cell PACE_REPS gained
+// above (10:45 mile, 1 mi goal 10:30), which stays un-dampened and prints Zone 5 on 9/9 cards on
+// V225 (hand-verified against the real engine before landing here).
+const GENERIC_CFG = R225
+  ? paceGoal({ targetDist:'1', targetMins:'10', targetSecs:'30', targetTime:'10:30',
+      mileBestMins:'10', mileBestSecs:'45', mileBestSrc:{kind:'entered'} })
+  : paceGoal({ targetDist:'1.5', targetMins:'12', targetSecs:'30', targetTime:'12:30',
+      mileBestMins:'8', mileBestSecs:'15', mileBestSrc:{kind:'entered'} });
 const gNotes = notesOf(GENERIC_CFG).filter(n => /Zone 5/.test(n.note));
 ok(gNotes.length > 0 && gNotes.every(n => n.note === RULED_INT_NOTE),
   `D9b the generic note as RENDERED equals the ruled string verbatim on ${gNotes.length} INT cards `

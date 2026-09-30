@@ -143,6 +143,7 @@ ERA[221] = ERA[220];   // V221 (D177/D178/D179/D180): ruled UNMOVED (D177 adds a
 ERA[222] = ERA[221];   // V222 (D181): ruled UNMOVED (D181 P-SWAPDURABLE is session-store only: nothing in buildProgram, 0 engine cards change; the ruling states HALF_MANNY 0ac7da6b1691a8e1 unchanged)
 ERA[223] = ERA[222];   // V223 (D182/D183/D184): ruled UNMOVED (D182 P-RACEDATE is race-date display and copy, amendment (a) withdrew the one hunk that moved the digest; D183 P-SAFEPACE is the wizard cardio_goal step; D184 P-TESTLEN pins dated test goals to their test week through the start resolver only, 0/210 race and run_base builds move, never NRC; nothing in buildProgram, 0 engine cards change; the rulings state HALF_MANNY 0ac7da6b1691a8e1 unchanged)
 ERA[224] = ERA[223];   // V224 (D185 P-WCTODAY): ruled UNMOVED (D185 is pure CSS, the wildcard-mark/checkmark color fix; no hunk reaches buildProgram; the ruling states HALF_MANNY 0ac7da6b1691a8e1 unchanged)
+ERA[225] = ERA[224];   // V225 (D186 P-CLOCKEND, D187 P-PACERATE): ruled UNMOVED (both rulings touch only the run_pace_goal pace clock and rate; neither reaches the lift-side draw this file audits)
 function shardCount(){ const raw = process.env.G219_SHARDS === undefined ? '' : String(process.env.G219_SHARDS);
   if(raw === '') return 4;
   if(!/^[0-9]+$/.test(raw) || parseInt(raw, 10) < 1){ fail++; console.log("FAIL: CONFIG: G219_SHARDS must be a positive integer, or empty/unset which means 4; got '" + raw + "'"); return 0; }

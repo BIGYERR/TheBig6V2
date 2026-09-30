@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="224"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="225"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2437,7 +2437,7 @@ function assessRunPaceCeiling(L) {
   if(tPacePerMile >= currentPace) return null; // target slower than current → reachable
   // Fastest pace reachable in L weeks FROM THE USER'S ACTUAL CURRENT PACE: the length engine's
   // forward pipeline inverted (undo the +1 grace, the age multiplier and raw*1.25 + 4).
-  const paceImprove = {beginner:3, intermediate:5, advanced:7}[exp] || 4;
+  const paceImprove = PACE_IMPROVE[exp] || PACE_IMPROVE.intermediate;
   const agePaceScale = {'55+':0.65, '36-54':0.85, '18-35':1.0}[age] || 1.0;
   const ageSafePaceImprove = +(paceImprove * agePaceScale).toFixed(2);
   const ageMult = {'55+':1.15, '36-54':1.07, '18-35':1.0}[age] || 1.0;
@@ -3081,7 +3081,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
   // Safe weekly build rates by experience (10% rule scaled)
   const weeklyPct = {beginner:0.08, intermediate:0.10, advanced:0.12}[experience] || 0.10;
   // Pace improvement: seconds per mile per week with interval training
-  const paceImprove = {beginner:3, intermediate:5, advanced:7}[experience] || 4;
+  const paceImprove = PACE_IMPROVE[experience] || PACE_IMPROVE.intermediate;
   // Age bracket dampens weekly pace improvement — older athletes need longer adaptation runway
   const agePaceScale = {'55+':0.65, '36-54':0.85, '18-35':1.0}[ageBracket] || 1.0;
   const ageSafePaceImprove = +(paceImprove * agePaceScale).toFixed(2);
@@ -3755,21 +3755,24 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
     const goalAlreadyMet = enteredTarget >= initialPace;
     const targetPace   = Math.min(enteredTarget, initialPace);
 
-    // Raw linear improvement per week over the full build block (not total — taper doesn't improve pace)
-    const rawImprovement = (initialPace - targetPace) / Math.max(buildWeeks, 1);
+    // D186 (V225): N build weeks are N-1 steps between week 1 and week N.
+    // The taper is a primer, it holds the pace the block built and cuts the
+    // volume; it never introduces a faster target. The block target IS the
+    // last build week's pace, so the gap is divided over N-1 steps, not N,
+    // or week N overshoots past the entered target by one step.
+    const rawImprovement = (initialPace - targetPace) / Math.max(buildWeeks - 1, 1);
 
     // Adaptation dampener: physiology caps pace gains, further reduced by age bracket.
-    // D101 (V202): ONE safe rate. The age-scaled table value set at the call site IS the cap.
+    // D101 (V202): one planning rate. The age-scaled table value set at the call site IS the cap.
     // The old ceiling of 12 s/mi/wk and the x2.5 multiplier had no source and let a compressed
     // timeline promise 30 s/mi in a week. Fallback mirrors expPaceDefaults above: the same
     // hand table, unscaled, for the case where the call site did not set the property.
-    const expPaceImprove = {beginner:3, intermediate:5, advanced:7};   // V176 (D9)
     const maxPaceImprovementPerWeek = buildRunProgressionForLength._paceImprovePerWeek
-      || expPaceImprove[exp] || 5;
+      || PACE_IMPROVE[exp] || PACE_IMPROVE.intermediate;
     const weeklyImprovement = Math.min(rawImprovement, maxPaceImprovementPerWeek);
 
     // Realistic achievable target pace given this timeline
-    const realisticTargetPace = initialPace - (weeklyImprovement * buildWeeks);
+    const realisticTargetPace = initialPace - (weeklyImprovement * Math.max(buildWeeks - 1, 0));
 
     paceProgression = [];
     for(let w = 0; w < totalWeeks; w++) {
@@ -3817,12 +3820,11 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
   // Inject pace params onto function for run_pace_goal before calling progression builder
   if(goalId === 'run_pace_goal') {
     const expPaceDefaults = {beginner:690, intermediate:570, advanced:450};   // V176 (D9)
-    const expPaceImprove  = {beginner:3, intermediate:5, advanced:7};
     const agePaceScale    = {'55+':0.65, '36-54':0.85, '18-35':1.0};
     const rawTargetSecs = arguments[10] || null;
     const rawTargetDist = parseFloat(arguments[9]) || 1.5;
     const ageBracket = arguments[11] || '18-35';
-    const baseImprove = expPaceImprove[experience||'intermediate'] || 5;
+    const baseImprove = PACE_IMPROVE[experience||'intermediate'] || PACE_IMPROVE.intermediate;
     // D100 (V202): the pace clock starts where the athlete actually is AT THE DISTANCE THEY
     // ENTERED. Anchoring on the mile pace itself started a 1.5-mile goal at a pace the athlete
     // only holds for a mile, so the goal read "slower" than the anchor and the clock parked flat.
@@ -4142,7 +4144,10 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
             const goalFmt = fmt(pp._originalTarget);
             const _reachIdx = _psShift > 0 ? Math.max(0, (tw - taperWks - 1) - (_psTap || _psShift)) : null;
             const reachFmt = fmt(_reachIdx != null && pp[_reachIdx] != null ? pp[_reachIdx] : pp._realisticTarget);
-            note = `SI: Pace moves ${pp._weeklyGain} seconds per mile each week. That is the safe rate for your experience and age. Your full goal of ${goalFmt}/mi needs more weeks than this block has. The target for this block is ${reachFmt}/mi. Hit the prescribed pace precisely.`;
+            const _sameFmt = goalFmt === reachFmt;   // D186: at the m:ss grain the block lands on the goal. Do not say the goal needs more weeks and then hand it over.
+            note = _sameFmt
+              ? `SI: Pace moves ${pp._weeklyGain} seconds per mile each week. The target for this block is ${reachFmt}/mi. Hit the prescribed pace precisely.`
+              : `SI: Pace moves ${pp._weeklyGain} seconds per mile each week. Your full goal of ${goalFmt}/mi needs more weeks than this block has. The target for this block is ${reachFmt}/mi. Hit the prescribed pace precisely.`;
           } else {
             note = 'SI: Zone 5 (95%+ max HR) on work efforts. All out on each rep. Take the full recovery. Build from 4 reps to 8. Hard cap at 8. Quality over quantity. If pace drops, stop.';
           }
@@ -4200,6 +4205,9 @@ const NRC_GOALS = new Set(['run_5k', 'run_10k', 'run_half', 'run_marathon']);
 // set answers the question for a cfg from any era. run_base is NOT here: a Lydiard block
 // has no hard day to space, so the spacing chooser has nothing to choose.
 const PACE_GOALS = new Set(['run_pace_goal', 'run_mile_time', 'run_15_under10']);
+// D187: seconds per mile per week, a planning rate, not a limit; the age scalers
+// multiply it; the same number sizes the undated block and caps the clock (D101).
+const PACE_IMPROVE = {beginner:3, intermediate:3, advanced:2};
 // V188 (D14a): race alignment. Count BACK from the race, not forward from today.
 // Plan lengths are the table lengths; floors are the source's own minimums (app copy
 // says "I don't recommend", never names the source — ruled V188).
@@ -4895,7 +4903,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
       if(swimPace._goalMet) {
         note = _anchorLine + 'INT: Your goal split is already within your current split. This block holds your split and builds your reps.';
       } else if(swimPace._dampened) {
-        note = _anchorLine + `INT: Split moves ${swimPace._weeklyGain} seconds per 100 each week. That is the safe rate for your experience and age. Your full goal of ${_goalPhrase} needs more weeks than this block has. The target for this block is ${fmt(_reachSplit)}/100. Hit the prescribed split precisely.`;
+        note = _anchorLine + `INT: Split moves ${swimPace._weeklyGain} seconds per 100 each week. Your full goal of ${_goalPhrase} needs more weeks than this block has. The target for this block is ${fmt(_reachSplit)}/100. Hit the prescribed split precisely.`;
       } else {
         note = _anchorLine;
         note += 'INT: 100 repeats at your target split. Start at 4, build to 8. Hard cap at 8. If your split slips, end the session. Consistency between reps matters.';
@@ -7474,7 +7482,12 @@ function _mileEntryState(g, exp){
   if(g===undefined) g=(typeof WD!=='undefined'&&WD.cardioGoals)?WD.cardioGoals.run:null;
   if(exp===undefined) exp=(typeof WD!=='undefined')?WD.experience:'';
   if(!g||exp==='beginner') return {ok:true};
-  if(g.mileBestMins===undefined||g.mileBestMins==='') return {ok:true};
+  if(g.mileBestMins===undefined||g.mileBestMins===''){
+    // D187 R3 (V225): a run_pace_goal with no mile has no anchor to build the clock from --
+    // D110a's swim gate is the model. Every OTHER run goal type still passes through blank.
+    if(g.id==='run_pace_goal') return {ok:false, blank:true, msg:'Required. Enter your most recent timed mile.'};
+    return {ok:true};
+  }
   const mm=+g.mileBestMins, ss=+(g.mileBestSecs||0);
   const sec=mm*60+ss;
   // D183 (P-SAFEPACE amendment 2 (e)): no mid-sentence dashes; the D116 mile sheet shares these strings.
@@ -7487,13 +7500,13 @@ function _mileEntryState(g, exp){
 }
 function _mileAdvisoryHTML(){
   const st=_mileEntryState(); const t=st.msg||st.adv||'';
-  return '<div id="mileAdvisory" style="font-size:11px;line-height:1.45;margin-top:6px;display:'+(t?'block':'none')+';color:'+(st.msg?'var(--signal)':'var(--muted)')+'">'+t+'</div>';
+  return '<div id="mileAdvisory" style="font-size:11px;line-height:1.45;margin-top:6px;display:'+(t?'block':'none')+';color:'+((st.msg&&!st.blank)?'var(--signal)':'var(--muted)')+'">'+t+'</div>';
 }
 function updateMileAdvisory(){
   const el=document.getElementById('mileAdvisory'); if(!el) return;
   const st=_mileEntryState(); const t=st.msg||st.adv||'';
   el.textContent=t; el.style.display=t?'block':'none';
-  el.style.color=st.msg?'var(--signal)':'var(--muted)';
+  el.style.color=(st.msg&&!st.blank)?'var(--signal)':'var(--muted)';
 }
 // D110a M2 (V212, Mario: make it required): a swim time goal needs a real current time. One
 // validator in the D9 shape, shared by the advisory and the doGenerate refusal. The 500 goal reads

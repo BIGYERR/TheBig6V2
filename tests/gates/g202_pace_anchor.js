@@ -38,7 +38,18 @@ function ok(cond, msg){ if(cond){ PASS++; console.log('  ok   ' + msg); } else {
 
 // ── HAND TABLES (the gate's own copy; never read from the app) ────────────────
 const EXP_DEFAULT = { beginner:690, intermediate:570, advanced:450 };      // V176 (D9)
-const EXP_IMPROVE = { beginner:3,   intermediate:5,   advanced:7   };      // s/mi/wk, unscaled
+// D187 (V225): Mario ruled T1 {3,3,2} on 2026-09-23, hoisted to one PACE_IMPROVE declaration; the
+// old {3,5,7} table (V176 D9, unscaled) is the ruled rate on every artifact BEFORE that ship. This
+// stays a HAND table, never a read of the artifact's own PACE_IMPROVE (P4 exists to catch a mutation
+// to that very value — reading it live would make the row tautological, see the ORACLE note above).
+const EXP_IMPROVE_BY_VERSION = [
+  { from: 0,   to: 224,      ruling: 'V176 (D9), pre-D187', table: { beginner:3, intermediate:5, advanced:7 } },
+  { from: 225, to: Infinity, ruling: 'D187 (V225)',          table: { beginner:3, intermediate:3, advanced:2 } },
+];
+const EXP_IMPROVE_ROW = EXP_IMPROVE_BY_VERSION.filter(r => +IA.version >= r.from && +IA.version <= r.to)[0];
+if(!EXP_IMPROVE_ROW){ FAIL++; console.log('  FAIL RATE-ERA no EXP_IMPROVE_BY_VERSION row covers ia-version ' + IA.version
+  + ': the pace-improvement rate has no ruled hand table at this version, so P4/P4b/P4c/P4d are void'); }
+const EXP_IMPROVE = (EXP_IMPROVE_ROW || EXP_IMPROVE_BY_VERSION[0]).table;      // s/mi/wk, unscaled
 const AGE_SCALE   = { '18-35':1.0,  '36-54':0.85,     '55+':0.65   };
 const MI_PER_KM   = 0.621;                                                  // the ruled factor
 const hand = {
@@ -387,20 +398,38 @@ const PINNED_CFG = paceGoal({ targetDist:'1.5', targetMins:'10', targetSecs:'30'
 // the 8:15 mile interpolates to row mile 495 / fiveK 535, read at 1.5 mi in log distance
 // (fraction 0.35766) for an anchor of 509.306 s/mi. Mario confirmed the resulting 7:44/mi.
 const PIN = {
-  weeks: 11, initial: 509.3064395186472, target: 420, gain: 5, realistic: 464.3, dampened: true,
-  arr: [509.3,504.3,499.3,494.3,489.3,484.3,479.3,474.3,469.3,464.3,464.3],
+  weeks: 11, initial: 509.3064395186472, target: 420, gain: 3, realistic: 485.3, dampened: true,
+  arr: [509.3,506.3,503.3,500.3,497.3,494.3,491.3,488.3,485.3,485.3,485.3],
   // V202 slice 6 re-pin, by RULING not by drift. D111 (A 251-252) makes the interval pace the
   // base pace LESS 16 s/mi instead of x0.95. D105's sequencing (E9) was REVERTED in slice 6:
   // its walk limb fired on 0 of 54 blocks, so it was a pin that could not trip, and it moves to
-  // D114/D115. The INT clock therefore walks with the array again, at D101's 5 s/mi/wk:
-  //   W1 reads PIN.arr[0] 509.3 less 16 = 493.3 s/mi -> dose 493, printed 8:13/mi
-  //   W6 reads PIN.arr[5] 484.3 less 16 = 468.3 s/mi -> dose 468, printed 7:48/mi
-  // PIN.arr[5] is PIN.arr[0] less five weeks of the 5 s/mi/wk gain: 509.3 - 25 = 484.3.
-  // Both rows are hand arithmetic on the array above, not a reading of the artifact.
+  // D114/D115.
+  // RE-PINNED for D186/D187 (V225). D187 moved the intermediate rate 5 -> 3 s/mi/wk (T1, Mario
+  // 2026-09-23). D186 moved the divisor AND the realistic-target multiplier from buildWeeks to
+  // buildWeeks - 1: this cfg taper-gates at 2 weeks (eventTargeted true forces a taper even off
+  // the wizard's own test-pin path), so totalWeeks 11 - taper 2 = 9 build weeks = 8 STEPS, not 9.
+  // realistic = 509.3064 - 3 x 8 = 485.3064 -> 485.3. Every array entry re-derived on the same
+  // terms (max(realistic, initial - gain x w) for w = 0..8, then the taper holds 485.3 at w 9, 10),
+  // and cross-checked against the built artifact before landing here (both routes agree).
+  // The INT clock still walks with the array, D111's -16 s/mi unchanged:
+  //   W1 reads PIN.arr[0] 509.3 less 16 = 493.3 s/mi -> dose 493, printed 8:13/mi (w=0, always
+  //     the unmoved anchor regardless of rate, so this row is IDENTICAL pre- and post-D186/D187)
+  //   W6 reads PIN.arr[5] 494.3 less 16 = 478.3 s/mi -> dose 478, printed 7:58/mi
+  // The Long Interval (LI, formerly CHI) tempo dose at the taper week (W10) and the Long Slow
+  // Distance (LSD) dose at W1 are read directly off the rebuilt artifact: LI is NOT flat off this
+  // pin's OLD array value, it moves with the array (524 s/mi at W10, was 501). D187 amendment 2
+  // (coach 2026-09-29): LSD is not flat either, on either version -- it is only this ONE pin (W1)
+  // that looks unchanged. LSD reads the chart row of the week's progression pace
+  // (`_row = paceChartLookup('mile', paceProgression[idx])`), so its recovery pace walks with the
+  // clock at the chart's recovery slope same as every other week; W1 alone equals the anchor row
+  // (659) because W1 is always the unmoved anchor, the same reason the W1 INT row above is
+  // identical pre- and post-D186/D187. A later week's LSD pin would need its own re-derivation.
+  // Both rows are hand arithmetic on the array above plus one direct read where the ruling does
+  // not itself supply a formula (LI), never a reading of the artifact for the D186/D187 numbers.
   // The doctrine derivation and the recovery band live in tests/gates/g202_int_doctrine.js.
   cards: [ { w:1,  st:LBL.int,                   tgt:493, pace:'8:13/mi'  },
-           { w:6,  st:LBL.int,                   tgt:468, pace:'7:48/mi'  },
-           { w:10, st:LBL.chi,                   tgt:501, pace:'8:21/mi' },
+           { w:6,  st:LBL.int,                   tgt:478, pace:'7:58/mi'  },
+           { w:10, st:LBL.chi,                   tgt:524, pace:'8:44/mi' },
            { w:1,  st:/Long Slow Distance/,      tgt:659, pace:'10:59/mi' } ],
 };
 // the same number, derived here instead of quoted: the mile and 5K columns of the 8:15 row,
@@ -415,9 +444,10 @@ ok(Math.abs(pPP.ip - PIN_HAND) < 1e-9 && Math.abs(PIN_HAND - PIN.initial) < 1e-9
   `Q2b the pinned anchor re-derives from the hand chart: 495 + (535-495) x ln(1.5)/ln(3.107) = `
   + `${PIN_HAND.toFixed(4)} (measure's surgery printed ${PIN.initial.toFixed(4)})`);
 ok(pPP.tp === PIN.target, `Q3 pinned target ${PIN.target} s/mi = 10:30 over 1.5 mi (got ${pPP.tp})`);
-ok(pPP.gain === PIN.gain, `Q4 pinned weekly gain ${PIN.gain} s/mi/wk = intermediate 5 x age 1.0 (got ${pPP.gain})`);
+ok(pPP.gain === PIN.gain, `Q4 pinned weekly gain ${PIN.gain} s/mi/wk = intermediate 3 x age 1.0 (D187, was 5) (got ${pPP.gain})`);
 ok(pPP.real === PIN.realistic, `Q5 pinned realistic target ${PIN.realistic} s/mi = anchor `
-  + `${PIN.initial.toFixed(1)} less ${PIN.gain} s/mi/wk over 9 walked weeks, printed 7:44/mi `
+  + `${PIN.initial.toFixed(1)} less ${PIN.gain} s/mi/wk over 8 stepped weeks (D186: buildWeeks - 1, `
+  + `9 build weeks is 8 steps), printed 8:05/mi `
   + `(got ${pPP.real})`);
 ok(pPP.dampened === PIN.dampened, `Q6 the dampened branch fires on the pinned cfg (got ${pPP.dampened})`);
 ok(JSON.stringify(pPP.arr) === JSON.stringify(PIN.arr),
@@ -433,9 +463,9 @@ for(const c of PIN.cards){
   // independent clock arithmetic: what is printed IS what is prescribed
   if(s.dose && hand.clock(s.dose.tgt) + '/mi' !== c.pace) qbad.push(`W${c.w} printed ${c.pace} != clock(${s.dose.tgt})`);
 }
-ok(qbad.length === 0, `Q8 the four pinned cards read W1 INT 493 (8:13/mi) and W6 INT 468 (7:48/mi), `
-  + `which are array weeks 1 and 6 (509.3 and 484.3) each less D111's 16 s/mi, `
-  + `W10 CHI 501 (8:21/mi), W1 LSD 659 (10:59/mi), each printed pace equal to its own prescribed seconds`
+ok(qbad.length === 0, `Q8 (re-pinned D186/D187, V225) the four pinned cards read W1 SI 493 (8:13/mi) and W6 SI 478 (7:58/mi), `
+  + `which are array weeks 1 and 6 (509.3 and 494.3) each less D111's 16 s/mi, `
+  + `W10 LI 524 (8:44/mi), W1 LSD 659 (10:59/mi), each printed pace equal to its own prescribed seconds`
   + (qbad.length ? ' — first miss: ' + qbad[0] : ''));
 
 // ── R — the four ruled properties of the row reader, each on a hand-built row ──

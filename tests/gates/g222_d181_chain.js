@@ -47,7 +47,7 @@
 //                  every record below _cut before any re-apply); sabotage S4 (drop R5) is what proves them.
 //   5L licence     slot detail != live is licensed up to LIC5L_MAX (70, the residue STEP printed over 15,545 chains, the
 //                  boot-side injury re-filter of section 12 (C)), each residue row's boot equal to the MAP boot. The licence
-//                  is a predicate on ia-version, LIC5L_ERAS.includes(VER): eras 222, 223, 224 (each added by a re-ruling that
+//                  is a predicate on ia-version, LIC5L_ERAS.includes(VER): eras 222, 223, 224, 225 (each added by a re-ruling that
 //                  printed the same 68 rows); above the last listed era REFUSED, residue 0 until re-ruled.
 //   IA_ASSUME_VERSION=222 lifts a file stamped exactly 221 to 222 for a discrimination run. It is announced, and ignored
 //   on any other file. gate.sh never sets it.
@@ -83,7 +83,7 @@ const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const ERA = 222, BASE_ERA = 221, V221_COMMIT = '57b9dee80269743a40b350aa399351661dd9c06b';
-const LIC5L_ERAS = [222, 223, 224], LIC5L_MAX = 70, LIC5L_OF = 15545;
+const LIC5L_ERAS = [222, 223, 224, 225], LIC5L_MAX = 70, LIC5L_OF = 15545;
 const NU = 40, N8 = 6;
 let pass = 0, fail = 0;
 const t0 = Date.now();
@@ -93,7 +93,7 @@ const done = () => { try { if(TMPD) fs.rmSync(TMPD, { recursive:true, force:true
 const R = {
   R5:  "row 5  untouched MARIO W5 Thu box->goblet->Leg press: boot = last live card in name AND detail (Leg press 4×8–12), chip offers goblet, two undos reach Barbell box squat 4×3 with the store empty",
   R5c: "row 5c untouched MARIO W5 Thu 2-cycle box->goblet->box: boots 1 and 2 = last live card (Barbell box squat 4×8–12)",
-  R5L: "row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras 222, 223); every residue row boots equal to the composed-map boot",
+  R5L: `row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras ${LIC5L_ERAS.join(', ')}); every residue row boots equal to the composed-map boot`,
   R5X: "row 5X untouched reachable collide2 and exch3: whole day == live, all of them",
   R8:  "row 8  CONTROL hist-restored day boots byte-equal to its ia_hist_ record, every class x t1 t2 up_st up_bt up_ts",
   R8d: "row 8d CONTROL no duplicate item name on a booted hist-restored card (undercounts on injured MARIO; row 8 is the byte check)",

@@ -127,7 +127,7 @@ ok('C4b the changed set is non-empty, so the helper is not a no-op rename', diff
 
 // ── C5 — the reproducing card ──────────────────────────────────────────────
 // Mario's config. 480 s/mi is 8 minutes 0 seconds by hand: 480 / 60 = 8 exactly.
-function mkCfg(anchorMins, anchorSecs){
+function mkCfg(anchorMins, anchorSecs, goalMins, goalSecs, dist){
   const c = JSON.parse(JSON.stringify(fixtures.HALF_MANNY));
   c.experience = 'intermediate'; c.seed = 76308;
   c.primaryPath = 'goal'; c.eventTargeted = false; delete c.raceDate;
@@ -135,7 +135,9 @@ function mkCfg(anchorMins, anchorSecs){
   c.cardioGoals = { run: { id:'run_pace_goal', label:'run_pace_goal',
     mileBestMins:String(anchorMins), mileBestSecs:String(anchorSecs),
     baselineDist:'5', baseline:'5mi',
-    targetDist:'1.5', paceUnit:'mi', targetMins:'9', targetSecs:'30' } };
+    targetDist: dist !== undefined ? String(dist) : '1.5', paceUnit:'mi',
+    targetMins: goalMins !== undefined ? String(goalMins) : '9',
+    targetSecs: goalSecs !== undefined ? String(goalSecs) : '30' } };
   return c;
 }
 const REPRO = IA.buildProgram(mkCfg(8, 0));
@@ -148,10 +150,41 @@ const reproCards = sessionsOf(REPRO, 11, 'thu');
 ok('C5 the reproducing config builds a W11 THU cardio session', reproCards.length > 0, String(reproCards.length));
 const reproDetail = reproCards.length ? String(reproCards[0].detail || '') : '';
 const reproDose = reproCards.length ? (reproCards[0].dose || reproCards[0]._dose || {}) : {};
-eq('C5 W11 THU dose.tgt is the prescribed tempo seconds', reproDose.tgt, 480);
-ok('C5 W11 THU detail prints the tempo pace as 8:00/mi (480 s = 8 min 0 s)',
-   reproDetail.indexOf('Tempo Pace: 8:00/mi') !== -1, reproDetail.slice(0, 80));
+// D186/D187 amendment 3 item 2 (coach 2026-09-29): SAME MECHANISM as g202/g209 Class E --
+// _tempoSec reads the same walked clock (paceProgression[idx] x 1.08), so this cell's W11 (the
+// last build week; undated, tw 11, bw 11, no taper, 10 steps) moves with the rate. Hand anchor
+// (the gate's own existing interpolation, unmoved): 494.306. Below 225: 494.306 - 5x10 = 444.306,
+// x 1.08 = 479.85 -> 480, "8:00/mi". From 225: 494.306 - 3x10 = 464.306, x 1.08 = 501.44 -> 501,
+// "8:21/mi" (D187's rate 3; the undated case has bw = tw so D186's steps = bw - 1 = 10 either way,
+// only the rate moved here). Hand-verified against the live V225 engine before landing: W11 THU
+// LI prints tgt 501, "Tempo Pace: 8:21/mi", exactly.
+const C5_TGT = (+VER >= 225) ? 501 : 480, C5_TXT = (+VER >= 225) ? 'Tempo Pace: 8:21/mi' : 'Tempo Pace: 8:00/mi';
+eq('C5 W11 THU dose.tgt is the prescribed tempo seconds', reproDose.tgt, C5_TGT);
+ok('C5 W11 THU detail prints the tempo pace (' + C5_TXT + ')',
+   reproDetail.indexOf(C5_TXT) !== -1, reproDetail.slice(0, 80));
 ok('C5 W11 THU detail carries no :60 seconds limb', !/\d:60\b/.test(reproDetail), reproDetail.slice(0, 80));
+
+// ── C5b — the carry cell, restored (D186/D187 amendment 3 item 2) ──────────
+// C5 used to double as "the reproducing card" for the old-idiom ":60" carry (479.85 -> 8:00, old
+// idiom 7:60), but 501.44 is nowhere near a :60 boundary, so that coverage silently vanished when
+// C5's own value moved. Anchored at WEEK 1 instead, which neither D186 nor any rate change ever
+// touches (week 1 is always the unmoved anchor pace), this cell reproduces the SAME carry
+// identically on both eras: mile 7:24 (444 s), 1 mi goal 6:00, undated. Hand: 444 x 1.08 = 479.52
+// -> 480, "8:00/mi", old idiom 7:60. Added as a NEW row keyed from 225 only (even though the
+// printed value is identical pre- and post-D186/D187) to restore the coverage C5 used to give;
+// hand-verified against the live engine on BOTH V224 and V225 before landing: both print W1 THU
+// LI tgt 480, "Tempo Pace: 8:00/mi", identically.
+if(+VER >= 225){
+  const CARRY = IA.buildProgram(mkCfg(7, 24, '6', '00', '1'));
+  const carryCards = sessionsOf(CARRY, 1, 'thu');
+  ok('C5b the carry config builds a W1 THU cardio session', carryCards.length > 0, String(carryCards.length));
+  const carryDetail = carryCards.length ? String(carryCards[0].detail || '') : '';
+  const carryDose = carryCards.length ? (carryCards[0].dose || carryCards[0]._dose || {}) : {};
+  eq('C5b W1 THU dose.tgt is the prescribed tempo seconds (the unmoved anchor, both eras)', carryDose.tgt, 480);
+  ok('C5b W1 THU detail prints the tempo pace as 8:00/mi (479.52 -> 480, the old idiom\'s 7:60 carry)',
+     carryDetail.indexOf('Tempo Pace: 8:00/mi') !== -1, carryDetail.slice(0, 80));
+  ok('C5b W1 THU detail carries no :60 seconds limb', !/\d:60\b/.test(carryDetail), carryDetail.slice(0, 80));
+}
 
 // ── C6 — the string agrees with the number, across a lattice ───────────────
 // For every tempo card that carries a numeric dose.tgt, the gate divides tgt by

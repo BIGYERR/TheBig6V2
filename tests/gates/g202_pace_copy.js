@@ -49,15 +49,27 @@ const strip = s => String(s || '').replace(/<[^>]+>/g, '');
 
 // ── hand arithmetic (typed here, never read from the app) ────────────────────
 const clock = s => Math.floor(s/60) + ':' + String(Math.round(s % 60)).padStart(2, '0');
-const EXP_IMPROVE = { beginner:3, intermediate:5, advanced:7 };
+// D187 (V225): Mario ruled T1 {3,3,2} on 2026-09-23, hoisted to one PACE_IMPROVE declaration; the
+// old {3,5,7} table (V176 D9, unscaled) is the ruled rate on every artifact BEFORE that ship. Kept
+// as a HAND table, era-gated, exactly as g202_pace_anchor.js's EXP_IMPROVE_BY_VERSION is.
+// D186 (V225) also moves the realistic-target multiplier from buildWeeks to buildWeeks - 1. This
+// PRT TING cfg tapers at 2 weeks regardless of era (eventTargeted forces a taper; unrelated to the
+// rate), so buildWeeks is 9 on every artifact; only the STEP COUNT the gain is multiplied by moves,
+// from 9 (the old, one-step-off bug) to 8 (D186: buildWeeks - 1 steps between week 1 and week N).
+const RATE_BY_VERSION = [
+  { from: 0,   to: 224,      ruling: 'V176 (D9), pre-D186/D187', table: { beginner:3, intermediate:5, advanced:7 }, steps: 9 },
+  { from: 225, to: Infinity, ruling: 'D186/D187 (V225)',          table: { beginner:3, intermediate:3, advanced:2 }, steps: 8 },
+];
+const RATE_ERA = RATE_BY_VERSION.filter(r => +IA.version >= r.from && +IA.version <= r.to)[0] || RATE_BY_VERSION[0];
+const EXP_IMPROVE = RATE_ERA.table;
 const AGE_SCALE   = { '18-35':1.0, '36-54':0.85, '55+':0.65 };
 
 // PRT TING: entered mile 8:15, entered goal 10:30 over 1.5 mi, intermediate, 18-35.
-const HAND_GAIN  = EXP_IMPROVE.intermediate * AGE_SCALE['18-35'];       // 5 s/mi/wk
+const HAND_GAIN  = EXP_IMPROVE.intermediate * AGE_SCALE['18-35'];       // 5 s/mi/wk pre-225, 3 s/mi/wk from 225
 const HAND_GOAL  = ((10*60 + 30) / 1.5);                                // 420 s/mi
 // Amended D100: the anchor is the 8:15 row (mile 495, 5K 535) read at 1.5 mi in log distance.
 const HAND_ANCHOR = 495 + (535 - 495) * Math.log(1.5) / Math.log(3.107);   // 509.3064 s/mi
-const HAND_REACH  = +(HAND_ANCHOR - HAND_GAIN * 9).toFixed(1);             // 464.3 s/mi -> 7:44/mi
+const HAND_REACH  = +(HAND_ANCHOR - HAND_GAIN * RATE_ERA.steps).toFixed(1);   // 464.3 pre-225 (7:44/mi), 485.3 from 225 (8:05/mi)
                                                         // D101 realistic target, pinned by g202_pace_anchor Q5
 
 // ── coach's ruled strings, VERBATIM ──────────────────────────────────────────
@@ -65,10 +77,15 @@ const HAND_REACH  = +(HAND_ANCHOR - HAND_GAIN * 9).toFixed(1);             // 46
 // not move. D109 (V206) re-rules its HEAD only, from "INT — Interval: " to "INT: " (coach's table,
 // tests/measure/v206_d109_table.txt entry 21, typed below), and retires the label exemption. The
 // V202 row holds on 202..205 and REFUSES above 205. An artifact no row covers fails loudly.
+// D187 R4 (V225): the sentence "That is the safe rate for your experience and age." is deleted
+// from the run note (no rate in this app is a safety limit; Mario stopped calling the run rate
+// safe and the coach cannot keep calling it safe on the next card). safeRate:false rows carry no
+// such sentence in RULED_NOTE below, regardless of head.
 const PACE_NOTE_BY_VERSION = [
-  { from: 202, to: 205,      ruling: 'E4 (V202)',   head: 'INT — Interval: ', labelExempt: true  },
-  { from: 206, to: 207,      ruling: 'D109 (V206)', head: 'INT: ',            labelExempt: false },
-  { from: 208, to: Infinity, ruling: 'D103a (V208)', head: 'SI: ',            labelExempt: false },   // the INT is the Short Interval
+  { from: 202, to: 205,      ruling: 'E4 (V202)',    head: 'INT — Interval: ', labelExempt: true,  safeRate: true  },
+  { from: 206, to: 207,      ruling: 'D109 (V206)',  head: 'INT: ',            labelExempt: false, safeRate: true  },
+  { from: 208, to: 224,      ruling: 'D103a (V208)', head: 'SI: ',             labelExempt: false, safeRate: true  },   // the INT is the Short Interval
+  { from: 225, to: Infinity, ruling: 'D187 (V225)',  head: 'SI: ',             labelExempt: false, safeRate: false },   // "safe rate" sentence deleted
 ];
 const IAV = +IA.version;
 // ── D103a (V208) ERA ROWS for the run builder's quality labels (standing ruling 4) ──
@@ -90,8 +107,9 @@ if(!COPY_ERA){
     + `ruled text at this version, so C1 and C3 below cannot mean anything`);
 }
 const RULED_NOTE = (COPY_ERA ? COPY_ERA.head : 'NO ERA ROW ')
-  + `Pace moves ${HAND_GAIN} seconds per mile each week. That is the safe rate for your `
-  + `experience and age. Your full goal of ${clock(HAND_GOAL)}/mi needs more weeks than this block has. `
+  + `Pace moves ${HAND_GAIN} seconds per mile each week. `
+  + ((COPY_ERA && COPY_ERA.safeRate) ? 'That is the safe rate for your experience and age. ' : '')
+  + `Your full goal of ${clock(HAND_GOAL)}/mi needs more weeks than this block has. `
   + `The target for this block is ${clock(HAND_REACH)}/mi. Hit the prescribed pace precisely.`;
 const RULED_PACE_TAIL  = ' Week 1 runs off this row. Every week after it moves toward your goal.';
 const RULED_CHART_TAIL = ' Every pace in this program comes from this row.';
@@ -262,6 +280,18 @@ for(const mb of [['5','30'],['8','15'],['11','00']])
           baselineDist:'3', baseline:'3mi', targetDist:dist, targetMins:tt[0], targetSecs:tt[1],
           targetTime:tt[0]+':'+tt[1], mileBestMins:mb[0], mileBestSecs:mb[1],
           mileBestSrc:{kind:'entered'} }, { experience:exp }));
+// D186/D187 (V225) coverage fix: the two-line clock fix walks steeper (buildWeeks - 1 instead of
+// buildWeeks) AND the rate table dropped (5 -> 3 s/mi/wk intermediate, 7 -> 2 advanced), so every
+// one of the 54 cfgs above that used to land un-dampened ("on-schedule", the class C10a's threshold
+// exists to guard) now crosses the D101 cap and reads dampened (0 of 54, was 18 of 54 on V224). A
+// gap of 1 s/mi at the 8:15 mile over 1 mi still clears the cap (found by direct sweep against the
+// V225 artifact, not invented): this single cfg restores the "neither" class so C10/C10a can still
+// mean what they say. Kept as one appended cfg rather than a fourth `tt`, so the base 54-cfg lattice
+// (unchanged since V202) stays legible as its own thing.
+APX_LAT.push(runGoal({ id:'run_pace_goal', label:'Hit a Pace / Time Goal', paceUnit:'mi',
+  baselineDist:'3', baseline:'3mi', targetDist:'1', targetMins:'8', targetSecs:'14',
+  targetTime:'8:14', mileBestMins:'8', mileBestSecs:'15',
+  mileBestSrc:{kind:'entered'} }, { experience:'intermediate' }));
 
 const shiftMap = () => { const m = {}; for(let i=1;i<=30;i++) m[i] = SHIFT_WKS; return m; };
 let zeroCards = 0, zeroWithApx = 0, shiftCards = 0, shiftMissing = [], shiftDouble = [], shiftTailBad = [];
