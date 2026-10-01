@@ -1,0 +1,1081 @@
+==== MODE beg shards 6
+  ban_carry: 0
+  ban_hingeB: 0
+  ban_liftA: 0
+  ban_powerB: 0
+  builds: 56700
+  byAge:
+      18-35 A>-: 210
+      18-35 A>B: 2025
+      18-35 B>A: 180
+      18-35 B>C: 405
+      18-35 C>B: 465
+      36-54 A>-: 210
+      36-54 A>B: 1770
+      36-54 B>-: 105
+      36-54 B>A: 180
+      36-54 B>C: 495
+      36-54 C>B: 465
+      55+ A>-: 315
+      55+ A>B: 1560
+      55+ B>-: 105
+      55+ B>A: 360
+      55+ B>C: 285
+      55+ C>B: 465
+  byDirFocus:
+      A>- balanced pace1330: 105
+      A>- fatloss pace1330: 105
+      A>- hypertrophy pace1330: 105
+      A>- strength pace1330: 105
+      A>- support_athletic pace1330: 105
+      A>- support_prevention pace1330: 105
+      A>- support_strength pace1330: 105
+      A>B balanced 10k: 90
+      A>B balanced half: 90
+      A>B balanced half5mi: 90
+      A>B balanced mara: 90
+      A>B balanced mara8mi: 90
+      A>B balanced pace12: 180
+      A>B balanced pace1330: 90
+      A>B fatloss 10k: 90
+      A>B fatloss half: 90
+      A>B fatloss half5mi: 90
+      A>B fatloss mara: 90
+      A>B fatloss mara8mi: 90
+      A>B fatloss pace12: 180
+      A>B fatloss pace1330: 90
+      A>B hypertrophy 10k: 90
+      A>B hypertrophy half: 90
+      A>B hypertrophy half5mi: 90
+      A>B hypertrophy mara: 90
+      A>B hypertrophy mara8mi: 90
+      A>B hypertrophy pace12: 180
+      A>B hypertrophy pace1330: 90
+      A>B strength 10k: 90
+      A>B strength half: 90
+      A>B strength half5mi: 90
+      A>B strength mara: 90
+      A>B strength mara8mi: 90
+      A>B strength pace12: 180
+      A>B strength pace1330: 90
+      A>B support_athletic 10k: 90
+      A>B support_athletic base: 105
+      A>B support_athletic half: 90
+      A>B support_athletic half5mi: 90
+      A>B support_athletic mara: 90
+      A>B support_athletic mara8mi: 90
+      A>B support_athletic pace12: 180
+      A>B support_athletic pace1330: 90
+      A>B support_prevention 10k: 90
+      A>B support_prevention base: 105
+      A>B support_prevention half: 90
+      A>B support_prevention half5mi: 90
+      A>B support_prevention mara: 90
+      A>B support_prevention mara8mi: 90
+      A>B support_prevention pace12: 180
+      A>B support_prevention pace1330: 90
+      A>B support_strength 10k: 90
+      A>B support_strength base: 105
+      A>B support_strength half: 90
+      A>B support_strength half5mi: 90
+      A>B support_strength mara: 90
+      A>B support_strength mara8mi: 90
+      A>B support_strength pace12: 180
+      A>B support_strength pace1330: 90
+      B>- balanced pace1330: 30
+      B>- fatloss pace1330: 30
+      B>- hypertrophy pace1330: 30
+      B>- strength pace1330: 30
+      B>- support_athletic pace1330: 30
+      B>- support_prevention pace1330: 30
+      B>- support_strength pace1330: 30
+      B>A support_athletic base: 180
+      B>A support_athletic base3mi: 60
+      B>A support_prevention base: 180
+      B>A support_prevention base3mi: 60
+      B>A support_strength base: 180
+      B>A support_strength base3mi: 60
+      B>C balanced pace12: 75
+      B>C balanced pace1330: 30
+      B>C fatloss pace12: 75
+      B>C fatloss pace1330: 30
+      B>C hypertrophy pace12: 75
+      B>C hypertrophy pace1330: 30
+      B>C strength pace12: 75
+      B>C strength pace1330: 30
+      B>C support_athletic base: 105
+      B>C support_athletic base3mi: 45
+      B>C support_athletic pace12: 75
+      B>C support_athletic pace1330: 30
+      B>C support_prevention base: 105
+      B>C support_prevention base3mi: 45
+      B>C support_prevention pace12: 75
+      B>C support_prevention pace1330: 30
+      B>C support_strength base: 105
+      B>C support_strength base3mi: 45
+      B>C support_strength pace12: 75
+      B>C support_strength pace1330: 30
+      C>B balanced pace1330: 45
+      C>B fatloss pace1330: 45
+      C>B hypertrophy pace1330: 45
+      C>B strength pace1330: 45
+      C>B support_athletic base: 180
+      C>B support_athletic base3mi: 180
+      C>B support_athletic pace1330: 45
+      C>B support_prevention base: 180
+      C>B support_prevention base3mi: 180
+      C>B support_prevention pace1330: 45
+      C>B support_strength base: 180
+      C>B support_strength base3mi: 180
+      C>B support_strength pace1330: 45
+  byDirGoalMile:
+      A>- pace1330 9:00: 735
+      A>B 10k 9:00: 630
+      A>B base 10:00: 135
+      A>B base 9:00: 180
+      A>B half 9:00: 630
+      A>B half5mi 9:00: 630
+      A>B mara 9:00: 630
+      A>B mara8mi 9:00: 630
+      A>B pace12 10:00: 420
+      A>B pace12 11:00: 210
+      A>B pace12 9:00: 630
+      A>B pace1330 10:00: 420
+      A>B pace1330 11:00: 210
+      B>- pace1330 9:00: 210
+      B>A base 12:00: 135
+      B>A base 12:30: 135
+      B>A base 13:00: 135
+      B>A base 14:00: 135
+      B>A base3mi 12:00: 45
+      B>A base3mi 12:30: 45
+      B>A base3mi 13:00: 45
+      B>A base3mi 14:00: 45
+      B>C base 10:00: 90
+      B>C base 9:00: 225
+      B>C base3mi 9:00: 135
+      B>C pace12 10:00: 210
+      B>C pace12 9:00: 315
+      B>C pace1330 10:00: 210
+      C>B base 12:00: 135
+      C>B base 12:30: 135
+      C>B base 13:00: 135
+      C>B base 14:00: 135
+      C>B base3mi 12:00: 135
+      C>B base3mi 12:30: 135
+      C>B base3mi 13:00: 135
+      C>B base3mi 14:00: 135
+      C>B pace1330 9:00: 315
+  byEq:
+      commercial A>-: 735
+      commercial A>B: 5355
+      commercial B>-: 210
+      commercial B>A: 720
+      commercial B>C: 1185
+      commercial C>B: 1395
+  byFocus:
+      balanced A>-: 105
+      balanced A>B: 720
+      balanced B>-: 30
+      balanced B>C: 105
+      balanced C>B: 45
+      fatloss A>-: 105
+      fatloss A>B: 720
+      fatloss B>-: 30
+      fatloss B>C: 105
+      fatloss C>B: 45
+      hypertrophy A>-: 105
+      hypertrophy A>B: 720
+      hypertrophy B>-: 30
+      hypertrophy B>C: 105
+      hypertrophy C>B: 45
+      strength A>-: 105
+      strength A>B: 720
+      strength B>-: 30
+      strength B>C: 105
+      strength C>B: 45
+      support_athletic A>-: 105
+      support_athletic A>B: 825
+      support_athletic B>-: 30
+      support_athletic B>A: 240
+      support_athletic B>C: 255
+      support_athletic C>B: 405
+      support_prevention A>-: 105
+      support_prevention A>B: 825
+      support_prevention B>-: 30
+      support_prevention B>A: 240
+      support_prevention B>C: 255
+      support_prevention C>B: 405
+      support_strength A>-: 105
+      support_strength A>B: 825
+      support_strength B>-: 30
+      support_strength B>A: 240
+      support_strength B>C: 255
+      support_strength C>B: 405
+  byGoal:
+      10k A>B: 630
+      base A>B: 315
+      base B>A: 540
+      base B>C: 315
+      base C>B: 540
+      base3mi B>A: 180
+      base3mi B>C: 135
+      base3mi C>B: 540
+      half A>B: 630
+      half5mi A>B: 630
+      mara A>B: 630
+      mara8mi A>B: 630
+      pace12 A>B: 1260
+      pace12 B>C: 525
+      pace1330 A>-: 735
+      pace1330 A>B: 630
+      pace1330 B>-: 210
+      pace1330 B>C: 210
+      pace1330 C>B: 315
+  byMile:
+      10:00 A>B: 975
+      10:00 B>C: 510
+      11:00 A>B: 420
+      12:00 B>A: 180
+      12:00 C>B: 270
+      12:30 B>A: 180
+      12:30 C>B: 270
+      13:00 B>A: 180
+      13:00 C>B: 270
+      14:00 B>A: 180
+      14:00 C>B: 270
+      9:00 A>-: 735
+      9:00 A>B: 3960
+      9:00 B>-: 210
+      9:00 B>C: 675
+      9:00 C>B: 315
+  byRest:
+      mon/thu/sun A>-: 245
+      mon/thu/sun A>B: 1785
+      mon/thu/sun B>-: 70
+      mon/thu/sun B>A: 240
+      mon/thu/sun B>C: 395
+      mon/thu/sun C>B: 465
+      sat/sun A>-: 245
+      sat/sun A>B: 1785
+      sat/sun B>-: 70
+      sat/sun B>A: 240
+      sat/sun B>C: 395
+      sat/sun C>B: 465
+      sun/wed A>-: 245
+      sun/wed A>B: 1785
+      sun/wed B>-: 70
+      sun/wed B>A: 240
+      sun/wed B>C: 395
+      sun/wed C>B: 465
+  byWeek:
+      W10 A>-: 315
+      W10 A>B: 1545
+      W11 A>-: 315
+      W11 A>B: 525
+      W12 B>-: 210
+      W13 A>-: 105
+      W2 A>B: 630
+      W3 C>B: 1080
+      W4 A>B: 1260
+      W4 B>C: 180
+      W5 A>B: 945
+      W5 B>C: 825
+      W7 A>B: 315
+      W7 B>A: 360
+      W8 A>B: 90
+      W8 B>C: 180
+      W8 C>B: 315
+      W9 A>B: 45
+      W9 B>A: 360
+  cells: 28350
+  crash: 0
+  dir:
+      A>-: 735
+      A>B: 5355
+      B>-: 210
+      B>A: 720
+      B>C: 1185
+      C>B: 1395
+  lrDaysBase: 302670
+  lrDaysCand: 301725
+  lrDaysCandChecked: 301725
+  lrDaysSecChangedTotal: 9420
+  moves: 9600
+  progIdentical: 3150
+  secChangedNonLR: 5775
+  secChangedSameTier: 315
+  selfChecked: 4050
+  selfDiffBase: 0
+  selfDiffCand: 0
+  setsOverB: 0
+  signAgainst: 1260
+  signRule:
+      faster longer-tier: 315
+      faster shorter-tier: 7485
+      slower longer-tier: 1800
+  tierLRPresence:
+      A>- sec-changed: 735
+      A>A sec-same: 159015
+      A>B sec-changed: 5355
+      B>- sec-changed: 210
+      B>A sec-changed: 720
+      B>B sec-same: 70650
+      B>C sec-changed: 1065
+      B>C sec-same: 120
+      C>B sec-changed: 1335
+      C>B sec-same: 60
+      C>C sec-changed: 315
+      C>C sec-same: 63090
+  tierOracleMismatch: 0
+  unique moved programs: 4740   unique moved days: 9600
+  EX {"cell":"pace12 9:00 support_strength 18-35 sun/wed 1003 commercial beginner","w":"5","d":"sat","dir":"B>C","mA":49.47,"mC":40.72,"detA":"3.5 mi at Recovery Pace: 14:08/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","detC":"3.5 mi at Recovery Pace: 11:38/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","doseA":{"k":"dist","mi":3.5,"tgt":848,"key":"long"},"doseC":{"k":"dist","mi":3.5,"tgt":698,"key":"long"},"sec":true,"gridA":"W5 SAT Full Body {Long Slow Distance (LSD)} :: Strength[Decline pushups, Feet-elevated inverted rows]","gridC":"W5 SAT Full Body {Long Slow Distance (LSD)} :: Strength[Decline pushups, Feet-elevated inverted rows] | Explosive finisher[Mountain climbers, Kettlebell swing]"}
+  EX {"cell":"pace12 9:00 support_strength 18-35 sun/wed 1003 commercial beginner","w":"10","d":"sat","dir":"A>B","mA":76.82,"mC":62.33,"detA":"5.5 mi at Recovery Pace: 13:58/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","detC":"5.5 mi at Recovery Pace: 11:20/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","doseA":{"k":"dist","mi":5.5,"tgt":838,"key":"long"},"doseC":{"k":"dist","mi":5.5,"tgt":680,"key":"long"},"sec":true,"gridA":"W10 SAT Post-Run Mobility {Long Slow Distance (LSD)} :: Post-run mobility[Standing calf stretch, Couch stretch, Hip 90/90 stretch, T-spine mobility, Foam roll]","gridC":"W10 SAT Full Body {Long Slow Distance (LSD)} :: Strength[Pushups (slow tempo), Feet-elevated inverted rows]"}
+  EX {"cell":"pace12 9:00 support_strength 18-35 sun/wed 1003 commercial beginner","w":"11","d":"sat","dir":"A>B","mA":83.6,"mC":67.7,"detA":"6 mi at Recovery Pace: 13:56/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","detC":"6 mi at Recovery Pace: 11:17/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","doseA":{"k":"dist","mi":6,"tgt":836,"key":"long"},"doseC":{"k":"dist","mi":6,"tgt":677,"key":"long"},"sec":true,"gridA":"W11 SAT Post-Run Mobility {Long Slow Distance (LSD)} :: Post-run mobility[Standing calf stretch, Couch stretch, Hip 90/90 stretch, T-spine mobility, Foam roll]","gridC":"W11 SAT Full Body {Long Slow Distance (LSD)} :: Strength[Dips, Inverted rows (bodyweight)]"}
+  EX {"cell":"pace12 9:00 support_strength 18-35 sat/sun 76308 commercial beginner","w":"5","d":"fri","dir":"B>C","mA":49.47,"mC":40.72,"detA":"3.5 mi at Recovery Pace: 14:08/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","detC":"3.5 mi at Recovery Pace: 11:38/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","doseA":{"k":"dist","mi":3.5,"tgt":848,"key":"long"},"doseC":{"k":"dist","mi":3.5,"tgt":698,"key":"long"},"sec":true,"gridA":"W5 FRI Full Body {Long Slow Distance (LSD)} :: Strength[Decline pushups, Inverted rows (rings)]","gridC":"W5 FRI Full Body {Long Slow Distance (LSD)} :: Strength[Decline pushups, Inverted rows (rings)] | Explosive finisher[Mountain climbers, Jump squats] | Core — Rotational Power[Side plank thread-the-needle, Band woodchopper (door anchor)]"}
+  odd n=180
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W4 mon
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W4 tue
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W4 thu
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W4 fri
+  ODD SECMOVE tier C pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W4 sat
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W8 mon
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W8 tue
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W8 thu
+==== MODE eq shards 6
+  ban_carry: 0
+  ban_hingeB: 0
+  ban_liftA: 0
+  ban_powerB: 0
+  builds: 68040
+  byAge:
+      18-35 A>-: 252
+      18-35 A>B: 2430
+      18-35 B>A: 216
+      18-35 B>C: 486
+      18-35 C>B: 558
+      36-54 A>-: 252
+      36-54 A>B: 2124
+      36-54 B>-: 126
+      36-54 B>A: 216
+      36-54 B>C: 594
+      36-54 C>B: 558
+      55+ A>-: 378
+      55+ A>B: 1872
+      55+ B>-: 126
+      55+ B>A: 432
+      55+ B>C: 342
+      55+ C>B: 558
+  byDirFocus:
+      A>- balanced pace1330: 126
+      A>- fatloss pace1330: 126
+      A>- hypertrophy pace1330: 126
+      A>- strength pace1330: 126
+      A>- support_athletic pace1330: 126
+      A>- support_prevention pace1330: 126
+      A>- support_strength pace1330: 126
+      A>B balanced 10k: 108
+      A>B balanced half: 108
+      A>B balanced half5mi: 108
+      A>B balanced mara: 108
+      A>B balanced mara8mi: 108
+      A>B balanced pace12: 216
+      A>B balanced pace1330: 108
+      A>B fatloss 10k: 108
+      A>B fatloss half: 108
+      A>B fatloss half5mi: 108
+      A>B fatloss mara: 108
+      A>B fatloss mara8mi: 108
+      A>B fatloss pace12: 216
+      A>B fatloss pace1330: 108
+      A>B hypertrophy 10k: 108
+      A>B hypertrophy half: 108
+      A>B hypertrophy half5mi: 108
+      A>B hypertrophy mara: 108
+      A>B hypertrophy mara8mi: 108
+      A>B hypertrophy pace12: 216
+      A>B hypertrophy pace1330: 108
+      A>B strength 10k: 108
+      A>B strength half: 108
+      A>B strength half5mi: 108
+      A>B strength mara: 108
+      A>B strength mara8mi: 108
+      A>B strength pace12: 216
+      A>B strength pace1330: 108
+      A>B support_athletic 10k: 108
+      A>B support_athletic base: 126
+      A>B support_athletic half: 108
+      A>B support_athletic half5mi: 108
+      A>B support_athletic mara: 108
+      A>B support_athletic mara8mi: 108
+      A>B support_athletic pace12: 216
+      A>B support_athletic pace1330: 108
+      A>B support_prevention 10k: 108
+      A>B support_prevention base: 126
+      A>B support_prevention half: 108
+      A>B support_prevention half5mi: 108
+      A>B support_prevention mara: 108
+      A>B support_prevention mara8mi: 108
+      A>B support_prevention pace12: 216
+      A>B support_prevention pace1330: 108
+      A>B support_strength 10k: 108
+      A>B support_strength base: 126
+      A>B support_strength half: 108
+      A>B support_strength half5mi: 108
+      A>B support_strength mara: 108
+      A>B support_strength mara8mi: 108
+      A>B support_strength pace12: 216
+      A>B support_strength pace1330: 108
+      B>- balanced pace1330: 36
+      B>- fatloss pace1330: 36
+      B>- hypertrophy pace1330: 36
+      B>- strength pace1330: 36
+      B>- support_athletic pace1330: 36
+      B>- support_prevention pace1330: 36
+      B>- support_strength pace1330: 36
+      B>A support_athletic base: 216
+      B>A support_athletic base3mi: 72
+      B>A support_prevention base: 216
+      B>A support_prevention base3mi: 72
+      B>A support_strength base: 216
+      B>A support_strength base3mi: 72
+      B>C balanced pace12: 90
+      B>C balanced pace1330: 36
+      B>C fatloss pace12: 90
+      B>C fatloss pace1330: 36
+      B>C hypertrophy pace12: 90
+      B>C hypertrophy pace1330: 36
+      B>C strength pace12: 90
+      B>C strength pace1330: 36
+      B>C support_athletic base: 126
+      B>C support_athletic base3mi: 54
+      B>C support_athletic pace12: 90
+      B>C support_athletic pace1330: 36
+      B>C support_prevention base: 126
+      B>C support_prevention base3mi: 54
+      B>C support_prevention pace12: 90
+      B>C support_prevention pace1330: 36
+      B>C support_strength base: 126
+      B>C support_strength base3mi: 54
+      B>C support_strength pace12: 90
+      B>C support_strength pace1330: 36
+      C>B balanced pace1330: 54
+      C>B fatloss pace1330: 54
+      C>B hypertrophy pace1330: 54
+      C>B strength pace1330: 54
+      C>B support_athletic base: 216
+      C>B support_athletic base3mi: 216
+      C>B support_athletic pace1330: 54
+      C>B support_prevention base: 216
+      C>B support_prevention base3mi: 216
+      C>B support_prevention pace1330: 54
+      C>B support_strength base: 216
+      C>B support_strength base3mi: 216
+      C>B support_strength pace1330: 54
+  byDirGoalMile:
+      A>- pace1330 9:00: 882
+      A>B 10k 9:00: 756
+      A>B base 10:00: 162
+      A>B base 9:00: 216
+      A>B half 9:00: 756
+      A>B half5mi 9:00: 756
+      A>B mara 9:00: 756
+      A>B mara8mi 9:00: 756
+      A>B pace12 10:00: 504
+      A>B pace12 11:00: 252
+      A>B pace12 9:00: 756
+      A>B pace1330 10:00: 504
+      A>B pace1330 11:00: 252
+      B>- pace1330 9:00: 252
+      B>A base 12:00: 162
+      B>A base 12:30: 162
+      B>A base 13:00: 162
+      B>A base 14:00: 162
+      B>A base3mi 12:00: 54
+      B>A base3mi 12:30: 54
+      B>A base3mi 13:00: 54
+      B>A base3mi 14:00: 54
+      B>C base 10:00: 108
+      B>C base 9:00: 270
+      B>C base3mi 9:00: 162
+      B>C pace12 10:00: 252
+      B>C pace12 9:00: 378
+      B>C pace1330 10:00: 252
+      C>B base 12:00: 162
+      C>B base 12:30: 162
+      C>B base 13:00: 162
+      C>B base 14:00: 162
+      C>B base3mi 12:00: 162
+      C>B base3mi 12:30: 162
+      C>B base3mi 13:00: 162
+      C>B base3mi 14:00: 162
+      C>B pace1330 9:00: 378
+  byEq:
+      bodyweight A>-: 294
+      bodyweight A>B: 2142
+      bodyweight B>-: 84
+      bodyweight B>A: 288
+      bodyweight B>C: 474
+      bodyweight C>B: 558
+      commercial A>-: 294
+      commercial A>B: 2142
+      commercial B>-: 84
+      commercial B>A: 288
+      commercial B>C: 474
+      commercial C>B: 558
+      home_full A>-: 294
+      home_full A>B: 2142
+      home_full B>-: 84
+      home_full B>A: 288
+      home_full B>C: 474
+      home_full C>B: 558
+  byFocus:
+      balanced A>-: 126
+      balanced A>B: 864
+      balanced B>-: 36
+      balanced B>C: 126
+      balanced C>B: 54
+      fatloss A>-: 126
+      fatloss A>B: 864
+      fatloss B>-: 36
+      fatloss B>C: 126
+      fatloss C>B: 54
+      hypertrophy A>-: 126
+      hypertrophy A>B: 864
+      hypertrophy B>-: 36
+      hypertrophy B>C: 126
+      hypertrophy C>B: 54
+      strength A>-: 126
+      strength A>B: 864
+      strength B>-: 36
+      strength B>C: 126
+      strength C>B: 54
+      support_athletic A>-: 126
+      support_athletic A>B: 990
+      support_athletic B>-: 36
+      support_athletic B>A: 288
+      support_athletic B>C: 306
+      support_athletic C>B: 486
+      support_prevention A>-: 126
+      support_prevention A>B: 990
+      support_prevention B>-: 36
+      support_prevention B>A: 288
+      support_prevention B>C: 306
+      support_prevention C>B: 486
+      support_strength A>-: 126
+      support_strength A>B: 990
+      support_strength B>-: 36
+      support_strength B>A: 288
+      support_strength B>C: 306
+      support_strength C>B: 486
+  byGoal:
+      10k A>B: 756
+      base A>B: 378
+      base B>A: 648
+      base B>C: 378
+      base C>B: 648
+      base3mi B>A: 216
+      base3mi B>C: 162
+      base3mi C>B: 648
+      half A>B: 756
+      half5mi A>B: 756
+      mara A>B: 756
+      mara8mi A>B: 756
+      pace12 A>B: 1512
+      pace12 B>C: 630
+      pace1330 A>-: 882
+      pace1330 A>B: 756
+      pace1330 B>-: 252
+      pace1330 B>C: 252
+      pace1330 C>B: 378
+  byMile:
+      10:00 A>B: 1170
+      10:00 B>C: 612
+      11:00 A>B: 504
+      12:00 B>A: 216
+      12:00 C>B: 324
+      12:30 B>A: 216
+      12:30 C>B: 324
+      13:00 B>A: 216
+      13:00 C>B: 324
+      14:00 B>A: 216
+      14:00 C>B: 324
+      9:00 A>-: 882
+      9:00 A>B: 4752
+      9:00 B>-: 252
+      9:00 B>C: 810
+      9:00 C>B: 378
+  byRest:
+      mon/thu/sun A>-: 294
+      mon/thu/sun A>B: 2142
+      mon/thu/sun B>-: 84
+      mon/thu/sun B>A: 288
+      mon/thu/sun B>C: 474
+      mon/thu/sun C>B: 558
+      sat/sun A>-: 294
+      sat/sun A>B: 2142
+      sat/sun B>-: 84
+      sat/sun B>A: 288
+      sat/sun B>C: 474
+      sat/sun C>B: 558
+      sun/wed A>-: 294
+      sun/wed A>B: 2142
+      sun/wed B>-: 84
+      sun/wed B>A: 288
+      sun/wed B>C: 474
+      sun/wed C>B: 558
+  byWeek:
+      W10 A>-: 378
+      W10 A>B: 1854
+      W11 A>-: 378
+      W11 A>B: 630
+      W12 B>-: 252
+      W13 A>-: 126
+      W2 A>B: 756
+      W3 C>B: 1296
+      W4 A>B: 1512
+      W4 B>C: 216
+      W5 A>B: 1134
+      W5 B>C: 990
+      W7 A>B: 378
+      W7 B>A: 432
+      W8 A>B: 108
+      W8 B>C: 216
+      W8 C>B: 378
+      W9 A>B: 54
+      W9 B>A: 432
+  cells: 34020
+  crash: 0
+  dir:
+      A>-: 882
+      A>B: 6426
+      B>-: 252
+      B>A: 864
+      B>C: 1422
+      C>B: 1674
+  lrDaysBase: 363204
+  lrDaysCand: 362070
+  lrDaysCandChecked: 362070
+  lrDaysSecChangedTotal: 11292
+  moves: 11520
+  progIdentical: 3780
+  secChangedNonLR: 6930
+  secChangedSameTier: 378
+  selfChecked: 4860
+  selfDiffBase: 0
+  selfDiffCand: 0
+  setsOverB: 0
+  signAgainst: 1512
+  signRule:
+      faster longer-tier: 378
+      faster shorter-tier: 8982
+      slower longer-tier: 2160
+  tierLRPresence:
+      A>- sec-changed: 882
+      A>A sec-same: 190818
+      A>B sec-changed: 6426
+      B>- sec-changed: 252
+      B>A sec-changed: 864
+      B>B sec-same: 84780
+      B>C sec-changed: 1278
+      B>C sec-same: 144
+      C>B sec-changed: 1590
+      C>B sec-same: 84
+      C>C sec-changed: 378
+      C>C sec-same: 75708
+  tierOracleMismatch: 0
+  unique moved programs: 5688   unique moved days: 11520
+  EX {"cell":"pace12 9:00 support_strength 18-35 sun/wed 1000 commercial beginner","w":"5","d":"sat","dir":"B>C","mA":49.47,"mC":40.72,"detA":"3.5 mi at Recovery Pace: 14:08/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","detC":"3.5 mi at Recovery Pace: 11:38/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","doseA":{"k":"dist","mi":3.5,"tgt":848,"key":"long"},"doseC":{"k":"dist","mi":3.5,"tgt":698,"key":"long"},"sec":true,"gridA":"W5 SAT Full Body {Long Slow Distance (LSD)} :: Strength[Pushups (slow tempo), Inverted rows (rings)]","gridC":"W5 SAT Full Body {Long Slow Distance (LSD)} :: Strength[Pushups (slow tempo), Inverted rows (rings)] | Explosive finisher[Jump squats, Ball slams]"}
+  EX {"cell":"pace12 9:00 support_strength 18-35 sun/wed 1000 commercial beginner","w":"10","d":"sat","dir":"A>B","mA":76.82,"mC":62.33,"detA":"5.5 mi at Recovery Pace: 13:58/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","detC":"5.5 mi at Recovery Pace: 11:20/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","doseA":{"k":"dist","mi":5.5,"tgt":838,"key":"long"},"doseC":{"k":"dist","mi":5.5,"tgt":680,"key":"long"},"sec":true,"gridA":"W10 SAT Post-Run Mobility {Long Slow Distance (LSD)} :: Post-run mobility[Standing calf stretch, Couch stretch, Hip 90/90 stretch, T-spine mobility, Foam roll]","gridC":"W10 SAT Full Body {Long Slow Distance (LSD)} :: Strength[Decline pushups, Feet-elevated inverted rows]"}
+  EX {"cell":"pace12 9:00 support_strength 18-35 sun/wed 1000 commercial beginner","w":"11","d":"sat","dir":"A>B","mA":83.6,"mC":67.7,"detA":"6 mi at Recovery Pace: 13:56/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","detC":"6 mi at Recovery Pace: 11:17/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","doseA":{"k":"dist","mi":6,"tgt":836,"key":"long"},"doseC":{"k":"dist","mi":6,"tgt":677,"key":"long"},"sec":true,"gridA":"W11 SAT Post-Run Mobility {Long Slow Distance (LSD)} :: Post-run mobility[Standing calf stretch, Couch stretch, Hip 90/90 stretch, T-spine mobility, Foam roll]","gridC":"W11 SAT Full Body {Long Slow Distance (LSD)} :: Strength[Pushups (slow tempo), Inverted rows (rings)]"}
+  EX {"cell":"pace12 9:00 support_strength 18-35 sat/sun 1000 commercial beginner","w":"5","d":"fri","dir":"B>C","mA":49.47,"mC":40.72,"detA":"3.5 mi at Recovery Pace: 14:08/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","detC":"3.5 mi at Recovery Pace: 11:38/mi (Zone 2).\n60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles.","doseA":{"k":"dist","mi":3.5,"tgt":848,"key":"long"},"doseC":{"k":"dist","mi":3.5,"tgt":698,"key":"long"},"sec":true,"gridA":"W5 FRI Full Body {Long Slow Distance (LSD)} :: Strength[Pushups (slow tempo), Inverted rows (rings)]","gridC":"W5 FRI Full Body {Long Slow Distance (LSD)} :: Strength[Pushups (slow tempo), Inverted rows (rings)] | Explosive finisher[Jump squats, Ball slams] | Core — Rotational Power[Side plank thread-the-needle, Band woodchopper (door anchor)]"}
+  odd n=180
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W4 mon
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W4 tue
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W4 thu
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W4 fri
+  ODD SECMOVE tier C pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W4 sat
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W8 mon
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W8 tue
+  ODD SECMOVE tier - pace1330 9:00 support_strength 18-35 sun/wed 1000 commercial beginner W8 thu
+==== MODE nonbeg shards 6
+  ban_carry: 0
+  ban_hingeB: 0
+  ban_liftA: 0
+  ban_powerB: 0
+  builds: 45360
+  byAge:
+  byDirFocus:
+  byDirGoalMile:
+  byEq:
+  byFocus:
+  byGoal:
+  byMile:
+  byRest:
+  byWeek:
+  cells: 22680
+  crash: 0
+  dir:
+  lrDaysBase: 232650
+  lrDaysCand: 232650
+  lrDaysCandChecked: 232650
+  lrDaysSecChangedTotal: 0
+  moves: 0
+  progIdentical: 20160
+  secChangedNonLR: 0
+  secChangedSameTier: 0
+  selfChecked: 3240
+  selfDiffBase: 0
+  selfDiffCand: 0
+  setsOverB: 0
+  signAgainst: 0
+  signRule:
+  tierLRPresence:
+      A>A sec-same: 139728
+      B>B sec-same: 63078
+      C>C sec-same: 29844
+  tierOracleMismatch: 0
+  unique moved programs: 0   unique moved days: 0
+  odd n=0
+== beg cells 28350 moves 9600
+  LENGTH-CONFOUNDED(A1 11>9wk): 1260
+  REV base s_athletic W3 C>B 40>45: 180
+  REV base s_athletic W7 B>A 70>75: 60
+  REV base s_athletic W9 B>A 70>75: 120
+  REV base s_prevention W3 C>B 40>45: 180
+  REV base s_prevention W7 B>A 70>75: 60
+  REV base s_prevention W9 B>A 70>75: 120
+  REV base s_strength W3 C>B 40>45: 180
+  REV base s_strength W7 B>A 70>75: 60
+  REV base s_strength W9 B>A 70>75: 120
+  REV base3mi s_athletic W3 C>B 40>45: 180
+  REV base3mi s_athletic W7 B>A 70>75: 60
+  REV base3mi s_prevention W3 C>B 40>45: 180
+  REV base3mi s_prevention W7 B>A 70>75: 60
+  REV base3mi s_strength W3 C>B 40>45: 180
+  REV base3mi s_strength W7 B>A 70>75: 60
+  REV sec-changed: 1800
+  longer(lift down): 1800
+  shorter(lift up): 6540
+  programs shorter(lift up): 3345
+  programs LENGTH-CONFOUNDED(A1 11>9wk): 315
+  programs longer(lift down): 1080
+  programs any: 4740
+== eq cells 34020 moves 11520
+  LENGTH-CONFOUNDED(A1 11>9wk): 1512
+  REV base s_athletic W3 C>B 40>45: 216
+  REV base s_athletic W7 B>A 70>75: 72
+  REV base s_athletic W9 B>A 70>75: 144
+  REV base s_prevention W3 C>B 40>45: 216
+  REV base s_prevention W7 B>A 70>75: 72
+  REV base s_prevention W9 B>A 70>75: 144
+  REV base s_strength W3 C>B 40>45: 216
+  REV base s_strength W7 B>A 70>75: 72
+  REV base s_strength W9 B>A 70>75: 144
+  REV base3mi s_athletic W3 C>B 40>45: 216
+  REV base3mi s_athletic W7 B>A 70>75: 72
+  REV base3mi s_prevention W3 C>B 40>45: 216
+  REV base3mi s_prevention W7 B>A 70>75: 72
+  REV base3mi s_strength W3 C>B 40>45: 216
+  REV base3mi s_strength W7 B>A 70>75: 72
+  REV sec-changed: 2160
+  eq bodyweight: 3840
+  eq commercial: 3840
+  eq home_full: 3840
+  longer(lift down): 2160
+  shorter(lift up): 7848
+  programs shorter(lift up): 4014
+  programs LENGTH-CONFOUNDED(A1 11>9wk): 378
+  programs longer(lift down): 1296
+  programs any: 5688
+GK example W3 sat V225 {"t":"C","m":40,"tgt":845,"key":"long","sub":"Easy Run — Long"} V226 {"t":"B","m":45,"tgt":870,"key":"long","sub":"Easy Run — Long"}
+   V225 detail: 40 min easy and conversational (RPE 3-4 out of 10). Around 14:05/mi is
+   V226 detail: 45 min easy and conversational (RPE 3-4 out of 10). Around 14:30/mi is
+ROW pace12 none support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+ROW pace12 none balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+ROW pace12 9:00 support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C23.7 W2:C29.5 W3:C35.3 W4:C24.7 W5:C40.7 W6:B46.3 W7:B51.8 W8:C35.7 W9:B57 W10:B62.3 W11:B67.7
+ROW pace12 9:00 balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C23.7 W2:C29.5 W3:C35.3 W4:C24.7 W5:C40.7 W6:B46.3 W7:B51.8 W8:C35.7 W9:B57 W10:B62.3 W11:B67.7
+ROW pace12 10:00 support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C26.1 W2:C32.4 W3:C38.8 W4:C27.1 W5:C44.8 W6:B50.9 W7:B57.1 W8:C39.3 W9:B62.8 W10:B68.8 W11:B74.7
+ROW pace12 10:00 balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C26.1 W2:C32.4 W3:C38.8 W4:C27.1 W5:C44.8 W6:B50.9 W7:B57.1 W8:C39.3 W9:B62.8 W10:B68.8 W11:B74.7
+ROW pace12 11:30 support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+ROW pace12 11:30 balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+ROW pace12 13:00 support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C29 W2:C36.3 W3:C43.5 W4:C30.4 W5:B50.8 W6:B57.9 W7:B65 W8:C44.8 W9:B71.8 W10:A78.7 W11:A85.7
+ROW pace12 13:00 balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C29 W2:C36.3 W3:C43.5 W4:C30.4 W5:B50.8 W6:B57.9 W7:B65 W8:C44.8 W9:B71.8 W10:A78.7 W11:A85.7
+ROW pace12 14:00 support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C29 W2:C36.3 W3:C43.5 W4:C30.4 W5:B50.8 W6:B57.9 W7:B65 W8:C44.8 W9:B71.8 W10:A78.7 W11:A85.7
+ROW pace12 14:00 balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C29 W2:C36.3 W3:C43.5 W4:C30.4 W5:B50.8 W6:B57.9 W7:B65 W8:C44.8 W9:B71.8 W10:A78.7 W11:A85.7
+ROW pace1330 none support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+ROW pace1330 none balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+ROW pace1330 9:00 support_prevention wks 11>9 titlesW [] nonLRsec 16 wks:4,8,10,11
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C23.7 W2:C29.6 W3:C35.4 W4:C41.1 W5:B46.9 W6:B52.6 W7:B58.3 W8:B63.9 W9:B69.5
+ROW pace1330 9:00 balanced wks 11>9 titlesW [] nonLRsec 16 wks:4,8,10,11
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C23.7 W2:C29.6 W3:C35.4 W4:C41.1 W5:B46.9 W6:B52.6 W7:B58.3 W8:B63.9 W9:B69.5
+ROW pace1330 10:00 support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C26.1 W2:C32.4 W3:C38.8 W4:C27.1 W5:C44.8 W6:B50.9 W7:B57.1 W8:C39.3 W9:B62.8 W10:B68.8 W11:B74.7
+ROW pace1330 10:00 balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C26.1 W2:C32.4 W3:C38.8 W4:C27.1 W5:C44.8 W6:B50.9 W7:B57.1 W8:C39.3 W9:B62.8 W10:B68.8 W11:B74.7
+ROW pace1330 11:30 support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+ROW pace1330 11:30 balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+ROW pace1330 13:00 support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C29 W2:C36.3 W3:C43.5 W4:C30.4 W5:B50.8 W6:B57.9 W7:B65 W8:C44.8 W9:B71.8 W10:A78.7 W11:A85.7
+ROW pace1330 13:00 balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C29 W2:C36.3 W3:C43.5 W4:C30.4 W5:B50.8 W6:B57.9 W7:B65 W8:C44.8 W9:B71.8 W10:A78.7 W11:A85.7
+ROW pace1330 14:00 support_prevention wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C29 W2:C36.3 W3:C43.5 W4:C30.4 W5:B50.8 W6:B57.9 W7:B65 W8:C44.8 W9:B71.8 W10:A78.7 W11:A85.7
+ROW pace1330 14:00 balanced wks 11>11 titlesW [] nonLRsec 0 wks:
+    A W1:C28.6 W2:C35.7 W3:C42.6 W4:C29.9 W5:B49.5 W6:B56.4 W7:B63.3 W8:C43.6 W9:B70 W10:A76.8 W11:A83.6
+    C W1:C29 W2:C36.3 W3:C43.5 W4:C30.4 W5:B50.8 W6:B57.9 W7:B65 W8:C44.8 W9:B71.8 W10:A78.7 W11:A85.7
+ROW 5k none support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+ROW 5k none balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+ROW 5k 9:00 support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C11.6 W2:C15 W3:C25 W4:C30 W5:C33 W6:B46.3 W7:C35.9
+ROW 5k 9:00 balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C11.6 W2:C15 W3:C25 W4:C30 W5:C33 W6:B46.3 W7:C35.9
+ROW 5k 10:00 support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C12.8 W2:C15 W3:C25 W4:C30 W5:C33 W6:B51 W7:C39.5
+ROW 5k 10:00 balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C12.8 W2:C15 W3:C25 W4:C30 W5:C33 W6:B51 W7:C39.5
+ROW 5k 11:30 support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+ROW 5k 11:30 balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+ROW 5k 13:00 support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C14.5 W2:C15 W3:C25 W4:C30 W5:C33 W6:B58 W7:C45
+ROW 5k 13:00 balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C14.5 W2:C15 W3:C25 W4:C30 W5:C33 W6:B58 W7:C45
+ROW 5k 14:00 support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C14.5 W2:C15 W3:C25 W4:C30 W5:C33 W6:B58 W7:C45
+ROW 5k 14:00 balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C14.1 W2:C15 W3:C25 W4:C30 W5:C33 W6:B56.3 W7:C43.7
+    C W1:C14.5 W2:C15 W3:C25 W4:C30 W5:C33 W6:B58 W7:C45
+ROW 10k none support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+ROW 10k none balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+ROW 10k 9:00 support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C35.9 W2:C35.9 W3:B46.3 W4:B57.9 W5:B71.8 W6:A81.1 W7:B71.8
+ROW 10k 9:00 balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C35.9 W2:C35.9 W3:B46.3 W4:B57.9 W5:B71.8 W6:A81.1 W7:B71.8
+ROW 10k 10:00 support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C39.5 W2:C39.5 W3:B51 W4:B63.8 W5:A79 W6:A89.3 W7:A79
+ROW 10k 10:00 balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C39.5 W2:C39.5 W3:B51 W4:B63.8 W5:A79 W6:A89.3 W7:A79
+ROW 10k 11:30 support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+ROW 10k 11:30 balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+ROW 10k 13:00 support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C45 W2:C45 W3:B58 W4:B72.5 W5:A89.9 W6:A101.5 W7:A89.9
+ROW 10k 13:00 balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C45 W2:C45 W3:B58 W4:B72.5 W5:A89.9 W6:A101.5 W7:A89.9
+ROW 10k 14:00 support_prevention wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C45 W2:C45 W3:B58 W4:B72.5 W5:A89.9 W6:A101.5 W7:A89.9
+ROW 10k 14:00 balanced wks 8>8 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:C43.7 W3:B56.3 W4:B70.4 W5:A87.3 W6:A98.6 W7:A87.3
+    C W1:C45 W2:C45 W3:B58 W4:B72.5 W5:A89.9 W6:A101.5 W7:A89.9
+ROW half none support_prevention wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+ROW half none balanced wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+ROW half 9:00 support_prevention wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C35.9 W2:B46.3 W3:B57.9 W4:B71.8 W5:B71.8 W6:A92.7 W7:A110 W8:A115.8 W9:A115.8 W10:A92.7 W11:A144.8 W12:B60 W13:A81.1
+ROW half 9:00 balanced wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C35.9 W2:B46.3 W3:B57.9 W4:B71.8 W5:B71.8 W6:A92.7 W7:A110 W8:A115.8 W9:A115.8 W10:A92.7 W11:A144.8 W12:B60 W13:A81.1
+ROW half 10:00 support_prevention wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C39.5 W2:B51 W3:B63.8 W4:A79 W5:A79 W6:A102 W7:A121.1 W8:A127.5 W9:A127.5 W10:A102 W11:A159.4 W12:B60 W13:A89.3
+ROW half 10:00 balanced wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C39.5 W2:B51 W3:B63.8 W4:A79 W5:A79 W6:A102 W7:A121.1 W8:A127.5 W9:A127.5 W10:A102 W11:A159.4 W12:B60 W13:A89.3
+ROW half 11:30 support_prevention wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+ROW half 11:30 balanced wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+ROW half 13:00 support_prevention wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C45 W2:B58 W3:B72.5 W4:A89.9 W5:A89.9 W6:A116 W7:A137.8 W8:A145 W9:A145 W10:A116 W11:A181.3 W12:B60 W13:A101.5
+ROW half 13:00 balanced wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C45 W2:B58 W3:B72.5 W4:A89.9 W5:A89.9 W6:A116 W7:A137.8 W8:A145 W9:A145 W10:A116 W11:A181.3 W12:B60 W13:A101.5
+ROW half 14:00 support_prevention wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C45 W2:B58 W3:B72.5 W4:A89.9 W5:A89.9 W6:A116 W7:A137.8 W8:A145 W9:A145 W10:A116 W11:A181.3 W12:B60 W13:A101.5
+ROW half 14:00 balanced wks 14>14 titlesW [] nonLRsec 0 wks:
+    A W1:C43.7 W2:B56.3 W3:B70.4 W4:A87.3 W5:A87.3 W6:A112.7 W7:A133.8 W8:A140.8 W9:A140.8 W10:A112.7 W11:A176 W12:B60 W13:A98.6
+    C W1:C45 W2:B58 W3:B72.5 W4:A89.9 W5:A89.9 W6:A116 W7:A137.8 W8:A145 W9:A145 W10:A116 W11:A181.3 W12:B60 W13:A101.5
+ROW mara none support_prevention wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+ROW mara none balanced wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+ROW mara 9:00 support_prevention wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B57.9 W2:B71.8 W3:A81.1 W4:B71.8 W5:A92.7 W6:A115.8 W7:A108 W8:A144.8 W9:A151.7 W10:A120 W11:A162.2 W12:A185.3 W13:A90 W14:A208.5 W15:A173.8 W16:A139 W17:A115.8
+ROW mara 9:00 balanced wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B57.9 W2:B71.8 W3:A81.1 W4:B71.8 W5:A92.7 W6:A115.8 W7:A108 W8:A144.8 W9:A151.7 W10:A120 W11:A162.2 W12:A185.3 W13:A90 W14:A208.5 W15:A173.8 W16:A139 W17:A115.8
+ROW mara 10:00 support_prevention wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B63.8 W2:A79 W3:A89.3 W4:A79 W5:A102 W6:A127.5 W7:A118.8 W8:A159.4 W9:A167 W10:A120 W11:A178.5 W12:A204 W13:A90 W14:A229.5 W15:A191.3 W16:A153 W17:A127.5
+ROW mara 10:00 balanced wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B63.8 W2:A79 W3:A89.3 W4:A79 W5:A102 W6:A127.5 W7:A118.8 W8:A159.4 W9:A167 W10:A120 W11:A178.5 W12:A204 W13:A90 W14:A229.5 W15:A191.3 W16:A153 W17:A127.5
+ROW mara 11:30 support_prevention wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+ROW mara 11:30 balanced wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+ROW mara 13:00 support_prevention wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B72.5 W2:A89.9 W3:A101.5 W4:A89.9 W5:A116 W6:A145 W7:A135.1 W8:A181.3 W9:A189.9 W10:A120 W11:A203 W12:A232 W13:A90 W14:A261 W15:A217.5 W16:A174 W17:A145
+ROW mara 13:00 balanced wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B72.5 W2:A89.9 W3:A101.5 W4:A89.9 W5:A116 W6:A145 W7:A135.1 W8:A181.3 W9:A189.9 W10:A120 W11:A203 W12:A232 W13:A90 W14:A261 W15:A217.5 W16:A174 W17:A145
+ROW mara 14:00 support_prevention wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B72.5 W2:A89.9 W3:A101.5 W4:A89.9 W5:A116 W6:A145 W7:A135.1 W8:A181.3 W9:A189.9 W10:A120 W11:A203 W12:A232 W13:A90 W14:A261 W15:A217.5 W16:A174 W17:A145
+ROW mara 14:00 balanced wks 18>18 titlesW [] nonLRsec 0 wks:
+    A W1:B70.4 W2:A87.3 W3:A98.6 W4:A87.3 W5:A112.7 W6:A140.8 W7:A131.3 W8:A176 W9:A184.5 W10:A120 W11:A197.2 W12:A225.3 W13:A90 W14:A253.5 W15:A211.3 W16:A169 W17:A140.8
+    C W1:B72.5 W2:A89.9 W3:A101.5 W4:A89.9 W5:A116 W6:A145 W7:A135.1 W8:A181.3 W9:A189.9 W10:A120 W11:A203 W12:A232 W13:A90 W14:A261 W15:A217.5 W16:A174 W17:A145
+ROW base none support_prevention wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65 W7:B70 W8:A75 W9:A85
+    C W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65 W7:B70 W8:A75 W9:A85
+ROW base none balanced wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W6:B45 W8:B45
+    C W6:B45 W8:B45
+ROW base 9:00 support_prevention wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65 W7:B70 W8:A75 W9:A85
+    C W1:C25 W2:C30 W3:C35 W4:C40 W5:B45 W6:B50 W7:B60 W8:B65 W9:B70
+ROW base 9:00 balanced wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W6:B45 W8:B45
+    C W6:B45 W8:B45
+ROW base 10:00 support_prevention wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65 W7:B70 W8:A75 W9:A85
+    C W1:C25 W2:C30 W3:C40 W4:B45 W5:B50 W6:B55 W7:B65 W8:B70 W9:A75
+ROW base 10:00 balanced wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W6:B45 W8:B45
+    C W6:B45 W8:B45
+ROW base 11:30 support_prevention wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65 W7:B70 W8:A75 W9:A85
+    C W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65 W7:B70 W8:A75 W9:A85
+ROW base 11:30 balanced wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W6:B45 W8:B45
+    C W6:B45 W8:B45
+ROW base 13:00 support_prevention wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65 W7:B70 W8:A75 W9:A85
+    C W1:C30 W2:C35 W3:B45 W4:B50 W5:B60 W6:B65 W7:A75 W8:A80 W9:A85
+ROW base 13:00 balanced wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W6:B45 W8:B45
+    C W6:B45 W8:B45
+ROW base 14:00 support_prevention wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65 W7:B70 W8:A75 W9:A85
+    C W1:C30 W2:C35 W3:B45 W4:B50 W5:B60 W6:B65 W7:A75 W8:A80 W9:A85
+ROW base 14:00 balanced wks 9>9 titlesW [] nonLRsec 0 wks:
+    A W6:B45 W8:B45
+    C W6:B45 W8:B45
+ROW base3mi none support_prevention wks 6>6 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65
+    C W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65
+ROW base3mi none balanced wks 6>6 titlesW [] nonLRsec 0 wks:
+    A 
+    C 
+ROW base3mi 9:00 support_prevention wks 6>6 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65
+    C W1:C25 W2:C30 W3:C35 W4:C40 W5:B45 W6:B50
+ROW base3mi 9:00 balanced wks 6>6 titlesW [] nonLRsec 0 wks:
+    A 
+    C 
+ROW base3mi 10:00 support_prevention wks 6>6 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65
+    C W1:C25 W2:C30 W3:C40 W4:B45 W5:B50 W6:B55
+ROW base3mi 10:00 balanced wks 6>6 titlesW [] nonLRsec 0 wks:
+    A 
+    C 
+ROW base3mi 11:30 support_prevention wks 6>6 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65
+    C W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65
+ROW base3mi 11:30 balanced wks 6>6 titlesW [] nonLRsec 0 wks:
+    A 
+    C 
+ROW base3mi 13:00 support_prevention wks 6>6 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65
+    C W1:C30 W2:C35 W3:B45 W4:B50 W5:B60 W6:B65
+ROW base3mi 13:00 balanced wks 6>6 titlesW [] nonLRsec 0 wks:
+    A 
+    C 
+ROW base3mi 14:00 support_prevention wks 6>6 titlesW [] nonLRsec 0 wks:
+    A W1:C30 W2:C35 W3:C40 W4:B50 W5:B55 W6:B65
+    C W1:C30 W2:C35 W3:B45 W4:B50 W5:B60 W6:B65
+ROW base3mi 14:00 balanced wks 6>6 titlesW [] nonLRsec 0 wks:
+    A 
+    C 

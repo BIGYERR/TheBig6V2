@@ -414,15 +414,27 @@ eq('buildProgram left cfg byte-identical (no _racePin, no scratch)', JSON.string
 console.log('\n4. D119: the provenance sentence, every kind typed out in full');
 const sentence = IA.eval('runAnchorSentence');
 const TAIL = ' Every pace in this program comes from this row.';
+// ERA (standing rulings 2 and 4), keyed to D188/D189 (tests/measure/v226_rulings/d188_d189_ruling.md) at
+// ia-version >= 226: runAnchorInfo's return gains `exp` (D188 E7), the sentence names the level's default
+// (D189 F9: "the intermediate default") and the kind 'beginner' writer is retired, so a beginner with no mile
+// is kind 'default' with exp 'beginner'. The typed anchors carry exp from 226 because the ruled shape does;
+// the V203 rows stay asserted at <= 225.
+const D189_ERA = 226;
+const ERA_D189 = artifactV >= D189_ERA;
 function A(o){ return Object.assign({ anchorSec:630, rawSec:630, clamped:null, row:{}, kind:'entered',
-                                      prog:'', n:0, wk:0, from:null, race:'half', goalId:'run_half' }, o); }
+                                      prog:'', n:0, wk:0, from:null, race:'half', goalId:'run_half' }, ERA_D189 ? { exp:'intermediate' } : {}, o); }
 
 eq('edited + from.kind entered names the week and the prior TIME',
    sentence(A({ kind:'edited', wk:4, from:{ kind:'entered', mins:'11', secs:'00' } })),
    'Anchored on a <b>10:30 mile</b>, the time you entered in week 4. Before that it was 11:00.' + TAIL);
+if(!ERA_D189)
 eq('edited + from.kind default names the week and says it was estimated',
    sentence(A({ kind:'edited', wk:6, from:{ kind:'default', mins:'', secs:'' } })),
    'Anchored on a <b>10:30 mile</b>, the time you entered in week 6. Before that it was estimated from experience.' + TAIL);
+else   // D189 Copy "Card, edited from default"
+eq('D189 era: edited + from.kind default names the week and the level default',
+   sentence(A({ kind:'edited', wk:6, from:{ kind:'default', mins:'', secs:'' } })),
+   'Anchored on a <b>10:30 mile</b>, the time you entered in week 6. Before that it was the intermediate default.' + TAIL);
 eq('edited + from with a seconds value that needs padding',
    sentence(A({ kind:'edited', wk:11, from:{ kind:'entered', mins:'9', secs:'5' } })),
    'Anchored on a <b>10:30 mile</b>, the time you entered in week 11. Before that it was 9:05.' + TAIL);
@@ -450,11 +462,19 @@ eq('seeded, singular', sentence(A({ kind:'seeded', n:1, prog:'THE BASE' })),
    'Anchored on a <b>10:30 mile</b>, worked back from 1 recovery run you logged in THE BASE.' + TAIL);
 eq('seeded with no program name', sentence(A({ kind:'seeded', n:0, prog:'' })),
    'Anchored on a <b>10:30 mile</b>, worked back from the recovery runs you logged in your last program.' + TAIL);
+if(!ERA_D189){
 eq('beginner (no tail, and the article is "an" at 11:30)',
    sentence(A({ kind:'beginner', anchorSec:690, rawSec:690 })),
    'Anchored on an <b>11:30 mile</b>, the beginner default. A mile time starts being used at intermediate.');
 eq('default / estimated from experience', sentence(A({ kind:'default', anchorSec:570, rawSec:570 })),
    'Anchored on a <b>9:30 mile</b>, estimated from experience; no mile time was entered.' + TAIL);
+} else {   // D189 Copy "Card, default" + existing tail; After "card run_5k|beginner"
+eq('D188/D189 era: beginner with no mile is the default form ("an" at 11:30, the beginner default, the tail)',
+   sentence(A({ kind:'default', exp:'beginner', anchorSec:690, rawSec:690 })),
+   'Anchored on an <b>11:30 mile</b>, the beginner default. No mile time was entered. Tap the pencil to enter one.' + TAIL);
+eq('D189 era: default names the intermediate default and the pencil', sentence(A({ kind:'default', anchorSec:570, rawSec:570 })),
+   'Anchored on a <b>9:30 mile</b>, the intermediate default. No mile time was entered. Tap the pencil to enter one.' + TAIL);
+}
 eq('clamped beats every kind, including edited',
    sentence(A({ kind:'edited', wk:4, clamped:'fast', anchorSec:300, rawSec:240, from:{ kind:'entered', mins:'4', secs:'0' } })),
    'Anchored on a <b>5:00 mile</b>, the 4:00 you entered is faster than the chart goes, so its fastest row is used.' + TAIL);

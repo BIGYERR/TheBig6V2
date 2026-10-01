@@ -101,6 +101,12 @@ const ERA = 223;
 // directly from its text (independent of the D183 ERA/IA_ASSUME_VERSION machinery below, which is
 // a different, unrelated predicate) so IMPROVE stays the rate the artifact under test actually runs.
 const RATE_STAMP = +((fs.readFileSync(ART, 'utf8').match(/<meta name="ia-version" content="(\d+)"/) || [])[1] || NaN);
+// D188 P-BEGINNERMILE / D189 P-PACEDISCLOSE (V226, tests/measure/v226_rulings/d188_d189_ruling.md), keyed on the
+// same real stamp (standing rulings 2 and 4). D188 E1 reads a beginner's mile like anyone's (the hand oracle's
+// `exp !== 'beginner' && mileSecs` -> `mileSecs`); E2 retires the beginner sentence so a beginner takes the
+// generic form (Mario (b)); D189 F5/F6: while the mile is required and blank (intermediate/advanced pace goal)
+// the feasibility line and the dated card's reach go quiet and a dated test pin keeps its week in the header.
+const D188_STAMP = RATE_STAMP >= 226;
 const ZONES = [['NY', 'America/New_York'], ['UTC', 'UTC']];
 const ZONE_ENV = 'G223_D183_ZONE';
 
@@ -111,12 +117,15 @@ const ROWS = {
   T2: 'T2 the same render, unflushed, paints #progLenLine, #raceDateFeedback and #paceDisplayLine over seeded sentinels',
   H168: 'H168 168 edit sequences, field handler then date handler lifted from the rendered HTML: header "Program length: 5 weeks. Your test sets it." == card "Your test is in week 5." after each, no Recommended, red or button; the 21:17 screen 0/168',
   S1: 'S1 dated tw 5, mile 8:00, goal 10:30: --accent card, R3 sentence then "Your mile is 8:00. In 5 weeks that reaches about 1.5 mi in 12:00. ..."',
-  S2: 'S2 dated tw 5, no mile, intermediate, goal 12:00: --accent card, R3 sentence then the no-mile sentence (9:30 default, 14:15)',
-  S3: 'S3 dated tw 5, beginner, goal 12:00, with and without a stale mile in WD: --accent card, R3 sentence then the beginner sentence (11:30 default, 17:15)',
+  S2: D188_STAMP ? 'S2 dated tw 5, no mile, intermediate, goal 12:00, D189 F5/F6 required and blank: --run card, the R3 sentence alone, no reach on the step, header keeps the test week'
+                 : 'S2 dated tw 5, no mile, intermediate, goal 12:00: --accent card, R3 sentence then the no-mile sentence (9:30 default, 14:15)',
+  S3: D188_STAMP ? 'S3 dated tw 5, beginner, goal 12:00: no mile --accent card, R3 sentence then the generic beginner sentence (11:30 default, 17:15, D188 E2); mile 8:00 is read (D188 E1), no gap, --run card, the R3 sentence alone'
+                 : 'S3 dated tw 5, beginner, goal 12:00, with and without a stale mile in WD: --accent card, R3 sentence then the beginner sentence (11:30 default, 17:15)',
   S4: 'S4 Mario, mile 8:00, goal 12:00, no gap: --run card, exactly "Your test is in week 5. The program ends on it. The taper lands in front of it.", no reach on the step',
   S5: 'S5 dated tw 1 (test Fri 2026-09-25), mile 8:00, goal 10:30: header "1 week", --accent card, R3 tw 1 sentence then "In 1 week that reaches about 1.5 mi in 12:00"',
   S6: 'S6 dated, test before the first training day (start 2026-10-26, test 2026-10-20), with a gap: --signal card, the null sentence exactly, no reach on the step',
-  S8: 'S8 undated #paceFeasLine frame: amendment 3 A2/A3/A4 sentences exactly, visible, --accent, no button, no "safe"',
+  S8: D188_STAMP ? 'S8 undated #paceFeasLine frame: A2 and A4 (D188 generic beginner form) exactly, visible, --accent, no button, no "safe"; A3 required and blank, the frame empty and hidden (D189 F6)'
+                 : 'S8 undated #paceFeasLine frame: amendment 3 A2/A3/A4 sentences exactly, visible, --accent, no button, no "safe"',
   S9: 'S9 dated tw 5, 2 km in 8:30, mile 8:00: --accent card, the sentence reads "2 km" with the hand numbers',
   NS1: 'NS1 the name step\'s Program length row reads "5 weeks" on Mario\'s WD and "1 week" on tw 1',
   HM: 'HM CONTROL: HALF_MANNY digest 0ac7da6b1691a8e1, self-stable',
@@ -217,31 +226,35 @@ const KM_MI = 0.621;                                                      // ame
 function handReach(L, exp, age, mileSecs, dist, unit, goalSecs){
   if(age !== '18-35') throw new Error('hand oracle: age multiplier for ' + age + ' is not typed from the ruling');
   const ageMult = 1.0;                                                    // 18-35 only (see above)
-  const cur = (exp !== 'beginner' && mileSecs) ? mileSecs : DEFAULT_MILE[exp];
+  const cur = (D188_STAMP ? mileSecs : (exp !== 'beginner' && mileSecs)) ? mileSecs : DEFAULT_MILE[exp];   // D188 E1 from 226
   const improvingWeeks = Math.max(0, ((L - 1) / ageMult - 4) / 1.25);     // undo the +1 grace, the age multiplier, raw*1.25 + 4
   const rate = +(IMPROVE[exp] * AGE_SCALE[age]).toFixed(2);
   const ach = cur - improvingWeeks * rate;
   const mi = unit === 'km' ? dist * KM_MI : dist;
   const tPace = goalSecs / mi;
   return { L, cur, ach, total: ach * mi, tPace, gap: ach - tPace, shows: tPace < cur && ach - tPace >= TOLERANCE,
-           fromMile: exp !== 'beginner' && !!mileSecs, exp, distLabel: dist + ' ' + unit, goalSecs };
+           fromMile: D188_STAMP ? !!mileSecs : (exp !== 'beginner' && !!mileSecs), exp, distLabel: dist + ' ' + unit, goalSecs };
 }
 const wk = L => L + (L === 1 ? ' week' : ' weeks');                      // amendment 2 (a): digits, singular at 1
 // Amendment 2 (a)/(b) sentence shapes, typed.
 function handSentence(r){
   const reach = ' In ' + wk(r.L) + ' that reaches about ' + r.distLabel + ' in ' + clk(r.total) + '. Your goal is ' + clk(r.goalSecs) + '.';
   if(r.fromMile) return 'Your mile is ' + clk(r.cur) + '.' + reach + ' Keep it or change it above.';
-  if(r.exp === 'beginner') return 'Your paces start from the beginner default of ' + clk(r.cur) + ' per mile.' + reach + ' Keep it or change it above.';
+  if(!D188_STAMP && r.exp === 'beginner') return 'Your paces start from the beginner default of ' + clk(r.cur) + ' per mile.' + reach + ' Keep it or change it above.';   // retired by D188 E2 from 226
   return 'You have not entered a mile time. The ' + r.exp + ' default is ' + clk(r.cur) + ' per mile.' + reach + ' Enter your mile above and this updates.';
 }
 // Coach's copy, verbatim.
 const V = {
   S1: 'Your mile is 8:00. In 5 weeks that reaches about 1.5 mi in 12:00. Your goal is 10:30. Keep it or change it above.',                                              // amendment 2 (a)
   S2: 'You have not entered a mile time. The intermediate default is 9:30 per mile. In 5 weeks that reaches about 1.5 mi in 14:15. Your goal is 12:00. Enter your mile above and this updates.',   // amendment 2 (a)
-  S3: 'Your paces start from the beginner default of 11:30 per mile. In 5 weeks that reaches about 1.5 mi in 17:15. Your goal is 12:00. Keep it or change it above.',   // amendment 2 (b)
+  S3: D188_STAMP
+    ? 'You have not entered a mile time. The beginner default is 11:30 per mile. In 5 weeks that reaches about 1.5 mi in 17:15. Your goal is 12:00. Enter your mile above and this updates.'   // D188 E2 / Mario (b): D183's generic form at the hand L5 numbers
+    : 'Your paces start from the beginner default of 11:30 per mile. In 5 weeks that reaches about 1.5 mi in 17:15. Your goal is 12:00. Keep it or change it above.',   // amendment 2 (b)
   A2: 'Your mile is 8:00. In 11 weeks that reaches about 1.5 mi in 11:38. Your goal is 9:30. Keep it or change it above.',                                              // amendment 3 After A2, re-derived for D187 (V225): intermediate rate 5 -> 3 s/mi/wk
   A3: 'You have not entered a mile time. The intermediate default is 9:30 per mile. In 11 weeks that reaches about 1.5 mi in 13:53. Your goal is 10:30. Enter your mile above and this updates.', // A3, re-derived for D187 (V225): intermediate rate 5 -> 3 s/mi/wk
-  A4: 'Your paces start from the beginner default of 11:30 per mile. In 11 weeks that reaches about 1.5 mi in 16:53. Your goal is 12:00. Keep it or change it above.',  // A4
+  A4: D188_STAMP
+    ? 'You have not entered a mile time. The beginner default is 11:30 per mile. In 11 weeks that reaches about 1.5 mi in 16:53. Your goal is 12:00. Enter your mile above and this updates.'   // D188/D189 Copy "Feasibility, beginner no mile", verbatim
+    : 'Your paces start from the beginner default of 11:30 per mile. In 11 weeks that reaches about 1.5 mi in 16:53. Your goal is 12:00. Keep it or change it above.',  // A4
 };
 const CARD_TW = w => 'Your test is in week ' + w + '. The program ends on it. The taper lands in front of it.';                       // R3 _tw >= 2
 const CARD_TW1 = 'Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.';                      // R3 _tw == 1
@@ -377,8 +390,10 @@ function runHandler(code, thisObj){ IA.ctx.__G223_THIS = thisObj; IA.eval('(func
   eq('mile 8:00 goal 10:30 L5 reach', clk(r1.total), '12:00'); eq('gap', Math.round(r1.gap), 60); eq('S1 sentence', handSentence(r1), V.S1);
   const r2 = handReach(5, 'intermediate', '18-35', null, 1.5, 'mi', 720);
   eq('no mile intermediate L5 reach', clk(r2.total), '14:15'); eq('gap', Math.round(r2.gap), 90); eq('S2 sentence', handSentence(r2), V.S2);
-  const r3 = handReach(5, 'beginner', '18-35', 480, 1.5, 'mi', 720);
-  eq('beginner L5 reach (mile ignored)', clk(r3.total), '17:15'); eq('gap', Math.round(r3.gap), 210); eq('S3 sentence', handSentence(r3), V.S3);
+  const r3 = handReach(5, 'beginner', '18-35', D188_STAMP ? null : 480, 1.5, 'mi', 720);   // D188 (V226): a beginner's mile is read, so S3's 17:15 is the no-mile beginner
+  eq(D188_STAMP ? 'beginner L5 reach (no mile, D188)' : 'beginner L5 reach (mile ignored)', clk(r3.total), '17:15'); eq('gap', Math.round(r3.gap), 210); eq('S3 sentence', handSentence(r3), V.S3);
+  if(D188_STAMP){ const r3m = handReach(5, 'beginner', '18-35', 480, 1.5, 'mi', 720);
+    eq('D188 beginner 8:00 L5 reach (mile read)', clk(r3m.total), '12:00'); eq('D188 beginner 8:00 goal 12:00 shows no gap', r3m.shows, false); }
   eq('tw 1 L1 reach', clk(handReach(1, 'intermediate', '18-35', 480, 1.5, 'mi', 630).total), '12:00');
   eq('L12 goal 9:30', clk(handReach(12, 'intermediate', '18-35', 480, 1.5, 'mi', 570).total), '11:35');   // D187 (V225): was 11:18 at rate 5, re-derived at rate 3
   const a2 = handReach(11, 'intermediate', '18-35', 480, 1.5, 'mi', 570), a3 = handReach(11, 'intermediate', '18-35', null, 1.5, 'mi', 630), a4 = handReach(11, 'beginner', '18-35', null, 1.5, 'mi', 720);
@@ -459,11 +474,22 @@ const W5 = handWeek(TODAY, TEST);
   row('S1', bad, 1); }
 { const bad = [];
   const s = tryDo(() => cardCase({}, goalOf(720)));
+  if(D188_STAMP){   // D189 F5/F6: required and blank; the dated card quotes no reach (S4's no-gap shape), the header keeps the test week
+    const m = s.crash ? ['crash ' + s.crash] : cardMsgs(s, 'var(--run)', CARD_TW(W5), HDR_TEST(W5));
+    if(!s.crash && s.text.indexOf(REACH_TOKEN) >= 0) m.push('a reach sentence on the step');
+    cell(bad, 'S2', m);
+  } else
   cell(bad, 'S2', s.crash ? ['crash ' + s.crash] : cardMsgs(s, 'var(--accent)', CARD_TW(W5) + ' ' + V.S2, HDR_TEST(W5)));
   row('S2', bad, 1); }
 { const bad = [];
   for(const [lbl, run] of [['no mile', goalOf(720)], ['stale mile 8:00', Object.assign(mileOf(480), goalOf(720))]]){
     const s = tryDo(() => cardCase({ experience:'beginner' }, run));
+    if(D188_STAMP && lbl !== 'no mile'){   // D188 E1: the 8:00 is read, not stale. Hand oracle: no gap at L5, so S4's shape
+      const r = handReach(W5, 'beginner', '18-35', 480, 1.5, 'mi', 720);
+      const m = r.shows ? ['oracle: beginner 8:00 at week ' + W5 + ' shows a gap'] : [];
+      if(s.crash) m.push('crash ' + s.crash);
+      else { m.push(...cardMsgs(s, 'var(--run)', CARD_TW(W5), HDR_TEST(W5))); if(s.text.indexOf(REACH_TOKEN) >= 0) m.push('a reach sentence on the step'); }
+      cell(bad, 'S3 D188 mile 8:00 read', m); continue; }
     cell(bad, 'S3 ' + lbl, s.crash ? ['crash ' + s.crash] : cardMsgs(s, 'var(--accent)', CARD_TW(W5) + ' ' + V.S3, HDR_TEST(W5))); }
   row('S3', bad, 2); }
 { const bad = [];
@@ -489,6 +515,11 @@ const W5 = handWeek(TODAY, TEST);
     const s = tryDo(() => cardCase({ experience: exp, eventTargeted: false, raceDate: '' }, run));
     if(s.crash){ cell(bad, lbl, ['crash ' + s.crash]); continue; }
     const m = [], el = reg.get('paceFeasLine');
+    if(D188_STAMP && lbl === 'A3'){   // D189 F6: required and blank, the feasibility line is empty (ruling After: "feas: (empty)")
+      if(!inBody('paceFeasLine') || !el) m.push('frame not in the step');
+      else if(el.style.display === 'block') m.push('frame shown (display "block") with ' + J(s.feasText));
+      if(s.feasText !== '') m.push('frame ' + J(s.feasText) + ' want ""');
+      cell(bad, lbl, m); continue; }
     if(!inBody('paceFeasLine') || !el || el.style.display !== 'block') m.push('frame not shown (display ' + J(el && el.style.display) + ')');
     if(s.feasText !== want) m.push('frame ' + J(s.feasText) + ' want ' + J(want));
     if(colorOf(s.feas) !== 'var(--accent)') m.push('frame colour ' + J(colorOf(s.feas)));

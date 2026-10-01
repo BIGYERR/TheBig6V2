@@ -1,0 +1,135 @@
+[
+  {
+    "name": "S1 -> D188 E4 reverted: buildRunSession ignores a beginner mile again (experience !== beginner restored on the arguments[12] read)",
+    "anchor": "const _mileBestSecs = arguments[12] ? arguments[12] : null;",
+    "replacement": "const _mileBestSecs = (experience !== 'beginner' && arguments[12]) ? arguments[12] : null;",
+    "gate": "gates/g226_d188_beginnermile.js",
+    "note": "NAMED TRIP: G1g (SI 4x400m pace off the 13:00 mile), G1 run_base 13:00 Around pace, G1 9:00 differential (G1c/G1d). Verified: d188 PASS 26 FAIL 5: G1g SI, G1 run_base 13:00 Around, G1 run_pace_goal and run_base 9:00 differentials, G5 backstop. d189 green. EXPECTED: those five."
+  },
+  {
+    "name": "S2 -> D188 E5 reverted: buildNRCSession ignores a beginner mile again (experience !== beginner restored on anchorSec)",
+    "anchor": "const anchorSec = mileBestSecs ? mileBestSecs : expCurrentPace;",
+    "replacement": "const anchorSec = (experience !== 'beginner' && mileBestSecs) ? mileBestSecs : expCurrentPace;",
+    "gate": "gates/g226_d188_beginnermile.js",
+    "note": "NAMED TRIP: G1 run_5k/run_half beginner mile 13:00 chart row (G1a/b), G1 9:00 differential (G1d). Verified: d188 PASS 26 FAIL 5: G1 run_5k and run_half 13:00 chart row, G1 run_5k and run_half 9:00 differentials, G5 backstop. d189 green. EXPECTED: those five."
+  },
+  {
+    "name": "S3 -> D188 E3 reverted: calcProgramLength ignores a beginner mile again (experience !== beginner restored on _mileBestSecs)",
+    "anchor": "var _mileBestSecs = (goal.mileBestMins",
+    "replacement": "var _mileBestSecs = (experience !== 'beginner' && goal.mileBestMins",
+    "gate": "gates/g226_d188_beginnermile.js",
+    "note": "NAMED TRIP: G1 length cell beginner 13:30 goal, mile 9:00 -> 9 (G1e; mutant prints 11). Verified: d188 PASS 29 FAIL 2: G1 length cell 13:30 goal mile 9:00 -> 9, G5 backstop; the no-mile length cell and G1f length row stay green. d189 green."
+  },
+  {
+    "name": "S4 -> D188 E1 reverted: assessRunPaceCeiling ignores a beginner mile again (exp !== beginner restored on mileBest)",
+    "anchor": "const mileBest = (g.mileBestMins",
+    "replacement": "const mileBest = (exp !== 'beginner' && g.mileBestMins",
+    "gate": "gates/g226_d188_beginnermile.js",
+    "note": "NAMED TRIP: G1f (typed \"Your mile is 9:00.\" sentence, function and wizard #paceFeasLine). Verified: d188 PASS 28 FAIL 3: both G1f sentence rows (function and wizard read \"You have not entered a mile time\"), G5 backstop; G1f length row green (E3, not E1). d189 green."
+  },
+  {
+    "name": "S5 -> D188 E6 reverted: _mileEntryState returns ok for every beginner again (if(!g||exp===beginner) early return)",
+    "anchor": "  if(!g) return {ok:true};\n  if(g.mileBestMins===undefined",
+    "replacement": "  if(!g||exp==='beginner') return {ok:true};\n  if(g.mileBestMins===undefined",
+    "gate": "gates/g226_d188_beginnermile.js",
+    "note": "NAMED TRIP: G3 beginner 2:30 / 30:00 / 13:00 / 4:30 on all 5 run goals and the D116 sheet call. Verified: d188 PASS 25 FAIL 6: G3 2:30, 30:00, 13:00, 4:30 and the D116 sheet call, G5 backstop; G3 blank stays green. d189 green."
+  },
+  {
+    "name": "S6 -> D188 E6 beginner exemption dropped from R3: a beginner run_pace_goal with a blank mile is refused",
+    "anchor": "if(g.id==='run_pace_goal' && exp!=='beginner') return {ok:false, blank:true",
+    "replacement": "if(g.id==='run_pace_goal') return {ok:false, blank:true",
+    "gate": "gates/g226_d188_beginnermile.js",
+    "note": "NAMED TRIP: G3 beginner blank mile on all 5 run goals, G5 R3 literal count (also g226_d189 G8f). Verified: d188 PASS 29 FAIL 2: G3 beginner blank (run_pace_goal refused), G5 R3 literal count 0. d189 PASS 17 FAIL 1: G8f (got empty). EXPECTED: those three."
+  },
+  {
+    "name": "S7 -> D188 E9 reverted: the wizard hides Current mile time from beginners again",
+    "anchor": "${(t==='run') ? `<div class=\"input-group\"",
+    "replacement": "${(t==='run' && WD.experience !== 'beginner') ? `<div class=\"input-group\"",
+    "gate": "gates/g226_d188_beginnermile.js",
+    "note": "NAMED TRIP: G4 beginner wizard render, Current mile time and mileAdvisory exactly 1 (also g226_d189 G8a). Verified: d188 PASS 30 FAIL 1: G4 wizard field count. d189 PASS 17 FAIL 1: G8a (3/12 cells, the beginner ones). G5 green (WD.experience token is not near a mile anchor)."
+  },
+  {
+    "name": "S8 -> D188 E10 reverted on exp (amendment b): the program card hides the mile pencil from beginners",
+    "anchor": "Run paces<button onclick=\"event.stopPropagation();openMileSheet('${p.id}')\" aria-label=\"Change mile time\" style=\"background:none;border:none;cursor:pointer;color:var(--muted);padding:2px;display:flex;align-items:center\">${asyIcon('pencil',14)}</button>",
+    "replacement": "Run paces${s.runAnchor.exp!=='beginner'?`<button onclick=\"event.stopPropagation();openMileSheet('${p.id}')\" aria-label=\"Change mile time\" style=\"background:none;border:none;cursor:pointer;color:var(--muted);padding:2px;display:flex;align-items:center\">${asyIcon('pencil',14)}</button>`:''}",
+    "gate": "gates/g226_d188_beginnermile.js",
+    "note": "NAMED TRIP: G4 beginner program card carries aria-label exactly 1 (also g226_d189 G7c, g203_mile_pencil D188 era). Verified: d188 PASS 30 FAIL 1: G4 beginner program card pencil count. d189 PASS 17 FAIL 1: G7c (beginner run_base, no pencil). g203_mile_pencil PASS 98 FAIL 2: D188 era beginner -> 1 pencil and its aria-label row (clean g203 PASS 100 FAIL 0). Replaces v203 #3."
+  },
+  {
+    "name": "S9 -> D188 E7 reverted: runAnchorInfo classifies every beginner as kind beginner again, whatever mile he entered",
+    "anchor": "const kind = !entered ? 'default'",
+    "replacement": "const kind = exp === 'beginner' ? 'beginner' : !entered ? 'default'",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G6b (no S1 on beginners), G7e beginner entered and seeded rows. Verified: d189 PASS 16 FAIL 2: G6b and G7e (the two beginner rows). d188 PASS 30 FAIL 1: G5 backstop only. EXPECTED: those three."
+  },
+  {
+    "name": "S10 -> D189 S1 pass not called: d189DefaultAnchorNote( removed from buildProgram",
+    "anchor": "d189DefaultAnchorNote(weeks, {...cfg, cardioTypes, cardioGoals});",
+    "replacement": ";",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G6b. Verified: d189 PASS 17 FAIL 1: G6b only. d188 green."
+  },
+  {
+    "name": "S11 -> D189 S1 pass appends to every paced W1 run: return; after the append deleted",
+    "anchor": "rebuilds off it.';\n      return; } }",
+    "replacement": "rebuilds off it.';\n      } }",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G6b (many S1 notes per program). Verified: d189 PASS 17 FAIL 1: G6b only. d188 green."
+  },
+  {
+    "name": "S12 -> D189 S1 lands on week 2 instead of week 1",
+    "anchor": "const w1 = weeks['1'] || weeks[1];",
+    "replacement": "const w1 = weeks['2'] || weeks[2];",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G6b (W2 placement). Verified: d189 PASS 17 FAIL 1: G6b only. d188 green."
+  },
+  {
+    "name": "S13 -> D189 run_base dropped from _CHART_RUN_GOALS: run_base gets no run anchor",
+    "anchor": "'run_15_under10','run_base']);",
+    "replacement": "'run_15_under10']);",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G7a / G7b / G7c run_base cells. Verified: d189 PASS 13 FAIL 5: G7a, G7b, G7c (run_base cells), plus G6b and G8a (run_base drops out of the S1 and helper surfaces). d188 green."
+  },
+  {
+    "name": "S14 -> D189 run_base chips branch removed: run_base prints the four race chips",
+    "anchor": "const list = a.goalId==='run_base' ? [['Mile',r.mile]] : ",
+    "replacement": "const list = ",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G7c run_base chips exactly [Mile, Recovery]. Verified: d189 PASS 16 FAIL 2: G7c and G7b (run_base clipboard reads the four race chips). d188 green."
+  },
+  {
+    "name": "S15 -> D189 D9 >25:00 copy reverted to the V225 Leave it blank tail",
+    "anchor": "Over 25:00 reads as a walk, not a run. Check the entry.'",
+    "replacement": "Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead.'",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G8b D9 >25:00 string (also g226_d188 G3 beginner 30:00 and sheet call). Verified: d189 PASS 17 FAIL 1: G8b. d188 PASS 29 FAIL 2: G3 beginner 30:00 and the D116 sheet call. EXPECTED: those three."
+  },
+  {
+    "name": "S16 -> D189 F5 required blank header branch removed from #progLenLine",
+    "anchor": "if(!(p && p.tw) && _ms.blank) return ",
+    "replacement": "if(false) return ",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G8c #progLenLine header. Verified: d189 PASS 17 FAIL 1: G8c only. d188 green."
+  },
+  {
+    "name": "S17 -> D189 F1 helper returns the V225 label on every goal and level",
+    "anchor": "function _mileFieldHelp(){",
+    "replacement": "function _mileFieldHelp(){ return 'Optional. It sets your training paces.';",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G8a wizard helper, 4 goals x 3 levels. Verified: d189 PASS 17 FAIL 1: G8a only (12/12 cells). d188 green."
+  },
+  {
+    "name": "S18 -> D189 feasibility suppression removed: a required blank mile quotes a reach from the default",
+    "anchor": "const _f = _mileEntryState().blank ? null : assessRunPaceCeiling(",
+    "replacement": "const _f = assessRunPaceCeiling(",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G8d #paceFeasLine empty. Verified: d189 PASS 17 FAIL 1: G8d only (intermediate quotes a reach from the default). d188 green."
+  },
+  {
+    "name": "S20 -> D189 F10 reverted: the Week 1 scope tail is withheld from a beginner run_pace_goal clipboard line",
+    "anchor": "const scope = (a.goalId === 'run_pace_goal') ?",
+    "replacement": "const scope = (a.goalId === 'run_pace_goal' && a.exp !== 'beginner') ?",
+    "gate": "gates/g226_d189_pacedisclose.js",
+    "note": "NAMED TRIP: G7b beginner run_pace_goal clipboard line. Verified: d189 PASS 17 FAIL 1: G7b only, 1/10 cells, run_pace_goal|beginner. d188 green. Successor of v202 #11."
+  }
+]

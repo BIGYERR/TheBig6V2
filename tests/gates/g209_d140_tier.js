@@ -39,6 +39,9 @@ const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version;
 const D140_ERA = 209;
+// D188 P-BEGINNERMILE (V226) Class A2 re-keys K1 from 226 (standing rulings 2 and 4): the carry case is a
+// beginner carrying an 8:15 mile, which D188 reads. <= 225 keeps measure's literal.
+const D188_ERA = 226;
 
 let pass = 0, fail = 0, skip = 0;
 function ok(label, cond, got){
@@ -243,9 +246,31 @@ ok('K0 no long-run day on any tier carries a carry item, whatever section it rid
   const cc = Object.assign(cl(STAND), { equipment:'crossfit', liftingFocus:'balanced', experience:'beginner', restDays:['sat','sun'] });
   const day = IA.buildProgram(cl(cc)).weeks[6].fri;
   const m = +minutesOf(day.cardio && day.cardio.dose).toFixed(1);
+  if(VER < D188_ERA){
   ok('K1 carry case (crossfit, balanced, beginner, rest sat+sun, seed 24865) W6 Fri: 56.4 min, tier B, no carry, the strength pair only',
      m === 56.4 && handTier(day.cardio) === 'B' && carryN(day) === 0 && shape(day) === '[Strength] Dips, Inverted rows (rings)',
      m + ' min, tier ' + handTier(day.cardio) + ', ' + carryN(day) + ' carry, ' + shape(day));
+  } else {
+    // D188 P-BEGINNERMILE Class A2 (tests/measure/v226_rulings/d188_d189_ruling.md), LICENSED by Mario
+    // 2026-09-30 (a2): more lifting, less rest, beginners with a mile only. The beginner's entered 8:15 is
+    // now read, the anchor is faster than the 11:30 default, the long run's time on feet shortens and this
+    // day leaves tier B for tier C. The row asserts the direction only (tier C by the gate's own dose
+    // arithmetic, time on feet under 45, no carry) and the licence's population predicate (a beginner
+    // carrying a mile); it never pins a minutes value read off this engine. K1b holds the bound from the
+    // other side: the same beginner with no mile is unmoved (D188 Class A3, byte-identical but for D189's
+    // W1 note), so W6 Fri stays measure's typed carry case above.
+    const rg = cc.cardioGoals.run;
+    const pop = cc.experience === 'beginner' && rg.id === 'run_pace_goal' && !!rg.mileBestMins && +rg.mileBestMins > 0;
+    ok('K1 D188 era (ia-version ' + VER + ' >= ' + D188_ERA + ', Class A2 licensed 2026-09-30): the carry case is a beginner with a mile (' + rg.mileBestMins + ':' + rg.mileBestSecs + ') and its W6 Fri long run moves to tier C, under 45 min on feet, no carry',
+       pop && handTier(day.cardio) === 'C' && m < 45 && carryN(day) === 0,
+       'population ' + pop + ', ' + m + ' min, tier ' + handTier(day.cardio) + ', ' + carryN(day) + ' carry');
+    const nm = cl(cc); nm.cardioGoals.run.mileBestMins = ''; nm.cardioGoals.run.mileBestSecs = ''; delete nm.cardioGoals.run.mileBestSrc;
+    const d0 = IA.buildProgram(cl(nm)).weeks[6].fri;
+    const m0 = +minutesOf(d0.cardio && d0.cardio.dose).toFixed(1);
+    ok('K1b D188 population bound: the same beginner with NO mile is unmoved (Class A3), W6 Fri stays measure\'s carry case: 56.4 min, tier B, no carry, the strength pair only',
+       m0 === 56.4 && handTier(d0.cardio) === 'B' && carryN(d0) === 0 && shape(d0) === '[Strength] Dips, Inverted rows (rings)',
+       m0 + ' min, tier ' + handTier(d0.cardio) + ', ' + carryN(d0) + ' carry, ' + shape(d0));
+  }
   if(PAIR){
     const b = IB.buildProgram(cl(cc)).weeks[6].fri;
     const hid = (b.sections || []).filter(s => !/carry/i.test(s.label || '') && (s.items || []).some(i => CARRY_RX.test(i.name || '')));

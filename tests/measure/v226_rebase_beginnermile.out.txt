@@ -1,0 +1,243 @@
+== surgery SX
+  anchor A1 wizard hide (pace goal branch) :2855 count 1
+  anchor A2 wizard hide (other run goals) :2876 count 1
+  anchor A3 assessRunPaceCeiling :2433 count 1
+  anchor A4 calcProgramLength :3179 count 1
+  anchor A5 buildRunSession anchor :3815 count 1
+  anchor A6 buildNRCSession anchor :4376 count 1
+  anchor A7 runAnchorInfo rawSec :14709 count 1
+  anchor A8 runAnchorInfo clamped :14715 count 1
+  anchor A9 runAnchorInfo kind :14717 count 1
+  anchor A10 _mileEntryState early return :7484 count 1
+  anchor A11 pencil hide :14823 count 1
+== surgery SV (A10 kept)
+  anchor A1 wizard hide (pace goal branch) :2855 count 1
+  anchor A2 wizard hide (other run goals) :2876 count 1
+  anchor A3 assessRunPaceCeiling :2433 count 1
+  anchor A4 calcProgramLength :3179 count 1
+  anchor A5 buildRunSession anchor :3815 count 1
+  anchor A6 buildNRCSession anchor :4376 count 1
+  anchor A7 runAnchorInfo rawSec :14709 count 1
+  anchor A8 runAnchorInfo clamped :14715 count 1
+  anchor A9 runAnchorInfo kind :14717 count 1
+  anchor A11 pencil hide :14823 count 1
+ia-version B 225 SX 225
+
+== 0. HALF_MANNY digest (expect 0ac7da6b1691a8e1)
+  B 0ac7da6b1691a8e1 self-equal true
+  SX 0ac7da6b1691a8e1 self-equal true
+  SV 0ac7da6b1691a8e1 self-equal true
+
+== 2. premise: beginner, no mile, seed 1000, W1 run cards (B)
+-- run_pace_goal L 11 anchor {"raw":690,"row":690,"kind":"beginner","cl":null}
+   mon Short Interval (SI) |  | toks 11:30/mi 11:46/mi 8:00/mi 11:22/mi | run || Short Interval (SI) || 4x400m at 11:30/mi. This week's goal pace is 11:46/mi. Recovery: 5:43 to 7:09 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breath
+   thu Long Interval (LI) |  | toks 12:43/mi | run || Long Interval (LI) || 15 min continuous at Tempo Pace: 12:43/mi (RPE 8-9 out of 10). Hard but controlled. Labored breathing, short phrases only. You should NOT be able to hold a conversation. || LI: Zone 3-4 (85-95% max HR). Hard sustained effort at tem
+   fri Long Slow Distance (LSD) |  | toks 14:18/mi | run || Long Slow Distance (LSD) || 1.5 mi at Recovery Pace: 14:18/mi (Zone 2).
+60–70% max HR. Full sentences, no gasping. This is your recovery run. Not a tempo, not a push. If in doubt, go slower. || LSD: Recovery and base building. These runs feel almost too
+   sat Long Slow Distance (LSD) |  | toks 14:18/mi | run || Long Slow Distance (LSD) || 2 mi at Recovery Pace: 14:18/mi (Zone 2).
+60–70% max HR. You must be able to speak in full sentences the entire time. If you cannot, slow down. Bring water if over 5 miles. || LSD: The foundation of endurance. Go easy. The ae
+-- run_5k L 8 anchor {"raw":690,"row":690,"kind":"beginner","cl":null}
+   mon Speed Run — Intervals |  | toks 12:15/mi | run || Speed Run — Intervals || 8 × 1:00 at 5K Pace — 8:00 of work
+5:00 warm up
+8 × 1:00 at 5K Pace (12:15/mi)
+1:00 easy recovery between every effort || INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slow
+   thu Speed Run — Intervals |  | toks 12:15/mi 12:35/mi 11:30/mi | run || Speed Run — Intervals || Mixed-pace ladder down to Best — 10:00 of work, 10 efforts
+5:00 warm up
+1:00 at 5K Pace (12:15/mi)
+2:00 at 10K Pace (12:35/mi)
+1:00 at 5K Pace (12:15/mi)
+2 × 0:45 at Mile Pace (11:30/mi)
+2:00 at 10K Pace (12:35/mi)
+1:00 at 5K Pa
+   fri Recovery Run |  | toks 14:05/mi 13:33/mi | run || Recovery Run || 7 min recovery run at Recovery Pace (14:05/mi). 4–5/10 effort, easy enough to talk, laugh, or argue freely. Start a touch slower than that, finish a touch faster. Do not run faster than 13:33/mi. || RECOVERY RUN: Just as important as the
+   sat Long Run |  | toks 14:05/mi 13:33/mi | run || Long Run || One Mile Run: 1 mile run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average Recovery Pace (14:05/mi) across the run. Comfortable the whole way. Average no faster than 13:33/mi. || LONG RUN: Easy start,
+-- run_base L 9 anchor null
+   mon Benchmark Run |  | toks  | run || Benchmark Run || 20 min at a steady RPE 6 out of 10. Comfortably hard, a short sentence between breaths. Hold the effort dead even from first minute to last. No surging, no fading. Log the distance you covered. || BENCHMARK: Your baseline. The final wee
+   sat Easy Run |  | toks 14:05/mi 13:33/mi | run || Easy Run || 25 min easy and conversational (RPE 3-4 out of 10). Around 14:05/mi is right for you. Do not run faster than 13:33/mi. Distance is not the goal; time on feet is. Log the distance you covered. Walk breaks are fine and smart: run 3 min, walk 1
+
+== 2b. same W1, beginner mile 13:00 and 9:00: B vs SX (tokens per card)
+-- run_pace_goal mile 13:00 L B/SX 11 11
+   mon Short Interval (SI) B: 11:30/mi 11:46/mi 8:00/mi 11:22/mi | SX: 11:58/mi 12:14/mi 8:00/mi 11:50/mi
+   thu Long Interval (LI) B: 12:43/mi | SX: 13:13/mi
+   fri Long Slow Distance (LSD) B: 14:18/mi | SX: 14:30/mi
+   sat Long Slow Distance (LSD) B: 14:18/mi | SX: 14:30/mi
+-- run_pace_goal mile 9:00 L B/SX 11 11
+   mon Short Interval (SI) B: 11:30/mi 11:46/mi 8:00/mi 11:22/mi | SX: 8:58/mi 9:14/mi 8:00/mi 8:50/mi
+   thu Long Interval (LI) B: 12:43/mi | SX: 9:59/mi
+   fri Long Slow Distance (LSD) B: 14:18/mi | SX: 11:52/mi
+   sat Long Slow Distance (LSD) B: 14:18/mi | SX: 11:52/mi
+-- run_5k mile 13:00 L B/SX 8 8
+   mon Speed Run — Intervals B: 12:15/mi | SX: 12:40/mi
+   thu Speed Run — Intervals B: 12:15/mi 12:35/mi 11:30/mi | SX: 12:40/mi 13:05/mi 12:00/mi
+   fri Recovery Run B: 14:05/mi 13:33/mi | SX: 14:30/mi 14:03/mi
+   sat Long Run B: 14:05/mi 13:33/mi | SX: 14:30/mi 14:03/mi
+-- run_5k mile 9:00 L B/SX 8 8
+   mon Speed Run — Intervals B: 12:15/mi | SX: 9:40/mi
+   thu Speed Run — Intervals B: 12:15/mi 12:35/mi 11:30/mi | SX: 9:40/mi 10:00/mi 9:00/mi
+   fri Recovery Run B: 14:05/mi 13:33/mi | SX: 11:35/mi 11:03/mi
+   sat Long Run B: 14:05/mi 13:33/mi | SX: 11:35/mi 11:03/mi
+-- run_base mile 13:00 L B/SX 9 9
+   mon Benchmark Run B: (none) | SX: (none)
+   sat Easy Run B: 14:05/mi 13:33/mi | SX: 14:30/mi 14:03/mi
+-- run_base mile 9:00 L B/SX 9 9
+   mon Benchmark Run B: (none) | SX: (none)
+   sat Easy Run B: 14:05/mi 13:33/mi | SX: 11:35/mi 11:03/mi
+
+== 3. M1. harness fixtures: HALF_MANNY(intermediate, mileBest=10)
+  gate lines with beginner AND mileBest|mileSec on one line: 4 g202_pace_copy.js:195 g223_d183_safepace.js:220 g223_d183_safepace.js:227 g223_d183_safepace.js:676
+  M1 run_pace_goal seeded 9:00 B cfg mile 9:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 11 dg 1560e1724e9a5321 | W1 Short Interval (SI)[11:30/mi 11:46/mi 8:00/mi 11:16/mi] Long Interval (LI)[12:43/mi] Long Slow Distance (LSD)[14:18/mi] Long Slow Distance (LSD)[14:18/mi]
+  M1 run_pace_goal seeded 9:00 SX cfg mile 9:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 11 dg 2eb48efd0eed6d41 | W1 Short Interval (SI)[8:58/mi 9:14/mi 8:00/mi 8:44/mi] Long Interval (LI)[9:59/mi] Long Slow Distance (LSD)[11:52/mi] Long Slow Distance (LSD)[11:52/mi]
+  M1 run_pace_goal seeded 13:00 B cfg mile 13:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 11 dg 96f1959966ee32fe | W1 Short Interval (SI)[11:30/mi 11:46/mi 8:00/mi 11:16/mi] Long Interval (LI)[12:43/mi] Long Slow Distance (LSD)[14:18/mi] Long Slow Distance (LSD)[14:18/mi]
+  M1 run_pace_goal seeded 13:00 SX cfg mile 13:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 11 dg 79b1c68d92d888a0 | W1 Short Interval (SI)[11:58/mi 12:14/mi 8:00/mi 11:44/mi] Long Interval (LI)[13:13/mi] Long Slow Distance (LSD)[14:30/mi] Long Slow Distance (LSD)[14:30/mi]
+  M1 run_5k seeded 9:00 B cfg mile 9:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 8 dg 3f2b8a85d7e121d9 | W1 Speed Run — Intervals[12:15/mi] Speed Run — Intervals[12:15/mi 12:35/mi 11:30/mi] Recovery Run[14:05/mi 13:33/mi] Long Run[14:05/mi 13:33/mi]
+  M1 run_5k seeded 9:00 SX cfg mile 9:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 8 dg 947dbbb57bc218fb | W1 Speed Run — Intervals[9:40/mi] Speed Run — Intervals[9:40/mi 10:00/mi 9:00/mi] Recovery Run[11:35/mi 11:03/mi] Long Run[11:35/mi 11:03/mi]
+  M1 run_5k seeded 13:00 B cfg mile 13:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 8 dg 0c08bb0008c0c440 | W1 Speed Run — Intervals[12:15/mi] Speed Run — Intervals[12:15/mi 12:35/mi 11:30/mi] Recovery Run[14:05/mi 13:33/mi] Long Run[14:05/mi 13:33/mi]
+  M1 run_5k seeded 13:00 SX cfg mile 13:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 8 dg d0868426456eea57 | W1 Speed Run — Intervals[12:40/mi] Speed Run — Intervals[12:40/mi 13:05/mi 12:00/mi] Recovery Run[14:30/mi 14:03/mi] Long Run[14:30/mi 14:03/mi]
+  M1 run_base seeded 9:00 B cfg mile 9:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 9 dg 19e64ad4946e315e | W1 Benchmark Run[] Easy Run[14:05/mi 13:33/mi]
+  M1 run_base seeded 9:00 SX cfg mile 9:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 9 dg df7ad042f6c303ca | W1 Benchmark Run[] Easy Run[11:35/mi 11:03/mi]
+  M1 run_base seeded 13:00 B cfg mile 13:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 9 dg e4f72785e83978c7 | W1 Benchmark Run[] Easy Run[14:05/mi 13:33/mi]
+  M1 run_base seeded 13:00 SX cfg mile 13:0 src {"kind":"seeded","prog":"PRIOR","n":6} L 9 dg 932d99e4bd7382d2 | W1 Benchmark Run[] Easy Run[14:30/mi 14:03/mi]
+
+== 5. wizard mile field + validator on a BLANK mile
+  run_pace_goal beginner     B  field no  label "" validator {"ok":true} build ok L11
+  run_pace_goal beginner     SX field YES label "Optional. It sets your training paces." validator {"ok":false,"blank":true,"msg":"Required. Enter your most recent timed mile."} build REFUSED no program toast=""
+  run_pace_goal beginner     SV field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L11
+  run_pace_goal intermediate B  field YES label "Optional. It sets your training paces." validator {"ok":false,"blank":true,"msg":"Required. Enter your most recent timed mile."} build REFUSED no program toast=""
+  run_pace_goal intermediate SX field YES label "Optional. It sets your training paces." validator {"ok":false,"blank":true,"msg":"Required. Enter your most recent timed mile."} build REFUSED no program toast=""
+  run_pace_goal intermediate SV field YES label "Optional. It sets your training paces." validator {"ok":false,"blank":true,"msg":"Required. Enter your most recent timed mile."} build REFUSED no program toast=""
+  run_5k        beginner     B  field no  label "" validator {"ok":true} build ok L8
+  run_5k        beginner     SX field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L8
+  run_5k        beginner     SV field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L8
+  run_5k        intermediate B  field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L8
+  run_5k        intermediate SX field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L8
+  run_5k        intermediate SV field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L8
+  run_base      beginner     B  field no  label "" validator {"ok":true} build ok L9
+  run_base      beginner     SX field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L9
+  run_base      beginner     SV field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L9
+  run_base      intermediate B  field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L10
+  run_base      intermediate SX field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L10
+  run_base      intermediate SV field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L10
+  run_10k       beginner     B  field no  label "" validator {"ok":true} build ok L8
+  run_10k       beginner     SX field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L8
+  run_10k       beginner     SV field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L8
+  run_10k       intermediate B  field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L8
+  run_10k       intermediate SX field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L8
+  run_10k       intermediate SV field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L8
+  run_half      beginner     B  field no  label "" validator {"ok":true} build ok L14
+  run_half      beginner     SX field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L14
+  run_half      beginner     SV field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L14
+  run_half      intermediate B  field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L14
+  run_half      intermediate SX field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L14
+  run_half      intermediate SV field YES label "Optional. It sets your training paces." validator {"ok":true} build ok L14
+  validator probes (explicit args): beginner pace blank B {"ok":true} SX {"ok":false,"blank":true,"msg":"Required. Enter your most recent timed mile."} SV {"ok":true}
+  beginner 13:00 advisory: B {"ok":true} SX {"ok":true,"adv":"At 13:00 your paces come from the 12:00 row, the chart’s slowest. Consider a base block first."}
+  D116 sheet shape (no id) beginner blank SX {"ok":true} | intermediate 13:00 B {"ok":true,"adv":"At 13:00 your paces come from the 12:00 row, the chart’s slowest. Consider a base block first."}
+  buildProjectionCard(ee,11,780) contains "your 13:00 mile": false len 0
+
+== 4. M4 lattice
+  cells 400 secs 12 | B self-identity 400/400
+   (a) beginner B==SX digest | run_10k mile 11:30                                 20/20
+   (a) beginner B==SX digest | run_10k mile 13:00                                 0/20
+   (a) beginner B==SX digest | run_10k mile 9:00                                  0/20
+   (a) beginner B==SX digest | run_10k mile none                                  20/20
+   (a) beginner B==SX digest | run_5k mile 11:30                                  20/20
+   (a) beginner B==SX digest | run_5k mile 13:00                                  0/20
+   (a) beginner B==SX digest | run_5k mile 9:00                                   0/20
+   (a) beginner B==SX digest | run_5k mile none                                   20/20
+   (a) beginner B==SX digest | run_base mile 11:30                                20/20
+   (a) beginner B==SX digest | run_base mile 13:00                                0/20
+   (a) beginner B==SX digest | run_base mile 9:00                                 0/20
+   (a) beginner B==SX digest | run_base mile none                                 20/20
+   (a) beginner B==SX digest | run_half mile 11:30                                20/20
+   (a) beginner B==SX digest | run_half mile 13:00                                0/20
+   (a) beginner B==SX digest | run_half mile 9:00                                 0/20
+   (a) beginner B==SX digest | run_half mile none                                 20/20
+   (a) beginner B==SX digest | run_pace_goal mile 11:30                           20/20
+   (a) beginner B==SX digest | run_pace_goal mile 13:00                           0/20
+   (a) beginner B==SX digest | run_pace_goal mile 9:00                            0/20
+   (a) beginner B==SX digest | run_pace_goal mile none                            20/20
+   (c) L beginner-SX == L intermediate-B | run_10k mile 11:30                     20/20
+   (c) L beginner-SX == L intermediate-B | run_10k mile 13:00                     20/20
+   (c) L beginner-SX == L intermediate-B | run_10k mile 9:00                      20/20
+   (c) L beginner-SX == L intermediate-B | run_5k mile 11:30                      20/20
+   (c) L beginner-SX == L intermediate-B | run_5k mile 13:00                      20/20
+   (c) L beginner-SX == L intermediate-B | run_5k mile 9:00                       20/20
+   (c) L beginner-SX == L intermediate-B | run_base mile 11:30                    0/20
+   (c) L beginner-SX == L intermediate-B | run_base mile 13:00                    0/20
+   (c) L beginner-SX == L intermediate-B | run_base mile 9:00                     0/20
+   (c) L beginner-SX == L intermediate-B | run_half mile 11:30                    20/20
+   (c) L beginner-SX == L intermediate-B | run_half mile 13:00                    20/20
+   (c) L beginner-SX == L intermediate-B | run_half mile 9:00                     20/20
+   (c) L beginner-SX == L intermediate-B | run_pace_goal mile 11:30               20/20
+   (c) L beginner-SX == L intermediate-B | run_pace_goal mile 13:00               20/20
+   (c) L beginner-SX == L intermediate-B | run_pace_goal mile 9:00                20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_10k mile 11:30   20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_10k mile 13:00   20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_10k mile 9:00    20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_5k mile 11:30    20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_5k mile 13:00    20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_5k mile 9:00     20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_base mile 11:30  20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_base mile 13:00  20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_base mile 9:00   20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_half mile 11:30  20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_half mile 13:00  20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_half mile 9:00   20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_pace_goal mile 11:30 20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_pace_goal mile 13:00 20/20
+   (c) W1 pace token multiset equal (ignoring day/subtype) | run_pace_goal mile 9:00 20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_10k mile 11:30           20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_10k mile 13:00           20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_10k mile 9:00            20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_5k mile 11:30            20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_5k mile 13:00            20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_5k mile 9:00             20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_base mile 11:30          20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_base mile 13:00          20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_base mile 9:00           20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_half mile 11:30          20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_half mile 13:00          20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_half mile 9:00           20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_pace_goal mile 11:30     20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_pace_goal mile 13:00     20/20
+   (c) beginner-SX W1 run tokens == intermediate-B | run_pace_goal mile 9:00      20/20
+   (i) intermediate B==SX digest | run_10k                                        80/80
+   (i) intermediate B==SX digest | run_5k                                         80/80
+   (i) intermediate B==SX digest | run_base                                       80/80
+   (i) intermediate B==SX digest | run_half                                       80/80
+   (i) intermediate B==SX digest | run_pace_goal                                  80/80
+
+  (b) anchor/row/kind per goal x mile (seed 1000), B vs SX; hand default 690, hand chart floor 12:00
+    run_pace_goal none  B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":690,"row":690,"kind":"default","cl":null} | L B/SX 11/11
+    run_pace_goal 9:00  B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":540,"row":540,"kind":"entered","cl":null} | L B/SX 11/11
+    run_pace_goal 11:30 B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":690,"row":690,"kind":"entered","cl":null} | L B/SX 11/11
+    run_pace_goal 13:00 B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":780,"row":720,"kind":"entered","cl":"slow"} | L B/SX 11/11
+    run_5k        none  B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":690,"row":690,"kind":"default","cl":null} | L B/SX 8/8
+    run_5k        9:00  B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":540,"row":540,"kind":"entered","cl":null} | L B/SX 8/8
+    run_5k        11:30 B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":690,"row":690,"kind":"entered","cl":null} | L B/SX 8/8
+    run_5k        13:00 B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":780,"row":720,"kind":"entered","cl":"slow"} | L B/SX 8/8
+    run_base      none  B null | SX null | L B/SX 9/9
+    run_base      9:00  B null | SX null | L B/SX 9/9
+    run_base      11:30 B null | SX null | L B/SX 9/9
+    run_base      13:00 B null | SX null | L B/SX 9/9
+    run_10k       none  B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":690,"row":690,"kind":"default","cl":null} | L B/SX 8/8
+    run_10k       9:00  B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":540,"row":540,"kind":"entered","cl":null} | L B/SX 8/8
+    run_10k       11:30 B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":690,"row":690,"kind":"entered","cl":null} | L B/SX 8/8
+    run_10k       13:00 B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":780,"row":720,"kind":"entered","cl":"slow"} | L B/SX 8/8
+    run_half      none  B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":690,"row":690,"kind":"default","cl":null} | L B/SX 14/14
+    run_half      9:00  B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":540,"row":540,"kind":"entered","cl":null} | L B/SX 14/14
+    run_half      11:30 B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":690,"row":690,"kind":"entered","cl":null} | L B/SX 14/14
+    run_half      13:00 B {"raw":690,"row":690,"kind":"beginner","cl":null} | SX {"raw":780,"row":720,"kind":"entered","cl":"slow"} | L B/SX 14/14
+
+  (b) card sentence seed 1000 run_5k: B none: Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate. 
+      SX none: Anchored on an 11:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row. 
+      SX 13:00: Anchored on a 12:00 mile, the 13:00 you entered is slower than the chart goes, so its slowest row is used. Every pace in this program comes from this row.
+
+  (c) examples of beginner-SX vs intermediate-B W1 differences (first 2 per goal x mile):
+
+  (c-age) run_pace_goal 9:00, beginner-SX vs intermediate-B, W1 tokens equal and L equal, per age (20 seeds):
+    18-35 tokens equal 20/20 L equal 20/20 
+    36-54 tokens equal 0/20 L equal 0/20 seed 1000 L 12/11 BEG Short Interval (SI)[8:58/mi 9:14/mi 8:00/mi 8:51/mi] Long Interval (LI)[9:59/mi] Long Slow Distance (LSD)[11:52/mi] Long Slow Distance (LSD)[11:52/mi] INT Short Interval (SI)[8:58/mi 9:14/mi 8:00/mi 8:54/mi] Long Interval (LI)[9:59/mi] Long Slow Distance (LSD)[11:52/mi] Long Slow Distance (LSD)[11:52/mi]
+    55+ tokens equal 0/20 L equal 0/20 seed 1000 L 13/11 BEG Short Interval (SI)[8:58/mi 9:14/mi 8:00/mi 8:55/mi] Long Interval (LI)[9:59/mi] Long Slow Distance (LSD)[11:52/mi] Long Slow Distance (LSD)[11:52/mi] INT Short Interval (SI)[8:58/mi 9:14/mi 8:00/mi 8:59/mi] Long Interval (LI)[9:59/mi] Long Slow Distance (LSD)[11:52/mi] Long Slow Distance (LSD)[11:52/mi]
+
+DONE

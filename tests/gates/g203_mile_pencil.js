@@ -14,6 +14,8 @@
 //   * the pencil table is the ruling's after-grid: a run goal that reads the
 //     pace chart gets exactly one pencil, run_base gets none because it has no
 //     runAnchor at all, and a beginner gets none because the beginner default is
+//     (ia-version <= 225; from 226 D188 E10 makes the pencil unconditional and D189 F7
+//     gives run_base a runAnchor, so every row gets one: see section 4's era rows)
 //     not a number the athlete owns.
 //   * the mile-validation strings are typed here, one pair per era: the V176 (D9)
 //     literals at ia-version <= 222, D183's (P-SAFEPACE amendment 2 (e)) at >= 223.
@@ -70,6 +72,8 @@ const MSG_OVER_25_D9 = 'Over 25:00 reads as a walk, not a run — leave it blank
 // D183 (P-SAFEPACE amendment 2 (e), tests/measure/v223_rulings/p_safepace_ruling.md) at ia-version >= 223. Typed from the ruling.
 const MSG_UNDER_3_D183 = 'Under 3:00 is not a mile time. The world record is 3:43. Check the entry.';
 const MSG_OVER_25_D183 = 'Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead.';
+// D189 (P-PACEDISCLOSE F4, tests/measure/v226_rulings/d188_d189_ruling.md, Copy "D9 >25:00") at ia-version >= 226. Typed from the ruling.
+const MSG_OVER_25_D189 = 'Over 25:00 reads as a walk, not a run. Check the entry.';
 
 // D116 lock predicate, hand table: {totalWeeks, week, locked}
 const LOCK_TABLE = [
@@ -154,7 +158,11 @@ const MILE_MSG_ERA = eraV >= D183_ERA
   ? 'D183 era (ia-version ' + eraV + ' >= ' + D183_ERA + '): P-SAFEPACE amendment 2 (e) strings'
   : 'D9 era (ia-version ' + eraV + ' <= ' + (D183_ERA - 1) + '): V176 (D9) strings';
 const MSG_UNDER_3 = eraV >= D183_ERA ? MSG_UNDER_3_D183 : MSG_UNDER_3_D9;
-const MSG_OVER_25 = eraV >= D183_ERA ? MSG_OVER_25_D183 : MSG_OVER_25_D9;
+// D189 era (ia-version >= 226, P-PACEDISCLOSE F4): the over-25:00 string stops recommending a blank; the
+// under-3:00 string is untouched by D189 and keeps its D183 era above.
+const D189_ERA = 226;
+const OVER_25_TAG = eraV >= D189_ERA ? 'D189' : MILE_MSG_TAG;
+const MSG_OVER_25 = eraV >= D189_ERA ? MSG_OVER_25_D189 : eraV >= D183_ERA ? MSG_OVER_25_D183 : MSG_OVER_25_D9;
 const SURFACE = {
   'openMileSheet declared':      typeof IA.eval('typeof openMileSheet === "function" ? openMileSheet : undefined') === 'function',
   'commitMileChange declared':   typeof IA.eval('typeof commitMileChange === "function" ? commitMileChange : undefined') === 'function',
@@ -268,18 +276,33 @@ console.log('\n4. pencil presence (ruling after-grid)');
 const detail = IA.eval('progDetailHTML');
 const mkProg = cfg => ({ id:'gQ', name:'n', totalWeeks:14, startDate:startDateForWeek(3),
                          cfg: Object.assign({}, IA.fixtures.HALF_MANNY, cfg) });
+// ERA ROWS (standing rulings 2 and 4). <= 225: the V203 after-grid. >= 226: D188 E10 makes the pencil
+// unconditional ("beginner pencils: 0" -> 1 from 226) and D189 F7 gives run_base a runAnchor (Class C:
+// "run_base gains the Run paces group (Mile, Recovery), the sentence, the clipboard line and a pencil"),
+// both typed from tests/measure/v226_rulings/d188_d189_ruling.md.
+const D188_ERA = 226;
+const PENCIL_D188 = eraV >= D188_ERA;
 const PENCIL_GRID = [
   { label: 'run_half / intermediate (chart-reading anchor)', cfg: {}, pencils: 1 },
-  { label: 'run_base (no runAnchor at all)', cfg: { cardioGoals:{ run:{ id:'run_base', label:'Build a Base' } } }, pencils: 0 },
-  { label: 'beginner experience (beginner default anchor)', cfg: { experience:'beginner' }, pencils: 0 },
+  PENCIL_D188
+    ? { label: 'D189 era: run_base (runAnchor, Run paces group, pencil)', cfg: { cardioGoals:{ run:{ id:'run_base', label:'Build a Base' } } }, pencils: 1 }
+    : { label: 'run_base (no runAnchor at all)', cfg: { cardioGoals:{ run:{ id:'run_base', label:'Build a Base' } } }, pencils: 0 },
+  PENCIL_D188
+    ? { label: 'D188 era: beginner experience (the pencil is unconditional)', cfg: { experience:'beginner' }, pencils: 1 }
+    : { label: 'beginner experience (beginner default anchor)', cfg: { experience:'beginner' }, pencils: 0 },
 ];
 PENCIL_GRID.forEach(r => {
   const h = detail(mkProg(r.cfg));
   eq(r.label + ' -> ' + r.pencils + ' pencil(s)', (h.match(/openMileSheet\(/g) || []).length, r.pencils);
   if(r.pencils) ok(r.label + ' pencil carries the ruled aria-label', /aria-label="Change mile time"/.test(h));
 });
-ok('run_base renders no Run paces group at all', !/det-label[^>]*>Run paces/.test(detail(mkProg(PENCIL_GRID[1].cfg))));
-ok('beginner still renders the Run paces group (chips, no pencil)', /det-label[^>]*>Run paces/.test(detail(mkProg(PENCIL_GRID[2].cfg))));
+if(!PENCIL_D188){
+  ok('run_base renders no Run paces group at all', !/det-label[^>]*>Run paces/.test(detail(mkProg(PENCIL_GRID[1].cfg))));
+  ok('beginner still renders the Run paces group (chips, no pencil)', /det-label[^>]*>Run paces/.test(detail(mkProg(PENCIL_GRID[2].cfg))));
+} else {
+  ok('D189 era: run_base renders the Run paces group', /det-label[^>]*>Run paces/.test(detail(mkProg(PENCIL_GRID[1].cfg))));
+  ok('D188 era: beginner renders the Run paces group (chips and pencil)', /det-label[^>]*>Run paces/.test(detail(mkProg(PENCIL_GRID[2].cfg))));
+}
 
 // ── 5. commit: from is ALWAYS emitted ─────────────────────────────────────────
 console.log('\n5. commitMileChange writes kind:edited and ALWAYS writes from');
@@ -333,7 +356,7 @@ eq('2:30 rejected, value unchanged', g.mileBestMins + ':' + g.mileBestSecs, '10:
 eq('2:30 uses the ' + MILE_MSG_TAG + ' under-3:00 string', toasts[0], MSG_UNDER_3);
 g = commit('26', '00');
 eq('26:00 rejected, value unchanged', g.mileBestMins + ':' + g.mileBestSecs, '10:30');
-eq('26:00 uses the ' + MILE_MSG_TAG + ' over-25:00 string', toasts[0], MSG_OVER_25);
+eq('26:00 uses the ' + OVER_25_TAG + ' over-25:00 string', toasts[0], MSG_OVER_25);
 g = commit('4', '10');
 eq('4:10 advises but COMMITS', g.mileBestMins + ':' + g.mileBestSecs, '4:10');
 ok('4:10 toast leads with the ruled sentence', toasts[0].indexOf(COMMIT_TOAST) === 0, toasts[0]);
@@ -392,6 +415,6 @@ IA.buildProgram(IA.fixtures.HALF_MANNY);
 eq('buildProgram left cfg byte-identical (no _racePin, no scratch)', JSON.stringify(IA.fixtures.HALF_MANNY), cfgBefore);
 
 console.log('\nERA race-date rows: ' + RACEDATE_ERA);
-console.log('ERA mile validator strings: ' + MILE_MSG_ERA);
+console.log('ERA mile validator strings: ' + MILE_MSG_ERA + (eraV >= D189_ERA ? '; over-25:00 is D189 era (ia-version ' + eraV + ' >= ' + D189_ERA + '): P-PACEDISCLOSE F4' : ''));
 console.log('PASS ' + pass + ' FAIL ' + fail);
 process.exit(fail ? 1 : 0);

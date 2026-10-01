@@ -1,0 +1,187 @@
+== P2a anchor counts (candidate /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/f12a37a6-7352-4251-8d99-97802f07477d/scratchpad/measureC/cand.html)
+S1   anchor count 1  E4 :3815 restore beginner clause (buildRunSession)
+S2   anchor count 1  E5 :4376 restore beginner clause (buildNRCSession)
+S3   anchor count 1  E3 :3179 restore beginner clause (calcProgramLength)
+S4   anchor count 1  E1 :2433 restore beginner clause (assessRunPaceCeiling)
+S5   anchor count 1  E6 restore if(!g||exp===beginner) early return
+S6   anchor count 1  E6 drop && exp!==beginner from R3
+S7   anchor count 1  E9 :2876 restore wizard guard
+S8   anchor count 1  E10 restore pencil guard kind!==beginner
+S9   anchor count 1  E7 restore kind===beginner branch
+S10  anchor count 1  D189 remove d189DefaultAnchorNote( call
+S11  anchor count 1  D189 delete return; after the append
+S12  anchor count 1  D189 weeks['1'] -> weeks['2']
+S13  anchor count 1  D189 'run_base' out of _CHART_RUN_GOALS
+S14  anchor count 1  D189 run_base chips branch removed
+S15  anchor count 1  D189 D9 >25:00 old string
+S16  anchor count 1  D189 F5 header branch removed
+S17  anchor count 1  D189 helper returns V225 label
+S18  anchor count 1  D189 _mileEntryState().blank ? null : removed
+S19  anchor count 1 in tests/gates/g222_d181_chain.js  LIC5L_ERAS without 226 (gate file)
+
+== P2b behaviour fingerprint (independent lattice: 72 builds, 36 anchor strings, 36 cards, 91 validator calls, 42 wizard renders, 42 ceiling calls)
+candidate == itself: 0 differing of 307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"0/36","ceiling":"0/36"}
+S1   MOVES 8/307 {"progs":"8/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"0/36","ceiling":"0/36"}
+       first progs beginner|run_pace_goal|540|1000
+S2   MOVES 16/307 {"progs":"16/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"0/36","ceiling":"0/36"}
+       first progs beginner|run_5k|540|1000
+S3   NO-OP 0/307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"0/36","ceiling":"0/36"}
+S4   MOVES 4/307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"2/36","ceiling":"2/36"}
+       first wizard beginner|run_pace_goal|540|12:0
+       first ceiling beginner|run_pace_goal|540|12:0
+S5   MOVES 21/307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"21/91","wizard":"0/36","ceiling":"0/36"}
+       first validator beginner|run_pace_goal|2:30
+S6   MOVES 3/307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"1/91","wizard":"2/36","ceiling":"0/36"}
+       first validator beginner|run_pace_goal|blank
+       first wizard beginner|run_pace_goal|0|12:0
+S7   MOVES 8/307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"8/36","ceiling":"0/36"}
+       first wizard beginner|run_5k|0|-
+S8   NO-OP 0/307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"0/36","ceiling":"0/36"}
+S9   MOVES 36/307 {"progs":"12/72","anchor":"18/36","card":"6/36","validator":"0/91","wizard":"0/36","ceiling":"0/36"}
+       first progs beginner|run_pace_goal|0|1000
+       first anchor beginner|run_pace_goal|0|1000
+       first card beginner|run_pace_goal|540|1000
+S10  MOVES 24/307 {"progs":"24/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"0/36","ceiling":"0/36"}
+       first progs beginner|run_pace_goal|0|1000
+S11  MOVES 20/307 {"progs":"20/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"0/36","ceiling":"0/36"}
+       first progs beginner|run_pace_goal|0|1000
+S12  MOVES 24/307 {"progs":"24/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"0/36","ceiling":"0/36"}
+       first progs beginner|run_pace_goal|0|1000
+S13  MOVES 22/307 {"progs":"4/72","anchor":"6/36","card":"6/36","validator":"0/91","wizard":"6/36","ceiling":"0/36"}
+       first progs beginner|run_base|0|1000
+       first anchor beginner|run_base|0|1000
+       first card beginner|run_base|0|1000
+       first wizard beginner|run_base|0|-
+S14  MOVES 12/307 {"progs":"0/72","anchor":"6/36","card":"6/36","validator":"0/91","wizard":"0/36","ceiling":"0/36"}
+       first anchor beginner|run_base|0|1000
+       first card beginner|run_base|0|1000
+S15  MOVES 16/307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"16/91","wizard":"0/36","ceiling":"0/36"}
+       first validator beginner|run_pace_goal|30:00
+S16  MOVES 4/307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"4/36","ceiling":"0/36"}
+       first wizard intermediate|run_pace_goal|0|12:0
+S17  MOVES 36/307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"36/36","ceiling":"0/36"}
+       first wizard beginner|run_pace_goal|0|12:0
+S18  MOVES 2/307 {"progs":"0/72","anchor":"0/36","card":"0/36","validator":"0/91","wizard":"2/36","ceiling":"0/36"}
+       first wizard intermediate|run_pace_goal|0|12:0
+
+== P2c gate trips (new FAIL rows vs the candidate; candidate FAIL set shown first)
+cand g226_d188_beginnermile PASS 25 FAIL 1 fails: G5
+cand g226_d189_pacedisclose PASS 18 FAIL 0 fails: none
+cand g222_d181_chain PASS 8 FAIL 0 fails: none
+S1   beh 8    | g226_d188 PASS 22 FAIL 4 new[G1,G1,G1] | g226_d189 PASS 18 FAIL 0 new[-] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G1 D188 run_base beginner mile 13:00: W1 easy run "Around" pace equals the 12:00 row Recovery 14:30 (doctrine)
+       FAIL G1 D188 run_pace_goal beginner mile 9:00 at 18-35: W1 detail pace tokens equal the INTERMEDIATE cell, same mile and seed (differential, not a han
+       FAIL G1 D188 run_base beginner mile 9:00 at 18-35: W1 detail pace tokens equal the INTERMEDIATE cell, same mile and seed (differential, not a hand lit
+S2   beh 16   | g226_d188 PASS 21 FAIL 5 new[G1,G1,G1,G1] | g226_d189 PASS 18 FAIL 0 new[-] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G1 D188 run_5k beginner mile 13:00: every W1 NRC labeled pace equals the 12:00 chart row typed from doctrine (5K 12:40, Recovery 14:30), 5K and R
+       FAIL G1 D188 run_half beginner mile 13:00: every W1 NRC labeled pace equals the 12:00 chart row typed from doctrine (5K 12:40, Recovery 14:30), 5K and
+       FAIL G1 D188 run_5k beginner mile 9:00 at 18-35: W1 detail pace tokens equal the INTERMEDIATE cell, same mile and seed (differential, not a hand liter
+       FAIL G1 D188 run_half beginner mile 9:00 at 18-35: W1 detail pace tokens equal the INTERMEDIATE cell, same mile and seed (differential, not a hand lit
+S3   beh 0    | g226_d188 PASS 24 FAIL 2 new[G1] | g226_d189 PASS 18 FAIL 0 new[-] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G1 D188 length cell: beginner, goal 1.5 mi in 13:30, mile 9:00 -> 9 (gap 0 by hand, beginner base floor)
+S4   beh 4    | g226_d188 PASS 25 FAIL 1 new[-] | g226_d189 PASS 18 FAIL 0 new[-] | g222_d181 PASS 8 FAIL 0 new[-]
+S5   beh 21   | g226_d188 PASS 20 FAIL 6 new[G3,G3,G3,G3,G3] | g226_d189 PASS 18 FAIL 0 new[-] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G3 D188 beginner 2:30 on all 5 run goals -> {"ok":false,"msg":"Under 3:00 is not a mile time. The world record is 3:43. Check the entry."}
+       FAIL G3 D188 beginner 30:00 on all 5 run goals -> {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Check the entry."}
+       FAIL G3 D188 beginner 13:00 on all 5 run goals -> {"ok":true,"adv":"At 13:00 your paces come from the 12:00 row, the chart’s slowest. Consider a base 
+       FAIL G3 D188 beginner 4:30 on all 5 run goals -> {"ok":true,"adv":"At 4:30 your paces come from the chart’s fastest row, 5:00. It tops out there."}
+       FAIL G3 D188 D116 sheet call _mileEntryState({mileBestMins:'30',mileBestSecs:'0'},'beginner') -> {"ok":false,"msg":"Over 25:00 reads as a walk, not a 
+S6   beh 3    | g226_d188 PASS 25 FAIL 1 new[G3] healed[G5] | g226_d189 PASS 17 FAIL 1 new[G8] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G3 D188 beginner blank mile on all 5 run goals -> {"ok":true}
+       FAIL G8f D189 beginner run_pace_goal, no mile: the generic feasibility form
+S7   beh 8    | g226_d188 PASS 24 FAIL 2 new[G4] | g226_d189 PASS 17 FAIL 1 new[G8] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G4 D188 beginner wizard render on all 5 run goals: "Current mile time" exactly 1 and id="mileAdvisory" exactly 1
+       FAIL G8a D189 wizard helper under "Current mile time", 4 goals x 3 levels
+S8   beh 0    | g226_d188 PASS 24 FAIL 2 new[G5] | g226_d189 PASS 18 FAIL 0 new[-] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G5 D188 kind!=='beginner': 0
+S9   beh 36   | g226_d188 PASS 25 FAIL 1 new[-] | g226_d189 PASS 17 FAIL 1 new[G6] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G6b D189 S1: every no-mile program (6 goals x 3 levels x 20 seeds x 2 rest, R3 cells excluded) carries exactly one S1 note, on the V225 grid's fi
+S10  beh 24   | g226_d188 PASS 25 FAIL 1 new[-] | g226_d189 PASS 17 FAIL 1 new[G6] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G6b D189 S1: every no-mile program (6 goals x 3 levels x 20 seeds x 2 rest, R3 cells excluded) carries exactly one S1 note, on the V225 grid's fi
+S11  beh 20   | g226_d188 PASS 25 FAIL 1 new[-] | g226_d189 PASS 17 FAIL 1 new[G6] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G6b D189 S1: every no-mile program (6 goals x 3 levels x 20 seeds x 2 rest, R3 cells excluded) carries exactly one S1 note, on the V225 grid's fi
+S12  beh 24   | g226_d188 PASS 25 FAIL 1 new[-] | g226_d189 PASS 17 FAIL 1 new[G6] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G6b D189 S1: every no-mile program (6 goals x 3 levels x 20 seeds x 2 rest, R3 cells excluded) carries exactly one S1 note, on the V225 grid's fi
+S13  beh 22   | g226_d188 PASS 25 FAIL 1 new[-] | g226_d189 PASS 13 FAIL 5 new[G6,G7,G7,G7,G8] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G6b D189 S1: every no-mile program (6 goals x 3 levels x 20 seeds x 2 rest, R3 cells excluded) carries exactly one S1 note, on the V225 grid's fi
+       FAIL G7a D189 card: default sentence, 3 levels x {run_5k, run_half, run_base} + beginner run_pace_goal
+       FAIL G7b D189 clipboard: default Run anchor line, same 10 cells
+       FAIL G7c D189 run_base card: Run paces chips exactly [Mile, Recovery] with one pencil, 3 levels
+       FAIL G8a D189 wizard helper under "Current mile time", 4 goals x 3 levels
+S14  beh 12   | g226_d188 PASS 25 FAIL 1 new[-] | g226_d189 PASS 16 FAIL 2 new[G7,G7] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G7b D189 clipboard: default Run anchor line, same 10 cells
+       FAIL G7c D189 run_base card: Run paces chips exactly [Mile, Recovery] with one pencil, 3 levels
+S15  beh 16   | g226_d188 PASS 23 FAIL 3 new[G3,G3] | g226_d189 PASS 17 FAIL 1 new[G8] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G3 D188 beginner 30:00 on all 5 run goals -> {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Check the entry."}
+       FAIL G3 D188 D116 sheet call _mileEntryState({mileBestMins:'30',mileBestSecs:'0'},'beginner') -> {"ok":false,"msg":"Over 25:00 reads as a walk, not a 
+       FAIL G8b D189 D9 >25:00 string (validator and rendered #mileAdvisory)
+S16  beh 4    | g226_d188 PASS 25 FAIL 1 new[-] | g226_d189 PASS 17 FAIL 1 new[G8] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G8c D189 intermediate/advanced run_pace_goal, no mile: #progLenLine header (template and repaint)
+S17  beh 36   | g226_d188 PASS 25 FAIL 1 new[-] | g226_d189 PASS 17 FAIL 1 new[G8] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G8a D189 wizard helper under "Current mile time", 4 goals x 3 levels
+S18  beh 2    | g226_d188 PASS 25 FAIL 1 new[-] | g226_d189 PASS 17 FAIL 1 new[G8] | g222_d181 PASS 8 FAIL 0 new[-]
+       FAIL G8d D189 intermediate/advanced run_pace_goal, no mile: #paceFeasLine empty
+S19  beh n/a(gate) | g222_d181 PASS 7 FAIL 1 new[row 5L]
+       FAIL row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras 222, 223, 224, 225); every residu
+
+== P1 G5 token scan
+candidate: 16 'beginner' tokens in comment-stripped source (newline-preserving pass agrees: true)
+  index.html:7491  window-needed     74 (mileBest)  IN-120  if(g.id==='run_pace_goal' && exp!=='beginner') return {ok:false, 
+  index.html:3195  window-needed    545 (mileBest)         tDist <= 5.0 ? 15 : 21; if(experience === 'beginner') { 
+  index.html:7506  window-needed    868 (mileBest)         termediate'; if(g.id==='run_pace_goal' && exp!=='beginner') return 'Required. 
+  index.html:3224  window-needed   1920 (mileBest)         ediate'; var rcur; if(expTier === 'beginner') { 
+  index.html:3234  window-needed   2290 (mileBest)         Id === 'run_5k') { needed = expTier === 'beginner' ? weeksToReach(rcur
+  index.html:3236  window-needed   2462 (mileBest)         d === 'run_10k') { needed = expTier === 'beginner' ? weeksToReach(rcur
+  index.html:3720  window-needed   3162 (mileBest)         |longStarts.run_base)[exp]; if(exp === 'beginner') { const RUN_FL
+  index.html:3715  window-needed   3322 (mileBest)         ; const exp = (experience === 'beginner' || experience === '
+  index.html:2698  window-needed   3645 (mileBest)         ap:8px;margin-bottom:20px"> ${[ {id:'beginner', icon:'🌱', lab
+  index.html:6761  window-needed  14750 (mileBest)          if(prev&&rpe==='8')rpe='7'; if(exp==='beginner' && wk){ if(wk<=2) r
+  index.html:6782  window-needed  15305 (mileBest)         (weeks, cfg){ const beg=(cfg&&cfg.experience)==='beginner'; Object.keys(week
+  index.html:8231  window-needed  25225 (mileBest)         (w)); if(cfg.experience==='beginner' && !wv._taper && !w
+  index.html:8282  window-needed  26410 (mileBest)          const _begEase = cfg.experience==='beginner' && !wv._taper && !w
+  index.html:4945  window-needed  28007 (mileBest)         (baselineMiles, experience) { if(experience !== 'beginner') return 0; const 
+  index.html:8410  window-needed  29267 (mileBest)         ool.length<=3 ? 2 : 3; const start = exp==='beginner' ? 0 
+  index.html:8933  window-needed  46179 (mileBest)         baseline.'; const isBeginner=cfg.experience==='beginner'; const restNote
+S1: tokens 17 (+1); restored/changed: line 3817 need 17 (arguments[12]) ] || 570; const _mileBestSecs = (experience !== 'beginner' && arguments[12]) ?
+     G5 literal tokens [kind===, kind!==, 'beginner default', beginner default of]: 0,0,0,0
+S2: tokens 17 (+1); restored/changed: line 4378 need 12 (mileBest) ate'] || 570; const anchorSec = (experience !== 'beginner' && mileBestSecs) ? 
+     G5 literal tokens [kind===, kind!==, 'beginner default', beginner default of]: 0,0,0,0
+S3: tokens 17 (+1); restored/changed: line 3181 need 17 (mileBest)  var _mileBestSecs = (experience !== 'beginner' && goal.mileBestMin
+     G5 literal tokens [kind===, kind!==, 'beginner default', beginner default of]: 0,0,0,0
+S4: tokens 17 (+1); restored/changed: line 2436 need 14 (mileBest) :450}[exp] || 570; const mileBest = (exp !== 'beginner' && g.mileBestMins !
+     G5 literal tokens [kind===, kind!==, 'beginner default', beginner default of]: 0,0,0,0
+S5: tokens 17 (+1); restored/changed: line 7486 need 35 (mileBest) D!=='undefined')?WD.experience:''; if(!g||exp==='beginner') return {ok:true}; 
+     G5 literal tokens [kind===, kind!==, 'beginner default', beginner default of]: 0,0,0,0
+S6: tokens 15 (+-1); restored/changed: none
+     G5 literal tokens [kind===, kind!==, 'beginner default', beginner default of]: 0,0,0,0
+S7: tokens 17 (+1); restored/changed: line 2878 need 438 (mileBest) iv> ${(t==='run' && WD.experience !== 'beginner') ? `<div class="inp
+     G5 literal tokens [kind===, kind!==, 'beginner default', beginner default of]: 0,0,0,0
+S8: tokens 17 (+1); restored/changed: line 14848 need 7536 (mileBest) ems:center;gap:7px">Run paces${s.runAnchor.kind!=='beginner'?`<button onclick="e
+     G5 literal tokens [kind===, kind!==, 'beginner default', beginner default of]: 0,1,0,0
+S9: tokens 18 (+2); restored/changed: line 14742 need 44 (mileBest) c = g.mileBestSrc || null; const kind = exp === 'beginner' ? 'beginner' : !ent || line 14742 need 57 (mileBest) tSrc || null; const kind = exp === 'beginner' ? 'beginner' : !entered ? 'defau
+     G5 literal tokens [kind===, kind!==, 'beginner default', beginner default of]: 0,0,0,0
+
+== P3 old sabotage specs: anchors not count==1 on the candidate (and their count on V225)
+  example.json #2 cand 0 v225 0 gate gates/g000_boot.js | no-op mutation (must report NOT-APPLIED, not SURVIVED)
+  v193_samecard.json #13 cand 0 v225 0 gate gates/g193_samecard.js | M13 -> G1: _accFresh is wired but reads an empty card, so both push sections believe nothing is taken
+  v195.json #12 cand 0 v225 0 gate gates/g195_wildcard.js | M12 (gk P2) -> the week-view tag is dropped out of the innerHTML concatenation while the _wcTag variable stays
+  v197.json #4 cand 0 v225 0 gate gates/g197b_sweep.js | M4 -> D76 dropped: the same-card subtraction is gone, so Wall sit prints under Knee stability and again under 
+  v200.json #2 cand 0 v225 0 gate gates/g200_pull_arbitration.js | M4 -> the Pull superset B conditioning slot stops drawing from the conditioning pool and repeats the day's fir
+  v200.json #3 cand 0 v225 0 gate gates/g199_deload_arbitration.js | M5 -> the Pull superset B conditioning slot is pinned to a hinge on every tier and every goal, so pull cards o
+  v201.json #4 cand 0 v225 0 gate gates/g199_deload_arbitration.js | M4 -> the candidate declares ia-version 202, a version no era row exists for, so every gate that keys a fixtur
+  v202.json #2 cand 0 v225 1 gate gates/g202_pace_anchor.js | M2 -> the beginner guard is dropped from the single place that computes the entered mile in seconds. D100 stil
+  v202.json #8 cand 0 v225 1 gate gates/g202_pace_copy.js | M8 -> E5's goal scoping is reverted: the anchor card tells a pace-goal athlete that EVERY pace in the program 
+  v202.json #9 cand 0 v225 1 gate gates/g202_pace_copy.js | M9 -> E6 is reverted: the rendered card keeps the ruled week-1 scope but the CLIPBOARD line drops it, so the t
+  v202.json #11 cand 0 v225 1 gate gates/g202_pace_copy.js | M11 -> the beginner exclusion is dropped from the clipboard mirror only. A beginner's card ends on its own sen
+  v203.json #3 cand 0 v225 1 gate gates/g203_mile_pencil.js | M3 -> the beginner exclusion is dropped from the pencil. A beginner's Run paces group now carries an edit penc
+  v225.json #5 cand 0 v225 1 gate gates/g225_d187_pacerate.js | M5 -> D187 R3's goal-scoping dropped: the g.id==='run_pace_goal' condition is removed from the blank-mile refu
+  13 of 535 mutations NOT count==1 on the candidate
+
+== P4 NSW SI W1 hand oracle, beginner run_pace_goal 1.5 mi 12:00, mile 13:00, seed 1000
+  hand: initialPace = 720 + 40*ln1.5/ln3.107 = 734.31 (12:14); SI = init - 16 = 718.31 (11:58); row.mile - 2 = 718 (11:58)
+  cand mile 13:00 goal 1.5 in 12:0 L11: mon 4x400m at 11:58/mi. This week's goal pace is 12:14/mi.
+  cand mile 13:00 goal 1.5 in 13:30 L11: mon 4x400m at 11:58/mi. This week's goal pace is 12:14/mi.
+  cand mile 9:00 goal 1.5 in 12:0 L11: mon 4x400m at 8:58/mi. This week's goal pace is 9:14/mi.
+  v225 mile 13:00 goal 1.5 in 12:0 L11: mon 4x400m at 11:30/mi. This week's goal pace is 11:46/mi.
+  v225 mile 13:00 goal 1.5 in 13:30 L11: mon 4x400m at 11:30/mi. This week's goal pace is 11:46/mi.
+  v225 mile 9:00 goal 1.5 in 12:0 L11: mon 4x400m at 11:30/mi. This week's goal pace is 11:46/mi.

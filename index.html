@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="225"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="226"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1994,6 +1994,9 @@ function wizardTestPin(){
 function progLenLineHTML(p, len){
   if(p === undefined) p = wizardTestPin();
   if(len === undefined) len = p ? p.len : ((WD.cardioTypes||[]).length ? calcProgramLength(WD.cardioTypes, {...WD.cardioGoals, _experience:WD.experience||'intermediate', _ageBracket:WD.ageBracket||'18-35', _eventTargeted:WD.eventTargeted}, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks : 6);
+  // D189 (P-PACEDISCLOSE F5): a required mile left blank has no length to print yet. A dated test pin
+  // still prints its test week: that length is true without a mile.
+  const _ms=(typeof _mileEntryState==='function')?_mileEntryState():{ok:true}; if(!(p && p.tw) && _ms.blank) return '<b style="color:var(--accent)">Program length: your mile time sets it.</b> Enter your current mile time and the length appears.';
   const n = (p && p.tw) || len;
   return '<b style="color:var(--accent)">Program length: '+n+(n === 1 ? ' week.' : ' weeks.')+'</b> '+((p && p.tw) ? 'Your test sets it.' : 'Set by your longest cardio goal and your experience.');
 }
@@ -2277,7 +2280,7 @@ function updateRaceDateFeedback() {
   if(input && input.value) WD.raceDate = input.value;
   const p = wizardTestPin();
   const len = p ? p.len : ((WD.cardioTypes||[]).length ? calcProgramLength(WD.cardioTypes, {...WD.cardioGoals, _experience:WD.experience||'intermediate', _ageBracket:WD.ageBracket||'18-35', _eventTargeted:WD.eventTargeted}, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks : 6);
-  const _f = assessRunPaceCeiling((p && p.tw) || len);   // D183 amendment 2 (f): L is the program's length, the test week when one pins, else the header's len
+  const _f = _mileEntryState().blank ? null : assessRunPaceCeiling((p && p.tw) || len);   // D183 amendment 2 (f): L is the program's length, the test week when one pins, else the header's len
   const _ll = document.getElementById('progLenLine');
   if(_ll) _ll.innerHTML = progLenLineHTML(p, len);
   updatePaceDisplay();
@@ -2426,11 +2429,11 @@ function assessRunPaceCeiling(L) {
   if(!(tDist > 0) || !(tTotal > 0)) return null;
   const tPacePerMile = tTotal / tDist;
   // Current pace, mirroring calcProgramLength exactly: the user's entered mile time when
-  // present (non-beginner), otherwise the experience-default. Using the SAME baseline the
+  // present (any level since D188), otherwise the experience-default. Using the SAME baseline the
   // length engine uses is essential — otherwise a fast runner who entered a quick mile time
   // gets told to slow below their current pace.
   const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[exp] || 570;   // V176 (D9)
-  const mileBest = (exp !== 'beginner' && g.mileBestMins !== undefined && g.mileBestMins !== '')
+  const mileBest = (g.mileBestMins !== undefined && g.mileBestMins !== '')
     ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0)
     : null;
   const currentPace = mileBest || expCurrentPace;
@@ -2456,7 +2459,6 @@ function paceCeilingSentence(f) {
   const wk = f.L + (f.L === 1 ? ' week' : ' weeks');
   const reach = ' In '+wk+' that reaches about '+f.distLabel+' in '+_clkMS(f.safeTotal)+'. Your goal is '+_clkMS(f.tTotal)+'.';
   if(f.fromMile) return 'Your mile is '+_clkMS(f.cur)+'.'+reach+' Keep it or change it above.';
-  if(f.exp === 'beginner') return 'Your paces start from the beginner default of '+_clkMS(f.cur)+' per mile.'+reach+' Keep it or change it above.';
   return 'You have not entered a mile time. The '+f.exp+' default is '+_clkMS(f.cur)+' per mile.'+reach+' Enter your mile above and this updates.';
 }
 // D183 (amendment 3): the undated #paceFeasLine frame. The accent frame around the R1 sentence and nothing
@@ -2852,8 +2854,8 @@ function renderWizardStep() {
                 <span style="font-size:13px;color:var(--muted);flex-shrink:0">${WD.cardioGoals['run']?.paceUnit||'mi'}</span>
               </div>
             </div>
-            ${WD.experience !== 'beginner' ? `<div class="input-group" style="margin-top:8px">
-              <div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400">Optional. It sets your training paces.</span></div>
+            <div class="input-group" style="margin-top:8px">
+              <div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400">${_mileFieldHelp()}</span></div>
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="flex:1;text-align:center">
                   <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updateRaceDateFeedback();updateMileAdvisory()" min="3" max="20">
@@ -2865,7 +2867,7 @@ function renderWizardStep() {
                   <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
                 </div>
               </div>${_mileAdvisoryHTML()}
-            </div>` : ''}` : `
+            </div>` : `
             ${t==='run'?_seedBannerHTML():''}<div class="input-group" style="margin-top:10px">
               <div class="input-label">${t==='run'?'How far can you currently run?':t==='bike'?'How long can you currently ride?':'How far can you currently swim?'} (optional)</div>
               <div style="display:flex;gap:8px;align-items:center">
@@ -2873,8 +2875,8 @@ function renderWizardStep() {
                 <span style="font-size:13px;color:var(--muted);flex-shrink:0">${t==='run'?'mi':t==='bike'?'min':'yards'}</span>
               </div>
             </div>
-            ${(t==='run' && WD.experience !== 'beginner') ? `<div class="input-group" style="margin-top:8px">
-              <div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400">Optional. It sets your training paces.</span></div>
+            ${(t==='run') ? `<div class="input-group" style="margin-top:8px">
+              <div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400">${_mileFieldHelp()}</span></div>
               <div style="display:flex;align-items:center;gap:6px">
                 <div style="flex:1;text-align:center">
                   <input type="number" class="input-field" style="text-align:center" placeholder="min" value="${g.mileBestMins||''}" oninput="WD.cardioGoals['run'].mileBestMins=this.value;WD.cardioGoals['run'].mileBestSrc={kind:'entered'};updateRaceDateFeedback();updateMileAdvisory()" min="3" max="20">
@@ -3176,7 +3178,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         var tPacePerMile = _pgT.tPacePerMile;
         // Use the user's actual mile time if entered, otherwise fall back to experience default.
         // This makes program length consistent with the pace targets shown in sessions.
-        var _mileBestSecs = (experience !== 'beginner' && goal.mileBestMins !== undefined && goal.mileBestMins !== '')
+        var _mileBestSecs = (goal.mileBestMins !== undefined && goal.mileBestMins !== '')
           ? (+goal.mileBestMins||0)*60 + (+goal.mileBestSecs||0)
           : null;
         var currentPaceForCalc = _mileBestSecs || expCurrentPace;
@@ -3809,10 +3811,10 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
 
   // ── PACE CHART ANCHOR ──
   // Derive training paces from the NRC pace chart using the user's mile best if provided,
-  // otherwise fall back to experience-based defaults. Beginner always uses default (11:30/mi).
+  // otherwise fall back to experience-based defaults. A beginner's entry is read like anyone's (D188).
   // mileBestSecs pre-converted and passed as arguments[12] from the schedule builder.
   const _expCurrentPace = {beginner:690, intermediate:570, advanced:450}[experience||'intermediate'] || 570;
-  const _mileBestSecs = (experience !== 'beginner' && arguments[12]) ? arguments[12] : null;
+  const _mileBestSecs = arguments[12] ? arguments[12] : null;
   const _anchorSec = _mileBestSecs || _expCurrentPace;
   const _chartRow = paceChartLookup('mile', _anchorSec);
   const _fmtPace = s => _clkMS(s) + '/mi';   // D126 (V204): seconds limb owned by _clkMS
@@ -4373,7 +4375,7 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
 
   // Pace chart anchor — mile best if provided, else experience default
   const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[experience||'intermediate'] || 570;
-  const anchorSec = (experience !== 'beginner' && mileBestSecs) ? mileBestSecs : expCurrentPace;
+  const anchorSec = mileBestSecs ? mileBestSecs : expCurrentPace;
   const chartRow = paceChartLookup('mile', anchorSec);
   const fmt = s => _clkMS(s) + '/mi';   // D126 (V204): seconds limb owned by _clkMS. Suffix stays here.
   // V171 (D1): {mile} is Nike's first chart column — the row anchor itself. Every "Mile
@@ -7474,18 +7476,19 @@ function showLengthWarning(msg, weeks, onConfirm){
 }
 // ── V176 (D9): mile-time validation. The chart clamps silently (5:00–12:00 rows);
 // impossible entries are rejected here, and out-of-chart entries are told what the
-// clamp will do BEFORE the build. Beginners never see the field; their entry is
-// ignored by every consumer, so they pass clean.
+// clamp will do BEFORE the build. D188: beginners see the field too and their
+// entry is read, so D9 judges it at every level; a blank stays optional for them.
 function _mileEntryState(g, exp){
   // V203 (D116): (g, exp) default to the wizard draft so the mid-program mile
   // sheet and the wizard share ONE validator and one set of strings.
   if(g===undefined) g=(typeof WD!=='undefined'&&WD.cardioGoals)?WD.cardioGoals.run:null;
   if(exp===undefined) exp=(typeof WD!=='undefined')?WD.experience:'';
-  if(!g||exp==='beginner') return {ok:true};
+  if(!g) return {ok:true};
   if(g.mileBestMins===undefined||g.mileBestMins===''){
     // D187 R3 (V225): a run_pace_goal with no mile has no anchor to build the clock from --
     // D110a's swim gate is the model. Every OTHER run goal type still passes through blank.
-    if(g.id==='run_pace_goal') return {ok:false, blank:true, msg:'Required. Enter your most recent timed mile.'};
+    // D188: beginners stay optional on every goal.
+    if(g.id==='run_pace_goal' && exp!=='beginner') return {ok:false, blank:true, msg:'Required. Enter your most recent timed mile.'};
     return {ok:true};
   }
   const mm=+g.mileBestMins, ss=+(g.mileBestSecs||0);
@@ -7493,10 +7496,17 @@ function _mileEntryState(g, exp){
   // D183 (P-SAFEPACE amendment 2 (e)): no mid-sentence dashes; the D116 mile sheet shares these strings.
   if(!(mm>=0)||!(ss>=0)||ss>=60||!isFinite(sec)) return {ok:false,msg:'That mile time is not a real time. Check the minutes and seconds.'};
   if(sec<180) return {ok:false,msg:'Under 3:00 is not a mile time. The world record is 3:43. Check the entry.'};
-  if(sec>1500) return {ok:false,msg:'Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead.'};
+  if(sec>1500) return {ok:false,msg:'Over 25:00 reads as a walk, not a run. Check the entry.'};
   if(sec<300) return {ok:true,adv:'At '+_fmtMileAnchor(sec)+' your paces come from the chart\u2019s fastest row, 5:00. It tops out there.'};
   if(sec>720) return {ok:true,adv:'At '+_fmtMileAnchor(sec)+' your paces come from the 12:00 row, the chart\u2019s slowest. Consider a base block first.'};
   return {ok:true};
+}
+function _mileFieldHelp(){
+  const g=(WD.cardioGoals&&WD.cardioGoals.run)||{}; const exp=WD.experience||'intermediate';
+  if(g.id==='run_pace_goal' && exp!=='beginner') return 'Required. Your paces and your program length start from it.';
+  const a=runAnchorInfo({cardioTypes:['run'],cardioGoals:{run:{id:g.id||'run_base'}},experience:exp}); if(!a) return 'Optional.';
+  const m=_fmtMileAnchor(a.anchorSec), art=/^(8|11|18):/.test(m)?'an':'a';
+  return 'Optional. Leave it blank and your paces come from '+art+' '+m+' mile, the '+exp+' default. Enter a mile only if you have timed one.';
 }
 function _mileAdvisoryHTML(){
   const st=_mileEntryState(); const t=st.msg||st.adv||'';
@@ -10959,6 +10969,7 @@ function engineD_synthesis(cfg, A, B, plan, C){
   // that notices the section is no longer a superset.
   d18LongRunDayPass(weeks);   // V176 (D18): before the sweep, so demotions it causes are swept
   raceEveLiftPass(weeks, totalWeeks);   // V189 (D38): no lifting from two days out through the race
+  d189DefaultAnchorNote(weeks, {...cfg, cardioTypes, cardioGoals});   // V226 (D189 S1): after every note writer; a throwaway spread, cfg untouched
   singletonSupersetSweep(weeks);
   delete cfg._racePin;   // V188 (D14a): derived at build time, never stored — refreshProgram recomputes it
   // V208 (coach): a program with no lifting day prints no lift-placement note, on every arm. Read after
@@ -11026,6 +11037,20 @@ function _d18MobilityBlock(){
 // Hinge / legs / plyo vocabulary. Belt to the section-level drops: catches a hinge
 // riding a label the section rule keeps (a full day's "Main — Deadlift").
 const _D18_LEG_RX=/swing|clean|snatch|deadlift|romanian|\brdl\b|good morning|hip thrust|hip extension|glute bridge|squat|lunge|step-?up|\bleg\b|calf|calves|glute|nordic|broad jump|box jump|jump|bound|skater|wall ball|sled|pistol/i;
+// V226 (D189 S1): a program anchored on the experience default says so once, on the first paced
+// run of week 1, appended after the app-owned note (the V171 text stays an exact prefix). Self-
+// expiring: kind 'default' only, so a pencil edit rebuilds the future weeks and the sentence is gone.
+function d189DefaultAnchorNote(weeks, cfg){
+  const a = runAnchorInfo(cfg); if(!a || a.kind !== 'default') return;
+  const w1 = weeks['1'] || weeks[1]; if(!w1) return;
+  for(const d of _ISO_ORDER){ const day = w1[d]; if(!day || day.rest) continue;
+    for(const c of [].concat(day.cardio||[])){ if(!c || c.type!=='run') continue;
+      if(/RACE DAY|TIME TRIAL|^Benchmark Run/i.test(c.subtype||'') || (c.dose && c.dose.key==='bench')) continue;
+      if(!/\d:\d\d\/mi/.test(c.detail||'')) continue;
+      const m=_fmtMileAnchor(a.anchorSec), art=/^(8|11|18):/.test(m)?'an':'a';
+      c.note = (c.note ? c.note+' ' : '') + 'Paces here start from '+art+' '+m+' mile, the '+a.exp+' default. Tap the pencil on your program card to enter your mile time. Every run ahead of you rebuilds off it.';
+      return; } }
+}
 function d18LongRunDayPass(weeks){
   Object.keys(weeks).forEach(w=>{
     const wk=weeks[w]; if(!wk) return;
@@ -14696,36 +14721,36 @@ const _DAYF={sun:'Sun',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sa
 // mile anchor the athlete was never shown — the V156 seed writes it into the wizard as if
 // typed, and no surface stated it. These helpers are read-only over cfg; the engines keep
 // their own anchor logic and the assertion suite checks the two agree.
-const _CHART_RUN_GOALS = new Set(['run_half','run_marathon','run_5k','run_10k','run_pace_goal','run_mile_time','run_15_under10']);
+const _CHART_RUN_GOALS = new Set(['run_half','run_marathon','run_5k','run_10k','run_pace_goal','run_mile_time','run_15_under10','run_base']);
 function runAnchorInfo(cfg){
   const c = cfg || {};
   if(!(c.cardioTypes||[]).includes('run')) return null;
   const g = c.cardioGoals && c.cardioGoals.run;
-  if(!g || !g.id || !_CHART_RUN_GOALS.has(g.id)) return null;      // run_base prints no pace (V157)
+  if(!g || !g.id || !_CHART_RUN_GOALS.has(g.id)) return null;      // run_base easy runs pace off this row since V206 (D189)
   const exp = c.experience || 'intermediate';
   const expDef = {beginner:690, intermediate:570, advanced:450}[exp] || 570;
   const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0) : 0;
-  // Same rule as both engines: a beginner's entry is ignored; a falsy entry falls to the default.
-  const rawSec = (exp !== 'beginner' && entered) ? entered : expDef;
+  // Same rule as both engines: a falsy entry falls to the default (D188: every level).
+  const rawSec = entered ? entered : expDef;
   const row = paceChartLookup('mile', rawSec);
   // The chart CLAMPS: anything at or under its fastest row trains at that row, anything at
   // or over its slowest trains there. row.mile is the anchor the engines actually use, so
   // that is the number stated; when it differs from the entry, the sentence says so.
   const anchorSec = row.mile;
-  const clamped = (exp !== 'beginner' && !!entered && Math.round(row.mile) !== Math.round(rawSec)) ? (rawSec < row.mile ? 'fast' : 'slow') : null;
+  const clamped = (!!entered && Math.round(row.mile) !== Math.round(rawSec)) ? (rawSec < row.mile ? 'fast' : 'slow') : null;
   const src = g.mileBestSrc || null;
-  const kind = exp === 'beginner' ? 'beginner' : !entered ? 'default' : (src && src.kind === 'seeded') ? 'seeded' : (src && src.kind === 'edited') ? 'edited' : 'entered';
+  const kind = !entered ? 'default' : (src && src.kind === 'seeded') ? 'seeded' : (src && src.kind === 'edited') ? 'edited' : 'entered';
   const race = g.id === 'run_half' ? 'half' : g.id === 'run_marathon' ? 'marathon' : null;
   // V176 (D10): the fixed target for pace-goal programs. The chip is the prescription;
   // the measure of progress is the projection card walking toward it.
   const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
     ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
-  return {anchorSec, rawSec, clamped, row, kind, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
+  return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
 }
 function _fmtMileAnchor(sec){ return _clkMS(sec); }   // D126 (V204)
 function runAnchorChips(a){
   const r = a.row;
-  const list = [['Mile',r.mile],['5K',r.fiveK],['10K',r.tenK],['Tempo',r.tempo]];
+  const list = a.goalId==='run_base' ? [['Mile',r.mile]] : [['Mile',r.mile],['5K',r.fiveK],['10K',r.tenK],['Tempo',r.tempo]];
   if(a.race) list.push([a.race==='half'?'Half':'Marathon', r[a.race]]);
   list.push(['Recovery', r.recovery]);
   // V187 (F7): Nike's six-speed effort scale, printed on the unit line of NRC programs
@@ -14742,6 +14767,7 @@ function runAnchorSentence(a){
   const art = /^(8|11|18):/.test(m) ? 'an' : 'a';
   const tail = (a.goalId === 'run_pace_goal')
     ? ' Week 1 runs off this row. Every week after it moves toward your goal.'
+    : (a.goalId === 'run_base') ? ' Your easy runs take their pace and their ceiling from this row. Benchmark runs prescribe no pace.'
     : ' Every pace in this program comes from this row.';
   if(a.clamped){
     const raw = a.rawSec > 0 ? `the ${_fmtMileAnchor(a.rawSec)} you entered` : 'the mile time you entered';
@@ -14750,22 +14776,21 @@ function runAnchorSentence(a){
   }
   if(a.kind === 'seeded')   return `Anchored on ${art} <b>${m} mile</b>, worked back from ${a.n>0?a.n:'the'} recovery run${a.n===1?'':'s'} you logged in ${a.prog||'your last program'}.` + tail;
   if(a.kind === 'edited' && a.from){
-    const from = a.from.kind === 'default' ? 'estimated from experience'
+    const from = a.from.kind === 'default' ? 'the '+a.exp+' default'
                : _fmtMileAnchor((+a.from.mins||0)*60 + (+a.from.secs||0));
     return `Anchored on ${art} <b>${m} mile</b>, the time you entered in week ${a.wk}. Before that it was ${from}.` + tail;
   }
   if(a.kind === 'entered' || a.kind === 'edited')  return `Anchored on ${art} <b>${m} mile</b>, the time you entered.` + tail;
-  if(a.kind === 'beginner') return `Anchored on ${art} <b>${m} mile</b>, the beginner default. A mile time starts being used at intermediate.`;
-  return `Anchored on ${art} <b>${m} mile</b>, estimated from experience; no mile time was entered.` + tail;
+  return `Anchored on ${art} <b>${m} mile</b>, the ${a.exp} default. No mile time was entered. Tap the pencil to enter one.` + tail;
 }
 function runAnchorLine(a){
   const m = _fmtMileAnchor(a.anchorSec);
   const prov = a.clamped ? `entry ${a.rawSec>0?_fmtMileAnchor(a.rawSec):'invalid'} clamped to the chart's ${a.clamped==='fast'?'fastest':'slowest'} row`
              : a.kind==='seeded' ? `seeded from ${a.prog||'previous block'}, ${a.n} logged recovery run${a.n===1?'':'s'}`
              : a.kind==='edited' ? `edited in week ${a.wk}`
-             : a.kind==='entered' ? 'entered' : a.kind==='beginner' ? 'beginner default' : 'est. from experience';
+             : a.kind==='entered' ? 'entered' : a.exp+' default, no mile time entered';
   const chips = runAnchorChips(a).slice(1).map(c=>`${c.k.toLowerCase()} ${c.v}`).join(' / ');
-  const scope = (a.goalId === 'run_pace_goal' && a.kind !== 'beginner') ? ' | Week 1 runs off this row. Every week after it moves toward your goal.' : '';
+  const scope = (a.goalId === 'run_pace_goal') ? ' | Week 1 runs off this row. Every week after it moves toward your goal.' : '';
   return `Run anchor: ${m} mile (${prov}) → ${chips}${scope}`;
 }
 function progSelData(p){
@@ -14820,7 +14845,7 @@ function progDetailHTML(p){
       <div class="det-group"><div class="det-label">Profile</div>${row('Experience',s.experience)}${row('Age range',s.ageBracket)}${row('Equipment',s.equipLabel)}${row('Units',s.unit)}</div>
       <div class="det-group"><div class="det-label">Schedule</div>${row('Train days',days)}${row('Rest days',rest)}${row('Length',s.length+' weeks')}</div>
       <div class="det-group"><div class="det-label">Starting 1RM${estNote}</div><div class="det-lifts">${chip('Squat',s.lifts.squat)}${chip('Bench',s.lifts.bench)}${chip('Deadlift',s.lifts.deadlift)}</div></div>${s.runAnchor?`
-      <div class="det-group"><div class="det-label" style="display:inline-flex;align-items:center;gap:7px">Run paces${s.runAnchor.kind!=='beginner'?`<button onclick="event.stopPropagation();openMileSheet('${p.id}')" aria-label="Change mile time" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:2px;display:flex;align-items:center">${asyIcon('pencil',14)}</button>`:''}</div><div class="det-paces">${runAnchorChips(s.runAnchor).map(c=>`<div class="lift-chip"><div class="lc-k">${c.k}</div><div class="lc-v">${c.v}</div><div class="lc-u">${c.u}</div></div>`).join('')}</div><div class="det-src">${runAnchorSentence(s.runAnchor)}</div></div>`:''}
+      <div class="det-group"><div class="det-label" style="display:inline-flex;align-items:center;gap:7px">Run paces<button onclick="event.stopPropagation();openMileSheet('${p.id}')" aria-label="Change mile time" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:2px;display:flex;align-items:center">${asyIcon('pencil',14)}</button></div><div class="det-paces">${runAnchorChips(s.runAnchor).map(c=>`<div class="lift-chip"><div class="lc-k">${c.k}</div><div class="lc-v">${c.v}</div><div class="lc-u">${c.u}</div></div>`).join('')}</div><div class="det-src">${runAnchorSentence(s.runAnchor)}</div></div>`:''}
       <div class="det-group"><div class="det-label">Cardio</div>${cardioRows}</div>
       ${eventGroup}
       <div class="det-foot"><span class="det-seed">${s.seed!=null?'seed '+s.seed:''}</span><button class="copy-icon-btn" onclick="event.stopPropagation();copyProgSel('${p.id}')" aria-label="Copy program selections for troubleshooting" title="Copy for troubleshooting">${asyIcon('copy',15)}</button></div>

@@ -1,0 +1,286 @@
+ia-version 225
+
+== 1. REACHABILITY: doGenerate, no mile vs mile 8:00, 3 seeds per cell, rest sun/wed, hybrid path ==
+run_pace_goal  beginner     no-mile builds 3/3  mile-8:00 builds 3/3 
+run_pace_goal  intermediate no-mile builds 0/3  mile-8:00 builds 3/3  refusal: Required. Enter your most recent timed mile.
+run_pace_goal  advanced     no-mile builds 0/3  mile-8:00 builds 3/3  refusal: Required. Enter your most recent timed mile.
+run_5k         beginner     no-mile builds 3/3  mile-8:00 builds 3/3 
+run_5k         intermediate no-mile builds 3/3  mile-8:00 builds 3/3 
+run_5k         advanced     no-mile builds 3/3  mile-8:00 builds 3/3 
+run_10k        beginner     no-mile builds 3/3  mile-8:00 builds 3/3 
+run_10k        intermediate no-mile builds 3/3  mile-8:00 builds 3/3 
+run_10k        advanced     no-mile builds 3/3  mile-8:00 builds 3/3 
+run_half       beginner     no-mile builds 3/3  mile-8:00 builds 3/3 
+run_half       intermediate no-mile builds 3/3  mile-8:00 builds 3/3 
+run_half       advanced     no-mile builds 3/3  mile-8:00 builds 3/3 
+run_marathon   beginner     no-mile builds 3/3  mile-8:00 builds 3/3 
+run_marathon   intermediate no-mile builds 3/3  mile-8:00 builds 3/3 
+run_marathon   advanced     no-mile builds 3/3  mile-8:00 builds 3/3 
+run_base       beginner     no-mile builds 3/3  mile-8:00 builds 3/3 
+run_base       intermediate no-mile builds 3/3  mile-8:00 builds 3/3 
+run_base       advanced     no-mile builds 3/3  mile-8:00 builds 3/3 
+-- event path (eventTargeted, no race date), seed 1000, no mile:
+  run_pace_goal beginner    builds 11w
+  run_pace_goal intermediateREFUSED Required. Enter your most recent timed mile.
+  run_pace_goal advanced    REFUSED Required. Enter your most recent timed mile.
+  run_5k        beginner    builds 8w
+  run_5k        intermediatebuilds 8w
+  run_5k        advanced    builds 8w
+  run_10k       beginner    builds 8w
+  run_10k       intermediatebuilds 8w
+  run_10k       advanced    builds 8w
+  run_half      beginner    builds 14w
+  run_half      intermediatebuilds 14w
+  run_half      advanced    builds 14w
+  run_marathon  beginner    builds 18w
+  run_marathon  intermediatebuilds 18w
+  run_marathon  advanced    builds 18w
+  run_base      beginner    builds 9w
+  run_base      intermediatebuilds 10w
+  run_base      advanced    builds 6w
+
+== 2. SURFACES, reachable no-mile cells, seed 1000 ==
+-- run_pace_goal|beginner | weeks 11 | anchor kind beginner anchorSec 11:30 hand 11:30 =
+   wizard field: NO FIELD | advisory: none | header 11
+   paceFeasLine: "Your paces start from the beginner default of 11:30 per mile. In 11 weeks that reaches about 1.5 mi in 16:53. Your goal is 12:00. Keep it or change it above."
+   card Run paces block: "Run paces Goal 12:00 1.5 mi Mile 11:30 /mi 5K 12:15 /mi 10K 12:35 /mi Tempo 13:00 /mi Recovery 14:05 /mi Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate." | pencil false
+   card sentence: "Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate."
+   clipboard: "Run anchor: 11:30 mile (beginner default) → mile 11:30 / 5k 12:15 / 10k 12:35 / tempo 13:00 / recovery 14:05"
+   D9 >25:00 at beginner: {"ok":true} | blank: {"ok":true}
+   W1 first paced (mon, NSW) Short Interval (SI)
+      detail: "4x400m at 11:30/mi. This week's goal pace is 11:46/mi. Recovery: 5:43 to 7:09 of easy jogging or walking. Keep moving. Warm up 10 to 15 minutes. Build from an easy jog. Add 4 to 5 bursts of 15 to 30 seconds. Cool down until breathing is easy."
+      note:   "SI: Pace moves 3 seconds per mile each week. Your full goal of 8:00/mi needs more weeks than this block has. The target for this block is 11:16/mi. Hit the prescribed pace precisely."
+-- run_pace_goal|intermediate REFUSED at doGenerate with no mile; wizard as rendered before the refusal:
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":true,"color":"var(--muted)","text":"Required. Enter your most recent timed mile."} | header 11
+   paceFeasLine: "You have not entered a mile time. The intermediate default is 9:30 per mile. In 11 weeks that reaches about 1.5 mi in 13:53. Your goal is 12:00. Enter your mile above and this updates."
+   D9 >25:00: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":false,"blank":true,"msg":"Required. Enter your most recent timed mile."}
+-- run_pace_goal|advanced REFUSED at doGenerate with no mile; wizard as rendered before the refusal:
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":true,"color":"var(--muted)","text":"Required. Enter your most recent timed mile."} | header 6
+   paceFeasLine: ""
+   D9 >25:00: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":false,"blank":true,"msg":"Required. Enter your most recent timed mile."}
+-- run_5k|beginner | weeks 8 | anchor kind beginner anchorSec 11:30 hand 11:30 =
+   wizard field: NO FIELD | advisory: none | header 8
+   card Run paces block: "Run paces Mile 11:30 /mi · 9/10 5K 12:15 /mi · 7–8/10 10K 12:35 /mi · 6–7/10 Tempo 13:00 /mi · 6/10 Recovery 14:05 /mi · 4–5/10 Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate." | pencil false
+   card sentence: "Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate."
+   clipboard: "Run anchor: 11:30 mile (beginner default) → 5k 12:15 / 10k 12:35 / tempo 13:00 / recovery 14:05"
+   D9 >25:00 at beginner: {"ok":true} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (12:15/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_5k|intermediate | weeks 8 | anchor kind default anchorSec 9:30 hand 9:30 =
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":false,"color":"var(--muted)","text":""} | header 8
+   card Run paces block: "Run paces Mile 9:30 /mi · 9/10 5K 10:15 /mi · 7–8/10 10K 10:35 /mi · 6–7/10 Tempo 11:00 /mi · 6/10 Recovery 12:10 /mi · 4–5/10 Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row." | pencil true
+   card sentence: "Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row."
+   clipboard: "Run anchor: 9:30 mile (est. from experience) → 5k 10:15 / 10k 10:35 / tempo 11:00 / recovery 12:10"
+   D9 >25:00 at intermediate: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (10:15/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_5k|advanced | weeks 8 | anchor kind default anchorSec 7:30 hand 7:30 =
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":false,"color":"var(--muted)","text":""} | header 8
+   card Run paces block: "Run paces Mile 7:30 /mi · 9/10 5K 8:05 /mi · 7–8/10 10K 8:25 /mi · 6–7/10 Tempo 8:50 /mi · 6/10 Recovery 9:55 /mi · 4–5/10 Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row." | pencil true
+   card sentence: "Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row."
+   clipboard: "Run anchor: 7:30 mile (est. from experience) → 5k 8:05 / 10k 8:25 / tempo 8:50 / recovery 9:55"
+   D9 >25:00 at advanced: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (8:05/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_10k|beginner | weeks 8 | anchor kind beginner anchorSec 11:30 hand 11:30 =
+   wizard field: NO FIELD | advisory: none | header 8
+   card Run paces block: "Run paces Mile 11:30 /mi · 9/10 5K 12:15 /mi · 7–8/10 10K 12:35 /mi · 6–7/10 Tempo 13:00 /mi · 6/10 Recovery 14:05 /mi · 4–5/10 Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate." | pencil false
+   card sentence: "Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate."
+   clipboard: "Run anchor: 11:30 mile (beginner default) → 5k 12:15 / 10k 12:35 / tempo 13:00 / recovery 14:05"
+   D9 >25:00 at beginner: {"ok":true} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (12:15/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_10k|intermediate | weeks 8 | anchor kind default anchorSec 9:30 hand 9:30 =
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":false,"color":"var(--muted)","text":""} | header 8
+   card Run paces block: "Run paces Mile 9:30 /mi · 9/10 5K 10:15 /mi · 7–8/10 10K 10:35 /mi · 6–7/10 Tempo 11:00 /mi · 6/10 Recovery 12:10 /mi · 4–5/10 Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row." | pencil true
+   card sentence: "Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row."
+   clipboard: "Run anchor: 9:30 mile (est. from experience) → 5k 10:15 / 10k 10:35 / tempo 11:00 / recovery 12:10"
+   D9 >25:00 at intermediate: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (10:15/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_10k|advanced | weeks 8 | anchor kind default anchorSec 7:30 hand 7:30 =
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":false,"color":"var(--muted)","text":""} | header 8
+   card Run paces block: "Run paces Mile 7:30 /mi · 9/10 5K 8:05 /mi · 7–8/10 10K 8:25 /mi · 6–7/10 Tempo 8:50 /mi · 6/10 Recovery 9:55 /mi · 4–5/10 Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row." | pencil true
+   card sentence: "Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row."
+   clipboard: "Run anchor: 7:30 mile (est. from experience) → 5k 8:05 / 10k 8:25 / tempo 8:50 / recovery 9:55"
+   D9 >25:00 at advanced: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (8:05/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_half|beginner | weeks 11 | anchor kind beginner anchorSec 11:30 hand 11:30 =
+   wizard field: NO FIELD | advisory: none | header 11
+   card Run paces block: "Run paces Mile 11:30 /mi · 9/10 5K 12:15 /mi · 7–8/10 10K 12:35 /mi · 6–7/10 Tempo 13:00 /mi · 6/10 Half 13:15 /mi Recovery 14:05 /mi · 4–5/10 Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate." | pencil false
+   card sentence: "Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate."
+   clipboard: "Run anchor: 11:30 mile (beginner default) → 5k 12:15 / 10k 12:35 / tempo 13:00 / half 13:15 / recovery 14:05"
+   D9 >25:00 at beginner: {"ok":true} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (12:15/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_half|intermediate | weeks 11 | anchor kind default anchorSec 9:30 hand 9:30 =
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":false,"color":"var(--muted)","text":""} | header 11
+   card Run paces block: "Run paces Mile 9:30 /mi · 9/10 5K 10:15 /mi · 7–8/10 10K 10:35 /mi · 6–7/10 Tempo 11:00 /mi · 6/10 Half 11:05 /mi Recovery 12:10 /mi · 4–5/10 Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row." | pencil true
+   card sentence: "Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row."
+   clipboard: "Run anchor: 9:30 mile (est. from experience) → 5k 10:15 / 10k 10:35 / tempo 11:00 / half 11:05 / recovery 12:10"
+   D9 >25:00 at intermediate: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (10:15/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_half|advanced | weeks 11 | anchor kind default anchorSec 7:30 hand 7:30 =
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":false,"color":"var(--muted)","text":""} | header 11
+   card Run paces block: "Run paces Mile 7:30 /mi · 9/10 5K 8:05 /mi · 7–8/10 10K 8:25 /mi · 6–7/10 Tempo 8:50 /mi · 6/10 Half 8:45 /mi Recovery 9:55 /mi · 4–5/10 Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row." | pencil true
+   card sentence: "Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row."
+   clipboard: "Run anchor: 7:30 mile (est. from experience) → 5k 8:05 / 10k 8:25 / tempo 8:50 / half 8:45 / recovery 9:55"
+   D9 >25:00 at advanced: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (8:05/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_marathon|beginner | weeks 14 | anchor kind beginner anchorSec 11:30 hand 11:30 =
+   wizard field: NO FIELD | advisory: none | header 14
+   card Run paces block: "Run paces Mile 11:30 /mi · 9/10 5K 12:15 /mi · 7–8/10 10K 12:35 /mi · 6–7/10 Tempo 13:00 /mi · 6/10 Marathon 13:20 /mi Recovery 14:05 /mi · 4–5/10 Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate." | pencil false
+   card sentence: "Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate."
+   clipboard: "Run anchor: 11:30 mile (beginner default) → 5k 12:15 / 10k 12:35 / tempo 13:00 / marathon 13:20 / recovery 14:05"
+   D9 >25:00 at beginner: {"ok":true} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (12:15/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_marathon|intermediate | weeks 14 | anchor kind default anchorSec 9:30 hand 9:30 =
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":false,"color":"var(--muted)","text":""} | header 14
+   card Run paces block: "Run paces Mile 9:30 /mi · 9/10 5K 10:15 /mi · 7–8/10 10K 10:35 /mi · 6–7/10 Tempo 11:00 /mi · 6/10 Marathon 11:25 /mi Recovery 12:10 /mi · 4–5/10 Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row." | pencil true
+   card sentence: "Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row."
+   clipboard: "Run anchor: 9:30 mile (est. from experience) → 5k 10:15 / 10k 10:35 / tempo 11:00 / marathon 11:25 / recovery 12:10"
+   D9 >25:00 at intermediate: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (10:15/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_marathon|advanced | weeks 14 | anchor kind default anchorSec 7:30 hand 7:30 =
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":false,"color":"var(--muted)","text":""} | header 14
+   card Run paces block: "Run paces Mile 7:30 /mi · 9/10 5K 8:05 /mi · 7–8/10 10K 8:25 /mi · 6–7/10 Tempo 8:50 /mi · 6/10 Marathon 9:10 /mi Recovery 9:55 /mi · 4–5/10 Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row." | pencil true
+   card sentence: "Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this program comes from this row."
+   clipboard: "Run anchor: 7:30 mile (est. from experience) → 5k 8:05 / 10k 8:25 / tempo 8:50 / marathon 9:10 / recovery 9:55"
+   D9 >25:00 at advanced: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":true}
+   W1 first paced (mon, NRC) Speed Run — Intervals
+      detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (8:05/mi)\n1:00 easy recovery between every effort"
+      note:   "INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won't hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort)."
+-- run_base|beginner | weeks 9 | anchor kind null 
+   wizard field: NO FIELD | advisory: none | header 9
+   card Run paces block: NONE (runAnchorInfo null) | pencil false
+   card sentence: null
+   clipboard: null
+   D9 >25:00 at beginner: {"ok":true} | blank: {"ok":true}
+   W1 first paced (sat, NSW) Easy Run
+      detail: "25 min easy and conversational (RPE 3-4 out of 10). Around 14:05/mi is right for you. Do not run faster than 13:33/mi. Distance is not the goal; time on feet is. Log the distance you covered. Walk breaks are fine and smart: run 3 min, walk 1 min, repeat. Effort stays conversational either way."
+      note:   "EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it feels almost too easy, it is working."
+-- run_base|intermediate | weeks 10 | anchor kind null 
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":false,"color":"var(--muted)","text":""} | header 10
+   card Run paces block: NONE (runAnchorInfo null) | pencil false
+   card sentence: null
+   clipboard: null
+   D9 >25:00 at intermediate: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":true}
+   W1 first paced (sat, NSW) Easy Run
+      detail: "25 min easy and conversational (RPE 3-4 out of 10). Around 12:10/mi is right for you. Do not run faster than 11:35/mi. Distance is not the goal; time on feet is. Log the distance you covered."
+      note:   "EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it feels almost too easy, it is working."
+-- run_base|advanced | weeks 6 | anchor kind null 
+   wizard field: "Current mile time | Optional. It sets your training paces." | advisory: {"shown":false,"color":"var(--muted)","text":""} | header 6
+   card Run paces block: NONE (runAnchorInfo null) | pencil false
+   card sentence: null
+   clipboard: null
+   D9 >25:00 at advanced: {"ok":false,"msg":"Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead."} | blank: {"ok":true}
+   W1 first paced (sat, NSW) Easy Run
+      detail: "25 min easy and conversational (RPE 3-4 out of 10). Around 9:55/mi is right for you. Do not run faster than 9:23/mi. Distance is not the goal; time on feet is. Log the distance you covered."
+      note:   "EASY RUN: The aerobic engine builds at conversational effort. Time in the zone is the dose, not miles and not speed. If it feels almost too easy, it is working."
+
+-- beginner WITH mile 8:00 (ignored today): card sentence per goal
+   run_pace_goal  beginner 11:30 | Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate.
+   run_5k         beginner 11:30 | Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate.
+   run_10k        beginner 11:30 | Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate.
+   run_half       beginner 11:30 | Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate.
+   run_marathon   beginner 11:30 | Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermediate.
+   run_base       runAnchorInfo null
+
+-- AUDIT §1 Before strings vs V225 (rendered this pass | present in comment-stripped source)
+  B1 card beginner       rendered YES | source no 
+  B2 card intermediate   rendered YES | source no 
+  B4 wizard label        rendered no  | source no 
+  B7a pace SI            rendered YES | source no 
+  B7b pace LSD           rendered YES | source no 
+  B7c 5k intervals       rendered YES | source no 
+  B7e base easy          rendered YES | source no 
+-- AUDIT §2 Call 4 copy: shipped verbatim? nearest shipped fragment
+  W1   verbatim no  | fragment "(optional)" in source x2 first js+1646: <div class="input-label">How far can you currently run? (optional)</div>
+  W2   verbatim no  | fragment "the intermediate default" in source x0
+  W2b  verbatim no  | fragment "If you have never timed a mile" in source x0
+  W3   verbatim no  | fragment "Your paces start from" in source x1 first js+1256: if(f.exp === 'beginner') return 'Your paces start from the beginner default of '+_clkMS(f.cur)+' per mile.'+reach+' Keep it or change it above.';
+  C1   verbatim no  | fragment "Tap the pencil" in source x0
+  C1b  verbatim no  | fragment "does not read a mile time" in source x0
+  C3   verbatim no  | fragment "Benchmark runs prescribe no pace" in source x0
+  S1   verbatim no  | fragment "Paces here start from" in source x0
+  S1b  verbatim no  | fragment "follow the effort" in source x0
+  K1   verbatim no  | fragment "intermediate default" in source x0
+  D9   verbatim no  | fragment "Over 25:00 reads as a walk, not a run." in source x1 first js+6293: if(sec>1500) return {ok:false,msg:'Over 25:00 reads as a walk, not a run. Leave it blank and the program anchors on your experience level instead.'};
+
+== 3. WIZARD LENGTH HEADER, run_pace_goal non-beginner, no mile vs entered miles ==
+cells 48 | no-mile header renders a length 48/48 | doGenerate refuses 48/48 | no-mile header == header at hand default mile 48/48
+entered-mile pairs where header != the no-mile header: 189/624 | cells with >=1 such mile 48/48 {"intermediate":{"n":24,"diff":87,"pairs":312},"advanced":{"n":24,"diff":102,"pairs":312}}
+  eg intermediate 18-35 1.5mi 9:30: no-mile header 11 | 6:00=6 6:30=10 7:00=11 7:30=11 8:00=11 8:30=11 9:00=11 9:30=11 10:00=11 10:30=11 11:00=11 11:30=11 12:00=11
+  eg intermediate 18-35 1.5mi 11:00: no-mile header 11 | 6:00=6 6:30=6 7:00=6 7:30=10 8:00=11 8:30=11 9:00=11 9:30=11 10:00=11 10:30=11 11:00=11 11:30=11 12:00=11
+  eg intermediate 18-35 1.5mi 12:30: no-mile header 11 | 6:00=6 6:30=6 7:00=6 7:30=6 8:00=6 8:30=10 9:00=11 9:30=11 10:00=11 10:30=11 11:00=11 11:30=11 12:00=11
+  eg intermediate 18-35 1.5mi 14:15: no-mile header 6 | 6:00=6 6:30=6 7:00=6 7:30=6 8:00=6 8:30=6 9:00=6 9:30=6 10:00=11 10:30=11 11:00=11 11:30=11 12:00=11
+  eg intermediate 18-35 1mi 6:00: no-mile header 9 | 6:00=6 6:30=9 7:00=9 7:30=9 8:00=9 8:30=9 9:00=9 9:30=9 10:00=9 10:30=9 11:00=9 11:30=9 12:00=9
+  eg intermediate 18-35 1mi 7:00: no-mile header 9 | 6:00=6 6:30=6 7:00=6 7:30=9 8:00=9 8:30=9 9:00=9 9:30=9 10:00=9 10:30=9 11:00=9 11:30=9 12:00=9
+
+== 4. M2: buildProgram lattice, 6 goals x 3 exp x 20 seeds x rest {sun/wed, sat/sun} x mile {none, 8:00} ==
+baseline self-equal true
+{"builds":1440,"crash":0,"noMileReach":640,"one":640,"none":0,"tie":0,"orderDisagree":0,"excl":0,"nrcSel":480,"noteEmpty":0,"mileEntered":720,"mileEnteredBegIgnored":240,"discTok":0,"runCards":27720,"unreachNoMile":80}
+segment (reachable no-mile):
+  run_pace_goal|beginner     {"n":40,"one":40,"none":0}
+  run_5k|beginner            {"n":40,"one":40,"none":0}
+  run_5k|intermediate        {"n":40,"one":40,"none":0}
+  run_5k|advanced            {"n":40,"one":40,"none":0}
+  run_10k|beginner           {"n":40,"one":40,"none":0}
+  run_10k|intermediate       {"n":40,"one":40,"none":0}
+  run_10k|advanced           {"n":40,"one":40,"none":0}
+  run_half|beginner          {"n":40,"one":40,"none":0}
+  run_half|intermediate      {"n":40,"one":40,"none":0}
+  run_half|advanced          {"n":40,"one":40,"none":0}
+  run_marathon|beginner      {"n":40,"one":40,"none":0}
+  run_marathon|intermediate  {"n":40,"one":40,"none":0}
+  run_marathon|advanced      {"n":40,"one":40,"none":0}
+  run_base|beginner          {"n":40,"one":40,"none":0}
+  run_base|intermediate      {"n":40,"one":40,"none":0}
+  run_base|advanced          {"n":40,"one":40,"none":0}
+none, why:
+selected card by goal (NRC/NSW, day, subtype):
+   120  run_10k NRC mon Speed Run — Intervals
+   120  run_5k NRC mon Speed Run — Intervals
+    60  run_base NSW fri Easy Run
+    60  run_base NSW sat Easy Run
+   120  run_half NRC mon Speed Run — Intervals
+   120  run_marathon NRC mon Speed Run — Intervals
+    40  run_pace_goal NSW mon Short Interval (SI)
+HALF_MANNY digest 0ac7da6b1691a8e1 self-equal true pinned 0ac7da6b1691a8e1 true
+
+== 5. M3: dash/hyphen/Nike sweep on current strings the ruling touches, and on the Call 4 copy ==
+  HIT [en-dash] run_5k|beginner runpaces: "Run paces Mile 11:30 /mi · 9/10 5K 12:15 /mi · 7–8/10 10K 12:35 /mi · 6–7/10 Tempo 13:00 /mi · 6/10 Recovery 14:05 /mi · 4–5/10 Anchored on an 11:30 mile, the beginner default. A mile time starts being used at intermedia"
+  HIT [em-dash] run_5k|beginner W1 detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (12:15/mi)\n1:00 easy recovery between every effort"
+  HIT [en-dash] run_5k|intermediate runpaces: "Run paces Mile 9:30 /mi · 9/10 5K 10:15 /mi · 7–8/10 10K 10:35 /mi · 6–7/10 Tempo 11:00 /mi · 6/10 Recovery 12:10 /mi · 4–5/10 Anchored on a 9:30 mile, estimated from experience; no mile time was entered. Every pace in t"
+  HIT [em-dash] run_5k|intermediate W1 detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (10:15/mi)\n1:00 easy recovery between every effort"
+  HIT [en-dash] run_5k|advanced runpaces: "Run paces Mile 7:30 /mi · 9/10 5K 8:05 /mi · 7–8/10 10K 8:25 /mi · 6–7/10 Tempo 8:50 /mi · 6/10 Recovery 9:55 /mi · 4–5/10 Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every pace in this "
+  HIT [em-dash] run_5k|advanced W1 detail: "8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace (8:05/mi)\n1:00 easy recovery between every effort"
+  HIT [en-dash] run_half|beginner runpaces: "Run paces Mile 11:30 /mi · 9/10 5K 12:15 /mi · 7–8/10 10K 12:35 /mi · 6–7/10 Tempo 13:00 /mi · 6/10 Half 13:15 /mi Recovery 14:05 /mi · 4–5/10 Anchored on an 11:30 mile, the beginner default. A mile time starts being use"
+  HIT [en-dash] run_half|intermediate runpaces: "Run paces Mile 9:30 /mi · 9/10 5K 10:15 /mi · 7–8/10 10K 10:35 /mi · 6–7/10 Tempo 11:00 /mi · 6/10 Half 11:05 /mi Recovery 12:10 /mi · 4–5/10 Anchored on a 9:30 mile, estimated from experience; no mile time was entered. "
+  HIT [en-dash] run_half|advanced runpaces: "Run paces Mile 7:30 /mi · 9/10 5K 8:05 /mi · 7–8/10 10K 8:25 /mi · 6–7/10 Tempo 8:50 /mi · 6/10 Half 8:45 /mi Recovery 9:55 /mi · 4–5/10 Anchored on a 7:30 mile, estimated from experience; no mile time was entered. Every"
+  HIT [en-dash] run_marathon|beginner runpaces: "Run paces Mile 11:30 /mi · 9/10 5K 12:15 /mi · 7–8/10 10K 12:35 /mi · 6–7/10 Tempo 13:00 /mi · 6/10 Marathon 13:20 /mi Recovery 14:05 /mi · 4–5/10 Anchored on an 11:30 mile, the beginner default. A mile time starts being"
+  HIT [en-dash] run_marathon|intermediate runpaces: "Run paces Mile 9:30 /mi · 9/10 5K 10:15 /mi · 7–8/10 10K 10:35 /mi · 6–7/10 Tempo 11:00 /mi · 6/10 Marathon 11:25 /mi Recovery 12:10 /mi · 4–5/10 Anchored on a 9:30 mile, estimated from experience; no mile time was enter"
+  HIT [en-dash] run_marathon|advanced runpaces: "Run paces Mile 7:30 /mi · 9/10 5K 8:05 /mi · 7–8/10 10K 8:25 /mi · 6–7/10 Tempo 8:50 /mi · 6/10 Marathon 9:10 /mi Recovery 9:55 /mi · 4–5/10 Anchored on a 7:30 mile, estimated from experience; no mile time was entered. E"
+  HIT [range hyphen] run_base|beginner W1 detail: "25 min easy and conversational (RPE 3-4 out of 10). Around 14:05/mi is right for you. Do not run faster than 13:33/mi. Distance is not the goal; time on feet is. Log the distance you covered. Walk breaks are fine and sma"
+  HIT [range hyphen] run_base|intermediate W1 detail: "25 min easy and conversational (RPE 3-4 out of 10). Around 12:10/mi is right for you. Do not run faster than 11:35/mi. Distance is not the goal; time on feet is. Log the distance you covered."
+  HIT [range hyphen] run_base|advanced W1 detail: "25 min easy and conversational (RPE 3-4 out of 10). Around 9:55/mi is right for you. Do not run faster than 9:23/mi. Distance is not the goal; time on feet is. Log the distance you covered."
+current strings swept 38 with a hit 15
+Call 4 strings swept 11 with a hit 0
+
+DONE

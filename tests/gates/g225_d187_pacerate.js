@@ -26,12 +26,21 @@
 //   225 and up  every row asserts.
 //   IA_ASSUME_VERSION=225 lifts a file stamped exactly 224 to 225 for a discrimination run (not a ship proof).
 'use strict';
-const path = require('path'), fs = require('fs');
+const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const H = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const BASEFILE = process.argv[3] ? path.resolve(process.argv[3]) : null;
 const ERA = 225;
+// D189 P-PACEDISCLOSE (V226) Class B re-keys CONFINEMENT from 226 (standing rulings 2 and 4): run_base's one
+// W1 note gains the S1 suffix. <= 225 keeps the byte-identical digest row.
+const D189_ERA = 226;
+// CONFINEMENT baseline (V226 slice 7e): tests/sabotage.py passes no argv[3], so a baseline read only from argv
+// failed closed on the control and made every mutation on this gate trip. The baseline is now resolved by era:
+// argv[3] if it reads the wanted version, else `git show <pinned commit>:index.html` into os.tmpdir().
+// Era 225 wants V224 (the D187 confinement baseline); era 226+ wants V225 (D189 Class B's before-state).
+const V224_COMMIT = '7b61da8d66da290186bb27236af63d0eff3d33dd';   // V224: D185 P-WCTODAY
+const V225_COMMIT = '35919943d766606dcbf5e09c98a08b5782dc2223';   // V225: D186/D187
 
 let pass = 0, fail = 0;
 const t0 = Date.now();
@@ -46,7 +55,7 @@ if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
 } else if(process.env.IA_ASSUME_VERSION !== undefined){
   console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-console.log('g225 D187 pacerate | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + (BASEFILE ? ' | baseline ' + BASEFILE : ' | NO BASELINE (confinement will fail closed)'));
+console.log('g225 D187 pacerate | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + (BASEFILE ? ' | argv baseline ' + BASEFILE : ' | no argv baseline (CONFINEMENT pulls its pinned commit)'));
 
 const ROW_LABELS = [
   'CENSUS PACE_IMPROVE declared exactly once',
@@ -167,10 +176,26 @@ const CS = stripComments(IA.js);   // comment-stripped source, the census oracle
 
 // ── CONFINEMENT (needs a baseline artifact: candidate vs V224, byte-identical digest per goal) ──
 {
-  if(!BASEFILE || !fs.existsSync(BASEFILE)){
-    ok(ROW_LABELS[9], false, 'no baseline artifact provided (fail closed, not a silent pass)');
+  const WANT_BASE = VER >= D189_ERA ? 225 : 224;
+  const PIN = WANT_BASE === 225 ? V225_COMMIT : V224_COMMIT;
+  let BASE = null, baseWhy = '';
+  if(BASEFILE){
+    if(!fs.existsSync(BASEFILE)) baseWhy = 'argv baseline missing; ';
+    else { try { const b = H.load(BASEFILE); if(+b.version === WANT_BASE){ BASE = b; baseWhy = 'argv ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not ' + WANT_BASE + '; '; } catch(e){ baseWhy = 'argv baseline failed to boot: ' + e.message + '; '; } }
+  }
+  if(!BASE){
+    const f = path.join(os.tmpdir(), 'g225_d187_v' + WANT_BASE + '_' + process.pid + '.html');
+    try {
+      try { fs.unlinkSync(f); } catch(e){}
+      fs.writeFileSync(f, cp.execFileSync('git', ['-C', ROOT, 'show', PIN + ':index.html'], { maxBuffer: 1 << 27 }));
+      const b = H.load(f); if(+b.version === WANT_BASE){ BASE = b; baseWhy += 'git ' + PIN.slice(0, 7); } else baseWhy += 'git copy reads ' + b.version;
+    } catch(e){ baseWhy += 'git show failed: ' + String(e.message).slice(0, 80); }
+    try { fs.unlinkSync(f); } catch(e){}
+  }
+  console.log('  CONFINEMENT baseline: ' + (BASE ? 'V' + WANT_BASE + ' from ' + baseWhy : 'UNAVAILABLE (' + baseWhy + ')'));
+  if(!BASE){
+    ok(ROW_LABELS[9], false, 'no V' + WANT_BASE + ' baseline (fail closed, not a silent pass): ' + baseWhy);
   } else {
-    const BASE = H.load(BASEFILE);
     const CFG0 = Object.assign(JSON.parse(JSON.stringify(H.fixtures.HALF_MANNY)), {});
     const goalCfgs = {
       swim_100_time: { cardioTypes: ['swim'], cardioGoals: { swim: { id: 'swim_100_time', swimUnit: 'yd', baseMins: '1', baseSecs: '10', base500Mins: '7', base500Secs: '0' } } },
@@ -181,6 +206,7 @@ const CS = stripComments(IA.js);   // comment-stripped source, the census oracle
       run_half: { cardioTypes: ['run'], cardioGoals: { run: { id: 'run_half', label: 'Half Marathon', mileBestMins: '10', mileBestSecs: '30', baselineDist: '5', baseline: '5mi' } } },
       run_marathon: { cardioTypes: ['run'], cardioGoals: { run: { id: 'run_marathon', label: 'Marathon', mileBestMins: '10', mileBestSecs: '30', baselineDist: '5', baseline: '5mi' } } },
     };
+    if(VER < D189_ERA){
     const diffs = [];
     for(const [goalId, over] of Object.entries(goalCfgs)){
       const cfg = Object.assign(JSON.parse(JSON.stringify(CFG0)), over);
@@ -191,6 +217,61 @@ const CS = stripComments(IA.js);   // comment-stripped source, the census oracle
       else if(dA !== dB) diffs.push(goalId + ' candidate ' + dA + ' != baseline ' + dB);
     }
     ok(ROW_LABELS[9], diffs.length === 0, diffs.join(' | ') || (Object.keys(goalCfgs).length + ' goal types identical'));
+    } else {
+    // ERA ROW (standing rulings 2 and 4), keyed to D189 P-PACEDISCLOSE Class B (tests/measure/v226_rulings/
+    // d188_d189_ruling.md): from 226 every no-mile program gains the S1 suffix on ONE W1 run card's note
+    // and nothing else on the grid moves. Of these seven cells only run_base carries no mile (HALF_MANNY is
+    // intermediate), so the hand expectation is: run_base carries exactly one S1 suffix, on a week 1 note,
+    // after a non-empty prefix and one space; every other cell carries none. Strip it and each program equals
+    // the baseline's. The suffix is typed from the ruling's Copy section (S1) at the intermediate level,
+    // never read from the engine. The strip runs on both sides, so a baseline at 226 or later (which carries
+    // the note too) compares like for like; a baseline at 225 or earlier must carry none. Seed pinned by
+    // HALF_MANNY, clock fields stripped by progDigest, the baseline proven equal to itself before the diff,
+    // and an empty pre-strip diff on run_base against a pre-226 baseline is a failure.
+    const S1_SUFFIX = 'Paces here start from a 9:30 mile, the intermediate default. Tap the pencil on your program card to enter your mile time. Every run ahead of you rebuilds off it.';
+    const S1_CELLS = { run_base: 1 };
+    const BASE_VER = +BASE.version;
+    const s1Strip = prog => {
+      const hits = [];
+      (function walk(o, pth){
+        if(!o || typeof o !== 'object') return;
+        for(const k of Object.keys(o)){
+          const v = o[k], p = pth.concat(k);
+          if(typeof v === 'string'){ if(v.indexOf(S1_SUFFIX) >= 0) hits.push({ o, k, p, v }); }
+          else walk(v, p);
+        }
+      })(prog, []);
+      const bad = [];
+      for(const h of hits){
+        const placed = h.p[0] === 'weeks' && h.p[1] === '1' && h.k === 'note'
+          && h.v.length > S1_SUFFIX.length + 1 && h.v.slice(-(S1_SUFFIX.length + 1)) === ' ' + S1_SUFFIX;
+        if(!placed) bad.push(h.p.join('.') + ' = ' + JSON.stringify(h.v.slice(0, 90)));
+        else h.o[h.k] = h.v.slice(0, h.v.length - S1_SUFFIX.length - 1);
+      }
+      return { n: hits.length, bad, where: hits.map(h => h.p.join('.')) };
+    };
+    const diffs = [], moved = [];
+    for(const [goalId, over] of Object.entries(goalCfgs)){
+      const cfg = Object.assign(JSON.parse(JSON.stringify(CFG0)), over);
+      let pA = null, pB = null, pB2 = null, err = null;
+      try { pA = IA.buildProgram(JSON.parse(JSON.stringify(cfg))); } catch(e){ err = 'candidate: ' + e.message; }
+      try { pB = BASE.buildProgram(JSON.parse(JSON.stringify(cfg))); pB2 = BASE.buildProgram(JSON.parse(JSON.stringify(cfg))); } catch(e){ err = (err ? err + '; ' : '') + 'baseline: ' + e.message; }
+      if(err){ diffs.push(goalId + ' CRASH ' + err); continue; }
+      if(H.progDigest(pB) !== H.progDigest(pB2)){ diffs.push(goalId + ' the baseline does not equal itself'); continue; }
+      const want = S1_CELLS[goalId] || 0, wantB = BASE_VER >= D189_ERA ? want : 0;
+      const dA0 = H.progDigest(pA), dB0 = H.progDigest(pB);
+      const sA = s1Strip(pA), sB = s1Strip(pB);
+      if(sA.n !== want) diffs.push(goalId + ' candidate carries ' + sA.n + ' S1 suffix(es), want ' + want + (sA.where.length ? ' (' + sA.where.join(', ') + ')' : ''));
+      if(sB.n !== wantB) diffs.push(goalId + ' baseline V' + BASE_VER + ' carries ' + sB.n + ' S1 suffix(es), want ' + wantB);
+      sA.bad.concat(sB.bad).forEach(b => diffs.push(goalId + ' S1 off its ruled place (a W1 note, after a prefix): ' + b));
+      if(want && !wantB && dA0 === dB0) diffs.push(goalId + ' empty diff before the strip: the S1 note never moved the program');
+      const dA = H.progDigest(pA), dB = H.progDigest(pB);
+      if(dA !== dB) diffs.push(goalId + ' after the S1 strip candidate ' + dA + ' != baseline ' + dB);
+      else if(want) moved.push(goalId + ' ' + dA0 + ' -> strip at ' + sA.where.join(', ') + ' -> ' + dA);
+    }
+    ok('CONFINEMENT D189 era (ia-version ' + VER + ' >= ' + D189_ERA + ', Class B): strip the S1 suffix from the one W1 note and every cell equals the baseline V' + BASE_VER + ' (swim/bike/run_base/NRC)',
+       diffs.length === 0, diffs.join(' | ') || (Object.keys(goalCfgs).length + ' goal types identical after the strip; ' + moved.join('; ')));
+    }
   }
 }
 

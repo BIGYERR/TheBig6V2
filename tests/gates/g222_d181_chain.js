@@ -47,7 +47,7 @@
 //                  every record below _cut before any re-apply); sabotage S4 (drop R5) is what proves them.
 //   5L licence     slot detail != live is licensed up to LIC5L_MAX (70, the residue STEP printed over 15,545 chains, the
 //                  boot-side injury re-filter of section 12 (C)), each residue row's boot equal to the MAP boot. The licence
-//                  is a predicate on ia-version, LIC5L_ERAS.includes(VER): eras 222, 223, 224, 225 (each added by a re-ruling that
+//                  is a predicate on ia-version, LIC5L_ERAS.includes(VER): eras 222, 223, 224, 225, 226 (each added by a re-ruling that
 //                  printed the same 68 rows); above the last listed era REFUSED, residue 0 until re-ruled.
 //   IA_ASSUME_VERSION=222 lifts a file stamped exactly 221 to 222 for a discrimination run. It is announced, and ignored
 //   on any other file. gate.sh never sets it.
@@ -83,7 +83,7 @@ const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const ERA = 222, BASE_ERA = 221, V221_COMMIT = '57b9dee80269743a40b350aa399351661dd9c06b';
-const LIC5L_ERAS = [222, 223, 224, 225], LIC5L_MAX = 70, LIC5L_OF = 15545;
+const LIC5L_ERAS = [222, 223, 224, 225, 226], LIC5L_MAX = 70, LIC5L_OF = 15545;
 const NU = 40, N8 = 6;
 let pass = 0, fail = 0;
 const t0 = Date.now();

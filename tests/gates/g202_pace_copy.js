@@ -197,6 +197,16 @@ const FORMS = [
   ['slowclamp',{ mileBestMins:'22', mileBestSecs:'00', mileBestSrc:{kind:'entered'} }, 'advanced'],
 ];
 const CHART_IDS = ['run_5k', 'run_10k', 'run_half', 'run_marathon'];
+// D188 ERA (standing rulings 2, 3 and 4; tests/measure/v226_rulings/d188_d189_ruling.md, D188 Blast radius ->
+// Tests: "g202_pace_copy.js:195 ... hand oracles `exp !== 'beginner' && mileSecs` -> `mileSecs` from 226").
+// :195 is the 'beginner' FORM above, a beginner with an 8:15 mile. C7 below exempted it from the tail by
+// reading the engine's `v.kind !== 'beginner'`; D188 E7 retires the kind 'beginner' writer, so from 226 that
+// read is always true and could not tell a mile that is read from one that is ignored. It is WIRED, not
+// re-pointed: <= 225 keeps the V202 exemption as it was read; >= 226 decides the tail from the hand-typed mile.
+// D188 E1: a form with a mile prints its entered, seeded or clamped sentence at every level, beginner
+// included, and takes the tail. D189 F9 retires the beginner sentence, so a form with no mile prints the level
+// default and takes the tail too. No form is exempt from 226.
+const D188_ERA = 226;
 let dashBad = [], tailBad = [], mirrorBad = [];
 for(const [tag, mb, exp] of FORMS){
   for(const gid of ['run_pace_goal'].concat(CHART_IDS)){
@@ -209,11 +219,14 @@ for(const [tag, mb, exp] of FORMS){
     if(a.mid > 0) dashBad.push(`${gid}/${tag}/${exp}: |${s}|`);
     if(dashAudit(l).mid > 0) dashBad.push(`${gid}/${tag}/${exp} LINE: |${l}|`);
     const wantPace = (gid === 'run_pace_goal');
-    // the beginner form is ruled to end on its own sentence and take neither tail
-    if(v.kind !== 'beginner'){
+    // the beginner form is ruled to end on its own sentence and take neither tail (ia-version <= 225)
+    const mileSecs = (+mb.mileBestMins || 0) * 60 + (+mb.mileBestSecs || 0);   // hand, typed from FORMS
+    const tailRule = IAV >= D188_ERA ? (mileSecs ? 'D188 E1, the mile is read' : 'D189 F9, the level default')
+                                     : (v.kind !== 'beginner' ? 'V202 E5' : null);
+    if(tailRule){
       const has = s.indexOf(wantPace ? RULED_PACE_TAIL : RULED_CHART_TAIL) >= 0;
       const hasWrong = s.indexOf(wantPace ? RULED_CHART_TAIL : RULED_PACE_TAIL) >= 0;
-      if(!has || hasWrong) tailBad.push(`${gid}/${tag}/${exp}: |${s}|`);
+      if(!has || hasWrong) tailBad.push(`${gid}/${tag}/${exp} [${tailRule}]: |${s}|`);
     }
     // E6 mirror: the clipboard says what the card says
     const cardScope = s.indexOf('Week 1 runs off this row') >= 0;

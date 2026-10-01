@@ -194,9 +194,16 @@ console.log('sweep: ' + rows.length + ' builds (3 experience x 3 age x 2 unit x 
   + MILES.length + ' entered miles x ' + GOALS.length + ' entered goals)');
 
 // ── P1 — amended D100 anchor: the athlete's own row, READ AT THE GOAL DISTANCE ──
+// ERA (standing rulings 2 and 4), keyed to D188 P-BEGINNERMILE Class A1 (tests/measure/v226_rulings/
+// d188_d189_ruling.md). At ia-version <= 225 the V172 rule holds: a beginner's entered mile is ignored and he
+// anchors on the 690 row. From 226 D188 repeals it (E3/E4/E5 read a beginner's mile like anyone's), so every
+// level anchors on the entered mile's own row. P1, P1b and P1d read the anchor through this one switch; P1c
+// (non-beginners) is the same rule on both sides of the line.
+const D188_ERA = 226;
+const D188_ON = +IA.version >= D188_ERA;
 let p1bad = [], p1beg = 0, p1nonbeg = 0;
 for(const r of rows){
-  const anchorMile = r.exp === 'beginner' ? EXP_DEFAULT.beginner : hand.secs(r.mb[0], r.mb[1]);
+  const anchorMile = (r.exp === 'beginner' && !D188_ON) ? EXP_DEFAULT.beginner : hand.secs(r.mb[0], r.mb[1]);
   const d = hand.miles(r.goal.targetDist, r.unit);
   r.handIP = handRowPaceAt(handRow(anchorMile), d);
   r.handMileCol = handRow(anchorMile).mile;
@@ -206,9 +213,11 @@ for(const r of rows){
     p1bad.push(`${r.exp}/${r.mb.join(':')}/goal ${r.goal.targetDist}${r.unit} got ${r.pp.ip} want ${r.handIP.toFixed(4)}`);
 }
 ok(p1bad.length === 0, `P1 amended D100 _initialPace is the athlete's own chart row read at the goal `
-  + `distance — the entered mile's row for every non-beginner, the 690 row for every beginner: `
+  + (D188_ON ? `distance — the entered mile's row at every level, beginners included (D188, ia-version ${IA.version} >= ${D188_ERA}): `
+            : `distance — the entered mile's row for every non-beginner, the 690 row for every beginner: `)
   + `${rows.length - p1bad.length} of ${rows.length} (${p1nonbeg} non-beginner, ${p1beg} beginner)`
   + (p1bad.length ? ' — first miss: ' + p1bad[0] : ''));
+if(!D188_ON){
 const p1bBad = rows.filter(r => r.exp === 'beginner')
   .filter(r => Math.abs(r.pp.ip - handRowPaceAt(handRow(EXP_DEFAULT.beginner), r.handDist)) > 1e-9);
 ok(p1bBad.length === 0,
@@ -216,6 +225,32 @@ ok(p1bBad.length === 0,
   + `690 s/mi ROW regardless of the mile time entered, converted to their own goal distance `
   + `(at a 1-mile goal that row reads 690 exactly; at 1.5 mi it reads 706.09, not 690)`
   + (p1bBad.length ? ' — first miss: ' + `${p1bBad[0].exp}/${p1bBad[0].mb.join(':')} got ${p1bBad[0].pp.ip}` : ''));
+} else {
+  // D188 Class A1 (V226) repeals the V172 rule: a beginner's entered mile is read like anyone's.
+  // ORACLE: the hand chart value, not a differential against another engine cell. Every beginner build
+  // must sit on its OWN entered mile's row read at its goal distance (HAND_CHART, handRow, handRowPaceAt,
+  // typed above), none may sit on the 690 row (all four entered miles are faster than 11:30, so on the
+  // hand chart each reads a different pace at every goal distance), and the 6:00 cell at a 1.5 mi goal
+  // reads the typed literal 370.73 for the beginner exactly as for the intermediate:
+  //   360 + (390 - 360) × ln 1.5 / ln 3.107 = 360 + 30 × 0.405465 / 1.133657 = 370.73
+  // (the 6:00 row's mile and 5K columns, log-interpolated by hand), not the 690 row's 706.09.
+  // Hand counts: 120 beginner builds (3 age × 2 unit × 4 mile × 5 goal); 12 cells at 6:00 and 1.5 mi
+  // (beginner and intermediate × 3 age × the two 1.5 mi goals).
+  const BEG_600_15MI = 370.73;
+  const beg = rows.filter(r => r.exp === 'beginner');
+  const offOwn = beg.filter(r => Math.abs(r.pp.ip - handRowPaceAt(handRow(hand.secs(r.mb[0], r.mb[1])), r.handDist)) > 1e-9);
+  const on690 = beg.filter(r => Math.abs(r.pp.ip - handRowPaceAt(handRow(EXP_DEFAULT.beginner), r.handDist)) < 1e-9);
+  const c600 = rows.filter(r => (r.exp === 'beginner' || r.exp === 'intermediate') && r.mb[0] === '6' && r.mb[1] === '00'
+    && r.unit === 'mi' && r.goal.targetDist === '1.5');
+  const c600bad = c600.filter(r => Math.abs(r.pp.ip - BEG_600_15MI) > 0.005);
+  ok(beg.length === 120 && offOwn.length === 0 && on690.length === 0 && c600.length === 12 && c600bad.length === 0,
+    `P1b D188 era (ia-version ${IA.version} >= ${D188_ERA}): the V172 beginner rule is repealed. All ${beg.length} `
+    + `beginner builds anchor on their own entered mile's chart row (hand chart value), ${on690.length} on the 690 row, `
+    + `and the 6:00 cell at a 1.5 mi goal reads ${BEG_600_15MI} for the beginner as for the intermediate `
+    + `(${c600.length - c600bad.length} of ${c600.length} cells), not 706.09`
+    + (offOwn.length ? ' — first off its own row: ' + `${offOwn[0].mb.join(':')}/${offOwn[0].handDist.toFixed(4)} mi got ${offOwn[0].pp.ip}` : '')
+    + (c600bad.length ? ' — first 6:00 miss: ' + `${c600bad[0].exp}/${c600bad[0].age} got ${c600bad[0].pp.ip}` : ''));
+}
 const p1cBad = rows.filter(r => r.exp !== 'beginner').filter(r => {
   const mine = handRowPaceAt(handRow(hand.secs(r.mb[0], r.mb[1])), r.handDist);
   const dflt = handRowPaceAt(handRow(EXP_DEFAULT[r.exp]), r.handDist);
@@ -234,7 +269,8 @@ for(const r of rows){
   else { p1dLong++; if(r.pp.ip <= r.handMileCol + 1e-9)
       p1dBad.push(`${r.exp}/${r.handDist.toFixed(4)} mi anchor ${r.pp.ip} not slower than mile column ${r.handMileCol}`); }
 }
-ok(p1dBad.length === 0, `P1d the anchor equals the mile column at or below one mile (${p1dShort} builds) `
+ok(p1dBad.length === 0, `P1d the anchor equals the mile column at or below one mile (${p1dShort} builds; `
+  + (D188_ON ? `the entered mile's column at every level, D188` : `the 690 column for beginners, V172`) + `) `
   + `and is strictly slower past it (${p1dLong} builds): a longer goal never starts the clock at the `
   + `athlete's mile pace` + (p1dBad.length ? ' — first miss: ' + p1dBad[0] : ''));
 

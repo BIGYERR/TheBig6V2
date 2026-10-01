@@ -509,13 +509,17 @@ ok('C8 the survivor carries its own ss===60 correction on the following line' + 
 //             pace-line shapes and brought-in (2) the km lens: every time in the R1 sentence
 //             and on both pace lines goes through _clkMS (+11). R1 retired the offer
 //             (achievablePacePerMile / applySuggestedPace), which held the safeTotal pair.
+//   226 on:   26, round-OUTSIDE stays 0. D188 E2 (V226, Class F) deleted paceCeilingSentence's beginner
+//             line, which held exactly one call: _clkMS(f.cur) in "Your paces start from the beginner
+//             default of ... per mile." (V225 :2459). Hand count: 27 - 1 = 26.
 // `outside` is the round-OUTSIDE Math.round(x) % 60 count for the era; it was a flat 2 until V223.
 // A version with no row fails loudly. It never falls back to a neighbouring row.
 const CLK_CALLS_BY_ERA = [
   { from: 204, to: 206,      calls: 11, outside: 2, why: 'D126 inventory' },
   { from: 207, to: 217,      calls: 13, outside: 2, why: 'D106a (V207) test-card detail adds 2' },
   { from: 218, to: 222,      calls: 16, outside: 2, why: 'D157 (V218) three swim labels read the total through _clkMS: pace line 2393, initial render 2817, sizer label 3330' },
-  { from: 223, to: Infinity, calls: 27, outside: 0, why: 'D183 (V223) amendment 2 (a)/(b)/(d), R5, brought-in (2) add 11: paceCeilingSentence 5 (2456 x2, 2457, 2458, 2459), updatePaceDisplay 2 (2407), paceDisplayLine initial render 2 (2844), swim pace line per100 +1 (2386), swim initial render per100 +1 (2802); R1 retired the offer and its Math.round(safeTotal) % 60 pair' },
+  { from: 223, to: 225,      calls: 27, outside: 0, why: 'D183 (V223) amendment 2 (a)/(b)/(d), R5, brought-in (2) add 11: paceCeilingSentence 5 (2456 x2, 2457, 2458, 2459), updatePaceDisplay 2 (2407), paceDisplayLine initial render 2 (2844), swim pace line per100 +1 (2386), swim initial render per100 +1 (2802); R1 retired the offer and its Math.round(safeTotal) % 60 pair' },
+  { from: 226, to: Infinity, calls: 26, outside: 0, why: 'D188 E2 (V226, Class F) deleted the paceCeilingSentence beginner line and its one call, _clkMS(f.cur) at V225 :2459: 27 - 1' },
 ];
 const CLK_ROW = CLK_CALLS_BY_ERA.find(r => +VER >= r.from && +VER <= r.to) || null;
 ok('C8 CLK_CALLS_BY_ERA has a row for ia-version ' + VER + (CLK_ROW ? ' (' + CLK_ROW.why + ')' : ' (NO ROW)') + FIXIT,
