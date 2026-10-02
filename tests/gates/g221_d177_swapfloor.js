@@ -112,8 +112,10 @@ const stripRep = s => String(s).replace(REP_TOKEN, (m, sets) => sets + '×#');
 // So G3c's power and off-grammar compares are cue-blind above 226: the exact suffix is removed from both sides,
 // once, before comparing. Typed here, never read from the engine. At 226 and below this is identity. The cue
 // byte itself is in D190's gate's custody (tests/measure/v227_rulings/d190_swapseam_ruling.md, Gates).
-const D190_CUE = ' — hold RPE 7, two in the tank';
-function cueBlind(s){ return (VER > 226 && typeof s === 'string' && s.endsWith(D190_CUE)) ? s.slice(0, s.length - D190_CUE.length) : s; }
+// V228 D193 R1 (split, Mario round 2; Amendment 2 "g227 gates": "`cueBlind` strips both wordings, the same shape as R4"):
+// the cue is recognised by shape, V227's "two" and V228's "three", still only above 226.
+const D190_CUE_RE = / — hold RPE 7, (?:two|three) in the tank$/;
+function cueBlind(s){ if(!(VER > 226 && typeof s === 'string')) return s; const m = D190_CUE_RE.exec(s); return m ? s.slice(0, m.index) : s; }
 function handKind(n, D){
   const W = handFloor(n);
   if(W === null) return { k:'null', W };

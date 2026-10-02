@@ -1,0 +1,31 @@
+v228_undokey_480 | CF from V227 HEAD | chains selected 480 (manny 114, mario_noinj 366)
+  ALL | S2 boot==live (appears after undo)  480
+  ALL | after-undo boot == S2 boot: true  480
+  ALL | after-undo live == S2 live: true  480
+  ALL | hand replay == boot slot detail: true  480
+  ALL | ia_hist_ keys at S2 0  480
+  ALL | same name elsewhere on the day: false  480
+  ALL | slot differs: false, other items differ: 0  480
+  ALL | text shape: other  480
+  ALL | undo rx entries 1  480
+  BRANCH last replay record: [verbatim (no floor)]  480
+  SHAPE manny Band woodchopper (door anchor) > | other  114
+  SHAPE mario_noinj Cable woodchoppers > | other  120
+  SHAPE mario_noinj Medicine ball rotary toss > | other  120
+  SHAPE mario_noinj Pallof press > | other  126
+  manny | S2 boot==live (appears after undo)  114
+  mario_noinj | S2 boot==live (appears after undo)  366
+  EX manny W5 fri slot 2.0 : Band woodchopper (door anchor) "3×12 each" > Ab wheel rollouts > Garhammer raises > Ab wheel rollouts
+    S2 (before last tap): boot==live true
+    store before undo [{"from":"Band woodchopper (door anchor)","to":"Ab wheel rollouts","rx":[{"s":2,"i":0,"d":"3×12 each"}]},{"from":"Ab wheel rollouts","to":"Garhammer raises","rx":[{"s":2,"i":0,"d":"3×12 each"}]},{"from":"Garhammer raises","to":"Ab wheel rollouts","rx":[{"s":2,"i":0,"d":"3×12 each"}]}]
+    chip Garhammer raises | undo used record Garhammer raises->Ab wheel rollouts rx [{"s":2,"i":0,"d":"3×12 each"}]
+    store after undo ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Garhammer raises"]
+    live after undo slot "3×12 each" | boot slot "3×12 each" | all diffs 
+    hand replay (applySessionSwaps :10305 -> applySwapPrefs :10159 -> _swapDetailFor :10123): Band woodchopper (door anchor)->Ab wheel rollouts: "3×12 each" => "3×12 each" [verbatim (no floor)] | Ab wheel rollouts->Garhammer raises: "3×12 each" => "3×12 each" [verbatim (no floor)]
+  EX mario_noinj W5 mon slot 3.0 : Pallof press "3×12 each" > Ab wheel rollouts > Garhammer raises > Ab wheel rollouts
+    S2 (before last tap): boot==live true
+    store before undo [{"from":"Pallof press","to":"Ab wheel rollouts","rx":[{"s":3,"i":0,"d":"3×12 each"}]},{"from":"Ab wheel rollouts","to":"Garhammer raises","rx":[{"s":3,"i":0,"d":"3×12 each"}]},{"from":"Garhammer raises","to":"Ab wheel rollouts","rx":[{"s":3,"i":0,"d":"3×12 each"}]}]
+    chip Garhammer raises | undo used record Garhammer raises->Ab wheel rollouts rx [{"s":3,"i":0,"d":"3×12 each"}]
+    store after undo ["Pallof press->Ab wheel rollouts","Ab wheel rollouts->Garhammer raises"]
+    live after undo slot "3×12 each" | boot slot "3×12 each" | all diffs 
+    hand replay (applySessionSwaps :10305 -> applySwapPrefs :10159 -> _swapDetailFor :10123): Pallof press->Ab wheel rollouts: "3×12 each" => "3×12 each" [verbatim (no floor)] | Ab wheel rollouts->Garhammer raises: "3×12 each" => "3×12 each" [verbatim (no floor)]

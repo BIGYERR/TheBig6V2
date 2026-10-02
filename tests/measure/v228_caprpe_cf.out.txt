@@ -1,0 +1,58 @@
+V227 ia-version 227
+  anchor 1 count 1 :: const INJ_CAP_CUE=' — hold RPE 7, two in the tank';
+  anchor 2 count 1 :: function _stripCapCue(d){ return (typeof d==='string'&&d.endsWith(INJ_CAP_CUE))?d.slice(0,
+  anchor 3 count 1 :: if(pat&&P.cap.has(pat)&&detail&&!/RPE/.test(detail)) detail=detail+INJ_CAP_CUE;
+
+=== M1 uncued RPE>7 donors -> capped sheet targets, L9 (7 injured configs), live / boot / exSwapPrefs build, V227 vs CF
+   donor x candidate pairs 1637 | capped targets 114 | crash 0 | boot landed V227 114 CF 114
+   class (iii-b) RPE>7 on the capped end: live V227 114 -> CF 0 | boot (landed) V227 114 -> CF 0 | by config elbow_wa 48 | knee_protect 14 | lowback_wa 28 | mario 4 | shoulder_wa 20 | live==boot V227 114 CF 114 /114
+   distinct live V227 end shapes 4 (each with CF text and R2 coverage flags on the CF text):
+     [50, RPE>7 50] V227 "N×R @ RPE 8"
+        CF "N×R @ RPE 7" x50
+        FLAG no gloss 50
+     [48, RPE>7 48] V227 "N sets — RPE 8 (stop 2 reps short of failure)"
+        CF "N sets — RPE 7 (leave 3 or more in reserve)" x48
+     [12, RPE>7 12] V227 "N×R each @ RPE 8"
+        CF "N×R each @ RPE 7" x12
+        FLAG no gloss 12
+     [4, RPE>7 4] V227 "N sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest"
+        CF "N sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" x4
+   donor shapes behind iii-b: N sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest 4 | N×R @ RPE 8 96 | N×R each @ RPE 8 14
+   BUILD exSwapPrefs: prefs 48 | landed cards 118 | RPE>7 V227 52 -> CF 0 | CF flags (none)
+   build iii-b shapes V227 => CF: N sets — RPE 8 (stop 2 reps short of failure)  =>  N sets — RPE 7 (leave 3 or more in reserve) 48 | N sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest  =>  N sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 2–3 min rest 4
+
+=== M2 after-grid V227 vs CF, L432 (6 regions x 2 tiers x 4 equipment x 3 exp x 3 focus), positional, every differing card classified
+   builds 432 | cards 77693 | classified (i) literal 3372 | (ii) clamp 300 | (ii-b) clamp Burpees Main 16 | UNCLASSIFIED 0
+   (ii) by region/tier ankle/workaround 28 | elbow/protect 28 | elbow/workaround 56 | hip/protect 8 | hip/workaround 28 | knee/workaround 28 | lowback/protect 48 | lowback/workaround 48 | shoulder/workaround 28 | by eq bodyweight 300 | by label Main 300
+   (ii-b) lowback/protect/bodyweight/advanced/support_athletic W1 Main — Burpees 1 | lowback/protect/bodyweight/advanced/support_athletic W2 Main — Burpees 1 | lowback/protect/bodyweight/advanced/support_strength W1 Main — Burpees 1 | lowback/protect/bodyweight/advanced/support_strength W2 Main — Burpees 1 | lowback/protect/bodyweight/intermediate/support_athletic W1 Main — Burpees 1 | lowback/protect/bodyweight/intermediate/support_athletic W2 Main — Burpees 1 | lowback/protect/bodyweight/intermediate/support_strength W1 Main — Burpees 1 | lowback/protect/bodyweight/intermediate/support_strength W2 Main — Burpees 1 | lowback/workaround/bodyweight/advanced/support_athletic W1 Main — Burpees 1 | lowback/workaround/bodyweight/advanced/support_athletic W2 Main — Burpees 1 | lowback/workaround/bodyweight/advanced/support_strength W1 Main — Burpees 1 | lowback/workaround/bodyweight/advanced/support_strength W2 Main — Burpees 1 | lowback/workaround/bodyweight/intermediate/support_athletic W1 Main — Burpees 1 | lowback/workaround/bodyweight/intermediate/support_athletic W2 Main — Burpees 1 | lowback/workaround/bodyweight/intermediate/support_strength W1 Main — Burpees 1 | lowback/workaround/bodyweight/intermediate/support_strength W2 Main — Burpees 1
+   (i) by region/tier ankle/workaround 162 | elbow/protect 432 | elbow/workaround 704 | hip/protect 60 | hip/workaround 418 | knee/protect 210 | knee/workaround 162 | lowback/protect 60 | lowback/workaround 348 | shoulder/workaround 816 | Burpees 36
+     e.g. (ii) knee/workaround/bodyweight/beginner/support_strength W5 Split squat "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest" => "3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+     e.g. (ii) knee/workaround/bodyweight/beginner/support_strength W6 Split squat "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest" => "3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+   (a′) capped cards still naming RPE>7 on CF: 4
+     elbow/workaround/bodyweight/advanced/support_strength W3 mon [Chest volume] Pushups (slow 3s eccentric) "4 sets — RPE 8 (stop 2 reps short of failure)"
+     elbow/workaround/bodyweight/advanced/support_strength W4 mon [Chest volume] Pushups (slow 3s eccentric) "4 sets — RPE 8 (stop 2 reps short of failure)"
+     elbow/workaround/bodyweight/advanced/support_athletic W3 mon [Chest volume] Pushups (slow 3s eccentric) "4 sets — RPE 8 (stop 2 reps short of failure)"
+     elbow/workaround/bodyweight/advanced/support_athletic W4 mon [Chest volume] Pushups (slow 3s eccentric) "4 sets — RPE 8 (stop 2 reps short of failure)"
+
+   (iii) cued donor -> capped unloadable target, L9: live / boot / build, V227 vs CF
+   pairs 864 | capped unloadable 210 | live RPE 8: V227 196 CF 0 | live RPE 7 CF 196 | boot RPE 8: V227 196 CF 0 | boot RPE 7 CF 196 | live==boot CF 210/210 | CF ends N sets — RPE 7 (leave 3 or more in reserve) 196 | N×R each — CUE(three) 4 | N×R — CUE(three) 10
+   build: landed 218 | RPE 8 V227 202 CF 0 | RPE 7 CF 202 | CF ends N sets — RPE 7 (leave 3 or more in reserve) 202 | N×R each — CUE(three) 6 | N×R — CUE(three) 10
+
+   (iv) grid stored by V227 (old literal), booted on V227 and CF; one live swap per cued W1-W4 card (first candidate), boot replay, undo
+     mario        booted CF: old-literal cards 4 new-literal 2
+     knee_protect booted CF: old-literal cards 4 new-literal 4
+     ankle_wa     booted CF: old-literal cards 4 new-literal 2
+     hip_wa       booted CF: old-literal cards 10 new-literal 6
+     lowback_wa   booted CF: old-literal cards 8 new-literal 4
+     shoulder_wa  booted CF: old-literal cards 20 new-literal 8
+     elbow_wa     booted CF: old-literal cards 20 new-literal 10
+     live swaps 70 | V227 tree OLD carried 60 | bwsets 8 8 | no-RPE no-cue 2 | CF tree bwsets 7 8 | new cue 60 | no-RPE no-cue 2
+     CF capped targets bwsets 7 8 | new cue 60 | CF uncapped targets no-RPE no-cue 2
+     boot replay landed V227 70 CF 70 | V227 OLD carried 60 | bwsets 8 8 | no-RPE no-cue 2 | CF bwsets 7 8 | new cue 60 | no-RPE no-cue 2
+     undo restores the stored detail verbatim: V227 70/70 CF 70/70
+
+=== M3 HALF_MANNY digest and uninjured byte-identity
+   HALF_MANNY V227 0ac7da6b1691a8e1 | CF 0ac7da6b1691a8e1 (CF self equal) | expected 0ac7da6b1691a8e1: YES
+   uninjured builds (mario_noinj + the 36 uninjured L432 cells) weeks JSON byte-identical V227 vs CF: 37/37
+   CF _stripCapCue on non-cue details (L9 incl. HALF_MANNY): false strips 0/1722
+DONE lines 46

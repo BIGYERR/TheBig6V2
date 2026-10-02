@@ -1,0 +1,37 @@
+  h3 CF boot!=live  110
+  h3 CF boot!=live by config lowback_wa  110
+  h3 CF boot!=live by week W3  110
+  h3 CF boot!=live | CF store before undo collapsed | U_d | slot detail only yes  96
+  h3 CF boot!=live | CF store before undo collapsed | U_d' | slot detail only yes  14
+  h3 CF store collapsed (all chains)  871
+  h3 CF store collapsed and boot!=live  110
+  h3 V227 boot!=live  110
+  h3 n  12933
+  h4 CF boot!=live  2999
+  h4 CF boot!=live by config lowback_wa  2999
+  h4 CF boot!=live by week W3  2999
+  h4 CF boot!=live | CF store before undo collapsed | U_d | slot detail only yes  1450
+  h4 CF boot!=live | CF store before undo collapsed | U_d' | slot detail only yes  1549
+  h4 CF store collapsed (all chains)  32054
+  h4 CF store collapsed and boot!=live  2999
+  h4 V227 boot!=live  4216
+  h4 healed by CF  1217
+  h4 n  175465
+  h5 CF boot!=live  54
+  h5 CF boot!=live by config lowback_wa  54
+  h5 CF boot!=live by week W3  54
+  h5 CF boot!=live | CF store before undo collapsed | U_d | slot detail only yes  23
+  h5 CF boot!=live | CF store before undo collapsed | U_d' | slot detail only yes  31
+  h5 CF store collapsed (all chains)  391
+  h5 CF store collapsed and boot!=live  54
+  h5 V227 boot!=live  76
+  h5 healed by CF  24
+  h5 n  1000
+CF-created boot!=live rows: 2
+  h5 lowback_wa W3 tue A>B>C>D>C>B : Kettlebell single-arm row > Cable curl > Dumbbell row > Inverted rows (bodyweight) > Dumbbell row > Cable curl
+    V227: store ["Kettlebell single-arm row->Cable curl","Cable curl->Dumbbell row","Inverted rows (bodyweight)->Dumbbell row","Dumbbell row->Cable curl"] chip Kettlebell single-arm row undo Kettlebell single-arm row "2×8 each — hold RPE 7, two in the tank" ok 0 boot==live 1
+    CF:   store ["Kettlebell single-arm row->Cable curl","Cable curl->Dumbbell row","Inverted rows (bodyweight)->Dumbbell row","Dumbbell row->Cable curl"] chip Dumbbell row undo Dumbbell row "2 sets — RPE 8 (stop 2 reps short of failure)" ok 1 store after ["Kettlebell single-arm row->Cable curl","Cable curl->Dumbbell row","Inverted rows (bodyweight)->Dumbbell row"] | boot diff {"where":"slot","si":1,"ii":0,"live":"Dumbbell row | 2 sets — RPE 8 (stop 2 reps short of failure)","boot":"Dumbbell row | 2×8 each — hold RPE 7, two in the tank","keys":"detail"}
+  h5 lowback_wa W3 tue A>B>C>B>D>B : Kettlebell single-arm row > Incline dumbbell curl > Feet-elevated inverted rows > Incline dumbbell curl > Dumbbell hammer curl > Incline dumbbell curl
+    V227: store ["Kettlebell single-arm row->Incline dumbbell curl","Feet-elevated inverted rows->Incline dumbbell curl","Incline dumbbell curl->Dumbbell hammer curl","Dumbbell hammer curl->Incline dumbbell curl"] chip Kettlebell single-arm row undo Kettlebell single-arm row "2×8 each — hold RPE 7, two in the tank" ok 0 boot==live 1
+    CF:   store ["Kettlebell single-arm row->Incline dumbbell curl","Feet-elevated inverted rows->Incline dumbbell curl","Incline dumbbell curl->Dumbbell hammer curl","Dumbbell hammer curl->Incline dumbbell curl"] chip Dumbbell hammer curl undo Dumbbell hammer curl "2 sets — RPE 8 (stop 2 reps short of failure)" ok 1 store after ["Kettlebell single-arm row->Incline dumbbell curl","Feet-elevated inverted rows->Incline dumbbell curl","Incline dumbbell curl->Dumbbell hammer curl"] | boot diff {"where":"slot","si":1,"ii":0,"live":"Dumbbell hammer curl | 2 sets — RPE 8 (stop 2 reps short of failure)","boot":"Dumbbell hammer curl | 2×8 each","keys":"detail"}
+PASS-free post-pass: printed 29 tallies

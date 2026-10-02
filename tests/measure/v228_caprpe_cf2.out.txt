@@ -1,0 +1,82 @@
+PREP working index.html ia-version 228 sha fdd2eb848f59 | carry V228 copy sha fdd2eb848f59 (equal: true) | V227 sha c9069fe64113
+  anchor [R7 fifth shape in _capRpeClamp] count 1
+  anchor [R3 carry from the kept pre-hold dose] count 1
+  anchor [R3 keep the dose + R8 detect the hold] count 1
+  anchor [R3 _preF captured before the re-filter] count 1
+  anchor [R8 hold toasts] count 1
+  anchor [R3 undo drops the kept dose of the restored item] count 1
+  CF2 written sha a57b5f88f59d
+  CF2 boots: ia-version 228 | _capRpeClamp(TEST9) === R7 text: true
+gate CF2 DUMPED 150068
+worker V228:ankle_wa 15
+worker V228:mario 320
+worker CF2:mario 320
+worker V228:hip_wa 1405
+worker CF2:ankle_wa 15
+worker V228:knee_protect 1232
+worker CF2:knee_protect 1232
+worker V228:shoulder_wa 3708
+worker CF2:hip_wa 1405
+worker V228:lowback_wa 3531
+worker CF2:lowback_wa 3531
+worker CF2:shoulder_wa 3708
+worker V228:elbow_wa 8369
+worker CF2:elbow_wa 8369
+chains done
+
+=== M4 the R3 carry on the D190 lattice chains (18,580; L9 injured configs, weeks 3/5/7)
+  chains on all four 18580 | unreachable CF2 0 V228 0
+  live != boot: V227 487 | V228 slices 1+2 6327 | CF2 487 | CF2 residue chain ids == V227 residue ids: true (in both 487, CF2 only 0, V227 only 0)
+  pre-hold carry (NOCLAMP live end, clamped when the end is capped): CF2 live equal 18580/18580 (V228 12518) | uncapped ends 6062/6062 | capped ends 12518/12518 | CF2 boot equal 18093/18580 | CF2 live-or-boot == pre-hold on non-residue 18093/18093
+  boot vs slices 1+2 byte-identical 18580/18580 | build vs slices 1+2 18580/18580
+  undo (live slot after undoing the last hop) vs slices 1+2 15870/18580 | undo then boot vs slices 1+2 18580/18580 | chips equal 18580
+    undo differs mario#182 Leg extension > 45° back extension > Barbell hip thrust CF2 {"n":"45° back extension","d":"2 sets — RPE 8 (stop 2 reps short of failure)"} V228 {"n":"45° back extension","d":"2 sets — RPE 7 (leave 3 or more in reserve)"}
+    undo differs mario#183 Leg extension > 45° back extension > Glute-ham raise CF2 {"n":"45° back extension","d":"2 sets — RPE 8 (stop 2 reps short of failure)"} V228 {"n":"45° back extension","d":"2 sets — RPE 7 (leave 3 or more in reserve)"}
+    undo differs mario#184 Leg extension > 45° back extension > Nordic hamstring curl (anchored) CF2 {"n":"45° back extension","d":"2 sets — RPE 8 (stop 2 reps short of failure)"} V228 {"n":"45° back extension","d":"2 sets — RPE 7 (leave 3 or more in reserve)"}
+    undo differs mario#185 Leg extension > 45° back extension > Single-leg glute bridge CF2 {"n":"45° back extension","d":"2 sets — RPE 8 (stop 2 reps short of failure)"} V228 {"n":"45° back extension","d":"2 sets — RPE 7 (leave 3 or more in reserve)"}
+    undo differs mario#186 Leg extension > 45° back extension > Single-leg hip thrust CF2 {"n":"45° back extension","d":"2 sets — RPE 8 (stop 2 reps short of failure)"} V228 {"n":"45° back extension","d":"2 sets — RPE 7 (leave 3 or more in reserve)"}
+  undo restores the card as it stood before the last hop: CF2 17089/18580 | V228 17003/18580 | of the 2710 undo differences, the pre-last-hop card also differs between trees 2710
+  of the CF2 live changes, inside the V227 residue 222 | outside 5840
+  live CF2 vs slices 1+2 changed 6062 (expected the 5,840) | of them uncapped end 6062 | toasts changed on some hop 18580 | CF2 hold toasts on hops 39203
+  mario W5 thu mario#67 Single-leg hip thrust > Barbell hip thrust > Leg extension > Barbell good mornings
+    CF2 hop1 "2×6–10 @ RPE 8" | Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers.
+    CF2 hop2 "2×6–10 @ RPE 7" | Leg extension in, barbell hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7.
+    CF2 hop3 "2×6–10 @ RPE 8" | Barbell good mornings in, leg extension out. Same job, same numbers.
+    CF2 boot "2×6–10 @ RPE 8" | build "2×6–10 @ RPE 8" (Barbell hip thrust) | V228 live "2×6–10 @ RPE 7"
+  DIRECT one hop Single-leg hip thrust "2×6–10 @ RPE 8" -> Barbell good mornings "2×6–10 @ RPE 8" | Barbell good mornings in, single-leg hip thrust out. Same job, same numbers.
+
+=== M5 toasts, D177 gate L1 sweep (row dumps V227 / V228 / CF2 joined by position)
+  rows V227 150068 V228 150068 CF2 150068 | (where,to) aligned 150068
+  clamp pairs (capped target, card RPE != donor RPE by hand parse): CF2 1630 | V228 1630 | false effort/numbers claims: CF2 458 V228 1630
+  CF2 toast on clamp pairs == expected hold variant (branch read from the V228 toast) 1172/1630 | by variant NOT HOLD: No load to add here, so take the sets to the same effort. 458 | unloadable-hold 360 | verbatim-hold 613 | window-hold 199
+    miss commercial|support_prevention|beginner|lift|lowback/workaround W1 tue Chinups -> Feet-elevated inverted rows :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest => 3 sets — RPE 6 (leave 3 or more in reserve) | toast "Feet-elevated inverted rows in, chinups out. No load to add here, so take the sets to the same effort." want "Feet-elevated inverted rows in, chinups out. No load to add here. Your injury plan holds this one at RPE 7."
+    miss commercial|support_prevention|beginner|lift|lowback/workaround W1 tue Chinups -> Inverted rows (bodyweight) :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest => 3 sets — RPE 6 (leave 3 or more in reserve) | toast "Inverted rows (bodyweight) in, chinups out. No load to add here, so take the sets to the same effort." want "Inverted rows (bodyweight) in, chinups out. No load to add here. Your injury plan holds this one at RPE 7."
+    miss commercial|support_prevention|beginner|lift|lowback/workaround W1 tue Chinups -> Inverted rows (rings) :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest => 3 sets — RPE 6 (leave 3 or more in reserve) | toast "Inverted rows (rings) in, chinups out. No load to add here, so take the sets to the same effort." want "Inverted rows (rings) in, chinups out. No load to add here. Your injury plan holds this one at RPE 7."
+    miss commercial|support_prevention|beginner|lift|lowback/workaround W2 tue Chinups -> Feet-elevated inverted rows :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest => 3 sets — RPE 6 (leave 3 or more in reserve) | toast "Feet-elevated inverted rows in, chinups out. No load to add here, so take the sets to the same effort." want "Feet-elevated inverted rows in, chinups out. No load to add here. Your injury plan holds this one at RPE 7."
+    miss commercial|support_prevention|beginner|lift|lowback/workaround W2 tue Chinups -> Inverted rows (bodyweight) :: 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest => 3 sets — RPE 6 (leave 3 or more in reserve) | toast "Inverted rows (bodyweight) in, chinups out. No load to add here, so take the sets to the same effort." want "Inverted rows (bodyweight) in, chinups out. No load to add here. Your injury plan holds this one at RPE 7."
+  the clamp class (capped target, V227 card RPE > 7): 2514 | CF2 toast == expected hold variant 1172 | false effort/numbers claims 1342 | variants NOT HOLD 1342 | unloadable-hold 360 | verbatim-hold 613 | window-hold 199
+  hand-parse pairs outside the clamp class still claiming same effort: 458 | V227 toast identical 458 | V227 card identical 458 | donor->card RPE 6.5->6 398 | 7.5->7 60
+  non-clamp pairs 148438: toast == V228 148438 | == V227 148438 | hold toast on a non-clamp pair 0 (none)
+  card text CF2 vs V228 on all pairs: equal 149828/150068 | changed R7 text 240
+
+=== M6 R7 held test
+  R7 text on an UNCAPPED target (donor a native held-test card): 113 | V228 printed there number-only 113 | V227 TEST9 (RPE 9 test) 113
+  live gate rows printing R7 text 240 | donor texts TEST9 56 | Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here. 184 | capped targets 127 | number-only "at RPE 7 … new baseline" in CF2 rows 0
+  BUILD (gate L1, 384 builds): cards printing R7 text 30 (uninjured 0) | V227 test cards on a capped pattern 28 | number-only shape 0 | uncapped test cards byte-identical to V227 102/104 | uninjured builds byte-identical to V227 96/96
+    e.g. strength|beginner|commercial|knee/workaround W6 thu [Main — Barbell box squat] Barbell box squat V227 "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+    e.g. strength|beginner|commercial|lowback/workaround W6 thu [Main — Dumbbell goblet squat] Dumbbell goblet squat V227 "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+    e.g. UNCAPPED-ON-V227 test card moved: strength|beginner|bodyweight|lowback/workaround W6 tue [Main — Burpees] V227 Burpees [-] -> CF2 Burpees [-] "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here."
+    e.g. UNCAPPED-ON-V227 test card moved: strength|advanced|bodyweight|lowback/workaround W6 tue [Main — Burpees] V227 Burpees [-] -> CF2 Burpees [-] "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here."
+
+=== M7 digests and uninjured byte-identity on CF2
+  HALF_MANNY (unpinned clock, as gates do) V227 0ac7da6b1691a8e1 V228 0ac7da6b1691a8e1 CF2 0ac7da6b1691a8e1 | expected 0ac7da6b1691a8e1
+  g227_d190_cuecap c-DIGEST (progDigest(buildProgram), clock pinned 2026-09-24, built twice per tree; configs as the gate names them):
+    c-DIGEST mario        CF2 39679fdc5762f2b5 | V228 slices 1+2 39679fdc5762f2b5 | V227 7681cf8e4b3d42da (CF2 == slices 1+2)
+    c-DIGEST ankle_wa     CF2 24fea086fe087454 | V228 slices 1+2 24fea086fe087454 | V227 03e359b5731139a6 (CF2 == slices 1+2)
+    c-DIGEST hip_wa       CF2 6c73687da203475a | V228 slices 1+2 6c73687da203475a | V227 f2ae1010ae57eab7 (CF2 == slices 1+2)
+    c-DIGEST lowback_wa   CF2 d6e7e7178c37c073 | V228 slices 1+2 d6e7e7178c37c073 | V227 d4de0af4ab123f38 (CF2 == slices 1+2)
+    c-DIGEST shoulder_wa  CF2 7cd72ca7e37a6f29 | V228 slices 1+2 7cd72ca7e37a6f29 | V227 fdfc74330b68d5fc (CF2 == slices 1+2)
+    c-DIGEST elbow_wa     CF2 9a1b2079ac9cf7bd | V228 slices 1+2 9a1b2079ac9cf7bd | V227 1bd7fe074b3557ee (CF2 == slices 1+2)
+    c-DIGEST manny        CF2 0ac7da6b1691a8e1 | V228 slices 1+2 0ac7da6b1691a8e1 | V227 0ac7da6b1691a8e1 (CF2 == slices 1+2)
+    c-DIGEST mario_noinj  CF2 d59b65f1d978a263 | V228 slices 1+2 d59b65f1d978a263 | V227 d59b65f1d978a263 (CF2 == slices 1+2)
+  uninjured byte-identity CF2 vs V227: support lattice + mario_noinj 37/37 | gate L1 healthy configs 96/96 | total 133/133

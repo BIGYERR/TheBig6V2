@@ -1,0 +1,55 @@
+candidate index.html ia-version 228 | baseline /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/3a93b6bd-f518-4d1a-a71e-2afb713a85f0/scratchpad/base_v227.html ia-version 227
+PASS baseline reads ia-version 227
+PASS candidate reads ia-version 228
+PASS mario V227 self-stable 7681cf8e4b3d42da/7681cf8e4b3d42da
+PASS mario V228 self-stable 39679fdc5762f2b5/39679fdc5762f2b5
+  mario        V227 7681cf8e4b3d42da  V228 39679fdc5762f2b5  ORACLE 39679fdc5762f2b5 | V227 detail strings substituted 6 (old 6, new 0, non-detail old 0) | V228 detail old 0 new 6 non-detail new 0
+PASS mario V228 == oracle
+PASS mario V227 carries no literal outside detail, V228 none old
+PASS mario injured: substitution non-vacuous (>0 detail strings) and V227 != V228
+PASS ankle_wa V227 self-stable 03e359b5731139a6/03e359b5731139a6
+PASS ankle_wa V228 self-stable 24fea086fe087454/24fea086fe087454
+  ankle_wa     V227 03e359b5731139a6  V228 24fea086fe087454  ORACLE 24fea086fe087454 | V227 detail strings substituted 6 (old 6, new 0, non-detail old 0) | V228 detail old 0 new 6 non-detail new 0
+PASS ankle_wa V228 == oracle
+PASS ankle_wa V227 carries no literal outside detail, V228 none old
+PASS ankle_wa injured: substitution non-vacuous (>0 detail strings) and V227 != V228
+PASS hip_wa V227 self-stable f2ae1010ae57eab7/f2ae1010ae57eab7
+PASS hip_wa V228 self-stable 6c73687da203475a/6c73687da203475a
+  hip_wa       V227 f2ae1010ae57eab7  V228 6c73687da203475a  ORACLE 6c73687da203475a | V227 detail strings substituted 16 (old 16, new 0, non-detail old 0) | V228 detail old 0 new 16 non-detail new 0
+PASS hip_wa V228 == oracle
+PASS hip_wa V227 carries no literal outside detail, V228 none old
+PASS hip_wa injured: substitution non-vacuous (>0 detail strings) and V227 != V228
+PASS lowback_wa V227 self-stable d4de0af4ab123f38/d4de0af4ab123f38
+PASS lowback_wa V228 self-stable d6e7e7178c37c073/d6e7e7178c37c073
+  lowback_wa   V227 d4de0af4ab123f38  V228 d6e7e7178c37c073  ORACLE d6e7e7178c37c073 | V227 detail strings substituted 12 (old 12, new 0, non-detail old 0) | V228 detail old 0 new 12 non-detail new 0
+PASS lowback_wa V228 == oracle
+PASS lowback_wa V227 carries no literal outside detail, V228 none old
+PASS lowback_wa injured: substitution non-vacuous (>0 detail strings) and V227 != V228
+PASS shoulder_wa V227 self-stable fdfc74330b68d5fc/fdfc74330b68d5fc
+PASS shoulder_wa V228 self-stable 7cd72ca7e37a6f29/7cd72ca7e37a6f29
+  shoulder_wa  V227 fdfc74330b68d5fc  V228 7cd72ca7e37a6f29  ORACLE 7cd72ca7e37a6f29 | V227 detail strings substituted 28 (old 28, new 0, non-detail old 0) | V228 detail old 0 new 28 non-detail new 0
+PASS shoulder_wa V228 == oracle
+PASS shoulder_wa V227 carries no literal outside detail, V228 none old
+PASS shoulder_wa injured: substitution non-vacuous (>0 detail strings) and V227 != V228
+PASS elbow_wa V227 self-stable 1bd7fe074b3557ee/1bd7fe074b3557ee
+PASS elbow_wa V228 self-stable 9a1b2079ac9cf7bd/9a1b2079ac9cf7bd
+  elbow_wa     V227 1bd7fe074b3557ee  V228 9a1b2079ac9cf7bd  ORACLE 9a1b2079ac9cf7bd | V227 detail strings substituted 30 (old 30, new 0, non-detail old 0) | V228 detail old 0 new 30 non-detail new 0
+PASS elbow_wa V228 == oracle
+PASS elbow_wa V227 carries no literal outside detail, V228 none old
+PASS elbow_wa injured: substitution non-vacuous (>0 detail strings) and V227 != V228
+PASS manny V227 self-stable 0ac7da6b1691a8e1/0ac7da6b1691a8e1
+PASS manny V228 self-stable 0ac7da6b1691a8e1/0ac7da6b1691a8e1
+  manny        V227 0ac7da6b1691a8e1  V228 0ac7da6b1691a8e1  ORACLE 0ac7da6b1691a8e1 | V227 detail strings substituted 0 (old 0, new 0, non-detail old 0) | V228 detail old 0 new 0 non-detail new 0
+PASS manny V228 == oracle
+PASS manny V227 carries no literal outside detail, V228 none old
+PASS manny uninjured: V227 == V228
+PASS manny uninjured: zero substitutions
+PASS mario_noinj V227 self-stable d59b65f1d978a263/d59b65f1d978a263
+PASS mario_noinj V228 self-stable d59b65f1d978a263/d59b65f1d978a263
+  mario_noinj  V227 d59b65f1d978a263  V228 d59b65f1d978a263  ORACLE d59b65f1d978a263 | V227 detail strings substituted 0 (old 0, new 0, non-detail old 0) | V228 detail old 0 new 0 non-detail new 0
+PASS mario_noinj V228 == oracle
+PASS mario_noinj V227 carries no literal outside detail, V228 none old
+PASS mario_noinj uninjured: V227 == V228
+PASS mario_noinj uninjured: zero substitutions
+
+PASS 44 FAIL 0

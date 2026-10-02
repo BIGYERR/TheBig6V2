@@ -154,7 +154,7 @@ const R = {
 };
 
 // ── HAND ORACLE ──────────────────────────────────────────────────────────────────────────────────────────────────
-const CUE = ' — hold RPE 7, two in the tank';
+// CUE is typed after the version predicate below (V228 D193 R1, split): it reads VER.
 const CAP = { knee:['squat', 'lunge', 'leg_iso'], ankle:['squat', 'lunge'], hip:['hinge', 'lunge', 'hip_ext', 'squat'],
   lowback:['hinge', 'squat', 'row', 'hip_ext'], shoulder:['hpress', 'vpress', 'delt_iso'], elbow:['hpress', 'tri_iso', 'bi_iso', 'row', 'vpull'] };
 const CUED = [
@@ -229,6 +229,8 @@ if(process.env.IA_ASSUME_VERSION !== undefined){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   } else console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
+// V228 D193 R1 (split, Mario round 2; Amendment 2 "g227 gates"): the hand cue literal is version-predicated on the artifact's own ia-version, "three" at 228 and above, "two" at 227 and below, so the row still runs on V227. Sited here, after VER: VER is a `let` declared above, so the old site (the HAND ORACLE / ORACLE block) would read it in its temporal dead zone.
+const CUE = VER >= 228 ? ' — hold RPE 7, three in the tank' : ' — hold RPE 7, two in the tank';
 console.log('g227 D190 seam | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | N ' + N + ', N3 ' + N3 + ', NC ' + NC);
 if(!(VER >= ERA)){
   console.log('REFUSED: ia-version ' + VER + ' predates D190 P-SWAPSEAM (V' + ERA + '). No row may pass on it.');

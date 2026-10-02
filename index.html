@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="227"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="228"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -8088,8 +8088,11 @@ function injuryPlan(cfg){
 function _injViewName(n,cfg){ if(!cfg||!cfg.injury) return n; const P=injuryPlan(cfg); if(!P||!P.swapNames||!P.swapNames[n]) return n; const g=_gearLens((cfg&&cfg.equipment)||'home_full'); if(!g(n)) return n; const to=P.swapNames[n]; const FB={'Cable pushdown':'Close-grip pushups'}; return g(to)?to:(FB[to]||to); }
 // V227 D190 P-SWAPSEAM (R2): the plan's cap cue is one literal, read by the appender in applyInjuryFilter and by
 // the stripper both swap hops run before _swapDetailFor, so the carry never sees it and the filter alone writes it.
-const INJ_CAP_CUE=' — hold RPE 7, two in the tank';
-function _stripCapCue(d){ return (typeof d==='string'&&d.endsWith(INJ_CAP_CUE))?d.slice(0,d.length-INJ_CAP_CUE.length):d; }
+// V228 D193 P-CAPRPE R1 (split, Mario round 2): the cue says three, rpeFromWave's rir at RPE 7 and _bwSetsFromDetail's RPE 7 line.
+const INJ_CAP_CUE=' — hold RPE 7, three in the tank';
+// V228 D193 P-CAPRPE (R4): the stripper recognises the cue by shape, not by today's spelling: V227 stored 'two in the
+// tank', V228 writes 'three'. One regex, both wordings, no constant to expire; every other detail comes back unchanged.
+function _stripCapCue(d){ if(typeof d!=='string') return d; const m=/ — hold RPE 7, (?:two|three) in the tank$/.exec(d); return m?d.slice(0,m.index):d; }
 function applyInjuryFilter(sections,cfg){
   const P=injuryPlan(cfg);
   if(!P||!Array.isArray(sections)) return sections;
@@ -14176,7 +14179,8 @@ let _swapCtx=null;
 function swapOriginOf(name){
   if(!activeProgId||!currentDayKey) return null;
   const list=(getSwaps(activeProgId)['w'+currentWeek+'_'+currentDayKey])||[];
-  const hit=list.filter(e=>e&&e.to===name)[0];
+  // V228 D192 P-UNDOKEY: the most recent record whose `to` is the card's name, so the chip names the lift that just left.
+  const hit=list.filter(e=>e&&e.to===name).pop();
   return hit?hit.from:null;
 }
 // Compact form of a prescription, for the one place the sheet states it. Real detail

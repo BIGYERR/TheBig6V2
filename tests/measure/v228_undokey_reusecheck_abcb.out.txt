@@ -1,0 +1,6 @@
+reusecheck: files 20 (absent in B 0) | rows 61180 | identical on 12 fields 59018 | missing 0 | differ 2162
+  DIFF ur_CF_h3_manny_5_0.json manny5#26632 sa,sb
+  DIFF ur_CF_h3_manny_5_0.json manny5#26652 sa,sb
+  DIFF ur_CF_h3_manny_5_0.json manny5#26672 sa,sb
+  DIFF ur_CF_h3_manny_5_0.json manny5#26692 aH,bH,sa,sb
+  DIFF ur_CF_h3_manny_5_0.json manny5#26712 aH,bH,sa,sb

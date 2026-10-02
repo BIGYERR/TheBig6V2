@@ -118,8 +118,8 @@ const done = () => { console.log('  runtime ' + secs()); console.log('\nPASS ' +
 
 const R = {
   bALL:   'row b-ALL    cue <=> cap on every live hop of the injured lattice (knee, ankle, hip, lowback, shoulder, elbow at workaround; W3, W5; hop1, hop2, cyc2): the card ends with the cue iff the plan caps the pattern and the cue-free dose carries no RPE',
-  bH1:    'row b-HAND-1 MARIO knee/wa W5 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell split-stance deadlift -> Dumbbell goblet squat ends `2×8 — hold RPE 7, two in the tank`, live == boot',
-  bH2:    'row b-HAND-2 ankle/wa W3 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell goblet squat (`2×8 — hold RPE 7, two in the tank`) -> Dumbbell split-stance deadlift (`2×8`), live == boot',
+  bH1:    'row b-HAND-1 MARIO knee/wa W5 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell split-stance deadlift -> Dumbbell goblet squat ends `{RX8C}`, live == boot',
+  bH2:    'row b-HAND-2 ankle/wa W3 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell goblet squat (`{RX8C}`) -> Dumbbell split-stance deadlift (`2×8`), live == boot',
   bH3:    'row b-HAND-3 ankle/wa W3 thu Leg superset B: Kettlebell swing -> Dumbbell goblet squat (cued) -> Nordic hamstring curl (anchored) prints `2 sets — RPE 8 (stop 2 reps short of failure)`, live == boot',
   cTOAST: 'row c-TOAST  pair vs V226: the toast on every live hop of the injured lattice is unmoved, 0 moved',
   cUNINJ: 'row c-UNINJ  pair vs V226: HALF_MANNY and mario_noinj live, boot, toast and undo unmoved, 0 moved',
@@ -128,18 +128,13 @@ const R = {
 };
 
 // ── TYPED ORACLE ─────────────────────────────────────────────────────────────────────────────────────────────────
-const CUE = ' — hold RPE 7, two in the tank';
+// CUE, RX8C and HANDS are typed after the version predicate below (V228 D193 R1, split): they read VER.
 const CAP = { knee:['squat', 'lunge', 'leg_iso'], ankle:['squat', 'lunge'], hip:['hinge', 'lunge', 'hip_ext', 'squat'],
   lowback:['hinge', 'squat', 'row', 'hip_ext'], shoulder:['hpress', 'vpress', 'delt_iso'], elbow:['hpress', 'tri_iso', 'bi_iso', 'row', 'vpull'] };
 const KB = 'Kettlebell swing', SSDL = 'Dumbbell split-stance deadlift', GOB = 'Dumbbell goblet squat', NORD = 'Nordic hamstring curl (anchored)';
 const PAT_TYPED = { [KB]:'hinge', [SSDL]:'hinge', [GOB]:'squat', [NORD]:'hip_ext' };
-const RX8 = '2×8', RX8C = '2×8 — hold RPE 7, two in the tank', BW8 = '2 sets — RPE 8 (stop 2 reps short of failure)';
+const RX8 = '2×8', BW8 = '2 sets — RPE 8 (stop 2 reps short of failure)';
 const TOAST_GOB = 'Dumbbell goblet squat in, kettlebell swing out. Same job, same numbers.';
-const HANDS = [
-  { key:'bH1', ck:'mario',    w:5, d:'thu', sec:'Leg superset B', donor:KB, donorRx:RX8, hops:[SSDL, GOB],  want:[RX8, RX8C],  toast:[null, null] },
-  { key:'bH2', ck:'ankle_wa', w:3, d:'thu', sec:'Leg superset B', donor:KB, donorRx:RX8, hops:[GOB, SSDL],  want:[RX8C, RX8],  toast:[TOAST_GOB, null] },
-  { key:'bH3', ck:'ankle_wa', w:3, d:'thu', sec:'Leg superset B', donor:KB, donorRx:RX8, hops:[GOB, NORD],  want:[RX8C, BW8],  toast:[TOAST_GOB, null] },
-];
 const cueCount = s => s.split(CUE).length - 1;
 const stripCue = s => s.endsWith(CUE) ? s.slice(0, s.length - CUE.length) : s;
 // IFF: true when the card is right. region null (uninjured) never cues.
@@ -212,6 +207,18 @@ if(process.env.IA_ASSUME_VERSION !== undefined){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   } else console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
+// V228 D193 R1 (split, Mario round 2; Amendment 2 "g227 gates"): the hand cue literal is version-predicated on the
+// artifact's own ia-version, "three" at 228 and above, "two" at 227 and below, so every row still runs on V227. Sited
+// here, after VER (a `let` declared above): the old TYPED ORACLE site would read it in its temporal dead zone. RX8C and
+// HANDS read CUE at load time, so they sit here too (HANDS moved verbatim); the bH1/bH2 labels are filled from RX8C.
+const CUE = VER >= 228 ? ' — hold RPE 7, three in the tank' : ' — hold RPE 7, two in the tank';
+const RX8C = RX8 + CUE;
+const HANDS = [
+  { key:'bH1', ck:'mario',    w:5, d:'thu', sec:'Leg superset B', donor:KB, donorRx:RX8, hops:[SSDL, GOB],  want:[RX8, RX8C],  toast:[null, null] },
+  { key:'bH2', ck:'ankle_wa', w:3, d:'thu', sec:'Leg superset B', donor:KB, donorRx:RX8, hops:[GOB, SSDL],  want:[RX8C, RX8],  toast:[TOAST_GOB, null] },
+  { key:'bH3', ck:'ankle_wa', w:3, d:'thu', sec:'Leg superset B', donor:KB, donorRx:RX8, hops:[GOB, NORD],  want:[RX8C, BW8],  toast:[TOAST_GOB, null] },
+];
+R.bH1 = R.bH1.split('{RX8C}').join(RX8C); R.bH2 = R.bH2.split('{RX8C}').join(RX8C);
 console.log('g227 D190 cue <=> cap + pairs | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | NS ' + NS + ', NU ' + NU);
 if(!(VER >= ERA)){
   console.log('REFUSED: ia-version ' + VER + ' predates D190 P-SWAPSEAM (V' + ERA + '). No row may pass on it.');
@@ -402,8 +409,16 @@ for(const h of HANDS){
     const a = progDigest(fresh(T).buildProgram(clone(CFGS[ck]))), b = progDigest(fresh(T).buildProgram(clone(CFGS[ck]))); DG[T][ck] = a === b ? a : 'SELF-MISMATCH ' + a + '/' + b; } }
   Object.keys(CFGS).forEach(ck => console.log('    c-DIGEST ' + ck.padEnd(12) + ' now ' + DG.C[ck] + (B ? '  V' + BASE_ERA + ' ' + DG.B[ck] : '')));
   if(!B) ok(R.cDIGEST + setupNote, false);
-  else { const eq = Object.keys(CFGS).filter(ck => !/SELF/.test(DG.C[ck]) && !/SELF/.test(DG.B[ck]) && DG.C[ck] === DG.B[ck]).length;
-    ok(R.cDIGEST, eq === Object.keys(CFGS).length, eq + '/' + Object.keys(CFGS).length + ' configs equal'); }
+  else {
+    // V228 D193 R1 (split), class (i): at VER >= 228 the six injured configs are licensed to move by the cue word only and
+    // read against measure's hand table (tests/measure/v228_cdigest.out.txt: V227 output with the word substituted, hashed
+    // by the harness progDigest), never against this gate's own run; manny and mario_noinj still read against V226.
+    // Below 228 the row is unchanged.
+    const D193_DIGEST = { mario:'39679fdc5762f2b5', ankle_wa:'24fea086fe087454', hip_wa:'6c73687da203475a', lowback_wa:'d6e7e7178c37c073', shoulder_wa:'7cd72ca7e37a6f29', elbow_wa:'9a1b2079ac9cf7bd' };
+    const wantOf = ck => (VER >= 228 && Object.prototype.hasOwnProperty.call(D193_DIGEST, ck)) ? D193_DIGEST[ck] : DG.B[ck];
+    if(VER >= 228) console.log('    c-DIGEST at ' + VER + ': ' + Object.keys(D193_DIGEST).map(ck => ck + ' want ' + D193_DIGEST[ck]).join(', ') + ' (D193 class (i), measure); manny, mario_noinj want V' + BASE_ERA);
+    const eq = Object.keys(CFGS).filter(ck => !/SELF/.test(DG.C[ck]) && !/SELF/.test(DG.B[ck]) && DG.C[ck] === wantOf(ck)).length;
+    ok(R.cDIGEST + (VER >= 228 ? ' (at 228 and above: the six injured against the D193 class (i) table)' : ''), eq === Object.keys(CFGS).length, eq + '/' + Object.keys(CFGS).length + ' configs equal'); }
 }
 // ── c-MANNY (standing ruling 5) ───────────────────────────────────────────────────────────────────────────────────
 {

@@ -1,0 +1,9 @@
+[
+ {
+  "name": "S1-D192 swapOriginOf -> first record whose `to` is the card's name ([0]): the chip names the grid lift, not the lift that just left",
+  "anchor": "const hit=list.filter(e=>e&&e.to===name).pop();",
+  "replacement": "const hit=list.filter(e=>e&&e.to===name)[0];",
+  "gate": "gates/g228_d192_undokey.js",
+  "note": "NAMED TRIP: d2-CHIP and d2-UNDO on the A>B>C>B, hop4 revisit and hop5 U_d' classes (gate builder, no argv[3], git 5ce31e8 fallback: 448/2,201 each; walk strict A>B>C>B 96/96, each hop4 revisit shape 40/40, hop5 191/1,000, the PIN). EXPECTED: d2-CHIP, d2-UNDO; d2-BOOT-U, INFO and d2-MANNY stay green by design (proof the spec hits the chip key, not undo at large). g227 row (d) does not trip by design; its INFO D192 line prints 28 wrong again."
+ }
+]

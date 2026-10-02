@@ -1,0 +1,98 @@
+v228_undokey | V227 ia-version 227 (copy of index.html)
+  CF anchor  :14179 count 1 | const hit=list.filter(e=>e&&e.to===name)[0];  ->  .pop()
+  CF2 anchor :14441 count 1 | const hit=list.filter(e=>e&&e.from===from)[0];  ->  .pop()  (CF2 = CF + this)
+  CF vs V227: lines 18194/18194, changed 1 at :14179 | string literals on changed lines equal true
+  CF2 vs V227: lines 18194/18194, changed 2 at :14179,:14441 | string literals on changed lines equal true
+
+=== BLAST (build path)
+  HALF_MANNY digest V227 0ac7da6b1691a8e1 (self-stable true) | CF 0ac7da6b1691a8e1 | CF2 0ac7da6b1691a8e1 | weekGrid hash 1d9c9bc5de69/1d9c9bc5de69/1d9c9bc5de69
+  lattice+fixtures digests: 10 configs, CF differs 0, CF2 differs 0 | mario 7681cf8e4b3d42da | manny 0ac7da6b1691a8e1 | mario_noinj d59b65f1d978a263 | knee_protect cc6e417c30b2a309 | ankle_wa 03e359b5731139a6 | hip_wa f2ae1010ae57eab7 | lowback_wa d4de0af4ab123f38 | shoulder_wa fdfc74330b68d5fc | elbow_wa 1bd7fe074b3557ee | fx_HALF_MANNY 0ac7da6b1691a8e1
+
+  hand trace A>B>C>B store [{"from":"A","to":"B"},{"from":"B","to":"C"},{"from":"C","to":"B"}] | first to==B A | last to==B C | max records per from under recordSwap: 1 (filter e.from!==from before push)
+  ENUM mario        {"W3":"3093 hop3, 0 hop5","W5":"3343 hop3, 0 hop5"}
+  hop4 lowback_wa total 0 (cap 450000) -> enumerated weeks run: 3,5
+  ENUM lowback_wa   {"W3":"2554 hop3, 0 hop5, 0 hop4 enumerated","W5":"2475 hop3, 0 hop5, 0 hop4 enumerated"}
+  ENUM elbow_wa     {"W3":"3082 hop3, 0 hop5","W5":"3429 hop3, 0 hop5"}
+  ENUM manny        {"W3":"3036 hop3, 0 hop5","W5":"2886 hop3, 0 hop5"}
+  ENUM mario_noinj  {"W3":"3272 hop3, 0 hop5","W5":"3420 hop3, 0 hop5"}
+
+workers 180 s, jobs 20, crashed 0
+MISSING CF2:h3_mario_3_0 (failed measurement)
+MISSING CF2:h3_mario_5_0 (failed measurement)
+MISSING CF2:h3_lowback_wa_3_0 (failed measurement)
+MISSING CF2:h3_lowback_wa_5_0 (failed measurement)
+MISSING CF2:h3_elbow_wa_3_0 (failed measurement)
+MISSING CF2:h3_elbow_wa_5_0 (failed measurement)
+MISSING CF2:h3_manny_3_0 (failed measurement)
+MISSING CF2:h3_manny_5_0 (failed measurement)
+MISSING CF2:h3_mario_noinj_3_0 (failed measurement)
+MISSING CF2:h3_mario_noinj_5_0 (failed measurement)
+fresh-VM boot agrees with in-VM reboot: 119/120 | missing result files 10 | lost ids 0
+
+=== h3 (full enumeration, 5 configs x W3,W5) | unreachable 0
+  ALL   n 30590 | wrong V227 28246 -> CF 0 (fixed 28246, CREATED 0) | day!=pre V227 28246 CF 0 | chip==hand V227 2344 CF 30590 | no chip V227 0 CF 0 | boot==live V227 30322 CF 29842 | boot==pre V227 2076 CF 29842 | chip after undo==hand V227 2344 CF 30590 (none: 28246/0) | dup-from stores 0 | boot slot==live slot V227 30322 CF 29842 | boot!=live CREATED by CF 480 healed 0 | CF2==CF 0/0
+  U_d   n 0 | wrong V227 0 -> CF 0 (fixed 0, CREATED 0) | day!=pre V227 0 CF 0 | chip==hand V227 0 CF 0 | no chip V227 0 CF 0 | boot==live V227 0 CF 0 | boot==pre V227 0 CF 0 | chip after undo==hand V227 0 CF 0 (none: 0/0) | dup-from stores 0 | boot slot==live slot V227 0 CF 0 | boot!=live CREATED by CF 0 healed 0 | CF2==CF 0/0
+  U_d'  n 30590 | wrong V227 28246 -> CF 0 (fixed 28246, CREATED 0) | day!=pre V227 28246 CF 0 | chip==hand V227 2344 CF 30590 | no chip V227 0 CF 0 | boot==live V227 30322 CF 29842 | boot==pre V227 2076 CF 29842 | chip after undo==hand V227 2344 CF 30590 (none: 28246/0) | dup-from stores 0 | boot slot==live slot V227 30322 CF 29842 | boot!=live CREATED by CF 480 healed 0 | CF2==CF 0/0
+  FAM A>B>C>B       n 30590 | wrong V227 28246 -> CF 0 (fixed 28246, CREATED 0) | day!=pre V227 28246 CF 0 | chip==hand V227 2344 CF 30590 | no chip V227 0 CF 0 | boot==live V227 30322 CF 29842 | boot==pre V227 2076 CF 29842 | chip after undo==hand V227 2344 CF 30590 (none: 28246/0) | dup-from stores 0 | boot slot==live slot V227 30322 CF 29842 | boot!=live CREATED by CF 480 healed 0 | CF2==CF 0/0
+  CFG h3|elbow_wa|A>B>C>B         n 6511 | wrong V227 6032 -> CF 0 (fixed 6032, CREATED 0) | day!=pre V227 6032 CF 0 | chip==hand V227 479 CF 6511 | no chip V227 0 CF 0 | boot==live V227 6450 CF 6450 | boot==pre V227 418 CF 6450 | chip after undo==hand V227 479 CF 6511 (none: 6032/0) | dup-from stores 0 | boot slot==live slot V227 6450 CF 6450 | boot!=live CREATED by CF 0 healed 0 | CF2==CF 0/0
+  CFG h3|lowback_wa|A>B>C>B       n 5029 | wrong V227 4608 -> CF 0 (fixed 4608, CREATED 0) | day!=pre V227 4608 CF 0 | chip==hand V227 421 CF 5029 | no chip V227 0 CF 0 | boot==live V227 4971 CF 4971 | boot==pre V227 363 CF 4971 | chip after undo==hand V227 421 CF 5029 (none: 4608/0) | dup-from stores 0 | boot slot==live slot V227 4971 CF 4971 | boot!=live CREATED by CF 0 healed 0 | CF2==CF 0/0
+  CFG h3|manny|A>B>C>B            n 5922 | wrong V227 5454 -> CF 0 (fixed 5454, CREATED 0) | day!=pre V227 5454 CF 0 | chip==hand V227 468 CF 5922 | no chip V227 0 CF 0 | boot==live V227 5887 CF 5773 | boot==pre V227 433 CF 5773 | chip after undo==hand V227 468 CF 5922 (none: 5454/0) | dup-from stores 0 | boot slot==live slot V227 5887 CF 5773 | boot!=live CREATED by CF 114 healed 0 | CF2==CF 0/0
+  CFG h3|mario_noinj|A>B>C>B      n 6692 | wrong V227 6190 -> CF 0 (fixed 6190, CREATED 0) | day!=pre V227 6190 CF 0 | chip==hand V227 502 CF 6692 | no chip V227 0 CF 0 | boot==live V227 6636 CF 6270 | boot==pre V227 446 CF 6270 | chip after undo==hand V227 502 CF 6692 (none: 6190/0) | dup-from stores 0 | boot slot==live slot V227 6636 CF 6270 | boot!=live CREATED by CF 366 healed 0 | CF2==CF 0/0
+  CFG h3|mario|A>B>C>B            n 6436 | wrong V227 5962 -> CF 0 (fixed 5962, CREATED 0) | day!=pre V227 5962 CF 0 | chip==hand V227 474 CF 6436 | no chip V227 0 CF 0 | boot==live V227 6378 CF 6378 | boot==pre V227 416 CF 6378 | chip after undo==hand V227 474 CF 6436 (none: 5962/0) | dup-from stores 0 | boot slot==live slot V227 6378 CF 6378 | boot!=live CREATED by CF 0 healed 0 | CF2==CF 0/0
+
+=== h4 (lowback_wa, enumerated) | unreachable 0
+  ALL   n 0 | wrong V227 0 -> CF 0 (fixed 0, CREATED 0) | day!=pre V227 0 CF 0 | chip==hand V227 0 CF 0 | no chip V227 0 CF 0 | boot==live V227 0 CF 0 | boot==pre V227 0 CF 0 | chip after undo==hand V227 0 CF 0 (none: 0/0) | dup-from stores 0 | boot slot==live slot V227 0 CF 0 | boot!=live CREATED by CF 0 healed 0 | CF2==CF 0/0
+  U_d   n 0 | wrong V227 0 -> CF 0 (fixed 0, CREATED 0) | day!=pre V227 0 CF 0 | chip==hand V227 0 CF 0 | no chip V227 0 CF 0 | boot==live V227 0 CF 0 | boot==pre V227 0 CF 0 | chip after undo==hand V227 0 CF 0 (none: 0/0) | dup-from stores 0 | boot slot==live slot V227 0 CF 0 | boot!=live CREATED by CF 0 healed 0 | CF2==CF 0/0
+  U_d'  n 0 | wrong V227 0 -> CF 0 (fixed 0, CREATED 0) | day!=pre V227 0 CF 0 | chip==hand V227 0 CF 0 | no chip V227 0 CF 0 | boot==live V227 0 CF 0 | boot==pre V227 0 CF 0 | chip after undo==hand V227 0 CF 0 (none: 0/0) | dup-from stores 0 | boot slot==live slot V227 0 CF 0 | boot!=live CREATED by CF 0 healed 0 | CF2==CF 0/0
+
+=== h5 (seeded sample) | unreachable 0
+  ALL   n 0 | wrong V227 0 -> CF 0 (fixed 0, CREATED 0) | day!=pre V227 0 CF 0 | chip==hand V227 0 CF 0 | no chip V227 0 CF 0 | boot==live V227 0 CF 0 | boot==pre V227 0 CF 0 | chip after undo==hand V227 0 CF 0 (none: 0/0) | dup-from stores 0 | boot slot==live slot V227 0 CF 0 | boot!=live CREATED by CF 0 healed 0 | CF2==CF 0/0
+  U_d   n 0 | wrong V227 0 -> CF 0 (fixed 0, CREATED 0) | day!=pre V227 0 CF 0 | chip==hand V227 0 CF 0 | no chip V227 0 CF 0 | boot==live V227 0 CF 0 | boot==pre V227 0 CF 0 | chip after undo==hand V227 0 CF 0 (none: 0/0) | dup-from stores 0 | boot slot==live slot V227 0 CF 0 | boot!=live CREATED by CF 0 healed 0 | CF2==CF 0/0
+  U_d'  n 0 | wrong V227 0 -> CF 0 (fixed 0, CREATED 0) | day!=pre V227 0 CF 0 | chip==hand V227 0 CF 0 | no chip V227 0 CF 0 | boot==live V227 0 CF 0 | boot==pre V227 0 CF 0 | chip after undo==hand V227 0 CF 0 (none: 0/0) | dup-from stores 0 | boot slot==live slot V227 0 CF 0 | boot!=live CREATED by CF 0 healed 0 | CF2==CF 0/0
+
+=== CF boot != live after undo, by kind|config|week|shape|where|differing keys|V227 same chain (n)
+  h3|elbow_wa|W3|A>B>C>B|slot|detail|V227 ne  24
+  h3|elbow_wa|W5|A>B>C>B|slot|detail|V227 ne  37
+  h3|lowback_wa|W3|A>B>C>B|slot|detail|V227 ne  28
+  h3|lowback_wa|W5|A>B>C>B|slot|detail|V227 ne  30
+  h3|manny|W3|A>B>C>B|slot|detail|V227 ne  17
+  h3|manny|W5|A>B>C>B|slot|detail|V227 eq  114
+  h3|manny|W5|A>B>C>B|slot|detail|V227 ne  18
+  h3|mario_noinj|W3|A>B>C>B|slot|detail|V227 ne  25
+  h3|mario_noinj|W5|A>B>C>B|slot|detail|V227 eq  366
+  h3|mario_noinj|W5|A>B>C>B|slot|detail|V227 ne  31
+  h3|mario|W3|A>B>C>B|slot|detail|V227 ne  24
+  h3|mario|W5|A>B>C>B|slot|detail|V227 ne  34
+  BOOTEX h3 mario W3 mon A>B>A>B : Close-grip bench press > Landmine rotational press > Close-grip bench press > Landmine rotational press
+    CF store before ["Landmine rotational press->Close-grip bench press","Close-grip bench press->Landmine rotational press"] after ["Landmine rotational press->Close-grip bench press"] | undo ok 1
+    diff {"where":"slot","si":0,"ii":0,"live":"Close-grip bench press | 4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form","boot":"Close-grip bench press | 4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form","keys":"detail"} | V227 boot==live 0
+  BOOTEX h3 mario W3 tue A>B>A>B : Trap bar deadlift > Kettlebell single-leg deadlift > Trap bar deadlift > Kettlebell single-leg deadlift
+    CF store before ["Kettlebell single-leg deadlift->Trap bar deadlift","Trap bar deadlift->Kettlebell single-leg deadlift"] after ["Kettlebell single-leg deadlift->Trap bar deadlift"] | undo ok 1
+    diff {"where":"slot","si":0,"ii":0,"live":"Trap bar deadlift | 4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest","boot":"Trap bar deadlift | 4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest","keys":"detail"} | V227 boot==live 0
+
+=== EXAMPLES (V227 wrong rows; chip text before -> after)
+   h3 mario W3 tue A>B>C>B : Trap bar deadlift > Barbell Romanian deadlift > Deadlift > Barbell Romanian deadlift
+    store ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"]
+    V227: chip "SWAPPED IN for Trap bar deadlift" -> undo lands Trap bar deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | toast "Trap bar deadlift is back on the card." | chip after "" | store after ["Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"] | boot==live 1
+    CF:   chip "SWAPPED IN for Deadlift" -> undo lands Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | toast "Deadlift is back on the card." | chip after "Barbell Romanian deadlift" | store after ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift"] | boot==live 1 boot==pre 1
+    expected (chain tuple): card Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest", chip on it Barbell Romanian deadlift
+   h3 lowback_wa W3 mon A>B>C>B : Close-grip bench press > Barbell bench press > Dumbbell bench press > Barbell bench press
+    store ["Close-grip bench press->Barbell bench press","Barbell bench press->Dumbbell bench press","Dumbbell bench press->Barbell bench press"]
+    V227: chip "SWAPPED IN for Close-grip bench press" -> undo lands Close-grip bench press "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" | toast "Close-grip bench press is back on the card." | chip after "" | store after ["Barbell bench press->Dumbbell bench press","Dumbbell bench press->Barbell bench press"] | boot==live 1
+    CF:   chip "SWAPPED IN for Dumbbell bench press" -> undo lands Dumbbell bench press "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" | toast "Dumbbell bench press is back on the card." | chip after "Barbell bench press" | store after ["Close-grip bench press->Barbell bench press","Barbell bench press->Dumbbell bench press"] | boot==live 1 boot==pre 1
+    expected (chain tuple): card Dumbbell bench press "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form", chip on it Barbell bench press
+   h3 elbow_wa W3 tue A>B>C>B : Trap bar deadlift > Barbell Romanian deadlift > Deadlift > Barbell Romanian deadlift
+    store ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"]
+    V227: chip "SWAPPED IN for Trap bar deadlift" -> undo lands Trap bar deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | toast "Trap bar deadlift is back on the card." | chip after "" | store after ["Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"] | boot==live 1
+    CF:   chip "SWAPPED IN for Deadlift" -> undo lands Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | toast "Deadlift is back on the card." | chip after "Barbell Romanian deadlift" | store after ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift"] | boot==live 1 boot==pre 1
+    expected (chain tuple): card Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest", chip on it Barbell Romanian deadlift
+   h3 manny W3 thu A>B>C>B : Trap bar deadlift > Barbell Romanian deadlift > Deadlift > Barbell Romanian deadlift
+    store ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"]
+    V227: chip "SWAPPED IN for Trap bar deadlift" -> undo lands Trap bar deadlift "3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | toast "Trap bar deadlift is back on the card." | chip after "" | store after ["Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"] | boot==live 1
+    CF:   chip "SWAPPED IN for Deadlift" -> undo lands Deadlift "3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | toast "Deadlift is back on the card." | chip after "Barbell Romanian deadlift" | store after ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift"] | boot==live 1 boot==pre 1
+    expected (chain tuple): card Deadlift "3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest", chip on it Barbell Romanian deadlift
+   h3 mario_noinj W3 tue A>B>C>B : Trap bar deadlift > Barbell Romanian deadlift > Deadlift > Barbell Romanian deadlift
+    store ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"]
+    V227: chip "SWAPPED IN for Trap bar deadlift" -> undo lands Trap bar deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | toast "Trap bar deadlift is back on the card." | chip after "" | store after ["Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"] | boot==live 1
+    CF:   chip "SWAPPED IN for Deadlift" -> undo lands Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | toast "Deadlift is back on the card." | chip after "Barbell Romanian deadlift" | store after ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift"] | boot==live 1 boot==pre 1
+    expected (chain tuple): card Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest", chip on it Barbell Romanian deadlift

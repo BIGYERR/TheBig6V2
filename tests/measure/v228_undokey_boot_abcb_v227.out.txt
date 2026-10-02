@@ -1,0 +1,40 @@
+  h3 CF boot!=live  748
+  h3 CF boot!=live by config elbow_wa  61
+  h3 CF boot!=live by config lowback_wa  58
+  h3 CF boot!=live by config manny  149
+  h3 CF boot!=live by config mario  58
+  h3 CF boot!=live by config mario_noinj  422
+  h3 CF boot!=live by week W3  118
+  h3 CF boot!=live by week W5  630
+  h3 CF boot!=live | CF store before undo collapsed | U_d' | slot detail only yes  268
+  h3 CF boot!=live | CF store before undo one-per-hop | U_d' | slot detail only yes  480
+  h3 CF store collapsed (all chains)  2344
+  h3 CF store collapsed and boot!=live  268
+  h3 V227 boot!=live  268
+  h3 n  30590
+CF-created boot!=live rows: 480
+  h3 manny W5 fri A>B>C>B : Band woodchopper (door anchor) > Ab wheel rollouts > Garhammer raises > Ab wheel rollouts
+    V227: store ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Garhammer raises","Garhammer raises->Ab wheel rollouts"] chip Band woodchopper (door anchor) undo Band woodchopper (door anchor) "3×12 each" ok 0 boot==live 1
+    CF:   store ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Garhammer raises","Garhammer raises->Ab wheel rollouts"] chip Garhammer raises undo Garhammer raises "3×12 each" ok 1 store after ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Garhammer raises"] | boot diff {"where":"slot","si":2,"ii":0,"live":"Garhammer raises | 3×12 each","boot":"Garhammer raises | 2×10–15 each @ RPE 7","keys":"detail"}
+  h3 manny W5 fri A>B>C>B : Band woodchopper (door anchor) > Ab wheel rollouts > Landmine rotations > Ab wheel rollouts
+    V227: store ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Landmine rotations","Landmine rotations->Ab wheel rollouts"] chip Band woodchopper (door anchor) undo Band woodchopper (door anchor) "3×12 each" ok 0 boot==live 1
+    CF:   store ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Landmine rotations","Landmine rotations->Ab wheel rollouts"] chip Landmine rotations undo Landmine rotations "3×12 each" ok 1 store after ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Landmine rotations"] | boot diff {"where":"slot","si":2,"ii":0,"live":"Landmine rotations | 3×12 each","boot":"Landmine rotations | 2×10–15 each @ RPE 7","keys":"detail"}
+  h3 manny W5 fri A>B>C>B : Band woodchopper (door anchor) > Ab wheel rollouts > McGill curl-up > Ab wheel rollouts
+    V227: store ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->McGill curl-up","McGill curl-up->Ab wheel rollouts"] chip Band woodchopper (door anchor) undo Band woodchopper (door anchor) "3×12 each" ok 0 boot==live 1
+    CF:   store ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->McGill curl-up","McGill curl-up->Ab wheel rollouts"] chip McGill curl-up undo McGill curl-up "3×12 each" ok 1 store after ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->McGill curl-up"] | boot diff {"where":"slot","si":2,"ii":0,"live":"McGill curl-up | 3×12 each","boot":"McGill curl-up | 2×10–15 each @ RPE 7","keys":"detail"}
+  h3 manny W5 fri A>B>C>B : Band woodchopper (door anchor) > Ab wheel rollouts > Standing torso rotations (slow) > Ab wheel rollouts
+    V227: store ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Standing torso rotations (slow)","Standing torso rotations (slow)->Ab wheel rollouts"] chip Band woodchopper (door anchor) undo Band woodchopper (door anchor) "3×12 each" ok 0 boot==live 1
+    CF:   store ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Standing torso rotations (slow)","Standing torso rotations (slow)->Ab wheel rollouts"] chip Standing torso rotations (slow) undo Standing torso rotations (slow) "3×12 each" ok 1 store after ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Standing torso rotations (slow)"] | boot diff {"where":"slot","si":2,"ii":0,"live":"Standing torso rotations (slow) | 3×12 each","boot":"Standing torso rotations (slow) | 2×10–15 each @ RPE 7","keys":"detail"}
+  h3 manny W5 fri A>B>C>B : Band woodchopper (door anchor) > Ab wheel rollouts > Toes-to-bar > Ab wheel rollouts
+    V227: store ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Toes-to-bar","Toes-to-bar->Ab wheel rollouts"] chip Band woodchopper (door anchor) undo Band woodchopper (door anchor) "3×12 each" ok 0 boot==live 1
+    CF:   store ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Toes-to-bar","Toes-to-bar->Ab wheel rollouts"] chip Toes-to-bar undo Toes-to-bar "3×12 each" ok 1 store after ["Band woodchopper (door anchor)->Ab wheel rollouts","Ab wheel rollouts->Toes-to-bar"] | boot diff {"where":"slot","si":2,"ii":0,"live":"Toes-to-bar | 3×12 each","boot":"Toes-to-bar | 2×10–15 each @ RPE 7","keys":"detail"}
+  h3 manny W5 fri A>B>C>B : Band woodchopper (door anchor) > Bird dogs > Ab wheel rollouts > Bird dogs
+    V227: store ["Band woodchopper (door anchor)->Bird dogs","Bird dogs->Ab wheel rollouts","Ab wheel rollouts->Bird dogs"] chip Band woodchopper (door anchor) undo Band woodchopper (door anchor) "3×12 each" ok 0 boot==live 1
+    CF:   store ["Band woodchopper (door anchor)->Bird dogs","Bird dogs->Ab wheel rollouts","Ab wheel rollouts->Bird dogs"] chip Ab wheel rollouts undo Ab wheel rollouts "3×12 each" ok 1 store after ["Band woodchopper (door anchor)->Bird dogs","Bird dogs->Ab wheel rollouts"] | boot diff {"where":"slot","si":2,"ii":0,"live":"Ab wheel rollouts | 3×12 each","boot":"Ab wheel rollouts | 2×10–15 each @ RPE 7","keys":"detail"}
+  h3 manny W5 fri A>B>C>B : Band woodchopper (door anchor) > Bird dogs > Garhammer raises > Bird dogs
+    V227: store ["Band woodchopper (door anchor)->Bird dogs","Bird dogs->Garhammer raises","Garhammer raises->Bird dogs"] chip Band woodchopper (door anchor) undo Band woodchopper (door anchor) "3×12 each" ok 0 boot==live 1
+    CF:   store ["Band woodchopper (door anchor)->Bird dogs","Bird dogs->Garhammer raises","Garhammer raises->Bird dogs"] chip Garhammer raises undo Garhammer raises "3×12 each" ok 1 store after ["Band woodchopper (door anchor)->Bird dogs","Bird dogs->Garhammer raises"] | boot diff {"where":"slot","si":2,"ii":0,"live":"Garhammer raises | 3×12 each","boot":"Garhammer raises | 2×10–15 each @ RPE 7","keys":"detail"}
+  h3 manny W5 fri A>B>C>B : Band woodchopper (door anchor) > Bird dogs > Landmine rotations > Bird dogs
+    V227: store ["Band woodchopper (door anchor)->Bird dogs","Bird dogs->Landmine rotations","Landmine rotations->Bird dogs"] chip Band woodchopper (door anchor) undo Band woodchopper (door anchor) "3×12 each" ok 0 boot==live 1
+    CF:   store ["Band woodchopper (door anchor)->Bird dogs","Bird dogs->Landmine rotations","Landmine rotations->Bird dogs"] chip Landmine rotations undo Landmine rotations "3×12 each" ok 1 store after ["Band woodchopper (door anchor)->Bird dogs","Bird dogs->Landmine rotations"] | boot diff {"where":"slot","si":2,"ii":0,"live":"Landmine rotations | 3×12 each","boot":"Landmine rotations | 2×10–15 each @ RPE 7","keys":"detail"}
+PASS-free post-pass: printed 14 tallies

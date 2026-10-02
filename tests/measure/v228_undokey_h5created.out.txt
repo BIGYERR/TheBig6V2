@@ -1,0 +1,25 @@
+v228_undokey_480 | CF from V227 HEAD | chains selected 2 (manny 0, mario_noinj 0)
+  ALL | S2 boot!=live (pre-existing)  1
+  ALL | S2 boot==live (appears after undo)  1
+  ALL | after-undo boot == S2 boot: false  1
+  ALL | after-undo boot == S2 boot: true  1
+  ALL | after-undo live == S2 live: true  2
+  ALL | hand replay == boot slot detail: false  1
+  ALL | hand replay == boot slot detail: true  1
+  ALL | ia_hist_ keys at S2 0  2
+  ALL | same name elsewhere on the day: false  2
+  ALL | slot differs: true, other items differ: 0  2
+  ALL | text shape: bwsets form on one side  2
+  ALL | undo rx entries 1  2
+  BRANCH last replay record: Inverted rows (bodyweight)->Dumbbell row (no item named Inverted rows (bodyweight) at the slot: skipped)  1
+  BRANCH last replay record: [D177 floor row, carried verbatim]  1
+  SHAPE lowback_wa Kettlebell single-arm row > | bwsets form on one side  2
+  lowback_wa | S2 boot!=live (pre-existing)  1
+  lowback_wa | S2 boot==live (appears after undo)  1
+  EX lowback_wa W3 tue slot 1.0 : Kettlebell single-arm row "2×8 each — hold RPE 7, two in the tank" > Cable curl > Dumbbell row > Inverted rows (bodyweight) > Dumbbell row > Cable curl
+    S2 (before last tap): boot==live true
+    store before undo [{"from":"Kettlebell single-arm row","to":"Cable curl","rx":[{"s":1,"i":0,"d":"2×8 each — hold RPE 7, two in the tank"}]},{"from":"Cable curl","to":"Dumbbell row","rx":[{"s":1,"i":0,"d":"2×8 each"}]},{"from":"Inverted rows (bodyweight)","to":"Dumbbell row","rx":[{"s":1,"i":0,"d":"2 sets — RPE 8 (stop 2 reps short of failure)"}]},{"from":"Dumbbell row","to":"Cable curl","rx":[{"s":1,"i":0,"d":"2 sets — RPE 8 (stop 2 reps short of failure)"}]}]
+    chip Dumbbell row | undo used record Dumbbell row->Cable curl rx [{"s":1,"i":0,"d":"2 sets — RPE 8 (stop 2 reps short of failure)"}]
+    store after undo ["Kettlebell single-arm row->Cable curl","Cable curl->Dumbbell row","Inverted rows (bodyweight)->Dumbbell row"]
+    live after undo slot "2 sets — RPE 8 (stop 2 reps short of failure)" | boot slot "2×8 each — hold RPE 7, two in the tank" | all diffs 1.0 live[Dumbbell row | 2 sets — RPE 8 (stop 2 reps short of failure)] boot[Dumbbell row | 2×8 each — hold RPE 7, two in the tank]
+    hand replay (applySessionSwaps :10305 -> applySwapPrefs :10159 -> _swapDetailFor :10123): Kettlebell single-arm row->Cable curl: "2×8 each — hold RPE 7, two in the tank" => "2×8 each" [D177 floor row, carried verbatim] | Cable curl->Dumbbell row: "2×8 each" => "2×8 each" [D177 floor row, carried verbatim] | Inverted rows (bodyweight)->Dumbbell row (no item named Inverted rows (bodyweight) at the slot: skipped)

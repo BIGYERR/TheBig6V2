@@ -1,0 +1,58 @@
+g227 D190 seam | candidate /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/3a93b6bd-f518-4d1a-a71e-2afb713a85f0/scratchpad/measure_undokey/gate227/cf.html ia-version 227 | N 40, N3 6, NC 8
+  V226 tree: LIVE (argv[3] /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/3a93b6bd-f518-4d1a-a71e-2afb713a85f0/scratchpad/measure_undokey/base_v226.html)
+  SELFCHECK boot==boot==fresh boot, W5 Thu: all 12 true
+    e-PRE knee_wa W3 thu Leg superset A :: Reverse lunge (KB) | found 1 at [1][0] "Leg superset A" "2×10 each — hold RPE 7, two in the tank" | typed lunge in knee/wa cap | classifier lunge | ok
+    e-PRE knee_wa W5 thu Leg superset A :: Step-ups (KB) | found 1 at [1][0] "Leg superset A" "2×10 each — hold RPE 7, two in the tank" | typed lunge in knee/wa cap | classifier lunge | ok
+    e-PRE ankle_wa W3 thu * :: Dumbbell Bulgarian split squat | found 1 at [1][0] "Leg superset A" "2×10 each — hold RPE 7, two in the tank" | typed lunge in ankle/wa cap | classifier lunge | ok
+    e-PRE ankle_wa W5 thu * :: Dumbbell Bulgarian split squat | found 1 at [1][0] "Leg superset A" "2×10 each — hold RPE 7, two in the tank" | typed lunge in ankle/wa cap | classifier lunge | ok
+PASS row e-PRE D190 HAND precondition: the 2 natively cued mario items and the 2 ankle ones are on their days by name and carry the cue on a typed capped pattern (4/4 located, cued, typed capped)
+  ENUM knee_wa     denominators W3|collide2 289 | W3|cyc2 224 | W3|exch3 210 | W3|hop1 264 | W3|hop2 3146 | W5|collide2 218 | W5|cyc2 250 | W5|exch3 166 | W5|hop1 288 | W5|hop2 3379
+         population 3326 W3|collide2 32 | W3|cyc2 80 | W3|cyc2|FULL 88 | W3|cyc3 30 | W3|exch3 32 | W3|hop1 80 | W3|hop1|FULL 107 | W3|hop2 80 | W3|hop2|FULL 916 | W3|hop3 57 | W5|collide2 32 | W5|cyc2 80 | W5|cyc2|FULL 107 | W5|cyc3 30 | W5|exch3 28 | W5|hop1 80 | W5|hop1|FULL 134 | W5|hop2 80 | W5|hop2|FULL 1194 | W5|hop3 59
+  ENUM ankle_wa    denominators W3|collide2 291 | W3|cyc2 226 | W3|exch3 213 | W3|hop1 263 | W3|hop2 3136 | W5|collide2 236 | W5|cyc2 254 | W5|exch3 184 | W5|hop1 287 | W5|hop2 3381
+         population 3330 W3|collide2 32 | W3|cyc2 80 | W3|cyc2|FULL 90 | W3|cyc3 30 | W3|exch3 32 | W3|hop1 80 | W3|hop1|FULL 106 | W3|hop2 80 | W3|hop2|FULL 906 | W3|hop3 60 | W5|collide2 32 | W5|cyc2 80 | W5|cyc2|FULL 111 | W5|cyc3 30 | W5|exch3 32 | W5|hop1 80 | W5|hop1|FULL 133 | W5|hop2 80 | W5|hop2|FULL 1196 | W5|hop3 60
+  ENUM hip_wa      denominators W3|collide2 278 | W3|cyc2 219 | W3|exch3 193 | W3|hop1 266 | W3|hop2 3122 | W5|collide2 271 | W5|cyc2 238 | W5|exch3 201 | W5|hop1 269 | W5|hop2 3127
+         population 1395 W3|collide2 34 | W3|cyc2 163 | W3|cyc3 30 | W3|exch3 28 | W3|hop1 178 | W3|hop2 200 | W3|hop3 60 | W5|collide2 32 | W5|cyc2 169 | W5|cyc3 30 | W5|exch3 31 | W5|hop1 180 | W5|hop2 200 | W5|hop3 60
+  ENUM lowback_wa  denominators W3|collide2 358 | W3|cyc2 212 | W3|exch3 267 | W3|hop1 247 | W3|hop2 2539 | W5|collide2 199 | W5|cyc2 209 | W5|exch3 156 | W5|hop1 236 | W5|hop2 2470
+         population 1396 W3|collide2 34 | W3|cyc2 170 | W3|cyc3 30 | W3|exch3 34 | W3|hop1 181 | W3|hop2 200 | W3|hop3 60 | W5|collide2 32 | W5|cyc2 159 | W5|cyc3 30 | W5|exch3 32 | W5|hop1 174 | W5|hop2 200 | W5|hop3 60
+  ENUM shoulder_wa denominators W3|collide2 203 | W3|cyc2 202 | W3|exch3 131 | W3|hop1 230 | W3|hop2 2686 | W5|collide2 239 | W5|cyc2 240 | W5|exch3 171 | W5|hop1 274 | W5|hop2 3084
+         population 1455 W3|collide2 34 | W3|cyc2 178 | W3|cyc3 30 | W3|exch3 34 | W3|hop1 184 | W3|hop2 200 | W3|hop3 60 | W5|collide2 32 | W5|cyc2 188 | W5|cyc3 30 | W5|exch3 28 | W5|hop1 197 | W5|hop2 200 | W5|hop3 60
+  ENUM elbow_wa    denominators W3|collide2 230 | W3|cyc2 222 | W3|exch3 174 | W3|hop1 258 | W3|hop2 3032 | W5|collide2 234 | W5|cyc2 257 | W5|exch3 168 | W5|hop1 291 | W5|hop2 3358
+         population 1452 W3|collide2 34 | W3|cyc2 172 | W3|cyc3 30 | W3|exch3 34 | W3|hop1 185 | W3|hop2 200 | W3|hop3 60 | W5|collide2 32 | W5|cyc2 189 | W5|cyc3 30 | W5|exch3 28 | W5|hop1 198 | W5|hop2 200 | W5|hop3 60
+  enumerated | 7.1 s
+  ran knee_wa 3326 chains in 24.5 s
+  ran ankle_wa 3330 chains in 24.5 s
+  ran hip_wa 1395 chains in 8.0 s
+  ran lowback_wa 1396 chains in 7.8 s
+  ran shoulder_wa 1455 chains in 8.0 s
+  ran elbow_wa 1452 chains in 8.2 s
+  chains run 12354, reachable 12354, dropped (a hop not offered at replay) 0 | 88.0 s
+    a-MEM U 11998 collide2 392 | cyc2 2104 | cyc3 360 | exch3 373 | hop1 2277 | hop2 6132 | hop3 360
+          U' 356 hop3 356
+          store != hand 0
+PASS row a-MEM D190 membership proven: store-derived U (one ia_swaps_ record per hop, read after the chain) == hand-derived U (hop froms pairwise distinct), every reachable chain (store != hand 0/12354, |U| 11998, |U'| 356)
+    a-U residue by config|week|class: ankle_wa|W3|collide2 0/32 | ankle_wa|W3|cyc2 0/170 | ankle_wa|W3|cyc3 0/30 | ankle_wa|W3|exch3 0/32 | ankle_wa|W3|hop1 0/186 | ankle_wa|W3|hop2 0/986 | ankle_wa|W3|hop3 0/30 | ankle_wa|W5|collide2 0/32 | ankle_wa|W5|cyc2 0/191 | ankle_wa|W5|cyc3 0/30 | ankle_wa|W5|exch3 0/32 | ankle_wa|W5|hop1 0/213 | ankle_wa|W5|hop2 0/1276 | ankle_wa|W5|hop3 0/30 | elbow_wa|W3|collide2 0/34 | elbow_wa|W3|cyc2 0/172 | elbow_wa|W3|cyc3 0/30 | elbow_wa|W3|exch3 0/34 | elbow_wa|W3|hop1 0/185 | elbow_wa|W3|hop2 0/200 | elbow_wa|W3|hop3 0/30 | elbow_wa|W5|collide2 0/32 | elbow_wa|W5|cyc2 0/189 | elbow_wa|W5|cyc3 0/30 | elbow_wa|W5|exch3 0/28 | elbow_wa|W5|hop1 0/198 | elbow_wa|W5|hop2 0/200 | elbow_wa|W5|hop3 0/30 | hip_wa|W3|collide2 0/34 | hip_wa|W3|cyc2 0/163 | hip_wa|W3|cyc3 0/30 | hip_wa|W3|exch3 0/28 | hip_wa|W3|hop1 0/178 | hip_wa|W3|hop2 0/200 | hip_wa|W3|hop3 0/30 | hip_wa|W5|collide2 0/32 | hip_wa|W5|cyc2 0/169 | hip_wa|W5|cyc3 0/30 | hip_wa|W5|exch3 0/31 | hip_wa|W5|hop1 0/180 | hip_wa|W5|hop2 0/200 | hip_wa|W5|hop3 0/30 | knee_wa|W3|collide2 0/32 | knee_wa|W3|cyc2 0/168 | knee_wa|W3|cyc3 0/30 | knee_wa|W3|exch3 0/32 | knee_wa|W3|hop1 0/187 | knee_wa|W3|hop2 0/996 | knee_wa|W3|hop3 0/30 | knee_wa|W5|collide2 0/32 | knee_wa|W5|cyc2 0/187 | knee_wa|W5|cyc3 0/30 | knee_wa|W5|exch3 0/28 | knee_wa|W5|hop1 0/214 | knee_wa|W5|hop2 0/1274 | knee_wa|W5|hop3 0/30 | lowback_wa|W3|collide2 0/34 | lowback_wa|W3|cyc2 0/170 | lowback_wa|W3|cyc3 0/30 | lowback_wa|W3|exch3 0/34 | lowback_wa|W3|hop1 0/181 | lowback_wa|W3|hop2 0/200 | lowback_wa|W3|hop3 0/30 | lowback_wa|W5|collide2 0/32 | lowback_wa|W5|cyc2 0/159 | lowback_wa|W5|cyc3 0/30 | lowback_wa|W5|exch3 0/32 | lowback_wa|W5|hop1 0/174 | lowback_wa|W5|hop2 0/200 | lowback_wa|W5|hop3 0/30 | shoulder_wa|W3|collide2 0/34 | shoulder_wa|W3|cyc2 0/178 | shoulder_wa|W3|cyc3 0/30 | shoulder_wa|W3|exch3 0/34 | shoulder_wa|W3|hop1 0/184 | shoulder_wa|W3|hop2 0/200 | shoulder_wa|W3|hop3 0/30 | shoulder_wa|W5|collide2 0/32 | shoulder_wa|W5|cyc2 0/188 | shoulder_wa|W5|cyc3 0/30 | shoulder_wa|W5|exch3 0/28 | shoulder_wa|W5|hop1 0/197 | shoulder_wa|W5|hop2 0/200 | shoulder_wa|W5|hop3 0/30
+PASS row a-U D190 on U: every touched slot boots equal to the live card in name and detail, residue 0 of |U|, |U| > 0, no licence (residue 0/11998, chains that moved the live card 9895)
+    INFO D191 P-SWAPREVISIT (never asserted, never licensed): |U'| 356, residue 30 | ankle_wa|hop3 4 | elbow_wa|hop3 4 | hip_wa|hop3 5 | knee_wa|hop3 5 | lowback_wa|hop3 7 | shoulder_wa|hop3 5
+      knee_wa W5 fri hop3 Machine chest press > Decline pushups > Machine chest press > Kettlebell single-arm press store ["Decline pushups->Machine chest press","Machine chest press->Kettlebell single-arm press"]
+        live [{"n":"Kettlebell single-arm press","d":"2 sets — RPE 6 (leave 3 or more in reserve)"}]
+        boot [{"n":"Kettlebell single-arm press","d":"2×12 — RPE 6–7, leave 3+ in reserve — 3 min rest, focus on form"}]
+      knee_wa W3 thu hop3 Glute-ham raise > Single-leg glute bridge > Glute-ham raise > Lying leg curl store ["Single-leg glute bridge->Glute-ham raise","Glute-ham raise->Lying leg curl"]
+        live [{"n":"Lying leg curl","d":"2 sets — RPE 7 (leave 3 or more in reserve)"}]
+        boot [{"n":"Lying leg curl","d":"2×6–10 @ RPE 7"}]
+      knee_wa W5 sat hop3 Kettlebell swing > 45° back extension > Kettlebell swing > Sumo deadlift store ["45° back extension->Kettlebell swing","Kettlebell swing->Sumo deadlift"]
+        live [{"n":"Sumo deadlift","d":"2 sets — RPE 8 (stop 2 reps short of failure)"}]
+        boot [{"n":"Sumo deadlift","d":"2×10"}]
+    a-U' V226 run 356, reachable on both 356 | V226 boots == live 326, of those candidate != live (created) 0 | healed 0
+PASS row a-U' D190 pair on U' (store shorter than the chain): every U' chain that boots equal to live on V226 boots equal to live on the candidate, created 0 (created 0 of 326 U' chains equal on V226 (|U'| 356, healed 0))
+    d-U |U_d| 12282 (|U_d'| 72) by class, chip == hand chip / undo byte-identical / |U_d|: hop1 2277/2277/2277 | hop2 6132/6132/6132 | cyc2 2104/2104/2104 | hop3 644/644/644 | cyc3 360/360/360 | collide2 392/392/392 | exch3 373/373/373
+          by config, chip == hand chip and undo byte-identical / |U_d|: knee_wa 3317/3317 | ankle_wa 3323/3323 | hip_wa 1384/1384 | lowback_wa 1378/1378 | shoulder_wa 1441/1441 | elbow_wa 1439/1439
+PASS row d-U D190 R6 on U_d (hand: hop `to` names pairwise distinct on the day): the chip on the last hop's card is found and equals the last hop's `from`, and undoSwap(chip) leaves the whole day byte-identical to the day before the last hop; residue 0 of |U_d|, |U_d| > 0, no licence (residue 0/12282 (no chip 0, chip != hand chip 0, undo not byte-identical 0))
+    INFO D192 P-UNDOKEY (never asserted, never licensed): |U_d'| 72, undo wrong 0 | wrong/total by shape: hop3 A>B>A>B 0/44 | hop3 A>B>C>B 0/28 | chip != hand chip 0 | healed vs V226 28
+    d-U' V226 run 72, reachable on both 72 | V226 undoes byte-identical 44, of those candidate not (created) 0 | healed 28
+PASS row d-U' D190 R6 pair on U_d' (some `to` repeats on the day): every U_d' chain that undoes byte-identical on V226 undoes byte-identical on the candidate, created 0, |U_d'| > 0 (created 0 of 44 U_d' chains byte-identical on V226 (|U_d'| 72, on both 72, healed 28))
+    e chains per item: knee_wa W3 Reverse lunge (KB) 62 | knee_wa W5 Step-ups (KB) 57 | ankle_wa W3 Dumbbell Bulgarian split squat 55 | ankle_wa W5 Dumbbell Bulgarian split squat 55 | ankle_wa|cyc2 10 | ankle_wa|hop1 10 | ankle_wa|hop2 90 | knee_wa|cyc2 6 | knee_wa|hop1 12 | knee_wa|hop2 101
+PASS row e D190 every reachable hop1/hop2/cyc2 chain from the 4 natively cued items: touched slot and whole day live == boot (live != boot 0/229 (62 + 57 + 55 + 55))
+  runtime 90.8 s
+
+PASS 7 FAIL 0
+exit 0

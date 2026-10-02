@@ -1,0 +1,225 @@
+v228_undokey_480 | CF from V227 HEAD | chains selected 268 (manny 35, mario_noinj 56)
+  ALL | S2 boot==live (appears after undo)  268
+  ALL | after-undo boot == S2 boot: false  268
+  ALL | after-undo live == S2 live: true  268
+  ALL | hand replay == boot slot detail: true  268
+  ALL | ia_hist_ keys at S2 0  268
+  ALL | same name elsewhere on the day: false  268
+  ALL | slot differs: true, other items differ: 0  268
+  ALL | text shape: bwsets form on one side  234
+  ALL | text shape: other  4
+  ALL | text shape: rep window on one side  30
+  ALL | undo rx entries 1  268
+  BRANCH last replay record: 45° back extension->Barbell hip thrust (no item named 45° back extension at the slot: skipped)  1
+  BRANCH last replay record: 45° back extension->Dumbbell seated calf raise (no item named 45° back extension at the slot: skipped)  1
+  BRANCH last replay record: 45° back extension->Dumbbell standing calf raise (no item named 45° back extension at the slot: skipped)  3
+  BRANCH last replay record: 45° back extension->Glute-ham raise (no item named 45° back extension at the slot: skipped)  3
+  BRANCH last replay record: 45° back extension->Kettlebell swing (no item named 45° back extension at the slot: skipped)  14
+  BRANCH last replay record: 45° back extension->Single-leg hip thrust (no item named 45° back extension at the slot: skipped)  4
+  BRANCH last replay record: Cable curl->Neutral-grip chinups (no item named Cable curl at the slot: skipped)  1
+  BRANCH last replay record: Decline pushups->Bench dips (no item named Decline pushups at the slot: skipped)  1
+  BRANCH last replay record: Decline pushups->Cable lateral raise (no item named Decline pushups at the slot: skipped)  4
+  BRANCH last replay record: Decline pushups->Cable pushdown (no item named Decline pushups at the slot: skipped)  1
+  BRANCH last replay record: Decline pushups->Close-grip bench press (no item named Decline pushups at the slot: skipped)  3
+  BRANCH last replay record: Decline pushups->Dumbbell bench press (no item named Decline pushups at the slot: skipped)  6
+  BRANCH last replay record: Decline pushups->Dumbbell decline press (no item named Decline pushups at the slot: skipped)  1
+  BRANCH last replay record: Decline pushups->Dumbbell front raise (no item named Decline pushups at the slot: skipped)  4
+  BRANCH last replay record: Decline pushups->Dumbbell rear delt fly (no item named Decline pushups at the slot: skipped)  8
+  BRANCH last replay record: Decline pushups->Dumbbell skullcrushers (no item named Decline pushups at the slot: skipped)  4
+  BRANCH last replay record: Decline pushups->Machine chest press (no item named Decline pushups at the slot: skipped)  8
+  BRANCH last replay record: Diamond pushups->Bench dips (no item named Diamond pushups at the slot: skipped)  1
+  BRANCH last replay record: Diamond pushups->Cable lateral raise (no item named Diamond pushups at the slot: skipped)  4
+  BRANCH last replay record: Diamond pushups->Cable pushdown (no item named Diamond pushups at the slot: skipped)  1
+  BRANCH last replay record: Diamond pushups->Close-grip bench press (no item named Diamond pushups at the slot: skipped)  2
+  BRANCH last replay record: Diamond pushups->Dumbbell bench press (no item named Diamond pushups at the slot: skipped)  4
+  BRANCH last replay record: Diamond pushups->Dumbbell decline press (no item named Diamond pushups at the slot: skipped)  1
+  BRANCH last replay record: Diamond pushups->Dumbbell front raise (no item named Diamond pushups at the slot: skipped)  4
+  BRANCH last replay record: Diamond pushups->Dumbbell rear delt fly (no item named Diamond pushups at the slot: skipped)  8
+  BRANCH last replay record: Diamond pushups->Dumbbell skullcrushers (no item named Diamond pushups at the slot: skipped)  4
+  BRANCH last replay record: Diamond pushups->Machine chest press (no item named Diamond pushups at the slot: skipped)  8
+  BRANCH last replay record: Dips->Bench dips (no item named Dips at the slot: skipped)  1
+  BRANCH last replay record: Dips->Close-grip bench press (no item named Dips at the slot: skipped)  1
+  BRANCH last replay record: Dips->Dumbbell bench press (no item named Dips at the slot: skipped)  4
+  BRANCH last replay record: Dips->Dumbbell decline press (no item named Dips at the slot: skipped)  1
+  BRANCH last replay record: Dips->Machine chest press (no item named Dips at the slot: skipped)  3
+  BRANCH last replay record: Dumbbell Bulgarian split squat->Leg press (no item named Dumbbell Bulgarian split squat at the slot: skipped)  1
+  BRANCH last replay record: Dumbbell goblet squat->Barbell box squat (no item named Dumbbell goblet squat at the slot: skipped)  1
+  BRANCH last replay record: Dumbbell goblet squat->Leg press (no item named Dumbbell goblet squat at the slot: skipped)  1
+  BRANCH last replay record: Dumbbell row->Neutral-grip chinups (no item named Dumbbell row at the slot: skipped)  1
+  BRANCH last replay record: Dumbbell split-stance deadlift->Barbell box squat (no item named Dumbbell split-stance deadlift at the slot: skipped)  1
+  BRANCH last replay record: Dumbbell split-stance deadlift->Sumo deadlift (no item named Dumbbell split-stance deadlift at the slot: skipped)  3
+  BRANCH last replay record: Feet-elevated inverted rows->Barbell curl (no item named Feet-elevated inverted rows at the slot: skipped)  4
+  BRANCH last replay record: Feet-elevated inverted rows->Barbell row (no item named Feet-elevated inverted rows at the slot: skipped)  4
+  BRANCH last replay record: Feet-elevated inverted rows->Dumbbell curl (no item named Feet-elevated inverted rows at the slot: skipped)  1
+  BRANCH last replay record: Feet-elevated inverted rows->Dumbbell row (no item named Feet-elevated inverted rows at the slot: skipped)  5
+  BRANCH last replay record: Feet-elevated inverted rows->Incline dumbbell curl (no item named Feet-elevated inverted rows at the slot: skipped)  1
+  BRANCH last replay record: Feet-elevated inverted rows->Kettlebell single-arm row (no item named Feet-elevated inverted rows at the slot: skipped)  5
+  BRANCH last replay record: Feet-elevated inverted rows->Neutral-grip chinups (no item named Feet-elevated inverted rows at the slot: skipped)  1
+  BRANCH last replay record: Feet-elevated inverted rows->Pendlay row (no item named Feet-elevated inverted rows at the slot: skipped)  4
+  BRANCH last replay record: Feet-elevated inverted rows->Weighted chinups (no item named Feet-elevated inverted rows at the slot: skipped)  1
+  BRANCH last replay record: Inverted rows (bodyweight)->Barbell curl (no item named Inverted rows (bodyweight) at the slot: skipped)  4
+  BRANCH last replay record: Inverted rows (bodyweight)->Barbell row (no item named Inverted rows (bodyweight) at the slot: skipped)  4
+  BRANCH last replay record: Inverted rows (bodyweight)->Dumbbell curl (no item named Inverted rows (bodyweight) at the slot: skipped)  1
+  BRANCH last replay record: Inverted rows (bodyweight)->Dumbbell row (no item named Inverted rows (bodyweight) at the slot: skipped)  5
+  BRANCH last replay record: Inverted rows (bodyweight)->Incline dumbbell curl (no item named Inverted rows (bodyweight) at the slot: skipped)  1
+  BRANCH last replay record: Inverted rows (bodyweight)->Kettlebell single-arm row (no item named Inverted rows (bodyweight) at the slot: skipped)  5
+  BRANCH last replay record: Inverted rows (bodyweight)->Neutral-grip chinups (no item named Inverted rows (bodyweight) at the slot: skipped)  1
+  BRANCH last replay record: Inverted rows (bodyweight)->Pendlay row (no item named Inverted rows (bodyweight) at the slot: skipped)  4
+  BRANCH last replay record: Inverted rows (bodyweight)->Weighted chinups (no item named Inverted rows (bodyweight) at the slot: skipped)  1
+  BRANCH last replay record: Inverted rows (rings)->Barbell curl (no item named Inverted rows (rings) at the slot: skipped)  4
+  BRANCH last replay record: Inverted rows (rings)->Barbell row (no item named Inverted rows (rings) at the slot: skipped)  4
+  BRANCH last replay record: Inverted rows (rings)->Dumbbell curl (no item named Inverted rows (rings) at the slot: skipped)  1
+  BRANCH last replay record: Inverted rows (rings)->Dumbbell row (no item named Inverted rows (rings) at the slot: skipped)  5
+  BRANCH last replay record: Inverted rows (rings)->Incline dumbbell curl (no item named Inverted rows (rings) at the slot: skipped)  1
+  BRANCH last replay record: Inverted rows (rings)->Kettlebell single-arm row (no item named Inverted rows (rings) at the slot: skipped)  5
+  BRANCH last replay record: Inverted rows (rings)->Neutral-grip chinups (no item named Inverted rows (rings) at the slot: skipped)  1
+  BRANCH last replay record: Inverted rows (rings)->Pendlay row (no item named Inverted rows (rings) at the slot: skipped)  4
+  BRANCH last replay record: Inverted rows (rings)->Weighted chinups (no item named Inverted rows (rings) at the slot: skipped)  1
+  BRANCH last replay record: Kettlebell single-arm row->Lat pulldown (no item named Kettlebell single-arm row at the slot: skipped)  1
+  BRANCH last replay record: Kettlebell single-leg deadlift->Sumo deadlift (no item named Kettlebell single-leg deadlift at the slot: skipped)  3
+  BRANCH last replay record: Kettlebell single-leg deadlift->Trap bar deadlift (no item named Kettlebell single-leg deadlift at the slot: skipped)  3
+  BRANCH last replay record: Kettlebell swing->Trap bar deadlift (no item named Kettlebell swing at the slot: skipped)  3
+  BRANCH last replay record: Landmine reverse lunge->Barbell box squat (no item named Landmine reverse lunge at the slot: skipped)  3
+  BRANCH last replay record: Landmine reverse lunge->Leg press (no item named Landmine reverse lunge at the slot: skipped)  1
+  BRANCH last replay record: Landmine rotational press->Close-grip bench press (no item named Landmine rotational press at the slot: skipped)  3
+  BRANCH last replay record: Landmine rotational press->Dumbbell bench press (no item named Landmine rotational press at the slot: skipped)  3
+  BRANCH last replay record: Leg press->Barbell box squat (no item named Leg press at the slot: skipped)  2
+  BRANCH last replay record: Leg press->Paused back squat (no item named Leg press at the slot: skipped)  1
+  BRANCH last replay record: Leg press->Sumo deadlift (no item named Leg press at the slot: skipped)  2
+  BRANCH last replay record: Nordic hamstring curl (anchored)->Barbell hip thrust (no item named Nordic hamstring curl (anchored) at the slot: skipped)  1
+  BRANCH last replay record: Nordic hamstring curl (anchored)->Dumbbell standing calf raise (no item named Nordic hamstring curl (anchored) at the slot: skipped)  1
+  BRANCH last replay record: Nordic hamstring curl (anchored)->Glute-ham raise (no item named Nordic hamstring curl (anchored) at the slot: skipped)  3
+  BRANCH last replay record: Nordic hamstring curl (anchored)->Kettlebell swing (no item named Nordic hamstring curl (anchored) at the slot: skipped)  3
+  BRANCH last replay record: Nordic hamstring curl (anchored)->Single-leg hip thrust (no item named Nordic hamstring curl (anchored) at the slot: skipped)  4
+  BRANCH last replay record: Pushups (slow tempo)->Cable lateral raise (no item named Pushups (slow tempo) at the slot: skipped)  1
+  BRANCH last replay record: Pushups (slow tempo)->Close-grip bench press (no item named Pushups (slow tempo) at the slot: skipped)  1
+  BRANCH last replay record: Pushups (slow tempo)->Dumbbell bench press (no item named Pushups (slow tempo) at the slot: skipped)  1
+  BRANCH last replay record: Pushups (slow tempo)->Dumbbell front raise (no item named Pushups (slow tempo) at the slot: skipped)  4
+  BRANCH last replay record: Pushups (slow tempo)->Dumbbell rear delt fly (no item named Pushups (slow tempo) at the slot: skipped)  5
+  BRANCH last replay record: Pushups (slow tempo)->Machine chest press (no item named Pushups (slow tempo) at the slot: skipped)  8
+  BRANCH last replay record: Single-leg glute bridge->Barbell hip thrust (no item named Single-leg glute bridge at the slot: skipped)  1
+  BRANCH last replay record: Single-leg glute bridge->Glute-ham raise (no item named Single-leg glute bridge at the slot: skipped)  3
+  BRANCH last replay record: Single-leg glute bridge->Kettlebell swing (no item named Single-leg glute bridge at the slot: skipped)  3
+  BRANCH last replay record: Single-leg glute bridge->Single-leg hip thrust (no item named Single-leg glute bridge at the slot: skipped)  4
+  SHAPE elbow_wa Barbell box squat > | rep window on one side  1
+  SHAPE elbow_wa Barbell row > | bwsets form on one side  3
+  SHAPE elbow_wa Cable lateral raise > | bwsets form on one side  3
+  SHAPE elbow_wa Cable pushdown > | bwsets form on one side  2
+  SHAPE elbow_wa Close-grip bench press > | bwsets form on one side  5
+  SHAPE elbow_wa Close-grip bench press > | rep window on one side  1
+  SHAPE elbow_wa Dumbbell bench press > | bwsets form on one side  3
+  SHAPE elbow_wa Dumbbell bench press > | other  1
+  SHAPE elbow_wa Dumbbell front raise > | bwsets form on one side  3
+  SHAPE elbow_wa Dumbbell rear delt fly > | bwsets form on one side  6
+  SHAPE elbow_wa Dumbbell row > | bwsets form on one side  3
+  SHAPE elbow_wa Glute-ham raise > | bwsets form on one side  3
+  SHAPE elbow_wa Kettlebell single-arm row > | bwsets form on one side  3
+  SHAPE elbow_wa Kettlebell swing > | bwsets form on one side  6
+  SHAPE elbow_wa Machine chest press > | bwsets form on one side  6
+  SHAPE elbow_wa Paused back squat > | rep window on one side  1
+  SHAPE elbow_wa Pendlay row > | bwsets form on one side  3
+  SHAPE elbow_wa Single-leg hip thrust > | bwsets form on one side  3
+  SHAPE elbow_wa Sumo deadlift > | rep window on one side  3
+  SHAPE elbow_wa Trap bar deadlift > | rep window on one side  2
+  SHAPE lowback_wa Barbell curl > | bwsets form on one side  6
+  SHAPE lowback_wa Barbell hip thrust > | bwsets form on one side  3
+  SHAPE lowback_wa Cable lateral raise > | bwsets form on one side  2
+  SHAPE lowback_wa Dumbbell bench press > | bwsets form on one side  3
+  SHAPE lowback_wa Dumbbell curl > | bwsets form on one side  3
+  SHAPE lowback_wa Dumbbell front raise > | bwsets form on one side  3
+  SHAPE lowback_wa Dumbbell rear delt fly > | bwsets form on one side  5
+  SHAPE lowback_wa Dumbbell row > | bwsets form on one side  3
+  SHAPE lowback_wa Dumbbell skullcrushers > | bwsets form on one side  2
+  SHAPE lowback_wa Dumbbell standing calf raise > | bwsets form on one side  3
+  SHAPE lowback_wa Incline dumbbell curl > | bwsets form on one side  3
+  SHAPE lowback_wa Kettlebell single-arm row > | bwsets form on one side  3
+  SHAPE lowback_wa Lat pulldown > | other  1
+  SHAPE lowback_wa Leg press > | rep window on one side  3
+  SHAPE lowback_wa Machine chest press > | bwsets form on one side  7
+  SHAPE lowback_wa Neutral-grip chinups > | bwsets form on one side  3
+  SHAPE lowback_wa Neutral-grip chinups > | rep window on one side  2
+  SHAPE lowback_wa Single-leg hip thrust > | bwsets form on one side  3
+  SHAPE manny Barbell row > | bwsets form on one side  3
+  SHAPE manny Bench dips > | bwsets form on one side  3
+  SHAPE manny Close-grip bench press > | bwsets form on one side  2
+  SHAPE manny Dumbbell bench press > | bwsets form on one side  5
+  SHAPE manny Dumbbell decline press > | bwsets form on one side  3
+  SHAPE manny Dumbbell row > | bwsets form on one side  3
+  SHAPE manny Dumbbell seated calf raise > | bwsets form on one side  1
+  SHAPE manny Dumbbell skullcrushers > | bwsets form on one side  2
+  SHAPE manny Dumbbell standing calf raise > | bwsets form on one side  1
+  SHAPE manny Kettlebell single-arm row > | bwsets form on one side  3
+  SHAPE manny Kettlebell swing > | bwsets form on one side  3
+  SHAPE manny Pendlay row > | bwsets form on one side  3
+  SHAPE manny Weighted chinups > | bwsets form on one side  3
+  SHAPE mario Barbell box squat > | rep window on one side  3
+  SHAPE mario Barbell curl > | bwsets form on one side  3
+  SHAPE mario Barbell row > | bwsets form on one side  3
+  SHAPE mario Cable lateral raise > | bwsets form on one side  2
+  SHAPE mario Close-grip bench press > | rep window on one side  1
+  SHAPE mario Dumbbell bench press > | bwsets form on one side  2
+  SHAPE mario Dumbbell bench press > | other  1
+  SHAPE mario Dumbbell front raise > | bwsets form on one side  3
+  SHAPE mario Dumbbell rear delt fly > | bwsets form on one side  5
+  SHAPE mario Dumbbell row > | bwsets form on one side  3
+  SHAPE mario Dumbbell skullcrushers > | bwsets form on one side  2
+  SHAPE mario Glute-ham raise > | bwsets form on one side  3
+  SHAPE mario Kettlebell single-arm row > | bwsets form on one side  3
+  SHAPE mario Kettlebell swing > | bwsets form on one side  6
+  SHAPE mario Machine chest press > | bwsets form on one side  7
+  SHAPE mario Pendlay row > | bwsets form on one side  3
+  SHAPE mario Single-leg hip thrust > | bwsets form on one side  3
+  SHAPE mario Sumo deadlift > | rep window on one side  3
+  SHAPE mario Trap bar deadlift > | rep window on one side  2
+  SHAPE mario_noinj Barbell box squat > | rep window on one side  3
+  SHAPE mario_noinj Barbell curl > | bwsets form on one side  3
+  SHAPE mario_noinj Barbell row > | bwsets form on one side  3
+  SHAPE mario_noinj Cable lateral raise > | bwsets form on one side  2
+  SHAPE mario_noinj Close-grip bench press > | rep window on one side  1
+  SHAPE mario_noinj Dumbbell bench press > | bwsets form on one side  2
+  SHAPE mario_noinj Dumbbell bench press > | other  1
+  SHAPE mario_noinj Dumbbell front raise > | bwsets form on one side  3
+  SHAPE mario_noinj Dumbbell rear delt fly > | bwsets form on one side  5
+  SHAPE mario_noinj Dumbbell row > | bwsets form on one side  3
+  SHAPE mario_noinj Dumbbell skullcrushers > | bwsets form on one side  2
+  SHAPE mario_noinj Glute-ham raise > | bwsets form on one side  3
+  SHAPE mario_noinj Kettlebell single-arm row > | bwsets form on one side  3
+  SHAPE mario_noinj Kettlebell swing > | bwsets form on one side  5
+  SHAPE mario_noinj Machine chest press > | bwsets form on one side  7
+  SHAPE mario_noinj Pendlay row > | bwsets form on one side  3
+  SHAPE mario_noinj Single-leg hip thrust > | bwsets form on one side  3
+  SHAPE mario_noinj Sumo deadlift > | rep window on one side  2
+  SHAPE mario_noinj Trap bar deadlift > | rep window on one side  2
+  elbow_wa | S2 boot==live (appears after undo)  61
+  lowback_wa | S2 boot==live (appears after undo)  58
+  manny | S2 boot==live (appears after undo)  35
+  mario | S2 boot==live (appears after undo)  58
+  mario_noinj | S2 boot==live (appears after undo)  56
+  EX elbow_wa W3 mon slot 0.0 : Close-grip bench press "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" > Landmine rotational press > Close-grip bench press > Landmine rotational press
+    S2 (before last tap): boot==live true
+    store before undo [{"from":"Landmine rotational press","to":"Close-grip bench press","rx":[{"s":0,"i":0,"d":"4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form"}]},{"from":"Close-grip bench press","to":"Landmine rotational press","rx":[{"s":0,"i":0,"d":"4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form"}]}]
+    chip Close-grip bench press | undo used record Close-grip bench press->Landmine rotational press rx [{"s":0,"i":0,"d":"4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form"}]
+    store after undo ["Landmine rotational press->Close-grip bench press"]
+    live after undo slot "4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" | boot slot "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" | all diffs 0.0 live[Close-grip bench press | 4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form] boot[Close-grip bench press | 4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form]
+    hand replay (applySessionSwaps :10305 -> applySwapPrefs :10159 -> _swapDetailFor :10123): Landmine rotational press->Close-grip bench press (no item named Landmine rotational press at the slot: skipped)
+  EX lowback_wa W3 thu slot 0.0 : Leg press "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" > Dumbbell goblet squat > Leg press > Dumbbell goblet squat
+    S2 (before last tap): boot==live true
+    store before undo [{"from":"Dumbbell goblet squat","to":"Leg press","rx":[{"s":0,"i":0,"d":"4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"}]},{"from":"Leg press","to":"Dumbbell goblet squat","rx":[{"s":0,"i":0,"d":"4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"}]}]
+    chip Leg press | undo used record Leg press->Dumbbell goblet squat rx [{"s":0,"i":0,"d":"4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"}]
+    store after undo ["Dumbbell goblet squat->Leg press"]
+    live after undo slot "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" | boot slot "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" | all diffs 0.0 live[Leg press | 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest] boot[Leg press | 4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest]
+    hand replay (applySessionSwaps :10305 -> applySwapPrefs :10159 -> _swapDetailFor :10123): Dumbbell goblet squat->Leg press (no item named Dumbbell goblet squat at the slot: skipped)
+  EX manny W3 mon slot 0.0 : Close-grip bench press "3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" > Dips > Close-grip bench press > Dips
+    S2 (before last tap): boot==live true
+    store before undo [{"from":"Dips","to":"Close-grip bench press","rx":[{"s":0,"i":0,"d":"3 sets — RPE 6 (leave 3 or more in reserve)"}]},{"from":"Close-grip bench press","to":"Dips","rx":[{"s":0,"i":0,"d":"3 sets — RPE 6 (leave 3 or more in reserve)"}]}]
+    chip Close-grip bench press | undo used record Close-grip bench press->Dips rx [{"s":0,"i":0,"d":"3 sets — RPE 6 (leave 3 or more in reserve)"}]
+    store after undo ["Dips->Close-grip bench press"]
+    live after undo slot "3 sets — RPE 6 (leave 3 or more in reserve)" | boot slot "3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" | all diffs 0.0 live[Close-grip bench press | 3 sets — RPE 6 (leave 3 or more in reserve)] boot[Close-grip bench press | 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest]
+    hand replay (applySessionSwaps :10305 -> applySwapPrefs :10159 -> _swapDetailFor :10123): Dips->Close-grip bench press (no item named Dips at the slot: skipped)
+  EX mario W3 mon slot 0.0 : Close-grip bench press "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" > Landmine rotational press > Close-grip bench press > Landmine rotational press
+    S2 (before last tap): boot==live true
+    store before undo [{"from":"Landmine rotational press","to":"Close-grip bench press","rx":[{"s":0,"i":0,"d":"4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form"}]},{"from":"Close-grip bench press","to":"Landmine rotational press","rx":[{"s":0,"i":0,"d":"4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form"}]}]
+    chip Close-grip bench press | undo used record Close-grip bench press->Landmine rotational press rx [{"s":0,"i":0,"d":"4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form"}]
+    store after undo ["Landmine rotational press->Close-grip bench press"]
+    live after undo slot "4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" | boot slot "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" | all diffs 0.0 live[Close-grip bench press | 4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form] boot[Close-grip bench press | 4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form]
+    hand replay (applySessionSwaps :10305 -> applySwapPrefs :10159 -> _swapDetailFor :10123): Landmine rotational press->Close-grip bench press (no item named Landmine rotational press at the slot: skipped)

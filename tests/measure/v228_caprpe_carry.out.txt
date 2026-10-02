@@ -1,0 +1,109 @@
+PREP V227 227 sha c9069fe64113 | V228 228 sha fdd2eb848f59 (working index.html, HEAD 5ce31e8) | NOCLAMP anchor count 1
+ENUM mario         two-hop chains walked 6999 | two-hop with hop1 firing 16 | two-hop with hop2 firing 22 | hop3 kept 304 | total kept 320
+ENUM manny         two-hop chains walked 0 | two-hop with hop1 firing 0 | two-hop with hop2 firing 0 | hop3 kept 0 | total kept 0
+ENUM mario_noinj   two-hop chains walked 0 | two-hop with hop1 firing 0 | two-hop with hop2 firing 0 | hop3 kept 0 | total kept 0
+ENUM knee_protect  two-hop chains walked 6829 | two-hop with hop1 firing 77 | two-hop with hop2 firing 40 | hop3 kept 1155 | total kept 1232
+ENUM ankle_wa      two-hop chains walked 6997 | two-hop with hop1 firing 0 | two-hop with hop2 firing 3 | hop3 kept 15 | total kept 15
+ENUM hip_wa        two-hop chains walked 6706 | two-hop with hop1 firing 87 | two-hop with hop2 firing 57 | hop3 kept 1318 | total kept 1405
+ENUM lowback_wa    two-hop chains walked 5430 | two-hop with hop1 firing 240 | two-hop with hop2 firing 133 | hop3 kept 3291 | total kept 3531
+ENUM shoulder_wa   two-hop chains walked 6212 | two-hop with hop1 firing 249 | two-hop with hop2 firing 120 | hop3 kept 3459 | total kept 3708
+ENUM elbow_wa      two-hop chains walked 6869 | two-hop with hop1 firing 542 | two-hop with hop2 firing 251 | hop3 kept 7827 | total kept 8369
+  gate splice 1 anchor count 1
+  gate splice 2 anchor count 1
+  gate splice 3 anchor count 1
+  gate splice 4 anchor count 1
+  gate V227: DUMPED 150068
+  gate V228: DUMPED 150068
+
+=== F1 chains where the clamp fires on a non-final hop (D190 lattice, weeks 3/5/7, L9 injured configs)
+  chains 18580 | unreachable at some hop (V228) 0
+  reachable on all three trees 18580 | V228 live != boot 6327 | V227 live != boot 487 | NOCLAMP live != boot 487
+  V228 live != boot by end end capped 265 | end uncapped 6062 | by class cyc2/h1 47 | hop2/h1 341 | hop3/h1 3936 | hop3/h2 2003 | by config ankle_wa 15 | elbow_wa 2099 | hip_wa 546 | knee_protect 683 | lowback_wa 1909 | mario 230 | shoulder_wa 845 | by week W3 1323 | W5 5004
+  which side equals the pre-clamp carry (PRECARRY): live 265 | boot 5840 | neither 222 /6327
+  live shape -> boot shape bwsets RPE 7 -> bwsets RPE 8 4410 | bwsets RPE 7 -> grammar@ RPE 7 32 | bwsets RPE 7 -> grammar@ RPE 8 76 | bwsets RPE 7 -> no-RPE RPE null 146 | bwsets RPE 7 -> prose/other RPE 7 233 | grammar@ RPE 7 -> grammar@ RPE 8 1430
+  all reachable chains, V228 live vs PRECARRY: equal 12518 | V228 boot vs PRECARRY: equal 18093 /18580
+  build (exSwapPrefs map A>B>C(>D)): build slot name == chain end 2487/18580 | build name end 2487 | first hop only 16093 | where the end landed, build == boot 1590 build == live 1133
+  NEW residue (V227 live == boot, V228 live != boot) 5840 | pre-existing (V227 live != boot too) 487 | V227 residue that V228 closed 0
+  NEW by end end uncapped 5840 | NEW boot == PRECARRY 5840 live == PRECARRY 0 | NEW live == V227 live 0 boot == V227 boot 5840 (literal-blind: 5840)
+  NEW live shape -> boot shape uncap bwsets RPE 7 -> bwsets RPE 8 4410 | uncap grammar@ RPE 7 -> grammar@ RPE 8 1430
+  NEW by class/fire cyc2/h1 47 | hop2/h1 341 | hop3/h1 3497 | hop3/h2 1955 | by config ankle_wa 15 | elbow_wa 1927 | hip_wa 495 | knee_protect 635 | lowback_wa 1789 | mario 230 | shoulder_wa 749
+  pre-existing (V227 already live != boot) V228 shape cap bwsets -> grammar@ 32 | cap bwsets -> prose/other 233 | uncap bwsets -> grammar@ 76 | uncap bwsets -> no-RPE 146
+  NEW end capped (both sides should be clamped): (none)
+    e.g. mario W3 thu hop3/h2 45° back extension > Step-ups (KB) > 45° back extension end uncapped
+       live "2 sets — RPE 7 (leave 3 or more in reserve)"
+       boot "2 sets — RPE 8 (stop 2 reps short of failure)"
+       build "2 sets — RPE 8 (stop 2 reps short of failure)" (45° back extension)
+       pre-clamp carry "2 sets — RPE 8 (stop 2 reps short of failure)" | V227 live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2 sets — RPE 8 (stop 2 reps short of failure)"
+    e.g. mario W5 thu hop3/h2 Barbell hip thrust > Leg extension > Barbell good mornings end uncapped
+       live "2×6–10 @ RPE 7"
+       boot "2×6–10 @ RPE 8"
+       build "2×6–10 @ RPE 8" (Barbell hip thrust)
+       pre-clamp carry "2×6–10 @ RPE 8" | V227 live "2×6–10 @ RPE 8" boot "2×6–10 @ RPE 8"
+    e.g. knee_protect W5 tue hop3/h2 45° back extension > Kettlebell swing > Barbell good mornings end capped
+       live "2 sets — RPE 7 (leave 3 or more in reserve)"
+       boot "2×10 — hold RPE 7, three in the tank"
+       build "2×10 — hold RPE 7, three in the tank" (Barbell good mornings)
+       pre-clamp carry "2 sets — RPE 7 (leave 3 or more in reserve)" | V227 live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2×10 — hold RPE 7, two in the tank"
+    e.g. knee_protect W5 tue hop3/h2 45° back extension > Kettlebell swing > Barbell hip thrust end uncapped
+       live "2 sets — RPE 7 (leave 3 or more in reserve)"
+       boot "2×10"
+       build "2×8–12 @ RPE 8" (Barbell hip thrust)
+       pre-clamp carry "2 sets — RPE 8 (stop 2 reps short of failure)" | V227 live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2×10"
+    e.g. lowback_wa W5 tue hop3/h1 Feet-elevated inverted rows > Incline dumbbell curl > Dumbbell curl end uncapped
+       live "3 sets — RPE 7 (leave 3 or more in reserve)"
+       boot "3×10–12 @ RPE 8"
+       build "3×10–12 @ RPE 8" (Dumbbell curl)
+       pre-clamp carry "3 sets — RPE 8 (stop 2 reps short of failure)" | V227 live "3 sets — RPE 8 (stop 2 reps short of failure)" boot "3×10–12 @ RPE 8"
+    e.g. lowback_wa W5 thu hop3/h1 45° back extension > Dumbbell standing calf raise > Barbell hip thrust end capped
+       live "3 sets — RPE 7 (leave 3 or more in reserve)"
+       boot "3×15–20 @ RPE 7"
+       build "3×15–20 — hold RPE 7, three in the tank" (Barbell hip thrust)
+       pre-clamp carry "3 sets — RPE 7 (leave 3 or more in reserve)" | V227 live "3 sets — RPE 8 (stop 2 reps short of failure)" boot "3×15–20 @ RPE 8"
+
+=== F2-F4 the D177 gate L1 sweep, row dump V227 150068 / V228 150068 rows | joined by position, (where,to,D) equal 147103
+  rows whose DONOR changed between trees (build-path change on the native card) 2965 | donor change class (donor pattern capped 2965) clamp bwsets bwsets 2781 | clamp prose/other prose/other 184 | card result O verbatim both 2965
+  rows with the same donor: changed clamp bwsets 549 | clamp prose/other 56 | clamp wave 567 | literal 118 | clamp rows on an uncapped target 0
+  G3a      fail V228 728/104375 (V227 0) | by class clamp bwsets [capped target] 127 | clamp prose/other [capped target] 34 | clamp wave [capped target] 567 | by D shape bwsets 127 | prose/other 34 | wave 567
+  G3c_pow  fail V228 118/4066 (V227 0) | by class literal [capped target] 118 | by D shape no-RPE 118
+  G3c_off  fail V228 89/28896 (V227 0) | by class clamp bwsets [capped target] 65 | clamp prose/other [capped target] 24 | by D shape bwsets 65 | prose/other 24
+  G3d      fail V228 263/32188 (V227 0) | by class clamp wave [capped target] 263 | by D shape wave 263
+  G3e      fail V228 177/37307 (V227 0) | by class clamp bwsets [capped target] 62 | clamp prose/other [capped target] 10 | clamp wave [capped target] 105 | by D shape bwsets 62 | prose/other 10 | wave 105
+  G3f      fail V228 199/5984 (V227 0) | by class clamp wave [capped target] 199 | by D shape wave 199
+  G6a      fail V228 84/150068 (V227 0) | by class clamp bwsets [capped target] 62 | clamp prose/other [capped target] 22 | by D shape bwsets 62 | prose/other 22
+
+  F2 prose/other RPE>7 donors onto capped targets (gate L1, live): 56 rows | distinct donor texts 1 | V228 changed 56
+    [56] commercial|strength|beginner|lift|knee/workaround W6 tue Barbell Romanian deadlift -> Barbell box squat
+       D/V227 "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+       V228   "Work up to one heavy set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+
+  F2b BUILD path on the gate L1 injured configs (288 builds): changed cards 2247 | UNCLASSIFIED 56 | clamp bwsets 439 | clamp grammar@ 130 | clamp prose/other 28 | literal 1594 | by focus hypertrophy 296 | strength 154 | support_strength 147
+    [56] commercial|hypertrophy|beginner|lift|knee/workaround W5 sat [Lower strength] Reverse lunge (KB)
+       V227 "2×10–12 each @ RPE 8"
+       V228 "2×10–12 each @ RPE 7"
+    [28] commercial|hypertrophy|beginner|lift|lowback/workaround W5 sat [Lower strength] 45° back extension
+       V227 "2 sets — RPE 8 (stop 2 reps short of failure)"
+       V228 "2 sets — RPE 7 (leave 3 or more in reserve)"
+    [74] commercial|hypertrophy|beginner|lift|lowback/workaround W5 sat [Upper superset] Dumbbell row
+       V227 "2×8–12 @ RPE 8"
+       V228 "2×8–12 @ RPE 7"
+    [28] commercial|strength|beginner|lift|knee/workaround W6 thu [Main — Barbell box squat] Barbell box squat
+       V227 "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+       V228 "Work up to one heavy set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+    [277] home_basic|support_strength|beginner|event|knee/workaround W9 thu [Main — Squat (slow 3s tempo)] Squat (slow 3s tempo)
+       V227 "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest"
+       V228 "3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+    [134] home_basic|support_strength|beginner|event|lowback/workaround W9 tue [Main — Banded hip thrust] Banded hip thrust
+       V227 "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest"
+       V228 "3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"
+    NON-CLAMP {"tag":"bodyweight|support_strength|beginner|event|lowback/workaround","w":"9","d":"tue","n":"Burpees","label":"Main — Burpees","cls":"UNCLASSIFIED","a":"3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest","b":"3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"}
+    NON-CLAMP {"tag":"bodyweight|support_strength|beginner|event|lowback/workaround","w":"10","d":"tue","n":"Burpees","label":"Main — Burpees","cls":"UNCLASSIFIED","a":"3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest","b":"3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"}
+    NON-CLAMP {"tag":"bodyweight|support_strength|beginner|event|lowback/workaround","w":"11","d":"tue","n":"Burpees","label":"Main — Burpees","cls":"UNCLASSIFIED","a":"3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest","b":"3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"}
+    NON-CLAMP {"tag":"bodyweight|support_strength|advanced|lift|lowback/workaround","w":"1","d":"tue","n":"Burpees","label":"Main — Burpees","cls":"UNCLASSIFIED","a":"3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest","b":"3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"}
+    NON-CLAMP {"tag":"bodyweight|support_strength|advanced|lift|lowback/workaround","w":"2","d":"tue","n":"Burpees","label":"Main — Burpees","cls":"UNCLASSIFIED","a":"3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest","b":"3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"}
+    NON-CLAMP {"tag":"bodyweight|support_strength|advanced|event|lowback/workaround","w":"1","d":"tue","n":"Burpees","label":"Main — Burpees","cls":"UNCLASSIFIED","a":"3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest","b":"3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"}
+    NON-CLAMP {"tag":"bodyweight|support_strength|advanced|event|lowback/workaround","w":"2","d":"tue","n":"Burpees","label":"Main — Burpees","cls":"UNCLASSIFIED","a":"3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest","b":"3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"}
+    NON-CLAMP {"tag":"bodyweight|support_strength|advanced|event|lowback/workaround","w":"9","d":"tue","n":"Burpees","label":"Main — Burpees","cls":"UNCLASSIFIED","a":"3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest","b":"3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"}
+    NON-CLAMP {"tag":"bodyweight|support_strength|advanced|event|lowback/workaround","w":"10","d":"tue","n":"Burpees","label":"Main — Burpees","cls":"UNCLASSIFIED","a":"3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest","b":"3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"}
+    NON-CLAMP {"tag":"bodyweight|support_strength|advanced|event|lowback/workaround","w":"11","d":"tue","n":"Burpees","label":"Main — Burpees","cls":"UNCLASSIFIED","a":"3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest","b":"3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest"}
+
+  F4 toasts on rows whose card the clamp changed: 1172 | by toast T119 "…take the sets to the same effort." 360 | T3 "Same sets, same effort. Reps move…" 199 | TSAME "Same job, same numbers." 613 | RPE donor -> card 7.5->7 72 | 8->7 393 | 8.5->7 307 | 9->7 300 | 9.5->7 100 | G6a-failing among them 84 | G6a-failing not clamp rows 0
