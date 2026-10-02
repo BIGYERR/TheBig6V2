@@ -1,0 +1,72 @@
+[
+ {
+  "name": "S1-D190 R3 (a) -> the live filter call in applySwapChoice is dropped: the plan never re-decides the cue on the tapped card",
+  "anchor": "  if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){\n    try{\n      const _fs=applyInjuryFilter(",
+  "replacement": "  if(false){\n    try{\n      const _fs=applyInjuryFilter(",
+  "gate": "gates/g227_d190_seam.js",
+  "note": "NAMED TRIP: row a-U (ruling: 128 on measure's population; gate builder, argv[3] base_v226: residue 566/11,998) and the pair row a-U' (created 12). Also row e (53/229). The (b) trip of the same mutation is the next row. EXPECTED: a-U, a-U', e; a-MEM and e-PRE stay green. Row d (D190 R6, re-ruled in RE-RULING 2) is named by S6-D190."
+ },
+ {
+  "name": "S1-D190 R3 (b) -> the live filter call in applySwapChoice is dropped: cue <=> cap breaks on the live hop",
+  "anchor": "  if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){\n    try{\n      const _fs=applyInjuryFilter(",
+  "replacement": "  if(false){\n    try{\n      const _fs=applyInjuryFilter(",
+  "gate": "gates/g227_d190_cuecap.js",
+  "note": "NAMED TRIP: row b-ALL (gate builder, argv[3] base_v226: 2,038/9,882 hops) and b-HAND-1, b-HAND-2, b-HAND-3. EXPECTED: those four; c-MANNY stays green (no build-path change). Row d (D190 R6, re-ruled in RE-RULING 2) is named by S6-D190."
+ },
+ {
+  "name": "S2-D190 R2 live (a) -> the strip in applySwapChoice is dropped: the tap carries the donor's cue into _swapDetailFor",
+  "anchor": "  const _base=_stripCapCue(_wasDetail);",
+  "replacement": "  const _base=_wasDetail;",
+  "gate": "gates/g227_d190_seam.js",
+  "note": "NAMED TRIP: row a-U on the ankle/wa W3 class (gate builder, argv[3] base_v226: residue 556/11,998, ankle/wa W3 thu included) and the pair row a-U' (created 18). Also row e (176/229). EXPECTED: a-U, a-U', e; a-MEM and e-PRE stay green. Row d (D190 R6, re-ruled in RE-RULING 2) is named by S6-D190."
+ },
+ {
+  "name": "S2-D190 R2 live (b) -> the strip in applySwapChoice is dropped: a cued donor's cue survives onto an uncapped target",
+  "anchor": "  const _base=_stripCapCue(_wasDetail);",
+  "replacement": "  const _base=_wasDetail;",
+  "gate": "gates/g227_d190_cuecap.js",
+  "note": "NAMED TRIP: row b-ALL (gate builder, argv[3] base_v226: 1,130/9,882 hops), b-HAND-2 and b-HAND-3 (ankle/wa W3 thu: the goblet squat's cue rides onto the split-stance deadlift and the Nordic curl). EXPECTED: those three; b-HAND-1 and c-MANNY stay green. Row d (D190 R6, re-ruled in RE-RULING 2) is named by S6-D190."
+ },
+ {
+  "name": "S3-D190 R2 boot (e) -> the strip in applySwapPrefs is dropped: the boot replay carries the donor's cue, live != boot on chains off a natively cued item",
+  "anchor": "      it.detail=_swapDetailFor(to,_stripCapCue(it.detail));",
+  "replacement": "      it.detail=_swapDetailFor(to,it.detail);",
+  "gate": "gates/g227_d190_seam.js",
+  "note": "NAMED TRIP: row e on the natively cued chains (gate builder, argv[3] base_v226: live != boot 176/229). Also a-U (548/11,998) and the pair row a-U' (created 18). EXPECTED: e, a-U, a-U'; a-MEM and e-PRE stay green. Row d (D190 R6, re-ruled in RE-RULING 2) is named by S6-D190."
+ },
+ {
+  "name": "S3-D190 R2 build (c2-i) -> the strip in applySwapPrefs is dropped: a cfg.exSwapPrefs build pins the source's cue to the target",
+  "anchor": "      it.detail=_swapDetailFor(to,_stripCapCue(it.detail));",
+  "replacement": "      it.detail=_swapDetailFor(to,it.detail);",
+  "gate": "gates/g227_d190_prefpath.js",
+  "note": "NAMED TRIP: row c2-i on the build path (ruling: 192 cards / 138 builds on U2's population; gate builder, argv[3] base_v226: 210 cards in 71 builds = U2 192 + P9b ankle 18), c2-ii (68/138) and c2-hand. EXPECTED: c2-i, c2-ii, c2-hand; c2-iii stays green (only target cards move). Row d (D190 R6, re-ruled in RE-RULING 2) is named by S6-D190."
+ },
+ {
+  "name": "S4-D190 R4 -> the live filter moves above _reRx: a cue the filter appends reads as a moved dose and flips the toast",
+  "anchor": "  const _reRx=(item.detail!==_base);\n  if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){\n    try{\n      const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],activeProg.cfg);\n      const _fi=_fs&&_fs[0]&&_fs[0].items&&_fs[0].items[0];\n      if(_fi&&_fi.name===to) item.detail=_fi.detail;\n    }catch(e){}\n  }\n",
+  "replacement": "  if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){\n    try{\n      const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],activeProg.cfg);\n      const _fi=_fs&&_fs[0]&&_fs[0].items&&_fs[0].items[0];\n      if(_fi&&_fi.name===to) item.detail=_fi.detail;\n    }catch(e){}\n  }\n  const _reRx=(item.detail!==_base);\n",
+  "gate": "gates/g227_d190_cuecap.js",
+  "note": "NAMED TRIP: row c-TOAST (ruling: 133 on measure's population; gate builder, argv[3] base_v226: 2,038/9,882 hops), b-HAND-2 and b-HAND-3 (their toast leg). EXPECTED: c-TOAST, b-HAND-2, b-HAND-3; b-ALL, b-HAND-1 and c-MANNY stay green (the card is the same; only the toast moves). Bycatch to check, not this row's gate: g221_d177_swapfloor G6a. Row d (D190 R6, re-ruled in RE-RULING 2) is named by S6-D190."
+ },
+ {
+  "name": "S5-D190 R5 -> the boot re-filter in applySessionSwaps is disabled: the boot replays the cue-free carry and never writes the plan's cue",
+  "anchor": "    if(hit && prog.cfg && prog.cfg.injury){\n      day.sections=applyInjuryFilter(day.sections,prog.cfg);\n    }",
+  "replacement": "    if(false && hit && prog.cfg && prog.cfg.injury){\n      day.sections=applyInjuryFilter(day.sections,prog.cfg);\n    }",
+  "gate": "gates/g227_d190_seam.js",
+  "note": "NAMED TRIP: row a-U (gate builder, argv[3] base_v226: residue 566/11,998) and the pair row a-U' (created 12). Also row e (53/229). EXPECTED: a-U, a-U', e; a-MEM and e-PRE stay green. Row d (D190 R6, re-ruled in RE-RULING 2) is named by S6-D190."
+ },
+ {
+  "name": "S6-D190 R6 (d) -> the hit.rx restore block in undoSwap is dropped: undo brings the donor's name back but not its detail",
+  "anchor": "  if(Array.isArray(hit.rx)){\n    const _put=[];\n    hit.rx.forEach(function(p){\n      if(!p||typeof p.d!=='string') return;\n      const ps=day.sections[p.s], at=ps&&ps.items&&ps.items[p.i];\n      let it=(at&&at.name===from&&_put.indexOf(at)<0)?at:null;\n      if(!it) (day.sections||[]).some(function(s){return ((s&&s.items)||[]).some(function(x){\n        if(x&&x.name===from&&_put.indexOf(x)<0){it=x;return true;} return false;});});\n      if(it){it.detail=p.d;_put.push(it);}\n    });\n  }\n  clearSwap(activeProgId,currentWeek,currentDayKey,from);",
+  "replacement": "  clearSwap(activeProgId,currentWeek,currentDayKey,from);",
+  "gate": "gates/g227_d190_seam.js",
+  "note": "NAMED TRIP: row d-U (RE-RULING 2 section 1: every U_d chain whose donor detail the rename alone does not reproduce, D177 window swaps and cued donors; measure P11 on this walk plus HALF_MANNY and mario_noinj: 1,886/15,112 over all 7 classes; 1,526/10,513 on the withdrawn lattice-only row d). The record still carries rx, so only the restore is under test. EXPECTED: d-U. a-MEM, a-U, a-U', e-PRE and e read no undo and stay green; d-U' is not named by this row. Keyed to RE-RULING 2 (D190 R6, undo unchanged)."
+ },
+ {
+  "name": "S6-D190 R6 (g221 G5) -> the hit.rx restore block in undoSwap is dropped: the D177 window and cued donors come back with the grid detail",
+  "anchor": "  if(Array.isArray(hit.rx)){\n    const _put=[];\n    hit.rx.forEach(function(p){\n      if(!p||typeof p.d!=='string') return;\n      const ps=day.sections[p.s], at=ps&&ps.items&&ps.items[p.i];\n      let it=(at&&at.name===from&&_put.indexOf(at)<0)?at:null;\n      if(!it) (day.sections||[]).some(function(s){return ((s&&s.items)||[]).some(function(x){\n        if(x&&x.name===from&&_put.indexOf(x)<0){it=x;return true;} return false;});});\n      if(it){it.detail=p.d;_put.push(it);}\n    });\n  }\n  clearSwap(activeProgId,currentWeek,currentDayKey,from);",
+  "replacement": "  clearSwap(activeProgId,currentWeek,currentDayKey,from);",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: G5a, G5b, G5c (measure P11 on this mutation: G5a 26,715 of 150,068 not byte-identical after undo, G5b Close-grip bench press -> Dips -> undo returns the open-sets detail, G5c). RE-RULING 2 said this trip 'may also trip g221 G7-1a'; P11 measured that false (G7-1a PASS: it checks the exSwapPrefs window on a build and a reboot and never calls undoSwap), so G7-1a is not named. Same mutation as the row above."
+ }
+]

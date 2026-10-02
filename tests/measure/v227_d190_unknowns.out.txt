@@ -1,0 +1,101 @@
+v227_d190_unknowns | BASE /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0d209eb9-c4f5-49d1-974c-7a51334cecdf/scratchpad/measure2/base_v226.html (ia-version 226) | D190 /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0d209eb9-c4f5-49d1-974c-7a51334cecdf/scratchpad/measure2/d190_226.html
+
+=== U1 mechanism sites (V226)
+  recordSwap :10275 | same-from filter :10282 const list=(s[k]||[]).filter(e=>e&&e.from!==from);
+  applySessionSwaps :10301 replays records in array order, one per pass, via applySwapPrefs :10155 -> _swapDetailFor :10119
+  applySwapChoice live hop :14290 (carries the current card detail, whatever B left on it)
+  hand trace of the filter on A>B, B>A, A>C: [{"from":"B","to":"A"},{"from":"A","to":"C"}] (the A>B record is gone; boot replays B>A (no B on the card: no-op) then A>C from the grid dose)
+  U1 ENUM mario W3: 49650 {"hop3|A>B>A>C":2978,"hop3|A>B>C>D":44081,"cyc3|A>B>C>D":2591}
+  U1 ENUM mario W5: 52215 {"hop3|A>B>A>C":3300,"cyc3|A>B>C>D":2753,"hop3|A>B>C>D":46162}
+  U1 ENUM lowback_wa W3: 34071 {"hop3|A>B>A>C":2434,"hop3|A>B>C>D":29586,"cyc3|A>B>C>D":2051}
+  U1 ENUM lowback_wa W5: 33404 {"hop3|A>B>A>C":2409,"cyc3|A>B>C>D":2042,"hop3|A>B>C>D":28953}
+  U1 ENUM elbow_wa W3: 48376 {"hop3|A>B>A>C":2961,"hop3|A>B>C>D":42915,"cyc3|A>B>C>D":2500}
+  U1 ENUM elbow_wa W5: 51872 {"hop3|A>B>A>C":3381,"cyc3|A>B>C>D":2726,"hop3|A>B>C>D":45765}
+  U1 ENUM total 269588 chains per tree (memo note: a candidate list is computed per (slot, current name), as the sheet would, on the untouched day)
+
+=== U2 the build pass
+  accessoryGrammarSweep :6781 | predicate :6793 const m=/^(\d+)×(\d+)(–\d+)?( each)?$/.exec(it.detail||''); | exemptions _BW_KEEP_FIXED / _GRAMMAR_BALLISTIC on the NAME
+  build order: native applyInjuryFilter :10903 (cue written) -> exSwapPrefs block :10937 (applySwapPrefs, then applyInjuryFilter on a hit) -> grammar sweep call :10963 (LAST)
+  BASE accessoryGrammarSweep on W3 beginner: "2×10 each" -> "2×8–12 each @ RPE 7" | "2×10 each — hold RPE 7, two in the tank" -> "2×10 each — hold RPE 7, two in the tank"
+  D190 accessoryGrammarSweep on W3 beginner: "2×10 each" -> "2×8–12 each @ RPE 7" | "2×10 each — hold RPE 7, two in the tank" -> "2×10 each — hold RPE 7, two in the tank"
+
+=== U2 population: one exSwapPrefs pref per natively cued source x every sheet candidate of it (taken on a day it is on)
+  mario        natively cued sources 2 ["Step-ups (KB)","Reverse lunge (KB)"] | prefs 12 | builds moved 9/12 | cards moved 28 of 52 target cards | {"(ii+g) cue dropped, grammar sweep rewrote":28}
+  lowback_wa   natively cued sources 4 ["Dumbbell row","Barbell hip thrust","Kettlebell single-arm row","Single-leg hip thrust"] | prefs 40 | builds moved 31/40 | cards moved 92 of 168 target cards | {"other":38,"(ii+g) cue dropped, grammar sweep rewrote":54}
+  hip_wa       natively cued sources 6 ["Step-ups (KB)","Kettlebell single-leg deadlift","Dumbbell split-stance deadlift","Glute-ham raise","Barbell good mornings","Single-leg hip thrust"] | prefs 47 | builds moved 22/47 | cards moved 52 of 156 target cards | {"(ii+g) cue dropped, grammar sweep rewrote":36,"other":16}
+  elbow_wa     natively cued sources 12 ["Barbell row","Weighted chinups","Dumbbell row","Dumbbell curl","Rope tricep extension","Pendlay row","Kettlebell single-arm row","Dumbbell hammer curl","Overhead dumbbell extension","Close-grip bench press","Incline dumbbell curl","Cable pushdown"] | prefs 106 | builds moved 47/106 | cards moved 112 of 504 target cards | {"other":82,"(ii+g) cue dropped, grammar sweep rewrote":30}
+  shoulder_wa  natively cued sources 8 ["Dumbbell incline press","Dumbbell decline press","Dumbbell rear delt fly","Kettlebell single-arm press","Incline barbell press","Face pull","Dumbbell front raise","Dumbbell floor press"] | prefs 63 | builds moved 29/63 | cards moved 106 of 406 target cards | {"(ii+g) cue dropped, grammar sweep rewrote":44,"other":62}
+  every moved card (with the native reference): /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0d209eb9-c4f5-49d1-974c-7a51334cecdf/scratchpad/measure2/u2_moved_cards.txt (390 lines). First 8:
+    mario {Step-ups (KB): Barbell good mornings} W1 thu Leg superset A :: "2×10 each — hold RPE 7, two in the tank" => "2×8–12 each @ RPE 6–7" [(ii+g) cue dropped, grammar sweep rewrote] | native Barbell good mornings (no pref) noinj: (none) || knee/wa: (none)
+    mario {Step-ups (KB): Barbell good mornings} W2 thu Leg superset A :: "2×10 each — hold RPE 7, two in the tank" => "2×8–12 each @ RPE 6–7" [(ii+g) cue dropped, grammar sweep rewrote] | native Barbell good mornings (no pref) noinj: (none) || knee/wa: (none)
+    mario {Step-ups (KB): Barbell good mornings} W5 thu Leg superset A :: "2×10 each — hold RPE 7, two in the tank" => "2×8–12 each @ RPE 8" [(ii+g) cue dropped, grammar sweep rewrote] | native Barbell good mornings (no pref) noinj: (none) || knee/wa: (none)
+    mario {Step-ups (KB): Barbell good mornings} W6 thu Leg superset A :: "2×10 each — hold RPE 7, two in the tank" => "2×8–12 each @ RPE 8" [(ii+g) cue dropped, grammar sweep rewrote] | native Barbell good mornings (no pref) noinj: (none) || knee/wa: (none)
+    mario {Step-ups (KB): Barbell hip thrust} W1 thu Leg superset A :: "2×10 each — hold RPE 7, two in the tank" => "2×8–12 each @ RPE 6–7" [(ii+g) cue dropped, grammar sweep rewrote] | native Barbell hip thrust (no pref) noinj: (none) || knee/wa: (none)
+    mario {Step-ups (KB): Barbell hip thrust} W2 thu Leg superset A :: "2×10 each — hold RPE 7, two in the tank" => "2×8–12 each @ RPE 6–7" [(ii+g) cue dropped, grammar sweep rewrote] | native Barbell hip thrust (no pref) noinj: (none) || knee/wa: (none)
+    mario {Step-ups (KB): Barbell hip thrust} W5 thu Leg superset A :: "2×10 each — hold RPE 7, two in the tank" => "2×8–12 each @ RPE 8" [(ii+g) cue dropped, grammar sweep rewrote] | native Barbell hip thrust (no pref) noinj: (none) || knee/wa: (none)
+    mario {Step-ups (KB): Barbell hip thrust} W6 thu Leg superset A :: "2×10 each — hold RPE 7, two in the tank" => "2×8–12 each @ RPE 8" [(ii+g) cue dropped, grammar sweep rewrote] | native Barbell hip thrust (no pref) noinj: (none) || knee/wa: (none)
+  (ii+g) cards whose D190 detail appears among the native no-pref prints of the same movement (uninjured build): 0/192
+  HALF_MANNY exSwapPrefs: null
+  exSwapPrefs writers in V226 (non-comment lines): :14475 p.cfg.exSwapPrefs={...(p.cfg.exSwapPrefs||{})}; || :14476 p.cfg.exSwapPrefs[from]=to;
+  acceptSwapNudge :14469 <- button onclick :1100 <- showSwapNudge :14455 <- applySwapChoice nudge :14307 <- bumpSwapCount :10330 (SWAP_NUDGE_AT const SWAP_NUDGE_AT=3;)
+
+=== U1 results (workers 2267 s)
+  BASE: reachable 269588/269588 | residue (slot or whole day live != boot) 1837/269588
+    by config|week: mario|W3 178/49650 | mario|W5 830/52215 | lowback_wa|W3 158/34071 | lowback_wa|W5 201/33404 | elbow_wa|W3 185/48376 | elbow_wa|W5 285/51872
+    by shape: hop3 A>B>A>x 1257/17463 | hop3 A>B>C>x 580/237462 | cyc3 A>B>C>x 0/14663
+    residue split: (a) cue anywhere in the chain 788 | (b) no cue anywhere 1049
+    residue x first hop to an unloadable (B left "N sets — RPE"): no-revisit|B loaded|a 580 | revisit|B loaded|b 166 | revisit|B unloadable|a 208 | revisit|B unloadable|b 883
+    residue store shape: 2 records, A>B gone 1257 | 3 records, A>B kept 580 | non-residue revisit chains with A>B gone: 14832/16206
+    residue kinds (live -> boot): live bw-sets form -> boot cued 208 | live bw-sets form -> boot loaded 883 | live loaded -> boot cued 580 | live loaded -> boot loaded 166
+  D190: reachable 269588/269588 | residue (slot or whole day live != boot) 1257/269588
+    by config|week: mario|W3 176/49650 | mario|W5 252/52215 | lowback_wa|W3 158/34071 | lowback_wa|W5 201/33404 | elbow_wa|W3 185/48376 | elbow_wa|W5 285/51872
+    by shape: hop3 A>B>A>x 1257/17463 | hop3 A>B>C>x 0/237462 | cyc3 A>B>C>x 0/14663
+    residue split: (a) cue anywhere in the chain 208 | (b) no cue anywhere 1049
+    residue x first hop to an unloadable (B left "N sets — RPE"): revisit|B loaded|b 166 | revisit|B unloadable|a 208 | revisit|B unloadable|b 883
+    residue store shape: 2 records, A>B gone 1257 | non-residue revisit chains with A>B gone: 14832/16206
+    residue kinds (live -> boot): live bw-sets form -> boot cued 127 | live bw-sets form -> boot loaded 964 | live loaded -> boot loaded 166
+  V226 -> D190: residue both 1257 | healed by D190 580 | created by D190 0 | healed by kind mario|a 580 | created (none)
+  ROW mario3#157 hop3 W3 mon Close-grip bench press (4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form) > Landmine rotational press > Close-grip bench press > Barbell bench press
+    V226 steps "4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" , "4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" , "4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" | boot "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form"
+    V226 ia_swaps_PM[w3_mon] [{"from":"Landmine rotational press","to":"Close-grip bench press"},{"from":"Close-grip bench press","to":"Barbell bench press"}]
+    D190 steps "4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" , "4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" , "4×6–10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" | boot "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" | store [{"from":"Landmine rotational press","to":"Close-grip bench press"},{"from":"Close-grip bench press","to":"Barbell bench press"}]
+  ROW lowback_wa3#11094 hop3 W3 tue Kettlebell single-arm row (2×8 each — hold RPE 7, two in the tank) > Feet-elevated inverted rows > Kettlebell single-arm row > Dumbbell row
+    V226 steps "2 sets — RPE 7 (leave 3 or more in reserve)" , "2 sets — RPE 7 (leave 3 or more in reserve)" , "2 sets — RPE 7 (leave 3 or more in reserve)" | boot "2×8 each — hold RPE 7, two in the tank"
+    V226 ia_swaps_PM[w3_tue] [{"from":"Feet-elevated inverted rows","to":"Kettlebell single-arm row"},{"from":"Kettlebell single-arm row","to":"Dumbbell row"}]
+    D190 steps "2 sets — RPE 8 (stop 2 reps short of failure)" , "2 sets — RPE 8 (stop 2 reps short of failure)" , "2 sets — RPE 8 (stop 2 reps short of failure)" | boot "2×8 each — hold RPE 7, two in the tank" | store [{"from":"Feet-elevated inverted rows","to":"Kettlebell single-arm row"},{"from":"Kettlebell single-arm row","to":"Dumbbell row"}]
+  PREMISES ROW knee_protect#1946 on BASE: 45° back extension > Cable pull-through > Single-leg hip thrust | steps "4 sets — RPE 7 (leave 3 or more in reserve)" , "4 sets — RPE 7 (leave 3 or more in reserve)" , "4 sets — RPE 7 (leave 3 or more in reserve)" | boot "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+    stored [{"from":"45° back extension","to":"Cable pull-through","rx":[{"s":0,"i":0,"d":"4 sets — RPE 7 (leave 3 or more in reserve)"}]},{"from":"Cable pull-through","to":"Single-leg hip thrust","rx":[{"s":0,"i":0,"d":"4 sets — RPE 7 (leave 3 or more in reserve)"}]}]
+  PREMISES ROW knee_protect#1946 on D190: 45° back extension > Cable pull-through > Single-leg hip thrust | steps "4 sets — RPE 7 (leave 3 or more in reserve)" , "4 sets — RPE 7 (leave 3 or more in reserve)" , "4 sets — RPE 7 (leave 3 or more in reserve)" | boot "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+    stored [{"from":"45° back extension","to":"Cable pull-through","rx":[{"s":0,"i":0,"d":"4 sets — RPE 7 (leave 3 or more in reserve)"}]},{"from":"Cable pull-through","to":"Single-leg hip thrust","rx":[{"s":0,"i":0,"d":"4 sets — RPE 7 (leave 3 or more in reserve)"}]}]
+  PREMISES ROW lowback_wa#1209 on BASE: Inverted rows (rings) > Dumbbell curl > Incline dumbbell curl | steps "3 sets — RPE 7 (leave 3 or more in reserve)" , "3 sets — RPE 7 (leave 3 or more in reserve)" , "3 sets — RPE 7 (leave 3 or more in reserve)" | boot "3×10–12 @ RPE 7"
+    stored [{"from":"Inverted rows (rings)","to":"Dumbbell curl","rx":[{"s":3,"i":1,"d":"3 sets — RPE 7 (leave 3 or more in reserve)"}]},{"from":"Dumbbell curl","to":"Incline dumbbell curl","rx":[{"s":3,"i":1,"d":"3 sets — RPE 7 (leave 3 or more in reserve)"}]}]
+  PREMISES ROW lowback_wa#1209 on D190: Inverted rows (rings) > Dumbbell curl > Incline dumbbell curl | steps "3 sets — RPE 7 (leave 3 or more in reserve)" , "3 sets — RPE 7 (leave 3 or more in reserve)" , "3 sets — RPE 7 (leave 3 or more in reserve)" | boot "3×10–12 @ RPE 7"
+    stored [{"from":"Inverted rows (rings)","to":"Dumbbell curl","rx":[{"s":3,"i":1,"d":"3 sets — RPE 7 (leave 3 or more in reserve)"}]},{"from":"Dumbbell curl","to":"Incline dumbbell curl","rx":[{"s":3,"i":1,"d":"3 sets — RPE 7 (leave 3 or more in reserve)"}]}]
+
+=== U2 reference (390 moved cards): D190 vs the uninjured build carrying the same pref, same slot (V226 tree)
+    24 elbow_wa|ii+g|D190 == uninjured+pref
+     6 elbow_wa|ii+g|R2 n/a (slot not on the uninjured card)
+    72 elbow_wa|iii|D190 == uninjured+pref
+    10 elbow_wa|iii|R2 n/a (slot not on the uninjured card)
+    12 hip_wa|ii+g|D190 == uninjured+pref
+    24 hip_wa|ii+g|R2 n/a (slot not on the uninjured card)
+    10 hip_wa|iii|D190 == uninjured+pref
+     6 hip_wa|iii|R2 n/a (slot not on the uninjured card)
+    10 lowback_wa|ii+g|D190 == uninjured+pref
+    44 lowback_wa|ii+g|R2 n/a (slot not on the uninjured card)
+     6 lowback_wa|iii|D190 == uninjured+pref
+    30 lowback_wa|iii|R2 n/a (slot not on the uninjured card)
+     2 lowback_wa|iii|neither == uninjured+pref
+    28 mario|ii+g|R2 n/a (slot not on the uninjured card)
+    34 shoulder_wa|ii+g|D190 == uninjured+pref
+    10 shoulder_wa|ii+g|R2 n/a (slot not on the uninjured card)
+    44 shoulder_wa|iii|D190 == uninjured+pref
+    14 shoulder_wa|iii|R2 n/a (slot not on the uninjured card)
+     4 shoulder_wa|iii|neither == uninjured+pref
+  e.g. mario {Step-ups (KB): Barbell good mornings} W1 thu Leg superset A | V226 "2×10 each — hold RPE 7, two in the tank" | D190 "2×8–12 each @ RPE 6–7" | R0 injured no-pref src "2×10 each — hold RPE 7, two in the tank" | R1 uninjured no-pref src undefined | R2 uninjured same pref undefined
+  e.g. mario {Step-ups (KB): Barbell good mornings} W2 thu Leg superset A | V226 "2×10 each — hold RPE 7, two in the tank" | D190 "2×8–12 each @ RPE 6–7" | R0 injured no-pref src "2×10 each — hold RPE 7, two in the tank" | R1 uninjured no-pref src undefined | R2 uninjured same pref undefined
+  e.g. mario {Step-ups (KB): Barbell good mornings} W5 thu Leg superset A | V226 "2×10 each — hold RPE 7, two in the tank" | D190 "2×8–12 each @ RPE 8" | R0 injured no-pref src "2×10 each — hold RPE 7, two in the tank" | R1 uninjured no-pref src undefined | R2 uninjured same pref undefined
+  e.g. lowback_wa {Dumbbell row: Feet-elevated inverted rows} W1 tue Pull | V226 "2 sets — RPE 7 (leave 3 or more in reserve)" | D190 "2 sets — RPE 8 (stop 2 reps short of failure)" | R0 injured no-pref src "2×8 each — hold RPE 7, two in the tank" | R1 uninjured no-pref src undefined | R2 uninjured same pref undefined
+  e.g. hip_wa {Step-ups (KB): Dumbbell seated calf raise} W1 thu Leg superset A | V226 "2×10 each — hold RPE 7, two in the tank" | D190 "2×8–12 each @ RPE 6–7" | R0 injured no-pref src "2×10 each — hold RPE 7, two in the tank" | R1 uninjured no-pref src undefined | R2 uninjured same pref undefined
+  e.g. elbow_wa {Barbell row: Feet-elevated inverted rows} W1 tue Pull superset A | V226 "2 sets — RPE 7 (leave 3 or more in reserve)" | D190 "2 sets — RPE 8 (stop 2 reps short of failure)" | R0 injured no-pref src "2×8 — hold RPE 7, two in the tank" | R1 uninjured no-pref src "2×6–10 @ RPE 6–7" | R2 uninjured same pref "2 sets — RPE 8 (stop 2 reps short of failure)"
+  e.g. shoulder_wa {Dumbbell incline press: Cable pushdown} W1 mon Secondary compound | V226 "3×10 — hold RPE 7, two in the tank" | D190 "3×8–12 @ RPE 6–7" | R0 injured no-pref src "3×10 — hold RPE 7, two in the tank" | R1 uninjured no-pref src "3×8–12 @ RPE 6–7" | R2 uninjured same pref "3×8–12 @ RPE 6–7"

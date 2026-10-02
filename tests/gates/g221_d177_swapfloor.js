@@ -108,6 +108,12 @@ const GRAM = /^(\d+)×(\d+)(?:–(\d+))? — RPE /;                       // R2:
 const REP_TOKEN = /^(\d+)×\d+(?:–\d+)?/;
 const handRewrite = (d, w) => d.replace(REP_TOKEN, (m, s) => s + '×' + w[0] + '–' + w[1]);
 const stripRep = s => String(s).replace(REP_TOKEN, (m, sets) => sets + '×#');
+// D190: the plan's cue is a second live-path writer outside `_swapDetailFor`; D177's claim is the rep token.
+// So G3c's power and off-grammar compares are cue-blind above 226: the exact suffix is removed from both sides,
+// once, before comparing. Typed here, never read from the engine. At 226 and below this is identity. The cue
+// byte itself is in D190's gate's custody (tests/measure/v227_rulings/d190_swapseam_ruling.md, Gates).
+const D190_CUE = ' — hold RPE 7, two in the tank';
+function cueBlind(s){ return (VER > 226 && typeof s === 'string' && s.endsWith(D190_CUE)) ? s.slice(0, s.length - D190_CUE.length) : s; }
 function handKind(n, D){
   const W = handFloor(n);
   if(W === null) return { k:'null', W };
@@ -152,7 +158,7 @@ const R = {
   G2:'G2 _repFloor equals the hand floor table on 14 named movements (RR1 rows, RR4 landmine literal, swing 10–15)',
   G3a:'G3a L1: 0 Main swap pairs change outside the rep token',
   G3b:'G3b L1: 0 Main swap pairs on a window row land under their window',
-  G3c:'G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2)',
+  G3c:'G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2); compare cue-blind above 226 (D190)',
   G3d:'G3d L1: donors at or above the floor stay verbatim',
   G3e:'G3e L1: null-row pairs stay verbatim',
   G3f:'G3f L1: every Main pair under its window prints exactly the hand rewrite (and some do)',
@@ -293,14 +299,14 @@ for(const cfg of L1){
           if(/The load runs out before the reps do here/.test(String(toast))) S.t3++;
           if(isPow){
             if(H.k === 'zero') continue;
-            S.pow++; if(O !== D){ S.powChg++; note('pow', where + ' :: ' + D + ' => ' + O); }
+            S.pow++; if(cueBlind(O) !== cueBlind(D)){ S.powChg++; note('pow', where + ' :: ' + D + ' => ' + O); }
             continue;
           }
           S.main++;
           if(PAIR && sdB(to, D) !== O) S.mainDiff++;
           if(H.k === 'zero'){ S.zeroN++; if(O !== D) S.zeroChg++; continue; }
           if(O !== D && stripRep(O) !== stripRep(D)){ S.outside++; note('out', where + ' :: ' + D + ' => ' + O); }
-          if(H.k === 'offgram'){ S.offN++; if(O !== D){ S.offChg++; note('off', where + ' :: ' + D + ' => ' + O); } }
+          if(H.k === 'offgram'){ S.offN++; if(cueBlind(O) !== cueBlind(D)){ S.offChg++; note('off', where + ' :: ' + D + ' => ' + O); } }
           if(H.k === 'null'){ S.nullN++; if(O !== D){ S.nullBad++; note('null', where + ' :: ' + D + ' => ' + O); } }
           if(H.k === 'atfloor'){ S.atN++; if(O !== D){ S.atBad++; note('at', where + ' :: ' + D + ' => ' + O); } }
           if(H.k === 'win'){ S.winN++; if(O !== H.out){ S.winBad++; note('win', where + ' :: ' + D + ' => ' + O); } }

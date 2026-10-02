@@ -1,0 +1,100 @@
+v227_d190_undo | V226 ia-version 226 | V227 ia-version 227 (working index.html) | CF = V227 + swapOriginOf last-match
+
+=== Q1 sites (V227 working tree)
+  :14176 swapOriginOf
+  :14179   chip lookup: FIRST record whose to == the current name
+  :14436 undoSwap
+  :14441   undo lookup: first record whose from == chip
+  :14443   rename back: hit.to -> from via applySwapPrefs
+  :14460   clearSwap(from)
+  :10279 recordSwap
+  :10286   same-from filter (D191 / U1)
+  :10292 clearSwap
+  :12825 card chip render calls swapOriginOf
+  hand trace A>B>C>B: store [{"from":"A","to":"B"},{"from":"B","to":"C"},{"from":"C","to":"B"}] | chip on B = first to==B -> A | undoSwap(A) renames B back to A (expected C) | last-match chip would be C
+  ENUM mario        {"W3":"49650 hop3 {\"A>B>C>B\":3093,\"A>B>A>x\":2754,\"A>B>C>A\":2591,\"other\":41212}, 1000 hop4","W5":"52215 hop3 {\"A>B>C>B\":3343,\"A>B>A>x\":3050,\"A>B>C>A\":2753,\"other\":43069}, 1000 hop4"}
+  ENUM lowback_wa   {"W3":"34071 hop3 {\"A>B>C>B\":2554,\"A>B>A>x\":2222,\"other\":27244,\"A>B>C>A\":2051}, 1000 hop4","W5":"33404 hop3 {\"A>B>C>B\":2475,\"A>B>A>x\":2200,\"A>B>C>A\":2042,\"other\":26687}, 1000 hop4"}
+  ENUM elbow_wa     {"W3":"48376 hop3 {\"A>B>C>B\":3082,\"A>B>A>x\":2739,\"A>B>C>A\":2500,\"other\":40055}, 1000 hop4","W5":"51872 hop3 {\"A>B>C>B\":3429,\"A>B>A>x\":3124,\"A>B>C>A\":2726,\"other\":42593}, 1000 hop4"}
+  ENUM manny        {"W3":"44989 hop3 {\"A>B>C>B\":3036,\"A>B>A>x\":2884,\"A>B>C>A\":2626,\"other\":36443}, 1000 hop4","W5":"43150 hop3 {\"A>B>C>B\":2886,\"A>B>A>x\":2615,\"other\":35284,\"A>B>C>A\":2365}, 1000 hop4"}
+  ENUM mario_noinj  {"W3":"51515 hop3 {\"A>B>C>B\":3272,\"A>B>A>x\":2934,\"A>B>C>A\":2715,\"other\":42594}, 1000 hop4","W5":"53380 hop3 {\"A>B>C>B\":3420,\"A>B>A>x\":3127,\"A>B>C>A\":2830,\"other\":44003}, 1000 hop4"}
+
+workers 3537 s
+
+=== Q2 hop3 (full enumeration)
+  V226 reachable 462622/462622 | slot != pre-hop 28246 | whole day != pre-hop 28246 | no chip 0
+    by config|shape (slot wrong / day wrong / n): elbow_wa|A>B>A>x 0/0/5863 | elbow_wa|A>B>C>A 0/0/5226 | elbow_wa|A>B>C>B 6032/6032/6511 | elbow_wa|other 0/0/82648 | lowback_wa|A>B>A>x 0/0/4422 | lowback_wa|A>B>C>A 0/0/4093 | lowback_wa|A>B>C>B 4608/4608/5029 | lowback_wa|other 0/0/53931 | manny|A>B>A>x 0/0/5499 | manny|A>B>C>A 0/0/4991 | manny|A>B>C>B 5454/5454/5922 | manny|other 0/0/71727 | mario_noinj|A>B>A>x 0/0/6061 | mario_noinj|A>B>C>A 0/0/5545 | mario_noinj|A>B>C>B 6190/6190/6692 | mario_noinj|other 0/0/86597 | mario|A>B>A>x 0/0/5804 | mario|A>B>C>A 0/0/5344 | mario|A>B>C>B 5962/5962/6436 | mario|other 0/0/84281
+    wrong by config: elbow_wa 6032 | lowback_wa 4608 | manny 5454 | mario 5962 | mario_noinj 6190
+  V227 reachable 462622/462622 | slot != pre-hop 28246 | whole day != pre-hop 28246 | no chip 0
+    by config|shape (slot wrong / day wrong / n): elbow_wa|A>B>A>x 0/0/5863 | elbow_wa|A>B>C>A 0/0/5226 | elbow_wa|A>B>C>B 6032/6032/6511 | elbow_wa|other 0/0/82648 | lowback_wa|A>B>A>x 0/0/4422 | lowback_wa|A>B>C>A 0/0/4093 | lowback_wa|A>B>C>B 4608/4608/5029 | lowback_wa|other 0/0/53931 | manny|A>B>A>x 0/0/5499 | manny|A>B>C>A 0/0/4991 | manny|A>B>C>B 5454/5454/5922 | manny|other 0/0/71727 | mario_noinj|A>B>A>x 0/0/6061 | mario_noinj|A>B>C>A 0/0/5545 | mario_noinj|A>B>C>B 6190/6190/6692 | mario_noinj|other 0/0/86597 | mario|A>B>A>x 0/0/5804 | mario|A>B>C>A 0/0/5344 | mario|A>B>C>B 5962/5962/6436 | mario|other 0/0/84281
+    wrong by config: elbow_wa 6032 | lowback_wa 4608 | manny 5454 | mario 5962 | mario_noinj 6190
+  CF   (revisit shapes full + every 20th other) reachable 102549/102549 | slot != pre-hop 0 | whole day != pre-hop 0 | no chip 0
+    by config|shape (slot wrong / day wrong / n): elbow_wa|A>B>A>x 0/0/5863 | elbow_wa|A>B>C>A 0/0/5226 | elbow_wa|A>B>C>B 0/0/6511 | elbow_wa|other 0/0/4175 | lowback_wa|A>B>A>x 0/0/4422 | lowback_wa|A>B>C>A 0/0/4093 | lowback_wa|A>B>C>B 0/0/5029 | lowback_wa|other 0/0/2652 | manny|A>B>A>x 0/0/5499 | manny|A>B>C>A 0/0/4991 | manny|A>B>C>B 0/0/5922 | manny|other 0/0/3673 | mario_noinj|A>B>A>x 0/0/6061 | mario_noinj|A>B>C>A 0/0/5545 | mario_noinj|A>B>C>B 0/0/6692 | mario_noinj|other 0/0/4369 | mario|A>B>A>x 0/0/5804 | mario|A>B>C>A 0/0/5344 | mario|A>B>C>B 0/0/6436 | mario|other 0/0/4242
+  V226 -> V227: wrong both 28246 | healed 0 | created 0 | day-level: created 0 healed 0
+  V227 -> CF (last-match chip) on 102549 chains: wrong on V227 28246, fixed by CF 28246, created by CF 0 | CF still wrong by shape (none) | CF created by shape (none)
+  V227 wrong rows: store had one record per hop (no collapse) 28246/28246 | store collapsed 0 | undo landed on the original donor A 28246 | landed on the chip 28246
+  D191 class A>B>A>x on V227: n 27649, store collapsed 27649, undo wrong 0, day wrong 0
+  ROW mario3#15399 mario W3 tue A>B>C>B Trap bar deadlift > Barbell Romanian deadlift > Deadlift > Barbell Romanian deadlift
+    store before undo ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"] | chip Trap bar deadlift
+    pre-last-hop slot Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | after undo Trap bar deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | store after ["Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"] | chip after undo ""
+    CF: chip Deadlift, after undo Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest", ok true
+  ROW lowback_wa3#10585 lowback_wa W3 tue A>B>C>B Neutral-grip chinups > Chinups > Lat pulldown > Chinups
+    store before undo ["Neutral-grip chinups->Chinups","Chinups->Lat pulldown","Lat pulldown->Chinups"] | chip Neutral-grip chinups
+    pre-last-hop slot Lat pulldown "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | after undo Neutral-grip chinups "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | store after ["Chinups->Lat pulldown","Lat pulldown->Chinups"] | chip after undo ""
+    CF: chip Lat pulldown, after undo Lat pulldown "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest", ok true
+  ROW elbow_wa3#15459 elbow_wa W3 tue A>B>C>B Trap bar deadlift > Barbell Romanian deadlift > Deadlift > Barbell Romanian deadlift
+    store before undo ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"] | chip Trap bar deadlift
+    pre-last-hop slot Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | after undo Trap bar deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | store after ["Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"] | chip after undo ""
+    CF: chip Deadlift, after undo Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest", ok true
+
+=== Q3 hop4 (seeded sample)
+  V226 reachable 10000/10000 | slot != pre-hop 1112 | whole day != pre-hop 1112 | no chip 0
+    by config|shape (slot wrong / day wrong / n): elbow_wa|A>B>A>C>A 7/7/7 | elbow_wa|A>B>C>A>C 13/13/13 | elbow_wa|A>B>C>D>B 116/116/116 | elbow_wa|A>B>C>D>C 103/103/103 | lowback_wa|A>B>A>C>A 8/8/8 | lowback_wa|A>B>C>A>C 10/10/10 | lowback_wa|A>B>C>D>B 97/97/97 | lowback_wa|A>B>C>D>C 112/112/112 | manny|A>B>A>C>A 8/8/8 | manny|A>B>C>A>C 10/10/10 | manny|A>B>C>D>B 98/98/98 | manny|A>B>C>D>C 112/112/112 | mario_noinj|A>B>A>C>A 6/6/6 | mario_noinj|A>B>C>A>C 11/11/11 | mario_noinj|A>B>C>D>B 86/86/86 | mario_noinj|A>B>C>D>C 94/94/94 | mario|A>B>A>C>A 9/9/9 | mario|A>B>C>A>C 8/8/8 | mario|A>B>C>D>B 97/97/97 | mario|A>B>C>D>C 107/107/107
+    hop4 shapes wrong: A>B>A>C>A 38 | A>B>C>A>C 52 | A>B>C>D>B 494 | A>B>C>D>C 528 | of shapes present 15 (rows 10000)
+    wrong by config: elbow_wa 239 | lowback_wa 227 | manny 228 | mario 221 | mario_noinj 197
+  V227 reachable 10000/10000 | slot != pre-hop 1112 | whole day != pre-hop 1112 | no chip 0
+    by config|shape (slot wrong / day wrong / n): elbow_wa|A>B>A>C>A 7/7/7 | elbow_wa|A>B>C>A>C 13/13/13 | elbow_wa|A>B>C>D>B 116/116/116 | elbow_wa|A>B>C>D>C 103/103/103 | lowback_wa|A>B>A>C>A 8/8/8 | lowback_wa|A>B>C>A>C 10/10/10 | lowback_wa|A>B>C>D>B 97/97/97 | lowback_wa|A>B>C>D>C 112/112/112 | manny|A>B>A>C>A 8/8/8 | manny|A>B>C>A>C 10/10/10 | manny|A>B>C>D>B 98/98/98 | manny|A>B>C>D>C 112/112/112 | mario_noinj|A>B>A>C>A 6/6/6 | mario_noinj|A>B>C>A>C 11/11/11 | mario_noinj|A>B>C>D>B 86/86/86 | mario_noinj|A>B>C>D>C 94/94/94 | mario|A>B>A>C>A 9/9/9 | mario|A>B>C>A>C 8/8/8 | mario|A>B>C>D>B 97/97/97 | mario|A>B>C>D>C 107/107/107
+    hop4 shapes wrong: A>B>A>C>A 38 | A>B>C>A>C 52 | A>B>C>D>B 494 | A>B>C>D>C 528 | of shapes present 15 (rows 10000)
+    wrong by config: elbow_wa 239 | lowback_wa 227 | manny 228 | mario 221 | mario_noinj 197
+  CF   reachable 10000/10000 | slot != pre-hop 0 | whole day != pre-hop 0 | no chip 0
+    by config|shape (slot wrong / day wrong / n): 
+    hop4 shapes wrong: (none) | of shapes present 15 (rows 10000)
+  V226 -> V227: wrong both 1112 | healed 0 | created 0 | day-level: created 0 healed 0
+  V227 -> CF (last-match chip) on 10000 chains: wrong on V227 1112, fixed by CF 1112, created by CF 0 | CF still wrong by shape (none) | CF created by shape (none)
+  V227 wrong rows: store had one record per hop (no collapse) 1022/1112 | store collapsed 90 | undo landed on the original donor A 494 | landed on the chip 1112
+  ROW mario3#7192+3 mario W3 mon A>B>C>D>C Side plank > Dead bugs > Ab wheel rollouts > Windshield wipers > Ab wheel rollouts
+    store before undo ["Side plank->Dead bugs","Dead bugs->Ab wheel rollouts","Ab wheel rollouts->Windshield wipers","Windshield wipers->Ab wheel rollouts"] | chip Dead bugs
+    pre-last-hop slot Windshield wipers "3×30–45 sec each" | after undo Dead bugs "3×30–45 sec each" | store after ["Side plank->Dead bugs","Ab wheel rollouts->Windshield wipers","Windshield wipers->Ab wheel rollouts"] | chip after undo "Side plank"
+    CF: chip Windshield wipers, after undo Windshield wipers "3×30–45 sec each", ok true
+  ROW mario3#15870+19 mario W3 tue A>B>C>D>B Trap bar deadlift > Dumbbell split-stance deadlift > Leg press > Dumbbell goblet squat > Dumbbell split-stance deadlift
+    store before undo ["Trap bar deadlift->Dumbbell split-stance deadlift","Dumbbell split-stance deadlift->Leg press","Leg press->Dumbbell goblet squat","Dumbbell goblet squat->Dumbbell split-stance deadlift"] | chip Trap bar deadlift
+    pre-last-hop slot Dumbbell goblet squat "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | after undo Trap bar deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | store after ["Dumbbell split-stance deadlift->Leg press","Leg press->Dumbbell goblet squat","Dumbbell goblet squat->Dumbbell split-stance deadlift"] | chip after undo ""
+    CF: chip Dumbbell goblet squat, after undo Dumbbell goblet squat "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest", ok true
+  ROW mario3#19785+306 mario W3 thu A>B>C>A>C Dumbbell goblet squat > Dumbbell split-stance deadlift > Barbell Romanian deadlift > Dumbbell goblet squat > Barbell Romanian deadlift
+    store before undo ["Dumbbell split-stance deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Dumbbell goblet squat","Dumbbell goblet squat->Barbell Romanian deadlift"] | chip Dumbbell split-stance deadlift
+    pre-last-hop slot Dumbbell goblet squat "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" | after undo Dumbbell split-stance deadlift "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" | store after ["Barbell Romanian deadlift->Dumbbell goblet squat","Dumbbell goblet squat->Barbell Romanian deadlift"] | chip after undo ""
+    CF: chip Dumbbell goblet squat, after undo Dumbbell goblet squat "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest", ok true
+  ROW mario3#48269+253 mario W3 sat A>B>A>C>A Decline pushups > Cable pushdown > Decline pushups > Cable lateral raise > Decline pushups
+    store before undo ["Cable pushdown->Decline pushups","Decline pushups->Cable lateral raise","Cable lateral raise->Decline pushups"] | chip Cable pushdown
+    pre-last-hop slot Cable lateral raise "2 sets — RPE 7 (leave 3 or more in reserve)" | after undo Cable pushdown "2 sets — RPE 7 (leave 3 or more in reserve)" | store after ["Decline pushups->Cable lateral raise","Cable lateral raise->Decline pushups"] | chip after undo ""
+    CF: chip Cable lateral raise, after undo Cable lateral raise "2 sets — RPE 7 (leave 3 or more in reserve)", ok true
+
+=== Q5 one row in full (V227): mario W3 tue slot [0][0] section "Main — Trap bar deadlift"
+  grid: Trap bar deadlift ""
+  tap 1 -> Barbell Romanian deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | chip Trap bar deadlift | toast Barbell Romanian deadlift in, trap bar deadlift out. Same job, same numbers.
+  tap 2 -> Deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | chip Barbell Romanian deadlift | toast Deadlift in, barbell romanian deadlift out. Same job, same numbers.
+  tap 3 -> Barbell Romanian deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | chip Trap bar deadlift | toast Barbell Romanian deadlift in, deadlift out. Same job, same numbers.
+  chip on the card before undo: "Trap bar deadlift" (the athlete expects Deadlift)
+  undo toast: Trap bar deadlift is back on the card.
+  card after undo: Trap bar deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | chip after undo: (none) | store after ["Barbell Romanian deadlift->Deadlift","Deadlift->Barbell Romanian deadlift"]
+  next boot: Trap bar deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest"
+  elbow_wa|A>B>A>B         undo wrong 0/479 | store collapsed 479
+  elbow_wa|A>B>C>B         undo wrong 6032/6032 | store collapsed 0
+  lowback_wa|A>B>A>B       undo wrong 0/421 | store collapsed 421
+  lowback_wa|A>B>C>B       undo wrong 4608/4608 | store collapsed 0
+  manny|A>B>A>B            undo wrong 0/468 | store collapsed 468
+  manny|A>B>C>B            undo wrong 5454/5454 | store collapsed 0
+  mario_noinj|A>B>A>B      undo wrong 0/502 | store collapsed 502
+  mario_noinj|A>B>C>B      undo wrong 6190/6190 | store collapsed 0
+  mario|A>B>A>B            undo wrong 0/474 | store collapsed 474
+  mario|A>B>C>B            undo wrong 5962/5962 | store collapsed 0
+  total 28246/30590

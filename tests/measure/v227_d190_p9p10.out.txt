@@ -1,0 +1,72 @@
+=== P9a the U2 cards matching neither V226 nor D190 to the uninjured+same-pref build
+  found 6 (expected 6) of 390 moved cards
+  lowback_wa {Barbell hip thrust -> 45° back extension} W1 thu slot [3][0] "Leg superset B"
+    V226  45° back extension "2 sets — RPE 7 (leave 3 or more in reserve)"
+    D190  45° back extension "2 sets — RPE 8 (stop 2 reps short of failure)"
+    UNINJ+pref same [si][ii] Kettlebell swing "2×8" | same label section on uninjured: [3][0] Kettlebell swing "2×8" ; [3][1] 45° back extension "2 sets — RPE 6 (leave 3 or more in reserve)"
+    injured no-pref same slot: Barbell hip thrust "2×8 — hold RPE 7, two in the tank"
+    pattern hip_ext capped on lowback/wa: true | same name same slot on uninjured: false | P.swapNames[target] null P.swapNames[source] null
+    => OUTSIDE (not same name in same slot on uninjured, capped pattern)
+  lowback_wa {Barbell hip thrust -> 45° back extension} W2 thu slot [3][0] "Leg superset B"
+    V226  45° back extension "2 sets — RPE 7 (leave 3 or more in reserve)"
+    D190  45° back extension "2 sets — RPE 8 (stop 2 reps short of failure)"
+    UNINJ+pref same [si][ii] Kettlebell swing "2×8" | same label section on uninjured: [3][0] Kettlebell swing "2×8" ; [3][1] 45° back extension "2 sets — RPE 6 (leave 3 or more in reserve)"
+    injured no-pref same slot: Barbell hip thrust "2×8 — hold RPE 7, two in the tank"
+    pattern hip_ext capped on lowback/wa: true | same name same slot on uninjured: false | P.swapNames[target] null P.swapNames[source] null
+    => OUTSIDE (not same name in same slot on uninjured, capped pattern)
+  shoulder_wa {Dumbbell decline press -> Diamond pushups} W1 mon slot [2][0] "Chest volume"
+    V226  Diamond pushups "3 sets — RPE 7 (leave 3 or more in reserve)"
+    D190  Diamond pushups "3 sets — RPE 8 (stop 2 reps short of failure)"
+    UNINJ+pref same [si][ii] Diamond pushups "3 sets — RPE 6 (leave 3 or more in reserve)" | same label section on uninjured: [2][0] Diamond pushups "3 sets — RPE 6 (leave 3 or more in reserve)"
+    injured no-pref same slot: Dumbbell decline press "3×12 — hold RPE 7, two in the tank"
+    pattern hpress capped on shoulder/wa: true | same name same slot on uninjured: true | P.swapNames[target] null P.swapNames[source] null
+    => OUTSIDE (capped pattern)
+  shoulder_wa {Dumbbell decline press -> Diamond pushups} W1 fri slot [1][0] "Pump"
+    V226  Diamond pushups "2 sets — RPE 7 (leave 3 or more in reserve)"
+    D190  Diamond pushups "2 sets — RPE 8 (stop 2 reps short of failure)"
+    UNINJ+pref same [si][ii] Diamond pushups "2 sets — RPE 6 (leave 3 or more in reserve)" | same label section on uninjured: [1][0] Diamond pushups "2 sets — RPE 6 (leave 3 or more in reserve)" ; [1][1] Rope tricep extension "2×12–15 @ RPE 6–7"
+    injured no-pref same slot: Dumbbell decline press "2×15 — hold RPE 7, two in the tank"
+    pattern hpress capped on shoulder/wa: true | same name same slot on uninjured: true | P.swapNames[target] null P.swapNames[source] null
+    => OUTSIDE (capped pattern)
+  shoulder_wa {Dumbbell decline press -> Diamond pushups} W2 mon slot [2][0] "Chest volume"
+    V226  Diamond pushups "3 sets — RPE 7 (leave 3 or more in reserve)"
+    D190  Diamond pushups "3 sets — RPE 8 (stop 2 reps short of failure)"
+    UNINJ+pref same [si][ii] Diamond pushups "3 sets — RPE 6 (leave 3 or more in reserve)" | same label section on uninjured: [2][0] Diamond pushups "3 sets — RPE 6 (leave 3 or more in reserve)"
+    injured no-pref same slot: Dumbbell decline press "3×12 — hold RPE 7, two in the tank"
+    pattern hpress capped on shoulder/wa: true | same name same slot on uninjured: true | P.swapNames[target] null P.swapNames[source] null
+    => OUTSIDE (capped pattern)
+  shoulder_wa {Dumbbell decline press -> Diamond pushups} W2 fri slot [1][0] "Pump"
+    V226  Diamond pushups "2 sets — RPE 7 (leave 3 or more in reserve)"
+    D190  Diamond pushups "2 sets — RPE 8 (stop 2 reps short of failure)"
+    UNINJ+pref same [si][ii] Diamond pushups "2 sets — RPE 6 (leave 3 or more in reserve)" | same label section on uninjured: [1][0] Diamond pushups "2 sets — RPE 6 (leave 3 or more in reserve)" ; [1][1] Rope tricep extension "2×12–15 @ RPE 6–7"
+    injured no-pref same slot: Dumbbell decline press "2×15 — hold RPE 7, two in the tank"
+    pattern hpress capped on shoulder/wa: true | same name same slot on uninjured: true | P.swapNames[target] null P.swapNames[source] null
+    => OUTSIDE (capped pattern)
+  P9a summary: inside 0 (of them not byte-equal 0) | outside 6 by reason capped 4 | slot-mismatch capped 2
+
+=== P9b U2 method on ankle/wa: one pref per natively cued source -> every sheet candidate (taken on a day the source is on)
+  natively cued cards 6: W1 thu Leg superset A :: Dumbbell Bulgarian split squat "2×10 each — hold RPE 7, two in the tank" ; W2 thu Leg superset A :: Dumbbell Bulgarian split squat "2×10 each — hold RPE 7, two in the tank" ; W3 thu Leg superset A :: Dumbbell Bulgarian split squat "2×10 each — hold RPE 7, two in the tank" ; W4 thu Leg superset A :: Dumbbell Bulgarian split squat "2×10 each — hold RPE 7, two in the tank" ; W5 thu Leg superset A :: Dumbbell Bulgarian split squat "2×10 each — hold RPE 7, two in the tank" ; W6 thu Leg superset A :: Dumbbell Bulgarian split squat "2×10 each — hold RPE 7, two in the tank" | distinct sources ["Dumbbell Bulgarian split squat"]
+  source Dumbbell Bulgarian split squat (W1 thu): candidates Dumbbell split-stance deadlift[hinge], Barbell box squat[squat,capped], Barbell Romanian deadlift[hinge], Deadlift[hinge], Leg press[squat,capped]
+  ankle/wa: prefs 5 | builds moved 3/5 | cards moved / target cards: 18/34
+  kinds:   ref c2ii-eq 12 |   ref c2ii-outside 6 | ii+g 18
+    e.g. {Dumbbell Bulgarian split squat -> Dumbbell split-stance deadlift} W1 thu [1][0] Leg superset A :: Dumbbell split-stance deadlift V226 "2×10 each — hold RPE 7, two in the tank" => D190 Dumbbell split-stance deadlift "2×8–12 each @ RPE 6–7" | uninj+pref Dumbbell split-stance deadlift "2×8–12 each @ RPE 6–7" [ii+g]
+    e.g. {Dumbbell Bulgarian split squat -> Dumbbell split-stance deadlift} W2 thu [1][0] Leg superset A :: Dumbbell split-stance deadlift V226 "2×10 each — hold RPE 7, two in the tank" => D190 Dumbbell split-stance deadlift "2×8–12 each @ RPE 6–7" | uninj+pref Dumbbell split-stance deadlift "2×8–12 each @ RPE 6–7" [ii+g]
+    e.g. {Dumbbell Bulgarian split squat -> Dumbbell split-stance deadlift} W3 thu [1][0] Leg superset A :: Dumbbell split-stance deadlift V226 "2×10 each — hold RPE 7, two in the tank" => D190 Dumbbell split-stance deadlift "2×8–12 each @ RPE 7" | uninj+pref Dumbbell goblet side lunge "2×8–12 each @ RPE 7" [ii+g]
+    e.g. {Dumbbell Bulgarian split squat -> Dumbbell split-stance deadlift} W4 thu [1][0] Leg superset A :: Dumbbell split-stance deadlift V226 "2×10 each — hold RPE 7, two in the tank" => D190 Dumbbell split-stance deadlift "2×8–12 each @ RPE 7" | uninj+pref Dumbbell goblet side lunge "2×8–12 each @ RPE 7" [ii+g]
+    e.g. {Dumbbell Bulgarian split squat -> Dumbbell split-stance deadlift} W5 thu [1][0] Leg superset A :: Dumbbell split-stance deadlift V226 "2×10 each — hold RPE 7, two in the tank" => D190 Dumbbell split-stance deadlift "2×8–12 each @ RPE 8" | uninj+pref Dumbbell split-stance deadlift "2×8–12 each @ RPE 8" [ii+g]
+    e.g. {Dumbbell Bulgarian split squat -> Dumbbell split-stance deadlift} W6 thu [1][0] Leg superset A :: Dumbbell split-stance deadlift V226 "2×10 each — hold RPE 7, two in the tank" => D190 Dumbbell split-stance deadlift "2×8–12 each @ RPE 8" | uninj+pref Dumbbell split-stance deadlift "2×8–12 each @ RPE 8" [ii+g]
+  OTHER / gone / non-target (printed in full): 0
+
+=== P10 native unloadable accessories on capped patterns (no pref, no swap)
+  sites: applyInjuryFilter cue append :8125 | build-time filter calls :10903 and :10921 | unloadableRxSweep :11173 called :10963 -> _bwSetsFromDetail call :11194 | _bwSetsFromDetail :6754 rpe read :6757 | beginner floor :6761
+  mario        capped-pattern cards 12 | unloadable (bodyweight-sets form) 0 | V226 form (none) | D190 == V226 0/0 | cue-off CF form (none) || W5+ only (beginner floor off): n 0, V226 RPE7 0, CF RPE7 0, V226 7 & CF 8 0
+  ankle_wa     capped-pattern cards 12 | unloadable (bodyweight-sets form) 0 | V226 form (none) | D190 == V226 0/0 | cue-off CF form (none) || W5+ only (beginner floor off): n 0, V226 RPE7 0, CF RPE7 0, V226 7 & CF 8 0
+  lowback_wa   capped-pattern cards 24 | unloadable (bodyweight-sets form) 6 | V226 form RPE 6 2 | RPE 7 4 | D190 == V226 6/6 | cue-off CF form RPE 6 2 | RPE 7 2 | RPE 8 2 || W5+ only (beginner floor off): n 2, V226 RPE7 2, CF RPE7 0, V226 7 & CF 8 2
+  hip_wa       capped-pattern cards 30 | unloadable (bodyweight-sets form) 2 | V226 form RPE 6 2 | D190 == V226 2/2 | cue-off CF form RPE 6 2 || W5+ only (beginner floor off): n 0, V226 RPE7 0, CF RPE7 0, V226 7 & CF 8 0
+  elbow_wa     capped-pattern cards 58 | unloadable (bodyweight-sets form) 16 | V226 form RPE 6 6 | RPE 7 10 | D190 == V226 16/16 | cue-off CF form RPE 6 6 | RPE 7 6 | RPE 8 4 || W5+ only (beginner floor off): n 6, V226 RPE7 6, CF RPE7 2, V226 7 & CF 8 4
+  shoulder_wa  capped-pattern cards 46 | unloadable (bodyweight-sets form) 6 | V226 form RPE 6 2 | RPE 7 4 | D190 == V226 6/6 | cue-off CF form RPE 6 2 | RPE 7 4 || W5+ only (beginner floor off): n 2, V226 RPE7 2, CF RPE7 2, V226 7 & CF 8 0
+  TOTAL unloadable capped native cards 30 | V226 RPE 7 form 18 | of those, RPE 8 with the cue append neutralised (cue is the cause) 6 | V226 RPE 7 and CF RPE 7 (beginner floor W3-4 or other) 12 | D190 differs from V226 on 0
+  by week (V226 form/CF form): W01 6/6 6 | W02 6/6 6 | W03 7/7 4 | W04 7/7 4 | W05 7/7 2 | W05 7/8 3 | W06 7/7 2 | W06 7/8 3
+  e.g. lowback_wa W5 sat Strength :: Inverted rows (rings) [row] V226 "2 sets — RPE 7 (leave 3 or more in reserve)" | D190 "2 sets — RPE 7 (leave 3 or more in reserve)" | cue-off "2 sets — RPE 8 (stop 2 reps short of failure)"
+  e.g. elbow_wa W5 tue Pull superset A :: L-sit chinups [vpull] V226 "2 sets — RPE 7 (leave 3 or more in reserve)" | D190 "2 sets — RPE 7 (leave 3 or more in reserve)" | cue-off "2 sets — RPE 8 (stop 2 reps short of failure)"
+  direct: _bwSetsFromDetail("2×10 each — hold RPE 7, two in the tank", 5, "beginner", false) = "2 sets — RPE 7 (leave 3 or more in reserve)" | ("2×10 each", 5, "beginner", false) = "2 sets — RPE 8 (stop 2 reps short of failure)"

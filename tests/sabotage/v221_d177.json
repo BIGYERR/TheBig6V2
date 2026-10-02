@@ -71,10 +71,10 @@
  },
  {
   "name": "S1-D177 RR3 -> the build-time pref pass (applySwapPrefs) skips the window: cfg.exSwapPrefs prints the donor reps",
-  "anchor": "      it.detail=_swapDetailFor(to,it.detail);",
-  "replacement": "      it.detail=(function(f){return (f&&f[1]!==0)?it.detail:_swapDetailFor(to,it.detail);})(_repFloor(to));",
+  "anchor": "      it.detail=_swapDetailFor(to,_stripCapCue(it.detail));",
+  "replacement": "      it.detail=(function(f){return (f&&f[1]!==0)?_stripCapCue(it.detail):_swapDetailFor(to,_stripCapCue(it.detail));})(_repFloor(to));",
   "gate": "gates/g221_d177_swapfloor.js",
-  "note": "NAMED TRIP: G7-1a (W1 4×6, W2 4×5, W5/W6 4×3 goblet). The live tap keeps its own call, so G1 stays green."
+  "note": "NAMED TRIP: G7-1a (W1 4×6, W2 4×5, W5/W6 4×3 goblet). The live tap keeps its own call, so G1 stays green. Re-anchored V227 (D190 RE-RULING 1 §C): the V226 line is gone, the spec bites on the D190 line; the donor expression `it.detail` becomes `_stripCapCue(it.detail)` in both branches, so only D177's window is skipped."
  },
  {
   "name": "G8b -> addedDetailFor's fallback drops to 3×8: under the swing window, so the add path could be re-prescribed",

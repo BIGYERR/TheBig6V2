@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="226"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="227"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -8086,6 +8086,10 @@ function injuryPlan(cfg){
 // accessories on capped patterns (wave lifts are clamped inside scheme() instead,
 // so their printed RPE is already correct and gets no note).
 function _injViewName(n,cfg){ if(!cfg||!cfg.injury) return n; const P=injuryPlan(cfg); if(!P||!P.swapNames||!P.swapNames[n]) return n; const g=_gearLens((cfg&&cfg.equipment)||'home_full'); if(!g(n)) return n; const to=P.swapNames[n]; const FB={'Cable pushdown':'Close-grip pushups'}; return g(to)?to:(FB[to]||to); }
+// V227 D190 P-SWAPSEAM (R2): the plan's cap cue is one literal, read by the appender in applyInjuryFilter and by
+// the stripper both swap hops run before _swapDetailFor, so the carry never sees it and the filter alone writes it.
+const INJ_CAP_CUE=' — hold RPE 7, two in the tank';
+function _stripCapCue(d){ return (typeof d==='string'&&d.endsWith(INJ_CAP_CUE))?d.slice(0,d.length-INJ_CAP_CUE.length):d; }
 function applyInjuryFilter(sections,cfg){
   const P=injuryPlan(cfg);
   if(!P||!Array.isArray(sections)) return sections;
@@ -8122,7 +8126,7 @@ function applyInjuryFilter(sections,cfg){
         const SWAP_GEAR_FALLBACK={'Cable pushdown':'Close-grip pushups'};
         if(_gOK(name)){ const to=P.swapNames[name]; name=_gOK(to)?to:(SWAP_GEAR_FALLBACK[to]||to); }
       }
-      if(pat&&P.cap.has(pat)&&detail&&!/RPE/.test(detail)) detail=detail+' — hold RPE 7, two in the tank';
+      if(pat&&P.cap.has(pat)&&detail&&!/RPE/.test(detail)) detail=detail+INJ_CAP_CUE;
       if(seen.has(name)) return;  // swaps can collide with an existing pick
       seen.add(name);
       // Labels embed the drawn movement ('Main — Dumbbell bench press'), so a
@@ -10163,7 +10167,7 @@ function applySwapPrefs(sections,map){
       if(!to||to===it.name) return;
       const was=it.name;
       it.name=to; hit=true;
-      it.detail=_swapDetailFor(to,it.detail);
+      it.detail=_swapDetailFor(to,_stripCapCue(it.detail));
       if(sec.label&&sec.label.indexOf(was)>=0) sec.label=sec.label.split(was).join(to);
     });
   });
@@ -14286,9 +14290,19 @@ function applySwapChoice(to){
   });});
   item.name=to;
   const _wasDetail=item.detail;
+  // V227 D190 P-SWAPSEAM: the carry is blind to the plan's cue (R2), _reRx reads the stripped donor so a cue never
+  // moves a toast (R4), and the plan's filter alone decides the cue for the movement now on the card (R3).
+  const _base=_stripCapCue(_wasDetail);
   const _rx={};
-  item.detail=_swapDetailFor(to,item.detail,_rx);
-  const _reRx=(item.detail!==_wasDetail);
+  item.detail=_swapDetailFor(to,_base,_rx);
+  const _reRx=(item.detail!==_base);
+  if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){
+    try{
+      const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],activeProg.cfg);
+      const _fi=_fs&&_fs[0]&&_fs[0].items&&_fs[0].items[0];
+      if(_fi&&_fi.name===to) item.detail=_fi.detail;
+    }catch(e){}
+  }
   if(sec.label&&sec.label.indexOf(from)>=0) sec.label=sec.label.split(from).join(to);
   recordSwap(activeProgId,currentWeek,currentDayKey,from,to,_undoRx);
   const nudge=bumpSwapCount(activeProgId,from,to);

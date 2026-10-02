@@ -1,0 +1,330 @@
+v227_swapseam | base ia-version 226 HEAD 637bc8e | base == working index.html: true
+IDENTITY buildProgram progDigest (clock pinned, seed pinned; each config built twice per tree): equal across HEAD/BASE/S1/S2 for 9/9 configs
+  mario         HEAD 7681cf8e4b3d42da  S1 7681cf8e4b3d42da  S2 7681cf8e4b3d42da
+  manny         HEAD 0ac7da6b1691a8e1  S1 0ac7da6b1691a8e1  S2 0ac7da6b1691a8e1
+  mario_noinj   HEAD d59b65f1d978a263  S1 d59b65f1d978a263  S2 d59b65f1d978a263
+  knee_protect  HEAD cc6e417c30b2a309  S1 cc6e417c30b2a309  S2 cc6e417c30b2a309
+  ankle_wa      HEAD 03e359b5731139a6  S1 03e359b5731139a6  S2 03e359b5731139a6
+  hip_wa        HEAD f2ae1010ae57eab7  S1 f2ae1010ae57eab7  S2 f2ae1010ae57eab7
+  lowback_wa    HEAD d4de0af4ab123f38  S1 d4de0af4ab123f38  S2 d4de0af4ab123f38
+  shoulder_wa   HEAD fdfc74330b68d5fc  S1 fdfc74330b68d5fc  S2 fdfc74330b68d5fc
+  elbow_wa      HEAD 1bd7fe074b3557ee  S1 1bd7fe074b3557ee  S2 1bd7fe074b3557ee
+  MANNY_DIGEST_BY_VERSION[226] = 0ac7da6b1691a8e1 | harness HALF_MANNY digest (unpinned clock, as gates do) HEAD 0ac7da6b1691a8e1 S1 0ac7da6b1691a8e1
+ENUM mario         7551 {"W3|hop1":264,"W3|cyc2":224,"W3|hop2":3146,"W5|hop1":288,"W5|cyc2":250,"W5|hop2":3379}
+ENUM manny         9386 {"W3|hop1":258,"W3|cyc2":246,"W3|hop2":2931,"W5|hop1":244,"W5|cyc2":222,"W5|hop2":2796,"W7|hop1":217,"W7|cyc2":196,"W7|hop2":2276}
+ENUM mario_noinj   7831 {"W3|hop1":282,"W3|cyc2":242,"W3|hop2":3304,"W5|hop1":295,"W5|cyc2":260,"W5|hop2":3448}
+ENUM knee_protect  7366 {"W3|hop1":268,"W3|cyc2":223,"W3|hop2":3209,"W5|hop1":269,"W5|cyc2":236,"W5|hop2":3161}
+ENUM ankle_wa      7547 {"W3|hop1":263,"W3|cyc2":226,"W3|hop2":3136,"W5|hop1":287,"W5|cyc2":254,"W5|hop2":3381}
+ENUM hip_wa        7241 {"W3|hop1":266,"W3|cyc2":219,"W3|hop2":3122,"W5|hop1":269,"W5|cyc2":238,"W5|hop2":3127}
+ENUM lowback_wa    5913 {"W3|hop1":247,"W3|cyc2":212,"W3|hop2":2539,"W5|hop1":236,"W5|cyc2":209,"W5|hop2":2470}
+ENUM shoulder_wa   6716 {"W3|hop1":230,"W3|cyc2":202,"W3|hop2":2686,"W5|hop1":274,"W5|cyc2":240,"W5|hop2":3084}
+ENUM elbow_wa      7418 {"W3|hop1":258,"W3|cyc2":222,"W3|hop2":3032,"W5|hop1":291,"W5|cyc2":257,"W5|hop2":3358}
+workers done 820 s
+
+=== TREE BASE | chains 66969 reachable 66969 (unreachable at replay 0)
+  slot detail live!=boot 128/66969 | slot name live!=boot 0/66969 | whole day live!=boot 128/66969
+    ankle_wa|ankle/workaround|cyc2           slot-detail residue 0/480   whole-day 0/480
+    ankle_wa|ankle/workaround|hop1           slot-detail residue 1/550   whole-day 1/550
+    ankle_wa|ankle/workaround|hop2           slot-detail residue 59/6517   whole-day 59/6517
+    elbow_wa|elbow/workaround|cyc2           slot-detail residue 0/479   whole-day 0/479
+    elbow_wa|elbow/workaround|hop1           slot-detail residue 0/549   whole-day 0/549
+    elbow_wa|elbow/workaround|hop2           slot-detail residue 0/6390   whole-day 0/6390
+    hip_wa|hip/workaround|cyc2               slot-detail residue 0/457   whole-day 0/457
+    hip_wa|hip/workaround|hop1               slot-detail residue 0/535   whole-day 0/535
+    hip_wa|hip/workaround|hop2               slot-detail residue 0/6249   whole-day 0/6249
+    knee_protect|knee/protect|cyc2           slot-detail residue 0/459   whole-day 0/459
+    knee_protect|knee/protect|hop1           slot-detail residue 0/537   whole-day 0/537
+    knee_protect|knee/protect|hop2           slot-detail residue 0/6370   whole-day 0/6370
+    lowback_wa|lowback/workaround|cyc2       slot-detail residue 0/421   whole-day 0/421
+    lowback_wa|lowback/workaround|hop1       slot-detail residue 0/483   whole-day 0/483
+    lowback_wa|lowback/workaround|hop2       slot-detail residue 0/5009   whole-day 0/5009
+    manny|none|cyc2                          slot-detail residue 0/664   whole-day 0/664
+    manny|none|hop1                          slot-detail residue 0/719   whole-day 0/719
+    manny|none|hop2                          slot-detail residue 0/8003   whole-day 0/8003
+    mario_noinj|none|cyc2                    slot-detail residue 0/502   whole-day 0/502
+    mario_noinj|none|hop1                    slot-detail residue 0/577   whole-day 0/577
+    mario_noinj|none|hop2                    slot-detail residue 0/6752   whole-day 0/6752
+    mario|knee/workaround|cyc2               slot-detail residue 0/474   whole-day 0/474
+    mario|knee/workaround|hop1               slot-detail residue 0/552   whole-day 0/552
+    mario|knee/workaround|hop2               slot-detail residue 68/6525   whole-day 68/6525
+    shoulder_wa|shoulder/workaround|cyc2     slot-detail residue 0/442   whole-day 0/442
+    shoulder_wa|shoulder/workaround|hop1     slot-detail residue 0/504   whole-day 0/504
+    shoulder_wa|shoulder/workaround|hop2     slot-detail residue 0/5770   whole-day 0/5770
+  gate-lattice view (mario+manny hop2+cyc2, all chains, not the gate sample): manny|W3 0/3177 | manny|W5 0/3018 | manny|W7 0/2472 | mario|W3 0/3370 | mario|W5 68/3629
+  residue by week: ankle_wa|W3|thu 4 | ankle_wa|W5|sat 24 | ankle_wa|W5|thu 12 | ankle_wa|W5|tue 20 | mario|W5|sat 26 | mario|W5|thu 20 | mario|W5|tue 22
+  residue by donor RPE-bearing (pre detail has RPE): donor no-RPE 128 | live detail has RPE: no 128
+  RPE denominators (reachable, injured configs): donor RPE 31775, donor no-RPE 17977
+  residue by donor pattern > final pattern: hinge>leg_iso 6 | hinge>lunge 28 | hinge>squat 94
+  residue by section label: Explosive finisher 50 | Leg superset B 36 | Pull superset B 42
+  residue kind: 
+    128× cue appended at boot
+  residue pairs: 
+    92× 2×10 -> 2×10 — hold RPE 7, two in the tank
+    36× 2×8 -> 2×8 — hold RPE 7, two in the tank
+  residue boot == MAP boot: 128/128
+  whole-day diffs NOT on the swapped slot: 0
+  BOOT RE-FILTER (applySessionSwaps on a hit): injured reachable chains 49752, days with a hit 49752, hits where the re-filter changed the day 128/49752 | uninjured chains with a filter call 0
+    changed, by config|class: ankle_wa|hop1 1 | ankle_wa|hop2 59 | mario|hop2 68
+    changed, slot residue too: 128/128
+  idempotency on the live day (injured): f2=f1|f(live)!=live 128 | f2=f1|f(live)=live 49624
+  UNDO last hop: chip found 66969/66969 | slot != what the athlete saw before the last hop 0/66969 | undo boot slot != undo live 5/66969 | undo boot whole day != undo live 5/66969
+    undo-boot ankle_wa#1673 hop2 Dumbbell goblet squat>Dumbbell split-stance deadlift live 2×8 | boot 2×8 — hold RPE 7, two in the tank
+    undo-boot ankle_wa#1674 hop2 Dumbbell goblet squat>Kettlebell single-leg deadlift live 2×8 | boot 2×8 — hold RPE 7, two in the tank
+  IA_HIST (t1, sampled): rows 2262 | hist slot != live 0 | boot slot != live 0
+  TOASTS (every hop, reachable): noload 10883 | same 116103 | window 1946
+  HOP-1 window (Reps move to) on rows whose live slot carries the cue: 0
+
+=== TREE S1 | chains 66969 reachable 66969 (unreachable at replay 0)
+  slot detail live!=boot 5/66969 | slot name live!=boot 0/66969 | whole day live!=boot 5/66969
+    ankle_wa|ankle/workaround|cyc2           slot-detail residue 1/480   whole-day 1/480
+    ankle_wa|ankle/workaround|hop1           slot-detail residue 0/550   whole-day 0/550
+    ankle_wa|ankle/workaround|hop2           slot-detail residue 4/6517   whole-day 4/6517
+    elbow_wa|elbow/workaround|cyc2           slot-detail residue 0/479   whole-day 0/479
+    elbow_wa|elbow/workaround|hop1           slot-detail residue 0/549   whole-day 0/549
+    elbow_wa|elbow/workaround|hop2           slot-detail residue 0/6390   whole-day 0/6390
+    hip_wa|hip/workaround|cyc2               slot-detail residue 0/457   whole-day 0/457
+    hip_wa|hip/workaround|hop1               slot-detail residue 0/535   whole-day 0/535
+    hip_wa|hip/workaround|hop2               slot-detail residue 0/6249   whole-day 0/6249
+    knee_protect|knee/protect|cyc2           slot-detail residue 0/459   whole-day 0/459
+    knee_protect|knee/protect|hop1           slot-detail residue 0/537   whole-day 0/537
+    knee_protect|knee/protect|hop2           slot-detail residue 0/6370   whole-day 0/6370
+    lowback_wa|lowback/workaround|cyc2       slot-detail residue 0/421   whole-day 0/421
+    lowback_wa|lowback/workaround|hop1       slot-detail residue 0/483   whole-day 0/483
+    lowback_wa|lowback/workaround|hop2       slot-detail residue 0/5009   whole-day 0/5009
+    manny|none|cyc2                          slot-detail residue 0/664   whole-day 0/664
+    manny|none|hop1                          slot-detail residue 0/719   whole-day 0/719
+    manny|none|hop2                          slot-detail residue 0/8003   whole-day 0/8003
+    mario_noinj|none|cyc2                    slot-detail residue 0/502   whole-day 0/502
+    mario_noinj|none|hop1                    slot-detail residue 0/577   whole-day 0/577
+    mario_noinj|none|hop2                    slot-detail residue 0/6752   whole-day 0/6752
+    mario|knee/workaround|cyc2               slot-detail residue 0/474   whole-day 0/474
+    mario|knee/workaround|hop1               slot-detail residue 0/552   whole-day 0/552
+    mario|knee/workaround|hop2               slot-detail residue 0/6525   whole-day 0/6525
+    shoulder_wa|shoulder/workaround|cyc2     slot-detail residue 0/442   whole-day 0/442
+    shoulder_wa|shoulder/workaround|hop1     slot-detail residue 0/504   whole-day 0/504
+    shoulder_wa|shoulder/workaround|hop2     slot-detail residue 0/5770   whole-day 0/5770
+  gate-lattice view (mario+manny hop2+cyc2, all chains, not the gate sample): manny|W3 0/3177 | manny|W5 0/3018 | manny|W7 0/2472 | mario|W3 0/3370 | mario|W5 0/3629
+  residue by week: ankle_wa|W3|thu 5
+  residue by donor RPE-bearing (pre detail has RPE): donor no-RPE 5 | live detail has RPE: yes 5
+  RPE denominators (reachable, injured configs): donor RPE 31775, donor no-RPE 17977
+  residue by donor pattern > final pattern: hinge>hinge 3 | hinge>hip_ext 2
+  residue by section label: Leg superset B 5
+  residue kind: 
+    3× cue on live, not at boot
+    2× other: live[13:]="7 (leave 3 or more in reserve)" boot[13:]="8 (stop 2 reps short of failure)"
+  residue pairs: 
+    3× 2×8 — hold RPE 7, two in the tank -> 2×8
+    2× 2 sets — RPE 7 (leave 3 or more in reserve) -> 2 sets — RPE 8 (stop 2 reps short of failure)
+  whole-day diffs NOT on the swapped slot: 0
+  BOOT RE-FILTER (applySessionSwaps on a hit): injured reachable chains 49752, days with a hit 49752, hits where the re-filter changed the day 128/49752 | uninjured chains with a filter call 0
+    changed, by config|class: ankle_wa|hop1 1 | ankle_wa|hop2 59 | mario|hop2 68
+    changed, slot residue too: 0/128
+    non-slot change mario#5409 Dumbbell split-stance deadlift>Dumbbell goblet squat :: Main — Barbell box squat{Barbell box squat|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest} Leg superset A{Step-ups (KB)|2×10 each — hold RPE 7, two in the tank} Knee stability{Spanish squat hold (KB)|2×25 sec} Leg superset B{Dumbbell goblet squat|2×8;Single-leg hip thrust|2×6–10 @ RPE 8} Hip stability{Banded side steps|2×15–20 each @ RPE 8;Banded monster walks|2
+    non-slot change mario#5410 Dumbbell split-stance deadlift>Reverse lunge (KB) :: Main — Barbell box squat{Barbell box squat|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest} Leg superset A{Step-ups (KB)|2×10 each — hold RPE 7, two in the tank} Knee stability{Spanish squat hold (KB)|2×25 sec} Leg superset B{Reverse lunge (KB)|2×8;Single-leg hip thrust|2×6–10 @ RPE 8} Hip stability{Banded side steps|2×15–20 each @ RPE 8;Banded monster walks|2×12
+    non-slot change mario#5411 Dumbbell split-stance deadlift>Leg press :: Main — Barbell box squat{Barbell box squat|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest} Leg superset A{Step-ups (KB)|2×10 each — hold RPE 7, two in the tank} Knee stability{Spanish squat hold (KB)|2×25 sec} Leg superset B{Leg press|2×8;Single-leg hip thrust|2×6–10 @ RPE 8} Hip stability{Banded side steps|2×15–20 each @ RPE 8;Banded monster walks|2×12–15 each 
+  idempotency on the live day (injured): f2=f1|f(live)=live 49752
+  UNDO last hop: chip found 66969/66969 | slot != what the athlete saw before the last hop 0/66969 | undo boot slot != undo live 0/66969 | undo boot whole day != undo live 0/66969
+  IA_HIST (t1, sampled): rows 2262 | hist slot != live 0 | boot slot != live 0
+  TOASTS (every hop, reachable): noload 11016 | same 115970 | window 1946
+  HOP-1 window (Reps move to) on rows whose live slot carries the cue: 0
+
+=== TREE S2 | chains 66969 reachable 66969 (unreachable at replay 0)
+  slot detail live!=boot 5/66969 | slot name live!=boot 0/66969 | whole day live!=boot 5/66969
+    ankle_wa|ankle/workaround|cyc2           slot-detail residue 1/480   whole-day 1/480
+    ankle_wa|ankle/workaround|hop1           slot-detail residue 0/550   whole-day 0/550
+    ankle_wa|ankle/workaround|hop2           slot-detail residue 4/6517   whole-day 4/6517
+    elbow_wa|elbow/workaround|cyc2           slot-detail residue 0/479   whole-day 0/479
+    elbow_wa|elbow/workaround|hop1           slot-detail residue 0/549   whole-day 0/549
+    elbow_wa|elbow/workaround|hop2           slot-detail residue 0/6390   whole-day 0/6390
+    hip_wa|hip/workaround|cyc2               slot-detail residue 0/457   whole-day 0/457
+    hip_wa|hip/workaround|hop1               slot-detail residue 0/535   whole-day 0/535
+    hip_wa|hip/workaround|hop2               slot-detail residue 0/6249   whole-day 0/6249
+    knee_protect|knee/protect|cyc2           slot-detail residue 0/459   whole-day 0/459
+    knee_protect|knee/protect|hop1           slot-detail residue 0/537   whole-day 0/537
+    knee_protect|knee/protect|hop2           slot-detail residue 0/6370   whole-day 0/6370
+    lowback_wa|lowback/workaround|cyc2       slot-detail residue 0/421   whole-day 0/421
+    lowback_wa|lowback/workaround|hop1       slot-detail residue 0/483   whole-day 0/483
+    lowback_wa|lowback/workaround|hop2       slot-detail residue 0/5009   whole-day 0/5009
+    manny|none|cyc2                          slot-detail residue 0/664   whole-day 0/664
+    manny|none|hop1                          slot-detail residue 0/719   whole-day 0/719
+    manny|none|hop2                          slot-detail residue 0/8003   whole-day 0/8003
+    mario_noinj|none|cyc2                    slot-detail residue 0/502   whole-day 0/502
+    mario_noinj|none|hop1                    slot-detail residue 0/577   whole-day 0/577
+    mario_noinj|none|hop2                    slot-detail residue 0/6752   whole-day 0/6752
+    mario|knee/workaround|cyc2               slot-detail residue 0/474   whole-day 0/474
+    mario|knee/workaround|hop1               slot-detail residue 0/552   whole-day 0/552
+    mario|knee/workaround|hop2               slot-detail residue 0/6525   whole-day 0/6525
+    shoulder_wa|shoulder/workaround|cyc2     slot-detail residue 0/442   whole-day 0/442
+    shoulder_wa|shoulder/workaround|hop1     slot-detail residue 0/504   whole-day 0/504
+    shoulder_wa|shoulder/workaround|hop2     slot-detail residue 0/5770   whole-day 0/5770
+  gate-lattice view (mario+manny hop2+cyc2, all chains, not the gate sample): manny|W3 0/3177 | manny|W5 0/3018 | manny|W7 0/2472 | mario|W3 0/3370 | mario|W5 0/3629
+  residue by week: ankle_wa|W3|thu 5
+  residue by donor RPE-bearing (pre detail has RPE): donor no-RPE 5 | live detail has RPE: yes 5
+  RPE denominators (reachable, injured configs): donor RPE 31775, donor no-RPE 17977
+  residue by donor pattern > final pattern: hinge>hinge 3 | hinge>hip_ext 2
+  residue by section label: Leg superset B 5
+  residue kind: 
+    3× cue on live, not at boot
+    2× other: live[13:]="7 (leave 3 or more in reserve)" boot[13:]="8 (stop 2 reps short of failure)"
+  residue pairs: 
+    3× 2×8 — hold RPE 7, two in the tank -> 2×8
+    2× 2 sets — RPE 7 (leave 3 or more in reserve) -> 2 sets — RPE 8 (stop 2 reps short of failure)
+  whole-day diffs NOT on the swapped slot: 0
+  BOOT RE-FILTER (applySessionSwaps on a hit): injured reachable chains 49752, days with a hit 49752, hits where the re-filter changed the day 128/49752 | uninjured chains with a filter call 0
+    changed, by config|class: ankle_wa|hop1 1 | ankle_wa|hop2 59 | mario|hop2 68
+    changed, slot residue too: 0/128
+    non-slot change mario#5409 Dumbbell split-stance deadlift>Dumbbell goblet squat :: Main — Barbell box squat{Barbell box squat|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest} Leg superset A{Step-ups (KB)|2×10 each — hold RPE 7, two in the tank} Knee stability{Spanish squat hold (KB)|2×25 sec} Leg superset B{Dumbbell goblet squat|2×8;Single-leg hip thrust|2×6–10 @ RPE 8} Hip stability{Banded side steps|2×15–20 each @ RPE 8;Banded monster walks|2
+    non-slot change mario#5410 Dumbbell split-stance deadlift>Reverse lunge (KB) :: Main — Barbell box squat{Barbell box squat|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest} Leg superset A{Step-ups (KB)|2×10 each — hold RPE 7, two in the tank} Knee stability{Spanish squat hold (KB)|2×25 sec} Leg superset B{Reverse lunge (KB)|2×8;Single-leg hip thrust|2×6–10 @ RPE 8} Hip stability{Banded side steps|2×15–20 each @ RPE 8;Banded monster walks|2×12
+    non-slot change mario#5411 Dumbbell split-stance deadlift>Leg press :: Main — Barbell box squat{Barbell box squat|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest} Leg superset A{Step-ups (KB)|2×10 each — hold RPE 7, two in the tank} Knee stability{Spanish squat hold (KB)|2×25 sec} Leg superset B{Leg press|2×8;Single-leg hip thrust|2×6–10 @ RPE 8} Hip stability{Banded side steps|2×15–20 each @ RPE 8;Banded monster walks|2×12–15 each 
+  idempotency on the live day (injured): f2=f1|f(live)=live 49752
+  UNDO last hop: chip found 66969/66969 | slot != what the athlete saw before the last hop 0/66969 | undo boot slot != undo live 0/66969 | undo boot whole day != undo live 0/66969
+  IA_HIST (t1, sampled): rows 2262 | hist slot != live 0 | boot slot != live 0
+  TOASTS (every hop, reachable): noload 10883 | same 116103 | window 1946
+  HOP-1 window (Reps move to) on rows whose live slot carries the cue: 0
+
+=== BASE -> S1 / S2 per chain (joined by chain id)
+  S1: joined 66969 | any field moved 133 | live day moved 133 | boot day moved 0 | reachability moved 0 | toast moved 133 | undo result moved 5
+    live moved by config: ankle_wa|cyc2 1 | ankle_wa|hop1 1 | ankle_wa|hop2 63 | mario|hop2 68 | boot moved by config: 
+    uninjured configs (manny, mario_noinj): moved rows 0/17217
+    toast moves: Same job, same numbers. => No load to add here, so take the sets to 1 | Same job, same numbers.+No load to add here, so take the sets to => No load to add here, so take the sets to+No load to add here, so take the sets to 2 | Same job, same numbers.+Same job, same numbers. => No load to add here, so take the sets to+Same job, same numbers. 3 | Same job, same numbers.+Same job, same numbers. => Same job, same numbers.+No load to add here, so take the sets to 127
+    e.g. mario#5409 Dumbbell split-stance deadlift>Dumbbell goblet squat live 2×8 => 2×8 — hold RPE 7, two in the tank
+    e.g. mario#5410 Dumbbell split-stance deadlift>Reverse lunge (KB) live 2×8 => 2×8 — hold RPE 7, two in the tank
+    boot moved without live moving: 0
+  S2: joined 66969 | any field moved 133 | live day moved 133 | boot day moved 0 | reachability moved 0 | toast moved 0 | undo result moved 5
+    live moved by config: ankle_wa|cyc2 1 | ankle_wa|hop1 1 | ankle_wa|hop2 63 | mario|hop2 68 | boot moved by config: 
+    uninjured configs (manny, mario_noinj): moved rows 0/17217
+    e.g. mario#5409 Dumbbell split-stance deadlift>Dumbbell goblet squat live 2×8 => 2×8 — hold RPE 7, two in the tank
+    e.g. mario#5410 Dumbbell split-stance deadlift>Reverse lunge (KB) live 2×8 => 2×8 — hold RPE 7, two in the tank
+    boot moved without live moving: 0
+
+=== REPORTER CASE mario (knee/workaround, seed 76308, commercial, beginner, support_strength) W5 hop2 residue: 68
+    by day: sat 26 | thu 20 | tue 22 | by chain: 
+      3× Kettlebell swing > Dumbbell split-stance deadlift > Dumbbell goblet squat
+      3× Kettlebell swing > Dumbbell split-stance deadlift > Reverse lunge (KB)
+      3× Kettlebell swing > Dumbbell split-stance deadlift > Leg press
+      3× Kettlebell swing > Kettlebell single-leg deadlift > Dumbbell goblet squat
+      3× Kettlebell swing > Kettlebell single-leg deadlift > Reverse lunge (KB)
+      3× Kettlebell swing > Kettlebell single-leg deadlift > Leg press
+      3× Kettlebell swing > Barbell Romanian deadlift > Leg press
+      3× Kettlebell swing > Barbell Romanian deadlift > Dumbbell goblet squat
+      3× Kettlebell swing > Barbell Romanian deadlift > Reverse lunge (KB)
+      3× Kettlebell swing > Deadlift > Leg press
+      3× Kettlebell swing > Deadlift > Dumbbell goblet squat
+      3× Kettlebell swing > Deadlift > Reverse lunge (KB)
+      2× Kettlebell swing > Sumo deadlift > Leg press
+      2× Kettlebell swing > Sumo deadlift > Dumbbell goblet squat
+      2× Kettlebell swing > Sumo deadlift > Reverse lunge (KB)
+      3× Kettlebell swing > Trap bar deadlift > Leg press
+      3× Kettlebell swing > Trap bar deadlift > Dumbbell goblet squat
+      3× Kettlebell swing > Trap bar deadlift > Reverse lunge (KB)
+      3× Kettlebell swing > Barbell hip thrust > Leg extension
+      3× Kettlebell swing > Glute-ham raise > Leg extension
+      2× Kettlebell swing > Dumbbell split-stance deadlift > Barbell box squat
+      2× Kettlebell swing > Kettlebell single-leg deadlift > Barbell box squat
+      2× Kettlebell swing > Barbell Romanian deadlift > Barbell box squat
+      2× Kettlebell swing > Deadlift > Barbell box squat
+      1× Kettlebell swing > Sumo deadlift > Barbell box squat
+      2× Kettlebell swing > Trap bar deadlift > Barbell box squat
+  mario#5409 mario W5 thu slot [3][0] section "Leg superset B"
+    chain   Kettlebell swing (2×8) -> Dumbbell split-stance deadlift (2×8) -> Dumbbell goblet squat
+    live    "2×8"
+    boot    "2×8 — hold RPE 7, two in the tank"
+    diff    cue appended at boot | name live Dumbbell goblet squat boot Dumbbell goblet squat | toasts Same job, same numbers. + Same job, same numbers.
+    S1 live "2×8 — hold RPE 7, two in the tank" | S1 boot "2×8 — hold RPE 7, two in the tank" | S1 toasts Same job, same numbers. + No load to add here, so take the sets to the same effort.
+  mario#5410 mario W5 thu slot [3][0] section "Leg superset B"
+    chain   Kettlebell swing (2×8) -> Dumbbell split-stance deadlift (2×8) -> Reverse lunge (KB)
+    live    "2×8"
+    boot    "2×8 — hold RPE 7, two in the tank"
+    diff    cue appended at boot | name live Reverse lunge (KB) boot Reverse lunge (KB) | toasts Same job, same numbers. + Same job, same numbers.
+    S1 live "2×8 — hold RPE 7, two in the tank" | S1 boot "2×8 — hold RPE 7, two in the tank" | S1 toasts Same job, same numbers. + No load to add here, so take the sets to the same effort.
+  mario#5411 mario W5 thu slot [3][0] section "Leg superset B"
+    chain   Kettlebell swing (2×8) -> Dumbbell split-stance deadlift (2×8) -> Leg press
+    live    "2×8"
+    boot    "2×8 — hold RPE 7, two in the tank"
+    diff    cue appended at boot | name live Leg press boot Leg press | toasts Same job, same numbers. + Same job, same numbers.
+    S1 live "2×8 — hold RPE 7, two in the tank" | S1 boot "2×8 — hold RPE 7, two in the tank" | S1 toasts Same job, same numbers. + No load to add here, so take the sets to the same effort.
+  mario#5500 mario W5 thu slot [3][0] section "Leg superset B"
+    chain   Kettlebell swing (2×8) -> Barbell hip thrust (2×8) -> Leg extension
+    live    "2×8"
+    boot    "2×8 — hold RPE 7, two in the tank"
+    diff    cue appended at boot | name live Leg extension boot Leg extension | toasts Same job, same numbers. + Same job, same numbers.
+    S1 live "2×8 — hold RPE 7, two in the tank" | S1 boot "2×8 — hold RPE 7, two in the tank" | S1 toasts Same job, same numbers. + No load to add here, so take the sets to the same effort.
+  mario#7429 mario W5 sat slot [1][1] section "Explosive finisher"
+    chain   Kettlebell swing (2×10) -> Dumbbell split-stance deadlift (2×10) -> Dumbbell goblet squat
+    live    "2×10"
+    boot    "2×10 — hold RPE 7, two in the tank"
+    diff    cue appended at boot | name live Dumbbell goblet squat boot Dumbbell goblet squat | toasts Same job, same numbers. + Same job, same numbers.
+    S1 live "2×10 — hold RPE 7, two in the tank" | S1 boot "2×10 — hold RPE 7, two in the tank" | S1 toasts Same job, same numbers. + No load to add here, so take the sets to the same effort.
+
+=== v227_swapseam_post.js
+== ankle_wa S1 survivors 5 | of them BASE residue 0
+  ankle_wa#1673 hop2 W3 thu [3][0] "Leg superset B"
+    donor Kettlebell swing (2×8)
+    hop1 -> Dumbbell goblet squat | S1 live "2×8 — hold RPE 7, two in the tank" | BASE live "2×8" | toast S1 No load to add here, so take the sets to the same effort.
+    hop2 -> Dumbbell split-stance deadlift | S1 live "2×8 — hold RPE 7, two in the tank" | BASE live "2×8" | toast S1 Same job, same numbers.
+    S1 boot "2×8" | BASE boot "2×8" | BASE live "2×8"
+  ankle_wa#1674 hop2 W3 thu [3][0] "Leg superset B"
+    donor Kettlebell swing (2×8)
+    hop1 -> Dumbbell goblet squat | S1 live "2×8 — hold RPE 7, two in the tank" | BASE live "2×8" | toast S1 No load to add here, so take the sets to the same effort.
+    hop2 -> Kettlebell single-leg deadlift | S1 live "2×8 — hold RPE 7, two in the tank" | BASE live "2×8" | toast S1 Same job, same numbers.
+    S1 boot "2×8" | BASE boot "2×8" | BASE live "2×8"
+  ankle_wa#1675 hop2 W3 thu [3][0] "Leg superset B"
+    donor Kettlebell swing (2×8)
+    hop1 -> Dumbbell goblet squat | S1 live "2×8 — hold RPE 7, two in the tank" | BASE live "2×8" | toast S1 No load to add here, so take the sets to the same effort.
+    hop2 -> 45° back extension | S1 live "2 sets — RPE 7 (leave 3 or more in reserve)" | BASE live "2 sets — RPE 8 (stop 2 reps short of failure)" | toast S1 No load to add here, so take the sets to the same effort.
+    S1 boot "2 sets — RPE 8 (stop 2 reps short of failure)" | BASE boot "2 sets — RPE 8 (stop 2 reps short of failure)" | BASE live "2 sets — RPE 8 (stop 2 reps short of failure)"
+  ankle_wa#1676 cyc2 W3 thu [3][0] "Leg superset B"
+    donor Kettlebell swing (2×8)
+    hop1 -> Dumbbell goblet squat | S1 live "2×8 — hold RPE 7, two in the tank" | BASE live "2×8" | toast S1 No load to add here, so take the sets to the same effort.
+    hop2 -> Kettlebell swing | S1 live "2×8 — hold RPE 7, two in the tank" | BASE live "2×8" | toast S1 Same job, same numbers.
+    S1 boot "2×8" | BASE boot "2×8" | BASE live "2×8"
+  ankle_wa#1677 hop2 W3 thu [3][0] "Leg superset B"
+    donor Kettlebell swing (2×8)
+    hop1 -> Dumbbell goblet squat | S1 live "2×8 — hold RPE 7, two in the tank" | BASE live "2×8" | toast S1 No load to add here, so take the sets to the same effort.
+    hop2 -> Nordic hamstring curl (anchored) | S1 live "2 sets — RPE 7 (leave 3 or more in reserve)" | BASE live "2 sets — RPE 8 (stop 2 reps short of failure)" | toast S1 No load to add here, so take the sets to the same effort.
+    S1 boot "2 sets — RPE 8 (stop 2 reps short of failure)" | BASE boot "2 sets — RPE 8 (stop 2 reps short of failure)" | BASE live "2 sets — RPE 8 (stop 2 reps short of failure)"
+  S1 boot re-filter writes 60: {"cue added on the swapped item":60}
+  chains with RPE-bearing donor: 4670 / 7547, live unchanged by S1 among them 4670 | live moved by S1 among RPE-bearing donors 0
+== mario S1 survivors 0 | of them BASE residue 0
+  S1 boot re-filter writes 68: {"cue added on the swapped item":68}
+  chains with RPE-bearing donor: 4677 / 7551, live unchanged by S1 among them 4677 | live moved by S1 among RPE-bearing donors 0
+
+=== v227_swapseam_manny.js
+  manny W3|cyc2   slot != live: IN-VM boot 0/246   FRESH-page boot 0/246
+  manny W3|hop2   slot != live: IN-VM boot 0/2931   FRESH-page boot 0/2931
+  manny W5|cyc2   slot != live: IN-VM boot 0/222   FRESH-page boot 0/222
+  manny W5|hop2   slot != live: IN-VM boot 114/2796   FRESH-page boot 0/2796
+  manny W7|cyc2   slot != live: IN-VM boot 0/196   FRESH-page boot 0/196
+  manny W7|hop2   slot != live: IN-VM boot 95/2276   FRESH-page boot 0/2276
+  TOTAL manny hop2+cyc2: IN-VM 209/8667  FRESH 0/8667
+  manny#8484 W7 fri Ab wheel rollouts>Garhammer raises
+    live  Garhammer raises | 3×8 each
+    inVM  Garhammer raises | 2×6–10 each @ RPE 7
+    fresh Garhammer raises | 3×8 each
+  manny#8489 W7 fri Ab wheel rollouts>McGill curl-up
+    live  McGill curl-up | 3×8 each
+    inVM  McGill curl-up | 2×6–10 each @ RPE 7
+    fresh McGill curl-up | 3×8 each
+  manny#5795 W5 fri Ab wheel rollouts>Garhammer raises
+    live  Garhammer raises | 3×12 each
+    inVM  Garhammer raises | 2×10–15 each @ RPE 7
+    fresh Garhammer raises | 3×12 each
+  manny#8496 W7 fri Ab wheel rollouts>Standing torso rotations (slow)
+    live  Standing torso rotations (slow) | 3×8 each
+    inVM  Standing torso rotations (slow) | 2×6–10 each @ RPE 7
+    fresh Standing torso rotations (slow) | 3×8 each
+  manny#8498 W7 fri Ab wheel rollouts>Toes-to-bar
+    live  Toes-to-bar | 3×8 each
+    inVM  Toes-to-bar | 2×6–10 each @ RPE 7
+    fresh Toes-to-bar | 3×8 each
+  manny#5800 W5 fri Ab wheel rollouts>Landmine rotations
+    live  Landmine rotations | 3×12 each
+    inVM  Landmine rotations | 2×10–15 each @ RPE 7
+    fresh Landmine rotations | 3×12 each
+
+=== per-gate on surgery copies (node gate cand base_v226), non-zero FAIL only; base run: every gate PASS (gate.sh, blast step byte-identical)
+s1 g221_d177_swapfloor.js: PASS 18 FAIL 2
+FAIL G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2) (got power 118 of 4066, off grammar 0 of 28896 | e.g. commercial|support_strength|beginner|event|knee/workaround W5 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank | e.g. commercial|support_strength|beginner|event|knee/workaround W6 sat Kettlebell swing -> Step-ups 
+FAIL G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise (got 118 of 150068, third toast 5984 vs hand window 5984 | e.g. commercial|support_strength|beginner|event|knee/workaround W5 sat Kettlebell swing -> Step-ups (KB) [offgram] Step-ups (KB) in, kettlebell swing out. No load to add here, so take the sets to the
+s2 g221_d177_swapfloor.js: PASS 19 FAIL 1
+FAIL G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2) (got power 118 of 4066, off grammar 0 of 28896 | e.g. commercial|support_strength|beginner|event|knee/workaround W5 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank | e.g. commercial|support_strength|beginner|event|knee/workaround W6 sat Kettlebell swing -> Step-ups 

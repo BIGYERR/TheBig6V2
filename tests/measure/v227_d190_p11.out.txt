@@ -1,0 +1,64 @@
+v227_d190_p11 | V227 ia-version 227 (working index.html) | V226 226 | SAB = V227 minus index.html:14449–14459 (the hit.rx restore block in undoSwap):
+    -   if(Array.isArray(hit.rx)){
+    -     const _put=[];
+    -     hit.rx.forEach(function(p){
+    -       if(!p||typeof p.d!=='string') return;
+    -       const ps=day.sections[p.s], at=ps&&ps.items&&ps.items[p.i];
+    -       let it=(at&&at.name===from&&_put.indexOf(at)<0)?at:null;
+    -       if(!it) (day.sections||[]).some(function(s){return ((s&&s.items)||[]).some(function(x){
+    -         if(x&&x.name===from&&_put.indexOf(x)<0){it=x;return true;} return false;});});
+    -       if(it){it.detail=p.d;_put.push(it);}
+    -     });
+    -   }
+  sites: swapOriginOf :14176 (first to-match :14179) | card chip :12825 | undoSwap :14436 (first from-match :14441, rename back :14443)
+  ENUM knee_wa     3326 collide2 64 | cyc2 355 | cyc3 60 | exch3 60 | hop1 401 | hop2 2270 | hop3 116
+  ENUM ankle_wa    3330 collide2 64 | cyc2 361 | cyc3 60 | exch3 64 | hop1 399 | hop2 2262 | hop3 120
+  ENUM hip_wa      1395 collide2 66 | cyc2 332 | cyc3 60 | exch3 59 | hop1 358 | hop2 400 | hop3 120
+  ENUM lowback_wa  1396 collide2 66 | cyc2 329 | cyc3 60 | exch3 66 | hop1 355 | hop2 400 | hop3 120
+  ENUM shoulder_wa 1455 collide2 66 | cyc2 366 | cyc3 60 | exch3 62 | hop1 381 | hop2 400 | hop3 120
+  ENUM elbow_wa    1452 collide2 66 | cyc2 361 | cyc3 60 | exch3 62 | hop1 383 | hop2 400 | hop3 120
+  ENUM manny       1387 collide2 64 | cyc2 341 | cyc3 54 | exch3 64 | hop1 350 | hop2 400 | hop3 114
+  ENUM mario_noinj 1461 collide2 66 | cyc2 367 | cyc3 60 | exch3 66 | hop1 382 | hop2 400 | hop3 120
+  ran V227 15202 chains in 73 s
+  ran V226 15202 chains in 71 s
+  ran SAB 15202 chains in 71 s
+
+=== P11 row (d) on the seam walk (V227) | reachable 15202/15202
+  class      |U_d|   chip found  chip==hand  undo byte-identical  wrong   ||  |U_d'|  undo wrong  V226 wrong  created  healed
+  hop1        3009        3009        3009                3009       0   ||      0           0           0        0       0
+  hop2        6932        6932        6932                6932       0   ||      0           0           0        0       0
+  cyc2        2812        2812        2812                2812       0   ||      0           0           0        0       0
+  hop3         860         860         860                 860       0   ||     90          35          35        0       0
+  cyc3         474         474         474                 474       0   ||      0           0           0        0       0
+  collide2     522         522         522                 522       0   ||      0           0           0        0       0
+  exch3        503         503         503                 503       0   ||      0           0           0        0       0
+  TOTAL U_d 15112, wrong 0, chip != hand 0 | U_d created vs V226 0 | U_d' 90 wrong 35 | P11 PASS (each class non-empty, 0 wrong, chip == hand chip on every U_d chain; U_d' non-empty, created 0)
+  U_d by config: knee_wa 3317/3317 | ankle_wa 3323/3323 | hip_wa 1384/1384 | lowback_wa 1378/1378 | shoulder_wa 1441/1441 | elbow_wa 1439/1439 | manny 1379/1379 | mario_noinj 1451/1451
+  U_d' wrong by shape: hop3|A>B>C>B 35 | right hop3|A>B>A>B 55
+  e.g. collide2 knee_wa W3 mon [0][0] Close-grip bench press->Bench dips, [1][0] Incline barbell press->Close-grip bench press
+      last hop card [1][0] Close-grip bench press | store ["Close-grip bench press->Bench dips","Incline barbell press->Close-grip bench press"] | chip Incline barbell press (hand Incline barbell press) | undo whole day byte-identical true
+  e.g. exch3 knee_wa W3 mon [2][0] Dumbbell incline press->Dumbbell decline press, [0][0] Close-grip bench press->Dumbbell incline press, [2][0] Dumbbell decline press->Close-grip bench press
+      last hop card [2][0] Close-grip bench press | store ["Dumbbell incline press->Dumbbell decline press","Close-grip bench press->Dumbbell incline press","Dumbbell decline press->Close-grip bench press"] | chip Dumbbell decline press (hand Dumbbell decline press) | undo whole day byte-identical true
+
+=== Named trip: SAB (no hit.rx restore) on U_d
+  hop1      wrong 596/3009
+  hop2      wrong 977/6932
+  cyc2      wrong 81/2812
+  hop3      wrong 104/860
+  cyc3      wrong 9/474
+  collide2  wrong 81/522
+  exch3     wrong 38/503
+  TOTAL U_d wrong on SAB 1886/15112 | by config ankle_wa 449 | elbow_wa 227 | hip_wa 223 | knee_wa 445 | lowback_wa 183 | manny 66 | mario_noinj 93 | shoulder_wa 200 | lattice (hop1/hop2/cyc2, the current gate row d) 1654/12753
+  SAB wrong kind (first differing item): donor dose lost 433 | other 1111 | rep token differs 342
+    knee_wa W5 thu hop1 Barbell box squat->Leg press | [0][0] Barbell box squat "4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" => Barbell box squat "4×5–8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+    knee_wa W5 thu hop1 Barbell box squat->Dumbbell goblet squat | [0][0] Barbell box squat "4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" => Barbell box squat "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+    knee_wa W3 mon hop1 Close-grip bench press->Cable lateral raise | [0][0] Close-grip bench press "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form" => Close-grip bench press "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form"
+  gate g221_d177_swapfloor.js on SAB: PASS 17 FAIL 3
+
+    FAIL G5a L1: swap then undo leaves day.sections byte-identical on every Main and Power pair (R4) (got 26715 of 150068 not identical, throws 0 | e.g. commercial|support_prevention|beginner|lift|healthy W1 mon Close-grip bench press -> Dips [zero] | e.g. commercial|support_prevention|beginner|lift|healthy W1 fri Machine chest press -> Dips [zero] | e.g. commercial|support_prevention|beginner|lift|healthy W1 fri Machine chest press -> Decline pushups [zero])
+    FAIL G5b L1: Close-grip bench press -> Dips -> undo restores the donor detail, day byte-identical (got {"where":"commercial|support_prevention|beginner|lift|healthy W1 mon Close-grip bench press -> Dips","ok":false,"D":"3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form","O":"3 sets — RPE 6 (leave 3 or more in reserve)"})
+    FAIL G5c constructed duplicate-name day (RR4 re-scope): tap / tap both / reboot re-apply, then undo, byte-identical (got tap A, undo; tap A, tap B, undo; tap A, reboot re-apply, undo: B 2×8–12 — RPE 8 (leave ~2 reps in reserve), 3 min rest)
+    PASS G7-1a cfg.exSwapPrefs {Barbell box squat: Dumbbell goblet squat}: every week the pref lands prints the window, on a build and on a reboot with W1 frozen; cfg not mutated
+  gate g227_d190_seam.js on SAB: PASS 5 FAIL 1
+
+    FAIL row d D190 swap then undo of the last hop: whole day byte-identical to the day before that hop, chip found, every injured lattice chain (hop1/hop2/cyc2) (got not byte-identical 1526/10513, no chip 0)

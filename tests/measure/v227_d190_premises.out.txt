@@ -1,0 +1,386 @@
+v227_d190_premises | base ia-version 226 HEAD 637bc8e | HEAD == working index.html: true
+
+=== SURGERY DIFF (V226 -> D190 tree, d190_226.html)
+8088a8089,8090
+> const INJ_CAP_CUE=' — hold RPE 7, two in the tank';
+> function _stripCapCue(d){ return (typeof d==='string'&&d.endsWith(INJ_CAP_CUE))?d.slice(0,d.length-INJ_CAP_CUE.length):d; }
+8125c8127
+<       if(pat&&P.cap.has(pat)&&detail&&!/RPE/.test(detail)) detail=detail+' — hold RPE 7, two in the tank';
+---
+>       if(pat&&P.cap.has(pat)&&detail&&!/RPE/.test(detail)) detail=detail+INJ_CAP_CUE;
+10166c10168
+<       it.detail=_swapDetailFor(to,it.detail);
+---
+>       it.detail=_swapDetailFor(to,_stripCapCue(it.detail));
+14288a14291
+>   const _base=_stripCapCue(_wasDetail);
+14290,14291c14293,14301
+<   item.detail=_swapDetailFor(to,item.detail,_rx);
+<   const _reRx=(item.detail!==_wasDetail);
+---
+>   item.detail=_swapDetailFor(to,_base,_rx);
+>   const _reRx=(item.detail!==_base);
+>   if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){
+>     try{
+>       const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],activeProg.cfg);
+>       const _fi=_fs&&_fs[0]&&_fs[0].items&&_fs[0].items[0];
+>       if(_fi&&_fi.name===to) item.detail=_fi.detail;
+>     }catch(e){}
+>   }
+
+syntax ok d190_226.html
+syntax ok d190_227.html
+syntax ok t_d190.html
+syntax ok t_base.html
+
+=== P5 buildProgram digests (clock pinned, seed pinned, each built twice per tree)
+  mario         HEAD 7681cf8e4b3d42da  D190 7681cf8e4b3d42da
+  manny         HEAD 0ac7da6b1691a8e1  D190 0ac7da6b1691a8e1
+  mario_noinj   HEAD d59b65f1d978a263  D190 d59b65f1d978a263
+  knee_protect  HEAD cc6e417c30b2a309  D190 cc6e417c30b2a309
+  ankle_wa      HEAD 03e359b5731139a6  D190 03e359b5731139a6
+  hip_wa        HEAD f2ae1010ae57eab7  D190 f2ae1010ae57eab7
+  lowback_wa    HEAD d4de0af4ab123f38  D190 d4de0af4ab123f38
+  shoulder_wa   HEAD fdfc74330b68d5fc  D190 fdfc74330b68d5fc
+  elbow_wa      HEAD 1bd7fe074b3557ee  D190 1bd7fe074b3557ee
+  P5a digests equal 9/9 -> PASS
+  P5b HALF_MANNY (harness, unpinned clock as gates do): HEAD 0ac7da6b1691a8e1 D190@227 0ac7da6b1691a8e1 | MANNY_DIGEST_BY_VERSION[226] 0ac7da6b1691a8e1 [227] undefined -> PASS
+  P5c sheet candidates for Reverse lunge (KB), mario W3 thu: Step-ups (KB)[lunge], Dumbbell split-stance deadlift[hinge], Kettlebell single-leg deadlift[hinge], Barbell box squat[squat], Barbell Romanian deadlift[hinge], Deadlift[hinge]
+  P5c exSwapPrefs {Reverse lunge (KB): Dumbbell split-stance deadlift} [hinge] digest HEAD 8d9bcfa112b93911 D190 74385d1de10317d4 | cards changed 2 {"cue dropped":2}
+    W3 thu Leg superset A :: Dumbbell split-stance deadlift "2×10 each — hold RPE 7, two in the tank" => Dumbbell split-stance deadlift "2×8–12 each @ RPE 7"
+    W4 thu Leg superset A :: Dumbbell split-stance deadlift "2×10 each — hold RPE 7, two in the tank" => Dumbbell split-stance deadlift "2×8–12 each @ RPE 7"
+  P5c exSwapPrefs {Reverse lunge (KB): Kettlebell single-leg deadlift} [hinge] digest HEAD a843f170f7d3bfa4 D190 3cb99033eb278b3c | cards changed 2 {"cue dropped":2}
+    W3 thu Leg superset A :: Kettlebell single-leg deadlift "2×10 each — hold RPE 7, two in the tank" => Kettlebell single-leg deadlift "2×8–12 each @ RPE 7"
+    W4 thu Leg superset A :: Kettlebell single-leg deadlift "2×10 each — hold RPE 7, two in the tank" => Kettlebell single-leg deadlift "2×8–12 each @ RPE 7"
+  P5c exSwapPrefs {Reverse lunge (KB): Barbell Romanian deadlift} [hinge] digest HEAD c8451c3a47f99bed D190 d1de835253cf7391 | cards changed 2 {"cue dropped":2}
+    W3 thu Leg superset A :: Barbell Romanian deadlift "2×10 each — hold RPE 7, two in the tank" => Barbell Romanian deadlift "2×8–12 each @ RPE 7"
+    W4 thu Leg superset A :: Barbell Romanian deadlift "2×10 each — hold RPE 7, two in the tank" => Barbell Romanian deadlift "2×8–12 each @ RPE 7"
+ENUM mario         7795 {"W3|hop1":264,"W3|cyc2":224,"W3|hop2":3146,"W3|collide2_pop":289,"W3|exch3_pop":210,"W3|collide2":32,"W3|exch3":32,"W3|cyc3":30,"W3|hop3":30,"W5|hop1":288,"W5|cyc2":250,"W5|hop2":3379,"W5|collide2_pop":218,"W5|exch3_pop":166,"W5|collide2":32,"W5|exch3":28,"W5|cyc3":30,"W5|hop3":30}
+ENUM manny         9746 {"W3|hop1":258,"W3|cyc2":246,"W3|hop2":2931,"W3|collide2_pop":251,"W3|exch3_pop":215,"W3|collide2":32,"W3|exch3":32,"W3|cyc3":30,"W3|hop3":30,"W5|hop1":244,"W5|cyc2":222,"W5|hop2":2796,"W5|collide2_pop":319,"W5|exch3_pop":270,"W5|collide2":32,"W5|exch3":32,"W5|cyc3":24,"W5|hop3":30,"W7|hop1":217,"W7|cyc2":196,"W7|hop2":2276,"W7|collide2_pop":275,"W7|exch3_pop":220,"W7|collide2":32,"W7|exch3":32,"W7|hop3":30,"W7|cyc3":24}
+ENUM mario_noinj   8083 {"W3|hop1":282,"W3|cyc2":242,"W3|hop2":3304,"W3|collide2_pop":288,"W3|exch3_pop":203,"W3|collide2":34,"W3|exch3":34,"W3|cyc3":30,"W3|hop3":30,"W5|hop1":295,"W5|cyc2":260,"W5|hop2":3448,"W5|collide2_pop":231,"W5|exch3_pop":170,"W5|collide2":32,"W5|exch3":32,"W5|cyc3":30,"W5|hop3":30}
+ENUM knee_protect  7614 {"W3|hop1":268,"W3|cyc2":223,"W3|hop2":3209,"W3|collide2_pop":357,"W3|exch3_pop":263,"W3|collide2":32,"W3|exch3":32,"W3|hop3":30,"W3|cyc3":30,"W5|hop1":269,"W5|cyc2":236,"W5|hop2":3161,"W5|collide2_pop":277,"W5|exch3_pop":222,"W5|collide2":32,"W5|exch3":32,"W5|cyc3":30,"W5|hop3":30}
+ENUM ankle_wa      7795 {"W3|hop1":263,"W3|cyc2":226,"W3|hop2":3136,"W3|collide2_pop":291,"W3|exch3_pop":213,"W3|collide2":32,"W3|exch3":32,"W3|cyc3":30,"W3|hop3":30,"W5|hop1":287,"W5|cyc2":254,"W5|hop2":3381,"W5|collide2_pop":236,"W5|exch3_pop":184,"W5|collide2":32,"W5|exch3":32,"W5|cyc3":30,"W5|hop3":30}
+ENUM hip_wa        7486 {"W3|hop1":266,"W3|cyc2":219,"W3|hop2":3122,"W3|collide2_pop":278,"W3|exch3_pop":193,"W3|collide2":34,"W3|exch3":28,"W3|cyc3":30,"W3|hop3":30,"W5|hop1":269,"W5|cyc2":238,"W5|hop2":3127,"W5|collide2_pop":271,"W5|exch3_pop":201,"W5|collide2":32,"W5|exch3":31,"W5|cyc3":30,"W5|hop3":30}
+ENUM lowback_wa    6165 {"W3|hop1":247,"W3|cyc2":212,"W3|hop2":2539,"W3|collide2_pop":358,"W3|exch3_pop":267,"W3|collide2":34,"W3|exch3":34,"W3|hop3":30,"W3|cyc3":30,"W5|hop1":236,"W5|cyc2":209,"W5|hop2":2470,"W5|collide2_pop":199,"W5|exch3_pop":156,"W5|collide2":32,"W5|exch3":32,"W5|cyc3":30,"W5|hop3":30}
+ENUM shoulder_wa   6964 {"W3|hop1":230,"W3|cyc2":202,"W3|hop2":2686,"W3|collide2_pop":203,"W3|exch3_pop":131,"W3|collide2":34,"W3|exch3":34,"W3|cyc3":30,"W3|hop3":30,"W5|hop1":274,"W5|cyc2":240,"W5|hop2":3084,"W5|collide2_pop":239,"W5|exch3_pop":171,"W5|collide2":32,"W5|exch3":28,"W5|cyc3":30,"W5|hop3":30}
+ENUM elbow_wa      7666 {"W3|hop1":258,"W3|cyc2":222,"W3|hop2":3032,"W3|collide2_pop":230,"W3|exch3_pop":174,"W3|collide2":34,"W3|exch3":34,"W3|cyc3":30,"W3|hop3":30,"W5|hop1":291,"W5|cyc2":257,"W5|hop2":3358,"W5|collide2_pop":234,"W5|exch3_pop":168,"W5|collide2":32,"W5|exch3":28,"W5|cyc3":30,"W5|hop3":30}
+
+jobs done 997 s
+
+=== GATES run directly (argv[3] = HEAD base_v226.html) — rows where any count differs from HEAD
+  g193_samecard.js                   HEAD PASS 53 FAIL 0 | D190@226 PASS 53 FAIL 0 | D190@227 NO SUMMARY (crash, exit 1)
+  g197a_pool_static.js               HEAD PASS 41 FAIL 0 | D190@226 PASS 41 FAIL 0 | D190@227 PASS 40 FAIL 1
+      D190_227 FAIL D1 HALF_MANNY digest matches the V227 row (NO ROW)  -> 0ac7da6b1691a8e1 — no MANNY_DIGEST_BY_VERSION row for V227: an unruled digest move
+  g197b_sweep.js                     HEAD PASS 30 FAIL 0 | D190@226 PASS 30 FAIL 0 | D190@227 PASS 24 FAIL 6
+      D190_227 FAIL B4i home_full machine items == the era row (V209 pin 200, the raw-EXLIB Preacher curl; V210 D70c 0) (NO ERA ROW for ia-version 227)  -> 0
+      D190_227 FAIL B4j home_full machine survivors are exactly the era row's names and counts (NO ERA ROW for ia-version 227)  -> {} vs row null
+      D190_227 FAIL B4k home_full cable items == the era row (V209 pin 13; V210 D70c 0) (NO ERA ROW for ia-version 227)  -> 0
+      D190_227 FAIL B4l home_full cable survivors are exactly the era row's names and counts (NO ERA ROW for ia-version 227)  -> {} vs row null
+      D190_227 FAIL B5c same-card duplicates == undefined (the V227 row; 187 through V218, 240 at V196/V197; D76 absorbs the whole +175 harvest cost, then D85 licenses 5 and D91 licenses 48 more: on 48 deload leg cards — W12 TUE, run_half, seed 11, home_basic 24 + minimal 24 — recoveryDeload now keeps its surviving accessory block by PATTERN, so Leg superset B (hinge) survives where Leg superset A did, and the Step-ups (KB) that Leg superset A repeated from the Main slot leaves the card. Item count per card is unchanged on all 48 (46 at 8 items, 2 at 7): the repeat was replaced, not dropped. Every duplicate 
+      D190_227 FAIL B8a HALF_MANNY digest matches the V227 row (NO ROW)  -> 0ac7da6b1691a8e1 — no MANNY_DIGEST_BY_VERSION row for V227: an unruled digest move
+  g198_posterior_floor.js            HEAD PASS 29 FAIL 0 | D190@226 PASS 29 FAIL 0 | D190@227 PASS 28 FAIL 1
+  g199_deload_arbitration.js         HEAD PASS 56 FAIL 0 | D190@226 PASS 56 FAIL 0 | D190@227 PASS 41 FAIL 15
+  g200_core_tier.js                  HEAD PASS 43 FAIL 0 | D190@226 PASS 43 FAIL 0 | D190@227 PASS 41 FAIL 2
+  g200_pull_arbitration.js           HEAD PASS 18 FAIL 0 | D190@226 PASS 18 FAIL 0 | D190@227 PASS 12 FAIL 6
+  g202_d108_touchset_freeze.js       HEAD PASS 10 FAIL 0 | D190@226 PASS 10 FAIL 0 | D190@227 PASS 9 FAIL 1
+  g202_pace_anchor.js                HEAD PASS 33 FAIL 0 | D190@226 PASS 33 FAIL 0 | D190@227 PASS 32 FAIL 1
+  g202_pace_copy.js                  HEAD PASS 16 FAIL 0 | D190@226 PASS 16 FAIL 0 | D190@227 PASS 15 FAIL 1
+  g203_mile_pencil.js                HEAD PASS 100 FAIL 0 | D190@226 PASS 100 FAIL 0 | D190@227 PASS 98 FAIL 2
+  g204_clock_limb.js                 HEAD PASS 75 FAIL 0 | D190@226 PASS 75 FAIL 0 | D190@227 PASS 73 FAIL 2
+      D190_227 FAIL MANNY_DIGEST_BY_VERSION has a row for ia-version 227 (got undefined)
+      D190_227 FAIL HALF_MANNY digest unmoved by D126 (a clock fix may not move a build) == undefined (got "0ac7da6b1691a8e1")
+  g210_equipment_denials.js          HEAD PASS 128 FAIL 0 | D190@226 PASS 128 FAIL 0 | D190@227 PASS 127 FAIL 1
+      D190_227 FAIL O6r the harness era row for ia-version 227 exists and reads 0ac7da6b1691a8e1
+  g219_samecard_draws.js             HEAD PASS 15 FAIL 0 | D190@226 PASS 15 FAIL 0 | D190@227 PASS 5 FAIL 10
+      D190_227 FAIL F1 D164 repro W1 mon Chest volume reads the era row (-) (NO ERA ROW for ia-version 227) (got Pec deck 3×12–15 @ RPE 6–7)
+      D190_227 FAIL F2 D164 repro W1 mon: a name printed twice on the card is present (the V218 twin) (NO ERA ROW for ia-version 227) (got [])
+      D190_227 FAIL R1 D159 cfB RATCHET: duplicate days (a name on 2+ items of one card) <= undefined (V218 2,840; V219 0; may only fall) (NO ERA ROW for ia-version 227) (got 0)
+      D190_227 FAIL R2 D159: Leg isolation holding an on-card name == undefined days (V218 12) (NO ERA ROW for ia-version 227) (got 0)
+      D190_227 FAIL R3 D164 slice 1: shoulder/workaround swap-target duplicate days == undefined (V218 1,121) (NO ERA ROW for ia-version 227) (got 0)
+      D190_227 FAIL R4 D164 slice 1: shoulder/workaround Chest + knee sections == undefined (V218 4,774; V219 4,770 expires on D169) (NO ERA ROW for ia-version 227) (got 4770)
+      D190_227 FAIL R5 D164 slice 1: Chest + knee sections with no chest movement == undefined (V218 821; V219 891 EQUALITY, expires on D169) (NO ERA ROW for ia-version 227) (got 891)
+      D190_227 FAIL R6 D164 slice 2: elbow/workaround days whose Biceps prints one item == undefined (builder-observed pin, see header) (NO ERA ROW for ia-version 227) (got 412)
+      D190_227 FAIL R7 D165: Main echoed in Leg superset A or Leg circuit == undefined days (V218 907) (NO ERA ROW for ia-version 227) (got 0)
+      D190_227 FAIL R8 D166: Main echoed in Pull superset B == undefined days (V218 800) (NO ERA ROW for ia-version 227) (got 0)
+  g221_d177_swapfloor.js             HEAD PASS 20 FAIL 0 | D190@226 PASS 19 FAIL 1 | D190@227 PASS 19 FAIL 1
+      D190_226 FAIL G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2) (got power 118 of 4066, off grammar 0 of 28896 | e.g. commercial|support_strength|beginner|event|knee/workaround W5 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank | e.g. commercial|support_strength|beginner|event|knee/workaround W6 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank | e.g. commercial|support_strength|beginner|event|knee/workaround W9 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank)
+      D190_227 FAIL G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2) (got power 118 of 4066, off grammar 0 of 28896 | e.g. commercial|support_strength|beginner|event|knee/workaround W5 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank | e.g. commercial|support_strength|beginner|event|knee/workaround W6 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank | e.g. commercial|support_strength|beginner|event|knee/workaround W9 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank)
+  g226_d189_pacedisclose.js          HEAD PASS 18 FAIL 0 | D190@226 PASS 18 FAIL 0 | D190@227 PASS 17 FAIL 1
+      D190_227 FAIL G10 D189 HALF_MANNY: MANNY_DIGEST_BY_VERSION[ver] exists, equals 0ac7da6b1691a8e1, and the build prints it (got row[227] undefined, built 0ac7da6b1691a8e1)
+  gates with identical summaries on all three artifacts: 66/82
+
+  [g221_d177_swapfloor.js on D190_226] PASS 19 FAIL 1
+    PASS G1a Mario's card (commercial|support_strength|beginner|liftonly|knee/workaround, seed 76308, W5 Thu): Barbell box squat -> Dumbbell goblet squat via applySwapChoice prints `4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest`
+    FAIL G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2) (got power 118 of 4066, off grammar 0 of 28896 | e.g. commercial|support_strength|beginner|event|knee/workaround W5 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank | e.g. commercial|support_strength|beginner|event|knee/workaround W6 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank | e.g. commercial|support_strength|beginner|event|knee/workaround W9 sat Kettlebell swing -> Step-ups (KB) :: 2×10 => 2×10 — hold RPE 7, two in the tank)
+    PASS G5a L1: swap then undo leaves day.sections byte-identical on every Main and Power pair (R4)
+    PASS G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise
+    PASS G7-1b the injury filter still re-runs after a pref: Box jumps lands on healthy, never on knee/workaround ("Jumps are out.")
+    PASS G7-2a a day restored from an ia_hist_ snapshot at 4×3, re-swapped through applySwapChoice, shows the window live
+
+  [g221_RESCOPED on D190_226] PASS 20 FAIL 0
+    PASS G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2)
+    PASS G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise
+
+  [g221_RESCOPED on HEAD] PASS 20 FAIL 0
+    PASS G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2)
+
+  [g222_d181_chain.js on D190_227] PASS 8 FAIL 0
+      5L licence: REFUSED at ia-version 227 (eras 222, 223, 224, 225, 226 only, standing ruling 2; above the last listed era 226): residue must be 0 until re-ruled
+      ENUM mario (weeks 3,5,7): {"days":10,"slots":52,"W3|cyc2":224,"W3|hop2":3146,"W3|collide2":289,"W3|exch3":210,"W3|cyc3":30,"W3|hop3":30,"W5|cyc2":250,"W5|hop2":3379,"W5|collide2":218,"W5|exch3":166,"W5|cyc3":30,"W5|hop3":30}
+      ENUM manny (weeks 3,5,7): {"days":15,"slots":74,"W3|cyc2":246,"W3|hop2":2931,"W3|collide2":251,"W3|exch3":215,"W3|cyc3":30,"W3|hop3":30,"W5|cyc2":222,"W5|hop2":2796,"W5|collide2":319,"W5|exch3":270,"W5|cyc3":24,"W5|hop3":30,"W7|cyc2":196,"W7|hop2":2276,"W7|collide2":275,"W7|exch3":220,"W7|hop3":30,"W7|cyc3":24}
+    PASS row 5  untouched MARIO W5 Thu box->goblet->Leg press: boot = last live card in name AND detail (Leg press 4×8–12), chip offers goblet, two undos reach Barbell box squat 4×3 with the store empty (boot Leg press | 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest =live, chip Dumbbell goblet squat, 1/1)
+    PASS row 5c untouched MARIO W5 Thu 2-cycle box->goblet->box: boots 1 and 2 = last live card (Barbell box squat 4×8–12) (BOOT1 Barbell box squat | 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest =live, 1/1)
+    PASS row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras 222, 223, 224, 225, 226); every residue row boots equal to the composed-map boot (name!=live 0/5088, detail!=live 0/5088 (licence REFUSED above 226: 0), residue rows unlike the MAP boot 0)
+    PASS row 5X untouched reachable collide2 and exch3: whole day == live, all of them (collide2 809/809, exch3 716/716 whole day == live)
+    PASS row 8  CONTROL hist-restored day boots byte-equal to its ia_hist_ record, every class x t1 t2 up_st up_bt up_ts (rewrites 0/4070, no snapshot 0)
+    PASS row 8d CONTROL no duplicate item name on a booted hist-restored card (undercounts on injured MARIO; row 8 is the byte check) (booted hist-restored cards with a duplicate name 0/4070, snapshots carrying one 0)
+    PASS row 9a CONTROL up_ts: candidate boots byte-equal, day for day, to V221's boot of the same storage (814/814 byte-equal)
+    PASS row 9b up_ts then one re-tap on the candidate, reboot: holds (boot == re-tapped live day) (814/814 hold, re-taps that moved the card 582 (0 is an empty re-tap and proves nothing))
+    PASS 8 FAIL 0
+
+  [g222_d181_chain.js on D190_226] PASS 8 FAIL 0
+    PASS row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras 222, 223, 224, 225, 226); every residue row boots equal to the composed-map boot (name!=live 0/5088, detail!=live 0/5088 (licence <= 70 of 15545, eras 222, 223, 224, 225, 226), residue rows unlike the MAP boot 0)
+
+=== LATTICE rows: BASE 69314 D190 69314 joined 69314 | reachability moved BASE->D190 0
+
+=== P1 residue live != fresh-page boot
+  BASE  lattice hop1/hop2/cyc2             last-hop slot 128/66969 | whole day 128/66969
+      by config|class: slot ankle_wa|hop1 1 | ankle_wa|hop2 59 | mario|hop2 68 || day ankle_wa|hop1 1 | ankle_wa|hop2 59 | mario|hop2 68
+  BASE  samples hop3/cyc3/collide2/exch3   last-hop slot 11/2345 | whole day 12/2345
+      by config|class: slot ankle_wa|collide2 3 | ankle_wa|hop3 1 | elbow_wa|hop3 1 | knee_protect|hop3 1 | lowback_wa|hop3 3 | mario|hop3 1 | shoulder_wa|hop3 1 || day ankle_wa|collide2 3 | ankle_wa|exch3 1 | ankle_wa|hop3 1 | elbow_wa|hop3 1 | knee_protect|hop3 1 | lowback_wa|hop3 3 | mario|hop3 1 | shoulder_wa|hop3 1
+  D190  lattice hop1/hop2/cyc2             last-hop slot 0/66969 | whole day 0/66969  -> PASS
+  D190  samples hop3/cyc3/collide2/exch3   last-hop slot 6/2345 | whole day 6/2345  -> FAIL
+      by config|class: slot elbow_wa|hop3 1 | knee_protect|hop3 1 | lowback_wa|hop3 3 | shoulder_wa|hop3 1 || day elbow_wa|hop3 1 | knee_protect|hop3 1 | lowback_wa|hop3 3 | shoulder_wa|hop3 1
+      knee_protect#1946 hop3 W3 thu Cable pull-through > 45° back extension > Cable pull-through > Single-leg hip thrust
+        live "4 sets — RPE 7 (leave 3 or more in reserve)" boot "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+      lowback_wa#4304 hop3 W5 tue Dumbbell row > Inverted rows (rings) > Dumbbell row > Chinups
+        live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2×8 each"
+      lowback_wa#1209 hop3 W3 tue Dumbbell curl > Inverted rows (rings) > Dumbbell curl > Incline dumbbell curl
+        live "3 sets — RPE 7 (leave 3 or more in reserve)" boot "3×10–12 @ RPE 7"
+      lowback_wa#1582 hop3 W3 thu Dumbbell standing calf raise > 45° back extension > Dumbbell standing calf raise > Glute-ham raise
+        live "3 sets — RPE 7 (leave 3 or more in reserve)" boot "3×15–20 @ RPE 7"
+      shoulder_wa#1815 hop3 W3 thu Glute-ham raise > Single-leg glute bridge > Glute-ham raise > Cable pull-through
+        live "2 sets — RPE 7 (leave 3 or more in reserve)" boot "2×6–10 @ RPE 7"
+      elbow_wa#5764 hop3 W5 thu Single-leg hip thrust > Single-leg glute bridge > Single-leg hip thrust > Lying leg curl
+        live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2×6–10 @ RPE 8"
+      sample denominators: ankle_wa|collide2 64 | ankle_wa|cyc3 60 | ankle_wa|exch3 64 | ankle_wa|hop3 60 | elbow_wa|collide2 66 | elbow_wa|cyc3 60 | elbow_wa|exch3 62 | elbow_wa|hop3 60 | hip_wa|collide2 66 | hip_wa|cyc3 60 | hip_wa|exch3 59 | hip_wa|hop3 60 | knee_protect|collide2 64 | knee_protect|cyc3 60 | knee_protect|exch3 64 | knee_protect|hop3 60 | lowback_wa|collide2 66 | lowback_wa|cyc3 60 | lowback_wa|exch3 66 | lowback_wa|hop3 60 | manny|collide2 96 | manny|cyc3 78 | manny|exch3 96 | manny|hop3 90 | mario_noinj|collide2 66 | mario_noinj|cyc3 60 | mario_noinj|exch3 66 | mario_noinj|hop3 60 | mario|collide2 64 | mario|cyc3 60 | mario|exch3 60 | mario|hop3 60 | shoulder_wa|collide2 66 | shoulder_wa|cyc3 60 | shoulder_wa|exch3 62 | shoulder_wa|hop3 60
+
+=== P2 toasts moved V226 -> D190 (every hop): lattice 0/66969 -> PASS | samples 0/2345
+
+=== P3 live / boot moved V226 -> D190 (last-hop slot), lattice 66969 joined reachable
+  live moved 1996 | by config|class|kind:
+        1 ankle_wa|hop1|(i) cue now at tap
+        8 ankle_wa|hop1|(ii) cue dropped, loaded end|natively-cued donor
+       59 ankle_wa|hop2|(i) cue now at tap
+       64 ankle_wa|hop2|(ii) cue dropped, loaded end|natively-cued donor
+        8 ankle_wa|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       17 elbow_wa|cyc2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       11 elbow_wa|hop1|(ii) cue dropped, loaded end|natively-cued donor
+       28 elbow_wa|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       79 elbow_wa|hop2|(ii) cue dropped, loaded end|natively-cued donor
+      443 elbow_wa|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+        7 hip_wa|cyc2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       14 hip_wa|hop1|(ii) cue dropped, loaded end|natively-cued donor
+        9 hip_wa|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       91 hip_wa|hop2|(ii) cue dropped, loaded end|natively-cued donor
+      137 hip_wa|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+        6 knee_protect|cyc2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+        9 knee_protect|hop1|(ii) cue dropped, loaded end|natively-cued donor
+        6 knee_protect|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       69 knee_protect|hop2|(ii) cue dropped, loaded end|natively-cued donor
+       91 knee_protect|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       12 lowback_wa|cyc2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       20 lowback_wa|hop1|(ii) cue dropped, loaded end|natively-cued donor
+       12 lowback_wa|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+      111 lowback_wa|hop2|(ii) cue dropped, loaded end|natively-cued donor
+      172 lowback_wa|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+        8 mario|hop1|(ii) cue dropped, loaded end|natively-cued donor
+        1 mario|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       68 mario|hop2|(i) cue now at tap
+       66 mario|hop2|(ii) cue dropped, loaded end|natively-cued donor
+       21 mario|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       15 shoulder_wa|cyc2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       12 shoulder_wa|hop1|(ii) cue dropped, loaded end|natively-cued donor
+       15 shoulder_wa|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       59 shoulder_wa|hop2|(ii) cue dropped, loaded end|natively-cued donor
+      247 shoulder_wa|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+  boot moved 1868 | by config|class|kind:
+        8 ankle_wa|hop1|(ii) cue dropped, loaded end|natively-cued donor
+       64 ankle_wa|hop2|(ii) cue dropped, loaded end|natively-cued donor
+        8 ankle_wa|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       17 elbow_wa|cyc2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       11 elbow_wa|hop1|(ii) cue dropped, loaded end|natively-cued donor
+       28 elbow_wa|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       79 elbow_wa|hop2|(ii) cue dropped, loaded end|natively-cued donor
+      443 elbow_wa|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+        7 hip_wa|cyc2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       14 hip_wa|hop1|(ii) cue dropped, loaded end|natively-cued donor
+        9 hip_wa|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       91 hip_wa|hop2|(ii) cue dropped, loaded end|natively-cued donor
+      137 hip_wa|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+        6 knee_protect|cyc2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+        9 knee_protect|hop1|(ii) cue dropped, loaded end|natively-cued donor
+        6 knee_protect|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       69 knee_protect|hop2|(ii) cue dropped, loaded end|natively-cued donor
+       91 knee_protect|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       12 lowback_wa|cyc2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       20 lowback_wa|hop1|(ii) cue dropped, loaded end|natively-cued donor
+       12 lowback_wa|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+      111 lowback_wa|hop2|(ii) cue dropped, loaded end|natively-cued donor
+      172 lowback_wa|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+        8 mario|hop1|(ii) cue dropped, loaded end|natively-cued donor
+        1 mario|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       66 mario|hop2|(ii) cue dropped, loaded end|natively-cued donor
+       21 mario|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       15 shoulder_wa|cyc2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       12 shoulder_wa|hop1|(ii) cue dropped, loaded end|natively-cued donor
+       15 shoulder_wa|hop1|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+       59 shoulder_wa|hop2|(ii) cue dropped, loaded end|natively-cued donor
+      247 shoulder_wa|hop2|(iii) RPE 7 form -> RPE 8 form|natively-cued donor
+  class (i) 128 (mario 68, ankle 60, other cfgs 0) | (ii) 621 | (iii) 1247 | other 0
+  (i) rows == V226 residue rows (BASE boot != live): 128/128 of V226 residue 128
+  boot moved == (ii)+(iii): boot-moved not in (ii)+(iii) 0, (ii)+(iii) whose boot did not move 0, same kind on both paths 1868/1868 -> PASS
+  natively-cued donor chains (lattice, reachable): ankle_wa 110 | elbow_wa 912 | hip_wa 450 | knee_protect 307 | lowback_wa 389 | mario 119 | shoulder_wa 572
+  samples: live moved 87/2345 ankle_wa|(i) cue now at tap 4 | ankle_wa|(ii) cue dropped, loaded end 1 | elbow_wa|(ii) cue dropped, loaded end 2 | elbow_wa|(iii) RPE 7 form -> RPE 8 form 15 | hip_wa|(ii) cue dropped, loaded end 4 | hip_wa|(iii) RPE 7 form -> RPE 8 form 9 | knee_protect|(ii) cue dropped, loaded end 7 | knee_protect|(iii) RPE 7 form -> RPE 8 form 6 | lowback_wa|(ii) cue dropped, loaded end 9 | lowback_wa|(iii) RPE 7 form -> RPE 8 form 12 | mario|(i) cue now at tap 1 | mario|(ii) cue dropped, loaded end 2 | mario|(iii) RPE 7 form -> RPE 8 form 2 | shoulder_wa|(ii) cue dropped, loaded end 3 | shoulder_wa|(iii) RPE 7 form -> RPE 8 form 10
+
+=== P4 uninjured (manny, mario_noinj) moved on live/boot/toast/undo: lattice 0/17217 -> PASS | all classes 0/17829
+
+=== P6 undo of the last hop (lattice hop1/hop2/cyc2)
+  BASE  chip 66969/66969 | slot != pre-hop live 0 | whole day not byte-identical to pre-hop (clock stripped) 0 (injured 0/49752) | undo-boot != undo-live (day) 5
+    by config: day (none) || undo-boot ankle_wa|cyc2 1 | ankle_wa|hop2 4
+    ankle_wa#1729 Dumbbell goblet squat>Dumbbell split-stance deadlift undo live "2×8" boot "2×8 — hold RPE 7, two in the tank"
+    ankle_wa#1730 Dumbbell goblet squat>Kettlebell single-leg deadlift undo live "2×8" boot "2×8 — hold RPE 7, two in the tank"
+    ankle_wa#1731 Dumbbell goblet squat>45° back extension undo live "2×8" boot "2×8 — hold RPE 7, two in the tank"
+  D190  chip 66969/66969 | slot != pre-hop live 0 | whole day not byte-identical to pre-hop (clock stripped) 0 (injured 0/49752) | undo-boot != undo-live (day) 0 -> PASS
+  IA_HIST t1 BASE: rows 4607 | hist slot != live 0 | boot slot != live 0
+  IA_HIST t1 D190: rows 4607 | hist slot != live 0 | boot slot != live 0
+
+=== cue <=> cap on D190 live final slot (workaround configs; cap table typed from the ruling)
+  violations 0/43871 (none)
+  named: mario KB swing -> DB goblet squat: (not on lattice)
+  named: mario DB goblet squat -> DB split-stance DL: mario#5440 hop2 "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+  named: ankle DB goblet squat -> Nordic hamstring curl (anchored): ankle_wa#1733 hop2 "2 sets — RPE 8 (stop 2 reps short of failure)"
+  named: ankle KB swing -> DB goblet squat: ankle_wa#1728 hop1 "2×8 — hold RPE 7, two in the tank"
+
+=== Ruling table rows on D190
+  mario#5409 Dumbbell row (2×8–12 each @ RPE 8) > Feet-elevated inverted rows > Dumbbell row > Barbell row | steps "2 sets — RPE 8 (stop 2 reps short of failure)" , "2×6–10 @ RPE 8" , "2 sets — RPE 8 (stop 2 reps short of failure)" | live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2 sets — RPE 8 (stop 2 reps short of failure)" | V226 live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2 sets — RPE 8 (stop 2 reps short of failure)"
+  mario#5410 Sumo deadlift (4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest) > Trap bar deadlift > Sumo deadlift > Kettlebell swing | steps "4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" , "2×10" , "4×10–15 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | live "4×10–15 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" boot "4×10–15 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | V226 live "4×10–15 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" boot "4×10–15 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest"
+  mario#5411 Dumbbell row (2×8–12 each @ RPE 8) > Cable curl > Dumbbell row > L-sit chinups | steps "2×8–12 each @ RPE 8" , "2 sets — RPE 8 (stop 2 reps short of failure)" , "2×8–12 each @ RPE 8" | live "2×8–12 each @ RPE 8" boot "2×8–12 each @ RPE 8" | V226 live "2×8–12 each @ RPE 8" boot "2×8–12 each @ RPE 8"
+  mario#5500 Barbell box squat (4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest) > Dumbbell split-stance deadlift > Dumbbell goblet squat | steps "4×5–8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" , "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" | live "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" boot "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" | V226 live "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" boot "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+  mario#7429 Decline pushups (2 sets — RPE 7 (leave 3 or more in reserve)) > Dumbbell bench press > Dumbbell decline press | steps "2 sets — RPE 7 (leave 3 or more in reserve)" , "2 sets — RPE 7 (leave 3 or more in reserve)" | live "2 sets — RPE 7 (leave 3 or more in reserve)" boot "2 sets — RPE 7 (leave 3 or more in reserve)" | V226 live "2 sets — RPE 7 (leave 3 or more in reserve)" boot "2 sets — RPE 7 (leave 3 or more in reserve)"
+  ankle_wa#1673 Dumbbell Bulgarian split squat (2×10 each — hold RPE 7, two in the tank) > Deadlift > 45° back extension | steps "2×10 each" , "2 sets — RPE 8 (stop 2 reps short of failure)" | live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2 sets — RPE 8 (stop 2 reps short of failure)" | V226 live "2 sets — RPE 7 (leave 3 or more in reserve)" boot "2 sets — RPE 7 (leave 3 or more in reserve)"
+  ankle_wa#1677 Wall sit (2×25 sec) > Spanish squat hold (KB) | steps "2×25 sec" | live "2×25 sec" boot "2×25 sec" | V226 live "2×25 sec" boot "2×25 sec"
+
+=== P8 chains from natively cued items (mario, ankle_wa), every class, live vs boot on D190
+  mario: chains 127 from items {"W3 thu Leg superset A :: Reverse lunge (KB)":68,"W5 thu Leg superset A :: Step-ups (KB)":59} | live != boot 0 -> PASS | by class cyc2 6 | cyc3 2 | hop1 12 | hop2 101 | hop3 6
+    full list: /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0d209eb9-c4f5-49d1-974c-7a51334cecdf/scratchpad/measure2/p8_mario.txt | final-detail kinds: (ii) cue dropped, loaded end 76 | (iii) RPE 7 form -> RPE 8 form 24 | same 27
+    hop1 W3 Reverse lunge (KB) > Step-ups (KB) | live "2×10 each — hold RPE 7, two in the tank" boot "2×10 each — hold RPE 7, two in the tank"
+    hop1 W5 Step-ups (KB) > Reverse lunge (KB) | live "2×10 each — hold RPE 7, two in the tank" boot "2×10 each — hold RPE 7, two in the tank"
+    cyc2 W3 Reverse lunge (KB) > Step-ups (KB) > Reverse lunge (KB) | live "2×10 each — hold RPE 7, two in the tank" boot "2×10 each — hold RPE 7, two in the tank"
+    cyc2 W5 Step-ups (KB) > Reverse lunge (KB) > Step-ups (KB) | live "2×10 each — hold RPE 7, two in the tank" boot "2×10 each — hold RPE 7, two in the tank"
+    hop2 W3 Reverse lunge (KB) > Step-ups (KB) > 45° back extension | live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2 sets — RPE 8 (stop 2 reps short of failure)"
+    hop2 W5 Step-ups (KB) > Reverse lunge (KB) > Dumbbell goblet squat | live "2×10 each — hold RPE 7, two in the tank" boot "2×10 each — hold RPE 7, two in the tank"
+    hop2 W3 Reverse lunge (KB) > Step-ups (KB) > Barbell good mornings | live "2×10 each" boot "2×10 each"
+    hop2 W5 Step-ups (KB) > Reverse lunge (KB) > Dumbbell split-stance deadlift | live "2×10 each" boot "2×10 each"
+  ankle_wa: chains 112 from items {"W3 thu Leg superset A :: Dumbbell Bulgarian split squat":56,"W5 thu Leg superset A :: Dumbbell Bulgarian split squat":56} | live != boot 0 -> PASS | by class cyc2 10 | cyc3 1 | hop1 10 | hop2 90 | hop3 1
+    full list: /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/0d209eb9-c4f5-49d1-974c-7a51334cecdf/scratchpad/measure2/p8_ankle_wa.txt | final-detail kinds: (ii) cue dropped, loaded end 72 | (iii) RPE 7 form -> RPE 8 form 8 | same 32
+    hop1 W3 Dumbbell Bulgarian split squat > Dumbbell goblet squat | live "2×10 each — hold RPE 7, two in the tank" boot "2×10 each — hold RPE 7, two in the tank"
+    hop1 W5 Dumbbell Bulgarian split squat > Dumbbell split-stance deadlift | live "2×10 each" boot "2×10 each"
+    hop2 W3 Dumbbell Bulgarian split squat > Dumbbell goblet squat > Leg press | live "2×10 each — hold RPE 7, two in the tank" boot "2×10 each — hold RPE 7, two in the tank"
+    hop2 W5 Dumbbell Bulgarian split squat > Dumbbell split-stance deadlift > Kettlebell single-leg deadlift | live "2×10 each" boot "2×10 each"
+    cyc2 W3 Dumbbell Bulgarian split squat > Dumbbell goblet squat > Dumbbell Bulgarian split squat | live "2×10 each — hold RPE 7, two in the tank" boot "2×10 each — hold RPE 7, two in the tank"
+    hop2 W5 Dumbbell Bulgarian split squat > Dumbbell split-stance deadlift > Barbell Romanian deadlift | live "2×10 each" boot "2×10 each"
+    hop2 W3 Dumbbell Bulgarian split squat > Dumbbell goblet squat > Dumbbell split-stance deadlift | live "2×10 each" boot "2×10 each"
+    hop2 W5 Dumbbell Bulgarian split squat > Dumbbell split-stance deadlift > Deadlift | live "2×10 each" boot "2×10 each"
+  boot re-filter BASE: changed the day on 128/49752 injured hit days (lattice) ankle_wa 60 | mario 68
+  boot re-filter D190: changed the day on 1119/49752 injured hit days (lattice) ankle_wa 90 | elbow_wa 334 | hip_wa 192 | knee_protect 126 | lowback_wa 62 | mario 91 | shoulder_wa 224
+
+=== POST: gate lines at D190@227 that are not PASS (gates whose counts moved)
+  g193_samecard.js: 2 lines
+    if (!OPEN_UNRULED) throw new Error('g193: no OPEN_UNRULED_BY_VERSION row for V' + IA.version + ': an unruled register (D133)');
+    Error: g193: no OPEN_UNRULED_BY_VERSION row for V227: an unruled register (D133)
+  g198_posterior_floor.js: 1 lines
+    FAIL C1 HALF_MANNY digest matches the V227 row (NO ROW — no MANNY_DIGEST_BY_VERSION entry for this version: an unruled digest move) (got 0ac7da6b1691a8e1)
+  g199_deload_arbitration.js: 15 lines
+    FAIL B1 HALF_MANNY progDigest matches the V227 row of MANNY_DIGEST_BY_VERSION (NO ROW) (got 0ac7da6b1691a8e1) — no MANNY_DIGEST_BY_VERSION row for V227: an unruled digest move
+    FAIL B2 with __DELOAD_OFF the same fixture matches the V227 row of MANNY_DELOAD_OFF_DIGEST_BY_VERSION (NO ROW) (got 1069cd7f86eed204): B1 is MEANINGFUL, the fixture does pass through the deload (B1 would be vacuous if the two digests were equal) — no MANNY_DEL
+    FAIL C1 zero-posterior weeks on the SHIPPED card == NO ROW (the V227 DELOAD_ARB_BY_VERSION row) of 17856 weeks (1,728 configs); got 264 — no DELOAD_ARB_BY_VERSION row for V227: an unpinned arbitration count (D133)
+  g200_core_tier.js: 2 lines
+    FAIL F1a the counterfactual matches the V227 row of MANNY_CORE_OFF_DIGEST_BY_VERSION (NO ROW) (got 9d14801a63111081) — no MANNY_CORE_OFF_DIGEST_BY_VERSION row for V227: an unruled counterfactual digest move
+    FAIL F1b the candidate ships the V227 row of MANNY_DIGEST_BY_VERSION (NO ROW) (got 0ac7da6b1691a8e1) — no MANNY_DIGEST_BY_VERSION row for V227: an unruled digest move
+  g200_pull_arbitration.js: 7 lines
+    FAIL B1 HALF_MANNY progDigest matches the V227 row of MANNY_DIGEST_BY_VERSION (NO ROW) (got 0ac7da6b1691a8e1) — no MANNY_DIGEST_BY_VERSION row for V227: an unruled digest move
+    ok   P2 WHICH BLOCK SURVIVES (D93 amended, NARROWED by D94 V201): on every deload day build where BOTH Pull superset A and Pull superset B enter p1, exactly one survives to p2, and the survivor is Pull superset B if and only if B holds an E_PAT posterior item 
+    FAIL P2c POSITIVE-LIMB POPULATION: both-enter deload pull cards whose Pull superset B holds an E_PAT posterior item at p1 == undefined (the V227 row) of 1120 deload day builds (210 of which offer both blocks); got 138. THIS IS A LEGITIMATE PIN BECAUSE IT IS RE
+  g202_d108_touchset_freeze.js: 1 lines
+    FAIL R6  HALF MANNY matches the V227 row of MANNY_DIGEST_BY_VERSION (NO ROW): got 0ac7da6b1691a8e1. D108 changes no prescription; a move here is an unruled digest move, and an absent row is a missing pin, not a pass
+  g202_pace_anchor.js: 1 lines
+    FAIL B1 HALF_MANNY matches the V227 row of MANNY_DIGEST_BY_VERSION (NO ROW): got 0ac7da6b1691a8e1. D100 and D101 touch the run_pace_goal path only; a move here is an unruled digest move
+  g202_pace_copy.js: 1 lines
+    FAIL B2 HALF_MANNY matches the V227 row of MANNY_DIGEST_BY_VERSION (NO ROW): got 0ac7da6b1691a8e1. E4-E6 are copy only; a digest move here means a prescription moved
+  g203_mile_pencil.js: 2 lines
+    FAIL MANNY_DIGEST_BY_VERSION has a row for ia-version 227  -> undefined
+    FAIL HALF_MANNY digest unmoved by D116 (pinned to the V227 era row)  -> got "0ac7da6b1691a8e1" want undefined
+
+=== POST P1: D190 sample residue rows against V226
+  D190 residue 6, of them V226 residue with identical live AND boot slot 5 | V226 sample residue 12, healed by D190 6 ankle_wa|collide2 3 | ankle_wa|exch3 1 | ankle_wa|hop3 1 | mario|hop3 1
+  knee_protect#1946 hop3 W3 thu "Main — Single-leg hip thrust"
+    Cable pull-through (4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest) > 45° back extension ["4 sets — RPE 7 (leave 3 or more in reserve)"] > Cable pull-through ["4 sets — RPE 7 (leave 3 or more in reserve)"] > Single-leg hip thrust ["4 sets — RPE 7 (leave 3 or more in reserve)"]
+    D190 live "4 sets — RPE 7 (leave 3 or more in reserve)" boot "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest"
+    V226 live "4 sets — RPE 7 (leave 3 or more in reserve)" boot "4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" | donor cued false | any step cued false
+  lowback_wa#4304 hop3 W5 tue "Pull"
+    Dumbbell row (2×8 each — hold RPE 7, two in the tank) > Inverted rows (rings) ["2 sets — RPE 8 (stop 2 reps short of failure)"] > Dumbbell row ["2 sets — RPE 8 (stop 2 reps short of failure)"] > Chinups ["2 sets — RPE 8 (stop 2 reps short of failure)"]
+    D190 live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2×8 each"
+    V226 live "2 sets — RPE 7 (leave 3 or more in reserve)" boot "2×8 each — hold RPE 7, two in the tank" | donor cued true | any step cued false
+  lowback_wa#1209 hop3 W3 tue "Biceps"
+    Dumbbell curl (3×10–12 @ RPE 7) > Inverted rows (rings) ["3 sets — RPE 7 (leave 3 or more in reserve)"] > Dumbbell curl ["3 sets — RPE 7 (leave 3 or more in reserve)"] > Incline dumbbell curl ["3 sets — RPE 7 (leave 3 or more in reserve)"]
+    D190 live "3 sets — RPE 7 (leave 3 or more in reserve)" boot "3×10–12 @ RPE 7"
+    V226 live "3 sets — RPE 7 (leave 3 or more in reserve)" boot "3×10–12 @ RPE 7" | donor cued false | any step cued false
+  lowback_wa#1582 hop3 W3 thu "Calves"
+    Dumbbell standing calf raise (3×15–20 @ RPE 7) > 45° back extension ["3 sets — RPE 7 (leave 3 or more in reserve)"] > Dumbbell standing calf raise ["3 sets — RPE 7 (leave 3 or more in reserve)"] > Glute-ham raise ["3 sets — RPE 7 (leave 3 or more in reserve)"]
+    D190 live "3 sets — RPE 7 (leave 3 or more in reserve)" boot "3×15–20 @ RPE 7"
+    V226 live "3 sets — RPE 7 (leave 3 or more in reserve)" boot "3×15–20 @ RPE 7" | donor cued false | any step cued false
+  shoulder_wa#1815 hop3 W3 thu "Leg superset B"
+    Glute-ham raise (2×6–10 @ RPE 7) > Single-leg glute bridge ["2 sets — RPE 7 (leave 3 or more in reserve)"] > Glute-ham raise ["2 sets — RPE 7 (leave 3 or more in reserve)"] > Cable pull-through ["2 sets — RPE 7 (leave 3 or more in reserve)"]
+    D190 live "2 sets — RPE 7 (leave 3 or more in reserve)" boot "2×6–10 @ RPE 7"
+    V226 live "2 sets — RPE 7 (leave 3 or more in reserve)" boot "2×6–10 @ RPE 7" | donor cued false | any step cued false
+  elbow_wa#5764 hop3 W5 thu "Leg superset B"
+    Single-leg hip thrust (2×6–10 @ RPE 8) > Single-leg glute bridge ["2 sets — RPE 8 (stop 2 reps short of failure)"] > Single-leg hip thrust ["2 sets — RPE 8 (stop 2 reps short of failure)"] > Lying leg curl ["2 sets — RPE 8 (stop 2 reps short of failure)"]
+    D190 live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2×6–10 @ RPE 8"
+    V226 live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2×6–10 @ RPE 8" | donor cued false | any step cued false
+
+=== POST P3: class (iii) (RPE 7 form -> RPE 8 form) by whether the end pattern is capped (cap table typed from the ruling; knee/protect not in it)
+  (iii) 1247 | ankle_wa|end uncapped|hip_ext 8 | elbow_wa|END CAPPED (plan wants 7, card 8)|bi_iso 51 | elbow_wa|END CAPPED (plan wants 7, card 8)|hpress 104 | elbow_wa|END CAPPED (plan wants 7, card 8)|row 244 | elbow_wa|END CAPPED (plan wants 7, card 8)|tri_iso 10 | elbow_wa|END CAPPED (plan wants 7, card 8)|vpull 54 | elbow_wa|end uncapped|delt_iso 25 | hip_wa|END CAPPED (plan wants 7, card 8)|hinge 11 | hip_wa|END CAPPED (plan wants 7, card 8)|hip_ext 108 | hip_wa|END CAPPED (plan wants 7, card 8)|squat 3 | hip_wa|end uncapped|calf_iso 19 | hip_wa|end uncapped|leg_iso 12 | knee_protect|no hand table|calf_iso 16 | knee_protect|no hand table|hinge 14 | knee_protect|no hand table|hip_ext 73 | lowback_wa|END CAPPED (plan wants 7, card 8)|hip_ext 70 | lowback_wa|END CAPPED (plan wants 7, card 8)|row 66 | lowback_wa|end uncapped|bi_iso 21 | lowback_wa|end uncapped|calf_iso 12 | lowback_wa|end uncapped|leg_iso 18 | lowback_wa|end uncapped|vpull 9 | mario|END CAPPED (plan wants 7, card 8)|leg_iso 2 | mario|end uncapped|calf_iso 2 | mario|end uncapped|hinge 1 | mario|end uncapped|hip_ext 17 | shoulder_wa|END CAPPED (plan wants 7, card 8)|delt_iso 42 | shoulder_wa|END CAPPED (plan wants 7, card 8)|hpress 202 | shoulder_wa|END CAPPED (plan wants 7, card 8)|vpress 3 | shoulder_wa|end uncapped|tri_iso 30
+  (ii) 621 | ankle_wa|end uncapped 72 | elbow_wa|end uncapped 90 | hip_wa|end uncapped 105 | knee_protect|no hand table 78 | lowback_wa|end uncapped 131 | mario|end uncapped 74 | shoulder_wa|end uncapped 71
+    e.g. elbow_wa#4792 hop2 W5 tue Barbell row (2×8 — hold RPE 7, two in the tank) > Pendlay row > Feet-elevated inverted rows [row] V226 "2 sets — RPE 7 (leave 3 or more in reserve)" -> D190 "2 sets — RPE 8 (stop 2 reps short of failure)"
+    e.g. elbow_wa#4793 hop2 W5 tue Barbell row (2×8 — hold RPE 7, two in the tank) > Pendlay row > Inverted rows (bodyweight) [row] V226 "2 sets — RPE 7 (leave 3 or more in reserve)" -> D190 "2 sets — RPE 8 (stop 2 reps short of failure)"
+    e.g. lowback_wa#908 hop2 W3 tue Kettlebell single-arm row (2×8 each — hold RPE 7, two in the tank) > Dumbbell row > Lat pulldown [vpull] V226 "2×8 each — hold RPE 7, two in the tank" -> D190 "2×8 each"
+
+=== POST: the ruling's before/after table rows, found by content (D190 tree)
+  mario#5589 mario W5 thu "Leg superset B" Kettlebell swing > Dumbbell split-stance deadlift > Dumbbell goblet squat (2×8)
+    D190 steps "2×8" , "2×8 — hold RPE 7, two in the tank" | boot "2×8 — hold RPE 7, two in the tank" | toasts Same job, same numbers. + Same job, same numbers.
+    V226 steps "2×8" , "2×8" | boot "2×8 — hold RPE 7, two in the tank"
+  mario#5590 mario W5 thu "Leg superset B" Kettlebell swing > Dumbbell split-stance deadlift > Reverse lunge (KB) (2×8)
+    D190 steps "2×8" , "2×8 — hold RPE 7, two in the tank" | boot "2×8 — hold RPE 7, two in the tank" | toasts Same job, same numbers. + Same job, same numbers.
+    V226 steps "2×8" , "2×8" | boot "2×8 — hold RPE 7, two in the tank"
+  mario#5591 mario W5 thu "Leg superset B" Kettlebell swing > Dumbbell split-stance deadlift > Leg press (2×8)
+    D190 steps "2×8" , "2×8 — hold RPE 7, two in the tank" | boot "2×8 — hold RPE 7, two in the tank" | toasts Same job, same numbers. + Same job, same numbers.
+    V226 steps "2×8" , "2×8" | boot "2×8 — hold RPE 7, two in the tank"
+  mario#5680 mario W5 thu "Leg superset B" Kettlebell swing > Barbell hip thrust > Leg extension (2×8)
+    D190 steps "2×8" , "2×8 — hold RPE 7, two in the tank" | boot "2×8 — hold RPE 7, two in the tank" | toasts Same job, same numbers. + Same job, same numbers.
+    V226 steps "2×8" , "2×8" | boot "2×8 — hold RPE 7, two in the tank"
+  mario#7661 mario W5 sat "Explosive finisher" Kettlebell swing > Dumbbell split-stance deadlift > Dumbbell goblet squat (2×10)
+    D190 steps "2×10" , "2×10 — hold RPE 7, two in the tank" | boot "2×10 — hold RPE 7, two in the tank" | toasts Same job, same numbers. + Same job, same numbers.
+    V226 steps "2×10" , "2×10" | boot "2×10 — hold RPE 7, two in the tank"
+  ankle_wa#1729 ankle_wa W3 thu "Leg superset B" Kettlebell swing > Dumbbell goblet squat > Dumbbell split-stance deadlift (2×8)
+    D190 steps "2×8 — hold RPE 7, two in the tank" , "2×8" | boot "2×8" | toasts Same job, same numbers. + Same job, same numbers.
+    V226 steps "2×8" , "2×8" | boot "2×8"
+  ankle_wa#1733 ankle_wa W3 thu "Leg superset B" Kettlebell swing > Dumbbell goblet squat > Nordic hamstring curl (anchored) (2×8)
+    D190 steps "2×8 — hold RPE 7, two in the tank" , "2 sets — RPE 8 (stop 2 reps short of failure)" | boot "2 sets — RPE 8 (stop 2 reps short of failure)" | toasts Same job, same numbers. + No load to add here, so take the sets to the same effort.
+    V226 steps "2×8" , "2 sets — RPE 8 (stop 2 reps short of failure)" | boot "2 sets — RPE 8 (stop 2 reps short of failure)"
+
+=== POST P5c probe: where the exSwapPrefs build moves the dose
+  HEAD _swapDetailFor(DB split-stance DL, "2×10 each") = "2×10 each" | (…, "2×10 each — hold RPE 7, two in the tank") = "2×10 each — hold RPE 7, two in the tank"
+    no-pref build, every Reverse lunge (KB): W3 thu "2×10 each — hold RPE 7, two in the tank" ; W4 thu "2×10 each — hold RPE 7, two in the tank"
+  D190 _swapDetailFor(DB split-stance DL, "2×10 each") = "2×10 each" | (…, "2×10 each — hold RPE 7, two in the tank") = "2×10 each — hold RPE 7, two in the tank"
+    no-pref build, every Reverse lunge (KB): W3 thu "2×10 each — hold RPE 7, two in the tank" ; W4 thu "2×10 each — hold RPE 7, two in the tank"
