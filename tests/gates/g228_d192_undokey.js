@@ -87,8 +87,15 @@
 //              and d2-UNDO); residue on collide2 or exch3 refutes a-U or the replay, not D192 (standing ruling 7: park).
 //   INFO       D191 P-SWAPREVISIT, U' only: |U'|, boot != live after undo on candidate and V227, created, healed, every
 //              created chain by name with its repeated `from`. Never asserted, never licensed; no pair row on U' boot
-//              (ruling §3: it would read created 2 and need the licence just refused).
-//   GUARD      the §5 refutation, FAIL-only (it adds no PASS): created above 2 on HOP5 (measure's seed), any created
+//              (ruling §3: it would read created 2 and need the licence just refused). V229: the comparator is the
+//              projection D194 Amendment 2 R8 defines (tests/measure/v229_rulings/d194_injlens_ruling.md): each
+//              section's label and each item's {name, detail, base}, base = the dose beneath the hold,
+//              _stripCapCue(_preHold ?? detail), by a hand stripper typed in this file (the cue shape and the held-test
+//              shape -> TEST_RX_TEXT), never asked of the tree. The whole-JSON counts and the D191 kept-dose shadow
+//              (boot carries no `_preHold` where live does, projection equal) print beside it. No era key (R8).
+//   GUARD      the §5 refutation, FAIL-only (it adds no PASS), judged on that projection (D194 Amendment 2 R8 is the
+//              ruling that defines GUARD's comparator; d2-BOOT-U and every other row keep the whole-day JSON):
+//              created above 2 on HOP5 (measure's seed), any created
 //              chain on WALK or HOP4 (measure: 0 at hop3 and hop4), or a created chain with no repeated `from`. A created
 //              chain in U cannot exist without a d2-BOOT-U residue (it boots != live on the candidate), so that half of
 //              the refutation also FAILS d2-BOOT-U by name.
@@ -137,7 +144,16 @@ const R = {
   BOOTU: "row d2-BOOT-U D192 on U (hand: hop `from` names pairwise distinct): after undo a fresh-VM boot of the day equals the live day; residue 0, |U| > 0, PIN in U boots equal to live",
   MANNY: 'row d2-MANNY D192 HALF_MANNY digest == era table == 0ac7da6b1691a8e1 == V227, self-stable; swapOriginOf reached 0 times by buildProgram and refreshProgram (counter wired)',
 };
-const GUARD = 'GUARD D192 refutation (ruling §5): created above 2 on the hop5 seed, created on the walk or hop4, or a created chain with no repeated `from`';
+const GUARD = 'GUARD D192 refutation (ruling §5, projection per D194 Amendment 2: section label, item name, detail and the dose beneath the hold _stripCapCue(_preHold ?? detail) by hand shape): created above 2 on the hop5 seed, created on the walk or hop4, or a created chain with no repeated from';
+// D194 Amendment 2 (R8): the projection the athlete and the next tap read. Hand stripper, typed from D193 R4's cue shape and
+// Amendment 3 section 2's held-test shape (-> the TEST_RX_TEXT literal, typed here); the tree is never asked.
+const _CUE_HAND = / — hold RPE 7, (?:two|three) in the tank$/;
+const _TEST_RX_HAND = 'Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline.';
+const _HELD_TEST_HAND = /^Work up to one working set of 3 to 5 reps at RPE \d+(?:\.\d+)?\. Technique stays crisp\. No grinding\. Log the weight and the reps\. Your injury plan holds this lift, so there is no new baseline here\.$/;
+const _stripHand = d => { const s = String(d == null ? '' : d); return _HELD_TEST_HAND.test(s) ? _TEST_RX_HAND : s.replace(_CUE_HAND, ''); };
+const PROJ = j => JSON.stringify((JSON.parse(j) || []).map(s => ({ label:(s && s.label) || null, items:((s && s.items) || []).map(it => ({ name:it && it.name, detail:it && it.detail, base:_stripHand(it && (it._preHold ?? it.detail)) })) })));
+const PHN = j => (j.match(/"_preHold"/g) || []).length;
+
 
 // ── FIXTURES ─────────────────────────────────────────────────────────────────────────────────────────────────────
 const START = '2026-08-24', CLOCK = '2026-09-24';
@@ -231,7 +247,8 @@ function act(tg, c){
       for(let ii = 0; ii < Math.max(li.length, bi.length) && !diff; ii++) if(JSON.stringify(li[ii]) !== JSON.stringify(bi[ii])){ const a = li[ii] || {}, b = bi[ii] || {};
         diff = '[' + si + '][' + ii + '] live ' + clean(a.name) + ' | ' + (a.detail || '') + ' ; boot ' + clean(b.name) + ' | ' + (b.detail || ''); } }
     if(!diff) diff = 'a section field'; }
-  return { un:0, chip, undoEq:!!chip && afterJ === prevJ, recBefore, recAfter, slotAfter, bootSlot, bootEq:bootJ === afterJ, diff };
+  return { un:0, chip, undoEq:!!chip && afterJ === prevJ, recBefore, recAfter, slotAfter, bootSlot, bootEq:bootJ === afterJ, diff,
+    projEq:PROJ(bootJ) === PROJ(afterJ), phLive:PHN(afterJ), phBoot:PHN(bootJ) };   // D194 Amendment 2 (R8)
 }
 
 // ── LOAD + VERSION PREDICATE ───────────────────────────────────────────────────────────────────────────────────────
@@ -400,18 +417,25 @@ const U = reach.filter(inU), UP = reach.filter(c => !inU(c));
 {
   if(B) for(const c of UP) c.rb = act('B', c);
   const both = UP.filter(c => c.rb && !c.rb.un);
-  const created = both.filter(c => c.rb.bootEq && !c.r.bootEq), healed = both.filter(c => !c.rb.bootEq && c.r.bootEq);
+  // D194 Amendment 2 (R8): GUARD and this INFO line compare U' on the projection; the whole-JSON counts print beside it.
+  const created = both.filter(c => c.rb.projEq && !c.r.projEq), healed = both.filter(c => !c.rb.projEq && c.r.projEq);
+  const createdW = both.filter(c => c.rb.bootEq && !c.r.bootEq), healedW = both.filter(c => !c.rb.bootEq && c.r.bootEq);
+  const shadow = createdW.filter(c => created.indexOf(c) < 0), shadowPH = shadow.filter(c => c.r.phLive > c.r.phBoot);
   const P = ['walk', 'hop4', 'hop5', 'pin'];
-  const line = P.map(p => { const g = UP.filter(c => c.pop === p), gb = both.filter(c => c.pop === p); return p + " |U'| " + g.length + ' boot != live candidate ' + g.filter(c => !c.r.bootEq).length
-    + ' / V227 ' + (B ? gb.filter(c => !c.rb.bootEq).length + ' (on both ' + gb.length + ')' : 'n/a') + ', created ' + created.filter(c => c.pop === p).length + ', healed ' + healed.filter(c => c.pop === p).length; }).join(' | ');
-  console.log("  INFO D191 P-SWAPREVISIT (never asserted, never licensed; no pair row on U' boot, ruling §3): " + line + ' | ' + sec());
-  console.log("       U' boot != live on the candidate by group: " + byGrp(UP, c => !c.r.bootEq));
+  const line = P.map(p => { const g = UP.filter(c => c.pop === p), gb = both.filter(c => c.pop === p); return p + " |U'| " + g.length
+    + ' boot != live whole JSON candidate ' + g.filter(c => !c.r.bootEq).length + ' / V227 ' + (B ? gb.filter(c => !c.rb.bootEq).length : 'n/a')
+    + ', projection candidate ' + g.filter(c => !c.r.projEq).length + ' / V227 ' + (B ? gb.filter(c => !c.rb.projEq).length : 'n/a') + ' (on both ' + gb.length + ')'
+    + ', created projection ' + created.filter(c => c.pop === p).length + ' (whole JSON ' + createdW.filter(c => c.pop === p).length + ')'
+    + ', healed projection ' + healed.filter(c => c.pop === p).length + ' (whole JSON ' + healedW.filter(c => c.pop === p).length + ')'; }).join(' | ');
+  console.log("  INFO D191 P-SWAPREVISIT (never asserted, never licensed; no pair row on U' boot, ruling §3; projection per D194 Amendment 2): " + line + ' | ' + sec());
+  console.log("       U' boot != live on the candidate by group, projection: " + byGrp(UP, c => !c.r.projEq) + "\n       whole JSON: " + byGrp(UP, c => !c.r.bootEq));
+  console.log('  INFO D191 kept-dose shadow (boot carries no `_preHold` where live does, projection equal): ' + shadow.length + ' of ' + createdW.length + ' created on whole JSON (' + P.map(p => p + ' ' + shadow.filter(c => c.pop === p).length).join(', ') + '); live carries more _preHold keys than boot on ' + shadowPH.length + ' of ' + shadow.length);
   created.forEach(c => console.log('       created ' + tag(c) + ' | repeated from ' + JSON.stringify(repFrom(c)) + ' | store before undo ' + JSON.stringify(c.r.recBefore)
     + ' after ' + JSON.stringify(c.r.recAfter) + ' | ' + c.r.diff));
   const c5 = created.filter(c => c.pop === 'hop5').length, cw = created.filter(c => c.pop !== 'hop5').length, noRep = created.filter(c => repFrom(c).length === 0).length;
   if(!B) ok(GUARD + ' (setup: no V227 tree: ' + baseWhy + ')', false);
   else if(c5 > 2 || cw > 0 || noRep > 0) ok(GUARD, false, 'hop5 created ' + c5 + ', walk+hop4 created ' + cw + ', created with no repeated from ' + noRep + ': stop and re-measure');
-  else console.log('  INFO GUARD clear (ruling §5 refutation, FAIL-only): hop5 created ' + c5 + ' <= 2, walk+hop4 created ' + cw + ', every created chain has a repeated `from`');
+  else console.log('  INFO GUARD clear on the projection (ruling §5 refutation, FAIL-only, D194 Amendment 2): hop5 created ' + c5 + ' <= 2, walk+hop4 created ' + cw + ', created with no repeated from ' + noRep + ' | whole JSON beside it: hop5 ' + createdW.filter(c => c.pop === 'hop5').length + ', walk+hop4 ' + createdW.filter(c => c.pop !== 'hop5').length);
 }
 // ── d2-MANNY ───────────────────────────────────────────────────────────────────────────────────────────────────────
 {

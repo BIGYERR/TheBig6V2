@@ -1,0 +1,86 @@
+[
+ {
+  "name": "V229-S2-D193 R2 -> the clamp branch in applyInjuryFilter is removed: a capped RPE above 7 rides through",
+  "anchor": "      if(pat&&P.cap.has(pat)&&detail) detail=/RPE/.test(detail)?_capRpeClamp(detail):detail+INJ_CAP_CUE;   // V229 D193 (R2, R7)\n",
+  "replacement": "      if(pat&&P.cap.has(pat)&&detail) detail=/RPE/.test(detail)?detail:detail+INJ_CAP_CUE;   // V229 D193 (R2, R7)\n",
+  "gate": "gates/g229_d193_build.js",
+  "note": "NAMED TRIP: row a (tests/measure/v228_rulings/d193_caprpe_ruling.md Amendment 1 section 8 and Amendment 4: (a) 316; tests/measure/v229_rulings/d194_injlens_ruling.md Sabotage: S2 -> (a) 316, (o) lowback 2). Printed by builder at V229: L432 316 of U 8,462 above RPE 7, home_basic 120 of 2,092. Also b, d-BWSETS, d-GRAMMAR, d-WAVE, d-LOADCAP, h and j (FAIL 8), and g229_d194_lens o (lowback 2). EXPECTED: a."
+ },
+ {
+  "name": "V229-S3-D193 R2 -> the clamp is applied regardless of cap: uncapped injured cards are held too",
+  "anchor": "      if(pat&&P.cap.has(pat)&&detail) detail=/RPE/.test(detail)?_capRpeClamp(detail):detail+INJ_CAP_CUE;   // V229 D193 (R2, R7)\n",
+  "replacement": "      if(pat&&P.cap.has(pat)&&detail) detail=/RPE/.test(detail)?_capRpeClamp(detail):detail+INJ_CAP_CUE;   // V229 D193 (R2, R7)\n      else if(detail&&/RPE/.test(detail)) detail=_capRpeClamp(detail);\n",
+  "gate": "gates/g229_d193_build.js",
+  "note": "NAMED TRIP: row b (tests/measure/v228_rulings/d193_caprpe_ruling.md original Sabotage S3 -> (b); tests/measure/v229_rulings/d194_injlens_ruling.md Sabotage: S3 -> (b)). Printed by builder at V229: outside the clamp population 478 of 1,053 byte-identical to V228. Also j (unheld test cards 36 of 102) and d-WAVE. EXPECTED: b."
+ },
+ {
+  "name": "V229-S6-D193 R2 -> _bwSetsFromDetail is made cue-blind: a cued bodyweight native reads RPE 8",
+  "anchor": "  let rpe=/rpe\\s*6|light|easy/i.test(detail||'')?'6':/rpe\\s*7/i.test(detail||'')?'7':'8';\n",
+  "replacement": "  const _cb=_stripCapCue(detail||'');\n  let rpe=/rpe\\s*6|light|easy/i.test(_cb)?'6':/rpe\\s*7/i.test(_cb)?'7':'8';\n",
+  "gate": "gates/g229_d193_build.js",
+  "note": "NAMED TRIP: row a (tests/measure/v228_rulings/d193_caprpe_ruling.md original Sabotage S6 -> (a), the 1,066 natives flip to 8; tests/measure/v229_rulings/d194_injlens_ruling.md Sabotage: S6 as Amendments 1 and 4). Printed by builder at V229: L432 1,066 of U 8,462 above RPE 7, home_basic 334. Also b and h. EXPECTED: a."
+ },
+ {
+  "name": "V229-S7-D193 R2 -> the bwsets clamp lowers the number but keeps (stop 2 reps short of failure)",
+  "anchor": "    return 'RPE 7'+(/^ \\(stop/.test(g)?' (leave 3 or more in reserve)':/^ \\(heaviest/.test(g)?' (leave ~3 in reserve)':' (leave ~3 reps in reserve)');\n",
+  "replacement": "    return 'RPE 7'+(/^ \\(stop/.test(g)?' (stop 2 reps short of failure)':/^ \\(heaviest/.test(g)?' (leave ~3 in reserve)':' (leave ~3 reps in reserve)');\n",
+  "gate": "gates/g229_d193_build.js",
+  "note": "NAMED TRIP: row d-BWSETS (tests/measure/v228_rulings/d193_caprpe_ruling.md original Sabotage S7 -> (d); tests/measure/v229_rulings/d194_injlens_ruling.md Sabotage: S7 as Amendments 1 and 4). Printed by builder at V229: 1,211 of 1,239 bwsets holds keep the forbidden gloss. EXPECTED: d-BWSETS only."
+ },
+ {
+  "name": "V229-S9-D193 R2 -> the loadCapped clamp keeps (heaviest pair you can find)",
+  "anchor": "    return 'RPE 7'+(/^ \\(stop/.test(g)?' (leave 3 or more in reserve)':/^ \\(heaviest/.test(g)?' (leave ~3 in reserve)':' (leave ~3 reps in reserve)');\n",
+  "replacement": "    return 'RPE 7'+(/^ \\(stop/.test(g)?' (leave 3 or more in reserve)':/^ \\(heaviest/.test(g)?' (heaviest pair you can find)':' (leave ~3 reps in reserve)');\n",
+  "gate": "gates/g229_d193_build.js",
+  "note": "NAMED TRIP: row d-LOADCAP (tests/measure/v228_rulings/d193_caprpe_ruling.md Amendment 1 section 8: S9 -> (d), (h); tests/measure/v229_rulings/d194_injlens_ruling.md Sabotage: S9 as Amendments 1 and 4). Printed by builder at V229: 310 of 310 loadCapped holds keep `heaviest pair`. Also h (0 of 2 heaviest-pair cards read the hold). EXPECTED: d-LOADCAP, h."
+ },
+ {
+  "name": "V229-S10-D193 R2 -> the wave clamp drops the number but keeps ~2 reps",
+  "anchor": "    return 'RPE 7'+(/^ \\(stop/.test(g)?' (leave 3 or more in reserve)':/^ \\(heaviest/.test(g)?' (leave ~3 in reserve)':' (leave ~3 reps in reserve)');\n",
+  "replacement": "    return 'RPE 7'+(/^ \\(stop/.test(g)?' (leave 3 or more in reserve)':/^ \\(heaviest/.test(g)?' (leave ~3 in reserve)':g);\n",
+  "gate": "gates/g229_d193_build.js",
+  "note": "NAMED TRIP: row d-WAVE (tests/measure/v228_rulings/d193_caprpe_ruling.md Amendment 1 section 8: S10 -> (d), (e'); tests/measure/v229_rulings/d194_injlens_ruling.md Sabotage: S10 as Amendments 1 and 4). Printed by builder at V229: 2 of 2 held wave texts keep `~2 reps` / `~1 rep`. EXPECTED: d-WAVE only."
+ },
+ {
+  "name": "V229-S14-D193 R7 -> the fifth shape is number-only: a held test keeps the heavy-set baseline words at RPE 7",
+  "anchor": "  if(/^Work up to one heavy set of 3 to 5 reps at RPE [\\d.]+\\. Technique stays crisp\\. No grinding\\. Log the weight and the reps\\. That set is your new baseline\\.$/.test(d)) return INJ_HELD_TEST;\n",
+  "replacement": "",
+  "gate": "gates/g229_d193_build.js",
+  "note": "NAMED TRIP: row j (tests/measure/v228_rulings/d193_caprpe_ruling.md Amendment 2 S14 and Amendment 4: (j) 30; tests/measure/v229_rulings/d194_injlens_ruling.md Sabotage: S14 -> (j) 30, (o) R7 row). Printed by builder at V229: R7 on 0 of 30 held test cards, number-only 30. Also g229_d194_lens o (strength W6 thu). EXPECTED: j only."
+ },
+ {
+  "name": "V229-S15-D193 R7 -> the fifth shape is applied regardless of cap: an unheld test card prints the held-test words",
+  "anchor": "      if(pat&&P.cap.has(pat)&&detail) detail=/RPE/.test(detail)?_capRpeClamp(detail):detail+INJ_CAP_CUE;   // V229 D193 (R2, R7)\n",
+  "replacement": "      if(pat&&P.cap.has(pat)&&detail) detail=/RPE/.test(detail)?_capRpeClamp(detail):detail+INJ_CAP_CUE;   // V229 D193 (R2, R7)\n      else if(detail&&/^Work up to one heavy set of 3 to 5 reps at RPE [\\d.]+\\. /.test(detail)) detail=INJ_HELD_TEST;\n",
+  "gate": "gates/g229_d193_build.js",
+  "note": "NAMED TRIP: row j (tests/measure/v228_rulings/d193_caprpe_ruling.md Amendment 2 S15 -> (b), (j); tests/measure/v229_rulings/d194_injlens_ruling.md Sabotage: S15 -> (b), (j)). Printed by builder at V229: unheld test cards byte-identical to V228 36 of 102. Also b (outside 1,017 of 1,053). EXPECTED: j, b."
+ },
+ {
+  "name": "V229-S17-D193 R7 -> the stripper does not map R7's held-test text back to the test",
+  "anchor": "if(/^Work up to one working set of 3 to 5 reps at RPE [\\d.]+\\. Technique stays crisp\\. No grinding\\. Log the weight and the reps\\. Your injury plan holds this lift, so there is no new baseline here\\.$/.test(d)) return TEST_RX_TEXT; ",
+  "replacement": "",
+  "gate": "gates/g229_d193_build.js",
+  "note": "NAMED TRIP: row f (tests/measure/v228_rulings/d193_caprpe_ruling.md Amendment 3 S17; tests/measure/v229_rulings/d194_injlens_ruling.md Sabotage: S17 -> (f)). Printed by builder at V229: _stripCapCue(INJ_HELD_TEST) WRONG, 2 hand strings wrong. EXPECTED: f only."
+ },
+ {
+  "name": "V229-S11-D193 R3 -> the live carry reads the clamped card, not the kept dose beneath it",
+  "anchor": "  const _base=_stripCapCue((typeof item._preHold==='string')?item._preHold:_wasDetail);\n",
+  "replacement": "  const _base=_stripCapCue(_wasDetail);\n",
+  "gate": "gates/g227_d190_seam.js",
+  "note": "NAMED TRIP: row a-U (tests/measure/v228_rulings/d193_caprpe_ruling.md Amendment 2 S11 -> (i) 5,840, a V230 row per tests/measure/v229_rulings/d194_injlens_ruling.md R3'; at V229 the shipped trip is D190's live == boot row, which tests/measure/v229_rulings/d194_injlens_ruling.md R4 names and M9 printed red on slice 1 alone, a-U 83 of 11,998, a-U' 1 of 326). Printed by builder at V229: a-U residue 83 of 11,998, a-U' created 1 of 326. EXPECTED: a-U, a-U'."
+ },
+ {
+  "name": "V229-S13-D193 R8 -> the hold sentence is dropped from the swap toast",
+  "anchor": "      ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'. Your injury plan holds this one at RPE 7.'\n      : _reRx\n      ? to+' in, '+from.toLowerCase()+' out. No load to add here. Your injury plan holds this one at RPE 7.'\n      : to+' in, '+from.toLowerCase()+' out. Same sets, same reps. Your injury plan holds this one at RPE 7.')\n",
+  "replacement": "      ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'.'\n      : _reRx\n      ? to+' in, '+from.toLowerCase()+' out. No load to add here.'\n      : to+' in, '+from.toLowerCase()+' out. Same sets, same reps.')\n",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: row G6a (tests/measure/v228_rulings/d193_caprpe_ruling.md Amendment 2 S13 -> (k), a V230 row per tests/measure/v229_rulings/d194_injlens_ruling.md R3'; at V229 G6a is re-keyed under D193 R8 per tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 (r): every moved toast ends in the hold sentence, count pinned). Printed by builder at V229: moved 1,243 (pin 1,243), not a hold variant on a hand clamp pair 1,243. EXPECTED: G6a only."
+ },
+ {
+  "name": "V229-S16-D193 R3 -> the kept pre-hold dose is printed as the card instead of the plan's held dose",
+  "anchor": "      if(_fi&&_fi.name===to){ _held=(/RPE/.test(_preF)&&_fi.detail!==_preF); item.detail=_fi.detail; }\n",
+  "replacement": "      if(_fi&&_fi.name===to){ _held=(/RPE/.test(_preF)&&_fi.detail!==_preF); item.detail=_preF; }\n",
+  "gate": "gates/g221_d177_swapfloor.js",
+  "note": "NAMED TRIP: rows G3a, G3c, G3d, G3e, G3f (tests/measure/v228_rulings/d193_caprpe_ruling.md Amendment 2 S16 -> (a) or (i); at V229 these D177 rows are re-keyed under D193 Amendment 4 per tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 (r) and read the dose beneath the hold). Printed by builder at V229: beneath-the-hold misses G3a 767, G3c 106, G3d 263, G3e 199, G3f 199. EXPECTED: G3a, G3c, G3d, G3e, G3f."
+ }
+]

@@ -446,3 +446,114 @@ HALF_MANNY 0ac7da6b1691a8e1 (unmoved) | uninjured 133/133 | uninjured live swap 
 2. **D192 P-UNDOKEY ships at V228** as re-ruled in `tests/measure/v228_rulings/d192_undokey_ruling.md`.
 3. **D193-HELDTEST: yes** (R7's text, held lifts only), for V229.
 4. **R8 hold toasts: ship as written**, for V229.
+
+---
+
+# D193 — Amendment 4: six M8 misses, every one a count or a gate-scope correction under the existing number; the toast trigger keys on the dose the clamp was handed; the undo-route shape difference is V222 note (3), not the hold
+
+Ruled on shipped V228 (HEAD 2c1a89c, `ia-version` 228) and measure's CF3 copy (`/private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/7d4ab7fc-ad06-4917-b0e4-faf3f7d43e66/scratchpad/measure/t_cf3.html`), 2026-10-02, V229 chat. Evidence: `/Users/CanasBangin/Desktop/TheBig6V2/tests/measure/v228_rulings/d193_caprpe_ruling.md` (all parts, Mario's round 2 at the tail) and `/Users/CanasBangin/Desktop/TheBig6V2/tests/measure/v229_rulings/measure_caprpe_cf3_v228.md` (M8; script `tests/measure/v229_caprpe_cf3.js`, output `tests/measure/v229_caprpe_cf3.out.txt`), both read in full, plus my own prints this session on V227, V228 and CF3 (scratch only: `/private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/7d4ab7fc-ad06-4917-b0e4-faf3f7d43e66/scratchpad/coach/a4.js`, output `a4.out.txt`; seed 76308, clock 2026-09-24, start 2026-08-24; measure's chain helpers required read-only). Everything quoted below was printed in this session unless marked "measure". **No new D-code and no new doctrine call.** R1 to R8 stand as Amendments 1 to 3 left them; one trigger sentence (R8) is restated to what Amendment 3 §1's oracle already says.
+
+## Finding
+
+None of the six is a defect in the clamp, the kept dose or the held test. Four are gate claims written at the wrong scope (1, 3, 4, 6), one is a pre-existing class the brief mis-attributed to the hold (2), and one is a population the rule already covers but R8's sentence did not (5). The kept dose closes both routes Amendment 3 named (measure: (i-r) 18,093/18,580, (i-u) live == boot 11,096/11,096, live == pre-hold carry 11,096/11,096). `HALF_MANNY` `0ac7da6b1691a8e1` on all three trees; uninjured 133/133 (measure).
+
+**Miss 1, (a″) is 72.** Printed on V228, the 72 lowback builds (protect + workaround × 4 equipment × 3 experience × 3 focus): filter-capped, final-uncapped cards 72, every one `Banded hip thrust>Burpees`, bodyweight tier only, protect 54 + workaround 18; by label Main 36, Leg superset B 24, Leg circuit 12; by kind cue 36, bwsets RPE>7 16, bwsets RPE≤7 20. The 20: 12 beginner Mains `3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 3 min rest` (W1–W2, three focuses, both tiers) and 8 prevention Mains at RPE 7. Amendment 1 §2's "52" subtracted the 20 Mains the clamp does not touch from a row whose definition does not ask about RPE. The definition stands; the number was wrong.
+
+**Miss 2, the undo-route shape difference is V222 note (3) and is identical on V227, V228 and CF3.** Printed, `hip_wa#801`, W5 thu, native `Step-ups (KB)` `2×10 each — hold RPE 7, three in the tank` (lunge, capped):
+```
+V228  hop1 -> 45° back extension  "2 sets — RPE 8 (stop 2 reps short of failure)"   toast "…No load to add here, so take the sets to the same effort."
+      hop2 -> Barbell hip thrust  "2 sets — RPE 8 (stop 2 reps short of failure)"   undo -> 45° back extension "2 sets — RPE 8 (…)"
+      hop3 -> Glute-ham raise     "2 sets — RPE 8 (stop 2 reps short of failure)"   boot same   direct native -> Glute-ham raise "2×10 each — hold RPE 7, three in the tank"
+CF3   hop1 -> 45° back extension  "2 sets — RPE 7 (leave 3 or more in reserve)"  kept "2 sets — RPE 8 (…)"   toast "…No load to add here. Your injury plan holds this one at RPE 7."
+      hop2 -> Barbell hip thrust  "2 sets — RPE 7 (…)"  kept "2 sets — RPE 8 (…)"   undo -> 45° back extension "2 sets — RPE 7 (…)" with "2 sets — RPE 8 (…)" beneath
+      hop3 -> Glute-ham raise     "2 sets — RPE 7 (leave 3 or more in reserve)"   boot same   direct "2×10 each — hold RPE 7, three in the tank"
+V227  the V228 shape with "two"; live == boot, live != direct on the same chain
+```
+The rep target dies at hop 1, where `_swapDetailFor` hands an unloadable 45° back extension to `_bwSetsFromDetail` (`2×10 each` → `2 sets — RPE 8`), and the sets-form then rides onto every later lift, loadable or not. That is V222 note (3) verbatim ("a rep target lost through an unloadable middle hop is never regained on a loadable end"), recorded in §12 since V222 and injury-blind. From the res_U dumps: 5,868 of 11,096 chains print live ≠ direct on V228 and on CF3, the same 5,868 ids on both trees, and 5,868/5,868 have a bwsets card at hop 1; of the 8,399 chains whose hop 1 is bwsets, the 2,531 that still equal the direct hop are those whose native was already bwsets (208) or whose direct hop converts too (native cue 1,660, grammar 663). The hold-sensitive comparator (live == pre-hold carry along the route) is 11,096/11,096 on CF3 and 3,701/11,096 on V228. So the claim D193 owns passes in full; the claim it does not own was never true and is not the hold's. Note in passing what CF3 does fix on this chain: on V228 a capped hinge (Glute-ham raise) prints RPE 8 when reached through a chain and RPE 7 when reached directly; on CF3 it prints 7 on every route.
+
+**Miss 3, (l) grew because Amendment 3 §2 made the prose hold recoverable.** Measure: G3a 832 = 529 hold-of-donor + 199 hold-of-window + 104 R7-native donors onto uncapped targets printing `_testRx`; G3e 202 = 177 + 25; G3c-off 168 = 89 + 79; G3d 263; G3f 199. Printed from the CF3 gate rows: 113 rows with D == R7 text land on uncapped targets and print `_testRx` (0 of them capped by the hand table; e.g. `knee/workaround W6 thu Barbell box squat -> Barbell Romanian deadlift`, toast "Same job, same numbers."), 71 land on capped targets and print R7's text (71/71 capped; toast "…Same sets, same reps. Your injury plan holds this one at RPE 7."). Amendment 2's (l) said "on uncapped targets byte-verbatim"; Amendment 3 §2 then ruled the carry reads beneath the prose hold, so the uncapped card is byte-verbatim to the donor read beneath its hold, not to the donor's text. The gate claim moves to the rule; the rule does not move. **G3c power:** HEAD's g221 reader already strips both wordings above 226 (`tests/gates/g221_d177_swapfloor.js` :155–156, `D190_CUE_RE = / — hold RPE 7, (?:two|three) in the tank$/`, shipped with R4 at V228). Measure: `G3c_pow_both` V228 0, CF3 0; the 118 exists only under the retired "two"-only reader. Amendment 2's "G3c power 118 to absorb" was absorbed at V228. V229 absorbs nothing there.
+
+**Miss 4, (k) INFO 458 is the capped-target figure; the all-target figure is P-BWBUCKET's population, now measured, and 4,736 of it is not a changed number.** Printed over the D177 L1 gate rows (150,068 per tree), predicate "card RPE ≠ donor RPE, toast claims same numbers or same effort, no hold toast": V228 7,648 (capped 728, uncapped 6,920); CF3 7,378 (capped 458, uncapped 6,920). The 270 that leave between the trees are the capped unloadable pairs with donors 8.5/9/9.5 (130 + 100 + 40) that CF3 clamps to 7 with the hold toast. Of the 7,648, **4,736 are `RPE 6–7` donors whose card reads RPE 6**, e.g. healthy beginner `Machine chest press -> Dips`, D `2×12 — RPE 6–7, leave 3+ in reserve — 3 min rest, focus on form`, O `2 sets — RPE 6 (leave 3 or more in reserve)`, toast "…so take the sets to the same effort." A card inside the range the donor named is the same effort; the reader did not change a number, it picked one the donor allowed, and the reserve words agree (3+ ↔ 3 or more). Outside the donor's range: **2,912 on V228 (capped 728, uncapped 2,184), 2,642 on CF3 (capped 458, uncapped 2,184)**. Uncapped split (both trees): 6.5→6 1,009, 7.5→7 186, 8.5→8 451, 9→8 374, 9.5→8 164. The 9→8 rows are the ones with teeth (e.g. healthy hypertrophy W6 `Close-grip bench press -> Dips`, D `5×10 — RPE 9 (leave ~1 rep in reserve), last set AMRAP — log it…`, O `4 sets — RPE 8 (stop 2 reps short of failure)`, toast "same effort"); they are cap-blind and V227-identical, P-BWBUCKET as parked.
+
+**Miss 5, the 196 are inside the rule; R8's sentence was narrower than its oracle, and V228's toast on them is false today.** Printed, `hip_wa#1199`, W5 thu, native `Barbell good mornings` `2×8 — hold RPE 7, three in the tank`, hop1 → Glute-ham raise (cue carried), hop2 → Nordic hamstring curl (anchored), unloadable, hinge capped:
+```
+V228  card "2 sets — RPE 8 (stop 2 reps short of failure)"   toast "Nordic hamstring curl (anchored) in, glute-ham raise out. No load to add here, so take the sets to the same effort."
+CF3   card "2 sets — RPE 7 (leave 3 or more in reserve)"  kept "2 sets — RPE 8 (…)"   toast "Nordic hamstring curl (anchored) in, glute-ham raise out. No load to add here. Your injury plan holds this one at RPE 7."
+```
+On V228 the donor card said RPE 7 and the new card says 8, so "same effort" is a lie; this is the class (iii) hole R2 closes. On CF3 both sentences are true (7 → 7). Which one the rule calls for: the stripper reads beneath the cue (`2×8`), the reader guesses 8, the clamp writes 7. The number on the new card came from the plan, not from the carry, and the new card no longer shows a cue: its hold is written as a plain `RPE 7`. The toast is the only place this card's hold is named. That is the same reasoning Amendment 3 §2 used for the 71 R7-native donors onto capped targets (stripped to the RPE 9 test, re-held, hold toast "true: one working set, 3 to 5 reps, held"), and the same predicate Amendment 3 §1 typed into the (k) oracle ("hand-bucketed converted-donor RPE > 7 … no-RPE unloadable donors bucket to 8 per the reader rule"). The 196 were simply never on the L1 lattice (measure: "donor names none (cued/bare onto unloadable) 0" there). D190 R4 is untouched: a cue appended to a dose that names no RPE (`2×10` → `2×10 — hold RPE 7, three in the tank`) fires no clamp and keeps "Same job, same numbers." (the 14 cue ends of the same 210 pairs).
+
+**Miss 6, labels.** Measure's by-name counts on the D177 L1 lattice (CF3 vs V227, totals unchanged at 2,247): clamp bwsets 439 = Split squat 116, Banded hip thrust 108, Squat (slow 3s tempo) 94, Dumbbell goblet squat 67, 45° back extension 28, Single-leg hip thrust 26; clamp grammar `@ RPE 8` → `@ RPE 7` 130 = Reverse lunge (KB) 56, Dumbbell row 46, Single-leg hip thrust 28; Burpees Mains 56 = 54 clamp + 2 R7; R7 text 28; literal 1,594. Amendment 2's "Squat (slow 3s tempo) 277, Banded hip thrust 134, Dumbbell row 74" and its per-equipment attributions are withdrawn.
+
+## The rules (restated where a sentence was wrong; nothing Mario approved moves)
+
+- **R8 trigger (restated).** The hold toast fires when the clamp changed the RPE of the dose it was handed: the donor read beneath its hold (`_stripCapCue`), converted for the target where the target is unloadable (`_bwSetsFromDetail`'s bucket). "An RPE the donor named" is retired from R8's sentence; the three strings and D190 R4 are unchanged. Measure's siting (`_held = /RPE/.test(_preF) && output !== _preF`) implements exactly this. Expected populations: L1 rows 1,243 (unchanged); L9 class (iii) pairs 196 hold toasts (V228: 196 "same effort" toasts on cards reading 8).
+- **(i-u) claim (narrowed).** D193 claims live == boot == pre-hold carry along the route on every chain (11,096/11,096). "== direct" is asserted only where no intermediate is unloadable; where one is, the difference is V222 note (3), pinned as INFO at 5,868 on V228 and CF3 (same ids), not to grow.
+- **(k) INFO (scoped).** The 458 is the capped-target row (V228 and CF3). The all-target row is P-BWBUCKET's population and reads a range donor as unchanged when the card lies inside the range: 2,912 on V228, 2,642 on CF3.
+- **(a″) definition unchanged, figure 72.**
+- **(l) predicate (as Amendment 3 §2 implies).** On uncapped targets the card equals the donor read beneath its hold by the hand stripper (both cue wordings; R7 text → `_testRx` text), byte-verbatim after that. On capped targets the card equals the hand hold applied to the stripped donor (number 7, gloss by shape per Amendment 1 §3, R7 text for the test prose, rep token unchanged).
+
+## Corrected gate claims (V228 | CF3; keyed on today's `ia-version`, REFUSE below 229; each row named here must fail on V228 at the stated figure or carry a conjunct that does)
+- **(a)** 316 → 0 on L432; `home_basic` 120 → 0. Unchanged. **(a′)** INFO 4 | 4. **(a″)** INFO **72 | 72** (36 Mains + 36 accessories, lowback/protect 54 + lowback/workaround 18, all `Banded hip thrust>Burpees`); the 16 Mains above 7 inside it are part of (a)'s 316.
+- **(e)** unchanged (196/210 read 8 → 0; live == boot 210/210 both trees). **Gains (k″):** the 196 bwsets ends print the unloadable hold toast (V228 0, and V228's "same effort" on them is false); the 14 cue ends print "Same job, same numbers." (D190 R4).
+- **(e′)** unchanged (114 → 0; 52/118 → 0; wave 20 → 0 with hold toasts 20/20).
+- **(i)** unchanged (residue 487 by id). **(i-r)** live == boot == in-session end 18,093/18,580 on both trees; because that conjunct also passes on V228, the row carries "rebooted slot carries the kept dose 18,580/18,580" (V228 0) and "every capped end equals the hand hold" (V228 fails on the ends above 7). **(i-u)** live == boot 11,096/11,096 (both trees); live == pre-hold carry **3,701 | 11,096**; undone card carries the kept dose **0 | 11,096**; live == direct asserted on the hand-defined subset with no unloadable intermediate; INFO complement **5,868 | 5,868**, V222 note (3). Hand rows: mario W5 thu undo route (hop3 Barbell hip thrust `2×6–10 @ RPE 8` == boot == direct, measure CF3; V228 same text because nothing is clamped there, so the discriminating conjunct is the kept dose on the undone card: V228 null, CF3 `2×6–10 @ RPE 8`).
+- **(j)** build 30 / 0 number-only / 102/102 / 0 uninjured; live R7 on 127 (56 TEST9 donors + 71 R7 natives), 113 R7-donor rows onto uncapped targets print `_testRx` byte-identical to V227 with "Same job, same numbers." Unchanged from Amendment 3 (measure reproduces all).
+- **(k)** 1,243 hold variants (verbatim 684, unloadable 360, window 199), 0 false claims, 0 hold toasts off the clamp set, non-clamp toasts == V227 148,825/148,825. **INFO capped 458 | 458.** **INFO all targets (P-BWBUCKET, range-aware) 2,912 | 2,642**; the raw predicate 7,648 | 7,378 may be printed beside it but is not the pin.
+- **(l)** per the predicate above. Rows to absorb on CF3 with the V228 figure 0: G3a 832, G3d 263, G3e 202, G3f 199, G3c-off 168. **G3c power 0 | 0**; the 118 line is deleted from the claim.
+- **(f), (b), (c), (d), (g), (h)** unchanged. (b) still pins: uninjured object row 27/27, no `_preHold` on uninjured programs (measure 0).
+- **INFO P-HOLDBENEATH:** 1,510 bwsets natives onto uncapped targets carry the held 7 (measure); 0 R7 rows on uncapped targets (the prose leaves the class, as Amendment 3 ruled).
+- **Drop from D193's list:** Amendment 3 §4's INFO "~1,500 chains where undo does not restore the pre-last-hop card": measure reads 18,580/18,580 restored on V228 and CF3 since D192; D192's gate owns the chip.
+
+## Sabotage
+S2 → (a) 316 (as Amendment 1). S14 → (j) **30** + 56 (not 28). S17 → (j) 113, (k) 71 (unchanged). S19 and S20 trip the narrowed (i-u): the pre-hold comparator and the mario hand row (CF2's delete-on-undo printed Barbell hip thrust 7 vs 8 vs 8 there). **S22 (new):** R8 trigger keyed on the donor card as read (cue counted as RPE 7) instead of the converted dose → (k″) 196 and (k) 71 lose the hold toast. No spec changes for misses 1, 3, 4, 6; they are claim figures, not mutations.
+
+## Parked-line changes (replace the prior text)
+- **P-BWBUCKET:** population measured on the D177 L1 rows (V228). Raw predicate 7,648; 4,736 are `RPE 6–7` donors landing at RPE 6, inside the donor's range, not this class. Outside the range 2,912: capped 728 (458 at 6.5→6 and 7.5→7, which stay; 270 at 8.5/9/9.5→8, which V229 clamps to 7 with the hold toast) and uncapped 2,184 (6.5→6 1,009, 7.5→7 186, 8.5→8 451, 9→8 374, 9.5→8 164). Cap-blind, V227-identical. After P-BWFALLBACK.
+- **V222 note (3)** gains: on the D190 lattice undo route, 5,868 of 11,096 chains end on a loadable lift with a sets-only dose because hop 1 was unloadable; same ids on V228 and CF3; V229's hold rides it correctly (`hip_wa#801` Glute-ham raise `2 sets — RPE 7 (leave 3 or more in reserve)`, toast "Same sets, same reps. Your injury plan holds this one at RPE 7." on a card that prints no reps). The toast string is not reopened; the sets-only dose on a loadable lift is the defect.
+- **P-HOLDBENEATH:** INFO 1,510 on the L1 rows (number clamp only).
+- **P-BWFALLBACK:** (a″) is 72 (36 Mains, 16 of them clamped by V229; 36 accessories), expected 0 when the fallback's pattern is `hip_ext`.
+- **P-FILTERLAST, P-ADDSEAM:** unchanged.
+
+## M8's UNKNOWNs: none blocks builder
+Travel overlay (h): ruled in Amendment 1 §4/§7, V228 figure read on the gate's own previous-version run, parks if it cannot pass. Other seeds: fuzz row. Deeper (i-u) shapes: one rule (restore from the record), proven on 11,096 one-undo chains; gatekeeper adds one hand row (mario W5 thu, hop1 → hop2 → hop3 → undo → undo → hop4) that parks under standing ruling 7 if it cannot pass. Hist and past-week days: D181 R5 never replays a hist-restored day, so the kept dose on the hist item is the only carry source there and measure printed it riding (`ia_hist_PM w5_thu … "_preHold":"2×6–10 @ RPE 8"`, hop3 == boot); hand row, not a blocker. Add path: P-ADDSEAM, not this build. S11–S21: gatekeeper's step on the built artifact, after builder by definition.
+
+## Siting: one conflict, one note
+- **Conflict, siting #2.** The stripper maps R7 by exact string equality. R4's rule, extended to the fifth shape by Amendment 3 §2, is "by shape, not by today's spelling": the day R7's words are re-worded, every stored card carrying the old prose would ride onto an uncapped lift as prose (the Amendment 3 §2 defect returning) and the clamp's regex would not see it either. Recommend the stripper match the R7 shape (its fixed clauses with the number free), the same form `_capRpeClamp` already uses for `_testRx`. Counter: exact equality can never false-strip and no retired R7 wording exists today; acceptable for V229 only with a gate row pinning `_stripCapCue(INJ_HELD_TEST) === _testRx`, which (f) already carries.
+- **Note, siting #1.** `_TEST_RX_TEXT` duplicates `_testRx`'s literal; prefer builder's alternative (hoist one text, `_testRx` reads it) so the gate's oracle has one string to pin. Not a rule conflict.
+- #3 to #8 are consistent with Amendment 3 §4 (build path never writes the dose; undo restores from the record or deletes; injury guard; `ph` only when the from-card kept one). #5 implements the restated R8 trigger as-is.
+
+## Before (printed this session, V228 shipped)
+```
+hip_wa#801 undo route  hop3 Glute-ham raise "2 sets — RPE 8 (stop 2 reps short of failure)" == boot | direct "2×10 each — hold RPE 7, three in the tank"   (capped hinge at 8 through the chain, 7 direct)
+hip_wa#1199 hop2 Nordic hamstring curl  "2 sets — RPE 8 (stop 2 reps short of failure)"  toast "…No load to add here, so take the sets to the same effort."   (donor said RPE 7: false)
+(a″) lowback 72 builds: 72 = Main 36 (16 RPE>7, 20 ≤7) + Leg superset B 24 + Leg circuit 12, all Banded hip thrust>Burpees, bodyweight
+(k) INFO all targets 7648 (capped 728, uncapped 6920) | inside donor range (6–7 -> 6) 4736 | outside 2912
+(i-u) live!=direct 5868/11096, all hop1 bwsets | live==pre-hold 3701 | kept dose on undone card 0
+G3c power (HEAD reader, both wordings) 0 | measure: G3a 0, G3d 0, G3e 0, G3f 0, G3c-off 0
+HALF_MANNY 0ac7da6b1691a8e1
+```
+
+## After (CF3 printed; expected at V229)
+```
+hip_wa#801 undo route  hop3 Glute-ham raise "2 sets — RPE 7 (leave 3 or more in reserve)" == boot | kept "2 sets — RPE 8 (…)" | direct "2×10 each — hold RPE 7, three in the tank"   (live==pre-hold 11096/11096; the shape gap is V222 note (3), INFO 5868)
+hip_wa#1199 hop2 Nordic hamstring curl  "2 sets — RPE 7 (leave 3 or more in reserve)"  kept "2 sets — RPE 8 (…)"  toast "…No load to add here. Your injury plan holds this one at RPE 7."   (196 such on L9)
+(a″) 72 unchanged (16 of its Mains now at 7, inside (a)'s 316 -> 0)
+(k) 1243 hold variants, 0 false claims | INFO capped 458 | INFO all targets 2642 (raw 7378)
+(l) G3a 832, G3d 263, G3e 202, G3f 199, G3c-off 168 under the beneath-the-hold predicate, 0 fails | G3c power 0
+(j) 30 / 0 / 102/102 / 0 ; live 127, 113 uncapped print _testRx verbatim
+HALF_MANNY 0ac7da6b1691a8e1 (unmoved) | uninjured 133/133
+```
+
+## Mario
+Nothing reaches him. The clamp, the kept dose, D193-HELDTEST's words and the three R8 strings are exactly what he approved in round 2. The one item that looked like his, which toast the 196 cued-to-unloadable swaps get, is a scope correction under R8's own definition: the strings do not change, the plan did write the number on those cards, and V228's current sentence on them is false. For the session report: the corrected figures are (a″) 72, (k) INFO 458 capped and 2,642 all-target, (l) 832/263/202/199/168 with G3c power already 0 since V228, and the 5,868 undo-route shape differences are the V222 note (3) class, identical on V228.
+
+**Recommendation:** Builder proceeds on CF3's shape with the corrected claims above (no code change to the clamp, kept dose or toasts beyond measure's surgery), the stripper matching R7 by shape rather than exact text, S14 at 30, S22 added, and the (i-u) and (i-r) rows carrying a kept-dose conjunct so each fails on V228.
+
+**Counter:** Key R8 on the donor card as the athlete read it (the cue counting as RPE 7), which returns the 196 and the 71 to the generic toast and makes 1,243 into 1,172; rejected because the number on those cards came from the plan and the card no longer shows a cue, so the hold toast is the only place the hold is named, and Amendment 3 already ruled the 71 that way.
+
+---
+
+## Session decisions (V229 chat, 2026-10-02) — main session record, not coach text
+- **Siting #2 (stripper):** take coach's recommendation. `_stripCapCue` recognises R7's text by shape (fixed clauses, number free), not by exact equality, and returns the one hoisted `_testRx` text.
+- **Siting #1 (shared text):** one hoisted text. `_testRx` reads a top-level constant; the stripper returns that constant; no duplicated literal.
+- Nothing reached Mario (coach: "Nothing reaches him"); Amendment 4 is a count and scope correction under D193 as approved in round 2.

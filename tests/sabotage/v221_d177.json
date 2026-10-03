@@ -50,17 +50,17 @@
  },
  {
   "name": "S2-D177 R4 -> undoSwap finds the stored item but never writes the detail back",
-  "anchor": "if(it){it.detail=p.d;_put.push(it);}",
-  "replacement": "if(it){_put.push(it);}",
+  "anchor": "if(it){it.detail=p.d;if(typeof p.ph==='string') it._preHold=p.ph; else delete it._preHold;_put.push(it);}",
+  "replacement": "if(it){if(typeof p.ph==='string') it._preHold=p.ph; else delete it._preHold;_put.push(it);}",
   "gate": "gates/g221_d177_swapfloor.js",
-  "note": "NAMED TRIP: G5a, G5b, G5c. The record still carries rx, so only the restore is under test."
+  "note": "NAMED TRIP: G5a, G5b, G5c. The record still carries rx, so only the restore is under test. V229 re-anchor: slice 3 (D193 Amendment 3 §4, D194 Amendment 1 R6) widened this restore to write the kept dose beside the detail (`if(typeof p.ph==='string') it._preHold=p.ph; else delete it._preHold;`), so the old anchor counts 0 on the V229 candidate; the mutation now drops only `it.detail=p.d;` and leaves the kept-dose restore as slice 3 wrote it, so the detail write is still the one thing under test. Printed by builder 2026-10-03 on the V229 candidate (d854af0a91f8, base_v228 as argv[3]): G5a 27,456 of 150,068 not identical, G5b, G5c; g221 PASS 17 FAIL 3 (unmutated 20/0)."
  },
  {
   "name": "S1-D177 R5 -> the third toast branch is dropped: a windowed swap says 'No load to add here'",
-  "anchor": "showToast(_rx.win",
-  "replacement": "showToast(false",
+  "anchor": "  showToast(_held\n    ? (_rx.win\n      ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'. Your injury plan holds this one at RPE 7.'\n      : _reRx\n      ? to+' in, '+from.toLowerCase()+' out. No load to add here. Your injury plan holds this one at RPE 7.'\n      : to+' in, '+from.toLowerCase()+' out. Same sets, same reps. Your injury plan holds this one at RPE 7.')\n    : _rx.win\n",
+  "replacement": "  showToast(_held\n    ? (false\n      ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'. Your injury plan holds this one at RPE 7.'\n      : _reRx\n      ? to+' in, '+from.toLowerCase()+' out. No load to add here. Your injury plan holds this one at RPE 7.'\n      : to+' in, '+from.toLowerCase()+' out. Same sets, same reps. Your injury plan holds this one at RPE 7.')\n    : false\n",
   "gate": "gates/g221_d177_swapfloor.js",
-  "note": "NAMED TRIP: G1b (toast), G6a (third toast 0 vs hand window), G7-2a."
+  "note": "NAMED TRIP: G1b (toast), G6a (third toast 0 vs hand window), G7-2a. V229 re-anchor: slice 2 (D193 R8) wrapped this toast as `showToast(_held ? (…hold variants…) : _rx.win …`, so the window test now appears twice and the old anchor counts 0 on the V229 candidate; the mutation sets both window tests (the hold variant's and the plain one) to false, so a windowed swap falls to the 'No load to add here' branch on either side. Printed by builder 2026-10-03 on the V229 candidate (d854af0a91f8, base_v228 as argv[3]): G1b (toast `… No load to add here, so take the sets to the same effort.`), G6a (third toast 0 vs hand window 5,984), G7-2a; g221 PASS 17 FAIL 3 (unmutated 20/0)."
  },
  {
   "name": "S1-D177 R5 -> out.win is set whenever the candidate has any floor row: the third toast fires on [0,0] and at-floor pairs",

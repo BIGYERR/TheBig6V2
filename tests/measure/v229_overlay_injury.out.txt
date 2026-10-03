@@ -1,0 +1,287 @@
+TREES V227 c9069fe64113 ia-version 227 | V228 a53d3ea6c8d2 ia-version 228 | SL2 e5ade9595b39 ia-version 228 | CF3 caa16e0c6902 ia-version 228 | working index.html e5ade9595b39
+
+[1] V228 comment-stripped sites with an injury write shape (=, key:, delete, ['injury']): 7
+    15266 [paceShiftMap:15254] const P=injuryPlan({injury:{region:inj.region,tier:inj.tier}});
+    15418 [overlayBackCopy:15409] const OVERLAY_TYPE_LABEL={substitute:'TRAVEL',injury:'INJURY',reduce:'LESS TIME',suspend:'SUSPENDED'};
+    15660 [applyInjuryDraft:15654] const ov={id:'ov_'+Date.now(),type:'injury',from,to:null,patch:{injury:{region:R,tier:T}},note:'',created:Date.now()};
+    15682 [imBackFromInjury:15674] patch:{injury:{region,tier:'workaround',bridge:true}},note:'',created:Date.now()});
+    15687 [imBackFromInjury:15674] const _pw=injuryPlan({injury:{region,tier:'workaround'}});
+    15688 [imBackFromInjury:15674] const _pp=injuryPlan({injury:{region,tier:'protect'}});
+    15693 [imBackFromInjury:15674] patch:{injury:{region,tier:'workaround',halfstep:true}},note:'',created:Date.now()+1});
+[2] V228 comment-stripped cfg.injury reads: 14 -> 7375 [deconflictAdjacentDupes:7310], 7951 [injuryPlan:7950], 8088 [_injViewName:8088], 8544 [_bwRung:8412], 8969 [buildSections:8924], 9360 [buildSections:8924], 9480 [buildSections:8924], 9508 [buildSections:8924], 9849 [auxSwapCandidates:9839], 9968 [_swapInjuryOK:9967], 10323 [applySessionSwaps:10308], 10928 [engineD_synthesis:10849], 10947 [engineD_synthesis:10849], 14303 [applySwapChoice:14274]
+    buildProgram spans lines 11207-11215
+    reader fn deconflictAdjacentDupes | called inside buildProgram body: false | call sites 1: 10962<engineD_synthesis>
+    reader fn injuryPlan | called inside buildProgram body: false | call sites 9: 5489<getSessionTypes> 7819<injurySweepCardio> 8097<applyInjuryFilter> 8153<injuryDayTitle> 8184<engineC_kinematics> 8454<_bwRung> 15266<paceShiftMap> 15687<imBackFromInjury> 15688<imBackFromInjury>
+    reader fn _injViewName | called inside buildProgram body: false | call sites 6: 9131<buildSections> 9135<buildSections> 9173<buildSections> 9174<buildSections> 9237<buildSections> 9240<buildSections>
+    reader fn _bwRung | called inside buildProgram body: false | call sites 1: 8422<_bwRung>
+    reader fn buildSections | called inside buildProgram body: false | call sites 1: 10910<engineD_synthesis>
+    reader fn auxSwapCandidates | called inside buildProgram body: false | call sites 1: 14222<openSwapSheet>
+    reader fn _swapInjuryOK | called inside buildProgram body: false | call sites 4: 7354<deconflictAdjacentDupes> 9851<auxSwapCandidates> 9997<addCandidates> 10084<swapCandidates>
+    reader fn applySessionSwaps | called inside buildProgram body: false | call sites 1: 16036<refreshProgram>
+    reader fn engineD_synthesis | called inside buildProgram body: true | call sites 1: 11213<buildProgram>
+    reader fn applySwapChoice | called inside buildProgram body: false | call sites 1: 14207<_swapRow>
+[5] V228 refreshProgram order: buildProgram(prog.cfg) 15827 | applyOverlays 15841 | freeze _pierce 15975 | applyRestDayMoves 16022 | applySessionSwaps 16036 | pruneDayEdits 16043
+
+[1] SL2 comment-stripped sites with an injury write shape (=, key:, delete, ['injury']): 7
+    15303 [paceShiftMap:15291] const P=injuryPlan({injury:{region:inj.region,tier:inj.tier}});
+    15455 [overlayBackCopy:15446] const OVERLAY_TYPE_LABEL={substitute:'TRAVEL',injury:'INJURY',reduce:'LESS TIME',suspend:'SUSPENDED'};
+    15697 [applyInjuryDraft:15691] const ov={id:'ov_'+Date.now(),type:'injury',from,to:null,patch:{injury:{region:R,tier:T}},note:'',created:Date.now()};
+    15719 [imBackFromInjury:15711] patch:{injury:{region,tier:'workaround',bridge:true}},note:'',created:Date.now()});
+    15724 [imBackFromInjury:15711] const _pw=injuryPlan({injury:{region,tier:'workaround'}});
+    15725 [imBackFromInjury:15711] const _pp=injuryPlan({injury:{region,tier:'protect'}});
+    15730 [imBackFromInjury:15711] patch:{injury:{region,tier:'workaround',halfstep:true}},note:'',created:Date.now()+1});
+[2] SL2 comment-stripped cfg.injury reads: 14 -> 7375 [deconflictAdjacentDupes:7310], 7951 [injuryPlan:7950], 8088 [_injViewName:8088], 8566 [_bwRung:8434], 8991 [buildSections:8946], 9382 [buildSections:8946], 9502 [buildSections:8946], 9530 [buildSections:8946], 9871 [auxSwapCandidates:9861], 9990 [_swapInjuryOK:9989], 10345 [applySessionSwaps:10330], 10950 [engineD_synthesis:10871], 10969 [engineD_synthesis:10871], 14332 [applySwapChoice:14296]
+    buildProgram spans lines 11229-11237
+    reader fn deconflictAdjacentDupes | called inside buildProgram body: false | call sites 1: 10984<engineD_synthesis>
+    reader fn injuryPlan | called inside buildProgram body: false | call sites 9: 5489<getSessionTypes> 7819<injurySweepCardio> 8119<applyInjuryFilter> 8175<injuryDayTitle> 8206<engineC_kinematics> 8476<_bwRung> 15303<paceShiftMap> 15724<imBackFromInjury> 15725<imBackFromInjury>
+    reader fn _injViewName | called inside buildProgram body: false | call sites 6: 9153<buildSections> 9157<buildSections> 9195<buildSections> 9196<buildSections> 9259<buildSections> 9262<buildSections>
+    reader fn _bwRung | called inside buildProgram body: false | call sites 1: 8444<_bwRung>
+    reader fn buildSections | called inside buildProgram body: false | call sites 1: 10932<engineD_synthesis>
+    reader fn auxSwapCandidates | called inside buildProgram body: false | call sites 1: 14244<openSwapSheet>
+    reader fn _swapInjuryOK | called inside buildProgram body: false | call sites 4: 7354<deconflictAdjacentDupes> 9873<auxSwapCandidates> 10019<addCandidates> 10106<swapCandidates>
+    reader fn applySessionSwaps | called inside buildProgram body: false | call sites 1: 16073<refreshProgram>
+    reader fn engineD_synthesis | called inside buildProgram body: true | call sites 1: 11235<buildProgram>
+    reader fn applySwapChoice | called inside buildProgram body: false | call sites 1: 14229<_swapRow>
+[5] SL2 refreshProgram order: buildProgram(prog.cfg) 15864 | applyOverlays 15878 | freeze _pierce 16012 | applyRestDayMoves 16059 | applySessionSwaps 16073 | pruneDayEdits 16080
+
+[1] history: 77 distinct .html blobs, ia-versions 81..228 (+7 unversioned) | first blob reading cfg.injury v98 | blobs with a non-overlay injury write shape: 2 -> v0 b1f34ca8 "index.html" cfg.injury-read:false overlay-type- ; v0 dbc1b52d "iron_asylum_v3.html" cfg.injury-read:false over
+    versions present 0,81,83,86,88,98,99,100,102,103,104,108,109,112,130,132,133,142,146,151,155,160,164,165,172,180,182,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228
+
+[1] handoff lines with Mario + injury + own/his/live/device: 35
+    8: - **Working file:** `index.html` — **V228**; `<meta name="ia-version">`=**228**. Built in order after V227. **V228 BUILT D193 P-CAPRPE's wording half (Mario split the ruling) and D192 P-UNDOKEY.** The injury hold cue now
+    10: - **D-CODE REGISTRY (read before issuing any D-code): highest assigned = D193. Next free = D194.** (V228 session issued D193 P-CAPRPE (a capped pattern never prints above RPE 7: the cue says "three in the tank", `applyIn
+    12: - **Most recent work (V228): D193 P-CAPRPE ruled, re-ruled three times and split; its wording half and D192 P-UNDOKEY built; one proof.** Measure's before-picture on V227 (`tests/measure/v228_rulings/measure_caprpe_v227.
+    16: - **Prior work (V227): §12 (C) built as D190, one ruling, two measure-driven re-rulings, eleven slices, one proof.** Measure proved Mario's W5 case on V226 (`tests/measure/v227_rulings/measure_swapseam_v226.md`): 68 of 3
+    34: - **Prior work (V222): build 2b of the held triage queue, one ruling, two measure-driven re-rulings, one proof.** P-SWAPDURABLE (ruled mid-V221, held by Mario to lead V222) re-baselined on V221 (`tests/measure/v222_swapd
+    38: - **Prior work (V220): build 1 of the held triage queue, four zero-engine rulings, one proof.** A triage chat (2026-09-22 to 24) ruled 12 fixes from Mario's screenshot backlog against V206 to V209 and built nothing; the 
+    58: - **Prior work (V210): the equipment the athlete owns is the only equipment the app prescribes.** The equipment ruling (D70c) re-measured on V209: every anchor still held and the counterfactual took every denial to 0 of 
+    62: - **Prior work (V208): the engine stops reading the words on the card.** Opened as the D103a/D104a/D140 version; ended as D103a + D104a + a V207 fix-forward, with D140 split out by Mario after measure showed its shared-p
+    74: - **Prior work (V202): the NSW test-goal run path, and the discovery that there are TWO Physical Training Guides.** Reported: the run path is off doctrine on Mario's live program (seed 24865, 5 train days, event 4 weeks 
+    86: - **Prior work (V198): D85 — the budget may not spend the day's last posterior chain item.** ONE ENGINE LINE, and it took three gatekeeper passes and two coach rulings to earn it. V197's gatekeeper had found 186 posterio
+    94: - **Prior work (V194): D53 + D54 + D55 — the implement claim the app could not back, and the gate that had been lying for two versions.** Mario, off a device screenshot of the Progress tab: *"the commentary as 'up 20lbs 
+    97: - **Prior work (V192): D41 + D42 + D43 — three movements the pool never had, and the latch that shipped with them.** Mario sent a screenshot of a Meta AI list of six exercises and asked whether they belonged in the pool 
+BASELINE self V228 CFG weeks equal true (22995 bytes) | stored record equal after clock strip: true
+BASELINE self V228 OV weeks equal true (23927 bytes) | stored record equal after clock strip: true
+BASELINE self SL2 CFG weeks equal true (22995 bytes) | stored record equal after clock strip: true
+BASELINE self SL2 OV weeks equal true (23927 bytes) | stored record equal after clock strip: true
+PRESENTATION V228 mario: OV stored cfg.injury undefined overlays [{"type":"injury","from":"2026-09-21","to":null,"patch":{"injury":{"region":"knee","tier":"workaround"}}}] | live activeProg.cfg.injury CFG "{\"region\":\"knee\",\"tier\":\"workaround\"}" OV "null"
+    days differing CFG vs OV by week {"1":"2/7","2":"2/7","3":"3/7","4":"3/7","5":"5/7","6":"5/7"}
+PRESENTATION SL2 mario: OV stored cfg.injury undefined overlays [{"type":"injury","from":"2026-09-21","to":null,"patch":{"injury":{"region":"knee","tier":"workaround"}}}] | live activeProg.cfg.injury CFG "{\"region\":\"knee\",\"tier\":\"workaround\"}" OV "null"
+    days differing CFG vs OV by week {"1":"2/7","2":"2/7","3":"3/7","4":"3/7","5":"5/7","6":"5/7"}
+
+[3] mario V227 CFG W5 spliced cards 31 | on capped pattern 2 | cue 1 | R7 text 0 | capped with RPE>7 0
+
+[3] mario V227 OV W5 spliced cards 31 | on capped pattern 2 | cue 1 | R7 text 0 | capped with RPE>7 0
+
+[3] mario V228 CFG W5 spliced cards 31 | on capped pattern 2 | cue 1 | R7 text 0 | capped with RPE>7 0
+
+[3] mario V228 OV W5 spliced cards 31 | on capped pattern 2 | cue 1 | R7 text 0 | capped with RPE>7 0
+
+[3] mario SL2 CFG W5 spliced cards 31 | on capped pattern 2 | cue 1 | R7 text 0 | capped with RPE>7 0
+
+[3] mario SL2 OV W5 spliced cards 31 | on capped pattern 2 | cue 1 | R7 text 0 | capped with RPE>7 0
+
+[3] mario CF3 CFG W5 spliced cards 31 | on capped pattern 2 | cue 1 | R7 text 0 | capped with RPE>7 0
+
+[3] mario CF3 OV W5 spliced cards 31 | on capped pattern 2 | cue 1 | R7 text 0 | capped with RPE>7 0
+
+[3] lowback_bw V227 CFG W5 spliced cards 30 | on capped pattern 6 | cue 0 | R7 text 0 | capped with RPE>7 2 e.g. tue Single-leg hip thrust "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest" ; thu Squat (slow 3s tempo) "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest"
+
+[3] lowback_bw V227 OV W5 spliced cards 30 | on capped pattern 6 | cue 0 | R7 text 0 | capped with RPE>7 2 e.g. tue Single-leg hip thrust "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest" ; thu Squat (slow 3s tempo) "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest"
+
+[3] lowback_bw V228 CFG W5 spliced cards 30 | on capped pattern 6 | cue 0 | R7 text 0 | capped with RPE>7 2 e.g. tue Single-leg hip thrust "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest" ; thu Squat (slow 3s tempo) "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest"
+
+[3] lowback_bw V228 OV W5 spliced cards 30 | on capped pattern 6 | cue 0 | R7 text 0 | capped with RPE>7 2 e.g. tue Single-leg hip thrust "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 3 min rest" ; thu Squat (slow 3s tempo) "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest"
+
+[3] lowback_bw SL2 CFG W5 spliced cards 30 | on capped pattern 6 | cue 0 | R7 text 0 | capped with RPE>7 0
+
+[3] lowback_bw SL2 OV W5 spliced cards 30 | on capped pattern 6 | cue 0 | R7 text 0 | capped with RPE>7 0
+
+[3] lowback_bw CF3 CFG W5 spliced cards 30 | on capped pattern 6 | cue 0 | R7 text 0 | capped with RPE>7 0
+
+[3] lowback_bw CF3 OV W5 spliced cards 30 | on capped pattern 6 | cue 0 | R7 text 0 | capped with RPE>7 0
+
+[3] chain V227 CFG W5 thu [3,1] start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 -> Barbell hip thrust (hip_ext, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 -> Leg extension (leg_iso, capped true) "2×6–10 @ RPE 8" | _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+    hop3 -> Barbell good mornings (hinge, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx entries 3, with ph 0
+    BOOT  Barbell good mornings "2×6–10 @ RPE 8" | _preHold none
+    UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 8" | _preHold none
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 8"
+
+[3] chain V227 OV W5 thu [3,1] start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 -> Barbell hip thrust (hip_ext, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 -> Leg extension (leg_iso, capped true) "2×6–10 @ RPE 8" | _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+    hop3 -> Barbell good mornings (hinge, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx entries 3, with ph 0
+    BOOT  Barbell good mornings "2×6–10 @ RPE 8" | _preHold none
+    UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 8" | _preHold none
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 8"
+
+[3] chain V228 CFG W5 thu [3,1] start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 -> Barbell hip thrust (hip_ext, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 -> Leg extension (leg_iso, capped true) "2×6–10 @ RPE 8" | _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+    hop3 -> Barbell good mornings (hinge, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx entries 3, with ph 0
+    BOOT  Barbell good mornings "2×6–10 @ RPE 8" | _preHold none
+    UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 8" | _preHold none
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 8"
+
+[3] chain V228 OV W5 thu [3,1] start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 -> Barbell hip thrust (hip_ext, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 -> Leg extension (leg_iso, capped true) "2×6–10 @ RPE 8" | _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+    hop3 -> Barbell good mornings (hinge, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx entries 3, with ph 0
+    BOOT  Barbell good mornings "2×6–10 @ RPE 8" | _preHold none
+    UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 8" | _preHold none
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 8"
+
+[3] chain SL2 CFG W5 thu [3,1] start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 -> Barbell hip thrust (hip_ext, capped false) "2×6–10 @ RPE 8" | _preHold "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 -> Leg extension (leg_iso, capped true) "2×6–10 @ RPE 7" | _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, barbell hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+    hop3 -> Barbell good mornings (hinge, capped false) "2×6–10 @ RPE 8" | _preHold "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx entries 3, with ph 2
+    BOOT  Barbell good mornings "2×6–10 @ RPE 8" | _preHold none
+    UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" | _preHold PRESENT
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 7"
+
+[3] chain SL2 OV W5 thu [3,1] start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 -> Barbell hip thrust (hip_ext, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 -> Leg extension (leg_iso, capped true) "2×6–10 @ RPE 8" | _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+    hop3 -> Barbell good mornings (hinge, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx entries 3, with ph 0
+    BOOT  Barbell good mornings "2×6–10 @ RPE 8" | _preHold none
+    UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 8" | _preHold none
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 8"
+
+[3] chain CF3 CFG W5 thu [3,1] start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 -> Barbell hip thrust (hip_ext, capped false) "2×6–10 @ RPE 8" | _preHold "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 -> Leg extension (leg_iso, capped true) "2×6–10 @ RPE 7" | _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, barbell hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+    hop3 -> Barbell good mornings (hinge, capped false) "2×6–10 @ RPE 8" | _preHold "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx entries 3, with ph 2
+    BOOT  Barbell good mornings "2×6–10 @ RPE 8" | _preHold PRESENT
+    UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" | _preHold PRESENT
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 7"
+
+[3] chain CF3 OV W5 thu [3,1] start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 -> Barbell hip thrust (hip_ext, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 -> Leg extension (leg_iso, capped true) "2×6–10 @ RPE 8" | _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+    hop3 -> Barbell good mornings (hinge, capped false) "2×6–10 @ RPE 8" | _preHold none | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx entries 3, with ph 0
+    BOOT  Barbell good mornings "2×6–10 @ RPE 8" | _preHold none
+    UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 8" | _preHold none
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 8"
+
+[5] V228 OV boot trace (consecutive repeats folded): applyInjuryFilter(cfg.injury=null) x30 -> applyOverlays -> applyInjuryFilter(cfg.injury={"region":"knee","tier":"workaround"}) x60 -> applySessionSwaps(W5thu cue cards before=1, prog.cfg.injury=null)
+
+[5] SL2 OV boot trace (consecutive repeats folded): applyInjuryFilter(cfg.injury=null) x30 -> applyOverlays -> applyInjuryFilter(cfg.injury={"region":"knee","tier":"workaround"}) x60 -> applySessionSwaps(W5thu cue cards before=1, prog.cfg.injury=null)
+
+[4] D190 lattice chains V228: 18580 chains (0 missing files) | W3 (past week, outside overlay from 2026-09-21; freeze serves the stored uninjured grid) 5257 excluded | W5 start card differs between presentations 0 | W5 comparable 13323
+  W5 all n=13323 | live card differs 0 | any toast differs 0 | boot card differs 138 | undo differs 0 | undo+boot differs 0 | ANY differs 138
+      hold toast CFG 0 OV 0 | _preHold kept CFG 0 OV 0 | ph in record CFG 0 OV 0
+      final hop onto capped pattern 8489: live cue CFG 0 OV 0 | live RPE>7 CFG 8489 OV 8489 | boot RPE>7 OV 8351 | boot cue CFG 138 OV 0
+      boot != live (same presentation) CFG 330 OV 330 | hop failures 0
+  W5 mario n=305 | live card differs 0 | any toast differs 0 | boot card differs 0 | undo differs 0 | undo+boot differs 0 | ANY differs 0
+      hold toast CFG 0 OV 0 | _preHold kept CFG 0 OV 0 | ph in record CFG 0 OV 0
+      final hop onto capped pattern 90: live cue CFG 0 OV 0 | live RPE>7 CFG 90 OV 90 | boot RPE>7 OV 90 | boot cue CFG 0 OV 0
+      boot != live (same presentation) CFG 0 OV 0 | hop failures 0
+  W5 knee_protect n=1160 | live card differs 0 | any toast differs 0 | boot card differs 16 | undo differs 0 | undo+boot differs 0 | ANY differs 16
+      hold toast CFG 0 OV 0 | _preHold kept CFG 0 OV 0 | ph in record CFG 0 OV 0
+      final hop onto capped pattern 537: live cue CFG 0 OV 0 | live RPE>7 CFG 537 OV 537 | boot RPE>7 OV 521 | boot cue CFG 16 OV 0
+      boot != live (same presentation) CFG 28 OV 28 | hop failures 0
+  W5 hip_wa n=606 | live card differs 0 | any toast differs 0 | boot card differs 16 | undo differs 0 | undo+boot differs 0 | ANY differs 16
+      hold toast CFG 0 OV 0 | _preHold kept CFG 0 OV 0 | ph in record CFG 0 OV 0
+      final hop onto capped pattern 380: live cue CFG 0 OV 0 | live RPE>7 CFG 380 OV 380 | boot RPE>7 OV 364 | boot cue CFG 16 OV 0
+      boot != live (same presentation) CFG 22 OV 22 | hop failures 0
+  W5 lowback_wa n=2627 | live card differs 0 | any toast differs 0 | boot card differs 12 | undo differs 0 | undo+boot differs 0 | ANY differs 12
+      hold toast CFG 0 OV 0 | _preHold kept CFG 0 OV 0 | ph in record CFG 0 OV 0
+      final hop onto capped pattern 1195: live cue CFG 0 OV 0 | live RPE>7 CFG 1195 OV 1195 | boot RPE>7 OV 1183 | boot cue CFG 12 OV 0
+      boot != live (same presentation) CFG 78 OV 78 | hop failures 0
+  W5 shoulder_wa n=2486 | live card differs 0 | any toast differs 0 | boot card differs 33 | undo differs 0 | undo+boot differs 0 | ANY differs 33
+      hold toast CFG 0 OV 0 | _preHold kept CFG 0 OV 0 | ph in record CFG 0 OV 0
+      final hop onto capped pattern 1960: live cue CFG 0 OV 0 | live RPE>7 CFG 1960 OV 1960 | boot RPE>7 OV 1927 | boot cue CFG 33 OV 0
+      boot != live (same presentation) CFG 72 OV 72 | hop failures 0
+  W5 elbow_wa n=6139 | live card differs 0 | any toast differs 0 | boot card differs 61 | undo differs 0 | undo+boot differs 0 | ANY differs 61
+      hold toast CFG 0 OV 0 | _preHold kept CFG 0 OV 0 | ph in record CFG 0 OV 0
+      final hop onto capped pattern 4327: live cue CFG 0 OV 0 | live RPE>7 CFG 4327 OV 4327 | boot RPE>7 OV 4266 | boot cue CFG 61 OV 0
+      boot != live (same presentation) CFG 130 OV 130 | hop failures 0
+    e.g. OV RPE>7 on capped mario tue 45° back extension > Leg extension > Lying leg curl | OV "2 sets — RPE 8 (stop 2 reps short of failure)" | CFG "2 sets — RPE 8 (stop 2 reps short of failure)"
+    e.g. OV RPE>7 on capped mario thu 45° back extension > Leg extension > Lying leg curl | OV "2 sets — RPE 8 (stop 2 reps short of failure)" | CFG "2 sets — RPE 8 (stop 2 reps short of failure)"
+    e.g. OV RPE>7 on capped mario sat 45° back extension > Leg extension > Lying leg curl | OV "2 sets — RPE 8 (stop 2 reps short of failure)" | CFG "2 sets — RPE 8 (stop 2 reps short of failure)"
+    e.g. OV RPE>7 on capped mario tue 45° back extension > Leg extension > Seated leg curl | OV "2 sets — RPE 8 (stop 2 reps short of failure)" | CFG "2 sets — RPE 8 (stop 2 reps short of failure)"
+
+[4] D177 L1 injured slice V228: 288 injured cfgs (0 chunk files missing) | W5 patterned cards 4529 | with no CFG candidate 8 | hopped 4521 | start card same in both presentations 4521
+  L1 all n=4521 | live differs 143 | toast differs 0 | boot differs 143 | hold toast CFG 0 OV 0 | kept CFG 0 OV 0 | OV live cue 0 CFG live cue 143 | hop failures 0
+  L1 knee/workaround n=1900 | live differs 48 | toast differs 0 | boot differs 48 | hold toast CFG 0 OV 0 | kept CFG 0 OV 0 | OV live cue 0 CFG live cue 48 | hop failures 0
+  L1 lowback/workaround n=1706 | live differs 95 | toast differs 0 | boot differs 95 | hold toast CFG 0 OV 0 | kept CFG 0 OV 0 | OV live cue 0 CFG live cue 95 | hop failures 0
+  L1 shoulder/protect n=915 | live differs 0 | toast differs 0 | boot differs 0 | hold toast CFG 0 OV 0 | kept CFG 0 OV 0 | OV live cue 0 CFG live cue 0 | hop failures 0
+  [2] candidate lists (9990 _swapInjuryOK via swapCandidates/auxSwapCandidates on activeProg.cfg): W5 patterned cards 4529 | OV list longer than CFG 394 | cards offered >=1 name the injury plan rejects 1387 | rejected names offered 1451 of 39117 OV offers
+     by region/tier knee/workaround 293 | lowback/workaround 758 | shoulder/protect 336 | by eq bodyweight 63 | commercial 285 | crossfit 284 | home_basic 215 | home_full 323 | minimal 217
+     e.g. knee/workaround commercial W5 tue Sumo deadlift offers Jump squats
+     e.g. knee/workaround commercial W5 thu Dumbbell goblet squat offers Jump squats
+     e.g. lowback/workaround commercial W5 mon Dumbbell bench press offers Landmine rotational press
+     e.g. lowback/workaround commercial W5 tue Lat pulldown offers L-sit chinups
+
+[4] D190 lattice chains SL2: 18580 chains (0 missing files) | W3 (past week, outside overlay from 2026-09-21; freeze serves the stored uninjured grid) 5257 excluded | W5 start card differs between presentations 0 | W5 comparable 13323
+  W5 all n=13323 | live card differs 8489 | any toast differs 13323 | boot card differs 8489 | undo differs 10834 | undo+boot differs 10523 | ANY differs 13323
+      hold toast CFG 13323 OV 0 | _preHold kept CFG 13323 OV 0 | ph in record CFG 25752 OV 0
+      final hop onto capped pattern 8489: live cue CFG 0 OV 0 | live RPE>7 CFG 0 OV 8489 | boot RPE>7 OV 8351 | boot cue CFG 138 OV 0
+      boot != live (same presentation) CFG 330 OV 330 | hop failures 0
+  W5 mario n=305 | live card differs 90 | any toast differs 305 | boot card differs 90 | undo differs 211 | undo+boot differs 211 | ANY differs 305
+      hold toast CFG 305 OV 0 | _preHold kept CFG 305 OV 0 | ph in record CFG 594 OV 0
+      final hop onto capped pattern 90: live cue CFG 0 OV 0 | live RPE>7 CFG 0 OV 90 | boot RPE>7 OV 90 | boot cue CFG 0 OV 0
+      boot != live (same presentation) CFG 0 OV 0 | hop failures 0
+  W5 knee_protect n=1160 | live card differs 537 | any toast differs 1160 | boot card differs 537 | undo differs 897 | undo+boot differs 861 | ANY differs 1160
+      hold toast CFG 1160 OV 0 | _preHold kept CFG 1160 OV 0 | ph in record CFG 2243 OV 0
+      final hop onto capped pattern 537: live cue CFG 0 OV 0 | live RPE>7 CFG 0 OV 537 | boot RPE>7 OV 521 | boot cue CFG 16 OV 0
+      boot != live (same presentation) CFG 28 OV 28 | hop failures 0
+  W5 hip_wa n=606 | live card differs 380 | any toast differs 606 | boot card differs 380 | undo differs 515 | undo+boot differs 488 | ANY differs 606
+      hold toast CFG 606 OV 0 | _preHold kept CFG 606 OV 0 | ph in record CFG 1176 OV 0
+      final hop onto capped pattern 380: live cue CFG 0 OV 0 | live RPE>7 CFG 0 OV 380 | boot RPE>7 OV 364 | boot cue CFG 16 OV 0
+      boot != live (same presentation) CFG 22 OV 22 | hop failures 0
+  W5 lowback_wa n=2627 | live card differs 1195 | any toast differs 2627 | boot card differs 1195 | undo differs 1848 | undo+boot differs 1788 | ANY differs 2627
+      hold toast CFG 2627 OV 0 | _preHold kept CFG 2627 OV 0 | ph in record CFG 5074 OV 0
+      final hop onto capped pattern 1195: live cue CFG 0 OV 0 | live RPE>7 CFG 0 OV 1195 | boot RPE>7 OV 1183 | boot cue CFG 12 OV 0
+      boot != live (same presentation) CFG 78 OV 78 | hop failures 0
+  W5 shoulder_wa n=2486 | live card differs 1960 | any toast differs 2486 | boot card differs 1960 | undo differs 2196 | undo+boot differs 2121 | ANY differs 2486
+      hold toast CFG 2486 OV 0 | _preHold kept CFG 2486 OV 0 | ph in record CFG 4789 OV 0
+      final hop onto capped pattern 1960: live cue CFG 0 OV 0 | live RPE>7 CFG 0 OV 1960 | boot RPE>7 OV 1927 | boot cue CFG 33 OV 0
+      boot != live (same presentation) CFG 72 OV 72 | hop failures 0
+  W5 elbow_wa n=6139 | live card differs 4327 | any toast differs 6139 | boot card differs 4327 | undo differs 5167 | undo+boot differs 5054 | ANY differs 6139
+      hold toast CFG 6139 OV 0 | _preHold kept CFG 6139 OV 0 | ph in record CFG 11876 OV 0
+      final hop onto capped pattern 4327: live cue CFG 0 OV 0 | live RPE>7 CFG 0 OV 4327 | boot RPE>7 OV 4266 | boot cue CFG 61 OV 0
+      boot != live (same presentation) CFG 130 OV 130 | hop failures 0
+    e.g. OV RPE>7 on capped mario tue 45° back extension > Leg extension > Lying leg curl | OV "2 sets — RPE 8 (stop 2 reps short of failure)" | CFG "2 sets — RPE 7 (leave 3 or more in reserve)"
+    e.g. OV RPE>7 on capped mario thu 45° back extension > Leg extension > Lying leg curl | OV "2 sets — RPE 8 (stop 2 reps short of failure)" | CFG "2 sets — RPE 7 (leave 3 or more in reserve)"
+    e.g. OV RPE>7 on capped mario sat 45° back extension > Leg extension > Lying leg curl | OV "2 sets — RPE 8 (stop 2 reps short of failure)" | CFG "2 sets — RPE 7 (leave 3 or more in reserve)"
+    e.g. OV RPE>7 on capped mario tue 45° back extension > Leg extension > Seated leg curl | OV "2 sets — RPE 8 (stop 2 reps short of failure)" | CFG "2 sets — RPE 7 (leave 3 or more in reserve)"
+
+[4] D177 L1 injured slice SL2: 288 injured cfgs (0 chunk files missing) | W5 patterned cards 4529 | with no CFG candidate 8 | hopped 4521 | start card same in both presentations 4521
+  L1 all n=4521 | live differs 189 | toast differs 46 | boot differs 189 | hold toast CFG 46 OV 0 | kept CFG 4521 OV 0 | OV live cue 0 CFG live cue 143 | hop failures 0
+  L1 knee/workaround n=1900 | live differs 48 | toast differs 0 | boot differs 48 | hold toast CFG 0 OV 0 | kept CFG 1900 OV 0 | OV live cue 0 CFG live cue 48 | hop failures 0
+  L1 lowback/workaround n=1706 | live differs 141 | toast differs 46 | boot differs 141 | hold toast CFG 46 OV 0 | kept CFG 1706 OV 0 | OV live cue 0 CFG live cue 95 | hop failures 0
+  L1 shoulder/protect n=915 | live differs 0 | toast differs 0 | boot differs 0 | hold toast CFG 0 OV 0 | kept CFG 915 OV 0 | OV live cue 0 CFG live cue 0 | hop failures 0
+  [2] candidate lists (9990 _swapInjuryOK via swapCandidates/auxSwapCandidates on activeProg.cfg): W5 patterned cards 4529 | OV list longer than CFG 394 | cards offered >=1 name the injury plan rejects 1387 | rejected names offered 1451 of 39117 OV offers
+     by region/tier knee/workaround 293 | lowback/workaround 758 | shoulder/protect 336 | by eq bodyweight 63 | commercial 285 | crossfit 284 | home_basic 215 | home_full 323 | minimal 217
+     e.g. knee/workaround commercial W5 tue Sumo deadlift offers Jump squats
+     e.g. knee/workaround commercial W5 thu Dumbbell goblet squat offers Jump squats
+     e.g. lowback/workaround commercial W5 mon Dumbbell bench press offers Landmine rotational press
+     e.g. lowback/workaround commercial W5 tue Lat pulldown offers L-sit chinups
+[4] D190 W5 chains V228 -> SL2, CFG presentation: n=13323 | any 13323 | boot 8351 | live 8489 | toast 13323 | undo 10834 | undoBoot 10523
+[4] D190 W5 chains V228 -> SL2, OV presentation: n=13323 | any 0 | boot 0 | live 0 | toast 0 | undo 0 | undoBoot 0
+[4] D177 L1 hops V228 -> SL2, CFG presentation: n=4521 | live 142 | toast 46 | boot 142
+[4] D177 L1 hops V228 -> SL2, OV presentation: n=4521 | live 96 | toast 0 | boot 96
+[4] OV L1 live moved V228 -> SL2: 96 | start card moved (build clamp on the spliced day) 96 | from capped 96 | to capped 96 | from capped AND to uncapped (held dose carried onto a free movement) 0 | to capped with RPE>7 on SL2 0 | by region knee/workaround 32 | lowback/workaround 64
+    e.g. knee/workaround commercial W5 sat Reverse lunge (KB) -> Step-ups (KB) (to capped true) | V228 start "2×10–12 each @ RPE 8" live "2×10–12 each @ RPE 8" | SL2 start "2×10–12 each @ RPE 7" live "2×10–12 each @ RPE 7" | SL2 CFG live "2×10–12 each @ RPE 7"
+    e.g. lowback/workaround commercial W5 sat 45° back extension -> Barbell hip thrust (to capped true) | V228 start "2 sets — RPE 8 (stop 2 reps short of failure)" live "2 sets — RPE 8 (stop 2 reps short of failure)" | SL2 start "2 sets — RPE 7 (leave 3 or more in reserve)" live "2 sets — RPE 7 (leave 3 or more in reserve)" | SL2 CFG live "2 sets — RPE 7 (leave 3 or more in reserve)"
+    e.g. lowback/workaround commercial W5 sat Dumbbell row -> Kettlebell single-arm row (to capped true) | V228 start "2×8–12 @ RPE 8" live "2×8–12 @ RPE 8" | SL2 start "2×8–12 @ RPE 7" live "2×8–12 @ RPE 7" | SL2 CFG live "2×8–12 @ RPE 7"
+    e.g. knee/workaround commercial W5 sat Reverse lunge (KB) -> Step-ups (KB) (to capped true) | V228 start "2×10–12 each @ RPE 8" live "2×10–12 each @ RPE 8" | SL2 start "2×10–12 each @ RPE 7" live "2×10–12 each @ RPE 7" | SL2 CFG live "2×10–12 each @ RPE 7"
+    held-dose-onto-free rows: SL2 OV live == SL2 CFG live 0/0
+[SPREAD] build-held W5 cards on SL2 (OV, L1 injured slice, 16 chunks, 0 missing): 96 | with an uncapped same-sheet candidate 96 | hop failures 0
+  swapped onto an uncapped movement: SL2 OV live == V228 OV live (dose beneath the hold travels) 0/96 | SL2 OV live carries RPE<=7 where V228 carried RPE>7 96 | SL2 CFG live == V228 OV live 0/96 | SL2 CFG _preHold kept 96 OV 0
+  by region knee/workaround 32 | lowback/workaround 64 | by target pattern calf_iso 24 | hinge 30 | hip_ext 2 | lunge 32 | vpull 8
+    e.g. knee/workaround commercial W5 sat Reverse lunge (KB) (V228 "2×10–12 each @ RPE 8", SL2 build "2×10–12 each @ RPE 7") -> Dumbbell split-stance deadlift [hinge] | V228 OV "2×10–12 each @ RPE 8" | SL2 OV "2×10–12 each @ RPE 7" | SL2 CFG "2×10–12 each @ RPE 7"
+    e.g. lowback/workaround commercial W5 sat 45° back extension (V228 "2 sets — RPE 8 (stop 2 reps short of failure)", SL2 build "2 sets — RPE 7 (leave 3 or more in reserve)") -> Dumbbell seated calf raise [calf_iso] | V228 OV "2 sets — RPE 8 (stop 2 reps short of failure)" | SL2 OV "2 sets — RPE 7 (leave 3 or more in reserve)" | SL2 CFG "2 sets — RPE 7 (leave 3 or more in reserve)"
+    e.g. lowback/workaround commercial W5 sat Dumbbell row (V228 "2×8–12 @ RPE 8", SL2 build "2×8–12 @ RPE 7") -> Lat pulldown [vpull] | V228 OV "2×8–12 @ RPE 8" | SL2 OV "2×8–12 @ RPE 7" | SL2 CFG "2×8–12 @ RPE 7"
+  done 4 s

@@ -1,0 +1,300 @@
+# v229_slice3_cf5.js output (M10, CF5). Parts: tree, gates, single, chains+report, guard, toast.
+## tree
+CF4 sha 68e0077e8096 (M9 68e0077e8096) | _renamed present before: 0
+CF5 anchor U count 1
+CF5 anchor B count 1
+diff CF4 -> CF5: 1223 bytes, hunks 5, -lines 1, +lines 7
+@@ -10350,0 +10351 @@
++    const _renamed=[];   // V229 D193 (A3 s4) / D194 R6: the items this replay renamed, by identity
+@@ -10352,0 +10354 @@
++      const _was=[]; day.sections.forEach(s=>((s&&s.items)||[]).forEach(it=>{ if(it&&it.name===e.from) _was.push(it); }));
+@@ -10353,0 +10356 @@
++      _was.forEach(it=>{ if(it.name!==e.from&&_renamed.indexOf(it)<0) _renamed.push(it); });
+@@ -10355,0 +10359,2 @@
++      // the pre-filter replay result rides beside each renamed item; the filter copies item fields through
++      _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });
+@@ -14508 +14513,2 @@
+-      if(it){it.detail=p.d;_put.push(it);}
++      // V229 D193 (Amendment 3 section 4) / D194 R6: the kept dose comes back from the record with the card, or nothing is kept.
++      if(it){it.detail=p.d;if(typeof p.ph==='string') it._preHold=p.ph; else delete it._preHold;_put.push(it);}
+TREE CF5 sha 5ff9119afd7e ia-version 228 | boot ok true
+applySwapPrefs call sites CF5: 10194 function applySwapPrefs(sections,map){ || 10355 if(applySwapPrefs(day.sections,m1)) hit=true; || 10984 if(applySwapPrefs(_day.sections,cfg.exSwapPrefs) && cfg.injury){ || 14500 applySwapPrefs(day.sections,back);
+## diff -u CF4 CF5 hunks
+@@ -10348,11 +10348,16 @@
+@@ -14505,7 +14510,8 @@
+## gates
+v220 22daccb44d8f ia-version 220
+v221 c28606362b96 ia-version 221
+v226 94ce52f12f8d ia-version 226
+v227 c9069fe64113 ia-version 227
+CF5 g227_d190_prefpath (baseline v226) exit 0 | PASS 4 FAIL 0 (18 s)
+CF5 g228_d193_cueword (baseline v227) exit 1 | PASS 4 FAIL 1 (20 s)
+CF5 g221_d177_swapfloor (baseline v220) exit 1 | PASS 14 FAIL 6 (25 s)
+CF5 g222_d181_durable (baseline v221) exit 0 | PASS 10 FAIL 0 (33 s)
+V228 g221_d177_swapfloor (baseline v220) exit 0 | PASS 20 FAIL 0 (52 s)
+V228 g228_d193_cueword (baseline v227) exit 0 | PASS 5 FAIL 0 (75 s)
+CF5 g227_d190_cuecap (baseline v226) exit 1 | PASS 7 FAIL 1 (185 s)
+CF5 g228_d192_undokey (baseline v227) exit 1 | PASS 4 FAIL 1 (201 s)
+CF5 g227_d190_seam (baseline v226) exit 0 | PASS 7 FAIL 0 (210 s)
+V228 g222_d181_durable (baseline v221) exit 0 | PASS 10 FAIL 0 (216 s)
+V228 g227_d190_cuecap (baseline v226) exit 0 | PASS 8 FAIL 0 (216 s)
+V228 g227_d190_prefpath (baseline v226) exit 0 | PASS 4 FAIL 0 (218 s)
+V228 g228_d192_undokey (baseline v227) exit 0 | PASS 4 FAIL 0 (219 s)
+V228 g227_d190_seam (baseline v226) exit 0 | PASS 7 FAIL 0 (222 s)
+CF5 g222_d181_chain (baseline v221) exit 0 | PASS 8 FAIL 0 (223 s)
+V228 g222_d181_chain (baseline v221) exit 0 | PASS 8 FAIL 0 (256 s)
+gates done
+### gate_g221_d177_swapfloor_CF5.out
+PASS G1a Mario's card (commercial|support_strength|beginner|liftonly|knee/workaround, seed 76308, W5 Thu): Barbell box squat -> Dumbbell goblet squat via applySwapChoice prints `4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest`
+PASS G1b the toast is `Dumbbell goblet squat in, barbell box squat out. The load runs out before the reps do here. Same sets, same effort. Reps move to 8 to 12.`
+PASS G2 _repFloor equals the hand floor table on 14 named movements (RR1 rows, RR4 landmine literal, swing 10–15)
+FAIL G3a L1: 0 Main swap pairs change outside the rep token (got 832 of 145368 | e.g. commercial|hypertrophy|beginner|lift|knee/workaround W5 tue Barbell Romanian deadlift -> Leg press :: 5×10 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest => 5×10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest | e.g. commercial|hypertrophy|beginner|lift|knee/work
+PASS G3b L1: 0 Main swap pairs on a window row land under their window
+FAIL G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2); compare cue-blind above 226 (D190) (got power 0 of 4066, off grammar 168 of 28896 | e.g. commercial|strength|beginner|lift|knee/workaround W6 tue Barbell Romanian deadlift -> Leg press :: Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new b
+FAIL G3d L1: donors at or above the floor stay verbatim (got 263 of 32188 | e.g. commercial|hypertrophy|beginner|lift|knee/workaround W5 tue Barbell Romanian deadlift -> Leg press :: 5×10 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest => 5×10 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest | e.g. commercial|hypertrophy|beginner|lift|knee/workaroun
+FAIL G3e L1: null-row pairs stay verbatim (got 202 of 37307 | e.g. commercial|strength|beginner|lift|knee/workaround W5 tue Barbell Romanian deadlift -> Barbell box squat :: 4×2 — RPE 9 (leave ~1 rep in reserve), ramp up with 2–3 warmup sets, 3 min rest => 4×2 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest | e.g. commercial|strength|beginner|lift|knee/workaround W6 tue Barbell 
+FAIL G3f L1: every Main pair under its window prints exactly the hand rewrite (and some do) (got 199 of 5984 | e.g. commercial|strength|beginner|lift|knee/workaround W5 tue Barbell Romanian deadlift -> Leg press :: 4×2 — RPE 9 (leave ~1 rep in reserve), ramp up with 2–3 warmup sets, 3 min rest => 4×5–8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest | e.g. commercial|strength|
+PASS G5a L1: swap then undo leaves day.sections byte-identical on every Main and Power pair (R4)
+PASS G5b L1: Close-grip bench press -> Dips -> undo restores the donor detail, day byte-identical
+FAIL G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise (got 1252 of 150068, third toast 5984 vs hand window 5984 | e.g. commercial|hypertrophy|beginner|lift|knee/workaround W5 tue Barbell Romanian deadlift -> Leg press [atfloor] Leg press in, barbell romanian deadlift out. Same sets, same reps. Your injury plan holds this one at RP
+PASS G5c constructed duplicate-name day (RR4 re-scope): tap / tap both / reboot re-apply, then undo, byte-identical
+PASS G5d legacy record without rx: undo restores the name, throws nothing, clears the record (RR3)
+PASS G6b home_basic|strength|beginner W1 Mon: Dumbbell decline press -> Dips keeps the V119 copy
+PASS G6c home_basic|strength|beginner W1 Tue: Dumbbell Romanian deadlift 4×6 -> Kettlebell single-leg deadlift prints "Same job, same numbers." and the donor verbatim
+PASS G7-1a cfg.exSwapPrefs {Barbell box squat: Dumbbell goblet squat}: every week the pref lands prints the window, on a build and on a reboot with W1 frozen; cfg not mutated
+PASS G7-1b the injury filter still re-runs after a pref: Box jumps lands on healthy, never on knee/workaround ("Jumps are out.")
+PASS G7-2a a day restored from an ia_hist_ snapshot at 4×3, re-swapped through applySwapChoice, shows the window live
+PASS G8b addedDetailFor fallback is `3×10 — RPE 7`: Main grammar, at or above every hand window low end, left verbatim
+PASS 14 FAIL 6
+### gate_g222_d181_chain_CF5.out
+PASS row 5  untouched MARIO W5 Thu box->goblet->Leg press: boot = last live card in name AND detail (Leg press 4×8–12), chip offers goblet, two undos reach Barbell box squat 4×3 with the store empty (boot Leg press | 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest =live, chip Dumbbell goblet squat, 1/1)
+PASS row 5c untouched MARIO W5 Thu 2-cycle box->goblet->box: boots 1 and 2 = last live card (Barbell box squat 4×8–12) (BOOT1 Barbell box squat | 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest =live, 1/1)
+PASS row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras 222, 223, 224, 225, 226); every residue row boots equal to the composed-map boot (name!=live 0/5088, detail!=live 0/5088 (licence REFUSED above 226: 0), residue rows unlike the MAP boot 0)
+PASS row 5X untouched reachable collide2 and exch3: whole day == live, all of them (collide2 809/809, exch3 716/716 whole day == live)
+PASS row 8  CONTROL hist-restored day boots byte-equal to its ia_hist_ record, every class x t1 t2 up_st up_bt up_ts (rewrites 0/4070, no snapshot 0)
+PASS row 8d CONTROL no duplicate item name on a booted hist-restored card (undercounts on injured MARIO; row 8 is the byte check) (booted hist-restored cards with a duplicate name 0/4070, snapshots carrying one 0)
+PASS row 9a CONTROL up_ts: candidate boots byte-equal, day for day, to V221's boot of the same storage (814/814 byte-equal)
+PASS row 9b up_ts then one re-tap on the candidate, reboot: holds (boot == re-tapped live day) (814/814 hold, re-taps that moved the card 677 (0 is an empty re-tap and proves nothing))
+PASS 8 FAIL 0
+### gate_g222_d181_durable_CF5.out
+PASS 1 lattice DURABLE, 504 cells, per touch×order cell: the booted slot carries the last choice in name AND detail (goblet `4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest`, Front squat `4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest`), and a touched day's ia_hist_ carries it (V221 190/504) (DURABLE 504/504)
+PASS 1c CONTROL (passes on V221 too): draft|swap_then_touch and done|swap_then_touch 72/72 each (draft|swap_then_touch 72/72, done|swap_then_touch 72/72)
+PASS 3 boot-orphaned logs: an ia_exw_ key naming a lift on the last live card and absent from the booted card, 0/504 (V221 72/504) (0/504 {})
+PASS 3d CONTROL (passes on V221 too): ia_exw_ key and entry counts equal across the reboot, 504/504 (504/504)
+PASS 2 undo reachable after reboot, 7 orderings: boot1 `Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest`, chip offers Barbell box squat, undo -> `Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest` at the slot, record cleared, snapshot holds the box squat, boots 2 and 3 hold (V221 1/7) (
+PASS 4 M3 add/skip × swap on a frozen W5 Thu, 42 orderings: live==boot AND live==next-week boot 42/42 (V221 13/42) (42/42 (boot 42, next-week boot 42))
+PASS 4d CONTROL (passes on V221 too): M3 double-apply 0/42 (the COPY shape reads 6/42) (0/42)
+PASS 5s M4 snapshotted day, box -> goblet -> leg press, touch first/between/last: boot1 `Leg press :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest` chip goblet, undo -> goblet 4×8–12, chip box, undo -> box 4×3, record gone, each surviving a boot 3/3 (V221 0/3) (3/3)
+PASS 6a CONTROL, must-not (a) (passes on V221 too): a swap or an undo on an untouched day writes no ia_hist_ and leaves the freeze cut unchanged, 0/36 (0/36)
+PASS 10 the record on a hist-restored day survives the boot byte-unchanged and the undo chip is offered, 7 shapes (V221 0/7, pruned) (7/7)
+PASS 10 FAIL 0
+### gate_g227_d190_cuecap_CF5.out
+PASS row b-ALL    cue <=> cap on every live hop of the injured lattice (knee, ankle, hip, lowback, shoulder, elbow at workaround; W3, W5; hop1, hop2, cyc2): the card ends with the cue iff the plan caps the pattern and the cue-free dose carries no RPE (violations 0/9882 hops on 5543 chains (oracle cues 2038, off a cued donor 3597))
+PASS row b-HAND-1 MARIO knee/wa W5 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell split-stance deadlift -> Dumbbell goblet squat ends `2×8 — hold RPE 7, three in the tank`, live == boot (hop1 live "2×8" =boot, hop2 live "2×8 — hold RPE 7, three in the tank" =boot)
+PASS row b-HAND-2 ankle/wa W3 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell goblet squat (`2×8 — hold RPE 7, three in the tank`) -> Dumbbell split-stance deadlift (`2×8`), live == boot (hop1 live "2×8 — hold RPE 7, three in the tank" =boot, hop2 live "2×8" =boot)
+PASS row b-HAND-3 ankle/wa W3 thu Leg superset B: Kettlebell swing -> Dumbbell goblet squat (cued) -> Nordic hamstring curl (anchored) prints `2 sets — RPE 8 (stop 2 reps short of failure)`, live == boot (hop1 live "2×8 — hold RPE 7, three in the tank" =boot, hop2 live "2 sets — RPE 8 (stop 2 reps short of failure)" =boot)
+FAIL row c-TOAST  pair vs V226: the toast on every live hop of the injured lattice is unmoved, 0 moved (got toasts moved 1706/9882 hops)
+PASS row c-UNINJ  pair vs V226: HALF_MANNY and mario_noinj live, boot, toast and undo unmoved, 0 moved (moved 0/1396 chains (live, boot, toast, undo, undo-boot))
+PASS row c-DIGEST pair vs V226: progDigest(buildProgram) equal on every lattice config, the uninjured two included (at 228 and above: the six injured against the D193 class (i) table) (8/8 configs equal)
+PASS row c-MANNY  MANNY_DIGEST_BY_VERSION[227] exists and === [226] by reference; HALF_MANNY on the artifact prints the era row ([227]===[226], HALF_MANNY 0ac7da6b1691a8e1 == [228])
+PASS 7 FAIL 1
+### gate_g227_d190_prefpath_CF5.out
+PASS row c2-i    cue <=> cap on every built card of every pref build (natively cued source x every sheet candidate, six workaround regions): cue iff pattern capped and the cue-free dose carries no RPE (0 violations of 49218 cards, in 0 of 273 builds)
+PASS row c2-ii   uninjured-plus-same-pref reference (baseline), structural population (same name in the same slot on the uninjured build, pattern uncapped on the plan): target-card detail byte-equal (0 mismatches of 138 in population (excluded 1182))
+PASS row c2-iii  PAIR vs V226: no card other than the pref target moves, slot for slot, on every pref build (0 non-target cards moved of 47898 compared, 273 builds)
+PASS row c2-hand HAND build-path rows of the ruling: knee/wa {Reverse lunge (KB) -> DB split-stance DL} W3/W4 THU `2×8–12 each @ RPE 7`; shoulder/wa {DB incline press -> Cable pushdown} W1 MON `3×8–12 @ RPE 6–7` (3 cells exact)
+PASS 4 FAIL 0
+### gate_g227_d190_seam_CF5.out
+PASS row e-PRE D190 HAND precondition: the 2 natively cued mario items and the 2 ankle ones are on their days by name and carry the cue on a typed capped pattern (4/4 located, cued, typed capped)
+PASS row a-MEM D190 membership proven: store-derived U (one ia_swaps_ record per hop, read after the chain) == hand-derived U (hop froms pairwise distinct), every reachable chain (store != hand 0/12354, |U| 11998, |U'| 356)
+PASS row a-U D190 on U: every touched slot boots equal to the live card in name and detail, residue 0 of |U|, |U| > 0, no licence (residue 0/11998, chains that moved the live card 9895)
+    INFO D191 P-SWAPREVISIT (never asserted, never licensed): |U'| 356, residue 30 | ankle_wa|hop3 4 | elbow_wa|hop3 4 | hip_wa|hop3 5 | knee_wa|hop3 5 | lowback_wa|hop3 7 | shoulder_wa|hop3 5
+PASS row a-U' D190 pair on U' (store shorter than the chain): every U' chain that boots equal to live on V226 boots equal to live on the candidate, created 0 (created 0 of 326 U' chains equal on V226 (|U'| 356, healed 0))
+PASS row d-U D190 R6 on U_d (hand: hop `to` names pairwise distinct on the day): the chip on the last hop's card is found and equals the last hop's `from`, and undoSwap(chip) leaves the whole day byte-identical to the day before the last hop; residue 0 of |U_d|, |U_d| > 0, no licence (residue 0/12282 (no chip 0, chip != hand chip 0, undo not byte-identical 0))
+PASS row d-U' D190 R6 pair on U_d' (some `to` repeats on the day): every U_d' chain that undoes byte-identical on V226 undoes byte-identical on the candidate, created 0, |U_d'| > 0 (created 0 of 44 U_d' chains byte-identical on V226 (|U_d'| 72, on both 72, healed 28))
+PASS row e D190 every reachable hop1/hop2/cyc2 chain from the 4 natively cued items: touched slot and whole day live == boot (live != boot 0/229 (62 + 57 + 55 + 55))
+PASS 7 FAIL 0
+### gate_g228_d192_undokey_CF5.out
+PASS row d2-CHIP D192 whole walk: the chip on the last hop's card is found and equals the last hop's `from` (off the chain tuple); residue 0, |U_d'| > 0, every class and shape non-empty, PIN chip Deadlift (wrong 0/2201 (no chip 0, U_d' 0/744, hop5 0/1000), empty strata 0, PIN chip "Deadlift")
+PASS row d2-UNDO D192 whole walk: after undoSwap(chip) the live day is byte-identical to the live day before the last hop, and on U the day's store is the chain's first n-1 hops in recording order; residue 0, PIN store typed (wrong 0/2201 (day != pre 0, store != hand on U 0, hop5 0), PIN slot Deadlift store ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift"])
+PASS row d2-BOOT-U D192 on U (hand: hop `from` names pairwise distinct): after undo a fresh-VM boot of the day equals the live day; residue 0, |U| > 0, PIN in U boots equal to live (residue 0/1587, PIN in U, boots Deadlift == live true)
+  INFO D191 P-SWAPREVISIT (never asserted, never licensed; no pair row on U' boot, ruling §3): walk |U'| 128 boot != live candidate 98 / V227 18 (on both 128), created 80, healed 0 | hop4 |U'| 95 boot != live candidate 47 / V227 81 (on both 95), created 1, healed 35 | hop5 |U'| 391 boot != live candidate 93 / V227 76 (on both 391), created 36, healed 19 | pin |U'| 0 boot != live candidate 0 / V227 0 (on both 0), cre
+FAIL GUARD D192 refutation (ruling §5): created above 2 on the hop5 seed, created on the walk or hop4, or a created chain with no repeated `from` (got hop5 created 36, walk+hop4 created 81, created with no repeated from 0: stop and re-measure)
+PASS row d2-MANNY D192 HALF_MANNY digest == era table == 0ac7da6b1691a8e1 == V227, self-stable; swapOriginOf reached 0 times by buildProgram and refreshProgram (counter wired) (0ac7da6b1691a8e1, calls 0)
+PASS 4 FAIL 1
+### gate_g228_d193_cueword_CF5.out
+PASS row c-LIT       INJ_CAP_CUE is ` — hold RPE 7, three in the tank`: three = 10 − 7 by hand, and the RPE card says RPE 8 ≈ 2 reps left (8 + 2 = 10) (word "three", want "three"; card agrees)
+FAIL row b-ONECLASS  every L9, L432 and home_basic build == V227 with ` — hold RPE 7, two in the tank` re-ended `three`, nothing else; uninjured 47 byte-identical; HALF_MANNY on the era row, [228] === [227] (got L9: candidate == SUBST(V227) 9/9; L432: candidate == SUBST(V227) 380/432; home_basic: candidate == SUBST(V227) 72/108; uninjured47: candidate == SUBST(V227) 47/47; MANNY [228]===[227], 0ac7da6b1691a8e1 == [
+PASS row f-STRIP     _stripCapCue strips both wordings to the bare dose, identity on every non-cue detail (hand near misses, HALF_MANNY "tank" cards, every non-cue card of HALF_MANNY and L9) (hand 0 wrong of 13, false strips 0/1722, tank cards 0/9 stripped)
+PASS row f-STORED    a V227-stored "two" card (mario knee/wa W5 thu Step-ups (KB)) swapped live on the candidate: capped target re-cued "three", uncapped no cue, 0 old words, undo restores the stored words (Reverse lunge (KB) [lunge, capped] week 6 ok, Barbell good mornings [hinge, uncapped] week 6 ok)
+PASS row g-COUPLE    invariants: _addRxKind refuses a cued detail (either wording); 0 power cards cued; a loaded-to-loaded uncued swap carries the donor dose verbatim (fence holds, power cued 0/649, uncued swap verbatim)
+PASS 4 FAIL 1
+### gate_g221_d177_swapfloor_V228.out
+PASS G1a Mario's card (commercial|support_strength|beginner|liftonly|knee/workaround, seed 76308, W5 Thu): Barbell box squat -> Dumbbell goblet squat via applySwapChoice prints `4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest`
+PASS G1b the toast is `Dumbbell goblet squat in, barbell box squat out. The load runs out before the reps do here. Same sets, same effort. Reps move to 8 to 12.`
+PASS G2 _repFloor equals the hand floor table on 14 named movements (RR1 rows, RR4 landmine literal, swing 10–15)
+PASS G3a L1: 0 Main swap pairs change outside the rep token
+PASS G3b L1: 0 Main swap pairs on a window row land under their window
+PASS G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2); compare cue-blind above 226 (D190)
+PASS G3d L1: donors at or above the floor stay verbatim
+PASS G3e L1: null-row pairs stay verbatim
+PASS G3f L1: every Main pair under its window prints exactly the hand rewrite (and some do)
+PASS G5a L1: swap then undo leaves day.sections byte-identical on every Main and Power pair (R4)
+PASS G5b L1: Close-grip bench press -> Dips -> undo restores the donor detail, day byte-identical
+PASS G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise
+PASS G5c constructed duplicate-name day (RR4 re-scope): tap / tap both / reboot re-apply, then undo, byte-identical
+PASS G5d legacy record without rx: undo restores the name, throws nothing, clears the record (RR3)
+PASS G6b home_basic|strength|beginner W1 Mon: Dumbbell decline press -> Dips keeps the V119 copy
+PASS G6c home_basic|strength|beginner W1 Tue: Dumbbell Romanian deadlift 4×6 -> Kettlebell single-leg deadlift prints "Same job, same numbers." and the donor verbatim
+PASS G7-1a cfg.exSwapPrefs {Barbell box squat: Dumbbell goblet squat}: every week the pref lands prints the window, on a build and on a reboot with W1 frozen; cfg not mutated
+PASS G7-1b the injury filter still re-runs after a pref: Box jumps lands on healthy, never on knee/workaround ("Jumps are out.")
+PASS G7-2a a day restored from an ia_hist_ snapshot at 4×3, re-swapped through applySwapChoice, shows the window live
+PASS G8b addedDetailFor fallback is `3×10 — RPE 7`: Main grammar, at or above every hand window low end, left verbatim
+PASS 20 FAIL 0
+### gate_g222_d181_chain_V228.out
+PASS row 5  untouched MARIO W5 Thu box->goblet->Leg press: boot = last live card in name AND detail (Leg press 4×8–12), chip offers goblet, two undos reach Barbell box squat 4×3 with the store empty (boot Leg press | 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest =live, chip Dumbbell goblet squat, 1/1)
+PASS row 5c untouched MARIO W5 Thu 2-cycle box->goblet->box: boots 1 and 2 = last live card (Barbell box squat 4×8–12) (BOOT1 Barbell box squat | 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest =live, 1/1)
+PASS row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras 222, 223, 224, 225, 226); every residue row boots equal to the composed-map boot (name!=live 0/5088, detail!=live 0/5088 (licence REFUSED above 226: 0), residue rows unlike the MAP boot 0)
+PASS row 5X untouched reachable collide2 and exch3: whole day == live, all of them (collide2 809/809, exch3 716/716 whole day == live)
+PASS row 8  CONTROL hist-restored day boots byte-equal to its ia_hist_ record, every class x t1 t2 up_st up_bt up_ts (rewrites 0/4070, no snapshot 0)
+PASS row 8d CONTROL no duplicate item name on a booted hist-restored card (undercounts on injured MARIO; row 8 is the byte check) (booted hist-restored cards with a duplicate name 0/4070, snapshots carrying one 0)
+PASS row 9a CONTROL up_ts: candidate boots byte-equal, day for day, to V221's boot of the same storage (814/814 byte-equal)
+PASS row 9b up_ts then one re-tap on the candidate, reboot: holds (boot == re-tapped live day) (814/814 hold, re-taps that moved the card 585 (0 is an empty re-tap and proves nothing))
+PASS 8 FAIL 0
+### gate_g222_d181_durable_V228.out
+PASS 1 lattice DURABLE, 504 cells, per touch×order cell: the booted slot carries the last choice in name AND detail (goblet `4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest`, Front squat `4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest`), and a touched day's ia_hist_ carries it (V221 190/504) (DURABLE 504/504)
+PASS 1c CONTROL (passes on V221 too): draft|swap_then_touch and done|swap_then_touch 72/72 each (draft|swap_then_touch 72/72, done|swap_then_touch 72/72)
+PASS 3 boot-orphaned logs: an ia_exw_ key naming a lift on the last live card and absent from the booted card, 0/504 (V221 72/504) (0/504 {})
+PASS 3d CONTROL (passes on V221 too): ia_exw_ key and entry counts equal across the reboot, 504/504 (504/504)
+PASS 2 undo reachable after reboot, 7 orderings: boot1 `Dumbbell goblet squat :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest`, chip offers Barbell box squat, undo -> `Barbell box squat :: 4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest` at the slot, record cleared, snapshot holds the box squat, boots 2 and 3 hold (V221 1/7) (
+PASS 4 M3 add/skip × swap on a frozen W5 Thu, 42 orderings: live==boot AND live==next-week boot 42/42 (V221 13/42) (42/42 (boot 42, next-week boot 42))
+PASS 4d CONTROL (passes on V221 too): M3 double-apply 0/42 (the COPY shape reads 6/42) (0/42)
+PASS 5s M4 snapshotted day, box -> goblet -> leg press, touch first/between/last: boot1 `Leg press :: 4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest` chip goblet, undo -> goblet 4×8–12, chip box, undo -> box 4×3, record gone, each surviving a boot 3/3 (V221 0/3) (3/3)
+PASS 6a CONTROL, must-not (a) (passes on V221 too): a swap or an undo on an untouched day writes no ia_hist_ and leaves the freeze cut unchanged, 0/36 (0/36)
+PASS 10 the record on a hist-restored day survives the boot byte-unchanged and the undo chip is offered, 7 shapes (V221 0/7, pruned) (7/7)
+PASS 10 FAIL 0
+### gate_g227_d190_cuecap_V228.out
+PASS row b-ALL    cue <=> cap on every live hop of the injured lattice (knee, ankle, hip, lowback, shoulder, elbow at workaround; W3, W5; hop1, hop2, cyc2): the card ends with the cue iff the plan caps the pattern and the cue-free dose carries no RPE (violations 0/9882 hops on 5543 chains (oracle cues 2038, off a cued donor 3597))
+PASS row b-HAND-1 MARIO knee/wa W5 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell split-stance deadlift -> Dumbbell goblet squat ends `2×8 — hold RPE 7, three in the tank`, live == boot (hop1 live "2×8" =boot, hop2 live "2×8 — hold RPE 7, three in the tank" =boot)
+PASS row b-HAND-2 ankle/wa W3 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell goblet squat (`2×8 — hold RPE 7, three in the tank`) -> Dumbbell split-stance deadlift (`2×8`), live == boot (hop1 live "2×8 — hold RPE 7, three in the tank" =boot, hop2 live "2×8" =boot)
+PASS row b-HAND-3 ankle/wa W3 thu Leg superset B: Kettlebell swing -> Dumbbell goblet squat (cued) -> Nordic hamstring curl (anchored) prints `2 sets — RPE 8 (stop 2 reps short of failure)`, live == boot (hop1 live "2×8 — hold RPE 7, three in the tank" =boot, hop2 live "2 sets — RPE 8 (stop 2 reps short of failure)" =boot)
+PASS row c-TOAST  pair vs V226: the toast on every live hop of the injured lattice is unmoved, 0 moved (toasts moved 0/9882 hops)
+PASS row c-UNINJ  pair vs V226: HALF_MANNY and mario_noinj live, boot, toast and undo unmoved, 0 moved (moved 0/1396 chains (live, boot, toast, undo, undo-boot))
+PASS row c-DIGEST pair vs V226: progDigest(buildProgram) equal on every lattice config, the uninjured two included (at 228 and above: the six injured against the D193 class (i) table) (8/8 configs equal)
+PASS row c-MANNY  MANNY_DIGEST_BY_VERSION[227] exists and === [226] by reference; HALF_MANNY on the artifact prints the era row ([227]===[226], HALF_MANNY 0ac7da6b1691a8e1 == [228])
+PASS 8 FAIL 0
+### gate_g227_d190_prefpath_V228.out
+PASS row c2-i    cue <=> cap on every built card of every pref build (natively cued source x every sheet candidate, six workaround regions): cue iff pattern capped and the cue-free dose carries no RPE (0 violations of 49218 cards, in 0 of 273 builds)
+PASS row c2-ii   uninjured-plus-same-pref reference (baseline), structural population (same name in the same slot on the uninjured build, pattern uncapped on the plan): target-card detail byte-equal (0 mismatches of 138 in population (excluded 1182))
+PASS row c2-iii  PAIR vs V226: no card other than the pref target moves, slot for slot, on every pref build (0 non-target cards moved of 47898 compared, 273 builds)
+PASS row c2-hand HAND build-path rows of the ruling: knee/wa {Reverse lunge (KB) -> DB split-stance DL} W3/W4 THU `2×8–12 each @ RPE 7`; shoulder/wa {DB incline press -> Cable pushdown} W1 MON `3×8–12 @ RPE 6–7` (3 cells exact)
+PASS 4 FAIL 0
+### gate_g227_d190_seam_V228.out
+PASS row e-PRE D190 HAND precondition: the 2 natively cued mario items and the 2 ankle ones are on their days by name and carry the cue on a typed capped pattern (4/4 located, cued, typed capped)
+PASS row a-MEM D190 membership proven: store-derived U (one ia_swaps_ record per hop, read after the chain) == hand-derived U (hop froms pairwise distinct), every reachable chain (store != hand 0/12354, |U| 11998, |U'| 356)
+PASS row a-U D190 on U: every touched slot boots equal to the live card in name and detail, residue 0 of |U|, |U| > 0, no licence (residue 0/11998, chains that moved the live card 9895)
+    INFO D191 P-SWAPREVISIT (never asserted, never licensed): |U'| 356, residue 30 | ankle_wa|hop3 4 | elbow_wa|hop3 4 | hip_wa|hop3 5 | knee_wa|hop3 5 | lowback_wa|hop3 7 | shoulder_wa|hop3 5
+PASS row a-U' D190 pair on U' (store shorter than the chain): every U' chain that boots equal to live on V226 boots equal to live on the candidate, created 0 (created 0 of 326 U' chains equal on V226 (|U'| 356, healed 0))
+PASS row d-U D190 R6 on U_d (hand: hop `to` names pairwise distinct on the day): the chip on the last hop's card is found and equals the last hop's `from`, and undoSwap(chip) leaves the whole day byte-identical to the day before the last hop; residue 0 of |U_d|, |U_d| > 0, no licence (residue 0/12282 (no chip 0, chip != hand chip 0, undo not byte-identical 0))
+PASS row d-U' D190 R6 pair on U_d' (some `to` repeats on the day): every U_d' chain that undoes byte-identical on V226 undoes byte-identical on the candidate, created 0, |U_d'| > 0 (created 0 of 44 U_d' chains byte-identical on V226 (|U_d'| 72, on both 72, healed 28))
+PASS row e D190 every reachable hop1/hop2/cyc2 chain from the 4 natively cued items: touched slot and whole day live == boot (live != boot 0/229 (62 + 57 + 55 + 55))
+PASS 7 FAIL 0
+### gate_g228_d192_undokey_V228.out
+PASS row d2-CHIP D192 whole walk: the chip on the last hop's card is found and equals the last hop's `from` (off the chain tuple); residue 0, |U_d'| > 0, every class and shape non-empty, PIN chip Deadlift (wrong 0/2201 (no chip 0, U_d' 0/744, hop5 0/1000), empty strata 0, PIN chip "Deadlift")
+PASS row d2-UNDO D192 whole walk: after undoSwap(chip) the live day is byte-identical to the live day before the last hop, and on U the day's store is the chain's first n-1 hops in recording order; residue 0, PIN store typed (wrong 0/2201 (day != pre 0, store != hand on U 0, hop5 0), PIN slot Deadlift store ["Trap bar deadlift->Barbell Romanian deadlift","Barbell Romanian deadlift->Deadlift"])
+PASS row d2-BOOT-U D192 on U (hand: hop `from` names pairwise distinct): after undo a fresh-VM boot of the day equals the live day; residue 0, |U| > 0, PIN in U boots equal to live (residue 0/1587, PIN in U, boots Deadlift == live true)
+  INFO D191 P-SWAPREVISIT (never asserted, never licensed; no pair row on U' boot, ruling §3): walk |U'| 128 boot != live candidate 18 / V227 18 (on both 128), created 0, healed 0 | hop4 |U'| 95 boot != live candidate 13 / V227 81 (on both 95), created 0, healed 68 | hop5 |U'| 391 boot != live candidate 54 / V227 76 (on both 391), created 2, healed 24 | pin |U'| 0 boot != live candidate 0 / V227 0 (on both 0), creat
+  INFO GUARD clear (ruling §5 refutation, FAIL-only): hop5 created 2 <= 2, walk+hop4 created 0, every created chain has a repeated `from`
+PASS row d2-MANNY D192 HALF_MANNY digest == era table == 0ac7da6b1691a8e1 == V227, self-stable; swapOriginOf reached 0 times by buildProgram and refreshProgram (counter wired) (0ac7da6b1691a8e1, calls 0)
+PASS 4 FAIL 0
+### gate_g228_d193_cueword_V228.out
+PASS row c-LIT       INJ_CAP_CUE is ` — hold RPE 7, three in the tank`: three = 10 − 7 by hand, and the RPE card says RPE 8 ≈ 2 reps left (8 + 2 = 10) (word "three", want "three"; card agrees)
+PASS row b-ONECLASS  every L9, L432 and home_basic build == V227 with ` — hold RPE 7, two in the tank` re-ended `three`, nothing else; uninjured 47 byte-identical; HALF_MANNY on the era row, [228] === [227] (L9: candidate == SUBST(V227) 9/9; L432: candidate == SUBST(V227) 432/432; home_basic: candidate == SUBST(V227) 108/108; uninjured47: candidate == SUBST(V227) 47/47; MANNY [228]===[227], 0ac7da6b1691a8e1 == [228
+PASS row f-STRIP     _stripCapCue strips both wordings to the bare dose, identity on every non-cue detail (hand near misses, HALF_MANNY "tank" cards, every non-cue card of HALF_MANNY and L9) (hand 0 wrong of 13, false strips 0/1722, tank cards 0/9 stripped)
+PASS row f-STORED    a V227-stored "two" card (mario knee/wa W5 thu Step-ups (KB)) swapped live on the candidate: capped target re-cued "three", uncapped no cue, 0 old words, undo restores the stored words (Reverse lunge (KB) [lunge, capped] week 6 ok, Barbell good mornings [hinge, uncapped] week 6 ok)
+PASS row g-COUPLE    invariants: _addRxKind refuses a cued detail (either wording); 0 power cards cued; a loaded-to-loaded uncued swap carries the donor dose verbatim (fence holds, power cued 0/649, uncued swap verbatim)
+PASS 5 FAIL 0
+## single
+[1] mario OV W5 CF4: swap rejected 0 of 222 (22 cards) | aux 0 of 66 (5) | add 0 of 79 (5 days)
+[1] mario OV W5 CF5: swap rejected 0 of 222 (22 cards) | aux 0 of 66 (5) | add 0 of 79 (5 days)
+[1] HALF_MANNY V228 digest 0ac7da6b1691a8e1 self-stable true
+[1] HALF_MANNY CF5 digest 0ac7da6b1691a8e1 self-stable true
+[1] uninjured builds CF5 == V228: 98/98
+[b] uninjured mario_noinj W5 thu, 4 hops then boot, undo-all, undo+boot: _preHold keys in day (live/boot/undo/undo+boot) CF5 0/0/0/0 V228 0/0/0/0 | day JSON CF5 == V228 true/true/true/true | ph in record CF5 false
+
+[3] mario W5 thu V228 CFG
+    U1 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold none | undo(chip "Single-leg hip thrust") -> Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none | day identical to pre-hop true
+    U2 hop1 Leg extension "2×6–10 @ RPE 8" _preHold none | hop2 Barbell good mornings "2×6–10 @ RPE 8" _preHold none | undo -> Leg extension "2×6–10 @ RPE 8" _preHold none | day identical to pre-hop2 true | record after undo rx 1 ph []
+    RB REBOOT slot Leg extension "2×6–10 @ RPE 8" _preHold none | hop3 LIVE "2×6–10 @ RPE 8" | BOOT "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8" | live==boot==direct true
+
+[3] mario W5 thu SL2 CFG
+    U1 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | undo(chip "Single-leg hip thrust") -> Single-leg hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | day identical to pre-hop false
+    U2 hop1 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | hop2 Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | undo -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | day identical to pre-hop2 true | record after undo rx 1 ph []
+    RB REBOOT slot Leg extension "2×6–10 @ RPE 7" _preHold none | hop3 LIVE "2×6–10 @ RPE 7" | BOOT "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8" | live==boot==direct false
+
+[3] mario W5 thu CF5 CFG
+    U1 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | undo(chip "Single-leg hip thrust") -> Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none | day identical to pre-hop true
+    U2 hop1 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | hop2 Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | undo -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | day identical to pre-hop2 true | record after undo rx 1 ph []
+    RB REBOOT slot Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | hop3 LIVE "2×6–10 @ RPE 8" | BOOT "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8" | live==boot==direct true
+
+[3] mario W5 thu V228 OV
+    U1 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold none | undo(chip "Single-leg hip thrust") -> Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none | day identical to pre-hop true
+    U2 hop1 Leg extension "2×6–10 @ RPE 8" _preHold none | hop2 Barbell good mornings "2×6–10 @ RPE 8" _preHold none | undo -> Leg extension "2×6–10 @ RPE 8" _preHold none | day identical to pre-hop2 true | record after undo rx 1 ph []
+    RB REBOOT slot Leg extension "2×6–10 @ RPE 8" _preHold none | hop3 LIVE "2×6–10 @ RPE 8" | BOOT "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8" | live==boot==direct true
+
+[3] mario W5 thu SL2 OV
+    U1 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold none | undo(chip "Single-leg hip thrust") -> Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none | day identical to pre-hop true
+    U2 hop1 Leg extension "2×6–10 @ RPE 8" _preHold none | hop2 Barbell good mornings "2×6–10 @ RPE 8" _preHold none | undo -> Leg extension "2×6–10 @ RPE 8" _preHold none | day identical to pre-hop2 true | record after undo rx 1 ph []
+    RB REBOOT slot Leg extension "2×6–10 @ RPE 8" _preHold none | hop3 LIVE "2×6–10 @ RPE 8" | BOOT "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8" | live==boot==direct true
+
+[3] mario W5 thu CF5 OV
+    U1 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold none | undo(chip "Single-leg hip thrust") -> Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none | day identical to pre-hop true
+    U2 hop1 Leg extension "2×6–10 @ RPE 8" _preHold none | hop2 Barbell good mornings "2×6–10 @ RPE 8" _preHold none | undo -> Leg extension "2×6–10 @ RPE 8" _preHold none | day identical to pre-hop2 true | record after undo rx 1 ph []
+    RB REBOOT slot Leg extension "2×6–10 @ RPE 8" _preHold none | hop3 LIVE "2×6–10 @ RPE 8" | BOOT "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8" | live==boot==direct true
+[3] OV SL2 == V228 OV line by line: 3/3
+[3] OV CF5 == V228 OV line by line: 3/3
+[5] base V228 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 0 | ia_swaps_PM: _preHold/ph 0, name/detail paths 0
+[5] base SL2 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 0 | ia_swaps_PM: _preHold/ph 0, name/detail paths 0
+[5] base CF5 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 0 | ia_swaps_PM: _preHold/ph 0, name/detail paths 0
+    name/detail projection SL2 == V228: ia_programs true, ia_hist_PM true, ia_swaps_PM true
+    name/detail projection CF5 == V228: ia_programs true, ia_hist_PM true, ia_swaps_PM true | CF5 == SL2: ia_programs true, ia_hist_PM true, ia_swaps_PM true
+[5] hop V228 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 0 | ia_swaps_PM: _preHold/ph 0, name/detail paths 6
+[5] hop SL2 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 0 | ia_swaps_PM: _preHold/ph 1 [ia_swaps_PM.w5_thu[1].rx[0].ph="2×6–10 @ RPE 8"], name/detail paths 6
+[5] hop CF5 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 0 | ia_swaps_PM: _preHold/ph 1 [ia_swaps_PM.w5_thu[1].rx[0].ph="2×6–10 @ RPE 8"], name/detail paths 6
+    name/detail projection SL2 == V228: ia_programs true, ia_hist_PM true, ia_swaps_PM true
+    name/detail projection CF5 == V228: ia_programs true, ia_hist_PM true, ia_swaps_PM true | CF5 == SL2: ia_programs true, ia_hist_PM true, ia_swaps_PM true
+[5] reboot V228 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 0 | ia_swaps_PM: _preHold/ph 0, name/detail paths 6
+[5] reboot SL2 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 0 | ia_swaps_PM: _preHold/ph 1 [ia_swaps_PM.w5_thu[1].rx[0].ph="2×6–10 @ RPE 8"], name/detail paths 6
+[5] reboot CF5 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 0 | ia_swaps_PM: _preHold/ph 1 [ia_swaps_PM.w5_thu[1].rx[0].ph="2×6–10 @ RPE 8"], name/detail paths 6
+    name/detail projection SL2 == V228: ia_programs true, ia_hist_PM true, ia_swaps_PM true
+    name/detail projection CF5 == V228: ia_programs true, ia_hist_PM true, ia_swaps_PM true | CF5 == SL2: ia_programs true, ia_hist_PM true, ia_swaps_PM true
+[5] trained V228 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 16 | ia_swaps_PM: _preHold/ph 0, name/detail paths 6
+[5] trained SL2 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 1 [ia_hist_PM.w5_thu.s3i1._preHold="2×6–10 @ RPE 8"], name/detail paths 16 | ia_swaps_PM: _preHold/ph 1 [ia_swaps_PM.w5_thu[1].rx[0].ph="2×6–10 @ RPE 8"], name/detail paths 6
+[5] trained CF5 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 1 [ia_hist_PM.w5_thu.s3i1._preHold="2×6–10 @ RPE 8"], name/detail paths 16 | ia_swaps_PM: _preHold/ph 1 [ia_swaps_PM.w5_thu[1].rx[0].ph="2×6–10 @ RPE 8"], name/detail paths 6
+    name/detail projection SL2 == V228: ia_programs true, ia_hist_PM false, ia_swaps_PM true
+    name/detail projection CF5 == V228: ia_programs true, ia_hist_PM false, ia_swaps_PM true | CF5 == SL2: ia_programs true, ia_hist_PM true, ia_swaps_PM true
+[5] trainedReboot V228 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 0, name/detail paths 16 | ia_swaps_PM: _preHold/ph 0, name/detail paths 6
+[5] trainedReboot SL2 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 1 [ia_hist_PM.w5_thu.s3i1._preHold="2×6–10 @ RPE 8"], name/detail paths 16 | ia_swaps_PM: _preHold/ph 1 [ia_swaps_PM.w5_thu[1].rx[0].ph="2×6–10 @ RPE 8"], name/detail paths 6
+[5] trainedReboot CF5 | ia_programs: _preHold/ph 0, name/detail paths 366 | ia_hist_PM: _preHold/ph 1 [ia_hist_PM.w5_thu.s3i1._preHold="2×6–10 @ RPE 8"], name/detail paths 16 | ia_swaps_PM: _preHold/ph 1 [ia_swaps_PM.w5_thu[1].rx[0].ph="2×6–10 @ RPE 8"], name/detail paths 6
+    name/detail projection SL2 == V228: ia_programs true, ia_hist_PM false, ia_swaps_PM true
+    name/detail projection CF5 == V228: ia_programs true, ia_hist_PM false, ia_swaps_PM true | CF5 == SL2: ia_programs true, ia_hist_PM true, ia_swaps_PM true
+[5] slot after reboot V228: untrained Leg extension "2×6–10 @ RPE 8" _preHold none | trained (hist-restored) Leg extension "2×6–10 @ RPE 8" _preHold none
+[5] slot after reboot SL2: untrained Leg extension "2×6–10 @ RPE 7" _preHold none | trained (hist-restored) Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+[5] slot after reboot CF5: untrained Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | trained (hist-restored) Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+## chains
+C worker CF5:elbow_wa:OV 8369 (88 s)
+chains done
+ALL_DONE
+[4] BASELINE V228 OV mario chains, this run vs M9 run: differ 0 of 320
+[4] CF5 OV vs V228 OV W5 chains n=13323 | moved: (none) | _preHold key on slot: live 0 boot 0 undo 0 undo+boot 0 | chains whose booted day carries any _preHold 0, whose undone day does 0 | ph entries 0 | hold toasts 0
+[4] CF5 OV vs V228 OV W3 chains n=5257 | moved: (none) | _preHold key on slot: live 0 boot 0 undo 0 undo+boot 0 | chains whose booted day carries any _preHold 0, whose undone day does 0 | ph entries 0 | hold toasts 0
+## guard
+[guard] created chains parsed 117 of 117 lines | by pop hop4 1 | hop5 36 | walk 80 | by shape A>B>A>B 41 | A>B>A>B>A>C 1 | A>B>A>C 39 | A>B>A>C>A>D 3 | A>B>C>A>D 1 | A>B>C>B>A>D 2 | A>B>C>B>D>B 1 | A>B>C>D>A>B 4 | A>B>C>D>A>E 24 | A>B>C>D>C>B 1
+[guard] V228: replayed 117 (unreplayable 0) | boot == live after undo 115 | differing, by differing keys: detail 2
+[guard] SL2: replayed 117 (unreplayable 0) | boot == live after undo 0 | differing, by differing keys: _preHold 115 | _preHold,detail 2
+[guard] CF5: replayed 117 (unreplayable 0) | boot == live after undo 0 | differing, by differing keys: _preHold 115 | _preHold,detail 2
+    e.g. walk knee_wa W3 tue A>B>A>B Weighted chinups > Barbell row > Weighted chinups > Barbell row | chip "Weighted chinups" | [1][1] live Weighted chinups "2×5–6 @ RPE 7" _preHold "2×5–6 @ RPE 7" ; boot Weighted chinups "2×5–6 @ RPE 7" _preHold undefined
+    e.g. walk knee_wa W3 sat A>B>A>B Feet-elevated inverted rows > Dumbbell row > Feet-elevated inverted rows > Dumbbell row | chip "Feet-elevated inverted rows" | [0][1] live Feet-elevated inverted rows "2 sets — RPE 7 (leave 3 or more in reserve)" _preHold "2 sets — RPE 7 (leave 3 or more in reserve)" ; boot Feet-elevated inverted rows "2 sets — RPE 7 (leave 3 or more in reserve)" _preHold undefined
+    e.g. walk knee_wa W3 tue A>B>A>B Trap bar deadlift > Sumo deadlift > Trap bar deadlift > Sumo deadlift | chip "Trap bar deadlift" | [0][0] live Trap bar deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" _preHold "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" ; boot Trap bar deadlift "4×5 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" _preHold undefined
+## toast
+[2] c-TOAST corroboration (D190 chain lattice, fixture, hop1/hop2/cyc2): hops 2268 | toasts moved vs V226 1915 | moved ending with the hold sentence 1915 | moved NOT a hold variant 0 | per cfg elbow_wa 958 | hip_wa 143 | lowback_wa 350 | mario 22 | shoulder_wa 442

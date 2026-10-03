@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="228"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="229"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -8090,9 +8090,31 @@ function _injViewName(n,cfg){ if(!cfg||!cfg.injury) return n; const P=injuryPlan
 // the stripper both swap hops run before _swapDetailFor, so the carry never sees it and the filter alone writes it.
 // V228 D193 P-CAPRPE R1 (split, Mario round 2): the cue says three, rpeFromWave's rir at RPE 7 and _bwSetsFromDetail's RPE 7 line.
 const INJ_CAP_CUE=' — hold RPE 7, three in the tank';
+// V229 D193 P-CAPRPE (Amendment 3 section 2, V229 siting): the strength test-week text is one top-level string, read by
+// _testRx in the build and returned by the stripper below; INJ_HELD_TEST is R7's text (D193-HELDTEST): a held pattern
+// does not test. The filter writes it on a capped Main; the stripper reads beneath it, so it appears only on a held lift.
+const TEST_RX_TEXT='Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline.';
+const INJ_HELD_TEST='Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here.';
 // V228 D193 P-CAPRPE (R4): the stripper recognises the cue by shape, not by today's spelling: V227 stored 'two in the
 // tank', V228 writes 'three'. One regex, both wordings, no constant to expire; every other detail comes back unchanged.
-function _stripCapCue(d){ if(typeof d!=='string') return d; const m=/ — hold RPE 7, (?:two|three) in the tank$/.exec(d); return m?d.slice(0,m.index):d; }
+// V229 D193 (Amendment 3 section 2): it also reads beneath R7's held-test text, matched by shape (its fixed clauses, the
+// RPE number free) and returned as TEST_RX_TEXT. The test text itself and every non-cue detail still come back unchanged.
+function _stripCapCue(d){ if(typeof d!=='string') return d; if(/^Work up to one working set of 3 to 5 reps at RPE [\d.]+\. Technique stays crisp\. No grinding\. Log the weight and the reps\. Your injury plan holds this lift, so there is no new baseline here\.$/.test(d)) return TEST_RX_TEXT; const m=/ — hold RPE 7, (?:two|three) in the tank$/.exec(d); return m?d.slice(0,m.index):d; }
+// V229 D193 P-CAPRPE (R2, R7): on a capped pattern a named RPE above 7 (a range by its top) is held at 7, and the reserve
+// gloss it carried is restated by the file's own RPE 7 line for that shape: bwsets (_bwSetsFromDetail's RPE 7 branch),
+// wave (rpeFromWave at 7, rir 3), loadCapped (scheme()'s _effEase line). The @ RPE grammar never glosses and gets none.
+// R7 (D193-HELDTEST), checked first: a detail of the strength test's shape (TEST_RX_TEXT, any RPE number) becomes
+// INJ_HELD_TEST, the hold in words. Any other detail at or under 7 comes back byte-identical. Read only by
+// applyInjuryFilter, the plan's single writer (D190).
+function _capRpeClamp(d){
+  if(typeof d!=='string') return d;
+  if(/^Work up to one heavy set of 3 to 5 reps at RPE [\d.]+\. Technique stays crisp\. No grinding\. Log the weight and the reps\. That set is your new baseline\.$/.test(d)) return INJ_HELD_TEST;
+  return d.replace(/RPE\s*(\d+(?:\.\d+)?)(?:[–-](\d+(?:\.\d+)?))?\+?( \((?:stop 2 reps short of failure|leave ~\d+ reps? in reserve|heaviest pair you can find)\))?/g,function(t,lo,hi,g){
+    if(!(Math.max(+lo,hi?+hi:0)>7)) return t;
+    if(!g) return 'RPE 7';
+    return 'RPE 7'+(/^ \(stop/.test(g)?' (leave 3 or more in reserve)':/^ \(heaviest/.test(g)?' (leave ~3 in reserve)':' (leave ~3 reps in reserve)');
+  });
+}
 function applyInjuryFilter(sections,cfg){
   const P=injuryPlan(cfg);
   if(!P||!Array.isArray(sections)) return sections;
@@ -8129,7 +8151,7 @@ function applyInjuryFilter(sections,cfg){
         const SWAP_GEAR_FALLBACK={'Cable pushdown':'Close-grip pushups'};
         if(_gOK(name)){ const to=P.swapNames[name]; name=_gOK(to)?to:(SWAP_GEAR_FALLBACK[to]||to); }
       }
-      if(pat&&P.cap.has(pat)&&detail&&!/RPE/.test(detail)) detail=detail+INJ_CAP_CUE;
+      if(pat&&P.cap.has(pat)&&detail) detail=/RPE/.test(detail)?_capRpeClamp(detail):detail+INJ_CAP_CUE;   // V229 D193 (R2, R7)
       if(seen.has(name)) return;  // swaps can collide with an existing pick
       seen.add(name);
       // Labels embed the drawn movement ('Main — Dumbbell bench press'), so a
@@ -8936,7 +8958,7 @@ function engineC_kinematics(cfg, A, B){
     // and isRecoveryWeek is week-loop scope, not buildSections scope — so the taper guard
     // alone is the correct gate here. The day-tag site keeps both guards (it has both).
     const _testWk = goal==='strength' && totalWeeks<=6 && w===totalWeeks && !inTaper(w);
-    const _testRx = 'Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline.';
+    const _testRx = TEST_RX_TEXT;   // V229 D193: one text, hoisted beside the cue stripper, which returns it beneath R7
     const isBeginner=cfg.experience==='beginner';
     const restNote=isBeginner?' — 3 min rest, focus on form':'';
     // V135: the barbell days opened cold into RPE-8 work while every run interval carries
@@ -9838,7 +9860,7 @@ function _auxGearOK(name,equip){
 // bypassed through the side door of a swap.
 function auxSwapCandidates(outName,day,prog){
   const fam=_auxFamily(outName); if(!fam) return [];
-  const cfg=(prog&&prog.cfg)||{};
+  const cfg=_dayPlanCfg(prog,day);   // D194 R1 (equipment unchanged: injury only)
   const onCard=Object.create(null);
   ((day&&day.sections)||[]).forEach(function(s){((s&&s.items)||[]).forEach(function(it){if(it&&it.name)onCard[it.name.toLowerCase()]=1;});});
   const _ssP=_ssPartnerOf(day,outName);   // V164 D5: same partner filter as swapCandidates
@@ -9962,6 +9984,16 @@ function swapUniverseFor(prog,week,day){
   if(Array.isArray(byKey)&&byKey.length) return byKey;
   return Array.isArray(prog._swapUniverse)?prog._swapUniverse:[];
 }
+// D194 R1 (P-INJLENS), measure CF4 reading: the plan that governs a card is the plan of the day the card is on.
+// Outside buildProgram the injury is read off the day's own overlay stamp (_ovKey via dayOverlayInfo, the carrier
+// swapUniverseFor already keys on). A day whose stamp carries no injury key (no stamp, or a travel stamp) keeps
+// prog.cfg's injury, which is what that day's build used. Injury only: every other field is prog.cfg's.
+function _dayPlanCfg(prog,day){
+  const base=(prog&&prog.cfg)||{};
+  const ov=dayOverlayInfo(day);
+  if(!ov||!ov.patch||!Object.prototype.hasOwnProperty.call(ov.patch,'injury')) return base;
+  return Object.assign({},base,{injury:ov.patch.injury});
+}
 // Survives the athlete's injury plan? Wrapped as a throwaway section so the real
 // filter does the judging — no second copy of the drop rules.
 function _swapInjuryOK(name,cfg){
@@ -9980,7 +10012,7 @@ function _swapInjuryOK(name,cfg){
 // is paternalistic, offering it silently is negligent. So off-region candidates appear,
 // with what they actually collide with stated on the row.
 function addCandidates(day,week,prog){
-  const cfg=(prog&&prog.cfg)||{};
+  const cfg=_dayPlanCfg(prog,day);   // D194 R1
   const onCard=Object.create(null), patsOnCard=Object.create(null);
   let dayRegion=null;
   ((day&&day.sections)||[]).forEach(function(s){((s&&s.items)||[]).forEach(function(it){
@@ -10068,7 +10100,7 @@ function addedDetailFor(day,name,week,prog){
   return '3\u00d710 \u2014 RPE 7';
 }
 function swapCandidates(outName,day,week,prog){
-  const cfg=(prog&&prog.cfg)||{};
+  const cfg=_dayPlanCfg(prog,day);   // D194 R1
   const outPat=_pattern(outName);
   const outRegion=outPat?_PATTERN_REGION[outPat]:null;
   // Already on today's card — never offer a duplicate movement.
@@ -10316,11 +10348,16 @@ function applySessionSwaps(prog,store){
     // _swapDetailFor the sheet used, so each hop's detail comes from the hop before it.
     const list=(store[k]||[]).filter(e=>e&&e.from&&e.to);
     let hit=false;
+    const _renamed=[];   // V229 D193 (A3 s4) / D194 R6: the items this replay renamed, by identity
     list.forEach(e=>{
       const m1=Object.create(null); m1[e.from]=e.to;
+      const _was=[]; day.sections.forEach(s=>((s&&s.items)||[]).forEach(it=>{ if(it&&it.name===e.from) _was.push(it); }));
       if(applySwapPrefs(day.sections,m1)) hit=true;
+      _was.forEach(it=>{ if(it.name!==e.from&&_renamed.indexOf(it)<0) _renamed.push(it); });
     });
     if(hit && prog.cfg && prog.cfg.injury){
+      // the pre-filter replay result rides beside each renamed item; the filter copies item fields through
+      _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });
       day.sections=applyInjuryFilter(day.sections,prog.cfg);
     }
   });
@@ -14290,21 +14327,29 @@ function applySwapChoice(to){
   // path renames them all. undoSwap writes these back; nothing replays them on a build.
   const _undoRx=[];
   (day.sections||[]).forEach(function(s,si){((s&&s.items)||[]).forEach(function(it,ii){
-    if(it&&it.name===from&&typeof it.detail==='string') _undoRx.push({s:si,i:ii,d:it.detail});
+    // V229 D193 (Amendment 3 section 4): the from-card's kept dose rides beside its detail as `ph`, only when it has one.
+    if(it&&it.name===from&&typeof it.detail==='string'){ const _e={s:si,i:ii,d:it.detail}; if(typeof it._preHold==='string') _e.ph=it._preHold; _undoRx.push(_e); }
   });});
   item.name=to;
   const _wasDetail=item.detail;
   // V227 D190 P-SWAPSEAM: the carry is blind to the plan's cue (R2), _reRx reads the stripped donor so a cue never
   // moves a toast (R4), and the plan's filter alone decides the cue for the movement now on the card (R3).
-  const _base=_stripCapCue(_wasDetail);
+  // V229 D193 (R3): the dose that travels is the dose beneath the hold: the kept pre-hold dose when this card has one,
+  // else the card as it stands, read beneath the cue or the held-test text.
+  const _base=_stripCapCue((typeof item._preHold==='string')?item._preHold:_wasDetail);
   const _rx={};
   item.detail=_swapDetailFor(to,_base,_rx);
   const _reRx=(item.detail!==_base);
+  // V229 D193 (R3, R8; Amendment 3 section 4): on an injured program the tap keeps the dose before the re-filter beside the
+  // card (never printed, never in a sheet row, a digest or a toast), and _held says the plan's clamp changed the RPE of the
+  // dose it was handed. Nothing is kept on an uninjured program: the card is its own beneath.
+  const _preF=item.detail; let _held=false;
   if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){
+    item._preHold=_preF;
     try{
       const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],activeProg.cfg);
       const _fi=_fs&&_fs[0]&&_fs[0].items&&_fs[0].items[0];
-      if(_fi&&_fi.name===to) item.detail=_fi.detail;
+      if(_fi&&_fi.name===to){ _held=(/RPE/.test(_preF)&&_fi.detail!==_preF); item.detail=_fi.detail; }
     }catch(e){}
   }
   if(sec.label&&sec.label.indexOf(from)>=0) sec.label=sec.label.split(from).join(to);
@@ -14317,7 +14362,14 @@ function applySwapChoice(to){
   // movement cannot express them, say so instead.
   // V221 D177 (R5): the third branch fires only when the window branch moved the reps.
   // Never on the unloadable branch, which keeps its V119 copy, never on a verbatim pair.
-  showToast(_rx.win
+  // V229 D193 (R8): when the plan's clamp changed the number, the toast names the hold in the same branch's words.
+  showToast(_held
+    ? (_rx.win
+      ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'. Your injury plan holds this one at RPE 7.'
+      : _reRx
+      ? to+' in, '+from.toLowerCase()+' out. No load to add here. Your injury plan holds this one at RPE 7.'
+      : to+' in, '+from.toLowerCase()+' out. Same sets, same reps. Your injury plan holds this one at RPE 7.')
+    : _rx.win
     ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Same sets, same effort. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'.'
     : _reRx
     ? to+' in, '+from.toLowerCase()+' out. No load to add here, so take the sets to the same effort.'
@@ -14458,7 +14510,8 @@ function undoSwap(from){
       let it=(at&&at.name===from&&_put.indexOf(at)<0)?at:null;
       if(!it) (day.sections||[]).some(function(s){return ((s&&s.items)||[]).some(function(x){
         if(x&&x.name===from&&_put.indexOf(x)<0){it=x;return true;} return false;});});
-      if(it){it.detail=p.d;_put.push(it);}
+      // V229 D193 (Amendment 3 section 4) / D194 R6: the kept dose comes back from the record with the card, or nothing is kept.
+      if(it){it.detail=p.d;if(typeof p.ph==='string') it._preHold=p.ph; else delete it._preHold;_put.push(it);}
     });
   }
   clearSwap(activeProgId,currentWeek,currentDayKey,from);

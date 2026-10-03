@@ -47,6 +47,12 @@
 // VERSION PREDICATE (standing rulings 2 and 4). D193's split ships at 228.
 //   below 228      REFUSED, every row FAILS by name.
 //   228 and up     every row asserts.
+//   229 and up     b-ONECLASS is retired: tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 (r) "b-ONECLASS era
+//                  228 only, refuses at 229, its successor is D193 (a)/(b)" (g229_d193_build.js, V229). Its build pass still
+//                  runs (it fills the caches f-STRIP and g-COUPLE read) and prints its lines; the row prints one named
+//                  `SKIP ... REFUSED at ia-version N (era 228 only)` line, never PASS and never FAIL: the shape gate.sh
+//                  accepts for an era-bound row past its era (g221's scoped-out pair rows and G9). c-LIT, f-STRIP, f-STORED
+//                  and g-COUPLE (R1, R4, R5, R6) assert at every version from 228 up.
 //   IA_ASSUME_VERSION=228 lifts a file stamped exactly 227 to 228 for a discrimination run. It is announced, and ignored
 //   on any other file. gate.sh never sets it. Run on V227 that way: c-LIT, b-ONECLASS, f-STRIP and f-STORED FAIL with
 //   their counts printed (the V227 cue says "two", its grid is not V227-substituted, its stripper misses "three", its
@@ -223,7 +229,10 @@ const setupNote = B ? '' : ' (setup: no V' + BASE_ERA + ' tree: ' + baseWhy + ')
 // ── b-ONECLASS (plus the build caches f-STRIP and g-COUPLE read) ───────────────────────────────────────────────────
 const BUILT = {};   // candidate builds by set|key
 {
-  if(!B) ok(R.bONE + setupNote, false);
+  // D194 Amendment 1 (r): "b-ONECLASS era 228 only, refuses at 229, its successor is D193 (a)/(b)" (g229_d193_build.js, V229).
+  // The build pass below still runs (f-STRIP and g-COUPLE read its caches); from 229 the row prints one named SKIP line.
+  const ONE_RETIRED = VER >= 229;
+  if(!B && !ONE_RETIRED) ok(R.bONE + setupNote, false);
   const VC = fresh('C'), VB = B ? fresh('B') : null;
   // SELFCHECK: the shared VM is inert (a fresh-page build equals it) and each tree builds the same program twice
   const probe = [L9.mario, L9.manny, L9.elbow_wa];
@@ -262,7 +271,8 @@ const BUILT = {};   // candidate builds by set|key
   const builtPin = progDigest(fresh('C').buildProgram(clone(fixtures.HALF_MANNY)));      // and on the gate's pinned clock
   console.log('    b MANNY MANNY_DIGEST_BY_VERSION[' + ERA + '] ' + (has ? MD[ERA] : 'ABSENT') + ', [' + BASE_ERA + '] ' + MD[BASE_ERA] + ', [' + VER + '] ' + row + ' | HALF_MANNY built ' + built + ', pinned ' + builtPin);
   const mannyOK = has && ref && typeof row === 'string' && built === row && builtPin === row;
-  if(B) ok(R.bONE + (has ? '' : ' (row MANNY_DIGEST_BY_VERSION[' + ERA + '] ABSENT)'), allOK && baseSelf === baseAll && baseAll > 0 && mannyOK,
+  if(ONE_RETIRED) console.log('SKIP ' + R.bONE + ': REFUSED at ia-version ' + VER + ' (era 228 only: "nothing but the word changes" is V228\'s claim); its successor is D193 (a)/(b), g229_d193_build.js, V229 (tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 (r)). Never PASS, never FAIL.');
+  else if(B) ok(R.bONE + (has ? '' : ' (row MANNY_DIGEST_BY_VERSION[' + ERA + '] ABSENT)'), allOK && baseSelf === baseAll && baseAll > 0 && mannyOK,
     lines.map(l => l.split(' | ')[0]).join('; ') + '; MANNY [' + ERA + ']' + (ref ? '===' : '!==') + '[' + BASE_ERA + '], ' + built + (built === row ? ' == ' : ' != ') + '[' + VER + ']');
 }
 

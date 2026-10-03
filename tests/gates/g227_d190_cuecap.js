@@ -60,6 +60,13 @@
 // VERSION PREDICATE (standing rulings 2 and 4). D190 ships at 227.
 //   below 227      REFUSED, every assertion row FAILS by name.
 //   227 and up     every row asserts.
+//   229 and up     c-TOAST re-keyed (D193's R8 hold toasts: tests/measure/v228_rulings/d193_caprpe_ruling.md Amendment 2
+//                  R8 and Amendment 4 "The rules", R8 trigger restated; tests/measure/v229_rulings/d194_injlens_ruling.md
+//                  Amendment 1 (r) and Amendment 3's beneath-the-hold lens): every toast that moved against V226 is the
+//                  hold variant of its hand kind on a hand clamp pair, every hand clamp pair prints the hold sentence, and
+//                  the moved count is pinned (1,706 of 9,882; 0 on V228).
+//                  Fixture presentation (`cfg.injury` stored); app equivalence is D194 part 2's row.
+//                  Below 229 c-TOAST asserts exactly as before.
 //   IA_ASSUME_VERSION=227 lifts a file stamped exactly 226 to 227 for a discrimination run. It is announced, and
 //   ignored on any other file. gate.sh never sets it.
 //   Pair rows (c-TOAST, c-UNINJ, c-DIGEST) read the baseline from argv[3] if it reads ia-version 226, else from
@@ -380,7 +387,53 @@ for(const h of HANDS){
     console.log('    c-TOAST ' + Object.keys(seg).map(k => k + ' ' + seg[k].mv + '/' + seg[k].n).join(', ') + ' | hops with a toast ' + nonEmpty + ', hops the plan cues ' + cueHops);
     if(mv.length) console.log('    c-TOAST moves: ' + fmt(tally(mv, m => String(m.b).replace(/^.* out\. /, '').slice(0, 30) + ' => ' + String(m.a).replace(/^.* out\. /, '').slice(0, 30))));
     mv.slice(0, 3).forEach(m => console.log('      ' + tag(m.c) + ' hop' + (m.k + 1) + '\n        V' + BASE_ERA + ' ' + m.b + '\n        now  ' + m.a));
-    ok(R.cTOAST, SELF_C && SELF_B && PAIRSELF && hops > 0 && nonEmpty > 0 && cueHops > 0 && moved === 0, 'toasts moved ' + moved + '/' + hops + ' hops');
+    // V229 D193 R8 (Amendment 2 R8, Amendment 4 "The rules": R8 trigger restated, (k) "0 false claims"), D194 Amendment 1 (r)
+    // ("c-TOAST 1,706 of 9,882 (D193 R8: every moved toast ends with the hold sentence and its pair's clamp changed the number
+    // by the (k) hand oracle; count pinned; the row parks if any moved toast is not a hold variant)") and Amendment 3 (the
+    // dose is judged beneath its hold). Fixture presentation (`cfg.injury` stored); app equivalence is D194 part 2's row.
+    // HAND (k) ORACLE, typed, never the tree under test, measure's M8 (k) method (tests/measure/v229_caprpe_cf3.js :359-368)
+    // carried hop by hop: the dose handed to the clamp is the chain's dose read beneath its hold (both cue wordings; R7's
+    // text by shape -> the strength test text), converted where V226 itself converted the same pair (its card != its
+    // donor, both read beneath the cue, and no window toast) by the unloadable reader's bucket (Amendment 3 section 1: 6
+    // for RPE 6.x, light or easy; 7 for RPE 7.x; else 8), else its named RPE (a range by its top). A clamp pair is a
+    // target capped by CAP (the gate's hand table; `pat` is the classifier, not under test) with that RPE above 7. The
+    // hold variant's body is typed from R8: window "The load runs out before the reps do here. Reps move to a to b."
+    // (a and b off V226's window toast), unloadable "No load to add here.", verbatim "Same sets, same reps.", each ending
+    // " Your injury plan holds this one at RPE 7.".
+    const D193_ERA = 229, D193_CTOAST_PIN = 1706;
+    if(VER >= D193_ERA){
+      const HOLD_K = ' Your injury plan holds this one at RPE 7.';
+      const CUE_K = / — hold RPE 7, (?:two|three) in the tank$/;
+      const R7_K = /^Work up to one working set of 3 to 5 reps at RPE \d+(?:\.\d+)?\. Technique stays crisp\. No grinding\. Log the weight and the reps\. Your injury plan holds this lift, so there is no new baseline here\.$/;
+      const TEST_K = 'Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline.';
+      const blindK = s => typeof s !== 'string' ? '' : R7_K.test(s) ? TEST_K : s.replace(CUE_K, '');
+      const rpeK = d => { const re = /RPE\s*(\d+(?:\.\d+)?)(?:\s*[–-]\s*(\d+(?:\.\d+)?))?/g; let m, best = null; while((m = re.exec(String(d || '')))){ const v = Math.max(+m[1], m[2] ? +m[2] : 0); if(best === null || v > best) best = v; } return best; };
+      const bucketK = d => /rpe\s*6|light|easy/i.test(String(d || '')) ? 6 : /rpe\s*7/i.test(String(d || '')) ? 7 : 8;
+      const bwK = d => { const m = /^(\d+)\s*[×x]/.exec(d || ''); const s = m ? Math.min(4, Math.max(2, +m[1])) : 3, r = bucketK(d); return r === 8 ? s + ' sets — RPE 8 (stop 2 reps short of failure)' : s + ' sets — RPE ' + r + ' (leave 3 or more in reserve)'; };
+      const bodyOf = t => { const i = String(t || '').indexOf(' out. '); return i < 0 ? null : String(t).slice(i + 6); };
+      let mvK = 0, badK = 0, clampK = 0, missK = 0; const exK = [], kinds = {};
+      for(const ck of INJ_CK){ const r = REG(ck);
+        for(const c of POP[ck]){ const a = RES.C[ck][c.id], b = RES.B[ck][c.id]; let beneath = blindK(c.dt);
+          c.hops.forEach((h, k) => {
+            const bDon = k === 0 ? b.pre.d : b.steps[k - 1].d, bCard = b.steps[k].d, bT = b.toasts[k] || '', aT = a.toasts[k] || '';
+            const wm = /The load runs out before the reps do here\. .*Reps move to (\d+) to (\d+)\./.exec(bT);
+            const conv = !wm && blindK(bCard) !== blindK(bDon);
+            const pre = conv ? bucketK(beneath) : rpeK(beneath);
+            const clamp = !!r && CAP[r].includes(pat(h.to)) && pre !== null && pre > 7;
+            const kind = wm ? 'window' : conv ? 'unloadable' : 'verbatim';
+            const body = wm ? 'The load runs out before the reps do here. Reps move to ' + wm[1] + ' to ' + wm[2] + '.' + HOLD_K : conv ? 'No load to add here.' + HOLD_K : 'Same sets, same reps.' + HOLD_K;
+            if(clamp){ clampK++; if(!aT.endsWith(HOLD_K)){ missK++; if(exK.length < 4) exK.push('clamp pair without the hold: ' + tag(c) + ' hop' + (k + 1) + ' [' + kind + '] ' + aT); } }
+            if(aT !== bT || !!a.unreach !== !!b.unreach){ mvK++; kinds[kind] = (kinds[kind] || 0) + 1;
+              if(!(clamp && aT.endsWith(HOLD_K) && bodyOf(aT) === body)){ badK++; if(exK.length < 8) exK.push('moved, not the hold variant on a hand clamp pair: ' + tag(c) + ' hop' + (k + 1) + ' [' + kind + (clamp ? ', clamp' : ', not clamp') + '] V' + BASE_ERA + ' ' + bT + ' | now ' + aT + ' | want body ' + body); } }
+            if(conv) beneath = bwK(beneath);
+          }); } }
+      console.log('    c-TOAST D193 R8 (V' + VER + '): moved ' + mvK + ' by hand kind ' + fmt(kinds) + ' | hand clamp pairs ' + clampK + ', without the hold sentence ' + missK + ' | moved and not the hold variant on a hand clamp pair ' + badK);
+      exK.forEach(s => console.log('      ' + s));
+      ok(R.cTOAST + ' [V229 D193 R8, D194 Amendment 1 (r) / Amendment 3: moved ' + mvK + ' == pin ' + D193_CTOAST_PIN + ', every one the hold variant on a hand clamp pair (not ' + badK + '), hand clamp pairs ' + clampK + ' without the hold ' + missK + ']',
+        SELF_C && SELF_B && PAIRSELF && hops > 0 && nonEmpty > 0 && cueHops > 0 && moved === mvK && badK === 0 && missK === 0 && mvK === D193_CTOAST_PIN,
+        'toasts moved ' + moved + '/' + hops + ' hops (pin ' + D193_CTOAST_PIN + '), not a hold variant on a hand clamp pair ' + badK + ', hand clamp pairs without the hold ' + missK);
+    }
+    else ok(R.cTOAST, SELF_C && SELF_B && PAIRSELF && hops > 0 && nonEmpty > 0 && cueHops > 0 && moved === 0, 'toasts moved ' + moved + '/' + hops + ' hops');
   }
 }
 // ── c-UNINJ ───────────────────────────────────────────────────────────────────────────────────────────────────────

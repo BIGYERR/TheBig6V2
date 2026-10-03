@@ -1,0 +1,288 @@
+##### PART=prep
+PREP HEAD 2c1a89c origin/main 2c1a89c | V228 ia-version 228 sha a53d3ea6c8d2 | working index.html sha a53d3ea6c8d2 | V227 (5ce31e8) sha c9069fe64113
+  parked E3 text read 1001 chars (ends with applyInjuryFilter header: true) | E4 old/new read: 2
+  anchor [E3 _capRpeClamp (parked) + R7 fifth shape] count 1
+  anchor [E4 capped branch clamps (parked)] count 1
+  anchor [A3 sec.2 stripper reads beneath R7 text] count 1
+  anchor [A3 sec.4 boot replay keeps the dose (applySwapPrefs keep flag)] count 1
+  anchor [A3 sec.4 boot replay carry reads/writes the kept dose] count 1
+  anchor [A3 sec.4 applySessionSwaps passes keep on injured programs] count 1
+  anchor [A3 sec.4 record carries the from-card kept dose (rx[].ph)] count 1
+  anchor [R3 live carry reads the kept dose] count 1
+  anchor [R3 keep + R8 detect (injured only)] count 1
+  anchor [R8 hold toasts] count 1
+  anchor [A3 sec.4 undo: renamed-back items drop the undone dose] count 1
+  anchor [A3 sec.4 undo restores the kept dose from the record] count 1
+  CF3 written sha caa16e0c6902 | _capRpeClamp occurrences 2 | _preHold occurrences 11
+  CF3 boots: ia-version 228 | _capRpeClamp(TEST9)===R7 true | _stripCapCue(R7)===TEST9 true | _stripCapCue(TEST9) identity true
+    clamp probe "3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmu -> "3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 2–3 min rest" | hand ==
+    clamp probe "2×6–10 @ RPE 8" -> "2×6–10 @ RPE 7" | hand ==
+    clamp probe "4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup set -> "4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | hand ==
+    clamp probe "4×3 — RPE 9 (leave ~1 rep in reserve), ramp up with 2–3 warmup sets,  -> "4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | hand ==
+    clamp probe "3 sets of 8 to 12 — RPE 8 (heaviest pair you can find)" -> "3 sets of 8 to 12 — RPE 7 (leave ~3 in reserve)" | hand ==
+    clamp probe "3×8 @ RPE 7" -> "3×8 @ RPE 7" | hand ==
+    clamp probe "RPE 6–7 (leave 3–4 in reserve — learn the movement)" -> "RPE 6–7 (leave 3–4 in reserve — learn the movement)" | hand ==
+    clamp probe "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays cri -> "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. L | hand ==
+    clamp probe "3×10 @ RPE 7–8" -> "3×10 @ RPE 7" | hand ==
+##### PART=chains (worker log)
+worker U:V228:elbow_wa 5201 (51 s)
+worker U:CF3:elbow_wa 5201 (51 s)
+worker R:V228:elbow_wa 8369 (73 s)
+worker R:CF3:elbow_wa 8369 (73 s)
+worker S:V227:elbow_wa 8369 (73 s)
+worker U:CF3:shoulder_wa 2195 (106 s)
+worker R:V228:shoulder_wa 3708 (120 s)
+worker R:CF3:shoulder_wa 3708 (120 s)
+worker S:CF3:shoulder_wa 3708 (123 s)
+worker S:V228:shoulder_wa 3708 (123 s)
+worker U:V228:shoulder_wa 2195 (135 s)
+worker S:CF3:elbow_wa 8369 (145 s)
+worker S:V228:elbow_wa 8369 (146 s)
+worker S:V227:shoulder_wa 3708 (157 s)
+worker R:CF3:lowback_wa 3531 (168 s)
+worker U:V228:lowback_wa 2069 (174 s)
+worker U:CF3:lowback_wa 2069 (175 s)
+worker R:V228:lowback_wa 3531 (180 s)
+worker R:CF3:hip_wa 1405 (202 s)
+worker S:CF3:lowback_wa 3531 (205 s)
+worker R:V228:hip_wa 1405 (207 s)
+worker S:V228:lowback_wa 3531 (208 s)
+worker S:CF3:hip_wa 1405 (209 s)
+worker S:V227:lowback_wa 3531 (209 s)
+worker S:V228:hip_wa 1405 (215 s)
+worker U:CF3:hip_wa 764 (217 s)
+worker U:V228:hip_wa 764 (221 s)
+worker S:V227:hip_wa 1405 (232 s)
+worker U:CF3:knee_protect 725 (238 s)
+worker U:V228:knee_protect 725 (241 s)
+worker R:CF3:knee_protect 1232 (241 s)
+worker R:V228:knee_protect 1232 (247 s)
+worker S:CF3:mario 320 (251 s)
+worker S:CF3:knee_protect 1232 (252 s)
+worker R:CF3:mario 320 (252 s)
+worker S:V228:knee_protect 1232 (253 s)
+worker S:CF3:ankle_wa 15 (254 s)
+worker S:V228:ankle_wa 15 (255 s)
+worker S:V228:mario 320 (256 s)
+worker R:CF3:ankle_wa 15 (256 s)
+worker U:CF3:ankle_wa 0 (256 s)
+worker U:V228:ankle_wa 0 (256 s)
+worker R:V228:ankle_wa 15 (257 s)
+worker S:V227:ankle_wa 15 (257 s)
+worker U:CF3:mario 142 (257 s)
+worker U:V228:mario 142 (257 s)
+worker R:V228:mario 320 (258 s)
+worker S:V227:mario 320 (260 s)
+worker S:V227:knee_protect 1232 (262 s)
+chains done 262 s
+ALLDONE
+gate CF3 DUMPED 150068
+gate V228 DUMPED 150068
+gate V227 DUMPED 150068
+##### PART=builds
+LENS wrapper neutrality (wrapped build with __pre stripped == plain build): 144/144
+BASELINE self-identity (two VMs, pinned clock, same cfg): 10/10
+
+=== L432 (6 regions x 2 tiers x 4 equipment x 3 exp x 3 support focus): 432 builds, 77693 cards (V228)
+  V228 filter lens U 8462 | U naming RPE>7 (gate a) 316 bwsets 316 | final lens capped 8402, RPE>7 304 | (a′) final-only RPE>7 4 | (a″) filter-only 72 (RPE>7 16)
+  CF3 filter lens U 8462 | U naming RPE>7 (gate a) 0 (none) | final lens capped 8402, RPE>7 4 | (a′) final-only RPE>7 4 | (a″) filter-only 72 (RPE>7 0)
+  CF3 vs V228 changed cards 316 | clamp bwsets 216 | clamp bwsets [renamed after filter: Burpees] 16 | clamp bwsets [renamed after filter: Pushups (slow 3s eccentric)] 28 | clamp bwsets [renamed after filter: Squat (slow 3s tempo)] 56 | UNCLASSIFIED 0
+  changed by region/tier ankle/workaround 28 | elbow/protect 28 | elbow/workaround 56 | hip/protect 8 | hip/workaround 28 | knee/workaround 28 | lowback/protect 56 | lowback/workaround 56 | shoulder/workaround 28 | by eq bodyweight 316
+
+=== home_basic (6 x 2 x 3 x 3): 108 builds, 19793 cards (V228)
+  V228 filter lens U 2092 | U naming RPE>7 (gate a) 120 bwsets 120 | final lens capped 2092, RPE>7 120 | (a′) final-only RPE>7 0 | (a″) filter-only 0 (RPE>7 0)
+  CF3 filter lens U 2092 | U naming RPE>7 (gate a) 0 (none) | final lens capped 2092, RPE>7 0 | (a′) final-only RPE>7 0 | (a″) filter-only 0 (RPE>7 0)
+  CF3 vs V228 changed cards 120 | clamp bwsets 120 | UNCLASSIFIED 0
+  changed by region/tier ankle/workaround 28 | elbow/workaround 12 | hip/protect 8 | hip/workaround 28 | knee/workaround 8 | lowback/protect 28 | lowback/workaround 8 | by eq home_basic 120
+
+=== D177 L1 lattice (384 builds; 288 injured) changed cards vs V227
+  V228 changed 1594 | literal 1594
+  CF3 changed 2247 | R7 text 28 | R7 text (Burpees Main, filter-capped) 2 | clamp bwsets 439 | clamp bwsets (Burpees Main, filter-capped) 54 | clamp grammar@ 130 | literal 1594
+  CF3 clamp bwsets by name 45° back extension 28 | Banded hip thrust 108 | Burpees 54 | Dumbbell goblet squat 67 | Single-leg hip thrust 26 | Split squat 116 | Squat (slow 3s tempo) 94
+  CF3 clamp grammar@ by name Dumbbell row 46 | Reverse lunge (KB) 56 | Single-leg hip thrust 28
+
+=== (j) build, D177 L1: CF3 cards printing R7 text 30 (uninjured 0) final-UNCAPPED/filter-capped Burpees 2 | final-capped/filter-capped Banded hip thrust 4 | final-capped/filter-capped Barbell box squat 2 | final-capped/filter-capped Dumbbell goblet squat 14 | final-capped/filter-capped Split squat 6 | final-capped/filter-capped Squat (slow 3s tempo) 2 | number-only "at RPE 7 … new baseline" 0 | V227 _testRx cards on a filter-lens CAPPED pattern 30 | filter-lens UNCAPPED _testRx cards byte-identical to V227 on CF3 102/102 | uninjured builds CF3 == V228 (weeks JSON) 96/96
+
+=== L9 natives CF3 == V228 (so V228 is the pre-hold carry on the D190 lattice): 1254/1254
+
+=== (e) class (iii): cued donor -> capped unloadable target, L9 live/boot: pairs 210 | live RPE 8 V228 196 CF3 0 | live RPE 7 CF3 196 | boot RPE 8 V228 196 CF3 0 | live==boot V228 210 CF3 210 /210 | CF3 ends bwsets RPE 7 196 | cue RPE 7 14 | CF3 toasts hold 196
+  build exSwapPrefs: landed 218 | RPE 8 V228 202 CF3 0 | RPE 7 CF3 202 | CF3 ends bwsets RPE 7 202 | cue RPE 7 16
+
+=== (e′) class (iii-b): uncued RPE>7 donor -> capped target, L9: pairs 114 | live RPE>7 V228 114 CF3 0 | boot RPE>7 V228 114 CF3 0 | live==boot CF3 114/114 | CF3 live == hand hold of V228 live 114 | CF3 ends bwsets 52 | grammar@ 62
+  build exSwapPrefs: landed 118 | RPE>7 V228 52 CF3 0 | CF3 == hand hold of V228 118/118
+
+=== wave rows (four support_athletic configs): 20 | live RPE>7 V228 20 CF3 0 | CF3 live==boot 20 | CF3 == hand hold of V228 20 | CF3 toasts hold 20 | V228 toasts No load to add here, so take the sets to the same effort. 10 | Same job, same numbers. 6 | The load runs out before the reps do here. Same sets, same effort. Reps move to 5 to 8. 2 | The load runs out before the reps do here. Same sets, same effort. Reps move to 6 to 10. 2
+    knee/workaround/commercial/beginner W5 tue Sumo deadlift -> Barbell box squat
+      V228 "4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | Barbell box squat in, sumo deadlift out. Same job, same numbers.
+      CF3  "4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | boot "4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | Barbell box squat in, sumo deadlift out. Same sets, same reps. Your injury plan holds this one at RPE 7.
+    knee/workaround/commercial/beginner W5 tue Sumo deadlift -> Leg press
+      V228 "4×5–8 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | Leg press in, sumo deadlift out. The load runs out before the reps do here. Same sets, same effort. Reps move to 5 to 8.
+      CF3  "4×5–8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | boot "4×5–8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | Leg press in, sumo deadlift out. The load runs out before the reps do here. Reps move to 5 to 8. Your injury plan holds this one at RPE 7.
+    knee/workaround/commercial/beginner W6 tue Sumo deadlift -> Barbell box squat
+      V228 "4×3 — RPE 9 (leave ~1 rep in reserve), ramp up with 2–3 warmup sets, 3 min rest" | Barbell box squat in, sumo deadlift out. Same job, same numbers.
+      CF3  "4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | boot "4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | Barbell box squat in, sumo deadlift out. Same sets, same reps. Your injury plan holds this one at RPE 7.
+    knee/workaround/commercial/beginner W6 tue Sumo deadlift -> Leg press
+      V228 "4×5–8 — RPE 9 (leave ~1 rep in reserve), ramp up with 2–3 warmup sets, 3 min rest" | Leg press in, sumo deadlift out. The load runs out before the reps do here. Same sets, same effort. Reps move to 5 to 8.
+      CF3  "4×5–8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | boot "4×5–8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest" | Leg press in, sumo deadlift out. The load runs out before the reps do here. Reps move to 5 to 8. Your injury plan holds this one at RPE 7.
+
+=== (f) CF3 _stripCapCue: (R7 text) === _testRx text true | identity on _testRx true | L9 incl. HALF_MANNY non-cue cards: false strips 0/1722 (HALF_MANNY "tank" cards 9, false strips 0) | distinct non-cue details over L432+home_basic+L1 CF3: false strips 0/348
+
+=== HALF_MANNY digest (unpinned clock, as gates do): V227 0ac7da6b1691a8e1 V228 0ac7da6b1691a8e1 CF3 0ac7da6b1691a8e1 CF3 again 0ac7da6b1691a8e1 | pinned 2026-09-24: V228 0ac7da6b1691a8e1 CF3 0ac7da6b1691a8e1 | expected 0ac7da6b1691a8e1
+  uninjured support lattice + mario_noinj (37): CF3 == V228 37 | CF3 == V227 37 (healthy L1 configs reported under (j))
+
+=== (b) uninjured live swap object row, mario_noinj W5 every swappable slot, two hops then undo: slots 27 | item+day JSON CF3 == V228 27/27 | ia_swaps_ record CF3 == V228 27/27 | day after undo CF3 == V228 27/27 | CF3 days carrying _preHold 0
+
+=== stores (mario knee/wa W5 thu Single-leg hip thrust; hop1 Barbell hip thrust, hop2 Leg extension)
+  V228
+    after hops: card "2×6–10 @ RPE 8" kept null
+    after hop   ia_programs 0 _preHold, 0 ph | ia_hist_PM absent | ia_swaps_PM 0 _preHold, 0 ph
+      ia_swaps_PM w5_thu [{"from":"Single-leg hip thrust","to":"Barbell hip thrust","ts":1790265600000,"rx":[{"s":3,"i":1,"d":"2×6–10 @ RPE 8"}]},{"from":"Barbell hip thrust","to":"Leg extension","ts":1790265600000,"rx":[{"s":3,"i":1,"d":"2×6–10 @ RPE 8"}]}]
+    after rest move ia_programs 0 _preHold, 0 ph | ia_hist_PM absent | ia_swaps_PM 0 _preHold, 0 ph
+      ia_programs W5 thu slot {"name":"Leg extension","detail":"2×6–10 @ RPE 8"}
+      reboot after rest move: slot {"n":"Leg extension","d":"2×6–10 @ RPE 8","h":null}
+      hop3 Barbell good mornings live "2×6–10 @ RPE 8" | Barbell good mornings in, leg extension out. Same job, same numbers.
+      boot after hop3 "2×6–10 @ RPE 8"
+    trained-day swap (snapshotDay then hops) ia_programs 0 _preHold, 0 ph | ia_hist_PM 0 _preHold, 0 ph | ia_swaps_PM 0 _preHold, 0 ph
+      ia_hist_PM w5_thu slot {"name":"Leg extension","detail":"2×6–10 @ RPE 8"}
+      reboot (hist-restored day): slot {"n":"Leg extension","d":"2×6–10 @ RPE 8","h":null}
+      hop3 Barbell good mornings live "2×6–10 @ RPE 8" | Barbell good mornings in, leg extension out. Same job, same numbers.
+      boot after hop3 "2×6–10 @ RPE 8"
+  CF3
+    after hops: card "2×6–10 @ RPE 7" kept "2×6–10 @ RPE 8"
+    after hop   ia_programs 0 _preHold, 0 ph | ia_hist_PM absent | ia_swaps_PM 0 _preHold, 1 ph
+      ia_swaps_PM w5_thu [{"from":"Single-leg hip thrust","to":"Barbell hip thrust","ts":1790265600000,"rx":[{"s":3,"i":1,"d":"2×6–10 @ RPE 8"}]},{"from":"Barbell hip thrust","to":"Leg extension","ts":1790265600000,"rx":[{"s":3,"i":1,"d":"2×6–10 @ RPE 8","ph":"2×6–10 @ RPE 8"}]}]
+    after rest move ia_programs 1 _preHold, 0 ph | ia_hist_PM absent | ia_swaps_PM 0 _preHold, 1 ph
+      ia_programs W5 thu slot {"name":"Leg extension","detail":"2×6–10 @ RPE 7","_preHold":"2×6–10 @ RPE 8"}
+      reboot after rest move: slot {"n":"Leg extension","d":"2×6–10 @ RPE 7","h":"2×6–10 @ RPE 8"}
+      hop3 Barbell good mornings live "2×6–10 @ RPE 8" | Barbell good mornings in, leg extension out. Same job, same numbers.
+      boot after hop3 "2×6–10 @ RPE 8"
+    trained-day swap (snapshotDay then hops) ia_programs 0 _preHold, 0 ph | ia_hist_PM 1 _preHold, 0 ph | ia_swaps_PM 0 _preHold, 1 ph
+      ia_hist_PM w5_thu slot {"name":"Leg extension","detail":"2×6–10 @ RPE 7","_preHold":"2×6–10 @ RPE 8"}
+      reboot (hist-restored day): slot {"n":"Leg extension","d":"2×6–10 @ RPE 7","h":"2×6–10 @ RPE 8"}
+      hop3 Barbell good mornings live "2×6–10 @ RPE 8" | Barbell good mornings in, leg extension out. Same job, same numbers.
+      boot after hop3 "2×6–10 @ RPE 8"
+  CF3 source lines touching _preHold / .ph (comments stripped): 7
+    10188: it.detail=_swapDetailFor(to,_stripCapCue((keep&&typeof it._preHold==='string')?it._preHold:it.detail));
+    10189: if(keep) it._preHold=it.detail;
+    14309: if(it&&it.name===from&&typeof it.detail==='string'){ const _e={s:si,i:ii,d:it.detail}; if(typeof it._preHold==='string') _e.ph=it._preHold; _undoRx.push(_e); }
+    14315: const _base=_stripCapCue((typeof item._preHold==='string')?item._preHold:_wasDetail);
+    14321: item._preHold=_preF;
+    14472: _bk.forEach(function(x){ if(x.name===from) delete x._preHold; });
+    14485: if(it){it.detail=p.d; if(typeof p.ph==='string') it._preHold=p.ph; else delete it._preHold; _put.push(it);}
+  generic serializers of a day/item in CF3 (JSON.stringify(day|it|item|...)) lines: 2 1316,1327
+
+=== hand rows: mario knee/wa W5 thu [Single-leg hip thrust]
+  V228 native "2×6–10 @ RPE 8"
+    in-session: Barbell hip thrust "2×6–10 @ RPE 8" kept null | Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers.
+                Leg extension "2×6–10 @ RPE 8" kept null | Leg extension in, barbell hip thrust out. Same job, same numbers.
+                Barbell good mornings "2×6–10 @ RPE 8" kept null | Barbell good mornings in, leg extension out. Same job, same numbers.
+      boot "2×6–10 @ RPE 8" | direct GM "2×6–10 @ RPE 8" | Barbell good mornings in, single-leg hip thrust out. Same job, same numbers.
+    reboot route: hop2 Leg extension "2×6–10 @ RPE 8" kept null | REBOOT slot "2×6–10 @ RPE 8" kept null
+      hop3 Barbell good mornings LIVE "2×6–10 @ RPE 8" | Barbell good mornings in, leg extension out. Same job, same numbers.
+      boot "2×6–10 @ RPE 8" | direct "2×6–10 @ RPE 8" | Barbell good mornings in, single-leg hip thrust out. Same job, same numbers.
+    undo route: hop1 Leg extension "2×6–10 @ RPE 8" kept null | hop2 GM "2×6–10 @ RPE 8"
+      records [{"from":"Single-leg hip thrust","to":"Leg extension","rx":[{"s":3,"i":1,"d":"2×6–10 @ RPE 8"}]},{"from":"Leg extension","to":"Barbell good mornings","rx":[{"s":3,"i":1,"d":"2×6–10 @ RPE 8"}]}]
+      UNDO chip "Leg extension" -> "Leg extension" "2×6–10 @ RPE 8" kept null
+      hop3 Barbell hip thrust LIVE "2×6–10 @ RPE 8" | Barbell hip thrust in, leg extension out. Same job, same numbers.
+      boot "2×6–10 @ RPE 8" | direct "2×6–10 @ RPE 8" | Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers.
+  CF3 native "2×6–10 @ RPE 8"
+    in-session: Barbell hip thrust "2×6–10 @ RPE 8" kept "2×6–10 @ RPE 8" | Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers.
+                Leg extension "2×6–10 @ RPE 7" kept "2×6–10 @ RPE 8" | Leg extension in, barbell hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7.
+                Barbell good mornings "2×6–10 @ RPE 8" kept "2×6–10 @ RPE 8" | Barbell good mornings in, leg extension out. Same job, same numbers.
+      boot "2×6–10 @ RPE 8" | direct GM "2×6–10 @ RPE 8" | Barbell good mornings in, single-leg hip thrust out. Same job, same numbers.
+    reboot route: hop2 Leg extension "2×6–10 @ RPE 7" kept "2×6–10 @ RPE 8" | REBOOT slot "2×6–10 @ RPE 7" kept "2×6–10 @ RPE 8"
+      hop3 Barbell good mornings LIVE "2×6–10 @ RPE 8" | Barbell good mornings in, leg extension out. Same job, same numbers.
+      boot "2×6–10 @ RPE 8" | direct "2×6–10 @ RPE 8" | Barbell good mornings in, single-leg hip thrust out. Same job, same numbers.
+    undo route: hop1 Leg extension "2×6–10 @ RPE 7" kept "2×6–10 @ RPE 8" | hop2 GM "2×6–10 @ RPE 8"
+      records [{"from":"Single-leg hip thrust","to":"Leg extension","rx":[{"s":3,"i":1,"d":"2×6–10 @ RPE 8"}]},{"from":"Leg extension","to":"Barbell good mornings","rx":[{"s":3,"i":1,"d":"2×6–10 @ RPE 7","ph":"2×6–10 @ RPE 8"}]}]
+      UNDO chip "Leg extension" -> "Leg extension" "2×6–10 @ RPE 7" kept "2×6–10 @ RPE 8"
+      hop3 Barbell hip thrust LIVE "2×6–10 @ RPE 8" | Barbell hip thrust in, leg extension out. Same job, same numbers.
+      boot "2×6–10 @ RPE 8" | direct "2×6–10 @ RPE 8" | Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers.
+  V228 strength beginner commercial knee/wa W6 thu native "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No gri
+    -> RDL: Barbell Romanian deadlift "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | Barbell Romanian deadlift in, barbell box squat out. Same job, same numbers.
+        boot "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+    -> Leg press: Leg press "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | Leg press in, barbell box squat out. Same job, same numbers.
+        boot "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+    -> Leg press -> RDL: Leg press "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | Leg press in, barbell box squat out. Same job, same numbers.
+        Barbell Romanian deadlift "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | Barbell Romanian deadlift in, leg press out. Same job, same numbers.
+        boot "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+  CF3 strength beginner commercial knee/wa W6 thu native "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No g
+    -> RDL: Barbell Romanian deadlift "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | Barbell Romanian deadlift in, barbell box squat out. Same job, same numbers.
+        boot "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+    -> Leg press: Leg press "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here." | Leg press in, barbell box squat out. Same sets, same reps. Your injury plan holds this one at RPE 7.
+        boot "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here."
+    -> Leg press -> RDL: Leg press "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here." | Leg press in, barbell box squat out. Same sets, same reps. Your injury plan holds this one at RPE 7.
+        Barbell Romanian deadlift "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | Barbell Romanian deadlift in, leg press out. Same job, same numbers.
+        boot "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline."
+BUILDS DONE
+EXIT 0
+##### PART=report
+=== chains: result files missing 0
+  chains S on all trees 18580 | unreachable at some hop: V227 0 V228 0 CF3 0
+  BASELINE V227 re-run == V228-chat V227 run: live 18580/18580 boot 18580/18580
+
+=== (i) in-session, D190 lattice: live != boot V227 487 | V228 487 | CF3 487 | CF3 vs V228 residue ids: both 487, first only 0, second only 0 | CF3 vs V227 residue ids: both 487, first only 0, second only 0 | V228 vs V227: both 487, first only 0, second only 0
+  CF3 live == pre-hold carry (V228 live end, hand hold when the end is capped) 18580/18580 (uncapped ends 6062/6062, capped 12518/12518) | CF3 boot == pre-hold 18093/18580 | CF3 live==boot==pre-hold 18093
+  CF3 vs CF2 (V228-chat): live 18580/18580 boot 18580 build 18580 undo 17003 undoBoot 17089 chip 17003 toasts 18580
+  CF3 vs slices 1+2: boot 18580/18580 build 18580 | build carries a kept dose: CF3 0
+  V228 vs slices 1+2 (no clamp vs clamp): build equal 9671/18580 | V228 chips vs CF2 chips equal 17003/18580
+  chip moved CF2 -> CF3 1577 | by class hop3 1577 | undo slot moved CF2 -> CF3 1577
+    chip moved mario#0 45° back extension > Step-ups (KB) > 45° back extension CF2 chip "Kettlebell swing" CF3 chip "Step-ups (KB)" | undo CF2 "Kettlebell swing" CF3 "Step-ups (KB)"
+    chip moved mario#18 45° back extension > Leg extension > 45° back extension CF2 chip "Kettlebell swing" CF3 chip "Leg extension" | undo CF2 "Kettlebell swing" CF3 "Leg extension"
+    chip moved mario#26 45° back extension > Leg extension > 45° back extension CF2 chip "Step-ups (KB)" CF3 chip "Leg extension" | undo CF2 "Step-ups (KB)" CF3 "Leg extension"
+  undo restores the pre-last-hop card (detail): V228 18580 CF3 18580 (CF2 17089) /18580 | by name: V228 18580 CF3 18580 (CF2 17003)
+  CF3 hold toasts on hops 39203 | V228 0
+  mario W5 thu mario#67 in-session CF3 steps ["2×6–10 @ RPE 8","2×6–10 @ RPE 7","2×6–10 @ RPE 8"] boot "2×6–10 @ RPE 8" | V228 steps ["2×6–10 @ RPE 8","2×6–10 @ RPE 8","2×6–10 @ RPE 8"]
+
+=== (i-r) reboot before the last hop, V228: chains 18580 | unreachable 0 | live==boot==in-session end 18093/18580 | live==boot 18093 | live==in-session 18580 | not-equal ids vs V227 residue: both 487, first only 0, second only 0 | rebooted slot carries a kept dose 0
+    mario W5 thu reboot route V228: rebooted slot {"n":"Leg extension","d":"2×6–10 @ RPE 8","h":null} | hop3 live "2×6–10 @ RPE 8" | Barbell good mornings in, leg extension out. Same job, same numbers. | boot "2×6–10 @ RPE 8"
+
+=== (i-r) reboot before the last hop, CF3: chains 18580 | unreachable 0 | live==boot==in-session end 18093/18580 | live==boot 18093 | live==in-session 18580 | not-equal ids vs V227 residue: both 487, first only 0, second only 0 | rebooted slot carries a kept dose 18580
+    mario W5 thu reboot route CF3: rebooted slot {"n":"Leg extension","d":"2×6–10 @ RPE 7","h":"2×6–10 @ RPE 8"} | hop3 live "2×6–10 @ RPE 8" | Barbell good mornings in, leg extension out. Same job, same numbers. | boot "2×6–10 @ RPE 8"
+
+=== (i-u) undo onto a held intermediate then one more hop, V228: chains 11096 (hop3 chains whose hop 1 fires) | unreachable 0 | undo did not land on hop 1 0 | live==boot 11096 | live==direct 5228 | live==boot==direct 5228 | live == pre-hold (V228 route, hand hold if capped) 3701 | undone card carries a kept dose 0 | live!=boot ids vs V227 residue: both 0, first only 0, second only 487
+  live != direct by end capped end bwsets vs direct cue 2849 | capped end bwsets vs direct grammar@ 694 | uncapped end bwsets vs direct grammar@ 905 | uncapped end bwsets vs direct no-RPE 1420
+    live!=direct hip_wa#801 45° back extension > Barbell hip thrust > Glute-ham raise undone {"n":"45° back extension","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null} live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2 sets — RPE 8 (stop 2 reps short of failure)" direct "2×10 each — hold RPE 7, three in the tank"
+    live!=direct hip_wa#4 45° back extension > Barbell hip thrust > Single-leg hip thrust undone {"n":"45° back extension","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null} live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2 sets — RPE 8 (stop 2 reps short of failure)" direct "2×10 each — hold RPE 7, three in the tank"
+    live!=direct hip_wa#5 45° back extension > Barbell hip thrust > Cable pull-through undone {"n":"45° back extension","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null} live "2 sets — RPE 8 (stop 2 reps short of failure)" boot "2 sets — RPE 8 (stop 2 reps short of failure)" direct "2×10 each — hold RPE 7, three in the tank"
+    pre-hold miss mario#155 Leg extension > Lying leg curl > Leg extension live "2×6–10 @ RPE 8" want "2×6–10 @ RPE 7"
+    pre-hold miss mario#156 Leg extension > Lying leg curl > Seated leg curl live "2×6–10 @ RPE 8" want "2×6–10 @ RPE 7"
+    pre-hold miss mario#157 Leg extension > Lying leg curl > Standing cable hamstring curl live "2×6–10 @ RPE 8" want "2×6–10 @ RPE 7"
+  mario W5 thu undo route V228 mario#201: undo chip "Leg extension" -> {"n":"Leg extension","d":"2×6–10 @ RPE 8","h":null} | hop3 live "2×6–10 @ RPE 8" | Barbell hip thrust in, leg extension out. Same job, same numbers. | boot "2×6–10 @ RPE 8" | direct "2×6–10 @ RPE 8"
+
+=== (i-u) undo onto a held intermediate then one more hop, CF3: chains 11096 (hop3 chains whose hop 1 fires) | unreachable 0 | undo did not land on hop 1 0 | live==boot 11096 | live==direct 5228 | live==boot==direct 5228 | live == pre-hold (V228 route, hand hold if capped) 11096 | undone card carries a kept dose 11096 | live!=boot ids vs V227 residue: both 0, first only 0, second only 487
+  live != direct by end capped end bwsets vs direct cue 2849 | capped end bwsets vs direct grammar@ 694 | uncapped end bwsets vs direct grammar@ 905 | uncapped end bwsets vs direct no-RPE 1420
+    live!=direct hip_wa#801 45° back extension > Barbell hip thrust > Glute-ham raise undone {"n":"45° back extension","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"} live "2 sets — RPE 7 (leave 3 or more in reserve)" boot "2 sets — RPE 7 (leave 3 or more in reserve)" direct "2×10 each — hold RPE 7, three in the tank"
+    live!=direct hip_wa#4 45° back extension > Barbell hip thrust > Single-leg hip thrust undone {"n":"45° back extension","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"} live "2 sets — RPE 7 (leave 3 or more in reserve)" boot "2 sets — RPE 7 (leave 3 or more in reserve)" direct "2×10 each — hold RPE 7, three in the tank"
+    live!=direct hip_wa#5 45° back extension > Barbell hip thrust > Cable pull-through undone {"n":"45° back extension","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"} live "2 sets — RPE 7 (leave 3 or more in reserve)" boot "2 sets — RPE 7 (leave 3 or more in reserve)" direct "2×10 each — hold RPE 7, three in the tank"
+  mario W5 thu undo route CF3 mario#201: undo chip "Leg extension" -> {"n":"Leg extension","d":"2×6–10 @ RPE 7","h":"2×6–10 @ RPE 8"} | hop3 live "2×6–10 @ RPE 8" | Barbell hip thrust in, leg extension out. Same job, same numbers. | boot "2×6–10 @ RPE 8" | direct "2×6–10 @ RPE 8"
+
+=== gate rows (D177 L1 sweep dump): sha V227 re-dump 209513b5bc59 | V228-chat V227 dump 209513b5bc59 (baseline equals itself: true)
+  rows V227 150068 V228 150068 CF3 150068 | (where,to) aligned 150068
+
+=== (k) toasts. Clamp pairs (hand: capped target + hand-bucketed converted-donor RPE > 7; no-RPE unloadable donors bucket to 8 per the reader rule) 1243 | of them donor names an RPE 1243, donor names none (cued/bare onto unloadable) 0 | donor is R7 text 71
+  CF3 toast == expected hold variant 1243/1243 | by variant unloadable-hold 360 | verbatim-hold 684 | window-hold 199 | false same-numbers/effort claims on clamp pairs 0
+  hold toasts off the clamp set 0 (none)
+  non-clamp pairs 148825: toast == V228 148825 | == V227 148825
+  INFO (P-BWBUCKET): non-clamp pairs whose card RPE != donor RPE and toast claims same: CF3 7378 6.5->6 1407 | 7->6 4736 | 7.5->7 246 | 8.5->8 451 | 9->8 374 | 9.5->8 164 | toast == V227 7378 | card == V227 7378
+  same predicate on V228 rows (no clamp anywhere): 7648 6.5->6 capped 398 | 6.5->6 uncapped 1009 | 7->6 uncapped 4736 | 7.5->7 capped 60 | 7.5->7 uncapped 186 | 8.5->8 capped 130 | 8.5->8 uncapped 451 | 9->8 capped 100 | 9->8 uncapped 374 | 9.5->8 capped 40 | 9.5->8 uncapped 164
+
+=== (j) live, gate rows: CF3 rows printing R7 text 127 | donor R7 native 71 | TEST9 56 | on capped targets 127 | R7-donor rows onto UNCAPPED targets 113: card == _testRx 113, == V228 card 113, == V227 card 113, toast "Same job, same numbers." 113 | R7-donor rows onto capped targets 71 (toast hold 71) | number-only "at RPE 7 … new baseline" in CF3 rows 0
+
+=== (l) D177 verbatim rows (carry-pass predicates; "both" = cueBlind on both wordings, "twoOnly" = the V227-era gate reader)
+  G3a              V227 0 | V228 0 | CF3 832 capped: hold of donor 529 | capped: hold of window 199 | uncapped: beneath-hold verbatim (R7 donor -> _testRx) 104 | CF3 by D shape R7 104 | bwsets 127 | prose(test) 34 | wave 567
+  G3c_pow_twoOnly  V227 0 | V228 118 | CF3 118 capped: hold of donor 118 | CF3 by D shape no-RPE 118
+  G3c_pow_both     V227 0 | V228 0 | CF3 0 (none) | CF3 by D shape (none)
+  G3c_off_twoOnly  V227 0 | V228 0 | CF3 168 capped: hold of donor 89 | uncapped: beneath-hold verbatim (R7 donor -> _testRx) 79 | CF3 by D shape R7 79 | bwsets 65 | prose(test) 24
+  G3c_off_both     V227 0 | V228 0 | CF3 168 capped: hold of donor 89 | uncapped: beneath-hold verbatim (R7 donor -> _testRx) 79 | CF3 by D shape R7 79 | bwsets 65 | prose(test) 24
+  G3d              V227 0 | V228 0 | CF3 263 capped: hold of donor 263 | CF3 by D shape wave 263
+  G3e              V227 0 | V228 0 | CF3 202 capped: hold of donor 177 | uncapped: beneath-hold verbatim (R7 donor -> _testRx) 25 | CF3 by D shape R7 25 | bwsets 62 | prose(test) 10 | wave 105
+  G3f              V227 0 | V228 0 | CF3 199 capped: hold of window 199 | CF3 by D shape wave 199
+REPORT DONE
+EXIT 0
+##### PART=extra
+(a″) V228 L432 filter-capped, final-uncapped: 72 | by pre>final Banded hip thrust{hip_ext}>Burpees{-} 72 | by region/tier lowback/protect 54 | lowback/workaround 18 | by label Leg circuit 12 | Leg superset B 24 | Main 36 | by detail kind bwsets 20 | bwsets RPE>7 16 | cue 36
+  Mains at or under RPE 7 advanced/support_prevention RPE 7 (leave ~3 in reserve), ramp up with 2–3 warm 4 | beginner/support_athletic RPE 6–7 (leave 3–4 in reserve — learn the movement 4 | beginner/support_prevention RPE 6–7 (leave 3–4 in reserve — learn the movement 4 | beginner/support_strength RPE 6–7 (leave 3–4 in reserve — learn the movement 4 | intermediate/support_prevention RPE 7 (leave ~3 in reserve), ramp up with 2–3 warm 4
+P-HOLDBENEATH (gate L1 rows): donor is a CF3 native the build held (D != V228 D) 2965 R7 184 | bwsets 2781 | onto UNCAPPED targets 1623 R7 -> card _testRx (beneath the prose hold) 113 | bwsets -> card held RPE 7 dose verbatim 1510
+INFO (k) capped targets, CF3: card RPE != donor RPE, toast claims same, no hold toast 458 6.5->6 398 | 7.5->7 60
+EXTRA DONE

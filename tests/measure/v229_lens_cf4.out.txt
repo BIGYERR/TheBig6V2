@@ -1,0 +1,313 @@
+# v229_lens_cf4.js output (M9, CF4). Parts: trees, l1+chains (worker logs summarized), single, report, report2, du, g227 summaries.
+## trees
+slice-1 on scratch copy: post ia-version meta 228 unchanged: 1 / OK: 4 edits written to /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/7d4ab7fc-ad06-4917-b0e4-faf3f7d43e66/scratchpad/measure3/sl1.html (ia-version stays 228)
+CF4 anchor E1 count 1
+CF4 anchor E2 count 1
+CF4 anchor E3 count 1
+CF4 anchor E4 count 1
+CF4 _dayPlanCfg sites: 9863 const cfg=_dayPlanCfg(prog,day);   // D194 R1 (equipment unc || 9991 function _dayPlanCfg(prog,day){ || 10015 const cfg=_dayPlanCfg(prog,day);   // D194 R1 || 10103 const cfg=_dayPlanCfg(prog,day);   // D194 R1
+CF4 _swapInjuryOK call sites: 7354, 9873, 9999, 10029, 10116 | activeProg.cfg.injury reads: 14342 | prog.cfg.injury reads: 10355
+TREE V228 sha a53d3ea6c8d2 ia-version 228
+TREE SL2 sha e5ade9595b39 ia-version 228
+TREE SL1 sha 55e12050c447 ia-version 228
+TREE CF4 sha 68e0077e8096 ia-version 228
+TREE V226 sha 94ce52f12f8d ia-version 226 | working index.html e5ade9595b39
+BOOT SL1 ok, typeof _dayPlanCfg undefined
+BOOT CF4 ok, typeof _dayPlanCfg function
+## sweep logs
+jobs done 48 in 29 s
+/private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/7d4ab7fc-ad06-4917-b0e4-faf3f7d43e66/scratchpad/measure3/l1.out:0
+/private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/7d4ab7fc-ad06-4917-b0e4-faf3f7d43e66/scratchpad/measure3/chains.out:0
+jobs done 28 in 237 s
+SWEEP_DONE
+## single
+[A] BASELINE V228 two independent OV writes equal after id/created strip: true (26115 bytes) | raw equal (clock pinned) true | two VMs, same record: weeks equal true, W3+W5 lists equal true (19932 bytes, non-empty true)
+    cross-session: measure2 stored_V228_mario_OV == this session (strip) true
+[A] BASELINE SL2 two independent OV writes equal after id/created strip: true (26115 bytes) | raw equal (clock pinned) true | two VMs, same record: weeks equal true, W3+W5 lists equal true (19932 bytes, non-empty true)
+    cross-session: measure2 stored_SL2_mario_OV == this session (strip) true
+[A] BASELINE CF4 two independent OV writes equal after id/created strip: true (26115 bytes) | raw equal (clock pinned) true | two VMs, same record: weeks equal true, W3+W5 lists equal true (19916 bytes, non-empty true)
+
+[p] mario knee/wa OV V228 | activeProg.cfg.injury null | W5 stamps mon:S tue:S wed:- thu:S fri:S sat:S sun:- | W3 stamped days 0 | lens W5 thu (no helper) W3 thu (no helper)
+    W5 swap (patterned) cards 22: rejected 2 of 223 offers, cards with >=1 2 -> tue Sumo deadlift [pat]: Jump squats ; thu Barbell box squat [pat]: Jump squats
+    W5 aux cards 5: rejected 2 of 68 -> sat Mountain climbers [aux]: Burpees, High knees | add picker days 5: rejected 5 of 79 -> mon (add) [add]: o:Jump squats ; tue (add) [add]: g:Jump squats ; thu (add) [add]: m:Jump squats ; fri (add) [add]: o:Jump squats ; sat (add) [add]: o:Jump squats
+    W5 OV lists == CFG (fixture) lists on same tree: 24/32 e.g. mon (add) [add] A=["g:Barbell overhead press","g:Barbell push press","g:Incline barbell press","g:Dumbbell Arnold press","g:Dumbbell incline press","g:Kettlebell single-arm press","m:Barbell bench press","m:Landmine rotational press","m:Dumbbell decline press","m:Dumbbell floor press","m:Bench dips","o:Barbell box squat","o:Barbell Romanian deadlift","o:Barbell row","o:Deadlift","o:Jump squats","o:Leg press"] B="[\"g:Barbell overhead press\",\"g:Barbell push press\",\"g:Incline barbell press\",\"g:Dumbbell Arnold press\",\"g:Dumbbell incline press\",\"g:Kettlebell single-arm press\",\"m:Barbell bench press\",\"m:Landmine rotational press\",\"m:Dumbbell decline press\",\"m:Dumbbell floor press\",\"m:Bench dips\",\"o:Barbell box squat\",\"o:Barbell Romanian deadlift\",\"o:Barbell row\",\"o:Deadlift\",\"o:Leg press\",\"o:Pendlay row\"]" ; tue Sumo deadlift [pat] A=["Barbell Romanian deadlift","Deadlift","Trap bar deadlift","Dumbbell split-stance deadlift","Kettlebell single-leg deadlift","Barbell good mornings","Barbell box squat","Jump squats","Leg press","Dumbbell goblet squat","Reverse lunge (KB)"] B="[\"Barbell Romanian deadlift\",\"Deadlift\",\"Trap bar deadlift\",\"Dumbbell split-stance deadlift\",\"Kettlebell single-leg deadlift\",\"Barbell good mornings\",\"Barbell box squat\",\"Leg press\",\"Dumbbell goblet squat\",\"Reverse lunge (KB)\",\"Cable pull-through\"]" ; tue (add) [add] A=["g:Barbell box squat","g:Jump squats","g:Leg press","g:Dumbbell goblet squat","g:Reverse lunge (KB)","g:Cable pull-through","m:Barbell Romanian deadlift","m:Deadlift","m:Trap bar deadlift","m:Dumbbell split-stance deadlift","m:Kettlebell single-leg deadlift","o:Barbell bench press","o:Barbell overhead press","o:Barbell push press","o:Close-grip bench press","o:Incline barbell press","o:Landmine rotational press"] B="[\"g:Barbell box squat\",\"g:Leg press\",\"g:Dumbbell goblet squat\",\"g:Reverse lunge (KB)\",\"g:Cable pull-through\",\"g:45° back extension\",\"m:Barbell Romanian deadlift\",\"m:Deadlift\",\"m:Trap bar deadlift\",\"m:Dumbbell split-stance deadlift\",\"m:Kettlebell single-leg deadlift\",\"o:Barbell bench press\",\"o:Barbell overhead press\",\"o:Barbell push press\",\"o:Close-grip bench press\",\"o:Incline barbell press\",\"o:Landmine rotational press\"]" | fixture W5 rejected 0 of 367
+
+[p] mario knee/wa OV SL2 | activeProg.cfg.injury null | W5 stamps mon:S tue:S wed:- thu:S fri:S sat:S sun:- | W3 stamped days 0 | lens W5 thu (no helper) W3 thu (no helper)
+    W5 swap (patterned) cards 22: rejected 2 of 223 offers, cards with >=1 2 -> tue Sumo deadlift [pat]: Jump squats ; thu Barbell box squat [pat]: Jump squats
+    W5 aux cards 5: rejected 2 of 68 -> sat Mountain climbers [aux]: Burpees, High knees | add picker days 5: rejected 5 of 79 -> mon (add) [add]: o:Jump squats ; tue (add) [add]: g:Jump squats ; thu (add) [add]: m:Jump squats ; fri (add) [add]: o:Jump squats ; sat (add) [add]: o:Jump squats
+    W5 OV lists == CFG (fixture) lists on same tree: 24/32 e.g. mon (add) [add] A=["g:Barbell overhead press","g:Barbell push press","g:Incline barbell press","g:Dumbbell Arnold press","g:Dumbbell incline press","g:Kettlebell single-arm press","m:Barbell bench press","m:Landmine rotational press","m:Dumbbell decline press","m:Dumbbell floor press","m:Bench dips","o:Barbell box squat","o:Barbell Romanian deadlift","o:Barbell row","o:Deadlift","o:Jump squats","o:Leg press"] B="[\"g:Barbell overhead press\",\"g:Barbell push press\",\"g:Incline barbell press\",\"g:Dumbbell Arnold press\",\"g:Dumbbell incline press\",\"g:Kettlebell single-arm press\",\"m:Barbell bench press\",\"m:Landmine rotational press\",\"m:Dumbbell decline press\",\"m:Dumbbell floor press\",\"m:Bench dips\",\"o:Barbell box squat\",\"o:Barbell Romanian deadlift\",\"o:Barbell row\",\"o:Deadlift\",\"o:Leg press\",\"o:Pendlay row\"]" ; tue Sumo deadlift [pat] A=["Barbell Romanian deadlift","Deadlift","Trap bar deadlift","Dumbbell split-stance deadlift","Kettlebell single-leg deadlift","Barbell good mornings","Barbell box squat","Jump squats","Leg press","Dumbbell goblet squat","Reverse lunge (KB)"] B="[\"Barbell Romanian deadlift\",\"Deadlift\",\"Trap bar deadlift\",\"Dumbbell split-stance deadlift\",\"Kettlebell single-leg deadlift\",\"Barbell good mornings\",\"Barbell box squat\",\"Leg press\",\"Dumbbell goblet squat\",\"Reverse lunge (KB)\",\"Cable pull-through\"]" ; tue (add) [add] A=["g:Barbell box squat","g:Jump squats","g:Leg press","g:Dumbbell goblet squat","g:Reverse lunge (KB)","g:Cable pull-through","m:Barbell Romanian deadlift","m:Deadlift","m:Trap bar deadlift","m:Dumbbell split-stance deadlift","m:Kettlebell single-leg deadlift","o:Barbell bench press","o:Barbell overhead press","o:Barbell push press","o:Close-grip bench press","o:Incline barbell press","o:Landmine rotational press"] B="[\"g:Barbell box squat\",\"g:Leg press\",\"g:Dumbbell goblet squat\",\"g:Reverse lunge (KB)\",\"g:Cable pull-through\",\"g:45° back extension\",\"m:Barbell Romanian deadlift\",\"m:Deadlift\",\"m:Trap bar deadlift\",\"m:Dumbbell split-stance deadlift\",\"m:Kettlebell single-leg deadlift\",\"o:Barbell bench press\",\"o:Barbell overhead press\",\"o:Barbell push press\",\"o:Close-grip bench press\",\"o:Incline barbell press\",\"o:Landmine rotational press\"]" | fixture W5 rejected 0 of 367
+
+[p] mario knee/wa OV CF4 | activeProg.cfg.injury null | W5 stamps mon:S tue:S wed:- thu:S fri:S sat:S sun:- | W3 stamped days 0 | lens W5 thu {"region":"knee","tier":"workaround"} W3 thu null
+    W5 swap (patterned) cards 22: rejected 0 of 222 offers, cards with >=1 0
+    W5 aux cards 5: rejected 0 of 66 | add picker days 5: rejected 0 of 79
+    W5 OV lists == CFG (fixture) lists on same tree: 32/32 | fixture W5 rejected 0 of 367
+[p] mario SL2 vs V228: OV W3 (pre-from) 32/32 | OV W5 32/32 | fixture W3 30/30 | fixture W5 32/32
+[p] mario CF4 vs V228: OV W3 (pre-from) 32/32 | OV W5 24/32 (moved: mon (add) [add] A=["g:Barbell overhead press","g:Barbell push press","g:Incline barbell press","g:Dumbbell Arnold press","g:Dumbbell incline press","g:Kettlebell single-arm press","m:Barbell bench press","m:Landmine rotational press","m:Dumbbell decline press","m:Dumbbell floor press","m:Bench dips","o:Barbell box squat","o:Barbell Romanian deadlift","o:Barbell row","o:Deadlift","o:Leg press","o:Pendlay row"] B="[\"g:Barbell overhead press\",\"g:Barbell push press\",\"g:Incline barbell press\",\"g:Dumbbell Arnold press\",\"g:Dumbbell incline press\",\"g:Kettlebell single-arm press\",\"m:Barbell bench press\",\"m:Landmine rotational press\",\"m:Dumbbell decline press\",\"m:Dumbbell floor press\",\"m:Bench dips\",\"o:Barbell box squat\",\"o:Barbell Romanian deadlift\",\"o:Barbell row\",\"o:Deadlift\",\"o:Jump squats\",\"o:Leg press\"]" ; tue Sumo deadlift [pat] A=["Barbell Romanian deadlift","Deadlift","Trap bar deadlift","Dumbbell split-stance deadlift","Kettlebell single-leg deadlift","Barbell good mornings","Barbell box squat","Leg press","Dumbbell goblet squat","Reverse lunge (KB)","Cable pull-through"] B="[\"Barbell Romanian deadlift\",\"Deadlift\",\"Trap bar deadlift\",\"Dumbbell split-stance deadlift\",\"Kettlebell single-leg deadlift\",\"Barbell good mornings\",\"Barbell box squat\",\"Jump squats\",\"Leg press\",\"Dumbbell goblet squat\",\"Reverse lunge (KB)\"]" ; tue (add) [add] A=["g:Barbell box squat","g:Leg press","g:Dumbbell goblet squat","g:Reverse lunge (KB)","g:Cable pull-through","g:45° back extension","m:Barbell Romanian deadlift","m:Deadlift","m:Trap bar deadlift","m:Dumbbell split-stance deadlift","m:Kettlebell single-leg deadlift","o:Barbell bench press","o:Barbell overhead press","o:Barbell push press","o:Close-grip bench press","o:Incline barbell press","o:Landmine rotational press"] B="[\"g:Barbell box squat\",\"g:Jump squats\",\"g:Leg press\",\"g:Dumbbell goblet squat\",\"g:Reverse lunge (KB)\",\"g:Cable pull-through\",\"m:Barbell Romanian deadlift\",\"m:Deadlift\",\"m:Trap bar deadlift\",\"m:Dumbbell split-stance deadlift\",\"m:Kettlebell single-leg deadlift\",\"o:Barbell bench press\",\"o:Barbell overhead press\",\"o:Barbell push press\",\"o:Close-grip bench press\",\"o:Incline barbell press\",\"o:Landmine rotational press\"]") | fixture W3 30/30 | fixture W5 32/32
+
+[p] Thursday-from (2026-09-24) V228 W5 stamps mon:- tue:- wed:- thu:S fri:S sat:S sun:- | lens mon:(no helper) tue:(no helper) wed:(no helper) thu:(no helper) fri:(no helper) sat:(no helper) sun:(no helper)
+    mon cards 6 rejected 0 of 81
+    tue cards 7 rejected 2 of 77 -> tue Sumo deadlift [pat]: Jump squats ; tue (add) [add]: g:Jump squats
+    thu cards 6 rejected 2 of 56 -> thu Barbell box squat [pat]: Jump squats ; thu (add) [add]: m:Jump squats
+    fri cards 8 rejected 1 of 101 -> fri (add) [add]: o:Jump squats
+    sat cards 5 rejected 3 of 55 -> sat Mountain climbers [aux]: Burpees, High knees ; sat (add) [add]: o:Jump squats
+
+[p] Thursday-from (2026-09-24) SL2 W5 stamps mon:- tue:- wed:- thu:S fri:S sat:S sun:- | lens mon:(no helper) tue:(no helper) wed:(no helper) thu:(no helper) fri:(no helper) sat:(no helper) sun:(no helper)
+    mon cards 6 rejected 0 of 81
+    tue cards 7 rejected 2 of 77 -> tue Sumo deadlift [pat]: Jump squats ; tue (add) [add]: g:Jump squats
+    thu cards 6 rejected 2 of 56 -> thu Barbell box squat [pat]: Jump squats ; thu (add) [add]: m:Jump squats
+    fri cards 8 rejected 1 of 101 -> fri (add) [add]: o:Jump squats
+    sat cards 5 rejected 3 of 55 -> sat Mountain climbers [aux]: Burpees, High knees ; sat (add) [add]: o:Jump squats
+
+[p] Thursday-from (2026-09-24) CF4 W5 stamps mon:- tue:- wed:- thu:S fri:S sat:S sun:- | lens mon:null tue:null wed:null thu:knee,workaround fri:knee,workaround sat:knee,workaround sun:null
+    mon cards 6 rejected 0 of 81
+    tue cards 7 rejected 2 of 77 -> tue Sumo deadlift [pat]: Jump squats ; tue (add) [add]: g:Jump squats
+    thu cards 6 rejected 0 of 55
+    fri cards 8 rejected 0 of 101
+    sat cards 5 rejected 0 of 53
+[p] Thursday-from SL2 vs V228 per day: mon 6/6 | tue 7/7 | thu 6/6 | fri 8/8 | sat 5/5
+[p] Thursday-from CF4 vs V228 per day: mon 6/6 | tue 7/7 | thu 4/6 | fri 7/8 | sat 3/5
+
+[p] HALF_MANNY fixture seed 76308 injury null
+[p] uninjured HALF_MANNY SL2 vs V228 lists: W3 30/30 | W5 29/29
+[p] uninjured mario_noinj SL2 vs V228 lists: W3 32/32 | W5 32/32
+[p] uninjured HALF_MANNY CF4 vs V228 lists: W3 30/30 | W5 29/29
+[p] uninjured mario_noinj CF4 vs V228 lists: W3 32/32 | W5 32/32
+
+[p] travel-only (minimal, 09-22..09-24) on mario_noinj V228 W5 stamps mon:- tue:substitute wed:- thu:substitute fri:- sat:- sun:- | lens tue (no helper)
+
+[p] travel-only (minimal, 09-22..09-24) on mario_noinj SL2 W5 stamps mon:- tue:substitute wed:- thu:substitute fri:- sat:- sun:- | lens tue (no helper)
+
+[p] travel-only (minimal, 09-22..09-24) on mario_noinj CF4 W5 stamps mon:- tue:substitute wed:- thu:substitute fri:- sat:- sun:- | lens tue null
+[p] travel-only SL2 vs V228: stamped days (tue,thu) 13/13 | whole W5 32/32
+[p] travel-only CF4 vs V228: stamped days (tue,thu) 13/13 | whole W5 32/32
+
+[p] bridge/halfstep V228 overlays [{"type":"injury","from":"2026-09-24","to":"2026-09-30","patch":{"injury":{"region":"knee","tier":"workaround","bridge":true}}},{"type":"injury","from":"2026-10-01","to":"2026-10-07","patch":{"injury":{"region":"knee","tier":"workaround","halfstep":true}}}]
+    stamped days W5thu:bridge W5fri:bridge W5sat:bridge W6mon:bridge W6tue:bridge W6thu:halfstep W6fri:halfstep W6sat:halfstep | lens W5 fri (no helper) | lens W6 fri (no helper)
+    bridge days 5, cards 33: rejected by knee/workaround 9 of 390 | by the bridge patch itself 9 -> W5thu Barbell box squat [pat]: Jump squats ; W5thu (add) [add]: m:Jump squats ; W5fri (add) [add]: o:Jump squats ; W5sat Mountain climbers [aux]: Burpees, High knees
+    halfstep days 3, cards 19: rejected by the halfstep patch 0 of 212 | by knee/workaround (contrast) 6
+
+[p] bridge/halfstep SL2 overlays [{"type":"injury","from":"2026-09-24","to":"2026-09-30","patch":{"injury":{"region":"knee","tier":"workaround","bridge":true}}},{"type":"injury","from":"2026-10-01","to":"2026-10-07","patch":{"injury":{"region":"knee","tier":"workaround","halfstep":true}}}]
+    stamped days W5thu:bridge W5fri:bridge W5sat:bridge W6mon:bridge W6tue:bridge W6thu:halfstep W6fri:halfstep W6sat:halfstep | lens W5 fri (no helper) | lens W6 fri (no helper)
+    bridge days 5, cards 33: rejected by knee/workaround 9 of 390 | by the bridge patch itself 9 -> W5thu Barbell box squat [pat]: Jump squats ; W5thu (add) [add]: m:Jump squats ; W5fri (add) [add]: o:Jump squats ; W5sat Mountain climbers [aux]: Burpees, High knees
+    halfstep days 3, cards 19: rejected by the halfstep patch 0 of 212 | by knee/workaround (contrast) 6
+
+[p] bridge/halfstep CF4 overlays [{"type":"injury","from":"2026-09-24","to":"2026-09-30","patch":{"injury":{"region":"knee","tier":"workaround","bridge":true}}},{"type":"injury","from":"2026-10-01","to":"2026-10-07","patch":{"injury":{"region":"knee","tier":"workaround","halfstep":true}}}]
+    stamped days W5thu:bridge W5fri:bridge W5sat:bridge W6mon:bridge W6tue:bridge W6thu:halfstep W6fri:halfstep W6sat:halfstep | lens W5 fri {"region":"knee","tier":"workaround","bridge":true} | lens W6 fri {"region":"knee","tier":"workaround","halfstep":true}
+    bridge days 5, cards 33: rejected by knee/workaround 0 of 387 | by the bridge patch itself 0
+    halfstep days 3, cards 19: rejected by the halfstep patch 0 of 212 | by knee/workaround (contrast) 6
+[p] bridge SL2 lists == V228 (uninjured read) 33/33
+[p] halfstep SL2 lists == V228 (uninjured read) 19/19
+[p] bridge CF4 lists == V228 (uninjured read) 25/33
+[p] halfstep CF4 lists == V228 (uninjured read) 19/19
+
+[INFO] stacked injury_then_travel V228 overlays ["injury@1790265600000","substitute@1790265660000"]
+    mon stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens (no helper) | rejected 1/81
+    tue stamp ["substitute",{"equipment":"minimal"}] | build cue cards 0 | lens (no helper) | rejected 1/62
+    thu stamp ["substitute",{"equipment":"minimal"}] | build cue cards 0 | lens (no helper) | rejected 1/54
+    fri stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens (no helper) | rejected 1/101
+
+[INFO] stacked injury_then_travel SL2 overlays ["injury@1790265600000","substitute@1790265660000"]
+    mon stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens (no helper) | rejected 1/81
+    tue stamp ["substitute",{"equipment":"minimal"}] | build cue cards 0 | lens (no helper) | rejected 1/62
+    thu stamp ["substitute",{"equipment":"minimal"}] | build cue cards 0 | lens (no helper) | rejected 1/54
+    fri stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens (no helper) | rejected 1/101
+
+[INFO] stacked injury_then_travel CF4 overlays ["injury@1790265600000","substitute@1790265660000"]
+    mon stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens {"region":"knee","tier":"workaround"} | rejected 0/81
+    tue stamp ["substitute",{"equipment":"minimal"}] | build cue cards 0 | lens null | rejected 1/62
+    thu stamp ["substitute",{"equipment":"minimal"}] | build cue cards 0 | lens null | rejected 1/54
+    fri stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens {"region":"knee","tier":"workaround"} | rejected 0/101
+
+[INFO] stacked travel_then_injury V228 overlays ["substitute@1790265600000","injury@1790265660000"]
+    mon stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens (no helper) | rejected 1/81
+    tue stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens (no helper) | rejected 2/77
+    thu stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 1 | lens (no helper) | rejected 2/56
+    fri stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens (no helper) | rejected 1/101
+
+[INFO] stacked travel_then_injury SL2 overlays ["substitute@1790265600000","injury@1790265660000"]
+    mon stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens (no helper) | rejected 1/81
+    tue stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens (no helper) | rejected 2/77
+    thu stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 1 | lens (no helper) | rejected 2/56
+    fri stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens (no helper) | rejected 1/101
+
+[INFO] stacked travel_then_injury CF4 overlays ["substitute@1790265600000","injury@1790265660000"]
+    mon stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens {"region":"knee","tier":"workaround"} | rejected 0/81
+    tue stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens {"region":"knee","tier":"workaround"} | rejected 0/77
+    thu stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 1 | lens {"region":"knee","tier":"workaround"} | rejected 0/55
+    fri stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | build cue cards 0 | lens {"region":"knee","tier":"workaround"} | rejected 0/101
+
+[INFO] hist V228: snapshot w5_tue present true, snapshot carries _ovKey "[\"injury\",{\"injury\":{\"region\":\"knee\",\"tier\":\"workaround\"}}]" | booted W5 tue == snapshot true, stamp yes, lens (no helper), rejected 2/77
+    after removeOverlay + boot: overlays 0 | W5 tue (snapshot) stamp yes lens (no helper) rejected(knee judge) 2/77 | W5 thu (no snapshot) stamp no lens (no helper) rejected(knee judge) 2/62
+
+[INFO] hist SL2: snapshot w5_tue present true, snapshot carries _ovKey "[\"injury\",{\"injury\":{\"region\":\"knee\",\"tier\":\"workaround\"}}]" | booted W5 tue == snapshot true, stamp yes, lens (no helper), rejected 2/77
+    after removeOverlay + boot: overlays 0 | W5 tue (snapshot) stamp yes lens (no helper) rejected(knee judge) 2/77 | W5 thu (no snapshot) stamp no lens (no helper) rejected(knee judge) 2/62
+
+[INFO] hist CF4: snapshot w5_tue present true, snapshot carries _ovKey "[\"injury\",{\"injury\":{\"region\":\"knee\",\"tier\":\"workaround\"}}]" | booted W5 tue == snapshot true, stamp yes, lens {"region":"knee","tier":"workaround"}, rejected 0/77
+    after removeOverlay + boot: overlays 0 | W5 tue (snapshot) stamp yes lens {"region":"knee","tier":"workaround"} rejected(knee judge) 0/77 | W5 thu (no snapshot) stamp no lens null rejected(knee judge) 2/62
+[o] lowback_bw OV V228 W5 cards 30 | capped 6 | capped RPE>7 2 (tue Single-leg hip thrust "3 sets — RPE 8 (stop 2 reps short of fai" ; thu Squat (slow 3s tempo) "3 sets — RPE 8 (stop 2 reps short of fai") | cue 0 | OV == fixture cards 30/30
+[o] lowback_bw OV SL2 W5 cards 30 | capped 6 | capped RPE>7 0 | cue 0 | OV == fixture cards 30/30
+[o] lowback_bw OV CF4 W5 cards 30 | capped 6 | capped RPE>7 0 | cue 0 | OV == fixture cards 30/30
+[o] mario OV V228 W5 cards 31 | capped 2 | capped RPE>7 0 | cue 1 | OV == fixture cards 31/31
+[o] mario OV SL2 W5 cards 31 | capped 2 | capped RPE>7 0 | cue 1 | OV == fixture cards 31/31
+[o] mario OV CF4 W5 cards 31 | capped 2 | capped RPE>7 0 | cue 1 | OV == fixture cards 31/31
+[o] strength6 knee/wa OV V228 totalWeeks 6 | W6 thu "Main — Barbell box squat" == R7 false, == TEST true | W6 tue "Main — Barbell Romanian deadlift" == TEST true, == R7 false | W6 OV == fixture cards 33/33
+[o] strength6 knee/wa OV SL2 totalWeeks 6 | W6 thu "Main — Barbell box squat" == R7 true, == TEST false | W6 tue "Main — Barbell Romanian deadlift" == TEST true, == R7 false | W6 OV == fixture cards 33/33
+[o] strength6 knee/wa OV CF4 totalWeeks 6 | W6 thu "Main — Barbell box squat" == R7 true, == TEST false | W6 tue "Main — Barbell Romanian deadlift" == TEST true, == R7 false | W6 OV == fixture cards 33/33
+
+[q] mario OV W5 thu chain V228 [3,1]
+    start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 Barbell hip thrust "2×6–10 @ RPE 8" | _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 Leg extension "2×6–10 @ RPE 8" | _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+    hop3 Barbell good mornings "2×6–10 @ RPE 8" | _preHold none | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx 3 with ph 0
+    BOOT Barbell good mornings "2×6–10 @ RPE 8"
+    UNDO Leg extension "2×6–10 @ RPE 8"
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 8"
+
+[q] mario OV W5 thu chain SL2 [3,1]
+    start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 Barbell hip thrust "2×6–10 @ RPE 8" | _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 Leg extension "2×6–10 @ RPE 8" | _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+    hop3 Barbell good mornings "2×6–10 @ RPE 8" | _preHold none | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx 3 with ph 0
+    BOOT Barbell good mornings "2×6–10 @ RPE 8"
+    UNDO Leg extension "2×6–10 @ RPE 8"
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 8"
+
+[q] mario OV W5 thu chain CF4 [3,1]
+    start Single-leg hip thrust "2×6–10 @ RPE 8"
+    hop1 Barbell hip thrust "2×6–10 @ RPE 8" | _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+    hop2 Leg extension "2×6–10 @ RPE 8" | _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+    hop3 Barbell good mornings "2×6–10 @ RPE 8" | _preHold none | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+    record rx 3 with ph 0
+    BOOT Barbell good mornings "2×6–10 @ RPE 8"
+    UNDO Leg extension "2×6–10 @ RPE 8"
+    UNDO+BOOT Leg extension "2×6–10 @ RPE 8"
+[q] chain SL2 == V228 line by line: 8/8
+[q] chain CF4 == V228 line by line: 8/8
+
+[b] HALF_MANNY V228 digest "0ac7da6b1691a8e1" | self-stable true
+
+[b] HALF_MANNY SL2 digest "0ac7da6b1691a8e1" | self-stable true
+
+[b] HALF_MANNY CF4 digest "0ac7da6b1691a8e1" | self-stable true
+[b] uninjured builds (L1 uninjured + MARIO + HALF_MANNY) byte-identical to V228: SL2 98/98 | CF4 98/98
+## report
+[p] L1 V228 rows 16018 from 16/16 chunk files, injured cfgs 288
+[p] L1 SL2 rows 16018 from 16/16 chunk files, injured cfgs 288
+[p] L1 CF4 rows 16018 from 16/16 chunk files, injured cfgs 288
+
+[p] L1 W5 kind=pat (pat = swapCandidates tier1+tier2; aux = auxSwapCandidates incl. _powerAllowed; add = addCandidates gap+more+off per day)
+  V228 cards 4529 (stamped 4529) | rejected offered 1451 of 39117 | cards >=1 rejected 1387 | prior def (OV-only extras that are rejected) 1451 | OV list == fixture list 3142/4529 | OV longer 394 | fixture rejected 0
+     cards>=1 by reg knee/workaround 293 | lowback/workaround 758 | shoulder/protect 336 || by eq bodyweight 63 | commercial 285 | crossfit 284 | home_basic 215 | home_full 323 | minimal 217 || by exp advanced 654 | beginner 733
+  SL2 cards 4529 (stamped 4529) | rejected offered 1451 of 39117 | cards >=1 rejected 1387 | prior def (OV-only extras that are rejected) 1451 | OV list == fixture list 3142/4529 | OV longer 394 | fixture rejected 0
+     cards>=1 by reg knee/workaround 293 | lowback/workaround 758 | shoulder/protect 336 || by eq bodyweight 63 | commercial 285 | crossfit 284 | home_basic 215 | home_full 323 | minimal 217 || by exp advanced 654 | beginner 733
+  CF4 cards 4529 (stamped 4529) | rejected offered 0 of 38659 | cards >=1 rejected 0 | prior def (OV-only extras that are rejected) 0 | OV list == fixture list 4529/4529 | OV longer 0 | fixture rejected 0
+
+[p] L1 W5 kind=aux (pat = swapCandidates tier1+tier2; aux = auxSwapCandidates incl. _powerAllowed; add = addCandidates gap+more+off per day)
+  V228 cards 1754 (stamped 1754) | rejected offered 4228 of 21856 | cards >=1 rejected 941 | prior def (OV-only extras that are rejected) 4228 | OV list == fixture list 785/1754 | OV longer 969 | fixture rejected 0
+     cards>=1 by reg knee/workaround 92 | lowback/workaround 269 | shoulder/protect 580 || by eq bodyweight 187 | commercial 142 | crossfit 146 | home_basic 159 | home_full 142 | minimal 165 || by exp advanced 457 | beginner 484
+  SL2 cards 1754 (stamped 1754) | rejected offered 4228 of 21856 | cards >=1 rejected 941 | prior def (OV-only extras that are rejected) 4228 | OV list == fixture list 785/1754 | OV longer 969 | fixture rejected 0
+     cards>=1 by reg knee/workaround 92 | lowback/workaround 269 | shoulder/protect 580 || by eq bodyweight 187 | commercial 142 | crossfit 146 | home_basic 159 | home_full 142 | minimal 165 || by exp advanced 457 | beginner 484
+  CF4 cards 1754 (stamped 1754) | rejected offered 0 of 17340 | cards >=1 rejected 0 | prior def (OV-only extras that are rejected) 0 | OV list == fixture list 1754/1754 | OV longer 0 | fixture rejected 0
+
+[p] L1 W5 kind=add (pat = swapCandidates tier1+tier2; aux = auxSwapCandidates incl. _powerAllowed; add = addCandidates gap+more+off per day)
+  V228 cards 1440 (stamped 1440) | rejected offered 2104 of 19380 | cards >=1 rejected 1120 | prior def (OV-only extras that are rejected) 2104 | OV list == fixture list 320/1440 | OV longer 160 | fixture rejected 0
+     cards>=1 by reg knee/workaround 480 | lowback/workaround 200 | shoulder/protect 440 || by eq bodyweight 120 | commercial 216 | crossfit 216 | home_basic 176 | home_full 216 | minimal 176 || by exp advanced 560 | beginner 560
+  SL2 cards 1440 (stamped 1440) | rejected offered 2104 of 19380 | cards >=1 rejected 1120 | prior def (OV-only extras that are rejected) 2104 | OV list == fixture list 320/1440 | OV longer 160 | fixture rejected 0
+     cards>=1 by reg knee/workaround 480 | lowback/workaround 200 | shoulder/protect 440 || by eq bodyweight 120 | commercial 216 | crossfit 216 | home_basic 176 | home_full 216 | minimal 176 || by exp advanced 560 | beginner 560
+  CF4 cards 1440 (stamped 1440) | rejected offered 0 of 19142 | cards >=1 rejected 0 | prior def (OV-only extras that are rejected) 0 | OV list == fixture list 1440/1440 | OV longer 0 | fixture rejected 0
+
+[p] W3 stamped rows: V228 0/8295 | SL2 0/8295 | CF4 0/8295
+[p] L1 SL2 vs V228 W3: OV lists equal 8295/8295 | fixture lists equal 5172/5172 | rows absent on V228 0 | by kind OV equal pat 5346/5346 aux 1509/1509 add 1440/1440
+[p] L1 SL2 vs V228 W5: OV lists equal 7723/7723 | fixture lists equal 7723/7723 | rows absent on V228 0 | by kind OV equal pat 4529/4529 aux 1754/1754 add 1440/1440
+[p] L1 CF4 vs V228 W3: OV lists equal 8295/8295 | fixture lists equal 5172/5172 | rows absent on V228 0 | by kind OV equal pat 5346/5346 aux 1509/1509 add 1440/1440
+[p] L1 CF4 vs V228 W5: OV lists equal 4247/7723 | fixture lists equal 7723/7723 | rows absent on V228 0 | by kind OV equal pat 3142/4529 aux 785/1754 add 320/1440
+[p] CF4 W5 OV lists that moved vs V228 3476 | every removed name was a rejected name 3420/3476 | moved on unstamped day 0 | names added (backfill under the slice cap) 2859, of which rejected 0
+
+[q] V228 OV (this session) vs V228 OV (measure2 run) [baseline self] W5: n=13323 | (none)
+[q] SL2 OV vs V228 OV W5: n=13323 | (none)
+[q] CF4 OV vs V228 OV W5: n=13323 | (none)
+[q] CF4 OV vs SL2 OV W5: n=13323 | (none)
+[q] CF4 OV vs CF4 fixture: start card only W5: n=13323 | (none)
+[q] V228 OV (this session) vs V228 OV (measure2 run) [baseline self] W3: n=5257 | (none)
+[q] SL2 OV vs V228 OV W3: n=5257 | (none)
+[q] CF4 OV vs V228 OV W3: n=5257 | (none)
+[q] CF4 OV vs SL2 OV W3: n=5257 | (none)
+[q] CF4 OV vs CF4 fixture: start card only W3: n=5257 | any 5227 | start 5227 | per cfg elbow_wa 2230 | hip_wa 799 | knee_protect 72 | lowback_wa 904 | shoulder_wa 1222
+[q] CF4 OV W5 chains 13323: hold toasts 0 | _preHold kept 0 | ph entries 0
+## report2
+[p] moved lists removing a judge-accepted name: 56 | by kind aux 56 | by reg knee/workaround 28 | lowback/workaround 28 | removed names Broad jumps 28 | Dumbbell snatch 56 | Kettlebell clean 56 | Lateral bounds 28 | Power clean (light & explosive) 24 | Single-arm KB snatch 28 | Skater bounds 28 | Trap bar jump 12 | Tuck jumps 28
+    e.g. cfg 145 knee/workaround crossfit beginner W5 sat Wall ball shots [aux] removed Dumbbell snatch, Kettlebell clean, Power clean (light & explosive) | _powerAllowed(Dumbbell snatch, injured) false uninjured true | in fixture list false
+    e.g. cfg 146 lowback/workaround crossfit beginner W5 sat Wall ball shots [aux] removed Broad jumps, Dumbbell snatch, Kettlebell clean, Lateral bounds, Power clean (light & explosive), Skater bounds, Trap bar jump, Tuck jumps | _powerAllowed(Broad jumps, injured) false uninjured true | in fixture list false
+    e.g. cfg 149 knee/workaround crossfit beginner W5 sat Wall ball shots [aux] removed Dumbbell snatch, Kettlebell clean, Power clean (light & explosive) | _powerAllowed(Dumbbell snatch, injured) false uninjured true | in fixture list false
+    e.g. cfg 150 lowback/workaround crossfit beginner W5 sat Wall ball shots [aux] removed Broad jumps, Dumbbell snatch, Kettlebell clean, Lateral bounds, Power clean (light & explosive), Skater bounds, Trap bar jump, Tuck jumps | _powerAllowed(Broad jumps, injured) false uninjured true | in fixture list false
+## du
+[du] V228 CFG W3 mon Incline barbell press > Barbell push press | chip "Incline barbell press" | undo identical true
+[du] SL1 CFG W3 mon Incline barbell press > Barbell push press | chip "Incline barbell press" | undo identical true
+[du] SL2 CFG W3 mon Incline barbell press > Barbell push press | chip "Incline barbell press" | undo identical false | sections.1.items.0._preHold: before undefined | after undo "3×8–12 @ RPE 7"
+[du] CF4 CFG W3 mon Incline barbell press > Barbell push press | chip "Incline barbell press" | undo identical false | sections.1.items.0._preHold: before undefined | after undo "3×8–12 @ RPE 7"
+[du] V228 OV W3 mon Incline barbell press > Barbell push press | chip "Incline barbell press" | undo identical true
+[du] SL1 OV W3 mon Incline barbell press > Barbell push press | chip "Incline barbell press" | undo identical true
+[du] SL2 OV W3 mon Incline barbell press > Barbell push press | chip "Incline barbell press" | undo identical true
+[du] CF4 OV W3 mon Incline barbell press > Barbell push press | chip "Incline barbell press" | undo identical true
+[du] V228 CFG W3 fri Toes-to-bar > Band woodchopper (door anchor) | chip "Toes-to-bar" | undo identical true
+[du] SL1 CFG W3 fri Toes-to-bar > Band woodchopper (door anchor) | chip "Toes-to-bar" | undo identical true
+[du] SL2 CFG W3 fri Toes-to-bar > Band woodchopper (door anchor) | chip "Toes-to-bar" | undo identical false | sections.3.items.0._preHold: before undefined | after undo "3×6–10 @ RPE 7"
+[du] CF4 CFG W3 fri Toes-to-bar > Band woodchopper (door anchor) | chip "Toes-to-bar" | undo identical false | sections.3.items.0._preHold: before undefined | after undo "3×6–10 @ RPE 7"
+[du] V228 OV W3 fri Toes-to-bar > Band woodchopper (door anchor) | chip "Toes-to-bar" | undo identical true
+[du] SL1 OV W3 fri Toes-to-bar > Band woodchopper (door anchor) | chip "Toes-to-bar" | undo identical true
+[du] SL2 OV W3 fri Toes-to-bar > Band woodchopper (door anchor) | chip "Toes-to-bar" | undo identical true
+[du] CF4 OV W3 fri Toes-to-bar > Band woodchopper (door anchor) | chip "Toes-to-bar" | undo identical true
+[du] V228 CFG W5 thu Single-leg hip thrust > Barbell hip thrust | chip "Single-leg hip thrust" | undo identical true
+[du] SL1 CFG W5 thu Single-leg hip thrust > Barbell hip thrust | chip "Single-leg hip thrust" | undo identical true
+[du] SL2 CFG W5 thu Single-leg hip thrust > Barbell hip thrust | chip "Single-leg hip thrust" | undo identical false | sections.3.items.1._preHold: before undefined | after undo "2×6–10 @ RPE 8"
+[du] CF4 CFG W5 thu Single-leg hip thrust > Barbell hip thrust | chip "Single-leg hip thrust" | undo identical false | sections.3.items.1._preHold: before undefined | after undo "2×6–10 @ RPE 8"
+[du] V228 OV W5 thu Single-leg hip thrust > Barbell hip thrust | chip "Single-leg hip thrust" | undo identical true
+[du] SL1 OV W5 thu Single-leg hip thrust > Barbell hip thrust | chip "Single-leg hip thrust" | undo identical true
+[du] SL2 OV W5 thu Single-leg hip thrust > Barbell hip thrust | chip "Single-leg hip thrust" | undo identical true
+[du] CF4 OV W5 thu Single-leg hip thrust > Barbell hip thrust | chip "Single-leg hip thrust" | undo identical true
+## g227_d190_seam on v228 (baseline V226 637bc8e)
+PASS row e-PRE D190 HAND precondition: the 2 natively cued mario items and the 2 ankle ones are on their days by name and carry the cue on a typed capped pattern (4/4 located, cued, typed capped)
+PASS row a-MEM D190 membership proven: store-derived U (one ia_swaps_ record per hop, read after the chain) == hand-derived U (hop froms pairwise distinct), every reachable chain (store != hand 0/12354, |U| 11998, |U'| 356)
+PASS row a-U D190 on U: every touched slot boots equal to the live card in name and detail, residue 0 of |U|, |U| > 0, no licence (residue 0/11998, chains that moved the live card 9895)
+PASS row a-U' D190 pair on U' (store shorter than the chain): every U' chain that boots equal to live on V226 boots equal to live on the candidate, created 0 (created 0 of 326 U' chains equal on V226 (|U'| 356, healed 0))
+    d-U |U_d| 12282 (|U_d'| 72) by class, chip == hand chip / undo byte-identical / |U_d|: hop1 2277/2277/2277 | hop2 6132/6132/6132 | cyc2 2104/2104/2104 | hop3 644/644/644 | cyc3 360/360/360 | collide2 392/392/392 | exch3 373/373/373
+          by config, chip == hand chip and undo byte-identical / |U_d|: knee_wa 3317/3317 | ankle_wa 3323/3323 | hip_wa 1384/1384 | lowback_wa 1378/1378 | shoulder_wa 1441/1441 | elbow_wa 1439/1439
+PASS row d-U D190 R6 on U_d (hand: hop `to` names pairwise distinct on the day): the chip on the last hop's card is found and equals the last hop's `from`, and undoSwap(chip) leaves the whole day byte-identical to the day before the last hop; residue 0 of |U_d|, |U_d| > 0, no licence (residue 0/12282 (no chip 0, chip != hand chip 0, undo not byte-identical 0))
+PASS row d-U' D190 R6 pair on U_d' (some `to` repeats on the day): every U_d' chain that undoes byte-identical on V226 undoes byte-identical on the candidate, created 0, |U_d'| > 0 (created 0 of 44 U_d' chains byte-identical on V226 (|U_d'| 72, on both 72, healed 28))
+PASS row e D190 every reachable hop1/hop2/cyc2 chain from the 4 natively cued items: touched slot and whole day live == boot (live != boot 0/229 (62 + 57 + 55 + 55))
+PASS 7 FAIL 0
+## g227_d190_seam on sl1 (baseline V226 637bc8e)
+PASS row e-PRE D190 HAND precondition: the 2 natively cued mario items and the 2 ankle ones are on their days by name and carry the cue on a typed capped pattern (4/4 located, cued, typed capped)
+PASS row a-MEM D190 membership proven: store-derived U (one ia_swaps_ record per hop, read after the chain) == hand-derived U (hop froms pairwise distinct), every reachable chain (store != hand 0/12354, |U| 11998, |U'| 356)
+FAIL row a-U D190 on U: every touched slot boots equal to the live card in name and detail, residue 0 of |U|, |U| > 0, no licence (got residue 83/11998, chains that moved the live card 9908)
+FAIL row a-U' D190 pair on U' (store shorter than the chain): every U' chain that boots equal to live on V226 boots equal to live on the candidate, created 0 (got created 1 of 326 U' chains equal on V226 (|U'| 356, healed 0))
+    d-U |U_d| 12282 (|U_d'| 72) by class, chip == hand chip / undo byte-identical / |U_d|: hop1 2277/2277/2277 | hop2 6132/6132/6132 | cyc2 2104/2104/2104 | hop3 644/644/644 | cyc3 360/360/360 | collide2 392/392/392 | exch3 373/373/373
+          by config, chip == hand chip and undo byte-identical / |U_d|: knee_wa 3317/3317 | ankle_wa 3323/3323 | hip_wa 1384/1384 | lowback_wa 1378/1378 | shoulder_wa 1441/1441 | elbow_wa 1439/1439
+PASS row d-U D190 R6 on U_d (hand: hop `to` names pairwise distinct on the day): the chip on the last hop's card is found and equals the last hop's `from`, and undoSwap(chip) leaves the whole day byte-identical to the day before the last hop; residue 0 of |U_d|, |U_d| > 0, no licence (residue 0/12282 (no chip 0, chip != hand chip 0, undo not byte-identical 0))
+PASS row d-U' D190 R6 pair on U_d' (some `to` repeats on the day): every U_d' chain that undoes byte-identical on V226 undoes byte-identical on the candidate, created 0, |U_d'| > 0 (created 0 of 44 U_d' chains byte-identical on V226 (|U_d'| 72, on both 72, healed 28))
+PASS row e D190 every reachable hop1/hop2/cyc2 chain from the 4 natively cued items: touched slot and whole day live == boot (live != boot 0/229 (62 + 57 + 55 + 55))
+PASS 5 FAIL 2
+## g227_d190_seam on sl2 (baseline V226 637bc8e)
+PASS row e-PRE D190 HAND precondition: the 2 natively cued mario items and the 2 ankle ones are on their days by name and carry the cue on a typed capped pattern (4/4 located, cued, typed capped)
+PASS row a-MEM D190 membership proven: store-derived U (one ia_swaps_ record per hop, read after the chain) == hand-derived U (hop froms pairwise distinct), every reachable chain (store != hand 0/12354, |U| 11998, |U'| 356)
+PASS row a-U D190 on U: every touched slot boots equal to the live card in name and detail, residue 0 of |U|, |U| > 0, no licence (residue 0/11998, chains that moved the live card 9895)
+PASS row a-U' D190 pair on U' (store shorter than the chain): every U' chain that boots equal to live on V226 boots equal to live on the candidate, created 0 (created 0 of 326 U' chains equal on V226 (|U'| 356, healed 0))
+    d-U |U_d| 12282 (|U_d'| 72) by class, chip == hand chip / undo byte-identical / |U_d|: hop1 2277/0/2277 | hop2 6132/5298/6132 | cyc2 2104/2104/2104 | hop3 644/582/644 | cyc3 360/360/360 | collide2 392/0/392 | exch3 373/359/373
+          by config, chip == hand chip and undo byte-identical / |U_d|: knee_wa 2502/3317 | ankle_wa 2509/3323 | hip_wa 901/1384 | lowback_wa 899/1378 | shoulder_wa 946/1441 | elbow_wa 946/1439
+FAIL row d-U D190 R6 on U_d (hand: hop `to` names pairwise distinct on the day): the chip on the last hop's card is found and equals the last hop's `from`, and undoSwap(chip) leaves the whole day byte-identical to the day before the last hop; residue 0 of |U_d|, |U_d| > 0, no licence (got residue 3579/12282 (no chip 0, chip != hand chip 0, undo not byte-identical 3579))
+PASS row d-U' D190 R6 pair on U_d' (some `to` repeats on the day): every U_d' chain that undoes byte-identical on V226 undoes byte-identical on the candidate, created 0, |U_d'| > 0 (created 0 of 44 U_d' chains byte-identical on V226 (|U_d'| 72, on both 72, healed 28))
+PASS row e D190 every reachable hop1/hop2/cyc2 chain from the 4 natively cued items: touched slot and whole day live == boot (live != boot 0/229 (62 + 57 + 55 + 55))
+PASS 6 FAIL 1
+## g227_d190_seam on cf4 (baseline V226 637bc8e)
+PASS row e-PRE D190 HAND precondition: the 2 natively cued mario items and the 2 ankle ones are on their days by name and carry the cue on a typed capped pattern (4/4 located, cued, typed capped)
+PASS row a-MEM D190 membership proven: store-derived U (one ia_swaps_ record per hop, read after the chain) == hand-derived U (hop froms pairwise distinct), every reachable chain (store != hand 0/12354, |U| 11998, |U'| 356)
+PASS row a-U D190 on U: every touched slot boots equal to the live card in name and detail, residue 0 of |U|, |U| > 0, no licence (residue 0/11998, chains that moved the live card 9895)
+PASS row a-U' D190 pair on U' (store shorter than the chain): every U' chain that boots equal to live on V226 boots equal to live on the candidate, created 0 (created 0 of 326 U' chains equal on V226 (|U'| 356, healed 0))
+    d-U |U_d| 12282 (|U_d'| 72) by class, chip == hand chip / undo byte-identical / |U_d|: hop1 2277/0/2277 | hop2 6132/5298/6132 | cyc2 2104/2104/2104 | hop3 644/582/644 | cyc3 360/360/360 | collide2 392/0/392 | exch3 373/359/373
+          by config, chip == hand chip and undo byte-identical / |U_d|: knee_wa 2502/3317 | ankle_wa 2509/3323 | hip_wa 901/1384 | lowback_wa 899/1378 | shoulder_wa 946/1441 | elbow_wa 946/1439
+FAIL row d-U D190 R6 on U_d (hand: hop `to` names pairwise distinct on the day): the chip on the last hop's card is found and equals the last hop's `from`, and undoSwap(chip) leaves the whole day byte-identical to the day before the last hop; residue 0 of |U_d|, |U_d| > 0, no licence (got residue 3579/12282 (no chip 0, chip != hand chip 0, undo not byte-identical 3579))
+PASS row d-U' D190 R6 pair on U_d' (some `to` repeats on the day): every U_d' chain that undoes byte-identical on V226 undoes byte-identical on the candidate, created 0, |U_d'| > 0 (created 0 of 44 U_d' chains byte-identical on V226 (|U_d'| 72, on both 72, healed 28))
+PASS row e D190 every reachable hop1/hop2/cyc2 chain from the 4 natively cued items: touched slot and whole day live == boot (live != boot 0/229 (62 + 57 + 55 + 55))
+PASS 6 FAIL 1
