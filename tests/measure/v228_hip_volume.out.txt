@@ -1,0 +1,429 @@
+ia-version 228
+
+==== PRT TING | goal=athletic focus=support_athletic run=run_pace_goal seed=87747 | start (race week = last week, date arithmetic)=2026-08-10 (engine prog.startDate=null) totalWeeks=11 | today 2026-10-03 = week 8 | self-identical true
+ wk  lived  items sets | C1 glute-ext it/sets | C2 hinge it/sets (nordic/ghr) | C3 frontal it/sets | C4 mobility it/sets
+ W1  lived    28   88 | 0/0                 | 2/7 (0/0)                     | 3/7               | 1/2 | C5 flexor 0/0
+ W2  lived    28   88 | 0/0                 | 2/7 (0/0)                     | 2/5               | 1/1 | C5 flexor 1/2
+ W3  lived    29   91 | 0/0                 | 2/7 (0/0)                     | 2/4               | 1/2 | C5 flexor 0/0
+ W4  lived    23   67 | 1/3                 | 2/7 (0/0)                     | 3/6               | 0/0 | C5 flexor 0/0
+ W5  lived    27   79 | 0/0                 | 2/7 (0/0)                     | 3/6               | 0/0 | C5 flexor 0/0
+ W6  lived    26   77 | 0/0                 | 2/7 (0/0)                     | 2/4               | 1/2 | C5 flexor 0/0
+ W7  lived    26   77 | 0/0                 | 3/10 (0/0)                    | 1/2               | 1/2 | C5 flexor 1/2
+ W8  TODAY    22   63 | 0/0                 | 5/14 (0/0)                    | 1/2               | 1/2 | C5 flexor 1/2
+ W9           26   76 | 0/0                 | 3/10 (0/0)                    | 2/4               | 0/0 | C5 flexor 1/2
+ W10           7   18 | 0/0                 | 1/3 (0/0)                     | 0/0               | 0/0 | C5 flexor 0/0
+ W11           7   14 | 0/0                 | 1/2 (0/0)                     | 0/0               | 0/0 | C5 flexor 0/0
+ TOTAL lift items 249 sets 738 | C1 1 items (0.4%) 3 sets (0.4%) | C2 25/81 (11.0% of sets; nordic/ghr 0/0) | C3 19/40 (5.4%) | C4 mobility 6/11 | C5 hip-flexor strength 4/8
+ -- item lists by week --
+  W1 C2: tue [Leg superset B] Dumbbell split-stance deadlift 3×6–10 @ RPE 8 ; thu [Main — Deadlift] Deadlift 4×6 — RPE 8 (leave
+  W1 C3: tue [Leg superset A] Dumbbell goblet side lunge 3×8–12 each @ RPE  ; tue [Hip stability] Clamshells w/ band 2×15 each ; tue [Hip stability] Hip airplane (light KB) 2×6 each, slow
+  W1 C4: tue Hip 90/90 stretch
+  W2 C2: tue [Leg superset B] Dumbbell split-stance deadlift 3×6–10 @ RPE 8 ; thu [Main — Deadlift] Deadlift 4×5 — RPE 8 (leave
+  W2 C3: tue [Leg superset A] Dumbbell goblet side lunge 3×8–12 each @ RPE  ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE
+  W2 C4: tue Worlds greatest stretch
+  W2 C5: tue [Hip stability] Seated banded hip flexion 2×15 each
+  W3 C2: tue [Leg superset B] Barbell good mornings 3×6–10 @ RPE 8 ; thu [Main — Deadlift] Deadlift 4×5 — RPE 8.5 (lea
+  W3 C3: tue [Hip stability] Banded monster walks 2×12–15 each @ RPE ; tue [Hip stability] Banded side steps 2×15–20 each @ RPE
+  W3 C4: tue IT band stretch
+  W4 C1: tue [Leg superset B] Barbell hip thrust 3×6–10 @ RPE 8
+  W4 C2: tue [Leg superset B] Barbell good mornings 3×6–10 @ RPE 8 ; thu [Main — Deadlift] Deadlift 4×7 — RPE 6 (recov
+  W4 C3: tue [Hip stability] Banded side steps 2×15–20 each @ RPE ; tue [Hip stability] Hip airplane (light KB) 2×6 each, slow ; tue [Hip stability] Weighted 90/90 hip switch 2×6 each
+  W5 C2: tue [Leg superset B] Barbell Romanian deadlift 3×6–10 @ RPE 8 ; thu [Main — Sumo deadlift] Sumo deadlift 4×3 — RPE 8.5 (lea
+  W5 C3: tue [Hip stability] Standing band hip abduction 2×12–15 each @ RPE ; tue [Hip stability] Banded side steps 2×15–20 each @ RPE ; tue [Hip stability] Weighted 90/90 hip switch 2×6 each
+  W6 C2: tue [Leg superset B] Barbell Romanian deadlift 3×6–10 @ RPE 8 ; thu [Main — Sumo deadlift] Sumo deadlift 4×3 — RPE 9 (leave
+  W6 C3: tue [Hip stability] Hip airplane (light KB) 2×6 each, slow ; tue [Hip stability] Clamshells w/ band 2×15 each
+  W6 C4: tue IT band stretch
+  W7 C2: mon [Conditioning] Kettlebell swing 3×12 ; tue [Leg superset B] Kettlebell single-leg deadlift 3×6–10 @ RPE 8 ; thu [Main — Deadlift] Deadlift 4×5 — RPE 8 (leave
+  W7 C3: tue [Hip stability] Standing band hip abduction 2×12–15 each @ RPE
+  W7 C4: tue IT band stretch
+  W7 C5: tue [Hip stability] Seated banded hip flexion 2×15 each
+  W8 C2: tue [Leg superset B] Kettlebell single-leg deadlift 3×6–10 @ RPE 8 ; tue [Leg superset B] 45° back extension 3 sets — RPE 8 (st ; thu [Main — Deadlift] Deadlift 4×7 — RPE 6 (recov ; sat [Power — explosive first] Kettlebell swing 2×10 — fast and cr ; sat [Power — explosive first] Dumbbell snatch 2×5 — explosive, ~
+  W8 C3: tue [Hip stability] Banded monster walks 2×12–15 each @ RPE
+  W8 C4: tue Hip 90/90 stretch
+  W8 C5: tue [Hip stability] Seated banded hip flexion 2×15 each
+  W9 C2: tue [Leg superset B] Kettlebell single-leg deadlift 3×6–10 @ RPE 8 ; thu [Main — Deadlift] Deadlift 4×3 — RPE 8.5 (lea ; fri [Light finisher] Kettlebell swing 3×12
+  W9 C3: tue [Hip stability] Hip airplane (light KB) 2×6 each, slow ; tue [Hip stability] Weighted 90/90 hip switch 2×6 each
+  W9 C5: tue [Hip stability] Seated banded hip flexion 2×15 each
+  W10 C2: thu [Primer — Deadlift] Deadlift 3×3 — RPE 5–6 (pri
+  W11 C2: thu [Primer — Sumo deadlift] Sumo deadlift 2×3 — RPE 5–6 (pri
+
+==== THE HALF MANNY (pasted) | goal=endurance focus=support_prevention run=run_half seed=76308 | start (race week = last week, date arithmetic)=2026-08-31 (engine prog.startDate=null) totalWeeks=14 | today 2026-10-03 = week 5 | self-identical true
+ wk  lived  items sets | C1 glute-ext it/sets | C2 hinge it/sets (nordic/ghr) | C3 frontal it/sets | C4 mobility it/sets
+ W1  lived    31   73 | 0/0                 | 3/9 (0/0)                     | 1/2               | 1/2 | C5 flexor 1/2
+ W2  lived    30   71 | 0/0                 | 3/9 (0/0)                     | 2/4               | 1/2 | C5 flexor 0/0
+ W3  lived    30   69 | 0/0                 | 2/5 (0/0)                     | 3/6               | 1/2 | C5 flexor 0/0
+ W4  lived    21   46 | 0/0                 | 2/5 (0/0)                     | 3/6               | 1/2 | C5 flexor 0/0
+ W5  TODAY    29   66 | 0/0                 | 3/7 (0/0)                     | 2/4               | 1/2 | C5 flexor 0/0
+ W6           30   67 | 0/0                 | 3/7 (0/0)                     | 3/6               | 3/6 | C5 flexor 0/0
+ W7           30   68 | 0/0                 | 2/5 (0/0)                     | 2/4               | 4/7 | C5 flexor 0/0
+ W8           21   45 | 0/0                 | 2/5 (0/0)                     | 1/2               | 4/7 | C5 flexor 1/2
+ W9           29   66 | 0/0                 | 2/5 (0/0)                     | 3/6               | 4/8 | C5 flexor 0/0
+ W10          28   63 | 0/0                 | 2/5 (0/0)                     | 3/6               | 4/8 | C5 flexor 0/0
+ W11          31   66 | 0/0                 | 2/4 (0/0)                     | 2/4               | 3/6 | C5 flexor 1/2
+ W12          21   44 | 0/0                 | 2/4 (0/0)                     | 2/4               | 1/1 | C5 flexor 0/0
+ W13           7   18 | 0/0                 | 1/3 (0/0)                     | 0/0               | 0/0 | C5 flexor 0/0
+ W14           5   10 | 0/0                 | 1/2 (0/0)                     | 0/0               | 0/0 | C5 flexor 0/0
+ TOTAL lift items 343 sets 772 | C1 0 items (0.0%) 0 sets (0.0%) | C2 30/75 (9.7% of sets; nordic/ghr 0/0) | C3 27/54 (7.0%) | C4 mobility 28/53 | C5 hip-flexor strength 3/6
+ -- item lists by week --
+  W1 C2: tue [Leg circuit — runner arm] Barbell Romanian deadlift 2×6–10 @ RPE 7 ; thu [Main — Barbell Romanian ] Barbell Romanian deadlift 3×12 — RPE 6.5 (le ; sat [Power — explosive first] Kettlebell swing 4×10 — fast and cr
+  W1 C3: tue [Hip stability] Hip airplane (light KB) 2×6 each, slow
+  W1 C4: tue Hip 90/90 stretch
+  W1 C5: tue [Hip stability] Seated banded hip flexion 2×15 each
+  W2 C2: tue [Leg circuit — runner arm] Barbell Romanian deadlift 2×6–10 @ RPE 7 ; thu [Main — Barbell Romanian ] Barbell Romanian deadlift 3×12 — RPE 6.5 (le ; sat [Power — explosive first] Kettlebell swing 4×10 — fast and cr
+  W2 C3: tue [Hip stability] Standing band hip abduction 2×12–15 each @ RPE ; tue [Hip stability] Hip airplane (light KB) 2×6 each, slow
+  W2 C4: tue Hip 90/90 stretch
+  W3 C2: tue [Leg circuit — runner arm] Kettlebell swing 2×8 ; thu [Main — Trap bar deadlift] Trap bar deadlift 3×10 — RPE 6.5 (le
+  W3 C3: tue [Leg circuit — runner arm] Dumbbell goblet side lunge 2×8–12 each @ RPE  ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE ; tue [Hip stability] Standing band hip abduction 2×12–15 each @ RPE
+  W3 C4: tue Hip 90/90 stretch
+  W4 C2: tue [Leg circuit — runner arm] Kettlebell swing 2×8 ; thu [Main — Trap bar deadlift] Trap bar deadlift 3×13 — RPE 6 (reco
+  W4 C3: tue [Leg circuit — runner arm] Dumbbell goblet side lunge 2×8–12 each @ RPE  ; tue [Hip stability] Banded side steps 2×15–20 each @ RPE ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE
+  W4 C4: tue IT band stretch
+  W5 C2: tue [Leg circuit — runner arm] Kettlebell swing 2×8 ; thu [Main — Sumo deadlift] Sumo deadlift 3×8 — RPE 7 (leave ; thu [Pull superset B] Kettlebell swing 2×10
+  W5 C3: tue [Hip stability] Banded side steps 2×15–20 each @ RPE ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE
+  W5 C4: tue IT band stretch
+  W6 C2: tue [Leg circuit — runner arm] Kettlebell swing 2×8 ; thu [Main — Sumo deadlift] Sumo deadlift 3×8 — RPE 7 (leave ; thu [Pull superset B] Kettlebell swing 2×10
+  W6 C3: tue [Hip stability] Banded side steps 2×15–20 each @ RPE ; tue [Hip stability] Clamshells w/ band 2×15 each ; tue [Hip stability] Weighted 90/90 hip switch 2×6 each
+  W6 C4: sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W7 C2: tue [Leg circuit — runner arm] Kettlebell single-leg deadlift 2×6–10 @ RPE 7 ; thu [Main — Trap bar deadlift] Trap bar deadlift 3×10 — RPE 6.5 (le
+  W7 C3: tue [Hip stability] Clamshells w/ band 2×15 each ; tue [Hip stability] Banded side steps 2×15–20 each @ RPE
+  W7 C4: tue Worlds greatest stretch ; sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W8 C2: tue [Leg circuit — runner arm] Kettlebell single-leg deadlift 2×6–10 @ RPE 7 ; thu [Main — Trap bar deadlift] Trap bar deadlift 3×13 — RPE 6 (reco
+  W8 C3: tue [Hip stability] Clamshells w/ band 2×15 each
+  W8 C4: tue Worlds greatest stretch ; sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W8 C5: tue [Hip stability] Seated banded hip flexion 2×15 each
+  W9 C2: tue [Leg circuit — runner arm] Dumbbell split-stance deadlift 2×6–10 @ RPE 7 ; thu [Main — Deadlift] Deadlift 3×8 — RPE 7 (leave
+  W9 C3: tue [Leg circuit — runner arm] Dumbbell goblet side lunge 2×8–12 each @ RPE  ; tue [Hip stability] Clamshells w/ band 2×15 each ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE
+  W9 C4: tue IT band stretch ; sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W10 C2: tue [Leg circuit — runner arm] Dumbbell split-stance deadlift 2×6–10 @ RPE 7 ; thu [Main — Deadlift] Deadlift 3×8 — RPE 7 (leave
+  W10 C3: tue [Leg circuit — runner arm] Dumbbell goblet side lunge 2×8–12 each @ RPE  ; tue [Hip stability] Clamshells w/ band 2×15 each ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE
+  W10 C4: tue IT band stretch ; sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W11 C2: tue [Leg circuit — runner arm] Kettlebell single-leg deadlift 2×6–10 @ RPE 7 ; thu [Main — Barbell Romanian ] Barbell Romanian deadlift 2×8 — RPE 6.5 (lea
+  W11 C3: tue [Hip stability] Hip airplane (light KB) 2×6 each, slow ; tue [Hip stability] Weighted 90/90 hip switch 2×6 each
+  W11 C4: sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W11 C5: tue [Hip stability] Seated banded hip flexion 2×15 each
+  W12 C2: tue [Leg circuit — runner arm] Kettlebell single-leg deadlift 2×6–10 @ RPE 7 ; thu [Main — Barbell Romanian ] Barbell Romanian deadlift 2×9 — RPE 6 (recov
+  W12 C3: tue [Hip stability] Banded side steps 2×15–20 each @ RPE ; tue [Hip stability] Hip airplane (light KB) 2×6 each, slow
+  W12 C4: tue Worlds greatest stretch
+  W13 C2: thu [Primer — Trap bar deadli] Trap bar deadlift 3×12 — RPE 5–6 (pr
+  W14 C2: thu [Primer — Trap bar deadli] Trap bar deadlift 2×12 — RPE 5–6 (pr
+
+==== HALF_MANNY fixture (harness) | goal=endurance focus=support_prevention run=run_half seed=76308 | start (race week = last week, date arithmetic)=2026-08-31 (engine prog.startDate=null) totalWeeks=14 | today 2026-10-03 = week 5 | self-identical true
+ wk  lived  items sets | C1 glute-ext it/sets | C2 hinge it/sets (nordic/ghr) | C3 frontal it/sets | C4 mobility it/sets
+ W1  lived    31   73 | 0/0                 | 3/9 (0/0)                     | 1/2               | 1/2 | C5 flexor 1/2
+ W2  lived    29   67 | 0/0                 | 2/5 (0/0)                     | 2/4               | 1/2 | C5 flexor 0/0
+ W3  lived    30   69 | 0/0                 | 2/5 (0/0)                     | 3/6               | 1/2 | C5 flexor 0/0
+ W4  lived    21   45 | 0/0                 | 2/5 (0/0)                     | 3/6               | 4/8 | C5 flexor 0/0
+ W5  TODAY    29   65 | 0/0                 | 3/7 (0/0)                     | 2/4               | 4/8 | C5 flexor 0/0
+ W6           30   67 | 0/0                 | 3/7 (0/0)                     | 3/6               | 3/6 | C5 flexor 0/0
+ W7           30   68 | 0/0                 | 2/5 (0/0)                     | 2/4               | 4/7 | C5 flexor 0/0
+ W8           21   45 | 0/0                 | 2/5 (0/0)                     | 1/2               | 4/7 | C5 flexor 1/2
+ W9           29   66 | 0/0                 | 2/5 (0/0)                     | 3/6               | 4/8 | C5 flexor 0/0
+ W10          28   63 | 0/0                 | 2/5 (0/0)                     | 3/6               | 4/8 | C5 flexor 0/0
+ W11          31   66 | 0/0                 | 2/4 (0/0)                     | 2/4               | 3/6 | C5 flexor 1/2
+ W12          21   44 | 0/0                 | 2/4 (0/0)                     | 2/4               | 1/1 | C5 flexor 0/0
+ W13           8   19 | 0/0                 | 1/3 (0/0)                     | 0/0               | 3/6 | C5 flexor 0/0
+ W14           5   10 | 0/0                 | 1/2 (0/0)                     | 0/0               | 0/0 | C5 flexor 0/0
+ TOTAL lift items 343 sets 767 | C1 0 items (0.0%) 0 sets (0.0%) | C2 29/71 (9.3% of sets; nordic/ghr 0/0) | C3 27/54 (7.0%) | C4 mobility 37/71 | C5 hip-flexor strength 3/6
+ -- item lists by week --
+  W1 C2: tue [Leg circuit — runner arm] Barbell Romanian deadlift 2×6–10 @ RPE 7 ; thu [Main — Barbell Romanian ] Barbell Romanian deadlift 3×12 — RPE 6.5 (le ; sat [Power — explosive first] Kettlebell swing 4×10 — fast and cr
+  W1 C3: tue [Hip stability] Hip airplane (light KB) 2×6 each, slow
+  W1 C4: tue Hip 90/90 stretch
+  W1 C5: tue [Hip stability] Seated banded hip flexion 2×15 each
+  W2 C2: tue [Leg circuit — runner arm] Barbell Romanian deadlift 2×6–10 @ RPE 7 ; thu [Main — Barbell Romanian ] Barbell Romanian deadlift 3×12 — RPE 6.5 (le
+  W2 C3: tue [Hip stability] Standing band hip abduction 2×12–15 each @ RPE ; tue [Hip stability] Hip airplane (light KB) 2×6 each, slow
+  W2 C4: tue Hip 90/90 stretch
+  W3 C2: tue [Leg circuit — runner arm] Kettlebell swing 2×8 ; thu [Main — Trap bar deadlift] Trap bar deadlift 3×10 — RPE 6.5 (le
+  W3 C3: tue [Leg circuit — runner arm] Dumbbell goblet side lunge 2×8–12 each @ RPE  ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE ; tue [Hip stability] Standing band hip abduction 2×12–15 each @ RPE
+  W3 C4: tue Hip 90/90 stretch
+  W4 C2: tue [Leg circuit — runner arm] Kettlebell swing 2×8 ; thu [Main — Trap bar deadlift] Trap bar deadlift 3×13 — RPE 6 (reco
+  W4 C3: tue [Leg circuit — runner arm] Dumbbell goblet side lunge 2×8–12 each @ RPE  ; tue [Hip stability] Banded side steps 2×15–20 each @ RPE ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE
+  W4 C4: tue IT band stretch ; sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W5 C2: tue [Leg circuit — runner arm] Kettlebell swing 2×8 ; thu [Main — Sumo deadlift] Sumo deadlift 3×8 — RPE 7 (leave ; thu [Pull superset B] Kettlebell swing 2×10
+  W5 C3: tue [Hip stability] Banded side steps 2×15–20 each @ RPE ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE
+  W5 C4: tue IT band stretch ; sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W6 C2: tue [Leg circuit — runner arm] Kettlebell swing 2×8 ; thu [Main — Sumo deadlift] Sumo deadlift 3×8 — RPE 7 (leave ; thu [Pull superset B] Kettlebell swing 2×10
+  W6 C3: tue [Hip stability] Banded side steps 2×15–20 each @ RPE ; tue [Hip stability] Clamshells w/ band 2×15 each ; tue [Hip stability] Weighted 90/90 hip switch 2×6 each
+  W6 C4: sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W7 C2: tue [Leg circuit — runner arm] Kettlebell single-leg deadlift 2×6–10 @ RPE 7 ; thu [Main — Trap bar deadlift] Trap bar deadlift 3×10 — RPE 6.5 (le
+  W7 C3: tue [Hip stability] Clamshells w/ band 2×15 each ; tue [Hip stability] Banded side steps 2×15–20 each @ RPE
+  W7 C4: tue Worlds greatest stretch ; sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W8 C2: tue [Leg circuit — runner arm] Kettlebell single-leg deadlift 2×6–10 @ RPE 7 ; thu [Main — Trap bar deadlift] Trap bar deadlift 3×13 — RPE 6 (reco
+  W8 C3: tue [Hip stability] Clamshells w/ band 2×15 each
+  W8 C4: tue Worlds greatest stretch ; sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W8 C5: tue [Hip stability] Seated banded hip flexion 2×15 each
+  W9 C2: tue [Leg circuit — runner arm] Dumbbell split-stance deadlift 2×6–10 @ RPE 7 ; thu [Main — Deadlift] Deadlift 3×8 — RPE 7 (leave
+  W9 C3: tue [Leg circuit — runner arm] Dumbbell goblet side lunge 2×8–12 each @ RPE  ; tue [Hip stability] Clamshells w/ band 2×15 each ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE
+  W9 C4: tue IT band stretch ; sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W10 C2: tue [Leg circuit — runner arm] Dumbbell split-stance deadlift 2×6–10 @ RPE 7 ; thu [Main — Deadlift] Deadlift 3×8 — RPE 7 (leave
+  W10 C3: tue [Leg circuit — runner arm] Dumbbell goblet side lunge 2×8–12 each @ RPE  ; tue [Hip stability] Clamshells w/ band 2×15 each ; tue [Hip stability] Banded monster walks 2×12–15 each @ RPE
+  W10 C4: tue IT band stretch ; sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W11 C2: tue [Leg circuit — runner arm] Kettlebell single-leg deadlift 2×6–10 @ RPE 7 ; thu [Main — Barbell Romanian ] Barbell Romanian deadlift 2×8 — RPE 6.5 (lea
+  W11 C3: tue [Hip stability] Hip airplane (light KB) 2×6 each, slow ; tue [Hip stability] Weighted 90/90 hip switch 2×6 each
+  W11 C4: sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W11 C5: tue [Hip stability] Seated banded hip flexion 2×15 each
+  W12 C2: tue [Leg circuit — runner arm] Kettlebell single-leg deadlift 2×6–10 @ RPE 7 ; thu [Main — Barbell Romanian ] Barbell Romanian deadlift 2×9 — RPE 6 (recov
+  W12 C3: tue [Hip stability] Banded side steps 2×15–20 each @ RPE ; tue [Hip stability] Hip airplane (light KB) 2×6 each, slow
+  W12 C4: tue Worlds greatest stretch
+  W13 C2: thu [Primer — Trap bar deadli] Trap bar deadlift 3×12 — RPE 5–6 (pr
+  W13 C4: sat Standing calf stretch ; sat Couch stretch ; sat Hip 90/90 stretch
+  W14 C2: thu [Primer — Trap bar deadli] Trap bar deadlift 2×12 — RPE 5–6 (pr
+
+fixture vs pasted: fixture mile 10:30 baseline 5mi vs pasted 8:00; lift-item sequences equal: false
+
+PRT day titles W1: mon=Push{Short Interval (SI)} | tue=Legs | wed=rest | thu=Pull{Long Interval (LI)} | fri=Push (light){Long Slow Distance (LSD)} | sat=Full Body{Long Slow Distance (LSD)} | sun=rest
+
+MANNY day titles W1: mon=Strength Support{Speed Run — Intervals} | tue=Leg Strength + Mobility | wed=rest | thu=Posterior Chain{Speed Run — Fartlek} | fri=Recovery Lift{Recovery Run} | sat=Full Body Support{Long Run} | sun=rest
+
+PRT Leg superset B / Hip extension sections: 9
+   W1 tue: Dumbbell split-stance deadlift
+   W2 tue: Dumbbell split-stance deadlift
+   W3 tue: Barbell good mornings
+   W4 tue: Barbell good mornings + Barbell hip thrust
+   W5 tue: Barbell Romanian deadlift
+   W6 tue: Barbell Romanian deadlift
+   W7 tue: Kettlebell single-leg deadlift
+   W8 tue: Kettlebell single-leg deadlift + 45° back extension
+   W9 tue: Kettlebell single-leg deadlift
+PRT lower-titled days: 11
+   W1 tue Legs :: Main — Front squat | Leg superset A | Leg superset B | Hip stability | Foot & ankle
+   W2 tue Legs :: Main — Front squat | Leg superset A | Leg superset B | Hip stability | Foot & ankle
+   W3 tue Legs :: Main — Back squat | Leg superset A | Leg superset B | Hip stability | Foot & ankle
+   W4 tue Legs :: Main — Back squat | Leg superset B | Hip stability | Foot & ankle
+   W5 tue Legs :: Main — Barbell box squat | Leg superset A | Leg superset B | Hip stability | Foot & ankle
+   W6 tue Legs :: Main — Barbell box squat | Leg superset A | Leg superset B | Hip stability | Foot & ankle
+   W7 tue Legs :: Main — Paused back squat | Leg superset A | Leg superset B | Hip stability | Foot & ankle
+   W8 tue Legs :: Main — Paused back squat | Leg superset B | Hip stability | Foot & ankle
+   W9 tue Legs :: Main — Front squat | Leg superset A | Leg superset B | Hip stability | Foot & ankle
+   W10 tue Legs :: Primer — Front squat | Taper | Foot & ankle
+   W11 tue Legs :: Primer — Paused back squat | Taper | Foot & ankle — mobility only
+
+MANNY Leg superset B / Hip extension sections: 0
+MANNY lower-titled days: 14
+   W1 tue Leg Strength + Mobility :: Main — Front squat | Leg circuit — runner armor | Calf — achilles armor | Hip stability | Foot & ankle | Loaded carry finisher
+   W2 tue Leg Strength + Mobility :: Main — Front squat | Leg circuit — runner armor | Calf — achilles armor | Hip stability | Foot & ankle | Loaded carry finisher
+   W3 tue Leg Strength + Mobility :: Main — Back squat | Leg circuit — runner armor | Calf — achilles armor | Hip stability | Foot & ankle | Loaded carry finisher
+   W4 tue Leg Strength + Mobility :: Main — Back squat | Leg circuit — runner armor | Hip stability | Foot & ankle
+   W5 tue Leg Strength + Mobility :: Main — Front squat | Leg circuit — runner armor | Calf — achilles armor | Hip stability | Foot & ankle | Loaded carry finisher
+   W6 tue Leg Strength + Mobility :: Main — Front squat | Leg circuit — runner armor | Calf — achilles armor | Hip stability | Foot & ankle | Loaded carry finisher
+   W7 tue Leg Strength + Mobility :: Main — Front squat | Leg circuit — runner armor | Calf — achilles armor | Hip stability | Foot & ankle | Loaded carry finisher
+   W8 tue Leg Strength + Mobility :: Main — Front squat | Leg circuit — runner armor | Hip stability | Foot & ankle
+   W9 tue Leg Strength + Mobility :: Main — Back squat | Leg circuit — runner armor | Calf — achilles armor | Hip stability | Foot & ankle | Loaded carry finisher
+   W10 tue Leg Strength + Mobility :: Main — Back squat | Leg circuit — runner armor | Calf — achilles armor | Hip stability | Foot & ankle | Loaded carry finisher
+   W11 tue Leg Strength + Mobility :: Main — Back squat | Leg circuit — runner armor | Calf — achilles armor | Hip stability | Foot & ankle | Loaded carry finisher
+   W12 tue Leg Strength + Mobility :: Main — Back squat | Leg circuit — runner armor | Hip stability | Foot & ankle
+   W13 tue Leg Strength + Mobility :: Primer — Front squat | Taper | Foot & ankle
+   W14 tue Leg Strength + Mobility :: Primer — Front squat | Taper | Foot & ankle — mobility only
+
+==== D. LATTICE 3024 builds (7 foci x 3 families x 6 tiers x 3 exp x 4 seeds x 2 rests), crash 0 
+  ALL                                            builds>=1 C1 1636/3024 meanC1 sets/wk  0.82 | C2  6.87 | C3  4.25 | lift sets/wk 74.6
+  FOCUS hypertrophy                              builds>=1 C1 246/432  meanC1 sets/wk  1.33 | C2  7.18 | C3  4.45 | lift sets/wk 79.0
+  FAM race                                       builds>=1 C1 523/1008 meanC1 sets/wk  0.58 | C2  5.93 | C3  3.82 | lift sets/wk 64.3
+  TIER commercial                                builds>=1 C1 259/504  meanC1 sets/wk  0.78 | C2  7.84 | C3  4.67 | lift sets/wk 75.3
+  EXP beginner                                   builds>=1 C1 734/1008 meanC1 sets/wk  1.07 | C2  6.43 | C3  4.19 | lift sets/wk 68.2
+  EXP intermediate                               builds>=1 C1 561/1008 meanC1 sets/wk  0.91 | C2  6.95 | C3  4.27 | lift sets/wk 75.4
+  EXP advanced                                   builds>=1 C1 341/1008 meanC1 sets/wk  0.48 | C2  7.24 | C3  4.30 | lift sets/wk 80.1
+  TIER crossfit                                  builds>=1 C1 246/504  meanC1 sets/wk  0.56 | C2  9.30 | C3  4.37 | lift sets/wk 76.9
+  TIER home_full                                 builds>=1 C1 296/504  meanC1 sets/wk  1.10 | C2  7.54 | C3  4.67 | lift sets/wk 75.8
+  TIER home_basic                                builds>=1 C1 211/504  meanC1 sets/wk  0.42 | C2  7.63 | C3  3.99 | lift sets/wk 74.9
+  TIER minimal                                   builds>=1 C1 224/504  meanC1 sets/wk  0.50 | C2  6.88 | C3  3.99 | lift sets/wk 74.2
+  TIER bodyweight                                builds>=1 C1 400/504  meanC1 sets/wk  1.58 | C2  2.05 | C3  3.83 | lift sets/wk 70.4
+  FAM test                                       builds>=1 C1 547/1008 meanC1 sets/wk  0.68 | C2  6.95 | C3  4.40 | lift sets/wk 75.0
+  FAM none                                       builds>=1 C1 566/1008 meanC1 sets/wk  1.20 | C2  7.74 | C3  4.54 | lift sets/wk 84.5
+  FOCUS strength                                 builds>=1 C1 209/432  meanC1 sets/wk  1.10 | C2  6.62 | C3  4.46 | lift sets/wk 74.3
+  FOCUS fatloss                                  builds>=1 C1 268/432  meanC1 sets/wk  0.77 | C2  7.41 | C3  4.21 | lift sets/wk 76.6
+  FOCUS balanced                                 builds>=1 C1 262/432  meanC1 sets/wk  0.75 | C2  7.09 | C3  4.20 | lift sets/wk 76.1
+  FOCUS support_strength                         builds>=1 C1 347/432  meanC1 sets/wk  0.95 | C2  6.49 | C3  4.14 | lift sets/wk 70.5
+  FOCUS support_athletic                         builds>=1 C1 252/432  meanC1 sets/wk  0.71 | C2  8.32 | C3  4.19 | lift sets/wk 77.9
+  FOCUS support_prevention                       builds>=1 C1 52/432   meanC1 sets/wk  0.14 | C2  5.01 | C3  4.12 | lift sets/wk 67.7
+ -- cells (focus | family | tier) --
+  hypertrophy | race | commercial                builds>=1 C1 12/24    meanC1 sets/wk  0.91 | C2  7.15 | C3  4.30 | lift sets/wk 68.2
+  hypertrophy | race | crossfit                  builds>=1 C1 8/24     meanC1 sets/wk  0.44 | C2  7.20 | C3  3.88 | lift sets/wk 69.4
+  hypertrophy | race | home_full                 builds>=1 C1 16/24    meanC1 sets/wk  0.92 | C2  7.14 | C3  4.30 | lift sets/wk 68.4
+  hypertrophy | race | home_basic                builds>=1 C1 6/24     meanC1 sets/wk  0.28 | C2  6.80 | C3  3.49 | lift sets/wk 68.3
+  hypertrophy | race | minimal                   builds>=1 C1 6/24     meanC1 sets/wk  0.36 | C2  5.68 | C3  3.49 | lift sets/wk 65.9
+  hypertrophy | race | bodyweight                builds>=1 C1 20/24    meanC1 sets/wk  1.79 | C2  1.81 | C3  3.50 | lift sets/wk 61.5
+  hypertrophy | test | commercial                builds>=1 C1 13/24    meanC1 sets/wk  1.19 | C2  8.81 | C3  5.73 | lift sets/wk 81.6
+  hypertrophy | test | crossfit                  builds>=1 C1 11/24    meanC1 sets/wk  0.50 | C2  9.56 | C3  4.50 | lift sets/wk 82.9
+  hypertrophy | test | home_full                 builds>=1 C1 16/24    meanC1 sets/wk  1.25 | C2  8.76 | C3  5.73 | lift sets/wk 81.9
+  hypertrophy | test | home_basic                builds>=1 C1 8/24     meanC1 sets/wk  0.31 | C2  7.64 | C3  3.99 | lift sets/wk 79.9
+  hypertrophy | test | minimal                   builds>=1 C1 8/24     meanC1 sets/wk  0.44 | C2  6.36 | C3  3.99 | lift sets/wk 79.2
+  hypertrophy | test | bodyweight                builds>=1 C1 22/24    meanC1 sets/wk  2.10 | C2  2.06 | C3  4.00 | lift sets/wk 74.0
+  hypertrophy | none | commercial                builds>=1 C1 16/24    meanC1 sets/wk  2.68 | C2  9.58 | C3  6.25 | lift sets/wk 93.8
+  hypertrophy | none | crossfit                  builds>=1 C1 18/24    meanC1 sets/wk  1.68 | C2 11.25 | C3  4.75 | lift sets/wk 93.0
+  hypertrophy | none | home_full                 builds>=1 C1 20/24    meanC1 sets/wk  2.85 | C2  9.75 | C3  6.25 | lift sets/wk 93.8
+  hypertrophy | none | home_basic                builds>=1 C1 12/24    meanC1 sets/wk  1.21 | C2  8.39 | C3  4.00 | lift sets/wk 89.3
+  hypertrophy | none | minimal                   builds>=1 C1 12/24    meanC1 sets/wk  1.61 | C2  7.79 | C3  4.00 | lift sets/wk 88.6
+  hypertrophy | none | bodyweight                builds>=1 C1 22/24    meanC1 sets/wk  3.42 | C2  3.53 | C3  4.00 | lift sets/wk 83.1
+  strength | race | commercial                   builds>=1 C1 12/24    meanC1 sets/wk  0.90 | C2  6.91 | C3  4.34 | lift sets/wk 63.8
+  strength | race | crossfit                     builds>=1 C1 8/24     meanC1 sets/wk  0.43 | C2  6.96 | C3  3.92 | lift sets/wk 64.9
+  strength | race | home_full                    builds>=1 C1 16/24    meanC1 sets/wk  0.93 | C2  6.88 | C3  4.34 | lift sets/wk 64.0
+  strength | race | home_basic                   builds>=1 C1 6/24     meanC1 sets/wk  0.27 | C2  6.56 | C3  3.49 | lift sets/wk 63.8
+  strength | race | minimal                      builds>=1 C1 6/24     meanC1 sets/wk  0.36 | C2  5.68 | C3  3.49 | lift sets/wk 62.2
+  strength | race | bodyweight                   builds>=1 C1 20/24    meanC1 sets/wk  1.79 | C2  1.81 | C3  3.50 | lift sets/wk 59.2
+  strength | test | commercial                   builds>=1 C1 13/24    meanC1 sets/wk  1.19 | C2  8.29 | C3  5.74 | lift sets/wk 76.6
+  strength | test | crossfit                     builds>=1 C1 10/24    meanC1 sets/wk  0.49 | C2  9.04 | C3  4.52 | lift sets/wk 78.3
+  strength | test | home_full                    builds>=1 C1 14/24    meanC1 sets/wk  1.28 | C2  8.20 | C3  5.74 | lift sets/wk 76.7
+  strength | test | home_basic                   builds>=1 C1 6/24     meanC1 sets/wk  0.28 | C2  7.14 | C3  3.99 | lift sets/wk 75.6
+  strength | test | minimal                      builds>=1 C1 8/24     meanC1 sets/wk  0.44 | C2  6.19 | C3  3.99 | lift sets/wk 74.4
+  strength | test | bodyweight                   builds>=1 C1 22/24    meanC1 sets/wk  2.10 | C2  2.06 | C3  4.00 | lift sets/wk 69.7
+  strength | none | commercial                   builds>=1 C1 14/24    meanC1 sets/wk  2.42 | C2  8.75 | C3  6.25 | lift sets/wk 86.5
+  strength | none | crossfit                     builds>=1 C1 12/24    meanC1 sets/wk  1.25 | C2 10.25 | C3  4.75 | lift sets/wk 87.7
+  strength | none | home_full                    builds>=1 C1 16/24    meanC1 sets/wk  2.50 | C2  8.67 | C3  6.25 | lift sets/wk 88.5
+  strength | none | home_basic                   builds>=1 C1 8/24     meanC1 sets/wk  0.83 | C2  7.33 | C3  4.00 | lift sets/wk 83.2
+  strength | none | minimal                      builds>=1 C1 8/24     meanC1 sets/wk  0.83 | C2  6.50 | C3  4.00 | lift sets/wk 83.8
+  strength | none | bodyweight                   builds>=1 C1 10/24    meanC1 sets/wk  1.42 | C2  2.00 | C3  4.00 | lift sets/wk 78.6
+  fatloss | race | commercial                    builds>=1 C1 13/24    meanC1 sets/wk  0.30 | C2  7.45 | C3  4.01 | lift sets/wk 66.7
+  fatloss | race | crossfit                      builds>=1 C1 13/24    meanC1 sets/wk  0.30 | C2  8.04 | C3  4.01 | lift sets/wk 67.5
+  fatloss | race | home_full                     builds>=1 C1 15/24    meanC1 sets/wk  0.69 | C2  7.06 | C3  4.01 | lift sets/wk 66.8
+  fatloss | race | home_basic                    builds>=1 C1 14/24    meanC1 sets/wk  0.34 | C2  7.40 | C3  3.79 | lift sets/wk 66.1
+  fatloss | race | minimal                       builds>=1 C1 15/24    meanC1 sets/wk  0.39 | C2  6.78 | C3  3.79 | lift sets/wk 65.1
+  fatloss | race | bodyweight                    builds>=1 C1 21/24    meanC1 sets/wk  1.50 | C2  2.10 | C3  3.50 | lift sets/wk 62.5
+  fatloss | test | commercial                    builds>=1 C1 12/24    meanC1 sets/wk  0.38 | C2  8.55 | C3  4.55 | lift sets/wk 78.3
+  fatloss | test | crossfit                      builds>=1 C1 12/24    meanC1 sets/wk  0.37 | C2 10.85 | C3  4.55 | lift sets/wk 81.0
+  fatloss | test | home_full                     builds>=1 C1 16/24    meanC1 sets/wk  0.81 | C2  8.12 | C3  4.55 | lift sets/wk 78.3
+  fatloss | test | home_basic                    builds>=1 C1 14/24    meanC1 sets/wk  0.35 | C2  8.58 | C3  4.18 | lift sets/wk 77.9
+  fatloss | test | minimal                       builds>=1 C1 14/24    meanC1 sets/wk  0.37 | C2  8.14 | C3  4.18 | lift sets/wk 77.6
+  fatloss | test | bodyweight                    builds>=1 C1 23/24    meanC1 sets/wk  1.89 | C2  2.27 | C3  4.00 | lift sets/wk 73.4
+  fatloss | none | commercial                    builds>=1 C1 16/24    meanC1 sets/wk  0.97 | C2  8.64 | C3  4.75 | lift sets/wk 84.8
+  fatloss | none | crossfit                      builds>=1 C1 16/24    meanC1 sets/wk  0.97 | C2 11.72 | C3  4.75 | lift sets/wk 90.0
+  fatloss | none | home_full                     builds>=1 C1 16/24    meanC1 sets/wk  1.67 | C2  7.94 | C3  4.75 | lift sets/wk 86.3
+  fatloss | none | home_basic                    builds>=1 C1 12/24    meanC1 sets/wk  0.69 | C2  8.92 | C3  4.25 | lift sets/wk 86.2
+  fatloss | none | minimal                       builds>=1 C1 12/24    meanC1 sets/wk  0.69 | C2  8.42 | C3  4.25 | lift sets/wk 86.5
+  fatloss | none | bodyweight                    builds>=1 C1 14/24    meanC1 sets/wk  1.25 | C2  2.31 | C3  4.00 | lift sets/wk 82.8
+  balanced | race | commercial                   builds>=1 C1 12/24    meanC1 sets/wk  0.26 | C2  7.12 | C3  3.96 | lift sets/wk 66.0
+  balanced | race | crossfit                     builds>=1 C1 12/24    meanC1 sets/wk  0.26 | C2  7.71 | C3  3.96 | lift sets/wk 67.0
+  balanced | race | home_full                    builds>=1 C1 14/24    meanC1 sets/wk  0.64 | C2  6.74 | C3  3.96 | lift sets/wk 66.2
+  balanced | race | home_basic                   builds>=1 C1 12/24    meanC1 sets/wk  0.30 | C2  7.07 | C3  3.77 | lift sets/wk 65.5
+  balanced | race | minimal                      builds>=1 C1 15/24    meanC1 sets/wk  0.39 | C2  6.05 | C3  3.79 | lift sets/wk 63.7
+  balanced | race | bodyweight                   builds>=1 C1 21/24    meanC1 sets/wk  1.50 | C2  2.10 | C3  3.50 | lift sets/wk 61.2
+  balanced | test | commercial                   builds>=1 C1 12/24    meanC1 sets/wk  0.31 | C2  8.05 | C3  4.51 | lift sets/wk 77.9
+  balanced | test | crossfit                     builds>=1 C1 12/24    meanC1 sets/wk  0.31 | C2 10.34 | C3  4.51 | lift sets/wk 80.7
+  balanced | test | home_full                    builds>=1 C1 16/24    meanC1 sets/wk  0.72 | C2  7.65 | C3  4.51 | lift sets/wk 78.0
+  balanced | test | home_basic                   builds>=1 C1 13/24    meanC1 sets/wk  0.29 | C2  8.08 | C3  4.16 | lift sets/wk 77.9
+  balanced | test | minimal                      builds>=1 C1 14/24    meanC1 sets/wk  0.37 | C2  7.19 | C3  4.18 | lift sets/wk 76.9
+  balanced | test | bodyweight                   builds>=1 C1 23/24    meanC1 sets/wk  1.89 | C2  2.27 | C3  4.00 | lift sets/wk 72.6
+  balanced | none | commercial                   builds>=1 C1 16/24    meanC1 sets/wk  0.97 | C2  8.58 | C3  4.75 | lift sets/wk 84.9
+  balanced | none | crossfit                     builds>=1 C1 16/24    meanC1 sets/wk  0.97 | C2 11.67 | C3  4.75 | lift sets/wk 90.1
+  balanced | none | home_full                    builds>=1 C1 16/24    meanC1 sets/wk  1.67 | C2  7.89 | C3  4.75 | lift sets/wk 86.4
+  balanced | none | home_basic                   builds>=1 C1 12/24    meanC1 sets/wk  0.69 | C2  8.86 | C3  4.25 | lift sets/wk 85.8
+  balanced | none | minimal                      builds>=1 C1 12/24    meanC1 sets/wk  0.69 | C2  7.86 | C3  4.25 | lift sets/wk 85.9
+  balanced | none | bodyweight                   builds>=1 C1 14/24    meanC1 sets/wk  1.25 | C2  2.31 | C3  4.00 | lift sets/wk 82.2
+  support_strength | race | commercial           builds>=1 C1 17/24    meanC1 sets/wk  0.43 | C2  6.60 | C3  3.92 | lift sets/wk 63.1
+  support_strength | race | crossfit             builds>=1 C1 17/24    meanC1 sets/wk  0.43 | C2  7.26 | C3  3.92 | lift sets/wk 64.3
+  support_strength | race | home_full            builds>=1 C1 17/24    meanC1 sets/wk  0.92 | C2  6.11 | C3  3.92 | lift sets/wk 63.1
+  support_strength | race | home_basic           builds>=1 C1 15/24    meanC1 sets/wk  0.42 | C2  6.59 | C3  3.74 | lift sets/wk 62.8
+  support_strength | race | minimal              builds>=1 C1 19/24    meanC1 sets/wk  0.55 | C2  5.78 | C3  3.74 | lift sets/wk 61.2
+  support_strength | race | bodyweight           builds>=1 C1 22/24    meanC1 sets/wk  1.55 | C2  1.91 | C3  3.50 | lift sets/wk 57.2
+  support_strength | test | commercial           builds>=1 C1 19/24    meanC1 sets/wk  0.56 | C2  7.15 | C3  4.46 | lift sets/wk 70.6
+  support_strength | test | crossfit             builds>=1 C1 19/24    meanC1 sets/wk  0.54 | C2  8.76 | C3  4.46 | lift sets/wk 73.0
+  support_strength | test | home_full            builds>=1 C1 20/24    meanC1 sets/wk  0.96 | C2  6.74 | C3  4.46 | lift sets/wk 70.8
+  support_strength | test | home_basic           builds>=1 C1 18/24    meanC1 sets/wk  0.43 | C2  7.26 | C3  4.16 | lift sets/wk 70.8
+  support_strength | test | minimal              builds>=1 C1 18/24    meanC1 sets/wk  0.55 | C2  6.42 | C3  4.16 | lift sets/wk 69.2
+  support_strength | test | bodyweight           builds>=1 C1 24/24    meanC1 sets/wk  1.84 | C2  1.99 | C3  4.00 | lift sets/wk 64.7
+  support_strength | none | commercial           builds>=1 C1 24/24    meanC1 sets/wk  1.36 | C2  8.00 | C3  4.58 | lift sets/wk 77.9
+  support_strength | none | crossfit             builds>=1 C1 24/24    meanC1 sets/wk  1.36 | C2 11.25 | C3  4.58 | lift sets/wk 84.3
+  support_strength | none | home_full            builds>=1 C1 24/24    meanC1 sets/wk  2.33 | C2  7.03 | C3  4.58 | lift sets/wk 79.3
+  support_strength | none | home_basic           builds>=1 C1 18/24    meanC1 sets/wk  0.97 | C2  8.39 | C3  4.19 | lift sets/wk 78.8
+  support_strength | none | minimal              builds>=1 C1 18/24    meanC1 sets/wk  0.97 | C2  7.47 | C3  4.19 | lift sets/wk 80.3
+  support_strength | none | bodyweight           builds>=1 C1 14/24    meanC1 sets/wk  0.97 | C2  2.14 | C3  4.00 | lift sets/wk 77.0
+  support_athletic | race | commercial           builds>=1 C1 12/24    meanC1 sets/wk  0.24 | C2  8.21 | C3  3.98 | lift sets/wk 68.2
+  support_athletic | race | crossfit             builds>=1 C1 12/24    meanC1 sets/wk  0.24 | C2  8.36 | C3  3.98 | lift sets/wk 67.8
+  support_athletic | race | home_full            builds>=1 C1 14/24    meanC1 sets/wk  0.62 | C2  7.83 | C3  3.98 | lift sets/wk 68.3
+  support_athletic | race | home_basic           builds>=1 C1 13/24    meanC1 sets/wk  0.30 | C2  8.33 | C3  3.79 | lift sets/wk 68.0
+  support_athletic | race | minimal              builds>=1 C1 15/24    meanC1 sets/wk  0.39 | C2  7.41 | C3  3.79 | lift sets/wk 66.5
+  support_athletic | race | bodyweight           builds>=1 C1 21/24    meanC1 sets/wk  1.50 | C2  2.10 | C3  3.50 | lift sets/wk 63.9
+  support_athletic | test | commercial           builds>=1 C1 10/24    meanC1 sets/wk  0.29 | C2  9.74 | C3  4.43 | lift sets/wk 77.8
+  support_athletic | test | crossfit             builds>=1 C1 10/24    meanC1 sets/wk  0.27 | C2 10.26 | C3  4.43 | lift sets/wk 77.6
+  support_athletic | test | home_full            builds>=1 C1 14/24    meanC1 sets/wk  0.62 | C2  9.40 | C3  4.43 | lift sets/wk 78.0
+  support_athletic | test | home_basic           builds>=1 C1 12/24    meanC1 sets/wk  0.23 | C2  9.41 | C3  4.18 | lift sets/wk 77.2
+  support_athletic | test | minimal              builds>=1 C1 12/24    meanC1 sets/wk  0.29 | C2  8.47 | C3  4.18 | lift sets/wk 76.1
+  support_athletic | test | bodyweight           builds>=1 C1 21/24    meanC1 sets/wk  1.60 | C2  2.27 | C3  4.00 | lift sets/wk 72.6
+  support_athletic | none | commercial           builds>=1 C1 16/24    meanC1 sets/wk  0.97 | C2 11.08 | C3  4.75 | lift sets/wk 89.5
+  support_athletic | none | crossfit             builds>=1 C1 16/24    meanC1 sets/wk  0.97 | C2 12.22 | C3  4.75 | lift sets/wk 90.3
+  support_athletic | none | home_full            builds>=1 C1 16/24    meanC1 sets/wk  1.67 | C2 10.39 | C3  4.75 | lift sets/wk 90.9
+  support_athletic | none | home_basic           builds>=1 C1 12/24    meanC1 sets/wk  0.69 | C2 11.47 | C3  4.25 | lift sets/wk 90.4
+  support_athletic | none | minimal              builds>=1 C1 12/24    meanC1 sets/wk  0.69 | C2 10.47 | C3  4.25 | lift sets/wk 91.1
+  support_athletic | none | bodyweight           builds>=1 C1 14/24    meanC1 sets/wk  1.25 | C2  2.31 | C3  4.00 | lift sets/wk 87.7
+  support_prevention | race | commercial         builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  4.85 | C3  3.94 | lift sets/wk 61.2
+  support_prevention | race | crossfit           builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  6.06 | C3  3.94 | lift sets/wk 60.9
+  support_prevention | race | home_full          builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  4.85 | C3  3.94 | lift sets/wk 61.0
+  support_prevention | race | home_basic         builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  4.84 | C3  3.71 | lift sets/wk 60.4
+  support_prevention | race | minimal            builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  4.74 | C3  3.71 | lift sets/wk 60.3
+  support_prevention | race | bodyweight         builds>=1 C1 16/24    meanC1 sets/wk  0.68 | C2  1.07 | C3  3.50 | lift sets/wk 56.9
+  support_prevention | test | commercial         builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  5.39 | C3  4.43 | lift sets/wk 69.1
+  support_prevention | test | crossfit           builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  7.01 | C3  4.43 | lift sets/wk 69.1
+  support_prevention | test | home_full          builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  5.39 | C3  4.43 | lift sets/wk 68.9
+  support_prevention | test | home_basic         builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  5.39 | C3  4.14 | lift sets/wk 68.7
+  support_prevention | test | minimal            builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  5.35 | C3  4.14 | lift sets/wk 68.6
+  support_prevention | test | bodyweight         builds>=1 C1 18/24    meanC1 sets/wk  0.80 | C2  1.20 | C3  4.00 | lift sets/wk 64.5
+  support_prevention | none | commercial         builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  5.78 | C3  4.50 | lift sets/wk 74.3
+  support_prevention | none | crossfit           builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  9.44 | C3  4.50 | lift sets/wk 74.8
+  support_prevention | none | home_full          builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  5.78 | C3  4.50 | lift sets/wk 75.4
+  support_prevention | none | home_basic         builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  5.78 | C3  4.17 | lift sets/wk 75.8
+  support_prevention | none | minimal            builds>=1 C1 0/24     meanC1 sets/wk  0.00 | C2  5.78 | C3  4.17 | lift sets/wk 75.8
+  support_prevention | none | bodyweight         builds>=1 C1 18/24    meanC1 sets/wk  1.06 | C2  1.50 | C3  4.00 | lift sets/wk 72.6
+ -- C1 names drawn across lattice (item-weeks) --
+   2020 Single-leg hip thrust
+   2018 Single-leg glute bridge
+   1403 Barbell hip thrust
+   1107 Banded hip thrust
+   560 Single-leg hip thrust (shoulders on bed)
+   493 Cable pull-through
+   403 Single-leg glute bridge (weighted)
+
+==== C. surgery anchor count 1 (must be 1)
+
+PRT TING: surgery copy == unmodified build: true | legs-builder calls 9
+  hipExtPool at legs site (W1): ["Barbell hip thrust","Glute-ham raise","45° back extension","Single-leg hip thrust"] | preventionSupport=false
+  W1 drew hipExt="Barbell hip thrust" (class 1) hinge0=Dumbbell split-stance deadlift | printed that week: NO
+  W2 drew hipExt="Barbell hip thrust" (class 1) hinge0=Dumbbell split-stance deadlift | printed that week: NO
+  W3 drew hipExt="Barbell hip thrust" (class 1) hinge0=Barbell good mornings | printed that week: NO
+  W4 drew hipExt="Barbell hip thrust" (class 1) hinge0=Barbell good mornings | printed that week: 4|tue|Barbell hip thrust
+  W5 drew hipExt="Barbell hip thrust" (class 1) hinge0=Barbell Romanian deadlift | printed that week: NO
+  W6 drew hipExt="Barbell hip thrust" (class 1) hinge0=Barbell Romanian deadlift | printed that week: NO
+  W7 drew hipExt="45° back extension" (class 2) hinge0=Kettlebell single-leg deadlift | printed that week: NO
+  W8 drew hipExt="45° back extension" (class 2) hinge0=Kettlebell single-leg deadlift | printed that week: 8|tue|45° back extension
+  W9 drew hipExt="45° back extension" (class 2) hinge0=Barbell Romanian deadlift | printed that week: NO
+  ablation __BUDGET_OFF: C1 items 6 sets 18 :: W1 tue [Leg superset B] Barbell hip thrust ; W2 tue [Leg superset B] Barbell hip thrust ; W3 tue [Leg superset B] Barbell hip thrust ; W4 tue [Leg superset B] Barbell hip thrust ; W5 tue [Leg superset B] Barbell hip thrust ; W6 tue [Leg superset B] Barbell hip thrust
+  ablation __DELOAD_OFF: C1 items 0 sets 0
+  ablation __CAP_OFF: C1 items 6 sets 18 :: W1 tue [Leg superset B] Barbell hip thrust ; W2 tue [Leg superset B] Barbell hip thrust ; W3 tue [Leg superset B] Barbell hip thrust ; W4 tue [Leg superset B] Barbell hip thrust ; W5 tue [Leg superset B] Barbell hip thrust ; W6 tue [Leg superset B] Barbell hip thrust
+  ablation __REGIONAL_OFF: C1 items 1 sets 3 :: W4 tue [Leg superset B] Barbell hip thrust
+
+THE HALF MANNY (pasted): surgery copy == unmodified build: true | legs-builder calls 12
+  hipExtPool at legs site (W1): ["Barbell hip thrust","Glute-ham raise","45° back extension","Single-leg hip thrust"] | preventionSupport=true
+  W1 drew hipExt="45° back extension" (class 2) hinge0=Barbell Romanian deadlift | printed that week: NO | prevention branch never reads ex.hipExt
+  W2 drew hipExt="45° back extension" (class 2) hinge0=Barbell Romanian deadlift | printed that week: NO | prevention branch never reads ex.hipExt
+  W3 drew hipExt="Glute-ham raise" (class 2) hinge0=Kettlebell swing | printed that week: NO | prevention branch never reads ex.hipExt
+  W4 drew hipExt="Glute-ham raise" (class 2) hinge0=Kettlebell swing | printed that week: NO | prevention branch never reads ex.hipExt
+  W5 drew hipExt="Single-leg hip thrust" (class 1) hinge0=Kettlebell swing | printed that week: NO | prevention branch never reads ex.hipExt
+  W6 drew hipExt="Single-leg hip thrust" (class 1) hinge0=Kettlebell swing | printed that week: NO | prevention branch never reads ex.hipExt
+  W7 drew hipExt="45° back extension" (class 2) hinge0=Kettlebell single-leg deadlift | printed that week: NO | prevention branch never reads ex.hipExt
+  W8 drew hipExt="45° back extension" (class 2) hinge0=Kettlebell single-leg deadlift | printed that week: NO | prevention branch never reads ex.hipExt
+  W9 drew hipExt="Single-leg hip thrust" (class 1) hinge0=Dumbbell split-stance deadlift | printed that week: NO | prevention branch never reads ex.hipExt
+  W10 drew hipExt="Single-leg hip thrust" (class 1) hinge0=Dumbbell split-stance deadlift | printed that week: NO | prevention branch never reads ex.hipExt
+  W11 drew hipExt="Single-leg hip thrust" (class 1) hinge0=Kettlebell single-leg deadlift | printed that week: NO | prevention branch never reads ex.hipExt
+  W12 drew hipExt="Single-leg hip thrust" (class 1) hinge0=Kettlebell single-leg deadlift | printed that week: NO | prevention branch never reads ex.hipExt
+  ablation __BUDGET_OFF: C1 items 0 sets 0
+  ablation __DELOAD_OFF: C1 items 0 sets 0
+  ablation __CAP_OFF: C1 items 0 sets 0
+  ablation __REGIONAL_OFF: C1 items 0 sets 0
+
+==== C2. legs-site hipExt draw vs print, 1512 builds (rest sun/wed), budget ablation = __BUDGET_OFF rebuild
+  FOCUS hypertrophy            legs-builder calls 1710 | prevention branch (slot never read) 0 | hipExt drawn 1710 (C1 1193) | printed 934/1710 (C1 696/1193) | with budget OFF printed 1710/1710 (C1 1193/1193)
+  TIER commercial              legs-builder calls 1995 | prevention branch (slot never read) 285 | hipExt drawn 1710 (C1 1038) | printed 939/1710 (C1 566/1038) | with budget OFF printed 1342/1710 (C1 811/1038)
+  FAM race                     legs-builder calls 4662 | prevention branch (slot never read) 666 | hipExt drawn 3996 (C1 2370) | printed 2038/3996 (C1 1278/2370) | with budget OFF printed 3228/3996 (C1 1999/2370)
+  ALL                          legs-builder calls 11970 | prevention branch (slot never read) 1710 | hipExt drawn 10260 (C1 6298) | printed 5553/10260 (C1 3551/6298) | with budget OFF printed 7872/10260 (C1 4969/6298)
+  TIER crossfit                legs-builder calls 1995 | prevention branch (slot never read) 285 | hipExt drawn 1710 (C1 1014) | printed 910/1710 (C1 531/1014) | with budget OFF printed 1342/1710 (C1 799/1014)
+  TIER home_full               legs-builder calls 1995 | prevention branch (slot never read) 285 | hipExt drawn 1710 (C1 1710) | printed 938/1710 (C1 938/1710) | with budget OFF printed 1342/1710 (C1 1342/1710)
+  TIER home_basic              legs-builder calls 1995 | prevention branch (slot never read) 285 | hipExt drawn 1710 (C1 756) | printed 910/1710 (C1 423/756) | with budget OFF printed 1342/1710 (C1 608/756)
+  TIER minimal                 legs-builder calls 1995 | prevention branch (slot never read) 285 | hipExt drawn 1710 (C1 756) | printed 968/1710 (C1 449/756) | with budget OFF printed 1342/1710 (C1 608/756)
+  TIER bodyweight              legs-builder calls 1995 | prevention branch (slot never read) 285 | hipExt drawn 1710 (C1 1024) | printed 888/1710 (C1 644/1024) | with budget OFF printed 1162/1710 (C1 801/1024)
+  FAM test                     legs-builder calls 4284 | prevention branch (slot never read) 612 | hipExt drawn 3672 (C1 2288) | printed 1770/3672 (C1 1177/2288) | with budget OFF printed 2808/3672 (C1 1810/2288)
+  FAM none                     legs-builder calls 3024 | prevention branch (slot never read) 432 | hipExt drawn 2592 (C1 1640) | printed 1745/2592 (C1 1096/1640) | with budget OFF printed 1836/2592 (C1 1160/1640)
+  FOCUS strength               legs-builder calls 1710 | prevention branch (slot never read) 0 | hipExt drawn 1710 (C1 1193) | printed 858/1710 (C1 647/1193) | with budget OFF printed 1158/1710 (C1 855/1193)
+  FOCUS fatloss                legs-builder calls 1710 | prevention branch (slot never read) 0 | hipExt drawn 1710 (C1 978) | printed 847/1710 (C1 501/978) | with budget OFF printed 1162/1710 (C1 689/978)
+  FOCUS balanced               legs-builder calls 1710 | prevention branch (slot never read) 0 | hipExt drawn 1710 (C1 978) | printed 831/1710 (C1 489/978) | with budget OFF printed 1162/1710 (C1 689/978)
+  FOCUS support_strength       legs-builder calls 1710 | prevention branch (slot never read) 0 | hipExt drawn 1710 (C1 978) | printed 1281/1710 (C1 748/978) | with budget OFF printed 1590/1710 (C1 914/978)
+  FOCUS support_athletic       legs-builder calls 1710 | prevention branch (slot never read) 0 | hipExt drawn 1710 (C1 978) | printed 802/1710 (C1 470/978) | with budget OFF printed 1090/1710 (C1 629/978)
+  FOCUS support_prevention     legs-builder calls 1710 | prevention branch (slot never read) 1710 | hipExt drawn 0 (C1 0) | printed 0/0 (C1 0/0) | with budget OFF printed 0/0 (C1 0/0)
+DONE

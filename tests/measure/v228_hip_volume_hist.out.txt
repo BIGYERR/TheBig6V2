@@ -1,0 +1,11 @@
+h_774988c.html: v132 | PRT C1 0 | MANNY C1 5 [W5 thu Single-leg hip thrust; W6 thu Single-leg hip thrust; W9 thu Single-leg hip thrust; W10 thu Single-leg hip thrust; W11 thu Single-leg hip thrust] 
+h_d24a48b.html: v155 | PRT C1 0 | MANNY C1 0 
+h_c92c793.html: v164 | PRT C1 0 | MANNY C1 0 
+h_ead5407.html: v172 | PRT C1 0 | MANNY C1 0 
+h_73eb4c6.html: v187 | PRT C1 0 | MANNY C1 0 
+h_8c296a6.html: v197 | PRT C1 0 | MANNY C1 0 
+h_fc076a8.html: v199 | PRT C1 1 [W4 mon Barbell hip thrust] | MANNY C1 0 
+h_7474f06.html: v215 | PRT C1 1 [W4 tue Barbell hip thrust] | MANNY C1 0 
+h_V219.html: v219 | PRT C1 1 [W4 tue Barbell hip thrust] | MANNY C1 0 
+h_V224.html: v224 | PRT C1 1 [W4 tue Barbell hip thrust] | MANNY C1 0 
+h_HEAD.html: v228 | PRT C1 1 [W4 tue Barbell hip thrust] | MANNY C1 0 
