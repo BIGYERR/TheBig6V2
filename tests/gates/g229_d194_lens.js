@@ -39,7 +39,14 @@
 // VERSION PREDICATE (standing rulings 2 and 4).
 //   below 229   REFUSED: every row FAILS by name.
 //   229         every row asserts.
-//   230 and up  (o) and (p) assert; (q) REFUSES with "D194 part 2 must re-key this row" (its predicate is VER === 229).
+//   230 and up  (o) and (p) assert. (q) is retired at 230 by D194 part 2 (Amendment 1 R3′), not inverted: past 229 it
+//               prints one named `SKIP row q … retired at ia-version 230 by D194 part 2; delivery asserted by
+//               g230_d194_lens2 d194-q′ and d194-eq` line, never PASS and never FAIL, on the live run and on the
+//               no-baseline setup run alike (b-ONECLASS's V229 idiom, tests/gates/g228_d193_cueword.js: a column-0
+//               REFUSED or a named FAIL would red gate.sh). What it pinned dormant is asserted delivered by
+//               tests/gates/g230_d194_lens2.js rows d194-q′ (the typed hand routes) and d194-eq (overlay == fixture on
+//               the D190 lattice); session form calls 3 and 7, tests/measure/v230_rulings/v230_session_calls.md. At 229
+//               (q) asserts exactly as before.
 //   IA_ASSUME_VERSION=229 lifts a file stamped exactly 228 to 229 for a discrimination run; it is announced, ignored on
 //   any other file, and gate.sh never sets it. On V228 that way every row FAILS at its V228 figure: (o) lowback 2 and
 //   the W6 thu test text; p-SWAP 1,451 / 1,387; p-AUX 4,228 / 941; p-ADD 2,104 / 1,120; p-MARIO 2 of 223; p-UNSTAMPED
@@ -317,7 +324,11 @@ if(!FILES.B){
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 P('  V' + BASE_ERA + ' baseline: ' + (FILES.B ? 'LIVE (' + baseWhy + ')' : 'SETUP FAILED (' + baseWhy + ')'));
-if(!FILES.B){ ORDER.forEach(k => ok(R[k] + (k === 'q' && !Q_LIVE ? ' (REFUSED: ia-version ' + VER + ' is past V229; D194 part 2 must re-key this row)' : ' (setup: no V' + BASE_ERA + ' tree: ' + baseWhy + ')'), false)); done(); }
+// V230 (D194 part 2, Amendment 1 R3′): past 229 (q) is retired, not inverted (tests/measure/v230_rulings/
+// v230_session_calls.md items 3 and 7). One named SKIP line at column 0, counted neither PASS nor FAIL (b-ONECLASS's
+// V229 idiom, tests/gates/g228_d193_cueword.js); gate.sh reads only `^REFUSED`, `^\s*FAIL` and the summary.
+const Q_RETIRE = () => P('SKIP ' + R.q + ': retired at ia-version 230 by D194 part 2; delivery asserted by g230_d194_lens2 d194-q′ and d194-eq (Amendment 1 R3′; tests/measure/v230_rulings/v230_session_calls.md items 3 and 7; this file reads ia-version ' + VER + ', the row is era 229 only). Never PASS, never FAIL.');
+if(!FILES.B){ ORDER.forEach(k => { if(k === 'q' && !Q_LIVE){ Q_RETIRE(); return; } ok(R[k] + ' (setup: no V' + BASE_ERA + ' tree: ' + baseWhy + ')', false); }); done(); }
 const CF = FILES.C, BF = FILES.B;
 const RES = {};   // row -> [cond, got]
 const guard = (k, fn) => { try { fn(); } catch(e){ RES[k] = [false, 'crash: ' + String(e && e.message || e).slice(0, 160)]; P('    ' + k + ' CRASH ' + String(e && e.stack || e).slice(0, 400)); } };
@@ -563,7 +574,7 @@ Promise.all(WORK).then(rs => {
     RES.q = [SELF && QR.selfQ && QR.handOK && QR.treeOK && QR.fixOK && QR.sampleOK && QR.sampleFix, QR.got + (RES.qh ? '; hand routes ' + RES.qh[1] : '')];
   }
   // print rows in order
-  ORDER.forEach(k => { if(k === 'q' && !Q_LIVE){ ok(R.q + ' (REFUSED: ia-version ' + VER + ' is past V229; D194 part 2 must re-key this row)', false); return; }
+  ORDER.forEach(k => { if(k === 'q' && !Q_LIVE){ Q_RETIRE(); return; }
     const r = RES[k] || [false, 'row not computed']; ok(R[k], r[0], r[1]); });
   done();
 }).catch(e => { P('  MERGE CRASH ' + String(e && e.stack || e).slice(0, 400)); ORDER.forEach(k => ok(R[k] + ' (merge crashed)', false)); done(); });

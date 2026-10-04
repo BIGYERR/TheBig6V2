@@ -350,3 +350,82 @@ Nothing reaches him. No card, toast or string changes; the nine athletes concern
 - **Slice-cap deviation.** `tests/edits/v229_g5b_d193_build_g_conjunct.py` was briefed as 1 edit and asserted 8 anchors (row label, two conjuncts, two header passages); verified (candidate 10/0, refusal 0/10, discrimination 0/10, identity-clamp 2/8). Standing ruling 6 binds the brief; recorded here, not redone.
 - **`g228_d193_cueword` b-ONECLASS retirement form (session's call, recorded, not re-ruled).** Amendment 1 (r) says the row is "era 228 only, refuses at 229". `tests/gate.sh` exits 1 on any FAIL and on any column-0 `REFUSED` line, so a refused row printed as a named FAIL would red the V229 ship run. The shipped precedent for an era-bound row past its era is g221's `SKIP <row>: scoped out …` (G9, "a later ruling owns HALF_MANNY"): never PASS, never FAIL. From 229 b-ONECLASS prints one `SKIP row b-ONECLASS …: REFUSED at ia-version 229 (era 228 only …); its successor is D193 (a)/(b), g229_d193_build.js, V229` line; at 228 it asserts exactly as before; the gate's other rows (c-LIT, f-STRIP, f-STORED, g-COUPLE) still assert at every version from 228 up. Script `tests/edits/v229_g4_cuecap_cueword.py`.
 - **`g227_d190_cuecap` c-TOAST at 229:** moved 1,706 == pin (unloadable 1,153, verbatim 553), hand clamp pairs 1,706 with 0 lacking the hold toast, 0 moved toasts not a hold variant; "moved" compares artifact against V226 (no stale hand formula), the (k) oracle tracks the dose beneath the hold by hand along each chain.
+
+---
+
+# D194 — Amendment 4: P-POSTSWEEP, the class R3′ did not name. V230 SHIPS AS BUILT. The lens surfaces a build defect at boot; it does not create it
+
+> Main session note (V230 chat, 2026-10-03): coach's return was headed "D194 Amendment 2"; Amendments 1–3 already exist in
+> this file, so it is saved as Amendment 4. No other word is changed. Coach: "No new D-code is issued (an amendment and an
+> INFO pin, per the D193/D181 precedent); D196 stays free." Evidence it rules on: `tests/measure/v230_rulings/measure_postsweep_reject_m13.md` (M13).
+
+## Evidence printed this session
+- `node tests/measure/v230_gk_burpees_bootdrop.js <HEAD as base_v229> index.html` (V229 = `ia-version 229`, working tree = `230`), ankle/protect | bodyweight | intermediate | balanced | sat,sun, W4 wed, swap Single-leg wall sit → Wall sit:
+  - V229 CFG: live `Burpees | Single-leg glute bridge | Wall sit | …`, boot without Burpees, boot == live false.
+  - V229 OV: live `Burpees | …`, boot `Burpees | …`, boot == live TRUE (the jump stays on the protected ankle on every route).
+  - V230 CFG and V230 OV: boot drops Burpees, boot == live false. Filter re-applied to the built day drops Burpees on all four.
+- M13 (`tests/measure/v230_postsweep_reject.out.txt` :141–168) beginner example, quoted in the grids below. Population identical V229/V230 and OV/FIX: L432 22 of 12,960 lifting days in 11 of 432 builds (18 `Main — Burpees`, ankle/protect bodyweight W3/W4 thu, sole Main item; 4 `Chest volume` Pushups RPE 8, elbow/workaround bodyweight advanced W3/W4 mon); LBW 16; OV5 0; lowback 0; Mario 0 of 30. 38/38 written by `_bwFallback` inside `bodyweightSweep` (:11002), after every in-build `applyInjuryFilter`. Non-reject days: 0/4,198, 0/4,248, 0/3,506, 0/11, 0/8 boot != live.
+- Guards: `applySessionSwaps` :10358 `if(hit && _dayPlanCfg(prog,day).injury)` re-filters the WHOLE day; `applySwapChoice` :14348 filters the swapped item only. `_dayPlanCfg` :9991. HALF_MANNY `0ac7da6b1691a8e1`, unmoved.
+- The plan's own words (:15608, ankle/protect): "Nothing stands on that ankle under load. Leg day leans hip and hamstring." The hip-extension reservation (:8733) shows ankle/protect deliberately put hip extension in the squat slot; the sweep turned that `Banded hip thrust` into `Burpees` through the catch-all (:6537, `\bband` in `_BW_GEAR` :6522 sends it to the fallback, no branch matches "hip thrust"). The plan picked a hip thrust. The sweep put a jump there. The filter never saw it.
+
+## Finding
+Every V230 boot != live on an overlay program is a day where the build printed a movement the injury plan never judged. The boot re-filter (the V210/V223 safety rule, handoff :523: "re-run the filter on any day they touch") is now reading the day's plan, as D194 R1 rules, and the plan drops the jump. The boot card is right. The live card is the BUILT card, and it is wrong: a burpee is a landing on an ankle the plan says nothing stands on under load. V229 overlay kept that jump on every route, which is consistent and consistently wrong. V229 fixture already dropped it at boot 88/88; V230 makes overlay equal fixture, which is the equivalence row doing its job.
+
+This is D190's shape (a prescription decided by tap history) but not D190's seam. D190 said the defect is "the plan's instruction arriving a day late; the boot card was right and the live card was short." Both halves hold here, and the lateness has one root: `applyInjuryFilter` runs before `bodyweightSweep`, the last name-changing pass (P-FILTERLAST), and the catch-all lands a hip thrust on Burpees (P-BWFALLBACK). Both are build-path rulings, both already in §12, one already queued by Mario to V231. R3′ keeps V230's build path byte-identical (2,160 of 2,160) and that stands.
+
+## Coaching ranking of the three things the athlete can see
+1. A jump on a protected ankle (18 L432 / 12 LBW Thursdays). The build's error, V229 and V230 alike. The plan exists for the joint. This is the only one of the three that can re-injure.
+2. A Main that vanishes at boot after an unrelated swap on that day. The plan removing a movement it should have removed at build. The booted day keeps five sections (`Leg superset A | Knee stability | Leg superset B | Leg isolation | Hip stability`), still carries hip extension (`Single-leg hip thrust`) and hamstring work (`Bodyweight back extension`, the swapped-in Nordic): it still "leans hip and hamstring" as the plan says. A lighter Thursday is the safer error. Mario's counter on record ranks a wrong movement above a wrong dose; a missing movement ranks below both. Reach is narrow by construction: an untrained day (trained days are frozen, R5) on which the athlete swapped a DIFFERENT card. Mario 0 of 30.
+3. RPE 8 where the plan says 7 (4 L432 / 4 LBW Monday Pushups cards, advanced elbow/workaround bodyweight). One RPE point on one accessory. D193's clamp is right at boot and short on the live card. A dose, the least of the three.
+
+## Why not fix it inside V230 (each rejected)
+- Narrow the boot to the swapped items (match the tap): makes the boot LESS right and reopens :523's hole on overlay programs (swap in a hinge, flag a low back two days later, the boot walks the hinge back). Changes a shipped safety rule, not the lens.
+- Widen the tap to a whole-day live re-filter (so live == boot): the Main disappears under the athlete's thumb because he swapped a hamstring curl, with no toast and no cue. Worse than the boot drop, and a new live behaviour R3′ did not license ("two guards and two filter cfgs and nothing else").
+- Re-filter after the sweep on the build path: that IS P-FILTERLAST, a build-path doctrine change with its own differential, and alone it would ship 18 Main-less Thursdays as the BUILT program (the Burpees would be dropped at build with nothing landing in their place). Wrong order: the landing must change first.
+Holding V230 for any of these keeps every overlay-injured athlete's boot replay unfiltered and Mario's own W5 thu hold (Leg extension "2×6–10 @ RPE 7", toast printed, M12) waiting, to protect 22 Thursdays in 11 of 432 builds that today show a jump on every route.
+
+## What changes (record and pin only; no byte of index.html)
+- Handoff §11f under D194: this amendment, verbatim. §12 P-BWFALLBACK gains: "M13 ties 30 of its 38 post-sweep rejects to the catch-all landing of `Banded hip thrust`; closing it closes V230's Burpees boot drop on 18 of 22 L432 days and 12 of 16 LBW. V231 coach must print the W3/W4 thu day after the new landing and check it against `Leg superset A: Single-leg glute bridge` and `Leg isolation: Single-leg hip thrust` on the same day: `deconflictAdjacentDupes` (:11000) runs BEFORE the sweep, so a sweep-made same-day double is not deconflicted (D159 was exactly this double on home_basic ankle/protect)." §12 P-FILTERLAST becomes measured: "M13 is the post-sweep re-filter differential: L432 22 of 12,960 (18 Burpees drops, 4 Pushups re-details), LBW 16, OV5 0, Mario 0, 0 new items; the 54/108 pre-sweep bench-press renames are renamed by the sweep and none reaches the athlete. Closes the 8 Pushups the catch-all cannot. Builds V232, after P-BWFALLBACK, on the V231 artifact, with M13's UNKNOWN cells (fatloss, NRC paths, crossfit and home_full on LBW) swept first. Expected differential after P-BWFALLBACK: exactly the Pushups re-details and 0 drops."
+- One INFO gate row in `tests/gates/g230_d194_lens2.js`, keyed to D194 (standing ruling 4), predicate `VER === 230`, REFUSES at 231 naming P-BWFALLBACK (standing ruling 2: the 22 is a direction already found wrong). Two conjuncts: (i) the post-sweep reject set on L432 is 22 with the stated composition and equals V229's set (build path identical, R3′'s "nothing else"); (ii) on every landed swap of a non-reject card on a reject day, overlay boot == fixture boot == the hand oracle (the live day minus the reject names, Pushups re-detailed) 88/88, and undo+boot restores the built day 88/88 (the equivalence row reaching this class). V231's gatekeeper must re-key it with P-BWFALLBACK's after-figure (expected 4 on L432, 4 on LBW), V232's to 0.
+
+## What deliberately does NOT change
+V230's two guards and two filter cfgs; the build path (2,160 of 2,160 byte-identical); `applySessionSwaps`' whole-day re-filter (V210/V223 rule); the tap's single-item filter; D194 R1, R3′, the equivalence row and every V230 gate figure; HALF_MANNY `0ac7da6b1691a8e1`; Mario's D194 QUEUE ORDER (V230 lens, V231 P-BWFALLBACK + P-HIPEXT); the 22 built Burpees cards themselves until V231. No NRC session, no constant.
+
+## Before (V229, overlay presentation, M13 example: ankle/protect | bodyweight | beginner | support_strength | sun,wed, W3 thu, swap Single-leg glute bridge → Nordic hamstring curl (anchored))
+```
+built:  Main — Burpees: Burpees | Leg superset A: Single-leg glute bridge | Knee stability: Single-leg wall sit | Leg superset B: Bodyweight back extension | Leg isolation: Single-leg hip thrust | Hip stability: Fire hydrants + Standing hip abduction + Hip 90/90 stretch
+live:   Main — Burpees: Burpees | Leg superset A: Nordic hamstring curl (anchored) | Knee stability | Leg superset B | Leg isolation | Hip stability
+boot:   Main — Burpees: Burpees | Leg superset A: Nordic hamstring curl (anchored) | …   (V229 OV: no re-filter, the jump stays; gk repro boot == live TRUE)
+undo:   built day, Burpees present
+```
+## After (V230 as built, ships)
+```
+built:  unchanged (byte-identical to V229)
+live:   Main — Burpees: Burpees | Leg superset A: Nordic hamstring curl (anchored) | Knee stability: Single-leg wall sit | Leg superset B: Bodyweight back extension | Leg isolation: Single-leg hip thrust | Hip stability: Fire hydrants + Standing hip abduction + Hip 90/90 stretch
+boot:   Leg superset A: Nordic hamstring curl (anchored) | Knee stability: Single-leg wall sit | Leg superset B: Bodyweight back extension | Leg isolation: Single-leg hip thrust | Hip stability: Fire hydrants + Standing hip abduction + Hip 90/90 stretch   (Main gone, no empty section, day opens on Leg superset A; reboot identical)
+undo:   Main — Burpees: Burpees | Leg superset A: Single-leg glute bridge | … (the built day, 88/88); undo+boot the same
+```
+Accessory case (elbow/workaround | bodyweight | advanced | support_strength, W3 mon, Archer pushups → Close-grip pushups): every name equal live and boot; only `Chest volume: Pushups (slow 3s eccentric)` reads "4 sets — RPE 8 (stop 2 reps short of failure)" live and "4 sets — RPE 7 (leave 3 or more in reserve)" at boot.
+Expected at V231 (not printed, a measure target for V231's coach): the built Main is the plan's hip-extension fallback, live == boot on these 18 + 12 days, and the row re-keys to the 4 + 4 Pushups.
+
+## Blast radius (coaching terms)
+Nothing moves in any program at V230 beyond what R3′ already ruled. The class touches: ankle/protect bodyweight athletes (any experience, support focuses and balanced), W3 and W4 Thursday (Wednesday on sat,sun rest) Mains; elbow/workaround bodyweight advanced W3/W4 Monday `Chest volume`; only on an untrained day the athlete swapped another card on. No commercial, crossfit, home_full, home_basic; no W5+; no lowback; no run day; no NRC session; Mario 0.
+
+## V231 scope
+Leave P-FILTERLAST out of V231. P-BWFALLBACK owns the movement error (30 of 38) and must land first so the re-filter has a legal Main to keep; two rulings moving the same W3/W4 Thursday cards in one build cannot be told apart in the blast-radius diff, and P-FILTERLAST's proof is a differential that reads exactly "8 Pushups re-details, 0 drops", visible only if it ships alone; its UNKNOWN cells are unmeasured. I would yield to folding it in only if the V231 coach prints, on a source-surgery copy with P-BWFALLBACK applied, the post-sweep differential on L432 + LBW + the UNKNOWN cells and it is exactly the Pushups re-details with 0 drops, 0 new items and HALF_MANNY unmoved.
+
+**Recommendation:** Ship V230 as built; record this class as D194 Amendment 2 [saved as Amendment 4] with one INFO row keyed `VER === 230` refusing at 231; V231 stays P-BWFALLBACK + P-HIPEXT and must print the W3/W4 thu day for a same-day hip-thrust double; P-FILTERLAST is V232 on the V231 artifact.
+
+**Counter:** Hold V230 until P-BWFALLBACK lands and ship both together so no athlete ever sees a Main vanish at boot; rejected because the hold leaves every overlay-injured athlete's boot replay unfiltered (the :523 hinge-on-a-fresh-low-back hole, open on every overlay program today) and Mario's own W5 hold waiting, to spare 22 Thursdays that today show a jump on a protected ankle on every route.
+
+**Mario's call:** ship or hold V230 (doctrine: which card survives, the jump or the lighter Thursday), and whether V231's scope stays as he queued it. The gate row's shape, keying and placement are the session's. I recommend he say: "Ship V230. Record the Burpees class under D194 Amendment 2 [4]. V231 stays P-BWFALLBACK plus P-HIPEXT. P-FILTERLAST is V232."
+
+## Mario's decisions on Amendment 4 (2026-10-03, V230 chat) — main session record, not coach text
+1. **D194 AMENDMENT 4: "Ship V230 (Recommended)".** V230 ships as built; the post-sweep reject class is recorded under this
+   amendment with the INFO row keyed `VER === 230`, refusing at 231.
+2. **P-FILTERLAST SLOT: "Fold into V231"** (against coach's recommendation of V232 alone). V231 = P-BWFALLBACK + P-HIPEXT (D195)
+   + P-FILTERLAST. Coach's stated condition for folding, which binds V231: the V231 coach prints, on a source-surgery copy with
+   P-BWFALLBACK applied, the post-sweep differential on L432 + LBW + M13's UNKNOWN cells (fatloss, NRC paths, crossfit and
+   home_full on LBW), and it must be exactly the 8 Pushups re-details with 0 drops, 0 new items and HALF_MANNY unmoved. If it is
+   not, P-FILTERLAST goes back to coach before V231's builder (standing ruling 7). The INFO row's V231 re-key figure then
+   expects 0 on L432 and LBW (both P-BWFALLBACK's 30 and P-FILTERLAST's 8 closed), not 4 + 4.

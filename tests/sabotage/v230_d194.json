@@ -1,0 +1,44 @@
+[
+ {
+  "name": "S22-D193 R8 -> the hold trigger is keyed on the donor as read (cue = RPE 7, else the donor's first RPE)",
+  "anchor": "      if(_fi&&_fi.name===to){ _held=(/RPE/.test(_preF)&&_fi.detail!==_preF); item.detail=_fi.detail; }",
+  "replacement": "      if(_fi&&_fi.name===to){ const _dm=/ — hold RPE 7, (?:two|three) in the tank$/.test(_wasDetail)?7:((/RPE\\s*(\\d+(?:\\.\\d+)?)/.exec(String(_wasDetail))||[])[1]); _held=(_dm!=null&&+_dm>7&&_fi.detail!==_preF); item.detail=_fi.detail; }",
+  "gate": "gates/g230_d194_lens2.js",
+  "note": "NAMED TRIP: row d193-k″ (IRON_ASYLUM_HANDOFF_1_1.md section 12 \"S22 (R8 trigger keyed on the donor as read → (k″) 196) lands with its row\"; figure: tests/measure/v230_rulings/measure_lens_overlay_cf6_m12.md [5], measure's exact mutation, cf6.html line 14352): R8's unloadable hold toast is lost on 196 of 196 bwsets ends on OV1 (and 196 of 196 on the fixture); cards moved 0. EXPECTED: d193-k″ (196 of 196). Side trips printed under the slice-8 gate (tests/edits/v230_s8_g230_instfix_claim.py): d194-fixture (L1 149,997 of 150,068, toast 71; CFG1 pairs 128 of 324), d193-k″ (0 of 196, the NAMED trip), d193-k (hold variants 1,172 of 1,243, false claims 71, INFO capped 529), d193-i (hold toasts 9,497 vs 39,203), d194-eq's baseline clause, d194-q′ (Leg press toast). d194-postsweep (slice 9) reads day JSON, never a toast, and is not expected to trip."
+ },
+ {
+  "name": "S28-D194 R3′ -> the tap guard back on activeProg.cfg (V229's form; the filter cfg left on the lens)",
+  "anchor": "  if(activeProg&&_dayPlanCfg(activeProg,day).injury){\n    item._preHold=_preF;\n",
+  "replacement": "  if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){\n    item._preHold=_preF;\n",
+  "gate": "gates/g230_d194_lens2.js",
+  "note": "NAMED TRIP: row d194-eq, live (tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 R3′: the tap guard reads the plan of the day): on an overlay program the tap keeps no dose and does not re-filter, so the live card, its _preHold, ph and the toasts differ from the fixture. Also d194-q′ (the typed mario routes print \"2×6–10 @ RPE 8\" with no hold toast on OV5). Figure: no per-site figure ruled; the bound is tests/measure/v230_rulings/measure_lens_overlay_cf6_m12.md [4], V229 OV1 vs CFG1 (both halves off) live 12,518, toasts 18,580, _preHold and ph 18,580 of 18,580; read on the run. EXPECTED: d194-eq (live) and d194-q′."
+ },
+ {
+  "name": "S29-D194 R3′ -> the tap filter cfg back to activeProg.cfg (the guard left on the lens)",
+  "anchor": "      const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],_dayPlanCfg(activeProg,day));\n",
+  "replacement": "      const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],activeProg.cfg);\n",
+  "gate": "gates/g230_d194_lens2.js",
+  "note": "NAMED TRIP: row d194-eq, live (tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 R3′: the tap filter cfg is the plan of the day): the dose is kept but the re-filter reads the overlay program's uninjured cfg, so the live card stays above RPE 7 with no hold toast where the fixture holds it. Figure: no per-site figure ruled; bound tests/measure/v230_rulings/measure_lens_overlay_cf6_m12.md [4], V229 OV1 vs CFG1 live 12,518 of 18,580; read on the run. EXPECTED: d194-eq (live card above RPE 7); d194-q′ side trip expected (U2 hop onto Leg extension)."
+ },
+ {
+  "name": "S30-D194 R3′ -> the boot guard back on prog.cfg (V229's form; the filter cfg left on the lens)",
+  "anchor": "    if(hit && _dayPlanCfg(prog,day).injury){\n",
+  "replacement": "    if(hit && prog.cfg && prog.cfg.injury){\n",
+  "gate": "gates/g230_d194_lens2.js",
+  "note": "NAMED TRIP: rows d193-i-r and d194-eq, boot (tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 R3′: the boot guard reads the plan of the day): on an overlay program the boot replay keeps no dose and does not re-filter, so the rebooted slot carries no kept dose (d193-i-r: 18,580 of 18,580 on OV1 wanted) and the boot card differs from the fixture. Figure: no per-site figure ruled; bound tests/measure/v230_rulings/measure_lens_overlay_cf6_m12.md [4], V229 OV1 vs CFG1 boot 12,518, undo+boot 15,053 of 18,580; d193-i-r's V229 baseline kept dose 0; read on the run. EXPECTED: d193-i-r and d194-eq (boot)."
+ },
+ {
+  "name": "S31-D194 R3′ -> the boot filter cfg back to prog.cfg (the guard left on the lens)",
+  "anchor": "      day.sections=applyInjuryFilter(day.sections,_dayPlanCfg(prog,day));\n",
+  "replacement": "      day.sections=applyInjuryFilter(day.sections,prog.cfg);\n",
+  "gate": "gates/g230_d194_lens2.js",
+  "note": "NAMED TRIP: row d194-eq, boot (tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 R3′: the boot filter cfg is the plan of the day): the boot replay keeps the dose but re-filters with the overlay program's uninjured cfg, so the booted card stays above RPE 7 where the fixture holds it. Figure: no per-site figure ruled; bound tests/measure/v230_rulings/measure_lens_overlay_cf6_m12.md [4], V229 OV1 vs CFG1 boot 12,518 of 18,580; read on the run. EXPECTED: d194-eq (boot); d193-i-r side trip expected (live == boot)."
+ },
+ {
+  "name": "S32-D194-A4 the boot re-filter judges only the swapped items (Amendment 4's rejected option 1, narrowing the boot to match the tap)",
+  "anchor": "      day.sections=applyInjuryFilter(day.sections,_dayPlanCfg(prog,day));\n",
+  "replacement": "      _renamed.forEach(it=>{ const _f=applyInjuryFilter([{label:'x',items:[{name:it.name,detail:it.detail}]}],_dayPlanCfg(prog,day)); const _g=_f&&_f[0]&&_f[0].items&&_f[0].items[0]; if(_g&&_g.name===it.name) it.detail=_g.detail; });\n",
+  "gate": "gates/g230_d194_lens2.js",
+  "note": "NAMED TRIP: row d194-postsweep (ii) (tests/measure/v229_rulings/d194_injlens_ruling.md D194 Amendment 4, \"Why not fix it inside V230\", the first rejected option: narrowing the boot to the swapped items makes the boot LESS right and reopens the handoff :523 hole on overlay programs). The boot replay judges only the items it renamed, in the tap's single-item form, and leaves every other card as replayed, so on the 22 post-sweep reject days the booted day keeps `Burpees` and the RPE 8 `Pushups (slow 3s eccentric)` on both presentations: OV1 boot == fixture boot still, but boot == the hand oracle 0 of 88 (boot == live). Figure: M13 (tests/measure/v230_rulings/measure_postsweep_reject_m13.md [2]), V229 OV1 boot == live 88 of 88, is this shape. EXPECTED: d194-postsweep (ii). Other rows: none expected (d194-eq compares OV1 with the fixture and both narrow together; the D190 lattice, the L9 pairs and the hand routes run commercial builds, where no post-sweep reject exists); read on the run."
+ }
+]

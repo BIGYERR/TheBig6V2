@@ -1,0 +1,20 @@
+ia-version 229 CFG | built W4 wed: Burpees | Single-leg glute bridge | Single-leg wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   filter re-applied to the built day: Single-leg glute bridge | Single-leg wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   live after swapping Single-leg wall sit -> Wall sit: Burpees | Single-leg glute bridge | Wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   boot: Single-leg glute bridge | Wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   boot == live: false
+ia-version 230 CFG | built W4 wed: Burpees | Single-leg glute bridge | Single-leg wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   filter re-applied to the built day: Single-leg glute bridge | Single-leg wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   live after swapping Single-leg wall sit -> Wall sit: Burpees | Single-leg glute bridge | Wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   boot: Single-leg glute bridge | Wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   boot == live: false
+ia-version 229 OV | built W4 wed: Burpees | Single-leg glute bridge | Single-leg wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   filter re-applied to the built day: Single-leg glute bridge | Single-leg wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   live after swapping Single-leg wall sit -> Wall sit: Burpees | Single-leg glute bridge | Wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   boot: Burpees | Single-leg glute bridge | Wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   boot == live: true
+ia-version 230 OV | built W4 wed: Burpees | Single-leg glute bridge | Single-leg wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   filter re-applied to the built day: Single-leg glute bridge | Single-leg wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   live after swapping Single-leg wall sit -> Wall sit: Burpees | Single-leg glute bridge | Wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   boot: Single-leg glute bridge | Wall sit | Bodyweight back extension | Single-leg hip thrust | Clamshells (bodyweight)+Fire hydrants+IT band stretch
+   boot == live: false

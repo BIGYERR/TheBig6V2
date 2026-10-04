@@ -1,0 +1,626 @@
+##### PART prep
+PREP HEAD 0bec3ec origin/main 0bec3ec | V229 (HEAD) ia-version 229 sha d854af0a91f8 | working index.html sha d854af0a91f8 | V228 (2c1a89c) ia-version 228
+  anchor [S1 applySwapChoice guard] count 1 at line 14347
+  anchor [S2 applySwapChoice filter cfg] count 1 at line 14350
+  anchor [S3 applySessionSwaps guard] count 1 at line 10358
+  anchor [S4 applySessionSwaps filter cfg] count 1 at line 10361
+  S22 anchor count 1
+  version meta count 1
+
+[2] diff V229 -> CF6 (8 changed lines, hunks 4)
+    10358c10358
+    <     if(hit && prog.cfg && prog.cfg.injury){
+    ---
+    >     if(hit && _dayPlanCfg(prog,day).injury){
+    10361c10361
+    <       day.sections=applyInjuryFilter(day.sections,prog.cfg);
+    ---
+    >       day.sections=applyInjuryFilter(day.sections,_dayPlanCfg(prog,day));
+    14347c14347
+    <   if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){
+    ---
+    >   if(activeProg&&_dayPlanCfg(activeProg,day).injury){
+    14350c14350
+    <       const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],activeProg.cfg);
+    ---
+    >       const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],_dayPlanCfg(activeProg,day));
+    
+[2] HALF_MANNY digest V229 0ac7da6b1691a8e1 | CF6 0ac7da6b1691a8e1 | CF6 again 0ac7da6b1691a8e1 | CF6S22 0ac7da6b1691a8e1 | expected 0ac7da6b1691a8e1
+    trees: V229 d854af0a91f8 CF6 fa890201f5c6 CF6S22 496c00cc66e7 CF6_230 72ac41c8d340
+
+[1] V229 comment-stripped: 597 top-level functions | buildProgram spans lines 11244-11252
+[1] every `.injury` token in V229 (comments stripped): 34 | inside buildProgram 0 | outside 34 | of the outside, `cfg.injury` reads (any prefix) 16
+    7375 [deconflictAdjacentDupes:7310] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        if(moved && cfg && cfg.injury){
+    7951 [injuryPlan:7950] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | ON ROUTE tap:applySwapChoice>applyInjuryFilter>injuryPlan ; boot:applySessionSwaps>applyInjuryFilter>injuryPlan ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>imBackFromInjury>injuryPlan ; reboot:refreshProgram>paceShiftMap>injuryPlan
+        const inj=cfg&&cfg.injury;
+    8088 [_injViewName:8088] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        function _injViewName(n,cfg){ if(!cfg||!cfg.injury) return n; const P=injuryPlan(cfg); if(!P||!P.swapNames||!P.swapNames[n]) return n; const g=_gearLens((cfg&&cfg.equipme
+    8566 [engineC_kinematics:8192] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        const _powerLegal = powerPool.filter(n=>_powerAllowed(n, cfg.experience, cfg.injury, cfg.ageBracket))
+    8991 [engineC_kinematics:8192] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,isRace));
+    8991 [engineC_kinematics:8192] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,isRace));
+    9382 [engineC_kinematics:8192] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW));
+    9382 [engineC_kinematics:8192] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW));
+    9502 [engineC_kinematics:8192] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        const _finPower=_powerAllowed(ex.cond[3], cfg.experience, cfg.injury, cfg.ageBracket);
+    9530 [engineC_kinematics:8192] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        const _condPower=(ex.cond||[]).filter(n=>_powerAllowed(n, cfg.experience, cfg.injury, cfg.ageBracket));
+    9871 [auxSwapCandidates:9861] read cfg.injury => ALREADY ON THE LENS (local cfg = _dayPlanCfg) | ON ROUTE tap:applySwapChoice>openDetail>buildSectionsHTML>buildExItem>openSwapSheet>auxSwapCandidates ; undo:undoSwap>openDetail>buildSectionsHTML>buildExItem>openSwapSheet>auxSwapCandidates
+        if(fam==='power'&&typeof _powerAllowed==='function'&&!_powerAllowed(n,cfg.experience,cfg.injury,cfg.ageBracket)) return false;
+    9995 [_dayPlanCfg:9991] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>buildSectionsHTML>buildExItem>openSwapSheet>swapCandidates>_dayPlanCfg ; undo:undoSwap>openDetail>buildSectionsHTML>buildExItem>openSwapSheet>swapCandidates>_dayPlanCfg
+        return Object.assign({},base,{injury:ov.patch.injury});
+    10000 [_swapInjuryOK:9999] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | ON ROUTE tap:applySwapChoice>openDetail>buildSectionsHTML>buildExItem>openSwapSheet>swapCandidates>_swapInjuryOK ; undo:undoSwap>openDetail>buildSectionsHTML>buildExItem>openSwapSheet>swapCandidates>_swapInjuryOK
+        if(!cfg||!cfg.injury) return true;
+    10358 [applySessionSwaps:10340] read prog.cfg.injury => ONE OF THE FOUR (guard) | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>removeOverlay>refreshProgram>applySessionSwaps ; boot:applySessionSwaps ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>removeOverlay>refreshProgram>applySessionSwaps ; reboot:refreshProgram>applySessionSwaps
+        if(hit && prog.cfg && prog.cfg.injury){
+    10965 [engineD_synthesis:10886] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        if(cfg.injury) Object.keys(weeks[w]).forEach(_d=>{ const _day=weeks[w][_d]; if(_day&&Array.isArray(_day.sections)) _day.sections=applyInjuryFilter(_day.sections,cfg); });
+    10984 [engineD_synthesis:10886] read cfg.injury => HELPER (cfg is a parameter: the caller decides which plan) | on no tap/boot/undo/reboot route
+        if(applySwapPrefs(_day.sections,cfg.exSwapPrefs) && cfg.injury){
+    11985 [renderWeekView:11937] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView
+        const _injOv=activeProg.overlays.find(ov=>_live(ov)&&ov.type==='injury'&&ov.patch&&ov.patch.injury);
+    11986 [renderWeekView:11937] read _injOv.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView
+        if(_injOv) _injWk=_injOv.patch.injury;
+    12028 [renderWeekView:11937] read injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView
+        const _liveInj=_injWk||((_liveInjuryOverlay()||{}).patch||{}).injury||null;
+    14347 [applySwapChoice:14311] read activeProg.cfg.injury => ONE OF THE FOUR (guard) | ON ROUTE tap:applySwapChoice ; undo:undoSwap>openDetail>buildSectionsHTML>buildExItem>openSwapSheet>_swapRow>applySwapChoice
+        if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){
+    15316 [paceShiftMap:15307] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>imBackFromInjury>paceShiftMap ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>imBackFromInjury>paceShiftMap ; reboot:refreshProgram>paceShiftMap
+        if(!ov||ov.type!=='injury'||!ov.patch||!ov.patch.injury) return;
+    15317 [paceShiftMap:15307] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>imBackFromInjury>paceShiftMap ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>imBackFromInjury>paceShiftMap ; reboot:refreshProgram>paceShiftMap
+        const inj=ov.patch.injury;
+    15487 [renderOverlayChip:15473] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip
+        const _isInj=!!(ov.type==='injury'&&ov.patch&&ov.patch.injury);
+    15488 [renderOverlayChip:15473] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip
+        const _isBridge=_isInj&&!!ov.patch.injury.bridge;
+    15490 [renderOverlayChip:15473] read INJURY_REGIONS[ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip
+        const _r=INJURY_REGIONS[ov.patch.injury.region];
+    15493 [renderOverlayChip:15473] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip
+        :((_r?_r.label:'Injury')+(ov.patch.injury.tier==='protect'?' (protected)':' (working around it)'));
+    15511 [renderOverlayChip:15473] read INJURY_REGIONS[ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip
+        const _rl=(INJURY_REGIONS[ov.patch.injury.region]||{}).label||'it';
+    15567 [openInjurySheet:15564] read live.patch.injury => OTHER | on no tap/boot/undo/reboot route
+        if(live){ _ovDraft.injRegion=live.patch.injury.region; _ovDraft.injTier=live.patch.injury.tier; }
+    15567 [openInjurySheet:15564] read live.patch.injury => OTHER | on no tap/boot/undo/reboot route
+        if(live){ _ovDraft.injRegion=live.patch.injury.region; _ovDraft.injTier=live.patch.injury.tier; }
+    15581 [_liveInjuryOverlay:15576] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>_liveInjuryOverlay ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>_liveInjuryOverlay
+        if(!ov||ov.type!=='injury'||!ov.patch||!ov.patch.injury||ov.patch.injury.bridge) return false;
+    15581 [_liveInjuryOverlay:15576] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>_liveInjuryOverlay ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>_liveInjuryOverlay
+        if(!ov||ov.type!=='injury'||!ov.patch||!ov.patch.injury||ov.patch.injury.bridge) return false;
+    15730 [imBackFromInjury:15727] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>imBackFromInjury ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>imBackFromInjury
+        if(!ov||!ov.patch||!ov.patch.injury) { removeOverlay(id); return; }
+    15731 [imBackFromInjury:15727] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>imBackFromInjury ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>imBackFromInjury
+        const region=ov.patch.injury.region;
+    16013 [refreshProgram:15837] read ov.patch.injury => OTHER | ON ROUTE tap:applySwapChoice>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>removeOverlay>refreshProgram ; undo:undoSwap>openDetail>handleDayStatus>renderWeekView>renderOverlayChip>removeOverlay>refreshProgram ; reboot:refreshProgram
+        .filter(ov => ov && ov.type==='injury' && ov.patch && ov.patch.injury)
+[1] helper readers (take cfg, read cfg.injury) and every call site outside buildProgram with the cfg it passes:
+    deconflictAdjacentDupes: 1 call sites outside buildProgram
+      10999 [engineD_synthesis] OTHER-ARG :: deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks);
+    injuryPlan: 10 call sites outside buildProgram
+      5489 [buildCardioProgression] OTHER-ARG :: injuryPlan(cfg);
+      7819 [injurySweepCardio] OTHER-ARG :: injuryPlan(cfg);
+      8088 [_injViewName] OTHER-ARG :: injuryPlan(cfg); if(!P||!P.swapNames||!P.swapNames[n]) return n; const g=_gearLens((cfg&&cfg.equipment)||'home_full'); if(!g(n)) return n; const to=P.swapNames[
+      8119 [applyInjuryFilter] OTHER-ARG route:tap,boot,undo,reboot :: injuryPlan(cfg);
+      8175 [injuryDayTitle] OTHER-ARG :: injuryPlan(cfg);
+      8206 [engineC_kinematics] OTHER-ARG :: injuryPlan(cfg);
+      8476 [engineC_kinematics] OTHER-ARG :: injuryPlan(cfg), _noRack=!!(_ip&&_ip.tier!=='halfstep'&&(_ip.region==='shoulder'||_ip.region==='elbow'));
+      15319 [paceShiftMap] OTHER-ARG route:tap,undo,reboot :: injuryPlan({injury:{region:inj.region,tier:inj.tier}});
+      15740 [imBackFromInjury] OTHER-ARG route:tap,undo :: injuryPlan({injury:{region,tier:'workaround'}});
+      15741 [imBackFromInjury] OTHER-ARG route:tap,undo :: injuryPlan({injury:{region,tier:'protect'}});
+    _injViewName: 12 call sites outside buildProgram
+      9153 [engineC_kinematics] OTHER-ARG :: _injViewName(x,cfg)!==_injViewName(ex.chestMain,cfg));
+      9153 [engineC_kinematics] OTHER-ARG :: _injViewName(ex.chestMain,cfg));
+      9157 [engineC_kinematics] OTHER-ARG :: _injViewName(x,cfg)!==_injViewName(secondary,cfg)),2,blockSeed(w)+101);
+      9157 [engineC_kinematics] OTHER-ARG :: _injViewName(secondary,cfg)),2,blockSeed(w)+101);
+      9195 [engineC_kinematics] OTHER-ARG :: _injViewName(it.name,cfg)]=1;}});});
+      9196 [engineC_kinematics] OTHER-ARG :: _injViewName(n,cfg)];};
+      9259 [engineC_kinematics] OTHER-ARG :: _injViewName(bis[1],cfg)===_injViewName(bis[0],cfg)){ const _alt=_bicPool.filter(n=>n!==bis[0]&&_injViewName(n,cfg)!==_injViewName(bis[0],cfg)); if(_alt.length)
+      9259 [engineC_kinematics] OTHER-ARG :: _injViewName(bis[0],cfg)){ const _alt=_bicPool.filter(n=>n!==bis[0]&&_injViewName(n,cfg)!==_injViewName(bis[0],cfg)); if(_alt.length) bis[1]=pick(_alt,1,blockSe
+      9259 [engineC_kinematics] OTHER-ARG :: _injViewName(n,cfg)!==_injViewName(bis[0],cfg)); if(_alt.length) bis[1]=pick(_alt,1,blockSeed(w)+104)[0]; }
+      9259 [engineC_kinematics] OTHER-ARG :: _injViewName(bis[0],cfg)); if(_alt.length) bis[1]=pick(_alt,1,blockSeed(w)+104)[0]; }
+      9262 [engineC_kinematics] OTHER-ARG :: _injViewName(n,cfg)!==_injViewName(bis[0],cfg)));
+      9262 [engineC_kinematics] OTHER-ARG :: _injViewName(bis[0],cfg)));
+    engineC_kinematics: 0 call sites outside buildProgram
+    _swapInjuryOK: 4 call sites outside buildProgram
+      7354 [deconflictAdjacentDupes] OTHER-ARG :: _swapInjuryOK(n,cfg);
+      9873 [auxSwapCandidates] LENS route:tap,undo :: _swapInjuryOK(n,cfg);
+      10029 [addCandidates] LENS :: _swapInjuryOK(n,cfg)) return;
+      10116 [swapCandidates] LENS route:tap,undo :: _swapInjuryOK(n,cfg)) return;
+    engineD_synthesis: 0 call sites outside buildProgram
+    applyInjuryFilter: 7 call sites outside buildProgram
+      7379 [deconflictAdjacentDupes] OTHER-ARG :: applyInjuryFilter(day.sections,cfg);
+      10002 [_swapInjuryOK] OTHER-ARG route:tap,undo :: applyInjuryFilter([{label:'x',items:[{name:name,detail:'3×5'}]}],cfg);
+      10361 [applySessionSwaps] PROG.CFG route:tap,boot,undo,reboot :: applyInjuryFilter(day.sections,prog.cfg);
+      10947 [engineD_synthesis] OTHER-ARG :: applyInjuryFilter(buildSections(role,w,{fullVariant,wantCarry:d===carryHost,cardio,hotNext}),cfg)),role,cardio,goal)};
+      10965 [engineD_synthesis] OTHER-ARG :: applyInjuryFilter(_day.sections,cfg); });
+      10985 [engineD_synthesis] OTHER-ARG :: applyInjuryFilter(_day.sections,cfg);
+      14350 [applySwapChoice] PROG.CFG route:tap,undo :: applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],activeProg.cfg);
+    _powerAllowed (takes the injury value): 4 call sites outside buildProgram
+      8566 [engineC_kinematics] const _powerLegal = powerPool.filter(n=>_powerAllowed(n, cfg.experience, cfg.injury, cfg.ageBracket))
+      9502 [engineC_kinematics] const _finPower=_powerAllowed(ex.cond[3], cfg.experience, cfg.injury, cfg.ageBracket);
+      9530 [engineC_kinematics] const _condPower=(ex.cond||[]).filter(n=>_powerAllowed(n, cfg.experience, cfg.injury, cfg.ageBracket));
+      9871 [auxSwapCandidates] if(fam==='power'&&typeof _powerAllowed==='function'&&!_powerAllowed(n,cfg.experience,cfg.injury,cfg.ageBracket)) return false;
+[1] _dayPlanCfg defined at line 9991 | call sites 9863<auxSwapCandidates> 10015<addCandidates> 10103<swapCandidates>
+    function _dayPlanCfg(prog,day){
+      const base=(prog&&prog.cfg)||{};
+      const ov=dayOverlayInfo(day);
+      if(!ov||!ov.patch||!Object.prototype.hasOwnProperty.call(ov.patch,'injury')) return base;
+      return Object.assign({},base,{injury:ov.patch.injury});
+    }
+##### PART probe
+PROBE V229 mario CFG self-identity true | cfg.injury "{\"region\":\"knee\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE V229 mario CFG1 self-identity true | cfg.injury "{\"region\":\"knee\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE V229 mario OV5 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"5/5","6":"5/5"}
+PROBE V229 mario OV1 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  CFG1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  OV5 day == FIX day (stamp removed) by week {"1":"3/5","2":"3/5","3":"2/5","4":"2/5","5":"5/5","6":"5/5"}
+  OV1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+PROBE V229 lowback_wa CFG self-identity true | cfg.injury "{\"region\":\"lowback\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE V229 lowback_wa CFG1 self-identity true | cfg.injury "{\"region\":\"lowback\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE V229 lowback_wa OV5 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"5/5","6":"5/5"}
+PROBE V229 lowback_wa OV1 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  CFG1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  OV5 day == FIX day (stamp removed) by week {"1":"0/5","2":"2/5","3":"2/5","4":"2/5","5":"5/5","6":"5/5"}
+  OV1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+PROBE V229 elbow_wa CFG self-identity true | cfg.injury "{\"region\":\"elbow\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE V229 elbow_wa CFG1 self-identity true | cfg.injury "{\"region\":\"elbow\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE V229 elbow_wa OV5 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"5/5","6":"5/5"}
+PROBE V229 elbow_wa OV1 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  CFG1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  OV5 day == FIX day (stamp removed) by week {"1":"0/5","2":"1/5","3":"3/5","4":"3/5","5":"5/5","6":"5/5"}
+  OV1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+PROBE CF6 mario CFG self-identity true | cfg.injury "{\"region\":\"knee\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE CF6 mario CFG1 self-identity true | cfg.injury "{\"region\":\"knee\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE CF6 mario OV5 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"5/5","6":"5/5"}
+PROBE CF6 mario OV1 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  CFG1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  OV5 day == FIX day (stamp removed) by week {"1":"3/5","2":"3/5","3":"2/5","4":"2/5","5":"5/5","6":"5/5"}
+  OV1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+PROBE CF6 lowback_wa CFG self-identity true | cfg.injury "{\"region\":\"lowback\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE CF6 lowback_wa CFG1 self-identity true | cfg.injury "{\"region\":\"lowback\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE CF6 lowback_wa OV5 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"5/5","6":"5/5"}
+PROBE CF6 lowback_wa OV1 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  CFG1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  OV5 day == FIX day (stamp removed) by week {"1":"0/5","2":"2/5","3":"2/5","4":"2/5","5":"5/5","6":"5/5"}
+  OV1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+PROBE CF6 elbow_wa CFG self-identity true | cfg.injury "{\"region\":\"elbow\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE CF6 elbow_wa CFG1 self-identity true | cfg.injury "{\"region\":\"elbow\",\"tier\":\"workaround\"}" | overlays 0 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"0/5","6":"0/5"}
+PROBE CF6 elbow_wa OV5 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"0/5","2":"0/5","3":"0/5","4":"0/5","5":"5/5","6":"5/5"}
+PROBE CF6 elbow_wa OV1 self-identity true | cfg.injury "null" | overlays 1 | stamped days by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  CFG1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+  OV5 day == FIX day (stamp removed) by week {"1":"0/5","2":"1/5","3":"3/5","4":"3/5","5":"5/5","6":"5/5"}
+  OV1 day == FIX day (stamp removed) by week {"1":"5/5","2":"5/5","3":"5/5","4":"5/5","5":"5/5","6":"5/5"}
+##### PART hand
+
+[6] mario knee/wa W5 thu [3,1] V229 OV5 | stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | activeProg.cfg.injury null | native Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none
+  U0 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+     hop2 Leg extension "2×6–10 @ RPE 8" _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+     hop3 Barbell good mornings "2×6–10 @ RPE 8" _preHold none | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+     record Single-leg hip thrust>Barbell hip thrust ph=- | Barbell hip thrust>Leg extension ph=- | Leg extension>Barbell good mornings ph=-
+     BOOT Barbell good mornings "2×6–10 @ RPE 8" _preHold none
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 8" _preHold none
+     UNDO+BOOT Leg extension "2×6–10 @ RPE 8" _preHold none
+  U1 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold none | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+     UNDO -> Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none | day identical to the untouched day true | UNDO+BOOT Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none
+  U2 hop1 Leg extension "2×6–10 @ RPE 8" _preHold none | toast "Leg extension in, single-leg hip thrust out. Same job, same numbers."
+     hop2 Barbell good mornings "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers." | record Single-leg hip thrust>Leg extension ph=- | Leg extension>Barbell good mornings ph=-
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 8" _preHold none
+     hop3 Barbell hip thrust LIVE "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, leg extension out. Same job, same numbers."
+     BOOT Barbell hip thrust "2×6–10 @ RPE 8" _preHold none | DIRECT "2×6–10 @ RPE 8"
+  RB hop2 Leg extension "2×6–10 @ RPE 8" _preHold none | toast "Leg extension in, barbell hip thrust out. Same job, same numbers."
+     REBOOT slot Leg extension "2×6–10 @ RPE 8" _preHold none
+     hop3 Barbell good mornings LIVE "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+     BOOT Barbell good mornings "2×6–10 @ RPE 8" _preHold none | DIRECT "2×6–10 @ RPE 8"
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 8" _preHold none
+     UNDO+BOOT Leg extension "2×6–10 @ RPE 8" _preHold none
+
+[6] mario knee/wa W5 thu [3,1] CF6 OV5 | stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] | activeProg.cfg.injury null | native Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none
+  U0 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+     hop2 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, barbell hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+     hop3 Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+     record Single-leg hip thrust>Barbell hip thrust ph=- | Barbell hip thrust>Leg extension ph="2×6–10 @ RPE 8" | Leg extension>Barbell good mornings ph="2×6–10 @ RPE 8"
+     BOOT Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8"
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     UNDO+BOOT Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+  U1 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+     UNDO -> Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none | day identical to the untouched day true | UNDO+BOOT Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none
+  U2 hop1 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, single-leg hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+     hop2 Barbell good mornings "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers." | record Single-leg hip thrust>Leg extension ph=- | Leg extension>Barbell good mornings ph="2×6–10 @ RPE 8"
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     hop3 Barbell hip thrust LIVE "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, leg extension out. Same job, same numbers."
+     BOOT Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8"
+  RB hop2 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, barbell hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+     REBOOT slot Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     hop3 Barbell good mornings LIVE "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+     BOOT Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8"
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     UNDO+BOOT Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+
+[6] mario knee/wa W5 thu [3,1] V229 CFG | stamp null | activeProg.cfg.injury {"region":"knee","tier":"workaround"} | native Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none
+  U0 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+     hop2 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, barbell hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+     hop3 Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+     record Single-leg hip thrust>Barbell hip thrust ph=- | Barbell hip thrust>Leg extension ph="2×6–10 @ RPE 8" | Leg extension>Barbell good mornings ph="2×6–10 @ RPE 8"
+     BOOT Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8"
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     UNDO+BOOT Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+  U1 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+     UNDO -> Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none | day identical to the untouched day true | UNDO+BOOT Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none
+  U2 hop1 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, single-leg hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+     hop2 Barbell good mornings "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers." | record Single-leg hip thrust>Leg extension ph=- | Leg extension>Barbell good mornings ph="2×6–10 @ RPE 8"
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     hop3 Barbell hip thrust LIVE "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, leg extension out. Same job, same numbers."
+     BOOT Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8"
+  RB hop2 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, barbell hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+     REBOOT slot Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     hop3 Barbell good mornings LIVE "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+     BOOT Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8"
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     UNDO+BOOT Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+
+[6] mario knee/wa W5 thu [3,1] CF6 CFG | stamp null | activeProg.cfg.injury {"region":"knee","tier":"workaround"} | native Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none
+  U0 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+     hop2 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, barbell hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+     hop3 Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+     record Single-leg hip thrust>Barbell hip thrust ph=- | Barbell hip thrust>Leg extension ph="2×6–10 @ RPE 8" | Leg extension>Barbell good mornings ph="2×6–10 @ RPE 8"
+     BOOT Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8"
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     UNDO+BOOT Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+  U1 hop1 Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, single-leg hip thrust out. Same job, same numbers."
+     UNDO -> Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none | day identical to the untouched day true | UNDO+BOOT Single-leg hip thrust "2×6–10 @ RPE 8" _preHold none
+  U2 hop1 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, single-leg hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+     hop2 Barbell good mornings "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers." | record Single-leg hip thrust>Leg extension ph=- | Leg extension>Barbell good mornings ph="2×6–10 @ RPE 8"
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     hop3 Barbell hip thrust LIVE "2×6–10 @ RPE 8" | toast "Barbell hip thrust in, leg extension out. Same job, same numbers."
+     BOOT Barbell hip thrust "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8"
+  RB hop2 Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8" | toast "Leg extension in, barbell hip thrust out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+     REBOOT slot Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     hop3 Barbell good mornings LIVE "2×6–10 @ RPE 8" | toast "Barbell good mornings in, leg extension out. Same job, same numbers."
+     BOOT Barbell good mornings "2×6–10 @ RPE 8" _preHold "2×6–10 @ RPE 8" | DIRECT "2×6–10 @ RPE 8"
+     UNDO chip "Leg extension" -> Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+     UNDO+BOOT Leg extension "2×6–10 @ RPE 7" _preHold "2×6–10 @ RPE 8"
+
+[6] knee/wa strength beginner commercial V229 OV5 (weeks 6) W6 thu [0,0] stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] native "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here."
+    -> Leg press: Leg press "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." _preHold none | toast "Leg press in, barbell box squat out. Same job, same numbers." | BOOT "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | UNDO -> Barbell box squat "Work up to one working set of 3 to 5 reps at RPE 7. Techniq
+    -> Barbell Romanian deadlift: Barbell Romanian deadlift "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." _preHold none | toast "Barbell Romanian deadlift in, barbell box squat out. Same job, same numbers." | BOOT "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | UNDO -> Barbell box squat "Work up to one working set of 3 to 5 reps at RPE 7. Techniq
+
+[6] knee/wa strength beginner commercial CF6 OV5 (weeks 6) W6 thu [0,0] stamp ["injury",{"injury":{"region":"knee","tier":"workaround"}}] native "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here."
+    -> Leg press: Leg press "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here." _preHold present | toast "Leg press in, barbell box squat out. Same sets, same reps. Your injury plan holds this one at RPE 7." | BOOT "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here." | UNDO -> Barbell box squat "Work up to one working set of 3 to 5 reps at RPE 7. Techniq
+    -> Barbell Romanian deadlift: Barbell Romanian deadlift "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." _preHold present | toast "Barbell Romanian deadlift in, barbell box squat out. Same job, same numbers." | BOOT "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | UNDO -> Barbell box squat "Work up to one working set of 3 to 5 reps at RPE 7. Techniq
+
+[6] knee/wa strength beginner commercial V229 CFG (weeks 6) W6 thu [0,0] stamp null native "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here."
+    -> Leg press: Leg press "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here." _preHold present | toast "Leg press in, barbell box squat out. Same sets, same reps. Your injury plan holds this one at RPE 7." | BOOT "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here." | UNDO -> Barbell box squat "Work up to one working set of 3 to 5 reps at RPE 7. Techniq
+    -> Barbell Romanian deadlift: Barbell Romanian deadlift "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." _preHold present | toast "Barbell Romanian deadlift in, barbell box squat out. Same job, same numbers." | BOOT "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | UNDO -> Barbell box squat "Work up to one working set of 3 to 5 reps at RPE 7. Techniq
+
+[6] knee/wa strength beginner commercial CF6 CFG (weeks 6) W6 thu [0,0] stamp null native "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here."
+    -> Leg press: Leg press "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here." _preHold present | toast "Leg press in, barbell box squat out. Same sets, same reps. Your injury plan holds this one at RPE 7." | BOOT "Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here." | UNDO -> Barbell box squat "Work up to one working set of 3 to 5 reps at RPE 7. Techniq
+    -> Barbell Romanian deadlift: Barbell Romanian deadlift "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." _preHold present | toast "Barbell Romanian deadlift in, barbell box squat out. Same job, same numbers." | BOOT "Work up to one heavy set of 3 to 5 reps at RPE 9. Technique stays crisp. No grinding. Log the weight and the reps. That set is your new baseline." | UNDO -> Barbell box squat "Work up to one working set of 3 to 5 reps at RPE 7. Techniq
+##### PART report
+=== chain result files missing: 0
+
+=== [4] EQUIVALENCE ROW (S chains: in-session hops, toasts, boot, undo, undo+boot; D190 lattice)
+  baseline equals itself: S:V229:CFG vs S:CF6:CFG (the surgery does not touch the fixture)
+
+  V229 CFG == CF6 CFG: chains 18580 | differ on live/toast/boot/undo/undo+boot 0 | differ on any field incl. _preHold, ph and whole-day JSON 0 | by field (none)
+    per config elbow_wa 0/0 of 8369 | shoulder_wa 0/0 of 3708 | lowback_wa 0/0 of 3531 | hip_wa 0/0 of 1405 | knee_protect 0/0 of 1232 | mario 0/0 of 320 | ankle_wa 0/0 of 15
+  clock control: CF6 CFG (W5 clock) vs CF6 CFG1 (W1 clock)
+
+  CF6 CFG vs CF6 CFG1: chains 18580 | differ on live/toast/boot/undo/undo+boot 0 | differ on any field incl. _preHold, ph and whole-day JSON 0 | by field (none)
+    per config elbow_wa 0/0 of 8369 | shoulder_wa 0/0 of 3708 | lowback_wa 0/0 of 3531 | hip_wa 0/0 of 1405 | knee_protect 0/0 of 1232 | mario 0/0 of 320 | ankle_wa 0/0 of 15
+  OV1 (overlay from W1 Monday, clock W1 Monday: every week spliced) vs FIXTURE (CFG1, same clock)
+
+  CF6 OV1 vs CF6 CFG1 [all weeks]: chains 18580 | differ on live/toast/boot/undo/undo+boot 0 | differ on any field incl. _preHold, ph and whole-day JSON 0 | by field (none)
+    per config elbow_wa 0/0 of 8369 | shoulder_wa 0/0 of 3708 | lowback_wa 0/0 of 3531 | hip_wa 0/0 of 1405 | knee_protect 0/0 of 1232 | mario 0/0 of 320 | ankle_wa 0/0 of 15
+
+  CF6 OV1 vs CF6 CFG1 [W5]: chains 13323 | differ on live/toast/boot/undo/undo+boot 0 | differ on any field incl. _preHold, ph and whole-day JSON 0 | by field (none)
+    per config elbow_wa 0/0 of 6139 | shoulder_wa 0/0 of 2486 | lowback_wa 0/0 of 2627 | hip_wa 0/0 of 606 | knee_protect 0/0 of 1160 | mario 0/0 of 305 | ankle_wa 0/0 of 0
+
+  CF6 OV1 vs CF6 CFG1 [W3]: chains 5257 | differ on live/toast/boot/undo/undo+boot 0 | differ on any field incl. _preHold, ph and whole-day JSON 0 | by field (none)
+    per config elbow_wa 0/0 of 2230 | shoulder_wa 0/0 of 1222 | lowback_wa 0/0 of 904 | hip_wa 0/0 of 799 | knee_protect 0/0 of 72 | mario 0/0 of 15 | ankle_wa 0/0 of 15
+
+  V229 OV1 vs CF6 CFG1 (before: what V229 delivers on an overlay vs the fixture answer): chains 18580 | differ on live/toast/boot/undo/undo+boot 18580 | differ on any field incl. _preHold, ph and whole-day JSON 18580 | by field boot 12518 | bootDay 18580 | boot_preHold 18580 | live 12518 | liveDay 18580 | live_preHold 18580 | ph 18580 | toasts 18580 | undo 15589 | undoBoot 15053 | undoBootDay 17670 | undoBoot_preHold 17670 | undoDay 18580 | undo_preHold 18580
+    per config elbow_wa 8369/8369 of 8369 | shoulder_wa 3708/3708 of 3708 | lowback_wa 3531/3531 of 3531 | hip_wa 1405/1405 of 1405 | knee_protect 1232/1232 of 1232 | mario 320/320 of 320 | ankle_wa 15/15 of 15
+    e.g. [live] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6CFG1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [live_preHold] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6CFG1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [toasts] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: ["Barbell row in, pendlay row out. Same job, same numbers.","Feet-elevated inverted rows in, barbell row out. No load to add here, so take the sets to the same effort.","Inverted rows (bodyweight) in, feet-elevated inverted rows out. Same job, same numbers."]
+        SCF6CFG1: ["Barbell row in, pendlay row out. Same job, same numbers.","Feet-elevated inverted rows in, barbell row out. No load to add here. Your injury plan holds this one at RPE 7.","Inverted rows (bodyweight) in, feet-elevated inverted rows out. Same sets, same reps. Your injury plan holds this one at RPE 7."]
+    e.g. [boot] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6CFG1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [boot_preHold] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6CFG1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [undo] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: {"n":"Feet-elevated inverted rows","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6CFG1: {"n":"Feet-elevated inverted rows","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"}
+
+  V229 OV1 vs CF6 OV1 (what CF6 moves on the overlay presentation): chains 18580 | differ on live/toast/boot/undo/undo+boot 18580 | differ on any field incl. _preHold, ph and whole-day JSON 18580 | by field boot 12518 | bootDay 18580 | boot_preHold 18580 | live 12518 | liveDay 18580 | live_preHold 18580 | ph 18580 | toasts 18580 | undo 15589 | undoBoot 15053 | undoBootDay 17670 | undoBoot_preHold 17670 | undoDay 18580 | undo_preHold 18580
+    per config elbow_wa 8369/8369 of 8369 | shoulder_wa 3708/3708 of 3708 | lowback_wa 3531/3531 of 3531 | hip_wa 1405/1405 of 1405 | knee_protect 1232/1232 of 1232 | mario 320/320 of 320 | ankle_wa 15/15 of 15
+    e.g. [live] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [live_preHold] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [toasts] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: ["Barbell row in, pendlay row out. Same job, same numbers.","Feet-elevated inverted rows in, barbell row out. No load to add here, so take the sets to the same effort.","Inverted rows (bodyweight) in, feet-elevated inverted rows out. Same job, same numbers."]
+        SCF6OV1: ["Barbell row in, pendlay row out. Same job, same numbers.","Feet-elevated inverted rows in, barbell row out. No load to add here. Your injury plan holds this one at RPE 7.","Inverted rows (bodyweight) in, feet-elevated inverted rows out. Same sets, same reps. Your injury plan holds this one at RPE 7."]
+    e.g. [boot] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [boot_preHold] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6OV1: {"n":"Inverted rows (bodyweight)","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [undo] elbow_wa elbow_wa#0 W3 tue Pendlay row > Barbell row > Feet-elevated inverted rows > Inverted rows (bodyweight)
+        SV229OV1: {"n":"Feet-elevated inverted rows","d":"2 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6OV1: {"n":"Feet-elevated inverted rows","d":"2 sets — RPE 7 (leave 3 or more in reserve)","h":"2 sets — RPE 8 (stop 2 reps short of failure)"}
+  OV5 (overlay from W5 Monday, clock W5 Thursday, the app state of the ruling and of (q))
+
+  CF6 OV5 vs CF6 CFG [W5, spliced]: chains 13323 | differ on live/toast/boot/undo/undo+boot 0 | differ on any field incl. _preHold, ph and whole-day JSON 0 | by field (none)
+    per config elbow_wa 0/0 of 6139 | shoulder_wa 0/0 of 2486 | lowback_wa 0/0 of 2627 | hip_wa 0/0 of 606 | knee_protect 0/0 of 1160 | mario 0/0 of 305 | ankle_wa 0/0 of 0
+
+  V229 OV5 vs CF6 OV5 [W5]: chains 13323 | differ on live/toast/boot/undo/undo+boot 13323 | differ on any field incl. _preHold, ph and whole-day JSON 13323 | by field boot 8489 | bootDay 13323 | boot_preHold 13323 | live 8489 | liveDay 13323 | live_preHold 13323 | ph 13323 | toasts 13323 | undo 10834 | undoBoot 10523 | undoBootDay 12638 | undoBoot_preHold 12638 | undoDay 13323 | undo_preHold 13323
+    per config elbow_wa 6139/6139 of 6139 | shoulder_wa 2486/2486 of 2486 | lowback_wa 2627/2627 of 2627 | hip_wa 606/606 of 606 | knee_protect 1160/1160 of 1160 | mario 305/305 of 305 | ankle_wa 0/0 of 0
+    e.g. [live] elbow_wa elbow_wa#2230 W5 mon Close-grip bench press > Barbell bench press > Decline pushups > Diamond pushups
+        SV229OV5: {"n":"Diamond pushups","d":"3 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6OV5: {"n":"Diamond pushups","d":"3 sets — RPE 7 (leave 3 or more in reserve)","h":"3 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [live_preHold] elbow_wa elbow_wa#2230 W5 mon Close-grip bench press > Barbell bench press > Decline pushups > Diamond pushups
+        SV229OV5: {"n":"Diamond pushups","d":"3 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6OV5: {"n":"Diamond pushups","d":"3 sets — RPE 7 (leave 3 or more in reserve)","h":"3 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [toasts] elbow_wa elbow_wa#2230 W5 mon Close-grip bench press > Barbell bench press > Decline pushups > Diamond pushups
+        SV229OV5: ["Barbell bench press in, close-grip bench press out. Same job, same numbers.","Decline pushups in, barbell bench press out. No load to add here, so take the sets to the same effort.","Diamond pushups in, decline pushups out. Same job, same numbers."]
+        SCF6OV5: ["Barbell bench press in, close-grip bench press out. Same job, same numbers.","Decline pushups in, barbell bench press out. No load to add here. Your injury plan holds this one at RPE 7.","Diamond pushups in, decline pushups out. Same sets, same reps. Your injury plan holds this one at RPE 7."]
+    e.g. [boot] elbow_wa elbow_wa#2230 W5 mon Close-grip bench press > Barbell bench press > Decline pushups > Diamond pushups
+        SV229OV5: {"n":"Diamond pushups","d":"3 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6OV5: {"n":"Diamond pushups","d":"3 sets — RPE 7 (leave 3 or more in reserve)","h":"3 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [boot_preHold] elbow_wa elbow_wa#2230 W5 mon Close-grip bench press > Barbell bench press > Decline pushups > Diamond pushups
+        SV229OV5: {"n":"Diamond pushups","d":"3 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6OV5: {"n":"Diamond pushups","d":"3 sets — RPE 7 (leave 3 or more in reserve)","h":"3 sets — RPE 8 (stop 2 reps short of failure)"}
+    e.g. [undo] elbow_wa elbow_wa#2230 W5 mon Close-grip bench press > Barbell bench press > Decline pushups > Diamond pushups
+        SV229OV5: {"n":"Decline pushups","d":"3 sets — RPE 8 (stop 2 reps short of failure)","h":null}
+        SCF6OV5: {"n":"Decline pushups","d":"3 sets — RPE 7 (leave 3 or more in reserve)","h":"3 sets — RPE 8 (stop 2 reps short of failure)"}
+
+  V229 OV5 vs CF6 OV5 [W3, unspliced]: chains 5257 | differ on live/toast/boot/undo/undo+boot 0 | differ on any field incl. _preHold, ph and whole-day JSON 0 | by field (none)
+    per config elbow_wa 0/0 of 2230 | shoulder_wa 0/0 of 1222 | lowback_wa 0/0 of 904 | hip_wa 0/0 of 799 | knee_protect 0/0 of 72 | mario 0/0 of 15 | ankle_wa 0/0 of 15
+  CF6OV1 chains on a stamped day 18580/18580 (W5 13323/13323)
+  CF6OV5 chains on a stamped day 13323/18580 (W5 13323/13323)
+
+=== [3] (i) chain carry and the hold machinery, per presentation (S chains)
+  CF6CFG1 [all]: chains 18580 | live != boot 487 | chains keeping _preHold at any hop 18580 | ph in record 35949 | hold toasts 39203 | booted slot carries _preHold 18580 | live end on a capped pattern above RPE 7 0
+  CF6OV1 [all]: chains 18580 | live != boot 487 | chains keeping _preHold at any hop 18580 | ph in record 35949 | hold toasts 39203 | booted slot carries _preHold 18580 | live end on a capped pattern above RPE 7 0
+  V229OV1 [all]: chains 18580 | live != boot 487 | chains keeping _preHold at any hop 0 | ph in record 0 | hold toasts 0 | booted slot carries _preHold 0 | live end on a capped pattern above RPE 7 12518
+  CF6CFG [W5]: chains 13323 | live != boot 330 | chains keeping _preHold at any hop 13323 | ph in record 25752 | hold toasts 27592 | booted slot carries _preHold 13323 | live end on a capped pattern above RPE 7 0
+  CF6OV5 [W5]: chains 13323 | live != boot 330 | chains keeping _preHold at any hop 13323 | ph in record 25752 | hold toasts 27592 | booted slot carries _preHold 13323 | live end on a capped pattern above RPE 7 0
+  V229OV5 [W5]: chains 13323 | live != boot 330 | chains keeping _preHold at any hop 0 | ph in record 0 | hold toasts 0 | booted slot carries _preHold 0 | live end on a capped pattern above RPE 7 8489
+  residue ids (live != boot) CF6 OV1 vs CF6 CFG1: both 487, first only 0, second only 0 | CF6 OV5 vs CF6 CFG [W5]: both 330, first only 0, second only 0
+
+=== [3] (i-r) reboot before the last hop
+  CF6CFG1 [all]: chains 18580 | live==boot==in-session end 18093 | live==boot 18093 | rebooted slot carries the kept dose 18580 | unreachable 0
+  CF6OV1 [all]: chains 18580 | live==boot==in-session end 18093 | live==boot 18093 | rebooted slot carries the kept dose 18580 | unreachable 0
+  V229OV1 [all]: chains 18580 | live==boot==in-session end 18093 | live==boot 18093 | rebooted slot carries the kept dose 0 | unreachable 0
+  CF6CFG [W5]: chains 13323 | live==boot==in-session end 12993 | live==boot 12993 | rebooted slot carries the kept dose 13323 | unreachable 0
+  CF6OV5 [W5]: chains 13323 | live==boot==in-session end 12993 | live==boot 12993 | rebooted slot carries the kept dose 13323 | unreachable 0
+  V229OV5 [W5]: chains 13323 | live==boot==in-session end 12993 | live==boot 12993 | rebooted slot carries the kept dose 0 | unreachable 0
+  R equivalence CF6 OV1 vs CF6 CFG1 (rebooted slot incl. _preHold, last-hop live, boot, toasts): differ 0 of 18580
+
+=== [3] (i-u) undo onto a held intermediate then one more hop
+  CF6CFG1 [all]: chains 11096 | live==boot 11096 | live==direct 5228 | undone card carries the kept dose 11096 | undo missed hop 1 0
+  CF6OV1 [all]: chains 11096 | live==boot 11096 | live==direct 5228 | undone card carries the kept dose 11096 | undo missed hop 1 0
+  V229OV1 [all]: chains 11096 | live==boot 11096 | live==direct 5228 | undone card carries the kept dose 0 | undo missed hop 1 0
+  CF6CFG [W5]: chains 8269 | live==boot 8269 | live==direct 4429 | undone card carries the kept dose 8269 | undo missed hop 1 0
+  CF6OV5 [W5]: chains 8269 | live==boot 8269 | live==direct 4429 | undone card carries the kept dose 8269 | undo missed hop 1 0
+  V229OV5 [W5]: chains 8269 | live==boot 8269 | live==direct 4429 | undone card carries the kept dose 0 | undo missed hop 1 0
+  U equivalence CF6 OV1 vs CF6 CFG1 (undone card incl. _preHold, live, boot, direct, toasts): differ 0 of 11096
+
+=== [3] (e) / (e′) / (k″) single-hop rows, L9 (7 injured configs), live + boot
+  STAMP instrument check (synthetic applyOverlays shape == real writer OV1, every day of the 7 L9 configs): 294/294
+  (e) CF6:CFG1     pairs 210 | donor == fixture donor 210 | on a stamped day 0 | live bwsets RPE 8 0 RPE 7 196 | live cue end 14 | boot RPE 8 0 | live==boot 210 | hold toasts 196 (k″ on bwsets ends 196) | "Same job, same numbers." 14 | _preHold live 210 boot 210 | == CF6:CFG1 (live, toast, boot, _preHold) 210/210
+  (e) CF6:OV1      pairs 210 | donor == fixture donor 210 | on a stamped day 210 | live bwsets RPE 8 0 RPE 7 196 | live cue end 14 | boot RPE 8 0 | live==boot 210 | hold toasts 196 (k″ on bwsets ends 196) | "Same job, same numbers." 14 | _preHold live 210 boot 210 | == CF6:CFG1 (live, toast, boot, _preHold) 210/210
+  (e) V229:OV1     pairs 210 | donor == fixture donor 210 | on a stamped day 210 | live bwsets RPE 8 196 RPE 7 0 | live cue end 0 | boot RPE 8 196 | live==boot 210 | hold toasts 0 (k″ on bwsets ends 0) | "Same job, same numbers." 14 | _preHold live 0 boot 0 | == CF6:CFG1 (live, toast, boot, _preHold) 0/210
+  (e) CF6S22:OV1   pairs 210 | donor == fixture donor 210 | on a stamped day 210 | live bwsets RPE 8 0 RPE 7 196 | live cue end 14 | boot RPE 8 0 | live==boot 210 | hold toasts 0 (k″ on bwsets ends 0) | "Same job, same numbers." 14 | _preHold live 210 boot 210 | == CF6:CFG1 (live, toast, boot, _preHold) 14/210
+  (e) CF6S22:CFG1  pairs 210 | donor == fixture donor 210 | on a stamped day 0 | live bwsets RPE 8 0 RPE 7 196 | live cue end 14 | boot RPE 8 0 | live==boot 210 | hold toasts 0 (k″ on bwsets ends 0) | "Same job, same numbers." 14 | _preHold live 210 boot 210 | == CF6:CFG1 (live, toast, boot, _preHold) 14/210
+  (e) V229:CFG1    pairs 210 | donor == fixture donor 210 | on a stamped day 0 | live bwsets RPE 8 0 RPE 7 196 | live cue end 14 | boot RPE 8 0 | live==boot 210 | hold toasts 196 (k″ on bwsets ends 196) | "Same job, same numbers." 14 | _preHold live 210 boot 210 | == CF6:CFG1 (live, toast, boot, _preHold) 210/210
+  (e) CF6:CFG      pairs 72 | donor == fixture donor 72 | on a stamped day 0 | live bwsets RPE 8 0 RPE 7 66 | live cue end 6 | boot RPE 8 0 | live==boot 72 | hold toasts 66 (k″ on bwsets ends 66) | "Same job, same numbers." 6 | _preHold live 72 boot 72 | == CF6:CFG (live, toast, boot, _preHold) 72/72
+  (e) CF6:OV5      pairs 72 | donor == fixture donor 72 | on a stamped day 72 | live bwsets RPE 8 0 RPE 7 66 | live cue end 6 | boot RPE 8 0 | live==boot 72 | hold toasts 66 (k″ on bwsets ends 66) | "Same job, same numbers." 6 | _preHold live 72 boot 72 | == CF6:CFG (live, toast, boot, _preHold) 72/72
+  (e) V229:OV5     pairs 72 | donor == fixture donor 72 | on a stamped day 72 | live bwsets RPE 8 66 RPE 7 0 | live cue end 0 | boot RPE 8 66 | live==boot 72 | hold toasts 0 (k″ on bwsets ends 0) | "Same job, same numbers." 6 | _preHold live 0 boot 0 | == CF6:CFG (live, toast, boot, _preHold) 0/72
+    e.g. moved by CF6 on OV1: elbow_wa W1 tue Barbell row "2×8 — hold RPE 7, three in the tank" -> Feet-elevated inverted rows
+      V229 OV1 "2 sets — RPE 8 (stop 2 reps short of failure)" "Feet-elevated inverted rows in, barbell row out. No load to add here, so take the sets to the same effort."
+      CF6 OV1  "2 sets — RPE 7 (leave 3 or more in reserve)" "Feet-elevated inverted rows in, barbell row out. No load to add here. Your injury plan holds this one at RPE 7."
+  (e′) CF6:CFG1     pairs 114 | donor == fixture donor 114 | on a stamped day 0 | live RPE>7 0 | boot RPE>7 0 | live==boot 114 | hold toasts 114 (k″ on bwsets ends 52) | "Same job, same numbers." 0 | _preHold live 114 boot 114 | == CF6:CFG1 (live, toast, boot, _preHold) 114/114
+  (e′) CF6:OV1      pairs 114 | donor == fixture donor 114 | on a stamped day 114 | live RPE>7 0 | boot RPE>7 0 | live==boot 114 | hold toasts 114 (k″ on bwsets ends 52) | "Same job, same numbers." 0 | _preHold live 114 boot 114 | == CF6:CFG1 (live, toast, boot, _preHold) 114/114
+  (e′) V229:OV1     pairs 114 | donor == fixture donor 114 | on a stamped day 114 | live RPE>7 114 | boot RPE>7 114 | live==boot 114 | hold toasts 0 (k″ on bwsets ends 0) | "Same job, same numbers." 66 | _preHold live 0 boot 0 | == CF6:CFG1 (live, toast, boot, _preHold) 0/114
+  (e′) CF6S22:OV1   pairs 114 | donor == fixture donor 114 | on a stamped day 114 | live RPE>7 0 | boot RPE>7 0 | live==boot 114 | hold toasts 114 (k″ on bwsets ends 52) | "Same job, same numbers." 0 | _preHold live 114 boot 114 | == CF6:CFG1 (live, toast, boot, _preHold) 114/114
+  (e′) CF6S22:CFG1  pairs 114 | donor == fixture donor 114 | on a stamped day 0 | live RPE>7 0 | boot RPE>7 0 | live==boot 114 | hold toasts 114 (k″ on bwsets ends 52) | "Same job, same numbers." 0 | _preHold live 114 boot 114 | == CF6:CFG1 (live, toast, boot, _preHold) 114/114
+  (e′) V229:CFG1    pairs 114 | donor == fixture donor 114 | on a stamped day 0 | live RPE>7 0 | boot RPE>7 0 | live==boot 114 | hold toasts 114 (k″ on bwsets ends 52) | "Same job, same numbers." 0 | _preHold live 114 boot 114 | == CF6:CFG1 (live, toast, boot, _preHold) 114/114
+  (e′) CF6:CFG      pairs 114 | donor == fixture donor 114 | on a stamped day 0 | live RPE>7 0 | boot RPE>7 0 | live==boot 114 | hold toasts 114 (k″ on bwsets ends 52) | "Same job, same numbers." 0 | _preHold live 114 boot 114 | == CF6:CFG (live, toast, boot, _preHold) 114/114
+  (e′) CF6:OV5      pairs 114 | donor == fixture donor 114 | on a stamped day 114 | live RPE>7 0 | boot RPE>7 0 | live==boot 114 | hold toasts 114 (k″ on bwsets ends 52) | "Same job, same numbers." 0 | _preHold live 114 boot 114 | == CF6:CFG (live, toast, boot, _preHold) 114/114
+  (e′) V229:OV5     pairs 114 | donor == fixture donor 114 | on a stamped day 114 | live RPE>7 114 | boot RPE>7 114 | live==boot 114 | hold toasts 0 (k″ on bwsets ends 0) | "Same job, same numbers." 66 | _preHold live 0 boot 0 | == CF6:CFG (live, toast, boot, _preHold) 0/114
+    e.g. moved by CF6 on OV1: elbow_wa W5 mon Cable lateral raise "3×10–15 @ RPE 8" -> Cable pushdown
+      V229 OV1 "3×10–15 @ RPE 8" "Cable pushdown in, cable lateral raise out. Same job, same numbers."
+      CF6 OV1  "3×10–15 @ RPE 7" "Cable pushdown in, cable lateral raise out. Same sets, same reps. Your injury plan holds this one at RPE 7."
+  [5] S22 (R8 trigger keyed on the donor as read, cue counted as RPE 7) on (e), OV1: hold toasts lost 196 of 196 (on bwsets ends, the (k″) set: 196) | cards moved by S22 0
+      same on the fixture (CFG1): hold toasts lost 196 of 196
+      e.g. elbow_wa Barbell row "2×8 — hold RPE 7, three in the tank" -> Feet-elevated inverted rows | CF6 "Feet-elevated inverted rows in, barbell row out. No load to add here. Your injury plan holds this one at RPE 7." | S22 "Feet-elevated inverted rows in, barbell row out. No load to add here, so take the sets to the same effort."
+REPORT DONE
+##### PART dumprep
+rows V228 150068
+rows V227 150068
+rows CF6_CFG 150068
+rows CF6_STAMP 150068
+rows V229_CFG 150068
+rows V229_STAMP 150068
+aligned (where,to by index): CF6_STAMP~CF6_CFG true | V229_CFG~CF6_CFG true | V229_STAMP~CF6_CFG true | V228~CF6_CFG true | V227~CF6_CFG true
+
+=== [4] g221 L1 rows identity
+  CF6 STAMP vs CF6 CFG (the lens on the overlay shape vs the fixture): card differs 0 | toast differs 0 | any 0 of 150068
+  V229 CFG vs CF6 CFG (fixture unchanged by the surgery): card differs 0 | toast differs 0 | any 0 of 150068
+  V229 STAMP vs CF6 STAMP (what CF6 moves on the overlay shape): card differs 1361 | toast differs 1243 | any 1361 of 150068
+      e.g. commercial|support_strength|beginner|event|knee/workaround W5 sat Kettlebell swing -> Step-ups (KB) :: "2×10" | V229_STAMP "2×10" "Step-ups (KB) in, kettlebell swing out. Same job, same numbers." | CF6_STAMP "2×10 — hold RPE 7, three in the tank" "Step-ups (KB) in, kettlebell swing out. Same job, same numbers."
+      e.g. commercial|support_strength|beginner|event|knee/workaround W6 sat Kettlebell swing -> Step-ups (KB) :: "2×10" | V229_STAMP "2×10" "Step-ups (KB) in, kettlebell swing out. Same job, same numbers." | CF6_STAMP "2×10 — hold RPE 7, three in the tank" "Step-ups (KB) in, kettlebell swing out. Same job, same numbers."
+
+=== [3] (k) CF6_CFG: clamp pairs 1243 | toast == hand hold variant 1243 | by variant unloadable 360 | verbatim 684 | window 199 | false same-numbers/effort claims on clamp pairs 0 | hold toasts off the clamp set 0 | non-clamp toasts == V227 148825/148825 | INFO capped (card RPE != donor RPE, claims same, no hold) 458
+    (l) G3a 832 {capped: hold of donor 529 | capped: hold of window 199 | uncapped: beneath-hold verbatim 104} ; G3c_pow 0 {(none)} ; G3c_off 168 {capped: hold of donor 89 | uncapped: beneath-hold verbatim 79} ; G3d 263 {capped: hold of donor 263} ; G3e 202 {capped: hold of donor 177 | uncapped: beneath-hold verbatim 25} ; G3f 199 {capped: hold of window 199}
+    (j) live: rows printing R7 text 127 | R7-donor rows onto uncapped targets printing _testRx 113
+
+=== [3] (k) CF6_STAMP: clamp pairs 1243 | toast == hand hold variant 1243 | by variant unloadable 360 | verbatim 684 | window 199 | false same-numbers/effort claims on clamp pairs 0 | hold toasts off the clamp set 0 | non-clamp toasts == V227 148825/148825 | INFO capped (card RPE != donor RPE, claims same, no hold) 458
+    (l) G3a 832 {capped: hold of donor 529 | capped: hold of window 199 | uncapped: beneath-hold verbatim 104} ; G3c_pow 0 {(none)} ; G3c_off 168 {capped: hold of donor 89 | uncapped: beneath-hold verbatim 79} ; G3d 263 {capped: hold of donor 263} ; G3e 202 {capped: hold of donor 177 | uncapped: beneath-hold verbatim 25} ; G3f 199 {capped: hold of window 199}
+    (j) live: rows printing R7 text 127 | R7-donor rows onto uncapped targets printing _testRx 113
+
+=== [3] (k) V229_STAMP: clamp pairs 1243 | toast == hand hold variant 0 | by variant (none) | false same-numbers/effort claims on clamp pairs 1243 | hold toasts off the clamp set 0 | non-clamp toasts == V227 148825/148825 | INFO capped (card RPE != donor RPE, claims same, no hold) 728
+    (l) G3a 143 {capped OTHER 39 | uncapped: beneath-hold verbatim 104} ; G3c_pow 0 {(none)} ; G3c_off 96 {capped OTHER 17 | uncapped: beneath-hold verbatim 79} ; G3d 0 {(none)} ; G3e 47 {capped OTHER 22 | uncapped: beneath-hold verbatim 25} ; G3f 0 {(none)}
+    (j) live: rows printing R7 text 0 | R7-donor rows onto uncapped targets printing _testRx 113
+
+=== [3] (k) V229_CFG: clamp pairs 1243 | toast == hand hold variant 1243 | by variant unloadable 360 | verbatim 684 | window 199 | false same-numbers/effort claims on clamp pairs 0 | hold toasts off the clamp set 0 | non-clamp toasts == V227 148825/148825 | INFO capped (card RPE != donor RPE, claims same, no hold) 458
+    (l) G3a 832 {capped: hold of donor 529 | capped: hold of window 199 | uncapped: beneath-hold verbatim 104} ; G3c_pow 0 {(none)} ; G3c_off 168 {capped: hold of donor 89 | uncapped: beneath-hold verbatim 79} ; G3d 263 {capped: hold of donor 263} ; G3e 202 {capped: hold of donor 177 | uncapped: beneath-hold verbatim 25} ; G3f 199 {capped: hold of window 199}
+    (j) live: rows printing R7 text 127 | R7-donor rows onto uncapped targets printing _testRx 113
+DUMPREP DONE
+##### PART gatesum
+CF6_230_g221_d177_swapfloor :: PASS 20 FAIL 0
+    SKIP G4a (pair) L1: 0 _pattern-null items differ under _swapDetailFor, candidate vs V220, while Main swap pairs do (RR5): scoped out, candidate 230 is not D177's build pair (221 vs 220)
+    SKIP G4b (pair) L1: Landmine rotations, named no-change under _swapDetailFor, present on the lattice: scoped out, candidate 230 is not D177's build pair (221 vs 220)
+    SKIP G4c (pair) L1: Dumbbell renegade rows, named no-change under _swapDetailFor, present on the lattice: scoped out, candidate 230 is not D177's build pair (221 vs 220)
+    SKIP G7-4 (pair) L2 (seed 51407): 0 engine cards change against V220; V220 equals itself: scoped out, candidate 230 is not D177's build pair (221 vs 220)
+    SKIP G8a (pair) L2: 0 add-path details change against V220: scoped out, candidate 230 is not D177's build pair (221 vs 220)
+    SKIP G9 HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable (no era row): scoped out, candidate 230: a later ruling owns HALF_MANNY (standing ruling 5)
+CF6_230_g221_d178_active :: PASS 46 FAIL 0
+    SKIP Bnp (pair) boot with no pointer (live, empty, no key, all archived): storage, globals, screen, toasts identical to V220: scoped out, candidate 230 is not D178's build pair (221 vs 220)
+    SKIP W2 (pair) wizard landing, 6 goal shapes: screen, currentWeek and showScreen/renderWeekView/renderProgList order identical to V220: scoped out, candidate 230 is not D178's build pair (221 vs 220)
+    SKIP W3 (pair) wizard landing, 6 goal shapes: the loaded program identical to V220 (overlays normalised, blockOpen dropped, clock and id fields stripped): scoped out, candidate 230 is not D178's build pair (221 vs 220)
+    SKIP H1 (pair) archive active P0, next arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 230 is not D178's build pair (221 vs 220)
+    SKIP H2 (pair) delete active P0, next arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 230 is not D178's build pair (221 vs 220)
+    SKIP H3 (pair) archive active P0, null arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 230 is not D178's build pair (221 vs 220)
+    SKIP H4 (pair) delete active P0, null arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 230 is not D178's build pair (221 vs 220)
+    SKIP M1 HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable (no era row): scoped out, candidate 230: a later ruling owns HALF_MANNY (standing ruling 5)
+CF6_230_g221_d179_donenav :: PASS 27 FAIL 0
+    SKIP P1 (pair) the pending week render, every training day as today (70), is byte-identical to V220; V220 equals itself; marked renders differ (comparator live): scoped out, candidate 230 is not D179's build pair (221 vs 220)
+    SKIP P2 (pair) the reopened day body and footer, pending / Done / Skipped (210 opens), are byte-identical to V220 (footer layout and strings unchanged): scoped out, candidate 230 is not D179's build pair (221 vs 220)
+    SKIP G9 HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable (no era row): scoped out, candidate 230: a later ruling owns HALF_MANNY (standing ruling 5)
+CF6_230_g221_d180_blockopen :: PASS 22 FAIL 0
+    SKIP I5 (v) progDigest(buildProgram(HALF_MANNY)) = 0ac7da6b1691a8e1, self-stable (no era row): scoped out, candidate 230: a later ruling owns HALF_MANNY (standing ruling 5)
+    SKIP P1 (pair) refreshProgram lattice: V220 equals itself; non-aligned JSON byte-identical to V220; aligned JSON equals V220 once blockOpen is dropped and differs with it: scoped out, candidate 230 is not D180's build pair (221 vs 220)
+    SKIP P2 (pair) wizard landing W1 render equals V220's landing (the :1964 picture), V220 equal to itself, 46/46: scoped out, candidate 230 is not D180's build pair (221 vs 220)
+    SKIP P3 (pair) the Before column reproduces on V220: W1 and W4 0 /5 DONE, no .pre cell, reminder "More than a week off", scheduledDays 18, 7 of 7 rest days eligible, W1 mon opens: scoped out, candidate 230 is not D180's build pair (221 vs 220)
+CF6_230_g222_d181_chain :: PASS 8 FAIL 0
+      5L licence: REFUSED at ia-version 230 (eras 222, 223, 224, 225, 226 only, standing ruling 2; above the last listed era 226): residue must be 0 until re-ruled
+    PASS row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras 222, 223, 224, 225, 226); every residue row boots equal to the composed-map boot (name!=live 0/5088, detail!=live 0/5088 (licence REFUSED above 226: 0), residue rows unlike the MAP boot 0)
+CF6_230_g222_d181_durable :: PASS 10 FAIL 0
+    INFO candidate V230 snap_at_origin: move candidates mon,tue,thu,fri,sat | swap on Wed Sumo deadlift -> Barbell Romanian deadlift | hist keys w5_tue | swap keys w5_wed
+    INFO candidate V230 snap_at_dest: move candidates mon,tue,thu,fri,sat | swap on Wed Sumo deadlift -> Barbell Romanian deadlift | hist keys w5_wed | swap keys w5_wed
+CF6_230_g227_d190_cuecap :: PASS 7 FAIL 1
+    FAIL row c-MANNY  MANNY_DIGEST_BY_VERSION[227] exists and === [226] by reference; HALF_MANNY on the artifact prints the era row (got [227]===[226], HALF_MANNY 0ac7da6b1691a8e1 != [230])
+CF6_230_g227_d190_prefpath :: PASS 4 FAIL 0
+CF6_230_g227_d190_seam :: PASS 7 FAIL 0
+CF6_230_g228_d192_undokey :: PASS 3 FAIL 1
+    FAIL row d2-MANNY D192 HALF_MANNY digest == era table == 0ac7da6b1691a8e1 == V227, self-stable; swapOriginOf reached 0 times by buildProgram and refreshProgram (counter wired) (got 0ac7da6b1691a8e1, calls 0)
+CF6_230_g228_d193_cueword :: PASS 4 FAIL 0
+    SKIP row b-ONECLASS  every L9, L432 and home_basic build == V227 with ` — hold RPE 7, two in the tank` re-ended `three`, nothing else; uninjured 47 byte-identical; HALF_MANNY on the era row, [228] === [227]: REFUSED at ia-version 230 (era 228 only: "nothing but the word changes" is V228's claim); its successor is D193 (a)/(b), g229_d193_build.js, V229 (tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 (r)). Never PASS, never FAIL.
+CF6_230_g229_d193_build :: PASS 9 FAIL 1
+    FAIL row b         nothing moves but the clamp population: every other card of every injured build byte-identical to V228, > 0 moved; uninjured 133 byte-identical; HALF_MANNY on the era row, [229] === [228]; no _preHold on an uninjured item after a build, two live swaps, a boot replay or an undo (got outside 1053/1053, moved L432 316 HB 120 L1 653; uninjured 133/133; MANNY [229]===[228], 0ac7da6b1691a8e1 != [230]; object row 27/27, _preHold 0)
+CF6_230_g229_d194_lens :: PASS 7 FAIL 1
+    FAIL row q           DORMANCY PIN (VER === 229): on the overlay program a swap onto a held target keeps no dose, records no ph, prints no hold toast; boot keeps none; undo == V228; hand routes U1/U2/RB print "2×6–10 @ RPE 8" everywhere; FIXED-SEED SAMPLE of overlay chains (not the 13,323 + 5,257 lattice) == V228 live/toast/boot/undo/undo+boot; not blind (the fixture keeps the dose) (REFUSED: ia-version 230 is past V229; D194 part 2 must re-key this row)
+CF6_g221_d177_swapfloor :: PASS 20 FAIL 0
+    SKIP G4a (pair) L1: 0 _pattern-null items differ under _swapDetailFor, candidate vs V220, while Main swap pairs do (RR5): scoped out, candidate 229 is not D177's build pair (221 vs 220)
+    SKIP G4b (pair) L1: Landmine rotations, named no-change under _swapDetailFor, present on the lattice: scoped out, candidate 229 is not D177's build pair (221 vs 220)
+    SKIP G4c (pair) L1: Dumbbell renegade rows, named no-change under _swapDetailFor, present on the lattice: scoped out, candidate 229 is not D177's build pair (221 vs 220)
+    SKIP G7-4 (pair) L2 (seed 51407): 0 engine cards change against V220; V220 equals itself: scoped out, candidate 229 is not D177's build pair (221 vs 220)
+    SKIP G8a (pair) L2: 0 add-path details change against V220: scoped out, candidate 229 is not D177's build pair (221 vs 220)
+    SKIP G9 HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable (no era row): scoped out, candidate 229: a later ruling owns HALF_MANNY (standing ruling 5)
+CF6_g221_d178_active :: PASS 46 FAIL 0
+    SKIP Bnp (pair) boot with no pointer (live, empty, no key, all archived): storage, globals, screen, toasts identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP W2 (pair) wizard landing, 6 goal shapes: screen, currentWeek and showScreen/renderWeekView/renderProgList order identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP W3 (pair) wizard landing, 6 goal shapes: the loaded program identical to V220 (overlays normalised, blockOpen dropped, clock and id fields stripped): scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP H1 (pair) archive active P0, next arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP H2 (pair) delete active P0, next arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP H3 (pair) archive active P0, null arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP H4 (pair) delete active P0, null arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP M1 HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable (no era row): scoped out, candidate 229: a later ruling owns HALF_MANNY (standing ruling 5)
+CF6_g221_d179_donenav :: PASS 27 FAIL 0
+    SKIP P1 (pair) the pending week render, every training day as today (70), is byte-identical to V220; V220 equals itself; marked renders differ (comparator live): scoped out, candidate 229 is not D179's build pair (221 vs 220)
+    SKIP P2 (pair) the reopened day body and footer, pending / Done / Skipped (210 opens), are byte-identical to V220 (footer layout and strings unchanged): scoped out, candidate 229 is not D179's build pair (221 vs 220)
+    SKIP G9 HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable (no era row): scoped out, candidate 229: a later ruling owns HALF_MANNY (standing ruling 5)
+CF6_g221_d180_blockopen :: PASS 22 FAIL 0
+    SKIP I5 (v) progDigest(buildProgram(HALF_MANNY)) = 0ac7da6b1691a8e1, self-stable (no era row): scoped out, candidate 229: a later ruling owns HALF_MANNY (standing ruling 5)
+    SKIP P1 (pair) refreshProgram lattice: V220 equals itself; non-aligned JSON byte-identical to V220; aligned JSON equals V220 once blockOpen is dropped and differs with it: scoped out, candidate 229 is not D180's build pair (221 vs 220)
+    SKIP P2 (pair) wizard landing W1 render equals V220's landing (the :1964 picture), V220 equal to itself, 46/46: scoped out, candidate 229 is not D180's build pair (221 vs 220)
+    SKIP P3 (pair) the Before column reproduces on V220: W1 and W4 0 /5 DONE, no .pre cell, reminder "More than a week off", scheduledDays 18, 7 of 7 rest days eligible, W1 mon opens: scoped out, candidate 229 is not D180's build pair (221 vs 220)
+CF6_g222_d181_chain :: PASS 8 FAIL 0
+      5L licence: REFUSED at ia-version 229 (eras 222, 223, 224, 225, 226 only, standing ruling 2; above the last listed era 226): residue must be 0 until re-ruled
+    PASS row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras 222, 223, 224, 225, 226); every residue row boots equal to the composed-map boot (name!=live 0/5088, detail!=live 0/5088 (licence REFUSED above 226: 0), residue rows unlike the MAP boot 0)
+CF6_g222_d181_durable :: PASS 10 FAIL 0
+    INFO candidate V229 snap_at_origin: move candidates mon,tue,thu,fri,sat | swap on Wed Sumo deadlift -> Barbell Romanian deadlift | hist keys w5_tue | swap keys w5_wed
+    INFO candidate V229 snap_at_dest: move candidates mon,tue,thu,fri,sat | swap on Wed Sumo deadlift -> Barbell Romanian deadlift | hist keys w5_wed | swap keys w5_wed
+CF6_g227_d190_cuecap :: PASS 8 FAIL 0
+CF6_g227_d190_prefpath :: PASS 4 FAIL 0
+CF6_g227_d190_seam :: PASS 7 FAIL 0
+CF6_g228_d192_undokey :: PASS 4 FAIL 0
+CF6_g228_d193_cueword :: PASS 4 FAIL 0
+    SKIP row b-ONECLASS  every L9, L432 and home_basic build == V227 with ` — hold RPE 7, two in the tank` re-ended `three`, nothing else; uninjured 47 byte-identical; HALF_MANNY on the era row, [228] === [227]: REFUSED at ia-version 229 (era 228 only: "nothing but the word changes" is V228's claim); its successor is D193 (a)/(b), g229_d193_build.js, V229 (tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 (r)). Never PASS, never FAIL.
+CF6_g229_d193_build :: PASS 10 FAIL 0
+CF6_g229_d194_lens :: PASS 7 FAIL 1
+    FAIL row q           DORMANCY PIN (VER === 229): on the overlay program a swap onto a held target keeps no dose, records no ph, prints no hold toast; boot keeps none; undo == V228; hand routes U1/U2/RB print "2×6–10 @ RPE 8" everywhere; FIXED-SEED SAMPLE of overlay chains (not the 13,323 + 5,257 lattice) == V228 live/toast/boot/undo/undo+boot; not blind (the fixture keeps the dose) (got hand routes MOVED, == V228 false, sample moved 568 of 568 W5 and 544 of 591 W3, kept 568, ph 585, hold toasts 252, booted/undone _preHold 1112; fixture: routes hold as Amendment 1, sample keeps 568 / hold toasts 252 / boot keeps 568)
+V229_g221_d177_swapfloor :: PASS 20 FAIL 0
+    SKIP G4a (pair) L1: 0 _pattern-null items differ under _swapDetailFor, candidate vs V220, while Main swap pairs do (RR5): scoped out, candidate 229 is not D177's build pair (221 vs 220)
+    SKIP G4b (pair) L1: Landmine rotations, named no-change under _swapDetailFor, present on the lattice: scoped out, candidate 229 is not D177's build pair (221 vs 220)
+    SKIP G4c (pair) L1: Dumbbell renegade rows, named no-change under _swapDetailFor, present on the lattice: scoped out, candidate 229 is not D177's build pair (221 vs 220)
+    SKIP G7-4 (pair) L2 (seed 51407): 0 engine cards change against V220; V220 equals itself: scoped out, candidate 229 is not D177's build pair (221 vs 220)
+    SKIP G8a (pair) L2: 0 add-path details change against V220: scoped out, candidate 229 is not D177's build pair (221 vs 220)
+    SKIP G9 HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable (no era row): scoped out, candidate 229: a later ruling owns HALF_MANNY (standing ruling 5)
+V229_g221_d178_active :: PASS 46 FAIL 0
+    SKIP Bnp (pair) boot with no pointer (live, empty, no key, all archived): storage, globals, screen, toasts identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP W2 (pair) wizard landing, 6 goal shapes: screen, currentWeek and showScreen/renderWeekView/renderProgList order identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP W3 (pair) wizard landing, 6 goal shapes: the loaded program identical to V220 (overlays normalised, blockOpen dropped, clock and id fields stripped): scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP H1 (pair) archive active P0, next arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP H2 (pair) delete active P0, next arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP H3 (pair) archive active P0, null arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP H4 (pair) delete active P0, null arm: landing, calls, stored programs and reboot identical to V220: scoped out, candidate 229 is not D178's build pair (221 vs 220)
+    SKIP M1 HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable (no era row): scoped out, candidate 229: a later ruling owns HALF_MANNY (standing ruling 5)
+V229_g221_d179_donenav :: PASS 27 FAIL 0
+    SKIP P1 (pair) the pending week render, every training day as today (70), is byte-identical to V220; V220 equals itself; marked renders differ (comparator live): scoped out, candidate 229 is not D179's build pair (221 vs 220)
+    SKIP P2 (pair) the reopened day body and footer, pending / Done / Skipped (210 opens), are byte-identical to V220 (footer layout and strings unchanged): scoped out, candidate 229 is not D179's build pair (221 vs 220)
+    SKIP G9 HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable (no era row): scoped out, candidate 229: a later ruling owns HALF_MANNY (standing ruling 5)
+V229_g221_d180_blockopen :: PASS 22 FAIL 0
+    SKIP I5 (v) progDigest(buildProgram(HALF_MANNY)) = 0ac7da6b1691a8e1, self-stable (no era row): scoped out, candidate 229: a later ruling owns HALF_MANNY (standing ruling 5)
+    SKIP P1 (pair) refreshProgram lattice: V220 equals itself; non-aligned JSON byte-identical to V220; aligned JSON equals V220 once blockOpen is dropped and differs with it: scoped out, candidate 229 is not D180's build pair (221 vs 220)
+    SKIP P2 (pair) wizard landing W1 render equals V220's landing (the :1964 picture), V220 equal to itself, 46/46: scoped out, candidate 229 is not D180's build pair (221 vs 220)
+    SKIP P3 (pair) the Before column reproduces on V220: W1 and W4 0 /5 DONE, no .pre cell, reminder "More than a week off", scheduledDays 18, 7 of 7 rest days eligible, W1 mon opens: scoped out, candidate 229 is not D180's build pair (221 vs 220)
+V229_g222_d181_chain :: PASS 8 FAIL 0
+      5L licence: REFUSED at ia-version 229 (eras 222, 223, 224, 225, 226 only, standing ruling 2; above the last listed era 226): residue must be 0 until re-ruled
+    PASS row 5L untouched reachable hop2+cyc2: slot name != live 0; slot detail != live within the residue licence (eras 222, 223, 224, 225, 226); every residue row boots equal to the composed-map boot (name!=live 0/5088, detail!=live 0/5088 (licence REFUSED above 226: 0), residue rows unlike the MAP boot 0)
+V229_g222_d181_durable :: PASS 10 FAIL 0
+    INFO candidate V229 snap_at_origin: move candidates mon,tue,thu,fri,sat | swap on Wed Sumo deadlift -> Barbell Romanian deadlift | hist keys w5_tue | swap keys w5_wed
+    INFO candidate V229 snap_at_dest: move candidates mon,tue,thu,fri,sat | swap on Wed Sumo deadlift -> Barbell Romanian deadlift | hist keys w5_wed | swap keys w5_wed
+V229_g227_d190_cuecap :: PASS 8 FAIL 0
+V229_g227_d190_prefpath :: PASS 4 FAIL 0
+V229_g227_d190_seam :: PASS 7 FAIL 0
+V229_g228_d192_undokey :: PASS 4 FAIL 0
+V229_g228_d193_cueword :: PASS 4 FAIL 0
+    SKIP row b-ONECLASS  every L9, L432 and home_basic build == V227 with ` — hold RPE 7, two in the tank` re-ended `three`, nothing else; uninjured 47 byte-identical; HALF_MANNY on the era row, [228] === [227]: REFUSED at ia-version 229 (era 228 only: "nothing but the word changes" is V228's claim); its successor is D193 (a)/(b), g229_d193_build.js, V229 (tests/measure/v229_rulings/d194_injlens_ruling.md Amendment 1 (r)). Never PASS, never FAIL.
+V229_g229_d193_build :: PASS 10 FAIL 0
+V229_g229_d194_lens :: PASS 8 FAIL 0
+##### chains/pairs/dump run logs
+worker U:V229:mario:OV5 142 (638 s)
+jobs done 133 in 638 s
+pairs ankle_wa 0 stamp 42/42 (0 s)
+pairs mario 4 stamp 42/42 (1 s)
+pairs knee_protect 14 stamp 42/42 (2 s)
+pairs hip_wa 28 stamp 42/42 (3 s)
+pairs lowback_wa 70 stamp 42/42 (7 s)
+pairs shoulder_wa 78 stamp 42/42 (8 s)
+pairs elbow_wa 130 stamp 42/42 (11 s)
+jobs done 7 in 11 s
+dump V229:STAMP exit 0 DUMPED 150068 (15 s)
+dump CF6:CFG exit 0 DUMPED 150068 (15 s)
+dump V229:CFG exit 0 DUMPED 150068 (15 s)
+dump CF6:STAMP exit 0 DUMPED 150068 (16 s)
+dumps done
+ALLDONE

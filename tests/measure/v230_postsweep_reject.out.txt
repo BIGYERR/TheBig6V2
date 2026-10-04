@@ -1,0 +1,281 @@
+PREP V229 ia-version 229 sha d854af0a91f88a5d == git 0bec3ec true | V230 ia-version 230 sha 72ac41c8d34034ce
+  tag229.html anchor [bwSweep tag] count 1 line 6900
+  tag229.html anchor [pre-sweep hook] count 1 line 11003
+  tag230.html anchor [bwSweep tag] count 1 line 6900
+  tag230.html anchor [pre-sweep hook] count 1 line 11003
+PREP V230 self-identity 6/6 | TAG230 == V230 (with __bw stripped) 6/6 | 0.3 s
+PREP lattice sizes {"L432":432,"LBW":432,"MARIO":1}
+cells loaded 5191 TAG230/FIX/L432 432 | TAG230/FIX/LBW 432 | V229/FIX/L432 432 | V229/FIX/LBW 432 | V229/OV1/L432 432 | V229/OV1/LBW 432 | V229/OV5/LBW 432 | V230/FIX/L432 432 | V230/FIX/LBW 432 | V230/OV1/L432 432 | V230/OV1/LBW 432 | V230/OV5/LBW 432 | TAG230/FIX/MARIO 1 | V229/FIX/MARIO 1 | V229/OV1/MARIO 1 | V229/OV5/MARIO 1 | V230/FIX/MARIO 1 | V230/OV1/MARIO 1 | V230/OV5/MARIO 1
+
+=== (1) L432 TAG230 fixture: 432 builds, 12960 lifting days | post-sweep rejects 22 cards on 22 days in 11 builds | new items from refilter 0
+  pre-sweep reject count (hook just before bodyweightSweep, injured bodyweight builds) total 54 over 432 builds that reached the hook | shoulder/workaround|bodyweight|beginner|support_strength|sun,wed 1mon:rename:Dumbbell bench press,2mon:rename:Dumbbell bench press,3mon:rename:Dumbbell bench press,4mon:rename:Dumbbell bench press,5mon:rename:Dumbbell bench press,6mon:rename:Dumbbell bench press | shoulder/workaround|bodyweight|beginner|support_athletic|sun,wed 1mon:rename:Dumbbell bench press,2mon:rename:Dumbbell bench press,3mon:rename:Dumbbell bench press,4mon:rename:Dumbbell bench press,5mon:rename:Dumbbell bench press,6mon:rename:Dumbbell bench press | shoulder/workaround|bodyweight|beginner|support_prevention|sun,wed 1mon:rename:Dumbbell bench press,2mon:rename:Dumbbell bench press,3mon:rename:Dumbbell bench press,4mon:rename:Dumbbell bench press,5mon:rename:Dumbbell bench press,6mon:rename:Dumbbell bench press
+  by kind drop 18 | redetail 4
+  by source _bwFallback catch-all/branch (FB<Banded hip thrust) 18 | _bwFallback catch-all/branch (FB<Dumbbell incline press) 4
+  by region/tier ankle/protect 18 | elbow/workaround 4
+  by equipment bodyweight 22
+  by experience advanced 10 | beginner 6 | intermediate 6
+  by focus support_athletic 8 | support_strength 8 | support_prevention 6
+  by rest sun,wed 22
+  by name drop Burpees 18 | redetail Pushups (slow 3s eccentric) 4
+  by section Main (sole item) 18 | accessory (sole item) 4
+  by label Main — Burpees 18 | Chest volume 4
+  by week W3 11 | W4 11
+  by day thu 18 | mon 4
+  by region/tier x name ankle/protect Burpees 18 | elbow/workaround Pushups (slow 3s eccentric) 4
+  V229 OV1: rejects 22 over 12960 pierced lifting days | == TAG fixture set 22/22 (TAG 22)
+  V229 FIX: rejects 22 over 12960 pierced lifting days | == TAG fixture set 22/22 (TAG 22)
+  V230 OV1: rejects 22 over 12960 pierced lifting days | == TAG fixture set 22/22 (TAG 22)
+  V230 FIX: rejects 22 over 12960 pierced lifting days | == TAG fixture set 22/22 (TAG 22)
+
+=== (1) LBW TAG230 fixture: 432 builds, 12960 lifting days | post-sweep rejects 16 cards on 16 days in 8 builds | new items from refilter 0
+  pre-sweep reject count (hook just before bodyweightSweep, injured bodyweight builds) total 108 over 432 builds that reached the hook | shoulder/workaround|bodyweight|beginner|balanced|sun,wed 1mon:rename:Dumbbell bench press,2mon:rename:Dumbbell bench press,3mon:rename:Dumbbell bench press,4mon:rename:Dumbbell bench press,5mon:rename:Dumbbell bench press,6mon:rename:Dumbbell bench press | shoulder/workaround|bodyweight|beginner|balanced|sat,sun 1mon:rename:Dumbbell bench press,2mon:rename:Dumbbell bench press,3mon:rename:Dumbbell bench press,4mon:rename:Dumbbell bench press,5mon:rename:Dumbbell bench press,6mon:rename:Dumbbell bench press | shoulder/workaround|bodyweight|beginner|strength|sun,wed 1mon:rename:Dumbbell bench press,2mon:rename:Dumbbell bench press,3mon:rename:Dumbbell bench press,4mon:rename:Dumbbell bench press,5mon:rename:Dumbbell bench press,6mon:rename:Dumbbell bench press
+  by kind drop 12 | redetail 4
+  by source _bwFallback catch-all/branch (FB<Banded hip thrust) 12 | _bwFallback catch-all/branch (FB<Dumbbell incline press) 4
+  by region/tier ankle/protect 12 | elbow/workaround 4
+  by equipment bodyweight 16
+  by experience advanced 8 | beginner 4 | intermediate 4
+  by focus balanced 16
+  by rest sat,sun 8 | sun,wed 8
+  by name drop Burpees 12 | redetail Pushups (slow 3s eccentric) 4
+  by section Main (sole item) 12 | accessory (sole item) 4
+  by label Main — Burpees 12 | Chest volume 4
+  by week W3 8 | W4 8
+  by day thu 6 | wed 6 | mon 4
+  by region/tier x name ankle/protect Burpees 12 | elbow/workaround Pushups (slow 3s eccentric) 4
+  V229 OV1: rejects 16 over 12960 pierced lifting days | == TAG fixture set 16/16 (TAG 16)
+  V229 FIX: rejects 16 over 12960 pierced lifting days | == TAG fixture set 16/16 (TAG 16)
+  V229 OV5: rejects 0 over 4320 pierced lifting days | == TAG fixture set 0/0 (TAG 0)
+  V230 OV1: rejects 16 over 12960 pierced lifting days | == TAG fixture set 16/16 (TAG 16)
+  V230 FIX: rejects 16 over 12960 pierced lifting days | == TAG fixture set 16/16 (TAG 16)
+  V230 OV5: rejects 0 over 4320 pierced lifting days | == TAG fixture set 0/0 (TAG 0)
+
+=== (1) MARIO TAG230 fixture: 1 builds, 30 lifting days | post-sweep rejects 0 cards on 0 days in 0 builds | new items from refilter 0
+  pre-sweep reject count (hook just before bodyweightSweep, injured bodyweight builds) total 0 over 1 builds that reached the hook
+
+=== (2) L432 V229 OV1 | reject-day swaps tried 144 landed 88 (skipped 56: no candidate 56)
+   boot != live 0/88 (names differ 0) | boot == hand (live minus rejects) 18/88 | boot names == live 88
+   on 0 of 22 reject days | per day: swaps-that-drop / swaps 0/4 18 | 0/3 2 | 0/5 2
+   reboot (no new tap) == first boot 88/88 | undo: errors 0, live after undo == built day 88/88, undo+boot == undo live 88/88, undo+boot names == built 88/88
+   (3) live tap: other cards moved at the tap 0/88 | reject card gone from live at the tap 0/88 | choice landed elsewhere 0
+   control (days with no reject): swaps 5184 landed 4198 | boot != live 0/4198 | reboot == boot 4198 | undo+boot == undo live 4198 | other cards moved at tap 0
+
+=== (2) L432 V230 OV1 | reject-day swaps tried 144 landed 88 (skipped 56: no candidate 56)
+   boot != live 88/88 (names differ 70) | boot == hand (live minus rejects) 88/88 | boot names == live 18
+   on 22 of 22 reject days | per day: swaps-that-drop / swaps 4/4 18 | 3/3 2 | 5/5 2
+   reboot (no new tap) == first boot 88/88 | undo: errors 0, live after undo == built day 88/88, undo+boot == undo live 88/88, undo+boot names == built 88/88
+   among drops: sections live>boot 6>5 32 | 4>3 24 | 5>5 18 | 5>4 14 | Main sections live>boot 1>0 70 | 1>1 18 | empty sections at boot 0 | by reject drop:Burpees 70 | redetail:Pushups (slow 3s eccentric) 18
+   (3) live tap: other cards moved at the tap 0/88 | reject card gone from live at the tap 0/88 | choice landed elsewhere 0
+   control (days with no reject): swaps 5184 landed 4198 | boot != live 0/4198 | reboot == boot 4198 | undo+boot == undo live 4198 | other cards moved at tap 0
+
+=== (2) L432 V229 FIX | reject-day swaps tried 144 landed 88 (skipped 56: no candidate 56)
+   boot != live 88/88 (names differ 70) | boot == hand (live minus rejects) 88/88 | boot names == live 18
+   on 22 of 22 reject days | per day: swaps-that-drop / swaps 4/4 18 | 3/3 2 | 5/5 2
+   reboot (no new tap) == first boot 88/88 | undo: errors 0, live after undo == built day 88/88, undo+boot == undo live 88/88, undo+boot names == built 88/88
+   among drops: sections live>boot 6>5 32 | 4>3 24 | 5>5 18 | 5>4 14 | Main sections live>boot 1>0 70 | 1>1 18 | empty sections at boot 0 | by reject drop:Burpees 70 | redetail:Pushups (slow 3s eccentric) 18
+   (3) live tap: other cards moved at the tap 0/88 | reject card gone from live at the tap 0/88 | choice landed elsewhere 0
+   control (days with no reject): swaps 5184 landed 4198 | boot != live 0/4198 | reboot == boot 4198 | undo+boot == undo live 4198 | other cards moved at tap 0
+
+=== (2) L432 V230 FIX | reject-day swaps tried 144 landed 88 (skipped 56: no candidate 56)
+   boot != live 88/88 (names differ 70) | boot == hand (live minus rejects) 88/88 | boot names == live 18
+   on 22 of 22 reject days | per day: swaps-that-drop / swaps 4/4 18 | 3/3 2 | 5/5 2
+   reboot (no new tap) == first boot 88/88 | undo: errors 0, live after undo == built day 88/88, undo+boot == undo live 88/88, undo+boot names == built 88/88
+   among drops: sections live>boot 6>5 32 | 4>3 24 | 5>5 18 | 5>4 14 | Main sections live>boot 1>0 70 | 1>1 18 | empty sections at boot 0 | by reject drop:Burpees 70 | redetail:Pushups (slow 3s eccentric) 18
+   (3) live tap: other cards moved at the tap 0/88 | reject card gone from live at the tap 0/88 | choice landed elsewhere 0
+   control (days with no reject): swaps 5184 landed 4198 | boot != live 0/4198 | reboot == boot 4198 | undo+boot == undo live 4198 | other cards moved at tap 0
+
+=== (2) LBW V229 OV1 | reject-day swaps tried 100 landed 62 (skipped 38: no candidate 38)
+   boot != live 0/62 (names differ 0) | boot == hand (live minus rejects) 18/62 | boot names == live 62
+   on 0 of 16 reject days | per day: swaps-that-drop / swaps 0/4 10 | 0/3 4 | 0/5 2
+   reboot (no new tap) == first boot 62/62 | undo: errors 0, live after undo == built day 62/62, undo+boot == undo live 62/62, undo+boot names == built 62/62
+   (3) live tap: other cards moved at the tap 0/62 | reject card gone from live at the tap 0/62 | choice landed elsewhere 0
+   control (days with no reject): swaps 5184 landed 4248 | boot != live 0/4248 | reboot == boot 4248 | undo+boot == undo live 4248 | other cards moved at tap 0
+
+=== (2) LBW V230 OV1 | reject-day swaps tried 100 landed 62 (skipped 38: no candidate 38)
+   boot != live 62/62 (names differ 44) | boot == hand (live minus rejects) 62/62 | boot names == live 18
+   on 16 of 16 reject days | per day: swaps-that-drop / swaps 4/4 10 | 3/3 4 | 5/5 2
+   reboot (no new tap) == first boot 62/62 | undo: errors 0, live after undo == built day 62/62, undo+boot == undo live 62/62, undo+boot names == built 62/62
+   among drops: sections live>boot 6>5 32 | 5>5 18 | 5>4 12 | Main sections live>boot 1>0 44 | 1>1 18 | empty sections at boot 0 | by reject drop:Burpees 44 | redetail:Pushups (slow 3s eccentric) 18
+   (3) live tap: other cards moved at the tap 0/62 | reject card gone from live at the tap 0/62 | choice landed elsewhere 0
+   control (days with no reject): swaps 5184 landed 4248 | boot != live 0/4248 | reboot == boot 4248 | undo+boot == undo live 4248 | other cards moved at tap 0
+
+=== (2) LBW V229 FIX | reject-day swaps tried 100 landed 62 (skipped 38: no candidate 38)
+   boot != live 62/62 (names differ 44) | boot == hand (live minus rejects) 62/62 | boot names == live 18
+   on 16 of 16 reject days | per day: swaps-that-drop / swaps 4/4 10 | 3/3 4 | 5/5 2
+   reboot (no new tap) == first boot 62/62 | undo: errors 0, live after undo == built day 62/62, undo+boot == undo live 62/62, undo+boot names == built 62/62
+   among drops: sections live>boot 6>5 32 | 5>5 18 | 5>4 12 | Main sections live>boot 1>0 44 | 1>1 18 | empty sections at boot 0 | by reject drop:Burpees 44 | redetail:Pushups (slow 3s eccentric) 18
+   (3) live tap: other cards moved at the tap 0/62 | reject card gone from live at the tap 0/62 | choice landed elsewhere 0
+   control (days with no reject): swaps 5184 landed 4248 | boot != live 0/4248 | reboot == boot 4248 | undo+boot == undo live 4248 | other cards moved at tap 0
+
+=== (2) LBW V230 FIX | reject-day swaps tried 100 landed 62 (skipped 38: no candidate 38)
+   boot != live 62/62 (names differ 44) | boot == hand (live minus rejects) 62/62 | boot names == live 18
+   on 16 of 16 reject days | per day: swaps-that-drop / swaps 4/4 10 | 3/3 4 | 5/5 2
+   reboot (no new tap) == first boot 62/62 | undo: errors 0, live after undo == built day 62/62, undo+boot == undo live 62/62, undo+boot names == built 62/62
+   among drops: sections live>boot 6>5 32 | 5>5 18 | 5>4 12 | Main sections live>boot 1>0 44 | 1>1 18 | empty sections at boot 0 | by reject drop:Burpees 44 | redetail:Pushups (slow 3s eccentric) 18
+   (3) live tap: other cards moved at the tap 0/62 | reject card gone from live at the tap 0/62 | choice landed elsewhere 0
+   control (days with no reject): swaps 5184 landed 4248 | boot != live 0/4248 | reboot == boot 4248 | undo+boot == undo live 4248 | other cards moved at tap 0
+
+=== (2) LBW V229 OV5 | reject-day swaps tried 0 landed 0 (skipped 0: (none))
+   control (days with no reject): swaps 4320 landed 3506 | boot != live 0/3506 | reboot == boot 3506 | undo+boot == undo live 3506 | other cards moved at tap 0
+
+=== (2) LBW V230 OV5 | reject-day swaps tried 0 landed 0 (skipped 0: (none))
+   control (days with no reject): swaps 4320 landed 3506 | boot != live 0/3506 | reboot == boot 3506 | undo+boot == undo live 3506 | other cards moved at tap 0
+
+=== (2) MARIO V229 OV1 | reject-day swaps tried 0 landed 0 (skipped 0: (none))
+   control (days with no reject): swaps 12 landed 11 | boot != live 0/11 | reboot == boot 11 | undo+boot == undo live 11 | other cards moved at tap 0
+
+=== (2) MARIO V230 OV1 | reject-day swaps tried 0 landed 0 (skipped 0: (none))
+   control (days with no reject): swaps 12 landed 11 | boot != live 0/11 | reboot == boot 11 | undo+boot == undo live 11 | other cards moved at tap 0
+
+=== (2) MARIO V229 FIX | reject-day swaps tried 0 landed 0 (skipped 0: (none))
+   control (days with no reject): swaps 12 landed 11 | boot != live 0/11 | reboot == boot 11 | undo+boot == undo live 11 | other cards moved at tap 0
+
+=== (2) MARIO V230 FIX | reject-day swaps tried 0 landed 0 (skipped 0: (none))
+   control (days with no reject): swaps 12 landed 11 | boot != live 0/11 | reboot == boot 11 | undo+boot == undo live 11 | other cards moved at tap 0
+
+=== (2) MARIO V229 OV5 | reject-day swaps tried 0 landed 0 (skipped 0: (none))
+   control (days with no reject): swaps 10 landed 8 | boot != live 0/8 | reboot == boot 8 | undo+boot == undo live 8 | other cards moved at tap 0
+
+=== (2) MARIO V230 OV5 | reject-day swaps tried 0 landed 0 (skipped 0: (none))
+   control (days with no reject): swaps 10 landed 8 | boot != live 0/8 | reboot == boot 8 | undo+boot == undo live 8 | other cards moved at tap 0
+
+(2) MAIN example V230 OV1 ankle/protect|bodyweight|beginner|support_strength|sun,wed W3 thu swap Single-leg glute bridge -> Nordic hamstring curl (anchored)
+   built:
+      Main — Burpees: Burpees
+      Leg superset A: Single-leg glute bridge
+      Knee stability: Single-leg wall sit
+      Leg superset B: Bodyweight back extension
+      Leg isolation: Single-leg hip thrust
+      Hip stability: Fire hydrants + Standing hip abduction + Hip 90/90 stretch
+   live:
+      Main — Burpees: Burpees
+      Leg superset A: Nordic hamstring curl (anchored)
+      Knee stability: Single-leg wall sit
+      Leg superset B: Bodyweight back extension
+      Leg isolation: Single-leg hip thrust
+      Hip stability: Fire hydrants + Standing hip abduction + Hip 90/90 stretch
+   boot:
+      Leg superset A: Nordic hamstring curl (anchored)
+      Knee stability: Single-leg wall sit
+      Leg superset B: Bodyweight back extension
+      Leg isolation: Single-leg hip thrust
+      Hip stability: Fire hydrants + Standing hip abduction + Hip 90/90 stretch
+   undoBoot:
+      Main — Burpees: Burpees
+      Leg superset A: Single-leg glute bridge
+      Knee stability: Single-leg wall sit
+      Leg superset B: Bodyweight back extension
+      Leg isolation: Single-leg hip thrust
+      Hip stability: Fire hydrants + Standing hip abduction + Hip 90/90 stretch
+
+(2) ACCESSORY/OTHER example V230 OV1 elbow/workaround|bodyweight|advanced|support_strength|sun,wed W3 mon swap Archer pushups -> Close-grip pushups
+   built:
+      Main — Archer pushups: Archer pushups
+      Secondary compound — Decline pushups (feet elevated): Decline pushups (feet elevated)
+      Chest volume: Pushups (slow 3s eccentric)
+      Delts: Wall slides
+      : Side plank + Plank shoulder taps
+   live:
+      Main — Close-grip pushups: Close-grip pushups
+      Secondary compound — Decline pushups (feet elevated): Decline pushups (feet elevated)
+      Chest volume: Pushups (slow 3s eccentric)
+      Delts: Wall slides
+      : Side plank + Plank shoulder taps
+   boot:
+      Main — Close-grip pushups: Close-grip pushups
+      Secondary compound — Decline pushups (feet elevated): Decline pushups (feet elevated)
+      Chest volume: Pushups (slow 3s eccentric)
+      Delts: Wall slides
+      : Side plank + Plank shoulder taps
+   undoBoot:
+      Main — Archer pushups: Archer pushups
+      Secondary compound — Decline pushups (feet elevated): Decline pushups (feet elevated)
+      Chest volume: Pushups (slow 3s eccentric)
+      Delts: Wall slides
+      : Side plank + Plank shoulder taps
+
+[6] V230 comment-stripped `.injury = (assignment)`: 0 lines
+
+[6] V230 comment-stripped `injury: (object key)`: 8 lines
+   9995 [_dayPlanCfg] return Object.assign({},base,{injury:ov.patch.injury});
+   15319 [paceShiftMap] const P=injuryPlan({injury:{region:inj.region,tier:inj.tier}});
+   15471 [overlayBackCopy] const OVERLAY_TYPE_LABEL={substitute:'TRAVEL',injury:'INJURY',reduce:'LESS TIME',suspend:'SUSPENDED'};
+   15713 [applyInjuryDraft] const ov={id:'ov_'+Date.now(),type:'injury',from,to:null,patch:{injury:{region:R,tier:T}},note:'',created:Date.now()};
+   15735 [imBackFromInjury] patch:{injury:{region,tier:'workaround',bridge:true}},note:'',created:Date.now()});
+   15740 [imBackFromInjury] const _pw=injuryPlan({injury:{region,tier:'workaround'}});
+   15741 [imBackFromInjury] const _pp=injuryPlan({injury:{region,tier:'protect'}});
+   15746 [imBackFromInjury] patch:{injury:{region,tier:'workaround',halfstep:true}},note:'',created:Date.now()+1});
+
+[6] V230 comment-stripped `['injury'] / "injury" key`: 0 lines
+
+[6] V230 comment-stripped `delete .injury`: 0 lines
+
+[6] V230 comment-stripped `Object.assign(...cfg...) with injury`: 1 lines
+   9995 [_dayPlanCfg] return Object.assign({},base,{injury:ov.patch.injury});
+[6b] bare `injury` tokens 36
+  166 [?] .phase-pill--injury{background:transparent;color:var(--red);border-color:var(--red);}
+  196 [?] .is-injury-week .wk-topbar{background:rgba(158,51,40,0.07);border-bottom-color:rgba(158,51,40,0.22);box-shadow:inset 0 3px 0 0 var(--red);}
+  197 [?] .is-injury-week .wk-subrow{background:rgba(158,51,40,0.07);border-bottom-color:rgba(158,51,40,0.22);}
+  198 [?] .is-injury-week .day-card:not(.rest){border-left:3px solid var(--red);}
+  1011 [?] <button class="hurt-btn" id="hurtBtn" onclick="openInjurySheet()" aria-label="Report or manage an injury">
+  2982 [renderWizardStep] ? 'Your <b>' + _floorReason + '</b> goal needs at least <b>' + _minDays + ' training days a week</b> to build the volume safely and avoid injury. To add more rest, ease your goal or pick a shorter distance.'
+  6739 [_powerAllowed] function _powerAllowed(name, experience, injury, ageBracket){
+  6746 [_powerAllowed] if(injury && injury.tier==='protect') return false;
+  6747 [_powerAllowed] if(injury && injury.tier==='workaround' && c > 0.5) return false;
+  7879 [injurySweepCardio] s.note='Hard running is parked while this heals. Easy volume keeps the engine without poking the injury.';
+  7887 [injurySweepCardio] wk[d]={type:alt,subtype:'Cross-Train',detail:(alt==='bike'?'Easy spin, ':'Easy swim, ')+mins+' minutes at 5 to 6 out of 10. Holds your aerobic base while the injury heals.',note:'Impact is off the table for now. Same slot, same engine, different tool.',week:s.
+  8097 [_injViewName] const INJ_HELD_TEST='Work up to one working set of 3 to 5 reps at RPE 7. Technique stays crisp. No grinding. Log the weight and the reps. Your injury plan holds this lift, so there is no new baseline here.';
+  8102 [_stripCapCue] function _stripCapCue(d){ if(typeof d!=='string') return d; if(/^Work up to one working set of 3 to 5 reps at RPE [\d.]+\. Technique stays crisp\. No grinding\. Log the weight and the reps\. Your injury plan holds this lift, so there is no new baseline here\.$
+  9994 [_dayPlanCfg] if(!ov||!ov.patch||!Object.prototype.hasOwnProperty.call(ov.patch,'injury')) return base;
+  11642 [calcCurrentWeek] "Never bounce a stretch. Ballistic, jerky movement trips the stretch reflex and risks injury while doing nothing for flexibility.",
+  11646 [calcCurrentWeek] "Take a stretch to mild tightness and hold — never to pain. Balanced with strength work, the injury risk is negligible.",
+  11985 [renderWeekView] const _injOv=activeProg.overlays.find(ov=>_live(ov)&&ov.type==='injury'&&ov.patch&&ov.patch.injury);
+  12000 [renderWeekView] _pill.classList.add('phase-pill--injury');
+  12015 [renderWeekView] if(!_injWk) _pill.classList.remove('phase-pill--injury');
+  12022 [renderWeekView] if(_wkScreen) _wkScreen.classList.toggle('is-injury-week', !!_injWk);
+  14368 [applySwapChoice] ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'. Your injury plan holds this one at RPE 7.'
+  14370 [applySwapChoice] ? to+' in, '+from.toLowerCase()+' out. No load to add here. Your injury plan holds this one at RPE 7.'
+  14371 [applySwapChoice] : to+' in, '+from.toLowerCase()+' out. Same sets, same reps. Your injury plan holds this one at RPE 7.')
+  15316 [paceShiftMap] if(!ov||ov.type!=='injury'||!ov.patch||!ov.patch.injury) return;
+  15366 [applyOverlays] if(!ov || (ov.type!=='substitute' && ov.type!=='injury') || !ov.patch) return;
+  15487 [renderOverlayChip] const _isInj=!!(ov.type==='injury'&&ov.patch&&ov.patch.injury);
+  15569 [openInjurySheet] _ovDraft.type='injury';
+  15570 [openInjurySheet] _ovDraft.tab='injury';
+  15581 [_liveInjuryOverlay] if(!ov||ov.type!=='injury'||!ov.patch||!ov.patch.injury||ov.patch.injury.bridge) return false;
+  15591 [renderOverlaySheet] const inj=(_ovDraft.tab||'travel')==='injury';
+  15712 [applyInjuryDraft] if(!overlayWeekRange(activeProg,{type:'injury',from,to:null,patch:{}},activeProg.totalWeeks||0)){showToast('That date falls outside your program');return;}
+  15713 [applyInjuryDraft] const ov={id:'ov_'+Date.now(),type:'injury',from,to:null,patch:{injury:{region:R,tier:T}},note:'',created:Date.now()};
+  15734 [imBackFromInjury] activeProg.overlays.push({id:'ov_'+Date.now(),type:'injury',from:today,to:_addDaysIso(today,6),
+  15745 [imBackFromInjury] activeProg.overlays.push({id:'ov_'+(Date.now()+1),type:'injury',from:_addDaysIso(today,7),to:_addDaysIso(today,13),
+  15752 [imBackFromInjury] const lbl=(INJURY_REGIONS[region]||{}).label||'injury';
+  16013 [refreshProgram] .filter(ov => ov && ov.type==='injury' && ov.patch && ov.patch.injury)
+[6b] ia_programs writers 19
+  1417 [applyRestMove] if(i>=0){ progs[i].weeks=activeProg.weeks; savePrograms(progs); }
+  7592 [doGenerate] programs.push(prog);savePrograms(programs);
+  14006 [saveTestMax] savePrograms(programs);
+  14548 [acceptSwapNudge] savePrograms(programs);
+  14735 [setProgRace] if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
+  14769 [setProgStart] if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
+  15069 [commitGoalChange] savePrograms(programs);
+  15149 [commitMileChange] savePrograms(programs);
+  15531 [removeOverlay] if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
+  15717 [applyInjuryDraft] if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
+  15749 [imBackFromInjury] if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
+  15815 [_saveOverlays] if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
+  15831 [applyOverlayDraft] if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
+  15848 [refreshProgram] try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,seed:prog.seed}; savePrograms(_ps); } }catch(e){}
+  15864 [refreshProgram] try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,_testWeek:prog.cfg._testWeek,_raceDateCappedWeeks:prog.cfg._raceDateCappedWeeks};
+  16125 [commitRename] p.name=nn;savePrograms(programs);
+  16151 [archiveProg] p.archived=true;p.archivedAt=Date.now();savePrograms(programs);
+  16159 [unarchiveProg] delete p.archived;delete p.archivedAt;savePrograms(programs);
+  16171 [deleteProg] programs=programs.filter(p=>p.id!==id);savePrograms(programs);
+[6b] WD (doGenerate cfg = buildProgram(WD)) writers 2
+  2065 [_applyWizardStart] let WD = {
+  2185 [startWizard] WD = {
+elbow/workaround|bodyweight|advanced|support_strength|sun,wed W3mon "4 sets — RPE 8 (stop 2 reps short of failure)" => "4 sets — RPE 7 (leave 3 or more in reserve)"
+elbow/workaround|bodyweight|advanced|support_strength|sun,wed W4mon "4 sets — RPE 8 (stop 2 reps short of failure)" => "4 sets — RPE 7 (leave 3 or more in reserve)"
+elbow/workaround|bodyweight|advanced|support_athletic|sun,wed W3mon "4 sets — RPE 8 (stop 2 reps short of failure)" => "4 sets — RPE 7 (leave 3 or more in reserve)"
+elbow/workaround|bodyweight|advanced|support_athletic|sun,wed W4mon "4 sets — RPE 8 (stop 2 reps short of failure)" => "4 sets — RPE 7 (leave 3 or more in reserve)"
+elbow/workaround|bodyweight|advanced|balanced|sun,wed W3mon "4 sets — RPE 8 (stop 2 reps short of failure)" => "4 sets — RPE 7 (leave 3 or more in reserve)"
+elbow/workaround|bodyweight|advanced|balanced|sun,wed W4mon "4 sets — RPE 8 (stop 2 reps short of failure)" => "4 sets — RPE 7 (leave 3 or more in reserve)"
+elbow/workaround|bodyweight|advanced|balanced|sat,sun W3mon "4 sets — RPE 8 (stop 2 reps short of failure)" => "4 sets — RPE 7 (leave 3 or more in reserve)"
+elbow/workaround|bodyweight|advanced|balanced|sat,sun W4mon "4 sets — RPE 8 (stop 2 reps short of failure)" => "4 sets — RPE 7 (leave 3 or more in reserve)"

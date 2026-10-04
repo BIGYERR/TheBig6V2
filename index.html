@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="229"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="230"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -10355,10 +10355,10 @@ function applySessionSwaps(prog,store){
       if(applySwapPrefs(day.sections,m1)) hit=true;
       _was.forEach(it=>{ if(it.name!==e.from&&_renamed.indexOf(it)<0) _renamed.push(it); });
     });
-    if(hit && prog.cfg && prog.cfg.injury){
+    if(hit && _dayPlanCfg(prog,day).injury){
       // the pre-filter replay result rides beside each renamed item; the filter copies item fields through
       _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });
-      day.sections=applyInjuryFilter(day.sections,prog.cfg);
+      day.sections=applyInjuryFilter(day.sections,_dayPlanCfg(prog,day));
     }
   });
 }
@@ -14344,10 +14344,10 @@ function applySwapChoice(to){
   // card (never printed, never in a sheet row, a digest or a toast), and _held says the plan's clamp changed the RPE of the
   // dose it was handed. Nothing is kept on an uninjured program: the card is its own beneath.
   const _preF=item.detail; let _held=false;
-  if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){
+  if(activeProg&&_dayPlanCfg(activeProg,day).injury){
     item._preHold=_preF;
     try{
-      const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],activeProg.cfg);
+      const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],_dayPlanCfg(activeProg,day));
       const _fi=_fs&&_fs[0]&&_fs[0].items&&_fs[0].items[0];
       if(_fi&&_fi.name===to){ _held=(/RPE/.test(_preF)&&_fi.detail!==_preF); item.detail=_fi.detail; }
     }catch(e){}

@@ -1,10 +1,10 @@
 [
  {
   "name": "S18-D194 A1 -> the boot replay keeps no dose: the _renamed stamp inside the injury guard is dropped",
-  "anchor": "      _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });\n      day.sections=applyInjuryFilter(day.sections,prog.cfg);\n",
-  "replacement": "      day.sections=applyInjuryFilter(day.sections,prog.cfg);\n",
+  "anchor": "      _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });\n      day.sections=applyInjuryFilter(day.sections,_dayPlanCfg(prog,day));\n",
+  "replacement": "      day.sections=applyInjuryFilter(day.sections,_dayPlanCfg(prog,day));\n",
   "gate": "gates/g228_d192_undokey.js",
-  "note": "NAMED TRIP: row d2-BOOT-U (tests/measure/v229_rulings/d194_injlens_ruling.md, Amendment 1 Sabotage S18: upper bound 1,378 of 1,587 with neither half; figure read on the run): after undo a fresh boot of the day no longer equals the live day on the fixture. Also trips g229_d194_lens q (fixture conjunct: the mario RB reboot slot loses _preHold \"2×6–10 @ RPE 8\"). EXPECTED: d2-BOOT-U (printed by builder at V229: residue 1,282 of 1,587, inside the ruled bound). GUARD also reads FAIL on this mutant (projected hop5 created 7, walk+hop4 0); it is a side trip, not the named one (Amendment 2 Sabotage)."
+  "note": "NAMED TRIP: row d2-BOOT-U (tests/measure/v229_rulings/d194_injlens_ruling.md, Amendment 1 Sabotage S18: upper bound 1,378 of 1,587 with neither half; figure read on the run): after undo a fresh boot of the day no longer equals the live day on the fixture. Also trips g229_d194_lens q (fixture conjunct: the mario RB reboot slot loses _preHold \"2×6–10 @ RPE 8\"). EXPECTED: d2-BOOT-U (printed by builder at V229: residue 1,282 of 1,587, inside the ruled bound). GUARD also reads FAIL on this mutant (projected hop5 created 7, walk+hop4 0); it is a side trip, not the named one (Amendment 2 Sabotage). (re-anchored at V230: D194 part 2 moved the guard / filter cfg onto _dayPlanCfg)"
  },
  {
   "name": "S19-D194 A1 -> undo always deletes the kept dose, never restores ph from the record",
@@ -29,10 +29,10 @@
  },
  {
   "name": "S21-D194 A1 -> the tap keeps a dose on an uninjured program: the keep is written outside the cfg.injury guard",
-  "anchor": "  if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){\n    item._preHold=_preF;\n",
-  "replacement": "  item._preHold=_preF;\n  if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){\n",
+  "anchor": "  if(activeProg&&_dayPlanCfg(activeProg,day).injury){\n    item._preHold=_preF;\n",
+  "replacement": "  item._preHold=_preF;\n  if(activeProg&&_dayPlanCfg(activeProg,day).injury){\n",
   "gate": "gates/g229_d193_build.js",
-  "note": "NAMED TRIP: row b (tests/measure/v229_rulings/d194_injlens_ruling.md, Amendment 1 Sabotage S21 and the (b) addition: no _preHold on an uninjured item after a build, two live swaps, a boot replay or an undo; object row V228 byte-identical): the uninjured hops carry _preHold. No figure ruled; read on the run. Also g229_d194_lens q (the overlay tap keeps a dose). EXPECTED: b (printed by builder at V229: object row 0 of 27 slots equal V228, _preHold 83 after hops/boot/undo, ph 27 in records)."
+  "note": "NAMED TRIP: row b (tests/measure/v229_rulings/d194_injlens_ruling.md, Amendment 1 Sabotage S21 and the (b) addition: no _preHold on an uninjured item after a build, two live swaps, a boot replay or an undo; object row V228 byte-identical): the uninjured hops carry _preHold. No figure ruled; read on the run. Also g229_d194_lens q (the overlay tap keeps a dose). EXPECTED: b (printed by builder at V229: object row 0 of 27 slots equal V228, _preHold 83 after hops/boot/undo, ph 27 in records). (re-anchored at V230: D194 part 2 moved the guard / filter cfg onto _dayPlanCfg)"
  },
  {
   "name": "S23-D194 -> the lens helper returns prog.cfg regardless of the day",
@@ -63,13 +63,6 @@
   "note": "NAMED TRIP: row p-ADD (tests/measure/v229_rulings/d194_injlens_ruling.md, D194 Sabotage S24c: (p) by list; Amendment 1 (p): add 2,104 of 19,380): 2,104 of 19,380, day pickers 1,120 of 1,440. Also p-MARIO add 5 of 79, p-UNSTAMPED, p-BRIDGE. EXPECTED: p-ADD, p-MARIO, p-UNSTAMPED, p-BRIDGE; o, p-SWAP, p-AUX, q stay green (printed by builder at V229: 2,104 / 1,120; add 5 of 79; thu/fri/sat 1/1/1; bridge 5 of 387)."
  },
  {
-  "name": "S25-D194 -> the tap guard and its filter cfg read the lens (premature activation of D194 part 2)",
-  "anchor": "  if(activeProg&&activeProg.cfg&&activeProg.cfg.injury){\n    item._preHold=_preF;\n    try{\n      const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],activeProg.cfg);\n",
-  "replacement": "  if(_dayPlanCfg(activeProg,day).injury){\n    item._preHold=_preF;\n    try{\n      const _fs=applyInjuryFilter([{label:'x',items:[{name:to,detail:item.detail}]}],_dayPlanCfg(activeProg,day));\n",
-  "gate": "gates/g229_d194_lens.js",
-  "note": "NAMED TRIP: row q (tests/measure/v229_rulings/d194_injlens_ruling.md, D194 Sabotage S25: (q)): on the overlay program the U2 hop onto Leg extension prints \"2×6–10 @ RPE 7\" with the hold toast and keeps _preHold; the sample moves on every W5 chain (printed by builder at V229: 568 of 568 W5, 473 of 591 W3 through the batch-level _preHold count). EXPECTED: q only."
- },
- {
   "name": "S26-D194 -> the lens reads the week's Monday stamp instead of the day's",
   "anchor": "  const ov=dayOverlayInfo(day);\n  if(!ov||!ov.patch||!Object.prototype.hasOwnProperty.call(ov.patch,'injury')) return base;\n",
   "replacement": "  const _wk=Object.values((prog&&prog.weeks)||{}).find(w=>w&&Object.values(w).includes(day));\n  const ov=dayOverlayInfo(_wk&&_wk.mon?_wk.mon:day);\n  if(!ov||!ov.patch||!Object.prototype.hasOwnProperty.call(ov.patch,'injury')) return base;\n",
@@ -78,9 +71,9 @@
  },
  {
   "name": "S27-D194 A1 -> the boot keep is written outside the prog.cfg.injury guard",
-  "anchor": "    if(hit && prog.cfg && prog.cfg.injury){\n      // the pre-filter replay result rides beside each renamed item; the filter copies item fields through\n      _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });\n",
-  "replacement": "    _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });\n    if(hit && prog.cfg && prog.cfg.injury){\n      // the pre-filter replay result rides beside each renamed item; the filter copies item fields through\n",
-  "gate": "gates/g229_d194_lens.js",
-  "note": "NAMED TRIP: row q (tests/measure/v229_rulings/d194_injlens_ruling.md, Amendment 1 Sabotage S27: (q), an overlay program's booted item carries _preHold; also (b)): every booted overlay program in the sample carries _preHold (printed by builder at V229: 1,159 of 1,159) and the RB reboot slot keeps a dose. Also g229_d193_build b. EXPECTED: q only."
+  "anchor": "    if(hit && _dayPlanCfg(prog,day).injury){\n      // the pre-filter replay result rides beside each renamed item; the filter copies item fields through\n      _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });\n",
+  "replacement": "    _renamed.forEach(it=>{ if(typeof it.detail==='string') it._preHold=it.detail; });\n    if(hit && _dayPlanCfg(prog,day).injury){\n      // the pre-filter replay result rides beside each renamed item; the filter copies item fields through\n",
+  "gate": "gates/g229_d193_build.js",
+  "note": "NAMED TRIP: row b (tests/measure/v229_rulings/d194_injlens_ruling.md, Amendment 1 Sabotage S27: \"boot keep written outside the `prog.cfg.injury` guard → (q) (an overlay program's booted item carries `_preHold`) and (b)\"; row (q) is retired at V230, so the trip is (b), tests/measure/v230_rulings/v230_session_calls.md item 10): the boot replay stamps _preHold on the renamed items of an uninjured program, so an uninjured item carries _preHold after a boot replay. EXPECTED: b. History (was row q until V230): NAMED TRIP: row q (tests/measure/v229_rulings/d194_injlens_ruling.md, Amendment 1 Sabotage S27: (q), an overlay program's booted item carries _preHold; also (b)): every booted overlay program in the sample carries _preHold (printed by builder at V229: 1,159 of 1,159) and the RB reboot slot keeps a dose. Also g229_d193_build b. EXPECTED: q only. (re-anchored at V230: D194 part 2 moved the guard / filter cfg onto _dayPlanCfg)"
  }
 ]
