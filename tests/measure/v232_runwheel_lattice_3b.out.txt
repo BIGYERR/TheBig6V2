@@ -1,0 +1,15 @@
+ia-version 231 | clock pinned 2026-10-03
+
+════ PART 3b — IMPLIED FREE DIMENSION on dosed run forms (run goals of the Part 2 lattice) ════
+configs 3780
+dist forms: implied minutes (planned mi x tgt pace): n 45360 | min 6.82 | p50 55.25 | p90 137.50 | p99 268.55 | max 268.55
+  > 59: 20160 / 45360  run_10k | Long Run x630; run_10k | Long Run — Peak x630; run_10k | Long Run — Taper x630; run_half | Long Run x3780; run_half | Long Run — Dress Rehearsal x630; run_half | Long Run — Peak x630; run_half | Long Run — RACE DAY x630; run_half | Long Run — Taper x630; run_marathon | Long Run x5040; run_marathon | Long Run — Cutback x1260; run_marathon | Long Run — Peak x630; run_marathon | Long Run — RACE DAY x630; run_marathon | Long Run — Taper x1890; run_pace_goal | Long Slow Distance (LSD) x2520
+  > 99: 10080 / 45360  run_half | Long Run x1890; run_half | Long Run — Peak x630; run_half | Long Run — RACE DAY x630; run_marathon | Long Run x3150; run_marathon | Long Run — Cutback x630; run_marathon | Long Run — Peak x630; run_marathon | Long Run — RACE DAY x630; run_marathon | Long Run — Taper x1890
+  > 179: 1260 / 45360  run_marathon | Long Run — Peak x630; run_marathon | Long Run — RACE DAY x630
+  max row: [268.55,"run_marathon","Long Run — RACE DAY",18,26.2,615]
+time forms: implied miles (planned min / tgt pace): n 60840 | min 0.64 | p50 3.00 | p90 5.45 | p99 10.91 | max 10.91
+  > 9.99: 630 / 60840  run_marathon | Long Run x630
+  > 99: 0 / 60840  
+  max row: [10.909090909090908,"run_marathon","Long Run",10,120,660]
+no tgt (free dimension has no implied value): {"time":1260,"dist":0}
+dose.cap values: {"time cap=628 mins=7":630,"dist cap=628 mins=undefined":28980,"time cap=628 mins=12":1260,"time cap=628 mins=15":810,"time cap=628 mins=25":9270,"time cap=628 mins=30":7560,"time cap=628 mins=33":1260,"time cap=628 mins=31":1890,"time cap=628 mins=35":8100,"time cap=628 mins=40":3870,"time cap=628 mins=50":1710,"time cap=628 mins=45":7110,"time cap=628 mins=60":3960,"time cap=628 mins=10":630,"time cap=628 mins=48":630,"time cap=628 mins=120":630,"time cap=628 mins=65":720,"time cap=628 mins=90":630,"time cap=628 mins=75":720,"time cap=628 mins=80":630,"time cap=628 mins=20":270,"time cap=628 mins=55":540}

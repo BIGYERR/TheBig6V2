@@ -1,0 +1,14 @@
+ia-version 231 | clock pinned 2026-10-03
+
+════ PART 1b — REPORTER SEARCH, wide: W2 THU, title /pull/i, strip LI 15 min @ 8:51/mi ════
+  configs tried 22680 | W2 THU LI 15 @ 8:51 with /pull/ title: 432
+  W2 THU LI 15 @ 8:51 by mile|target: {"mile 8:00 tgt 1.5/10/30":126,"mile 8:00 tgt 1.5/12/0":126,"mile 8:00 tgt 1.5/11/0":126,"mile 8:15 tgt 1/7/30":126}
+  titles on those days: {"Pull":432,"Posterior Chain":72}
+    HIT mile 8:00 tgt 1.5/10/30 | hypertrophy beginner commercial rest sun,wed :: Pull :: Run — LI · Planned 15 min @ 8:51/mi|{"k":"time","mins":15,"tgt":531,"key":"chi"}
+    HIT mile 8:00 tgt 1.5/10/30 | hypertrophy beginner commercial rest wed,sun :: Pull :: Run — LI · Planned 15 min @ 8:51/mi|{"k":"time","mins":15,"tgt":531,"key":"chi"}
+    HIT mile 8:00 tgt 1.5/10/30 | hypertrophy beginner commercial rest fri,sun :: Pull :: Run — LI · Planned 15 min @ 8:51/mi|{"k":"time","mins":15,"tgt":531,"key":"chi"}
+    HIT mile 8:00 tgt 1.5/10/30 | hypertrophy beginner crossfit rest sun,wed :: Pull :: Run — LI · Planned 15 min @ 8:51/mi|{"k":"time","mins":15,"tgt":531,"key":"chi"}
+    HIT mile 8:00 tgt 1.5/10/30 | hypertrophy beginner crossfit rest wed,sun :: Pull :: Run — LI · Planned 15 min @ 8:51/mi|{"k":"time","mins":15,"tgt":531,"key":"chi"}
+    HIT mile 8:00 tgt 1.5/10/30 | hypertrophy beginner crossfit rest fri,sun :: Pull :: Run — LI · Planned 15 min @ 8:51/mi|{"k":"time","mins":15,"tgt":531,"key":"chi"}
+    HIT mile 8:00 tgt 1.5/10/30 | hypertrophy beginner full_gym rest sun,wed :: Pull :: Run — LI · Planned 15 min @ 8:51/mi|{"k":"time","mins":15,"tgt":531,"key":"chi"}
+    HIT mile 8:00 tgt 1.5/10/30 | hypertrophy beginner full_gym rest wed,sun :: Pull :: Run — LI · Planned 15 min @ 8:51/mi|{"k":"time","mins":15,"tgt":531,"key":"chi"}

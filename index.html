@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="231"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="232"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -332,6 +332,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
    is in: 3+2 columns on a 375pt screen gives 59pt each, clear of the 44pt target. */
 .iaw-cell.iaw-f3{flex:3;}
 .iaw-cell.iaw-f2{flex:2;}
+/* V232 (D199): a run wheel alone in its row (the stacked dosed forms) is held to the width
+   of the generic run form's three-column Miles cell, so its columns match that row instead
+   of sprawling to the full card. At a 375pt viewport: 375 - 2×16 .detail-body - 2×1
+   .log-section border - 2×16 .log-body = 309 for the row; 309 - 12 gap = 297 to flex;
+   the f3 cell takes 3/5 of it, 178.2. */
+.iaw-solo{max-width:178.2px;}
 .iaw-cap{font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
 .iaw{display:flex;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;position:relative;overflow:hidden;box-shadow:inset 0 2px 3px rgba(40,34,22,0.10),inset 0 -2px 3px rgba(40,34,22,0.07);}
 .iaw-shade{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;z-index:2;background:linear-gradient(180deg,rgba(40,34,22,0.13) 0%,rgba(40,34,22,0.05) 22%,rgba(255,255,255,0.16) 50%,rgba(40,34,22,0.05) 78%,rgba(40,34,22,0.13) 100%);}
@@ -13541,7 +13547,11 @@ const _IAW_ROW=44;
 const _IAW_SPEC={
   dist:{fmt:'dec3',  cap:'Miles',        cols:[{min:0,max:99,nil:true},{min:0,max:9,dot:true},{min:0,max:9}]},
   pace:{fmt:'clock', cap:'Pace / mile',  cols:[{min:4,max:17,nil:true},{min:0,max:59,pad:2}]},
-  rept:{fmt:'clock', cap:'Typical rep',  cols:[{min:0,max:9, nil:true},{min:0,max:59,pad:2}]}
+  rept:{fmt:'clock', cap:'Typical rep',  cols:[{min:0,max:9, nil:true},{min:0,max:59,pad:2}]},
+  // V232 (D199): run time as a clock with hours. 0..9 hours covers every finish under 10:00:00,
+  // the file's one ceiling on logged cardio minutes (max="600" on the rest-day sheet). Hours
+  // carries the dash and does not wrap; minutes and seconds wrap (derived from nil, D5).
+  hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, nil:true},{min:0,max:59,pad:2},{min:0,max:59,pad:2}]}
 };
 // V184 (D5): round-robin. A column is cyclic exactly when it has no dash row — that is
 // derived, not hand-listed, so a new column can never be missed. Seconds, tenths and
@@ -13573,10 +13583,23 @@ function _iawFace(c,v){
 // so reopening a day can never silently rewrite what was logged.
 function _iawParse(kind,val){
   var sp=_IAW_SPEC[kind], s=String(val==null?'':val).trim();
+  // V232 (D200): run minutes stay stored as DECIMAL MINUTES; this reads them back as a clock.
+  // A bare integer, a decimal or a leading-dot decimal (D203); never a colon. Rounded to the
+  // nearest second, so a two-place value lands on the second the athlete left the wheel on.
+  // Hours above 9 clamp for display only. Empty or malformed lands on the dash.
+  if(sp.fmt==='hms'){
+    var mh=s.match(/^\d*(?:\.\d+)?/);
+    if(!mh||mh[0]==='') return ['','',''];
+    var t=Math.round(parseFloat(mh[0])*60);
+    var hh=Math.min(sp.cols[0].max,Math.floor(t/3600));
+    return [String(hh),String(Math.floor((t%3600)/60)),String(t%60)];
+  }
   if(!s) return sp.fmt==='dec3'?['','','']:['',''];
   if(sp.fmt==='dec3'){
-    var m3=s.match(/^(\d+)(?:\.(\d)(\d)?)?/);
-    if(!m3) return ['','',''];
+    // V232 (D203): the whole is optional, so a keypad's .86 seeds 0 . 8 6 rather than the
+    // dash; an empty whole reads 0. A string with no digits at the front still lands on the dash.
+    var m3=s.match(/^(\d*)(?:\.(\d)(\d)?)?/);
+    if(!m3||m3[0]==='') return ['','',''];
     var a3=Math.max(sp.cols[0].min,Math.min(sp.cols[0].max,+m3[1]));
     var b3=m3[2]==null?0:+m3[2], c3=m3[3]==null?0:+m3[3];
     return [String(a3),String(b3),String(c3)];
@@ -13596,10 +13619,15 @@ function _iawFormat(kind,vals){
   var sp=_IAW_SPEC[kind];
   if(vals[0]==='') return '';
   var b=vals[1]===''?'0':vals[1];
+  // V232 (D200): h:mm:ss -> decimal minutes to two places (7:30 -> 7.50, 15:20 -> 15.33).
+  // Two places is exact at the one-second grain: the error is at most 0.3 s.
+  if(sp.fmt==='hms'){ var sx=vals[2]===''||vals[2]==null?'0':vals[2]; return ((+vals[0])*60+(+b)+(+sx)/60).toFixed(2); }
   if(sp.fmt==='dec3'){ var c=vals[2]===''||vals[2]==null?'0':vals[2]; return vals[0]+'.'+b+c; }
   return sp.fmt==='dec' ? (vals[0]+'.'+b) : (vals[0]+':'+('00'+b).slice(-2));
 }
-function iaWheelHTML(kind, hiddenId, val, capOverride){
+// V232 (D202): `plan` is the fixed dimension's planned value. It rides on the wheel as
+// data-plan and seeds the face when storage is blank; it is display only, never written.
+function iaWheelHTML(kind, hiddenId, val, capOverride, plan){
   var sp=_IAW_SPEC[kind];
   var cols=sp.cols.map(function(c){
     return '<div class="iaw-col" data-ci="'+sp.cols.indexOf(c)+'" data-wrap="'+(_iawWraps(c)?'1':'')+'" data-len="'+_iawRows(c).length+'"><div class="iaw-pad"></div>'
@@ -13609,7 +13637,7 @@ function iaWheelHTML(kind, hiddenId, val, capOverride){
       + '<div class="iaw-pad"></div></div>';
   }).join('');
   return '<div class="iaw-cell iaw-f'+sp.cols.length+'"><div class="iaw-cap">'+(capOverride||sp.cap)+'</div>'
-    + '<div class="iaw" data-kind="'+kind+'" data-for="'+hiddenId+'"><div class="iaw-shade"></div><div class="iaw-band"></div>'+cols+'</div>'
+    + '<div class="iaw" data-kind="'+kind+'" data-for="'+hiddenId+'"'+(plan==null||plan===''?'':' data-plan="'+String(plan).replace(/"/g,'&quot;')+'"')+'><div class="iaw-shade"></div><div class="iaw-band"></div>'+cols+'</div>'
     + '<input type="hidden" id="'+hiddenId+'" value="'+String(val==null?'':val).replace(/"/g,'&quot;')+'"></div>';
 }
 // The cylinder cue (D3). Windowed on purpose: a wrapped seconds column is 300 rows and
@@ -13655,6 +13683,11 @@ function _iawCommit(w){
   var h=document.getElementById(w.getAttribute('data-for'));
   if(!h) return;
   var next=_iawFormat(kind,vals);
+  // V232 (session call 8): browsers fire scroll for a programmatic scrollTop, so the seed frame
+  // and a recentre reach this settle on open. Until the wheel has rested on a face other than
+  // the one it was seeded on, nothing is written: opening a day never writes, whatever the
+  // stored string. The first rest elsewhere marks it moved; from then on only the dedupe gates.
+  if(!w._iawMoved){ if(next===w._iawSeedFace) return; w._iawMoved=true; }
   if(h.value===next) return;
   h.value=next;
   h.dispatchEvent(new Event('input',{bubbles:true}));
@@ -13678,8 +13711,10 @@ function iaWheelInit(root){
     if(w._iawOn) return; w._iawOn=true;
     var kind=w.getAttribute('data-kind');
     var h=document.getElementById(w.getAttribute('data-for'));
-    var seed=_iawParse(kind, h?h.value:'');
-    var cols=w.querySelectorAll('.iaw-col');
+    // V232 (D202): blank storage seeds from the plan when the wheel carries one. Display only:
+    // the plan face becomes the seed face, so _iawCommit's guard keeps an untouched open unwritten.
+    var hv=h?h.value:'', seed=_iawParse(kind, hv!==''?hv:(w.getAttribute('data-plan')||''));
+    var cols=w.querySelectorAll('.iaw-col'), landed=[];
     for(var i=0;i<cols.length;i++){ (function(col,ci){
       var raf=0;
       // V221 (D179): the settle is a named step so iaWheelFlush can run a pending one early.
@@ -13694,9 +13729,13 @@ function iaWheelInit(root){
       var home=_iawHome(_IAW_SPEC[kind].cols[ci]);
       var items=col.querySelectorAll('.iaw-it'), idx=home;
       for(var k=home;k<items.length;k++) if(items[k].getAttribute('data-v')===seed[ci]){ idx=k; break; }
+      landed[ci]=items[idx]?items[idx].getAttribute('data-v'):'';
       // scrollTop before layout is a no-op on iOS, so land it in a frame.
       (window.requestAnimationFrame||setTimeout)(function(){ col.scrollTop=idx*_IAW_ROW; _iawSel(col); _iawShape(col); });
     })(cols[i],i); }
+    // V232 (session call 8): the face this wheel actually shows after seeding. Not the parsed
+    // seed: a value with no matching row lands on home, and the face is what the eye sees.
+    w._iawSeedFace=_iawFormat(kind,landed);
   })(wheels[n]); }
 }
 // Input block for ONE cardio sport. Used both for the prescribed field and when a
@@ -13718,26 +13757,29 @@ function cardioFieldHTML(sport, e, dose, sub){
           <span class="reps-of">of ${dose.reps}${dose.k==='reps_time'?' · '+dose.mins+' min each':''}</span>
         </div>
         <input type="hidden" id="log_run_reps" value="${e.run_reps||''}">`;
-    if(dose.k==='time') return strip+`<label>${asyIcon('run',15)} Run — log the session</label>
-        <div class="log-row">
-          <div><input type="number" inputmode="decimal" id="log_run_mins" placeholder="${dose.mins}" value="${e.run_mins||''}" min="0" style="${_DOSE_INPUT_STYLE}"><div class="f-sub">actual minutes · blank = as planned</div></div>
-          <div><input type="number" inputmode="decimal" id="log_run_dist" placeholder="miles" value="${e.run_dist||''}" step="0.01" min="0" style="${_DOSE_INPUT_STYLE}"><div class="f-sub">distance — off the watch</div></div>
-        </div>
+    // V232 (D199, D201, D202, D206): two wheels, stacked (two three-column wheels side by side
+    // are six columns, under the 44pt target at 375pt). The fixed dimension comes first and is
+    // seeded from the plan for display; the free dimension parks on the dash.
+    if(dose.k==='time') return strip+`<label>${asyIcon('run',15)} Log the run</label>
+        <div class="iaw-wrap iaw-solo">${iaWheelHTML('hms','log_run_mins',e.run_mins||'',null,dose.mins)}</div>
+        <div class="f-sub">Shows the plan. Move it to match the watch.</div>
+        <div class="iaw-wrap iaw-solo">${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}</div>
+        <div class="f-sub">Off the watch.</div>
         <div id="doseDerived"></div>`;
-    if(dose.k==='dist') return strip+`<label>${asyIcon('run',15)} Run — log the session</label>
-        <div class="log-row">
-          <div><input type="number" inputmode="decimal" id="log_run_dist" placeholder="${dose.mi}" value="${e.run_dist||''}" step="0.01" min="0" style="${_DOSE_INPUT_STYLE}"><div class="f-sub">actual miles · blank = as planned</div></div>
-          <div><input type="number" inputmode="decimal" id="log_run_mins" placeholder="minutes" value="${e.run_mins||''}" min="0" style="${_DOSE_INPUT_STYLE}"><div class="f-sub">time — off the watch</div></div>
-        </div>
+    if(dose.k==='dist') return strip+`<label>${asyIcon('run',15)} Log the run</label>
+        <div class="iaw-wrap iaw-solo">${iaWheelHTML('dist','log_run_dist',e.run_dist||'',null,dose.mi)}</div>
+        <div class="f-sub">Shows the plan. Move it to match the watch.</div>
+        <div class="iaw-wrap iaw-solo">${iaWheelHTML('hms','log_run_mins',e.run_mins||'')}</div>
+        <div class="f-sub">Off the watch.</div>
         <div id="doseDerived"></div>`;
     if(dose.k==='reps_dist') return strip+`<div class="log-field" style="margin-bottom:10px">${stepper}</div>
         <div class="iaw-wrap" style="max-width:190px">${iaWheelHTML('rept','log_run_rep_time',e.run_rep_time||'')}</div>
         <div class="f-sub">what the watch showed on most reps</div>
         <div id="doseDerived"></div>`;
     if(dose.k==='reps_time') return strip+`<div class="log-field" style="margin-bottom:10px">${stepper}</div>
-        <label>Distance covered — work reps total</label>
-        <input type="number" inputmode="decimal" id="log_run_dist" placeholder="miles" value="${e.run_dist||''}" step="0.01" min="0" style="${_DOSE_INPUT_STYLE};max-width:150px">
-        <div class="f-sub">exclude the easy jog between reps</div>
+        <label>Miles in the work reps</label>
+        <div class="iaw-wrap iaw-solo">${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}</div>
+        <div class="f-sub">Leave out the easy jog between reps.</div>
         <div id="doseDerived"></div>`;
   }
   // V171 (D5): the generic form stays the form for NRC speed days (post-V154 ruling);

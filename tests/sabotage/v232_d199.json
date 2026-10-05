@@ -1,0 +1,121 @@
+[
+ {
+  "name": "S1-D199 hms hours column loses nil:true (no dash, wraps)",
+  "anchor": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, nil:true},",
+  "replacement": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9},",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D199-spec. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S2-D199 hms hours max 9 -> 8",
+  "anchor": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, nil:true},",
+  "replacement": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:8, nil:true},",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D199-spec. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S3-D200 hms format toFixed(2) -> toFixed(1)",
+  "anchor": "return ((+vals[0])*60+(+b)+(+sx)/60).toFixed(2);",
+  "replacement": "return ((+vals[0])*60+(+b)+(+sx)/60).toFixed(1);",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D200-rt. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S4-D200 hms parse Math.round -> Math.floor",
+  "anchor": "var t=Math.round(parseFloat(mh[0])*60);",
+  "replacement": "var t=Math.floor(parseFloat(mh[0])*60);",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D200-rt. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S5-D203 dec3 whole back to required (d* -> d+)",
+  "anchor": "var m3=s.match(/^(\\d*)(?:\\.(\\d)(\\d)?)?/);",
+  "replacement": "var m3=s.match(/^(\\d+)(?:\\.(\\d)(\\d)?)?/);",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D203. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S6-D203 dec3 empty-match test removed",
+  "anchor": "if(!m3||m3[0]==='') return ['','',''];",
+  "replacement": "if(!m3) return ['','',''];",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D203. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S7-call8 seed-face guard early return removed",
+  "anchor": "if(!w._iawMoved){ if(next===w._iawSeedFace) return; w._iawMoved=true; }",
+  "replacement": "if(!w._iawMoved){ w._iawMoved=true; }",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D202-open. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S8-call8 the moved mark removed",
+  "anchor": "if(!w._iawMoved){ if(next===w._iawSeedFace) return; w._iawMoved=true; }",
+  "replacement": "if(!w._iawMoved){ if(next===w._iawSeedFace) return; }",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D202-move. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S9-D202 plan seed ignored in iaWheelInit",
+  "anchor": "var hv=h?h.value:'', seed=_iawParse(kind, hv!==''?hv:(w.getAttribute('data-plan')||''));",
+  "replacement": "var hv=h?h.value:'', seed=_iawParse(kind, hv);",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D202-open. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S10-D199 time form wheel order swapped",
+  "anchor": "<div class=\"iaw-wrap iaw-solo\">${iaWheelHTML('hms','log_run_mins',e.run_mins||'',null,dose.mins)}</div>\n        <div class=\"f-sub\">Shows the plan. Move it to match the watch.</div>\n        <div class=\"iaw-wrap iaw-solo\">${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}</div>",
+  "replacement": "<div class=\"iaw-wrap iaw-solo\">${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}</div>\n        <div class=\"f-sub\">Shows the plan. Move it to match the watch.</div>\n        <div class=\"iaw-wrap iaw-solo\">${iaWheelHTML('hms','log_run_mins',e.run_mins||'',null,dose.mins)}</div>",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D199/D201/D204-forms. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S11-D202 data-plan on the dist form free time wheel",
+  "anchor": "${iaWheelHTML('hms','log_run_mins',e.run_mins||'')}",
+  "replacement": "${iaWheelHTML('hms','log_run_mins',e.run_mins||'',null,dose.mi)}",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D199/D201/D204-forms. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S12-D204 reps_time miles back to a number box",
+  "anchor": "<label>Miles in the work reps</label>\n        <div class=\"iaw-wrap iaw-solo\">${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}</div>",
+  "replacement": "<label>Miles in the work reps</label>\n        <input type=\"number\" inputmode=\"decimal\" id=\"log_run_dist\" placeholder=\"miles\" value=\"${e.run_dist||''}\" step=\"0.01\" min=\"0\" style=\"${_DOSE_INPUT_STYLE};max-width:150px\">",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D199/D201/D204-forms. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S13-D206 Hours first restored on the free time wheel",
+  "anchor": "${iaWheelHTML('hms','log_run_mins',e.run_mins||'')}</div>\n        <div class=\"f-sub\">Off the watch.</div>",
+  "replacement": "${iaWheelHTML('hms','log_run_mins',e.run_mins||'')}</div>\n        <div class=\"f-sub\">Off the watch. Hours first.</div>",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D206-copy. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S14-D199 one iaw-solo dropped (reps_time wrap)",
+  "anchor": "<label>Miles in the work reps</label>\n        <div class=\"iaw-wrap iaw-solo\">",
+  "replacement": "<label>Miles in the work reps</label>\n        <div class=\"iaw-wrap\">",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D199/D201/D204-forms. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S15-D199 iaw-solo max-width 178.2 -> 300",
+  "anchor": ".iaw-solo{max-width:178.2px;}",
+  "replacement": ".iaw-solo{max-width:300px;}",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D199-width. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S16-D206 time form label back to the em-dash label",
+  "anchor": "if(dose.k==='time') return strip+`<label>${asyIcon('run',15)} Log the run</label>",
+  "replacement": "if(dose.k==='time') return strip+`<label>${asyIcon('run',15)} Run — log the session</label>",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D206-copy. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ },
+ {
+  "name": "S17-D202 dist form fixed wheel loses its plan",
+  "anchor": "${iaWheelHTML('dist','log_run_dist',e.run_dist||'',null,dose.mi)}",
+  "replacement": "${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}",
+  "gate": "gates/g232_d199_runwheel.js",
+  "note": "NAMED TRIP: row D202-open. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+ }
+]

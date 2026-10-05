@@ -1,0 +1,164 @@
+ia-version 231 | clock pinned 2026-10-03
+
+════ PART 1 — REPORTER: W2 THU Pull, RUN — LI · Planned 15 min @ 8:51/mi ════
+
+-- HALF_MANNY (harness fixture) | weeks 14 | startDate null
+  W2 THU title: Posterior Chain | rest false | cardio {"type":"run","subtype":"Speed Run — Intervals"}
+  strip: (none: generic form)
+  run strips with 8:51 or 15 min: none
+
+-- PRT TING (v202_persistence_C.js cfg) | weeks 11 | startDate null
+  W2 THU title: Posterior Chain | rest false | cardio {"type":"run","subtype":"Long Interval (LI)","dose":{"k":"time","mins":15,"tgt":547,"key":"chi"}}
+  strip: Run — LI · Planned 15 min @ 9:07/mi
+  run strips with 8:51 or 15 min: 
+    W1 thu Posterior Chain :: Run — LI · Planned 15 min @ 9:10/mi
+    W2 thu Posterior Chain :: Run — LI · Planned 15 min @ 9:07/mi
+    W7 thu Posterior Chain :: Run — LI · Planned 18 min @ 8:51/mi
+    W8 thu Posterior Chain :: Run — LI · Planned 13 min @ 8:51/mi
+
+-- search: exact strip "RUN — LI · Planned 15 min @ 8:51/mi" on W2 THU, title /Pull/
+  configs tried 588 | exact (W2 thu, Pull, LI 15 min @ 8:51): 0 | W2 thu non-Pull: 2 | LI 15 min @ 8:51 anywhere: 3
+    W2THU run_pace_goal mile 8:00 rest sun,wed :: Posterior Chain :: Run — LI · Planned 15 min @ 8:51/mi
+    W2THU run_pace_goal mile 8:00 rest sun,wed :: Posterior Chain :: Run — LI · Planned 15 min @ 8:51/mi
+    ANY run_pace_goal mile 8:00 rest sun,wed -> W2 thu Posterior Chain
+    ANY run_pace_goal mile 8:00 rest sat,sun -> W2 wed Posterior Chain
+    ANY run_pace_goal mile 8:00 rest sun -> W2 wed Full Body Support — Upper
+
+-- rendered dose.k=time form, input/label elements, for an LI 15 min @ 8:51 dose
+  [synthetic dose {k:time,mins:15,tgt:531} — real one printed below if found]
+   <span class="ps-lbl">Run — LI · Planned</span>
+   <span class="ps-val">15 min @ 8:51/mi</span>
+   <label>
+   <input type="number" inputmode="decimal" id="log_run_mins" placeholder="15" value="" min="0" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-size:16px;padding:9px 12px;outline:none">
+   <div class="f-sub">actual minutes · blank = as planned</div>
+   <input type="number" inputmode="decimal" id="log_run_dist" placeholder="miles" value="" step="0.01" min="0" style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-size:16px;padding:9px 12px;outline:none">
+   <div class="f-sub">distance — off the watch</div>
+
+════ PART 2 — LATTICE ════
+METHOD lattice goals 16 (run 6, bike 5, swim 5) x focus 7 x exp 3 x equip 5 x rest 2 x seed 3 = 10080 configs (10080 built, 0 crashed) | runtime 65s
+day entries 871710 | rest 249060 | LOG FORMS (non-rest days) 622650 | of which no cardio field 192810 (array cardio 0)
+(a) forms with >=1 wheel today: 54180 / 622650 = 8.70% | wheel instances {"dist":47250,"pace":47250,"rept":6930}
+(b) forms with a run MINUTES number box: 107460 / 622650 = 17.26%
+(c) forms with a run DISTANCE number box: 107460 / 622650 = 17.26%
+(d) forms with either run number box: 107460 / 622650 = 17.26%
+(e) forms with >=1 wheel if every run mins/dist box became a wheel: 161640 / 622650 = 25.96%  (today 8.70%)
+scope line: bike minutes number box 128880 / 622650 = 20.70% | swim yards number box 139320 / 622650 = 22.38%
+
+-- segment: sport:dose.k   [forms | wheel today | mins box | dist box | either | hypothetical >=1 wheel]
+  (no cardio)                                       192810 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  bike:null                                          12600 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  bike:reps_time                                     24660 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  bike:time                                          91620 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  run:dist                                           45360 | 0 (0.00%) | 45360 (100.00%) | 45360 (100.00%) | 45360 (100.00%) | 45360 (100.00%)
+  run:null                                           47250 | 47250 (100.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 47250 (100.00%)
+  run:reps_dist                                       6930 | 6930 (100.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 6930 (100.00%)
+  run:time                                           62100 | 0 (0.00%) | 62100 (100.00%) | 62100 (100.00%) | 62100 (100.00%) | 62100 (100.00%)
+  swim:null                                         139320 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+
+-- segment: goal   [forms | wheel today | mins box | dist box | either | hypothetical >=1 wheel]
+  bike_50                                            44100 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  bike_base                                          37800 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  bike_cals                                          31500 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  bike_century                                       63000 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  bike_ftp                                           37800 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  run_10k                                            25200 | 9450 (37.50%) | 10710 (42.50%) | 10710 (42.50%) | 10710 (42.50%) | 20160 (80.00%)
+  run_5k                                             25200 | 9450 (37.50%) | 10710 (42.50%) | 10710 (42.50%) | 10710 (42.50%) | 20160 (80.00%)
+  run_base                                           18900 | 0 (0.00%) | 12960 (68.57%) | 12960 (68.57%) | 12960 (68.57%) | 12960 (68.57%)
+  run_half                                           44100 | 17010 (38.57%) | 18270 (41.43%) | 18270 (41.43%) | 18270 (41.43%) | 35280 (80.00%)
+  run_marathon                                       56700 | 11340 (20.00%) | 34020 (60.00%) | 34020 (60.00%) | 34020 (60.00%) | 45360 (80.00%)
+  run_pace_goal                                      34650 | 6930 (20.00%) | 20790 (60.00%) | 20790 (60.00%) | 20790 (60.00%) | 27720 (80.00%)
+  swim_100_time                                      28350 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  swim_500_time                                      30450 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  swim_base                                          37800 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  swim_mile                                          50400 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+  swim_tri                                           56700 | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%)
+
+-- segment: focus   [forms | wheel today | mins box | dist box | either | hypothetical >=1 wheel]
+  balanced                                           88950 | 7740 (8.70%) | 15120 (17.00%) | 15120 (17.00%) | 15120 (17.00%) | 22860 (25.70%)
+  fatloss                                            88950 | 7740 (8.70%) | 15120 (17.00%) | 15120 (17.00%) | 15120 (17.00%) | 22860 (25.70%)
+  hypertrophy                                        88950 | 7740 (8.70%) | 15120 (17.00%) | 15120 (17.00%) | 15120 (17.00%) | 22860 (25.70%)
+  strength                                           88950 | 7740 (8.70%) | 15120 (17.00%) | 15120 (17.00%) | 15120 (17.00%) | 22860 (25.70%)
+  support_athletic                                   88950 | 7740 (8.70%) | 15660 (17.61%) | 15660 (17.61%) | 15660 (17.61%) | 23400 (26.31%)
+  support_prevention                                 88950 | 7740 (8.70%) | 15660 (17.61%) | 15660 (17.61%) | 15660 (17.61%) | 23400 (26.31%)
+  support_strength                                   88950 | 7740 (8.70%) | 15660 (17.61%) | 15660 (17.61%) | 15660 (17.61%) | 23400 (26.31%)
+
+-- segment: exp   [forms | wheel today | mins box | dist box | either | hypothetical >=1 wheel]
+  advanced                                          202650 | 18060 (8.91%) | 35820 (17.68%) | 35820 (17.68%) | 35820 (17.68%) | 53880 (26.59%)
+  beginner                                          211050 | 18060 (8.56%) | 35820 (16.97%) | 35820 (16.97%) | 35820 (16.97%) | 53880 (25.53%)
+  intermediate                                      208950 | 18060 (8.64%) | 35820 (17.14%) | 35820 (17.14%) | 35820 (17.14%) | 53880 (25.79%)
+
+-- segment: equip   [forms | wheel today | mins box | dist box | either | hypothetical >=1 wheel]
+  bodyweight                                        124530 | 10836 (8.70%) | 21492 (17.26%) | 21492 (17.26%) | 21492 (17.26%) | 32328 (25.96%)
+  commercial                                        124530 | 10836 (8.70%) | 21492 (17.26%) | 21492 (17.26%) | 21492 (17.26%) | 32328 (25.96%)
+  crossfit                                          124530 | 10836 (8.70%) | 21492 (17.26%) | 21492 (17.26%) | 21492 (17.26%) | 32328 (25.96%)
+  home_basic                                        124530 | 10836 (8.70%) | 21492 (17.26%) | 21492 (17.26%) | 21492 (17.26%) | 32328 (25.96%)
+  home_full                                         124530 | 10836 (8.70%) | 21492 (17.26%) | 21492 (17.26%) | 21492 (17.26%) | 32328 (25.96%)
+
+-- segment: rest   [forms | wheel today | mins box | dist box | either | hypothetical >=1 wheel]
+  sat,sun                                           311325 | 27090 (8.70%) | 53730 (17.26%) | 53730 (17.26%) | 53730 (17.26%) | 80820 (25.96%)
+  sun,wed                                           311325 | 27090 (8.70%) | 53730 (17.26%) | 53730 (17.26%) | 53730 (17.26%) | 80820 (25.96%)
+
+-- segment: run subtype (run days only)   [forms | wheel today | mins box | dist box | either | hypothetical >=1 wheel]
+  Benchmark Run | time                                 630 | 0 (0.00%) | 630 (100.00%) | 630 (100.00%) | 630 (100.00%) | 630 (100.00%)
+  Benchmark Run — Retest | time                        630 | 0 (0.00%) | 630 (100.00%) | 630 (100.00%) | 630 (100.00%) | 630 (100.00%)
+  Easy Run + Strides | time                           2790 | 0 (0.00%) | 2790 (100.00%) | 2790 (100.00%) | 2790 (100.00%) | 2790 (100.00%)
+  Easy Run | time                                     6210 | 0 (0.00%) | 6210 (100.00%) | 6210 (100.00%) | 6210 (100.00%) | 6210 (100.00%)
+  Easy Run — Long | time                              1620 | 0 (0.00%) | 1620 (100.00%) | 1620 (100.00%) | 1620 (100.00%) | 1620 (100.00%)
+  Long Interval (LI) | time                           6930 | 0 (0.00%) | 6930 (100.00%) | 6930 (100.00%) | 6930 (100.00%) | 6930 (100.00%)
+  Long Run | dist                                    15120 | 0 (0.00%) | 15120 (100.00%) | 15120 (100.00%) | 15120 (100.00%) | 15120 (100.00%)
+  Long Run | time                                     3150 | 0 (0.00%) | 3150 (100.00%) | 3150 (100.00%) | 3150 (100.00%) | 3150 (100.00%)
+  Long Run — Cutback | dist                           1260 | 0 (0.00%) | 1260 (100.00%) | 1260 (100.00%) | 1260 (100.00%) | 1260 (100.00%)
+  Long Run — Cutback | time                           1260 | 0 (0.00%) | 1260 (100.00%) | 1260 (100.00%) | 1260 (100.00%) | 1260 (100.00%)
+  Long Run — Dress Rehearsal | dist                    630 | 0 (0.00%) | 630 (100.00%) | 630 (100.00%) | 630 (100.00%) | 630 (100.00%)
+  Long Run — Peak | dist                              2520 | 0 (0.00%) | 2520 (100.00%) | 2520 (100.00%) | 2520 (100.00%) | 2520 (100.00%)
+  Long Run — RACE DAY | dist                          2520 | 0 (0.00%) | 2520 (100.00%) | 2520 (100.00%) | 2520 (100.00%) | 2520 (100.00%)
+  Long Run — Taper | dist                             3780 | 0 (0.00%) | 3780 (100.00%) | 3780 (100.00%) | 3780 (100.00%) | 3780 (100.00%)
+  Long Slow Distance (LSD) | dist                    13860 | 0 (0.00%) | 13860 (100.00%) | 13860 (100.00%) | 13860 (100.00%) | 13860 (100.00%)
+  Recovery Run | dist                                 5670 | 0 (0.00%) | 5670 (100.00%) | 5670 (100.00%) | 5670 (100.00%) | 5670 (100.00%)
+  Recovery Run | time                                37800 | 0 (0.00%) | 37800 (100.00%) | 37800 (100.00%) | 37800 (100.00%) | 37800 (100.00%)
+  Short Interval (SI) | reps_dist                     6930 | 6930 (100.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 6930 (100.00%)
+  Speed Run — Fartlek | generic                       5040 | 5040 (100.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 5040 (100.00%)
+  Speed Run — Hills | generic                         3780 | 3780 (100.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 3780 (100.00%)
+  Speed Run — Intervals | generic                    28350 | 28350 (100.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 28350 (100.00%)
+  Speed Run — Tempo | generic                        10080 | 10080 (100.00%) | 0 (0.00%) | 0 (0.00%) | 0 (0.00%) | 10080 (100.00%)
+  Steady Aerobic Run | time                           1080 | 0 (0.00%) | 1080 (100.00%) | 1080 (100.00%) | 1080 (100.00%) | 1080 (100.00%)
+
+════ PART 3 — ENVELOPES (dosed run forms) ════
+dose.k=time minutes (strip value): n 62100 | min 7 | p10 16 | p50 31 | p90 60 | p99 120 | max 120 min
+  values: 7:630 10:630 11:630 12:1260 13:630 15:2340 16:1170 17:1530 18:630 19:1260 20:2160 25:9270 30:7560 31:1890 33:1260 35:8100 40:3870 45:7110 48:630 50:1710 55:540 60:3960 65:720 75:720 80:630 90:630 120:630
+  non-integer values: 0 / 62100
+  > 59 min: 7290 / 62100 | > 99 min: 630 | > 179 min: 0
+  > 59 min by goal|subtype: run_base | Easy Run — Long x360; run_half | Long Run — Cutback x630; run_half | Recovery Run x630; run_marathon | Long Run x630; run_marathon | Long Run — Cutback x630; run_marathon | Recovery Run x4410
+  > 99 min by goal|subtype: run_marathon | Long Run x630
+  max minutes per goal|subtype (week of first max): run_10k | Recovery Run = 50 (W6); run_5k | Long Run = 33 (W5); run_5k | Recovery Run = 35 (W7); run_base | Benchmark Run = 20 (W1); run_base | Benchmark Run — Retest = 20 (W6); run_base | Easy Run = 55 (W5); run_base | Easy Run + Strides = 55 (W5); run_base | Easy Run — Long = 75 (W6); run_base | Steady Aerobic Run = 17 (W5); run_half | Long Run — Cutback = 60 (W12); run_half | Recovery Run = 60 (W12); run_marathon | Long Run = 120 (W10); run_marathon | Long Run — Cutback = 90 (W13); run_marathon | Recovery Run = 80 (W16); run_pace_goal | Long Interval (LI) = 20 (W11)
+  MAX: {"v":120,"goal":"run_marathon","sub":"Long Run","w":10,"weeks":18,"day":"sat","cfg":"hypertrophy|beginner|commercial|sun,wed|76308","detail":"Two Hour Run: 120-minute run, run as a progression. Start slower than Recovery Pace, finish faster than it, and average "}
+dose.k=dist miles (strip value): n 45360 | min 0.62 | p10 2 | p50 5 | p90 12.5 | p99 26.2 | max 26.2 mi
+  values: 0.62:630 1:1890 1.5:210 1.8:210 2:2310 2.1:420 2.2:210 2.5:420 2.6:210 2.7:210 2.8:630 3:630 3.1:5460 3.2:210 3.3:210 3.5:840 3.6:420 3.8:420 4:2730 4.1:210 4.3:210 4.5:840 4.6:420 4.8:210 5:2730 5.1:210 5.2:1470 5.5:630 6:630 6.2:4410 6.6:420 7:1890 7.3:420 8:2310 9.32:630 9.5:630 10:2520 12:630 12.5:1260 13.1:1260 14:630 15:630 16:630 18:630 26.2:630
+  non-integer values: 24570 / 45360
+  > 99 mi: 0 / 45360 | > 26.2: 0 | decimals >2 places: 0
+  max miles per goal|subtype: run_10k | Long Run = 6.2 (W5); run_10k | Long Run — Peak = 7 (W6); run_10k | Long Run — RACE DAY = 6.2 (W8); run_10k | Long Run — Taper = 6.2 (W7); run_10k | Recovery Run = 1 (W8); run_5k | Long Run = 1 (W1); run_5k | Long Run — Peak = 4 (W6); run_5k | Long Run — RACE DAY = 3.1 (W8); run_5k | Long Run — Taper = 3.1 (W7); run_5k | Recovery Run = 2 (W3); run_half | Long Run = 10 (W8); run_half | Long Run — Dress Rehearsal = 8 (W10); run_half | Long Run — Peak = 12.5 (W11); run_half | Long Run — RACE DAY = 13.1 (W14); run_half | Long Run — Taper = 7 (W13); run_half | Recovery Run = 3.1 (W13); run_marathon | Long Run = 16 (W12); run_marathon | Long Run — Cutback = 9.32 (W7); run_marathon | Long Run — Peak = 18 (W14); run_marathon | Long Run — RACE DAY = 26.2 (W18); run_marathon | Long Run — Taper = 15 (W15); run_marathon | Recovery Run = 3.1 (W2); run_pace_goal | Long Slow Distance (LSD) = 8 (W10)
+  MAX: {"v":26.2,"goal":"run_marathon","sub":"Long Run — RACE DAY","w":18,"weeks":18,"day":"sun","cfg":"hypertrophy|beginner|commercial|sun,wed|76308","detail":"26.2 miles. Marathon race day. Target pace 10:15/mi. Trust your training, start controlled, finish strong."}
+dose.k=reps_time total work minutes (reps x mins): none
+  reps x mins shapes: 
+target pace (dose.tgt) on dosed run forms: n 113130 | min 7:58 | p50 11:00 | max 11:17 /mi  (pace wheel 4:00–17:59)
+  tgt < 240s: 0 | tgt >= 1080s: 0
+  tgt by dose.k: time 8:54–11:00 | dist 9:10–11:17 | reps_dist 7:58–8:28
+dose key-sets: {"time:cap,k,mins,tgt":42210,"dist:cap,k,mi,tgt":28980,"dist:k,mi,tgt":2520,"reps_dist:k,key,m,rec,reps,tgt":6930,"time:k,key,mins,tgt":8010,"dist:k,key,mi,tgt":13860,"time:k,key,mins":1260,"time:cap,k,key,mins,tgt":10620}
+dose source: {"time:emitted":62100,"dist:emitted":45360,"reps_dist:emitted":6930} | run details mentioning km: 0
+
+════ PART 4 — PLAN STRIP per dose kind (shape with # for numbers: example ×count) ════
+  dose.k=dist n 45360
+     Run · Planned 1 mi @ 11:00/mi ×31500
+     Run — LSD · Planned 1.5 mi @ 11:17/mi ×13860
+  dose.k=reps_dist n 6930
+     Run — SI · Planned 4 × 400m @ 8:28/mi ×6930
+  dose.k=time n 62100
+     Run · Planned 7 min @ 11:00/mi ×42210
+     Run — LI · Planned 15 min @ 9:26/mi ×6930
+     Run — TEST · Planned 20 min ×1260
+     Run — EASY · Planned 25 min @ 11:00/mi ×10620
+     Run — STDY · Planned 15 min @ 10:28/mi ×1080
+  form time inputs: <input type="number" inputmode="decimal" id="log_run_mins" placeholder="30" value="" min="0">  <input type="number" inputmode="decimal" id="log_run_dist" placeholder="miles" value="" step="0.01" min="0"> | f-sub: actual minutes · blank = as planned / distance — off the watch
+  form dist inputs: <input type="number" inputmode="decimal" id="log_run_dist" placeholder="4" value="" step="0.01" min="0">  <input type="number" inputmode="decimal" id="log_run_mins" placeholder="minutes" value="" min="0"> | f-sub: actual miles · blank = as planned / time — off the watch
+  form reps_time inputs: <input type="hidden" id="log_run_reps" value="">  <input type="number" inputmode="decimal" id="log_run_dist" placeholder="miles" value="" step="0.01" min="0"> | f-sub: exclude the easy jog between reps
+  form reps_dist inputs: <input type="hidden" id="log_run_reps" value="">  <input type="hidden" id="log_run_rep_time" value=""> | f-sub: what the watch showed on most reps

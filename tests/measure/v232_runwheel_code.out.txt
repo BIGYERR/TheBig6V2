@@ -1,0 +1,133 @@
+ia-version 231
+EMIT sport=run dose=time entry=blank inputs=[{"id":"log_run_mins","type":"number","step":null,"min":"0","max":null,"ph":"15","im":"decimal","val":""},{"id":"log_run_dist","type":"number","step":"0.01","min":"0","max":null,"ph":"miles","im":"decimal","val":""}] wheels=[]
+EMIT sport=run dose=time entry=filled inputs=[{"id":"log_run_mins","type":"number","step":null,"min":"0","max":null,"ph":"15","im":"decimal","val":"15.333"},{"id":"log_run_dist","type":"number","step":"0.01","min":"0","max":null,"ph":"miles","im":"decimal","val":"3.456"}] wheels=[]
+EMIT sport=run dose=dist entry=blank inputs=[{"id":"log_run_dist","type":"number","step":"0.01","min":"0","max":null,"ph":"3.1","im":"decimal","val":""},{"id":"log_run_mins","type":"number","step":null,"min":"0","max":null,"ph":"minutes","im":"decimal","val":""}] wheels=[]
+EMIT sport=run dose=dist entry=filled inputs=[{"id":"log_run_dist","type":"number","step":"0.01","min":"0","max":null,"ph":"3.1","im":"decimal","val":"3.456"},{"id":"log_run_mins","type":"number","step":null,"min":"0","max":null,"ph":"minutes","im":"decimal","val":"15.333"}] wheels=[]
+EMIT sport=run dose=reps_time entry=blank inputs=[{"id":"log_run_reps","type":"hidden","step":null,"min":null,"max":null,"ph":null,"im":null,"val":""},{"id":"log_run_dist","type":"number","step":"0.01","min":"0","max":null,"ph":"miles","im":"decimal","val":""}] wheels=[]
+EMIT sport=run dose=reps_time entry=filled inputs=[{"id":"log_run_reps","type":"hidden","step":null,"min":null,"max":null,"ph":null,"im":null,"val":"5"},{"id":"log_run_dist","type":"number","step":"0.01","min":"0","max":null,"ph":"miles","im":"decimal","val":"3.456"}] wheels=[]
+EMIT sport=run dose=reps_dist entry=blank inputs=[{"id":"log_run_reps","type":"hidden","step":null,"min":null,"max":null,"ph":null,"im":null,"val":""},{"id":"log_run_rep_time","type":"hidden","step":null,"min":null,"max":null,"ph":null,"im":null,"val":""}] wheels=["rept->log_run_rep_time"]
+EMIT sport=run dose=reps_dist entry=filled inputs=[{"id":"log_run_reps","type":"hidden","step":null,"min":null,"max":null,"ph":null,"im":null,"val":"5"},{"id":"log_run_rep_time","type":"hidden","step":null,"min":null,"max":null,"ph":null,"im":null,"val":"1:52"}] wheels=["rept->log_run_rep_time"]
+EMIT sport=run dose=generic_null entry=blank inputs=[{"id":"log_run_dist","type":"hidden","step":null,"min":null,"max":null,"ph":null,"im":null,"val":""},{"id":"log_run_pace","type":"hidden","step":null,"min":null,"max":null,"ph":null,"im":null,"val":""}] wheels=["dist->log_run_dist","pace->log_run_pace"]
+EMIT sport=run dose=generic_null entry=filled inputs=[{"id":"log_run_dist","type":"hidden","step":null,"min":null,"max":null,"ph":null,"im":null,"val":"3.456"},{"id":"log_run_pace","type":"hidden","step":null,"min":null,"max":null,"ph":null,"im":null,"val":"8:51"}] wheels=["dist->log_run_dist","pace->log_run_pace"]
+EMIT sport=bike dose=time entry=blank inputs=[{"id":"log_bike_mins","type":"number","step":null,"min":"0","max":null,"ph":"minutes","im":null,"val":""}] wheels=[]
+EMIT sport=bike dose=time entry=filled inputs=[{"id":"log_bike_mins","type":"number","step":null,"min":"0","max":null,"ph":"minutes","im":null,"val":"45"}] wheels=[]
+EMIT sport=bike dose=generic_null entry=blank inputs=[{"id":"log_bike_mins","type":"number","step":null,"min":"0","max":null,"ph":"minutes","im":null,"val":""}] wheels=[]
+EMIT sport=bike dose=generic_null entry=filled inputs=[{"id":"log_bike_mins","type":"number","step":null,"min":"0","max":null,"ph":"minutes","im":null,"val":"45"}] wheels=[]
+EMIT sport=swim dose=time entry=blank inputs=[{"id":"log_swim_yards","type":"number","step":"25","min":"0","max":null,"ph":"yards","im":null,"val":""}] wheels=[]
+EMIT sport=swim dose=time entry=filled inputs=[{"id":"log_swim_yards","type":"number","step":"25","min":"0","max":null,"ph":"yards","im":null,"val":"1500"}] wheels=[]
+EMIT sport=swim dose=generic_null entry=blank inputs=[{"id":"log_swim_yards","type":"number","step":"25","min":"0","max":null,"ph":"yards","im":null,"val":""}] wheels=[]
+EMIT sport=swim dose=generic_null entry=filled inputs=[{"id":"log_swim_yards","type":"number","step":"25","min":"0","max":null,"ph":"yards","im":null,"val":"1500"}] wheels=[]
+EMIT total forms rendered 18
+HARNESS typeof Event before stub: undefined
+SEED dist fired-on-touch=0 stored="" parse=["","",""] shown=["","0","0"] wheelReads=null plusReads=null -> blank->dash; hidden after init="" commit-if-touched=""
+SEED dist fired-on-touch=1 stored="3" parse=["3","0","0"] shown=["3","0","0"] wheelReads=3 plusReads=3 -> exact; hidden after init="3" commit-if-touched="3.00"
+SEED dist fired-on-touch=1 stored="3.1" parse=["3","1","0"] shown=["3","1","0"] wheelReads=3.1 plusReads=3.1 -> exact; hidden after init="3.1" commit-if-touched="3.10"
+SEED dist fired-on-touch=0 stored="3.10" parse=["3","1","0"] shown=["3","1","0"] wheelReads=3.1 plusReads=3.1 -> exact; hidden after init="3.10" commit-if-touched="3.10"
+SEED dist fired-on-touch=0 stored="3.45" parse=["3","4","5"] shown=["3","4","5"] wheelReads=3.45 plusReads=3.45 -> exact; hidden after init="3.45" commit-if-touched="3.45"
+SEED dist fired-on-touch=1 stored="3.456" parse=["3","4","5"] shown=["3","4","5"] wheelReads=3.45 plusReads=3.456 -> lossy; hidden after init="3.456" commit-if-touched="3.45"
+SEED dist fired-on-touch=0 stored="0.86" parse=["0","8","6"] shown=["0","8","6"] wheelReads=0.86 plusReads=0.86 -> exact; hidden after init="0.86" commit-if-touched="0.86"
+SEED dist fired-on-touch=1 stored=".86" parse=["","",""] shown=["","0","0"] wheelReads=null plusReads=0.86 -> LANDS ON DASH; hidden after init=".86" commit-if-touched=""
+SEED dist fired-on-touch=1 stored="13.1" parse=["13","1","0"] shown=["13","1","0"] wheelReads=13.1 plusReads=13.1 -> exact; hidden after init="13.1" commit-if-touched="13.10"
+SEED dist fired-on-touch=1 stored="26.2" parse=["26","2","0"] shown=["26","2","0"] wheelReads=26.2 plusReads=26.2 -> exact; hidden after init="26.2" commit-if-touched="26.20"
+SEED dist fired-on-touch=0 stored="99.99" parse=["99","9","9"] shown=["99","9","9"] wheelReads=99.99 plusReads=99.99 -> exact; hidden after init="99.99" commit-if-touched="99.99"
+SEED dist fired-on-touch=1 stored="100" parse=["99","0","0"] shown=["99","0","0"] wheelReads=99 plusReads=100 -> clamp; hidden after init="100" commit-if-touched="99.00"
+SEED dist fired-on-touch=1 stored="150" parse=["99","0","0"] shown=["99","0","0"] wheelReads=99 plusReads=150 -> clamp; hidden after init="150" commit-if-touched="99.00"
+SEED dist fired-on-touch=1 stored="-1" parse=["","",""] shown=["","0","0"] wheelReads=null plusReads=-1 -> LANDS ON DASH; hidden after init="-1" commit-if-touched=""
+SEED dist fired-on-touch=1 stored="0" parse=["0","0","0"] shown=["0","0","0"] wheelReads=0 plusReads=0 -> exact; hidden after init="0" commit-if-touched="0.00"
+SEED dist fired-on-touch=1 stored="1e1" parse=["1","0","0"] shown=["1","0","0"] wheelReads=1 plusReads=10 -> lossy; hidden after init="1e1" commit-if-touched="1.00"
+SEED dist fired-on-touch=1 stored="3,5" parse=["3","0","0"] shown=["3","0","0"] wheelReads=3 plusReads=null -> MALFORMED->3; hidden after init="3,5" commit-if-touched="3.00"
+SEED dist fired-on-touch=1 stored="abc" parse=["","",""] shown=["","0","0"] wheelReads=null plusReads=null -> blank->dash; hidden after init="abc" commit-if-touched=""
+SEED dist summary: 11 exact / 3 lossy / 2 dash / 2 clamp / 0 throw over 18 stored values
+SEED pace stored-run_mins="" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="15" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="7.5" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="15.333" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="15.5" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="45.25" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="0.5" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="59" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="60" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="75" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="99" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="100" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="150" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="185" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="-5" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace stored-run_mins="7:30" parse=["7","30"] shown=["7","30"] commit-if-touched="7:30"
+SEED pace stored-run_mins="1e2" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED pace on decimal-minute strings: 15/16 non-blank stored values land on the dash
+SEED rept stored-run_mins="" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="15" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="7.5" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="15.333" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="15.5" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="45.25" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="0.5" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="59" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="60" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="75" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="99" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="100" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="150" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="185" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="-5" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept stored-run_mins="7:30" parse=["7","30"] shown=["7","30"] commit-if-touched="7:30"
+SEED rept stored-run_mins="1e2" parse=["",""] shown=["","0"] commit-if-touched=""
+SEED rept on decimal-minute strings: 15/16 non-blank stored values land on the dash
+MSS 15 min = 900.0000 s -> exact on a seconds grid
+MSS 7.5 min = 450.0000 s -> exact on a seconds grid
+MSS 15.333 min = 919.9800 s -> NOT on a seconds grid (nearest 15:20)
+MSS 15.5 min = 930.0000 s -> exact on a seconds grid
+MSS 45.25 min = 2715.0000 s -> exact on a seconds grid
+MSS 0.5 min = 30.0000 s -> exact on a seconds grid
+MSS 59 min = 3540.0000 s -> exact on a seconds grid
+MSS 60 min = 3600.0000 s -> exact on a seconds grid
+MSS 75 min = 4500.0000 s -> exact on a seconds grid
+MSS 99 min = 5940.0000 s -> exact on a seconds grid
+MSS 100 min = 6000.0000 s -> exact on a seconds grid
+MSS 150 min = 9000.0000 s -> exact on a seconds grid
+MSS 185 min = 11100.0000 s -> exact on a seconds grid
+MSS 1e2 min = 6000.0000 s -> exact on a seconds grid
+READ decimal 7.5: parseFloat=7.5 unary+=7.5 Number=7.5 truthy=true _parseClock=7.5 _paceStrToSec=null
+READ clock 7:30: parseFloat=7 unary+=NaN Number=NaN truthy=true _parseClock=450 _paceStrToSec=450
+READ blank: parseFloat=NaN unary+=0 Number=0 truthy=false _parseClock=null _paceStrToSec=null
+READ dist 2.35: parseFloat=2.35 unary+=2.35 Number=2.35 truthy=true _parseClock=2.35 _paceStrToSec=null
+READ dist 6.00: parseFloat=6 unary+=6 Number=6 truthy=true _parseClock=6 _paceStrToSec=null
+DD dose=time mins="" dist="" -> {}
+DD dose=time mins="" dist="1" -> {"sec":900,"pace":"15:00/mi","tgt":531,"assumed":"assuming planned 15 min"}
+DD dose=time mins="" dist="1.00" -> {"sec":900,"pace":"15:00/mi","tgt":531,"assumed":"assuming planned 15 min"}
+DD dose=time mins="7.5" dist="" -> {}
+DD dose=time mins="7.5" dist="1" -> {"sec":450,"pace":"7:30/mi","tgt":531,"assumed":null}
+DD dose=time mins="7.5" dist="1.00" -> {"sec":450,"pace":"7:30/mi","tgt":531,"assumed":null}
+DD dose=time mins="7:30" dist="" -> {}
+DD dose=time mins="7:30" dist="1" -> {"sec":420,"pace":"7:00/mi","tgt":531,"assumed":null}
+DD dose=time mins="7:30" dist="1.00" -> {"sec":420,"pace":"7:00/mi","tgt":531,"assumed":null}
+DD dose=time mins="15" dist="" -> {}
+DD dose=time mins="15" dist="1" -> {"sec":900,"pace":"15:00/mi","tgt":531,"assumed":null}
+DD dose=time mins="15" dist="1.00" -> {"sec":900,"pace":"15:00/mi","tgt":531,"assumed":null}
+DD dose=time mins="15:00" dist="" -> {}
+DD dose=time mins="15:00" dist="1" -> {"sec":900,"pace":"15:00/mi","tgt":531,"assumed":null}
+DD dose=time mins="15:00" dist="1.00" -> {"sec":900,"pace":"15:00/mi","tgt":531,"assumed":null}
+DD dose=dist mins="" dist="" -> {}
+DD dose=dist mins="" dist="1" -> {}
+DD dose=dist mins="" dist="1.00" -> {}
+DD dose=dist mins="7.5" dist="" -> {"sec":145.16129032258064,"pace":"2:25/mi","tgt":531,"dist":3.1,"assumed":"assuming planned 3.1 mi"}
+DD dose=dist mins="7.5" dist="1" -> {"sec":450,"pace":"7:30/mi","tgt":531,"dist":null,"assumed":null}
+DD dose=dist mins="7.5" dist="1.00" -> {"sec":450,"pace":"7:30/mi","tgt":531,"dist":null,"assumed":null}
+DD dose=dist mins="7:30" dist="" -> {"sec":135.48387096774192,"pace":"2:15/mi","tgt":531,"dist":3.1,"assumed":"assuming planned 3.1 mi"}
+DD dose=dist mins="7:30" dist="1" -> {"sec":420,"pace":"7:00/mi","tgt":531,"dist":null,"assumed":null}
+DD dose=dist mins="7:30" dist="1.00" -> {"sec":420,"pace":"7:00/mi","tgt":531,"dist":null,"assumed":null}
+DD dose=dist mins="15" dist="" -> {"sec":290.3225806451613,"pace":"4:50/mi","tgt":531,"dist":3.1,"assumed":"assuming planned 3.1 mi"}
+DD dose=dist mins="15" dist="1" -> {"sec":900,"pace":"15:00/mi","tgt":531,"dist":null,"assumed":null}
+DD dose=dist mins="15" dist="1.00" -> {"sec":900,"pace":"15:00/mi","tgt":531,"dist":null,"assumed":null}
+DD dose=dist mins="15:00" dist="" -> {"sec":290.3225806451613,"pace":"4:50/mi","tgt":531,"dist":3.1,"assumed":"assuming planned 3.1 mi"}
+DD dose=dist mins="15:00" dist="1" -> {"sec":900,"pace":"15:00/mi","tgt":531,"dist":null,"assumed":null}
+DD dose=dist mins="15:00" dist="1.00" -> {"sec":900,"pace":"15:00/mi","tgt":531,"dist":null,"assumed":null}
+SPEC {"dist":{"fmt":"dec3","cap":"Miles","cols":[{"min":0,"max":99,"nil":true},{"min":0,"max":9,"dot":true},{"min":0,"max":9}]},"pace":{"fmt":"clock","cap":"Pace / mile","cols":[{"min":4,"max":17,"nil":true},{"min":0,"max":59,"pad":2}]},"rept":{"fmt":"clock","cap":"Typical rep","cols":[{"min":0,"max":9,"nil":true},{"min":0,"max":59,"pad":2}]}} REPS 5
+ROWS dist [{"rows":101,"wraps":false,"dom":101},{"rows":10,"wraps":true,"dom":50},{"rows":10,"wraps":true,"dom":50}]
+ROWS pace [{"rows":15,"wraps":false,"dom":15},{"rows":60,"wraps":true,"dom":300}]
+ROWS rept [{"rows":11,"wraps":false,"dom":11},{"rows":60,"wraps":true,"dom":300}]
+FORMAT pace blank-left "" pace 7,30 "7:30" dist 6,0,0 "6.00" dec branch unused? fmt values: ["dec3","clock","clock"]
+DONE lines 130
+PERSIST dose=dist mi=3.1 typed mins=30 dist blank -> {"run_mins":"30","run_dist":"3.1","run_pace":"9:41/mi"}
+DONE2
