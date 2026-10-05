@@ -122,15 +122,20 @@ function resolve(expr, equip){
   const skeleton = src.replace(/'[^']*'/g, "''").replace(/"[^"]*"/g, '""')
                       .replace(/\/[^\/\n]+\/[a-z]*/g, 'RX');
   const foreign = (skeleton.match(/[A-Za-z_][A-Za-z0-9_]*/g) || []).filter(id =>
-    !['hasBarbell','hasCables','hasDumbbells','isCrossfit','hasGHD','isBW','_gear','_floorPool','_bw','filter','test','n','i','indexOf','length','RX','slice'].includes(id));
+    !['hasBarbell','hasCables','hasDumbbells','isCrossfit','hasGHD','isBW','_gear','_floorPool','_bw','_bwHTak','_bwHTlb','filter','test','n','i','indexOf','length','RX','slice'].includes(id));
   if (foreign.length) return null;
   const _gear = a => a.filter(nm => gearOK(nm, g));   // the tier's gear gate (hand table above)
   const _floorPool = (p, min, add) => p.length >= min ? p : p.concat([add]);   // V215 D149: append when short
   const _bw = (bw, other) => (g.isBW ? bw : other);
+  // V231 INSTRUMENT FIX (tests/measure/v231_rulings/v231_absorb_ruling.md, the g193_pool_overlay row): the two hip-thrust literals D195/D196 name in
+  // pool expressions, hand-transcribed from index.html:8445–8446 (tier and lens predicates are a hand table, never
+  // read from a build). V230 names neither, so V230 resolves exactly as before.
+  const _bwHTak = g.isBW ? 'Single-leg glute bridge' : 'Banded hip thrust';
+  const _bwHTlb = g.isBW ? 'Single-leg hip thrust (shoulders on bed)' : 'Banded hip thrust';
   try {
-    const f = new Function('hasBarbell','hasCables','hasDumbbells','isCrossfit','hasGHD','isBW','_gear','_floorPool','_bw',
+    const f = new Function('hasBarbell','hasCables','hasDumbbells','isCrossfit','hasGHD','isBW','_gear','_floorPool','_bw','_bwHTak','_bwHTlb',
       'return (' + src + ');');
-    const v = f(g.hasBarbell, g.hasCables, g.hasDumbbells, g.isCrossfit, g.hasGHD, g.isBW, _gear, _floorPool, _bw);
+    const v = f(g.hasBarbell, g.hasCables, g.hasDumbbells, g.isCrossfit, g.hasGHD, g.isBW, _gear, _floorPool, _bw, _bwHTak, _bwHTlb);
     return Array.isArray(v) ? v.filter(x => typeof x === 'string') : null;
   } catch (e){ return null; }
 }

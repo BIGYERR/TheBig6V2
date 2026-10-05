@@ -47,7 +47,8 @@
 //        print identically in both builds: the dedupe reads the card BEFORE d18LongRunDayPass strips it, so
 //        V215 renamed against a finisher its shipped long day no longer shows (measure's appendix). That is
 //        D160 (the dedupe reads the post-D18 card), ruled for V217, not this build.
-//   HM   HALF_MANNY digest, typed: 0ac7da6b1691a8e1 (an NRC race program; ruled unmoved).
+//   HM   HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[ia-version], row existence a conjunct
+//        (an NRC race program; ruled unmoved; V231 absorb ruling section 4).
 //
 // VERSION PREDICATE (standing ruling 4). D156 ships on ia-version 216.
 //   below 216: NOT APPLICABLE, every row skipped by name, clean exit.
@@ -55,13 +56,12 @@
 //   against baseline 215 and SKIP by name on every other pair. The rest is ruling-level from 216 up.
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
-const { load, progDigest, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, progDigest, fixtures, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version, ERA = 216, V215_COMMIT = '7474f0607bfdf50b768e95221a1f7e9ef52067b6';
-const HM_DIGEST = '0ac7da6b1691a8e1';
 const ROWS = ['F0','F1','F2','F3','G1','G2','N1','K1','HM'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
@@ -206,6 +206,15 @@ else {
     console.log('   ' + l + ': changed long days ' + JSON.stringify(R.chgLong) + ', knock-on K ' + R.K + ', unclassified ' + R.X + (R.X ? ' ' + JSON.stringify(R.why) : ''));
     ok('K1 PAIR ' + l + ': every changed day is a long day or a knock-on rename only V215 made (K ' + R.K + ')', !R.X, R.X + ' ' + R.XEx.join('; ')); });
 }
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md sections 3 and 4; standing rulings 3, 4 and 5):
+// this row defends D156's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[+IA.version], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// D156 (standing ruling 4).
 { const d = progDigest(IA.buildProgram(cl(fixtures.HALF_MANNY)));
-  ok('HM HALF_MANNY digest is ' + HM_DIGEST + ' (ruled unmoved)', d === HM_DIGEST, d); }
+  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  ok('HM HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved)',
+     eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && d === eraRow, d + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 done();

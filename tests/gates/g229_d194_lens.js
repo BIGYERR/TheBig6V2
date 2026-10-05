@@ -47,6 +47,20 @@
 //               tests/gates/g230_d194_lens2.js rows d194-q′ (the typed hand routes) and d194-eq (overlay == fixture on
 //               the D190 lattice); session form calls 3 and 7, tests/measure/v230_rulings/v230_session_calls.md. At 229
 //               (q) asserts exactly as before.
+//   231 and up  (tests/measure/v231_rulings/v231_absorb_ruling.md section 3; standing rulings 2 and 4) p-SWAP, p-AUX and
+//               p-ADD SPLIT: they keep rejected 0, rows >= 1 rejected 0, OV == FIX on every stamped W5 row, every W5 row
+//               stamped, W3 unstamped and the judge not blind, at the V231 row counts 4,608 / 1,814 / 1,440 (typed, the
+//               ruling's print; V230 4,529 / 1,754 / 1,440). Their "pre-from W3 == V228" and "FIX W3+W5 == V228"
+//               conjuncts and the row-set symmetry those two rest on (the candidate prints 5,202/5,460, 1,506/1,602,
+//               1,344/1,440 and 8,595/9,174, 3,491/3,704, 2,691/2,880) assert at 230 and below only. The durable form
+//               ("a FIX list differs from V228 only on a day whose built card differs from V228's") was probed and does
+//               not hold on the candidate (61 FIX rows differ on V228-identical days, e.g. bodyweight lowback/workaround
+//               W5 tue Single-leg hip thrust; V230 0), so the split is plain. p-UNSTAMPED SPLITS: it keeps Thursday-from, the
+//               travel-only overlay and mario_noinj W3/W5 == V228 32/32 32/32; its HALF_MANNY W3/W5 == V228 conjunct
+//               (the candidate prints 27/31, 26/30, the moved lists on the A-1 Tuesday card) asserts at 230 and below
+//               only. At 231 and up each scoped conjunct prints one named SKIP line at column 0 naming the successors
+//               g231_d195b_cost D195-B-b, g231_d195_hipext D195-A-b, g231_d196_bwfallback D196-a..d, never PASS and never
+//               FAIL. Below 231 the four rows assert exactly as before.
 //   IA_ASSUME_VERSION=229 lifts a file stamped exactly 228 to 229 for a discrimination run; it is announced, ignored on
 //   any other file, and gate.sh never sets it. On V228 that way every row FAILS at its V228 figure: (o) lowback 2 and
 //   the W6 thu test text; p-SWAP 1,451 / 1,387; p-AUX 4,228 / 941; p-ADD 2,104 / 1,120; p-MARIO 2 of 223; p-UNSTAMPED
@@ -158,6 +172,9 @@ const W = {   // the ruled figures (V229 expected; V228 where the row requires t
   thu:{ base:{ thu:[2, 56], fri:[1, 101], sat:[3, 55] }, tue:[2, 77, ['tue Sumo deadlift: Jump squats', 'tue (add): g:Jump squats']], same:{ mon:6, tue:7 } },
   travel:32, manny:{ w3:30, w5:29 }, noinj:{ w3:32, w5:32 }, bridge:{ base:[9, 390] }, halfstep:19,
 };
+// V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, p-SWAP / p-AUX / p-ADD SPLIT): the W5 row counts the
+// kept conjuncts read at 231 and up (typed, the ruling's print; V230 reads W.L1).
+const V231_ERA = 231, W231 = { pat:4608, aux:1814, add:1440 };
 
 // ── FIXTURES ─────────────────────────────────────────────────────────────────────────────────────────────────────
 const clone = x => JSON.parse(JSON.stringify(x));
@@ -466,8 +483,17 @@ guard('pUNS', () => { const KN = CFGS.mario; const T = {}, lines = [];
   const um3 = eqL(U.mannyC.w3, U.mannyB.w3), um5 = eqL(U.mannyC.w5, U.mannyB.w5), un3 = eqL(U.mario_noinjC.w3, U.mario_noinjB.w3), un5 = eqL(U.mario_noinjC.w5, U.mario_noinjB.w5);
   lines.push('uninjured == V228: HALF_MANNY W3 ' + um3.eq + '/' + um3.n + ' W5 ' + um5.eq + '/' + um5.n + ' | mario_noinj W3 ' + un3.eq + '/' + un3.n + ' W5 ' + un5.eq + '/' + un5.n);
   const okU = um3.all && um3.n === W.manny.w3 && um5.all && um5.n === W.manny.w5 && un3.all && un3.n === W.noinj.w3 && un5.all && un5.n === W.noinj.w5;
+  const dayMv = (A, B) => DAYS.map(d => { const e = eqL(A, B, [d]); return (e.eq === e.n && e.nb === e.n) ? null : d + ' ' + e.eq + '/' + e.n + (e.nb !== e.n ? ' (V228 ' + e.nb + ' rows)' : ''); }).filter(Boolean).join(', ') || 'none';
+  lines.push('HALF_MANNY lists differing from V228 by day: W3 ' + dayMv(U.mannyC.w3, U.mannyB.w3) + ' | W5 ' + dayMv(U.mannyC.w5, U.mannyB.w5));
   lines.forEach(l => P('    p-UNSTAMPED ' + l));
-  RES.pUNS = [SELF && okThu && okTV && okU, 'Thursday-from thu/fri/sat rejected ' + c.thu.rej + '/' + c.fri.rej + '/' + c.sat.rej + ', mon/tue == V228 ' + (eqMon.all && eqTue.all) + (okThu ? '' : ' (Thursday-from not as ruled)') + '; travel ' + eqTV.eq + '/' + eqTV.n + '; uninjured ' + (okU ? 'identical' : 'MOVED')];
+  // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, p-UNSTAMPED SPLIT; standing rulings 2 and 4): at
+  // 231 and up the row keeps Thursday-from, travel-only and mario_noinj W3/W5 == V228; the HALF_MANNY W3/W5 == V228
+  // conjunct asserts at 230 and below only and at 231 and up prints one named SKIP line at column 0.
+  if(VER >= V231_ERA){ const okN = un3.all && un3.n === W.noinj.w3 && un5.all && un5.n === W.noinj.w5;
+    P('SKIP row p-UNSTAMPED HALF_MANNY W3/W5 lists == V228 (W3 ' + um3.eq + '/' + um3.n + ', W5 ' + um5.eq + '/' + um5.n + ' on this tree): scoped to ia-version 230 and below by the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 3); successors g231_d195b_cost D195-B-b, g231_d195_hipext D195-A-b, g231_d196_bwfallback D196-a..d. Never PASS, never FAIL.');
+    R.pUNS += ' [V231 split: Thursday-from, travel-only, mario_noinj W3/W5 == V228; the HALF_MANNY W3/W5 conjunct SKIPs]';
+    RES.pUNS = [SELF && okThu && okTV && okN, 'Thursday-from thu/fri/sat rejected ' + c.thu.rej + '/' + c.fri.rej + '/' + c.sat.rej + ', mon/tue == V228 ' + (eqMon.all && eqTue.all) + (okThu ? '' : ' (Thursday-from not as ruled)') + '; travel ' + eqTV.eq + '/' + eqTV.n + '; mario_noinj W3 ' + un3.eq + '/' + un3.n + ', W5 ' + un5.eq + '/' + un5.n + (okN ? '' : ' MOVED')]; }
+  else RES.pUNS = [SELF && okThu && okTV && okU, 'Thursday-from thu/fri/sat rejected ' + c.thu.rej + '/' + c.fri.rej + '/' + c.sat.rej + ', mon/tue == V228 ' + (eqMon.all && eqTue.all) + (okThu ? '' : ' (Thursday-from not as ruled)') + '; travel ' + eqTV.eq + '/' + eqTV.n + '; uninjured ' + (okU ? 'identical' : 'MOVED')];
 });
 
 // (p) bridge and halfstep (imBackFromInjury on the mario overlay; clock +60 s for distinct ids)
@@ -547,7 +573,15 @@ Promise.all(WORK).then(rs => {
     ex.forEach(e => P('      e.g. ' + e));
     const c = allCfg && symOK && SELF && S.n5 === want && S.st5 === want && S.rej === 0 && S.cards === 0 && S.eqFix === want && S.fixMiss === 0
       && S.n3 > 0 && S.eq3 === S.n3 && S.st3 === 0 && S.rej3 > 0 && S.nf > 0 && S.eqf === S.nf;
-    RES[row] = [c, 'rejected ' + S.rej + ' of ' + S.offers + ', rows >= 1 rejected ' + S.cards + ' of ' + S.n5 + ', OV == FIX ' + S.eqFix + '/' + S.st5 + ', W3 == V228 ' + S.eq3 + '/' + S.n3 + ', FIX == V228 ' + S.eqf + '/' + S.nf + (allCfg ? '' : '; L1 sweep incomplete (' + seen.size + ' cfgs)') + (S.rej3 > 0 ? '' : '; judge blind on W3') + (symOK ? '' : '; row sets differ')];
+    // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, p-SWAP / p-AUX / p-ADD SPLIT, classes B-1, A-1
+    // and D196 via the cards; standing rulings 2 and 4): at 231 and up the row keeps every conjunct but the two "== V228"
+    // ones and the row-set symmetry they rest on, at the W231 row counts; those print one named SKIP line at column 0.
+    if(VER >= V231_ERA){ const w2 = W231[k], asym = L.filter(x => !x.sym.every(Boolean)).length;
+      const c2 = allCfg && SELF && S.n5 === w2 && S.st5 === w2 && S.rej === 0 && S.cards === 0 && S.eqFix === w2 && S.fixMiss === 0 && S.n3 > 0 && S.st3 === 0 && S.rej3 > 0 && S.nf > 0;
+      P('SKIP row ' + row.replace(/^p/, 'p-') + ' pre-from W3 OV lists == V228 (' + S.eq3 + '/' + S.n3 + '), FIX W3+W5 lists == V228 (' + S.eqf + '/' + S.nf + ') and the row-set symmetry they rest on (' + asym + ' of ' + seen.size + ' cfgs asymmetric) on this tree: scoped to ia-version 230 and below by the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 3); successors g231_d195b_cost D195-B-b, g231_d195_hipext D195-A-b, g231_d196_bwfallback D196-a..d. Never PASS, never FAIL.');
+      R[row] += ' [V231 split: rejected 0, rows 0, OV == FIX ' + w2 + '/' + w2 + '; W3 == V228, FIX == V228 and the row-set symmetry SKIP]';
+      RES[row] = [c2, 'rejected ' + S.rej + ' of ' + S.offers + ', rows >= 1 rejected ' + S.cards + ' of ' + S.n5 + ', OV == FIX ' + S.eqFix + '/' + S.st5 + (allCfg ? '' : '; L1 sweep incomplete (' + seen.size + ' cfgs)') + (S.rej3 > 0 ? '' : '; judge blind on W3')]; }
+    else RES[row] = [c, 'rejected ' + S.rej + ' of ' + S.offers + ', rows >= 1 rejected ' + S.cards + ' of ' + S.n5 + ', OV == FIX ' + S.eqFix + '/' + S.st5 + ', W3 == V228 ' + S.eq3 + '/' + S.n3 + ', FIX == V228 ' + S.eqf + '/' + S.nf + (allCfg ? '' : '; L1 sweep incomplete (' + seen.size + ' cfgs)') + (S.rej3 > 0 ? '' : '; judge blind on W3') + (symOK ? '' : '; row sets differ')];
   }
   // q sample
   if(Q_LIVE){

@@ -28,7 +28,8 @@
 //       tree. Byte-identity with the key stripped is the BUILD-TIME proof for D103a slices 1-3
 //       (stamp, readers, chip + history); it is not a standing claim about the final V208,
 //       which also carries the LI/SI rename, D104a and D140 on the same ia-version.
-//   K5  HALF_MANNY digest 0ac7da6b1691a8e1 (NRC fixture: nothing it prints is stamped).
+//   K5  HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[ia-version], row existence a
+//       conjunct (NRC fixture: nothing it prints is stamped; V231 absorb ruling section 4).
 //
 // VERSION PREDICATE (standing ruling 4): D103a ships on ia-version 208. Below 208 every row is
 // printed SKIP, never a bare PASS. K4 runs ONLY when the baseline (argv[3]) carries the SAME
@@ -36,7 +37,7 @@
 // against the previous release (208 vs 207) it prints SKIP with the reason.
 'use strict';
 const path = require('path');
-const { load, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
@@ -152,6 +153,15 @@ else {
   }
 }
 // ── K5 ─────────────────────────────────────────────────────────────────────────────
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
+// this row defends D103a's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[+IA.version], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// D103a (standing ruling 4).
 { let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
-  ok('K5 HALF_MANNY digest is 0ac7da6b1691a8e1 (NRC: nothing it prints is stamped)', hm === '0ac7da6b1691a8e1', hm); }
+  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  ok('K5 HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (NRC: nothing it prints is stamped)',
+     eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 done();

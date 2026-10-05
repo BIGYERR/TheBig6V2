@@ -1,0 +1,1337 @@
+######## PART=prep (SCR=/private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/adf6a3cd-1bcb-472e-a3ec-2078adfbc3be/scratchpad/measure2)
+index.html ia-version 230
+HOOK tree:
+  anchor H1 legs-site log count 1
+  anchor H2a budget day key count 1
+  anchor H2b budget view count 1
+  anchor H3 pre-sweep snapshot count 1
+  anchor H4 injury filter wrap count 1
+B tree:
+  anchor B _cost membership count 1
+A tree:
+  anchor A1 prevention pool subset count 1
+  anchor A2 fourth circuit item count 1
+AB tree (B on A):
+  anchor B _cost membership count 1
+baseline == itself (pristine, built twice): 67/67
+HOOK (logging + IFW on) == pristine, progDigest: 67/67
+HALF_MANNY fixture digest pristine 0ac7da6b1691a8e1 (expect 0ac7da6b1691a8e1); HOOK 0ac7da6b1691a8e1
+A tree, IFW wrapper on == off: 64/64
+ms/build ~6
+PREP DONE
+######## PART=single (SCR=/private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/adf6a3cd-1bcb-472e-a3ec-2078adfbc3be/scratchpad/measure2)
+==== 0a. RE-LOCATE on V230 (line numbers in index.html)
+  ex.hipExt draw (_slot)                                                 :8865
+  ex.hipExt assigned                                                     :8935
+  hipExtPool decl                                                        :8490
+  hipExtBW decl                                                          :8496
+  prevention branch (never reads ex.hipExt)                              :9281
+  runner-armor circuit push                                              :9291
+  non-prevention Leg superset B reads ex.hipExt                          :9322
+  hipExtBW reader (full-body lowerHipExt)                                :9471
+  preventionSupport decl                                                 :8203
+  capSessionBudget                                                       :10571
+  _isHalf                                                                :10576
+  _cost                                                                  :10577
+  SESSION_SET_BUDGET                                                     :10570
+  recoveryDeload                                                         :10469
+  capRegionalFatigue                                                     :10729
+  pass order (buildSections->applyInjuryFilter->recoveryDeload->capRegionalFatigue) :10947
+  capSessionBudget caller                                                :10970
+  bodyweightSweep caller                                                 :11002
+  bodyweightSweep def                                                    :6884
+  _BW_SUBS                                                               :6503
+  _BW_GEAR                                                               :6527
+  _bwFallback                                                            :6528
+  _bwFallback catch-all Burpees                                          :6537
+  HIP-EXTENSION RESERVATION                                              :8729
+  reservation filter _left                                               :8743
+  substitute overlay patch (equipment)                                   :15826, :15827
+  applyOverlays                                                          :15359
+  _isHalf readers                                                        :10577
+
+==== 0b/5. HALF_MANNY digests (fixture): V=0ac7da6b1691a8e1  B=0ac7da6b1691a8e1  A=14aacbced1c527d7  AB=14aacbced1c527d7  | expect V=0ac7da6b1691a8e1; B==V byte-identical: false
+  pasted MANNY (mile 8:00) digests: V=b4c29531fbe3674b  B=b4c29531fbe3674b  A=7d1f9c7b92395375  AB=7d1f9c7b92395375 | lift sequence fixture==pasted (V): false
+  HALF_MANNY hipExt draw per week (V hook log): W1=45° back extension ; W2=45° back extension ; W3=Glute-ham raise ; W4=Glute-ham raise ; W5=Single-leg hip thrust ; W6=Single-leg hip thrust ; W7=45° back extension ; W8=45° back extension ; W9=Single-leg hip thrust ; W10=Single-leg hip thrust ; W11=Single-leg hip thrust ; W12=Single-leg hip thrust
+  HALF_MANNY A-tree hipExt pool/draw: W1=Single-leg hip thrust hinge0=Barbell Romanian deadlift pool=["Single-leg hip thrust"] ; W2=Single-leg hip thrust hinge0=Barbell Romanian deadlift pool=["Single-leg hip thrust"] ; W3=Single-leg hip thrust hinge0=Kettlebell swing pool=["Single-leg hip thrust"] ...
+
+==== 0c/5. HALF_MANNY fixture, every Tue W1..W14: card per arm, budget view t/cap
+  W1 tue  [V 19.5/20 | B 15.5/20 | A 19.5/20 | AB 15.5/20]  budgetOff==V: true
+    V   Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    B   (identical to V)
+    A   Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    AB  Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W2 tue  [V 19.5/20 | B 15.5/20 | A 19.5/20 | AB 15.5/20]  budgetOff==V: true
+    V   Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Standing band hip abduction 2×12–15 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    B   (identical to V)
+    A   Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Standing band hip abduction 2×12–15 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    AB  Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Standing band hip abduction 2×12–15 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W3 tue  [V 19.5/20 | B 15.5/20 | A 19.5/20 | AB 15.5/20]  budgetOff==V: true
+    V   Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    B   (identical to V)
+    A   Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    AB  Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W4 tue  [V 15/20 | B 12/20 | A 17/20 | AB 14/20]  budgetOff==V: true
+    V   Main — Back squat :: Back squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Standing ankle CARs 2×5 each direction
+    B   (identical to V)
+    A   Main — Back squat :: Back squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Standing ankle CARs 2×5 each direction
+    AB  Main — Back squat :: Back squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Standing ankle CARs 2×5 each direction
+  W5 tue  [V 18.5/20 | B 15.5/20 | A 18.5/20 | AB 15.5/20]  budgetOff==V: true
+    V   Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    B   (identical to V)
+    A   Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    AB  Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W6 tue  [V 17.5/20 | B 15.5/20 | A 17.5/20 | AB 15.5/20]  budgetOff==V: true
+    V   Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Clamshells w/ band 2×15 each | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    B   (identical to V)
+    A   Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Clamshells w/ band 2×15 each | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    AB  Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Clamshells w/ band 2×15 each | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W7 tue  [V 17.5/20 | B 15.5/20 | A 17.5/20 | AB 15.5/20]  budgetOff==V: true
+    V   Main — Front squat :: Front squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+    B   (identical to V)
+    A   Main — Front squat :: Front squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+    AB  Main — Front squat :: Front squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+  W8 tue  [V 15/20 | B 12/20 | A 17/20 | AB 14/20]  budgetOff==V: true
+    V   Main — Front squat :: Front squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Seated banded hip flexion 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Single-leg bent-knee soleus raise 2×12 each, slow
+    B   (identical to V)
+    A   Main — Front squat :: Front squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Seated banded hip flexion 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Single-leg bent-knee soleus raise 2×12 each, slow
+    AB  Main — Front squat :: Front squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Seated banded hip flexion 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Single-leg bent-knee soleus raise 2×12 each, slow
+  W9 tue  [V 18.5/20 | B 15.5/20 | A 18.5/20 | AB 15.5/20]  budgetOff==V: true
+    V   Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+    B   (identical to V)
+    A   Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+    AB  Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+  W10 tue  [V 18.5/20 | B 15.5/20 | A 18.5/20 | AB 15.5/20]  budgetOff==V: true
+    V   Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+    B   (identical to V)
+    A   Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+    AB  Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+  W11 tue  [V 18.5/20 | B 14.5/20 | A 18.5/20 | AB 14.5/20]  budgetOff==V: true
+    V   Main — Back squat :: Back squat 2×8 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+    B   (identical to V)
+    A   Main — Back squat :: Back squat 2×8 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+    AB  Main — Back squat :: Back squat 2×8 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+  W12 tue  [V 14/20 | B 11/20 | A 16/20 | AB 13/20]  budgetOff==V: true
+    V   Main — Back squat :: Back squat 2×9 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Worlds greatest stretch 5 each side
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+    B   (identical to V)
+    A   Main — Back squat :: Back squat 2×9 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Worlds greatest stretch 5 each side
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+    AB  Main — Back squat :: Back squat 2×9 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Worlds greatest stretch 5 each side
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+  W13 tue  [V 10/20 | B 8/20 | A 10/20 | AB 8/20]  budgetOff==V: true
+    V   Primer — Front squat :: Front squat 3×12 — RPE 5–6 (primer — light and crisp, well short of failure), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Tibialis raise (wall lean) 2×20
+    B   (identical to V)
+    A   (identical to V)
+    AB  (identical to V)
+  W14 tue  [V 9/20 | B 8/20 | A 9/20 | AB 8/20]  budgetOff==V: true
+    V   Primer — Front squat :: Front squat 2×12 — RPE 5–6 (primer — light and crisp, well short of failure), 2–3 min rest
+        Taper :: Race week — primer only. Movement quality, zero grind. The hay is in the barn. 
+        Foot & ankle — mobility only :: Standing ankle CARs 2×5 each direction | Toe yoga (splay + big-toe lifts) 2×10 each foot
+    B   (identical to V)
+    A   (identical to V)
+    AB  (identical to V)
+
+==== 0d/3. PRT TING (seed 87747): Tue budget views W1..W11
+  W1 tue V 24.5/20 | B 20/20 | mon V 22/17 B 20.5/17
+  W2 tue V 25.5/20 | B 20/20 | mon V 25/17 B 23.5/17
+  W3 tue V 23/20 | B 20/20 | mon V 20.5/17 B 20.5/17
+  W4 tue V 17/20 | B 14/20 | mon V 11.5/17 B 11.5/17
+  W5 tue V 23/20 | B 20/20 | mon V 22/17 B 22/17
+  W6 tue V 23/20 | B 20/20 | mon V 22/17 B 22/17
+  W7 tue V 24/20 | B 20/20 | mon V 20.5/17 B 20.5/17
+  W8 tue V 18/20 | B 14/20 | mon V 11.5/17 B 11.5/17
+  W9 tue V 25.5/20 | B 20/20 | mon V 22/17 B 20.5/17
+  W10 tue V 10/20 | B 8/20 | mon V 6/17 B 6/17
+  W11 tue V 9/20 | B 8/20 | mon V 5/17 B 5/17
+  PRT W9 tue:
+    V    Main — Front squat :: Front squat 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Dumbbell Bulgarian split squat 3×8–12 each @ RPE 8
+        Leg superset B :: Kettlebell single-leg deadlift 3×6–10 @ RPE 8
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+    V-bo Main — Front squat :: Front squat 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A (SS 3) :: Dumbbell Bulgarian split squat 3×8–12 each @ RPE 8 | Terminal knee extension (band) 3×25 sec
+        Leg superset B (SS 3) :: Kettlebell single-leg deadlift 3×6–10 @ RPE 8 | 45° back extension 3 sets — RPE 8 (stop 2 reps short of failure)
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+    B    Main — Front squat :: Front squat 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A (SS 3) :: Dumbbell Bulgarian split squat 3×8–12 each @ RPE 8 | Terminal knee extension (band) 3×25 sec
+        Leg superset B (SS 3) :: Kettlebell single-leg deadlift 3×6–10 @ RPE 8 | 45° back extension 3 sets — RPE 8 (stop 2 reps short of failure)
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+    A==V true AB==B true
+  PRT W9 mon:
+    V    Main — Incline barbell press :: Incline barbell press 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Barbell overhead press 3×6–10 @ RPE 8
+        Chest + knee (SS 3) :: Dumbbell incline press 3×10–15 @ RPE 8 | Terminal knee extension (band) 3×25 sec
+        Core — Anti-Rotation :: Bird dogs 3×12 each
+    V-bo Main — Incline barbell press :: Incline barbell press 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Barbell overhead press 3×6–10 @ RPE 8
+        Conditioning (SS 3) :: Burpees 3×12 | Ball slams 3×10
+        Chest + knee (SS 3) :: Dumbbell incline press 3×10–15 @ RPE 8 | Terminal knee extension (band) 3×25 sec
+        Core — Anti-Rotation :: Bird dogs 3×12 each | Side plank 3×30–45 sec each
+    B    Main — Incline barbell press :: Incline barbell press 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Barbell overhead press 3×6–10 @ RPE 8
+        Conditioning :: Burpees 3×12
+        Chest + knee (SS 3) :: Dumbbell incline press 3×10–15 @ RPE 8 | Terminal knee extension (band) 3×25 sec
+        Core — Anti-Rotation :: Bird dogs 3×12 each
+    A==V true AB==B true
+  PRT W1 mon:
+    V    Main — Barbell bench press :: Barbell bench press 4×6 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 3×6–10 @ RPE 8
+        Chest + knee (SS 3) :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure) | Terminal knee extension (band) 3×25 sec
+        Core — Anti-Rotation :: Bird dogs 3×12 each
+    V-bo Main — Barbell bench press :: Barbell bench press 4×6 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 3×6–10 @ RPE 8
+        Conditioning (SS 3) :: Broad jumps 3×12 | Ball slams 3×10
+        Chest + knee (SS 3) :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure) | Terminal knee extension (band) 3×25 sec
+        Core — Anti-Rotation :: Suitcase carry 3×40 yd each | Bird dogs 3×12 each
+    B    Main — Barbell bench press :: Barbell bench press 4×6 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 3×6–10 @ RPE 8
+        Conditioning :: Broad jumps 3×12
+        Chest + knee (SS 3) :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure) | Terminal knee extension (band) 3×25 sec
+        Core — Anti-Rotation :: Bird dogs 3×12 each
+    A==V true AB==B true
+  PRT W2 mon:
+    V    Main — Barbell bench press :: Barbell bench press 4×5 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 3×6–10 @ RPE 8
+        Chest + knee (SS 3) :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure) | Terminal knee extension (band) 3×25 sec
+        Core — Rotational Power :: Medicine ball rotary toss 3×8 each
+    V-bo Main — Barbell bench press :: Barbell bench press 4×5 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 3×6–10 @ RPE 8
+        Conditioning (SS 3) :: Broad jumps 3×12 | Ball slams 3×10
+        Chest + knee (SS 3) :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure) | Terminal knee extension (band) 3×25 sec
+        Core — Rotational Power :: Medicine ball rotary toss 3×8 each | Landmine rotations 3×8–12 each @ RPE 8
+    B    Main — Barbell bench press :: Barbell bench press 4×5 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 3×6–10 @ RPE 8
+        Chest + knee (SS 3) :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure) | Terminal knee extension (band) 3×25 sec
+        Core — Rotational Power :: Medicine ball rotary toss 3×8 each
+    A==V true AB==B true
+  PRT hipExt draws (V): W1=Barbell hip thrust ; W2=Barbell hip thrust ; W3=Barbell hip thrust ; W4=Barbell hip thrust ; W5=Barbell hip thrust ; W6=Barbell hip thrust ; W7=45° back extension ; W8=45° back extension ; W9=45° back extension
+  PRT whole-program day cells changed V->B: 9/77
+
+==== 6a. today's sweep on the five A-arm names (engine maps, V230)
+  Single-leg hip thrust                      -> no gear token: kept as is
+  Banded hip thrust                          -> _BW_GEAR hit (Band) -> _bwFallback: Burpees
+  Single-leg glute bridge (weighted)         -> _BW_GEAR hit (weighted) -> _bwFallback: Burpees
+  Single-leg glute bridge                    -> no gear token: kept as is
+  Single-leg hip thrust (shoulders on bed)   -> no gear token: kept as is
+  EXLIB prehab pools (B membership): {"hip":["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion"],"knee":["Spanish squat hold (KB)","Wall sit","Terminal knee extension (band)"],"fa":["Tibialis raise (wall lean)","Banded dorsiflexion","Single-leg bent-knee soleus raise","Standing ankle CARs"],"fabw":["Tibialis raise (wall lean)","Single-leg bent-knee soleus raise","Standing ankle CARs"]}
+  newly half-priced by B (members _isHalf misses): Banded monster walks | Standing band hip abduction | Hip airplane (light KB) | Seated banded hip flexion | Terminal knee extension (band) | Tibialis raise (wall lean) | Banded dorsiflexion | Single-leg bent-knee soleus raise | Standing ankle CARs
+SINGLE DONE
+######## PART=report (SCR=/private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/adf6a3cd-1bcb-472e-a3ec-2078adfbc3be/scratchpad/measure2)
+workers 6 configs 3888 | builds ok 3888 crash 0 | self-identity 718/718
+
+==== 6b. which builds ran bodyweightSweep (pre-sweep hook fires inside its predicate)
+  TIER bodyweight        828/828
+  TIER commercial        0/612
+  TIER crossfit          0/612
+  TIER home_basic        0/720
+  TIER home_full         0/612
+  TIER minimal           0/504
+  L FULL                 504/3024
+  L L432                 108/432
+  L LBW                  216/432
+
+==== 0e. C1 printed anywhere: builds >= 1 C1 item, support_prevention FULL lattice, per tree (V230 / B / A / AB; v228 read 0/360 loaded, 34/72 bodyweight)
+  FOCUS support_prevention (432 FULL + 144 L432): V 123/576 | Vbo 123/576 | B 123/576 | A 552/576 | AB 552/576
+  FT FULL/support_prevention/bodyweight       V 52/72 | Vbo 52/72 | B 52/72 | A 62/72 | AB 62/72
+  FT FULL/support_prevention/commercial       V 0/72 | Vbo 0/72 | B 0/72 | A 72/72 | AB 72/72
+  FT FULL/support_prevention/crossfit         V 0/72 | Vbo 0/72 | B 0/72 | A 72/72 | AB 72/72
+  FT FULL/support_prevention/home_basic       V 0/72 | Vbo 0/72 | B 0/72 | A 72/72 | AB 72/72
+  FT FULL/support_prevention/home_full        V 0/72 | Vbo 0/72 | B 0/72 | A 72/72 | AB 72/72
+  FT FULL/support_prevention/minimal          V 0/72 | Vbo 0/72 | B 0/72 | A 72/72 | AB 72/72
+  FULL sun,wed-equivalent legs row: see L FULL (both rests); v228 C2 used sun/wed only
+  ALL: V 2200/3888 (items 11800) | Vbo 2515/3888 (items 17682) | B 2378/3888 (items 14415) | A 2629/3888 (items 15035) | AB 2807/3888 (items 17823)
+
+==== 0f/2. legs-site hipExt draw vs print (v228 method). Segments; v228 ALL(sun/wed FULL) read C1 printed 3,551/6,298, budget-off 4,969
+  ALL                       V C1 6900/13692 all 11571/23584 prevSlot 58/4084(of 4284) || Vbo C1 9861/13692 all 16297/23584 prevSlot 58/4084(of 4284) || B C1 9244/13692 all 15190/23584 prevSlot 58/4084(of 4284) || A C1 6900/13692 all 11571/23584 prevSlot 3401/3990(of 4284) || AB C1 9244/13692 all 15190/23584 prevSlot 3574/3990(of 4284)
+  L FULL                    V C1 6234/12596 all 9791/20520 prevSlot 52/3420(of 3420) || Vbo C1 9195/12596 all 14409/20520 prevSlot 52/3420(of 3420) || B C1 8578/12596 all 13356/20520 prevSlot 52/3420(of 3420) || A C1 6234/12596 all 9791/20520 prevSlot 2965/3420(of 3420) || AB C1 8578/12596 all 13356/20520 prevSlot 3138/3420(of 3420)
+  REST sun,wed              V C1 4085/7144 all 6839/12456 prevSlot 32/2374(of 2574) || Vbo C1 5503/7144 all 9212/12456 prevSlot 32/2374(of 2574) || B C1 5249/7144 all 8764/12456 prevSlot 32/2374(of 2574) || A C1 4085/7144 all 6839/12456 prevSlot 1995/2280(of 2574) || AB C1 5249/7144 all 8764/12456 prevSlot 2005/2280(of 2574)
+  L L432                    V C1 402/596 all 792/1328 prevSlot 6/664(of 864) || Vbo C1 402/596 all 792/1328 prevSlot 6/664(of 864) || B C1 402/596 all 792/1328 prevSlot 6/664(of 864) || A C1 402/596 all 792/1328 prevSlot 436/570(of 864) || AB C1 402/596 all 792/1328 prevSlot 436/570(of 864)
+  L LBW                     V C1 264/500 all 988/1736 prevSlot 0/0(of 0) || Vbo C1 264/500 all 1096/1736 prevSlot 0/0(of 0) || B C1 264/500 all 1042/1736 prevSlot 0/0(of 0) || A C1 264/500 all 988/1736 prevSlot 0/0(of 0) || AB C1 264/500 all 1042/1736 prevSlot 0/0(of 0)
+  TIER bodyweight           V C1 1482/2592 all 2154/4444 prevSlot 52/700(of 786) || Vbo C1 1720/2592 all 2617/4444 prevSlot 52/700(of 786) || B C1 1681/2592 all 2434/4444 prevSlot 52/700(of 786) || A C1 1482/2592 all 2154/4444 prevSlot 346/678(of 786) || AB C1 1681/2592 all 2434/4444 prevSlot 346/678(of 786)
+  TIER commercial           V C1 1048/2208 all 1840/3816 prevSlot 0/768(of 786) || Vbo C1 1579/2208 all 2681/3816 prevSlot 0/768(of 786) || B C1 1459/2208 all 2503/3816 prevSlot 0/768(of 786) || A C1 1048/2208 all 1840/3816 prevSlot 662/726(of 786) || AB C1 1459/2208 all 2503/3816 prevSlot 696/726(of 786)
+  TIER crossfit             V C1 970/2112 all 1798/3792 prevSlot 0/756(of 786) || Vbo C1 1544/2112 all 2694/3792 prevSlot 0/756(of 786) || B C1 1415/2112 all 2507/3792 prevSlot 0/756(of 786) || A C1 970/2112 all 1798/3792 prevSlot 662/726(of 786) || AB C1 1415/2112 all 2507/3792 prevSlot 696/726(of 786)
+  TIER home_basic           V C1 757/1596 all 2176/4392 prevSlot 0/570(of 570) || Vbo C1 1196/1596 all 3162/4392 prevSlot 0/570(of 570) || B C1 1112/1596 all 2939/4392 prevSlot 0/570(of 570) || A C1 757/1596 all 2176/4392 prevSlot 536/570(of 570) || AB C1 1112/1596 all 2939/4392 prevSlot 570/570(of 570)
+  TIER home_full            V C1 1834/3672 all 1834/3720 prevSlot 6/720(of 786) || Vbo C1 2678/3672 all 2678/3720 prevSlot 6/720(of 786) || B C1 2505/3672 all 2505/3720 prevSlot 6/720(of 786) || A C1 1834/3672 all 1834/3720 prevSlot 662/720(of 786) || AB C1 2505/3672 all 2505/3720 prevSlot 696/720(of 786)
+  TIER minimal              V C1 809/1512 all 1769/3420 prevSlot 0/570(of 570) || Vbo C1 1144/1512 all 2465/3420 prevSlot 0/570(of 570) || B C1 1072/1512 all 2302/3420 prevSlot 0/570(of 570) || A C1 809/1512 all 1769/3420 prevSlot 533/570(of 570) || AB C1 1072/1512 all 2302/3420 prevSlot 570/570(of 570)
+  FOCUS balanced            V C1 949/2168 all 1758/4004 prevSlot 0/0(of 0) || Vbo C1 1297/2168 all 2314/4004 prevSlot 0/0(of 0) || B C1 1297/2168 all 2314/4004 prevSlot 0/0(of 0) || A C1 949/2168 all 1758/4004 prevSlot 0/0(of 0) || AB C1 1297/2168 all 2314/4004 prevSlot 0/0(of 0)
+  FOCUS fatloss             V C1 892/1956 all 1506/3420 prevSlot 0/0(of 0) || Vbo C1 1228/1956 all 2054/3420 prevSlot 0/0(of 0) || B C1 1228/1956 all 2054/3420 prevSlot 0/0(of 0) || A C1 892/1956 all 1506/3420 prevSlot 0/0(of 0) || AB C1 1228/1956 all 2054/3420 prevSlot 0/0(of 0)
+  FOCUS hypertrophy         V C1 1385/2530 all 2146/3996 prevSlot 0/0(of 0) || Vbo C1 2530/2530 all 3996/3996 prevSlot 0/0(of 0) || B C1 1913/2530 all 2889/3996 prevSlot 0/0(of 0) || A C1 1385/2530 all 2146/3996 prevSlot 0/0(of 0) || AB C1 1913/2530 all 2889/3996 prevSlot 0/0(of 0)
+  FOCUS strength            V C1 1148/2530 all 1728/3996 prevSlot 0/0(of 0) || Vbo C1 1595/2530 all 2285/3996 prevSlot 0/0(of 0) || B C1 1595/2530 all 2285/3996 prevSlot 0/0(of 0) || A C1 1148/2530 all 1728/3996 prevSlot 0/0(of 0) || AB C1 1595/2530 all 2285/3996 prevSlot 0/0(of 0)
+  FOCUS support_athletic    V C1 982/2254 all 1732/4084 prevSlot 0/0(of 0) || Vbo C1 1272/2254 all 2234/4084 prevSlot 0/0(of 0) || B C1 1272/2254 all 2234/4084 prevSlot 0/0(of 0) || A C1 982/2254 all 1732/4084 prevSlot 0/0(of 0) || AB C1 1272/2254 all 2234/4084 prevSlot 0/0(of 0)
+  FOCUS support_prevention  V C1 0/0 all 0/0 prevSlot 58/4084(of 4284) || Vbo C1 0/0 all 0/0 prevSlot 58/4084(of 4284) || B C1 0/0 all 0/0 prevSlot 58/4084(of 4284) || A C1 0/0 all 0/0 prevSlot 3401/3990(of 4284) || AB C1 0/0 all 0/0 prevSlot 3574/3990(of 4284)
+  FOCUS support_strength    V C1 1544/2254 all 2701/4084 prevSlot 0/0(of 0) || Vbo C1 1939/2254 all 3414/4084 prevSlot 0/0(of 0) || B C1 1939/2254 all 3414/4084 prevSlot 0/0(of 0) || A C1 1544/2254 all 2701/4084 prevSlot 0/0(of 0) || AB C1 1939/2254 all 3414/4084 prevSlot 0/0(of 0)
+  FAM none                  V C1 2858/4376 all 5270/8248 prevSlot 14/1528(of 1728) || Vbo C1 2986/4376 all 5560/8248 prevSlot 14/1528(of 1728) || B C1 2914/4376 all 5408/8248 prevSlot 14/1528(of 1728) || A C1 2858/4376 all 5270/8248 prevSlot 1220/1434(of 1728) || AB C1 2914/4376 all 5408/8248 prevSlot 1220/1434(of 1728)
+  FAM race                  V C1 2132/4740 all 3419/7992 prevSlot 28/1332(of 1332) || Vbo C1 3592/4740 all 5772/7992 prevSlot 28/1332(of 1332) || B C1 3320/4740 all 5276/7992 prevSlot 28/1332(of 1332) || A C1 2132/4740 all 3419/7992 prevSlot 1159/1332(of 1332) || AB C1 3320/4740 all 5276/7992 prevSlot 1230/1332(of 1332)
+  FAM test                  V C1 1910/4576 all 2882/7344 prevSlot 16/1224(of 1224) || Vbo C1 3283/4576 all 4965/7344 prevSlot 16/1224(of 1224) || B C1 3010/4576 all 4506/7344 prevSlot 16/1224(of 1224) || A C1 1910/4576 all 2882/7344 prevSlot 1022/1224(of 1224) || AB C1 3010/4576 all 4506/7344 prevSlot 1124/1224(of 1224)
+  NOTE: "REST sun,wed" mixes FULL + injured lattices; the v228-comparable row is printed by the report for L FULL x sun,wed below.
+
+==== 2. diffs (cells = non-rest lifting days of the reference). tags: VB = B alone on V230, VA = A alone, BAB = A on top of B, VAB = both
+  -- VB --
+    ALL                        progs changed 2028/3888 | cells changed 11934/149148 | items removed 0 added 16053 (in V budget-off 16053, novel 0) redetail 14 sections removed 0
+    L FULL                     progs changed 1953/3024 | cells changed 11685/123228 | items removed 0 added 15790 (in V budget-off 15790, novel 0) redetail 14 sections removed 0
+    L L432                     progs changed 19/432 | cells changed 43/12960 | items removed 0 added 43 (in V budget-off 43, novel 0) redetail 0 sections removed 0
+    L LBW                      progs changed 56/432 | cells changed 206/12960 | items removed 0 added 220 (in V budget-off 220, novel 0) redetail 0 sections removed 0
+    FOCUS balanced             progs changed 295/576 | cells changed 1744/21924 | items removed 0 added 2487 (in V budget-off 2487, novel 0) redetail 0 sections removed 0
+    FOCUS fatloss              progs changed 272/432 | cells changed 1673/17604 | items removed 0 added 2411 (in V budget-off 2411, novel 0) redetail 0 sections removed 0
+    FOCUS hypertrophy          progs changed 432/576 | cells changed 2441/21924 | items removed 0 added 2846 (in V budget-off 2846, novel 0) redetail 0 sections removed 0
+    FOCUS strength             progs changed 243/576 | cells changed 1758/21924 | items removed 0 added 2610 (in V budget-off 2610, novel 0) redetail 0 sections removed 0
+    FOCUS support_athletic     progs changed 294/576 | cells changed 1878/21924 | items removed 0 added 2644 (in V budget-off 2644, novel 0) redetail 0 sections removed 0
+    FOCUS support_prevention   progs changed 202/576 | cells changed 855/21924 | items removed 0 added 895 (in V budget-off 895, novel 0) redetail 14 sections removed 0
+    FOCUS support_strength     progs changed 290/576 | cells changed 1585/21924 | items removed 0 added 2160 (in V budget-off 2160, novel 0) redetail 0 sections removed 0
+    TIER bodyweight            progs changed 170/828 | cells changed 601/30258 | items removed 0 added 601 (in V budget-off 601, novel 0) redetail 0 sections removed 0
+    TIER commercial            progs changed 346/612 | cells changed 2203/23778 | items removed 0 added 3049 (in V budget-off 3049, novel 0) redetail 4 sections removed 0
+    TIER crossfit              progs changed 375/612 | cells changed 2280/23778 | items removed 0 added 3126 (in V budget-off 3126, novel 0) redetail 4 sections removed 0
+    TIER home_basic            progs changed 425/720 | cells changed 2525/27018 | items removed 0 added 3427 (in V budget-off 3427, novel 0) redetail 0 sections removed 0
+    TIER home_full             progs changed 376/612 | cells changed 2294/23778 | items removed 0 added 3140 (in V budget-off 3140, novel 0) redetail 6 sections removed 0
+    TIER minimal               progs changed 336/504 | cells changed 2031/20538 | items removed 0 added 2710 (in V budget-off 2710, novel 0) redetail 0 sections removed 0
+    FAM none                   progs changed 319/1872 | cells changed 837/56160 | items removed 0 added 853 (in V budget-off 853, novel 0) redetail 0 sections removed 0
+    FAM race                   progs changed 841/1008 | cells changed 5405/50148 | items removed 0 added 7475 (in V budget-off 7475, novel 0) redetail 6 sections removed 0
+    FAM test                   progs changed 868/1008 | cells changed 5692/42840 | items removed 0 added 7725 (in V budget-off 7725, novel 0) redetail 8 sections removed 0
+    by week (cells changed): 1:1532 2:1687 3:1579 4:869 5:1608 6:1473 7:593 8:46 9:743 10:743 11:699 12:0 13:196 14:166
+    top added:
+      2131  Farmer carry
+      1876  Suitcase carry
+      1663  Terminal knee extension (band)
+      1570  Spanish squat hold (KB)
+      1262  Wall sit
+      1094  Overhead carry
+      788  Barbell hip thrust
+      730  Single-leg hip thrust
+      599  Nordic hamstring curl (anchored)
+      500  Banded hip thrust
+      382  45° back extension
+      334  Bodyweight back extension
+      329  Dumbbell standing calf raise
+      312  Dumbbell seated calf raise
+      241  Single-leg glute bridge
+    top removed:
+    sections removed:
+    redetail ex: FULL commercial W3 tue: Landmine rotational press [3×15 each] -> [2×15 each] ; FULL crossfit W3 tue: Landmine rotational press [3×15 each] -> [2×15 each] ; FULL home_full W3 tue: Landmine rotational press [3×15 each] -> [2×15 each] ; FULL commercial W3 tue: Landmine rotational press [3×15 each] -> [2×15 each] ; FULL crossfit W3 tue: Landmine rotational press [3×15 each] -> [2×15 each] ; FULL home_full W3 tue: Landmine rotational press [3×15 each] -> [2×15 each]
+  -- VA --
+    ALL                        progs changed 488/3888 | cells changed 3313/149148 | items removed 3102 added 3445 redetail 20 sections removed 3009
+    L FULL                     progs changed 412/3024 | cells changed 2877/123228 | items removed 2678 added 2937 redetail 0 sections removed 2597
+    L L432                     progs changed 76/432 | cells changed 436/12960 | items removed 424 added 508 redetail 20 sections removed 412
+    L LBW                      progs changed 0/432 | cells changed 0/12960 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS balanced             progs changed 0/576 | cells changed 0/21924 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS fatloss              progs changed 0/432 | cells changed 0/17604 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS hypertrophy          progs changed 0/576 | cells changed 0/21924 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS strength             progs changed 0/576 | cells changed 0/21924 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS support_athletic     progs changed 0/576 | cells changed 0/21924 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS support_prevention   progs changed 488/576 | cells changed 3313/21924 | items removed 3102 added 3445 redetail 20 sections removed 3009
+    FOCUS support_strength     progs changed 0/576 | cells changed 0/21924 | items removed 0 added 0 redetail 0 sections removed 0
+    TIER bodyweight            progs changed 65/828 | cells changed 258/30258 | items removed 210 added 258 redetail 0 sections removed 144
+    TIER commercial            progs changed 93/612 | cells changed 662/23778 | items removed 627 added 674 redetail 0 sections removed 624
+    TIER crossfit              progs changed 93/612 | cells changed 662/23778 | items removed 645 added 722 redetail 10 sections removed 636
+    TIER home_basic            progs changed 72/720 | cells changed 536/27018 | items removed 489 added 536 redetail 0 sections removed 486
+    TIER home_full             progs changed 93/612 | cells changed 662/23778 | items removed 645 added 722 redetail 10 sections removed 636
+    TIER minimal               progs changed 72/504 | cells changed 533/20538 | items removed 486 added 533 redetail 0 sections removed 483
+    FAM none                   progs changed 212/1872 | cells changed 1204/56160 | items removed 1276 added 1336 redetail 20 sections removed 1264
+    FAM race                   progs changed 138/1008 | cells changed 1119/50148 | items removed 953 added 1119 redetail 0 sections removed 914
+    FAM test                   progs changed 138/1008 | cells changed 990/42840 | items removed 873 added 990 redetail 0 sections removed 831
+    by week (cells changed): 1:417 2:407 3:460 4:452 5:440 6:430 7:123 8:139 9:109 10:109 11:131 12:36 13:30 14:30
+    top added:
+      1974  Single-leg hip thrust
+      545  Banded hip thrust
+      524  Single-leg glute bridge (weighted)
+      222  Single-leg hip thrust (shoulders on bed)
+      152  Wall sit
+      28  Single-leg glute bridge
+    top removed:
+      1344  Dumbbell standing calf raise
+      1240  Dumbbell seated calf raise
+      167  Machine seated calf raise
+      107  Wall sit
+      48  Nordic hamstring curl (anchored)
+      46  Single-leg glute bridge
+      32  Single-leg calf raise (bodyweight)
+      24  Step-ups (chair)
+      22  Calf raise (bodyweight)
+      16  Reverse lunge
+      14  Bulgarian split squat (foot on chair)
+      12  Walking lunge
+      12  Single-leg hip thrust
+      6  Seated leg curl
+      6  Lying leg curl
+    sections removed:
+      1745  Calf — achilles armor
+      1060  Calves
+      204  Leg isolation
+    removed ex: FULL none commercial support_prevention beginner s87747 W1 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s87747 W2 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s87747 W3 tue: Machine seated calf raise
+                FULL none commercial support_prevention beginner s87747 W4 tue: Machine seated calf raise
+                FULL none commercial support_prevention beginner s87747 W5 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s87747 W6 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W1 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W2 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W3 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W5 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W6 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W7 thu: Dumbbell standing calf raise
+    redetail ex: L432 crossfit W1 thu: Single-leg hip thrust [2×10–15 @ RPE 7] -> [2×6–10 each @ RPE 7] ; L432 crossfit W1 thu: Wall sit [2×25 sec] -> [3×25 sec] ; L432 crossfit W2 thu: Single-leg hip thrust [2×10–15 @ RPE 7] -> [2×6–10 each @ RPE 7] ; L432 crossfit W2 thu: Wall sit [2×25 sec] -> [3×25 sec] ; L432 home_full W1 thu: Single-leg hip thrust [2×10–15 @ RPE 6–7] -> [2×6–10 each @ RPE 6–7] ; L432 home_full W1 thu: Wall sit [2×25 sec] -> [3×25 sec]
+  -- BAB --
+    ALL                        progs changed 488/3888 | cells changed 3486/149148 | items removed 3240 added 3618 redetail 20 sections removed 3162
+    L FULL                     progs changed 412/3024 | cells changed 3050/123228 | items removed 2816 added 3110 redetail 0 sections removed 2750
+    L L432                     progs changed 76/432 | cells changed 436/12960 | items removed 424 added 508 redetail 20 sections removed 412
+    L LBW                      progs changed 0/432 | cells changed 0/12960 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS balanced             progs changed 0/576 | cells changed 0/21924 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS fatloss              progs changed 0/432 | cells changed 0/17604 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS hypertrophy          progs changed 0/576 | cells changed 0/21924 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS strength             progs changed 0/576 | cells changed 0/21924 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS support_athletic     progs changed 0/576 | cells changed 0/21924 | items removed 0 added 0 redetail 0 sections removed 0
+    FOCUS support_prevention   progs changed 488/576 | cells changed 3486/21924 | items removed 3240 added 3618 redetail 20 sections removed 3162
+    FOCUS support_strength     progs changed 0/576 | cells changed 0/21924 | items removed 0 added 0 redetail 0 sections removed 0
+    TIER bodyweight            progs changed 65/828 | cells changed 258/30258 | items removed 210 added 258 redetail 0 sections removed 144
+    TIER commercial            progs changed 93/612 | cells changed 696/23778 | items removed 654 added 708 redetail 0 sections removed 654
+    TIER crossfit              progs changed 93/612 | cells changed 696/23778 | items removed 672 added 756 redetail 10 sections removed 666
+    TIER home_basic            progs changed 72/720 | cells changed 570/27018 | items removed 516 added 570 redetail 0 sections removed 516
+    TIER home_full             progs changed 93/612 | cells changed 696/23778 | items removed 672 added 756 redetail 10 sections removed 666
+    TIER minimal               progs changed 72/504 | cells changed 570/20538 | items removed 516 added 570 redetail 0 sections removed 516
+    FAM none                   progs changed 212/1872 | cells changed 1204/56160 | items removed 1276 added 1336 redetail 20 sections removed 1264
+    FAM race                   progs changed 138/1008 | cells changed 1190/50148 | items removed 1014 added 1190 redetail 0 sections removed 980
+    FAM test                   progs changed 138/1008 | cells changed 1092/42840 | items removed 950 added 1092 redetail 0 sections removed 918
+    by week (cells changed): 1:442 2:442 3:460 4:472 5:460 6:460 7:128 8:144 9:124 10:124 11:134 12:36 13:30 14:30
+    top added:
+      2076  Single-leg hip thrust
+      612  Banded hip thrust
+      528  Single-leg glute bridge (weighted)
+      222  Single-leg hip thrust (shoulders on bed)
+      152  Wall sit
+      28  Single-leg glute bridge
+    top removed:
+      1386  Dumbbell standing calf raise
+      1340  Dumbbell seated calf raise
+      178  Machine seated calf raise
+      92  Wall sit
+      48  Nordic hamstring curl (anchored)
+      46  Single-leg glute bridge
+      32  Single-leg calf raise (bodyweight)
+      24  Step-ups (chair)
+      22  Calf raise (bodyweight)
+      16  Reverse lunge
+      14  Bulgarian split squat (foot on chair)
+      12  Walking lunge
+      12  Single-leg hip thrust
+      6  Seated leg curl
+      6  Lying leg curl
+    sections removed:
+      1898  Calf — achilles armor
+      1060  Calves
+      204  Leg isolation
+    removed ex: FULL none commercial support_prevention beginner s87747 W1 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s87747 W2 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s87747 W3 tue: Machine seated calf raise
+                FULL none commercial support_prevention beginner s87747 W4 tue: Machine seated calf raise
+                FULL none commercial support_prevention beginner s87747 W5 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s87747 W6 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W1 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W2 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W3 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W5 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W6 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W7 thu: Dumbbell standing calf raise
+    redetail ex: L432 crossfit W1 thu: Single-leg hip thrust [2×10–15 @ RPE 7] -> [2×6–10 each @ RPE 7] ; L432 crossfit W1 thu: Wall sit [2×25 sec] -> [3×25 sec] ; L432 crossfit W2 thu: Single-leg hip thrust [2×10–15 @ RPE 7] -> [2×6–10 each @ RPE 7] ; L432 crossfit W2 thu: Wall sit [2×25 sec] -> [3×25 sec] ; L432 home_full W1 thu: Single-leg hip thrust [2×10–15 @ RPE 6–7] -> [2×6–10 each @ RPE 6–7] ; L432 home_full W1 thu: Wall sit [2×25 sec] -> [3×25 sec]
+  -- VAB --
+    ALL                        progs changed 2314/3888 | cells changed 14790/149148 | items removed 3087 added 19518 redetail 34 sections removed 3009
+    L FULL                     progs changed 2163/3024 | cells changed 14105/123228 | items removed 2663 added 18747 redetail 14 sections removed 2597
+    L L432                     progs changed 95/432 | cells changed 479/12960 | items removed 424 added 551 redetail 20 sections removed 412
+    L LBW                      progs changed 56/432 | cells changed 206/12960 | items removed 0 added 220 redetail 0 sections removed 0
+    FOCUS balanced             progs changed 295/576 | cells changed 1744/21924 | items removed 0 added 2487 redetail 0 sections removed 0
+    FOCUS fatloss              progs changed 272/432 | cells changed 1673/17604 | items removed 0 added 2411 redetail 0 sections removed 0
+    FOCUS hypertrophy          progs changed 432/576 | cells changed 2441/21924 | items removed 0 added 2846 redetail 0 sections removed 0
+    FOCUS strength             progs changed 243/576 | cells changed 1758/21924 | items removed 0 added 2610 redetail 0 sections removed 0
+    FOCUS support_athletic     progs changed 294/576 | cells changed 1878/21924 | items removed 0 added 2644 redetail 0 sections removed 0
+    FOCUS support_prevention   progs changed 488/576 | cells changed 3711/21924 | items removed 3087 added 4360 redetail 34 sections removed 3009
+    FOCUS support_strength     progs changed 290/576 | cells changed 1585/21924 | items removed 0 added 2160 redetail 0 sections removed 0
+    TIER bodyweight            progs changed 228/828 | cells changed 855/30258 | items removed 210 added 859 redetail 0 sections removed 144
+    TIER commercial            progs changed 400/612 | cells changed 2775/23778 | items removed 624 added 3727 redetail 4 sections removed 624
+    TIER crossfit              progs changed 429/612 | cells changed 2852/23778 | items removed 642 added 3852 redetail 14 sections removed 636
+    TIER home_basic            progs changed 458/720 | cells changed 2971/27018 | items removed 486 added 3967 redetail 0 sections removed 486
+    TIER home_full             progs changed 430/612 | cells changed 2866/23778 | items removed 642 added 3866 redetail 16 sections removed 636
+    TIER minimal               progs changed 369/504 | cells changed 2471/20538 | items removed 483 added 3247 redetail 0 sections removed 483
+    FAM none                   progs changed 531/1872 | cells changed 2041/56160 | items removed 1276 added 2189 redetail 20 sections removed 1264
+    FAM race                   progs changed 896/1008 | cells changed 6426/50148 | items removed 948 added 8599 redetail 6 sections removed 914
+    FAM test                   progs changed 887/1008 | cells changed 6323/42840 | items removed 863 added 8730 redetail 8 sections removed 831
+    by week (cells changed): 1:1884 2:2014 3:1961 4:1276 5:1988 6:1843 7:701 8:190 9:837 10:832 11:826 12:36 13:216 14:186
+    top added:
+      2806  Single-leg hip thrust
+      2131  Farmer carry
+      1876  Suitcase carry
+      1663  Terminal knee extension (band)
+      1570  Spanish squat hold (KB)
+      1414  Wall sit
+      1112  Banded hip thrust
+      1094  Overhead carry
+      788  Barbell hip thrust
+      646  Single-leg glute bridge (weighted)
+      599  Nordic hamstring curl (anchored)
+      382  45° back extension
+      334  Bodyweight back extension
+      325  Single-leg hip thrust (shoulders on bed)
+      287  Dumbbell standing calf raise
+    top removed:
+      1344  Dumbbell standing calf raise
+      1240  Dumbbell seated calf raise
+      167  Machine seated calf raise
+      92  Wall sit
+      48  Nordic hamstring curl (anchored)
+      46  Single-leg glute bridge
+      32  Single-leg calf raise (bodyweight)
+      24  Step-ups (chair)
+      22  Calf raise (bodyweight)
+      16  Reverse lunge
+      14  Bulgarian split squat (foot on chair)
+      12  Walking lunge
+      12  Single-leg hip thrust
+      6  Seated leg curl
+      6  Lying leg curl
+    sections removed:
+      1745  Calf — achilles armor
+      1060  Calves
+      204  Leg isolation
+    removed ex: FULL none commercial support_prevention beginner s87747 W1 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s87747 W2 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s87747 W3 tue: Machine seated calf raise
+                FULL none commercial support_prevention beginner s87747 W4 tue: Machine seated calf raise
+                FULL none commercial support_prevention beginner s87747 W5 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s87747 W6 tue: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W1 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W2 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W3 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W5 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W6 thu: Dumbbell seated calf raise
+                FULL none commercial support_prevention beginner s4242 W7 thu: Dumbbell standing calf raise
+    redetail ex: FULL commercial W3 tue: Landmine rotational press [3×15 each] -> [2×15 each] ; FULL crossfit W3 tue: Landmine rotational press [3×15 each] -> [2×15 each] ; FULL home_full W3 tue: Landmine rotational press [3×15 each] -> [2×15 each] ; FULL commercial W3 tue: Landmine rotational press [3×15 each] -> [2×15 each] ; FULL crossfit W3 tue: Landmine rotational press [3×15 each] -> [2×15 each] ; FULL home_full W3 tue: Landmine rotational press [3×15 each] -> [2×15 each]
+
+==== 1/6/7. prevention leg days (reference day carries Leg circuit — runner armor)
+  -- AvsV --
+    ALL                       legDays 4284 | gained 3224 notGained 1060 | carryLost 0 calfLost 1745 otherRemoved 1357 | recovery legDays 324 gained 283 | regionalHit 271 budgetHit 188 deloadHit 0 | dblExact 0 dblC1 26 | sweepSeen 119 sweepFallback 0 preDblExact 0 preDblC1 26 | IF kept/redetail/rename/drop 3786/54/0/54 of 3894
+    L FULL                    legDays 3420 | gained 2788 notGained 632 | carryLost 0 calfLost 1745 otherRemoved 933 | recovery legDays 324 gained 283 | regionalHit 221 budgetHit 188 deloadHit 0 | dblExact 0 dblC1 24 | sweepSeen 97 sweepFallback 0 preDblExact 0 preDblC1 24 | IF kept/redetail/rename/drop 3324/0/0/0 of 3324
+    L L432                    legDays 864 | gained 436 notGained 428 | carryLost 0 calfLost 0 otherRemoved 424 | recovery legDays 0 gained 0 | regionalHit 50 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 2 | sweepSeen 22 sweepFallback 0 preDblExact 0 preDblC1 2 | IF kept/redetail/rename/drop 462/54/0/54 of 570
+    TIER bodyweight           legDays 786 | gained 184 notGained 602 | carryLost 0 calfLost 38 otherRemoved 172 | recovery legDays 54 gained 48 | regionalHit 271 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 26 | sweepSeen 119 sweepFallback 0 preDblExact 0 preDblC1 26 | IF kept/redetail/rename/drop 582/0/0/0 of 582
+    TIER commercial           legDays 786 | gained 659 notGained 127 | carryLost 0 calfLost 342 otherRemoved 285 | recovery legDays 54 gained 47 | regionalHit 0 budgetHit 37 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 690/18/0/18 of 726
+    TIER crossfit             legDays 786 | gained 659 notGained 127 | carryLost 0 calfLost 342 otherRemoved 303 | recovery legDays 54 gained 47 | regionalHit 0 budgetHit 37 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 690/18/0/18 of 726
+    TIER home_basic           legDays 570 | gained 533 notGained 37 | carryLost 0 calfLost 342 otherRemoved 147 | recovery legDays 54 gained 47 | regionalHit 0 budgetHit 37 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 570/0/0/0 of 570
+    TIER home_full            legDays 786 | gained 659 notGained 127 | carryLost 0 calfLost 342 otherRemoved 303 | recovery legDays 54 gained 47 | regionalHit 0 budgetHit 37 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 684/18/0/18 of 720
+    TIER minimal              legDays 570 | gained 530 notGained 40 | carryLost 0 calfLost 339 otherRemoved 147 | recovery legDays 54 gained 47 | regionalHit 0 budgetHit 40 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 570/0/0/0 of 570
+    FAM none                  legDays 1728 | gained 1196 notGained 532 | carryLost 0 calfLost 0 otherRemoved 1276 | recovery legDays 0 gained 0 | regionalHit 130 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 2 | sweepSeen 34 sweepFallback 0 preDblExact 0 preDblC1 2 | IF kept/redetail/rename/drop 1302/54/0/54 of 1410
+    FAM race                  legDays 1332 | gained 1080 notGained 252 | carryLost 0 calfLost 914 otherRemoved 39 | recovery legDays 180 gained 166 | regionalHit 87 budgetHit 76 deloadHit 0 | dblExact 0 dblC1 12 | sweepSeen 46 sweepFallback 0 preDblExact 0 preDblC1 12 | IF kept/redetail/rename/drop 1292/0/0/0 of 1292
+    FAM test                  legDays 1224 | gained 948 notGained 276 | carryLost 0 calfLost 831 otherRemoved 42 | recovery legDays 144 gained 117 | regionalHit 54 budgetHit 112 deloadHit 0 | dblExact 0 dblC1 12 | sweepSeen 39 sweepFallback 0 preDblExact 0 preDblC1 12 | IF kept/redetail/rename/drop 1192/0/0/0 of 1192
+    EXP advanced              legDays 1428 | gained 1052 notGained 376 | carryLost 0 calfLost 571 otherRemoved 452 | recovery legDays 108 gained 93 | regionalHit 118 budgetHit 82 deloadHit 0 | dblExact 0 dblC1 6 | sweepSeen 46 sweepFallback 0 preDblExact 0 preDblC1 6 | IF kept/redetail/rename/drop 1294/18/0/18 of 1330
+    EXP beginner              legDays 1428 | gained 1072 notGained 356 | carryLost 0 calfLost 579 otherRemoved 459 | recovery legDays 108 gained 89 | regionalHit 77 budgetHit 66 deloadHit 0 | dblExact 0 dblC1 10 | sweepSeen 36 sweepFallback 0 preDblExact 0 preDblC1 10 | IF kept/redetail/rename/drop 1246/18/0/18 of 1282
+    EXP intermediate          legDays 1428 | gained 1100 notGained 328 | carryLost 0 calfLost 595 otherRemoved 446 | recovery legDays 108 gained 101 | regionalHit 76 budgetHit 40 deloadHit 0 | dblExact 0 dblC1 10 | sweepSeen 37 sweepFallback 0 preDblExact 0 preDblC1 10 | IF kept/redetail/rename/drop 1246/18/0/18 of 1282
+    INJ ankle/protect         legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ ankle/workaround      legDays 72 | gained 72 notGained 0 | carryLost 0 calfLost 0 otherRemoved 60 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 2 | sweepSeen 18 sweepFallback 0 preDblExact 0 preDblC1 2 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    INJ elbow/protect         legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 10 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    INJ elbow/workaround      legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 10 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    INJ hip/protect           legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/54 of 54
+    INJ hip/workaround        legDays 72 | gained 54 notGained 18 | carryLost 0 calfLost 0 otherRemoved 54 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/54/0/0 of 54
+    INJ knee/protect          legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 30/0/0/0 of 30
+    INJ knee/workaround       legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 10 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 4 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    INJ lowback/protect       legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ lowback/workaround    legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ none                  legDays 3420 | gained 2788 notGained 632 | carryLost 0 calfLost 1745 otherRemoved 933 | recovery legDays 324 gained 283 | regionalHit 221 budgetHit 188 deloadHit 0 | dblExact 0 dblC1 24 | sweepSeen 97 sweepFallback 0 preDblExact 0 preDblC1 24 | IF kept/redetail/rename/drop 3324/0/0/0 of 3324
+    INJ shoulder/protect      legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 10 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    INJ shoulder/workaround   legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 10 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    by week: 1:413/576 k-223  2:403/576 k-213  3:444/576 k-240  4:442/576 k-115  5:428/576 k-224  6:418/576 k-214  7:123/144 k-123  8:124/144  9:105/144 k-105  10:105/144 k-105  11:123/144 k-123  12:36/36  13:30/36 k-30  14:30/36 k-30
+    printed grammar of the new item (tier :: name detail):
+      585  commercial :: Single-leg hip thrust 2×6–10 each @ RPE 7
+      585  crossfit :: Single-leg hip thrust 2×6–10 each @ RPE 7
+      585  home_full :: Single-leg hip thrust 2×6–10 each @ RPE 7
+      254  home_basic :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+      251  minimal :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+      235  home_basic :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 7
+      235  minimal :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 7
+      156  bodyweight :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+      56  commercial :: Single-leg hip thrust 2×6–10 each @ RPE 6–7
+      56  crossfit :: Single-leg hip thrust 2×6–10 each @ RPE 6–7
+      56  home_full :: Single-leg hip thrust 2×6–10 each @ RPE 6–7
+      24  home_basic :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 6–7
+      24  minimal :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 6–7
+      20  home_basic :: Banded hip thrust 2 sets — RPE 6 (leave 3 or more in reserve)
+      20  minimal :: Banded hip thrust 2 sets — RPE 6 (leave 3 or more in reserve)
+      18  commercial :: Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+      18  crossfit :: Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+      18  home_full :: Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+      14  bodyweight :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+      12  bodyweight :: Single-leg glute bridge 2 sets — RPE 6 (leave 3 or more in reserve)
+    drawn -> printed name (inj tier):
+      533  none commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      533  none crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      533  none home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      274  none home_basic :: Banded hip thrust -> Banded hip thrust
+      271  none minimal :: Banded hip thrust -> Banded hip thrust
+      259  none home_basic :: Single-leg glute bridge (weighted) -> Single-leg glute bridge (weighted)
+      259  none minimal :: Single-leg glute bridge (weighted) -> Single-leg glute bridge (weighted)
+      100  none bodyweight :: Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed)
+      26  none bodyweight :: Single-leg glute bridge -> Single-leg glute bridge
+      18  knee/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  knee/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  knee/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround bodyweight :: Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed)
+      18  hip/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  hip/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  hip/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/protect commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/protect crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/protect home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/protect commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/protect crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+    not gained, why:
+      138  none bodyweight advanced :: drawn, not on card (Single-leg hip thrust (shoulders on bed)) pool=["Single-leg hip thrust (shoulders on bed)"]
+      68  none bodyweight intermediate :: drawn, not on card (Single-leg hip thrust (shoulders on bed)) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      66  none bodyweight beginner :: drawn, not on card (Single-leg hip thrust (shoulders on bed)) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      48  none bodyweight beginner :: hipExt==hinge0 (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      48  none bodyweight intermediate :: hipExt==hinge0 (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      40  none bodyweight beginner :: drawn, not on card (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      36  none bodyweight intermediate :: drawn, not on card (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      16  none commercial advanced :: drawn, not on card (Single-leg hip thrust) pool=["Single-leg hip thrust"]
+      16  none crossfit advanced :: drawn, not on card (Single-leg hip thrust) pool=["Single-leg hip thrust"]
+      16  none home_full advanced :: drawn, not on card (Single-leg hip thrust) pool=["Single-leg hip thrust"]
+      16  none minimal advanced :: drawn, not on card (Banded hip thrust) pool=["Banded hip thrust","Single-leg glute bridge (weighted)"]
+      14  none home_basic advanced :: drawn, not on card (Banded hip thrust) pool=["Banded hip thrust","Single-leg glute bridge (weighted)"]
+      13  none commercial beginner :: drawn, not on card (Single-leg hip thrust) pool=["Single-leg hip thrust"]
+      13  none crossfit beginner :: drawn, not on card (Single-leg hip thrust) pool=["Single-leg hip thrust"]
+      13  none home_full beginner :: drawn, not on card (Single-leg hip thrust) pool=["Single-leg hip thrust"]
+      13  none minimal beginner :: drawn, not on card (Banded hip thrust) pool=["Banded hip thrust","Single-leg glute bridge (weighted)"]
+      12  none home_basic beginner :: drawn, not on card (Banded hip thrust) pool=["Banded hip thrust","Single-leg glute bridge (weighted)"]
+      8  none commercial intermediate :: drawn, not on card (Single-leg hip thrust) pool=["Single-leg hip thrust"]
+      8  none crossfit intermediate :: drawn, not on card (Single-leg hip thrust) pool=["Single-leg hip thrust"]
+      8  none home_full intermediate :: drawn, not on card (Single-leg hip thrust) pool=["Single-leg hip thrust"]
+      6  none home_basic intermediate :: drawn, not on card (Banded hip thrust) pool=["Banded hip thrust","Single-leg glute bridge (weighted)"]
+      6  none minimal intermediate :: drawn, not on card (Banded hip thrust) pool=["Banded hip thrust","Single-leg glute bridge (weighted)"]
+      6  knee/protect bodyweight intermediate :: hipExt null pool=["Bodyweight back extension"]
+      6  ankle/protect commercial beginner :: hipExt null pool=[]
+      6  ankle/protect commercial advanced :: hipExt null pool=[]
+      6  ankle/protect crossfit intermediate :: hipExt null pool=[]
+      6  ankle/protect home_full beginner :: hipExt null pool=[]
+      6  ankle/protect home_full advanced :: hipExt null pool=[]
+      6  ankle/protect bodyweight intermediate :: hipExt null pool=[]
+      6  hip/workaround bodyweight intermediate :: hipExt null pool=[]
+    other removed:
+      732  Dumbbell standing calf raise
+      240  Dumbbell seated calf raise
+      107  Wall sit
+      72  Machine seated calf raise
+      48  Nordic hamstring curl (anchored)
+      46  Single-leg glute bridge
+      24  Step-ups (chair)
+      16  Reverse lunge
+      14  Bulgarian split squat (foot on chair)
+      12  Walking lunge
+      12  Single-leg hip thrust
+      8  Calf raise (bodyweight)
+      ex: FULL none bodyweight W11 thu: Step-ups (chair) ; FULL none bodyweight W9 thu: Bulgarian split squat (foot on chair) ; FULL none bodyweight W10 thu: Bulgarian split squat (foot on chair) ; FULL none bodyweight W11 tue: Step-ups (chair) ; FULL none commercial W1 thu: Dumbbell standing calf raise ; FULL none commercial W2 thu: Dumbbell standing calf raise ; FULL none commercial W3 thu: Dumbbell seated calf raise ; FULL none commercial W4 thu: Dumbbell seated calf raise
+    calfLost ex: FULL commercial W1 tue ; FULL commercial W2 tue ; FULL commercial W3 tue ; FULL commercial W4 tue ; FULL commercial W5 tue ; FULL commercial W6 tue ; FULL commercial W1 thu ; FULL commercial W2 thu ; FULL commercial W3 thu ; FULL commercial W5 thu ; FULL commercial W6 thu ; FULL commercial W7 thu
+    regionalHit ex: FULL none bodyweight W1 tue ; FULL none bodyweight W2 tue ; FULL none bodyweight W3 tue ; FULL none bodyweight W4 tue ; FULL none bodyweight W5 tue ; FULL none bodyweight W6 tue ; FULL none bodyweight W1 thu ; FULL none bodyweight W2 thu ; FULL none bodyweight W3 thu ; FULL none bodyweight W7 thu ; FULL none bodyweight W9 thu ; FULL none bodyweight W10 thu
+    same-day C1 doubles (final card):
+      24  none bodyweight :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+      2  ankle/workaround bodyweight :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+    circuit hinge also C1 (two glute-max items in the round): 159
+    sweep map of the new item (pre -> post):
+      93  Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed)
+      26  Single-leg glute bridge -> Single-leg glute bridge
+    pre-sweep C1 doubles:
+      24  none :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+      2  ankle/workaround :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+    any circuit item renamed by the sweep (pos, pre -> post):
+    injury filter on the new item (non-kept):
+   redetail       18  hip/workaround commercial :: Single-leg hip thrust 2×8 each -> Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+   redetail       18  hip/workaround crossfit :: Single-leg hip thrust 2×8 each -> Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+   redetail       18  hip/workaround home_full :: Single-leg hip thrust 2×8 each -> Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+   drop       12  hip/protect commercial :: 45° back extension 2×8 each -> (gone) circuit now: ["Leg extension 2×10 each","Spanish squat hold (KB) 2×25 sec"]
+   drop       12  hip/protect crossfit :: 45° back extension 2×8 each -> (gone) circuit now: ["Spanish squat hold (KB) 2×25 sec"]
+   drop       12  hip/protect home_full :: Bodyweight back extension 2×8 each -> (gone) circuit now: ["Spanish squat hold (KB) 2×25 sec"]
+   drop       6  hip/protect commercial :: 45° back extension 2×8 each -> (gone) circuit now: ["Lying leg curl 2×10 each","Wall sit 2×25 sec"]
+   drop       6  hip/protect crossfit :: 45° back extension 2×8 each -> (gone) circuit now: ["Wall sit 2×25 sec"]
+   drop       6  hip/protect home_full :: Bodyweight back extension 2×8 each -> (gone) circuit now: ["Wall sit 2×25 sec"]
+  -- ABvsB --
+    ALL                       legDays 4284 | gained 3412 notGained 872 | carryLost 0 calfLost 1898 otherRemoved 1342 | recovery legDays 324 gained 318 | regionalHit 392 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 26 | sweepSeen 120 sweepFallback 0 preDblExact 0 preDblC1 26 | IF kept/redetail/rename/drop 3786/54/0/54 of 3894
+    L FULL                    legDays 3420 | gained 2976 notGained 444 | carryLost 0 calfLost 1898 otherRemoved 918 | recovery legDays 324 gained 318 | regionalHit 342 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 24 | sweepSeen 98 sweepFallback 0 preDblExact 0 preDblC1 24 | IF kept/redetail/rename/drop 3324/0/0/0 of 3324
+    L L432                    legDays 864 | gained 436 notGained 428 | carryLost 0 calfLost 0 otherRemoved 424 | recovery legDays 0 gained 0 | regionalHit 50 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 2 | sweepSeen 22 sweepFallback 0 preDblExact 0 preDblC1 2 | IF kept/redetail/rename/drop 462/54/0/54 of 570
+    TIER bodyweight           legDays 786 | gained 184 notGained 602 | carryLost 0 calfLost 38 otherRemoved 172 | recovery legDays 54 gained 48 | regionalHit 392 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 26 | sweepSeen 120 sweepFallback 0 preDblExact 0 preDblC1 26 | IF kept/redetail/rename/drop 582/0/0/0 of 582
+    TIER commercial           legDays 786 | gained 696 notGained 90 | carryLost 0 calfLost 372 otherRemoved 282 | recovery legDays 54 gained 54 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 690/18/0/18 of 726
+    TIER crossfit             legDays 786 | gained 696 notGained 90 | carryLost 0 calfLost 372 otherRemoved 300 | recovery legDays 54 gained 54 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 690/18/0/18 of 726
+    TIER home_basic           legDays 570 | gained 570 notGained 0 | carryLost 0 calfLost 372 otherRemoved 144 | recovery legDays 54 gained 54 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 570/0/0/0 of 570
+    TIER home_full            legDays 786 | gained 696 notGained 90 | carryLost 0 calfLost 372 otherRemoved 300 | recovery legDays 54 gained 54 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 684/18/0/18 of 720
+    TIER minimal              legDays 570 | gained 570 notGained 0 | carryLost 0 calfLost 372 otherRemoved 144 | recovery legDays 54 gained 54 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 570/0/0/0 of 570
+    FAM none                  legDays 1728 | gained 1196 notGained 532 | carryLost 0 calfLost 0 otherRemoved 1276 | recovery legDays 0 gained 0 | regionalHit 130 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 2 | sweepSeen 34 sweepFallback 0 preDblExact 0 preDblC1 2 | IF kept/redetail/rename/drop 1302/54/0/54 of 1410
+    FAM race                  legDays 1332 | gained 1156 notGained 176 | carryLost 0 calfLost 980 otherRemoved 34 | recovery legDays 180 gained 176 | regionalHit 133 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 12 | sweepSeen 46 sweepFallback 0 preDblExact 0 preDblC1 12 | IF kept/redetail/rename/drop 1292/0/0/0 of 1292
+    FAM test                  legDays 1224 | gained 1060 notGained 164 | carryLost 0 calfLost 918 otherRemoved 32 | recovery legDays 144 gained 142 | regionalHit 129 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 12 | sweepSeen 40 sweepFallback 0 preDblExact 0 preDblC1 12 | IF kept/redetail/rename/drop 1192/0/0/0 of 1192
+    EXP advanced              legDays 1428 | gained 1134 notGained 294 | carryLost 0 calfLost 638 otherRemoved 442 | recovery legDays 108 gained 108 | regionalHit 166 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 6 | sweepSeen 46 sweepFallback 0 preDblExact 0 preDblC1 6 | IF kept/redetail/rename/drop 1294/18/0/18 of 1330
+    EXP beginner              legDays 1428 | gained 1138 notGained 290 | carryLost 0 calfLost 630 otherRemoved 454 | recovery legDays 108 gained 104 | regionalHit 114 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 10 | sweepSeen 36 sweepFallback 0 preDblExact 0 preDblC1 10 | IF kept/redetail/rename/drop 1246/18/0/18 of 1282
+    EXP intermediate          legDays 1428 | gained 1140 notGained 288 | carryLost 0 calfLost 630 otherRemoved 446 | recovery legDays 108 gained 106 | regionalHit 112 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 10 | sweepSeen 38 sweepFallback 0 preDblExact 0 preDblC1 10 | IF kept/redetail/rename/drop 1246/18/0/18 of 1282
+    INJ ankle/protect         legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ ankle/workaround      legDays 72 | gained 72 notGained 0 | carryLost 0 calfLost 0 otherRemoved 60 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 2 | sweepSeen 18 sweepFallback 0 preDblExact 0 preDblC1 2 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    INJ elbow/protect         legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 10 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    INJ elbow/workaround      legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 10 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    INJ hip/protect           legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/54 of 54
+    INJ hip/workaround        legDays 72 | gained 54 notGained 18 | carryLost 0 calfLost 0 otherRemoved 54 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/54/0/0 of 54
+    INJ knee/protect          legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 30/0/0/0 of 30
+    INJ knee/workaround       legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 10 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 4 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    INJ lowback/protect       legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ lowback/workaround    legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ none                  legDays 3420 | gained 2976 notGained 444 | carryLost 0 calfLost 1898 otherRemoved 918 | recovery legDays 324 gained 318 | regionalHit 342 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 24 | sweepSeen 98 sweepFallback 0 preDblExact 0 preDblC1 24 | IF kept/redetail/rename/drop 3324/0/0/0 of 3324
+    INJ shoulder/protect      legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 10 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    INJ shoulder/workaround   legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 10 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 72/0/0/0 of 72
+    by week: 1:438/576 k-248  2:438/576 k-248  3:444/576 k-240  4:462/576 k-120  5:448/576 k-244  6:448/576 k-244  7:128/144 k-128  8:144/144  9:120/144 k-120  10:120/144 k-120  11:126/144 k-126  12:36/36  13:30/36 k-30  14:30/36 k-30
+    printed grammar of the new item (tier :: name detail):
+      618  commercial :: Single-leg hip thrust 2×6–10 each @ RPE 7
+      618  crossfit :: Single-leg hip thrust 2×6–10 each @ RPE 7
+      618  home_full :: Single-leg hip thrust 2×6–10 each @ RPE 7
+      282  home_basic :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+      282  minimal :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+      240  home_basic :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 7
+      240  minimal :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 7
+      156  bodyweight :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+      60  commercial :: Single-leg hip thrust 2×6–10 each @ RPE 6–7
+      60  crossfit :: Single-leg hip thrust 2×6–10 each @ RPE 6–7
+      60  home_full :: Single-leg hip thrust 2×6–10 each @ RPE 6–7
+      24  home_basic :: Banded hip thrust 2 sets — RPE 6 (leave 3 or more in reserve)
+      24  home_basic :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 6–7
+      24  minimal :: Banded hip thrust 2 sets — RPE 6 (leave 3 or more in reserve)
+      24  minimal :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 6–7
+      18  commercial :: Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+      18  crossfit :: Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+      18  home_full :: Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+      14  bodyweight :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+      12  bodyweight :: Single-leg glute bridge 2 sets — RPE 6 (leave 3 or more in reserve)
+    drawn -> printed name (inj tier):
+      570  none commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      570  none crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      570  none home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      306  none home_basic :: Banded hip thrust -> Banded hip thrust
+      306  none minimal :: Banded hip thrust -> Banded hip thrust
+      264  none home_basic :: Single-leg glute bridge (weighted) -> Single-leg glute bridge (weighted)
+      264  none minimal :: Single-leg glute bridge (weighted) -> Single-leg glute bridge (weighted)
+      100  none bodyweight :: Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed)
+      26  none bodyweight :: Single-leg glute bridge -> Single-leg glute bridge
+      18  knee/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  knee/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  knee/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround bodyweight :: Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed)
+      18  hip/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  hip/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  hip/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/protect commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/protect crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/protect home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/protect commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/protect crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+    not gained, why:
+      138  none bodyweight advanced :: drawn, not on card (Single-leg hip thrust (shoulders on bed)) pool=["Single-leg hip thrust (shoulders on bed)"]
+      68  none bodyweight intermediate :: drawn, not on card (Single-leg hip thrust (shoulders on bed)) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      66  none bodyweight beginner :: drawn, not on card (Single-leg hip thrust (shoulders on bed)) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      48  none bodyweight beginner :: hipExt==hinge0 (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      48  none bodyweight intermediate :: hipExt==hinge0 (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      40  none bodyweight beginner :: drawn, not on card (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      36  none bodyweight intermediate :: drawn, not on card (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      6  knee/protect bodyweight intermediate :: hipExt null pool=["Bodyweight back extension"]
+      6  ankle/protect commercial beginner :: hipExt null pool=[]
+      6  ankle/protect commercial advanced :: hipExt null pool=[]
+      6  ankle/protect crossfit intermediate :: hipExt null pool=[]
+      6  ankle/protect home_full beginner :: hipExt null pool=[]
+      6  ankle/protect home_full advanced :: hipExt null pool=[]
+      6  ankle/protect bodyweight intermediate :: hipExt null pool=[]
+      6  hip/workaround bodyweight intermediate :: hipExt null pool=[]
+      6  hip/protect commercial beginner :: drawn, not on card (45° back extension) pool=["45° back extension"]
+      6  hip/protect commercial advanced :: drawn, not on card (45° back extension) pool=["45° back extension"]
+      6  hip/protect crossfit intermediate :: drawn, not on card (45° back extension) pool=["45° back extension"]
+      6  hip/protect home_full beginner :: drawn, not on card (Bodyweight back extension) pool=["Bodyweight back extension"]
+      6  hip/protect home_full advanced :: drawn, not on card (Bodyweight back extension) pool=["Bodyweight back extension"]
+      6  hip/protect bodyweight intermediate :: hipExt null pool=["Bodyweight back extension"]
+      6  lowback/workaround commercial beginner :: hipExt null pool=[]
+      6  lowback/workaround commercial advanced :: hipExt null pool=[]
+      6  lowback/workaround crossfit intermediate :: hipExt null pool=[]
+      6  lowback/workaround home_full beginner :: hipExt null pool=[]
+      6  lowback/workaround home_full advanced :: hipExt null pool=[]
+      6  lowback/workaround bodyweight intermediate :: hipExt null pool=[]
+      6  lowback/protect commercial beginner :: hipExt null pool=[]
+      6  lowback/protect commercial advanced :: hipExt null pool=[]
+      6  lowback/protect crossfit intermediate :: hipExt null pool=[]
+    other removed:
+      732  Dumbbell standing calf raise
+      240  Dumbbell seated calf raise
+      92  Wall sit
+      72  Machine seated calf raise
+      48  Nordic hamstring curl (anchored)
+      46  Single-leg glute bridge
+      24  Step-ups (chair)
+      16  Reverse lunge
+      14  Bulgarian split squat (foot on chair)
+      12  Walking lunge
+      12  Single-leg hip thrust
+      8  Calf raise (bodyweight)
+      ex: FULL none bodyweight W11 thu: Step-ups (chair) ; FULL none bodyweight W9 thu: Bulgarian split squat (foot on chair) ; FULL none bodyweight W10 thu: Bulgarian split squat (foot on chair) ; FULL none bodyweight W11 tue: Step-ups (chair) ; FULL none commercial W1 thu: Dumbbell standing calf raise ; FULL none commercial W2 thu: Dumbbell standing calf raise ; FULL none commercial W3 thu: Dumbbell seated calf raise ; FULL none commercial W4 thu: Dumbbell seated calf raise
+    calfLost ex: FULL commercial W1 tue ; FULL commercial W2 tue ; FULL commercial W3 tue ; FULL commercial W4 tue ; FULL commercial W5 tue ; FULL commercial W6 tue ; FULL commercial W1 thu ; FULL commercial W2 thu ; FULL commercial W3 thu ; FULL commercial W5 thu ; FULL commercial W6 thu ; FULL commercial W7 thu
+    regionalHit ex: FULL none bodyweight W1 tue ; FULL none bodyweight W2 tue ; FULL none bodyweight W3 tue ; FULL none bodyweight W4 tue ; FULL none bodyweight W5 tue ; FULL none bodyweight W6 tue ; FULL none bodyweight W1 thu ; FULL none bodyweight W2 thu ; FULL none bodyweight W3 thu ; FULL none bodyweight W7 thu ; FULL none bodyweight W9 thu ; FULL none bodyweight W10 thu
+    same-day C1 doubles (final card):
+      24  none bodyweight :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+      2  ankle/workaround bodyweight :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+    circuit hinge also C1 (two glute-max items in the round): 90
+    sweep map of the new item (pre -> post):
+      94  Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed)
+      26  Single-leg glute bridge -> Single-leg glute bridge
+    pre-sweep C1 doubles:
+      24  none :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+      2  ankle/workaround :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+    any circuit item renamed by the sweep (pos, pre -> post):
+    injury filter on the new item (non-kept):
+   redetail       18  hip/workaround commercial :: Single-leg hip thrust 2×8 each -> Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+   redetail       18  hip/workaround crossfit :: Single-leg hip thrust 2×8 each -> Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+   redetail       18  hip/workaround home_full :: Single-leg hip thrust 2×8 each -> Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+   drop       12  hip/protect commercial :: 45° back extension 2×8 each -> (gone) circuit now: ["Leg extension 2×10 each","Spanish squat hold (KB) 2×25 sec"]
+   drop       12  hip/protect crossfit :: 45° back extension 2×8 each -> (gone) circuit now: ["Spanish squat hold (KB) 2×25 sec"]
+   drop       12  hip/protect home_full :: Bodyweight back extension 2×8 each -> (gone) circuit now: ["Spanish squat hold (KB) 2×25 sec"]
+   drop       6  hip/protect commercial :: 45° back extension 2×8 each -> (gone) circuit now: ["Lying leg curl 2×10 each","Wall sit 2×25 sec"]
+   drop       6  hip/protect crossfit :: 45° back extension 2×8 each -> (gone) circuit now: ["Wall sit 2×25 sec"]
+   drop       6  hip/protect home_full :: Bodyweight back extension 2×8 each -> (gone) circuit now: ["Wall sit 2×25 sec"]
+  -- ABvsV --
+    ALL                       legDays 4284 | gained 3418 notGained 866 | carryLost 0 calfLost 1745 otherRemoved 1342 | recovery legDays 324 gained 318 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 26 | sweepSeen 120 sweepFallback 0 preDblExact 0 preDblC1 26 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    L FULL                    legDays 3420 | gained 2982 notGained 438 | carryLost 0 calfLost 1745 otherRemoved 918 | recovery legDays 324 gained 318 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 24 | sweepSeen 98 sweepFallback 0 preDblExact 0 preDblC1 24 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    L L432                    legDays 864 | gained 436 notGained 428 | carryLost 0 calfLost 0 otherRemoved 424 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 2 | sweepSeen 22 sweepFallback 0 preDblExact 0 preDblC1 2 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    TIER bodyweight           legDays 786 | gained 190 notGained 596 | carryLost 0 calfLost 38 otherRemoved 172 | recovery legDays 54 gained 48 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 26 | sweepSeen 120 sweepFallback 0 preDblExact 0 preDblC1 26 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    TIER commercial           legDays 786 | gained 696 notGained 90 | carryLost 0 calfLost 342 otherRemoved 282 | recovery legDays 54 gained 54 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    TIER crossfit             legDays 786 | gained 696 notGained 90 | carryLost 0 calfLost 342 otherRemoved 300 | recovery legDays 54 gained 54 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    TIER home_basic           legDays 570 | gained 570 notGained 0 | carryLost 0 calfLost 342 otherRemoved 144 | recovery legDays 54 gained 54 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    TIER home_full            legDays 786 | gained 696 notGained 90 | carryLost 0 calfLost 342 otherRemoved 300 | recovery legDays 54 gained 54 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    TIER minimal              legDays 570 | gained 570 notGained 0 | carryLost 0 calfLost 339 otherRemoved 144 | recovery legDays 54 gained 54 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    FAM none                  legDays 1728 | gained 1196 notGained 532 | carryLost 0 calfLost 0 otherRemoved 1276 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 2 | sweepSeen 34 sweepFallback 0 preDblExact 0 preDblC1 2 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    FAM race                  legDays 1332 | gained 1159 notGained 173 | carryLost 0 calfLost 914 otherRemoved 34 | recovery legDays 180 gained 176 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 12 | sweepSeen 46 sweepFallback 0 preDblExact 0 preDblC1 12 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    FAM test                  legDays 1224 | gained 1063 notGained 161 | carryLost 0 calfLost 831 otherRemoved 32 | recovery legDays 144 gained 142 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 12 | sweepSeen 40 sweepFallback 0 preDblExact 0 preDblC1 12 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    EXP advanced              legDays 1428 | gained 1136 notGained 292 | carryLost 0 calfLost 571 otherRemoved 442 | recovery legDays 108 gained 108 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 6 | sweepSeen 46 sweepFallback 0 preDblExact 0 preDblC1 6 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    EXP beginner              legDays 1428 | gained 1140 notGained 288 | carryLost 0 calfLost 579 otherRemoved 454 | recovery legDays 108 gained 104 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 10 | sweepSeen 36 sweepFallback 0 preDblExact 0 preDblC1 10 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    EXP intermediate          legDays 1428 | gained 1142 notGained 286 | carryLost 0 calfLost 595 otherRemoved 446 | recovery legDays 108 gained 106 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 10 | sweepSeen 38 sweepFallback 0 preDblExact 0 preDblC1 10 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ ankle/protect         legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ ankle/workaround      legDays 72 | gained 72 notGained 0 | carryLost 0 calfLost 0 otherRemoved 60 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 2 | sweepSeen 18 sweepFallback 0 preDblExact 0 preDblC1 2 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ elbow/protect         legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ elbow/workaround      legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ hip/protect           legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ hip/workaround        legDays 72 | gained 54 notGained 18 | carryLost 0 calfLost 0 otherRemoved 54 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ knee/protect          legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ knee/workaround       legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 4 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ lowback/protect       legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ lowback/workaround    legDays 72 | gained 0 notGained 72 | carryLost 0 calfLost 0 otherRemoved 0 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ none                  legDays 3420 | gained 2982 notGained 438 | carryLost 0 calfLost 1745 otherRemoved 918 | recovery legDays 324 gained 318 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 24 | sweepSeen 98 sweepFallback 0 preDblExact 0 preDblC1 24 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ shoulder/protect      legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    INJ shoulder/workaround   legDays 72 | gained 62 notGained 10 | carryLost 0 calfLost 0 otherRemoved 62 | recovery legDays 0 gained 0 | regionalHit 0 budgetHit 0 deloadHit 0 | dblExact 0 dblC1 0 | sweepSeen 0 sweepFallback 0 preDblExact 0 preDblC1 0 | IF kept/redetail/rename/drop 0/0/0/0 of 0
+    by week: 1:438/576 k-223  2:438/576 k-213  3:447/576 k-240  4:462/576 k-115  5:448/576 k-224  6:448/576 k-214  7:128/144 k-123  8:144/144  9:123/144 k-105  10:120/144 k-105  11:126/144 k-123  12:36/36  13:30/36 k-30  14:30/36 k-30
+    printed grammar of the new item (tier :: name detail):
+      618  commercial :: Single-leg hip thrust 2×6–10 each @ RPE 7
+      618  crossfit :: Single-leg hip thrust 2×6–10 each @ RPE 7
+      618  home_full :: Single-leg hip thrust 2×6–10 each @ RPE 7
+      282  home_basic :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+      282  minimal :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+      240  home_basic :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 7
+      240  minimal :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 7
+      159  bodyweight :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+      60  commercial :: Single-leg hip thrust 2×6–10 each @ RPE 6–7
+      60  crossfit :: Single-leg hip thrust 2×6–10 each @ RPE 6–7
+      60  home_full :: Single-leg hip thrust 2×6–10 each @ RPE 6–7
+      24  home_basic :: Banded hip thrust 2 sets — RPE 6 (leave 3 or more in reserve)
+      24  home_basic :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 6–7
+      24  minimal :: Banded hip thrust 2 sets — RPE 6 (leave 3 or more in reserve)
+      24  minimal :: Single-leg glute bridge (weighted) 2×6–10 each @ RPE 6–7
+      18  commercial :: Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+      18  crossfit :: Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+      18  home_full :: Single-leg hip thrust 2×8 each — hold RPE 7, three in the tank
+      16  bodyweight :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+      12  bodyweight :: Single-leg glute bridge 2 sets — RPE 6 (leave 3 or more in reserve)
+    drawn -> printed name (inj tier):
+      570  none commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      570  none crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      570  none home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      306  none home_basic :: Banded hip thrust -> Banded hip thrust
+      306  none minimal :: Banded hip thrust -> Banded hip thrust
+      264  none home_basic :: Single-leg glute bridge (weighted) -> Single-leg glute bridge (weighted)
+      264  none minimal :: Single-leg glute bridge (weighted) -> Single-leg glute bridge (weighted)
+      103  none bodyweight :: Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed)
+      26  none bodyweight :: Single-leg glute bridge -> Single-leg glute bridge
+      18  knee/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  knee/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  knee/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  ankle/workaround bodyweight :: Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed)
+      18  hip/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  hip/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  hip/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/protect commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/protect crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  shoulder/protect home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/workaround commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/workaround crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/workaround home_full :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/protect commercial :: Single-leg hip thrust -> Single-leg hip thrust
+      18  elbow/protect crossfit :: Single-leg hip thrust -> Single-leg hip thrust
+    not gained, why:
+      136  none bodyweight advanced :: drawn, not on card (Single-leg hip thrust (shoulders on bed)) pool=["Single-leg hip thrust (shoulders on bed)"]
+      66  none bodyweight intermediate :: drawn, not on card (Single-leg hip thrust (shoulders on bed)) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      65  none bodyweight beginner :: drawn, not on card (Single-leg hip thrust (shoulders on bed)) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      48  none bodyweight beginner :: hipExt==hinge0 (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      48  none bodyweight intermediate :: hipExt==hinge0 (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      39  none bodyweight beginner :: drawn, not on card (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      36  none bodyweight intermediate :: drawn, not on card (Single-leg glute bridge) pool=["Single-leg glute bridge","Single-leg hip thrust (shoulders on bed)"]
+      6  knee/protect bodyweight intermediate :: hipExt null pool=["Bodyweight back extension"]
+      6  ankle/protect commercial beginner :: hipExt null pool=[]
+      6  ankle/protect commercial advanced :: hipExt null pool=[]
+      6  ankle/protect crossfit intermediate :: hipExt null pool=[]
+      6  ankle/protect home_full beginner :: hipExt null pool=[]
+      6  ankle/protect home_full advanced :: hipExt null pool=[]
+      6  ankle/protect bodyweight intermediate :: hipExt null pool=[]
+      6  hip/workaround bodyweight intermediate :: hipExt null pool=[]
+      6  hip/protect commercial beginner :: drawn, not on card (45° back extension) pool=["45° back extension"]
+      6  hip/protect commercial advanced :: drawn, not on card (45° back extension) pool=["45° back extension"]
+      6  hip/protect crossfit intermediate :: drawn, not on card (45° back extension) pool=["45° back extension"]
+      6  hip/protect home_full beginner :: drawn, not on card (Bodyweight back extension) pool=["Bodyweight back extension"]
+      6  hip/protect home_full advanced :: drawn, not on card (Bodyweight back extension) pool=["Bodyweight back extension"]
+      6  hip/protect bodyweight intermediate :: hipExt null pool=["Bodyweight back extension"]
+      6  lowback/workaround commercial beginner :: hipExt null pool=[]
+      6  lowback/workaround commercial advanced :: hipExt null pool=[]
+      6  lowback/workaround crossfit intermediate :: hipExt null pool=[]
+      6  lowback/workaround home_full beginner :: hipExt null pool=[]
+      6  lowback/workaround home_full advanced :: hipExt null pool=[]
+      6  lowback/workaround bodyweight intermediate :: hipExt null pool=[]
+      6  lowback/protect commercial beginner :: hipExt null pool=[]
+      6  lowback/protect commercial advanced :: hipExt null pool=[]
+      6  lowback/protect crossfit intermediate :: hipExt null pool=[]
+    other removed:
+      732  Dumbbell standing calf raise
+      240  Dumbbell seated calf raise
+      92  Wall sit
+      72  Machine seated calf raise
+      48  Nordic hamstring curl (anchored)
+      46  Single-leg glute bridge
+      24  Step-ups (chair)
+      16  Reverse lunge
+      14  Bulgarian split squat (foot on chair)
+      12  Walking lunge
+      12  Single-leg hip thrust
+      8  Calf raise (bodyweight)
+      ex: FULL none bodyweight W11 thu: Step-ups (chair) ; FULL none bodyweight W9 thu: Bulgarian split squat (foot on chair) ; FULL none bodyweight W10 thu: Bulgarian split squat (foot on chair) ; FULL none bodyweight W11 tue: Step-ups (chair) ; FULL none commercial W1 thu: Dumbbell standing calf raise ; FULL none commercial W2 thu: Dumbbell standing calf raise ; FULL none commercial W3 thu: Dumbbell seated calf raise ; FULL none commercial W4 thu: Dumbbell seated calf raise
+    calfLost ex: FULL commercial W1 tue ; FULL commercial W2 tue ; FULL commercial W3 tue ; FULL commercial W4 tue ; FULL commercial W5 tue ; FULL commercial W6 tue ; FULL commercial W1 thu ; FULL commercial W2 thu ; FULL commercial W3 thu ; FULL commercial W5 thu ; FULL commercial W6 thu ; FULL commercial W7 thu
+    same-day C1 doubles (final card):
+      24  none bodyweight :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+      2  ankle/workaround bodyweight :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+    circuit hinge also C1 (two glute-max items in the round): 95
+    sweep map of the new item (pre -> post):
+      94  Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed)
+      26  Single-leg glute bridge -> Single-leg glute bridge
+    pre-sweep C1 doubles:
+      24  none :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+      2  ankle/workaround :: Single-leg hip thrust (shoulders on bed) + [Leg circuit — runner armor] Single-leg glute bridge
+    any circuit item renamed by the sweep (pos, pre -> post):
+    injury filter on the new item (non-kept):
+REPORT DONE
+######## PART=probe (SCR=/private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/adf6a3cd-1bcb-472e-a3ec-2078adfbc3be/scratchpad/measure2)
+==== P1. HALF_MANNY raw JSON keys differing B vs V: ["id","created"] | V vs V rebuilt: ["id","created"] | weeks identical B vs V: true
+
+==== P2. HALF_MANNY Tue calf line present (W1..W12): V YYY-YYY-YYY- | Vreg YYY-YYY-YYY- | A ------------ | Areg YYY-YYY-YYY- | Abo ------------ | AB ------------ | ABreg YYY-YYY-YYY-
+  W6 tue A with __REGIONAL_OFF:
+        Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Clamshells w/ band 2×15 each | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+
+==== P3. sections the arm loses vs its reference (A vs V, AB vs B), attributed by ablation (present with __REGIONAL_OFF => capRegionalFatigue; else present with __BUDGET_OFF => capSessionBudget), over 21924 prevention day cells (576 builds: 432 FULL + 144 L432)
+    980  AB | Calf — achilles armor | capRegionalFatigue | FULL race
+    918  AB | Calf — achilles armor | capRegionalFatigue | FULL test
+    732  AB | Calves | capRegionalFatigue | FULL none
+    716  A | Calves | capRegionalFatigue | FULL none
+    638  A | Calf — achilles armor | capRegionalFatigue | FULL race
+    523  A | Calf — achilles armor | capRegionalFatigue | FULL test
+    328  A | Calves | capRegionalFatigue | L432 none
+    328  AB | Calves | capRegionalFatigue | L432 none
+    308  A | Calf — achilles armor | other | FULL test
+    276  A | Calf — achilles armor | other | FULL race
+    112  AB | Leg isolation | capRegionalFatigue | FULL none
+     84  A | Leg isolation | capRegionalFatigue | L432 none
+     84  AB | Leg isolation | capRegionalFatigue | L432 none
+     76  A | Leg isolation | capRegionalFatigue | FULL none
+     44  A | Leg isolation | other | FULL none
+     16  A | Calves | other | FULL none
+      8  AB | Leg isolation | other | FULL none
+  other ex A: FULL none commercial beginner s87747 W2 tue lost Calf — achilles armor ; FULL none commercial beginner s87747 W3 mon lost Calf — achilles armor ; FULL none commercial beginner s87747 W4 mon lost Calf — achilles armor ; FULL none commercial beginner s87747 W5 mon lost Calf — achilles armor ; FULL none commercial beginner s87747 W6 mon lost Calf — achilles armor ; FULL none commercial beginner s76308 W1 mon lost Calf — achilles armor
+  other ex AB: FULL none bodyweight advanced s1234 W4 thu lost Leg isolation ; FULL none bodyweight advanced s1234 W4 wed lost Leg isolation ; FULL none bodyweight advanced s4242 W4 thu lost Leg isolation ; FULL none bodyweight advanced s4242 W5 thu lost Leg isolation ; FULL none bodyweight advanced s4242 W6 thu lost Leg isolation ; FULL none bodyweight advanced s4242 W4 wed lost Leg isolation
+
+==== P4. knee/protect commercial beginner support_prevention (MARIO base, no run): A pool ["Bodyweight back extension"] draws W1 Bodyweight back extension (hinge0 Kettlebell single-leg deadlift) ; W2 Bodyweight back extension (hinge0 Kettlebell single-leg deadlift) ; W3 Bodyweight back extension (hinge0 Kettlebell swing) ; W4 Bodyweight back extension (hinge0 Kettlebell swing) | IFW log [{"w":1,"d":"thu","pre":{"si":1,"name":"Bodyweight back extension","detail":"2×8 each"},"post":{"name":"Bodyweight back extension","detail":"2×8 each"},"circ":["Single-leg hip thrust 2×10 each","Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank","Bodyweight back extension 2×8 each"]},{"w":2,"d":"thu","pre":{"si":1,"name":"Bodyweight back extension","detail":"2×8 each"},"post":{"name":"Bodyweight back extension","detail":"2×8 each"},"circ":["Single-leg hip thrust 2×10 each","Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank","Bodyweight back extension 2×8 each"]}]
+  W1 thu V   Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank
+        Calves :: Machine seated calf raise 2×15–20 @ RPE 6–7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+  W1 thu A   Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank
+        Calves :: Machine seated calf raise 2×15–20 @ RPE 6–7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+  W1 thu Areg Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank | Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calves :: Machine seated calf raise 2×15–20 @ RPE 6–7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+
+==== P4. knee/protect bodyweight intermediate support_prevention (MARIO base, no run): A pool ["Bodyweight back extension"] draws W1 null (hinge0 Single-leg Romanian deadlift (bodyweight)) ; W2 null (hinge0 Single-leg Romanian deadlift (bodyweight)) ; W3 null (hinge0 Single-leg Romanian deadlift (bodyweight)) ; W4 null (hinge0 Single-leg Romanian deadlift (bodyweight)) | IFW log []
+  W1 thu V   Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Side-lying leg raises 2×15 each | Hip 90/90 stretch 2×45 sec each
+  W1 thu A   Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Side-lying leg raises 2×15 each | Hip 90/90 stretch 2×45 sec each
+  W1 thu Areg Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Side-lying leg raises 2×15 each | Hip 90/90 stretch 2×45 sec each
+
+==== P4. lowback/workaround commercial beginner support_prevention (MARIO base, no run): A pool [] draws W1 null (hinge0 Barbell hip thrust) ; W2 null (hinge0 Barbell hip thrust) ; W3 null (hinge0 Barbell hip thrust) ; W4 null (hinge0 Barbell hip thrust) | IFW log []
+  W1 thu V   Main — Dumbbell goblet squat :: Dumbbell goblet squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec | Barbell hip thrust 2×8 — hold RPE 7, three in the tank
+        Calves :: Machine seated calf raise 2×15–20 @ RPE 6–7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+  W1 thu A   Main — Dumbbell goblet squat :: Dumbbell goblet squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec | Barbell hip thrust 2×8 — hold RPE 7, three in the tank
+        Calves :: Machine seated calf raise 2×15–20 @ RPE 6–7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+  W1 thu Areg Main — Dumbbell goblet squat :: Dumbbell goblet squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec | Barbell hip thrust 2×8 — hold RPE 7, three in the tank
+        Calves :: Machine seated calf raise 2×15–20 @ RPE 6–7
+        Leg isolation :: Seated leg curl 2×10–15 @ RPE 6–7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+
+==== P4. lowback/protect bodyweight beginner support_prevention (MARIO base, no run): A pool [] draws W1 null (hinge0 Single-leg glute bridge) ; W2 null (hinge0 Single-leg glute bridge) ; W3 null (hinge0 Banded hip thrust) ; W4 null (hinge0 Banded hip thrust) | IFW log []
+  W1 thu V   Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Reverse lunge 2 sets — RPE 6 (leave 3 or more in reserve) | Wall sit 2×25 sec | Single-leg glute bridge 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Side-lying leg raises 2×15 each | Hip 90/90 stretch 2×45 sec each
+  W1 thu A   Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Reverse lunge 2 sets — RPE 6 (leave 3 or more in reserve) | Wall sit 2×25 sec | Single-leg glute bridge 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Side-lying leg raises 2×15 each | Hip 90/90 stretch 2×45 sec each
+  W1 thu Areg Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Reverse lunge 2 sets — RPE 6 (leave 3 or more in reserve) | Wall sit 2×25 sec | Single-leg glute bridge 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Leg isolation (SS 2) :: Single-leg hip thrust 2 sets — RPE 6 (leave 3 or more in reserve) | Nordic hamstring curl (anchored) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Side-lying leg raises 2×15 each | Hip 90/90 stretch 2×45 sec each
+
+==== P4. ankle/protect commercial beginner support_prevention (MARIO base, no run): A pool [] draws W1 null (hinge0 Kettlebell single-leg deadlift) ; W2 null (hinge0 Kettlebell single-leg deadlift) ; W3 null (hinge0 Kettlebell swing) ; W4 null (hinge0 Kettlebell swing) | IFW log []
+  W1 thu V   Main — Dumbbell goblet squat :: Dumbbell goblet squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 6–7
+        Leg isolation :: Seated leg curl 2×10–15 @ RPE 6–7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+  W1 thu A   Main — Dumbbell goblet squat :: Dumbbell goblet squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 6–7
+        Leg isolation :: Seated leg curl 2×10–15 @ RPE 6–7
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+  W1 thu Areg Main — Dumbbell goblet squat :: Dumbbell goblet squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 6–7
+        Leg isolation (SS 2) :: Seated leg curl 2×10–15 @ RPE 6–7 | Nordic hamstring curl (anchored) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+
+==== P4. hip/protect commercial beginner support_prevention (MARIO base, no run): A pool ["45° back extension"] draws W1 45° back extension (hinge0 Barbell Romanian deadlift) ; W2 45° back extension (hinge0 Barbell Romanian deadlift) ; W3 45° back extension (hinge0 Barbell Romanian deadlift) ; W4 45° back extension (hinge0 Barbell Romanian deadlift) | IFW log [{"w":1,"d":"thu","pre":{"si":1,"name":"45° back extension","detail":"2×8 each"},"post":null,"circ":["Leg extension 2×10 each","Spanish squat hold (KB) 2×25 sec"]},{"w":2,"d":"thu","pre":{"si":1,"name":"45° back extension","detail":"2×8 each"},"post":null,"circ":["Leg extension 2×10 each","Spanish squat hold (KB) 2×25 sec"]}]
+  W1 thu V   Main — Dumbbell goblet squat :: Dumbbell goblet squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Leg extension 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec
+        Calves :: Machine seated calf raise 2×15–20 @ RPE 6–7
+        Leg isolation :: Leg press 3×12 — hold RPE 7, three in the tank
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+  W1 thu A   Main — Dumbbell goblet squat :: Dumbbell goblet squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Leg extension 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec
+        Calves :: Machine seated calf raise 2×15–20 @ RPE 6–7
+        Leg isolation :: Leg press 3×12 — hold RPE 7, three in the tank
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+  W1 thu Areg Main — Dumbbell goblet squat :: Dumbbell goblet squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Leg extension 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec
+        Calves :: Machine seated calf raise 2×15–20 @ RPE 6–7
+        Leg isolation :: Leg press 3×12 — hold RPE 7, three in the tank
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+
+==== P5. non-runner prevention leg day (FULL none commercial beginner s4242 sun,wed) W1 thu:
+  V    Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 6–7
+        Calves :: Dumbbell seated calf raise 2×15–20 @ RPE 6–7
+        Hip stability :: Hip airplane (light KB) 2×6 each, slow | Clamshells w/ band 2×15 each | Hip 90/90 stretch 2×45 sec each
+  A    Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 6–7 | Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        Leg isolation :: Wall sit 3×25 sec
+        Hip stability :: Hip airplane (light KB) 2×6 each, slow | Clamshells w/ band 2×15 each | Hip 90/90 stretch 2×45 sec each
+  Areg Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 6–7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 6–7 | Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        Calves :: Dumbbell seated calf raise 2×15–20 @ RPE 6–7
+        Leg isolation :: Standing cable hamstring curl 2×10–15 @ RPE 6–7
+        Hip stability :: Hip airplane (light KB) 2×6 each, slow | Clamshells w/ band 2×15 each | Hip 90/90 stretch 2×45 sec each
+
+==== P6. legs-site, FULL x rest sun/wed (1512 builds, the v228 C2 lattice): V C1 printed 3551/6298 all 5553/10260 | Vbo C1 printed 4969/6298 all 7872/10260 | B C1 printed 4715/6298 all 7451/10260   (v228: C1 3,551/6,298, budget-off 4,969/6,298, all 5,553/10,260)
+
+==== P7. not-gained prevention leg days grouped (arm | injury | reason | tier):
+     18  ABvsB | ankle/protect | hipExt null | bodyweight
+     18  ABvsB | ankle/protect | hipExt null | commercial
+     18  ABvsB | ankle/protect | hipExt null | crossfit
+     18  ABvsB | ankle/protect | hipExt null | home_full
+     10  ABvsB | elbow/protect | drawn, not on card | bodyweight
+     10  ABvsB | elbow/workaround | drawn, not on card | bodyweight
+     18  ABvsB | hip/protect | drawn, not on card | commercial
+     18  ABvsB | hip/protect | drawn, not on card | crossfit
+     18  ABvsB | hip/protect | drawn, not on card | home_full
+     18  ABvsB | hip/protect | hipExt null | bodyweight
+     18  ABvsB | hip/workaround | hipExt null | bodyweight
+     12  ABvsB | knee/protect | drawn, not on card | commercial
+     12  ABvsB | knee/protect | drawn, not on card | crossfit
+      6  ABvsB | knee/protect | drawn, not on card | home_full
+     18  ABvsB | knee/protect | hipExt null | bodyweight
+      6  ABvsB | knee/protect | hipExt null | commercial
+      6  ABvsB | knee/protect | hipExt null | crossfit
+     12  ABvsB | knee/protect | hipExt null | home_full
+     10  ABvsB | knee/workaround | drawn, not on card | bodyweight
+     18  ABvsB | lowback/protect | hipExt null | bodyweight
+     18  ABvsB | lowback/protect | hipExt null | commercial
+     18  ABvsB | lowback/protect | hipExt null | crossfit
+     18  ABvsB | lowback/protect | hipExt null | home_full
+     18  ABvsB | lowback/workaround | hipExt null | bodyweight
+     18  ABvsB | lowback/workaround | hipExt null | commercial
+     18  ABvsB | lowback/workaround | hipExt null | crossfit
+     18  ABvsB | lowback/workaround | hipExt null | home_full
+    348  ABvsB | none | drawn, not on card | bodyweight
+     96  ABvsB | none | hipExt==hinge0 | bodyweight
+     10  ABvsB | shoulder/protect | drawn, not on card | bodyweight
+     10  ABvsB | shoulder/workaround | drawn, not on card | bodyweight
+     18  AvsV | ankle/protect | hipExt null | bodyweight
+     18  AvsV | ankle/protect | hipExt null | commercial
+     18  AvsV | ankle/protect | hipExt null | crossfit
+     18  AvsV | ankle/protect | hipExt null | home_full
+     10  AvsV | elbow/protect | drawn, not on card | bodyweight
+     10  AvsV | elbow/workaround | drawn, not on card | bodyweight
+     18  AvsV | hip/protect | drawn, not on card | commercial
+     18  AvsV | hip/protect | drawn, not on card | crossfit
+     18  AvsV | hip/protect | drawn, not on card | home_full
+     18  AvsV | hip/protect | hipExt null | bodyweight
+     18  AvsV | hip/workaround | hipExt null | bodyweight
+     12  AvsV | knee/protect | drawn, not on card | commercial
+     12  AvsV | knee/protect | drawn, not on card | crossfit
+      6  AvsV | knee/protect | drawn, not on card | home_full
+     18  AvsV | knee/protect | hipExt null | bodyweight
+      6  AvsV | knee/protect | hipExt null | commercial
+      6  AvsV | knee/protect | hipExt null | crossfit
+     12  AvsV | knee/protect | hipExt null | home_full
+     10  AvsV | knee/workaround | drawn, not on card | bodyweight
+     18  AvsV | lowback/protect | hipExt null | bodyweight
+     18  AvsV | lowback/protect | hipExt null | commercial
+     18  AvsV | lowback/protect | hipExt null | crossfit
+     18  AvsV | lowback/protect | hipExt null | home_full
+     18  AvsV | lowback/workaround | hipExt null | bodyweight
+     18  AvsV | lowback/workaround | hipExt null | commercial
+     18  AvsV | lowback/workaround | hipExt null | crossfit
+     18  AvsV | lowback/workaround | hipExt null | home_full
+    348  AvsV | none | drawn, not on card | bodyweight
+     37  AvsV | none | drawn, not on card | commercial
+     37  AvsV | none | drawn, not on card | crossfit
+     37  AvsV | none | drawn, not on card | home_basic
+     37  AvsV | none | drawn, not on card | home_full
+     40  AvsV | none | drawn, not on card | minimal
+     96  AvsV | none | hipExt==hinge0 | bodyweight
+     10  AvsV | shoulder/protect | drawn, not on card | bodyweight
+     10  AvsV | shoulder/workaround | drawn, not on card | bodyweight
+PROBE DONE
+######## PART=drift (SCR=/private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/adf6a3cd-1bcb-472e-a3ec-2078adfbc3be/scratchpad/measure2)
+V228 tree: 
+  anchor A1 prevention pool subset count 1
+  anchor A2 fourth circuit item count 1
+  V228 ia-version 228 HALF_MANNY digest 0ac7da6b1691a8e1 | A on V228 14aacbced1c527d7
+  V228 Tue calf W1..W12: V228 YYY-YYY-YYY- | A on V228 ------------ | A on V228, __REGIONAL_OFF YYY-YYY-YYY-
+  A on V228 W6 tue:
+        Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Clamshells w/ band 2×15 each | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+
+  B redetail commercial race intermediate s1234 sun,wed W3 tue: Landmine rotational press [3×15 each] -> [2×15 each]  budget view V 21/19 B 19.5/19
+    V    Main — Incline barbell press :: Incline barbell press 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 2×6–10 @ RPE 7
+        Accessory :: Landmine rotational press 3×15 each
+        Chest + knee (SS 2) :: Dumbbell bench press 2×10–15 @ RPE 7 | Terminal knee extension (band) 2×25 sec
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each
+    B    Main — Incline barbell press :: Incline barbell press 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 2×6–10 @ RPE 7
+        Accessory (SS 2) :: Pushups (slow tempo) 2 sets — RPE 7 (leave 3 or more in reserve) | Landmine rotational press 2×15 each
+        Chest + knee (SS 2) :: Dumbbell bench press 2×10–15 @ RPE 7 | Terminal knee extension (band) 2×25 sec
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each
+    V-bo Main — Incline barbell press :: Incline barbell press 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 2×6–10 @ RPE 7
+        Accessory (SS 2) :: Pushups (slow tempo) 2 sets — RPE 7 (leave 3 or more in reserve) | Landmine rotational press 2×15 each
+        Chest + knee (SS 2) :: Dumbbell bench press 2×10–15 @ RPE 7 | Terminal knee extension (band) 2×25 sec
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each
+
+  B redetail commercial race intermediate s1234 sat,sun W3 tue: Landmine rotational press [3×15 each] -> [2×15 each]  budget view V 21/19 B 19.5/19
+    V    Main — Incline barbell press :: Incline barbell press 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 2×6–10 @ RPE 7
+        Accessory :: Landmine rotational press 3×15 each
+        Chest + knee (SS 2) :: Dumbbell bench press 2×10–15 @ RPE 7 | Terminal knee extension (band) 2×25 sec
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each
+    B    Main — Incline barbell press :: Incline barbell press 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 2×6–10 @ RPE 7
+        Accessory (SS 2) :: Pushups (slow tempo) 2 sets — RPE 7 (leave 3 or more in reserve) | Landmine rotational press 2×15 each
+        Chest + knee (SS 2) :: Dumbbell bench press 2×10–15 @ RPE 7 | Terminal knee extension (band) 2×25 sec
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each
+    V-bo Main — Incline barbell press :: Incline barbell press 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 2×6–10 @ RPE 7
+        Accessory (SS 2) :: Pushups (slow tempo) 2 sets — RPE 7 (leave 3 or more in reserve) | Landmine rotational press 2×15 each
+        Chest + knee (SS 2) :: Dumbbell bench press 2×10–15 @ RPE 7 | Terminal knee extension (band) 2×25 sec
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each
+  B redetail rows (loaded prevention FULL): 14
+DRIFT DONE

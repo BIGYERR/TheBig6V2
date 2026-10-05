@@ -36,7 +36,7 @@
 // the trial moves, so B3 SKIPs by name there (V209 UPKEEP, gatekeeper).
 'use strict';
 const path = require('path');
-const { load, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
@@ -163,6 +163,15 @@ else { const RB = IB.eval('_runClass'); const seen = new Set(), moved = [];
 { const t = ['1.5 Mile Test — TIME TRIAL', '1 Mile Test — TIME TRIAL', 'Benchmark Run', 'Benchmark Run — Retest'].map(s => s + ' ' + RC(s));
   ok('D2 the test and the benchmark stay out of the run history (null class)', ['1.5 Mile Test — TIME TRIAL', '1 Mile Test — TIME TRIAL', 'Benchmark Run', 'Benchmark Run — Retest'].every(s => RC(s) === null), t.join('; ')); }
 // ── M ───────────────────────────────────────────────────────────────────────────────
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
+// this row defends D103a slice 3's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[+IA.version], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// D103a slice 3 (standing ruling 4).
 { let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
-  ok('M1 HALF_MANNY digest is 0ac7da6b1691a8e1', hm === '0ac7da6b1691a8e1', hm); }
+  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  ok('M1 HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (D103a slice 3 moves no NRC card)',
+     eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 done();

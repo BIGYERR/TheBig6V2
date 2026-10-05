@@ -35,8 +35,9 @@
 //               U and its fresh boot equals live; the name it boots to is d2-UNDO's claim, so the chip key stays out of
 //               d2-BOOT-U).
 //   V227        INFO only: the baseline's own act, chip, undo and boot of the same U' chain.
-//   ERA TABLE   d2-MANNY: MANNY_DIGEST_BY_VERSION[VER] and the digest typed here, 0ac7da6b1691a8e1 (standing ruling 5,
-//               unmoved; printed by coach on V227 and by measure on CF and CF2).
+//   ERA TABLE   d2-MANNY: MANNY_DIGEST_BY_VERSION[VER], row existence a conjunct (standing ruling 5, unmoved; printed
+//               by coach on V227 and by measure on CF and CF2). The digest once typed here and the V227 baseline's
+//               digest left the assertion at V231 (absorb ruling sections 3 and 4: literal + row -> row only).
 //
 // POPULATION. Enumerated on the tree under test with measure's enumerator (tests/measure/v228_undokey.js :109-122, itself
 //   g227's): a hop is taken only when its target is in the swap sheet's own candidate list for the item as it then stands
@@ -71,10 +72,11 @@
 //   IA_ASSUME_VERSION=228 lifts a file stamped exactly 227 to 228 for a discrimination run. It is announced, ignored on any
 //   other file, and gate.sh never sets it. Expected on V227 (assumed 228): d2-CHIP and d2-UNDO FAIL (every strict
 //   A>B>C>B, every hop4 revisit shape, 191/1,000 hop5, the PIN); d2-BOOT-U, INFO and d2-MANNY hold.
-//   V227 tree      INFO and d2-MANNY read the baseline from argv[3] if it reads 227, else from `git show
+//   V227 tree      INFO and the refutation guard read the baseline from argv[3] if it reads 227, else from `git show
 //                  5ce31e8a5f175e69009f6e1c46b93f3d5e62eb47:index.html` (V227) into os.tmpdir(), because tests/sabotage.py
 //                  passes no argv[3] (g227's form). The run prints which source it used. No tree reading 227 FAILS
-//                  d2-MANNY and the refutation guard by name, never PASS.
+//                  the refutation guard by name, never PASS. d2-MANNY prints the V227 digest when that tree is live
+//                  and asserts the era row only (V231 absorb ruling section 3).
 //
 // ROWS
 //   d2-CHIP    whole walk (WALK, HOP4, HOP5, PIN): the chip on the last hop's card is found and equals the last hop's
@@ -99,7 +101,8 @@
 //              chain on WALK or HOP4 (measure: 0 at hop3 and hop4), or a created chain with no repeated `from`. A created
 //              chain in U cannot exist without a d2-BOOT-U residue (it boots != live on the candidate), so that half of
 //              the refutation also FAILS d2-BOOT-U by name.
-//   d2-MANNY   HALF_MANNY digest == MANNY_DIGEST_BY_VERSION[VER] == 0ac7da6b1691a8e1 == the V227 baseline's,
+//   d2-MANNY   HALF_MANNY digest == MANNY_DIGEST_BY_VERSION[VER], row existence a conjunct (V231 absorb ruling
+//              sections 3 and 4: the typed literal and the V227 equality left the row; V227's digest prints as INFO),
 //              self-stable; and the D192 statement that one read-side line reaches no build: a counter wrapped on
 //              swapOriginOf by name reads 0 across two buildProgram calls and a refreshProgram boot, and 1 after one
 //              direct call (the counter is wired).
@@ -128,7 +131,6 @@ const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const ERA = 228, BASE_ERA = 227;
 const V227_COMMIT = '5ce31e8a5f175e69009f6e1c46b93f3d5e62eb47';   // V227: D190 (the V227 artifact, forever)
-const MANNY_TYPED = '0ac7da6b1691a8e1';
 const KW = { hop1:8, hop2:8, cyc2:8, 'hop3 A>B>C>D':4, 'hop3 A>B>C>B':6, 'hop3 A>B>A>B':4, 'hop3 A>B>A>C':4, cyc3:6, collide2:6, exch3:6 };
 const H4SHAPES = ['A>B>C>D>B', 'A>B>C>D>C', 'A>B>C>A>C', 'A>B>A>C>A'], K4 = 40, K4O = 80, N5 = 1000;
 const H5_SEED = 0xC0FFEE + 3 * 7 + 'lowback_wa'.length * 131;     // measure's mulberry(0xC0FFEE + w*7 + ck.length*131), w 3
@@ -142,7 +144,7 @@ const R = {
   CHIP:  "row d2-CHIP D192 whole walk: the chip on the last hop's card is found and equals the last hop's `from` (off the chain tuple); residue 0, |U_d'| > 0, every class and shape non-empty, PIN chip Deadlift",
   UNDO:  "row d2-UNDO D192 whole walk: after undoSwap(chip) the live day is byte-identical to the live day before the last hop, and on U the day's store is the chain's first n-1 hops in recording order; residue 0, PIN store typed",
   BOOTU: "row d2-BOOT-U D192 on U (hand: hop `from` names pairwise distinct): after undo a fresh-VM boot of the day equals the live day; residue 0, |U| > 0, PIN in U boots equal to live",
-  MANNY: 'row d2-MANNY D192 HALF_MANNY digest == era table == 0ac7da6b1691a8e1 == V227, self-stable; swapOriginOf reached 0 times by buildProgram and refreshProgram (counter wired)',
+  MANNY: 'row d2-MANNY D192 HALF_MANNY digest == era table row MANNY_DIGEST_BY_VERSION[VER] (row present), self-stable; swapOriginOf reached 0 times by buildProgram and refreshProgram (counter wired)',
 };
 const GUARD = 'GUARD D192 refutation (ruling §5, projection per D194 Amendment 2: section label, item name, detail and the dose beneath the hold _stripCapCue(_preHold ?? detail) by hand shape): created above 2 on the hop5 seed, created on the walk or hop4, or a created chain with no repeated from';
 // D194 Amendment 2 (R8): the projection the athlete and the next tap read. Hand stripper, typed from D193 R4's cue shape and
@@ -268,9 +270,9 @@ if(!(VER >= ERA)){
   console.log('  INFO D191 P-SWAPREVISIT: not run (REFUSED)');
   done();
 }
-// V227 baseline (INFO, the guard, d2-MANNY): argv[3] if it reads 227, else `git show <V227_COMMIT>:index.html` into
+// V227 baseline (INFO, the guard; d2-MANNY prints its digest): argv[3] if it reads 227, else `git show <V227_COMMIT>:index.html` into
 // os.tmpdir(), because tests/sabotage.py passes no argv[3]. fresh('B') reloads FILES.B on every chain, so the git copy
-// lives until exit. No tree reading 227 leaves B null; d2-MANNY and the guard then FAIL setup by name, never PASS.
+// lives until exit. No tree reading 227 leaves B null; the guard then FAILS setup by name, never PASS.
 let B = null, baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
@@ -444,10 +446,17 @@ const U = reach.filter(inU), UP = reach.filter(c => !inU(c));
   const d1 = progDigest(X.buildProgram(clone(fixtures.HALF_MANNY))), d2 = progDigest(X.buildProgram(clone(fixtures.HALF_MANNY)));
   setup(X, 'manny'); boot(X);
   const nBuild = E(X, 'globalThis.__soN'); E(X, 'swapOriginOf("Deadlift");'); const wired = E(X, 'globalThis.__soN') === nBuild + 1;
-  const era = MANNY_DIGEST_BY_VERSION[VER];
+  // V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md sections 3 and 4; standing rulings 3, 4 and 5):
+  // this row defends D192's claim "my ruling did not move HALF_MANNY". The literal it compared
+  // against went: the only object that carries that claim across later rulings is the era table that
+  // standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[VER], fails loudly when that
+  // row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+  // to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+  // D192 (standing ruling 4). Section 3: "literal + row -> row only"; VER is this gate's own version variable.
+  const eraV = VER, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
   const dB = B ? progDigest(fresh('B').buildProgram(clone(fixtures.HALF_MANNY))) : null;
-  console.log('    d2-MANNY candidate ' + d1 + ' (self-stable ' + (d1 === d2) + ') | era[' + VER + '] ' + era + ' | typed ' + MANNY_TYPED + ' | V227 ' + (dB || 'n/a (' + baseWhy + ')')
+  console.log('    d2-MANNY candidate ' + d1 + ' (self-stable ' + (d1 === d2) + ') | era[' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT') + ' | V227 (INFO) ' + (dB || 'n/a (' + baseWhy + ')')
     + ' | swapOriginOf calls in 2 buildProgram + 1 refreshProgram: ' + nBuild + ', counter wired ' + wired);
-  ok(R.MANNY + (B ? '' : ' (setup: no V227 tree: ' + baseWhy + ')'), d1 === d2 && d1 === era && d1 === MANNY_TYPED && dB === d1 && nBuild === 0 && wired, d1 + ', calls ' + nBuild);
+  ok(R.MANNY, d1 === d2 && eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && d1 === eraRow && nBuild === 0 && wired, d1 + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT') + ', calls ' + nBuild);
 }
 done();

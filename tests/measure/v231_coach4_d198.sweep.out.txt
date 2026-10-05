@@ -1,0 +1,487 @@
+coach4 d196a2_fix  clock 2026-08-24  configs 9270
+PREP
+  anchor `const lowerHipExt=pick(hipExtBW,1,blockSeed(w)+20)[0];` count in candidate: 1 ; in V230: 1
+  FIX-B (index-stable: same draw, seeded re-pick from the pool minus the hinge only when the draw collides): const _lhe0=pick(hipExtBW,1,blockSeed(w)+20)[0];const lowerHipExt=(_lhe0===lowerHinge)?(pick(hipExtBW.filter(x=>x!==lowerHinge),1,blockSeed(w)+20)[0]||_lhe0):_lhe0;
+  FIX-A (filter-before-pick, the sibling lowerPush idiom at :9479; narrows the array pick() registers): const lowerHipExt=pick(hipExtBW.filter(x=>x!==lowerHinge),1,blockSeed(w)+20)[0]||pick(hipExtBW,1,blockSeed(w)+20)[0];
+  t_CF   (candidate + FIX-B) 1b403743f8ad1b16
+  t_CA   (candidate + FIX-A) c4866ceaaab26f77
+  t_PREf (t_PREx + FIX-B)    b69f55cf476d5fa6
+  tree V    72ac41c8d34034ce ok ia-version 230
+  tree ABx  8d90f9463198e7d4 ok ia-version 230
+  tree PREx 450783528238a6ee ok ia-version 230
+  tree PREf b69f55cf476d5fa6 ia-version 230
+  tree C    1249c248a6794d1c ok ia-version 231
+  tree CF   1b403743f8ad1b16 ia-version 231
+  tree CA   c4866ceaaab26f77 ia-version 231
+  fixtures: HALF_MANNY
+  digests V    HALF_MANNY 0ac7da6b1691a8e1
+  digests ABx  HALF_MANNY 2d35e8f743680cfa
+  digests PREx HALF_MANNY 2d35e8f743680cfa
+  digests PREf HALF_MANNY 2d35e8f743680cfa
+  digests C    HALF_MANNY 2d35e8f743680cfa
+  digests CF   HALF_MANNY 2d35e8f743680cfa
+  digests CA   HALF_MANNY 2d35e8f743680cfa
+
+  TYPED (i)  Leg superset B beginner W1/W2 RPE 6  E bodyweight|hypertrophy|none|lowback/protect|beginner|18-35|s1013|sun
+    W1 wed:
+      V    [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Burpees 2×8 — hold RPE 7, three in the tank
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 6 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 6 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Standing hip abduction 2 sets — RPE 6 (leave 3 or more in reserve) | Hip 90/90 stretch 2×6 each
+      ABx  [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Burpees 2×8 — hold RPE 7, three in the tank
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 6 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 6 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Standing hip abduction 2 sets — RPE 6 (leave 3 or more in reserve) | Hip 90/90 stretch 2×6 each
+      PREx [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 6 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 6 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Standing hip abduction 2 sets — RPE 6 (leave 3 or more in reserve) | Hip 90/90 stretch 2×6 each
+      PREf [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 6 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 6 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Standing hip abduction 2 sets — RPE 6 (leave 3 or more in reserve) | Hip 90/90 stretch 2×6 each
+      C    [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 6 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 6 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Standing hip abduction 2 sets — RPE 6 (leave 3 or more in reserve) | Hip 90/90 stretch 2×6 each
+      CF   [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 6 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 6 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Standing hip abduction 2 sets — RPE 6 (leave 3 or more in reserve) | Hip 90/90 stretch 2×6 each
+    W3 wed:
+      V    [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Burpees 2×8 — hold RPE 7, three in the tank
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 7 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Clamshells (bodyweight) 2×20 each | Hip 90/90 stretch 2×45 sec each
+      ABx  [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Burpees 2×8 — hold RPE 7, three in the tank
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 7 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Clamshells (bodyweight) 2×20 each | Hip 90/90 stretch 2×45 sec each
+      PREx [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 7 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Clamshells (bodyweight) 2×20 each | Hip 90/90 stretch 2×45 sec each
+      PREf [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 7 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Clamshells (bodyweight) 2×20 each | Hip 90/90 stretch 2×45 sec each
+      C    [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 7 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Clamshells (bodyweight) 2×20 each | Hip 90/90 stretch 2×45 sec each
+      CF   [Legs (spine-safe)] Main — Squat (slow 3s tempo) :: Squat (slow 3s tempo) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 2×25 sec
+        Leg superset B :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calves :: Single-leg calf raise (bodyweight) 3 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation (SS 3) :: Nordic hamstring curl (anchored) 3 sets — RPE 7 (leave 3 or more in reserve) | Single-leg glute bridge 3 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Clamshells (bodyweight) 2×20 each | Hip 90/90 stretch 2×45 sec each
+
+  TYPED (ii) Lower strength + Explosive finisher  E bodyweight|hypertrophy|none|lowback/protect|beginner|18-35|s3039|sun
+    W1 sat:
+      V    [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 6 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 6 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 6 (leave 3 or more in reserve)
+        Explosive finisher :: Single-leg wall sit 2×30 sec
+      ABx  [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 6 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 6 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 6 (leave 3 or more in reserve)
+        Explosive finisher :: Single-leg wall sit 2×30 sec
+      PREx [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 6 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 6 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 6 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Burpees 2×12 | Single-leg wall sit 2×30 sec
+      PREf [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 6 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 6 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 6 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Burpees 2×12 | Single-leg wall sit 2×30 sec
+      C    [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 6 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 6 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 6 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Burpees 2×12 | Single-leg wall sit 2×30 sec
+      CF   [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 6 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 6 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 6 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Burpees 2×12 | Single-leg wall sit 2×30 sec
+    W3 sat:
+      V    [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher :: Single-leg wall sit 2×30 sec
+      ABx  [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher :: Single-leg wall sit 2×30 sec
+      PREx [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Burpees 2×12 | Single-leg wall sit 2×30 sec
+      PREf [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Burpees 2×12 | Single-leg wall sit 2×30 sec
+      C    [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Burpees 2×12 | Single-leg wall sit 2×30 sec
+      CF   [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Burpees 2×12 | Single-leg wall sit 2×30 sec
+
+  TYPED (iii) Lower strength + Hip extension + push collapse  E bodyweight|balanced|none|lowback/protect|beginner|18-35|s1013|sun
+    W3 sat:
+      V    [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+      ABx  [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+      PREx [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push :: Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+      PREf [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+      C    [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push :: Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+      CF   [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+    W4 sat:
+      V    [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+      ABx  [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+      PREx [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push :: Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+      PREf [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+      C    [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push :: Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+      CF   [Full Body — Lower] Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+
+  self-identity on 96 sampled configs (every 97th of 9270): V 96, C 96, CF 96
+RUN jobs 78 worker crashes 0 160 s
+
+CELLS 9270/9270 | by lattice FULL 3024 | INJ 3024 | E 1728 | K 630 | L432 432 | LBW 432 | crashes 0
+
+################ (A) `Hip extension + push` census per tree (days with the section; collapsed = 1 item; doubled = shares a name with Lower strength; hepGone = Lower strength without HEP)
+  V    {"hepDays":3760,"collapsed":1237,"doubled":150,"hepGone":6659} | programs with a collapsed HEP 287, doubled 40 of 9270
+  ABx  {"hepDays":3760,"collapsed":1237,"doubled":150,"hepGone":6659} | programs with a collapsed HEP 287, doubled 40 of 9270
+  PREx {"hepDays":3760,"collapsed":1258,"doubled":150,"hepGone":6659} | programs with a collapsed HEP 290, doubled 40 of 9270
+  PREf {"hepDays":3760,"collapsed":1177,"doubled":80,"hepGone":6659} | programs with a collapsed HEP 276, doubled 20 of 9270
+  C    {"hepDays":3760,"collapsed":1258,"doubled":150,"hepGone":6659} | programs with a collapsed HEP 290, doubled 40 of 9270
+  CF   {"hepDays":3760,"collapsed":1177,"doubled":80,"hepGone":6659} | programs with a collapsed HEP 276, doubled 20 of 9270
+  CA   {"hepDays":3760,"collapsed":1186,"doubled":80,"hepGone":6659} | programs with a collapsed HEP 276, doubled 20 of 9270
+  V230 collapsed HEP days by L x tier x inj: E bodyweight lowback/protect 91 | E bodyweight none 70 | E bodyweight shoulder/protect 70 | E crossfit knee/protect 70 | E home_basic knee/protect 70 | E minimal knee/protect 70 | E bodyweight knee/protect 68 | E crossfit none 68 | E crossfit shoulder/protect 68 | E home_basic none 68 | E home_basic shoulder/protect 68 | E minimal none 68 | E minimal shoulder/protect 68 | E commercial none 34 | E commercial shoulder/protect 34 | E home_full none 34 | E home_full shoulder/protect 34 | E commercial lowback/protect 32 | E crossfit lowback/protect 32 | E home_basic lowback/protect 32 | E home_full lowback/protect 32 | E minimal lowback/protect 32 | E commercial knee/protect 12 | E home_full knee/protect 12
+  V230 doubled  HEP days by L x tier x inj: E commercial knee/protect 16 | E crossfit knee/protect 16 | E home_basic knee/protect 16 | E home_full knee/protect 16 | E minimal knee/protect 16 | E commercial lowback/protect 14 | E crossfit lowback/protect 14 | E home_basic lowback/protect 14 | E home_full lowback/protect 14 | E minimal lowback/protect 14
+  cand collapsed HEP days by L x tier x inj: E bodyweight lowback/protect 112 | E bodyweight none 70 | E bodyweight shoulder/protect 70 | E crossfit knee/protect 70 | E home_basic knee/protect 70 | E minimal knee/protect 70 | E bodyweight knee/protect 68 | E crossfit none 68 | E crossfit shoulder/protect 68 | E home_basic none 68 | E home_basic shoulder/protect 68 | E minimal none 68 | E minimal shoulder/protect 68 | E commercial none 34 | E commercial shoulder/protect 34 | E home_full none 34 | E home_full shoulder/protect 34 | E commercial lowback/protect 32 | E crossfit lowback/protect 32 | E home_basic lowback/protect 32 | E home_full lowback/protect 32 | E minimal lowback/protect 32 | E commercial knee/protect 12 | E home_full knee/protect 12
+  cand doubled  HEP days by L x tier x inj: E commercial knee/protect 16 | E crossfit knee/protect 16 | E home_basic knee/protect 16 | E home_full knee/protect 16 | E minimal knee/protect 16 | E commercial lowback/protect 14 | E crossfit lowback/protect 14 | E home_basic lowback/protect 14 | E home_full lowback/protect 14 | E minimal lowback/protect 14
+  CF   collapsed 1177 doubled 80 hepGone 6659 | CA collapsed 1186 doubled 80
+  collapsed/doubled days by rest pattern (V230): sun 1387 | cand: sun 1408
+
+################ (B) the fix's own differential, candidate -> CF (FIX-B)
+  ops 151 on 16 days, 2 programs of 9270 | by L E 151 | by kind add 81 | rename 70 | by label Hip extension + push 151
+  by tier x inj: bodyweight lowback/protect 77 | commercial lowback/protect 14 | crossfit lowback/protect 14 | home_basic lowback/protect 14 | home_full lowback/protect 14 | minimal lowback/protect 14 | bodyweight none 2 | bodyweight shoulder/protect 2
+  by focus: balanced 122 | hypertrophy 29 | by rest: sun 151 | by week: W10 26 | W11 26 | W9 26 | W12 13 | W3 11 | W4 11 | W5 9 | W6 9 | W1 6 | W2 6 | W7 4 | W8 4
+  regression tags: rename hip/foot 70
+  transitions (top 40):
+        70  rename rename [Hip extension + push] Banded hip thrust N -> [Hip extension + push] Single-leg hip thrust N
+        56  add add [Hip extension + push] Nordic hamstring curl (anchored) N
+        21  add add [Hip extension + push] Single-leg glute bridge N
+         4  add add [Hip extension + push] Bodyweight back extension N
+    e.g. rename Hip extension + push @ rename 9 sat rename [Hip extension + push] Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) -> [Hip extension + push] Single-leg hip thrust 2×10 — hold RPE 7, three in the tank
+              C: Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Diamond pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+              CF: Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg hip thrust 2×10 — hold RPE 7, three in the tank | Diamond pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+    e.g. rename Hip extension + push @ rename 9 sat rename [Hip extension + push] Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) -> [Hip extension + push] Single-leg hip thrust 2×10 — hold RPE 7, three in the tank
+              C: Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Diamond pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+              CF: Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg hip thrust 2×10 — hold RPE 7, three in the tank | Diamond pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+    e.g. rename Hip extension + push @ rename 9 sat rename [Hip extension + push] Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) -> [Hip extension + push] Single-leg hip thrust 2×10 — hold RPE 7, three in the tank
+              C: Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Diamond pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+              CF: Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg hip thrust 2×10 — hold RPE 7, three in the tank | Diamond pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+    e.g. rename Hip extension + push @ rename 9 sat rename [Hip extension + push] Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) -> [Hip extension + push] Single-leg hip thrust 2×10 — hold RPE 7, three in the tank
+              C: Lower strength (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+              CF: Lower strength (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg hip thrust 2×10 — hold RPE 7, three in the tank | Pike pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+    e.g. add Hip extension + push @ add 1 sat add [Hip extension + push] Nordic hamstring curl (anchored) 4 sets — RPE 7 (leave 3 or more in reserve)
+              C: Lower strength (SS 4) :: Bulgarian split squat (foot on chair) 4 sets — RPE 8 (stop 2 reps short of failure) | Single-leg glute bridge 4 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push :: Pike pushups 4 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 4×30 sec
+              CF: Lower strength (SS 4) :: Bulgarian split squat (foot on chair) 4 sets — RPE 8 (stop 2 reps short of failure) | Single-leg glute bridge 4 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 4) :: Nordic hamstring curl (anchored) 4 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 4 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 4×30 sec
+    e.g. add Hip extension + push @ add 3 sat add [Hip extension + push] Bodyweight back extension 4 sets — RPE 8 (stop 2 reps short of failure)
+              C: Lower strength (SS 4) :: Bulgarian split squat (foot on chair) 4 sets — RPE 8 (stop 2 reps short of failure) | Nordic hamstring curl (anchored) 4 sets — RPE 8 (stop 2 reps short of failure)
+        Hip extension + push :: Pike pushups 4 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher :: High knees 4×12
+              CF: Lower strength (SS 4) :: Bulgarian split squat (foot on chair) 4 sets — RPE 8 (stop 2 reps short of failure) | Nordic hamstring curl (anchored) 4 sets — RPE 8 (stop 2 reps short of failure)
+        Hip extension + push (SS 4) :: Bodyweight back extension 4 sets — RPE 8 (stop 2 reps short of failure) | Pike pushups 4 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher :: High knees 4×12
+    e.g. add Hip extension + push @ add 3 sat add [Hip extension + push] Bodyweight back extension 4 sets — RPE 8 (stop 2 reps short of failure)
+              C: Lower strength (SS 4) :: Bulgarian split squat (foot on chair) 4 sets — RPE 8 (stop 2 reps short of failure) | Nordic hamstring curl (anchored) 4 sets — RPE 8 (stop 2 reps short of failure)
+        Hip extension + push :: Feet-elevated inverted row (under a table) 4 sets — RPE 7 (leave 3 or more in reserve)
+        Core — Rotational Power :: Windshield wipers 3×16 (180° arc)
+              CF: Lower strength (SS 4) :: Bulgarian split squat (foot on chair) 4 sets — RPE 8 (stop 2 reps short of failure) | Nordic hamstring curl (anchored) 4 sets — RPE 8 (stop 2 reps short of failure)
+        Hip extension + push (SS 4) :: Bodyweight back extension 4 sets — RPE 8 (stop 2 reps short of failure) | Feet-elevated inverted row (under a table) 4 sets — RPE 7 (leave 3 or more in reserve)
+        Core — Rotational Power :: Windshield wipers 3×16 (180° arc)
+    e.g. rename Hip extension + push @ rename 9 sat rename [Hip extension + push] Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) -> [Hip extension + push] Single-leg hip thrust 2×10 — hold RPE 7, three in the tank
+              C: Lower strength (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+              CF: Lower strength (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg hip thrust 2×10 — hold RPE 7, three in the tank | Pike pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+
+  FIX-A for comparison, candidate -> CA: 
+  ops 264 on 28 days, 3 programs | by tier x inj bodyweight lowback/protect 135 | bodyweight knee/protect 35 | commercial lowback/protect 14 | crossfit lowback/protect 14 | home_basic lowback/protect 14 | home_full lowback/protect 14 | minimal lowback/protect 14 | bodyweight none 12 | bodyweight shoulder/protect 12 | by kind rename 164 | add 91 | drop 9
+  universe C->CF: programs losing 0 gaining 0 | C->CA: losing 0 (none) gaining 0
+
+################ (C) D196-6 universe V230 -> candidate (== V230 -> CF): programs gaining, by L x inj x tier
+  gaining 198 of 9270 | E lowback/protect bodyweight +Single-leg hip thrust (shoulders on bed) 60 | INJ lowback/protect bodyweight +Single-leg hip thrust (shoulders on bed) 42 | INJ lowback/workaround bodyweight +Single-leg hip thrust (shoulders on bed) 42 | LBW lowback/protect bodyweight +Single-leg hip thrust (shoulders on bed) 18 | LBW lowback/workaround bodyweight +Single-leg hip thrust (shoulders on bed) 18 | L432 lowback/protect bodyweight +Single-leg hip thrust (shoulders on bed) 9 | L432 lowback/workaround bodyweight +Single-leg hip thrust (shoulders on bed) 9 | losing 0 | V->CF gaining 198 losing 0
+
+################ (D) W5 step with the fix (ABx -> PREf), classified by the amended text; per lattice
+
+  == K: 630 configs; W5 ops 907; OUTSIDE 0
+         455  D196-1(Main)   | programs 85 | days 455 | inj knee/protect 455 | tier bodyweight 455 | exp beginner 155 | advanced 151 | intermediate 149 | rest sat,sun 411 | sun,wed 44
+            e.g. K bodyweight|hypertrophy|run_5k|knee/protect|intermediate|55+|s1234|sat,sun W1 wed :: rename [Main — Burpees] Burpees 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+         263  D196-2(Leg sections rename)   | programs 48 | days 263 | inj knee/protect 263 | tier bodyweight 263 | exp beginner 115 | intermediate 112 | advanced 36 | rest sat,sun 263
+            e.g. K bodyweight|hypertrophy|run_5k|knee/protect|intermediate|55+|s1234|sat,sun W1 wed :: rename [Leg superset B] Bodyweight back extension 3 sets — RPE 8 (stop 2 reps short of failure) -> [Leg superset B] Single-leg Romanian deadlift (bodyweight) 3 sets — RPE 7 (leave 3 or more in reserve)
+          79  D196-2(Leg sections drop)   | programs 23 | days 79 | inj knee/protect 79 | tier bodyweight 79 | exp advanced 79 | rest sat,sun 67 | sun,wed 12
+            e.g. K bodyweight|strength|run_5k|knee/protect|advanced|55+|s1234|sat,sun W1 wed :: drop [Leg superset B] Bodyweight back extension 3 sets — RPE 8 (stop 2 reps short of failure)
+          42  D196-2-Am2(knee/protect circuit rename)   | programs 9 | days 42 | inj knee/protect 42 | tier bodyweight 42 | exp beginner 18 | intermediate 14 | advanced 10 | rest sat,sun 42
+            e.g. K bodyweight|support_prevention|run_5k|knee/protect|intermediate|55+|s1234|sat,sun W1 wed :: rename [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+            e.g. K bodyweight|support_prevention|run_5k|knee/protect|intermediate|55+|s1234|sat,sun W2 wed :: rename [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+          36  D196-5(leave Leg isolation)   | programs 4 | days 36 | inj knee/protect 36 | tier bodyweight 36 | exp beginner 27 | intermediate 9 | rest sat,sun 36
+            e.g. K bodyweight|hypertrophy|run_half|knee/protect|beginner|55+|s1234|sat,sun W1 wed :: drop [Leg isolation] Single-leg glute bridge 3 sets — RPE 6 (leave 3 or more in reserve)
+          18  D196-5-Am2(appear Calves)   | programs 2 | days 18 | inj knee/protect 18 | tier bodyweight 18 | exp advanced 18 | rest sat,sun 18
+            e.g. K bodyweight|hypertrophy|run_base|knee/protect|advanced|55+|s1234|sat,sun W1 wed :: add [Calves] Calf raise (bodyweight) 4 sets — RPE 8 (stop 2 reps short of failure)
+            e.g. K bodyweight|hypertrophy|run_base|knee/protect|advanced|55+|s1234|sat,sun W2 wed :: add [Calves] Calf raise (bodyweight) 4 sets — RPE 8 (stop 2 reps short of failure)
+          12  D196-1(Primer)   | programs 6 | days 12 | inj knee/protect 12 | tier bodyweight 12 | exp advanced 4 | beginner 4 | intermediate 4 | rest sat,sun 12
+            e.g. K bodyweight|hypertrophy|run_5k|knee/protect|intermediate|55+|s1234|sat,sun W7 wed :: rename [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest -> [Primer — Single-leg glute bridge] Single-leg glute bridge 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+           2  D196-2-Am2(knee/protect circuit drop)   | programs 1 | days 2 | inj knee/protect 2 | tier bodyweight 2 | exp advanced 2 | rest sun,wed 2
+            e.g. K bodyweight|support_prevention|run_pace_goal|knee/protect|advanced|18-35|s76308|sun,wed W9 thu :: drop [Leg circuit — runner armor] Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+            e.g. K bodyweight|support_prevention|run_pace_goal|knee/protect|advanced|18-35|s76308|sun,wed W10 thu :: drop [Leg circuit — runner armor] Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+    regression TEXT tags on W5 ops: Main => D196-1(Main) 455 | circuit => D196-2-Am2(knee/protect circuit rename) 42 | circuit => D196-2-Am2(knee/protect circuit drop) 2
+    FL step PREf -> CF: 0 ops | (none)
+
+  == E: 1728 configs; W5 ops 1276; OUTSIDE 63
+         576  D196-4(Leg superset B, RPE 7)   | programs 72 | days 576 | inj lowback/protect 576 | tier bodyweight 576 | exp advanced 324 | beginner 252 | rest sat,sun 192 | sun 192 | sun,wed 192
+            e.g. E bodyweight|hypertrophy|none|lowback/protect|beginner|18-35|s1013|sun W3 wed :: rename [Leg superset B] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+         144  D196-1(Main)   | programs 60 | days 144 | inj knee/protect 96 | lowback/protect 48 | tier bodyweight 144 | exp advanced 72 | beginner 72 | rest sat,sun 48 | sun 48 | sun,wed 48
+            e.g. E bodyweight|balanced|none|knee/protect|beginner|18-35|s1013|sun W5 wed :: rename [Main — Burpees] Burpees 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+          72  D196-4(Leg superset B, RPE 6 beginner W1-2)   | programs 36 | days 72 | inj lowback/protect 72 | tier bodyweight 72 | exp beginner 72 | rest sat,sun 24 | sun 24 | sun,wed 24
+            e.g. E bodyweight|hypertrophy|none|lowback/protect|beginner|18-35|s1013|sun W1 wed :: rename [Leg superset B] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+          70  D198-1(re-draw: HEP partner == the day's Lower strength hinge)   | programs 20 | days 70 | inj lowback/protect 70 | tier commercial 14 | crossfit 14 | home_basic 14 | home_full 14 | minimal 14 | exp advanced 35 | beginner 35 | rest sun 70
+            e.g. E commercial|balanced|run_pace_goal|lowback/protect|beginner|18-35|s1013|sun W9 sat :: rename [Hip extension + push] Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) -> [Hip extension + push] Single-leg hip thrust 2×10 — hold RPE 7, three in the tank
+              ABx: Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Diamond pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg hip thrust 2×10 — hold RPE 7, three in the tank | Diamond pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+            e.g. E commercial|balanced|run_pace_goal|lowback/protect|beginner|18-35|s1013|sun W10 sat :: rename [Hip extension + push] Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) -> [Hip extension + push] Single-leg hip thrust 2×10 — hold RPE 7, three in the tank
+              ABx: Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Diamond pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 8 | Banded hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg hip thrust 2×10 — hold RPE 7, three in the tank | Diamond pushups 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: Mountain climbers 2×12 | Spanish squat hold (KB) 2×30 sec
+          60  D196-3-Am2(Explosive finisher N×12; matcher pairs it with the Lower strength burpee)   | programs 12 | days 60 | inj lowback/protect 60 | tier bodyweight 60 | exp advanced 30 | beginner 30 | rest sun 60
+            e.g. E bodyweight|hypertrophy|none|lowback/protect|beginner|18-35|s3039|sun W1 sat :: relabel [Lower strength] Burpees 2×10 — hold RPE 7, three in the tank -> [Explosive finisher] Burpees 2×12
+            e.g. E bodyweight|hypertrophy|none|lowback/protect|beginner|18-35|s3039|sun W2 sat :: relabel [Lower strength] Burpees 2×10 — hold RPE 7, three in the tank -> [Explosive finisher] Burpees 2×12
+          60  D198-2(partner restored on a pre-existing collision)   | programs 14 | days 60 | inj lowback/protect 56 | none 2 | shoulder/protect 2 | tier bodyweight 60 | exp advanced 51 | beginner 9 | rest sun 60
+            e.g. E bodyweight|hypertrophy|none|lowback/protect|advanced|18-35|s1013|sun W1 sat :: add [Hip extension + push] Nordic hamstring curl (anchored) 4 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Lower strength (SS 4) :: Bulgarian split squat (foot on chair) 4 sets — RPE 8 (stop 2 reps short of failure) | Single-leg glute bridge 4 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push :: Pike pushups 4 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 4×30 sec
+              PREf: Lower strength (SS 4) :: Bulgarian split squat (foot on chair) 4 sets — RPE 8 (stop 2 reps short of failure) | Single-leg glute bridge 4 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 4) :: Nordic hamstring curl (anchored) 4 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 4 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 4×30 sec
+            e.g. E bodyweight|hypertrophy|none|lowback/protect|advanced|18-35|s1013|sun W2 sat :: add [Hip extension + push] Nordic hamstring curl (anchored) 4 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Lower strength (SS 4) :: Bulgarian split squat (foot on chair) 4 sets — RPE 8 (stop 2 reps short of failure) | Single-leg glute bridge 4 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push :: Pike pushups 4 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 4×30 sec
+              PREf: Lower strength (SS 4) :: Bulgarian split squat (foot on chair) 4 sets — RPE 8 (stop 2 reps short of failure) | Single-leg glute bridge 4 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 4) :: Nordic hamstring curl (anchored) 4 sets — RPE 7 (leave 3 or more in reserve) | Pike pushups 4 sets — RPE 7 (leave 3 or more in reserve)
+        Knee stability :: Wall sit 4×30 sec
+          60  D196-2(Leg sections rename)   | programs 18 | days 60 | inj knee/protect 60 | tier bodyweight 60 | exp advanced 30 | beginner 30 | rest sat,sun 20 | sun 20 | sun,wed 20
+            e.g. E bodyweight|balanced|none|knee/protect|beginner|18-35|s3039|sun W5 wed :: rename [Leg superset A] Single-leg glute bridge 2 sets — RPE 8 (stop 2 reps short of failure) -> [Leg superset A] Bodyweight back extension 2 sets — RPE 8 (stop 2 reps short of failure)
+          48  D196-4(Lower strength, RPE 7; matcher add-form)   | programs 9 | days 48 | inj lowback/protect 48 | tier bodyweight 48 | exp advanced 30 | beginner 18 | rest sun 48
+            e.g. E bodyweight|hypertrophy|none|lowback/protect|beginner|18-35|s3039|sun W3 sat :: add [Lower strength] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+          39  D196-4(Lower strength, RPE 7)   | programs 11 | days 39 | inj lowback/protect 39 | tier bodyweight 39 | exp advanced 30 | beginner 9 | rest sun 39
+            e.g. E bodyweight|hypertrophy|run_pace_goal|lowback/protect|beginner|18-35|s3039|sun W4 sat :: rename [Lower strength] Burpees 2×10 — hold RPE 7, three in the tank -> [Lower strength] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+          24  D196-1(Primer)   | programs 12 | days 24 | inj knee/protect 12 | lowback/protect 12 | tier bodyweight 24 | exp advanced 12 | beginner 12 | rest sat,sun 8 | sun 8 | sun,wed 8
+            e.g. E bodyweight|balanced|run_half|lowback/protect|beginner|18-35|s1013|sun W13 tue :: rename [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest -> [Primer — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+          21  OUT:D198-other relabel Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed)   | programs 5 | days 21 | inj lowback/protect 21 | tier bodyweight 21 | exp beginner 21 | rest sun 21
+            e.g. E bodyweight|balanced|none|lowback/protect|beginner|18-35|s1013|sun W3 sat :: relabel [Hip extension + push] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) -> [Lower strength] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+            e.g. E bodyweight|balanced|none|lowback/protect|beginner|18-35|s1013|sun W4 sat :: relabel [Hip extension + push] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) -> [Lower strength] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+            e.g. E bodyweight|balanced|run_pace_goal|lowback/protect|beginner|18-35|s1013|sun W3 sat :: relabel [Hip extension + push] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) -> [Lower strength] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+            e.g. E bodyweight|balanced|run_pace_goal|lowback/protect|beginner|18-35|s1013|sun W4 sat :: relabel [Hip extension + push] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) -> [Lower strength] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+          21  OUT:D196-lb-other drop Lower strength   | programs 5 | days 21 | inj lowback/protect 21 | tier bodyweight 21 | exp beginner 21 | rest sun 21
+            e.g. E bodyweight|balanced|none|lowback/protect|beginner|18-35|s1013|sun W3 sat :: drop [Lower strength] Burpees 2×10 — hold RPE 7, three in the tank
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+            e.g. E bodyweight|balanced|none|lowback/protect|beginner|18-35|s1013|sun W4 sat :: drop [Lower strength] Burpees 2×10 — hold RPE 7, three in the tank
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+            e.g. E bodyweight|balanced|run_pace_goal|lowback/protect|beginner|18-35|s1013|sun W3 sat :: drop [Lower strength] Burpees 2×10 — hold RPE 7, three in the tank
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+            e.g. E bodyweight|balanced|run_pace_goal|lowback/protect|beginner|18-35|s1013|sun W4 sat :: drop [Lower strength] Burpees 2×10 — hold RPE 7, three in the tank
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+          21  OUT:D198-other add undefined -> Single-leg glute bridge   | programs 5 | days 21 | inj lowback/protect 21 | tier bodyweight 21 | exp beginner 21 | rest sun 21
+            e.g. E bodyweight|balanced|none|lowback/protect|beginner|18-35|s1013|sun W3 sat :: add [Hip extension + push] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+            e.g. E bodyweight|balanced|none|lowback/protect|beginner|18-35|s1013|sun W4 sat :: add [Hip extension + push] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+            e.g. E bodyweight|balanced|run_pace_goal|lowback/protect|beginner|18-35|s1013|sun W3 sat :: add [Hip extension + push] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Explosive finisher (SS 2) :: High knees 2×12 | Wall sit 2×30 sec
+            e.g. E bodyweight|balanced|run_pace_goal|lowback/protect|beginner|18-35|s1013|sun W4 sat :: add [Hip extension + push] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Burpees 2×10 — hold RPE 7, three in the tank
+        Hip extension + push (SS 2) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+              PREf: Lower strength (SS 2) :: Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip extension + push (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Pushups (slow 3s eccentric) 2 sets — RPE 7 (leave 3 or more in reserve)
+          18  D196-2(Leg sections drop)   | programs 9 | days 18 | inj knee/protect 18 | tier bodyweight 18 | exp advanced 18 | rest sat,sun 6 | sun 6 | sun,wed 6
+            e.g. E bodyweight|balanced|none|knee/protect|advanced|18-35|s1013|sun W5 wed :: drop [Leg superset B] Single-leg Romanian deadlift (bodyweight) 4 sets — RPE 7 (leave 3 or more in reserve)
+          12  D196-4(Lower strength, RPE 6 beginner W1-2; matcher add-form)   | programs 6 | days 12 | inj lowback/protect 12 | tier bodyweight 12 | exp beginner 12 | rest sun 12
+            e.g. E bodyweight|hypertrophy|none|lowback/protect|beginner|18-35|s3039|sun W1 sat :: add [Lower strength] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+          12  D196-3(relabel Pull)   | programs 12 | days 12 | inj lowback/protect 12 | tier bodyweight 12 | exp advanced 6 | beginner 6 | rest sat,sun 4 | sun 4 | sun,wed 4
+            e.g. E bodyweight|balanced|run_pace_goal|lowback/protect|beginner|18-35|s3039|sun W7 tue :: relabel [Pull] Neutral-grip chinups 2 sets — RPE 8 (stop 2 reps short of failure) -> [Pull superset B] Neutral-grip chinups 2 sets — RPE 8 (stop 2 reps short of failure)
+          12  D196-3(pull N×10)   | programs 12 | days 12 | inj lowback/protect 12 | tier bodyweight 12 | exp advanced 6 | beginner 6 | rest sat,sun 4 | sun 4 | sun,wed 4
+            e.g. E bodyweight|balanced|run_pace_goal|lowback/protect|beginner|18-35|s3039|sun W7 tue :: add [Pull superset B] Burpees 2×10
+           6  D196-5-Am2(appear Calves)   | programs 3 | days 6 | inj knee/protect 6 | tier bodyweight 6 | exp advanced 6 | rest sat,sun 2 | sun 2 | sun,wed 2
+            e.g. E bodyweight|balanced|none|knee/protect|advanced|18-35|s1013|sun W5 wed :: add [Calves] Calf raise (bodyweight) 4 sets — RPE 8 (stop 2 reps short of failure)
+            e.g. E bodyweight|balanced|none|knee/protect|advanced|18-35|s1013|sun W6 wed :: add [Calves] Calf raise (bodyweight) 4 sets — RPE 8 (stop 2 reps short of failure)
+    regression TEXT tags on W5 ops: Main => D196-1(Main) 144 | hip/foot => D198-1(re-draw: HEP partner == the day's Lower strength hinge) 70
+    FL step PREf -> CF: 0 ops | (none)
+
+  == FULL+INJ+L432+LBW: 6912 configs; W5 ops 1241; OUTSIDE 0
+         603  D196-1(Main)   | programs 166 | days 603 | inj lowback/workaround 249 | lowback/protect 243 | ankle/protect 91 | knee/protect 20 | tier bodyweight 603 | exp intermediate 289 | advanced 236 | beginner 78 | rest sun,wed 355 | sat,sun 248
+            e.g. INJ bodyweight|fatloss|run_pace_goal|knee/protect|intermediate|18-35|s76308|sun,wed W9 thu :: rename [Main — Burpees] Burpees 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+         207  D196-4(Leg superset B, RPE 7)   | programs 42 | days 207 | inj lowback/protect 207 | tier bodyweight 207 | exp intermediate 101 | advanced 90 | beginner 16 | rest sun,wed 121 | sat,sun 86
+            e.g. INJ bodyweight|hypertrophy|run_5k|lowback/protect|intermediate|18-35|s4242|sun,wed W1 thu :: rename [Leg superset B] Burpees 3×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave 3 or more in reserve)
+         120  D196-3(pull N×10)   | programs 60 | days 120 | inj lowback/workaround 62 | lowback/protect 58 | tier bodyweight 120 | exp advanced 50 | intermediate 50 | beginner 20 | rest sun,wed 78 | sat,sun 42
+            e.g. INJ bodyweight|fatloss|run_half|lowback/workaround|intermediate|18-35|s76308|sun,wed W1 tue :: add [Pull] Burpees 3×10
+          64  D196-2(Leg sections rename)   | programs 18 | days 64 | inj ankle/protect 58 | knee/protect 6 | tier bodyweight 64 | exp intermediate 36 | advanced 28 | rest sun,wed 42 | sat,sun 22
+            e.g. INJ bodyweight|balanced|run_pace_goal|knee/protect|intermediate|18-35|s4242|sun,wed W7 thu :: rename [Leg] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure) -> [Leg] Bodyweight back extension 3 sets — RPE 8 (stop 2 reps short of failure)
+          64  D196-2(Leg sections add)   | programs 19 | days 38 | inj ankle/protect 64 | tier bodyweight 64 | exp intermediate 28 | beginner 20 | advanced 16 | rest sun,wed 50 | sat,sun 14
+            e.g. INJ bodyweight|balanced|none|ankle/protect|intermediate|18-35|s76308|sun,wed W3 thu :: add [Leg isolation] Wall sit 3×25 sec
+          58  D196-3(relabel Pull)   | programs 29 | days 58 | inj lowback/protect 58 | tier bodyweight 58 | exp advanced 24 | intermediate 24 | beginner 10 | rest sun,wed 38 | sat,sun 20
+            e.g. INJ bodyweight|fatloss|run_pace_goal|lowback/protect|intermediate|18-35|s76308|sun,wed W1 tue :: relabel [Pull] Neutral-grip chinups 3 sets — RPE 8 (stop 2 reps short of failure) -> [Pull superset B] Neutral-grip chinups 3 sets — RPE 8 (stop 2 reps short of failure)
+          38  D196-4(Leg circuit, RPE 7)   | programs 9 | days 38 | inj lowback/protect 38 | tier bodyweight 38 | exp intermediate 18 | advanced 16 | beginner 4 | rest sun,wed 26 | sat,sun 12
+            e.g. INJ bodyweight|support_prevention|run_5k|lowback/protect|intermediate|18-35|s4242|sun,wed W1 thu :: rename [Leg circuit — runner armor] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg circuit — runner armor] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+          24  D196-1(Primer)   | programs 12 | days 24 | inj ankle/protect 12 | knee/protect 12 | tier bodyweight 24 | exp advanced 12 | intermediate 12 | rest sat,sun 12 | sun,wed 12
+            e.g. INJ bodyweight|fatloss|run_5k|knee/protect|intermediate|18-35|s4242|sun,wed W7 thu :: rename [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest -> [Primer — Single-leg glute bridge] Single-leg glute bridge 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+          24  D196-2(Leg sections drop)   | programs 12 | days 24 | inj ankle/protect 20 | knee/protect 4 | tier bodyweight 24 | exp intermediate 12 | beginner 8 | advanced 4 | rest sun,wed 16 | sat,sun 8
+            e.g. INJ bodyweight|balanced|run_marathon|knee/protect|advanced|18-35|s76308|sat,sun W9 wed :: drop [Leg superset B] Single-leg Romanian deadlift (bodyweight) 4 sets — RPE 7 (leave 3 or more in reserve)
+          20  D196-2(Leg sections relabel)   | programs 10 | days 20 | inj ankle/protect 20 | tier bodyweight 20 | exp intermediate 12 | beginner 8 | rest sun,wed 16 | sat,sun 4
+            e.g. INJ bodyweight|balanced|none|ankle/protect|intermediate|18-35|s76308|sun,wed W3 thu :: relabel [Leg isolation] Single-leg hip thrust 3 sets — RPE 8 (stop 2 reps short of failure) -> [Leg superset A] Single-leg hip thrust 3 sets — RPE 8 (stop 2 reps short of failure)
+           7  D196-2-Am2(ankle/protect circuit rename)   | programs 2 | days 7 | inj ankle/protect 7 | tier bodyweight 7 | exp intermediate 5 | advanced 2 | rest sun,wed 5 | sat,sun 2
+            e.g. INJ bodyweight|support_prevention|run_pace_goal|ankle/protect|intermediate|18-35|s76308|sun,wed W3 thu :: rename [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+            e.g. INJ bodyweight|support_prevention|run_pace_goal|ankle/protect|intermediate|18-35|s76308|sun,wed W4 thu :: rename [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+           6  D196-2-Am2(ankle/protect circuit relabel)   | programs 3 | days 6 | inj ankle/protect 6 | tier bodyweight 6 | exp advanced 2 | beginner 2 | intermediate 2 | rest sun,wed 6
+            e.g. L432 bodyweight|support_prevention|none|ankle/protect|beginner|18-35|s76308|sun,wed W3 thu :: relabel [Leg isolation] Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+            e.g. L432 bodyweight|support_prevention|none|ankle/protect|beginner|18-35|s76308|sun,wed W4 thu :: relabel [Leg isolation] Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+           6  D196-2-Am2(ankle/protect circuit drop)   | programs 3 | days 6 | inj ankle/protect 6 | tier bodyweight 6 | exp advanced 2 | beginner 2 | intermediate 2 | rest sun,wed 6
+            e.g. L432 bodyweight|support_prevention|none|ankle/protect|beginner|18-35|s76308|sun,wed W3 thu :: drop [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+            e.g. L432 bodyweight|support_prevention|none|ankle/protect|beginner|18-35|s76308|sun,wed W4 thu :: drop [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+    regression TEXT tags on W5 ops: Main => D196-1(Main) 603 | circuit => D196-4(Leg circuit, RPE 7) 38 | circuit => D196-2-Am2(ankle/protect circuit rename) 7 | circuit => D196-2-Am2(ankle/protect circuit drop) 6
+    FL step PREf -> CF: 12 ops | D197-1 12
+
+TOTAL W5 ops (ABx -> PREf) 3424 | OUTSIDE 63 | per class: D196-1(Main) 1202 | D196-4(Leg superset B, RPE 7) 783 | D196-2(Leg sections rename) 387 | D196-3(pull N×10) 132 | D196-2(Leg sections drop) 121 | D196-4(Leg superset B, RPE 6 beginner W1-2) 72 | D196-3(relabel Pull) 70 | D198-1(re-draw: HEP partner == the day's Lower strength hinge) 70 | D196-2(Leg sections add) 64 | D196-1(Primer) 60 | D196-3-Am2(Explosive finisher N×12; matcher pairs it with the Lower strength burpee) 60 | D198-2(partner restored on a pre-existing collision) 60 | D196-4(Lower strength, RPE 7; matcher add-form) 48 | D196-2-Am2(knee/protect circuit rename) 42 | D196-4(Lower strength, RPE 7) 39 | D196-4(Leg circuit, RPE 7) 38 | D196-5(leave Leg isolation) 36 | D196-5-Am2(appear Calves) 24 | OUT:D196-lb-other drop Lower strength 21 | OUT:D198-other add undefined -> Single-leg glute bridge 21 | OUT:D198-other relabel Single-leg hip thrust (shoulders on bed) -> Single-leg hip thrust (shoulders on bed) 21 | D196-2(Leg sections relabel) 20 | D196-4(Lower strength, RPE 6 beginner W1-2; matcher add-form) 12 | D196-2-Am2(ankle/protect circuit rename) 7 | D196-2-Am2(ankle/protect circuit drop) 6 | D196-2-Am2(ankle/protect circuit relabel) 6 | D196-2-Am2(knee/protect circuit drop) 2
+REPORT DONE

@@ -1,0 +1,115 @@
+=== W5-step circuit ops, ankle/protect bodyweight prevention
+
+--- INJ test intermediate s76308 sun,wed (goal run_pace_goal)
+  W3 thu {dry}
+    [ABx final]      Main — Burpees :: Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+    [PREx final]     Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+    [PREx regional-off] Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+    [PREx budget-off]   Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+    [ALLx pre-sweep snapshot] Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×10 each | Single-leg wall sit 2×25 sec | Bodyweight back extension 2×8
+      Hip stability :: Fire hydrants 2×15 each | Standing hip abduction 2×20 each | Hip 90/90 stretch 2×45 sec each
+    [ALLx final]     Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+  W9 thu {dry}
+    [ABx final]      Main — Burpees :: Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Side-lying leg raises 2×15 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+    [PREx final]     Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Side-lying leg raises 2×15 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+    [PREx regional-off] Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Side-lying leg raises 2×15 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+    [PREx budget-off]   Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Side-lying leg raises 2×15 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+    [ALLx pre-sweep snapshot] Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×10 each | Wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2×8
+      Hip stability :: Side-lying leg raises 2×15 each | Fire hydrants 2×15 each | IT band stretch 2×30 sec each
+    [ALLx final]     Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Side-lying leg raises 2×15 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+
+--- L432 none beginner s76308 sun,wed
+  W3 thu {dry}
+    [ABx final]      Main — Burpees :: Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Leg isolation :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+    [PREx final]     Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+    [PREx regional-off] Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+    [PREx budget-off]   Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+    [ALLx pre-sweep snapshot] Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×10 each | Single-leg wall sit 2×25 sec | Bodyweight back extension 2×8
+      Leg isolation (SS 3) :: Wall sit 3×25 sec | Nordic hamstring curl (anchored) 3×12
+      Hip stability :: Fire hydrants 2×15 each | Standing hip abduction 2×20 each | Hip 90/90 stretch 2×45 sec each
+    [ALLx final]     Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+  W4 thu {dry}
+    [ABx final]      Main — Burpees :: Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Leg isolation :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+    [PREx final]     Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+    [PREx regional-off] Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+    [PREx budget-off]   Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+    [ALLx pre-sweep snapshot] Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×10 each | Single-leg wall sit 2×25 sec | Bodyweight back extension 2×8
+      Leg isolation (SS 3) :: Wall sit 3×25 sec | Nordic hamstring curl (anchored) 3×12
+      Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2×15 each | IT band stretch 2×30 sec each
+    [ALLx final]     Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+      Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+
+=== A-2(drop) example: FULL support_prevention|none|commercial|none|beginner|s1234|sun,wed W3 thu, B vs ABx (+ablations)
+  [B] Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Terminal knee extension (band) 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7
+      Calves :: Dumbbell standing calf raise 2×15–20 @ RPE 7
+      Leg isolation :: Wall sit 3×25 sec
+      Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | IT band stretch 2×30 sec each
+  [ABx] Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Terminal knee extension (band) 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7
+      Calves :: Dumbbell standing calf raise 2×15–20 @ RPE 7
+      Leg isolation :: Wall sit 3×25 sec
+      Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | IT band stretch 2×30 sec each
+  [ABx __REGIONAL_OFF] Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Terminal knee extension (band) 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7
+      Calves :: Dumbbell standing calf raise 2×15–20 @ RPE 7
+      Leg isolation (SS 2) :: Standing cable hamstring curl 2×10–15 @ RPE 7 | Wall sit 2×25 sec
+      Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | IT band stretch 2×30 sec each
+  [ABx __BUDGET_OFF] Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+      Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Terminal knee extension (band) 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7
+      Calves :: Dumbbell standing calf raise 2×15–20 @ RPE 7
+      Leg isolation :: Wall sit 3×25 sec
+      Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | IT band stretch 2×30 sec each

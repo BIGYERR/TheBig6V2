@@ -54,25 +54,34 @@
 //        home_full reaches it.
 //   P1   knee/protect: the hip-extension reservation is never empty on any tier (probe). The slot's
 //        collision drop rate is printed per tier, never asserted: coach ruled it acceptable.
+//        231 and up: re-keyed by focus (VERSION PREDICATE below).
 //   K1   PAIR. knee/protect: no section lost vs V214 on any tier (label counts per day).
 //   K2   PAIR. commercial and crossfit programs byte-identical to V214 (progDigest), knee/protect
 //        lattice and the GHD lattice.
 //   K3   knee/protect: no day prints the same movement twice.
-//   HM   HALF_MANNY digest, typed: 0ac7da6b1691a8e1 (crossfit owns the station; ruled unmoved).
+//   HM   HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[ia-version], row existence a
+//        conjunct (crossfit owns the station; ruled unmoved; V231 absorb ruling section 4).
 //
 // VERSION PREDICATE (standing ruling 4). D149 ships on ia-version 215.
 //   below 215: NOT APPLICABLE, every row skipped by name, clean exit.
 //   K1 and K2 say "this build moved only what D149 moves", so they run only on candidate 215 against
 //   baseline 214 and SKIP by name on every other pair. Every other row is ruling-level from 215 up.
+//   231 and up: P1 RE-KEYED (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g215:272 P1; standing
+//   rulings 2 and 4). D195 A2r reads the reservation on support_prevention leg days too, and there it empties: those
+//   days carry no Leg superset B, so the empty read builds nothing (ex.hipExt null, A2r's concat is empty). The probe's
+//   reads are segmented by focus (support_prevention vs every other focus) and the row asserts, per tier, that every
+//   empty read is a support_prevention read and at least one is: empty == emptyPrev, emptyOther 0, emptyPrev > 0
+//   (the ruling prints 898 empty of 6,301 reads per tier on the candidate, V230 emptyPrev 0). Successors for the card
+//   consequence: g231_d195_hipext D195-A-b (knee/protect circuit length == V230's) and D195-A-e. Below 231 P1
+//   asserts as before (never empty).
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
-const { load, progDigest, fixtures, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, progDigest, fixtures, DAYS, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version, ERA = 215, V214_COMMIT = '978b0b56bd5c2470972146d618d64292ca48a241';
-const HM_DIGEST = '0ac7da6b1691a8e1';
 const ROWS = ['G1','G1v','G1h','G2','G3','G4','L1','F0','F1','F1o','F2','F2o','P1','K1','K2','K3','HM'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
@@ -214,7 +223,9 @@ for(const x of LAT_K){
   if(CF_B.IA){ try { if(progDigest(CF_B.IA.buildProgram(clone(x.cfg))) !== dg) bump(K.fb, t); } catch(e){ bump(K.fb, t + '|CRASH'); } }
   if(PROBE.IA){ PROBE.IA.ctx.__G215 = []; let q; try { q = PROBE.IA.buildProgram(clone(x.cfg)); } catch(e){ q = null; }
     if(!q || progDigest(q) !== dg) K.probeBad++;
-    PROBE.IA.ctx.__G215.forEach(([len, drew]) => { bump(K.pr, t + '|calls'); if(!len) bump(K.pr, t + '|empty'); else if(!drew) bump(K.pr, t + '|dropped'); }); }
+    // V231 P1 (absorb ruling section 3): every read is also counted under its focus, support_prevention ('prev') or any other ('other').
+    const pfoc = x.cfg.liftingFocus === 'support_prevention' ? 'prev' : 'other';
+    PROBE.IA.ctx.__G215.forEach(([len, drew]) => { bump(K.pr, t + '|calls'); bump(K.pr, t + '|calls|' + pfoc); if(!len){ bump(K.pr, t + '|empty'); bump(K.pr, t + '|empty|' + pfoc); } else if(!drew) bump(K.pr, t + '|dropped'); }); }
   let b = null; if(PAIR && V214){ try { b = V214.buildProgram(clone(x.cfg)); } catch(e){ b = null; } }
   if(PAIR && V214 && OWNS[t].GHD){ K.k2N++; if(!b || progDigest(b) !== dg){ K.k2++; if(K.k2Ex.length < 3) K.k2Ex.push(t + ' ' + x.cfg.liftingFocus + ' ' + x.cfg.cardioGoals.run.id); } }
   Object.keys(p.weeks || {}).forEach(w => DAYS.forEach(d => {
@@ -267,9 +278,18 @@ TIERS.forEach(t => { const f = FIRE_B.includes(t), n = g(K.fb, t), c = g(K.fb, t
 TIERS.forEach(t => ok('F2o ' + t + ' knee/protect Leg superset B hip-extension item is in ' + JSON.stringify(handB(t).set), g(K.lsbBad, t) === 0,
   g(K.lsbBad, t) + (K.lsbEx.length ? ' e.g. ' + K.lsbEx.join('; ') : '')));
 ok('F2o home_full knee/protect Leg superset B carries the hip-extension item (floor b prints)', g(K.lsb, 'home_full|2') > 0, 'two-item ' + g(K.lsb, 'home_full|2') + ' of ' + (g(K.lsb, 'home_full|1') + g(K.lsb, 'home_full|2')));
+// V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g215:272 P1 RE-KEY; standing rulings 2 and 4): at
+// 231 and up every empty read must be a support_prevention read, at least one must be, and no other focus reads empty.
+// Below 231 the row is unchanged. The focus split is printed on every tree (V230 reads emptyPrev 0, so the 231 row fails there).
+const V231_ERA = 231;
 TIERS.forEach(t => { const calls = g(K.pr, t + '|calls'), e = g(K.pr, t + '|empty'), dr = g(K.pr, t + '|dropped');
+  const cP = g(K.pr, t + '|calls|prev'), cO = g(K.pr, t + '|calls|other'), eP = g(K.pr, t + '|empty|prev'), eO = g(K.pr, t + '|empty|other');
   console.log('   P1 ' + t + ': reservation reads ' + calls + ', empty ' + e + ', collision drops ' + dr + ' (' + (calls - e ? (100 * dr / (calls - e)).toFixed(1) : '0.0') + '% of non-empty reads); Leg superset B two-item ' + g(K.lsb, t + '|2') + ' of ' + (g(K.lsb, t + '|1') + g(K.lsb, t + '|2')) + '; hip-ext items ' + g(K.hx, t));
-  ok('P1 ' + t + ' knee/protect: the hip-extension reservation is never empty', PROBE.c === 1 && K.probeBad === 0 && calls > 0 && e === 0,
+  console.log('   P1 ' + t + ' by focus: support_prevention reads ' + cP + ', empty ' + eP + ' | other foci reads ' + cO + ', empty ' + eO);
+  if(VER >= V231_ERA) ok('P1 ' + t + ' knee/protect [V231 D195 A2r: every empty hip-extension read is a support_prevention read, at least one is; no other focus reads empty]',
+    PROBE.c === 1 && K.probeBad === 0 && calls > 0 && e === eP && eO === 0 && eP > 0,
+    PROBE.c !== 1 ? 'probe anchor count ' + PROBE.c : e + ' empty of ' + calls + ' reads (support_prevention ' + eP + ' of ' + cP + ', other foci ' + eO + ' of ' + cO + '), probe copy digest mismatches ' + K.probeBad);
+  else ok('P1 ' + t + ' knee/protect: the hip-extension reservation is never empty', PROBE.c === 1 && K.probeBad === 0 && calls > 0 && e === 0,
     PROBE.c !== 1 ? 'probe anchor count ' + PROBE.c : e + ' empty of ' + calls + ' reads, probe copy digest mismatches ' + K.probeBad); });
 if(PAIR){
   TIERS.forEach(t => ok('K1 ' + t + ' knee/protect loses no section vs V214', !!V214 && K.crash === 0 && g(K.loss, t) === 0,
@@ -278,6 +298,15 @@ if(PAIR){
   ok('K2 commercial and crossfit programs byte-identical to V214 (GHD lattice, every plan)', !!V214 && k2gN > 0 && k2g === 0, V214 ? k2g + ' of ' + k2gN + ' differ ' + k2gEx.join('; ') : v214err);
 } else { skipRow('K1 pair 215/214 only'); skipRow('K2 pair 215/214 only'); }
 TIERS.forEach(t => ok('K3 ' + t + ' knee/protect: no day prints the same movement twice', g(K.dup, t) === 0, g(K.dup, t) + (K.dupEx.length ? ' e.g. ' + K.dupEx.join('; ') : '')));
-const hm = progDigest(IA.buildProgram(clone(fixtures.HALF_MANNY)));
-ok('HM HALF_MANNY digest is ' + HM_DIGEST + ' (ruled unmoved)', hm === HM_DIGEST, hm);
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
+// this row defends D149's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[+IA.version], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// D149 (standing ruling 4).
+{ const hm = progDigest(IA.buildProgram(clone(fixtures.HALF_MANNY)));
+  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  ok('HM HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved)',
+     eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 done();

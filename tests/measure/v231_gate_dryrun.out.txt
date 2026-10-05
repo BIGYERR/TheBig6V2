@@ -1,0 +1,56 @@
+V231 M16 — full gate.sh dry run on copies stamped ia-version 231 (measure, Mode B). Script: tests/measure/v231_gate_dryrun.js
+Raw outputs: scratchpad/measure3/{gate_*.out, per_stamp231/, per_all231/, gx_stamp231/, gx_all231/, summ_*.out, gx_summary.out}
+Copies: STAMP = index.html V230 (HEAD 71c76d8) 230->231; ALL231 = coach1/t_ALL.html (sha 99c3361ac729fabb) 230->231. Anchor count 1, diff = 1 line each. Baseline = git show HEAD:index.html.
+
+gate.sh (stops at first red):
+  CONTROL V230 vs itself: steps 0-4 pass, 89/89 gates FAIL 0, 0 REFUSED; step 5 FAIL "byte-identical" (expected, file vs itself).
+  STAMP : stops at g193_samecard CRASH (no OPEN_UNRULED_BY_VERSION row for V231).
+  ALL231: stops at g193_pool_overlay FAIL 1 (stale debt "thin-pool ankle/protect squatPool" no longer trips).
+Per gate, all 89 run alone:
+  STAMP : failing 18, crashed 1, refusing 1 (lens2 is both failing and refusing).
+  ALL231: failing 37, crashed 1, refusing 3.
+
+STAMP, every red gate:
+ (a) no [231] row: MANNY_DIGEST_BY_VERSION (harness; read by g197a D1, g197b B8a, g198 C1, g199 B1, g200_core F1b, g200_pull B1, g202_d108 R6, g202_pace_anchor B1, g202_pace_copy B2, g203 x2, g204 x2, g210 O6r, g226_d189 G10, g227 c-MANNY, g228 d2-MANNY, g229 b)
+     MANNY_DELOAD_OFF_DIGEST_BY_VERSION (g199 B2); MANNY_CORE_OFF_DIGEST_BY_VERSION (g200_core F1a);
+     OPEN_UNRULED_BY_VERSION (g193_samecard, throws = crash); HF_LEAK_BY_VERSION (g197b B4i-l); B5C_BY_VERSION (g197b B5c);
+     DELOAD_ARB_BY_VERSION (g199 C1 C3 C5 D2 I3); DELOAD_HINGE_BY_VERSION (g199 E1a E1b E2 E3 G1); E6_BY_VERSION (g199 E6);
+     SWAP_BY_VERSION (g200_pull P2c P2d P6 P4 P7); g219 ERA (F1 F2 R1-R8).
+ (b) g230_d194_lens2 d194-postsweep REFUSED at 231 (predicate VER === ERA(230)).
+ (d) none. With every (a) table aliased [231]=[230], 12 of the 12 table gates go fully green on STAMP (aliased rerun).
+     The gx reruns of g226/g227/g228/g229 failed on setup only (git show from a non-repo scratch tree); they are not counted.
+
+(a) figures at 231 (STAMP | ALL231 | [230]):
+  MANNY_DIGEST            0ac7da6b1691a8e1 | 2d35e8f743680cfa | 0ac7da6b1691a8e1   STAMP equal, ALL231 MOVED
+  MANNY_DELOAD_OFF        1069cd7f86eed204 | 145c60296526a949 | 1069cd7f86eed204   STAMP equal, ALL231 MOVED
+  MANNY_CORE_OFF          9d14801a63111081 | 5770a4b1c4e2404d | 9d14801a63111081   STAMP equal, ALL231 MOVED
+  OPEN_UNRULED            equal | equal (g193_samecard 53/53 on both with the alias)
+  HF_LEAK                 machine 0 cable 0 {} {} | same | same   equal
+  B5C                     0 | 0 | 0   equal
+  DELOAD_ARB C1/C3        264 | 240 | 264   ALL231 MOVED
+             C5           0 | 0 | 0
+             D2           19 | 17 | 19   ALL231 MOVED (sha-method 2861 -> 2863 differ of 2880)
+             I3 capLSBkilled 18 | 18 | 18 (entering the cap 15720 -> 15702 of 95232 day builds)
+  DELOAD_HINGE E1a 12369, E1b 9319, E3 44 /15360, G1 1275 | identical | identical   equal
+  E6                      28 | 28 | 28   equal
+  SWAP (P2c)              138 | 138 | 138   equal (g200_pull 17/18 on ALL231, only B1 digest)
+  g219 ERA R1..R8         0,0,0,4770,891,412,0,0 | identical | identical   equal (15/15 on both)
+
+ALL231 additionally (c), figures the V231 change moved (STAMP -> ALL231):
+  g193_pool_overlay   stale debt line 43 ">=215 thin-pool ankle/protect squatPool" no longer trips (DEBT lines 17 -> 16)
+  g197d_d84_base E5   capSessionBudget sha 36b5b8efdfa1d3d8 (licensed D91) -> 10a5806729632f09 (the _cost/_prehabHalf edit at index :10577)
+  g199 (gx)           C1/C3 264->240; D2 19->17; F2 Leg superset B after deload 15720->15702; F3 A+B 30264->30246; I2 FAIL (blank interpolation); B1/B2 digests
+  g199 / g200_pull    REFUSED on the real gate: A1 week-assembly anchor count 0 (the capRegionalFatigue call at index :10951 gains a 5th arg)
+  HALF_MANNY literal 0ac7da6b1691a8e1 pins: g207_gk_trial Q7, g207_test_week D9, g208_d103a_chip M1, g208_d103a_key K5, g208_d103a_readers M1,
+                      g208_d104a_runbase M1, g209 M1, g210 O6, g211 HM, g214 HM, g215 HM, g216_d154 HM, g216_d156 HM, g223 [NY]/[UTC] HM
+  g210 O6u            HALF_MANNY swap universe 86 -> 83
+  g215 F2             floor (b) fires on knee/protect: commercial 0 -> 18/126, crossfit 0 -> 18/126, home_basic 0 -> 9/126
+  g221 G3a 832->839/146198; G3c off grammar 168->172/29241; G3e 202->205/37559; G6a 1243->1253/150898
+  g225 CONFINEMENT    S1-strip vs V225 now differs on swim_100_time, swim_500_time, bike_ftp, run_base
+  g226_d188 G2 120/120 -> 0/120; G1h-P2b 0 -> 48 cfgs differ; G1h-P5 0 -> 3252 days differ
+  g226_d189 G6b 640/640 -> 0/640 ("another byte moved vs V225"); G10 digest
+  g227 c-UNINJ 0 -> 172/1396 chains; c-DIGEST 8/8 -> 7/8; c-MANNY digest
+  g229_d193 b outside 1053/1053 -> 573/1053, uninjured 133/133 -> 50/133; d-BWSETS 1239/1239 -> 1169/1239; j R7 30/30 -> 28/30, L1 uninjured 96/96 -> 27/96; f non-cue 1722 -> 1734
+  g229_d194 p-SWAP/p-AUX/p-ADD/p-UNSTAMPED: W3 / FIX == V228 lists move (e.g. FIX 8202/9234), "uninjured MOVED"
+  g230 lens2 d194-fixture L1 150068 -> 150898 pairs, aligned false; d193-k clamp 1243 -> 1253 (verbatim 684 -> 694, INFO capped 458 -> 440); d193-l G3a 832->839, G3c-off 168->172, G3e 202->205
+Not measured: d194-postsweep's 231 figure (the row REFUSES before measuring; a relaxed scratch copy was denied by the permission classifier).

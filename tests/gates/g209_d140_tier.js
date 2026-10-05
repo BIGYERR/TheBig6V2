@@ -23,7 +23,9 @@
 //     "3 sets — RPE 7" as one set; this oracle never agrees with that;
 //   * T0, T1, T2 are the ruling's before/after grid for the stand-in, typed as literals;
 //   * K1 is measure's carry case, typed as a literal (W6 Fri, 4 mi at 14:06, 56.4 min);
-//   * M1 is HALF_MANNY's shipped digest as measure printed it (unmoved on all three arms).
+//   * M1 is HALF_MANNY's digest against its era row MANNY_DIGEST_BY_VERSION[ia-version] (the row must
+//     exist). Measure printed it unmoved by D140 on all three arms; from V231 the era table, not a
+//     typed literal, carries that claim (absorb ruling section 4).
 //   * C2, N1 and L1 compare against the V208 artifact (argv[3]). V208 is the thing D140 must
 //     not move outside the long-run days; it is a baseline, not an oracle for the tier rules.
 //
@@ -33,7 +35,7 @@
 //     pair, or no baseline, skips them BY NAME. Every other row runs at 209 and above.
 'use strict';
 const path = require('path');
-const { load, fixtures, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
@@ -288,8 +290,16 @@ if(PAIR){
 } else ['C2','N1','L1'].forEach(r => skipRow(r + ' scoped to the D140 build pair (candidate 209, baseline 208); this run is ' + VER + ' vs ' + (IB ? IB.version : 'no baseline')));
 
 // ── M1 HALF_MANNY ─────────────────────────────────────────────────────────────────────
+// V231 (absorb ruling section 4, tests/measure/v231_rulings/v231_absorb_ruling.md; standing rulings
+// 3, 4 and 5): this row defends ITS ruling's claim that it did not move HALF_MANNY. The typed
+// literal is gone: the only object that carries that claim across later rulings is the era table
+// standing ruling 5 governs, so the row compares the built digest to MANNY_DIGEST_BY_VERSION[ia-version]
+// and fails loudly when that row is absent. Re-pointing the literal to a later digest would be the
+// vacuous line standing ruling 3 forbids; deleting the row would be an unruled removal.
 {
+  const row = MANNY_DIGEST_BY_VERSION[VER], rowOk = typeof row === 'string' && /^[0-9a-f]{16}$/.test(row);
   let hm; try { hm = progDigest(IA.buildProgram(cl(fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
-  ok('M1 HALF_MANNY shipped digest is unmoved by D140 (0ac7da6b1691a8e1, measure\'s print)', hm === '0ac7da6b1691a8e1', hm);
+  ok('M1 HALF_MANNY shipped digest is unmoved by D140: it equals its era row MANNY_DIGEST_BY_VERSION[' + VER + '] = ' + row + ', and that row exists',
+     rowOk && hm === row, rowOk ? hm : 'NO ERA ROW for ia-version ' + VER + ' (built ' + hm + ')');
 }
 summary();

@@ -134,7 +134,7 @@ ok(`P5z the quality-run matcher (${HARD_ROW ? HARD_ROW.ruling : 'NO ROW'}) sees 
 // ══ V208 slice 0: Q0-Q7 (see header) ═════════════════════════════════════════════════
 const ERA208 = 208, QROWS = ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9','Q9x'];
 if(VER < ERA208){ QROWS.forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates the D106a fix-forward (V' + ERA208 + ')')); done(); }
-const { progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const { progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const EASY = c => !!c && c.type === 'run' && !c.legLoad && /^Long Slow Distance/.test(c.subtype || '');
 const LONGC = c => !!c && c.type === 'run' && !!c.legLoad && /^Long Slow Distance/.test(c.subtype || '');
 const runOf = day => day && !day.rest ? [].concat(day.cardio || []).find(c => c && c.type === 'run') || null : null;
@@ -254,8 +254,17 @@ for(const gk of Object.keys(QGOALS)) for(const mk of Object.keys(QMIX)){
   }
 }
 // Q7: HALF_MANNY is an NRC fixture; the fix-forward touches the NSW test pin and the LSD limb only.
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
+// this row defends the D106a fix-forward's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[+IA.version], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// the D106a fix-forward (standing ruling 4).
 { let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
-  ok('Q7 HALF_MANNY digest is 0ac7da6b1691a8e1 (ruled unmoved: no NRC card moves)', hm === '0ac7da6b1691a8e1', hm); }
+  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  ok('Q7 HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved: no NRC card moves)',
+     eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 // ══ V214 close C: Q9 / Q9x, B4's T-2 limb (from ia-version 214) ═══════════════════════════════
 // From 214 the eve is D158's shakeout, so B4 (D106a) acts only at T-2, and no row from 214 up reached
 // a calendar where B4 fires there (sabotage v208_shakeout S3, B4 keeping only its long-LSD limb,

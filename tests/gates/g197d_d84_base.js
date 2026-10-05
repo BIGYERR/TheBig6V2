@@ -372,6 +372,14 @@ function afterSweep(bCells, bFell, bRose, bEg, rCells) {
   //              is why one digest covers both and why this gate still answers V197-vs-V196.
   // A DIGEST IS REFRESHED ONLY BY A RULING. If this assertion fails, the question is not
   // 'what is the new digest' — it is 'which ruling licensed that edit to the budget'.
+  //   CSB_D195 — V231, the text LICENSED BY RULING D195 (D195-B `_cost` + D195 Amendment 2 A6; tests/measure/v231_rulings/v231_absorb_ruling.md, the g197d:389
+  //              E5 row: "add era `cv >= 231` → `CSB_D195`, rule label 'D195' ...; older eras kept"). Exactly two
+  //              lines of the slice move from the D91 text: `const _cost=…` gains the `_prehabHalf` set in front of it,
+  //              and `const score=sr*10+…` scores a Leg circuit item at ii>=3 as 3. Printed by builder with this gate's
+  //              own slice and sha256 before this edit: candidate (ia-version 231, sha 1249c248a679) 5e8f2f07d1c52dfc,
+  //              V230 (sha 72ac41c8d340) 36b5b8efdfa1d3d8 (the D91 text), the B-alone tree (measure5/t_B.html, sha b958d4b09b1181bc) 10a5806729632f09.
+  //              CSB_D91 stays accepted for 199..230, so V230 keeps hashing to its own era.
+  const CSB_D195 = '5e8f2f07d1c52dfc01523f3613a66a4ac36b2c1c5849cd91567d322f99f5ddbd';
   const CSB_D91 = '36b5b8efdfa1d3d86e235654d17b3c28e5fd2161520901c9acc4ed02a0b80fc5';
   const CSB_D85 = 'fb16df9c8a6798937d3e0a9904f23944bf3f68cac258a21ef772ccf9040357c3';
   const CSB_PRE = 'c8064f3cc1989cd5f60f308bc2644119162238c4946843ee3b9ccea8ebe06a5f';
@@ -382,9 +390,10 @@ function afterSweep(bCells, bFell, bRose, bEg, rCells) {
   // and V197-vs-V196 after the re-pin. An unknown ia-version is held to the newest text.
   const preD85 = cv !== null && cv < 198;        // pre-D85 artifact: allowed the pre-D85 text
   const preD91 = cv !== null && cv < 199;        // V198: allowed the D85 text
-  const want = preD85 ? CSB_PRE : (preD91 ? CSB_D85 : CSB_D91);
-  const era  = preD85 ? 'pre-D85' : (preD91 ? 'D85 (V198)' : 'D91 (V199)');
-  const rule = preD91 ? 'D85' : 'D91';           // the ruling that licenses THIS era's text
+  const preD195 = cv !== null && cv < 231;       // V199..V230: allowed the D91 text (the D195 era is cv >= 231)
+  const want = preD85 ? CSB_PRE : (preD91 ? CSB_D85 : (preD195 ? CSB_D91 : CSB_D195));
+  const era  = preD85 ? 'pre-D85' : (preD91 ? 'D85 (V198)' : (preD195 ? 'D91 (V199)' : 'D195 (V231)'));
+  const rule = preD91 ? 'D85' : (preD195 ? 'D91' : 'D195');   // the ruling that licenses THIS era's text
   const dig  = csb === null ? null : crypto.createHash('sha256').update(csb).digest('hex');
   ok('E5 capSessionBudget is byte-for-byte the ' + era + ' licensed text '
      + '(licensing ruling ' + rule + '; nothing since ' + rule + ' has edited budget machinery)',

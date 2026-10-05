@@ -59,8 +59,21 @@
 // VERSION PREDICATE (standing rulings 2 and 4).
 //   below 230   REFUSED: every row FAILS by name.
 //   230         every row asserts.
-//   231 and up  every row asserts except d194-postsweep (INFO, D194 Amendment 4, keyed VER === 230), which prints a
-//               column-0 REFUSED line and FAILS by name: P-BWFALLBACK + P-FILTERLAST (V231) must re-key it.
+//   231 and up  (tests/measure/v231_rulings/v231_absorb_ruling.md sections 3 and 6; standing rulings 2 and 4)
+//               d194-fixture is SCOPED to 230: at 231 and up it prints one column-0 SKIP line with this tree's figures,
+//               never PASS and never FAIL ("V230's claim about V230; a later build's fixture moves by its own ruling
+//               (D195 A-1/B-1, D196, D197)"; the candidate's L1 sweep has 150,989 pairs, V229 150,068).
+//               d193-k and d193-l ABSORB D196-1 at the swap sheet with g221's pins (W231 below, typed): 150,989 pairs,
+//               clamp pairs 1,253 = hold variants (verbatim 694, unloadable 360, window 199), non-clamp toasts == V229
+//               STAMP 141,557/141,557; G3a 839 (529 / 199 / 111), G3c-off 172, G3d 263, G3e 205, G3f 199; every other
+//               conjunct as at 230; plus the bed-thrust donor conjunct: pairs whose donor is `Single-leg hip thrust
+//               (shoulders on bed)` (the D196-1 card that was `Burpees` on V230) are clamp pairs 10, each the hold
+//               variant (d193-k), and G3a 7, G3c-off 4, G3e 3 (d193-l); V230 has 0 such donors.
+//               d194-postsweep is RE-KEYED (section 6): its population jobs run and the row asserts L432 post-sweep
+//               rejects 0 for the candidate, OV1 and fixture (432 builds, 12,960 lifting days each; D196-1 closed the
+//               18 Burpees drops, D197-1 the 4 Pushups re-details), with V229 reading the typed 22 in the same run (the
+//               instrument is not blind); (ii) is dropped as vacuous (no reject day exists) and prints one column-0
+//               SKIP line; the reach jobs, which serve (ii) and the typed-build re-read, run at 230 only.
 //   IA_ASSUME_VERSION=230 lifts a file stamped exactly 229 to 230 for a discrimination run; it is announced, ignored on
 //   any other file, and gate.sh never sets it. On V229 that way every figure row FAILS at its V229 figure (d193-e live
 //   bwsets at RPE 8 196; d193-k″ hold toasts 0 of 196; d193-e′ live and boot above RPE 7 114; d193-k 0 hold variants,
@@ -186,11 +199,11 @@
 //               decision 2 on Amendment 4 ("P-FILTERLAST SLOT: Fold into V231") puts P-BWFALLBACK, P-HIPEXT and
 //               P-FILTERLAST in V231, so V231's gatekeeper re-keys this row with the after-figure, expected 0 on L432
 //               (P-BWFALLBACK closes the 18 Burpees, P-FILTERLAST the 4 Pushups re-details), not the 4 the coach text
-//               named before the fold.
+//               named before the fold. V231 re-keyed it to 0 (absorb ruling section 6; VERSION PREDICATE above).
 //
 // RUNTIME. Jobs run in a pool of 4 worker processes (fixed; no environment knob): the 7 lattice enumerations first,
-//   then the 3 hand-route jobs, the 7 L9 pair configs and 8 shards of the L1 sweep, then (at ia-version 230 only)
-//   d194-postsweep's 8 population shards (54 L432 configs each, both trees, OV1 and the fixture) and its 11 reach jobs
+//   then the 3 hand-route jobs, the 7 L9 pair configs and 8 shards of the L1 sweep, then d194-postsweep's 8 population
+//   shards (54 L432 configs each, both trees, OV1 and the fixture; at 230 and up) and its 11 reach jobs (at 230 only)
 //   (one per typed reject build, both trees, OV1 and the fixture); each enumeration, when it lands, queues its config's
 //   lattice in shards of at most 300 batches (whole batches, one chain per day per batch), ahead of the jobs not yet
 //   started. The lattice's cost is the boots (every setup and every boot is a refreshProgram), so it scales with the
@@ -202,7 +215,7 @@ const H = require(path.join(__dirname, '..', 'harness.js'));
 const { load } = H;
 
 const ROOT = path.join(__dirname, '..', '..');
-const ERA = 230, BASE_ERA = 229;
+const ERA = 230, BASE_ERA = 229, V231_ERA = 231;   // V231_ERA: the V231 absorb ruling (sections 3 and 6)
 const V229_COMMIT = '0bec3ecfdc53ecb71b74178a3d6c49398ae87018';   // index.html at this commit is the V229 artifact (== 5297b4b's)
 const POOL = 4, L1_SHARDS = 8, MARK = '__G230_RESULT__';
 const IS_WORKER = process.argv.includes('--worker');
@@ -292,6 +305,16 @@ const W = {
   ir:{ tri:18093, w5tri:12993, v229:{ kept:0 } },
   eq:{ v229:{ all:18580, live:12518, boot:12518, undo:15589, undoBoot:15053, toasts:18580, live_preHold:18580, ph:18580 } },
   iu:{ n:11096, info:5868, w5n:8269, v229:{ kept:0 } },
+};
+// V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, d193-k and d193-l ABSORB, class D196-1 at the swap
+// sheet; standing rulings 2 and 4): the pins at 231 and up, typed from the ruling (g221's D193_PIN era pins), never read
+// from a tree. INFO capped, G3c power and the config count are carried from W unchanged. bed: pairs on candidate STAMP
+// whose donor is BED_DONOR, the D196-1 card that was `Burpees` on V230 (g221's out 7 / off 4 / null 3 / toast-moved 10).
+const BED_DONOR = 'Single-leg hip thrust (shoulders on bed)';
+const W231 = {
+  L1:{ cfgs:W.L1.cfgs, pairs:150989, clamp:1253, hv:1253, hvK:{ verbatim:694, unloadable:360, window:199 }, info:W.L1.info, nonClamp:141557 },
+  l:{ G3a:839, G3aCls:{ donor:529, window:199, verbatim:111 }, pow:W.l.pow, off:172, at:263, nul:205, win:199 },
+  bed:{ clamp:10, hv:10, G3a:7, off:4, nul:3 },
 };
 
 // ── FIXTURES ─────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -421,7 +444,7 @@ function sweepL1(IA, cfg, pres){
   }
   return rows;
 }
-const newL1 = () => ({ pairs:0, thr:0, clamp:0, hv:0, hvK:{ verbatim:0, unloadable:0, window:0 }, fals:0, holdOff:0, info:0, hvMiss:0,
+const newL1 = () => ({ pairs:0, thr:0, clamp:0, hv:0, hvK:{ verbatim:0, unloadable:0, window:0 }, fals:0, holdOff:0, info:0, hvMiss:0, bt:{ pairs:0, clamp:0, hv:0, G3a:0, off:0, nul:0, at:0, win:0 },
   pow:0, powChg:0, main:0, G3a:0, G3aCls:{ donor:0, window:0, verbatim:0 }, G3aMiss:0, offN:0, off:0, offMiss:0, nulN:0, nul:0, nulMiss:0, atN:0, at:0, atMiss:0, winN:0, win:0, winMiss:0 });
 function classify(cfg, r, pat){ const Hk = handKind(r.to, r.D); const Db = stripHand(r.D); const capd = capOf(cfg).includes(pat(clean(r.to)));
   const conv = Hk.k === 'zero' && CONVERTS_HAND.test(Db);
@@ -430,18 +453,19 @@ function classify(cfg, r, pat){ const Hk = handKind(r.to, r.D); const Db = strip
   return { Hk, Db, capd, conv, clamp:capd && pre !== null && pre > 7, kind:Hk.k === 'win' ? 'window' : conv ? 'unloadable' : 'verbatim',
     wantH:Hk.k === 'win' ? T3H(r.to, r.from, Hk.W) : conv ? T119H(r.to, r.from) : TSAMEH(r.to, r.from), X9:capd ? holdHand(E9) : E9 }; }
 function tallyL1(S, r, c, note){ const O = r.O, D = r.D, t = String(r.toast);
-  S.pairs++; if(r.thr) S.thr++;
-  if(c.clamp){ S.clamp++; if(r.toast === c.wantH && t.endsWith(HOLD)){ S.hv++; S.hvK[c.kind]++; } else { S.hvMiss++; note('hv', r.key + ' [' + c.kind + '] ' + t + ' | want ' + c.wantH); } if(claims(t)) S.fals++; }
+  const bed = clean(r.from) === BED_DONOR;   // V231 (absorb ruling section 3): the bed-thrust donor tier, counted on every tree
+  S.pairs++; if(r.thr) S.thr++; if(bed) S.bt.pairs++;
+  if(c.clamp){ S.clamp++; if(bed) S.bt.clamp++; if(r.toast === c.wantH && t.endsWith(HOLD)){ S.hv++; S.hvK[c.kind]++; if(bed) S.bt.hv++; } else { S.hvMiss++; note('hv', r.key + ' [' + c.kind + '] ' + t + ' | want ' + c.wantH); } if(claims(t)) S.fals++; }
   else if(t.endsWith(HOLD)){ S.holdOff++; note('off', r.key + ' ' + t); }
   if(c.capd && rpeHand(c.Db) !== null && rpeHand(O) !== null && rpeHand(c.Db) !== rpeHand(O) && claims(t) && !t.endsWith(HOLD)) S.info++;
   if(r.isPow){ if(c.Hk.k === 'zero') return; S.pow++; if(cueBlind(O) !== cueBlind(D)) S.powChg++; return; }
   if(c.Hk.k === 'zero') return; S.main++;
-  if(O !== D && stripRep(O) !== stripRep(D)){ S.G3a++; S.G3aCls[c.capd ? (c.Hk.k === 'win' ? 'window' : 'donor') : 'verbatim']++; }
+  if(O !== D && stripRep(O) !== stripRep(D)){ S.G3a++; S.G3aCls[c.capd ? (c.Hk.k === 'win' ? 'window' : 'donor') : 'verbatim']++; if(bed) S.bt.G3a++; }
   if(stripRep(O) !== stripRep(c.X9)){ S.G3aMiss++; note('A', r.key + ' :: ' + D + ' => ' + O + ' | want ' + c.X9); }
-  if(c.Hk.k === 'offgram'){ S.offN++; if(cueBlind(O) !== cueBlind(D)) S.off++; if(cueBlind(O) !== cueBlind(c.X9)){ S.offMiss++; note('off', r.key + ' :: ' + D + ' => ' + O + ' | want ' + c.X9); } }
-  if(c.Hk.k === 'null'){ S.nulN++; if(O !== D) S.nul++; if(O !== c.X9){ S.nulMiss++; note('null', r.key + ' :: ' + D + ' => ' + O + ' | want ' + c.X9); } }
-  if(c.Hk.k === 'atfloor'){ S.atN++; if(O !== D) S.at++; if(O !== c.X9){ S.atMiss++; note('at', r.key + ' :: ' + D + ' => ' + O + ' | want ' + c.X9); } }
-  if(c.Hk.k === 'win'){ S.winN++; if(O !== c.Hk.out) S.win++; if(O !== c.X9){ S.winMiss++; note('win', r.key + ' :: ' + D + ' => ' + O + ' | want ' + c.X9); } }
+  if(c.Hk.k === 'offgram'){ S.offN++; if(cueBlind(O) !== cueBlind(D)){ S.off++; if(bed) S.bt.off++; } if(cueBlind(O) !== cueBlind(c.X9)){ S.offMiss++; note('off', r.key + ' :: ' + D + ' => ' + O + ' | want ' + c.X9); } }
+  if(c.Hk.k === 'null'){ S.nulN++; if(O !== D){ S.nul++; if(bed) S.bt.nul++; } if(O !== c.X9){ S.nulMiss++; note('null', r.key + ' :: ' + D + ' => ' + O + ' | want ' + c.X9); } }
+  if(c.Hk.k === 'atfloor'){ S.atN++; if(O !== D){ S.at++; if(bed) S.bt.at++; } if(O !== c.X9){ S.atMiss++; note('at', r.key + ' :: ' + D + ' => ' + O + ' | want ' + c.X9); } }
+  if(c.Hk.k === 'win'){ S.winN++; if(O !== c.Hk.out){ S.win++; if(bed) S.bt.win++; } if(O !== c.X9){ S.winMiss++; note('win', r.key + ' :: ' + D + ' => ' + O + ' | want ' + c.X9); } }
 }
 function jobL1(spec){
   const C = fresh(spec.art, PRES.CFG.clock), B = fresh(spec.base, PRES.CFG.clock), B2 = fresh(spec.base, PRES.CFG.clock);
@@ -680,7 +704,6 @@ const PS_TABLE = [
 // the ruled counts (M13 [1] and [2])
 const PS_N = { configs:432, days:12960, rej:22, drop:18, redetail:4, builds:11, tried:144, landed:88 };
 const PS_COMBO = [['C', 'OV1'], ['C', 'CFG1'], ['B', 'OV1'], ['B', 'CFG1']], PS_SHARDS = 8;
-const PS_REFUSE = 'D194 Amendment 4 pins V230\'s post-sweep reject class; P-BWFALLBACK + P-FILTERLAST (V231) must re-key this row (expected 0)';
 const psBuild = r => r.slice(0, 4).join('|'), psLine = r => r.join('|');
 // the re-applied filter, measure's __rej verbatim: positional tags, the config's own injury on the program's cfg, never _dayPlanCfg
 const PS_HELP = "globalThis.__rej=function(sections,inj){var S=JSON.parse(JSON.stringify(sections||[]));S.forEach(function(s,si){((s&&s.items)||[]).forEach(function(it,ii){if(it)it.__k=si+'.'+ii;});});"
@@ -787,6 +810,13 @@ if(!(VER >= ERA)){
   ORDER.forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();
 }
+// V231 (tests/measure/v231_rulings/v231_absorb_ruling.md sections 3 and 6; standing rulings 2 and 4): at 231 and up the
+// re-keyed rows print their V231 labels; at 230 every label reads as above.
+if(VER >= V231_ERA) Object.assign(R, {
+  'd193-k':     'row d193-k      [V231 D196-1] g221 L1 sweep on STAMP (150,989 pairs, 384 configs): hand clamp pairs 1,253, toast == the hand hold variant 1,253 (verbatim 694, unloadable 360, window 199), 0 false same-numbers/effort claims, 0 hold toasts off the clamp set, INFO capped 458 pinned; STAMP == CFG card 0 and toast 0 differ; non-clamp toasts == V229 STAMP 141,557/141,557; bed-thrust donor clamp pairs 10, each the hold variant (V230 0) (V229: 0 hold variants, 1,243 false claims, INFO 728)',
+  'd193-l':     'row d193-l      [V231 D196-1] g221 L1 sweep on STAMP, (l)\'s predicate (capped: hand hold of D177\'s card on the stripped donor; uncapped: D177\'s card on the stripped donor), 0 misses, moved counts == CFG\'s and pinned: G3a 839 (529 / 199 / 111), G3c power 0, G3c off grammar 172, G3d 263, G3e 205, G3f 199; bed-thrust donor G3a 7, G3c-off 4, G3e 3 (V230 0) (V229 STAMP: G3a 143, G3c-off 96, G3d 0, G3e 47, G3f 0)',
+  'd194-postsweep': 'row d194-postsweep INFO [V231 re-key: D196-1 + D197-1] L432 post-sweep rejects 0 (V230 22: 18 Burpees drops, 4 Pushups re-details) on the candidate, OV1 and fixture (432 builds, 12,960 lifting days each); V229 == the typed table (22 in 11 builds) on OV1 and fixture in the same run; (ii) dropped as vacuous (no reject day exists)',
+});
 let BF = null, baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
@@ -808,9 +838,12 @@ const CF = ART;
 // ── JOBS ────────────────────────────────────────────────────────────────────────────────────────────────────────
 const JOBS = CK7.map(ck => ({ kind:'enum', ck, base:BF })).concat([['C', 'OV5'], ['C', 'CFG'], ['B', 'OV5']].map(([t, p]) => ({ kind:'hand', t, pres:p, file:t === 'C' ? CF : BF })), CK7.map(ck => ({ kind:'pairs', ck, art:CF, base:BF })));
 for(let s = 0; s < L1_SHARDS; s++) JOBS.push({ kind:'l1', shard:s, art:CF, base:BF, cis:L1.map((c, i) => i).filter(i => i % L1_SHARDS === s) });
-if(VER === ERA){   // d194-postsweep (D194 Amendment 4) asserts at ia-version 230 only, so its jobs run only there
+// d194-postsweep (D194 Amendment 4; V231 absorb ruling section 6) asserts at 230 and up, so its population jobs run at 230
+// and up; its reach jobs serve (ii) and the typed-build re-read, which assert at 230 only ((ii) is dropped as vacuous at
+// 231 and up: no reject day exists), so they run only there.
+if(VER >= ERA){
   for(let s = 0; s < PS_SHARDS; s++) JOBS.push({ kind:'ps', shard:s, art:CF, base:BF, cis:L432.map((c, i) => i).filter(i => i % PS_SHARDS === s) });
-  [...new Set(PS_TABLE.map(psBuild))].forEach(k => JOBS.push({ kind:'reach', ck:k, art:CF, base:BF })); }
+  if(VER === ERA) [...new Set(PS_TABLE.map(psBuild))].forEach(k => JOBS.push({ kind:'reach', ck:k, art:CF, base:BF })); }
 const ENUM = {};   // ck -> the enumerated chains (an enum job that dies leaves its config absent, and every lattice row FAILS)
 function runPool(jobs){ let i = 0, pend = jobs.filter(j => j.kind === 'enum').length, wake = []; const res = [];
   const landed = (j, r) => { if(j.kind !== 'enum') return; pend--; if(r && Array.isArray(r.chains)){ ENUM[j.ck] = r.chains;
@@ -908,24 +941,32 @@ runPool(JOBS).then(res => {
     RES['d193-e′'] = [pairsOK && okB && n === W.e2.n && n5 === n && good(a) && good(b) && eq1 === n && eq5 === n,
       'pairs ' + n + ', OV1 live above 7 ' + a.hi + ' (V229 ' + W.e2.v229 + '), boot above 7 ' + a.bhi + ', hold toasts ' + a.hold + ', == CFG1 ' + eq1 + (b ? '; OV5 live above 7 ' + b.hi + ', boot above 7 ' + b.bhi + ', hold toasts ' + b.hold + ', == CFG ' + eq5 : '; OV5 missing') + (okB ? '' : '; BASELINE not as ruled: V229 OV1 live above 7 ' + bhi)]; }
   // (k) toast truth on the overlay shape (STAMP), the hand oracle; STAMP == CFG; non-clamp toasts == V229's
-  { const s = L.CSTAMP, f = L.CCFG; const kv = s.hvK;
+  // V231 (absorb ruling section 3, d193-k ABSORB, class D196-1; standing rulings 2 and 4): at 231 and up the row reads
+  // the W231 pins and adds the bed-thrust donor conjunct (clamp pairs 10, each the hold variant; V230 0).
+  { const s = L.CSTAMP, f = L.CCFG; const kv = s.hvK; const V231 = VER >= V231_ERA, WL = V231 ? W231.L1 : W.L1, bt = s.bt;
     P('    d193-k candidate STAMP: pairs ' + s.pairs + ' | clamp pairs ' + s.clamp + ' | hold variants ' + s.hv + ' (verbatim ' + kv.verbatim + ', unloadable ' + kv.unloadable + ', window ' + kv.window + '; clamp pairs without it ' + s.hvMiss + ') | false claims ' + s.fals + ' | hold toasts off the clamp set ' + s.holdOff + ' | INFO capped ' + s.info
       + ' || candidate CFG: hold variants ' + f.hv + ', false ' + f.fals + ', INFO ' + f.info + ' || V229 STAMP: hold variants ' + L.BSTAMP.hv + ', false ' + L.BSTAMP.fals + ', INFO ' + L.BSTAMP.info);
     P('    d193-k STAMP == CFG (candidate): aligned ' + X.sc.align + ', card differs ' + X.sc.card + ', toast differs ' + X.sc.toast + ' of ' + X.sc.n + ' | non-clamp toasts == V229 STAMP ' + X.nc.eq + '/' + X.nc.n + exs('CSTAMP:hv', 'CSTAMP:off', 'sccard', 'sctoast', 'nc'));
     const bS = L.BSTAMP, okB = bS.hv === W.L1.v229.hv && bS.fals === W.L1.v229.fals && bS.info === W.L1.v229.info;
-    RES['d193-k'] = [l1OK && okB && !crash.length && cfgs === W.L1.cfgs && s.pairs === W.L1.pairs && s.thr === 0 && s.clamp === W.L1.clamp && s.hv === W.L1.hv && kv.verbatim === W.L1.hvK.verbatim && kv.unloadable === W.L1.hvK.unloadable && kv.window === W.L1.hvK.window
-      && s.fals === 0 && s.holdOff === 0 && s.info === W.L1.info && X.sc.align && X.sc.n === W.L1.pairs && X.sc.card === 0 && X.sc.toast === 0 && X.nc.n === W.L1.nonClamp && X.nc.eq === X.nc.n,
-      'clamp pairs ' + s.clamp + ', hold variants ' + s.hv + ' (verbatim ' + kv.verbatim + ', unloadable ' + kv.unloadable + ', window ' + kv.window + '), false claims ' + s.fals + ', hold toasts off the clamp set ' + s.holdOff + ', INFO capped ' + s.info + ', STAMP vs CFG card ' + X.sc.card + ' toast ' + X.sc.toast + ', non-clamp == V229 ' + X.nc.eq + '/' + X.nc.n + (okB ? '' : '; BASELINE not as ruled: V229 STAMP hold variants ' + bS.hv + ', false ' + bS.fals + ', INFO ' + bS.info)]; }
+    P('    d193-k bed-thrust donor (' + BED_DONOR + ') on candidate STAMP: pairs ' + bt.pairs + ' | clamp pairs ' + bt.clamp + ', hold variants ' + bt.hv + ' || V229 STAMP: pairs ' + bS.bt.pairs + ', clamp pairs ' + bS.bt.clamp + (V231 ? ' | ruled (V231) clamp pairs ' + W231.bed.clamp + ', hold variants ' + W231.bed.hv : ''));
+    const btOK = !V231 || (bt.clamp === W231.bed.clamp && bt.hv === W231.bed.hv);
+    RES['d193-k'] = [l1OK && okB && btOK && !crash.length && cfgs === WL.cfgs && s.pairs === WL.pairs && s.thr === 0 && s.clamp === WL.clamp && s.hv === WL.hv && kv.verbatim === WL.hvK.verbatim && kv.unloadable === WL.hvK.unloadable && kv.window === WL.hvK.window
+      && s.fals === 0 && s.holdOff === 0 && s.info === WL.info && X.sc.align && X.sc.n === WL.pairs && X.sc.card === 0 && X.sc.toast === 0 && X.nc.n === WL.nonClamp && X.nc.eq === X.nc.n,
+      'clamp pairs ' + s.clamp + ', hold variants ' + s.hv + ' (verbatim ' + kv.verbatim + ', unloadable ' + kv.unloadable + ', window ' + kv.window + '), false claims ' + s.fals + ', hold toasts off the clamp set ' + s.holdOff + ', INFO capped ' + s.info + ', STAMP vs CFG card ' + X.sc.card + ' toast ' + X.sc.toast + ', non-clamp == V229 ' + X.nc.eq + '/' + X.nc.n + (V231 ? ', bed-thrust donor clamp pairs ' + bt.clamp + ' (hold variant ' + bt.hv + ')' : '') + (okB ? '' : '; BASELINE not as ruled: V229 STAMP hold variants ' + bS.hv + ', false ' + bS.fals + ', INFO ' + bS.info)]; }
   // (l) D177's verbatim rows beneath the plan's hold, on STAMP, == CFG
-  { const s = L.CSTAMP, f = L.CCFG; const ln = x => 'G3a ' + x.G3a + ' (' + x.G3aCls.donor + ' / ' + x.G3aCls.window + ' / ' + x.G3aCls.verbatim + ', miss ' + x.G3aMiss + '), G3c power ' + x.powChg + ' of ' + x.pow + ', G3c-off ' + x.off + ' of ' + x.offN + ' (miss ' + x.offMiss + '), G3d ' + x.at + ' of ' + x.atN + ' (miss ' + x.atMiss + '), G3e ' + x.nul + ' of ' + x.nulN + ' (miss ' + x.nulMiss + '), G3f ' + x.win + ' of ' + x.winN + ' (miss ' + x.winMiss + ')';
+  // V231 (absorb ruling section 3, d193-l ABSORB, class D196-1; standing rulings 2 and 4): at 231 and up the row reads
+  // the W231 pins and adds the bed-thrust donor conjunct (G3a 7, G3c-off 4, G3e 3; V230 0).
+  { const s = L.CSTAMP, f = L.CCFG; const V231 = VER >= V231_ERA, WLl = V231 ? W231.l : W.l, bt = s.bt; const ln = x => 'G3a ' + x.G3a + ' (' + x.G3aCls.donor + ' / ' + x.G3aCls.window + ' / ' + x.G3aCls.verbatim + ', miss ' + x.G3aMiss + '), G3c power ' + x.powChg + ' of ' + x.pow + ', G3c-off ' + x.off + ' of ' + x.offN + ' (miss ' + x.offMiss + '), G3d ' + x.at + ' of ' + x.atN + ' (miss ' + x.atMiss + '), G3e ' + x.nul + ' of ' + x.nulN + ' (miss ' + x.nulMiss + '), G3f ' + x.win + ' of ' + x.winN + ' (miss ' + x.winMiss + ')';
     const keys = ['main', 'G3a', 'G3aMiss', 'pow', 'powChg', 'offN', 'off', 'offMiss', 'nulN', 'nul', 'nulMiss', 'atN', 'at', 'atMiss', 'winN', 'win', 'winMiss'];
     const eqCFG = keys.every(k => s[k] === f[k]) && ['donor', 'window', 'verbatim'].every(k => s.G3aCls[k] === f.G3aCls[k]);
     P('    d193-l candidate STAMP: ' + ln(s) + '\n    d193-l candidate CFG:   ' + ln(f) + '\n    d193-l V229 STAMP:      ' + ln(L.BSTAMP) + exs('CSTAMP:A', 'CSTAMP:off', 'CSTAMP:null', 'CSTAMP:at', 'CSTAMP:win'));
     const bS = L.BSTAMP, okB = bS.G3a === W.l.v229.G3a && bS.off === W.l.v229.off && bS.at === W.l.v229.at && bS.nul === W.l.v229.nul && bS.win === W.l.v229.win;
-    RES['d193-l'] = [l1OK && okB && !crash.length && cfgs === W.L1.cfgs && eqCFG && s.G3a === W.l.G3a && s.G3aCls.donor === W.l.G3aCls.donor && s.G3aCls.window === W.l.G3aCls.window && s.G3aCls.verbatim === W.l.G3aCls.verbatim
-      && s.pow > 0 && s.powChg === W.l.pow && s.offN > 0 && s.off === W.l.off && s.atN > 0 && s.at === W.l.at && s.nulN > 0 && s.nul === W.l.nul && s.winN > 0 && s.win === W.l.win
+    P('    d193-l bed-thrust donor on candidate STAMP: G3a moved ' + bt.G3a + ', G3c-off ' + bt.off + ', G3e ' + bt.nul + ', G3d ' + bt.at + ', G3f ' + bt.win + ' || V229 STAMP: G3a ' + bS.bt.G3a + ', G3c-off ' + bS.bt.off + ', G3e ' + bS.bt.nul + (V231 ? ' | ruled (V231) G3a ' + W231.bed.G3a + ', G3c-off ' + W231.bed.off + ', G3e ' + W231.bed.nul : ''));
+    const btOK = !V231 || (bt.G3a === W231.bed.G3a && bt.off === W231.bed.off && bt.nul === W231.bed.nul);
+    RES['d193-l'] = [l1OK && okB && btOK && !crash.length && cfgs === W.L1.cfgs && eqCFG && s.G3a === WLl.G3a && s.G3aCls.donor === WLl.G3aCls.donor && s.G3aCls.window === WLl.G3aCls.window && s.G3aCls.verbatim === WLl.G3aCls.verbatim
+      && s.pow > 0 && s.powChg === WLl.pow && s.offN > 0 && s.off === WLl.off && s.atN > 0 && s.at === WLl.at && s.nulN > 0 && s.nul === WLl.nul && s.winN > 0 && s.win === WLl.win
       && s.G3aMiss === 0 && s.offMiss === 0 && s.atMiss === 0 && s.nulMiss === 0 && s.winMiss === 0,
-      ln(s) + (eqCFG ? ', == CFG' : ', != CFG (' + ln(f) + ')') + (okB ? '' : '; BASELINE not as ruled: V229 STAMP ' + ln(bS))]; }
+      ln(s) + (eqCFG ? ', == CFG' : ', != CFG (' + ln(f) + ')') + (V231 ? ', bed-thrust donor G3a ' + bt.G3a + ', G3c-off ' + bt.off + ', G3e ' + bt.nul : '') + (okB ? '' : '; BASELINE not as ruled: V229 STAMP ' + ln(bS))]; }
 
   // ── THE D190 LATTICE ROWS ──
   // merge: numbers add, objects recurse, the first example string is kept
@@ -998,8 +1039,31 @@ runPool(JOBS).then(res => {
     if(c5.ok){ const m = HJ['C:OV5'].mario; P('      e.g. OV5 U0 hop2 ' + m.U0.hops[1].n + ' ' + JSON.stringify(m.U0.hops[1].d) + ' _preHold ' + JSON.stringify(m.U0.hops[1].h) + ' toast "' + m.U0.hops[1].t + '" | r7 Leg press "' + HJ['C:OV5'].r7.lp.hop.t + '"'); }
     RES['d194-q′'] = [okB && c5.ok && cf.ok, 'OV5 ' + (c5.ok ? 'all typed lines' : c5.miss.length + ' off (' + c5.miss[0] + ')') + ', CFG ' + (cf.ok ? 'all typed lines' : cf.miss.length + ' off (' + cf.miss[0] + ')') + (okB ? '' : '; BASELINE not as ruled: V229 OV5 ' + bm.length + ' lines off (' + bm[0] + ')')]; }
 
-  // d194-postsweep (D194 Amendment 4, INFO): asserted at ia-version 230 only; from 231 a column-0 REFUSED line and a FAIL by name
-  if(VER !== ERA){ P('REFUSED: row d194-postsweep at ia-version ' + VER + ': ' + PS_REFUSE); RES['d194-postsweep'] = [false, 'REFUSED at ia-version ' + VER + ': ' + PS_REFUSE]; }
+  // d194-postsweep (D194 Amendment 4, INFO): at 230 the typed table, the re-read and (ii) assert as ruled. V231 (absorb ruling
+  // section 6, RE-KEY, classes D196-1 + D197-1; standing rulings 2 and 4): at 231 and up the same population jobs run and
+  // the row asserts L432 rejects 0 for the candidate, OV1 and fixture, with V229 reading the typed table in the same run
+  // (the instrument is not blind); (ii) is dropped as vacuous (no reject day exists) and prints one column-0 SKIP line.
+  if(VER >= V231_ERA){ const SJ = JOBS.map((j, i) => j.kind === 'ps' ? res[i] : undefined).filter(x => x !== undefined);
+    const N = PS_N, PB = [...new Set(PS_TABLE.map(psBuild))], TS = new Set(PS_TABLE.map(psLine)), K = PS_COMBO.map(([t, p]) => t + ':' + p);
+    const NM = { 'C:OV1':'candidate OV1', 'C:CFG1':'candidate fixture', 'B:OV1':'V229 OV1', 'B:CFG1':'V229 fixture' };
+    const psOK = SJ.length === PS_SHARDS && SJ.every(Boolean);
+    const kinds = rows => ({ drop:rows.filter(x => x.split('|')[8] === 'drop').length, redetail:rows.filter(x => x.split('|')[8] === 'redetail').length, rename:rows.filter(x => x.split('|')[8] === 'rename').length,
+      days:new Set(rows.map(x => x.split('|').slice(0, 6).join('|'))).size, builds:new Set(rows.map(x => x.split('|').slice(0, 4).join('|'))).size });
+    const tq = kinds(PS_TABLE.map(psLine)), tableOK = PS_TABLE.length === N.rej && TS.size === N.rej && tq.drop === N.drop && tq.redetail === N.redetail && tq.days === N.rej && tq.builds === N.builds && PB.length === N.builds;
+    const pop = {}; K.forEach(k => { const o = pop[k] = { builds:0, days:0, neu:0, rej:[], crash:[] };
+      SJ.filter(Boolean).forEach(r => { const s = r.R[k]; o.builds += s.builds; o.days += s.days; o.neu += s.neu; o.rej.push(...s.rej); o.crash.push(...s.crash); }); });
+    const setEq = o => { const s = new Set(o.rej); return o.rej.length === TS.size && s.size === TS.size && [...TS].every(x => s.has(x)); };
+    const popOK = k => pop[k].builds === N.configs && pop[k].days === N.days && !pop[k].crash.length && setEq(pop[k]);
+    const zero = k => pop[k].builds === N.configs && pop[k].days === N.days && !pop[k].crash.length && pop[k].rej.length === 0;
+    K.forEach(k => { const o = pop[k], q = kinds(o.rej), cand = k.charAt(0) === 'C';
+      P('    d194-postsweep (i) ' + NM[k] + ': builds ' + o.builds + ', lifting days ' + o.days + ' | rejects ' + o.rej.length + ' (drops ' + q.drop + ', re-details ' + q.redetail + ', renames ' + q.rename + ') on ' + q.days + ' days in ' + q.builds + ' builds | ' + (cand ? 'ruled 0 (V231 re-key)' : '== the typed table ' + setEq(o)) + ' | new items ' + o.neu
+        + (o.crash.length ? ' | CRASH ' + o.crash[0] : '') + (cand && o.rej.length ? ' | e.g. ' + o.rej[0] : '')); });
+    P('    d194-postsweep typed table ' + PS_TABLE.length + ' rows (drops ' + tq.drop + ', re-details ' + tq.redetail + ', builds ' + tq.builds + ') consistent ' + tableOK);
+    P('SKIP row d194-postsweep (ii) the reach on the typed reject days: dropped at ia-version 231 and up as vacuous by the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 6), no reject day exists on the candidate (OV1 ' + pop['C:OV1'].rej.length + ', fixture ' + pop['C:CFG1'].rej.length + ' rejects); its reach jobs do not run; its successor is g231_d194a4_lateplan a4-dedupe / a4-nojumps / a4-cards (D194 Amendment 5). Never PASS, never FAIL.');
+    const cOK = zero('C:OV1') && zero('C:CFG1'), okB = popOK('B:OV1') && popOK('B:CFG1');
+    RES['d194-postsweep'] = [psOK && tableOK && cOK && okB,
+      '(i) candidate rejects OV1 ' + pop['C:OV1'].rej.length + ', fixture ' + pop['C:CFG1'].rej.length + ' (builds ' + pop['C:OV1'].builds + '/' + pop['C:CFG1'].builds + ', lifting days ' + pop['C:OV1'].days + '/' + pop['C:CFG1'].days + '); V229 == the typed table on OV1 ' + popOK('B:OV1') + ', fixture ' + popOK('B:CFG1')
+      + (psOK ? '' : '; JOBS not usable (population ' + SJ.filter(Boolean).length + '/' + PS_SHARDS + ')') + (tableOK ? '' : '; TYPED TABLE inconsistent with its counts') + (okB ? '' : '; BASELINE not as ruled')]; }
   else { const SJ = JOBS.map((j, i) => j.kind === 'ps' ? res[i] : undefined).filter(x => x !== undefined), RJ = JOBS.map((j, i) => j.kind === 'reach' ? res[i] : undefined).filter(x => x !== undefined);
     const N = PS_N, PB = [...new Set(PS_TABLE.map(psBuild))], TS = new Set(PS_TABLE.map(psLine)), K = PS_COMBO.map(([t, p]) => t + ':' + p);
     const NM = { 'C:OV1':'candidate OV1', 'C:CFG1':'candidate fixture', 'B:OV1':'V229 OV1', 'B:CFG1':'V229 fixture' };
@@ -1047,7 +1111,10 @@ runPool(JOBS).then(res => {
 
   // print rows in order: instruments, then figures (unread when an instrument failed)
   INST.forEach(k => { const r = RES[k] || [false, 'row not computed']; ok(R[k], r[0], r[1]); });
-  FIG.forEach(k => { if(!INSTR_OK){ ok(R[k] + ' (not read: instrument ' + INST.filter(i => !(RES[i] && RES[i][0])).join(', ') + ' failed)', false); return; }
+  // V231 (absorb ruling section 3, g230 d194-fixture SCOPE; standing rulings 2 and 4): at 231 and up the claim row is
+  // V230's claim about V230 and prints one column-0 SKIP line with this tree's figures, never PASS and never FAIL.
+  FIG.forEach(k => { if(k === 'd194-fixture' && VER >= V231_ERA){ P('SKIP row d194-fixture CLAIM (R3′ "nothing else") scoped to ia-version 230 by the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 3): V230\'s claim about V230; a later build\'s fixture moves by its own ruling (D195 A-1/B-1, D196, D197). This tree: ' + (RES[k] ? RES[k][1] : 'not computed') + ' (V229 pairs ' + W.L1.pairs + '). Never PASS, never FAIL.'); return; }
+    if(!INSTR_OK){ ok(R[k] + ' (not read: instrument ' + INST.filter(i => !(RES[i] && RES[i][0])).join(', ') + ' failed)', false); return; }
     const r = RES[k] || [false, 'row not computed']; ok(R[k], r[0], r[1]); });
   done();
 }).catch(e => { P('  MERGE CRASH ' + String(e && e.stack || e).slice(0, 600)); ORDER.forEach(k => ok(R[k] + ' (merge crashed)', false)); done(); });

@@ -24,6 +24,12 @@
 // VERSION PREDICATE (standing rulings 2 and 4). D187 ships at 225.
 //   below 225   REFUSED, every row FAILS by name.
 //   225 and up  every row asserts.
+//   231 and up  CONFINEMENT is SCOPED to its era (tests/measure/v231_rulings/v231_absorb_ruling.md section 3; standing
+//               rulings 2 and 4): it asserts at 225 (V224 equality) and at 226 to 230 (D189 Class B). D195 moves the run
+//               cells (the ruling prints 4 programs, 38 days moved, ops A-1 38, B-1 6, 0 other), so "nothing moved on a
+//               goal this ruling does not touch" belongs to the builds before it. At 231 and up the row prints one
+//               named SKIP line at column 0, never PASS and never FAIL, resolves no baseline, and names the successors
+//               g231_d195b_cost D195-B-b and g231_d195_hipext D195-A-b. Every other row asserts as before.
 //   IA_ASSUME_VERSION=225 lifts a file stamped exactly 224 to 225 for a discrimination run (not a ship proof).
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
@@ -35,6 +41,8 @@ const ERA = 225;
 // D189 P-PACEDISCLOSE (V226) Class B re-keys CONFINEMENT from 226 (standing rulings 2 and 4): run_base's one
 // W1 note gains the S1 suffix. <= 225 keeps the byte-identical digest row.
 const D189_ERA = 226;
+// V231 absorb ruling section 3 (g225_d187:272 CONFINEMENT SCOPE): CONFINEMENT asserts below 231 only.
+const V231_ERA = 231;
 // CONFINEMENT baseline (V226 slice 7e): tests/sabotage.py passes no argv[3], so a baseline read only from argv
 // failed closed on the control and made every mutation on this gate trip. The baseline is now resolved by era:
 // argv[3] if it reads the wanted version, else `git show <pinned commit>:index.html` into os.tmpdir().
@@ -175,7 +183,10 @@ const CS = stripComments(IA.js);   // comment-stripped source, the census oracle
 }
 
 // ── CONFINEMENT (needs a baseline artifact: candidate vs V224, byte-identical digest per goal) ──
-{
+// V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g225_d187:272 CONFINEMENT SCOPE; standing rulings
+// 2 and 4): at 231 and up one named SKIP line at column 0, never PASS and never FAIL; below 231 the block runs as before.
+if(VER >= V231_ERA) console.log('SKIP CONFINEMENT D189 era (strip the S1 suffix and every cell equals the baseline V225, swim/bike/run_base/NRC): scoped to ia-version 226 to 230 by the V231 absorb ruling (' + 'tests/measure/v231_rulings/v231_absorb_ruling.md section 3); D195 moves the run cells (the ruling prints 4 programs, 38 days moved, ops A-1 38, B-1 6); successors g231_d195b_cost D195-B-b, g231_d195_hipext D195-A-b. Never PASS, never FAIL.');
+else {
   const WANT_BASE = VER >= D189_ERA ? 225 : 224;
   const PIN = WANT_BASE === 225 ? V225_COMMIT : V224_COMMIT;
   let BASE = null, baseWhy = '';

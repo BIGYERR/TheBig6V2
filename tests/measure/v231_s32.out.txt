@@ -1,0 +1,524 @@
+# v231_s32 M20 — S32-D194-A4 survivor. cand sha 1b403743f8ad1b16, mut sha 3afc343beaa8c54b, positive control ctl.html (re-filter line deleted)
+## PREP
+PREP cand sha 1b403743f8ad1b16 mut sha 3afc343beaa8c54b
+PREP ia-version cand 231 mut 231
+PREP clean self-identity 17/17 | clean build == mutant build 17/17
+PREP stored+boot self-identity (MARIO, FIX/OV1/OV5/MIX) 4/4
+PREP lattice sizes {"L432":432,"LBW":432,"LBWX":432,"FAT":180,"NRC":96,"D190":8,"MARIO":1}
+## (1) GATES clean vs mutant (V230 baseline argv[3])
+g000_boot.js                         clean: PASS 10 FAIL 0             mutant: PASS 10 FAIL 0
+g190_rounds.js                       clean: PASS 49 FAIL 0             mutant: PASS 49 FAIL 0
+g191_pacedelta.js                    clean: PASS 26 FAIL 0             mutant: PASS 26 FAIL 0
+g192_floorpress_shoulder_gear.js     clean: PASS 29 FAIL 0             mutant: PASS 29 FAIL 0
+g192_labelsync.js                    clean: PASS 26 FAIL 0             mutant: PASS 26 FAIL 0
+g192_landmine_rotpress.js            clean: PASS 34 FAIL 0             mutant: PASS 34 FAIL 0
+g192_shoulder_side.js                clean: PASS 29 FAIL 0             mutant: PASS 29 FAIL 0
+g193_budget_floor.js                 clean: PASS 36 FAIL 0             mutant: PASS 36 FAIL 0
+g193_d50_trunkfloor.js               clean: PASS 17 FAIL 0             mutant: PASS 17 FAIL 0
+g193_gear_gates.js                   clean: PASS 168 FAIL 0            mutant: PASS 168 FAIL 0
+g193_pool_overlay.js                 clean: PASS 223 FAIL 0            mutant: PASS 223 FAIL 0
+g193_rotation_reach.js               clean: PASS 24 FAIL 0             mutant: PASS 24 FAIL 0
+g193_samecard.js                     clean: PASS 53 FAIL 0             mutant: PASS 53 FAIL 0
+g193_trunk_protect.js                clean: PASS 38 FAIL 0             mutant: PASS 38 FAIL 0
+g194_implement_and_range.js          clean: PASS 19 FAIL 0             mutant: PASS 19 FAIL 0
+g195_wildcard.js                     clean: PASS 298 FAIL 0            mutant: PASS 298 FAIL 0   << DIFFERS
+g196_ledger.js                       clean: PASS 55 FAIL 0             mutant: PASS 55 FAIL 0
+g197a_pool_static.js                 clean: PASS 41 FAIL 0             mutant: PASS 41 FAIL 0
+g197b_sweep.js                       clean: PASS 30 FAIL 0             mutant: PASS 30 FAIL 0
+g197c_d84_cmp.js                     clean: PASS 35 FAIL 0             mutant: PASS 35 FAIL 0
+g197d_d84_base.js                    clean: PASS 6 FAIL 0              mutant: PASS 6 FAIL 0
+g198_posterior_floor.js              clean: PASS 29 FAIL 0             mutant: PASS 29 FAIL 0
+g199_deload_arbitration.js           clean: PASS 54 FAIL 0             mutant: PASS 54 FAIL 0
+g200_core_tier.js                    clean: PASS 43 FAIL 0             mutant: PASS 43 FAIL 0
+g200_pull_arbitration.js             clean: PASS 18 FAIL 0             mutant: PASS 18 FAIL 0
+g202_d108_touchset_freeze.js         clean: PASS 10 FAIL 0             mutant: PASS 10 FAIL 0
+g202_int_doctrine.js                 clean: PASS 27 FAIL 0             mutant: PASS 27 FAIL 0
+g202_pace_anchor.js                  clean: PASS 33 FAIL 0             mutant: PASS 33 FAIL 0
+g202_pace_copy.js                    clean: PASS 16 FAIL 0             mutant: PASS 16 FAIL 0
+g203_ceiling_and_anchor.js           clean: PASS 151 FAIL 0            mutant: PASS 151 FAIL 0
+g203_mile_pencil.js                  clean: PASS 100 FAIL 0            mutant: PASS 100 FAIL 0
+g204_clock_limb.js                   clean: PASS 75 FAIL 0             mutant: PASS 75 FAIL 0
+g205_bike_unmoved.js                 clean: PASS 15 FAIL 0             mutant: PASS 15 FAIL 0
+g205_chi_table6.js                   clean: PASS 29 FAIL 0             mutant: PASS 29 FAIL 0
+g205_d114_int_table6.js              clean: PASS 18 FAIL 0             mutant: PASS 18 FAIL 0
+g205_d125_ceiling.js                 clean: PASS 22 FAIL 0             mutant: PASS 22 FAIL 0
+g205_d125_spaced.js                  clean: PASS 23 FAIL 0             mutant: PASS 23 FAIL 0
+g205_d129_tiebreak.js                clean: PASS 111 FAIL 0            mutant: PASS 111 FAIL 0
+g205_d130_typed.js                   clean: PASS 24 FAIL 0             mutant: PASS 24 FAIL 0
+g205_d132_walkweek.js                clean: PASS 16 FAIL 0             mutant: PASS 16 FAIL 0
+g205_pace_eve.js                     clean: PASS 25 FAIL 0             mutant: PASS 25 FAIL 0
+g206_d109_copy.js                    clean: PASS 13 FAIL 0             mutant: PASS 13 FAIL 0
+g206_d137_runbase_chi.js             clean: PASS 11 FAIL 0             mutant: PASS 11 FAIL 0
+g207_gk_trial_present.js             clean: PASS 651 FAIL 0            mutant: PASS 651 FAIL 0
+g207_test_calendar.js                clean: PASS 19 FAIL 0             mutant: PASS 19 FAIL 0
+g207_test_week.js                    clean: PASS 79 FAIL 0             mutant: PASS 79 FAIL 0
+g208_d103a_chip.js                   clean: PASS 12 FAIL 0             mutant: PASS 12 FAIL 0
+g208_d103a_key.js                    clean: PASS 6 FAIL 0              mutant: PASS 6 FAIL 0
+g208_d103a_readers.js                clean: PASS 21 FAIL 0             mutant: PASS 21 FAIL 0
+g208_d104a_runbase.js                clean: PASS 10 FAIL 0             mutant: PASS 10 FAIL 0
+g209_d140_tier.js                    clean: PASS 15 FAIL 0             mutant: PASS 15 FAIL 0
+g210_equipment_denials.js            clean: PASS 128 FAIL 0            mutant: PASS 128 FAIL 0
+g211_d153_d155.js                    clean: PASS 48 FAIL 0             mutant: PASS 48 FAIL 0
+g212_d110a_swim.js                   clean: PASS 42 FAIL 0             mutant: PASS 42 FAIL 0
+g213_d113a.js                        clean: PASS 25 FAIL 0             mutant: PASS 25 FAIL 0
+g214_d158_eve.js                     clean: PASS 8 FAIL 0              mutant: PASS 8 FAIL 0
+g215_d149_ghd.js                     clean: PASS 61 FAIL 0             mutant: PASS 61 FAIL 0
+g216_d154_swap_lens.js               clean: PASS 25 FAIL 0             mutant: PASS 25 FAIL 0
+g216_d156_longday.js                 clean: PASS 6 FAIL 0              mutant: PASS 6 FAIL 0
+g217_d160_dedupe_view.js             clean: PASS 13 FAIL 0             mutant: PASS 13 FAIL 0
+g218_d157_swim_sizer.js              clean: PASS 11 FAIL 0             mutant: PASS 11 FAIL 0
+g219_d167_pairs.js                   clean: PASS 4 FAIL 0              mutant: PASS 4 FAIL 0
+g219_samecard_draws.js               clean: PASS 15 FAIL 0             mutant: PASS 15 FAIL 0
+g220_d173_recovbanner.js             clean: PASS 7 FAIL 0              mutant: PASS 7 FAIL 0
+g220_d174_emoji.js                   clean: PASS 37 FAIL 0             mutant: PASS 37 FAIL 0
+g220_d175_popcond.js                 clean: PASS 82 FAIL 0             mutant: PASS 82 FAIL 0
+g221_d177_swapfloor.js               clean: PASS 20 FAIL 0             mutant: PASS 20 FAIL 0
+g221_d178_active.js                  clean: PASS 46 FAIL 0             mutant: PASS 46 FAIL 0
+g221_d179_donenav.js                 clean: PASS 27 FAIL 0             mutant: PASS 27 FAIL 0
+g221_d180_blockopen.js               clean: PASS 22 FAIL 0             mutant: PASS 22 FAIL 0
+g222_d181_chain.js                   clean: PASS 8 FAIL 0              mutant: PASS 8 FAIL 0
+g222_d181_durable.js                 clean: PASS 10 FAIL 0             mutant: PASS 10 FAIL 0
+g223_d182_racedate.js                clean: PASS 30 FAIL 0             mutant: PASS 30 FAIL 0
+g223_d183_safepace.js                clean: PASS 60 FAIL 0             mutant: PASS 60 FAIL 0
+g223_d184_testlen.js                 clean: PASS 36 FAIL 0             mutant: PASS 36 FAIL 0
+g224_d185_wctoday.js                 clean: PASS 28 FAIL 0             mutant: PASS 28 FAIL 0
+g225_d186_clockend.js                clean: PASS 10 FAIL 0             mutant: PASS 10 FAIL 0
+g225_d187_pacerate.js                clean: PASS 9 FAIL 0              mutant: PASS 9 FAIL 0
+g226_d188_beginnermile.js            clean: PASS 39 FAIL 0             mutant: PASS 39 FAIL 0
+g226_d189_pacedisclose.js            clean: PASS 18 FAIL 0             mutant: PASS 18 FAIL 0   << DIFFERS
+g227_d190_cuecap.js                  clean: PASS 8 FAIL 0              mutant: PASS 8 FAIL 0
+g227_d190_prefpath.js                clean: PASS 4 FAIL 0              mutant: PASS 4 FAIL 0
+g227_d190_seam.js                    clean: PASS 7 FAIL 0              mutant: PASS 7 FAIL 0
+g228_d192_undokey.js                 clean: PASS 4 FAIL 0              mutant: PASS 4 FAIL 0
+g228_d193_cueword.js                 clean: PASS 4 FAIL 0              mutant: PASS 4 FAIL 0
+g229_d193_build.js                   clean: PASS 10 FAIL 0             mutant: PASS 10 FAIL 0
+g229_d194_lens.js                    clean: PASS 7 FAIL 0              mutant: PASS 7 FAIL 0
+g230_d194_lens2.js                   clean: PASS 14 FAIL 0             mutant: PASS 14 FAIL 0   << DIFFERS
+g231_d195_hipext.js                  clean: PASS 6 FAIL 0              mutant: PASS 6 FAIL 0
+g231_d195b_cost.js                   clean: PASS 3 FAIL 0              mutant: PASS 3 FAIL 0
+g231_d196_bwfallback.js              clean: PASS 4 FAIL 0              mutant: PASS 4 FAIL 0
+g231_d197_filterlast.js              clean: PASS 3 FAIL 0              mutant: PASS 3 FAIL 0
+g231_d198_hepdraw.js                 clean: PASS 3 FAIL 0              mutant: PASS 3 FAIL 0   << DIFFERS
+g_fuzz_shard_equiv.js                clean: PASS 13 FAIL 0             mutant: PASS 13 FAIL 0
+
+GATES 94 | identical output (timings normalised) 90 | differ 4 | not green on clean 0 | not green on mutant 0
+
+-- g195_wildcard.js clean PASS 298 FAIL 0 / mutant PASS 298 FAIL 0 | lines only in clean 1, only in mutant 1
+   C< # g195_wildcard on cand.html (ia-version 231)
+   M> # g195_wildcard on mut.html (ia-version 231)
+
+-- g226_d189_pacedisclose.js clean PASS 18 FAIL 0 / mutant PASS 18 FAIL 0 | lines only in clean 1, only in mutant 1
+   C<   baseline V225: /var/folders/qm/lfndhmb905l4nx5_j6_sdb4h0000gn/T/g226d189-sYMunV/v225.html
+   M>   baseline V225: /var/folders/qm/lfndhmb905l4nx5_j6_sdb4h0000gn/T/g226d189-E27uJT/v225.html
+
+-- g230_d194_lens2.js clean PASS 14 FAIL 0 / mutant PASS 14 FAIL 0 | lines only in clean 1, only in mutant 1
+   C<   V229 baseline: LIVE (argv[3] reads ia-version 230, not 229; git show 0bec3ec:index.html written to /var/folders/qm/lfndhmb905l4nx5_j6_sdb4h0000gn/T/g230_d194_lens2_v229_13796.html (fallback))
+   M>   V229 baseline: LIVE (argv[3] reads ia-version 230, not 229; git show 0bec3ec:index.html written to /var/folders/qm/lfndhmb905l4nx5_j6_sdb4h0000gn/T/g230_d194_lens2_v229_16204.html (fallback))
+
+-- g231_d198_hepdraw.js clean PASS 3 FAIL 0 / mutant PASS 3 FAIL 0 | lines only in clean 3, only in mutant 3
+   C<   pre-D198 tree: BUILT (D198 line 1 -> 0, anchor 0 -> 1, reverted sha256 prefix 1249c248a6794d1c)
+   C<     INFO pre-D198 tree sha256 prefix 1249c248a6794d1c == the ruling's candidate 1249c248a6794d1c (INFO: equal only while the candidate is V231 as built)
+   C<     D198-c c-surgery ok :: D198 line 1 -> 0, anchor 0 -> 1, reverted sha256 prefix 1249c248a6794d1c
+   M>   pre-D198 tree: BUILT (D198 line 1 -> 0, anchor 0 -> 1, reverted sha256 prefix 65f1e88b2e653eed)
+   M>     INFO pre-D198 tree sha256 prefix 65f1e88b2e653eed != the ruling's candidate 1249c248a6794d1c (INFO: equal only while the candidate is V231 as built)
+   M>     D198-c c-surgery ok :: D198 line 1 -> 0, anchor 0 -> 1, reverted sha256 prefix 65f1e88b2e653eed
+## POSITIVE CONTROL (ctl.html, D190 lattice; FIX/OV1 then PRE1/OVOV/PRE5)
+  FIX                                cells    6 | swaps    952 (skipped 132) persisted at boot 952/952 on injured-plan days 952 rounds 48 | boot diff 94/1764 (names/details/labels differ 94) | reboot diff 94 | undo+boot diff 0
+  OV1                                cells    6 | swaps    952 (skipped 132) persisted at boot 952/952 on injured-plan days 952 rounds 48 | boot diff 94/1764 (names/details/labels differ 94) | reboot diff 94 | undo+boot diff 0
+-- by pres
+  OVOV                               cells    6 | swaps    952 (skipped 132) persisted at boot 694/952 on injured-plan days 952 rounds 48 | boot diff 89/1764 (names/details/labels differ 89) | reboot diff 89 | undo+boot diff 0
+  PRE1                               cells    6 | swaps    996 (skipped 120) persisted at boot 755/996 on injured-plan days 996 rounds 48 | boot diff 109/1764 (names/details/labels differ 109) | reboot diff 109 | undo+boot diff 0
+  PRE5                               cells    6 | swaps    330 (skipped 42) persisted at boot 252/330 on injured-plan days 330 rounds 48 | boot diff 40/1764 (names/details/labels differ 40) | reboot diff 40 | undo+boot diff 0
+
+## (2)(3) REACH + IDEMPOTENCE
+cells loaded 12772 | errors 0 | build clean==mutant 12772/12772
+
+=== (2) REACH: booted days where mutant boot != clean boot (full JSON, clock fields stripped) / booted days compared
+
+-- by pres
+  FIX                                cells 1579 | swaps 234856 (skipped 63625) persisted at boot 234856/234856 on injured-plan days 234856 rounds 13659 | boot diff 0/517202 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX                                cells 1579 | swaps 234856 (skipped 63625) persisted at boot 234856/234856 on injured-plan days 234856 rounds 13659 | boot diff 0/517202 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1                                cells 1579 | swaps 234856 (skipped 63625) persisted at boot 234856/234856 on injured-plan days 234856 rounds 13659 | boot diff 0/517202 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5                                cells 1579 | swaps  85506 (skipped 23441) persisted at boot 85506/85506 on injured-plan days 85506 rounds 13293 | boot diff 0/502530 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OVOV                               cells 1579 | swaps 234856 (skipped 63625) persisted at boot 149572/234856 on injured-plan days 234856 rounds 13659 | boot diff 7161/517202 (names/details/labels differ 7161) | reboot diff 7161 | undo+boot diff 0
+  OVT                                cells 1579 | swaps 234856 (skipped 63625) persisted at boot 157031/234856 on injured-plan days 234856 rounds 13659 | boot diff 1309/517202 (names/details/labels differ 1309) | reboot diff 1309 | undo+boot diff 0
+  PRE1                               cells 1579 | swaps 259570 (skipped 40004) persisted at boot 163867/259570 on injured-plan days 259570 rounds 13784 | boot diff 10289/489426 (names/details/labels differ 10289) | reboot diff 10289 | undo+boot diff 0
+  PRE5                               cells 1579 | swaps  92593 (skipped 17173) persisted at boot 57513/92593 on injured-plan days 92593 rounds 13388 | boot diff 3888/479682 (names/details/labels differ 3888) | reboot diff 3888 | undo+boot diff 0
+  UNINJ                              cells  140 | swaps  23150 (skipped 3594) persisted at boot 23052/23150 on injured-plan days 0 rounds 1220 | boot diff 0/43750 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+
+-- by pres|L
+  FIX|D190                           cells    6 | swaps    952 (skipped 132) persisted at boot 952/952 on injured-plan days 952 rounds 48 | boot diff 0/1764 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|FAT                            cells  180 | swaps  25241 (skipped 7164) persisted at boot 25241/25241 on injured-plan days 25241 rounds 1505 | boot diff 0/55482 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|L432                           cells  432 | swaps  61463 (skipped 16327) persisted at boot 61463/61463 on injured-plan days 61463 rounds 3655 | boot diff 0/132174 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|LBW                            cells  432 | swaps  60356 (skipped 16266) persisted at boot 60356/60356 on injured-plan days 60356 rounds 3658 | boot diff 0/129108 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|LBWX                           cells  432 | swaps  64616 (skipped 14752) persisted at boot 64616/64616 on injured-plan days 64616 rounds 3780 | boot diff 0/129108 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|MARIO                          cells    1 | swaps    156 (skipped 26) persisted at boot 156/156 on injured-plan days 156 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|NRC                            cells   96 | swaps  22072 (skipped 8958) persisted at boot 22072/22072 on injured-plan days 22072 rounds 1005 | boot diff 0/69272 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|D190                           cells    6 | swaps    952 (skipped 132) persisted at boot 952/952 on injured-plan days 952 rounds 48 | boot diff 0/1764 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|FAT                            cells  180 | swaps  25241 (skipped 7164) persisted at boot 25241/25241 on injured-plan days 25241 rounds 1505 | boot diff 0/55482 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|L432                           cells  432 | swaps  61463 (skipped 16327) persisted at boot 61463/61463 on injured-plan days 61463 rounds 3655 | boot diff 0/132174 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|LBW                            cells  432 | swaps  60356 (skipped 16266) persisted at boot 60356/60356 on injured-plan days 60356 rounds 3658 | boot diff 0/129108 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|LBWX                           cells  432 | swaps  64616 (skipped 14752) persisted at boot 64616/64616 on injured-plan days 64616 rounds 3780 | boot diff 0/129108 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|MARIO                          cells    1 | swaps    156 (skipped 26) persisted at boot 156/156 on injured-plan days 156 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|NRC                            cells   96 | swaps  22072 (skipped 8958) persisted at boot 22072/22072 on injured-plan days 22072 rounds 1005 | boot diff 0/69272 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|D190                           cells    6 | swaps    952 (skipped 132) persisted at boot 952/952 on injured-plan days 952 rounds 48 | boot diff 0/1764 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|FAT                            cells  180 | swaps  25241 (skipped 7164) persisted at boot 25241/25241 on injured-plan days 25241 rounds 1505 | boot diff 0/55482 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|L432                           cells  432 | swaps  61463 (skipped 16327) persisted at boot 61463/61463 on injured-plan days 61463 rounds 3655 | boot diff 0/132174 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|LBW                            cells  432 | swaps  60356 (skipped 16266) persisted at boot 60356/60356 on injured-plan days 60356 rounds 3658 | boot diff 0/129108 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|LBWX                           cells  432 | swaps  64616 (skipped 14752) persisted at boot 64616/64616 on injured-plan days 64616 rounds 3780 | boot diff 0/129108 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|MARIO                          cells    1 | swaps    156 (skipped 26) persisted at boot 156/156 on injured-plan days 156 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|NRC                            cells   96 | swaps  22072 (skipped 8958) persisted at boot 22072/22072 on injured-plan days 22072 rounds 1005 | boot diff 0/69272 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|D190                           cells    6 | swaps    316 (skipped 46) persisted at boot 316/316 on injured-plan days 316 rounds 48 | boot diff 0/1722 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|FAT                            cells  180 | swaps   8685 (skipped 2166) persisted at boot 8685/8685 on injured-plan days 8685 rounds 1455 | boot diff 0/51996 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|L432                           cells  432 | swaps  21028 (skipped 5136) persisted at boot 21028/21028 on injured-plan days 21028 rounds 3551 | boot diff 0/127092 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|LBW                            cells  432 | swaps  20408 (skipped 5294) persisted at boot 20408/20408 on injured-plan days 20408 rounds 3562 | boot diff 0/127344 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|LBWX                           cells  432 | swaps  21666 (skipped 4792) persisted at boot 21666/21666 on injured-plan days 21666 rounds 3666 | boot diff 0/125244 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|MARIO                          cells    1 | swaps     53 (skipped 9) persisted at boot 53/53 on injured-plan days 53 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|NRC                            cells   96 | swaps  13350 (skipped 5998) persisted at boot 13350/13350 on injured-plan days 13350 rounds 1003 | boot diff 0/68838 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OVOV|D190                          cells    6 | swaps    952 (skipped 132) persisted at boot 694/952 on injured-plan days 952 rounds 48 | boot diff 53/1764 (names/details/labels differ 53) | reboot diff 53 | undo+boot diff 0
+  OVOV|FAT                           cells  180 | swaps  25241 (skipped 7164) persisted at boot 15993/25241 on injured-plan days 25241 rounds 1505 | boot diff 833/55482 (names/details/labels differ 833) | reboot diff 833 | undo+boot diff 0
+  OVOV|L432                          cells  432 | swaps  61463 (skipped 16327) persisted at boot 39607/61463 on injured-plan days 61463 rounds 3655 | boot diff 2045/132174 (names/details/labels differ 2045) | reboot diff 2045 | undo+boot diff 0
+  OVOV|LBW                           cells  432 | swaps  60356 (skipped 16266) persisted at boot 39800/60356 on injured-plan days 60356 rounds 3658 | boot diff 1588/129108 (names/details/labels differ 1588) | reboot diff 1588 | undo+boot diff 0
+  OVOV|LBWX                          cells  432 | swaps  64616 (skipped 14752) persisted at boot 40620/64616 on injured-plan days 64616 rounds 3780 | boot diff 2140/129108 (names/details/labels differ 2140) | reboot diff 2140 | undo+boot diff 0
+  OVOV|MARIO                         cells    1 | swaps    156 (skipped 26) persisted at boot 146/156 on injured-plan days 156 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OVOV|NRC                           cells   96 | swaps  22072 (skipped 8958) persisted at boot 12712/22072 on injured-plan days 22072 rounds 1005 | boot diff 502/69272 (names/details/labels differ 502) | reboot diff 502 | undo+boot diff 0
+  OVT|D190                           cells    6 | swaps    952 (skipped 132) persisted at boot 641/952 on injured-plan days 952 rounds 48 | boot diff 9/1764 (names/details/labels differ 9) | reboot diff 9 | undo+boot diff 0
+  OVT|FAT                            cells  180 | swaps  25241 (skipped 7164) persisted at boot 16973/25241 on injured-plan days 25241 rounds 1505 | boot diff 159/55482 (names/details/labels differ 159) | reboot diff 159 | undo+boot diff 0
+  OVT|L432                           cells  432 | swaps  61463 (skipped 16327) persisted at boot 41100/61463 on injured-plan days 61463 rounds 3655 | boot diff 286/132174 (names/details/labels differ 286) | reboot diff 286 | undo+boot diff 0
+  OVT|LBW                            cells  432 | swaps  60356 (skipped 16266) persisted at boot 41970/60356 on injured-plan days 60356 rounds 3658 | boot diff 700/129108 (names/details/labels differ 700) | reboot diff 700 | undo+boot diff 0
+  OVT|LBWX                           cells  432 | swaps  64616 (skipped 14752) persisted at boot 40452/64616 on injured-plan days 64616 rounds 3780 | boot diff 92/129108 (names/details/labels differ 92) | reboot diff 92 | undo+boot diff 0
+  OVT|MARIO                          cells    1 | swaps    156 (skipped 26) persisted at boot 122/156 on injured-plan days 156 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OVT|NRC                            cells   96 | swaps  22072 (skipped 8958) persisted at boot 15773/22072 on injured-plan days 22072 rounds 1005 | boot diff 63/69272 (names/details/labels differ 63) | reboot diff 63 | undo+boot diff 0
+  PRE1|D190                          cells    6 | swaps    996 (skipped 120) persisted at boot 755/996 on injured-plan days 996 rounds 48 | boot diff 69/1764 (names/details/labels differ 69) | reboot diff 69 | undo+boot diff 0
+  PRE1|FAT                           cells  180 | swaps  28644 (skipped 3744) persisted at boot 18096/28644 on injured-plan days 28644 rounds 1488 | boot diff 1385/52920 (names/details/labels differ 1385) | reboot diff 1385 | undo+boot diff 0
+  PRE1|L432                          cells  432 | swaps  68364 (skipped 9360) persisted at boot 43509/68364 on injured-plan days 68364 rounds 3624 | boot diff 2901/123480 (names/details/labels differ 2901) | reboot diff 2901 | undo+boot diff 0
+  PRE1|LBW                           cells  432 | swaps  67104 (skipped 8856) persisted at boot 45230/67104 on injured-plan days 67104 rounds 3672 | boot diff 2812/119952 (names/details/labels differ 2812) | reboot diff 2812 | undo+boot diff 0
+  PRE1|LBWX                          cells  432 | swaps  70032 (skipped 8784) persisted at boot 45262/70032 on injured-plan days 70032 rounds 3840 | boot diff 2638/120960 (names/details/labels differ 2638) | reboot diff 2638 | undo+boot diff 0
+  PRE1|MARIO                         cells    1 | swaps    166 (skipped 20) persisted at boot 138/166 on injured-plan days 166 rounds 8 | boot diff 8/294 (names/details/labels differ 8) | reboot diff 8 | undo+boot diff 0
+  PRE1|NRC                           cells   96 | swaps  24264 (skipped 9120) persisted at boot 10877/24264 on injured-plan days 24264 rounds 1104 | boot diff 476/70056 (names/details/labels differ 476) | reboot diff 476 | undo+boot diff 0
+  PRE5|D190                          cells    6 | swaps    330 (skipped 42) persisted at boot 252/330 on injured-plan days 330 rounds 48 | boot diff 24/1764 (names/details/labels differ 24) | reboot diff 24 | undo+boot diff 0
+  PRE5|FAT                           cells  180 | swaps   9492 (skipped 1296) persisted at boot 6087/9492 on injured-plan days 9492 rounds 1452 | boot diff 511/51408 (names/details/labels differ 511) | reboot diff 511 | undo+boot diff 0
+  PRE5|L432                          cells  432 | swaps  22668 (skipped 3300) persisted at boot 14610/22668 on injured-plan days 22668 rounds 3552 | boot diff 1079/122976 (names/details/labels differ 1079) | reboot diff 1079 | undo+boot diff 0
+  PRE5|LBW                           cells  432 | swaps  22488 (skipped 2880) persisted at boot 15190/22488 on injured-plan days 22488 rounds 3528 | boot diff 1080/118944 (names/details/labels differ 1080) | reboot diff 1080 | undo+boot diff 0
+  PRE5|LBWX                          cells  432 | swaps  23136 (skipped 3072) persisted at boot 15066/23136 on injured-plan days 23136 rounds 3696 | boot diff 916/116928 (names/details/labels differ 916) | reboot diff 916 | undo+boot diff 0
+  PRE5|MARIO                         cells    1 | swaps     55 (skipped 7) persisted at boot 49/55 on injured-plan days 55 rounds 8 | boot diff 2/294 (names/details/labels differ 2) | reboot diff 2 | undo+boot diff 0
+  PRE5|NRC                           cells   96 | swaps  14424 (skipped 6576) persisted at boot 6259/14424 on injured-plan days 14424 rounds 1104 | boot diff 276/67368 (names/details/labels differ 276) | reboot diff 276 | undo+boot diff 0
+  UNINJ|D190                         cells    8 | swaps   1450 (skipped 252) persisted at boot 1439/1450 on injured-plan days 0 rounds 68 | boot diff 0/2842 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|FAT                          cells   15 | swaps   2387 (skipped 312) persisted at boot 2384/2387 on injured-plan days 0 rounds 124 | boot diff 0/4410 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|L432                         cells   36 | swaps   5697 (skipped 780) persisted at boot 5688/5697 on injured-plan days 0 rounds 302 | boot diff 0/10290 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|LBW                          cells   36 | swaps   5592 (skipped 738) persisted at boot 5572/5592 on injured-plan days 0 rounds 306 | boot diff 0/9996 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|LBWX                         cells   36 | swaps   5836 (skipped 732) persisted at boot 5810/5836 on injured-plan days 0 rounds 320 | boot diff 0/10080 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|MARIO                        cells    1 | swaps    166 (skipped 20) persisted at boot 165/166 on injured-plan days 0 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|NRC                          cells    8 | swaps   2022 (skipped 760) persisted at boot 1994/2022 on injured-plan days 0 rounds 92 | boot diff 0/5838 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+
+-- by pres|tier
+  FIX|protect                        cells  786 | swaps 110401 (skipped 42578) persisted at boot 110401/110401 on injured-plan days 110401 rounds 6774 | boot diff 0/275422 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|workaround                     cells  793 | swaps 124455 (skipped 21047) persisted at boot 124455/124455 on injured-plan days 124455 rounds 6885 | boot diff 0/241780 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|protect                        cells  786 | swaps 110401 (skipped 42578) persisted at boot 110401/110401 on injured-plan days 110401 rounds 6774 | boot diff 0/275422 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|workaround                     cells  793 | swaps 124455 (skipped 21047) persisted at boot 124455/124455 on injured-plan days 124455 rounds 6885 | boot diff 0/241780 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|protect                        cells  786 | swaps 110401 (skipped 42578) persisted at boot 110401/110401 on injured-plan days 110401 rounds 6774 | boot diff 0/275422 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|workaround                     cells  793 | swaps 124455 (skipped 21047) persisted at boot 124455/124455 on injured-plan days 124455 rounds 6885 | boot diff 0/241780 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|protect                        cells  786 | swaps  40352 (skipped 15383) persisted at boot 40352/40352 on injured-plan days 40352 rounds 6584 | boot diff 0/267386 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|workaround                     cells  793 | swaps  45154 (skipped 8058) persisted at boot 45154/45154 on injured-plan days 45154 rounds 6709 | boot diff 0/235144 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OVOV|protect                       cells  786 | swaps 110401 (skipped 42578) persisted at boot 59621/110401 on injured-plan days 110401 rounds 6774 | boot diff 2540/275422 (names/details/labels differ 2540) | reboot diff 2540 | undo+boot diff 0
+  OVOV|workaround                    cells  793 | swaps 124455 (skipped 21047) persisted at boot 89951/124455 on injured-plan days 124455 rounds 6885 | boot diff 4621/241780 (names/details/labels differ 4621) | reboot diff 4621 | undo+boot diff 0
+  OVT|protect                        cells  786 | swaps 110401 (skipped 42578) persisted at boot 78040/110401 on injured-plan days 110401 rounds 6774 | boot diff 53/275422 (names/details/labels differ 53) | reboot diff 53 | undo+boot diff 0
+  OVT|workaround                     cells  793 | swaps 124455 (skipped 21047) persisted at boot 78991/124455 on injured-plan days 124455 rounds 6885 | boot diff 1256/241780 (names/details/labels differ 1256) | reboot diff 1256 | undo+boot diff 0
+  PRE1|protect                       cells  786 | swaps 129204 (skipped 19932) persisted at boot 68306/129204 on injured-plan days 129204 rounds 6864 | boot diff 4042/243684 (names/details/labels differ 4042) | reboot diff 4042 | undo+boot diff 0
+  PRE1|workaround                    cells  793 | swaps 130366 (skipped 20072) persisted at boot 95561/130366 on injured-plan days 130366 rounds 6920 | boot diff 6247/245742 (names/details/labels differ 6247) | reboot diff 6247 | undo+boot diff 0
+  PRE5|protect                       cells  786 | swaps  46104 (skipped 8562) persisted at boot 23928/46104 on injured-plan days 46104 rounds 6666 | boot diff 1720/238812 (names/details/labels differ 1720) | reboot diff 1720 | undo+boot diff 0
+  PRE5|workaround                    cells  793 | swaps  46489 (skipped 8611) persisted at boot 33585/46489 on injured-plan days 46489 rounds 6722 | boot diff 2168/240870 (names/details/labels differ 2168) | reboot diff 2168 | undo+boot diff 0
+  UNINJ|none                         cells    2 | swaps    454 (skipped 132) persisted at boot 449/454 on injured-plan days 0 rounds 20 | boot diff 0/1078 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|workaround                   cells  138 | swaps  22696 (skipped 3462) persisted at boot 22603/22696 on injured-plan days 0 rounds 1200 | boot diff 0/42672 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+
+-- by pres|region
+  FIX|ankle                          cells  263 | swaps  40491 (skipped 6846) persisted at boot 40491/40491 on injured-plan days 40491 rounds 2260 | boot diff 0/80234 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|elbow                          cells  263 | swaps  37454 (skipped 17935) persisted at boot 37454/37454 on injured-plan days 37454 rounds 2476 | boot diff 0/97272 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|hip                            cells  263 | swaps  39829 (skipped 7060) persisted at boot 39829/39829 on injured-plan days 39829 rounds 2085 | boot diff 0/81242 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|knee                           cells  264 | swaps  39465 (skipped 7176) persisted at boot 39465/39465 on injured-plan days 39465 rounds 2076 | boot diff 0/80332 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|lowback                        cells  263 | swaps  40014 (skipped 7046) persisted at boot 40014/40014 on injured-plan days 40014 rounds 2273 | boot diff 0/79506 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|shoulder                       cells  263 | swaps  37603 (skipped 17562) persisted at boot 37603/37603 on injured-plan days 37603 rounds 2489 | boot diff 0/98616 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|ankle                          cells  263 | swaps  39829 (skipped 7060) persisted at boot 39829/39829 on injured-plan days 39829 rounds 2085 | boot diff 0/81242 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|elbow                          cells  263 | swaps  39309 (skipped 7150) persisted at boot 39309/39309 on injured-plan days 39309 rounds 2068 | boot diff 0/80038 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|hip                            cells  263 | swaps  40014 (skipped 7046) persisted at boot 40014/40014 on injured-plan days 40014 rounds 2273 | boot diff 0/79506 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|knee                           cells  264 | swaps  40647 (skipped 6872) persisted at boot 40647/40647 on injured-plan days 40647 rounds 2268 | boot diff 0/80528 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|lowback                        cells  263 | swaps  37603 (skipped 17562) persisted at boot 37603/37603 on injured-plan days 37603 rounds 2489 | boot diff 0/98616 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|shoulder                       cells  263 | swaps  37454 (skipped 17935) persisted at boot 37454/37454 on injured-plan days 37454 rounds 2476 | boot diff 0/97272 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|ankle                          cells  263 | swaps  40491 (skipped 6846) persisted at boot 40491/40491 on injured-plan days 40491 rounds 2260 | boot diff 0/80234 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|elbow                          cells  263 | swaps  37454 (skipped 17935) persisted at boot 37454/37454 on injured-plan days 37454 rounds 2476 | boot diff 0/97272 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|hip                            cells  263 | swaps  39829 (skipped 7060) persisted at boot 39829/39829 on injured-plan days 39829 rounds 2085 | boot diff 0/81242 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|knee                           cells  264 | swaps  39465 (skipped 7176) persisted at boot 39465/39465 on injured-plan days 39465 rounds 2076 | boot diff 0/80332 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|lowback                        cells  263 | swaps  40014 (skipped 7046) persisted at boot 40014/40014 on injured-plan days 40014 rounds 2273 | boot diff 0/79506 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|shoulder                       cells  263 | swaps  37603 (skipped 17562) persisted at boot 37603/37603 on injured-plan days 37603 rounds 2489 | boot diff 0/98616 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|ankle                          cells  263 | swaps  14846 (skipped 2599) persisted at boot 14846/14846 on injured-plan days 14846 rounds 2212 | boot diff 0/79562 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|elbow                          cells  263 | swaps  13701 (skipped 6597) persisted at boot 13701/13701 on injured-plan days 13701 rounds 2435 | boot diff 0/95634 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|hip                            cells  263 | swaps  14502 (skipped 2565) persisted at boot 14502/14502 on injured-plan days 14502 rounds 2042 | boot diff 0/79814 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|knee                           cells  264 | swaps  14443 (skipped 2856) persisted at boot 14443/14443 on injured-plan days 14443 rounds 2041 | boot diff 0/79408 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|lowback                        cells  263 | swaps  14497 (skipped 2517) persisted at boot 14497/14497 on injured-plan days 14497 rounds 2223 | boot diff 0/78162 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|shoulder                       cells  263 | swaps  13517 (skipped 6307) persisted at boot 13517/13517 on injured-plan days 13517 rounds 2340 | boot diff 0/89950 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OVOV|ankle                         cells  263 | swaps  40491 (skipped 6846) persisted at boot 30330/40491 on injured-plan days 40491 rounds 2260 | boot diff 216/80234 (names/details/labels differ 216) | reboot diff 216 | undo+boot diff 0
+  OVOV|elbow                         cells  263 | swaps  37454 (skipped 17935) persisted at boot 19277/37454 on injured-plan days 37454 rounds 2476 | boot diff 697/97272 (names/details/labels differ 697) | reboot diff 697 | undo+boot diff 0
+  OVOV|hip                           cells  263 | swaps  39829 (skipped 7060) persisted at boot 22469/39829 on injured-plan days 39829 rounds 2085 | boot diff 3901/81242 (names/details/labels differ 3901) | reboot diff 3901 | undo+boot diff 0
+  OVOV|knee                          cells  264 | swaps  39465 (skipped 7176) persisted at boot 36134/39465 on injured-plan days 39465 rounds 2076 | boot diff 44/80332 (names/details/labels differ 44) | reboot diff 44 | undo+boot diff 0
+  OVOV|lowback                       cells  263 | swaps  40014 (skipped 7046) persisted at boot 11536/40014 on injured-plan days 40014 rounds 2273 | boot diff 1772/79506 (names/details/labels differ 1772) | reboot diff 1772 | undo+boot diff 0
+  OVOV|shoulder                      cells  263 | swaps  37603 (skipped 17562) persisted at boot 29826/37603 on injured-plan days 37603 rounds 2489 | boot diff 531/98616 (names/details/labels differ 531) | reboot diff 531 | undo+boot diff 0
+  OVT|ankle                          cells  263 | swaps  40491 (skipped 6846) persisted at boot 34146/40491 on injured-plan days 40491 rounds 2260 | boot diff 14/80234 (names/details/labels differ 14) | reboot diff 14 | undo+boot diff 0
+  OVT|elbow                          cells  263 | swaps  37454 (skipped 17935) persisted at boot 16837/37454 on injured-plan days 37454 rounds 2476 | boot diff 69/97272 (names/details/labels differ 69) | reboot diff 69 | undo+boot diff 0
+  OVT|hip                            cells  263 | swaps  39829 (skipped 7060) persisted at boot 26296/39829 on injured-plan days 39829 rounds 2085 | boot diff 114/81242 (names/details/labels differ 114) | reboot diff 114 | undo+boot diff 0
+  OVT|knee                           cells  264 | swaps  39465 (skipped 7176) persisted at boot 30289/39465 on injured-plan days 39465 rounds 2076 | boot diff 12/80332 (names/details/labels differ 12) | reboot diff 12 | undo+boot diff 0
+  OVT|lowback                        cells  263 | swaps  40014 (skipped 7046) persisted at boot 31186/40014 on injured-plan days 40014 rounds 2273 | boot diff 612/79506 (names/details/labels differ 612) | reboot diff 612 | undo+boot diff 0
+  OVT|shoulder                       cells  263 | swaps  37603 (skipped 17562) persisted at boot 18277/37603 on injured-plan days 37603 rounds 2489 | boot diff 488/98616 (names/details/labels differ 488) | reboot diff 488 | undo+boot diff 0
+  PRE1|ankle                         cells  263 | swaps  43234 (skipped 6664) persisted at boot 32408/43234 on injured-plan days 43234 rounds 2296 | boot diff 919/81522 (names/details/labels differ 919) | reboot diff 919 | undo+boot diff 0
+  PRE1|elbow                         cells  263 | swaps  43234 (skipped 6664) persisted at boot 26168/43234 on injured-plan days 43234 rounds 2296 | boot diff 1328/81522 (names/details/labels differ 1328) | reboot diff 1328 | undo+boot diff 0
+  PRE1|hip                           cells  263 | swaps  43234 (skipped 6664) persisted at boot 29129/43234 on injured-plan days 43234 rounds 2296 | boot diff 525/81522 (names/details/labels differ 525) | reboot diff 525 | undo+boot diff 0
+  PRE1|knee                          cells  264 | swaps  43400 (skipped 6684) persisted at boot 30999/43400 on injured-plan days 43400 rounds 2304 | boot diff 885/81816 (names/details/labels differ 885) | reboot diff 885 | undo+boot diff 0
+  PRE1|lowback                       cells  263 | swaps  43234 (skipped 6664) persisted at boot 23162/43234 on injured-plan days 43234 rounds 2296 | boot diff 3984/81522 (names/details/labels differ 3984) | reboot diff 3984 | undo+boot diff 0
+  PRE1|shoulder                      cells  263 | swaps  43234 (skipped 6664) persisted at boot 22001/43234 on injured-plan days 43234 rounds 2296 | boot diff 2648/81522 (names/details/labels differ 2648) | reboot diff 2648 | undo+boot diff 0
+  PRE5|ankle                         cells  263 | swaps  15423 (skipped 2861) persisted at boot 11489/15423 on injured-plan days 15423 rounds 2230 | boot diff 302/79898 (names/details/labels differ 302) | reboot diff 302 | undo+boot diff 0
+  PRE5|elbow                         cells  263 | swaps  15423 (skipped 2861) persisted at boot 9587/15423 on injured-plan days 15423 rounds 2230 | boot diff 434/79898 (names/details/labels differ 434) | reboot diff 434 | undo+boot diff 0
+  PRE5|hip                           cells  263 | swaps  15423 (skipped 2861) persisted at boot 9987/15423 on injured-plan days 15423 rounds 2230 | boot diff 319/79898 (names/details/labels differ 319) | reboot diff 319 | undo+boot diff 0
+  PRE5|knee                          cells  264 | swaps  15478 (skipped 2868) persisted at boot 11013/15478 on injured-plan days 15478 rounds 2238 | boot diff 262/80192 (names/details/labels differ 262) | reboot diff 262 | undo+boot diff 0
+  PRE5|lowback                       cells  263 | swaps  15423 (skipped 2861) persisted at boot 7533/15423 on injured-plan days 15423 rounds 2230 | boot diff 1737/79898 (names/details/labels differ 1737) | reboot diff 1737 | undo+boot diff 0
+  PRE5|shoulder                      cells  263 | swaps  15423 (skipped 2861) persisted at boot 7904/15423 on injured-plan days 15423 rounds 2230 | boot diff 834/79898 (names/details/labels differ 834) | reboot diff 834 | undo+boot diff 0
+  UNINJ|ankle                        cells    1 | swaps    166 (skipped 20) persisted at boot 165/166 on injured-plan days 0 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|elbow                        cells    1 | swaps    166 (skipped 20) persisted at boot 165/166 on injured-plan days 0 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|hip                          cells    1 | swaps    166 (skipped 20) persisted at boot 165/166 on injured-plan days 0 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|knee                         cells  133 | swaps  21866 (skipped 3362) persisted at boot 21778/21866 on injured-plan days 0 rounds 1160 | boot diff 0/41202 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|lowback                      cells    1 | swaps    166 (skipped 20) persisted at boot 165/166 on injured-plan days 0 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|none                         cells    2 | swaps    454 (skipped 132) persisted at boot 449/454 on injured-plan days 0 rounds 20 | boot diff 0/1078 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|shoulder                     cells    1 | swaps    166 (skipped 20) persisted at boot 165/166 on injured-plan days 0 rounds 8 | boot diff 0/294 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+
+-- by pres|equip
+  FIX|bodyweight                     cells  360 | swaps  49105 (skipped 13788) persisted at boot 49105/49105 on injured-plan days 49105 rounds 2944 | boot diff 0/108612 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|commercial                     cells  199 | swaps  32973 (skipped 9918) persisted at boot 32973/32973 on injured-plan days 32973 rounds 1715 | boot diff 0/82082 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|crossfit                       cells  408 | swaps  63250 (skipped 16860) persisted at boot 63250/63250 on injured-plan days 63250 rounds 3661 | boot diff 0/141918 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|home_basic                     cells  252 | swaps  35707 (skipped 9805) persisted at boot 35707/35707 on injured-plan days 35707 rounds 2195 | boot diff 0/75978 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  FIX|home_full                      cells  360 | swaps  53821 (skipped 13254) persisted at boot 53821/53821 on injured-plan days 53821 rounds 3144 | boot diff 0/108612 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|bodyweight                     cells  360 | swaps  49105 (skipped 13788) persisted at boot 49105/49105 on injured-plan days 49105 rounds 2944 | boot diff 0/108612 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|commercial                     cells  199 | swaps  32973 (skipped 9918) persisted at boot 32973/32973 on injured-plan days 32973 rounds 1715 | boot diff 0/82082 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|crossfit                       cells  408 | swaps  63250 (skipped 16860) persisted at boot 63250/63250 on injured-plan days 63250 rounds 3661 | boot diff 0/141918 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|home_basic                     cells  252 | swaps  35707 (skipped 9805) persisted at boot 35707/35707 on injured-plan days 35707 rounds 2195 | boot diff 0/75978 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  MIX|home_full                      cells  360 | swaps  53821 (skipped 13254) persisted at boot 53821/53821 on injured-plan days 53821 rounds 3144 | boot diff 0/108612 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|bodyweight                     cells  360 | swaps  49105 (skipped 13788) persisted at boot 49105/49105 on injured-plan days 49105 rounds 2944 | boot diff 0/108612 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|commercial                     cells  199 | swaps  32973 (skipped 9918) persisted at boot 32973/32973 on injured-plan days 32973 rounds 1715 | boot diff 0/82082 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|crossfit                       cells  408 | swaps  63250 (skipped 16860) persisted at boot 63250/63250 on injured-plan days 63250 rounds 3661 | boot diff 0/141918 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|home_basic                     cells  252 | swaps  35707 (skipped 9805) persisted at boot 35707/35707 on injured-plan days 35707 rounds 2195 | boot diff 0/75978 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV1|home_full                      cells  360 | swaps  53821 (skipped 13254) persisted at boot 53821/53821 on injured-plan days 53821 rounds 3144 | boot diff 0/108612 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|bodyweight                     cells  360 | swaps  16688 (skipped 4532) persisted at boot 16688/16688 on injured-plan days 16688 rounds 2899 | boot diff 0/106722 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|commercial                     cells  199 | swaps  14143 (skipped 4719) persisted at boot 14143/14143 on injured-plan days 14143 rounds 1691 | boot diff 0/79828 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|crossfit                       cells  408 | swaps  24218 (skipped 7014) persisted at boot 24218/24218 on injured-plan days 24218 rounds 3566 | boot diff 0/137396 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|home_basic                     cells  252 | swaps  12127 (skipped 3105) persisted at boot 12127/12127 on injured-plan days 12127 rounds 2088 | boot diff 0/74172 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OV5|home_full                      cells  360 | swaps  18330 (skipped 4071) persisted at boot 18330/18330 on injured-plan days 18330 rounds 3049 | boot diff 0/104412 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  OVOV|bodyweight                    cells  360 | swaps  49105 (skipped 13788) persisted at boot 33500/49105 on injured-plan days 49105 rounds 2944 | boot diff 1316/108612 (names/details/labels differ 1316) | reboot diff 1316 | undo+boot diff 0
+  OVOV|commercial                    cells  199 | swaps  32973 (skipped 9918) persisted at boot 20729/32973 on injured-plan days 32973 rounds 1715 | boot diff 1124/82082 (names/details/labels differ 1124) | reboot diff 1124 | undo+boot diff 0
+  OVOV|crossfit                      cells  408 | swaps  63250 (skipped 16860) persisted at boot 39443/63250 on injured-plan days 63250 rounds 3661 | boot diff 1854/141918 (names/details/labels differ 1854) | reboot diff 1854 | undo+boot diff 0
+  OVOV|home_basic                    cells  252 | swaps  35707 (skipped 9805) persisted at boot 22351/35707 on injured-plan days 35707 rounds 2195 | boot diff 1040/75978 (names/details/labels differ 1040) | reboot diff 1040 | undo+boot diff 0
+  OVOV|home_full                     cells  360 | swaps  53821 (skipped 13254) persisted at boot 33549/53821 on injured-plan days 53821 rounds 3144 | boot diff 1827/108612 (names/details/labels differ 1827) | reboot diff 1827 | undo+boot diff 0
+  OVT|bodyweight                     cells  360 | swaps  49105 (skipped 13788) persisted at boot 35055/49105 on injured-plan days 49105 rounds 2944 | boot diff 638/108612 (names/details/labels differ 638) | reboot diff 638 | undo+boot diff 0
+  OVT|commercial                     cells  199 | swaps  32973 (skipped 9918) persisted at boot 23236/32973 on injured-plan days 32973 rounds 1715 | boot diff 142/82082 (names/details/labels differ 142) | reboot diff 142 | undo+boot diff 0
+  OVT|crossfit                       cells  408 | swaps  63250 (skipped 16860) persisted at boot 38805/63250 on injured-plan days 63250 rounds 3661 | boot diff 64/141918 (names/details/labels differ 64) | reboot diff 64 | undo+boot diff 0
+  OVT|home_basic                     cells  252 | swaps  35707 (skipped 9805) persisted at boot 24266/35707 on injured-plan days 35707 rounds 2195 | boot diff 303/75978 (names/details/labels differ 303) | reboot diff 303 | undo+boot diff 0
+  OVT|home_full                      cells  360 | swaps  53821 (skipped 13254) persisted at boot 35669/53821 on injured-plan days 53821 rounds 3144 | boot diff 162/108612 (names/details/labels differ 162) | reboot diff 162 | undo+boot diff 0
+  PRE1|bodyweight                    cells  360 | swaps  54408 (skipped 7968) persisted at boot 36188/54408 on injured-plan days 54408 rounds 2880 | boot diff 2360/101304 (names/details/labels differ 2360) | reboot diff 2360 | undo+boot diff 0
+  PRE1|commercial                    cells  199 | swaps  36310 (skipped 7700) persisted at boot 21189/36310 on injured-plan days 36310 rounds 1712 | boot diff 1569/79674 (names/details/labels differ 1569) | reboot diff 1569 | undo+boot diff 0
+  PRE1|crossfit                      cells  408 | swaps  69072 (skipped 12264) persisted at boot 40761/69072 on injured-plan days 69072 rounds 3768 | boot diff 2252/135576 (names/details/labels differ 2252) | reboot diff 2252 | undo+boot diff 0
+  PRE1|home_basic                    cells  252 | swaps  40464 (skipped 4896) persisted at boot 26572/40464 on injured-plan days 40464 rounds 2232 | boot diff 1567/71064 (names/details/labels differ 1567) | reboot diff 1567 | undo+boot diff 0
+  PRE1|home_full                     cells  360 | swaps  59316 (skipped 7176) persisted at boot 39157/59316 on injured-plan days 59316 rounds 3192 | boot diff 2541/101808 (names/details/labels differ 2541) | reboot diff 2541 | undo+boot diff 0
+  PRE5|bodyweight                    cells  360 | swaps  18312 (skipped 2472) persisted at boot 12254/18312 on injured-plan days 18312 rounds 2880 | boot diff 950/100800 (names/details/labels differ 950) | reboot diff 950 | undo+boot diff 0
+  PRE5|commercial                    cells  199 | swaps  15217 (skipped 4417) persisted at boot 8371/15217 on injured-plan days 15217 rounds 1712 | boot diff 626/77826 (names/details/labels differ 626) | reboot diff 626 | undo+boot diff 0
+  PRE5|crossfit                      cells  408 | swaps  25968 (skipped 6072) persisted at boot 14983/25968 on injured-plan days 25968 rounds 3660 | boot diff 776/131712 (names/details/labels differ 776) | reboot diff 776 | undo+boot diff 0
+  PRE5|home_basic                    cells  252 | swaps  13440 (skipped 1692) persisted at boot 8860/13440 on injured-plan days 13440 rounds 2052 | boot diff 620/70056 (names/details/labels differ 620) | reboot diff 620 | undo+boot diff 0
+  PRE5|home_full                     cells  360 | swaps  19656 (skipped 2520) persisted at boot 13045/19656 on injured-plan days 19656 rounds 3084 | boot diff 916/99288 (names/details/labels differ 916) | reboot diff 916 | undo+boot diff 0
+  UNINJ|bodyweight                   cells   30 | swaps   4534 (skipped 664) persisted at boot 4534/4534 on injured-plan days 0 rounds 240 | boot diff 0/8442 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|commercial                   cells   24 | swaps   4257 (skipped 790) persisted at boot 4231/4257 on injured-plan days 0 rounds 202 | boot diff 0/8820 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|crossfit                     cells   35 | swaps   6044 (skipped 1134) persisted at boot 6008/6044 on injured-plan days 0 rounds 326 | boot diff 0/12082 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|home_basic                   cells   21 | swaps   3372 (skipped 408) persisted at boot 3349/3372 on injured-plan days 0 rounds 186 | boot diff 0/5922 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+  UNINJ|home_full                    cells   30 | swaps   4943 (skipped 598) persisted at boot 4930/4943 on injured-plan days 0 rounds 266 | boot diff 0/8484 (names/details/labels differ 0) | reboot diff 0 | undo+boot diff 0
+
+REACHABLE TOTAL (FIX+OV1+OV5+UNINJ+PRE1+PRE5+OVOV+OVT): boot diff 22647/3584196 booted days over 1400243 swaps in 11193 cell-runs | reboot 22647 | undo+boot 0
+MIX (INFO): boot diff 0/517202 over 234856 swaps in 1579 cell-runs
+
+-- examples FIX: 0 cells with a diff
+
+-- examples OV1: 0 cells with a diff
+
+-- examples OV5: 0 cells with a diff
+
+-- examples UNINJ: 0 cells with a diff
+
+-- examples MIX: 0 cells with a diff
+
+-- examples PRE1: 1259 cells with a diff | by swap-in Mountain climbers -> Burpees 587 | High knees -> Burpees 476 | Mountain climbers -> High knees 278 | Back squat -> Front squat 266 | Ball slams -> Broad jumps 238 | Overhead dumbbell extension -> Dumbbell skullcrushers 176 | Side plank -> Ab wheel rollouts 149 | Incline dumbbell curl -> Barbell curl 132 | Dumbbell incline press -> Dumbbell Arnold press 109 | Machine chest press -> Bench dips 90 | Band woodchopper (door anchor) -> Ab wheel rollouts 88 | Medicine ball rotary toss -> Ab wheel rollouts 80 | Standing torso rotations (slow) -> Ab wheel rollouts 80 | Bird dogs -> Ab wheel rollouts 75
+  D190 knee/workaround|commercial|beginner|support_strength|sun,wed W3 sat plan {"region":"knee","tier":"workaround"} swap Mountain climbers -> High knees @1.0 jsonOnly false
+     built Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Feet-elevated inverted rows|2 sets — RPE 7 (leave 3 or more in reserve)} Explosive finisher{Mountain climbers|2×15;Burpees|2×10}
+     live  Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Feet-elevated inverted rows|2 sets — RPE 7 (leave 3 or more in reserve)} Explosive finisher{High knees|2×15;Burpees|2×10}
+     clean Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Feet-elevated inverted rows|2 sets — RPE 7 (leave 3 or more in reserve)}
+     mut   Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Feet-elevated inverted rows|2 sets — RPE 7 (leave 3 or more in reserve)} Explosive finisher{High knees|2×15}
+  D190 ankle/workaround|commercial|beginner|support_strength|sun,wed W3 sat plan {"region":"ankle","tier":"workaround"} swap Mountain climbers -> High knees @1.0 jsonOnly false
+     built Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Feet-elevated inverted rows|2 sets — RPE 7 (leave 3 or more in reserve)} Explosive finisher{Mountain climbers|2×15;Burpees|2×10}
+     live  Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Feet-elevated inverted rows|2 sets — RPE 7 (leave 3 or more in reserve)} Explosive finisher{High knees|2×15;Burpees|2×10}
+     clean Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Feet-elevated inverted rows|2 sets — RPE 7 (leave 3 or more in reserve)}
+     mut   Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Feet-elevated inverted rows|2 sets — RPE 7 (leave 3 or more in reserve)} Explosive finisher{High knees|2×15}
+  D190 hip/workaround|commercial|beginner|support_strength|sun,wed W5 tue plan {"region":"hip","tier":"workaround"} swap Incline dumbbell curl -> Barbell curl @3.0 jsonOnly false
+     built Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull superset B{Dumbbell row|2×8–12 each @ RPE 8;Kettlebell swing|2×10} Biceps{Incline dumbbell curl|3×10–12 @ RPE 8}
+     live  Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull superset B{Dumbbell row|2×8–12 each @ RPE 8;Kettlebell swing|2×10} Biceps{Barbell curl|3×10–12 @ RPE 8}
+     clean Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull{Dumbbell row|2×8–12 each @ RPE 8} Biceps{Barbell curl|3×10–12 @ RPE 8}
+     mut   Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull{Dumbbell row|2×8–12 each @ RPE 8} Biceps{Barbell curl|3×10–12 @ RPE 8;Barbell curl|3×10–12 @ RPE 8}
+
+-- examples PRE5: 983 cells with a diff | by swap-in Mountain climbers -> Burpees 741 | Incline dumbbell curl -> Barbell curl 277 | Pallof press -> Ab wheel rollouts 195 | High knees -> Burpees 180 | Dumbbell incline press -> Dumbbell Arnold press 146 | Standing torso rotations (slow) -> Ab wheel rollouts 79 | Overhead dumbbell extension -> Dumbbell skullcrushers 72 | Machine chest press -> Bench dips 68 | Band woodchopper (door anchor) -> Ab wheel rollouts 54 | Dumbbell front raise -> Dumbbell lateral raise 50 | Bird dogs -> Ab wheel rollouts 49 | Side plank thread-the-needle -> Ab wheel rollouts 49 | Single-arm resistance band row -> Resistanc
+  D190 knee/workaround|commercial|beginner|support_strength|sun,wed W5 sat plan {"region":"knee","tier":"workaround"} swap Mountain climbers -> Burpees @1.0 jsonOnly false
+     built Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Mountain climbers|2×15;Jump squats|2×10}
+     live  Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15;Jump squats|2×10}
+     clean Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Kettlebell swing|2×10}
+     mut   Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15;Kettlebell swing|2×10}
+     field 1.0 C={"name":"Kettlebell swing","detail":"2×10"} M={"name":"Burpees","detail":"2×15","_preHold":"2×15"}
+  D190 ankle/workaround|commercial|beginner|support_strength|sun,wed W5 sat plan {"region":"ankle","tier":"workaround"} swap Mountain climbers -> Burpees @1.0 jsonOnly false
+     built Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Mountain climbers|2×15;Jump squats|2×10}
+     live  Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15;Jump squats|2×10}
+     clean Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Kettlebell swing|2×10}
+     mut   Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15;Kettlebell swing|2×10}
+     field 1.0 C={"name":"Kettlebell swing","detail":"2×10"} M={"name":"Burpees","detail":"2×15","_preHold":"2×15"}
+  D190 hip/workaround|commercial|beginner|support_strength|sun,wed W5 tue plan {"region":"hip","tier":"workaround"} swap Incline dumbbell curl -> Barbell curl @3.0 jsonOnly false
+     built Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull superset B{Dumbbell row|2×8–12 each @ RPE 8;Kettlebell swing|2×10} Biceps{Incline dumbbell curl|3×10–12 @ RPE 8}
+     live  Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull superset B{Dumbbell row|2×8–12 each @ RPE 8;Kettlebell swing|2×10} Biceps{Barbell curl|3×10–12 @ RPE 8}
+     clean Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull{Dumbbell row|2×8–12 each @ RPE 8} Biceps{Barbell curl|3×10–12 @ RPE 8}
+     mut   Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull{Dumbbell row|2×8–12 each @ RPE 8} Biceps{Barbell curl|3×10–12 @ RPE 8;Barbell curl|3×10–12 @ RPE 8}
+
+-- examples OVOV: 756 cells with a diff | by swap-in Mountain climbers -> High knees 212 | Incline dumbbell curl -> Barbell curl 211 | Mountain climbers -> Burpees 211 | Side plank -> Ab wheel rollouts 162 | Dumbbell curl -> Barbell curl 160 | Dumbbell incline press -> Dumbbell Arnold press 137 | Band woodchopper (door anchor) -> Ab wheel rollouts 116 | Standing torso rotations (slow) -> Ab wheel rollouts 108 | Kettlebell single-arm press -> Dumbbell Arnold press 82 | Medicine ball rotary toss -> Ab wheel rollouts 77 | Landmine rotations -> Ab wheel rollouts 73 | Side plank thread-the-needle -> Ab wheel rollouts 68 | Chinups -> Inverted row (kne
+  D190 ankle/workaround|commercial|beginner|support_strength|sun,wed W5 tue plan {"region":"hip","tier":"workaround"} swap Incline dumbbell curl -> Barbell curl @3.0 jsonOnly false
+     built Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull superset B{Dumbbell row|2×8–12 each @ RPE 8;Kettlebell swing|2×10} Biceps{Incline dumbbell curl|3×10–12 @ RPE 8}
+     live  Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull superset B{Dumbbell row|2×8–12 each @ RPE 8;Kettlebell swing|2×10} Biceps{Barbell curl|3×10–12 @ RPE 8}
+     clean Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull{Dumbbell row|2×8–12 each @ RPE 8} Biceps{Barbell curl|3×10–12 @ RPE 8}
+     mut   Main — Sumo deadlift{Sumo deadlift|4×3 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest} Pull superset A{Barbell row|2×6–10 @ RPE 8;L-sit chinups|2 sets — RPE 8 (stop 2 reps short of failure)} Pull{Dumbbell row|2×8–12 each @ RPE 8} Biceps{Barbell curl|3×10–12 @ RPE 8;Barbell curl|3×10–12 @ RPE 8}
+  D190 hip/workaround|commercial|beginner|support_strength|sun,wed W2 mon plan {"region":"lowback","tier":"workaround"} swap Medicine ball rotary toss -> Ab wheel rollouts @4.0 jsonOnly false
+     built Main — Close-grip bench press{Close-grip bench press|4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form} Secondary compound — Dumbbell incline press{Dumbbell incline press|3×8–12 @ RPE 6–7} Chest volume{Diamond pushups|3 sets — RPE 6 (leave 3 or more in reserve)} Delts{Dumbbell rear delt fly|3×10–15 @ RPE 6–7} {Medicine ball rotary toss|3×8 each;Cable woodchoppers|3×12 each}
+     live  Main — Close-grip bench press{Close-grip bench press|4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form} Secondary compound — Dumbbell incline press{Dumbbell incline press|3×8–12 @ RPE 6–7} Chest volume{Diamond pushups|3 sets — RPE 6 (leave 3 or more in reserve)} Delts{Dumbbell rear delt fly|3×10–15 @ RPE 6–7} {Ab wheel rollouts|3×8 each;Cable woodchoppers|3×12 each}
+     clean Main — Close-grip bench press{Close-grip bench press|4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form} Secondary compound — Dumbbell incline press{Dumbbell incline press|3×8–12 @ RPE 6–7} Chest volume{Diamond pushups|3 sets — RPE 6 (leave 3 or more in reserve)} Delts{Dumbbell rear delt fly|3×10–15 @ RPE 6–7} {Dead bugs|3×8 each;Cable woodchoppers|3×12 each}
+     mut   Main — Close-grip bench press{Close-grip bench press|4×5 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest — 3 min rest, focus on form} Secondary compound — Dumbbell incline press{Dumbbell incline press|3×8–12 @ RPE 6–7} Chest volume{Diamond pushups|3 sets — RPE 6 (leave 3 or more in reserve)} Delts{Dumbbell rear delt fly|3×10–15 @ RPE 6–7} {Ab wheel rollouts|3×8 each;Cable woodchoppers|3×12 each}
+     field 4.0 C={"name":"Dead bugs","detail":"3×8 each","_preHold":"3×8 each"} M={"name":"Ab wheel rollouts","detail":"3×8 each","_preHold":"3×8 each"}
+  D190 lowback/workaround|commercial|beginner|support_strength|sun,wed W1 fri plan {"region":"shoulder","tier":"workaround"} swap Machine chest press -> Bench dips @0.0 jsonOnly false
+     built Main — Machine chest press{Machine chest press|2×12 — RPE 6–7, leave 3+ in reserve — 3 min rest, focus on form;Kettlebell single-arm press|2×10–15 each @ RPE 6–7} Pump{Diamond pushups|2 sets — RPE 6 (leave 3 or more in reserve);Rope tricep extension|2×12–15 @ RPE 6–7} Delt finisher{Dumbbell rear delt fly|2×15–20 @ RPE 6–7} {Dead bugs|3×8–10;Superman|3×12}
+     live  Main — Bench dips{Bench dips|2×12 — RPE 6–7, leave 3+ in reserve — 3 min rest, focus on form;Kettlebell single-arm press|2×10–15 each @ RPE 6–7} Pump{Diamond pushups|2 sets — RPE 6 (leave 3 or more in reserve);Rope tricep extension|2×12–15 @ RPE 6–7} Delt finisher{Dumbbell rear delt fly|2×15–20 @ RPE 6–7} {Dead bugs|3×8–10;Superman|3×12}
+     clean Main — Bench dips{Kettlebell single-arm press|2×12 each — hold RPE 7, three in the tank} Pump{Dumbbell decline press|2×15 — hold RPE 7, three in the tank;Rope tricep extension|2×12–15 @ RPE 6–7} Delt finisher{Dumbbell rear delt fly|2×20 — hold RPE 7, three in the tank} {Ab wheel rollouts|3×8–10 @ RPE 6–7;Superman|3×12}
+     mut   Main — Bench dips{Bench dips|2×12 — RPE 6–7, leave 3+ in reserve — 3 min rest, focus on form;Kettlebell single-arm press|2×12 each — hold RPE 7, three in the tank} Pump{Dumbbell decline press|2×15 — hold RPE 7, three in the tank;Rope tricep extension|2×12–15 @ RPE 6–7} Delt finisher{Dumbbell rear delt fly|2×20 — hold RPE 7, three in the tank} {Ab wheel rollouts|3×8–10 @ RPE 6–7;Superman|3×12}
+     field 0.0 C={"name":"Kettlebell single-arm press","detail":"2×12 each — hold RPE 7, three in the tank"} M={"name":"Bench dips","detail":"2×12 — RPE 6–7, leave 3+ in reserve — 3 min rest, focus on form","_preHold":"2×12 — RPE 6–7, leave 3+ in reserve — 3 min rest, focus on form"}
+
+-- examples OVT: 328 cells with a diff | by swap-in Mountain climbers -> Burpees 263 | Bird dogs -> Ab wheel rollouts 88 | Single-leg hip thrust (shoulders on bed) -> Bodyweight back extension 72 | Single-arm resistance band row -> Resistance band row 63 | Inverted row (knees bent, under a table) -> Feet-elevated inverted row (under a table) 60 | Banded hip thrust -> Bodyweight back extension 54 | Incline dumbbell curl -> Barbell curl 24 | Side plank -> Bird dogs 18 | Single-leg glute bridge -> Bodyweight back extension 18 | Single-leg glute bridge -> Nordic hamstring curl (anchored) 14 | Side plank -> Ab wheel rollouts 12 | Chinups -> L-sit ch
+  D190 hip/workaround|commercial|beginner|support_strength|sun,wed W5 sat plan {"region":"hip","tier":"protect"} swap Mountain climbers -> Burpees @1.0 jsonOnly false
+     built Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Mountain climbers|2×15}
+     live  Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15}
+     clean Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15}
+     mut   Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15;Burpees|2×10}
+  D190 lowback/workaround|commercial|beginner|support_strength|sun,wed W5 sat plan {"region":"lowback","tier":"protect"} swap Mountain climbers -> Burpees @1.0 jsonOnly false
+     built Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 7 (leave 3 or more in reserve)} Explosive finisher{Mountain climbers|2×15}
+     live  Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 7 (leave 3 or more in reserve)} Explosive finisher{Burpees|2×15}
+     clean Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve)} Explosive finisher{Burpees|2×15}
+     mut   Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve)} Explosive finisher{Burpees|2×15;Burpees|2×10}
+  D190 shoulder/workaround|commercial|beginner|support_strength|sun,wed W5 sat plan {"region":"shoulder","tier":"protect"} swap Mountain climbers -> Burpees @1.0 jsonOnly false
+     built Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Mountain climbers|2×15;Kettlebell swing|2×10}
+     live  Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15;Kettlebell swing|2×10}
+     clean Strength{Inverted rows (bodyweight)|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15} {Pallof press|3×12 each;Dumbbell renegade rows|3×8 each}
+     mut   Strength{Inverted rows (bodyweight)|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15;Burpees|2×10} {Pallof press|3×12 each;Dumbbell renegade rows|3×8 each}
+
+=== (3) IDEMPOTENCE: built (booted, unswapped) lifting days where applyInjuryFilter(day) != day
+-- by pres
+  FIX                          days  50186 | day plan has injury 50186 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  MIX                          days  50186 | day plan has injury 50186 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV1                          days  50186 | day plan has injury 50186 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV5                          days  50186 | day plan has injury 18606 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVOV                         days  50186 | day plan has injury 50186 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVT                          days  50186 | day plan has injury 50186 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE1                         days  50058 | day plan has injury 50058 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE5                         days  50058 | day plan has injury 18478 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  UNINJ                        days   4462 | day plan has injury 0 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+-- by pres|tier
+  FIX|protect                  days  24988 | day plan has injury 24988 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  FIX|workaround               days  25198 | day plan has injury 25198 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  MIX|protect                  days  24988 | day plan has injury 24988 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  MIX|workaround               days  25198 | day plan has injury 25198 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV1|protect                  days  24988 | day plan has injury 24988 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV1|workaround               days  25198 | day plan has injury 25198 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV5|protect                  days  24988 | day plan has injury 9268 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV5|workaround               days  25198 | day plan has injury 9338 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVOV|protect                 days  24988 | day plan has injury 24988 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVOV|workaround              days  25198 | day plan has injury 25198 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVT|protect                  days  24988 | day plan has injury 24988 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVT|workaround               days  25198 | day plan has injury 25198 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE1|protect                 days  24924 | day plan has injury 24924 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE1|workaround              days  25134 | day plan has injury 25134 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE5|protect                 days  24924 | day plan has injury 9204 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE5|workaround              days  25134 | day plan has injury 9274 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  UNINJ|none                   days     98 | day plan has injury 0 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  UNINJ|workaround             days   4364 | day plan has injury 0 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+-- by pres|L
+  FIX|D190                     days    180 | day plan has injury 180 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  FIX|FAT                      days   5400 | day plan has injury 5400 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  FIX|L432                     days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  FIX|LBW                      days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  FIX|LBWX                     days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  FIX|MARIO                    days     30 | day plan has injury 30 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  FIX|NRC                      days   5696 | day plan has injury 5696 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  MIX|D190                     days    180 | day plan has injury 180 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  MIX|FAT                      days   5400 | day plan has injury 5400 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  MIX|L432                     days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  MIX|LBW                      days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  MIX|LBWX                     days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  MIX|MARIO                    days     30 | day plan has injury 30 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  MIX|NRC                      days   5696 | day plan has injury 5696 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV1|D190                     days    180 | day plan has injury 180 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV1|FAT                      days   5400 | day plan has injury 5400 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV1|L432                     days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV1|LBW                      days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV1|LBWX                     days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV1|MARIO                    days     30 | day plan has injury 30 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV1|NRC                      days   5696 | day plan has injury 5696 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV5|D190                     days    180 | day plan has injury 60 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV5|FAT                      days   5400 | day plan has injury 1800 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV5|L432                     days  12960 | day plan has injury 4320 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV5|LBW                      days  12960 | day plan has injury 4320 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV5|LBWX                     days  12960 | day plan has injury 4320 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV5|MARIO                    days     30 | day plan has injury 10 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OV5|NRC                      days   5696 | day plan has injury 3776 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVOV|D190                    days    180 | day plan has injury 180 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVOV|FAT                     days   5400 | day plan has injury 5400 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVOV|L432                    days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVOV|LBW                     days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVOV|LBWX                    days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVOV|MARIO                   days     30 | day plan has injury 30 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVOV|NRC                     days   5696 | day plan has injury 5696 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVT|D190                     days    180 | day plan has injury 180 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVT|FAT                      days   5400 | day plan has injury 5400 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVT|L432                     days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVT|LBW                      days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVT|LBWX                     days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVT|MARIO                    days     30 | day plan has injury 30 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  OVT|NRC                      days   5696 | day plan has injury 5696 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE1|D190                    days    180 | day plan has injury 180 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE1|FAT                     days   5400 | day plan has injury 5400 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE1|L432                    days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE1|LBW                     days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE1|LBWX                    days  12960 | day plan has injury 12960 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE1|MARIO                   days     30 | day plan has injury 30 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE1|NRC                     days   5568 | day plan has injury 5568 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE5|D190                    days    180 | day plan has injury 60 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE5|FAT                     days   5400 | day plan has injury 1800 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE5|L432                    days  12960 | day plan has injury 4320 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE5|LBW                     days  12960 | day plan has injury 4320 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE5|LBWX                    days  12960 | day plan has injury 4320 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE5|MARIO                   days     30 | day plan has injury 10 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  PRE5|NRC                     days   5568 | day plan has injury 3648 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  UNINJ|D190                   days    278 | day plan has injury 0 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  UNINJ|FAT                    days    450 | day plan has injury 0 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  UNINJ|L432                   days   1080 | day plan has injury 0 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  UNINJ|LBW                    days   1080 | day plan has injury 0 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  UNINJ|LBWX                   days   1080 | day plan has injury 0 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  UNINJ|MARIO                  days     30 | day plan has injury 0 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+  UNINJ|NRC                    days    464 | day plan has injury 0 | _dayPlanCfg injury != hand injury 0 | non-idempotent under _dayPlanCfg 0 (sig 0) | under hand injury 0 (sig 0)
+-- non-idempotent examples: 0 cells
+## CLASSIFY (late presentations, sampled examples)
+PRE1 sampled diffs 3394 | mutant keeps a card the clean boot removed (the swapped-in card) 2293 | mutant prints a duplicate name in one section 1101
+PRE5 sampled diffs 2413 | mutant keeps a card the clean boot removed (the swapped-in card) 1634 | mutant prints a duplicate name in one section 779
+OVOV sampled diffs 2076 | mutant keeps a card the clean boot removed (the swapped-in card) 1744 | mutant prints a duplicate name in one section 332
+OVT sampled diffs 728 | mutant prints a duplicate name in one section 457 | mutant keeps a card the clean boot removed (the swapped-in card) 271
+## DUPPROBE
+DUPPROBE FIX 176 cells | cards 34155 | candidates offered 248179 | offered names already on the day 0 (same section 0) | cards with any 0

@@ -48,12 +48,13 @@
 //       carrying a non-core, non-hip section with items; a program is lift-free only if neither holds.
 //   R8b programs WITH a lift day are byte-identical to the pre-edit tree (build pair only: the baseline
 //       carries the candidate's ia-version; against V207 it prints SKIP).
-//   M1  HALF_MANNY digest 0ac7da6b1691a8e1.
+//   M1  HALF_MANNY digest equals its era row MANNY_DIGEST_BY_VERSION[ia-version]; the row must exist
+//       (V231, absorb ruling section 4: the era table, not a typed literal, carries D104a's claim).
 // VERSION PREDICATE (standing ruling 4): D104a ships on ia-version 208. Below 208 every row prints
 // SKIP. R7 runs only with a baseline whose ia-version is 207 or 208.
 'use strict';
 const path = require('path'), fs = require('fs');
-const { load, progDigest, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, progDigest, fixtures, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
@@ -203,6 +204,14 @@ else { const IB = load(BASEFILE);
     else { const strip = p => { const q = clone(p); delete q.created; delete q.id; return JSON.stringify(q); }; const moved = [];
       withLift.forEach(i => { if(strip(IA.buildProgram(clone(CF[i].cfg))) !== strip(IB.buildProgram(clone(CF[i].cfg)))) moved.push(CF[i].fam + ' race ' + CF[i].cfg.raceDate); });
       ok(`R8b the ${withLift.length} programs with a lift day are byte-identical to the pre-edit tree`, withLift.length > 0 && moved.length === 0, moved.length + ' moved: ' + moved.slice(0, 3).join('; ')); } } }
-{ let hm; try { hm = progDigest(IA.buildProgram(clone(fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
-  ok('M1 HALF_MANNY digest is 0ac7da6b1691a8e1 (NRC: D104a does not reach it)', hm === '0ac7da6b1691a8e1', hm); }
+// V231 (absorb ruling section 4, tests/measure/v231_rulings/v231_absorb_ruling.md; standing rulings
+// 3, 4 and 5): this row defends ITS ruling's claim that it did not move HALF_MANNY. The typed
+// literal is gone: the only object that carries that claim across later rulings is the era table
+// standing ruling 5 governs, so the row compares the built digest to MANNY_DIGEST_BY_VERSION[ia-version]
+// and fails loudly when that row is absent. Re-pointing the literal to a later digest would be the
+// vacuous line standing ruling 3 forbids; deleting the row would be an unruled removal.
+{ const row = MANNY_DIGEST_BY_VERSION[VER], rowOk = typeof row === 'string' && /^[0-9a-f]{16}$/.test(row);
+  let hm; try { hm = progDigest(IA.buildProgram(clone(fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
+  ok('M1 HALF_MANNY digest equals its era row MANNY_DIGEST_BY_VERSION[' + VER + '] = ' + row + ', and that row exists (NRC: D104a does not reach it)',
+     rowOk && hm === row, rowOk ? hm : 'NO ERA ROW for ia-version ' + VER + ' (built ' + hm + ')'); }
 done();

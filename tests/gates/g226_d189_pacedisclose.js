@@ -24,6 +24,12 @@
 //
 // VERSION PREDICATE (standing rulings 2 and 4). D189 ships at 226.
 //   226 and up    every row asserts the D189 truth.
+//   231 and up    G6b SPLITS (tests/measure/v231_rulings/v231_absorb_ruling.md section 3; standing rulings 2 and 4):
+//                 it keeps the S1 half (exactly one S1 note, on the V225 grid's first paced W1 run card, == the V225
+//                 note + one space + S1) and adds "cells whose lifting days differ from V225 == 640" (D195-B's cost
+//                 lens, class B-1, moved the lifting days of every cell: the ruling printed 640 cells, ops B-1 7,694,
+//                 0 other; V230 reads 0). Its whole-program byte equality with V225 asserts at 230 and below only and
+//                 at 231 and up prints one column-0 SKIP line, never PASS and never FAIL.
 //   225 and below every row asserts the V225 truth where one exists (0 S1 notes, the V209 card sentence,
 //                 the "Optional. It sets your training paces." label, ...); a row with no V225 truth is counted
 //                 in NA, never as a pass.
@@ -36,6 +42,7 @@ const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ARG_BASE = process.argv[3] ? path.resolve(process.argv[3]) : null;
 const ERA = 226, TAG = 'D189';
+const V231_ERA = 231, V231_LIFT = 640;   // V231 absorb ruling section 3, G6b split: typed, the ruling's print (640/640 cells)
 const V225_COMMIT = '35919943d766606dcbf5e09c98a08b5782dc2223';   // "V225: D186/D187 ..." (the V225 artifact, forever)
 
 let pass = 0, fail = 0, na = 0;
@@ -111,7 +118,6 @@ const FEAS_BEG = 'You have not entered a mile time. The beginner default is 11:3
 const FEAS_BEG_V225 = 'Your paces start from the beginner default of 11:30 per mile.';
 const FEAS_INT_V225 = 'You have not entered a mile time. The intermediate default is 9:30 per mile.';
 const HM_CARD = 'Anchored on a 10:30 mile, the time you entered. Every pace in this program comes from this row.';
-const HM_DIGEST = '0ac7da6b1691a8e1';
 const COPY_RX = /\w\s?[-\u2013\u2014]\s?\w/;
 const ASSERTED = [];   // every string G6 to G8 asserted, for G9
 const seen = (where, s) => { if(typeof s === 'string' && s) ASSERTED.push([where, s]); };
@@ -134,7 +140,7 @@ const ROW = {
   G8e: 'G8e ' + TAG + ' intermediate/advanced run_pace_goal, 9:00 typed: "Your mile is 9:00." form and a numeric header',
   G8f: 'G8f ' + TAG + ' beginner run_pace_goal, no mile: the generic feasibility form',
   G9:  'G9 ' + TAG + ' copy: every string asserted in G6 to G8 has 0 mid-sentence dashes and 0 "Nike"',
-  G10: 'G10 ' + TAG + ' HALF_MANNY: MANNY_DIGEST_BY_VERSION[ver] exists, equals 0ac7da6b1691a8e1, and the build prints it',
+  G10: 'G10 ' + TAG + ' HALF_MANNY: MANNY_DIGEST_BY_VERSION[ver] exists, is a 16 hex digest, and the build prints it',
 };
 const guard = (id, fn) => { try { fn(); } catch(e){ ok(ROW[id] + ' (CRASH)', false, String(e && e.stack || e).split('\n').slice(0, 3).join(' | ')); } };
 
@@ -202,6 +208,14 @@ guard('G6a', () => {
 });
 guard('G6b', () => {
   let cells = 0, good = 0; const why = {}, ex = [];
+  // V231 (absorb ruling section 3, G6b SPLIT): a lifting day is a day's `sections`; a cell's lifting days differ from V225
+  // when any week/day's sections JSON differs. Counted on every D189 tree, asserted at 231 and up.
+  const V231 = VER >= V231_ERA; let lcells = 0, lmoved = 0, ldays = 0, outEq = 0;
+  const liftDays = (a, b) => { let n = 0; const wa = a.weeks || {}, wb = b.weeks || {};
+    new Set(Object.keys(wa).concat(Object.keys(wb))).forEach(w => { const da = wa[w] || {}, db = wb[w] || {};
+      new Set(Object.keys(da).concat(Object.keys(db))).forEach(d => { const sa = da[d] && da[d].sections, sb = db[d] && db[d].sections;
+        if(JSON.stringify(sa === undefined ? null : sa) !== JSON.stringify(sb === undefined ? null : sb)) n++; }); }); return n; };
+  const noLift = p => { const c = JSON.parse(JSON.stringify(p)); Object.keys(c.weeks || {}).forEach(w => Object.keys(c.weeks[w] || {}).forEach(d => { const dy = c.weeks[w][d]; if(dy && typeof dy === 'object') delete dy.sections; })); return c; };
   const miss = (k, tag) => { why[k] = (why[k] || 0) + 1; if(ex.length < 4) ex.push(k + ' @ ' + tag); };
   for(const goal of GOALS) for(const exp of EXPS){ if(refused(goal, exp)) continue;
     for(const seed of SEEDS) for(const rest of RESTS){
@@ -210,6 +224,7 @@ guard('G6b', () => {
       if(!D189){ const n = countS1(pc); if(n === 0) good++; else miss('V225 truth: S1 text present (' + n + ')', tag); continue; }
       if(!BASE){ miss('no baseline', tag); continue; }
       const pb = build(BASE, cfg), site = firstPaced(pb);
+      lcells++; { const ld = liftDays(pc, pb); if(ld){ lmoved++; ldays += ld; } }
       if(!site){ miss('V225 grid has no paced W1 run card', tag); continue; }
       const nS1 = countS1(pc); if(nS1 !== 1){ miss('S1 count ' + nS1, tag); continue; }
       const baseNote = site.c.note;
@@ -221,12 +236,18 @@ guard('G6b', () => {
       if(note !== want){ miss('note != V225 note + one space + S1', tag); continue; }
       const restored = JSON.parse(JSON.stringify(pc)), rc = cardAt(restored, site);
       if(baseNote === undefined) delete rc.note; else rc.note = baseNote;
-      if(H.progDigest(restored) !== H.progDigest(pb)){ miss('another byte moved vs V225', tag); continue; }
+      if(V231){ if(H.progDigest(noLift(restored)) === H.progDigest(noLift(pb))) outEq++; }
+      else if(H.progDigest(restored) !== H.progDigest(pb)){ miss('another byte moved vs V225', tag); continue; }
       seen('G6 S1 ' + exp, note.slice(note.length - S1(exp).length));
       good++;
     } }
   const expectCells = 640;
-  ok(ROW.G6b, cells === expectCells && good === cells, good + '/' + cells + ' cells (ruled 640)' + (Object.keys(why).length ? ' misses ' + J(why) + ' e.g. ' + ex.join(' ; ') : ''));
+  if(D189 && BASE) console.log('    G6b lifting days vs V225 (every week and day, its sections): cells differing ' + lmoved + ' of ' + lcells + ', days differing ' + ldays + (V231 ? ' | INFO, not asserted: cells equal to V225 outside the lifting sections with the S1 note restored ' + outEq + ' of ' + good : ''));
+  if(V231) console.log('SKIP row G6b whole-program byte equality with V225 (S1 note restored): asserted at ia-version 230 and below only; the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 3) splits G6b at 231 and up (D195-B moved the lifting days of every cell, class B-1). Never PASS, never FAIL.');
+  if(V231) ok(ROW.G6b + ' [V231 split: the S1 half kept, the whole-program byte equality dropped; cells whose lifting days differ from V225 == ' + V231_LIFT + ', B-1]',
+    cells === expectCells && good === cells && lcells === expectCells && lmoved === V231_LIFT,
+    good + '/' + cells + ' cells (ruled 640), lifting days differ on ' + lmoved + '/' + lcells + ' cells (ruled ' + V231_LIFT + ')' + (Object.keys(why).length ? ' misses ' + J(why) + ' e.g. ' + ex.join(' ; ') : ''));
+  else ok(ROW.G6b, cells === expectCells && good === cells, good + '/' + cells + ' cells (ruled 640)' + (Object.keys(why).length ? ' misses ' + J(why) + ' e.g. ' + ex.join(' ; ') : ''));
 });
 guard('G6c', () => {
   let cells = 0, good = 0; const ex = [];
@@ -402,9 +423,16 @@ guard('G9', () => {
 });
 
 // ── G10: HALF_MANNY ──
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md sections 3 and 4; standing rulings 3, 4 and 5):
+// this row defends D189's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[VER], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// D189 (standing ruling 4). Section 3: "literal + row -> row only"; VER is this gate's own version variable.
 guard('G10', () => {
-  const row = H.MANNY_DIGEST_BY_VERSION[VER], built = H.progDigest(build(IA, H.fixtures.HALF_MANNY));
-  ok(ROW.G10, row !== undefined && row === HM_DIGEST && built === row, 'row[' + VER + '] ' + J(row) + ', built ' + built);
+  const eraV = VER, eraHas = Object.prototype.hasOwnProperty.call(H.MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? H.MANNY_DIGEST_BY_VERSION[eraV] : undefined, built = H.progDigest(build(IA, H.fixtures.HALF_MANNY));
+  ok(ROW.G10, eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && built === eraRow, built + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT'));
 });
 
 done();

@@ -1,0 +1,139 @@
+
+################ (1) CLASSIFIER V -> B -> ABx -> PREx -> ALLx on M17's lattice: 6912 configs (FULL 3024 | INJ 3024 | L432 432 | LBW 432), crashes 0
+  ALLx (round 3, A2 runner-gated) vs ALLx1 (round 2, A2 on every prevention build): programs differing 126, days 336 | by INJ none 56 | ankle/workaround 14 | elbow/protect 12 | shoulder/protect 12 | elbow/workaround 8 | hip/workaround 8 | knee/workaround 8 | shoulder/workaround 8 | by FAM none 126 | ops drop [Leg isolation] 200 | add [Leg isolation] 124 | drop [Leg circuit — runner armor] 28 | relabel [Leg circuit — runner armor] 20
+  V->ALLx: programs changed 3816/6912, days 23240/385560 | ALLx vs PRIOR ALL (coach1 t_ALL): programs differing 419, days 2270 by L: FULL 153 | INJ 152 | L432 114 | by INJ: none 153 | knee/protect 38 | elbow/protect 35 | shoulder/protect 35 | ankle/workaround 24 | elbow/workaround 24 | knee/workaround 24 | shoulder/workaround 24 | hip/workaround 22 | lowback/protect 16 | lowback/workaround 16 | ankle/protect 4 | hip/protect 4
+
+  STEP B: days changed 20023 | ops 26577 | UNCLASSIFIED ops 0
+     26548  B-1   | INJ none 15790 | shoulder/protect 1844 | elbow/protect 1509 | knee/workaround 1384 | hip/workaround 1369 | shoulder/workaround 1216 | elbow/workaround 921 | lowback/workaround 731 | lowback/protect 612 | knee/protect 395 | ankle/workaround 333 | ankle/protect 312  | TIER home_full 5794 | minimal 5076 | commercial 4991 | home_basic 4863 | crossfit 4528 | bodyweight 1296 | FAM race 12684 | test 12491 | none 1373 | runner 25175
+          e.g. FULL hypertrophy|race|commercial|none|beginner|s87747|sun,wed W1 tue :: add [Calves] Dumbbell standing calf raise 3×15–20 @ RPE 6–7
+        28  B-2   | INJ none 14 | ankle/protect 3 | hip/protect 3 | ankle/workaround 2 | elbow/workaround 2 | hip/workaround 2 | knee/workaround 2 | TIER home_full 14 | commercial 10 | crossfit 4 | FAM test 16 | race 12 | runner 28
+          e.g. FULL support_prevention|race|commercial|none|intermediate|s1234|sun,wed W3 tue :: redetail [Accessory] Landmine rotational press 3×15 each -> [Accessory] Landmine rotational press 2×15 each
+         1  B-3(adjacent-day re-space, same label, same pattern)   | INJ knee/workaround 1 | TIER commercial 1 | FAM race 1 | runner 1
+          e.g. INJ balanced|race|commercial|knee/workaround|intermediate|s1234|sat,sun W7 wed :: rename [Leg superset B] Barbell good mornings 3×6–10 @ RPE 8 -> [Leg superset B] Dumbbell split-stance deadlift 3×6–10 @ RPE 8
+
+  STEP A: days changed 3020 | ops 3147 | UNCLASSIFIED ops 0
+      3014  A-1   | INJ none 1836 | ankle/workaround 216 | knee/workaround 216 | hip/workaround 174 | elbow/workaround 157 | shoulder/workaround 157 | elbow/protect 129 | shoulder/protect 129 | TIER commercial 531 | crossfit 518 | minimal 516 | home_full 505 | home_basic 501 | bodyweight 443 | FAM race 1562 | test 1452 | runner 3014
+          e.g. FULL support_prevention|race|commercial|none|beginner|s87747|sun,wed W1 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        90  A-4(budget: optional core item)   | INJ shoulder/protect 49 | elbow/protect 41 | TIER commercial 25 | bodyweight 16 | minimal 14 | crossfit 13 | home_basic 11 | home_full 11 | FAM race 48 | test 42 | runner 90
+          e.g. INJ support_prevention|race|commercial|shoulder/protect|beginner|s1234|sun,wed W1 tue :: drop [Core — Rotational Power] Cable woodchoppers 3×12 each
+          e.g. INJ support_prevention|race|commercial|shoulder/protect|beginner|s1234|sun,wed W3 tue :: drop [Core — Rotational Power] Standing torso rotations (slow) 2×8–12 each @ RPE 7
+          e.g. INJ support_prevention|race|commercial|shoulder/protect|beginner|s1234|sun,wed W5 tue :: drop [Core — Rotational Power] Band woodchopper (door anchor) 3×12 each
+        43  A-4(budget: carry finisher)   | INJ shoulder/protect 43 | TIER minimal 15 | commercial 11 | crossfit 6 | home_basic 6 | home_full 5 | FAM race 24 | test 19 | runner 43
+          e.g. INJ support_prevention|race|commercial|shoulder/protect|beginner|s1234|sun,wed W2 tue :: drop [Loaded carry finisher] Farmer carry 3×40 yards, heavy
+          e.g. INJ support_prevention|race|commercial|shoulder/protect|beginner|s1234|sun,wed W5 tue :: drop [Loaded carry finisher] Farmer carry 3×40 yards, heavy
+          e.g. INJ support_prevention|race|commercial|shoulder/protect|beginner|s1234|sun,wed W7 tue :: drop [Loaded carry finisher] Overhead carry 3×40 yards each, heavy
+
+  STEP W5: days changed 872 | ops 1241 | UNCLASSIFIED ops 13
+       603  D196-1   | INJ lowback/workaround 249 | lowback/protect 243 | ankle/protect 91 | knee/protect 20 | TIER bodyweight 603 | FAM none 306 | race 155 | test 142 | runner 297
+          e.g. INJ fatloss|test|bodyweight|knee/protect|intermediate|s76308|sun,wed W9 thu :: rename [Main — Burpees] Burpees 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+       245  D196-4   | INJ lowback/protect 245 | TIER bodyweight 245 | FAM none 112 | test 69 | race 64 | runner 133
+          e.g. INJ hypertrophy|race|bodyweight|lowback/protect|intermediate|s4242|sun,wed W1 thu :: rename [Leg superset B] Burpees 3×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave 3 or more in reserve)
+       178  D196-2   | INJ ankle/protect 168 | knee/protect 10 | TIER bodyweight 178 | FAM none 122 | test 30 | race 26 | runner 56
+          e.g. INJ balanced|race|bodyweight|knee/protect|advanced|s76308|sat,sun W9 wed :: drop [Leg superset B] Single-leg Romanian deadlift (bodyweight) 4 sets — RPE 7 (leave 3 or more in reserve)
+        58  D196-3   | INJ lowback/protect 58 | TIER bodyweight 58 | FAM none 38 | test 12 | race 8 | runner 20
+          e.g. INJ fatloss|test|bodyweight|lowback/protect|intermediate|s76308|sun,wed W1 tue :: relabel [Pull] Neutral-grip chinups 3 sets — RPE 8 (stop 2 reps short of failure) -> [Pull superset B] Neutral-grip chinups 3 sets — RPE 8 (stop 2 reps short of failure)
+        46  D196-3(3×10)   | INJ lowback/workaround 26 | lowback/protect 20 | TIER bodyweight 46 | FAM none 28 | race 10 | test 8 | runner 18
+          e.g. INJ fatloss|race|bodyweight|lowback/workaround|intermediate|s76308|sun,wed W1 tue :: add [Pull] Burpees 3×10
+        40  D196-3(4×10)   | INJ lowback/protect 20 | lowback/workaround 20 | TIER bodyweight 40 | FAM none 24 | race 8 | test 8 | runner 16
+          e.g. INJ fatloss|race|bodyweight|lowback/workaround|advanced|s76308|sat,sun W1 tue :: add [Pull] Burpees 4×10
+        34  D196-3(2×10)   | INJ lowback/protect 18 | lowback/workaround 16 | TIER bodyweight 34 | FAM none 28 | test 4 | race 2 | runner 6
+          e.g. INJ support_strength|race|bodyweight|lowback/workaround|intermediate|s76308|sun,wed W1 tue :: add [Pull] Burpees 2×10
+        24  D196-1(Primer label)   | INJ ankle/protect 12 | knee/protect 12 | TIER bodyweight 24 | FAM race 24 | runner 24
+          e.g. INJ fatloss|race|bodyweight|knee/protect|intermediate|s4242|sun,wed W7 thu :: rename [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest -> [Primer — Single-leg glute bridge] Single-leg glute bridge 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+         7  UNCLASSIFIED:D196-circuit-removal(rename) Single-leg glute bridge   | INJ ankle/protect 7 | TIER bodyweight 7 | FAM test 7 | runner 7
+          e.g. INJ support_prevention|test|bodyweight|ankle/protect|intermediate|s76308|sun,wed W3 thu :: rename [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Main — Burpees :: Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+              PREx: Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+          e.g. INJ support_prevention|test|bodyweight|ankle/protect|intermediate|s76308|sun,wed W4 thu :: rename [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Main — Burpees :: Burpees 2 sets — RPE 6 (leave plenty in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+              PREx: Main — Single-leg glute bridge :: Single-leg glute bridge 2 sets — RPE 6 (leave plenty in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+          e.g. INJ support_prevention|test|bodyweight|ankle/protect|intermediate|s76308|sun,wed W9 thu :: rename [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Main — Burpees :: Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Side-lying leg raises 2×15 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+              PREx: Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Side-lying leg raises 2×15 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+         6  UNCLASSIFIED:D196-circuit-removal(drop) Single-leg glute bridge   | INJ ankle/protect 6 | TIER bodyweight 6 | FAM none 6 | runner 0
+          e.g. L432 support_prevention|none|bodyweight|ankle/protect|beginner|s76308|sun,wed W3 thu :: drop [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Main — Burpees :: Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+              PREx: Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+          e.g. L432 support_prevention|none|bodyweight|ankle/protect|beginner|s76308|sun,wed W4 thu :: drop [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Main — Burpees :: Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+              PREx: Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+          e.g. L432 support_prevention|none|bodyweight|ankle/protect|intermediate|s76308|sun,wed W3 thu :: drop [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+              ABx: Main — Burpees :: Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+              PREx: Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Leg isolation (SS 2) :: Wall sit 2×25 sec | Nordic hamstring curl (anchored) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+
+  STEP FL: days changed 12 | ops 12 | UNCLASSIFIED ops 0
+        12  D197-1   | INJ elbow/workaround 12 | TIER bodyweight 12 | FAM none 12 | runner 0
+          e.g. INJ fatloss|none|bodyweight|elbow/workaround|advanced|s76308|sat,sun W3 mon :: redetail [Chest volume] Pushups (slow 3s eccentric) 4 sets — RPE 8 (stop 2 reps short of failure) -> [Chest volume] Pushups (slow 3s eccentric) 4 sets — RPE 7 (leave 3 or more in reserve)
+
+################ (2) D195 amended (ABx = B + A1x/A2/A3/A5) vs B on EVERY prevention build in the lattice: 1008 builds (crash 0), leg days 7685, non-leg days ABx != B: 0
+  leg days by family: race 2655 | none 2592 | test 2438 | 4th printed by family: race 1562 | test 1452 | non-runner (fam none) leg days ABx != B: 0
+  fourth item printed: 3014/7685 (dry 1952/5219, run-stacked 1062/2466) | without A5 (ABn): 3789
+  calf lost (B has, ABx lacks): 0/4092 | without A5: 777
+  carry lost (B has, ABx lacks): 43/2351 by plan x tier: shoulder/protect minimal 15 | shoulder/protect commercial 11 | shoulder/protect crossfit 6 | shoulder/protect home_basic 6 | shoulder/protect home_full 5 | by fam: race 24 | test 19 | on runner programs: 43
+  circuit positions 1-2 changed B -> ABx: 0/7685 | without A5: 68 none bodyweight {Short Interval (SI)} 8 | none bodyweight {Speed Run — Intervals} 6 | elbow/protect bodyweight {Steady Aerobic Run} 4 | elbow/protect crossfit {Steady Aerobic Run} 4 | none bodyweight {Speed Run — Tempo} 4 | shoulder/protect bodyweight {Steady Aerobic Run} 4 | shoulder/protect crossf
+  items removed B -> ABx: 133 Core — Rotational Power :: Side plank thread-the-needle [budget] 18 | Loaded carry finisher :: Farmer carry [budget] 18 | Loaded carry finisher :: Suitcase carry [budget] 18 | Core — Rotational Power :: Standing torso rotations (slow) [budget] 14 | Core — Anti-Rotation :: Plank shoulder taps [budget] 12 | Core — Rotational Power :: Landmine rotations [budget] 8 | Core — Anti-Rotation :: Dumbbell renegade rows [budget] 7 | Loaded carry finisher :: Overhead carry [budget] 7 | Core — Rotational Power :: Band woodchopper (door anchor) [budget] 6 | Core — Rotational Power :: Windshield wipers [budget] 6 | Core — Anti-Rotation :: Farmer carry [budget] 5 | Core — Rotational Power :: Cable woodchoppers [budget] 4 | Core — Rotational Power :: Medicine ball rotary toss [budget] 4 | Core — Anti-Rotation :: Bird dogs [budget] 2 | Core — Anti-Rotation :: Side plank [budget] 2 | Core — Anti-Rotation :
+  removal days by plan x tier x fam: shoulder/protect commercial test 11 | shoulder/protect commercial race 9 | shoulder/protect minimal test 9 | elbow/protect bodyweight test 6 | elbow/protect commercial test 6 | shoulder/protect bodyweight test 6 | shoulder/protect crossfit race 6 | shoulder/protect home_basic race 6 | shoulder/protect home_full race 6 | shoulder/protect minimal race 6 | elbow/protect commercial race 5 | elbow/protect crossfit race 4 | elbow/protect home_basic race 4 | elbow/protect home_full race 4 | elbow/protect minimal test 4 | shoulder/protect crossfit test 4 | elbow/protect bodyweight race 2 | elbow/protect crossfit test 2 | elbow/protect minimal race 2 | shoulder/protect bodyweight race 2 | shoulder/protect home_basic test 2 | shoulder/protect home_full test 2 | elbow/protect home_basic test 1 | elbow/protect home_full test 1
+  budget view on removal/extra-add days (110): B final total vs cap: B 18.5/20 26 | B 20/20 17 | B 19/20 15 | B 17/18 14 | B 17.5/20 9 | B 18/20 8 | B 21.5/20 6 | B 22/18 6 | B 19.5/20 3 | B 20/18 2 | B 23.5/20 2 | B 18/18 1 | B 21/20 1 | ABx budget-off total: off 20.5/20 24 | off 22/20 18 | off 21.5/20 13 | off 20.5/18 8 | off 21/20 7 | off 24.5/20 6 | off 25/18 6 | off 19/18 5 | off 20/20 5 | off 19.5/20 4 | off 22.5/20 3 | off 23/20 3 | off 21.5/18 2 | off 23.5/20 2 | off 23/18 2 | off 26.5/20 2 | ABx final: final 19/20 27 | final 17.5/20 15 | final 18/20 14 | final 17.5/18 13 | final 18.5/20 12 | final 20/20 11 | final 20.5/18 6 | final 23/20 4 | final 18.5/18 2 | final 21.5/18 2 | final 21.5/20 2 | final 25/20 2
+  items added B -> ABx beyond the 4th: (none)
+  4th item NOT built, by plan x tier: none bodyweight 315 | none minimal 261 | none commercial 252 | none crossfit 252 | none home_basic 252 | none home_full 252 | ankle/protect commercial 72 | hip/protect commercial 72 | hip/workaround bodyweight 72 | knee/protect commercial 72 | lowback/protect commercial 72 | lowback/workaround bodyweight 72 | lowback/workaround home_full 67 | ankle/protect home_full 64 | knee/protect home_full 64 | lowback/protect home_full 64 | ankle/protect crossfit 62 | knee/protect crossfit 62 | lowback/protect crossfit 62 | lowback/workaround crossfit 62 | hip/protect home_full 60 | ankle/protect bodyweight 59 | hip/protect crossfit 59 | knee/protect bodyweight 59 | lowback/protect bodyweight 59 | lowback/workaround commercial 59 | hip/protect bodyweight 57 | ankle/protect minimal 51 | knee/protect minimal 51 | lowback/protect minimal 51 | lowback/workaround minimal 51 | elbow/protect home_full 49 | lowback/workaround home_basic 49 | shoulder/protect home_full 49 | ankle/protect home_basic 46 | knee/protect home_basic 46 | lowback/protect home_basic 46 | elbow/protect bodyweight 45 | hip/protect minimal 45 | shoulder/protect bodyweight 45 | elbow/workaround home_full 44 | shoulder/workaround h
+  4th item by plan :: name: none :: Single-leg hip thrust 954 | none :: Single-leg glute bridge (weighted) 326 | none :: Banded hip thrust 301 | none :: Single-leg hip thrust (shoulders on bed) 209 | ankle/workaround :: Single-leg hip thrust 98 | hip/workaround :: Single-leg hip thrust 98 | knee/workaround :: Single-leg hip thrust 98 | elbow/protect :: Single-leg hip thrust 81 | shoulder/protect :: Single-leg hip thrust 81 | elbow/workaround :: Single-leg hip thrust 72 | shoulder/workaround :: Single-leg hip thrust 72 | none :: Single-leg glute bridge 46 | ankle/workaround :: Single-leg hip thrust (shoulders on bed) 42 | knee/workaround :: Single-leg hip thrust (shoulders on bed) 42 | ankle/workaround :: Banded hip thrust 39 | hip/workaround :: Banded hip thrust 39 | knee/workaround :: Banded hip thrust 39 | elbow/workaround :: Single-leg hip thrust (shoulders on bed) 38 | shoulder/workaround :: Single-leg hip thrust (shoulders on bed) 38 | ankle/workaround :: Single-leg glute bridge (weighted) 37 | hip/workaround :: Single-leg glute bridge (weighted) 37 | knee/workaround :: Single-leg glute bridge (weighted) 37 | elbow/workaround :: Single-leg glute bridge (weighted) 25 | shoulder/workaround :: Single-leg glute bridge (weighted) 25 | elbow/workaround :: Banded hip thrust 22 | shoulder/workaround :: Banded hip thrust 22 | elbow/protect :: Banded hip thrust 18 | shoulder/protect :: Banded hip thrust 18 | elbow/protect :: Single-leg glute bridge (weighted) 16 | shoulder/protect :: Single-leg glute bridge 
+  knee/protect days carrying a 4th item: 0/354 | Bodyweight back extension as 4th anywhere: 0 (none)
+  stacked-run days where the thrust yields (ABx 3 items, dry same cell prints 4): 775 | by rest x exp: sat,sun beginner {Short Interval (SI)} 120 | sat,sun advanced {Short Interval (SI)} 118 | sat,sun intermediate {Short Interval (SI)} 115 | sat,sun beginner {Speed Run — Intervals} 110 | sat,sun intermediate {Speed Run — Intervals} 106 | sat,sun advanced {Speed Run — Intervals} 105 | sat,sun beginner {Speed Run — Hills} 14 | sat,sun beginner {Speed Run — Tempo} 14 | sat,sun intermediate {Speed Run 
+
+################ (3) g215 lattices (LAT_G 760 + LAT_K 630), crash 0
+  floor (b) fires on V        : commercial 0/126, crossfit 0/126, home_full 79/126, home_basic 0/126, bodyweight 0/126  | prevention cells firing: 0/90
+  floor (b) fires on ABx      : commercial 0/126, crossfit 0/126, home_full 84/126, home_basic 0/126, bodyweight 0/126  | prevention cells firing: 0/90
+  floor (b) fires on ALLx     : commercial 0/126, crossfit 0/126, home_full 84/126, home_basic 0/126, bodyweight 0/126  | prevention cells firing: 0/90
+  floor (b) fires on PRIORALL : commercial 18/126, crossfit 18/126, home_full 102/126, home_basic 9/126, bodyweight 0/126  | prevention cells firing: 63/90
+  D197 ops PREx -> ALLx on g215 lattices: 9 | D197-2(own-plan drop of a sweep catch-all name: Burpees < Pec deck @ankle/workaround) 9
+     G bodyweight|hypertrophy|ankle/workaround|intermediate|55+|s4242|sun,wed W1 mon :: drop [Chest volume] Burpees 3×15
+     G bodyweight|hypertrophy|ankle/workaround|intermediate|55+|s4242|sun,wed W2 mon :: drop [Chest volume] Burpees 3×15
+     G bodyweight|hypertrophy|ankle/workaround|intermediate|55+|s4242|sun,wed W3 mon :: drop [Chest volume] Burpees 3×15
+     G bodyweight|hypertrophy|ankle/workaround|intermediate|55+|s4242|sun,wed W5 mon :: drop [Chest volume] Burpees 3×15
+     G bodyweight|hypertrophy|ankle/workaround|intermediate|55+|s4242|sun,wed W6 mon :: drop [Chest volume] Burpees 3×15
+     G bodyweight|hypertrophy|ankle/workaround|intermediate|55+|s4242|sun,wed W7 mon :: drop [Chest volume] Burpees 3×15
+     G bodyweight|hypertrophy|ankle/workaround|intermediate|55+|s4242|sun,wed W9 mon :: drop [Chest volume] Burpees 3×15
+     G bodyweight|hypertrophy|ankle/workaround|intermediate|55+|s4242|sun,wed W10 mon :: drop [Chest volume] Burpees 3×15
+     G bodyweight|hypertrophy|ankle/workaround|intermediate|55+|s4242|sun,wed W11 mon :: drop [Chest volume] Burpees 3×15
+
+################ (4) swap universe V vs tree, FULL + L432 (3456; prevention 576)
+  Ax      PREV universe changed 0/576 by tier: commercial 0/108, crossfit 0/108, home_full 0/108, home_basic 0/72, minimal 0/72, bodyweight 0/108 | names: (none)
+  Ax      CTRL universe changed 0/2880 by tier: commercial 0/504, crossfit 0/504, home_full 0/504, home_basic 0/432, minimal 0/432, bodyweight 0/504 | names: (none)
+  W5      PREV universe changed 6/576 by tier: commercial 0/108, crossfit 0/108, home_full 0/108, home_basic 0/72, minimal 0/72, bodyweight 6/108 | names: +Single-leg hip thrust (shoulders on bed) 6
+  W5      CTRL universe changed 12/2880 by tier: commercial 0/504, crossfit 0/504, home_full 0/504, home_basic 0/432, minimal 0/432, bodyweight 12/504 | names: +Single-leg hip thrust (shoulders on bed) 12
+  ALLx    PREV universe changed 6/576 by tier: commercial 0/108, crossfit 0/108, home_full 0/108, home_basic 0/72, minimal 0/72, bodyweight 6/108 | names: +Single-leg hip thrust (shoulders on bed) 6
+  ALLx    CTRL universe changed 12/2880 by tier: commercial 0/504, crossfit 0/504, home_full 0/504, home_basic 0/432, minimal 0/432, bodyweight 12/504 | names: +Single-leg hip thrust (shoulders on bed) 12
+  PRIORALLPREV universe changed 473/576 by tier: commercial 99/108, crossfit 99/108, home_full 93/108, home_basic 72/72, minimal 72/72, bodyweight 38/108 | names: -Barbell hip thrust 279 | -Glute-ham raise 198 | -45° back extension 195 | -Bodyweight back extension 176 | -Cable pull-through 99 | -Nordic hamstring curl (anchored) 96 | +Single-leg hip thrust (shoulders on bed) 6
+  PRIORALLCTRL universe changed 12/2880 by tier: commercial 0/504, crossfit 0/504, home_full 0/504, home_basic 0/432, minimal 0/432, bodyweight 12/504 | names: +Single-leg hip thrust (shoulders on bed) 12
+REPORT DONE
+REPORT_EXIT 0

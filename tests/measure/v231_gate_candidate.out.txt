@@ -1,0 +1,63 @@
+V231 M18 — every HEAD gate (89, from a git clone of HEAD 71c76d8; g231_* excluded) on the real V231 candidate, baseline V230.
+Script tests/measure/v231_gate_candidate.js (+ v231_gate_candidate_p1.js). Raw outputs: session scratch measure5/ (per_*/, gx_*/, attrib.out, gxrows.out, p1.out).
+Copies (sha256): cand 1249c248a6794d1c (index.html ia 231; == coach2 t_ALLx except line 8) | V230 72ac41c8d34034ce (== git show HEAD:index.html)
+ t_B b958d4b09b1181bc | t_ABx 8d90f9463198e7d4 | t_PREx 450783528238a6ee | t_ALLx 0e3e0dea88ce0f12. Part trees and V230 stamped 230->231 (one-line diff) for attribution.
+ Chain: V230 -B-> t_B -A-> t_ABx -D196(W5)-> t_PREx -D197(FL)-> t_ALLx (coach2 surgery script :180,:198).
+
+TOTALS (per gate, alone)
+ V230 control   89 gates: 0 failing, 0 crashed, 0 refusing.
+ STAMP (V230@231) 18 failing, 1 crashed (g193_samecard), 1 refusing (g230 d194-postsweep).   == M16 STAMP.
+ CANDIDATE      37 failing, 1 crashed (g193_samecard), 1 refusing (g230 d194-postsweep).  Failing rows: 101 lines = 55 version-only + 46 engine-caused.
+ t_PREx@231 == candidate row for row (D197 moves no HEAD gate row).  t_B@231: 22 failing.  t_ABx@231: 35 failing.
+ Alias clone (X[231]=X[230] after every X[230]= line): STAMP all 38 red gates green except g230 (REFUSED by design + d194-postsweep FAIL);
+   candidate still red on 31 rows across 31 gates (below).
+
+(a) VERSION TABLE WITH NO [231] ROW  — figure at 231 on the candidate | [230]
+ MANNY_DIGEST_BY_VERSION harness.js:374  -> 2d35e8f743680cfa | 0ac7da6b1691a8e1  MOVES (part A). Readers failing: g197a:356 D1, g197b:304 B8a, g198:222 C1, g199:505 B1,
+   g200_core:153 F1b, g200_pull:328 B1, g202_d108:176 R6, g202_pace_anchor B1, g202_pace_copy:355 B2, g203:410 (+row-exists), g204:545 (+row-exists),
+   g210:423 O6r, g226_d189:137 G10, g227:484 c-MANNY, g228 d2-MANNY, g229_d193:421 b (b also moved by engine, see c).
+ MANNY_DELOAD_OFF_DIGEST_BY_VERSION harness.js:393 -> 145c60296526a949 | 1069cd7f86eed204 MOVES (A). g199 B2.
+ MANNY_CORE_OFF_DIGEST_BY_VERSION harness.js:412 -> 5770a4b1c4e2404d | 9d14801a63111081 MOVES (A). g200_core:151 F1a.
+ DELOAD_ARB_BY_VERSION g199:179 -> C1 240 | 264 of 17,856 weeks MOVES (D196: B 264, ABx 264, PREx 240); C3 240 | 264 (denominator 14,976) MOVES (D196);
+   D2 17 | 19 (sha 2,863 | 2,861 differ of 2,880) MOVES (B: t_B already 17); C5 0|0, I3 18|18 (15,720 entering) EQUAL.
+ DELOAD_HINGE_BY_VERSION g199:193 E1a 12,369, E1b 9,319, E2, E3 44/15,360, G1 1,275 (G2,G5) EQUAL.  E6_BY_VERSION g199:186 E6 28 EQUAL.
+ OPEN_UNRULED_BY_VERSION g193_samecard:318 (throws at :320 = the crash) -> 53/53 EQUAL.  HF_LEAK g197b:236 B4i-B4l 0/0 EQUAL.  B5C g197b:251 B5c 0 EQUAL.
+ SWAP_BY_VERSION g200_pull:302 P2c 138, P2d, P4, P6 {Kettlebell swing:138}, P7 EQUAL.  g219 ERA:151 F1, F2, R1-R8 (0,0,0,4770,891,412,0,0) 15/15 EQUAL.
+
+(b) LITERAL HALF_MANNY 0ac7da6b1691a8e1 PINS failing (candidate 2d35e8f743680cfa; first moves at A):
+ g207_gk_trial_present:258 Q7, g207_test_week:339 D9, g208_d103a_chip:167 M1, g208_d103a_key:156 K5, g208_d103a_readers:290 M1, g208_d104a_runbase:207 M1,
+ g209_d140_tier:293 M1, g210:419/421 O6, g211:67 HM, g214:233 HM, g215:75/282 HM, g216_d154:74 HM, g216_d156:64 HM, g223_d183:265/554 [NY] HM and [UTC] HM,
+ g226_d189:114/137 G10 (also table), g228:131 d2-MANNY (also table).  = 17 gate files.
+ Hold the literal, do not trip: g212:136, g213:79, g218:222, g221_d177:75, g221_d178:59, g221_d179:59, g221_d180:90, g223_d184:722/751 (era-scoped).
+
+(c) FIGURES THE ENGINE MOVED (V230 -> candidate; first part)
+ g197d_d84_base:389 E5 capSessionBudget sha 36b5b8efdfa1d3d8 -> 5e8f2f07d1c52dfc (B: 10a5806729632f09; A re-edits it). B-1 + A-4 (budget machinery text).
+ g199:561 F2 Leg superset B after deload 15,720 -> 15,702 (D196, PREx).  g199:562 F3 A+B 30,264 -> 30,246 (D196).
+ g199:627 I2 bodyweight swap cells reaching the card without posterior 108 -> 0 (D196; the 'Banded hip thrust -> Burpees' rename is gone, D196-1/D196-6).
+ g215:272 P1 x5 tiers knee/protect hip-ext reservation empty 0 -> 898 of 6,301 reads (A). Segmented: 898/898 support_prevention reads, 0/5,403 other-focus reads,
+   every tier. Cause: A's new line cand:8768 filters hipExtPool on prevention to thrust/bridge/pull-through, removing floor (b)'s 'Bodyweight back extension'
+   (cand:8755) before the reservation read (:8868). 0 of 630 g215 LAT_K programs change digest B->ABx: the claim moves at the read site, no card moves. UNCLASSIFIED (no card op).
+ g221_d177:438 G3a 832 -> 839 of 146,289; :441 G3c off-grammar 168 -> 172 of 29,147; :445 G3e 202 -> 205 of 37,567; :455 G6a 1,243 -> 1,253 of 150,989 (all D196, PREx).
+   Example: commercial|hypertrophy|beginner|lift|knee/workaround W5 tue Barbell RDL -> Leg press 5x10 RPE 8.5 -> RPE 7. D196-2 population entering the clamp.
+ g225:272 CONFINEMENT: run_base/run_5k/run_half/run_marathon digests vs V225 after S1 strip differ (B: run_base + run_marathon; A adds run_5k, run_half). B-1, A-1.
+ g226_d188:290 G2 120/120 -> 0/120 (B); :575 G1h-P2b 0 -> 48 cfgs (B 44, A 48); :578 G1h-P5 0 -> 3,252 days (B 2,365, A 3,252). B-1/A-1 on support_prevention.
+ g226_d189:229 G6b 640/640 -> 0/640 (B). B-1.
+ g227:474 c-DIGEST 8/8 -> 7/8 (A; manny). g227:454 c-UNINJ 0 -> 144/1,396 chains (manny 144/677, mario_noinj 0/719) (A). Follows the HALF_MANNY move.
+ g229_d193:421 b outside 1,053/1,053 -> 565/1,053; uninjured 133/133 -> 50/133 (+table). :? d-BWSETS 1,239/1,239 -> 1,169/1,239 hand hold (D196).
+   :508 f distinct 0/360 and non-cue details 1,722 -> 1,734 (A). :456 j L1 uninjured 96/96 -> 27/96 (B 51, A 27), R7 held 30/30 -> 28/30 (D196).
+ g229_d194 p-SWAP/p-AUX/p-ADD (B first; FIX == V228 e.g. p-SWAP 8,595/9,174, p-ADD 2,691/2,880) and p-UNSTAMPED (A: uninjured HALF_MANNY lists MOVED).
+ g230 d194-fixture L1 150,068 -> 150,989 'aligned false' (B 150,047, A 150,042, D196 150,989); d193-k clamp pairs 1,243 -> 1,253 (verbatim 684 -> 694) (D196);
+   d193-l G3a 832 -> 839, G3c-off 168 -> 172, G3e 202 -> 205 (D196).
+ g193_pool_overlay: debt line 43 '>=215 thin-pool ankle/protect squatPool' no longer trips (D196) — see (d).
+
+(d) INSTRUMENT BLINDED
+ g193_pool_overlay (D196): PASS 220 -> 185 (35 assertions stop evaluating); unresolved assignments 3 -> 8: + knee/protect squatPool, ankle/protect squatPool,
+   lowback/protect backCompoundPool, lowback/protect hingePool, lowback/workaround backCompoundPool. B and ABx: 220, 3 unresolved.
+ g199 I2c/I2d pass vacuously at 0 ('for all 0', tier census {}), were 108/108 bodyweight.
+
+(e) REFUSES BY DESIGN
+ g230_d194_lens2:811 d194-postsweep (VER === ERA 230): REFUSED + INFO row FAIL on STAMP and candidate alike.
+
+M16 (c) ROWS NOW PASSING on the candidate: g210 O6u (swap universe), g215 F2 (floor (b) on knee/protect, all 5 tiers), g199 A1 and g200_pull A1 anchor (count 1;
+ g200_pull P2c-P7 equal on alias), g199 aliased I2-blank (now evaluates: 0).  M16 rows still failing with new figures: g221 (same), g227 c-UNINJ 172 -> 144,
+ g229_d193 b 573 -> 565, j L1 27/96 (same), d-BWSETS 1,169 (same).  New vs M16: g215 P1 x5 (898 empty reads).

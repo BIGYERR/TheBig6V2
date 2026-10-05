@@ -59,7 +59,8 @@
 //         no "safe".
 //   S9    dated tw 5, 2 km in 8:30, mile 8:00: the sentence reads "2 km" with the hand numbers.
 //   NS1   the name step's Program length row: "5 weeks" on Mario's WD, "1 week" on tw 1.
-//   HM    CONTROL  HALF_MANNY digest 0ac7da6b1691a8e1, self-stable (ruled unmoved; standing ruling 5).
+//   HM    CONTROL  HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[ia-version], row existence a
+//         conjunct (V231 absorb ruling section 4), self-stable (ruled unmoved; standing ruling 5).
 // Pass 2:
 //   RN    R3 non-test: dated bike_century, N read from the header (R5's goal header typed around it), at diff +2, +1, 0,
 //         -1 (--accent) and 1 week out (--red, "1 week is short"): R3's sentences and colours typed; under a week is the red
@@ -128,7 +129,7 @@ const ROWS = {
                  : 'S8 undated #paceFeasLine frame: amendment 3 A2/A3/A4 sentences exactly, visible, --accent, no button, no "safe"',
   S9: 'S9 dated tw 5, 2 km in 8:30, mile 8:00: --accent card, the sentence reads "2 km" with the hand numbers',
   NS1: 'NS1 the name step\'s Program length row reads "5 weeks" on Mario\'s WD and "1 week" on tw 1',
-  HM: 'HM CONTROL: HALF_MANNY digest 0ac7da6b1691a8e1, self-stable',
+  HM: 'HM CONTROL: HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[ia-version] (row present), self-stable',
   // ── pass 2 ──
   RN: 'RN R3 non-test: dated bike_century (N from the header) at diff +2, +1, 0, -1 and 1 week out reads R3\'s sentences and colours, under a week is the red line; NRC HALF_MANNY WD reads amendment 2 (e)\'s two alignedStartCopy shapes',
   L1: 'L1 amendment 2 (f): the sentence\'s "In N weeks" is the #progLenLine number (dated tw 5; undated run+swim), and the sentence is the hand inversion at that N',
@@ -262,7 +263,6 @@ const CARD_NULL = 'Your test is before your first training day. This program sta
 const HDR_TEST = n => 'Program length: ' + wk(n) + '. Your test sets it.';                                                            // R5 dated test goal
 const REACH_TOKEN = 'that reaches about';
 const TODAY = '2026-09-22', TEST = '2026-10-20', TEST_TW1 = '2026-09-25', START_AFTER = '2026-10-26';
-const HALF_MANNY_DIGEST = '0ac7da6b1691a8e1';
 
 // ── comment stripper: lifted verbatim from tests/gates/g221_d178_active.js (itself from g220_d173) ──
 const BS = String.fromCharCode(92);
@@ -547,12 +547,20 @@ const W5 = handWeek(TODAY, TEST);
   row('NS1', bad, 2); }
 
 // ── HM: HALF_MANNY, ruled unmoved ──
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md sections 3 and 4; standing rulings 3, 4 and 5):
+// this row defends D183's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[+IA.version], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// D183 (standing ruling 4). The child reads its own artifact's stamp, so [NY] and [UTC] read the same row.
 { const bad = [];
   const fx = H.fixtures.HALF_MANNY; if(fx.seed == null) bad.push('fixture seed is not pinned');
   const d = [0, 1].map(() => tryDo(() => H.progDigest(IA.buildProgram(JSON.parse(JSON.stringify(fx))))));
   if(d[0] !== d[1]) bad.push('not self-stable ' + J(d));
-  if(d[0] !== HALF_MANNY_DIGEST) bad.push('digest ' + J(d[0]) + ' want ' + HALF_MANNY_DIGEST);
-  row('HM', bad, 2); }
+  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(H.MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? H.MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  if(!(eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && d[0] === eraRow)) bad.push('digest ' + J(d[0]) + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT'));
+  row('HM', bad, 2, 'era row [' + eraV + '] ' + eraRow); }
 
 // ═════════════════════════════════════════════ PASS 2 ═════════════════════════════════════════════
 // Every screen a row renders is also snapped into STATES, the sweep B1, M6, A3S and A3F read.

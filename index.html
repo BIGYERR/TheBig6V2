@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="230"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="231"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -8442,6 +8442,8 @@ function engineC_kinematics(cfg, A, B){
     return pool.slice(start, start+win);
   }
   const _bw=(bwPool,other)=>isBW?_bwRung(bwPool):other;
+  const _bwHTlb=isBW?'Single-leg hip thrust (shoulders on bed)':'Banded hip thrust';
+  const _bwHTak=isBW?'Single-leg glute bridge':'Banded hip thrust';
   // Pools where difficulty is NOT the axis (conditioning, carries, plyometrics) must skip
   // the rung narrowing: burpees vs mountain climbers are not rungs, and narrowing them
   // starves call sites that request more items than the window holds.
@@ -8587,7 +8589,7 @@ function engineC_kinematics(cfg, A, B){
         // under load. Nordic/GHR (eccentric knee flexion) filtered from hipExtPool.
         // V215 (D149 floor a): home_full owns neither the GHD station nor cables, so the gear
         // gate leaves this list one name long. A second member is appended only when short.
-        squatPool = hasBarbell?_floorPool(_gear(['Barbell hip thrust','45° back extension','Cable pull-through']),2,'Single-leg glute bridge'):['Banded hip thrust','Single-leg glute bridge','Bodyweight back extension'];
+        squatPool = hasBarbell?_floorPool(_gear(['Barbell hip thrust','45° back extension','Cable pull-through']),2,'Single-leg glute bridge'):[_bwHTak,'Single-leg glute bridge','Bodyweight back extension'];
         lungePool = ['Single-leg hip thrust','Single-leg glute bridge','Bodyweight back extension'];
         hipExtPool = hipExtPool.filter(n=>!/nordic|glute-ham|\bghr\b/i.test(n));
         if(!hipExtPool.length) hipExtPool=['Single-leg glute bridge','Bodyweight back extension'];
@@ -8598,7 +8600,7 @@ function engineC_kinematics(cfg, A, B){
       }
     } else if(_R==='ankle'){
       if(_T==='protect'){
-        squatPool = hasCables?['Leg press','Dumbbell goblet squat']:hasBarbell?_gear(['Barbell hip thrust','45° back extension']):['Banded hip thrust','Single-leg glute bridge'];
+        squatPool = hasCables?['Leg press','Dumbbell goblet squat']:hasBarbell?_gear(['Barbell hip thrust','45° back extension']):[_bwHTak,'Single-leg glute bridge'];
         lungePool = ['Single-leg hip thrust','Single-leg glute bridge'];
       } else {
         // Box bias trims dorsiflexion demand; Bulgarians keep single-leg work with
@@ -8636,8 +8638,8 @@ function engineC_kinematics(cfg, A, B){
         // day's main slot to hip extension left the week with no vertical or horizontal
         // pull main at all — rows are dropped at protect tier, so the day had nothing.
         // A hanging vertical pull is spine-decompressive and is the correct main here.
-        backCompoundPool = hasBarbell?_gear(['Neutral-grip chinups','Chinups','Lat pulldown','Assisted pullups']):['Banded hip thrust','Single-leg glute bridge'];
-        hingePool = ['Banded hip thrust','Single-leg glute bridge'];
+        backCompoundPool = hasBarbell?_gear(['Neutral-grip chinups','Chinups','Lat pulldown','Assisted pullups']):[_bwHTlb,'Single-leg glute bridge'];
+        hingePool = [_bwHTlb,'Single-leg glute bridge'];
         hipExtPool = ['Single-leg hip thrust','Single-leg glute bridge'];
         squatPool = hasCables?['Leg press','Dumbbell goblet squat']:['Dumbbell goblet squat'];
         // V193 (D44): the pulldown is a CABLE movement and this literal never passed
@@ -8703,7 +8705,7 @@ function engineC_kinematics(cfg, A, B){
         // Same call as protect: the pull day keeps a pull. Hip extension is the correct
         // spine-neutral HINGE substitute and stays on the legs day, where it already
         // lives — it does not also need to be the pull day's main lift.
-        backCompoundPool = hasBarbell?_gear(['Weighted chinups','Neutral-grip chinups','Lat pulldown','Chinups']):['Banded hip thrust','Single-leg hip thrust'];
+        backCompoundPool = hasBarbell?_gear(['Weighted chinups','Neutral-grip chinups','Lat pulldown','Chinups']):[_bwHTlb,'Single-leg hip thrust'];
         hingePool = hasBarbell?['Barbell hip thrust','Single-leg hip thrust']:['Single-leg glute bridge','Bodyweight back extension'];
         rowPool = ['Dumbbell row','Kettlebell single-arm row'];
         squatPool = hasCables?['Leg press','Dumbbell goblet squat']:['Dumbbell goblet squat'];
@@ -8763,6 +8765,7 @@ function engineC_kinematics(cfg, A, B){
            ||backCompoundPool!==_preInj.back||hipExtPool!==_preInj.hipExt,
     upper: chestCompoundPool!==_preInj.chest||rowPool!==_preInj.row||backCompoundPool!==_preInj.back
   };
+  if(preventionSupport){ _swapUniverseAdd(hipExtPool); hipExtPool=hipExtPool.filter(n=>/hip thrust|glute bridge|pull-?through/i.test(n)&&n!=='Barbell hip thrust'&&n!=='Cable pull-through'); }
 
   // Rotation strategy by goal:
   // strength/hypertrophy: locked full 6 weeks (need consistent movement for progression)
@@ -9291,7 +9294,7 @@ function engineC_kinematics(cfg, A, B){
         s.push({label:'Leg circuit — runner armor',superset:true,rounds:2,items:[
           {name:ex.lunge[0],detail:'2×10 each'},
           {name:ex.kneeStab,detail:'2×25 sec'},
-          {name:ex.hinge[0],detail:'2×8'}]});
+          {name:ex.hinge[0],detail:'2×8'}].concat((_isRunner&&ex.hipExt&&ex.hipExt!==ex.hinge[0])?[{name:ex.hipExt,detail:'2×8 each'}]:[])});
         // V154 (D4): the calf/achilles guarantee — the most-injured tissue in distance
         // runners had ZERO work anywhere in the prevention template. Run-goal builds only;
         // eccentric emphasis carried in the copy. Pool logic mirrors the hypertrophy calf
@@ -9468,7 +9471,7 @@ function engineC_kinematics(cfg, A, B){
       if(fullVariant==='lower'){
         const lowerLead=pick(lungePool,2,blockSeed(w)+16);
         const lowerHinge=pick(hingePool,1,blockSeed(w)+17)[0];
-        const lowerHipExt=pick(hipExtBW,1,blockSeed(w)+20)[0];
+        const _lhe0=pick(hipExtBW,1,blockSeed(w)+20)[0];const lowerHipExt=(_lhe0===lowerHinge)?(pick(hipExtBW.filter(x=>x!==lowerHinge),1,blockSeed(w)+20)[0]||_lhe0):_lhe0;
         const lowerPush=pick(fullPushPool.filter(x=>x!==ex.fullPush),1,blockSeed(w)+19)[0]||ex.fullPush;
         // SAME-DAY RULE (V129, doctrine): heavy strength and plyometrics must not share a
         // day for the same body area, though upper strength with lower plyo is explicitly
@@ -10574,7 +10577,7 @@ function capSessionBudget(sections, cardio){
   if(!Array.isArray(sections)||!sections.length) return sections;
   const _isStretch=n=>/stretch|mobility|90\/90|foam|worlds greatest/i.test(n||'');
   const _isHalf=n=>/carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises/i.test(n||'');
-  const _cost=it=>{ if(!it||_isStretch(it.name)) return 0; const s=_setCount(it.detail); return _isHalf(it.name)?s*0.5:s; };
+  const _prehabHalf=new Set([].concat(EXLIB.hip_stability,EXLIB.knee_stability,EXLIB.foot_ankle,EXLIB.foot_ankle_bw)); const _cost=it=>{ if(!it||_isStretch(it.name)) return 0; const s=_setCount(it.detail); return (_isHalf(it.name)||_prehabHalf.has(it.name))?s*0.5:s; };
   const _total=list=>list.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+_cost(it),0),0);
   const cap=Math.max(12, SESSION_SET_BUDGET - Math.round(_cardioInterference(cardio)*2));
   if(_total(sections)<=cap) return sections;
@@ -10712,7 +10715,7 @@ function capSessionBudget(sections, cardio){
         if(_cost(it)<=0) return;
         if(_compoundTier(it.name)===3) return;            // barbell compounds are never budget fodder
         if(_postLeft<=1 && _isPost(it.name)) return;       // V198 (D85): the day's LAST hinge/hip_ext is not budget fodder
-        const score=sr*10+_itemRank(it.name);
+        const score=(((ii>=3)&&/^leg circuit/i.test((s&&s.label)||''))?3:sr)*10+_itemRank(it.name);
         const pos=si*100+ii;
         if(!best || score>best.score || (score===best.score && pos>best.pos)) best={si,ii,score,pos};
       });
@@ -10755,6 +10758,7 @@ function capRegionalFatigue(sections, role, cardio, goal){
     const L=(label||'').toLowerCase();
     if(/^main|^primer|^power\b|^strength\b/.test(L)) return (itemIdx>0) ? 2 : 0;  // protect the main lift ONLY
     if(/secondary compound|conditioning|delts|chest volume|pull superset a|leg superset a/.test(L)) return 1;
+    if(/^leg circuit/.test(L)) return (itemIdx>=3) ? 3 : 2;
     if(/superset b|biceps|triceps|leg isolation|calves|accessory|pump|chest \+ knee/.test(L)) return 2;
     if(/finisher|optional|explosive/.test(L)) return 3;
     return 2;
@@ -10768,6 +10772,7 @@ function capRegionalFatigue(sections, role, cardio, goal){
   const _legCut = Math.round(_interf * 3);
   const _uppCut = Math.round(_interf * 1.5);
   const _capFor = r => Math.max(6, _setCap(r) - (r==='legs' ? _legCut : _uppCut));
+  const _moveCapFor = r => _moveCap(r) + ((role==='legs' && r==='legs' && out.some(s=>/^leg circuit/i.test((s&&s.label)||'')&&((s&&s.items)||[]).length>=4)) ? 1 : 0);
 
   // 1) Score each REGION two ways in a single pass:
   //    • regionScore — PATTERN SATURATION. Distinct patterns are cheap; the 2nd+ movement
@@ -10820,10 +10825,10 @@ function capRegionalFatigue(sections, role, cardio, goal){
     const overAmt=r=>Math.max(
       (regionScore[r]||0)-_ceil(r),
       ((regionSets[r]||0)-_capFor(r))*1.5,
-      ((regionMoves[r]||0)-_moveCap(r))*4
+      ((regionMoves[r]||0)-_moveCapFor(r))*4
     );
     const over=['push','pull','legs']
-      .filter(r=>(regionScore[r]||0)>_ceil(r) || (regionSets[r]||0)>_capFor(r) || (regionMoves[r]||0)>_moveCap(r))
+      .filter(r=>(regionScore[r]||0)>_ceil(r) || (regionSets[r]||0)>_capFor(r) || (regionMoves[r]||0)>_moveCapFor(r))
       .sort((a,b)=>overAmt(b)-overAmt(a));
     if(!over.length) break;
     const region=over[0];
@@ -10999,7 +11004,8 @@ function engineD_synthesis(cfg, A, B, plan, C){
   deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks);
   // Final catch-all for the "Room only" tier — see bodyweightSweep. Runs AFTER core/hip
   // injection so it catches gear arriving from those subsystems too.
-  if(cfg.equipment==='bodyweight') bodyweightSweep(weeks, cfg.experience, cfg.liftingFocus==='support_prevention');
+  if(cfg.equipment==='bodyweight'){ bodyweightSweep(weeks, cfg.experience, cfg.liftingFocus==='support_prevention');
+    if(cfg.injury) Object.keys(weeks).forEach(_w=>Object.keys(weeks[_w]||{}).forEach(_d=>{ const _day=weeks[_w][_d]; if(_day&&Array.isArray(_day.sections)) _day.sections=applyInjuryFilter(_day.sections,cfg); })); }
   // LAST. Must run after every pass that can change a NAME — bodyweightSweep substitutes
   // gear names, the injury filter swaps movements, the deconflicts move them between days.
   // The predicate is name-derived, so sweeping earlier would judge a movement that is not

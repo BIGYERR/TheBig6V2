@@ -1,0 +1,1377 @@
+# M17 v231_gate_attrib — outputs (trees: coach1/t_*.html copied to measure4/trees, all ia-version 230, t_V == HEAD sha 72ac41c8d34034ce)
+
+################ PART uni
+==== U1. HALF_MANNY (seed 76308) swap universe size per tree; names lost / gained vs V; digest
+  V    size 86  digest 0ac7da6b1691a8e1  lost []  gained []
+  B    size 86  digest 0ac7da6b1691a8e1  lost []  gained []
+  A    size 83  digest 14aacbced1c527d7  lost ["Barbell hip thrust","Glute-ham raise","45° back extension"]  gained []
+  AB   size 83  digest 14aacbced1c527d7  lost ["Barbell hip thrust","Glute-ham raise","45° back extension"]  gained []
+  Ap   size 83  digest f5ed630033ebe3db  lost ["Barbell hip thrust","Glute-ham raise","45° back extension"]  gained []
+  Ar   size 83  digest f5ed630033ebe3db  lost ["Barbell hip thrust","Glute-ham raise","45° back extension"]  gained []
+  ABp  size 83  digest 2d35e8f743680cfa  lost ["Barbell hip thrust","Glute-ham raise","45° back extension"]  gained []
+  W5   size 86  digest 0ac7da6b1691a8e1  lost []  gained []
+  FL   size 86  digest 0ac7da6b1691a8e1  lost []  gained []
+  PRE  size 83  digest 2d35e8f743680cfa  lost ["Barbell hip thrust","Glute-ham raise","45° back extension"]  gained []
+  ALL  size 83  digest 2d35e8f743680cfa  lost ["Barbell hip thrust","Glute-ham raise","45° back extension"]  gained []
+
+==== U2. HALF_MANNY swap options, V vs A (swapCandidates on the same name, same week/day): items asked 379; lose >= 1 option 18; gain >= 1 18
+  days with a lost option (18): W1 sat x1, W3 tue x1, W4 tue x1, W4 sat x1, W5 tue x1, W5 thu x1, W5 sat x1, W6 tue x1, W6 thu x1, W6 sat x1, W7 sat x1, W8 sat x1, W9 sat x1, W10 sat x1, W11 tue x1, W11 sat x1, W12 tue x1, W13 sat x1
+       9  Post-run mobility :: Standing calf stretch -> 45° back extension
+       9  Post-run mobility :: Standing calf stretch -> Barbell hip thrust
+       9  Post-run mobility :: Standing calf stretch -> Glute-ham raise
+       4  Leg circuit — runner armor :: Kettlebell swing -> 45° back extension
+       4  Leg circuit — runner armor :: Kettlebell swing -> Barbell hip thrust
+       4  Leg circuit — runner armor :: Kettlebell swing -> Glute-ham raise
+       3  Leg circuit — runner armor :: Kettlebell swing -> Single-leg hip thrust
+       2  Pull superset B :: Kettlebell swing -> 45° back extension
+       2  Pull superset B :: Kettlebell swing -> Barbell hip thrust
+       2  Pull superset B :: Kettlebell swing -> Glute-ham raise
+       2  Leg circuit — runner armor :: Step-ups (KB) -> 45° back extension
+       2  Leg circuit — runner armor :: Step-ups (KB) -> Barbell hip thrust
+       1  Power — explosive first :: Kettlebell swing -> 45° back extension
+       1  Power — explosive first :: Kettlebell swing -> Barbell hip thrust
+       1  Power — explosive first :: Kettlebell swing -> Glute-ham raise
+       1  Leg circuit — runner armor :: Step-ups (KB) -> Glute-ham raise
+  e.g. W1 sat [Power — explosive first] Kettlebell swing loses ["45° back extension","Barbell hip thrust","Glute-ham raise"]
+  e.g. W3 tue [Leg circuit — runner armor] Kettlebell swing loses ["45° back extension","Barbell hip thrust","Glute-ham raise","Single-leg hip thrust"]
+  e.g. W4 tue [Leg circuit — runner armor] Kettlebell swing loses ["45° back extension","Barbell hip thrust","Glute-ham raise"]
+  e.g. W4 sat [Post-run mobility] Standing calf stretch loses ["45° back extension","Barbell hip thrust","Glute-ham raise"]
+  e.g. W5 tue [Leg circuit — runner armor] Kettlebell swing loses ["45° back extension","Barbell hip thrust","Glute-ham raise","Single-leg hip thrust"]
+  e.g. W5 thu [Pull superset B] Kettlebell swing loses ["45° back extension","Barbell hip thrust","Glute-ham raise"]
+
+==== U2. HALF_MANNY swap options, V vs ALL (swapCandidates on the same name, same week/day): items asked 388; lose >= 1 option 27; gain >= 1 27
+  days with a lost option (23): W1 tue x1, W1 sat x1, W2 tue x1, W3 tue x2, W4 tue x1, W4 sat x1, W5 tue x2, W5 thu x1, W5 sat x1, W6 tue x2, W6 thu x1, W6 sat x1, W7 tue x1, W7 sat x1, W8 sat x1, W9 tue x1, W9 sat x1, W10 tue x1, W10 sat x1, W11 tue x2, W11 sat x1, W12 tue x1, W13 sat x1
+       9  Post-run mobility :: Standing calf stretch -> 45° back extension
+       9  Post-run mobility :: Standing calf stretch -> Barbell hip thrust
+       9  Post-run mobility :: Standing calf stretch -> Glute-ham raise
+       5  Calf — achilles armor :: Dumbbell seated calf raise -> 45° back extension
+       5  Calf — achilles armor :: Dumbbell seated calf raise -> Barbell hip thrust
+       5  Calf — achilles armor :: Dumbbell seated calf raise -> Glute-ham raise
+       4  Leg circuit — runner armor :: Kettlebell swing -> 45° back extension
+       4  Leg circuit — runner armor :: Kettlebell swing -> Barbell hip thrust
+       4  Leg circuit — runner armor :: Kettlebell swing -> Glute-ham raise
+       4  Calf — achilles armor :: Dumbbell standing calf raise -> 45° back extension
+       4  Calf — achilles armor :: Dumbbell standing calf raise -> Barbell hip thrust
+       4  Calf — achilles armor :: Dumbbell standing calf raise -> Glute-ham raise
+       3  Leg circuit — runner armor :: Kettlebell swing -> Single-leg hip thrust
+       2  Calf — achilles armor :: Dumbbell seated calf raise -> Single-leg hip thrust
+       2  Pull superset B :: Kettlebell swing -> 45° back extension
+       2  Pull superset B :: Kettlebell swing -> Barbell hip thrust
+       2  Pull superset B :: Kettlebell swing -> Glute-ham raise
+       2  Leg circuit — runner armor :: Step-ups (KB) -> 45° back extension
+       2  Leg circuit — runner armor :: Step-ups (KB) -> Barbell hip thrust
+       1  Power — explosive first :: Kettlebell swing -> 45° back extension
+       1  Power — explosive first :: Kettlebell swing -> Barbell hip thrust
+       1  Power — explosive first :: Kettlebell swing -> Glute-ham raise
+       1  Calf — achilles armor :: Dumbbell standing calf raise -> Single-leg hip thrust
+       1  Leg circuit — runner armor :: Step-ups (KB) -> Glute-ham raise
+  e.g. W1 tue [Calf — achilles armor] Dumbbell seated calf raise loses ["45° back extension","Barbell hip thrust","Glute-ham raise"]
+  e.g. W1 sat [Power — explosive first] Kettlebell swing loses ["45° back extension","Barbell hip thrust","Glute-ham raise"]
+  e.g. W2 tue [Calf — achilles armor] Dumbbell seated calf raise loses ["45° back extension","Barbell hip thrust","Glute-ham raise"]
+  e.g. W3 tue [Leg circuit — runner armor] Kettlebell swing loses ["45° back extension","Barbell hip thrust","Glute-ham raise","Single-leg hip thrust"]
+  e.g. W3 tue [Calf — achilles armor] Dumbbell standing calf raise loses ["45° back extension","Barbell hip thrust","Glute-ham raise","Single-leg hip thrust"]
+  e.g. W4 tue [Leg circuit — runner armor] Kettlebell swing loses ["45° back extension","Barbell hip thrust","Glute-ham raise"]
+
+==== U3. swap-universe change by tree, prevention (FULL 432 + L432 144) vs control (FULL non-prevention 2,592 + L432 non-prevention 288)
+  PREV A   programs whose universe changed 467/576  by tier: commercial 99/108, crossfit 99/108, home_full 93/108, home_basic 72/72, minimal 72/72, bodyweight 32/108
+  PREV W5  programs whose universe changed 6/576  by tier: commercial 0/108, crossfit 0/108, home_full 0/108, home_basic 0/72, minimal 0/72, bodyweight 6/108
+  PREV ALL programs whose universe changed 473/576  by tier: commercial 99/108, crossfit 99/108, home_full 93/108, home_basic 72/72, minimal 72/72, bodyweight 38/108
+  CTRL A   programs whose universe changed 0/2880  by tier: commercial 0/504, crossfit 0/504, home_full 0/504, home_basic 0/432, minimal 0/432, bodyweight 0/504
+  CTRL W5  programs whose universe changed 12/2880  by tier: commercial 0/504, crossfit 0/504, home_full 0/504, home_basic 0/432, minimal 0/432, bodyweight 12/504
+  CTRL ALL programs whose universe changed 12/2880  by tier: commercial 0/504, crossfit 0/504, home_full 0/504, home_basic 0/432, minimal 0/432, bodyweight 12/504
+    CTRL ALL +Single-leg hip thrust (shoulders on bed)   bodyweight 12
+    CTRL W5 +Single-leg hip thrust (shoulders on bed)    bodyweight 12
+    PREV A -45° back extension                           commercial 99, crossfit 96
+    PREV A -Barbell hip thrust                           commercial 93, crossfit 93, home_full 93
+    PREV A -Bodyweight back extension                    home_basic 72, minimal 72, bodyweight 32
+    PREV A -Cable pull-through                           commercial 99
+    PREV A -Glute-ham raise                              commercial 99, crossfit 99
+    PREV A -Nordic hamstring curl (anchored)             home_basic 48, minimal 48
+    PREV ALL +Single-leg hip thrust (shoulders on bed)   bodyweight 6
+    PREV ALL -45° back extension                         commercial 99, crossfit 96
+    PREV ALL -Barbell hip thrust                         commercial 93, crossfit 93, home_full 93
+    PREV ALL -Bodyweight back extension                  home_basic 72, minimal 72, bodyweight 32
+    PREV ALL -Cable pull-through                         commercial 99
+    PREV ALL -Glute-ham raise                            commercial 99, crossfit 99
+    PREV ALL -Nordic hamstring curl (anchored)           home_basic 48, minimal 48
+    PREV W5 +Single-leg hip thrust (shoulders on bed)    bodyweight 6
+EXIT 0
+
+################ PART probe
+==== PR1. HALF_MANNY: options lost because the name left the universe (Barbell hip thrust, Glute-ham raise, 45° back extension): 27 item lists (12 on days whose card is byte-identical V vs ALL, 15 on changed days)
+    W1 tue (card changed) [Calf — achilles armor] Dumbbell seated calf raise loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W1 sat (card unchanged) [Power — explosive first] Kettlebell swing loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W2 tue (card changed) [Calf — achilles armor] Dumbbell seated calf raise loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W3 tue (card changed) [Leg circuit — runner armor] Kettlebell swing loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W3 tue (card changed) [Calf — achilles armor] Dumbbell standing calf raise loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W4 tue (card changed) [Leg circuit — runner armor] Kettlebell swing loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W4 sat (card unchanged) [Post-run mobility] Standing calf stretch loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W5 tue (card changed) [Leg circuit — runner armor] Kettlebell swing loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W5 tue (card changed) [Calf — achilles armor] Dumbbell seated calf raise loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W5 thu (card unchanged) [Pull superset B] Kettlebell swing loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W5 sat (card unchanged) [Post-run mobility] Standing calf stretch loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W6 tue (card changed) [Leg circuit — runner armor] Kettlebell swing loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W6 tue (card changed) [Calf — achilles armor] Dumbbell seated calf raise loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W6 thu (card unchanged) [Pull superset B] Kettlebell swing loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W6 sat (card unchanged) [Post-run mobility] Standing calf stretch loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W7 tue (card changed) [Calf — achilles armor] Dumbbell seated calf raise loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W7 sat (card unchanged) [Post-run mobility] Standing calf stretch loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W8 sat (card unchanged) [Post-run mobility] Standing calf stretch loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W9 tue (card changed) [Calf — achilles armor] Dumbbell standing calf raise loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W9 sat (card unchanged) [Post-run mobility] Standing calf stretch loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W10 tue (card changed) [Calf — achilles armor] Dumbbell standing calf raise loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W10 sat (card unchanged) [Post-run mobility] Standing calf stretch loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W11 tue (card changed) [Leg circuit — runner armor] Step-ups (KB) loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W11 tue (card changed) [Calf — achilles armor] Dumbbell standing calf raise loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W11 sat (card unchanged) [Post-run mobility] Standing calf stretch loses 45° back extension, Barbell hip thrust, Glute-ham raise
+    W12 tue (card changed) [Leg circuit — runner armor] Step-ups (KB) loses 45° back extension, Barbell hip thrust
+    W13 sat (card unchanged) [Post-run mobility] Standing calf stretch loses 45° back extension, Barbell hip thrust, Glute-ham raise
+  options lost for another reason: 6
+    W3 tue [Leg circuit — runner armor] Kettlebell swing loses Single-leg hip thrust  (now on the ALL card)
+    W3 tue [Calf — achilles armor] Dumbbell standing calf raise loses Single-leg hip thrust  (now on the ALL card)
+    W5 tue [Leg circuit — runner armor] Kettlebell swing loses Single-leg hip thrust  (now on the ALL card)
+    W5 tue [Calf — achilles armor] Dumbbell seated calf raise loses Single-leg hip thrust  (now on the ALL card)
+    W6 tue [Leg circuit — runner armor] Kettlebell swing loses Single-leg hip thrust  (now on the ALL card)
+    W6 tue [Calf — achilles armor] Dumbbell seated calf raise loses Single-leg hip thrust  (now on the ALL card)
+  options gained V -> ALL (name: lists): {"Step-ups (KB)":24,"Dumbbell goblet side lunge":8,"Dumbbell split-stance deadlift":8,"Single-leg hip thrust":12,"Dumbbell Bulgarian split squat":19,"Reverse lunge (KB)":4,"Walking lunge (KB)":3,"Kettlebell single-leg deadlift":5,"Kettlebell swing":2,"Barbell Romanian deadlift":1}
+  weeks where each lost name is on a V230 card: Barbell hip thrust 0, Glute-ham raise 0, 45° back extension 0
+EXIT 0
+
+################ PART floor
+==== F1. g215 F2 replica: floor (b) fires iff the tree differs from the same tree with floor (b) written out (g215 FB_FROM -> FB_TO); knee/protect lattice 630 (g215 LAT_K verbatim)
+  V   commercial 0/126, crossfit 0/126, home_full 79/126, home_basic 0/126, bodyweight 0/126   by focus on ALL-firing tiers: home_full:hypertrophy 12 home_full:strength 13 home_full:fatloss 14 home_full:balanced 13 home_full:support_strength 16 home_full:support_athletic 11
+  B   commercial 0/126, crossfit 0/126, home_full 84/126, home_basic 0/126, bodyweight 0/126   by focus on ALL-firing tiers: home_full:hypertrophy 14 home_full:strength 15 home_full:fatloss 15 home_full:balanced 13 home_full:support_strength 16 home_full:support_athletic 11
+  A   commercial 4/126, crossfit 4/126, home_full 83/126, home_basic 0/126, bodyweight 0/126   by focus on ALL-firing tiers: commercial:support_prevention 4 crossfit:support_prevention 4 home_full:hypertrophy 12 home_full:strength 13 home_full:fatloss 14 home_full:balanced 13 home_full:support_strength 16 home_full:support_athletic 11 home_full:support_prevention 4
+  AB  commercial 4/126, crossfit 4/126, home_full 88/126, home_basic 0/126, bodyweight 0/126   by focus on ALL-firing tiers: commercial:support_prevention 4 crossfit:support_prevention 4 home_full:hypertrophy 14 home_full:strength 15 home_full:fatloss 15 home_full:balanced 13 home_full:support_strength 16 home_full:support_athletic 11 home_full:support_prevention 4
+  Ap  commercial 18/126, crossfit 18/126, home_full 97/126, home_basic 9/126, bodyweight 3/126   by focus on ALL-firing tiers: commercial:support_prevention 18 crossfit:support_prevention 18 home_full:hypertrophy 12 home_full:strength 13 home_full:fatloss 14 home_full:balanced 13 home_full:support_strength 16 home_full:support_athletic 11 home_full:support_prevention 18 home_basic:support_prevention 9 bodyweight:support_prevention 3
+  ABp commercial 18/126, crossfit 18/126, home_full 102/126, home_basic 9/126, bodyweight 3/126   by focus on ALL-firing tiers: commercial:support_prevention 18 crossfit:support_prevention 18 home_full:hypertrophy 14 home_full:strength 15 home_full:fatloss 15 home_full:balanced 13 home_full:support_strength 16 home_full:support_athletic 11 home_full:support_prevention 18 home_basic:support_prevention 9 bodyweight:support_prevention 3
+  W5  commercial 0/126, crossfit 0/126, home_full 79/126, home_basic 0/126, bodyweight 0/126   by focus on ALL-firing tiers: home_full:hypertrophy 12 home_full:strength 13 home_full:fatloss 14 home_full:balanced 13 home_full:support_strength 16 home_full:support_athletic 11
+  FL  commercial 0/126, crossfit 0/126, home_full 79/126, home_basic 0/126, bodyweight 0/126   by focus on ALL-firing tiers: home_full:hypertrophy 12 home_full:strength 13 home_full:fatloss 14 home_full:balanced 13 home_full:support_strength 16 home_full:support_athletic 11
+  PRE commercial 18/126, crossfit 18/126, home_full 102/126, home_basic 9/126, bodyweight 0/126   by focus on ALL-firing tiers: commercial:support_prevention 18 crossfit:support_prevention 18 home_full:hypertrophy 14 home_full:strength 15 home_full:fatloss 15 home_full:balanced 13 home_full:support_strength 16 home_full:support_athletic 11 home_full:support_prevention 18 home_basic:support_prevention 9
+  ALL commercial 18/126, crossfit 18/126, home_full 102/126, home_basic 9/126, bodyweight 0/126   by focus on ALL-firing tiers: commercial:support_prevention 18 crossfit:support_prevention 18 home_full:hypertrophy 14 home_full:strength 15 home_full:fatloss 15 home_full:balanced 13 home_full:support_strength 16 home_full:support_athletic 11 home_full:support_prevention 18 home_basic:support_prevention 9
+
+==== F2. firing configs on ALL: day-level effect, V vs ALL, and ALL vs ALL-without-floor (b)
+  commercial support_prevention beginner run_5k s76308 W1 thu
+      V230      Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+      ALL       Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank | Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+      ALL-noFb  Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  crossfit support_prevention beginner run_5k s76308 W1 thu
+      V230      Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+      ALL       Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank | Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+      ALL-noFb  Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  home_full hypertrophy beginner run_5k s76308 W1 sat
+      V230      Lower strength (SS 2) :: Single-leg glute bridge 2 sets — RPE 6 (leave 3 or more in reserve) | Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+        Upper superset (SS 2) :: Dumbbell decline press 2×8–12 @ RPE 6–7 | Kettlebell single-arm row 2×8–12 @ RPE 6–7
+        Arms finisher (SS 2) :: Dumbbell hammer curl 2×12–15 @ RPE 6–7 | Dumbbell skullcrushers 2×12–15 @ RPE 6–7
+      ALL       Lower strength (SS 2) :: Single-leg glute bridge 2 sets — RPE 6 (leave 3 or more in reserve) | Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+        Upper superset (SS 2) :: Dumbbell decline press 2×8–12 @ RPE 6–7 | Kettlebell single-arm row 2×8–12 @ RPE 6–7
+        Arms finisher (SS 2) :: Dumbbell hammer curl 2×12–15 @ RPE 6–7 | Dumbbell skullcrushers 2×12–15 @ RPE 6–7
+      ALL-noFb  Lower strength (SS 2) :: Single-leg glute bridge 2 sets — RPE 6 (leave 3 or more in reserve) | Dumbbell split-stance deadlift 2×10–12 @ RPE 6–7
+        Upper superset (SS 2) :: Dumbbell decline press 2×8–12 @ RPE 6–7 | Kettlebell single-arm row 2×8–12 @ RPE 6–7
+        Arms finisher (SS 2) :: Dumbbell hammer curl 2×12–15 @ RPE 6–7 | Dumbbell skullcrushers 2×12–15 @ RPE 6–7
+  home_basic support_prevention intermediate run_5k s1234 W1 wed
+      V230      Main — Banded hip thrust :: Banded hip thrust 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 7 | Double Kettlebell deadlift 2×8 — hold RPE 7, three in the tank
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Clamshells w/ band 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Banded dorsiflexion 2×15 each
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+      ALL       Main — Banded hip thrust :: Banded hip thrust 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 7 | Double Kettlebell deadlift 2×8 — hold RPE 7, three in the tank | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Clamshells w/ band 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Banded dorsiflexion 2×15 each
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+      ALL-noFb  Main — Banded hip thrust :: Banded hip thrust 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 7 | Double Kettlebell deadlift 2×8 — hold RPE 7, three in the tank
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Clamshells w/ band 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Banded dorsiflexion 2×15 each
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+        5  commercial | BW back extension newly printed
+       12  commercial | V->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+       46  commercial | V->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        4  commercial | V->ALL | add [Loaded carry finisher] Farmer carry
+       15  commercial | V->ALL | add [Loaded carry finisher] Suitcase carry
+       62  commercial | days V->ALL
+       19  commercial | days V->ALL-noFloor
+       58  commercial | days noFloor->ALL
+       12  commercial | noFloor->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+       46  commercial | noFloor->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+       18  commercial | programs
+        5  crossfit | BW back extension newly printed
+       12  crossfit | V->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+       46  crossfit | V->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        4  crossfit | V->ALL | add [Loaded carry finisher] Farmer carry
+       15  crossfit | V->ALL | add [Loaded carry finisher] Suitcase carry
+       62  crossfit | days V->ALL
+       19  crossfit | days V->ALL-noFloor
+       58  crossfit | days noFloor->ALL
+       12  crossfit | noFloor->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+       46  crossfit | noFloor->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+       18  crossfit | programs
+        6  home_basic | V->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+       16  home_basic | V->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        4  home_basic | V->ALL | add [Loaded carry finisher] Farmer carry
+       26  home_basic | days V->ALL
+        4  home_basic | days V->ALL-noFloor
+       22  home_basic | days noFloor->ALL
+        6  home_basic | noFloor->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+       16  home_basic | noFloor->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        9  home_basic | programs
+        5  home_full | BW back extension newly printed
+       20  home_full | V->ALL | add [Calves] Dumbbell seated calf raise
+        7  home_full | V->ALL | add [Calves] Dumbbell standing calf raise
+        6  home_full | V->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+       34  home_full | V->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        4  home_full | V->ALL | add [Leg isolation] Single-leg glute bridge 3 sets — RPE 6 (leave 3 or more in reserve)
+        8  home_full | V->ALL | add [Leg isolation] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure)
+       19  home_full | V->ALL | add [Leg superset B] Bodyweight back extension 3 sets — RPE 8 (stop 2 reps short of failure)
+       12  home_full | V->ALL | add [Leg superset B] Bodyweight back extension 4 sets — RPE 8 (stop 2 reps short of failure)
+       45  home_full | V->ALL | add [Loaded carry finisher] Farmer carry
+        1  home_full | V->ALL | add [Loaded carry finisher] Overhead carry
+       45  home_full | V->ALL | add [Loaded carry finisher] Suitcase carry
+      187  home_full | days V->ALL
+      385  home_full | days V->ALL-noFloor
+      377  home_full | days noFloor->ALL
+        6  home_full | noFloor->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+       34  home_full | noFloor->ALL | add [Leg circuit — runner armor] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+       36  home_full | noFloor->ALL | add [Leg superset B] Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+       27  home_full | noFloor->ALL | add [Leg superset B] Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+      101  home_full | noFloor->ALL | add [Leg superset B] Bodyweight back extension 2 sets — RPE 8 (stop 2 reps short of failure)
+       53  home_full | noFloor->ALL | add [Leg superset B] Bodyweight back extension 3 sets — RPE 8 (stop 2 reps short of failure)
+       12  home_full | noFloor->ALL | add [Leg superset B] Bodyweight back extension 4 sets — RPE 8 (stop 2 reps short of failure)
+       15  home_full | noFloor->ALL | drop [Calves] Dumbbell seated calf raise 3×15–20 @ RPE 8
+       12  home_full | noFloor->ALL | drop [Calves] Dumbbell seated calf raise 4×15–20 @ RPE 8
+        2  home_full | noFloor->ALL | drop [Leg isolation] Single-leg glute bridge 3 sets — RPE 6 (leave 3 or more in reserve)
+        3  home_full | noFloor->ALL | drop [Leg isolation] Single-leg glute bridge 3 sets — RPE 7 (leave 3 or more in reserve)
+       13  home_full | noFloor->ALL | drop [Leg isolation] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure)
+        6  home_full | noFloor->ALL | rename [Lower strength] Dumbbell split-stance deadlift 2×10–12 @ RPE 6–7 -> [Lower strength] Bodyweight back extension 2 sets — RPE 6 (leave
+        6  home_full | noFloor->ALL | rename [Lower strength] Dumbbell split-stance deadlift 2×10–12 @ RPE 7 -> [Lower strength] Bodyweight back extension 2 sets — RPE 7 (leave 3
+       11  home_full | noFloor->ALL | rename [Lower strength] Dumbbell split-stance deadlift 2×10–12 @ RPE 7 -> [Lower strength] Bodyweight back extension 2 sets — RPE 8 (stop 2 
+        6  home_full | noFloor->ALL | rename [Lower strength] Dumbbell split-stance deadlift 2×8–10 @ RPE 6–7 -> [Lower strength] Bodyweight back extension 2 sets — RPE 6 (leave 
+       25  home_full | noFloor->ALL | rename [Lower strength] Dumbbell split-stance deadlift 2×8–10 @ RPE 7 -> [Lower strength] Bodyweight back extension 2 sets — RPE 7 (leave 3 
+       31  home_full | noFloor->ALL | rename [Lower strength] Dumbbell split-stance deadlift 3×10–12 @ RPE 7 -> [Lower strength] Bodyweight back extension 3 sets — RPE 8 (stop 2 
+       23  home_full | noFloor->ALL | rename [Lower strength] Dumbbell split-stance deadlift 3×8–10 @ RPE 7 -> [Lower strength] Bodyweight back extension 3 sets — RPE 7 (leave 3 
+      102  home_full | programs
+EXIT 0
+
+################ PART cls
+==== CLS: lattice 6912 configs; built on all five trees 6912; crashes {}; V==V self-identity 141/141
+  V->ALL: programs changed 4194/6912; days changed 25444/385560
+    ALL        progs 4194/6912  days 25444/385560
+    L FULL     progs 2170/3024  days 13979/174636
+    L INJ      progs 1766/3024  days 10274/174636
+    L L432     progs 158/432  days 777/18144
+    L LBW      progs 100/432  days 414/18144
+
+  STEP B: programs changed 3526/6912, days changed 20023 (classified 20022, UNCLASSIFIED 1)
+    days changed by segment (changed/days in segment): FAM none 1345/120960; FAM race 9407/144648 [U 1]; FAM test 9271/119952; FOCUS balanced 2923/55944 [U 1]; FOCUS fatloss 2786/49896; FOCUS hypertrophy 4211/55944; FOCUS strength 2972/55944; FOCUS support_athletic 3109/55944; FOCUS support_prevention 1450/55944; FOCUS support_strength 2572/55944; INJ ankle/protect 278/17556; INJ ankle/workaround 313/17598; INJ elbow/protect 1058/17556; INJ elbow/workaround 852/17598; INJ hip/protect 125/17556; INJ hip/workaround 990/17598; INJ knee/protect 351/17556; INJ knee/workaround 1037/17598 [U 1]; INJ lowback/protect 548/17556; INJ lowback/workaround 678/17598; INJ none 11685/174636; INJ shoulder/protect 1148/17556; INJ shoulder/workaround 960/17598; L FULL 11685/174636; L INJ 8089/174636 [U 1]; L L432 43/18144; L LBW 206/18144; TIER bodyweight 1266/71820; TIER commercial 3681/62748 [U 1]; TIER crossfit 3372/60690; TIER home_basic 3579/67284; TIER home_full 4389/62748; TIER minimal 3736/60270
+    op B-1                                               26548   FOCUS hypertrophy 4900, TIER commercial 4991, INJ none 15790, FAM race 12684, TIER crossfit 4528, TIER home_full 5794, TIER home_basic 4863, TIER minimal 5076, TIER bodyweight 1296, FAM test 12491, FAM none 1373, FOCUS strength 4207, FOCUS fatloss 3903, FOCUS balanced 4027, FOCUS support_strength 3497, FOCUS support_athletic 4261, FOCUS support_prevention 1753, INJ knee/workaround 1384, INJ knee/protect 395, INJ ankle/workaround 333, INJ ankle/protect 312, INJ hip/workaround 1369, INJ hip/protect 132, INJ lowback/workaround 731, INJ lowback/protect 612, INJ shoulder/workaround 1216, INJ shoulder/protect 1844, INJ elbow/workaround 921, INJ elbow/protect 1509
+        e.g. FULL hypertrophy race commercial none beginner s87747 sun,wed W1 tue :: add [Calves] Dumbbell standing calf raise 3×15–20 @ RPE 6–7
+        e.g. FULL hypertrophy race commercial none beginner s87747 sun,wed W1 tue :: add [Leg isolation] Single-leg glute bridge 3 sets — RPE 6 (leave 3 or more in reserve)
+        e.g. FULL hypertrophy race commercial none beginner s87747 sun,wed W2 tue :: add [Calves] Dumbbell standing calf raise 3×15–20 @ RPE 6–7
+        e.g. FULL hypertrophy race commercial none beginner s87747 sat,sun W1 mon :: add [Leg superset B] Single-leg hip thrust 2×6–10 @ RPE 6–7
+    op B-2                                                  28   FOCUS support_prevention 28, TIER commercial 10, INJ none 14, FAM race 12, TIER crossfit 4, TIER home_full 14, FAM test 16, INJ knee/workaround 2, INJ ankle/workaround 2, INJ ankle/protect 3, INJ hip/workaround 2, INJ hip/protect 3, INJ elbow/workaround 2
+        e.g. FULL support_prevention race commercial none intermediate s1234 sun,wed W3 tue :: redetail [Accessory] Landmine rotational press 3×15 each -> [Accessory] Landmine rotational press 2×15 each
+        e.g. FULL support_prevention race crossfit none intermediate s1234 sun,wed W3 tue :: redetail [Accessory] Landmine rotational press 3×15 each -> [Accessory] Landmine rotational press 2×15 each
+        e.g. FULL support_prevention race home_full none intermediate s1234 sun,wed W3 tue :: redetail [Accessory] Landmine rotational press 3×15 each -> [Accessory] Landmine rotational press 2×15 each
+        e.g. FULL support_prevention race commercial none intermediate s1234 sat,sun W3 tue :: redetail [Accessory] Landmine rotational press 3×15 each -> [Accessory] Landmine rotational press 2×15 each
+    op UNCLASSIFIED:B-removal                                1   PASS other 1, LOST Leg superset B: Barbell good mornings 1, FOCUS balanced 1, TIER commercial 1, INJ knee/workaround 1, FAM race 1
+        e.g. INJ balanced race commercial knee/workaround intermediate s1234 sat,sun W7 wed :: rename [Leg superset B] Barbell good mornings 3×6–10 @ RPE 8 -> [Leg superset B] Dumbbell split-stance deadlift 3×6–10 @ RPE 8
+
+  STEP A: programs changed 797/6912, days changed 5284 (classified 5084, UNCLASSIFIED 200)
+    days changed by segment (changed/days in segment): FAM none 2154/120960 [U 24]; FAM race 1606/144648 [U 82]; FAM test 1524/119952 [U 94]; FOCUS support_prevention 5284/55944 [U 200]; INJ ankle/protect 24/17556; INJ ankle/workaround 360/17598 [U 20]; INJ elbow/protect 298/17556 [U 63]; INJ elbow/workaround 301/17598; INJ hip/protect 12/17556; INJ hip/workaround 306/17598; INJ knee/protect 110/17556; INJ knee/workaround 360/17598; INJ lowback/protect 96/17556 [U 4]; INJ lowback/workaround 96/17598; INJ none 2722/174636 [U 22]; INJ shoulder/protect 298/17556 [U 91]; INJ shoulder/workaround 301/17598; L FULL 2722/174636 [U 22]; L INJ 1914/174636 [U 166]; L L432 648/18144 [U 12]; TIER bodyweight 871/71820 [U 50]; TIER commercial 1005/62748 [U 39]; TIER crossfit 952/60690 [U 38]; TIER home_basic 767/67284 [U 23]; TIER home_full 919/62748 [U 29]; TIER minimal 770/60270 [U 21]
+    op A-1                                                5000   NAME Single-leg hip thrust [loaded] 1386, FOCUS support_prevention 5000, TIER commercial 919, INJ none 2704, FAM race 1582, TIER crossfit 890, TIER home_full 869, NAME Banded hip thrust [home_basic] 236, TIER home_basic 741, NAME Single-leg glute bridge (weighted) [home_basic] 226, NAME Banded hip thrust [minimal] 233, TIER minimal 760, NAME Single-leg glute bridge (weighted) [minimal] 220, NAME Single-leg glute bridge [bodyweight] 78, TIER bodyweight 821, NAME Single-leg hip thrust (shoulders on bed) [bodyweight] 297, FAM test 1480, FAM none 1938, NAME Walking lunge [bodyweight] 8, NAME Reverse lunge [bodyweight] 8, NAME Bulgarian split squat (foot on chair) [bodyweight] 4, NAME Single-leg hip thrust @knee/workaround [loaded] 188, INJ knee/workaround 382, NAME Single-leg glute bridge (weighted) @knee/workaround [home_basic] 37, NAME Banded hip thrust @knee/workaround [home_basic] 12, NAME Banded hip thrust @knee/workaround [minimal] 43, NAME Single-leg glute bridge (weighted) @knee/workaround [minimal] 8, NAME Step-ups (chair) @knee/workaround [home_basic] 4, NAME Reverse lunge @knee/workaround [home_basic] 8, NAME Step-ups (chair) @knee/workaround [minimal] 4, NAME Bodyweight back extension @knee/protect [loaded] 78, INJ knee/protect 90, NAME Bodyweight back extension @knee/protect [minimal] 12, NAME Single-leg hip thrust @ankle/workaround [loaded] 168, INJ ankle/workaround 340, NAME Single-leg glute bridge (weighted) @ankle/workaround [home_basic] 37, NAME Banded hip thrust @ankle/workaround [home_basic] 12, NAME Banded hip thrust @ankle/workaround [minimal] 43, NAME Single-leg glute bridge (weighted) @ankle/workaround [minimal] 8, NAME Single-leg hip thrust @hip/workaround [loaded] 188, INJ hip/workaround 288, NAME Single-leg glute bridge (weighted) @hip/workaround [home_basic] 37, NAME Banded hip thrust @hip/workaround [home_basic] 12, NAME Banded hip thrust @hip/workaround [minimal] 43, NAME Single-leg glute bridge (weighted) @hip/workaround [minimal] 8, NAME Single-leg hip thrust @shoulder/workaround [loaded] 162, INJ shoulder/workaround 313, NAME Single-leg glute bridge (weighted) @shoulder/workaround [home_basic] 27, NAME Banded hip thrust @shoulder/workaround [home_basic] 8, NAME Banded hip thrust @shoulder/workaround [minimal] 30, NAME Single-leg glute bridge (weighted) @shoulder/workaround [minimal] 6, NAME Single-leg hip thrust @shoulder/protect [loaded] 173, INJ shoulder/protect 285, NAME Single-leg glute bridge (weighted) @shoulder/protect [home_basic] 24, NAME Banded hip thrust @shoulder/protect [minimal] 29, NAME Single-leg glute bridge (weighted) @shoulder/protect [minimal] 4, NAME Banded hip thrust @shoulder/protect [home_basic] 1, NAME Single-leg hip thrust @elbow/workaround [loaded] 162, INJ elbow/workaround 313, NAME Single-leg glute bridge (weighted) @elbow/workaround [home_basic] 27, NAME Banded hip thrust @elbow/workaround [home_basic] 8, NAME Banded hip thrust @elbow/workaround [minimal] 30, NAME Single-leg glute bridge (weighted) @elbow/workaround [minimal] 6, NAME Single-leg hip thrust @elbow/protect [loaded] 173, INJ elbow/protect 285, NAME Single-leg glute bridge (weighted) @elbow/protect [home_basic] 24, NAME Banded hip thrust @elbow/protect [minimal] 29, NAME Single-leg glute bridge (weighted) @elbow/protect [minimal] 4, NAME Banded hip thrust @elbow/protect [home_basic] 1, NAME Step-ups (chair) [bodyweight] 8, NAME Single-leg hip thrust (shoulders on bed) @knee/workaround [bodyweight] 72, NAME Step-ups (chair) @knee/workaround [bodyweight] 6, NAME Single-leg hip thrust (shoulders on bed) @ankle/workaround [bodyweight] 72, NAME Single-leg hip thrust (shoulders on bed) @shoulder/workaround [bodyweight] 68, NAME Walking lunge @shoulder/workaround [bodyweight] 6, NAME Reverse lunge @shoulder/workaround [bodyweight] 6, NAME Single-leg hip thrust (shoulders on bed) @shoulder/protect [bodyweight] 42, NAME Single-leg hip thrust (shoulders on bed) @elbow/workaround [bodyweight] 68, NAME Walking lunge @elbow/workaround [bodyweight] 6, NAME Reverse lunge @elbow/workaround [bodyweight] 6, NAME Single-leg hip thrust (shoulders on bed) @elbow/protect [bodyweight] 42, NAME Step-ups (chair) @shoulder/protect [bodyweight] 4, NAME Step-ups (chair) @elbow/protect [bodyweight] 4, NAME Walking lunge @shoulder/protect [bodyweight] 4, NAME Reverse lunge @shoulder/protect [bodyweight] 4, NAME Walking lunge @elbow/protect [bodyweight] 4, NAME Reverse lunge @elbow/protect [bodyweight] 4
+        e.g. FULL support_prevention race commercial none beginner s87747 sun,wed W1 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        e.g. FULL support_prevention race commercial none beginner s87747 sun,wed W2 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        e.g. FULL support_prevention race commercial none beginner s87747 sun,wed W3 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. FULL support_prevention race commercial none beginner s1234 sun,wed W1 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+    op A-2                                                 722   FOCUS support_prevention 722, TIER commercial 116, INJ none 212, FAM none 722, TIER crossfit 188, TIER home_full 164, TIER bodyweight 190, INJ knee/workaround 44, TIER home_basic 44, TIER minimal 20, INJ knee/protect 20, INJ ankle/workaround 40, INJ ankle/protect 24, INJ hip/workaround 34, INJ hip/protect 12, INJ lowback/workaround 96, INJ lowback/protect 92, INJ shoulder/workaround 28, INJ shoulder/protect 46, INJ elbow/workaround 28, INJ elbow/protect 46
+        e.g. FULL support_prevention none commercial none beginner s4242 sun,wed W1 thu :: add [Leg isolation] Wall sit 3×25 sec
+        e.g. FULL support_prevention none commercial none beginner s4242 sun,wed W2 thu :: add [Leg isolation] Wall sit 3×25 sec
+        e.g. FULL support_prevention none commercial none intermediate s1234 sun,wed W3 thu :: drop [Leg isolation] Wall sit 3×25 sec
+        e.g. FULL support_prevention none commercial none beginner s1234 sun,wed W3 thu :: drop [Leg isolation] Wall sit 3×25 sec
+    op A-3                                                  72   FOCUS support_prevention 72, TIER bodyweight 8, INJ none 8, FAM none 72, TIER commercial 8, INJ ankle/protect 4, TIER crossfit 20, INJ lowback/workaround 30, TIER home_basic 12, INJ lowback/protect 26, TIER minimal 2, TIER home_full 22, INJ hip/protect 4
+        e.g. FULL support_prevention none bodyweight none intermediate s1234 sun,wed W5 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+        e.g. FULL support_prevention none bodyweight none intermediate s1234 sun,wed W6 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+        e.g. INJ support_prevention none commercial ankle/protect beginner s1234 sun,wed W5 thu :: redetail [Leg isolation] Leg press 3×12 — hold RPE 7, three in the tank -> [Leg isolation] Leg press 2×12 — hold RPE 7, three in the tank
+        e.g. FULL support_prevention none bodyweight none beginner s1234 sun,wed W5 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+    op UNCLASSIFIED:A-other                                182   PASS capRegionalFatigue 30, LOST Leg circuit: Walking lunge 4, FOCUS support_prevention 182, TIER bodyweight 56, INJ none 22, FAM race 72, LOST Leg circuit: Reverse lunge 6, LOST Leg circuit: Bulgarian split squat (foot on chair) 5, FAM test 86, TIER crossfit 35, INJ ankle/workaround 20, FAM none 24, TIER commercial 31, INJ lowback/protect 4, PASS capSessionBudget 128, LOST Core: Cable woodchoppers 4, INJ shoulder/protect 72, LOST Core: Standing torso rotations (slow) 14, LOST Core: Band woodchopper (door anchor) 6, LOST Core: Suitcase carry 2, LOST Core: Medicine ball rotary toss 4, LOST Core: Landmine rotations 8, LOST Core: Dumbbell renegade rows 7, LOST Core: Side plank thread-the-needle 18, TIER home_basic 21, LOST Core: Windshield wipers 6, LOST Core: Farmer carry 5, LOST Leg circuit: Spanish squat hold (KB) 12, LOST Core: Plank shoulder taps 12, LOST Leg circuit: Wall sit 22, INJ elbow/protect 64, LOST Leg circuit: Step-ups (chair) 15, TIER home_full 25, TIER minimal 14, LOST Leg circuit: Single-leg wall sit 4, LOST Core: Side plank 2, LOST Core: Bird dogs 2
+        e.g. FULL support_prevention race bodyweight none beginner s76308 sat,sun W3 mon :: rename [Leg circuit — runner armor] Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. FULL support_prevention race bodyweight none beginner s76308 sat,sun W4 mon :: rename [Leg circuit — runner armor] Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+          B: Main — Bulgarian split squat (foot on chair) :: Bulgarian split squat (foot on chair) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Single-leg calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+          ABp: Main — Bulgarian split squat (foot on chair) :: Bulgarian split squat (foot on chair) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Single-leg calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | IT band stretch 2×30 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+        e.g. FULL support_prevention race bodyweight none beginner s76308 sat,sun W5 mon :: rename [Leg circuit — runner armor] Reverse lunge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. FULL support_prevention test bodyweight none beginner s87747 sat,sun W11 mon :: rename [Leg circuit — runner armor] Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+    op UNCLASSIFIED:calf-or-carry-removed                   49   PASS capSessionBudget 49, LOST Loaded carry finisher: Farmer carry 18, FOCUS support_prevention 49, TIER commercial 13, INJ shoulder/protect 46, FAM race 26, LOST Loaded carry finisher: Overhead carry 7, LOST Loaded carry finisher: Suitcase carry 18, TIER home_basic 6, FAM test 23, TIER crossfit 6, TIER home_full 7, LOST Calf: Dumbbell seated calf raise 2, INJ elbow/protect 3, LOST Calf: Dumbbell standing calf raise 2, TIER minimal 15, LOST Calf: Single-leg calf raise (bodyweight) 2, TIER bodyweight 2
+        e.g. INJ support_prevention race commercial shoulder/protect beginner s1234 sun,wed W2 tue :: drop [Loaded carry finisher] Farmer carry 3×40 yards, heavy
+        e.g. INJ support_prevention race commercial shoulder/protect beginner s1234 sun,wed W5 tue :: drop [Loaded carry finisher] Farmer carry 3×40 yards, heavy
+          B: Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Terminal knee extension (band) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Machine seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+        Core — Rotational Power :: Side plank thread-the-needle 3×10 each | Band woodchopper (door anchor) 3×12 each
+          ABp: Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Terminal knee extension (band) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Machine seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Tibialis raise (wall lean) 2×20
+        Core — Rotational Power :: Side plank thread-the-needle 3×10 each
+        e.g. INJ support_prevention race commercial shoulder/protect beginner s1234 sun,wed W7 tue :: drop [Loaded carry finisher] Overhead carry 3×40 yards each, heavy
+        e.g. INJ support_prevention race home_full shoulder/protect intermediate s87747 sun,wed W2 tue :: drop [Loaded carry finisher] Farmer carry 3×40 yards, heavy
+
+  STEP W5: programs changed 184/6912, days changed 872 (classified 831, UNCLASSIFIED 41)
+    days changed by segment (changed/days in segment): FAM none 418/120960 [U 6]; FAM race 243/144648 [U 24]; FAM test 211/119952 [U 11]; FOCUS balanced 156/55944 [U 2]; FOCUS fatloss 79/49896 [U 8]; FOCUS hypertrophy 150/55944; FOCUS strength 143/55944; FOCUS support_athletic 126/55944 [U 2]; FOCUS support_prevention 109/55944 [U 21]; FOCUS support_strength 109/55944 [U 8]; INJ ankle/protect 103/17556 [U 25]; INJ knee/protect 32/17556 [U 16]; INJ lowback/protect 488/17556; INJ lowback/workaround 249/17598; L INJ 578/174636 [U 35]; L L432 90/18144 [U 6]; L LBW 204/18144; TIER bodyweight 872/71820 [U 41]
+    op D196-1                                              603   FOCUS support_strength 63, TIER bodyweight 603, INJ ankle/protect 91, FAM none 306, INJ lowback/workaround 249, INJ lowback/protect 243, FOCUS balanced 99, FOCUS strength 126, FOCUS fatloss 45, INJ knee/protect 20, FAM test 142, FAM race 155, FOCUS support_athletic 81, FOCUS support_prevention 63, FOCUS hypertrophy 126
+        e.g. L432 support_strength none bodyweight ankle/protect beginner s76308 sun,wed W3 thu :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        e.g. L432 support_strength none bodyweight ankle/protect beginner s76308 sun,wed W4 thu :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        e.g. L432 support_strength none bodyweight ankle/protect intermediate s76308 sun,wed W3 thu :: rename [Main — Burpees] Burpees 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+        e.g. INJ fatloss test bodyweight knee/protect intermediate s76308 sun,wed W9 thu :: rename [Main — Burpees] Burpees 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+    op D196-2                                              168   FOCUS support_strength 27, TIER bodyweight 168, INJ ankle/protect 162, FAM none 116, FOCUS balanced 71, INJ knee/protect 6, FAM test 26, FOCUS support_athletic 51, FOCUS fatloss 7, FAM race 26, FOCUS support_prevention 12
+        e.g. L432 support_strength none bodyweight ankle/protect beginner s76308 sun,wed W3 thu :: relabel [Leg isolation] Single-leg hip thrust 3 sets — RPE 7 (leave 3 or more in reserve) -> [Leg superset A] Single-leg hip thrust 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. L432 support_strength none bodyweight ankle/protect beginner s76308 sun,wed W3 thu :: drop [Leg superset A] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. L432 support_strength none bodyweight ankle/protect beginner s76308 sun,wed W3 thu :: add [Leg isolation] Wall sit 3×25 sec
+        e.g. INJ balanced test bodyweight knee/protect intermediate s4242 sun,wed W11 thu :: rename [Leg superset B] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure) -> [Leg superset B] Single-leg Romanian deadlift (bodyweight) 3 sets — RPE 7 (leave 3 or more in reserve)
+    op D196-3                                               92   FOCUS support_strength 24, TIER bodyweight 92, INJ lowback/workaround 16, FAM none 66, INJ lowback/protect 76, FOCUS balanced 28, FAM race 10, FOCUS fatloss 4, FAM test 16, FOCUS support_athletic 18, FOCUS support_prevention 18
+        e.g. L432 support_strength none bodyweight lowback/workaround beginner s76308 sun,wed W1 tue :: add [Pull] Burpees 2×10
+        e.g. L432 support_strength none bodyweight lowback/workaround beginner s76308 sun,wed W2 tue :: add [Pull] Burpees 2×10
+        e.g. L432 support_strength none bodyweight lowback/workaround intermediate s76308 sun,wed W1 tue :: add [Pull] Burpees 2×10
+        e.g. INJ support_strength race bodyweight lowback/workaround intermediate s76308 sun,wed W1 tue :: add [Pull] Burpees 2×10
+    op D196-3(dose N×10, N!=2)                              86   FOCUS support_strength 10, TIER bodyweight 86, INJ lowback/workaround 46, FAM none 52, INJ lowback/protect 40, FOCUS balanced 28, FOCUS fatloss 12, FAM race 18, FAM test 16, FOCUS support_athletic 20, FOCUS support_prevention 16
+        e.g. L432 support_strength none bodyweight lowback/workaround advanced s76308 sun,wed W1 tue :: add [Pull] Burpees 3×10
+        e.g. L432 support_strength none bodyweight lowback/workaround advanced s76308 sun,wed W2 tue :: add [Pull] Burpees 3×10
+        e.g. L432 support_strength none bodyweight lowback/protect advanced s76308 sun,wed W1 tue :: add [Pull superset B] Burpees 3×10
+        e.g. INJ fatloss race bodyweight lowback/workaround intermediate s76308 sun,wed W1 tue :: add [Pull] Burpees 3×10
+    op D196-4                                              245   FOCUS support_strength 38, TIER bodyweight 245, INJ lowback/protect 245, FAM none 112, FOCUS balanced 57, FOCUS hypertrophy 24, FAM race 64, FOCUS strength 17, FAM test 69, FOCUS fatloss 26, FOCUS support_athletic 45, FOCUS support_prevention 38
+        e.g. L432 support_strength none bodyweight lowback/protect beginner s76308 sun,wed W3 thu :: rename [Leg superset B] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. L432 support_strength none bodyweight lowback/protect beginner s76308 sun,wed W4 thu :: rename [Leg superset B] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. L432 support_strength none bodyweight lowback/protect beginner s76308 sun,wed W5 thu :: rename [Leg superset B] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. INJ hypertrophy race bodyweight lowback/protect intermediate s4242 sun,wed W1 thu :: rename [Leg superset B] Burpees 3×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave 3 or more in reserve)
+    op UNCLASSIFIED:D196-ak-other                           71   PASS other 24, LOST Primer: Burpees 24, FOCUS fatloss 16, TIER bodyweight 71, INJ knee/protect 28, FAM race 48, PASS capRegionalFatigue 17, LOST Leg: Single-leg glute bridge 4, FOCUS balanced 2, FAM test 11, FOCUS support_strength 16, FOCUS support_athletic 2, FOCUS support_prevention 35, INJ ankle/protect 43, LOST Leg circuit: Single-leg glute bridge 13, FAM none 12
+        e.g. INJ fatloss race bodyweight knee/protect intermediate s4242 sun,wed W7 thu :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        e.g. INJ fatloss race bodyweight knee/protect intermediate s4242 sun,wed W7 thu :: add [Primer — Single-leg glute bridge] Single-leg glute bridge 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+          ABp: Primer — Burpees :: Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+          PRE: Primer — Single-leg glute bridge :: Single-leg glute bridge 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        e.g. INJ fatloss race bodyweight knee/protect intermediate s4242 sun,wed W8 thu :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        e.g. INJ fatloss race bodyweight knee/protect advanced s4242 sat,sun W7 wed :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+
+  STEP FL: programs changed 6/6912, days changed 12 (classified 12, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM none 12/120960; FOCUS balanced 4/55944; FOCUS fatloss 2/49896; FOCUS support_athletic 2/55944; FOCUS support_strength 4/55944; INJ elbow/workaround 12/17598; L INJ 4/174636; L L432 4/18144; L LBW 4/18144; TIER bodyweight 12/71820
+    op D197-1                                               12   FOCUS support_strength 4, TIER bodyweight 12, INJ elbow/workaround 12, FAM none 12, FOCUS balanced 4, FOCUS support_athletic 2, FOCUS fatloss 2
+        e.g. L432 support_strength none bodyweight elbow/workaround advanced s76308 sun,wed W3 mon :: redetail [Chest volume] Pushups (slow 3s eccentric) 4 sets — RPE 8 (stop 2 reps short of failure) -> [Chest volume] Pushups (slow 3s eccentric) 4 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. L432 support_strength none bodyweight elbow/workaround advanced s76308 sun,wed W4 mon :: redetail [Chest volume] Pushups (slow 3s eccentric) 4 sets — RPE 8 (stop 2 reps short of failure) -> [Chest volume] Pushups (slow 3s eccentric) 4 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. LBW balanced none bodyweight elbow/workaround advanced s76308 sun,wed W3 mon :: redetail [Chest volume] Pushups (slow 3s eccentric) 4 sets — RPE 8 (stop 2 reps short of failure) -> [Chest volume] Pushups (slow 3s eccentric) 4 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. L432 support_athletic none bodyweight elbow/workaround advanced s76308 sun,wed W3 mon :: redetail [Chest volume] Pushups (slow 3s eccentric) 4 sets — RPE 8 (stop 2 reps short of failure) -> [Chest volume] Pushups (slow 3s eccentric) 4 sets — RPE 7 (leave 3 or more in reserve)
+EXIT 0
+
+################ PART gcls
+==== CLS g221_d177_swapfloor_: 387 configs; built on all five trees 387; crashes {}; V==V self-identity 12/12
+  V->ALL: programs changed 268/387; days changed 1931/27006
+    ALL        progs 268/387  days 1931/27006
+
+  STEP B: programs changed 201/387, days changed 1268 (classified 1268, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM none 184/8190; FAM race 1084/18816; FOCUS hypertrophy 552/6720; FOCUS strength 290/6720; FOCUS support_prevention 130/6720; FOCUS support_strength 296/6846; INJ knee/workaround 347/6804; INJ lowback/workaround 234/6720; INJ none 244/6762; INJ shoulder/protect 443/6720; L g221_d177_swapfloor 1268/27006; TIER bodyweight 108/4480; TIER commercial 228/4606; TIER crossfit 240/4480; TIER home_basic 242/4480; TIER home_full 236/4480; TIER minimal 214/4480
+    op B-1                                                1676   FOCUS support_prevention 208, TIER commercial 305, INJ knee/workaround 417, FAM race 1492, FOCUS support_strength 409, INJ lowback/workaround 269, FOCUS hypertrophy 646, INJ none 335, FAM none 184, FOCUS strength 413, TIER home_full 314, TIER crossfit 325, TIER home_basic 335, TIER bodyweight 109, TIER minimal 288, INJ shoulder/protect 655
+        e.g. g221_d177_swapfloor support_prevention race commercial knee/workaround beginner s76308 sun,wed W1 thu :: add [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g221_d177_swapfloor support_prevention race commercial knee/workaround beginner s76308 sun,wed W2 thu :: add [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g221_d177_swapfloor support_prevention race commercial knee/workaround beginner s76308 sun,wed W3 thu :: add [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g221_d177_swapfloor support_strength race commercial shoulder/protect advanced s76308 sun,wed W1 tue :: add [Leg superset A] Dumbbell Bulgarian split squat 3×8–12 each @ RPE 8
+
+  STEP A: programs changed 78/387, days changed 680 (classified 585, UNCLASSIFIED 95)
+    days changed by segment (changed/days in segment): FAM none 252/8190; FAM race 428/18816 [U 95]; FOCUS support_prevention 680/6720 [U 95]; INJ knee/workaround 216/6804; INJ lowback/workaround 36/6720; INJ none 214/6762; INJ shoulder/protect 214/6720 [U 95]; L g221_d177_swapfloor 680/27006 [U 95]; TIER bodyweight 110/4480 [U 5]; TIER commercial 114/4606 [U 18]; TIER crossfit 114/4480 [U 18]; TIER home_basic 114/4480 [U 18]; TIER home_full 114/4480 [U 18]; TIER minimal 114/4480 [U 18]
+    op A-1                                                 670   NAME Single-leg hip thrust @knee/workaround [loaded] 108, FOCUS support_prevention 670, TIER commercial 108, INJ knee/workaround 234, FAM race 428, NAME Single-leg hip thrust @shoulder/protect [loaded] 108, INJ shoulder/protect 218, FAM none 242, NAME Single-leg hip thrust [loaded] 108, TIER home_full 108, INJ none 218, TIER crossfit 108, NAME Single-leg glute bridge (weighted) [home_basic] 32, TIER home_basic 116, NAME Banded hip thrust [home_basic] 4, NAME Single-leg hip thrust (shoulders on bed) [bodyweight] 34, TIER bodyweight 114, NAME Single-leg glute bridge (weighted) [minimal] 32, TIER minimal 116, NAME Banded hip thrust [minimal] 4, NAME Step-ups (chair) @knee/workaround [home_basic] 8, NAME Single-leg glute bridge (weighted) @knee/workaround [home_basic] 32, NAME Single-leg glute bridge (weighted) @shoulder/protect [home_basic] 32, NAME Banded hip thrust @shoulder/protect [home_basic] 4, NAME Banded hip thrust @knee/workaround [home_basic] 4, NAME Single-leg hip thrust (shoulders on bed) @shoulder/protect [bodyweight] 34, NAME Walking lunge @shoulder/protect [bodyweight] 2, NAME Reverse lunge @shoulder/protect [bodyweight] 2, NAME Single-leg hip thrust (shoulders on bed) @knee/workaround [bodyweight] 36, NAME Single-leg glute bridge (weighted) @knee/workaround [minimal] 32, NAME Banded hip thrust @knee/workaround [minimal] 4, NAME Single-leg glute bridge (weighted) @shoulder/protect [minimal] 32, NAME Step-ups (chair) @knee/workaround [minimal] 8, NAME Banded hip thrust @shoulder/protect [minimal] 4, NAME Walking lunge [bodyweight] 2, NAME Reverse lunge [bodyweight] 2, NAME Step-ups (chair) @knee/workaround [bodyweight] 2
+        e.g. g221_d177_swapfloor support_prevention race commercial knee/workaround beginner s76308 sun,wed W1 thu :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        e.g. g221_d177_swapfloor support_prevention race commercial knee/workaround beginner s76308 sun,wed W2 thu :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        e.g. g221_d177_swapfloor support_prevention race commercial knee/workaround beginner s76308 sun,wed W3 thu :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g221_d177_swapfloor support_prevention none commercial none beginner s76308 sun,wed W1 thu :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+    op A-2                                                  90   FOCUS support_prevention 90, TIER home_full 18, INJ lowback/workaround 36, FAM none 90, INJ none 12, TIER bodyweight 16, INJ shoulder/protect 12, INJ knee/workaround 30, TIER crossfit 18, TIER home_basic 16, TIER commercial 6, TIER minimal 16
+        e.g. g221_d177_swapfloor support_prevention none home_full lowback/workaround beginner s76308 sun,wed W1 thu :: add [Leg isolation] Single-leg hip thrust 2×12 — hold RPE 7, three in the tank
+        e.g. g221_d177_swapfloor support_prevention none home_full lowback/workaround beginner s76308 sun,wed W2 thu :: add [Leg isolation] Single-leg hip thrust 2×12 — hold RPE 7, three in the tank
+        e.g. g221_d177_swapfloor support_prevention none home_full lowback/workaround beginner s76308 sun,wed W3 thu :: add [Leg isolation] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g221_d177_swapfloor support_prevention none home_full shoulder/protect beginner s76308 sun,wed W5 thu :: add [Leg isolation] Wall sit 3×25 sec
+    op A-3                                                  12   FOCUS support_prevention 12, TIER home_full 4, INJ lowback/workaround 12, FAM none 12, TIER home_basic 2, TIER crossfit 4, TIER minimal 2
+        e.g. g221_d177_swapfloor support_prevention none home_full lowback/workaround beginner s76308 sun,wed W1 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+        e.g. g221_d177_swapfloor support_prevention none home_full lowback/workaround beginner s76308 sun,wed W2 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+        e.g. g221_d177_swapfloor support_prevention none home_full lowback/workaround beginner s76308 sun,wed W5 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+        e.g. g221_d177_swapfloor support_prevention none home_basic lowback/workaround beginner s76308 sun,wed W1 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+    op UNCLASSIFIED:A-other                                 73   PASS capSessionBudget 73, LOST Core: Standing torso rotations (slow) 11, FOCUS support_prevention 73, TIER home_full 16, INJ shoulder/protect 73, FAM race 73, LOST Core: Band woodchopper (door anchor) 4, LOST Core: Landmine rotations 8, LOST Core: Farmer carry 8, LOST Core: Side plank thread-the-needle 20, LOST Core: Windshield wipers 8, LOST Core: Dumbbell renegade rows 8, TIER home_basic 14, TIER bodyweight 5, LOST Core: Cable woodchoppers 2, TIER commercial 14, LOST Core: Medicine ball rotary toss 2, TIER crossfit 14, TIER minimal 10, LOST Core: Suitcase carry 2
+        e.g. g221_d177_swapfloor support_prevention race home_full shoulder/protect advanced s76308 sun,wed W1 tue :: drop [Core — Rotational Power] Standing torso rotations (slow) 2×8–12 each @ RPE 7
+        e.g. g221_d177_swapfloor support_prevention race home_full shoulder/protect advanced s76308 sun,wed W3 tue :: drop [Core — Rotational Power] Band woodchopper (door anchor) 3×12 each
+          B: Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+        Core — Rotational Power :: Side plank thread-the-needle 3×10 each | Band woodchopper (door anchor) 3×12 each
+          ABp: Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Core — Rotational Power :: Side plank thread-the-needle 3×10 each
+        e.g. g221_d177_swapfloor support_prevention race home_full shoulder/protect advanced s76308 sun,wed W5 tue :: drop [Core — Rotational Power] Landmine rotations 2×8–12 each @ RPE 7
+        e.g. g221_d177_swapfloor support_prevention race commercial shoulder/protect beginner s76308 sun,wed W1 tue :: drop [Core — Rotational Power] Cable woodchoppers 3×12 each
+    op UNCLASSIFIED:calf-or-carry-removed                   66   PASS capSessionBudget 66, LOST Loaded carry finisher: Suitcase carry 34, FOCUS support_prevention 66, TIER home_full 12, INJ shoulder/protect 66, FAM race 66, LOST Loaded carry finisher: Overhead carry 16, LOST Loaded carry finisher: Farmer carry 16, TIER home_basic 16, TIER commercial 10, TIER crossfit 12, TIER minimal 16
+        e.g. g221_d177_swapfloor support_prevention race home_full shoulder/protect advanced s76308 sun,wed W2 tue :: drop [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g221_d177_swapfloor support_prevention race home_full shoulder/protect advanced s76308 sun,wed W3 tue :: drop [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+          B: Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+        Core — Rotational Power :: Side plank thread-the-needle 3×10 each | Band woodchopper (door anchor) 3×12 each
+          ABp: Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Core — Rotational Power :: Side plank thread-the-needle 3×10 each
+        e.g. g221_d177_swapfloor support_prevention race home_full shoulder/protect advanced s76308 sun,wed W5 tue :: drop [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g221_d177_swapfloor support_prevention race commercial shoulder/protect beginner s76308 sun,wed W2 tue :: drop [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+
+  STEP W5: programs changed 16/387, days changed 112 (classified 104, UNCLASSIFIED 8)
+    days changed by segment (changed/days in segment): FAM none 32/8190; FAM race 80/18816 [U 8]; FOCUS hypertrophy 40/6720 [U 4]; FOCUS strength 40/6720 [U 4]; FOCUS support_prevention 16/6720; FOCUS support_strength 16/6846; INJ lowback/workaround 112/6720 [U 8]; L g221_d177_swapfloor 112/27006 [U 8]; TIER bodyweight 112/4480 [U 8]
+    op D196-1                                              104   FOCUS support_prevention 16, TIER bodyweight 104, INJ lowback/workaround 104, FAM none 32, FAM race 72, FOCUS support_strength 16, FOCUS hypertrophy 36, FOCUS strength 36
+        e.g. g221_d177_swapfloor support_prevention none bodyweight lowback/workaround beginner s76308 sun,wed W1 tue :: rename [Main — Burpees] Burpees 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 3 min rest -> [Main — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 3 min rest
+        e.g. g221_d177_swapfloor support_prevention none bodyweight lowback/workaround beginner s76308 sun,wed W2 tue :: rename [Main — Burpees] Burpees 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 3 min rest -> [Main — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 3 min rest
+        e.g. g221_d177_swapfloor support_prevention race bodyweight lowback/workaround advanced s76308 sun,wed W1 tue :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 3 min rest -> [Main — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 3 min rest
+        e.g. g221_d177_swapfloor support_prevention none bodyweight lowback/workaround advanced s76308 sun,wed W1 tue :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 3 min rest -> [Main — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 3 min rest
+    op D196-3                                                8   FOCUS support_prevention 4, TIER bodyweight 8, INJ lowback/workaround 8, FAM none 4, FOCUS support_strength 4, FAM race 4
+        e.g. g221_d177_swapfloor support_prevention none bodyweight lowback/workaround beginner s76308 sun,wed W1 tue :: add [Pull] Burpees 2×10
+        e.g. g221_d177_swapfloor support_prevention none bodyweight lowback/workaround beginner s76308 sun,wed W2 tue :: add [Pull] Burpees 2×10
+        e.g. g221_d177_swapfloor support_strength race bodyweight lowback/workaround beginner s76308 sun,wed W1 tue :: add [Pull] Burpees 2×10
+        e.g. g221_d177_swapfloor support_strength race bodyweight lowback/workaround beginner s76308 sun,wed W2 tue :: add [Pull] Burpees 2×10
+    op D196-3(dose N×10, N!=2)                               8   FOCUS support_prevention 4, TIER bodyweight 8, INJ lowback/workaround 8, FAM race 4, FOCUS support_strength 4, FAM none 4
+        e.g. g221_d177_swapfloor support_prevention race bodyweight lowback/workaround advanced s76308 sun,wed W1 tue :: add [Pull] Burpees 4×10
+        e.g. g221_d177_swapfloor support_prevention race bodyweight lowback/workaround advanced s76308 sun,wed W2 tue :: add [Pull] Burpees 4×10
+        e.g. g221_d177_swapfloor support_strength none bodyweight lowback/workaround advanced s76308 sun,wed W1 tue :: add [Pull] Burpees 3×10
+        e.g. g221_d177_swapfloor support_prevention none bodyweight lowback/workaround advanced s76308 sun,wed W1 tue :: add [Pull] Burpees 4×10
+    op UNCLASSIFIED:D196-lb-other                           16   PASS other 8, LOST Primer: Burpees 8, FOCUS hypertrophy 8, TIER bodyweight 16, INJ lowback/workaround 16, FAM race 16, FOCUS strength 8
+        e.g. g221_d177_swapfloor hypertrophy race bodyweight lowback/workaround beginner s76308 sun,wed W13 tue :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        e.g. g221_d177_swapfloor hypertrophy race bodyweight lowback/workaround beginner s76308 sun,wed W13 tue :: add [Primer — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+          ABp: Primer — Burpees :: Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+          PRE: Primer — Single-leg hip thrust (shoulders on bed) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+        e.g. g221_d177_swapfloor hypertrophy race bodyweight lowback/workaround beginner s76308 sun,wed W14 tue :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        e.g. g221_d177_swapfloor hypertrophy race bodyweight lowback/workaround advanced s76308 sun,wed W13 tue :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+
+  STEP FL: programs changed 0/387, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+==== CLS g226_d188_beginnermile_: 404 configs; built on all five trees 404; crashes {}; V==V self-identity 12/12
+  V->ALL: programs changed 404/404; days changed 2736/29344
+    ALL        progs 404/404  days 2736/29344
+
+  STEP B: programs changed 388/404, days changed 2265 (classified 2265, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM race 770/12684; FAM test 1495/16660; FOCUS balanced 1767/22687; FOCUS support_prevention 498/6657; INJ none 2265/29344; L g226_d188_beginnermile 2265/29344; TIER commercial 1206/13314; TIER crossfit 1059/16030
+    op B-1                                                2739   FOCUS balanced 2229, TIER crossfit 1162, INJ none 2739, FAM race 898, FAM test 1841, FOCUS support_prevention 510, TIER commercial 1577
+        e.g. g226_d188_beginnermile balanced race crossfit none beginner s1000 sun,wed W2 tue :: add [Loaded carry finisher] Farmer carry 3×40 yards, heavy
+        e.g. g226_d188_beginnermile balanced race crossfit none beginner s1000 sun,wed W4 tue :: add [Loaded carry finisher] Overhead carry 3×40 yards each, heavy
+        e.g. g226_d188_beginnermile balanced race crossfit none beginner s1000 sun,wed W6 tue :: add [Loaded carry finisher] Farmer carry 3×40 yards, heavy
+        e.g. g226_d188_beginnermile balanced race crossfit none beginner s1074 sun,wed W4 tue :: add [Loaded carry finisher] Farmer carry 3×40 yards, heavy
+    op B-2                                                   3   FOCUS support_prevention 3, TIER commercial 3, INJ none 3, FAM test 3
+        e.g. g226_d188_beginnermile support_prevention test commercial none intermediate s1001 mon,thu,sun W7 fri :: redetail [Accessory] Landmine rotational press 3×15 each -> [Accessory] Landmine rotational press 2×15 each
+        e.g. g226_d188_beginnermile support_prevention test commercial none intermediate s1001 mon,thu,sun W7 fri :: redetail [Accessory] Landmine rotational press 3×15 each -> [Accessory] Landmine rotational press 2×15 each
+        e.g. g226_d188_beginnermile support_prevention test commercial none intermediate s1001 mon,thu,sun W7 fri :: redetail [Accessory] Landmine rotational press 3×15 each -> [Accessory] Landmine rotational press 2×15 each
+
+  STEP A: programs changed 96/404, days changed 903 (classified 903, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM race 288/12684; FAM test 615/16660; FOCUS support_prevention 903/6657; INJ none 903/29344; L g226_d188_beginnermile 903/29344; TIER commercial 903/13314
+    op A-1                                                 903   NAME Single-leg hip thrust [loaded] 903, FOCUS support_prevention 903, TIER commercial 903, INJ none 903, FAM test 615, FAM race 288
+        e.g. g226_d188_beginnermile support_prevention test commercial none beginner s1000 sun,wed W1 mon :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        e.g. g226_d188_beginnermile support_prevention test commercial none beginner s1000 sun,wed W2 mon :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        e.g. g226_d188_beginnermile support_prevention test commercial none beginner s1000 sun,wed W3 mon :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g226_d188_beginnermile support_prevention test commercial none beginner s76308 sun,wed W1 mon :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+
+  STEP W5: programs changed 0/404, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+
+  STEP FL: programs changed 0/404, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+==== CLS g226_d189_pacedisclose_: 454 configs; built on all five trees 454; crashes {}; V==V self-identity 12/12
+  V->ALL: programs changed 454/454; days changed 3687/30646
+    ALL        progs 454/454  days 3687/30646
+
+  STEP B: programs changed 454/454, days changed 3687 (classified 3687, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM race 2692/22960; FAM test 995/7686; FOCUS balanced 3687/30646; INJ none 3687/30646; L g226_d189_pacedisclose 3687/30646; TIER crossfit 3687/30646
+    op B-1                                                5444   FOCUS balanced 5444, TIER crossfit 5444, INJ none 5444, FAM race 3939, FAM test 1505
+        e.g. g226_d189_pacedisclose balanced race crossfit none intermediate s1000 sun,wed W1 mon :: add [Core — Anti-Rotation] Suitcase carry 3×40 yd each
+        e.g. g226_d189_pacedisclose balanced race crossfit none intermediate s1000 sun,wed W1 tue :: add [Leg superset B] 45° back extension 3 sets — RPE 8 (stop 2 reps short of failure)
+        e.g. g226_d189_pacedisclose balanced race crossfit none intermediate s1000 sun,wed W1 tue :: add [Loaded carry finisher] Farmer carry 3×40 yards, heavy
+        e.g. g226_d189_pacedisclose balanced race crossfit none beginner s1037 sun,wed W2 tue :: add [Loaded carry finisher] Farmer carry 3×40 yards, heavy
+
+  STEP A: programs changed 0/454, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+
+  STEP W5: programs changed 0/454, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+
+  STEP FL: programs changed 0/454, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+==== CLS g229_d194_lens_: 385 configs; built on all five trees 385; crashes {}; V==V self-identity 12/12
+  V->ALL: programs changed 269/385; days changed 1943/26978
+    ALL        progs 269/385  days 1943/26978
+
+  STEP B: programs changed 201/385, days changed 1268 (classified 1268, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM none 184/8064; FAM race 1084/18914; FOCUS hypertrophy 552/6720; FOCUS strength 290/6720; FOCUS support_prevention 130/6818; FOCUS support_strength 296/6720; INJ knee/workaround 347/6720; INJ lowback/workaround 234/6720; INJ none 244/6818; INJ shoulder/protect 443/6720; L g229_d194_lens 1268/26978; TIER bodyweight 108/4480; TIER commercial 228/4480; TIER crossfit 240/4578; TIER home_basic 242/4480; TIER home_full 236/4480; TIER minimal 214/4480
+    op B-1                                                1676   FOCUS support_prevention 208, TIER commercial 305, INJ knee/workaround 417, FAM race 1492, FOCUS support_strength 409, INJ none 335, INJ shoulder/protect 655, FOCUS hypertrophy 646, INJ lowback/workaround 269, FAM none 184, FOCUS strength 413, TIER home_full 314, TIER crossfit 325, TIER home_basic 335, TIER bodyweight 109, TIER minimal 288
+        e.g. g229_d194_lens support_prevention race commercial knee/workaround beginner s76308 sun,wed W1 thu :: add [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g229_d194_lens support_prevention race commercial knee/workaround beginner s76308 sun,wed W2 thu :: add [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g229_d194_lens support_prevention race commercial knee/workaround beginner s76308 sun,wed W3 thu :: add [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g229_d194_lens hypertrophy none commercial none beginner s76308 sun,wed W2 thu :: add [Leg isolation] Seated leg curl 3×10–15 @ RPE 6–7
+
+  STEP A: programs changed 79/385, days changed 692 (classified 597, UNCLASSIFIED 95)
+    days changed by segment (changed/days in segment): FAM none 252/8064; FAM race 440/18914 [U 95]; FOCUS support_prevention 692/6818 [U 95]; INJ knee/workaround 216/6720; INJ lowback/workaround 36/6720; INJ none 226/6818; INJ shoulder/protect 214/6720 [U 95]; L g229_d194_lens 692/26978 [U 95]; TIER bodyweight 110/4480 [U 5]; TIER commercial 114/4480 [U 18]; TIER crossfit 126/4578 [U 18]; TIER home_basic 114/4480 [U 18]; TIER home_full 114/4480 [U 18]; TIER minimal 114/4480 [U 18]
+    op A-1                                                 682   NAME Single-leg hip thrust [loaded] 120, FOCUS support_prevention 682, TIER crossfit 120, INJ none 230, FAM race 440, NAME Single-leg hip thrust @knee/workaround [loaded] 108, TIER commercial 108, INJ knee/workaround 234, TIER home_full 108, FAM none 242, NAME Step-ups (chair) @knee/workaround [home_basic] 8, NAME Single-leg glute bridge (weighted) @knee/workaround [home_basic] 32, TIER home_basic 116, NAME Single-leg hip thrust (shoulders on bed) @knee/workaround [bodyweight] 36, TIER bodyweight 114, NAME Single-leg glute bridge (weighted) @shoulder/protect [minimal] 32, TIER minimal 116, INJ shoulder/protect 218, NAME Banded hip thrust @shoulder/protect [minimal] 4, NAME Single-leg hip thrust @shoulder/protect [loaded] 108, NAME Single-leg glute bridge (weighted) @shoulder/protect [home_basic] 32, NAME Banded hip thrust @knee/workaround [home_basic] 4, NAME Single-leg hip thrust (shoulders on bed) [bodyweight] 34, NAME Walking lunge [bodyweight] 2, NAME Reverse lunge [bodyweight] 2, NAME Single-leg hip thrust (shoulders on bed) @shoulder/protect [bodyweight] 34, NAME Single-leg glute bridge (weighted) [home_basic] 32, NAME Banded hip thrust [home_basic] 4, NAME Step-ups (chair) @knee/workaround [bodyweight] 2, NAME Walking lunge @shoulder/protect [bodyweight] 2, NAME Reverse lunge @shoulder/protect [bodyweight] 2, NAME Single-leg glute bridge (weighted) [minimal] 32, NAME Banded hip thrust [minimal] 4, NAME Single-leg glute bridge (weighted) @knee/workaround [minimal] 32, NAME Banded hip thrust @knee/workaround [minimal] 4, NAME Banded hip thrust @shoulder/protect [home_basic] 4, NAME Step-ups (chair) @knee/workaround [minimal] 8
+        e.g. g229_d194_lens support_prevention race crossfit none intermediate s76308 sun,wed W1 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g229_d194_lens support_prevention race crossfit none intermediate s76308 sun,wed W2 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g229_d194_lens support_prevention race crossfit none intermediate s76308 sun,wed W3 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g229_d194_lens support_prevention none commercial none beginner s76308 sun,wed W1 thu :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+    op A-2                                                  90   FOCUS support_prevention 90, TIER home_full 18, INJ knee/workaround 30, FAM none 90, TIER crossfit 18, TIER home_basic 16, INJ shoulder/protect 12, TIER bodyweight 16, INJ none 12, TIER minimal 16, INJ lowback/workaround 36, TIER commercial 6
+        e.g. g229_d194_lens support_prevention none home_full knee/workaround beginner s76308 sun,wed W5 thu :: add [Leg isolation] Wall sit 3×25 sec
+        e.g. g229_d194_lens support_prevention none home_full knee/workaround beginner s76308 sun,wed W6 thu :: add [Leg isolation] Wall sit 3×25 sec
+        e.g. g229_d194_lens support_prevention none crossfit knee/workaround beginner s76308 sun,wed W5 thu :: add [Leg isolation] Wall sit 3×25 sec
+        e.g. g229_d194_lens support_prevention none home_full shoulder/protect beginner s76308 sun,wed W5 thu :: add [Leg isolation] Wall sit 3×25 sec
+    op A-3                                                  12   FOCUS support_prevention 12, TIER minimal 2, INJ lowback/workaround 12, FAM none 12, TIER home_full 4, TIER home_basic 2, TIER crossfit 4
+        e.g. g229_d194_lens support_prevention none minimal lowback/workaround beginner s76308 sun,wed W1 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+        e.g. g229_d194_lens support_prevention none minimal lowback/workaround beginner s76308 sun,wed W2 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+        e.g. g229_d194_lens support_prevention none home_full lowback/workaround beginner s76308 sun,wed W1 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+        e.g. g229_d194_lens support_prevention none home_full lowback/workaround beginner s76308 sun,wed W2 thu :: redetail [Leg isolation] Wall sit 3×25 sec -> [Leg isolation] Wall sit 2×25 sec
+    op UNCLASSIFIED:A-other                                 73   PASS capSessionBudget 73, LOST Core: Side plank thread-the-needle 20, FOCUS support_prevention 73, TIER minimal 10, INJ shoulder/protect 73, FAM race 73, LOST Core: Standing torso rotations (slow) 11, LOST Core: Suitcase carry 2, LOST Core: Landmine rotations 8, TIER crossfit 14, LOST Core: Windshield wipers 8, LOST Core: Farmer carry 8, LOST Core: Dumbbell renegade rows 8, TIER bodyweight 5, TIER home_full 16, LOST Core: Band woodchopper (door anchor) 4, TIER home_basic 14, LOST Core: Cable woodchoppers 2, TIER commercial 14, LOST Core: Medicine ball rotary toss 2
+        e.g. g229_d194_lens support_prevention race minimal shoulder/protect advanced s76308 sun,wed W1 tue :: drop [Core — Rotational Power] Side plank thread-the-needle 3×10 each
+        e.g. g229_d194_lens support_prevention race minimal shoulder/protect advanced s76308 sun,wed W3 tue :: drop [Core — Rotational Power] Standing torso rotations (slow) 2×8–12 each @ RPE 7
+          B: Main — Step-ups (KB) :: Step-ups (KB) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell Romanian deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+        Core — Rotational Power :: Windshield wipers 3×16 (180° arc) | Standing torso rotations (slow) 2×8–12 each @ RPE 7
+          ABp: Main — Step-ups (KB) :: Step-ups (KB) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell Romanian deadlift 2×6–10 @ RPE 7 | Single-leg glute bridge (weighted) 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Core — Rotational Power :: Windshield wipers 3×16 (180° arc)
+        e.g. g229_d194_lens support_prevention race minimal shoulder/protect advanced s76308 sun,wed W7 tue :: drop [Core — Rotational Power] Side plank thread-the-needle 3×10 each
+        e.g. g229_d194_lens support_prevention race crossfit shoulder/protect advanced s76308 sun,wed W1 tue :: drop [Core — Rotational Power] Landmine rotations 2×8–12 each @ RPE 7
+    op UNCLASSIFIED:calf-or-carry-removed                   66   PASS capSessionBudget 66, LOST Loaded carry finisher: Suitcase carry 34, FOCUS support_prevention 66, TIER minimal 16, INJ shoulder/protect 66, FAM race 66, LOST Loaded carry finisher: Overhead carry 16, LOST Loaded carry finisher: Farmer carry 16, TIER crossfit 12, TIER home_full 12, TIER home_basic 16, TIER commercial 10
+        e.g. g229_d194_lens support_prevention race minimal shoulder/protect advanced s76308 sun,wed W1 tue :: drop [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g229_d194_lens support_prevention race minimal shoulder/protect advanced s76308 sun,wed W2 tue :: drop [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+          B: Main — Dumbbell goblet squat :: Dumbbell goblet squat 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Standing band hip abduction 2×12–15 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each
+          ABp: Main — Dumbbell goblet squat :: Dumbbell goblet squat 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Reverse lunge (KB) 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg glute bridge (weighted) 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Standing band hip abduction 2×12–15 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each
+        e.g. g229_d194_lens support_prevention race minimal shoulder/protect advanced s76308 sun,wed W3 tue :: drop [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g229_d194_lens support_prevention race crossfit shoulder/protect advanced s76308 sun,wed W2 tue :: drop [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+
+  STEP W5: programs changed 16/385, days changed 112 (classified 104, UNCLASSIFIED 8)
+    days changed by segment (changed/days in segment): FAM none 32/8064; FAM race 80/18914 [U 8]; FOCUS hypertrophy 40/6720 [U 4]; FOCUS strength 40/6720 [U 4]; FOCUS support_prevention 16/6818; FOCUS support_strength 16/6720; INJ lowback/workaround 112/6720 [U 8]; L g229_d194_lens 112/26978 [U 8]; TIER bodyweight 112/4480 [U 8]
+    op D196-1                                              104   FOCUS support_prevention 16, TIER bodyweight 104, INJ lowback/workaround 104, FAM race 72, FOCUS strength 36, FOCUS hypertrophy 36, FAM none 32, FOCUS support_strength 16
+        e.g. g229_d194_lens support_prevention race bodyweight lowback/workaround advanced s76308 sun,wed W1 tue :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 3 min rest -> [Main — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 3 min rest
+        e.g. g229_d194_lens support_prevention race bodyweight lowback/workaround advanced s76308 sun,wed W2 tue :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 3 min rest -> [Main — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 3 min rest
+        e.g. g229_d194_lens support_prevention race bodyweight lowback/workaround advanced s76308 sun,wed W9 tue :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 3 min rest -> [Main — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 3 min rest
+        e.g. g229_d194_lens support_prevention race bodyweight lowback/workaround beginner s76308 sun,wed W1 tue :: rename [Main — Burpees] Burpees 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 3 min rest -> [Main — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 3 min rest
+    op D196-3                                                8   FOCUS support_prevention 4, TIER bodyweight 8, INJ lowback/workaround 8, FAM race 4, FOCUS support_strength 4, FAM none 4
+        e.g. g229_d194_lens support_prevention race bodyweight lowback/workaround beginner s76308 sun,wed W1 tue :: add [Pull] Burpees 2×10
+        e.g. g229_d194_lens support_prevention race bodyweight lowback/workaround beginner s76308 sun,wed W2 tue :: add [Pull] Burpees 2×10
+        e.g. g229_d194_lens support_strength none bodyweight lowback/workaround beginner s76308 sun,wed W1 tue :: add [Pull] Burpees 2×10
+        e.g. g229_d194_lens support_strength none bodyweight lowback/workaround beginner s76308 sun,wed W2 tue :: add [Pull] Burpees 2×10
+    op D196-3(dose N×10, N!=2)                               8   FOCUS support_prevention 4, TIER bodyweight 8, INJ lowback/workaround 8, FAM race 4, FAM none 4, FOCUS support_strength 4
+        e.g. g229_d194_lens support_prevention race bodyweight lowback/workaround advanced s76308 sun,wed W1 tue :: add [Pull] Burpees 4×10
+        e.g. g229_d194_lens support_prevention race bodyweight lowback/workaround advanced s76308 sun,wed W2 tue :: add [Pull] Burpees 4×10
+        e.g. g229_d194_lens support_prevention none bodyweight lowback/workaround advanced s76308 sun,wed W1 tue :: add [Pull] Burpees 4×10
+        e.g. g229_d194_lens support_prevention none bodyweight lowback/workaround advanced s76308 sun,wed W2 tue :: add [Pull] Burpees 4×10
+    op UNCLASSIFIED:D196-lb-other                           16   PASS other 8, LOST Primer: Burpees 8, FOCUS strength 8, TIER bodyweight 16, INJ lowback/workaround 16, FAM race 16, FOCUS hypertrophy 8
+        e.g. g229_d194_lens strength race bodyweight lowback/workaround beginner s76308 sun,wed W13 tue :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        e.g. g229_d194_lens strength race bodyweight lowback/workaround beginner s76308 sun,wed W13 tue :: add [Primer — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+          ABp: Primer — Burpees :: Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+          PRE: Primer — Single-leg hip thrust (shoulders on bed) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+        e.g. g229_d194_lens strength race bodyweight lowback/workaround beginner s76308 sun,wed W14 tue :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        e.g. g229_d194_lens hypertrophy race bodyweight lowback/workaround beginner s76308 sun,wed W13 tue :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+
+  STEP FL: programs changed 0/385, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+==== CLS g215_d149_ghd_: 499 configs; built on all five trees 499; crashes {}; V==V self-identity 12/12
+  V->ALL: programs changed 359/499; days changed 2109/33677
+    ALL        progs 359/499  days 2109/33677
+
+  STEP B: programs changed 298/499, days changed 1712 (classified 1711, UNCLASSIFIED 1)
+    days changed by segment (changed/days in segment): FAM race 1264/24171 [U 1]; FAM test 448/9506; FOCUS balanced 245/5075; FOCUS fatloss 219/4487; FOCUS hypertrophy 450/5985; FOCUS strength 267/4613; FOCUS support_athletic 302/4823 [U 1]; FOCUS support_prevention 64/4508; FOCUS support_strength 165/4186; INJ ankle/protect 22/1267; INJ ankle/workaround 24/847; INJ elbow/protect 81/868; INJ elbow/workaround 107/1029; INJ hip/protect 23/1134; INJ hip/workaround 66/819; INJ knee/protect 421/15302; INJ knee/workaround 97/1029; INJ lowback/protect 32/945; INJ lowback/workaround 43/798; INJ none 640/7847; INJ shoulder/protect 82/924; INJ shoulder/workaround 74/868 [U 1]; L g215_d149_ghd 1712/33677 [U 1]; TIER bodyweight 164/6804; TIER commercial 350/6482 [U 1]; TIER crossfit 388/6804; TIER home_basic 273/6482; TIER home_full 537/7105
+    op B-1                                                2226   FOCUS hypertrophy 518, TIER commercial 458, INJ none 880, FAM race 1627, INJ knee/protect 454, INJ knee/workaround 141, FOCUS strength 343, INJ hip/workaround 110, FAM test 599, FOCUS fatloss 304, INJ lowback/protect 32, TIER crossfit 494, INJ elbow/protect 117, INJ elbow/workaround 118, FOCUS balanced 337, INJ shoulder/protect 143, INJ shoulder/workaround 109, FOCUS support_athletic 423, TIER home_full 735, INJ ankle/workaround 27, FOCUS support_strength 237, TIER home_basic 375, TIER bodyweight 164, FOCUS support_prevention 64, INJ hip/protect 24, INJ ankle/protect 22, INJ lowback/workaround 49
+        e.g. g215_d149_ghd hypertrophy race commercial none beginner s76308 sun,wed W1 tue :: add [Calves] Machine seated calf raise 3×15–20 @ RPE 6–7
+        e.g. g215_d149_ghd hypertrophy race commercial none beginner s76308 sun,wed W1 tue :: add [Leg isolation] Seated leg curl 3×10–15 @ RPE 6–7
+        e.g. g215_d149_ghd hypertrophy race commercial none beginner s76308 sun,wed W2 tue :: add [Calves] Machine seated calf raise 3×15–20 @ RPE 6–7
+        e.g. g215_d149_ghd balanced test commercial none beginner s76308 sun,wed W2 thu :: add [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+    op UNCLASSIFIED:B-removal                                1   PASS other 1, LOST Leg superset B: Dumbbell split-stance deadlift 1, FOCUS support_athletic 1, TIER commercial 1, INJ shoulder/workaround 1, FAM race 1
+        e.g. g215_d149_ghd support_athletic race commercial shoulder/workaround advanced s555 sat,sun W3 wed :: rename [Leg superset B] Dumbbell split-stance deadlift 3×6–10 @ RPE 8 -> [Leg superset B] Kettlebell single-leg deadlift 3×6–10 @ RPE 8
+
+  STEP A: programs changed 44/499, days changed 223 (classified 218, UNCLASSIFIED 5)
+    days changed by segment (changed/days in segment): FAM race 182/24171 [U 5]; FAM test 41/9506; FOCUS support_prevention 223/4508 [U 5]; INJ ankle/workaround 12/847; INJ elbow/protect 14/868; INJ hip/workaround 6/819; INJ knee/protect 60/15302; INJ knee/workaround 6/1029; INJ none 87/7847 [U 5]; INJ shoulder/protect 28/924; INJ shoulder/workaround 10/868; L g215_d149_ghd 223/33677 [U 5]; TIER bodyweight 32/6804 [U 5]; TIER commercial 44/6482; TIER crossfit 56/6804; TIER home_basic 32/6482; TIER home_full 59/7105
+    op A-1                                                 218   NAME Single-leg hip thrust @ankle/workaround [loaded] 6, FOCUS support_prevention 218, TIER commercial 44, INJ ankle/workaround 12, FAM race 177, NAME Single-leg hip thrust [loaded] 55, TIER crossfit 56, INJ none 82, NAME Banded hip thrust [home_basic] 6, TIER home_basic 32, NAME Single-leg glute bridge (weighted) [home_basic] 12, NAME Bodyweight back extension @knee/protect [loaded] 52, INJ knee/protect 60, TIER home_full 59, NAME Bodyweight back extension @knee/protect [home_basic] 8, NAME Single-leg hip thrust @shoulder/protect [loaded] 14, INJ shoulder/protect 28, NAME Single-leg hip thrust @shoulder/workaround [loaded] 6, INJ shoulder/workaround 10, NAME Single-leg hip thrust (shoulders on bed) [bodyweight] 9, TIER bodyweight 27, NAME Single-leg hip thrust @hip/workaround [loaded] 6, INJ hip/workaround 6, FAM test 41, NAME Banded hip thrust @ankle/workaround [home_basic] 6, NAME Single-leg hip thrust (shoulders on bed) @shoulder/protect [bodyweight] 14, NAME Single-leg glute bridge @shoulder/workaround [bodyweight] 2, NAME Single-leg hip thrust (shoulders on bed) @shoulder/workaround [bodyweight] 2, NAME Single-leg hip thrust @elbow/protect [loaded] 14, INJ elbow/protect 14, NAME Single-leg hip thrust @knee/workaround [loaded] 6, INJ knee/workaround 6
+        e.g. g215_d149_ghd support_prevention race commercial ankle/workaround beginner s1234 sat,sun W1 wed :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        e.g. g215_d149_ghd support_prevention race commercial ankle/workaround beginner s1234 sat,sun W2 wed :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        e.g. g215_d149_ghd support_prevention race commercial ankle/workaround beginner s1234 sat,sun W3 wed :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g215_d149_ghd support_prevention race crossfit shoulder/protect advanced s555 sat,sun W1 wed :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+    op UNCLASSIFIED:A-other                                  5   PASS capRegionalFatigue 5, LOST Leg circuit: Step-ups (chair) 2, FOCUS support_prevention 5, TIER bodyweight 5, INJ none 5, FAM race 5, LOST Leg circuit: Walking lunge 3
+        e.g. g215_d149_ghd support_prevention race bodyweight none intermediate s1234 sat,sun W11 mon :: rename [Leg circuit — runner armor] Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g215_d149_ghd support_prevention race bodyweight none intermediate s20260 sat,sun W3 mon :: rename [Leg circuit — runner armor] Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g215_d149_ghd support_prevention race bodyweight none intermediate s20260 sat,sun W5 mon :: rename [Leg circuit — runner armor] Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+          B: Main — Split squat :: Split squat 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+          ABp: Main — Split squat :: Split squat 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        e.g. g215_d149_ghd support_prevention race bodyweight none intermediate s20260 sat,sun W6 mon :: rename [Leg circuit — runner armor] Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+
+  STEP W5: programs changed 37/499, days changed 202 (classified 140, UNCLASSIFIED 62)
+    days changed by segment (changed/days in segment): FAM race 136/24171 [U 42]; FAM test 66/9506 [U 20]; FOCUS balanced 31/5075 [U 12]; FOCUS fatloss 18/4487 [U 8]; FOCUS hypertrophy 54/5985 [U 8]; FOCUS strength 32/4613; FOCUS support_athletic 20/4823 [U 10]; FOCUS support_prevention 18/4508 [U 14]; FOCUS support_strength 29/4186 [U 10]; INJ ankle/protect 23/1267 [U 2]; INJ knee/protect 155/15302 [U 56]; INJ lowback/protect 22/945 [U 4]; INJ lowback/workaround 2/798; L g215_d149_ghd 202/33677 [U 62]; TIER bodyweight 202/6804 [U 62]
+    op D196-1                                              185   FOCUS balanced 25, TIER bodyweight 185, INJ ankle/protect 21, FAM test 57, FOCUS support_strength 26, INJ knee/protect 151, FAM race 128, FOCUS support_prevention 18, FOCUS hypertrophy 46, FOCUS support_athletic 20, FOCUS fatloss 18, FOCUS strength 32, INJ lowback/protect 11, INJ lowback/workaround 2
+        e.g. g215_d149_ghd balanced test bodyweight ankle/protect beginner s31337 sun,wed W3 thu :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        e.g. g215_d149_ghd balanced test bodyweight ankle/protect beginner s31337 sun,wed W4 thu :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        e.g. g215_d149_ghd balanced test bodyweight ankle/protect beginner s31337 sun,wed W5 thu :: rename [Main — Burpees] Burpees 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+        e.g. g215_d149_ghd hypertrophy race bodyweight ankle/protect intermediate s1234 sat,sun W1 wed :: rename [Main — Burpees] Burpees 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest -> [Main — Single-leg glute bridge] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+    op D196-2                                              100   FOCUS hypertrophy 45, TIER bodyweight 100, INJ ankle/protect 15, FAM race 67, INJ knee/protect 85, FOCUS support_athletic 8, FOCUS support_strength 6, FAM test 33, FOCUS balanced 8, FOCUS fatloss 6, FOCUS strength 27
+        e.g. g215_d149_ghd hypertrophy race bodyweight ankle/protect intermediate s1234 sat,sun W1 wed :: rename [Leg isolation] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure) -> [Leg isolation] Nordic hamstring curl (anchored) 3 sets — RPE 8 (stop 2 reps short of failure)
+        e.g. g215_d149_ghd hypertrophy race bodyweight ankle/protect intermediate s1234 sat,sun W2 wed :: rename [Leg isolation] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure) -> [Leg isolation] Nordic hamstring curl (anchored) 3 sets — RPE 8 (stop 2 reps short of failure)
+        e.g. g215_d149_ghd hypertrophy race bodyweight ankle/protect intermediate s1234 sat,sun W3 wed :: rename [Leg isolation] Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure) -> [Leg isolation] Nordic hamstring curl (anchored) 3 sets — RPE 8 (stop 2 reps short of failure)
+        e.g. g215_d149_ghd fatloss race bodyweight knee/protect intermediate s1234 sat,sun W1 wed :: rename [Leg superset B] Bodyweight back extension 2 sets — RPE 8 (stop 2 reps short of failure) -> [Leg superset B] Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+    op D196-4                                                7   FOCUS support_strength 3, TIER bodyweight 7, INJ lowback/protect 7, FAM test 7, FOCUS balanced 4
+        e.g. g215_d149_ghd support_strength test bodyweight lowback/protect beginner s1234 sat,sun W5 wed :: rename [Leg superset B] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g215_d149_ghd support_strength test bodyweight lowback/protect beginner s1234 sat,sun W6 wed :: rename [Leg superset B] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g215_d149_ghd support_strength test bodyweight lowback/protect beginner s1234 sat,sun W7 wed :: rename [Leg superset B] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g215_d149_ghd balanced test bodyweight lowback/protect beginner s20260 sat,sun W3 wed :: rename [Leg superset B] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+    op UNCLASSIFIED:D196-ak-other                           64   PASS other 58, LOST Leg: Bodyweight back extension 38, FOCUS support_strength 10, TIER bodyweight 64, INJ knee/protect 60, FAM race 46, LOST Primer: Burpees 6, FOCUS hypertrophy 12, LOST Leg circuit: Bodyweight back extension 14, FOCUS support_prevention 14, FOCUS support_athletic 10, FAM test 18, FOCUS balanced 10, FOCUS fatloss 8, INJ ankle/protect 4
+        e.g. g215_d149_ghd support_strength race bodyweight knee/protect intermediate s8086 sun,wed W1 thu :: rename [Leg] Bodyweight back extension 2 sets — RPE 8 (stop 2 reps short of failure) -> [Leg] Single-leg hip thrust 2 sets — RPE 8 (stop 2 reps short of failure)
+        e.g. g215_d149_ghd support_strength race bodyweight knee/protect intermediate s8086 sun,wed W2 thu :: rename [Leg] Bodyweight back extension 2 sets — RPE 8 (stop 2 reps short of failure) -> [Leg] Single-leg hip thrust 2 sets — RPE 8 (stop 2 reps short of failure)
+          ABp: Main — Burpees :: Burpees 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg :: Bodyweight back extension 2 sets — RPE 8 (stop 2 reps short of failure)
+        Leg superset B :: Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Side-lying leg raises 2×15 each | Fire hydrants 2 sets — RPE 8 (stop 2 reps short of failure) | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+          PRE: Main — Single-leg glute bridge :: Single-leg glute bridge 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg :: Single-leg hip thrust 2 sets — RPE 8 (stop 2 reps short of failure)
+        Leg superset B :: Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Side-lying leg raises 2×15 each | Fire hydrants 2 sets — RPE 8 (stop 2 reps short of failure) | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        e.g. g215_d149_ghd hypertrophy race bodyweight knee/protect intermediate s1234 sat,sun W7 wed :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        e.g. g215_d149_ghd hypertrophy race bodyweight knee/protect intermediate s1234 sat,sun W7 wed :: add [Primer — Single-leg glute bridge] Single-leg glute bridge 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+          ABp: Primer — Burpees :: Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Single-leg bent-knee soleus raise 2×12 each, slow
+          PRE: Primer — Single-leg glute bridge :: Single-leg glute bridge 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Single-leg bent-knee soleus raise 2×12 each, slow
+    op UNCLASSIFIED:D196-lb-other                            6   PASS other 4, LOST Primer: Burpees 2, FOCUS hypertrophy 4, TIER bodyweight 6, INJ lowback/protect 6, FAM race 4, LOST Leg superset B: Burpees 2, FOCUS balanced 2, FAM test 2
+        e.g. g215_d149_ghd hypertrophy race bodyweight lowback/protect beginner s31337 sun,wed W7 tue :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        e.g. g215_d149_ghd hypertrophy race bodyweight lowback/protect beginner s31337 sun,wed W7 tue :: add [Primer — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+          ABp: Primer — Burpees :: Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+          PRE: Primer — Single-leg hip thrust (shoulders on bed) :: Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+        e.g. g215_d149_ghd hypertrophy race bodyweight lowback/protect beginner s31337 sun,wed W8 tue :: drop [Primer — Burpees] Burpees 2 sets — RPE 6 (leave plenty in the tank), 2–3 min rest
+        e.g. g215_d149_ghd balanced test bodyweight lowback/protect beginner s20260 sat,sun W1 wed :: rename [Leg superset B] Burpees 2×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 6 (leave 3 or more in reserve)
+
+  STEP FL: programs changed 1/499, days changed 9 (classified 0, UNCLASSIFIED 9)
+    days changed by segment (changed/days in segment): FAM race 9/24171 [U 9]; FOCUS hypertrophy 9/5985 [U 9]; INJ ankle/workaround 9/847 [U 9]; L g215_d149_ghd 9/33677 [U 9]; TIER bodyweight 9/6804 [U 9]
+    op UNCLASSIFIED:D197-other                               9   PASS other 9, LOST Chest volume: Burpees 9, FOCUS hypertrophy 9, TIER bodyweight 9, INJ ankle/workaround 9, FAM race 9
+        e.g. g215_d149_ghd hypertrophy race bodyweight ankle/workaround intermediate s4242 sun,wed W1 mon :: drop [Chest volume] Burpees 3×15
+        e.g. g215_d149_ghd hypertrophy race bodyweight ankle/workaround intermediate s4242 sun,wed W2 mon :: drop [Chest volume] Burpees 3×15
+          PRE: Main — Pushups (slow 3s eccentric) :: Pushups (slow 3s eccentric) 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+        Secondary compound — Diamond pushups :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure)
+        Chest volume :: Burpees 3×15
+        Delts (SS 3) :: Wall slides 3×15 | Prone Y-T-W raises 3×15
+        Core — Rotational Power :: Standing torso rotations (slow) 3 sets — RPE 8 (stop 2 reps short of failure)
+          ALL: Main — Pushups (slow 3s eccentric) :: Pushups (slow 3s eccentric) 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+        Secondary compound — Diamond pushups :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure)
+        Delts (SS 3) :: Wall slides 3×15 | Prone Y-T-W raises 3×15
+        Core — Rotational Power :: Standing torso rotations (slow) 3 sets — RPE 8 (stop 2 reps short of failure)
+        e.g. g215_d149_ghd hypertrophy race bodyweight ankle/workaround intermediate s4242 sun,wed W3 mon :: drop [Chest volume] Burpees 3×15
+==== CLS g210_equipment_denials_: 515 configs; built on all five trees 515; crashes {}; V==V self-identity 12/12
+  V->ALL: programs changed 470/515; days changed 3186/34258
+    ALL        progs 470/515  days 3186/34258
+
+  STEP B: programs changed 440/515, days changed 2864 (classified 2864, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM race 2032/25186; FAM test 832/9072; FOCUS balanced 412/4284; FOCUS fatloss 276/3423; FOCUS hypertrophy 1031/10864; FOCUS strength 483/4949; FOCUS support_athletic 349/3577; FOCUS support_prevention 93/3437; FOCUS support_strength 220/3724; INJ ankle/protect 14/441; INJ ankle/workaround 22/350; INJ elbow/protect 123/1085; INJ elbow/workaround 138/1190; INJ hip/protect 16/385; INJ hip/workaround 45/385; INJ knee/protect 38/420; INJ knee/workaround 45/385; INJ lowback/protect 29/329; INJ lowback/workaround 45/441; INJ none 2077/26432; INJ shoulder/protect 123/1155; INJ shoulder/workaround 149/1260; L g210_equipment_denials 2864/34258; TIER bodyweight 244/5985; TIER commercial 691/7406; TIER crossfit 707/7469; TIER home_basic 532/5978; TIER home_full 690/7420
+    op B-1                                                3822   FOCUS hypertrophy 1242, TIER commercial 936, INJ none 2828, FAM race 2682, FOCUS support_strength 316, FOCUS strength 673, FAM test 1140, FOCUS support_athletic 511, FOCUS support_prevention 94, FOCUS balanced 562, INJ hip/workaround 55, FOCUS fatloss 424, INJ shoulder/workaround 205, TIER crossfit 972, INJ elbow/protect 154, TIER home_full 925, INJ knee/protect 38, TIER home_basic 745, TIER bodyweight 244, INJ elbow/workaround 160, INJ shoulder/protect 181, INJ lowback/workaround 55, INJ hip/protect 22, INJ ankle/workaround 22, INJ ankle/protect 14, INJ lowback/protect 36, INJ knee/workaround 52
+        e.g. g210_equipment_denials hypertrophy race commercial none beginner s76308 sun,wed W1 tue :: add [Calves] Machine seated calf raise 3×15–20 @ RPE 6–7
+        e.g. g210_equipment_denials hypertrophy race commercial none beginner s76308 sun,wed W1 tue :: add [Leg isolation] Seated leg curl 3×10–15 @ RPE 6–7
+        e.g. g210_equipment_denials hypertrophy race commercial none beginner s76308 sun,wed W2 tue :: add [Calves] Machine seated calf raise 3×15–20 @ RPE 6–7
+        e.g. g210_equipment_denials hypertrophy race commercial none advanced s76308 sun,wed W1 tue :: add [Leg superset B] 45° back extension 3 sets — RPE 8 (stop 2 reps short of failure)
+
+  STEP A: programs changed 51/515, days changed 355 (classified 350, UNCLASSIFIED 5)
+    days changed by segment (changed/days in segment): FAM race 234/25186 [U 5]; FAM test 121/9072; FOCUS support_prevention 355/3437 [U 5]; INJ none 355/26432 [U 5]; L g210_equipment_denials 355/34258 [U 5]; TIER bodyweight 71/5985 [U 5]; TIER commercial 68/7406; TIER crossfit 81/7469; TIER home_basic 70/5978; TIER home_full 65/7420
+    op A-1                                                 350   NAME Single-leg hip thrust [loaded] 214, FOCUS support_prevention 350, TIER commercial 68, INJ none 350, FAM test 121, FAM race 229, TIER crossfit 81, TIER home_full 65, NAME Banded hip thrust [home_basic] 19, TIER home_basic 70, NAME Single-leg glute bridge (weighted) [home_basic] 51, NAME Single-leg hip thrust (shoulders on bed) [bodyweight] 62, TIER bodyweight 66, NAME Single-leg glute bridge [bodyweight] 4
+        e.g. g210_equipment_denials support_prevention test commercial none advanced s4242 sun,wed W1 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g210_equipment_denials support_prevention test commercial none advanced s4242 sun,wed W2 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g210_equipment_denials support_prevention test commercial none advanced s4242 sun,wed W3 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g210_equipment_denials support_prevention race commercial none intermediate s1234 sat,sun W4 mon :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+    op UNCLASSIFIED:A-other                                  5   PASS capRegionalFatigue 5, LOST Leg circuit: Step-ups (chair) 2, FOCUS support_prevention 5, TIER bodyweight 5, INJ none 5, FAM race 5, LOST Leg circuit: Walking lunge 3
+        e.g. g210_equipment_denials support_prevention race bodyweight none intermediate s20260 sat,sun W3 mon :: rename [Leg circuit — runner armor] Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g210_equipment_denials support_prevention race bodyweight none intermediate s20260 sat,sun W5 mon :: rename [Leg circuit — runner armor] Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+          B: Main — Split squat :: Split squat 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+          ABp: Main — Split squat :: Split squat 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        e.g. g210_equipment_denials support_prevention race bodyweight none intermediate s20260 sat,sun W6 mon :: rename [Leg circuit — runner armor] Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g210_equipment_denials support_prevention race bodyweight none intermediate s1234 sat,sun W11 mon :: rename [Leg circuit — runner armor] Step-ups (chair) 2 sets — RPE 7 (leave 3 or more in reserve) -> [Leg circuit — runner armor] Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+
+  STEP W5: programs changed 1/515, days changed 11 (classified 11, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM test 11/9072; FOCUS hypertrophy 11/10864; INJ lowback/protect 11/329; L g210_equipment_denials 11/34258; TIER bodyweight 11/5985
+    op D196-4                                               11   FOCUS hypertrophy 11, TIER bodyweight 11, INJ lowback/protect 11, FAM test 11
+        e.g. g210_equipment_denials hypertrophy test bodyweight lowback/protect advanced s4242 sun,wed W1 thu :: rename [Leg superset B] Burpees 4×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 4 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g210_equipment_denials hypertrophy test bodyweight lowback/protect advanced s4242 sun,wed W2 thu :: rename [Leg superset B] Burpees 4×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 4 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g210_equipment_denials hypertrophy test bodyweight lowback/protect advanced s4242 sun,wed W3 thu :: rename [Leg superset B] Burpees 4×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 4 sets — RPE 7 (leave 3 or more in reserve)
+
+  STEP FL: programs changed 0/515, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+==== CLS g225_d187_pacerate_: 7 configs; built on all five trees 7; crashes {}; V==V self-identity 6/6
+  V->ALL: programs changed 7/7; days changed 58/504
+    ALL        progs 7/7  days 58/504
+
+  STEP B: programs changed 2/7, days changed 6 (classified 6, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM race 2/280; FAM test 4/42; FOCUS support_prevention 6/504; INJ none 6/504; L g225_d187_pacerate 6/504; TIER crossfit 6/504
+    op B-1                                                   6   FOCUS support_prevention 6, TIER crossfit 6, INJ none 6, FAM race 2, FAM test 4
+        e.g. g225_d187_pacerate support_prevention race crossfit none intermediate s76308 sun,wed W13 thu :: add [Loaded carry finisher] Overhead carry 3×40 yards each, heavy
+        e.g. g225_d187_pacerate support_prevention race crossfit none intermediate s76308 sun,wed W14 thu :: add [Loaded carry finisher] Overhead carry 3×40 yards each, heavy
+        e.g. g225_d187_pacerate support_prevention test crossfit none intermediate s76308 sun,wed W1 mon :: add [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+        e.g. g225_d187_pacerate support_prevention test crossfit none intermediate s76308 sun,wed W2 mon :: add [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+
+  STEP A: programs changed 7/7, days changed 58 (classified 58, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM none 20/182; FAM race 34/280; FAM test 4/42; FOCUS support_prevention 58/504; INJ none 58/504; L g225_d187_pacerate 58/504; TIER crossfit 58/504
+    op A-1                                                  58   NAME Single-leg hip thrust [loaded] 58, FOCUS support_prevention 58, TIER crossfit 58, INJ none 58, FAM none 20, FAM race 34, FAM test 4
+        e.g. g225_d187_pacerate support_prevention none crossfit none intermediate s76308 sun,wed W1 thu :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g225_d187_pacerate support_prevention none crossfit none intermediate s76308 sun,wed W2 thu :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g225_d187_pacerate support_prevention none crossfit none intermediate s76308 sun,wed W3 thu :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g225_d187_pacerate support_prevention none crossfit none intermediate s76308 sun,wed W1 thu :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+
+  STEP W5: programs changed 0/7, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+
+  STEP FL: programs changed 0/7, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+==== CLS g227_d190_cuecap_: 8 configs; built on all five trees 8; crashes {}; V==V self-identity 6/6
+  V->ALL: programs changed 1/8; days changed 12/392
+    ALL        progs 1/8  days 12/392
+
+  STEP B: programs changed 0/8, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+
+  STEP A: programs changed 1/8, days changed 12 (classified 12, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM race 12/98; FOCUS support_prevention 12/98; INJ none 12/140; L g227_d190_cuecap 12/392; TIER crossfit 12/98
+    op A-1                                                  12   NAME Single-leg hip thrust [loaded] 12, FOCUS support_prevention 12, TIER crossfit 12, INJ none 12, FAM race 12
+        e.g. g227_d190_cuecap support_prevention race crossfit none intermediate s76308 sun,wed W1 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g227_d190_cuecap support_prevention race crossfit none intermediate s76308 sun,wed W2 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g227_d190_cuecap support_prevention race crossfit none intermediate s76308 sun,wed W3 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+
+  STEP W5: programs changed 0/8, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+
+  STEP FL: programs changed 0/8, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+==== CLS g229_d193_build_: 6 configs; built on all five trees 6; crashes {}; V==V self-identity 6/6
+  V->ALL: programs changed 3/6; days changed 27/364
+    ALL        progs 3/6  days 27/364
+
+  STEP B: programs changed 1/6, days changed 9 (classified 9, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM race 9/196; FOCUS strength 9/98; INJ shoulder/protect 9/98; L g229_d193_build 9/364; TIER minimal 9/98
+    op B-1                                                  18   FOCUS strength 18, TIER minimal 18, INJ shoulder/protect 18, FAM race 18
+        e.g. g229_d193_build strength race minimal shoulder/protect advanced s76308 sun,wed W1 tue :: add [Leg superset A] Reverse lunge (KB) 4×8–12 each @ RPE 8
+        e.g. g229_d193_build strength race minimal shoulder/protect advanced s76308 sun,wed W1 tue :: add [Leg superset A] Spanish squat hold (KB) 4×25 sec
+        e.g. g229_d193_build strength race minimal shoulder/protect advanced s76308 sun,wed W2 tue :: add [Leg superset A] Reverse lunge (KB) 4×8–12 each @ RPE 8
+
+  STEP A: programs changed 1/6, days changed 12 (classified 12, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM race 12/196; FOCUS support_prevention 12/98; INJ none 12/98; L g229_d193_build 12/364; TIER crossfit 12/98
+    op A-1                                                  12   NAME Single-leg hip thrust [loaded] 12, FOCUS support_prevention 12, TIER crossfit 12, INJ none 12, FAM race 12
+        e.g. g229_d193_build support_prevention race crossfit none intermediate s76308 sun,wed W1 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g229_d193_build support_prevention race crossfit none intermediate s76308 sun,wed W2 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g229_d193_build support_prevention race crossfit none intermediate s76308 sun,wed W3 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+
+  STEP W5: programs changed 1/6, days changed 6 (classified 6, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM none 6/168; FOCUS support_strength 6/168; INJ lowback/protect 6/42; L g229_d193_build 6/364; TIER bodyweight 6/42
+    op D196-1                                                2   FOCUS support_strength 2, TIER bodyweight 2, INJ lowback/protect 2, FAM none 2
+        e.g. g229_d193_build support_strength none bodyweight lowback/protect advanced s76308 sun,wed W1 tue :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest -> [Main — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest
+        e.g. g229_d193_build support_strength none bodyweight lowback/protect advanced s76308 sun,wed W2 tue :: rename [Main — Burpees] Burpees 3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest -> [Main — Single-leg hip thrust (shoulders on bed)] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave 3 or more in reserve), ramp up with 2–3 warmup sets, 3 min rest
+    op D196-3                                                2   FOCUS support_strength 2, TIER bodyweight 2, INJ lowback/protect 2, FAM none 2
+        e.g. g229_d193_build support_strength none bodyweight lowback/protect advanced s76308 sun,wed W1 tue :: relabel [Pull] Neutral-grip chinups 3 sets — RPE 8 (stop 2 reps short of failure) -> [Pull superset B] Neutral-grip chinups 3 sets — RPE 8 (stop 2 reps short of failure)
+        e.g. g229_d193_build support_strength none bodyweight lowback/protect advanced s76308 sun,wed W2 tue :: relabel [Pull] Neutral-grip chinups 3 sets — RPE 8 (stop 2 reps short of failure) -> [Pull superset B] Neutral-grip chinups 3 sets — RPE 8 (stop 2 reps short of failure)
+    op D196-3(dose N×10, N!=2)                               2   FOCUS support_strength 2, TIER bodyweight 2, INJ lowback/protect 2, FAM none 2
+        e.g. g229_d193_build support_strength none bodyweight lowback/protect advanced s76308 sun,wed W1 tue :: add [Pull superset B] Burpees 3×10
+        e.g. g229_d193_build support_strength none bodyweight lowback/protect advanced s76308 sun,wed W2 tue :: add [Pull superset B] Burpees 3×10
+    op D196-4                                                4   FOCUS support_strength 4, TIER bodyweight 4, INJ lowback/protect 4, FAM none 4
+        e.g. g229_d193_build support_strength none bodyweight lowback/protect advanced s76308 sun,wed W3 thu :: rename [Leg superset B] Burpees 3×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g229_d193_build support_strength none bodyweight lowback/protect advanced s76308 sun,wed W4 thu :: rename [Leg superset B] Burpees 3×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave 3 or more in reserve)
+        e.g. g229_d193_build support_strength none bodyweight lowback/protect advanced s76308 sun,wed W5 thu :: rename [Leg superset B] Burpees 3×8 — hold RPE 7, three in the tank -> [Leg superset B] Single-leg hip thrust (shoulders on bed) 3 sets — RPE 7 (leave 3 or more in reserve)
+
+  STEP FL: programs changed 0/6, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+==== CLS g199_deload_arbitration_: 10 configs; built on all five trees 10; crashes {}; V==V self-identity 6/6
+  V->ALL: programs changed 8/10; days changed 64/840
+    ALL        progs 8/10  days 64/840
+
+  STEP B: programs changed 7/10, days changed 52 (classified 52, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM none 4/42; FAM race 30/490; FAM test 18/308; FOCUS balanced 21/350; FOCUS hypertrophy 31/392; INJ knee/protect 9/252; INJ lowback/protect 18/175; INJ none 7/238; INJ shoulder/protect 18/175; L g199_deload_arbitration 52/840; TIER commercial 13/140; TIER crossfit 12/294; TIER home_full 9/98; TIER minimal 18/154
+    op B-1                                                  83   FOCUS hypertrophy 53, TIER commercial 14, INJ none 7, FAM none 4, FOCUS balanced 30, INJ knee/protect 10, FAM race 44, TIER minimal 35, INJ lowback/protect 31, FAM test 35, TIER home_full 13, INJ shoulder/protect 35, TIER crossfit 21
+        e.g. g199_deload_arbitration hypertrophy none commercial none beginner s1013 sun W2 wed :: add [Leg isolation] Standing cable hamstring curl 3×10–15 @ RPE 6–7
+        e.g. g199_deload_arbitration hypertrophy none commercial none beginner s1013 sun W4 wed :: add [Leg isolation] Standing cable hamstring curl 3×10–15 @ RPE 7
+        e.g. g199_deload_arbitration hypertrophy none commercial none beginner s1013 sun W5 wed :: add [Leg isolation] Standing cable hamstring curl 3×10–15 @ RPE 8
+        e.g. g199_deload_arbitration balanced race commercial knee/protect beginner s3039 sun W1 wed :: add [Loaded carry finisher] Suitcase carry 3×40 yards each, heavy
+
+  STEP A: programs changed 1/10, days changed 12 (classified 12, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): FAM race 12/490; FOCUS support_prevention 12/98; INJ none 12/238; L g199_deload_arbitration 12/840; TIER crossfit 12/294
+    op A-1                                                  12   NAME Single-leg hip thrust [loaded] 12, FOCUS support_prevention 12, TIER crossfit 12, INJ none 12, FAM race 12
+        e.g. g199_deload_arbitration support_prevention race crossfit none intermediate s76308 sun,wed W1 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g199_deload_arbitration support_prevention race crossfit none intermediate s76308 sun,wed W2 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+        e.g. g199_deload_arbitration support_prevention race crossfit none intermediate s76308 sun,wed W3 tue :: add [Leg circuit — runner armor] Single-leg hip thrust 2×6–10 each @ RPE 7
+
+  STEP W5: programs changed 0/10, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+
+  STEP FL: programs changed 0/10, days changed 0 (classified 0, UNCLASSIFIED 0)
+    days changed by segment (changed/days in segment): 
+
+################ PART summ_c
+######## g193_pool_overlay
+  V [PASS 220 FAIL 0]
+     PASS 220 FAIL :: PASS 220 FAIL 0
+  B [PASS 220 FAIL 0]
+     PASS 220 FAIL :: PASS 220 FAIL 0
+  A [PASS 220 FAIL 0]
+     PASS 220 FAIL :: PASS 220 FAIL 0
+  AB [PASS 220 FAIL 0]
+     PASS 220 FAIL :: PASS 220 FAIL 0
+  Ap [PASS 220 FAIL 0]
+     PASS 220 FAIL :: PASS 220 FAIL 0
+  Ar [NO SUMMARY]
+  ABp [PASS 220 FAIL 0]
+     PASS 220 FAIL :: PASS 220 FAIL 0
+  W5 [PASS 185 FAIL 1]
+     FAIL stale debt: :: FAIL stale debt: "thin-pool ankle/protect squatPool" is listed in g193_pool_overlay_debt.txt but no longer trips. If it was fixed, delete the line and drop
+     PASS 185 FAIL :: PASS 185 FAIL 1
+  FL [PASS 220 FAIL 0]
+     PASS 220 FAIL :: PASS 220 FAIL 0
+  PRE [NO SUMMARY]
+  ALL [PASS 185 FAIL 1]
+     FAIL stale debt: :: FAIL stale debt: "thin-pool ankle/protect squatPool" is listed in g193_pool_overlay_debt.txt but no longer trips. If it was fixed, delete the line and drop
+     PASS 185 FAIL :: PASS 185 FAIL 1
+######## g197d_d84_base
+  V [PASS 6 FAIL 0]
+  B [PASS 5 FAIL 1]
+     FAIL E5 capSessionBudget :: FAIL E5 capSessionBudget is byte-for-byte the D91 (V199) licensed text (licensing ruling D91; nothing since D91 has edited budget machinery)  -> ia
+  A [PASS 6 FAIL 0]
+  AB [PASS 5 FAIL 1]
+     FAIL E5 capSessionBudget :: FAIL E5 capSessionBudget is byte-for-byte the D91 (V199) licensed text (licensing ruling D91; nothing since D91 has edited budget machinery)  -> ia
+  Ap [PASS 6 FAIL 0]
+  Ar [NO SUMMARY]
+  ABp [PASS 5 FAIL 1]
+     FAIL E5 capSessionBudget :: FAIL E5 capSessionBudget is byte-for-byte the D91 (V199) licensed text (licensing ruling D91; nothing since D91 has edited budget machinery)  -> ia
+  W5 [PASS 6 FAIL 0]
+  FL [PASS 6 FAIL 0]
+  PRE [NO SUMMARY]
+  ALL [PASS 5 FAIL 1]
+     FAIL E5 capSessionBudget :: FAIL E5 capSessionBudget is byte-for-byte the D91 (V199) licensed text (licensing ruling D91; nothing since D91 has edited budget machinery)  -> ia
+######## g199_deload_arbitration
+  V [PASS 56 FAIL 0]
+  B [PASS 54 FAIL 2]
+     FAIL D2 19 ::   FAIL D2 19 deload weeks (the V230 row) are byte-identical with the deload off, so the sha-method deload count is 2861 (2863 differ of 2880). 2880 and 2863 are 
+     FAIL E6 END-TO-END ::   FAIL E6 END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): 40 deload day builds ship zero posterior where __DELOAD_OF
+  A [PASS 54 FAIL 2]
+  AB [PASS 52 FAIL 4]
+     FAIL D2 19 ::   FAIL D2 19 deload weeks (the V230 row) are byte-identical with the deload off, so the sha-method deload count is 2861 (2863 differ of 2880). 2880 and 2863 are 
+     FAIL E6 END-TO-END ::   FAIL E6 END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): 40 deload day builds ship zero posterior where __DELOAD_OF
+  Ap [PASS 54 FAIL 2]
+  Ar [NO SUMMARY]
+  ABp [PASS 52 FAIL 4]
+     FAIL D2 19 ::   FAIL D2 19 deload weeks (the V230 row) are byte-identical with the deload off, so the sha-method deload count is 2861 (2863 differ of 2880). 2880 and 2863 are 
+     FAIL E6 END-TO-END ::   FAIL E6 END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): 40 deload day builds ship zero posterior where __DELOAD_OF
+  W5 [PASS 51 FAIL 5]
+     FAIL C1 zero-posterior ::   FAIL C1 zero-posterior weeks on the SHIPPED card == 264 (the V230 DELOAD_ARB_BY_VERSION row) of 17856 weeks (1,728 configs); got 240
+     FAIL C3 the ::   FAIL C3 the surviving 264 (the V230 row) are all NON-deload weeks (denominator 14976), so C2's zero holds: got 240
+     FAIL F2 Leg ::   FAIL F2 Leg superset B present after the deload == 15,720, same all-day-builds denominator; got 15702
+     FAIL F3 ACCESSORY-BLOCK ::   FAIL F3 ACCESSORY-BLOCK CONSERVATION: A + B after the deload == 30,264, the identical total V198 shipped as 16,704 + 13,560. The ruling SWAPS whic
+     FAIL I2 of ::   FAIL I2 of the same 2,160, 0 cells reach the SHIPPED card with no posterior left, and NOT ONE of them loses it to a trim. capSessionBudget keeps the section an
+  FL [PASS 56 FAIL 0]
+  PRE [NO SUMMARY]
+  ALL [PASS 48 FAIL 8]
+     FAIL C1 zero-posterior ::   FAIL C1 zero-posterior weeks on the SHIPPED card == 264 (the V230 DELOAD_ARB_BY_VERSION row) of 17856 weeks (1,728 configs); got 240
+     FAIL C3 the ::   FAIL C3 the surviving 264 (the V230 row) are all NON-deload weeks (denominator 14976), so C2's zero holds: got 240
+     FAIL D2 19 ::   FAIL D2 19 deload weeks (the V230 row) are byte-identical with the deload off, so the sha-method deload count is 2861 (2863 differ of 2880). 2880 and 2863 are 
+     FAIL F2 Leg ::   FAIL F2 Leg superset B present after the deload == 15,720, same all-day-builds denominator; got 15702
+     FAIL F3 ACCESSORY-BLOCK ::   FAIL F3 ACCESSORY-BLOCK CONSERVATION: A + B after the deload == 30,264, the identical total V198 shipped as 16,704 + 13,560. The ruling SWAPS whic
+     FAIL I2 of ::   FAIL I2 of the same 2,160, 0 cells reach the SHIPPED card with no posterior left, and NOT ONE of them loses it to a trim. capSessionBudget keeps the section an
+######## g200_pull_arbitration
+  V [PASS 18 FAIL 0]
+     PASS 18 FAIL :: PASS 18 FAIL 0
+  B [PASS 18 FAIL 0]
+     PASS 18 FAIL :: PASS 18 FAIL 0
+  A [PASS 17 FAIL 1]
+     FAIL B1 HALF_MANNY :: 14aacbced1c527d7)
+     PASS 17 FAIL :: PASS 17 FAIL 1
+  AB [PASS 17 FAIL 1]
+     FAIL B1 HALF_MANNY :: 14aacbced1c527d7)
+     PASS 17 FAIL :: PASS 17 FAIL 1
+  Ap [PASS 17 FAIL 1]
+     FAIL B1 HALF_MANNY :: f5ed630033ebe3db)
+     PASS 17 FAIL :: PASS 17 FAIL 1
+  Ar [NO SUMMARY]
+  ABp [PASS 17 FAIL 1]
+     FAIL B1 HALF_MANNY :: 2d35e8f743680cfa)
+     PASS 17 FAIL :: PASS 17 FAIL 1
+  W5 [PASS 18 FAIL 0]
+     PASS 18 FAIL :: PASS 18 FAIL 0
+  FL [PASS 18 FAIL 0]
+     PASS 18 FAIL :: PASS 18 FAIL 0
+  PRE [NO SUMMARY]
+  ALL [PASS 17 FAIL 1]
+     FAIL B1 HALF_MANNY :: 2d35e8f743680cfa)
+     PASS 17 FAIL :: PASS 17 FAIL 1
+######## g210_equipment_denials
+  V [PASS 128 FAIL 0]
+     PASS O6u HALF_MANNY’s :: PASS O6u HALF_MANNY’s swap universe holds 86 names (commercial owns everything; the lens removes none)
+  B [PASS 128 FAIL 0]
+     PASS O6u HALF_MANNY’s :: PASS O6u HALF_MANNY’s swap universe holds 86 names (commercial owns everything; the lens removes none)
+  A [PASS 126 FAIL 2]
+     FAIL O6u HALF_MANNY’s :: 83)
+  AB [PASS 126 FAIL 2]
+     FAIL O6u HALF_MANNY’s :: 83)
+  Ap [PASS 126 FAIL 2]
+     FAIL O6u HALF_MANNY’s :: 83)
+  Ar [NO SUMMARY]
+  ABp [PASS 126 FAIL 2]
+     FAIL O6u HALF_MANNY’s :: 83)
+  W5 [PASS 128 FAIL 0]
+     PASS O6u HALF_MANNY’s :: PASS O6u HALF_MANNY’s swap universe holds 86 names (commercial owns everything; the lens removes none)
+  FL [PASS 128 FAIL 0]
+     PASS O6u HALF_MANNY’s :: PASS O6u HALF_MANNY’s swap universe holds 86 names (commercial owns everything; the lens removes none)
+  PRE [NO SUMMARY]
+  ALL [PASS 126 FAIL 2]
+     FAIL O6u HALF_MANNY’s :: 83)
+######## g215_d149_ghd
+  V [PASS 61 FAIL 0]
+     PASS F2 floor :: PASS F2 floor (b) never fires on commercial knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on crossfit knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) fires on home_full knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on home_basic knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on bodyweight knee/protect (counterfactual: floor written out)
+  B [PASS 61 FAIL 0]
+     PASS F2 floor :: PASS F2 floor (b) never fires on commercial knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on crossfit knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) fires on home_full knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on home_basic knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on bodyweight knee/protect (counterfactual: floor written out)
+  A [PASS 58 FAIL 3]
+     FAIL F2 floor :: 4 of 126 programs differ)
+     FAIL F2 floor :: 4 of 126 programs differ)
+     PASS F2 floor :: PASS F2 floor (b) fires on home_full knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on home_basic knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on bodyweight knee/protect (counterfactual: floor written out)
+  AB [PASS 58 FAIL 3]
+     FAIL F2 floor :: 4 of 126 programs differ)
+     FAIL F2 floor :: 4 of 126 programs differ)
+     PASS F2 floor :: PASS F2 floor (b) fires on home_full knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on home_basic knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on bodyweight knee/protect (counterfactual: floor written out)
+  Ap [PASS 56 FAIL 5]
+     FAIL F2 floor :: 18 of 126 programs differ)
+     FAIL F2 floor :: 18 of 126 programs differ)
+     PASS F2 floor :: PASS F2 floor (b) fires on home_full knee/protect (counterfactual: floor written out)
+     FAIL F2 floor :: 9 of 126 programs differ)
+     FAIL F2 floor :: 3 of 126 programs differ)
+  Ar [NO SUMMARY]
+  ABp [PASS 56 FAIL 5]
+     FAIL F2 floor :: 18 of 126 programs differ)
+     FAIL F2 floor :: 18 of 126 programs differ)
+     PASS F2 floor :: PASS F2 floor (b) fires on home_full knee/protect (counterfactual: floor written out)
+     FAIL F2 floor :: 9 of 126 programs differ)
+     FAIL F2 floor :: 3 of 126 programs differ)
+  W5 [PASS 61 FAIL 0]
+     PASS F2 floor :: PASS F2 floor (b) never fires on commercial knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on crossfit knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) fires on home_full knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on home_basic knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on bodyweight knee/protect (counterfactual: floor written out)
+  FL [PASS 61 FAIL 0]
+     PASS F2 floor :: PASS F2 floor (b) never fires on commercial knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on crossfit knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) fires on home_full knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on home_basic knee/protect (counterfactual: floor written out)
+     PASS F2 floor :: PASS F2 floor (b) never fires on bodyweight knee/protect (counterfactual: floor written out)
+  PRE [NO SUMMARY]
+  ALL [PASS 57 FAIL 4]
+     FAIL F2 floor :: 18 of 126 programs differ)
+     FAIL F2 floor :: 18 of 126 programs differ)
+     PASS F2 floor :: PASS F2 floor (b) fires on home_full knee/protect (counterfactual: floor written out)
+     FAIL F2 floor :: 9 of 126 programs differ)
+     PASS F2 floor :: PASS F2 floor (b) never fires on bodyweight knee/protect (counterfactual: floor written out)
+######## g221_d177_swapfloor
+  V [PASS 20 FAIL 0]
+     PASS G3a L1: :: PASS G3a L1: 0 Main swap pairs change outside the rep token [V229 D193 Amendment 4 (l): moved 832 == pin 832; card != the hand card beneath the hold 0]
+     PASS G3c L1: :: PASS G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2); compare cue-blind above 226 (D190) [V229 D193 Amendment 4 (l): powe
+     PASS G3e L1: :: PASS G3e L1: null-row pairs stay verbatim [V229 D193 Amendment 4 (l): moved 202 == pin 202; card != the hand card beneath the hold 0]
+     PASS G6a L1: :: PASS G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise [V229 D193 (k), R
+  B [PASS 20 FAIL 0]
+     PASS G3a L1: :: PASS G3a L1: 0 Main swap pairs change outside the rep token [V229 D193 Amendment 4 (l): moved 832 == pin 832; card != the hand card beneath the hold 0]
+     PASS G3c L1: :: PASS G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2); compare cue-blind above 226 (D190) [V229 D193 Amendment 4 (l): powe
+     PASS G3e L1: :: PASS G3e L1: null-row pairs stay verbatim [V229 D193 Amendment 4 (l): moved 202 == pin 202; card != the hand card beneath the hold 0]
+     PASS G6a L1: :: PASS G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise [V229 D193 (k), R
+  A [PASS 20 FAIL 0]
+     PASS G3a L1: :: PASS G3a L1: 0 Main swap pairs change outside the rep token [V229 D193 Amendment 4 (l): moved 832 == pin 832; card != the hand card beneath the hold 0]
+     PASS G3c L1: :: PASS G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2); compare cue-blind above 226 (D190) [V229 D193 Amendment 4 (l): powe
+     PASS G3e L1: :: PASS G3e L1: null-row pairs stay verbatim [V229 D193 Amendment 4 (l): moved 202 == pin 202; card != the hand card beneath the hold 0]
+     PASS G6a L1: :: PASS G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise [V229 D193 (k), R
+  AB [PASS 20 FAIL 0]
+     PASS G3a L1: :: PASS G3a L1: 0 Main swap pairs change outside the rep token [V229 D193 Amendment 4 (l): moved 832 == pin 832; card != the hand card beneath the hold 0]
+     PASS G3c L1: :: PASS G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2); compare cue-blind above 226 (D190) [V229 D193 Amendment 4 (l): powe
+     PASS G3e L1: :: PASS G3e L1: null-row pairs stay verbatim [V229 D193 Amendment 4 (l): moved 202 == pin 202; card != the hand card beneath the hold 0]
+     PASS G6a L1: :: PASS G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise [V229 D193 (k), R
+  Ap [PASS 20 FAIL 0]
+     PASS G3a L1: :: PASS G3a L1: 0 Main swap pairs change outside the rep token [V229 D193 Amendment 4 (l): moved 832 == pin 832; card != the hand card beneath the hold 0]
+     PASS G3c L1: :: PASS G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2); compare cue-blind above 226 (D190) [V229 D193 Amendment 4 (l): powe
+     PASS G3e L1: :: PASS G3e L1: null-row pairs stay verbatim [V229 D193 Amendment 4 (l): moved 202 == pin 202; card != the hand card beneath the hold 0]
+     PASS G6a L1: :: PASS G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise [V229 D193 (k), R
+  Ar [NO SUMMARY]
+  ABp [PASS 20 FAIL 0]
+     PASS G3a L1: :: PASS G3a L1: 0 Main swap pairs change outside the rep token [V229 D193 Amendment 4 (l): moved 832 == pin 832; card != the hand card beneath the hold 0]
+     PASS G3c L1: :: PASS G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2); compare cue-blind above 226 (D190) [V229 D193 Amendment 4 (l): powe
+     PASS G3e L1: :: PASS G3e L1: null-row pairs stay verbatim [V229 D193 Amendment 4 (l): moved 202 == pin 202; card != the hand card beneath the hold 0]
+     PASS G6a L1: :: PASS G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise [V229 D193 (k), R
+  W5 [PASS 16 FAIL 4]
+     FAIL G3a L1: :: moved 839 of 146307 (pin 832), beneath-the-hold misses 0 | e.g. commercial|hypertrophy|beginner|lift|knee/workaround W5 tue Barbell Romanian deadlift -> Leg pr
+     FAIL G3c L1: :: power 0 of 4066 (pin 0), off grammar moved 172 of 29137 (pin 168), beneath-the-hold misses 0 | e.g. commercial|strength|beginner|lift|knee/workaround W6 tue Ba
+     FAIL G3e L1: :: moved 205 of 37567 (pin 202), beneath-the-hold misses 0 | e.g. commercial|strength|beginner|lift|knee/workaround W5 tue Barbell Romanian deadlift -> Barbell bo
+     FAIL G6a L1: :: moved 1253 of 151007 (pin 1243), not a hold variant on a hand clamp pair 0, hand clamp pair without it 0, third toast 5984 vs hand window 5984)
+  FL [PASS 20 FAIL 0]
+     PASS G3a L1: :: PASS G3a L1: 0 Main swap pairs change outside the rep token [V229 D193 Amendment 4 (l): moved 832 == pin 832; card != the hand card beneath the hold 0]
+     PASS G3c L1: :: PASS G3c L1: 0 power pairs change, 0 Main donors outside the S×R — RPE grammar change (R2); compare cue-blind above 226 (D190) [V229 D193 Amendment 4 (l): powe
+     PASS G3e L1: :: PASS G3e L1: null-row pairs stay verbatim [V229 D193 Amendment 4 (l): moved 202 == pin 202; card != the hand card beneath the hold 0]
+     PASS G6a L1: :: PASS G6a L1: the third toast fires exactly when the hand window fires; V119 copy on a changed [0,0] pair; "Same job, same numbers." otherwise [V229 D193 (k), R
+  PRE [NO SUMMARY]
+  ALL [PASS 16 FAIL 4]
+     FAIL G3a L1: :: moved 839 of 146198 (pin 832), beneath-the-hold misses 0 | e.g. commercial|hypertrophy|beginner|lift|knee/workaround W5 tue Barbell Romanian deadlift -> Leg pr
+     FAIL G3c L1: :: power 0 of 4168 (pin 0), off grammar moved 172 of 29241 (pin 168), beneath-the-hold misses 0 | e.g. commercial|strength|beginner|lift|knee/workaround W6 tue Ba
+     FAIL G3e L1: :: moved 205 of 37559 (pin 202), beneath-the-hold misses 0 | e.g. commercial|strength|beginner|lift|knee/workaround W5 tue Barbell Romanian deadlift -> Barbell bo
+     FAIL G6a L1: :: moved 1253 of 150898 (pin 1243), not a hold variant on a hand clamp pair 0, hand clamp pair without it 0, third toast 5984 vs hand window 5984)
+######## g225_d187_pacerate
+  V [PASS 10 FAIL 0]
+     PASS CONFINEMENT D189 :: PASS CONFINEMENT D189 era (ia-version 230 >= 226, Class B): strip the S1 suffix from the one W1 note and every cell equals the baseline V225 (swim/bik
+  B [PASS 9 FAIL 1]
+     FAIL CONFINEMENT D189 :: run_base after the S1 strip candidate 91567d1896a97a40 != baseline a6f969abb40f0ced | run_marathon after the S1 strip candidate 4b7792e386092d9a != ba
+  A [PASS 9 FAIL 1]
+     FAIL CONFINEMENT D189 :: swim_100_time after the S1 strip candidate eea63c46e146baab != baseline a47d8d14f480dcd1 | swim_500_time after the S1 strip candidate fdf023f60f9d227f
+  AB [PASS 9 FAIL 1]
+     FAIL CONFINEMENT D189 :: swim_100_time after the S1 strip candidate eea63c46e146baab != baseline a47d8d14f480dcd1 | swim_500_time after the S1 strip candidate fdf023f60f9d227f
+  Ap [PASS 9 FAIL 1]
+     FAIL CONFINEMENT D189 :: swim_100_time after the S1 strip candidate eea63c46e146baab != baseline a47d8d14f480dcd1 | swim_500_time after the S1 strip candidate fdf023f60f9d227f
+  Ar [NO SUMMARY]
+  ABp [PASS 9 FAIL 1]
+     FAIL CONFINEMENT D189 :: swim_100_time after the S1 strip candidate eea63c46e146baab != baseline a47d8d14f480dcd1 | swim_500_time after the S1 strip candidate fdf023f60f9d227f
+  W5 [PASS 10 FAIL 0]
+     PASS CONFINEMENT D189 :: PASS CONFINEMENT D189 era (ia-version 230 >= 226, Class B): strip the S1 suffix from the one W1 note and every cell equals the baseline V225 (swim/bik
+  FL [PASS 10 FAIL 0]
+     PASS CONFINEMENT D189 :: PASS CONFINEMENT D189 era (ia-version 230 >= 226, Class B): strip the S1 suffix from the one W1 note and every cell equals the baseline V225 (swim/bik
+  PRE [NO SUMMARY]
+  ALL [PASS 9 FAIL 1]
+     FAIL CONFINEMENT D189 :: swim_100_time after the S1 strip candidate eea63c46e146baab != baseline a47d8d14f480dcd1 | swim_500_time after the S1 strip candidate fdf023f60f9d227f
+######## g226_d188_beginnermile
+  V [PASS 42 FAIL 0]
+     PASS G2 D188 :: PASS G2 D188 beginner no-mile program with exactly ' ' + S1 stripped from every note equals the V225 build, digest for digest (120/120 cells, 120 S1 suffixes s
+     PASS G1h-P2b D188 :: PASS G1h-P2b D188 beginner at 11:30 (m = 690): weekGrid byte-identical to V225 (48 cfgs) (0)
+     PASS G1h-P5 D188 :: PASS G1h-P5 D188 same length: every non-long-run day and every unmoved long-run day has V225's sections byte for byte (22872 + 2934 days) (0)
+  B [PASS 39 FAIL 3]
+     FAIL G2 D188 :: 0/120 cells, 120 S1 suffixes stripped; run_pace_goal seed 1000 cand e17d34954627e4f8 != V225 04c531a6f0637a5e | run_pace_goal seed 1037 cand d9f2e90115dcf237 !
+     FAIL G1h-P2b D188 :: 44: beginner base3mi event/support_prevention 11:30 mon+thu+sun s1000 weekGrid differs at 11:30 || beginner base3mi event/support_prevention 11:30 mon+thu
+     FAIL G1h-P5 D188 :: 2365: beginner base3mi event/support_prevention no mile mon+thu+sun s1000 W1 tue non-long-run day: [Main — Back squat] Back squat ; [Leg circuit — runner a
+  A [PASS 40 FAIL 2]
+     PASS G2 D188 :: PASS G2 D188 beginner no-mile program with exactly ' ' + S1 stripped from every note equals the V225 build, digest for digest (120/120 cells, 120 S1 suffixes s
+     FAIL G1h-P2b D188 :: 24: beginner base3mi event/support_prevention 11:30 mon+thu+sun s1000 weekGrid differs at 11:30 || beginner base3mi event/support_prevention 11:30 mon+thu
+     FAIL G1h-P5 D188 :: 1708: beginner base3mi event/support_prevention no mile mon+thu+sun s1000 W1 tue non-long-run day: [Main — Back squat] Back squat ; [Leg circuit — runner a
+  AB [PASS 39 FAIL 3]
+     FAIL G2 D188 :: 0/120 cells, 120 S1 suffixes stripped; run_pace_goal seed 1000 cand e17d34954627e4f8 != V225 04c531a6f0637a5e | run_pace_goal seed 1037 cand d9f2e90115dcf237 !
+     FAIL G1h-P2b D188 :: 48: beginner base3mi event/support_prevention 11:30 mon+thu+sun s1000 weekGrid differs at 11:30 || beginner base3mi event/support_prevention 11:30 mon+thu
+     FAIL G1h-P5 D188 :: 3252: beginner base3mi event/support_prevention no mile mon+thu+sun s1000 W1 tue non-long-run day: [Main — Back squat] Back squat ; [Leg circuit — runner a
+  Ap [PASS 40 FAIL 2]
+     PASS G2 D188 :: PASS G2 D188 beginner no-mile program with exactly ' ' + S1 stripped from every note equals the V225 build, digest for digest (120/120 cells, 120 S1 suffixes s
+     FAIL G1h-P2b D188 :: 24: beginner base3mi event/support_prevention 11:30 mon+thu+sun s1000 weekGrid differs at 11:30 || beginner base3mi event/support_prevention 11:30 mon+thu
+     FAIL G1h-P5 D188 :: 1708: beginner base3mi event/support_prevention no mile mon+thu+sun s1000 W1 tue non-long-run day: [Main — Back squat] Back squat ; [Leg circuit — runner a
+  Ar [NO SUMMARY]
+  ABp [PASS 39 FAIL 3]
+     FAIL G2 D188 :: 0/120 cells, 120 S1 suffixes stripped; run_pace_goal seed 1000 cand e17d34954627e4f8 != V225 04c531a6f0637a5e | run_pace_goal seed 1037 cand d9f2e90115dcf237 !
+     FAIL G1h-P2b D188 :: 48: beginner base3mi event/support_prevention 11:30 mon+thu+sun s1000 weekGrid differs at 11:30 || beginner base3mi event/support_prevention 11:30 mon+thu
+     FAIL G1h-P5 D188 :: 3252: beginner base3mi event/support_prevention no mile mon+thu+sun s1000 W1 tue non-long-run day: [Main — Back squat] Back squat ; [Leg circuit — runner a
+  W5 [PASS 42 FAIL 0]
+     PASS G2 D188 :: PASS G2 D188 beginner no-mile program with exactly ' ' + S1 stripped from every note equals the V225 build, digest for digest (120/120 cells, 120 S1 suffixes s
+     PASS G1h-P2b D188 :: PASS G1h-P2b D188 beginner at 11:30 (m = 690): weekGrid byte-identical to V225 (48 cfgs) (0)
+     PASS G1h-P5 D188 :: PASS G1h-P5 D188 same length: every non-long-run day and every unmoved long-run day has V225's sections byte for byte (22872 + 2934 days) (0)
+  FL [PASS 42 FAIL 0]
+     PASS G2 D188 :: PASS G2 D188 beginner no-mile program with exactly ' ' + S1 stripped from every note equals the V225 build, digest for digest (120/120 cells, 120 S1 suffixes s
+     PASS G1h-P2b D188 :: PASS G1h-P2b D188 beginner at 11:30 (m = 690): weekGrid byte-identical to V225 (48 cfgs) (0)
+     PASS G1h-P5 D188 :: PASS G1h-P5 D188 same length: every non-long-run day and every unmoved long-run day has V225's sections byte for byte (22872 + 2934 days) (0)
+  PRE [NO SUMMARY]
+  ALL [PASS 39 FAIL 3]
+     FAIL G2 D188 :: 0/120 cells, 120 S1 suffixes stripped; run_pace_goal seed 1000 cand e17d34954627e4f8 != V225 04c531a6f0637a5e | run_pace_goal seed 1037 cand d9f2e90115dcf237 !
+     FAIL G1h-P2b D188 :: 48: beginner base3mi event/support_prevention 11:30 mon+thu+sun s1000 weekGrid differs at 11:30 || beginner base3mi event/support_prevention 11:30 mon+thu
+     FAIL G1h-P5 D188 :: 3252: beginner base3mi event/support_prevention no mile mon+thu+sun s1000 W1 tue non-long-run day: [Main — Back squat] Back squat ; [Leg circuit — runner a
+######## g226_d189_pacedisclose
+  V [PASS 18 FAIL 0]
+     PASS G6b D189 :: PASS G6b D189 S1: every no-mile program (6 goals x 3 levels x 20 seeds x 2 rest, R3 cells excluded) carries exactly one S1 note, on the V225 grid's first pace
+  B [PASS 17 FAIL 1]
+     FAIL G6b D189 :: 0/640 cells (ruled 640) misses {"another byte moved vs V225":640} e.g. another byte moved vs V225 @ run_5k|beginner|1000|sun/wed ; another byte moved vs V225 
+  A [PASS 17 FAIL 1]
+     PASS G6b D189 :: PASS G6b D189 S1: every no-mile program (6 goals x 3 levels x 20 seeds x 2 rest, R3 cells excluded) carries exactly one S1 note, on the V225 grid's first pace
+  AB [PASS 16 FAIL 2]
+     FAIL G6b D189 :: 0/640 cells (ruled 640) misses {"another byte moved vs V225":640} e.g. another byte moved vs V225 @ run_5k|beginner|1000|sun/wed ; another byte moved vs V225 
+  Ap [PASS 17 FAIL 1]
+     PASS G6b D189 :: PASS G6b D189 S1: every no-mile program (6 goals x 3 levels x 20 seeds x 2 rest, R3 cells excluded) carries exactly one S1 note, on the V225 grid's first pace
+  Ar [NO SUMMARY]
+  ABp [PASS 16 FAIL 2]
+     FAIL G6b D189 :: 0/640 cells (ruled 640) misses {"another byte moved vs V225":640} e.g. another byte moved vs V225 @ run_5k|beginner|1000|sun/wed ; another byte moved vs V225 
+  W5 [PASS 18 FAIL 0]
+     PASS G6b D189 :: PASS G6b D189 S1: every no-mile program (6 goals x 3 levels x 20 seeds x 2 rest, R3 cells excluded) carries exactly one S1 note, on the V225 grid's first pace
+  FL [PASS 18 FAIL 0]
+     PASS G6b D189 :: PASS G6b D189 S1: every no-mile program (6 goals x 3 levels x 20 seeds x 2 rest, R3 cells excluded) carries exactly one S1 note, on the V225 grid's first pace
+  PRE [NO SUMMARY]
+  ALL [PASS 16 FAIL 2]
+     FAIL G6b D189 :: 0/640 cells (ruled 640) misses {"another byte moved vs V225":640} e.g. another byte moved vs V225 @ run_5k|beginner|1000|sun/wed ; another byte moved vs V225 
+######## g227_d190_cuecap
+  V [PASS 8 FAIL 0]
+     PASS row c-UNINJ :: PASS row c-UNINJ  pair vs V226: HALF_MANNY and mario_noinj live, boot, toast and undo unmoved, 0 moved (moved 0/1396 chains (live, boot, toast, undo, undo-
+     PASS row c-DIGEST :: PASS row c-DIGEST pair vs V226: progDigest(buildProgram) equal on every lattice config, the uninjured two included (at 228 and above: the six injured agai
+     PASS row c-MANNY :: PASS row c-MANNY  MANNY_DIGEST_BY_VERSION[227] exists and === [226] by reference; HALF_MANNY on the artifact prints the era row ([227]===[226], HALF_MANNY 
+  B [PASS 8 FAIL 0]
+     PASS row c-UNINJ :: PASS row c-UNINJ  pair vs V226: HALF_MANNY and mario_noinj live, boot, toast and undo unmoved, 0 moved (moved 0/1396 chains (live, boot, toast, undo, undo-
+     PASS row c-DIGEST :: PASS row c-DIGEST pair vs V226: progDigest(buildProgram) equal on every lattice config, the uninjured two included (at 228 and above: the six injured agai
+     PASS row c-MANNY :: PASS row c-MANNY  MANNY_DIGEST_BY_VERSION[227] exists and === [226] by reference; HALF_MANNY on the artifact prints the era row ([227]===[226], HALF_MANNY 
+  A [PASS 5 FAIL 3]
+     FAIL row c-UNINJ :: moved 172/1396 chains (live, boot, toast, undo, undo-boot))
+     FAIL row c-DIGEST :: 7/8 configs equal)
+     FAIL row c-MANNY :: [227]===[226], HALF_MANNY 14aacbced1c527d7 != [230])
+  AB [PASS 5 FAIL 3]
+     FAIL row c-UNINJ :: moved 172/1396 chains (live, boot, toast, undo, undo-boot))
+     FAIL row c-DIGEST :: 7/8 configs equal)
+     FAIL row c-MANNY :: [227]===[226], HALF_MANNY 14aacbced1c527d7 != [230])
+  Ap [PASS 5 FAIL 3]
+     FAIL row c-UNINJ :: moved 172/1396 chains (live, boot, toast, undo, undo-boot))
+     FAIL row c-DIGEST :: 7/8 configs equal)
+     FAIL row c-MANNY :: [227]===[226], HALF_MANNY f5ed630033ebe3db != [230])
+  Ar [NO SUMMARY]
+  ABp [PASS 5 FAIL 3]
+     FAIL row c-UNINJ :: moved 172/1396 chains (live, boot, toast, undo, undo-boot))
+     FAIL row c-DIGEST :: 7/8 configs equal)
+     FAIL row c-MANNY :: [227]===[226], HALF_MANNY 2d35e8f743680cfa != [230])
+  W5 [PASS 8 FAIL 0]
+     PASS row c-UNINJ :: PASS row c-UNINJ  pair vs V226: HALF_MANNY and mario_noinj live, boot, toast and undo unmoved, 0 moved (moved 0/1396 chains (live, boot, toast, undo, undo-
+     PASS row c-DIGEST :: PASS row c-DIGEST pair vs V226: progDigest(buildProgram) equal on every lattice config, the uninjured two included (at 228 and above: the six injured agai
+     PASS row c-MANNY :: PASS row c-MANNY  MANNY_DIGEST_BY_VERSION[227] exists and === [226] by reference; HALF_MANNY on the artifact prints the era row ([227]===[226], HALF_MANNY 
+  FL [PASS 8 FAIL 0]
+     PASS row c-UNINJ :: PASS row c-UNINJ  pair vs V226: HALF_MANNY and mario_noinj live, boot, toast and undo unmoved, 0 moved (moved 0/1396 chains (live, boot, toast, undo, undo-
+     PASS row c-DIGEST :: PASS row c-DIGEST pair vs V226: progDigest(buildProgram) equal on every lattice config, the uninjured two included (at 228 and above: the six injured agai
+     PASS row c-MANNY :: PASS row c-MANNY  MANNY_DIGEST_BY_VERSION[227] exists and === [226] by reference; HALF_MANNY on the artifact prints the era row ([227]===[226], HALF_MANNY 
+  PRE [NO SUMMARY]
+  ALL [PASS 5 FAIL 3]
+     FAIL row c-UNINJ :: moved 172/1396 chains (live, boot, toast, undo, undo-boot))
+     FAIL row c-DIGEST :: 7/8 configs equal)
+     FAIL row c-MANNY :: [227]===[226], HALF_MANNY 2d35e8f743680cfa != [230])
+######## g229_d193_build
+  V [PASS 10 FAIL 0]
+     PASS row b :: PASS row b         nothing moves but the clamp population: every other card of every injured build byte-identical to V228, > 0 moved; uninjured 133 byte-identica
+     PASS row d-BWSETS :: PASS row d-BWSETS  every bwsets card the clamp writes reads `N sets — RPE 7 (leave 3 or more in reserve)` (hand table), RPE 7, 0 keep `stop 2 reps short` 
+     PASS row j :: PASS row j         build, D177 L1: R7 text on the 30 held test cards (28 + 2 Burpees), 0 number-only, 102/102 unheld test cards byte-identical to V228, 0 R7 on u
+     PASS row f :: PASS row f         _stripCapCue(INJ_HELD_TEST) === TEST_RX_TEXT (both typed, R7 by shape); identity on TEST_RX_TEXT and on every non-cue detail (L9 1,722, HALF_M
+  B [PASS 8 FAIL 2]
+     FAIL row b :: outside 867/1053, moved L432 316 HB 120 L1 653; uninjured 86/133; MANNY [229]===[228], 0ac7da6b1691a8e1 == [230]; object row 27/27, _preHold 0)
+     PASS row d-BWSETS :: PASS row d-BWSETS  every bwsets card the clamp writes reads `N sets — RPE 7 (leave 3 or more in reserve)` (hand table), RPE 7, 0 keep `stop 2 reps short` 
+     FAIL row j :: R7 on 30 of 30 held, unheld 102/102, number-only 0, uninjured R7 0, L1 uninjured 51/96)
+     PASS row f :: PASS row f         _stripCapCue(INJ_HELD_TEST) === TEST_RX_TEXT (both typed, R7 by shape); identity on TEST_RX_TEXT and on every non-cue detail (L9 1,722, HALF_M
+  A [PASS 7 FAIL 3]
+     FAIL row b :: outside 810/1053, moved L432 316 HB 120 L1 653; uninjured 97/133; MANNY [229]===[228], 14aacbced1c527d7 != [230]; object row 27/27, _preHold 0)
+     PASS row d-BWSETS :: PASS row d-BWSETS  every bwsets card the clamp writes reads `N sets — RPE 7 (leave 3 or more in reserve)` (hand table), RPE 7, 0 keep `stop 2 reps short` 
+     FAIL row j :: R7 on 30 of 30 held, unheld 102/102, number-only 0, uninjured R7 0, L1 uninjured 72/96)
+     FAIL row f :: constants as typed, strip(INJ_HELD_TEST) === TEST_RX_TEXT, hand 0 wrong, false strips 0/1725, tank 0/9, distinct 0/360)
+  AB [PASS 7 FAIL 3]
+     FAIL row b :: outside 646/1053, moved L432 316 HB 120 L1 653; uninjured 50/133; MANNY [229]===[228], 14aacbced1c527d7 != [230]; object row 27/27, _preHold 0)
+     PASS row d-BWSETS :: PASS row d-BWSETS  every bwsets card the clamp writes reads `N sets — RPE 7 (leave 3 or more in reserve)` (hand table), RPE 7, 0 keep `stop 2 reps short` 
+     FAIL row j :: R7 on 30 of 30 held, unheld 102/102, number-only 0, uninjured R7 0, L1 uninjured 27/96)
+     FAIL row f :: constants as typed, strip(INJ_HELD_TEST) === TEST_RX_TEXT, hand 0 wrong, false strips 0/1725, tank 0/9, distinct 0/360)
+  Ap [PASS 7 FAIL 3]
+     FAIL row b :: outside 769/1053, moved L432 316 HB 120 L1 653; uninjured 97/133; MANNY [229]===[228], f5ed630033ebe3db != [230]; object row 27/27, _preHold 0)
+     PASS row d-BWSETS :: PASS row d-BWSETS  every bwsets card the clamp writes reads `N sets — RPE 7 (leave 3 or more in reserve)` (hand table), RPE 7, 0 keep `stop 2 reps short` 
+     FAIL row j :: R7 on 30 of 30 held, unheld 102/102, number-only 0, uninjured R7 0, L1 uninjured 72/96)
+     FAIL row f :: constants as typed, strip(INJ_HELD_TEST) === TEST_RX_TEXT, hand 0 wrong, false strips 0/1727, tank 0/9, distinct 0/360)
+  Ar [NO SUMMARY]
+  ABp [PASS 7 FAIL 3]
+     FAIL row b :: outside 605/1053, moved L432 316 HB 120 L1 653; uninjured 50/133; MANNY [229]===[228], 2d35e8f743680cfa != [230]; object row 27/27, _preHold 0)
+     PASS row d-BWSETS :: PASS row d-BWSETS  every bwsets card the clamp writes reads `N sets — RPE 7 (leave 3 or more in reserve)` (hand table), RPE 7, 0 keep `stop 2 reps short` 
+     FAIL row j :: R7 on 30 of 30 held, unheld 102/102, number-only 0, uninjured R7 0, L1 uninjured 27/96)
+     FAIL row f :: constants as typed, strip(INJ_HELD_TEST) === TEST_RX_TEXT, hand 0 wrong, false strips 0/1734, tank 0/9, distinct 0/360)
+  W5 [PASS 7 FAIL 3]
+     FAIL row b :: outside 1010/1053, moved L432 316 HB 120 L1 653; uninjured 133/133; MANNY [229]===[228], 0ac7da6b1691a8e1 == [230]; object row 27/27, _preHold 0)
+     FAIL row d-BWSETS :: 1169/1239 hand hold, 0 keep FORBID, 0 RPE != 7)
+     FAIL row j :: R7 on 28 of 30 held, unheld 102/102, number-only 0, uninjured R7 0, L1 uninjured 96/96)
+     PASS row f :: PASS row f         _stripCapCue(INJ_HELD_TEST) === TEST_RX_TEXT (both typed, R7 by shape); identity on TEST_RX_TEXT and on every non-cue detail (L9 1,722, HALF_M
+  FL [PASS 9 FAIL 1]
+     FAIL row b :: outside 1042/1053, moved L432 316 HB 120 L1 653; uninjured 133/133; MANNY [229]===[228], 0ac7da6b1691a8e1 == [230]; object row 27/27, _preHold 0)
+     PASS row d-BWSETS :: PASS row d-BWSETS  every bwsets card the clamp writes reads `N sets — RPE 7 (leave 3 or more in reserve)` (hand table), RPE 7, 0 keep `stop 2 reps short` 
+     PASS row j :: PASS row j         build, D177 L1: R7 text on the 30 held test cards (28 + 2 Burpees), 0 number-only, 102/102 unheld test cards byte-identical to V228, 0 R7 on u
+     PASS row f :: PASS row f         _stripCapCue(INJ_HELD_TEST) === TEST_RX_TEXT (both typed, R7 by shape); identity on TEST_RX_TEXT and on every non-cue detail (L9 1,722, HALF_M
+  PRE [NO SUMMARY]
+  ALL [PASS 6 FAIL 4]
+     FAIL row b :: outside 573/1053, moved L432 316 HB 120 L1 653; uninjured 50/133; MANNY [229]===[228], 2d35e8f743680cfa != [230]; object row 27/27, _preHold 0)
+     FAIL row d-BWSETS :: 1169/1239 hand hold, 0 keep FORBID, 0 RPE != 7)
+     FAIL row j :: R7 on 28 of 30 held, unheld 102/102, number-only 0, uninjured R7 0, L1 uninjured 27/96)
+     FAIL row f :: constants as typed, strip(INJ_HELD_TEST) === TEST_RX_TEXT, hand 0 wrong, false strips 0/1734, tank 0/9, distinct 0/360)
+######## g229_d194_lens
+  V [PASS 7 FAIL 0]
+     PASS row p-SWAP :: PASS row p-SWAP      L1 overlay W5 swap lists: rejected names 0 (V228 1,451 of 39,117, cards 1,387 of 4,529), OV == FIX on spliced days 4,529/4,529; pre-fro
+     PASS row p-AUX :: PASS row p-AUX       L1 overlay W5 aux lists (incl. _powerAllowed): rejected 0 (V228 4,228 of 21,856, cards 941 of 1,754), OV == FIX 1,754/1,754; pre-from W3
+     PASS row p-ADD :: PASS row p-ADD       L1 overlay W5 add pickers: rejected 0 (V228 2,104 of 19,380, pickers 1,120 of 1,440), OV == FIX 1,440/1,440; pre-from W3 and every FIX l
+     PASS row p-UNSTAMPED :: PASS row p-UNSTAMPED Thursday-from: mon to wed unstamped and == V228, thu to sat 0 rejected (V228 2 / 1 / 3); travel-only overlay W5 == V228; HALF_MANN
+  B [PASS 4 FAIL 3]
+     FAIL row p-SWAP :: rejected 0 of 38974, rows >= 1 rejected 0 of 4576, OV == FIX 4576/4576, W3 == V228 5262/5424, FIX == V228 8759/9110; row sets differ)
+     FAIL row p-AUX :: rejected 0 of 17699, rows >= 1 rejected 0 of 1840, OV == FIX 1840/1840, W3 == V228 1506/1602, FIX == V228 3485/3756; row sets differ)
+     FAIL row p-ADD :: rejected 0 of 19061, rows >= 1 rejected 0 of 1440, OV == FIX 1440/1440, W3 == V228 1377/1440, FIX == V228 2776/2880; row sets differ)
+     PASS row p-UNSTAMPED :: PASS row p-UNSTAMPED Thursday-from: mon to wed unstamped and == V228, thu to sat 0 rejected (V228 2 / 1 / 3); travel-only overlay W5 == V228; HALF_MANN
+  A [PASS 3 FAIL 4]
+     FAIL row p-SWAP :: rejected 0 of 38618, rows >= 1 rejected 0 of 4529, OV == FIX 4529/4529, W3 == V228 5148/5346, FIX == V228 8509/8972; row sets differ)
+     FAIL row p-AUX :: rejected 0 of 17340, rows >= 1 rejected 0 of 1762, OV == FIX 1762/1762, W3 == V228 1476/1509, FIX == V228 3522/3573; row sets differ)
+     FAIL row p-ADD :: rejected 0 of 19078, rows >= 1 rejected 0 of 1440, OV == FIX 1440/1440, W3 == V228 1371/1440, FIX == V228 2729/2880; row sets differ)
+     FAIL row p-UNSTAMPED :: Thursday-from thu/fri/sat rejected 0/0/0, mon/tue == V228 true; travel 32/32; uninjured MOVED)
+  AB [PASS 3 FAIL 4]
+     FAIL row p-SWAP :: rejected 0 of 38933, rows >= 1 rejected 0 of 4576, OV == FIX 4576/4576, W3 == V228 5064/5424, FIX == V228 8300/9110; row sets differ)
+     FAIL row p-AUX :: rejected 0 of 17699, rows >= 1 rejected 0 of 1848, OV == FIX 1848/1848, W3 == V228 1473/1602, FIX == V228 3468/3764; row sets differ)
+     FAIL row p-ADD :: rejected 0 of 18997, rows >= 1 rejected 0 of 1440, OV == FIX 1440/1440, W3 == V228 1308/1440, FIX == V228 2625/2880; row sets differ)
+     FAIL row p-UNSTAMPED :: Thursday-from thu/fri/sat rejected 0/0/0, mon/tue == V228 true; travel 32/32; uninjured MOVED)
+  Ap [PASS 3 FAIL 4]
+     FAIL row p-SWAP :: rejected 0 of 38893, rows >= 1 rejected 0 of 4579, OV == FIX 4579/4579, W3 == V228 5151/5418, FIX == V228 8480/9064; row sets differ)
+     FAIL row p-AUX :: rejected 0 of 17252, rows >= 1 rejected 0 of 1736, OV == FIX 1736/1736, W3 == V228 1476/1479, FIX == V228 3484/3529; row sets differ)
+     FAIL row p-ADD :: rejected 0 of 19010, rows >= 1 rejected 0 of 1440, OV == FIX 1440/1440, W3 == V228 1368/1440, FIX == V228 2724/2880; row sets differ)
+     FAIL row p-UNSTAMPED :: Thursday-from thu/fri/sat rejected 0/0/0, mon/tue == V228 true; travel 32/32; uninjured MOVED)
+  Ar [NO SUMMARY]
+  ABp [PASS 3 FAIL 4]
+     FAIL row p-SWAP :: rejected 0 of 39232, rows >= 1 rejected 0 of 4630, OV == FIX 4630/4630, W3 == V228 5067/5496, FIX == V228 8282/9218; row sets differ)
+     FAIL row p-AUX :: rejected 0 of 17565, rows >= 1 rejected 0 of 1830, OV == FIX 1830/1830, W3 == V228 1503/1602, FIX == V228 3490/3728; row sets differ)
+     FAIL row p-ADD :: rejected 0 of 18921, rows >= 1 rejected 0 of 1440, OV == FIX 1440/1440, W3 == V228 1305/1440, FIX == V228 2620/2880; row sets differ)
+     FAIL row p-UNSTAMPED :: Thursday-from thu/fri/sat rejected 0/0/0, mon/tue == V228 true; travel 32/32; uninjured MOVED)
+  W5 [PASS 4 FAIL 3]
+     FAIL row p-SWAP :: rejected 0 of 38765, rows >= 1 rejected 0 of 4537, OV == FIX 4537/4537, W3 == V228 5346/5346, FIX == V228 8876/8988)
+     FAIL row p-AUX :: rejected 0 of 17324, rows >= 1 rejected 0 of 1746, OV == FIX 1746/1746, W3 == V228 1509/1509, FIX == V228 3549/3549)
+     FAIL row p-ADD :: rejected 0 of 19212, rows >= 1 rejected 0 of 1440, OV == FIX 1440/1440, W3 == V228 1440/1440, FIX == V228 2842/2880)
+     PASS row p-UNSTAMPED :: PASS row p-UNSTAMPED Thursday-from: mon to wed unstamped and == V228, thu to sat 0 rejected (V228 2 / 1 / 3); travel-only overlay W5 == V228; HALF_MANN
+  FL [PASS 7 FAIL 0]
+     PASS row p-SWAP :: PASS row p-SWAP      L1 overlay W5 swap lists: rejected names 0 (V228 1,451 of 39,117, cards 1,387 of 4,529), OV == FIX on spliced days 4,529/4,529; pre-fro
+     PASS row p-AUX :: PASS row p-AUX       L1 overlay W5 aux lists (incl. _powerAllowed): rejected 0 (V228 4,228 of 21,856, cards 941 of 1,754), OV == FIX 1,754/1,754; pre-from W3
+     PASS row p-ADD :: PASS row p-ADD       L1 overlay W5 add pickers: rejected 0 (V228 2,104 of 19,380, pickers 1,120 of 1,440), OV == FIX 1,440/1,440; pre-from W3 and every FIX l
+     PASS row p-UNSTAMPED :: PASS row p-UNSTAMPED Thursday-from: mon to wed unstamped and == V228, thu to sat 0 rejected (V228 2 / 1 / 3); travel-only overlay W5 == V228; HALF_MANN
+  PRE [NO SUMMARY]
+  ALL [PASS 3 FAIL 4]
+     FAIL row p-SWAP :: rejected 0 of 39345, rows >= 1 rejected 0 of 4638, OV == FIX 4638/4638, W3 == V228 5067/5496, FIX == V228 8202/9234; row sets differ)
+     FAIL row p-AUX :: rejected 0 of 17549, rows >= 1 rejected 0 of 1822, OV == FIX 1822/1822, W3 == V228 1503/1602, FIX == V228 3474/3712; row sets differ)
+     FAIL row p-ADD :: rejected 0 of 18991, rows >= 1 rejected 0 of 1440, OV == FIX 1440/1440, W3 == V228 1305/1440, FIX == V228 2584/2880; row sets differ)
+     FAIL row p-UNSTAMPED :: Thursday-from thu/fri/sat rejected 0/0/0, mon/tue == V228 true; travel 32/32; uninjured MOVED)
+######## g230_d194_lens2
+  V [PASS 15 FAIL 0]
+     PASS row d194-fixture :: PASS row d194-fixture CLAIM (R3′ "nothing else"; fails by name, gates no row) the fixture presentation did not move: candidate CFG == V229 CFG on the 
+     PASS row d193-k″ :: PASS row d193-k″     on OV1 the 196 bwsets ends print R8's unloadable hold toast "<to> in, <from> out. No load to add here. Your injury plan holds this one
+     PASS row d193-k :: PASS row d193-k      g221 L1 sweep on STAMP (150,068 pairs, 384 configs): hand clamp pairs 1,243, toast == the hand hold variant 1,243 (verbatim 684, unload
+     PASS row d193-l :: PASS row d193-l      g221 L1 sweep on STAMP, (l)'s predicate (capped: hand hold of D177's card on the stripped donor; uncapped: D177's card on the stripped 
+     PASS row d194-postsweep :: PASS row d194-postsweep INFO (D194 Amendment 4; asserted at ia-version 230 only, REFUSED from 231 until P-BWFALLBACK + P-FILTERLAST re-key it, expec
+  B [PASS 13 FAIL 2]
+     FAIL row d194-fixture :: L1 150047/150047 (card differs 0, toast 0, aligned false), pairs 324/324)
+     PASS row d193-k″ :: PASS row d193-k″     on OV1 the 196 bwsets ends print R8's unloadable hold toast "<to> in, <from> out. No load to add here. Your injury plan holds this one
+     FAIL row d193-k :: clamp pairs 1243, hold variants 1243 (verbatim 684, unloadable 360, window 199), false claims 0, hold toasts off the clamp set 0, INFO capped 458, STAMP vs 
+     PASS row d193-l :: PASS row d193-l      g221 L1 sweep on STAMP, (l)'s predicate (capped: hand hold of D177's card on the stripped donor; uncapped: D177's card on the stripped 
+     PASS row d194-postsweep :: PASS row d194-postsweep INFO (D194 Amendment 4; asserted at ia-version 230 only, REFUSED from 231 until P-BWFALLBACK + P-FILTERLAST re-key it, expec
+  A [PASS 13 FAIL 2]
+     FAIL row d194-fixture :: L1 150044/150044 (card differs 0, toast 0, aligned false), pairs 324/324)
+     PASS row d193-k″ :: PASS row d193-k″     on OV1 the 196 bwsets ends print R8's unloadable hold toast "<to> in, <from> out. No load to add here. Your injury plan holds this one
+     FAIL row d193-k :: clamp pairs 1243, hold variants 1243 (verbatim 684, unloadable 360, window 199), false claims 0, hold toasts off the clamp set 0, INFO capped 440, STAMP vs 
+     PASS row d193-l :: PASS row d193-l      g221 L1 sweep on STAMP, (l)'s predicate (capped: hand hold of D177's card on the stripped donor; uncapped: D177's card on the stripped 
+     PASS row d194-postsweep :: PASS row d194-postsweep INFO (D194 Amendment 4; asserted at ia-version 230 only, REFUSED from 231 until P-BWFALLBACK + P-FILTERLAST re-key it, expec
+  AB [PASS 13 FAIL 2]
+     FAIL row d194-fixture :: L1 150023/150023 (card differs 0, toast 0, aligned false), pairs 324/324)
+     PASS row d193-k″ :: PASS row d193-k″     on OV1 the 196 bwsets ends print R8's unloadable hold toast "<to> in, <from> out. No load to add here. Your injury plan holds this one
+     FAIL row d193-k :: clamp pairs 1243, hold variants 1243 (verbatim 684, unloadable 360, window 199), false claims 0, hold toasts off the clamp set 0, INFO capped 440, STAMP vs 
+     PASS row d193-l :: PASS row d193-l      g221 L1 sweep on STAMP, (l)'s predicate (capped: hand hold of D177's card on the stripped donor; uncapped: D177's card on the stripped 
+     PASS row d194-postsweep :: PASS row d194-postsweep INFO (D194 Amendment 4; asserted at ia-version 230 only, REFUSED from 231 until P-BWFALLBACK + P-FILTERLAST re-key it, expec
+  Ap [NO SUMMARY]
+  Ar [NO SUMMARY]
+  ABp [NO SUMMARY]
+  W5 [PASS 11 FAIL 4]
+     FAIL row d194-fixture :: L1 151007/151007 (card differs 0, toast 0, aligned false), pairs 324/324)
+     PASS row d193-k″ :: PASS row d193-k″     on OV1 the 196 bwsets ends print R8's unloadable hold toast "<to> in, <from> out. No load to add here. Your injury plan holds this one
+     FAIL row d193-k :: clamp pairs 1253, hold variants 1253 (verbatim 694, unloadable 360, window 199), false claims 0, hold toasts off the clamp set 0, INFO capped 458, STAMP vs 
+     FAIL row d193-l :: G3a 839 (529 / 199 / 111, miss 0), G3c power 0 of 4066, G3c-off 172 of 29137 (miss 0), G3d 263 of 32188 (miss 0), G3e 205 of 37567 (miss 0), G3f 199 of 5984
+     FAIL row d194-postsweep :: (i) rejects 4 (0 + 4) in 2 builds, == the typed table on 2 of 4 presentations, self 26/44; (ii) landed 88 of 180, OV1 boot == fixture boot 88/88, ==
+  FL [PASS 14 FAIL 1]
+     PASS row d194-fixture :: PASS row d194-fixture CLAIM (R3′ "nothing else"; fails by name, gates no row) the fixture presentation did not move: candidate CFG == V229 CFG on the 
+     PASS row d193-k″ :: PASS row d193-k″     on OV1 the 196 bwsets ends print R8's unloadable hold toast "<to> in, <from> out. No load to add here. Your injury plan holds this one
+     PASS row d193-k :: PASS row d193-k      g221 L1 sweep on STAMP (150,068 pairs, 384 configs): hand clamp pairs 1,243, toast == the hand hold variant 1,243 (verbatim 684, unload
+     PASS row d193-l :: PASS row d193-l      g221 L1 sweep on STAMP, (l)'s predicate (capped: hand hold of D177's card on the stripped donor; uncapped: D177's card on the stripped 
+     FAIL row d194-postsweep :: (i) rejects 0 (0 + 0) in 0 builds, == the typed table on 2 of 4 presentations, self 26/44; (ii) landed 88 of 144, OV1 boot == fixture boot 88/88, ==
+  PRE [NO SUMMARY]
+  ALL [NO SUMMARY]

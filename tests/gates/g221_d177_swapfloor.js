@@ -30,6 +30,14 @@
 //                  G6a 1,243 (D194 Amendment 3: from 229 G6a's V119 "changed [0,0] pair" is judged on the donor read
 //                  beneath its hold) (0 on V228, so each re-keyed row fails there). Fixture presentation (`cfg.injury` stored);
 //                  app equivalence is D194 part 2's row. Below 229 these rows assert exactly as before.
+//   231 and up     (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, class D196-1 at the swap sheet; standing
+//                  rulings 2 and 4) the same six rows read a second pin table, D193_PIN_V231: G3a 839, G3c power 0 / off
+//                  grammar 172, G3d 263, G3e 205, G3f 199, G6a 1,253 (229 and 230 keep the table above). G3a, G3c, G3e
+//                  and G6a carry one more conjunct: the moved pairs whose donor is `Single-leg hip thrust (shoulders on
+//                  bed)` (the D196-1 bodyweight lowback/workaround card that was `Burpees` on V230) count G3a 7, G3c off
+//                  grammar 4, G3e 3, G6a toast 10 (typed pins, the ruling's print; the D198 re-ruling states the four
+//                  figures unchanged by D198; V230 has 0 such donors, so each re-keyed row fails there). Below 231 the
+//                  rows assert as before.
 //   pair rows      G4 G7-4 G8a assert only on D177's build pair: candidate 221 against baseline 220 (argv[3] when it
 //                  reads 220, else git 8ee4385). Any other candidate: SKIP, scoped out, never PASS. G9 asserts on 221 only.
 //   IA_ASSUME_VERSION=221 lifts a file stamped 220 to 221 for a pre-bump development run. It is announced, and it is
@@ -179,6 +187,11 @@ const FALLBACK = '3×10 — RPE 7';
 // hand kind on a hand clamp pair, every hand clamp pair's toast moved, and the moved count is pinned at (k)'s 1,243.
 const D193_ERA = 229;
 const D193_PIN = { G3a:832, G3cPow:0, G3cOff:168, G3d:263, G3e:202, G3f:199, G6a:1243 };   // G6a: D194 Amendment 3 (replaces Amendment 1 (r)'s 1,252), D193 Amendment 4 (k)
+// V231 (absorb ruling section 3, g221 ABSORB, class D196-1): the second pin table for ia-version 231 and up, and the moved
+// pairs it adds, all on one donor name, typed from the ruling's print (never this run).
+const D193_V231_ERA = 231;
+const D193_PIN_V231 = { G3a:839, G3cPow:0, G3cOff:172, G3d:263, G3e:205, G3f:199, G6a:1253 };
+const BED_DONOR = 'Single-leg hip thrust (shoulders on bed)', BED_PIN_V231 = { out:7, off:4, nul:3, t:10 };
 const CAP_HAND = { knee:{ workaround:['squat', 'lunge', 'leg_iso'] }, lowback:{ workaround:['hinge', 'squat', 'row', 'hip_ext'] }, shoulder:{ protect:[] } };
 const CUE_HAND = / — hold RPE 7, (?:two|three) in the tank$/;
 const CUE3_HAND = ' — hold RPE 7, three in the tank';
@@ -211,6 +224,7 @@ const T3H = (to, from, w) => to + ' in, ' + from.toLowerCase() + ' out. The load
 const T119H = (to, from) => to + ' in, ' + from.toLowerCase() + ' out. No load to add here.' + HOLD_HAND;
 const TSAMEH = (to, from) => to + ' in, ' + from.toLowerCase() + ' out. Same sets, same reps.' + HOLD_HAND;
 const S9 = { capPairs:0, bA:0, bOff:0, bAt:0, bNull:0, bWin:0, mvT:0, bT:0, missT:0, clampT:0, ex:{} };
+const BED9 = { out:0, off:0, nul:0, t:0 };   // V231: moved pairs whose donor is BED_DONOR (G3a, G3c off grammar, G3e, G6a toast), every tree
 const note9 = (k, s) => { (S9.ex[k] = S9.ex[k] || []).length < 3 && S9.ex[k].push(s); };
 const exs9 = k => (S9.ex[k] || []).map(s => ' | e.g. ' + s).join('');
 
@@ -392,7 +406,7 @@ for(const cfg of L1){
             if(clamp9) S9.clampT++;
             // D194 Amendment 3: the V119 "changed [0,0] pair" is judged on the donor read beneath its hold, the (l) lens.
             const wantT9 = H.k === 'win' ? T3(to, from, H.W) : (H.k === 'zero' && O !== Db9) ? T119(to, from) : TSAME(to, from);
-            if(toast !== wantT9){ S9.mvT++; if(!(clamp9 && toast === wantH && String(toast).endsWith(HOLD_HAND))){ S9.bT++; note9('t', where + ' [' + H.k + (clamp9 ? ', hand clamp pair' : ', not a hand clamp pair') + '] ' + toast + ' | want ' + (clamp9 ? wantH : wantT9)); } }
+            if(toast !== wantT9){ S9.mvT++; if(clean(from) === BED_DONOR) BED9.t++; if(!(clamp9 && toast === wantH && String(toast).endsWith(HOLD_HAND))){ S9.bT++; note9('t', where + ' [' + H.k + (clamp9 ? ', hand clamp pair' : ', not a hand clamp pair') + '] ' + toast + ' | want ' + (clamp9 ? wantH : wantT9)); } }
             else if(clamp9){ S9.missT++; note9('miss', where + ' [' + H.k + '] ' + toast + ' | want ' + wantH); }
           }
           if(isPow){
@@ -403,9 +417,9 @@ for(const cfg of L1){
           S.main++;
           if(PAIR && sdB(to, D) !== O) S.mainDiff++;
           if(H.k === 'zero'){ S.zeroN++; if(O !== D) S.zeroChg++; continue; }
-          if(O !== D && stripRep(O) !== stripRep(D)){ S.outside++; note('out', where + ' :: ' + D + ' => ' + O); }
-          if(H.k === 'offgram'){ S.offN++; if(cueBlind(O) !== cueBlind(D)){ S.offChg++; note('off', where + ' :: ' + D + ' => ' + O); } }
-          if(H.k === 'null'){ S.nullN++; if(O !== D){ S.nullBad++; note('null', where + ' :: ' + D + ' => ' + O); } }
+          if(O !== D && stripRep(O) !== stripRep(D)){ S.outside++; if(clean(from) === BED_DONOR) BED9.out++; note('out', where + ' :: ' + D + ' => ' + O); }
+          if(H.k === 'offgram'){ S.offN++; if(cueBlind(O) !== cueBlind(D)){ S.offChg++; if(clean(from) === BED_DONOR) BED9.off++; note('off', where + ' :: ' + D + ' => ' + O); } }
+          if(H.k === 'null'){ S.nullN++; if(O !== D){ S.nullBad++; if(clean(from) === BED_DONOR) BED9.nul++; note('null', where + ' :: ' + D + ' => ' + O); } }
           if(H.k === 'atfloor'){ S.atN++; if(O !== D){ S.atBad++; note('at', where + ' :: ' + D + ' => ' + O); } }
           if(H.k === 'win'){ S.winN++; if(O !== H.out){ S.winBad++; note('win', where + ' :: ' + D + ' => ' + O); } }
           // V229 D193 (l), Amendment 4 "The rules": fixture presentation (`cfg.injury` stored); app equivalence is D194 part 2's row.
@@ -433,18 +447,20 @@ const crashNote = S.crash.length ? ' | build crashes ' + S.crash.length + ': ' +
 // V229 D193 era (VER >= D193_ERA): G3a G3c G3d G3e G3f and G6a assert D193 Amendment 4's (l)/(k) predicate on their
 // whole population and pin the moved count (0 on V228). Fixture presentation (`cfg.injury` stored); app equivalence is
 // D194 part 2's row. Below 229 each row asserts exactly as before.
-const D9 = VER >= D193_ERA;
+// V231 (absorb ruling section 3): at 231 and up the six D9 rows read D193_PIN_V231; 229 and 230 read D193_PIN.
+const D9 = VER >= D193_ERA, ERA231 = VER >= D193_V231_ERA, PIN9 = ERA231 ? D193_PIN_V231 : D193_PIN;
 if(D9) console.log('  D193 era (V' + VER + '): Main pairs on a hand-capped target ' + S9.capPairs + ', hand clamp pairs (toasts) ' + S9.clampT);
-if(D9) ok(R.G3a + ' [V229 D193 Amendment 4 (l): moved ' + S.outside + ' == pin ' + D193_PIN.G3a + '; card != the hand card beneath the hold ' + S9.bA + ']', !S.crash.length && S.main > 0 && S9.bA === 0 && S.outside === D193_PIN.G3a, 'moved ' + S.outside + ' of ' + S.main + ' (pin ' + D193_PIN.G3a + '), beneath-the-hold misses ' + S9.bA + crashNote + exs9('A') + exs('out'));
+if(D9) console.log('  V231 bed-thrust donor (' + BED_DONOR + ') moved pairs on this tree: G3a ' + BED9.out + ', G3c off grammar ' + BED9.off + ', G3e ' + BED9.nul + ', G6a toast ' + BED9.t + ' | pin table ' + (ERA231 ? 'D193_PIN_V231 (ia-version ' + D193_V231_ERA + ' and up)' : 'D193_PIN (229 and 230)') + ' | swap pairs ' + S.pairs);
+if(D9) ok(R.G3a + ' [V229 D193 Amendment 4 (l): moved ' + S.outside + ' == pin ' + PIN9.G3a + '; card != the hand card beneath the hold ' + S9.bA + ']' + (ERA231 ? ' [V231 D196-1: bed-thrust donor moved ' + BED9.out + ' == ' + BED_PIN_V231.out + ']' : ''), !S.crash.length && S.main > 0 && S9.bA === 0 && S.outside === PIN9.G3a && (!ERA231 || BED9.out === BED_PIN_V231.out), 'moved ' + S.outside + ' of ' + S.main + ' (pin ' + PIN9.G3a + '), beneath-the-hold misses ' + S9.bA + (ERA231 ? ', bed-thrust donor moved ' + BED9.out + ' (pin ' + BED_PIN_V231.out + ')' : '') + crashNote + exs9('A') + exs('out'));
 else ok(R.G3a, !S.crash.length && S.main > 0 && S.outside === 0, S.outside + ' of ' + S.main + crashNote + exs('out'));
 ok(R.G3b, !S.crash.length && S.underN > 0 && S.under === 0, S.under + ' of ' + S.underN + crashNote + exs('under'));
-if(D9) ok(R.G3c + ' [V229 D193 Amendment 4 (l): power moved ' + S.powChg + ' == pin ' + D193_PIN.G3cPow + ', off grammar moved ' + S.offChg + ' == pin ' + D193_PIN.G3cOff + '; off-grammar card != the hand card beneath the hold ' + S9.bOff + ']', !S.crash.length && S.pow > 0 && S.powChg === D193_PIN.G3cPow && S.offN > 0 && S9.bOff === 0 && S.offChg === D193_PIN.G3cOff, 'power ' + S.powChg + ' of ' + S.pow + ' (pin ' + D193_PIN.G3cPow + '), off grammar moved ' + S.offChg + ' of ' + S.offN + ' (pin ' + D193_PIN.G3cOff + '), beneath-the-hold misses ' + S9.bOff + crashNote + exs('pow') + exs9('off') + exs('off'));
+if(D9) ok(R.G3c + ' [V229 D193 Amendment 4 (l): power moved ' + S.powChg + ' == pin ' + PIN9.G3cPow + ', off grammar moved ' + S.offChg + ' == pin ' + PIN9.G3cOff + '; off-grammar card != the hand card beneath the hold ' + S9.bOff + ']' + (ERA231 ? ' [V231 D196-1: bed-thrust donor off grammar moved ' + BED9.off + ' == ' + BED_PIN_V231.off + ']' : ''), !S.crash.length && S.pow > 0 && S.powChg === PIN9.G3cPow && S.offN > 0 && S9.bOff === 0 && S.offChg === PIN9.G3cOff && (!ERA231 || BED9.off === BED_PIN_V231.off), 'power ' + S.powChg + ' of ' + S.pow + ' (pin ' + PIN9.G3cPow + '), off grammar moved ' + S.offChg + ' of ' + S.offN + ' (pin ' + PIN9.G3cOff + '), beneath-the-hold misses ' + S9.bOff + (ERA231 ? ', bed-thrust donor off grammar moved ' + BED9.off + ' (pin ' + BED_PIN_V231.off + ')' : '') + crashNote + exs('pow') + exs9('off') + exs('off'));
 else ok(R.G3c, !S.crash.length && S.pow > 0 && S.powChg === 0 && S.offN > 0 && S.offChg === 0, 'power ' + S.powChg + ' of ' + S.pow + ', off grammar ' + S.offChg + ' of ' + S.offN + crashNote + exs('pow') + exs('off'));
-if(D9) ok(R.G3d + ' [V229 D193 Amendment 4 (l): moved ' + S.atBad + ' == pin ' + D193_PIN.G3d + '; card != the hand card beneath the hold ' + S9.bAt + ']', !S.crash.length && S.atN > 0 && S9.bAt === 0 && S.atBad === D193_PIN.G3d, 'moved ' + S.atBad + ' of ' + S.atN + ' (pin ' + D193_PIN.G3d + '), beneath-the-hold misses ' + S9.bAt + crashNote + exs9('at') + exs('at'));
+if(D9) ok(R.G3d + ' [V229 D193 Amendment 4 (l): moved ' + S.atBad + ' == pin ' + PIN9.G3d + '; card != the hand card beneath the hold ' + S9.bAt + ']', !S.crash.length && S.atN > 0 && S9.bAt === 0 && S.atBad === PIN9.G3d, 'moved ' + S.atBad + ' of ' + S.atN + ' (pin ' + PIN9.G3d + '), beneath-the-hold misses ' + S9.bAt + crashNote + exs9('at') + exs('at'));
 else ok(R.G3d, !S.crash.length && S.atN > 0 && S.atBad === 0, S.atBad + ' of ' + S.atN + crashNote + exs('at'));
-if(D9) ok(R.G3e + ' [V229 D193 Amendment 4 (l): moved ' + S.nullBad + ' == pin ' + D193_PIN.G3e + '; card != the hand card beneath the hold ' + S9.bNull + ']', !S.crash.length && S.nullN > 0 && S9.bNull === 0 && S.nullBad === D193_PIN.G3e, 'moved ' + S.nullBad + ' of ' + S.nullN + ' (pin ' + D193_PIN.G3e + '), beneath-the-hold misses ' + S9.bNull + crashNote + exs9('null') + exs('null'));
+if(D9) ok(R.G3e + ' [V229 D193 Amendment 4 (l): moved ' + S.nullBad + ' == pin ' + PIN9.G3e + '; card != the hand card beneath the hold ' + S9.bNull + ']' + (ERA231 ? ' [V231 D196-1: bed-thrust donor moved ' + BED9.nul + ' == ' + BED_PIN_V231.nul + ']' : ''), !S.crash.length && S.nullN > 0 && S9.bNull === 0 && S.nullBad === PIN9.G3e && (!ERA231 || BED9.nul === BED_PIN_V231.nul), 'moved ' + S.nullBad + ' of ' + S.nullN + ' (pin ' + PIN9.G3e + '), beneath-the-hold misses ' + S9.bNull + (ERA231 ? ', bed-thrust donor moved ' + BED9.nul + ' (pin ' + BED_PIN_V231.nul + ')' : '') + crashNote + exs9('null') + exs('null'));
 else ok(R.G3e, !S.crash.length && S.nullN > 0 && S.nullBad === 0, S.nullBad + ' of ' + S.nullN + crashNote + exs('null'));
-if(D9) ok(R.G3f + ' [V229 D193 Amendment 4 (l): moved ' + S.winBad + ' == pin ' + D193_PIN.G3f + '; card != the hand rewrite beneath the hold ' + S9.bWin + ']', !S.crash.length && S.winN > 0 && S9.bWin === 0 && S.winBad === D193_PIN.G3f, 'moved ' + S.winBad + ' of ' + S.winN + ' (pin ' + D193_PIN.G3f + '), beneath-the-hold misses ' + S9.bWin + crashNote + exs9('win') + exs('win'));
+if(D9) ok(R.G3f + ' [V229 D193 Amendment 4 (l): moved ' + S.winBad + ' == pin ' + PIN9.G3f + '; card != the hand rewrite beneath the hold ' + S9.bWin + ']', !S.crash.length && S.winN > 0 && S9.bWin === 0 && S.winBad === PIN9.G3f, 'moved ' + S.winBad + ' of ' + S.winN + ' (pin ' + PIN9.G3f + '), beneath-the-hold misses ' + S9.bWin + crashNote + exs9('win') + exs('win'));
 else ok(R.G3f, !S.crash.length && S.winN > 0 && S.winBad === 0, S.winBad + ' of ' + S.winN + crashNote + exs('win'));
 pairRow('G4a', S.pn > 0 && S.pnDiff === 0 && S.mainDiff > 0, S.pnDiff + ' of ' + S.pn + ' differ; Main pairs differing ' + S.mainDiff + exs('pn'));
 pairRow('G4b', S.lr > 0 && S.lrDiff === 0, S.lrDiff + ' of ' + S.lr);
@@ -452,7 +468,7 @@ pairRow('G4c', S.rr > 0 && S.rrDiff === 0, S.rrDiff + ' of ' + S.rr);
 ok(R.G5a, !S.crash.length && S.pairs > 0 && S.idBad === 0 && S.throws === 0 && S.winN > 0 && S.zeroChg > 0,
   S.idBad + ' of ' + S.pairs + ' not identical, throws ' + S.throws + crashNote + exs('id') + exs('throw'));
 ok(R.G5b, !!S.cgbp && S.cgbp.ok && S.cgbp.O !== S.cgbp.D, S.cgbp ? JSON.stringify(S.cgbp) : 'pair not on L1');
-if(D9) ok(R.G6a + ' [V229 D193 (k), R8 trigger restated, D194 Amendment 3 (V119 changed judged beneath the hold): moved ' + S9.mvT + ' == pin ' + D193_PIN.G6a + ', every one the hold variant on a hand clamp pair (not ' + S9.bT + '), hand clamp pairs ' + S9.clampT + ' without the hold toast ' + S9.missT + ', third toast ' + S.t3 + ' vs hand window ' + S.winN + ']', !S.crash.length && S.pairs > 0 && S9.bT === 0 && S9.missT === 0 && S9.mvT === D193_PIN.G6a && S.t3 === S.winN && S.t3 > 0, 'moved ' + S9.mvT + ' of ' + S.pairs + ' (pin ' + D193_PIN.G6a + '), not a hold variant on a hand clamp pair ' + S9.bT + ', hand clamp pair without it ' + S9.missT + ', third toast ' + S.t3 + ' vs hand window ' + S.winN + exs9('t') + exs9('miss'));
+if(D9) ok(R.G6a + ' [V229 D193 (k), R8 trigger restated, D194 Amendment 3 (V119 changed judged beneath the hold): moved ' + S9.mvT + ' == pin ' + PIN9.G6a + ', every one the hold variant on a hand clamp pair (not ' + S9.bT + '), hand clamp pairs ' + S9.clampT + ' without the hold toast ' + S9.missT + ', third toast ' + S.t3 + ' vs hand window ' + S.winN + ']' + (ERA231 ? ' [V231 D196-1: bed-thrust donor toast moved ' + BED9.t + ' == ' + BED_PIN_V231.t + ']' : ''), !S.crash.length && S.pairs > 0 && S9.bT === 0 && S9.missT === 0 && S9.mvT === PIN9.G6a && (!ERA231 || BED9.t === BED_PIN_V231.t) && S.t3 === S.winN && S.t3 > 0, 'moved ' + S9.mvT + ' of ' + S.pairs + ' (pin ' + PIN9.G6a + '), not a hold variant on a hand clamp pair ' + S9.bT + ', hand clamp pair without it ' + S9.missT + ', third toast ' + S.t3 + ' vs hand window ' + S.winN + (ERA231 ? ', bed-thrust donor toast moved ' + BED9.t + ' (pin ' + BED_PIN_V231.t + ')' : '') + exs9('t') + exs9('miss'));
 else ok(R.G6a, !S.crash.length && S.pairs > 0 && S.toastBad === 0 && S.t3 === S.winN && S.t3 > 0, S.toastBad + ' of ' + S.pairs + ', third toast ' + S.t3 + ' vs hand window ' + S.winN + exs('toast'));
 
 // G5c constructed duplicate-name day, G5d legacy record

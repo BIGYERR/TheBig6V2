@@ -51,8 +51,9 @@
 //        coach's verbatim text; 11:00 over 1.5 mi is 440 s/mi = 7:20 by hand. The Tuesday
 //        shakeout's dose is the untagged easy LSD of the same cfg built WITHOUT the test pin
 //        (the pre-move card), and 2.3 mi by the T table's easy-array arithmetic (easy start
-//        1.625, 2.1 2.6 3.1, peak 3.1 x 0.7333 = 2.3). HALF_MANNY is V206's shipped digest
-//        (0ac7da6b1691a8e1): D106a moves no NRC card. NRC keeps Race Day, and a bike LSD on an
+//        1.625, 2.1 2.6 3.1, peak 3.1 x 0.7333 = 2.3). HALF_MANNY's digest is the era
+//        row MANNY_DIGEST_BY_VERSION[ia-version] (D9; V231 absorb ruling section 4; it was V206's
+//        shipped digest through V230): D106a moves no NRC card. NRC keeps Race Day, and a bike LSD on an
 //        NRC multi-sport eve keeps the title it had (the refuted premise that led to the guard).
 //   SCOPING: T, F2 and B build with the LENGTH pin only (_raceDateCappedWeeks). With the test
 //   pin as well, slice B turns week tw into the test week, which is D's claim, not theirs.
@@ -62,7 +63,7 @@
 'use strict';
 process.env.TZ = 'America/New_York';
 const path = require('path');
-const { load, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
@@ -335,8 +336,17 @@ for(const [lab, tw, date] of [['D8c spacer Mon/Tue/Wed tw1', 1, '2026-09-24'], [
        && JSON.stringify(trials(p)) === JSON.stringify([tw + 'thu']) && intLeft.length === 0 && chiLeft.length === 0 && hard12.length === 0,
      JSON.stringify({pre: DAYS.map(d => preW[d] && preW[d].cardio ? String(preW[d].cardio.subtype).slice(0, 22) : null), trials: trials(p), intLeft, chiLeft, hard12}));
 }
-let hm; try { hm = progDigest(IA.buildProgram(JSON.parse(JSON.stringify(IA.fixtures.HALF_MANNY)))); } catch(e){ hm = 'CRASH ' + e.message; }
-eq('D9 HALF_MANNY digest is V206\'s shipped digest (D106a moves no NRC card)', hm, '0ac7da6b1691a8e1');
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
+// this row defends D106a's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[+IA.version], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// D106a (standing ruling 4).
+{ let hm; try { hm = progDigest(IA.buildProgram(JSON.parse(JSON.stringify(IA.fixtures.HALF_MANNY)))); } catch(e){ hm = 'CRASH ' + e.message; }
+  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  ok('D9 HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (D106a moves no NRC card)',
+     eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 function markerDays(p){
   const flat = []; [p.totalWeeks - 1, p.totalWeeks].forEach(w => { if(p.weeks[w]) DAYS.forEach(d => flat.push({w, d})); });
   const ri = flat.findIndex(x => { const y = p.weeks[x.w][x.d]; return y && y.cardio && /RACE DAY|TIME TRIAL/i.test(y.cardio.subtype || ''); });

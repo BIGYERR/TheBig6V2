@@ -1,0 +1,525 @@
+
+=== F1 shoulder/protect prevention runner leg day: B vs ABx vs ABx budget-off
+    cfg INJ support_prevention|race|commercial|shoulder/protect|beginner|s1234|sun,wed
+  W1 tue {dry}
+    [V       ] budget 17/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 6–7 | Clamshells w/ band 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Banded dorsiflexion 2×15 each
+        Core — Rotational Power :: Medicine ball rotary toss 3×8 each
+    [B       ] budget 20/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 6–7 | Clamshells w/ band 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Banded dorsiflexion 2×15 each
+        Core — Rotational Power :: Medicine ball rotary toss 3×8 each | Cable woodchoppers 3×12 each
+    [ABx     ] budget 19/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 6–7 | Clamshells w/ band 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Banded dorsiflexion 2×15 each
+        Core — Rotational Power :: Medicine ball rotary toss 3×8 each
+  W2 tue {dry}
+    [V       ] budget 17/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 6–7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each
+    [B       ] budget 18.5/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 6–7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each
+    [ABx     ] budget 19/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 6–7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each
+  W4 tue {dry}
+    [V       ] budget 12/20
+        Main — Back squat :: Back squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Terminal knee extension (band) 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Seated banded hip flexion 2×15 each | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+    [B       ] budget 12/20 (identical to V)
+    [ABx     ] budget 14/20
+        Main — Back squat :: Back squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Terminal knee extension (band) 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Seated banded hip flexion 2×15 each | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+    [ABx bo ] budget 23.5/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 6–7 | Clamshells w/ band 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Banded dorsiflexion 2×15 each
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+        Core — Rotational Power :: Medicine ball rotary toss 3×8 each | Cable woodchoppers 3×12 each
+    [ABx bo ] budget 20.5/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 6–7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each
+
+=== F1b elbow/protect prevention runner leg day
+    cfg INJ support_prevention|race|commercial|elbow/protect|beginner|s1234|sun,wed
+  W1 tue {dry}
+    [B       ] budget 20/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 6–7 | Clamshells w/ band 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Banded dorsiflexion 2×15 each
+        Core — Rotational Power :: Medicine ball rotary toss 3×8 each | Cable woodchoppers 3×12 each
+    [ABx     ] budget 19/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 6–7 | Clamshells w/ band 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Banded dorsiflexion 2×15 each
+        Core — Rotational Power :: Medicine ball rotary toss 3×8 each
+  W2 tue {dry}
+    [B       ] budget 17/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 6–7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each
+    [ABx     ] budget 19/20
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 6–7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each
+
+=== F1c round-1 hold-loss cell (shoulder/protect, stacked W3 mon): B / ABx1 (A5 only) / ABx (A5 + A6)
+    cfg INJ support_prevention|test|commercial|shoulder/protect|intermediate|s87747|sat,sun
+  W3 mon {Steady Aerobic Run}
+    [B       ] budget 16/18
+        Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7
+        Calf — achilles armor :: Machine seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Banded side steps 2×15–20 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each
+        Core — Rotational Power :: Landmine rotations 2×8–12 each @ RPE 7
+    [ABx1    ] budget 16/18 (identical to B)
+    [ABx     ] budget 16/18 (identical to ABx1)
+  W1 mon {Benchmark Run}
+    [B       ] budget 17/18
+        Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Terminal knee extension (band) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Tibialis raise (wall lean) 2×20
+        Core — Rotational Power :: Medicine ball rotary toss 3×8 each
+    [ABx1    ] budget 17/18 (identical to B)
+    [ABx     ] budget 17/18 (identical to ABx1)
+
+=== station classes: Glute-ham raise = BENCH | Barbell good mornings = RACK | Dumbbell split-stance deadlift = PORT | Single-leg hip thrust = PORT | Barbell hip thrust = RACK
+
+=== F2 M17 circuit-lunge cell: B vs ABn (no A5/A6) vs ABx
+    cfg FULL support_prevention|race|bodyweight|none|beginner|s76308|sat,sun
+  W3 mon {Speed Run — Intervals}
+    [B       ] budget 21/17
+        Main — Bulgarian split squat (foot on chair) :: Bulgarian split squat (foot on chair) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Single-leg calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+    [ABn     ] budget 21/17
+        Main — Bulgarian split squat (foot on chair) :: Bulgarian split squat (foot on chair) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Single-leg calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+    [ABx     ] budget 21/17
+        Main — Bulgarian split squat (foot on chair) :: Bulgarian split squat (foot on chair) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Single-leg calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+    [PRIORALL] budget 21/17
+        Main — Bulgarian split squat (foot on chair) :: Bulgarian split squat (foot on chair) 3 sets — RPE 7 (leave ~3 in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg wall sit 2×25 sec | Single-leg Romanian deadlift (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve) | Single-leg hip thrust (shoulders on bed) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Single-leg calf raise (bodyweight) 2 sets — RPE 7 (leave 3 or more in reserve)
+        Hip stability :: Fire hydrants 2 sets — RPE 7 (leave 3 or more in reserve) | Standing hip abduction 2 sets — RPE 7 (leave 3 or more in reserve) | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+  W1 mon {Speed Run — Intervals}
+    [B       ] budget 17/17
+        Main — Split squat :: Split squat 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Reverse lunge 2 sets — RPE 6 (leave 3 or more in reserve) | Wall sit 2×25 sec | Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calf — achilles armor :: Calf raise (bodyweight) 2 sets — RPE 6 (leave 3 or more in reserve)
+        Hip stability :: Clamshells (bodyweight) 2×20 each | Side-lying leg raises 2×15 each | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Single-leg bent-knee soleus raise 2×12 each, slow
+    [ABn     ] budget 17/17 (identical to B)
+    [ABx     ] budget 17/17 (identical to ABn)
+    [PRIORALL] budget 17/17 (identical to ABx)
+
+=== F2b prior ruling D195-A-d cell (stacked speed run W1 mon): V / B / ABn / ABx
+    cfg FULL support_prevention|race|commercial|none|beginner|s87747|sat,sun
+  W1 mon {Speed Run — Intervals}
+    [V       ] budget 12/17
+        Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 6–7 | Terminal knee extension (band) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 6–7
+        Hip stability :: Clamshells w/ band 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Tibialis raise (wall lean) 2×20
+    [B       ] budget 14/17
+        Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 6–7 | Terminal knee extension (band) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 6–7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Tibialis raise (wall lean) 2×20
+    [ABn     ] budget 14/17
+        Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 6–7 | Terminal knee extension (band) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 6–7 | Single-leg hip thrust 2×6–10 each @ RPE 6–7
+        Hip stability :: Clamshells w/ band 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Tibialis raise (wall lean) 2×20
+    [ABx     ] budget 14/17
+        Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 6–7 | Terminal knee extension (band) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 6–7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Tibialis raise (wall lean) 2×20
+  W3 mon {Speed Run — Fartlek}
+    [V       ] budget 14/17
+        Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7
+        Calf — achilles armor :: Machine seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Banded side steps 2×15–20 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each
+    [B       ] budget 14/17 (identical to V)
+    [ABn     ] budget 14/17
+        Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Banded side steps 2×15–20 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each
+    [ABx     ] budget 14/17
+        Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7
+        Calf — achilles armor :: Machine seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Banded side steps 2×15–20 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each
+
+=== F3 knee/protect commercial prevention (g215 cell): V / PRIORALL / ALLx
+    cfg K support_prevention|race|commercial|knee/protect|beginner|s76308|sun,wed
+  W1 thu {Incline Walk}
+    [V       ] budget 13/18
+        Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+    [PRIORALL] budget 17.5/18
+        Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank | Bodyweight back extension 2 sets — RPE 6 (leave 3 or more in reserve)
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    [ALLx    ] budget 14.5/18
+        Main — 45° back extension :: 45° back extension 3 sets — RPE 6–7 (leave 3–4 in reserve — learn the movement), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg hip thrust 2×8–12 each @ RPE 6–7 | Kettlebell single-leg deadlift 2×8 — hold RPE 7, three in the tank
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W3 thu {Incline Walk}
+    [V       ] budget 14/18
+        Main — Cable pull-through :: Cable pull-through 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Kettlebell swing 2×8 — hold RPE 7, three in the tank
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+    [PRIORALL] budget 18.5/18
+        Main — Cable pull-through :: Cable pull-through 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Kettlebell swing 2×8 — hold RPE 7, three in the tank | Bodyweight back extension 2 sets — RPE 7 (leave 3 or more in reserve)
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    [ALLx    ] budget 15.5/18
+        Main — Cable pull-through :: Cable pull-through 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Single-leg glute bridge 2 sets — RPE 7 (leave 3 or more in reserve) | Kettlebell swing 2×8 — hold RPE 7, three in the tank
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    (age 55+, goal run_half)
+
+=== F4 D197 drop cell: V / PRExt (tagged: [<source]) / ALLx
+    cfg G hypertrophy|race|bodyweight|ankle/workaround|intermediate|s4242|sun,wed
+  W1 mon {Easy Run (protected)}
+    [V       ] budget 16.5/19
+        Main — Pushups (slow 3s eccentric) :: Pushups (slow 3s eccentric) 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+        Secondary compound — Diamond pushups :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure)
+        Chest volume :: Burpees 3×15
+        Delts (SS 3) :: Wall slides 3×15 | Prone Y-T-W raises 3×15
+        Core — Anti-Rotation :: Plank shoulder taps 3×12 each
+    [PRExt   ] budget 16.5/19 (identical to V)
+    [ALLx    ] budget 13.5/19
+        Main — Pushups (slow 3s eccentric) :: Pushups (slow 3s eccentric) 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+        Secondary compound — Diamond pushups :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure)
+        Delts (SS 3) :: Wall slides 3×15 | Prone Y-T-W raises 3×15
+        Core — Anti-Rotation :: Plank shoulder taps 3×12 each
+  W2 mon {Easy Run (protected)}
+    [V       ] budget 18/19
+        Main — Pushups (slow 3s eccentric) :: Pushups (slow 3s eccentric) 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+        Secondary compound — Diamond pushups :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure)
+        Chest volume :: Burpees 3×15
+        Delts (SS 3) :: Wall slides 3×15 | Prone Y-T-W raises 3×15
+        Core — Rotational Power :: Standing torso rotations (slow) 3 sets — RPE 8 (stop 2 reps short of failure)
+    [PRExt   ] budget 18/19 (identical to V)
+    [ALLx    ] budget 15/19
+        Main — Pushups (slow 3s eccentric) :: Pushups (slow 3s eccentric) 3 sets — RPE 8 (stop 2 reps short of failure), ramp up with 2–3 warmup sets, 2–3 min rest
+        Secondary compound — Diamond pushups :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure)
+        Delts (SS 3) :: Wall slides 3×15 | Prone Y-T-W raises 3×15
+        Core — Rotational Power :: Standing torso rotations (slow) 3 sets — RPE 8 (stop 2 reps short of failure)
+
+=== F7 B-step rename cell INJ balanced|race|commercial|knee/workaround|intermediate|s1234|sat,sun :: rename [Leg superset B] Barbell good mornings 3×6–10 @ RPE 8 -> [Leg superset B] Dumbbell split-stance deadlift 3×6–10 @ RPE 8
+  W7 tue
+    [V] Main — Barbell Romanian deadlift :: Barbell Romanian deadlift 3×8 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+        Pull superset A (SS 3) :: Pendlay row 3×6–10 @ RPE 8 | Chinups 3 sets — RPE 8 (stop 2 reps short of failure)
+        Pull superset B (SS 3) :: Kettlebell single-arm row 3×8–12 each @ RPE 8 | Kettlebell swing 3×10
+    [B] Main — Barbell Romanian deadlift :: Barbell Romanian deadlift 3×8 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest
+        Pull superset A (SS 3) :: Pendlay row 3×6–10 @ RPE 8 | Chinups 3 sets — RPE 8 (stop 2 reps short of failure)
+        Pull superset B (SS 3) :: Kettlebell single-arm row 3×8–12 each @ RPE 8 | Kettlebell swing 3×10
+  W7 wed
+    [V] Main — Leg press :: Leg press 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A (SS 3) :: Reverse lunge (KB) 3×10 each — hold RPE 7, three in the tank | Spanish squat hold (KB) 3×25 sec
+        Leg superset B :: Barbell good mornings 3×6–10 @ RPE 8
+        Hip stability :: Standing band hip abduction 2×12–15 each @ RPE 8 | Banded side steps 2×15–20 each @ RPE 8 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Banded dorsiflexion 2×15 each
+    [B] Main — Leg press :: Leg press 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A (SS 3) :: Reverse lunge (KB) 3×10 each — hold RPE 7, three in the tank | Spanish squat hold (KB) 3×25 sec
+        Leg superset B (SS 3) :: Dumbbell split-stance deadlift 3×6–10 @ RPE 8 | Glute-ham raise 3×6–10 @ RPE 8
+        Hip stability :: Standing band hip abduction 2×12–15 each @ RPE 8 | Banded side steps 2×15–20 each @ RPE 8 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Banded dorsiflexion 2×15 each
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+  W7 thu
+    [V] Main — Machine chest press :: Machine chest press 3×12 — RPE 6–7, leave 3+ in reserve | Dumbbell Arnold press 3×10–15 @ RPE 8
+        Pump (SS 3) :: Dips 3 sets — RPE 8 (stop 2 reps short of failure) | Cable pushdown 3×12–15 @ RPE 8
+        Core — Anti-Extension :: Ab wheel rollouts 3×8–10 @ RPE 8 | Plank hold 3×40 sec
+    [B] Main — Machine chest press :: Machine chest press 3×12 — RPE 6–7, leave 3+ in reserve | Dumbbell Arnold press 3×10–15 @ RPE 8
+        Pump (SS 3) :: Dips 3 sets — RPE 8 (stop 2 reps short of failure) | Cable pushdown 3×12–15 @ RPE 8
+        Core — Anti-Extension :: Ab wheel rollouts 3×8–10 @ RPE 8 | Plank hold 3×40 sec
+
+=== HALF_MANNY (fixture seed 76308) V230 vs ALLx, every Tue; other days
+  W1 tue Leg Strength + Mobility
+    V230: Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    ALLx: Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W2 tue Leg Strength + Mobility
+    V230: Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Standing band hip abduction 2×12–15 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    ALLx: Main — Front squat :: Front squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Barbell Romanian deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Standing band hip abduction 2×12–15 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W3 tue Leg Strength + Mobility
+    V230: Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    ALLx: Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Standing band hip abduction 2×12–15 each @ RPE 7 | Hip 90/90 stretch 2×45 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W4 tue Leg Strength + Mobility
+    V230: Main — Back squat :: Back squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Standing ankle CARs 2×5 each direction
+    ALLx: Main — Back squat :: Back squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Standing ankle CARs 2×5 each direction
+  W5 tue Leg Strength + Mobility
+    V230: Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    ALLx: Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W6 tue Leg Strength + Mobility
+    V230: Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Clamshells w/ band 2×15 each | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+    ALLx: Main — Front squat :: Front squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Clamshells w/ band 2×15 each | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Suitcase carry 3×40 yards each, heavy
+  W7 tue Leg Strength + Mobility
+    V230: Main — Front squat :: Front squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+    ALLx: Main — Front squat :: Front squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell seated calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 7 | Worlds greatest stretch 5 each side
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+  W8 tue Leg Strength + Mobility
+    V230: Main — Front squat :: Front squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Seated banded hip flexion 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Single-leg bent-knee soleus raise 2×12 each, slow
+    ALLx: Main — Front squat :: Front squat 3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Walking lunge (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Clamshells w/ band 2×15 each | Seated banded hip flexion 2×15 each | Worlds greatest stretch 5 each side
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Single-leg bent-knee soleus raise 2×12 each, slow
+  W9 tue Leg Strength + Mobility
+    V230: Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+    ALLx: Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+  W10 tue Leg Strength + Mobility
+    V230: Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+    ALLx: Main — Back squat :: Back squat 3×8 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Dumbbell goblet side lunge 2×8–12 each @ RPE 7 | Spanish squat hold (KB) 2×25 sec | Dumbbell split-stance deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Clamshells w/ band 2×15 each | Banded monster walks 2×12–15 each @ RPE 7 | IT band stretch 2×30 sec each
+        Foot & ankle :: Standing ankle CARs 2×5 each direction | Tibialis raise (wall lean) 2×20
+        Loaded carry finisher :: Farmer carry 3×40 yards, heavy
+  W11 tue Leg Strength + Mobility
+    V230: Main — Back squat :: Back squat 2×8 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+    ALLx: Main — Back squat :: Back squat 2×8 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+  W12 tue Leg Strength + Mobility
+    V230: Main — Back squat :: Back squat 2×9 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Worlds greatest stretch 5 each side
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+    ALLx: Main — Back squat :: Back squat 2×9 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Kettlebell single-leg deadlift 2×6–10 @ RPE 7 | Single-leg hip thrust 2×6–10 each @ RPE 7
+        Hip stability :: Banded side steps 2×15–20 each @ RPE 7 | Hip airplane (light KB) 2×6 each, slow | Worlds greatest stretch 5 each side
+        Foot & ankle :: Single-leg bent-knee soleus raise 2×12 each, slow | Tibialis raise (wall lean) 2×20
+  W13 tue Leg Strength + Mobility  (identical V230 == ALLx)
+    card: Primer — Front squat :: Front squat 3×12 — RPE 5–6 (primer — light and crisp, well short of failure), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+        Foot & ankle :: Banded dorsiflexion 2×15 each | Tibialis raise (wall lean) 2×20
+  W14 tue Leg Strength + Mobility  (identical V230 == ALLx)
+    card: Primer — Front squat :: Front squat 2×12 — RPE 5–6 (primer — light and crisp, well short of failure), 2–3 min rest
+        Taper :: Race week — primer only. Movement quality, zero grind. The hay is in the barn. 
+        Foot & ankle — mobility only :: Standing ankle CARs 2×5 each direction | Toe yoga (splay + big-toe lifts) 2×10 each foot
+  calf W1..W14 V230 YYY-YYY-YYY--- ALLx YYY-YYY-YYY--- | carry V230 YYY-YYY-YYY--- ALLx YYY-YYY-YYY--- | non-Tue days changed 0 | days ALLx != PRIOR ALL: 0
+  swap sheet V vs ALLx: items asked 388, lose >= 1 option 6, gain >= 1 6 | universe V 86 ALLx 86 lost [] gained []
+     lost: W3 tue [Leg circuit — runner armor] Kettlebell swing -> Single-leg hip thrust (now on the ALLx card)
+     lost: W3 tue [Calf — achilles armor] Dumbbell standing calf raise -> Single-leg hip thrust (now on the ALLx card)
+     lost: W5 tue [Leg circuit — runner armor] Kettlebell swing -> Single-leg hip thrust (now on the ALLx card)
+     lost: W5 tue [Calf — achilles armor] Dumbbell seated calf raise -> Single-leg hip thrust (now on the ALLx card)
+     lost: W6 tue [Leg circuit — runner armor] Kettlebell swing -> Single-leg hip thrust (now on the ALLx card)
+     lost: W6 tue [Calf — achilles armor] Dumbbell seated calf raise -> Single-leg hip thrust (now on the ALLx card)
+     gained names: {"Step-ups (KB)":6}
+
+=== PRT TING (seed 87747): V / B / ALLx W9 mon, W9 tue, W10 tue, W1 mon
+  PRT W9 mon
+    V    Main — Incline barbell press :: Incline barbell press 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Barbell overhead press 3×6–10 @ RPE 8
+        Chest + knee (SS 3) :: Dumbbell incline press 3×10–15 @ RPE 8 | Terminal knee extension (band) 3×25 sec
+        Core — Anti-Rotation :: Bird dogs 3×12 each
+    B    Main — Incline barbell press :: Incline barbell press 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Barbell overhead press 3×6–10 @ RPE 8
+        Conditioning :: Burpees 3×12
+        Chest + knee (SS 3) :: Dumbbell incline press 3×10–15 @ RPE 8 | Terminal knee extension (band) 3×25 sec
+        Core — Anti-Rotation :: Bird dogs 3×12 each
+    ALLx (identical to B)
+  PRT W9 tue
+    V    Main — Front squat :: Front squat 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A :: Dumbbell Bulgarian split squat 3×8–12 each @ RPE 8
+        Leg superset B :: Kettlebell single-leg deadlift 3×6–10 @ RPE 8
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+    B    Main — Front squat :: Front squat 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest
+        Leg superset A (SS 3) :: Dumbbell Bulgarian split squat 3×8–12 each @ RPE 8 | Terminal knee extension (band) 3×25 sec
+        Leg superset B (SS 3) :: Kettlebell single-leg deadlift 3×6–10 @ RPE 8 | 45° back extension 3 sets — RPE 8 (stop 2 reps short of failure)
+        Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+        Loaded carry finisher :: Overhead carry 3×40 yards each, heavy
+    ALLx (identical to B)
+  PRT W10 tue
+    V    Primer — Front squat :: Front squat 3×3 — RPE 5–6 (primer — light and crisp, well short of failure), 2–3 min rest
+        Taper :: Taper — volume and load pulled back so you arrive fresh. 
+        Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction
+    B    (identical to V230)
+    ALLx (identical to B)
+  PRT W1 mon
+    V    Main — Barbell bench press :: Barbell bench press 4×6 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 3×6–10 @ RPE 8
+        Chest + knee (SS 3) :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure) | Terminal knee extension (band) 3×25 sec
+        Core — Anti-Rotation :: Bird dogs 3×12 each
+    B    Main — Barbell bench press :: Barbell bench press 4×6 — RPE 8 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Dumbbell lateral raise 3×6–10 @ RPE 8
+        Conditioning :: Broad jumps 3×12
+        Chest + knee (SS 3) :: Diamond pushups 3 sets — RPE 8 (stop 2 reps short of failure) | Terminal knee extension (band) 3×25 sec
+        Core — Anti-Rotation :: Bird dogs 3×12 each
+    ALLx (identical to B)
+  PRT day cells changed V->ALLx: 9/77 | ALLx == B on every cell: true
+CARDS DONE
+CARDS_EXIT 0

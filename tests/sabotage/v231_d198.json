@@ -1,0 +1,9 @@
+[
+ {
+  "name": "S-e-D198 the hip-extension pick reverted to the plain pick (the D198 line deleted)",
+  "anchor": "const _lhe0=pick(hipExtBW,1,blockSeed(w)+20)[0];const lowerHipExt=(_lhe0===lowerHinge)?(pick(hipExtBW.filter(x=>x!==lowerHinge),1,blockSeed(w)+20)[0]||_lhe0):_lhe0;",
+  "replacement": "const lowerHipExt=pick(hipExtBW,1,blockSeed(w)+20)[0];",
+  "gate": "gates/g231_d198_hepdraw.js",
+  "note": "NAMED TRIP: row D198-a (a-doubled: 70 days whose Lower strength hinge name is also a Hip extension + push name, on 20 loaded lowback/protect programs W9-W12; a-collapse: 21 one-item Hip extension + push on 5 bodyweight lowback/protect programs). Also expected: D198-b (the three typed after-cards) and D198-c (c-surgery: the candidate no longer carries the D198 line). Ruling: tests/measure/v231_rulings/v231_reruling2_d196a2_d198.md Sabotage S-e."
+ }
+]

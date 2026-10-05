@@ -46,15 +46,16 @@
 //        as V213 handles it: same card types and subtypes, same lift presence, same rest flag. V213 (git
 //        bc3cccc) is the oracle the ruling names. Pre-existing lifts at T-1 / T-2 under a parked test are
 //        ruled not a defect and are not asserted anywhere in this file.
-//   HM   HALF_MANNY digest, typed: 0ac7da6b1691a8e1 (ruled unmoved: an NRC fixture, no test pin).
+//   HM   HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[ia-version], row existence a
+//        conjunct (ruled unmoved: an NRC fixture, no test pin; V231 absorb ruling section 4).
 //
 // VERSION PREDICATE (standing ruling 4). D158 ships on ia-version 214.
 //   below 214: NOT APPLICABLE, every row skipped by name, clean exit.
 //   D5 and D6 say "this build moved only the eve", so they run only on the build pair candidate 214
-//   against baseline 213, and SKIP by name on every other pair. HM is typed and runs from 214 up.
+//   against baseline 213, and SKIP by name on every other pair. HM reads the era row and runs from 214 up.
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
-const { load, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
@@ -229,6 +230,15 @@ if(!(VER === ERA && BASE)){
        crash === 0 && [...EXCL].every(m => reach[m] > 0) && d8.length === 0, 'crash ' + crash + ', ' + d8.length + '/' + d8n + ': ' + d8.slice(0, 2).join(' || '));
   }
 }
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
+// this row defends D158's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[+IA.version], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// D158 (standing ruling 4).
 { let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
-  ok('HM HALF_MANNY digest is 0ac7da6b1691a8e1 (ruled unmoved: an NRC fixture carries no test pin)', hm === '0ac7da6b1691a8e1', hm); }
+  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  ok('HM HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved: an NRC fixture carries no test pin)',
+     eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 done();

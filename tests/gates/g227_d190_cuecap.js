@@ -67,6 +67,12 @@
 //                  the moved count is pinned (1,706 of 9,882; 0 on V228).
 //                  Fixture presentation (`cfg.injury` stored); app equivalence is D194 part 2's row.
 //                  Below 229 c-TOAST asserts exactly as before.
+//   231 and up     c-DIGEST and c-UNINJ re-keyed (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, class A-1:
+//                  HALF_MANNY's W1 to W12 Tuesdays gain D195 Amendment 2's fourth item). c-DIGEST: manny wants the
+//                  harness era row MANNY_DIGEST_BY_VERSION[VER] (standing ruling 5; 2d35e8f743680cfa at 231; an absent
+//                  row FAILS by name), mario_noinj still wants V226. c-UNINJ: mario_noinj 0 moved of 719 chains; manny
+//                  144 moved of 677, every moved chain on W3 tue or W5 tue (typed pins, the ruling's print). Below 231
+//                  both rows assert exactly as before. c-MANNY needs no change (it already reads MD[VER]).
 //   IA_ASSUME_VERSION=227 lifts a file stamped exactly 226 to 227 for a discrimination run. It is announced, and
 //   ignored on any other file. gate.sh never sets it.
 //   Pair rows (c-TOAST, c-UNINJ, c-DIGEST) read the baseline from argv[3] if it reads ia-version 226, else from
@@ -451,7 +457,21 @@ for(const h of HANDS){
     console.log('    c-UNINJ ' + line.join(', ') + ' | chains that moved the live card ' + liveMoved + ', undos taken ' + undos + ', boots that replayed a swap ' + replays);
     if(mv.length) console.log('    c-UNINJ moved fields: ' + fmt(tally(mv, m => m.diff.join('+'))));
     mv.slice(0, 3).forEach(m => console.log('      ' + tag(m.c) + ' fields ' + m.diff.join(',')));
-    ok(R.cUNINJ, SELF_C && SELF_B && PAIRSELF && n > 0 && liveMoved > 0 && undos > 0 && replays > 0 && moved === 0, 'moved ' + moved + '/' + n + ' chains (live, boot, toast, undo, undo-boot)');
+    // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g227:454 c-UNINJ RE-KEY, class A-1; standing
+    // rulings 2 and 4): at 231 and up HALF_MANNY's Tuesdays carry D195 Amendment 2's fourth item, so the pair against
+    // V226 moves on manny's W3 tue and W5 tue chains only. Typed pins (the ruling's print, never this run): mario_noinj
+    // 0 moved of 719; manny 144 moved of 677, every moved chain on W3 tue or W5 tue. Below 231 the row is unchanged.
+    const V231_ERA = 231, UNINJ_PIN = { manny:{ n:677, moved:144 }, mario_noinj:{ n:719, moved:0 } }, UNINJ_DAYS = ['3|tue', '5|tue'];
+    if(VER >= V231_ERA){
+      const mvOf = ck => mv.filter(m => m.c.ck === ck), offDay = mv.filter(m => !UNINJ_DAYS.includes(m.c.w + '|' + m.c.d));
+      const pinOK = UNINJ_CK.every(ck => POP[ck].length === UNINJ_PIN[ck].n && mvOf(ck).length === UNINJ_PIN[ck].moved);
+      console.log('    c-UNINJ V231 (A-1): moved by chain day ' + fmt(tally(mv, m => m.c.ck + ' W' + m.c.w + ' ' + m.c.d)) + ' | moved off W3 tue / W5 tue ' + offDay.length + ' | typed pins ' + UNINJ_CK.map(ck => ck + ' ' + UNINJ_PIN[ck].moved + '/' + UNINJ_PIN[ck].n).join(', '));
+      offDay.slice(0, 3).forEach(m => console.log('      off-day move: ' + tag(m.c) + ' fields ' + m.diff.join(',')));
+      ok(R.cUNINJ + ' [V231 A-1: mario_noinj ' + UNINJ_PIN.mario_noinj.moved + ' of ' + UNINJ_PIN.mario_noinj.n + ', manny ' + UNINJ_PIN.manny.moved + ' of ' + UNINJ_PIN.manny.n + ', every move on W3 tue or W5 tue]',
+        SELF_C && SELF_B && PAIRSELF && n > 0 && liveMoved > 0 && undos > 0 && replays > 0 && pinOK && offDay.length === 0 && moved === UNINJ_PIN.manny.moved + UNINJ_PIN.mario_noinj.moved,
+        UNINJ_CK.map(ck => ck + ' moved ' + mvOf(ck).length + '/' + POP[ck].length).join(', ') + ', off W3 tue / W5 tue ' + offDay.length);
+    }
+    else ok(R.cUNINJ, SELF_C && SELF_B && PAIRSELF && n > 0 && liveMoved > 0 && undos > 0 && replays > 0 && moved === 0, 'moved ' + moved + '/' + n + ' chains (live, boot, toast, undo, undo-boot)');
   }
 }
 // ── c-DIGEST ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -468,10 +488,15 @@ for(const h of HANDS){
     // by the harness progDigest), never against this gate's own run; manny and mario_noinj still read against V226.
     // Below 228 the row is unchanged.
     const D193_DIGEST = { mario:'39679fdc5762f2b5', ankle_wa:'24fea086fe087454', hip_wa:'6c73687da203475a', lowback_wa:'d6e7e7178c37c073', shoulder_wa:'7cd72ca7e37a6f29', elbow_wa:'9a1b2079ac9cf7bd' };
-    const wantOf = ck => (VER >= 228 && Object.prototype.hasOwnProperty.call(D193_DIGEST, ck)) ? D193_DIGEST[ck] : DG.B[ck];
-    if(VER >= 228) console.log('    c-DIGEST at ' + VER + ': ' + Object.keys(D193_DIGEST).map(ck => ck + ' want ' + D193_DIGEST[ck]).join(', ') + ' (D193 class (i), measure); manny, mario_noinj want V' + BASE_ERA);
+    // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g227:474 c-DIGEST RE-KEY, class A-1; standing
+    // rulings 2 and 5): at 231 and up manny wants the harness era row MANNY_DIGEST_BY_VERSION[VER] (2d35e8f743680cfa at
+    // 231), never this run; an absent row wants the string ABSENT and fails the row by name. mario_noinj still wants V226.
+    const V231_ERA = 231, MDV = H.MANNY_DIGEST_BY_VERSION || {};
+    const mannyWant = (Object.prototype.hasOwnProperty.call(MDV, VER) && typeof MDV[VER] === 'string') ? MDV[VER] : 'ABSENT MANNY_DIGEST_BY_VERSION[' + VER + ']';
+    const wantOf = ck => (VER >= V231_ERA && ck === 'manny') ? mannyWant : (VER >= 228 && Object.prototype.hasOwnProperty.call(D193_DIGEST, ck)) ? D193_DIGEST[ck] : DG.B[ck];
+    if(VER >= 228) console.log('    c-DIGEST at ' + VER + ': ' + Object.keys(D193_DIGEST).map(ck => ck + ' want ' + D193_DIGEST[ck]).join(', ') + ' (D193 class (i), measure); ' + (VER >= V231_ERA ? 'manny wants MANNY_DIGEST_BY_VERSION[' + VER + '] ' + mannyWant + ' (V231 A-1, standing ruling 5; V' + BASE_ERA + ' reads ' + DG.B.manny + '), mario_noinj wants V' + BASE_ERA : 'manny, mario_noinj want V' + BASE_ERA));
     const eq = Object.keys(CFGS).filter(ck => !/SELF/.test(DG.C[ck]) && !/SELF/.test(DG.B[ck]) && DG.C[ck] === wantOf(ck)).length;
-    ok(R.cDIGEST + (VER >= 228 ? ' (at 228 and above: the six injured against the D193 class (i) table)' : ''), eq === Object.keys(CFGS).length, eq + '/' + Object.keys(CFGS).length + ' configs equal'); }
+    ok(R.cDIGEST + (VER >= 228 ? ' (at 228 and above: the six injured against the D193 class (i) table)' : '') + (VER >= V231_ERA ? ' (at 231 and above: manny against MANNY_DIGEST_BY_VERSION[' + VER + '], V231 A-1)' : ''), eq === Object.keys(CFGS).length, eq + '/' + Object.keys(CFGS).length + ' configs equal'); }
 }
 // ── c-MANNY (standing ruling 5) ───────────────────────────────────────────────────────────────────────────────────
 {

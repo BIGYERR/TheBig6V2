@@ -52,7 +52,8 @@
 //        B and C are counted and printed as named classes, never failures. Anything else FAILS.
 //   C1   _INJ_EFFECT.elbow.workaround is the ruled sentence, exactly.
 //   C2   that sentence carries no hyphen or dash.
-//   HM   HALF_MANNY digest, typed: 0ac7da6b1691a8e1 (no injury on the fixture; ruled unmoved).
+//   HM   HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[ia-version], row existence a
+//        conjunct (no injury on the fixture; ruled unmoved; V231 absorb ruling section 4).
 //
 // V215∘D156. V216 carries D154 AND D156 (slice 2: the loaded full-body day's _longDay also reads
 // dose.key 'long'). The pair rows isolate D154, so their baseline is V215 with D156's predicate grafted
@@ -65,13 +66,12 @@
 //   baseline 215 and SKIP by name on every other pair. Every other row is ruling-level from 216 up.
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
-const { load, progDigest, fixtures, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, progDigest, fixtures, DAYS, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version, ERA = 216, V215_COMMIT = '7474f0607bfdf50b768e95221a1f7e9ef52067b6';
-const HM_DIGEST = '0ac7da6b1691a8e1';
 const ROWS = ['U0','U1','U2','U3','P1','P2','P3','P4','Q1','Q2','Q3','Q4','C1','C2','HM'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
@@ -251,6 +251,15 @@ else {
   ok('C2 elbow/workaround copy carries no hyphen or dash', typeof s === 'string' && !/[-‐‑–—]/.test(s), JSON.stringify(s)); }
 
 // ── fixture ──────────────────────────────────────────────────────────────────────────────
-{ const d = progDigest(IA.buildProgram(clone(fixtures.HALF_MANNY)));
-  ok('HM HALF_MANNY digest is ' + HM_DIGEST + ' (ruled unmoved)', d === HM_DIGEST, d); }
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
+// this row defends D154's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[+IA.version], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// D154 (standing ruling 4).
+{ const hm = progDigest(IA.buildProgram(clone(fixtures.HALF_MANNY)));
+  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  ok('HM HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved)',
+     eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 done();

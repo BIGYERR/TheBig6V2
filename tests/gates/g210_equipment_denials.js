@@ -42,7 +42,9 @@
 //       healthy count (an injured card getting back the section V209's injury filter took), and
 //       may FALL only by a same-card duplicate collapse (every lost section's movements print
 //       elsewhere on the new card, and no section stem is gained). Both cards print.
-//   O6  HALF_MANNY digest, typed: 0ac7da6b1691a8e1 (ruled unmoved; coach's surgery copy).
+//   O6  HALF_MANNY digest against its era row MANNY_DIGEST_BY_VERSION[ia-version], the row must exist
+//       (ruled unmoved; coach's surgery copy printed it at V210; V231 absorb ruling section 4 retired
+//       the typed literal here and in O6r).
 //
 // SLICES. D70c + D150 + D149 ship on ONE ia-version (210) in five builder slices. A row owned by
 // a slice not yet built prints NOT YET BUILT with its live count, never PASS. The status is a
@@ -416,9 +418,17 @@ if(BASEFILE){
 } else skipRow('O5b section counts vs V209: no baseline given');
 
 // ── O6: HALF_MANNY ───────────────────────────────────────────────────────────────────────
-const MANNY = '0ac7da6b1691a8e1';
+// V231 (absorb ruling section 4, tests/measure/v231_rulings/v231_absorb_ruling.md; standing rulings
+// 3, 4 and 5): O6 and O6r defend ITS ruling's claim that it did not move HALF_MANNY. The typed
+// literal is gone: the only object that carries that claim across later rulings is the era table
+// standing ruling 5 governs, so the row compares the built digest to MANNY_DIGEST_BY_VERSION[ia-version]
+// and fails loudly when that row is absent. Re-pointing the literal to a later digest would be the
+// vacuous line standing ruling 3 forbids; deleting the row would be an unruled removal.
+const MANNY = MANNY_DIGEST_BY_VERSION[VER], MANNY_ROW = typeof MANNY === 'string' && /^[0-9a-f]{16}$/.test(MANNY);
 const mp = IA.buildProgram(IA.fixtures.HALF_MANNY), md = progDigest(mp);
-ok('O6 HALF_MANNY digest is ' + MANNY + ' (ruled unmoved)', md === MANNY, md);
+ok('O6 HALF_MANNY digest equals its era row MANNY_DIGEST_BY_VERSION[' + VER + '] = ' + MANNY + ', and that row exists (ruled unmoved)',
+   MANNY_ROW && md === MANNY, MANNY_ROW ? md : 'NO ERA ROW for ia-version ' + VER + ' (built ' + md + ')');
 ok('O6u HALF_MANNY’s swap universe holds 86 names (commercial owns everything; the lens removes none)', (mp._swapUniverse || []).length === 86, (mp._swapUniverse || []).length);
-owned(FINAL, 'O6r the harness era row for ia-version ' + VER + ' exists and reads ' + MANNY, MANNY_DIGEST_BY_VERSION[VER] === MANNY, MANNY_DIGEST_BY_VERSION[VER]);
+owned(FINAL, 'O6r the harness era row for ia-version ' + VER + ' exists and reads the digest the candidate builds (' + md + ')',
+      MANNY_ROW && MANNY === md, MANNY_ROW ? MANNY : 'NO ERA ROW for ia-version ' + VER);
 summary();

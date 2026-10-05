@@ -47,7 +47,7 @@
 // (the key's V207 head, suffix kept); I3 also strips the key from that V207 card, the frozen path.
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os');
-const { load, progDigest, extractInlineJS } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, progDigest, extractInlineJS, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
@@ -286,6 +286,14 @@ if(!BASE_OK) skip('N1 ' + BASE_WHY);
 else { const moved = []; NRCCFG.forEach((c, i) => { let a, b; try { a = canon(build(IA, c)); } catch(e){ a = 'CRASH ' + e.message; } try { b = canon(build(IB, c)); } catch(e){ b = 'CRASH ' + e.message; } if(a !== b || /^CRASH/.test(a)) moved.push('#' + i + ' ' + c.cardioGoals.run.id + ' ' + c.cardioTypes.join('+') + ' ' + (c.injury ? JSON.stringify(c.injury) : 'no injury')); });
   ok(`N1 ${NRCCFG.length} NRC programs (5K, half x run, +bike, +swim x no injury, halfstep, easy, reduce) are byte-identical to the baseline`, moved.length === 0, moved.length + ': ' + moved.slice(0, 3).join('; ')); }
 // ── M: HALF_MANNY ───────────────────────────────────────────────────────────────────
-{ let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
-  ok('M1 HALF_MANNY digest is 0ac7da6b1691a8e1 (NRC: no reader change reaches it)', hm === '0ac7da6b1691a8e1', hm); }
+// V231 (absorb ruling section 4, tests/measure/v231_rulings/v231_absorb_ruling.md; standing rulings
+// 3, 4 and 5): this row defends ITS ruling's claim that it did not move HALF_MANNY. The typed
+// literal is gone: the only object that carries that claim across later rulings is the era table
+// standing ruling 5 governs, so the row compares the built digest to MANNY_DIGEST_BY_VERSION[ia-version]
+// and fails loudly when that row is absent. Re-pointing the literal to a later digest would be the
+// vacuous line standing ruling 3 forbids; deleting the row would be an unruled removal.
+{ const row = MANNY_DIGEST_BY_VERSION[VER], rowOk = typeof row === 'string' && /^[0-9a-f]{16}$/.test(row);
+  let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
+  ok('M1 HALF_MANNY digest equals its era row MANNY_DIGEST_BY_VERSION[' + VER + '] = ' + row + ', and that row exists (NRC: no reader change reaches it)',
+     rowOk && hm === row, rowOk ? hm : 'NO ERA ROW for ia-version ' + VER + ' (built ' + hm + ')'); }
 done();

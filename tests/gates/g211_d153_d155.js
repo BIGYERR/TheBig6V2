@@ -42,7 +42,8 @@
 //   G6  D155's after-grid: a recovery-week tier B "Full Body" day on commercial or home_full,
 //       strength or hypertrophy, with no Strength main and no hip section left, keeps Upper superset.
 //   G0  identity fuzz: V210 built twice from the same cfg is identical (the diff is not noise).
-//   HM  HALF_MANNY shipped digest, typed: 0ac7da6b1691a8e1 (ruled unmoved; outside the branch).
+//   HM  HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[ia-version], row existence a
+//       conjunct (ruled unmoved; outside the branch; V231 absorb ruling section 4).
 //
 // VERSION PREDICATE (standing ruling 4). D153 and D155 ship on ia-version 211.
 //   below 211: NOT APPLICABLE, every row skipped by name, clean exit.
@@ -56,7 +57,7 @@
 // build every row passes.
 'use strict';
 const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
-const { load, fixtures, progDigest, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
+const { load, fixtures, progDigest, DAYS, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
@@ -64,7 +65,6 @@ const VER = +IA.version;
 const ERA = 211;
 const PAIR = VER === ERA;                 // build-pair rows run only for candidate 211 vs V210
 const V210_COMMIT = 'd8d2f5ba89fa2d1630fa2b30fb76dceee55778f1';
-const HM_DIGEST = '0ac7da6b1691a8e1';
 
 let pass = 0, fail = 0, skip = 0, scoped = 0, fixt = 0;
 function ok(label, cond, got){
@@ -226,5 +226,15 @@ for(const g of ['run_pace_goal','run_mile_time','run_15_under10','run_base']) fo
 run('NRC', NRC, {tb:1000, rec:50});
 run('NSW', NSW, {tb:1000, rec:50});
 run('D153', D153, {tb:100, rec:10, pullThrough:true});
-ok('HM HALF_MANNY shipped digest is ' + HM_DIGEST + ' (ruled unmoved)', progDigest(IA.buildProgram(cl(fixtures.HALF_MANNY))) === HM_DIGEST, progDigest(IA.buildProgram(cl(fixtures.HALF_MANNY))));
+// V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
+// this row defends D153/D155's claim "my ruling did not move HALF_MANNY". The literal it compared
+// against went: the only object that carries that claim across later rulings is the era table that
+// standing ruling 5 governs, so the row reads MANNY_DIGEST_BY_VERSION[+IA.version], fails loudly when that
+// row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
+// to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
+// D153/D155 (standing ruling 4).
+{ const hm = progDigest(IA.buildProgram(cl(fixtures.HALF_MANNY)));
+  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  ok('HM HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved)',
+     eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 summary();

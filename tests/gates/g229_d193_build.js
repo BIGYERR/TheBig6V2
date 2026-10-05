@@ -73,6 +73,22 @@
 // VERSION PREDICATE (standing rulings 2 and 4). D193's build half ships at 229.
 //   below 229      REFUSED, every row FAILS by name.
 //   229 and up     every row asserts.
+//   231 and up     (tests/measure/v231_rulings/v231_absorb_ruling.md section 3; standing rulings 2 and 4) row b SPLITS:
+//                  it keeps the object row, 0 `_preHold` on any uninjured build, HALF_MANNY on the era row and > 0 clamp
+//                  moves on L432, HB and L1; its "byte-identical to V228" conjuncts (injured builds outside the clamp
+//                  population, the 133 uninjured builds; the candidate prints 565/1,053 and 50/133) assert at 230 and
+//                  below only, and at 231 and up print one named SKIP line (counted neither PASS nor FAIL) naming the
+//                  successors g231_d195b_cost D195-B-b, g231_d195_hipext D195-A-b, g231_d196_bwfallback D196-a..d.
+//                  d-BWSETS ABSORBS D196-1: the hand hold reads on 1,169 cards under their V228 name plus 70 renamed to
+//                  `Single-leg glute bridge` or `Single-leg hip thrust (shoulders on bed)`, 1,239 in all, FORBID 0,
+//                  RPE != 7 0 (typed pins, the ruling's print; V230 renamed 0). Below 231 both rows assert as before.
+//                  j ABSORBS D196-1 and SPLITS: the 30 held L1 test cards read R7's text, 28 under their V228 name and 2
+//                  renamed `Burpees` to `Single-leg hip thrust (shoulders on bed)` (final-name Burpees 0, bed thrust held
+//                  2), unheld 102/102, number-only 0, uninjured R7 0; its "L1 uninjured 96/96 byte-identical" conjunct
+//                  (the candidate prints 27/96) asserts at 230 and below only and at 231 and up prints one named SKIP line
+//                  naming row b's successors (typed pins, the ruling's print; V230 bed thrust held 0). f ABSORBS A-1:
+//                  the L9 non-cue population is 1,734 at 231 and up (V230 1,722; the one moved string is
+//                  `2×6–10 each @ RPE 7`, 2 to 14). Below 231 both rows assert as before.
 //   IA_ASSUME_VERSION=229 lifts a file stamped exactly 228 to 229 for a discrimination run. It is announced, and ignored
 //   on any other file. gate.sh never sets it. Run on V228 that way every row FAILS at its V228 figure (printed
 //   by builder): a 316 and 120; b 0 moved on L432, home_basic and L1 (an empty diff); d-BWSETS 0 of 1,239 (L432 316,
@@ -324,8 +340,16 @@ if(!BASE_OK){
   // per-lattice accumulators
   const A = {}; const newA = () => ({ builds:0, U:0, Uhi:0, UhiB:0, a1:0, a1B:0, a2:0, a2B:0, a2tab:{}, ex:[] });
   const B = { inj:0, injSame:0, moved:{}, bad:[], un:0, unSame:0, unBad:[], preHold:0 };
-  const D = {}; const newD = () => ({ pop:0, ok:0, forb:0, notSeven:0, bySet:{}, ex:[] });
-  const JJ = { held:0, heldOK:0, burpees:0, unheld:0, unheldUn:0, unheldSame:0, r7L1:0, r7Un:0, r7Other:0, numOnly:0, l1Un:0, l1UnSame:0, heldOther:0, heldOtherOK:0, unheldOther:0, unheldOtherSame:0, ex:[] };
+  const D = {}; const newD = () => ({ pop:0, ok:0, forb:0, notSeven:0, bySet:{}, ex:[], ren:0, renTab:{}, renSet:{} });
+  // V231 (absorb ruling section 3, d-BWSETS, class D196-1): the two hip-extension names a renamed clamp card may carry,
+  // typed, and the ruled split of the bwsets clamp population. V231_ERA also keys row b's split.
+  const V231_ERA = 231, D196_REN = ['Single-leg glute bridge', 'Single-leg hip thrust (shoulders on bed)'], D196_BW = { same:1169, ren:70, pop:1239 };
+  const JJ = { held:0, heldOK:0, burpees:0, unheld:0, unheldUn:0, unheldSame:0, r7L1:0, r7Un:0, r7Other:0, numOnly:0, l1Un:0, l1UnSame:0, heldOther:0, heldOtherOK:0, unheldOther:0, unheldOtherSame:0, ex:[],
+    burpC:0, bed:0, ren:0, renBurp:0, renTab:{} };
+  // V231 (absorb ruling section 3, g229_d193:456 j, class D196-1): on the candidate the held L1 test cards are read by
+  // their final name too. Typed pins, the ruling's print: 28 same name + 2 renamed `Burpees` > the bed thrust with R7's
+  // text, final-name Burpees 0, bed thrust held 2.
+  const J_BURP = 'Burpees', J_BED = 'Single-leg hip thrust (shoulders on bed)', J_V231 = { same:28, ren:2, burpees:0, bed:2 };
   const HH = {};
 
   const setDet = (o, c, v) => { try { o.weeks[c.w][c.d].sections[c.si].items[c.ii].detail = v; } catch(e){} };
@@ -354,13 +378,18 @@ if(!BASE_OK){
     pop.forEach(b => { const c = cm.get(b.k); const cd = c ? c.det : null, sameName = !!c && c.n === b.n;
       if(TEST_SHAPE.test(b.det)){
         const good = sameName && cd === R7_T; const burp = !cap.includes(pat(b.n));
-        if(tag === 'L1'){ JJ.held++; if(good) JJ.heldOK++; if(burp) JJ.burpees++; } else { JJ.heldOther++; if(good) JJ.heldOtherOK++; }
+        if(tag === 'L1'){ JJ.held++; if(good) JJ.heldOK++; if(burp) JJ.burpees++;
+          if(!!c && c.n === J_BURP) JJ.burpC++;
+          if(!!c && c.n === J_BED){ JJ.bed++; if(!sameName && cd === R7_T){ JJ.ren++; if(b.n === J_BURP) JJ.renBurp++; tally(JJ.renTab, b.n + ' > ' + c.n); } } }
+        else { JJ.heldOther++; if(good) JJ.heldOtherOK++; }
         if(!good && JJ.ex.length < 4) JJ.ex.push(tag + ' ' + key + ' W' + b.w + ' ' + b.d + ' ' + b.n + ' -> ' + (c && c.n) + ' ' + JSON.stringify(cd));
         return; }
       const kind = kindOf(b.det); const d = D[kind] || (D[kind] = newD()); d.pop++; tally(d.bySet, tag);
       const want = handHold(b.det); const forb = cd === null || FORBID.some(f => cd.includes(f)); const seven = rpeMax(cd) === 7;
       if(forb) d.forb++; if(!seven) d.notSeven++;
-      if(sameName && cd === want && !forb && seven) d.ok++; else if(d.ex.length < 3) d.ex.push(tag + ' ' + key + ' W' + b.w + ' ' + b.d + ' ' + b.n + ' ' + JSON.stringify(b.det) + ' -> ' + JSON.stringify(cd) + ' want ' + JSON.stringify(want)); });
+      if(sameName && cd === want && !forb && seven) d.ok++;
+      else if(!sameName && !!c && D196_REN.includes(c.n) && cd === want && !forb && seven){ d.ren++; tally(d.renTab, b.n + ' > ' + c.n); tally(d.renSet, tag); }
+      else if(d.ex.length < 3) d.ex.push(tag + ' ' + key + ' W' + b.w + ' ' + b.d + ' ' + b.n + ' ' + JSON.stringify(b.det) + ' -> ' + JSON.stringify(cd) + ' want ' + JSON.stringify(want)); });
     // j: unheld test cards
     B1.cards.forEach(b => { if(!TEST_SHAPE.test(b.det) || cap.includes(pat(b.pre))) return; const c = cm.get(b.k); const same = !!c && c.det === b.det && c.n === b.n;
       if(tag === 'L1'){ JJ.unheld++; if(same) JJ.unheldSame++; } else { JJ.unheldOther++; if(same) JJ.unheldOtherSame++; }
@@ -418,14 +447,31 @@ if(!BASE_OK){
     + ' | candidate _preHold after hops/boot/undo ' + OB.pre + ', ph in records ' + OB.ph + ', in stores ' + OB.store);
   OB.ex.forEach(s => console.log('      ' + s));
   const movedAll = (B.moved.L432 || 0) > 0 && (B.moved.HB || 0) > 0 && (B.moved.L1 || 0) > 0;
-  ok(R.b + (has ? '' : ' (row MANNY_DIGEST_BY_VERSION[' + ERA + '] ABSENT)'), selfAll && B.inj > 0 && B.injSame === B.inj && movedAll && B.un === UNINJ_N && B.unSame === B.un && B.preHold === 0 && mannyOK
-    && OB.n > 0 && OB.same === OB.n && OB.rec === OB.n && OB.boot === OB.n && OB.undo === OB.n && OB.pre === 0 && OB.ph === 0 && OB.store === 0,
+  // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g229_d193:421 b SPLIT; standing rulings 2 and 4):
+  // bKeep is every conjunct the row keeps at 231 and up (object row, 0 _preHold on uninjured builds, HALF_MANNY on the era
+  // row, > 0 clamp moves, the baseline equal to itself). The two "byte-identical to V228" conjuncts assert at 230 and below
+  // only; at 231 and up they print one named SKIP line at column 0, never PASS and never FAIL.
+  const bKeep = selfAll && B.inj > 0 && movedAll && B.un === UNINJ_N && B.preHold === 0 && mannyOK
+    && OB.n > 0 && OB.same === OB.n && OB.rec === OB.n && OB.boot === OB.n && OB.undo === OB.n && OB.pre === 0 && OB.ph === 0 && OB.store === 0;
+  if(VER >= V231_ERA) console.log('SKIP row b byte-identical to V228 (injured builds outside the clamp population ' + B.injSame + '/' + B.inj + ', uninjured builds ' + B.unSame + '/' + B.un + ' on this tree): scoped to ia-version 230 and below by the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 3); successors g231_d195b_cost D195-B-b, g231_d195_hipext D195-A-b, g231_d196_bwfallback D196-a..d. Never PASS, never FAIL.');
+  ok(R.b + (has ? '' : ' (row MANNY_DIGEST_BY_VERSION[' + ERA + '] ABSENT)') + (VER >= V231_ERA ? ' [V231 split: object row, _preHold, MANNY era row, > 0 moved; the byte-identical conjuncts SKIP]' : ''),
+    VER >= V231_ERA ? bKeep : bKeep && B.injSame === B.inj && B.unSame === B.un,
     'outside ' + B.injSame + '/' + B.inj + ', moved L432 ' + (B.moved.L432 || 0) + ' HB ' + (B.moved.HB || 0) + ' L1 ' + (B.moved.L1 || 0) + '; uninjured ' + B.unSame + '/' + B.un + '; MANNY [' + ERA + ']' + (ref ? '===' : '!==') + '[' + BASE_ERA + '], ' + built + (built === row ? ' == ' : ' != ') + '[' + VER + ']; object row ' + OB.same + '/' + OB.n + ', _preHold ' + OB.pre);
 
   // ── d ──────────────────────────────────────────────────────────────────────────────────────────────────────────
   Object.keys(D).sort().forEach(k => { const d = D[k]; console.log('    d ' + k + ': clamp population ' + d.pop + ' (' + fmt(d.bySet) + ') | hand hold ' + d.ok + ' | keep FORBID ' + d.forb + ' | RPE != 7 ' + d.notSeven); d.ex.forEach(s => console.log('      ' + s)); });
   const dRow = (key, kind, extra) => { const d = D[kind] || newD(); ok(R[key], selfAll && d.pop > 0 && d.ok === d.pop && d.forb === 0 && d.notSeven === 0 && (extra === undefined || extra), d.ok + '/' + d.pop + ' hand hold, ' + d.forb + ' keep FORBID, ' + d.notSeven + ' RPE != 7'); };
-  dRow('dBW', 'bwsets', (D.bwsets && D.bwsets.bySet.L432 > 0 && D.bwsets.bySet.HB > 0 && D.bwsets.bySet.L1 > 0));
+  // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g229_d193 d-BWSETS ABSORB, class D196-1; standing
+  // rulings 2 and 4): at 231 and up a bwsets card in the clamp population reads its hand hold under its V228 name (1,169)
+  // or renamed to one of D196_REN (70), 1,239 in all, FORBID 0, RPE != 7 0, typed pins. Below 231 the row is unchanged
+  // (the renamed tier is counted on every tree and printed; V230 reads 0).
+  const bwSets = !!(D.bwsets && D.bwsets.bySet.L432 > 0 && D.bwsets.bySet.HB > 0 && D.bwsets.bySet.L1 > 0);
+  { const d = D.bwsets || newD(); console.log('    d bwsets renamed to a D196 name with the hand hold ' + d.ren + ' (' + fmt(d.renSet) + ') | ' + fmt(d.renTab)); }
+  if(VER >= V231_ERA){ const d = D.bwsets || newD();
+    ok(R.dBW + ' [V231 D196-1: ' + D196_BW.same + ' same name + ' + D196_BW.ren + ' renamed to a D196 name = ' + D196_BW.pop + ']',
+      selfAll && bwSets && d.pop === D196_BW.pop && d.ok === D196_BW.same && d.ren === D196_BW.ren && d.ok + d.ren === d.pop && d.forb === 0 && d.notSeven === 0,
+      d.ok + ' same name + ' + d.ren + ' renamed of ' + d.pop + ' hand hold, ' + d.forb + ' keep FORBID, ' + d.notSeven + ' RPE != 7'); }
+  else dRow('dBW', 'bwsets', bwSets);
   dRow('dGR', 'grammar');
   // d-WAVE: synthetic donor through the plan's single writer
   { const X = plainVM('C'); const PV = plainVM('B'); const patOK = Object.keys(PAT_TYPED).every(n => (E(PV, '_pattern(' + JSON.stringify(n) + ')') || null) === PAT_TYPED[n]) && CAP_KNEE.includes(PAT_TYPED['Barbell box squat']) && !CAP_KNEE.includes(PAT_TYPED[RDL]);
@@ -453,7 +499,20 @@ if(!BASE_OK){
     + ' | R7 on L1 ' + JJ.r7L1 + ', elsewhere injured ' + JJ.r7Other + ', on uninjured ' + JJ.r7Un + ' | number-only anywhere ' + JJ.numOnly + ' | L1 uninjured byte-identical ' + JJ.l1UnSame + '/' + JJ.l1Un + ' (ruled ' + J_UNINJ + ')'
     + ' | other lattices: held ' + JJ.heldOtherOK + '/' + JJ.heldOther + ', unheld identical ' + JJ.unheldOtherSame + '/' + JJ.unheldOther);
   JJ.ex.forEach(s => console.log('      ' + s));
-  ok(R.j, selfAll && JJ.held === J_HELD && JJ.heldOK === J_HELD && JJ.burpees === J_BURPEES && JJ.unheld === J_UNHELD && JJ.unheldSame === J_UNHELD && JJ.r7L1 === J_HELD && JJ.r7Un === 0
+  // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g229_d193:456 j ABSORB + split, class D196-1;
+  // standing rulings 2 and 4): at 231 and up the row asserts held 30 = 28 same name + 2 renamed `Burpees` > the bed
+  // thrust (R7's text), final-name Burpees 0, bed thrust held 2, unheld 102/102, number-only 0, uninjured R7 0; its
+  // "L1 uninjured byte-identical to V228" conjunct asserts at 230 and below only and at 231 and up prints one named SKIP
+  // line at column 0, never PASS and never FAIL. Below 231 the row is unchanged.
+  console.log('    j L1 held test cards by the candidate\'s final name: ' + J_BURP + ' ' + JJ.burpC + ', ' + J_BED + ' ' + JJ.bed + ' (renamed with R7\'s text ' + JJ.ren + ', from ' + J_BURP + ' ' + JJ.renBurp + ': ' + fmt(JJ.renTab) + ')');
+  if(VER >= V231_ERA){
+    console.log('SKIP row j L1 uninjured byte-identical to V228 (' + JJ.l1UnSame + '/' + JJ.l1Un + ' on this tree): scoped to ia-version 230 and below by the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 3); successors g231_d195b_cost D195-B-b, g231_d195_hipext D195-A-b, g231_d196_bwfallback D196-a..d. Never PASS, never FAIL.');
+    ok(R.j + ' [V231 D196-1: held ' + J_HELD + ' = ' + J_V231.same + ' same name + ' + J_V231.ren + ' renamed to the bed thrust, final-name Burpees ' + J_V231.burpees + '; the L1 uninjured byte-identical conjunct SKIPs]',
+      selfAll && JJ.held === J_HELD && JJ.heldOK === J_V231.same && JJ.ren === J_V231.ren && JJ.renBurp === J_V231.ren && JJ.heldOK + JJ.ren === JJ.held && JJ.burpC === J_V231.burpees && JJ.bed === J_V231.bed
+        && JJ.unheld === J_UNHELD && JJ.unheldSame === J_UNHELD && JJ.r7L1 === J_HELD && JJ.r7Un === 0 && JJ.numOnly === 0 && JJ.l1Un === J_UNINJ && JJ.heldOtherOK === JJ.heldOther && JJ.unheldOtherSame === JJ.unheldOther,
+      'R7 on ' + JJ.heldOK + ' same name + ' + JJ.ren + ' renamed of ' + JJ.held + ' held, final-name Burpees ' + JJ.burpC + ', bed thrust held ' + JJ.bed + ', unheld ' + JJ.unheldSame + '/' + JJ.unheld + ', number-only ' + JJ.numOnly + ', uninjured R7 ' + JJ.r7Un + ', L1 uninjured builds ' + JJ.l1Un);
+  }
+  else ok(R.j, selfAll && JJ.held === J_HELD && JJ.heldOK === J_HELD && JJ.burpees === J_BURPEES && JJ.unheld === J_UNHELD && JJ.unheldSame === J_UNHELD && JJ.r7L1 === J_HELD && JJ.r7Un === 0
     && JJ.numOnly === 0 && JJ.l1Un === J_UNINJ && JJ.l1UnSame === J_UNINJ && JJ.heldOtherOK === JJ.heldOther && JJ.unheldOtherSame === JJ.unheldOther,
     'R7 on ' + JJ.heldOK + ' of ' + JJ.held + ' held, unheld ' + JJ.unheldSame + '/' + JJ.unheld + ', number-only ' + JJ.numOnly + ', uninjured R7 ' + JJ.r7Un + ', L1 uninjured ' + JJ.l1UnSame + '/' + JJ.l1Un);
 
@@ -489,6 +548,9 @@ if(!BASE_OK){
 
 // ── f ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
 {
+  // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g229_d193:508 f ABSORB, class A-1; standing
+  // rulings 2 and 4): the L9 non-cue population is 1,734 at 231 and up (typed, the ruling's print), 1,722 below.
+  const V231_ERA = 231, NONCUE_V231 = 1734, nonCue = VER >= V231_ERA ? NONCUE_V231 : NONCUE_L9;
   const lit = n => E(XF, 'typeof ' + n + "==='string'?" + n + ':null');
   const held = lit('INJ_HELD_TEST'), test = lit('TEST_RX_TEXT');
   const litOK = held === R7_T && test === TEST_T;
@@ -502,10 +564,10 @@ if(!BASE_OK){
   const tank = (L9CARDS.manny || []).filter(c => /tank/.test(c.det)).map(c => c.det); const to = stripAll(tank); let tankBad = 0; tank.forEach((d, i) => { if(to[i] !== d) tankBad++; });
   const dist = [...DISTINCT]; const dout = stripAll(dist); let distBad = 0; const dEx = []; dist.forEach((d, i) => { if(dout[i] !== d){ distBad++; if(dEx.length < 3) dEx.push(JSON.stringify(d).slice(0, 120)); } });
   console.log('    f INJ_HELD_TEST ' + (held === R7_T ? '== R7 typed' : JSON.stringify(held)) + ' | TEST_RX_TEXT ' + (test === TEST_T ? '== test typed' : JSON.stringify(test)) + ' | _stripCapCue(INJ_HELD_TEST) ' + (viaConst === TEST_T ? '=== TEST_RX_TEXT' : JSON.stringify(viaConst))
-    + ' | hand strings ' + (STRIP_HAND.length - handBad.length) + '/' + STRIP_HAND.length + ' | L9 non-cue cards false strips ' + falseStrips + '/' + pop.length + ' (ruled ' + NONCUE_L9 + ') | HALF_MANNY "tank" cards ' + tank.length + ' (ruled ' + MANNY_TANK + '), stripped ' + tankBad
+    + ' | hand strings ' + (STRIP_HAND.length - handBad.length) + '/' + STRIP_HAND.length + ' | L9 non-cue cards false strips ' + falseStrips + '/' + pop.length + ' (ruled ' + nonCue + ') | HALF_MANNY "tank" cards ' + tank.length + ' (ruled ' + MANNY_TANK + '), stripped ' + tankBad
     + ' | distinct non-cue details of every build false strips ' + distBad + '/' + dist.length);
   handBad.forEach(s => console.log('      ' + s)); dEx.forEach(s => console.log('      false strip ' + s));
-  ok(R.f, litOK && viaConst === TEST_T && test !== null && stripAll([test])[0] === TEST_T && handBad.length === 0 && pop.length === NONCUE_L9 && falseStrips === 0 && tank.length === MANNY_TANK && tankBad === 0 && dist.length > 0 && distBad === 0,
+  ok(R.f + (VER >= V231_ERA ? ' [V231 A-1: L9 non-cue 1,734]' : ''), litOK && viaConst === TEST_T && test !== null && stripAll([test])[0] === TEST_T && handBad.length === 0 && pop.length === nonCue && falseStrips === 0 && tank.length === MANNY_TANK && tankBad === 0 && dist.length > 0 && distBad === 0,
     'constants ' + (litOK ? 'as typed' : 'NOT as typed') + ', strip(INJ_HELD_TEST) ' + (viaConst === TEST_T ? '=== TEST_RX_TEXT' : 'WRONG') + ', hand ' + handBad.length + ' wrong, false strips ' + falseStrips + '/' + pop.length + ', tank ' + tankBad + '/' + tank.length + ', distinct ' + distBad + '/' + dist.length);
 }
 
