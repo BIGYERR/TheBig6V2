@@ -17,8 +17,8 @@ Mario is the sole developer, product owner and primary user.
 - **coach** — read-only. Owns coaching correctness and doctrine. Rules on WHAT should ship.
 - **builder** — read/write. Owns the edit. Writes anchor-asserted edit scripts. Never invents a ruling.
 - **gatekeeper** — read + bash, never edits. Owns proof. Runs `tests/gate.sh`, sabotage, blast radius, fuzz.
-**Gatekeeper blocks ship.** No version is done until gatekeeper reports ALL GATES PASS on the final
-artifact, every sabotage TRIPPED with 0 NOT-APPLIED / 0 CRASH, and every diff hunk is classified.
+**Gatekeeper blocks ship.** No version is done until gatekeeper's final run confirms the shipped artifact
+(Proof scope, below), every mutation the build ran TRIPPED with 0 NOT-APPLIED / 0 CRASH, and every diff hunk is classified.
 The main session orchestrates and talks to Mario; it does not do measure's, builder's or gatekeeper's job inline.
 **coach rules against evidence coach did not gather** — measure runs before the ruling, not inside it.
 Builder is the only agent holding `Edit`/`Write`. coach, measure and gatekeeper never run below opus:
@@ -42,13 +42,46 @@ scope lives in handoff §12.
 2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `v<N>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience.
 4. Builder ships: anchor-asserted edits (every anchor `count==1` before writing), `ia-version` bumped by ONE, exactly when Mario says so. **Right before every builder dispatch**, re-read HEAD against `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
-5. Gatekeeper proves it: `tests/gate.sh index.html <baseline>` + `tests/sabotage.py` + fuzz. Green or a NAMED failing gate. The sabotage sweep runs **every** spec in `tests/sabotage/`, old ones included, not just this build's (V221: three V219 mutations had survived unseen since V220).
+5. Gatekeeper proves it as **Proof scope** (below) sets out: one draft run, one final run. `gate.sh` reports every red, not the first. Green or a NAMED failing gate.
 6. `handoff-update` skill: the seven-element session entry. Then `git add -A && git commit -m "V<N>: <one line>" && git push && git tag V<N> && git push --tags`.
 7. **A push is not a deploy. "Push" means Mario's phone gets the new version, and it is not done until you have proved that.** Pages can report its last build as `built` with no error while sitting several commits behind — it silently did not fire on V192 or V193. So after pushing, confirm all three, in this order, and never infer a later one from an earlier one:
    - the remote has it: `git rev-parse main` == `git rev-parse origin/main`, and `git show origin/main:index.html | grep -oE 'content="[0-9]+"'` reads the new version (read it out of `origin/main`, not the working copy);
    - Pages built THAT commit: `gh api repos/bigyerr/TheBig6V2/pages/builds/latest --jq '.status, .commit'`. If the commit is stale, force it with `gh api -X POST repos/bigyerr/TheBig6V2/pages/builds` and poll until `built` (~40 s);
    - the live URL serves it: `curl -s "https://bigyerr.github.io/TheBig6V2/?cb=$(date +%s)" | grep -oE 'content="[0-9]+"'`. Cache-bust the query string; `cache-control` is `max-age=600`, so an unbusted fetch can lie for ten minutes.
    Only then is the version shipped. Tell Mario the live number you read back, not the number you pushed.
+
+## Proof scope (Mario, standing from Post-V233)
+This section is the single source for what a proof runs. `gatekeeper.md` and the `ship` and `session-start` skills point
+here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_rulings/measure_sabotage_history_mS.md`,
+`measure_tooling_inventory_mT.md`, `post_v233_proof_scope_decisions.md`, and `tests/measure/v233_gate_reach.json`.
+- **Budget.** Proof finishes in under 15 minutes of wall time for a LOCAL change and under 30 for a CROSS-CUTTING one.
+  If a change cannot fit, tell Mario before proof starts what you would drop and why, and wait for his answer.
+- **Classify before proof.** Tell Mario whether the change is LOCAL or CROSS-CUTTING, and why. Cross-cutting is any of:
+  a changed function that more than 20 gates execute in the reach map; a stored format (an `ia_` key, `cfg`,
+  `prog.weeks`); program output (any digest or era row moves); `tests/harness.js` or `tests/gate.sh`. Everything else
+  is local. When unsure, it is cross-cutting.
+- **Dependency chain (local).** Every gate the reach map says executes a changed function, every gate the map cannot
+  see, every new or edited gate, and boot. `tests/chain.js <base> <cand>` prints the list.
+- **Draft run, then final run.** Gatekeeper proves the draft once, before builder's last slice: cross-cutting gets the
+  full suite (`gate.sh`, blast radius, fuzz); local gets its dependency chain and blast radius. The final run confirms
+  the shipped file only: version, syntax, boot, the new and edited gates, and every hunk between the proven draft and
+  the shipped file classified. It reruns nothing the draft proved unless the last slice touched it.
+- **Previous version.** Only gates that are new or edited in the build run against the previous version. A row written
+  by the era script does not make a gate edited.
+- **Version scope.** No gate row is scoped to one exact `ia-version`. A row uses a range or a minimum, or it is an era
+  row the era script bumps; a claim that one build moved nothing is an era row (this is how standing ruling 4's build
+  scope is written). V220's bump silently retired g219's three `VER === ERA` rows. The sabotage clause below is the
+  backstop, not the fix.
+- **Era rows.** A table the ruling does not move gets its reference row from `tests/era_bump.py <N>`, never by hand. A
+  table the ruling moves is written by builder from coach's printed digest (standing ruling 5).
+- **Sabotage.** Every build: anchor-check every mutation in every spec (no gate runs), then trip-run the build's own
+  spec, every mutation naming a gate the build edited, and every mutation naming a gate that still has a row scoped to
+  one exact `ia-version`. The full sweep trip-runs every spec, old ones included, when 7 days have passed since the last
+  one; it runs outside any build's budget and rebuilds the reach map in the same run. Its date goes on the digest line
+  as `full sweep YYYY-MM-DD`, and `session-start` reports whether it is due.
+- **Review.** Every 25 builds, measure reruns the gate history analysis (`tests/measure/v232_gate_history.js`, record
+  shaped like `v232_rulings/measure_gate_history_mH.md`) and reports which gates have never caught a real bug. Last run
+  Post-V232; next due after V257.
 
 ## Standing rulings (settled — do not re-ask, do not re-derive)
 Each of these was paid for in a session. They are not open questions, and no agent reopens one
@@ -102,7 +135,7 @@ which does reach him arrives with a recommendation.
 - No process substitution `<(...)` — use temp files.
 - Oracles are independent: a gate never asserts the engine equals its own output. Hand tables, the doctrine text, date arithmetic.
 - A gate must print `PASS n FAIL n`. Missing summary = crash = NOT a pass. A gate that crashes reports nothing, and nothing is not "no failures".
-- Run every gate against the PREVIOUS version first. A gate that passes on both is not testing what it claims.
+- Run every new or edited gate against the PREVIOUS version first. A gate that passes on both is not testing what it claims.
 - Sabotage: every mutation must trip a NAMED gate. Anchor `count==1` or it is NOT-APPLIED. A no-op mutation is a mutation defect, not a gate defect — rewrite the mutation. All-trip is as suspicious as a survivor.
 - Blast-radius diff: 100% of hunks classified into a ruled class before ship. A removal that was not ruled is a regression (a ruling that SELECTS is not a ruling that DELETES).
 - Identity fuzz: pin `cfg.seed`, strip clock fields, prove baseline == itself before diffing anything.
@@ -159,20 +192,24 @@ Every brief to either carries the per-build items, then the standing lines for t
   (≤4 edits) and what earlier slices landed; the baseline path; whether this slice bumps `ia-version` and to what; the
   diff classes the ruling licenses.
 - **Gatekeeper, per build:** every ruling in the build, verbatim; the version Mario named; the baseline path; the edit
-  scripts, gates and sabotage specs; the diff classes builder declared; whether `HALF_MANNY` may move and to what digest.
+  scripts, gates and sabotage specs; the diff classes builder declared; whether `HALF_MANNY` may move and to what digest;
+  the Proof scope section pasted, with the LOCAL or CROSS-CUTTING call and its gate list, draft run or final run, and
+  whether the full sweep is due.
 - **Both, standing:** gate runs are `bash -c 'set -eo pipefail; …'`, no `<(...)`; every gate prints `PASS n FAIL n` and a
   missing summary is a crash; oracles never ask the engine; strip comments before any token-gone scan; pin `cfg.seed`,
   strip clock fields and prove a baseline equals itself before diffing; an empty diff is a failure. Standing rulings 2
   (a licence is a predicate on today's `ia-version`), 3 (wire a dead pin, never re-point it), 4 (a gate is keyed to the
   ruling it defends) and 5 (`HALF_MANNY` moves only by a ruling that printed the digest first). NRC sessions are
-  verbatim; no harness asserts taper, volume or rep shape on them. Temp files go only under the scratch path the brief
+  verbatim; no harness asserts taper, volume or rep shape on them. No gate row is scoped to one exact `ia-version`: a
+  range, a minimum, or an era row (Proof scope, Version scope). Temp files go only under the scratch path the brief
   names, never bare `/tmp`.
 - **Builder, standing:** standing ruling 7 (a premise refuted mid-slice PARKS the slice: script stays in `tests/edits/`,
   nothing committed; a gate row that cannot pass parks the same way); pool and post-filter reason through one lens, so
   grep the other half; a conditional write with no else is a latch; `exStoreKey` is the only `ia_exw_` writer; race day
-  is found by subtype; any `\uXXXX` text that must land is built with `chr(92)`, never typed.
-- **Gatekeeper, standing:** run every gate against the previous version too; the sabotage sweep runs every spec, old
-  ones included; a sabotage anchor that is not `count==1` is NOT-APPLIED and a no-op mutation is a mutation defect;
+  is found by subtype; any `\uXXXX` text that must land is built with `chr(92)`, never typed; an era row for a table the
+  ruling does not move comes from `tests/era_bump.py`, never by hand.
+- **Gatekeeper, standing:** run every new or edited gate against the previous version too; every build anchor-checks
+  every spec and trip-runs the Proof scope set; the full sweep runs every spec, old ones included, when it is due; a sabotage anchor that is not `count==1` is NOT-APPLIED and a no-op mutation is a mutation defect;
   all-trip is as suspicious as a survivor; 100% of blast-radius hunks are classified, and an unruled removal is a regression.
 
 ## Files
