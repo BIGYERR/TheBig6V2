@@ -1,0 +1,91 @@
+ia-version 232 | clock pinned 2026-10-03 | part D
+
+════ D — dynamic reproduction (VM, DOM registry stub) ════
+cfg run_10k+bike_base | balanced | intermediate | commercial | rest sun,wed | seed 76308 | startDate 2026-09-28 (Mon), clock Sat 2026-10-03 = W1
+W1 grid: mon:bike/Long Slow Distance (LSD) | tue:bike/Long Ride (LSD) | wed:REST | thu:-/ | fri:run/Recovery Run | sat:run/Long Run | sun:REST
+restDayEligible(1,wed)=true
+  [applyRestCardio#1 threw after its writes: wscroll.appendChild is not a function]
+  [applyRestCardio#2 threw after its writes: wscroll.appendChild is not a function]
+after 2 rest-sheet logs: ia_logs_.w1_wed = {"rest_cardio":true,"rest_type":"bike","rest_mins":30.5,"rpe":5,"bike_mins":630.5} | hand sum 600+30.5 = 630.5
+restMoveCandidates(1) = ["mon","tue","thu","fri","sat"] (dest key w1_wed is NOT checked for an existing log)
+  movable bike-cardio days ["mon","tue"] | movable run-cardio days ["fri","sat"]
+  [applyRestMove threw after its writes: wscroll.appendChild is not a function]
+  PATH A move bike day mon->wed: openDetail(wed) day.rest=false movedFrom=mon cardio=bike/Long Slow Distance (LSD) | bike field present=true value="630.5" | plan strip=true | "logged but never marked" nudge=true
+  after refreshProgram(stored): w1.wed rest=false movedFrom=mon cardio=bike
+  PATH A after reboot: openDetail(wed) day.rest=false movedFrom=mon cardio=bike/Long Slow Distance (LSD) | bike field present=true value="630.5" | plan strip=true | "logged but never marked" nudge=true
+  persistLogFields (status tap / any input event) rewrites w1_wed: before {"rest_cardio":true,"rest_type":"bike","rest_mins":30.5,"rpe":5,"bike_mins":630.5} -> after {"rpe":"5","run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"630.5","swim_yards":"","notes":"","swapFrom":"","swapTo":"","week":1,"ts":1791043200000}
+  [applyRestMove threw after its writes: wscroll.appendChild is not a function]
+  PATH B move run day fri->wed: openDetail(wed) day.rest=false movedFrom=fri cardio=run/Recovery Run | bike field present=false value="null" | plan strip=true | "logged but never marked" nudge=true
+  PATH B setCardioSwap(bike): bike box=true value="630.5" strip=false | stored w1_wed now {"rpe":"5","run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"630.5","swim_yards":"","notes":"","swapFrom":"run","swapTo":"bike","week":1,"ts":1791043200000}
+
+  Q3 run day w1_sat Long Run dose {"k":"dist","mi":3.1,"tgt":660,"cap":628} | ids in cardioFields: ["log_run_dist","log_run_mins","doseDerived"]
+  typed run 45 min / 5 mi, persisted: {"run_mins":"45","run_dist":"5","bike_mins":"","swapFrom":"","swapTo":""}
+  setCardioSwap(bike): bike box=true value="" strip=false wheel=false | _curLogDose=null | stored {"run_mins":"","run_dist":"","bike_mins":"","swapFrom":"run","swapTo":"bike"}
+  setCardioSwap(run) back: log_run_mins value="" log_run_dist value="" | stored {"run_mins":"","run_dist":"","bike_mins":"","swapFrom":"","swapTo":""}
+  reopen after saved bike swap (40): bike box=true value="40" strip=false _curLogDose=null
+  bike day w1_tue swap run->bike back: strip=true dose={"k":"time","mins":45}
+
+DONE
+ia-version 232 | clock pinned 2026-10-03 | part S
+
+════ S — run/swim -> bike swap reach on measure B lattice (10,080 configs) ════
+configs 10080 crash 0 | log forms (non-rest days) 622650 | cardio run 161640 swim 139320 bike 128880 array 0 none/other 192810
+reachable swaps INTO bike (picker offers run,bike,swim on every run/swim day): 300960 = 48.34% of log forms
+  swapped bike field: number box 300960 | plan strip 0 | wheel 0 (dose=null by setCardioSwap)
+  by goal family: {"run goal :: run day":161640,"swim goal :: swim day":139320}
+planned bike days swapped away and back: 128880 | strip restored 116280 (null-dose INT has none)
+
+DONE
+ia-version 232 | clock pinned 2026-10-03 | part R
+
+════ R — move reach, measure B lattice bike goals (verbatim) ════
+configs with bike in cardioTypes 3150 crash 0 | rest days (rest sheet can write bike_mins on any past/today one) 85680
+  rest days whose week has >=1 movable training day (week untouched): 85680 (100.00%)
+  ... a bike-cardio day (bike field opens directly on the rest key): 85680 (100.00%), of which with an emitted dose (strip) 85680
+  ... a run/swim-cardio day (bike field via swap picker): 0 (0.00%) | either route: 85680 (100.00%)
+  either by rest pattern: {"sun,wed":42840,"sat,sun":42840}
+  either by goal: {"bike_base":15120,"bike_ftp":15120,"bike_50":17640,"bike_century":25200,"bike_cals":12600}
+
+════ R — move reach, X multi-sport (run+bike, swim+bike) ════
+configs with bike in cardioTypes 6930 crash 0 | rest days (rest sheet can write bike_mins on any past/today one) 191436
+  rest days whose week has >=1 movable training day (week untouched): 191436 (100.00%)
+  ... a bike-cardio day (bike field opens directly on the rest key): 191436 (100.00%), of which with an emitted dose (strip) 191436
+  ... a run/swim-cardio day (bike field via swap picker): 191436 (100.00%) | either route: 191436 (100.00%)
+  either by rest pattern: {"sun,wed":95718,"sat,sun":95718}
+  either by goal: {"run_5k+bike_base":2016,"run_5k+bike_ftp":2016,"run_5k+bike_50":2016,"run_5k+bike_century":2016,"run_5k+bike_cals":2016,"run_10k+bike_base":2016,"run_10k+bike_ftp":2016,"run_10k+bike_50":2016,"run_10k+bike_century":2016,"run_10k+bike_cals":2016,"run_half+bike_base":3528,"run_half+bike_ftp":3528,"run_half+bike_50":3528,"run_half+bike_century":3528,"run_half+bike_cals":3528,"run_marathon+bike_base":4536,"run_marathon+bike_ftp":4536,"run_marathon+bike_50":4536,"run_marathon+bike_century":4536,"run_marathon+bike_cals":4536,"run_pace_goal+bike_base":3024,"run_pace_goal+bike_ftp":3024,"run_pace_goal+bike_50":3528,"run_pace_goal+bike_century":5040,"run_pace_goal+bike_cals":2772,"run_base+bike_base":3024,"run_base+bike_ftp":3024,"run_base+bike_50":3528,"run_base+bike_century":5040,"run_base+bike_cals":2520,"swim_base+bike_base":3024,"swim_base+bike_ftp":3024,"swim_base+bike_50":3528,"swim_base+bike_century":5040,"swim_base+bike_cals":3024,"swim_mile+bike_base":4032,"swim_mile+bike_ftp":4032,"swim_mile+bike_50":4032,"swim_mile+bike_century":5040,"swim_mile+bike_cals":4032,"swim_500_time+bike_base":3024,"swim_500_time+bike_ftp":3024,"swim_500_time+bike_50":3528,"swim_500_time+bike_century":5040,"swim_500_time+bike_cals":2688,"swim_100_time+bike_base":3024,"swim_100_time+bike_ftp":3024,"swim_100_time+bike_50":3528,"swim_100_time+bike_century":5040,"swim_100_time+bike_cals":2520,"swim_tri+bike_base":4536,"swim_tri+bike_ftp":4536,"swim_tri+bike_50":4536,"swim_tri+bike_century":5040,"swim_tri+bike_cals":4536}
+
+DONE
+ia-version 232 | clock pinned 2026-10-03 | part IB
+
+════ IB — injury sweep, measure B lattice, seed 76308 only (3,360 configs) ════
+configs 3360 x 13 injury states = 43680 injured builds, crash 0 | states: knee/protect,knee/workaround,ankle/protect,ankle/workaround,hip/protect,hip/workaround,lowback/protect,lowback/workaround,shoulder/protect,shoulder/workaround,elbow/protect,elbow/workaround,knee/halfstep
+Cross-Train days 0 | bike Cross-Train days 0 | of those on a config whose first goal is not a bike goal: 0 | non-bike Cross-Train: {}
+  bike Cross-Train forms: number box 0 | strip {} | dose kind {}
+  minutes (time dose) n=0 min undefined p10 - p50 - p90 - max undefined | ==35 (minsOf fallback value) 0 | >59 0 | >180 0 | non-integer 0
+  oracle: uninjured same-day time dose comparable n=0, xtrain mins == base mins 0
+  by state: 
+  by config goal: 
+  by exp: 
+  by week: 
+
+DONE
+ia-version 232 | clock pinned 2026-10-03 | part IX
+
+════ IX — injury sweep, X multi-sport (6,930 configs) ════
+configs 6930 x 13 injury states = 90090 injured builds, crash 0 | states: knee/protect,knee/workaround,ankle/protect,ankle/workaround,hip/protect,hip/workaround,lowback/protect,lowback/workaround,shoulder/protect,shoulder/workaround,elbow/protect,elbow/workaround,knee/halfstep
+Cross-Train days 654696 | bike Cross-Train days 654696 | of those on a config whose first goal is not a bike goal: 654696 | non-bike Cross-Train: {}
+  bike Cross-Train forms: number box 654696 | strip {"strip":654696} | dose kind {"time(parsed)":654696}
+  minutes (time dose) n=654696 min 12 p10 33 p50 35 p90 45 max 120 | ==35 (minsOf fallback value) 478848 | >59 39648 | >180 0 | non-integer 0
+  oracle: uninjured same-day time dose comparable n=91152, xtrain mins == base mins 86616 | mismatches e.g. [["run_pace_goal+bike_base|support_strength|beginner","knee/protect","W3","thu","Long Interval (LI)","base 16","xtrain 15"],["run_pace_goal+bike_base|support_strength|beginner","knee/protect","W4","thu","Long Interval (LI)","base 11","xtrain 15"],["run_pace_goal+bike_base|support_strength|beginner","knee/protect","W5","thu","Long Interval (LI)","base 17","xtrain 15"],["run_pace_goal+bike_base|support_strength|beginner","knee/protect","W6","thu","Long Interval (LI)","base 17","xtrain 15"],["run_pace_goal+bike_base|support_strength|beginner","ankle/protect","W3","thu","Long Interval (LI)","base 16","xtrain 15"],["run_pace_goal+bike_base|support_strength|beginner","ankle/protect","W4","thu","Long Interval (LI)","base 11","xtrain 15"]]
+  by state: shoulder/protect [swim replaced] 103680 | shoulder/workaround [swim replaced] 103680 | knee/protect [run replaced] 68274 | ankle/protect [run replaced] 68274 | hip/protect [run replaced] 68274 | lowback/protect [run replaced] 68274 | knee/protect [bike replaced] 27720 | ankle/protect [bike replaced] 27720 | hip/protect [bike replaced] 27720 | lowback/protect [bike replaced] 27720 | knee/protect [ replaced] 15840 | ankle/protect [ replaced] 15840 | hip/protect [ replaced] 15840 | lowback/protect [ replaced] 15840
+  by config goal: run_base+bike_century 24480 | run_marathon+bike_base 22032 | run_marathon+bike_ftp 22032 | run_marathon+bike_50 22032 | run_marathon+bike_century 22032 | run_marathon+bike_cals 22032 | run_pace_goal+bike_century 20160 | run_half+bike_base 17136 | run_half+bike_ftp 17136 | run_half+bike_50 17136 | run_half+bike_century 17136 | run_half+bike_cals 17136 | run_pace_goal+bike_50 17136 | run_base+bike_50 17136 | run_pace_goal+bike_base 14688 | run_pace_goal+bike_ftp 14688 | run_pace_goal+bike_cals 13464 | run_base+bike_base 11232 | run_base+bike_ftp 11232 | swim_tri+bike_base 11016 | swim_tri+bike_ftp 11016 | swim_tri+bike_50 11016 | swim_tri+bike_cals 11016 | swim_mile+bike_century 10800 | swim_tri+bike_century 10800 | run_5k+bike_base 9792 | run_5k+bike_ftp 9792 | run_5k+bike_50 9792 | run_5k+bike_century 9792 | run_5k+bike_cals 9792 | run_10k+bike_base 9792 | run_10k+bike_ftp 9792 | run_10k+bike_50 9792 | run_10k+bike_century 9792 | run_10k+bike_cals 9792 | swim_mile+bike_base 9792 | swim_mile+bike_ftp 9792 | swim_mile+bike_50 9792 | swim_mile+bike_cals 9792 | run_base+bike_cals 9360 | swim_base+bike_century 8640 | swim_500_time+bike_century 8640 | swim_100_time+bike_century 8640 | swim_base+bike_50 7560 | swim_500_time+bike_50 7560 | swim_100_time+bike_50 7560 | swim_500_time+bike_base 6480 | swim_500_time+bike_ftp 6480 | swim_100_time+bike_base 6480 | swim_100_time+bike_ftp 6480 | swim_500_time+bike_cals 5760 | swim_base+bike_base 5616 | swim_base+bike_ftp 5616 | swim_base+bike_cals 5616 | swim_100_time+bike_cals 5400
+  by exp: beginner 218472 | intermediate 218112 | advanced 218112
+  by week: W1 49176 | W2 49176 | W3 49176 | W4 49176 | W5 49176 | W6 49176 | W7 49176 | W8 49176 | W9 36936 | W10 36936 | W11 35100 | W12 33876 | W13 25812 | W14 25812 | W15 15624 | W16 15624 | W17 13176 | W18 13176 | W19 4608 | W20 4608
+
+DONE
+ia-version 232 | clock pinned 2026-10-03 | part V
+
+════ V — base rest key vs injured variant (B seed 76308 + X) ════
+configs 10290 injured builds 133770 crash 0 | base rest-day keys x states 3567928 | injured variant non-rest on a base rest key 20160 (bike 14400) e.g. [["X","run_5k+bike_base|hypertrophy|beginner","knee/protect","W8","fri"],["X","run_5k+bike_base|hypertrophy|beginner","knee/workaround","W8","fri"],["X","run_5k+bike_base|hypertrophy|beginner","ankle/protect","W8","fri"],["X","run_5k+bike_base|hypertrophy|beginner","ankle/workaround","W8","fri"],["X","run_5k+bike_base|hypertrophy|beginner","hip/protect","W8","fri"]]
+
+DONE

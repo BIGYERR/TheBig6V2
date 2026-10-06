@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="232"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="233"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -13586,13 +13586,14 @@ function _iawParse(kind,val){
   // V232 (D200): run minutes stay stored as DECIMAL MINUTES; this reads them back as a clock.
   // A bare integer, a decimal or a leading-dot decimal (D203); never a colon. Rounded to the
   // nearest second, so a two-place value lands on the second the athlete left the wheel on.
-  // Hours above 9 clamp for display only. Empty or malformed lands on the dash.
+  // V233 (D208): above the dial's ceiling the whole face pegs there (9:59:59, from the column
+  // maxes), for display only. Empty or malformed lands on the dash.
   if(sp.fmt==='hms'){
     var mh=s.match(/^\d*(?:\.\d+)?/);
     if(!mh||mh[0]==='') return ['','',''];
     var t=Math.round(parseFloat(mh[0])*60);
-    var hh=Math.min(sp.cols[0].max,Math.floor(t/3600));
-    return [String(hh),String(Math.floor((t%3600)/60)),String(t%60)];
+    t=Math.min(t,sp.cols[0].max*3600+sp.cols[1].max*60+sp.cols[2].max);
+    return [String(Math.floor(t/3600)),String(Math.floor((t%3600)/60)),String(t%60)];
   }
   if(!s) return sp.fmt==='dec3'?['','','']:['',''];
   if(sp.fmt==='dec3'){
@@ -13790,8 +13791,12 @@ function cardioFieldHTML(sport, e, dose, sub){
           ${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}
           ${iaWheelHTML('pace','log_run_pace',e.run_pace||'')}
         </div>`;
-  if(sport==='bike') return (dose?_doseStripHTML('bike',dose,sub||''):'')+`<label>${asyIcon('bike',15)} Bike — actual duration</label>
-        <input type="number" id="log_bike_mins" placeholder="minutes" value="${e.bike_mins||''}" min="0" class="input-field">`;
+  // V233 (D207, D209 as amended, D210): one hms wheel alone in the stacked wrap, the run time
+  // form's markup. No plan argument, so every bike shape parks on the dash until a ride is
+  // stored; the strip above carries the plan. No sub-label (Mario). The hidden input keeps
+  // the id log_bike_mins, so both listener arrays and persistLogFields read it unchanged.
+  if(sport==='bike') return (dose?_doseStripHTML('bike',dose,sub||''):'')+`<label>${asyIcon('bike',15)} Log the ride</label>
+        <div class="iaw-wrap iaw-solo">${iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')}</div>`;
   if(sport==='swim') return `<label>${asyIcon('swim',15)} Swim — actual yardage</label>
         <input type="number" id="log_swim_yards" placeholder="yards" value="${e.swim_yards||''}" min="0" step="25" class="input-field">`;
   return '';

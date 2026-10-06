@@ -113,7 +113,8 @@ const LEGACY = [   // [form, stored entry, hand faces by hidden id]
   ['dist', { run_dist:'100' }, { log_run_dist:'99.00', log_run_mins:DASH_HMS }],
   ['time', { run_mins:'100' }, { log_run_mins:'1:40:00', log_run_dist:DASH_MI }],
   ['time', { run_mins:'15.333' }, { log_run_mins:'0:15:20', log_run_dist:DASH_MI }],
-  ['time', { run_mins:'650' }, { log_run_mins:'9:50:00', log_run_dist:DASH_MI }],
+  // V233 D208 re-rules D200's shipped hours-only clamp to a whole-face peg (tests/measure/v233_rulings/v233_ruling_d207_d211.md); a getter, so VER is read at use.
+  ['time', { run_mins:'650' }, { get log_run_mins(){ return VER >= 233 ? '9:59:59' : '9:50:00'; }, log_run_dist:DASH_MI }],
   ['time', { run_mins:'7.5' }, { log_run_mins:'0:07:30', log_run_dist:DASH_MI }],
 ];
 const W375 = (375 - 2 * 16 - 2 * 1 - 2 * 16 - 12) * 3 / 5;   // 178.2

@@ -1,0 +1,79 @@
+[
+ {
+  "name": "S1-D207 plan argument re-added on the bike wheel",
+  "anchor": "iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')",
+  "replacement": "iaWheelHTML('hms','log_bike_mins',e.bike_mins||'',null,dose&&dose.mins)",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D207/D210-forms (data-plan on every dosed bike form); D207-open may also trip (a planned face is not the dash). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ },
+ {
+  "name": "S2-D207 bike back to the V232 number box",
+  "anchor": "<div class=\"iaw-wrap iaw-solo\">${iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')}</div>",
+  "replacement": "<input type=\"number\" id=\"log_bike_mins\" placeholder=\"minutes\" value=\"${e.bike_mins||''}\" min=\"0\" class=\"input-field\">",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D207/D210-forms (number box, no hms wheel, forms-source). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ },
+ {
+  "name": "S3-D207 bike wheel kind hms to dist",
+  "anchor": "iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')",
+  "replacement": "iaWheelHTML('dist','log_bike_mins',e.bike_mins||'')",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D207/D210-forms (no iaw-solo > iaw-f3 > Time > hms wheel head). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ },
+ {
+  "name": "S4-D207 stored bike value ignored in the bike branch",
+  "anchor": "iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')",
+  "replacement": "iaWheelHTML('hms','log_bike_mins','')",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D207-open (open-legacy: stored 45 opens on the dash, not 0:45:00). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ },
+ {
+  "name": "S5-D209 label back to the V232 copy",
+  "anchor": "${asyIcon('bike',15)} Log the ride</label>",
+  "replacement": "${asyIcon('bike',15)} Bike — actual duration</label>",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D209-copy (label, dash in label, copy-source). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ },
+ {
+  "name": "S6-D209 a sub-label added after the bike wrap",
+  "anchor": "<div class=\"iaw-wrap iaw-solo\">${iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')}</div>`;",
+  "replacement": "<div class=\"iaw-wrap iaw-solo\">${iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')}</div><div class=\"f-sub\">Off the watch.</div>`;",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D209-copy (f-sub on every bike form). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ },
+ {
+  "name": "S7-D210 iaw-solo dropped from the bike wrap only",
+  "anchor": "<div class=\"iaw-wrap iaw-solo\">${iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')",
+  "replacement": "<div class=\"iaw-wrap\">${iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D207/D210-forms (wraps is not iaw-wrap iaw-solo). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ },
+ {
+  "name": "S8-D208 whole-face clamp line removed",
+  "anchor": "    t=Math.min(t,sp.cols[0].max*3600+sp.cols[1].max*60+sp.cols[2].max);\n",
+  "replacement": "",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D208-clamp (clamp-parse: 650 / 600 / 630.5 no longer peg at 9:59:59). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ },
+ {
+  "name": "S9-D208 ceiling loses its seconds term",
+  "anchor": "    t=Math.min(t,sp.cols[0].max*3600+sp.cols[1].max*60+sp.cols[2].max);\n",
+  "replacement": "    t=Math.min(t,sp.cols[0].max*3600+sp.cols[1].max*60);\n",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D208-clamp (clamp-parse: the ceiling is 9:59:00, 600 seeds 9:59:00 not 9:59:59). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ },
+ {
+  "name": "S10-D208 V232 hours-only clamp restored",
+  "anchor": "    t=Math.min(t,sp.cols[0].max*3600+sp.cols[1].max*60+sp.cols[2].max);\n    return [String(Math.floor(t/3600)),String(Math.floor((t%3600)/60)),String(t%60)];\n",
+  "replacement": "    var hh=Math.min(sp.cols[0].max,Math.floor(t/3600));\n    return [String(hh),String(Math.floor((t%3600)/60)),String(t%60)];\n",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D208-clamp (clamp-parse: 650 seeds 9:50:00). g232_d199_runwheel.js row D202-open, conjunct open-legacy, also trips on this mutant (its era-keyed 650 entry expects 9:59:59 at ia-version 233). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ },
+ {
+  "name": "S11-D207-move bike id dropped from the openDetail listener array",
+  "anchor": "['log_rpe','log_run_dist','log_run_pace','log_run_mins','log_run_rep_time','log_bike_mins','log_swim_yards','log_notes']",
+  "replacement": "['log_rpe','log_run_dist','log_run_pace','log_run_mins','log_run_rep_time','log_swim_yards','log_notes']",
+  "gate": "gates/g233_d207_bikewheel.js",
+  "note": "NAMED TRIP: row D207-move (move-45: a moved wheel no longer persists to ia_logs_). Ruling: tests/measure/v233_rulings/v233_ruling_d207_d211.md with v233_session_calls.md items 6 (D209 amended) and 11 (D208 boundary)."
+ }
+]

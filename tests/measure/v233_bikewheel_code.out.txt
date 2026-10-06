@@ -1,0 +1,100 @@
+ia-version 232
+
+== 1. READERS/WRITERS of bike_mins (code, comments stripped) ==
+  :1438  if(type==='bike')      e.bike_mins=(+e.bike_mins||0)+m;
+  :1536  if(lg&&(lg.rpe||lg.notes||lg.run_dist||lg.bike_mins||lg.swim_yards)) return;
+  :13794  <input type="number" id="log_bike_mins" placeholder="minutes" value="${e.bike_mins||''}" min="0" class="input-field">`;
+  :14142  const _hasLog=_le&&((_le.notes&&_le.notes.trim())||_le.run_dist||_le.run_pace||_le.run_mins||_le.run_reps||_le.run_rep_time||_le.bike_mins||_le.swim_yards);
+  :14150  ['log_rpe','log_run_dist','log_run_pace','log_run_mins','log_run_rep_time','log_bike_mins','log_swim_yards','log_notes'].forEach(function(id){
+  :14707  bike_mins:g('log_bike_mins'), swim_yards:g('log_swim_yards'),
+  :14758  ['log_run_dist','log_run_pace','log_run_mins','log_run_rep_time','log_bike_mins','log_swim_yards'].forEach(function(id){
+  :17459  if(entry.bike_mins && +entry.bike_mins > 0) weeklyData[w].bike += +entry.bike_mins;
+  :17465  if(entry.rpe||entry.run_dist||entry.bike_mins||entry.swim_yards||entry.notes) {
+  total lines 9
+  emitters of id="log_bike_mins": 1 :13794
+  listener arrays carrying log_bike_mins: 2 :14150 :14758
+  bike branch of cardioFieldHTML carries doseDerived: false | "as planned" text: false
+  doseDerived reads bike fields: false | updateDoseDerived reads bike: false
+  lines with as-planned wording (code): :13472 return {sec:sec, pace:_fmtPaceMi(sec)+'/mi', tgt:dose.tgt, assumed:mins>0?null:('assuming  | :13477 return {sec:sec, pace:_fmtPaceMi(sec)+'/mi', tgt:dose.tgt, dist:(dist>0?null:useD), assume | :13488 return {sec:sec, pace:_fmtPaceMi(sec)+'/mi', tgt:dose.tgt, workMin:wm, assumed:(reps!=null
+
+== 2. BIKE FORM RENDER ==
+  [null dose (INT / swapped)] dose=null entry={}
+    <label><svg/> Bike — actual duration</label> <input type="number" id="log_bike_mins" placeholder="minutes" value="" min="0" class="input-field">
+  [null dose (INT / swapped)] dose=null entry={"bike_mins":"45"}
+    <label><svg/> Bike — actual duration</label> <input type="number" id="log_bike_mins" placeholder="minutes" value="45" min="0" class="input-field">
+  [time lsd] dose={"k":"time","mins":60} entry={}
+    <div class="plan-strip bike-strip"><span class="ps-lbl">Bike — LSD · Planned</span><span class="ps-val">60 min</span></div><label><svg/> Bike — actual duration</label> <input type="number" id="log_bike_mins" placeholder="minutes" value="" min="0" class="input-field">
+  [time lsd] dose={"k":"time","mins":60} entry={"bike_mins":"45"}
+    <div class="plan-strip bike-strip"><span class="ps-lbl">Bike — LSD · Planned</span><span class="ps-val">60 min</span></div><label><svg/> Bike — actual duration</label> <input type="number" id="log_bike_mins" placeholder="minutes" value="45" min="0" class="input-field">
+  [time chi 1 rep] dose={"k":"time","mins":20} entry={}
+    <div class="plan-strip bike-strip"><span class="ps-lbl">Bike · Planned</span><span class="ps-val">20 min</span></div><label><svg/> Bike — actual duration</label> <input type="number" id="log_bike_mins" placeholder="minutes" value="" min="0" class="input-field">
+  [time chi 1 rep] dose={"k":"time","mins":20} entry={"bike_mins":"45"}
+    <div class="plan-strip bike-strip"><span class="ps-lbl">Bike · Planned</span><span class="ps-val">20 min</span></div><label><svg/> Bike — actual duration</label> <input type="number" id="log_bike_mins" placeholder="minutes" value="45" min="0" class="input-field">
+  [reps_time chi] dose={"k":"reps_time","reps":3,"mins":10} entry={}
+    <div class="plan-strip bike-strip"><span class="ps-lbl">Bike · Planned</span><span class="ps-val">3 × 10 min</span></div><label><svg/> Bike — actual duration</label> <input type="number" id="log_bike_mins" placeholder="minutes" value="" min="0" class="input-field">
+  [reps_time chi] dose={"k":"reps_time","reps":3,"mins":10} entry={"bike_mins":"45"}
+    <div class="plan-strip bike-strip"><span class="ps-lbl">Bike · Planned</span><span class="ps-val">3 × 10 min</span></div><label><svg/> Bike — actual duration</label> <input type="number" id="log_bike_mins" placeholder="minutes" value="45" min="0" class="input-field">
+  [parsed time (Cross-Train)] dose={"k":"time","mins":40,"tgt":null,"parsed":true} entry={}
+    <div class="plan-strip bike-strip"><span class="ps-lbl">Bike · Planned</span><span class="ps-val">40 min</span></div><label><svg/> Bike — actual duration</label> <input type="number" id="log_bike_mins" placeholder="minutes" value="" min="0" class="input-field">
+  [parsed time (Cross-Train)] dose={"k":"time","mins":40,"tgt":null,"parsed":true} entry={"bike_mins":"45"}
+    <div class="plan-strip bike-strip"><span class="ps-lbl">Bike · Planned</span><span class="ps-val">40 min</span></div><label><svg/> Bike — actual duration</label> <input type="number" id="log_bike_mins" placeholder="minutes" value="45" min="0" class="input-field">
+
+== 5. hms PARSE on stored bike_mins shapes ==
+  stored="" value-attr-today="" +reads=0 parse=["","",""] face=dash seedFace->"" hand=dash OK
+  stored="0" value-attr-today="0" +reads=0 parse=["0","0","0"] face=0:00:00 seedFace->"0.00" hand=0:00:00 OK
+  stored="45" value-attr-today="45" +reads=45 parse=["0","45","0"] face=0:45:00 seedFace->"45.00" hand=0:45:00 OK
+  stored="45.5" value-attr-today="45.5" +reads=45.5 parse=["0","45","30"] face=0:45:30 seedFace->"45.50" hand=0:45:30 OK
+  stored=".5" value-attr-today=".5" +reads=0.5 parse=["0","0","30"] face=0:00:30 seedFace->"0.50" hand=0:00:30 OK
+  stored="90" value-attr-today="90" +reads=90 parse=["1","30","0"] face=1:30:00 seedFace->"90.00" hand=1:30:00 OK
+  stored="600" value-attr-today="600" +reads=600 parse=["9","0","0"] face=9:00:00 seedFace->"540.00" hand=10:00:00 MISMATCH
+  stored="601" value-attr-today="601" +reads=601 parse=["9","1","0"] face=9:01:00 seedFace->"541.00" hand=10:01:00 MISMATCH
+  stored="-1" value-attr-today="-1" +reads=-1 parse=["","",""] face=dash seedFace->"" hand=dash(neg) OK
+  stored="1e1" value-attr-today="1e1" +reads=10 parse=["0","1","0"] face=0:01:00 seedFace->"1.00" hand=0:10:00 MISMATCH
+  stored="3,5" value-attr-today="3,5" +reads=NaN parse=["0","3","0"] face=0:03:00 seedFace->"3.00" hand=dash MISMATCH
+  stored=30 value-attr-today="30" +reads=30 parse=["0","30","0"] face=0:30:00 seedFace->"30.00" hand=0:30:00 OK
+  parse summary: 8 match / 4 mismatch over 12 values
+
+== 6. WHEEL WIRING ==
+  iaWheelInit chars=1412 mentions log_run=0 bike=0 data-plan=1 _curLogDose=0
+  _iawCommit chars=481 mentions log_run=0 bike=0 data-plan=0 _curLogDose=0
+  _iawParse chars=1033 mentions log_run=0 bike=0 data-plan=0 _curLogDose=0
+  _iawFormat chars=425 mentions log_run=0 bike=0 data-plan=0 _curLogDose=0
+  iaWheelHTML chars=963 mentions log_run=0 bike=0 data-plan=1 _curLogDose=0
+  iaWheelFlush chars=212 mentions log_run=0 bike=0 data-plan=0 _curLogDose=0
+  persistLogFields chars=1234 mentions log_run=9 bike=2 data-plan=0 _curLogDose=1
+  updateDoseDerived chars=1496 mentions log_run=4 bike=0 data-plan=0 _curLogDose=5
+  iaw-solo CSS rules: .iaw-solo{max-width:178.2px;}
+  wheel call sites (iaWheelHTML(...)):
+   :13764 iaWheelHTML('hms','log_run_mins',e.run_mins||'',null,dose.mins)
+   :13766 iaWheelHTML('dist','log_run_dist',e.run_dist||'')
+   :13770 iaWheelHTML('dist','log_run_dist',e.run_dist||'',null,dose.mi)
+   :13772 iaWheelHTML('hms','log_run_mins',e.run_mins||'')
+   :13776 iaWheelHTML('rept','log_run_rep_time',e.run_rep_time||'')
+   :13781 iaWheelHTML('dist','log_run_dist',e.run_dist||'')
+   :13790 iaWheelHTML('dist','log_run_dist',e.run_dist||'')
+   :13791 iaWheelHTML('pace','log_run_pace',e.run_pace||'')
+  doseDerived(bike time dose, run fields blank)={} | reps_time={}
+
+== 7. tests/ pins on the bike form ==
+  tests/gates/g205_bike_unmoved.js:83 return {name:'B', primaryPath:'goal', cardioTypes:['bike'],
+  tests/gates/g205_d125_ceiling.js:335 ['bike','swim'].forEach(other => {
+  tests/gates/g205_pace_eve.js:259 bike.cardioTypes = ['bike']; bike.cardioGoals = { bike:{ id:'bike_base', label:'Base', baselineDist:'10', baseline:'10mi' } };
+  tests/gates/g206_d109_copy.js:303 { tag:'bike', type:'bike', cfg: Object.assign({ name:'B', cardioTypes:['bike'],
+  tests/gates/g208_d103a_chip.js:80 for(const t of ['bike', 'swim']) for(const sfx of ['', ' — Taper']) for(const [lab, w] of [['Continuous High Intensity (CHI)', 'CHI'], ['Interval (INT)', 'INT']
+  tests/gates/g217_d160_dedupe_view.js:352 {k:'bike', types:['bike'], goals:{bike:{id:'bike_base', label:'Bb'}}} ];
+  tests/gates/g218_d157_swim_sizer.js:217 { const c = clone(fixtures.HALF_MANNY); c.seed = seed; c.experience = exp; c.cardioTypes = ['bike']; c.cardioGoals = { bike:{ id:'bike_ftp', label:'FTP' } }; c.
+  tests/gates/g221_d180_blockopen.js:312 wadd('bike_base', false, null, { cardioTypes:['bike'], cardioGoals:{ bike:{ id:'bike_base', label:'Build Cycling Base' } }, eventTargeted:false });
+  tests/gates/g223_d183_safepace.js:599 const bike = raceDate => { setWDg({ cardioTypes:['bike'], raceDate }, BIKE); renderStep('cardio_goal', true); return screen(); };
+  tests/gates/g223_d183_safepace.js:739 ['past date, non-test (bike_century)', () => setWDg({ cardioTypes:['bike'], raceDate: PAST }, BIKE), RED_PAST],
+  tests/gates/g223_d183_safepace.js:740 ['under a week, non-test (bike_century, 3 days)', () => setWDg({ cardioTypes:['bike'], raceDate: addDays(TODAY, 3) }, BIKE), RED_WEEK],
+  tests/gates/g225_d187_pacerate.js:214 bike_ftp: { cardioTypes: ['bike'], cardioGoals: { bike: { id: 'bike_ftp', label: 'Improve FTP / Power' } } },
+  tests/gates/g232_d199_runwheel.js:486 const ES = [{}, { run_dist:'3.10', run_pace:'9:30' }, { run_dist:'.86', run_rep_time:'1:45', run_reps:'5' }, { bike_mins:'40', swim_yards:'1500' }];
+  tests/gates/g232_d199_runwheel.js:489 for(const e of ES) for(const sub of SUBS) for(const [sp, dz] of [['run', null], ['run', RD], ['bike', null], ['bike', BK], ['swim', null]]){
+  pin lines 14 over 185 files
+
+== REST SHEET ==
+  :1408 rest-sheet TIME input min=1 max=600 inputmode=numeric
+  applyRestCardio bike write: e.bike_mins=(+e.bike_mins||0)+m (number, accumulates; 2 x 600 = 1200 possible)
+  completedKey(1,"mon")="w1_mon" logKey(1,"mon")="w1_mon"
+
+DONE
