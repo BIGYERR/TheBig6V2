@@ -1,4 +1,4 @@
-// g219_d167_pairs.js — GATE for D167 (+ D167a) and D171 (coach): THE ADJACENT-DAY DEDUPE WALKS THE CALENDAR THE WEEK RENDERS.
+// g219_d167_pairs.js — GATE for D167 (+ D167a), D171 and D212 (coach): THE ADJACENT-DAY DEDUPE WALKS THE CALENDAR THE WEEK RENDERS.
 //
 //   node tests/gates/g219_d167_pairs.js [candidate] [baseline V218]
 //
@@ -13,6 +13,11 @@
 //          RPE 8 before a hot Sunday, 2 Sundays clamped for nothing." hotNextHingeClampSweep is defended by D171.T;
 //          buildProgram's inline `hotNext` (the `_ISO_ORDER.length-1` form) is UNDEFENDED: not a callable unit, and
 //          reverting it is inert on all 15,180 lattice configs.
+//   D212   (Post-V233, Mario concurred 2026-10-07) the forward form of R2, S4-D167's guard: "A loaded delt-isolation
+//          accessory may print on two consecutive training days (outside Main/Primer/Power on the second) only when every
+//          other gear-legal member of the delt-isolation family already prints on one of those two cards; and > 0 such
+//          licensed repeats exist on the lattice (liveness)." Pool exhausted is a claim about the athlete's gear, not
+//          about the build's draw; healthy configs are graded, injured configs are a watch.
 //
 // ORACLES, independent of the engine under test:
 //   CAL    Monday-start date arithmetic: a day's calendar index is (w-1)*7 + {mon:0 .. sun:6}; its predecessor is
@@ -25,12 +30,17 @@
 //   PAT    a hand table (below) for "within pattern" on the licensed cascade swaps; a name not in it fails.
 //   LENS   hinge membership (D171.T) is read through the FROZEN V218 artifact's _pattern. The candidate's own lens
 //          is never consulted.
+//   FAM    D212's delt-isolation family, a hand table typed from post_v233_ruling_d212.md (beside DUR_ROWS): Dumbbell
+//          lateral raise, Dumbbell front raise, Dumbbell rear delt fly on every tier that has dumbbells (crossfit,
+//          commercial, home_full, home_basic, minimal); commercial adds Cable lateral raise and Face pull; bodyweight has
+//          no loaded member. Membership is by name (lower-cased); no lens (_pattern, isTrackableWeight) is consulted and
+//          the build's own swap universe is never read. A tier missing from the table fails D212 by name.
 //
 // ARMS
 //   V218   git 44fd483 (or argv[3] when it reads 218). Frozen before-picture for B0/F0 and the LENS.
 //   CAND   the candidate, with one inert logging line at the dedupe rename (`        it.name=to;` count==1) that
 //          records [the day object being renamed, the name before]. The day is LOCATED by object identity in the
-//          shipped program, never by the engine's pair coordinates. D1 and D171.T read CAND.
+//          shipped program, never by the engine's pair coordinates. D1, D171.T and D212 read CAND.
 //   LW     CAND with its `function _adjDayPairs(...)` replaced by WALK (anchor count==1). D167.Z/D167.H read CAND vs LW.
 //
 // LATTICE: the D167 lattice of tests/measure/v219_chain_rebaseline.js (lat 'C', 15,180 configs), copied verbatim.
@@ -48,14 +58,21 @@
 //   D171.T  FORWARD (K2b.N and K2b.T's claim; v219 S3-D171's guard): no hinge item (LENS) on a training day whose
 //           calendar tomorrow (CAL) carries legLoad cardio (CARD) keeps '@ RPE 8' or 'RPE 8 (stop 2 reps short of
 //           failure)'; > 0 such items sit on a final Saturday.
+//   D212    FORWARD (R2's claim in forward form; v219 S4-D167's guard), healthy configs (x.ik === 'healthy'), CAND: for
+//           every calendar pair (CAL) A -> B where both days train, an item on B outside a Main/Primer/Power section
+//           whose name is in the config's FAM tier and anywhere on A's card (CARD) is a delt repeat. It is licensed only
+//           when every other FAM member of that tier prints on A or B, else a violation. 0 violations, and licensed > 0
+//           (liveness). Injured configs are counted and printed as an INFO watch, never graded. Reads the CAND program
+//           the shard already builds (no extra build) and runs even when the legacy walk fails.
 //   K2a.H, K2a.P, K2a.L, K2a.Z, D167a, K2b.N, K2b.T, R1 and R2 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
-//        They pinned D167/D171 on the build pair (219 vs V218 and the XP transplant). PARKED (standing ruling 7):
-//        R2's claim ("CAND calendar repeats sat>sun 28, sun>mon 6", v219 S4-D167's only guard) has no forward form
-//        with an independent oracle (whether a swap was legal needs the build's own swap universe), and its count
-//        form (a ceiling of 28 / 6) does not hold at 233: 36 / 6 from V226 (D188/D189, measure mE's bisect).
+//        They pinned D167/D171 on the build pair (219 vs V218 and the XP transplant). R2's claim ("CAND calendar
+//        repeats sat>sun 28, sun>mon 6", v219 S4-D167's only guard) is now carried by D212's forward row above (coach
+//        D212, Mario concurred 2026-10-07): the oracle is the athlete's gear (FAM), not the build's swap universe, so
+//        R2's count form (a ceiling of 28 / 6, 36 / 6 from V226 under D188/D189) stays retired.
 //
-// VERSION PREDICATE (standing rulings 2 and 4). D167/D171 ship on ia-version 219.
-//   below 219: REFUSED, every row FAILS by name (never a vacuous pass). 219 and above: every row runs.
+// VERSION PREDICATE (standing rulings 2 and 4). D167/D171 ship on ia-version 219; D212 (tests only, Post-V233) claims
+//   every build >= 219. Below 219: REFUSED, every row FAILS by name, D212 included (never a vacuous pass). 219 and
+//   above: every row runs.
 // env: G219_SHARDS (default min(4, cpus)).
 'use strict';
 'use strict';
@@ -65,7 +82,12 @@ const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const BASEFILE = process.argv[3] || null;
 const ERA = 219, V218_COMMIT = '44fd4830f9653e790aa43477787374cd29711988';
-const DUR_ROWS = ['B0','F0','D1','D167.Z','D167.H','D171.T'];
+const DUR_ROWS = ['B0','F0','D1','D167.Z','D167.H','D171.T','D212'];
+// FAM (D212's oracle): the loaded delt-isolation family by equipment tier, hand-typed from post_v233_ruling_d212.md, never
+// read from the engine. Dumbbells on every tier but bodyweight, cables only on commercial. Compared by lower-cased name.
+const FAM_DB = ['Dumbbell lateral raise', 'Dumbbell front raise', 'Dumbbell rear delt fly'], FAM_CABLE = ['Cable lateral raise', 'Face pull'];
+const FAM = { crossfit:FAM_DB, commercial:FAM_DB.concat(FAM_CABLE), home_full:FAM_DB, home_basic:FAM_DB, minimal:FAM_DB, bodyweight:[] };
+const FAM_EXEMPT = /^(main|primer|power)/i;   // B's section label: a Main/Primer/Power item is outside the claim
 const cl = o => JSON.parse(JSON.stringify(o)), cnt = (s, a) => s.split(a).length - 1;
 const OFF = {mon:0,tue:1,wed:2,thu:3,fri:4,sat:5,sun:6}, ISO = Object.keys(OFF);
 
@@ -166,6 +188,21 @@ if(process.env.G219SHARD !== undefined){
           bump('T eve hinge'); if(fin) bump('T final sat hinge');
           if(det.indexOf('@ RPE 8') >= 0 || det.indexOf('RPE 8 (stop 2 reps short of failure)') >= 0){ bump('T unclamped'); if(fin) bump('T unclamped final sat'); ex('T unclamped', tag + ' W' + a.w + ' ' + a.d + ' ' + it.name + ' ' + JSON.stringify(det)); }
           else if(det.indexOf('@ RPE 7') >= 0 || det.indexOf('RPE 7 (leave 3 or more in reserve)') >= 0){ bump('T clamp form'); if(fin) bump('T clamp form final sat'); } })); }); }
+    // D212 (forward, CAND alone, before the LW gate so it runs when the legacy walk fails): a FAM member on B (outside
+    // Main/Primer/Power) that is also on A's card is a repeat; licensed when every other member of the tier is on A or B.
+    { const hk = x.ik === 'healthy' ? 'H' : 'INJ', fam = FAM[x.c.equipment]; bump('D212 cfg ' + hk);
+      if(!fam){ bump('D212 tier unknown'); ex('D212 tier unknown', tag + ' equipment ' + x.c.equipment); }
+      else { const famL = fam.map(s => s.toLowerCase()), cc = calOf(c.p); let licC = false, vioC = false;
+        Object.keys(cc).map(Number).forEach(ix => { const a = cc[ix], b = cc[ix + 1]; if(!a || !b || !trains(a.y) || !trains(b.y)) return;
+          const nA = namesOn(a.y), nB = namesOn(b.y), pt = a.d === 'sat' ? 'sat>sun' : a.d === 'sun' ? 'sun>mon' : 'interior';
+          b.y.sections.forEach(sec => { if(FAM_EXEMPT.test(String((sec && sec.label) || ''))) return;
+            ((sec && sec.items) || []).forEach(it => { const n = String((it && it.name) || '').toLowerCase(); if(!n || famL.indexOf(n) < 0 || !nA.has(n)) return;
+              const miss = fam.filter(z => { const l = z.toLowerCase(); return l !== n && !nA.has(l) && !nB.has(l); });
+              bump('D212 rep ' + hk + ' ' + pt);
+              if(!miss.length){ bump('D212 lic ' + hk + ' ' + pt); licC = true; return; }
+              bump('D212 vio ' + hk + ' ' + pt); vioC = true;
+              ex(hk === 'H' ? 'D212 vio' : 'D212 inj vio', tag + (hk === 'H' ? '' : ' ' + x.ik) + ' W' + a.w + ' ' + a.d + ' > ' + b.d + ' ' + it.name + ' [' + sec.label + '] missing ' + miss.join(', ')); }); }); });
+        if(licC) bump('D212 lic cfgs ' + hk); if(vioC) bump('D212 vio cfgs ' + hk); } }
     if(!LW) continue;
     // D167.Z / D167.H (forward): CAND vs LW, the candidate with the hand-typed Sun..Sat walk put back
     const xl = LW.buildProgram(cl(x.c)); const cc2 = calOf(c.p), cl2 = calOf(xl);
@@ -246,7 +283,7 @@ function report(){
     'renames ' + g('D1 renames') + ', unlocated ' + g('D1 unlocated') + ', W1 Monday ' + g('D1 first day') + ', not on prev ' + g('D1 not on prev') + exs('D1 not on prev') + exs('D1 first day') + exs('D1 unlocated'));
   // K2a.H, K2a.P, K2a.L, K2a.Z, D167a, K2b.N, K2b.T, R1 and R2 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They pinned D167/D171 on the
   // build pair (219 vs V218 and the XP transplant). The claims that were v219 S1-D167's and S3-D171's only guards are
-  // the forward rows below (standing ruling 3 as amended); R2's (S4-D167's only guard) is parked, see the header.
+  // the forward rows below (standing ruling 3 as amended); R2's claim (S4-D167's only guard) is carried by the D212 row below.
   if(lwErr){ console.log('LEGACY WALK FAILED: ' + lwErr); ['D167.Z', 'D167.H'].forEach(r => ok(r + ' (legacy walk: ' + lwErr + ')', false)); }
   else {
     const H = g('H programs'), Z = g('Z sunREST programs'), hist = ISO.map(d => d + ' ' + g('H days ' + d)).join(', '), midN = CAS.length + g('H cascades unlisted');
@@ -259,5 +296,11 @@ function report(){
   }
   ok('D171.T FORWARD (every build >= 219): no hinge item (V218 lens) on a training day whose calendar tomorrow carries legLoad cardio keeps an RPE 8 clamp grammar (' + g('T eve hinge') + ' items, ' + g('T final sat hinge') + ' on a final Saturday, ' + g('T clamp form') + ' read the clamped form)',
     g('T final sat hinge') > 0 && !g('T unclamped'), 'unclamped ' + g('T unclamped') + ' (final Saturday ' + g('T unclamped final sat') + '), final-Saturday items ' + g('T final sat hinge') + exs('T unclamped'));
+  // D212 (forward form of R2; v219 S4-D167's guard): healthy configs graded; injured counted as a watch (INFO, never graded)
+  { const B3 = ['sat>sun', 'sun>mon', 'interior'], s3 = p => B3.map(b => g(p + ' ' + b)), tot = p => s3(p).reduce((a, n) => a + n, 0);
+    const rep = tot('D212 rep H'), lic = tot('D212 lic H'), vio = tot('D212 vio H'), unk = g('D212 tier unknown');
+    ok('D212 FORWARD (every build >= 219, healthy configs): a loaded delt-isolation accessory (FAM hand table) printing again on the next training day outside Main/Primer/Power is licensed only when every other gear-legal family member prints on one of the two cards (' + rep + ' repeats on ' + g('D212 cfg H') + ' healthy configs, licensed ' + lic + ' [sat>sun/sun>mon/interior ' + s3('D212 lic H').join('/') + '] on ' + g('D212 lic cfgs H') + ' configs; licensed > 0)',
+      vio === 0 && lic > 0 && unk === 0, 'violations ' + vio + ' [sat>sun/sun>mon/interior ' + s3('D212 vio H').join('/') + '] on ' + g('D212 vio cfgs H') + ' configs, licensed ' + lic + ', tier not in FAM ' + unk + exs('D212 vio') + exs('D212 tier unknown'));
+    console.log('INFO D212 injured (watch, never graded): ' + g('D212 cfg INJ') + ' injured configs swept, ' + tot('D212 rep INJ') + ' delt repeats, licensed ' + tot('D212 lic INJ') + ', a gear-legal member on neither card ' + tot('D212 vio INJ') + ' [sat>sun/sun>mon/interior ' + s3('D212 vio INJ').join('/') + '] on ' + g('D212 vio cfgs INJ') + ' configs' + exs('D212 inj vio')); }
   done();
 }

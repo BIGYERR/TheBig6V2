@@ -26,3 +26,12 @@ MEASURE MUST ESTABLISH BEFORE BUILDER WRITES IT: (1) 0 violations on every tag V
 
 Recommendation: ship the family-table row as g219's R2 replacement, scoped to healthy configs, with the liveness conjunct, and leave the 42 front raises in the app as licensed residue.
 Counter: on a tier-B long-run day the tier's own intent is less lifting, so dropping an exhausted repeat (Sunday Delts keeps rear delt fly alone) would honour both rulings at once; it is an app change touching 13 of 5,310 programs and belongs in §12 as a watch, not in a tooling pass.
+
+## Mario's concurrence (2026-10-07, V234 chat; saved by the main session)
+Mario: "Concur with D212. Land it first as a tests-only follow-up, then V234: P-SWAPKEEP."
+Status: CONCURRED. Build as the Post-V233 D212 follow-up (tests only, no version, no tag, no deploy proof).
+Session siting (main session's call, not a ruling change): the row is g219_d167_pairs.js key `D212`, reading the CAND
+program the shard already builds (no new build per config), healthy configs only (`x.ik === 'healthy'`), with the
+liveness conjunct (licensed repeats > 0). Injured configs are counted and printed as a watch, never graded. The oracle
+is the hand table above, typed in the gate. Manifest: one ruled `+ g219_d167_pairs.js D212` line. v219 S4-D167 leaves
+tests/sabotage/known_survivors.txt in the same slice (the list only shrinks; the gate is re-armed).

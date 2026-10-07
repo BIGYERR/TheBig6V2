@@ -25,7 +25,7 @@
   "anchor": "if(!cands.length) return;",
   "replacement": "if(cands.length<2) return;",
   "gate": "gates/g219_d167_pairs.js",
-  "note": "NAMED TRIP in g219_d167_pairs.js row R2 only (sat>sun/sun>mon 92/14 vs 28/6). The loop body is not transplanted, so K2a stays green. Needs ia-version 219: pair rows run only on 219 (SKIP above), every row is REFUSED below. Pair rows read V218 from git 44fd483 when no baseline is passed, as sabotage.py runs it."
+  "note": "NAMED TRIP in g219_d167_pairs.js row D212 (V233+S4: 138 healthy violations 80/8/50 sat>sun/sun>mon/interior on 28 configs; R2 retired Post-V233). Every other g219 row stays green. Needs ia-version 219 or later: every row runs on 219 and above, every row is REFUSED below. The gate reads V218 from git 44fd483 when no baseline is passed, as sabotage.py runs it."
  },
  {
   "name": "S5-D167 durable -> the A day of a pair is read from B's week, so W sun -> W+1 mon compares Monday against the Sunday six days AFTER it",

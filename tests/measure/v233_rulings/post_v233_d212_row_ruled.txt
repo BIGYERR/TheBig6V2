@@ -1,0 +1,3 @@
+# ROW_RULED for the Post-V233 D212 follow-up (tests only, no build). Passed to gate.sh step 4b as ROW_RULED=<this file>.
+# Written by the main session from the ruling file post_v233_ruling_d212.md (Mario concurred 2026-10-07).
++ g219_d167_pairs.js D212  # D212 (coach, Mario concurred 2026-10-07): forward form of g219's retired R2 on the hand-typed delt family, healthy configs, liveness; v219 S4-D167's guard

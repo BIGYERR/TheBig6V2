@@ -91,6 +91,18 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
 - **Review.** Every 25 builds, measure reruns the gate history analysis (`tests/measure/v232_gate_history.js`, record
   shaped like `v232_rulings/measure_gate_history_mH.md`), reports which gates have never caught a real bug, and audits
   every `tests/skip_allow.txt` entry. Last run Post-V232; next due after V257.
+- **Friction report** (Mario, standing from V234). After each build, before the digest line, report to Mario in five
+  lines or fewer any of these that happened:
+  - the classify call was a judgment call, and which side you came down on and why;
+  - proof time came within 20% of its budget, or went over and had to ask;
+  - a rule had to be interpreted or worked around to fit the change, naming the rule and the workaround;
+  - the manifest hunk needed the ruling reworded to count as explained, or flagged something that was not really a row change;
+  - the allow list was touched;
+  - any step the rules required that proved nothing new on this build.
+  For each item, say in one line whether you would change the wording and to what. If nothing fired, the report is one
+  line: `Friction: none.` It runs on every build through V238; from V239 on, only when something fires. Never adapt to
+  an awkward rule silently: if a rule is wrong, the fix is a wording change Mario approves, not a workaround that
+  becomes a habit.
 
 ## Standing rulings (settled — do not re-ask, do not re-derive)
 Each of these was paid for in a session. They are not open questions, and no agent reopens one
