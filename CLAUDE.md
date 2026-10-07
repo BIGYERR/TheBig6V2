@@ -32,7 +32,8 @@ into its ruling file before briefing builder**, and every brief cites only what 
 the return that was not saved.
 
 ## Session rhythm (do not skip steps)
-**One build per chat.** Each version starts in a fresh chat. A chat never carries past one build, and never past a
+**One version per chat; a tests-only pass may precede it** (Mario, Post-V234). Each version starts in a fresh chat.
+A chat never carries past one version, and never past a
 compaction: if it compacts mid-build, stop at the next safe point (a builder slice either landed whole or stays parked
 in `tests/edits/`; nothing is committed that gatekeeper has not proved), tell Mario where the build stands, and
 continue in a fresh chat. **A chat ends by handing Mario the next chat's prompt:** one line naming the build and its target
@@ -56,6 +57,9 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
 `measure_tooling_inventory_mT.md`, `post_v233_proof_scope_decisions.md`, and `tests/measure/v233_gate_reach.json`.
 - **Budget.** Proof finishes in under 15 minutes of wall time for a LOCAL change and under 30 for a CROSS-CUTTING one.
   If a change cannot fit, tell Mario before proof starts what you would drop and why, and wait for his answer.
+  **Until 2026-10-13**, when the full sweep rebuilds the reach map, a LOCAL change that adds a manifest row runs
+  `gate.sh` in full (the manifest is regenerated only from every gate's output) on a 20-minute budget (Mario,
+  Post-V234). The exception ends on 2026-10-13; from then the 15-minute LOCAL budget applies to every LOCAL change.
 - **Classify before proof.** Tell Mario whether the change is LOCAL or CROSS-CUTTING, and why. Cross-cutting is any of:
   a changed function that more than 20 gates execute in the reach map; a stored format (an `ia_` key, `cfg`,
   `prog.weeks`); program output (any digest or era row moves); `tests/harness.js` or `tests/gate.sh`. Everything else
@@ -65,9 +69,15 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
 - **Draft run, then final run.** Gatekeeper proves the draft once, before builder's last slice: cross-cutting gets the
   full suite (`gate.sh`, blast radius, fuzz); local gets its dependency chain and blast radius. The final run confirms
   the shipped file only: version, syntax, boot, the new and edited gates, and every hunk between the proven draft and
-  the shipped file classified. It reruns nothing the draft proved unless the last slice touched it.
+  the shipped file classified. It reruns nothing the draft proved unless the last slice touched it. When no builder
+  slice lands after the draft, the final run is the version line and a sha256 check of the whole proven tree
+  (`index.html` and every gate, spec, harness and tooling file under `tests/`, not the app file alone) showing 0
+  changes since the draft, apart from `tests/row_manifest.txt`, which gatekeeper writes from the proven draft (Mario,
+  Post-V234).
 - **Previous version.** Only gates that are new or edited in the build run against the previous version. A row written
-  by the era script does not make a gate edited.
+  by the era script does not make a gate edited. A new gate runs against the previous version's body relabelled to
+  the candidate's version (its `ia-version` meta set to the candidate's), so its rows are tested, not its version
+  check; an edited gate runs against the previous version as shipped (Mario, Post-V234).
 - **Version scope.** No gate row goes dark. Every row a gate declares prints exactly one status line (PASS, FAIL, SKIP
   or SCOPED OUT), and a declared row with no status line is red. At the candidate's version every row runs: a row that
   prints SKIP or SCOPED OUT in `gate.sh` is red unless `tests/skip_allow.txt` lists it, and every entry there names the
@@ -161,7 +171,7 @@ which does reach him arrives with a recommendation.
 - No process substitution `<(...)` — use temp files.
 - Oracles are independent: a gate never asserts the engine equals its own output. Hand tables, the doctrine text, date arithmetic.
 - A gate must print `PASS n FAIL n`. Missing summary = crash = NOT a pass. A gate that crashes reports nothing, and nothing is not "no failures".
-- Run every new or edited gate against the PREVIOUS version first. A gate that passes on both is not testing what it claims.
+- Run every new or edited gate against the PREVIOUS version first (a new gate against the previous body relabelled to the candidate's version; Proof scope). A gate that passes on both is not testing what it claims.
 - Sabotage: every mutation must trip a NAMED gate. Anchor `count==1` or it is NOT-APPLIED. A no-op mutation is a mutation defect, not a gate defect — rewrite the mutation. All-trip is as suspicious as a survivor.
 - Blast-radius diff: 100% of hunks classified into a ruled class before ship. A removal that was not ruled is a regression (a ruling that SELECTS is not a ruling that DELETES).
 - Identity fuzz: pin `cfg.seed`, strip clock fields, prove baseline == itself before diffing anything.
@@ -235,7 +245,8 @@ Every brief to either carries the per-build items, then the standing lines for t
   is found by subtype; any `\uXXXX` text that must land is built with `chr(92)`, never typed; an era row for a table the
   ruling does not move comes from `tests/era_bump.py`, never by hand; builder never edits `tests/row_manifest.txt`,
   and every new gate prints its rows through `tests/status.js`.
-- **Gatekeeper, standing:** run every new or edited gate against the previous version too; every build anchor-checks
+- **Gatekeeper, standing:** run every edited gate against the previous version too, and every new gate against the
+  previous version's body relabelled to the candidate's version; every build anchor-checks
   every spec and trip-runs the Proof scope set; the full sweep runs every spec, old ones included, when it is due;
   gatekeeper alone regenerates `tests/row_manifest.txt`, from a proven run only, and classifies its hunks against the
   ruling; a sabotage anchor that is not `count==1` is NOT-APPLIED and a no-op mutation is a mutation defect;
