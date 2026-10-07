@@ -41,7 +41,8 @@
 //        week with a long run no run follows it in the ISO week. R2v: the lattice reaches long-run
 //        weeks. Solo NRC is outside D146: its days are V153's chooser, which this build does not touch.
 //   R3   excluded modes (noimpact, noimpact_swim, easy, reduce), pace solo and multi-sport: every
-//        build byte-identical to V212. PAIR. R3v: all four modes reached, each with multi-sport builds.
+//        build byte-identical to V212. PAIR. R3v: all four modes reached, each with multi-sport builds; R3v runs
+//        from 213 up (Version scope, post-V233), a minimum row and not the pair's.
 //   R3n  the same claim on NRC multi-sport (slice 2c): run_5k + bike and run_half + swim under one
 //        state per excluded mode, every calendar, byte-identical to V212. PAIR.
 //   R8   RULING-LEVEL, from 213 up (V214 close C): pace multi-sport under the four excluded modes keeps
@@ -68,15 +69,13 @@
 // Run on V212 forced to 213, R1, R2 and R5 fail; on the V213 build every row passes.
 'use strict';
 const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
-const { load, fixtures, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const { load } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version;
 const ERA = 213;
-const PAIR = VER === ERA;                 // build-pair rows run only for candidate 213 vs V212
 const V212_COMMIT = '169537cb615546b6b68c6826887a70fc11e1d5cd';
-const HM_DIGEST = '0ac7da6b1691a8e1';
 
 let pass = 0, fail = 0, skip = 0, scoped = 0, fixt = 0;
 function ok(label, cond, got){
@@ -85,8 +84,10 @@ function ok(label, cond, got){
 }
 function fixture(label, cond, got){ fixt++; ok('HF ' + label, cond, got); }
 function skipRow(label){ skip++; console.log('SKIP ' + label); }
-function pairRow(label, cond, got){
-  if(!PAIR){ scoped++; console.log('SCOPED OUT ' + label + ' [build pair 213/212 only; candidate is ' + VER + '] (now ' + got + ')'); return; }
+// Version scope (post-V233): a row that holds from the D113a/D146 era onward is a minimum row, live on every candidate
+// from 213 up. R3v is one; the pair rows keep PAIR.
+function minRow(label, cond, got){
+  if(!(VER >= ERA)){ skipRow(label + ' skipped below the D113a/D146 era'); return; }
   ok(label, cond, got);
 }
 function summary(){
@@ -96,7 +97,7 @@ function summary(){
 }
 if(!(VER >= ERA)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D113a/D146 (V' + ERA + ').');
-  ['HF','R0','R1','R1v','R2','R2v','R3','R3v','R3n','R8','R8n','R8v','R4','R4p','R5','R6','R7','R7v','HM'].forEach(r => skipRow(r + ' skipped below the D113a/D146 era'));
+  ['HF','R1','R1v','R2','R2v','R3v','R8','R8n','R8v','R4','R5','R7','R7v'].forEach(r => skipRow(r + ' skipped below the D113a/D146 era'));
   summary();
 }
 
@@ -186,11 +187,10 @@ if(!BASE){
 console.log('baseline: ' + (BASE ? 'V212 from ' + baseWhy : 'UNAVAILABLE (' + baseWhy + ')'));
 const build = (I, cfg) => I.buildProgram(cl(cfg));
 const weeksOf = p => Object.keys(p.weeks).map(Number).sort((a, b) => a - b);
-const maxRuns = p => Math.max(0, ...weeksOf(p).map(w => runsOf(p.weeks[w]).length));
 
 // ── R1 / R6: pace, solo and multi-sport ──────────────────────────────────────────────────
 {
-  let n = 0, crash = 0, W = 0, uW = 0, ex = null, three = 0, r6n = 0, r6mv = 0, r6ex = null;
+  let n = 0, crash = 0, W = 0, uW = 0, ex = null, three = 0;
   const LAT = [];
   CALS.forEach((rest, i) => LAT.push({ex:{}, rest, f:FOCI[i % 3]}));
   EXTRAS.forEach((e, j) => CALS.forEach((rest, i) => LAT.push({ex:e, rest, f:FOCI[(i + j) % 3]})));
@@ -200,13 +200,11 @@ const maxRuns = p => Math.max(0, ...weeksOf(p).map(w => runsOf(p.weeks[w]).lengt
     const multi = Object.keys(x.ex).length > 0;
     weeksOf(p).forEach(w => { const R = runsOf(p.weeks[w]); W++; if(multi && R.length === 3) three++;
       if(untol(R)){ uW++; if(!ex) ex = (multi ? JSON.stringify(x.ex) : 'solo') + ' rest=' + x.rest + ' W' + w + ' ' + R.map(r => r.day + ':' + r.t).join(' '); } });
-    if(multi && BASE){ const b = build(BASE, cfg); if(maxRuns(b) <= 2){ r6n++; if(progDigest(b) !== progDigest(p)){ r6mv++; if(!r6ex) r6ex = JSON.stringify(x.ex) + ' rest=' + x.rest; } } }
   });
   ok('R1 pace lattice builds without a crash (' + LAT.length + ' configs)', crash === 0 && n === LAT.length, crash + ' crashes');
   ok('R1v the pace lattice reaches multi-sport three-run weeks (' + three + ')', three > 100, three);
   ok('R1 pace, solo and multi-sport: 0 weeks with an untolerated hard run pair (of ' + W + ' weeks)', uW === 0, uW + ', first ' + ex);
-  if(!BASE) pairRow('R6 multi-sport pace builds with two runs a week at most need the V212 baseline', false, baseWhy);
-  else pairRow('R6 multi-sport pace builds whose V212 week holds two runs at most are unmoved against V212 (' + r6n + ' builds)', r6n > 100 && r6mv === 0, r6mv + ', first ' + r6ex);
+  // R6 (D113a/D146: multi-sport pace builds whose V212 week holds two runs at most unmoved against V212) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 }
 
 // ── R2 / R7: NRC, solo and multi-sport ───────────────────────────────────────────────────
@@ -245,48 +243,25 @@ const maxRuns = p => Math.max(0, ...weeksOf(p).map(w => runsOf(p.weeks[w]).lengt
   const MODES = new Set(['noimpact','noimpact_swim','easy','reduce']);
   const INJ = [{region:'knee',tier:'protect'},{region:'hip',tier:'protect'},{region:'knee',tier:'workaround'},{region:'ankle',tier:'workaround'}];
   const EXC = [{},{bike:'bike_base'},{swim:'swim_base'},{bike:'bike_ftp', swim:'swim_mile'}];
-  if(!BASE){ pairRow('R3 excluded injury modes need the V212 baseline', false, baseWhy); pairRow('R3v excluded mode reach needs the V212 baseline', false, baseWhy); }
-  else if(!PAIR){ pairRow('R3 excluded injury modes byte-identical to V212', false, 'n/a'); pairRow('R3v excluded mode reach', false, 'n/a'); }
+  // R3v runs from the D113a/D146 era onward (Version scope): the reach of V212's excluded-mode population on the
+  // candidate lattice is a state claim, so it is a minimum row. R3, the identity to V212, stays the build pair's.
+  if(!BASE){ minRow('R3v excluded mode reach needs the V212 baseline', false, baseWhy); }
   else {
     const plan = BASE.eval('injuryPlan');     // V212's own plan picks the population; the claim is the identity
-    let n = 0, mv = 0, ex = null, crash = 0; const reach = {}, multiReach = {};
+    let crash = 0; const reach = {}, multiReach = {};
     EXC.forEach((e, j) => INJ.forEach(inj => CALS.forEach((rest, i) => {
       const cfg = mkCfg('run_pace_goal', e, rest, FOCI[(i + j) % 3], {injury:inj});
       const mode = (plan(cl(cfg)) || {}).cardioMode || 'none'; if(!MODES.has(mode)) return;
       let a, b; try { a = build(IA, cfg); b = build(BASE, cfg); } catch(err) { crash++; return; }
-      n++; reach[mode] = (reach[mode] || 0) + 1; if(Object.keys(e).length) multiReach[mode] = (multiReach[mode] || 0) + 1;
-      if(progDigest(a) !== progDigest(b)){ mv++; if(!ex) ex = mode + ' ' + JSON.stringify(e) + ' ' + inj.region + '/' + inj.tier + ' rest=' + rest; }
+      reach[mode] = (reach[mode] || 0) + 1; if(Object.keys(e).length) multiReach[mode] = (multiReach[mode] || 0) + 1;
     })));
-    pairRow('R3v the lattice reaches all four excluded modes, each with multi-sport builds (' + JSON.stringify(reach) + ' multi-sport ' + JSON.stringify(multiReach) + ')',
+    minRow('R3v the lattice reaches all four excluded modes, each with multi-sport builds (' + JSON.stringify(reach) + ' multi-sport ' + JSON.stringify(multiReach) + ')',
       crash === 0 && [...MODES].every(m => reach[m] > 0 && multiReach[m] > 0), JSON.stringify(multiReach) + ' crash ' + crash);
-    pairRow('R3 excluded injury modes, pace solo and multi-sport: every build byte-identical to V212 (' + n + ' builds)', n > 0 && mv === 0, mv + ', first ' + ex);
+    // R3 (D113a: excluded injury modes, pace solo and multi-sport, byte-identical to V212) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
   }
 }
 
-// ── R3n: NRC multi-sport under the excluded modes is byte-identical to V212 (slice 2c) ──────────
-// Coach, V213: the NRC arm of the multi-sport routing honours the exclusion key as the pace arm does.
-// Those modes rewrite every run, so there is nothing for the chooser to space and the week keeps the
-// layout V212 dealt it. V212's own injuryPlan picks the population; the claim is the identity.
-{
-  const MODES = new Set(['noimpact','noimpact_swim','easy','reduce']);
-  const INJ = [{region:'knee',tier:'protect'},{region:'hip',tier:'protect'},{region:'knee',tier:'workaround'},{region:'ankle',tier:'workaround'}];
-  const SAMPLE = [['run_5k', {bike:'bike_base'}], ['run_half', {swim:'swim_base'}]];
-  if(!BASE) pairRow('R3n NRC multi-sport excluded modes need the V212 baseline', false, baseWhy);
-  else if(!PAIR) pairRow('R3n NRC multi-sport excluded modes byte-identical to V212', false, 'n/a');
-  else {
-    const plan = BASE.eval('injuryPlan');
-    let n = 0, mv = 0, ex = null, crash = 0; const reach = {};
-    SAMPLE.forEach(([g, e], j) => INJ.forEach(inj => CALS.forEach((rest, i) => {
-      const cfg = mkCfg(g, e, rest, FOCI[(i + j) % 3], {injury:inj});
-      const mode = (plan(cl(cfg)) || {}).cardioMode || 'none'; if(!MODES.has(mode)) return;
-      let a, b; try { a = build(IA, cfg); b = build(BASE, cfg); } catch(err) { crash++; return; }
-      n++; reach[mode] = (reach[mode] || 0) + 1;
-      if(progDigest(a) !== progDigest(b)){ mv++; if(!ex) ex = g + ' ' + JSON.stringify(e) + ' ' + mode + ' ' + inj.region + '/' + inj.tier + ' rest=' + rest; }
-    })));
-    pairRow('R3n NRC multi-sport under the excluded modes (run_5k + bike, run_half + swim): every build byte-identical to V212 (' + n + ' builds, ' + JSON.stringify(reach) + ')',
-      crash === 0 && [...MODES].every(m => reach[m] > 0) && mv === 0, mv + ' moved, first ' + ex + ', crash ' + crash);
-  }
-}
+// R3n (D146 slice 2c: NRC multi-sport under the excluded modes byte-identical to V212) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 
 // ── R8 / R8n / R8v: the exclusion key keeps the chooser off (RULING-LEVEL, from 213 up) ─────────
 // D113a amended and D146 slice 2c: under noimpact, noimpact_swim, easy and reduce the multi-sport week
@@ -334,7 +309,7 @@ const maxRuns = p => Math.max(0, ...weeksOf(p).map(w => runsOf(p.weeks[w]).lengt
 // ── R4 / R5: the 35 three-day solo pace calendars at tw 6 / 9 / 11 / 15 ──────────────────
 {
   const TW = [6, 9, 11, 15]; const spacer = new Set(SPACER_TYPED);
-  let r4n = 0, r4bad = 0, r4ex = null, r5n = 0, r5bad = 0, r5ex = null, crash = 0, pN = 0, pCells = 0, pDiff = 0, pex = null;
+  let r4n = 0, r4bad = 0, r4ex = null, r5n = 0, r5bad = 0, r5ex = null, crash = 0;
   THREE.forEach(c => { const cal = c.join('+'); const rest = DAYS.filter(d => !c.includes(d));
     TW.forEach(tw => FOCI.forEach(f => {
       const cfg = mkCfg('run_pace_goal', {}, rest, f, {_raceDateCappedWeeks:tw}); let p;
@@ -348,8 +323,6 @@ const maxRuns = p => Math.max(0, ...weeksOf(p).map(w => runsOf(p.weeks[w]).lengt
         const good = T === tw && per.length === tw && per.every(R => R.length === 3 && cnt(R, 'int') + cnt(R, 'chi') === 1)
           && JSON.stringify(iW) === JSON.stringify(wantI) && JSON.stringify(cW) === JSON.stringify(wantC);
         if(!good){ r4bad++; if(!r4ex) r4ex = cal + ' tw=' + tw + ' ' + f + ' T=' + T + ' runs/wk ' + per.map(R => R.length).join('') + ' INT wks [' + iW + '] CHI wks [' + cW + '] want INT 1..' + (cr - 1) + ' CHI ' + cr + '..' + tw; }
-        if(PAIR && BASE){ pN++; const b = build(BASE, cfg);
-          weeksOf(b).forEach(w => DAYS.forEach(d => { pCells++; if(JSON.stringify(cards(b.weeks[w][d])) !== JSON.stringify(cards((p.weeks[w] || {})[d]))){ pDiff++; if(!pex) pex = cal + ' tw=' + tw + ' ' + f + ' W' + w + ' ' + d; } })); }
       } else {
         r5n++;
         const good = T === tw && per.length === tw && per.every(R => R.length === 3 && cnt(R, 'int') === 1 && cnt(R, 'chi') === 1 && cnt(R, 'long') === 1 && untol(R) === 0);
@@ -359,15 +332,9 @@ const maxRuns = p => Math.max(0, ...weeksOf(p).map(w => runsOf(p.weeks[w]).lengt
     })); });
   ok('R4/R5 three-day pace lattice builds without a crash (' + (35 * TW.length * 3) + ' configs)', crash === 0 && r4n + r5n === 35 * TW.length * 3, crash + ' crashes');
   ok('R4 the 7 spacer calendars: three runs and one quality a week, INT weeks 1..cross-1 then CHI weeks cross..tw, cross = max(3, ceil(tw × 0.55)) (' + r4n + ' builds)', r4n === 84 && r4bad === 0, r4bad + ', first ' + r4ex);
-  if(!BASE) pairRow('R4p the 7 spacer calendars need the V212 baseline', false, baseWhy);
-  else pairRow('R4p the 7 spacer calendars: cardio byte-identical to V212 on every day (' + pN + ' builds, ' + pCells + ' day-cells)', pN === 84 && pDiff === 0, pDiff + ', first ' + pex);
+  // R4p (D113a: the 7 spacer calendars' cardio byte-identical to V212) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
   ok('R5 the 28 spaceable calendars: three runs, one INT, one CHI and one long run every week, no untolerated pair (' + r5n + ' builds)', r5n === 336 && r5bad === 0, r5bad + ', first ' + r5ex);
 }
 
-// ── R0 / HM ──────────────────────────────────────────────────────────────────────────────
-if(!BASE) pairRow('R0 identity fuzz needs the V212 baseline', false, baseWhy);
-else { const cfg = mkCfg('run_pace_goal', {bike:'bike_base'}, ['sun','wed'], 'balanced');
-  pairRow('R0 V212 built twice from the same cfg is identical', progDigest(build(BASE, cfg)) === progDigest(build(BASE, cfg))); }
-{ const got = progDigest(build(IA, fixtures.HALF_MANNY));
-  pairRow('HM HALF_MANNY shipped digest is ' + HM_DIGEST + ' (ruled unmoved)', got === HM_DIGEST, got); }
+// R0 HM (D113a/D146: V212 built twice identical; HALF_MANNY typed 0ac7da6b1691a8e1) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 summary();

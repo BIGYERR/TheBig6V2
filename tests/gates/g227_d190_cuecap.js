@@ -112,6 +112,10 @@
 //       loaded end) and b-HAND-2.
 //   M4  the live filter block moved above `const _reRx=(item.detail!==_base);`: trips c-TOAST (a cue the filter appends
 //       turns "Same job, same numbers." into "No load to add here").
+// IDS (post-V233 V4: every row prints through tests/status.js; CLAUDE.md Proof scope, Row manifest). Each row above
+//   is the id D190-<row>, keyed to the ruling it defends (standing ruling 4): D190-b-ALL, D190-b-HAND-1, D190-b-HAND-2,
+//   D190-b-HAND-3, D190-c-TOAST, D190-c-UNINJ, D190-c-DIGEST, D190-c-MANNY. A boot failure or a REFUSED version prints
+//   FAIL for every declared id by name.
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const H = require(path.join(__dirname, '..', 'harness.js'));
@@ -123,21 +127,28 @@ const BASEFILE = process.argv[3] || null;
 const ERA = 227, BASE_ERA = 226;
 const V226_COMMIT = '637bc8e24a243daf3803a554125bba117f44281f';   // V226: D188/D189 (the V226 artifact, forever)
 const NS = 16, NU = 24;
-let pass = 0, fail = 0;
 const t0 = Date.now();
-const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l + (g === undefined ? '' : ' (' + g + ')')); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
+// Rows print through tests/status.js (post-V233 V4). RID: row key -> status id. ok(row key, label, cond, got) is the
+// row's one status line: got prints in the label on a PASS and as the detail on a FAIL, as before.
+const S = require('../status')('g227_d190_cuecap');
+const RID = { bALL:'D190-b-ALL', bH1:'D190-b-HAND-1', bH2:'D190-b-HAND-2', bH3:'D190-b-HAND-3', cTOAST:'D190-c-TOAST',
+  cUNINJ:'D190-c-UNINJ', cDIGEST:'D190-c-DIGEST', cMANNY:'D190-c-MANNY' };
+S.declare(Object.values(RID));
+const ok = (k, l, c, g) => c ? S.pass(RID[k], l + (g === undefined ? '' : ' (' + g + ')')) : S.fail(RID[k], l, g === undefined ? '' : 'got ' + g);
 const secs = () => ((Date.now() - t0) / 1000).toFixed(1) + ' s';
-const done = () => { console.log('  runtime ' + secs()); console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
+const done = () => { console.log('  runtime ' + secs()); S.summary(); };
+// a boot failure or a REFUSED version: FAIL for every declared id by name (R is read at call time, after it is typed)
+const failAll = (why, detail) => { for(const k of Object.keys(RID)) S.fail(RID[k], R[k] + ' (' + why + ')', detail); done(); };
 
 const R = {
-  bALL:   'row b-ALL    cue <=> cap on every live hop of the injured lattice (knee, ankle, hip, lowback, shoulder, elbow at workaround; W3, W5; hop1, hop2, cyc2): the card ends with the cue iff the plan caps the pattern and the cue-free dose carries no RPE',
-  bH1:    'row b-HAND-1 MARIO knee/wa W5 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell split-stance deadlift -> Dumbbell goblet squat ends `{RX8C}`, live == boot',
-  bH2:    'row b-HAND-2 ankle/wa W3 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell goblet squat (`{RX8C}`) -> Dumbbell split-stance deadlift (`2×8`), live == boot',
-  bH3:    'row b-HAND-3 ankle/wa W3 thu Leg superset B: Kettlebell swing -> Dumbbell goblet squat (cued) -> Nordic hamstring curl (anchored) prints `2 sets — RPE 8 (stop 2 reps short of failure)`, live == boot',
-  cTOAST: 'row c-TOAST  pair vs V226: the toast on every live hop of the injured lattice is unmoved, 0 moved',
-  cUNINJ: 'row c-UNINJ  pair vs V226: HALF_MANNY and mario_noinj live, boot, toast and undo unmoved, 0 moved',
-  cDIGEST:'row c-DIGEST pair vs V226: progDigest(buildProgram) equal on every lattice config, the uninjured two included',
-  cMANNY: 'row c-MANNY  MANNY_DIGEST_BY_VERSION[227] exists and === [226] by reference; HALF_MANNY on the artifact prints the era row',
+  bALL:   'cue <=> cap on every live hop of the injured lattice (knee, ankle, hip, lowback, shoulder, elbow at workaround; W3, W5; hop1, hop2, cyc2): the card ends with the cue iff the plan caps the pattern and the cue-free dose carries no RPE',
+  bH1:    'MARIO knee/wa W5 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell split-stance deadlift -> Dumbbell goblet squat ends `{RX8C}`, live == boot',
+  bH2:    'ankle/wa W3 thu Leg superset B: Kettlebell swing (2×8) -> Dumbbell goblet squat (`{RX8C}`) -> Dumbbell split-stance deadlift (`2×8`), live == boot',
+  bH3:    'ankle/wa W3 thu Leg superset B: Kettlebell swing -> Dumbbell goblet squat (cued) -> Nordic hamstring curl (anchored) prints `2 sets — RPE 8 (stop 2 reps short of failure)`, live == boot',
+  cTOAST: 'pair vs V226: the toast on every live hop of the injured lattice is unmoved, 0 moved',
+  cUNINJ: 'pair vs V226: HALF_MANNY and mario_noinj live, boot, toast and undo unmoved, 0 moved',
+  cDIGEST:'pair vs V226: progDigest(buildProgram) equal on every lattice config, the uninjured two included',
+  cMANNY: 'MANNY_DIGEST_BY_VERSION[227] exists and === [226] by reference; HALF_MANNY on the artifact prints the era row',
 };
 
 // ── TYPED ORACLE ─────────────────────────────────────────────────────────────────────────────────────────────────
@@ -213,7 +224,7 @@ const fmt = m => Object.keys(m).sort().map(k => k + ' ' + m[k]).join(' | ') || '
 
 // ── LOAD + VERSION PREDICATE ───────────────────────────────────────────────────────────────────────────────────────
 let IA, STAMP = NaN;
-try { IA = load(ART); STAMP = +IA.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { IA = load(ART); STAMP = +IA.version; } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION !== undefined){
   if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
@@ -235,8 +246,7 @@ R.bH1 = R.bH1.split('{RX8C}').join(RX8C); R.bH2 = R.bH2.split('{RX8C}').join(RX8
 console.log('g227 D190 cue <=> cap + pairs | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | NS ' + NS + ', NU ' + NU);
 if(!(VER >= ERA)){
   console.log('REFUSED: ia-version ' + VER + ' predates D190 P-SWAPSEAM (V' + ERA + '). No row may pass on it.');
-  Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
-  done();
+  failAll('REFUSED');
 }
 // V226 baseline for the pair rows c-TOAST, c-UNINJ, c-DIGEST (V227 slice 10, the V226 slice 7e form of g225_d187_pacerate.js and the g226
 // gates): argv[3] if it reads 226, else `git show <V226_COMMIT>:index.html` into os.tmpdir(), because
@@ -353,7 +363,7 @@ const tag = c => c.ck + ' W' + c.w + ' ' + c.d + ' ' + c.cls + ' ' + c.donor + '
   console.log('    b guard: chains ' + nChains + ', dropped (hop not offered at replay) ' + dropped + ', hops the oracle cues ' + wantCue + ', hops it does not ' + wantNo + ', hops off a cued donor ' + offCued);
   if(bad.length) console.log('    b violations by kind: ' + fmt(tally(bad, b => b.c.ck + '|' + b.p + '|' + (!b.nameOK ? 'name' : b.v.want ? 'cue missing' : b.v.has ? 'cue on an uncued card' : 'cue malformed'))));
   bad.slice(0, 4).forEach(b => console.log('      ' + tag(b.c) + ' hop' + (b.k + 1) + ' [' + b.p + ']: ' + b.st.n + ' :: ' + b.st.d));
-  ok(R.bALL, SELF_C && hops > 0 && wantCue > 0 && wantNo > 0 && offCued > 0 && bad.length === 0, 'violations ' + bad.length + '/' + hops + ' hops on ' + nChains + ' chains (oracle cues ' + wantCue + ', off a cued donor ' + offCued + ')');
+  ok('bALL', R.bALL, SELF_C && hops > 0 && wantCue > 0 && wantNo > 0 && offCued > 0 && bad.length === 0, 'violations ' + bad.length + '/' + hops + ' hops on ' + nChains + ' chains (oracle cues ' + wantCue + ', off a cued donor ' + offCued + ')');
 }
 
 // ── b-HAND-1..3 ───────────────────────────────────────────────────────────────────────────────────────────────────
@@ -363,7 +373,7 @@ for(const h of HANDS){
   const patOK = [h.donor].concat(h.hops).every(n => pat(n) === PAT_TYPED[n]);
   const A = fresh('C'); setup(A, h.ck); boot(A); const d0 = dayOf(A, h.w, h.d); let L = null;
   ((d0 && d0.sections) || []).forEach((s, si) => { if(clean(s.label).indexOf(h.sec) !== 0) return; (s.items || []).forEach((it, ii) => { if(!L && clean(it.name) === h.donor) L = { si, ii }; }); });
-  if(!L){ ok(R[h.key] + ' (setup: ' + h.donor + ' not in ' + h.sec + ' on ' + h.ck + ' W' + h.w + ' ' + h.d + ', fixture moved)', false); continue; }
+  if(!L){ ok(h.key, R[h.key] + ' (setup: ' + h.donor + ' not in ' + h.sec + ' on ' + h.ck + ' W' + h.w + ' ' + h.d + ', fixture moved)', false); continue; }
   const pre = slotOf(d0, L.si, L.ii), got = [];
   for(let k = 1; k <= h.hops.length; k++){
     const X = fresh('C'); setup(X, h.ck); boot(X); let un = 0, toast = '';
@@ -376,13 +386,13 @@ for(const h of HANDS){
   got.forEach((g, k) => console.log('      hop' + (k + 1) + ' -> ' + h.hops[k] + ' | live ' + g.live.n + ' :: ' + g.live.d + ' | boot ' + g.bt.n + ' :: ' + g.bt.d + (g.dayEq ? ' (day == live)' : ' (day != live)') + ' | not offered ' + g.un + ' | toast ' + g.toast));
   const okH = SELF_C && typedOK && patOK && pre.n === h.donor && pre.d === h.donorRx && got.every((g, k) => g.un === 0 && g.live.n === h.hops[k] && g.live.d === h.want[k]
     && g.bt.n === g.live.n && g.bt.d === g.live.d && g.dayEq && (h.toast[k] === null || g.toast === h.toast[k]));
-  ok(R[h.key], okH, got.map((g, k) => 'hop' + (k + 1) + ' live ' + JSON.stringify(g.live.d) + (g.bt.d === g.live.d && g.dayEq ? ' =boot' : ' boot ' + JSON.stringify(g.bt.d))).join(', '));
+  ok(h.key, R[h.key], okH, got.map((g, k) => 'hop' + (k + 1) + ' live ' + JSON.stringify(g.live.d) + (g.bt.d === g.live.d && g.dayEq ? ' =boot' : ' boot ' + JSON.stringify(g.bt.d))).join(', '));
 }
 
 // ── c-TOAST ───────────────────────────────────────────────────────────────────────────────────────────────────────
 {
   const setupNote = B ? '' : ' (setup: no V' + BASE_ERA + ' tree: ' + baseWhy + ')';
-  if(!B) ok(R.cTOAST + setupNote, false);
+  if(!B) ok('cTOAST', R.cTOAST + setupNote, false);
   else {
     let hops = 0, moved = 0, nonEmpty = 0, cueHops = 0; const mv = [], seg = {};
     for(const ck of INJ_CK){ const r = REG(ck);
@@ -435,17 +445,17 @@ for(const h of HANDS){
           }); } }
       console.log('    c-TOAST D193 R8 (V' + VER + '): moved ' + mvK + ' by hand kind ' + fmt(kinds) + ' | hand clamp pairs ' + clampK + ', without the hold sentence ' + missK + ' | moved and not the hold variant on a hand clamp pair ' + badK);
       exK.forEach(s => console.log('      ' + s));
-      ok(R.cTOAST + ' [V229 D193 R8, D194 Amendment 1 (r) / Amendment 3: moved ' + mvK + ' == pin ' + D193_CTOAST_PIN + ', every one the hold variant on a hand clamp pair (not ' + badK + '), hand clamp pairs ' + clampK + ' without the hold ' + missK + ']',
+      ok('cTOAST', R.cTOAST + ' [V229 D193 R8, D194 Amendment 1 (r) / Amendment 3: moved ' + mvK + ' == pin ' + D193_CTOAST_PIN + ', every one the hold variant on a hand clamp pair (not ' + badK + '), hand clamp pairs ' + clampK + ' without the hold ' + missK + ']',
         SELF_C && SELF_B && PAIRSELF && hops > 0 && nonEmpty > 0 && cueHops > 0 && moved === mvK && badK === 0 && missK === 0 && mvK === D193_CTOAST_PIN,
         'toasts moved ' + moved + '/' + hops + ' hops (pin ' + D193_CTOAST_PIN + '), not a hold variant on a hand clamp pair ' + badK + ', hand clamp pairs without the hold ' + missK);
     }
-    else ok(R.cTOAST, SELF_C && SELF_B && PAIRSELF && hops > 0 && nonEmpty > 0 && cueHops > 0 && moved === 0, 'toasts moved ' + moved + '/' + hops + ' hops');
+    else ok('cTOAST', R.cTOAST, SELF_C && SELF_B && PAIRSELF && hops > 0 && nonEmpty > 0 && cueHops > 0 && moved === 0, 'toasts moved ' + moved + '/' + hops + ' hops');
   }
 }
 // ── c-UNINJ ───────────────────────────────────────────────────────────────────────────────────────────────────────
 {
   const setupNote = B ? '' : ' (setup: no V' + BASE_ERA + ' tree: ' + baseWhy + ')';
-  if(!B) ok(R.cUNINJ + setupNote, false);
+  if(!B) ok('cUNINJ', R.cUNINJ + setupNote, false);
   else {
     const F = ['unreach', 'steps', 'toasts', 'live', 'boot', 'chip', 'undoToast', 'undoSlot', 'undoSig', 'undoBoot'];
     let n = 0, moved = 0, liveMoved = 0, undos = 0, replays = 0; const mv = [], line = [];
@@ -467,11 +477,11 @@ for(const h of HANDS){
       const pinOK = UNINJ_CK.every(ck => POP[ck].length === UNINJ_PIN[ck].n && mvOf(ck).length === UNINJ_PIN[ck].moved);
       console.log('    c-UNINJ V231 (A-1): moved by chain day ' + fmt(tally(mv, m => m.c.ck + ' W' + m.c.w + ' ' + m.c.d)) + ' | moved off W3 tue / W5 tue ' + offDay.length + ' | typed pins ' + UNINJ_CK.map(ck => ck + ' ' + UNINJ_PIN[ck].moved + '/' + UNINJ_PIN[ck].n).join(', '));
       offDay.slice(0, 3).forEach(m => console.log('      off-day move: ' + tag(m.c) + ' fields ' + m.diff.join(',')));
-      ok(R.cUNINJ + ' [V231 A-1: mario_noinj ' + UNINJ_PIN.mario_noinj.moved + ' of ' + UNINJ_PIN.mario_noinj.n + ', manny ' + UNINJ_PIN.manny.moved + ' of ' + UNINJ_PIN.manny.n + ', every move on W3 tue or W5 tue]',
+      ok('cUNINJ', R.cUNINJ + ' [V231 A-1: mario_noinj ' + UNINJ_PIN.mario_noinj.moved + ' of ' + UNINJ_PIN.mario_noinj.n + ', manny ' + UNINJ_PIN.manny.moved + ' of ' + UNINJ_PIN.manny.n + ', every move on W3 tue or W5 tue]',
         SELF_C && SELF_B && PAIRSELF && n > 0 && liveMoved > 0 && undos > 0 && replays > 0 && pinOK && offDay.length === 0 && moved === UNINJ_PIN.manny.moved + UNINJ_PIN.mario_noinj.moved,
         UNINJ_CK.map(ck => ck + ' moved ' + mvOf(ck).length + '/' + POP[ck].length).join(', ') + ', off W3 tue / W5 tue ' + offDay.length);
     }
-    else ok(R.cUNINJ, SELF_C && SELF_B && PAIRSELF && n > 0 && liveMoved > 0 && undos > 0 && replays > 0 && moved === 0, 'moved ' + moved + '/' + n + ' chains (live, boot, toast, undo, undo-boot)');
+    else ok('cUNINJ', R.cUNINJ, SELF_C && SELF_B && PAIRSELF && n > 0 && liveMoved > 0 && undos > 0 && replays > 0 && moved === 0, 'moved ' + moved + '/' + n + ' chains (live, boot, toast, undo, undo-boot)');
   }
 }
 // ── c-DIGEST ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -481,7 +491,7 @@ for(const h of HANDS){
   for(const T of TREES){ DG[T] = {}; for(const ck of Object.keys(CFGS)){
     const a = progDigest(fresh(T).buildProgram(clone(CFGS[ck]))), b = progDigest(fresh(T).buildProgram(clone(CFGS[ck]))); DG[T][ck] = a === b ? a : 'SELF-MISMATCH ' + a + '/' + b; } }
   Object.keys(CFGS).forEach(ck => console.log('    c-DIGEST ' + ck.padEnd(12) + ' now ' + DG.C[ck] + (B ? '  V' + BASE_ERA + ' ' + DG.B[ck] : '')));
-  if(!B) ok(R.cDIGEST + setupNote, false);
+  if(!B) ok('cDIGEST', R.cDIGEST + setupNote, false);
   else {
     // V228 D193 R1 (split), class (i): at VER >= 228 the six injured configs are licensed to move by the cue word only and
     // read against measure's hand table (tests/measure/v228_cdigest.out.txt: V227 output with the word substituted, hashed
@@ -496,7 +506,7 @@ for(const h of HANDS){
     const wantOf = ck => (VER >= V231_ERA && ck === 'manny') ? mannyWant : (VER >= 228 && Object.prototype.hasOwnProperty.call(D193_DIGEST, ck)) ? D193_DIGEST[ck] : DG.B[ck];
     if(VER >= 228) console.log('    c-DIGEST at ' + VER + ': ' + Object.keys(D193_DIGEST).map(ck => ck + ' want ' + D193_DIGEST[ck]).join(', ') + ' (D193 class (i), measure); ' + (VER >= V231_ERA ? 'manny wants MANNY_DIGEST_BY_VERSION[' + VER + '] ' + mannyWant + ' (V231 A-1, standing ruling 5; V' + BASE_ERA + ' reads ' + DG.B.manny + '), mario_noinj wants V' + BASE_ERA : 'manny, mario_noinj want V' + BASE_ERA));
     const eq = Object.keys(CFGS).filter(ck => !/SELF/.test(DG.C[ck]) && !/SELF/.test(DG.B[ck]) && DG.C[ck] === wantOf(ck)).length;
-    ok(R.cDIGEST + (VER >= 228 ? ' (at 228 and above: the six injured against the D193 class (i) table)' : '') + (VER >= V231_ERA ? ' (at 231 and above: manny against MANNY_DIGEST_BY_VERSION[' + VER + '], V231 A-1)' : ''), eq === Object.keys(CFGS).length, eq + '/' + Object.keys(CFGS).length + ' configs equal'); }
+    ok('cDIGEST', R.cDIGEST + (VER >= 228 ? ' (at 228 and above: the six injured against the D193 class (i) table)' : '') + (VER >= V231_ERA ? ' (at 231 and above: manny against MANNY_DIGEST_BY_VERSION[' + VER + '], V231 A-1)' : ''), eq === Object.keys(CFGS).length, eq + '/' + Object.keys(CFGS).length + ' configs equal'); }
 }
 // ── c-MANNY (standing ruling 5) ───────────────────────────────────────────────────────────────────────────────────
 {
@@ -506,7 +516,7 @@ for(const h of HANDS){
   const built = progDigest(load(ART).buildProgram(clone(fixtures.HALF_MANNY)));            // the harness way (real clock)
   const builtPin = progDigest(fresh('C').buildProgram(clone(fixtures.HALF_MANNY)));        // and with the gate's pinned clock
   console.log('    c-MANNY MANNY_DIGEST_BY_VERSION[' + ERA + '] ' + (has ? MD[ERA] : 'ABSENT') + ', [' + BASE_ERA + '] ' + MD[BASE_ERA] + ', [' + VER + '] ' + row + ' | HALF_MANNY built ' + built + ', pinned ' + builtPin);
-  ok(R.cMANNY + (has ? '' : ' (row MANNY_DIGEST_BY_VERSION[' + ERA + '] ABSENT)'), has && ref && typeof row === 'string' && built === row && builtPin === row,
+  ok('cMANNY', R.cMANNY + (has ? '' : ' (row MANNY_DIGEST_BY_VERSION[' + ERA + '] ABSENT)'), has && ref && typeof row === 'string' && built === row && builtPin === row,
     '[' + ERA + ']' + (ref ? '===' : '!==') + '[' + BASE_ERA + '], HALF_MANNY ' + built + (built === row ? ' == ' : ' != ') + '[' + VER + ']');
 }
 done();

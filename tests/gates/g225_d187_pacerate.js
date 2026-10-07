@@ -1,8 +1,8 @@
 // g225_d187_pacerate.js — GATE for D187 (P-PACERATE): the rate is a planning number with one
 // owner, {3,3,2}, the mile is required on non-beginner run_pace_goal, and no string calls a rate safe.
 //
-//   node tests/gates/g225_d187_pacerate.js <candidate.html> [baseline_V224.html]
-//   IA_ASSUME_VERSION=225 node tests/gates/g225_d187_pacerate.js <tree stamped 224> [baseline_V224.html]  (discrimination)
+//   node tests/gates/g225_d187_pacerate.js <candidate.html>
+//   IA_ASSUME_VERSION=225 node tests/gates/g225_d187_pacerate.js <tree stamped 224>  (discrimination)
 //
 // THE RULING THIS DEFENDS: tests/measure/v225_rulings/d186_d187_pacerate_clockend_v225.md, D187 section
 // (Finding, R1-R5, "What deliberately does NOT change", dispatch edit list (d)). D-code D187.
@@ -18,69 +18,54 @@
 //                 separately, in the runtime MILE-REQUIRED / confinement section below, as a second witness).
 //   MILE-REQUIRED _mileEntryState called directly with a bare {id} goal object and an experience string —
 //                 never through doGenerate's toast (that's D110a's own model, already gated).
-//   CONFINEMENT   whole-program digests from TWO different artifacts (candidate vs baseline), the only way
-//                 to prove NOTHING moved on a goal type this ruling does not touch.
+//   CONFINEMENT   (candidate vs a V224/V225 baseline, digest per goal; D187 V225, D189 Class B V226, scoped to 230 and
+//                 below by the V231 absorb ruling section 3) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 //
 // VERSION PREDICATE (standing rulings 2 and 4). D187 ships at 225.
 //   below 225   REFUSED, every row FAILS by name.
 //   225 and up  every row asserts.
-//   231 and up  CONFINEMENT is SCOPED to its era (tests/measure/v231_rulings/v231_absorb_ruling.md section 3; standing
-//               rulings 2 and 4): it asserts at 225 (V224 equality) and at 226 to 230 (D189 Class B). D195 moves the run
-//               cells (the ruling prints 4 programs, 38 days moved, ops A-1 38, B-1 6, 0 other), so "nothing moved on a
-//               goal this ruling does not touch" belongs to the builds before it. At 231 and up the row prints one
-//               named SKIP line at column 0, never PASS and never FAIL, resolves no baseline, and names the successors
-//               g231_d195b_cost D195-B-b and g231_d195_hipext D195-A-b. Every other row asserts as before.
 //   IA_ASSUME_VERSION=225 lifts a file stamped exactly 224 to 225 for a discrimination run (not a ship proof).
 'use strict';
-const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
+const path = require('path');
 const H = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
-const BASEFILE = process.argv[3] ? path.resolve(process.argv[3]) : null;
 const ERA = 225;
-// D189 P-PACEDISCLOSE (V226) Class B re-keys CONFINEMENT from 226 (standing rulings 2 and 4): run_base's one
-// W1 note gains the S1 suffix. <= 225 keeps the byte-identical digest row.
-const D189_ERA = 226;
-// V231 absorb ruling section 3 (g225_d187:272 CONFINEMENT SCOPE): CONFINEMENT asserts below 231 only.
-const V231_ERA = 231;
-// CONFINEMENT baseline (V226 slice 7e): tests/sabotage.py passes no argv[3], so a baseline read only from argv
-// failed closed on the control and made every mutation on this gate trip. The baseline is now resolved by era:
-// argv[3] if it reads the wanted version, else `git show <pinned commit>:index.html` into os.tmpdir().
-// Era 225 wants V224 (the D187 confinement baseline); era 226+ wants V225 (D189 Class B's before-state).
-const V224_COMMIT = '7b61da8d66da290186bb27236af63d0eff3d33dd';   // V224: D185 P-WCTODAY
-const V225_COMMIT = '35919943d766606dcbf5e09c98a08b5782dc2223';   // V225: D186/D187
 
-let pass = 0, fail = 0;
+// Rows print through tests/status.js (CLAUDE.md Proof scope, Row manifest): one status line per declared id, one
+// summary. The ids take each row's existing family name: CENSUS1..3, RATE1, COPY1..2, MILE1..3 (MILE-REQUIRED).
+const S = require('../status')('g225_d187_pacerate.js');
 const t0 = Date.now();
-const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l + (g === undefined ? '' : ' (' + g + ')')); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
-const done = () => { console.log('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s'); console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
+const ROWS = {
+  CENSUS1: 'CENSUS PACE_IMPROVE declared exactly once',
+  CENSUS2: 'CENSUS old {3,5,7} literal table: 0 occurrences (comment-stripped)',
+  CENSUS3: 'CENSUS PACE_IMPROVE read at the expected reader-site count',
+  RATE1: 'RATE PACE_IMPROVE deep-equals {beginner:3, intermediate:3, advanced:2}',
+  COPY1: 'COPY run SI note template: no "safe rate" / "safely"',
+  COPY2: 'COPY swim INT note template: no "safe rate" / "safely"',
+  MILE1: 'MILE-REQUIRED non-beginner run_pace_goal, blank mile: refused',
+  MILE2: 'MILE-REQUIRED non-beginner NON-pace run goal, blank mile: unaffected',
+  MILE3: 'MILE-REQUIRED beginner run_pace_goal, blank mile: unaffected (byte-identical beginner path)',
+};
+const ROW_IDS = Object.keys(ROWS);
+S.declare(ROW_IDS);
+const ok = (id, c, g) => c ? S.pass(id, ROWS[id] + (g === undefined ? '' : ' (' + g + ')')) : S.fail(id, ROWS[id], g === undefined ? '' : 'got ' + g);
+const done = () => { console.log('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s'); S.summary(); };
+const failAll = (why, detail) => { for(const id of ROW_IDS) S.fail(id, ROWS[id] + ' (' + why + ')', detail); done(); };
 
 let STAMP = NaN;
-try { STAMP = +H.load(ART).version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { STAMP = +H.load(ART).version; } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
   VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 } else if(process.env.IA_ASSUME_VERSION !== undefined){
   console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-console.log('g225 D187 pacerate | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + (BASEFILE ? ' | argv baseline ' + BASEFILE : ' | no argv baseline (CONFINEMENT pulls its pinned commit)'));
+console.log('g225 D187 pacerate | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
 
-const ROW_LABELS = [
-  'CENSUS PACE_IMPROVE declared exactly once',
-  'CENSUS old {3,5,7} literal table: 0 occurrences (comment-stripped)',
-  'CENSUS PACE_IMPROVE read at the expected reader-site count',
-  'RATE PACE_IMPROVE deep-equals {beginner:3, intermediate:3, advanced:2}',
-  'COPY run SI note template: no "safe rate" / "safely"',
-  'COPY swim INT note template: no "safe rate" / "safely"',
-  'MILE-REQUIRED non-beginner run_pace_goal, blank mile: refused',
-  'MILE-REQUIRED non-beginner NON-pace run goal, blank mile: unaffected',
-  'MILE-REQUIRED beginner run_pace_goal, blank mile: unaffected (byte-identical beginner path)',
-  'CONFINEMENT 0 digest diffs on every non-pace-goal cell (swim/bike/run_base/NRC)',
-];
 if(!(VER >= ERA)){
   console.log('REFUSED: ia-version ' + VER + ' predates D187 P-PACERATE (V' + ERA + '). No row may pass on it.');
-  ROW_LABELS.forEach(l => ok(l + ' (REFUSED)', false));
-  done();
+  failAll('REFUSED');
 }
 
 // ── comment stripper (lifted verbatim from tests/gates/g221_d178_active.js / g223_d183_safepace.js) ──
@@ -127,11 +112,11 @@ const CS = stripComments(IA.js);   // comment-stripped source, the census oracle
 // ── CENSUS ──
 {
   const declMatches = (CS.match(/\bPACE_IMPROVE\s*=\s*\{/g) || []).length;
-  ok(ROW_LABELS[0], declMatches === 1, declMatches);
+  ok('CENSUS1', declMatches === 1, declMatches);
 }
 {
   const oldTable = (CS.match(/\{beginner\s*:\s*3\s*,\s*intermediate\s*:\s*5\s*,\s*advanced\s*:\s*7\s*\}/g) || []).length;
-  ok(ROW_LABELS[1], oldTable === 0, oldTable);
+  ok('CENSUS2', oldTable === 0, oldTable);
 }
 {
   // Every occurrence of the identifier PACE_IMPROVE minus the one declaration is a reader site.
@@ -141,7 +126,7 @@ const CS = stripComments(IA.js);   // comment-stripped source, the census oracle
   // LINE may use the identifier more than once (e.g. `PACE_IMPROVE[exp] || PACE_IMPROVE.intermediate`), so
   // the ruled count is the number of INDEPENDENT USE SITES (lines), not the raw token count.
   const readerLines = (CS.match(/[^\n]*\bPACE_IMPROVE\b[^\n]*/g) || []).filter(l => !/\bPACE_IMPROVE\s*=\s*\{/.test(l));
-  ok(ROW_LABELS[2], readerLines.length === 4, 'reader lines ' + readerLines.length + ' (raw token occurrences beyond the declaration: ' + readers + ')');
+  ok('CENSUS3', readerLines.length === 4, 'reader lines ' + readerLines.length + ' (raw token occurrences beyond the declaration: ' + readers + ')');
 }
 
 // ── RATE ──
@@ -150,7 +135,7 @@ const CS = stripComments(IA.js);   // comment-stripped source, the census oracle
   try { rate = JSON.parse(IA.eval('JSON.stringify(PACE_IMPROVE)')); } catch(e){ err = e.message; }
   const want = { beginner: 3, intermediate: 3, advanced: 2 };
   const eq = rate && Object.keys(want).every(k => rate[k] === want[k]) && Object.keys(rate || {}).length === 3;
-  ok(ROW_LABELS[3], eq, err || JSON.stringify(rate));
+  ok('RATE1', eq, err || JSON.stringify(rate));
 }
 
 // ── COPY (source-level: the two note-template string literals) ──
@@ -161,13 +146,13 @@ const CS = stripComments(IA.js);   // comment-stripped source, the census oracle
   const runTplMatch = CS.match(/note\s*=\s*`SI: Pace moves[^`]*`/) || CS.match(/note\s*=\s*_sameFmt[\s\S]{0,800}?Hit the prescribed pace precisely\.`;/);
   const runTpl = runTplMatch ? runTplMatch[0] : '';
   const bad = /safe rate|safely/i.test(runTpl);
-  ok(ROW_LABELS[4], !!runTpl && !bad, runTpl ? (bad ? 'template contains a banned phrase' : 'clean, ' + runTpl.length + ' chars') : 'template not found');
+  ok('COPY1', !!runTpl && !bad, runTpl ? (bad ? 'template contains a banned phrase' : 'clean, ' + runTpl.length + ' chars') : 'template not found');
 }
 {
   const swimTplMatch = CS.match(/note\s*=\s*_anchorLine\s*\+\s*`INT: Split moves[^`]*`/);
   const swimTpl = swimTplMatch ? swimTplMatch[0] : '';
   const bad = /safe rate|safely/i.test(swimTpl);
-  ok(ROW_LABELS[5], !!swimTpl && !bad, swimTpl ? (bad ? 'template contains a banned phrase' : 'clean, ' + swimTpl.length + ' chars') : 'template not found');
+  ok('COPY2', !!swimTpl && !bad, swimTpl ? (bad ? 'template contains a banned phrase' : 'clean, ' + swimTpl.length + ' chars') : 'template not found');
 }
 
 // ── MILE-REQUIRED (direct function calls, D110a's model, no wizard/doGenerate needed) ──
@@ -175,115 +160,13 @@ const CS = stripComments(IA.js);   // comment-stripped source, the census oracle
   const J = v => JSON.stringify(v);
   const call = (g, exp) => { try { return JSON.parse(IA.eval('JSON.stringify(_mileEntryState(' + J(g) + ',' + J(exp) + '))')); } catch(e){ return { crash: e.message }; } };
   const r1 = call({ id: 'run_pace_goal' }, 'intermediate');
-  ok(ROW_LABELS[6], r1 && r1.ok === false && r1.blank === true, JSON.stringify(r1));
+  ok('MILE1', r1 && r1.ok === false && r1.blank === true, JSON.stringify(r1));
   const r2 = call({ id: 'run_5k' }, 'intermediate');
-  ok(ROW_LABELS[7], r2 && r2.ok === true, JSON.stringify(r2));
+  ok('MILE2', r2 && r2.ok === true, JSON.stringify(r2));
   const r3 = call({ id: 'run_pace_goal' }, 'beginner');
-  ok(ROW_LABELS[8], r3 && r3.ok === true, JSON.stringify(r3));
+  ok('MILE3', r3 && r3.ok === true, JSON.stringify(r3));
 }
 
-// ── CONFINEMENT (needs a baseline artifact: candidate vs V224, byte-identical digest per goal) ──
-// V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g225_d187:272 CONFINEMENT SCOPE; standing rulings
-// 2 and 4): at 231 and up one named SKIP line at column 0, never PASS and never FAIL; below 231 the block runs as before.
-if(VER >= V231_ERA) console.log('SKIP CONFINEMENT D189 era (strip the S1 suffix and every cell equals the baseline V225, swim/bike/run_base/NRC): scoped to ia-version 226 to 230 by the V231 absorb ruling (' + 'tests/measure/v231_rulings/v231_absorb_ruling.md section 3); D195 moves the run cells (the ruling prints 4 programs, 38 days moved, ops A-1 38, B-1 6); successors g231_d195b_cost D195-B-b, g231_d195_hipext D195-A-b. Never PASS, never FAIL.');
-else {
-  const WANT_BASE = VER >= D189_ERA ? 225 : 224;
-  const PIN = WANT_BASE === 225 ? V225_COMMIT : V224_COMMIT;
-  let BASE = null, baseWhy = '';
-  if(BASEFILE){
-    if(!fs.existsSync(BASEFILE)) baseWhy = 'argv baseline missing; ';
-    else { try { const b = H.load(BASEFILE); if(+b.version === WANT_BASE){ BASE = b; baseWhy = 'argv ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not ' + WANT_BASE + '; '; } catch(e){ baseWhy = 'argv baseline failed to boot: ' + e.message + '; '; } }
-  }
-  if(!BASE){
-    const f = path.join(os.tmpdir(), 'g225_d187_v' + WANT_BASE + '_' + process.pid + '.html');
-    try {
-      try { fs.unlinkSync(f); } catch(e){}
-      fs.writeFileSync(f, cp.execFileSync('git', ['-C', ROOT, 'show', PIN + ':index.html'], { maxBuffer: 1 << 27 }));
-      const b = H.load(f); if(+b.version === WANT_BASE){ BASE = b; baseWhy += 'git ' + PIN.slice(0, 7); } else baseWhy += 'git copy reads ' + b.version;
-    } catch(e){ baseWhy += 'git show failed: ' + String(e.message).slice(0, 80); }
-    try { fs.unlinkSync(f); } catch(e){}
-  }
-  console.log('  CONFINEMENT baseline: ' + (BASE ? 'V' + WANT_BASE + ' from ' + baseWhy : 'UNAVAILABLE (' + baseWhy + ')'));
-  if(!BASE){
-    ok(ROW_LABELS[9], false, 'no V' + WANT_BASE + ' baseline (fail closed, not a silent pass): ' + baseWhy);
-  } else {
-    const CFG0 = Object.assign(JSON.parse(JSON.stringify(H.fixtures.HALF_MANNY)), {});
-    const goalCfgs = {
-      swim_100_time: { cardioTypes: ['swim'], cardioGoals: { swim: { id: 'swim_100_time', swimUnit: 'yd', baseMins: '1', baseSecs: '10', base500Mins: '7', base500Secs: '0' } } },
-      swim_500_time: { cardioTypes: ['swim'], cardioGoals: { swim: { id: 'swim_500_time', swimUnit: 'yd', baseMins: '7', baseSecs: '0' } } },
-      bike_ftp: { cardioTypes: ['bike'], cardioGoals: { bike: { id: 'bike_ftp', label: 'Improve FTP / Power' } } },
-      run_base: { cardioTypes: ['run'], cardioGoals: { run: { id: 'run_base', label: 'Build Running Base', baselineDist: '3', baseline: '3mi' } } },
-      run_5k: { cardioTypes: ['run'], cardioGoals: { run: { id: 'run_5k', label: '5K', mileBestMins: '8', mileBestSecs: '0' } } },
-      run_half: { cardioTypes: ['run'], cardioGoals: { run: { id: 'run_half', label: 'Half Marathon', mileBestMins: '10', mileBestSecs: '30', baselineDist: '5', baseline: '5mi' } } },
-      run_marathon: { cardioTypes: ['run'], cardioGoals: { run: { id: 'run_marathon', label: 'Marathon', mileBestMins: '10', mileBestSecs: '30', baselineDist: '5', baseline: '5mi' } } },
-    };
-    if(VER < D189_ERA){
-    const diffs = [];
-    for(const [goalId, over] of Object.entries(goalCfgs)){
-      const cfg = Object.assign(JSON.parse(JSON.stringify(CFG0)), over);
-      let dA = null, dB = null, err = null;
-      try { dA = H.progDigest(IA.buildProgram(JSON.parse(JSON.stringify(cfg)))); } catch(e){ err = 'candidate: ' + e.message; }
-      try { dB = H.progDigest(BASE.buildProgram(JSON.parse(JSON.stringify(cfg)))); } catch(e){ err = (err ? err + '; ' : '') + 'baseline: ' + e.message; }
-      if(err) diffs.push(goalId + ' CRASH ' + err);
-      else if(dA !== dB) diffs.push(goalId + ' candidate ' + dA + ' != baseline ' + dB);
-    }
-    ok(ROW_LABELS[9], diffs.length === 0, diffs.join(' | ') || (Object.keys(goalCfgs).length + ' goal types identical'));
-    } else {
-    // ERA ROW (standing rulings 2 and 4), keyed to D189 P-PACEDISCLOSE Class B (tests/measure/v226_rulings/
-    // d188_d189_ruling.md): from 226 every no-mile program gains the S1 suffix on ONE W1 run card's note
-    // and nothing else on the grid moves. Of these seven cells only run_base carries no mile (HALF_MANNY is
-    // intermediate), so the hand expectation is: run_base carries exactly one S1 suffix, on a week 1 note,
-    // after a non-empty prefix and one space; every other cell carries none. Strip it and each program equals
-    // the baseline's. The suffix is typed from the ruling's Copy section (S1) at the intermediate level,
-    // never read from the engine. The strip runs on both sides, so a baseline at 226 or later (which carries
-    // the note too) compares like for like; a baseline at 225 or earlier must carry none. Seed pinned by
-    // HALF_MANNY, clock fields stripped by progDigest, the baseline proven equal to itself before the diff,
-    // and an empty pre-strip diff on run_base against a pre-226 baseline is a failure.
-    const S1_SUFFIX = 'Paces here start from a 9:30 mile, the intermediate default. Tap the pencil on your program card to enter your mile time. Every run ahead of you rebuilds off it.';
-    const S1_CELLS = { run_base: 1 };
-    const BASE_VER = +BASE.version;
-    const s1Strip = prog => {
-      const hits = [];
-      (function walk(o, pth){
-        if(!o || typeof o !== 'object') return;
-        for(const k of Object.keys(o)){
-          const v = o[k], p = pth.concat(k);
-          if(typeof v === 'string'){ if(v.indexOf(S1_SUFFIX) >= 0) hits.push({ o, k, p, v }); }
-          else walk(v, p);
-        }
-      })(prog, []);
-      const bad = [];
-      for(const h of hits){
-        const placed = h.p[0] === 'weeks' && h.p[1] === '1' && h.k === 'note'
-          && h.v.length > S1_SUFFIX.length + 1 && h.v.slice(-(S1_SUFFIX.length + 1)) === ' ' + S1_SUFFIX;
-        if(!placed) bad.push(h.p.join('.') + ' = ' + JSON.stringify(h.v.slice(0, 90)));
-        else h.o[h.k] = h.v.slice(0, h.v.length - S1_SUFFIX.length - 1);
-      }
-      return { n: hits.length, bad, where: hits.map(h => h.p.join('.')) };
-    };
-    const diffs = [], moved = [];
-    for(const [goalId, over] of Object.entries(goalCfgs)){
-      const cfg = Object.assign(JSON.parse(JSON.stringify(CFG0)), over);
-      let pA = null, pB = null, pB2 = null, err = null;
-      try { pA = IA.buildProgram(JSON.parse(JSON.stringify(cfg))); } catch(e){ err = 'candidate: ' + e.message; }
-      try { pB = BASE.buildProgram(JSON.parse(JSON.stringify(cfg))); pB2 = BASE.buildProgram(JSON.parse(JSON.stringify(cfg))); } catch(e){ err = (err ? err + '; ' : '') + 'baseline: ' + e.message; }
-      if(err){ diffs.push(goalId + ' CRASH ' + err); continue; }
-      if(H.progDigest(pB) !== H.progDigest(pB2)){ diffs.push(goalId + ' the baseline does not equal itself'); continue; }
-      const want = S1_CELLS[goalId] || 0, wantB = BASE_VER >= D189_ERA ? want : 0;
-      const dA0 = H.progDigest(pA), dB0 = H.progDigest(pB);
-      const sA = s1Strip(pA), sB = s1Strip(pB);
-      if(sA.n !== want) diffs.push(goalId + ' candidate carries ' + sA.n + ' S1 suffix(es), want ' + want + (sA.where.length ? ' (' + sA.where.join(', ') + ')' : ''));
-      if(sB.n !== wantB) diffs.push(goalId + ' baseline V' + BASE_VER + ' carries ' + sB.n + ' S1 suffix(es), want ' + wantB);
-      sA.bad.concat(sB.bad).forEach(b => diffs.push(goalId + ' S1 off its ruled place (a W1 note, after a prefix): ' + b));
-      if(want && !wantB && dA0 === dB0) diffs.push(goalId + ' empty diff before the strip: the S1 note never moved the program');
-      const dA = H.progDigest(pA), dB = H.progDigest(pB);
-      if(dA !== dB) diffs.push(goalId + ' after the S1 strip candidate ' + dA + ' != baseline ' + dB);
-      else if(want) moved.push(goalId + ' ' + dA0 + ' -> strip at ' + sA.where.join(', ') + ' -> ' + dA);
-    }
-    ok('CONFINEMENT D189 era (ia-version ' + VER + ' >= ' + D189_ERA + ', Class B): strip the S1 suffix from the one W1 note and every cell equals the baseline V' + BASE_VER + ' (swim/bike/run_base/NRC)',
-       diffs.length === 0, diffs.join(' | ') || (Object.keys(goalCfgs).length + ' goal types identical after the strip; ' + moved.join('; ')));
-    }
-  }
-}
+// CONFINEMENT (candidate vs V224/V225, D187 V225 and D189 Class B V226; V231 absorb ruling section 3) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 
 done();

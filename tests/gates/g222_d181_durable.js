@@ -69,16 +69,14 @@
 //   INFO (never counts): a rest-day-moved, snapshotted, swapped day on both trees (the second re-ruling's first carried
 //        unknown): snapshot at the origin, and snapshot at the destination. Printed, not asserted.
 'use strict';
-const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
+const path = require('path');
 const { load, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
-const BASEFILE = process.argv[3] || null;
-const ERA = 222, BASE_ERA = 221, V221_COMMIT = '57b9dee80269743a40b350aa399351661dd9c06b';
+const ERA = 222;
 let pass = 0, fail = 0, skip = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l + (g === undefined ? '' : ' (' + g + ')')); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
-const skipRow = (l, why) => { skip++; console.log('SKIP ' + l + ': ' + why); };
 const done = () => { console.log('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
 
 // ── HAND ORACLE ──────────────────────────────────────────────────────────────
@@ -91,13 +89,7 @@ const ADDN = 'Dumbbell hammer curl', ADDSWAP = 'Dumbbell biceps curl';
 // Date arithmetic. 2026-08-24 is a Monday; a day's program week is floor(days since start / 7) + 1.
 const START = '2026-08-24', W = 5, D = 'thu';
 const CLOCKS = { future_prevwk:'2026-09-17', future_samewk:'2026-09-21', today:'2026-09-24', past_samewk:'2026-09-26', past_nextwk:'2026-09-29' };
-const dayNum = iso => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) / 864e5;
-const handWeek = iso => Math.floor((dayNum(iso) - dayNum(START)) / 7) + 1;
 const HAND_W5THU = '2026-09-24';
-// D108's cut, typed: max(current week, +1 when the current week is touched; highest touched week + 1).
-const handCut = (clockIso, touchedWeeks) => { const cw = handWeek(clockIso), mx = Math.max(0, ...touchedWeeks);
-  return Math.max(cw + (touchedWeeks.includes(cw) ? 1 : 0), mx + 1); };
-const HAND_CUT = { tick_w5thu:handCut(CLOCKS.today, [5]), tick_w3tue:handCut(CLOCKS.today, [3]) };   // 6 and 5
 
 // ── FIXTURES ─────────────────────────────────────────────────────────────────
 const clean = s => String(s || '').replace(/<svg[\s\S]*?<\/svg>\s*/g, '').trim();
@@ -107,17 +99,6 @@ function MARIO(){ return { name:'M', primaryPath:'lift', cardioTypes:[], cardioG
   liftingFocus:'support_strength', experience:'beginner', ageBracket:'18-35', equipment:'commercial', unit:'lbs',
   restDays:['sun','wed'], days:['sun','mon','tue','wed','thu','fri','sat'], bench:135, squat:155, deadlift:185, seed:76308,
   injury:{ region:'knee', tier:'workaround' } }; }
-function mk(t, f, x, g, i, seed){
-  const race = !!g.id && /half/.test(g.id);
-  return { name:'M', primaryPath:g.id ? (race ? 'event' : 'cardio') : 'lift', cardioTypes:g.id ? ['run'] : [],
-    cardioGoals:g.id ? { run:{ id:g.id, label:g.k, mileBestMins:'10', mileBestSecs:'30', baselineDist:'5', baseline:'5mi', targetDist:'1.5', targetMins:'11', targetSecs:'0' } } : {},
-    eventTargeted:race, raceDate:race ? '2026-12-06' : null, liftingFocus:f, experience:x, ageBracket:'18-35', equipment:t, unit:'lbs',
-    restDays:['sun', 'wed'], days:['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'], bench:135, squat:155, deadlift:185, seed, ...(i.v ? { injury:i.v } : {}) };
-}
-const LO = { k:'liftonly', id:null }, HALF = { k:'half', id:'run_half' };
-const L7 = [MARIO()];
-for(const t of ['commercial', 'home_full', 'crossfit', 'home_basic', 'bodyweight', 'minimal']) for(const f of ['support_prevention', 'support_strength', 'hypertrophy', 'strength'])
-  for(const g of [LO, HALF]) for(const i of [{ v:null }, { v:{ region:'knee', tier:'workaround' } }]) L7.push(mk(t, f, 'beginner', g, i, 76308));
 
 // ── ROWS (static, so a refused era fails every one by name) ──────────────────
 const R = {
@@ -130,9 +111,6 @@ const R = {
   R4d:'4d CONTROL (passes on V221 too): M3 double-apply 0/42 (the COPY shape reads 6/42)',
   R5s:'5s M4 snapshotted day, box -> goblet -> leg press, touch first/between/last: boot1 `' + LP + ' :: ' + EXPLP + '` chip goblet, undo -> goblet 4×8–12, chip box, undo -> box 4×3, record gone, each surviving a boot 3/3 (V221 0/3)',
   R6a:'6a CONTROL, must-not (a) (passes on V221 too): a swap or an undo on an untouched day writes no ia_hist_ and leaves the freeze cut unchanged, 0/36',
-  R6b:'6b PAIR CONTROL, must-not (b) (invariance: same day on both trees by design): a knee/workaround overlay added after a swap on an untrained W5 Thu still pierces it, the swap stands, no ia_hist_, same day on candidate and V221',
-  R6c:'6c PAIR CONTROL, must-not (c) (invariance: same on both trees by design): a trained day with no swap boots byte-identical on candidate and V221 and equal to its snapshot; a tick-only day\'s cut equals V221\'s and the hand cut (' + HAND_CUT.tick_w5thu + ', ' + HAND_CUT.tick_w3tue + ')',
-  R7: '7 PAIR CONTROL (invariance: nothing in buildProgram): 0 engine cards differ, candidate vs V221, over ' + L7.length + ' configs (V221 equals itself); HALF_MANNY digest equals MANNY_DIGEST_BY_VERSION[ia-version]',
   R10:'10 the record on a hist-restored day survives the boot byte-unchanged and the undo chip is offered, 7 shapes (V221 0/7, pruned)',
 };
 
@@ -150,28 +128,7 @@ if(!(VER >= ERA)){
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();
 }
-// HALF_MANNY first, on an unpinned clock, exactly as the harness prints it.
-const MANNY_C = (() => { try { return progDigest(IA.buildProgram(IA.fixtures.HALF_MANNY)) + '/' + progDigest(IA.buildProgram(IA.fixtures.HALF_MANNY)); } catch(e){ return 'threw ' + e.message; } })();
-let B = null, baseWhy = '';
-if(VER === ERA){
-  try {
-    if(BASEFILE){ const b = load(BASEFILE); if(+b.version === BASE_ERA) B = b; else baseWhy = 'argv[3] reads ' + b.version + '; '; }
-    if(!B){
-      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'g222d181-')), f = path.join(tmp, 'v221.html');
-      fs.writeFileSync(f, cp.execFileSync('git', ['show', V221_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 27 }));
-      const b = load(f); fs.rmSync(tmp, { recursive:true, force:true });
-      if(+b.version === BASE_ERA){ B = b; baseWhy += 'baseline from git ' + V221_COMMIT.slice(0, 7); } else baseWhy += 'git reads ' + b.version;
-    }
-  } catch(e){ baseWhy += 'baseline load failed: ' + String(e && e.message || e).slice(0, 160); B = null; }
-}
-const PAIR = VER === ERA && !!B;
-console.log('  pair rows: ' + (PAIR ? 'LIVE (candidate ' + VER + ' vs V' + BASE_ERA + (baseWhy ? ', ' + baseWhy : ', argv[3]') + ')' : VER === ERA ? 'SETUP FAILED (' + baseWhy + ')' : 'scoped out (candidate ' + VER + ' is not D181\'s pair)'));
-const pairRow = (key, cond, got) => {
-  if(PAIR) return ok(R[key], cond, got);
-  if(VER === ERA) return ok(R[key] + ' (setup: ' + baseWhy + ')', false);
-  skipRow(R[key], 'scoped out, candidate ' + VER + " is not D181's build pair (222 vs 221)");
-};
-const MANNY_B = B ? (() => { try { return progDigest(B.buildProgram(B.fixtures.HALF_MANNY)); } catch(e){ return 'threw ' + e.message; } })() : null;
+// The V221 loader (D181's build pair, 222 vs 221: 6b, 6c and 7 read it, and the WRAP install and INFO print on the baseline) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 
 // ── DRIVER (the premise's, unchanged in shape) ───────────────────────────────
 function pin(X, iso){ const T = new Date(iso + 'T12:00:00').getTime(); const RD = Date;
@@ -179,7 +136,7 @@ function pin(X, iso){ const T = new Date(iso + 'T12:00:00').getTime(); const RD 
 const E = (X, c) => X.eval(c);
 // The freeze cut is read where the engine hands it on: pruneDayEdits(pid, _swapCut). Wrapping it changes nothing.
 const WRAP = "globalThis.__cut=null;(function(){var f=pruneDayEdits;pruneDayEdits=function(p,c){globalThis.__cut=c;return f(p,c);};})();";
-E(IA, WRAP); if(B) E(B, WRAP);
+E(IA, WRAP);
 function setupCfg(X, cfg, dated, mutateStored){
   X.localStorage.clear(); pin(X, CLOCKS.today);
   const p = X.buildProgram(cfg), st = JSON.parse(JSON.stringify(p));
@@ -364,61 +321,7 @@ function daySig(X){ const dy = day(X); const ss = dy.sections || [];
 }
 console.log('  hand rows done | ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s');
 
-// ── PAIR ROWS 6b, 6c, 7 ──────────────────────────────────────────────────────
-function run6b(X){
-  const H = MARIO(); delete H.injury;
-  const p = setupCfg(X, H, true); const l = loc(p.weeks[W][D], DONOR); if(!l) return { err:'no donor on the healthy W5 Thu' };
-  const stored = JSON.parse(JSON.stringify(p.weeks[W][D]));
-  pin(X, CLOCKS.today); boot(X); view(X);
-  const it = day(X).sections[l.si].items[l.ii]; X.ctx.__c = { secIdx:l.si, itemIdx:l.ii, name:it.name, detail:it.detail }; X.ctx.__to = GOB; E(X, '_swapCtx=__c;applySwapChoice(__to);');
-  const liveSlot = clean(day(X).sections[l.si].items[l.ii].name);
-  E(X, "(function(){var ps=getPrograms();ps[0].overlays=[{id:'ov_g222',type:'injury',from:'2026-09-21',to:null,patch:{injury:{region:'knee',tier:'workaround'}},note:'',created:1}];savePrograms(ps);})()");
-  boot(X); const b = day(X); const slot = clean(b.sections[l.si].items[l.ii].name);
-  const names = dy => dy.sections.map((s, si) => (s.items || []).map((x, ii) => (si === l.si && ii === l.ii) ? '#' : clean(x.name)).join(';')).join('|');
-  return { liveSlot, slot, hist:!!JS(X, 'ia_hist_PM')[KEY], pierced:names(b) !== names(stored), day:J(b), stored:names(stored), booted:names(b) }; }
-function run6c(X){
-  const r = {};
-  const trained = [['draft_w5thu', 5, 'thu', 'draft'], ['done_w5thu', 5, 'thu', 'done'], ['draft_w3tue', 3, 'tue', 'draft']];
-  for(const [tag, w, d, kind] of trained){
-    setup(X, true); pin(X, CLOCKS.today); boot(X); view(X, w, d); X.ctx.__title = day(X, w, d).title || 'T';
-    if(kind === 'draft') E(X, "writeSetDraft('zz_g222',['5'],['95'],'');"); else E(X, "handleDayStatus('" + d + "',__title,'complete');");
-    const snap = JS(X, 'ia_hist_PM')['w' + w + '_' + d];
-    boot(X); const b = day(X, w, d); r[tag] = { day:J(b), eqSnap:!!snap && J(b) === J(snap) }; }
-  for(const [tag, w, d] of [['tick_w5thu', 5, 'thu'], ['tick_w3tue', 3, 'tue']]){
-    setup(X, true); pin(X, CLOCKS.today); boot(X); view(X, w, d); const it = day(X, w, d).sections[0].items[0];
-    X.ctx.__n = clean(it.name); X.ctx.__det = it.detail; E(X, 'logExerciseWeight(__n,95,__det,' + w + ",[5],[95],'" + d + "');");
-    boot(X); r[tag] = { cut:cutNow(X), day:J(day(X, w, d)) }; }
-  return r; }
-if(PAIR){
-  // 6b
-  { let a, b, b2; try { a = run6b(IA); b = run6b(B); b2 = run6b(B); } catch(e){ a = { err:'threw ' + e.message }; }
-    if(a.err || !b || b.err) pairRow('R6b', false, (a.err || (b && b.err)));
-    else { console.log('    6b stored W5 Thu  ' + a.stored + '\n    6b booted (cand)  ' + a.booted + '\n    6b booted (V221)  ' + b.booted);
-      pairRow('R6b', b.day === b2.day && a.liveSlot === GOB && a.slot === GOB && !a.hist && a.pierced && a.day === b.day,
-        'candidate: slot ' + a.slot + ', pierced ' + a.pierced + ', ia_hist_ ' + a.hist + ' | V221: slot ' + b.slot + ', pierced ' + b.pierced + ' | same day ' + (a.day === b.day) + ' | V221 self ' + (b.day === b2.day)); } }
-  // 6c
-  { let a, b, b2; try { a = run6c(IA); b = run6c(B); b2 = run6c(B); } catch(e){ a = null; console.log('    6c threw ' + e.message); }
-    if(!a) pairRow('R6c', false, 'threw');
-    else { const tr = ['draft_w5thu', 'done_w5thu', 'draft_w3tue'];
-      const same = tr.filter(k => a[k].day === b[k].day && a[k].eqSnap && b[k].eqSnap);
-      const self = tr.every(k => b[k].day === b2[k].day) && b.tick_w5thu.cut === b2.tick_w5thu.cut;
-      const cuts = ['tick_w5thu', 'tick_w3tue'].map(k => k + ' ' + a[k].cut + '/' + b[k].cut + ' hand ' + HAND_CUT[k]);
-      const cutsOk = ['tick_w5thu', 'tick_w3tue'].every(k => a[k].cut === b[k].cut && a[k].cut === HAND_CUT[k]);
-      console.log('    6c info: tick-only day booted equal across trees: w5thu ' + (a.tick_w5thu.day === b.tick_w5thu.day) + ', w3tue ' + (a.tick_w3tue.day === b.tick_w3tue.day) + ' (not asserted: the ruling asks the cut)');
-      pairRow('R6c', self && same.length === tr.length && cutsOk, 'trained days byte-identical and equal to the snapshot ' + same.length + '/' + tr.length + ' | cuts cand/V221: ' + cuts.join(', ') + ' | V221 self ' + self); } }
-  // 7
-  { pin(IA, CLOCKS.today); pin(B, CLOCKS.today); let cards = 0, diff = 0, dig = 0, self = 0, crash = 0; const ex = [];
-    for(const cfg of L7){
-      let pe, pb, pb2; try { pe = IA.buildProgram(JSON.parse(JSON.stringify(cfg))); pb = B.buildProgram(JSON.parse(JSON.stringify(cfg))); pb2 = B.buildProgram(JSON.parse(JSON.stringify(cfg))); } catch(e){ crash++; continue; }
-      if(J(pb.weeks) !== J(pb2.weeks)) self++;
-      if(J(pe.weeks) !== J(pb.weeks)) dig++;
-      Object.keys(pe.weeks).forEach(w => Object.keys(pe.weeks[w]).forEach(d => { const de = pe.weeks[w][d], db = pb.weeks[w] && pb.weeks[w][d];
-        (de && de.sections || []).forEach((s, si) => (s.items || []).forEach((it, ii) => { cards++; const ib = db && db.sections && db.sections[si] && db.sections[si].items && db.sections[si].items[ii];
-          if(!ib || ib.name !== it.name || ib.detail !== it.detail){ diff++; if(ex.length < 3) ex.push('W' + w + ' ' + d + ' ' + clean(it.name)); } })); })); }
-    const want = MANNY_DIGEST_BY_VERSION[VER], mc = MANNY_C.split('/');
-    pairRow('R7', !crash && cards > 0 && diff === 0 && dig === 0 && self === 0 && mc[0] === mc[1] && mc[0] === want && MANNY_B === want,
-      diff + ' of ' + cards + ' cards, ' + dig + ' of ' + L7.length + ' builds moved; V221 self-unstable ' + self + '; crashes ' + crash + ' | HALF_MANNY ' + MANNY_C + ' (V221 ' + MANNY_B + ') vs MANNY_DIGEST_BY_VERSION[' + VER + '] ' + want + (ex.length ? ' | ' + ex.join('; ') : '')); }
-} else { pairRow('R6b', false, 'no pair'); pairRow('R6c', false, 'no pair'); pairRow('R7', false, 'no pair'); }
+// 6b, 6c and 7 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D181 (P-SWAPDURABLE) on its build pair (222 vs 221): must-not (b), must-not (c) with the hand cut, and no engine card moved against V221.
 
 // ── INFO: rest-day moved, snapshotted, swapped day (never counts) ────────────
 function infoMove(X, tag){
@@ -448,6 +351,5 @@ function infoMove(X, tag){
   lines.forEach(s => console.log(s)); }
 console.log('\n-- INFO (prints, never counts): rest-day move x snapshot x swap, W5 (move Tue -> Wed, clock W5 Thu) --');
 infoMove(IA, 'candidate V' + STAMP);
-if(B) infoMove(B, 'baseline V' + B.version);
 console.log('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s');
 done();

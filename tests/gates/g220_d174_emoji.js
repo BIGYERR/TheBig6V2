@@ -17,7 +17,8 @@
 //     Unicode-property class oracle \p{Emoji_Presentation} / \p{Extended_Pictographic}). Class A and A2 are counted
 //     whether the source stores the literal glyph or its backslash-u escape text.
 //   - hand tables typed from the ruling's s2/s3/s4/s5 After (and Before) text;
-//   - the V219 artifact (git show 920fa0a:index.html) for pool and dismiss ORDER, never for the edited rows;
+//   - (rows C0-C4 read the V219 artifact, git show 920fa0a:index.html, for pool and dismiss ORDER; retired Post-V233,
+//     see ROWS);
 //   - rendered output from the artifact's own site expressions, graded against the ruling's shape (an <svg> where
 //     the emoji was, the celebration emoji as text).
 // This file is ASCII only: every non-ASCII glyph and every backslash-u escape text is built in code.
@@ -46,8 +47,10 @@
 //   A0 scanner sane  A1 zero non-allowlisted A/A2 pictographs  A2 allowlist anchors resolve once, every mechanism live
 //   B1-B9 s2 After texts exactly once (token equality)  B10 s3 >=7 text  B11 Before texts gone  B12 short-gap string
 //   gone  B13 wizard seed caption
-//   C0 V219 readable  C1 pool tiers and counts  C2 unedited rows equal V219  C3 edited rows = hand table (and V219 =
-//   Before)  C4 POP_DISMISS  C5 reminder pool ASCII
+//   C5 reminder pool ASCII. C0-C4 (V219 readable, pool tiers and counts, unedited rows equal V219, edited rows = hand
+//   table and V219 = Before, POP_DISMISS), switched by the baseline's ia-version read `bver === '219'`, retired
+//   Post-V233 under standing ruling 3 (a build-scoped claim retires when the next build ships; the previous-version run
+//   replaces it).
 //   D1 POP_CFG.reminder.icon  D2a-d injury icons from source  D3a-c popFire render (DOM stub)  D4a-d chrome renders
 //   E1-E3 allowlist self-check on in-memory copies (NOT probes)
 'use strict';
@@ -55,7 +58,6 @@ const path = require('path'), fs = require('fs'), cp = require('child_process'),
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
-const BASE_REF = '920fa0a';   // V219 commit ("V219: D167/D171/D159/D164/D170/D165/D166")
 
 const CP = (...a) => String.fromCodePoint(...a);
 const BS = String.fromCharCode(92);
@@ -305,7 +307,6 @@ const S2_ROWS = EDITED.filter(e => e[3] !== null);   // the nine s2 strings (rem
 const GE7 = 'More than a week off. Mark what happened, then ease back in. First sessions back at reduced effort. Never chase missed work.';
 const OLD_GONE = ['you know ' + MD + ' faster', 'Look at you ' + MD, '8-story walk-up', 'medal ' + MD, 'whole thing ' + MD, 'But okay ' + MD,
   'your call ' + MD, 'Rare as fuck ' + MD, 'weak-ass', 'ease back in ' + MD, MD + ' edit if you know better'];
-const COUNTS = { workout:27, reminder:5, streak:5, season:9 };
 const INJURY = [['Good. One week to prove it.', 'shield'], ['Good. Two weeks to full send.', 'shield'], ['Good sign.', 'shield'], ['Two weeks and trending worse.', 'warning']];
 
 // ---------- rows ----------
@@ -320,11 +321,6 @@ const ROWS = [
   ['B11', 's2/s3/s4 Before texts gone from the comment-stripped source (raw and escape-decoded)'],
   ['B12', 's3 row 2 (D175 interaction): the short-gap string "This one got away from you" is gone'],
   ['B13', 's4: wizard seed caption reads Estimated from <q>X<q>. Edit if you know better. with no em-dash'],
-  ['C0', 'V219 artifact (git show ' + BASE_REF + ':index.html) readable and stamped 219'],
-  ['C1', 'POP_POOLS tiers workout/reminder/streak/season with 27/5/5/9 entries, on V219 and on the candidate'],
-  ['C2', 'every unedited POP_POOLS entry reads exactly as on V219 (order unchanged; ia_pop_idx_ stores indices)'],
-  ['C3', 'the 13 edited POP_POOLS entries read the hand table After text, and V219 read the Before text'],
-  ['C4', 'POP_DISMISS: 7 labels, order and text unchanged from V219 (emoji kept)'],
   ['C5', 's5: the reminder pool holds no codepoint above U+007F'],
   ['D1', "s5: POP_CFG.reminder.icon === 'notebook', an ASY_ICON_PATHS name"],
   ['D2a', "s5: injury BACK IN 'Good. One week to prove it.' icon 'shield'"], ['D2b', "s5: injury BACK IN 'Good. Two weeks to full send.' icon 'shield'"],
@@ -386,31 +382,10 @@ function main(){
       ok('B13', cnt(d, 'Estimated from ' + LQ + '${s.progName}' + RQ + '. Edit if you know better.') === 1 && cnt(d, MD) === 0 && cnt(tpl, BS + 'u2014') === 0, JSON.stringify(d.slice(0, 200))); }
   });
 
-  family(['C0', 'C1', 'C2', 'C3', 'C4', 'C5'], () => {
+  // C0-C4 (the V219 comparison, armed by the baseline's ia-version read) retired Post-V233 under standing ruling 3.
+  family(['C5'], () => {
     if(!S) S = scan(src);
-    let base = null, why = '';
-    try { base = cp.execFileSync('git', ['-C', ROOT, 'show', BASE_REF + ':index.html'], { maxBuffer:64 << 20, stdio:['ignore', 'pipe', 'pipe'] }).toString('utf8'); } catch(e){ why = String((e && e.message) || e).slice(0, 160); }
-    const bver = base ? (/<meta name="ia-version" content="(\d+)"/.exec(base) || [])[1] : null;
-    ok('C0', bver === '219', base ? 'ia-version ' + bver : why);
-    const B = bver === '219' ? scan(base) : null;
-    const tp = literalAt(S, 'const POP_POOLS='), bp = B ? literalAt(B, 'const POP_POOLS=') : null;
-    const tiers = ['workout', 'reminder', 'streak', 'season'];
-    const shape = p => p ? Object.keys(p).join(',') + ' ' + Object.keys(p).map(k => (p[k] || []).length).join('/') : 'null';
-    const want = tiers.join(',') + ' ' + tiers.map(k => COUNTS[k]).join('/');
-    ok('C1', shape(tp) === want && shape(bp) === want, 'candidate ' + shape(tp) + ' | V219 ' + shape(bp));
-    const edited = new Set(EDITED.map(e => e[0] + e[1]));
-    let n = 0; const diff = [];
-    if(tp && bp) tiers.forEach(k => (bp[k] || []).forEach((e, i) => { if(edited.has(k + i)) return; n++; if(!tp[k] || popText(tp[k][i]) !== popText(e)) diff.push(k + '[' + i + ']'); }));
-    ok('C2', !!(tp && bp) && n === 33 && diff.length === 0, 'compared ' + n + ', differ ' + diff.join(' '));
-    const bad = [];
-    if(tp && bp) EDITED.forEach(([k, i, after, before]) => {
-      if(popText((tp[k] || [])[i]) !== after) bad.push('candidate ' + k + '[' + i + '] ' + JSON.stringify(popText((tp[k] || [])[i])));
-      const b0 = popText((bp[k] || [])[i]);
-      const bOk = before !== null ? b0 === before : (typeof b0 === 'string' && b0.indexOf(after + ' ') === 0 && b0.length > after.length + 1 && [...b0.slice(after.length + 1)].every(ch => ch.codePointAt(0) > 0x7F));
-      if(!bOk) bad.push('V219 ' + k + '[' + i + '] ' + JSON.stringify(b0)); });
-    ok('C3', !!(tp && bp) && bad.length === 0, bad.slice(0, 3).join(' | '));
-    const td = literalAt(S, 'const POP_DISMISS='), bd = B ? literalAt(B, 'const POP_DISMISS=') : null;
-    ok('C4', !!(td && bd) && td.length === 7 && JSON.stringify(td) === JSON.stringify(bd), 'candidate ' + JSON.stringify(td) + ' | V219 ' + (bd ? bd.length : '-'));
+    const tp = literalAt(S, 'const POP_POOLS=');
     const hi = tp ? (tp.reminder || []).map(popText).filter(s => [...String(s)].some(ch => ch.codePointAt(0) > 0x7F)) : ['(no pool)'];
     ok('C5', !!tp && tp.reminder.length === 5 && hi.length === 0, hi.map(s => JSON.stringify(s)).join(' '));
   });

@@ -52,7 +52,7 @@
 //                 "Same job, same numbers.", and the ruled counts (M12).
 //   POPULATION    the single-hop pairs are drawn on the BASELINE tree's fixture (CFG1), with the baseline's _pattern and
 //                 _repFloor naming a target's pattern and floor, so the population is the same whichever tree is the
-//                 candidate (row d194-fixture claims the fixture is unmoved; no population leans on that claim).
+//                 candidate (no population leaned on the fixture-unmoved claim row d194-fixture, retired Post-V233).
 //                 The L1 sweep's capped flag reads the baseline's _pattern the same way. The classifier is not under
 //                 test; the plan is.
 //
@@ -60,9 +60,7 @@
 //   below 230   REFUSED: every row FAILS by name.
 //   230         every row asserts.
 //   231 and up  (tests/measure/v231_rulings/v231_absorb_ruling.md sections 3 and 6; standing rulings 2 and 4)
-//               d194-fixture is SCOPED to 230: at 231 and up it prints one column-0 SKIP line with this tree's figures,
-//               never PASS and never FAIL ("V230's claim about V230; a later build's fixture moves by its own ruling
-//               (D195 A-1/B-1, D196, D197)"; the candidate's L1 sweep has 150,989 pairs, V229 150,068).
+//               d194-fixture (scoped to 230 by section 3: a SKIP line at 231 and up) retired Post-V233 (POST-V233 below).
 //               d193-k and d193-l ABSORB D196-1 at the swap sheet with g221's pins (W231 below, typed): 150,989 pairs,
 //               clamp pairs 1,253 = hold variants (verbatim 694, unloadable 360, window 199), non-clamp toasts == V229
 //               STAMP 141,557/141,557; G3a 839 (529 / 199 / 111), G3c-off 172, G3d 263, G3e 205, G3f 199; every other
@@ -72,34 +70,33 @@
 //               d194-postsweep is RE-KEYED (section 6): its population jobs run and the row asserts L432 post-sweep
 //               rejects 0 for the candidate, OV1 and fixture (432 builds, 12,960 lifting days each; D196-1 closed the
 //               18 Burpees drops, D197-1 the 4 Pushups re-details), with V229 reading the typed 22 in the same run (the
-//               instrument is not blind); (ii) is dropped as vacuous (no reject day exists) and prints one column-0
-//               SKIP line; the reach jobs, which serve (ii) and the typed-build re-read, run at 230 only.
+//               instrument is not blind); (ii) is dropped as vacuous (no reject day exists).
+//   POST-V233  (standing ruling 3 as amended: a check written to switch off after its own build retires when the next
+//               build ships; the previous-version run replaces it) retired: d194-fixture, with the L1 jobs' V229 CFG
+//               sweep that fed only it (measure mC); d194-postsweep's 230 assertion ((i) at the typed 22, (ii) the reach,
+//               the typed-build re-read) with its `VER === ERA` reach jobs, jobReach and its helpers, and (ii)'s SKIP line
+//               at 231 and up. At 230 d194-postsweep now FAILS by name.
 //   IA_ASSUME_VERSION=230 lifts a file stamped exactly 229 to 230 for a discrimination run; it is announced, ignored on
 //   any other file, and gate.sh never sets it. On V229 that way every figure row FAILS at its V229 figure (d193-e live
 //   bwsets at RPE 8 196; d193-k″ hold toasts 0 of 196; d193-e′ live and boot above RPE 7 114; d193-k 0 hold variants,
 //   1,243 false claims, INFO capped 728; d193-l G3a 143, G3c-off 96, G3d 0, G3e 47, G3f 0) while the three instrument
-//   rows and the claim row d194-fixture pass; d194-postsweep FAILS on its (ii) (V229's overlay boot keeps the jump: 0 of
-//   88 boots equal the hand oracle) while its (i) holds (the same 22 rejects).
+//   rows pass; d194-postsweep FAILS by name (its 230 assertion retired Post-V233).
 //   Each figure row also requires the BASELINE to read its V229 figure on the same presentation in the same run (the
 //   baseline shows the defect, g229's precedent): V229 OV1 bwsets at RPE 8 196, hold toasts 0 of 196, live above RPE 7
 //   114; V229 STAMP 0 hold variants, 1,243 false claims, INFO capped 728, G3a 143, G3c-off 96, G3d 0, G3e 47, G3f 0;
-//   V229 the same 22 post-sweep rejects, and V229 OV1 boot != V229 fixture boot on 88 of 88 swaps (d194-postsweep).
+//   V229 the same 22 post-sweep rejects on OV1 and the fixture (d194-postsweep).
 //   The baseline is argv[3] if it reads ia-version 229, else `git show <V229_COMMIT>:index.html` written under
 //   os.tmpdir() (the runner sets TMPDIR to its scratch path); the run prints which path it used.
 //
-// ROWS (the three instrument rows first; if one fails, every other row FAILS by name, unread. Then the claim row
-//   d194-fixture, which fails by name and gates nothing, then the figure rows, each read and asserted on its own.)
+// ROWS (the three instrument rows first; if one fails, every other row FAILS by name, unread. Then the figure rows,
+//   each read and asserted on its own.)
 //   inst-self   every stored record (7 L9 configs × CFG, CFG1, OV1, OV5, both trees) written twice in two fresh VMs
 //               equals itself; every L1 baseline build equals itself in two VMs (384/384), clock fields stripped.
 //   inst-stamp  STAMP == the real writer (OV1) on every day of the 7 L9 configs, both trees (294/294 each; 210 stamped).
 //   inst-ov1    an OV1 carded day == the CFG1 day with the stamp removed, every carded day of the 7 L9 configs, both
 //               trees (210/210 each), and every OV1 carded day is stamped.
-//   d194-fixture  CLAIM, not an instrument (R3′ "V230 moves two guards and two filter cfgs and nothing else"): the
-//               fixture presentation did not move: candidate CFG == V229 CFG on the whole L1 sweep (150,068/150,068,
-//               card and toast, rows aligned) and on every L9 single-hop pair at CFG1 (324/324: donor, live card,
-//               _preHold, toast, boot card, boot name, boot _preHold). It gated the figure rows until gatekeeper's
-//               finding 2 (tests/measure/v230_rulings/v230_session_calls.md item 12): S22 moves the fixture as well as
-//               the overlay, so the gating row hid d193-k″'s own figure under the mutation that exists to test it.
+//   d194-fixture  retired Post-V233 (VERSION PREDICATE, POST-V233): the CLAIM (R3′ "nothing else") that candidate CFG ==
+//               V229 CFG on the L1 sweep and on the L9 pairs at CFG1, scoped to 230 at V231 (absorb ruling section 3).
 //   d193-e      L9 single-hop pairs (a cued native onto a capped unloadable target), 210, on OV1: live bwsets at RPE 8 0
 //               (V229 196), at RPE 7 196, cue ends 14, live == boot 210/210, every pair on a stamped day, OV1 == CFG1
 //               210/210 (donor, live, _preHold, toast, boot, boot _preHold); the W5-on subset on OV5 == CFG 72/72.
@@ -200,11 +197,15 @@
 //               P-FILTERLAST in V231, so V231's gatekeeper re-keys this row with the after-figure, expected 0 on L432
 //               (P-BWFALLBACK closes the 18 Burpees, P-FILTERLAST the 4 Pushups re-details), not the 4 the coach text
 //               named before the fold. V231 re-keyed it to 0 (absorb ruling section 6; VERSION PREDICATE above).
+//               Post-V233: the 230 assertion, its reach and (ii)'s SKIP line retired (VERSION PREDICATE, POST-V233).
 //
-// RUNTIME. Jobs run in a pool of 4 worker processes (fixed; no environment knob): the 7 lattice enumerations first,
+// RUNTIME. Jobs run in a pool of POOL worker processes: G230_POOL when it is a positive integer, else GATE_POOL when it
+//   is one (tests/gate.sh sets it from this gate's pool column in tests/gate_times.txt, tests/sabotage.py to its
+//   SABOTAGE_JOBS), else 4 (HEAD's default before slice 7; never 0; post-V233 s11: slice 7's core-count default
+//   multiplied with GATE_JOBS and SABOTAGE_JOBS), printed as "pool N": the 7 lattice enumerations first,
 //   then the 3 hand-route jobs, the 7 L9 pair configs and 8 shards of the L1 sweep, then d194-postsweep's 8 population
-//   shards (54 L432 configs each, both trees, OV1 and the fixture; at 230 and up) and its 11 reach jobs (at 230 only)
-//   (one per typed reject build, both trees, OV1 and the fixture); each enumeration, when it lands, queues its config's
+//   shards (54 L432 configs each, both trees, OV1 and the fixture; at 230 and up; its 11 reach jobs, at 230 only,
+//   retired Post-V233); each enumeration, when it lands, queues its config's
 //   lattice in shards of at most 300 batches (whole batches, one chain per day per batch), ahead of the jobs not yet
 //   started. The lattice's cost is the boots (every setup and every boot is a refreshProgram), so it scales with the
 //   batch count, not the chain count. Each prints one result line on stdout and writes no file. A worker that dies
@@ -217,7 +218,9 @@ const { load } = H;
 const ROOT = path.join(__dirname, '..', '..');
 const ERA = 230, BASE_ERA = 229, V231_ERA = 231;   // V231_ERA: the V231 absorb ruling (sections 3 and 6)
 const V229_COMMIT = '0bec3ecfdc53ecb71b74178a3d6c49398ae87018';   // index.html at this commit is the V229 artifact (== 5297b4b's)
-const POOL = 4, L1_SHARDS = 8, MARK = '__G230_RESULT__';
+const POOL = /^[1-9][0-9]*$/.test(process.env.G230_POOL || '') ? +process.env.G230_POOL
+    : /^[1-9][0-9]*$/.test(process.env.GATE_POOL || '') ? +process.env.GATE_POOL : 4,
+  L1_SHARDS = 8, MARK = '__G230_RESULT__';
 const IS_WORKER = process.argv.includes('--worker');
 const POS = process.argv.slice(2).filter(a => a !== '--worker');
 const ART = POS[0] || path.join(ROOT, 'index.html');
@@ -294,7 +297,7 @@ const TSAMEH = (to, from) => to + ' in, ' + from.toLowerCase() + ' out. Same set
 const TSAME = (to, from) => to + ' in, ' + from.toLowerCase() + ' out. Same job, same numbers.';
 // the ruled figures (M12 [3] and [5]; D193 Amendment 4; the V229 figure each must fail at)
 const W = {
-  stamp:{ days:294, stamped:210 }, ovday:210, self:{ records:56, l1:384 }, fixPairs:324,
+  stamp:{ days:294, stamped:210 }, ovday:210, self:{ records:56, l1:384 },
   e:{ n:210, bw8:0, bw7:196, cue:14, w5:72, v229bw8:196 }, kpp:{ hold:196, same:14, v229hold:0 },
   e2:{ n:114, v229:114 },
   L1:{ cfgs:384, pairs:150068, clamp:1243, hv:1243, hvK:{ verbatim:684, unloadable:360, window:199 }, info:458, nonClamp:148825, v229:{ hv:0, fals:1243, info:728 } },
@@ -471,18 +474,18 @@ function jobL1(spec){
   const C = fresh(spec.art, PRES.CFG.clock), B = fresh(spec.base, PRES.CFG.clock), B2 = fresh(spec.base, PRES.CFG.clock);
   [C, B].forEach(X => E(X, "activeProgId='P1';"));
   const PC = {}; const pat = n => (n in PC) ? PC[n] : (PC[n] = B.eval('_pattern(' + JSON.stringify(n) + ')') || '-');
-  const out = { cfgs:0, crash:[], S:{ CCFG:newL1(), CSTAMP:newL1(), BCFG:newL1(), BSTAMP:newL1() },
-    x:{ sc:{ n:0, align:true, card:0, toast:0 }, fix:{ n:0, align:true, card:0, toast:0 }, nc:{ n:0, eq:0 }, mv:{ card:0, toast:0 }, self:{ n:0, eq:0 } }, ex:{} };
+  const out = { cfgs:0, crash:[], S:{ CCFG:newL1(), CSTAMP:newL1(), BSTAMP:newL1() },
+    x:{ sc:{ n:0, align:true, card:0, toast:0 }, nc:{ n:0, eq:0 }, mv:{ card:0, toast:0 }, self:{ n:0, eq:0 } }, ex:{} };
   const note = (k, s) => { (out.ex[k] = out.ex[k] || []).length < 3 && out.ex[k].push(s); };
   const cmp = (X, a, b, nm) => { X.n += a.length; if(a.length !== b.length || a.some((r, i) => r.key !== b[i].key)){ X.align = false; note('align', nm + ' ' + a.length + ' vs ' + b.length); return; }
     a.forEach((r, i) => { if(r.O !== b[i].O){ X.card++; note(nm + 'card', r.key + ' :: ' + JSON.stringify(r.O) + ' vs ' + JSON.stringify(b[i].O)); } if(r.toast !== b[i].toast){ X.toast++; note(nm + 'toast', r.key + ' :: ' + r.toast + ' | vs ' + b[i].toast); } }); };
   for(const ci of spec.cis){ const cfg = L1[ci];
     try {
       out.x.self.n++; if(J(B.buildProgram(clone(cfg))) === J(B2.buildProgram(clone(cfg)))) out.x.self.eq++; else note('self', 'L1#' + ci);
-      const R = { CCFG:sweepL1(C, cfg, 'CFG'), CSTAMP:sweepL1(C, cfg, 'STAMP'), BCFG:sweepL1(B, cfg, 'CFG'), BSTAMP:sweepL1(B, cfg, 'STAMP') };
+      const R = { CCFG:sweepL1(C, cfg, 'CFG'), CSTAMP:sweepL1(C, cfg, 'STAMP'), BSTAMP:sweepL1(B, cfg, 'STAMP') };
       out.cfgs++;
       Object.keys(R).forEach(k => R[k].forEach(r => tallyL1(out.S[k], r, classify(cfg, r, pat), (n, s) => note(k + ':' + n, s))));
-      cmp(out.x.sc, R.CSTAMP, R.CCFG, 'sc'); cmp(out.x.fix, R.CCFG, R.BCFG, 'fix');
+      cmp(out.x.sc, R.CSTAMP, R.CCFG, 'sc');
       if(R.CSTAMP.length === R.BSTAMP.length) R.CSTAMP.forEach((r, i) => { const b = R.BSTAMP[i]; if(r.key !== b.key) return; const cl = classify(cfg, r, pat).clamp;
         if(r.O !== b.O) out.x.mv.card++; if(r.toast !== b.toast) out.x.mv.toast++;
         if(!cl){ out.x.nc.n++; if(r.toast === b.toast) out.x.nc.eq++; else note('nc', r.key + ' :: ' + r.toast + ' | V229 ' + b.toast); } });
@@ -702,7 +705,7 @@ const PS_TABLE = [
   ['elbow/workaround', 'bodyweight', 'advanced', 'support_athletic', 4, 'mon', 'Chest volume', 1, 'redetail', 'Pushups (slow 3s eccentric)', PS_R8, PS_R7],
 ];
 // the ruled counts (M13 [1] and [2])
-const PS_N = { configs:432, days:12960, rej:22, drop:18, redetail:4, builds:11, tried:144, landed:88 };
+const PS_N = { configs:432, days:12960, rej:22, drop:18, redetail:4, builds:11 };   // tried 144 / landed 88 fed the 230 reach, retired Post-V233
 const PS_COMBO = [['C', 'OV1'], ['C', 'CFG1'], ['B', 'OV1'], ['B', 'CFG1']], PS_SHARDS = 8;
 const psBuild = r => r.slice(0, 4).join('|'), psLine = r => r.join('|');
 // the re-applied filter, measure's __rej verbatim: positional tags, the config's own injury on the program's cfg, never _dayPlanCfg
@@ -711,28 +714,10 @@ const PS_HELP = "globalThis.__rej=function(sections,inj){var S=JSON.parse(JSON.s
   + "var r=[];S.forEach(function(s,si){((s&&s.items)||[]).forEach(function(it,ii){if(!it||!it.name)return;var k=si+'.'+ii,g=got[k];var row={si:si,ii:ii,n:it.name,lab:s.label||'',nItems:s.items.length,bw:it.__bw||null};"
   + "if(!g){row.kind='drop';r.push(row);}else if(g.name!==it.name){row.kind='rename';row.to=g.name;r.push(row);}else if((g.detail||'')!==(it.detail||'')){row.kind='redetail';row.d0=it.detail;row.d1=g.detail;r.push(row);}});});return {r:r,neu:neu};};";
 const psDays = W => { const o = []; Object.keys(W).forEach(w => Object.keys(W[w] || {}).forEach(d => { const dy = W[w][d]; if(dy && Array.isArray(dy.sections) && dy.sections.some(s => s && s.items && s.items.length)) o.push([+w, d]); })); return o; };
-const psCards = dy => { const o = []; ((dy && dy.sections) || []).forEach((s, si) => (s.items || []).forEach((it, ii) => { if(it && it.name) o.push({ si, ii, n:it.name, d:it.detail || '', lab:s.label || '' }); })); return o; };
 const psEng = (k, w, d, r) => k.split('|').concat([w, d, clean(r.lab), r.nItems, r.kind, r.n], r.kind === 'redetail' ? [r.d0, r.d1] : r.kind === 'rename' ? [r.to] : []).join('|');
 const psRej = (X, k, inj, W) => { const o = { days:0, neu:0, rej:[] }; for(const [w, d] of psDays(W)){ o.days++; X.ctx.__S = W[w][d].sections;
   const R = JSON.parse(E(X, 'JSON.stringify(__rej(__S,' + JSON.stringify(inj) + '))')); o.neu += R.neu; R.r.forEach(r => o.rej.push(psEng(k, w, d, r))); } return o; };
 const psSha = s => crypto.createHash('sha1').update(String(s)).digest('hex').slice(0, 20);
-const psH = dy => { const c = dy && typeof dy === 'object' ? clone(dy) : dy; if(c && typeof c === 'object') delete c._ovKey; return psSha(J(c)); };
-const psVis = dy => JSON.stringify(((dy && dy.sections) || []).map(s => [clean(s.label), (s.items || []).map(it => [it.name, it.detail])]));
-// the hand oracle for the boot: the live day with the typed reject names removed, emptied sections dropped, the typed detail substituted
-function psOracle(live, rows){ const e = clone(live); delete e._ovKey;
-  rows.forEach(r => (e.sections || []).forEach(s => { if(clean(s.label) !== r[6]) return;
-    if(r[8] === 'drop') s.items = (s.items || []).filter(it => it.name !== r[9]); else (s.items || []).forEach(it => { if(it.name === r[9] && it.detail === r[10]) it.detail = r[11]; }); }));
-  e.sections = (e.sections || []).filter(s => s.items && s.items.length); return e; }
-// measure's trySwap: the first of three candidates not already on the day whose landing puts that name in the slot
-function psTrySwap(X, w, d, card, used){ E(X, 'currentWeek=' + w + ";currentDayKey='" + d + "';"); let cs = [];
-  try { cs = JSON.parse(E(X, 'JSON.stringify(__cands(activeProg.weeks[' + w + '].' + d + ',' + w + ',' + JSON.stringify(card.n) + '))')); } catch(e){ return { err:'cands ' + e.message }; }
-  cs = cs.map(x => typeof x === 'string' ? x : (x && x.name)).filter(Boolean).filter(x => !used.has(x.toLowerCase()));
-  for(const to of cs.slice(0, 3)){ const before = JSON.parse(dayJ(X, w, d)); X.ctx.__c = { secIdx:card.si, itemIdx:card.ii, name:card.n, detail:card.d }; X.ctx.__to = to;
-    try { E(X, '__T.length=0;_swapCtx=__c;applySwapChoice(__to);'); } catch(e){ return { err:'apply ' + e.message }; }
-    const after = JSON.parse(dayJ(X, w, d)); const slot = after.sections[card.si] && after.sections[card.si].items[card.ii];
-    if(slot && slot.name === to) return { to, before, after };
-    if(JSON.stringify(before) !== JSON.stringify(after)) return { to, before, after, landedOther:true }; }
-  return { none:true }; }
 // ps: a shard of L432, every config on the four presentations; the reject rows of every lifting day
 function jobPS(spec){ const out = { R:{} };
   for(const [t, p] of PS_COMBO){ const file = t === 'C' ? spec.art : spec.base, clk = PRES[p].clock; const o = out.R[t + ':' + p] = { builds:0, days:0, neu:0, rej:[], sha:{}, crash:[] };
@@ -742,43 +727,28 @@ function jobPS(spec){ const out = { R:{} };
         if(PS_TABLE.some(r => psBuild(r) === x.k)) o.sha[x.k] = psSha(st);
       } catch(e){ o.crash.push(x.k + ': ' + String(e && e.message || e).slice(0, 120)); } } }
   return out; }
-// reach: one typed reject build on the four presentations; one round per non-reject card on its typed reject days
-function jobReach(spec){ const x = L432.find(z => z.k === spec.ck), T = PS_TABLE.filter(r => psBuild(r) === spec.ck), out = { ck:spec.ck, R:{} };
-  for(const [t, p] of PS_COMBO){ const file = t === 'C' ? spec.art : spec.base, clk = PRES[p].clock; const o = out.R[t + ':' + p] = { sha:null, rej:[], miss:[], swaps:[] };
-    const st = stored(fresh(file, clk), x.c, p); o.sha = psSha(st);
-    const nw = () => { const Y = fresh(file, clk); E(Y, PS_HELP); return Y; }; const A = nw(), B1 = nw(), B2 = nw(), U = nw();
-    setup(A, st); const W0 = JSON.parse(E(A, 'JSON.stringify(activeProg.weeks)')); o.rej = psRej(A, x.k, x.c.injury, W0).rej;
-    const DAYS = [...new Set(T.map(r => r[4] + ' ' + r[5]))].map(s => { const w = +s.split(' ')[0], d = s.split(' ')[1], rows = T.filter(r => r[4] === w && r[5] === d), cs = psCards(W0[w] && W0[w][d]); const rc = [];
-      rows.forEach(r => { const at = cs.filter(c => clean(c.lab) === r[6] && c.n === r[9]); if(at.length !== 1) o.miss.push(psLine(r) + ' found ' + at.length); else rc.push(at[0]); });
-      return { w, d, rows, oth:cs.filter(c => !rc.some(z => z.si === c.si && z.ii === c.ii)) }; });
-    const maxR = Math.max(0, ...DAYS.map(z => z.oth.length));
-    for(let q = 0; q < maxR; q++){ setup(A, st); const done = [];
-      for(const z of DAYS){ const card = z.oth[q]; if(!card) continue; const used = new Set(psCards(JSON.parse(dayJ(A, z.w, z.d))).map(c => c.n.toLowerCase())); done.push({ z, card, s:psTrySwap(A, z.w, z.d, card, used), uerr:0 }); }
-      bootFrom(A, B1); bootFrom(B1, B2);
-      done.filter(y => y.s.to).forEach(y => { E(A, 'currentWeek=' + y.z.w + ";currentDayKey='" + y.z.d + "';"); try { E(A, 'undoSwap(' + JSON.stringify(y.card.n) + ');'); } catch(e){ y.uerr = 1; } });
-      bootFrom(A, U);
-      for(const y of done){ const w = y.z.w, d = y.z.d, key = x.k + '|W' + w + '|' + d + '|' + y.card.si + '.' + y.card.ii + '|' + y.card.n;
-        if(!y.s.to){ o.swaps.push({ key, skip:y.s.err || 'no candidate' }); continue; }
-        const live = y.s.after, boot = JSON.parse(dayJ(B1, w, d)), ora = psOracle(live, y.z.rows);
-        o.swaps.push({ key, to:y.s.to, other:!!y.s.landedOther, uerr:y.uerr, vis:psVis(boot) === psVis(ora),
-          h:{ live:psH(live), boot:psH(boot), ora:psH(ora), reboot:psH(JSON.parse(dayJ(B2, w, d))), undoLive:psH(JSON.parse(dayJ(A, w, d))), undoBoot:psH(JSON.parse(dayJ(U, w, d))), built:psH(W0[w][d]) },
-          ex:{ live:psVis(live), boot:psVis(boot), ora:psVis(ora) } }); } } }
-  return out; }
-const JOBK = { pairs:jobPairs, l1:jobL1, enum:jobEnum, lat:jobLat, hand:jobHand, ps:jobPS, reach:jobReach };
+const JOBK = { pairs:jobPairs, l1:jobL1, enum:jobEnum, lat:jobLat, hand:jobHand, ps:jobPS };
 function workerMain(){ const spec = JSON.parse(fs.readFileSync(0, 'utf8')); const fn = JOBK[spec.kind]; if(!fn) throw new Error('unknown job kind ' + spec.kind);
   const r = fn(spec); process.stdout.write(MARK + JSON.stringify({ ok:true, r }) + '\n'); }
 
 // ── PARENT ───────────────────────────────────────────────────────────────────────────────────────────────────────
 function parentMain(){
-let pass = 0, fail = 0; const t0 = Date.now();
+const t0 = Date.now();
 const P = s => console.log(s);
-const ok = (l, c, g) => { if(c){ pass++; P('PASS ' + l + (g === undefined ? '' : ' (' + g + ')')); } else { fail++; P('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
-const done = () => { P('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s'); P('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
+// ROW IDS (post-V233 V5; CLAUDE.md Proof scope, Row manifest): every row prints its one status line through the
+// shared helper tests/status.js. Ids: the row names, ASCII and in the id grammar (inst-* -> d194-inst-*, ″ -> -dprime, ′ -> -prime), declared from ORDER below; the parent prints, workers return data.
+// A row's label is its R text without the `row <name>` prefix (the id carries the name); a PASS keeps the figures in
+// parentheses, a FAIL prints them as its detail. A boot failure, REFUSED or a setup failure FAILS every row by name.
+const STAT = require('../status')('g230_d194_lens2');
+const ID = { 'inst-self':'d194-inst-self', 'inst-stamp':'d194-inst-stamp', 'inst-ov1':'d194-inst-ov1', 'd193-e':'d193-e', 'd193-k″':'d193-k-dprime', 'd193-e′':'d193-e-prime',
+  'd193-k':'d193-k', 'd193-l':'d193-l', 'd193-i':'d193-i', 'd193-i-r':'d193-i-r', 'd193-i-u':'d193-i-u', 'd194-eq':'d194-eq', 'd194-q′':'d194-q-prime', 'd194-postsweep':'d194-postsweep' };
+const lab = l => String(l).replace(/^row \S+ +/, '');
+const ok = (k, l, c, g) => c ? STAT.pass(ID[k], lab(l) + (g === undefined ? '' : ' (' + g + ')')) : STAT.fail(ID[k], lab(l), g === undefined ? '' : 'got ' + g);
+const done = () => { P('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s'); STAT.summary(); };
 const R = {
   'inst-self':  'row inst-self   INSTRUMENT every stored record (7 L9 configs × CFG, CFG1, OV1, OV5, both trees) equals itself written in two fresh VMs (56/56); every L1 baseline build equals itself in two VMs (384/384)',
   'inst-stamp': 'row inst-stamp  INSTRUMENT STAMP (applyOverlays\' shape, synthetic) == the real writer (applyInjuryDraft from W1 Monday) on every day of the 7 L9 configs, both trees (294/294 each, 210 stamped)',
   'inst-ov1':   'row inst-ov1    INSTRUMENT an OV1 carded day == the CFG1 day with the stamp removed, every carded day of the 7 L9 configs, both trees (210/210 each), every one stamped',
-  'd194-fixture': 'row d194-fixture CLAIM (R3′ "nothing else"; fails by name, gates no row) the fixture presentation did not move: candidate CFG == V229 CFG on the g221 L1 sweep (150,068/150,068 card and toast) and on the L9 single-hop pairs at CFG1 (324/324)',
   'd193-e':     'row d193-e      L9 single-hop pairs, a cued native onto a capped unloadable target (210), on OV1: live bwsets at RPE 8 0 (V229 196), at RPE 7 196, cue ends 14, live == boot 210/210, all on a stamped day, OV1 == CFG1 210/210 (donor, live, _preHold, toast, boot, boot _preHold); W5-on subset OV5 == CFG 72/72',
   'd193-k″':    'row d193-k″     on OV1 the 196 bwsets ends print R8\'s unloadable hold toast "<to> in, <from> out. No load to add here. Your injury plan holds this one at RPE 7." 196/196 (V229 0); the 14 cue ends print "<to> in, <from> out. Same job, same numbers." 14/14',
   'd193-e′':    'row d193-e′     L9 single-hop pairs, a native above RPE 7 onto a capped target (114, all W5 on), on OV1 and on OV5: live above RPE 7 0 (V229 114), boot above RPE 7 0 (V229 114), live == boot 114, hold toasts 114 (V229 0), OV1 == CFG1 and OV5 == CFG 114/114',
@@ -792,12 +762,13 @@ const R = {
   'd194-postsweep': 'row d194-postsweep INFO (D194 Amendment 4; asserted at ia-version 230 only, REFUSED from 231 until P-BWFALLBACK + P-FILTERLAST re-key it, expected 0) L432 post-sweep rejects 22 (18 Burpees drops, 4 Pushups re-details) in 11 of 432 builds == the typed table, candidate and V229, OV1 and fixture; on every landed swap of a non-reject card on a reject day (88 of 144) OV1 boot == fixture boot == the hand oracle 88/88, undo+boot == the built day 88/88 (V229 OV1 boot != fixture boot 88 of 88)',
 };
 const INST = ['inst-self', 'inst-stamp', 'inst-ov1'];   // the gating instruments: if one fails, every other row FAILS unread
-const FIG = ['d194-fixture', 'd193-e', 'd193-k″', 'd193-e′', 'd193-k', 'd193-l', 'd193-i', 'd193-i-r', 'd193-i-u', 'd194-eq', 'd194-q′', 'd194-postsweep'];   // d194-fixture is a claim row: read like a figure row, gates nothing
+const FIG = ['d193-e', 'd193-k″', 'd193-e′', 'd193-k', 'd193-l', 'd193-i', 'd193-i-r', 'd193-i-u', 'd194-eq', 'd194-q′', 'd194-postsweep'];
 const ORDER = INST.concat(FIG);
+STAT.declare(ORDER.map(k => ID[k]));   // an ORDER key with no id throws: no summary, red
 
 // ── LOAD + VERSION PREDICATE ───────────────────────────────────────────────────────────────────────────────────────
 let IA, STAMP = NaN;
-try { IA = load(ART); STAMP = +IA.version; } catch(e){ P('FAIL boot: ' + e.message); fail++; done(); }
+try { IA = load(ART); STAMP = +IA.version; } catch(e){ ORDER.forEach(k => ok(k, R[k] + ' (boot: ' + e.message + ')', false)); done(); }
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION !== undefined){
   if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
@@ -807,7 +778,7 @@ if(process.env.IA_ASSUME_VERSION !== undefined){
 P('g230 D194 P-INJLENS part 2 (the lens alone: D193 live rows on the overlay presentation) | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
 if(!(VER >= ERA)){
   P('REFUSED: ia-version ' + VER + ' predates D194 P-INJLENS part 2 (V' + ERA + '). No row may pass on it.');
-  ORDER.forEach(k => ok(R[k] + ' (REFUSED)', false));
+  ORDER.forEach(k => ok(k, R[k] + ' (REFUSED)', false));
   done();
 }
 // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md sections 3 and 6; standing rulings 2 and 4): at 231 and up the
@@ -828,22 +799,21 @@ if(!BF){
     try { fs.unlinkSync(f); } catch(e){}
     process.on('exit', () => { try { fs.unlinkSync(f); } catch(e){} });
     fs.writeFileSync(f, cp.execFileSync('git', ['-C', ROOT, 'show', V229_COMMIT + ':index.html'], { maxBuffer:1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ BF = f; baseWhy += 'git show ' + V229_COMMIT.slice(0, 7) + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(+b.version === BASE_ERA){ BF = f; baseWhy += 'git show ' + V229_COMMIT.slice(0, 7) + ':index.html written to os.tmpdir() as g230_d194_lens2_v' + BASE_ERA + '_<pid>.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 P('  V' + BASE_ERA + ' baseline: ' + (BF ? 'LIVE (' + baseWhy + ')' : 'SETUP FAILED (' + baseWhy + ')'));
-if(!BF){ ORDER.forEach(k => ok(R[k] + ' (setup: no V' + BASE_ERA + ' tree: ' + baseWhy + ')', false)); done(); }
+if(!BF){ ORDER.forEach(k => ok(k, R[k] + ' (setup: no V' + BASE_ERA + ' tree: ' + baseWhy + ')', false)); done(); }
 const CF = ART;
 
 // ── JOBS ────────────────────────────────────────────────────────────────────────────────────────────────────────
 const JOBS = CK7.map(ck => ({ kind:'enum', ck, base:BF })).concat([['C', 'OV5'], ['C', 'CFG'], ['B', 'OV5']].map(([t, p]) => ({ kind:'hand', t, pres:p, file:t === 'C' ? CF : BF })), CK7.map(ck => ({ kind:'pairs', ck, art:CF, base:BF })));
 for(let s = 0; s < L1_SHARDS; s++) JOBS.push({ kind:'l1', shard:s, art:CF, base:BF, cis:L1.map((c, i) => i).filter(i => i % L1_SHARDS === s) });
-// d194-postsweep (D194 Amendment 4; V231 absorb ruling section 6) asserts at 230 and up, so its population jobs run at 230
-// and up; its reach jobs serve (ii) and the typed-build re-read, which assert at 230 only ((ii) is dropped as vacuous at
-// 231 and up: no reject day exists), so they run only there.
+// d194-postsweep (D194 Amendment 4; V231 absorb ruling section 6): its population jobs run at 230 and up. Its reach jobs
+// (at 230 only: (ii) and the typed-build re-read) retired Post-V233 under standing ruling 3, with the 230 assertion.
 if(VER >= ERA){
   for(let s = 0; s < PS_SHARDS; s++) JOBS.push({ kind:'ps', shard:s, art:CF, base:BF, cis:L432.map((c, i) => i).filter(i => i % PS_SHARDS === s) });
-  if(VER === ERA) [...new Set(PS_TABLE.map(psBuild))].forEach(k => JOBS.push({ kind:'reach', ck:k, art:CF, base:BF })); }
+}
 const ENUM = {};   // ck -> the enumerated chains (an enum job that dies leaves its config absent, and every lattice row FAILS)
 function runPool(jobs){ let i = 0, pend = jobs.filter(j => j.kind === 'enum').length, wake = []; const res = [];
   const landed = (j, r) => { if(j.kind !== 'enum') return; pend--; if(r && Array.isArray(r.chains)){ ENUM[j.ck] = r.chains;
@@ -863,7 +833,14 @@ const tW = Date.now();
 runPool(JOBS).then(res => {
   P('  jobs ' + res.filter(Boolean).length + '/' + JOBS.length + ' usable (' + ((Date.now() - tW) / 1000).toFixed(1) + ' s from spawn, pool ' + POOL + ')');
   const PJ = JOBS.map((j, i) => j.kind === 'pairs' ? res[i] : undefined).filter(x => x !== undefined), LJ = JOBS.map((j, i) => j.kind === 'l1' ? res[i] : undefined).filter(x => x !== undefined);
-  const AJ = JOBS.map((j, i) => j.kind === 'lat' ? res[i] : undefined).filter(x => x !== undefined);
+  // The lattice shards merge in a FIXED order, CK7 order then shard index (post-V233 s8). runPool splices a config's lat
+  // shards in at its cursor when that config's enum job lands, so their JOBS index follows enum finish order and the
+  // pool size; merged in that order, addInto's first-example-wins kept a different "e.g." chain at pool 8 than at
+  // pool 3. Every lattice merge below (LA, LPC, and the e.g. samples of d193-i-r, d193-i-u and d194-eq) reads AJ in
+  // this order, so the gate's output is the same at any pool apart from the clock line. The counts are sums and
+  // never depended on it.
+  const AJ = JOBS.map((j, i) => j.kind === 'lat' ? { ck:j.ck, shard:j.shard, r:res[i] } : undefined).filter(x => x !== undefined)
+    .sort((a, b) => CK7.indexOf(a.ck) - CK7.indexOf(b.ck) || a.shard - b.shard).map(x => x.r);
   const HJ = {}; JOBS.forEach((j, i) => { if(j.kind === 'hand') HJ[j.t + ':' + j.pres] = res[i]; });
   const pairsOK = PJ.length === CK7.length && PJ.every(Boolean), l1OK = LJ.length === L1_SHARDS && LJ.every(Boolean);
   const RES = {};
@@ -871,12 +848,12 @@ runPool(JOBS).then(res => {
   const PR = pairsOK ? PJ.flatMap(r => r.rows) : [];
   // L1-side merge
   const sumL1 = k => { const S = newL1(); LJ.filter(Boolean).forEach(r => { const s = r.S[k]; Object.keys(S).forEach(f => { if(typeof S[f] === 'number') S[f] += s[f]; else Object.keys(S[f]).forEach(g => { S[f][g] += s[f][g]; }); }); }); return S; };
-  const L = { CCFG:sumL1('CCFG'), CSTAMP:sumL1('CSTAMP'), BCFG:sumL1('BCFG'), BSTAMP:sumL1('BSTAMP') };
-  const X = { sc:{ n:0, align:true, card:0, toast:0 }, fix:{ n:0, align:true, card:0, toast:0 }, nc:{ n:0, eq:0 }, mv:{ card:0, toast:0 }, self:{ n:0, eq:0 } }; let cfgs = 0; const crash = [], EX = {};
+  const L = { CCFG:sumL1('CCFG'), CSTAMP:sumL1('CSTAMP'), BSTAMP:sumL1('BSTAMP') };
+  const X = { sc:{ n:0, align:true, card:0, toast:0 }, nc:{ n:0, eq:0 }, mv:{ card:0, toast:0 }, self:{ n:0, eq:0 } }; let cfgs = 0; const crash = [], EX = {};
   LJ.filter(Boolean).forEach(r => { cfgs += r.cfgs; crash.push(...r.crash); Object.keys(X).forEach(k => Object.keys(X[k]).forEach(f => { if(f === 'align') X[k].align = X[k].align && r.x[k].align; else X[k][f] += r.x[k][f]; }));
     Object.keys(r.ex).forEach(k => { EX[k] = (EX[k] || []).concat(r.ex[k]).slice(0, 3); }); });
   const exs = (...ks) => ks.flatMap(k => (EX[k] || []).map(s => ' | e.g. [' + k + '] ' + s)).join('');
-  if(l1OK){ P('  L1: ' + cfgs + '/' + L1.length + ' configs | pairs CCFG ' + L.CCFG.pairs + ', CSTAMP ' + L.CSTAMP.pairs + ', BCFG ' + L.BCFG.pairs + ', BSTAMP ' + L.BSTAMP.pairs + ' | throws ' + [L.CCFG.thr, L.CSTAMP.thr, L.BCFG.thr, L.BSTAMP.thr].join('/') + (crash.length ? ' | CRASH ' + crash.slice(0, 2).join('; ') : ''));
+  if(l1OK){ P('  L1: ' + cfgs + '/' + L1.length + ' configs | pairs CCFG ' + L.CCFG.pairs + ', CSTAMP ' + L.CSTAMP.pairs + ', BSTAMP ' + L.BSTAMP.pairs + ' | throws ' + [L.CCFG.thr, L.CSTAMP.thr, L.BSTAMP.thr].join('/') + (crash.length ? ' | CRASH ' + crash.slice(0, 2).join('; ') : ''));
     P('  L1: V229 STAMP -> candidate STAMP moves cards ' + X.mv.card + ', toasts ' + X.mv.toast); }
 
   // ── INSTRUMENT ROWS ──
@@ -887,14 +864,6 @@ runPool(JOBS).then(res => {
     const c = per('C'), b = per('B');
     P('    inst-stamp candidate ' + c.eq + '/' + c.n + ' days (stamped ' + c.st + ')' + (c.ex.length ? ' first differing ' + c.ex[0] : '') + ' | V229 ' + b.eq + '/' + b.n + ' (stamped ' + b.st + ')' + (b.ex.length ? ' first differing ' + b.ex[0] : ''));
     RES['inst-stamp'] = [pairsOK && [c, b].every(x => x.n === W.stamp.days && x.eq === x.n && x.st === W.stamp.stamped), 'candidate ' + c.eq + '/' + c.n + ' (stamped ' + c.st + '), V229 ' + b.eq + '/' + b.n + ' (stamped ' + b.st + ')']; }
-  // the claim row d194-fixture (R3′ "nothing else"): computed beside the instruments, printed with the figure rows, gates nothing
-  { const same = (a, b) => !!a && !!b && a.dn === b.dn && a.o === b.o && a.h === b.h && a.t === b.t && a.b === b.b && a.bn === b.bn && a.bh === b.bh;
-    const fp = PR.filter(r => same(r.R['C:CFG1'], r.R['B:CFG1'])).length;
-    const bad = PR.find(r => !same(r.R['C:CFG1'], r.R['B:CFG1']));
-    P('    d194-fixture (claim) L1 candidate CFG == V229 CFG: aligned ' + X.fix.align + ', card differs ' + X.fix.card + ', toast differs ' + X.fix.toast + ' of ' + X.fix.n + exs('fixcard', 'fixtoast', 'align') + ' | L9 pairs at CFG1 ' + fp + '/' + PR.length
-      + (bad ? ' | e.g. ' + bad.ck + ' W' + bad.w + ' ' + bad.d + ' ' + clean(bad.from) + ' -> ' + bad.to + ' ' + JSON.stringify(bad.R['C:CFG1']) + ' vs ' + JSON.stringify(bad.R['B:CFG1']) : ''));
-    RES['d194-fixture'] = [pairsOK && l1OK && !crash.length && cfgs === W.L1.cfgs && X.fix.align && X.fix.n === W.L1.pairs && X.fix.card === 0 && X.fix.toast === 0 && PR.length === W.fixPairs && fp === PR.length,
-      'L1 ' + (X.fix.n - Math.max(X.fix.card, X.fix.toast)) + '/' + X.fix.n + ' (card differs ' + X.fix.card + ', toast ' + X.fix.toast + ', aligned ' + X.fix.align + '), pairs ' + fp + '/' + PR.length]; }
   { const per = t => PJ.filter(Boolean).reduce((a, r) => ({ n:a.n + r.ovday[t].n, eq:a.eq + r.ovday[t].eq, st:a.st + r.ovday[t].stamped, ex:a.ex.concat(r.ovday[t].ex.map(x => r.ck + ' ' + x)) }), { n:0, eq:0, st:0, ex:[] });
     const c = per('C'), b = per('B');
     P('    inst-ov1 candidate ' + c.eq + '/' + c.n + ' carded days (stamped ' + c.st + ')' + (c.ex.length ? ' first differing ' + c.ex[0] : '') + ' | V229 ' + b.eq + '/' + b.n + ' (stamped ' + b.st + ')' + (b.ex.length ? ' first differing ' + b.ex[0] : ''));
@@ -917,8 +886,8 @@ runPool(JOBS).then(res => {
     RES['d193-e'] = [pairsOK && okB && f.n === W.e.n && f.bw8 === W.e.bw8 && f.bw7 === W.e.bw7 && f.cue === W.e.cue && f.lb === f.n && f.st === f.n && f.eq1 === f.n && f.n5 === W.e.w5 && f.eq5 === f.n5 && f.st5 === f.n5,
       'pairs ' + f.n + ', live bwsets RPE 8 ' + f.bw8 + ' (V229 ' + W.e.v229bw8 + '), RPE 7 ' + f.bw7 + ', cue ends ' + f.cue + ', live == boot ' + f.lb + ', OV1 == CFG1 ' + f.eq1 + '/' + f.n + ', OV5 == CFG ' + f.eq5 + '/' + f.n5 + (okB ? '' : '; BASELINE not as ruled: V229 OV1 bwsets at RPE 8 ' + b8)]; }
   // (k″) the toasts on (e)'s ends, typed
-  // the two sets are named on the BASELINE fixture (B:CFG1, the ruled expected answer; the claim row d194-fixture says
-  // it == the candidate's fixture and gates nothing), not by the card the overlay printed: its bwsets ends at RPE 7
+  // the two sets are named on the BASELINE fixture (B:CFG1, the ruled expected answer), not by the card the overlay
+  // printed: its bwsets ends at RPE 7
   // and its cue ends. So under a mutation that moves the fixture too (S22) the row still reads its own figure.
   { const k = 'C:OV1', B7 = PE.filter(r => bwAt(r.R['B:CFG1'].o, 7)), CU = PE.filter(r => isCue(r.R['B:CFG1'].o));
     const b7 = cnt(B7, r => bwAt(r.R[k].o, 7)), cu = cnt(CU, r => isCue(r.R[k].o));
@@ -1039,10 +1008,11 @@ runPool(JOBS).then(res => {
     if(c5.ok){ const m = HJ['C:OV5'].mario; P('      e.g. OV5 U0 hop2 ' + m.U0.hops[1].n + ' ' + JSON.stringify(m.U0.hops[1].d) + ' _preHold ' + JSON.stringify(m.U0.hops[1].h) + ' toast "' + m.U0.hops[1].t + '" | r7 Leg press "' + HJ['C:OV5'].r7.lp.hop.t + '"'); }
     RES['d194-q′'] = [okB && c5.ok && cf.ok, 'OV5 ' + (c5.ok ? 'all typed lines' : c5.miss.length + ' off (' + c5.miss[0] + ')') + ', CFG ' + (cf.ok ? 'all typed lines' : cf.miss.length + ' off (' + cf.miss[0] + ')') + (okB ? '' : '; BASELINE not as ruled: V229 OV5 ' + bm.length + ' lines off (' + bm[0] + ')')]; }
 
-  // d194-postsweep (D194 Amendment 4, INFO): at 230 the typed table, the re-read and (ii) assert as ruled. V231 (absorb ruling
+  // d194-postsweep (D194 Amendment 4, INFO): its 230 assertion (the typed table, the re-read, (ii)) retired Post-V233
+  // (standing ruling 3); at 230 the row FAILS by name. V231 (absorb ruling
   // section 6, RE-KEY, classes D196-1 + D197-1; standing rulings 2 and 4): at 231 and up the same population jobs run and
   // the row asserts L432 rejects 0 for the candidate, OV1 and fixture, with V229 reading the typed table in the same run
-  // (the instrument is not blind); (ii) is dropped as vacuous (no reject day exists) and prints one column-0 SKIP line.
+  // (the instrument is not blind); (ii) is dropped as vacuous (no reject day exists).
   if(VER >= V231_ERA){ const SJ = JOBS.map((j, i) => j.kind === 'ps' ? res[i] : undefined).filter(x => x !== undefined);
     const N = PS_N, PB = [...new Set(PS_TABLE.map(psBuild))], TS = new Set(PS_TABLE.map(psLine)), K = PS_COMBO.map(([t, p]) => t + ':' + p);
     const NM = { 'C:OV1':'candidate OV1', 'C:CFG1':'candidate fixture', 'B:OV1':'V229 OV1', 'B:CFG1':'V229 fixture' };
@@ -1059,65 +1029,19 @@ runPool(JOBS).then(res => {
       P('    d194-postsweep (i) ' + NM[k] + ': builds ' + o.builds + ', lifting days ' + o.days + ' | rejects ' + o.rej.length + ' (drops ' + q.drop + ', re-details ' + q.redetail + ', renames ' + q.rename + ') on ' + q.days + ' days in ' + q.builds + ' builds | ' + (cand ? 'ruled 0 (V231 re-key)' : '== the typed table ' + setEq(o)) + ' | new items ' + o.neu
         + (o.crash.length ? ' | CRASH ' + o.crash[0] : '') + (cand && o.rej.length ? ' | e.g. ' + o.rej[0] : '')); });
     P('    d194-postsweep typed table ' + PS_TABLE.length + ' rows (drops ' + tq.drop + ', re-details ' + tq.redetail + ', builds ' + tq.builds + ') consistent ' + tableOK);
-    P('SKIP row d194-postsweep (ii) the reach on the typed reject days: dropped at ia-version 231 and up as vacuous by the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 6), no reject day exists on the candidate (OV1 ' + pop['C:OV1'].rej.length + ', fixture ' + pop['C:CFG1'].rej.length + ' rejects); its reach jobs do not run; its successor is g231_d194a4_lateplan a4-dedupe / a4-nojumps / a4-cards (D194 Amendment 5). Never PASS, never FAIL.');
     const cOK = zero('C:OV1') && zero('C:CFG1'), okB = popOK('B:OV1') && popOK('B:CFG1');
     RES['d194-postsweep'] = [psOK && tableOK && cOK && okB,
       '(i) candidate rejects OV1 ' + pop['C:OV1'].rej.length + ', fixture ' + pop['C:CFG1'].rej.length + ' (builds ' + pop['C:OV1'].builds + '/' + pop['C:CFG1'].builds + ', lifting days ' + pop['C:OV1'].days + '/' + pop['C:CFG1'].days + '); V229 == the typed table on OV1 ' + popOK('B:OV1') + ', fixture ' + popOK('B:CFG1')
       + (psOK ? '' : '; JOBS not usable (population ' + SJ.filter(Boolean).length + '/' + PS_SHARDS + ')') + (tableOK ? '' : '; TYPED TABLE inconsistent with its counts') + (okB ? '' : '; BASELINE not as ruled')]; }
-  else { const SJ = JOBS.map((j, i) => j.kind === 'ps' ? res[i] : undefined).filter(x => x !== undefined), RJ = JOBS.map((j, i) => j.kind === 'reach' ? res[i] : undefined).filter(x => x !== undefined);
-    const N = PS_N, PB = [...new Set(PS_TABLE.map(psBuild))], TS = new Set(PS_TABLE.map(psLine)), K = PS_COMBO.map(([t, p]) => t + ':' + p);
-    const NM = { 'C:OV1':'candidate OV1', 'C:CFG1':'candidate fixture', 'B:OV1':'V229 OV1', 'B:CFG1':'V229 fixture' };
-    const psOK = SJ.length === PS_SHARDS && SJ.every(Boolean), rOK = RJ.length === PB.length && RJ.every(Boolean);
-    const kinds = rows => ({ drop:rows.filter(x => x.split('|')[8] === 'drop').length, redetail:rows.filter(x => x.split('|')[8] === 'redetail').length, rename:rows.filter(x => x.split('|')[8] === 'rename').length,
-      days:new Set(rows.map(x => x.split('|').slice(0, 6).join('|'))).size, builds:new Set(rows.map(x => x.split('|').slice(0, 4).join('|'))).size });
-    // the typed table reads its own ruled counts (both typed: the oracle is consistent before anything is compared with it)
-    const tq = kinds(PS_TABLE.map(psLine)), tableOK = PS_TABLE.length === N.rej && TS.size === N.rej && tq.drop === N.drop && tq.redetail === N.redetail && tq.days === N.rej && tq.builds === N.builds && PB.length === N.builds;
-    // (i) the reject set, each presentation against the typed table
-    const pop = {}; K.forEach(k => { const o = pop[k] = { builds:0, days:0, neu:0, rej:[], sha:{}, crash:[] };
-      SJ.filter(Boolean).forEach(r => { const s = r.R[k]; o.builds += s.builds; o.days += s.days; o.neu += s.neu; o.rej.push(...s.rej); Object.assign(o.sha, s.sha); o.crash.push(...s.crash); }); });
-    const setEq = o => { const s = new Set(o.rej); return o.rej.length === TS.size && s.size === TS.size && [...TS].every(x => s.has(x)); };
-    const popOK = k => pop[k].builds === N.configs && pop[k].days === N.days && !pop[k].crash.length && setEq(pop[k]);
-    K.forEach(k => { const o = pop[k], q = kinds(o.rej), s = new Set(o.rej), extra = o.rej.filter(x => !TS.has(x)), miss = [...TS].filter(x => !s.has(x));
-      P('    d194-postsweep (i) ' + NM[k] + ': builds ' + o.builds + ', lifting days ' + o.days + ' | rejects ' + o.rej.length + ' (drops ' + q.drop + ', re-details ' + q.redetail + ', renames ' + q.rename + ') on ' + q.days + ' days in ' + q.builds + ' builds | == the typed table ' + setEq(o) + ' | new items ' + o.neu
-        + (o.crash.length ? ' | CRASH ' + o.crash[0] : '') + (extra.length ? ' | e.g. not typed: ' + extra[0] : '') + (miss.length ? ' | e.g. typed, not found: ' + miss[0] : '')); });
-    // self: every typed build re-read on fresh VMs (its reach job) == the population job, stored record and reject rows
-    let selfN = 0, selfEq = 0, selfEx = '';
-    RJ.filter(Boolean).forEach(r => K.forEach(k => { selfN++; const a = r.R[k], pr = pop[k].rej.filter(x => psBuild(x.split('|')) === r.ck).sort(), rr = a.rej.slice().sort();
-      if(a.sha === pop[k].sha[r.ck] && JSON.stringify(pr) === JSON.stringify(rr) && !a.miss.length) selfEq++;
-      else if(!selfEx) selfEx = r.ck + ' ' + NM[k] + (a.miss.length ? ': typed card not on the day, ' + a.miss[0] : a.sha !== pop[k].sha[r.ck] ? ': stored record differs' : ': reject rows differ'); }));
-    P('    d194-postsweep typed table ' + PS_TABLE.length + ' rows (drops ' + tq.drop + ', re-details ' + tq.redetail + ', builds ' + tq.builds + ') consistent ' + tableOK + ' | typed builds re-read on fresh VMs == the population job ' + selfEq + '/' + selfN + (selfEx ? ' | e.g. ' + selfEx : ''));
-    // (ii) the reach: every landed swap of a non-reject card on a typed reject day
-    const SW = {}; K.forEach(k => { SW[k] = RJ.filter(Boolean).flatMap(r => r.R[k].swaps); });
-    const land = k => SW[k].filter(s => s.to);
-    const stat = k => { const L = land(k), c = f => L.filter(f).length; return { tried:SW[k].length, landed:L.length, other:c(s => s.other), uerr:c(s => s.uerr), ne:c(s => s.h.boot !== s.h.live),
-      ora:c(s => s.h.boot === s.h.ora), vis:c(s => s.vis), reb:c(s => s.h.reboot === s.h.boot), ul:c(s => s.h.undoLive === s.h.built), ub:c(s => s.h.undoBoot === s.h.built) }; };
-    const pair = (ka, kb) => { const A = new Map(land(ka).map(s => [s.key, s])), B = new Map(land(kb).map(s => [s.key, s])); let n = 0, to = 0, eq = 0;
-      for(const [key, a] of A){ const b = B.get(key); if(!b) continue; n++; if(a.to === b.to) to++; if(a.h.boot === b.h.boot) eq++; } return { n, to, eq, a:A.size, b:B.size }; };
-    const S = {}; K.forEach(k => { const s = S[k] = stat(k);
-      P('    d194-postsweep (ii) ' + NM[k] + ': swaps tried ' + s.tried + ', landed ' + s.landed + ' (on another card ' + s.other + ') | boot != live ' + s.ne + ' | boot == the hand oracle ' + s.ora + ' (names and details ' + s.vis + ') | reboot == boot ' + s.reb + ' | undo errors ' + s.uerr + ', live after undo == built ' + s.ul + ', undo+boot == built ' + s.ub); });
-    const pc = pair('C:OV1', 'C:CFG1'), pb = pair('B:OV1', 'B:CFG1');
-    P('    d194-postsweep (ii) OV1 boot == fixture boot (day JSON, stamp removed): candidate ' + pc.eq + ' of ' + pc.n + ' paired (same swap ' + pc.to + ') | V229 ' + pb.eq + ' of ' + pb.n + ' paired (same swap ' + pb.to + ')');
-    { const ex = land('C:OV1').find(s => s.h.boot !== s.h.ora) || land('C:OV1')[0]; if(ex) P('      e.g. ' + ex.key + ' -> ' + ex.to + '\n        live   ' + ex.ex.live + '\n        boot   ' + ex.ex.boot + '\n        oracle ' + ex.ex.ora); }
-    const c1 = S['C:OV1'], cf = S['C:CFG1'], q = kinds(pop['C:OV1'].rej);
-    const iOK = psOK && tableOK && K.every(popOK);
-    const iiOK = rOK && [c1, cf].every(s => s.tried === N.tried && s.landed === N.landed && s.ora === N.landed && s.ub === N.landed) && pc.a === N.landed && pc.b === N.landed && pc.n === N.landed && pc.to === N.landed && pc.eq === N.landed;
-    const okB = psOK && rOK && popOK('B:OV1') && popOK('B:CFG1') && S['B:OV1'].landed === N.landed && S['B:CFG1'].landed === N.landed && pb.n === N.landed && pb.to === N.landed && pb.eq === 0;
-    const selfOK = rOK && selfN === PB.length * K.length && selfEq === selfN;
-    RES['d194-postsweep'] = [iOK && iiOK && okB && selfOK,
-      '(i) rejects ' + pop['C:OV1'].rej.length + ' (' + q.drop + ' + ' + q.redetail + ') in ' + q.builds + ' builds, == the typed table on ' + K.filter(popOK).length + ' of 4 presentations, self ' + selfEq + '/' + selfN
-      + '; (ii) landed ' + c1.landed + ' of ' + c1.tried + ', OV1 boot == fixture boot ' + pc.eq + '/' + pc.n + ', == the hand oracle ' + c1.ora + '/' + c1.landed + ' (fixture ' + cf.ora + '/' + cf.landed + '), undo+boot == built ' + c1.ub + '/' + c1.landed + ' (fixture ' + cf.ub + '/' + cf.landed + ')'
-      + (psOK && rOK ? '' : '; JOBS not usable (population ' + SJ.filter(Boolean).length + '/' + PS_SHARDS + ', reach ' + RJ.filter(Boolean).length + '/' + PB.length + ')') + (tableOK ? '' : '; TYPED TABLE inconsistent with its counts')
-      + (okB ? '' : '; BASELINE not as ruled: V229 OV1 boot != fixture boot ' + (pb.n - pb.eq) + ' of ' + pb.n + ', V229 rejects == typed ' + popOK('B:OV1') + '/' + popOK('B:CFG1'))]; }
+  else RES['d194-postsweep'] = [false, 'its ia-version 230 assertion ((i) at the typed 22, (ii) the reach, the typed-build re-read) retired Post-V233 under standing ruling 3; d194-postsweep asserts from 231'];
 
   // print rows in order: instruments, then figures (unread when an instrument failed)
-  INST.forEach(k => { const r = RES[k] || [false, 'row not computed']; ok(R[k], r[0], r[1]); });
-  // V231 (absorb ruling section 3, g230 d194-fixture SCOPE; standing rulings 2 and 4): at 231 and up the claim row is
-  // V230's claim about V230 and prints one column-0 SKIP line with this tree's figures, never PASS and never FAIL.
-  FIG.forEach(k => { if(k === 'd194-fixture' && VER >= V231_ERA){ P('SKIP row d194-fixture CLAIM (R3′ "nothing else") scoped to ia-version 230 by the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 3): V230\'s claim about V230; a later build\'s fixture moves by its own ruling (D195 A-1/B-1, D196, D197). This tree: ' + (RES[k] ? RES[k][1] : 'not computed') + ' (V229 pairs ' + W.L1.pairs + '). Never PASS, never FAIL.'); return; }
-    if(!INSTR_OK){ ok(R[k] + ' (not read: instrument ' + INST.filter(i => !(RES[i] && RES[i][0])).join(', ') + ' failed)', false); return; }
-    const r = RES[k] || [false, 'row not computed']; ok(R[k], r[0], r[1]); });
+  INST.forEach(k => { const r = RES[k] || [false, 'row not computed']; ok(k, R[k], r[0], r[1]); });
+  FIG.forEach(k => {
+    if(!INSTR_OK){ ok(k, R[k] + ' (not read: instrument ' + INST.filter(i => !(RES[i] && RES[i][0])).map(i => ID[i]).join(', ') + ' failed)', false); return; }
+    const r = RES[k] || [false, 'row not computed']; ok(k, R[k], r[0], r[1]); });
   done();
-}).catch(e => { P('  MERGE CRASH ' + String(e && e.stack || e).slice(0, 600)); ORDER.forEach(k => ok(R[k] + ' (merge crashed)', false)); done(); });
+}).catch(e => { P('  MERGE CRASH ' + String(e && e.stack || e).slice(0, 600)); ORDER.forEach(k => ok(k, R[k] + ' (merge crashed)', false)); done(); });
 }
 
 if(IS_WORKER){ try { workerMain(); } catch(e){ process.stdout.write(MARK + JSON.stringify({ ok:false, err:String(e && e.stack || e).slice(0, 600) }) + '\n'); } }

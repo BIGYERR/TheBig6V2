@@ -18,9 +18,9 @@
 //   S1 SITE       the target card is selected independently on the V225 artifact's own W1 grid (mon..sun,
 //                 first run card with \d:\d\d/mi in detail and a subtype not matching
 //                 RACE DAY|TIME TRIAL|^Benchmark Run), never read back from where the candidate put it.
-//   CONFINEMENT   whole-program digest, candidate with the one S1 note restored vs the V225 artifact
-//                 (default: git show of the V225 commit), both built from the same pinned seed and clock;
-//                 the baseline is proved self-equal before any diff.
+//   BASELINE      the V225 artifact (default: git show of the V225 commit), built from the same pinned seed and clock
+//                 as the candidate and proved self-equal before any diff. G6b's whole-program byte equality with it
+//                 (the S1 note restored, asserted at 230 and below) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 //
 // VERSION PREDICATE (standing rulings 2 and 4). D189 ships at 226.
 //   226 and up    every row asserts the D189 truth.
@@ -28,8 +28,8 @@
 //                 it keeps the S1 half (exactly one S1 note, on the V225 grid's first paced W1 run card, == the V225
 //                 note + one space + S1) and adds "cells whose lifting days differ from V225 == 640" (D195-B's cost
 //                 lens, class B-1, moved the lifting days of every cell: the ruling printed 640 cells, ops B-1 7,694,
-//                 0 other; V230 reads 0). Its whole-program byte equality with V225 asserts at 230 and below only and
-//                 at 231 and up prints one column-0 SKIP line, never PASS and never FAIL.
+//                 0 other; V230 reads 0). Its whole-program byte equality with V225 (asserted at 230 and below)
+//                 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 //   225 and below every row asserts the V225 truth where one exists (0 S1 notes, the V209 card sentence,
 //                 the "Optional. It sets your training paces." label, ...); a row with no V225 truth is counted
 //                 in NA, never as a pass.
@@ -237,17 +237,16 @@ guard('G6b', () => {
       const restored = JSON.parse(JSON.stringify(pc)), rc = cardAt(restored, site);
       if(baseNote === undefined) delete rc.note; else rc.note = baseNote;
       if(V231){ if(H.progDigest(noLift(restored)) === H.progDigest(noLift(pb))) outEq++; }
-      else if(H.progDigest(restored) !== H.progDigest(pb)){ miss('another byte moved vs V225', tag); continue; }
+      // the whole-program byte equality with V225 (the else of V231; V231 absorb ruling section 3) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
       seen('G6 S1 ' + exp, note.slice(note.length - S1(exp).length));
       good++;
     } }
   const expectCells = 640;
   if(D189 && BASE) console.log('    G6b lifting days vs V225 (every week and day, its sections): cells differing ' + lmoved + ' of ' + lcells + ', days differing ' + ldays + (V231 ? ' | INFO, not asserted: cells equal to V225 outside the lifting sections with the S1 note restored ' + outEq + ' of ' + good : ''));
-  if(V231) console.log('SKIP row G6b whole-program byte equality with V225 (S1 note restored): asserted at ia-version 230 and below only; the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 3) splits G6b at 231 and up (D195-B moved the lifting days of every cell, class B-1). Never PASS, never FAIL.');
   if(V231) ok(ROW.G6b + ' [V231 split: the S1 half kept, the whole-program byte equality dropped; cells whose lifting days differ from V225 == ' + V231_LIFT + ', B-1]',
     cells === expectCells && good === cells && lcells === expectCells && lmoved === V231_LIFT,
     good + '/' + cells + ' cells (ruled 640), lifting days differ on ' + lmoved + '/' + lcells + ' cells (ruled ' + V231_LIFT + ')' + (Object.keys(why).length ? ' misses ' + J(why) + ' e.g. ' + ex.join(' ; ') : ''));
-  else ok(ROW.G6b, cells === expectCells && good === cells, good + '/' + cells + ' cells (ruled 640)' + (Object.keys(why).length ? ' misses ' + J(why) + ' e.g. ' + ex.join(' ; ') : ''));
+  else ok(ROW.G6b + ' [whole-program byte equality retired Post-V233]', cells === expectCells && good === cells, good + '/' + cells + ' cells (ruled 640)' + (Object.keys(why).length ? ' misses ' + J(why) + ' e.g. ' + ex.join(' ; ') : ''));
 });
 guard('G6c', () => {
   let cells = 0, good = 0; const ex = [];

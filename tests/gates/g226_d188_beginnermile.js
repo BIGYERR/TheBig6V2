@@ -39,9 +39,9 @@
 //                 otherwise B or C, settled against the same (week, day) on the other artifact: one pre-pass draw, two
 //                 tiers, so the side that lost items is B). Vocabularies lifted from g209 (D18/D140) plus D153's hinge
 //                 pair. The block sits after G2 because it reads G2's V225 baseline.
-//   G2 IDENTITY   two artifacts: the candidate with the D189 S1 suffix (typed below, ' ' + S1) stripped from every
-//                 note must equal the V225 artifact's build, digest for digest, and V225 must equal itself first.
-//                 Baseline: argv[3] if it reads ia-version 225, else `git show <V225 commit>:index.html`.
+//   G2 BASELINE   the V225 artifact's builds equal themselves (the precondition G1h's baseline rests on). Baseline:
+//                 argv[3] if it reads ia-version 225, else `git show <V225 commit>:index.html`. G2's identity row
+//                 (the candidate minus the D189 S1 suffix equals V225) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 //   G3 VALIDATOR  the D9 strings and R3 string typed from the V226 source text; `_mileEntryState(g, exp)` called
 //                 directly (D110a's model), compared by canonical deep equality.
 //   G4 SURFACES   substring counts on the rendered wizard body and on progDetailHTML output.
@@ -52,20 +52,14 @@
 //
 // VERSION PREDICATE (standing rulings 2 and 4). D188 ships at 226.
 //   226 and up    every row asserts the D188 after-state.
-//   231 and up    three rows are SCOPED to 230 and below (tests/measure/v231_rulings/v231_absorb_ruling.md section 3;
-//                 standing rulings 2 and 4): G2's identity row (the candidate minus S1 equals the V225 build), G1h-P2b
-//                 (11:30 weekGrid identity) and G1h-P5 (unmoved days byte-identical). D195 moves those populations (the
-//                 ruling prints G2 120 of 120 cells moved, ops B-1 657; the G1h lattice 384 of 384 cfgs moved, ops A-1
-//                 1,806, B-1 3,155, B-2 7, 0 other). At 231 and up each prints one named SKIP line at column 0, never PASS
-//                 and never FAIL, naming the successors g231_d195b_cost D195-B-b and g231_d195_hipext D195-A-b. G2's V225
-//                 self-identity precondition and G1h-P0, P1, A1L, P2, P3, P4, L1 to L3 assert as before.
+//   G2's identity row, G1h-P2b and G1h-P5 (asserted at 226 to 230; V231 absorb ruling section 3) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 //   225 and below every row asserts the V225 truth (printed "era truth"), so the suite stays green on the previous
 //                 artifact for the right reason. One block lacks a V225 truth: G1h (the A2 / A1-L licence compares
-//                 V226 against V225, and V225 has no counterpart), so below 226 its 11 rows are counted NA by name.
+//                 V226 against V225, and V225 has no counterpart), so below 226 its 9 rows are counted NA by name.
 //   IA_ASSUME_VERSION=226 lifts a file stamped exactly 225 to 226 for a discrimination run (not a ship proof): the
 //                 rows D188 changed go RED on V225, the unchanged ones (G1 no-mile length, G1f length, G2, G3 blank
 //                 and R3, G4 intermediate pencil) stay green.
-//                 G1h: P0 to P5 stay green (V225 against V225 moves nothing) and the liveness rows L1 to L3 go RED.
+//                 G1h: P0 to P4 stay green (V225 against V225 moves nothing) and the liveness rows L1 to L3 go RED.
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 
@@ -81,10 +75,6 @@ const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const BASEFILE = process.argv[3] ? path.resolve(process.argv[3]) : null;
 const ERA = 226;
 const V225_COMMIT = '35919943d766606dcbf5e09c98a08b5782dc2223';   // "V225: D186/D187 — the pace clock lands on the goal ..."
-// V231 absorb ruling section 3 (g226_d188 G2, G1h-P2b, G1h-P5 SCOPE): those rows assert at 230 and below only; at 231 and
-// up each prints this line at column 0, counted neither PASS nor FAIL.
-const V231_ERA = 231;
-const scopeSkip = (row, fig) => console.log('SKIP ' + row + ' (' + fig + ' on this tree): scoped to ia-version 230 and below by the V231 absorb ruling (tests/measure/v231_rulings/v231_absorb_ruling.md section 3); successors g231_d195b_cost D195-B-b, g231_d195_hipext D195-A-b. Never PASS, never FAIL.');
 
 let pass = 0, fail = 0, na = 0;
 const t0 = RealDate.now();
@@ -271,14 +261,6 @@ for(const goal of ['run_pace_goal', 'run_5k', 'run_half', 'run_base']){
 
 // ══ G2 (D188 no-mile identity) ═════════════════════════════════════════════════════════════════
 console.log('\nG2 no-mile identity: beginner, no mile, x 6 goals x ' + SEEDS.length + ' seeds (' + TAG + ')');
-function stripS1(p){
-  const q = JSON.parse(JSON.stringify(p)); let n = 0; const tail = ' ' + S1_BEG;
-  (function walk(o){ if(!o || typeof o !== 'object') return;
-    if(typeof o.note === 'string' && o.note.endsWith(tail)){ o.note = o.note.slice(0, o.note.length - tail.length); n++; }
-    for(const k of Object.keys(o)) walk(o[k]); })(q);
-  return { q, n };
-}
-const s1Count = p => { let n = 0; (function walk(o){ if(!o || typeof o !== 'object') return; if(typeof o.note === 'string' && o.note.indexOf(S1_BEG) >= 0) n++; for(const k of Object.keys(o)) walk(o[k]); })(p); return n; };
 let BASE = null, baseWhy = '';
 if(D188){
   if(BASEFILE && fs.existsSync(BASEFILE)){ try { const b = H.load(BASEFILE); if(+b.version === 225){ BASE = b; baseWhy = 'argv ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 225; '; } catch(e){ baseWhy = 'argv baseline failed to boot: ' + e.message + '; '; } }
@@ -295,26 +277,18 @@ if(D188){
 }
 {
   const REF = D188 ? BASE : IA;   // era truth: the candidate (V225) must be self-stable and carry no S1
-  let selfEq = 0, same = 0, cells = 0, strips = 0; const bad = [], badSelf = [];
+  let selfEq = 0, cells = 0; const badSelf = [];
   if(!REF){
     ok('G2 ' + TAG + ' V225 baseline builds equal themselves (precondition)', false, 'no V225 baseline (fail closed, not a silent pass): ' + baseWhy);
-    if(VER >= V231_ERA) scopeSkip('G2 ' + TAG + ' beginner no-mile program minus the S1 suffix equals the V225 build, digest for digest', 'no V225 baseline');
-    else ok('G2 ' + TAG + ' beginner no-mile program minus the S1 suffix equals the V225 build, digest for digest', false, 'no V225 baseline');
   } else {
     for(const goal of ALL6) for(const s of SEEDS){
       cells++; const cfg = cfgOf(goal, 'beginner', s, 0);
-      let r1, r2, c;
+      let r1, r2;
       try { r1 = H.progDigest(build(REF, cfg)); r2 = H.progDigest(build(REF, cfg)); } catch(e){ badSelf.push(goal + ' seed ' + s + ' baseline threw ' + e.message); continue; }
       if(r1 === r2) selfEq++; else { badSelf.push(goal + ' seed ' + s + ' ' + r1 + ' != ' + r2); continue; }
-      try { c = build(IA, cfg); } catch(e){ bad.push(goal + ' seed ' + s + ' candidate threw ' + e.message); continue; }
-      if(D188){ const st = stripS1(c); strips += st.n; const dc = H.progDigest(st.q); if(dc === r1) same++; else bad.push(goal + ' seed ' + s + ' cand ' + dc + ' != V225 ' + r1); }
-      else { const k = s1Count(c); strips += k; if(k === 0 && H.progDigest(c) === r1) same++; else bad.push(goal + ' seed ' + s + ' S1 notes ' + k); }
     }
     ok('G2 ' + TAG + ' ' + (D188 ? 'V225 baseline' : 'candidate') + ' builds equal themselves before any diff (' + ALL6.length + ' goals x ' + SEEDS.length + ' seeds)', selfEq === cells && cells > 0, selfEq + '/' + cells + (badSelf.length ? '; ' + badSelf.slice(0, 3).join(' | ') : ''));
-    if(VER >= V231_ERA) scopeSkip('G2 ' + TAG + ' beginner no-mile program with exactly \' \' + S1 stripped from every note equals the V225 build, digest for digest', same + '/' + cells + ' cells equal, ' + strips + ' S1 suffixes stripped');
-    else ok('G2 ' + TAG + ' ' + (D188 ? 'beginner no-mile program with exactly \' \' + S1 stripped from every note equals the V225 build, digest for digest'
-                                 : 'beginner no-mile program carries no S1 note (V225 truth: no disclosure pass)'),
-       same === cells && cells > 0, same + '/' + cells + ' cells, ' + strips + ' S1 suffixes ' + (D188 ? 'stripped' : 'found') + (bad.length ? '; ' + bad.slice(0, 3).join(' | ') : ''));
+    // G2's identity row (the candidate minus S1 equals the V225 build; D188 V226, V231 absorb ruling section 3) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
   }
 }
 
@@ -447,8 +421,8 @@ function stripComments(src){
 // :3816-3818 the anchor) are NOT read here; the oracle below is typed from the doctrine text.
 {
   const G1H_ROWS = ['G1h-P0 V225 self-identity', 'G1h-P1 population bound', 'G1h-A1L length licence', 'G1h-P2 long-run set and direction',
-    'G1h-P2b 11:30 weekGrid identity', 'G1h-P3 oracle tier = applied tier, minutes direction', 'G1h-P4 new-tier content',
-    'G1h-P5 unmoved days byte-identical', 'G1h-L1 liveness shorter tier', 'G1h-L2 liveness longer tier', 'G1h-L3 liveness A1-L'];
+    'G1h-P3 oracle tier = applied tier, minutes direction', 'G1h-P4 new-tier content',
+    'G1h-L1 liveness shorter tier', 'G1h-L2 liveness longer tier', 'G1h-L3 liveness A1-L'];
   console.log('\nG1h D188 A2 / A1-L licence (re-licence 2026-10-01): beginner x 4 goals x 2 path/focus cells x mile {none, 9:00, 11:30, 13:00} x 2 rest x 3 seeds, + the same intermediate lattice as the P1 control (' + TAG + ')');
   if(!D188){
     G1H_ROWS.forEach(r => { na++; console.log('  NA ' + r + ': the licence compares V226 against V225; ia-version ' + VER + ' has no counterpart'); });
@@ -513,9 +487,9 @@ function stripComments(src){
     };
     const agree = (o, a) => a === o || a === '-' || (a === '?' && (o === 'B' || o === 'C'));
     const sgn = x => x > 0 ? 1 : x < 0 ? -1 : 0;
-    const nBad = { P0: 0, P1: 0, A1L: 0, P2: 0, P2b: 0, P3: 0, P4: 0, P5: 0 }, bad = { P0: [], P1: [], A1L: [], P2: [], P2b: [], P3: [], P4: [], P5: [] };
+    const nBad = { P0: 0, P1: 0, A1L: 0, P2: 0, P3: 0, P4: 0 }, bad = { P0: [], P1: [], A1L: [], P2: [], P3: [], P4: [] };
     const miss = (k, s) => { nBad[k]++; if(bad[k].length < 3) bad[k].push(s); };
-    const cnt = { cfg: 0, lic: 0, pop1: 0, same: 0, a1l: 0, a1lHit: 0, at690: 0, pairs: 0, unmoved: 0, nonLR: 0, p4: 0, p4new: 0, minMv: 0, shorter: 0, longer: 0 };
+    const cnt = { cfg: 0, lic: 0, pop1: 0, same: 0, a1l: 0, a1lHit: 0, pairs: 0, unmoved: 0, nonLR: 0, p4: 0, p4new: 0, minMv: 0, shorter: 0, longer: 0 };
     const p4 = (day, t, where, isNew) => {
       cnt.p4++; if(isNew) cnt.p4new++;
       const k = carries(day); if(k) miss('P4', where + ' tier ' + t + ' carries ' + k + ': ' + shapeOf(day));
@@ -551,13 +525,12 @@ function stripComments(src){
         continue;
       }
       cnt.same++;
-      if(lic && L.m === HM){ cnt.at690++; if(H.weekGrid(p5) !== H.weekGrid(p6)) miss('P2b', L.tag + ' weekGrid differs at 11:30'); }
       const s1 = L.m ? null : S1_OF[L.exp];
       for(let w = 1; w <= len5; w++) for(const d of DAYS){
         const d5 = p5.weeks[w] && p5.weeks[w][d], d6 = p6.weeks[w] && p6.weeks[w][d], where = L.tag + ' W' + w + ' ' + d;
         if(!d5 || !d6){ if(d5 || d6) miss('P2', where + ' present on one side only'); continue; }
         const t5 = oTier(d5), t6 = oTier(d6);
-        if(!t5 && !t6){ cnt.nonLR++; if(LRJ(secs(d5)) !== LRJ(secs(d6))) miss('P5', where + ' non-long-run day: ' + shapeOf(d5) + ' -> ' + shapeOf(d6)); continue; }
+        if(!t5 && !t6){ cnt.nonLR++; continue; }
         if(!t5 || !t6){ miss('P2', where + ' long run on one side only (' + (t5 || '-') + ' / ' + (t6 || '-') + ')'); continue; }
         cnt.pairs++;
         const c5 = d5.cardio, c6 = d6.cardio, mv = sgn(RK[t6] - RK[t5]), dm = +(minOf(c6.dose) - minOf(c5.dose)).toFixed(2);
@@ -573,7 +546,7 @@ function stripComments(src){
         }
         const [a5, a6] = readPair(d5, d6);
         if(!agree(t5, a5) || !agree(t6, a6)) miss('P3', where + ' oracle ' + t5 + '/' + t6 + ' (' + mins + ') applied ' + a5 + '/' + a6 + ': ' + shapeOf(d5) + ' -> ' + shapeOf(d6));
-        if(mv === 0){ cnt.unmoved++; if(LRJ(secs(d5)) !== LRJ(secs(d6))) miss('P5', where + ' tier ' + t5 + ' unmoved: ' + shapeOf(d5) + ' -> ' + shapeOf(d6)); }
+        if(mv === 0) cnt.unmoved++;
         p4(d6, t6, where, mv !== 0);
       }
     }
@@ -585,12 +558,10 @@ function stripComments(src){
     ok('G1h-P1 D188 intermediate, or beginner with no mile (S1 suffix stripped): 0 tier moves and every long-run day byte-identical to V225 (' + cnt.pop1 + ' cfgs)', nBad.P1 === 0 && cnt.pop1 > 0, ex('P1'));
     ok('G1h-A1L D188 a length change only on a beginner pace goal with a mile off 11:30, sign(len226 - len225) = sign(m - 690) (' + cnt.a1l + ' cfgs; judged by P4 only)', nBad.A1L === 0, ex('A1L'));
     ok('G1h-P2 D188 same length: a long run on one side is a long run on the other with the same subtype; tier moves only toward sign(m - 690) (C<B<A)', nBad.P2 === 0 && cnt.pairs > 0, ex('P2'));
-    if(VER >= V231_ERA) scopeSkip('G1h-P2b D188 beginner at 11:30 (m = 690): weekGrid byte-identical to V225 (' + cnt.at690 + ' cfgs)', nBad.P2b + ' of ' + cnt.at690 + ' cfgs differ');
-    else ok('G1h-P2b D188 beginner at 11:30 (m = 690): weekGrid byte-identical to V225 (' + cnt.at690 + ' cfgs)', nBad.P2b === 0 && cnt.at690 > 0, ex('P2b'));
+    // G1h-P2b (11:30 weekGrid identity; D188 V226, V231 absorb ruling section 3) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
     ok('G1h-P3 D188 the hand tier (dose minutes, >= 75 A, >= 45 B) equals the tier read off the printed day, both sides; minutes move only toward sign(m - 690) (' + cnt.pairs + ' pairs)', nBad.P3 === 0 && cnt.pairs > 0, ex('P3'));
     ok('G1h-P4 D188 V226 long-run content: A no lifting; B no hinge/leg, no power, at most 8 working sets; no carry on any tier (' + cnt.p4 + ' days, ' + cnt.p4new + ' new tier or A1-L)', nBad.P4 === 0 && cnt.p4new > 0, ex('P4'));
-    if(VER >= V231_ERA) scopeSkip('G1h-P5 D188 same length: every non-long-run day and every unmoved long-run day has V225\'s sections byte for byte (' + cnt.nonLR + ' + ' + cnt.unmoved + ' days)', nBad.P5 + ' days differ');
-    else ok('G1h-P5 D188 same length: every non-long-run day and every unmoved long-run day has V225\'s sections byte for byte (' + cnt.nonLR + ' + ' + cnt.unmoved + ' days)', nBad.P5 === 0 && cnt.nonLR > 0 && cnt.unmoved > 0, ex('P5'));
+    // G1h-P5 (unmoved days byte-identical; D188 V226, V231 absorb ruling section 3) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
     ok('G1h-L1 D188 liveness: a 9:00 beginner moves long runs to a shorter tier (' + cnt.shorter + ' days)', cnt.shorter > 0, cnt.shorter);
     ok('G1h-L2 D188 liveness: a 13:00 beginner on run_base, event, support focus moves long runs to a longer tier (' + cnt.longer + ' days)', cnt.longer > 0, cnt.longer);
     ok('G1h-L3 D188 liveness: pace goal 1.5 mi in 13:30 at a 9:00 mile shortens to 9 weeks under A1-L (' + cnt.a1lHit + ' cfgs)', cnt.a1lHit > 0, cnt.a1lHit);

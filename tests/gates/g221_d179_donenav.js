@@ -48,15 +48,13 @@
 //   G9   HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable (221 only; standing ruling 5, no era row).
 'use strict';
 process.env.TZ = 'America/New_York';
-const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
+const path = require('path');
 const H = require(path.join(__dirname, '..', 'harness.js'));
-const { load, progDigest } = H;
+const { load } = H;
 
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
-const BASEFILE = process.argv[3] || null;
-const ERA = 221, BASE_ERA = 220, V220_COMMIT = '8ee4385b6108a2eade639628aa99dee0ab201950';
-const MANNY = '0ac7da6b1691a8e1';
+const ERA = 221;
 let pass = 0, fail = 0, skip = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l + (g === undefined ? '' : ' :: ' + g)); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = (l, why) => { skip++; console.log('SKIP ' + l + ': ' + why); };
@@ -111,11 +109,7 @@ const R = {
   K1:'K1 copy, comments stripped: `' + OLD_SKIP + '` occurs once, inside resolveReminder (the parked twin)',
   K2:'K2 copy, comments stripped: handleDayStatus labels skipped as `' + SKIP_LBL + '`, no em-dash label left in it',
   K3:'K3 copy, comments stripped: `OPEN SESSION` occurs once; each hero string occurs once',
-  P1:'P1 (pair) the pending week render, every training day as today (70), is byte-identical to V220; V220 equals itself; marked renders differ (comparator live)',
-  P2:'P2 (pair) the reopened day body and footer, pending / Done / Skipped (210 opens), are byte-identical to V220 (footer layout and strings unchanged)',
-  G9:'G9 HALF_MANNY digest ' + MANNY + ' on the candidate, self-stable (no era row)',
 };
-const PAIR_ROWS = ['P1', 'P2'];
 
 // ── ENV: virtual clock + retaining DOM stub ──────────────────────────────────
 function mkEnv(file){
@@ -198,30 +192,6 @@ if(!(VER >= ERA)){
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();
 }
-// Baseline for the pair rows: D179's build pair is 221 against 220. Two loads: V220 must equal itself.
-let B = null, B2 = null, baseWhy = '';
-if(VER === ERA){
-  try {
-    let bf = null;
-    if(BASEFILE){ const b = load(BASEFILE); if(+b.version === BASE_ERA) bf = BASEFILE; else baseWhy = 'argv[3] reads ' + b.version + '; '; }
-    let tmp = null;
-    if(!bf){
-      tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'g221d179-')); bf = path.join(tmp, 'v220.html');
-      fs.writeFileSync(bf, cp.execFileSync('git', ['show', V220_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 27 }));
-      baseWhy += 'baseline from git ' + V220_COMMIT.slice(0, 7);
-    }
-    const b1 = mkEnv(bf), b2 = mkEnv(bf);
-    if(tmp) fs.rmSync(tmp, { recursive:true, force:true });
-    if(+b1.IA.version === BASE_ERA){ B = b1; B2 = b2; } else { baseWhy += ' reads ' + b1.IA.version; }
-  } catch(e){ baseWhy += 'baseline load failed: ' + String(e && e.message || e).slice(0, 160); B = null; }
-}
-const PAIR = VER === ERA && !!B;
-console.log('  pair rows: ' + (PAIR ? 'LIVE (candidate ' + VER + ' vs V' + BASE_ERA + (baseWhy ? ', ' + baseWhy : ', argv[3]') + ')' : VER === ERA ? 'SETUP FAILED (' + baseWhy + ')' : "scoped out (candidate " + VER + " is not D179's pair)"));
-const pairRow = (key, cond, got) => {
-  if(PAIR) return ok(R[key], cond, got);
-  if(VER === ERA) return ok(R[key] + ' (setup: ' + baseWhy + ')', false);
-  skipRow(R[key], 'scoped out, candidate ' + VER + " is not D179's build pair (221 vs 220)");
-};
 const safe = fn => { try { return fn(); } catch(e){ return [false, 'threw ' + (e && e.message)]; } };
 const row = (key, fn) => { const r = safe(fn); ok(R[key], r[0], r[1]); };
 // tallies: k -> [pass, fail, first failures]
@@ -410,35 +380,9 @@ row('K2', () => { const hd = body('handleDayStatus'); return [!!hd && count(hd, 
   'new label ' + count(hd, "skipped:'" + SKIP_LBL + "'") + ', em-dash label ' + count(hd, 'Skipped ✕ —')]; });
 row('K3', () => { const a = count(JS, 'OPEN SESSION'), b = count(JS, DONE_STR), c = count(JS, SKIP_STR); return [a === 1 && b === 1 && c === 1, 'OPEN SESSION ' + a + ', Done string ' + b + ', Skipped string ' + c]; });
 
-// ---- P: pair rows, the untouched classes against V220 ----
-function pairTranscript(X){
-  X.setup(); const week = [], marked = [], foot = [];
-  for(const [w, d] of X.TRAIN){
-    X.clearMarks(); X.T.clear(); X.setNow(dateOf(w, d)); X.ev('currentWeek=' + w + ';'); X.ev('renderWeekView()'); week.push(X.html());
-    for(const st of [null, 'complete', 'skipped']){
-      X.clearMarks();
-      if(st) X.ev('saveCompleted({[completedKey(' + w + ",'" + d + "')]:{title:'x',ts:1,status:'" + st + "'}})");
-      if(st === 'skipped'){ X.ev('renderWeekView()'); marked.push(X.html()); }
-      X.open(d); foot.push(X.els.detailStatusRow.innerHTML + '\n' + X.els.detailBody.innerHTML); X.ev('closeDetail()');
-    }
-  }
-  return { week, marked, foot };
-}
-if(PAIR){
-  const c = pairTranscript(E), b = pairTranscript(B), b2 = pairTranscript(B2);
-  const nd = (x, y) => x.filter((s, i) => s !== y[i]).length;
-  const selfOk = nd(b.week, b2.week) === 0 && nd(b.foot, b2.foot) === 0 && nd(b.marked, b2.marked) === 0 && b.week.length === RULING_TRAIN;
-  const live = nd(c.marked, b.marked);
-  pairRow('P1', selfOk && c.week.length === b.week.length && nd(c.week, b.week) === 0 && live > 0,
-    nd(c.week, b.week) + ' of ' + c.week.length + ' pending renders differ; V220 self ' + (selfOk ? 'equal' : 'UNEQUAL') + '; skipped renders differing (live) ' + live + '/' + c.marked.length);
-  pairRow('P2', selfOk && c.foot.length === 3 * RULING_TRAIN && nd(c.foot, b.foot) === 0 && live > 0,
-    nd(c.foot, b.foot) + ' of ' + c.foot.length + ' reopened bodies and footers differ');
-} else PAIR_ROWS.forEach(k => pairRow(k, false, 'no pair'));
+// P1 and P2 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D179 on its build pair: the pending week renders and the reopened day bodies and footers byte-identical to V220.
 
-// ---- G9 HALF_MANNY ----
-if(VER === ERA) row('G9', () => { const a = progDigest(E.IA.buildProgram(H.fixtures.HALF_MANNY)), b = progDigest(E.IA.buildProgram(H.fixtures.HALF_MANNY));
-  return [a === MANNY && a === b, a + ' / ' + b]; });
-else skipRow(R.G9, 'scoped out, candidate ' + VER + ': a later ruling owns HALF_MANNY (standing ruling 5)');
+// G9 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D179's HALF_MANNY claim (standing ruling 5): digest 0ac7da6b1691a8e1 on candidate 221, self-stable.
 if(E.errs.length) console.log('  note: ' + E.errs.length + ' timer callbacks threw, e.g. ' + [...new Set(E.errs)].slice(0, 2).join(' | '));
 console.log('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s');
 done();

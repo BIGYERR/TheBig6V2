@@ -70,14 +70,13 @@
 //   scratch path) and is removed on exit.
 'use strict';
 process.env.TZ = 'America/New_York';
-const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
+const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
-const { load, progDigest } = H;
+const { load } = H;
 
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
-const BASEFILE = process.argv[3] ? path.resolve(process.argv[3]) : null;
-const ERA = 232, BASE_ERA = 231, V231_COMMIT = '5d9354b';
+const ERA = 232;
 const RealDate = Date, DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 // ── HAND ORACLE ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -134,11 +133,7 @@ function mkCfg(g, ex){
 let pass = 0, fail = 0, skip = 0; const t0 = Date.now();
 const P = s => console.log(s);
 const ok = (l, c, g) => { if(c){ pass++; P('PASS ' + l + (g === undefined ? '' : ' (' + g + ')')); } else { fail++; P('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
-const skipRow = (l, why) => { skip++; P('SKIP ' + l + ': ' + why); };
 const done = () => { P('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s'); P('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-const TMPS = [];
-process.on('exit', () => TMPS.forEach(f => { try { fs.unlinkSync(f); } catch(e){} }));
-function tmpWrite(tag, text){ const f = path.join(os.tmpdir(), 'g232_d199_' + tag + '_' + process.pid + '.html'); fs.writeFileSync(f, text); TMPS.push(f); return f; }
 const J = JSON.stringify;
 const R = {
   'D199-spec': 'row D199-spec (D199, VER >= 232) the hms wheel renders hours [dash, 0..9] no wrap : minutes [00..59] wrap : seconds [00..59] wrap, cap Time, class iaw-f3',
@@ -149,7 +144,6 @@ const R = {
   'D202-move': 'row D202-move (D202, call 8, VER >= 232) a moved fixed wheel commits 15.50 / 8.25 and ia_logs_ stores it; away and back to the seed face commits; a settle on the seed face alone writes nothing; doseDerived reads the stored value (15.5 min / 2 mi = 7:45/mi)',
   'D206-copy': 'row D206-copy (D206 + call 7, VER >= 232) `Log the run`, `Shows the plan. Move it to match the watch.`, `Off the watch.` on both free wheels, `Miles in the work reps`, `Leave out the easy jog between reps.`; no `Hours first`; no mid-sentence dash',
   'D199-width': 'row D199-width (D199 layout, call 12, VER >= 232) `.iaw-solo{max-width:178.2px}` = (375 − 2×16 − 2×1 − 2×16 − 12) × 3/5, its CSS premises present',
-  'D-untouched': 'row D-untouched (pair 232 vs 231) generic run, reps_dist, bike, swim markup byte-identical to V231; HALF_MANNY digest = MANNY_DIGEST_BY_VERSION[232] (row exists), self-stable',
 };
 const ROW_ORDER = Object.keys(R);
 function row(key, cj){ cj.forEach(([n, c, d]) => P('    ' + key + ' ' + n + ' ' + (c ? 'ok' : 'FAIL') + ' :: ' + d));
@@ -280,17 +274,6 @@ let VER = NaN, C = null, CAND_TEXT = '';
 try { CAND_TEXT = fs.readFileSync(ART, 'utf8'); C = mkEnv(ART); VER = +C.IA.version; }
 catch(e){ P('FAIL boot: ' + String(e && e.message || e).slice(0, 200)); fail++; ROW_ORDER.forEach(k => ok(R[k] + ' (candidate did not boot)', false)); done(); }
 P('g232 D199–D206 P-RUNWHEEL | candidate ' + ART + ' ia-version ' + VER + (VER >= ERA ? '' : ' (below ' + ERA + ': every behaviour row runs and must FAIL by its own conjuncts)'));
-let BF = null, baseWhy = '';
-if(BASEFILE){
-  if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
-} else baseWhy = 'no argv[3]; ';
-if(!BF && VER === ERA){
-  try { const f = tmpWrite('v231', cp.execFileSync('git', ['-C', ROOT, 'show', V231_COMMIT + ':index.html'], { maxBuffer:1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ BF = f; baseWhy += 'git show ' + V231_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
-  } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
-}
-P('  V' + BASE_ERA + ' baseline: ' + (BF ? 'LIVE (' + baseWhy + ')' : 'not loaded (' + baseWhy + ')'));
 const PARSE = (k, s) => C.ev('_iawParse')(k, s), FMT = (k, a) => C.ev('_iawFormat')(k, a);
 
 // ── ROW D199-spec ────────────────────────────────────────────────────────────────────────────────────────────────
@@ -479,27 +462,9 @@ function rowWidth(){
   row('D199-width', cj);
 }
 
-// ── ROW D-untouched (pair 232 vs 231 only) ───────────────────────────────────────────────────────────────────────
-function rowUntouched(){
-  if(VER !== ERA || !BF){ skipRow(R['D-untouched'], 'scoped out: this premise is the V' + ERA + ' build pair (candidate 232 against baseline 231); candidate reads ' + VER + ', baseline ' + (BF ? 'live' : 'not loaded (' + baseWhy + ')')); return; }
-  const cj = [];
-  const B = load(BF), CL = load(ART);
-  const ES = [{}, { run_dist:'3.10', run_pace:'9:30' }, { run_dist:'.86', run_rep_time:'1:45', run_reps:'5' }, { bike_mins:'40', swim_yards:'1500' }];
-  const SUBS = ['', 'Speed Run', 'Easy Run'], RD = { k:'reps_dist', reps:6, m:400, tgt:480 }, BK = { k:'time', mins:40, tgt:null };
-  let n = 0, same = 0; const diff = [];
-  for(const e of ES) for(const sub of SUBS) for(const [sp, dz] of [['run', null], ['run', RD], ['bike', null], ['bike', BK], ['swim', null]]){
-    n++; const a = CL.eval('cardioFieldHTML')(sp, e, dz, sub), b = B.eval('cardioFieldHTML')(sp, e, dz, sub);
-    if(a === b) same++; else if(diff.length < 3) diff.push(sp + ' ' + (dz ? dz.k : 'null') + ' ' + J(e) + ' ' + J(sub)); }
-  cj.push(['u-markup', same === n && n > 0, same + '/' + n + ' generic run, reps_dist, bike (null and dosed), swim forms byte-identical to V' + BASE_ERA + (diff.length ? ' | differ ' + diff.join('; ') : '')]);
-  const neg = CL.eval('cardioFieldHTML')('run', {}, DOSES.time, '') !== B.eval('cardioFieldHTML')('run', {}, DOSES.time, '');
-  cj.push(['u-live', neg, 'the comparator is live: the dosed time form differs from V' + BASE_ERA + ' (' + neg + ')']);
-  const has = Object.prototype.hasOwnProperty.call(H.MANNY_DIGEST_BY_VERSION, ERA), want = H.MANNY_DIGEST_BY_VERSION[ERA];
-  const d1 = progDigest(CL.buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY)))), d2 = progDigest(load(ART).buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY))));
-  cj.push(['u-manny', has && d1 === want && d1 === d2, 'MANNY_DIGEST_BY_VERSION[' + ERA + '] ' + (has ? 'exists = ' + want : 'MISSING') + '; HALF_MANNY on the candidate ' + d1 + ', fresh VM ' + d2 + (d1 === d2 ? ' (self-stable)' : ' (NOT self-stable)')]);
-  row('D-untouched', cj);
-}
+// D-untouched (the V232 build pair: D199 to D206 moved no generic run, reps_dist, bike or swim markup against V231; HALF_MANNY era row 232) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 
-const ROWS = { 'D199-spec':rowSpec, 'D200-rt':rowRt, 'D203':rowDec3, 'D199/D201/D204-forms':rowForms, 'D202-open':rowOpen, 'D202-move':rowMove, 'D206-copy':rowCopy, 'D199-width':rowWidth, 'D-untouched':rowUntouched };
+const ROWS = { 'D199-spec':rowSpec, 'D200-rt':rowRt, 'D203':rowDec3, 'D199/D201/D204-forms':rowForms, 'D202-open':rowOpen, 'D202-move':rowMove, 'D206-copy':rowCopy, 'D199-width':rowWidth };
 for(const k of ROW_ORDER){ try { ROWS[k](); } catch(e){ P('    ' + k + ' CRASH ' + String(e && e.stack || e).slice(0, 400)); ok(R[k] + ' (crashed)', false); } }
 P('  timer errors in the candidate VM: ' + C.errs.length + (C.errs.length ? ' ' + J(C.errs.slice(0, 3)) : ''));
 done();

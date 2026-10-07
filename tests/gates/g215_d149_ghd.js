@@ -79,10 +79,9 @@ const path = require('path'), fs = require('fs'), os = require('os'), cp = requi
 const { load, progDigest, fixtures, DAYS, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
-const VER = +IA.version, ERA = 215, V214_COMMIT = '978b0b56bd5c2470972146d618d64292ca48a241';
-const ROWS = ['G1','G1v','G1h','G2','G3','G4','L1','F0','F1','F1o','F2','F2o','P1','K1','K2','K3','HM'];
+const VER = +IA.version, ERA = 215;
+const ROWS = ['G1','G1v','G1h','G2','G3','G4','L1','F0','F1','F1o','F2','F2o','P1','K3','HM'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = l => { skip++; console.log('SKIP ' + l); };
@@ -120,7 +119,6 @@ const FIRE_A = TIERS.filter(t => handA(t).fires), FIRE_B = TIERS.filter(t => han
 // ── helpers ──────────────────────────────────────────────────────────────────────────────
 const clean = n => String(n == null ? '' : n).replace(/<svg[\s\S]*?<\/svg>\s*/g, '').replace(/<[^>]+>/g, '').trim();
 const live = d => (d && !d.rest && d.sections || []).filter(s => (s.items || []).length);
-const stem = s => String(s.label || (s.coreHeader ? '{core}' : '(none)')).replace(/\s*[—-]\s.*$/, '');
 const bump = (o, k, n = 1) => { o[k] = (o[k] || 0) + n; };
 const clone = v => JSON.parse(JSON.stringify(v));
 const GOALS = [['run_5k',{}],['run_half',{}],['run_pace_goal',{targetDist:'1.5',targetMins:'10',targetSecs:'0'}],['run_base',{}],['run_10k',{}],['run_marathon',{}]];
@@ -168,17 +166,6 @@ function variant(tag, from, to){
   const f = path.join(TMP, tag + '.html'); fs.writeFileSync(f, IA.html.replace(from, () => to)); return { c, IA: load(f) };
 }
 const CF_A = variant('cfA', FA_FROM, FA_TO), CF_B = variant('cfB', FB_FROM, FB_TO), PROBE = variant('probe', PR_AT, PR_AT + PR_ADD);
-let V214 = null, v214err = '';
-if(VER === ERA){
-  try {
-    if(BASEFILE){ const b = load(BASEFILE); if(+b.version === 214) V214 = b; }
-    if(!V214){ const f = path.join(TMP, 'v214.html');
-      fs.writeFileSync(f, cp.execFileSync('git', ['show', V214_COMMIT + ':index.html'], { cwd: ROOT, maxBuffer: 1 << 26 }));
-      V214 = load(f); if(+V214.version !== 214){ v214err = 'git ' + V214_COMMIT.slice(0, 7) + ' reads ' + V214.version; V214 = null; } }
-  } catch(e){ v214err = String(e.message).slice(0, 160); V214 = null; }
-}
-const PAIR = VER === ERA;
-console.log('candidate ia-version ' + VER + '; pair rows ' + (PAIR ? (V214 ? 'against V214' : 'UNAVAILABLE: ' + v214err) : 'skipped (pair 215/214 only)'));
 console.log('hand FIRE_A ' + JSON.stringify(FIRE_A) + ' FIRE_B ' + JSON.stringify(FIRE_B));
 const swapCandidates = IA.swapCandidates || IA.eval('swapCandidates');
 const candNames = r => { const out = []; if(!r) return out;
@@ -186,7 +173,7 @@ const candNames = r => { const out = []; if(!r) return out;
 
 // ── the GHD lattice + travel ─────────────────────────────────────────────────────────────
 const S = { items:{}, uni:{}, uniSize:{}, sw:{}, swCalls:{}, swCands:{}, hip:{}, tItems:{}, tUni:{}, tUniSize:{}, ex:{} };
-let built = 0, crash = 0, swCrash = 0, tBuilt = 0, tCrash = 0, k2g = 0, k2gN = 0; const k2gEx = [];
+let built = 0, crash = 0, swCrash = 0, tBuilt = 0, tCrash = 0;
 function scanItems(p, eq, into){
   Object.keys(p.weeks || {}).forEach(w => DAYS.forEach(d => live(p.weeks[w][d]).forEach(s => s.items.forEach(it => { const n = clean(it.name);
     if(GHD(n)){ bump(into, eq); if(!OWNS[eq].GHD && !S.ex[eq]) S.ex[eq] = n + ' W' + w + ' ' + d; }
@@ -201,8 +188,6 @@ for(const x of LAT_G){
     Object.keys(p.weeks || {}).forEach(w => DAYS.forEach(d => { const day = p.weeks[w][d]; live(day).forEach(s => s.items.forEach(it => { const n = clean(it.name);
       if(asked.has(n)) return; asked.add(n); let cs; try { cs = candNames(swapCandidates(it.name, day, w, p)); } catch(e){ swCrash++; return; }
       bump(S.swCalls, x.eq); bump(S.swCands, x.eq, cs.length); cs.forEach(c => { if(GHD(c)) bump(S.sw, x.eq); }); })); })); }
-  if(PAIR && V214 && OWNS[x.eq].GHD){ k2gN++; let b; try { b = V214.buildProgram(clone(x.cfg)); } catch(e){ b = null; }
-    if(!b || progDigest(b) !== progDigest(p)){ k2g++; if(k2gEx.length < 3) k2gEx.push(x.eq + ' ' + (x.inj ? x.inj.region + '/' + x.inj.tier : 'healthy') + ' seed ' + SEEDS[x.si]); } }
 }
 for(const x of LAT_T){
   let p; try { p = IA.buildProgram(clone(x.cfg)); } catch(e){ tCrash++; continue; } tBuilt++;
@@ -212,7 +197,7 @@ for(const x of LAT_T){
 console.log('GHD lattice ' + built + ' of ' + LAT_G.length + ' built (' + crash + ' crashed); travel ' + tBuilt + ' of ' + LAT_T.length + ' (' + tCrash + ' crashed)');
 
 // ── the knee/protect lattice ─────────────────────────────────────────────────────────────
-const K = { cfg:{}, crash:0, fa:{}, fb:{}, probeBad:0, pr:{}, loss:{}, lossEx:[], dup:{}, dupEx:[], k2:0, k2N:0, k2Ex:[],
+const K = { cfg:{}, crash:0, fa:{}, fb:{}, probeBad:0, pr:{}, dup:{}, dupEx:[],
             main:{}, mainBad:{}, mainEx:[], lsb:{}, lsbBad:{}, lsbEx:[], hx:{} };
 const HX = /hip thrust|glute bridge|back extension|glute-ham|pull-through/i;
 for(const x of LAT_K){
@@ -226,16 +211,12 @@ for(const x of LAT_K){
     // V231 P1 (absorb ruling section 3): every read is also counted under its focus, support_prevention ('prev') or any other ('other').
     const pfoc = x.cfg.liftingFocus === 'support_prevention' ? 'prev' : 'other';
     PROBE.IA.ctx.__G215.forEach(([len, drew]) => { bump(K.pr, t + '|calls'); bump(K.pr, t + '|calls|' + pfoc); if(!len){ bump(K.pr, t + '|empty'); bump(K.pr, t + '|empty|' + pfoc); } else if(!drew) bump(K.pr, t + '|dropped'); }); }
-  let b = null; if(PAIR && V214){ try { b = V214.buildProgram(clone(x.cfg)); } catch(e){ b = null; } }
-  if(PAIR && V214 && OWNS[t].GHD){ K.k2N++; if(!b || progDigest(b) !== dg){ K.k2++; if(K.k2Ex.length < 3) K.k2Ex.push(t + ' ' + x.cfg.liftingFocus + ' ' + x.cfg.cardioGoals.run.id); } }
   Object.keys(p.weeks || {}).forEach(w => DAYS.forEach(d => {
     const day = p.weeks[w][d], secs = live(day), names = [];
     secs.forEach(s => s.items.forEach(it => names.push(clean(it.name))));
     bump(K.hx, t, names.filter(n => HX.test(n)).length);
     const seen = {}; const dn = names.find(n => { const r = seen[n]; seen[n] = 1; return r; });
     if(dn){ bump(K.dup, t); if(K.dupEx.length < 3) K.dupEx.push(t + ' W' + w + ' ' + d + ' ' + dn); }
-    if(b){ const d0 = b.weeks[w] && b.weeks[w][d]; const m = {}; live(d0).forEach(s => bump(m, stem(s), -1)); secs.forEach(s => bump(m, stem(s), 1));
-      Object.entries(m).forEach(([l, v]) => { if(v < 0){ bump(K.loss, t, -v); if(K.lossEx.length < 4) K.lossEx.push(t + ' W' + w + ' ' + d + ' lost ' + l); } }); }
     const lsb = secs.find(s => s.label === 'Leg superset B'); if(!lsb) return;
     bump(K.lsb, t + '|' + lsb.items.length);
     if(lsb.items[1]){ const n = clean(lsb.items[1].name); if(!handB(t).set.includes(n)){ bump(K.lsbBad, t); if(K.lsbEx.length < 3) K.lsbEx.push(t + ' ' + n); } }
@@ -291,12 +272,7 @@ TIERS.forEach(t => { const calls = g(K.pr, t + '|calls'), e = g(K.pr, t + '|empt
     PROBE.c !== 1 ? 'probe anchor count ' + PROBE.c : e + ' empty of ' + calls + ' reads (support_prevention ' + eP + ' of ' + cP + ', other foci ' + eO + ' of ' + cO + '), probe copy digest mismatches ' + K.probeBad);
   else ok('P1 ' + t + ' knee/protect: the hip-extension reservation is never empty', PROBE.c === 1 && K.probeBad === 0 && calls > 0 && e === 0,
     PROBE.c !== 1 ? 'probe anchor count ' + PROBE.c : e + ' empty of ' + calls + ' reads, probe copy digest mismatches ' + K.probeBad); });
-if(PAIR){
-  TIERS.forEach(t => ok('K1 ' + t + ' knee/protect loses no section vs V214', !!V214 && K.crash === 0 && g(K.loss, t) === 0,
-    V214 ? g(K.loss, t) + ' lost' + (K.lossEx.length ? ' e.g. ' + K.lossEx.join('; ') : '') : v214err));
-  ok('K2 commercial and crossfit programs byte-identical to V214 (knee/protect lattice)', !!V214 && K.k2N > 0 && K.k2 === 0, V214 ? K.k2 + ' of ' + K.k2N + ' differ ' + K.k2Ex.join('; ') : v214err);
-  ok('K2 commercial and crossfit programs byte-identical to V214 (GHD lattice, every plan)', !!V214 && k2gN > 0 && k2g === 0, V214 ? k2g + ' of ' + k2gN + ' differ ' + k2gEx.join('; ') : v214err);
-} else { skipRow('K1 pair 215/214 only'); skipRow('K2 pair 215/214 only'); }
+// K1 and K2 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D149: on knee/protect no tier lost a section against V214, and commercial and crossfit programs stayed byte-identical to V214.
 TIERS.forEach(t => ok('K3 ' + t + ' knee/protect: no day prints the same movement twice', g(K.dup, t) === 0, g(K.dup, t) + (K.dupEx.length ? ' e.g. ' + K.dupEx.join('; ') : '')));
 // V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
 // this row defends D149's claim "my ruling did not move HALF_MANNY". The literal it compared

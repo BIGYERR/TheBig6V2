@@ -29,10 +29,15 @@ const { load, fixtures, DAYS } = require(path.join(__dirname, '..', 'harness.js'
 const FILE = process.argv[2] || 'index.html';
 const IA = load(FILE);
 
-let PASS = 0, FAIL = 0;
-const fails = [];
-function ok(){ PASS++; }
-function bad(msg){ FAIL++; fails.push(msg); }
+// Every row prints through the shared status helper tests/status.js (post-V233 V1; CLAUDE.md Proof scope, Row
+// manifest): one status line per declared id, and the per-build and per-tier families each print ONE loop line.
+const S = require('../status')('g192_labelsync');
+S.declare([
+  'C1-healthy-lattice', 'C2-vocab', 'C3-injured-builds', 'C4-injured-lattice', 'C5-claims', 'C6-primer',
+  'C7-raceweek-primer', 'H1-swap-latch', 'H2-unexplained', 'D43-fires', 'D43-noleak', 'D43-negctl',
+  'U1-swap-name', 'U2-swap-label', 'U3-spine-name', 'U4-spine-label', 'N1-healthy', 'N2-generic',
+  'N3-idempotent',
+]);
 
 const clean = s => String(s || '').replace(/<svg[\s\S]*?<\/svg>\s*/g, '').trim();
 
@@ -85,13 +90,16 @@ for (const equipment of EQUIP) {
   }
   healthyHasBench[equipment] = n;
 }
-if (healthySections > 500) ok(); else bad(`healthy control lattice too thin: ${healthySections} sections`);
-if (VOCAB.size > 100) ok(); else bad(`movement vocabulary too thin: ${VOCAB.size} names`);
+S.check('C1-healthy-lattice', healthySections > 500, 'the healthy control lattice is thick enough to read the vocabulary off',
+  `healthy control lattice too thin: ${healthySections} sections`);
+S.check('C2-vocab', VOCAB.size > 100, 'the movement vocabulary read off the healthy lattice is thick enough',
+  `movement vocabulary too thin: ${VOCAB.size} names`);
 
 // ── injured lattice: every heading claim must hold ───────────────────────────
 let injSections = 0, claims = 0, swapMismatch = 0, parked = 0, unexplained = 0, primerClaims = 0, raceWeekPrimer = 0;
 const swapSamples = [], unexplainedSamples = [];
 const floorPress = {}, benchLeak = {};
+const LB = S.loop('C3-injured-builds', 'every shoulder workaround build on the injured lattice runs');
 
 for (const equipment of EQUIP) {
   floorPress[equipment] = 0; benchLeak[equipment] = 0;
@@ -100,7 +108,8 @@ for (const equipment of EQUIP) {
       { equipment, seed, injury: { region: 'shoulder', tier: 'workaround' } });
     let prog;
     try { prog = IA.buildProgram(cfg); }
-    catch (e) { bad(`build threw equipment=${equipment} seed=${seed}: ${e.message}`); continue; }
+    catch (e) { LB.fail(`equipment=${equipment} seed=${seed}`, `build threw: ${e.message}`); continue; }
+    LB.pass(`equipment=${equipment} seed=${seed}`);
     for (const s of sectionsOf(prog)) {
       injSections++;
       floorPress[equipment] += s.names.filter(x => x === 'Dumbbell floor press').length;
@@ -126,31 +135,36 @@ for (const equipment of EQUIP) {
   }
 }
 
-if (injSections > 500) ok(); else bad(`injured lattice too thin: ${injSections} sections`);
-if (claims > 200) ok(); else bad(`too few heading claims to test: ${claims} — the gate is blind`);
-if (primerClaims > 0) ok(); else bad('no Primer heading named a movement — the race-week case is untested');
-if (raceWeekPrimer > 0) ok(); else bad('no race-week Primer heading named a movement — the reported case is untested');
+LB.done();
+S.check('C4-injured-lattice', injSections > 500, 'the injured lattice is thick enough', `injured lattice too thin: ${injSections} sections`);
+S.check('C5-claims', claims > 200, 'enough headings name a movement for the claim to be tested',
+  `too few heading claims to test: ${claims} — the gate is blind`);
+S.check('C6-primer', primerClaims > 0, 'some Primer heading names a movement',
+  'no Primer heading named a movement — the race-week case is untested');
+S.check('C7-raceweek-primer', raceWeekPrimer > 0, 'some race-week Primer heading names a movement',
+  'no race-week Primer heading named a movement — the reported case is untested');
 
-if (swapMismatch === 0) ok();
-else bad(`${swapMismatch}/${claims} headings name a movement the overlay RENAMED away (label latch):\n     ` + swapSamples.join('\n     '));
+S.check('H1-swap-latch', swapMismatch === 0, 'no heading names a movement the overlay renamed away (the heading follows the item)',
+  `${swapMismatch}/${claims} headings name a movement the overlay RENAMED away (label latch):\n     ` + swapSamples.join('\n     '));
 
-if (unexplained === 0) ok();
-else bad(`${unexplained}/${claims} headings name a movement that is neither prescribed nor explained by the parked dropNames class:\n     ` + unexplainedSamples.join('\n     '));
+S.check('H2-unexplained', unexplained === 0, 'every heading claim holds, or names a movement the overlay deletes (the parked dropNames class)',
+  `${unexplained}/${claims} headings name a movement that is neither prescribed nor explained by the parked dropNames class:\n     ` + unexplainedSamples.join('\n     '));
 
 // ── D43 still fires, and does not leak into a healthy program ────────────────
 // Dumbbells exist on every tier except the no-gear one, where a later pass
 // converts the press to a pushup; assert on the tiers that own the dumbbell.
 const DB_TIERS = EQUIP.filter(e => e !== 'bodyweight');
+const LF = S.loop('D43-fires', "D43 fires: every dumbbell tier's shoulder workaround program prescribes 'Dumbbell floor press'");
+const LN = S.loop('D43-noleak', "D43 holds: no dumbbell tier's shoulder workaround program prescribes 'Dumbbell bench press'");
 for (const e of DB_TIERS) {
-  if (floorPress[e] > 0) ok();
-  else bad(`D43: '${e}' shoulder/workaround never prescribed 'Dumbbell floor press' — the swap stopped firing`);
-  if (benchLeak[e] === 0) ok();
-  else bad(`D43: '${e}' shoulder/workaround still prescribed 'Dumbbell bench press' ${benchLeak[e]}× — the swap is leaking`);
+  LF.check(floorPress[e] > 0, e, `D43: '${e}' shoulder/workaround never prescribed 'Dumbbell floor press' — the swap stopped firing`);
+  LN.check(benchLeak[e] === 0, e, `D43: '${e}' shoulder/workaround still prescribed 'Dumbbell bench press' ${benchLeak[e]}× — the swap is leaking`);
 }
+LF.done(); LN.done();
 {
   const healthyTiers = DB_TIERS.filter(e => healthyHasBench[e] > 0);
-  if (healthyTiers.length > 0) ok();
-  else bad('negative control blind: no healthy program on any dumbbell tier prescribes the bench press, so "the swap is overlay-only" is untested');
+  S.check('D43-negctl', healthyTiers.length > 0, 'negative control: a healthy program on some dumbbell tier prescribes the bench press',
+    'negative control blind: no healthy program on any dumbbell tier prescribes the bench press, so "the swap is overlay-only" is untested');
 }
 
 // ── direct unit pass over applyInjuryFilter: BOTH rename paths ───────────────
@@ -167,40 +181,39 @@ function filterOne(label, name, detail, injury){
 }
 {
   const r = filterOne('Main — Dumbbell bench press', 'Dumbbell bench press', '4×5', { region: 'shoulder', tier: 'workaround' });
-  if (r && r.name === 'Dumbbell floor press') ok();
-  else bad(`unit swapNames: expected 'Dumbbell floor press', got '${r && r.name}' — D43 swap did not fire`);
-  if (r && r.label === 'Main — Dumbbell floor press') ok();
-  else bad(`unit swapNames: heading stayed '${r && r.label}' — the label did not follow the item`);
+  S.check('U1-swap-name', r && r.name === 'Dumbbell floor press', "unit swapNames: the D43 swap renames the item to 'Dumbbell floor press'",
+    `unit swapNames: expected 'Dumbbell floor press', got '${r && r.name}' — D43 swap did not fire`);
+  S.check('U2-swap-label', r && r.label === 'Main — Dumbbell floor press', 'unit swapNames: the heading follows the renamed item',
+    `unit swapNames: heading stayed '${r && r.label}' — the label did not follow the item`);
 }
 {
   const r = filterOne('Core — Ab wheel rollouts', 'Ab wheel rollouts', '3×10', { region: 'lowback', tier: 'workaround' });
-  if (r && r.name === 'Dead bugs') ok();
-  else bad(`unit SPINE_SWAP: expected 'Dead bugs', got '${r && r.name}' — spine-safe swap did not fire`);
-  if (r && r.label === 'Core — Dead bugs') ok();
-  else bad(`unit SPINE_SWAP: heading stayed '${r && r.label}' — the label did not follow the item`);
+  S.check('U3-spine-name', r && r.name === 'Dead bugs', "unit SPINE_SWAP: the spine-safe swap renames the item to 'Dead bugs'",
+    `unit SPINE_SWAP: expected 'Dead bugs', got '${r && r.name}' — spine-safe swap did not fire`);
+  S.check('U4-spine-label', r && r.label === 'Core — Dead bugs', 'unit SPINE_SWAP: the heading follows the renamed item',
+    `unit SPINE_SWAP: heading stayed '${r && r.label}' — the label did not follow the item`);
 }
 {
   // Negative controls. A healthy athlete's card is untouched; a heading that does
   // not name the item is left exactly as written; the pass is idempotent.
   const h = filterOne('Main — Dumbbell bench press', 'Dumbbell bench press', '4×5', null);
-  if (h && h.name === 'Dumbbell bench press' && h.label === 'Main — Dumbbell bench press') ok();
-  else bad(`negative control: healthy cfg rewrote '${h && h.label}' / '${h && h.name}'`);
+  S.check('N1-healthy', h && h.name === 'Dumbbell bench press' && h.label === 'Main — Dumbbell bench press',
+    "negative control: a healthy athlete's card is untouched", `negative control: healthy cfg rewrote '${h && h.label}' / '${h && h.name}'`);
 
   const g = filterOne('Pump', 'Dumbbell bench press', '4×5', { region: 'shoulder', tier: 'workaround' });
-  if (g && g.label === 'Pump' && g.name === 'Dumbbell floor press') ok();
-  else bad(`negative control: generic heading became '${g && g.label}'`);
+  S.check('N2-generic', g && g.label === 'Pump' && g.name === 'Dumbbell floor press',
+    'negative control: a heading that does not name the item is left exactly as written', `negative control: generic heading became '${g && g.label}'`);
 
   const cfg2 = Object.assign({}, fixtures.HALF_MANNY, { injury: { region: 'shoulder', tier: 'workaround' } });
   const once = IA.applyInjuryFilter([{ label: 'Main — Dumbbell bench press', items: [{ name: 'Dumbbell bench press', detail: '4×5' }] }], cfg2);
   const twice = IA.applyInjuryFilter(once, cfg2);
-  if (twice[0].label === 'Main — Dumbbell floor press' && clean(twice[0].items[0].name) === 'Dumbbell floor press') ok();
-  else bad(`idempotence: second pass produced '${twice[0].label}' / '${clean(twice[0].items[0].name)}'`);
+  S.check('N3-idempotent', twice[0].label === 'Main — Dumbbell floor press' && clean(twice[0].items[0].name) === 'Dumbbell floor press',
+    'idempotence: a second pass of the filter changes nothing',
+    `idempotence: second pass produced '${twice[0].label}' / '${clean(twice[0].items[0].name)}'`);
 }
 
 console.log(`g192_labelsync: healthySections=${healthySections} injSections=${injSections} vocab=${VOCAB.size}`);
 console.log(`  heading claims=${claims} (Primer=${primerClaims}, race-week Primer=${raceWeekPrimer})`);
 console.log(`  mismatch: swap-rename=${swapMismatch} parked-drop=${parked} unexplained=${unexplained}`);
 console.log(`  floor press by tier ${JSON.stringify(floorPress)} | bench-press leak ${JSON.stringify(benchLeak)}`);
-fails.forEach(f => console.log('  FAIL ' + f));
-console.log(`PASS ${PASS} FAIL ${FAIL}`);
-process.exit(FAIL ? 1 : 0);
+S.summary();

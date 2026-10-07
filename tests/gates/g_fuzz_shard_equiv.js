@@ -12,9 +12,13 @@ const JS=path.join(TESTS,'measure','v195_gk_identity_fuzz.js');
 const SH=path.join(TESTS,'fuzz.sh');
 const CAND=process.argv[2];
 const BASE=process.argv[3]||CAND;
-let pass=0, fail=0;
-const ok=m=>{pass++; console.log('   ok: '+m);};
-const bad=m=>{fail++; console.log('FAIL: '+m);};
+// ROWS (post-V233 V2: every row prints through tests/status.js; CLAUDE.md Proof scope, Row manifest), numbered by
+// the gate's sections: F0 the inputs, F1 the bare invocation, F2 the driver, F3 the raw counters (F3-sums one loop
+// row over the 9 counters), F4 the partition. A row that cannot run after an early stop is named by summary().
+// The helper is ST: S below is the sequential run's counters, as it always was.
+const ST=require('../status')('g_fuzz_shard_equiv');
+ST.declare(['F0-cand','F0-tools','F1-bare','F2-stdout','F2-rc','F2-total','F3-seq','F3-parts','F3-sums',
+  'F4-walked','F4-order','F4-thin','F4-residue','F4-overlap','F4-union','F4-pre','F4-preran']);
 // Every exit path of this gate goes through done(), and done() is the ONLY place the
 // scratch dir is removed. TMPDIR stays '' until mkdtemp returns, so the two argument
 // checks below -- which run before the dir exists -- cannot throw on it. The rm is in
@@ -22,10 +26,11 @@ const bad=m=>{fail++; console.log('FAIL: '+m);};
 var TMPDIR='';
 function done(){
   try{ if(TMPDIR) fs.rmSync(TMPDIR,{recursive:true,force:true}); }catch(e){}
-  console.log('PASS '+pass+' FAIL '+fail); process.exit(fail?1:0);
+  ST.summary();
 }
-if(!CAND||!fs.existsSync(CAND)){ bad('no candidate html'); done(); }
-for(const f of [JS,SH]) if(!fs.existsSync(f)){ bad('missing '+f); done(); }
+if(!ST.check('F0-cand',CAND&&fs.existsSync(CAND),'the candidate html is given and exists','no candidate html')) done();
+{ const miss=[JS,SH].filter(f=>!fs.existsSync(f));
+  if(!ST.check('F0-tools',miss.length===0,'the fuzz script and the shard driver exist','missing '+miss[0])) done(); }
 
 const AXES={goals:3,equip:2,focus:3,exper:1,seeds:1,rest:2,age:2};
 const M=Object.keys(AXES).reduce((n,k)=>n*AXES[k],1);   // 72, by hand, not by the engine
@@ -44,24 +49,22 @@ const SEQ=path.join(dir,'seq.json');
 // 1. sequential, and the bare invocation it has to stay identical to
 const seq=run(process.execPath,[JS,CAND,BASE,'--lattice','small','--shard','0/1','--out',SEQ]);
 const bare=run(process.execPath,[JS,CAND,BASE,'--lattice','small']);
-if(bare.out===seq.out && bare.rc===seq.rc) ok('--shard 0/1 is byte-identical to the bare invocation');
-else bad('--shard 0/1 differs from the bare invocation (rc '+seq.rc+' vs '+bare.rc+')');
+ST.check('F1-bare',bare.out===seq.out && bare.rc===seq.rc,'--shard 0/1 is byte-identical to the bare invocation',
+  '--shard 0/1 differs from the bare invocation (rc '+seq.rc+' vs '+bare.rc+')');
 
 // 2. the driver
 const drv=run('bash',[SH,CAND,BASE,'--lattice','small'],{FUZZ_OUT:fan});
-if(drv.out===seq.out) ok('driver stdout is byte-identical to the sequential run ('+seq.out.split('\n').length+' lines)');
-else {
-  bad('driver stdout differs from the sequential run');
+if(!ST.check('F2-stdout',drv.out===seq.out,'driver stdout is byte-identical to the sequential run ('+seq.out.split('\n').length+' lines)',
+  'driver stdout differs from the sequential run')){
   const a=seq.out.split('\n'), b=drv.out.split('\n');
   for(let i=0;i<Math.max(a.length,b.length);i++) if(a[i]!==b[i]){
     console.log('     line '+(i+1)+' seq: '+JSON.stringify(a[i]));
     console.log('     line '+(i+1)+' drv: '+JSON.stringify(b[i])); break; }
 }
-if(drv.rc===seq.rc) ok('driver exit code matches the sequential run ('+seq.rc+')');
-else bad('driver exit code '+drv.rc+' != sequential '+seq.rc);
+ST.check('F2-rc',drv.rc===seq.rc,'driver exit code matches the sequential run ('+seq.rc+')','driver exit code '+drv.rc+' != sequential '+seq.rc);
 const ft=s=>(s.split('\n').filter(l=>l.indexOf('FUZZTOTAL')===0)[0]||'');
-if(ft(seq.out) && ft(drv.out)===ft(seq.out)) ok('FUZZTOTAL line identical: '+ft(seq.out));
-else bad('FUZZTOTAL mismatch: seq '+JSON.stringify(ft(seq.out))+' drv '+JSON.stringify(ft(drv.out)));
+ST.check('F2-total',ft(seq.out) && ft(drv.out)===ft(seq.out),'FUZZTOTAL line identical: '+ft(seq.out),
+  'FUZZTOTAL mismatch: seq '+JSON.stringify(ft(seq.out))+' drv '+JSON.stringify(ft(drv.out)));
 
 // 3. raw counters. Summed HERE, not by the merge pass, so the gate does not grade
 //    the merge with the merge's own arithmetic.
@@ -71,23 +74,24 @@ function readJson(f){
   try{ return JSON.parse(fs.readFileSync(f,'utf8')); }catch(e){ return null; }
 }
 const S=readJson(SEQ);
-if(!S){ bad('sequential run wrote no counters'); done(); }
+if(!ST.check('F3-seq',!!S,'the sequential run wrote its counters','sequential run wrote no counters')) done();
 const parts=[readJson(path.join(fan,'pre.json'))];
 for(let i=0;i<NSH;i++) parts.push(readJson(path.join(fan,'fuzz_'+i+'.json')));
-if(parts.some(p=>!p)){ bad('a shard produced no result file: '+parts.map((p,i)=>p?'':(i?('fuzz_'+(i-1)):'pre')).filter(Boolean).join(' ')); done(); }
-let sumsOk=true;
+if(!ST.check('F3-parts',!parts.some(p=>!p),'the --pre stage and all '+NSH+' shards wrote a result file',
+  'a shard produced no result file: '+parts.map((p,i)=>p?'':(i?('fuzz_'+(i-1)):'pre')).filter(Boolean).join(' '))) done();
+const LS=ST.loop('F3-sums','all 9 raw counters sum exactly: '+KEYS.map(k=>k+'='+S[k]).join(' '));
 KEYS.forEach(k=>{
   const s=parts.reduce((n,p)=>n+p[k],0);
-  if(s!==S[k]){ sumsOk=false; bad('counter '+k+': shards sum to '+s+', sequential says '+S[k]); }
+  LS.check(s===S[k],'counter '+k,'shards sum to '+s+', sequential says '+S[k]);
 });
-if(sumsOk) ok('all 9 raw counters sum exactly: '+KEYS.map(k=>k+'='+S[k]).join(' '));
+LS.done();
 
 // 4. the partition itself, against the hand-computed lattice size
-if(S.idx.length===M) ok('sequential walked '+M+' configs (hand arithmetic: 3x2x3x1x1x2x2)');
-else bad('sequential walked '+S.idx.length+' configs, hand arithmetic says '+M);
+ST.check('F4-walked',S.idx.length===M,'sequential walked '+M+' configs (hand arithmetic: 3x2x3x1x1x2x2)',
+  'sequential walked '+S.idx.length+' configs, hand arithmetic says '+M);
 const full=[]; for(let i=0;i<M;i++) full.push(i);
-if(S.idx.join(',')===full.join(',')) ok('sequential index set is exactly 0..'+(M-1)+' in order');
-else bad('sequential index set is not 0..'+(M-1));
+ST.check('F4-order',S.idx.join(',')===full.join(','),'sequential index set is exactly 0..'+(M-1)+' in order',
+  'sequential index set is not 0..'+(M-1));
 let union=[], overlap=0, wrongRes=0, thin=0;
 for(let i=0;i<NSH;i++){
   const ix=parts[i+1].idx;
@@ -96,21 +100,19 @@ for(let i=0;i<NSH;i++){
   union=union.concat(ix);
 }
 const seen=new Set(); union.forEach(v=>{ if(seen.has(v)) overlap++; seen.add(v); });
-if(!thin) ok('every one of the '+NSH+' shards got more than one config (min '+Math.min.apply(null,parts.slice(1).map(p=>p.idx.length))+')');
-else bad(thin+' shard(s) got fewer than 2 configs, the partition is trivial');
-if(!wrongRes) ok('every config index lands in the shard its residue names');
-else bad(wrongRes+' config indices are in the wrong shard');
-if(!overlap) ok('no config index appears in two shards');
-else bad(overlap+' config indices appear in more than one shard');
+ST.check('F4-thin',!thin,'every one of the '+NSH+' shards got more than one config (min '+Math.min.apply(null,parts.slice(1).map(p=>p.idx.length))+')',
+  thin+' shard(s) got fewer than 2 configs, the partition is trivial');
+ST.check('F4-residue',!wrongRes,'every config index lands in the shard its residue names',wrongRes+' config indices are in the wrong shard');
+ST.check('F4-overlap',!overlap,'no config index appears in two shards',overlap+' config indices appear in more than one shard');
 const sorted=union.slice().sort((a,b)=>a-b);
-if(sorted.length===M && sorted.join(',')===full.join(',')) ok('union of the '+NSH+' shards is exactly 0..'+(M-1)+': no gap, no overlap');
-else bad('union of the shards is '+sorted.length+' indices, not the full 0..'+(M-1)+' set');
-if(parts[0].cells===0 && parts[0].idx.length===0) ok('the --pre stage walked no configs');
-else bad('the --pre stage walked configs, its builds would be counted twice');
+ST.check('F4-union',sorted.length===M && sorted.join(',')===full.join(','),'union of the '+NSH+' shards is exactly 0..'+(M-1)+': no gap, no overlap',
+  'union of the shards is '+sorted.length+' indices, not the full 0..'+(M-1)+' set');
+ST.check('F4-pre',parts[0].cells===0 && parts[0].idx.length===0,'the --pre stage walked no configs',
+  'the --pre stage walked configs, its builds would be counted twice');
 // `pre` is 0 on a green build, so a shard that ALSO ran the pre-blocks would double count
 // nothing visible. Assert it structurally instead of trusting the counter.
 const ran=parts.map((p,i)=>p.preRan?i:-1).filter(i=>i>=0);
-if(ran.length===1 && ran[0]===0) ok('the pre-blocks ran in exactly one part of the fan-out (the --pre stage)');
-else bad('the pre-blocks ran in '+ran.length+' parts of the fan-out ['+ran.join(',')+'], `pre` would be counted '+ran.length+' times');
+ST.check('F4-preran',ran.length===1 && ran[0]===0,'the pre-blocks ran in exactly one part of the fan-out (the --pre stage)',
+  'the pre-blocks ran in '+ran.length+' parts of the fan-out ['+ran.join(',')+'], `pre` would be counted '+ran.length+' times');
 
 done();   // removes TMPDIR itself

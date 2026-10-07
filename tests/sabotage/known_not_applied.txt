@@ -1,0 +1,17 @@
+# Documented NOT-APPLIED sabotage mutations, read by tests/sabotage.py --anchors-only, --gates and --proof-set.
+# Post-V233 Proof scope (Mario; CLAUDE.md Proof scope, Sabotage): every build anchor-checks every mutation in
+# every spec with no gate run. A NOT-APPLIED mutation not on this list fails the check by spec and name.
+# One line per mutation:  <spec>.json <mutation name>  # reason, build
+# The name is the spec row's "name" field verbatim; a line splits at its first two-spaces-hash-space.
+# THIS LIST ONLY SHRINKS. A listed mutation whose anchor applies again, or that no spec holds any more, fails
+# the check as STALE until its line is deleted. A mutation re-anchored by a build leaves the list that build.
+# Sources: tests/measure/v233_rulings/gatekeeper_run1.md (V233 sweep: 7 NOT-APPLIED, all documented) and
+# tests/measure/v233_rulings/measure_sabotage_history_mS.md (cause and first build of each). Each anchor
+# verified to count 0 in index.html at ia-version 233 when this list was written (post-V233 s6).
+example.json no-op mutation (must report NOT-APPLIED, not SURVIVED)  # deliberate no-op, the runner reports NOT-APPLIED and never SURVIVED; NOT-APPLIED at every tag (mS 44/44)
+v193_samecard.json M13 -> G1: _accFresh is wired but reads an empty card, so both push sections believe nothing is taken  # anchor drift, index.html V219; unseen V219 to V220, found V221, carried since (mS)
+v195.json M12 (gk P2) -> the week-view tag is dropped out of the innerHTML concatenation while the _wcTag variable stays declared, so the athlete never sees which session is still waiting  # anchor drift, index.html V220; found V221, carried since (mS)
+v197.json M4 -> D76 dropped: the same-card subtraction is gone, so Wall sit prints under Knee stability and again under Leg isolation on the same card, six sets of one isometric  # anchor drift, index.html V219; unseen V219 to V220, found V221, carried since (mS)
+v200.json M4 -> the Pull superset B conditioning slot stops drawing from the conditioning pool and repeats the day's first row instead, so no Pull superset B anywhere ever holds posterior-chain work and the POSITIVE LIMB of the D93 iff empties  # anchor drift, index.html V219; unseen V219 to V220, found V221, carried since (mS)
+v200.json M5 -> the Pull superset B conditioning slot is pinned to a hinge on every tier and every goal, so pull cards on g199's own 1,728-key lattice start entering the deload with a posterior-holding Pull superset B  # anchor drift, index.html V219; unseen V219 to V220, found V221, carried since (mS)
+v201.json M4 -> the candidate declares ia-version 202, a version no era row exists for, so every gate that keys a fixture digest to the artifact's own version looks its row up and finds nothing. STAND-IN, NOT THE RULED MUTATION: the ruling asked for the harness's V201 row to be DELETED; tests/sabotage.py can only mutate the candidate HTML, and this is the same observable reached from the candidate side  # era-scoped by design: the candidate declares ia-version 202, a stand-in for the ruled harness row deletion; NOT-APPLIED since V202 (mS)

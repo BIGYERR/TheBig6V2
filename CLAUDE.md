@@ -68,10 +68,19 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
   the shipped file classified. It reruns nothing the draft proved unless the last slice touched it.
 - **Previous version.** Only gates that are new or edited in the build run against the previous version. A row written
   by the era script does not make a gate edited.
-- **Version scope.** No gate row is scoped to one exact `ia-version`. A row uses a range or a minimum, or it is an era
-  row the era script bumps; a claim that one build moved nothing is an era row (this is how standing ruling 4's build
-  scope is written). V220's bump silently retired g219's three `VER === ERA` rows. The sabotage clause below is the
-  backstop, not the fix.
+- **Version scope.** No gate row goes dark. Every row a gate declares prints exactly one status line (PASS, FAIL, SKIP
+  or SCOPED OUT), and a declared row with no status line is red. At the candidate's version every row runs: a row that
+  prints SKIP or SCOPED OUT in `gate.sh` is red unless `tests/skip_allow.txt` lists it, and every entry there names the
+  gate, the row and the cause (a missing input, never a version; no blanket entries). Exact-version predicates are
+  also linted; a claim that one build moved nothing is an era row (this is how standing ruling 4's build scope is
+  written). V220's bump silently retired g219's three `VER === ERA` rows. **Known gap:** a row born dark never prints,
+  so it never enters the manifest; it is covered only by sabotage and the manifest-hunk rule below. The sabotage
+  clause below is the backstop, not the fix.
+- **Row manifest.** A gate's declared rows are its rows in `tests/row_manifest.txt`. Gatekeeper regenerates it from a
+  proven run only; builders never edit it. A row that leaves the manifest without a ruling is red. A ruling that adds
+  or changes a row shows as a manifest hunk, and a ruling that names a new row with no manifest hunk is red. A manifest
+  hunk that no ruling explains is red in both directions, rows added as well as rows removed. Every new
+  gate, and every gate converted by hand, prints its rows through the shared status helper `tests/status.js`.
 - **Era rows.** A table the ruling does not move gets its reference row from `tests/era_bump.py <N>`, never by hand. A
   table the ruling moves is written by builder from coach's printed digest (standing ruling 5).
 - **Sabotage.** Every build: anchor-check every mutation in every spec (no gate runs), then trip-run the build's own
@@ -80,8 +89,8 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
   one; it runs outside any build's budget and rebuilds the reach map in the same run. Its date goes on the digest line
   as `full sweep YYYY-MM-DD`, and `session-start` reports whether it is due.
 - **Review.** Every 25 builds, measure reruns the gate history analysis (`tests/measure/v232_gate_history.js`, record
-  shaped like `v232_rulings/measure_gate_history_mH.md`) and reports which gates have never caught a real bug. Last run
-  Post-V232; next due after V257.
+  shaped like `v232_rulings/measure_gate_history_mH.md`), reports which gates have never caught a real bug, and audits
+  every `tests/skip_allow.txt` entry. Last run Post-V232; next due after V257.
 
 ## Standing rulings (settled — do not re-ask, do not re-derive)
 Each of these was paid for in a session. They are not open questions, and no agent reopens one
@@ -99,6 +108,11 @@ without new evidence that contradicts the ruling itself.
    is unruled, in which case the constant goes. A dead pin looks maintained and defends nothing, and
    **re-pointing one is worse than either**: it makes a vacuous line look freshly maintained. Before
    repointing any pin, `grep -c` the symbol and require more than the declaration.
+   **A build-scoped claim is not a dead pin** (Mario, Post-V233). A check written to switch off after its
+   own build ("this build changed X against the one before") retires when the next build ships, and the
+   previous-version run (Proof scope) is its replacement. Rewiring applies to live checks that went dead,
+   never to checks written to switch off. When a planted bug survives and a retired or dark row was its
+   only guard, that claim is rewritten as a forward check (g219's D167 rows, the V221 trio).
 4. **Gate and spec files are keyed to the RULING they defend, not the version being built.** A gate's
    premise is scoped to its own build and its predicate must say so. An assertion that means "MY build
    changed nothing" with no version predicate will fire on somebody else's build and read as a regression.
@@ -198,7 +212,7 @@ Every brief to either carries the per-build items, then the standing lines for t
 - **Both, standing:** gate runs are `bash -c 'set -eo pipefail; …'`, no `<(...)`; every gate prints `PASS n FAIL n` and a
   missing summary is a crash; oracles never ask the engine; strip comments before any token-gone scan; pin `cfg.seed`,
   strip clock fields and prove a baseline equals itself before diffing; an empty diff is a failure. Standing rulings 2
-  (a licence is a predicate on today's `ia-version`), 3 (wire a dead pin, never re-point it), 4 (a gate is keyed to the
+  (a licence is a predicate on today's `ia-version`), 3 (wire a dead pin, never re-point it; a build-scoped claim retires at the next build), 4 (a gate is keyed to the
   ruling it defends) and 5 (`HALF_MANNY` moves only by a ruling that printed the digest first). NRC sessions are
   verbatim; no harness asserts taper, volume or rep shape on them. No gate row is scoped to one exact `ia-version`: a
   range, a minimum, or an era row (Proof scope, Version scope). Temp files go only under the scratch path the brief
@@ -207,9 +221,12 @@ Every brief to either carries the per-build items, then the standing lines for t
   nothing committed; a gate row that cannot pass parks the same way); pool and post-filter reason through one lens, so
   grep the other half; a conditional write with no else is a latch; `exStoreKey` is the only `ia_exw_` writer; race day
   is found by subtype; any `\uXXXX` text that must land is built with `chr(92)`, never typed; an era row for a table the
-  ruling does not move comes from `tests/era_bump.py`, never by hand.
+  ruling does not move comes from `tests/era_bump.py`, never by hand; builder never edits `tests/row_manifest.txt`,
+  and every new gate prints its rows through `tests/status.js`.
 - **Gatekeeper, standing:** run every new or edited gate against the previous version too; every build anchor-checks
-  every spec and trip-runs the Proof scope set; the full sweep runs every spec, old ones included, when it is due; a sabotage anchor that is not `count==1` is NOT-APPLIED and a no-op mutation is a mutation defect;
+  every spec and trip-runs the Proof scope set; the full sweep runs every spec, old ones included, when it is due;
+  gatekeeper alone regenerates `tests/row_manifest.txt`, from a proven run only, and classifies its hunks against the
+  ruling; a sabotage anchor that is not `count==1` is NOT-APPLIED and a no-op mutation is a mutation defect;
   all-trip is as suspicious as a survivor; 100% of blast-radius hunks are classified, and an unruled removal is a regression.
 
 ## Files

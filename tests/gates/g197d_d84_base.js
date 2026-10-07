@@ -1,9 +1,10 @@
 // g197d_d84_base — V197 D84, the BASELINE half of section E: the candidate is swept
-// against the SHIPPED baseline (E1g / E1h) and the budget machinery is proved byte-
-// identical to it (E5 × 2). Six assertions. FOUR need a baseline: E1g, E1h and the two
-// E5 byte-identity parts. TWO need none and run on every invocation: E0, the liveness
-// guard, and the E5 sha256 pin on capSessionBudget's own slice, which reads the candidate
-// alone and is this file's only sabotage coverage of the app.
+// against the SHIPPED baseline (E1g / E1h) and the budget machinery is confined to the
+// behaviour its last licensing ruling printed (E5 × 3). Six assertions. TWO need a
+// baseline: E1g and E1h. FOUR need none and run on every invocation: E0, the liveness
+// guard, and the three E5 behaviour digests (capSessionBudget, _itemCost, _setCount),
+// which replay a frozen corpus through the candidate and are this file's only sabotage
+// coverage of the app.
 //
 // SPLIT NOTE (V198, tests only). This file was section E (the baseline sweep) of g197_leg_accessory.js. That
 // gate ran 58.9s and was 93% of gate.sh's wall time, and an 8-wide fan-out is bounded by
@@ -14,21 +15,20 @@
 // their own section, IA.window.__SEC/__DAY have no reader anywhere, and localStorage is
 // empty at every boundary — so there is no ordering constraint between the four files.
 //
-// WITH NO BASELINE THE FOUR COMPARISON ASSERTIONS DO NOT RUN, ON PURPOSE. tests/sabotage.py
-// runs `node <gate> mutated.html` with no argv[3], so under sabotage E1g, E1h and the two
-// E5 byte-identity parts are skipped and this file prints their "not run" lines. The
-// mutations that used to trip section E's comparisons stay pointed at g197c_d84_cmp.js.
+// WITH NO BASELINE THE TWO COMPARISON ASSERTIONS DO NOT RUN, ON PURPOSE. tests/sabotage.py
+// runs `node <gate> mutated.html` with no argv[3], so under sabotage E1g and E1h are
+// skipped and this file prints their "not run" line. The mutations that used to trip
+// section E's comparisons stay pointed at g197c_d84_cmp.js.
 //
-// THE E5 DIGEST PIN IS NOT ONE OF THEM (V198 tooling, item 3 of 3). It stopped needing a
-// baseline when D85 re-pinned it to LICENSED TEXT: it is a sha256 of capSessionBudget's
-// own slice, answered by the candidate alone. It is therefore OUTSIDE the baseline branch
-// and runs on every invocation, which closes a real hole — until this change every
-// app-grading assertion in this file sat behind if (BASE_HTML), so under sabotage the file
-// graded nothing and printed a green summary no matter what the mutation did. The move is
-// PAIRED with a mutation, because coverage that is assumed is not coverage:
-// tests/sabotage/v198.json M7 is a COMMENT-ONLY edit inside capSessionBudget that trips E5
-// by name. Comment-only on purpose — it proves E5 sees an EDIT to the licensed text rather
-// than a change in behaviour, under the harness that could not reach it at all before.
+// E5 IS NOT ONE OF THEM. Since the V198 tooling pass it needs no baseline and runs on every
+// invocation, which closed a real hole: before that every app-grading assertion in this
+// file sat behind if (BASE_HTML), so under sabotage the file graded nothing and printed a
+// green summary no matter what the mutation did. Until Post-V233 E5 was a sha256 of
+// capSessionBudget's SOURCE slice, paired with a comment-only mutation. Post-V233 (Mario:
+// "Convert brittle line and text checks (like g224) to content checks.") it is three
+// digests of the budget machinery's BEHAVIOUR on a frozen corpus, and
+// tests/sabotage/v198.json M7 is a behavioural edit inside capSessionBudget that trips E5
+// by name. See the E5 block for the corpus, the era rows and their provenance.
 //
 // WHAT IT MUST NEVER PRINT IS `PASS 0 FAIL 0`. gate.sh reads a MISSING summary as a crash,
 // but it reads a summary of zero as green, and a zero summary is indistinguishable from a
@@ -36,15 +36,15 @@
 // baseline: it needs no second artifact, it is answered by the lattice this file builds
 // for itself, and it fails loudly if that enumeration is ever cut down.
 //
-// E0 IS NOW TWO PARTS, because moving E5 out took the no-baseline count from 1 to 2 and a
-// changing PASS count is exactly what once masked a dead gate body. The number is not
-// relaxed, it is ASSERTED: done() computes how many assertions were actually PUT (passed,
-// failed or refused) and fails by name if that is below NOBASE_MIN, the two that need no
-// baseline (E0 and the E5 digest pin). A body that stops executing anywhere above done()
-// now produces a NAMED red instead of a shorter green, whichever assertions went missing —
-// including the case E0's own lattice claim cannot see, where E0 passes and everything
-// after it is gone. Under sabotage this file prints PASS 2 FAIL 0; PASS 1, PASS 0 and a
-// missing summary are all red.
+// E0 IS TWO PARTS, because moving E5 out raised the no-baseline count, and a changing PASS
+// count is exactly what once masked a dead gate body. The number is not relaxed, it is
+// ASSERTED: done() computes how many assertions were actually PUT (passed, failed or
+// refused) and fails by name if that is below NOBASE_MIN, the four that need no baseline
+// (E0 and the three E5 behaviour digests). A body that stops executing anywhere above
+// done() now produces a NAMED red instead of a shorter green, whichever assertions went
+// missing — including the case E0's own lattice claim cannot see, where E0 passes and
+// everything after it is gone. Under sabotage a clean artifact prints PASS 4 FAIL 0; fewer
+// than four put, and a missing summary, are red.
 //
 // INTERNAL FAN-OUT. 1,728 configs built against the candidate, the moving release
 // baseline (E1g) and the fixed V196 artifact (E1h) — twice per config when the release
@@ -75,6 +75,9 @@
 //   fails by construction. The confinement is RE-PINNED to the D85-licensed TEXT rather
 //   than deleted: deleting it is an unruled removal, and it is the one assertion in the
 //   suite that sees the D85 edit as an EDIT rather than as an outcome.
+//   POST-V233 it is put on BEHAVIOUR instead of text (the E5 block): the text pin went red
+//   at V198, V199 twice and V231 pre with no behaviour change, and never saw D89's ruled
+//   move, which sat outside its slice.
 //
 // Usage: node tests/gates/g197d_d84_base.js <candidate.html> [baseline.html]
 // Internal: --shard i/N --out <json>   worker mode, never called by hand.
@@ -121,9 +124,10 @@ const V196_HTML = WORKER ? (V196_ARG && fs.existsSync(V196_ARG) ? V196_ARG : nul
 
 let pass = 0, fail = 0, refused = 0;
 // The number of assertions this file puts with NO baseline at all: E0 (the lattice
-// enumeration) and the E5 sha256 pin on capSessionBudget. Both are answered by the
-// candidate alone. done() enforces it as a floor; see the E0 note in the header.
-const NOBASE_MIN = 2;
+// enumeration) and the three E5 behaviour digests (capSessionBudget, _itemCost, _setCount).
+// All four are answered by the candidate and the committed V196 corpus source alone.
+// done() enforces it as a floor; see the E0 note in the header.
+const NOBASE_MIN = 4;
 function ok(name, cond, detail) {
   if (cond) { pass++; console.log('ok   ' + name); }
   else { fail++; console.log('FAIL ' + name + (detail !== undefined ? '  -> ' + detail : '')); }
@@ -162,7 +166,7 @@ process.on('exit', cleanup);
 function done() {
   cleanup();
   // E0, second part: the LIVENESS FLOOR. A summary is only worth reading if the body that
-  // produced it ran. This file always PUTS at least NOBASE_MIN assertions, because neither
+  // produced it ran. This file always PUTS at least NOBASE_MIN assertions, because none
   // of them needs a second artifact, so a shorter count means assertions stopped executing.
   // That is the failure a summary of zero cannot express on its own, and the failure a
   // count that is merely adjusted upward would hide.
@@ -170,8 +174,8 @@ function done() {
   if (putN < NOBASE_MIN) {
     fail++;
     console.log('FAIL E0 liveness floor: only ' + putN + ' assertion(s) were put, minimum '
-      + NOBASE_MIN + ' (E0 lattice enumeration, E5 capSessionBudget digest pin) — neither '
-      + 'needs a baseline, so the gate body stopped executing');
+      + NOBASE_MIN + ' (E0 lattice enumeration, E5 capSessionBudget/_itemCost/_setCount behaviour '
+      + 'digests) — none needs a baseline, so the gate body stopped executing');
   }
   if (refused) console.log('\nREFUSED ' + refused + ' assertion(s) — see the REFUSE lines above. A REFUSED assertion was NOT run and is NOT a pass.');
   console.log('\nPASS ' + pass + ' FAIL ' + fail);
@@ -340,86 +344,110 @@ function afterSweep(bCells, bFell, bRose, bEg, rCells) {
   } else {
     console.log('   -- E1g/E1h not run: no baseline argv[3] (gate.sh passes one; sabotage.py does not)');
   }
-// ── E5: CONFINEMENT OF THE BUDGET MACHINERY. One claim, two mechanisms: nothing has
-// edited budget machinery since D85 without a ruling.
-//   capSessionBudget is PINNED TO ITS LICENSED TEXT by sha256. Until V198 it was pinned
-//   to the shipped baseline under D84's premise that no budget machinery moved; D85
-//   (V198) edits this function on purpose, so a baseline comparison now fails by
-//   construction. Re-pinning keeps the confinement instead of deleting it — a deletion
-//   would be an unruled removal, and this is the only assertion in the suite that sees
-//   the D85 edit as an EDIT rather than as an outcome. Narrowing E5 to _itemCost/
-//   _setCount was the other candidate mechanism and was REJECTED for the same reason:
-//   it would leave the function D85 actually touched with no confinement at all.
-//   _itemCost and _setCount are NOT D85's, so they keep the baseline byte comparison.
-  // NO BASELINE BRANCH AROUND THE DIGEST PIN. The sha256 below is answered by the
-  // candidate alone, so it runs on every invocation — including sabotage.py's
-  // `node <gate> mutated.html`, which passes no argv[3]. This is the one app-grading
-  // assertion in this file a mutation can reach.
-  const slice = (src, start, end) => { const a = src.indexOf(start); if (a < 0) return null;
-    const b = src.indexOf(end, a); return b < 0 ? null : src.slice(a, b); };
-
-  // PROVENANCE OF THE PINS. sha256 of the bytes from `function capSessionBudget(sections,
-  // cardio){` up to (not including) `\nfunction capRegionalFatigue`.
-  //   CSB_D91  — V199, the text LICENSED BY RULING D91 (amendment to D85): D91 hoisted
-  //              the {hinge, hip_ext} lens to a top-level _isPostChain so recoveryDeload
-  //              and capSessionBudget read ONE writer; capSessionBudget's in-function
-  //              copy became the alias `const _isPost=_isPostChain;`. Ruling D91 is what
-  //              licenses that edit to the budget text — this is a RE-PIN, not a delete.
-  //   CSB_D85  — V198, the text LICENSED BY RULING D85: the {hinge, hip_ext} floor that
-  //              makes the day's last posterior chain item ineligible for the trim loop.
-  //              Kept accepted under ia-version < 199 so V198-vs-V197 stays answerable.
-  //   CSB_PRE  — the pre-D85 text. V196 and V197 carry it byte-for-byte identically, which
-  //              is why one digest covers both and why this gate still answers V197-vs-V196.
-  // A DIGEST IS REFRESHED ONLY BY A RULING. If this assertion fails, the question is not
-  // 'what is the new digest' — it is 'which ruling licensed that edit to the budget'.
-  //   CSB_D195 — V231, the text LICENSED BY RULING D195 (D195-B `_cost` + D195 Amendment 2 A6; tests/measure/v231_rulings/v231_absorb_ruling.md, the g197d:389
-  //              E5 row: "add era `cv >= 231` → `CSB_D195`, rule label 'D195' ...; older eras kept"). Exactly two
-  //              lines of the slice move from the D91 text: `const _cost=…` gains the `_prehabHalf` set in front of it,
-  //              and `const score=sr*10+…` scores a Leg circuit item at ii>=3 as 3. Printed by builder with this gate's
-  //              own slice and sha256 before this edit: candidate (ia-version 231, sha 1249c248a679) 5e8f2f07d1c52dfc,
-  //              V230 (sha 72ac41c8d340) 36b5b8efdfa1d3d8 (the D91 text), the B-alone tree (measure5/t_B.html, sha b958d4b09b1181bc) 10a5806729632f09.
-  //              CSB_D91 stays accepted for 199..230, so V230 keeps hashing to its own era.
-  const CSB_D195 = '5e8f2f07d1c52dfc01523f3613a66a4ac36b2c1c5849cd91567d322f99f5ddbd';
-  const CSB_D91 = '36b5b8efdfa1d3d86e235654d17b3c28e5fd2161520901c9acc4ed02a0b80fc5';
-  const CSB_D85 = 'fb16df9c8a6798937d3e0a9904f23944bf3f68cac258a21ef772ccf9040357c3';
-  const CSB_PRE = 'c8064f3cc1989cd5f60f308bc2644119162238c4946843ee3b9ccea8ebe06a5f';
-  const csb = slice(RAW, 'function capSessionBudget(sections, cardio){', '\nfunction capRegionalFatigue');
-  const cv  = iaVersion(RAW);
-  // Era predicate, oldest first, newest era as the fallthrough. Each older digest stays
-  // ACCEPTED for the versions that shipped it, so this gate keeps answering V198-vs-V197
-  // and V197-vs-V196 after the re-pin. An unknown ia-version is held to the newest text.
-  const preD85 = cv !== null && cv < 198;        // pre-D85 artifact: allowed the pre-D85 text
-  const preD91 = cv !== null && cv < 199;        // V198: allowed the D85 text
-  const preD195 = cv !== null && cv < 231;       // V199..V230: allowed the D91 text (the D195 era is cv >= 231)
-  const want = preD85 ? CSB_PRE : (preD91 ? CSB_D85 : (preD195 ? CSB_D91 : CSB_D195));
-  const era  = preD85 ? 'pre-D85' : (preD91 ? 'D85 (V198)' : (preD195 ? 'D91 (V199)' : 'D195 (V231)'));
-  const rule = preD91 ? 'D85' : (preD195 ? 'D91' : 'D195');   // the ruling that licenses THIS era's text
-  const dig  = csb === null ? null : crypto.createHash('sha256').update(csb).digest('hex');
-  ok('E5 capSessionBudget is byte-for-byte the ' + era + ' licensed text '
-     + '(licensing ruling ' + rule + '; nothing since ' + rule + ' has edited budget machinery)',
-     dig !== null && dig === want,
-     dig === null ? 'not found in candidate'
-       : 'ia-version ' + cv + ' digest ' + dig.slice(0, 16) + ' != licensed ' + want.slice(0, 16)
-         + ' — capSessionBudget was edited; name the ruling');
-
-  // The remaining two E5 parts DO need a second artifact: they are byte comparisons
-  // against the shipped baseline, so they stay behind BASE_HTML and stay unreachable
-  // from sabotage.py by construction.
-  if (BASE_HTML) {
-  const B = fs.readFileSync(BASE_HTML, 'utf8');
-  const PARTS = [
-    ['_itemCost',        'function _itemCost(it, sectionRegion){',       '\n// ── RECOVERY-WEEK VOLUME DELOAD'],
-    ['_setCount',        'function _setCount(detail){',                  '\nfunction _itemCost'],
+// ── E5: CONFINEMENT OF THE BUDGET MACHINERY, READ OFF BEHAVIOUR ─────────────────────
+// THE CLAIM IS UNCHANGED, and is the one this block has made since V198: "nothing has edited
+// budget machinery since D85 without a ruling", and, for _itemCost and _setCount, "D85 owns
+// the capSessionBudget trim loop and nothing else". What changed is WHERE it is read. Until
+// Post-V233 it was a sha256 of capSessionBudget's SOURCE slice (`function capSessionBudget(`
+// up to `\nfunction capRegionalFatigue`) plus a byte comparison of the _itemCost/_setCount
+// slices against the baseline. That text pin went red at V198, V199 twice and V231 pre with
+// no behaviour change (an alias, a declaration placed inside a slice, a comment), and it never
+// saw the one ruled move that sat OUTSIDE its slice (D89, below). Mario, Post-V233: "Convert
+// brittle line and text checks (like g224) to content checks."
+// (tests/measure/v233_rulings/post_v233_proof_scope_decisions.md; evidence
+// measure_tooling_inventory_mT.md BRITTLE PINS and v232_rulings/measure_gate_history_mH.md
+// class B.) This RETIRES the V198 doctrine that the confinement must see a comment-only EDIT:
+// a comment is not budget machinery. tests/sabotage/v198.json M7 is now a behavioural edit.
+//
+// THE CORPUS IS FROZEN. It is every day capSessionBudget is handed while the FIXED V196
+// artifact (baselines/V196.html, the committed file E1h already reads) builds the 144 configs
+// of this gate's own lattice at rest sun+wed and seed 1013: every tier × goal × injury, with
+// focus and experience crossed (hypertrophy/beginner, balanced/advanced). It is captured from
+// V196 and NEVER from the candidate, on purpose: the candidate's days move with every DRAW
+// ruling, and a budget confinement that reddened on a draw change would be a draw pin, the
+// same brittleness moved one step. The capture wraps V196's global binding at run time; no
+// source text is read or injected anywhere. Each captured day is replayed through the
+// CANDIDATE's capSessionBudget with its own cardio (so the interference cap is exercised
+// too), and every item on it through _setCount and _itemCost; each stream is digested.
+//
+// THE ORACLE IS AN ERA ROW, NOT A HAND TABLE, deliberately: the claim is "nothing has moved
+// since the licensing ruling", and a claim that a build moved nothing is an era row (CLAUDE.md
+// Version scope). The rows are RANGES keyed to the ruling that last moved the budget's
+// behaviour, the newest open-ended, the same shape as the old `<` predicates, so a build that
+// moves nothing needs no row and tests/era_bump.py has nothing to carry. A DIGEST IS REFRESHED
+// ONLY BY A RULING: when a row fails, the question is which ruling licensed the move, and the
+// answer is a range row printed from the ruled tree that closes the open one. Printed by
+// builder with this block's own corpus and replay on every tag V196..V233 (Post-V233 slice 3,
+// tests/edits/post_v233_s3_brittle_pins.py):
+//   196..197  pre-D85      V196 and V197 replay identically (one pre-D85 text digest covered both)
+//   198..199  D85 (V198)   the posterior floor. D91 (V199) hoisted the lens to _isPostChain:
+//                          the TEXT moved and the behaviour did not, so D91 has no row
+//   200..230  D89 (V200)   _compoundTier reads Pallof press as core (tier 0), so the tier-3
+//                          skip stops shielding it. Outside the old slice: never seen by text
+//   231..     D195 (V231)  D195-B `_cost` (the _prehabHalf set) and the Leg circuit ii>=3 score
+//   _setCount and _itemCost replay identically on every tag V196..V233: one open row each.
+  const BUDGET_BEHAVIOUR_BY_ERA = [
+    { from: 196, to: 197,      rule: 'pre-D85',     csb: '3606c512520dc264d5b41b04313e367ac212b4c0d2e6c2fe21337ca64135f87b' },
+    { from: 198, to: 199,      rule: 'D85 (V198)',  csb: '42b54ee6913b887dd1ba112636b505c6cee53ce23d51c4590f2608639ebed91a' },
+    { from: 200, to: 230,      rule: 'D89 (V200)',  csb: '470b536d85a0747dd37cadd59c017d802fc715f8c75cc2b801dde38aa95bfd0d' },
+    { from: 231, to: Infinity, rule: 'D195 (V231)', csb: '6be03983288738c911e207419b94562ca482169d477584880ef5d75cf4a904be' },
   ];
-  PARTS.forEach(([nm, a, b]) => {
-    const x = slice(RAW, a, b), y = slice(B, a, b);
-    ok('E5 ' + nm + ' is byte-identical to the baseline (D85 owns the capSessionBudget trim loop and nothing else)',
-       !!x && !!y && x === y, x === null ? 'not found in candidate' : (y === null ? 'not found in baseline' : 'differs'));
+  const ITEM_HELPERS_BY_ERA = [
+    { from: 196, to: Infinity, rule: 'V196',
+      setCount: 'f5a34d9cf980d05e9b2a6594b4093361fbf7324561afc3b2686aa5ed8e0087f8',
+      itemCost: 'f026dbc4b39d120546af57a4753b66f78adb56442ab7b8feb4f306b279a6e649' },
+  ];
+  const cv = iaVersion(RAW);
+  // An unknown ia-version is held to the newest row, as the old predicate held it to the newest text.
+  const eraOf = T => cv === null ? T[T.length - 1] : (T.find(r => cv >= r.from && cv <= r.to) || null);
+  const bRow = eraOf(BUDGET_BEHAVIOUR_BY_ERA), hRow = eraOf(ITEM_HELPERS_BY_ERA);
+  const E5_CFGS = E_L.filter(c => c.key.endsWith('|sun+wed|1013')
+    && ((c.cfg.liftingFocus === 'hypertrophy') === (c.cfg.experience === 'beginner')));
+  function e5Corpus(src) {
+    const IA_C = load(src);
+    IA_C.eval('var __e5corp = []; var __e5csb = capSessionBudget; capSessionBudget = function (s, c) {'
+      + ' __e5corp.push(JSON.stringify([s, c === undefined ? null : c])); return __e5csb(s, c); };');
+    E5_CFGS.forEach(c => IA_C.buildProgram(c.cfg));
+    return Array.from(new Set(JSON.parse(IA_C.eval('JSON.stringify(__e5corp)'))));
+  }
+  function e5Replay(corpus) {
+    const csbFn = IA.eval('capSessionBudget'), scFn = IA.eval('_setCount'), icFn = IA.eval('_itemCost');
+    const outs = [], sets = [], costs = []; let moved = 0;
+    corpus.forEach(s => {
+      const pair = JSON.parse(s), sec = pair[0], c = pair[1];
+      const before = JSON.stringify(sec);
+      const o = JSON.stringify(csbFn(JSON.parse(before), c === null ? undefined : c));
+      outs.push(o); if (o !== before) moved++;
+      sec.forEach(x => ((x && x.items) || []).forEach(it => { sets.push(scFn(it.detail)); costs.push(icFn(it, null)); }));
+    });
+    const H = t => crypto.createHash('sha256').update(t).digest('hex');
+    return { n: corpus.length, moved: moved, items: sets.length,
+             csb: H(outs.join('\n')), setCount: H(sets.join(',')), itemCost: H(costs.join(',')) };
+  }
+  const E5_SRC = resolveV196();
+  let e5 = null, e5err = '';
+  if (E5_SRC) { try { e5 = e5Replay(e5Corpus(E5_SRC)); } catch (e) { e5err = String((e && e.message) || e); } }
+  const E5_ROWS = [
+    ['capSessionBudget', bRow, 'csb', 'the posterior floor, the trunk floor, the trim order and the cap'],
+    ['_itemCost',        hRow, 'itemCost', 'D85 owns the capSessionBudget trim loop and nothing else'],
+    ['_setCount',        hRow, 'setCount', 'D85 owns the capSessionBudget trim loop and nothing else'],
+  ];
+  E5_ROWS.forEach(([nm, row, k, what]) => {
+    const label = 'E5 ' + nm + ' replays the ' + (row ? row.rule : 'NO ROW') + ' behaviour on the frozen V196 budget corpus'
+      + (e5 ? ' (' + e5.n + ' days, ' + e5.moved + ' trimmed, ' + e5.items + ' items)' : '')
+      + ' — nothing since ' + (row ? row.rule : '?') + ' has moved it (' + what + ')';
+    if (!E5_SRC) {
+      refuse(label, 'NOT RUN: the corpus is captured from baselines/V196.html (ia-version 196) and it is '
+        + 'missing or carries another version. Restore it with: git show V196:index.html > baselines/V196.html');
+    } else if (!e5) {
+      ok(label, false, 'corpus capture or replay threw: ' + e5err);
+    } else {
+      ok(label, !!row && e5.n > 0 && e5[k] === row[k],
+         !row ? 'ia-version ' + cv + ' has no era row'
+              : 'ia-version ' + cv + ' digest ' + e5[k].slice(0, 16) + ' != ' + row.rule + ' ' + row[k].slice(0, 16)
+                + ' — ' + nm + ' behaviour moved; name the ruling, then print its range row');
+    }
   });
-} else {
-  console.log('   -- E5 _itemCost/_setCount byte-identity not run: no baseline argv[3] '
-    + '(the E5 capSessionBudget digest pin above needs none and DID run)');
-}
 
   done();
 }

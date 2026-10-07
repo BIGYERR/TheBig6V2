@@ -325,7 +325,7 @@ function blank(){return {configs:0,weeks:0,dayCells:0,dlDayBuilds:0,deloadWeeks:
   zeroWeeks:0,zeroWeeksDeload:0,zeroWeeksNonDeload:0,postInP1:0,postOutP2:0,postOutP3:0,postShipped:0,
   killedByDeload:0,killedHeldByFinisher:0,killedKeepsMain:0,lblP1:{},lblP2:{},dropped:{},droppedPost:{},
   survCandViol:0,survCandMax:0,survCandGt1:0,trapAny:0,trapCand:0,trapNoCand:0,trapSurvViol:0,trapNoCandSurvViol:0,
-  lblP1all:{},lblP2all:{},killHold:{},reBudLost:{},reBudShip:{},reBudNonMob:0,reBudTier:{},reBudRename:{},lensOnlyHand:{},lensOnlyEng:{},swapReBudgetWeekZero:0,
+  lblP1all:{},lblP2all:{},killHold:{},reBudLost:{},reBudShip:{},reBudNonMob:0,lensOnlyHand:{},lensOnlyEng:{},swapReBudgetWeekZero:0,
   trapAnyE:0,trapCandE:0,trapNoCandE:0,trapSurvViolE:0,trapNoCandSurvViolE:0,
   swapPop:0,swapBoth:0,swapReCap:0,swapReBudget:0,capLSBin:0,capLSBkilled:0,
   pullP1all:{},pullP2all:{},pullShipAll:{},pullP1:{},pullP2:{},pullBothP1:0,pullSwapCensus:{},
@@ -344,13 +344,12 @@ function sweep(mine,instrFile){
       const REC=IA.eval('globalThis.__G199');
       const S=R[m]; S.configs++;
       const W=prog.weeks||{};
-      const shipPost={}, shipLab={}, shipSec={}, wkShip={}, wkDeload={}, wkSha={};
+      const shipPost={}, shipLab={}, wkShip={}, wkDeload={}, wkSha={};
       Object.keys(W).forEach(w=>{ let tot=0;
         Object.keys(W[w]).forEach(d=>{ const day=W[w][d]; let n=0;
           ((day&&day.sections)||[]).forEach(sec=>((sec&&sec.items)||[]).forEach(it=>{ if(isPost(it&&it.name)) n++; }));
           shipPost[w+'|'+d]=n; shipLab[w+'|'+d]=((day&&day.sections)||[]).map(sec=>String((sec&&sec.label)||''));
-          const SM={}; ((day&&day.sections)||[]).forEach(sec=>{ SM[String((sec&&sec.label)||'')]=((sec&&sec.items)||[]).map(it=>String((it&&it.name)||'')); });
-          shipSec[w+'|'+d]=SM; tot+=n; });
+          tot+=n; });
         wkShip[w]=tot; wkSha[w]=sha(JSON.stringify(W[w])); });
       REC.forEach(r=>{ S.dayCells++; if(r.dl) wkDeload[r.w]=true;
         const a1=cardPost(r.p1), a2=cardPost(r.p2), a3=cardPost(r.p3);
@@ -424,10 +423,7 @@ function sweep(mine,instrFile){
             (r.p3||[]).forEach(s=>(s.n||[]).forEach((n,i)=>{ if(isPost(n)) bump(S.reBudLost, (s.p[i]==='hinge'||s.p[i]==='hip_ext'?'[engine-post] ':'[hand-only] ')+s.l+' :: '+n); }));
             const SL=shipLab[r.w+'|'+r.d]||[];
             bump(S.reBudShip, SL.join(' | ')||'(card has no sections at all)');
-            if(SL.some(l=>!/mobility|stretch|foam/i.test(l))) S.reBudNonMob++;
-            bump(S.reBudTier, String(L.key).split('|')[0]);
-            const SM=shipSec[r.w+'|'+r.d]||{};
-            (r.p3||[]).filter(sc=>secPost(sc)>0).forEach(sc=>bump(S.reBudRename, sc.l+': '+(sc.n||[]).filter(isPost).join(', ')+' -> '+((SM[sc.l]||[]).join(', ')||'(section gone)'))); } }
+            if(SL.some(l=>!/mobility|stretch|foam/i.test(l))) S.reBudNonMob++; } }
         if(inTrap&&inSwap) S.trapAndSwap++;
         // the SAME trap predicate read through the ENGINE's lens ({hinge,hip_ext} per _pattern),
         // which is the lens a naive pre-pass would actually have used.
@@ -636,11 +632,9 @@ function report(){
   console.log('── I. re-loss downstream of the deload ──');
   ok(N.swapReCap===0,'I1 of the 2,160 newly-surviving swap cells, capRegionalFatigue empties '+N.swapReCap+'');
   // V231 era for I2, and I2c/I2d retired at 231 (tests/measure/v231_rulings/v231_absorb_ruling.md, the g199:627 I2 row: "ABSORB: `VER>=231 ? 0 : 108` | 0 | D196-4 | `IP.version>=231` | V230 108" and "I2c/I2d | RETIRE at ≥231 to SKIP lines (never PASS/FAIL)"), a predicate on today's ia-version (standing ruling 2), keyed to D196 P-BWFALLBACK (standing ruling 4): the 108 V230 cells are all rem[Leg superset B :: Burpees] add[Leg superset B :: Single-leg hip thrust (shoulders on bed)] on bodyweight lowback/protect, so the post-build rename I2c and I2d named no longer happens; printed by builder with this gate before this edit: I2 0 on the V231 candidate (sha 1249c248a679), 108 on the V230 baseline (sha 72ac41c8d340). I2b is unchanged. Below 231 all three rows print V230's text byte for byte; at 231 I2c and I2d print one named SKIP line each (the g228 form), never PASS and never FAIL.
-  const I2_V231=IP.version>=231, I2_SKIP=r=>'SKIP '+r+': RETIRED at ia-version '+IP.version+' (era 230 and below): '+"the renamer no longer lands Burpees on a posterior slot (D196); successor rows g231_d196_bwfallback D196-a/D196-c and this file's I2 at 0 (tests/measure/v231_rulings/v231_absorb_ruling.md, the g199:627 I2 row). Never PASS, never FAIL.";
+  const I2_V231=IP.version>=231;
   ok(N.swapReBudget===(I2_V231?0:108),I2_V231?('I2 of the same 2,160, '+N.swapReBudget+' cells reach the SHIPPED card with no posterior left (V231 era, D196 P-BWFALLBACK: V230 shipped 108, every one the Leg superset B Banded hip thrust renamed to Burpees after capSessionBudget on bodyweight lowback/protect; the V231 card carries Single-leg hip thrust (shoulders on bed) there). I2c and I2d are retired at 231'):('I2 of the same 2,160, '+N.swapReBudget+' cells reach the SHIPPED card with no posterior left, and NOT ONE of them loses it to a trim. capSessionBudget keeps the section and D85\'s floor keeps the item; what they carried entering is '+topn(N.reBudLost,2)+'. I2c names what actually happens to it'));
-  if(I2_V231) console.log(I2_SKIP('I2c')); else ok(g(N.reBudRename,'Leg superset B: Banded hip thrust -> Burpees')===N.swapReBudget,
-    'I2c and the cause is named, once, for all '+N.swapReBudget+': a POST-BUILD RENAMER rewrites the item after capSessionBudget. The section survives in place, its content does not: '+topn(N.reBudRename,2));
-  if(I2_V231) console.log(I2_SKIP('I2d')); else ok(g(N.reBudTier,'bodyweight')===N.swapReBudget,'I2d every one of them is on the bodyweight tier ('+JSON.stringify(N.reBudTier)+'). This is a RENAME-SURFACE defect that predates D91 and is only made visible by it: the tier renamer does not read the posterior-chain lens that capSessionBudget and recoveryDeload both defend. NOT fixed here, and not fixable in a gate — it needs a ruling');
+  // I2c and I2d (the V230 Burpees renamer rows, D196 P-BWFALLBACK, dark from I2_V231 = IP.version>=231) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
   ok(N.swapReBudgetWeekZero===0,'I2b and not one of those '+N.swapReBudget+' cells leaves its WEEK without posterior ('+N.swapReBudgetWeekZero+'): the coaching claim behind criterion 2 holds at the level it is made');
   ok(!!ERA&&N.capLSBkilled===ERA.capLSBkilled,'I3 capRegionalFatigue kills exactly '+ERAv('capLSBkilled')+' Leg superset B sections (the V'+IP.version+' row), out of '+N.capLSBin+' entering the cap (all day builds, n='+N.dayCells+'); got '+N.capLSBkilled+NOROW);
 

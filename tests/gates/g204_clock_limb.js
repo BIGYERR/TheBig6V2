@@ -26,8 +26,11 @@
 //            PTG p13/p16 2x-2.5x recovery band) computed here and required of the card.
 //       C7b  NRC — a HAND-TYPED PACE_CHART row, the seven columns typed from the table.
 //       C7c  swim — the swim progression formula re-derived here from the cfg.
-//   * C8 is the SOURCE census, not a build check. It re-derives the idiom inventory
-//     from the artifact text and pins it, so a twelfth copy cannot appear quietly.
+//   * C8 is D126's claim read off RENDERED STRINGS at the rounding edges: a lattice of
+//     durations (x.5, m:59.5, 3599.5, past the hour) through the owner and through every
+//     formatter C1-C7 reach (pace, NSW INT, swim INT) plus the one site that carries its
+//     own :60 (the seed mile anchor), each against arithmetic typed here. Until Post-V233
+//     it was a SOURCE census of call sites; see the C8 block for why it moved.
 //
 // VERSION PREDICATE (standing ruling 4 — a gate is keyed to the RULING it defends).
 // D126 ships on ia-version 204.
@@ -277,8 +280,8 @@ for(let mins = 5; mins <= 12; mins++){
           if((rec.lo !== wantLo || rec.hi !== wantHi) && intRecNumBad.length < 5)
             intRecNumBad.push(tag + ' rec=' + JSON.stringify(rec) + ' doctrine says {lo:' + wantLo + ',hi:' + wantHi + '}');
           // The _intClk domain. Both band limbs are rounded by the engine, so today the
-          // idiom and _clkMS agree on them and a re-point of _intClk alone shows up only
-          // in the C8 census. The day a fraction reaches this limb, THIS conjunct fails.
+          // idiom and _clkMS agree on them and a re-point of _intClk alone is invisible by
+          // output. The day a fraction reaches this limb, THIS conjunct fails.
           if((!Number.isInteger(dose.tgt) || !Number.isInteger(rec.lo) || !Number.isInteger(rec.hi)) && intFrac.length < 5)
             intFrac.push(tag + ' tgt=' + dose.tgt + ' rec=' + JSON.stringify(rec));
           const mR = det.match(INT_REC);
@@ -479,64 +482,140 @@ if(!SWIM_D110A){
      (killW1.match(SWIM_MAIN) || [])[1], '2:00');
 }
 
-// ── C8 — the SOURCE census. One helper, eleven call sites, one survivor ──────
-// Not a build check. This re-derives the idiom inventory from the artifact TEXT and
-// pins it, so a twelfth copy of the idiom cannot appear quietly six months from now.
-// The scanner masks comments, strings, regex literals and template TEXT (never the
-// ${...} code inside a template) and self-checks by parsing the masked script.
-const CENSUS = require(path.join(__dirname, '..', 'measure', 'v204_idiom_census.js')).census(ART);
-const FIXIT = ' >>> DO NOT EDIT THIS GATE ROW. Route the new seconds limb through _clkMS(sec), which rounds the WHOLE value before splitting at 60. If you genuinely need the raw remainder, round OUTSIDE the modulo: Math.round(x) % 60. Then update the counts here in the same commit. <<<';
-ok('C8 the census masker self-check parses the masked inline script (counts below are meaningless if this fails)',
-   CENSUS.parseOk, CENSUS.parseErr);
-ok('C8 exactly ONE surviving Math.round(<expr> % 60) in the artifact, was 12 on V203 (found ' + CENSUS.roundInside.length + ')' + FIXIT,
-   CENSUS.roundInside.length === 1, CENSUS.roundInside.map(h => 'line ' + h.line).join(' '));
-const survivor = CENSUS.roundInside[0] || { line: -1, text: '' };
-ok('C8 the one survivor is the applySeedData mile-anchor site, not a formatter (line ' + survivor.line + ')' + FIXIT,
-   /s\.mileSec/.test(survivor.text), survivor.text.slice(0, 110));
-// The survivor is allowed to round inside the modulo ONLY because it carries its own
-// carry correction on the very next line. Read it out of the source and require it.
-const nextLine = (CENSUS.srcLines[survivor.line] || '').replace(/\s/g, '');
-ok('C8 the survivor carries its own ss===60 correction on the following line' + FIXIT,
-   nextLine.indexOf('if(ss===60){mm++;ss=0;}') !== -1, nextLine.slice(0, 110));
-// The call-site count is ERA-KEYED (standing ruling 4): the count is a property of the build
-// that shipped it, so a gate row keyed to D126 alone would fire on somebody else's build.
-//   204..206: 11, D126's inventory.
-//   207..217: 13. D106a (V207) adds the NSW test-card detail in index.html (the trial card
-//             built in buildCardioProgression's race-pin post-pass, `detail:` line): the goal
-//             time and its pace, two calls, both through the one owner as D126 requires.
-//   218..222: 16. D157 (V218) three swim labels read the total through _clkMS.
-//   223 on:   27, and round-OUTSIDE 2 -> 0. D183 (V223) amendment 2 (a)/(b) and (d), R5's
-//             pace-line shapes and brought-in (2) the km lens: every time in the R1 sentence
-//             and on both pace lines goes through _clkMS (+11). R1 retired the offer
-//             (achievablePacePerMile / applySuggestedPace), which held the safeTotal pair.
-//   226 on:   26, round-OUTSIDE stays 0. D188 E2 (V226, Class F) deleted paceCeilingSentence's beginner
-//             line, which held exactly one call: _clkMS(f.cur) in "Your paces start from the beginner
-//             default of ... per mile." (V225 :2459). Hand count: 27 - 1 = 26.
-// `outside` is the round-OUTSIDE Math.round(x) % 60 count for the era; it was a flat 2 until V223.
-// A version with no row fails loudly. It never falls back to a neighbouring row.
-const CLK_CALLS_BY_ERA = [
-  { from: 204, to: 206,      calls: 11, outside: 2, why: 'D126 inventory' },
-  { from: 207, to: 217,      calls: 13, outside: 2, why: 'D106a (V207) test-card detail adds 2' },
-  { from: 218, to: 222,      calls: 16, outside: 2, why: 'D157 (V218) three swim labels read the total through _clkMS: pace line 2393, initial render 2817, sizer label 3330' },
-  { from: 223, to: 225,      calls: 27, outside: 0, why: 'D183 (V223) amendment 2 (a)/(b)/(d), R5, brought-in (2) add 11: paceCeilingSentence 5 (2456 x2, 2457, 2458, 2459), updatePaceDisplay 2 (2407), paceDisplayLine initial render 2 (2844), swim pace line per100 +1 (2386), swim initial render per100 +1 (2802); R1 retired the offer and its Math.round(safeTotal) % 60 pair' },
-  { from: 226, to: Infinity, calls: 26, outside: 0, why: 'D188 E2 (V226, Class F) deleted the paceCeilingSentence beginner line and its one call, _clkMS(f.cur) at V225 :2459: 27 - 1' },
+// ── C8 — D126 read off the RENDERED STRING, at the rounding edges ─────────────
+// D126 (V204, "the clock that printed 7:60"): the seconds limb has ONE owner, _clkMS, which
+// rounds the WHOLE value and then splits, so ':60' cannot be constructed and every clock the
+// app prints reads 00..59 in its seconds field.
+// UNTIL POST-V233 THIS ROW WAS A SOURCE CENSUS: tests/measure/v204_idiom_census.js counted
+// _clkMS call sites in the artifact text (era table 11/13/16/27/26) and the surviving
+// Math.round(x % 60) sites (one, the applySeedData mile anchor, plus its ss===60 line). It
+// went red at V207 and V223 with no behaviour change, each time a ruled build added a call
+// THROUGH the owner (measure mH class B; mT BRITTLE PINS), and no count can see a formatter
+// that keeps its call and stops carrying. Mario, Post-V233: "Convert brittle line and text
+// checks (like g224) to content checks." It is now put on output: durations chosen AT THE
+// ROUNDING EDGES, driven through every formatter C1-C7 already reach, each against arithmetic
+// typed here. The gate never asks _clkMS or a card what a clock should say.
+//   C8a  the owner: a hand table of edge rows, then every half second in [0, 7200] against
+//        the round-then-split clock this file computes (handClock, C6).
+//   C8b  pace, the tempo card. Week 1 tempo is the mile anchor x 1.08 (C5b's arithmetic), and
+//        three anchors put it at m:59.5 or past: 333 x 1.08 = 359.64, 444 x 1.08 = 479.52,
+//        611 x 1.08 = 659.88. Keyed from 225 with C5b, the era that row verified week 1 as
+//        the unmoved anchor.
+//   C8c  NSW INT. The note quotes the full goal pace, goal time / 2 mi, which is x.5 for every
+//        odd goal time. Five of the seven land on m:59.5; 841 and 901 are x.5 inside a minute.
+//   C8d  swim INT. Per 100 = base / 5, so a 500 yd base of 608, 609, 908 or 909 s puts week
+//        1's interval at m:59.6 or m:59.8; every week re-derived with C7c's own progression.
+//   C8e  the one site that rounds INSIDE the modulo and carries its own correction, the
+//        applySeedData mile anchor: edge mile seconds land as carried minutes and seconds.
+//   C8f  the ceiling, everywhere C8 looked: no clock in any detail, note, subtype or label of
+//        any session C8 built has a seconds field of 60 or more.
+const secField = t => +String(t).split(':')[1];
+const C8_BUILT = [];
+// C8a. Each row by hand: round the whole value (half up), then minutes = quotient by 60,
+// seconds = remainder. 0.5 -> 1 -> 0:01. 3599.5 -> 3600 -> 60:00. 3600.5 -> 3601 -> 60:01.
+// 3659.5 -> 3660 -> 61:00. 5999.5 -> 6000 -> 100:00. 7199.5 -> 7200 -> 120:00.
+const C8_EDGE = [
+  [0.4, '0:00'], [0.5, '0:01'], [29.5, '0:30'], [59.5, '1:00'], [119.5, '2:00'], [359.5, '6:00'],
+  [599.5, '10:00'], [3599.4, '59:59'], [3599.5, '60:00'], [3600.5, '60:01'], [3659.5, '61:00'],
+  [5999.5, '100:00'], [7199.5, '120:00']
 ];
-const CLK_ROW = CLK_CALLS_BY_ERA.find(r => +VER >= r.from && +VER <= r.to) || null;
-ok('C8 CLK_CALLS_BY_ERA has a row for ia-version ' + VER + (CLK_ROW ? ' (' + CLK_ROW.why + ')' : ' (NO ROW)') + FIXIT,
-   !!CLK_ROW, 'no row');
-ok('C8 exactly ' + (CLK_ROW ? CLK_ROW.calls : '?') + ' _clkMS call sites and 1 declaration at ia-version ' + VER + ' (found ' + CENSUS.clkCalls.length + ' and ' + CENSUS.clkDecls.length + ')' + FIXIT,
-   !!CLK_ROW && CENSUS.clkCalls.length === CLK_ROW.calls && CENSUS.clkDecls.length === 1,
-   CENSUS.clkCalls.map(h => h.line).join(','));
-const OUT_N = CLK_ROW ? CLK_ROW.outside : NaN;
-ok('C8 exactly ' + (CLK_ROW ? OUT_N : '?') + ' round-OUTSIDE Math.round(x) % 60 sites at ia-version ' + VER
-     + (OUT_N === 2 ? ', both the known-correct safeTotal pair' : OUT_N === 0 ? ' (D183 R1 retired the safeTotal pair with the offer)' : '') + FIXIT,
-   !!CLK_ROW && CENSUS.roundOutside.length === OUT_N && CENSUS.roundOutside.every(h => /Math\.round\(safeTotal\)\s*%\s*60/.test(h.text)),
-   CENSUS.roundOutside.map(h => 'line ' + h.line + ': ' + h.text.slice(0, 50)).join(' | '));
-console.log('C8 CENSUS ' + ART + ': roundInside=' + CENSUS.roundInside.length + ' (line ' + survivor.line + ')'
-  + ' clkCalls=' + CENSUS.clkCalls.length + ' [' + CENSUS.clkCalls.map(h => h.line).join(',') + ']'
-  + ' clkDecls=' + CENSUS.clkDecls.length
-  + ' roundOutside=' + CENSUS.roundOutside.length + ' [' + CENSUS.roundOutside.map(h => h.line).join(',') + ']'
-  + ' maskerParse=' + (CENSUS.parseOk ? 'OK' : 'FAILED'));
+const c8EdgeBad = C8_EDGE.filter(([s, w]) => clk(s) !== w).map(([s, w]) => s + ' -> ' + clk(s) + ' want ' + w);
+ok('C8a _clkMS prints all ' + C8_EDGE.length + ' hand-typed rounding edges (x.5, m:59.5, 3599.5, past the hour)',
+   c8EdgeBad.length === 0, c8EdgeBad.join(' | '));
+let c8Half = 0; const c8HalfBad = [];
+for(let i = 0; i <= 14400; i++){
+  const s = i / 2, got = clk(s), want = handClock(s);
+  c8Half++;
+  if((got !== want || !WELL.test(got)) && c8HalfBad.length < 5) c8HalfBad.push(s + ' -> ' + got + ' want ' + want);
+}
+ok('C8a every one of ' + c8Half + ' half seconds over [0,7200] prints the round-then-split clock computed here, seconds 00..59',
+   c8HalfBad.length === 0, c8HalfBad.join(' | '));
+// C8b. 333 x 1.08 = 359.64 -> 360 -> 6 r 0; 444 x 1.08 = 479.52 -> 480 -> 8 r 0; 611 x 1.08 =
+// 659.88 -> 660 -> 11 r 0. The idiom printed 5:60, 7:60 and 10:60. The 1 mi goal sits 84 s
+// under the anchor, as C5b's 7:24 -> 6:00 does.
+const C8_PACE = [ { a: 333, tgt: 360, clock: '6:00' }, { a: 444, tgt: 480, clock: '8:00' }, { a: 611, tgt: 660, clock: '11:00' } ];
+if(+VER >= 225){
+  for(const r of C8_PACE){
+    const gl = r.a - 84;
+    const p = IA.buildProgram(mkCfg(Math.floor(r.a / 60), r.a % 60, Math.floor(gl / 60), gl % 60, 1));
+    C8_BUILT.push(p);
+    const w1 = [];
+    for(const day of Object.keys(p.weeks['1'] || p.weeks[1] || {}))
+      for(const s of sessionsOf(p, 1, day)) if(String(s.detail || '').indexOf('Tempo Pace: ') !== -1) w1.push(s);
+    const bad = w1.filter(s => String(s.detail).indexOf('Tempo Pace: ' + r.clock + '/mi') === -1 || (s.dose || s._dose || {}).tgt !== r.tgt);
+    ok('C8b pace: a mile anchor of ' + r.a + ' s x 1.08 prints week 1 tempo as ' + r.clock + '/mi (tgt ' + r.tgt + '; the idiom printed :60 here)',
+       w1.length > 0 && bad.length === 0, w1.length + ' cards: ' + w1.map(s => String(s.detail).slice(0, 50)).join(' | '));
+  }
+} else for(const r of C8_PACE) skipRow('C8b pace anchor ' + r.a + ' s skipped below 225 (C5b era: week 1 tempo is the unmoved anchor)');
+// C8c. t / 2 by hand: 359.5 -> 360 -> 6:00; 419.5 -> 7:00; 420.5 -> 421 -> 7:01; 450.5 -> 451
+// -> 7:31; 479.5 -> 8:00; 539.5 -> 9:00; 599.5 -> 10:00. The anchor a is the goal pace + 60 s.
+const C8_INT = [ { t: 719, a: 420, clock: '6:00' }, { t: 839, a: 480, clock: '7:00' }, { t: 841, a: 481, clock: '7:01' },
+                 { t: 901, a: 511, clock: '7:31' }, { t: 959, a: 540, clock: '8:00' }, { t: 1079, a: 600, clock: '9:00' },
+                 { t: 1199, a: 660, clock: '10:00' } ];
+for(const r of C8_INT){
+  const p = IA.buildProgram(mkPaceCfg(Math.floor(r.a / 60), r.a % 60, 2, Math.floor(r.t / 60), r.t % 60));
+  C8_BUILT.push(p);
+  const q = [];
+  for(const wk of Object.keys(p.weeks || {})) for(const day of Object.keys(p.weeks[wk] || {})) for(const s of sessionsOf(p, wk, day)){
+    const m = String(s.note || '').match(INT_GOAL); if(m) q.push(m[1]);
+  }
+  ok('C8c NSW INT: a 2 mi goal of ' + Math.floor(r.t / 60) + ':' + String(r.t % 60).padStart(2, '0') + ' (' + (r.t / 2) + ' s/mi) is quoted as '
+     + r.clock + '/mi on every INT note that quotes it (' + q.length + ')', q.length > 0 && q.every(x => x === r.clock), q.join(','));
+}
+// C8d. 608/5 = 121.6, 609/5 = 121.8, 908/5 = 181.6, 909/5 = 181.8 s per 100. Week 1 interval,
+// D110a era (minus 2): 119.6 and 119.8 -> 120 -> 2:00, 179.6 and 179.8 -> 180 -> 3:00 (the
+// idiom: 1:60, 2:60). Pre-D110a (x 0.97): 117.952 and 118.146 -> 1:58, 176.152 and 176.346
+// -> 2:56. The week 1 split is the base itself: 121.6/121.8 -> 2:02, 181.6/181.8 -> 3:02.
+const C8_SWIM = [ { b: 608, w1: SWIM_D110A ? '2:00' : '1:58', split: '2:02' }, { b: 609, w1: SWIM_D110A ? '2:00' : '1:58', split: '2:02' },
+                  { b: 908, w1: SWIM_D110A ? '3:00' : '2:56', split: '3:02' }, { b: 909, w1: SWIM_D110A ? '3:00' : '2:56', split: '3:02' } ];
+for(const r of C8_SWIM){
+  const sc = mkSwimCfg(); sc.cardioGoals.swim.baseMins = String(Math.floor(r.b / 60)); sc.cardioGoals.swim.baseSecs = String(r.b % 60);
+  const p = IA.buildProgram(sc); C8_BUILT.push(p);
+  const tw = Object.keys(p.weeks || {}).length, init = r.b / (SWIM_FIXED_DIST / 100), real = init - SWIM_MAX_GAIN * tw;
+  const bad = []; let n = 0, w1 = '', w1s = '';
+  for(const wk of Object.keys(p.weeks || {})) for(const day of Object.keys(p.weeks[wk] || {})) for(const s of sessionsOf(p, wk, day)){
+    if(s.type !== 'swim' || !/Interval/.test(String(s.subtype || ''))) continue;
+    n++;
+    const wp = Math.max(real, init - SWIM_MAX_GAIN * (+wk - 1));
+    const d = String(s.detail || ''), mM = d.match(SWIM_MAIN), mS = d.match(SWIM_SPLIT);
+    if(+wk === 1 && !w1){ w1 = mM ? mM[1] : 'NONE'; w1s = mS ? mS[1] : 'NONE'; }
+    if((!mM || mM[1] !== handClock(swimIntOf(wp)) || !mS || mS[1] !== handClock(wp)) && bad.length < 4)
+      bad.push('W' + wk + ' ' + (mM ? mM[1] : 'NONE') + '/' + (mS ? mS[1] : 'NONE') + ' want ' + handClock(swimIntOf(wp)) + '/' + handClock(wp));
+  }
+  ok('C8d swim INT: a 500 yd base of ' + r.b + ' s (' + init.toFixed(1) + ' s/100) prints week 1 as ' + r.w1 + ' at a ' + r.split
+     + ' split and all ' + n + ' interval cards as the clock re-derived here (' + SWIM_INT_RULE + ')',
+     (init - SWIM_TARGET) / tw > SWIM_MAX_GAIN && n >= 4 && w1 === r.w1 && w1s === r.split && bad.length === 0,
+     'W1 ' + w1 + '/' + w1s + (bad.length ? ' | ' + bad.join(' | ') : '') + ' | clamp ' + ((init - SWIM_TARGET) / tw).toFixed(3));
+}
+// C8e. mileSec -> minutes, seconds by hand: 59.5 -> 60 -> 1 r 0; 419.6 -> 420 -> 7 r 0; 450.4
+// -> 450 -> 7 r 30; 479.4 -> 479 -> 7 r 59; 479.5 -> 480 -> 8 r 0; 3599.5 -> 3600 -> 60 r 0.
+// The site floors the minutes off the RAW value and rounds the remainder, then carries its own
+// ss===60: that carry is what is under test. Wizard state is saved and restored around it.
+const C8_SEED = [ [59.5, '1', '0'], [419.6, '7', '0'], [450.4, '7', '30'], [479.4, '7', '59'], [479.5, '8', '0'], [3599.5, '60', '0'] ];
+const seedBad = []; let seedErr = '';
+try {
+  IA.eval('var __g204wd = { cg: WD.cardioGoals, seed: WD._seed, ap: WD._seedApplied };');
+  for(const [ms, wm, ws] of C8_SEED){
+    IA.eval('WD.cardioGoals = { run: {} }; WD._seed = { mileSec: ' + ms + ' };');
+    // The wizard re-render that follows the write is DOM work the harness may not carry; the
+    // two fields under test are written before it, so a throw there is not a clock defect.
+    try { IA.eval('applySeedData()'); } catch(e) { }
+    const sg = JSON.parse(IA.eval('JSON.stringify(WD.cardioGoals.run)'));
+    if(sg.mileBestMins !== wm || sg.mileBestSecs !== ws) seedBad.push(ms + ' -> ' + sg.mileBestMins + ':' + sg.mileBestSecs + ' want ' + wm + ':' + ws);
+  }
+  IA.eval('WD.cardioGoals = __g204wd.cg; WD._seed = __g204wd.seed; WD._seedApplied = __g204wd.ap;');
+} catch(e) { seedErr = String((e && e.message) || e); }
+ok('C8e the applySeedData mile anchor (the one site that rounds inside the modulo and carries its own :60) lands all '
+   + C8_SEED.length + ' edge mile times as the hand-carried minutes and seconds', !seedErr && seedBad.length === 0, seedErr || seedBad.join(' | '));
+// C8f. The ceiling over everything C8 built.
+let c8Clocks = 0; const c8Sixty = [];
+for(const p of C8_BUILT) for(const wk of Object.keys(p.weeks || {})) for(const day of Object.keys(p.weeks[wk] || {})) for(const s of sessionsOf(p, wk, day))
+  for(const f of ['detail', 'note', 'subtype', 'label']) for(const m of String(s[f] || '').match(/\d+:\d+/g) || []){
+    c8Clocks++;
+    if(secField(m) >= 60 && c8Sixty.length < 5) c8Sixty.push('W' + wk + ' ' + day + ' ' + f + ' "' + m + '"');
+  }
+ok('C8f no clock among the ' + c8Clocks + ' clock strings on the ' + C8_BUILT.length + ' programs C8 built has a seconds field of 60 or more',
+   c8Clocks >= 300 && c8Sixty.length === 0, c8Sixty.join(' | ') || String(c8Clocks));
 
 // ── HALF_MANNY and cfg purity ──────────────────────────────────────────────
 const H = require(path.join(__dirname, '..', 'harness.js'));

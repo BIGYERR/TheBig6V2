@@ -49,14 +49,12 @@
 //             and the reboot after identical to V220. The invariant for these four paths is A10..A13.
 //   M1        HALF_MANNY digest 0ac7da6b1691a8e1 on the candidate, self-stable.
 'use strict';
-const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
-const { load, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const path = require('path');
+const { load } = require(path.join(__dirname, '..', 'harness.js'));
 
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
-const BASEFILE = process.argv[3] || null;
-const ERA = 221, BASE_ERA = 220, V220_COMMIT = '8ee4385b6108a2eade639628aa99dee0ab201950';
-const MANNY = '0ac7da6b1691a8e1';
+const ERA = 221;
 let pass = 0, fail = 0, skip = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = (l, why) => { skip++; console.log('SKIP ' + l + ': ' + why); };
@@ -171,19 +169,10 @@ const R = {
   Bc:'Bc boot (c) ia_active deleted, live L1: the three stores name L1, screenWeek',
   Bd:'Bd boot (d) ia_active archived, live L1: the three stores name L1, screenWeek',
   Be:'Be boot (e) control ia_active=L1: the three stores name L1, screenWeek',
-  Bnp:'Bnp (pair) boot with no pointer (live, empty, no key, all archived): storage, globals, screen, toasts identical to V220',
   L1:'L1 deleteProg with a legacy successor (cfg.seed missing, prog.seed 4242): stored cfg.seed 4242 survives, successor active',
   L2:'L2 deleteProg with a legacy dated test successor (seed 4343, no _testWeek): stored cfg.seed 4343 and _testWeek ' + T2_WEEK + ' survive, successor active',
   W1:'W1 wizard commit, 6 goal shapes: the three stores name the new program, currentWeek 1, screenWeek',
-  W2:'W2 (pair) wizard landing, 6 goal shapes: screen, currentWeek and showScreen/renderWeekView/renderProgList order identical to V220',
-  W3:'W3 (pair) wizard landing, 6 goal shapes: the loaded program identical to V220 (overlays normalised, blockOpen dropped, clock and id fields stripped)',
-  H1:'H1 (pair) archive active P0, next arm: landing, calls, stored programs and reboot identical to V220',
-  H2:'H2 (pair) delete active P0, next arm: landing, calls, stored programs and reboot identical to V220',
-  H3:'H3 (pair) archive active P0, null arm: landing, calls, stored programs and reboot identical to V220',
-  H4:'H4 (pair) delete active P0, null arm: landing, calls, stored programs and reboot identical to V220',
-  M1:'M1 HALF_MANNY digest ' + MANNY + ' on the candidate, self-stable (no era row)',
 };
-const PAIR_ROWS = ['Bnp', 'W2', 'W3', 'H1', 'H2', 'H3', 'H4'];
 
 // ── RUN ──────────────────────────────────────────────────────────────────────
 const t0 = Date.now();
@@ -199,27 +188,8 @@ if(!(VER >= ERA)){
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();
 }
-let BASEART = null, baseWhy = '', TMP = null;
-if(VER === ERA){
-  try {
-    if(BASEFILE){ const b = load(BASEFILE); if(+b.version === BASE_ERA) BASEART = BASEFILE; else baseWhy = 'argv[3] reads ' + b.version + '; '; }
-    if(!BASEART){
-      TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'g221d178-')); const f = path.join(TMP, 'v220.html');
-      fs.writeFileSync(f, cp.execFileSync('git', ['show', V220_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 27 }));
-      const b = load(f);
-      if(+b.version === BASE_ERA){ BASEART = f; baseWhy += 'baseline from git ' + V220_COMMIT.slice(0, 7); } else baseWhy += 'git reads ' + b.version;
-    }
-  } catch(e){ baseWhy += 'baseline load failed: ' + String(e && e.message || e).slice(0, 160); BASEART = null; }
-}
-const PAIR = VER === ERA && !!BASEART;
-console.log('  pair rows: ' + (PAIR ? 'LIVE (candidate ' + VER + ' vs V' + BASE_ERA + (baseWhy ? ', ' + baseWhy : ', argv[3]') + ')' : VER === ERA ? 'SETUP FAILED (' + baseWhy + ')' : 'scoped out (candidate ' + VER + ' is not D178\'s pair)'));
 const safe = fn => { try { return fn(); } catch(e){ return [false, 'threw ' + (e && e.message)]; } };
 const row = (key, fn) => { const r = safe(fn); ok(R[key], r[0], r[0] ? undefined : r[1]); };
-const pairRow = (key, fn) => {
-  if(PAIR) return row(key, fn);
-  if(VER === ERA) return ok(R[key] + ' (setup: ' + baseWhy + ')', false);
-  skipRow(R[key], 'scoped out, candidate ' + VER + " is not D178's build pair (221 vs 220)");
-};
 
 // ── FIXTURES (built once on the candidate; the same bytes go to V220 in every pair row) ──
 const HMF = IA.fixtures.HALF_MANNY;
@@ -244,7 +214,6 @@ const tstr = s => 'ia_active=' + s.ia + ' activeProgId=' + s.id + ' activeProg.i
 const STRIPK = /^(id|created|createdAt|ts|archivedAt)$/;
 const canon = o => JSON.stringify(o, (k, v) => STRIPK.test(k) ? undefined : (v && typeof v === 'object' && !Array.isArray(v)) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
 const normP = o => { const q = JSON.parse(JSON.stringify(o)); if(!Array.isArray(q.overlays)) q.overlays = []; delete q.blockOpen; return canon(q); };
-const lsDump = I => JSON.stringify([...I.localStorage._map.entries()].sort());
 const seg = (html, id) => { const i = html.indexOf('id="pcard_' + id + '"'); if(i < 0) return ''; const j = html.indexOf('id="pcard_', i + 1); return html.slice(i, j < 0 ? html.length : j); };
 const ICON = s => s.replace(/<svg[^>]*>[\s\S]*?<\/svg>/g, '[icon]');
 const titles = o => Object.keys(o || {}).map(k => k + ':' + (o[k] && o[k].title)).join('|');
@@ -392,14 +361,7 @@ const bstr = s => tstr(s) + ' screen=' + s.scr;
     ['Bd', { ia_programs:JSON.stringify([A1, L1P]), ia_active:'A1' }, 'L1', 'screenWeek'],
     ['Be', { ia_programs:JSON.stringify([L1P]), ia_active:'L1' }, 'L1', 'screenWeek']];
   for(const [key, st, want, scr] of BC) row(key, () => { const s = bsnap(bootM(ART, st)); return [holds(s) && s.id === want && s.scr === scr, bstr(s)]; });
-  pairRow('Bnp', () => {
-    const V = [['live L1', { ia_programs:JSON.stringify([L1P]) }], ['programs empty', { ia_programs:'[]' }], ['no programs key', {}], ['all archived', { ia_programs:JSON.stringify([A1]) }]];
-    const pic = I => lsDump(I) + '|' + JSON.stringify(bsnap(I)) + '|' + JSON.stringify(I.eval('__toasts.slice()'));
-    const bad = [];
-    for(const [nm, st] of V){ const b1 = pic(bootM(BASEART, st)), b2 = pic(bootM(BASEART, st)), c = pic(bootM(ART, st));
-      if(b1 !== b2) bad.push(nm + ': V220 differs from itself'); else if(c !== b1) bad.push(nm + ': ' + c.slice(-160)); }
-    return [!bad.length, bad.join('; ')];
-  });
+  // Bnp retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D178 on its build pair: boot with no pointer left storage, globals, screen and toasts identical to V220.
 }
 
 // ── L: legacy-delete backfill (re-ruling 4) ─────────────────────────────────
@@ -435,43 +397,12 @@ function wizardRun(art, cfg){
   const WC = WROWS.map(([nm, cfg]) => { try { return Object.assign({ nm }, wizardRun(ART, cfg)); } catch(e){ return { nm, err:e.message }; } });
   row('W1', () => { const bad = WC.filter(r => r.err || !(holds(r.s) && r.newId && r.s.id === r.newId && r.cw === 1 && r.scr === 'screenWeek'));
     return [!bad.length, bad.map(r => r.nm + ': ' + (r.err || tstr(r.s) + ' new ' + r.newId + ' week ' + r.cw + ' ' + r.scr)).join('; ')]; });
-  let WBS = null;
-  const wBase = () => { if(!WBS) WBS = WROWS.map(([nm, cfg]) => { const a = wizardRun(BASEART, cfg), b = wizardRun(BASEART, cfg); return { nm, a, self:a.scr === b.scr && a.cw === b.cw && a.landing === b.landing && a.prog === b.prog }; }); return WBS; };
-  pairRow('W2', () => { const B = wBase(), bad = [];
-    WC.forEach((r, i) => { const b = B[i]; if(!b.self) bad.push(r.nm + ': V220 differs from itself'); else if(r.err || r.landing.indexOf('showScreen(screenWeek)') < 0 || r.scr !== b.a.scr || r.cw !== b.a.cw || r.landing !== b.a.landing)
-      bad.push(r.nm + ': ' + (r.err || r.scr + '/w' + r.cw + ' [' + r.landing + '] vs V220 ' + b.a.scr + '/w' + b.a.cw + ' [' + b.a.landing + ']')); });
-    return [!bad.length, bad.join('; ')]; });
-  pairRow('W3', () => { const B = wBase(), bad = [];
-    WC.forEach((r, i) => { const b = B[i]; if(!b.self) bad.push(r.nm + ': V220 differs from itself'); else if(r.err || !r.prog || r.prog !== b.a.prog) bad.push(r.nm + (r.err ? ': ' + r.err : '')); });
-    return [!bad.length, bad.join('; ')]; });
+  // W2 and W3 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D178 on its build pair: the wizard landing and the loaded program identical to V220.
 }
 
-// ── H: archive / delete handoff, both arms (pair) ───────────────────────────
-function hWorld(art, json, action){
-  const I = load(art), LS = I.localStorage, ev = I.eval, ctx = I.ctx;
-  LS.setItem('ia_programs', json); LS.setItem('ia_active', 'P0'); ev(ELS); ev('activeProgId=null;activeProg=null;'); ev('init()'); I.flushTimers(20);
-  ev('showScreen("screenHome");currentWeek=2;currentDayKey="tue";');
-  const calls = [];
-  ['showScreen', 'renderWeekView', 'renderProgList', 'showToast'].forEach(n => { const f = ctx[n]; ctx[n] = function(...a){ calls.push(n + '(' + (a.length ? String(a[0]) : '') + ')'); return f.apply(this, a); }; });
-  ev(action);
-  const ap = ev('activeProg'), st = Object.assign(triple(LS, ev), { dig:ap ? progDigest(ap) : null, cw:ev('currentWeek'), dk:ev('currentDayKey'), scr:ev('_curScreen'),
-    calls:calls.join(' '), stored:canon(JSON.parse(LS.getItem('ia_programs') || 'null')) });
-  ev('activeProgId=null;activeProg=null;currentWeek=1;currentDayKey=null;'); ev('init()');
-  const ap2 = ev('activeProg'); st.reboot = Object.assign(triple(LS, ev), { dig:ap2 ? progDigest(ap2) : null, cw:ev('currentWeek'), scr:ev('_curScreen') });
-  return JSON.stringify(st);
-}
-for(const [key, json, action] of [['H1', C_JSON, 'archiveProg("P0")'], ['H2', C_JSON, 'deleteProg("P0")'], ['H3', C_JSON_P1A, 'archiveProg("P0")'], ['H4', C_JSON_P1A, 'deleteProg("P0")']])
-  pairRow(key, () => { const b1 = hWorld(BASEART, json, action), b2 = hWorld(BASEART, json, action), c = hWorld(ART, json, action);
-    if(b1 !== b2) return [false, 'V220 differs from itself'];
-    const cj = JSON.parse(c), bj = JSON.parse(b1), diff = Object.keys(bj).filter(k => JSON.stringify(cj[k]) !== JSON.stringify(bj[k]));
-    if(!cj.calls || !cj.stored) return [false, 'vacuous: no calls or no stored programs observed'];
-    return [c === b1, 'differs on ' + diff.join(',') + ': ' + diff.map(k => k + ' ' + JSON.stringify(cj[k]).slice(0, 120) + ' vs V220 ' + JSON.stringify(bj[k]).slice(0, 120)).join(' | ')]; });
+// H1 to H4 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D178 on its build pair: archive and delete of the active program, both arms, identical to V220.
 
-// ── M: HALF_MANNY ────────────────────────────────────────────────────────────
-if(VER === ERA) row('M1', () => { const a = progDigest(IA.buildProgram(IA.fixtures.HALF_MANNY)), b = progDigest(IA.buildProgram(IA.fixtures.HALF_MANNY));
-  return [a === MANNY && a === b, a + ' / ' + b]; });
-else skipRow(R.M1, 'scoped out, candidate ' + VER + ': a later ruling owns HALF_MANNY (standing ruling 5)');
+// M1 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D178's HALF_MANNY claim (standing ruling 5): digest 0ac7da6b1691a8e1 on candidate 221, self-stable.
 
-if(TMP) try { fs.rmSync(TMP, { recursive:true, force:true }); } catch(e){}
 console.log('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s');
 done();

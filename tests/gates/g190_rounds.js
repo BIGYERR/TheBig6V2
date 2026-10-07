@@ -406,17 +406,8 @@ function main(){
     }));
     return diffs.length === 0 ? true : 'the render mutated the data: ' + diffs.join(', ');
   });
-  // ERA (standing rulings 2/4). G11b is the pre-D176 contract: a round block's row is the bare remainder
-  // refStrip leaves. D176 (V220, P-BARERX) appends ' reps' to a bare remainder, so from ia-version 220 G11b
-  // SKIPs by name and G11f carries the row. An ia-version that is not an integer FAILS both; it never skips.
+  // G11b (the pre-D176 bare-remainder row, D176 P-BARERX V220, dark from `VER < D176_ERA`) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). G11f carries the row.
   const D176_ERA = 220, VER_OK = /^\d+$/.test(String(IA.version)), VER = VER_OK ? parseInt(IA.version, 10) : NaN;
-  if(!VER_OK) check('G11b era: ia-version is readable', false, 'ia-version ' + JSON.stringify(IA.version) + ' is missing or not an integer, so G11b cannot be keyed');
-  else if(VER < D176_ERA) tryCheck('G11b rendered rows lose the leading count', () => {
-    const d = details(renderSecs([SS3]));
-    const want = SS3.items.map(i => refStrip(i.detail));
-    return JSON.stringify(d) === JSON.stringify(want) ? true : 'want ' + JSON.stringify(want) + ' got ' + JSON.stringify(d);
-  });
-  else console.log("SKIP G11b: pre-D176 era; D176 appends ' reps' to a bare remainder, see G11f");
   tryCheck('G11c a rounds:null block keeps its rows intact', () => {
     const d = details(renderSecs([SSNULL]));
     const want = SSNULL.items.map(i => i.detail);

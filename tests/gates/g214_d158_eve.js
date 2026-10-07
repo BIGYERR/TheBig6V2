@@ -60,7 +60,7 @@ const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version, ERA = 214, V213_COMMIT = 'bc3cccce3f048a9e0e4e45846bfe8315635c8430';
-const ROWS = ['D0','D1','D2','D2v','D3','D4','D5','D6','D7','D8','HM'];
+const ROWS = ['D0','D1','D2','D2v','D3','D4','D8','HM'];
 let pass = 0, fail = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
@@ -91,7 +91,7 @@ let BASE = null, baseWhy = '';
     } catch(e) { baseWhy += 'git show failed: ' + String(e.message).slice(0, 80); }
   }
 }
-console.log('candidate ia-version ' + VER + '; baseline: ' + (BASE ? 'V213 from ' + baseWhy : (VER === ERA ? 'UNAVAILABLE (' + baseWhy + ')' : 'not read (pair rows are scoped to candidate 214)')));
+console.log('candidate ia-version ' + VER + '; baseline: ' + (BASE ? 'V213 from ' + baseWhy : 'UNAVAILABLE (' + baseWhy + ')'));
 
 // ── the dated NSW lattice ──
 const START = new Date(2026, 9, 5);   // Mon 2026-10-05, local
@@ -110,7 +110,7 @@ const mkCfg = (gk, mk, rest, tw, wd) => ({name:'GK', primaryPath:'event', eventT
   cardioTypes:MIX[mk].types.slice(), cardioGoals:Object.assign({run:clone(GOALS[gk])}, clone(MIX[mk].x)), liftingFocus:'balanced', experience:'intermediate',
   ageBracket:'18-35', equipment:'home_full', unit:'lbs', restDays:rest.slice(), days:JSDAY.slice(), bench:185, squat:255, deadlift:315, startDate:ymd(START), seed:24865});
 
-const A = {n:0, crash:[], te:0, re:0, tePrev:0, pre:{bike:0, swim:0, run:0, lift:0}, d1:[], d2:[], d2reach:0, d3:[], d4:[], d5n:0, d5:[], d5t2:0};
+const A = {n:0, crash:[], te:0, re:0, tePrev:0, pre:{bike:0, swim:0, run:0, lift:0}, d1:[], d2:[], d2reach:0, d3:[], d4:[]};
 for(const gk of Object.keys(GOALS)) for(const mk of Object.keys(MIX)) for(const rest of RESTS) for(const tw of [2, 5]) for(let wd = 0; wd < 7; wd++){
   const cfg = mkCfg(gk, mk, rest, tw, wd);
   const test = addDays(START, 7 * (tw - 1) + wd), eve = addDays(test, -1), t2 = addDays(test, -2);
@@ -143,19 +143,6 @@ for(const gk of Object.keys(GOALS)) for(const mk of Object.keys(MIX)) for(const 
   const trials = []; Object.keys(p.weeks).forEach(w => ISO.forEach(d => cards(p.weeks[w][d]).forEach(c => { if(/TIME TRIAL/.test(c.subtype || '')) trials.push('W' + w + ' ' + d); })));
   if(!(trials.length === 1 && trials[0] === 'W' + T0.w + ' ' + T0.d)) bad.push('trials ' + (trials.join(',') || 'none'));
   if(bad.length) A.d4.push(tag + ': ' + bad.join('; '));
-  // D5 (pair)
-  if(BASE){
-    let b; try { b = clone(BASE.buildProgram(clone(cfg))); } catch(e){ A.d5.push(tag + ': V213 crash ' + e.message); continue; }
-    A.d5n++;
-    const shk = !!day && day.title === 'Shakeout';
-    Object.keys(b.weeks).forEach(w => ISO.forEach(d => {
-      if(+w === T1.w && d === T1.d) return;
-      const x = b.weeks[w][d], y = p.weeks[w] && p.weeks[w][d];
-      if(canon(x) === canon(y)) return;
-      if(+w === T2.w && d === T2.d && shk && x && y && x.title === 'Shakeout' && y.title === 'Easy Run' && canon(Object.assign({}, x, {title:'Easy Run'})) === canon(y)){ A.d5t2++; return; }
-      A.d5.push(tag + ': W' + w + ' ' + d + ' moved (' + (x && x.title) + ' -> ' + (y && y.title) + ')');
-    }));
-  }
 }
 const L = `${A.n} dated NSW test programs (pace + mile x 4 mixes x ${RESTS.length} rest sets x tw 2,5 x 7 test weekdays)`;
 ok(`D0 ${L}: all build; reach: ${A.te} training-day eves (${A.tePrev} in week tw-1), ${A.re} rest-day eves; pre-pin eve content bike ${A.pre.bike}, swim ${A.pre.swim}, run ${A.pre.run}, lift-only ${A.pre.lift}`,
@@ -168,29 +155,7 @@ ok(`D2v the dose oracle reaches most training-day eves (${A.d2reach}/${A.te}, ne
 ok(`D3 every rest-day eve rests: rest flag, title Rest, no card (${A.re} eves)`, A.re > 0 && A.d3.length === 0, A.d3.length + '/' + A.re + ': ' + A.d3.slice(0, 3).join(' || '));
 ok(`D4 no hard run at T-1 or T-2, no lift at T-1, exactly one TIME TRIAL and it sits on the test day (${A.n} programs)`, A.n > 0 && A.d4.length === 0, A.d4.length + ': ' + A.d4.slice(0, 3).join(' || '));
 
-// ── D5 / D6: the build pair ──
-if(!(VER === ERA && BASE)){
-  console.log('SKIP D5 scoped to the build pair candidate 214 against baseline 213; this pair is ' + VER + ' vs ' + (BASE ? 213 : 'none'));
-  console.log('SKIP D6 scoped to the build pair candidate 214 against baseline 213; this pair is ' + VER + ' vs ' + (BASE ? 213 : 'none'));
-} else {
-  ok(`D5 PAIR: ${A.d5n} dated NSW programs byte-identical to V213 on every day but the eve (${A.d5t2} T-2 days retitled Shakeout to Easy Run because the eve now holds the shakeout)`,
-     A.d5n === A.n && A.d5.length === 0, A.d5.length + ': ' + A.d5.slice(0, 3).join(' || '));
-  const moved = []; let n = 0;
-  const nrc = (g, rest, rd, mk) => ({name:'GK', primaryPath:'event', eventTargeted:true, raceDate:rd, cardioTypes:MIX[mk].types.slice(),
-    cardioGoals:Object.assign({run:{id:g, label:g}}, clone(MIX[mk].x)), liftingFocus:'balanced', experience:'intermediate', ageBracket:'18-35', equipment:'home_full',
-    unit:'lbs', restDays:rest.slice(), days:JSDAY.slice(), bench:185, squat:255, deadlift:315, startDate:ymd(START), seed:76308});
-  for(const g of ['run_5k','run_10k','run_half','run_marathon']) for(const rest of RESTS) for(const rd of ['2026-11-19','2026-11-22','2027-02-01']) for(const mk of ['run','run+bike']){
-    const cfg = nrc(g, rest, rd, mk); n++;
-    let a, b; try { a = progDigest(IA.buildProgram(clone(cfg))); } catch(e){ a = 'CRASH ' + e.message; } try { b = progDigest(BASE.buildProgram(clone(cfg))); } catch(e){ b = 'CRASH ' + e.message; }
-    if(a !== b || /CRASH/.test(a)) moved.push(g + ' ' + rd + ' ' + mk + ' [' + rest + ']');
-  }
-  for(const gk of Object.keys(GOALS)) for(const mk of Object.keys(MIX)) for(const rest of RESTS){
-    const cfg = mkCfg(gk, mk, rest, 5, 3); delete cfg.raceDate; delete cfg._testWeek; delete cfg._raceDateCappedWeeks; cfg.eventTargeted = false; cfg.primaryPath = 'goal'; n++;
-    let a, b; try { a = progDigest(IA.buildProgram(clone(cfg))); } catch(e){ a = 'CRASH ' + e.message; } try { b = progDigest(BASE.buildProgram(clone(cfg))); } catch(e){ b = 'CRASH ' + e.message; }
-    if(a !== b || /CRASH/.test(a)) moved.push('undated ' + gk + ' ' + mk + ' [' + rest + ']');
-  }
-  ok(`D6 PAIR: ${n} NRC race-pinned and undated NSW programs byte-identical to V213`, n > 0 && moved.length === 0, moved.length + ': ' + moved.slice(0, 3).join('; '));
-}
+// D5 and D6 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D158: dated NSW programs byte-identical to V213 on every day but the eve, and NRC race-pinned and undated NSW programs byte-identical to V213.
 // ── D7 / D8: the protect-park modes (V214 fix, coach; see header) ──────────────────────────────
 {
   const INJ7 = {none:null, easy:{region:'lowback',tier:'workaround'}, noimpact:{region:'knee',tier:'protect'}, noimpact_swim:{region:'lowback',tier:'protect'},
@@ -204,9 +169,8 @@ if(!(VER === ERA && BASE)){
   const eveSig = x => canon({rest: !x || !!x.rest, lift: role(x) !== '-', cards: cards(x).map(c => c.type + ':' + (c.subtype || '')).sort()});
   if(!BASE){
     ok('D8 the excluded-mode eve row needs V213, the ruling\'s named oracle', false, baseWhy);
-    if(VER === ERA) ok('D7 the lift-role pair row needs V213', false, baseWhy); else console.log('SKIP D7 scoped to the build pair candidate 214 against baseline 213');
   } else {
-    const plan = IA.eval('injuryPlan'); let n = 0, crash = 0, d8n = 0; const d7 = [], d8 = [], reach = {};
+    const plan = IA.eval('injuryPlan'); let crash = 0, d8n = 0; const d8 = [], reach = {};
     for(const mk of ['run','run+bike','run+swim']) for(const rest of R7) for(const [tw, wd] of PLACE) for(const ik of Object.keys(INJ7)){
       const cfg = mkCfg('pace', mk, rest, tw, wd); if(INJ7[ik]) cfg.injury = clone(INJ7[ik]);
       const mode = (plan(clone(cfg)) || {}).cardioMode || 'none';
@@ -214,18 +178,14 @@ if(!(VER === ERA && BASE)){
       const T = [0, 1, 2].map(k => { const d = addDays(test, -k); return {k, w:weekOf(d), d:JSDAY[d.getDay()]}; });
       const tag = `${mk} rest ${rest.join('') || 'none'} ${ik} (${mode}) test ${cfg.raceDate}`;
       let a, b; try { a = clone(IA.buildProgram(clone(cfg))); b = clone(BASE.buildProgram(clone(cfg))); } catch(e){ crash++; continue; }
-      n++;
       const at = (p, x) => p.weeks[x.w] ? p.weeks[x.w][x.d] : undefined;
-      T.forEach(x => { const ra = role(at(a, x)), rb = role(at(b, x)); if(ra !== rb) d7.push(tag + ' T-' + x.k + ' W' + x.w + ' ' + x.d + ': ' + rb.slice(0, 60) + ' -> ' + ra.slice(0, 60)); });
       if(EXCL.has(mode) && !cfg.restDays.includes(T[1].d)){
         d8n++; reach[mode] = (reach[mode] || 0) + 1;
         const sa = eveSig(at(a, T[1])), sb = eveSig(at(b, T[1]));
         if(sa !== sb) d8.push(tag + ' eve W' + T[1].w + ' ' + T[1].d + ': V213 ' + sb + ' now ' + sa);
       }
     }
-    if(VER === ERA) ok(`D7 PAIR: ${n} injured dated programs (3 mixes x ${R7.length} rest sets x 4 test placements x 7 injury modes): 0 lift-role changes against V213 on T-2, T-1 and the test day`,
-                       n > 0 && crash === 0 && d7.length === 0, 'crash ' + crash + ', ' + d7.length + ': ' + d7.slice(0, 3).join(' || '));
-    else console.log('SKIP D7 scoped to the build pair candidate 214 against baseline 213; this pair is ' + VER + ' vs 213');
+    // D7 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended the V214 fix (coach) to D158: across the injured dated lattice the lift role of T-2, T-1 and the test day equals V213's.
     ok(`D8 under the protect-park modes the training-day eve is handled as V213 handles it: no shakeout card, no new lift, same rest flag (${d8n} eves, ${JSON.stringify(reach)})`,
        crash === 0 && [...EXCL].every(m => reach[m] > 0) && d8.length === 0, 'crash ' + crash + ', ' + d8.length + '/' + d8n + ': ' + d8.slice(0, 2).join(' || '));
   }

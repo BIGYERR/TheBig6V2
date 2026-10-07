@@ -34,14 +34,43 @@ const FILE = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const TZ_CHILD = process.env.G195_TZ_CHILD || '';
 const IA = load(FILE);
 
-let pass = 0, fail = 0;
-function ok(name, cond, detail) {
-  if (cond) { pass++; console.log('ok   ' + name); }
-  else { fail++; console.log('FAIL ' + name + (detail !== undefined ? '  -> ' + detail : '')); }
-}
-function tryOk(name, fn) {
-  try { const r = fn(); ok(name, r === true || (r && r.cond === true), r && r.detail); }
-  catch (e) { fail++; console.log('FAIL ' + name + '  -> threw: ' + e.message); }
+// Every row prints through the shared status helper tests/status.js (post-V233 V1; CLAUDE.md Proof scope, Row
+// manifest). The DST lattice child (section 12) declares DST_ROWS only. The parent declares its own rows, dst0-zones
+// (one sub-result per zone) and one loop row per DST_ROWS id (one sub-result per zone), so each lattice claim prints
+// ONE line in the parent however many zones it ran in. The helper is STAT: section 7 binds a local S and
+// section 10 a local ST, both of which would shadow a shorter name.
+const DST_ROWS = [
+  'dst1-us-spring', 'dst2-us-fall', 'dst3-eu-spring', 'dst4-eu-fall', 'dst5-south-autumn', 'dst6-south-spring',
+  'dst7-on-us-spring', 'dst8-on-us-fall', 'dst9-on-eu-spring', 'dst10-on-south', 'dst11-midweek',
+  'dst12-saturday', 'dst13-year', 'dst14-leap', 'dst15-sunday-wrap', 'dst16-rest-resolves',
+  'dst17-sched-drops-rest', 'dst18-before-start', 'dst19-week1-monday', 'dst20-first-day', 'dst21-last-day',
+  'dst22-after-end', 'dst23-missing-day', 'dst24-no-start', 'dst25-no-prog',
+];
+const PARENT_ROWS = [
+  'rest1-runs', 'rest2-comp', 'rest3-hist', 'rest4-record', 'rest5-stamp', 'rest6-bydate', 'rest7-roundtrip',
+  'rest8-streak', 'rest9-count', 'rest10-kicker', 'rest11-sub', 'rest12-season', 'rest13-nopr',
+  'train1-handwalk', 'train2-runs', 'train3-comp', 'train4-hist', 'train5-pending', 'train6-streak',
+  'train7-count', 'train8-sub', 'train9-season', 'out1-runs', 'out2-logs', 'out3-nostamp', 'out4-nowrite',
+  'out5-nomark', 'strip1-render', 'strip2-cells', 'strip3-mark', 'strip4-others', 'strip5-one',
+  'strip6-replace', 'strip7-nochk', 'strip8-future', 'strip9-chkwins', 'wv1-rest-tag', 'wv2-rest-copy',
+  'wv3-rest-pos', 'wv4-rest-lbl', 'wv5-train-tag', 'wv6-train-title', 'wv7-train-norest', 'wv8-empty',
+  'det1-runs', 'det2-tag', 'det3-first', 'det4-title', 'det5-escape', 'det6-notag', 'stk1-handwalk',
+  'stk2-control', 'stk3-control-counts', 'stk4-rescue', 'stk5-rescue-counts', 'stk6-order', 'stk7-perday',
+  'stk8-two', 'stk9-once', 'stk10-pending', 'stk11-nocomp', 'stk12-rest', 'stk13-rest-sched',
+  'stk14-rest-skip', 'src1-writers', 'src2-escalate', 'src3-completed', 'src4-skipped', 'src5-refresh',
+  'src6-noskip', 'mark1-svg', 'mark2-signal', 'mark3-glyph', 'copy1-ruled', 'copy2-harvested', 'copy3-hyphen',
+  'copy4-nike', 'copy5-skipped', 'copy6-claims', 'label1-mygoal', 'label2-pools', 'read1-counter',
+  'read2-badge', 'read3-empty',
+];
+const STAT = require('../status')(TZ_CHILD ? 'g195_wildcard dst child' : 'g195_wildcard');
+STAT.declare(TZ_CHILD ? DST_ROWS : PARENT_ROWS.concat(['dst0-zones'], DST_ROWS));
+function ok(id, name, cond, detail) { return STAT.check(id, cond, name, detail); }
+function lok(L, sub, cond, detail) { return L.check(cond, sub, detail); }   // one sub-result of a loop row
+function tryOk(id, name, fn) {
+  let r, err = null;
+  try { r = fn(); } catch (e) { err = e; }
+  if (err) return STAT.fail(id, name, 'threw: ' + err.message);
+  return ok(id, name, r === true || (r && r.cond === true), r && r.detail);
 }
 
 // ── hand date math (the gate's own, not the app's) ───────────────────────────
@@ -171,22 +200,22 @@ function runDstLattice(){
   //   US spring 2026-03-08, US fall 2026-11-01, EU spring 2026-03-29, EU fall 2026-10-25,
   //   AU (southern) autumn 2026-04-05, AU spring 2026-10-04, Chatham/Lord Howe track NZ/AU.
   const CASES = [
-    ['spring-forward inside the window (US)', '2026-02-16', 12],
-    ['fall-back inside the window (US)',      '2026-10-05', 12],
-    ['spring-forward inside the window (EU)', '2026-03-09', 8],
-    ['fall-back inside the window (EU)',      '2026-10-05', 8],
-    ['southern autumn inside the window',     '2026-03-16', 8],
-    ['southern spring inside the window',     '2026-09-14', 8],
-    ['startDate ON the US spring boundary',   '2026-03-08', 10],
-    ['startDate ON the US fall boundary',     '2026-11-01', 10],
-    ['startDate ON the EU spring boundary',   '2026-03-29', 10],
-    ['startDate ON the southern boundary',    '2026-04-05', 10],
-    ['start mid-week (Thu)',                  '2026-04-02', 6],
-    ['start on a Saturday',                   '2026-04-04', 6],
-    ['year boundary',                         '2025-12-15', 8],
-    ['leap February',                         '2028-02-14', 6],
+    ['dst1-us-spring', 'spring-forward inside the window (US)', '2026-02-16', 12],
+    ['dst2-us-fall', 'fall-back inside the window (US)',      '2026-10-05', 12],
+    ['dst3-eu-spring', 'spring-forward inside the window (EU)', '2026-03-09', 8],
+    ['dst4-eu-fall', 'fall-back inside the window (EU)',      '2026-10-05', 8],
+    ['dst5-south-autumn', 'southern autumn inside the window',     '2026-03-16', 8],
+    ['dst6-south-spring', 'southern spring inside the window',     '2026-09-14', 8],
+    ['dst7-on-us-spring', 'startDate ON the US spring boundary',   '2026-03-08', 10],
+    ['dst8-on-us-fall', 'startDate ON the US fall boundary',     '2026-11-01', 10],
+    ['dst9-on-eu-spring', 'startDate ON the EU spring boundary',   '2026-03-29', 10],
+    ['dst10-on-south', 'startDate ON the southern boundary',    '2026-04-05', 10],
+    ['dst11-midweek', 'start mid-week (Thu)',                  '2026-04-02', 6],
+    ['dst12-saturday', 'start on a Saturday',                   '2026-04-04', 6],
+    ['dst13-year', 'year boundary',                         '2025-12-15', 8],
+    ['dst14-leap', 'leap February',                         '2028-02-14', 6],
   ];
-  CASES.forEach(([name, start, tw]) => {
+  CASES.forEach(([id, name, start, tw]) => {
     put(mk(start, tw, ['sun']));
     const SD = new Date(+start.slice(0,4), +start.slice(5,7) - 1, +start.slice(8,10));
     const SMON = mondayOf(SD);
@@ -206,42 +235,43 @@ function runDstLattice(){
         if (fwd !== iso(d)) bad.push('roundtrip ' + iso(d) + ' -> ' + got.week + '/' + got.dayKey + ' -> ' + fwd);
       }
     }
-    ok('dst[' + name + ' start ' + start + ']: every day of the block resolves to the hand calendar', bad.length === 0,
+    ok(id, 'dst[' + name + ' start ' + start + ']: every day of the block resolves to the hand calendar', bad.length === 0,
        bad.length + ' wrong days: ' + bad.slice(0, 6).join(' | ') + (bad.length > 6 ? ' ...+' + (bad.length - 6) : ''));
   });
   // Sunday wrap: weekday index 6 is the one a modulo slip drops off the end.
   { put(mk('2026-04-06', 4, ['wed']));
     const got = JSON.parse(call(new Date(2026, 3, 12)));
-    ok('dst: Sunday wrap — index 6 resolves to sun of week 1', !!got && got.week === 1 && got.dayKey === 'sun', JSON.stringify(got)); }
+    ok('dst15-sunday-wrap', 'dst: Sunday wrap — index 6 resolves to sun of week 1', !!got && got.week === 1 && got.dayKey === 'sun', JSON.stringify(got)); }
   // A rest day still RESOLVES here; it is scheduledDays, later, that drops it.
   { put(mk('2026-04-06', 4, ['wed','sun']));
     const got = JSON.parse(call(new Date(2026, 3, 8)));
-    ok('dst: a rest day still resolves (the streak filter is scheduledDays, not this)', !!got && got.week === 1 && got.dayKey === 'wed', JSON.stringify(got));
+    ok('dst16-rest-resolves', 'dst: a rest day still resolves (the streak filter is scheduledDays, not this)', !!got && got.week === 1 && got.dayKey === 'wed', JSON.stringify(got));
     const sched = IA.eval("JSON.stringify(scheduledDays(new Date(2026,3,30)).filter(function(x){return x.d==='wed';}))");
-    ok('dst: scheduledDays really drops rest days', sched === '[]', sched); }
+    ok('dst17-sched-drops-rest', 'dst: scheduledDays really drops rest days', sched === '[]', sched); }
   // Edges.
   { put(mk('2026-04-08', 4, ['sun']));                     // Wednesday start: week 1 is short
-    ok('dst: the day before the start resolves to null', call(new Date(2026, 3, 7)) === 'null', call(new Date(2026, 3, 7)));
-    ok('dst: the Monday of week 1 before the start resolves to null', call(new Date(2026, 3, 6)) === 'null', call(new Date(2026, 3, 6)));
+    ok('dst18-before-start', 'dst: the day before the start resolves to null', call(new Date(2026, 3, 7)) === 'null', call(new Date(2026, 3, 7)));
+    ok('dst19-week1-monday', 'dst: the Monday of week 1 before the start resolves to null', call(new Date(2026, 3, 6)) === 'null', call(new Date(2026, 3, 6)));
     const first = JSON.parse(call(new Date(2026, 3, 8)) || 'null');
-    ok('dst: the first day of the program resolves to its own weekday', !!first && first.week === 1 && first.dayKey === 'wed', JSON.stringify(first));
+    ok('dst20-first-day', 'dst: the first day of the program resolves to its own weekday', !!first && first.week === 1 && first.dayKey === 'wed', JSON.stringify(first));
     const last = JSON.parse(call(addDays(new Date(2026, 3, 6), 27)) || 'null');
-    ok('dst: the last day of the block resolves to the last week', !!last && last.week === 4 && last.dayKey === 'sun', JSON.stringify(last));
-    ok('dst: the day after the final week resolves to null', call(addDays(new Date(2026, 3, 6), 28)) === 'null', call(addDays(new Date(2026, 3, 6), 28))); }
+    ok('dst21-last-day', 'dst: the last day of the block resolves to the last week', !!last && last.week === 4 && last.dayKey === 'sun', JSON.stringify(last));
+    ok('dst22-after-end', 'dst: the day after the final week resolves to null', call(addDays(new Date(2026, 3, 6), 28)) === 'null', call(addDays(new Date(2026, 3, 6), 28))); }
   // Degenerate program shapes.
   { const p = mk('2026-04-06', 4, ['sun']); delete p.weeks[2].thu; put(p);
-    ok('dst: a missing day object resolves to null', call(new Date(2026, 3, 16)) === 'null', call(new Date(2026, 3, 16)));
+    ok('dst23-missing-day', 'dst: a missing day object resolves to null', call(new Date(2026, 3, 16)) === 'null', call(new Date(2026, 3, 16)));
     const p2 = mk('2026-04-06', 4, ['sun']); delete p2.startDate; put(p2);
-    ok('dst: no startDate resolves to null', call(new Date(2026, 3, 8)) === 'null', call(new Date(2026, 3, 8)));
+    ok('dst24-no-start', 'dst: no startDate resolves to null', call(new Date(2026, 3, 8)) === 'null', call(new Date(2026, 3, 8)));
     IA.eval('activeProg=null');
-    ok('dst: no activeProg resolves to null', call(new Date(2026, 3, 8)) === 'null', call(new Date(2026, 3, 8))); }
+    ok('dst25-no-prog', 'dst: no activeProg resolves to null', call(new Date(2026, 3, 8)) === 'null', call(new Date(2026, 3, 8))); }
 }
 
 // ── DST CHILD MODE ───────────────────────────────────────────────────────────
 if (TZ_CHILD) {
   console.log('# g195 DST child TZ=' + TZ_CHILD + ' offsetNow=' + new Date().getTimezoneOffset());
   runDstLattice();
-  console.log('G195_TZ_SUMMARY ' + pass + ' ' + fail);
+  const r = STAT.summary({ exit: false });
+  console.log('G195_TZ_SUMMARY ' + r.pass + ' ' + r.fail);
   process.exit(0);
 }
 
@@ -264,37 +294,37 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
   try { IA.eval("completeWildcard('Chaos Workout')"); } catch (e) { threw = e.message; }
   IA.flushTimers();
 
-  ok('rest: completeWildcard runs', threw === null, threw);
-  ok('rest: ia_comp_ is byte-identical after the Wildcard',
+  ok('rest1-runs', 'rest: completeWildcard runs', threw === null, threw);
+  ok('rest2-comp', 'rest: ia_comp_ is byte-identical after the Wildcard',
      IA.localStorage.getItem('ia_comp_' + PID) === compBefore,
      IA.localStorage.getItem('ia_comp_' + PID));
-  ok('rest: ia_hist_ was never written (no snapshotDay on this path)',
+  ok('rest3-hist', 'rest: ia_hist_ was never written (no snapshotDay on this path)',
      IA.localStorage.getItem('ia_hist_' + PID) === null,
      IA.localStorage.getItem('ia_hist_' + PID));
   const wild = JSON.parse(IA.localStorage.getItem('ia_wild_' + PID) || '[]');
-  ok('rest: ia_wild_ holds exactly one record for the title', wild.length === 1 && wild[0].title === 'Chaos Workout', JSON.stringify(wild));
-  ok('rest: the record carries a week and a day key', !!(wild[0] && wild[0].week && wild[0].dayKey), JSON.stringify(wild[0]));
-  ok('rest: the day is resolved by DATE, not by the viewed week',
+  ok('rest4-record', 'rest: ia_wild_ holds exactly one record for the title', wild.length === 1 && wild[0].title === 'Chaos Workout', JSON.stringify(wild));
+  ok('rest5-stamp', 'rest: the record carries a week and a day key', !!(wild[0] && wild[0].week && wild[0].dayKey), JSON.stringify(wild[0]));
+  ok('rest6-bydate', 'rest: the day is resolved by DATE, not by the viewed week',
      !!wild[0] && wild[0].week === EXP_WEEK && wild[0].dayKey === TODAY_KEY && wild[0].week !== VIEWED_WEEK,
      JSON.stringify(wild[0]) + ' expected week ' + EXP_WEEK + ' day ' + TODAY_KEY);
   // round-trip: rebuild the calendar date from the stamped (week, dayKey) and compare to today
   if (wild[0] && wild[0].week && wild[0].dayKey) {
     const back = addDays(START_MON, (wild[0].week - 1) * 7 + DK.indexOf(wild[0].dayKey));
-    ok('rest: the stamped day round-trips to today’s calendar date', iso(back) === iso(TODAY), iso(back) + ' vs ' + iso(TODAY));
-  } else { fail++; console.log('FAIL rest: the stamped day round-trips to today’s calendar date  -> no stamp'); }
-  ok('rest: the streak does not extend and does not break',
+    ok('rest7-roundtrip', 'rest: the stamped day round-trips to today’s calendar date', iso(back) === iso(TODAY), iso(back) + ' vs ' + iso(TODAY));
+  } else { STAT.fail('rest7-roundtrip', 'rest: the stamped day round-trips to today’s calendar date', 'no stamp'); }
+  ok('rest8-streak', 'rest: the streak does not extend and does not break',
      IA.eval('computeStreak()') === streakBefore && streakBefore === 2,
      'before ' + streakBefore + ' after ' + IA.eval('computeStreak()') + ' (hand walk expects 2)');
-  ok('rest: completedCount is unmoved', IA.eval('completedCount()') === countBefore && countBefore === 2,
+  ok('rest9-count', 'rest: completedCount is unmoved', IA.eval('completedCount()') === countBefore && countBefore === 2,
      'before ' + countBefore + ' after ' + IA.eval('completedCount()'));
   const c = cap();
-  ok('rest: the celebration fired with the ruled kicker and line',
+  ok('rest10-kicker', 'rest: the celebration fired with the ruled kicker and line',
      !!c && c.opts.kicker === 'WILDCARD DONE' && c.opts.msg === 'You showed up. That is the whole game.', JSON.stringify(c));
-  ok('rest: the celebration says "Streak holds."', !!c && c.opts.sub === 'Streak holds.', JSON.stringify(c && c.opts.sub));
-  ok('rest: the season banner cannot fire from this path',
+  ok('rest11-sub', 'rest: the celebration says "Streak holds."', !!c && c.opts.sub === 'Streak holds.', JSON.stringify(c && c.opts.sub));
+  ok('rest12-season', 'rest: the season banner cannot fire from this path',
      IA.eval('__g195season') === 0 && IA.eval('__g195completion') === 0,
      'season=' + IA.eval('__g195season') + ' completion=' + IA.eval('__g195completion'));
-  ok('rest: the celebration claims no PR and no progress',
+  ok('rest13-nopr', 'rest: the celebration claims no PR and no progress',
      !!c && !(c.opts.stats && c.opts.stats.length), JSON.stringify(c && c.opts.stats));
 }
 
@@ -316,23 +346,23 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
 
   const c = cap();          // read the celebration BEFORE any later sub-case reinstalls the fixture
   const seasonAfter = IA.eval('__g195season'), completionAfter = IA.eval('__g195completion');
-  ok('train: today is the last scheduled day of the hand walk',
+  ok('train1-handwalk', 'train: today is the last scheduled day of the hand walk',
      !!last && last.d === TODAY_KEY && last.week === EXP_WEEK, JSON.stringify(last));
-  ok('train: completeWildcard runs', threw === null, threw);
-  ok('train: ia_comp_ is byte-identical after the Wildcard',
+  ok('train2-runs', 'train: completeWildcard runs', threw === null, threw);
+  ok('train3-comp', 'train: ia_comp_ is byte-identical after the Wildcard',
      IA.localStorage.getItem('ia_comp_' + PID) === compBefore, IA.localStorage.getItem('ia_comp_' + PID));
-  ok('train: ia_hist_ was never written', IA.localStorage.getItem('ia_hist_' + PID) === null,
+  ok('train4-hist', 'train: ia_hist_ was never written', IA.localStorage.getItem('ia_hist_' + PID) === null,
      IA.localStorage.getItem('ia_hist_' + PID));
-  ok('train: the prescribed session is still pending',
+  ok('train5-pending', 'train: the prescribed session is still pending',
      IA.eval("statusOf(" + EXP_WEEK + ",'" + TODAY_KEY + "')") === null,
      IA.eval("JSON.stringify(statusOf(" + EXP_WEEK + ",'" + TODAY_KEY + "'))"));
-  ok('train: the streak was 2 before and extends to 3',
+  ok('train6-streak', 'train: the streak was 2 before and extends to 3',
      streakBefore === 2 && IA.eval('computeStreak()') === 3,
      'before ' + streakBefore + ' after ' + IA.eval('computeStreak()'));
-  ok('train: completedCount still counts only the two hand-written completes',
+  ok('train7-count', 'train: completedCount still counts only the two hand-written completes',
      IA.eval('completedCount()') === 2, String(IA.eval('completedCount()')));
-  ok('train: the celebration says "Streak: 3."', !!c && c.opts.sub === 'Streak: 3.', JSON.stringify(c && c.opts.sub));
-  ok('train: the season banner cannot fire from this path',
+  ok('train8-sub', 'train: the celebration says "Streak: 3."', !!c && c.opts.sub === 'Streak: 3.', JSON.stringify(c && c.opts.sub));
+  ok('train9-season', 'train: the season banner cannot fire from this path',
      seasonAfter === 0 && completionAfter === 0,
      'season=' + seasonAfter + ' completion=' + completionAfter);
 }
@@ -346,14 +376,14 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
   try { IA.eval("completeWildcard('Chaos Workout')"); } catch (e) { threw = e.message; }
   IA.flushTimers();
   const wild = JSON.parse(IA.localStorage.getItem('ia_wild_' + PID) || '[]');
-  ok('outside: completeWildcard runs', threw === null, threw);
-  ok('outside: the Wildcard still logs to the counter', wild.length === 1 && wild[0].title === 'Chaos Workout', JSON.stringify(wild));
-  ok('outside: it refuses to stamp a day rather than stamping the wrong one',
+  ok('out1-runs', 'outside: completeWildcard runs', threw === null, threw);
+  ok('out2-logs', 'outside: the Wildcard still logs to the counter', wild.length === 1 && wild[0].title === 'Chaos Workout', JSON.stringify(wild));
+  ok('out3-nostamp', 'outside: it refuses to stamp a day rather than stamping the wrong one',
      !!wild[0] && !wild[0].week && !wild[0].dayKey, JSON.stringify(wild[0]));
-  ok('outside: nothing reached ia_comp_ or ia_hist_',
+  ok('out4-nowrite', 'outside: nothing reached ia_comp_ or ia_hist_',
      IA.localStorage.getItem('ia_comp_' + PID) === null && IA.localStorage.getItem('ia_hist_' + PID) === null,
      IA.localStorage.getItem('ia_comp_' + PID) + ' / ' + IA.localStorage.getItem('ia_hist_' + PID));
-  tryOk('outside: an unstamped record renders no mark on any day', () => {
+  tryOk('out5-nomark', 'outside: an unstamped record renders no mark on any day', () => {
     const h = IA.eval("wildcardTagHTML(1,'mon')") + IA.eval("wildcardTagHTML(3,'tue')");
     return { cond: h === '', detail: h };
   });
@@ -368,33 +398,33 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
   setWild([{ title: 'Chaos Workout', ts: 1, week: EXP_WEEK, dayKey: TODAY_KEY }]);
   IA.eval('renderWeekView()');
   const h = weekHTML();
-  ok('strip: renderWeekView actually wrote a week strip to daysList', h.indexOf('wk-strip') >= 0, h.slice(0, 160));
+  ok('strip1-render', 'strip: renderWeekView actually wrote a week strip to daysList', h.indexOf('wk-strip') >= 0, h.slice(0, 160));
   const cells = stripCells(h);
-  ok('strip: the rendered strip has a cell for all seven weekdays', Object.keys(cells).length === 7, Object.keys(cells).join(','));
-  ok('strip: the Wildcard day (' + TODAY_KEY + ') renders the W mark',
+  ok('strip2-cells', 'strip: the rendered strip has a cell for all seven weekdays', Object.keys(cells).length === 7, Object.keys(cells).join(','));
+  ok('strip3-mark', 'strip: the Wildcard day (' + TODAY_KEY + ') renders the W mark',
      !!cells[TODAY_KEY] && cells[TODAY_KEY].indexOf('wc-mark') >= 0 && cells[TODAY_KEY].indexOf('>W<') >= 0,
      cells[TODAY_KEY]);
-  ok('strip: every other day of the week renders no W mark',
+  ok('strip4-others', 'strip: every other day of the week renders no W mark',
      DK.filter(d => d !== TODAY_KEY).every(d => !cells[d] || cells[d].indexOf('wc-mark') < 0),
      DK.filter(d => d !== TODAY_KEY && cells[d] && cells[d].indexOf('wc-mark') >= 0).join(','));
-  ok('strip: exactly one W mark in the whole strip',
+  ok('strip5-one', 'strip: exactly one W mark in the whole strip',
      (stripOf(h).match(/class="wc-mark"/g) || []).length === 1,
      String((stripOf(h).match(/class="wc-mark"/g) || []).length));
-  ok('strip: the W replaced the date number in that cell, it is not printed alongside it',
+  ok('strip6-replace', 'strip: the W replaced the date number in that cell, it is not printed alongside it',
      !!cells[TODAY_KEY] && /<div class="wk-day-num">\s*<span class="wc-mark"/.test(cells[TODAY_KEY]),
      (cells[TODAY_KEY] || '').match(/<div class="wk-day-num">[\s\S]{0,60}/));
-  ok('strip: the Wildcard day is NOT marked with the completion check',
+  ok('strip7-nochk', 'strip: the Wildcard day is NOT marked with the completion check',
      !!cells[TODAY_KEY] && cells[TODAY_KEY].indexOf('class="chk"') < 0, cells[TODAY_KEY]);
   // A future week the athlete is merely browsing must carry nothing.
   IA.eval('currentWeek=' + VIEWED_WEEK); IA.eval('renderWeekView()');
   const hv = weekHTML();
-  ok('strip: a browsed future week renders neither a W mark nor a tag',
+  ok('strip8-future', 'strip: a browsed future week renders neither a W mark nor a tag',
      hv.indexOf('wc-mark') < 0 && hv.indexOf('wc-tag') < 0, hv.slice(0, 160));
   // A completion on the same day wins the cell: the check, not the W.
   IA.localStorage.setItem('ia_comp_' + PID, JSON.stringify({ ['w' + EXP_WEEK + '_' + TODAY_KEY]: { title: 'Recovery Lift', ts: 1, status: 'complete' } }));
   IA.eval('currentWeek=' + EXP_WEEK); IA.eval('renderWeekView()');
   const hc = stripCells(weekHTML());
-  ok('strip: a completed day shows the check, not the W, even when it also holds a Wildcard',
+  ok('strip9-chkwins', 'strip: a completed day shows the check, not the W, even when it also holds a Wildcard',
      !!hc[TODAY_KEY] && hc[TODAY_KEY].indexOf('class="chk"') >= 0 && hc[TODAY_KEY].indexOf('wc-mark') < 0, hc[TODAY_KEY]);
 }
 
@@ -407,12 +437,12 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
   setWild([{ title: 'Chaos Workout', ts: 1, week: EXP_WEEK, dayKey: TODAY_KEY }]);
   IA.eval('renderWeekView()');
   const hr = weekHTML();
-  ok('weekview/rest: the week view emits a .wc-tag block', hr.indexOf('class="wc-tag"') >= 0, hr.slice(0, 200));
-  ok('weekview/rest: the tag carries the ruled rest copy', hr.indexOf('Rest day. The streak sits this one out.') >= 0, 'copy missing from rendered output');
-  ok('weekview/rest: the tag sits BELOW the hero and ABOVE the stat tiles',
+  ok('wv1-rest-tag', 'weekview/rest: the week view emits a .wc-tag block', hr.indexOf('class="wc-tag"') >= 0, hr.slice(0, 200));
+  ok('wv2-rest-copy', 'weekview/rest: the tag carries the ruled rest copy', hr.indexOf('Rest day. The streak sits this one out.') >= 0, 'copy missing from rendered output');
+  ok('wv3-rest-pos', 'weekview/rest: the tag sits BELOW the hero and ABOVE the stat tiles',
      hr.indexOf('wc-tag') > hr.indexOf('wk-hero') && hr.indexOf('wc-tag') < hr.indexOf('wk-stats'),
      'hero@' + hr.indexOf('wk-hero') + ' tag@' + hr.indexOf('wc-tag') + ' stats@' + hr.indexOf('wk-stats'));
-  ok('weekview/rest: the tag label reads WILDCARD DONE', /<div class="wc-tag-lbl">WILDCARD DONE<\/div>/.test(hr), 'label missing');
+  ok('wv4-rest-lbl', 'weekview/rest: the tag label reads WILDCARD DONE', /<div class="wc-tag-lbl">WILDCARD DONE<\/div>/.test(hr), 'label missing');
 
   // training variant, and it must name the REAL title
   const progT = mkProg(REST_TODAY_TRAINS, 'Tempo Run');
@@ -420,22 +450,30 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
   setWild([{ title: 'Chaos Workout', ts: 1, week: EXP_WEEK, dayKey: TODAY_KEY }]);
   IA.eval('renderWeekView()');
   const ht = weekHTML();
-  ok('weekview/train: the week view emits a .wc-tag block', ht.indexOf('class="wc-tag"') >= 0, ht.slice(0, 200));
-  ok('weekview/train: the tag names the real prescribed session, not a constant',
+  ok('wv5-train-tag', 'weekview/train: the week view emits a .wc-tag block', ht.indexOf('class="wc-tag"') >= 0, ht.slice(0, 200));
+  ok('wv6-train-title', 'weekview/train: the tag names the real prescribed session, not a constant',
      ht.indexOf('Tempo Run is still on the board.') >= 0 && ht.indexOf('Your session is still on the board.') < 0,
      ht.slice(ht.indexOf('wc-tag'), ht.indexOf('wc-tag') + 260));
-  ok('weekview/train: the rest copy is NOT used on a training day',
+  ok('wv7-train-norest', 'weekview/train: the rest copy is NOT used on a training day',
      ht.indexOf('Rest day. The streak sits this one out.') < 0, 'rest copy leaked onto a training day');
   // no Wildcard at all: no tag anywhere
   IA.localStorage.removeItem('ia_wild_' + PID);
   IA.eval('renderWeekView()');
-  ok('weekview: with an empty Wildcard store the week view emits no tag', weekHTML().indexOf('wc-tag') < 0, weekHTML().slice(0, 160));
+  ok('wv8-empty', 'weekview: with an empty Wildcard store the week view emits no tag', weekHTML().indexOf('wc-tag') < 0, weekHTML().slice(0, 160));
 }
 
 // ═══ 6. THE DAY-DETAIL TAG IS RENDERED ══════════════════════════════════════
 // P3 replaced the prepend with `if(false)`. Only a real openDetail call catches it.
 // Titles with an apostrophe and an ampersand are kept: esc() handles them and that must
 // not silently regress into broken markup.
+const DET = {
+  runs: STAT.loop('det1-runs', 'detail: openDetail ran and wrote the body'),
+  tag: STAT.loop('det2-tag', 'detail: the body emits a .wc-tag block'),
+  first: STAT.loop('det3-first', 'detail: the tag is the FIRST thing in the body'),
+  title: STAT.loop('det4-title', 'detail: the tag interpolates the real title, escaped by hand-checked entity rules'),
+  esc: STAT.loop('det5-escape', 'detail: no raw apostrophe or bare ampersand survived into the tag'),
+  notag: STAT.loop('det6-notag', 'detail: with no Wildcard the body carries no tag'),
+};
 [
   ['Recovery Lift'],
   ["Farmer's & Rower's Day"],
@@ -449,24 +487,25 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
   try { IA.eval('openDetail(' + JSON.stringify(TODAY_KEY) + ', activeProg.weeks[' + EXP_WEEK + '][' + JSON.stringify(TODAY_KEY) + '])'); }
   catch (e) { threw = e.message; }
   const d = detailHTML();
-  ok('detail[' + title + ']: openDetail ran and wrote the body', threw === null && d.length > 0, threw || 'empty body');
-  ok('detail[' + title + ']: the body emits a .wc-tag block', d.indexOf('class="wc-tag"') >= 0, d.slice(0, 200));
-  ok('detail[' + title + ']: the tag is the FIRST thing in the body', d.indexOf('<div class="wc-tag"') === 0, d.slice(0, 120));
+  lok(DET.runs, 'detail[' + title + ']', threw === null && d.length > 0, threw || 'empty body');
+  lok(DET.tag, 'detail[' + title + ']', d.indexOf('class="wc-tag"') >= 0, d.slice(0, 200));
+  lok(DET.first, 'detail[' + title + ']', d.indexOf('<div class="wc-tag"') === 0, d.slice(0, 120));
   // Independent oracle for the escaped form: HTML entity rules, written out by hand here,
   // not read back from esc().
   const handEsc = (title + ' is still on the board.')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  ok('detail[' + title + ']: the tag interpolates the real title, escaped by hand-checked entity rules',
+  lok(DET.title, 'detail[' + title + ']',
      d.indexOf(handEsc) >= 0, handEsc + ' || ' + d.slice(d.indexOf('wc-tag'), d.indexOf('wc-tag') + 260));
-  ok('detail[' + title + ']: no raw apostrophe or bare ampersand survived into the tag',
+  lok(DET.esc, 'detail[' + title + ']',
      (() => { const t = d.slice(d.indexOf('<div class="wc-tag"'), d.indexOf('</div></div>') + 12);
               return t.indexOf("'") < 0 && !/&(?!amp;|#39;|quot;|lt;|gt;|nbsp;|#\d+;)/.test(t); })(),
      d.slice(d.indexOf('<div class="wc-tag"'), d.indexOf('<div class="wc-tag"') + 240));
   // Same day, no Wildcard: the tag must be absent, so the assertion above is not a constant.
   IA.localStorage.removeItem('ia_wild_' + PID);
   IA.eval('openDetail(' + JSON.stringify(TODAY_KEY) + ', activeProg.weeks[' + EXP_WEEK + '][' + JSON.stringify(TODAY_KEY) + '])');
-  ok('detail[' + title + ']: with no Wildcard the body carries no tag', detailHTML().indexOf('wc-tag') < 0, detailHTML().slice(0, 120));
+  lok(DET.notag, 'detail[' + title + ']', detailHTML().indexOf('wc-tag') < 0, detailHTML().slice(0, 120));
 });
+Object.keys(DET).forEach(k => DET[k].done());
 
 // ═══ 7. STREAK PRECEDENCE, INCLUDING THE V195 SKIP RESCUE ═══════════════════
 // Ruling (D71b): the skip describes the PRESCRIBED SESSION, the Wildcard describes what the
@@ -482,14 +521,14 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
   const S = { title: 'Recovery Lift', ts: 1, status: 'skipped' };
   const W = x => ({ title: 'Chaos Workout', ts: 1, week: x.week, dayKey: x.d });
 
-  ok('streak: the hand walk puts today last in the scheduled list',
+  ok('stk1-handwalk', 'streak: the hand walk puts today last in the scheduled list',
      today.d === TODAY_KEY && today.week === EXP_WEEK && prev.date < today.date, JSON.stringify([prev, today]));
 
   // CONTROL. today skipped, no Wildcard, two priors complete. Walk from the end: skip breaks.
   install(mkProg(REST_TODAY_TRAINS, 'Recovery Lift'), { [K(today)]: S, [K(prev)]: C, [K(prev2)]: C }, EXP_WEEK);
-  ok('streak/control: a skipped day with NO Wildcard still breaks the streak to 0',
+  ok('stk2-control', 'streak/control: a skipped day with NO Wildcard still breaks the streak to 0',
      IA.eval('computeStreak()') === 0, String(IA.eval('computeStreak()')));
-  ok('streak/control: skippedCount is 1 and completedCount is 2',
+  ok('stk3-control-counts', 'streak/control: skippedCount is 1 and completedCount is 2',
      IA.eval('skippedCount()') === 1 && IA.eval('completedCount()') === 2,
      IA.eval('skippedCount()') + '/' + IA.eval('completedCount()'));
 
@@ -497,9 +536,9 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
   // Hand walk backwards: today (skipped + Wildcard) counts 1, prev complete 2, prev2 complete 3,
   // everything earlier is pending and transparent. Expect 3.
   setWild([W(today)]);
-  ok('streak/rescue: a Wildcard on a SKIPPED day rescues the streak, 0 -> 3',
+  ok('stk4-rescue', 'streak/rescue: a Wildcard on a SKIPPED day rescues the streak, 0 -> 3',
      IA.eval('computeStreak()') === 3, String(IA.eval('computeStreak()')));
-  ok('streak/rescue: completedCount and skippedCount are unmoved by the rescue',
+  ok('stk5-rescue-counts', 'streak/rescue: completedCount and skippedCount are unmoved by the rescue',
      IA.eval('completedCount()') === 2 && IA.eval('skippedCount()') === 1,
      IA.eval('completedCount()') + '/' + IA.eval('skippedCount()'));
 
@@ -511,77 +550,77 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
   install(mkProg(REST_TODAY_TRAINS, 'Recovery Lift'), { [K(today)]: S, [K(prev)]: C, [K(prev2)]: C }, EXP_WEEK);
   setWild([W(today)]);                                                            // skip first
   const skipFirst = IA.eval('computeStreak()');
-  ok('streak/rescue: skip-then-Wildcard and Wildcard-then-skip give the same streak (3)',
+  ok('stk6-order', 'streak/rescue: skip-then-Wildcard and Wildcard-then-skip give the same streak (3)',
      wildFirst === 3 && skipFirst === 3, 'wildcard-first ' + wildFirst + ' skip-first ' + skipFirst);
 
   // A skip BEHIND the rescued day still breaks there. The rescue is per day, not a blanket.
   install(mkProg(REST_TODAY_TRAINS, 'Recovery Lift'), { [K(today)]: S, [K(prev)]: S, [K(prev2)]: C }, EXP_WEEK);
   setWild([W(today)]);
-  ok('streak/rescue: the rescue is per day — an unrescued skip behind it still breaks, streak 1',
+  ok('stk7-perday', 'streak/rescue: the rescue is per day — an unrescued skip behind it still breaks, streak 1',
      IA.eval('computeStreak()') === 1, String(IA.eval('computeStreak()')));
 
   // Both days rescued: the walk carries through two skips.
   setWild([W(today), W(prev)]);
-  ok('streak/rescue: two consecutive rescued skips both count, streak 3',
+  ok('stk8-two', 'streak/rescue: two consecutive rescued skips both count, streak 3',
      IA.eval('computeStreak()') === 3, String(IA.eval('computeStreak()')));
 
   // PRECEDENCE. complete + Wildcard on one day counts ONCE.
   install(mkProg(REST_TODAY_TRAINS, 'Recovery Lift'), { [K(today)]: C }, EXP_WEEK);
   const beforeDouble = IA.eval('computeStreak()');
   setWild([W(today)]);
-  ok('streak/precedence: a day holding BOTH a completion and a Wildcard counts once, 1 -> 1',
+  ok('stk9-once', 'streak/precedence: a day holding BOTH a completion and a Wildcard counts once, 1 -> 1',
      beforeDouble === 1 && IA.eval('computeStreak()') === 1, beforeDouble + ' -> ' + IA.eval('computeStreak()'));
 
   // Wildcard alone on a pending day still extends (the V195 first-pass behaviour, kept).
   install(mkProg(REST_TODAY_TRAINS, 'Recovery Lift'), null, EXP_WEEK);
   setWild([W(today)]);
-  ok('streak: a Wildcard on a pending day starts a streak of 1', IA.eval('computeStreak()') === 1, String(IA.eval('computeStreak()')));
-  ok('streak: it did so without writing a completion', IA.eval('completedCount()') === 0, String(IA.eval('completedCount()')));
+  ok('stk10-pending', 'streak: a Wildcard on a pending day starts a streak of 1', IA.eval('computeStreak()') === 1, String(IA.eval('computeStreak()')));
+  ok('stk11-nocomp', 'streak: it did so without writing a completion', IA.eval('completedCount()') === 0, String(IA.eval('completedCount()')));
 
   // REST DAY. scheduledDays drops it before any status lookup, so it neither extends nor breaks.
   const SR = handScheduled(REST_TODAY_RESTS);
   install(mkProg(REST_TODAY_RESTS, 'Recovery Lift'), { [K(SR[SR.length-1])]: C, [K(SR[SR.length-2])]: C }, EXP_WEEK);
   const restBefore = IA.eval('computeStreak()');
   setWild([{ title: 'Chaos Workout', ts: 1, week: EXP_WEEK, dayKey: TODAY_KEY }]);
-  ok('streak/rest: a rest-day Wildcard neither extends nor breaks, 2 -> 2',
+  ok('stk12-rest', 'streak/rest: a rest-day Wildcard neither extends nor breaks, 2 -> 2',
      restBefore === 2 && IA.eval('computeStreak()') === 2, restBefore + ' -> ' + IA.eval('computeStreak()'));
-  ok('streak/rest: today’s rest day is absent from scheduledDays entirely',
+  ok('stk13-rest-sched', 'streak/rest: today’s rest day is absent from scheduledDays entirely',
      IA.eval("scheduledDays(new Date()).filter(function(x){return x.week===" + EXP_WEEK + "&&x.d==='" + TODAY_KEY + "';}).length") === 0,
      'rest day reached the streak walk');
   // A rest day marked skipped by hand plus a Wildcard is still invisible.
   IA.localStorage.setItem('ia_comp_' + PID, JSON.stringify({ [K(SR[SR.length-1])]: C, [K(SR[SR.length-2])]: C, ['w' + EXP_WEEK + '_' + TODAY_KEY]: S }));
-  ok('streak/rest: a skipped rest day carrying a Wildcard is still invisible to the streak',
+  ok('stk14-rest-skip', 'streak/rest: a skipped rest day carrying a Wildcard is still invisible to the streak',
      IA.eval('computeStreak()') === 2, String(IA.eval('computeStreak()')));
 }
 
 // ═══ 8. THE FLOW NEVER TOUCHES THE COMPLETION WRITERS ═══════════════════════
 {
   const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
-  tryOk('source: completeWildcard calls no completion writer', () => {
+  tryOk('src1-writers', 'source: completeWildcard calls no completion writer', () => {
     const src = strip(IA.eval('completeWildcard.toString()'));
     const banned = ['markDayComplete', 'snapshotDay', 'ia_comp_', 'saveCompleted', 'fireCompletionPopup', 'fireSeasonPopup', 'skipped'];
     const hit = banned.filter(b => src.indexOf(b) >= 0);
     return { cond: hit.length === 0, detail: 'contains ' + hit.join(', ') };
   });
-  tryOk('source: the Wildcard celebration cannot escalate', () => {
+  tryOk('src2-escalate', 'source: the Wildcard celebration cannot escalate', () => {
     const src = strip(IA.eval('fireWildcardPopup.toString()'));
     const calls = (src.match(/\b[A-Za-z_$][\w$]*\s*\(/g) || []).map(x => x.replace(/\s*\($/, ''));
     const bad = calls.filter(c => /[Ss]eason|Completion|markDayComplete|snapshot/.test(c));
     return { cond: bad.length === 0 && calls.filter(c => c === 'popFire').length === 1, detail: 'calls=' + calls.join(',') };
   });
-  tryOk('source: completedCount never reads the Wildcard store', () => {
+  tryOk('src3-completed', 'source: completedCount never reads the Wildcard store', () => {
     const src = strip(IA.eval('completedCount.toString()'));
     return { cond: src.indexOf('ia_wild_') < 0 && src.indexOf('ildcard') < 0, detail: src };
   });
-  tryOk('source: skippedCount never reads the Wildcard store', () => {
+  tryOk('src4-skipped', 'source: skippedCount never reads the Wildcard store', () => {
     const src = strip(IA.eval('skippedCount.toString()'));
     return { cond: src.indexOf('ia_wild_') < 0 && src.indexOf('ildcard') < 0, detail: src };
   });
-  tryOk('source: refreshProgram cannot see a Wildcard day as trained', () => {
+  tryOk('src5-refresh', 'source: refreshProgram cannot see a Wildcard day as trained', () => {
     const src = strip(IA.eval('refreshProgram.toString()'));
     return { cond: src.indexOf('ia_wild_') < 0 && src.indexOf('ildcard') < 0, detail: 'refreshProgram reads the Wildcard store' };
   });
-  tryOk('source: no "skipped" string in the Wildcard flow (comments stripped)', () => {
+  tryOk('src6-noskip', 'source: no "skipped" string in the Wildcard flow (comments stripped)', () => {
     const fns = ['completeWildcard','fireWildcardPopup','wildcardDayFor','wildcardDaySet','wildcardOn','wildcardMarkHTML','wildcardTagHTML'];
     const hits = fns.filter(f => strip(IA.eval(f + '.toString()')).indexOf('skipped') >= 0);
     return { cond: hits.length === 0, detail: hits.join(',') };
@@ -591,15 +630,15 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
 // ═══ 9. THE MARK ════════════════════════════════════════════════════════════
 {
   const FLAME = 'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z';
-  tryOk('mark: flame plus a W, inline SVG, never emoji', () => {
+  tryOk('mark1-svg', 'mark: flame plus a W, inline SVG, never emoji', () => {
     const h = IA.eval('wildcardMarkHTML(14)');
     const emoji = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(h);
     return { cond: h.indexOf('<svg') >= 0 && h.indexOf(FLAME) >= 0 && h.indexOf('>W<') >= 0 && !emoji, detail: h };
   });
-  ok('mark: the W is painted in signal orange #CF4E1A',
+  ok('mark2-signal', 'mark: the W is painted in signal orange #CF4E1A',
      /\.wc-mark\{[^}]*color:var\(--signal\)/.test(IA.html) && /--signal:#CF4E1A/.test(IA.html),
      'missing .wc-mark signal rule');
-  ok('mark: no new glyph was authored (flame comes from the icon table)',
+  ok('mark3-glyph', 'mark: no new glyph was authored (flame comes from the icon table)',
      (IA.html.match(/"flame":/g) || []).length === 1, 'flame key count');
 }
 
@@ -651,31 +690,35 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
     popSubTrain: 'Streak: 3.',
     filterLabel: 'My Goal'
   };
+  const CR = STAT.loop('copy1-ruled', 'copy/harvest: every harvested Wildcard string reads exactly the ruled text');
   Object.keys(RULED).forEach(k => {
-    ok('copy/harvest: ' + k + ' reads exactly the ruled text', harvest[k] === RULED[k],
+    lok(CR, 'copy/harvest: ' + k, harvest[k] === RULED[k],
        JSON.stringify(harvest[k]) + ' expected ' + JSON.stringify(RULED[k]));
   });
+  CR.done();
 
   // (b) the copy rule, applied to what was harvested.
   const HARVESTED = Object.keys(RULED).map(k => harvest[k]).filter(s => typeof s === 'string');
-  ok('copy: every ruled string was actually harvested from the artifact', HARVESTED.length === Object.keys(RULED).length,
+  ok('copy2-harvested', 'copy: every ruled string was actually harvested from the artifact', HARVESTED.length === Object.keys(RULED).length,
      HARVESTED.length + '/' + Object.keys(RULED).length + ' harvested');
+  const CH = STAT.loop('copy3-hyphen', 'copy: no mid-sentence hyphen or dash in any harvested Wildcard string');
   HARVESTED.forEach(s => {
-    ok('copy: no mid-sentence hyphen or dash in the rendered string "' + s + '"', !/\S\s*[—–-]\s*\S/.test(s), s);
+    lok(CH, 'the rendered string "' + s + '"', !/\S\s*[—–-]\s*\S/.test(s), s);
   });
-  ok('copy: no user-facing "Nike" in any rendered Wildcard string', HARVESTED.every(s => s.indexOf('Nike') < 0),
+  CH.done();
+  ok('copy4-nike', 'copy: no user-facing "Nike" in any rendered Wildcard string', HARVESTED.every(s => s.indexOf('Nike') < 0),
      HARVESTED.filter(s => s.indexOf('Nike') >= 0).join(' | '));
-  ok('copy: the word "skipped" appears in no rendered Wildcard string',
+  ok('copy5-skipped', 'copy: the word "skipped" appears in no rendered Wildcard string',
      HARVESTED.every(s => s.toLowerCase().indexOf('skipped') < 0),
      HARVESTED.filter(s => s.toLowerCase().indexOf('skipped') >= 0).join(' | '));
-  ok('copy: no rendered Wildcard string claims a completion or a PR',
+  ok('copy6-claims', 'copy: no rendered Wildcard string claims a completion or a PR',
      HARVESTED.every(s => !/\b(complete|completed|PR\b|personal record)\b/i.test(s)),
      HARVESTED.filter(s => /\b(complete|completed|PR\b|personal record)\b/i.test(s)).join(' | '));
 
   // The filter-bar label lie, checked against the artifact rather than against a local.
-  ok('label: the rendered filter bar says "My Goal" with no parenthetical',
+  ok('label1-mygoal', 'label: the rendered filter bar says "My Goal" with no parenthetical',
      harvest.filterLabel === 'My Goal' && barHTML().indexOf('My Goal (') < 0, barHTML());
-  ok('label: RAND_POOLS still has no endurance key and getActivePool still falls back',
+  ok('label2-pools', 'label: RAND_POOLS still has no endurance key and getActivePool still falls back',
      IA.RAND_POOLS && !IA.RAND_POOLS.endurance, 'D66 is a later version; V195 only stops the label lying');
 }
 
@@ -691,18 +734,18 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
     { title: pool[1], ts: 2, week: EXP_WEEK, dayKey: TODAY_KEY }
   ];
   setWild(mixed);
-  tryOk('readers: the x/y counter counts both record shapes', () => {
+  tryOk('read1-counter', 'readers: the x/y counter counts both record shapes', () => {
     IA.eval('updateRandCounter()');
     const txt = IA.eval('__g195els.randCounter.textContent');
     return { cond: txt === '2/' + pool.length, detail: txt + ' expected 2/' + pool.length };
   });
-  tryOk('readers: the Done Before badge still fires off the title, whatever the shape', () => {
+  tryOk('read2-badge', 'readers: the Done Before badge still fires off the title, whatever the shape', () => {
     setWild(pool.map((t, i) => (i % 2 ? { title: t, ts: i } : { title: t, ts: i, week: EXP_WEEK, dayKey: TODAY_KEY })));
     IA.eval("randFilter='mine'; reroll();");
     const h = IA.eval('__g195els.randBody.innerHTML');
     return { cond: h.indexOf('Done Before') >= 0 && h.indexOf('wildcard-complete-btn') < 0, detail: h.slice(0, 200) };
   });
-  tryOk('readers: an empty store still offers the Complete button', () => {
+  tryOk('read3-empty', 'readers: an empty store still offers the Complete button', () => {
     IA.localStorage.removeItem('ia_wild_' + PID);
     IA.eval("randFilter='mine'; reroll();");
     const h = IA.eval('__g195els.randBody.innerHTML');
@@ -715,6 +758,8 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
 // are folded into this run's totals so the single PASS/FAIL summary covers all of them.
 // A child that dies without a summary is counted as one FAIL, never as silence.
 {
+  const ZONES = STAT.loop('dst0-zones', 'dst: the lattice child ran to its summary and is clean in every zone');
+  const byId = new Map(DST_ROWS.map(id => [id, []])), ranZones = [];
   TZ_LATTICE.forEach(tz => {
     let out = '', died = null;
     try {
@@ -726,16 +771,32 @@ console.log('# today=' + iso(TODAY) + ' ' + TODAY_KEY + ' | start=' + iso(START)
     } catch (e) { died = String((e && e.stderr) || (e && e.message) || 'child died').trim().split('\n')[0]; out = (e && (e.stdout || '')) || ''; }
     const m = out.match(/^G195_TZ_SUMMARY (\d+) (\d+)$/m);
     if (!m) {
-      fail++;
-      console.log('FAIL dst[' + tz + ']: the lattice child printed no summary (crash is not a pass)  -> ' + (died || out.slice(-300)));
+      lok(ZONES, 'dst[' + tz + ']', false, 'the lattice child printed no summary (crash is not a pass): ' + (died || out.slice(-300)));
       return;
     }
     const cPass = +m[1], cFail = +m[2];
-    out.split('\n').filter(l => l.indexOf('FAIL ') === 0).forEach(l => console.log('     [' + tz + '] ' + l));
-    pass += cPass; fail += cFail;
-    console.log('     dst[' + tz + ']: ' + cPass + ' pass / ' + cFail + ' fail (folded in)');
-    ok('dst[' + tz + ']: the whole lattice is clean in this zone', cFail === 0, cFail + ' failing assertions');
+    out.split('\n').filter(l => l.indexOf('FAIL ') === 0).forEach(l => STAT.info('[' + tz + '] ' + l));
+    ranZones.push(tz);
+    out.split('\n').forEach(l => {
+      const x = l.match(/^(PASS|FAIL) (\S+) (.*)$/);
+      if (x && byId.has(x[2])) byId.get(x[2]).push({ tz, status: x[1], text: x[3] });
+    });
+    STAT.info('dst[' + tz + ']: the child printed ' + cPass + ' pass / ' + cFail + ' fail');
+    lok(ZONES, 'dst[' + tz + ']', cFail === 0, cFail + ' failing assertions');
+  });
+  ZONES.done();
+  // One line per lattice claim. Its sub-results are the zones whose child ran to a summary; a zone that printed no
+  // status line, or more than one, for the claim is a failed sub-result.
+  DST_ROWS.forEach(id => {
+    const got = byId.get(id);
+    const p = got.find(g => g.status === 'PASS');
+    const L = STAT.loop(id, p ? p.text : 'dst lattice row ' + id + ' (no zone passed it)');
+    ranZones.forEach(tz => {
+      const z = got.filter(g => g.tz === tz);
+      lok(L, tz, z.length === 1 && z[0].status === 'PASS', z.length ? z.map(g => g.status + ' ' + g.text).join(' | ') : 'no status line in this zone');
+    });
+    L.done();
   });
 }
 
-console.log('PASS ' + pass + ' FAIL ' + fail);
+STAT.summary();

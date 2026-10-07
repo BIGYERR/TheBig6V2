@@ -79,14 +79,13 @@
 //   scratch path) and is removed on exit.
 'use strict';
 process.env.TZ = 'America/New_York';
-const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
+const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
-const { load, progDigest } = H;
+const { load } = H;
 
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
-const BASEFILE = process.argv[3] ? path.resolve(process.argv[3]) : null;
-const ERA = 233, BASE_ERA = 232, V232_COMMIT = '6ee30ea';
+const ERA = 233;
 const RealDate = Date, DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 // ── HAND ORACLE ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -104,7 +103,6 @@ const PEG = ['9', '59', '59'];
 const PARSE_HAND = [['600', PEG], ['601', PEG], ['630.5', PEG], ['650', PEG], ['1200', PEG], ['599.98', PEG], ['599.99', PEG], ['599', ['9', '59', '0']],
   ['45.5', ['0', '45', '30']], ['45', ['0', '45', '0']], ['.5', ['0', '0', '30']], ['', ['', '', '']], ['-1', ['', '', '']], ['abc', ['', '', '']]];
 const RUN_TIME_DOSE = { k:'time', mins:15, tgt:531, key:'chi' };
-const MANNY_HAND = '2d35e8f743680cfa';
 const NUDGE = 'You logged this one but never marked it.';
 const BIKEG = ['bike_century', 'bike_50', 'bike_base', 'bike_ftp', 'bike_cals'];
 const LAT_A = { foc:['balanced', 'strength'], exp:['beginner', 'advanced'], eq:['commercial', 'home_basic'], seeds:[76308, 24865] };
@@ -121,11 +119,7 @@ function mkCfg(sports, f, ex, eq, sd){
 let pass = 0, fail = 0, skip = 0; const t0 = Date.now();
 const P = s => console.log(s);
 const ok = (l, c, g) => { if(c){ pass++; P('PASS ' + l + (g === undefined ? '' : ' (' + g + ')')); } else { fail++; P('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
-const skipRow = (l, why) => { skip++; P('SKIP ' + l + ': ' + why); };
 const done = () => { P('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s'); P('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-const TMPS = [];
-process.on('exit', () => TMPS.forEach(f => { try { fs.unlinkSync(f); } catch(e){} }));
-function tmpWrite(tag, text){ const f = path.join(os.tmpdir(), 'g233_d207_' + tag + '_' + process.pid + '.html'); fs.writeFileSync(f, text); TMPS.push(f); return f; }
 const J = JSON.stringify;
 const R = {
   'D207/D210-forms': 'row D207/D210-forms (D207, D210, VER >= 233) every bike form is one hms wheel for log_bike_mins in iaw-wrap iaw-solo, no data-plan, hidden input once, no number box, strip iff dose; hand-built time / reps_time / null and lattice (a) bike goals (b) injured multi-sport Cross-Train (c) swapped-in',
@@ -133,7 +127,6 @@ const R = {
   'D207-open': 'row D207-open (D207, D200 gate inherited, VER >= 233) stored blank opens writing nothing on the dash; legacy 45 / 45.5 / .5 / 90 / 30 / 599 / 599.98 / 600 / 630.5 / -1 open writing nothing on their hand faces; every lattice form opens on the dash writing nothing',
   'D207-move': 'row D207-move (D207, D208, VER >= 233) hours 0 + minutes 45 commits 45.00 and ia_logs_ stores it; Progress weekly bike sum 45 and _hasLog read it; a settle on the seed face alone writes nothing; a touched pegged 630.5 commits 599.98',
   'D208-clamp': 'row D208-clamp (D208, VER >= 233) the hms parse pegs at 9:59:59 from the column maxes; run time form and bike form seed 650 / 600 / 630.5 at 9:59:59, 599 at 9:59:00, 45.5 at 0:45:30',
-  'D211-untouched': 'row D211-untouched (pair 233 vs 232) swim, generic run, reps_dist, run time / dist / reps_time markup and every hms face that rounds below 10:00:00 identical to V232; rest sheet identical; one `.iaw-solo{`; bike form differs (live); HALF_MANNY = MANNY_DIGEST_BY_VERSION[233] = 2d35e8f743680cfa, self-stable',
 };
 const ROW_ORDER = Object.keys(R);
 function row(key, cj){ cj.forEach(([n, c, d]) => P('    ' + key + ' ' + n + ' ' + (c ? 'ok' : 'FAIL') + ' :: ' + d));
@@ -273,17 +266,6 @@ let VER = NaN, C = null, CAND_TEXT = '';
 try { CAND_TEXT = fs.readFileSync(ART, 'utf8'); C = mkEnv(ART); VER = +C.IA.version; }
 catch(e){ P('FAIL boot: ' + String(e && e.message || e).slice(0, 200)); fail++; ROW_ORDER.forEach(k => ok(R[k] + ' (candidate did not boot)', false)); done(); }
 P('g233 D207–D211 P-BIKEWHEEL | candidate ' + ART + ' ia-version ' + VER + (VER >= ERA ? '' : ' (below ' + ERA + ': every behaviour row runs and must FAIL by its own conjuncts)'));
-let BF = null, baseWhy = '';
-if(BASEFILE){
-  if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
-} else baseWhy = 'no argv[3]; ';
-if(!BF && VER === ERA){
-  try { const f = tmpWrite('v232', cp.execFileSync('git', ['-C', ROOT, 'show', V232_COMMIT + ':index.html'], { maxBuffer:1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ BF = f; baseWhy += 'git show ' + V232_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
-  } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
-}
-P('  V' + BASE_ERA + ' baseline: ' + (BF ? 'LIVE (' + baseWhy + ')' : 'not loaded (' + baseWhy + ')'));
 
 // ── THE OPEN SURVEY (every row reads it) ─────────────────────────────────────────────────────────────────────────
 const SURV = { hand:{}, legacy:[], clampRun:[], clampBike:[], lat:[], progs:{ a:0, b:0, c:0 }, err:{} };
@@ -453,47 +435,9 @@ function rowClamp(){
   row('D208-clamp', cj);
 }
 
-// ── ROW D211-untouched (pair 233 vs 232 only) ────────────────────────────────────────────────────────────────────
-function rowUntouched(){
-  if(VER !== ERA || !BF){ skipRow(R['D211-untouched'], 'scoped out: this premise is the V' + ERA + ' build pair (candidate 233 against baseline 232); candidate reads ' + VER + ', baseline ' + (BF ? 'live' : 'not loaded (' + baseWhy + ')')); return; }
-  const cj = [];
-  const B = load(BF), CL = load(ART);
-  const ES = [{}, { run_mins:'45.5', run_dist:'3.10', run_pace:'9:30', swim_yards:'1500' }, { run_mins:'599', run_dist:'.86', run_rep_time:'1:45', run_reps:'5' }, { run_mins:'', run_dist:'', swim_yards:'' }, { run_mins:'15.333', run_dist:'8.25' }];
-  const SUBS = ['', 'Speed Run', 'Easy Run', 'Long Run'];
-  const FORMS = [['run', null], ['run', { k:'reps_dist', reps:6, m:400, tgt:480 }], ['run', RUN_TIME_DOSE], ['run', { k:'dist', mi:8, tgt:570 }], ['run', { k:'reps_time', reps:6, mins:3, tgt:480 }], ['swim', null]];
-  let n = 0, same = 0; const diff = [];
-  for(const e of ES) for(const sub of SUBS) for(const [sp, dz] of FORMS){
-    n++; const a = CL.eval('cardioFieldHTML')(sp, e, dz, sub), b = B.eval('cardioFieldHTML')(sp, e, dz, sub);
-    if(a === b) same++; else if(diff.length < 3) diff.push(sp + ' ' + (dz ? dz.k : 'null') + ' ' + J(e) + ' ' + J(sub)); }
-  cj.push(['u-markup', same === n && n > 0, same + '/' + n + ' generic run, reps_dist, run time / dist / reps_time, swim forms byte-identical to V' + BASE_ERA + (diff.length ? ' | differ ' + diff.join('; ') : '')]);
-  const pc = CL.eval('_iawParse'), pb = B.eval('_iawParse'); let pn = 0, ps = 0; const pd = [];
-  // The boundary is in rounded SECONDS: D200 rounds to the nearest second, D208 clamps that t. A stored value in
-  // [599.991667, 600) rounds to 36000 s (10:00:00) and pegs, so it belongs with the at-or-above set, not here.
-  const under = []; for(let h = 0; h < 60000; h++) under.push((h / 100).toFixed(2)); for(let i = 0; i < 600; i++) under.push(String(i)); under.push('', '.5', '-1', 'abc', '1e1', '3,5', '599.98', '599.99', '599.991');
-  for(const s of under){ pn++; if(J(pc('hms', s)) === J(pb('hms', s))) ps++; else if(pd.length < 3) pd.push(J(s)); }
-  const over = ['599.994', '599.999', '600', '601', '630.5', '650', '1200'], live = over.filter(s => J(pc('hms', s)) !== J(pb('hms', s))).length;
-  cj.push(['u-parse', ps === pn && live === over.length, ps + '/' + pn + ' stored values rounding below 10:00:00 (under 600 min) parse to the same hms face as V' + BASE_ERA + (pd.length ? ' | differ ' + pd.join(', ') : '') + '; rounding to 10:00:00 or above ' + live + '/' + over.length + ' differ (the comparator is live; 599.994 and 599.999 round to 36000 s)']);
-  const restCtx = 'activeProg={cfg:{cardioTypes:["run","bike","swim"]},weeks:{}}; activeProgId="u";';
-  CL.eval(restCtx); B.eval(restCtx); let rn = 0, rs = 0; const rd = [];
-  for(const ty of ['run', 'bike', 'swim', 'walk']) for(const rpe of [5, 7, 9]) for(const mins of [30, 600]){
-    const set = '_restDraft.type="' + ty + '"; _restDraft.rpe=' + rpe + '; _restDraft.mins=' + mins + '; _restDraft.dist="";';
-    CL.eval(set); B.eval(set); rn++; const a = CL.eval('_renderRestCardio')(1, 'wed', 'Wednesday'), b = B.eval('_renderRestCardio')(1, 'wed', 'Wednesday');
-    if(a === b && a.length > 0) rs++; else if(rd.length < 3) rd.push(ty + ' rpe ' + rpe + ' ' + mins); }
-  const fns = ['openRestSheet', 'renderRestSheet', '_renderRestMove', '_renderRestCardio', 'applyRestCardio', 'applyRestMove'], fd = fns.filter(f => String(CL.eval(f)) !== String(B.eval(f)));
-  cj.push(['u-rest', rs === rn && !fd.length, rs + '/' + rn + ' rest-sheet cardio renders identical to V' + BASE_ERA + (rd.length ? ' | differ ' + rd.join('; ') : '') + '; rest-sheet functions with different source: ' + J(fd)]);
-  const nsolo = CAND_TEXT.split('.iaw-solo{').length - 1;
-  cj.push(['u-solo', nsolo === 1, '`.iaw-solo{` occurrences in the candidate: ' + nsolo + ' (want 1)']);
-  const lv = [[{}, null, 'Interval'], [{}, { k:'time', mins:40 }, 'Long Ride (LSD)']].map(([e, dz, sub]) => CL.eval('cardioFieldHTML')('bike', e, dz, sub) !== B.eval('cardioFieldHTML')('bike', e, dz, sub));
-  cj.push(['u-live', lv.every(Boolean), 'the comparator is live: the bike form (null, time 40) differs from V' + BASE_ERA + ' ' + J(lv)]);
-  const has = Object.prototype.hasOwnProperty.call(H.MANNY_DIGEST_BY_VERSION, ERA), want = H.MANNY_DIGEST_BY_VERSION[ERA];
-  const d1 = progDigest(CL.buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY)))), d2 = progDigest(load(ART).buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY))));
-  const b1 = progDigest(B.buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY)))), b2 = progDigest(load(BF).buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY))));
-  cj.push(['u-manny-row', has && d1 === want, 'MANNY_DIGEST_BY_VERSION[' + ERA + '] ' + (has ? 'exists = ' + want : 'MISSING') + '; HALF_MANNY on the candidate ' + d1]);
-  cj.push(['u-manny', d1 === MANNY_HAND && d1 === d2 && b1 === MANNY_HAND && b1 === b2, 'HALF_MANNY candidate ' + d1 + ' / fresh VM ' + d2 + ', V' + BASE_ERA + ' ' + b1 + ' / fresh VM ' + b2 + ' (want ' + MANNY_HAND + ' on all four: the ruled value, self-stable on both trees)']);
-  row('D211-untouched', cj);
-}
+// D211-untouched (D211, the V233 build pair: D207 to D210 moved only the bike form against V232; HALF_MANNY era row 233) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 
-const ROWS = { 'D207/D210-forms':rowForms, 'D209-copy':rowCopy, 'D207-open':rowOpen, 'D207-move':rowMove, 'D208-clamp':rowClamp, 'D211-untouched':rowUntouched };
+const ROWS = { 'D207/D210-forms':rowForms, 'D209-copy':rowCopy, 'D207-open':rowOpen, 'D207-move':rowMove, 'D208-clamp':rowClamp };
 for(const k of ROW_ORDER){ try { ROWS[k](); } catch(e){ P('    ' + k + ' CRASH ' + String(e && e.stack || e).slice(0, 400)); ok(R[k] + ' (crashed)', false); } }
 P('  timer errors in the candidate VM: ' + C.errs.length + (C.errs.length ? ' ' + J(C.errs.slice(0, 3)) : ''));
 done();

@@ -1,0 +1,15 @@
+# Documented SURVIVED sabotage mutations, read by tests/sabotage.py --gates and --proof-set (post-V233 s8).
+# A mutation on this list that SURVIVES its gate is reported as a documented survivor and does not fail the run. A
+# SURVIVED mutation NOT on this list fails the run by spec and name, as it always has.
+# One line per mutation:  <spec>.json <mutation name>  # reason, build
+# The name is the spec row's "name" field verbatim; a line splits at its first two-spaces-hash-space.
+# THIS LIST ONLY SHRINKS. A listed mutation that TRIPS its gate again, or whose anchor no longer applies, or that no
+# spec holds any more, fails the run as STALE until its line is deleted. A build that re-arms a dead gate (standing
+# ruling 3: wire a dead pin, never re-point it) deletes that gate's lines the same build. A listed mutation the
+# selection does not run is not judged.
+# The plain `sabotage.py <cand> <spec>` call (the 7-day full sweep) never reads this list: there every survivor prints
+# SURVIVED and the spec exits 1, so gatekeeper sees each one at every full sweep.
+# Sources: tests/measure/v233_rulings/gatekeeper_run1.md (V233 sweep: survived=4, all documented) and
+# tests/measure/v233_rulings/measure_sabotage_history_mS.md (the cause and first build of each).
+v205_d122_threerun_v204.json S4 -> the quality crossover moves from 0.55 to 0.6, which is the three-run arm the LICENCE covers. Applies to the <=204 artifact only; on V205 the pace lattice is four-run and this anchor changes no INT card, so run this mutation against the V204 baseline  # survivor by design: it moves the three-run quality crossover only the <=204 artifact reads; on V205 and later the pace lattice is four-run and the anchor changes no INT card, so it survives on V205 html and trips on V204 html (both proven); scoped to <=204 by its own name; carried since V205 (mS)
+v219.json S4-D167 -> the dedupe gives up whenever fewer than two swaps are legal, leaving calendar repeats standing  # gate went dead, index.html V220: g219_d167_pairs.js keys its pair rows PAIR = VER === ERA (ERA 219), so the 219 to 220 version bump turned them off on an unedited gate; SURVIVED since V220 (8ee4385), found V221, carried since; V220 html re-stamped ia-version 219 trips it again (FAIL 1) (mS)

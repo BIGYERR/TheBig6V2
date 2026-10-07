@@ -1,0 +1,8 @@
+# Version scope debt, read by tests/version_scope.js (gate.sh step 2b).
+# Post-V233 decision (Mario; CLAUDE.md Proof scope, Version scope): no gate row is scoped to one exact ia-version.
+# One line per gate that still holds exact-version hits:  <gate file> <hit count>  # <comment>
+# THIS LIST ONLY SHRINKS. A gate with hits and no line, or more hits than its line, FAILs by name (a new
+# exact-version row). Fewer hits than its line FAILs as stale debt until the line is lowered (deleted at 0).
+# A hit is a source predicate, not a row: one predicate gates many rows (g219: PAIR = VER === ERA gates 9).
+# The comment carries measure mE's row count and classes i/ii/iii
+# (tests/measure/v233_rulings/measure_exact_version_mE.md); "not in mE" marks a gate mE's dark-row census missed.

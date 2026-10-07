@@ -31,7 +31,6 @@ const path = require('path');
 const fs = require('fs');
 const { load, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version;
 const D137_ERA = 206;
@@ -47,7 +46,7 @@ function eq(label, got, want){
 function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function summary(){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); }
 
-const ROWS = ['S1a','S1b','S1c','S1d','S2a','S2b','S2c','S3','S4a','S4b','S4c'];
+const ROWS = ['S1a','S1b','S1c','S1d','S2a','S2b','S2c','S3','S4b','S4c'];
 if(VER < D137_ERA){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D137 (V' + D137_ERA + ').');
   for(const r of ROWS) skipRow(r + ' skipped below the D137 era');
@@ -158,19 +157,7 @@ function prt(over){
 const isRunCHI = c => c.type === 'run' && LBL.chi.test(String(c.subtype || ''));
 const chiDose = d => { const m = d.match(/^(?:(\d+)\s*x\s*)?(\d+)\s*min/); return m ? (m[1] ? m[1] + 'x' + m[2] : m[2]) : '?'; };
 
-// S4a — unmoved against the baseline, scoped to the D137 build pair only.
-if(!BASEFILE){
-  skipRow('S4a no baseline passed as argv[3]; the D137 pair diff did not run (S4b and S4c still stand)');
-} else {
-  const IB = load(BASEFILE);
-  if(VER !== D137_ERA || +IB.version !== D137_ERA - 1){
-    skipRow('S4a scoped to the D137 build pair (candidate 206 vs baseline 205); this pair is ' + VER + ' vs ' + IB.version);
-  } else {
-    const a = seriesOf(IA.buildProgram(prt()), isRunCHI, chiDose), b = seriesOf(IB.buildProgram(prt()), isRunCHI, chiDose);
-    ok('S4a PRT TING (run_pace_goal, 11 weeks, evented) CHI series is identical to the V205 baseline: ' + b.join(' '),
-       a.length === 11 && JSON.stringify(a) === JSON.stringify(b), a.join(' '));
-  }
-}
+// S4a (D137: PRT TING's CHI series unmoved against the V205 baseline) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 // S4b — PRT TING without an event: Table 6 rows 1-11 with the hand cutback arithmetic.
 const pN = IA.buildProgram(prt({primaryPath:'goal', eventTargeted:false, raceDate:''}));
 eq('S4b PRT TING without an event prints Table 6 rows 1-11 with cutbacks at weeks 4 and 8',

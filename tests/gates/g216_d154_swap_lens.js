@@ -69,10 +69,9 @@ const path = require('path'), fs = require('fs'), os = require('os'), cp = requi
 const { load, progDigest, fixtures, DAYS, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
-const VER = +IA.version, ERA = 216, V215_COMMIT = '7474f0607bfdf50b768e95221a1f7e9ef52067b6';
-const ROWS = ['U0','U1','U2','U3','P1','P2','P3','P4','Q1','Q2','Q3','Q4','C1','C2','HM'];
+const VER = +IA.version, ERA = 216;
+const ROWS = ['U0','U1','U2','U3','P1','P2','P3','P4','C1','C2','HM'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = l => { skip++; console.log('SKIP ' + l); };
@@ -157,56 +156,9 @@ for(const eq of TIERS) for(let si = 0; si < SEEDS.length; si++) for(const f of F
   CELLS.push({ k:['L2',eq,f,e,r,si].join('|'), eq, plan:r + '/workaround', cfg:mk(eq,f,e,AGES[(si + EXPS.indexOf(e)) % 3],si,{ region:r, tier:'workaround' }) });
 const isSwap = c => c.plan === 'elbow/workaround' || c.plan === 'shoulder/workaround';
 
-// baseline for the pair rows
-const PAIR = VER === ERA;
-let V215 = null, v215err = null;
-if(PAIR){
-  try {
-    let srcFile = null;
-    if(BASEFILE){ const b = load(BASEFILE); if(+b.version === 215) srcFile = BASEFILE; else v215err = 'argv[3] reads ' + b.version; }
-    TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'g216-'));
-    if(!srcFile){ srcFile = path.join(TMP, 'v215.html');
-      fs.writeFileSync(srcFile, cp.execFileSync('git', ['show', V215_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 26 })); }
-    // graft D156 (the ruling's predicate, typed) onto V215 so the pair rows see D154 alone
-    const src = fs.readFileSync(srcFile, 'utf8');
-    const A = 'const _longDay=!!(_c&&_c.subtype&&(', n = src.split(A).length - 1;
-    if(n !== 1) v215err = 'D156 graft anchor count ' + n + ' in ' + srcFile;
-    else { const g = path.join(TMP, 'v215_d156.html');
-      fs.writeFileSync(g, src.replace(A, () => "const _longDay=!!(_c&&_c.dose&&_c.dose.key==='long')||!!(_c&&_c.subtype&&("));
-      V215 = load(g); if(+V215.version !== 215){ v215err = 'V215 graft reads ' + V215.version; V215 = null; } }
-  } catch(e){ v215err = String(e && e.message || e).slice(0, 200); V215 = null; }
-}
-
-const DEN = {}, CGP = {}, SKULL = {}, CPC = {}, DUP = {}, DUPEX = [], Q = { bw:[0,0], com:[0,0], noswap:[0,0] }, QEX = { bw:[], com:[], noswap:[] };
+const DEN = {}, CGP = {}, SKULL = {}, CPC = {}, DUP = {}, DUPEX = [];
 let built = 0, crashed = 0; const crashEx = [];
 const flat = y => [].concat(...((y && y.sections) || []).map(s => (s.items || []).map(i => clean(i.name))));
-// Q4 classes, by name and detail only (see the header). CAL is the calendar order the spacing pass walks.
-const CAL = ['sun','mon','tue','wed','thu','fri','sat'];
-const prevDay = (p, w, d) => { const i = CAL.indexOf(d); return i > 0 ? (p.weeks[w] || {})[CAL[i - 1]] : (p.weeks[+w - 1] || {}).sat; };
-const itemsOf = y => [].concat(...((y && y.sections) || []).map(s => (s.items || []).map(i => ({ n:clean(i.name), d:String(i.detail || '') }))));
-const labelsOf = y => ((y && y.sections) || []).map(s => String(s.label || ''));
-const sub = t => t.split('Cable pushdown').join('Close-grip pushups');
-function klass(x, y, prevY){
-  if(x.title !== y.title) return null;
-  const ix = itemsOf(x), iy = itemsOf(y), nx = ix.map(a => a.n), ny = iy.map(a => a.n);
-  const same = (a, b) => a.n === b.n && a.d === b.d;
-  if(ix.length === iy.length && nx.includes('Cable pushdown') && JSON.stringify(labelsOf(x).map(sub)) === JSON.stringify(labelsOf(y))
-     && ix.every((a, i) => a.n === 'Cable pushdown' ? iy[i].n === 'Close-grip pushups' : same(a, iy[i]))) return 'A';
-  // B: take V215's Cable pushdown out and the one press V215 did not print out of this build's day
-  // (capRegionalFatigue kept it once the pushups took the cut); the rest must match in order.
-  if(ix.length === iy.length && nx.includes('Cable pushdown') && !ny.includes('Close-grip pushups') && JSON.stringify(labelsOf(x)) === JSON.stringify(labelsOf(y))){
-    const rx = ix.filter((a, i) => i !== nx.indexOf('Cable pushdown')).map(a => a.n + '|' + a.d);
-    const adds = iy.map((a, j) => j).filter(j => /press|pushups?\b/i.test(ny[j]) && !nx.includes(ny[j]));
-    if(adds.length === 1 && JSON.stringify(rx) === JSON.stringify(iy.filter((a, j) => j !== adds[0]).map(a => a.n + '|' + a.d))) return 'B';
-  }
-  if(ix.length === iy.length && !nx.includes('Cable pushdown') && JSON.stringify(labelsOf(x)) === JSON.stringify(labelsOf(y))){
-    const diff = ix.map((a, i) => i).filter(i => !same(ix[i], iy[i]));
-    if(diff.length === 1 && ny[diff[0]] === 'Close-grip pushups' && /tricep|extension/i.test(nx[diff[0]])
-       && prevY && itemsOf(prevY).some(a => a.n === 'Close-grip pushups')) return 'C';
-  }
-  return null;
-}
-const Q4 = {}, Q4X = [];
 CELLS.forEach(c => {
   let p; try { p = IA.buildProgram(clone(c.cfg)); built++; } catch(e){ crashed++; if(crashEx.length < 3) crashEx.push(c.k + ': ' + e.message); return; }
   Object.keys(p.weeks || {}).forEach(w => DAYS.forEach(d => { const y = p.weeks[w][d]; if(!y) return; const nm = flat(y);
@@ -215,16 +167,6 @@ CELLS.forEach(c => {
       if(nm.filter(n => n === 'Close-grip pushups').length > 1){ bump(DUP, c.eq); if(DUPEX.length < 3) DUPEX.push(c.k + ' W' + w + ' ' + d); }
       if(c.plan === 'elbow/workaround'){ nm.forEach(n => { if(n === 'Close-grip pushups') bump(CGP, c.eq); if(n === 'Dumbbell skullcrushers') bump(SKULL, c.eq); if(n === 'Cable pushdown') bump(CPC, c.eq); }); }
     } }));
-  if(!PAIR || !V215) return;
-  const lane = c.eq === 'bodyweight' ? 'bw' : c.eq === 'commercial' ? 'com' : !isSwap(c) ? 'noswap' : null;
-  if(lane === null && !(c.plan === 'elbow/workaround' && DENIED_T.includes(c.eq))) return;
-  let b; try { b = V215.buildProgram(clone(c.cfg)); } catch(e){ if(lane){ Q[lane][1]++; QEX[lane].push(c.k + ' V215 crash'); } return; }
-  if(lane){ Q[lane][0]++; if(JSON.stringify(b.weeks) !== JSON.stringify(p.weeks)){ Q[lane][1]++; if(QEX[lane].length < 3) QEX[lane].push(c.k); } return; }
-  // Q4: every changed elbow/workaround day on the three no-cable tiers is class A, B or C
-  Object.keys(p.weeks || {}).forEach(w => DAYS.forEach(d => { const y = p.weeks[w][d], x = b.weeks[w] && b.weeks[w][d]; if(!y && !x) return;
-    if(JSON.stringify(x) === JSON.stringify(y)) return;
-    const k = (x && y) ? klass(x, y, prevDay(p, w, d)) : null;
-    bump(Q4, c.eq + '|' + (k || 'X')); if(!k && Q4X.filter(e => e.indexOf('|' + c.eq + '|') >= 0).length < 3) Q4X.push(c.k + ' W' + w + ' ' + d); }));
 });
 ok('P0 every lattice config builds (' + CELLS.length + ')', built === CELLS.length && !crashed, crashed + ' crashed ' + crashEx.join('; '));
 DENIED_T.concat(['bodyweight']).forEach(t => ok('P1 ' + t + ': elbow and shoulder workaround programs print no item the tier does not own', !DEN[t], DEN[t] || 0));
@@ -232,18 +174,7 @@ DENIED_T.forEach(t => ok('P2 ' + t + ': the elbow swap lands as Close-grip pushu
   (CGP[t] || 0) > 0 && !SKULL[t] && !CPC[t], 'Close-grip pushups ' + (CGP[t] || 0) + ', skullcrushers ' + (SKULL[t] || 0) + ', Cable pushdown ' + (CPC[t] || 0)));
 ok('P3 commercial: Cable pushdown still prints on elbow workaround cards', (CPC.commercial || 0) > 0, CPC.commercial || 0);
 ok('P4 no day prints Close-grip pushups twice (swap cells, every tier)', !Object.keys(DUP).length, JSON.stringify(DUP) + ' ' + DUPEX.join('; '));
-if(!PAIR){ ['Q1','Q2','Q3','Q4'].forEach(r => skipRow(r + ' pair row: candidate ' + VER + ' is not 216')); }
-else if(!V215){ ['Q1','Q2','Q3','Q4'].forEach(r => ok(r + ' pair row needs V215∘D156', false, v215err)); }
-else {
-  ok('Q1 PAIR bodyweight: every program byte-identical to V215∘D156 (' + Q.bw[0] + ' configs)', Q.bw[0] > 0 && !Q.bw[1], Q.bw[1] + ' differ ' + QEX.bw.join('; '));
-  ok('Q2 PAIR commercial: every program byte-identical to V215∘D156 (' + Q.com[0] + ' configs)', Q.com[0] > 0 && !Q.com[1], Q.com[1] + ' differ ' + QEX.com.join('; '));
-  ok('Q3 PAIR plans with no swapNames: every program byte-identical to V215∘D156 (' + Q.noswap[0] + ' configs)', Q.noswap[0] > 0 && !Q.noswap[1], Q.noswap[1] + ' differ ' + QEX.noswap.join('; '));
-  const q = (t, k) => Q4[t + '|' + k] || 0;
-  DENIED_T.forEach(t => ok('Q4 PAIR ' + t + ': every changed elbow/workaround day is the swap as ruled (A ' + q(t, 'A') + ') or a coach-accepted class (B trimmed downstream ' + q(t, 'B') + ', C spacing pass skips the pushups ' + q(t, 'C') + ')',
-    q(t, 'A') > 0 && !q(t, 'X'), 'unclassified ' + q(t, 'X') + ' ' + Q4X.filter(e => e.indexOf('|' + t + '|') >= 0).join('; ')));
-  console.log('CENSUS (named classes, B and C accepted by coach, not failures):');
-  DENIED_T.forEach(t => console.log('   ' + t + ': A ' + q(t, 'A') + '  B ' + q(t, 'B') + '  C ' + q(t, 'C') + '  unclassified ' + q(t, 'X')));
-}
+// Q1, Q2, Q3 and Q4 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D154: bodyweight, commercial and no-swap programs byte-identical to V215 with D156 grafted, and every changed elbow/workaround day on a no-cable tier is the swap as ruled or a coach-accepted class.
 
 // ── copy ─────────────────────────────────────────────────────────────────────────────────
 { let s = null; try { s = IA.eval('_INJ_EFFECT').elbow.workaround; } catch(e){ s = 'ERR ' + e.message; }

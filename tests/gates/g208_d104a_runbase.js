@@ -56,14 +56,13 @@
 const path = require('path'), fs = require('fs');
 const { load, progDigest, fixtures, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version, ERA = 208;
 let pass = 0, fail = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skip = l => console.log('SKIP ' + l);
 const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-const ROWS = ['R0','R0b','R1','R2','R3','R4','R5','R6','R7','R8a','R8b','M1'];
+const ROWS = ['R0','R0b','R1','R2','R3','R4','R5','R6','R8a','M1'];
 if(VER < ERA){ ROWS.forEach(r => skip(r + ' ia-version ' + VER + ' predates D104a (V' + ERA + ')')); done(); }
 
 const BASE = 'Nothing heavy lands on your long run or the day before it. Your lifting days were placed around it.';
@@ -159,22 +158,7 @@ ok('R4 the run_base note obeys the copy rule: two short sentences, no mid-senten
     for(const k of [1, 2]){ const o = 7 * (tw - 1) + wd - k; if(o < 0) continue; const w = Math.floor(o / 7) + 1, d = ISO[o % 7], day = p.weeks[w] && p.weeks[w][d]; days++;
       if(day && (day.sections || []).some(s => (s.items || []).length)) bad.push(g.id + (mix ? '+' + mix : '') + ' tw' + tw + ' test ' + ISO[wd] + ' T-' + k + ' W' + w + ' ' + d); } }
   ok(`R6 T-1 and T-2 of a dated pace or mile test carry no section with items (${days} days)`, days > 0 && bad.length === 0, bad.length + ': ' + bad.slice(0, 3).join('; ')); }
-// ── R7: undated pace/mile and NRC against the baseline ──────────────────────────────
-if(!BASEFILE) skip('R7 no baseline passed as argv[3]');
-else { const IB = load(BASEFILE);
-  if(!(+IB.version === 207 || +IB.version === 208)) skip('R7 baseline ia-version ' + IB.version + ' is neither V207 nor the V208 pre-slice tree');
-  else { const grid = p => Object.keys(p.weeks).map(w => ISO.map(d => { const x = p.weeks[w][d]; return !x || x.rest ? 'R' : (x.title || '?'); }).join(',')).join('|') + ' :: ' + p.legRecoveryNote;
-    const CF = []; let n = 0; const moved = [];
-    for(const g of ['run_pace_goal','run_mile_time']) for(const mix of ['', 'bike', 'swim']) for(const rest of REST.slice(0, 6)){
-      const cg = {run:g === 'run_pace_goal' ? {id:g, label:'Hit a Pace / Time Goal', mileBestMins:'8', mileBestSecs:'15', targetDist:'1.5', targetMins:'11', targetSecs:'0', paceUnit:'mi'} : {id:g, mileBestMins:'8', mileBestSecs:'15', targetDist:'1', targetMins:'7', targetSecs:'30', paceUnit:'mi'}};
-      if(mix === 'bike') cg.bike = {id:'bike_base'}; if(mix === 'swim') cg.swim = {id:'swim_base'};
-      CF.push({fam:g + (mix ? '+' + mix : ''), cfg:{name:'U', primaryPath:'goal', eventTargeted:false, cardioTypes:mix ? ['run', mix] : ['run'], cardioGoals:cg, liftingFocus:'balanced', experience:'intermediate', ageBracket:'18-35',
-        equipment:'home_full', unit:'lbs', restDays:rest.slice(), days:ALL.slice(), bench:185, squat:255, deadlift:315, seed:24865}}); }
-    for(const g of ['run_5k','run_10k','run_half','run_marathon']) for(const mix of ['', 'bike', 'swim']) for(const rest of [['sun'], ['sun','wed'], [], ['sat','sun']]){
-      const cg = {run:{id:g, label:g}}; if(mix === 'bike') cg.bike = {id:'bike_base', label:'Bike'}; if(mix === 'swim') cg.swim = {id:'swim_base', label:'Swim'};
-      CF.push({fam:'NRC ' + g, cfg:Object.assign(clone(fixtures.HALF_MANNY), {cardioTypes:mix ? ['run', mix] : ['run'], cardioGoals:cg, restDays:rest, seed:76308})}); }
-    for(const e of CF){ n++; if(grid(IA.buildProgram(clone(e.cfg))) !== grid(IB.buildProgram(clone(e.cfg)))) moved.push(e.fam + ' rest=' + e.cfg.restDays.join('+')); }
-    ok(`R7 undated pace/mile and NRC role grids and notes equal the baseline's (${n} programs)`, n > 0 && moved.length === 0, moved.length + ': ' + moved.slice(0, 3).join('; ')); } }
+// R7 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D104a: undated pace/mile and NRC role grids and notes equal the baseline's.
 // ── M1 ─────────────────────────────────────────────────────────────────────────────
 // ── R8: no lift day, no lift-placement note ─────────────────────────────────────────
 { const START = new Date(2026, 9, 5);   // Mon 2026-10-05
@@ -195,15 +179,8 @@ else { const IB = load(BASEFILE);
   CF.forEach((e, i) => { let p; try { p = IA.buildProgram(clone(e.cfg)); } catch(x){ crash++; return; }
     if(hasLift(p)) withLift.push(i); else { free.push(i); if(p.legRecoveryNote != null) bad.push(e.fam + ' race ' + e.cfg.raceDate + ' rest=[' + e.cfg.restDays + '] ' + JSON.stringify(String(p.legRecoveryNote).slice(0, 50))); } });
   ok(`R8a a program with no lift day prints no lift-placement note (${free.length} lift-free of ${CF.length} short dated programs, ${crash} crashes)`, crash === 0 && free.length > 0 && bad.length === 0, bad.length + ' carry a note: ' + bad.slice(0, 3).join('; '));
-  if(!BASEFILE) skip('R8b no baseline passed as argv[3]');
-  else { const IB = load(BASEFILE);
-    if(+IB.version !== VER) skip('R8b runs only against the pre-edit tree at the same ia-version (build proof for the V208 close guard); this pair is ' + VER + ' vs ' + IB.version);
-    // V213 (standing ruling 4): R8b is the V208 close pair. A later build before its bump also reads the
-    // same version as its baseline, and its ruled moves are not R8b's business.
-    else if(VER !== ERA) skip('R8b scoped to the V208 close build pair (candidate 208 against its 208 pre-edit tree); this pair is ' + VER + ' vs ' + IB.version + ', a later build before its bump');
-    else { const strip = p => { const q = clone(p); delete q.created; delete q.id; return JSON.stringify(q); }; const moved = [];
-      withLift.forEach(i => { if(strip(IA.buildProgram(clone(CF[i].cfg))) !== strip(IB.buildProgram(clone(CF[i].cfg)))) moved.push(CF[i].fam + ' race ' + CF[i].cfg.raceDate); });
-      ok(`R8b the ${withLift.length} programs with a lift day are byte-identical to the pre-edit tree`, withLift.length > 0 && moved.length === 0, moved.length + ' moved: ' + moved.slice(0, 3).join('; ')); } } }
+  // R8b retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended the D104a V208 close guard: programs with a lift day byte-identical to the pre-edit tree.
+}
 // V231 (absorb ruling section 4, tests/measure/v231_rulings/v231_absorb_ruling.md; standing rulings
 // 3, 4 and 5): this row defends ITS ruling's claim that it did not move HALF_MANNY. The typed
 // literal is gone: the only object that carries that claim across later rulings is the era table

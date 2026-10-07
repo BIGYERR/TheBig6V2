@@ -128,6 +128,10 @@
 //       every U_d chain whose donor detail the rename alone does not reproduce (D177 window swaps, cued donors; P11:
 //       1,886/15,112). The same mutation trips g221 G5a, G5b and G5c (its own spec row); G7-1a does not (P11: it never
 //       calls undoSwap), so the spec does not name it.
+// IDS (post-V233 V4: every row prints through tests/status.js; CLAUDE.md Proof scope, Row manifest). Each row above
+//   is the id D190-<row>, keyed to the ruling it defends (standing ruling 4): D190-a-MEM, D190-a-U, D190-a-Uprime (a-U'),
+//   D190-d-U, D190-d-Uprime (d-U'), D190-e-PRE, D190-e (the id grammar has no apostrophe). The INFO lines stay INFO (not
+//   rows). A boot failure or a REFUSED version prints FAIL for every declared id by name.
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
@@ -138,19 +142,26 @@ const BASEFILE = process.argv[3] || null;
 const ERA = 227, BASE_ERA = 226;
 const V226_COMMIT = '637bc8e24a243daf3803a554125bba117f44281f';   // V226: D188/D189 (the V226 artifact, forever)
 const N = 40, N3 = 6, NC = 8;
-let pass = 0, fail = 0;
 const t0 = Date.now();
-const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l + (g === undefined ? '' : ' (' + g + ')')); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
-const done = () => { console.log('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s'); console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
+// Rows print through tests/status.js (post-V233 V4). RID: row key -> status id. ok(row key, label, cond, got) is the
+// row's one status line: got prints in the label on a PASS and as the detail on a FAIL, as before.
+const S = require('../status')('g227_d190_seam');
+const RID = { aMEM:'D190-a-MEM', aU:'D190-a-U', aUp:'D190-a-Uprime', dU:'D190-d-U', dUp:'D190-d-Uprime', ePRE:'D190-e-PRE',
+  e:'D190-e' };
+S.declare(Object.values(RID));
+const ok = (k, l, c, g) => c ? S.pass(RID[k], l + (g === undefined ? '' : ' (' + g + ')')) : S.fail(RID[k], l, g === undefined ? '' : 'got ' + g);
+const done = () => { console.log('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s'); S.summary(); };
+// a boot failure or a REFUSED version: FAIL for every declared id by name (R is read at call time, after it is typed)
+const failAll = (why, detail) => { for(const k of Object.keys(RID)) S.fail(RID[k], R[k] + ' (' + why + ')', detail); done(); };
 
 const R = {
-  aMEM: 'row a-MEM D190 membership proven: store-derived U (one ia_swaps_ record per hop, read after the chain) == hand-derived U (hop froms pairwise distinct), every reachable chain',
-  aU:   'row a-U D190 on U: every touched slot boots equal to the live card in name and detail, residue 0 of |U|, |U| > 0, no licence',
-  aUp:  "row a-U' D190 pair on U' (store shorter than the chain): every U' chain that boots equal to live on V226 boots equal to live on the candidate, created 0",
-  dU:   "row d-U D190 R6 on U_d (hand: hop `to` names pairwise distinct on the day): the chip on the last hop's card is found and equals the last hop's `from`, and undoSwap(chip) leaves the whole day byte-identical to the day before the last hop; residue 0 of |U_d|, |U_d| > 0, no licence",
-  dUp:  "row d-U' D190 R6 pair on U_d' (some `to` repeats on the day): every U_d' chain that undoes byte-identical on V226 undoes byte-identical on the candidate, created 0, |U_d'| > 0",
-  ePRE: 'row e-PRE D190 HAND precondition: the 2 natively cued mario items and the 2 ankle ones are on their days by name and carry the cue on a typed capped pattern',
-  e:    'row e D190 every reachable hop1/hop2/cyc2 chain from the 4 natively cued items: touched slot and whole day live == boot',
+  aMEM: 'membership proven: store-derived U (one ia_swaps_ record per hop, read after the chain) == hand-derived U (hop froms pairwise distinct), every reachable chain',
+  aU:   'on U: every touched slot boots equal to the live card in name and detail, residue 0 of |U|, |U| > 0, no licence',
+  aUp:  "pair on U' (store shorter than the chain): every U' chain that boots equal to live on V226 boots equal to live on the candidate, created 0",
+  dU:   "R6 on U_d (hand: hop `to` names pairwise distinct on the day): the chip on the last hop's card is found and equals the last hop's `from`, and undoSwap(chip) leaves the whole day byte-identical to the day before the last hop; residue 0 of |U_d|, |U_d| > 0, no licence",
+  dUp:  "R6 pair on U_d' (some `to` repeats on the day): every U_d' chain that undoes byte-identical on V226 undoes byte-identical on the candidate, created 0, |U_d'| > 0",
+  ePRE: 'HAND precondition: the 2 natively cued mario items and the 2 ankle ones are on their days by name and carry the cue on a typed capped pattern',
+  e:    'every reachable hop1/hop2/cyc2 chain from the 4 natively cued items: touched slot and whole day live == boot',
 };
 
 // ── HAND ORACLE ──────────────────────────────────────────────────────────────────────────────────────────────────
@@ -222,7 +233,7 @@ const slotsOf = c => { const seen = new Set(), out = []; c.hops.forEach(h => { c
 
 // ── LOAD + VERSION PREDICATE ───────────────────────────────────────────────────────────────────────────────────────
 let IA0, STAMP = NaN;
-try { IA0 = load(ART); STAMP = +IA0.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { IA0 = load(ART); STAMP = +IA0.version; } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION !== undefined){
   if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
@@ -234,8 +245,7 @@ const CUE = VER >= 228 ? ' — hold RPE 7, three in the tank' : ' — hold RPE 7
 console.log('g227 D190 seam | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | N ' + N + ', N3 ' + N3 + ', NC ' + NC);
 if(!(VER >= ERA)){
   console.log('REFUSED: ia-version ' + VER + ' predates D190 P-SWAPSEAM (V' + ERA + '). No row may pass on it.');
-  Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
-  done();
+  failAll('REFUSED');
 }
 // V226 baseline for rows a-U' and d-U' (V227 slice 10, the V226 slice 7e form of g225_d187_pacerate.js and the g226
 // gates): argv[3] if it reads 226, else `git show <V226_COMMIT>:index.html` into os.tmpdir(), because
@@ -281,7 +291,7 @@ const LOC = [];   // {i, ck, w, d, si, ii} per located item
       + ' | typed ' + h.pat + (capped ? ' in ' : ' NOT in ') + region + '/wa cap | classifier ' + pat + ' | ' + (okI ? 'ok' : 'NO'));
   }
   lines.forEach(l => console.log(l));
-  ok(R.ePRE, SELF && good === CUED.length, good + '/' + CUED.length + ' located, cued, typed capped');
+  ok('ePRE', R.ePRE, SELF && good === CUED.length, good + '/' + CUED.length + ' located, cued, typed capped');
 }
 
 // ── ENUMERATE (tree under test; measure's enumerator; hand froms carried on every hop) ────────────────────────────────
@@ -374,7 +384,7 @@ const U = reach.filter(r => r.sU), UP = reach.filter(r => !r.sU);
   const mis = reach.filter(r => r.sU !== r.hU);
   console.log('    a-MEM U ' + U.length + ' ' + fmt(tally(U, r => r.c.cls)) + '\n          U\' ' + UP.length + ' ' + fmt(tally(UP, r => r.c.cls)) + '\n          store != hand ' + mis.length);
   mis.slice(0, 4).forEach(r => console.log('      ' + tag(r) + ' | hand ' + (r.hU ? 'U' : "U'") + ' store ' + (r.sU ? 'U' : "U'") + ' ' + JSON.stringify(r.rec.map(e => e.from + '->' + e.to))));
-  ok(R.aMEM, SELF && reach.length > 0 && U.length > 0 && mis.length === 0, 'store != hand ' + mis.length + '/' + reach.length + ", |U| " + U.length + ", |U'| " + UP.length);
+  ok('aMEM', R.aMEM, SELF && reach.length > 0 && U.length > 0 && mis.length === 0, 'store != hand ' + mis.length + '/' + reach.length + ", |U| " + U.length + ", |U'| " + UP.length);
 }
 // ── a-U ────────────────────────────────────────────────────────────────────────────────────────────────────────────
 {
@@ -385,21 +395,21 @@ const U = reach.filter(r => r.sU), UP = reach.filter(r => !r.sU);
     const pr = tally(res, r => { const i = r.live.findIndex((x, j) => x.n !== r.boot[j].n || x.d !== r.boot[j].d); return r.live[i].d + ' -> ' + r.boot[i].d; });
     Object.keys(pr).sort((a, b) => pr[b] - pr[a]).slice(0, 8).forEach(k => console.log('      ' + pr[k] + '× live ' + k.replace(' -> ', ' | boot ')));
     res.slice(0, 4).forEach(r => console.log('      ' + tag(r) + '\n        live ' + JSON.stringify(r.live) + '\n        boot ' + JSON.stringify(r.boot))); }
-  ok(R.aU, SELF && U.length > 0 && moved > 0 && res.length === 0, 'residue ' + res.length + '/' + U.length + ', chains that moved the live card ' + moved);
+  ok('aU', R.aU, SELF && U.length > 0 && moved > 0 && res.length === 0, 'residue ' + res.length + '/' + U.length + ', chains that moved the live card ' + moved);
 }
 // ── a-U' (pair vs V226) + INFO D191 ───────────────────────────────────────────────────────────────────────────────
 {
   const resP = UP.filter(r => !r.eq);
   console.log("    INFO D191 P-SWAPREVISIT (never asserted, never licensed): |U'| " + UP.length + ', residue ' + resP.length + ' | ' + fmt(tally(resP, r => r.c.ck + '|' + r.c.cls)));
   resP.slice(0, 3).forEach(r => console.log('      ' + tag(r) + ' store ' + JSON.stringify(r.rec.map(e => e.from + '->' + e.to)) + '\n        live ' + JSON.stringify(r.live) + '\n        boot ' + JSON.stringify(r.boot)));
-  if(!B) ok(R.aUp + ' (setup: no V226 tree: ' + baseWhy + ')', false);
+  if(!B) ok('aUp', R.aUp + ' (setup: no V226 tree: ' + baseWhy + ')', false);
   else {
     const BR = new Map(); for(const ck of Object.keys(CFGS)){ const ch = UP.filter(r => r.c.ck === ck).map(r => r.c); if(ch.length) run('B', ck, ch, false).forEach(x => BR.set(x.c.id, x)); }
     const both = UP.filter(r => BR.has(r.c.id) && !BR.get(r.c.id).unreach);
     const bEq = both.filter(r => BR.get(r.c.id).eq), created = bEq.filter(r => !r.eq), healed = both.filter(r => !BR.get(r.c.id).eq && r.eq);
     console.log("    a-U' V226 run " + BR.size + ', reachable on both ' + both.length + ' | V226 boots == live ' + bEq.length + ', of those candidate != live (created) ' + created.length + ' | healed ' + healed.length);
     created.slice(0, 3).forEach(r => console.log('      created ' + tag(r) + '\n        live ' + JSON.stringify(r.live) + ' boot ' + JSON.stringify(r.boot)));
-    ok(R.aUp, SELF && created.length === 0, "created " + created.length + " of " + bEq.length + " U' chains equal on V226 (|U'| " + UP.length + ', healed ' + healed.length + ')');
+    ok('aUp', R.aUp, SELF && created.length === 0, "created " + created.length + " of " + bEq.length + " U' chains equal on V226 (|U'| " + UP.length + ', healed ' + healed.length + ')');
   }
 }
 // ── d (RE-RULING 2): d-U on U_d, INFO D192 P-UNDOKEY, d-U' pair on U_d' vs V226 ───────────────────────────────────────
@@ -422,7 +432,7 @@ const U = reach.filter(r => r.sU), UP = reach.filter(r => !r.sU);
   console.log('          by config, chip == hand chip and undo byte-identical / |U_d|: ' + Object.keys(CFGS).map(ck => { const g = Ud.filter(r => r.c.ck === ck); return ck + ' ' + g.filter(r => chipOk(r) && r.undoEq).length + '/' + g.length; }).join(' | '));
   if(resU.length){ console.log('    d-U residue by config|week|class: ' + fmt(tally(resU, r => r.c.ck + '|W' + r.c.w + '|' + r.c.cls)));
     resU.slice(0, 4).forEach(r => console.log('      ' + tag(r) + ' | chip ' + (r.chip || '(none)') + ', hand chip ' + hChip(r.c) + (r.undoEq ? '' : ', undo not byte-identical'))); }
-  ok(R.dU, SELF && Ud.length > 0 && resU.length === 0, 'residue ' + resU.length + '/' + Ud.length + ' (no chip ' + Ud.filter(r => !r.chip).length
+  ok('dU', R.dU, SELF && Ud.length > 0 && resU.length === 0, 'residue ' + resU.length + '/' + Ud.length + ' (no chip ' + Ud.filter(r => !r.chip).length
     + ', chip != hand chip ' + Ud.filter(r => r.chip && !chipOk(r)).length + ', undo not byte-identical ' + Ud.filter(r => !r.undoEq).length + ')');
   // U_d' on V226: the same chains acted, booted and undone on the baseline (fresh('B'))
   let BD = null;
@@ -434,11 +444,11 @@ const U = reach.filter(r => r.sU), UP = reach.filter(r => !r.sU);
     + (Object.keys(byShape).sort().map(k => k + ' ' + (wrongShape[k] || 0) + '/' + byShape[k]).join(' | ') || '(none)')
     + ' | chip != hand chip ' + UdP.filter(r => !chipOk(r)).length + ' | healed vs V226 ' + (BD ? healed.length : 'n/a (no V226 tree)'));
   wrongP.slice(0, 2).forEach(r => console.log('      ' + tag(r) + ' | chip ' + (r.chip || '(none)') + ', hand chip ' + hChip(r.c) + ' | store ' + JSON.stringify(r.rec.map(e => e.from + '->' + e.to))));
-  if(!B) ok(R.dUp + ' (setup: no V226 tree: ' + baseWhy + ')', false);
+  if(!B) ok('dUp', R.dUp + ' (setup: no V226 tree: ' + baseWhy + ')', false);
   else {
     console.log("    d-U' V226 run " + BD.size + ', reachable on both ' + both.length + ' | V226 undoes byte-identical ' + bEq.length + ', of those candidate not (created) ' + created.length + ' | healed ' + healed.length);
     created.slice(0, 3).forEach(r => console.log('      created ' + tag(r) + ' | chip ' + (r.chip || '(none)') + ', V226 chip ' + (BD.get(r.c.id).chip || '(none)')));
-    ok(R.dUp, SELF && UdP.length > 0 && both.length > 0 && created.length === 0, 'created ' + created.length + ' of ' + bEq.length + " U_d' chains byte-identical on V226 (|U_d'| " + UdP.length + ', on both ' + both.length + ', healed ' + healed.length + ')');
+    ok('dUp', R.dUp, SELF && UdP.length > 0 && both.length > 0 && created.length === 0, 'created ' + created.length + ' of ' + bEq.length + " U_d' chains byte-identical on V226 (|U_d'| " + UdP.length + ', on both ' + both.length + ', healed ' + healed.length + ')');
   }
 }
 // ── e ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -447,6 +457,6 @@ const U = reach.filter(r => r.sU), UP = reach.filter(r => !r.sU);
   const per = CUED.map((h, i) => rows.filter(r => r.c.cued === i).length);
   console.log('    e chains per item: ' + CUED.map((h, i) => h.ck + ' W' + h.w + ' ' + h.name + ' ' + per[i]).join(' | ') + ' | ' + fmt(tally(rows, r => r.c.ck + '|' + r.c.cls)));
   bad.slice(0, 4).forEach(r => console.log('      ' + tag(r) + '\n        live ' + JSON.stringify(r.live) + '\n        boot ' + JSON.stringify(r.boot)));
-  ok(R.e, SELF && LOC.length === CUED.length && per.every(n => n > 0) && bad.length === 0, 'live != boot ' + bad.length + '/' + rows.length + ' (' + per.join(' + ') + ')');
+  ok('e', R.e, SELF && LOC.length === CUED.length && per.every(n => n > 0) && bad.length === 0, 'live != boot ' + bad.length + '/' + rows.length + ' (' + per.join(' + ') + ')');
 }
 done();

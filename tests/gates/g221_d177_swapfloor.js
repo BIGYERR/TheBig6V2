@@ -38,8 +38,11 @@
 //                  grammar 4, G3e 3, G6a toast 10 (typed pins, the ruling's print; the D198 re-ruling states the four
 //                  figures unchanged by D198; V230 has 0 such donors, so each re-keyed row fails there). Below 231 the
 //                  rows assert as before.
-//   pair rows      G4 G7-4 G8a assert only on D177's build pair: candidate 221 against baseline 220 (argv[3] when it
+//   pair rows      G4a G7-4 G8a assert only on D177's build pair: candidate 221 against baseline 220 (argv[3] when it
 //                  reads 220, else git 8ee4385). Any other candidate: SKIP, scoped out, never PASS. G9 asserts on 221 only.
+//   minimum rows   G4b and G4c run from 221 up (Version scope, post-V233): Landmine rotations and Dumbbell renegade rows
+//                  are named no-change under _swapDetailFor against V220 at every version, so off the pair they load
+//                  V220 themselves (argv[3] when it reads 220, else git 8ee4385). No V220: FAIL, never PASS.
 //   IA_ASSUME_VERSION=221 lifts a file stamped 220 to 221 for a pre-bump development run. It is announced, and it is
 //   ignored on any file not stamped exactly 220. gate.sh never sets it.
 // GATE-SCOPE ITEM 2, RESTATED (RE-RULING ON V220 (swap durability), item 3): "Frozen-day re-swap: a day with an
@@ -80,10 +83,8 @@ const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const ERA = 221, BASE_ERA = 220, V220_COMMIT = '8ee4385b6108a2eade639628aa99dee0ab201950';
-const MANNY = '0ac7da6b1691a8e1';
 let pass = 0, fail = 0, skip = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
-const skipRow = (l, why) => { skip++; console.log('SKIP ' + l + ': ' + why); };
 const done = () => { console.log('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
 
 // ── HAND ORACLE ──────────────────────────────────────────────────────────────
@@ -261,9 +262,8 @@ const R = {
   G3d:'G3d L1: donors at or above the floor stay verbatim',
   G3e:'G3e L1: null-row pairs stay verbatim',
   G3f:'G3f L1: every Main pair under its window prints exactly the hand rewrite (and some do)',
-  G4a:'G4a (pair) L1: 0 _pattern-null items differ under _swapDetailFor, candidate vs V220, while Main swap pairs do (RR5)',
-  G4b:'G4b (pair) L1: Landmine rotations, named no-change under _swapDetailFor, present on the lattice',
-  G4c:'G4c (pair) L1: Dumbbell renegade rows, named no-change under _swapDetailFor, present on the lattice',
+  G4b:'G4b (from 221, against V220) L1: Landmine rotations, named no-change under _swapDetailFor, present on the lattice',
+  G4c:'G4c (from 221, against V220) L1: Dumbbell renegade rows, named no-change under _swapDetailFor, present on the lattice',
   G5a:'G5a L1: swap then undo leaves day.sections byte-identical on every Main and Power pair (R4)',
   G5b:'G5b L1: Close-grip bench press -> Dips -> undo restores the donor detail, day byte-identical',
   G5c:'G5c constructed duplicate-name day (RR4 re-scope): tap / tap both / reboot re-apply, then undo, byte-identical',
@@ -274,12 +274,8 @@ const R = {
   G71a:'G7-1a cfg.exSwapPrefs {Barbell box squat: Dumbbell goblet squat}: every week the pref lands prints the window, on a build and on a reboot with W1 frozen; cfg not mutated',
   G71b:'G7-1b the injury filter still re-runs after a pref: Box jumps lands on healthy, never on knee/workaround ("' + DOCTRINE_KNEE + '")',
   G72a:'G7-2a a day restored from an ia_hist_ snapshot at 4×3, re-swapped through applySwapChoice, shows the window live',
-  G74:'G7-4 (pair) L2 (seed 51407): 0 engine cards change against V220; V220 equals itself',
-  G8a:'G8a (pair) L2: 0 add-path details change against V220',
   G8b:'G8b addedDetailFor fallback is `' + FALLBACK + '`: Main grammar, at or above every hand window low end, left verbatim',
-  G9:'G9 HALF_MANNY digest ' + MANNY + ' on the candidate, self-stable (no era row)',
 };
-const PAIR_ROWS = ['G4a', 'G4b', 'G4c', 'G74', 'G8a'];
 
 // ── RUN ──────────────────────────────────────────────────────────────────────
 const t0 = Date.now();
@@ -295,31 +291,30 @@ if(!(VER >= ERA)){
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();
 }
-// Baseline for the pair rows: D177's build pair is 221 against 220.
-let B = null, baseWhy = '';
-if(VER === ERA){
+// The V220 pair loader (D177's build pair, 221 vs 220: G4a, G7-4, G8a and G9 read it, and G4b and G4c on 221 through B4 = B) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
+// G4b and G4c run from D177's era onward (Version scope): the named no-change under _swapDetailFor is against V220 at
+// every version from 221 up, so they load V220 themselves.
+let B4 = null, base4Why = '';
+if(VER >= ERA){
   try {
-    if(BASEFILE){ const b = load(BASEFILE); if(+b.version === BASE_ERA) B = b; else baseWhy = 'argv[3] reads ' + b.version + '; '; }
-    if(!B){
+    if(BASEFILE){ const b = load(BASEFILE); if(+b.version === BASE_ERA) B4 = b; else base4Why = 'argv[3] reads ' + b.version + '; '; }
+    if(!B4){
       const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'g221d177-')), f = path.join(tmp, 'v220.html');
       fs.writeFileSync(f, cp.execFileSync('git', ['show', V220_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 27 }));
       const b = load(f); fs.rmSync(tmp, { recursive:true, force:true });
-      if(+b.version === BASE_ERA){ B = b; baseWhy += 'baseline from git ' + V220_COMMIT.slice(0, 7); } else baseWhy += 'git reads ' + b.version;
+      if(+b.version === BASE_ERA){ B4 = b; base4Why += 'baseline from git ' + V220_COMMIT.slice(0, 7); } else base4Why += 'git reads ' + b.version;
     }
-  } catch(e){ baseWhy += 'baseline load failed: ' + String(e && e.message || e).slice(0, 160); B = null; }
+  } catch(e){ base4Why += 'baseline load failed: ' + String(e && e.message || e).slice(0, 160); B4 = null; }
 }
-const PAIR = VER === ERA && !!B;
-console.log('  pair rows: ' + (PAIR ? 'LIVE (candidate ' + VER + ' vs V' + BASE_ERA + (baseWhy ? ', ' + baseWhy : ', argv[3]') + ')' : VER === ERA ? 'SETUP FAILED (' + baseWhy + ')' : 'scoped out (candidate ' + VER + ' is not D177\'s pair)'));
-const pairRow = (key, cond, got) => {
-  if(PAIR) return ok(R[key], cond, got);
-  if(VER === ERA) return ok(R[key] + ' (setup: ' + baseWhy + ')', false);
-  skipRow(R[key], 'scoped out, candidate ' + VER + " is not D177's build pair (221 vs 220)");
+const sdB4 = B4 ? B4.eval('_swapDetailFor') : null;
+const minRow = (key, cond, got) => {
+  if(VER >= ERA && sdB4) return ok(R[key], cond, got);
+  return ok(R[key] + ' (setup: ' + base4Why + ')', false);
 };
 const LS = IA.localStorage;
 IA.eval("globalThis.__T=null;showToast=function(m){globalThis.__T=m;};openDetail=function(){};closeSwapSheet=function(){};"
   + "renderWeekView=function(){};showScreen=function(){};bumpSwapCount=function(){return false;};activeProgId='P1';");
 const sdE = IA.eval('_swapDetailFor'), rfE = IA.eval('_repFloor'), patE = IA.eval('_pattern'), scE = IA.eval('swapCandidates');
-const sdB = PAIR ? B.eval('_swapDetailFor') : null;
 const safe = fn => { try { return fn(); } catch(e){ return [false, 'threw ' + (e && e.message)]; } };
 const row = (key, fn) => { const r = safe(fn); ok(R[key], r[0], r[0] ? undefined : r[1]); };
 const mainIdx = day => (day.sections || []).findIndex(s => /^main/i.test(clean(s && s.label)));
@@ -348,7 +343,7 @@ row('G2', () => {
 
 // L1 sweep: G3, G4, G5a/b, G6a in one pass over every Main and Power swap pair.
 const S = { cfgs:0, crash:[], days:0, pairs:0, main:0, pow:0, powChg:0, offN:0, offChg:0, winN:0, winBad:0, atN:0, atBad:0, nullN:0, nullBad:0,
-  zeroN:0, zeroChg:0, outside:0, under:0, underN:0, idBad:0, throws:0, toastBad:0, t3:0, pn:0, pnDiff:0, mainDiff:0,
+  zeroN:0, zeroChg:0, outside:0, under:0, underN:0, idBad:0, throws:0, toastBad:0, t3:0, pn:0,
   lr:0, lrDiff:0, rr:0, rrDiff:0, cgbp:null, ex:{} };
 const note = (k, s) => { (S.ex[k] = S.ex[k] || []).length < 3 && S.ex[k].push(s); };
 const exs = k => (S.ex[k] || []).map(s => ' | e.g. ' + s).join('');
@@ -361,10 +356,10 @@ for(const cfg of L1){
     S.days++;
     day.sections.forEach(s => ((s && s.items) || []).forEach(it => {
       if(!it || !it.name || typeof it.detail !== 'string' || patE(it.name) != null) return;
-      S.pn++; const n = clean(it.name), differ = PAIR && sdB(it.name, it.detail) !== sdE(it.name, it.detail);
-      if(differ){ S.pnDiff++; note('pn', n + ' :: ' + it.detail); }
-      if(n === 'Landmine rotations'){ S.lr++; if(differ) S.lrDiff++; }
-      if(n === 'Dumbbell renegade rows'){ S.rr++; if(differ) S.rrDiff++; }
+      S.pn++; const n = clean(it.name);
+      // G4b and G4c (minimum rows) read V220 through sdB4 at every version from 221 up.
+      if(n === 'Landmine rotations'){ S.lr++; if(!!sdB4 && sdB4(it.name, it.detail) !== sdE(it.name, it.detail)) S.lrDiff++; }
+      if(n === 'Dumbbell renegade rows'){ S.rr++; if(!!sdB4 && sdB4(it.name, it.detail) !== sdE(it.name, it.detail)) S.rrDiff++; }
     }));
     IA.eval("activeProg=__P;activeProgId='P1';currentWeek=" + (+w) + ";currentDayKey='" + d + "';localStorage.removeItem('ia_swaps_P1');");
     for(let si = 0; si < day.sections.length; si++){
@@ -415,7 +410,6 @@ for(const cfg of L1){
             continue;
           }
           S.main++;
-          if(PAIR && sdB(to, D) !== O) S.mainDiff++;
           if(H.k === 'zero'){ S.zeroN++; if(O !== D) S.zeroChg++; continue; }
           if(O !== D && stripRep(O) !== stripRep(D)){ S.outside++; if(clean(from) === BED_DONOR) BED9.out++; note('out', where + ' :: ' + D + ' => ' + O); }
           if(H.k === 'offgram'){ S.offN++; if(cueBlind(O) !== cueBlind(D)){ S.offChg++; if(clean(from) === BED_DONOR) BED9.off++; note('off', where + ' :: ' + D + ' => ' + O); } }
@@ -462,9 +456,9 @@ if(D9) ok(R.G3e + ' [V229 D193 Amendment 4 (l): moved ' + S.nullBad + ' == pin '
 else ok(R.G3e, !S.crash.length && S.nullN > 0 && S.nullBad === 0, S.nullBad + ' of ' + S.nullN + crashNote + exs('null'));
 if(D9) ok(R.G3f + ' [V229 D193 Amendment 4 (l): moved ' + S.winBad + ' == pin ' + PIN9.G3f + '; card != the hand rewrite beneath the hold ' + S9.bWin + ']', !S.crash.length && S.winN > 0 && S9.bWin === 0 && S.winBad === PIN9.G3f, 'moved ' + S.winBad + ' of ' + S.winN + ' (pin ' + PIN9.G3f + '), beneath-the-hold misses ' + S9.bWin + crashNote + exs9('win') + exs('win'));
 else ok(R.G3f, !S.crash.length && S.winN > 0 && S.winBad === 0, S.winBad + ' of ' + S.winN + crashNote + exs('win'));
-pairRow('G4a', S.pn > 0 && S.pnDiff === 0 && S.mainDiff > 0, S.pnDiff + ' of ' + S.pn + ' differ; Main pairs differing ' + S.mainDiff + exs('pn'));
-pairRow('G4b', S.lr > 0 && S.lrDiff === 0, S.lrDiff + ' of ' + S.lr);
-pairRow('G4c', S.rr > 0 && S.rrDiff === 0, S.rrDiff + ' of ' + S.rr);
+// G4a retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D177 RR5: on the build pair no _pattern-null item differed under _swapDetailFor against V220 while Main swap pairs did.
+minRow('G4b', S.lr > 0 && S.lrDiff === 0, S.lrDiff + ' of ' + S.lr);
+minRow('G4c', S.rr > 0 && S.rrDiff === 0, S.rrDiff + ' of ' + S.rr);
 ok(R.G5a, !S.crash.length && S.pairs > 0 && S.idBad === 0 && S.throws === 0 && S.winN > 0 && S.zeroChg > 0,
   S.idBad + ' of ' + S.pairs + ' not identical, throws ' + S.throws + crashNote + exs('id') + exs('throw'));
 ok(R.G5b, !!S.cgbp && S.cgbp.ok && S.cgbp.O !== S.cgbp.D, S.cgbp ? JSON.stringify(S.cgbp) : 'pair not on L1');
@@ -573,35 +567,7 @@ row('G72a', () => {
   return [restored && live.name === 'Dumbbell goblet squat' && live.detail === EXPG && toast === EXPT, 'restored ' + restored + ', live ' + live.name + ' :: ' + live.detail + ' :: ' + toast];
 });
 
-// L2 (pair): G7-4 engine cards, G8a add path
-if(PAIR){
-  const Q = { cfgs:0, crash:[], cards:0, cardDiff:0, dig:0, self:0, selfBad:0, add:0, addDiff:0, days:0, ex:[] };
-  const acE = IA.eval('addCandidates'), adE = IA.eval('addedDetailFor'), adB = B.eval('addedDetailFor');
-  L2.forEach((cfg, n) => {
-    let pb, pe; try { pb = B.buildProgram(cfg); pe = IA.buildProgram(cfg); } catch(e){ Q.crash.push(e.message); return; }
-    Q.cfgs++;
-    if(n % 6 === 0){ Q.self++; if(progDigest(B.buildProgram(cfg)) !== progDigest(pb)) Q.selfBad++; }
-    if(progDigest(pb) !== progDigest(pe)) Q.dig++;
-    const pbc = Object.assign({}, pb, { cfg }), pec = Object.assign({}, pe, { cfg });
-    Object.keys(pe.weeks).forEach(w => Object.keys(pe.weeks[w]).forEach(d => {
-      const de = pe.weeks[w][d], db = pb.weeks[w] && pb.weeks[w][d];
-      if(!de || de.rest || !Array.isArray(de.sections)){ if(J(de) !== J(db)) Q.cardDiff++; return; }
-      Q.days++;
-      if(!db || !Array.isArray(db.sections) || db.sections.length !== de.sections.length){ Q.cardDiff++; return; }
-      de.sections.forEach((s, si) => { const sb = db.sections[si]; (s.items || []).forEach((it, ii) => { Q.cards++;
-        const ib = sb && sb.items && sb.items[ii]; if(!ib || ib.name !== it.name || ib.detail !== it.detail){ Q.cardDiff++; if(Q.ex.length < 3) Q.ex.push('W' + w + ' ' + d + ' ' + it.name); } }); });
-      let ac = null; try { ac = acE(de, w, pec); } catch(e){}
-      if(!ac) return;
-      [].concat(ac.gap || [], ac.more || [], ac.off || []).forEach(nm => { Q.add++;
-        let a, b; try { a = sdB(nm, adB(db, nm, w, pbc)); b = sdE(nm, adE(de, nm, w, pec)); } catch(e){ a = 'threw'; b = 'threw ' + e.message; }
-        if(a !== b){ Q.addDiff++; if(Q.ex.length < 6) Q.ex.push('add ' + nm + ' :: ' + a + ' => ' + b); } });
-    }));
-  });
-  console.log('  L2: ' + Q.cfgs + '/' + L2.length + ' builds, ' + Q.days + ' training days, ' + Q.cards + ' cards, ' + Q.add + ' add-path details | ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s');
-  pairRow('G74', !Q.crash.length && Q.cards > 0 && Q.self > 0 && Q.selfBad === 0 && Q.cardDiff === 0 && Q.dig === 0 && S.mainDiff > 0,
-    Q.cardDiff + ' cards, ' + Q.dig + ' digests moved; V220 self ' + (Q.self - Q.selfBad) + '/' + Q.self + '; crashes ' + Q.crash.length + ' ' + Q.ex.join('; '));
-  pairRow('G8a', !Q.crash.length && Q.add > 0 && Q.addDiff === 0, Q.addDiff + ' of ' + Q.add + ' ' + Q.ex.filter(s => /^add/.test(s)).join('; '));
-} else { pairRow('G74', false, 'no pair'); pairRow('G8a', false, 'no pair'); }
+// G7-4 and G8a retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D177 on its build pair (221 vs 220): over L2 no engine card and no add-path detail moved against V220.
 
 // G8b the add-path fallback, read from the candidate's source (comments stripped)
 row('G8b', () => {
@@ -617,9 +583,6 @@ row('G8b', () => {
   return [lit === FALLBACK && !!g && +g[2] >= maxLo && !moved.length, JSON.stringify(lit) + ' grammar ' + !!g + ' low ' + (g && g[2]) + ' vs max window low ' + maxLo + ' moved ' + moved.join(',')];
 });
 
-// G9 HALF_MANNY
-if(VER === ERA) row('G9', () => { const a = progDigest(IA.buildProgram(IA.fixtures.HALF_MANNY)), b = progDigest(IA.buildProgram(IA.fixtures.HALF_MANNY));
-  return [a === MANNY && a === b, a + ' / ' + b]; });
-else skipRow(R.G9, 'scoped out, candidate ' + VER + ': a later ruling owns HALF_MANNY (standing ruling 5)');
+// G9 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended standing ruling 5 at D177: the HALF_MANNY digest typed for 221, self-stable.
 console.log('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s');
 done();

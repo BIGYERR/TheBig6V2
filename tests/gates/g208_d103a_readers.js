@@ -56,10 +56,8 @@ let pass = 0, fail = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skip = l => console.log('SKIP ' + l);
 const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-if(VER < ERA){ ['R','H','E','I','S','N','M'].forEach(r => skip(r + ' rows: ia-version ' + VER + ' predates D103a slice 2 (V' + ERA + ')')); done(); }
+if(VER < ERA){ ['R','H','E','I','S','M'].forEach(r => skip(r + ' rows: ia-version ' + VER + ' predates D103a slice 2 (V' + ERA + ')')); done(); }
 const IB = BASEFILE ? load(BASEFILE) : null;
-const BASE_OK = !!IB && VER === ERA && (+IB.version === 207 || +IB.version === 208);
-const BASE_WHY = !IB ? 'no baseline passed as argv[3]' : 'baseline ia-version ' + IB.version + ' is neither V207 nor the V208 pre-slice tree';
 function canon(v){
   if(v === null || typeof v !== 'object') return JSON.stringify(v) || 'null';
   if(Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
@@ -70,14 +68,6 @@ const DAYS = ['mon','tue','wed','thu','fri','sat','sun'], ALL = ['sun','mon','tu
 const HALFSTEP_SET = new Set(['int','chi','long','steady']);                  // ruling, hand table
 const PARK_SET = new Set(['int','chi','long','steady','bench','trial']);      // ruling, hand table
 const NSW = new Set(['run_base','run_pace_goal','run_mile_time','run_15_under10']);
-// label -> class, for unkeyed (baseline) cards. First match wins.
-function labelKey(c){
-  const s = String(c.subtype || '');
-  if(/TIME TRIAL/.test(s)) return 'trial'; if(/^Interval \(INT\)/.test(s)) return 'int'; if(/^Continuous High Intensity \(CHI\)/.test(s)) return 'chi';
-  if(/^Steady Aerobic Run/.test(s)) return 'steady'; if(/^Benchmark Run/.test(s)) return 'bench'; if(/^Easy Run — Long/.test(s)) return 'long';
-  if(/^Easy Run \(protected\)/.test(s)) return 'protected'; if(/^Easy Run/.test(s)) return 'easy'; if(/^Long Slow Distance \(LSD\)/.test(s)) return c.legLoad ? 'long' : 'easy';
-  return null;
-}
 const keyOf = c => (c && c.dose && c.dose.key) || null;
 const nswRun = c => !!c && c.type === 'run' && !c.isNRC && NSW.has(c.goalId);
 const cardsOf = p => { const o = []; Object.keys(p.weeks).forEach(w => DAYS.forEach(d => { const x = p.weeks[w][d]; if(x && x.cardio && !Array.isArray(x.cardio)) o.push({w, d, c:x.cardio}); })); return o; };
@@ -106,11 +96,6 @@ for(const mix of ['', 'bike']) for(const exp of ['beginner','advanced']) for(con
 for(const pp of ['fitness','event']) for(const bd of ['0.1','1']) for(const rest of [['sun','wed'], [], ['sat','sun']]){
   BASECFG.push({fam:'run_base 55+', dated:0, cfg:Object.assign({}, clone(IA.fixtures.HALF_MANNY), {name:'RB', primaryPath:pp, cardioTypes:['run'],
     cardioGoals:{run:{id:'run_base', label:'Build Running Base', baselineDist:bd, baseline:bd + 'mi'}}, eventTargeted:pp === 'event', raceDate:pp === 'event' ? '2027-06-01' : '', ageBracket:'55+', restDays:rest, seed:76308})});
-}
-const NRCCFG = [];
-for(const g of ['run_5k','run_half']) for(const mix of ['', 'bike', 'swim']) for(const inj of Object.keys(INJ)){
-  const cg = {run:{id:g, label:g}}; if(mix === 'bike') cg.bike = {id:'bike_base', label:'Bike'}; if(mix === 'swim') cg.swim = {id:'swim_base', label:'Swim'};
-  NRCCFG.push(withInj(Object.assign({}, clone(IA.fixtures.HALF_MANNY), {cardioTypes:mix ? ['run', mix] : ['run'], cardioGoals:cg, restDays:['sun'], seed:76308, raceDate:g === 'run_5k' ? '2026-11-19' : '2026-12-26'}), inj));
 }
 const build = (A, cfg) => { const p = clone(A.buildProgram(clone(cfg))); delete p.created; delete p.id; return p; };
 const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj; if(!cache.has(k)) cache.set(k, build(IA, withInj(BASECFG[i].cfg, inj))); return cache.get(k); };
@@ -152,18 +137,11 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
     byKey[k] = (byKey[k] || 0) + 1; if(touchedH(c)) hit[k] = (hit[k] || 0) + 1;
     if(touchedH(c) !== HALFSTEP_SET.has(k)) bad.push(b.fam + ' #' + i + ' W' + w + ' ' + d + ' key ' + k + (touchedH(c) ? ' half-stepped' : ' not half-stepped')); }));
   let before = null;
-  // before: the baseline's cuts by label class. H4 compares UNDATED programs only: slice 0 (the D106a fix-forward, same
-  // version) turned long LSDs at T-1/T-2 of a dated test into easy runs, which V207 still counts as long.
-  let before4 = null, after4 = {};
-  BASECFG.forEach((b, i) => { if(!b.dated) cardsOf(get(b.fam, i, 'halfstep')).forEach(({c}) => { if(nswRun(c) && touchedH(c)){ const k = keyOf(c); after4[k] = (after4[k] || 0) + 1; } }); });
-  if(BASE_OK){ before = {}; before4 = {}; BASECFG.forEach(b => cardsOf(build(IB, withInj(b.cfg, 'halfstep'))).forEach(({c}) => { if(nswRun(c) && touchedH(c)){ const k = keyOf(c) || labelKey(c); before[k] = (before[k] || 0) + 1; if(!b.dated) before4[k] = (before4[k] || 0) + 1; } })); }
   const bf = k => before ? (before[k] || 0) : 'n/a';
   ok(`H1 halfstep cuts a keyed NSW run iff its key is in {int, chi, long, steady} (${BASECFG.length} programs; cut/total: ${Object.keys(byKey).sort().map(k => k + ' ' + (hit[k] || 0) + '/' + byKey[k]).join(', ')})`, bad.length === 0 && Object.keys(byKey).length > 0, bad.length + ': ' + bad.slice(0, 3).join('; '));
   ok(`H2 NSW easy runs half-stepped: ${bf('easy')} before -> ${hit.easy || 0} after (of ${byKey.easy || 0})`, (byKey.easy || 0) > 0 && !(hit.easy || 0), hit.easy);
   ok(`H3 the test and the benchmark are never halved: trial ${bf('trial')} -> ${hit.trial || 0} (of ${byKey.trial || 0}), bench ${bf('bench')} -> ${hit.bench || 0} (of ${byKey.bench || 0})`, (byKey.trial || 0) > 0 && (byKey.bench || 0) > 0 && !(hit.trial || 0) && !(hit.bench || 0), (hit.trial || 0) + ' / ' + (hit.bench || 0));
-  if(!BASE_OK) skip('H4 ' + BASE_WHY + '; the unchanged-class counts did not run');
-  else { const cls = ['int','chi','long','steady'], diff = cls.filter(k => (before4[k] || 0) !== (after4[k] || 0));
-    ok(`H4 halfstep counts unchanged vs the baseline for the classes the ruling keeps, undated programs (${cls.map(k => k + ' ' + (before4[k] || 0) + '->' + (after4[k] || 0)).join(', ')})`, diff.length === 0 && cls.every(k => (after4[k] || 0) > 0), diff.join(',')); }
+  // H4 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D103a slice 2: the halfstep cut counts for int, chi, long and steady equal the baseline's.
 }
 // ── E: easy and reduce ──────────────────────────────────────────────────────────────
 {
@@ -195,9 +173,6 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
     ['easy','reduce'].forEach(m => cardsOf(m === 'easy' ? p : get(b.fam, i, 'reduce')).forEach(({w, d, c}) => { if(/^Easy Run \(protected\)/.test(c.subtype || '') && c.dose && c.dose.key !== undefined && c.dose.key !== 'easy') e4.push(m + ' ' + b.fam + ' #' + i + ' W' + w + ' ' + d + ' key ' + c.dose.key); }));
   });
   let benchBefore = 'n/a';
-  if(BASE_OK){ let pb = 0, tb = 0; BASECFG.forEach(b => { const pre = build(IB, withInj(b.cfg, 'none')), p = build(IB, withInj(b.cfg, 'easy'));
-    cardsOf(pre).forEach(({w, d, c}) => { if(nswRun(c) && (keyOf(c) || labelKey(c)) === 'bench'){ tb++; const a = p.weeks[w] && p.weeks[w][d] && p.weeks[w][d].cardio; if(a && /^Easy Run \(protected\)/.test(a.subtype || '')) pb++; } }); });
-    benchBefore = pb + '/' + tb; }
   ok(`E1 easy mode parks a keyed NSW run iff its key is in {int, chi, long, steady, bench, trial} (parked/total: ${Object.keys(total).sort().map(k => k + ' ' + (parked[k] || 0) + '/' + total[k]).join(', ')}; bench parked before: ${benchBefore})`,
      bad.length === 0 && ['int','chi','long','steady','bench','trial','easy'].every(k => (total[k] || 0) > 0), bad.length + ': ' + bad.slice(0, 3).join('; '));
   ok(`E2 an injured athlete in easy mode runs no test: 0 TIME TRIAL cards survive across ${datedProgs} dated programs (${parked.trial || 0}/${total.trial || 0} tests parked)`, datedProgs > 0 && trialsLeft.length === 0 && (total.trial || 0) > 0, trialsLeft.length + ': ' + trialsLeft.slice(0, 3).join('; '));
@@ -223,32 +198,24 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
   // E7: outside the injury modes the strides are untouched
   let sN = 0; const sBad = []; BASECFG.forEach((b, i) => cardsOf(get(b.fam, i, 'none')).forEach(({w, d, c}) => { if(!/ \+ Strides$/.test(c.subtype || '')) return; sN++; if(!String(c.detail || '').endsWith(STRIDES_BLOCK)) sBad.push(b.fam + ' #' + i + ' W' + w + ' ' + d); }));
   ok(`E7a without an injury every " + Strides" run still carries the whole finisher (${sN} cards)`, sN > 0 && sBad.length === 0, sBad.length + ': ' + sBad.slice(0, 3).join('; '));
-  if(!BASE_OK) skip('E7b ' + BASE_WHY);
-  else { let sB = 0; BASECFG.forEach(b => cardsOf(build(IB, withInj(b.cfg, 'none'))).forEach(({c}) => { if(/ \+ Strides$/.test(c.subtype || '') && String(c.detail || '').endsWith(STRIDES_BLOCK)) sB++; }));
-    ok(`E7b without an injury the strides count equals the baseline's (${sB} -> ${sN})`, sB === sN && sN > 0, sB + ' vs ' + sN); }
+  // E7b retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D103a slice 2b: without an injury the strides count equals the baseline's.
 }
 // ── I: interference ─────────────────────────────────────────────────────────────────
 {
-  const CI = IA.eval('_cardioInterference'), CB = BASE_OK ? IB.eval('_cardioInterference') : null;
+  const CI = IA.eval('_cardioInterference');
   const hand = c => { const s = ((c.subtype || '') + ' ' + (c.detail || '')).toLowerCase();
     const mi = parseFloat((s.match(/([\d.]+)\s*(?:mi\b|mile)/) || [])[1]) || 0, mn = parseFloat((s.match(/([\d.]+)[\s-]*min/) || [])[1]) || 0;
     const b = mi > 3 ? Math.min(0.5, (mi - 3) * 0.08) : mn > 45 ? Math.min(0.5, (mn - 45) * 0.01) : 0;
     return +(1.0 * (keyOf(c) === 'int' ? 1.4 : 1.05) + b).toFixed(2); };
-  // the card V207 printed for this key: the key's V207 head, every suffix kept (hand table, slice 4a)
-  const HEAD207 = {chi:'Continuous High Intensity (CHI)', int:'Interval (INT)'};
-  const as207 = c => { const r = clone(c); r.subtype = String(r.subtype || '').replace(/^(Long Interval \(LI\)|Short Interval \(SI\))/, m => HEAD207[keyOf(c)] || m); return r; };
-  let n = 0; const bad = [], badB = [], badR = []; let nu = 0, nu7 = 0; const badU = [];
+  let n = 0; const bad = [], badR = [];
   BASECFG.forEach((b, i) => cardsOf(get(b.fam, i, 'none')).forEach(({c}) => { if(!nswRun(c)) return; const k = keyOf(c);
-    if(k === 'int' || k === 'chi'){ n++; const v = CI(c); if(v !== hand(c)) bad.push(k + ' ' + v + ' want ' + hand(c)); if(CB && v !== CB(as207(c))) badB.push(k + ' ' + v + ' baseline ' + CB(as207(c)) + ' on "' + as207(c).subtype + '"');
+    if(k === 'int' || k === 'chi'){ n++; const v = CI(c); if(v !== hand(c)) bad.push(k + ' ' + v + ' want ' + hand(c));
       // relabelled to a name the scan reads as ANOTHER class (a CHI named like an interval, an INT named like a recovery run)
       const r = clone(c); r.subtype = k === 'chi' ? 'Long Interval (LI)' : 'Recovery Zqy'; if(CI(r) !== hand(c)) badR.push(k + ' as "' + r.subtype + '" ' + CI(r) + ' want ' + hand(c)); }
-    if(CB){ nu++; const u = clone(c); delete u.dose.key; if(CI(u) !== CB(u)) badU.push(String(c.subtype) + ' ' + CI(u) + ' baseline ' + CB(u));
-      if(k === 'int' || k === 'chi'){ nu7++; const u7 = as207(c); delete u7.dose.key; if(CI(u7) !== CB(u7)) badU.push('as V207 "' + u7.subtype + '" ' + CI(u7) + ' baseline ' + CB(u7)); } } }));
+    }));
   ok(`I1 keyed INT and CHI read 1.4 and 1.05 plus the distance bump, by hand (${n} cards)`, n > 0 && bad.length === 0, bad.length + ': ' + bad.slice(0, 3).join('; '));
   ok(`I4 a keyed INT or CHI relabelled to a name the scan reads as another class still reads its key's value (${n} cards)`, n > 0 && badR.length === 0, badR.length + ': ' + badR.slice(0, 3).join('; '));
-  if(!CB){ skip('I2 ' + BASE_WHY); skip('I3 ' + BASE_WHY); }
-  else { ok(`I2 keyed INT and CHI equal the baseline's value on the card V207 printed for the same key (${n} cards)`, n > 0 && badB.length === 0, badB.length + ': ' + badB.slice(0, 3).join('; '));
-         ok(`I3 unkeyed path: with dose.key stripped, every NSW run card reads the baseline's value as printed today (${nu} cards) and every INT and CHI reads it under its V207 label, the frozen path (${nu7} cards)`, nu > 0 && nu7 > 0 && badU.length === 0, badU.length + ': ' + badU.slice(0, 3).join('; ')); }
+  // I2 and I3 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D103a slice 2: keyed INT and CHI, and the unkeyed path, read the baseline's _cardioInterference value.
 }
 // ── S: shape ────────────────────────────────────────────────────────────────────────
 {
@@ -265,26 +232,9 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
   const lb = {mon:card('Long Interval (LI)', 'chi', true), thu:card('Zqy Session (ZQY)', 'int', true), sat:card('Long Slow Distance (LSD)', 'long', true), sun:card('Long Slow Distance (LSD)', 'easy', false)};
   const s3 = SH(clone(lb), ['mon','thu','sat','sun']);
   ok('S1c renamed quality labels still read as the speed days by key', !!s3 && s3.long === 'sat' && [...s3.speed].sort().join() === 'mon,thu', s3 && JSON.stringify({long:s3.long, speed:[...s3.speed]}));
-  if(!BASE_OK) skip('S2 ' + BASE_WHY);
-  else { const u = x => { const y = clone(x); Object.values(y).forEach(c => delete c.dose.key); return y; };
-    const sa = SH(u(wk), td), sb = IB.eval('_nrcRunShape')(u(wk), td), sc = SH(u(lb), ['mon','thu','sat','sun']), sd = IB.eval('_nrcRunShape')(u(lb), ['mon','thu','sat','sun']);
-    const ser = x => x ? JSON.stringify({long:x.long, eve:x.eve, after:x.after, speed:[...x.speed].sort(), easy:[...x.easy].sort()}) : 'null';
-    ok('S2 unkeyed path: with the keys stripped, the shape equals the baseline\'s on both hand grids', ser(sa) === ser(sb) && ser(sc) === ser(sd), ser(sa) + ' vs ' + ser(sb)); }
-  if(!(IB && +IB.version === VER)) skip('S3 runs only against the pre-slice tree at the same ia-version; ' + (IB ? 'this pair is ' + VER + ' vs ' + IB.version : 'no baseline'));
-  // V213 (standing ruling 4): S3 is V208's own build pair. A later build before its bump also reads the
-  // same version as its baseline, and its ruled moves are not S3's business.
-  else if(VER !== ERA) skip('S3 scoped to the D103a slice 2 build pair (candidate 208 against its 208 pre-slice tree); this pair is ' + VER + ' vs ' + IB.version + ', a later build before its bump');
-  else { const moved = [], expect = [];
-    // Non-vacuity only for the slice 2 pair: a baseline whose shape reader still takes the test as the long run.
-    const bLabel = (() => { const x = IB.eval('_nrcRunShape')(clone(wk), td); return !!x && x.long === 'sat'; })();
-    BASECFG.forEach((b, i) => { if(b.fam === 'pace' && b.dated === 1) expect.push(i); if(canon(get(b.fam, i, 'none')) !== canon(build(IB, withInj(b.cfg, 'none')))) moved.push(i); });
-    ok(`S3 without an injury, the only programs that move against the pre-slice tree are the dated ones with the test in week 1 (the test leaves the shape): ${moved.length} moved, ${expect.length} such programs${bLabel ? '' : '; the baseline already reads the key, so none need move'}`,
-       moved.every(i => expect.includes(i)) && (!bLabel || moved.length > 0), 'moved outside the class: ' + moved.filter(i => !expect.includes(i)).map(i => BASECFG[i].fam + ' #' + i).join(', ')); }
+  // S2 and S3 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D103a slice 2: the unkeyed shape equals the baseline's, and only week-1-test programs move against the pre-slice tree.
 }
-// ── N: NRC, bike and swim ───────────────────────────────────────────────────────────
-if(!BASE_OK) skip('N1 ' + BASE_WHY);
-else { const moved = []; NRCCFG.forEach((c, i) => { let a, b; try { a = canon(build(IA, c)); } catch(e){ a = 'CRASH ' + e.message; } try { b = canon(build(IB, c)); } catch(e){ b = 'CRASH ' + e.message; } if(a !== b || /^CRASH/.test(a)) moved.push('#' + i + ' ' + c.cardioGoals.run.id + ' ' + c.cardioTypes.join('+') + ' ' + (c.injury ? JSON.stringify(c.injury) : 'no injury')); });
-  ok(`N1 ${NRCCFG.length} NRC programs (5K, half x run, +bike, +swim x no injury, halfstep, easy, reduce) are byte-identical to the baseline`, moved.length === 0, moved.length + ': ' + moved.slice(0, 3).join('; ')); }
+// N1 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D103a slice 2: NRC, bike and swim programs, injured or not, byte-identical to the baseline.
 // ── M: HALF_MANNY ───────────────────────────────────────────────────────────────────
 // V231 (absorb ruling section 4, tests/measure/v231_rulings/v231_absorb_ruling.md; standing rulings
 // 3, 4 and 5): this row defends ITS ruling's claim that it did not move HALF_MANNY. The typed

@@ -39,18 +39,12 @@
 const path = require('path');
 const { load, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version, ERA = 208;
 let pass = 0, fail = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-if(VER < ERA){ ['K0','K1','K2','K2b','K3','K4','K5'].forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates D103a (V' + ERA + ')')); done(); }
-function canon(v){
-  if(v === null || typeof v !== 'object') return JSON.stringify(v) || 'null';
-  if(Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
-  return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canon(v[k])).join(',') + '}';
-}
+if(VER < ERA){ ['K0','K1','K2','K2b','K3','K5'].forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates D103a (V' + ERA + ')')); done(); }
 const clone = v => JSON.parse(JSON.stringify(v));
 const DAYS = ['mon','tue','wed','thu','fri','sat','sun'], ALL = ['sun','mon','tue','wed','thu','fri','sat'];
 const NSW = new Set(['run_base','run_pace_goal','run_mile_time','run_15_under10']);
@@ -136,22 +130,7 @@ ok(`K2 dose.key equals the label hand table on 100% of NSW run cards (${S.agree}
   built.forEach(p => { if(p) cardsOf(p).forEach(({c}) => { if(c.type === 'run' && !c.isNRC && NSW.has(c.goalId) && Object.prototype.hasOwnProperty.call(F, c.subtype)) F[c.subtype]++; }); });
   ok(`K2b the renamed heads are reached in both forms, so K2 reads them (${Object.keys(F).map(k => '"' + k + '" ' + F[k]).join(', ')})`, Object.values(F).every(n => n > 0), JSON.stringify(F)); }
 ok(`K3 NRC run, bike and swim cards carry no key (${S.other} cards)`, S.other > 0 && S.otherKeyed.length === 0, S.otherKeyed.length + ': ' + S.otherKeyed.slice(0, 3).join('; '));
-// ── K4: inertness against the pre-slice tree ─────────────────────────────────────────
-if(!BASEFILE) console.log('SKIP K4 no baseline passed as argv[3]; the inertness diff did not run');
-else {
-  const IB = load(BASEFILE);
-  if(+IB.version !== VER) console.log('SKIP K4 runs only against the pre-slice tree at the same ia-version (build-time proof for D103a slices 1-3); this pair is ' + VER + ' vs ' + IB.version);
-  // V213 (standing ruling 4): K4 is V208's own build pair. A later build before its bump also reads the
-  // same version as its baseline, and its ruled moves are not K4's business.
-  else if(VER !== ERA) console.log('SKIP K4 scoped to the D103a build pair (candidate 208 against its 208 pre-slice tree); this pair is ' + VER + ' vs ' + IB.version + ', a later build before its bump');
-  else {
-    const strip = p => { cardsOf(p).forEach(({c}) => { if(c.dose) delete c.dose.key; }); delete p.created; delete p.id; return canon(p); };
-    const moved = [];
-    LAT.forEach((L, i) => { if(!built[i]) return; let b; try { b = strip(clone(IB.buildProgram(clone(L.cfg)))); } catch(e){ b = 'CRASH ' + e.message; }
-      if(strip(clone(built[i])) !== b) moved.push(L.fam + ' #' + i); });
-    ok(`K4 with dose.key stripped, ${S.progs} programs are byte-identical to the pre-slice tree (the stamp is inert until slice 2)`, moved.length === 0, moved.length + ' moved: ' + moved.slice(0, 3).join('; '));
-  }
-}
+// K4 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D103a slices 1-3: the stamp is inert, every program byte-identical with dose.key stripped.
 // ── K5 ─────────────────────────────────────────────────────────────────────────────
 // V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
 // this row defends D103a's claim "my ruling did not move HALF_MANNY". The literal it compared

@@ -37,7 +37,6 @@
 const path = require('path');
 const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version;
 const D140_ERA = 209;
@@ -53,7 +52,7 @@ function ok(label, cond, got){
 function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function summary(){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); }
 
-const ROWS = ['T0','T1','T2','A1','A2','B1','B2','B3','B4','B5','K0','K1','K2','C2','N1','L1','M1'];
+const ROWS = ['T0','T1','T2','A1','A2','B1','B2','B3','B4','B5','K0','K1','M1'];
 if(!(VER >= D140_ERA)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D140 (V' + D140_ERA + ').');
   ROWS.forEach(r => skipRow(r + ' skipped below the D140 era'));
@@ -89,21 +88,6 @@ const daySets = day => items(day).filter(i => !STRETCH_RX.test(i.name || '')).re
 const carryN = day => items(day).filter(i => CARRY_RX.test(i.name || '')).length;
 const secName = s => (s.label || s.coreHeader || '');
 const shape = day => (day.sections || []).map(s => '[' + secName(s) + '] ' + (s.items || []).map(i => i.name).join(', ')).join(' ; ') || '(none)';
-// V208's day with the carry ban applied by hand: carry-labelled sections out, carry items out,
-// a section the removal empties out. Everything else is the day V208 dealt.
-function stripCarry(day){
-  const d = cl(day); if(!Array.isArray(d.sections)) return d;
-  const out = [];
-  d.sections.forEach(s => {
-    if(/carry/i.test(s.label || '') || /carry/i.test(s.coreHeader || '')) return;
-    const its = s.items || [], kept = its.filter(i => !CARRY_RX.test(i.name || ''));
-    if(its.length && !kept.length) return;
-    if(s.items) s.items = kept;
-    out.push(s);
-  });
-  d.sections = out;
-  return d;
-}
 
 // ── fixtures ──────────────────────────────────────────────────────────────────────────
 const STAND = { name:'PRT TING', primaryPath:'goal', eventTargeted:false, cardioTypes:['run'],
@@ -189,27 +173,20 @@ const RESTS = [['sun','wed'], ['sat','sun']];
 }
 
 // ── the lattice ───────────────────────────────────────────────────────────────────────
-const IB = BASEFILE ? load(BASEFILE) : null;
-const PAIR = !!IB && VER === D140_ERA && +IB.version === D140_ERA - 1;
 const n = { A:{NSW:0,NRC:0}, B:{NSW:0,NRC:0}, C:{NSW:0,NRC:0} };
-const bad = { A1:[], A2:[], B1:[], B2:[], B3:[], B5:[], K0:[], C2:[], N1:[] };
-let aBad = 0, a2Bad = 0, b1Bad = 0, b2Bad = 0, b3Bad = 0, b5Bad = 0, cPowCore = 0, k0Bad = 0, c2Bad = 0, n1Bad = 0, nonLong = 0, baseCarry = 0;
-const moved = { NSW:0, NRC:0 };
+const bad = { A1:[], A2:[], B1:[], B2:[], B3:[], B5:[], K0:[] };
+let aBad = 0, a2Bad = 0, b1Bad = 0, b2Bad = 0, b3Bad = 0, b5Bad = 0, cPowCore = 0, k0Bad = 0, nonLong = 0;
 const note = (k, s) => { if(bad[k].length < 3) bad[k].push(s); };
 for(const L of LAT){
   const p = IA.buildProgram(cl(L.cfg));
-  const q = PAIR ? IB.buildProgram(cl(L.cfg)) : null;
   for(let w = 1; w <= p.totalWeeks; w++) for(const d of DAYS){
     const day = p.weeks[w] && p.weeks[w][d]; if(!day) continue;
-    const bday = q && q.weeks[w] ? q.weeks[w][d] : null;
     const t = handTier(day.cardio), where = L.tag + ' W' + w + ' ' + d;
     if(!t){
       nonLong++;
-      if(PAIR && JSON.stringify(day) !== JSON.stringify(bday)){ n1Bad++; note('N1', where); }
       continue;
     }
     const limb = longKind(day.cardio); n[t][limb]++;
-    if(PAIR && bday){ if(JSON.stringify(day) !== JSON.stringify(bday)) moved[limb]++; baseCarry += carryN(bday); }
     if(carryN(day)){ k0Bad++; note('K0', where + ' ' + shape(day)); }
     if(t === 'A'){
       if((day.sections || []).some(s => !/post-run mobility|taper/i.test(s.label || ''))){ aBad++; note('A1', where + ' ' + shape(day)); }
@@ -225,7 +202,6 @@ for(const L of LAT){
       if(pc.length){ b5Bad++; note('B5', where + ' [' + pc.join('] [') + ']'); }
     } else {
       if((day.sections || []).some(s => POWER_CORE_RX.test(s.coreHeader || ''))) cPowCore++;
-      if(PAIR && bday && JSON.stringify(day) !== JSON.stringify(stripCarry(bday))){ c2Bad++; note('C2', where + '\n      V208 ' + shape(bday) + '\n      now  ' + shape(day)); }
     }
   }
 }
@@ -273,21 +249,10 @@ ok('K0 no long-run day on any tier carries a carry item, whatever section it rid
        m0 === 56.4 && handTier(d0.cardio) === 'B' && carryN(d0) === 0 && shape(d0) === '[Strength] Dips, Inverted rows (rings)',
        m0 + ' min, tier ' + handTier(d0.cardio) + ', ' + carryN(d0) + ' carry, ' + shape(d0));
   }
-  if(PAIR){
-    const b = IB.buildProgram(cl(cc)).weeks[6].fri;
-    const hid = (b.sections || []).filter(s => !/carry/i.test(s.label || '') && (s.items || []).some(i => CARRY_RX.test(i.name || '')));
-    ok('K2 on V208 the same day dealt its carries inside a section whose label never says carry (the premise is live)',
-       hid.length > 0 && hid.some(s => (s.label || '') === '' && /^Core /.test(s.coreHeader || '')), shape(b));
-  } else skipRow('K2 scoped to the D140 build pair (candidate 209, baseline 208); this run is ' + VER + ' vs ' + (IB ? IB.version : 'no baseline'));
+  // K2 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D140's premise: on V208 the carry case dealt its carries in a section whose label never says carry.
 }
 
-// ── pair rows: what D140 must not move ──────────────────────────────────────────────────
-if(PAIR){
-  ok('C2 every tier C long-run day is exactly the day V208 dealt, less its carries (' + den('C') + ')', c2Bad === 0, c2Bad + ': ' + bad.C2.join(' | '));
-  ok('N1 every non-long day is exactly the day V208 dealt (' + nonLong + ' days)', n1Bad === 0, n1Bad + ': ' + bad.N1.join(' | '));
-  ok('L1 D140 moved long-run days on both limbs and V208 dealt carries on them (moved NSW ' + moved.NSW + ', NRC ' + moved.NRC + '; V208 carry items ' + baseCarry + ')',
-     moved.NSW > 0 && moved.NRC > 0 && baseCarry > 0, JSON.stringify(moved) + ' carry ' + baseCarry);
-} else ['C2','N1','L1'].forEach(r => skipRow(r + ' scoped to the D140 build pair (candidate 209, baseline 208); this run is ' + VER + ' vs ' + (IB ? IB.version : 'no baseline')));
+// C2, N1 and L1 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D140: tier C long-run days are V208's less carries, non-long days are V208's, and D140 moved long-run days on both limbs.
 
 // ── M1 HALF_MANNY ─────────────────────────────────────────────────────────────────────
 // V231 (absorb ruling section 4, tests/measure/v231_rulings/v231_absorb_ruling.md; standing rulings

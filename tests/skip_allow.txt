@@ -1,0 +1,10 @@
+# tests/skip_allow.txt: the rows allowed to print SKIP or SCOPED OUT at the candidate's version (CLAUDE.md Proof scope,
+# Version scope). A row that prints SKIP or SCOPED OUT in gate.sh is red unless a line here names it; read by
+# `node tests/rows.js check <manifest> <dir> --allow tests/skip_allow.txt`.
+# Format, one row per line:   <gate> <key>  # cause
+#   <gate>  the gate file, e.g. g210_equipment_denials.js (the .js may be left off)
+#   <key>   the row's key as `node tests/rows.js parse` prints it; a row with no key cannot be listed (convert its gate
+#           to tests/status.js first)
+#   cause   the missing input that keeps the row from running, never a version
+# No blanket entries: no wildcard, one gate and one row per line. An entry that matches no SKIP or SCOPED OUT line is
+# stale, and stale is red.

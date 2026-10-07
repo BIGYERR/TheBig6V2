@@ -15,7 +15,7 @@
 //
 // TIMEZONE. Test weeks are counted across both 2026-11-01 (fall back) and 2027-03-14 (spring forward). This file is a
 // PARENT that spawns itself twice, once under TZ=America/New_York and once under TZ=UTC, and sums the two children.
-// Every row prints once per zone, tagged [NY] or [UTC]. A child that dies or prints no CHILD summary is a named FAIL.
+// Every row prints once per zone, keyed <row>.NY or <row>.UTC (tests/status.js). A child that dies or prints no CHILD summary is a named FAIL.
 //
 // CLOCK. Each child pins Date() with no argument and Date.now to Tue 2026-09-22 21:16 local (M7/M8's clock) before
 // the VM is built. Dated constructors are untouched.
@@ -128,12 +128,11 @@
 // controls R4D, R4B (D183's copy) and R5 (g203 reads 92/98 there) FAIL too; Z*, R3S, R6N and NRC0 pass. On the tree
 // with (a)(b) landed and (c) not, R1, R2, R3, R4, R6 and R6S FAIL and R3S, R4D, R4B, R5 and R6N pass.
 'use strict';
-const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process'), vm = require('vm');
+const fs = require('fs'), path = require('path'), cp = require('child_process'), vm = require('vm');
 const H = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
-const BASEARG = process.argv[3] ? path.resolve(process.argv[3]) : null;
-const ERA = 223, PREV = 222, PREV_COMMIT = '2694374';
+const ERA = 223;
 const ZONES = [['NY', 'America/New_York'], ['UTC', 'UTC']];
 
 const ROWS = {
@@ -144,32 +143,40 @@ const ROWS = {
   B1248: 'B1248 test weeks 1..26 on M8\'s 4/5 cell: header == name step == generate screen == built length == hand week',
   K27: 'K27 test weeks 27..30: the interim sentence exact, header == name step == generate screen == built == goal length, no TIME TRIAL',
   P1: 'P1 one predicate: NSW_TABLE6_INT.length - 1 once in code, inside progTestPin; no <= len / <= totalWeeksPreview / <= recommended gate',
-  R1: 'R1 (c\') resolver lattice, 120,050 points: the 1,206 (c) points keep start == entered with holdsTest true, moved-not-(c) 0; blast radius vs V222: every non-(c) return and every 2-argument return byte-equal to V222',
+  R1: 'R1 (c\') resolver lattice, 120,050 points: the 1,206 (c) points keep start == entered with holdsTest true, moved-not-(c) 0',
   R2: 'R2 (c\') builds on the (c) cells (1.5 mi goal x 3 experience): start == entered, tw 1, totalWeeks 1, the one trial on the test weekday, 0 train days start..test-1, 0 after the test in W1',
   R3: 'R3 (c\') name step on the (c) cells, entered ==, > and < today: the Q2 sentence with the gate\'s own Intl date of the entered day, non-empty, no "today", "this week" or U+2014',
   R3S: 'R3S CONTROL: the snap cell (entered Thu 2026-09-24, rest thu..sun, test Tue 2026-09-29) still prints the V222 snap sentence',
   R4: 'R4 (c\') step-3 callout on the (c) cells: var(--signal), 0 <svg, opens with the Q3 sentence, no "Primer" or "shakeout"',
   R4D: 'R4D CONTROL: cell D (today Mon, start today, rest sun, test Thu) still opens with the V222 tw 1 sentence',
   R4B: 'R4B CONTROL: cell B first pass (today Mon 2026-09-21, no start chosen, test Sat 2026-10-10) still prints "week 3"',
-  R5: 'R5 CONTROL: HALF_MANNY 0ac7da6b1691a8e1, g203 98/98 (the 210 NRC builds vs V222 are NRC0\'s; the pre-(c) comparison is tests/measure/v223_testlen_r5_blast.out.txt)',
   R6: 'R6 (c\') setProgStart into a (c) week (==, >, < today): startDate == entered, _testWeek 1, _raceDateCappedWeeks 1, the Q4 toast, no U+2014',
   R6S: 'R6S setProgStart into a snap week without the test: snaps to the next Monday with the de-dashed snap toast',
   R6N: 'R6N CONTROL (the _rsRace guard): HALF_MANNY\'s goal, rest thu..sun, re-dated to race-week Thursday still snaps',
-  NRC0: 'NRC0 CONTROL (blast radius vs V222): M7\'s 210 race and run_base builds digest-identical to V222, HALF_MANNY 0ac7da6b1691a8e1',
 };
 const ROW_KEYS = Object.keys(ROWS);
-const isControl = key => /^Z/.test(key) || ['NRC0', 'R3S', 'R4D', 'R4B', 'R5', 'R6N'].includes(key);
-const PAIR_ONLY = ['NRC0', 'R5'];                                                   // blast-radius rows scoped to this build's pair
+const isControl = key => /^Z/.test(key) || ['R3S', 'R4D', 'R4B', 'R6N'].includes(key);
+// Row ids (tests/status.js; CLAUDE.md Proof scope, Row manifest): every row prints once per zone, keyed <row>.<zone>
+// (Z0.NY, Z0.UTC). RD carries no digit, so its id adds one (RD0) and
+// the label keeps the row name. CHILD0.<zone> is the parent's check that the zone's
+// child ran every row and printed its CHILD summary.
+const RID = { RD: 'RD0' };
+const rowId = (key, tag) => (RID[key] || key) + '.' + tag;
+const childId = tag => 'CHILD0.' + tag;
 const stampOf = f => +((fs.readFileSync(f, 'utf8').match(/<meta name="ia-version" content="(\d+)"/) || [])[1]);
 
 // ═════════════════════════════════════════════ PARENT ═════════════════════════════════════════════
 if(!process.env.G184_ZONE){
-  let pass = 0, fail = 0;
-  const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
-  let tmpBase = null;
-  const done = () => { if(tmpBase){ try { fs.unlinkSync(tmpBase); } catch(e){} } console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
+  const S = require('../status')('g223_d184_testlen.js');
+  const DECL = [];   // [id, label]: every (row, zone), then the zone's child check; declared here, where the one summary runs
+  for(const [tag, tz] of ZONES){
+    for(const k of ROW_KEYS) DECL.push([rowId(k, tag), ROWS[k]]);
+    DECL.push([childId(tag), 'child under TZ=' + tz + ' ran every row and printed its CHILD summary']);
+  }
+  S.declare(DECL.map(d => d[0]));
+  const failAll = (why, detail) => { for(const [id, l] of DECL) S.fail(id, l + ' (' + why + ')', detail); S.summary(); };
   let STAMP = NaN;
-  try { STAMP = stampOf(ART); H.load(ART); } catch(e){ ok('boot: the candidate loads in the harness', false, e.message); done(); }
+  try { STAMP = stampOf(ART); H.load(ART); } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
   let VER = STAMP;
   if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
@@ -177,63 +184,40 @@ if(!process.env.G184_ZONE){
   console.log('g223 D184 testlen | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
   if(!(VER >= ERA)){
     console.log('REFUSED: ia-version ' + VER + ' predates D184 P-TESTLEN (V' + ERA + '). No row may pass on it.');
-    for(const [tag] of ZONES) for(const k of ROW_KEYS) ok('[' + tag + '] ' + ROWS[k] + ' (REFUSED)', false);
-    done();
+    failAll('REFUSED');
   }
-  // The V222 baseline for NRC0 (pair-scoped: only at 223).
-  const pair = VER === ERA;
-  let basePath = '', baseWhy = '';
-  if(pair){
-    if(BASEARG && fs.existsSync(BASEARG) && stampOf(BASEARG) === PREV){ basePath = BASEARG; baseWhy = 'argv[3] ' + path.basename(BASEARG); }
-    else {
-      baseWhy = BASEARG ? 'argv[3] ' + path.basename(BASEARG) + ' is not ia-version ' + PREV + '; ' : '';
-      try {
-        tmpBase = path.join(os.tmpdir(), 'g223_d184_v222_' + process.pid + '.html'); try { fs.unlinkSync(tmpBase); } catch(e){}
-        fs.writeFileSync(tmpBase, cp.execFileSync('git', ['-C', ROOT, 'show', PREV_COMMIT + ':index.html'], { maxBuffer: 1 << 27 }));
-        if(stampOf(tmpBase) === PREV){ basePath = tmpBase; baseWhy += 'git ' + PREV_COMMIT; } else baseWhy += 'git copy reads ' + stampOf(tmpBase);
-      } catch(e){ baseWhy += 'git show failed: ' + String(e.message).slice(0, 80); }
-    }
-    console.log('NRC0 baseline: ' + (basePath ? baseWhy : 'NONE (' + baseWhy + ')'));
-  }
-  // R5 (pair-scoped): g203, the lighter choice, run once here, its summary handed to both children.
-  let g203 = '';
-  if(pair){
-    const gr = cp.spawnSync(process.execPath, [path.join(__dirname, 'g203_mile_pencil.js'), ART], { env: process.env, encoding: 'utf8', maxBuffer: 1 << 26 });
-    const gs = [...String(gr.stdout || '').matchAll(/^PASS (\d+) FAIL (\d+)\s*$/mg)].pop();
-    g203 = gs ? 'PASS ' + gs[1] + ' FAIL ' + gs[2] : 'NO SUMMARY (exit ' + gr.status + ')';
-    console.log('R5 g203_mile_pencil.js, run once by the parent: ' + g203);
-  }
-  const want = ROW_KEYS.filter(k => pair || !PAIR_ONLY.includes(k));
+  // The V222 loader and `pair` (D184's build pair, 223 vs 222: NRC0 and R1's blast-radius part read them) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
+  const want = ROW_KEYS;
   for(const [tag, tz] of ZONES){
     console.log('\n-- TZ=' + tz + ' [' + tag + '] --');
     const r = cp.spawnSync(process.execPath, [__filename, ART], { env: Object.assign({}, process.env,
-      { TZ: tz, G184_ZONE: tag, G184_VER: String(VER), G184_PAIR: pair ? '1' : '', G184_BASE: basePath, G184_BASE_WHY: baseWhy,
-        G184_G203: g203 }),
+      { TZ: tz, G184_ZONE: tag }),
       encoding: 'utf8', maxBuffer: 1 << 26 });
     const out = r.stdout || '';
     for(const line of out.split('\n')){
-      const m = /^(PASS|FAIL) (\[(\w+)\] (\w+) .*)$/.exec(line);
-      if(m){ if(m[3] === tag && ROWS[m[4]]) (m[1] === 'PASS' ? pass++ : fail++); console.log(line); }
+      const m = /^(PASS|FAIL) (\S+) (.*)$/.exec(line);
+      if(m && S.ID_RE.test(m[2])) (m[1] === 'PASS' ? S.pass(m[2], m[3]) : S.fail(m[2], m[3]));   // the child's status line, printed here by id
       else if(line.trim() && !/^CHILD /.test(line)) console.log('  ' + line);
     }
     if(r.stderr && r.stderr.trim()) console.log('  stderr: ' + r.stderr.trim().split('\n').slice(-4).join(' | '));
     const s = /^CHILD (\w+) PASS (\d+) FAIL (\d+)\s*$/m.exec(out);
-    const seen = want.filter(k => new RegExp('^(PASS|FAIL) \\[' + tag + '\\] ' + k + ' ', 'm').test(out));
-    ok('[' + tag + '] child under TZ=' + tz + ' ran every row and printed its CHILD summary (exit ' + r.status + ')',
-       !!s && s[1] === tag && seen.length === want.length && +s[2] + +s[3] === want.length,
-       (s ? s[0] : 'no CHILD summary') + '; rows seen ' + seen.length + '/' + want.length);
+    const seen = want.filter(k => new RegExp('^(PASS|FAIL) ' + rowId(k, tag).replace(/\./g, '\\.') + ' ', 'm').test(out));
+    S.check(childId(tag), !!s && s[1] === tag && seen.length === want.length && +s[2] + +s[3] === want.length,
+       'child under TZ=' + tz + ' ran every row and printed its CHILD summary (exit ' + r.status + ')',
+       'got ' + (s ? s[0] : 'no CHILD summary') + '; rows seen ' + seen.length + '/' + want.length);
   }
-  done();
+  S.summary();
 }
 
 // ═════════════════════════════════════════════ CHILD ══════════════════════════════════════════════
-const TAG = process.env.G184_ZONE, VER = +process.env.G184_VER, PAIR = process.env.G184_PAIR === '1';
+const TAG = process.env.G184_ZONE;
+const CS = require('../status')('g223_d184_testlen.js child ' + TAG);   // this zone's emitter: the parent declares every id and prints the one summary
 let cpass = 0, cfail = 0;
 function row(key, bad, total, note){
-  const label = '[' + TAG + '] ' + ROWS[key];
+  const id = rowId(key, TAG), label = ROWS[key];
   const good = bad.length === 0 && total > 0;
-  if(good){ cpass++; console.log('PASS ' + label + ' (' + total + '/' + total + ' cells' + (note ? '; ' + note : '') + ')'); }
-  else { cfail++; console.log('FAIL ' + label + ' (' + (total - bad.length) + '/' + total + ' cells' + (note ? '; ' + note : '') + '; ' + bad.slice(0, 4).join(' | ') + (bad.length > 4 ? ' | +' + (bad.length - 4) + ' more' : '') + ')'); }
+  if(good){ cpass++; CS.pass(id, label + ' (' + total + '/' + total + ' cells' + (note ? '; ' + note : '') + ')'); }
+  else { cfail++; CS.fail(id, label, (total - bad.length) + '/' + total + ' cells' + (note ? '; ' + note : '') + '; ' + bad.slice(0, 4).join(' | ') + (bad.length > 4 ? ' | +' + (bad.length - 4) + ' more' : '')); }
 }
 
 // ── the hand oracle: integers only ────────────────────────────────────────────────────────────────
@@ -517,15 +501,12 @@ guard('R1', () => {
   const RULED_REST = { 'thu..sun':580, 'fri,sat,sun':344, 'sat,sun':170, sun:56, 'sun,wed':56 };   // typed from the ruling
   if(!(LAT.length === 120050 && CC.length === 1206 && seg['=='] === 42 && seg['>'] === 1134 && seg['<'] === 30 && J(byRest) === J(Object.fromEntries(Object.keys(byRest).map(k => [k, RULED_REST[k]]))) && Object.keys(byRest).length === 5))
     bad.push('oracle vs the ruling: points ' + LAT.length + ' (c) ' + CC.length + ' segments ' + J(seg) + ' by rest ' + J(byRest));
-  const BP = PAIR ? process.env.G184_BASE : '';
-  let B = null;
-  if(PAIR){ if(!BP) bad.push('no V222 baseline (' + process.env.G184_BASE_WHY + '): the blast-radius part did not run, not a pass'); else B = mkVM(BP); }
-  let cOk = 0, eqV = 0, eq2 = 0, movedV = 0, moved = 0, cMovedV = 0, selfOk = 0; const seenB = new Set();
+  // R1's blast-radius part (D184's build pair: every non-(c) and 2-argument return byte-equal to V222) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
+  let cOk = 0, moved = 0;
   for(const gl of Object.keys(GOALS_C)) for(let wd = 0; wd < 7; wd++){
     const today = addDays(W1MON, wd), chunk = LAT.filter(x => x.gl === gl && x.today === today), pts = chunk.map(x => [x.start, x.rk, x.race]);
     setToday(today);
-    const cr = callAll(V, pts), br = B ? callAll(B, pts) : null;
-    if(br){ if(J(br) === J(callAll(B, pts))) selfOk++; else bad.push('the V222 baseline does not equal itself on ' + gl + ' today ' + today); for(const q of br) seenB.add(q[0]); }
+    const cr = callAll(V, pts);
     chunk.forEach((x, i) => {
       const why = [], c3 = cr[i][0], c2 = cr[i][1], r3 = JSON.parse(c3), r2 = JSON.parse(c2);
       if(x.c){ if(r3.start === x.start && r3.holdsTest === true) cOk++; else why.push('(c) point returns ' + c3); }
@@ -533,19 +514,11 @@ guard('R1', () => {
         if('holdsTest' in r3) why.push('holdsTest on a non-(c) point: ' + c3);
         if(r3.start !== r2.start){ moved++; why.push('moved by the test date ' + r2.start + ' -> ' + r3.start); }
       }
-      if(br){ const b3 = br[i][0], b2 = br[i][1];
-        if(c2 === b2) eq2++; else why.push('2-argument return ' + c2 + ' vs V222 ' + b2);
-        if(!x.c){ if(c3 === b3) eqV++; else { why.push('return ' + c3 + ' vs V222 ' + b3); if(r3.start !== JSON.parse(b3).start) movedV++; } }
-        else if(r3.start !== JSON.parse(b3).start) cMovedV++;
-      }
       if(why.length) bad.push(gl + ' ' + tagC(x) + ': ' + why.join('; '));
     });
   }
-  if(B && seenB.size < 2) bad.push('the V222 returns are not input-sensitive (' + seenB.size + ' distinct): an empty diff proves nothing');
-  const nonC = LAT.length - CC.length;
   row('R1', bad, LAT.length + 1, 'oracle (c) ' + CC.length + ' = ' + seg['=='] + ' ==, ' + seg['>'] + ' >, ' + seg['<'] + ' <; (c) start == entered with holdsTest ' + cOk + '/' + CC.length
-    + '; moved-not-(c) ' + moved + (B ? '; blast radius vs V222 (' + (process.env.G184_BASE_WHY || '') + '; baseline self-equal ' + selfOk + '/14 chunks, ' + seenB.size + ' distinct returns): non-(c) byte-equal ' + eqV + '/' + nonC + ', 2-argument byte-equal ' + eq2 + '/' + LAT.length
-      + ', moved-not-(c) vs V222 ' + movedV + ', (c) moved vs V222 ' + cMovedV : PAIR ? '' : '; blast radius vs V222 SCOPED OUT (candidate ' + VER + ', not ' + ERA + ' vs ' + PREV + ')'));
+    + '; moved-not-(c) ' + moved);
 });
 
 // ── R2 builds on the (c) cells ──
@@ -713,43 +686,6 @@ guard('R6N', () => {
   row('R6N', bad, 1, 'snap to ' + want);
 });
 
-// ── R5 CONTROL HALF_MANNY and g203 (pair-scoped). The 210 NRC builds vs V222 are NRC0's; the pre-(c) comparison
-// was a one-time proof (tests/measure/v223_testlen_r5_blast.js, output in tests/measure/v223_testlen_r5_blast.out.txt). ──
-if(!PAIR) console.log('SCOPED OUT [' + TAG + '] ' + ROWS.R5 + ': the pair is candidate ' + VER + ', not ' + ERA + ' vs ' + PREV);
-else guard('R5', () => {
-  const bad = [];
-  let hm = 'none'; { const R2 = globalThis.Date; globalThis.Date = RD0; try { hm = H.progDigest(H.load(ART).buildProgram(clone(H.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; } globalThis.Date = R2; }
-  if(hm !== '0ac7da6b1691a8e1') bad.push('HALF_MANNY ' + hm + ' want 0ac7da6b1691a8e1');
-  const g203 = process.env.G184_G203 || 'NO SUMMARY';
-  if(g203 !== 'PASS 98 FAIL 0') bad.push('g203_mile_pencil.js ' + g203 + ' want PASS 98 FAIL 0');
-  row('R5', bad, 2, 'HALF_MANNY ' + hm + '; g203 ' + g203 + ' (run once by the parent)');
-});
-
-// ── NRC0 blast radius vs V222 (pair-scoped) ──
-if(!PAIR) console.log('SCOPED OUT [' + TAG + '] ' + ROWS.NRC0 + ': the pair is candidate ' + VER + ', not ' + ERA + ' vs ' + PREV);
-else {
-  const bad = []; let n = 0, distinct = 0, selfOk = 0;
-  const BP = process.env.G184_BASE;
-  if(!BP) bad.push('no V222 baseline (' + process.env.G184_BASE_WHY + '): a claim that did not run is not a pass');
-  else {
-    const B = mkVM(BP), seen = new Set();
-    const one = (VM, o) => { setWD(VM, o); const g = gen(VM); return g.err ? 'ERR ' + g.err : H.progDigest(g.p); };
-    for(const gid of ['run_5k', 'run_10k', 'run_half', 'run_marathon', 'run_base']) for(const exp of ['beginner', 'intermediate', 'advanced']) for(const mile of [null, 480]) for(const k of [4, 8, 12, 16, 20, 26, 30]){
-      n++;
-      const o = { primaryPath:'event', cardioTypes:['run'], experience:exp, ageBracket:'18-35', eventTargeted:true, raceDate:thuOfWeek(k), liftingFocus:'support_prevention',
-        equipment:'crossfit', restDays:['sun','wed'], unit:'lbs', seed:4242, name:'M', cardioGoals:{ run:Object.assign({ id:gid, label:'x', paceUnit:'mi' }, mile ? { mileBestMins:'8', mileBestSecs:'00' } : {}) } };
-      const b1 = one(B, o), b2 = one(B, o), c = one(V, o), tag = gid + ' ' + exp + ' mile ' + (mile ? '8:00' : 'none') + ' k' + k;
-      if(!/^[0-9a-f]{16}$/.test(b1) || b1 !== b2){ bad.push(tag + ': the baseline does not equal itself ' + b1 + '/' + b2); continue; }
-      selfOk++; seen.add(b1);
-      if(c !== b1) bad.push(tag + ': ' + c + ' vs V222 ' + b1);
-    }
-    distinct = seen.size;
-    if(distinct < 2) bad.push('the 210 baseline digests are not input-sensitive (' + distinct + ' distinct): an empty diff proves nothing');
-  }
-  n++;
-  let hm = 'none'; { const R2 = globalThis.Date; globalThis.Date = RD0; try { hm = H.progDigest(H.load(ART).buildProgram(clone(H.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; } globalThis.Date = R2; }
-  if(hm !== '0ac7da6b1691a8e1') bad.push('HALF_MANNY ' + hm + ' want 0ac7da6b1691a8e1');
-  row('NRC0', bad, n, 'baseline ' + (process.env.G184_BASE_WHY || 'none') + '; baseline self-equal ' + selfOk + '/210, ' + distinct + ' distinct digests; HALF_MANNY ' + hm);
-}
+// R5 and NRC0 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D184 (P-TESTLEN) on its build pair (223 vs 222): R5 the HALF_MANNY digest and g203 98/98, NRC0 M7's 210 race and run_base builds digest-identical to V222.
 
 console.log('CHILD ' + TAG + ' PASS ' + cpass + ' FAIL ' + cfail);

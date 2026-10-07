@@ -94,7 +94,6 @@
 const path = require('path');
 const { load, progDigest, MANNY_DIGEST_BY_VERSION, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version;
 const D70C_ERA = 210;
@@ -127,7 +126,7 @@ function summary(){
 }
 if(!(VER >= D70C_ERA)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D70c (V' + D70C_ERA + ').');
-  ['O1','O2f','O2x','O3a','O3n','O3b','O3g','O3g5','O3r','O3z','O4a','O4b','O4t','O4g','O5a','O5b','O5c','O5d','O5e',"O5d'",'O5g','O6','O6u','O6r']
+  ['O1','O2f','O2x','O3a','O3n','O3b','O3g','O3g5','O3r','O3z','O4a','O4b','O4t','O4g','O5a','O5c','O5d','O5e',"O5d'",'O5g','O6','O6u','O6r']
     .forEach(r => skipRow(r + ' skipped below the D70c era'));
   summary();
 }
@@ -220,7 +219,7 @@ const clean = n => String(n == null ? '' : n).replace(/<svg[\s\S]*?<\/svg>\s*/g,
 const SURF2 = /^Secondary compound|^(Arms?|Delts?) finisher/i;
 const RENAMED = new Set(['Cable pushdown']);   // injuryPlan elbow workaround swapNames target (D154)
 const bump = (o, k, n = 1) => { o[k] = (o[k] || 0) + n; };
-const B = { S1:{}, S2:{}, G:{}, G5:{}, R:{}, ALL:{} }, NAMES = {}, SECS = {};
+const B = { S1:{}, S2:{}, G:{}, G5:{}, R:{}, ALL:{} }, NAMES = {};
 const U = { size:{}, bad:{}, ghd:{}, badNames:{} };           // O4a
 const SW = { calls:{}, cands:{}, bad:{}, ghd:{}, badNames:{} }; // O4b
 const IMPL = /barbell|dumbbell|cable|machine|pec deck|leg press|hack squat|glute-ham|preacher|pulldown|face pull|smith/i;
@@ -237,12 +236,11 @@ let builds = 0, crash = 0, undef = 0, swCrash = 0, olderHyp = { crossfit:{}, hom
 for(const C of cells){
   let p; try { p = IA.buildProgram(C.cfg); } catch(e){ crash++; continue; }
   builds++;
-  const sc = [];
   const renamerCell = C.inj && C.inj.region === 'elbow' && C.inj.tier === 'workaround';
   const literalCell = C.inj && C.inj.tier === 'protect' && (C.inj.region === 'ankle' || C.inj.region === 'hip');
   const swapThis = !C.inj && C.si < 2, asked = new Set();
   Object.keys(p.weeks || {}).forEach(w => DAYS.forEach(d => {
-    const day = p.weeks[w][d]; sc.push(day && day.sections ? day.sections.length : -1);
+    const day = p.weeks[w][d];
     (day && day.sections || []).forEach(s => (s.items || []).forEach(it => {
       const raw = it && it.name, n = clean(raw);
       if(raw == null || !n || /\bundefined\b|\bnull\b|\bNaN\b/.test(n)){ undef++; return; }
@@ -264,7 +262,6 @@ for(const C of cells){
       }
     }));
   }));
-  SECS[C.k] = sc.join(',');
   universe(p, C.eq, U);
 }
 console.log('lattice: ' + builds + ' of ' + cells.length + ' built, ' + crash + ' crashed');
@@ -376,46 +373,7 @@ const mk2 = (eq, f, e, a, seed, inj) => { const c = mk(eq, f, e, a, 0, inj); c.s
   const leaks = prog ? plans.filter(([r, t]) => offer({ injury:{ region:r, tier:t } })).map(x => x.join('-')) : ['no fixture'];
   ok("O5g the swap sheet's injury test withholds the front squat under every shoulder and elbow plan (control: offered with no plan)",
      prog !== null && control === true && leaks.length === 0, 'seed ' + seedUsed + ', main ' + clean(main) + ', control ' + control + ', offered under ' + (leaks.join(', ') || 'none')); }
-if(BASEFILE){
-  const BA = load(BASEFILE);
-  if(VER === D70C_ERA && +BA.version === D70C_ERA - 1){
-    const stem = s => String(s.label || s.coreHeader || '').split(' — ')[0];
-    const nm = s => (s.items || []).map(i => clean(i && i.name));
-    const card = day => (day && day.sections || []).map(s => '      [' + (s.label || s.coreHeader || '') + '] ' + nm(s).join(' | ')).join('\n');
-    const cnt = day => day && day.sections ? day.sections.length : -1;
-    let diffCfg = 0, rise = 0, fall = 0, bad = 0, bcrash = 0; const badAt = [];
-    for(const C of cells){ let pb; try { pb = BA.buildProgram(C.cfg); } catch(e){ bcrash++; continue; }
-      const sc = []; Object.keys(pb.weeks || {}).forEach(w => DAYS.forEach(d => sc.push(cnt(pb.weeks[w][d]))));
-      if(sc.join(',') === SECS[C.k]) continue;
-      diffCfg++;
-      const pc = IA.buildProgram(C.cfg);
-      let ph = null; if(C.inj){ const h = JSON.parse(JSON.stringify(C.cfg)); delete h.injury; ph = IA.buildProgram(h); }
-      Object.keys(pc.weeks || {}).forEach(w => DAYS.forEach(d => {
-        const x = pb.weeks[w] && pb.weeks[w][d], y = pc.weeks[w][d], nx = cnt(x), ny = cnt(y);
-        if(nx === ny) return;
-        let verdict, fine;
-        if(ny > nx){
-          const nh = ph ? cnt(ph.weeks[w] && ph.weeks[w][d]) : null;
-          fine = ph !== null && ny === nh;
-          verdict = fine ? 'RISE to the same config’s healthy count (' + nh + ')' : 'RISE NOT EXCUSED (healthy count ' + nh + ')';
-          if(fine) rise++;
-        } else {
-          const left = (y.sections || []).map(stem), yNames = new Set((y.sections || []).flatMap(nm)), lost = [];
-          (x.sections || []).forEach(s => { const i = left.indexOf(stem(s)); if(i >= 0) left.splice(i, 1); else lost.push(s); });
-          fine = left.length === 0 && lost.length === nx - ny && lost.every(s => nm(s).length > 0 && nm(s).every(n => yNames.has(n)));
-          verdict = fine ? 'FALL by same-card duplicate collapse (' + lost.map(s => stem(s) + ': ' + nm(s).join('+')).join('; ') + ')'
-                         : 'FALL NOT EXCUSED (lost ' + lost.map(stem).join(', ') + '; gained ' + left.join(', ') + ')';
-          if(fine) fall++;
-        }
-        if(!fine){ bad++; if(badAt.length < 4) badAt.push(C.k + ' W' + w + ' ' + d); }
-        console.log('  O5b card ' + C.k + ' W' + w + ' ' + d + ': sections ' + nx + ' -> ' + ny + ', ' + verdict);
-        console.log('    V209:\n' + card(x) + '\n    candidate:\n' + card(y));
-      }));
-    }
-    ok('O5b section counts equal V209’s per config and day, except a rise to the healthy count or a fall by same-card duplicate collapse (3,000 configs)',
-       bad === 0 && bcrash === 0, diffCfg + ' configs differ; ' + rise + ' rises, ' + fall + ' falls excused; ' + bad + ' not excused ' + badAt.join(' ; ') + '; ' + bcrash + ' baseline crashes');
-  } else skipRow('O5b section counts vs V209: pair ' + VER + '/' + BA.version + ' is not the 210/209 build pair');
-} else skipRow('O5b section counts vs V209: no baseline given');
+// O5b (D70c: section counts equal V209's per config and day, the 210/209 build pair) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 
 // ── O6: HALF_MANNY ───────────────────────────────────────────────────────────────────────
 // V231 (absorb ruling section 4, tests/measure/v231_rulings/v231_absorb_ruling.md; standing rulings

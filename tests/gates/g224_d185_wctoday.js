@@ -79,26 +79,7 @@ const V224_BLOCK = [
   '.wc-mark-w{font-family:var(--font-display);font-weight:800;font-size:11px;letter-spacing:0;}',
 ];
 const V224_NAMES = ['.wk-day-num .chk', '.wk-day-num .wc-mark', '.wc-mark base', 'the D185 rule', '.wc-mark-w'];
-// Positional rows: the V224 layout premise (standing ruling 4), scoped to ia-version <= 231 (V232 D199, session
-// call 17). Indices are NOT re-pointed (standing ruling 3). Above 231 each prints a SKIP: never PASS, never FAIL.
-const POSITIONAL_MAX_V = 231;
-const POSITIONAL = [   // [label, 0-based line index in the V224 layout]
-  ['line 643 unchanged (.wk-day-num .chk)', 642],
-  ['line 644 unchanged (.wk-day-num .wc-mark)', 643],
-  ['line 645 unchanged (.wc-mark base)', 644],
-  ['line 646 is the new D185 rule (inserted immediately after :645)', 645],
-  ['line 647 unchanged (.wc-mark-w), pushed down by exactly one', 646],
-];
-const POSITIONAL_SKIP_WHY = 'scoped to ia-version <= ' + POSITIONAL_MAX_V + ', the V224 layout premise (standing ruling 4); '
-  + "V232's D199 `.iaw-solo` CSS (6 lines at :335) shifted the block by 6 lines; the position-free successor rows 1b "
-  + 'below carry the claim (session call 17). Never PASS, never FAIL.';
-const lines = SRC.split('\n');
-let skip1 = 0;
-POSITIONAL.forEach(([label, ix], k) => {
-  if (artifactV <= POSITIONAL_MAX_V) eq(label, lines[ix], V224_BLOCK[k]);
-  else { skip1++; console.log('  SKIP ' + label + ' at ia-version ' + artifactV + ': ' + POSITIONAL_SKIP_WHY); }
-});
-if (skip1) console.log('  ' + skip1 + ' positional rows SKIPPED at ia-version ' + artifactV + ', counted in neither PASS nor FAIL');
+// The five positional rows ("line 643".."line 647", the V224 layout premise, dark from `artifactV <= 231` by V232 D199 call 17) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). 1b carries the claim.
 
 // ── 1b. position-free successor (V232 D199, session call 17): the same five lines, located by content ──
 const styleText = [...SRC.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map(m => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');

@@ -134,8 +134,14 @@ function grab(src,name){const sig='function '+name+'(';const i=src.indexOf(sig);
     if(c==='{')d++;else if(c==='}'){d--;if(d===0)return src.slice(i,k+1);}}
   throw new Error('unbalanced '+name);}
 const parts=['const ALL_DAYS_ORDER='+JSON.stringify(DAYS)+';'];
-['isSpeedGoal','getNRCSessionTypes','getSessionTypes','_nrcSpacedRunDays'].forEach(n=>parts.push(grab(SRC,n)));
-const ctx={out:null};vm.runInNewContext(parts.join('\n')+'\nout={c:_nrcSpacedRunDays,gs:getSessionTypes};',ctx);
+const ctx={out:null};
+// A source anchor grab() cannot find (or cannot balance) is a NAMED FAIL with the summary
+// printed, never a throw (post-V233, Mario: "Kill the noise"). The row prints only when
+// it fails, so a green run's output is unchanged.
+try {
+  ['isSpeedGoal','getNRCSessionTypes','getSessionTypes','_nrcSpacedRunDays'].forEach(n=>parts.push(grab(SRC,n)));
+  vm.runInNewContext(parts.join('\n')+'\nout={c:_nrcSpacedRunDays,gs:getSessionTypes};',ctx);
+} catch(e){ ok('S0 the chooser extracts from the source (isSpeedGoal, getNRCSessionTypes, getSessionTypes, _nrcSpacedRunDays)', false, e.message); summary(1); }
 const ENG=ctx.out.c;
 const eLay=(train,p)=>p.idxs.map(i=>train[i].toUpperCase()+':'+p.typeOf[train[i]]).join(' ');
 

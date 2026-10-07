@@ -32,9 +32,18 @@ const SRC = fs.readFileSync(FILE, 'utf8');
 const IA = load(FILE);
 const applyInjuryFilter = IA.eval('applyInjuryFilter');
 
-let PASS = 0, FAIL = 0;
-const fail = m => { FAIL++; console.log('FAIL ' + m); };
-const pass = m => { PASS++; if (process.env.VERBOSE) console.log('  ok ' + m); };
+// ── ROWS (post-V233 V2: every row prints through tests/status.js; CLAUDE.md Proof scope, Row manifest).
+//   D52-chain   the injury pool-override chain is located in the source
+//   D52-lens    ASSERTION A, one loop row: every named member of an injury-branch pool survives its own overlay
+//   D44-floor   ASSERTION B, one loop row: at every gear tier a pool of two or more leaves two standing
+//   D44-thin    ASSERTION B: a pool authored under two members at some tier is listed in the debt census
+//   D52-lit, D52-lsit, D52-four, D52-whole, D52-single   ASSERTION C, the D52 literal and its draw site
+//   D52-debt    the §12 census, one loop row: every listed debt entry still trips
+// VERBOSE=1 prints each passing sub-result as an INFO line (not a row).
+const S = require('../status')('g193_pool_overlay');
+S.declare(['D52-chain', 'D52-lens', 'D44-floor', 'D44-thin', 'D52-lit', 'D52-lsit', 'D52-four', 'D52-whole',
+  'D52-single', 'D52-debt']);
+const verbose = m => { if (process.env.VERBOSE) S.info('ok ' + m); };
 
 // ── NAMED DEBT. Pre-existing trips live in g193_pool_overlay_debt.txt, which is the §12
 // item: each one is printed with its count on every run, so it is counted and visible
@@ -80,7 +89,8 @@ function gearOK(nm, g){
 
 // ── 1. Carve the injury pool-override chain out of the source. ───────────────
 const START = SRC.indexOf("if(_R==='knee'){");
-if (START < 0) fail('cannot find the injury pool-override chain (anchor "if(_R===\'knee\'){")');
+S.check('D52-chain', START >= 0, 'the injury pool-override chain is located in the source',
+  'cannot find the injury pool-override chain (anchor "if(_R===\'knee\'){")');
 let end = START, depth = 0;
 for (let i = START; i < SRC.length; i++){
   const ch = SRC[i];
@@ -158,6 +168,7 @@ console.log('injury pool assignments found: ' + ASSIGNS.length);
 // survive that branch's own overlay. Tier independent: applyInjuryFilter reads
 // cfg.injury, never cfg.equipment.
 const seenA = Object.create(null);
+const LA = S.loop('D52-lens', "Assertion A, same lens: every named member of an injury-branch pool survives that same plan's applyInjuryFilter");
 for (const a of ASSIGNS){
   if (!a.region || !a.tier) continue;
   const names = new Set();
@@ -178,15 +189,18 @@ for (const a of ASSIGNS){
   for (const nm of names){
     const k = a.region + '/' + a.tier + ' ' + a.name + ' ' + nm;
     if (seenA[k]) continue; seenA[k] = 1;
-    if (survives(nm, a.region, a.tier)){ pass('same-lens ' + k); continue; }
+    if (survives(nm, a.region, a.tier)){ LA.pass('same-lens ' + k); verbose('same-lens ' + k); continue; }
     const dk = 'same-lens ' + a.region + '/' + a.tier + ' ' + a.name + ' ' + nm;
     if (isDebt(dk)) console.log('DEBT ' + dk + '  (pre-existing, see g193_pool_overlay_debt.txt)');
-    else fail('same-lens: ' + a.region + '/' + a.tier + ' ' + a.name + " offers '" + nm +
-              "' and that same plan's applyInjuryFilter removes it");
+    else LA.fail('same-lens: ' + a.region + '/' + a.tier + ' ' + a.name + " offers '" + nm +
+                 "' and that same plan's applyInjuryFilter removes it");
   }
 }
+LA.done();
 
 const thin = Object.create(null);
+const thinBad = [];
+const LB = S.loop('D44-floor', "Assertion B, D44's floor: at every gear tier a pool of two or more members leaves two standing after its own overlay");
 // ── ASSERTION B — D44's FLOOR. At every gear tier the pool must leave two
 // members standing after its own overlay.
 for (const a of ASSIGNS){
@@ -200,36 +214,41 @@ for (const a of ASSIGNS){
       // is not the same defect; it is a pool-authoring question D44 did not rule on.
       const dk = 'thin-pool ' + a.region + '/' + a.tier + ' ' + a.name;
       if (isDebt(dk)) thin[dk] = (thin[dk] || 0) + 1;
-      else fail('thin-pool: ' + a.region + '/' + a.tier + ' ' + a.name + ' on ' + e +
+      else thinBad.push('thin-pool: ' + a.region + '/' + a.tier + ' ' + a.name + ' on ' + e +
                 ' is authored with ' + r.length + ' member(s) and is not in the debt census');
       continue;
     }
-    if (alive.length >= 2) pass('floor ' + a.region + '/' + a.tier + ' ' + a.name + ' ' + e);
-    else fail('floor: ' + a.region + '/' + a.tier + ' ' + a.name + ' on ' + e + ' holds ' +
+    const fk = 'floor ' + a.region + '/' + a.tier + ' ' + a.name + ' ' + e;
+    if (alive.length >= 2){ LB.pass(fk); verbose(fk); }
+    else LB.fail('floor: ' + a.region + '/' + a.tier + ' ' + a.name + ' on ' + e + ' holds ' +
               r.length + ' members and the overlay leaves ' + alive.length +
-              ' — below D44\'s floor of two [' + r.join(', ') + ']');
+              ', below D44\'s floor of two [' + r.join(', ') + ']');
   }
 }
+LB.done();
+S.check('D44-thin', thinBad.length === 0,
+  'Assertion B: every pool authored under two members at some gear tier is listed in the debt census',
+  thinBad.length + ' unlisted: ' + thinBad.slice(0, 3).join('; ') + (thinBad.length > 3 ? '; and ' + (thinBad.length - 3) + ' more' : ''));
 
 // ── ASSERTION C — the D52 literal itself, named, so a rewrite of the parser
 // above can never quietly stop testing the case this gate was written for.
 const lit = SRC.match(/rowPool = hasCables\?\['Straight-arm pulldown'\]:(\[[^\]]*\])/);
-if (!lit) fail('D52: the lowback/protect vertical-pull literal is gone or reshaped');
-else {
+// When the literal is gone the four rows under it do not run, as before; summary() names each as a dark row.
+S.check('D52-lit', !!lit, 'D52: the lowback/protect vertical-pull literal is present in its ruled shape',
+  'the lowback/protect vertical-pull literal is gone or reshaped');
+if (lit){
   const members = JSON.parse(lit[1].replace(/'/g, '"'));
-  if (members.indexOf('L-sit chinups') < 0) pass('D52 literal does not name L-sit chinups');
-  else fail("D52: the lowback/protect vertical-pull literal names 'L-sit chinups', which " +
-            'this same overlay nulls in SPINE_SWAP');
-  if (members.length >= 4) pass('D52 literal holds ' + members.length + ' members');
-  else fail('D52: the lowback/protect vertical-pull literal holds ' + members.length +
-            ' members, under the four its derivation gives');
-  if (/\.filter\(n=>backCompoundPool\.indexOf\(n\)<0\)/.test(SRC))
-    fail('D52: the whole-pool subtraction of backCompoundPool is back; only the DRAWN ' +
-         'backMain may be excluded, and it is excluded at the row-slot draw site');
-  else pass('D52 no whole-pool backCompoundPool subtraction');
-  if (/const _rowSrc0 = \(_inj&&rowPool!==_preInj\.row\)\?\(rowPool\|\|\[\]\)\.filter\(n=>n!==backMain\)/.test(SRC))
-    pass('D52 single-name backMain exclusion present at the row-slot draw site');
-  else fail('D52: the single-name backMain exclusion at the row-slot draw site is gone');
+  S.check('D52-lsit', members.indexOf('L-sit chinups') < 0, 'D52 literal does not name L-sit chinups',
+    "the lowback/protect vertical-pull literal names 'L-sit chinups', which this same overlay nulls in SPINE_SWAP");
+  S.check('D52-four', members.length >= 4, 'D52 literal holds ' + members.length + ' members',
+    'the lowback/protect vertical-pull literal holds ' + members.length + ' members, under the four its derivation gives');
+  S.check('D52-whole', !/\.filter\(n=>backCompoundPool\.indexOf\(n\)<0\)/.test(SRC),
+    'D52 no whole-pool backCompoundPool subtraction',
+    'the whole-pool subtraction of backCompoundPool is back; only the DRAWN ' +
+    'backMain may be excluded, and it is excluded at the row-slot draw site');
+  S.check('D52-single', /const _rowSrc0 = \(_inj&&rowPool!==_preInj\.row\)\?\(rowPool\|\|\[\]\)\.filter\(n=>n!==backMain\)/.test(SRC),
+    'D52 single-name backMain exclusion present at the row-slot draw site',
+    'the single-name backMain exclusion at the row-slot draw site is gone');
 }
 
 // ── THE §12 CENSUS, printed every run with its counts.
@@ -238,15 +257,20 @@ console.log('DEBT census: ' + DEBT.length + ' listed  |  same-lens ' +
   DEBT.filter(d => d.indexOf('same-lens ') === 0).length + '  thin-pool ' +
   DEBT.filter(d => d.indexOf('thin-pool ') === 0).length);
 thinKeys.forEach(k => console.log('DEBT ' + k + '  (' + thin[k] + ' gear tiers)'));
-for (const d of DEBT){
-  if (DEBT_HIT[d]) pass('debt still live: ' + d);
-  else fail('stale debt: "' + d + '" is listed in g193_pool_overlay_debt.txt but no longer ' +
-            'trips. If it was fixed, delete the line and drop the count in the §12 item.');
+// An empty census has nothing to go stale (as before: no row could fail); it still prints its one status line.
+if (!DEBT.length) S.pass('D52-debt', '§12 census: no debt entry is listed for this artifact, so none can go stale');
+else {
+  const LD = S.loop('D52-debt', '§12 census: every entry listed in g193_pool_overlay_debt.txt still trips');
+  for (const d of DEBT){
+    if (DEBT_HIT[d]) LD.pass('debt still live: ' + d);
+    else LD.fail('stale debt: "' + d + '"', 'listed in g193_pool_overlay_debt.txt but no longer ' +
+              'trips. If it was fixed, delete the line and drop the count in the §12 item.');
+  }
+  LD.done();
 }
 
 if (unresolved.length){
   console.log('unresolved assignments (not statically evaluable, NOT counted as passes): ' + unresolved.length);
   unresolved.forEach(u => console.log('   - ' + u));
 }
-console.log('PASS ' + PASS + ' FAIL ' + FAIL);
-process.exit(FAIL ? 1 : 0);
+S.summary();

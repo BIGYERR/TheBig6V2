@@ -52,14 +52,20 @@ const { load } = require(path.resolve(__dirname, '..', 'harness.js'));
 const FILE = process.argv[2] || path.resolve(__dirname, '..', '..', 'index.html');
 const IA = load(FILE);
 
-let PASS = 0, FAIL = 0; const fails = [];
-const ok = () => PASS++;
-const bad = m => { FAIL++; fails.push(m); };
+// Every row prints through the shared status helper tests/status.js (post-V233 V1; CLAUDE.md Proof scope, Row
+// manifest): one status line per declared id.
+const S = require('../status')('g194_implement_and_range');
+S.declare([
+  'R1-ledgerModel', 'R2-mainLiftBlock', 'D53-lbs', 'D53-kg', 'D53-noimpl', 'D53-flat', 'D53-expr', 'D54-copy',
+  'D54-noimpl', 'D54-hyphen', 'D54-branch', 'D54-singlearm', 'D55-primer-ladder', 'D55-primer-range',
+  'D55-lastset', 'D55-ready', 'D55-recency', 'D55-ctlA', 'D55-ctlB', 'D55-ctlC', 'D55-struct',
+]);
 
 const ledgerModel = IA.eval('ledgerModel');
 const buildMainLiftBlock = IA.eval('buildMainLiftBlock');
-if (typeof ledgerModel !== 'function') bad('ledgerModel not reachable in the VM');
-if (typeof buildMainLiftBlock !== 'function') bad('buildMainLiftBlock not reachable in the VM');
+S.check('R1-ledgerModel', typeof ledgerModel === 'function', 'ledgerModel is reachable in the VM', 'ledgerModel not reachable in the VM');
+S.check('R2-mainLiftBlock', typeof buildMainLiftBlock === 'function', 'buildMainLiftBlock is reachable in the VM',
+  'buildMainLiftBlock not reachable in the VM');
 
 const text = h => String(h).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -85,18 +91,18 @@ let d53Lbs = '', d53Kg = '', d53Flat = '';
   d53Lbs = text(buildMainLiftBlock(MODEL, 'lbs'));
   // O1, typed by hand from the ruling's after-grid.
   const want = 'Bench press 80×12 Opened at 60×12 in week 1 · up 20 lbs · heaviest in week 3';
-  if (d53Lbs.startsWith(want)) ok();
-  else bad(`D53 lbs line: expected to start "${want}", got "${d53Lbs.slice(0, 90)}"`);
+  S.check('D53-lbs', d53Lbs.startsWith(want), 'D53: the lbs progress line reads the hand-rendered after-grid',
+    `D53 lbs line: expected to start "${want}", got "${d53Lbs.slice(0, 90)}"`);
 
   d53Kg = text(buildMainLiftBlock(MODEL, 'kg'));
   const wantKg = 'Bench press 36.5×12 Opened at 27×12 in week 1 · up 9.5 kg · heaviest in week 3';
-  if (d53Kg.startsWith(wantKg)) ok();
-  else bad(`D53 kg line: expected to start "${wantKg}", got "${d53Kg.slice(0, 90)}"`);
+  S.check('D53-kg', d53Kg.startsWith(wantKg), 'D53: the kg progress line reads the hand-rendered after-grid',
+    `D53 kg line: expected to start "${wantKg}", got "${d53Kg.slice(0, 90)}"`);
 
   // O2 on the rendered string, on both units.
   const cl = implementClaims(d53Lbs).concat(implementClaims(d53Kg));
-  if (!cl.length) ok();
-  else bad(`D53 implement claim survives in the rendered progress line: ${JSON.stringify(cl)}`);
+  S.check('D53-noimpl', !cl.length, 'D53: the rendered progress line asserts no implement, in either unit',
+    `D53 implement claim survives in the rendered progress line: ${JSON.stringify(cl)}`);
 
   // O4 negative control: no gain -> the clause is absent entirely, not empty-rendered.
   const flat = { name: 'Bench press', mode: 'load',
@@ -104,22 +110,31 @@ let d53Lbs = '', d53Kg = '', d53Flat = '';
                  heavy: { v: 60, reps: 10, week: 2 }, first: { v: 60, reps: 10, week: 1 },
                  plotted: 2, accessoryDay: 0, noLoad: 0, entries: 2 };
   d53Flat = text(buildMainLiftBlock(flat, 'lbs'));
-  if (!d53Flat.includes(' up ') && d53Flat.includes('heaviest in week 2')) ok();
-  else bad(`D53 no-gain control: got "${d53Flat.slice(0, 90)}"`);
+  S.check('D53-flat', !d53Flat.includes(' up ') && d53Flat.includes('heaviest in week 2'),
+    'D53 negative control: with no gain the gain clause is absent entirely', `D53 no-gain control: got "${d53Flat.slice(0, 90)}"`);
 
   // The ruling forbade a lookup / regex / conditional on the implement. The only
   // conditional left in that expression is the numeric gain>0 test.
   const m = IA.html.match(/\+\(gain>0\?[^\n]*\n/);
-  if (!m) bad('D53: the progress-line expression is gone from the file');
-  else if (!/on the bar/.test(m[0]) && (m[0].match(/\?/g) || []).length === 1) ok();
-  else bad(`D53: progress-line expression grew a branch or kept the claim: ${m[0].trim()}`);
+  const L53 = 'D53: the progress-line expression keeps one conditional, the numeric gain test, and no implement claim';
+  if (!m) S.fail('D53-expr', L53, 'D53: the progress-line expression is gone from the file');
+  else S.check('D53-expr', !/on the bar/.test(m[0]) && (m[0].match(/\?/g) || []).length === 1, L53,
+    `D53: progress-line expression grew a branch or kept the claim: ${m[0].trim()}`);
 }
 
 // ───────────────────────────── D54 ─────────────────────────────
 let holdsBw = '', holdsGear = '';
 {
   const seam = IA.html.match(/const holds = _ovDraft\.equipment===[^\n]*\n[^\n]*\n[^\n]*\n/);
-  if (!seam) { bad('D54: the travel-overlay holds seam is gone from the file'); }
+  const D54L = {
+    'D54-copy': 'D54: the ruled sentence is in the non-bodyweight branch',
+    'D54-noimpl': 'D54: neither holds branch asserts an implement',
+    'D54-hyphen': 'D54 copy rule: no mid-sentence hyphen or em-dash in the holds copy',
+    'D54-branch': 'D54: the holds seam stays a two-branch bodyweight test',
+    'D54-singlearm': 'D54: the single arm progression survives the reword',
+  };
+  // A missing seam turns every D54 row red by name (the old gate printed one FAIL and skipped the five checks).
+  if (!seam) { Object.keys(D54L).forEach(id => S.fail(id, D54L[id], 'D54: the travel-overlay holds seam is gone from the file')); }
   else {
     const src = seam[0];
     const lines = src.split('\n');
@@ -127,27 +142,26 @@ let holdsBw = '', holdsGear = '';
     holdsGear = (lines[2] || '').replace(/\\u2019/g, '’');
 
     // Hand-typed after-copy from the ruling.
-    if (holdsGear.includes('Grab the heaviest load you can control and work in the 8 to 12 range.')) ok();
-    else bad(`D54: the ruled sentence is not in the non-bodyweight branch: ${holdsGear.trim().slice(0, 120)}`);
+    S.check('D54-copy', holdsGear.includes('Grab the heaviest load you can control and work in the 8 to 12 range.'), D54L['D54-copy'],
+      `D54: the ruled sentence is not in the non-bodyweight branch: ${holdsGear.trim().slice(0, 120)}`);
 
     // O2: neither branch may assert an implement.
     const cl = implementClaims(holdsBw).concat(implementClaims(holdsGear));
-    if (!cl.length) ok();
-    else bad(`D54 implement claim in the travel overlay copy: ${JSON.stringify(cl)}`);
+    S.check('D54-noimpl', !cl.length, D54L['D54-noimpl'], `D54 implement claim in the travel overlay copy: ${JSON.stringify(cl)}`);
 
     // Copy rule: no mid-sentence hyphen, no em-dash, in either branch.
     const body = (holdsBw + holdsGear).replace(/^[^']*'/, '');
-    if (!/\w-\w/.test(body) && !body.includes('—')) ok();
-    else bad(`D54 copy rule: mid-sentence hyphen or em-dash in the holds copy`);
+    S.check('D54-hyphen', !/\w-\w/.test(body) && !body.includes('—'), D54L['D54-hyphen'],
+      `D54 copy rule: mid-sentence hyphen or em-dash in the holds copy`);
 
     // The gate stayed a two-branch bodyweight test. D54 ruled a copy change, not a
     // new equipment conditional (which would be the D53 defect wearing a fix's clothes).
-    if (/_ovDraft\.equipment==='bodyweight'\s*$/.test(lines[0].trim()) && !/equipment===/.test(holdsGear)) ok();
-    else bad(`D54: the holds branch grew an equipment conditional: ${lines[0].trim()}`);
+    S.check('D54-branch', /_ovDraft\.equipment==='bodyweight'\s*$/.test(lines[0].trim()) && !/equipment===/.test(holdsGear), D54L['D54-branch'],
+      `D54: the holds branch grew an equipment conditional: ${lines[0].trim()}`);
 
     // O4: the instruction that is NOT an equipment claim must survive.
-    if (holdsGear.includes('If that still feels easy, go single arm.')) ok();
-    else bad('D54: "go single arm" was deleted; a ruling that rewords is not a ruling that deletes');
+    S.check('D54-singlearm', holdsGear.includes('If that still feels easy, go single arm.'), D54L['D54-singlearm'],
+      'D54: "go single arm" was deleted; a ruling that rewords is not a ruling that deletes');
   }
 }
 
@@ -175,14 +189,14 @@ let ladderNames = [], plainNames = [];
   const r = ledgerModel({ k1: { name: NAME, entries: f.entries } }, f.hist);
   const row = r.ladder.find(x => x.name === NAME);
   ladderNames = r.ladder.map(x => x.name); plainNames = r.plain.map(x => x.name);
-  if (row) ok(); else bad('D55 primer-last: the lift fell out of the Range Ladder');
-  if (row && row.lo === 8 && row.hi === 12) ok();
-  else bad(`D55 primer-last: expected lo 8 hi 12 from week 1, got ${row && row.lo}–${row && row.hi}`);
+  S.check('D55-primer-ladder', row, 'D55 primer-last: the lift stays in the Range Ladder', 'D55 primer-last: the lift fell out of the Range Ladder');
+  S.check('D55-primer-range', row && row.lo === 8 && row.hi === 12, "D55 primer-last: the range is week 1's 8 to 12",
+    `D55 primer-last: expected lo 8 hi 12 from week 1, got ${row && row.lo}–${row && row.hi}`);
   // O5: set performance is still the LAST session (6s at 25), not the range-carrying one.
-  if (row && row.wt === 25 && JSON.stringify(row.sets) === '[6,6,6]') ok();
-  else bad(`D55: sets/wt were redirected off the last session: wt=${row && row.wt} sets=${JSON.stringify(row && row.sets)}`);
-  if (row && row.ready === false) ok();
-  else bad('D55: `ready` is true, so the primer week is being scored against the range it was never given');
+  S.check('D55-lastset', row && row.wt === 25 && JSON.stringify(row.sets) === '[6,6,6]', 'D55 O5: sets and weight still come from the last session',
+    `D55: sets/wt were redirected off the last session: wt=${row && row.wt} sets=${JSON.stringify(row && row.sets)}`);
+  S.check('D55-ready', row && row.ready === false, 'D55: the primer week is not scored against a range it was never given',
+    'D55: `ready` is true, so the primer week is being scored against the range it was never given');
 }
 {
   // MOST RECENT RANGE WINS. Week 1 said 5–8, week 3 said 8–12, week 4 is a primer.
@@ -195,8 +209,8 @@ let ladderNames = [], plainNames = [];
   ]);
   const r = ledgerModel({ k1: { name: NAME, entries: f.entries } }, f.hist);
   const row = r.ladder.find(x => x.name === NAME);
-  if (row && row.lo === 8 && row.hi === 12) ok();
-  else bad(`D55 recency: expected week 3's 8–12, got ${row && row.lo}–${row && row.hi} (walk is not backwards, or all is unsorted)`);
+  S.check('D55-recency', row && row.lo === 8 && row.hi === 12, 'D55: the most recent session that carries a range wins',
+    `D55 recency: expected week 3's 8–12, got ${row && row.lo}–${row && row.hi} (walk is not backwards, or all is unsorted)`);
 }
 {
   // O4 negative control A: no session EVER carried a range -> Other Accessory Work.
@@ -205,8 +219,8 @@ let ladderNames = [], plainNames = [];
     { name: 'Dumbbell shrug', week: 2, day: 'mon', ts: 200, weight: 45, sets: [10], detail: '3×10 — RPE 8' }
   ]);
   const r = ledgerModel({ k1: { name: 'Dumbbell shrug', entries: f.entries } }, f.hist);
-  if (!r.ladder.length && r.plain.length === 1) ok();
-  else bad(`D55 control A: a lift with no range anywhere reached the Range Ladder (ladder=${r.ladder.length})`);
+  S.check('D55-ctlA', !r.ladder.length && r.plain.length === 1, 'D55 control A: a lift with no range anywhere falls to Other Accessory Work',
+    `D55 control A: a lift with no range anywhere reached the Range Ladder (ladder=${r.ladder.length})`);
 }
 {
   // O4 negative control B: the V193 behaviour is unchanged when the LAST session carries
@@ -217,8 +231,8 @@ let ladderNames = [], plainNames = [];
   ]);
   const r = ledgerModel({ k1: { name: NAME, entries: f.entries } }, f.hist);
   const row = r.ladder.find(x => x.name === NAME);
-  if (row && row.lo === 8 && row.hi === 12 && row.wt === 35 && row.ready === true) ok();
-  else bad(`D55 control B: normal case regressed: ${JSON.stringify(row)}`);
+  S.check('D55-ctlB', row && row.lo === 8 && row.hi === 12 && row.wt === 35 && row.ready === true,
+    'D55 control B: a last session that carries the range behaves as before', `D55 control B: normal case regressed: ${JSON.stringify(row)}`);
 }
 {
   // O4 negative control C: a MAIN-slot lift still routes to mains and never to the ladder,
@@ -232,8 +246,8 @@ let ladderNames = [], plainNames = [];
     { week: 2, day: 'mon', ts: 200, weight: 175, setsDone: [6, 6] }
   ];
   const r = ledgerModel({ k1: { name: 'Back squat', entries } }, hist);
-  if (r.mains.length === 1 && !r.ladder.length && !r.plain.length) ok();
-  else bad(`D55 control C: main-slot routing changed (mains=${r.mains.length} ladder=${r.ladder.length} plain=${r.plain.length})`);
+  S.check('D55-ctlC', r.mains.length === 1 && !r.ladder.length && !r.plain.length, 'D55 control C: a main-slot lift still routes to mains',
+    `D55 control C: main-slot routing changed (mains=${r.mains.length} ladder=${r.ladder.length} plain=${r.plain.length})`);
 }
 {
   // Structural: rng is assigned in exactly one place in ledgerModel and the consumer
@@ -241,8 +255,9 @@ let ladderNames = [], plainNames = [];
   const body = IA.html.slice(IA.html.indexOf('function ledgerModel('));
   const seg = body.slice(0, body.indexOf('\n}\n'));
   const assigns = (seg.match(/\brng\s*=/g) || []).length;
-  if (assigns === 2 && /if\(rng&&sets\.length\)/.test(seg) && /\blet rng=null;/.test(seg)) ok();
-  else bad(`D55 structural: rng assignments=${assigns} (expected 2: the let and the loop), consumer intact=${/if\(rng&&sets\.length\)/.test(seg)}`);
+  S.check('D55-struct', assigns === 2 && /if\(rng&&sets\.length\)/.test(seg) && /\blet rng=null;/.test(seg),
+    'D55 structural: rng is assigned only by its let and the loop, and the consumer still reads it',
+    `D55 structural: rng assignments=${assigns} (expected 2: the let and the loop), consumer intact=${/if\(rng&&sets\.length\)/.test(seg)}`);
 }
 
 console.log(`g194_implement_and_range: version=${IA.version}`);
@@ -251,6 +266,4 @@ console.log(`  D53 kg  :: ${d53Kg.slice(0, 80)}`);
 console.log(`  D53 flat:: ${d53Flat.slice(0, 80)}`);
 console.log(`  D54 gear:: ${holdsGear.trim().slice(0, 130)}`);
 console.log(`  D55 primer-last -> ladder=${JSON.stringify(ladderNames)} plain=${JSON.stringify(plainNames)}`);
-fails.forEach(f => console.log('  FAIL ' + f));
-console.log(`PASS ${PASS} FAIL ${FAIL}`);
-process.exit(FAIL ? 1 : 0);
+S.summary();

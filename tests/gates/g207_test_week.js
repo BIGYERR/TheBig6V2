@@ -65,7 +65,6 @@ process.env.TZ = 'America/New_York';
 const path = require('path');
 const { load, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version;
 const D106A_ERA = 207;
@@ -82,8 +81,8 @@ function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function summary(){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); }
 
 const ROWS = ['Z0','H1','H2','H3','H4','H5','H6','H7','H8','H9','F1','F2','F3',
-  'T1..T8 (a hand series, b Taper set, c dip set, f finite)','B6','B7','B8','B11',
-  'D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11','D12',
+  'T1..T8 (a hand series, b Taper set, c dip set, f finite)',
+  'D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11',
   'G1','G2','G3','G4','G4b','G4c','G5','G6','G7'];
 if(VER < D106A_ERA){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D106a (V' + D106A_ERA + ').');
@@ -217,20 +216,7 @@ for(let tw = 1; tw <= 8; tw++){
   else ok('T' + tw + 'f every card finite', bad.length === 0, bad.slice(0, 2).join('; '));
 }
 
-// ── B — no move at six weeks and up, scoped to the D106a build pair ───────────────────
-const BROWS = [['B6', 6], ['B7', 7], ['B8', 8], ['B11', null]];
-if(!BASEFILE){ for(const [r] of BROWS) skipRow(r + ' no baseline passed as argv[3]; the D106a pair diff did not run'); }
-else {
-  const IB = load(BASEFILE);
-  if(!(VER === 207 && +IB.version === 206)){
-    for(const [r] of BROWS) skipRow(r + ' scoped to the D106a build pair (candidate 207 vs baseline 206); this pair is ' + VER + ' vs ' + IB.version);
-  } else for(const [r, tw] of BROWS){
-    const cfg = tw ? pinned({_raceDateCappedWeeks:tw}) : pinned();   // length pin only (see SCOPING)
-    let a, b; try { a = JSON.stringify(IA.buildProgram(JSON.parse(JSON.stringify(cfg))).weeks); } catch(e){ a = 'CRASH ' + e.message; }
-    try { b = JSON.stringify(IB.buildProgram(JSON.parse(JSON.stringify(cfg))).weeks); } catch(e){ b = 'CRASH ' + e.message; }
-    ok(r + ' ' + (tw ? tw + '-week' : 'unpinned 11-week') + ' PRT TING weeks byte-equal to the V206 baseline', a === b && !/^CRASH/.test(a), a.length + ' vs ' + b.length + ' bytes');
-  }
-}
+// B6 B7 B8 B11 (D106a: PRT TING at 6, 7, 8 and 11 weeks byte-equal to the V206 baseline) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 
 // ── D — slice B: the test week ────────────────────────────────────────────────────────
 const TRIAL_DETAIL = '1.5 mi. Goal 11:00 (7:20/mi).';
@@ -364,23 +350,7 @@ else { const {flat, ri} = markerDays(nms); const eves = [];
     if(y && !y.rest && y.cardio && y.cardio.type !== 'run' && /^long slow distance/i.test(y.cardio.subtype || '')) eves.push({k, title: y.title, head: String(y.cardio.subtype).split(' — ')[0]}); }
   ok('D11 NRC 5K + bike: the bike LSD on the race eve window keeps its own title, never Shakeout or Easy Run (fixture must hold one)',
      eves.length > 0 && eves.every(e => e.title === e.head), JSON.stringify(eves)); }
-if(!BASEFILE){ skipRow('D12 no baseline passed as argv[3]; the NRC confinement diff did not run'); }
-else {
-  const IB2 = load(BASEFILE);
-  if(!(VER === 207 && +IB2.version === 206)) skipRow('D12 scoped to the D106a build pair (candidate 207 vs baseline 206); this pair is ' + VER + ' vs ' + IB2.version);
-  else {
-    const RACE = {run_5k:'2026-11-19', run_10k:'2026-11-21', run_half:'2026-12-26', run_marathon:'2027-01-24'};
-    let n = 0; const moved = [];
-    for(const g of Object.keys(RACE)) for(const T of [['run'], ['run','bike'], ['run','swim']]) for(const R of [['sun'], ['sun','wed']]) for(const evt of [true, false]){
-      const cfg = Object.assign({}, nrcBase, {cardioTypes:T, restDays:R, eventTargeted:evt, raceDate: evt ? RACE[g] : '',
-        cardioGoals: Object.assign({run:{id:g, label:g}}, T.includes('bike') ? {bike:{id:'bike_base', label:'Bike'}} : {}, T.includes('swim') ? {swim:{id:'swim_base', label:'Swim'}} : {})});
-      let a, b; try { a = JSON.stringify(IA.buildProgram(JSON.parse(JSON.stringify(cfg))).weeks); } catch(e){ a = 'CRASH ' + e.message; }
-      try { b = JSON.stringify(IB2.buildProgram(JSON.parse(JSON.stringify(cfg))).weeks); } catch(e){ b = 'CRASH ' + e.message; }
-      n++; if(a !== b || /^CRASH/.test(a)) moved.push(g + ' ' + T.join('+') + ' [' + R + '] ' + evt);
-    }
-    ok('D12 NRC confinement: ' + n + ' NRC builds (4 goals x run, run+bike, run+swim x 2 rest sets x dated/undated) byte-equal to V206', moved.length === 0, moved.length + ' moved: ' + moved.slice(0, 3).join('; '));
-  }
-}
+// D12 (D106a: NRC confinement, NRC builds byte-equal to the V206 baseline) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 
 // ── G — doGenerate writes the pins onto the stored program ────────────────────────────
 function gen(fields){

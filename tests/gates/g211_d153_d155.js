@@ -56,15 +56,12 @@
 // Run on V210 forced to 211, G1 and G2 fail (zero-lift days and surviving hinges); on the V211
 // build every row passes.
 'use strict';
-const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
+const path = require('path');
 const { load, fixtures, progDigest, DAYS, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version;
 const ERA = 211;
-const PAIR = VER === ERA;                 // build-pair rows run only for candidate 211 vs V210
-const V210_COMMIT = 'd8d2f5ba89fa2d1630fa2b30fb76dceee55778f1';
 
 let pass = 0, fail = 0, skip = 0, scoped = 0, fixt = 0;
 function ok(label, cond, got){
@@ -73,10 +70,6 @@ function ok(label, cond, got){
 }
 function fixture(label, cond, got){ fixt++; ok('HF ' + label, cond, got); }
 function skipRow(label){ skip++; console.log('SKIP ' + label); }
-function pairRow(label, cond, got){
-  if(!PAIR){ scoped++; console.log('SCOPED OUT ' + label + ' [build pair 211/210 only; candidate is ' + VER + '] (now ' + got + ')'); return; }
-  ok(label, cond, got);
-}
 function summary(){
   console.log('\nfixture guards ' + fixt + '  SCOPED OUT ' + scoped + '  SKIP ' + skip);
   console.log('PASS ' + pass + ' FAIL ' + fail);
@@ -84,7 +77,7 @@ function summary(){
 }
 if(!(VER >= ERA)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D153/D155 (V' + ERA + ').');
-  ['HF','G0','G1','G2','G2v','G3','G4','G4b','G5','G6','HM'].forEach(r => skipRow(r + ' skipped below the D153/D155 era'));
+  ['HF','G1','G2','G2v','G5','G6','HM'].forEach(r => skipRow(r + ' skipped below the D153/D155 era'));
   summary();
 }
 
@@ -151,41 +144,22 @@ for(const g of ['run_pace_goal','run_mile_time','run_15_under10','run_base']) fo
     const c = cl(STAND); c.cardioGoals.run.id = g; c.cardioGoals.run.mileBestMins = mm[0]; c.cardioGoals.run.mileBestSecs = mm[1];
     c.liftingFocus = f; c.equipment = q; c.restDays = r.slice(); c.experience = e; NSW.push({seg:g + '/' + mm.join(':'), c}); }
 
-// ── the V210 baseline (build-pair rows only) ─────────────────────────────────────────────────
-let BASE = null, baseWhy = '';
-if(PAIR){
-  if(BASEFILE && fs.existsSync(BASEFILE)){ const b = load(BASEFILE); if(+b.version === 210){ BASE = b; baseWhy = 'argv baseline ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 210; '; }
-  if(!BASE){
-    try {
-      const repo = path.join(__dirname, '..', '..');
-      const f = path.join(os.tmpdir(), 'g211_v210_' + process.pid + '.html'); try { fs.unlinkSync(f); } catch(e) {}
-      fs.writeFileSync(f, cp.execFileSync('git', ['-C', repo, 'show', V210_COMMIT + ':index.html'], {maxBuffer: 1 << 26}));
-      const b = load(f); if(+b.version === 210){ BASE = b; baseWhy += 'git ' + V210_COMMIT.slice(0, 7); } else baseWhy += 'git copy reads ' + b.version;
-    } catch(e) { baseWhy += 'git show failed: ' + String(e.message).slice(0, 80); }
-  }
-  console.log('baseline: ' + (BASE ? 'V210 from ' + baseWhy : 'UNAVAILABLE (' + baseWhy + ')'));
-}
+// the V210 baseline loaded only for G0 G2r G3 G4 G4b (retired in run() below); BASE stays null, so run()'s baseline branches are inert.
+let BASE = null;
 
 // ── run ──────────────────────────────────────────────────────────────────────────────────
 function run(limb, list, fl){
-  const R = {baseHinge:{}, cfg:0, crash:0, tb:0, zero:0, d38:0, hinge:0, hingeEx:{}, hingeElse:0, over8:0, maxSets:0,
-    g6n:0, g6bad:0, g6ex:null, nonLong:0, nonLongDiff:0, acN:0, acDiff:0, recN:0, recDiff:0, diffEx:null, selfN:0, selfDiff:0, zeroEx:null, recFullB:0};
+  const R = {cfg:0, crash:0, tb:0, zero:0, d38:0, hinge:0, hingeEx:{}, hingeElse:0, over8:0, maxSets:0,
+    g6n:0, g6bad:0, g6ex:null, zeroEx:null, recFullB:0};
   list.forEach((x, idx) => {
     R.cfg++;
     let p, b = null;
     try { p = IA.buildProgram(cl(x.c)); if(BASE) b = BASE.buildProgram(cl(x.c)); } catch(e) { R.crash++; return; }
-    if(BASE && idx % 25 === 0){ const b2 = BASE.buildProgram(cl(x.c)); R.selfN++; if(JSON.stringify(b.weeks) !== JSON.stringify(b2.weeks)) R.selfDiff++; }
     const eve = d38Window(p);
     const rw = new Set(((b || p).liftRecoveryWeeks) || []);
     for(let w = 1; w <= p.totalWeeks; w++) for(const d of DAYS){
       const y = p.weeks[w] && p.weeks[w][d]; if(!y) continue;
       const t = y.rest ? null : tier(y.cardio);
-      if(b){ const y0 = b.weeks[w] && b.weeks[w][d]; const t0 = y0 && !y0.rest ? tier(y0.cardio) : null;
-        if(t0 === 'B') live(y0).forEach(s => s.items.forEach(it => { if(HINGE.test(it.name || '')) R.baseHinge[it.name] = (R.baseHinge[it.name] || 0) + 1; }));
-        if(t0 !== 'B'){ const same = JSON.stringify(y0) === JSON.stringify(y);
-          if(!t0){ R.nonLong++; if(!same) R.nonLongDiff++; } else { R.acN++; if(!same) R.acDiff++; }
-          if(rw.has(w)){ R.recN++; if(!same) R.recDiff++; }
-          if(!same && !R.diffEx) R.diffEx = x.seg + ' ' + x.c.equipment + '/' + x.c.liftingFocus + ' W' + w + ' ' + d + ' "' + (y0 && y0.title) + '"'; } }
       if(t !== 'B'){ live(y).forEach(s => s.items.forEach(it => { if(HINGE.test(it.name || '')) R.hingeElse++; })); continue; }
       R.tb++;
       const lift = live(y).filter(s => cls(s) === 'lift');
@@ -207,14 +181,7 @@ function run(limb, list, fl){
   ok(L + ' G2v the hand list sees hinges on this lattice off tier B (' + R.hingeElse + ' items)', R.hingeElse > 0, R.hingeElse);
   ok(L + ' G5 every tier B long-run day holds 8 hand-counted working sets or fewer (max ' + R.maxSets + ')', R.over8 === 0, R.over8 + ' days over 8');
   ok(L + ' G6 recovery-week tier B loaded Full Body with no Strength or hip section keeps Upper superset (' + R.g6n + ' days)', R.g6n > 0 && R.g6bad === 0, R.g6bad + ' of ' + R.g6n + ', first ' + R.g6ex);
-  if(!PAIR){ ['G0','G2r','G3','G4','G4b'].forEach(r => pairRow(L + ' ' + r, false, 'n/a')); return; }
-  if(!BASE){ ok(L + ' G0/G3/G4/G4b need the V210 baseline', false, baseWhy); return; }
-  const bh = Object.values(R.baseHinge).reduce((a, v) => a + v, 0), bpt = Object.keys(R.baseHinge).filter(n => /pull-?through/i.test(n)).reduce((a, n) => a + R.baseHinge[n], 0);
-  pairRow(L + ' G2r the limb reaches the defect: V210 prints ' + bh + ' hand-list hinges on its tier B days (' + JSON.stringify(R.baseHinge) + ')', bh > 0 && (!fl.pullThrough || bpt > 0), bh + ' / pull-through ' + bpt);
-  pairRow(L + ' G0 V210 built twice is identical (' + R.selfN + ' sampled configs)', R.selfN > 0 && R.selfDiff === 0, R.selfDiff);
-  pairRow(L + ' G3 recovery weeks outside tier B long runs byte-identical to V210 (' + R.recN + ' days; D91 untouched)', R.recN > 0 && R.recDiff === 0, R.recDiff + ', first ' + R.diffEx);
-  pairRow(L + ' G4 non-long-run days byte-identical to V210 (' + R.nonLong + ' days)', R.nonLong > 0 && R.nonLongDiff === 0, R.nonLongDiff + ', first ' + R.diffEx);
-  pairRow(L + ' G4b tier A and C long-run days byte-identical to V210 (' + R.acN + ' days)', R.acN > 0 && R.acDiff === 0, R.acDiff + ', first ' + R.diffEx);
+  // G0 G2r G3 G4 G4b (D153/D155: V210 built twice identical, the limb reaches V210's tier B hinges, recovery weeks and non-long-run days byte-identical to V210) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 }
 // D153 limb: the population where V210 drew Cable pull-through on a tier B day (probe on V210).
 const D153 = [];
@@ -225,7 +192,7 @@ for(const g of ['run_pace_goal','run_mile_time','run_15_under10','run_base']) fo
   c.liftingFocus = f; c.equipment = 'commercial'; c.restDays = r.slice(); c.experience = 'advanced'; c.seed = 1001; D153.push({seg:g + '/' + mm.join(':') + ' s1001', c}); }
 run('NRC', NRC, {tb:1000, rec:50});
 run('NSW', NSW, {tb:1000, rec:50});
-run('D153', D153, {tb:100, rec:10, pullThrough:true});
+run('D153', D153, {tb:100, rec:10});
 // V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
 // this row defends D153/D155's claim "my ruling did not move HALF_MANNY". The literal it compared
 // against went: the only object that carries that claim across later rulings is the era table that

@@ -10,8 +10,8 @@
 //
 // TIMEZONE. The harness passes the host clock and TZ through ("harness pins TZ? NO"), so a gate that does not set TZ
 // passes on a UTC box while the phone is wrong. This file is a PARENT that spawns itself twice, once under
-// TZ=America/New_York and once under TZ=UTC, and sums the two children. Every row is printed once per zone, tagged
-// [NY] or [UTC]. A child that dies or prints no CHILD summary is a named FAIL, never a silent zero.
+// TZ=America/New_York and once under TZ=UTC, and sums the two children. Every row is printed once per zone, keyed
+// <row>.NY or <row>.UTC (tests/status.js: the parent declares every id and prints the one summary). A child that dies or prints no CHILD summary is a named FAIL, never a silent zero.
 //
 // CLOCK. Each cell pins the VM clock (Date() with no argument, and Date.now) to local noon of a typed date, the g222
 // pin. Dated constructors (new Date(y, m, d), new Date('YYYY-MM-DD')) are untouched, so the old UTC parse still
@@ -75,14 +75,24 @@ const ROWS = {
 };
 const ROW_KEYS = Object.keys(ROWS);
 const isControl = (key, tag) => /^Z/.test(key) || (key === 'R3' && tag === 'UTC');
+// Row ids (tests/status.js; CLAUDE.md Proof scope, Row manifest): every row prints once per zone, keyed <row>.<zone>
+// (Z0.NY, Z0.UTC). CHILD0.<zone> is the parent's check that the zone's
+// child ran every row and printed its CHILD summary.
+const rowId = (key, tag) => key + '.' + tag;
+const childId = tag => 'CHILD0.' + tag;
 
 // ═════════════════════════════════════════════ PARENT ═════════════════════════════════════════════
 if(!process.env.G223_ZONE){
-  let pass = 0, fail = 0;
-  const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
-  const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
+  const S = require('../status')('g223_d182_racedate.js');
+  const DECL = [];   // [id, label]: every (row, zone), then the zone's child check; declared here, where the one summary runs
+  for(const [tag, tz] of ZONES){
+    for(const k of ROW_KEYS) DECL.push([rowId(k, tag), ROWS[k]]);
+    DECL.push([childId(tag), 'child under TZ=' + tz + ' ran every row and printed its CHILD summary']);
+  }
+  S.declare(DECL.map(d => d[0]));
+  const failAll = (why, detail) => { for(const [id, l] of DECL) S.fail(id, l + ' (' + why + ')', detail); S.summary(); };
   let STAMP = NaN;
-  try { STAMP = +H.load(ART).version; } catch(e){ ok('boot: the candidate loads in the harness', false, e.message); done(); }
+  try { STAMP = +H.load(ART).version; } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
   let VER = STAMP;
   if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
@@ -90,36 +100,36 @@ if(!process.env.G223_ZONE){
   console.log('g223 D182 racedate | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
   if(!(VER >= ERA)){
     console.log('REFUSED: ia-version ' + VER + ' predates D182 P-RACEDATE (V' + ERA + '). No row may pass on it.');
-    for(const [tag] of ZONES) for(const k of ROW_KEYS) ok('[' + tag + '] ' + ROWS[k] + ' (REFUSED)', false);
-    done();
+    failAll('REFUSED');
   }
   for(const [tag, tz] of ZONES){
     console.log('\n-- TZ=' + tz + ' [' + tag + '] --');
     const r = cp.spawnSync(process.execPath, [__filename, ART], { env: Object.assign({}, process.env, { TZ: tz, G223_ZONE: tag }), encoding: 'utf8', maxBuffer: 1 << 26 });
     const out = r.stdout || '';
     for(const line of out.split('\n')){
-      const m = /^(PASS|FAIL) (\[(\w+)\] (\w+) .*)$/.exec(line);
-      if(m){ if(m[3] === tag && ROWS[m[4]]) (m[1] === 'PASS' ? pass++ : fail++); console.log(line); }
+      const m = /^(PASS|FAIL) (\S+) (.*)$/.exec(line);
+      if(m && S.ID_RE.test(m[2])) (m[1] === 'PASS' ? S.pass(m[2], m[3]) : S.fail(m[2], m[3]));   // the child's status line, printed here by id
       else if(line.trim() && !/^CHILD /.test(line)) console.log('  ' + line);
     }
     if(r.stderr && r.stderr.trim()) console.log('  stderr: ' + r.stderr.trim().split('\n').slice(-4).join(' | '));
     const s = /^CHILD (\w+) PASS (\d+) FAIL (\d+)\s*$/m.exec(out);
-    const seen = ROW_KEYS.filter(k => new RegExp('^(PASS|FAIL) \\[' + tag + '\\] ' + k + ' ', 'm').test(out));
-    ok('[' + tag + '] child under TZ=' + tz + ' ran every row and printed its CHILD summary (exit ' + r.status + ')',
-       !!s && s[1] === tag && seen.length === ROW_KEYS.length && +s[2] + +s[3] === ROW_KEYS.length,
-       (s ? s[0] : 'no CHILD summary') + '; rows seen ' + seen.length + '/' + ROW_KEYS.length);
+    const seen = ROW_KEYS.filter(k => new RegExp('^(PASS|FAIL) ' + rowId(k, tag).replace(/\./g, '\\.') + ' ', 'm').test(out));
+    S.check(childId(tag), !!s && s[1] === tag && seen.length === ROW_KEYS.length && +s[2] + +s[3] === ROW_KEYS.length,
+       'child under TZ=' + tz + ' ran every row and printed its CHILD summary (exit ' + r.status + ')',
+       'got ' + (s ? s[0] : 'no CHILD summary') + '; rows seen ' + seen.length + '/' + ROW_KEYS.length);
   }
-  done();
+  S.summary();
 }
 
 // ═════════════════════════════════════════════ CHILD ══════════════════════════════════════════════
 const TAG = process.env.G223_ZONE;
+const CS = require('../status')('g223_d182_racedate.js child ' + TAG);   // this zone's emitter: the parent declares every id and prints the one summary
 let cpass = 0, cfail = 0;
 function row(key, bad, total, note){
-  const label = '[' + TAG + '] ' + ROWS[key] + (isControl(key, TAG) && key === 'R3' ? ' (CONTROL under UTC: no DST, the V222 raw floor is right here)' : '');
+  const id = rowId(key, TAG), label = ROWS[key] + (isControl(key, TAG) && key === 'R3' ? ' (CONTROL under UTC: no DST, the V222 raw floor is right here)' : '');
   const good = bad.length === 0 && total > 0;
-  if(good){ cpass++; console.log('PASS ' + label + ' (' + total + '/' + total + ' cells' + (note ? '; ' + note : '') + ')'); }
-  else { cfail++; console.log('FAIL ' + label + ' (' + (total - bad.length) + '/' + total + ' cells; ' + bad.slice(0, 4).join(' | ') + (bad.length > 4 ? ' | +' + (bad.length - 4) + ' more' : '') + ')'); }
+  if(good){ cpass++; CS.pass(id, label + ' (' + total + '/' + total + ' cells' + (note ? '; ' + note : '') + ')'); }
+  else { cfail++; CS.fail(id, label, (total - bad.length) + '/' + total + ' cells; ' + bad.slice(0, 4).join(' | ') + (bad.length > 4 ? ' | +' + (bad.length - 4) + ' more' : '')); }
 }
 
 // ── the hand oracle: integers only ────────────────────────────────────────────────────────────────

@@ -1,0 +1,109 @@
+# Gate start order for tests/gate.sh step 4: `<gate file> <seconds> [pool=<n>]` per line; `#` lines are comments.
+# gate.sh starts gates longest first by these seconds; a gate missing here starts FIRST (its cost is unknown).
+# Grading and printing stay in glob order. gate.sh never writes this file: with GATE_TIMES_OUT=<path> it writes
+# the measured seconds to <path>, and the weekly full run refreshes this file from that output.
+# Seed (post-V233, slice 7): measure mSG alone wall (alone.json time.wall) for the 10 gates it timed alone;
+# every other gate is its T1 time (v233 gate phase, 8 jobs) x 0.432, mSG's median alone/T1 ratio.
+# pool=<n> (post-V233 s11; Mario: parallelize first): the gate runs <n> worker processes of its own (g230 only). gate.sh
+# starts it first, in the background, with GATE_POOL=<n>, and runs the other gates at -P max(2, GATE_JOBS - the sum of
+# the pools); sabotage.py runs its mutations after the others, one at a time, with GATE_POOL=<SABOTAGE_JOBS>. A third
+# column that is not pool=<positive integer>, or a fourth column, is a CONFIGURATION error in both. The column is set
+# here by hand, not measured: GATE_TIMES_OUT writes each gate's measured seconds and carries its pool=<n> over from
+# this file (post-V233 A2), so a refresh from it keeps every pool column.
+g000_boot.js 0.1
+g190_rounds.js 7.6
+g191_pacedelta.js 0.1
+g192_floorpress_shoulder_gear.js 0.4
+g192_labelsync.js 0.5
+g192_landmine_rotpress.js 0.1
+g192_shoulder_side.js 7.1
+g193_budget_floor.js 14.2
+g193_d50_trunkfloor.js 3.2
+g193_gear_gates.js 8.3
+g193_pool_overlay.js 0.0
+g193_rotation_reach.js 0.2
+g193_samecard.js 9.2
+g193_trunk_protect.js 0.6
+g194_implement_and_range.js 0.0
+g195_wildcard.js 0.4
+g196_ledger.js 0.1
+g197a_pool_static.js 1.1
+g197b_sweep.js 18.3
+g197c_d84_cmp.js 17.0
+g197d_d84_base.js 21.6
+g198_posterior_floor.js 0.6
+g199_deload_arbitration.js 11.6
+g200_core_tier.js 1.2
+g200_pull_arbitration.js 0.8
+g202_d108_touchset_freeze.js 0.1
+g202_int_doctrine.js 4.0
+g202_pace_anchor.js 2.9
+g202_pace_copy.js 1.0
+g203_ceiling_and_anchor.js 0.1
+g203_mile_pencil.js 0.1
+g204_clock_limb.js 1.0
+g205_bike_unmoved.js 0.1
+g205_chi_table6.js 0.1
+g205_d114_int_table6.js 0.0
+g205_d125_ceiling.js 3.5
+g205_d125_spaced.js 0.8
+g205_d129_tiebreak.js 0.5
+g205_d130_typed.js 4.8
+g205_d132_walkweek.js 8.5
+g205_pace_eve.js 1.8
+g206_d109_copy.js 0.1
+g206_d137_runbase_chi.js 0.1
+g207_gk_trial_present.js 4.9
+g207_test_calendar.js 0.3
+g207_test_week.js 0.4
+g208_d103a_chip.js 1.5
+g208_d103a_key.js 2.1
+g208_d103a_readers.js 4.3
+g208_d104a_runbase.js 8.5
+g209_d140_tier.js 3.6
+g210_equipment_denials.js 28.1
+g211_d153_d155.js 47.8
+g212_d110a_swim.js 4.3
+g213_d113a.js 55.0
+g214_d158_eve.js 6.9
+g215_d149_ghd.js 27.4
+g216_d154_swap_lens.js 13.4
+g216_d156_longday.js 28.9
+g217_d160_dedupe_view.js 176.1
+g218_d157_swim_sizer.js 1.3
+g219_d167_pairs.js 23.5
+g219_samecard_draws.js 29.0
+g220_d173_recovbanner.js 0.1
+g220_d174_emoji.js 0.8
+g220_d175_popcond.js 0.3
+g221_d177_swapfloor.js 15.4
+g221_d178_active.js 1.6
+g221_d179_donenav.js 6.5
+g221_d180_blockopen.js 9.5
+g222_d181_chain.js 112.5
+g222_d181_durable.js 15.5
+g223_d182_racedate.js 0.1
+g223_d183_safepace.js 1.2
+g223_d184_testlen.js 50.5
+g224_d185_wctoday.js 0.0
+g225_d186_clockend.js 0.3
+g225_d187_pacerate.js 0.3
+g226_d188_beginnermile.js 8.9
+g226_d189_pacedisclose.js 10.1
+g227_d190_cuecap.js 93.6
+g227_d190_prefpath.js 7.8
+g227_d190_seam.js 104.4
+g228_d192_undokey.js 101.6
+g228_d193_cueword.js 8.6
+g229_d193_build.js 26.3
+g229_d194_lens.js 14.8
+g230_d194_lens2.js 1064.0 pool=6
+g231_d194a4_lateplan.js 13.0
+g231_d195_hipext.js 23.0
+g231_d195b_cost.js 13.3
+g231_d196_bwfallback.js 20.8
+g231_d197_filterlast.js 0.7
+g231_d198_hepdraw.js 21.5
+g232_d199_runwheel.js 1.3
+g233_d207_bikewheel.js 8.6
+g_fuzz_shard_equiv.js 3.6

@@ -84,7 +84,7 @@
 //   SH3  a 100 goal switched to a 500 with no 500 time on file prints the "No current 500yd time" line.
 //   SH4  swimmer B (500 m 10:16, goal 9:30, sheet change to 9:00): the rebuilt week 1 prints
 //        "100m at 2:01" at a 2:03 split (123.2 - 2 = 121.2, Guide A p12).
-//   SH5  (build pair) swimmer B's rebuilt digest is coach's surgery print, a0f2e847ed9473d7.
+//   SH5  (from 212 up, Version scope) swimmer B's rebuilt digest is coach's surgery print, a0f2e847ed9473d7.
 //   M2a-M2f (slice 5, M2: Mario "make it required", coach's exact text; the D9 pattern).
 //   M2a  _swimEntryState, called in the VM on a hand lattice, returns the typed {ok, blank, msg}:
 //        blank or 0:00 500 on either goal -> the 500 prompt (500 rule first); blank 100 on the 100
@@ -103,7 +103,8 @@
 //   M2f  no "—", "–" or letter-hyphen-letter in any M2 string (the messages, labels and line).
 //   P0   identity fuzz: V211 built twice from one cfg is identical (the P rows are not noise).
 //   P1   run_pace_goal, NRC, bike and the untimed swim goals are byte-identical to V211, apart
-//        from the swim INT note (D110a rewrites it). P1n: that note is the typed D110a text.
+//        from the swim INT note (D110a rewrites it). P1n: that note is the typed D110a text. P1n runs from 212 up
+//        (Version scope, post-V233): off the build pair its audit runs on the candidate alone.
 //   P2   on the swim time lattice every card other than a swim INT card is byte-identical to V211,
 //        and every INT card keeps V211's rep count (D110a moves the clock, not the dose).
 //   HM   HALF_MANNY digest, typed: 0ac7da6b1691a8e1 (ruled unmoved: an NRC run fixture).
@@ -124,16 +125,12 @@
 // measured: the build passes every row (PASS 52 FAIL 0); slices through 6 fail FL1 FL1 GT1 (PASS 49
 // FAIL 3); V211 fails 38 rows (PASS 14 FAIL 38).
 'use strict';
-const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
+const fs = require('fs'), path = require('path');
 const { load, fixtures, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
 const VER = +IA.version;
 const ERA = 212;
-const PAIR = VER === ERA;
-const V211_COMMIT = '6adba21f8214516ec8b743f8a76c76d835e76eb5';
-const HM_DIGEST = '0ac7da6b1691a8e1';
 
 let pass = 0, fail = 0, skip = 0, scoped = 0, nyb = 0;
 function ok(label, cond, got){
@@ -142,8 +139,10 @@ function ok(label, cond, got){
 }
 function eq(label, got, want){ ok(label + ' == ' + JSON.stringify(want), got === want, JSON.stringify(got)); }
 function skipRow(label){ skip++; console.log('SKIP ' + label); }
-function pairRow(label, cond, got){
-  if(!PAIR){ scoped++; console.log('SCOPED OUT ' + label + ' [build pair 212/211 only; candidate is ' + VER + '] (now ' + got + ')'); return; }
+// Version scope (post-V233): a row that holds from the D110a era onward is a minimum row, live on every candidate from
+// 212 up. P1n and SH5 are minimum rows.
+function minRow(label, cond, got){
+  if(!(VER >= ERA)){ skipRow(label + ' skipped below the D110a era'); return; }
   ok(label, cond, got);
 }
 function notYet(label){ nyb++; console.log('NOT YET BUILT ' + label); }
@@ -155,7 +154,7 @@ function summary(){
 const LATER = [];
 if(!(VER >= ERA)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D110a (V' + ERA + ').');
-  ['L0','R1','R1k','R2','R3a','R3b','R3c','R4','N1','N2','N3','N4','N5','SH0','SH1','SH2','SH3','SH4','SH5','SO1','SO2','D1','D2','D3','D4','D5','D6','D7','D8','FL1','GT1','GT1b','M2a','M2b','M2c','M2d','M2e','M2f','P0','P1','P1n','P2','HM','CP'].forEach(r => skipRow(r + ' skipped below the D110a era'));
+  ['L0','R1','R1k','R2','R3a','R3b','R3c','R4','N1','N2','N3','N4','N5','SH0','SH1','SH2','SH3','SH4','SH5','SO1','SO2','D1','D2','D3','D6','D7','D8','FL1','GT1','M2a','M2b','M2c','M2d','M2e','M2f','P1n','CP'].forEach(r => skipRow(r + ' skipped below the D110a era'));
   LATER.forEach(r => skipRow(r + ' skipped below the D110a era'));
   summary();
 }
@@ -386,22 +385,7 @@ ok('N5 no swim note carries "—", "–" or letter-hyphen-letter (' + N.swimNote
   ok('CP buildProgram left a slower goal swim cfg byte-identical', JSON.stringify(c) === before, JSON.stringify(c).slice(0, 160));
 }
 
-// ── the V211 baseline (build-pair rows only) ─────────────────────────────────────────────
-// (D4 and D5 run after the baseline loads; see below.)
-let BASE = null, baseWhy = '', ARGV_BASE_VER = null;
-if(PAIR){
-  if(BASEFILE && fs.existsSync(BASEFILE)){ const b = load(BASEFILE); ARGV_BASE_VER = +b.version; if(+b.version === 211){ BASE = b; baseWhy = 'argv baseline ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 211; '; }
-  if(!BASE){
-    try {
-      const repo = path.join(__dirname, '..', '..');
-      const f = path.join(os.tmpdir(), 'g212_v211_' + process.pid + '.html'); try { fs.unlinkSync(f); } catch(e) {}
-      fs.writeFileSync(f, cp.execFileSync('git', ['-C', repo, 'show', V211_COMMIT + ':index.html'], { maxBuffer: 1 << 26 }));
-      const b = load(f); if(+b.version === 211){ BASE = b; baseWhy += 'git ' + V211_COMMIT.slice(0, 7); } else baseWhy += 'git copy reads ' + b.version;
-      try { fs.unlinkSync(f); } catch(e) {}
-    } catch(e) { baseWhy += 'git show failed: ' + String(e.message).slice(0, 80); }
-  }
-  console.log('baseline: ' + (BASE ? 'V211 from ' + baseWhy : 'UNAVAILABLE (' + baseWhy + ')'));
-}
+// The V211 baseline loader (D110a's build pair, 212 vs 211: P0, P1, P2, D4, D5 and P1n's pair path read it) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 
 // P1 configs: every limb D110a must not reach
 const PACE = { id: 'run_pace_goal', label: 'Hit a Pace / Time Goal', mileBestMins: '8', mileBestSecs: '15', mileBestSrc: { kind: 'entered' }, targetDist: '1.5', targetMins: '11', targetSecs: '0', paceUnit: 'mi' };
@@ -430,7 +414,6 @@ for(const exp of ['beginner', 'intermediate', 'advanced']) for(const seed of [76
   for(const s of ['swim_base', 'swim_mile', 'swim_tri']) P1.push([s, nswCfg({ swim: SW(s) }, exp, seed)]);
   P1.push(['swim_500_time with no goal time', swimCfg({ goal: 'swim_500_time', exp, age: '18-35', base: 600, tgt: null, unit: 'yd', seed })]);
 }
-const W = (I, c) => JSON.stringify(I.buildProgram(cl(c)).weeks);
 // P1 strips the swim INT note only: D110a rewrites the distance goal INT note (build to 8).
 let p1n = 0; const p1nBad = [];
 const WN = (I, c, audit) => { const w = I.buildProgram(cl(c)).weeks;
@@ -439,67 +422,13 @@ const WN = (I, c, audit) => { const w = I.buildProgram(cl(c)).weeks;
     delete x.note; }
   return JSON.stringify(w); };
 {
-  let g0 = 0, g0bad = [], p1 = 0, p1bad = [];
-  if(BASE){
-    for(const [lbl, c] of P1.slice(0, 12)){ g0++; if(W(BASE, c) !== W(BASE, c) && g0bad.length < 5) g0bad.push(lbl); }
-    for(const [lbl, c] of P1){ p1++; if(WN(IA, c, true) !== WN(BASE, c, false) && p1bad.length < 8) p1bad.push(lbl + ' ' + c.experience + ' seed ' + c.seed); }
-  }
-  pairRow('P0 identity fuzz: V211 built twice from one cfg is byte-identical (' + g0 + ' cfgs)', !!BASE && g0 >= 12 && g0bad.length === 0, BASE ? g0bad.join(' | ') : 'NO BASELINE');
-  // V213 (standing ruling 4): P1 is the 212-vs-211 pair. A baseline that reads the candidate's own
-  // version says the candidate is a later build before its bump (its ruled moves reach run_pace_goal
-  // and NRC), so P1 SKIPs by name there. The other pair rows are untouched.
-  if(PAIR && ARGV_BASE_VER === VER) skipRow('P1 scoped to the D110a build pair (212 vs 211): the baseline passed reads ' + ARGV_BASE_VER + ', the candidate\'s own version, so this candidate is a later build before its bump');
-  else
-  pairRow('P1 run_pace_goal, NRC, bike and untimed swim goals byte-identical to V211 apart from the swim INT note (' + p1 + ' builds)', !!BASE && p1 >= 60 && p1bad.length === 0, BASE ? p1bad.join(' | ') : 'NO BASELINE');
-  pairRow('P1n every swim INT note on those builds opens with the typed D110a distance note, build to 8 (' + p1n + ' cards)', !!BASE && p1n >= 20 && p1nBad.length === 0, BASE ? p1nBad.join(' | ') : 'NO BASELINE');
+  // P0 P1 (D110a: V211 built twice identical; P1's limbs byte-identical to V211 apart from the swim INT note) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
+  // P1n runs from the D110a era onward (Version scope): it audits the candidate's own swim INT notes on the P1 builds.
+  const P1N_RAN = (VER >= ERA && (P1.forEach(([, c]) => WN(IA, c, true)), true));
+  minRow('P1n every swim INT note on those builds opens with the typed D110a distance note, build to 8 (' + p1n + ' cards)', P1N_RAN && p1n >= 20 && p1nBad.length === 0, P1N_RAN ? p1nBad.join(' | ') : 'NO BASELINE');
 }
-// P2 — the swim time lattice: only swim INT cards move, and they keep V211's rep count
-{
-  let days = 0, ints = 0; const dayBad = [], repBad = [];
-  if(BASE) for(const o of LAT){
-    const a = IA.buildProgram(swimCfg(o)), b = BASE.buildProgram(swimCfg(o));
-    const tag = o.goal + ' ' + o.exp + ' ' + o.age + ' base ' + o.base + ' tgt ' + o.tgt;
-    for(const wk of Object.keys(b.weeks || {})) for(const d of Object.keys(b.weeks[wk] || {})){
-      const da = (a.weeks[wk] || {})[d], db = b.weeks[wk][d];
-      const strip = day => { if(!day) return day; const x = cl(day);
-        if(x.cardio) x.cardio = Array.isArray(x.cardio) ? x.cardio.map(c => isInt(c) ? 'INT' : c) : (isInt(x.cardio) ? 'INT' : x.cardio);
-        return JSON.stringify(x); };
-      days++;
-      if(strip(da) !== strip(db) && dayBad.length < 6) dayBad.push(tag + ' W' + wk + ' ' + d);
-      const ia = cardsOf(da).filter(isInt), ib = cardsOf(db).filter(isInt);
-      for(let i = 0; i < Math.max(ia.length, ib.length); i++){ ints++;
-        const ra = ia[i] && (String(ia[i].detail || '').match(DET_REP) || [])[1], rb = ib[i] && (String(ib[i].detail || '').match(DET_REP) || [])[1];
-        if(!ra || ra !== rb){ if(repBad.length < 6) repBad.push(tag + ' W' + wk + ' ' + d + ' reps ' + ra + ' vs ' + rb); } }
-    }
-    if(Object.keys(a.weeks || {}).length !== Object.keys(b.weeks || {}).length && dayBad.length < 6) dayBad.push(tag + ' program length moved');
-  }
-  pairRow('P2 on the swim time lattice every card other than a swim INT card is byte-identical to V211 (' + days + ' days)', !!BASE && days > 1000 && dayBad.length === 0, BASE ? dayBad.join(' | ') : 'NO BASELINE');
-  pairRow('P2 every swim INT card keeps V211\'s rep count (' + ints + ' cards)', !!BASE && ints > 1000 && repBad.length === 0, BASE ? repBad.join(' | ') : 'NO BASELINE');
-}
-{
-  const hm = progDigest(IA.buildProgram(cl(fixtures.HALF_MANNY)));
-  // D4 — slice 6 leaves the 500 goal untouched (pre-slice references, see the header)
-  const mk5 = o => swimCfg(Object.assign({ goal: 'swim_500_time', unit: 'yd', seed: 76308 }, o));
-  const d4c = progDigest(IA.buildProgram(mk5({ exp: 'intermediate', age: '18-35', base: 616, tgt: 240 })));
-  const d4a = progDigest(IA.buildProgram(mk5({ exp: 'intermediate', age: '36-54', base: 600, tgt: 540 })));
-  const hh = require('crypto').createHash('sha256'); let n4 = 0;
-  for(const exp of ['beginner', 'intermediate', 'advanced']) for(const age of ['18-35', '36-54', '55+']) for(const base of [null, 390, 480, 616, 750])
-    for(const tgt of [345, 450, 480, 570, 660]) for(const unit of ['yd', 'm']){ hh.update(progDigest(IA.buildProgram(mk5({ exp, age, base, tgt, unit, seed: 1234 }))) + '|'); n4++; }
-  const d4l = hh.digest('hex').slice(0, 16);
-  pairRow('D4 the 500 goal is untouched by D144: C7c fixture 63fe1fbf0fc44790, athlete A 402d3dde836e875c, 500 lattice (' + n4 + ' builds) e986019e9b9afa7d',
-     d4c === '63fe1fbf0fc44790' && d4a === '402d3dde836e875c' && d4l === 'e986019e9b9afa7d', d4c + ' / ' + d4a + ' / ' + d4l);
-  // D5 — base500 never reaches the sizer: swim_100_time program length is V211's
-  let n5 = 0; const d5bad = [];
-  if(BASE) for(const o of LAT.filter(x => x.goal === 'swim_100_time')){ n5++;
-    const a = IA.buildProgram(swimCfg(o)).totalWeeks, b = BASE.buildProgram(swimCfg(o)).totalWeeks;
-    if(a !== b && d5bad.length < 5) d5bad.push(o.exp + ' ' + o.age + ' base ' + o.base + ' b500 ' + o.b500 + ' tgt ' + o.tgt + ': ' + a + ' vs ' + b); }
-  const gtCfg = swimCfg({ goal: 'swim_100_time', exp: 'intermediate', age: '18-35', base: null, tgt: null, unit: 'yd', seed: 76308 });
-  gtCfg.cardioGoals.swim = { id: 'swim_100_time', label: 'x', swimUnit: 'yd', base500Mins: '5', base500Secs: '0', baseSecs: '58', targetSecs: '55' };   // GT1's cfg
-  const gtA = IA.buildProgram(cl(gtCfg)).totalWeeks, gtB = BASE ? BASE.buildProgram(cl(gtCfg)).totalWeeks : -1;
-  pairRow('GT1b the seconds-only goal leaves program length at V211\'s (' + gtA + ' vs ' + gtB + '; the sizer readers are D157, unchanged)', !!BASE && gtA === gtB && gtA > 0, gtA + ' vs ' + gtB);
-  pairRow('D5 swim_100_time program length is identical to V211 on ' + n5 + ' builds, most with a base500 on file', !!BASE && n5 >= 200 && d5bad.length === 0, BASE ? d5bad.join(' | ') : 'NO BASELINE');
-  pairRow('HM HALF_MANNY digest is the typed ' + HM_DIGEST + ' (ruled unmoved: an NRC run fixture has no swim time goal)', hm === HM_DIGEST, hm);
-}
+// P2 (D110a: off the swim INT cards the swim time lattice is byte-identical to V211, and INT cards keep V211's rep count) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
+// D4 GT1b D5 HM (D110a/D144: the 500 goal's typed pre-slice digests, the 100 goal's program length equal to V211's, HALF_MANNY typed 0ac7da6b1691a8e1) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 
 // ── SH rows (slice 3, the goal sheet) — run last: they write the VM's localStorage ───────────
 {
@@ -548,7 +477,8 @@ const WN = (I, c, audit) => { const w = I.buildProgram(cl(c)).weeks;
   ok('SH4 swimmer B rebuilt: week 1 prints "x 100m at 2:01/100" at a goal split of 2:03 (10:16 / 500 m = 123.2, minus 2)',
      /x 100m at 2:01\/100/.test(dB) && /goal split of 2:03\/100/.test(dB), dB.slice(0, 120));
   const hB = pB ? progDigest(pB) : 'NO BUILD';
-  pairRow('SH5 swimmer B rebuilt digest is coach\'s surgery print ' + SWIMMER_B_DIGEST, hB === SWIMMER_B_DIGEST, hB);
+  // SH5 runs from the D110a era onward (Version scope): swimmer B's rebuilt digest is the candidate's own state.
+  minRow('SH5 swimmer B rebuilt digest is coach\'s surgery print ' + SWIMMER_B_DIGEST, hB === SWIMMER_B_DIGEST, hB);
   // SO2 — a seconds-only current time carries, both limbs as stored
   const SO = [['100->100, minutes box empty', { id: 'swim_100_time', label: 'x', swimUnit: 'yd', baseMins: '', baseSecs: '58', targetMins: '0', targetSecs: '55' }, 'swim_100_time', ['0', '54'], { swimUnit: 'yd', baseMins: '', baseSecs: '58' }],
               ['100->100, no minutes key', { id: 'swim_100_time', label: 'x', swimUnit: 'yd', baseSecs: '58', targetMins: '0', targetSecs: '55' }, 'swim_100_time', ['0', '54'], { swimUnit: 'yd', baseSecs: '58' }]];

@@ -132,7 +132,7 @@ for(const mk of Object.keys(MIX)) for(const rest of [['sun','wed'], ['sat','sun'
 ok(`P5z the quality-run matcher (${HARD_ROW ? HARD_ROW.ruling : 'NO ROW'}) sees ${hardSeen} INT/CHI runs in the pre-pin weeks tw-1 and tw, ${p5reach} of them at T-1 or T-2 before the pin, so P4 and P5 read real cards`, hardSeen > 0 && p5reach > 0, hardSeen + ' / ' + p5reach);
 
 // ══ V208 slice 0: Q0-Q7 (see header) ═════════════════════════════════════════════════
-const ERA208 = 208, QROWS = ['Q0','Q1','Q2','Q3','Q4','Q5','Q6','Q7','Q8','Q9','Q9x'];
+const ERA208 = 208, QROWS = ['Q0','Q1','Q2','Q3','Q4','Q5','Q7','Q8','Q9','Q9x'];
 if(VER < ERA208){ QROWS.forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates the D106a fix-forward (V' + ERA208 + ')')); done(); }
 const { progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const EASY = c => !!c && c.type === 'run' && !c.legLoad && /^Long Slow Distance/.test(c.subtype || '');
@@ -228,31 +228,7 @@ for(const gk of Object.keys(QGOALS)) for(const mk of Object.keys(QMIX)){
   ok('Q5 raceEveLiftPass control: the easy LSD (legLoad false) on the eve is titled Shakeout', easy[1].sun.title === 'Shakeout', easy[1].sun.title);
   ok('Q5 raceEveLiftPass control: an NRC recovery run on the eve is titled Shakeout', nrc[1].sun.title === 'Shakeout', nrc[1].sun.title);
 }
-// Q6: NRC eves (T-2 through race day, flattened across the week boundary) byte-identical to V207.
-{
-  const BASEFILE = process.argv[3] || null;
-  if(!BASEFILE) console.log('SKIP Q6 no baseline passed as argv[3]; the NRC eve diff did not run');
-  else {
-    const IB = load(BASEFILE);
-    if(!(VER === ERA208 && +IB.version === 207)) console.log('SKIP Q6 scoped to the V208 slice 0 build pair (candidate 208 vs baseline 207); this pair is ' + VER + ' vs ' + IB.version);
-    else {
-      const nrcBase = Object.assign({}, IA.fixtures.HALF_MANNY, {restDays:['sun'], seed:76308});
-      const RACE = {run_5k:['2026-11-19','2026-11-22'], run_half:['2026-12-26','2026-12-28']};
-      const window = q => { const tw = q.totalWeeks, fl = []; [tw - 1, tw].forEach(w => { if(q.weeks[w]) DAYS.forEach(d => fl.push(q.weeks[w][d] || null)); });
-        const ri = fl.findIndex(x => x && x.cardio && /RACE DAY|TIME TRIAL/i.test(x.cardio.subtype || '')); return ri < 0 ? null : fl.slice(Math.max(0, ri - 2), ri + 1); };
-      let n = 0, shk = 0; const moved = [];
-      for(const g of Object.keys(RACE)) for(const rd of RACE[g]) for(const T of [['run'], ['run','bike']]) for(const R of [['sun'], ['sun','wed'], ['sat','sun']]){
-        const cfg = Object.assign({}, nrcBase, {cardioTypes:T, restDays:R, eventTargeted:true, raceDate:rd,
-          cardioGoals:Object.assign({run:{id:g, label:g}}, T.includes('bike') ? {bike:{id:'bike_base', label:'Bike'}} : {})});
-        let a, b; try { a = window(IA.buildProgram(clone(cfg))); } catch(e){ a = 'CRASH ' + e.message; }
-        try { b = window(IB.buildProgram(clone(cfg))); } catch(e){ b = 'CRASH ' + e.message; }
-        n++; if(Array.isArray(a)) shk += a.filter(x => x && x.title === 'Shakeout').length;
-        if(!Array.isArray(a) || canon(a) !== canon(b)) moved.push(g + ' ' + rd + ' ' + T.join('+') + ' [' + R + ']' + (Array.isArray(a) ? '' : ' ' + a));
-      }
-      ok('Q6 NRC eves: ' + n + ' dated run_5k and run_half builds, T-2 through race day byte-equal to V207 (' + shk + ' Shakeout eves seen)', moved.length === 0 && shk > 0, moved.length + ' moved: ' + moved.slice(0, 3).join('; '));
-    }
-  }
-}
+// Q6 (the D106a fix-forward, V208 slice 0: NRC eves byte-equal to the V207 baseline) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
 // Q7: HALF_MANNY is an NRC fixture; the fix-forward touches the NSW test pin and the LSD limb only.
 // V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md section 4; standing rulings 3, 4 and 5):
 // this row defends the D106a fix-forward's claim "my ruling did not move HALF_MANNY". The literal it compared

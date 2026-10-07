@@ -46,6 +46,13 @@
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const ROOT = path.join(__dirname, '..', '..');
 const FILE = process.argv[2] || path.join(ROOT, 'index.html');
+// ROWS (post-V233 V2: every row prints through tests/status.js; CLAUDE.md Proof scope, Row manifest). P0 and P0b are
+// the licence and the source surgery; P1 is one loop row over the routed pace rows; every other id is one assertion
+// below, named for its section. A row that cannot run because P0 or P0b failed is named by summary() as a dark row.
+const S = require('../status')('g205_d129_tiebreak');
+const ROWS = ['P0', 'P0b', 'P1', 'P1b', 'P2', 'P2c-pop', 'P2c-decl', 'P3', 'P4', 'P5-layout', 'P5-rank', 'P5-free',
+  'P6', 'P7-resid', 'P7-hard', 'P7-span', 'P7-r8', 'P7-r9', 'P7-sum', 'P8-layout', 'P8-rest'];
+S.declare(ROWS);
 
 function grab(src, name){
   const sig='function '+name+'('; const i=src.indexOf(sig);
@@ -76,22 +83,29 @@ const _codeOnly = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/g
 const HAS_D129 = /_evenKey/.test(_codeOnly) && /qualRest\s*,\s*qualFirst/.test(_codeOnly);
 if(VER >= 205){
   if(!HAS_D129){
-    console.log('FAIL P0 licence: ia-version ' + VER + ' is D129 era but the tiebreak surface (_evenKey, qualRest, qualFirst) is absent');
-    console.log('PASS 0 FAIL 1');
-    process.exit(1);
+    S.fail('P0', 'licence: ia-version ' + VER + ' is D129 era', 'the tiebreak surface (_evenKey, qualRest, qualFirst) is absent');
+    S.summary();
   }
-  console.log('P0 licence: ia-version ' + VER + ' carries the D129 tiebreak surface');
+  S.pass('P0', 'licence: ia-version ' + VER + ' carries the D129 tiebreak surface');
 } else if(!HAS_D129){
-  console.log('SKIP g205_d129_tiebreak: ia-version ' + VER + ' predates D129 (NOT APPLICABLE)');
-  console.log('PASS 0 FAIL 0');
-  process.exit(0);
+  for(const id of ROWS) S.skip(id, 'the D129 tiebreak surface (_evenKey, qualRest, qualFirst) is absent: ia-version ' + VER + ' predates D129 (NOT APPLICABLE)');
+  S.summary();
 } else {
-  console.log('NOTE ia-version ' + VER + ' with the D129 surface present: pre-bump working artifact, rows RUN');
+  S.pass('P0', 'licence: ia-version ' + VER + ' with the D129 surface present: pre-bump working artifact, rows RUN');
 }
 const parts = ["const ALL_DAYS_ORDER=['sun','mon','tue','wed','thu','fri','sat'];"];
-['isSpeedGoal','getNRCSessionTypes','getSessionTypes','_nrcSpacedRunDays'].forEach(n=>parts.push(grab(src,n)));
 const ctx = {out:null};
-vm.runInNewContext(parts.join('\n')+'\nout={c:_nrcSpacedRunDays,gs:getSessionTypes,gn:getNRCSessionTypes,sp:isSpeedGoal};', ctx);
+// A source anchor grab() cannot find (or cannot balance) is a NAMED FAIL with the summary
+// printed, never a throw (post-V233, Mario: "Kill the noise"). Same shape as P0 above:
+// no row below can run without the chooser, so the gate stops here, red and readable.
+try {
+  ['isSpeedGoal','getNRCSessionTypes','getSessionTypes','_nrcSpacedRunDays'].forEach(n=>parts.push(grab(src,n)));
+  vm.runInNewContext(parts.join('\n')+'\nout={c:_nrcSpacedRunDays,gs:getSessionTypes,gn:getNRCSessionTypes,sp:isSpeedGoal};', ctx);
+} catch(e){
+  S.fail('P0b', 'source surgery', e.message + ' (the chooser cannot be extracted, so no row below can run)');
+  S.summary();
+}
+S.pass('P0b', 'source surgery: the chooser and its session type tables are extracted from the artifact');
 const E = ctx.out;
 
 const DAYS=['sun','mon','tue','wed','thu','fri','sat'];
@@ -173,9 +187,6 @@ function topBy(list,key){ let b=list[0]; list.forEach(c=>{ if(cmp(c[key],b[key])
 const lay=(t,p)=>p.idxs.map(i=>t[i].toUpperCase()+':'+p.typeOf[t[i]]).join(' ');
 const engIn=(list,p,t)=>list.find(c=>c.idxs.join()===p.idxs.join()&&c.days.every(d=>c.typeOf[d]===p.typeOf[d]));
 
-let PASS=0,FAIL=0;
-function ok(c,msg){ if(c) PASS++; else { FAIL++; console.log('  FAIL ' + msg); } }
-
 // routed pace rows: ceiling below the training week, 2 or more days
 const PACE_ROWS=[];
 [0,1,2,3,4,5].forEach(nr=>combos(DAYS,nr).forEach(rest=>{
@@ -185,7 +196,7 @@ const PACE_ROWS=[];
 
 // ── P1: the pace arm is lex-optimal under the CORRECTED-eve objective ────────
 console.log('P1 pace arm lex-optimal under the corrected recBeforeLong (' + PACE_ROWS.length + ' rows)');
-let p1bad=0;
+const L1=S.loop('P1','pace arm lex-optimal under the corrected recBeforeLong, one sub-result per routed pace row');
 PACE_ROWS.forEach(r=>{
   const types=paceTypes(r.train,r.cap);   // V213 era row
   const all=space(r.train,r.cap,types,TP,true);
@@ -193,14 +204,14 @@ PACE_ROWS.forEach(r=>{
   const got=engIn(all,pick,r.train);
   const best=topBy(all,'rank');
   const good = got && best.some(b=>cmp(b.rank,got.rank)===0);
-  if(!good){ p1bad++; if(p1bad<=5) console.log('  FAIL P1 rest '+r.nm+' cap'+r.cap+' engine '+lay(r.train,pick)+
-    ' rank '+(got?got.rank.join(','):'ORPHAN')+' vs best '+best[0].rank.join(',')); }
-  ok(good,'');  // counted per row
+  L1.check(good,'rest '+r.nm+' cap'+r.cap, good?'':'engine '+lay(r.train,pick)+
+    ' rank '+(got?got.rank.join(','):'ORPHAN')+' vs best '+best[0].rank.join(','));   // one sub-result per row
 });
+L1.done();
 
 // ── P1b: the day AFTER the long run is never credited as padding it ─────────
 console.log('P1b no pace layout is credited for a recovery run the day AFTER the long');
-let p1b=0;
+let p1b=0; const p1bx=[];
 PACE_ROWS.forEach(r=>{
   const pick=E.c(r.train,r.cap,'run_pace_goal',true);
   const days=pick.idxs.map(i=>r.train[i]);
@@ -215,17 +226,18 @@ PACE_ROWS.forEach(r=>{
     const types=paceTypes(r.train,r.cap);   // V213 era row
     const all=space(r.train,r.cap,types,TP,true);
     const got=engIn(all,pick,r.train);
-    if(!got){ p1b++; console.log('  FAIL P1b rest '+r.nm+' cap'+r.cap+' engine layout '+lay(r.train,pick)+' is not in the era type space'); return; }
+    if(!got){ p1b++; p1bx.push('rest '+r.nm+' cap'+r.cap+' engine layout '+lay(r.train,pick)+' is not in the era type space'); return; }
     const better=all.find(c=>cmp(c.ruled.slice(0,3),got.ruled.slice(0,3))===0 && c.ruled[3]>got.ruled[3]);
-    if(better){ p1b++; console.log('  FAIL P1b rest '+r.nm+' cap'+r.cap+' kept a day-after pad over '+
+    if(better){ p1b++; p1bx.push('rest '+r.nm+' cap'+r.cap+' kept a day-after pad over '+
       better.days.map(d=>d.toUpperCase()+':'+better.typeOf[d]).join(' ')); }
   }
 });
-ok(p1b===0,'P1b: '+p1b+' rows kept a day-after pad over a true eve');
+S.check('P1b',p1b===0,'P1b: no pace layout keeps a day-after pad over a true eve',
+  p1b+' rows kept a day-after pad over a true eve; first: '+p1bx.slice(0,3).join(' ; '));
 
 // ── P2: ranks 6 and 7 are INERT on the NRC arm ──────────────────────────────
 console.log('P2 NRC is lex-optimal under the FIVE ruled terms alone (ranks 6/7 inert)');
-let nrcRows=0,p2bad=0;
+let nrcRows=0,p2bad=0; const p2x=[];
 ['run_5k','run_10k','run_half','run_marathon'].forEach(g=>{
   [0,1,2,3,4,5].forEach(nr=>combos(DAYS,nr).forEach(rest=>{
     const train=DAYS.filter(d=>rest.indexOf(d)<0), n=train.length;
@@ -237,12 +249,13 @@ let nrcRows=0,p2bad=0;
       const got=engIn(all,pick,train);
       const best=topBy(all,'ruled');
       const good = got && cmp(got.ruled,best[0].ruled)===0;
-      if(!good){ p2bad++; if(p2bad<=5) console.log('  FAIL P2 '+g+' rest '+(rest.join('+')||'none')+' cap'+cap+
+      if(!good){ p2bad++; if(p2x.length<3) p2x.push(g+' rest '+(rest.join('+')||'none')+' cap'+cap+
         ' rank '+(got?got.ruled.join(','):'ORPHAN')+' vs '+best[0].ruled.join(',')); }
     }
   }));
 });
-ok(p2bad===0,'P2: '+p2bad+'/'+nrcRows+' NRC rows are not five-term optimal');
+S.check('P2',p2bad===0,'P2: every scored NRC row is lex-optimal under the five ruled terms ('+nrcRows+' rows)',
+  p2bad+'/'+nrcRows+' NRC rows are not five-term optimal; first: '+p2x.join(' ; '));
 console.log('  NRC rows scored: '+nrcRows);
 
 // ── P2c: IDENTITY IS NOT CONSULTED ON THE NRC ARM ────────────────────────────
@@ -280,17 +293,19 @@ console.log('P2c identity is pace-family-only: NRC declines the even-spread subs
       }
     }));
   });
-  ok(tieMulti===445 && evenInTie===357,
-     'P2c population: '+tieMulti+' multi-subset ties (expected 445), even-spread subset in '+evenInTie+' (expected 357)');
-  ok(takesOther===129 && takesEven===228,
-     'P2c: the engine declined the even-spread subset on '+takesOther+' rows (expected 129) and took it on '+takesEven+' (expected 228). Zero declines means identity is scored on NRC');
+  S.check('P2c-pop',tieMulti===445 && evenInTie===357,
+     'P2c population: '+tieMulti+' multi-subset ties (expected 445), even-spread subset in '+evenInTie+' (expected 357)',
+     'the population moved off the measure');
+  S.check('P2c-decl',takesOther===129 && takesEven===228,
+     'P2c: the engine declined the even-spread subset on '+takesOther+' rows (expected 129) and took it on '+takesEven+' (expected 228)',
+     'Zero declines means identity is scored on NRC');
   console.log('  NRC declined it on '+takesOther+'/'+evenInTie+' offered rows; e.g. '+ex.join(' | '));
 }
 
 // ── P3: IDENTITY. Where the even-spread subset is in the five-term tie set,
 //        the engine must pick that subset. ───────────────────────────────────
 console.log('P3 identity: the incumbent even-spread subset wins every tie it is in');
-let p3n=0,p3bad=0;
+let p3n=0,p3bad=0; const p3x=[];
 PACE_ROWS.forEach(r=>{
   const types=paceTypes(r.train,r.cap);   // V213 era row
   const all=space(r.train,r.cap,types,TP,true);
@@ -299,16 +314,17 @@ PACE_ROWS.forEach(r=>{
   if(!tied.some(c=>c.idxs.join(',')===ev)) return;
   p3n++;
   const pick=E.c(r.train,r.cap,'run_pace_goal',true);
-  if(pick.idxs.join(',')!==ev){ p3bad++; console.log('  FAIL P3 rest '+r.nm+' cap'+r.cap+
+  if(pick.idxs.join(',')!==ev){ p3bad++; p3x.push('rest '+r.nm+' cap'+r.cap+
     ' incumbent '+ev.split(',').map(i=>r.train[+i]).join(',')+' but picked '+pick.idxs.map(i=>r.train[i]).join(',')); }
 });
-ok(p3bad===0,'P3: '+p3bad+'/'+p3n+' rows moved off the incumbent subset on a tie');
+S.check('P3',p3bad===0,'P3 identity: no row moved off the incumbent subset on a tie ('+p3n+' rows)',
+  p3bad+'/'+p3n+' rows moved off the incumbent subset on a tie; first: '+p3x.slice(0,3).join(' ; '));
 console.log('  rows where the incumbent subset ties at the top: '+p3n);
 
 // ── P4: SPREAD. Where it does NOT, the pick has the minimum longest run-free
 //        stretch over the tie set. ────────────────────────────────────────────
 console.log('P4 spread: among ties without the incumbent, the tightest week wins');
-let p4n=0,p4bad=0;
+let p4n=0,p4bad=0; const p4x=[];
 PACE_ROWS.forEach(r=>{
   const types=paceTypes(r.train,r.cap);   // V213 era row
   const all=space(r.train,r.cap,types,TP,true);
@@ -319,10 +335,11 @@ PACE_ROWS.forEach(r=>{
   const minLF=Math.min.apply(null,tied.map(c=>c.lf));
   const pick=E.c(r.train,r.cap,'run_pace_goal',true);
   const got=engIn(all,pick,r.train);
-  if(!got||got.lf!==minLF){ p4bad++; if(p4bad<=5) console.log('  FAIL P4 rest '+r.nm+' cap'+r.cap+
+  if(!got||got.lf!==minLF){ p4bad++; if(p4x.length<3) p4x.push('rest '+r.nm+' cap'+r.cap+
     ' longest run-free '+(got?got.lf:'?')+' but '+minLF+' was available'); }
 });
-ok(p4bad===0,'P4: '+p4bad+'/'+p4n+' rows took a looser week than the tie set allowed');
+S.check('P4',p4bad===0,'P4 spread: no row took a looser week than the tie set allowed ('+p4n+' rows)',
+  p4bad+'/'+p4n+' rows took a looser week than the tie set allowed; first: '+p4x.join(' ; '));
 console.log('  rows decided by spread: '+p4n);
 
 // ── P5: HAND TABLE. Mario's row, typed in as literals. ─────────────────────
@@ -333,9 +350,9 @@ console.log("P5 hand table: rest sun+wed, four-run ceiling");
   const got=engIn(space(train,4,E.gs(4,E.sp('run_pace_goal'),false,false),TP,true),pick,train);
   const want='MON:int THU:chi FRI:lsd_easy SAT:lsd_long';
   console.log('  '+lay(train,pick)+'  ruled rank '+(got?got.ruled.join(','):'ORPHAN'));
-  ok(lay(train,pick)===want,'P5 layout is "'+lay(train,pick)+'", hand table says "'+want+'"');
-  ok(got&&got.ruled.join(',')==='0,1,2,1,1','P5 ruled rank is not 0,1,2,1,1');
-  ok(got&&got.lf===2,'P5 longest run-free stretch is not 2');
+  S.check('P5-layout',lay(train,pick)===want,'P5 layout is "'+lay(train,pick)+'", hand table says "'+want+'"','the layout is off the hand table');
+  S.check('P5-rank',got&&got.ruled.join(',')==='0,1,2,1,1','P5 ruled rank is 0,1,2,1,1','P5 ruled rank is not 0,1,2,1,1: '+(got?got.ruled.join(','):'ORPHAN'));
+  S.check('P5-free',got&&got.lf===2,'P5 longest run-free stretch is 2','P5 longest run-free stretch is not 2: '+(got?got.lf:'ORPHAN'));
 }
 
 // ── P6: AFTER-GRID. The eve correction displaces 24 of the 93 pace rows. ───
@@ -357,7 +374,7 @@ console.log('P6 after-grid: the eve correction moves 24 of 93 pace rows');
     if(a.idxs.join()!==b.idxs.join()||a.days.some(d=>a.typeOf[d]!==b.typeOf[d])) moved++;
   });
   console.log('  displaced: '+moved+'/93');
-  ok(moved===24,'P6 eve correction displaced '+moved+' rows, after-grid says 24');
+  S.check('P6',moved===24,'P6 eve correction displaced '+moved+' rows, after-grid says 24','the displacement count moved off the after-grid');
 }
 
 // ── P7: DAYS ARE NEVER AN ARTIFACT OF LOOP ORDER. The residual tie count after
@@ -366,7 +383,7 @@ console.log('P6 after-grid: the eve correction moves 24 of 93 pace rows');
 //        Only the recovery day may differ. ──────────────────────────────────────
 console.log('P7 residual ties after rank 9, and what the survivors look like');
 {
-  let resid=0, spanning=0, hardSplit=0;
+  let resid=0, spanning=0, hardSplit=0; const p7x=[];
   PACE_ROWS.forEach(r=>{
     const types=E.gs(r.cap,E.sp('run_pace_goal'),false,false);
     const tied=topBy(space(r.train,r.cap,types,TP,true),'rank');
@@ -375,17 +392,17 @@ console.log('P7 residual ties after rank 9, and what the survivors look like');
     const dsets=tied.map(c=>c.idxs.join(',')).filter((v,i,a)=>a.indexOf(v)===i);
     if(dsets.length>1) spanning++;
     const hards=tied.map(c=>c.hard).filter((v,i,a)=>a.indexOf(v)===i);
-    if(hards.length>1){ hardSplit++; console.log('  FAIL P7 rest '+r.nm+' cap'+r.cap+
+    if(hards.length>1){ hardSplit++; p7x.push('rest '+r.nm+' cap'+r.cap+
       ' tie spans two hard-day placements: '+hards.join('  |  ')); }
     console.log('  residual tie: rest '+r.nm+' cap'+r.cap+' x'+tied.length+' -> '+
       tied.map(c=>lay(r.train,c)).join('  |  '));
   });
   console.log('  rows with a tie surviving rank 9: '+resid+'/'+PACE_ROWS.length+
               ' (spanning more than one day set: '+spanning+')');
-  ok(resid===2,'P7 residual tie count is '+resid+'/93, the measure pinned 2');
-  ok(hardSplit===0,'P7: '+hardSplit+' residual ties put the hard days on different days');
+  S.check('P7-resid',resid===2,'P7 residual tie count is '+resid+'/93, the measure pinned 2','the residual tie count moved off the measure');
+  S.check('P7-hard',hardSplit===0,'P7: '+hardSplit+' residual ties put the hard days on different days',p7x.slice(0,3).join(' ; ')||'a residual tie splits the hard days');
   // the measured refutation of the literal wording, pinned so it cannot drift silently
-  ok(spanning===2,'P7 day-set-spanning residual ties is '+spanning+', the measure pinned 2');
+  S.check('P7-span',spanning===2,'P7 day-set-spanning residual ties is '+spanning+', the measure pinned 2','the spanning count moved off the measure');
   // HOW THE NINE TIES AT RANK 7 ARE DISPOSED OF. Oracle-internal: it pins the shape of
   // the search space, not the engine's answer. Rank 8 breaks 5, rank 9 breaks 2, and 2
   // survive with the same hard days. The three numbers must sum to the rank-7 tie count.
@@ -398,9 +415,9 @@ console.log('P7 residual ties after rank 9, and what the survivors look like');
     if(t8>t9) r9++;
   });
   console.log('  ties broken by rank 8: '+r8+'/'+PACE_ROWS.length+'; by rank 9: '+r9+'/'+PACE_ROWS.length);
-  ok(r8===5,'P7 rank 8 broke '+r8+' ties, the measure pinned 5');
-  ok(r9===2,'P7 rank 9 broke '+r9+' ties, the measure pinned 2');
-  ok(r8+r9+resid===9,'P7 rank-7 ties do not account: '+r8+'+'+r9+'+'+resid+' is not 9');
+  S.check('P7-r8',r8===5,'P7 rank 8 broke '+r8+' ties, the measure pinned 5','the rank 8 count moved off the measure');
+  S.check('P7-r9',r9===2,'P7 rank 9 broke '+r9+' ties, the measure pinned 2','the rank 9 count moved off the measure');
+  S.check('P7-sum',r8+r9+resid===9,'P7 rank-7 ties account: '+r8+'+'+r9+'+'+resid+' is 9','P7 rank-7 ties do not account: '+r8+'+'+r9+'+'+resid+' is not 9');
 }
 
 // ── P8: AFTER-GRID HAND ROW. The ruling names this resolution for the five-way
@@ -411,10 +428,10 @@ console.log('P8 after-grid: rest fri, four-run ceiling');
   const pick=E.c(train,4,'run_pace_goal',true);
   const want='MON:int WED:chi THU:lsd_easy SAT:lsd_long';
   console.log('  '+lay(train,pick));
-  ok(lay(train,pick)===want,'P8 layout is "'+lay(train,pick)+'", the ruling says "'+want+'"');
+  S.check('P8-layout',lay(train,pick)===want,'P8 layout is "'+lay(train,pick)+'", the ruling says "'+want+'"','the layout is off the ruling');
   // rank 8 is the term that decides it: last quality Wednesday, three days clear of the long
   const got=engIn(space(train,4,E.gs(4,E.sp('run_pace_goal'),false,false),TP,true),pick,train);
-  ok(got&&got.qr===3,'P8 rest into the long run is '+(got?got.qr:'?')+' days, the ruling says 3');
+  S.check('P8-rest',got&&got.qr===3,'P8 rest into the long run is '+(got?got.qr:'?')+' days, the ruling says 3','the rest into the long run is off the ruling');
 }
 
-console.log('PASS '+PASS+' FAIL '+FAIL);
+S.summary();

@@ -24,6 +24,10 @@
 //                card's `note` or `detail` contains "—" or letter-hyphen-letter. EXEMPT: the
 //                `detail` of NRC Speed Run cards (Nike-verbatim tables) and every `subtype`.
 //
+// IDS (post-V233 V2: every row prints through tests/status.js; CLAUDE.md Proof scope, Row manifest). The rows
+// above keyed to the ruling they defend (standing ruling 4): D109-S-<builder>, D109-T-<builder>, D109-R-<fixture>,
+// the fixture tag with '_' written '-' (the id grammar has no '_'). Below the D109 era every row prints SCOPED OUT.
+//
 // SLICING. V206 lands D109 in slices: run builder (slice 2), NRC (slice 3), bike and swim
 // (slice 4). Until a builder's slice lands its S, T and R rows are EXPECTED red.
 //
@@ -43,17 +47,21 @@ const D109_ERA = 206;
 const LIVE = VER >= D109_ERA;
 const SRC = fs.readFileSync(ART, 'utf8');
 
-let pass = 0, fail = 0, na = 0;
-function row(label, cond, detail){
+const S = require('../status')('g206_d109_copy');
+const rid = (kind, tag) => 'D109-' + kind + '-' + String(tag).replace(/_/g, '-');
+const ROW_BUILDERS = ['run', 'nrc', 'bike', 'swim'];                                // the keys of BUILDERS below
+const ROW_FIXTURES = ['HALF_MANNY', 'run_base', 'pace_goal', 'bike', 'swim'];       // the tags of FIX below
+S.declare(ROW_BUILDERS.map(k => rid('S', k)).concat(ROW_BUILDERS.map(k => rid('T', k)), ROW_FIXTURES.map(t => rid('R', t))));
+let na = 0;
+function row(id, label, cond, detail){
   const tail = detail ? ' (' + detail + ')' : '';
-  if(!LIVE){ na++; console.log('NOT APPLICABLE ' + label + tail); return; }
-  if(cond){ pass++; console.log('PASS ' + label + tail); }
-  else { fail++; console.log('FAIL ' + label + tail); }
+  if(!LIVE){ na++; S.scoped(id, 'ia-version ' + VER + ' predates D109 (V' + D109_ERA + '), NOT APPLICABLE: ' + label + tail); return; }
+  if(cond) S.pass(id, label + tail);
+  else S.fail(id, label, detail);
 }
 function summary(){
-  console.log('\n' + (LIVE ? '' : 'ia-version ' + VER + ' predates D109 (V' + D109_ERA + '): '
-    + na + ' rows NOT APPLICABLE\n') + 'PASS ' + pass + ' FAIL ' + fail);
-  process.exit(fail ? 1 : 0);
+  if(!LIVE) S.info('ia-version ' + VER + ' predates D109 (V' + D109_ERA + '): ' + na + ' rows NOT APPLICABLE');
+  S.summary();
 }
 console.log('g206 D109 copy sweep — artifact ia-version ' + VER + (LIVE ? '' : ' (below the D109 era)'));
 
@@ -245,7 +253,7 @@ if(ents){
 // ── S and T rows ─────────────────────────────────────────────────────────────
 for(const key of Object.keys(BUILDERS)){
   const fn = BUILDERS[key], b = body(fn);
-  if(b.err){ row('S-' + key + ' ' + fn + ' body located', false, b.err); row('T-' + key + ' table text sited', false, b.err); continue; }
+  if(b.err){ row(rid('S', key), fn + ' body located', false, b.err); row(rid('T', key), 'table text sited in ' + fn, false, b.err); continue; }
   const sc = scan(b.text);
   const lines = sc.code.split('\n');
   const skipLn = new Set(); lines.forEach((l, j) => { if(ASSIGNS_NAME.test(l)) skipLn.add(j); });
@@ -256,12 +264,12 @@ for(const key of Object.keys(BUILDERS)){
   const ex = []
     .concat(emLines.slice(0, 3).map(j => at(j) + ' |' + lines[j].trim().slice(0, 70) + '|'))
     .concat(hyLits.slice(0, 3).map(x => at(x.line) + ' "' + (x.text.match(/\S*[A-Za-z]-[A-Za-z]\S*/) || [''])[0] + '"'));
-  row('S-' + key + ' ' + fn + ' (' + lines.length + ' lines, ' + sc.lits.length + ' literals, ' + skipLn.size
+  row(rid('S', key), fn + ' (' + lines.length + ' lines, ' + sc.lits.length + ' literals, ' + skipLn.size
       + ' subtype/phaseTag lines excluded): 0 lines carry "—" and 0 literals carry letter-hyphen-letter',
     sc.lits.length > 0 && emLines.length === 0 && hyLits.length === 0,
     'em-dash lines ' + emLines.length + ', hyphenated literals ' + hyLits.length + (ex.length ? '; first: ' + ex.join(' ; ') : ''));
 
-  if(!ents){ row('T-' + key + ' table text sited in ' + fn, false, tableErr); continue; }
+  if(!ents){ row(rid('T', key), 'table text sited in ' + fn, false, tableErr); continue; }
   const [lo, hi] = TABLE_RANGE[key], tBad = [];
   let want = 0;
   for(let k = lo; k <= hi; k++){
@@ -273,7 +281,7 @@ for(const key of Object.keys(BUILDERS)){
       tBad.push('#' + k + (e.by ? ' (' + e.by + ')' : '') + ' new ' + nNew + '/' + e.n + ' old ' + nOld + (e.gone ? ' superseded ' + nGone : ''));
   }
   (SUP_BAD[key] || []).forEach(x => tBad.push(x));
-  row('T-' + key + ' entries ' + lo + '-' + hi + ' of coach\'s table: each new text sits in ' + fn
+  row(rid('T', key), 'entries ' + lo + '-' + hi + ' of coach\'s table: each new text sits in ' + fn
       + ' exactly "@@ n" times and its old text 0 times (' + want + ' sites)',
     tBad.length === 0, tBad.length ? tBad.length + ' entries off; first: ' + tBad.slice(0, 4).join(', ') : '');
 }
@@ -310,7 +318,7 @@ const isSpeed = c => /^Speed Run/.test(String(c.subtype || ''));
 for(const f of FIX){
   let p = null, err = '';
   try { p = IA.buildProgram(clone(f.cfg)); } catch(e){ err = String(e && e.message || e); }
-  if(!p){ row('R-' + f.tag + ' builds', false, err); continue; }
+  if(!p){ row(rid('R', f.tag), f.tag + ' builds', false, err); continue; }
   let cards = 0, typed = 0, texts = 0, exempt = 0; const hits = [];
   Object.keys(p.weeks || {}).sort((a,b)=>+a-+b).forEach(w => DAYS.forEach(d => {
     const day = p.weeks[w][d]; if(!day || !day.cardio) return;
@@ -327,7 +335,7 @@ for(const f of FIX){
       }
     });
   }));
-  row('R-' + f.tag + ' (' + typed + ' ' + f.type + ' cards of ' + cards + ', ' + texts + ' note/detail texts audited, '
+  row(rid('R', f.tag), f.tag + ' (' + typed + ' ' + f.type + ' cards of ' + cards + ', ' + texts + ' note/detail texts audited, '
       + exempt + ' Speed Run details exempt): no note or detail carries "—" or letter-hyphen-letter',
     typed > 0 && texts > 0 && hits.length === 0,
     hits.length ? hits.length + ' texts; first: ' + hits.slice(0, 3).join(' ; ') : '');

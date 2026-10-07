@@ -85,13 +85,10 @@ const { load, progDigest, fixtures } = require(path.join(__dirname, '..', 'harne
 
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
-const BASEFILE = process.argv[3] || null;
-const ERA = 221, BASE_ERA = 220, V220_COMMIT = '8ee4385b6108a2eade639628aa99dee0ab201950';
-const MANNY = '0ac7da6b1691a8e1';
+const ERA = 221;
 const T0 = process.hrtime.bigint(); const secs = () => (Number(process.hrtime.bigint() - T0) / 1e9).toFixed(1);
 let pass = 0, fail = 0, skip = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l + (g === undefined ? '' : '  [' + g + ']')); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
-const skipRow = (l, why) => { skip++; console.log('SKIP ' + l + ': ' + why); };
 const done = () => { console.log('  runtime ' + secs() + ' s\n\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
 
 // ── HAND ORACLE ──────────────────────────────────────────────────────────────
@@ -142,7 +139,6 @@ const R = {
   I3c:'I3c (iii) activeProg against the wizard\'s own prog: the only differing key is overlays, 46/46',
   I3d:'I3d (iii) aligned wizard rows: stored blockOpen ' + TODAY_ISO + ', landing .pre cells are the date-arithmetic set, fixture landing 0 /0 DONE',
   I4:'I4 (iv) fixture (start ' + FIX_START + ', blockOpen ' + FIX_BO + ') boot: no reminder pop, no ia_reminded_ key',
-  I5:'I5 (v) progDigest(buildProgram(HALF_MANNY)) = ' + MANNY + ', self-stable (no era row)',
   T1:'T1 W1 strip 7/7 .pre, none tappable',
   T2:'T2 W1 DONE tile ' + T_AFTER.W1done,
   T3:'T3 W1 mon tap: toast "' + T_AFTER.toast + '", the day does not open',
@@ -153,11 +149,7 @@ const R = {
   T8:'T8 scheduledDays(today) = 1',
   T9:'T9 W1 hero offers no session (browse)',
   T10:'T10 streak 0 (same as before)',
-  P1:'P1 (pair) refreshProgram lattice: V220 equals itself; non-aligned JSON byte-identical to V220; aligned JSON equals V220 once blockOpen is dropped and differs with it',
-  P2:'P2 (pair) wizard landing W1 render equals V220\'s landing (the :1964 picture), V220 equal to itself, 46/46',
-  P3:'P3 (pair) the Before column reproduces on V220: W1 and W4 0 /5 DONE, no .pre cell, reminder "More than a week off", scheduledDays 18, 7 of 7 rest days eligible, W1 mon opens',
 };
-const PAIR_ROWS = ['P1', 'P2', 'P3'];
 
 // ── RUN ──────────────────────────────────────────────────────────────────────
 let IA0, STAMP = NaN;
@@ -173,27 +165,6 @@ if(!(VER >= ERA)){
   done();
 }
 if(ORACLE_BAD.length){ console.log('ORACLE INCONSISTENT: ' + ORACLE_BAD.join('; ')); Object.keys(R).forEach(k => ok(R[k] + ' (oracle inconsistent)', false)); done(); }
-// Baseline for the pair rows: D180's build pair is 221 against 220.
-let BASE = null, baseWhy = '';
-if(VER === ERA){
-  try {
-    if(BASEFILE){ const b = load(BASEFILE); if(+b.version === BASE_ERA) BASE = path.resolve(BASEFILE); else baseWhy = 'argv[3] reads ' + b.version + '; '; }
-    if(!BASE){
-      const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'g221d180-')), f = path.join(tmp, 'v220.html');
-      fs.writeFileSync(f, cp.execFileSync('git', ['show', V220_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 27 }));
-      const b = load(f);
-      if(+b.version === BASE_ERA){ BASE = f; baseWhy += 'baseline from git ' + V220_COMMIT.slice(0, 7); } else baseWhy += 'git reads ' + b.version;
-      process.on('exit', () => { try { fs.rmSync(tmp, { recursive:true, force:true }); } catch(e){} });
-    }
-  } catch(e){ baseWhy += 'baseline load failed: ' + String(e && e.message || e).slice(0, 160); BASE = null; }
-}
-const PAIR = VER === ERA && !!BASE;
-console.log('  pair rows: ' + (PAIR ? 'LIVE (candidate ' + VER + ' vs V' + BASE_ERA + (baseWhy ? ', ' + baseWhy : ', argv[3]') + ')' : VER === ERA ? 'SETUP FAILED (' + baseWhy + ')' : 'scoped out (candidate ' + VER + ' is not D180\'s pair)'));
-const pairRow = (key, fn) => {
-  if(PAIR){ let r; try { r = fn(); } catch(e){ r = [false, 'threw ' + e.message]; } return ok(R[key], r[0], r[1]); }
-  if(VER === ERA) return ok(R[key] + ' (setup: ' + baseWhy + ')', false);
-  skipRow(R[key], 'scoped out, candidate ' + VER + " is not D180's build pair (221 vs 220)");
-};
 const row = (key, fn) => { let r; try { r = fn(); } catch(e){ r = [false, 'threw ' + (e && e.stack || e).toString().split('\n').slice(0, 2).join(' ')]; } ok(R[key], r[0], r[1]); };
 
 // ── VM helpers ───────────────────────────────────────────────────────────────
@@ -377,8 +348,7 @@ function tableRead(file){
 }
 const TC = tableRead(ART);
 row('I4', () => [FIX_OK && TC.pops.length === 0 && TC.remindKey === null, 'reminder pops ' + (TC.pops.join(' | ') || 'none') + ', ia_reminded_HM1 ' + (TC.remindKey || 'absent') + ', fixture ' + FIX_OK]);
-if(VER === ERA) row('I5', () => { const I = load(ART), a = progDigest(I.buildProgram(fixtures.HALF_MANNY)), b = progDigest(I.buildProgram(fixtures.HALF_MANNY)); return [a === MANNY && a === b, a + ' / ' + b]; });
-else skipRow(R.I5, 'scoped out, candidate ' + VER + ': a later ruling owns HALF_MANNY (standing ruling 5)');
+// I5 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended standing ruling 5 at D180: the HALF_MANNY digest typed for 221, self-stable.
 row('T1', () => [FIX_OK && TC.W1.cells === 7 && TC.W1.pre === T_AFTER.W1pre && TC.W1.taps === T_AFTER.W1tap, 'cells ' + TC.W1.cells + ', .pre [' + TC.W1.pre + '], tappable ' + TC.W1.taps]);
 row('T2', () => [FIX_OK && TC.W1.done === T_AFTER.W1done, TC.W1.done]);
 row('T3', () => [FIX_OK && TC.tap.toasts.length === 1 && TC.tap.toasts[0] === T_AFTER.toast && TC.tap.key !== 'mon', 'toasts ' + JSON.stringify(TC.tap.toasts) + ', currentDayKey ' + TC.tap.key]);
@@ -390,31 +360,5 @@ row('T8', () => [FIX_OK && TC.sched === T_AFTER.sched, String(TC.sched)]);
 row('T9', () => [!!TC.W1.heroHtml && !/(START|OPEN) SESSION/.test(TC.W1.heroHtml) && !/\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/.test(TC.W1.hero), TC.W1.hero.slice(0, 60)]);
 row('T10', () => [TC.streak === T_AFTER.streak, String(TC.streak)]);
 
-// ── PAIR rows: candidate 221 against V220 ────────────────────────────────────
-if(PAIR){
-  const tP = secs();
-  const LB = lattice(BASE), LB2 = lattice(BASE);
-  pairRow('P1', () => {
-    const self = LB.every((o, i) => o.jsonH === LB2[i].jsonH);
-    let naSame = 0, naN = 0, alSame = 0, alDiff = 0, alN = 0;
-    LROWS.forEach((r, i) => { if(r.aligned){ alN++; if(LC[i].jnbH === LB[i].jnbH) alSame++; if(LC[i].jsonH !== LB[i].jsonH) alDiff++; } else { naN++; if(LC[i].jsonH === LB[i].jsonH) naSame++; } });
-    return [self && naN === 37 && alN === 365 && naSame === naN && alSame === alN && alDiff === alN,
-      'V220 self ' + (self ? 'OK' : 'NOT REPRODUCIBLE') + '; non-aligned byte-identical ' + naSame + '/' + naN + '; aligned equal without blockOpen ' + alSame + '/' + alN + ', differ with it ' + alDiff + '/' + alN];
-  });
-  const WB = wizardRun(BASE, false), WB2 = wizardRun(BASE, false);
-  pairRow('P2', () => {
-    const self = WB.every((o, i) => o.landing && o.landing === WB2[i].landing);
-    const n = WC.filter((o, i) => o.landing === WB[i].landing).length;
-    return [self && n === WROWS.length, 'V220 self ' + (self ? 'OK' : 'NOT REPRODUCIBLE') + '; landing == V220 landing ' + n + '/' + WROWS.length + (n < WROWS.length ? '; e.g. ' + WROWS.filter((r, i) => WC[i].landing !== WB[i].landing).slice(0, 3).map(r => r.name).join(', ') : '')];
-  });
-  const TB = tableRead(BASE);
-  pairRow('P3', () => {
-    const rem = (TB.pops[0] || '').replace(/^reminder::/, '');
-    const c = TB.W1.done === T_BEFORE.W1done && TB.W4.done === T_BEFORE.W4done && TB.W1.pre === '' && TB.W4.pre === '' && TB.W1.taps === 7
-      && rem.indexOf(T_BEFORE.remind) === 0 && TB.remindKey !== null && TB.sched === T_BEFORE.sched && TB.rest === T_BEFORE.restEligible
-      && TB.tap.key === 'mon' && TB.tap.toasts.indexOf(T_AFTER.toast) < 0;
-    return [c, 'V220: W1 ' + TB.W1.done + ' pre [' + TB.W1.pre + '] taps ' + TB.W1.taps + ', W4 ' + TB.W4.done + ' pre [' + TB.W4.pre + '], reminder "' + rem.slice(0, 40) + '", sched ' + TB.sched + ', rest ' + TB.rest + '/7, W1 mon opens ' + (TB.tap.key === 'mon')];
-  });
-  console.log('  pair rows in ' + (secs() - tP).toFixed(1) + ' s');
-} else PAIR_ROWS.forEach(k => pairRow(k, () => [false, 'no pair']));
+// P1, P2 and P3 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D180 (P-BLOCKOPEN) on its build pair (221 vs 220): the refreshProgram lattice, the wizard landing and the Before column against V220.
 done();

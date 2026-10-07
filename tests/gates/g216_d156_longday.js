@@ -59,10 +59,9 @@ const path = require('path'), fs = require('fs'), os = require('os'), cp = requi
 const { load, progDigest, fixtures, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
-const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
-const VER = +IA.version, ERA = 216, V215_COMMIT = '7474f0607bfdf50b768e95221a1f7e9ef52067b6';
-const ROWS = ['F0','F1','F2','F3','G1','G2','N1','K1','HM'];
+const VER = +IA.version, ERA = 216;
+const ROWS = ['F1','G1','G2','HM'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = l => { skip++; console.log('SKIP ' + l); };
@@ -81,13 +80,8 @@ const isStr = n => /stretch|mobility|90\/90|foam|worlds greatest/i.test(n || '')
 const setsOf = d => { let m = /^(\d+)\s*[x×]/.exec(d || ''); if(m) return +m[1]; m = /\b(\d+)\s*sets?\b/i.exec(d || ''); return m ? +m[1] : 1; };
 const daySets = y => ((y && y.sections) || []).reduce((a, s) => a + (s.items || []).reduce((b, it) => b + (isStr(it.name) ? 0 : setsOf(it.detail)), 0), 0);
 const liftSecs = y => ((y && y.sections) || []).filter(s => !/mobility|taper/i.test(s.label || ''));
-const clean = n => String(n == null ? '' : n).replace(/<svg[\s\S]*?<\/svg>\s*/g, '').replace(/<[^>]+>/g, '').trim();
-const stem = s => String(s.label || (s.coreHeader ? '{core}' : '(none)')).replace(/\s*—\s.*$/, '');
 const cl = o => JSON.parse(JSON.stringify(o));
-const bump = (o, k, n = 1) => { o[k] = (o[k] || 0) + n; };
 const CAL = ['sun','mon','tue','wed','thu','fri','sat'];
-const prevDay = (p, w, d) => { const i = CAL.indexOf(d); return i > 0 ? [w, CAL[i - 1]] : [+w - 1, 'sat']; };
-const dayOf = (p, w, d) => (p && p.weeks && p.weeks[w]) ? p.weeks[w][d] : undefined;
 
 // ── lattices (measure's) ─────────────────────────────────────────────────────────────────
 const FOC = ['balanced','hypertrophy','strength','support_athletic','support_prevention','support_strength'];
@@ -123,89 +117,30 @@ for(const plan of PLANS) for(const e of EXP) for(const r of RESTS) for(const q o
   L.push({lat:'NRC', k:[plan, e, r.join(','), q, f, dated].join('|'), c}); }
 const NSW_LATS = ['NSW','NSW+seeds','NSW multi'];
 
-// ── baseline and the NODD twin ───────────────────────────────────────────────────────────
-const PAIR = VER === ERA;
-let V215 = null, v215err = null, NODD = null, nodderr = null;
-try {
-  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'g216d156-'));
-  const src = fs.readFileSync(path.resolve(ART), 'utf8'), A = 'function deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks){', n = src.split(A).length - 1;
-  if(n !== 1) nodderr = 'NODD anchor count ' + n;
-  else { const f = path.join(TMP, 'nodd.html'); fs.writeFileSync(f, src.replace(A, () => A + ' return 0;')); NODD = load(f); }
-} catch(e){ nodderr = String(e && e.message || e).slice(0, 200); NODD = null; }
-if(PAIR){
-  try {
-    if(BASEFILE){ const b = load(BASEFILE); if(+b.version === 215) V215 = b; else v215err = 'argv[3] reads ' + b.version; }
-    if(!V215){ const f = path.join(TMP, 'v215.html');
-      fs.writeFileSync(f, cp.execFileSync('git', ['show', V215_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 26 }));
-      V215 = load(f); if(+V215.version !== 215){ v215err = 'git ' + V215_COMMIT.slice(0, 7) + ' reads ' + V215.version; V215 = null; } }
-  } catch(e){ v215err = String(e && e.message || e).slice(0, 200); V215 = null; }
-}
-
 // ── run ──────────────────────────────────────────────────────────────────────────────────
-const S = {}; NSW_LATS.concat(['NRC']).forEach(l => S[l] = { cfg:0, crash:0, longFin:0, longFinEx:[], chgLong:{}, K:0, X:0, XEx:[], nrcDiff:0, nrcEx:[] });
-const F0 = {}, F2 = { lost:0, of:0 }, F3 = { n:0, diff:0, ex:[] }, G = { bDays:0, zero:0, over8:0, max:0, ex:[] };
-function kClass(p, b, w, d, x, y, nodd){
-  if(isLong(y) || isLong(x) || !x || !y || x.title !== y.title) return 'title or long';
-  const sx = (x.sections || []), sy = (y.sections || []);
-  if(sx.length !== sy.length || sx.some((s, i) => stem(s) !== stem(sy[i]) || (s.items || []).length !== (sy[i].items || []).length)) return 'shape';
-  let diffs = 0;
-  for(let i = 0; i < sx.length; i++) for(let j = 0; j < (sx[i].items || []).length; j++){
-    const a = sx[i].items[j], c = sy[i].items[j];
-    if(String(a.detail || '') !== String(c.detail || '')) return 'detail';
-    if(clean(a.name) === clean(c.name)) continue;
-    diffs++;
-    if(/^(main|primer|power)/i.test(String(sx[i].label || ''))) return 'main';
-    const z = nodd && nodd.weeks[w] && nodd.weeks[w][d], zs = z && z.sections && z.sections[i], zi = zs && zs.items && zs.items[j];
-    if(!zi || clean(zi.name) !== clean(c.name)) return 'candidate renamed';   // the candidate prints the drawn name here
-  }
-  if(!diffs) return 'no name diff';
-  const [pw, pd] = prevDay(p, w, d);
-  if(isLong(dayOf(p, pw, pd)) || JSON.stringify(dayOf(b, pw, pd)) !== JSON.stringify(dayOf(p, pw, pd))) return '';
-  return 'prev day not long and unchanged';
-}
+const S = {}; NSW_LATS.concat(['NRC']).forEach(l => S[l] = { cfg:0, crash:0, longFin:0, longFinEx:[] });
+const G = { bDays:0, zero:0, over8:0, max:0, ex:[] };
 L.forEach(x => {
-  const R = S[x.lat]; let p, b = null;
-  try { p = IA.buildProgram(cl(x.c)); if(PAIR && V215) b = V215.buildProgram(cl(x.c)); } catch(e){ R.crash++; return; }
+  const R = S[x.lat]; let p;
+  try { p = IA.buildProgram(cl(x.c)); } catch(e){ R.crash++; return; }
   R.cfg++;
-  let nodd = null;
   Object.keys(p.weeks || {}).forEach(w => CAL.forEach(d => {
-    const y = p.weeks[w][d], o = b && b.weeks[w] && b.weeks[w][d];
-    if(x.lat === 'NRC'){ if(b && JSON.stringify(o) !== JSON.stringify(y)){ R.nrcDiff++; if(R.nrcEx.length < 3) R.nrcEx.push(x.k + ' W' + w + ' ' + d); } return; }
+    const y = p.weeks[w][d];
+    if(x.lat === 'NRC') return;
     if(!y) return;
     const T = tierOf(y);
     if(isLong(y) && hasFin(y)){ R.longFin++; if(R.longFinEx.length < 3) R.longFinEx.push(x.k + ' W' + w + ' ' + d); }
     if(T === 'B'){ G.bDays++; if(!liftSecs(y).length) G.zero++; const n = daySets(y); if(n > 8){ G.over8++; if(G.ex.length < 3) G.ex.push(x.k + ' W' + w + ' ' + d + ' ' + n + ' sets'); } if(n > G.max) G.max = n; }
-    if(!b) return;
-    if(x.lat === 'NSW' && o && isLong(o) && hasFin(o)) bump(F0, tierOf(o) || 'other');
-    if(x.lat === 'NSW' && T === 'C' && o && hasFin(o)){ F2.of++; if(!hasFin(y)) F2.lost++; }
-    if(T === 'A'){ F3.n++; if(JSON.stringify(o) !== JSON.stringify(y)){ F3.diff++; if(F3.ex.length < 3) F3.ex.push(x.k + ' W' + w + ' ' + d); } }
-    if(JSON.stringify(o) === JSON.stringify(y)) return;
-    if(isLong(y)){ bump(R.chgLong, T || (card(y).type + ' long')); return; }
-    if(NODD && !nodd) nodd = NODD.buildProgram(cl(x.c));
-    const why = kClass(p, b, w, d, o, y, nodd);
-    if(!why) R.K++; else { R.X++; bump(R.why = R.why || {}, why); if(R.XEx.length < 3) R.XEx.push(x.k + ' W' + w + ' ' + d + ' [' + why + ']'); }
   }));
 });
 const tot = l => S[l].cfg + ' configs';
 Object.keys(S).forEach(l => { if(S[l].crash) ok('P0 ' + l + ': every config builds', false, S[l].crash + ' crashed'); });
-if(!PAIR) skipRow('F0 fixture needs the 216/215 pair (V215 finisher counts)');
-else if(!V215) ok('F0 fixture needs V215', false, v215err);
-else ok('F0 fixture: V215 printed an Arms or Delts finisher on NSW long days of tier B and tier C (' + JSON.stringify(F0) + ')', (F0.B || 0) > 0 && (F0.C || 0) > 0, JSON.stringify(F0));
+// F0 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It was the D156 pair rows' fixture: V215 printed an Arms or Delts finisher on NSW long days of tier B and tier C.
 NSW_LATS.forEach(l => ok('F1 ' + l + ': no long day prints an Arms or Delts finisher (' + tot(l) + ')', !S[l].longFin, S[l].longFin + ' ' + S[l].longFinEx.join('; ')));
 G.bDays && console.log('tier B long days ' + G.bDays + ', max working sets ' + G.max);
 ok('G1 tier B long days: none is left with no lifting section (' + G.bDays + ' days)', G.bDays > 0 && !G.zero, G.zero);
 ok('G2 tier B long days: none prints more than 8 working sets (' + G.bDays + ' days)', G.bDays > 0 && !G.over8, G.over8 + ' ' + G.ex.join('; '));
-if(!PAIR){ ['F2','F3','N1','K1'].forEach(r => skipRow(r + ' pair row: candidate ' + VER + ' is not 216')); }
-else if(!V215){ ['F2','F3','N1','K1'].forEach(r => ok(r + ' pair row needs V215', false, v215err)); }
-else {
-  ok('F2 PAIR NSW: every tier C day V215 printed a finisher on loses it (' + F2.lost + '/' + F2.of + ')', F2.of > 0 && F2.lost === F2.of, F2.lost + '/' + F2.of);
-  ok('F3 PAIR every tier A long day is byte-identical to V215 (' + F3.n + ' days)', F3.n > 0 && !F3.diff, F3.diff + ' ' + F3.ex.join('; '));
-  ok('N1 PAIR every NRC program byte-identical to V215 (' + tot('NRC') + ')', S.NRC.cfg > 0 && !S.NRC.nrcDiff, S.NRC.nrcDiff + ' days ' + S.NRC.nrcEx.join('; '));
-  if(!NODD) NSW_LATS.forEach(l => ok('K1 PAIR ' + l + ' needs the NODD twin', false, nodderr));
-  else NSW_LATS.forEach(l => { const R = S[l];
-    console.log('   ' + l + ': changed long days ' + JSON.stringify(R.chgLong) + ', knock-on K ' + R.K + ', unclassified ' + R.X + (R.X ? ' ' + JSON.stringify(R.why) : ''));
-    ok('K1 PAIR ' + l + ': every changed day is a long day or a knock-on rename only V215 made (K ' + R.K + ')', !R.X, R.X + ' ' + R.XEx.join('; ')); });
-}
+// F2, F3, N1 and K1 retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). They defended D156: tier C days lost the finisher V215 printed, tier A long days and NRC programs stayed byte-identical to V215, and every other changed day was a long day or the knock-on rename class.
 // V231 MAINTENANCE (tests/measure/v231_rulings/v231_absorb_ruling.md sections 3 and 4; standing rulings 3, 4 and 5):
 // this row defends D156's claim "my ruling did not move HALF_MANNY". The literal it compared
 // against went: the only object that carries that claim across later rulings is the era table that
