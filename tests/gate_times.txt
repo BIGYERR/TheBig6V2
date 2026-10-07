@@ -106,4 +106,5 @@ g231_d197_filterlast.js 0.7
 g231_d198_hepdraw.js 21.5
 g232_d199_runwheel.js 1.3
 g233_d207_bikewheel.js 8.6
+g234_d213_swapkeep.js 1.4
 g_fuzz_shard_equiv.js 3.6

@@ -1,0 +1,19 @@
+# ROW_RULED for V234 (D213, D213 Amendment 1, D214). Passed to gate.sh step 4b as ROW_RULED=<this file>.
+# Written by the main session from tests/measure/v234_rulings/v234_ruling_d213_d214.md (Mario concurred 2026-10-07).
++ g234_d213_swapkeep.js K1  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js K2  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js K3  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js K4  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js K5  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js K6  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js K7  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js K8  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js K9  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js K10  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js K11  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js C1  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js L1  # D213 P-SWAPKEEP (Mario concurred 2026-10-07): new gate row, park/restore/credit
++ g234_d213_swapkeep.js N1  # D214 (Mario concurred 2026-10-07): new gate row, the swap note copy
++ g234_d213_swapkeep.js N2  # D214 (Mario concurred 2026-10-07): new gate row, the swap note copy
++ g234_d213_swapkeep.js N3  # D214 (Mario concurred 2026-10-07): new gate row, the swap note copy
++ g234_d213_swapkeep.js N4  # D214 (Mario concurred 2026-10-07): new gate row, the swap note copy

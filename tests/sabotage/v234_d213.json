@@ -1,0 +1,121 @@
+[
+ {
+  "name": "S1-D213 persistLogFields drops the parked carry",
+  "anchor": "  if(_keepParked) logs[key].parked=_keepParked;\n",
+  "replacement": "",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K5 (Mark Done drops parked) and K1 (the swap's own closing persist drops it). Trips K1,K2,K3,K4,C1,K5,K6,K7,K10,K11,N2,N3,L1 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S2-D213 arrival restores but leaves parked[arriving] behind",
+  "anchor": "    delete P[sport];\n",
+  "replacement": "",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K3 (parked.run still present after the swap back). Trips K3,K7,K9,K10,L1 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S3-D213 arrival never restores the parked set",
+  "anchor": "e[f]=(back&&back[f]!=null)?back[f]:'';",
+  "replacement": "e[f]='';",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K3 (the swap back shows a blank run). Trips K3,K4,C1,K7,K10,L1 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S4-D213 the leaving set is never parked (V233 erase)",
+  "anchor": "if(Object.keys(out).some(function(f){ return out[f]!==''; })) P[leaving]=out; else delete P[leaving];",
+  "replacement": "delete P[leaving];",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K1 (no parked.run: the V233 erase). Trips K1,K2,K3,K4,C1,K5,K6,K7,K10,K11,N2,N3,L1 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S5-D213 a blank leaving set parks anyway",
+  "anchor": "if(Object.keys(out).some(function(f){ return out[f]!==''; })) P[leaving]=out; else delete P[leaving];",
+  "replacement": "P[leaving]=out;",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K9 (nothing typed leaves a parked set of blanks). Trips K9,K10 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S6-D213 an empty parked object is left behind",
+  "anchor": "if(Object.keys(P).length) e.parked=P; else delete e.parked;",
+  "replacement": "e.parked=P;",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K9 (parked:{} after a swap with nothing typed). Trips K9,K10 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S7-D213 the leaving set parks under the planned sport",
+  "anchor": "P[leaving]=out; else",
+  "replacement": "P[planned]=out; else",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K7 (bike to swim parks the bike set under run, overwriting parked.run) and K2. Trips K2,K3,K4,C1,K7,L1 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S8-D213 the leaving sport is read as the planned sport",
+  "anchor": "const leaving=wrap.dataset.active||planned;",
+  "replacement": "const leaving=planned;",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K2 (bike 40 lost on the swap back) and K7 (the run set erased on bike to swim). Trips K2,K3,K4,C1,K7,K8,K9,K10,L1 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S9-D213 no wheel flush before the park",
+  "anchor": "  iaWheelFlush(wrap);\n  persistLogFields(currentDayKey);\n  const logs=getLogs();",
+  "replacement": "  persistLogFields(currentDayKey);\n  const logs=getLogs();",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K11 (the pending miles 6 never commits; parked.run reads 5). Trips K11 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S10-D213 parked numbers leak back to the top level on every persist",
+  "anchor": "  if(_keepParked) logs[key].parked=_keepParked;",
+  "replacement": "  if(_keepParked){ logs[key].parked=_keepParked; if(_keepParked.run) Object.assign(logs[key], _keepParked.run); }",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row C1 (MILES 5 while swapped to bike) and K1 (run_* not blank at top). Trips K1,C1,K6,K7,K10,K11,L1 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S11-D213A1 the swap keys by provenance on a moved-in day",
+  "anchor": "  const logs=getLogs();const key=logKey(currentWeek,currentDayKey);\n  const e=logs[key]||{};\n  if(sport!==leaving){",
+  "replacement": "  const logs=getLogs();const key=logKey(currentWeek,((activeProg.weeks[currentWeek]||{})[currentDayKey]||{}).movedFrom||currentDayKey);\n  const e=logs[key]||{};\n  if(sport!==leaving){",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K10 (the moved-in run parks under w1_sat; the rest day key loses it; native days untouched). Trips K10 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S12-D213 re-tapping the active chip resets its form",
+  "anchor": "  if(sport!==leaving){\n    const P=Object.assign({},e.parked||{});",
+  "replacement": "  if(sport===leaving){ (CARDIO_PARK_FIELDS[leaving]||[]).forEach(function(f){ e[f]=''; }); logs[key]=e; saveLogs(logs); }\n  if(sport!==leaving){\n    const P=Object.assign({},e.parked||{});",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row K8 (tapping the active sport blanks the stored numbers). Trips K8 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S13-D214 the note always prints variant one",
+  "anchor": "const kept=!!p&&",
+  "replacement": "const kept=false&&!!p&&",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row N2 (both sites) and N3 (swim variant two). Trips N2,N3 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S14-D214 the render site ignores the parked set",
+  "anchor": "${swapped?cardioSwapNoteText(activeSport, ct, e):''}",
+  "replacement": "${swapped?cardioSwapNoteText(activeSport, ct, {}):''}",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row N2 and N3, the buildLogHTML half (variant one on a reopen with a parked run). Trips N2,N3 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S15-D214 setCardioSwap reads the note from an empty entry",
+  "anchor": "note.textContent=cardioSwapNoteText(sport, planned, e);",
+  "replacement": "note.textContent=cardioSwapNoteText(sport, planned, {});",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row N2 and N3, the setCardioSwap half. Trips N2,N3 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S16-D214 render site back to the V233 copy",
+  "anchor": "${swapped?cardioSwapNoteText(activeSport, ct, e):''}",
+  "replacement": "${swapped?('Swapped from '+CARDIO_WORD[ct]+' — this counts toward your '+CARDIO_WORD[activeSport]+' progress, not '+CARDIO_WORD[ct]+'.'):''}",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row N4 (\"Swapped from\" in the stripped source, an em-dash in a printed note) and N1-N3 at the render site. Trips N1,N2,N3,N4 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ },
+ {
+  "name": "S17-D214 a dash in variant two",
+  "anchor": " numbers are kept. Switch back and they return.",
+  "replacement": " numbers are kept — switch back and they return.",
+  "gate": "gates/g234_d213_swapkeep.js",
+  "note": "NAMED TRIP: g234_d213_swapkeep.js row N4 (a dash in a printed note) and N2, N3 (exact text). Trips N2,N3,N4 on the V234 candidate. Ruling: tests/measure/v234_rulings/v234_ruling_d213_d214.md (D213, D214, D213 Amendment 1)."
+ }
+]
