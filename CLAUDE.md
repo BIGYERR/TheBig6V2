@@ -57,9 +57,10 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
 `measure_tooling_inventory_mT.md`, `post_v233_proof_scope_decisions.md`, and `tests/measure/v233_gate_reach.json`.
 - **Budget.** Proof finishes in under 15 minutes of wall time for a LOCAL change and under 30 for a CROSS-CUTTING one.
   If a change cannot fit, tell Mario before proof starts what you would drop and why, and wait for his answer.
-  **Until 2026-10-13**, when the full sweep rebuilds the reach map, a LOCAL change that adds a manifest row runs
-  `gate.sh` in full (the manifest is regenerated only from every gate's output) on a 20-minute budget (Mario,
-  Post-V234). The exception ends on 2026-10-13; from then the 15-minute LOCAL budget applies to every LOCAL change.
+  **Until the partial row check pass decides** (the first chat after the 2026-10-13 full sweep; handoff §12), a LOCAL
+  change that adds a manifest row runs `gate.sh` in full (the manifest is regenerated only from every gate's output)
+  on a 20-minute budget (Mario, Post-V234). That pass either builds the tool or, if history shows such changes are a
+  clear minority, ends the exception, and from then each such change asks Mario before proof.
 - **Classify before proof.** Tell Mario whether the change is LOCAL or CROSS-CUTTING, and why. Cross-cutting is any of:
   a changed function that more than 20 gates execute in the reach map; a stored format (an `ia_` key, `cfg`,
   `prog.weeks`); program output (any digest or era row moves); `tests/harness.js` or `tests/gate.sh`. Everything else
