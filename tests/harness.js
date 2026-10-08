@@ -378,6 +378,7 @@ MANNY_DIGEST_BY_VERSION[233] = MANNY_DIGEST_BY_VERSION[232];   // V233 (D207–D
 MANNY_DIGEST_BY_VERSION[234] = MANNY_DIGEST_BY_VERSION[233];   // era_bump V234: ruled UNMOVED, reference to [233]; tests/measure/v234_rulings/v234_ruling_d213_d214.md
 MANNY_DIGEST_BY_VERSION[235] = MANNY_DIGEST_BY_VERSION[234];   // era_bump V235: ruled UNMOVED, reference to [234]; tests/measure/v235_rulings/v235_ruling_d215_d217.md
 MANNY_DIGEST_BY_VERSION[236] = MANNY_DIGEST_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, reference to [235]; tests/measure/v236_rulings/v236_ruling_d218_d219.md
+MANNY_DIGEST_BY_VERSION[237] = MANNY_DIGEST_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[212] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[211];   // D110a/M2/D144: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V212 tree with g199's and g200's methods; swim only, HALF_MANNY holds 0 swim sessions)
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[213] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[212];   // D113a/D146/injury key: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V213 tree with g199's and g200's methods; HALF_MANNY is a solo NRC half, and neither the pace routing, the NRC multi-sport arm nor the injury key reaches a solo uninjured week)
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[214] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[213];   // D158: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V214 tree with g199's and g200's methods; HALF_MANNY is an NRC race program and the eve rule is NSW dated only, NRC race pins 0/792 moved)
@@ -403,6 +404,7 @@ MANNY_DELOAD_OFF_DIGEST_BY_VERSION[233] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[232
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[234] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[233];   // era_bump V234: ruled UNMOVED, reference to [233]; tests/measure/v234_rulings/v234_ruling_d213_d214.md
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[235] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[234];   // era_bump V235: ruled UNMOVED, reference to [234]; tests/measure/v235_rulings/v235_ruling_d215_d217.md
 MANNY_DELOAD_OFF_DIGEST_BY_VERSION[236] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, reference to [235]; tests/measure/v236_rulings/v236_ruling_d218_d219.md
+MANNY_DELOAD_OFF_DIGEST_BY_VERSION[237] = MANNY_DELOAD_OFF_DIGEST_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 MANNY_CORE_OFF_DIGEST_BY_VERSION[212] = MANNY_CORE_OFF_DIGEST_BY_VERSION[211];   // D110a/M2/D144: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V212 tree with g199's and g200's methods; swim only, HALF_MANNY holds 0 swim sessions)
 MANNY_CORE_OFF_DIGEST_BY_VERSION[213] = MANNY_CORE_OFF_DIGEST_BY_VERSION[212];   // D113a/D146/injury key: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V213 tree with g199's and g200's methods; HALF_MANNY is a solo NRC half, and neither the pace routing, the NRC multi-sport arm nor the injury key reaches a solo uninjured week)
 MANNY_CORE_OFF_DIGEST_BY_VERSION[214] = MANNY_CORE_OFF_DIGEST_BY_VERSION[213];   // D158: ruled UNMOVED (0ac7da6b1691a8e1 / 1069cd7f86eed204 / 9d14801a63111081 printed by coach on the V214 tree with g199's and g200's methods; HALF_MANNY is an NRC race program and the eve rule is NSW dated only, NRC race pins 0/792 moved)
@@ -428,6 +430,7 @@ MANNY_CORE_OFF_DIGEST_BY_VERSION[233] = MANNY_CORE_OFF_DIGEST_BY_VERSION[232];  
 MANNY_CORE_OFF_DIGEST_BY_VERSION[234] = MANNY_CORE_OFF_DIGEST_BY_VERSION[233];   // era_bump V234: ruled UNMOVED, reference to [233]; tests/measure/v234_rulings/v234_ruling_d213_d214.md
 MANNY_CORE_OFF_DIGEST_BY_VERSION[235] = MANNY_CORE_OFF_DIGEST_BY_VERSION[234];   // era_bump V235: ruled UNMOVED, reference to [234]; tests/measure/v235_rulings/v235_ruling_d215_d217.md
 MANNY_CORE_OFF_DIGEST_BY_VERSION[236] = MANNY_CORE_OFF_DIGEST_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, reference to [235]; tests/measure/v236_rulings/v236_ruling_d218_d219.md
+MANNY_CORE_OFF_DIGEST_BY_VERSION[237] = MANNY_CORE_OFF_DIGEST_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 
 module.exports = { load, extractInlineJS, fixtures, weekGrid, progDigest, DAYS, EXPORT_NAMES,
                    MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION,

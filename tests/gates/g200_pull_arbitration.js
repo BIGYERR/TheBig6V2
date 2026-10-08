@@ -306,6 +306,7 @@ SWAP_BY_VERSION[233] = SWAP_BY_VERSION[232];   // V233 (D207–D211 P-BIKEWHEEL)
 SWAP_BY_VERSION[234] = SWAP_BY_VERSION[233];   // era_bump V234: ruled UNMOVED, reference to [233]; tests/measure/v234_rulings/v234_ruling_d213_d214.md
 SWAP_BY_VERSION[235] = SWAP_BY_VERSION[234];   // era_bump V235: ruled UNMOVED, reference to [234]; tests/measure/v235_rulings/v235_ruling_d215_d217.md
 SWAP_BY_VERSION[236] = SWAP_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, reference to [235]; tests/measure/v236_rulings/v236_ruling_d218_d219.md
+SWAP_BY_VERSION[237] = SWAP_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 const SWAP_N = SWAP_BY_VERSION[(+IP.version <= 218) ? 218 : +IP.version];
 II.eval(SNAP_FN+"globalThis.__G200=null;");
 let inert=0,inertN=0;

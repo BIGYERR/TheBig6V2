@@ -1,0 +1,65 @@
+[
+ {
+  "name": "S1-D220 dist whole miles column regains the dash row (nil:true back, wrap:false dropped)",
+  "anchor": "dist:{fmt:'dec3',  cap:'Miles',        cols:[{min:0,max:99,wrap:false},",
+  "replacement": "dist:{fmt:'dec3',  cap:'Miles',        cols:[{min:0,max:99,nil:true},",
+  "gate": "gates/g237_d220_distzero.js",
+  "note": "NAMED TRIP: g237_d220_distzero.js row D220-rows (rendered dist column 0 gains the '' item: 101 items, data-len 101; hand '0'..'99', 100, no nil). A restored row alone is never reached by an open: _iawParse('dist','') still seeds whole miles on '0', so a blank wheel lands on 0.00, not the dash (the D215 Amendment 1 finding, as v235_d215.json S4-D215 for hms). Ruling: tests/measure/v237_rulings/v237_ruling_d220_d222.md (D220/D221, Sabotage paragraph)."
+ },
+ {
+  "name": "S2-D220 the dist zero face stores 0.00 instead of blank",
+  "anchor": "if((+vals[0])*100+(+b)*10+(+c)===0) return '';",
+  "replacement": "if((+vals[0])*100+(+b)*10+(+c)===0) return '0.00';",
+  "gate": "gates/g237_d220_distzero.js",
+  "note": "NAMED TRIP: g237_d220_distzero.js rows D220-zero (_iawFormat('dist',['0','0','0']) is \"0.00\"; hand ''), D220-clear-zero (miles rolled to 0.00 stores \"0.00\"; hand '') and D220-fixed-zero (the fixed wheel at 0.00 stores \"0.00\" and no planned-miles stamp; hand run_dist \"3.1\"). Also trips D221-clear (observed V237 slice 4d: miles to 0.00 alone on the reopened stamp writes \"0.00\"; hand nothing written). Ruling: tests/measure/v237_rulings/v237_ruling_d220_d222.md (D220/D221, Sabotage paragraph)."
+ },
+ {
+  "name": "S3-D220 the rept zero face stores 0:00 instead of blank",
+  "anchor": "if(kind==='rept'&&(+vals[0])*60+(+b)===0) return '';",
+  "replacement": "if(kind==='rept'&&(+vals[0])*60+(+b)===0) return '0:00';",
+  "gate": "gates/g237_d220_distzero.js",
+  "note": "NAMED TRIP: g237_d220_distzero.js rows D220-zero (_iawFormat('rept',['0','0']) is \"0:00\"; hand '') and the rept conjunct of D220-clear-zero (legacy run_rep_time \"0:00\", via 0:45, back to 0:00 stores \"0:00\"; hand ''). Ruling: tests/measure/v237_rulings/v237_ruling_d220_d222.md (D220/D221, Sabotage paragraph)."
+ },
+ {
+  "name": "S4-D220 dist blank parse returns dashes again",
+  "anchor": "if(!s) return kind==='pace'?['','']:(sp.fmt==='dec3'?['0','0','0']:['0','0']);",
+  "replacement": "if(!s) return kind==='pace'?['','']:(sp.fmt==='dec3'?['','','']:['0','0']);",
+  "gate": "gates/g237_d220_distzero.js",
+  "note": "NAMED TRIP: g237_d220_distzero.js row D220-zero only (_iawParse('dist','') is ['','','']; hand ['0','0','0']). The mutated line is the blank-string line of _iawParse (if(!s) return kind==='pace'?...): its dist arm returns dashes, its rept arm ['0','0'] and pace arm ['',''] keep today's values; the malformed line (m3) is untouched. Opens do not catch it by design: dist column 0 has no dash row, so the '' seed misses and lands on home 0, the 0.00 face. Ruling: tests/measure/v237_rulings/v237_ruling_d220_d222.md (D220/D221, Sabotage paragraph)."
+ },
+ {
+  "name": "S5-D220 dist whole miles column drops wrap:false (whole miles wraps)",
+  "anchor": "dist:{fmt:'dec3',  cap:'Miles',        cols:[{min:0,max:99,wrap:false},",
+  "replacement": "dist:{fmt:'dec3',  cap:'Miles',        cols:[{min:0,max:99},",
+  "gate": "gates/g237_d220_distzero.js",
+  "note": "NAMED TRIP: g237_d220_distzero.js rows D220-wrap (_iawWraps dist [true,true,true]; hand [false,true,true]) and the data-wrap conjunct of D220-rows (dist column 0 data-wrap \"1\"; hand ''). Second defender: g235_d215_hmszero.js row D216-wrap (dist [false,true,true]); the gate field runs one gate. Observed V237 slice 4d: D220-rows fails on dist-col0-rows as well (the wrapped column renders its list repeated), and g235 D215-rows trips beside D216-wrap. Ruling: tests/measure/v237_rulings/v237_ruling_d220_d222.md (D220/D221, Sabotage paragraph)."
+ },
+ {
+  "name": "S6-D220 rept minutes column drops wrap:false (rep minutes wraps)",
+  "anchor": "rept:{fmt:'clock', cap:'Typical rep',  cols:[{min:0,max:9, wrap:false},",
+  "replacement": "rept:{fmt:'clock', cap:'Typical rep',  cols:[{min:0,max:9},",
+  "gate": "gates/g237_d220_distzero.js",
+  "note": "NAMED TRIP: g237_d220_distzero.js rows D220-wrap (_iawWraps rept [true,true]; hand [false,true]) and the data-wrap conjunct of D220-rows (rept column 0 data-wrap \"1\"; hand ''). Second defender: g235_d215_hmszero.js row D216-wrap (rept [false,true]); the gate field runs one gate. Observed V237 slice 4d: D220-rows fails on rept-col0-rows as well (the wrapped column renders its list repeated), and g235 D215-rows trips beside D216-wrap. Ruling: tests/measure/v237_rulings/v237_ruling_d220_d222.md (D220/D221, Sabotage paragraph)."
+ },
+ {
+  "name": "S7-D221 the dist form seed predicate removed: the miles wheel seeds from e.run_dist unconditionally",
+  "anchor": "iaWheelHTML('dist','log_run_dist',e.run_dist===String(dose.mi)?'':(e.run_dist||''),null,dose.mi)",
+  "replacement": "iaWheelHTML('dist','log_run_dist',e.run_dist||'',null,dose.mi)",
+  "gate": "gates/g237_d220_distzero.js",
+  "note": "NAMED TRIP: g237_d220_distzero.js rows D221-seed (a stored stamp \"3.1\" reopens with hidden \"3.1\" and no \"assuming\"; hand '' and \"assuming planned 3.1 mi\"), D221-clear (the reopened time clear keeps run_dist \"3.1\"; hand all seven '') and D221-swap (after a time clear chip Bike parks the stamp; hand no parked). The mutated line is the dist form fixed miles wheel in cardioFieldHTML (the ruling's :13814). Also trips the collision conjunct of D221-rolled (observed V237 slice 4d: the two-decimal plan stored byte-equal to its stamp seeds its bytes, so RPE 7 keeps run_dist; hand ''). Ruling: tests/measure/v237_rulings/v237_ruling_d220_d222.md (D220/D221, Sabotage paragraph)."
+ },
+ {
+  "name": "S8-D221 the dist form seed predicate widened to numeric equality: an athlete-rolled 3.10 reads as the stamp",
+  "anchor": "iaWheelHTML('dist','log_run_dist',e.run_dist===String(dose.mi)?'':(e.run_dist||''),null,dose.mi)",
+  "replacement": "iaWheelHTML('dist','log_run_dist',+e.run_dist===+dose.mi?'':(e.run_dist||''),null,dose.mi)",
+  "gate": "gates/g237_d220_distzero.js",
+  "note": "NAMED TRIP: g237_d220_distzero.js row D221-rolled (stored \"3.10\" with \"47.22\" reopens with hidden ''; hand \"3.10\"). The predicate is byte equality with String(dose.mi) by ruling; numeric equality folds the athlete's rolled \"3.10\" into the derived stamp \"3.1\". Also trips the rolled-310 conjunct of D221-seed (observed V237 slice 4d: the same hidden '' for \"3.10\" on open). Ruling: tests/measure/v237_rulings/v237_ruling_d220_d222.md (D220/D221, Sabotage paragraph)."
+ },
+ {
+  "name": "S9-D220 dec3 empty match lands on the dash again (the g237 pin of v232_d199.json S6-D203)",
+  "anchor": "if(!m3||m3[0]==='') return ['0','0','0'];",
+  "replacement": "if(!m3||m3[0]==='') return ['','',''];",
+  "gate": "gates/g237_d220_distzero.js",
+  "note": "NAMED TRIP: g237_d220_distzero.js row D220-zero (_iawParse('dist', s) for 'abc', '.', '-1' is ['','','']; hand ['0','0','0']). The ruling pins this mutation to both g232 D203 and g237 D220-zero; the spec holds one gate per mutation, so v232_d199.json S6-D203 carries the g232 pin (same anchor and replacement) and this row carries the g237 pin. Ruling: tests/measure/v237_rulings/v237_ruling_d220_d222.md (D220/D221, Sabotage paragraph)."
+ }
+]

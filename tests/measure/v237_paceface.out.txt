@@ -1,0 +1,101 @@
+
+==================== /Users/CanasBangin/Desktop/TheBig6V2/index.html | ia-version 237
+§1a _IAW_SPEC.pace {"fmt":"clock","cap":"Pace / mile","cols":[{"min":4,"max":17,"nil":true},{"min":0,"max":59,"pad":2}]}
+   pace col0 rows 15 first ["","4","5"] last ["17"] nil-row true wraps false home 0
+   pace col1 rows 60 first ["0","1","2"] last ["59"] nil-row false wraps true home 120
+   input ""      parse ["",""] format(parse) "" iaWheelHTML sha d64cdbdfad64 len 13022
+   input "abc"   parse ["",""] format(parse) "" iaWheelHTML sha 14e08e673454 len 13025
+   input "8:30"  parse ["8","30"] format(parse) "8:30" iaWheelHTML sha f27fca9ebba1 len 13026
+   fn sha (comments stripped) {"_iawRows":"8a79cc2fa85f","_iawWraps":"edba8999ca94","_iawHome":"a61986b7c866","_iawList":"5150c23ec048","_iawFace":"c43fdbac3d8a","_iawParse":"5431a2caaaa0","_iawFormat":"c6bcad7f97bc","iaWheelHTML":"7a6a32b37b92","iaWheelInit":"f7a1c41ea737","_iawCommit":"c8b0e60277db","_iawSel":"4386f1d2c468","cardioFieldHTML":"ae05299d1e6b","setCardioSwap":"37d968c168d0"}
+§1b rendered pace wheel, HALF_MANNY host W1 mon, dose forced null (generic form)
+   stored ""      column faces ["—","00"] values ["","0"] items/col [15,300] hidden "" entry after open undefined
+   stored "abc"   column faces ["—","00"] values ["","0"] items/col [15,300] hidden "abc" entry after open "abc"
+   stored "8:30"  column faces ["8","30"] values ["8","30"] items/col [15,300] hidden "8:30" entry after open "8:30"
+   pace markup with rows removed: data-kind="pace" data-for="log_run_pace"><div class="iaw-shade"></div><div class="iaw-band"></div><div class="iaw-col" data-ci="0" data-wrap="" data-len="15"><div class="iaw-pad"></div><div class="iaw-pad"></div></div><div class="iaw-col" data-ci="1" data-wrap="1" data-len="60"><div class="iaw-pad"></div><div class="iaw-pad"></div></div></div><input type="hidden" id="log_run_pace" value=""></div> 
+   CSS colon/separator rules on .iaw: [".iaw-it{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--font-mono);font-size:19px;color:var(--text);will-change:transform,opacity;}"]
+§1c real path: multi seed 76308 W1 tue (bike) -> setCardioSwap(run) ok | pace markup present true | wheel model faces ["—","00"]
+§2 lattice 54 programs built (54 configs), errors 0 []
+   generic subtype "Speed Run — Fartlek"                       67
+   generic subtype "Speed Run — Hills"                         50
+   generic subtype "Speed Run — Intervals"                     378
+   generic subtype "Speed Run — Tempo"                         132
+   non-run cardio (swap-to-run reaches generic form)           180
+   run dose NULL -> generic form (pace wheel)                  627
+   run dose dist                                               537
+   run dose reps_dist                                          48
+   run dose time                                               744
+   sessions bike                                               124
+   sessions run                                                1956
+   sessions swim                                               56
+§3 literal "—:—" in file: 0 | "\u2014:\u2014": 0 | "&mdash;:&mdash;": 0
+   kind dist  nil cols [] blank ""     parse ["0","0","0"] landed faces ["0",".0","0"]
+   kind dist  nil cols [] blank "abc"  parse ["0","0","0"] landed faces ["0",".0","0"]
+   kind pace  nil cols [0] blank ""     parse ["",""] landed faces ["—","00"]
+   kind pace  nil cols [0] blank "abc"  parse ["",""] landed faces ["—","00"]
+   kind rept  nil cols [] blank ""     parse ["0","0"] landed faces ["0","00"]
+   kind rept  nil cols [] blank "abc"  parse ["0","0"] landed faces ["0","00"]
+   kind hms   nil cols [] blank ""     parse ["0","0","0"] landed faces ["0","00","00"]
+   kind hms   nil cols [] blank "abc"  parse ["0","0","0"] landed faces ["0","00","00"]
+
+==================== /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/25fd72ee-a32f-4a28-b82e-f900a731bf9a/scratchpad/base_v236.html | ia-version 236
+§1a _IAW_SPEC.pace {"fmt":"clock","cap":"Pace / mile","cols":[{"min":4,"max":17,"nil":true},{"min":0,"max":59,"pad":2}]}
+   pace col0 rows 15 first ["","4","5"] last ["17"] nil-row true wraps false home 0
+   pace col1 rows 60 first ["0","1","2"] last ["59"] nil-row false wraps true home 120
+   input ""      parse ["",""] format(parse) "" iaWheelHTML sha d64cdbdfad64 len 13022
+   input "abc"   parse ["",""] format(parse) "" iaWheelHTML sha 14e08e673454 len 13025
+   input "8:30"  parse ["8","30"] format(parse) "8:30" iaWheelHTML sha f27fca9ebba1 len 13026
+   fn sha (comments stripped) {"_iawRows":"8a79cc2fa85f","_iawWraps":"edba8999ca94","_iawHome":"a61986b7c866","_iawList":"5150c23ec048","_iawFace":"c43fdbac3d8a","_iawParse":"57cd33f7de48","_iawFormat":"6d1f0983b0e8","iaWheelHTML":"7a6a32b37b92","iaWheelInit":"f7a1c41ea737","_iawCommit":"c8b0e60277db","_iawSel":"4386f1d2c468","cardioFieldHTML":"c31b717d12b0","setCardioSwap":"37d968c168d0"}
+§1b rendered pace wheel, HALF_MANNY host W1 mon, dose forced null (generic form)
+   stored ""      column faces ["—","00"] values ["","0"] items/col [15,300] hidden "" entry after open undefined
+   stored "abc"   column faces ["—","00"] values ["","0"] items/col [15,300] hidden "abc" entry after open "abc"
+   stored "8:30"  column faces ["8","30"] values ["8","30"] items/col [15,300] hidden "8:30" entry after open "8:30"
+   pace markup with rows removed: data-kind="pace" data-for="log_run_pace"><div class="iaw-shade"></div><div class="iaw-band"></div><div class="iaw-col" data-ci="0" data-wrap="" data-len="15"><div class="iaw-pad"></div><div class="iaw-pad"></div></div><div class="iaw-col" data-ci="1" data-wrap="1" data-len="60"><div class="iaw-pad"></div><div class="iaw-pad"></div></div></div><input type="hidden" id="log_run_pace" value=""></div> 
+   CSS colon/separator rules on .iaw: [".iaw-it{height:44px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;font-family:var(--font-mono);font-size:19px;color:var(--text);will-change:transform,opacity;}"]
+§1c real path: multi seed 76308 W1 tue (bike) -> setCardioSwap(run) ok | pace markup present true | wheel model faces ["—","00"]
+§2 lattice 54 programs built (54 configs), errors 0 []
+   generic subtype "Speed Run — Fartlek"                       67
+   generic subtype "Speed Run — Hills"                         50
+   generic subtype "Speed Run — Intervals"                     378
+   generic subtype "Speed Run — Tempo"                         132
+   non-run cardio (swap-to-run reaches generic form)           180
+   run dose NULL -> generic form (pace wheel)                  627
+   run dose dist                                               537
+   run dose reps_dist                                          48
+   run dose time                                               744
+   sessions bike                                               124
+   sessions run                                                1956
+   sessions swim                                               56
+§3 literal "—:—" in file: 0 | "\u2014:\u2014": 0 | "&mdash;:&mdash;": 0
+   kind dist  nil cols [0] blank ""     parse ["","",""] landed faces ["—",".0","0"]
+   kind dist  nil cols [0] blank "abc"  parse ["","",""] landed faces ["—",".0","0"]
+   kind pace  nil cols [0] blank ""     parse ["",""] landed faces ["—","00"]
+   kind pace  nil cols [0] blank "abc"  parse ["",""] landed faces ["—","00"]
+   kind rept  nil cols [0] blank ""     parse ["",""] landed faces ["—","00"]
+   kind rept  nil cols [0] blank "abc"  parse ["",""] landed faces ["—","00"]
+   kind hms   nil cols [] blank ""     parse ["0","0","0"] landed faces ["0","00","00"]
+   kind hms   nil cols [] blank "abc"  parse ["0","0","0"] landed faces ["0","00","00"]
+
+§4 candidate vs base
+   pace spec equal true | rows equal true
+   static in equal true  ["",""]||d64cdbdfad64 vs ["",""]||d64cdbdfad64
+   static inabc equal true  ["",""]||14e08e673454 vs ["",""]||14e08e673454
+   static in8:30 equal true  ["8","30"]|8:30|f27fca9ebba1 vs ["8","30"]|8:30|f27fca9ebba1
+   fn _iawRows        same
+   fn _iawWraps       same
+   fn _iawHome        same
+   fn _iawList        same
+   fn _iawFace        same
+   fn _iawParse       DIFF
+   fn _iawFormat      DIFF
+   fn iaWheelHTML     same
+   fn iaWheelInit     same
+   fn _iawCommit      same
+   fn _iawSel         same
+   fn cardioFieldHTML DIFF
+   fn setCardioSwap   same
+   rendered face stored ""     same [{"v":"","face":"—"},{"v":"0","face":"00"}]|[15,300]|
+   rendered face stored "abc"  same [{"v":"","face":"—"},{"v":"0","face":"00"}]|[15,300]|abc
+   rendered face stored "8:30" same [{"v":"8","face":"8"},{"v":"30","face":"30"}]|[15,300]|8:30
+   swap path same ["—","00"]|true / ["—","00"]|true
+   lattice counts same
+DONE

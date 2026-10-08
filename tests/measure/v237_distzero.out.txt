@@ -1,0 +1,568 @@
+v237 measure mA P-DISTZERO | /Users/CanasBangin/Desktop/TheBig6V2/index.html ia-version 236
+
+§0 _IAW_SPEC column 0 per kind (nil = dash row; wrap = data-wrap)
+  dist  fmt dec3   col0 0..99 DASH wrap=false | col1 0..9 wrap=true | col2 0..9 wrap=true
+  pace  fmt clock  col0 4..17 DASH wrap=false | col1 0..59 wrap=true
+  rept  fmt clock  col0 0..9 DASH wrap=false | col1 0..59 wrap=true
+  hms   fmt hms    col0 0..9 wrap=false | col1 0..59 wrap=true | col2 0..59 wrap=true
+
+§1 REPRO, HALF_MANNY (seed 76308), every W1..W2 run day by dose shape
+  first host per shape: {"generic":"W1 mon \"Speed Run — Intervals\" null","time":"W1 fri \"Recovery Run\" {\"mins\":25}","dist":"W1 sat \"Long Run\" {\"mi\":3.1}"}
+  HOST dose=dist W1 sat "Long Run" plan 3.1 mi
+  A1 DRAFT, miles to —.75, time untouched, Log
+     opened miles 3.10 time 0:00:00 -> left miles —.75 time 0:00:00 | hidden log_run_dist "" log_run_mins "" | entry before tap null
+     toast "Nothing to log yet." label "Log" status null | ia_logs_ w1_sat null
+  A2 DRAFT, miles to —.75, time rolled 0:47:13, Log
+     opened miles 3.10 time 0:00:00 -> left miles —.75 time 0:47:13 | hidden log_run_dist "" log_run_mins "47.22" | entry before tap null
+     toast "Run logged ✓" label "Logged ✓" status null | ia_logs_ w1_sat {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+  A3 DRAFT, time 0:47:13 then miles to —.75, Log
+     opened miles 3.10 time 0:00:00 -> left miles —.75 time 0:47:13 | hidden log_run_dist "" log_run_mins "47.22" | entry before tap null
+     toast "Run logged ✓" label "Logged ✓" status null | ia_logs_ w1_sat {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+  A4 DRAFT, miles to 0.75 (column 0 on 0), time 0:47:13, Log [control]
+     opened miles 3.10 time 0:00:00 -> left miles 0.75 time 0:47:13 | hidden log_run_dist "0.75" log_run_mins "47.22" | entry before tap null
+     toast "Run logged ✓" label "Logged ✓" status null | ia_logs_ w1_sat {"run_dist":"0.75","run_pace":"62:58/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+  A5 DRAFT, miles to —.75, time untouched, Done
+     opened miles 3.10 time 0:00:00 -> left miles —.75 time 0:00:00 | hidden log_run_dist "" log_run_mins "" | entry before tap null
+     toast null label "Log" status "complete" | ia_logs_ w1_sat {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+  A6 DRAFT, miles to —.75, time 0:47:13, Done
+     opened miles 3.10 time 0:00:00 -> left miles —.75 time 0:47:13 | hidden log_run_dist "" log_run_mins "47.22" | entry before tap null
+     toast null label "Logged ✓" status "complete" | ia_logs_ w1_sat {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+  A7 DRAFT, miles to —.75, time 0:47:13, Skip
+     opened miles 3.10 time 0:00:00 -> left miles —.75 time 0:47:13 | hidden log_run_dist "" log_run_mins "47.22" | entry before tap null
+     toast null label "Logged ✓" status "skipped" | ia_logs_ w1_sat {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+  A8 LIVE (time 0:47:13 + miles 4.20 logged), then miles to —.75 (autosave), no tap
+     opened miles 3.10 time 0:00:00 -> left miles —.75 time 0:47:13 | hidden log_run_dist "" log_run_mins "47.22" | entry before tap {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+     toast null label "Logged ✓" status null | ia_logs_ w1_sat {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+  A9 LIVE (miles 4.20 only logged), then miles to —.75 (autosave), then Log
+     opened miles 3.10 time 0:00:00 -> left miles —.75 time 0:00:00 | hidden log_run_dist "" log_run_mins "" | entry before tap {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+     toast "Nothing to log yet." label "Log" status null | ia_logs_ w1_sat {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+  HOST dose=time W1 fri "Recovery Run" plan 25 min
+  B1 DRAFT, time on plan face untouched, miles —.75 (opens on dash), Log
+     opened miles —.00 time 0:25:00 -> left miles —.75 time 0:25:00 | toast "Nothing to log yet." label "Log" status null | ia_logs_ null
+  B2 DRAFT, time rolled 0:47:13, miles —.75, Log
+     opened miles —.00 time 0:25:00 -> left miles —.75 time 0:47:13 | toast "Run logged ✓" label "Logged ✓" status null | ia_logs_ {"run_dist":"","run_pace":"","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+  B3 DRAFT, time untouched, miles 0.75 [control], Log
+     opened miles —.00 time 0:25:00 -> left miles 0.75 time 0:25:00 | toast "Run logged ✓" label "Logged ✓" status null | ia_logs_ {"run_dist":"0.75","run_pace":"33:20/mi","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""}
+  hms (run_mins) column 0 rows: ["0","1","2","3","4","5","6","7","8","9"] -> dash row present: false; opened face 0:00:00
+  move hms column 0 to the dash: impossible (no row  in column 0)
+
+§2 SWEEP 54/54 programs, 1956 run days, 27786 drives, errors 0, 94.4 s
+  §2a headline: kind | path | companion | outcome : count
+    BY dist | draft-Done | alone | LOST '' : 1908
+    BY dist | draft-Done | with | LOST '' : 1371
+    BY dist | draft-Done | with | LOST PLAN STAMP() : 537
+    BY dist | draft-Log | alone | LOST no entry : 1908
+    BY dist | draft-Log | with | LOST '' : 1371
+    BY dist | draft-Log | with | LOST PLAN STAMP() : 537
+    BY dist | draft-Skip | alone | LOST '' : 1908
+    BY dist | draft-Skip | with | LOST '' : 1371
+    BY dist | draft-Skip | with | LOST PLAN STAMP() : 537
+    BY dist | live-autosave | alone | LOST '' : 1908
+    BY dist | live-autosave | with | LOST '' : 1371
+    BY dist | live-autosave | with | LOST PLAN STAMP() : 537
+    BY dist | live-then-Log | alone | LOST '' : 1908
+    BY dist | live-then-Log | with | LOST '' : 1371
+    BY dist | live-then-Log | with | LOST PLAN STAMP() : 537
+    BY dist | zero-face-Log | alone | zero:"0.00" : 1908
+    BY pace | draft-Done | alone | LOST '' : 627
+    BY pace | draft-Done | with | LOST '' : 627
+    BY pace | draft-Log | alone | LOST no entry : 627
+    BY pace | draft-Log | with | LOST '' : 627
+    BY pace | draft-Skip | alone | LOST '' : 627
+    BY pace | draft-Skip | with | LOST '' : 627
+    BY pace | live-autosave | alone | LOST '' : 627
+    BY pace | live-autosave | with | LOST '' : 627
+    BY pace | live-then-Log | alone | LOST '' : 627
+    BY pace | live-then-Log | with | LOST '' : 627
+    BY rept | draft-Done | alone | LOST '' : 48
+    BY rept | draft-Done | with | LOST '' : 48
+    BY rept | draft-Log | alone | LOST no entry : 48
+    BY rept | draft-Log | with | LOST '' : 48
+    BY rept | draft-Skip | alone | LOST '' : 48
+    BY rept | draft-Skip | with | LOST '' : 48
+    BY rept | live-autosave | alone | LOST '' : 48
+    BY rept | live-autosave | with | LOST '' : 48
+    BY rept | live-then-Log | alone | LOST '' : 48
+    BY rept | live-then-Log | with | LOST '' : 48
+    BY rept | zero-face-Log | alone | zero:"0:00" : 48
+  §2a2 toast: kind | shape | path | companion | toast : count
+    TOAST dist | dist | draft-Done | alone | null : 537
+    TOAST dist | dist | draft-Done | with | null : 537
+    TOAST dist | dist | draft-Log | alone | "Nothing to log yet." : 537
+    TOAST dist | dist | draft-Log | with | "Run logged ✓" : 537
+    TOAST dist | dist | draft-Skip | alone | null : 537
+    TOAST dist | dist | draft-Skip | with | null : 537
+    TOAST dist | dist | live-autosave | alone | null : 537
+    TOAST dist | dist | live-autosave | with | null : 537
+    TOAST dist | dist | live-then-Log | alone | "Nothing to log yet." : 537
+    TOAST dist | dist | live-then-Log | with | "Run logged ✓" : 537
+    TOAST dist | dist | zero-face-Log | alone | "Run logged ✓" : 537
+    TOAST dist | generic | draft-Done | alone | null : 627
+    TOAST dist | generic | draft-Done | with | null : 627
+    TOAST dist | generic | draft-Log | alone | "Nothing to log yet." : 627
+    TOAST dist | generic | draft-Log | with | "Run logged ✓" : 627
+    TOAST dist | generic | draft-Skip | alone | null : 627
+    TOAST dist | generic | draft-Skip | with | null : 627
+    TOAST dist | generic | live-autosave | alone | null : 627
+    TOAST dist | generic | live-autosave | with | null : 627
+    TOAST dist | generic | live-then-Log | alone | "Nothing to log yet." : 627
+    TOAST dist | generic | live-then-Log | with | "Run logged ✓" : 627
+    TOAST dist | generic | zero-face-Log | alone | "Run logged ✓" : 627
+    TOAST dist | time | draft-Done | alone | null : 744
+    TOAST dist | time | draft-Done | with | null : 744
+    TOAST dist | time | draft-Log | alone | "Nothing to log yet." : 744
+    TOAST dist | time | draft-Log | with | "Run logged ✓" : 744
+    TOAST dist | time | draft-Skip | alone | null : 744
+    TOAST dist | time | draft-Skip | with | null : 744
+    TOAST dist | time | live-autosave | alone | null : 744
+    TOAST dist | time | live-autosave | with | null : 744
+    TOAST dist | time | live-then-Log | alone | "Nothing to log yet." : 744
+    TOAST dist | time | live-then-Log | with | "Run logged ✓" : 744
+    TOAST dist | time | zero-face-Log | alone | "Run logged ✓" : 744
+    TOAST pace | generic | draft-Done | alone | null : 627
+    TOAST pace | generic | draft-Done | with | null : 627
+    TOAST pace | generic | draft-Log | alone | "Nothing to log yet." : 627
+    TOAST pace | generic | draft-Log | with | "Run logged ✓" : 627
+    TOAST pace | generic | draft-Skip | alone | null : 627
+    TOAST pace | generic | draft-Skip | with | null : 627
+    TOAST pace | generic | live-autosave | alone | null : 627
+    TOAST pace | generic | live-autosave | with | null : 627
+    TOAST pace | generic | live-then-Log | alone | "Nothing to log yet." : 627
+    TOAST pace | generic | live-then-Log | with | "Run logged ✓" : 627
+    TOAST rept | reps_dist | draft-Done | alone | null : 48
+    TOAST rept | reps_dist | draft-Done | with | null : 48
+    TOAST rept | reps_dist | draft-Log | alone | "Nothing to log yet." : 48
+    TOAST rept | reps_dist | draft-Log | with | "Run logged ✓" : 48
+    TOAST rept | reps_dist | draft-Skip | alone | null : 48
+    TOAST rept | reps_dist | draft-Skip | with | null : 48
+    TOAST rept | reps_dist | live-autosave | alone | null : 48
+    TOAST rept | reps_dist | live-autosave | with | null : 48
+    TOAST rept | reps_dist | live-then-Log | alone | "Nothing to log yet." : 48
+    TOAST rept | reps_dist | live-then-Log | with | "Run logged ✓" : 48
+    TOAST rept | reps_dist | zero-face-Log | alone | "Run logged ✓" : 48
+  §2b segment: kind | doctrine | goal | ok/lost : count
+    SEG dist | NRC | HALF_MANNY | lost : 560
+    SEG dist | NRC | HALF_MANNY | ok : 56
+    SEG dist | NRC | multi run_half+bike+swim | lost : 280
+    SEG dist | NRC | multi run_half+bike+swim | ok : 28
+    SEG dist | NRC | run_10k | lost : 2560
+    SEG dist | NRC | run_10k | ok : 256
+    SEG dist | NRC | run_5k | lost : 2560
+    SEG dist | NRC | run_5k | ok : 256
+    SEG dist | NRC | run_half | lost : 4480
+    SEG dist | NRC | run_half | ok : 448
+    SEG dist | NRC | run_marathon | lost : 5760
+    SEG dist | NRC | run_marathon | ok : 576
+    SEG dist | NSW | run_base | lost : 1440
+    SEG dist | NSW | run_base | ok : 144
+    SEG dist | NSW | run_pace_goal | lost : 1440
+    SEG dist | NSW | run_pace_goal | ok : 144
+    SEG pace | NRC | HALF_MANNY | lost : 270
+    SEG pace | NRC | run_10k | lost : 1200
+    SEG pace | NRC | run_5k | lost : 1200
+    SEG pace | NRC | run_half | lost : 2160
+    SEG pace | NRC | run_marathon | lost : 1440
+    SEG rept | NSW | run_pace_goal | lost : 480
+    SEG rept | NSW | run_pace_goal | ok : 48
+  §2c days by shape: {"DAYS | generic":627,"DAYS | time":744,"DAYS | dist":537,"DAYS | reps_dist":48}
+  §2d detail: wheel | shape | open | companion | path | outcome | toast | live after : count
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(0.62) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(1) | toast null | live true : 24
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(1.5) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(10) | toast null | live true : 38
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(12) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(12.5) | toast null | live true : 19
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(13.1) | toast null | live true : 19
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(14) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(15) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(16) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(18) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(2) | toast null | live true : 33
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(2.5) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(2.8) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(26.2) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(3) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(3.1) | toast null | live true : 68
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(3.3) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(3.5) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(3.8) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(4) | toast null | live true : 39
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(4.3) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(4.5) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(4.8) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(5) | toast null | live true : 31
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(5.2) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(5.5) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(6) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(6.2) | toast null | live true : 62
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(6.6) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(7) | toast null | live true : 27
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(8) | toast null | live true : 30
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(9.32) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | PLAN STAMP(9.5) | toast null | live true : 11
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done | n : 537
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(0.62) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(1) | toast "Run logged ✓" | live true : 24
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(1.5) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(10) | toast "Run logged ✓" | live true : 38
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(12) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(12.5) | toast "Run logged ✓" | live true : 19
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(13.1) | toast "Run logged ✓" | live true : 19
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(14) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(15) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(16) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(18) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(2) | toast "Run logged ✓" | live true : 33
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(2.5) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(2.8) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(26.2) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(3) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(3.1) | toast "Run logged ✓" | live true : 68
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(3.3) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(3.5) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(3.8) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(4) | toast "Run logged ✓" | live true : 39
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(4.3) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(4.5) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(4.8) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(5) | toast "Run logged ✓" | live true : 31
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(5.2) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(5.5) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(6) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(6.2) | toast "Run logged ✓" | live true : 62
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(6.6) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(7) | toast "Run logged ✓" | live true : 27
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(8) | toast "Run logged ✓" | live true : 30
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(9.32) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | PLAN STAMP(9.5) | toast "Run logged ✓" | live true : 11
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log | n : 537
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(0.62) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(1) | toast null | live true : 24
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(1.5) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(10) | toast null | live true : 38
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(12) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(12.5) | toast null | live true : 19
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(13.1) | toast null | live true : 19
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(14) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(15) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(16) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(18) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(2) | toast null | live true : 33
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(2.5) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(2.8) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(26.2) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(3) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(3.1) | toast null | live true : 68
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(3.3) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(3.5) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(3.8) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(4) | toast null | live true : 39
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(4.3) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(4.5) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(4.8) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(5) | toast null | live true : 31
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(5.2) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(5.5) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(6) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(6.2) | toast null | live true : 62
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(6.6) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(7) | toast null | live true : 27
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(8) | toast null | live true : 30
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(9.32) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | PLAN STAMP(9.5) | toast null | live true : 11
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip | n : 537
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(0.62) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(1) | toast null | live true : 24
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(1.5) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(10) | toast null | live true : 38
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(12) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(12.5) | toast null | live true : 19
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(13.1) | toast null | live true : 19
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(14) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(15) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(16) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(18) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(2) | toast null | live true : 33
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(2.5) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(2.8) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(26.2) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(3) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(3.1) | toast null | live true : 68
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(3.3) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(3.5) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(3.8) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(4) | toast null | live true : 39
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(4.3) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(4.5) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(4.8) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(5) | toast null | live true : 31
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(5.2) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(5.5) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(6) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(6.2) | toast null | live true : 62
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(6.6) | toast null | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(7) | toast null | live true : 27
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(8) | toast null | live true : 30
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(9.32) | toast null | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | PLAN STAMP(9.5) | toast null | live true : 11
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave | n : 537
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(0.62) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(1) | toast "Run logged ✓" | live true : 24
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(1.5) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(10) | toast "Run logged ✓" | live true : 38
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(12) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(12.5) | toast "Run logged ✓" | live true : 19
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(13.1) | toast "Run logged ✓" | live true : 19
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(14) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(15) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(16) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(18) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(2) | toast "Run logged ✓" | live true : 33
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(2.5) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(2.8) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(26.2) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(3) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(3.1) | toast "Run logged ✓" | live true : 68
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(3.3) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(3.5) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(3.8) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(4) | toast "Run logged ✓" | live true : 39
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(4.3) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(4.5) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(4.8) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(5) | toast "Run logged ✓" | live true : 31
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(5.2) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(5.5) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(6) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(6.2) | toast "Run logged ✓" | live true : 62
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(6.6) | toast "Run logged ✓" | live true : 4
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(7) | toast "Run logged ✓" | live true : 27
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(8) | toast "Run logged ✓" | live true : 30
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(9.32) | toast "Run logged ✓" | live true : 8
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | PLAN STAMP(9.5) | toast "Run logged ✓" | live true : 11
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log | n : 537
+    dist:run_dist | dist | opens-plan | alone | draft-Done | '' | toast null | live false : 537
+    dist:run_dist | dist | opens-plan | alone | draft-Done | n : 537
+    dist:run_dist | dist | opens-plan | alone | draft-Log | n : 537
+    dist:run_dist | dist | opens-plan | alone | draft-Log | no entry | toast "Nothing to log yet." | live false : 537
+    dist:run_dist | dist | opens-plan | alone | draft-Skip | '' | toast null | live false : 537
+    dist:run_dist | dist | opens-plan | alone | draft-Skip | n : 537
+    dist:run_dist | dist | opens-plan | alone | live-autosave | '' | toast null | live false : 537
+    dist:run_dist | dist | opens-plan | alone | live-autosave | n : 537
+    dist:run_dist | dist | opens-plan | alone | live-then-Log | '' | toast "Nothing to log yet." | live false : 537
+    dist:run_dist | dist | opens-plan | alone | live-then-Log | n : 537
+    dist:run_dist | dist | opens-plan | alone | zero-face-Log | "0.00" | toast "Run logged ✓" | live true : 537
+    dist:run_dist | dist | opens-plan | alone | zero-face-Log | n : 537
+    dist:run_dist | generic | opens-dash | +pace 9:30 | draft-Done | '' | toast null | live true : 627
+    dist:run_dist | generic | opens-dash | +pace 9:30 | draft-Done | n : 627
+    dist:run_dist | generic | opens-dash | +pace 9:30 | draft-Log | '' | toast "Run logged ✓" | live true : 627
+    dist:run_dist | generic | opens-dash | +pace 9:30 | draft-Log | n : 627
+    dist:run_dist | generic | opens-dash | +pace 9:30 | draft-Skip | '' | toast null | live true : 627
+    dist:run_dist | generic | opens-dash | +pace 9:30 | draft-Skip | n : 627
+    dist:run_dist | generic | opens-dash | +pace 9:30 | live-autosave | '' | toast null | live true : 627
+    dist:run_dist | generic | opens-dash | +pace 9:30 | live-autosave | n : 627
+    dist:run_dist | generic | opens-dash | +pace 9:30 | live-then-Log | '' | toast "Run logged ✓" | live true : 627
+    dist:run_dist | generic | opens-dash | +pace 9:30 | live-then-Log | n : 627
+    dist:run_dist | generic | opens-dash | alone | draft-Done | '' | toast null | live false : 627
+    dist:run_dist | generic | opens-dash | alone | draft-Done | n : 627
+    dist:run_dist | generic | opens-dash | alone | draft-Log | n : 627
+    dist:run_dist | generic | opens-dash | alone | draft-Log | no entry | toast "Nothing to log yet." | live false : 627
+    dist:run_dist | generic | opens-dash | alone | draft-Skip | '' | toast null | live false : 627
+    dist:run_dist | generic | opens-dash | alone | draft-Skip | n : 627
+    dist:run_dist | generic | opens-dash | alone | live-autosave | '' | toast null | live false : 627
+    dist:run_dist | generic | opens-dash | alone | live-autosave | n : 627
+    dist:run_dist | generic | opens-dash | alone | live-then-Log | '' | toast "Nothing to log yet." | live false : 627
+    dist:run_dist | generic | opens-dash | alone | live-then-Log | n : 627
+    dist:run_dist | generic | opens-dash | alone | zero-face-Log | "0.00" | toast "Run logged ✓" | live true : 627
+    dist:run_dist | generic | opens-dash | alone | zero-face-Log | n : 627
+    dist:run_dist | time | opens-dash | +time 0:47:13 | draft-Done | '' | toast null | live true : 744
+    dist:run_dist | time | opens-dash | +time 0:47:13 | draft-Done | n : 744
+    dist:run_dist | time | opens-dash | +time 0:47:13 | draft-Log | '' | toast "Run logged ✓" | live true : 744
+    dist:run_dist | time | opens-dash | +time 0:47:13 | draft-Log | n : 744
+    dist:run_dist | time | opens-dash | +time 0:47:13 | draft-Skip | '' | toast null | live true : 744
+    dist:run_dist | time | opens-dash | +time 0:47:13 | draft-Skip | n : 744
+    dist:run_dist | time | opens-dash | +time 0:47:13 | live-autosave | '' | toast null | live true : 744
+    dist:run_dist | time | opens-dash | +time 0:47:13 | live-autosave | n : 744
+    dist:run_dist | time | opens-dash | +time 0:47:13 | live-then-Log | '' | toast "Run logged ✓" | live true : 744
+    dist:run_dist | time | opens-dash | +time 0:47:13 | live-then-Log | n : 744
+    dist:run_dist | time | opens-dash | alone | draft-Done | '' | toast null | live false : 744
+    dist:run_dist | time | opens-dash | alone | draft-Done | n : 744
+    dist:run_dist | time | opens-dash | alone | draft-Log | n : 744
+    dist:run_dist | time | opens-dash | alone | draft-Log | no entry | toast "Nothing to log yet." | live false : 744
+    dist:run_dist | time | opens-dash | alone | draft-Skip | '' | toast null | live false : 744
+    dist:run_dist | time | opens-dash | alone | draft-Skip | n : 744
+    dist:run_dist | time | opens-dash | alone | live-autosave | '' | toast null | live false : 744
+    dist:run_dist | time | opens-dash | alone | live-autosave | n : 744
+    dist:run_dist | time | opens-dash | alone | live-then-Log | '' | toast "Nothing to log yet." | live false : 744
+    dist:run_dist | time | opens-dash | alone | live-then-Log | n : 744
+    dist:run_dist | time | opens-dash | alone | zero-face-Log | "0.00" | toast "Run logged ✓" | live true : 744
+    dist:run_dist | time | opens-dash | alone | zero-face-Log | n : 744
+    pace:run_pace | generic | opens-dash | +miles 3.10 | draft-Done | '' | toast null | live true : 627
+    pace:run_pace | generic | opens-dash | +miles 3.10 | draft-Done | n : 627
+    pace:run_pace | generic | opens-dash | +miles 3.10 | draft-Log | '' | toast "Run logged ✓" | live true : 627
+    pace:run_pace | generic | opens-dash | +miles 3.10 | draft-Log | n : 627
+    pace:run_pace | generic | opens-dash | +miles 3.10 | draft-Skip | '' | toast null | live true : 627
+    pace:run_pace | generic | opens-dash | +miles 3.10 | draft-Skip | n : 627
+    pace:run_pace | generic | opens-dash | +miles 3.10 | live-autosave | '' | toast null | live true : 627
+    pace:run_pace | generic | opens-dash | +miles 3.10 | live-autosave | n : 627
+    pace:run_pace | generic | opens-dash | +miles 3.10 | live-then-Log | '' | toast "Run logged ✓" | live true : 627
+    pace:run_pace | generic | opens-dash | +miles 3.10 | live-then-Log | n : 627
+    pace:run_pace | generic | opens-dash | alone | draft-Done | '' | toast null | live false : 627
+    pace:run_pace | generic | opens-dash | alone | draft-Done | n : 627
+    pace:run_pace | generic | opens-dash | alone | draft-Log | n : 627
+    pace:run_pace | generic | opens-dash | alone | draft-Log | no entry | toast "Nothing to log yet." | live false : 627
+    pace:run_pace | generic | opens-dash | alone | draft-Skip | '' | toast null | live false : 627
+    pace:run_pace | generic | opens-dash | alone | draft-Skip | n : 627
+    pace:run_pace | generic | opens-dash | alone | live-autosave | '' | toast null | live false : 627
+    pace:run_pace | generic | opens-dash | alone | live-autosave | n : 627
+    pace:run_pace | generic | opens-dash | alone | live-then-Log | '' | toast "Nothing to log yet." | live false : 627
+    pace:run_pace | generic | opens-dash | alone | live-then-Log | n : 627
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | draft-Done | '' | toast null | live true : 48
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | draft-Done | n : 48
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | draft-Log | '' | toast "Run logged ✓" | live true : 48
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | draft-Log | n : 48
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | draft-Skip | '' | toast null | live true : 48
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | draft-Skip | n : 48
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | live-autosave | '' | toast null | live true : 48
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | live-autosave | n : 48
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | live-then-Log | '' | toast "Run logged ✓" | live true : 48
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | live-then-Log | n : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | draft-Done | '' | toast null | live false : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | draft-Done | n : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | draft-Log | n : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | draft-Log | no entry | toast "Nothing to log yet." | live false : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | draft-Skip | '' | toast null | live false : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | draft-Skip | n : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | live-autosave | '' | toast null | live false : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | live-autosave | n : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | live-then-Log | '' | toast "Nothing to log yet." | live false : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | live-then-Log | n : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | zero-face-Log | "0:00" | toast "Run logged ✓" | live true : 48
+    rept:run_rep_time | reps_dist | opens-dash | alone | zero-face-Log | n : 48
+  §2e first example per detail key
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Done : HALF_MANNY|fixture W1 sat "Long Run" left —.75 mid null final {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Log : HALF_MANNY|fixture W1 sat "Long Run" left —.75 mid null final {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | draft-Skip : HALF_MANNY|fixture W1 sat "Long Run" left —.75 mid null final {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-autosave : HALF_MANNY|fixture W1 sat "Long Run" left —.75 mid {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | dist | opens-plan | +time 0:47:13 | live-then-Log : HALF_MANNY|fixture W1 sat "Long Run" left —.75 mid {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    dist:run_dist | dist | opens-plan | alone | draft-Done : HALF_MANNY|fixture W1 sat "Long Run" left —.75 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | dist | opens-plan | alone | draft-Log : HALF_MANNY|fixture W1 sat "Long Run" left —.75 mid null final null toast "Nothing to log yet."
+    dist:run_dist | dist | opens-plan | alone | draft-Skip : HALF_MANNY|fixture W1 sat "Long Run" left —.75 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | dist | opens-plan | alone | live-autosave : HALF_MANNY|fixture W1 sat "Long Run" left —.75 mid {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | dist | opens-plan | alone | live-then-Log : HALF_MANNY|fixture W1 sat "Long Run" left —.75 mid {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Nothing to log yet."
+    dist:run_dist | dist | opens-plan | alone | zero-face-Log : HALF_MANNY|fixture W1 sat "Long Run" left 0.00 mid null final {"run_dist":"0.00","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    dist:run_dist | generic | opens-dash | +pace 9:30 | draft-Done : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —.75 mid null final {"run_dist":"","run_pace":"9:30","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | generic | opens-dash | +pace 9:30 | draft-Log : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —.75 mid null final {"run_dist":"","run_pace":"9:30","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    dist:run_dist | generic | opens-dash | +pace 9:30 | draft-Skip : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —.75 mid null final {"run_dist":"","run_pace":"9:30","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | generic | opens-dash | +pace 9:30 | live-autosave : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —.75 mid {"run_dist":"","run_pace":"9:30","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"9:30","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | generic | opens-dash | +pace 9:30 | live-then-Log : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —.75 mid {"run_dist":"","run_pace":"9:30","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"9:30","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    dist:run_dist | generic | opens-dash | alone | draft-Done : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —.75 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | generic | opens-dash | alone | draft-Log : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —.75 mid null final null toast "Nothing to log yet."
+    dist:run_dist | generic | opens-dash | alone | draft-Skip : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —.75 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | generic | opens-dash | alone | live-autosave : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —.75 mid {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | generic | opens-dash | alone | live-then-Log : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —.75 mid {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Nothing to log yet."
+    dist:run_dist | generic | opens-dash | alone | zero-face-Log : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left 0.00 mid null final {"run_dist":"0.00","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    dist:run_dist | time | opens-dash | +time 0:47:13 | draft-Done : HALF_MANNY|fixture W1 fri "Recovery Run" left —.75 mid null final {"run_dist":"","run_pace":"","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | time | opens-dash | +time 0:47:13 | draft-Log : HALF_MANNY|fixture W1 fri "Recovery Run" left —.75 mid null final {"run_dist":"","run_pace":"","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    dist:run_dist | time | opens-dash | +time 0:47:13 | draft-Skip : HALF_MANNY|fixture W1 fri "Recovery Run" left —.75 mid null final {"run_dist":"","run_pace":"","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | time | opens-dash | +time 0:47:13 | live-autosave : HALF_MANNY|fixture W1 fri "Recovery Run" left —.75 mid {"run_dist":"","run_pace":"","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | time | opens-dash | +time 0:47:13 | live-then-Log : HALF_MANNY|fixture W1 fri "Recovery Run" left —.75 mid {"run_dist":"","run_pace":"","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    dist:run_dist | time | opens-dash | alone | draft-Done : HALF_MANNY|fixture W1 fri "Recovery Run" left —.75 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | time | opens-dash | alone | draft-Log : HALF_MANNY|fixture W1 fri "Recovery Run" left —.75 mid null final null toast "Nothing to log yet."
+    dist:run_dist | time | opens-dash | alone | draft-Skip : HALF_MANNY|fixture W1 fri "Recovery Run" left —.75 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | time | opens-dash | alone | live-autosave : HALF_MANNY|fixture W1 fri "Recovery Run" left —.75 mid {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    dist:run_dist | time | opens-dash | alone | live-then-Log : HALF_MANNY|fixture W1 fri "Recovery Run" left —.75 mid {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Nothing to log yet."
+    dist:run_dist | time | opens-dash | alone | zero-face-Log : HALF_MANNY|fixture W1 fri "Recovery Run" left 0.00 mid null final {"run_dist":"0.00","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    pace:run_pace | generic | opens-dash | +miles 3.10 | draft-Done : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —:30 mid null final {"run_dist":"3.10","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    pace:run_pace | generic | opens-dash | +miles 3.10 | draft-Log : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —:30 mid null final {"run_dist":"3.10","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    pace:run_pace | generic | opens-dash | +miles 3.10 | draft-Skip : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —:30 mid null final {"run_dist":"3.10","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    pace:run_pace | generic | opens-dash | +miles 3.10 | live-autosave : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —:30 mid {"run_dist":"3.10","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"3.10","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    pace:run_pace | generic | opens-dash | +miles 3.10 | live-then-Log : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —:30 mid {"run_dist":"3.10","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"3.10","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    pace:run_pace | generic | opens-dash | alone | draft-Done : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —:30 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    pace:run_pace | generic | opens-dash | alone | draft-Log : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —:30 mid null final null toast "Nothing to log yet."
+    pace:run_pace | generic | opens-dash | alone | draft-Skip : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —:30 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    pace:run_pace | generic | opens-dash | alone | live-autosave : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —:30 mid {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    pace:run_pace | generic | opens-dash | alone | live-then-Log : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" left —:30 mid {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Nothing to log yet."
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | draft-Done : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left —:45 mid null final {"run_dist":"1.24","run_pace":"","run_mins":"","run_reps":"5","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | draft-Log : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left —:45 mid null final {"run_dist":"1.24","run_pace":"","run_mins":"","run_reps":"5","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | draft-Skip : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left —:45 mid null final {"run_dist":"1.24","run_pace":"","run_mins":"","run_reps":"5","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | live-autosave : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left —:45 mid {"run_dist":"1.24","run_pace":"","run_mins":"","run_reps":"5","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"1.24","run_pace":"","run_mins":"","run_reps":"5","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    rept:run_rep_time | reps_dist | opens-dash | +reps +1 | live-then-Log : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left —:45 mid {"run_dist":"1.24","run_pace":"","run_mins":"","run_reps":"5","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"1.24","run_pace":"","run_mins":"","run_reps":"5","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+    rept:run_rep_time | reps_dist | opens-dash | alone | draft-Done : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left —:45 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    rept:run_rep_time | reps_dist | opens-dash | alone | draft-Log : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left —:45 mid null final null toast "Nothing to log yet."
+    rept:run_rep_time | reps_dist | opens-dash | alone | draft-Skip : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left —:45 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    rept:run_rep_time | reps_dist | opens-dash | alone | live-autosave : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left —:45 mid {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast null
+    rept:run_rep_time | reps_dist | opens-dash | alone | live-then-Log : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left —:45 mid {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} toast "Nothing to log yet."
+    rept:run_rep_time | reps_dist | opens-dash | alone | zero-face-Log : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" left 0:00 mid null final {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"0:00","bike_mins":"","swim_yards":"","rpe":""} toast "Run logged ✓"
+
+§3 FACT BASE
+  _iawParse("dist","") = ["","",""]
+  _iawParse("rept","") = ["",""]
+  _iawParse("pace","") = ["",""]
+  _iawParse("dist","0.00") = ["0","0","0"]
+  _iawParse("rept","0:00") = ["0","0"]
+  _iawParse("dist","0") = ["0","0","0"]
+  _iawParse("dist",".75") = ["0","7","5"]
+  _iawFormat("dist",["0","0","0"]) = "0.00"
+  _iawFormat("rept",["0","0"]) = "0:00"
+  _iawFormat("dist",["","7","5"]) = ""
+  _iawFormat("dist",["0","7","5"]) = "0.75"
+  _iawFormat("rept",["","45"]) = ""
+  _iawFormat("rept",["0","45"]) = "0:45"
+  _iawFormat("pace",["","30"]) = ""
+  _iawFormat("dist",["","0","0"]) = ""
+  readers on a stored zero face (each reader called as shipped):
+    run_dist="0.00": cardioEntryLive(run) true | truthy (_hasLog / restMove / session style) true | parseFloat>0 (charts, pvl, ladder, bench) false | logCardio empty test (=== "") false
+    run_rep_time="0:00": cardioEntryLive(run) true | truthy (_hasLog / restMove / session style) true | parseFloat>0 (charts, pvl, ladder, bench) false | _parseClock 0 | logCardio empty test (=== "") false
+    run_dist="": cardioEntryLive(run) false | truthy (_hasLog / restMove / session style) false | parseFloat>0 (charts, pvl, ladder, bench) false | logCardio empty test (=== "") true
+
+§4 REOPENED LIVE dose=dist clear (HALF_MANNY host), time logged 0:47:13 then Log then Done; reopen; clear
+  setup: Log toast "Run logged ✓" stored {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} | after Done {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} | reopen faces miles 3.10 time 0:47:13 label "Logged ✓"
+  A time->zero, then miles->dash
+    time->0:00:00    faces miles 3.10 time 0:00:00 | stored {"run_dist":"3.1","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} | live true label "Logged ✓"
+    miles->dash      faces miles —.10 time 0:00:00 | stored {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} | live false label "Log"
+    reopen: faces miles 3.10 time 0:00:00 status "complete" nudge false
+  B miles->dash, then time->zero
+    miles->dash      faces miles —.10 time 0:47:13 | stored {"run_dist":"3.1","run_pace":"15:14/mi","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} | live true label "Logged ✓"
+    time->0:00:00    faces miles —.10 time 0:00:00 | stored {"run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} | live false label "Log"
+    reopen: faces miles 3.10 time 0:00:00 status "complete" nudge false
+  C time->zero, then miles->0.00 (today's zero row)
+    time->0:00:00    faces miles 3.10 time 0:00:00 | stored {"run_dist":"3.1","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} | live true label "Logged ✓"
+    miles->0.00      faces miles 0.00 time 0:00:00 | stored {"run_dist":"0.00","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} | live true label "Logged ✓"
+    reopen: faces miles 0.00 time 0:00:00 status "complete" nudge false
+  D time->zero only
+    time->0:00:00    faces miles 3.10 time 0:00:00 | stored {"run_dist":"3.1","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","rpe":""} | live true label "Logged ✓"
+    reopen: faces miles 3.10 time 0:00:00 status "complete" nudge false
+
+§5 READERS (comment-stripped, every hit, line numbers)
+  log_run_dist : 9 code hits on 9 lines (raw incl. comments 9): 13533, 13810, 13814, 13825, 13834, 14205, 14804, 14820, 14898
+  log_run_rep_time : 6 code hits on 6 lines (raw incl. comments 6): 13533, 13820, 14205, 14805, 14820, 14898
+  log_run_pace : 4 code hits on 4 lines (raw incl. comments 4): 13835, 14205, 14804, 14898
+  run_dist : 32 code hits on 20 lines (raw incl. comments 33): 1441, 12213, 13055, 13435, 13533, 13810, 13814, 13825, 13834, 14194, 14205, 14804, 14820, 14823, 14898, 16422, 16674, 16744, 17598, 17605
+  run_rep_time : 10 code hits on 8 lines (raw incl. comments 10): 13435, 13533, 13820, 14194, 14205, 14805, 14820, 14898
+  'dist' : 21 code hits on 21 lines (raw incl. comments 21): 3992, 4031, 4433, 4437, 4447, 4507, 6144, 10072, 12401, 12415, 12457, 12463, 13485, 13500, 13522, 13546, 13810, 13813, 13814, 13825, 13834
+  'rept' : 1 code hits on 1 lines (raw incl. comments 1): 13820
+  if(vals[0]==='') return ''; : 1 code hits on 1 lines (raw incl. comments 1): 13657
+  context per run_dist / run_rep_time line:
+    :1441 [run_dist] in applyRestCardio | if(type==='run'&&d>0)  e.run_dist=(+e.run_dist||0)+d;
+    :12213 [run_dist] in renderWeekView | let miles=0; order.forEach(d=>{ const v=parseFloat((logs[logKey(currentWeek,d)]||{}).run_dist); if(!isNaN(v)) miles+=v; });
+    :13055 [run_dist] in _benchmarkEntryFor | const dist=parseFloat(e.run_dist); if(!(dist>0)) return;
+    :13435 [run_dist] in updateRPEDisplay | const CARDIO_PARK_FIELDS={run:['run_dist','run_pace','run_mins','run_reps','run_rep_time'],bike:['bike_mins'],swim:['swim_yards']};
+    :13810 [run_dist] in cardioFieldHTML | <div class="iaw-wrap iaw-solo">${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}</div>
+    :13814 [run_dist] in cardioFieldHTML | <div class="iaw-wrap iaw-solo">${iaWheelHTML('dist','log_run_dist',e.run_dist||'',null,dose.mi)}</div>
+    :13825 [run_dist] in cardioFieldHTML | <div class="iaw-wrap iaw-solo">${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}</div>
+    :13834 [run_dist] in cardioFieldHTML | ${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}
+    :14194 [run_dist] in openDetail | const _hasLog=_le&&((_le.notes&&_le.notes.trim())||_le.run_dist||_le.run_pace||_le.run_mins||_le.run_reps||_le.run_rep_time||_le.bike_mins||_le.swim_y
+    :14804 [run_dist] in persistLogFields | run_dist:gc('log_run_dist'), run_pace:gc('log_run_pace'),
+    :14823 [run_dist] in persistLogFields | if(_dd.dist!=null && !logs[key].run_dist) logs[key].run_dist=String(_dd.dist);
+    :16422 [run_dist] in seedFromPriorPrograms | if(e.run_dist&&+e.run_dist>0) maxDist=Math.max(maxDist,+e.run_dist);
+    :16674 [run_dist] in ladderWeekly | const d=+e.run_dist; if(!(d>0)) return;
+    :16744 [run_dist] in plannedVsLogged | const act=(e&&+e.run_dist>0)?+e.run_dist:0;
+    :17598 [run_dist] in renderProgressScreen | if(entry.run_dist && +entry.run_dist > 0) weeklyData[w].run += +entry.run_dist;
+    :17605 [run_dist] in renderProgressScreen | if(entry.rpe||entry.run_dist||entry.bike_mins||entry.swim_yards||entry.notes) {
+    :13435 [run_rep_time] in updateRPEDisplay | const CARDIO_PARK_FIELDS={run:['run_dist','run_pace','run_mins','run_reps','run_rep_time'],bike:['bike_mins'],swim:['swim_yards']};
+    :13820 [run_rep_time] in cardioFieldHTML | <div class="iaw-wrap" style="max-width:190px">${iaWheelHTML('rept','log_run_rep_time',e.run_rep_time||'')}</div>
+    :14194 [run_rep_time] in openDetail | const _hasLog=_le&&((_le.notes&&_le.notes.trim())||_le.run_dist||_le.run_pace||_le.run_mins||_le.run_reps||_le.run_rep_time||_le.bike_mins||_le.swim_y
+    :14805 [run_rep_time] in persistLogFields | run_mins:gc('log_run_mins'), run_reps:gc('log_run_reps'), run_rep_time:gc('log_run_rep_time'),
+
+runtime 94.5 s | drives 27786 | errors 0

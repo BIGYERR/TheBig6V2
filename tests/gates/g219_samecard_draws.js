@@ -155,6 +155,7 @@ ERA[233] = ERA[232];   // V233 (D207–D211 P-BIKEWHEEL): ruled UNMOVED, referen
 ERA[234] = ERA[233];   // era_bump V234: ruled UNMOVED, reference to [233]; tests/measure/v234_rulings/v234_ruling_d213_d214.md
 ERA[235] = ERA[234];   // era_bump V235: ruled UNMOVED, reference to [234]; tests/measure/v235_rulings/v235_ruling_d215_d217.md
 ERA[236] = ERA[235];   // era_bump V236: ruled UNMOVED, reference to [235]; tests/measure/v236_rulings/v236_ruling_d218_d219.md
+ERA[237] = ERA[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 function shardCount(){ const raw = process.env.G219_SHARDS === undefined ? '' : String(process.env.G219_SHARDS);
   if(raw === '') return 4;
   if(!/^[0-9]+$/.test(raw) || parseInt(raw, 10) < 1){ fail++; console.log("FAIL: CONFIG: G219_SHARDS must be a positive integer, or empty/unset which means 4; got '" + raw + "'"); return 0; }

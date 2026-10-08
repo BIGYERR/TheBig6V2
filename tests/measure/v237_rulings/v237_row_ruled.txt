@@ -1,0 +1,17 @@
+# ROW_RULED for V237 (D220 P-DISTZERO, D221 P-REOPENSTAMP, D222 scope). Passed to gate.sh step 4b as ROW_RULED=<this file>.
+# Written by the main session from tests/measure/v237_rulings/v237_ruling_d220_d222.md (Mario concurred 2026-10-08), before the draft run.
++ g237_d220_distzero.js D220-zero  # D220 P-DISTZERO (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D220-format  # D220 P-DISTZERO (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D220-rows  # D220 P-DISTZERO (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D220-wrap  # D220 P-DISTZERO (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D220-open  # D220 P-DISTZERO (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D220-tail  # D220 P-DISTZERO (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D220-clear-zero  # D220 P-DISTZERO (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D220-fixed-zero  # D220 P-DISTZERO (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D221-seed  # D221 P-REOPENSTAMP (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D221-clear  # D221 P-REOPENSTAMP (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D221-restamp  # D221 P-REOPENSTAMP (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D221-rolled  # D221 P-REOPENSTAMP (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D221-swap  # D221 P-REOPENSTAMP (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D222-pace  # D222 scope (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g237_d220_distzero.js D222-digest  # D222 scope (Mario concurred 2026-10-08): new gate row, Gate rows section

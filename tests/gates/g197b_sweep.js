@@ -240,6 +240,7 @@ HF_LEAK_BY_VERSION[233] = HF_LEAK_BY_VERSION[232];   // V233 (D207–D211 P-BIKE
 HF_LEAK_BY_VERSION[234] = HF_LEAK_BY_VERSION[233];   // era_bump V234: ruled UNMOVED, reference to [233]; tests/measure/v234_rulings/v234_ruling_d213_d214.md
 HF_LEAK_BY_VERSION[235] = HF_LEAK_BY_VERSION[234];   // era_bump V235: ruled UNMOVED, reference to [234]; tests/measure/v235_rulings/v235_ruling_d215_d217.md
 HF_LEAK_BY_VERSION[236] = HF_LEAK_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, reference to [235]; tests/measure/v236_rulings/v236_ruling_d218_d219.md
+HF_LEAK_BY_VERSION[237] = HF_LEAK_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 const HF_LEAK = HF_LEAK_BY_VERSION[(+IA.version <= 209) ? 209 : +IA.version];
 // B5c's same-card duplicate count, keyed by ia-version (D133). 187 through V218 (the bare literal B5c read until V219).
 const B5C_BY_VERSION = { 218: 187 };
@@ -261,6 +262,7 @@ B5C_BY_VERSION[233] = B5C_BY_VERSION[232];   // V233 (D207–D211 P-BIKEWHEEL): 
 B5C_BY_VERSION[234] = B5C_BY_VERSION[233];   // era_bump V234: ruled UNMOVED, reference to [233]; tests/measure/v234_rulings/v234_ruling_d213_d214.md
 B5C_BY_VERSION[235] = B5C_BY_VERSION[234];   // era_bump V235: ruled UNMOVED, reference to [234]; tests/measure/v235_rulings/v235_ruling_d215_d217.md
 B5C_BY_VERSION[236] = B5C_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, reference to [235]; tests/measure/v236_rulings/v236_ruling_d218_d219.md
+B5C_BY_VERSION[237] = B5C_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 const B5C_ROW = B5C_BY_VERSION[(+IA.version <= 218) ? 218 : +IA.version];   // no row -> B5c FAILS
 // Survivors of one kind, read off the census and off the row through the same needs() table,
 // compared name for name and count for count: no extras, no missing.

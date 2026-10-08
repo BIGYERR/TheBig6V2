@@ -17,8 +17,10 @@
 //   0:47:13 -> 47 + 13/60 = 47.2167 -> "47.22"; HALF_MANNY W1 sat Long Run dose 3.1 mi -> run_dist "3.1"; pace
 //   2833.2 s / 3.1 mi = 913.9 s/mi -> "15:14/mi"; the D200/D208 table of D215-format; plan 25 min -> face 0:25:00;
 //   minutes 30 on that plan -> "30.00"; hours 0 -> 1 -> 0 on that plan -> "25.00" (D202); the D203 dist parse table
-//   (g232's typed list, unchanged by D217); rendered column lists '0'..'9' (10 rows, no nil row), 300-row minutes and
-//   seconds, dash-first dist / rept / pace (hand lists); HALF_MANNY digest 2d35e8f743680cfa (printed by the ruling
+//   (g232's typed list, unchanged by D217; from VER 237 its abc, ., -1 entries land on zero, D220); rendered column lists
+//   '0'..'9' (10 rows, no nil row), 300-row minutes and seconds, dash-first dist / rept / pace through VER 236 and from
+//   VER 237 zero-first dist and rept ('0', D220) with pace still dash-first (hand lists); HALF_MANNY digest
+//   2d35e8f743680cfa (printed by the ruling
 //   before the build, standing ruling 5). Lattice plan faces: the plan minutes the wheel carries (data-plan), turned into
 //   h:mm:ss by hand arithmetic (g232's hmsFace). The lattice floor 1,755 is measure's hand count of hms forms that
 //   opened on the dash at V234 (the class D215 moves onto zero).
@@ -45,7 +47,9 @@
 //                 600 / 630.5 / 599.98 -> 9:59:59.
 //   D215-rows     rendered hms column 0 is exactly '0'..'9' (10 items, no nil item, data-len 10, data-wrap ''), columns
 //                 1 and 2 are 300 items with data-wrap 1; dist, rept and pace column 0 still begin with '' and carry
-//                 data-wrap ''.
+//                 data-wrap '' (VER <= 236). From VER 237 (D220; tests/measure/v237_rulings/v237_ruling_d220_d222.md,
+//                 "Existing rows this ruling flips") dist and rept column 0 begin with '0' and carry data-wrap ''; pace
+//                 still begins with '' (D222).
 //   D216-wrap     _iawWraps over the hms columns [false,true,true]; dist [false,true,true]; pace and rept [false,true].
 //   D215-open     three hand shapes (bike blank, run dose=dist blank, run dose=time plan 25) open on 0:00:00, 0:00:00,
 //                 0:25:00 writing nothing (0 input events, no ia_logs_ entry, no ia_hist_ snapshot); then every hms
@@ -68,7 +72,8 @@
 //                 bike-nudge, bike-progress, dist-same-open, time-zero, legacy-open, legacy-back.
 //   D217-digest   era row: MANNY_DIGEST_BY_VERSION[VER] exists (conjunct) and is 2d35e8f743680cfa, and HALF_MANNY built
 //                 on the candidate digests to it.
-//   D217-others   dist [dash,8,6] -> '', rept [dash,55] -> '', the D203 dist parse table, all unchanged (hand).
+//   D217-others   dist [dash,8,6] -> '', rept [dash,55] -> '' (the guard stays: a dash value still formats to ''), the
+//                 D203 dist parse table (hand): abc, ., -1 on the dash through VER 236, on zero from VER 237 (D220).
 'use strict';
 const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
@@ -82,14 +87,14 @@ const J = JSON.stringify;
 const LABEL = {
   'D215-zero':   "D215-zero (VER >= 235) the zero face 0:00:00 formats to ''; hms parse of '', abc, -1, 0, 0.00 is 0:00:00",
   'D215-format': 'D215-format (VER >= 235) D200 and D208 unchanged: the hand format and parse table',
-  'D215-rows':   "D215-rows (VER >= 235) rendered hms hours is '0'..'9' (10, no nil, data-len 10, no wrap); mm and ss 300 wrapping; dist, rept, pace keep the dash",
+  'D215-rows':   "D215-rows (VER >= 235) rendered hms hours is '0'..'9' (10, no nil, data-len 10, no wrap); mm and ss 300 wrapping; dist, rept, pace keep the dash (VER <= 236); from VER 237 dist and rept begin at 0 (D220), pace keeps the dash",
   'D216-wrap':   'D216-wrap (VER >= 235) _iawWraps: hms [false,true,true], dist [false,true,true], pace and rept [false,true]',
   'D215-open':   'D215-open (VER >= 235) blank hms wheels open on 0:00:00 (plan face on dose=time) and write nothing',
   'D215-tail':   'D215-tail (VER >= 235) a tail roll on a blank hms wheel stores 47.22 through Done (repros and the free class)',
   'D215-plan':   'D215-plan (VER >= 235) dose=time plan face 0:25:00; minutes 30 stores 30.00; hours 0 -> 1 -> 0 stores 25.00; no dash row',
   'D215-clear':  "D215-clear (VER >= 235) in the open that wrote the log, rolling the time back to 0:00:00 stores '' (bike, dose=dist with its stamps, dose=time, legacy 0.00)",
   'D217-digest': 'D217-digest (era row) MANNY_DIGEST_BY_VERSION[VER] exists and is 2d35e8f743680cfa; HALF_MANNY digests to it',
-  'D217-others': "D217-others (VER >= 235) dist [dash,8,6] -> '', rept [dash,55] -> '', the D203 dist parse table, unchanged",
+  'D217-others': "D217-others (VER >= 235) dist [dash,8,6] -> '', rept [dash,55] -> '', the D203 dist parse table (abc, ., -1 on the dash through VER 236, on zero from VER 237, D220)",
 };
 const IDS = Object.keys(LABEL);
 S.declare(IDS);
@@ -104,6 +109,8 @@ const FMT_TABLE = [[['0', '47', '13'], '47.22'], [['0', '0', '30'], '0.50'], [['
 const PARSE_TABLE = [['47.22', ['0', '47', '13']], ['45.5', ['0', '45', '30']], ['599', ['9', '59', '0']], ['600', ['9', '59', '59']],
   ['630.5', ['9', '59', '59']], ['599.98', ['9', '59', '59']]];
 const DEC3 = [['.86', ['0', '8', '6']], ['abc', ['', '', '']], ['.', ['', '', '']], ['-1', ['', '', '']], ['3.456', ['3', '4', '5']], ['100', ['99', '0', '0']]];
+// V237 (D220): a string with no digits at the front lands on zero (no dash row); the numeric rows are DEC3's, unchanged.
+const DEC3_V237 = [['.86', ['0', '8', '6']], ['abc', ['0', '0', '0']], ['.', ['0', '0', '0']], ['-1', ['0', '0', '0']], ['3.456', ['3', '4', '5']], ['100', ['99', '0', '0']]];
 const HOURS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const hmsFace = m => { const t = Math.round(m * 60); return Math.floor(t / 3600) + ':' + String(Math.floor((t % 3600) / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
 const NUDGE = 'You logged this one but never marked it.';
@@ -266,7 +273,10 @@ guard('D215-rows', () => {
   cj.push(['hms-hours-len', c0.len === 10, 'data-len ' + c0.len + ' (hand 10)']);
   cj.push(['hms-hours-data-wrap', c0.wrap === '', 'data-wrap ' + J(c0.wrap) + ' (hand "")']);
   for(const ci of [1, 2]){ const c = hc[ci] || {}; cj.push(['hms-col' + ci, (c.vals || []).length === 300 && c.wrap === '1', ((c.vals || []).length) + ' items, data-wrap ' + J(c.wrap) + ' (hand 300, "1")']); }
-  for(const k of ['dist', 'rept', 'pace']){ const c = renderCols(k)[0] || { vals:[] }; cj.push([k + '-dash', c.vals[0] === '' && c.wrap === '', 'col0 first ' + J(c.vals[0]) + ', data-wrap ' + J(c.wrap) + ' (hand "", "")']); }
+  // V237 (D220): from VER 237 dist and rept column 0 begins with '0' (no dash row) and still does not wrap; VER <= 236 keeps
+  // the dash first. Pace keeps its dash on every version (D222). Conjunct names stay.
+  for(const k of ['dist', 'rept', 'pace']){ const c = renderCols(k)[0] || { vals:[] }; const first = (VER >= 237 && k !== 'pace') ? '0' : '';
+    cj.push([k + '-dash', c.vals[0] === first && c.wrap === '', 'col0 first ' + J(c.vals[0]) + ', data-wrap ' + J(c.wrap) + ' (hand ' + J(first) + ', "")']); }
   row('D215-rows', cj);
 });
 
@@ -441,7 +451,7 @@ guard('D217-others', () => {
   const cj = [verCj('D217-others')];
   let g = FMT('dist', ['', '8', '6']); cj.push(['dist-dash', g === '', 'dist [dash,8,6] -> ' + J(g) + ' (hand "")']);
   g = FMT('rept', ['', '55']); cj.push(['rept-dash', g === '', 'rept [dash,55] -> ' + J(g) + ' (hand "")']);
-  const t = DEC3.map(([s, w]) => { const r = PARSE('dist', s); return [s, r, w, J(r) === J(w)]; });
+  const t = (VER >= 237 ? DEC3_V237 : DEC3).map(([s, w]) => { const r = PARSE('dist', s); return [s, r, w, J(r) === J(w)]; });
   cj.push(['dec3-table', t.every(x => x[3]), t.map(x => J(x[0]) + ' -> ' + J(x[1]) + (x[3] ? '' : ' (hand ' + J(x[2]) + ')')).join(', ')]);
   row('D217-others', cj);
 });

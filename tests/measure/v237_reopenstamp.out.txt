@@ -1,0 +1,107 @@
+candidate /Users/CanasBangin/Desktop/TheBig6V2/index.html ia-version 236
+§L LATTICE: 89/89 programs; run dose days {"time":742,"dist":511,"reps_dist":48}; drives 20440; errors 0; 135.4 s
+
+§R REPRO HALF_MANNY|fixture W1 sat "Long Run" mi 3.1: roll 0:47:13, Log, Back, reopen (hidden log_run_dist "3.1", label "Logged ✓"), roll time to 0:00:00 -> stored at the settle {"bike_mins":"","notes":"","rpe":"","run_dist":"3.1","run_mins":"","run_pace":"","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}, label "Logged ✓"; Back -> stored {"bike_mins":"","notes":"","rpe":"","run_dist":"3.1","run_mins":"","run_pace":"","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}, status null; reopen label "Logged ✓", hidden "3.1", nudge true
+
+§0 V236 LOG STEP on dose=dist (denominator = dose=dist days 511)
+  after Log tap: run_mins "47.22" true, run_dist===String(mi) (stamp) true, run_pace set true, label "Logged ✓" : 511
+  after time roll (DRAFT): entry none, label "Log" : 511
+  fresh open: hidden "", face==wheelOracle true, data-plan==String(mi) true, label "Log" : 511
+  roll time then Back, no Log: entry none : 511
+
+§1 CLEAR FLOWS S>gesture>X (S = commit before reopen; X = finishing tap). full = run_mins, run_dist, run_pace all empty
+  ctl:log>M_dash+T_zero>back n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  ctl:log>M_dash+T_zero>log  n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  ctl:log>M_dash>back        n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi","rpe":""}]
+  ctl:log>M_dash>log         n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi","rpe":""}]
+  ctl:log>M_zero>back        n 511 | full 0 | run_dist survives 511 (==String(mi) 0) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | weekMiles 0 progRun 0 pvl 0 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"0.00","run_pace":"15:14/mi","rpe":""}]
+  ctl:log>M_zero>log         n 511 | full 0 | run_dist survives 511 (==String(mi) 0) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | weekMiles 0 progRun 0 pvl 0 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"0.00","run_pace":"15:14/mi","rpe":""}]
+  ctl:log>T_zero+M_dash>back n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  ctl:log>T_zero+M_dash>log  n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  ctl:log>T_zero>back        n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  ctl:log>T_zero>log         n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  done>M_dash+T_zero>back    n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  done>M_dash+T_zero>done    n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | nudge on reopen 0 | restMove withholds 0 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  done>M_dash+T_zero>log     n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  done>M_dash>back           n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi","rpe":""}]
+  done>M_dash>done           n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | nudge on reopen 511 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi","rpe":""}]
+  done>M_dash>log            n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi","rpe":""}]
+  done>M_zero>back           n 511 | full 0 | run_dist survives 511 (==String(mi) 0) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"0.00","run_pace":"15:14/mi","rpe":""}]
+  done>M_zero>done           n 511 | full 0 | run_dist survives 511 (==String(mi) 0) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | nudge on reopen 511 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"0.00","run_pace":"15:14/mi","rpe":""}]
+  done>M_zero>log            n 511 | full 0 | run_dist survives 511 (==String(mi) 0) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"0.00","run_pace":"15:14/mi","rpe":""}]
+  done>T_zero+M_dash>back    n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  done>T_zero+M_dash>done    n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | nudge on reopen 0 | restMove withholds 0 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  done>T_zero+M_dash>log     n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  done>T_zero>back           n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"","run_dist":"3.1","run_pace":"","rpe":""}]
+  done>T_zero>done           n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | nudge on reopen 511 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"","run_dist":"3.1","run_pace":"","rpe":""}]
+  done>T_zero>log            n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"","run_dist":"3.1","run_pace":"","rpe":""}]
+  log>M_dash+T_zero>back     n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | nudge on reopen 0 | restMove withholds 0 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  log>M_dash+T_zero>done     n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  log>M_dash+T_zero>log      n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | nudge on reopen 0 | restMove withholds 0 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  log>M_dash>back            n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | nudge on reopen 511 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi","rpe":""}]
+  log>M_dash>done            n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi","rpe":""}]
+  log>M_dash>log             n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | nudge on reopen 511 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi","rpe":""}]
+  log>M_zero>back            n 511 | full 0 | run_dist survives 511 (==String(mi) 0) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | nudge on reopen 511 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"0.00","run_pace":"15:14/mi","rpe":""}]
+  log>M_zero>done            n 511 | full 0 | run_dist survives 511 (==String(mi) 0) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"0.00","run_pace":"15:14/mi","rpe":""}]
+  log>M_zero>log             n 511 | full 0 | run_dist survives 511 (==String(mi) 0) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | nudge on reopen 511 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 511 session 511  [ex {"run_mins":"47.22","run_dist":"0.00","run_pace":"15:14/mi","rpe":""}]
+  log>T_zero+M_dash>back     n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | nudge on reopen 0 | restMove withholds 0 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  log>T_zero+M_dash>done     n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  log>T_zero+M_dash>log      n 511 | full 511 | run_dist survives 0 (==String(mi) 0) | label at settle {"Log":511} | LIVE after 0 | status {"null":511} | nudge on reopen 0 | restMove withholds 0 | weekMiles 0 progRun 0 pvl 0 _hasLog 0 session 0  [ex {"run_mins":"","run_dist":"","run_pace":"","rpe":""}]
+  log>T_zero>back            n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | nudge on reopen 511 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"","run_dist":"3.1","run_pace":"","rpe":""}]
+  log>T_zero>done            n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"complete":511} | nudge on reopen 0 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"","run_dist":"3.1","run_pace":"","rpe":""}]
+  log>T_zero>log             n 511 | full 0 | run_dist survives 511 (==String(mi) 511) | label at settle {"Logged ✓":511} | LIVE after 511 | status {"null":511} | nudge on reopen 511 | restMove withholds 511 | weekMiles 511 progRun 511 pvl 511 _hasLog 511 session 511  [ex {"run_mins":"","run_dist":"3.1","run_pace":"","rpe":""}]
+
+§1h HEADLINE: reopened T_zero (one gesture) and the two-gesture clear, all reopened flows pooled
+  T_zero         fully cleared 0/3066, run_dist survives 3066/3066, card LIVE at the settle 3066/3066
+  M_dash         fully cleared 0/3066, run_dist survives 3066/3066, card LIVE at the settle 3066/3066
+  M_zero         fully cleared 0/3066, run_dist survives 3066/3066, card LIVE at the settle 3066/3066
+  T_zero+M_dash  fully cleared 3066/3066, run_dist survives 0/3066, card LIVE at the settle 0/3066
+  M_dash+T_zero  fully cleared 3066/3066, run_dist survives 0/3066, card LIVE at the settle 0/3066
+  segment log>T_zero>back run_dist survives, by goal: HALF_MANNY 15/15, run_5k 48/48, run_10k 72/72, run_half 120/120, run_marathon 160/160, run_pace_goal 96/96
+  by focus: fixture 15/15, balanced 248/248, strength 248/248 | by exp: undefined 15/15, beginner 248/248, advanced 248/248 | by seed: 24865 248/248, 76308 248/248, fixture 15/15
+  by week: W1 57/57, W2 49/49, W3 57/57, W4 41/41, W5 41/41, W6 49/49, W7 33/33, W8 49/49, W9 17/17, W10 9/9, W11 17/17, W13 18/18, W14 26/26, W12 8/8, W15 8/8, W16 8/8, W17 8/8, W18 16/16
+
+§2 STAMP BYTES vs ATHLETE-ROLLED BYTES (denominator = dose=dist days)
+  athlete rolled miles away and back to plan, Log: run_dist == wheel bytes | ==String(mi) false | numeric== true : 495
+  athlete rolled miles away and back to plan, Log: run_dist == wheel bytes | ==String(mi) true | numeric== true : 16
+  plan mi decimals 0 | String(mi)===wheel bytes false : 260
+  plan mi decimals 1 | String(mi)===wheel bytes false : 235
+  plan mi decimals 2 | String(mi)===wheel bytes true : 16
+
+§3a _benchmarkEntryFor: benchmark days by dose kind
+  time "Benchmark Run — Retest" : 8
+  time "Benchmark Run" : 8
+  dist benchmark days with a stamped-only entry credited by the real reader: 0/0
+
+§3b seedFromPriorPrograms (real call): maxDist without -> with the stamped-only entries, hand = max planned miles among them
+  programs where the stamped-only entries set maxDist (== hand): 33/33 eligible (skipped 56: ["recovery runs 0"])
+    HALF_MANNY|fixture n 15 maxDist 1 -> 13.1 hand 13.1
+    run_5k|balanced|beginner|76308 n 5 maxDist 1 -> 4 hand 4
+    run_5k|balanced|beginner|24865 n 5 maxDist 1 -> 4 hand 4
+    run_5k|balanced|advanced|76308 n 5 maxDist 1 -> 4 hand 4
+
+§3c swap park (setCardioSwap on a reopened stamped entry)
+  stamped (time 47:13) -> chip bike: parked.run.run_dist===String(mi) true, parked.run.run_mins "47.22", note says numbers kept true | chip run: run_dist restored===String(mi) true, label "Logged ✓" : 511
+  stamped then time cleared -> chip bike: parked.run.run_dist===String(mi) true, parked.run.run_mins "", note says numbers kept true | chip run: run_dist restored===String(mi) true, label "Logged ✓" : 511
+
+§3d restMoveCandidates (real call) on a day left unmarked after the clear: see "restMove withholds" in §1 (count of reopened drives where the day is NOT offered)
+
+§3e pre-V148 / V148-V231 text-box shape {rpe, run_dist typed, run_pace typed, no run_mins} on dose=dist days
+  typed == String(mi): reopen hidden==typed true, label "Logged ✓", nudge true, after RPE move run_dist==typed true run_pace kept false | byte-equal to a stamp true : 511
+  typed off plan: reopen hidden==typed true, label "Logged ✓", nudge true, after RPE move run_dist==typed true run_pace kept false | byte-equal to a stamp false : 511
+
+§4 REOPENED MILES WHEEL SEED (hidden input value and face)
+  dist | ROLLED-OFF reopened, time to zero, Back: run_dist kept true run_mins "" run_pace "" : 511
+  dist | reopen ROLLED-OFF-PLAN: hidden==stored true face==stored true label "Logged ✓" : 511
+  dist | reopen ROLLED-TO-PLAN: hidden==wheel bytes true face==wheelOracle true label "Logged ✓" : 511
+  dist | reopen STAMPED: hidden===String(mi) true face==wheelOracle true label "Logged ✓" : 511
+  time | fresh open | miles wheel data-plan null hidden "" face "" : 742
+  time | reopen after rolling 3.10 + Log | stored run_dist "3.10" hidden "3.10" face "3.10" label "Logged ✓" : 742
+
+§6 call sites (comment-stripped): run_dist, log_run_dist, CARDIO_PARK_FIELDS, cardioEntryLive
+  run_dist (20): 1441:applyRestCardio, 12213:renderWeekView, 13055:_benchmarkEntryFor, 13435:CARDIO_PARK_FIELDS, 13533:updateDoseDerived, 13810:cardioFieldHTML, 13814:cardioFieldHTML, 13825:cardioFieldHTML, 13834:cardioFieldHTML, 14194:openDetail, 14205:openDetail, 14804:persistLogFields, 14820:persistLogFields, 14823:persistLogFields, 14898:setCardioSwap, 16422:seedFromPriorPrograms, 16674:ladderWeekly, 16744:plannedVsLogged, 17598:renderProgressScreen, 17605:renderProgressScreen
+  log_run_dist (9): 13533:updateDoseDerived, 13810:cardioFieldHTML, 13814:cardioFieldHTML, 13825:cardioFieldHTML, 13834:cardioFieldHTML, 14205:openDetail, 14804:persistLogFields, 14820:persistLogFields, 14898:setCardioSwap
+  CARDIO_PARK_FIELDS (7): 1543:restMoveCandidates, 13435:CARDIO_PARK_FIELDS, 13440:cardioSwapNoteText, 14754:cardioEntryLive, 14841:logCardio, 14871:setCardioSwap, 14874:setCardioSwap
+  cardioEntryLive( (3): 13872:buildLogHTML, 14753:cardioEntryLive, 14761:cardioLive
+
+runtime 135.4 s | drives 20440 | errors 0 | app errors 0

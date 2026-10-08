@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="236"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="237"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -13574,9 +13574,9 @@ const _IAW_ROW=44;
 // Rep time: the only reps_dist distances are 400m and 800m, which at those same paces
 // span 0:55-8:27 — a 4:00 floor would be unreachable there, so it gets its own 0-9.
 const _IAW_SPEC={
-  dist:{fmt:'dec3',  cap:'Miles',        cols:[{min:0,max:99,nil:true},{min:0,max:9,dot:true},{min:0,max:9}]},
+  dist:{fmt:'dec3',  cap:'Miles',        cols:[{min:0,max:99,wrap:false},{min:0,max:9,dot:true},{min:0,max:9}]},
   pace:{fmt:'clock', cap:'Pace / mile',  cols:[{min:4,max:17,nil:true},{min:0,max:59,pad:2}]},
-  rept:{fmt:'clock', cap:'Typical rep',  cols:[{min:0,max:9, nil:true},{min:0,max:59,pad:2}]},
+  rept:{fmt:'clock', cap:'Typical rep',  cols:[{min:0,max:9, wrap:false},{min:0,max:59,pad:2}]},
   // V232 (D199): run time as a clock with hours. 0..9 hours covers every finish under 10:00:00,
   // the file's one ceiling on logged cardio minutes (max="600" on the rest-day sheet). V235
   // (D199 as amended by D215, D216): hours has no dash and does not wrap (D216), so the column
@@ -13593,7 +13593,10 @@ const _IAW_SPEC={
 // V235 (D216): one column says otherwise, by name. The hms hours column has no dash (D215)
 // and still never wraps: 9 hours and 0 hours are not neighbours on any clock, and 0..9 is a
 // ceiling (D199), not a cycle, so a flick off the floor must not turn 0:45:00 into 9:45:00.
-// It carries wrap:false, honoured first; every other column derives from nil as above.
+// V237 (D220): whole miles and rep minutes join it by name, no dash and no wrap: 99 miles and
+// 0 miles, 9 minutes and 0 minutes, are ceilings, not neighbours, and the same flick must not
+// turn a 0:45 rep into 9:45. The three carry wrap:false, honoured first; every other column
+// derives from nil as above.
 const _IAW_REPS=5;
 function _iawWraps(c){ if(c.wrap===false) return false; return !c.nil; }
 function _iawList(c){
@@ -13631,18 +13634,21 @@ function _iawParse(kind,val){
     t=Math.min(t,sp.cols[0].max*3600+sp.cols[1].max*60+sp.cols[2].max);
     return [String(Math.floor(t/3600)),String(Math.floor((t%3600)/60)),String(t%60)];
   }
-  if(!s) return sp.fmt==='dec3'?['','','']:['',''];
+  // V237 (D220): a blank or malformed miles or rep time string lands on the zero face (0.00,
+  // 0:00), which stores '', as hms does since D215. Pace alone keeps its dash (D222).
+  if(!s) return kind==='pace'?['','']:(sp.fmt==='dec3'?['0','0','0']:['0','0']);
   if(sp.fmt==='dec3'){
     // V232 (D203): the whole is optional, so a keypad's .86 seeds 0 . 8 6 rather than the
-    // dash; an empty whole reads 0. A string with no digits at the front still lands on the dash.
+    // dash; an empty whole reads 0. V237 (D220): a string with no digits at the front lands on
+    // zero, 0.00 (it was the dash).
     var m3=s.match(/^(\d*)(?:\.(\d)(\d)?)?/);
-    if(!m3||m3[0]==='') return ['','',''];
+    if(!m3||m3[0]==='') return ['0','0','0'];
     var a3=Math.max(sp.cols[0].min,Math.min(sp.cols[0].max,+m3[1]));
     var b3=m3[2]==null?0:+m3[2], c3=m3[3]==null?0:+m3[3];
     return [String(a3),String(b3),String(c3)];
   }
   var m = sp.fmt==='dec' ? s.match(/^(\d+)(?:\.(\d))?/) : s.match(/^(\d+):(\d{1,2})/);
-  if(!m) return ['',''];
+  if(!m) return kind==='rept'?['0','0']:['',''];
   var a=+m[1], b=m[2]==null?0:+m[2];
   var c0=sp.cols[0], c1=sp.cols[1];
   a=Math.max(c0.min,Math.min(c0.max,a));
@@ -13664,7 +13670,13 @@ function _iawFormat(kind,vals){
   if(sp.fmt==='hms'){ var sx=vals[2]===''||vals[2]==null?'0':vals[2];
     if((+vals[0])*3600+(+b)*60+(+sx)===0) return '';
     return ((+vals[0])*60+(+b)+(+sx)/60).toFixed(2); }
-  if(sp.fmt==='dec3'){ var c=vals[2]===''||vals[2]==null?'0':vals[2]; return vals[0]+'.'+b+c; }
+  // V237 (D220): the same for the miles wheel's 0.00 and the rep time wheel's 0:00, each checked
+  // on its total ahead of its arithmetic. Pace keeps its dash (D222): its first column starts at 4,
+  // so its total is never zero, and the dash returns '' through the guard above.
+  if(sp.fmt==='dec3'){ var c=vals[2]===''||vals[2]==null?'0':vals[2];
+    if((+vals[0])*100+(+b)*10+(+c)===0) return '';
+    return vals[0]+'.'+b+c; }
+  if(kind==='rept'&&(+vals[0])*60+(+b)===0) return '';
   return sp.fmt==='dec' ? (vals[0]+'.'+b) : (vals[0]+':'+('00'+b).slice(-2));
 }
 // V232 (D202): `plan` is the fixed dimension's planned value. It rides on the wheel as
@@ -13801,17 +13813,22 @@ function cardioFieldHTML(sport, e, dose, sub){
         <input type="hidden" id="log_run_reps" value="${e.run_reps||''}">`;
     // V232 (D199, D201, D202, D206): two wheels, stacked (two three-column wheels side by side
     // are six columns, under the 44pt target at 375pt). The fixed dimension comes first and is
-    // seeded from the plan for display; the free dimension parks on its blank face. V235 (D215):
-    // the free time wheel (dist form) parks on zero, 0:00:00, which stores ''; the free miles
-    // wheel (time form) stays on the dash.
+    // seeded from the plan for display. V237 (D220, amending D202): a blank fixed wheel shows the
+    // plan, a blank free wheel its zero face (0:00:00, 0.00, 0:00); only the pace wheel keeps the
+    // dash. The free time wheel (dist form, V235 D215) parks on 0:00:00 and the free miles wheel
+    // (time form, was the dash) on 0.00; each zero face stores ''.
     if(dose.k==='time') return strip+`<label>${asyIcon('run',15)} Log the run</label>
         <div class="iaw-wrap iaw-solo">${iaWheelHTML('hms','log_run_mins',e.run_mins||'',null,dose.mins)}</div>
         <div class="f-sub">Shows the plan. Move it to match the watch.</div>
         <div class="iaw-wrap iaw-solo">${iaWheelHTML('dist','log_run_dist',e.run_dist||'')}</div>
         <div class="f-sub">Off the watch.</div>
         <div id="doseDerived"></div>`;
+    // V237 (D221): on the dist form a stored run_dist byte-equal to String(dose.mi) is the V148
+    // stamp persistLogFields writes; it is derived, so the miles wheel seeds '' (the plan face)
+    // and every rebuild re-derives it from what the form holds. Any other bytes (a rolled 3.10,
+    // 4.20, a typed legacy value) are the athlete's and seed as before.
     if(dose.k==='dist') return strip+`<label>${asyIcon('run',15)} Log the run</label>
-        <div class="iaw-wrap iaw-solo">${iaWheelHTML('dist','log_run_dist',e.run_dist||'',null,dose.mi)}</div>
+        <div class="iaw-wrap iaw-solo">${iaWheelHTML('dist','log_run_dist',e.run_dist===String(dose.mi)?'':(e.run_dist||''),null,dose.mi)}</div>
         <div class="f-sub">Shows the plan. Move it to match the watch.</div>
         <div class="iaw-wrap iaw-solo">${iaWheelHTML('hms','log_run_mins',e.run_mins||'')}</div>
         <div class="f-sub">Off the watch.</div>
