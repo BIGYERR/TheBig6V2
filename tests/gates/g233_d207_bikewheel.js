@@ -72,6 +72,10 @@
 //                    read it (45, the nudge; a blank entry gets no nudge); a settle on the seed face alone writes nothing;
 //                    a touched pegged 630.5 commits 599.97 then 599.98. From VER 235 the hours step to 0 is a no-move (the
 //                    wheel opens on 0), so move-45 sees 1 input event, not 2; the blank seed-only settle rests hours on '0'.
+//                    V236 (D218; tests/measure/v236_rulings/v236_ruling_d218_d219.md, "Existing rows that flip"): from VER
+//                    236 the card is DRAFT until it holds a ride, so move-45 asserts the hidden node 45.00 with no entry,
+//                    then a tap on the rendered Log button (its own onclick) storing 45.00; move-progress and move-haslog
+//                    read that store unchanged. move-seedonly and move-peg (stored 630.5 is LIVE) do not split.
 //   D208-clamp       the hms parse table by hand; a run `time` form and the bike form seed 650 / 600 / 630.5 at 9:59:59,
 //                    599 at 9:59:00, 45.5 at 0:45:30, opening writing nothing. From VER 235 the table is PARSE_HAND_V235.
 //   D211-untouched   (pair 233 vs 232) swim, generic run, reps_dist and the run time / dist / reps_time forms byte-identical
@@ -140,7 +144,7 @@ const R = {
   'D207/D210-forms': 'row D207/D210-forms (D207, D210, VER >= 233) every bike form is one hms wheel for log_bike_mins in iaw-wrap iaw-solo, no data-plan, hidden input once, no number box, strip iff dose; hand-built time / reps_time / null and lattice (a) bike goals (b) injured multi-sport Cross-Train (c) swapped-in',
   'D209-copy': 'row D209-copy (D209 as amended by Mario, call 6, VER >= 233) label `Log the ride` after the bike glyph, no f-sub, `Bike — actual duration` / `Off the watch.` / `Whole ride` absent, no mid-sentence dash',
   'D207-open': 'row D207-open (D207, D200 gate inherited, VER >= 233) stored blank opens writing nothing on the dash; legacy 45 / 45.5 / .5 / 90 / 30 / 599 / 599.98 / 600 / 630.5 / -1 open writing nothing on their hand faces; every lattice form opens on the dash writing nothing (from VER 235 on 0:00:00, D215)',
-  'D207-move': 'row D207-move (D207, D208, VER >= 233) hours 0 + minutes 45 commits 45.00 and ia_logs_ stores it; Progress weekly bike sum 45 and _hasLog read it; a settle on the seed face alone writes nothing; a touched pegged 630.5 commits 599.98 (from VER 235 the hours step to 0 is a no-move: 1 input event, D215)',
+  'D207-move': 'row D207-move (D207, D208, VER >= 233) hours 0 + minutes 45 commits 45.00 and ia_logs_ stores it; Progress weekly bike sum 45 and _hasLog read it; a settle on the seed face alone writes nothing; a touched pegged 630.5 commits 599.98 (from VER 235 the hours step to 0 is a no-move: 1 input event, D215; from VER 236, D218, the move writes the hidden node only and a Log tap stores 45.00)',
   'D208-clamp': 'row D208-clamp (D208, VER >= 233) the hms parse pegs at 9:59:59 from the column maxes; run time form and bike form seed 650 / 600 / 630.5 at 9:59:59, 599 at 9:59:00, 45.5 at 0:45:30; blank, -1, abc parse to the dash (VER <= 234) or 0:00:00 (VER >= 235, D215)',
 };
 const ROW_ORDER = Object.keys(R);
@@ -408,13 +412,21 @@ function rowMove(){
   const [HW, HD] = HOSTB || [1, 'mon'];
   const need = () => { const w = C.wheel('log_bike_mins'); if(!w) throw new Error('no wheel for log_bike_mins on the rendered form'); return w; };
   const hid = () => C.els.log_bike_mins ? C.els.log_bike_mins.value : null;
+  // V236 (D218): the Log tap is the rendered #cardioLogBtn's own onclick.
+  const tapLog = () => { const b = (C.els.detailBody.innerHTML.match(/<button\b[^>]*\sid="cardioLogBtn"[^>]*>/) || [])[0], oc = b && (b.match(/\sonclick="([^"]*)"/) || [])[1];
+    if(!oc) throw new Error('no rendered #cardioLogBtn with an onclick'); C.ev(oc); C.advance(500); };
   step('move-45', () => {
     C.use(HOSTP); C.force(HAND.time.dose); C.setLog(HW, HD, null); C.open(HW, HD);
     C.move(need(), 0, '0'); C.move(need(), 1, '45');
+    // V236 (D218): DRAFT until a ride is stored; the moved wheel writes its hidden node, the Log tap stores it.
+    if(VER >= 236){ const p = C.entry(HW, HD), h = hid(), n = C.INPUTS.log_bike_mins || 0; tapLog(); const e = C.entry(HW, HD) || {};
+      cj.push(['move-45', p === null && h === '45.00' && n === 1 && e.bike_mins === '45.00', '0:00:00 -> hours 0 -> minutes 45: entry before Log ' + J(p) + ', hidden ' + J(h) + ', input events ' + n + '; Log stores bike_mins ' + J(e.bike_mins) + ' (want null, "45.00", 1; "45.00")']);
+    } else {
     const e = C.entry(HW, HD) || {};
     // V235 (D215): the wheel opens on 0 hours, so the hours step to 0 is a no-move: one input event (minutes 45), not two.
     const want45 = VER >= 235 ? 1 : 2;
     cj.push(['move-45', e.bike_mins === '45.00' && hid() === '45.00' && (C.INPUTS.log_bike_mins || 0) === want45, (VER >= 235 ? '0:00:00' : 'dash') + ' -> hours 0 -> minutes 45: stored bike_mins ' + J(e.bike_mins) + ', hidden ' + J(hid()) + ', input events ' + (C.INPUTS.log_bike_mins || 0) + ' (want "45.00", "45.00", ' + want45 + ')']);
+    }
     C.ctx.__dots.length = 0; const pr = tryv(() => C.ev('renderProgressScreen')());
     const ch = C.ctx.__dots.find(a => /Weekly Cycling Time/.test(String(a[0])));
     const wk = ch ? Array.from(ch[1]) : [], dat = ch ? Array.from(ch[2]) : [], v = dat[wk.indexOf(HW)];

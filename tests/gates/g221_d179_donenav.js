@@ -41,7 +41,13 @@
 //   B1d B1s B1m  (b1) Done / Skip / Mark Done ✓ stop and zero a running rest timer, float display unchanged.
 //   B2u B2b      (b2) undo and ‹ Back keep it running on the same _ruId (neg ctl).
 //   W1   a wheel scrolled 9:30 -> 10:30 and tapped inside its 90 ms window saves 10:30 (Done, Skip; layout loss on close).
+//        V236 (D218), setup only: from VER 236 the case copies the rendered #cardioSwapWrap data-* onto the stub
+//        (wrapSync), so the card's regime reads the run sport as on device; the claim is unchanged.
 //   W2   an undo tap inside the window is not flushed; the wheel's own settle commits later (neg ctl).
+//        V236 (D218; tests/measure/v236_rulings/v236_ruling_d218_d219.md, "Existing rows that flip"): from VER 236 the
+//        settle stores only on a LIVE day, so W2 runs per its seed (wheelCaseV236): stored 9:30 reads 9:30 at the undo
+//        tap and the settle stores 10:30; a DOM-only 9:30 stores nothing at the tap or after, the hidden node reads
+//        10:30. VER <= 235 keeps the claim above on wheelCase unchanged.
 //   A1a A1b A1c  (a1) hero on the today lattice: Done string / Skipped string, OPEN SESSION, is-today; pending and undo.
 //   A2   (a2) past-day pin: the hero stays on today, unchanged.  A3a-A3d (a3) strip ✕, ✓, date on undo, Wildcard mark.
 //   K1-K3 copy scan, comments stripped.  P1 P2 (pair) pending renders and reopened footers unchanged vs V220.
@@ -97,7 +103,7 @@ const R = {
   B2u:'B2u (b2) undo tap with the rest timer running: still running, same _ruId, interval live (neg ctl)',
   B2b:'B2b (b2) ‹ Back with the rest timer running: still running, same _ruId, interval live (neg ctl)',
   W1:'W1 pace wheel seeded ' + W_SEED + ', scrolled to ' + W_SETTLED + ', Done or Skip tapped 40 ms into the 90 ms window: ia_logs_ reads ' + W_SETTLED + ' at the tap and after (also with layout loss on close)',
-  W2:'W2 undo tap 40 ms into the window is not flushed: ia_logs_ reads ' + W_SEED + ' at the tap, the wheel settles ' + W_SETTLED + ' on its own, day stays open (neg ctl)',
+  W2:'W2 undo tap 40 ms into the window is not flushed: ia_logs_ reads ' + W_SEED + ' at the tap, the wheel settles ' + W_SETTLED + ' on its own, day stays open (neg ctl; from VER 236, D218, per seed: stored ' + W_SEED + ' reads ' + W_SEED + ' at the tap and settles ' + W_SETTLED + ', DOM-only ' + W_SEED + ' stores nothing and the hidden node reads ' + W_SETTLED + ')',
   A1a:'A1a (a1) today lattice, after Done: hero `Today · <Day>`, status line `' + DONE_STR + '`, CTA OPEN SESSION, is-today kept',
   A1b:'A1b (a1) today lattice, after Skip: status line `' + SKIP_STR + '`, CTA OPEN SESSION, is-today kept',
   A1c:'A1c (a1) today lattice, pending and after undo: no status string, CTA START SESSION',
@@ -288,10 +294,22 @@ let runDay = null;
 E.setup();
 for(const [w, d] of TRAIN){ E.fresh(w, d); E.open(d); if(/data-for="log_run_pace"/.test(els.detailBody.innerHTML)){ runDay = [w, d]; break; } }
 const readPace = (w, d) => { const l = JSON.parse(LS.getItem('ia_logs_measure') || '{}')[ev('logKey(' + w + ",'" + d + "')")]; return l ? l.run_pace : '(no entry)'; };
+// V236 (D218): the card's regime reads #cardioSwapWrap's data-planned / data-active, which this retaining stub never
+// parses. wrapSync().sync() copies them from the rendered markup after an open (what the browser's node carries; on device
+// closeDetail only drops .open and the wrap keeps them); restore() puts the stub's dataset back after the case.
+function wrapSync(){
+  const wrap = E.IA.ctx.document.getElementById('cardioSwapWrap'), keep = Object.assign({}, wrap.dataset);
+  return { wrap,
+    sync:() => { const m = (els.detailBody.innerHTML || '').match(/<div\b[^>]*\sid="cardioSwapWrap"[^>]*>/);
+      if(!m) throw new Error('no #cardioSwapWrap in the rendered day'); let a; const re = /\sdata-([a-z]+)="([^"]*)"/g; while((a = re.exec(m[0]))) wrap.dataset[a[1]] = a[2]; },
+    restore:() => { for(const k of Object.keys(wrap.dataset)) delete wrap.dataset[k]; Object.assign(wrap.dataset, keep); } };
+}
 function wheelCase(layoutLoss, st, undo){
   const [w, d] = runDay; E.fresh(w, d);
-  if(undo){ E.open(d); E.tap(d, st); ev('popClose()'); }
+  const ws = VER >= 236 ? wrapSync() : null;   // V236 (D218): W1 setup only; VER <= 235 never syncs
+  if(undo){ E.open(d); if(ws) ws.sync(); E.tap(d, st); ev('popClose()'); }
   E.open(d); els.log_run_pace.value = W_SEED;
+  if(ws) ws.sync();
   const { wh, cols } = fakeWheel(layoutLoss); E.cols = cols;
   ev('iaWheelInit')({ querySelectorAll:s => s === '.iaw' ? [wh] : [] }); advance(40);
   const seeded = [cols[0].scrollTop / WROW, cols[1].scrollTop / WROW];
@@ -299,17 +317,44 @@ function wheelCase(layoutLoss, st, undo){
   const pending = [...E.T.values()].some(t => t.kind === 'timeout');
   E.tap(d, st); const atTap = readPace(w, d), open = E.OPEN(); advance(200); const later = readPace(w, d);
   E.cols = []; ev('popClose()');
+  if(ws) ws.restore();
   return { seeded, pending, atTap, later, open };
+}
+// V236 (D218): the undo case per its seed, VER >= 236 only. The wrap's sport is synced after each open and put back after
+// the case through wrapSync, as in wheelCase. The setup's Done is a commit tap, so the
+// hidden node is first set to '' (an untouched card renders it blank; the stub would otherwise carry the previous case's
+// 10:30 into that commit). seed 'store': the entry then holds run_pace 9:30 (LIVE); seed 'dom': 9:30 sits on the hidden
+// node only (DRAFT).
+function wheelCaseV236(st, seed){
+  const [w, d] = runDay, ws = wrapSync(), wrap = ws.wrap, syncWrap = ws.sync;
+  E.fresh(w, d); E.open(d); syncWrap(); els.log_run_pace.value = ''; E.tap(d, st); ev('popClose()');
+  if(seed === 'store'){ const lk = ev('logKey(' + w + ",'" + d + "')"), logs = JSON.parse(LS.getItem('ia_logs_measure') || '{}');
+    logs[lk] = Object.assign({}, logs[lk], { run_pace:W_SEED }); LS.setItem('ia_logs_measure', JSON.stringify(logs)); }
+  E.open(d); syncWrap(); els.log_run_pace.value = W_SEED;
+  const { wh, cols } = fakeWheel(false); E.cols = cols;
+  ev('iaWheelInit')({ querySelectorAll:s => s === '.iaw' ? [wh] : [] }); advance(40);
+  const seeded = [cols[0].scrollTop / WROW, cols[1].scrollTop / WROW];
+  cols[0].scrollTop = W_TARGET_ROW * WROW; (cols[0]._lis.scroll || []).forEach(f => f()); advance(40);
+  const pending = [...E.T.values()].some(t => t.kind === 'timeout');
+  E.tap(d, st); const atTap = readPace(w, d), open = E.OPEN(); advance(200); const later = readPace(w, d), hidden = els.log_run_pace.value, logged = wrap.dataset.logged;
+  E.cols = []; ev('popClose()');
+  ws.restore();
+  return { seed, seeded, pending, atTap, later, hidden, logged, open };
 }
 const seededOk = r => r.seeded[0] === W_SEED_ROWS[0] && r.seeded[1] === W_SEED_ROWS[1] && r.pending;
 if(runDay){
   for(const ll of [false, true]) for(const st of ['complete', 'skipped']){ const r = wheelCase(ll, st, false);
     rec('W1', seededOk(r) && r.atTap === W_SETTLED && r.later === W_SETTLED, st + (ll ? ' layout-loss' : '') + ' ' + JSON.stringify(r)); }
-  for(const st of ['complete', 'skipped']){ const r = wheelCase(false, st, true);
+  if(VER <= 235) for(const st of ['complete', 'skipped']){ const r = wheelCase(false, st, true);
     rec('W2', seededOk(r) && r.atTap === W_SEED && r.later === W_SETTLED && r.open, 'undo ' + st + ' ' + JSON.stringify(r)); }
+  // V236 (D218): per seed. Stored 9:30 is LIVE: the undo tap saves the form unflushed (9:30), the settle stores 10:30.
+  // DOM-only 9:30 is DRAFT: nothing reaches run_pace at the tap or after; the settle lands on the hidden node, 10:30.
+  else for(const st of ['complete', 'skipped']) for(const seed of ['store', 'dom']){ const r = wheelCaseV236(st, seed);
+    const want = seed === 'store' ? r.atTap === W_SEED && r.later === W_SETTLED : r.atTap === '' && r.later === '' && r.hidden === W_SETTLED;
+    rec('W2', seededOk(r) && want && r.open, 'undo ' + st + ' ' + JSON.stringify(r)); }
 }
 row('W1', () => runDay ? tally('W1', 4) : [false, 'no training day renders a log_run_pace wheel']);
-row('W2', () => runDay ? tally('W2', 2) : [false, 'no training day renders a log_run_pace wheel']);
+row('W2', () => runDay ? tally('W2', VER >= 236 ? 4 : 2) : [false, 'no training day renders a log_run_pace wheel']);
 console.log('  timer and wheel done (wheel day ' + JSON.stringify(runDay) + ') | ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s');
 
 // ---- A: hero and strip (S7). A mark here pops, closes if still open, and lets toasts run out: the hero rows read the

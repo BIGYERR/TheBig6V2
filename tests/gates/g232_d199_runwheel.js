@@ -68,6 +68,10 @@
 //               and seeds the hand faces.
 //   D202-move   a moved fixed wheel commits two-decimal minutes / miles and persistLogFields stores them; away and back to
 //               the seed face commits; a settle on the seed face alone writes nothing; doseDerived reads the stored value.
+//               V236 (D218; tests/measure/v236_rulings/v236_ruling_d218_d219.md, "Existing rows that flip"): from VER 236
+//               the card is DRAFT until it holds a run number, so move-free, move-fixed-mins, move-derived, move-fixed-mi
+//               and move-back assert the hidden node with no entry, then a tap on the rendered Log button (its own
+//               onclick) storing it; VER <= 235 keeps the claims as written. move-seedonly does not split.
 //   D206-copy   the label and sub-label strings verbatim, `Hours first` absent, no mid-sentence dash in them.
 //   D199-width  `.iaw-solo{max-width:178.2px}` = WIDTH, its premises present.
 //   D-untouched (pair 232 vs 231) generic run, reps_dist, bike, swim markup byte-identical to V231; HALF_MANNY digest equals
@@ -158,7 +162,7 @@ const R = {
   'D203': 'row D203 (D203, VER >= 232) dist parse: .86 -> 0 . 8 6; abc, ., -1 -> dash; 3.456 -> 3 4 5; 100 -> 99',
   'D199/D201/D204-forms': 'row D199/D201/D204-forms (VER >= 232) hand-built time, dist, reps_time and every lattice form: no number box for log_run_mins / log_run_dist, hidden inputs present, wheels time [hms, dist] dist [dist, hms] reps_time [dist], data-plan only on the fixed wheel = dose.mins / dose.mi, every stacked wrap iaw-solo',
   'D202-open': 'row D202-open (D200 gate, D202, call 8, VER >= 232) opening with stored blank writes nothing on every form (0 input events, ia_logs_ byte-unchanged), the fixed face is the plan, the free wheel is on the dash (from VER 235 the free time wheel is on 0:00:00, D215; the free miles wheel stays on the dash); the legacy table opens writing nothing on its hand faces',
-  'D202-move': 'row D202-move (D202, call 8, VER >= 232) a moved fixed wheel commits 15.50 / 8.25 and ia_logs_ stores it; away and back to the seed face commits; a settle on the seed face alone writes nothing; doseDerived reads the stored value (15.5 min / 2 mi = 7:45/mi)',
+  'D202-move': 'row D202-move (D202, call 8, VER >= 232) a moved fixed wheel commits 15.50 / 8.25 and ia_logs_ stores it; away and back to the seed face commits; a settle on the seed face alone writes nothing; doseDerived reads the stored value (15.5 min / 2 mi = 7:45/mi) (from VER 236, D218: the move writes the hidden node only and a Log tap stores it)',
   'D206-copy': 'row D206-copy (D206 + call 7, VER >= 232) `Log the run`, `Shows the plan. Move it to match the watch.`, `Off the watch.` on both free wheels, `Miles in the work reps`, `Leave out the easy jog between reps.`; no `Hours first`; no mid-sentence dash',
   'D199-width': 'row D199-width (D199 layout, call 12, VER >= 232) `.iaw-solo{max-width:178.2px}` = (375 − 2×16 − 2×1 − 2×16 − 12) × 3/5, its CSS premises present',
 };
@@ -421,7 +425,38 @@ function rowMove(){
   const [HW, HD] = HOST || [1, 'mon'];
   const need = hid => { const w = C.wheel(hid); if(!w) throw new Error('no wheel for ' + hid + ' on the rendered form'); return w; };
   const ddText = () => (C.els.doseDerived.innerHTML || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  // V236 (D218): a DRAFT card's wheel writes its hidden node and repaints the readout, nothing else; the Log tap is the
+  // rendered #cardioLogBtn's own onclick. Each split step returns early from VER 236; VER <= 235 runs the code below it.
+  const hidv = id => C.els[id] ? C.els[id].value : null;
+  const tapLog = () => { const b = (C.els.detailBody.innerHTML.match(/<button\b[^>]*\sid="cardioLogBtn"[^>]*>/) || [])[0], oc = b && (b.match(/\sonclick="([^"]*)"/) || [])[1];
+    if(!oc) throw new Error('no rendered #cardioLogBtn with an onclick'); C.ev(oc); C.advance(500); };
+  const moveTimeV236 = () => {
+    C.ctx.__FORCE = DOSES.time; C.setLog(HW, HD, null); C.open(HW, HD);
+    C.move(need('log_run_dist'), 0, '2');
+    const p1 = C.entry(HW, HD), h1 = { mins:hidv('log_run_mins'), dist:hidv('log_run_dist') }, d1 = ddText(); tapLog(); const e1 = C.entry(HW, HD) || {};
+    cj.push(['move-free', p1 === null && h1.mins === '' && h1.dist === '2.00' && d1.includes(pace(15, 2)) && /assuming planned 15 min/.test(d1) && (e1.run_mins || '') === '' && e1.run_dist === '2.00',
+      'free miles to 2: entry before Log ' + J(p1) + ', hidden ' + J(h1) + ', derived "' + d1 + '"; Log stores ' + J({ run_mins:e1.run_mins, run_dist:e1.run_dist }) + ' (want null, {"mins":"","dist":"2.00"}, ' + pace(15, 2) + ', assuming planned 15 min; {"run_mins":"","run_dist":"2.00"})']);
+    C.setLog(HW, HD, null); C.open(HW, HD);
+    C.move(need('log_run_dist'), 0, '2'); C.move(need('log_run_mins'), 2, '30');
+    const p2 = C.entry(HW, HD), h2 = hidv('log_run_mins'), d2 = ddText(); tapLog(); const e2 = C.entry(HW, HD) || {};
+    cj.push(['move-fixed-mins', p2 === null && h2 === '15.50' && e2.run_mins === '15.50' && /^\d+\.\d\d$/.test(e2.run_mins), 'fixed 0:15:00 -> 0:15:30: entry before Log ' + J(p2) + ', hidden run_mins ' + J(h2) + '; Log stores run_mins ' + J(e2.run_mins) + ' (want null, "15.50"; "15.50", two decimals)']);
+    const dd = tryv(() => C.ev('doseDerived')(DOSES.time, { mins:e2.run_mins, dist:e2.run_dist }));
+    cj.push(['move-derived', d2.includes(pace(15.5, 2)) && !/assuming/.test(d2) && e2.run_pace === pace(15.5, 2) && dd && Math.round(dd.sec) === 465, 'derived before Log "' + d2 + '"; Log stores run_pace ' + J(e2.run_pace) + ', doseDerived(stored).sec ' + (dd && dd.sec) + ' (want ' + pace(15.5, 2) + ' = 465 s, no assuming)']);
+  };
+  const moveDistV236 = () => {
+    C.ctx.__FORCE = DOSES.dist; C.setLog(HW, HD, null); C.open(HW, HD); const ws = need('log_run_dist');
+    C.move(ws, 1, '2'); C.move(ws, 2, '5');
+    const p = C.entry(HW, HD), h = hidv('log_run_dist'); tapLog(); const e = C.entry(HW, HD) || {};
+    cj.push(['move-fixed-mi', p === null && h === '8.25' && e.run_dist === '8.25', 'fixed 8.00 -> 8.25: entry before Log ' + J(p) + ', hidden run_dist ' + J(h) + '; Log stores run_dist ' + J(e.run_dist) + ' (want null, "8.25"; "8.25")']);
+  };
+  const moveBackV236 = () => {
+    C.ctx.__FORCE = DOSES.dist; C.setLog(HW, HD, null); C.open(HW, HD); const ws = need('log_run_dist');
+    C.move(ws, 1, '5'); const a = hidv('log_run_dist'), pa = C.entry(HW, HD); C.move(ws, 1, '0'); const b = hidv('log_run_dist'), pb = C.entry(HW, HD), n = C.INPUTS.log_run_dist || 0;
+    tapLog(); const e = C.entry(HW, HD) || {};
+    cj.push(['move-back', a === '8.50' && b === '8.00' && n === 2 && pa === null && pb === null && e.run_dist === '8.00', 'away 8.50 then back to the seed face: hidden ' + J(a) + ' then ' + J(b) + ', input events ' + n + ', entry before Log ' + J(pa) + ' / ' + J(pb) + '; Log stores run_dist ' + J(e.run_dist) + ' (want "8.50", "8.00", 2, null / null; "8.00")']);
+  };
   step('move-time', () => {
+    if(VER >= 236) return moveTimeV236();
     C.ctx.__FORCE = DOSES.time; C.setLog(HW, HD, null); C.open(HW, HD);
     C.move(need('log_run_dist'), 0, '2');
     const e1 = C.entry(HW, HD) || {}, d1 = ddText();
@@ -433,12 +468,14 @@ function rowMove(){
     cj.push(['move-derived', d2.includes(pace(15.5, 2)) && !/assuming/.test(d2) && e2.run_pace === pace(15.5, 2) && dd && Math.round(dd.sec) === 465, 'derived "' + d2 + '", stored run_pace ' + J(e2.run_pace) + ', doseDerived(stored).sec ' + (dd && dd.sec) + ' (want ' + pace(15.5, 2) + ' = 465 s, no assuming)']);
   });
   step('move-dist', () => {
+    if(VER >= 236) return moveDistV236();
     C.ctx.__FORCE = DOSES.dist; C.setLog(HW, HD, null); C.open(HW, HD); const ws = need('log_run_dist');
     C.move(ws, 1, '2'); C.move(ws, 2, '5');
     const e = C.entry(HW, HD) || {};
     cj.push(['move-fixed-mi', e.run_dist === '8.25', 'fixed 8.00 -> 8.25: stored run_dist ' + J(e.run_dist) + ' (want "8.25")']);
   });
   step('move-back', () => {
+    if(VER >= 236) return moveBackV236();
     C.ctx.__FORCE = DOSES.dist; C.setLog(HW, HD, null); C.open(HW, HD); const ws = need('log_run_dist');
     C.move(ws, 1, '5'); const a = (C.entry(HW, HD) || {}).run_dist; C.move(ws, 1, '0'); const b = (C.entry(HW, HD) || {}).run_dist;
     cj.push(['move-back', a === '8.50' && b === '8.00' && (C.INPUTS.log_run_dist || 0) === 2, 'away 8.50 then back to the seed face: stored ' + J(a) + ' then ' + J(b) + ', input events ' + (C.INPUTS.log_run_dist || 0) + ' (want "8.50", "8.00", 2)']);

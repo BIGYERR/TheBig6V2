@@ -163,7 +163,10 @@ function install(cfg, pid){
 }
 function open(dk){ REG.clear(); return tryv(() => E('openDetail("' + dk + '", activeProg.weeks[currentWeek]["' + dk + '"])')); }
 const swap = s => tryv(() => E('setCardioSwap("' + s + '")'));
-const persist = dk => tryv(() => E('persistLogFields("' + dk + '")'));
+// V236 (D218 "Existing rows that flip": type() wrote the node then persisted in DRAFT, which stores no cardio number):
+// from VER 236 the helper's write is the commit the Log tap makes (persistLogFields(day,true)); on a LIVE card that is
+// byte-for-byte the listener's own write. VER <= 235 is unchanged. Setup only: no claim moves.
+const persist = dk => tryv(() => E('persistLogFields("' + dk + '"' + (STAMP >= 236 ? ',true' : '') + ')'));
 function type(dk, vals){ for(const f of Object.keys(vals)){ const el = REG.get('log_' + f); if(!el) return 'no input log_' + f; el.value = vals[f]; } persist(dk); return ''; }
 const hid = f => { const el = REG.get('log_' + f); return el ? el.value : null; };
 const fieldIds = () => ((REG.get('cardioFields') || {})._kids || []).filter(id => /^log_(run|bike|swim)_/.test(id));
@@ -191,7 +194,9 @@ const NOTES_SEEN = [];
 fresh();
 const PRE = { sub:E('activeProg.weeks[1].sat.cardio && activeProg.weeks[1].sat.cardio.subtype'), wrap:J((REG.get('cardioSwapWrap') || {}).dataset), strip:/class="plan-strip"/.test(fieldsHTML()) && fieldsHTML().includes(PLAN_FACE) };
 console.log('INFO repro day W1 SAT ' + J(PRE.sub) + ' wrap ' + PRE.wrap + ' strip ' + PRE.strip);
-const preOk = PRE.sub === 'Long Run' && PRE.wrap === J({ planned:'run', active:'run' }) && PRE.strip;
+// D218/D219 Amendment 1 (d): from VER 236 the wrap carries the regime attribute at every render, '0' on an empty store
+// (D218 item 1); the exact-dataset compare is kept.
+const preOk = PRE.sub === 'Long Run' && PRE.wrap === J(STAMP >= 236 ? { planned:'run', active:'run', logged:'0' } : { planned:'run', active:'run' }) && PRE.strip;
 const preWhy = preOk ? '' : 'precondition: W1 SAT is not the ruling\'s Long Run run day with a 3.1 mi strip (' + J(PRE) + ')';
 
 // ── K1, K2, K3, K4, N2 (live), C1: the repro walk ───────────────────────────────────────────────────────────────

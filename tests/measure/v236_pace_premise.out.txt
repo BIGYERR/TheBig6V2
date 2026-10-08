@@ -1,0 +1,210 @@
+candidate /Users/CanasBangin/Desktop/TheBig6V2/index.html ia-version 236 | base /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/f36d4ca3-1b1c-4e2c-85ab-457dd51074a2/scratchpad/base_v235.html ia-version 235
+§0 LATTICE 146/146 programs, 2004 run days, 5916 commits per tree; errors 0; 67.6 s
+
+§1 PER SHAPE x CASE (counts; denominator = the "| n" line)
+  dist | DAYS : 555
+  dist | a mins only | CAND run_pace non-empty after Done : 555
+  dist | a mins only | CAND run_pace non-empty at Log : 555
+  dist | a mins only | V235 run_pace non-empty after Done : 555
+  dist | a mins only | V235 run_pace non-empty at settle : 555
+  dist | a mins only | hand: pace derivable : 555
+  dist | a mins only | n : 555
+  dist | a mins only | stored == hand (±1 s) : 555
+  dist | b miles only | hand: no pace derivable : 555
+  dist | b miles only | n : 555
+  dist | c mins+miles | CAND run_pace non-empty after Done : 555
+  dist | c mins+miles | CAND run_pace non-empty at Log : 555
+  dist | c mins+miles | V235 run_pace non-empty after Done : 555
+  dist | c mins+miles | V235 run_pace non-empty at settle : 555
+  dist | c mins+miles | hand: pace derivable : 555
+  dist | c mins+miles | n : 555
+  dist | c mins+miles | stored == hand (±1 s) : 555
+  dist | p pace only | n/a (field absent) : 555
+  dist | pm miles+pace | n/a (field absent) : 555
+  dist | r rep time only | n/a (field absent) : 555
+  generic | DAYS : 627
+  generic | a mins only | n/a (field absent) : 627
+  generic | b miles only | hand: no pace derivable : 627
+  generic | b miles only | n : 627
+  generic | c mins+miles | n/a (field absent) : 627
+  generic | p pace only | CAND run_pace non-empty after Done : 627
+  generic | p pace only | CAND run_pace non-empty at Log : 627
+  generic | p pace only | V235 run_pace non-empty after Done : 627
+  generic | p pace only | V235 run_pace non-empty at settle : 627
+  generic | p pace only | hand: pace derivable : 627
+  generic | p pace only | n : 627
+  generic | p pace only | stored == hand (±1 s) : 627
+  generic | pm miles+pace | CAND run_pace non-empty after Done : 627
+  generic | pm miles+pace | CAND run_pace non-empty at Log : 627
+  generic | pm miles+pace | V235 run_pace non-empty after Done : 627
+  generic | pm miles+pace | V235 run_pace non-empty at settle : 627
+  generic | pm miles+pace | hand: pace derivable : 627
+  generic | pm miles+pace | n : 627
+  generic | pm miles+pace | stored == hand (±1 s) : 627
+  generic | r rep time only | n/a (field absent) : 627
+  reps_dist | DAYS : 48
+  reps_dist | a mins only | n/a (field absent) : 48
+  reps_dist | b miles only | n/a (field absent) : 48
+  reps_dist | c mins+miles | n/a (field absent) : 48
+  reps_dist | p pace only | n/a (field absent) : 48
+  reps_dist | pm miles+pace | n/a (field absent) : 48
+  reps_dist | r rep time only | CAND run_pace non-empty after Done : 48
+  reps_dist | r rep time only | CAND run_pace non-empty at Log : 48
+  reps_dist | r rep time only | V235 run_pace non-empty after Done : 48
+  reps_dist | r rep time only | V235 run_pace non-empty at settle : 48
+  reps_dist | r rep time only | hand: pace derivable : 48
+  reps_dist | r rep time only | n : 48
+  reps_dist | r rep time only | stored == hand (±1 s) : 48
+  time | DAYS : 758
+  time | a mins only | hand: no pace derivable : 758
+  time | a mins only | n : 758
+  time | b miles only | CAND run_pace non-empty after Done : 758
+  time | b miles only | CAND run_pace non-empty at Log : 758
+  time | b miles only | V235 run_pace non-empty after Done : 758
+  time | b miles only | V235 run_pace non-empty at settle : 758
+  time | b miles only | hand: pace derivable : 758
+  time | b miles only | n : 758
+  time | b miles only | stored == hand (±1 s) : 758
+  time | c mins+miles | CAND run_pace non-empty after Done : 758
+  time | c mins+miles | CAND run_pace non-empty at Log : 758
+  time | c mins+miles | V235 run_pace non-empty after Done : 758
+  time | c mins+miles | V235 run_pace non-empty at settle : 758
+  time | c mins+miles | hand: pace derivable : 758
+  time | c mins+miles | n : 758
+  time | c mins+miles | stored == hand (±1 s) : 758
+  time | p pace only | n/a (field absent) : 758
+  time | pm miles+pace | n/a (field absent) : 758
+  time | r rep time only | n/a (field absent) : 758
+  xtrain time | DAYS : 16
+  xtrain time | a mins only | hand: no pace derivable : 16
+  xtrain time | a mins only | n : 16
+  xtrain time | b miles only | CAND run_pace non-empty after Done : 16
+  xtrain time | b miles only | CAND run_pace non-empty at Log : 16
+  xtrain time | b miles only | V235 run_pace non-empty after Done : 16
+  xtrain time | b miles only | V235 run_pace non-empty at settle : 16
+  xtrain time | b miles only | hand: pace derivable : 16
+  xtrain time | b miles only | n : 16
+  xtrain time | b miles only | stored == hand (±1 s) : 16
+  xtrain time | c mins+miles | CAND run_pace non-empty after Done : 16
+  xtrain time | c mins+miles | CAND run_pace non-empty at Log : 16
+  xtrain time | c mins+miles | V235 run_pace non-empty after Done : 16
+  xtrain time | c mins+miles | V235 run_pace non-empty at settle : 16
+  xtrain time | c mins+miles | hand: pace derivable : 16
+  xtrain time | c mins+miles | n : 16
+  xtrain time | c mins+miles | stored == hand (±1 s) : 16
+  xtrain time | p pace only | n/a (field absent) : 16
+  xtrain time | pm miles+pace | n/a (field absent) : 16
+  xtrain time | r rep time only | n/a (field absent) : 16
+
+§1x FIRST EXAMPLE per shape x case
+  dist | a mins only : HALF_MANNY|fixture W1 sat "Long Run" dose {"k":"dist","mi":3.1} | CAND@Log {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi"} | V235@settle {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi"} | hand 15:14
+  dist | b miles only : HALF_MANNY|fixture W1 sat "Long Run" dose {"k":"dist","mi":3.1} | CAND@Log null | V235@settle null | hand none
+  dist | c mins+miles : HALF_MANNY|fixture W1 sat "Long Run" dose {"k":"dist","mi":3.1} | CAND@Log {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi"} | V235@settle {"run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi"} | hand 15:14
+  generic | b miles only : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" dose null | CAND@Log {"run_mins":"","run_dist":"3.10","run_pace":""} | V235@settle {"run_mins":"","run_dist":"3.10","run_pace":""} | hand none
+  generic | p pace only : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" dose null | CAND@Log {"run_mins":"","run_dist":"","run_pace":"9:30"} | V235@settle {"run_mins":"","run_dist":"","run_pace":"9:30"} | hand 9:30
+  generic | pm miles+pace : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" dose null | CAND@Log {"run_mins":"","run_dist":"3.10","run_pace":"9:30"} | V235@settle {"run_mins":"","run_dist":"3.10","run_pace":"9:30"} | hand 9:30
+  reps_dist | r rep time only : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" dose {"k":"reps_dist","reps":4,"m":400} | CAND@Log {"run_mins":"","run_dist":"","run_pace":"7:43/mi"} | V235@settle {"run_mins":"","run_dist":"","run_pace":"7:43/mi"} | hand 7:43
+  time | a mins only : HALF_MANNY|fixture W1 fri "Recovery Run" dose {"k":"time","mins":25} | CAND@Log {"run_mins":"47.22","run_dist":"","run_pace":""} | V235@settle {"run_mins":"47.22","run_dist":"","run_pace":""} | hand none
+  time | b miles only : HALF_MANNY|fixture W1 fri "Recovery Run" dose {"k":"time","mins":25} | CAND@Log {"run_mins":"","run_dist":"3.10","run_pace":"8:04/mi"} | V235@settle {"run_mins":"","run_dist":"3.10","run_pace":"8:04/mi"} | hand 8:04
+  time | c mins+miles : HALF_MANNY|fixture W1 fri "Recovery Run" dose {"k":"time","mins":25} | CAND@Log {"run_mins":"47.22","run_dist":"3.10","run_pace":"15:14/mi"} | V235@settle {"run_mins":"47.22","run_dist":"3.10","run_pace":"15:14/mi"} | hand 15:14
+  xtrain time | a mins only : injury shoulder run+swim W1 mon "Cross-Train" dose {"k":"time","mins":35} | CAND@Log {"run_mins":"47.22","run_dist":"","run_pace":""} | V235@settle {"run_mins":"47.22","run_dist":"","run_pace":""} | hand none
+  xtrain time | b miles only : injury shoulder run+swim W1 mon "Cross-Train" dose {"k":"time","mins":35} | CAND@Log {"run_mins":"","run_dist":"3.10","run_pace":"11:17/mi"} | V235@settle {"run_mins":"","run_dist":"3.10","run_pace":"11:17/mi"} | hand 11:17
+  xtrain time | c mins+miles : injury shoulder run+swim W1 mon "Cross-Train" dose {"k":"time","mins":35} | CAND@Log {"run_mins":"47.22","run_dist":"3.10","run_pace":"15:14/mi"} | V235@settle {"run_mins":"47.22","run_dist":"3.10","run_pace":"15:14/mi"} | hand 15:14
+
+§1t TOTAL run_pace deltas CAND vs V235 (both moments): 0 over 5916 commits
+
+§2 HALF_MANNY W1 day shapes (cand) — cardioTypes ["run"]
+  W1 mon : run "Speed Run — Intervals" shape generic dose null | fields log_run_dist,log_run_pace,log_rpe,log_notes | wheels dist:log_run_dist,pace:log_run_pace
+  W1 tue : no cardio (lift false)
+     #cardioLogBtn in markup false, log_rpe true
+  W1 wed : rest
+  W1 thu : run "Speed Run — Fartlek" shape generic dose null | fields log_run_dist,log_run_pace,log_rpe,log_notes | wheels dist:log_run_dist,pace:log_run_pace
+  W1 fri : run "Recovery Run" shape time dose {"k":"time","mins":25,"tgt":800} | fields log_run_dist,log_run_mins,log_rpe,log_notes | wheels hms:log_run_mins(plan 25),dist:log_run_dist
+  W1 sat : run "Long Run" shape dist dose {"k":"dist","mi":3.1,"tgt":800} | fields log_run_dist,log_run_mins,log_rpe,log_notes | wheels dist:log_run_dist(plan 3.1),hms:log_run_mins
+  W1 sun : rest
+  HALF_MANNY all weeks run days by shape: {"generic":27,"time":14,"dist":15}
+
+§3 CAND comment-stripped lines with token `sessions`: 20
+    2112: {id:'bike_cals',     label:'Hit Calorie Targets',   desc:'Burn-focused spin sessions'},
+    11666: "Keep PNF to no more than three to five sessions a week — like lifting, it needs recovery.",
+    11692: "Match the drink to the job: plain water for most sessions, carbs for long endurance, a little protein when you're building.",
+    14631: 'That is three sessions running you have traded '+from.toLowerCase()+' for '+to.toLowerCase()+'.'
+    15298: +'<div style="font-size:13px;color:var(--text);line-height:1.5;margin-top:12px">You are too close to the race. Three weeks out the work is done. Chang
+    17380: if(!(wt>0)){ unloaded.push({name, sessions:all.length,
+    17394: ready: sets.length>0 && sets.every(r=>r>=rng.hi), ups, sessions:all.length});
+    17396: plain.push({name, wt, sets, sessions:all.length,
+    17402: ladder.sort((a,b)=>(b.ready?1:0)-(a.ready?1:0) || b.sessions-a.sessions);
+    17403: plain.sort((a,b)=>b.sessions-a.sessions);
+    17404: unloaded.sort((a,b)=>b.sessions-a.sessions);
+    17515: +(accDay?' '+accDay+(accDay===1?' session':' sessions')+' where this ran as an accessory '+(accDay===1?'is':'are')
+    17517: +(noLoad?' '+noLoad+(noLoad===1?' session':' sessions')+' had no load written down. Add the weight and '
+    17542: +'<div style="font-size:10px;color:var(--muted);white-space:nowrap">'+(hi>lo?lo+'–'+hi:lo)+' '+u+' · '+r.sessions+' sessions</div></div>';
+    17547: +'<div style="font-size:10px;color:var(--muted);white-space:nowrap">'+(r.reps?r.reps.toLocaleString()+' reps · ':'')+r.sessions+' sessions</div></div>
+    17586: weeklyData[w] = {run:0, bike:0, swim:0, bench:null, squat:null, dead:null, rpe:null, sessions:0};
+    17603: weeklyData[w].sessions++;
+    17633: <div style="font-size:13px;line-height:1.6">Start logging your sessions and your progress will appear here as dotted line charts.</div>
+    17797: <div style="font-size:13px;line-height:1.6">Log sessions to see progress charts, exercise history, and your training journal here.</div>
+    18311: ? 'More than a week off. Mark what happened, then ease back in. First sessions back at reduced effort. Never chase missed work.'
+   weeklyData lines: 17584,17586,17594,17595,17596,17597,17599,17603,17620,17622,17642,17657,17693,17699,17705
+   CAND lines reading .rpe: 18
+    1348: _restDraft.type=types[0]||'run'; _restDraft.mins=30; _restDraft.dist=''; _restDraft.rpe=5;
+    1401: const rpeRows=RPE.map(([v,n,d])=>'<div class="rd-chip wide'+(_restDraft.rpe===v?' sel':'')+'" onclick="_rdSet(\'rpe\','+v+')"><b>RPE '+v+(v===9?'+':''
+    1404: const note=_restDraft.rpe>=9
+    1437: e.rest_cardio=true; e.rest_type=type; e.rest_mins=m; e.rpe=rpe;
+    1540: if(lg&&(lg.rpe||lg.notes||lg.run_dist||lg.bike_mins||lg.swim_yards)) return;
+    8359: if(!(_lo>=_floor[0])) return wv.s+'×'+_floor[0]+'–'+_floor[1]+' — RPE '+r.rpe+' ('+r.note+')'+_amrap;
+    8361: return wv.s+'×'+wv.r+' — RPE '+r.rpe+' ('+r.note+')'+_amrap;
+    12163: ? '<div class="wk-rest-logged">'+_heroCardio.rest_mins+' min '+(({run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'})[_heroCardio.rest_type]||_h
+    13867: const rpeVal=e.rpe||'';
+    14798: const _rpe=(_rpeEl&&_rpeEl.dataset.touched==='1')?g('log_rpe'):((logs[key]&&logs[key].rpe!=null)?logs[key].rpe:'');
+    16707: const rpe=+e.rpe; if(!(rpe>=EASY_RPE_LO&&rpe<=EASY_RPE_HI)) return;
+    17598: if(entry.rpe && +entry.rpe > 0) {
+    17599: weeklyData[w].rpe = weeklyData[w].rpe ? (+weeklyData[w].rpe + +entry.rpe)/2 : +entry.rpe;
+    17602: if(entry.rpe||entry.run_dist||entry.bike_mins||entry.swim_yards||entry.notes) {
+    17705: const rpeData = weeks.map(w => weeklyData[w].rpe || null);
+    17724: if(!entry.notes && !entry.rpe) return;
+    17747: const rpeColor = !entry.rpe ? 'var(--muted)' : +entry.rpe >= 9 ? 'var(--red)' : +entry.rpe >= 7 ? 'var(--lift)' : +entry.rpe >= 5 ? 'var(--accent)' : 
+    17755: ${entry.rpe ? `<div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:${rpeColor}">RPE ${entry.rpe} — ${RPE_LABELS[+entry.rp
+
+§3 V235 comment-stripped lines with token `sessions`: 20
+    2108: {id:'bike_cals',     label:'Hit Calorie Targets',   desc:'Burn-focused spin sessions'},
+    11662: "Keep PNF to no more than three to five sessions a week — like lifting, it needs recovery.",
+    11688: "Match the drink to the job: plain water for most sessions, carbs for long endurance, a little protein when you're building.",
+    14611: 'That is three sessions running you have traded '+from.toLowerCase()+' for '+to.toLowerCase()+'.'
+    15216: +'<div style="font-size:13px;color:var(--text);line-height:1.5;margin-top:12px">You are too close to the race. Three weeks out the work is done. Chang
+    17298: if(!(wt>0)){ unloaded.push({name, sessions:all.length,
+    17312: ready: sets.length>0 && sets.every(r=>r>=rng.hi), ups, sessions:all.length});
+    17314: plain.push({name, wt, sets, sessions:all.length,
+    17320: ladder.sort((a,b)=>(b.ready?1:0)-(a.ready?1:0) || b.sessions-a.sessions);
+    17321: plain.sort((a,b)=>b.sessions-a.sessions);
+    17322: unloaded.sort((a,b)=>b.sessions-a.sessions);
+    17433: +(accDay?' '+accDay+(accDay===1?' session':' sessions')+' where this ran as an accessory '+(accDay===1?'is':'are')
+    17435: +(noLoad?' '+noLoad+(noLoad===1?' session':' sessions')+' had no load written down. Add the weight and '
+    17460: +'<div style="font-size:10px;color:var(--muted);white-space:nowrap">'+(hi>lo?lo+'–'+hi:lo)+' '+u+' · '+r.sessions+' sessions</div></div>';
+    17465: +'<div style="font-size:10px;color:var(--muted);white-space:nowrap">'+(r.reps?r.reps.toLocaleString()+' reps · ':'')+r.sessions+' sessions</div></div>
+    17504: weeklyData[w] = {run:0, bike:0, swim:0, bench:null, squat:null, dead:null, rpe:null, sessions:0};
+    17521: weeklyData[w].sessions++;
+    17551: <div style="font-size:13px;line-height:1.6">Start logging your sessions and your progress will appear here as dotted line charts.</div>
+    17715: <div style="font-size:13px;line-height:1.6">Log sessions to see progress charts, exercise history, and your training journal here.</div>
+    18229: ? 'More than a week off. Mark what happened, then ease back in. First sessions back at reduced effort. Never chase missed work.'
+   weeklyData lines: 17502,17504,17512,17513,17514,17515,17517,17521,17538,17540,17560,17575,17611,17617,17623
+   V235 lines reading .rpe: 17
+    1344: _restDraft.type=types[0]||'run'; _restDraft.mins=30; _restDraft.dist=''; _restDraft.rpe=5;
+    1397: const rpeRows=RPE.map(([v,n,d])=>'<div class="rd-chip wide'+(_restDraft.rpe===v?' sel':'')+'" onclick="_rdSet(\'rpe\','+v+')"><b>RPE '+v+(v===9?'+':''
+    1400: const note=_restDraft.rpe>=9
+    1433: e.rest_cardio=true; e.rest_type=type; e.rest_mins=m; e.rpe=rpe;
+    1536: if(lg&&(lg.rpe||lg.notes||lg.run_dist||lg.bike_mins||lg.swim_yards)) return;
+    8355: if(!(_lo>=_floor[0])) return wv.s+'×'+_floor[0]+'–'+_floor[1]+' — RPE '+r.rpe+' ('+r.note+')'+_amrap;
+    8357: return wv.s+'×'+wv.r+' — RPE '+r.rpe+' ('+r.note+')'+_amrap;
+    12159: ? '<div class="wk-rest-logged">'+_heroCardio.rest_mins+' min '+(({run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'})[_heroCardio.rest_type]||_h
+    13854: const rpeVal=e.rpe||'';
+    16625: const rpe=+e.rpe; if(!(rpe>=EASY_RPE_LO&&rpe<=EASY_RPE_HI)) return;
+    17516: if(entry.rpe && +entry.rpe > 0) {
+    17517: weeklyData[w].rpe = weeklyData[w].rpe ? (+weeklyData[w].rpe + +entry.rpe)/2 : +entry.rpe;
+    17520: if(entry.rpe||entry.run_dist||entry.bike_mins||entry.swim_yards||entry.notes) {
+    17623: const rpeData = weeks.map(w => weeklyData[w].rpe || null);
+    17642: if(!entry.notes && !entry.rpe) return;
+    17665: const rpeColor = !entry.rpe ? 'var(--muted)' : +entry.rpe >= 9 ? 'var(--red)' : +entry.rpe >= 7 ? 'var(--lift)' : +entry.rpe >= 5 ? 'var(--accent)' : 
+    17673: ${entry.rpe ? `<div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:${rpeColor}">RPE ${entry.rpe} — ${RPE_LABELS[+entry.rp
+
+DONE 67.6 s

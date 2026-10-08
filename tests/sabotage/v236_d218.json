@@ -1,0 +1,100 @@
+[
+ {
+  "name": "S1-D218 listener persists in DRAFT: a settled wheel writes the entry before any Log tap",
+  "anchor": "if(free||cardioLive(dayKey)) persistLogFields(dayKey);",
+  "replacement": "persistLogFields(dayKey);",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D218-draft (the 0:47:13 settle creates an entry and an ia_hist_ snapshot; hand: entry null, no snapshot). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S2-D218 persistLogFields reads the cardio DOM in DRAFT: an RPE move stores the rolled draft",
+  "anchor": "const gc=v=>_live?g(v):'';",
+  "replacement": "const gc=v=>g(v);",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D218-rpe-notes (RPE 7 after a draft roll stores run_mins \"47.22\"; hand \"\"). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S3-D218 Log skips the empty check: an untouched card commits a blank entry and toasts Run logged",
+  "anchor": ".every(function(f){ return g('log_'+f)===''; })",
+  "replacement": ".every(function(f){ return false; })",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D218-empty (Log on an untouched W1 FRI writes an entry and toasts \"Run logged ✓\"; hand: entry null, \"Nothing to log yet.\"). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S4-D218 regime not recomputed after a write: the clear to 0:00:00 leaves the button on Logged",
+  "anchor": "cardioLive(dayKey);   // V236 (D218): the regime is recomputed after every write",
+  "replacement": "// the regime is not recomputed",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D218-live (after Log, the roll to 0:00:00 stores \"\" but the button stays \"Logged ✓\", data-logged unset; hand \"Log\", \"0\"). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S5-D218 render never seeds the regime: a stored run reopens on Log",
+  "anchor": "const _logged=hasCardio&&cardioEntryLive(e,activeSport);",
+  "replacement": "const _logged=false;",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D218-reopen (stored run_mins \"47.22\" opens with button \"Log\", data-logged \"0\"; hand \"Logged ✓\", \"1\"). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S6-D218 handleDayStatus does not force the commit: Done on a rolled draft stores nothing",
+  "anchor": "persistLogFields(dayKey,_commit);",
+  "replacement": "persistLogFields(dayKey);",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D218-done (roll 0:47:13, Done at 200 ms stores run_mins \"\"; hand \"47.22\"). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S7-D218 doseRep persists in DRAFT: a stepper step writes the entry",
+  "anchor": "// V236 (D218): on a DRAFT card the stepper is form only; the Log tap commits it.\n  if(cardioLive(currentDayKey)) persistLogFields(currentDayKey);",
+  "replacement": "// V236 (D218): on a DRAFT card the stepper is form only; the Log tap commits it.\n  persistLogFields(currentDayKey);",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D218-reps (the forced reps stepper +1 creates an entry; hand: entry null). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S8-D218 swim listener persists: the yards box writes per keystroke in DRAFT",
+  "anchor": "var free=(id==='log_rpe'||id==='log_notes');",
+  "replacement": "var free=(id==='log_rpe'||id==='log_notes'||id==='log_swim_yards');",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D218-swim (typing 1, 15, 150, 1500 on the swim host writes the entry; hand: entry null, ia_logs_ unchanged). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S9-D218 the run toast loses its check mark",
+  "anchor": "{run:'Run logged ✓',",
+  "replacement": "{run:'Run logged',",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D218-copy (CARDIO_LOGGED_TOAST in the stripped source is not the hand declaration). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S10-D218 chip parks the DOM draft: the leaving sport is committed before the park",
+  "anchor": "  iaWheelFlush(wrap);\n  persistLogFields(currentDayKey);",
+  "replacement": "  iaWheelFlush(wrap);\n  persistLogFields(currentDayKey,true);",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D218-chip (W1 SAT draft 0:47:13 then chip Bike parks run_mins \"47.22\"; hand: no parked, run_mins \"\"). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S11-D219 touched check dropped: an untouched slider stores its resting value",
+  "anchor": "_rpeEl&&_rpeEl.dataset.touched==='1'",
+  "replacement": "_rpeEl",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D219-rpe (untouched + note stores rpe \"5\"; hand \"\"). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S12-D219 untouched writes '' over a stored RPE: a reopened 7 is lost on a note",
+  "anchor": "((logs[key]&&logs[key].rpe!=null)?logs[key].rpe:'')",
+  "replacement": "''",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D219-rpe (reopen stored 7 + note stores rpe \"\"; hand \"7\"). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219, Sabotage paragraph)."
+ },
+ {
+  "name": "S13-D219 item 2 reverted: the rest-move logged test loses the CARDIO_PARK_FIELDS keys, a Log-tapped time form is offered as not logged",
+  "anchor": "    if(lg&&(lg.rpe||lg.notes||Object.keys(CARDIO_PARK_FIELDS).some(function(s){ return CARDIO_PARK_FIELDS[s].some(function(f){ return !!lg[f]; }); }))) return;",
+  "replacement": "    if(lg&&(lg.rpe||lg.notes||lg.run_dist||lg.bike_mins||lg.swim_yards)) return;",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D219-counter conjunct rest-move (W1 FRI logged 0:47:13 with no RPE is offered; hand: mon, tue, thu, sat). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219 Amendment 1 (b), (c))."
+ },
+ {
+  "name": "S14-D219 item 3 reverted: the journal skip drops a swap with no RPE and no note",
+  "anchor": "    if(!entry.notes && !entry.rpe && !(entry.swapFrom && entry.swapTo)) return;",
+  "replacement": "    if(!entry.notes && !entry.rpe) return;",
+  "gate": "gates/g236_d218_logbutton.js",
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D219-counter conjunct journal-swap (no W1 journal row; hand: Sat, \"Swapped Run → Bike\"). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219 Amendment 1 (b), (c))."
+ }
+]

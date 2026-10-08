@@ -1,0 +1,17 @@
+# ROW_RULED for V236 (D218 P-LOGBUTTON, D219). Passed to gate.sh step 4b as ROW_RULED=<this file>.
+# Written by the main session from tests/measure/v236_rulings/v236_ruling_d218_d219.md (Mario concurred 2026-10-08), before the draft run.
++ g236_d218_logbutton.js D218-draft  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-log  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-live  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-empty  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-rpe-notes  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-done  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-reopen  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-bike  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-swim  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-reps  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-chip  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-lift  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D218-copy  # D218 P-LOGBUTTON (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D219-rpe  # D219 untouched slider stores no RPE (Mario concurred 2026-10-08): new gate row, Gate rows section
++ g236_d218_logbutton.js D219-counter  # D219 untouched slider stores no RPE (Mario concurred 2026-10-08): new gate row, Gate rows section

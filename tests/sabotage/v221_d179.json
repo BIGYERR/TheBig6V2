@@ -1,7 +1,7 @@
 [
  {
   "name": "S6-D179 wheel flush -> the flush call is dropped: a wheel still inside its 90 ms settle window is not committed before persistLogFields",
-  "anchor": "if(statusOf(currentWeek,dayKey)!==status) iaWheelFlush(document.getElementById('detailOverlay'));",
+  "anchor": "if(_commit) iaWheelFlush(document.getElementById('detailOverlay'));",
   "replacement": ";",
   "gate": "gates/g221_d179_donenav.js",
   "note": "NAMED TRIP: W1 (ia_logs_ reads 9:30 at the tap)."
@@ -50,7 +50,7 @@
  },
  {
   "name": "S6-D179 wheel flush -> the flush runs on undo taps too: an undo tap commits a coasting wheel early",
-  "anchor": "if(statusOf(currentWeek,dayKey)!==status) iaWheelFlush(",
+  "anchor": "if(_commit) iaWheelFlush(",
   "replacement": "if(true) iaWheelFlush(",
   "gate": "gates/g221_d179_donenav.js",
   "note": "NAMED TRIP: W2 (ia_logs_ reads 10:30 at the undo tap)."

@@ -1,0 +1,289 @@
+candidate /Users/CanasBangin/Desktop/TheBig6V2/index.html ia-version 235
+§0 LATTICE: 146 programs built (0 failed), 5142 cardio days opened; errors 0; 89.1 s
+  days by form variant: {"run:generic":627,"run:time":758,"run:dist":555,"run:reps_dist":48,"bike:time":1061,"bike:nodose":132,"bike:reps_time":204,"swim":1604,"xtrain run:time":16,"xtrain bike:time":73,"xtrain swim":64}
+
+§1a FIRST HOST per variant (form markup head, entry after the free-field gesture, ts stripped)
+  bike:nodose : bike_century|balanced|beginner|76308 W1 tue "Interval (INT)" entry {"bike_mins":"47.22","notes":"","rpe":"5","run_dist":"","run_mins":"","run_pace":"","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}
+  bike:reps_time : bike_century|balanced|beginner|76308 W9 fri "Continuous High Intensity (CHI)" entry {"bike_mins":"47.22","notes":"","rpe":"5","run_dist":"","run_mins":"","run_pace":"","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":9}
+  bike:time : bike_century|balanced|beginner|76308 W1 mon "Long Slow Distance (LSD)" entry {"bike_mins":"47.22","notes":"","rpe":"5","run_dist":"","run_mins":"","run_pace":"","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}
+  run:dist : HALF_MANNY|fixture W1 sat "Long Run" entry {"bike_mins":"","notes":"","rpe":"5","run_dist":"3.1","run_mins":"47.22","run_pace":"15:14/mi","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}
+  run:generic : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" entry {"bike_mins":"","notes":"","rpe":"5","run_dist":"3.10","run_mins":"","run_pace":"","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}
+  run:reps_dist : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" entry {"bike_mins":"","notes":"","rpe":"5","run_dist":"","run_mins":"","run_pace":"7:43/mi","run_rep_time":"1:55","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}
+  run:time : HALF_MANNY|fixture W1 fri "Recovery Run" entry {"bike_mins":"","notes":"","rpe":"5","run_dist":"3.10","run_mins":"","run_pace":"8:04/mi","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}
+  swim : swim_100_time|balanced|beginner|76308 W1 mon "Long Slow Distance (LSD)" entry {"bike_mins":"","notes":"","rpe":"5","run_dist":"","run_mins":"","run_pace":"","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"1500","week":1}
+  xtrain bike:time : injury shoulder swim+bike|balanced|intermediate|76308 W1 mon "Cross-Train" entry {"bike_mins":"47.22","notes":"","rpe":"5","run_dist":"","run_mins":"","run_pace":"","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}
+  xtrain run:time : injury shoulder run+swim|balanced|intermediate|76308 W1 mon "Cross-Train" entry {"bike_mins":"","notes":"","rpe":"5","run_dist":"3.10","run_mins":"","run_pace":"11:17/mi","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}
+  xtrain swim : injury knee run+swim|balanced|intermediate|76308 W1 mon "Cross-Train" entry {"bike_mins":"","notes":"","rpe":"5","run_dist":"","run_mins":"","run_pace":"","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"1500","week":1}
+
+§1b OPEN and FIRST WRITE per variant (denominator = days of that variant)
+  bike:nodose | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 132
+  bike:reps_time | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 204
+  bike:time | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 1061
+  run:dist | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 555
+  run:generic | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 627
+  run:reps_dist | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 48
+  run:time | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 758
+  swim | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 1604
+  xtrain bike:time | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 73
+  xtrain run:time | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 16
+  xtrain swim | after free-field gesture: entry true, ia_hist_ snapshot true, status null, rpe stored "5", inputs true : 64
+
+§4a HAZARD S0 fresh open, empty store: field | face-vs-store class : count (denominator = days of the variant)
+  bike:nodose | hms:bike_mins | zero-face(D215) : 132
+  bike:nodose | slider:rpe | thumb-at-5,nothing-stored : 132
+  bike:reps_time | hms:bike_mins | zero-face(D215) : 204
+  bike:reps_time | slider:rpe | thumb-at-5,nothing-stored : 204
+  bike:time | hms:bike_mins | zero-face(D215) : 1061
+  bike:time | slider:rpe | thumb-at-5,nothing-stored : 1061
+  run:dist | dist:run_dist | plan-face(D202) : 555
+  run:dist | hms:run_mins | zero-face(D215) : 555
+  run:dist | slider:rpe | thumb-at-5,nothing-stored : 555
+  run:generic | dist:run_dist | blank : 627
+  run:generic | pace:run_pace | blank : 627
+  run:generic | slider:rpe | thumb-at-5,nothing-stored : 627
+  run:reps_dist | rept:run_rep_time | blank : 48
+  run:reps_dist | slider:rpe | thumb-at-5,nothing-stored : 48
+  run:reps_dist | stepper:run_reps | plan-count,nothing-stored : 48
+  run:time | dist:run_dist | blank : 758
+  run:time | hms:run_mins | plan-face(D202) : 758
+  run:time | slider:rpe | thumb-at-5,nothing-stored : 758
+  swim | box:swim_yards | blank : 1604
+  swim | slider:rpe | thumb-at-5,nothing-stored : 1604
+  xtrain bike:time | hms:bike_mins | zero-face(D215) : 73
+  xtrain bike:time | slider:rpe | thumb-at-5,nothing-stored : 73
+  xtrain run:time | dist:run_dist | blank : 16
+  xtrain run:time | hms:run_mins | plan-face(D202) : 16
+  xtrain run:time | slider:rpe | thumb-at-5,nothing-stored : 16
+  xtrain swim | box:swim_yards | blank : 64
+  xtrain swim | slider:rpe | thumb-at-5,nothing-stored : 64
+
+§4b HAZARD S1 after the one free-field gesture (settled)
+  bike:nodose | hms:bike_mins | agree : 132
+  bike:nodose | slider:rpe | label"Move slider",stored(5) : 132
+  bike:reps_time | hms:bike_mins | agree : 204
+  bike:reps_time | slider:rpe | label"Move slider",stored(5) : 204
+  bike:time | hms:bike_mins | agree : 1061
+  bike:time | slider:rpe | label"Move slider",stored(5) : 1061
+  run:dist | dist:run_dist | agree : 555
+  run:dist | hms:run_mins | agree : 555
+  run:dist | slider:rpe | label"Move slider",stored(5) : 555
+  run:generic | dist:run_dist | agree : 627
+  run:generic | pace:run_pace | blank : 627
+  run:generic | slider:rpe | label"Move slider",stored(5) : 627
+  run:reps_dist | rept:run_rep_time | agree : 48
+  run:reps_dist | slider:rpe | label"Move slider",stored(5) : 48
+  run:reps_dist | stepper:run_reps | plan-count,nothing-stored : 48
+  run:time | dist:run_dist | agree : 758
+  run:time | hms:run_mins | plan-face(D202) : 758
+  run:time | slider:rpe | label"Move slider",stored(5) : 758
+  swim | box:swim_yards | agree : 1604
+  swim | slider:rpe | label"Move slider",stored(5) : 1604
+  xtrain bike:time | hms:bike_mins | agree : 73
+  xtrain bike:time | slider:rpe | label"Move slider",stored(5) : 73
+  xtrain run:time | dist:run_dist | agree : 16
+  xtrain run:time | hms:run_mins | plan-face(D202) : 16
+  xtrain run:time | slider:rpe | label"Move slider",stored(5) : 16
+  xtrain swim | box:swim_yards | agree : 64
+  xtrain swim | slider:rpe | label"Move slider",stored(5) : 64
+
+§4c HAZARD S2 after Done and reopen
+  bike:nodose | hms:bike_mins | agree : 132
+  bike:nodose | slider:rpe | agree : 132
+  bike:reps_time | hms:bike_mins | agree : 204
+  bike:reps_time | slider:rpe | agree : 204
+  bike:time | hms:bike_mins | agree : 1061
+  bike:time | slider:rpe | agree : 1061
+  run:dist | dist:run_dist | agree : 555
+  run:dist | hms:run_mins | agree : 555
+  run:dist | slider:rpe | agree : 555
+  run:generic | dist:run_dist | agree : 627
+  run:generic | pace:run_pace | blank : 627
+  run:generic | slider:rpe | agree : 627
+  run:reps_dist | rept:run_rep_time | agree : 48
+  run:reps_dist | slider:rpe | agree : 48
+  run:reps_dist | stepper:run_reps | plan-count,nothing-stored : 48
+  run:time | dist:run_dist | agree : 758
+  run:time | hms:run_mins | plan-face(D202) : 758
+  run:time | slider:rpe | agree : 758
+  swim | box:swim_yards | agree : 1604
+  swim | slider:rpe | agree : 1604
+  xtrain bike:time | hms:bike_mins | agree : 73
+  xtrain bike:time | slider:rpe | agree : 73
+  xtrain run:time | dist:run_dist | agree : 16
+  xtrain run:time | hms:run_mins | plan-face(D202) : 16
+  xtrain run:time | slider:rpe | agree : 16
+  xtrain swim | box:swim_yards | agree : 64
+  xtrain swim | slider:rpe | agree : 64
+
+§3a DONE on an untouched form
+  bike:nodose | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 132
+  bike:reps_time | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 204
+  bike:time | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 1061
+  run:dist | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 555
+  run:generic | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 627
+  run:reps_dist | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 48
+  run:time | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 758
+  swim | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 1604
+  xtrain bike:time | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 73
+  xtrain run:time | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 16
+  xtrain swim | Done on untouched form: entry true keys non-empty ["rpe"], status complete, hist true, session true, _hasLog false : 64
+
+§4e HAZARD S3 column-0 dash gesture (P-DISTZERO), one per wheel per day
+  run:dist | dist:run_dist rolled then whole to dash | dash-with-digits(P-DISTZERO) face -.86 stored "" : 555
+  run:generic | dist:run_dist rolled then whole to dash | dash-with-digits(P-DISTZERO) face -.86 stored "" : 627
+  run:generic | pace:run_pace rolled then whole to dash | dash-with-digits(P-DISTZERO) face -:30 stored "" : 627
+  run:reps_dist | rept:run_rep_time rolled then whole to dash | dash-with-digits(P-DISTZERO) face -:55 stored "" : 48
+  run:time | dist:run_dist rolled then whole to dash | dash-with-digits(P-DISTZERO) face -.86 stored "" : 758
+  xtrain run:time | dist:run_dist rolled then whole to dash | dash-with-digits(P-DISTZERO) face -.86 stored "" : 16
+
+§4d HAZARD totals by class (field-instances): S0 {"blank":3744,"thumb-at-5,nothing-stored":5142,"plan-face(D202)":1329,"zero-face(D215)":2025,"plan-count,nothing-stored":48}
+   S1 {"agree":5697,"blank":627,"label\"Move slider\",stored(5)":5142,"plan-face(D202)":774,"plan-count,nothing-stored":48}
+   S2 {"agree":10839,"blank":627,"plan-face(D202)":774,"plan-count,nothing-stored":48}
+   S3 {"dash-with-digits(P-DISTZERO)":2631}
+
+§1c PER-FIELD WRITE TABLE (one fresh open per field gesture; keys = non-empty keys of the entry after; ev = input events)
+  run:generic        wheel dist log_run_dist                  ev 1 | ia_logs_ writes 1 | entry {"rpe":"5","run_dist":"2.00"} | hist true | status null
+  run:generic        wheel pace log_run_pace                  ev 1 | ia_logs_ writes 1 | entry {"rpe":"5","run_pace":"9:00"} | hist true | status null
+  run:generic        slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  run:generic        textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  run:generic        chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"run","swapTo":"bike"} | hist true | status null
+  run:generic        Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  run:generic        Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+  run:time           wheel hms log_run_mins                   ev 1 | ia_logs_ writes 1 | entry {"rpe":"5","run_mins":"30.00"} | hist true | status null
+  run:time           wheel dist log_run_dist                  ev 1 | ia_logs_ writes 1 | entry {"rpe":"5","run_dist":"2.00","run_pace":"12:30/mi"} | hist true | status null
+  run:time           slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  run:time           textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  run:time           chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"run","swapTo":"bike"} | hist true | status null
+  run:time           Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  run:time           Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+  run:dist           wheel hms log_run_mins                   ev 1 | ia_logs_ writes 1 | entry {"rpe":"5","run_dist":"3.1","run_mins":"30.00","run_pace":"9:41/mi"} | hist true | status null
+  run:dist           wheel dist log_run_dist                  ev 1 | ia_logs_ writes 1 | entry {"rpe":"5","run_dist":"2.10"} | hist true | status null
+  run:dist           slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  run:dist           textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  run:dist           chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"run","swapTo":"bike"} | hist true | status null
+  run:dist           Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  run:dist           Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+  run:reps_dist      wheel rept log_run_rep_time              ev 1 | ia_logs_ writes 1 | entry {"rpe":"5","run_pace":"4:01/mi","run_rep_time":"1:00"} | hist true | status null
+  run:reps_dist      stepper doseRep(+1)                      ev 0 | ia_logs_ writes 1 | entry {"rpe":"5","run_dist":"1.24","run_reps":"5"} | hist true | status null
+  run:reps_dist      slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  run:reps_dist      textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  run:reps_dist      chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"run","swapTo":"bike"} | hist true | status null
+  run:reps_dist      Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  run:reps_dist      Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+  bike:time          wheel hms log_bike_mins                  ev 1 | ia_logs_ writes 1 | entry {"bike_mins":"30.00","rpe":"5"} | hist true | status null
+  bike:time          slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  bike:time          textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  bike:time          chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"bike","swapTo":"run"} | hist true | status null
+  bike:time          Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  bike:time          Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+  bike:nodose        wheel hms log_bike_mins                  ev 1 | ia_logs_ writes 1 | entry {"bike_mins":"30.00","rpe":"5"} | hist true | status null
+  bike:nodose        slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  bike:nodose        textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  bike:nodose        chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"bike","swapTo":"run"} | hist true | status null
+  bike:nodose        Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  bike:nodose        Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+  bike:reps_time     wheel hms log_bike_mins                  ev 1 | ia_logs_ writes 1 | entry {"bike_mins":"30.00","rpe":"5"} | hist true | status null
+  bike:reps_time     slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  bike:reps_time     textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  bike:reps_time     chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"bike","swapTo":"run"} | hist true | status null
+  bike:reps_time     Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  bike:reps_time     Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+  swim               box log_swim_yards (type 1,15,150,1500)  ev 4 | ia_logs_ writes 4 | entry {"rpe":"5","swim_yards":"1500"} | hist true | status null
+  swim               slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  swim               textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  swim               chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"swim","swapTo":"bike"} | hist true | status null
+  swim               Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  swim               Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+  xtrain run:time    wheel hms log_run_mins                   ev 1 | ia_logs_ writes 1 | entry {"rpe":"5","run_mins":"30.00"} | hist true | status null
+  xtrain run:time    wheel dist log_run_dist                  ev 1 | ia_logs_ writes 1 | entry {"rpe":"5","run_dist":"2.00","run_pace":"17:30/mi"} | hist true | status null
+  xtrain run:time    slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  xtrain run:time    textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  xtrain run:time    chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"run","swapTo":"bike"} | hist true | status null
+  xtrain run:time    Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  xtrain run:time    Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+  xtrain bike:time   wheel hms log_bike_mins                  ev 1 | ia_logs_ writes 1 | entry {"bike_mins":"30.00","rpe":"5"} | hist true | status null
+  xtrain bike:time   slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  xtrain bike:time   textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  xtrain bike:time   chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"bike","swapTo":"run"} | hist true | status null
+  xtrain bike:time   Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  xtrain bike:time   Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+  xtrain swim        box log_swim_yards (type 1,15,150,1500)  ev 4 | ia_logs_ writes 4 | entry {"rpe":"5","swim_yards":"1500"} | hist true | status null
+  xtrain swim        slider log_rpe -> 7                      ev 1 | ia_logs_ writes 1 | entry {"rpe":"7"} | hist true | status null
+  xtrain swim        textarea log_notes "ok"                  ev 2 | ia_logs_ writes 2 | entry {"notes":"ok","rpe":"5"} | hist true | status null
+  xtrain swim        chip setCardioSwap(other)                ev 0 | ia_logs_ writes 3 | entry {"rpe":"5","swapFrom":"swim","swapTo":"bike"} | hist true | status null
+  xtrain swim        Done                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status complete
+  xtrain swim        Skip                                     ev 0 | ia_logs_ writes 1 | entry {"rpe":"5"} | hist true | status skipped
+
+§2 READERS of a log written by each path (restated predicates; nudge and Progress rendered on the host)
+  free field (dist form 47:13)         entry true | freeze-touched (ia_logs_ key, :16058) true | ia_hist_ true | status null | _hasLog true nudge rendered true | session(:17520) true | restMove still offers day false (:1536 blocks true) | weekMiles 3.1 progRun 3.1 pvl 3.1 | charts {"Weekly Running Mileage":3.1,"Average Session RPE":5} | rpe "5"
+  RPE only -> 7                        entry true | freeze-touched (ia_logs_ key, :16058) true | ia_hist_ true | status null | _hasLog false nudge rendered false | session(:17520) true | restMove still offers day false (:1536 blocks true) | weekMiles 0 progRun 0 pvl 0 | charts {"Weekly Running Mileage":null,"Average Session RPE":7} | rpe "7"
+  notes only                           entry true | freeze-touched (ia_logs_ key, :16058) true | ia_hist_ true | status null | _hasLog true nudge rendered true | session(:17520) true | restMove still offers day false (:1536 blocks true) | weekMiles 0 progRun 0 pvl 0 | charts {"Weekly Running Mileage":null,"Average Session RPE":5} | rpe "5"
+  chip tap only (run->bike->run)       entry true | freeze-touched (ia_logs_ key, :16058) true | ia_hist_ true | status null | _hasLog false nudge rendered false | session(:17520) true | restMove still offers day false (:1536 blocks true) | weekMiles 0 progRun 0 pvl 0 | charts {"Weekly Running Mileage":null,"Average Session RPE":5} | rpe "5"
+  Done on untouched                    entry true | freeze-touched (ia_logs_ key, :16058) true | ia_hist_ true | status complete | _hasLog false nudge rendered false | session(:17520) true | restMove still offers day false (:1536 blocks true) | weekMiles 0 progRun 0 pvl 0 | charts {"Weekly Running Mileage":null,"Average Session RPE":5} | rpe "5"
+  fixed miles wheel nudged 3.1 -> 3.5  entry true | freeze-touched (ia_logs_ key, :16058) true | ia_hist_ true | status null | _hasLog true nudge rendered true | session(:17520) true | restMove still offers day false (:1536 blocks true) | weekMiles 3.5 progRun 3.5 pvl 3.5 | charts {"Weekly Running Mileage":3.5,"Average Session RPE":5} | rpe "5"
+
+§3b DONE flows on HALF_MANNY|fixture W1 sat
+  filled then Done: entry byte-equal but ts true, status complete, overlay open false
+  reopen a Done day, move time to 0:50:13, no tap: stored run_mins "50.22" status complete (edit after Done saves with no tap)
+  then tap the primary button (reads "Done ✓ tap to undo Skip"): status null, run_mins "50.22", toast ["Unmarked"]
+  pending day, move to 0:55:13, ‹ Back: stored "55.22" status null
+  filled then Skip: entry kept true run_mins "47.22" status skipped
+  minutes rolled to 40, Done 20 ms later (inside the 90 ms settle): stored "40.00" status complete
+  logged, ‹ Back, reopen: nudge with Mark Done ✓ true
+
+§6 LIFECYCLE: move then leave
+  L1 roll minutes to 33, ‹ Back 10 ms later (no flush on close): stored after the timer "33.00", overlay open false
+  L2 roll minutes to 33 on sat, ‹ Back and open fri within 10 ms: sat entry null | fri entry {"bike_mins":"","notes":"","rpe":"5","run_dist":"","run_mins":"33.00","run_pace":"","run_rep_time":"","run_reps":"","swapFrom":"","swapTo":"","swim_yards":"","week":1}
+  L2d same, with the replaced nodes detached (scrollTop reads 0, WebKit has no box for them): sat null | fri null
+  L3 settled, then showScreen(Progress): stored "33.00", detail overlay still open true
+  L4 static: pagehide 0, beforeunload 0, visibilitychange 1 (listener body: addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') iaCheckForUpdate(); });), focusout/blur on log ids 0, location.reload 0, listener events on the cardio ids: ["input"]
+
+§1d CHIP-SWAPPED FORMS (every lattice host, all three sports) and a MOVED-IN day
+     hazard bike form | hms:bike_mins | zero-face(D215) : 7
+     hazard bike form | slider:rpe | label"Move slider",stored(5) : 7
+     hazard run form | dist:run_dist | blank : 6
+     hazard run form | pace:run_pace | blank : 6
+     hazard run form | slider:rpe | label"Move slider",stored(5) : 6
+     hazard swim form | box:swim_yards | blank : 9
+     hazard swim form | slider:rpe | label"Move slider",stored(5) : 9
+  bike:nodose -> run | fields log_run_dist,log_run_pace | entry after tap {"rpe":"5","swapFrom":"bike","swapTo":"run"} | hist true : 1
+  bike:nodose -> swim | fields log_swim_yards | entry after tap {"rpe":"5","swapFrom":"bike","swapTo":"swim"} | hist true : 1
+  bike:reps_time -> run | fields log_run_dist,log_run_pace | entry after tap {"rpe":"5","swapFrom":"bike","swapTo":"run"} | hist true : 1
+  bike:reps_time -> swim | fields log_swim_yards | entry after tap {"rpe":"5","swapFrom":"bike","swapTo":"swim"} | hist true : 1
+  bike:time -> run | fields log_run_dist,log_run_pace | entry after tap {"rpe":"5","swapFrom":"bike","swapTo":"run"} | hist true : 1
+  bike:time -> swim | fields log_swim_yards | entry after tap {"rpe":"5","swapFrom":"bike","swapTo":"swim"} | hist true : 1
+  run:dist -> bike | fields log_bike_mins | entry after tap {"rpe":"5","swapFrom":"run","swapTo":"bike"} | hist true : 1
+  run:dist -> swim | fields log_swim_yards | entry after tap {"rpe":"5","swapFrom":"run","swapTo":"swim"} | hist true : 1
+  run:generic -> bike | fields log_bike_mins | entry after tap {"rpe":"5","swapFrom":"run","swapTo":"bike"} | hist true : 1
+  run:generic -> swim | fields log_swim_yards | entry after tap {"rpe":"5","swapFrom":"run","swapTo":"swim"} | hist true : 1
+  run:reps_dist -> bike | fields log_bike_mins | entry after tap {"rpe":"5","swapFrom":"run","swapTo":"bike"} | hist true : 1
+  run:reps_dist -> swim | fields log_swim_yards | entry after tap {"rpe":"5","swapFrom":"run","swapTo":"swim"} | hist true : 1
+  run:time -> bike | fields log_bike_mins | entry after tap {"rpe":"5","swapFrom":"run","swapTo":"bike"} | hist true : 1
+  run:time -> swim | fields log_swim_yards | entry after tap {"rpe":"5","swapFrom":"run","swapTo":"swim"} | hist true : 1
+  swim -> bike | fields log_bike_mins | entry after tap {"rpe":"5","swapFrom":"swim","swapTo":"bike"} | hist true : 1
+  swim -> run | fields log_run_dist,log_run_pace | entry after tap {"rpe":"5","swapFrom":"swim","swapTo":"run"} | hist true : 1
+  xtrain bike:time -> run | fields log_run_dist,log_run_pace | entry after tap {"rpe":"5","swapFrom":"bike","swapTo":"run"} | hist true : 1
+  xtrain bike:time -> swim | fields log_swim_yards | entry after tap {"rpe":"5","swapFrom":"bike","swapTo":"swim"} | hist true : 1
+  xtrain run:time -> bike | fields log_bike_mins | entry after tap {"rpe":"5","swapFrom":"run","swapTo":"bike"} | hist true : 1
+  xtrain run:time -> swim | fields log_swim_yards | entry after tap {"rpe":"5","swapFrom":"run","swapTo":"swim"} | hist true : 1
+  xtrain swim -> bike | fields log_bike_mins | entry after tap {"rpe":"5","swapFrom":"swim","swapTo":"bike"} | hist true : 1
+  xtrain swim -> run | fields log_run_dist,log_run_pace | entry after tap {"rpe":"5","swapFrom":"swim","swapTo":"run"} | hist true : 1
+  (22 chip taps)
+  moved-in W1 sat -> wed: fields log_run_dist,log_run_mins | after minutes 47: w1_wed {"run_mins":"47.00","run_dist":"3.1"} w1_sat null hist w1_wed true
+
+§5a PRECEDENT rest sheet Log cardio
+  sheet open true toasts [] | body:  WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your program. MODALITY Run Bike Swim Walk TIME min Distance (miles) optional HOW HARD RPE 5 · Easy Conversational, full sentences RPE 7 · Steady Working, sentences getting short RPE 9+ · Hard That’s a training day, not a rest day Log it 
+  Log it with 0 min: toast ["How long did you go?"] entry null
+  Log it run 30 min 3 mi: toast ["30 min logged ✓"] sheet open false entry {"rest_cardio":true,"rest_mins":30,"rest_type":"run","rpe":5,"run_dist":3} hist false status null
+  Log it again, same numbers: run_dist 6 rest_mins 30 (additive; hand 3+3=6)
+  Log swim 20 min 800 yd: swim_yards 800 rest_type "swim"
+  week view hero button reads: "Log more"
+
+§5b PRECEDENT per-exercise lift Log
+  host W1 mon Close-grip bench press | before: ia_exw_ none, card class "", load box "" ph ""
+  a set stepper tap before Log: ia_logs_ draft ["close_grip_bench_press"], ia_exw_ none, hist true
+  tap Log: toast ["Logged ✓"], card class "logged", badge "✓", ia_exw_ entries 1 {"week":1,"day":"mon","weight":0,"setsDone":[13,12,12]}, draft cleared true, hist true, status null
+  tap Log again: entries 1 (one per exercise per day, overwrite)
+  reopen: counter "1 / 7 LOGGED", card logged true
+
+runtime 91.0 s | errors 0

@@ -1,0 +1,524 @@
+candidate /Users/CanasBangin/Desktop/TheBig6V2/index.html ia-version 236 | base /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/f36d4ca3-1b1c-4e2c-85ab-457dd51074a2/scratchpad/base_v235.html ia-version 235
+§0 LATTICE 146/146 programs, 5142 cardio days; Q2 7146 gesture cases; Q3 20568 swaps; errors 0; 233.7 s
+
+§2 REST-MOVE per shape x gesture
+  bike | DAYS : 1397
+  bike | bike 47:13 | CAND committed : 1397
+  bike | bike 47:13 | CAND keys {bike_mins} : 1397
+  bike | bike 47:13 | CAND offered after gesture, before Log (draft) : 1397
+  bike | bike 47:13 | V235 rpe "5" stamped : 1397
+  bike | bike 47:13 | n : 1397
+  dist | DAYS : 555
+  dist | miles 3.10 | CAND Log refused / no entry : 72
+  dist | miles 3.10 | CAND committed : 483
+  dist | miles 3.10 | CAND keys {run_dist} : 483
+  dist | miles 3.10 | CAND offered after gesture, before Log (draft) : 555
+  dist | miles 3.10 | V235 rpe "5" stamped : 483
+  dist | miles 3.10 | n : 555
+  dist | mins 47:13 | CAND committed : 555
+  dist | mins 47:13 | CAND keys {run_dist,run_mins,run_pace} : 555
+  dist | mins 47:13 | CAND offered after gesture, before Log (draft) : 555
+  dist | mins 47:13 | V235 rpe "5" stamped : 555
+  dist | mins 47:13 | n : 555
+  generic | DAYS : 627
+  generic | miles 3.10 | CAND committed : 627
+  generic | miles 3.10 | CAND keys {run_dist} : 627
+  generic | miles 3.10 | CAND offered after gesture, before Log (draft) : 627
+  generic | miles 3.10 | V235 rpe "5" stamped : 627
+  generic | miles 3.10 | n : 627
+  generic | pace 9:30 | CAND OFFERED after Log : 627
+  generic | pace 9:30 | CAND OFFERED while button reads Logged : 627
+  generic | pace 9:30 | CAND committed : 627
+  generic | pace 9:30 | CAND keys {run_pace} : 627
+  generic | pace 9:30 | CAND offered after gesture, before Log (draft) : 627
+  generic | pace 9:30 | V235 rpe "5" stamped : 627
+  generic | pace 9:30 | n : 627
+  reps_dist | DAYS : 48
+  reps_dist | rep time 1:55 | CAND OFFERED after Log : 48
+  reps_dist | rep time 1:55 | CAND OFFERED while button reads Logged : 48
+  reps_dist | rep time 1:55 | CAND committed : 48
+  reps_dist | rep time 1:55 | CAND keys {run_pace,run_rep_time} : 48
+  reps_dist | rep time 1:55 | CAND offered after gesture, before Log (draft) : 48
+  reps_dist | rep time 1:55 | V235 rpe "5" stamped : 48
+  reps_dist | rep time 1:55 | n : 48
+  reps_dist | reps +1 (stepper) | CAND committed : 48
+  reps_dist | reps +1 (stepper) | CAND keys {run_dist,run_reps} : 48
+  reps_dist | reps +1 (stepper) | CAND offered after gesture, before Log (draft) : 48
+  reps_dist | reps +1 (stepper) | V235 rpe "5" stamped : 48
+  reps_dist | reps +1 (stepper) | n : 48
+  swim | DAYS : 1604
+  swim | swim 1500 yd | CAND committed : 1604
+  swim | swim 1500 yd | CAND keys {swim_yards} : 1604
+  swim | swim 1500 yd | CAND offered after gesture, before Log (draft) : 1604
+  swim | swim 1500 yd | V235 rpe "5" stamped : 1604
+  swim | swim 1500 yd | n : 1604
+  time | DAYS : 758
+  time | miles 3.10 | CAND committed : 758
+  time | miles 3.10 | CAND keys {run_dist,run_pace} : 758
+  time | miles 3.10 | CAND offered after gesture, before Log (draft) : 758
+  time | miles 3.10 | V235 rpe "5" stamped : 758
+  time | miles 3.10 | n : 758
+  time | mins 47:13 | CAND OFFERED after Log : 758
+  time | mins 47:13 | CAND OFFERED while button reads Logged : 758
+  time | mins 47:13 | CAND committed : 758
+  time | mins 47:13 | CAND keys {run_mins} : 758
+  time | mins 47:13 | CAND offered after gesture, before Log (draft) : 758
+  time | mins 47:13 | V235 rpe "5" stamped : 758
+  time | mins 47:13 | n : 758
+  xtrain bike | DAYS : 73
+  xtrain bike | bike 47:13 | CAND committed : 73
+  xtrain bike | bike 47:13 | CAND keys {bike_mins} : 73
+  xtrain bike | bike 47:13 | CAND offered after gesture, before Log (draft) : 73
+  xtrain bike | bike 47:13 | V235 rpe "5" stamped : 73
+  xtrain bike | bike 47:13 | n : 73
+  xtrain swim | DAYS : 64
+  xtrain swim | swim 1500 yd | CAND committed : 64
+  xtrain swim | swim 1500 yd | CAND keys {swim_yards} : 64
+  xtrain swim | swim 1500 yd | CAND offered after gesture, before Log (draft) : 64
+  xtrain swim | swim 1500 yd | V235 rpe "5" stamped : 64
+  xtrain swim | swim 1500 yd | n : 64
+  xtrain time | DAYS : 16
+  xtrain time | miles 3.10 | CAND committed : 16
+  xtrain time | miles 3.10 | CAND keys {run_dist,run_pace} : 16
+  xtrain time | miles 3.10 | CAND offered after gesture, before Log (draft) : 16
+  xtrain time | miles 3.10 | V235 rpe "5" stamped : 16
+  xtrain time | miles 3.10 | n : 16
+  xtrain time | mins 47:13 | CAND OFFERED after Log : 16
+  xtrain time | mins 47:13 | CAND OFFERED while button reads Logged : 16
+  xtrain time | mins 47:13 | CAND committed : 16
+  xtrain time | mins 47:13 | CAND keys {run_mins} : 16
+  xtrain time | mins 47:13 | CAND offered after gesture, before Log (draft) : 16
+  xtrain time | mins 47:13 | V235 rpe "5" stamped : 16
+  xtrain time | mins 47:13 | n : 16
+
+§2x first exposed example per shape x gesture
+  generic | pace 9:30 : HALF_MANNY|fixture W1 mon "Speed Run — Intervals" CAND entry {"rpe":"","run_dist":"","run_pace":"9:30","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","notes":"","swapFrom":"","swapTo":"","week":1} btn "Logged ✓" | V235 entry rpe "5" offered false
+  reps_dist | rep time 1:55 : run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" CAND entry {"rpe":"","run_dist":"","run_pace":"7:43/mi","run_mins":"","run_reps":"","run_rep_time":"1:55","bike_mins":"","swim_yards":"","notes":"","swapFrom":"","swapTo":"","week":1} btn "Logged ✓" | V235 entry rpe "5" offered false
+  time | mins 47:13 : HALF_MANNY|fixture W1 fri "Recovery Run" CAND entry {"rpe":"","run_dist":"","run_pace":"","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","notes":"","swapFrom":"","swapTo":"","week":1} btn "Logged ✓" | V235 entry rpe "5" offered false
+  xtrain time | mins 47:13 : injury shoulder run+swim W1 mon "Cross-Train" CAND entry {"rpe":"","run_dist":"","run_pace":"","run_mins":"47.22","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","notes":"","swapFrom":"","swapTo":"","week":1} btn "Logged ✓" | V235 entry rpe "5" offered false
+
+§2r rendered rest sheet: HALF_MANNY|fixture W1 mon [pace 9:30] rest-sheet row: "Strength Support" / "Monday · not logged" | card button "Logged ✓" data-logged "1"
+
+§3 JOURNAL SWAP per shape -> chip
+  [bg: other day same week rpe 7] bike -> run | CAND entry carries swapFrom/swapTo : 1397
+  [bg: other day same week rpe 7] bike -> run | CAND entry rpe and notes empty : 1397
+  [bg: other day same week rpe 7] bike -> run | CAND journal NO swap row : 1397
+  [bg: other day same week rpe 7] bike -> run | CAND progress body reads No data yet: false : 1397
+  [bg: other day same week rpe 7] bike -> run | V235 entry rpe "5" : 1397
+  [bg: other day same week rpe 7] bike -> run | V235 journal shows RPE 5 : 1397
+  [bg: other day same week rpe 7] bike -> run | V235 journal shows swap row : 1397
+  [bg: other day same week rpe 7] bike -> run | n : 1397
+  [bg: other day same week rpe 7] bike -> swim | CAND entry carries swapFrom/swapTo : 1397
+  [bg: other day same week rpe 7] bike -> swim | CAND entry rpe and notes empty : 1397
+  [bg: other day same week rpe 7] bike -> swim | CAND journal NO swap row : 1397
+  [bg: other day same week rpe 7] bike -> swim | CAND progress body reads No data yet: false : 1397
+  [bg: other day same week rpe 7] bike -> swim | V235 entry rpe "5" : 1397
+  [bg: other day same week rpe 7] bike -> swim | V235 journal shows RPE 5 : 1397
+  [bg: other day same week rpe 7] bike -> swim | V235 journal shows swap row : 1397
+  [bg: other day same week rpe 7] bike -> swim | n : 1397
+  [bg: other day same week rpe 7] dist -> bike | CAND entry carries swapFrom/swapTo : 555
+  [bg: other day same week rpe 7] dist -> bike | CAND entry rpe and notes empty : 555
+  [bg: other day same week rpe 7] dist -> bike | CAND journal NO swap row : 555
+  [bg: other day same week rpe 7] dist -> bike | CAND progress body reads No data yet: false : 555
+  [bg: other day same week rpe 7] dist -> bike | V235 entry rpe "5" : 555
+  [bg: other day same week rpe 7] dist -> bike | V235 journal shows RPE 5 : 555
+  [bg: other day same week rpe 7] dist -> bike | V235 journal shows swap row : 555
+  [bg: other day same week rpe 7] dist -> bike | n : 555
+  [bg: other day same week rpe 7] dist -> swim | CAND entry carries swapFrom/swapTo : 555
+  [bg: other day same week rpe 7] dist -> swim | CAND entry rpe and notes empty : 555
+  [bg: other day same week rpe 7] dist -> swim | CAND journal NO swap row : 555
+  [bg: other day same week rpe 7] dist -> swim | CAND progress body reads No data yet: false : 555
+  [bg: other day same week rpe 7] dist -> swim | V235 entry rpe "5" : 555
+  [bg: other day same week rpe 7] dist -> swim | V235 journal shows RPE 5 : 555
+  [bg: other day same week rpe 7] dist -> swim | V235 journal shows swap row : 555
+  [bg: other day same week rpe 7] dist -> swim | n : 555
+  [bg: other day same week rpe 7] generic -> bike | CAND entry carries swapFrom/swapTo : 627
+  [bg: other day same week rpe 7] generic -> bike | CAND entry rpe and notes empty : 627
+  [bg: other day same week rpe 7] generic -> bike | CAND journal NO swap row : 627
+  [bg: other day same week rpe 7] generic -> bike | CAND progress body reads No data yet: false : 627
+  [bg: other day same week rpe 7] generic -> bike | V235 entry rpe "5" : 627
+  [bg: other day same week rpe 7] generic -> bike | V235 journal shows RPE 5 : 627
+  [bg: other day same week rpe 7] generic -> bike | V235 journal shows swap row : 627
+  [bg: other day same week rpe 7] generic -> bike | n : 627
+  [bg: other day same week rpe 7] generic -> swim | CAND entry carries swapFrom/swapTo : 627
+  [bg: other day same week rpe 7] generic -> swim | CAND entry rpe and notes empty : 627
+  [bg: other day same week rpe 7] generic -> swim | CAND journal NO swap row : 627
+  [bg: other day same week rpe 7] generic -> swim | CAND progress body reads No data yet: false : 627
+  [bg: other day same week rpe 7] generic -> swim | V235 entry rpe "5" : 627
+  [bg: other day same week rpe 7] generic -> swim | V235 journal shows RPE 5 : 627
+  [bg: other day same week rpe 7] generic -> swim | V235 journal shows swap row : 627
+  [bg: other day same week rpe 7] generic -> swim | n : 627
+  [bg: other day same week rpe 7] reps_dist -> bike | CAND entry carries swapFrom/swapTo : 48
+  [bg: other day same week rpe 7] reps_dist -> bike | CAND entry rpe and notes empty : 48
+  [bg: other day same week rpe 7] reps_dist -> bike | CAND journal NO swap row : 48
+  [bg: other day same week rpe 7] reps_dist -> bike | CAND progress body reads No data yet: false : 48
+  [bg: other day same week rpe 7] reps_dist -> bike | V235 entry rpe "5" : 48
+  [bg: other day same week rpe 7] reps_dist -> bike | V235 journal shows RPE 5 : 48
+  [bg: other day same week rpe 7] reps_dist -> bike | V235 journal shows swap row : 48
+  [bg: other day same week rpe 7] reps_dist -> bike | n : 48
+  [bg: other day same week rpe 7] reps_dist -> swim | CAND entry carries swapFrom/swapTo : 48
+  [bg: other day same week rpe 7] reps_dist -> swim | CAND entry rpe and notes empty : 48
+  [bg: other day same week rpe 7] reps_dist -> swim | CAND journal NO swap row : 48
+  [bg: other day same week rpe 7] reps_dist -> swim | CAND progress body reads No data yet: false : 48
+  [bg: other day same week rpe 7] reps_dist -> swim | V235 entry rpe "5" : 48
+  [bg: other day same week rpe 7] reps_dist -> swim | V235 journal shows RPE 5 : 48
+  [bg: other day same week rpe 7] reps_dist -> swim | V235 journal shows swap row : 48
+  [bg: other day same week rpe 7] reps_dist -> swim | n : 48
+  [bg: other day same week rpe 7] swim -> bike | CAND entry carries swapFrom/swapTo : 1604
+  [bg: other day same week rpe 7] swim -> bike | CAND entry rpe and notes empty : 1604
+  [bg: other day same week rpe 7] swim -> bike | CAND journal NO swap row : 1604
+  [bg: other day same week rpe 7] swim -> bike | CAND progress body reads No data yet: false : 1604
+  [bg: other day same week rpe 7] swim -> bike | V235 entry rpe "5" : 1604
+  [bg: other day same week rpe 7] swim -> bike | V235 journal shows RPE 5 : 1604
+  [bg: other day same week rpe 7] swim -> bike | V235 journal shows swap row : 1604
+  [bg: other day same week rpe 7] swim -> bike | n : 1604
+  [bg: other day same week rpe 7] swim -> run | CAND entry carries swapFrom/swapTo : 1604
+  [bg: other day same week rpe 7] swim -> run | CAND entry rpe and notes empty : 1604
+  [bg: other day same week rpe 7] swim -> run | CAND journal NO swap row : 1604
+  [bg: other day same week rpe 7] swim -> run | CAND progress body reads No data yet: false : 1604
+  [bg: other day same week rpe 7] swim -> run | V235 entry rpe "5" : 1604
+  [bg: other day same week rpe 7] swim -> run | V235 journal shows RPE 5 : 1604
+  [bg: other day same week rpe 7] swim -> run | V235 journal shows swap row : 1604
+  [bg: other day same week rpe 7] swim -> run | n : 1604
+  [bg: other day same week rpe 7] time -> bike | CAND entry carries swapFrom/swapTo : 758
+  [bg: other day same week rpe 7] time -> bike | CAND entry rpe and notes empty : 758
+  [bg: other day same week rpe 7] time -> bike | CAND journal NO swap row : 758
+  [bg: other day same week rpe 7] time -> bike | CAND progress body reads No data yet: false : 758
+  [bg: other day same week rpe 7] time -> bike | V235 entry rpe "5" : 758
+  [bg: other day same week rpe 7] time -> bike | V235 journal shows RPE 5 : 758
+  [bg: other day same week rpe 7] time -> bike | V235 journal shows swap row : 758
+  [bg: other day same week rpe 7] time -> bike | n : 758
+  [bg: other day same week rpe 7] time -> swim | CAND entry carries swapFrom/swapTo : 758
+  [bg: other day same week rpe 7] time -> swim | CAND entry rpe and notes empty : 758
+  [bg: other day same week rpe 7] time -> swim | CAND journal NO swap row : 758
+  [bg: other day same week rpe 7] time -> swim | CAND progress body reads No data yet: false : 758
+  [bg: other day same week rpe 7] time -> swim | V235 entry rpe "5" : 758
+  [bg: other day same week rpe 7] time -> swim | V235 journal shows RPE 5 : 758
+  [bg: other day same week rpe 7] time -> swim | V235 journal shows swap row : 758
+  [bg: other day same week rpe 7] time -> swim | n : 758
+  [bg: other day same week rpe 7] xtrain bike -> run | CAND entry carries swapFrom/swapTo : 73
+  [bg: other day same week rpe 7] xtrain bike -> run | CAND entry rpe and notes empty : 73
+  [bg: other day same week rpe 7] xtrain bike -> run | CAND journal NO swap row : 73
+  [bg: other day same week rpe 7] xtrain bike -> run | CAND progress body reads No data yet: false : 73
+  [bg: other day same week rpe 7] xtrain bike -> run | V235 entry rpe "5" : 73
+  [bg: other day same week rpe 7] xtrain bike -> run | V235 journal shows RPE 5 : 73
+  [bg: other day same week rpe 7] xtrain bike -> run | V235 journal shows swap row : 73
+  [bg: other day same week rpe 7] xtrain bike -> run | n : 73
+  [bg: other day same week rpe 7] xtrain bike -> swim | CAND entry carries swapFrom/swapTo : 73
+  [bg: other day same week rpe 7] xtrain bike -> swim | CAND entry rpe and notes empty : 73
+  [bg: other day same week rpe 7] xtrain bike -> swim | CAND journal NO swap row : 73
+  [bg: other day same week rpe 7] xtrain bike -> swim | CAND progress body reads No data yet: false : 73
+  [bg: other day same week rpe 7] xtrain bike -> swim | V235 entry rpe "5" : 73
+  [bg: other day same week rpe 7] xtrain bike -> swim | V235 journal shows RPE 5 : 73
+  [bg: other day same week rpe 7] xtrain bike -> swim | V235 journal shows swap row : 73
+  [bg: other day same week rpe 7] xtrain bike -> swim | n : 73
+  [bg: other day same week rpe 7] xtrain swim -> bike | CAND entry carries swapFrom/swapTo : 64
+  [bg: other day same week rpe 7] xtrain swim -> bike | CAND entry rpe and notes empty : 64
+  [bg: other day same week rpe 7] xtrain swim -> bike | CAND journal NO swap row : 64
+  [bg: other day same week rpe 7] xtrain swim -> bike | CAND progress body reads No data yet: false : 64
+  [bg: other day same week rpe 7] xtrain swim -> bike | V235 entry rpe "5" : 64
+  [bg: other day same week rpe 7] xtrain swim -> bike | V235 journal shows RPE 5 : 64
+  [bg: other day same week rpe 7] xtrain swim -> bike | V235 journal shows swap row : 64
+  [bg: other day same week rpe 7] xtrain swim -> bike | n : 64
+  [bg: other day same week rpe 7] xtrain swim -> run | CAND entry carries swapFrom/swapTo : 64
+  [bg: other day same week rpe 7] xtrain swim -> run | CAND entry rpe and notes empty : 64
+  [bg: other day same week rpe 7] xtrain swim -> run | CAND journal NO swap row : 64
+  [bg: other day same week rpe 7] xtrain swim -> run | CAND progress body reads No data yet: false : 64
+  [bg: other day same week rpe 7] xtrain swim -> run | V235 entry rpe "5" : 64
+  [bg: other day same week rpe 7] xtrain swim -> run | V235 journal shows RPE 5 : 64
+  [bg: other day same week rpe 7] xtrain swim -> run | V235 journal shows swap row : 64
+  [bg: other day same week rpe 7] xtrain swim -> run | n : 64
+  [bg: other day same week rpe 7] xtrain time -> bike | CAND entry carries swapFrom/swapTo : 16
+  [bg: other day same week rpe 7] xtrain time -> bike | CAND entry rpe and notes empty : 16
+  [bg: other day same week rpe 7] xtrain time -> bike | CAND journal NO swap row : 16
+  [bg: other day same week rpe 7] xtrain time -> bike | CAND progress body reads No data yet: false : 16
+  [bg: other day same week rpe 7] xtrain time -> bike | V235 entry rpe "5" : 16
+  [bg: other day same week rpe 7] xtrain time -> bike | V235 journal shows RPE 5 : 16
+  [bg: other day same week rpe 7] xtrain time -> bike | V235 journal shows swap row : 16
+  [bg: other day same week rpe 7] xtrain time -> bike | n : 16
+  [bg: other day same week rpe 7] xtrain time -> swim | CAND entry carries swapFrom/swapTo : 16
+  [bg: other day same week rpe 7] xtrain time -> swim | CAND entry rpe and notes empty : 16
+  [bg: other day same week rpe 7] xtrain time -> swim | CAND journal NO swap row : 16
+  [bg: other day same week rpe 7] xtrain time -> swim | CAND progress body reads No data yet: false : 16
+  [bg: other day same week rpe 7] xtrain time -> swim | V235 entry rpe "5" : 16
+  [bg: other day same week rpe 7] xtrain time -> swim | V235 journal shows RPE 5 : 16
+  [bg: other day same week rpe 7] xtrain time -> swim | V235 journal shows swap row : 16
+  [bg: other day same week rpe 7] xtrain time -> swim | n : 16
+  [swap only] bike -> run | CAND entry carries swapFrom/swapTo : 1397
+  [swap only] bike -> run | CAND entry rpe and notes empty : 1397
+  [swap only] bike -> run | CAND journal NO swap row (no journal section) : 1397
+  [swap only] bike -> run | CAND progress body reads No data yet: true : 1397
+  [swap only] bike -> run | V235 entry rpe "5" : 1397
+  [swap only] bike -> run | V235 journal shows RPE 5 : 1397
+  [swap only] bike -> run | V235 journal shows swap row : 1397
+  [swap only] bike -> run | n : 1397
+  [swap only] bike -> swim | CAND entry carries swapFrom/swapTo : 1397
+  [swap only] bike -> swim | CAND entry rpe and notes empty : 1397
+  [swap only] bike -> swim | CAND journal NO swap row (no journal section) : 1397
+  [swap only] bike -> swim | CAND progress body reads No data yet: true : 1397
+  [swap only] bike -> swim | V235 entry rpe "5" : 1397
+  [swap only] bike -> swim | V235 journal shows RPE 5 : 1397
+  [swap only] bike -> swim | V235 journal shows swap row : 1397
+  [swap only] bike -> swim | n : 1397
+  [swap only] dist -> bike | CAND entry carries swapFrom/swapTo : 555
+  [swap only] dist -> bike | CAND entry rpe and notes empty : 555
+  [swap only] dist -> bike | CAND journal NO swap row (no journal section) : 555
+  [swap only] dist -> bike | CAND progress body reads No data yet: true : 555
+  [swap only] dist -> bike | V235 entry rpe "5" : 555
+  [swap only] dist -> bike | V235 journal shows RPE 5 : 555
+  [swap only] dist -> bike | V235 journal shows swap row : 555
+  [swap only] dist -> bike | n : 555
+  [swap only] dist -> swim | CAND entry carries swapFrom/swapTo : 555
+  [swap only] dist -> swim | CAND entry rpe and notes empty : 555
+  [swap only] dist -> swim | CAND journal NO swap row (no journal section) : 555
+  [swap only] dist -> swim | CAND progress body reads No data yet: true : 555
+  [swap only] dist -> swim | V235 entry rpe "5" : 555
+  [swap only] dist -> swim | V235 journal shows RPE 5 : 555
+  [swap only] dist -> swim | V235 journal shows swap row : 555
+  [swap only] dist -> swim | n : 555
+  [swap only] generic -> bike | CAND entry carries swapFrom/swapTo : 627
+  [swap only] generic -> bike | CAND entry rpe and notes empty : 627
+  [swap only] generic -> bike | CAND journal NO swap row (no journal section) : 627
+  [swap only] generic -> bike | CAND progress body reads No data yet: true : 627
+  [swap only] generic -> bike | V235 entry rpe "5" : 627
+  [swap only] generic -> bike | V235 journal shows RPE 5 : 627
+  [swap only] generic -> bike | V235 journal shows swap row : 627
+  [swap only] generic -> bike | n : 627
+  [swap only] generic -> swim | CAND entry carries swapFrom/swapTo : 627
+  [swap only] generic -> swim | CAND entry rpe and notes empty : 627
+  [swap only] generic -> swim | CAND journal NO swap row (no journal section) : 627
+  [swap only] generic -> swim | CAND progress body reads No data yet: true : 627
+  [swap only] generic -> swim | V235 entry rpe "5" : 627
+  [swap only] generic -> swim | V235 journal shows RPE 5 : 627
+  [swap only] generic -> swim | V235 journal shows swap row : 627
+  [swap only] generic -> swim | n : 627
+  [swap only] reps_dist -> bike | CAND entry carries swapFrom/swapTo : 48
+  [swap only] reps_dist -> bike | CAND entry rpe and notes empty : 48
+  [swap only] reps_dist -> bike | CAND journal NO swap row (no journal section) : 48
+  [swap only] reps_dist -> bike | CAND progress body reads No data yet: true : 48
+  [swap only] reps_dist -> bike | V235 entry rpe "5" : 48
+  [swap only] reps_dist -> bike | V235 journal shows RPE 5 : 48
+  [swap only] reps_dist -> bike | V235 journal shows swap row : 48
+  [swap only] reps_dist -> bike | n : 48
+  [swap only] reps_dist -> swim | CAND entry carries swapFrom/swapTo : 48
+  [swap only] reps_dist -> swim | CAND entry rpe and notes empty : 48
+  [swap only] reps_dist -> swim | CAND journal NO swap row (no journal section) : 48
+  [swap only] reps_dist -> swim | CAND progress body reads No data yet: true : 48
+  [swap only] reps_dist -> swim | V235 entry rpe "5" : 48
+  [swap only] reps_dist -> swim | V235 journal shows RPE 5 : 48
+  [swap only] reps_dist -> swim | V235 journal shows swap row : 48
+  [swap only] reps_dist -> swim | n : 48
+  [swap only] swim -> bike | CAND entry carries swapFrom/swapTo : 1604
+  [swap only] swim -> bike | CAND entry rpe and notes empty : 1604
+  [swap only] swim -> bike | CAND journal NO swap row (no journal section) : 1604
+  [swap only] swim -> bike | CAND progress body reads No data yet: true : 1604
+  [swap only] swim -> bike | V235 entry rpe "5" : 1604
+  [swap only] swim -> bike | V235 journal shows RPE 5 : 1604
+  [swap only] swim -> bike | V235 journal shows swap row : 1604
+  [swap only] swim -> bike | n : 1604
+  [swap only] swim -> run | CAND entry carries swapFrom/swapTo : 1604
+  [swap only] swim -> run | CAND entry rpe and notes empty : 1604
+  [swap only] swim -> run | CAND journal NO swap row (no journal section) : 1604
+  [swap only] swim -> run | CAND progress body reads No data yet: true : 1604
+  [swap only] swim -> run | V235 entry rpe "5" : 1604
+  [swap only] swim -> run | V235 journal shows RPE 5 : 1604
+  [swap only] swim -> run | V235 journal shows swap row : 1604
+  [swap only] swim -> run | n : 1604
+  [swap only] time -> bike | CAND entry carries swapFrom/swapTo : 758
+  [swap only] time -> bike | CAND entry rpe and notes empty : 758
+  [swap only] time -> bike | CAND journal NO swap row (no journal section) : 758
+  [swap only] time -> bike | CAND progress body reads No data yet: true : 758
+  [swap only] time -> bike | V235 entry rpe "5" : 758
+  [swap only] time -> bike | V235 journal shows RPE 5 : 758
+  [swap only] time -> bike | V235 journal shows swap row : 758
+  [swap only] time -> bike | n : 758
+  [swap only] time -> swim | CAND entry carries swapFrom/swapTo : 758
+  [swap only] time -> swim | CAND entry rpe and notes empty : 758
+  [swap only] time -> swim | CAND journal NO swap row (no journal section) : 758
+  [swap only] time -> swim | CAND progress body reads No data yet: true : 758
+  [swap only] time -> swim | V235 entry rpe "5" : 758
+  [swap only] time -> swim | V235 journal shows RPE 5 : 758
+  [swap only] time -> swim | V235 journal shows swap row : 758
+  [swap only] time -> swim | n : 758
+  [swap only] xtrain bike -> run | CAND entry carries swapFrom/swapTo : 73
+  [swap only] xtrain bike -> run | CAND entry rpe and notes empty : 73
+  [swap only] xtrain bike -> run | CAND journal NO swap row (no journal section) : 73
+  [swap only] xtrain bike -> run | CAND progress body reads No data yet: true : 73
+  [swap only] xtrain bike -> run | V235 entry rpe "5" : 73
+  [swap only] xtrain bike -> run | V235 journal shows RPE 5 : 73
+  [swap only] xtrain bike -> run | V235 journal shows swap row : 73
+  [swap only] xtrain bike -> run | n : 73
+  [swap only] xtrain bike -> swim | CAND entry carries swapFrom/swapTo : 73
+  [swap only] xtrain bike -> swim | CAND entry rpe and notes empty : 73
+  [swap only] xtrain bike -> swim | CAND journal NO swap row (no journal section) : 73
+  [swap only] xtrain bike -> swim | CAND progress body reads No data yet: true : 73
+  [swap only] xtrain bike -> swim | V235 entry rpe "5" : 73
+  [swap only] xtrain bike -> swim | V235 journal shows RPE 5 : 73
+  [swap only] xtrain bike -> swim | V235 journal shows swap row : 73
+  [swap only] xtrain bike -> swim | n : 73
+  [swap only] xtrain swim -> bike | CAND entry carries swapFrom/swapTo : 64
+  [swap only] xtrain swim -> bike | CAND entry rpe and notes empty : 64
+  [swap only] xtrain swim -> bike | CAND journal NO swap row (no journal section) : 64
+  [swap only] xtrain swim -> bike | CAND progress body reads No data yet: true : 64
+  [swap only] xtrain swim -> bike | V235 entry rpe "5" : 64
+  [swap only] xtrain swim -> bike | V235 journal shows RPE 5 : 64
+  [swap only] xtrain swim -> bike | V235 journal shows swap row : 64
+  [swap only] xtrain swim -> bike | n : 64
+  [swap only] xtrain swim -> run | CAND entry carries swapFrom/swapTo : 64
+  [swap only] xtrain swim -> run | CAND entry rpe and notes empty : 64
+  [swap only] xtrain swim -> run | CAND journal NO swap row (no journal section) : 64
+  [swap only] xtrain swim -> run | CAND progress body reads No data yet: true : 64
+  [swap only] xtrain swim -> run | V235 entry rpe "5" : 64
+  [swap only] xtrain swim -> run | V235 journal shows RPE 5 : 64
+  [swap only] xtrain swim -> run | V235 journal shows swap row : 64
+  [swap only] xtrain swim -> run | n : 64
+  [swap only] xtrain time -> bike | CAND entry carries swapFrom/swapTo : 16
+  [swap only] xtrain time -> bike | CAND entry rpe and notes empty : 16
+  [swap only] xtrain time -> bike | CAND journal NO swap row (no journal section) : 16
+  [swap only] xtrain time -> bike | CAND progress body reads No data yet: true : 16
+  [swap only] xtrain time -> bike | V235 entry rpe "5" : 16
+  [swap only] xtrain time -> bike | V235 journal shows RPE 5 : 16
+  [swap only] xtrain time -> bike | V235 journal shows swap row : 16
+  [swap only] xtrain time -> bike | n : 16
+  [swap only] xtrain time -> swim | CAND entry carries swapFrom/swapTo : 16
+  [swap only] xtrain time -> swim | CAND entry rpe and notes empty : 16
+  [swap only] xtrain time -> swim | CAND journal NO swap row (no journal section) : 16
+  [swap only] xtrain time -> swim | CAND progress body reads No data yet: true : 16
+  [swap only] xtrain time -> swim | V235 entry rpe "5" : 16
+  [swap only] xtrain time -> swim | V235 journal shows RPE 5 : 16
+  [swap only] xtrain time -> swim | V235 journal shows swap row : 16
+  [swap only] xtrain time -> swim | n : 16
+
+§3x first example per shape -> chip
+  [bg: other day same week rpe 7] bike -> run : bike_century|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"bike","swapTo":"run"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Bike → Run 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] bike -> swim : bike_century|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"bike","swapTo":"swim"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Bike → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set,"
+  [bg: other day same week rpe 7] dist -> bike : HALF_MANNY|fixture W1 sat | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"bike"} journal "Session Journal Week 1 1 entry Mon RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Mon RPE 7 — Very Hard Sat RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] dist -> swim : HALF_MANNY|fixture W1 sat | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"swim"} journal "Session Journal Week 1 1 entry Mon RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Mon RPE 7 — Very Hard Sat RPE 5 — Hard Swapped Run → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] generic -> bike : HALF_MANNY|fixture W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"bike"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] generic -> swim : HALF_MANNY|fixture W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"swim"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Run → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] reps_dist -> bike : run_pace_goal|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"bike"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] reps_dist -> swim : run_pace_goal|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"swim"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Run → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] swim -> bike : swim_100_time|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"swim","swapTo":"bike"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Swim → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set,"
+  [bg: other day same week rpe 7] swim -> run : swim_100_time|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"swim","swapTo":"run"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Swim → Run 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] time -> bike : HALF_MANNY|fixture W1 fri | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"bike"} journal "Session Journal Week 1 1 entry Mon RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Mon RPE 7 — Very Hard Fri RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] time -> swim : HALF_MANNY|fixture W1 fri | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"swim"} journal "Session Journal Week 1 1 entry Mon RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Mon RPE 7 — Very Hard Fri RPE 5 — Hard Swapped Run → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] xtrain bike -> run : injury shoulder swim+bike W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"bike","swapTo":"run"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Bike → Run 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] xtrain bike -> swim : injury shoulder swim+bike W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"bike","swapTo":"swim"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Bike → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set,"
+  [bg: other day same week rpe 7] xtrain swim -> bike : injury knee run+swim W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"swim","swapTo":"bike"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Swim → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set,"
+  [bg: other day same week rpe 7] xtrain swim -> run : injury knee run+swim W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"swim","swapTo":"run"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Swim → Run 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] xtrain time -> bike : injury shoulder run+swim W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"bike"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [bg: other day same week rpe 7] xtrain time -> swim : injury shoulder run+swim W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"swim"} journal "Session Journal Week 1 1 entry Tue RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your traini" | V235 journal "Session Journal Week 1 2 entries Tue RPE 7 — Very Hard Mon RPE 5 — Hard Swapped Run → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, "
+  [swap only] bike -> run : bike_century|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"bike","swapTo":"run"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Bike → Run 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] bike -> swim : bike_century|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"bike","swapTo":"swim"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Bike → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own recor"
+  [swap only] dist -> bike : HALF_MANNY|fixture W1 sat | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"bike"} journal "" | V235 journal "Session Journal Week 1 1 entry Sat RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] dist -> swim : HALF_MANNY|fixture W1 sat | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"swim"} journal "" | V235 journal "Session Journal Week 1 1 entry Sat RPE 5 — Hard Swapped Run → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] generic -> bike : HALF_MANNY|fixture W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"bike"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] generic -> swim : HALF_MANNY|fixture W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"swim"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Run → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] reps_dist -> bike : run_pace_goal|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"bike"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] reps_dist -> swim : run_pace_goal|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"swim"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Run → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] swim -> bike : swim_100_time|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"swim","swapTo":"bike"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Swim → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own recor"
+  [swap only] swim -> run : swim_100_time|balanced|beginner|76308 W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"swim","swapTo":"run"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Swim → Run 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] time -> bike : HALF_MANNY|fixture W1 fri | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"bike"} journal "" | V235 journal "Session Journal Week 1 1 entry Fri RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] time -> swim : HALF_MANNY|fixture W1 fri | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"swim"} journal "" | V235 journal "Session Journal Week 1 1 entry Fri RPE 5 — Hard Swapped Run → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] xtrain bike -> run : injury shoulder swim+bike W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"bike","swapTo":"run"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Bike → Run 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] xtrain bike -> swim : injury shoulder swim+bike W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"bike","swapTo":"swim"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Bike → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own recor"
+  [swap only] xtrain swim -> bike : injury knee run+swim W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"swim","swapTo":"bike"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Swim → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own recor"
+  [swap only] xtrain swim -> run : injury knee run+swim W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"swim","swapTo":"run"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Swim → Run 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] xtrain time -> bike : injury shoulder run+swim W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"bike"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+  [swap only] xtrain time -> swim : injury shoulder run+swim W1 mon | CAND entry {"rpe":"","notes":"","swapFrom":"run","swapTo":"swim"} journal "" | V235 journal "Session Journal Week 1 1 entry Mon RPE 5 — Hard Swapped Run → Swim 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own record"
+
+§3f CAND [swap only] HALF_MANNY W1 SAT "Long Run" chip Bike: entry {"rpe":"","run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","notes":"","swapFrom":"run","swapTo":"bike","week":1}
+     journal section found false text: ""
+     progressBody empty-state: "Log sessions to see progress charts, exercise history, and your training journal here."
+
+§3f V235 [swap only] HALF_MANNY W1 SAT "Long Run" chip Bike: entry {"rpe":"5","run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","notes":"","swapFrom":"run","swapTo":"bike","week":1}
+     journal section found true text: "Session Journal Week 1 1 entry Sat RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training still runs on RPE. Deadlift Squat Bench Weight Reps"
+
+§3f CAND [bg: W1 FRI rpe 7 entry] HALF_MANNY W1 SAT "Long Run" chip Bike: entry {"rpe":"","run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","notes":"","swapFrom":"run","swapTo":"bike","week":1}
+     journal section found true text: "Session Journal Week 1 1 entry Fri RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training still runs on RPE. Deadlift Squat Bench Weight Reps"
+
+§3f V235 [bg: W1 FRI rpe 7 entry] HALF_MANNY W1 SAT "Long Run" chip Bike: entry {"rpe":"5","run_dist":"","run_pace":"","run_mins":"","run_reps":"","run_rep_time":"","bike_mins":"","swim_yards":"","notes":"","swapFrom":"run","swapTo":"bike","week":1}
+     journal section found true text: "Session Journal Week 1 2 entries Fri RPE 7 — Very Hard Sat RPE 5 — Hard Swapped Run → Bike 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training still runs on RPE. Deadlift Squat Bench Weight Reps"
+
+§4 CAND comment-stripped lines with token rpe (log_rpe, _restDraft.rpe, RPE_LABELS removed): 40
+    1342 [snapshotDay] const _restDraft={w:null,day:null,view:'menu',pick:null,type:null,mins:30,dist:'',rpe:5};
+    1401 [_renderRestCardio] const rpeRows=RPE.map(([v,n,d])=>'<div class="rd-chip wide'+(_restDraft.rpe===v?' sel':'')+'" onclick="_rdSet(\'rpe\','+v+')"><b>RPE '+v+(v===9?'+':'')+'</b> \u00b7 '+n+'
+    1432 [applyRestCardio] const {w,day,type,mins,dist,rpe}=_restDraft;
+    1437 [applyRestCardio] e.rest_cardio=true; e.rest_type=type; e.rest_mins=m; e.rpe=rpe;
+    1540 [restMoveCandidates] if(lg&&(lg.rpe||lg.notes||lg.run_dist||lg.bike_mins||lg.swim_yards)) return;
+    6767 [_bwSetsFromDetail] let rpe=/rpe\s*6|light|easy/i.test(detail||'')?'6':/rpe\s*7/i.test(detail||'')?'7':'8';
+    6768 [_bwSetsFromDetail] if(prev&&rpe==='8')rpe='7';
+    6771 [_bwSetsFromDetail] if(exp==='beginner' && wk){ if(wk<=2) rpe='6'; else if(wk<=4 && rpe==='8') rpe='7'; }
+    6772 [_bwSetsFromDetail] return rpe==='8' ? sets+' sets — RPE 8 (stop 2 reps short of failure)'
+    6773 [_bwSetsFromDetail] : sets+' sets — RPE '+rpe+' (leave 3 or more in reserve)';
+    6797 [accessoryGrammarSweep] const rpe=beg&&+w<=2?'6–7':(_prev||(beg&&+w<=4))?'7':'8';
+    6813 [accessoryGrammarSweep] sec.items[ii]={...it, detail:m[1]+'×'+range+(m[4]||'')+' @ RPE '+rpe};
+    8253 [rpeFromWave] if(wv._taper)  return {rpe:'5–6', note:'primer — light and crisp, well short of failure'};
+    8254 [rpeFromWave] if(wv._deload) return {rpe:'6',   note:'recovery — leave 4+ reps in the tank'};
+    8256 [rpeFromWave] let rpe = 6.5 + (p - 0.55) / (0.93 - 0.55) * 3;
+    8257 [rpeFromWave] rpe = Math.max(6.5, Math.min(9.5, Math.round(rpe*2)/2));
+    8258 [rpeFromWave] const rir = Math.max(0, Math.round(10 - rpe));
+    8259 [rpeFromWave] return {rpe, note:'leave ~'+rir+' rep'+(rir===1?'':'s')+' in reserve'};
+    8359 [scheme] if(!(_lo>=_floor[0])) return wv.s+'×'+_floor[0]+'–'+_floor[1]+' — RPE '+r.rpe+' ('+r.note+')'+_amrap;
+    8361 [scheme] return wv.s+'×'+wv.r+' — RPE '+r.rpe+' ('+r.note+')'+_amrap;
+    9625 [_cardioInterference] if(/interval|\bint\b|speed run|sprint|stride|zone 5|400m|800m|max effort|rpe 9/.test(t)) return 1.4;
+    9626 [_cardioInterference] if(/tempo pace|threshold|\bchi\b|fartlek|\bhills?\b|zone 3|zone 4|rpe 8/.test(t))        return 1.05;
+    12163 [renderWeekView] ? '<div class="wk-rest-logged">'+_heroCardio.rest_mins+' min '+(({run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'})[_heroCardio.rest_type]||_heroCardio.rest_type)
+    12227 [liftRpeKeyHTML] return '<div class="rpe-legend"><i>Rate of Perceived Exertion (RPE) is how hard a set should feel \u2014 10 means all-out, nothing left. Each lift tells you how many reps
+    13867 [buildLogHTML] const rpeVal=e.rpe||'';
+    14330 [_rxShort] const rpe=(D.match(/RPE\s*([\d.]+)/i)||[])[1];
+    14332 [_rxShort] if(clean&&rpe) return clean+' at RPE '+rpe;
+    14772 [cardioLive] // data-touched="1" (set by updateRPEDisplay); untouched, the entry's own rpe is carried,
+    14796 [persistLogFields] // V236 (D219): an untouched slider carries the entry's rpe.
+    14798 [persistLogFields] const _rpe=(_rpeEl&&_rpeEl.dataset.touched==='1')?g('log_rpe'):((logs[key]&&logs[key].rpe!=null)?logs[key].rpe:'');
+    14800 [persistLogFields] rpe:_rpe,
+    16707 [easyEffortWeekly] const rpe=+e.rpe; if(!(rpe>=EASY_RPE_LO&&rpe<=EASY_RPE_HI)) return;
+    17586 [renderProgressScreen] weeklyData[w] = {run:0, bike:0, swim:0, bench:null, squat:null, dead:null, rpe:null, sessions:0};
+    17598 [renderProgressScreen] if(entry.rpe && +entry.rpe > 0) {
+    17599 [renderProgressScreen] weeklyData[w].rpe = weeklyData[w].rpe ? (+weeklyData[w].rpe + +entry.rpe)/2 : +entry.rpe;
+    17602 [renderProgressScreen] if(entry.rpe||entry.run_dist||entry.bike_mins||entry.swim_yards||entry.notes) {
+    17705 [renderProgressScreen] const rpeData = weeks.map(w => weeklyData[w].rpe || null);
+    17724 [renderProgressScreen] if(!entry.notes && !entry.rpe) return;
+    17747 [renderProgressScreen] const rpeColor = !entry.rpe ? 'var(--muted)' : +entry.rpe >= 9 ? 'var(--red)' : +entry.rpe >= 7 ? 'var(--lift)' : +entry.rpe >= 5 ? 'var(--accent)' : 'var(--run)';
+    17755 [renderProgressScreen] ${entry.rpe ? `<div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:${rpeColor}">RPE ${entry.rpe} — ${RPE_LABELS[+entry.rpe]||''}</div>` : ''}
+
+§4 V235 comment-stripped lines with token rpe (log_rpe, _restDraft.rpe, RPE_LABELS removed): 37
+    1338 [snapshotDay] const _restDraft={w:null,day:null,view:'menu',pick:null,type:null,mins:30,dist:'',rpe:5};
+    1397 [_renderRestCardio] const rpeRows=RPE.map(([v,n,d])=>'<div class="rd-chip wide'+(_restDraft.rpe===v?' sel':'')+'" onclick="_rdSet(\'rpe\','+v+')"><b>RPE '+v+(v===9?'+':'')+'</b> \u00b7 '+n+'
+    1428 [applyRestCardio] const {w,day,type,mins,dist,rpe}=_restDraft;
+    1433 [applyRestCardio] e.rest_cardio=true; e.rest_type=type; e.rest_mins=m; e.rpe=rpe;
+    1536 [restMoveCandidates] if(lg&&(lg.rpe||lg.notes||lg.run_dist||lg.bike_mins||lg.swim_yards)) return;
+    6763 [_bwSetsFromDetail] let rpe=/rpe\s*6|light|easy/i.test(detail||'')?'6':/rpe\s*7/i.test(detail||'')?'7':'8';
+    6764 [_bwSetsFromDetail] if(prev&&rpe==='8')rpe='7';
+    6767 [_bwSetsFromDetail] if(exp==='beginner' && wk){ if(wk<=2) rpe='6'; else if(wk<=4 && rpe==='8') rpe='7'; }
+    6768 [_bwSetsFromDetail] return rpe==='8' ? sets+' sets — RPE 8 (stop 2 reps short of failure)'
+    6769 [_bwSetsFromDetail] : sets+' sets — RPE '+rpe+' (leave 3 or more in reserve)';
+    6793 [accessoryGrammarSweep] const rpe=beg&&+w<=2?'6–7':(_prev||(beg&&+w<=4))?'7':'8';
+    6809 [accessoryGrammarSweep] sec.items[ii]={...it, detail:m[1]+'×'+range+(m[4]||'')+' @ RPE '+rpe};
+    8249 [rpeFromWave] if(wv._taper)  return {rpe:'5–6', note:'primer — light and crisp, well short of failure'};
+    8250 [rpeFromWave] if(wv._deload) return {rpe:'6',   note:'recovery — leave 4+ reps in the tank'};
+    8252 [rpeFromWave] let rpe = 6.5 + (p - 0.55) / (0.93 - 0.55) * 3;
+    8253 [rpeFromWave] rpe = Math.max(6.5, Math.min(9.5, Math.round(rpe*2)/2));
+    8254 [rpeFromWave] const rir = Math.max(0, Math.round(10 - rpe));
+    8255 [rpeFromWave] return {rpe, note:'leave ~'+rir+' rep'+(rir===1?'':'s')+' in reserve'};
+    8355 [scheme] if(!(_lo>=_floor[0])) return wv.s+'×'+_floor[0]+'–'+_floor[1]+' — RPE '+r.rpe+' ('+r.note+')'+_amrap;
+    8357 [scheme] return wv.s+'×'+wv.r+' — RPE '+r.rpe+' ('+r.note+')'+_amrap;
+    9621 [_cardioInterference] if(/interval|\bint\b|speed run|sprint|stride|zone 5|400m|800m|max effort|rpe 9/.test(t)) return 1.4;
+    9622 [_cardioInterference] if(/tempo pace|threshold|\bchi\b|fartlek|\bhills?\b|zone 3|zone 4|rpe 8/.test(t))        return 1.05;
+    12159 [renderWeekView] ? '<div class="wk-rest-logged">'+_heroCardio.rest_mins+' min '+(({run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'})[_heroCardio.rest_type]||_heroCardio.rest_type)
+    12223 [liftRpeKeyHTML] return '<div class="rpe-legend"><i>Rate of Perceived Exertion (RPE) is how hard a set should feel \u2014 10 means all-out, nothing left. Each lift tells you how many reps
+    13854 [buildLogHTML] const rpeVal=e.rpe||'';
+    14310 [_rxShort] const rpe=(D.match(/RPE\s*([\d.]+)/i)||[])[1];
+    14312 [_rxShort] if(clean&&rpe) return clean+' at RPE '+rpe;
+    14739 [persistLogFields] rpe:g('log_rpe'),
+    16625 [easyEffortWeekly] const rpe=+e.rpe; if(!(rpe>=EASY_RPE_LO&&rpe<=EASY_RPE_HI)) return;
+    17504 [renderProgressScreen] weeklyData[w] = {run:0, bike:0, swim:0, bench:null, squat:null, dead:null, rpe:null, sessions:0};
+    17516 [renderProgressScreen] if(entry.rpe && +entry.rpe > 0) {
+    17517 [renderProgressScreen] weeklyData[w].rpe = weeklyData[w].rpe ? (+weeklyData[w].rpe + +entry.rpe)/2 : +entry.rpe;
+    17520 [renderProgressScreen] if(entry.rpe||entry.run_dist||entry.bike_mins||entry.swim_yards||entry.notes) {
+    17623 [renderProgressScreen] const rpeData = weeks.map(w => weeklyData[w].rpe || null);
+    17642 [renderProgressScreen] if(!entry.notes && !entry.rpe) return;
+    17665 [renderProgressScreen] const rpeColor = !entry.rpe ? 'var(--muted)' : +entry.rpe >= 9 ? 'var(--red)' : +entry.rpe >= 7 ? 'var(--lift)' : +entry.rpe >= 5 ? 'var(--accent)' : 'var(--run)';
+    17673 [renderProgressScreen] ${entry.rpe ? `<div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:${rpeColor}">RPE ${entry.rpe} — ${RPE_LABELS[+entry.rpe]||''}</div>` : ''}
+
+DONE 233.8 s

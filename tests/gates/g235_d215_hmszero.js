@@ -336,9 +336,11 @@ guard('D215-plan', () => {
   const c0 = o.wh ? o.wh._cols[0].items.map(x => x.v) : [];
   // the ruling's claim is row ABSENCE ("column 0 has no '' item"); the exact '0'..'9' list is D215-rows' claim
   handPlan.push(['plan-no-dash-row', c0.length > 0 && c0.indexOf('') < 0, 'hours rows ' + J(c0.slice(0, 11)) + (c0.length > 11 ? ' ... (' + c0.length + ')' : '') + ' (hand: no "" item)']);
-  C.roll(o.wh, [[1, '30']]); let e = C.entry(1, 'fri') || {};
+  // V236 (D218 "Existing rows that flip"): from VER 236 a rolled draft is stored by the Log tap; VER <= 235 unchanged.
+  const logTap = () => { if(VER >= 236){ C.ev('logCardio()'); C.advance(50); } };
+  C.roll(o.wh, [[1, '30']]); logTap(); let e = C.entry(1, 'fri') || {};
   handPlan.push(['minutes-30', e.run_mins === '30.00', 'run_mins ' + J(e.run_mins) + ' (hand "30.00")']);
-  o = openBlank(1, 'fri', 'log_run_mins'); C.roll(o.wh, [[0, '1']]); const mid = (C.entry(1, 'fri') || {}).run_mins;
+  o = openBlank(1, 'fri', 'log_run_mins'); C.roll(o.wh, [[0, '1']]); logTap(); const mid = (C.entry(1, 'fri') || {}).run_mins;
   C.roll(C.wheel('log_run_mins'), [[0, '0']]); e = C.entry(1, 'fri') || {};
   handPlan.push(['hours-0-1-0', mid === '85.00' && e.run_mins === '25.00', 'after hours 1 ' + J(mid) + ', after hours 0 ' + J(e.run_mins) + ' (hand "85.00", "25.00")']);
 });
@@ -404,7 +406,10 @@ guard('D215-clear', () => {
   cj.push(['bike-progress', ch0.drawn && +ch0.v === 47.22 && ch1.drawn && (ch1.v == null || +ch1.v === 0), 'Weekly Cycling Time W1 before ' + J(ch0.v) + ', after ' + J(ch1.v) + ' (hand 47.22, 0 shown as null)']);
   // dose=dist, logged in this open: run_mins "47.22" with the V148 stamps run_dist "3.1" and run_pace "15:14/mi" landed,
   // dist wheel untouched (the reopened case is P-REOPENSTAMP, not this row: D215 Amendment 1)
-  C.use(HALF); C.wipe(); C.open(1, 'sat'); C.roll(C.wheel('log_run_mins'), [[1, '47'], [2, '13']]); e = C.entry(1, 'sat') || {};
+  // V236 (D218 "Existing rows that flip"): from VER 236 the log is written by the Log tap before the clear.
+  C.use(HALF); C.wipe(); C.open(1, 'sat'); C.roll(C.wheel('log_run_mins'), [[1, '47'], [2, '13']]);
+  if(VER >= 236){ C.ev('logCardio()'); C.advance(50); }
+  e = C.entry(1, 'sat') || {};
   const stamped = e.run_mins === TAIL_MINS && e.run_dist === LR_DIST && e.run_pace === LR_PACE;
   C.roll(C.wheel('log_run_mins'), [[1, '0'], [2, '0']]); e = C.entry(1, 'sat') || {};
   cj.push(['dist-same-open', stamped && e.run_mins === '' && e.run_dist === '' && e.run_pace === '', 'stamped ' + stamped + '; after 0:00:00 run_mins ' + J(e.run_mins) + ', run_dist ' + J(e.run_dist) + ', run_pace ' + J(e.run_pace) + ' (hand "", "", "")']);
