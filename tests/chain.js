@@ -6,6 +6,7 @@
 // line prints VERSION BUMP instead, proved by gate.sh step 0); the gate list (map reach of
 // each changed function, the gates the map cannot see, new or edited gates vs --ref, boot), one per
 // line with its reasons; and the mechanical verdict. Exit 0 on a printed list, 2 on bad input.
+// Verdict: tests/harness.js differing from --ref by era rows only (era_bump.py --era-only-diff lists it era-only) is not cross-cutting (Mario, Post-V235); edited, or any tests/gate.sh diff, still is.
 //
 // Function extents come from V8, not from a hand tokenizer: the inline script (harness
 // extractInlineJS) is wrapped in a function whose first statement returns every column-0
@@ -207,8 +208,10 @@ for (const g of gateFiles) {
 const eb = cp.spawnSync('python3', [path.join(__dirname, 'era_bump.py'), '--era-only-diff', ref], { cwd: ROOT, encoding: 'utf8' });
 if (eb.status !== 0) die('era_bump.py --era-only-diff ' + ref + ' failed: ' + ((eb.stderr || '') + (eb.stdout || '')).trim());
 const eraOnly = [], otherEdits = [];
+let harnessEraOnly = false;   // Mario, Post-V235: era rows era_bump.py wrote do not make tests/harness.js cross-cutting
 for (const ln of eb.stdout.split('\n')) {
   const x = /^(edited|era-only)\s+(\S+)\s+\((.*)\)\s*$/.exec(ln); if (!x) continue;
+  if (x[2] === 'tests/harness.js') { harnessEraOnly = x[1] === 'era-only'; continue; }
   const gm = /^tests\/gates\/([^/]+)$/.exec(x[2]); if (!gm) continue;
   if (!gm[1].endsWith('.js')) { if (x[1] === 'edited') otherEdits.push(gm[1]); continue; }
   if (x[1] === 'era-only') { eraOnly.push(gm[1]); continue; }
@@ -226,7 +229,10 @@ for (const g of order) if (!missing.includes(g)) console.log('GATE ' + g + '  ['
 const cross = [];
 for (const [k, n] of changed) { const r = (reachOf[n] || []).length; if (r > THRESHOLD) cross.push(n + ' executed by ' + r + ' gates (> ' + THRESHOLD + ')'); }
 const infra = git(['diff', '--name-only', ref, '--', 'tests/harness.js', 'tests/gate.sh']).stdout.split('\n').filter(Boolean);
-for (const f of infra) cross.push(f + ' differs from ' + ref);
+for (const f of infra) {
+  if (f === 'tests/harness.js' && harnessEraOnly) { console.log('tests/harness.js differs from ' + ref + ' by era rows only (era_bump.py --era-only-diff): not cross-cutting'); continue; }
+  cross.push(f + ' differs from ' + ref);
+}
 if (outside.length) cross.push(outside.length + ' OUTSIDE A FUNCTION hunk(s)');
 if (cross.length) console.log('VERDICT CROSS-CUTTING: ' + cross.join('; '));
 else console.log('VERDICT LOCAL (mechanical); stored format? program output? — the session confirms before proof');

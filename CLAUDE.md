@@ -63,8 +63,9 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
   clear minority, ends the exception, and from then each such change asks Mario before proof.
 - **Classify before proof.** Tell Mario whether the change is LOCAL or CROSS-CUTTING, and why. Cross-cutting is any of:
   a changed function that more than 20 gates execute in the reach map; a stored format (an `ia_` key, `cfg`,
-  `prog.weeks`); program output (any digest or era row moves); `tests/harness.js` or `tests/gate.sh`. Everything else
-  is local. When unsure, it is cross-cutting.
+  `prog.weeks`); program output (any digest or era row moves); `tests/harness.js` or `tests/gate.sh`. Era rows that
+  `tests/era_bump.py` wrote do not make `tests/harness.js` cross-cutting; `tests/chain.js` reads them from
+  `era_bump.py --era-only-diff` (Mario, Post-V235). Everything else is local. When unsure, it is cross-cutting.
 - **Dependency chain (local).** Every gate the reach map says executes a changed function, every gate the map cannot
   see, every new or edited gate, and boot. `tests/chain.js <base> <cand>` prints the list.
 - **Draft run, then final run.** Gatekeeper proves the draft once, before builder's last slice: cross-cutting gets the
@@ -92,6 +93,10 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
   or changes a row shows as a manifest hunk, and a ruling that names a new row with no manifest hunk is red. A manifest
   hunk that no ruling explains is red in both directions, rows added as well as rows removed. Every new
   gate, and every gate converted by hand, prints its rows through the shared status helper `tests/status.js`.
+  The main session writes the ruling's new rows into the licence file `tests/measure/v<N>_rulings/v<N>_row_ruled.txt`
+  (`gate.sh` reads it as `ROW_RULED`) before the draft run, and gatekeeper's brief carries it. A row the ruling's list
+  missed is added to the ruling (its saved file and the licence file) before the final run, never licensed on the
+  fly (Mario, Post-V235).
 - **Era rows.** A table the ruling does not move gets its reference row from `tests/era_bump.py <N>`, never by hand. A
   table the ruling moves is written by builder from coach's printed digest (standing ruling 5).
 - **Sabotage.** Every build: anchor-check every mutation in every spec (no gate runs), then trip-run the build's own
@@ -230,7 +235,7 @@ Every brief to either carries the per-build items, then the standing lines for t
   diff classes the ruling licenses.
 - **Gatekeeper, per build:** every ruling in the build, verbatim; the version Mario named; the baseline path; the edit
   scripts, gates and sabotage specs; the diff classes builder declared; whether `HALF_MANNY` may move and to what digest;
-  the Proof scope section pasted, with the LOCAL or CROSS-CUTTING call and its gate list, draft run or final run, and
+  the licence file for new gate rows (`v<N>_row_ruled.txt`, written before the draft run); the Proof scope section pasted, with the LOCAL or CROSS-CUTTING call and its gate list, draft run or final run, and
   whether the full sweep is due.
 - **Both, standing:** gate runs are `bash -c 'set -eo pipefail; …'`, no `<(...)`; every gate prints `PASS n FAIL n` and a
   missing summary is a crash; oracles never ask the engine; strip comments before any token-gone scan; pin `cfg.seed`,
