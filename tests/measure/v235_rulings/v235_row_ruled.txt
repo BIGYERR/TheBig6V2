@@ -1,0 +1,12 @@
+# ROW_RULED for V235 (D215, D216, D217, D215 Amendment 1). Passed to gate.sh step 4b as ROW_RULED=<this file>.
+# Written by the main session from tests/measure/v235_rulings/v235_ruling_d215_d217.md (Mario concurred 2026-10-07).
++ g235_d215_hmszero.js D215-zero  # D215 P-HMSZERO (Mario concurred 2026-10-07): new gate row, Gate rows section
++ g235_d215_hmszero.js D215-format  # D215 P-HMSZERO (Mario concurred 2026-10-07): new gate row, Gate rows section
++ g235_d215_hmszero.js D215-rows  # D215 P-HMSZERO (Mario concurred 2026-10-07): new gate row, Gate rows section
++ g235_d215_hmszero.js D215-open  # D215 P-HMSZERO (Mario concurred 2026-10-07): new gate row, Gate rows section
++ g235_d215_hmszero.js D215-tail  # D215 P-HMSZERO (Mario concurred 2026-10-07): new gate row, Gate rows section
++ g235_d215_hmszero.js D215-plan  # D215 P-HMSZERO (Mario concurred 2026-10-07): new gate row, Gate rows section
++ g235_d215_hmszero.js D215-clear  # D215 P-HMSZERO, restated by D215 Amendment 1 (within-one-open clear): new gate row
++ g235_d215_hmszero.js D216-wrap  # D216 (hours does not wrap): new gate row, Gate rows section
++ g235_d215_hmszero.js D217-digest  # D217 (scope: hms only, no program output, Mario concurred 2026-10-07): new gate row
++ g235_d215_hmszero.js D217-others  # D217 (scope: hms only, no program output, Mario concurred 2026-10-07): new gate row

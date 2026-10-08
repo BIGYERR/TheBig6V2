@@ -1,0 +1,112 @@
+v235 measure P-HMSZERO branch | /Users/CanasBangin/Desktop/TheBig6V2/index.html ia-version 234
+
+§1 KINDS WITH A DASH (nil) IN COLUMN 0
+  dist  fmt dec3   cols 3 col0 nil=true col0 0..99
+  pace  fmt clock  cols 2 col0 nil=true col0 4..17
+  rept  fmt clock  cols 2 col0 nil=true col0 0..9
+  hms   fmt hms    cols 3 col0 nil=true col0 0..9
+  call sites (iaWheelHTML in rendered code, plan arg = 5th):
+    :13778 kind hms -> log_run_mins PLAN dose.mins
+    :13780 kind dist -> log_run_dist no plan (opens on dash when unstored)
+    :13784 kind dist -> log_run_dist PLAN dose.mi
+    :13786 kind hms -> log_run_mins no plan (opens on dash when unstored)
+    :13790 kind rept -> log_run_rep_time no plan (opens on dash when unstored)
+    :13795 kind dist -> log_run_dist no plan (opens on dash when unstored)
+    :13804 kind dist -> log_run_dist no plan (opens on dash when unstored)
+    :13805 kind pace -> log_run_pace no plan (opens on dash when unstored)
+    :13812 kind hms -> log_bike_mins no plan (opens on dash when unstored)
+
+§2 _iawFormat (what the hidden input receives) for col0 in {dash,0,1} x MM:SS — oracle = hand (dash as 0 h)
+  hms [—:45:00] -> ""   hand 45.00   <- LOST
+  hms [—:30:15] -> ""   hand 30.25   <- LOST
+  hms [—:00:30] -> ""   hand 0.50   <- LOST
+  hms [—:59:59] -> ""   hand 59.98   <- LOST
+  hms [—:01:00] -> ""   hand 1.00   <- LOST
+  hms [—:00:00] -> ""   hand 0.00   <- LOST
+  hms [0:45:00] -> "45.00"   hand 45.00
+  hms [0:30:15] -> "30.25"   hand 30.25
+  hms [0:00:30] -> "0.50"   hand 0.50
+  hms [0:59:59] -> "59.98"   hand 59.98
+  hms [0:01:00] -> "1.00"   hand 1.00
+  hms [0:00:00] -> "0.00"   hand 0.00
+  hms [1:45:00] -> "105.00"   hand 105.00
+  hms [1:30:15] -> "90.25"   hand 90.25
+  hms [1:00:30] -> "60.50"   hand 60.50
+  hms [1:59:59] -> "119.98"   hand 119.98
+  hms [1:01:00] -> "61.00"   hand 61.00
+  hms [1:00:00] -> "60.00"   hand 60.00
+  hms: 6/18 faces differ from hand
+  dist ["","8","6"] -> ""   hand 0.86   <- differs
+  dist ["0","8","6"] -> "0.86"   hand 0.86
+  dist ["3","1","0"] -> "3.10"   hand 3.10
+  dist ["","1","0"] -> ""   hand 0.10   <- differs
+  rept ["","55"] -> ""   hand 0:55   <- differs
+  rept ["0","55"] -> "0:55"   hand 0:55
+  pace ["","30"] -> ""   hand (no 0-minute row; min is 4)   <- differs
+  pace ["9","30"] -> "9:30"   hand 9:30
+  the read-back: _iawParse of each hms commit -> face
+    parse("45.00") = ["0","45","0"]
+    parse("0.50") = ["0","0","30"]
+    parse("") = ["","",""]
+    parse("0") = ["0","0","0"]
+    parse("60") = ["1","0","0"]
+
+§3 DEVICE DRIVE: 89 programs, 3172 run/bike days opened, 12610 wheel x scenario drives, 0 errors, 70.6 s
+  shape | open face | scenario : drives, LOST after roll settles, LOST after Done tap, 0 input events, no freeze snapshot  [example]
+  bike/null/hms:bike_mins | opens-dash | tail : n 132, lost-settle 132, lost-done 132, input0 132, nofreeze 132  [bike_century|balanced|beginner|76308 W1 tue "Interval (INT)" open "" left "" hand "47.22" stored undefined / after Done "" status "complete"]
+  bike/null/hms:bike_mins | opens-dash | zero-then-tail : n 132, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [bike_century|balanced|beginner|76308 W1 tue "Interval (INT)" open "" left "0" hand "47.22" stored "47.22" / after Done "47.22" status "complete"]
+  bike/reps_time/hms:bike_mins | opens-dash | tail : n 204, lost-settle 204, lost-done 204, input0 204, nofreeze 204  [bike_century|balanced|beginner|76308 W9 fri "Continuous High Intensity (CHI)" open "" left "" hand "47.22" stored undefined / after Done "" status "complete"]
+  bike/reps_time/hms:bike_mins | opens-dash | zero-then-tail : n 204, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [bike_century|balanced|beginner|76308 W9 fri "Continuous High Intensity (CHI)" open "" left "0" hand "47.22" stored "47.22" / after Done "47.22" status "complete"]
+  bike/time/hms:bike_mins | opens-dash | tail : n 908, lost-settle 908, lost-done 908, input0 908, nofreeze 908  [bike_century|balanced|beginner|76308 W1 mon "Long Slow Distance (LSD)" open "" left "" hand "47.22" stored undefined / after Done "" status "complete"]
+  bike/time/hms:bike_mins | opens-dash | zero-then-tail : n 908, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [bike_century|balanced|beginner|76308 W1 mon "Long Slow Distance (LSD)" open "" left "0" hand "47.22" stored "47.22" / after Done "47.22" status "complete"]
+  run/dist/dist:run_dist | opens-plan | away-and-back-to-plan : n 511, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [HALF_MANNY W1 sat "Long Run" open "3" left "3" hand "3.10" stored "3.10" / after Done "3.10" status "complete"]
+  run/dist/dist:run_dist | opens-plan | dash-then-tail : n 511, lost-settle 511, lost-done 511, input0 511, nofreeze 511  [HALF_MANNY W1 sat "Long Run" open "3" left "" hand "0.86" stored undefined / after Done "" status "complete"]
+  run/dist/dist:run_dist | opens-plan | tail : n 511, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [HALF_MANNY W1 sat "Long Run" open "3" left "3" hand "3.86" stored "3.86" / after Done "3.86" status "complete"]
+  run/dist/dist:run_dist | opens-plan | zero-then-tail : n 511, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [HALF_MANNY W1 sat "Long Run" open "3" left "0" hand "0.86" stored "0.86" / after Done "0.86" status "complete"]
+  run/dist/hms:run_mins | opens-dash | tail : n 511, lost-settle 511, lost-done 511, input0 511, nofreeze 511  [HALF_MANNY W1 sat "Long Run" open "" left "" hand "47.22" stored undefined / after Done "" status "complete"]
+  run/dist/hms:run_mins | opens-dash | zero-then-tail : n 511, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [HALF_MANNY W1 sat "Long Run" open "" left "0" hand "47.22" stored "47.22" / after Done "47.22" status "complete"]
+  run/null/dist:run_dist | opens-dash | tail : n 627, lost-settle 627, lost-done 627, input0 627, nofreeze 627  [HALF_MANNY W1 mon "Speed Run — Intervals" open "" left "" hand "0.86" stored undefined / after Done "" status "complete"]
+  run/null/dist:run_dist | opens-dash | zero-then-tail : n 627, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [HALF_MANNY W1 mon "Speed Run — Intervals" open "" left "0" hand "0.86" stored "0.86" / after Done "0.86" status "complete"]
+  run/null/pace:run_pace | opens-dash | tail : n 627, lost-settle 0, lost-done 0, no-intent 627, input0 627, nofreeze 627  [undefined Wundefined undefined "undefined" open undefined left undefined hand undefined stored undefined / after Done undefined status undefined]
+  run/null/pace:run_pace | opens-dash | zero-then-tail : n 627, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [HALF_MANNY W1 mon "Speed Run — Intervals" open "" left "4" hand "4:30" stored "4:30" / after Done "4:30" status "complete"]
+  run/reps_dist/rept:run_rep_time | opens-dash | tail : n 48, lost-settle 48, lost-done 48, input0 48, nofreeze 48  [run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" open "" left "" hand "0:55" stored undefined / after Done "" status "complete"]
+  run/reps_dist/rept:run_rep_time | opens-dash | zero-then-tail : n 48, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [run_pace_goal|balanced|beginner|76308 W1 mon "Short Interval (SI)" open "" left "0" hand "0:55" stored "0:55" / after Done "0:55" status "complete"]
+  run/time/dist:run_dist | opens-dash | tail : n 742, lost-settle 742, lost-done 742, input0 742, nofreeze 742  [HALF_MANNY W1 fri "Recovery Run" open "" left "" hand "0.86" stored undefined / after Done "" status "complete"]
+  run/time/dist:run_dist | opens-dash | zero-then-tail : n 742, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [HALF_MANNY W1 fri "Recovery Run" open "" left "0" hand "0.86" stored "0.86" / after Done "0.86" status "complete"]
+  run/time/hms:run_mins | opens-plan | away-and-back-to-plan : n 742, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [HALF_MANNY W1 fri "Recovery Run" open "0" left "0" hand "25.00" stored "25.00" / after Done "25.00" status "complete"]
+  run/time/hms:run_mins | opens-plan | dash-then-tail : n 742, lost-settle 742, lost-done 742, input0 742, nofreeze 742  [HALF_MANNY W1 fri "Recovery Run" open "0" left "" hand "47.22" stored undefined / after Done "" status "complete"]
+  run/time/hms:run_mins | opens-plan | tail : n 742, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [HALF_MANNY W1 fri "Recovery Run" open "0" left "0" hand "47.22" stored "47.22" / after Done "47.22" status "complete"]
+  run/time/hms:run_mins | opens-plan | zero-then-tail : n 742, lost-settle 0, lost-done 0, input0 0, nofreeze 0  [HALF_MANNY W1 fri "Recovery Run" open "0" left "0" hand "47.22" stored "47.22" / after Done "47.22" status "complete"]
+
+  HEADLINE hms wheels, tail-only roll: opens-dash 1755/1755 lost after Done; opens-plan 0/742 lost
+  hms opens-plan then hours rolled to dash, then tail: 742/742 lost after Done
+  hms control (hours set to 0 first): 0/2497 lost after Done
+  distinct shape x open-face states driven: 10 -> bike/null/hms:bike_mins|opens-dash, bike/reps_time/hms:bike_mins|opens-dash, bike/time/hms:bike_mins|opens-dash, run/dist/dist:run_dist|opens-plan, run/dist/hms:run_mins|opens-dash, run/null/dist:run_dist|opens-dash, run/null/pace:run_pace|opens-dash, run/reps_dist/rept:run_rep_time|opens-dash, run/time/dist:run_dist|opens-dash, run/time/hms:run_mins|opens-plan
+  segment hms opens-dash tail lost/total by goal: HALF_MANNY 15/15, bike_century 528/528, bike_50 276/276, bike_base 152/152, bike_ftp 152/152, bike_cals 136/136, run_5k 48/48, run_10k 72/72, run_half 120/120, run_marathon 160/160, run_pace_goal 96/96
+  by week: W1 161/161, W2 153/153, W3 161/161, W4 145/145, W5 145/145, W6 153/153, W7 137/137, W8 129/129, W9 97/97, W10 77/77, W11 77/77, W13 62/62, W14 54/54, W12 68/68, W15 24/24, W16 24/24, W17 24/24, W18 32/32, W19 16/16, W20 16/16
+  run dist-dose tail: entries with run_dist empty 511/511, run_pace empty 511/511, status complete 511/511
+  run dist-dose zero-then-tail: entries with run_dist empty 0/511, run_pace empty 0/511, status complete 511/511
+
+§4 CREDIT READERS on the first host of each key (entry before Done; _hasLog nudge on reopen; Progress chart value for that week)
+  bike/null/hms:bike_mins opens-dash tail [bike_century|balanced|beginner|76308 W1 tue]: entry NONE (no ia_logs_ key) | nudge false | 
+  bike/null/hms:bike_mins opens-dash zero-then-tail [bike_century|balanced|beginner|76308 W1 tue]: entry {"bike_mins":"47.22","run_mins":"","run_dist":"","run_pace":"","rpe":"5"} | nudge true | Weekly Cycling Time=47.22; Average Session RPE=5
+  bike/reps_time/hms:bike_mins opens-dash tail [bike_century|balanced|beginner|76308 W9 fri]: entry NONE (no ia_logs_ key) | nudge false | 
+  bike/reps_time/hms:bike_mins opens-dash zero-then-tail [bike_century|balanced|beginner|76308 W9 fri]: entry {"bike_mins":"47.22","run_mins":"","run_dist":"","run_pace":"","rpe":"5"} | nudge true | Weekly Cycling Time=47.22; Average Session RPE=5
+  bike/time/hms:bike_mins opens-dash tail [bike_century|balanced|beginner|76308 W1 mon]: entry NONE (no ia_logs_ key) | nudge false | 
+  bike/time/hms:bike_mins opens-dash zero-then-tail [bike_century|balanced|beginner|76308 W1 mon]: entry {"bike_mins":"47.22","run_mins":"","run_dist":"","run_pace":"","rpe":"5"} | nudge true | Weekly Cycling Time=47.22; Average Session RPE=5
+  run/dist/hms:run_mins opens-dash tail [HALF_MANNY W1 sat]: entry NONE (no ia_logs_ key) | nudge false | 
+  run/dist/hms:run_mins opens-dash zero-then-tail [HALF_MANNY W1 sat]: entry {"bike_mins":"","run_mins":"47.22","run_dist":"3.1","run_pace":"15:14/mi","rpe":"5"} | nudge true | Weekly Running Mileage=3.1; Average Session RPE=5
+  run/time/hms:run_mins opens-plan away-and-back-to-plan [HALF_MANNY W1 fri]: entry {"bike_mins":"","run_mins":"25.00","run_dist":"","run_pace":"","rpe":"5"} | nudge true | Weekly Running Mileage=null; Average Session RPE=5
+  run/time/hms:run_mins opens-plan dash-then-tail [HALF_MANNY W1 fri]: entry NONE (no ia_logs_ key) | nudge false | 
+  run/time/hms:run_mins opens-plan tail [HALF_MANNY W1 fri]: entry {"bike_mins":"","run_mins":"47.22","run_dist":"","run_pace":"","rpe":"5"} | nudge true | Weekly Running Mileage=null; Average Session RPE=5
+  run/time/hms:run_mins opens-plan zero-then-tail [HALF_MANNY W1 fri]: entry {"bike_mins":"","run_mins":"47.22","run_dist":"","run_pace":"","rpe":"5"} | nudge true | Weekly Running Mileage=null; Average Session RPE=5
+
+§5 READERS of the hidden ids / stored fields (comment-stripped, file:line)
+  log_run_mins (7): 13520, 13778, 13786, 14168, 14726, 14739, 14798
+  log_bike_mins (4): 13812, 14168, 14727, 14798
+  run_mins (10): 13049, 13422, 13520, 13778, 13786, 14160, 14168, 14726, 14739, 14798
+  bike_mins (10): 1438, 1536, 13422, 13812, 14160, 14168, 14727, 14798, 17499, 17505
+  _iawFormat( (3): 13632, 13699, 13752
+  _iawSeedFace (2): 13704, 13752
+
+runtime 70.6 s | drives 12610 | errors 0

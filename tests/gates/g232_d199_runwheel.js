@@ -17,6 +17,10 @@
 // ORACLES. Nothing below asks the engine what the answer should be.
 //   HMS_COLS     D199's spec as a hand table: hours ['', '0'..'9'] no wrap; minutes and seconds '0'..'59' five times,
 //                wrapping, faces '00'..'59'; cap `Time`; three columns (class iaw-f3).
+//                V235 (D215, D216; tests/measure/v235_rulings/v235_ruling_d215_d217.md, "Existing rows this ruling
+//                flips"): from VER 235 the hours column is HMS_COLS_V235's ['0'..'9'], 10 rows, no dash, still no wrap;
+//                VER <= 234 keeps HMS_COLS. HMS_PARSE_V235: blank, -1 and abc seed 0:00:00 from 235, and the zero face
+//                0:00:00 formats to '' (the one face D200's round trip excepts; it parses back to 0:00:00).
 //   SECONDS      D200: every T in 0..35999 s. h = T div 3600, mm = (T mod 3600) div 60, ss = T mod 60; the emitted string
 //                is hundredths n = round(5T/3) = (10T + 3) div 6 (no ties: 10T is even, 6k + 3 odd), printed n div 100 '.'
 //                two digits of n mod 100. Integer arithmetic only.
@@ -50,14 +54,18 @@
 //   and the baseline 231 (argv[3] when it reads 231, else git 5d9354b), else SKIP with the reason, never PASS.
 //
 // ROWS
-//   D199-spec   the hms wheel's rendered rows, wrap flags, faces, cap and column class equal HMS_COLS.
-//   D200-rt     36,000 seconds format to the integer oracle and parse back; D200 examples; stored-value table.
+//   D199-spec   the hms wheel's rendered rows, wrap flags, faces, cap and column class equal HMS_COLS (VER <= 234) or
+//               HMS_COLS_V235 (VER >= 235).
+//   D200-rt     36,000 seconds format to the integer oracle and parse back; D200 examples; stored-value table. From 235
+//               T = 0 formats to '' and parses back to 0:00:00, and the stored table is HMS_PARSE_V235 (D215).
 //   D203        the dist (dec3) parse table.
 //   D199/D201/D204-forms  hand-built time, dist, reps_time and every lattice form: 0 number boxes for log_run_mins /
 //               log_run_dist, hidden inputs present, wheel kinds and order, data-plan only on the fixed wheel and equal to
 //               dose.mins / dose.mi, every stacked wrap carries iaw-solo.
 //   D202-open   opening with stored '' writes nothing on every form (0 input events, ia_logs_ byte-unchanged); fixed face =
-//               FACES, free wheel on the dash; a legacy table opens writing nothing and seeds the hand faces.
+//               FACES, free wheel on the dash (VER <= 234; from 235 the free time wheel on the dist form opens on 0:00:00
+//               and the free miles wheel on the time form stays on the dash, D215); a legacy table opens writing nothing
+//               and seeds the hand faces.
 //   D202-move   a moved fixed wheel commits two-decimal minutes / miles and persistLogFields stores them; away and back to
 //               the seed face commits; a settle on the seed face alone writes nothing; doseDerived reads the stored value.
 //   D206-copy   the label and sub-label strings verbatim, `Hours first` absent, no mid-sentence dash in them.
@@ -88,12 +96,20 @@ const HMS_COLS = [
   { rows:rep5(range(0, 59)), wrap:'1', len:'60', faces:rep5(range(0, 59).map(v => v.padStart(2, '0'))) },
   { rows:rep5(range(0, 59)), wrap:'1', len:'60', faces:rep5(range(0, 59).map(v => v.padStart(2, '0'))) },
 ];
+// V235 (D215, D216): the hours column has no dash row and still does not wrap. Chosen at use (rowSpec), so the claim splits
+// by range: VER <= 234 HMS_COLS, VER >= 235 this table. Minutes and seconds are HMS_COLS' own entries, unchanged.
+const HMS_COLS_V235 = [{ rows:range(0, 9), wrap:'', len:'10', faces:range(0, 9) }, HMS_COLS[1], HMS_COLS[2]];
 const FMT_EX = [[['0', '7', '30'], '7.50'], [['0', '15', '20'], '15.33'], [['0', '30', '0'], '30.00'], [['', '47', '23'], '']];
 const HMS_PARSE = [['15.333', ['0', '15', '20']], ['100', ['1', '40', '0']], ['7.5', ['0', '7', '30']], ['', ['', '', '']], ['-1', ['', '', '']], ['abc', ['', '', '']]];
+// V235 (D215): blank and malformed seed 0:00:00 (no dash row to land on); the numeric rows are HMS_PARSE's, unchanged.
+const HMS_PARSE_V235 = [['15.333', ['0', '15', '20']], ['100', ['1', '40', '0']], ['7.5', ['0', '7', '30']], ['', ['0', '0', '0']], ['-1', ['0', '0', '0']], ['abc', ['0', '0', '0']]];
 const DEC3 = [['.86', ['0', '8', '6']], ['abc', ['', '', '']], ['.', ['', '', '']], ['-1', ['', '', '']], ['3.456', ['3', '4', '5']], ['100', ['99', '0', '0']]];
 const hmsFace = m => { const t = Math.round(m * 60); return Math.floor(t / 3600) + ':' + String(Math.floor((t % 3600) / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0'); };
 const miFace = mi => { const hd = Math.floor(Math.round(mi * 1000) / 10); return Math.floor(hd / 100) + '.' + String(hd % 100).padStart(2, '0'); };
 const DASH_HMS = DASH + ':00:00', DASH_MI = DASH + '.00';
+// V235 (D215): the free time wheel's blank face from 235 is zero, a stopwatch not started. A function, read at use: VER is set
+// after load. The free miles wheel keeps DASH_MI on every version (D217).
+const ZERO_HMS = '0:00:00', FREE_HMS = () => VER >= 235 ? ZERO_HMS : DASH_HMS;
 const pace = (mins, mi) => { const s = Math.round(mins * 60 / mi); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') + '/mi'; };
 const COPY = {
   time:      { label:'Log the run', subs:['Shows the plan. Move it to match the watch.', 'Off the watch.'], caps:['Time', 'Miles'] },
@@ -107,9 +123,10 @@ const FORM = {   // [hidden id, kind] in render order; the first is fixed (carri
 };
 const DOSES = { time:{ k:'time', mins:15, tgt:531, key:'chi' }, dist:{ k:'dist', mi:8, tgt:570 }, reps_time:{ k:'reps_time', reps:6, mins:3, tgt:480 } };
 const LEGACY = [   // [form, stored entry, hand faces by hidden id]
-  ['dist', { run_dist:'3.456' }, { log_run_dist:'3.45', log_run_mins:DASH_HMS }],
-  ['dist', { run_dist:'.86' }, { log_run_dist:'0.86', log_run_mins:DASH_HMS }],
-  ['dist', { run_dist:'100' }, { log_run_dist:'99.00', log_run_mins:DASH_HMS }],
+  // V235 (D215): the dist form's free time wheel is on the dash through 234 and on 0:00:00 from 235 (a getter, read at use).
+  ['dist', { run_dist:'3.456' }, { log_run_dist:'3.45', get log_run_mins(){ return FREE_HMS(); } }],
+  ['dist', { run_dist:'.86' }, { log_run_dist:'0.86', get log_run_mins(){ return FREE_HMS(); } }],
+  ['dist', { run_dist:'100' }, { log_run_dist:'99.00', get log_run_mins(){ return FREE_HMS(); } }],
   ['time', { run_mins:'100' }, { log_run_mins:'1:40:00', log_run_dist:DASH_MI }],
   ['time', { run_mins:'15.333' }, { log_run_mins:'0:15:20', log_run_dist:DASH_MI }],
   // V233 D208 re-rules D200's shipped hours-only clamp to a whole-face peg (tests/measure/v233_rulings/v233_ruling_d207_d211.md); a getter, so VER is read at use.
@@ -136,11 +153,11 @@ const ok = (l, c, g) => { if(c){ pass++; P('PASS ' + l + (g === undefined ? '' :
 const done = () => { P('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s'); P('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
 const J = JSON.stringify;
 const R = {
-  'D199-spec': 'row D199-spec (D199, VER >= 232) the hms wheel renders hours [dash, 0..9] no wrap : minutes [00..59] wrap : seconds [00..59] wrap, cap Time, class iaw-f3',
-  'D200-rt': 'row D200-rt (D200, VER >= 232) 0:00:00..9:59:59 each format to hundredths round(5T/3) and parse back to the same h/mm/ss; 7:30 -> 7.50, 15:20 -> 15.33, 0:30:00 -> 30.00; stored 15.333 / 100 / 7.5 seed 0:15:20 / 1:40:00 / 0:07:30, blank / -1 / abc on the dash',
+  'D199-spec': 'row D199-spec (D199, VER >= 232) the hms wheel renders hours [dash, 0..9] (VER <= 234) or [0..9] (VER >= 235, D215) no wrap : minutes [00..59] wrap : seconds [00..59] wrap, cap Time, class iaw-f3',
+  'D200-rt': 'row D200-rt (D200, VER >= 232) 0:00:00..9:59:59 each format to hundredths round(5T/3) and parse back to the same h/mm/ss; 7:30 -> 7.50, 15:20 -> 15.33, 0:30:00 -> 30.00; stored 15.333 / 100 / 7.5 seed 0:15:20 / 1:40:00 / 0:07:30, blank / -1 / abc on the dash (VER <= 234) or on 0:00:00 with the zero face stored as blank (VER >= 235, D215)',
   'D203': 'row D203 (D203, VER >= 232) dist parse: .86 -> 0 . 8 6; abc, ., -1 -> dash; 3.456 -> 3 4 5; 100 -> 99',
   'D199/D201/D204-forms': 'row D199/D201/D204-forms (VER >= 232) hand-built time, dist, reps_time and every lattice form: no number box for log_run_mins / log_run_dist, hidden inputs present, wheels time [hms, dist] dist [dist, hms] reps_time [dist], data-plan only on the fixed wheel = dose.mins / dose.mi, every stacked wrap iaw-solo',
-  'D202-open': 'row D202-open (D200 gate, D202, call 8, VER >= 232) opening with stored blank writes nothing on every form (0 input events, ia_logs_ byte-unchanged), the fixed face is the plan, the free wheel is on the dash; the legacy table opens writing nothing on its hand faces',
+  'D202-open': 'row D202-open (D200 gate, D202, call 8, VER >= 232) opening with stored blank writes nothing on every form (0 input events, ia_logs_ byte-unchanged), the fixed face is the plan, the free wheel is on the dash (from VER 235 the free time wheel is on 0:00:00, D215; the free miles wheel stays on the dash); the legacy table opens writing nothing on its hand faces',
   'D202-move': 'row D202-move (D202, call 8, VER >= 232) a moved fixed wheel commits 15.50 / 8.25 and ia_logs_ stores it; away and back to the seed face commits; a settle on the seed face alone writes nothing; doseDerived reads the stored value (15.5 min / 2 mi = 7:45/mi)',
   'D206-copy': 'row D206-copy (D206 + call 7, VER >= 232) `Log the run`, `Shows the plan. Move it to match the watch.`, `Off the watch.` on both free wheels, `Miles in the work reps`, `Leave out the easy jog between reps.`; no `Hours first`; no mid-sentence dash',
   'D199-width': 'row D199-width (D199 layout, call 12, VER >= 232) `.iaw-solo{max-width:178.2px}` = (375 − 2×16 − 2×1 − 2×16 − 12) × 3/5, its CSS premises present',
@@ -286,7 +303,7 @@ function rowSpec(){
   const cols = []; const cre = /<div class="iaw-col" data-ci="(\d+)" data-wrap="(1?)" data-len="(\d+)"><div class="iaw-pad"><\/div>([\s\S]*?)<div class="iaw-pad"><\/div><\/div>/g; let c;
   while((c = cre.exec(h))){ const rows = [], faces = []; const ire = /<div class="iaw-it(?: nil)?" data-v="([^"]*)">([^<]*)<\/div>/g; let it; while((it = ire.exec(c[4]))){ rows.push(it[1]); faces.push(it[2]); } cols.push({ wrap:c[2], len:c[3], rows, faces }); }
   cj.push(['spec-cols', cols.length === 3 && cls === 'iaw-f3', cols.length + ' columns, class ' + cls + ' (want 3, iaw-f3)']);
-  HMS_COLS.forEach((o, i) => { const g = cols[i] || {};
+  (VER >= 235 ? HMS_COLS_V235 : HMS_COLS).forEach((o, i) => { const g = cols[i] || {};
     cj.push(['spec-c' + i, J(g.rows) === J(o.rows) && J(g.faces) === J(o.faces) && g.wrap === o.wrap && g.len === o.len,
       'column ' + i + ': ' + (g.rows ? g.rows.length : 0) + ' rows (want ' + o.rows.length + '), wrap "' + g.wrap + '" (want "' + o.wrap + '"), len ' + g.len + ' (want ' + o.len + '), first faces ' + J((g.faces || []).slice(0, 3)) + ' (want ' + J(o.faces.slice(0, 3)) + ')']); });
   cj.push(['spec-cap', cap === 'Time', 'cap ' + J(cap) + ' (want "Time")']);
@@ -299,7 +316,8 @@ function rowRt(){
   let good = 0; const bad = [];
   for(let T = 0; T < 36000; T++){
     const h = Math.floor(T / 3600), m = Math.floor((T % 3600) / 60), s = T % 60, n = Math.floor((10 * T + 3) / 6);
-    const want = Math.floor(n / 100) + '.' + String(n % 100).padStart(2, '0');
+    // V235 (D215): from 235 the zero face is the one excepted: it stores '' and parses back to 0:00:00 (checked below).
+    const want = (VER >= 235 && T === 0) ? '' : Math.floor(n / 100) + '.' + String(n % 100).padStart(2, '0');
     const got = tryv(() => FMT('hms', [String(h), String(m), String(s)]));
     const back = typeof got === 'string' ? tryv(() => PARSE('hms', got)) : null;
     if(got === want && back && J(back) === J([String(h), String(m), String(s)])) good++;
@@ -308,7 +326,7 @@ function rowRt(){
   cj.push(['rt-seconds', good === 36000, good + '/36000 seconds format to the integer oracle and parse back' + (bad.length ? ' | e.g. ' + bad.join('; ') : '')]);
   const ex = FMT_EX.map(([a, w]) => { const g = tryv(() => FMT('hms', a)); return [a.join(':'), g, w, g === w]; });
   cj.push(['rt-examples', ex.every(x => x[3]), ex.map(x => x[0] + ' -> ' + J(x[1]) + (x[3] ? '' : ' (want ' + J(x[2]) + ')')).join(', ')]);
-  const st = HMS_PARSE.map(([s, w]) => { const g = tryv(() => PARSE('hms', s)); return [s, g, w, J(g) === J(w)]; });
+  const st = (VER >= 235 ? HMS_PARSE_V235 : HMS_PARSE).map(([s, w]) => { const g = tryv(() => PARSE('hms', s)); return [s, g, w, J(g) === J(w)]; });
   cj.push(['rt-stored', st.every(x => x[3]), st.map(x => J(x[0]) + ' -> ' + J(x[1]) + (x[3] ? '' : ' (want ' + J(x[2]) + ')')).join(', ')]);
   row('D200-rt', cj);
 }
@@ -383,14 +401,14 @@ function rowForms(){
 function rowOpen(){
   const cj = [verCj('open')];
   if(survErr) cj.push(['open-survey', false, survErr]);
-  const wantFaces = (k, dose) => k === 'time' ? { log_run_mins:hmsFace(dose.mins), log_run_dist:DASH_MI } : k === 'dist' ? { log_run_dist:miFace(dose.mi), log_run_mins:DASH_HMS } : { log_run_dist:DASH_MI };
+  const wantFaces = (k, dose) => k === 'time' ? { log_run_mins:hmsFace(dose.mins), log_run_dist:DASH_MI } : k === 'dist' ? { log_run_dist:miFace(dose.mi), log_run_mins:FREE_HMS() } : { log_run_dist:DASH_MI };
   for(const key of Object.keys(SURV.hand)){ const s = SURV.hand[key], want = wantFaces(s.k, s.dose);
     const good = s.inputs === 0 && s.same && J(s.faces) === J(want) && s.hidVals.mins === '' && s.hidVals.dist === '';
     cj.push(['open-' + key.replace(' ', '-'), good, s.k + ' (stored ' + key.split(' ')[1] + ' blank): faces ' + J(s.faces) + (J(s.faces) === J(want) ? '' : ' (want ' + J(want) + ')') + ', input events ' + s.inputs + ', ia_logs_ unchanged ' + s.same + ', hidden ' + J(s.hidVals)]); }
   let good = 0; const bad = [];
   SURV.lat.forEach(x => { const want = wantFaces(x.k, x.dose); const g = x.inputs === 0 && x.same && J(x.faces) === J(want);
     if(g) good++; else if(bad.length < 5) bad.push(x.name + ' W' + x.w + ' ' + x.d + ' ' + x.k + ' faces ' + J(x.faces) + ' want ' + J(want) + ' inputs ' + x.inputs + ' same ' + x.same); });
-  cj.push(['open-lattice', SURV.latDays > 0 && good === SURV.latDays, good + '/' + SURV.latDays + ' lattice days open writing nothing, fixed face = the plan by hand, free wheel on the dash' + (bad.length ? ' | ' + bad.join(' | ') : '')]);
+  cj.push(['open-lattice', SURV.latDays > 0 && good === SURV.latDays, good + '/' + SURV.latDays + ' lattice days open writing nothing, fixed face = the plan by hand, free wheel on ' + (VER >= 235 ? 'its blank face (time 0:00:00, miles dash)' : 'the dash') + (bad.length ? ' | ' + bad.join(' | ') : '')]);
   const lg = (SURV.legacy || []).map(x => { const g = x.inputs === 0 && x.same && J(x.faces) === J(x.want); return [x, g]; });
   cj.push(['open-legacy', lg.length === LEGACY.length && lg.every(y => y[1]), lg.map(([x, g]) => x.k + ' ' + J(x.stored) + ' -> ' + J(x.faces) + (g ? '' : ' (want ' + J(x.want) + ', inputs ' + x.inputs + ', same ' + x.same + ')')).join(', ')]);
   row('D202-open', cj);

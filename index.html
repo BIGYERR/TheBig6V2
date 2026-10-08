@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="234"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="235"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -13562,9 +13562,11 @@ const _IAW_SPEC={
   pace:{fmt:'clock', cap:'Pace / mile',  cols:[{min:4,max:17,nil:true},{min:0,max:59,pad:2}]},
   rept:{fmt:'clock', cap:'Typical rep',  cols:[{min:0,max:9, nil:true},{min:0,max:59,pad:2}]},
   // V232 (D199): run time as a clock with hours. 0..9 hours covers every finish under 10:00:00,
-  // the file's one ceiling on logged cardio minutes (max="600" on the rest-day sheet). Hours
-  // carries the dash and does not wrap; minutes and seconds wrap (derived from nil, D5).
-  hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, nil:true},{min:0,max:59,pad:2},{min:0,max:59,pad:2}]}
+  // the file's one ceiling on logged cardio minutes (max="600" on the rest-day sheet). V235
+  // (D199 as amended by D215, D216): hours has no dash and does not wrap (D216), so the column
+  // is the ten rows 0..9, and "nothing logged yet" is the zero face 0:00:00, which stores ''
+  // (D215). Minutes and seconds wrap (derived from nil, D5).
+  hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, wrap:false},{min:0,max:59,pad:2},{min:0,max:59,pad:2}]}
 };
 // V184 (D5): round-robin. A column is cyclic exactly when it has no dash row — that is
 // derived, not hand-listed, so a new column can never be missed. Seconds, tenths and
@@ -13572,8 +13574,12 @@ const _IAW_SPEC={
 // each pair never wraps: it carries the '—' meaning "didn't log it", and spinning off
 // the dash on a fast flick would make that state reachable by accident. No carry
 // either: 9:59 wraps to 9:00, so a flick on seconds cannot rewrite the minutes.
+// V235 (D216): one column says otherwise, by name. The hms hours column has no dash (D215)
+// and still never wraps: 9 hours and 0 hours are not neighbours on any clock, and 0..9 is a
+// ceiling (D199), not a cycle, so a flick off the floor must not turn 0:45:00 into 9:45:00.
+// It carries wrap:false, honoured first; every other column derives from nil as above.
 const _IAW_REPS=5;
-function _iawWraps(c){ return !c.nil; }
+function _iawWraps(c){ if(c.wrap===false) return false; return !c.nil; }
 function _iawList(c){
   var base=_iawRows(c);
   if(!_iawWraps(c)) return base;
@@ -13600,10 +13606,11 @@ function _iawParse(kind,val){
   // A bare integer, a decimal or a leading-dot decimal (D203); never a colon. Rounded to the
   // nearest second, so a two-place value lands on the second the athlete left the wheel on.
   // V233 (D208): above the dial's ceiling the whole face pegs there (9:59:59, from the column
-  // maxes), for display only. Empty or malformed lands on the dash.
+  // maxes), for display only. V235 (D215): empty or malformed (nothing at the front that reads as
+  // digits or a leading-dot decimal: '', 'abc', '-1') lands on 0:00:00, the zero face that stores ''.
   if(sp.fmt==='hms'){
     var mh=s.match(/^\d*(?:\.\d+)?/);
-    if(!mh||mh[0]==='') return ['','',''];
+    if(!mh||mh[0]==='') return ['0','0','0'];
     var t=Math.round(parseFloat(mh[0])*60);
     t=Math.min(t,sp.cols[0].max*3600+sp.cols[1].max*60+sp.cols[2].max);
     return [String(Math.floor(t/3600)),String(Math.floor((t%3600)/60)),String(t%60)];
@@ -13635,7 +13642,12 @@ function _iawFormat(kind,vals){
   var b=vals[1]===''?'0':vals[1];
   // V232 (D200): h:mm:ss -> decimal minutes to two places (7:30 -> 7.50, 15:20 -> 15.33).
   // Two places is exact at the one-second grain: the error is at most 0.3 s.
-  if(sp.fmt==='hms'){ var sx=vals[2]===''||vals[2]==null?'0':vals[2]; return ((+vals[0])*60+(+b)+(+sx)/60).toFixed(2); }
+  // V235 (D215): the zero face 0:00:00 is "nothing logged yet" (V182 D4) and stores '', checked
+  // ahead of the D200 arithmetic, so the truthy readers (_hasLog, the session counter) agree with
+  // the face. Tested on the total in seconds, not the strings, since a padded column may carry '00'.
+  if(sp.fmt==='hms'){ var sx=vals[2]===''||vals[2]==null?'0':vals[2];
+    if((+vals[0])*3600+(+b)*60+(+sx)===0) return '';
+    return ((+vals[0])*60+(+b)+(+sx)/60).toFixed(2); }
   if(sp.fmt==='dec3'){ var c=vals[2]===''||vals[2]==null?'0':vals[2]; return vals[0]+'.'+b+c; }
   return sp.fmt==='dec' ? (vals[0]+'.'+b) : (vals[0]+':'+('00'+b).slice(-2));
 }
@@ -13773,7 +13785,9 @@ function cardioFieldHTML(sport, e, dose, sub){
         <input type="hidden" id="log_run_reps" value="${e.run_reps||''}">`;
     // V232 (D199, D201, D202, D206): two wheels, stacked (two three-column wheels side by side
     // are six columns, under the 44pt target at 375pt). The fixed dimension comes first and is
-    // seeded from the plan for display; the free dimension parks on the dash.
+    // seeded from the plan for display; the free dimension parks on its blank face. V235 (D215):
+    // the free time wheel (dist form) parks on zero, 0:00:00, which stores ''; the free miles
+    // wheel (time form) stays on the dash.
     if(dose.k==='time') return strip+`<label>${asyIcon('run',15)} Log the run</label>
         <div class="iaw-wrap iaw-solo">${iaWheelHTML('hms','log_run_mins',e.run_mins||'',null,dose.mins)}</div>
         <div class="f-sub">Shows the plan. Move it to match the watch.</div>
@@ -13805,8 +13819,9 @@ function cardioFieldHTML(sport, e, dose, sub){
           ${iaWheelHTML('pace','log_run_pace',e.run_pace||'')}
         </div>`;
   // V233 (D207, D209 as amended, D210): one hms wheel alone in the stacked wrap, the run time
-  // form's markup. No plan argument, so every bike shape parks on the dash until a ride is
-  // stored; the strip above carries the plan. No sub-label (Mario). The hidden input keeps
+  // form's markup. No plan argument, so every bike shape parks on zero, 0:00:00, which stores ''
+  // (V235, D215; it was the dash), until a ride is stored; the strip above carries the plan.
+  // No sub-label (Mario). The hidden input keeps
   // the id log_bike_mins, so both listener arrays and persistLogFields read it unchanged.
   if(sport==='bike') return (dose?_doseStripHTML('bike',dose,sub||''):'')+`<label>${asyIcon('bike',15)} Log the ride</label>
         <div class="iaw-wrap iaw-solo">${iaWheelHTML('hms','log_bike_mins',e.bike_mins||'')}</div>`;

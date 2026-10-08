@@ -1,0 +1,30 @@
+[
+ {
+  "name": "S1-D216 hms hours column drops wrap:false (hours wraps)",
+  "anchor": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, wrap:false},",
+  "replacement": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9},",
+  "gate": "gates/g235_d215_hmszero.js",
+  "note": "NAMED TRIP: g235_d215_hmszero.js row D216-wrap (hms wraps [true,true,true]) and the data-wrap conjunct of D215-rows. Ruling: tests/measure/v235_rulings/v235_ruling_d215_d217.md (D216; Sabotage paragraph)."
+ },
+ {
+  "name": "S2-D215 the hms zero face stores 0.00 instead of blank",
+  "anchor": "if((+vals[0])*3600+(+b)*60+(+sx)===0) return '';",
+  "replacement": "if((+vals[0])*3600+(+b)*60+(+sx)===0) return '0.00';",
+  "gate": "gates/g235_d215_hmszero.js",
+  "note": "NAMED TRIP: g235_d215_hmszero.js rows D215-zero (format of 0:00:00 is not blank) and D215-clear (conjuncts bike-zero, bike-nudge, dist-same-open, time-zero, legacy-back: the roll back to 0:00:00 stores \"0.00\" and the nudge returns). Ruling: tests/measure/v235_rulings/v235_ruling_d215_d217.md (D215; D215 Amendment 1, Sabotage paragraph)."
+ },
+ {
+  "name": "S3-D215 hms blank parse returns dashes again",
+  "anchor": "if(!mh||mh[0]==='') return ['0','0','0'];",
+  "replacement": "if(!mh||mh[0]==='') return ['','',''];",
+  "gate": "gates/g235_d215_hmszero.js",
+  "note": "NAMED TRIP: g235_d215_hmszero.js row D215-zero (parse of '', abc, -1). D215-open does not catch it by design: with no dash row the seed misses and lands on home 0 (the ruling's note). Ruling: tests/measure/v235_rulings/v235_ruling_d215_d217.md (D215; Sabotage paragraph)."
+ },
+ {
+  "name": "S4-D215 hms hours column regains the dash row (nil:true back, wrap:false dropped)",
+  "anchor": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, wrap:false},",
+  "replacement": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, nil:true},",
+  "gate": "gates/g235_d215_hmszero.js",
+  "note": "NAMED TRIP: g235_d215_hmszero.js row D215-rows (hours rows gain the dash item) and the dash-row conjunct of D215-plan (742/742 plan wheels). Does not trip D215-tail: _iawParse('hms','') still seeds hours on '0', so a blank wheel never reaches the restored dash row (D215 Amendment 1). The g232 twin is v232_d199.json S1-D199 (pinned to D199-spec). Ruling: tests/measure/v235_rulings/v235_ruling_d215_d217.md (Sabotage paragraph, as amended)."
+ }
+]

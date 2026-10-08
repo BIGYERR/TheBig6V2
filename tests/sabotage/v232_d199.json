@@ -1,15 +1,15 @@
 [
  {
-  "name": "S1-D199 hms hours column loses nil:true (no dash, wraps)",
-  "anchor": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, nil:true},",
-  "replacement": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9},",
+  "name": "S1-D199 hms hours column regains the dash row (nil:true back, wrap:false dropped)",
+  "anchor": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, wrap:false},",
+  "replacement": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, nil:true},",
   "gate": "gates/g232_d199_runwheel.js",
-  "note": "NAMED TRIP: row D199-spec. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
+  "note": "NAMED TRIP: row D199-spec. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12. V235 re-anchor: tests/measure/v235_rulings/v235_ruling_d215_d217.md Sabotage (D215 Amendment 1), 'S1-D199 is hours regains the dash row: trips D199-spec here, and D215-rows plus the dash-row conjunct of D215-plan in g235; not D215-tail'; this pin stays on g232 D199-spec (V235 era: 10 rows, no dash)."
  },
  {
   "name": "S2-D199 hms hours max 9 -> 8",
-  "anchor": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, nil:true},",
-  "replacement": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:8, nil:true},",
+  "anchor": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:9, wrap:false},",
+  "replacement": "hms: {fmt:'hms',   cap:'Time',         cols:[{min:0,max:8, wrap:false},",
   "gate": "gates/g232_d199_runwheel.js",
   "note": "NAMED TRIP: row D199-spec. Ruling: tests/measure/v232_rulings/v232_ruling_d199_d206.md with v232_session_calls.md items 7, 8, 12."
  },

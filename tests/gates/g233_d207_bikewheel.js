@@ -25,6 +25,10 @@
 //                watch.`, `Whole ride` absent; the bike glyph by its two hand wheel circles (cx 5.5 and 18.5, cy 17.5, r 3.5).
 //   FACES        hand faces typed as strings: '45' 0:45:00, '45.5' 0:45:30, '.5' 0:00:30, '90' 1:30:00, 30 0:30:00, '599'
 //                9:59:00, '599.98' / '600' / '630.5' / '650' 9:59:59, '-1' and blank the dash (—:00:00).
+//                V235 (D215; tests/measure/v235_rulings/v235_ruling_d215_d217.md, "Existing rows this ruling flips" and
+//                "Session licence"): from VER 235 '-1' and blank open on 0:00:00 (ZERO_HMS), the zero face that stores '';
+//                blank, -1 and abc parse to 0:00:00 (PARSE_HAND_V235); the clamp seeds are unchanged. VER <= 234 keeps
+//                DASH_HMS, LEGACY_BIKE and PARSE_HAND byte for byte.
 //   COMMITS      hand decimal minutes: 0:45:00 -> 45.00; 9:59:58 -> 599.97; 9:59:59 -> 599.98 (two places, D200).
 //   PROGRESS     the weekly bike sum of a week holding one stored 45.00 is 45 (hand).
 //   PAIR         D211-untouched compares against the V232 tree (argv[3] when it reads 232, else git 6ee30ea), never against
@@ -58,16 +62,18 @@
 //   D207/D210-forms  hand-built bike forms (time 45, reps_time 3 × 15, null; e = {} and stored 45) and every lattice
 //                    form: one wheel, kind hms, for log_bike_mins, no data-plan, hidden input once, no number box, inside
 //                    iaw-wrap iaw-solo (WHEEL_HEAD), strip iff dose; lattice (a)(b)(c) each > 0, (a) reaches time,
-//                    reps_time and null, (b) reaches Cross-Train; a live swap renders the same shape; no bike number box
-//                    in the comment-stripped source.
+//                    reps_time and null, (b) reaches Cross-Train; a live swap renders the same shape on the dash (VER <= 234)
+//                    or on 0:00:00 (VER >= 235, D215, session licence); no bike number box in the comment-stripped source.
 //   D209-copy        COPY on the hand-built and every lattice form; old strings gone from the source.
 //   D207-open        stored blank (none, explicit '') on the three hand shapes opens writing nothing on the dash; the
 //                    legacy FACES table opens writing nothing on its hand faces; every lattice form likewise on the dash.
+//                    From VER 235 "on the dash" reads "on 0:00:00" throughout (D207 as amended by D215).
 //   D207-move        hours 0 then minutes 45 commits 45.00 and ia_logs_ stores it; the Progress weekly bike sum and _hasLog
 //                    read it (45, the nudge; a blank entry gets no nudge); a settle on the seed face alone writes nothing;
-//                    a touched pegged 630.5 commits 599.97 then 599.98.
+//                    a touched pegged 630.5 commits 599.97 then 599.98. From VER 235 the hours step to 0 is a no-move (the
+//                    wheel opens on 0), so move-45 sees 1 input event, not 2; the blank seed-only settle rests hours on '0'.
 //   D208-clamp       the hms parse table by hand; a run `time` form and the bike form seed 650 / 600 / 630.5 at 9:59:59,
-//                    599 at 9:59:00, 45.5 at 0:45:30, opening writing nothing.
+//                    599 at 9:59:00, 45.5 at 0:45:30, opening writing nothing. From VER 235 the table is PARSE_HAND_V235.
 //   D211-untouched   (pair 233 vs 232) swim, generic run, reps_dist and the run time / dist / reps_time forms byte-identical
 //                    to V232; the hms parse identical to V232 for every stored value whose nearest second is under 36000
 //                    (every hundredth 0.00..599.99, integers 0..599, odd strings; D200 rounds first, D208 clamps the rounded
@@ -98,10 +104,19 @@ const BIKE_GLYPH = ['<circle cx="5.5" cy="17.5" r="3.5"/>', '<circle cx="18.5" c
 const HAND = { time:{ dose:{ k:'time', mins:45 }, sub:'Long Ride (LSD)' }, reps_time:{ dose:{ k:'reps_time', reps:3, mins:15 }, sub:'Sweet Spot' }, null:{ dose:null, sub:'Interval' } };
 const LEGACY_BIKE = [['45', '0:45:00'], ['45.5', '0:45:30'], ['.5', '0:00:30'], ['90', '1:30:00'], [30, '0:30:00'], ['599', '9:59:00'],
   ['599.98', '9:59:59'], ['600', '9:59:59'], ['630.5', '9:59:59'], ['-1', DASH_HMS]];
+// V235 (D215): the same legacy table with '-1' on the zero face; every other row is LEGACY_BIKE's, unchanged.
+const LEGACY_BIKE_V235 = [['45', '0:45:00'], ['45.5', '0:45:30'], ['.5', '0:00:30'], ['90', '1:30:00'], [30, '0:30:00'], ['599', '9:59:00'],
+  ['599.98', '9:59:59'], ['600', '9:59:59'], ['630.5', '9:59:59'], ['-1', '0:00:00']];
 const CLAMP = [['650', '9:59:59'], ['600', '9:59:59'], ['630.5', '9:59:59'], ['599', '9:59:00'], ['45.5', '0:45:30']];
 const PEG = ['9', '59', '59'];
 const PARSE_HAND = [['600', PEG], ['601', PEG], ['630.5', PEG], ['650', PEG], ['1200', PEG], ['599.98', PEG], ['599.99', PEG], ['599', ['9', '59', '0']],
   ['45.5', ['0', '45', '30']], ['45', ['0', '45', '0']], ['.5', ['0', '0', '30']], ['', ['', '', '']], ['-1', ['', '', '']], ['abc', ['', '', '']]];
+// V235 (D215): blank and malformed parse to 0:00:00 (no dash row to land on); the clamp rows are PARSE_HAND's, unchanged.
+const PARSE_HAND_V235 = [['600', PEG], ['601', PEG], ['630.5', PEG], ['650', PEG], ['1200', PEG], ['599.98', PEG], ['599.99', PEG], ['599', ['9', '59', '0']],
+  ['45.5', ['0', '45', '30']], ['45', ['0', '45', '0']], ['.5', ['0', '0', '30']], ['', ['0', '0', '0']], ['-1', ['0', '0', '0']], ['abc', ['0', '0', '0']]];
+// V235 (D215): the bike wheel's blank face, chosen at use (VER is set after load): the dash through 234, zero from 235.
+const ZERO_HMS = '0:00:00', BLANK_HMS = () => VER >= 235 ? ZERO_HMS : DASH_HMS;
+const legacyBike = () => VER >= 235 ? LEGACY_BIKE_V235 : LEGACY_BIKE;
 const RUN_TIME_DOSE = { k:'time', mins:15, tgt:531, key:'chi' };
 const NUDGE = 'You logged this one but never marked it.';
 const BIKEG = ['bike_century', 'bike_50', 'bike_base', 'bike_ftp', 'bike_cals'];
@@ -124,9 +139,9 @@ const J = JSON.stringify;
 const R = {
   'D207/D210-forms': 'row D207/D210-forms (D207, D210, VER >= 233) every bike form is one hms wheel for log_bike_mins in iaw-wrap iaw-solo, no data-plan, hidden input once, no number box, strip iff dose; hand-built time / reps_time / null and lattice (a) bike goals (b) injured multi-sport Cross-Train (c) swapped-in',
   'D209-copy': 'row D209-copy (D209 as amended by Mario, call 6, VER >= 233) label `Log the ride` after the bike glyph, no f-sub, `Bike — actual duration` / `Off the watch.` / `Whole ride` absent, no mid-sentence dash',
-  'D207-open': 'row D207-open (D207, D200 gate inherited, VER >= 233) stored blank opens writing nothing on the dash; legacy 45 / 45.5 / .5 / 90 / 30 / 599 / 599.98 / 600 / 630.5 / -1 open writing nothing on their hand faces; every lattice form opens on the dash writing nothing',
-  'D207-move': 'row D207-move (D207, D208, VER >= 233) hours 0 + minutes 45 commits 45.00 and ia_logs_ stores it; Progress weekly bike sum 45 and _hasLog read it; a settle on the seed face alone writes nothing; a touched pegged 630.5 commits 599.98',
-  'D208-clamp': 'row D208-clamp (D208, VER >= 233) the hms parse pegs at 9:59:59 from the column maxes; run time form and bike form seed 650 / 600 / 630.5 at 9:59:59, 599 at 9:59:00, 45.5 at 0:45:30',
+  'D207-open': 'row D207-open (D207, D200 gate inherited, VER >= 233) stored blank opens writing nothing on the dash; legacy 45 / 45.5 / .5 / 90 / 30 / 599 / 599.98 / 600 / 630.5 / -1 open writing nothing on their hand faces; every lattice form opens on the dash writing nothing (from VER 235 on 0:00:00, D215)',
+  'D207-move': 'row D207-move (D207, D208, VER >= 233) hours 0 + minutes 45 commits 45.00 and ia_logs_ stores it; Progress weekly bike sum 45 and _hasLog read it; a settle on the seed face alone writes nothing; a touched pegged 630.5 commits 599.98 (from VER 235 the hours step to 0 is a no-move: 1 input event, D215)',
+  'D208-clamp': 'row D208-clamp (D208, VER >= 233) the hms parse pegs at 9:59:59 from the column maxes; run time form and bike form seed 650 / 600 / 630.5 at 9:59:59, 599 at 9:59:00, 45.5 at 0:45:30; blank, -1, abc parse to the dash (VER <= 234) or 0:00:00 (VER >= 235, D215)',
 };
 const ROW_ORDER = Object.keys(R);
 function row(key, cj){ cj.forEach(([n, c, d]) => P('    ' + key + ' ' + n + ' ' + (c ? 'ok' : 'FAIL') + ' :: ' + d));
@@ -302,7 +317,7 @@ section('hand', () => {
     for(const blank of ['none', 'explicit']) SURV.hand[k + ' ' + blank] = Object.assign({ k }, openRead(HOSTB[0], HOSTB[1], blank === 'none' ? null : { bike_mins:'', rpe:'', notes:'' }));
   }
   C.force(HAND.time.dose);
-  SURV.legacy = LEGACY_BIKE.map(([v, want]) => Object.assign({ v, want }, openRead(HOSTB[0], HOSTB[1], { bike_mins:v, rpe:'5' })));
+  SURV.legacy = legacyBike().map(([v, want]) => Object.assign({ v, want }, openRead(HOSTB[0], HOSTB[1], { bike_mins:v, rpe:'5' })));
   SURV.clampBike = CLAMP.map(([v, want]) => Object.assign({ v, want }, openRead(HOSTB[0], HOSTB[1], { bike_mins:v, rpe:'5' })));
   C.use(MANNY_P); C.force(RUN_TIME_DOSE);
   SURV.clampRun = CLAMP.map(([v, want]) => Object.assign({ v, want }, openRead(HOSTR[0], HOSTR[1], { run_mins:v, rpe:'5' })));
@@ -352,7 +367,7 @@ function rowForms(){
   const nbox = LG('a').concat(LG('b'), LG('c')).filter(x => x.shape.some(s => /number box/.test(s))).length, nplan = SURV.lat.filter(x => x.shape.some(s => /data-plan/.test(s))).length;
   cj.push(['forms-lattice-tally', SURV.lat.length > 0 && nbox === 0 && nplan === 0, SURV.lat.length + ' lattice bike forms: ' + nbox + ' with a number box, ' + nplan + ' with data-plan (want 0, 0)']);
   const sl = SURV.swapLive;
-  cj.push(['forms-swap-live', !!sl && !sl.shape.length && sl.face === DASH_HMS, sl ? "live setCardioSwap('bike') on HALF_MANNY " + J(HOSTR) + ': ' + (sl.shape.length ? sl.shape.join('; ') : 'ruled shape, no strip') + ', face ' + J(sl.face) + ' (want ' + DASH_HMS + ')' : 'not surveyed']);
+  cj.push(['forms-swap-live', !!sl && !sl.shape.length && sl.face === BLANK_HMS(), sl ? "live setCardioSwap('bike') on HALF_MANNY " + J(HOSTR) + ': ' + (sl.shape.length ? sl.shape.join('; ') : 'ruled shape, no strip') + ', face ' + J(sl.face) + ' (want ' + BLANK_HMS() + ')' : 'not surveyed']);
   const src = stripComments(CAND_TEXT), nsrc = (src.match(/<input\b[^>]*>/g) || []).filter(t => /type="number"/.test(t) && /id="log_bike_mins"/.test(t)).length;
   cj.push(['forms-source', nsrc === 0, 'number boxes with id log_bike_mins in the comment-stripped candidate: ' + nsrc]);
   row('D207/D210-forms', cj);
@@ -377,12 +392,12 @@ function rowCopy(){
 function rowOpen(){
   const cj = [verCj('open')].concat(errCj('open', ['hosts', 'hand', 'lattice-a', 'lattice-b', 'lattice-c']));
   for(const key of Object.keys(SURV.hand)){ const s = SURV.hand[key];
-    const good = s.inputs === 0 && s.same && s.face === DASH_HMS && s.hid === '';
-    cj.push(['open-' + key.replace(' ', '-'), good, s.k + ' (stored ' + key.split(' ')[1] + ' blank): face ' + J(s.face) + ' (want ' + DASH_HMS + '), input events ' + s.inputs + ', ia_logs_ unchanged ' + s.same + ', hidden ' + J(s.hid)]); }
+    const good = s.inputs === 0 && s.same && s.face === BLANK_HMS() && s.hid === '';
+    cj.push(['open-' + key.replace(' ', '-'), good, s.k + ' (stored ' + key.split(' ')[1] + ' blank): face ' + J(s.face) + ' (want ' + BLANK_HMS() + '), input events ' + s.inputs + ', ia_logs_ unchanged ' + s.same + ', hidden ' + J(s.hid)]); }
   const lg = SURV.legacy.map(x => [x, x.inputs === 0 && x.same && x.face === x.want]);
-  cj.push(['open-legacy', lg.length === LEGACY_BIKE.length && lg.every(y => y[1]), lg.map(([x, g]) => J(x.v) + ' -> ' + J(x.face) + (g ? '' : ' (want ' + x.want + ', inputs ' + x.inputs + ', same ' + x.same + ')')).join(', ')]);
-  for(const g of ['a', 'b', 'c']){ const L = LG(g), bad = L.filter(x => !(x.inputs === 0 && x.same && x.face === DASH_HMS));
-    cj.push(['open-lattice-' + g, L.length > 0 && !bad.length, (L.length - bad.length) + '/' + L.length + ' lattice (' + g + ') bike forms open on the dash writing nothing' + (bad.length ? ' | e.g. ' + bad.slice(0, 3).map(x => x.name + ' W' + x.w + ' ' + x.d + ' face ' + J(x.face) + ' inputs ' + x.inputs + ' same ' + x.same).join(' | ') : '')]); }
+  cj.push(['open-legacy', lg.length === legacyBike().length && lg.every(y => y[1]), lg.map(([x, g]) => J(x.v) + ' -> ' + J(x.face) + (g ? '' : ' (want ' + x.want + ', inputs ' + x.inputs + ', same ' + x.same + ')')).join(', ')]);
+  for(const g of ['a', 'b', 'c']){ const L = LG(g), bad = L.filter(x => !(x.inputs === 0 && x.same && x.face === BLANK_HMS()));
+    cj.push(['open-lattice-' + g, L.length > 0 && !bad.length, (L.length - bad.length) + '/' + L.length + ' lattice (' + g + ') bike forms open on ' + (VER >= 235 ? '0:00:00' : 'the dash') + ' writing nothing' + (bad.length ? ' | e.g. ' + bad.slice(0, 3).map(x => x.name + ' W' + x.w + ' ' + x.d + ' face ' + J(x.face) + ' inputs ' + x.inputs + ' same ' + x.same).join(' | ') : '')]); }
   row('D207-open', cj);
 }
 
@@ -397,7 +412,9 @@ function rowMove(){
     C.use(HOSTP); C.force(HAND.time.dose); C.setLog(HW, HD, null); C.open(HW, HD);
     C.move(need(), 0, '0'); C.move(need(), 1, '45');
     const e = C.entry(HW, HD) || {};
-    cj.push(['move-45', e.bike_mins === '45.00' && hid() === '45.00' && (C.INPUTS.log_bike_mins || 0) === 2, 'dash -> hours 0 -> minutes 45: stored bike_mins ' + J(e.bike_mins) + ', hidden ' + J(hid()) + ', input events ' + (C.INPUTS.log_bike_mins || 0) + ' (want "45.00", "45.00", 2)']);
+    // V235 (D215): the wheel opens on 0 hours, so the hours step to 0 is a no-move: one input event (minutes 45), not two.
+    const want45 = VER >= 235 ? 1 : 2;
+    cj.push(['move-45', e.bike_mins === '45.00' && hid() === '45.00' && (C.INPUTS.log_bike_mins || 0) === want45, (VER >= 235 ? '0:00:00' : 'dash') + ' -> hours 0 -> minutes 45: stored bike_mins ' + J(e.bike_mins) + ', hidden ' + J(hid()) + ', input events ' + (C.INPUTS.log_bike_mins || 0) + ' (want "45.00", "45.00", ' + want45 + ')']);
     C.ctx.__dots.length = 0; const pr = tryv(() => C.ev('renderProgressScreen')());
     const ch = C.ctx.__dots.find(a => /Weekly Cycling Time/.test(String(a[0])));
     const wk = ch ? Array.from(ch[1]) : [], dat = ch ? Array.from(ch[2]) : [], v = dat[wk.indexOf(HW)];
@@ -410,8 +427,9 @@ function rowMove(){
     C.use(HOSTP); C.force(HAND.time.dose);
     C.setLog(HW, HD, { bike_mins:'45', rpe:'5' }); const b1 = C.logs(); C.open(HW, HD); C.move(need(), 1, '45'); C.move(need(), 0, '0');
     const s1 = C.logs() === b1, i1 = C.inputs(), f1 = C.face(need());
-    C.setLog(HW, HD, null); C.open(HW, HD); C.move(need(), 0, ''); const e0 = C.entry(HW, HD), i0 = C.inputs();
-    cj.push(['move-seedonly', s1 && i1 === 0 && f1 === '0:45:00' && e0 === null && i0 === 0, 'stored 45 settles on its seed face 0:45:00 only: ia_logs_ unchanged ' + s1 + ', input events ' + i1 + ', face ' + J(f1) + '; blank settles on the dash only: entry ' + J(e0) + ', input events ' + i0 + ' (want true, 0, 0:45:00; null, 0)']);
+    // V235 (D215, session licence): no dash row from 235; the blank wheel's seed row is hours '0' (the 0:00:00 face).
+    C.setLog(HW, HD, null); C.open(HW, HD); C.move(need(), 0, VER >= 235 ? '0' : ''); const e0 = C.entry(HW, HD), i0 = C.inputs();
+    cj.push(['move-seedonly', s1 && i1 === 0 && f1 === '0:45:00' && e0 === null && i0 === 0, 'stored 45 settles on its seed face 0:45:00 only: ia_logs_ unchanged ' + s1 + ', input events ' + i1 + ', face ' + J(f1) + '; blank settles on ' + (VER >= 235 ? 'its seed face 0:00:00' : 'the dash') + ' only: entry ' + J(e0) + ', input events ' + i0 + ' (want true, 0, 0:45:00; null, 0)']);
   });
   step('move-peg', () => {
     C.use(HOSTP); C.force(HAND.time.dose);
@@ -426,7 +444,7 @@ function rowMove(){
 // ── ROW D208-clamp ───────────────────────────────────────────────────────────────────────────────────────────────
 function rowClamp(){
   const cj = [verCj('clamp')].concat(errCj('clamp', ['hosts', 'hand']));
-  const t = PARSE_HAND.map(([s, w]) => { const g = tryv(() => Array.from(C.ev('_iawParse')('hms', s))); return [s, g, w, J(g) === J(w)]; });
+  const t = (VER >= 235 ? PARSE_HAND_V235 : PARSE_HAND).map(([s, w]) => { const g = tryv(() => Array.from(C.ev('_iawParse')('hms', s))); return [s, g, w, J(g) === J(w)]; });
   cj.push(['clamp-parse', t.every(x => x[3]), t.map(x => J(x[0]) + ' -> ' + J(x[1]) + (x[3] ? '' : ' (want ' + J(x[2]) + ')')).join(', ')]);
   for(const [tag, L, fk] of [['run', SURV.clampRun, 'runFace'], ['bike', SURV.clampBike, 'face']]){
     const g = L.map(x => [x, x.inputs === 0 && x.same && x[fk] === x.want]);
