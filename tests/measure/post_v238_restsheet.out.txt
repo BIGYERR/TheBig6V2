@@ -1,0 +1,200 @@
+
+######## V238 (ia-version 238) clock Thu 2026-10-08 noon ########
+
+== start 2026-09-28 | currentWeek 2 | today key thu (Posterior Chain) | rest days W2: wed,sun
+  week view: hero "Today · Thursday" | "Training anyway?" on screen false | MILES 0
+  tap WED cell (onclick openDayKey('wed')): restDayEligible true | sheet open true | toast "" | sheet: WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+  tap SUN cell (onclick openDayKey('sun')): restDayEligible false | sheet open false | toast ""
+
+  [run] a1 distance only (minutes box left at its prefill) | prefill mins="30" dist="" | typed mins=null dist="3.1" | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"run","mins":30,"dist":"3.1","rpe":5}
+    Log it -> toast "30 min logged ✓" | sheet still open false | stored ia_logs_ {"w2_wed":{"restLog":{"run":{"mins":30,"dist":3.1,"rpe":5}},"week":2,"ts":1791475200000}} | typed distance in store: true
+    readers: MILES 3.1 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total 3.1 mi | no-data false | journal "Session Journal Week 2 1 entry Wed 30 min run logged · RPE 5 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. You"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] a2 distance only, minutes box cleared | prefill mins="30" dist="" | typed mins="" dist="3.1" | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"run","mins":0,"dist":"3.1","rpe":5}
+    Log it -> toast "How long did you go?" | sheet still open true | stored ia_logs_ null | typed distance in store: false
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data true | journal "(no journal)"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] b minutes + distance | prefill mins="30" dist="" | typed mins="25" dist="3.1" | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"run","mins":25,"dist":"3.1","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w2_wed":{"restLog":{"run":{"mins":25,"dist":3.1,"rpe":5}},"week":2,"ts":1791475200000}} | typed distance in store: true
+    readers: MILES 3.1 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total 3.1 mi | no-data false | journal "Session Journal Week 2 1 entry Wed 25 min run logged · RPE 5 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. You"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] c minutes only | prefill mins="30" dist="" | typed mins="25" dist=null | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"run","mins":25,"dist":"","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w2_wed":{"restLog":{"run":{"mins":25,"rpe":5}},"week":2,"ts":1791475200000}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 2 1 entry Wed 25 min run logged · RPE 5 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. You"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [walk] a1 walk, distance n/a, minutes prefill | prefill mins="30" dist=(no box) | typed mins=null dist=null | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"walk","mins":30,"dist":"","rpe":5}
+    Log it -> toast "30 min logged ✓" | sheet still open false | stored ia_logs_ {"w2_wed":{"restLog":{"walk":{"mins":30,"rpe":5}},"week":2,"ts":1791475200000}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 2 1 entry Wed 30 min walk logged · RPE 5 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Yo"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [walk] c walk minutes 25 | prefill mins="30" dist=(no box) | typed mins="25" dist=null | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"walk","mins":25,"dist":"","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w2_wed":{"restLog":{"walk":{"mins":25,"rpe":5}},"week":2,"ts":1791475200000}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 2 1 entry Wed 25 min walk logged · RPE 5 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Yo"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+  [run] d re-entry #1 distance only 3.1 -> toast "30 min logged ✓" | stored {"w2_wed":{"restLog":{"run":{"mins":30,"dist":3.1,"rpe":5}},"week":2,"ts":1791475200000}} | MILES 3.1
+  [run] d re-entry #2 distance only 3.1 -> toast "30 min logged ✓" | stored {"w2_wed":{"restLog":{"run":{"mins":60,"dist":6.2,"rpe":5}},"week":2,"ts":1791475200000}} | MILES 6.2
+
+== start 2026-10-05 | currentWeek 1 | today key thu (Posterior Chain) | rest days W1: wed,sun
+  week view: hero "Today · Thursday" | "Training anyway?" on screen false | MILES 0
+  tap WED cell (onclick openDayKey('wed')): restDayEligible true | sheet open true | toast "" | sheet: WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+  tap SUN cell (onclick openDayKey('sun')): restDayEligible false | sheet open false | toast ""
+
+  [run] a1 distance only (minutes box left at its prefill) | prefill mins="30" dist="" | typed mins=null dist="3.1" | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"run","mins":30,"dist":"3.1","rpe":5}
+    Log it -> toast "30 min logged ✓" | sheet still open false | stored ia_logs_ {"w1_wed":{"restLog":{"run":{"mins":30,"dist":3.1,"rpe":5}},"week":1,"ts":1791475200000}} | typed distance in store: true
+    readers: MILES 3.1 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total 3.1 mi | no-data false | journal "Session Journal Week 1 1 entry Wed 30 min run logged · RPE 5 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. You"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] a2 distance only, minutes box cleared | prefill mins="30" dist="" | typed mins="" dist="3.1" | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"run","mins":0,"dist":"3.1","rpe":5}
+    Log it -> toast "How long did you go?" | sheet still open true | stored ia_logs_ null | typed distance in store: false
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data true | journal "(no journal)"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] b minutes + distance | prefill mins="30" dist="" | typed mins="25" dist="3.1" | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"run","mins":25,"dist":"3.1","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w1_wed":{"restLog":{"run":{"mins":25,"dist":3.1,"rpe":5}},"week":1,"ts":1791475200000}} | typed distance in store: true
+    readers: MILES 3.1 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total 3.1 mi | no-data false | journal "Session Journal Week 1 1 entry Wed 25 min run logged · RPE 5 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. You"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] c minutes only | prefill mins="30" dist="" | typed mins="25" dist=null | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"run","mins":25,"dist":"","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w1_wed":{"restLog":{"run":{"mins":25,"rpe":5}},"week":1,"ts":1791475200000}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 1 1 entry Wed 25 min run logged · RPE 5 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. You"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [walk] a1 walk, distance n/a, minutes prefill | prefill mins="30" dist=(no box) | typed mins=null dist=null | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"walk","mins":30,"dist":"","rpe":5}
+    Log it -> toast "30 min logged ✓" | sheet still open false | stored ia_logs_ {"w1_wed":{"restLog":{"walk":{"mins":30,"rpe":5}},"week":1,"ts":1791475200000}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 1 1 entry Wed 30 min walk logged · RPE 5 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Yo"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [walk] c walk minutes 25 | prefill mins="30" dist=(no box) | typed mins="25" dist=null | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"walk","mins":25,"dist":"","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w1_wed":{"restLog":{"walk":{"mins":25,"rpe":5}},"week":1,"ts":1791475200000}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 1 1 entry Wed 25 min walk logged · RPE 5 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Yo"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+  [run] d re-entry #1 distance only 3.1 -> toast "30 min logged ✓" | stored {"w1_wed":{"restLog":{"run":{"mins":30,"dist":3.1,"rpe":5}},"week":1,"ts":1791475200000}} | MILES 3.1
+  [run] d re-entry #2 distance only 3.1 -> toast "30 min logged ✓" | stored {"w1_wed":{"restLog":{"run":{"mins":60,"dist":6.2,"rpe":5}},"week":1,"ts":1791475200000}} | MILES 6.2
+
+######## V237 (ia-version 237) clock Thu 2026-10-08 noon ########
+
+== start 2026-09-28 | currentWeek 2 | today key thu (Posterior Chain) | rest days W2: wed,sun
+  week view: hero "Today · Thursday" | "Training anyway?" on screen false | MILES 0
+  tap WED cell (onclick openDayKey('wed')): restDayEligible true | sheet open true | toast "" | sheet: WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+  tap SUN cell (onclick openDayKey('sun')): restDayEligible false | sheet open false | toast ""
+
+  [run] a1 distance only (minutes box left at its prefill) | prefill mins="30" dist="" | typed mins=null dist="3.1" | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"run","mins":30,"dist":"3.1","rpe":5}
+    Log it -> toast "30 min logged ✓" | sheet still open false | stored ia_logs_ {"w2_wed":{"rest_cardio":true,"rest_type":"run","rest_mins":30,"rpe":5,"run_dist":3.1}} | typed distance in store: true
+    readers: MILES 3.1 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total 3.1 mi | no-data false | journal "Session Journal Week 2 1 entry Wed RPE 5 — Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training st"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] a2 distance only, minutes box cleared | prefill mins="30" dist="" | typed mins="" dist="3.1" | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"run","mins":0,"dist":"3.1","rpe":5}
+    Log it -> toast "How long did you go?" | sheet still open true | stored ia_logs_ null | typed distance in store: false
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data true | journal "(no journal)"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] b minutes + distance | prefill mins="30" dist="" | typed mins="25" dist="3.1" | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"run","mins":25,"dist":"3.1","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w2_wed":{"rest_cardio":true,"rest_type":"run","rest_mins":25,"rpe":5,"run_dist":3.1}} | typed distance in store: true
+    readers: MILES 3.1 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total 3.1 mi | no-data false | journal "Session Journal Week 2 1 entry Wed RPE 5 — Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training st"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] c minutes only | prefill mins="30" dist="" | typed mins="25" dist=null | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"run","mins":25,"dist":"","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w2_wed":{"rest_cardio":true,"rest_type":"run","rest_mins":25,"rpe":5}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 2 1 entry Wed RPE 5 — Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training st"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [walk] a1 walk, distance n/a, minutes prefill | prefill mins="30" dist=(no box) | typed mins=null dist=null | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"walk","mins":30,"dist":"","rpe":5}
+    Log it -> toast "30 min logged ✓" | sheet still open false | stored ia_logs_ {"w2_wed":{"rest_cardio":true,"rest_type":"walk","rest_mins":30,"rpe":5}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 2 1 entry Wed RPE 5 — Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training st"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [walk] c walk minutes 25 | prefill mins="30" dist=(no box) | typed mins="25" dist=null | _restDraft at Log {"w":2,"day":"wed","view":"cardio","pick":null,"type":"walk","mins":25,"dist":"","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w2_wed":{"rest_cardio":true,"rest_type":"walk","rest_mins":25,"rpe":5}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 2 1 entry Wed RPE 5 — Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training st"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+  [run] d re-entry #1 distance only 3.1 -> toast "30 min logged ✓" | stored {"w2_wed":{"rest_cardio":true,"rest_type":"run","rest_mins":30,"rpe":5,"run_dist":3.1}} | MILES 3.1
+  [run] d re-entry #2 distance only 3.1 -> toast "30 min logged ✓" | stored {"w2_wed":{"rest_cardio":true,"rest_type":"run","rest_mins":30,"rpe":5,"run_dist":6.2}} | MILES 6.2
+
+== start 2026-10-05 | currentWeek 1 | today key thu (Posterior Chain) | rest days W1: wed,sun
+  week view: hero "Today · Thursday" | "Training anyway?" on screen false | MILES 0
+  tap WED cell (onclick openDayKey('wed')): restDayEligible true | sheet open true | toast "" | sheet: WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+  tap SUN cell (onclick openDayKey('sun')): restDayEligible false | sheet open false | toast ""
+
+  [run] a1 distance only (minutes box left at its prefill) | prefill mins="30" dist="" | typed mins=null dist="3.1" | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"run","mins":30,"dist":"3.1","rpe":5}
+    Log it -> toast "30 min logged ✓" | sheet still open false | stored ia_logs_ {"w1_wed":{"rest_cardio":true,"rest_type":"run","rest_mins":30,"rpe":5,"run_dist":3.1}} | typed distance in store: true
+    readers: MILES 3.1 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total 3.1 mi | no-data false | journal "Session Journal Week 1 1 entry Wed RPE 5 — Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training st"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] a2 distance only, minutes box cleared | prefill mins="30" dist="" | typed mins="" dist="3.1" | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"run","mins":0,"dist":"3.1","rpe":5}
+    Log it -> toast "How long did you go?" | sheet still open true | stored ia_logs_ null | typed distance in store: false
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data true | journal "(no journal)"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] b minutes + distance | prefill mins="30" dist="" | typed mins="25" dist="3.1" | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"run","mins":25,"dist":"3.1","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w1_wed":{"rest_cardio":true,"rest_type":"run","rest_mins":25,"rpe":5,"run_dist":3.1}} | typed distance in store: true
+    readers: MILES 3.1 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total 3.1 mi | no-data false | journal "Session Journal Week 1 1 entry Wed RPE 5 — Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training st"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [run] c minutes only | prefill mins="30" dist="" | typed mins="25" dist=null | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"run","mins":25,"dist":"","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w1_wed":{"rest_cardio":true,"rest_type":"run","rest_mins":25,"rpe":5}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 1 1 entry Wed RPE 5 — Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training st"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [walk] a1 walk, distance n/a, minutes prefill | prefill mins="30" dist=(no box) | typed mins=null dist=null | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"walk","mins":30,"dist":"","rpe":5}
+    Log it -> toast "30 min logged ✓" | sheet still open false | stored ia_logs_ {"w1_wed":{"rest_cardio":true,"rest_type":"walk","rest_mins":30,"rpe":5}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 1 1 entry Wed RPE 5 — Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training st"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+
+  [walk] c walk minutes 25 | prefill mins="30" dist=(no box) | typed mins="25" dist=null | _restDraft at Log {"w":1,"day":"wed","view":"cardio","pick":null,"type":"walk","mins":25,"dist":"","rpe":5}
+    Log it -> toast "25 min logged ✓" | sheet still open false | stored ia_logs_ {"w1_wed":{"rest_cardio":true,"rest_type":"walk","rest_mins":25,"rpe":5}} | typed distance in store: null
+    readers: MILES 0 | WED cell WED — 7 REST (cell html has jog mark: false) | hero rest lines [] | Progress run total (no mileage card) | no-data false | journal "Session Journal Week 1 1 entry Wed RPE 5 — Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training st"
+    back in: menu -> WEDNESDAY · REST DAY Not resting? Two ways to use it. Move a session you have not done yet, or log whatever cardio you g | no "logged" text
+             Log cardio -> WEDNESDAY · LOG CARDIO What did you do? Easy work on a rest day is recovery, not extra load. This will not touch your pr | inputs minutes="30" miles="" | no "logged" text
+  [run] d re-entry #1 distance only 3.1 -> toast "30 min logged ✓" | stored {"w1_wed":{"rest_cardio":true,"rest_type":"run","rest_mins":30,"rpe":5,"run_dist":3.1}} | MILES 3.1
+  [run] d re-entry #2 distance only 3.1 -> toast "30 min logged ✓" | stored {"w1_wed":{"rest_cardio":true,"rest_type":"run","rest_mins":30,"rpe":5,"run_dist":6.2}} | MILES 6.2
+
+== static V238 (index.html)
+  delete of a logs entry       6 10305,10316,10373,10396,14753,14778
+  restLog cleared/deleted      0 
+  rest_* cleared               0 
+  removeItem ia_logs_          0 
+  ia_logs_ key list (purge)    1 16406
+  openRestSheet      reads getLogs false | resets _restDraft.mins/dist true
+  renderRestSheet    reads getLogs false | resets _restDraft.mins/dist false
+  _renderRestCardio  reads getLogs false | resets _restDraft.mins/dist false
+  _renderRestMove    reads getLogs false | resets _restDraft.mins/dist false
+
+== static V237 (/private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/20578a8f-f8aa-4e72-ad06-fa95d0d97e86/scratchpad/base_v237.html)
+  delete of a logs entry       6 10256,10267,10324,10347,14689,14714
+  restLog cleared/deleted      0 
+  rest_* cleared               0 
+  removeItem ia_logs_          0 
+  ia_logs_ key list (purge)    1 16338
+  openRestSheet      reads getLogs false | resets _restDraft.mins/dist true
+  renderRestSheet    reads getLogs false | resets _restDraft.mins/dist false
+  _renderRestCardio  reads getLogs false | resets _restDraft.mins/dist false
+  _renderRestMove    reads getLogs false | resets _restDraft.mins/dist false
+
+DONE

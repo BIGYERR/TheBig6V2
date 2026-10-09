@@ -23,5 +23,5 @@ BLAST    …
 FUZZ     …
 VERDICT  GREEN | RED — <what>
 ```
-On GREEN the main session runs `handoff-update`, then `git add -A && git commit -m "V<N>: <title>" && git tag V<N> && git push --tags origin main`.
+On GREEN the main session runs `handoff-update`, then stages the build's files by path (never `git add -A`: another session's untracked files stay out; Mario, Post-V238) and runs `git commit -m "V<N>: <title>" && git tag V<N> && git push --tags origin main`.
 On RED the build goes back to builder with the named gate. The gate is not edited unless its oracle is shown wrong on a specific line.

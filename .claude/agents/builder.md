@@ -23,7 +23,7 @@ Procedure for every build:
    - when a rename touches a map whose keys are the old names, that map is rewritten last or excluded
    - the version meta bump is the last replacement in the script
    Keep the script; it is part of the record.
-4. Run it. Then immediately: `bash -c 'set -eo pipefail; node tests/harness.js index.html'` — the file must boot and build the HALF MANNY fixture before anything else happens.
+4. Run it. Then immediately: `python3 tests/sabotage.py --anchors-only index.html` (an old mutation whose anchor a ruled hunk rewrote is re-anchored in this build, never left NOT-APPLIED; Mario, Post-V238), and `bash -c 'set -eo pipefail; node tests/harness.js index.html'` — the file must boot and build the HALF MANNY fixture before anything else happens.
 5. Write or extend the gate for this change in `tests/gates/g<N>_<topic>.js` and the sabotage spec in `tests/sabotage/v<N>.json`. The gate's expectations come from the ruling's after-grid and an independent oracle (hand table, date math, doctrine text) — never from calling the engine and asserting it equals itself. Each mutation targets one gate.
 6. Hand off to gatekeeper with: the ruling, the edit script path, the gate + sabotage paths, the baseline path, and the classes of diff you EXPECT (so unclassified hunks stand out).
 

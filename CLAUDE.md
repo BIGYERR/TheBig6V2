@@ -39,12 +39,17 @@ in `tests/edits/`; nothing is committed that gatekeeper has not proved), tell Ma
 continue in a fresh chat. **A chat ends by handing Mario the next chat's prompt:** one line naming the build and its target
 version, plus anything he has already decided for it. Standing rules live in this file, never in the prompt; per-build
 scope lives in handoff §12.
+**One writer per working tree (Mario, Post-V238).** While a build is in flight, from the first builder dispatch to the
+deploy proof, one session writes to this working tree. Any other session that needs to write (a measure, a queue review,
+a docs pass) works in its own git worktree or waits until the build commits. V238's final hash went red on another
+session's files written into `tests/measure/` mid-proof.
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it.
 2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `v<N>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience.
 4. Builder ships: anchor-asserted edits (every anchor `count==1` before writing), `ia-version` bumped by ONE, exactly when Mario says so. **Right before every builder dispatch**, re-read HEAD against `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
 5. Gatekeeper proves it as **Proof scope** (below) sets out: one draft run, one final run. `gate.sh` reports every red, not the first. Green or a NAMED failing gate.
-6. `handoff-update` skill: the seven-element session entry. Then `git add -A && git commit -m "V<N>: <one line>" && git push && git tag V<N> && git push --tags`.
+6. `handoff-update` skill: the seven-element session entry. Then stage the build's files by path (every tracked change and every untracked file the build wrote; **never
+   `git add -A`**, Mario, Post-V238), and `git commit -m "V<N>: <one line>" && git push && git tag V<N> && git push --tags`.
 7. **A push is not a deploy. "Push" means Mario's phone gets the new version, and it is not done until you have proved that.** Pages can report its last build as `built` with no error while sitting several commits behind — it silently did not fire on V192 or V193. So after pushing, confirm all three, in this order, and never infer a later one from an earlier one:
    - the remote has it: `git rev-parse main` == `git rev-parse origin/main`, and `git show origin/main:index.html | grep -oE 'content="[0-9]+"'` reads the new version (read it out of `origin/main`, not the working copy);
    - Pages built THAT commit: `gh api repos/bigyerr/TheBig6V2/pages/builds/latest --jq '.status, .commit'`. If the commit is stale, force it with `gh api -X POST repos/bigyerr/TheBig6V2/pages/builds` and poll until `built` (~40 s);
@@ -75,7 +80,8 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
   slice lands after the draft, the final run is the version line and a sha256 check of the whole proven tree
   (`index.html` and every gate, spec, harness and tooling file under `tests/`, not the app file alone) showing 0
   changes since the draft, apart from `tests/row_manifest.txt`, which gatekeeper writes from the proven draft (Mario,
-  Post-V234).
+  Post-V234). The hash excludes untracked files the build did not write, and the brief names each one (Mario,
+  Post-V238).
 - **Previous version.** Only gates that are new or edited in the build run against the previous version. A row written
   by the era script does not make a gate edited. A new gate runs against the previous version's body relabelled to
   the candidate's version (its `ia-version` meta set to the candidate's), so its rows are tested, not its version
@@ -253,7 +259,9 @@ Every brief to either carries the per-build items, then the standing lines for t
   grep the other half; a conditional write with no else is a latch; `exStoreKey` is the only `ia_exw_` writer; race day
   is found by subtype; any `\uXXXX` text that must land is built with `chr(92)`, never typed; an era row for a table the
   ruling does not move comes from `tests/era_bump.py`, never by hand; builder never edits `tests/row_manifest.txt`,
-  and every new gate prints its rows through `tests/status.js`.
+  and every new gate prints its rows through `tests/status.js`; after every app slice builder runs
+  `python3 tests/sabotage.py --anchors-only index.html` and re-anchors any old mutation a ruled hunk orphaned (Mario,
+  Post-V238).
 - **Gatekeeper, standing:** run every edited gate against the previous version too, and every new gate, and every
   edited gate whose rows expect different results by version, against the previous version's body relabelled to the
   candidate's version; every build anchor-checks

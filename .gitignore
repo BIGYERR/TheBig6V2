@@ -10,3 +10,6 @@ __pycache__/
 # session profiling tooling (Mario's, not app or test code)
 cc_agent_profile.py
 profile.txt
+
+# Other sessions work in their own git worktrees here (Mario, Post-V238: one writer per working tree)
+.claude/worktrees/
