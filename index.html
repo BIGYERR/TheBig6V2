@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="237"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="238"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1227,11 +1227,50 @@ function getPrograms(){try{return JSON.parse(localStorage.getItem('ia_programs')
 function savePrograms(p){localStorage.setItem('ia_programs',JSON.stringify(p));}
 function getActiveProgId(){return localStorage.getItem('ia_active')||null;}
 function setActiveProgId(id){localStorage.setItem('ia_active',id);}
-function getLogs(){try{return JSON.parse(localStorage.getItem('ia_logs_'+activeProgId)||'{}');}catch{return{};}}
+// V238 (D223 item 5, Amendment 1 A1): restNorm is the read lens for one ia_logs_ day entry, and
+// getLogs/getLogsFor, the one read of the store, pass every entry through it. An entry with a
+// restLog, or with no rest_cardio, comes back as is. A V237 rest entry (rest_cardio still on it,
+// so persistLogFields never rebuilt it, and those keys are the jog's) comes back in the V238 shape
+// derived from the entry alone: restLog[rest_type] = {mins:rest_mins, rpe}; run_dist and
+// swim_yards become the run and swim dist; bike_mins becomes the ride's mins (the sum wins over
+// rest_mins). The seven flat keys it read are cleared; every key it does not name (sets, parked,
+// notes, week, ts) is carried untouched. It invents nothing: no ts, no week, no mins for a type
+// that held none. Pure: it never mutates its argument and nothing writes on boot; a legacy entry
+// converts when a writer's saveLogs persists the map it read. The lens runs outside the parse
+// try, so a lens fault can never come back as {} for a writer to save over the store.
+function restNorm(e){
+  if(!e||typeof e!=='object'||e.restLog||!e.rest_cardio) return e;
+  const FLAT=['rest_cardio','rest_type','rest_mins','rpe','run_dist','bike_mins','swim_yards'];
+  const num=v=>(+v>0?+v:0), t=e.rest_type||'';
+  const M={}, D={}, R={};
+  if(t&&num(e.rest_mins)) M[t]=num(e.rest_mins);
+  if(t&&e.rpe!=null&&e.rpe!==''&&isFinite(+e.rpe)) R[t]=+e.rpe;
+  if(num(e.run_dist)) D.run=num(e.run_dist);
+  if(num(e.swim_yards)) D.swim=num(e.swim_yards);
+  if(num(e.bike_mins)) M.bike=num(e.bike_mins);
+  const rl={};
+  [t,'run','swim','bike'].forEach(function(s,i,a){
+    if(!s||a.indexOf(s)!==i) return;
+    const o={};
+    if(s in M) o.mins=M[s];
+    if(s in D) o.dist=D[s];
+    if(s in R) o.rpe=R[s];
+    if(Object.keys(o).length) rl[s]=o;
+  });
+  const out={restLog:rl};
+  Object.keys(e).forEach(function(k){ if(FLAT.indexOf(k)<0) out[k]=e[k]; });
+  return out;
+}
+function restNormAll(l){
+  if(l&&typeof l==='object') Object.keys(l).forEach(function(k){ l[k]=restNorm(l[k]); });
+  return l;
+}
+function getLogs(){let l;try{l=JSON.parse(localStorage.getItem('ia_logs_'+activeProgId)||'{}');}catch{return{};}return restNormAll(l);}
 // V156: id-parameterized variants. The zero-arg accessors above stay untouched so every
 // existing call site is byte-identical; only the Progress selector and the wizard seed
 // read OTHER programs' stores, and they must say which one out loud.
-function getLogsFor(pid){try{return JSON.parse(localStorage.getItem('ia_logs_'+pid)||'{}');}catch{return{};}}
+// V238 (D223 item 5): the same restNorm lens as getLogs.
+function getLogsFor(pid){let l;try{l=JSON.parse(localStorage.getItem('ia_logs_'+pid)||'{}');}catch{return{};}return restNormAll(l);}
 function getDayHistFor(pid){try{return JSON.parse(localStorage.getItem('ia_hist_'+pid)||'{}');}catch{return{};}}
 function getExWeightsFor(pid){try{return JSON.parse(localStorage.getItem('ia_exw_'+pid)||'{}');}catch{return{};}}
 function saveExWeightsFor(pid,obj){localStorage.setItem('ia_exw_'+pid,JSON.stringify(obj));}
@@ -1434,13 +1473,21 @@ function applyRestCardio(){
   if(m<=0){showToast('How long did you go?');return;}
   const logs=getLogs(); const k=completedKey(w,day);
   const e=Object.assign({},logs[k]||{});
-  e.rest_cardio=true; e.rest_type=type; e.rest_mins=m; e.rpe=rpe;
-  // Feed the same fields Progress already aggregates, so weekly mileage picks this up
-  // without a second aggregation path.
-  const d=parseFloat(dist);
-  if(type==='run'&&d>0)  e.run_dist=(+e.run_dist||0)+d;
-  if(type==='bike')      e.bike_mins=(+e.bike_mins||0)+m;
-  if(type==='swim'&&d>0) e.swim_yards=(+e.swim_yards||0)+d;
+  // V238 (D223 items 1-2, Amendment 1 A6, D226): the jog is its own record on the day,
+  // restLog[type] = {mins, dist?, rpe}, numbers. It writes no top-level key a session reads:
+  // rest_cardio, rest_type, rest_mins, rpe and the run_dist/bike_mins/swim_yards sum are retired,
+  // so a session moved onto the day opens empty and its rebuild carries the jog. dist is stored
+  // only when the box took one (parseFloat > 0), never on walk. "Log more" never overwrites: the
+  // same type adds mins and dist and keeps the higher RPE; another type gets its own key. week
+  // and ts are stamped the way writeSetDraft stamps them.
+  const rl=Object.assign({},e.restLog||{}), was=rl[type]||{}, o={};
+  const fin=v=>(v!=null&&v!==''&&isFinite(+v))?+v:null;
+  const d=parseFloat(dist), dd=(type!=='walk'&&d>0)?d:0, wd=(+was.dist>0)?+was.dist:0;
+  o.mins=((+was.mins>0)?+was.mins:0)+m;
+  if(type!=='walk'&&wd+dd>0) o.dist=wd+dd;
+  const r0=fin(was.rpe), r1=fin(rpe);
+  if(r0!=null||r1!=null) o.rpe=Math.max(r0==null?-Infinity:r0, r1==null?-Infinity:r1);
+  rl[type]=o; e.restLog=rl; e.week=w; e.ts=Date.now();
   logs[k]=e; saveLogs(logs);
   closeRestSheet(); renderWeekView();
   showToast(m+' min logged \u2713');
@@ -1538,9 +1585,11 @@ function restMoveCandidates(w){
     if(comp[k]) return;
     const lg=logs[k];
     // V236 (D219 item 2): logged = an RPE, a note, or any field of CARDIO_PARK_FIELDS (the table cardioEntryLive
-    // reads, every sport), so a Log-tapped time, pace or rep-time form is never offered as not logged. swapTo and
-    // parked are not a log here: P-RESTMOVELOG.
-    if(lg&&(lg.rpe||lg.notes||Object.keys(CARDIO_PARK_FIELDS).some(function(s){ return CARDIO_PARK_FIELDS[s].some(function(f){ return !!lg[f]; }); }))) return;
+    // reads, every sport), so a Log-tapped time, pace or rep-time form is never offered as not logged.
+    // V238 (D225): a live swap (swapTo) or parked numbers (parked) are a log too, so a swapped-away day is never
+    // offered as a move origin. A chip tapped back to the planned sport leaves swapTo '' and no parked key
+    // (setCardioSwap deletes an empty park), so that day is judged on its session fields alone again.
+    if(lg&&(lg.rpe||lg.notes||lg.swapTo||lg.parked||Object.keys(CARDIO_PARK_FIELDS).some(function(s){ return CARDIO_PARK_FIELDS[s].some(function(f){ return !!lg[f]; }); }))) return;
     out.push({day:d,label:DAY_FULL[d]||d,title:day.title||'Training'});
   });
   return out;
@@ -11953,6 +12002,16 @@ function _wkScoot(el,to,cur){
   };
   _wkScootTmr=setTimeout(()=>{ _wkScootTmr=0; _wkScootRaf=requestAnimationFrame(step); },260);
 }
+// V238 (D224 rest hero H1 as restated in Amendment 1 A2, and the journal): the rest hero's sentence for
+// a day's rest-day jog record, one string per restLog type that holds mins, in restLog's key order,
+// e.g. "37 min run logged · RPE 7". The sport words are the hero's map; a missing RPE prints the
+// hero's dash. The journal prints the same strings, so the two never word a jog differently. A type
+// with no mins (a legacy lensed run that kept only its distance) has no line: the lens invents nothing.
+function restLogLines(rl){
+  if(!rl||typeof rl!=='object') return [];
+  const W={run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'};
+  return Object.keys(rl).filter(t=>rl[t]&&+rl[t].mins>0).map(t=>rl[t].mins+' min '+(W[t]||t)+' logged · RPE '+(rl[t].rpe||'—'));
+}
 function renderWeekView(){
   if(!activeProg) return;
   const nm=activeProg.name.length>26?activeProg.name.slice(0,26)+'…':activeProg.name;
@@ -12162,8 +12221,11 @@ function renderWeekView(){
   // Provenance and bonus work, surfaced on the hero so neither is a silent change.
   const _heroMovedFrom=(heroKey&&wkData[heroKey]&&wkData[heroKey].movedFrom)?(DAY_FULL[wkData[heroKey].movedFrom]||wkData[heroKey].movedFrom):null;
   const _heroCardio=(heroKey&&wkData[heroKey]&&wkData[heroKey].rest)?((getLogs()||{})[completedKey(currentWeek,heroKey)]||null):null;
-  const _rcLine=(_heroCardio&&_heroCardio.rest_cardio)
-    ? '<div class="wk-rest-logged">'+_heroCardio.rest_mins+' min '+(({run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'})[_heroCardio.rest_type]||_heroCardio.rest_type)+' logged \u00b7 RPE '+(_heroCardio.rpe||'\u2014')+'</div>'
+  // V238 (D224 rest hero, H1 as restated in Amendment 1 A2): the entry comes through the getLogs lens,
+  // so a V237 rest entry reads as restLog too. One line per restLog type that holds mins, in key
+  // order, same sentence and class as before; Log more below stays keyed on a line being there.
+  const _rcLine=(_heroCardio&&_heroCardio.restLog)
+    ? restLogLines(_heroCardio.restLog).map(s=>'<div class="wk-rest-logged">'+s+'</div>').join('')
     : '';
   if(heroMode==='rest'){
     const tip=restDayTip();
@@ -12210,7 +12272,9 @@ function renderWeekView(){
   // ── stat tiles ──
   const trainDays=order.filter(d=>wkData[d]&&!wkData[d].rest&&!dayBeforeStart(activeProg,currentWeek,d));   // V174 (D24): 0/2, not 0/5
   const doneN=trainDays.filter(d=>{const cp=completed[completedKey(currentWeek,d)];return cp&&(cp.status||'complete')==='complete';}).length;
-  let miles=0; order.forEach(d=>{ const v=parseFloat((logs[logKey(currentWeek,d)]||{}).run_dist); if(!isNaN(v)) miles+=v; });
+  // V238 (D224, weekly sums credit the jog): MILES is every day's session run_dist plus every
+  // day's rest-day jog, restLog.run.dist. Walk and row jogs credit nothing (MILES is a run tile).
+  let miles=0; order.forEach(d=>{ const e=logs[logKey(currentWeek,d)]||{}; const v=parseFloat(e.run_dist); if(!isNaN(v)) miles+=v; const j=+((e.restLog||{}).run||{}).dist; if(j>0) miles+=j; });
   miles=Math.round(miles*10)/10;
   const streak=computeStreak();
   const stats='<div class="wk-stats">'
@@ -14813,6 +14877,9 @@ function persistLogFields(dayKey, commit){
   const _keepSets=(logs[key]&&logs[key].sets)||null;
   // V234 (D213): the parked sport sets ride the rebuild the same way the sets do.
   const _keepParked=(logs[key]&&logs[key].parked)||null;
+  // V238 (D223 item 3): the rest-day jog's record rides the rebuild the same way. It is not a
+  // park field, so setCardioSwap never moves it.
+  const _keepRest=(logs[key]&&logs[key].restLog)||null;
   // V236 (D219): an untouched slider carries the entry's rpe.
   const _rpeEl=document.getElementById('log_rpe');
   const _rpe=(_rpeEl&&_rpeEl.dataset.touched==='1')?g('log_rpe'):((logs[key]&&logs[key].rpe!=null)?logs[key].rpe:'');
@@ -14827,6 +14894,7 @@ function persistLogFields(dayKey, commit){
   };
   if(_keepSets) logs[key].sets=_keepSets;
   if(_keepParked) logs[key].parked=_keepParked;
+  if(_keepRest) logs[key].restLog=_keepRest;
   // V148: derived values feed the LEGACY keys so charts, the journal and _hasLog keep
   // one read surface. run_pace only when no manual pace field is present (dose forms
   // have none, so this never overwrites a typed pace); run_dist only when the interval
@@ -16437,6 +16505,10 @@ function seedFromPriorPrograms(now){
     Object.entries(logs||{}).forEach(([key,e])=>{
       if(!e||!(e.ts>0)||e.ts<cut||e.ts>now) return;   // D5 window, both boundaries
       if(e.run_dist&&+e.run_dist>0) maxDist=Math.max(maxDist,+e.run_dist);
+      // V238 (D224 max readers, Amendment 1 A3): a rest-day jog inside the ts window is its own
+      // candidate for the longest run, never summed with the day's session. The pace seeds stay
+      // blind: a jog has no pace.
+      const _jd=+((e.restLog||{}).run||{}).dist; if(_jd>0) maxDist=Math.max(maxDist,_jd);
       const r=_recoveryPaceEntry(key,e,hist,tw);       // V155 predicate, reused
       if(!r) return;
       paces.push(r.sec); if(e.ts>latest) latest=e.ts;
@@ -16688,8 +16760,12 @@ function ladderWeekly(logs, totalWeeks, cut, skip1){
     const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
     if(cut&&w===cut) return;                       // D6
     if(skip1&&w===1) return;                       // V174 D26: short first week
-    const d=+e.run_dist; if(!(d>0)) return;
-    wk[w]=Math.max(wk[w]||0, d);
+    // V238 (D224 max readers, Amendment 1 A5): the rest-day jog is one more candidate for the
+    // week's longest single run, never added to the day's session: a double day's longest run is
+    // max(session, jog).
+    const d=+e.run_dist, j=+((e.restLog||{}).run||{}).dist;
+    const top=Math.max(d>0?d:0, j>0?j:0); if(!(top>0)) return;
+    wk[w]=Math.max(wk[w]||0, top);
   });
   return wk;
 }
@@ -17618,6 +17694,18 @@ function renderProgressScreen() {
     if(entry.rpe && +entry.rpe > 0) {
       weeklyData[w].rpe = weeklyData[w].rpe ? (+weeklyData[w].rpe + +entry.rpe)/2 : +entry.rpe;
     }
+    // V238 (D224, Amendment 1 A4): the rest-day jog (restLog) is its own record on the day and the
+    // weekly sums credit it: run adds restLog.run.dist, bike adds restLog.bike.mins, swim adds
+    // restLog.swim.dist (yards). Walk and row credit no total. Each jog type with an RPE is one
+    // more effort in the average, after the day's session RPE when that is set.
+    const _rl = (entry.restLog && typeof entry.restLog === 'object') ? entry.restLog : {};
+    if(_rl.run && +_rl.run.dist > 0) weeklyData[w].run += +_rl.run.dist;
+    if(_rl.bike && +_rl.bike.mins > 0) weeklyData[w].bike += +_rl.bike.mins;
+    if(_rl.swim && +_rl.swim.dist > 0) weeklyData[w].swim += +_rl.swim.dist;
+    Object.keys(_rl).forEach(t => {
+      const r = _rl[t] ? +_rl[t].rpe : 0;
+      if(r > 0) weeklyData[w].rpe = weeklyData[w].rpe ? (+weeklyData[w].rpe + r)/2 : r;
+    });
     // Count session if ANY meaningful data was logged
     if(entry.rpe||entry.run_dist||entry.bike_mins||entry.swim_yards||entry.notes) {
       weeklyData[w].sessions++;
@@ -17742,7 +17830,9 @@ function renderProgressScreen() {
   const journalEntries = [];
   Object.entries(allLogs).forEach(([key, entry]) => {
     // V236 (D219 item 3): a swap with no RPE and no note keeps its row, the isSwap line below.
-    if(!entry.notes && !entry.rpe && !(entry.swapFrom && entry.swapTo)) return;
+    // V238 (D224 journal, Amendment 1 A4): a day with a rest-day jog (restLog) keeps its row too, so a walk
+    // or row jog alone still reaches the journal and Progress does not fall back to its empty state.
+    if(!entry.notes && !entry.rpe && !(entry.swapFrom && entry.swapTo) && !(entry.restLog && Object.keys(entry.restLog).length)) return;
     const match = key.match(/^w(\d+)_(\w+)$/);
     if(!match) return;
     const w = parseInt(match[1]);
@@ -17769,13 +17859,17 @@ function renderProgressScreen() {
         const dayName = ({sun:'Sun',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat'})[dayKey]||dayKey;
         const isSwap = entry.swapFrom && entry.swapTo;
         const swapWord = s => ({run:'Run',bike:'Bike',swim:'Swim'})[s]||s;
-        const headMb = (entry.notes||isSwap) ? 6 : 0;
+        // V238 (D224 journal, A3): each jog type with mins prints one line, the rest hero's own sentence
+        // (restLogLines), never an RPE_LABELS word: the sheet's effort words are not the label table's.
+        const jogLines = restLogLines(entry.restLog);
+        const headMb = (entry.notes||isSwap||jogLines.length) ? 6 : 0;
         return `<div style="background:var(--surface2);border-radius:4px;padding:10px 12px;margin-bottom:6px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${headMb}px">
             <div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text)">${dayName}</div>
             ${entry.rpe ? `<div style="font-family:var(--font-display);font-size:12px;font-weight:700;color:${rpeColor}">RPE ${entry.rpe} — ${RPE_LABELS[+entry.rpe]||''}</div>` : ''}
           </div>
-          ${isSwap ? `<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--accent);background:rgba(24,23,18,0.06);border-radius:3px;padding:3px 7px;margin-bottom:${entry.notes?6:0}px">${asyIcon('history',12)} Swapped ${swapWord(entry.swapFrom)} → ${swapWord(entry.swapTo)}</div>` : ''}
+          ${isSwap ? `<div style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--accent);background:rgba(24,23,18,0.06);border-radius:3px;padding:3px 7px;margin-bottom:${(entry.notes||jogLines.length)?6:0}px">${asyIcon('history',12)} Swapped ${swapWord(entry.swapFrom)} → ${swapWord(entry.swapTo)}</div>` : ''}
+          ${jogLines.length ? `<div style="margin-bottom:${entry.notes?6:0}px">${jogLines.map(s => `<div style="font-size:12px;font-weight:500;color:var(--run);line-height:1.5">${s}</div>`).join('')}</div>` : ''}
           ${entry.notes ? `<div style="font-size:12px;color:var(--muted);line-height:1.5;font-style:italic">"${entry.notes}"</div>` : ''}
         </div>`;
       }).join('');

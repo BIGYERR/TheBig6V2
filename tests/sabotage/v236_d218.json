@@ -85,16 +85,16 @@
  },
  {
   "name": "S13-D219 item 2 reverted: the rest-move logged test loses the CARDIO_PARK_FIELDS keys, a Log-tapped time form is offered as not logged",
-  "anchor": "    if(lg&&(lg.rpe||lg.notes||Object.keys(CARDIO_PARK_FIELDS).some(function(s){ return CARDIO_PARK_FIELDS[s].some(function(f){ return !!lg[f]; }); }))) return;",
-  "replacement": "    if(lg&&(lg.rpe||lg.notes||lg.run_dist||lg.bike_mins||lg.swim_yards)) return;",
+  "anchor": "    if(lg&&(lg.rpe||lg.notes||lg.swapTo||lg.parked||Object.keys(CARDIO_PARK_FIELDS).some(function(s){ return CARDIO_PARK_FIELDS[s].some(function(f){ return !!lg[f]; }); }))) return;",
+  "replacement": "    if(lg&&(lg.rpe||lg.notes||lg.swapTo||lg.parked||lg.run_dist||lg.bike_mins||lg.swim_yards)) return;",
   "gate": "gates/g236_d218_logbutton.js",
-  "note": "NAMED TRIP: g236_d218_logbutton.js row D219-counter conjunct rest-move (W1 FRI logged 0:47:13 with no RPE is offered; hand: mon, tue, thu, sat). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219 Amendment 1 (b), (c))."
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D219-counter conjunct rest-move (W1 FRI logged 0:47:13 with no RPE is offered; hand: mon, tue, thu, sat). Re-anchored in V238 because D225 rewrote the line to add lg.swapTo||lg.parked; the mutation still drops only the CARDIO_PARK_FIELDS keys and keeps the D225 clause. Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219 Amendment 1 (b), (c))."
  },
  {
   "name": "S14-D219 item 3 reverted: the journal skip drops a swap with no RPE and no note",
-  "anchor": "    if(!entry.notes && !entry.rpe && !(entry.swapFrom && entry.swapTo)) return;",
-  "replacement": "    if(!entry.notes && !entry.rpe) return;",
+  "anchor": "    if(!entry.notes && !entry.rpe && !(entry.swapFrom && entry.swapTo) && !(entry.restLog && Object.keys(entry.restLog).length)) return;",
+  "replacement": "    if(!entry.notes && !entry.rpe && !(entry.restLog && Object.keys(entry.restLog).length)) return;",
   "gate": "gates/g236_d218_logbutton.js",
-  "note": "NAMED TRIP: g236_d218_logbutton.js row D219-counter conjunct journal-swap (no W1 journal row; hand: Sat, \"Swapped Run → Bike\"). Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219 Amendment 1 (b), (c))."
+  "note": "NAMED TRIP: g236_d218_logbutton.js row D219-counter conjunct journal-swap (no W1 journal row; hand: Sat, \"Swapped Run → Bike\"). Re-anchored in V238 because D224 extended the line with the restLog clause; the mutation still drops only the lone-swap clause and keeps the D224 clause. Ruling: tests/measure/v236_rulings/v236_ruling_d218_d219.md (D218/D219 Amendment 1 (b), (c))."
  }
 ]

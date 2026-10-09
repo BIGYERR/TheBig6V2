@@ -184,6 +184,7 @@ DELOAD_ARB_BY_VERSION[234] = DELOAD_ARB_BY_VERSION[233];   // era_bump V234: rul
 DELOAD_ARB_BY_VERSION[235] = DELOAD_ARB_BY_VERSION[234];   // era_bump V235: ruled UNMOVED, reference to [234]; tests/measure/v235_rulings/v235_ruling_d215_d217.md
 DELOAD_ARB_BY_VERSION[236] = DELOAD_ARB_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, reference to [235]; tests/measure/v236_rulings/v236_ruling_d218_d219.md
 DELOAD_ARB_BY_VERSION[237] = DELOAD_ARB_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
+DELOAD_ARB_BY_VERSION[238] = DELOAD_ARB_BY_VERSION[237];   // era_bump V238: ruled UNMOVED, reference to [237]; tests/measure/v238_rulings/v238_ruling_d223_d227.md
 E6_BY_VERSION[224] = E6_BY_VERSION[223];   // V224 (D185 P-WCTODAY): ruled UNMOVED (D185 is pure CSS, the wildcard-mark/checkmark color fix; no hunk reaches buildProgram; standing ruling 5: HALF_MANNY 0ac7da6b1691a8e1 / deload-off 1069cd7f86eed204 / core-off 9d14801a63111081 printed by gatekeeper's fuzz sweep on the V224 candidate; E6 28 carries)
 E6_BY_VERSION[225] = E6_BY_VERSION[224];   // V225 (D186 P-CLOCKEND, D187 P-PACERATE): ruled UNMOVED (both rulings touch only the run_pace_goal pace clock and rate; no hunk reaches buildProgram's deload arbitration; E6 28 carries)
 E6_BY_VERSION[226] = E6_BY_VERSION[225];   // V226 (D188 P-BEGINNERMILE, D189 P-PACEDISCLOSE): UNMOVED, reference to [225] (routine per-version table upkeep, session decision for V226 build 5: D188 reads a beginner's mile and D189 discloses a default anchor, and no value this table compares moved; printed equal to [225] on the V226 working tree (slices 1 to 6 landed) by builder with this gate before this row; E6 28 carries)
@@ -198,6 +199,7 @@ E6_BY_VERSION[234] = E6_BY_VERSION[233];   // era_bump V234: ruled UNMOVED, refe
 E6_BY_VERSION[235] = E6_BY_VERSION[234];   // era_bump V235: ruled UNMOVED, reference to [234]; tests/measure/v235_rulings/v235_ruling_d215_d217.md
 E6_BY_VERSION[236] = E6_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, reference to [235]; tests/measure/v236_rulings/v236_ruling_d218_d219.md
 E6_BY_VERSION[237] = E6_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
+E6_BY_VERSION[238] = E6_BY_VERSION[237];   // era_bump V238: ruled UNMOVED, reference to [237]; tests/measure/v238_rulings/v238_ruling_d223_d227.md
 DELOAD_HINGE_BY_VERSION[224] = DELOAD_HINGE_BY_VERSION[223];   // V224 (D185 P-WCTODAY): ruled UNMOVED (D185 is pure CSS, the wildcard-mark/checkmark color fix; no hunk reaches buildProgram; standing ruling 5: HALF_MANNY 0ac7da6b1691a8e1 / deload-off 1069cd7f86eed204 / core-off 9d14801a63111081 printed by gatekeeper's fuzz sweep on the V224 candidate; E1a 12369 E1b 9319 E3 44 G1 1275 G5 44 carry)
 DELOAD_HINGE_BY_VERSION[225] = DELOAD_HINGE_BY_VERSION[224];   // V225 (D186 P-CLOCKEND, D187 P-PACERATE): ruled UNMOVED (both rulings touch only the run_pace_goal pace clock and rate; no hunk reaches buildProgram's deload/hinge arbitration; E1a 12369 E1b 9319 E3 44 G1 1275 G5 44 carry)
 DELOAD_HINGE_BY_VERSION[226] = DELOAD_HINGE_BY_VERSION[225];   // V226 (D188 P-BEGINNERMILE, D189 P-PACEDISCLOSE): UNMOVED, reference to [225] (routine per-version table upkeep, session decision for V226 build 5: D188 reads a beginner's mile and D189 discloses a default anchor, and no value this table compares moved; printed equal to [225] on the V226 working tree (slices 1 to 6 landed) by builder with this gate before this row; E1a 12369 E1b 9319 E3 44 G1 1275 G5 44 carry)
@@ -212,6 +214,7 @@ DELOAD_HINGE_BY_VERSION[234] = DELOAD_HINGE_BY_VERSION[233];   // era_bump V234:
 DELOAD_HINGE_BY_VERSION[235] = DELOAD_HINGE_BY_VERSION[234];   // era_bump V235: ruled UNMOVED, reference to [234]; tests/measure/v235_rulings/v235_ruling_d215_d217.md
 DELOAD_HINGE_BY_VERSION[236] = DELOAD_HINGE_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, reference to [235]; tests/measure/v236_rulings/v236_ruling_d218_d219.md
 DELOAD_HINGE_BY_VERSION[237] = DELOAD_HINGE_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
+DELOAD_HINGE_BY_VERSION[238] = DELOAD_HINGE_BY_VERSION[237];   // era_bump V238: ruled UNMOVED, reference to [237]; tests/measure/v238_rulings/v238_ruling_d223_d227.md
 
 // ── HAND ORACLE ────────────────────────────────────────────────────────────────────
 const E_PAT=[

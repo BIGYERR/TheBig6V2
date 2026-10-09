@@ -1,0 +1,128 @@
+[
+ {
+  "name": "S1-D223 the jog writer writes rpe at the top level again",
+  "anchor": "rl[type]=o; e.restLog=rl; e.week=w; e.ts=Date.now();",
+  "replacement": "rl[type]=o; e.restLog=rl; e.week=w; e.ts=Date.now(); e.rpe=rpe;",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D223-writer (every cell stores top-level rpe 7; hand none of rpe, run_dist, bike_mins, swim_yards, rest_cardio, rest_type, rest_mins). D223 item 2: the writer no longer writes rpe. Observed V238 slice 5 (each mutation alone on a scratch copy, g238 only): also trips D223-noseed (the moved-in slider seeds 7), D224-journal and D226-logmore (top-level rpe beside restLog). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D223 item 2; R1 as restated by Amendment 1)."
+ },
+ {
+  "name": "S2-D223 the jog writer sums the run distance into run_dist again",
+  "anchor": "rl[type]=o; e.restLog=rl; e.week=w; e.ts=Date.now();",
+  "replacement": "rl[type]=o; e.restLog=rl; e.week=w; e.ts=Date.now(); if(type==='run'&&dd>0) e.run_dist=(+e.run_dist||0)+dd;",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D223-writer (the run cell stores run_dist 3.7 at the top level; hand absent). D223 item 2: no sum into run_dist/bike_mins/swim_yards. Observed V238 slice 5 (each mutation alone on a scratch copy, g238 only): also trips D223-noseed (the moved-in wheels seed 3.7) and D226-logmore (top-level run_dist). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D223 item 2; R1)."
+ },
+ {
+  "name": "S3-D226 Log more overwrites the same type instead of adding",
+  "anchor": "o.mins=((+was.mins>0)?+was.mins:0)+m;\n  if(type!=='walk'&&wd+dd>0) o.dist=wd+dd;",
+  "replacement": "o.mins=m;\n  if(type!=='walk'&&dd>0) o.dist=dd;",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D226-logmore (run then run stores {mins:20, dist:2}; hand 37 + 20 = 57, 3.7 + 2 = 5.7). Observed V238 slice 5 (each mutation alone on a scratch copy, g238 only): also trips both D226-logmore run arms (run-run and run-run-up). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D226: same type, mins and dist add; R8)."
+ },
+ {
+  "name": "S4-D226 Log more keeps the last RPE instead of the higher",
+  "anchor": "if(r0!=null||r1!=null) o.rpe=Math.max(r0==null?-Infinity:r0, r1==null?-Infinity:r1);",
+  "replacement": "if(r0!=null||r1!=null) o.rpe=(r1!=null?r1:r0);",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D226-logmore, arm run-run (7 then 5 stores rpe 5; hand max(7, 5) = 7). The arm run-run-up (5 then 9) holds under this mutation by design: it pins the other direction (a first-wins mutation). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D226: rpe takes the higher of the two; R8)."
+ },
+ {
+  "name": "S5-D223 persistLogFields drops the restLog carry",
+  "anchor": "if(_keepRest) logs[key].restLog=_keepRest;",
+  "replacement": "if(_keepRest) void 0;",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D223-carry (every pick and sequence leaves restLog undefined, 3 of 3 leaves lost; hand {run:{mins:37, dist:3.7, rpe:7}}, 0 lost). Observed V238 slice 5 (each mutation alone on a scratch copy, g238 only): also trips D224-miles, D224-progress and D224-journal (the jog is gone after the rebuild). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D223 item 3; R2)."
+ },
+ {
+  "name": "S6-D223 the read lens returns a V237 entry unconverted",
+  "anchor": "if(!e||typeof e!=='object'||e.restLog||!e.rest_cardio) return e;",
+  "replacement": "return e;",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D223-lens (getLogs/getLogsFor return the flat V237 keys, the journal prints \"RPE 7 — Very Hard\", the sets entry keeps rest_*, one saveLogs leaves both entries in the V237 shape; hand the restLog shapes). Observed V238 slice 5 (each mutation alone on a scratch copy, g238 only): also trips D224-journal legacy-nomins and D224-hero (v237-single, bike>run, bike>bike: the hero reads restLog only). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D223 item 5, Amendment 1 A1; R9)."
+ },
+ {
+  "name": "S7-D223 the read lens writes back on read (saveLogs inside getLogs)",
+  "anchor": "function getLogs(){let l;try{l=JSON.parse(localStorage.getItem('ia_logs_'+activeProgId)||'{}');}catch{return{};}return restNormAll(l);}",
+  "replacement": "function getLogs(){let l;try{l=JSON.parse(localStorage.getItem('ia_logs_'+activeProgId)||'{}');}catch{return{};}l=restNormAll(l);saveLogs(l);return l;}",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D223-lens, conjuncts reads-write-nothing and boot-writes-nothing (raw ia_logs_ bytes change on a read; hand unchanged). These conjuncts hold on V237 too: they are the no-change guards R12 says sabotage must break. Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D223 item 5: no boot write, heal on the next save; Mario item 4; R9, R12)."
+ },
+ {
+  "name": "S8-D224 week MILES ignores the jog's restLog.run.dist",
+  "anchor": "const j=+((e.restLog||{}).run||{}).dist; if(j>0) miles+=j;",
+  "replacement": "const j=0;",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D224-miles (MON moved in 5.2 reads 5.2, TUE moved in Done reads 0, bike form reads 0; hand 8.9, 3.7, 3.7). Observed V238 slice 5 (each mutation alone on a scratch copy, g238 only): also trips D223-lens miles. Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D224 sums bullet; R4)."
+ },
+ {
+  "name": "S9-D224 Progress weekly run total ignores the jog",
+  "anchor": "if(_rl.run && +_rl.run.dist > 0) weeklyData[w].run += +_rl.run.dist;",
+  "replacement": "if(false) weeklyData[w].run += +_rl.run.dist;",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D224-progress, conjunct run-total (Weekly Running Mileage W1 5.2; hand 3.7 + 5.2 = 8.9). Observed V238 slice 5 (each mutation alone on a scratch copy, g238 only): also trips D223-lens progress. Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D224 sums bullet; R5 as restated by Amendment 1)."
+ },
+ {
+  "name": "S10-D224 Progress weekly bike total ignores the jog",
+  "anchor": "if(_rl.bike && +_rl.bike.mins > 0) weeklyData[w].bike += +_rl.bike.mins;",
+  "replacement": "if(false) weeklyData[w].bike += +_rl.bike.mins;",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D224-progress, conjunct bike-total (Weekly Cycling Time 45; hand 37 + 45 = 82). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D224 sums bullet; R5)."
+ },
+ {
+  "name": "S11-D224 ladderWeekly adds the jog to the session instead of taking the max",
+  "anchor": "const top=Math.max(d>0?d:0, j>0?j:0);",
+  "replacement": "const top=(d>0?d:0)+(j>0?j:0);",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D224-progress, conjunct ladder-double (ladderWeekly W1 8.9; hand max(5.2, 3.7) = 5.2). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D224 max readers, Amendment 1 A5; R5 as restated)."
+ },
+ {
+  "name": "S12-D224 maxDist adds the jog to the day's session",
+  "anchor": "const _jd=+((e.restLog||{}).run||{}).dist; if(_jd>0) maxDist=Math.max(maxDist,_jd);",
+  "replacement": "const _jd=+((e.restLog||{}).run||{}).dist; if(_jd>0) maxDist=Math.max(maxDist,_jd+(+e.run_dist>0?+e.run_dist:0));",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D224-progress, conjunct maxdist-double (seed maxDist 8.9; hand max(5.2, 3.7) = 5.2, never 8.9). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D224 max readers; R5)."
+ },
+ {
+  "name": "S13-D224 the journal drops a day whose only record is the jog",
+  "anchor": "if(!entry.notes && !entry.rpe && !(entry.swapFrom && entry.swapTo) && !(entry.restLog && Object.keys(entry.restLog).length)) return;",
+  "replacement": "if(!entry.notes && !entry.rpe && !(entry.swapFrom && entry.swapTo)) return;",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D224-journal (moved-in Done-untouched day, legacy entry and walk-only program have no row; the walk-only program falls back to \"No data yet\"; hand a row with the jog line, Progress renders). Observed V238 slice 5 (each mutation alone on a scratch copy, g238 only): also trips D223-lens journal (the lensed V237 jog has no rpe, so its row is dropped) and D224-journal ts-order. Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D224 journal bullet, Amendment 1 A4; R6 as restated)."
+ },
+ {
+  "name": "S14-D224 the journal prints no jog line",
+  "anchor": "const jogLines = restLogLines(entry.restLog);",
+  "replacement": "const jogLines = [];",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D224-journal (the moved-in Done-untouched Wed row prints no \"37 min run logged · RPE 7\"; hand that line). Observed V238 slice 5 (each mutation alone on a scratch copy, g238 only): also trips D223-lens journal. Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D224 journal bullet; R6)."
+ },
+ {
+  "name": "S15-D224 the rest hero prints only the first restLog type",
+  "anchor": "? restLogLines(_heroCardio.restLog).map(s=>'<div class=\"wk-rest-logged\">'+s+'</div>').join('')",
+  "replacement": "? restLogLines(_heroCardio.restLog).slice(0,1).map(s=>'<div class=\"wk-rest-logged\">'+s+'</div>').join('')",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D224-hero, case v237-bike>run (one line; hand \"20 min run logged · RPE 5\" then \"37 min ride logged · RPE —\"). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D224 rest hero, Amendment 1 A2; R10 as restated)."
+ },
+ {
+  "name": "S16-D225 restMoveCandidates loses swapTo from its logged test",
+  "anchor": "if(lg&&(lg.rpe||lg.notes||lg.swapTo||lg.parked||",
+  "replacement": "if(lg&&(lg.rpe||lg.notes||lg.parked||",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D225-swapaway, conjunct away-offered (the 22 swap-blank days are offered, 22/44; hand 0/44). Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D225; R7 as restated by D225 Amendment 2)."
+ },
+ {
+  "name": "S17-D225 restMoveCandidates loses parked from its logged test",
+  "anchor": "if(lg&&(lg.rpe||lg.notes||lg.swapTo||lg.parked||",
+  "replacement": "if(lg&&(lg.rpe||lg.notes||lg.swapTo||",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D225-swapaway, conjunct under-swap (a number logged under the swap, then tapped back: parked holds it, swapTo '', offered 22/22; hand 0/22). The R7 arms alone cannot see this mutation: every swapped-away day also carries swapTo, and every tapped-back logged day holds its numbers at the top level; the under-swap arm is D225's amended sentence (\"not offered if a session's numbers were\" logged under the swap) and E10's bare lg.swapTo||lg.parked. Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D225, D225 Amendment 2)."
+ },
+ {
+  "name": "S18-D227 HALF_MANNY's program output moves (the Tuesday title)",
+  "anchor": "legs:'Leg Strength + Mobility'",
+  "replacement": "legs:'Leg Strength and Mobility'",
+  "gate": "gates/g238_d223_restlog.js",
+  "note": "NAMED TRIP: g238_d223_restlog.js row D227-digest, conjunct built (the HALF_MANNY digest leaves the era row 2d35e8f743680cfa). D227-digest passes on V238 and on V237 relabelled 238 alike (a no-change era row); this mutation is its trip. Ruling: tests/measure/v238_rulings/v238_ruling_d223_d227.md (D227: no program output moves; standing ruling 5; R11)."
+ }
+]

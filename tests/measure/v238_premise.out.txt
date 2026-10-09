@@ -1,0 +1,443 @@
+######## run 1: all parts (P2 here SUPERSEDED by run 2: install() did not clear ia_remind_last_, so maybeShowReminder differed by call order)
+
+════ P1 — reads and writes of ia_logs_ / the logs map (comments stripped) ════
+  'ia_logs_' literal                   5  1230:getLogs 1234:getLogsFor 1238:saveLogs 16160:refreshProgram 16338:purgeProgData
+  getLogs( call/def                   14  1230:getLogs 1264:readSetDraft 1278:writeSetDraft 1286:clearSetDraft 1435:applyRestCardio 1531:restMoveCandidates 12102:renderWeekView 12164:renderWeekView 13046:_benchmarkEntryFor 13873:buildLogHTML 14210:openDetail 14778:cardioLive 14799:persistLogFields 14883:setCardioSwap
+  getLogsFor( call/def                 4  1234:getLogsFor 16434:seedFromPriorPrograms 17596:renderProgressScreen 17741:renderProgressScreen
+  saveLogs( call/def                   6  1238:saveLogs 1283:writeSetDraft 1290:clearSetDraft 1444:applyRestCardio 14843:persistLogFields 14894:setCardioSwap
+  localStorage iteration (any)         0  
+  setItem with computed key            3  18097:popDismissText 18147:popPick 18321:maybeShowReminder
+  getItem with computed key            3  18094:popDismissText 18143:popPick 18309:maybeShowReminder
+  readers taking a logs param          6  16475:recoveryPaceWeekly 16683:ladderWeekly 16701:runsByClass 16723:easyEffortWeekly 16748:plannedVsLogged 17172:easyVsPrescribed
+  export / import / backup             1  13921:buildExportHTML
+  cardioTypes includes row (wizard)    0  
+ia-version 237 | startDate 2026-09-28
+
+════ P2/P3 — reader differential on V237 code, HALF_MANNY seed 76308, W1 WED jog 37 min 3.7 mi RPE 7 ════
+
+  WORLD A jog only
+    stored V0 {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}
+    stored V3 {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7,"week":1,"ts":1790784000000}
+    stored V2 {"restLog":{"run":{"mins":37,"dist":3.7,"rpe":7}},"week":1,"ts":1790784000000}
+    weekMILES              V0=3.7  | V3 same
+                           V2 DIFFERS=0
+    restHeroLine           V0=37 min run logged · RPE 7  | V3 same
+                           V2 DIFFERS=null
+    restHeroButton         V0=Log more  | V3 same
+                           V2 DIFFERS=Log cardio
+    weekDoneTile           V0=0/5  | V3 same  | V2 same
+    weekStripWed           V0=bot" style="color:#5f5f62">LEGS</div></div><div class="wk-day today" onclick="openDayKey('wed')"><div class="wk-day-lbl">WED</div><div class="wk-day-top" style="color:#3a2c08">—</div><div class="wk-day-num">30</div><div   | V3 same  | V2 same
+    computeStreak          V0=0  | V3 same  | V2 same
+    restMoveCandidates     V0=["mon","tue","thu","fri","sat"]  | V3 same  | V2 same
+    plannedVsLogged        V0={}  | V3 same  | V2 same
+    ladderWeekly           V0={"1":3.7}  | V3 same
+                           V2 DIFFERS={}
+    runsByClass            V0={"Recovery":[],"Easy":[],"Long":[],"Tempo":[],"Interval":[]}  | V3 same  | V2 same
+    easyEffortWeekly       V0={"weekly":{},"nRuns":0,"nWeeks":0}  | V3 same  | V2 same
+    easyVsPrescribed       V0=[]  | V3 same  | V2 same
+    recoveryPaceWeekly     V0={"weekly":{},"tgt":null,"nWeeks":0}  | V3 same  | V2 same
+    benchmarkEntry         V0=[null,null,null,null,null]  | V3 same  | V2 same
+    seedFromPriorPrograms  V0=null  | V3 same  | V2 same
+    refreshFreeze          V0={"wed":"Rest/true","w2mon":"Strength Support"}  | V3 same  | V2 same
+    maybeShowReminder      V0= ✓ Done ✕ Skip 
+                           V3 DIFFERS=(nothing rendered)
+                           V2 DIFFERS=(nothing rendered)
+    progressHasAnyData     V0=has data  | V3 same
+                           V2 DIFFERS=No data yet
+    progressJournalW1      V0=Session Journal Week 1 1 entry Wed RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training still runs on RPE. Deadlift Squat Bench Weight Reps   | V3 same
+                           V2 DIFFERS=(no journal)
+    html diff P3 (week+ts added) week: 0 changed chunks
+    html diff P3 (week+ts added) prog: 0 changed chunks
+    html diff P2 (D223 shape) week: 6 changed chunks
+      < <div class="wk-rest-logged">37 min run logged · RPE 7
+      < </div>
+      < <button class="wk-rest-act" onclick="openRestSheet(1,'wed','cardio')">Log more
+      > <button class="wk-rest-act" onclick="openRestSheet(1,'wed','cardio')">Log cardio
+      < <div class="wk-stat-num" >3.7
+      > <div class="wk-stat-num" >0
+    html diff P2 (D223 shape) prog: 75 changed chunks
+      < <div >
+      > <div >
+      < <div >
+      < <svg/> Weekly Running Mileage
+      < </div>
+      <     
+      > <div >
+      <     
+      < <div >
+      <       Total logged: 
+      < <b >3.7 mi
+      < </b>
+      <       · Peak week: 
+      < <b >3.7 mi
+      < </b>
+      <     
+      <   
+      < </div>
+      < <div >
+      < <div >
+      < <svg/> Average Session RPE
+      > <div >No data yet
+      < <svg/>
+      <     
+      < <div >
+      <       Total logged: 
+      < <b >7.0 
+      < </b>
+      <       · Peak week: 
+      < <b >7.0 
+      < </b>
+      <     
+      > <div >Log sessions to see progress charts, exercise history, and your training journal here.
+      < <div >
+      <       
+      < <div >
+      < <svg/> Session Journal
+      < </div>
+      <       
+      < <details class="journal-week" open>
+
+  WORLD B jog + Mon session (5.2 mi RPE 6, Done) + 4 Fri recovery runs W1-W4 (3 mi, 10:00/mi) for the seed
+    stored V0 {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}
+    stored V3 {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7,"week":1,"ts":1790784000000}
+    stored V2 {"restLog":{"run":{"mins":37,"dist":3.7,"rpe":7}},"week":1,"ts":1790784000000}
+    weekMILES              V0=11.9  | V3 same
+                           V2 DIFFERS=8.2
+    restHeroLine           V0=37 min run logged · RPE 7  | V3 same
+                           V2 DIFFERS=null
+    restHeroButton         V0=Log more  | V3 same
+                           V2 DIFFERS=Log cardio
+    weekDoneTile           V0=1/5  | V3 same  | V2 same
+    weekStripWed           V0=bot" style="color:#5f5f62">LEGS</div></div><div class="wk-day today" onclick="openDayKey('wed')"><div class="wk-day-lbl">WED</div><div class="wk-day-top" style="color:#3a2c08">—</div><div class="wk-day-num">30</div><div   | V3 same  | V2 same
+    computeStreak          V0=1  | V3 same  | V2 same
+    restMoveCandidates     V0=["tue","thu","sat"]  | V3 same  | V2 same
+    plannedVsLogged        V0={}  | V3 same  | V2 same
+    ladderWeekly           V0={"1":5.2,"2":3,"3":3,"4":3}  | V3 same  | V2 same
+    runsByClass            V0={"Recovery":[{"w":1,"sec":600},{"w":2,"sec":600},{"w":3,"sec":600},{"w":4,"sec":600}],"Easy":[],"Long":[],"Tempo":[],"Interval":[]}  | V3 same  | V2 same
+    easyEffortWeekly       V0={"weekly":{"1":600,"2":600,"3":600,"4":600},"nRuns":4,"nWeeks":4}  | V3 same  | V2 same
+    easyVsPrescribed       V0=[{"w":1,"sec":600,"tgt":800,"cap":760,"hot":true},{"w":2,"sec":600,"tgt":800,"cap":760,"hot":true},{"w":3,"sec":600,"tgt":800,"cap":760,"hot":true},{"w":4,"sec":600,"tgt":800,"cap":760,"hot":true}]  | V3 same  | V2 same
+    recoveryPaceWeekly     V0={"weekly":{"1":600,"2":600,"3":600,"4":600},"tgt":800,"nWeeks":4}  | V3 same  | V2 same
+    benchmarkEntry         V0=[null,null,null,null,null]  | V3 same  | V2 same
+    seedFromPriorPrograms  V0={"progId":"p_m","progName":"p_m","latest":1790697600000,"n":4,"avgRecSec":600,"mileSec":454.2857142857143,"maxDist":5.2}  | V3 same  | V2 same
+    refreshFreeze          V0={"wed":"Rest/true","w2mon":"Strength Support"}  | V3 same  | V2 same
+    maybeShowReminder      V0=(nothing rendered)  | V3 same  | V2 same
+    progressHasAnyData     V0=has data  | V3 same  | V2 same
+    progressJournalW1      V0=Session Journal Week 1 3 entries Wed RPE 7 — Very Hard Fri RPE 4 — Somewhat Hard Mon RPE 6 — Hard+ Week 2 1 entry Fri RPE 4 — Somewhat Hard Week 3 1 entry Fri RPE 4 — Somewhat Hard Week 4 1 entry Fri RPE 4 — Somewhat Har
+                           V3 DIFFERS=Session Journal Week 1 3 entries Fri RPE 4 — Somewhat Hard Mon RPE 6 — Hard+ Wed RPE 7 — Very Hard Week 2 1 entry Fri RPE 4 — Somewhat Hard Week 3 1 entry Fri RPE 4 — Somewhat Hard Week 4 1 entry Fri RPE 4 — Somewhat Har
+                           V2 DIFFERS=Session Journal Week 1 2 entries Fri RPE 4 — Somewhat Hard Mon RPE 6 — Hard+ Week 2 1 entry Fri RPE 4 — Somewhat Hard Week 3 1 entry Fri RPE 4 — Somewhat Hard Week 4 1 entry Fri RPE 4 — Somewhat Hard 1RM Estimator Option
+    html diff P3 (week+ts added) week: 0 changed chunks
+    html diff P3 (week+ts added) prog: 12 changed chunks
+      < <div >Wed
+      > <div >Fri
+      < <div >RPE 7 — Very Hard
+      > <div >RPE 4 — Somewhat Hard
+      < <div >Fri
+      > <div >Mon
+      < <div >RPE 4 — Somewhat Hard
+      > <div >RPE 6 — Hard+
+      < <div >Mon
+      > <div >Wed
+      < <div >RPE 6 — Hard+
+      > <div >RPE 7 — Very Hard
+    html diff P2 (D223 shape) week: 6 changed chunks
+      < <div class="wk-rest-logged">37 min run logged · RPE 7
+      < </div>
+      < <button class="wk-rest-act" onclick="openRestSheet(1,'wed','cardio')">Log more
+      > <button class="wk-rest-act" onclick="openRestSheet(1,'wed','cardio')">Log cardio
+      < <div class="wk-stat-num" >11.9
+      > <div class="wk-stat-num" >8.2
+    html diff P2 (D223 shape) prog: 25 changed chunks
+      < <b >20.9 mi
+      > <b >17.2 mi
+      < <b >11.9 mi
+      > <b >8.2 mi
+      < <b >18.0 
+      > <b >17.0 
+      < <b >6.0 
+      > <b >5.0 
+      < <span >3 entries
+      > <span >2 entries
+      < <div >Wed
+      < </div>
+      <             
+      < <div >RPE 7 — Very Hard
+      < </div>
+      <           
+      < </div>
+      <           
+      <           
+      <         
+      < </div>
+      < <div >
+      <           
+      < <div >
+      <             
+throws: {}
+
+════ P4 — orders that could put rest_cardio and a session key on one entry (HALF_MANNY 76308 W1) ════
+  (1) WED<-TUE opened, nothing saved: {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}
+  (2) then autoSaveSets/writeSetDraft("front_squat") on the moved-in lift day: {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7,"sets":{"front_squat":{"r":["5"],"w":["135"],"L":""}},"week":1,"ts":1790784000000} | session keys beside rest_cardio: ["sets"]
+      then clearSetDraft: {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7,"week":1,"ts":1790784000000}
+  (2b) WED<-SAT (run:dist + lifts) set autosave: {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7,"sets":{"kettlebell_swing":{"r":["5"],"w":["135"],"L":""}},"week":1,"ts":1790784000000}
+  (3) TUE with a set draft only: offered as move origin true; after the move TUE rest/moved {"rest":true,"moved":true}, restDayEligible(TUE) false (a jog can NOT land on the origin) | TUE entry {"week":1,"sets":{"front_squat":{"r":["5"],"w":["135"],"L":""}},"ts":1790784000000}
+  (4) MON session logged, rebuild with restDays [mon,sun]: {"w1mon":{"title":"Strength Support","rest":false},"w1wed":{"title":"Strength Support","rest":false},"w2mon":{"title":"Rest","rest":true}} (W1 MON frozen as trained = a jog cannot land on a logged MON)
+  (5) WED jog, rebuild with restDays [mon,sun]: {"w1wed":{"title":"Rest","rest":true}}
+  (6) openDayKey(WED rest): detail rendered false | rest sheet rendered true
+throws: {}
+
+════ P5 — sheet distance by type (HALF_MANNY W1 WED, cfg.cardioTypes widened to run,bike,swim,row for the chips) ════
+  run   sheet shows distance box: yes (miles) | typed 9.5 -> stored {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":9.5}
+  bike  sheet shows distance box: yes (miles) | typed 9.5 -> stored {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}
+  swim  sheet shows distance box: yes (yards) | typed 9.5 -> stored {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":9.5}
+  row   sheet shows distance box: yes (miles) | typed 9.5 -> stored {"rest_cardio":true,"rest_type":"row","rest_mins":37,"rpe":7}
+  walk  sheet shows distance box: no | typed 9.5 -> stored {"rest_cardio":true,"rest_type":"walk","rest_mins":37,"rpe":7}
+
+════ P6 — V237 rest hero vs one line per type through the ruling's lens (HALF_MANNY, types run,bike,swim,walk) ════
+  DIFF run>bike>run | V237 ["20 min run logged · RPE 5"] btn Log more | lens ["20 min run logged · RPE 5","20 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"run","rest_mins":20,"rpe":5,"run_dist":5.7,"bike_mins":20}
+  DIFF run>bike>bike | V237 ["20 min ride logged · RPE 5"] btn Log more | lens ["40 min ride logged · RPE 5"] | stored {"rest_cardio":true,"rest_type":"bike","rest_mins":20,"rpe":5,"run_dist":3.7,"bike_mins":40}
+  DIFF run>bike>swim | V237 ["20 min swim logged · RPE 5"] btn Log more | lens ["20 min swim logged · RPE 5","20 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"swim","rest_mins":20,"rpe":5,"run_dist":3.7,"bike_mins":20,"swim_yards":500}
+  DIFF bike>run | V237 ["20 min run logged · RPE 5"] btn Log more | lens ["20 min run logged · RPE 5","37 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"run","rest_mins":20,"rpe":5,"bike_mins":37,"run_dist":2}
+  DIFF bike>bike | V237 ["20 min ride logged · RPE 5"] btn Log more | lens ["57 min ride logged · RPE 5"] | stored {"rest_cardio":true,"rest_type":"bike","rest_mins":20,"rpe":5,"bike_mins":57}
+  DIFF bike>bike>bike | V237 ["20 min ride logged · RPE 5"] btn Log more | lens ["77 min ride logged · RPE 5"] | stored {"rest_cardio":true,"rest_type":"bike","rest_mins":20,"rpe":5,"bike_mins":77}
+  DIFF bike>swim | V237 ["20 min swim logged · RPE 5"] btn Log more | lens ["20 min swim logged · RPE 5","37 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"swim","rest_mins":20,"rpe":5,"bike_mins":37,"swim_yards":500}
+  DIFF bike>walk | V237 ["20 min walk logged · RPE 5"] btn Log more | lens ["20 min walk logged · RPE 5","37 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"walk","rest_mins":20,"rpe":5,"bike_mins":37}
+  sequences 84 (1, 2 and 3 logs over run/bike/swim/walk; 1st 37 min RPE 7, later 20 min RPE 5) | byte-identical line set 52 | differ 32 by class {"3-log mixed":27,"2-log mixed":3,"2-log same-type":1,"3-log same-type":1}
+  V237 hero lines rendered per entry: always 1 (the _rcLine regex count is printed per DIFF row)
+
+DONE
+######## run 2: P2 with full store reset, World B Mon session 2.0 mi
+ia-version 237 | startDate 2026-09-28
+
+════ P2/P3 — reader differential on V237 code, HALF_MANNY seed 76308, W1 WED jog 37 min 3.7 mi RPE 7 ════
+
+  WORLD A jog only
+    stored V0 {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}
+    stored V3 {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7,"week":1,"ts":1790784000000}
+    stored V2 {"restLog":{"run":{"mins":37,"dist":3.7,"rpe":7}},"week":1,"ts":1790784000000}
+    weekMILES              V0=3.7  | V3 same
+                           V2 DIFFERS=0
+    restHeroLine           V0=37 min run logged · RPE 7  | V3 same
+                           V2 DIFFERS=null
+    restHeroButton         V0=Log more  | V3 same
+                           V2 DIFFERS=Log cardio
+    weekDoneTile           V0=0/5  | V3 same  | V2 same
+    weekStripWed           V0=bot" style="color:#5f5f62">LEGS</div></div><div class="wk-day today" onclick="openDayKey('wed')"><div class="wk-day-lbl">WED</div><div class="wk-day-top" style="color:#3a2c08">—</div><div class="wk-day-num">30</div><div   | V3 same  | V2 same
+    computeStreak          V0=0  | V3 same  | V2 same
+    restMoveCandidates     V0=["mon","tue","thu","fri","sat"]  | V3 same  | V2 same
+    plannedVsLogged        V0={}  | V3 same  | V2 same
+    ladderWeekly           V0={"1":3.7}  | V3 same
+                           V2 DIFFERS={}
+    runsByClass            V0={"Recovery":[],"Easy":[],"Long":[],"Tempo":[],"Interval":[]}  | V3 same  | V2 same
+    easyEffortWeekly       V0={"weekly":{},"nRuns":0,"nWeeks":0}  | V3 same  | V2 same
+    easyVsPrescribed       V0=[]  | V3 same  | V2 same
+    recoveryPaceWeekly     V0={"weekly":{},"tgt":null,"nWeeks":0}  | V3 same  | V2 same
+    benchmarkEntry         V0=[null,null,null,null,null]  | V3 same  | V2 same
+    seedFromPriorPrograms  V0=null  | V3 same  | V2 same
+    refreshFreeze          V0={"wed":"Rest/true","w2mon":"Strength Support"}  | V3 same  | V2 same
+    maybeShowReminder      V0= ✓ Done ✕ Skip   | V3 same  | V2 same
+    progressHasAnyData     V0=has data  | V3 same
+                           V2 DIFFERS=No data yet
+    progressJournalW1      V0=Session Journal Week 1 1 entry Wed RPE 7 — Very Hard 1RM Estimator Optional — estimate a one-rep max from any recent set, just for your own records. Your training still runs on RPE. Deadlift Squat Bench Weight Reps   | V3 same
+                           V2 DIFFERS=(no journal)
+    html diff P3 (week+ts added) week: 0 changed chunks
+    html diff P3 (week+ts added) prog: 0 changed chunks
+    html diff P2 (D223 shape) week: 6 changed chunks
+      < <div class="wk-rest-logged">37 min run logged · RPE 7
+      < </div>
+      < <button class="wk-rest-act" onclick="openRestSheet(1,'wed','cardio')">Log more
+      > <button class="wk-rest-act" onclick="openRestSheet(1,'wed','cardio')">Log cardio
+      < <div class="wk-stat-num" >3.7
+      > <div class="wk-stat-num" >0
+    html diff P2 (D223 shape) prog: 75 changed chunks
+      < <div >
+      > <div >
+      < <div >
+      < <svg/> Weekly Running Mileage
+      < </div>
+      <     
+      > <div >
+      <     
+      < <div >
+      <       Total logged: 
+      < <b >3.7 mi
+      < </b>
+      <       · Peak week: 
+      < <b >3.7 mi
+      < </b>
+      <     
+      <   
+      < </div>
+      < <div >
+      < <div >
+      < <svg/> Average Session RPE
+      > <div >No data yet
+      < <svg/>
+      <     
+      < <div >
+      <       Total logged: 
+      < <b >7.0 
+      < </b>
+      <       · Peak week: 
+      < <b >7.0 
+      < </b>
+      <     
+      > <div >Log sessions to see progress charts, exercise history, and your training journal here.
+      < <div >
+      <       
+      < <div >
+      < <svg/> Session Journal
+      < </div>
+      <       
+      < <details class="journal-week" open>
+      <         
+      < <summary >
+      <           
+      < <span>Week 1
+      < </span>
+      <           
+      < <span >1 entry
+      < <span class="journal-caret" >
+      < <svg/>
+      < </span>
+      < </span>
+      <         
+      < </summary>
+      <         
+      < <div >
+      < <div >
+      <           
+      < <div >
+      <             
+      < <div >Wed
+      < </div>
+      <             
+      < <div >RPE 7 — Very Hard
+      < </div>
+      <           
+      < </div>
+      <           
+      <           
+      <         
+      < </div>
+      < </div>
+      <       
+      < </details>
+      <     
+      < </div>
+
+  WORLD B jog + Mon session (2.0 mi RPE 6, Done) + 4 Fri recovery runs W1-W4 (3 mi, 10:00/mi) for the seed
+    stored V0 {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}
+    stored V3 {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7,"week":1,"ts":1790784000000}
+    stored V2 {"restLog":{"run":{"mins":37,"dist":3.7,"rpe":7}},"week":1,"ts":1790784000000}
+    weekMILES              V0=8.7  | V3 same
+                           V2 DIFFERS=5
+    restHeroLine           V0=37 min run logged · RPE 7  | V3 same
+                           V2 DIFFERS=null
+    restHeroButton         V0=Log more  | V3 same
+                           V2 DIFFERS=Log cardio
+    weekDoneTile           V0=1/5  | V3 same  | V2 same
+    weekStripWed           V0=bot" style="color:#5f5f62">LEGS</div></div><div class="wk-day today" onclick="openDayKey('wed')"><div class="wk-day-lbl">WED</div><div class="wk-day-top" style="color:#3a2c08">—</div><div class="wk-day-num">30</div><div   | V3 same  | V2 same
+    computeStreak          V0=1  | V3 same  | V2 same
+    restMoveCandidates     V0=["tue","thu","sat"]  | V3 same  | V2 same
+    plannedVsLogged        V0={}  | V3 same  | V2 same
+    ladderWeekly           V0={"1":3.7,"2":3,"3":3,"4":3}  | V3 same
+                           V2 DIFFERS={"1":3,"2":3,"3":3,"4":3}
+    runsByClass            V0={"Recovery":[{"w":1,"sec":600},{"w":2,"sec":600},{"w":3,"sec":600},{"w":4,"sec":600}],"Easy":[],"Long":[],"Tempo":[],"Interval":[]}  | V3 same  | V2 same
+    easyEffortWeekly       V0={"weekly":{"1":600,"2":600,"3":600,"4":600},"nRuns":4,"nWeeks":4}  | V3 same  | V2 same
+    easyVsPrescribed       V0=[{"w":1,"sec":600,"tgt":800,"cap":760,"hot":true},{"w":2,"sec":600,"tgt":800,"cap":760,"hot":true},{"w":3,"sec":600,"tgt":800,"cap":760,"hot":true},{"w":4,"sec":600,"tgt":800,"cap":760,"hot":true}]  | V3 same  | V2 same
+    recoveryPaceWeekly     V0={"weekly":{"1":600,"2":600,"3":600,"4":600},"tgt":800,"nWeeks":4}  | V3 same  | V2 same
+    benchmarkEntry         V0=[null,null,null,null,null]  | V3 same  | V2 same
+    seedFromPriorPrograms  V0={"progId":"p_m","progName":"p_m","latest":1790697600000,"n":4,"avgRecSec":600,"mileSec":454.2857142857143,"maxDist":3}
+                           V3 DIFFERS={"progId":"p_m","progName":"p_m","latest":1790697600000,"n":4,"avgRecSec":600,"mileSec":454.2857142857143,"maxDist":3.7}  | V2 same
+    refreshFreeze          V0={"wed":"Rest/true","w2mon":"Strength Support"}  | V3 same  | V2 same
+    maybeShowReminder      V0= ✓ Done ✕ Skip   | V3 same  | V2 same
+    progressHasAnyData     V0=has data  | V3 same  | V2 same
+    progressJournalW1      V0=Session Journal Week 1 3 entries Wed RPE 7 — Very Hard Fri RPE 4 — Somewhat Hard Mon RPE 6 — Hard+ Week 2 1 entry Fri RPE 4 — Somewhat Hard Week 3 1 entry Fri RPE 4 — Somewhat Hard Week 4 1 entry Fri RPE 4 — Somewhat Har
+                           V3 DIFFERS=Session Journal Week 1 3 entries Fri RPE 4 — Somewhat Hard Mon RPE 6 — Hard+ Wed RPE 7 — Very Hard Week 2 1 entry Fri RPE 4 — Somewhat Hard Week 3 1 entry Fri RPE 4 — Somewhat Hard Week 4 1 entry Fri RPE 4 — Somewhat Har
+                           V2 DIFFERS=Session Journal Week 1 2 entries Fri RPE 4 — Somewhat Hard Mon RPE 6 — Hard+ Week 2 1 entry Fri RPE 4 — Somewhat Hard Week 3 1 entry Fri RPE 4 — Somewhat Hard Week 4 1 entry Fri RPE 4 — Somewhat Hard 1RM Estimator Option
+    html diff P3 (week+ts added) week: 0 changed chunks
+    html diff P3 (week+ts added) prog: 12 changed chunks
+      < <div >Wed
+      > <div >Fri
+      < <div >RPE 7 — Very Hard
+      > <div >RPE 4 — Somewhat Hard
+      < <div >Fri
+      > <div >Mon
+      < <div >RPE 4 — Somewhat Hard
+      > <div >RPE 6 — Hard+
+      < <div >Mon
+      > <div >Wed
+      < <div >RPE 6 — Hard+
+      > <div >RPE 7 — Very Hard
+    html diff P2 (D223 shape) week: 6 changed chunks
+      < <div class="wk-rest-logged">37 min run logged · RPE 7
+      < </div>
+      < <button class="wk-rest-act" onclick="openRestSheet(1,'wed','cardio')">Log more
+      > <button class="wk-rest-act" onclick="openRestSheet(1,'wed','cardio')">Log cardio
+      < <div class="wk-stat-num" >8.7
+      > <div class="wk-stat-num" >5
+    html diff P2 (D223 shape) prog: 25 changed chunks
+      < <b >17.7 mi
+      > <b >14.0 mi
+      < <b >8.7 mi
+      > <b >5.0 mi
+      < <b >18.0 
+      > <b >17.0 
+      < <b >6.0 
+      > <b >5.0 
+      < <span >3 entries
+      > <span >2 entries
+      < <div >Wed
+      < </div>
+      <             
+      < <div >RPE 7 — Very Hard
+      < </div>
+      <           
+      < </div>
+      <           
+      <           
+      <         
+      < </div>
+      < <div >
+      <           
+      < <div >
+      <             
+throws: {}
+
+DONE
+######## P4L
+ia-version 237 | startDate 2026-09-28
+
+════ P4L — lattice (seed 76308; 16 goals x 7 focus x 3 exp x 2 eq x 2 rest = 1344 configs): jog, move, open, one set autosave ════
+  pairs 6720 | moved-in days with a loggable exercise 6720 | entry carrying rest_cardio AND sets after one autosave 6720
+    bike jog | moved-in bike       {"n":1200,"loggable":1200,"coexist":1200}
+    bike jog | moved-in lift       {"n":900,"loggable":900,"coexist":900}
+    run jog | moved-in lift        {"n":600,"loggable":600,"coexist":600}
+    run jog | moved-in run         {"n":1920,"loggable":1920,"coexist":1920}
+    swim jog | moved-in lift       {"n":720,"loggable":720,"coexist":720}
+    swim jog | moved-in swim       {"n":1380,"loggable":1380,"coexist":1380}
+throws: {}
+
+DONE
+######## P6 classified
+ia-version 237 | startDate 2026-09-28
+
+════ P6 — V237 rest hero vs one line per type through the ruling's lens (HALF_MANNY, types run,bike,swim,walk) ════
+  DIFF run>bike>run | V237 ["20 min run logged · RPE 5"] btn Log more | lens ["20 min run logged · RPE 5","20 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"run","rest_mins":20,"rpe":5,"run_dist":5.7,"bike_mins":20}
+  DIFF run>bike>bike | V237 ["20 min ride logged · RPE 5"] btn Log more | lens ["40 min ride logged · RPE 5"] | stored {"rest_cardio":true,"rest_type":"bike","rest_mins":20,"rpe":5,"run_dist":3.7,"bike_mins":40}
+  DIFF run>bike>swim | V237 ["20 min swim logged · RPE 5"] btn Log more | lens ["20 min swim logged · RPE 5","20 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"swim","rest_mins":20,"rpe":5,"run_dist":3.7,"bike_mins":20,"swim_yards":500}
+  DIFF run>bike>walk | V237 ["20 min walk logged · RPE 5"] btn Log more | lens ["20 min walk logged · RPE 5","20 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"walk","rest_mins":20,"rpe":5,"run_dist":3.7,"bike_mins":20}
+  DIFF bike>run | V237 ["20 min run logged · RPE 5"] btn Log more | lens ["20 min run logged · RPE 5","37 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"run","rest_mins":20,"rpe":5,"bike_mins":37,"run_dist":2}
+  DIFF bike>run>bike | V237 ["20 min ride logged · RPE 5"] btn Log more | lens ["57 min ride logged · RPE 5"] | stored {"rest_cardio":true,"rest_type":"bike","rest_mins":20,"rpe":5,"bike_mins":57,"run_dist":2}
+  DIFF bike>bike | V237 ["20 min ride logged · RPE 5"] btn Log more | lens ["57 min ride logged · RPE 5"] | stored {"rest_cardio":true,"rest_type":"bike","rest_mins":20,"rpe":5,"bike_mins":57}
+  DIFF bike>bike>run | V237 ["20 min run logged · RPE 5"] btn Log more | lens ["20 min run logged · RPE 5","57 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"run","rest_mins":20,"rpe":5,"bike_mins":57,"run_dist":2}
+  DIFF bike>bike>bike | V237 ["20 min ride logged · RPE 5"] btn Log more | lens ["77 min ride logged · RPE 5"] | stored {"rest_cardio":true,"rest_type":"bike","rest_mins":20,"rpe":5,"bike_mins":77}
+  DIFF bike>bike>swim | V237 ["20 min swim logged · RPE 5"] btn Log more | lens ["20 min swim logged · RPE 5","57 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"swim","rest_mins":20,"rpe":5,"bike_mins":57,"swim_yards":500}
+  DIFF bike>bike>walk | V237 ["20 min walk logged · RPE 5"] btn Log more | lens ["20 min walk logged · RPE 5","57 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"walk","rest_mins":20,"rpe":5,"bike_mins":57}
+  DIFF bike>swim | V237 ["20 min swim logged · RPE 5"] btn Log more | lens ["20 min swim logged · RPE 5","37 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"swim","rest_mins":20,"rpe":5,"bike_mins":37,"swim_yards":500}
+  DIFF bike>swim>bike | V237 ["20 min ride logged · RPE 5"] btn Log more | lens ["57 min ride logged · RPE 5"] | stored {"rest_cardio":true,"rest_type":"bike","rest_mins":20,"rpe":5,"bike_mins":57,"swim_yards":500}
+  DIFF bike>walk | V237 ["20 min walk logged · RPE 5"] btn Log more | lens ["20 min walk logged · RPE 5","37 min ride logged · RPE —"] | stored {"rest_cardio":true,"rest_type":"walk","rest_mins":20,"rpe":5,"bike_mins":37}
+  sequences 84 (1, 2 and 3 logs over run/bike/swim/walk; 1st 37 min RPE 7, later 20 min RPE 5) | byte-identical line set 52 | differ 32 by class {"3-log mixed bike x1 not-last":18,"3-log mixed bike x2+ last":6,"2-log mixed bike x1 not-last":3,"2-log same-type bike x2+ last":1,"3-log mixed bike x2+ not-last":3,"3-log same-type bike x2+ last":1}
+  V237 hero lines rendered per entry: always 1 (the _rcLine regex count is printed per DIFF row)
+
+DONE

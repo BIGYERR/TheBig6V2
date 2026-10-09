@@ -1,0 +1,13 @@
+# ROW_RULED for V238 (D223 P-RESTMOVELOG, D224, D225, D226, D227, with D223-D227 Amendment 1). Passed to gate.sh step 4b as ROW_RULED=<this file>.
+# Written by the main session from tests/measure/v238_rulings/v238_ruling_d223_d227.md (Mario concurred 2026-10-08: "1. concur 2. yes 3. yes 4. yes 5. yes 6. queue"), before the draft run.
++ g238_d223_restlog.js D223-writer  # D223 (Mario concurred 2026-10-08): new gate row R1, Gate rows section (R1, R5, R6, R9, R10 as restated by Amendment 1)
++ g238_d223_restlog.js D223-carry  # D223 (Mario concurred 2026-10-08): new gate row R2, Gate rows section (R1, R5, R6, R9, R10 as restated by Amendment 1)
++ g238_d223_restlog.js D223-noseed  # D223 (Mario concurred 2026-10-08): new gate row R3, Gate rows section (R1, R5, R6, R9, R10 as restated by Amendment 1)
++ g238_d223_restlog.js D224-miles  # D224 (Mario concurred 2026-10-08): new gate row R4, Gate rows section (R1, R5, R6, R9, R10 as restated by Amendment 1)
++ g238_d223_restlog.js D224-progress  # D224 (Mario concurred 2026-10-08): new gate row R5, Gate rows section (R1, R5, R6, R9, R10 as restated by Amendment 1)
++ g238_d223_restlog.js D224-journal  # D224 (Mario concurred 2026-10-08): new gate row R6, Gate rows section (R1, R5, R6, R9, R10 as restated by Amendment 1)
++ g238_d223_restlog.js D225-swapaway  # D225 (Mario concurred 2026-10-08): new gate row R7 as restated by D225 Amendment 2 (R7)
++ g238_d223_restlog.js D226-logmore  # D226 (Mario concurred 2026-10-08): new gate row R8, Gate rows section (R1, R5, R6, R9, R10 as restated by Amendment 1)
++ g238_d223_restlog.js D223-lens  # D223 (Mario concurred 2026-10-08): new gate row R9, Gate rows section (R1, R5, R6, R9, R10 as restated by Amendment 1)
++ g238_d223_restlog.js D224-hero  # D224 (Mario concurred 2026-10-08): new gate row R10, Gate rows section (R1, R5, R6, R9, R10 as restated by Amendment 1)
++ g238_d223_restlog.js D227-digest  # D227 (Mario concurred 2026-10-08): new gate row R11, Gate rows section (R1, R5, R6, R9, R10 as restated by Amendment 1)

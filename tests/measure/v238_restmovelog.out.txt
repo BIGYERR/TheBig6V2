@@ -1,0 +1,1191 @@
+######## part r (r.out)
+ia-version 237 | startDate 2026-09-28 | clock set per case to the rest day (noon)
+
+════ R1 — seed 76308 HALF_MANNY: W1 first rest day, every candidate, run jog 37 min 3.7 mi RPE 7, seq Done ════
+fixture seed 76308 | cardioTypes ["run"] | restDays ["sun","wed"] | weeks 14
+W1: mon=run:generic(Strength Support {Speed Run — Intervals}) | tue=lift(Leg Strength + Mobility) | wed=rest(Rest) | thu=run:generic(Posterior Chain {Speed Run — Fartlek}) | fri=run:time(Recovery Lift {Recovery Run}) | sat=run:dist(Full Body Support {Long Run}) | sun=rest(Rest)
+first rest day wed | candidates ["mon","tue","thu","fri","sat"]
+  W1 rest wed <- mon [run:generic] jog run+3.7 seq done
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after done  {"rpe":7,"run_dist":"3.7"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins]
+  W1 rest wed <- mon [run:generic] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after rpe   {"rpe":"8","run_dist":"3.7"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe]
+  W1 rest wed <- mon [run:generic] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after input {"rpe":7,"run_dist":"5.2"} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2"}  | week MILES 5.2 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- mon [run:generic] jog run+3.7 seq log
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after log   {"rpe":7,"run_dist":"3.7"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins]
+  W1 rest wed <- tue [lift] jog run+3.7 seq done
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap null btn "null" nudge true
+      after done  {"rpe":7}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- tue [lift] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap null btn "null" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,run_dist]
+  W1 rest wed <- tue [lift] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap null btn "null" nudge true
+      after input {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} (null)
+      after type  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end []
+  W1 rest wed <- tue [lift] jog run+3.7 seq log
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap null btn "null" nudge true
+      after log   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end []
+  W1 rest wed <- thu [run:generic] jog run+3.7 seq done
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after done  {"rpe":7,"run_dist":"3.7"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins]
+  W1 rest wed <- thu [run:generic] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after rpe   {"rpe":"8","run_dist":"3.7"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe]
+  W1 rest wed <- thu [run:generic] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after input {"rpe":7,"run_dist":"5.2"} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2"}  | week MILES 5.2 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- thu [run:generic] jog run+3.7 seq log
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after log   {"rpe":7,"run_dist":"3.7"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins]
+  W1 rest wed <- fri [run:time] jog run+3.7 seq done
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after done  {"rpe":7,"run_dist":"3.7","run_pace":"6:45/mi"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins]
+  W1 rest wed <- fri [run:time] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after rpe   {"rpe":"8","run_dist":"3.7","run_pace":"6:45/mi"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe]
+  W1 rest wed <- fri [run:time] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after input {"rpe":7,"run_dist":"5.2","run_pace":"4:48/mi"} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2","run_pace":"4:48/mi"}  | week MILES 5.2 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- fri [run:time] jog run+3.7 seq log
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after log   {"rpe":7,"run_dist":"3.7","run_pace":"6:45/mi"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins]
+  W1 rest wed <- sat [run:dist] jog run+3.7 seq done
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after done  {"rpe":7,"run_dist":"3.7"}  | week MILES 3.7 pvl {"presc":3.1,"act":3.7}
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins]
+  W1 rest wed <- sat [run:dist] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after rpe   {"rpe":"8","run_dist":"3.7"}  | week MILES 3.7 pvl {"presc":3.1,"act":3.7}
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe]
+  W1 rest wed <- sat [run:dist] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after input {"rpe":7,"run_dist":"5.2"} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2"}  | week MILES 5.2 pvl {"presc":3.1,"act":5.2}
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- sat [run:dist] jog run+3.7 seq log
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after log   {"rpe":7,"run_dist":"3.7"}  | week MILES 3.7 pvl {"presc":3.1,"act":3.7}
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins]
+
+════ R2 — form-kind matrix (first (week, rest, candidate) per kind per source config) x jog x seq ════
+cells: run:generic=HALF_MANNY/W1/wed<-mon | lift=HALF_MANNY/W1/wed<-tue | run:time=HALF_MANNY/W1/wed<-fri | run:dist=HALF_MANNY/W1/wed<-sat | bike=run10k+bike+swim/W1/wed<-tue | swim=run10k+bike+swim/W1/wed<-thu | run:reps_dist=run_pace/W1/wed<-mon
+  W1 rest wed <- mon [run:generic] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after rpe   {"rpe":"8","run_dist":"3.7"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe]
+  W1 rest wed <- mon [run:generic] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after input {"rpe":7,"run_dist":"5.2"} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2"}  | week MILES 5.2 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- mon [run:generic] jog run+3.7 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"3.7","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- mon [run:generic] jog bike seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,bike_mins]
+  W1 rest wed <- mon [run:generic] jog bike seq type
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2"}  | week MILES 5.2 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- mon [run:generic] jog bike seq swap
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- mon [run:generic] jog swim+1370 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,swim_yards]
+  W1 rest wed <- mon [run:generic] jog swim+1370 seq type
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2"}  | week MILES 5.2 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- mon [run:generic] jog swim+1370 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- tue [lift] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap null btn "null" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,run_dist]
+  W1 rest wed <- tue [lift] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap null btn "null" nudge true
+      after input {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} (null)
+      after type  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end []
+  W1 rest wed <- tue [lift] jog run+3.7 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap null btn "null" nudge true
+      after swap  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end []
+  W1 rest wed <- tue [lift] jog bike seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap null btn "null" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,bike_mins]
+  W1 rest wed <- tue [lift] jog bike seq type
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap null btn "null" nudge true
+      after input {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} (null)
+      after type  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end []
+  W1 rest wed <- tue [lift] jog bike seq swap
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap null btn "null" nudge true
+      after swap  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end []
+  W1 rest wed <- tue [lift] jog swim+1370 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap null btn "null" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,swim_yards]
+  W1 rest wed <- tue [lift] jog swim+1370 seq type
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap null btn "null" nudge true
+      after input {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} (null)
+      after type  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end []
+  W1 rest wed <- tue [lift] jog swim+1370 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap null btn "null" nudge true
+      after swap  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end []
+  W1 rest wed <- fri [run:time] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after rpe   {"rpe":"8","run_dist":"3.7","run_pace":"6:45/mi"}  | week MILES 3.7 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe]
+  W1 rest wed <- fri [run:time] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after input {"rpe":7,"run_dist":"5.2","run_pace":"4:48/mi"} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2","run_pace":"4:48/mi"}  | week MILES 5.2 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- fri [run:time] jog run+3.7 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"3.7","run_pace":"6:45/mi","run_mins":"","run_reps":"","run_rep_time":""}}}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- fri [run:time] jog bike seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,bike_mins]
+  W1 rest wed <- fri [run:time] jog bike seq type
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2","run_pace":"4:48/mi"}  | week MILES 5.2 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- fri [run:time] jog bike seq swap
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- fri [run:time] jog swim+1370 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,swim_yards]
+  W1 rest wed <- fri [run:time] jog swim+1370 seq type
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2","run_pace":"4:48/mi"}  | week MILES 5.2 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- fri [run:time] jog swim+1370 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- sat [run:dist] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after rpe   {"rpe":"8","run_dist":"3.7"}  | week MILES 3.7 pvl {"presc":3.1,"act":3.7}
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe]
+  W1 rest wed <- sat [run:dist] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after input {"rpe":7,"run_dist":"5.2"} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2"}  | week MILES 5.2 pvl {"presc":3.1,"act":5.2}
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- sat [run:dist] jog run+3.7 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {"run_dist":"3.7"} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"3.7","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- sat [run:dist] jog bike seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl {"presc":3.1,"act":0}
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,bike_mins]
+  W1 rest wed <- sat [run:dist] jog bike seq type
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2"}  | week MILES 5.2 pvl {"presc":3.1,"act":5.2}
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- sat [run:dist] jog bike seq swap
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- sat [run:dist] jog swim+1370 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl {"presc":3.1,"act":0}
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,swim_yards]
+  W1 rest wed <- sat [run:dist] jog swim+1370 seq type
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} (run_dist=5.2)
+      after type  {"rpe":7,"run_dist":"5.2"}  | week MILES 5.2 pvl {"presc":3.1,"act":5.2}
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- sat [run:dist] jog swim+1370 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- tue [bike] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap {"planned":"bike","active":"bike","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,run_dist]
+  W1 rest wed <- tue [bike] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap {"planned":"bike","active":"bike","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} (bike_mins=45)
+      after type  {"rpe":7,"bike_mins":"45"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- tue [bike] jog run+3.7 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap {"planned":"bike","active":"bike","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"bike","swapTo":"run"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- tue [bike] jog bike seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {"bike_mins":"37"} wrap {"planned":"bike","active":"bike","logged":"1"} btn "Logged ✓" nudge true
+      after rpe   {"rpe":"8","bike_mins":"37"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe]
+  W1 rest wed <- tue [bike] jog bike seq type
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {"bike_mins":"37"} wrap {"planned":"bike","active":"bike","logged":"1"} btn "Logged ✓" nudge true
+      after input {"rpe":7,"bike_mins":"45"} (bike_mins=45)
+      after type  {"rpe":7,"bike_mins":"45"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- tue [bike] jog bike seq swap
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {"bike_mins":"37"} wrap {"planned":"bike","active":"bike","logged":"1"} btn "Logged ✓" nudge true
+      after swap  {"rpe":7,"swapFrom":"bike","swapTo":"run","parked":{"bike":{"bike_mins":"37"}}}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- tue [bike] jog swim+1370 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"bike","active":"bike","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,swim_yards]
+  W1 rest wed <- tue [bike] jog swim+1370 seq type
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"bike","active":"bike","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} (bike_mins=45)
+      after type  {"rpe":7,"bike_mins":"45"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- tue [bike] jog swim+1370 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"bike","active":"bike","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"bike","swapTo":"run"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- thu [swim] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap {"planned":"swim","active":"swim","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,run_dist]
+  W1 rest wed <- thu [swim] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap {"planned":"swim","active":"swim","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} (swim_yards=1500)
+      after type  {"rpe":7,"swim_yards":"1500"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- thu [swim] jog run+3.7 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap {"planned":"swim","active":"swim","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"swim","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- thu [swim] jog bike seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"swim","active":"swim","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,bike_mins]
+  W1 rest wed <- thu [swim] jog bike seq type
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"swim","active":"swim","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} (swim_yards=1500)
+      after type  {"rpe":7,"swim_yards":"1500"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- thu [swim] jog bike seq swap
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"swim","active":"swim","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"swim","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- thu [swim] jog swim+1370 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {"swim_yards":"1370"} wrap {"planned":"swim","active":"swim","logged":"1"} btn "Logged ✓" nudge true
+      after rpe   {"rpe":"8","swim_yards":"1370"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe]
+  W1 rest wed <- thu [swim] jog swim+1370 seq type
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {"swim_yards":"1370"} wrap {"planned":"swim","active":"swim","logged":"1"} btn "Logged ✓" nudge true
+      after input {"rpe":7,"swim_yards":"1500"} (swim_yards=1500)
+      after type  {"rpe":7,"swim_yards":"1500"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- thu [swim] jog swim+1370 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {"swim_yards":"1370"} wrap {"planned":"swim","active":"swim","logged":"1"} btn "Logged ✓" nudge true
+      after swap  {"rpe":7,"swapFrom":"swim","swapTo":"bike","parked":{"swim":{"swim_yards":"1370"}}}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- mon [run:reps_dist] jog run+3.7 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,run_dist]
+  W1 rest wed <- mon [run:reps_dist] jog run+3.7 seq type
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after input {"rpe":7,"run_pace":"6:02/mi"} (run_rep_time=1:30)
+      after type  {"rpe":7,"run_pace":"6:02/mi"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- mon [run:reps_dist] jog run+3.7 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "37 min run logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7}  | week MILES 3.7 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} | form {} wrap {"planned":"run","active":"run","logged":"1"} btn "Logged ✓" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,run_dist]
+  W1 rest wed <- mon [run:reps_dist] jog bike seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,bike_mins]
+  W1 rest wed <- mon [run:reps_dist] jog bike seq type
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} (run_rep_time=1:30)
+      after type  {"rpe":7,"run_pace":"6:02/mi"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- mon [run:reps_dist] jog bike seq swap
+      after jog   {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "37 min ride logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"bike","rest_mins":37,"rpe":7,"bike_mins":37} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,bike_mins]
+  W1 rest wed <- mon [run:reps_dist] jog swim+1370 seq rpe
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after rpe   {"rpe":"8"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,rpe,swim_yards]
+  W1 rest wed <- mon [run:reps_dist] jog swim+1370 seq type
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after input {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} (run_rep_time=1:30)
+      after type  {"rpe":7,"run_pace":"6:02/mi"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+  W1 rest wed <- mon [run:reps_dist] jog swim+1370 seq swap
+      after jog   {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "37 min swim logged · RPE 7" pvl null
+      after move  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370}  | week MILES 0 hero line "null"
+      after open  {"rest_cardio":true,"rest_type":"swim","rest_mins":37,"rpe":7,"swim_yards":1370} | form {} wrap {"planned":"run","active":"run","logged":"0"} btn "Log" nudge true
+      after swap  {"rpe":7,"swapFrom":"run","swapTo":"bike"}  | week MILES 0 pvl null
+      jog keys lost: at open [] at end [rest_cardio,rest_type,rest_mins,swim_yards]
+
+  R2 summary (kind | jog | seq -> jog keys lost at end, week MILES before jog-move -> end):
+    bike | jog bike | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bike | log -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bike | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bike | open -> lost [] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bike | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bike | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bike | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bikedist | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bikedist | log -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bikedist | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bikedist | open -> lost [] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bikedist | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bikedist | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog bikedist | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 form@open {"bike_mins":"37"} btn@open Logged ✓ nudge true
+    bike | jog run | done -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Log nudge true
+    bike | jog run | log -> lost [] MILES 3.7->3.7 btn@open Log nudge true
+    bike | jog run | notes -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Log nudge true
+    bike | jog run | open -> lost [] MILES 3.7->3.7 btn@open Log nudge true
+    bike | jog run | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,run_dist] MILES 3.7->0 btn@open Log nudge true
+    bike | jog run | swap -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Log nudge true
+    bike | jog run | type -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Log nudge true
+    bike | jog runnodist | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    bike | jog runnodist | log -> lost [] MILES 0->0 btn@open Log nudge false
+    bike | jog runnodist | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    bike | jog runnodist | open -> lost [] MILES 0->0 btn@open Log nudge false
+    bike | jog runnodist | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    bike | jog runnodist | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    bike | jog runnodist | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    bike | jog swim | done -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    bike | jog swim | log -> lost [] MILES 0->0 btn@open Log nudge true
+    bike | jog swim | notes -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    bike | jog swim | open -> lost [] MILES 0->0 btn@open Log nudge true
+    bike | jog swim | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,swim_yards] MILES 0->0 btn@open Log nudge true
+    bike | jog swim | swap -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    bike | jog swim | type -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    bike | jog walk | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    bike | jog walk | log -> lost [] MILES 0->0 btn@open Log nudge false
+    bike | jog walk | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    bike | jog walk | open -> lost [] MILES 0->0 btn@open Log nudge false
+    bike | jog walk | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    bike | jog walk | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    bike | jog walk | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    lift | jog bike (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open null nudge true
+    lift | jog bike (sheet does not offer) | log -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog bike (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open null nudge true
+    lift | jog bike (sheet does not offer) | open -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog bike (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open null nudge true
+    lift | jog bike (sheet does not offer) | swap -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog bike (sheet does not offer) | type -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog bikedist (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open null nudge true
+    lift | jog bikedist (sheet does not offer) | log -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog bikedist (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open null nudge true
+    lift | jog bikedist (sheet does not offer) | open -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog bikedist (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open null nudge true
+    lift | jog bikedist (sheet does not offer) | swap -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog bikedist (sheet does not offer) | type -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog run | done -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open null nudge true
+    lift | jog run | log -> lost [] MILES 3.7->3.7 btn@open null nudge true
+    lift | jog run | notes -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open null nudge true
+    lift | jog run | open -> lost [] MILES 3.7->3.7 btn@open null nudge true
+    lift | jog run | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,run_dist] MILES 3.7->0 btn@open null nudge true
+    lift | jog run | swap -> lost [] MILES 3.7->3.7 btn@open null nudge true
+    lift | jog run | type -> lost [] MILES 3.7->3.7 btn@open null nudge true
+    lift | jog runnodist | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open null nudge false
+    lift | jog runnodist | log -> lost [] MILES 0->0 btn@open null nudge false
+    lift | jog runnodist | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open null nudge false
+    lift | jog runnodist | open -> lost [] MILES 0->0 btn@open null nudge false
+    lift | jog runnodist | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open null nudge false
+    lift | jog runnodist | swap -> lost [] MILES 0->0 btn@open null nudge false
+    lift | jog runnodist | type -> lost [] MILES 0->0 btn@open null nudge false
+    lift | jog swim (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open null nudge true
+    lift | jog swim (sheet does not offer) | log -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog swim (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open null nudge true
+    lift | jog swim (sheet does not offer) | open -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog swim (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,swim_yards] MILES 0->0 btn@open null nudge true
+    lift | jog swim (sheet does not offer) | swap -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog swim (sheet does not offer) | type -> lost [] MILES 0->0 btn@open null nudge true
+    lift | jog walk | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open null nudge false
+    lift | jog walk | log -> lost [] MILES 0->0 btn@open null nudge false
+    lift | jog walk | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open null nudge false
+    lift | jog walk | open -> lost [] MILES 0->0 btn@open null nudge false
+    lift | jog walk | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open null nudge false
+    lift | jog walk | swap -> lost [] MILES 0->0 btn@open null nudge false
+    lift | jog walk | type -> lost [] MILES 0->0 btn@open null nudge false
+    run:dist | jog bike (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bike (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bike (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bike (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bike (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bike (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bike (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->5.2 btn@open Log nudge true
+    run:dist | jog bikedist (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bikedist (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bikedist (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bikedist (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bikedist (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bikedist (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:dist | jog bikedist (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->5.2 btn@open Log nudge true
+    run:dist | jog run | done -> lost [rest_cardio,rest_type,rest_mins] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:dist | jog run | log -> lost [rest_cardio,rest_type,rest_mins] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:dist | jog run | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:dist | jog run | open -> lost [] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:dist | jog run | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:dist | jog run | swap -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:dist | jog run | type -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->5.2 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:dist | jog runnodist | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:dist | jog runnodist | log -> lost [] MILES 0->0 btn@open Log nudge false
+    run:dist | jog runnodist | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:dist | jog runnodist | open -> lost [] MILES 0->0 btn@open Log nudge false
+    run:dist | jog runnodist | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    run:dist | jog runnodist | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:dist | jog runnodist | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->5.2 btn@open Log nudge false
+    run:dist | jog swim (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:dist | jog swim (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:dist | jog swim (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:dist | jog swim (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:dist | jog swim (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:dist | jog swim (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:dist | jog swim (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->5.2 btn@open Log nudge true
+    run:dist | jog walk | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:dist | jog walk | log -> lost [] MILES 0->0 btn@open Log nudge false
+    run:dist | jog walk | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:dist | jog walk | open -> lost [] MILES 0->0 btn@open Log nudge false
+    run:dist | jog walk | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    run:dist | jog walk | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:dist | jog walk | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->5.2 btn@open Log nudge false
+    run:generic | jog bike (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bike (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bike (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bike (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bike (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bike (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bike (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->5.2 btn@open Log nudge true
+    run:generic | jog bikedist (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bikedist (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bikedist (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bikedist (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bikedist (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bikedist (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:generic | jog bikedist (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->5.2 btn@open Log nudge true
+    run:generic | jog run | done -> lost [rest_cardio,rest_type,rest_mins] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:generic | jog run | log -> lost [rest_cardio,rest_type,rest_mins] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:generic | jog run | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:generic | jog run | open -> lost [] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:generic | jog run | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:generic | jog run | swap -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:generic | jog run | type -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->5.2 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:generic | jog runnodist | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:generic | jog runnodist | log -> lost [] MILES 0->0 btn@open Log nudge false
+    run:generic | jog runnodist | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:generic | jog runnodist | open -> lost [] MILES 0->0 btn@open Log nudge false
+    run:generic | jog runnodist | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    run:generic | jog runnodist | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:generic | jog runnodist | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->5.2 btn@open Log nudge false
+    run:generic | jog swim (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:generic | jog swim (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:generic | jog swim (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:generic | jog swim (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:generic | jog swim (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:generic | jog swim (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:generic | jog swim (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->5.2 btn@open Log nudge true
+    run:generic | jog walk | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:generic | jog walk | log -> lost [] MILES 0->0 btn@open Log nudge false
+    run:generic | jog walk | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:generic | jog walk | open -> lost [] MILES 0->0 btn@open Log nudge false
+    run:generic | jog walk | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    run:generic | jog walk | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:generic | jog walk | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->5.2 btn@open Log nudge false
+    run:reps_dist | jog bike (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bike (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bike (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bike (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bike (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bike (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bike (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bikedist (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bikedist (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bikedist (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bikedist (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bikedist (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bikedist (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog bikedist (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog run | done -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Logged ✓ nudge true
+    run:reps_dist | jog run | log -> lost [] MILES 3.7->3.7 btn@open Logged ✓ nudge true
+    run:reps_dist | jog run | notes -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Logged ✓ nudge true
+    run:reps_dist | jog run | open -> lost [] MILES 3.7->3.7 btn@open Logged ✓ nudge true
+    run:reps_dist | jog run | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,run_dist] MILES 3.7->0 btn@open Logged ✓ nudge true
+    run:reps_dist | jog run | swap -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Logged ✓ nudge true
+    run:reps_dist | jog run | type -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Logged ✓ nudge true
+    run:reps_dist | jog runnodist | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog runnodist | log -> lost [] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog runnodist | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog runnodist | open -> lost [] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog runnodist | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog runnodist | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog runnodist | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog swim (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog swim (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog swim (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog swim (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog swim (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog swim (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog swim (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:reps_dist | jog walk | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog walk | log -> lost [] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog walk | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog walk | open -> lost [] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog walk | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog walk | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:reps_dist | jog walk | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:time | jog bike (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:time | jog bike (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:time | jog bike (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:time | jog bike (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:time | jog bike (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:time | jog bike (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:time | jog bike (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->5.2 btn@open Log nudge true
+    run:time | jog bikedist (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:time | jog bikedist (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:time | jog bikedist (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:time | jog bikedist (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:time | jog bikedist (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:time | jog bikedist (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    run:time | jog bikedist (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->5.2 btn@open Log nudge true
+    run:time | jog run | done -> lost [rest_cardio,rest_type,rest_mins] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:time | jog run | log -> lost [rest_cardio,rest_type,rest_mins] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:time | jog run | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:time | jog run | open -> lost [] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:time | jog run | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 3.7->3.7 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:time | jog run | swap -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:time | jog run | type -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->5.2 form@open {"run_dist":"3.7"} btn@open Logged ✓ nudge true
+    run:time | jog runnodist | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:time | jog runnodist | log -> lost [] MILES 0->0 btn@open Log nudge false
+    run:time | jog runnodist | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:time | jog runnodist | open -> lost [] MILES 0->0 btn@open Log nudge false
+    run:time | jog runnodist | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    run:time | jog runnodist | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:time | jog runnodist | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->5.2 btn@open Log nudge false
+    run:time | jog swim (sheet does not offer) | done -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:time | jog swim (sheet does not offer) | log -> lost [] MILES 0->0 btn@open Log nudge true
+    run:time | jog swim (sheet does not offer) | notes -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:time | jog swim (sheet does not offer) | open -> lost [] MILES 0->0 btn@open Log nudge true
+    run:time | jog swim (sheet does not offer) | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:time | jog swim (sheet does not offer) | swap -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 btn@open Log nudge true
+    run:time | jog swim (sheet does not offer) | type -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->5.2 btn@open Log nudge true
+    run:time | jog walk | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:time | jog walk | log -> lost [] MILES 0->0 btn@open Log nudge false
+    run:time | jog walk | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:time | jog walk | open -> lost [] MILES 0->0 btn@open Log nudge false
+    run:time | jog walk | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    run:time | jog walk | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    run:time | jog walk | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->5.2 btn@open Log nudge false
+    swim | jog bike | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    swim | jog bike | log -> lost [] MILES 0->0 btn@open Log nudge true
+    swim | jog bike | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    swim | jog bike | open -> lost [] MILES 0->0 btn@open Log nudge true
+    swim | jog bike | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open Log nudge true
+    swim | jog bike | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    swim | jog bike | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    swim | jog bikedist | done -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    swim | jog bikedist | log -> lost [] MILES 0->0 btn@open Log nudge true
+    swim | jog bikedist | notes -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    swim | jog bikedist | open -> lost [] MILES 0->0 btn@open Log nudge true
+    swim | jog bikedist | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,bike_mins] MILES 0->0 btn@open Log nudge true
+    swim | jog bikedist | swap -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    swim | jog bikedist | type -> lost [rest_cardio,rest_type,rest_mins,bike_mins] MILES 0->0 btn@open Log nudge true
+    swim | jog run | done -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Log nudge true
+    swim | jog run | log -> lost [] MILES 3.7->3.7 btn@open Log nudge true
+    swim | jog run | notes -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Log nudge true
+    swim | jog run | open -> lost [] MILES 3.7->3.7 btn@open Log nudge true
+    swim | jog run | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe,run_dist] MILES 3.7->0 btn@open Log nudge true
+    swim | jog run | swap -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Log nudge true
+    swim | jog run | type -> lost [rest_cardio,rest_type,rest_mins,run_dist] MILES 3.7->0 btn@open Log nudge true
+    swim | jog runnodist | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    swim | jog runnodist | log -> lost [] MILES 0->0 btn@open Log nudge false
+    swim | jog runnodist | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    swim | jog runnodist | open -> lost [] MILES 0->0 btn@open Log nudge false
+    swim | jog runnodist | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    swim | jog runnodist | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    swim | jog runnodist | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    swim | jog swim | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 form@open {"swim_yards":"1370"} btn@open Logged ✓ nudge true
+    swim | jog swim | log -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 form@open {"swim_yards":"1370"} btn@open Logged ✓ nudge true
+    swim | jog swim | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 form@open {"swim_yards":"1370"} btn@open Logged ✓ nudge true
+    swim | jog swim | open -> lost [] MILES 0->0 form@open {"swim_yards":"1370"} btn@open Logged ✓ nudge true
+    swim | jog swim | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 form@open {"swim_yards":"1370"} btn@open Logged ✓ nudge true
+    swim | jog swim | swap -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 form@open {"swim_yards":"1370"} btn@open Logged ✓ nudge true
+    swim | jog swim | type -> lost [rest_cardio,rest_type,rest_mins,swim_yards] MILES 0->0 form@open {"swim_yards":"1370"} btn@open Logged ✓ nudge true
+    swim | jog walk | done -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    swim | jog walk | log -> lost [] MILES 0->0 btn@open Log nudge false
+    swim | jog walk | notes -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    swim | jog walk | open -> lost [] MILES 0->0 btn@open Log nudge false
+    swim | jog walk | rpe -> lost [rest_cardio,rest_type,rest_mins,rpe] MILES 0->0 btn@open Log nudge false
+    swim | jog walk | swap -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+    swim | jog walk | type -> lost [rest_cardio,rest_type,rest_mins] MILES 0->0 btn@open Log nudge false
+
+════ R3 — Progress + journal readers, HALF_MANNY W1 first rest day, run jog 3.7 mi, first candidate ════
+  Progress html "3.7" occurrences: empty store 0 | after jog 2 (journal "RPE 7" true) | after move 2 | after RPE touch on moved-in form 2 (journal "RPE 8" true, "RPE 7" false)
+  context of 3.7 after jog: tica,Geist,sans-serif">W13 Total logged: 3.7 mi · Peak week: <b style="
+
+throws: {}
+
+DONE
+######## part c2 (c2.out)
+ia-version 237 | startDate 2026-09-28 | clock set per case to the rest day (noon)
+
+════ C — swapped-away day with nothing on the arriving sport (HALF_MANNY + matrix configs, W1) ════
+  HALF_MANNY W1 mon [run:generic] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Strength Support"},"dest":{"rest":false,"movedFrom":"mon","title":"Strength Support"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  HALF_MANNY W1 mon [run:generic] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Strength Support"},"dest":{"rest":false,"movedFrom":"mon","title":"Strength Support"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  HALF_MANNY W1 thu [run:generic] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_thu {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Posterior Chain"},"dest":{"rest":false,"movedFrom":"thu","title":"Posterior Chain"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  HALF_MANNY W1 thu [run:generic] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_thu {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Posterior Chain"},"dest":{"rest":false,"movedFrom":"thu","title":"Posterior Chain"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  HALF_MANNY W1 fri [run:time] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"4:48/mi","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"4:48/mi","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Recovery Lift"},"dest":{"rest":false,"movedFrom":"fri","title":"Recovery Lift"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  HALF_MANNY W1 fri [run:time] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Recovery Lift"},"dest":{"rest":false,"movedFrom":"fri","title":"Recovery Lift"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  HALF_MANNY W1 sat [run:dist] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_sat {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Full Body Support"},"dest":{"rest":false,"movedFrom":"sat","title":"Full Body Support"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  HALF_MANNY W1 sat [run:dist] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_sat {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Full Body Support"},"dest":{"rest":false,"movedFrom":"sat","title":"Full Body Support"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run10k+bike+swim W1 mon [run:dist] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Full Body"},"dest":{"rest":false,"movedFrom":"mon","title":"Full Body"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run10k+bike+swim W1 mon [run:dist] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Full Body"},"dest":{"rest":false,"movedFrom":"mon","title":"Full Body"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run10k+bike+swim W1 tue [bike] logged-then-swap ->run | entry {"swapFrom":"bike","swapTo":"run","parked":{"bike":{"bike_mins":"45"}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_tue {"swapFrom":"bike","swapTo":"run","parked":{"bike":{"bike_mins":"45"}}} | dest entry null | moved-in form wrap {"planned":"bike","active":"bike","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push (light)"},"dest":{"rest":false,"movedFrom":"tue","title":"Push (light)"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Bike → Run <details style=\"background:var(--sur"
+  run10k+bike+swim W1 tue [bike] swap-blank ->run | entry {"swapFrom":"bike","swapTo":"run"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_tue {"swapFrom":"bike","swapTo":"run"} | dest entry null | moved-in form wrap {"planned":"bike","active":"bike","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push (light)"},"dest":{"rest":false,"movedFrom":"tue","title":"Push (light)"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Bike → Run <details style=\"background:var(--sur"
+  run10k+bike+swim W1 thu [swim] logged-then-swap ->bike | entry {"swapFrom":"swim","swapTo":"bike","parked":{"swim":{"swim_yards":"1500"}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_thu {"swapFrom":"swim","swapTo":"bike","parked":{"swim":{"swim_yards":"1500"}}} | dest entry null | moved-in form wrap {"planned":"swim","active":"swim","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Legs"},"dest":{"rest":false,"movedFrom":"thu","title":"Legs"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Swim → Bike <details style=\"background:var(--su"
+  run10k+bike+swim W1 thu [swim] swap-blank ->bike | entry {"swapFrom":"swim","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_thu {"swapFrom":"swim","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"swim","active":"swim","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Legs"},"dest":{"rest":false,"movedFrom":"thu","title":"Legs"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Swim → Bike <details style=\"background:var(--su"
+  run10k+bike+swim W1 fri [swim] logged-then-swap ->bike | entry {"swapFrom":"swim","swapTo":"bike","parked":{"swim":{"swim_yards":"1500"}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"swim","swapTo":"bike","parked":{"swim":{"swim_yards":"1500"}}} | dest entry null | moved-in form wrap {"planned":"swim","active":"swim","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push"},"dest":{"rest":false,"movedFrom":"fri","title":"Push"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Swim → Bike <details style=\"background:var(--su"
+  run10k+bike+swim W1 fri [swim] swap-blank ->bike | entry {"swapFrom":"swim","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"swim","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"swim","active":"swim","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push"},"dest":{"rest":false,"movedFrom":"fri","title":"Push"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Swim → Bike <details style=\"background:var(--su"
+  run_pace W1 mon [run:reps_dist] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"","run_pace":"6:02/mi","run_mins":"","run_reps":"","run_rep_time":"1:30"}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"","run_pace":"6:02/mi","run_mins":"","run_reps":"","run_rep_time":"1:30"}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push"},"dest":{"rest":false,"movedFrom":"mon","title":"Push"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_pace W1 mon [run:reps_dist] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push"},"dest":{"rest":false,"movedFrom":"mon","title":"Push"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_pace W1 thu [run:time] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"2:53/mi","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_thu {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"2:53/mi","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Pull"},"dest":{"rest":false,"movedFrom":"thu","title":"Pull"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_pace W1 thu [run:time] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_thu {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Pull"},"dest":{"rest":false,"movedFrom":"thu","title":"Pull"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_pace W1 fri [run:dist] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push (light)"},"dest":{"rest":false,"movedFrom":"fri","title":"Push (light)"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_pace W1 fri [run:dist] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push (light)"},"dest":{"rest":false,"movedFrom":"fri","title":"Push (light)"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_pace W1 sat [run:dist] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_sat {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Full Body"},"dest":{"rest":false,"movedFrom":"sat","title":"Full Body"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_pace W1 sat [run:dist] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_sat {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Full Body"},"dest":{"rest":false,"movedFrom":"sat","title":"Full Body"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_base W1 mon [run:time] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"3:51/mi","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"3:51/mi","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push"},"dest":{"rest":false,"movedFrom":"mon","title":"Push"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_base W1 mon [run:time] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push"},"dest":{"rest":false,"movedFrom":"mon","title":"Push"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_base W1 sat [run:time] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"4:48/mi","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_sat {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"4:48/mi","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Full Body"},"dest":{"rest":false,"movedFrom":"sat","title":"Full Body"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_base W1 sat [run:time] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_sat {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Full Body"},"dest":{"rest":false,"movedFrom":"sat","title":"Full Body"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  swim_base W1 mon [swim] logged-then-swap ->bike | entry {"swapFrom":"swim","swapTo":"bike","parked":{"swim":{"swim_yards":"1500"}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"swim","swapTo":"bike","parked":{"swim":{"swim_yards":"1500"}}} | dest entry null | moved-in form wrap {"planned":"swim","active":"swim","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push"},"dest":{"rest":false,"movedFrom":"mon","title":"Push"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Swim → Bike <details style=\"background:var(--su"
+  swim_base W1 mon [swim] swap-blank ->bike | entry {"swapFrom":"swim","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"swim","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"swim","active":"swim","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push"},"dest":{"rest":false,"movedFrom":"mon","title":"Push"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Swim → Bike <details style=\"background:var(--su"
+  swim_base W1 fri [swim] logged-then-swap ->bike | entry {"swapFrom":"swim","swapTo":"bike","parked":{"swim":{"swim_yards":"1500"}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"swim","swapTo":"bike","parked":{"swim":{"swim_yards":"1500"}}} | dest entry null | moved-in form wrap {"planned":"swim","active":"swim","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push (light)"},"dest":{"rest":false,"movedFrom":"fri","title":"Push (light)"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Swim → Bike <details style=\"background:var(--su"
+  swim_base W1 fri [swim] swap-blank ->bike | entry {"swapFrom":"swim","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"swim","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"swim","active":"swim","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push (light)"},"dest":{"rest":false,"movedFrom":"fri","title":"Push (light)"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Swim → Bike <details style=\"background:var(--su"
+  bike_ftp W1 mon [bike] logged-then-swap ->run | entry {"swapFrom":"bike","swapTo":"run","parked":{"bike":{"bike_mins":"45"}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"bike","swapTo":"run","parked":{"bike":{"bike_mins":"45"}}} | dest entry null | moved-in form wrap {"planned":"bike","active":"bike","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push"},"dest":{"rest":false,"movedFrom":"mon","title":"Push"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Bike → Run <details style=\"background:var(--sur"
+  bike_ftp W1 mon [bike] swap-blank ->run | entry {"swapFrom":"bike","swapTo":"run"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"bike","swapTo":"run"} | dest entry null | moved-in form wrap {"planned":"bike","active":"bike","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push"},"dest":{"rest":false,"movedFrom":"mon","title":"Push"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Bike → Run <details style=\"background:var(--sur"
+  bike_ftp W1 fri [bike] logged-then-swap ->run | entry {"swapFrom":"bike","swapTo":"run","parked":{"bike":{"bike_mins":"45"}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"bike","swapTo":"run","parked":{"bike":{"bike_mins":"45"}}} | dest entry null | moved-in form wrap {"planned":"bike","active":"bike","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push (light)"},"dest":{"rest":false,"movedFrom":"fri","title":"Push (light)"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Bike → Run <details style=\"background:var(--sur"
+  bike_ftp W1 fri [bike] swap-blank ->run | entry {"swapFrom":"bike","swapTo":"run"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"wed"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"bike","swapTo":"run"} | dest entry null | moved-in form wrap {"planned":"bike","active":"bike","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push (light)"},"dest":{"rest":false,"movedFrom":"fri","title":"Push (light)"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Bike → Run <details style=\"background:var(--sur"
+  run_5k W1 mon [run:generic] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"sat"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Legs"},"dest":{"rest":false,"movedFrom":"mon","title":"Legs"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_5k W1 mon [run:generic] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"sat"} eligible-for-rest-sheet false | origin entry kept at w1_mon {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Legs"},"dest":{"rest":false,"movedFrom":"mon","title":"Legs"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_5k W1 wed [run:generic] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"sat"} eligible-for-rest-sheet false | origin entry kept at w1_wed {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Pull"},"dest":{"rest":false,"movedFrom":"wed","title":"Pull"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_5k W1 wed [run:generic] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"sat"} eligible-for-rest-sheet false | origin entry kept at w1_wed {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Pull"},"dest":{"rest":false,"movedFrom":"wed","title":"Pull"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_5k W1 thu [run:time] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"1:21/mi","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"sat"} eligible-for-rest-sheet false | origin entry kept at w1_thu {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"1:21/mi","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push (light)"},"dest":{"rest":false,"movedFrom":"thu","title":"Push (light)"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_5k W1 thu [run:time] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"sat"} eligible-for-rest-sheet false | origin entry kept at w1_thu {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Push (light)"},"dest":{"rest":false,"movedFrom":"thu","title":"Push (light)"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_5k W1 fri [run:dist] logged-then-swap ->bike | entry {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"sat"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"run","swapTo":"bike","parked":{"run":{"run_dist":"5.2","run_pace":"","run_mins":"","run_reps":"","run_rep_time":""}}} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Full Body"},"dest":{"rest":false,"movedFrom":"fri","title":"Full Body"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  run_5k W1 fri [run:dist] swap-blank ->bike | entry {"swapFrom":"run","swapTo":"bike"} | offered by restMoveCandidates true | MOVED: origin stub {"rest":true,"moved":true,"movedTo":"sat"} eligible-for-rest-sheet false | origin entry kept at w1_fri {"swapFrom":"run","swapTo":"bike"} | dest entry null | moved-in form wrap {"planned":"run","active":"run","logged":"0"} form {} | refreshProgram {"origin":{"rest":true,"moved":true,"title":"Full Body"},"dest":{"rest":false,"movedFrom":"fri","title":"Full Body"}} | Progress swap text before move at 2400, after move: "round\" stroke-linejoin=\"round\" style=\"display:inline-block;vertical-align:middle;flex:0 0 auto\"> Swapped Run → Bike <details style=\"background:var(--sur"
+  C summary: {"HALF_MANNY run:generic logged-then-swap -> offered true":2,"HALF_MANNY run:generic swap-blank -> offered true":2,"HALF_MANNY run:time logged-then-swap -> offered true":1,"HALF_MANNY run:time swap-blank -> offered true":1,"HALF_MANNY run:dist logged-then-swap -> offered true":1,"HALF_MANNY run:dist swap-blank -> offered true":1,"run10k+bike+swim run:dist logged-then-swap -> offered true":1,"run10k+bike+swim run:dist swap-blank -> offered true":1,"run10k+bike+swim bike logged-then-swap -> offered true":1,"run10k+bike+swim bike swap-blank -> offered true":1,"run10k+bike+swim swim logged-then-swap -> offered true":2,"run10k+bike+swim swim swap-blank -> offered true":2,"run_pace run:reps_dist logged-then-swap -> offered true":1,"run_pace run:reps_dist swap-blank -> offered true":1,"run_pace run:time logged-then-swap -> offered true":1,"run_pace run:time swap-blank -> offered true":1,"run_pace run:dist logged-then-swap -> offered true":2,"run_pace run:dist swap-blank -> offered true":2,"run_base run:time logged-then-swap -> offered true":2,"run_base run:time swap-blank -> offered true":2,"swim_base swim logged-then-swap -> offered true":2,"swim_base swim swap-blank -> offered true":2,"bike_ftp bike logged-then-swap -> offered true":2,"bike_ftp bike swap-blank -> offered true":2,"run_5k run:generic logged-then-swap -> offered true":2,"run_5k run:generic swap-blank -> offered true":2,"run_5k run:time logged-then-swap -> offered true":1,"run_5k run:time swap-blank -> offered true":1,"run_5k run:dist logged-then-swap -> offered true":1,"run_5k run:dist swap-blank -> offered true":1}
+throws: {}
+
+DONE
+######## part o (o.out)
+ia-version 237 | startDate 2026-09-28 | clock set per case to the rest day (noon)
+
+════ O — other orders (HALF_MANNY W1 first rest day, first candidate) ════
+  Log more run->run (37 min 3.7 mi RPE 7, then 20 min 2 mi RPE 5): {"rest_cardio":true,"rest_type":"run","rest_mins":37,"rpe":7,"run_dist":3.7} -> {"rest_cardio":true,"rest_type":"run","rest_mins":20,"rpe":5,"run_dist":5.7} | hero line "20 min run logged · RPE 5" MILES 5.7
+  Log more run->bike (then 20 min bike): {"rest_cardio":true,"rest_type":"bike","rest_mins":20,"rpe":5,"run_dist":3.7,"bike_mins":20} | hero line "20 min ride logged · RPE 5"
+  walk 37 min: {"rest_cardio":true,"rest_type":"walk","rest_mins":37,"rpe":7} (no sport key written)
+  jog AFTER move: restDayEligible(dest wed, origin mon) = [false,false] | "Training anyway?" on week view false | openRestSheet(dest) rendered sheet false
+  move store lines (comments stripped):
+    1422: const moves=getRestMoves();
+    1424: saveRestMoves(moves);
+    1462: function getRestMoves(){try{return JSON.parse(localStorage.getItem('ia_moves_'+activeProgId)||'{}');}catch{return{};}}
+    1463: function saveRestMoves(m){localStorage.setItem('ia_moves_'+activeProgId,JSON.stringify(m));}
+    16279: const _mv=JSON.parse(localStorage.getItem('ia_moves_'+prog.id)||'{}');
+    16338: function purgeProgData(id){['ia_logs_','ia_comp_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','
+  -- draft-run swap probe (side, not P-RESTMOVELOG): HALF_MANNY W1 run day, type on a DRAFT card, tap bike, tap run --
+    mon typed run_dist=5.2 (draft: no persist) form {"run_dist":"5.2"} | after ->bike stored {"swapFrom":"run","swapTo":"bike"} | after ->run form {} stored {}
+throws: {}
+
+DONE
+######## part s (s.out)
+
+════ S — static: readers and writers of the keys at stake (comments stripped per line) ════
+  rest_cardio        fns  2: applyRestCardio@1437W | renderWeekView@12165R
+  rest_type          fns  2: applyRestCardio@1437W | renderWeekView@12166R
+  rest_mins          fns  2: applyRestCardio@1437W | renderWeekView@12166R
+  run_dist           fns 13: applyRestCardio@1441W | renderWeekView@12213R | _benchmarkEntryFor@13055R | updateRPEDisplay@13435R | updateDoseDerived@13533R | cardioFieldHTML@13823R,13831R,13842R,13851R | openDetail@14211R,14222R | persistLogFields@14821W,14837R,14840W | setCardioSwap@14915R | seedFromPriorPrograms@16439R | ladderWeekly@16691R | plannedVsLogged@16761W | renderProgressScreen@17615R,17622R
+  run_mins           fns  7: _benchmarkEntryFor@13056R | updateRPEDisplay@13435R | updateDoseDerived@13533R | cardioFieldHTML@13821R,13833R | openDetail@14211R,14222R | persistLogFields@14822W,14837R | setCardioSwap@14915R
+  bike_mins          fns  7: applyRestCardio@1442W | updateRPEDisplay@13435R | cardioFieldHTML@13860R | openDetail@14211R,14222R | persistLogFields@14823W | setCardioSwap@14915R | renderProgressScreen@17616R,17622R
+  swim_yards         fns  7: applyRestCardio@1443W | updateRPEDisplay@13435R | cardioFieldHTML@13862R | openDetail@14211R,14222R | persistLogFields@14823W | setCardioSwap@14915R | renderProgressScreen@17617R,17622R
+  swapTo             fns  9: _benchmarkEntryFor@13049R | buildLogHTML@13879R | persistLogFields@14825W | _recoveryPaceEntry@16462R | runsByClass@16705R | easyEffortWeekly@16726R | plannedVsLogged@16760R | easyVsPrescribed@17175R | renderProgressScreen@17745R,17770R,17778R
+  swapFrom           fns  2: persistLogFields@14825W | renderProgressScreen@17745R,17770R,17778R
+  parked             fns  4: injurySweepCardio@7892R | cardioSwapNoteText@13439R | persistLogFields@14815R,14829W | setCardioSwap@14886R,14893W
+  movedFrom          fns  3: applyRestDayMoves@1474R,1476W | restMoveCandidates@1536R | renderWeekView@12163R
+  ia_moves_          fns  4: getRestMoves@1462R | saveRestMoves@1463R | refreshProgram@16279R | purgeProgData@16338R
+  getRestMoves       fns  2: applyRestMove@1422R | getRestMoves@1462R
+  saveRestMoves      fns  2: applyRestMove@1424R | saveRestMoves@1463R
+  CARDIO_PARK_FIELDS fns  6: restMoveCandidates@1543R | updateRPEDisplay@13435R | cardioSwapNoteText@13440R | cardioEntryLive@14771R | logCardio@14858R | setCardioSwap@14888R,14891R
+  -- writer call sites by surface (onclick in markup = UI tap; else JS caller) --
+  applyRestCardio    calls  1: 1417:_renderRestCardio[UI]
+  applyRestMove      calls  1: 1391:_renderRestMove[UI]
+  applyRestDayMoves  calls  2: 1425:applyRestMove 16280:refreshProgram
+  saveRestMoves      calls  1: 1424:applyRestMove
+  persistLogFields   calls  7: 13559:doseRep 14225:openDetail[UI] 14710:handleDayStatus 14859:logCardio 14882:setCardioSwap 14917:setCardioSwap[UI] 14921:setCardioSwap
+  setCardioSwap      calls  1: 13869:cardioSwapChip[UI]
+  logCardio          calls  1: 13911:buildLogHTML[UI]
+  handleDayStatus    calls  2: 14213:openDetail[UI] 14744:statusFootHTML[UI]
+  doseRep            calls  2: 13807:cardioFieldHTML[UI] 13809:cardioFieldHTML[UI]
+  writeSetDraft      calls  1: 12567:autoSaveSets
+  clearSetDraft      calls  1: 14313:saveExWeight
+  saveLogs           calls  5: 1283:writeSetDraft 1290:clearSetDraft 1444:applyRestCardio 14843:persistLogFields 14894:setCardioSwap
+  openRestSheet      calls  3: 11820:openDayKey 12176:renderWeekView[UI] 12177:renderWeekView[UI]
+  _rdSet             calls  6: 1364:renderRestSheet[UI] 1365:renderRestSheet[UI] 1374:_renderRestMove[UI] 1377:_renderRestMove[UI] 1397:_renderRestCardio[UI] 1401:_renderRestCardio[UI]
+
+DONE
+######## part l_76308 (l_76308.out)
+ia-version 237 | startDate 2026-09-28 | clock set per case to the rest day (noon)
+
+════ L — lattice (full): W1, first eligible rest day x every candidate; jog = cfg sport (run 3.7 mi / bike 37 min / swim 1370 yd), 37 min RPE 7 ════
+configs 1344 crash 0 | rest x candidate pairs (W1, first rest day) 6720 | offered 6720 | moved-in forms rendering the picker 4500 | 187 s
+segment: seq | jog sport | moved-in kind -> n, rest_* lost, jog sport key lost, jog rpe lost, [open: _hasLog nudge, card LIVE "Logged ✓", jog value seeded on form], [type: week MILES < jog+typed]
+  done | bike jog | bike                   n  1200 rest_*  1200 sport     0 rpe     0
+  done | bike jog | lift                   n   900 rest_*   900 sport   900 rpe     0
+  done | run jog | lift                    n   600 rest_*   600 sport   600 rpe     0
+  done | run jog | run:dist                n   588 rest_*   588 sport     0 rpe     0
+  done | run jog | run:generic             n   588 rest_*   588 sport     0 rpe     0
+  done | run jog | run:reps_dist           n    84 rest_*    84 sport    84 rpe     0
+  done | run jog | run:time                n   660 rest_*   660 sport     0 rpe     0
+  done | swim jog | lift                   n   720 rest_*   720 sport   720 rpe     0
+  done | swim jog | swim                   n  1380 rest_*  1380 sport     0 rpe     0
+  log | bike jog | bike                    n  1200 rest_*  1200 sport     0 rpe     0
+  log | bike jog | lift                    n   900 rest_*     0 sport     0 rpe     0
+  log | run jog | lift                     n   600 rest_*     0 sport     0 rpe     0
+  log | run jog | run:dist                 n   588 rest_*   588 sport     0 rpe     0
+  log | run jog | run:generic              n   588 rest_*   588 sport     0 rpe     0
+  log | run jog | run:reps_dist            n    84 rest_*     0 sport     0 rpe     0
+  log | run jog | run:time                 n   660 rest_*   660 sport     0 rpe     0
+  log | swim jog | lift                    n   720 rest_*     0 sport     0 rpe     0
+  log | swim jog | swim                    n  1380 rest_*  1380 sport     0 rpe     0
+  open | bike jog | bike                   n  1200 rest_*     0 sport     0 rpe     0 nudge 1200 live 1200 seeded 1200
+  open | bike jog | lift                   n   900 rest_*     0 sport     0 rpe     0 nudge 900 live 0 seeded 0
+  open | run jog | lift                    n   600 rest_*     0 sport     0 rpe     0 nudge 600 live 0 seeded 0
+  open | run jog | run:dist                n   588 rest_*     0 sport     0 rpe     0 nudge 588 live 588 seeded 588
+  open | run jog | run:generic             n   588 rest_*     0 sport     0 rpe     0 nudge 588 live 588 seeded 588
+  open | run jog | run:reps_dist           n    84 rest_*     0 sport     0 rpe     0 nudge 84 live 84 seeded 0
+  open | run jog | run:time                n   660 rest_*     0 sport     0 rpe     0 nudge 660 live 660 seeded 660
+  open | swim jog | lift                   n   720 rest_*     0 sport     0 rpe     0 nudge 720 live 0 seeded 0
+  open | swim jog | swim                   n  1380 rest_*     0 sport     0 rpe     0 nudge 1380 live 1380 seeded 1380
+  rpe | bike jog | bike                    n  1200 rest_*  1200 sport     0 rpe  1200
+  rpe | bike jog | lift                    n   900 rest_*   900 sport   900 rpe   900
+  rpe | run jog | lift                     n   600 rest_*   600 sport   600 rpe   600
+  rpe | run jog | run:dist                 n   588 rest_*   588 sport     0 rpe   588
+  rpe | run jog | run:generic              n   588 rest_*   588 sport     0 rpe   588
+  rpe | run jog | run:reps_dist            n    84 rest_*    84 sport    84 rpe    84
+  rpe | run jog | run:time                 n   660 rest_*   660 sport     0 rpe   660
+  rpe | swim jog | lift                    n   720 rest_*   720 sport   720 rpe   720
+  rpe | swim jog | swim                    n  1380 rest_*  1380 sport     0 rpe  1380
+  type | bike jog | bike                   n  1200 rest_*  1200 sport  1200 rpe     0 milesDrop 0
+  type | bike jog | lift                   n   900 rest_*     0 sport     0 rpe     0 milesDrop 0
+  type | run jog | lift                    n   600 rest_*     0 sport     0 rpe     0 milesDrop 600
+  type | run jog | run:dist                n   588 rest_*   588 sport   588 rpe     0 milesDrop 588
+  type | run jog | run:generic             n   588 rest_*   588 sport   588 rpe     0 milesDrop 588
+  type | run jog | run:reps_dist           n    84 rest_*    84 sport    84 rpe     0 milesDrop 84
+  type | run jog | run:time                n   660 rest_*   660 sport   660 rpe     0 milesDrop 660
+  type | swim jog | lift                   n   720 rest_*     0 sport     0 rpe     0 milesDrop 0
+  type | swim jog | swim                   n  1380 rest_*  1380 sport  1380 rpe     0 milesDrop 0
+  TOTAL done  {"n":6720,"restLost":6720,"sportLost":2304,"rpeLost":0,"nudge":0,"live":0,"seededJog":0,"milesDrop":0}
+  TOTAL log   {"n":6720,"restLost":4416,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"seededJog":0,"milesDrop":0}
+  TOTAL open  {"n":6720,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":6720,"live":4500,"seededJog":4416,"milesDrop":0}
+  TOTAL rpe   {"n":6720,"restLost":6720,"sportLost":2304,"rpeLost":6720,"nudge":0,"live":0,"seededJog":0,"milesDrop":0}
+  TOTAL type  {"n":6720,"restLost":4500,"sportLost":4500,"rpeLost":0,"nudge":0,"live":0,"seededJog":0,"milesDrop":2520}
+throws: {}
+
+DONE
+######## part l_24865 (l_24865.out)
+ia-version 237 | startDate 2026-09-28 | clock set per case to the rest day (noon)
+
+════ L — lattice (full): W1, first eligible rest day x every candidate; jog = cfg sport (run 3.7 mi / bike 37 min / swim 1370 yd), 37 min RPE 7 ════
+configs 1344 crash 0 | rest x candidate pairs (W1, first rest day) 6720 | offered 6720 | moved-in forms rendering the picker 4500 | 187 s
+segment: seq | jog sport | moved-in kind -> n, rest_* lost, jog sport key lost, jog rpe lost, [open: _hasLog nudge, card LIVE "Logged ✓", jog value seeded on form], [type: week MILES < jog+typed]
+  done | bike jog | bike                   n  1200 rest_*  1200 sport     0 rpe     0
+  done | bike jog | lift                   n   900 rest_*   900 sport   900 rpe     0
+  done | run jog | lift                    n   600 rest_*   600 sport   600 rpe     0
+  done | run jog | run:dist                n   588 rest_*   588 sport     0 rpe     0
+  done | run jog | run:generic             n   588 rest_*   588 sport     0 rpe     0
+  done | run jog | run:reps_dist           n    84 rest_*    84 sport    84 rpe     0
+  done | run jog | run:time                n   660 rest_*   660 sport     0 rpe     0
+  done | swim jog | lift                   n   720 rest_*   720 sport   720 rpe     0
+  done | swim jog | swim                   n  1380 rest_*  1380 sport     0 rpe     0
+  log | bike jog | bike                    n  1200 rest_*  1200 sport     0 rpe     0
+  log | bike jog | lift                    n   900 rest_*     0 sport     0 rpe     0
+  log | run jog | lift                     n   600 rest_*     0 sport     0 rpe     0
+  log | run jog | run:dist                 n   588 rest_*   588 sport     0 rpe     0
+  log | run jog | run:generic              n   588 rest_*   588 sport     0 rpe     0
+  log | run jog | run:reps_dist            n    84 rest_*     0 sport     0 rpe     0
+  log | run jog | run:time                 n   660 rest_*   660 sport     0 rpe     0
+  log | swim jog | lift                    n   720 rest_*     0 sport     0 rpe     0
+  log | swim jog | swim                    n  1380 rest_*  1380 sport     0 rpe     0
+  open | bike jog | bike                   n  1200 rest_*     0 sport     0 rpe     0 nudge 1200 live 1200 seeded 1200
+  open | bike jog | lift                   n   900 rest_*     0 sport     0 rpe     0 nudge 900 live 0 seeded 0
+  open | run jog | lift                    n   600 rest_*     0 sport     0 rpe     0 nudge 600 live 0 seeded 0
+  open | run jog | run:dist                n   588 rest_*     0 sport     0 rpe     0 nudge 588 live 588 seeded 588
+  open | run jog | run:generic             n   588 rest_*     0 sport     0 rpe     0 nudge 588 live 588 seeded 588
+  open | run jog | run:reps_dist           n    84 rest_*     0 sport     0 rpe     0 nudge 84 live 84 seeded 0
+  open | run jog | run:time                n   660 rest_*     0 sport     0 rpe     0 nudge 660 live 660 seeded 660
+  open | swim jog | lift                   n   720 rest_*     0 sport     0 rpe     0 nudge 720 live 0 seeded 0
+  open | swim jog | swim                   n  1380 rest_*     0 sport     0 rpe     0 nudge 1380 live 1380 seeded 1380
+  rpe | bike jog | bike                    n  1200 rest_*  1200 sport     0 rpe  1200
+  rpe | bike jog | lift                    n   900 rest_*   900 sport   900 rpe   900
+  rpe | run jog | lift                     n   600 rest_*   600 sport   600 rpe   600
+  rpe | run jog | run:dist                 n   588 rest_*   588 sport     0 rpe   588
+  rpe | run jog | run:generic              n   588 rest_*   588 sport     0 rpe   588
+  rpe | run jog | run:reps_dist            n    84 rest_*    84 sport    84 rpe    84
+  rpe | run jog | run:time                 n   660 rest_*   660 sport     0 rpe   660
+  rpe | swim jog | lift                    n   720 rest_*   720 sport   720 rpe   720
+  rpe | swim jog | swim                    n  1380 rest_*  1380 sport     0 rpe  1380
+  type | bike jog | bike                   n  1200 rest_*  1200 sport  1200 rpe     0 milesDrop 0
+  type | bike jog | lift                   n   900 rest_*     0 sport     0 rpe     0 milesDrop 0
+  type | run jog | lift                    n   600 rest_*     0 sport     0 rpe     0 milesDrop 600
+  type | run jog | run:dist                n   588 rest_*   588 sport   588 rpe     0 milesDrop 588
+  type | run jog | run:generic             n   588 rest_*   588 sport   588 rpe     0 milesDrop 588
+  type | run jog | run:reps_dist           n    84 rest_*    84 sport    84 rpe     0 milesDrop 84
+  type | run jog | run:time                n   660 rest_*   660 sport   660 rpe     0 milesDrop 660
+  type | swim jog | lift                   n   720 rest_*     0 sport     0 rpe     0 milesDrop 0
+  type | swim jog | swim                   n  1380 rest_*  1380 sport  1380 rpe     0 milesDrop 0
+  TOTAL done  {"n":6720,"restLost":6720,"sportLost":2304,"rpeLost":0,"nudge":0,"live":0,"seededJog":0,"milesDrop":0}
+  TOTAL log   {"n":6720,"restLost":4416,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"seededJog":0,"milesDrop":0}
+  TOTAL open  {"n":6720,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":6720,"live":4500,"seededJog":4416,"milesDrop":0}
+  TOTAL rpe   {"n":6720,"restLost":6720,"sportLost":2304,"rpeLost":6720,"nudge":0,"live":0,"seededJog":0,"milesDrop":0}
+  TOTAL type  {"n":6720,"restLost":4500,"sportLost":4500,"rpeLost":0,"nudge":0,"live":0,"seededJog":0,"milesDrop":2520}
+throws: {}
+
+DONE
+######## part l_1234 (l_1234.out)
+ia-version 237 | startDate 2026-09-28 | clock set per case to the rest day (noon)
+
+════ L — lattice (full): W1, first eligible rest day x every candidate; jog = cfg sport (run 3.7 mi / bike 37 min / swim 1370 yd), 37 min RPE 7 ════
+configs 1344 crash 0 | rest x candidate pairs (W1, first rest day) 6720 | offered 6720 | moved-in forms rendering the picker 4500 | 186 s
+segment: seq | jog sport | moved-in kind -> n, rest_* lost, jog sport key lost, jog rpe lost, [open: _hasLog nudge, card LIVE "Logged ✓", jog value seeded on form], [type: week MILES < jog+typed]
+  done | bike jog | bike                   n  1200 rest_*  1200 sport     0 rpe     0
+  done | bike jog | lift                   n   900 rest_*   900 sport   900 rpe     0
+  done | run jog | lift                    n   600 rest_*   600 sport   600 rpe     0
+  done | run jog | run:dist                n   588 rest_*   588 sport     0 rpe     0
+  done | run jog | run:generic             n   588 rest_*   588 sport     0 rpe     0
+  done | run jog | run:reps_dist           n    84 rest_*    84 sport    84 rpe     0
+  done | run jog | run:time                n   660 rest_*   660 sport     0 rpe     0
+  done | swim jog | lift                   n   720 rest_*   720 sport   720 rpe     0
+  done | swim jog | swim                   n  1380 rest_*  1380 sport     0 rpe     0
+  log | bike jog | bike                    n  1200 rest_*  1200 sport     0 rpe     0
+  log | bike jog | lift                    n   900 rest_*     0 sport     0 rpe     0
+  log | run jog | lift                     n   600 rest_*     0 sport     0 rpe     0
+  log | run jog | run:dist                 n   588 rest_*   588 sport     0 rpe     0
+  log | run jog | run:generic              n   588 rest_*   588 sport     0 rpe     0
+  log | run jog | run:reps_dist            n    84 rest_*     0 sport     0 rpe     0
+  log | run jog | run:time                 n   660 rest_*   660 sport     0 rpe     0
+  log | swim jog | lift                    n   720 rest_*     0 sport     0 rpe     0
+  log | swim jog | swim                    n  1380 rest_*  1380 sport     0 rpe     0
+  open | bike jog | bike                   n  1200 rest_*     0 sport     0 rpe     0 nudge 1200 live 1200 seeded 1200
+  open | bike jog | lift                   n   900 rest_*     0 sport     0 rpe     0 nudge 900 live 0 seeded 0
+  open | run jog | lift                    n   600 rest_*     0 sport     0 rpe     0 nudge 600 live 0 seeded 0
+  open | run jog | run:dist                n   588 rest_*     0 sport     0 rpe     0 nudge 588 live 588 seeded 588
+  open | run jog | run:generic             n   588 rest_*     0 sport     0 rpe     0 nudge 588 live 588 seeded 588
+  open | run jog | run:reps_dist           n    84 rest_*     0 sport     0 rpe     0 nudge 84 live 84 seeded 0
+  open | run jog | run:time                n   660 rest_*     0 sport     0 rpe     0 nudge 660 live 660 seeded 660
+  open | swim jog | lift                   n   720 rest_*     0 sport     0 rpe     0 nudge 720 live 0 seeded 0
+  open | swim jog | swim                   n  1380 rest_*     0 sport     0 rpe     0 nudge 1380 live 1380 seeded 1380
+  rpe | bike jog | bike                    n  1200 rest_*  1200 sport     0 rpe  1200
+  rpe | bike jog | lift                    n   900 rest_*   900 sport   900 rpe   900
+  rpe | run jog | lift                     n   600 rest_*   600 sport   600 rpe   600
+  rpe | run jog | run:dist                 n   588 rest_*   588 sport     0 rpe   588
+  rpe | run jog | run:generic              n   588 rest_*   588 sport     0 rpe   588
+  rpe | run jog | run:reps_dist            n    84 rest_*    84 sport    84 rpe    84
+  rpe | run jog | run:time                 n   660 rest_*   660 sport     0 rpe   660
+  rpe | swim jog | lift                    n   720 rest_*   720 sport   720 rpe   720
+  rpe | swim jog | swim                    n  1380 rest_*  1380 sport     0 rpe  1380
+  type | bike jog | bike                   n  1200 rest_*  1200 sport  1200 rpe     0 milesDrop 0
+  type | bike jog | lift                   n   900 rest_*     0 sport     0 rpe     0 milesDrop 0
+  type | run jog | lift                    n   600 rest_*     0 sport     0 rpe     0 milesDrop 600
+  type | run jog | run:dist                n   588 rest_*   588 sport   588 rpe     0 milesDrop 588
+  type | run jog | run:generic             n   588 rest_*   588 sport   588 rpe     0 milesDrop 588
+  type | run jog | run:reps_dist           n    84 rest_*    84 sport    84 rpe     0 milesDrop 84
+  type | run jog | run:time                n   660 rest_*   660 sport   660 rpe     0 milesDrop 660
+  type | swim jog | lift                   n   720 rest_*     0 sport     0 rpe     0 milesDrop 0
+  type | swim jog | swim                   n  1380 rest_*  1380 sport  1380 rpe     0 milesDrop 0
+  TOTAL done  {"n":6720,"restLost":6720,"sportLost":2304,"rpeLost":0,"nudge":0,"live":0,"seededJog":0,"milesDrop":0}
+  TOTAL log   {"n":6720,"restLost":4416,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"seededJog":0,"milesDrop":0}
+  TOTAL open  {"n":6720,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":6720,"live":4500,"seededJog":4416,"milesDrop":0}
+  TOTAL rpe   {"n":6720,"restLost":6720,"sportLost":2304,"rpeLost":6720,"nudge":0,"live":0,"seededJog":0,"milesDrop":0}
+  TOTAL type  {"n":6720,"restLost":4500,"sportLost":4500,"rpeLost":0,"nudge":0,"live":0,"seededJog":0,"milesDrop":2520}
+throws: {}
+
+DONE
+######## part lm (lm.out)
+
+DONE
+MERGED configs 4032 crash 0 | pairs 20160 | offered 20160 | picker 13500
+  done | bike jog | bike                   {"n":3600,"restLost":3600,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  done | bike jog | lift                   {"n":2700,"restLost":2700,"sportLost":2700,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  done | run jog | lift                    {"n":1800,"restLost":1800,"sportLost":1800,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  done | run jog | run:dist                {"n":1764,"restLost":1764,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  done | run jog | run:generic             {"n":1764,"restLost":1764,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  done | run jog | run:reps_dist           {"n":252,"restLost":252,"sportLost":252,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  done | run jog | run:time                {"n":1980,"restLost":1980,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  done | swim jog | lift                   {"n":2160,"restLost":2160,"sportLost":2160,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  done | swim jog | swim                   {"n":4140,"restLost":4140,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  log | bike jog | bike                    {"n":3600,"restLost":3600,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  log | bike jog | lift                    {"n":2700,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  log | run jog | lift                     {"n":1800,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  log | run jog | run:dist                 {"n":1764,"restLost":1764,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  log | run jog | run:generic              {"n":1764,"restLost":1764,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  log | run jog | run:reps_dist            {"n":252,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  log | run jog | run:time                 {"n":1980,"restLost":1980,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  log | swim jog | lift                    {"n":2160,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  log | swim jog | swim                    {"n":4140,"restLost":4140,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  open | bike jog | bike                   {"n":3600,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":3600,"live":3600,"milesDrop":0,"seededJog":3600}
+  open | bike jog | lift                   {"n":2700,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":2700,"live":0,"milesDrop":0,"seededJog":0}
+  open | run jog | lift                    {"n":1800,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":1800,"live":0,"milesDrop":0,"seededJog":0}
+  open | run jog | run:dist                {"n":1764,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":1764,"live":1764,"milesDrop":0,"seededJog":1764}
+  open | run jog | run:generic             {"n":1764,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":1764,"live":1764,"milesDrop":0,"seededJog":1764}
+  open | run jog | run:reps_dist           {"n":252,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":252,"live":252,"milesDrop":0,"seededJog":0}
+  open | run jog | run:time                {"n":1980,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":1980,"live":1980,"milesDrop":0,"seededJog":1980}
+  open | swim jog | lift                   {"n":2160,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":2160,"live":0,"milesDrop":0,"seededJog":0}
+  open | swim jog | swim                   {"n":4140,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":4140,"live":4140,"milesDrop":0,"seededJog":4140}
+  rpe | bike jog | bike                    {"n":3600,"restLost":3600,"sportLost":0,"rpeLost":3600,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  rpe | bike jog | lift                    {"n":2700,"restLost":2700,"sportLost":2700,"rpeLost":2700,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  rpe | run jog | lift                     {"n":1800,"restLost":1800,"sportLost":1800,"rpeLost":1800,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  rpe | run jog | run:dist                 {"n":1764,"restLost":1764,"sportLost":0,"rpeLost":1764,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  rpe | run jog | run:generic              {"n":1764,"restLost":1764,"sportLost":0,"rpeLost":1764,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  rpe | run jog | run:reps_dist            {"n":252,"restLost":252,"sportLost":252,"rpeLost":252,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  rpe | run jog | run:time                 {"n":1980,"restLost":1980,"sportLost":0,"rpeLost":1980,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  rpe | swim jog | lift                    {"n":2160,"restLost":2160,"sportLost":2160,"rpeLost":2160,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  rpe | swim jog | swim                    {"n":4140,"restLost":4140,"sportLost":0,"rpeLost":4140,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  type | bike jog | bike                   {"n":3600,"restLost":3600,"sportLost":3600,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  type | bike jog | lift                   {"n":2700,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  type | run jog | lift                    {"n":1800,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":1800,"seededJog":0}
+  type | run jog | run:dist                {"n":1764,"restLost":1764,"sportLost":1764,"rpeLost":0,"nudge":0,"live":0,"milesDrop":1764,"seededJog":0}
+  type | run jog | run:generic             {"n":1764,"restLost":1764,"sportLost":1764,"rpeLost":0,"nudge":0,"live":0,"milesDrop":1764,"seededJog":0}
+  type | run jog | run:reps_dist           {"n":252,"restLost":252,"sportLost":252,"rpeLost":0,"nudge":0,"live":0,"milesDrop":252,"seededJog":0}
+  type | run jog | run:time                {"n":1980,"restLost":1980,"sportLost":1980,"rpeLost":0,"nudge":0,"live":0,"milesDrop":1980,"seededJog":0}
+  type | swim jog | lift                   {"n":2160,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  type | swim jog | swim                   {"n":4140,"restLost":4140,"sportLost":4140,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG done | bike jog    {"n":6300,"restLost":6300,"sportLost":2700,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG done | run jog     {"n":7560,"restLost":7560,"sportLost":2052,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG done | swim jog    {"n":6300,"restLost":6300,"sportLost":2160,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG log | bike jog     {"n":6300,"restLost":3600,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG log | run jog      {"n":7560,"restLost":5508,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG log | swim jog     {"n":6300,"restLost":4140,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG open | bike jog    {"n":6300,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":6300,"live":3600,"milesDrop":0,"seededJog":3600}
+  BYJOG open | run jog     {"n":7560,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":7560,"live":5760,"milesDrop":0,"seededJog":5508}
+  BYJOG open | swim jog    {"n":6300,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":6300,"live":4140,"milesDrop":0,"seededJog":4140}
+  BYJOG rpe | bike jog     {"n":6300,"restLost":6300,"sportLost":2700,"rpeLost":6300,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG rpe | run jog      {"n":7560,"restLost":7560,"sportLost":2052,"rpeLost":7560,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG rpe | swim jog     {"n":6300,"restLost":6300,"sportLost":2160,"rpeLost":6300,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG type | bike jog    {"n":6300,"restLost":3600,"sportLost":3600,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  BYJOG type | run jog     {"n":7560,"restLost":5760,"sportLost":5760,"rpeLost":0,"nudge":0,"live":0,"milesDrop":7560,"seededJog":0}
+  BYJOG type | swim jog    {"n":6300,"restLost":4140,"sportLost":4140,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  TOTAL done  {"n":20160,"restLost":20160,"sportLost":6912,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  TOTAL log   {"n":20160,"restLost":13248,"sportLost":0,"rpeLost":0,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  TOTAL open  {"n":20160,"restLost":0,"sportLost":0,"rpeLost":0,"nudge":20160,"live":13500,"milesDrop":0,"seededJog":13248}
+  TOTAL rpe   {"n":20160,"restLost":20160,"sportLost":6912,"rpeLost":20160,"nudge":0,"live":0,"milesDrop":0,"seededJog":0}
+  TOTAL type  {"n":20160,"restLost":13500,"sportLost":13500,"rpeLost":0,"nudge":0,"live":0,"milesDrop":7560,"seededJog":0}
