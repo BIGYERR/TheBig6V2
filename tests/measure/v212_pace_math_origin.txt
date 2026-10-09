@@ -1,0 +1,26 @@
+v212 measure — pace-math origin (archaeology, read-only). Artifact: scratchpad/base.html, ia-version 207.
+
+CONSTANTS (V207 line numbers)
+  paceImprove {beginner:3, intermediate:5, advanced:7} || 4   s/mi/week   :2231 (achievablePacePerMile), :3088 (calcProgramLength, comment "Pace improvement: seconds per mile per week with interval training"), :2453 (updatePaceFeasibility), :3822 (buildRunSession expPaceImprove), :3770 (D101 fallback)
+  agePaceScale {55+:0.65, 36-54:0.85, 18-35:1.0}   :2232 :3090 :2454 :3823
+  ageMult {55+:1.15, 36-54:1.07, 18-35:1.0}   :2234 :3084 :2456
+  expCurrentPace {beginner:690, intermediate:570, advanced:450}   :2236 :2441 :3100 :3813 :3821 :4341
+  weeksToPace: result = round(ceil(gap/rate)*1.25)+4, distCap 8/10/14/20   :3155-3163
+  pace-goal cap 9/11/15/21 (+1 grace), beginner ceiling 26, floor 6   :3199-3208
+  achievablePacePerMile inverts the above; floor 240 s/mi; seeds from expCurrentPace only (ignores entered mile)   :2229-2243
+  "Recommended: at least N" = calcProgramLength(...).weeks   :2283 -> :2339
+  weeklyPct {0.08,0.10,0.12} comment "10% rule scaled"   :3086
+
+ORIGIN (git log -S, all paths)
+  Every literal above first appears in a0effa9 2026-06-21 "Add files via upload" (iron_asylum_v4RUNNINGV50.html), the first engine in git. Pre-V50 history is not in the repo. iron_asylum_v3.html (97c8452) has none of it.
+  V50 had wizard beginner=660 at 3 sites, engines 690. V176 close-out D9: "Fold the wizard's beginner 660 into the engines' 690" (handoff :958, :1398).
+  D101 (V202): removed min(12, x2.5) cap; kept the 3/5/7 table as the single rate (:3767; handoff :26, :1567 "one sourced rate").
+  No comment cites a source (NSW page, NRC, Daniels, study, Mario) for 3/5/7, 0.65/0.85, 1.07/1.15, x1.25+4, 570/450.
+
+HANDOFF: no D-code ever ruled the 3/5/7 values, agePaceScale, ageMult, x1.25+4 or 570/450. Only D9 (beginner default) and D101 (which cap binds) touched them. Zero hits for "improvement rate", "s/mi/week", "safe progression".
+
+DOCTRINE
+  physicaltrainingguide2020.txt (22-page, Guide A) p.11: "total work be increased no more than 10% per week ... 5-8% being more ideal" (volume, not pace).
+  p.12: "gradually performing the intervals a little faster each week" (no number).
+  p.11/12: SI pace = 1.5-mile pace minus 4 s per 400 (an anchor, not a weekly rate).
+  nsw_ptg_sealswcc_11pg.txt: no "10%", no pace rate. NRC x4: none (only tempo "30-35 seconds slower than your 5K pace").

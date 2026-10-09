@@ -1,0 +1,49 @@
+artifact ia-version 237
+curWk=2 curTouched | a past-week untrained W1 mon -> KEPT (stored)
+curWk=2 curTouched | a2 past-week hist-only W1 tue -> KEPT (stored)
+curWk=2 curTouched | b cur trained (comp) W2 mon -> KEPT (stored)
+curWk=2 curTouched | b2 cur trained (hist snap) W2 tue -> KEPT (stored)
+curWk=2 curTouched | c cur untrained W2 thu -> REBUILT (live)
+curWk=2 curTouched | d next week W3 mon -> REBUILT (live)
+curWk=2 curTouched | e +4 weeks W6 mon -> REBUILT (live)
+curWk=2 curUntouched | a past-week untrained W1 mon -> KEPT (stored)
+curWk=2 curUntouched | a2 past-week hist-only W1 tue -> KEPT (stored)
+curWk=2 curUntouched | c cur untrained W2 thu -> REBUILT (live)
+curWk=2 curUntouched | d next week W3 mon -> REBUILT (live)
+curWk=2 curUntouched | e +4 weeks W6 mon -> REBUILT (live)
+curWk=4 curTouched | a past-week untrained W3 mon -> KEPT (stored)
+curWk=4 curTouched | a2 past-week hist-only W3 tue -> KEPT (stored)
+curWk=4 curTouched | b cur trained (comp) W4 mon -> KEPT (stored)
+curWk=4 curTouched | b2 cur trained (hist snap) W4 tue -> KEPT (stored)
+curWk=4 curTouched | c cur untrained W4 thu -> REBUILT (live)
+curWk=4 curTouched | d next week W5 mon -> REBUILT (live)
+curWk=4 curTouched | e +4 weeks W8 mon -> REBUILT (live)
+curWk=4 curUntouched | a past-week untrained W3 mon -> KEPT (stored)
+curWk=4 curUntouched | a2 past-week hist-only W3 tue -> KEPT (stored)
+curWk=4 curUntouched | c cur untrained W4 thu -> REBUILT (live)
+curWk=4 curUntouched | d next week W5 mon -> REBUILT (live)
+curWk=4 curUntouched | e +4 weeks W8 mon -> REBUILT (live)
+curWk=7 curTouched | a past-week untrained W6 mon -> KEPT (stored)
+curWk=7 curTouched | a2 past-week hist-only W6 tue -> KEPT (stored)
+curWk=7 curTouched | b cur trained (comp) W7 mon -> KEPT (stored)
+curWk=7 curTouched | b2 cur trained (hist snap) W7 tue -> KEPT (stored)
+curWk=7 curTouched | c cur untrained W7 thu -> REBUILT (live)
+curWk=7 curTouched | d next week W8 mon -> REBUILT (live)
+curWk=7 curTouched | e +4 weeks W11 mon -> REBUILT (live)
+curWk=7 curUntouched | a past-week untrained W6 mon -> KEPT (stored)
+curWk=7 curUntouched | a2 past-week hist-only W6 tue -> KEPT (stored)
+curWk=7 curUntouched | c cur untrained W7 thu -> REBUILT (live)
+curWk=7 curUntouched | d next week W8 mon -> REBUILT (live)
+curWk=7 curUntouched | e +4 weeks W11 mon -> REBUILT (live)
+
+SUMMARY kept 18 / 36
+  case a kept 6 / 6
+  case a2 kept 6 / 6
+  case b kept 3 / 3
+  case b2 kept 3 / 3
+  case c kept 0 / 6
+  case d kept 0 / 6
+  case e kept 0 / 6
+PROGRAM top-level keys: id,name,goal,liftingFocus,primaryPath,raceDate,raceDateWeeks,legRecoveryNote,liftRecoveryWeeks,taperWeeks,seed,cfg,totalWeeks,created,startDate,_swapUniverse,_swapUniverseByKey
+  created 1791507370045 | startDate null | blockOpen undefined | version-like legRecoveryNote,liftRecoveryWeeks,_swapUniverse,_swapUniverseByKey
+DONE

@@ -1,0 +1,8 @@
+surgery anchor count 1
+probe week W2, days carrying the knee_stability marker: mon,tue | later today = W4
+STEP1 today=W2 engine A: shown as mon=A-live(saw) tue=A-live(saw)
+STEP2 today=W4 engine B, stored=creation, never trained: W2 shows mon=CREATION tue=CREATION
+STEP3 same, but stored grid rewritten at STEP1 by a full-object saver: W2 shows mon=A-live(saw) tue=A-live(saw)
+STEP4 today=W5 engine B, all non-rest days: {"past:creation":15,"past:live":5,"current:live":5,"future:live":45}
+STEP5 startDate=null engine B, all non-rest days: {"live":70}
+DONE

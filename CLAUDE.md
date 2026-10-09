@@ -79,7 +79,10 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
 - **Previous version.** Only gates that are new or edited in the build run against the previous version. A row written
   by the era script does not make a gate edited. A new gate runs against the previous version's body relabelled to
   the candidate's version (its `ia-version` meta set to the candidate's), so its rows are tested, not its version
-  check; an edited gate runs against the previous version as shipped (Mario, Post-V234).
+  check; an edited gate runs against the previous version as shipped (Mario, Post-V234). An edited gate whose rows
+  expect different results by version (the old expectation kept at or below the previous version, the new one from
+  the candidate's) also runs against the previous version's body relabelled to the candidate's version: the
+  as-shipped run exercises only the old arm, and the relabelled run shows the new arm discriminates (Mario, Post-V237).
 - **Version scope.** No gate row goes dark. Every row a gate declares prints exactly one status line (PASS, FAIL, SKIP
   or SCOPED OUT), and a declared row with no status line is red. At the candidate's version every row runs: a row that
   prints SKIP or SCOPED OUT in `gate.sh` is red unless `tests/skip_allow.txt` lists it, and every entry there names the
@@ -251,8 +254,9 @@ Every brief to either carries the per-build items, then the standing lines for t
   is found by subtype; any `\uXXXX` text that must land is built with `chr(92)`, never typed; an era row for a table the
   ruling does not move comes from `tests/era_bump.py`, never by hand; builder never edits `tests/row_manifest.txt`,
   and every new gate prints its rows through `tests/status.js`.
-- **Gatekeeper, standing:** run every edited gate against the previous version too, and every new gate against the
-  previous version's body relabelled to the candidate's version; every build anchor-checks
+- **Gatekeeper, standing:** run every edited gate against the previous version too, and every new gate, and every
+  edited gate whose rows expect different results by version, against the previous version's body relabelled to the
+  candidate's version; every build anchor-checks
   every spec and trip-runs the Proof scope set; the full sweep runs every spec, old ones included, when it is due;
   gatekeeper alone regenerates `tests/row_manifest.txt`, from a proven run only, and classifies its hunks against the
   ruling; a sabotage anchor that is not `count==1` is NOT-APPLIED and a no-op mutation is a mutation defect;
