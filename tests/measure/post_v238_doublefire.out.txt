@@ -1,0 +1,40 @@
+
+######## V238 (ia-version 238)
+  his gesture, one call (button onclick "applyRestCardio()")
+    after call 1: stored {"restLog":{"run":{"mins":30,"dist":1,"rpe":7}},"week":2,"ts":1791475200000} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":30,"dist":"1","rpe":7,"view":"cardio"}
+    week MILES 1 | journal Session Journal Week 2 1 entry Wed 30 min run logged · RPE 7 1RM Estimator Optional — esti
+  his gesture, the Log it onclick run twice (button onclick "applyRestCardio()")
+    after call 1: stored {"restLog":{"run":{"mins":30,"dist":1,"rpe":7}},"week":2,"ts":1791475200000} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":30,"dist":"1","rpe":7,"view":"cardio"}
+    after call 2: stored {"restLog":{"run":{"mins":60,"dist":2,"rpe":7}},"week":2,"ts":1791475200000} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":30,"dist":"1","rpe":7,"view":"cardio"}
+    week MILES 2 | journal Session Journal Week 2 1 entry Wed 60 min run logged · RPE 7 1RM Estimator Optional — esti
+  minutes typed 60, one call (button onclick "applyRestCardio()")
+    after call 1: stored {"restLog":{"run":{"mins":60,"dist":1,"rpe":7}},"week":2,"ts":1791475200000} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":60,"dist":"1","rpe":7,"view":"cardio"}
+    week MILES 1 | journal Session Journal Week 2 1 entry Wed 60 min run logged · RPE 7 1RM Estimator Optional — esti
+  minutes typed 60, run twice (button onclick "applyRestCardio()")
+    after call 1: stored {"restLog":{"run":{"mins":60,"dist":1,"rpe":7}},"week":2,"ts":1791475200000} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":60,"dist":"1","rpe":7,"view":"cardio"}
+    after call 2: stored {"restLog":{"run":{"mins":120,"dist":2,"rpe":7}},"week":2,"ts":1791475200000} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":60,"dist":"1","rpe":7,"view":"cardio"}
+    week MILES 2 | journal Session Journal Week 2 1 entry Wed 120 min run logged · RPE 7 1RM Estimator Optional — est
+  applyRestMove x2: after 1 {"w2_wed":{"from":"tue","ts":1791475200000}} | after 2 {"w2_wed":{"from":"tue","ts":1791475200000}} | identical true
+  handleDayStatus(Done) x2: after 1 {"w2_thu":{"title":"x","ts":1791475200000,"status":"complete"}} | after 2 {}
+  applyOverlayDraft x2: threw Cannot set properties of null (setting 'onclick')
+
+######## V237 (ia-version 237)
+  his gesture, one call (button onclick "applyRestCardio()")
+    after call 1: stored {"rest_cardio":true,"rest_type":"run","rest_mins":30,"rpe":7,"run_dist":1} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":30,"dist":"1","rpe":7,"view":"cardio"}
+    week MILES 1 | journal Session Journal Week 2 1 entry Wed RPE 7 — Very Hard 1RM Estimator Optional — estimate a o
+  his gesture, the Log it onclick run twice (button onclick "applyRestCardio()")
+    after call 1: stored {"rest_cardio":true,"rest_type":"run","rest_mins":30,"rpe":7,"run_dist":1} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":30,"dist":"1","rpe":7,"view":"cardio"}
+    after call 2: stored {"rest_cardio":true,"rest_type":"run","rest_mins":30,"rpe":7,"run_dist":2} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":30,"dist":"1","rpe":7,"view":"cardio"}
+    week MILES 2 | journal Session Journal Week 2 1 entry Wed RPE 7 — Very Hard 1RM Estimator Optional — estimate a o
+  minutes typed 60, one call (button onclick "applyRestCardio()")
+    after call 1: stored {"rest_cardio":true,"rest_type":"run","rest_mins":60,"rpe":7,"run_dist":1} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":60,"dist":"1","rpe":7,"view":"cardio"}
+    week MILES 1 | journal Session Journal Week 2 1 entry Wed RPE 7 — Very Hard 1RM Estimator Optional — estimate a o
+  minutes typed 60, run twice (button onclick "applyRestCardio()")
+    after call 1: stored {"rest_cardio":true,"rest_type":"run","rest_mins":60,"rpe":7,"run_dist":1} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":60,"dist":"1","rpe":7,"view":"cardio"}
+    after call 2: stored {"rest_cardio":true,"rest_type":"run","rest_mins":60,"rpe":7,"run_dist":2} | overlay class open false | "Log it" still in restBody true | _restDraft {"mins":60,"dist":"1","rpe":7,"view":"cardio"}
+    week MILES 2 | journal Session Journal Week 2 1 entry Wed RPE 7 — Very Hard 1RM Estimator Optional — estimate a o
+  applyRestMove x2: after 1 {"w2_wed":{"from":"tue","ts":1791475200000}} | after 2 {"w2_wed":{"from":"tue","ts":1791475200000}} | identical true
+  handleDayStatus(Done) x2: after 1 {"w2_thu":{"title":"x","ts":1791475200000,"status":"complete"}} | after 2 {}
+  applyOverlayDraft x2: threw Cannot set properties of null (setting 'onclick')
+
+DONE

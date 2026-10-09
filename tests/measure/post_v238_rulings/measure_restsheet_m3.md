@@ -86,3 +86,62 @@ V237 gives the same toasts, the same closes and the same re-entry for every case
 4. Should a rest-day jog be undoable or editable? No path exists on either version.
 5. A re-log after a blank re-entry doubles the record (60 min / 6.2 mi on V238). Is D226's sum the right behaviour when the sheet gave him no sign the first log landed?
 6. Should a future rest day tell the athlete why nothing opens? It is inert and silent today.
+
+## m4 — can one tap on "Log it" store the jog twice? (V238 HEAD 21c8eeb, `index.html` unchanged since 2fbc98c)
+
+Mario's facts: no prior W2 WED log, he opened the sheet once, Log cardio, Run, typed 1 mile, tapped Log once. His journal reads `Wed 60 min run logged · RPE 7`.
+Script: `tests/measure/post_v238_doublefire.js`, output `tests/measure/post_v238_doublefire.out.txt`. It runs a VM drive of the real button onclick, V238 and V237. The applyOverlayDraft drive threw in the stub (a null `onclick` target), so that row is code-read only.
+
+### 1. Ways one tap can reach `applyRestCardio` twice
+**Certain from the code (V238 lines):**
+- **The button's only handler** is the inline `onclick="applyRestCardio()"` (:1456). Nothing else is bound to it:
+  - Whole-file count of `touchend`, `touchstart`, `ontouch`, `.click()`, `addEventListener('click'`: 0.
+  - `pointerup`/`pointerdown` (:14084, :14104) belong only to the rest-timer drag handle (`_rtWireDrag`).
+  - `dispatchEvent` (:13811) only fires `input` on a run-wheel node.
+  - `document.addEventListener` appears once, `touchmove` for the timer drag (:14125). There is no click delegate.
+  - The overlay (:1141-:1146) has only the "← Back" onclick.
+- **No repeated binding:** `renderRestSheet`/`_renderRestCardio` replace `innerHTML` with inline handlers each time, and bind no listeners.
+- **No re-entrancy:** `applyRestCardio` (:1470) calls `closeRestSheet` (removes `open`) and `renderWeekView`. It does not re-render or reopen the sheet, and does not call itself. So one click event = one call.
+- **But the sheet stays tappable after the call.** The `.rand-overlay` CSS (:885-:886) slides the sheet down for 0.36 s and delays `visibility:hidden` by 0.36 s, so the closing sheet is visible and hit-testable for 360 ms. In that window the `Log it` button is still in the DOM (restBody is not cleared; printed true after every call). `_restDraft` is also not reset (printed `{mins:30, dist:"1", rpe:7}` after the call; only `openRestSheet` :1387 resets it). A second click in that window re-runs the call with the same values.
+
+**Depends on the device, and on the hand:**
+- With `touch-action:manipulation` (:35) and `user-scalable=no` (:5), iOS Safari has no double-tap zoom, so one physical tap delivers one `click`. The code holds nothing that turns one tap into two clicks.
+- Two calls therefore need two click events: a second touch, a finger bounce, or a quick double tap within roughly 360 ms while the button slides down under the finger. Whether his "once" included that cannot be read from code.
+
+### 2. Routes to `60 min · RPE 7` from his session
+RPE 7 = he tapped the Steady chip (default 5; on V238 the RPE takes the max). Drive (V238) by route:
+
+| Route | Stored `restLog.run` | W2 MILES contribution | Journal |
+|---|---|---|---|
+| One call, minutes left at the 30 prefill | {mins:30, dist:1, rpe:7} | 1 | `30 min run…` (does not match his screen) |
+| **Two calls**, prefill 30 (double-fire) | **{mins:60, dist:2, rpe:7}** | 2 | `60 min run logged · RPE 7` |
+| One call, minutes typed 60 | **{mins:60, dist:1, rpe:7}** | 1 | `60 min run logged · RPE 7` |
+| Two calls, minutes typed 60 | {mins:120, dist:2, rpe:7} | 2 | `120 min…` (does not match) |
+
+V237, for comparison: two calls overwrite minutes (30 stays 30) and sum `run_dist` to 2, and the journal prints `RPE 7 — Very Hard` with no minutes. So `60 min` on his screen is either a V238 double call or minutes he set to 60 himself.
+
+**The discriminating fact is the distance:** 2 means a double call, 1 means one call with 60 entered.
+- No surface shows Wednesday's miles on their own. The journal and the hero print minutes and RPE only (`restLogLines` :12010), and the hero shows only on today's rest day.
+- **Cheapest read:** the Week 2 **MILES** tile (:12277 = every W2 day's `run_dist` + Wednesday's `restLog.run.dist`), minus the miles of any W2 run sessions he logged (each readable on its own card). The remainder is Wednesday: 2 means double-fire, 1 means single call. If he logged no other W2 run, the tile is Wednesday's distance directly.
+
+### 3. Blast radius if a double-fire is real
+- **Shared mechanism:** every inline-onclick button on an `.overlay` / `.rand-overlay` sheet that closes the sheet is still hit-testable for 0.36 s with its draft unreset. The sheets are detailOverlay, swapOverlay, addOverlay, randOverlay, restOverlay, changeOverlay, goalOverlay, mileOverlay, mileLockOverlay.
+- **Second call, by writer:**
+
+  | Writer | V238 | V237 | Basis |
+  |---|---|---|---|
+  | `applyRestCardio` | sums mins + dist, max rpe (D226) | overwrites mins, sums `run_dist` | driven |
+  | `applyRestMove` | idempotent: `ia_moves_` byte-identical | same | driven |
+  | `handleDayStatus` (Done) | toggle: the second call deletes the completion (`wasSame`, :14764 ff.), so Done undoes itself | same | driven |
+  | `applyOverlayDraft` | pushes a second overlay with a new `ov_`+Date.now() id, no dedupe (:16101-:16102) | same | code-read; the drive threw in the stub |
+
+- Unchanged by V238: everything except `applyRestCardio`. On `applyRestCardio`, V238 only changes which field doubles (minutes and distance, rather than distance alone).
+
+### Unknown
+- Whether his tap produced two clicks. That needs the MILES read above, or an on-device repro: tap Log it, then tap again within 0.36 s.
+- Other overlay buttons not listed above were not driven.
+
+### For coach (questions only)
+1. Should a closing sheet's apply button stay live during its 0.36 s slide-out, with its draft unreset?
+2. Is a second Log within that window the same jog or a "Log more"? D226 sums it.
+3. Does the Done toggle's second-tap undo inside the same window count as the same class?
