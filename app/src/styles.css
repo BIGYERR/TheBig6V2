@@ -1,0 +1,9 @@
+/*
+ * The legacy stylesheet (src/legacy/generated/legacy.css) is loaded before this file and owns every visual rule.
+ * The Angular host elements must not add boxes of their own: the legacy CSS was written for screens that sit
+ * directly in <body>, so the hosts take no part in layout.
+ */
+ia-root,
+ia-legacy-host {
+  display: contents;
+}
