@@ -17,7 +17,7 @@ Mario has had to repeat this more than once; a session that makes him say it aga
   `tests/sabotage/v0.240.0.json`; era rows keyed `'0.240.0'`; baseline `base_v<previous>.html`, where `<previous>` is the
   version HEAD carries, never "N-1".
 - **Code** reads, compares and prints a version only through `tests/semver.js` or `tests/semver.py`: never `+version`, a
-  string compare, `'V'+n` or arithmetic on a version.
+  string compare, `'V'+n` or arithmetic on a version. `SV.tag(v)` prints the label: `V239` for an old build, `v0.239.1` for a new one.
 - **Mario picks PATCH, MINOR or MAJOR** before every release (Versioning). Nobody infers it.
 - **A future `V<N>` anywhere is a defect.** One found in a brief, a template, a handoff line, a file name or an agent's
   return is corrected to the dotted form before it is used or repeated, and the correction is reported. builder and

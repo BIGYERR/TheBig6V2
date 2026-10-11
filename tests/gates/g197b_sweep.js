@@ -294,7 +294,7 @@ console.log('\n-- B5. same-card duplicates --');
 console.log('   duplicate-name-on-one-card items: ' + dup + '  (of which a harvested name: ' + harvestedDup + ')');
 ok('B5a a harvested name NEVER prints twice on one card (D76 subtraction)', harvestedDup === 0, harvestedDup);
 ok('B5b total same-card duplicates did not grow past the ruling ceiling of 415', dup <= 415, dup);
-ok('B5c same-card duplicates == ' + B5C_ROW + ' (the V' + IA.version + ' row; 187 through V218, 240 at V196/V197; D76 absorbs the whole +175 harvest cost, then D85 licenses 5 and D91 licenses 48 more: on 48 deload leg cards — W12 TUE, run_half, seed 11, home_basic 24 + minimal 24 — recoveryDeload now keeps its surviving accessory block by PATTERN, so Leg superset B (hinge) survives where Leg superset A did, and the Step-ups (KB) that Leg superset A repeated from the Main slot leaves the card. Item count per card is unchanged on all 48 (46 at 8 items, 2 at 7): the repeat was replaced, not dropped. Every duplicate this assertion has ever counted is Step-ups (KB))', B5C_ROW !== undefined && dup === B5C_ROW, dup);
+ok('B5c same-card duplicates == ' + B5C_ROW + ' (the ' + SV.tag(IA.version) + ' row; 187 through V218, 240 at V196/V197; D76 absorbs the whole +175 harvest cost, then D85 licenses 5 and D91 licenses 48 more: on 48 deload leg cards — W12 TUE, run_half, seed 11, home_basic 24 + minimal 24 — recoveryDeload now keeps its surviving accessory block by PATTERN, so Leg superset B (hinge) survives where Leg superset A did, and the Step-ups (KB) that Leg superset A repeated from the Main slot leaves the card. Item count per card is unchanged on all 48 (46 at 8 items, 2 at 7): the repeat was replaced, not dropped. Every duplicate this assertion has ever counted is Step-ups (KB))', B5C_ROW !== undefined && dup === B5C_ROW, dup);
 ok('B5d nowhere near 955 (that number means the three exclusions did not land)', dup < 955, dup);
 
 // ── D75: the hold dose ─────────────────────────────────────────────────────────────
@@ -320,9 +320,9 @@ ok('B7c the _bwFallback substitutes are gone from this section',
 console.log('\n-- B8. HALF_MANNY identity --');
 {
   const d = progDigest(IA.buildProgram(fixtures.HALF_MANNY));
-  ok('B8a HALF_MANNY digest matches the V' + IA.version + ' row (' + (MANNY_DIGEST || 'NO ROW') + ')',
+  ok('B8a HALF_MANNY digest matches the ' + SV.tag(IA.version) + ' row (' + (MANNY_DIGEST || 'NO ROW') + ')',
      !!MANNY_DIGEST && d === MANNY_DIGEST,
-     d + (MANNY_DIGEST ? '' : ' — no MANNY_DIGEST_BY_VERSION row for V' + IA.version + ': an unruled digest move'));
+     d + (MANNY_DIGEST ? '' : ' — no MANNY_DIGEST_BY_VERSION row for ' + SV.tag(IA.version) + ': an unruled digest move'));
 }
 
 console.log('\nPASS ' + pass + ' FAIL ' + fail);

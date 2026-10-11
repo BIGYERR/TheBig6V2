@@ -99,6 +99,7 @@
 const fs = require('fs');
 const path = require('path');
 const { load, fixtures, progDigest, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));   // SV.tag prints a version label (CLAUDE.md, PRIORITY 1)
 const LAT = require(path.join(__dirname, '..', 'lattice193.js'));
 
 const FILE = process.argv[2] || 'index.html';
@@ -456,13 +457,13 @@ else bad('L1 the sweep covered ' + CAND.cellsSwept + '/' + CELLS.length + ' cell
   console.log('       CARVE-OUT, printed with its denominator: ' + CAND.lrDays + '/' + CAND.dayBuilds +
     ' day-builds are NRC long-run tier days (A ' + (cTiers.A||0) + ', B ' + (cTiers.B||0) + ', C ' + (cTiers.C||0) +
     '), carrying ' + CAND.lrCore + ' core sections that B1b does not count' +
-    (BASE ? '. V' + BASE_VER + ': ' + BASE.lrDays + '/' + BASE.dayBuilds + ' day-builds, ' + BASE.lrCore + ' core sections excluded' : ''));
+    (BASE ? '. ' + SV.tag(BASE_VER) + ': ' + BASE.lrDays + '/' + BASE.dayBuilds + ' day-builds, ' + BASE.lrCore + ' core sections excluded' : ''));
   const perInj = {};
   for (const t of INJS) perInj[t] = { c:0, b:0 };
   if (BASE){
     // B1b's live-baseline cross-check of the transcribed V192 off-long-run core census (V193 widening; asserted only on a V192 baseline) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
     if (CAND.lrDays === BASE.lrDays) ok('B1b the carve-out covers the SAME ' + CAND.lrDays + ' day-builds on both versions — V193 did not move which days the run owns');
-    else bad('B1b the carve-out covers ' + CAND.lrDays + ' day-builds on the candidate but ' + BASE.lrDays + ' on V' + BASE_VER + ' — the exclusion set itself moved, so the comparison below is not like for like');
+    else bad('B1b the carve-out covers ' + CAND.lrDays + ' day-builds on the candidate but ' + BASE.lrDays + ' on ' + SV.tag(BASE_VER) + ' — the exclusion set itself moved, so the comparison below is not like for like');
     const lost = [];
     let totC = 0, totB = 0;
     for (const c of CELLS){
@@ -471,11 +472,11 @@ else bad('L1 the sweep covered ' + CAND.cellsSwept + '/' + CELLS.length + ' cell
       perInj[c.inj].c += nc; perInj[c.inj].b += nb;
       if (nc < nb) lost.push({ tag: c.tag, from: nb, to: nc, d: nb - nc });
     }
-    for (const t of INJS) console.log('       core sections off long-run days ' + t.padEnd(18) + ' V' + BASE_VER + ' ' + String(perInj[t].b).padStart(5) + ' -> ' + String(perInj[t].c).padStart(5) + '  delta ' + (perInj[t].c-perInj[t].b>=0?'+':'') + (perInj[t].c-perInj[t].b));
+    for (const t of INJS) console.log('       core sections off long-run days ' + t.padEnd(18) + ' ' + SV.tag(BASE_VER) + ' ' + String(perInj[t].b).padStart(5) + ' -> ' + String(perInj[t].c).padStart(5) + '  delta ' + (perInj[t].c-perInj[t].b>=0?'+':'') + (perInj[t].c-perInj[t].b));
     console.log('       core sections off long-run days, total ' + totB + ' -> ' + totC + ' over ' + CELLS.length + ' cells');
     const lostN = lost.reduce((a,x)=>a+x.d,0);
-    if (!lost.length) ok('B1b no cell lost a core section vs V' + BASE_VER + ' on any day the run does not own (0 lost over ' + CELLS.length + ' cells / ' + totB + ' baseline core sections, ' + BASE.lrCore + ' long-run-tier core sections excluded)');
-    else bad('B1b ' + lostN + ' core sections LOST vs V' + BASE_VER + ' OFF the long-run tiers in ' + lost.length + '/' + CELLS.length + ' cells:\n         ' +
+    if (!lost.length) ok('B1b no cell lost a core section vs ' + SV.tag(BASE_VER) + ' on any day the run does not own (0 lost over ' + CELLS.length + ' cells / ' + totB + ' baseline core sections, ' + BASE.lrCore + ' long-run-tier core sections excluded)');
+    else bad('B1b ' + lostN + ' core sections LOST vs ' + SV.tag(BASE_VER) + ' OFF the long-run tiers in ' + lost.length + '/' + CELLS.length + ' cells:\n         ' +
       lost.slice(0,10).map(x => x.tag + '  ' + x.from + ' -> ' + x.to).join('\n         '));
   } else {
     // NO BASELINE HANDED IN. B1b used to skip outright here, which meant the sabotage runner
@@ -578,9 +579,9 @@ function railClaim(tag, cand, base){
     if (c !== b) off.push(e + ' ' + b + ' -> ' + c + ' (' + (c-b>=0?'+':'') + (c-b) + ')');
   }
   console.log('       D47 rail [' + tag + '] items inside hip:true sections: ' + perTier.join(', '));
-  if (!off.length) ok('B3 ' + tag + ' (D47 RAIL, permanent): items inside hip:true sections are EQUAL on the candidate and V' + BASE_VER +
+  if (!off.length) ok('B3 ' + tag + ' (D47 RAIL, permanent): items inside hip:true sections are EQUAL on the candidate and ' + SV.tag(BASE_VER) +
     ' on ' + EQUIP.length + '/' + EQUIP.length + ' tiers — the budget cannot reach a protected section and did not');
-  else bad('B3 ' + tag + ' (D47 RAIL, permanent): items inside hip:true sections MOVED vs V' + BASE_VER + ' on ' + off.length + '/' + EQUIP.length +
+  else bad('B3 ' + tag + ' (D47 RAIL, permanent): items inside hip:true sections MOVED vs ' + SV.tag(BASE_VER) + ' on ' + off.length + '/' + EQUIP.length +
     ' tiers: ' + off.join(', ') + ' — this is the rail itself, not the licensed displacement, and no licence covers it');
 }
 
@@ -600,7 +601,7 @@ function prehabClaim(tag, cand, base, handTable, tableApplies){
     const c = cand.tiers[e].prehab, t = handTable[e], b = basePrehab[e];
     aggC += c; aggT += t; aggB += b;
     console.log('       prehab items [' + tag + '] ' + e.padEnd(11) + ' V192 census ' + String(t).padStart(5) + '  ->  ' + String(c).padStart(5) +
-      '   vs census ' + (c-t>=0?'+':'') + (c-t) + (base ? '   vs live V' + BASE_VER + ' ' + (c-b>=0?'+':'') + (c-b) : ''));
+      '   vs census ' + (c-t>=0?'+':'') + (c-t) + (base ? '   vs live ' + SV.tag(BASE_VER) + ' ' + (c-b>=0?'+':'') + (c-b) : ''));
     if (c - t < 0) below.push(e + ' ' + c + ' < ' + t);
     if (base && c - b < 0) belowBase.push(e + ' ' + (c-b));
   }
@@ -621,7 +622,7 @@ function prehabClaim(tag, cand, base, handTable, tableApplies){
   // that legitimately holds prehab steady. The per-tier losses vs the live baseline are
   // printed too, so nothing that used to be visible here stops being visible.
   if (base){
-    console.log('       REPORT ONLY \— B3 prehab AGGREGATE vs the live baseline [' + tag + '] V' + BASE_VER + ' ' + aggB + ' -> ' + aggC +
+    console.log('       REPORT ONLY \— B3 prehab AGGREGATE vs the live baseline [' + tag + '] ' + SV.tag(BASE_VER) + ' ' + aggB + ' -> ' + aggC +
       ' (delta ' + (aggC-aggB>=0?'+':'') + (aggC-aggB) + ' of ' + aggB + '), ' + belowBase.length + '/' + EQUIP.length + ' tiers below the live baseline' +
       (belowBase.length ? ': ' + belowBase.join(', ') : '') + '. The AGGREGATE is never gated; the PER-TIER ratchet below is.');
     ok('B3 ' + tag + ': prehab AGGREGATE delta vs the live baseline reported (' + aggB + ' -> ' + aggC + ', ' + belowBase.length + '/' + EQUIP.length + ' tiers down), not gated');
@@ -634,8 +635,8 @@ function prehabClaim(tag, cand, base, handTable, tableApplies){
     // caught only here. tests/sabotage.py hands in no baseline, so this claim DEFERS there.
     railClaim(tag, cand, base);
     // B3's D85 / D91 licence branches (V197 / V198 baselines) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
-    if (!belowBase.length) ok('B3 ' + tag + ': prehab is at or above the live V' + BASE_VER + ' baseline on ' + EQUIP.length + '/' + EQUIP.length + ' tiers (the RATCHET: a loss small enough to fit inside the V192 floor headroom still fails here)');
-    else bad('B3 ' + tag + ': prehab FELL vs the live V' + BASE_VER + ' baseline on ' + belowBase.length + '/' + EQUIP.length + ' tiers: ' + belowBase.join(', ') +
+    if (!belowBase.length) ok('B3 ' + tag + ': prehab is at or above the live ' + SV.tag(BASE_VER) + ' baseline on ' + EQUIP.length + '/' + EQUIP.length + ' tiers (the RATCHET: a loss small enough to fit inside the V192 floor headroom still fails here)');
+    else bad('B3 ' + tag + ': prehab FELL vs the live ' + SV.tag(BASE_VER) + ' baseline on ' + belowBase.length + '/' + EQUIP.length + ' tiers: ' + belowBase.join(', ') +
       ' \— still above the V192 census floor, and still a regression against the version this one ships after');
   } else {
     defer('B3 ' + tag + ': prehab AGGREGATE delta vs the live baseline (REPORT ONLY)', 'no baseline file supplied');
@@ -992,14 +993,14 @@ const EXPECT_PLAIN = 'Main lift[Back squat] | Accessory A[Dumbbell walking lunge
     if (base){
       let tb = 0, cb = 0;
       for (const e of EQUIP){ tb += base.tiers[e].thinCore; cb += base.tiers[e].coreSec; }
-      bs = '   V' + BASE_VER + ' was ' + tb + '/' + cb + ' (' + (cb ? (100*tb/cb).toFixed(2) : '0.00') + '%)';
+      bs = '   ' + SV.tag(BASE_VER) + ' was ' + tb + '/' + cb + ' (' + (cb ? (100*tb/cb).toFixed(2) : '0.00') + '%)';
     }
     console.log('       REPORT ONLY — thin core [' + tag + '] ' + thin + '/' + total + ' (' + (100*thin/total).toFixed(2) + '%)' + bs);
     return thin + '/' + total;
   };
   for (const e of EQUIP) console.log('       thin core [wide] ' + e.padEnd(11) + ' ' + String(CAND.tiers[e].thinCore).padStart(4) + '/' + CAND.tiers[e].coreSec);
   for (const t of INJS) console.log('       thin core [wide] by injury ' + t.padEnd(18) + ' ' + String(CAND.byInj[t].thinCore).padStart(4) + '/' + CAND.byInj[t].coreSec +
-    (BASE ? '   V' + BASE_VER + ' ' + BASE.byInj[t].thinCore + '/' + BASE.byInj[t].coreSec : ''));
+    (BASE ? '   ' + SV.tag(BASE_VER) + ' ' + BASE.byInj[t].thinCore + '/' + BASE.byInj[t].coreSec : ''));
   const w = line('wide', CAND, BASE);
   const n = line('narrow', CAND_N, BASE_N);
   console.log('       One hard trunk piece done properly on a tight day is a coachable prescription. A rise here is NOT a regression and is never asserted against. It is coach\'s call, not this gate\'s.');

@@ -353,7 +353,7 @@ console.log(`  note goal-met x non-zero-shift population: ${classCards.goalMet}/
 const row = SV.lookup(MANNY_DIGEST_BY_VERSION, IA.version);
 const mannyDigest = progDigest(IA.buildProgram(JSON.parse(JSON.stringify(fixtures.HALF_MANNY))));
 ok(!!row && mannyDigest === row,
-  `B2 HALF_MANNY matches the V${IA.version} row of MANNY_DIGEST_BY_VERSION (${row || 'NO ROW'}): got ${mannyDigest}. `
+  `B2 HALF_MANNY matches the ${SV.tag(IA.version)} row of MANNY_DIGEST_BY_VERSION (${row || 'NO ROW'}): got ${mannyDigest}. `
   + `E4-E6 are copy only; a digest move here means a prescription moved`);
 
 console.log('PASS ' + PASS + ' FAIL ' + FAIL);

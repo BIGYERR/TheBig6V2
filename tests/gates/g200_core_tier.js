@@ -149,9 +149,9 @@ const MLN=MO.eval('__LN'), MT=MO.eval('__T');
 const digC=progDigest(IA.buildProgram(JSON.parse(JSON.stringify(fixtures.HALF_MANNY))));
 const digM=progDigest(MO.buildProgram(JSON.parse(JSON.stringify(fixtures.HALF_MANNY))));
 const CORE_OFF_ROW=SV.lookup(MANNY_CORE_OFF_DIGEST_BY_VERSION,IA.version);   // era row, not a literal (D89)
-ok(!!CORE_OFF_ROW&&digM===CORE_OFF_ROW, 'F1a the counterfactual matches the V'+IA.version+' row of MANNY_CORE_OFF_DIGEST_BY_VERSION ('+(CORE_OFF_ROW||'NO ROW')+') (got '+digM+')'+(CORE_OFF_ROW?'':' — no MANNY_CORE_OFF_DIGEST_BY_VERSION row for V'+IA.version+': an unruled counterfactual digest move'));
+ok(!!CORE_OFF_ROW&&digM===CORE_OFF_ROW, 'F1a the counterfactual matches the '+SV.tag(IA.version)+' row of MANNY_CORE_OFF_DIGEST_BY_VERSION ('+(CORE_OFF_ROW||'NO ROW')+') (got '+digM+')'+(CORE_OFF_ROW?'':' — no MANNY_CORE_OFF_DIGEST_BY_VERSION row for '+SV.tag(IA.version)+': an unruled counterfactual digest move'));
 const SHIPPED_ROW=SV.lookup(MANNY_DIGEST_BY_VERSION,IA.version);   // era row, not a literal (D89)
-ok(!!SHIPPED_ROW&&digC===SHIPPED_ROW, 'F1b the candidate ships the V'+IA.version+' row of MANNY_DIGEST_BY_VERSION ('+(SHIPPED_ROW||'NO ROW')+') (got '+digC+')'+(SHIPPED_ROW?'':' — no MANNY_DIGEST_BY_VERSION row for V'+IA.version+': an unruled digest move'));
+ok(!!SHIPPED_ROW&&digC===SHIPPED_ROW, 'F1b the candidate ships the '+SV.tag(IA.version)+' row of MANNY_DIGEST_BY_VERSION ('+(SHIPPED_ROW||'NO ROW')+') (got '+digC+')'+(SHIPPED_ROW?'':' — no MANNY_DIGEST_BY_VERSION row for '+SV.tag(IA.version)+': an unruled digest move'));
 
 // D3 / E-non-vacuity: the V199 sentence and the V199 tag, read back from real calls on
 // the counterfactual. Without these, D1 and E1 would also pass on a build where

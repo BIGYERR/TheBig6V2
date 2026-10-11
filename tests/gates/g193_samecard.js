@@ -330,7 +330,7 @@ const OPEN_UNRULED = SV.lookup(OPEN_UNRULED_BY_VERSION, (SV.cmp(IA.version, 218)
 // A missing row is a NAMED FAIL with the summary printed, never a throw (post-V233, Mario:
 // "Make g193 fail cleanly instead of crashing"). Nothing below can be graded without it.
 if (!OPEN_UNRULED) {
-  bad('G0 no OPEN_UNRULED_BY_VERSION row for V' + IA.version + ': an unruled register (D133)');
+  bad('G0 no OPEN_UNRULED_BY_VERSION row for ' + SV.tag(IA.version) + ': an unruled register (D133)');
   console.log(`\nPASS ${PASS} FAIL ${FAIL}`);
   console.log('\nFAILURES:'); fails.forEach(f => console.log('  - ' + f)); process.exit(1);
 }

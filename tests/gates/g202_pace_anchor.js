@@ -538,7 +538,7 @@ ok(rMono.length === 0, `R5 the reader is monotone non-decreasing in distance acr
 const row = SV.lookup(MANNY_DIGEST_BY_VERSION, IA.version);
 const mannyDigest = progDigest(IA.buildProgram(JSON.parse(JSON.stringify(fixtures.HALF_MANNY))));
 ok(!!row && mannyDigest === row,
-  `B1 HALF_MANNY matches the V${IA.version} row of MANNY_DIGEST_BY_VERSION (${row || 'NO ROW'}): got ${mannyDigest}. `
+  `B1 HALF_MANNY matches the ${SV.tag(IA.version)} row of MANNY_DIGEST_BY_VERSION (${row || 'NO ROW'}): got ${mannyDigest}. `
   + `D100 and D101 touch the run_pace_goal path only; a move here is an unruled digest move`);
 
 console.log('PASS ' + PASS + ' FAIL ' + FAIL);

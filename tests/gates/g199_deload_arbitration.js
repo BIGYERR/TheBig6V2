@@ -526,8 +526,8 @@ const digOff=progDigest(IP.buildProgram(fixtures.HALF_MANNY));
 IP.eval("globalThis.__DELOAD_OFF=false;");
 const MANNY_DIGEST=SV.lookup(MANNY_DIGEST_BY_VERSION,IP.version);             // era row, not a literal (D89)
 const MANNY_OFF=SV.lookup(MANNY_DELOAD_OFF_DIGEST_BY_VERSION,IP.version);     // era row, not a literal (D89)
-ok(!!MANNY_DIGEST&&dig===MANNY_DIGEST,'B1 HALF_MANNY progDigest matches the V'+IP.version+' row of MANNY_DIGEST_BY_VERSION ('+(MANNY_DIGEST||'NO ROW')+') (got '+dig+')'+(MANNY_DIGEST?'':' — no MANNY_DIGEST_BY_VERSION row for V'+IP.version+': an unruled digest move'));
-ok(!!MANNY_OFF&&digOff===MANNY_OFF,'B2 with __DELOAD_OFF the same fixture matches the V'+IP.version+' row of MANNY_DELOAD_OFF_DIGEST_BY_VERSION ('+(MANNY_OFF||'NO ROW')+') (got '+digOff+'): B1 is MEANINGFUL, the fixture does pass through the deload (B1 would be vacuous if the two digests were equal)'+(MANNY_OFF?'':' — no MANNY_DELOAD_OFF_DIGEST_BY_VERSION row for V'+IP.version+': an unruled digest move'));
+ok(!!MANNY_DIGEST&&dig===MANNY_DIGEST,'B1 HALF_MANNY progDigest matches the '+SV.tag(IP.version)+' row of MANNY_DIGEST_BY_VERSION ('+(MANNY_DIGEST||'NO ROW')+') (got '+dig+')'+(MANNY_DIGEST?'':' — no MANNY_DIGEST_BY_VERSION row for '+SV.tag(IP.version)+': an unruled digest move'));
+ok(!!MANNY_OFF&&digOff===MANNY_OFF,'B2 with __DELOAD_OFF the same fixture matches the '+SV.tag(IP.version)+' row of MANNY_DELOAD_OFF_DIGEST_BY_VERSION ('+(MANNY_OFF||'NO ROW')+') (got '+digOff+'): B1 is MEANINGFUL, the fixture does pass through the deload (B1 would be vacuous if the two digests were equal)'+(MANNY_OFF?'':' — no MANNY_DELOAD_OFF_DIGEST_BY_VERSION row for '+SV.tag(IP.version)+': an unruled digest move'));
 ok(dig!==digOff,'B3 the two fixture digests differ');
 
 const SH=Math.max(1,parseInt(process.env.G199_SHARDS||String(Math.min(4,os.cpus().length)),10));
@@ -547,38 +547,38 @@ function report(){
   // that reads it, so an artifact with no row fails loudly instead of skipping.
   const ERA=SV.lookup(DELOAD_ARB_BY_VERSION,IP.version)||null;
   const ERAv=k=>(ERA?ERA[k]:'NO ROW');
-  const NOROW=(ERA?'':' — no DELOAD_ARB_BY_VERSION row for V'+IP.version+': an unpinned arbitration count (D133)');
+  const NOROW=(ERA?'':' — no DELOAD_ARB_BY_VERSION row for '+SV.tag(IP.version)+': an unpinned arbitration count (D133)');
   const g=(o,k)=>(o&&o[k])||0;
   const topn=(o,n)=>Object.keys(o||{}).sort((a,b)=>o[b]-o[a]).slice(0,n).map(k=>k+' '+o[k]).join(' | ');
   const D_DAY=N.dlDayBuilds, D_WK=N.deloadWeeks, ALLWK=N.weeks;
 
   console.log('── C. headline, shipped card, absolute counts (no baseline) ──');
-  ok(!!ERA&&N.zeroWeeks===ERA.zeroWeeks,'C1 zero-posterior weeks on the SHIPPED card == '+ERAv('zeroWeeks')+' (the V'+IP.version+' DELOAD_ARB_BY_VERSION row) of '+ALLWK+' weeks (1,728 configs); got '+N.zeroWeeks+NOROW);
+  ok(!!ERA&&N.zeroWeeks===ERA.zeroWeeks,'C1 zero-posterior weeks on the SHIPPED card == '+ERAv('zeroWeeks')+' (the '+SV.tag(IP.version)+' DELOAD_ARB_BY_VERSION row) of '+ALLWK+' weeks (1,728 configs); got '+N.zeroWeeks+NOROW);
   ok(N.zeroWeeksDeload===0,'C2 zero-posterior DELOAD weeks == 0 of '+D_WK+' deload weeks; got '+N.zeroWeeksDeload);
-  ok(!!ERA&&N.zeroWeeksNonDeload===ERA.zeroWeeksNonDeload,'C3 the surviving '+ERAv('zeroWeeksNonDeload')+' (the V'+IP.version+' row) are all NON-deload weeks (denominator '+N.nonDeloadWeeks+'), so C2\'s zero holds: got '+N.zeroWeeksNonDeload+NOROW);
+  ok(!!ERA&&N.zeroWeeksNonDeload===ERA.zeroWeeksNonDeload,'C3 the surviving '+ERAv('zeroWeeksNonDeload')+' (the '+SV.tag(IP.version)+' row) are all NON-deload weeks (denominator '+N.nonDeloadWeeks+'), so C2\'s zero holds: got '+N.zeroWeeksNonDeload+NOROW);
   ok(R.wrongWay===0,'C4 weeks going the WRONG way == 0: no week ships zero posterior that would ship posterior with the deload off (got '+R.wrongWay+' of '+ALLWK+')');
-  ok(!!ERA&&F.zeroWeeksDeload===ERA.zeroWeeksDeloadOff,'C5 __DELOAD_OFF comparator: with the pass disabled, '+ERAv('zeroWeeksDeloadOff')+' deload weeks (the V'+IP.version+' row) ship zero posterior. This set and C1\'s are DISJOINT; got '+F.zeroWeeksDeload+NOROW);
+  ok(!!ERA&&F.zeroWeeksDeload===ERA.zeroWeeksDeloadOff,'C5 __DELOAD_OFF comparator: with the pass disabled, '+ERAv('zeroWeeksDeloadOff')+' deload weeks (the '+SV.tag(IP.version)+' row) ship zero posterior. This set and C1\'s are DISJOINT; got '+F.zeroWeeksDeload+NOROW);
   ok(N.zeroWeeksDeload<=F.zeroWeeksDeload,'C6 shipped ('+N.zeroWeeksDeload+') <= __DELOAD_OFF ('+F.zeroWeeksDeload+'): arbitrated correctly the deload PROTECTS the chain rather than deleting it');
 
   console.log('── D. denominators, the conflict resolved rather than papered over ──');
   ok(D_WK===2880,'D1a deload weeks by isRecoveryWeek == 2,880 (got '+D_WK+')');
   ok(N.nonDeloadWeeks===14976,'D1b non-deload weeks == 14,976 (got '+N.nonDeloadWeeks+'); 2,880 + 14,976 == '+ALLWK);
-  ok(!!ERA&&R.dlIdentical===ERA.dlIdentical,'D2 '+ERAv('dlIdentical')+' deload weeks (the V'+IP.version+' row) are byte-identical with the deload off, so the sha-method deload count is '+(ERA?R.dlTotal-ERA.dlIdentical:'NO ROW')+' ('+(R.dlTotal-R.dlIdentical)+' differ of '+R.dlTotal+'). '+R.dlTotal+' and '+(R.dlTotal-R.dlIdentical)+' are two measurements, not a disagreement; got '+R.dlIdentical+NOROW);
+  ok(!!ERA&&R.dlIdentical===ERA.dlIdentical,'D2 '+ERAv('dlIdentical')+' deload weeks (the '+SV.tag(IP.version)+' row) are byte-identical with the deload off, so the sha-method deload count is '+(ERA?R.dlTotal-ERA.dlIdentical:'NO ROW')+' ('+(R.dlTotal-R.dlIdentical)+' differ of '+R.dlTotal+'). '+R.dlTotal+' and '+(R.dlTotal-R.dlIdentical)+' are two measurements, not a disagreement; got '+R.dlIdentical+NOROW);
   ok(R.ndIdentical===R.ndTotal&&R.ndTotal===14976,'D3 non-deload weeks are byte-identical with the pass on and off: '+R.ndIdentical+'/'+R.ndTotal+' (week-level identity, not just HALF_MANNY)');
 
   console.log('── E. THE DELOAD MUST STILL CUT ──');
   const HROW=DELOAD_HINGE_ROW_FOR(IP.version), HX=DELOAD_HINGE_EXCLUDES_TIER_B(IP.version);
-  const HNOROW=(HROW?'':' — no DELOAD_HINGE_BY_VERSION row for V'+IP.version);
-  ok(!!HROW&&N.postInP1===HROW.E1a,'E1a posterior items entering the deload == '+(HROW?HROW.E1a:'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row) across '+D_DAY+' deload day builds (got '+N.postInP1+')'+HNOROW);
+  const HNOROW=(HROW?'':' — no DELOAD_HINGE_BY_VERSION row for '+SV.tag(IP.version));
+  ok(!!HROW&&N.postInP1===HROW.E1a,'E1a posterior items entering the deload == '+(HROW?HROW.E1a:'NO ROW')+' (the '+SV.tag(IP.version)+' DELOAD_HINGE_BY_VERSION row) across '+D_DAY+' deload day builds (got '+N.postInP1+')'+HNOROW);
   const HSCOPE=(HX?' (tier B long-run days excluded by _longRunTier: '+(N.tierBDl||0)+' deload day builds)':'');
   const hIn=HX?N.postInP1X:N.postInP1, hOut=HX?N.postOutP2X:N.postOutP2, hKill=HX?N.killedByDeloadX:N.killedByDeload, hHold=(HX?N.killHoldX:N.killHold)||{};
-  ok(!!HROW&&hOut===HROW.E1b,'E1b posterior items leaving the deload == '+(HROW?HROW.E1b:'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+', a cut of '+(hIn-hOut)+' ('+(100*(hIn-hOut)/hIn).toFixed(1)+'%); got '+hOut+HNOROW);
+  ok(!!HROW&&hOut===HROW.E1b,'E1b posterior items leaving the deload == '+(HROW?HROW.E1b:'NO ROW')+' (the '+SV.tag(IP.version)+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+', a cut of '+(hIn-hOut)+' ('+(100*(hIn-hOut)/hIn).toFixed(1)+'%); got '+hOut+HNOROW);
   ok(!!HROW&&F.postInP1===HROW.E1a&&F.postOutP2===HROW.E1a,'E2 __DELOAD_OFF control cuts nothing (both ends == the row\'s E1a, '+(HROW?HROW.E1a:'NO ROW')+'): '+F.postInP1+' -> '+F.postOutP2+'. E1b is a real deletion, not an accounting artefact');
-  ok(!!HROW&&hKill===HROW.E3,'E3 STAGE-LOCAL (p1 -> p2): deload day builds taken from >0 posterior to 0 == '+(HROW?HROW.E3:'NO ROW')+' of '+D_DAY+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+'; got '+hKill+'. This is coach\'s ruled CEILING, not a floor'+HNOROW);
+  ok(!!HROW&&hKill===HROW.E3,'E3 STAGE-LOCAL (p1 -> p2): deload day builds taken from >0 posterior to 0 == '+(HROW?HROW.E3:'NO ROW')+' of '+D_DAY+' (the '+SV.tag(IP.version)+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+'; got '+hKill+'. This is coach\'s ruled CEILING, not a floor'+HNOROW);
   ok(N.killedHeldByFinisher===60,'E4 on all 60, every section that held the dropped posterior is labelled Explosive finisher (got '+N.killedHeldByFinisher+'): the ceiling is BY LABEL, and a future widening into optional/fluff sections moves this number');
   ok(N.killedKeepsMain===60,'E5 all 60 still keep their main/strength section (got '+N.killedKeepsMain+')');
   const E6_ROW=E6_ROW_FOR(IP.version);
-  ok(E6_ROW!==undefined&&R.endToEnd===E6_ROW,'E6 END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): '+R.endToEnd+' deload day builds ship zero posterior where __DELOAD_OFF ships some == '+(E6_ROW===undefined?'NO ROW':E6_ROW)+' (the V'+IP.version+' E6_BY_VERSION row'+(E6_ROW===undefined?': no E6_BY_VERSION row covers this ia-version':'')+'). Reported beside E3\'s stage-local '+(HROW?HROW.E3:'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row), never mixed into it');
+  ok(E6_ROW!==undefined&&R.endToEnd===E6_ROW,'E6 END-TO-END (p1 -> shipped card, folding in capRegionalFatigue and capSessionBudget): '+R.endToEnd+' deload day builds ship zero posterior where __DELOAD_OFF ships some == '+(E6_ROW===undefined?'NO ROW':E6_ROW)+' (the '+SV.tag(IP.version)+' E6_BY_VERSION row'+(E6_ROW===undefined?': no E6_BY_VERSION row covers this ia-version':'')+'). Reported beside E3\'s stage-local '+(HROW?HROW.E3:'NO ROW')+' (the '+SV.tag(IP.version)+' DELOAD_HINGE_BY_VERSION row), never mixed into it');
 
   console.log('── F. ACCESSORY-BLOCK CONSERVATION (the ruling adds no sets) ──');
   ok(g(N.lblP2all,'Leg superset A')===14544,'F1 Leg superset A present after the deload == 14,544. DENOMINATOR: all '+N.dayCells+' day builds (non-deload cards pass through recoveryDeload untouched, so they belong in this total); got '+g(N.lblP2all,'Leg superset A'));
@@ -622,14 +622,14 @@ function report(){
     + 'STRUCTURAL REASON, not a shortfall: E_FOCUS here is [hypertrophy, balanced], and Pull superset B exists only on the else branch of the goal===strength || goal===hypertrophy guard at index.html:8223, so hypertrophy configs label the section Row volume and cannot contribute a B at all. B enters on only ' + g(N.pullP1all,'Pull superset B') + ' of ' + N.dayCells + ' day builds.');
 
   console.log('── G. Leg isolation and Explosive finisher, BOTH denominators pinned ──');
-  ok(!!HROW&&g(N.dropped,'Leg isolation')===HROW.G1,'G1 Leg isolation DROPPED by the deload == '+(HROW?HROW.G1:'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row). DENOMINATOR: deload day builds (n='+D_DAY+'), of which '+g(N.lblP1,'Leg isolation')+' carried the block in. It only ever drops on a deload card, so the all-day-builds census moves by the same '+(HROW?HROW.G1:'NO ROW')+' ('+g(N.lblP1all,'Leg isolation')+' -> '+g(N.lblP2all,'Leg isolation')+'); got '+g(N.dropped,'Leg isolation'));
+  ok(!!HROW&&g(N.dropped,'Leg isolation')===HROW.G1,'G1 Leg isolation DROPPED by the deload == '+(HROW?HROW.G1:'NO ROW')+' (the '+SV.tag(IP.version)+' DELOAD_HINGE_BY_VERSION row). DENOMINATOR: deload day builds (n='+D_DAY+'), of which '+g(N.lblP1,'Leg isolation')+' carried the block in. It only ever drops on a deload card, so the all-day-builds census moves by the same '+(HROW?HROW.G1:'NO ROW')+' ('+g(N.lblP1all,'Leg isolation')+' -> '+g(N.lblP2all,'Leg isolation')+'); got '+g(N.dropped,'Leg isolation'));
   ok(!!HROW&&g(N.droppedPost,'Leg isolation')===HROW.G1,'G2 of those dropped Leg isolation blocks, POSTERIOR-HOLDING == '+(HROW?HROW.G1:'NO ROW')+' (the row\'s G1). SECOND DENOMINATOR: dropped blocks, not killed days. Every Leg isolation block the deload drops was carrying hinge or hip_ext work; got '+g(N.droppedPost,'Leg isolation'));
   ok(g(N.killHold,'Leg isolation')===0,'G2b THIRD DENOMINATOR, and the one that moved: on days the deload takes from >0 posterior to 0, Leg isolation holds the dropped posterior '+g(N.killHold,'Leg isolation')+' times. V198\'s census put it at 1,080 of 2,220 such days; that 1,080 is a V198-arm number and this baseline-free gate asserts the candidate\'s 0 instead. Do not read 1,350, 1,350 and 0 as three readings of one quantity');
   ok(g(N.dropped,'Explosive finisher')===1744,'G3 Explosive finisher DROPPED == 1,744 of the '+g(N.lblP1,'Explosive finisher')+' entering on deload cards (same denominator as G1); got '+g(N.dropped,'Explosive finisher'));
   ok(g(N.droppedPost,'Explosive finisher')===84,'G4 of those, POSTERIOR-HOLDING == 84 (dropped-block denominator, as G2); got '+g(N.droppedPost,'Explosive finisher'));
   ok(g(N.killHold,'Explosive finisher')===60,'G4b on KILLED days it holds the dropped posterior 60 times (killed-day denominator, as G2b). 84 and 60 are different questions: on 24 of the 84 the day kept posterior elsewhere; got '+g(N.killHold,'Explosive finisher'));
   ok(!!HROW&&JSON.stringify(hHold)===JSON.stringify(HROW.G5)&&g(hHold,'Explosive finisher')===hKill,
-    'G5 the killed-day holder census is EXACTLY '+(HROW?JSON.stringify(HROW.G5):'NO ROW')+' (the V'+IP.version+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+' and equals E3: no other label ever holds the posterior on a day the deload empties, so E3 is a CEILING BY LABEL and a widening into optional or fluff sections would move it (got '+JSON.stringify(hHold)+')'+HNOROW);
+    'G5 the killed-day holder census is EXACTLY '+(HROW?JSON.stringify(HROW.G5):'NO ROW')+' (the '+SV.tag(IP.version)+' DELOAD_HINGE_BY_VERSION row)'+HSCOPE+' and equals E3: no other label ever holds the posterior on a day the deload empties, so E3 is a CEILING BY LABEL and a widening into optional or fluff sections would move it (got '+JSON.stringify(hHold)+')'+HNOROW);
 
   console.log('     CENSUS lblP1all '+JSON.stringify(N.lblP1all)+' lblP2all '+JSON.stringify(N.lblP2all));
   console.log('     CENSUS killHold '+JSON.stringify(N.killHold));
@@ -655,7 +655,7 @@ function report(){
   ok(N.swapReBudget===(I2_V231?0:108),I2_V231?('I2 of the same 2,160, '+N.swapReBudget+' cells reach the SHIPPED card with no posterior left (V231 era, D196 P-BWFALLBACK: V230 shipped 108, every one the Leg superset B Banded hip thrust renamed to Burpees after capSessionBudget on bodyweight lowback/protect; the V231 card carries Single-leg hip thrust (shoulders on bed) there). I2c and I2d are retired at 231'):('I2 of the same 2,160, '+N.swapReBudget+' cells reach the SHIPPED card with no posterior left, and NOT ONE of them loses it to a trim. capSessionBudget keeps the section and D85\'s floor keeps the item; what they carried entering is '+topn(N.reBudLost,2)+'. I2c names what actually happens to it'));
   // I2c and I2d (the V230 Burpees renamer rows, D196 P-BWFALLBACK, dark from I2_V231 = IP.version>=231) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
   ok(N.swapReBudgetWeekZero===0,'I2b and not one of those '+N.swapReBudget+' cells leaves its WEEK without posterior ('+N.swapReBudgetWeekZero+'): the coaching claim behind criterion 2 holds at the level it is made');
-  ok(!!ERA&&N.capLSBkilled===ERA.capLSBkilled,'I3 capRegionalFatigue kills exactly '+ERAv('capLSBkilled')+' Leg superset B sections (the V'+IP.version+' row), out of '+N.capLSBin+' entering the cap (all day builds, n='+N.dayCells+'); got '+N.capLSBkilled+NOROW);
+  ok(!!ERA&&N.capLSBkilled===ERA.capLSBkilled,'I3 capRegionalFatigue kills exactly '+ERAv('capLSBkilled')+' Leg superset B sections (the '+SV.tag(IP.version)+' row), out of '+N.capLSBin+' entering the cap (all day builds, n='+N.dayCells+'); got '+N.capLSBkilled+NOROW);
 
   console.log('── J. card order preserved IN PLACE ──');
   ok(N.orderViol===0,'J1 the surviving sections are a subsequence of the entering sections on every deload card: nothing reordered, nothing appended ('+N.orderViol+' violations of '+D_DAY+')');

@@ -408,7 +408,7 @@ console.log('\n9. D116 is UI and cfg-write only: HALF_MANNY must not move');
 const D116_ENTRY_DIGEST = SV.lookup(H.MANNY_DIGEST_BY_VERSION, IA.version);
 ok('MANNY_DIGEST_BY_VERSION has a row for ia-version ' + IA.version,
    !!SV.lookup(H.MANNY_DIGEST_BY_VERSION, IA.version), String(SV.lookup(H.MANNY_DIGEST_BY_VERSION, IA.version)));
-eq('HALF_MANNY digest unmoved by D116 (pinned to the V' + IA.version + ' era row)',
+eq('HALF_MANNY digest unmoved by D116 (pinned to the ' + SV.tag(IA.version) + ' era row)',
    H.progDigest(IA.buildProgram(IA.fixtures.HALF_MANNY)), D116_ENTRY_DIGEST);
 
 const cfgBefore = JSON.stringify(IA.fixtures.HALF_MANNY);

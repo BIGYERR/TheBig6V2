@@ -444,7 +444,7 @@ for(const h of HANDS){
               if(!(clamp && aT.endsWith(HOLD_K) && bodyOf(aT) === body)){ badK++; if(exK.length < 8) exK.push('moved, not the hold variant on a hand clamp pair: ' + tag(c) + ' hop' + (k + 1) + ' [' + kind + (clamp ? ', clamp' : ', not clamp') + '] V' + BASE_ERA + ' ' + bT + ' | now ' + aT + ' | want body ' + body); } }
             if(conv) beneath = bwK(beneath);
           }); } }
-      console.log('    c-TOAST D193 R8 (V' + VER + '): moved ' + mvK + ' by hand kind ' + fmt(kinds) + ' | hand clamp pairs ' + clampK + ', without the hold sentence ' + missK + ' | moved and not the hold variant on a hand clamp pair ' + badK);
+      console.log('    c-TOAST D193 R8 (' + SV.tag(VER) + '): moved ' + mvK + ' by hand kind ' + fmt(kinds) + ' | hand clamp pairs ' + clampK + ', without the hold sentence ' + missK + ' | moved and not the hold variant on a hand clamp pair ' + badK);
       exK.forEach(s => console.log('      ' + s));
       ok('cTOAST', R.cTOAST + ' [V229 D193 R8, D194 Amendment 1 (r) / Amendment 3: moved ' + mvK + ' == pin ' + D193_CTOAST_PIN + ', every one the hold variant on a hand clamp pair (not ' + badK + '), hand clamp pairs ' + clampK + ' without the hold ' + missK + ']',
         SELF_C && SELF_B && PAIRSELF && hops > 0 && nonEmpty > 0 && cueHops > 0 && moved === mvK && badK === 0 && missK === 0 && mvK === D193_CTOAST_PIN,

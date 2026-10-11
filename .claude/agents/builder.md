@@ -10,7 +10,7 @@ omitClaudeMd: true
 Every version is `MAJOR.MINOR.PATCH`. **Never write a future release as `V<N>` or as a bare integer**: not in an edit script, a gate, a sabotage spec, a file name, a comment or your report.
 - **The past is integer, the future is dotted.** Builds 1 to 239 are `V1` to `V239` (each one is v0.N.0; V239 = 0.239.0) and keep their tags, digest lines, era-row keys and file names. Every release from `0.239.1` on is `v<MAJOR.MINOR.PATCH>`. Example: the build once called "V240" is `v0.240.0`.
 - **Names:** tag `v0.240.0`; commit `v0.240.0: <one line>`; digest `- **v0.240.0** — …`; `tests/measure/v0.240.0_rulings/` and `tests/measure/v0.240.0_<question>.js`; `tests/edits/v0.240.0_edit.py`; `tests/gates/g0.240.0_<topic>.js`; `tests/sabotage/v0.240.0.json`; era rows keyed `'0.240.0'`; baseline `base_v<previous>.html`, where `<previous>` is the version HEAD carries, never "N-1".
-- **Code** reads, compares and prints a version only through `tests/semver.js` (`parse`, `cmp(a, b) <op> 0`, `lookup`, `fromHtml`) or `tests/semver.py`: never `+version`, a string compare, `'V'+n` or arithmetic on a version.
+- **Code** reads, compares and prints a version only through `tests/semver.js` (`parse`, `cmp(a, b) <op> 0`, `lookup`, `fromHtml`, and `tag` to print one: `V239` for an old build, `v0.239.1` for a new one) or `tests/semver.py`: never `+version`, a string compare, `'V'+n` or arithmetic on a version.
 - **Mario picks PATCH, MINOR or MAJOR** for every release. You write exactly the version your brief names. If it names none, or names it as `V<N>`, stop and ask.
 - **A future `V<N>` is a defect wherever you find it** (your brief, a template, the handoff, a file name, a ruling): use the dotted form, and say in your report that you corrected it.
 

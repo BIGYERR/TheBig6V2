@@ -444,7 +444,7 @@ const crashNote = S.crash.length ? ' | build crashes ' + S.crash.length + ': ' +
 // D194 part 2's row. Below 229 each row asserts exactly as before.
 // V231 (absorb ruling section 3): at 231 and up the six D9 rows read D193_PIN_V231; 229 and 230 read D193_PIN.
 const D9 = SV.cmp(VER, D193_ERA) >= 0, ERA231 = SV.cmp(VER, D193_V231_ERA) >= 0, PIN9 = ERA231 ? D193_PIN_V231 : D193_PIN;
-if(D9) console.log('  D193 era (V' + VER + '): Main pairs on a hand-capped target ' + S9.capPairs + ', hand clamp pairs (toasts) ' + S9.clampT);
+if(D9) console.log('  D193 era (' + SV.tag(VER) + '): Main pairs on a hand-capped target ' + S9.capPairs + ', hand clamp pairs (toasts) ' + S9.clampT);
 if(D9) console.log('  V231 bed-thrust donor (' + BED_DONOR + ') moved pairs on this tree: G3a ' + BED9.out + ', G3c off grammar ' + BED9.off + ', G3e ' + BED9.nul + ', G6a toast ' + BED9.t + ' | pin table ' + (ERA231 ? 'D193_PIN_V231 (ia-version ' + D193_V231_ERA + ' and up)' : 'D193_PIN (229 and 230)') + ' | swap pairs ' + S.pairs);
 if(D9) ok(R.G3a + ' [V229 D193 Amendment 4 (l): moved ' + S.outside + ' == pin ' + PIN9.G3a + '; card != the hand card beneath the hold ' + S9.bA + ']' + (ERA231 ? ' [V231 D196-1: bed-thrust donor moved ' + BED9.out + ' == ' + BED_PIN_V231.out + ']' : ''), !S.crash.length && S.main > 0 && S9.bA === 0 && S.outside === PIN9.G3a && (!ERA231 || BED9.out === BED_PIN_V231.out), 'moved ' + S.outside + ' of ' + S.main + ' (pin ' + PIN9.G3a + '), beneath-the-hold misses ' + S9.bA + (ERA231 ? ', bed-thrust donor moved ' + BED9.out + ' (pin ' + BED_PIN_V231.out + ')' : '') + crashNote + exs9('A') + exs('out'));
 else ok(R.G3a, !S.crash.length && S.main > 0 && S.outside === 0, S.outside + ' of ' + S.main + crashNote + exs('out'));

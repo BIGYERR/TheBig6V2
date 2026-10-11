@@ -139,7 +139,17 @@ function below(lines, v){
   return hit;
 }
 
-module.exports = { SemVer, parse, cmp, lookup, fromHtml, str, bump, below, isSemVer };
+// tag: a version as a label prints it (CLAUDE.md, PRIORITY 1). A pre-semver build is V<N> (V239), a dotted version is
+// v<M.m.p> (v0.239.1). Display only: never compare or key on it. A value that does not parse prints as 'V' + value,
+// exactly what the old `'V' + version` displays printed, so a log line never throws.
+function tag(v){
+  let x;
+  try { x = parse(v); } catch (e) { return 'V' + String(v); }
+  if (x.major === Infinity || x.major === -Infinity) return x.toString();
+  return x.legacy ? 'V' + x.minor : 'v' + str(x);
+}
+
+module.exports = { SemVer, parse, cmp, lookup, fromHtml, str, bump, below, tag, isSemVer };
 
 function selftest(){
   let pass = 0, fail = 0;
@@ -229,6 +239,10 @@ function selftest(){
   row('S12 CLI below with nothing below exits 1, nothing on stdout', r.status === 1 && r.stdout === '', got(r));
   r = cli(['below', 'junk'], LIST);
   row('S12 CLI below with a candidate that does not parse exits 2, nothing on stdout', r.status === 2 && r.stdout === '', got(r));
+  // labels
+  row('S13 tag prints a pre-semver build as V<N>: 239, "239" and "V239" give V239', tag(239) === 'V239' && tag('239') === 'V239' && tag('V239') === 'V239', tag(239) + ' ' + tag('V239'));
+  row('S13 tag prints a dotted version as v<M.m.p>: "0.239.1", "V0.239.1" and a parsed 0.240.0', tag('0.239.1') === 'v0.239.1' && tag('V0.239.1') === 'v0.239.1' && tag(parse('0.240.0')) === 'v0.240.0', tag('0.239.1') + ' ' + tag('V0.239.1'));
+  row('S13 tag never throws: what does not parse prints as V + value, as the old displays did', tag(undefined) === 'Vundefined' && tag(null) === 'Vnull' && tag(NaN) === 'VNaN', tag(undefined) + ' ' + tag(null) + ' ' + tag(NaN));
   console.log('PASS ' + pass + ' FAIL ' + fail);
   return fail ? 1 : 0;
 }

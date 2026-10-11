@@ -116,6 +116,7 @@ jobs:
         run: |
           META=$(node tests/semver.js meta index.html) || { echo "::error::index.html has no ia-version meta"; exit 1; }
           node tests/semver.js str "$META" > /dev/null || { echo "::error::index.html ia-version '$META' is not a version (want N or M.m.p)"; exit 1; }
+          META="${META#v}"   # a meta written v0.239.1 names the licence v0.239.1, never vv0.239.1 (CLAUDE.md, PRIORITY 1)
           LICENCE="tests/measure/v${META}_rulings/v${META}_row_ruled.txt"
           if [ -f "$LICENCE" ]; then export ROW_RULED="$LICENCE"; echo "row licence: $LICENCE"; fi
           mkdir -p temp

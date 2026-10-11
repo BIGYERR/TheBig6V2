@@ -351,6 +351,6 @@ function infoMove(X, tag){
   }
   lines.forEach(s => console.log(s)); }
 console.log('\n-- INFO (prints, never counts): rest-day move x snapshot x swap, W5 (move Tue -> Wed, clock W5 Thu) --');
-infoMove(IA, 'candidate V' + STAMP);
+infoMove(IA, 'candidate ' + SV.tag(STAMP));
 console.log('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s');
 done();

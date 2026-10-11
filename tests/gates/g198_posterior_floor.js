@@ -220,7 +220,7 @@ console.log('── C. Mario\'s live program is untouched ──');
 const dig=progDigest(IA.buildProgram(fixtures.HALF_MANNY));
 const MANNY_DIGEST=SV.lookup(MANNY_DIGEST_BY_VERSION,IA.version);   // era row, not a literal (D89)
 ok(!!MANNY_DIGEST && dig===MANNY_DIGEST,
-   'C1 HALF_MANNY digest matches the V'+IA.version+' row ('+(MANNY_DIGEST||'NO ROW — no MANNY_DIGEST_BY_VERSION entry for this version: an unruled digest move')+') (got '+dig+')');
+   'C1 HALF_MANNY digest matches the '+SV.tag(IA.version)+' row ('+(MANNY_DIGEST||'NO ROW — no MANNY_DIGEST_BY_VERSION entry for this version: an unruled digest move')+') (got '+dig+')');
 
 console.log('PASS '+PASS+' FAIL '+FAIL);
 process.exit(FAIL?1:0);

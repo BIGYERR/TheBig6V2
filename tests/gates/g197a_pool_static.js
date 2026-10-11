@@ -354,9 +354,9 @@ console.log('\n-- D. HALF_MANNY --');
 {
   const p = IA.buildProgram(fixtures.HALF_MANNY);
   const d = progDigest(p);
-  ok('D1 HALF_MANNY digest matches the V' + IA.version + ' row (' + (MANNY_DIGEST || 'NO ROW') + ')',
+  ok('D1 HALF_MANNY digest matches the ' + SV.tag(IA.version) + ' row (' + (MANNY_DIGEST || 'NO ROW') + ')',
      !!MANNY_DIGEST && d === MANNY_DIGEST,
-     d + (MANNY_DIGEST ? '' : ' — no MANNY_DIGEST_BY_VERSION row for V' + IA.version + ': an unruled digest move'));
+     d + (MANNY_DIGEST ? '' : ' — no MANNY_DIGEST_BY_VERSION row for ' + SV.tag(IA.version) + ': an unruled digest move'));
   let li = 0;
   cells(p).forEach(c => (c.day.sections||[]).forEach(s => { if ((s.label||'') === SECTION) li++; }));
   ok('D2 "' + SECTION + '" never opens on his program (denseHypertrophy gate)', li === 0, li);

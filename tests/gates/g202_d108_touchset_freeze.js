@@ -175,7 +175,7 @@ row('R5', (!SX.after.weeks[laterW] || canon(SX.after.weeks[laterW]) === canon(li
 const mannyRow = SV.lookup(H.MANNY_DIGEST_BY_VERSION, IA.version);
 const manny = H.progDigest(IA.buildProgram(JSON.parse(JSON.stringify(H.fixtures.HALF_MANNY))));
 row('R6', !!mannyRow && manny === mannyRow,
-  'HALF MANNY matches the V' + IA.version + ' row of MANNY_DIGEST_BY_VERSION ('
+  'HALF MANNY matches the ' + SV.tag(IA.version) + ' row of MANNY_DIGEST_BY_VERSION ('
   + (mannyRow || 'NO ROW') + '): got ' + manny + '. D108 changes no prescription; a move here '
   + 'is an unruled digest move, and an absent row is a missing pin, not a pass');
 
