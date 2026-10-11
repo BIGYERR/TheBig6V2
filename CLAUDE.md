@@ -71,11 +71,19 @@ session's files written into `tests/measure/` mid-proof.
    ~40 s); Mario may leave it behind. Tell Mario the live number you read back, never the number you pushed.
 
 ## Pipeline (Mario, Post-V239): fast locally, the full suite in CI, `main` only by pull request
-- **Branches.** Work lands on `dev`: commit and push there as often as needed. Every push to `dev` runs the full suite in
+- **Branches.** Work lands on the local `dev` branch in the main checkout: commit there as often as needed. Only that
+  branch, from that checkout, is ever pushed to `origin/dev`. Every push to `dev` runs the full suite in
   CI and nothing waits for it; Mario reviews the results and, to release, opens the pull request into `main` himself.
   `main` is what Pages serves and what Heroku deploys (`backend/scripts/heroku.sh deploy` ships `origin/main`'s
   `backend/`), and branch protection lets it change only through a pull request from `dev` whose pipeline checks all
-  passed. A branch off `dev` is rare and merges back into `dev`, never into `main`.
+  passed. A branch off `dev` is rare and merges back into local `dev`, never into `main`.
+- **A worktree never pushes (Mario, Post-V239).** A session in a git worktree (`.claude/worktrees/*`) commits on its own
+  branch and never runs `git push`, not to `dev` and not to any other branch. When its work is done it rebases that
+  branch onto the current local `dev`, fast-forwards local `dev` to it (`git -C <main checkout> merge --ff-only
+  <branch>`), then deletes the worktree and the branch. If a build is in flight in the main checkout (One writer per
+  working tree), it waits until that build commits. Its work reaches GitHub with the main checkout's next push. On
+  Post-V239 the semver worktree pushed three commits straight to `origin/dev` while the main checkout held four
+  unpushed ones, and `dev` forked (4 ahead, 3 behind) on a project with one developer.
 - **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs everything fast enough (the gate suite's quick steps
   and its fast gates, sabotage anchors, the app's and the backend's tests and lint) and stops at 60 s; the pre-commit
   hook (`.githooks/pre-commit`, `--staged`) runs the part a commit touches. A gate still running at 60 s is left to CI,
