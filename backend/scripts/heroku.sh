@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Heroku helper for the backend. Run from anywhere in the repo:
 #   bash backend/scripts/heroku.sh setup <app-name>   create or adopt the app, set config vars, add the git remote
-#   bash backend/scripts/heroku.sh deploy             push the committed backend/ to Heroku, then prove it is live
+#   bash backend/scripts/heroku.sh deploy             push origin/main's backend/ to Heroku, then prove it is live
 #   bash backend/scripts/heroku.sh verify             prove the live dyno runs the last deployed commit
 #   bash backend/scripts/heroku.sh status             dynos, release, /healthz
 #   bash backend/scripts/heroku.sh logs               tail the logs
@@ -82,12 +82,16 @@ cmd_deploy() {
   need_cli
   local app; app="$(app_name)"
 
-  # Only committed files deploy. Refuse rather than ship something other than what is on screen.
-  [ -z "$(git status --porcelain -- .)" ] || die "backend/ has uncommitted changes; commit them first"
-
+  # Deploy what passed the pipeline: backend/ as it is on origin/main, which only a pull request from dev whose checks
+  # passed can change (.github/workflows/pipeline.yml). HEROKU_DEPLOY_REF=<ref> deploys another ref, for an emergency.
+  local ref="${HEROKU_DEPLOY_REF:-origin/main}"
+  if [ "$ref" = "origin/main" ]; then git fetch --quiet origin main || die "cannot read origin/main"; fi
   local source tree parent commit
-  source="$(git rev-parse --short HEAD)"
-  tree="$(git rev-parse "HEAD:$PREFIX")"
+  source="$(git rev-parse --short "$ref")" || die "no such ref: $ref"
+  tree="$(git rev-parse "$ref:$PREFIX")"
+  if [ "$(git rev-parse "HEAD:$PREFIX" 2>/dev/null)" != "$tree" ] || [ -n "$(git status --porcelain -- .)" ]; then
+    echo "Note: this checkout's backend/ differs from $ref's. Deploying $ref's; yours ships once it is merged dev -> main."
+  fi
   # Build on what Heroku already has, so every deploy is a fast-forward and no force push is needed.
   parent=""
   if git fetch --quiet "$REMOTE" main 2>/dev/null; then parent="$(git rev-parse FETCH_HEAD)"; fi

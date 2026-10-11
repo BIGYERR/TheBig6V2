@@ -1,0 +1,271 @@
+#!/usr/bin/env node
+// The 60-second check: everything fast enough to run while developing, under a hard 60 second limit. It is the check
+// every commit runs (.githooks/pre-commit) and the local proof for every change. Everything slower (the full gate suite
+// with its row check, fuzz, sabotage, e2e) runs in GitHub Actions on the pull request from dev into main
+// (.github/workflows/pipeline.yml), which must pass before anything deploys.
+//
+//   node tools/check.mjs              all of it: the gate suite's fast part, the app, the backend
+//   node tools/check.mjs --staged     only what the staged files touch (what the pre-commit hook runs)
+//   node tools/check.mjs --list       print what would run, and exit
+//   node tools/check.mjs --measure    time every gate that might be fast (6 at a time, no limit) and rewrite the
+//                                     committed table tools/check-gate-times.txt; rerun after gates change a lot
+//
+// The limit is hard: nothing runs past 60 s from the start (IA_CHECK_SECONDS can lower it, never raise it). A gate still
+// running at the deadline is stopped and reported as left to CI, which is not a failure: CI runs every gate. Any other
+// step still running at the deadline fails the check, since app and backend tests are meant to take seconds.
+//
+// Which gates run here: those whose measured time is at most FAST_GATE_SECONDS, plus any gate with no measured time at
+// all (a new gate). A known gate's time comes from the committed table (tools/check-gate-times.txt), which changes only
+// when someone reruns --measure, so one busy moment never moves a gate. A gate the table does not know is timed on its
+// first check here (temp/check-gate-times.txt): if it is slow, or stopped at the deadline, later checks leave it to CI.
+// Gates the table does not list but tests/gate_times.txt times as slow are CI-only from the start.
+//
+// The check is a logged run (tools/runlog.mjs), type "check": every step and every gate result is an event.
+import { execFileSync, spawn } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { availableParallelism } from 'node:os';
+import { join } from 'node:path';
+import { REPO, ROOT, attachRun, duration, startRun } from './runlog.mjs';
+
+const LIMIT_S = Math.min(60, Number(process.env.IA_CHECK_SECONDS) || 60);
+const FAST_GATE_SECONDS = 12;
+/** Gates stop this long before the hard limit, so the check can still report and exit inside it. */
+const GATE_MARGIN_MS = 3000;
+const args = process.argv.slice(2);
+const STAGED = args.includes('--staged');
+const LIST = args.includes('--list');
+const MEASURE = args.includes('--measure');
+const t0 = Date.now();
+const deadline = t0 + (process.argv.includes('--measure') ? 3_600_000 : LIMIT_S * 1000);
+const left = () => deadline - Date.now();
+
+// ── What to check ──────────────────────────────────────────────────────────────────────────────────────────────
+function stagedPaths() {
+  try {
+    return execFileSync('git', ['-C', REPO, 'diff', '--cached', '--name-only'], { encoding: 'utf8' }).split('\n').filter(Boolean);
+  } catch {
+    return null;
+  }
+}
+const paths = STAGED ? stagedPaths() : null;
+const touches = (re) => paths === null || paths.some((p) => re.test(p));
+const want = {
+  gates: touches(/^(index\.html|tests\/)/),
+  app: touches(/^(app\/|tools\/|index\.html)/),
+  backend: touches(/^backend\//),
+};
+
+// ── Gate selection ─────────────────────────────────────────────────────────────────────────────────────────────
+const LOCAL_TIMES = join(ROOT, 'check-gate-times.txt');
+function readTimes(file) {
+  const out = new Map();
+  try {
+    for (const line of readFileSync(file, 'utf8').split('\n')) {
+      const m = /^([\w.-]+\.js)\s+([\d.]+)/.exec(line.trim());
+      if (m) out.set(m[1], Number(m[2]));
+    }
+  } catch {
+    // No such table: the next one decides.
+  }
+  return out;
+}
+const SEED = join(REPO, 'tools', 'check-gate-times.txt');
+const seed = readTimes(SEED);
+const tables = [seed, readTimes(LOCAL_TIMES), readTimes(join(REPO, 'tests', 'gate_times.txt'))];
+const timeOf = (g) => tables.find((t) => t.has(g))?.get(g);
+const allGates = existsSync(join(REPO, 'tests', 'gates'))
+  ? execFileSync('ls', [join(REPO, 'tests', 'gates')], { encoding: 'utf8' }).split('\n').filter((f) => f.endsWith('.js'))
+  : [];
+// --measure: every gate the slow-gate list does not already rule out (gate_times.txt over 15 s), timed without a limit.
+const fastGates = MEASURE
+  ? allGates.filter((g) => (readTimes(join(REPO, 'tests', 'gate_times.txt')).get(g) ?? 0) <= 15)
+  : allGates.filter((g) => (timeOf(g) ?? 0) <= FAST_GATE_SECONDS);
+// Longest first, so the slow ones are not the ones left running at the deadline; new gates (no time) first of all.
+fastGates.sort((a, b) => (timeOf(b) ?? 1e9) - (timeOf(a) ?? 1e9));
+const ciOnly = allGates.filter((g) => !fastGates.includes(g));
+
+if (LIST) {
+  console.log(`check: limit ${LIMIT_S} s; ${STAGED ? `staged files: ${paths?.length ?? 0}` : 'everything'}`);
+  console.log(`  gates   ${want.gates ? `${fastGates.length} fast gates here, ${ciOnly.length} in CI only (${ciOnly.join(' ')})` : 'not touched'}`);
+  console.log(`  app     ${want.app ? 'sync, typecheck, unit, integration, lint' : 'not touched'}`);
+  console.log(`  backend ${want.backend ? 'test, lint' : 'not touched'}`);
+  process.exit(0);
+}
+
+// ── Running ────────────────────────────────────────────────────────────────────────────────────────────────────
+const attached = attachRun();
+let run = attached;
+if (!run) {
+  try {
+    run = startRun('check', { command: ['node tools/check.mjs', ...args].join(' '), cwd: REPO });
+  } catch {
+    run = null;
+  }
+}
+const note = (subject, text, global = false) => run?.event(subject, text, { global });
+const failures = [];
+const toCI = [];
+
+/**
+ * Runs one command until it ends or `stopAt` (epoch ms). Resolves { code, out, ms, stopped }.
+ * @param {string} cmd @param {string[]} cmdArgs @param {string} cwd @param {number} stopAt
+ */
+function exec(cmd, cmdArgs, cwd, stopAt, env = {}) {
+  return new Promise((resolve) => {
+    const started = Date.now();
+    let out = '';
+    let stopped = false;
+    const child = spawn(cmd, cmdArgs, { cwd, env: { ...process.env, ...env, FORCE_COLOR: '0' }, stdio: ['ignore', 'pipe', 'pipe'] });
+    child.stdout.on('data', (d) => (out += d));
+    child.stderr.on('data', (d) => (out += d));
+    const timer = setTimeout(() => {
+      stopped = true;
+      child.kill('SIGKILL');
+    }, Math.max(0, stopAt - Date.now()));
+    child.on('error', (err) => {
+      out += `\n${err.message}`;
+    });
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      resolve({ code: code ?? 1, out, ms: Date.now() - started, stopped });
+    });
+  });
+}
+
+const tail = (out, n = 15) => out.trimEnd().split('\n').slice(-n).join('\n');
+
+/** One step that must finish: fails on a nonzero exit or on reaching the deadline. */
+async function step(lane, name, cmd, cmdArgs, cwd) {
+  if (left() <= 0) {
+    failures.push(`${lane}: ${name} did not start: the ${LIMIT_S} s limit was reached`);
+    return false;
+  }
+  const r = await exec(cmd, cmdArgs, cwd, deadline);
+  const ok = r.code === 0 && !r.stopped;
+  note(lane, `${ok ? 'ok' : r.stopped ? 'STOPPED at the limit' : 'FAILED'}: ${name} (${duration(r.ms)})`, !ok);
+  if (!ok) {
+    failures.push(`${lane}: ${name} ${r.stopped ? `was still running at the ${LIMIT_S} s limit` : `failed (exit ${r.code})`}`);
+    console.error(`\ncheck: ${lane}: ${name} ${r.stopped ? 'hit the limit' : 'failed'}:\n${tail(r.out)}\n`);
+  }
+  return ok;
+}
+
+/** The gate suite's quick steps (gate.sh steps 0 to 3), then the fast gates, JOBS at a time. */
+async function gatesLane() {
+  const html = readFileSync(join(REPO, 'index.html'), 'utf8');
+  const version = /<meta name="ia-version" content="(\d+)"/.exec(html)?.[1];
+  if (!version) {
+    failures.push('gates: index.html has no ia-version meta');
+    return;
+  }
+  note('gates', `index.html is ia-version ${version}`);
+  // The baseline gates compare against: the previous version, as tagged.
+  const scratch = join(ROOT, 'check');
+  mkdirSync(scratch, { recursive: true });
+  let base = '';
+  try {
+    base = join(scratch, `base_v${Number(version) - 1}.html`);
+    writeFileSync(base, execFileSync('git', ['-C', REPO, 'show', `V${Number(version) - 1}:index.html`], { maxBuffer: 64 * 1024 * 1024 }));
+  } catch {
+    base = '';
+    note('gates', `no V${Number(version) - 1} tag here; gates run without a baseline`);
+  }
+  const syntax = `const {extractInlineJS}=require(${JSON.stringify(join(REPO, 'tests', 'harness'))});new (require('vm').Script)(extractInlineJS(require('fs').readFileSync(${JSON.stringify(join(REPO, 'index.html'))},'utf8')))`;
+  if (!(await step('gates', 'inline script compiles', process.execPath, ['-e', syntax], REPO))) return;
+  await step('gates', 'version scope lint', process.execPath, ['tests/version_scope.js'], REPO);
+  await step('gates', 'boot', process.execPath, ['tests/harness.js', 'index.html'], REPO);
+  await step('gates', 'sabotage anchors', 'python3', ['tests/sabotage.py', '--anchors-only', 'index.html'], REPO);
+
+  const jobs = Math.max(2, availableParallelism() - 2);
+  const queue = [...fastGates];
+  const measured = new Map();
+  const stopAt = deadline - GATE_MARGIN_MS;
+  let passed = 0;
+  async function worker() {
+    for (let g = queue.shift(); g; g = queue.shift()) {
+      if (stopAt - Date.now() <= 0) {
+        toCI.push(g);
+        continue;
+      }
+      const r = await exec(process.execPath, [join('tests', 'gates', g), 'index.html', ...(base ? [base] : [])], REPO, stopAt, { IA_NO_RUNLOG: '1' });
+      if (r.stopped) {
+        toCI.push(g);
+        measured.set(g, Math.max(r.ms / 1000, FAST_GATE_SECONDS + 1));
+        continue;
+      }
+      measured.set(g, r.ms / 1000);
+      // Graded as gate.sh grades: one PASS/FAIL summary with FAIL 0, and no REFUSED assertion.
+      const summaries = [...r.out.matchAll(/^PASS (\d+) FAIL (\d+)/gm)];
+      const refused = /^REFUSED/m.test(r.out);
+      if (summaries.length !== 1 || summaries[0][2] !== '0' || refused) {
+        const why = !summaries.length ? 'printed no PASS/FAIL summary (crash?)' : refused ? 'REFUSED an assertion' : summaries.map((m) => m[0]).join(' / ');
+        failures.push(`gates: ${g} ${why}`);
+        note('gate', `RED ${g}: ${why}`, true);
+        console.error(`\ncheck: ${g}: ${why}\n${r.out.split('\n').filter((l) => /^\s*(FAIL|REFUSE)/.test(l)).slice(0, 20).join('\n') || tail(r.out)}\n`);
+      } else {
+        passed++;
+        note('gate', `${summaries[0][0]}  ${g} (${duration(r.ms)})`);
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: jobs }, worker));
+  try {
+    if (MEASURE) {
+      // The committed table, rewritten from this measurement.
+      const head = readFileSync(SEED, 'utf8').split('\n').filter((l) => l.startsWith('#'));
+      const rows = [...measured].sort((a, b) => a[1] - b[1]).map(([g, s]) => `${g} ${s.toFixed(1)}`);
+      writeFileSync(SEED, [...head, ...rows].join('\n') + '\n');
+      note('gates', `measured ${measured.size} gates; rewrote tools/check-gate-times.txt`, true);
+    } else {
+      // A gate the committed table does not know is timed here once; if it is slow, later checks leave it to CI.
+      const local = readTimes(LOCAL_TIMES);
+      for (const [g, s] of measured) if (!seed.has(g)) local.set(g, s);
+      writeFileSync(LOCAL_TIMES, [...local].map(([g, s]) => `${g} ${s.toFixed(1)}`).join('\n') + '\n');
+    }
+  } catch {
+    // Timing is a convenience.
+  }
+  note('gates', `${passed} of ${fastGates.length} fast gates passed here; ${ciOnly.length + toCI.length} left to CI${toCI.length ? ` (${toCI.length} stopped at the limit: ${toCI.join(' ')})` : ''}`);
+}
+
+async function appLane() {
+  const app = join(REPO, 'app');
+  if (!existsSync(join(app, 'node_modules'))) {
+    failures.push('app: app/node_modules is missing; run npm ci in app/');
+    return;
+  }
+  const bin = (name) => join(app, 'node_modules', '.bin', name);
+  if (!(await step('app', 'sync from index.html', process.execPath, ['scripts/sync-legacy.mjs'], app))) return;
+  await step('app', 'typecheck', bin('tsc'), ['-p', 'tsconfig.node.json'], app);
+  await step('app', 'unit tests', process.execPath, ['--test', '--test-reporter=spec', 'test/unit/**/*.test.ts'], app);
+  await step('app', 'integration tests', process.execPath, ['--test', '--test-reporter=spec', 'test/integration/**/*.test.ts'], app);
+  await step('app', 'lint', bin('ng'), ['lint'], app);
+}
+
+async function backendLane() {
+  const be = join(REPO, 'backend');
+  if (!existsSync(join(be, 'node_modules'))) {
+    failures.push('backend: backend/node_modules is missing; run npm ci in backend/');
+    return;
+  }
+  await step('backend', 'tests', process.execPath, ['--test', '--test-reporter=spec', 'test/'], be);
+  await step('backend', 'lint', join(be, 'node_modules', '.bin', 'eslint'), ['.'], be);
+}
+
+const lanes = [];
+if (want.gates) lanes.push(gatesLane());
+if (want.app) lanes.push(appLane());
+if (want.backend) lanes.push(backendLane());
+const what = [want.gates && 'gates', want.app && 'app', want.backend && 'backend'].filter(Boolean).join(', ') || 'nothing (no staged file needs a check)';
+console.log(`check: ${what}; hard limit ${LIMIT_S} s`);
+await Promise.all(lanes);
+
+const took = Date.now() - t0;
+const leftToCI = want.gates ? ciOnly.length + toCI.length : 0;
+const summary = failures.length
+  ? `FAILED in ${duration(took)}: ${failures.length} problem${failures.length === 1 ? '' : 's'}`
+  : `passed in ${duration(took)}${leftToCI ? `; ${leftToCI} slow gates are left to CI` : ''}`;
+console.log(`check: ${summary}`);
+for (const f of failures) console.log(`  - ${f}`);
+if (run && !attached) run.finish({ exitCode: failures.length ? 1 : 0, details: [summary] });
+process.exitCode = failures.length ? 1 : 0;

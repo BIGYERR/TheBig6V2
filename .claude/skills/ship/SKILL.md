@@ -6,6 +6,8 @@ Preconditions: builder has produced `index.html` at the new version, a baseline 
 
 **Which of these steps a run includes, and over which gates and mutations, is set by the Proof scope section of CLAUDE.md, the single source** (draft run or final run, LOCAL or CROSS-CUTTING, the dependency chain, the sabotage set). Where this file disagrees with it, CLAUDE.md wins.
 
+**Where each step runs is set by CLAUDE.md's Pipeline section (Mario, Post-V239).** Locally only what finishes inside 60 seconds: `node tools/check.mjs`, plus the build's new and edited gates and their previous-version runs. The full `gate.sh` run, fuzz and the sabotage proof set run in GitHub Actions on the pull request from `dev` into `main`; read them with `gh pr checks` and `gh run download`, never rerun them locally.
+
 Run the included steps in this order, each as `bash -c 'set -eo pipefail; …'`. A red step ends the run.
 
 1. `tests/gate.sh index.html <scratch>/base_V<N-1>.html`, or the dependency chain for a LOCAL change. **On the draft run, set both `ROW_RULED=tests/measure/v<N>_rulings/v<N>_row_ruled.txt` and `ROW_MANIFEST_OUT=<scratch>/row_manifest.new` on that one invocation.** `tests/row_manifest.txt` is regenerated only from that output, so a draft run without `ROW_MANIFEST_OUT` has to be run again (V237 lost 10 minutes to the relaunch).

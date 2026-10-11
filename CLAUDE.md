@@ -16,7 +16,7 @@ Mario is the sole developer, product owner and primary user.
 - **measure** — read-only. Owns the before-picture. Proves a reported bug at the reporter's seed, sweeps a lattice, names the root cause and every other reader of the same value. Reports numbers with denominators. Never rules, never proposes a fix.
 - **coach** — read-only. Owns coaching correctness and doctrine. Rules on WHAT should ship.
 - **builder** — read/write. Owns the edit. Writes anchor-asserted edit scripts. Never invents a ruling.
-- **gatekeeper** — read + bash, never edits. Owns proof. Runs `tests/gate.sh`, sabotage, blast radius, fuzz.
+- **gatekeeper** — read + bash, never edits. Owns proof. Runs the 60-second local proof and reads the pull request's CI run for the full suite (`tests/gate.sh`, sabotage, blast radius, fuzz, e2e); see Pipeline.
 **Gatekeeper blocks ship.** No version is done until gatekeeper's final run confirms the shipped artifact
 (Proof scope, below), every mutation the build ran TRIPPED with 0 NOT-APPLIED / 0 CRASH, and every diff hunk is classified.
 The main session orchestrates and talks to Mario; it does not do measure's, builder's or gatekeeper's job inline.
@@ -35,7 +35,7 @@ the return that was not saved.
 **One version per chat; a tests-only pass may precede it** (Mario, Post-V234). Each version starts in a fresh chat.
 A chat never carries past one version, and never past a
 compaction: if it compacts mid-build, stop at the next safe point (a builder slice either landed whole or stays parked
-in `tests/edits/`; nothing is committed that gatekeeper has not proved), tell Mario where the build stands, and
+in `tests/edits/`; nothing merges into `main` that the pipeline has not proved), tell Mario where the build stands, and
 continue in a fresh chat. **A chat ends by handing Mario the next chat's prompt:** one line naming the build and its target
 version, plus anything he has already decided for it. Standing rules live in this file, never in the prompt; per-build
 scope lives in handoff §12.
@@ -47,14 +47,39 @@ session's files written into `tests/measure/` mid-proof.
 2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `v<N>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience.
 4. Builder ships: anchor-asserted edits (every anchor `count==1` before writing), `ia-version` bumped by ONE, exactly when Mario says so. **Right before every builder dispatch**, re-read HEAD against `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
-5. Gatekeeper proves it as **Proof scope** (below) sets out: one draft run, one final run. `gate.sh` reports every red, not the first. Green or a NAMED failing gate.
+5. Gatekeeper proves it as **Pipeline** and **Proof scope** (below) set out: locally inside 60 seconds, then the full suite in CI on the pull request from `dev` into `main`. `gate.sh` reports every red, not the first. Green or a NAMED failing gate.
 6. `handoff-update` skill: the seven-element session entry. Then stage the build's files by path (every tracked change and every untracked file the build wrote; **never
-   `git add -A`**, Mario, Post-V238), and `git commit -m "V<N>: <one line>" && git push && git tag V<N> && git push --tags`.
-7. **A push is not a deploy. "Push" means Mario's phone gets the new version, and it is not done until you have proved that.** Pages can report its last build as `built` with no error while sitting several commits behind — it silently did not fire on V192 or V193. So after pushing, confirm all three, in this order, and never infer a later one from an earlier one:
-   - the remote has it: `git rev-parse main` == `git rev-parse origin/main`, and `git show origin/main:index.html | grep -oE 'content="[0-9]+"'` reads the new version (read it out of `origin/main`, not the working copy);
+   `git add -A`**, Mario, Post-V238), commit on `dev` (`git commit -m "V<N>: <one line>"`; the pre-commit hook runs the 60-second check) and `git push origin dev`.
+   Open the pull request into main if none is open (`gh pr create --base main --head dev --fill`; it follows every later push to dev), wait for every
+   check (`gh pr checks --watch`), merge it (`gh pr merge --merge`), then tag what merged: `git fetch origin && git tag V<N> origin/main && git push origin V<N>`.
+7. **A merge is not a deploy. "Push" means Mario's phone gets the new version, and it is not done until you have proved that.** Pages can report its last build as `built` with no error while sitting several commits behind — it silently did not fire on V192 or V193. So after the merge, confirm all three, in this order, and never infer a later one from an earlier one. The pipeline's `deploy proof (Pages)` job does exactly this on every merge (`tools/deploy-check.mjs`); read its result, or run `node tools/deploy-check.mjs --expect <N>` yourself:
+   - the remote has it: `git show origin/main:index.html | grep -oE 'content="[0-9]+"'` reads the new version (read it out of `origin/main`, not the working copy);
    - Pages built THAT commit: `gh api repos/bigyerr/TheBig6V2/pages/builds/latest --jq '.status, .commit'`. If the commit is stale, force it with `gh api -X POST repos/bigyerr/TheBig6V2/pages/builds` and poll until `built` (~40 s);
    - the live URL serves it: `curl -s "https://bigyerr.github.io/TheBig6V2/?cb=$(date +%s)" | grep -oE 'content="[0-9]+"'`. Cache-bust the query string; `cache-control` is `max-age=600`, so an unbusted fetch can lie for ten minutes.
    Only then is the version shipped. Tell Mario the live number you read back, not the number you pushed.
+
+## Pipeline (Mario, Post-V239): fast locally, the full suite in CI, `main` only by pull request
+- **Branches.** Work lands on `dev`: commit and push there as often as needed; GitHub runs no check on a push to dev.
+  `main` is what Pages serves and what Heroku deploys (`backend/scripts/heroku.sh deploy` ships `origin/main`'s
+  `backend/`), and branch protection lets it change only through a pull request from `dev` whose pipeline checks all
+  passed. A branch off `dev` is rare and merges back into `dev`, never into `main`.
+- **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs everything fast enough (the gate suite's quick steps
+  and its fast gates, sabotage anchors, the app's and the backend's tests and lint) and stops at 60 s; the pre-commit
+  hook (`.githooks/pre-commit`, `--staged`) runs the part a commit touches. A gate still running at 60 s is left to CI,
+  not failed. No local proof step waits longer than that: anything slower belongs in CI.
+- **The full suite runs in CI** (`.github/workflows/pipeline.yml`) on every pull request into `main`: `gate.sh` with
+  every gate, the row check (with the version's `ROW_RULED` licence when it exists) and the blast radius against the
+  previous tagged version; fuzz; sabotage anchors and the proof set since `main`; the app and backend tests and lint;
+  the Docker e2e. Every job must pass to merge, and each uploads its run log (`temp/`) as an artifact; the gate job's
+  includes the run's row manifest (`temp/row_manifest.txt`). After a merge the `deploy proof (Pages)` job runs.
+- **What this replaces in Proof scope below:** the Budget bullet (local proof is 60 s, hard; CI has no wall budget,
+  30 to 45 minutes is normal); the Draft run and final run bullet (the draft is the local check plus the build's new
+  and edited gates and their previous-version runs, inside 60 s; the full suite is the pull request's CI run; the final
+  run is CI on the commit that merges, and gatekeeper reads it with `gh pr checks` and `gh run download`); and every
+  full `gate.sh`, fuzz or sabotage run gatekeeper used to make locally. Gatekeeper regenerates `tests/row_manifest.txt`
+  from the CI run's `temp/row_manifest.txt` and the fix goes to `dev`, which reruns CI. The classify call, previous
+  version, version scope, row manifest rules, era rows, sabotage selection and review stand as written.
+- **The weekly full sweep** stays outside any build and runs by hand until it moves into a scheduled CI job.
 
 ## Proof scope (Mario, standing from Post-V233)
 This section is the single source for what a proof runs. `gatekeeper.md` and the `ship` and `session-start` skills point
@@ -274,4 +299,6 @@ Every brief to either carries the per-build items, then the standing lines for t
 - `index.html` — the app. `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).
 - `docs/design/THE_ASYLUM_DS_REFERENCE*.md` — design system (bone `#F4F1E8`, ink, signal orange `#CF4E1A`; `asyIcon()` inline SVG, never emoji in chrome).
 - `tests/harness.js` (VM boot + fixtures + `weekGrid` + `progDigest`), `tests/gate.sh` (runner), `tests/gates/*.js` (one file per gate family, each prints `PASS n FAIL n`), `tests/sabotage.py` + `tests/sabotage/*.json`, `tests/measure/` (measure-pass scripts, keep them), `tests/lint_allow.txt` (known dupes = debt).
+- `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit (`git config core.hooksPath .githooks` once per clone). `.github/workflows/pipeline.yml` — the full suite on every pull request from `dev` into `main`, and the deploy proof after each merge.
+- `tools/` — the run log (`tools/README.md`): every test, build, deploy and server run is a folder under `temp/runs/` (gitignored, kept out of iCloud) with a line in `temp/events.log`; `~/Library/Logs/IronAsylum/orchestration.log` has one line per top-level start on this Mac. When something went wrong, `node tools/logs.mjs` is the first place to look. `tools/deploy-check.mjs` is rhythm step 7 as one command.
 - `doctrine/*.txt` — page-ordered OCR of the NSW guide and the four NRC plans. Gitignored (not published by Pages); regenerate from the archives with `doctrine/README.md` if missing.
