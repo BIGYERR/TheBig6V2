@@ -23,14 +23,16 @@
 // The check is a logged run (tools/runlog.mjs), type "check": every step and every gate result is an event.
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { availableParallelism } from 'node:os';
-import { join } from 'node:path';
+import { availableParallelism, setPriority } from 'node:os';
+import { basename, join } from 'node:path';
 import { REPO, ROOT, attachRun, duration, startRun } from './runlog.mjs';
 
 const LIMIT_S = Math.min(60, Number(process.env.IA_CHECK_SECONDS) || 60);
 const FAST_GATE_SECONDS = 12;
 /** Gates stop this long before the hard limit, so the check can still report and exit inside it. */
 const GATE_MARGIN_MS = 3000;
+/** The gates' CPU priority (nice) while the app and backend lanes run beside them. */
+const GATE_NICE = 10;
 const args = process.argv.slice(2);
 const STAGED = args.includes('--staged');
 const LIST = args.includes('--list');
@@ -107,15 +109,23 @@ const failures = [];
 const toCI = [];
 
 /**
- * Runs one command until it ends or `stopAt` (epoch ms). Resolves { code, out, ms, stopped }.
+ * Runs one command until it ends or `stopAt` (epoch ms). Resolves { code, out, ms, stopped }. `nice` lowers its CPU
+ * priority (and its children's).
  * @param {string} cmd @param {string[]} cmdArgs @param {string} cwd @param {number} stopAt
  */
-function exec(cmd, cmdArgs, cwd, stopAt, env = {}) {
+function exec(cmd, cmdArgs, cwd, stopAt, env = {}, nice = 0) {
   return new Promise((resolve) => {
     const started = Date.now();
     let out = '';
     let stopped = false;
     const child = spawn(cmd, cmdArgs, { cwd, env: { ...process.env, ...env, FORCE_COLOR: '0' }, stdio: ['ignore', 'pipe', 'pipe'] });
+    if (nice && child.pid) {
+      try {
+        setPriority(child.pid, nice);
+      } catch {
+        // Runs at normal priority.
+      }
+    }
     child.stdout.on('data', (d) => (out += d));
     child.stderr.on('data', (d) => (out += d));
     const timer = setTimeout(() => {
@@ -146,6 +156,16 @@ async function step(lane, name, cmd, cmdArgs, cwd) {
   if (!ok) {
     failures.push(`${lane}: ${name} ${r.stopped ? `was still running at the ${LIMIT_S} s limit` : `failed (exit ${r.code})`}`);
     console.error(`\ncheck: ${lane}: ${name} ${r.stopped ? 'hit the limit' : 'failed'}:\n${tail(r.out)}\n`);
+    // The whole output stays with the run, so a red step can be read after the terminal is gone.
+    if (run) {
+      try {
+        const file = run.artifact(`${lane}-${name.replace(/\W+/g, '-')}.log`);
+        writeFileSync(file, r.out);
+        note(lane, `${name}: output kept in artifacts/${basename(file)}`, false);
+      } catch {
+        // The terminal still has the tail.
+      }
+    }
   }
   return ok;
 }
@@ -187,7 +207,9 @@ async function gatesLane() {
         toCI.push(g);
         continue;
       }
-      const r = await exec(process.execPath, [join('tests', 'gates', g), 'index.html', ...(base ? [base] : [])], REPO, stopAt, { IA_NO_RUNLOG: '1' });
+      // Gates run at lower priority: they take the idle cores, and the app and backend steps, which fail the check if
+      // the deadline catches them, win when the CPU is short. A gate the deadline catches is only left to CI.
+      const r = await exec(process.execPath, [join('tests', 'gates', g), 'index.html', ...(base ? [base] : [])], REPO, stopAt, { IA_NO_RUNLOG: '1' }, MEASURE ? 0 : GATE_NICE);
       if (r.stopped) {
         toCI.push(g);
         measured.set(g, Math.max(r.ms / 1000, FAST_GATE_SECONDS + 1));
@@ -236,10 +258,14 @@ async function appLane() {
   }
   const bin = (name) => join(app, 'node_modules', '.bin', name);
   if (!(await step('app', 'sync from index.html', process.execPath, ['scripts/sync-legacy.mjs'], app))) return;
-  await step('app', 'typecheck', bin('tsc'), ['-p', 'tsconfig.node.json'], app);
-  await step('app', 'unit tests', process.execPath, ['--test', '--test-reporter=spec', 'test/unit/**/*.test.ts'], app);
-  await step('app', 'integration tests', process.execPath, ['--test', '--test-reporter=spec', 'test/integration/**/*.test.ts'], app);
-  await step('app', 'lint', bin('ng'), ['lint'], app);
+  // Independent once the sync is done, so they run together: an app step at the deadline fails the check, a gate
+  // there is only left to CI, and in series the app lane is what nears the limit when the machine is busy.
+  await Promise.all([
+    step('app', 'typecheck', bin('tsc'), ['-p', 'tsconfig.node.json'], app),
+    step('app', 'unit tests', process.execPath, ['--test', '--test-reporter=spec', 'test/unit/**/*.test.ts'], app),
+    step('app', 'integration tests', process.execPath, ['--test', '--test-reporter=spec', 'test/integration/**/*.test.ts'], app),
+    step('app', 'lint', bin('ng'), ['lint'], app),
+  ]);
 }
 
 async function backendLane() {
@@ -248,8 +274,10 @@ async function backendLane() {
     failures.push('backend: backend/node_modules is missing; run npm ci in backend/');
     return;
   }
-  await step('backend', 'tests', process.execPath, ['--test', '--test-reporter=spec', 'test/'], be);
-  await step('backend', 'lint', join(be, 'node_modules', '.bin', 'eslint'), ['.'], be);
+  await Promise.all([
+    step('backend', 'tests', process.execPath, ['--test', '--test-reporter=spec', 'test/'], be),
+    step('backend', 'lint', join(be, 'node_modules', '.bin', 'eslint'), ['.'], be),
+  ]);
 }
 
 const lanes = [];
