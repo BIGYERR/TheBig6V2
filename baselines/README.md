@@ -1,6 +1,6 @@
 # Baselines
 
-Previous builds, kept so blast-radius and gate work always has a real `N-1` to diff against.
+Previous builds, kept so blast-radius and gate work always has a real previous release to diff against.
 
 **Why this directory exists.** V188 and V189 were never committed. All three tags `V188`, `V189` and
 `V190` pointed at the same V190 commit, so `git show V189:index.html` returned V190 and the
@@ -11,7 +11,8 @@ without V189 the 28-hunk D39 diff could not be classified and three §5r figures
 
 **The rule now.** Git tags are the record of every release from V190 on. Checked 2026-10-11: each
 tag from V190 through V239 checks out an `index.html` that reads its own `ia-version`, so
-`git show V<N>:index.html` gives the previous build for any blast-radius run. Only V188 and V189 are
+`git show <tag>:index.html` gives that release; the previous release for a candidate is the tag just below it
+(`git tag --list | node tests/semver.js below <candidate>`), never "N-1". Only V188 and V189 are
 wrong (both tags check out V190), so their files here are the only true copies. This folder no
 longer grows with each release. It keeps three files: V188 and V189 for that reason, and V196
 because `tests/gates/g197d_d84_base.js` reads it as its fixed pre-D84 artifact. Add a file here only

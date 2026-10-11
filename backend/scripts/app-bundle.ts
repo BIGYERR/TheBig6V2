@@ -17,7 +17,7 @@ const SOURCE = resolve(process.env.APP_SOURCE_DIR || join(BACKEND, '..'));
 const OUT = resolve(process.env.APP_BUNDLE_DIR || join(BACKEND, 'app-web'));
 const APP_FILES = ['index.html', 'apple-touch-icon.png'];
 
-/** The ia-version the page declares, as written (239, or 0.240.0 after the semver switch), or ''. */
+/** The ia-version the page declares, as written (239 before the semver switch, 0.239.1 and on after it), or ''. */
 function appVersionOf(html: string): string {
   return /<meta name="ia-version" content="([^"]*)"/.exec(html)?.[1] ?? '';
 }

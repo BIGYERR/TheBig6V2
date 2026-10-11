@@ -1,4 +1,4 @@
-Measure-pass scripts live here, one per question, named `v<N>_<question>.js`. They are kept, not deleted:
+Measure-pass scripts live here, one per question, named `v<version>_<question>.js` (for example `v0.240.0_<question>.js`; pre-semver scripts keep `v<N>_`). They are kept, not deleted:
 the before-picture is part of the record. Pattern:
 
 ```js

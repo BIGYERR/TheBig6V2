@@ -69,7 +69,7 @@ describe('the newest version comes from config, then the app at /app/, then the 
   let dir: string;
   before(() => {
     dir = mkdtempSync(join(tmpdir(), 'ia-app-'));
-    writeFileSync(join(dir, 'index.html'), '<!doctype html><meta name="ia-version" content="240"><title>app</title>');
+    writeFileSync(join(dir, 'index.html'), '<!doctype html><meta name="ia-version" content="0.239.1"><title>app</title>');
   });
   after(() => rmSync(dir, { recursive: true, force: true }));
 
@@ -77,13 +77,13 @@ describe('the newest version comes from config, then the app at /app/, then the 
     const s = await boot({}, dir);
     await s.beat({ appVersion: '239' });
     const v = await s.admin('versions');
-    assert.deepEqual([v.latest, v.latestFrom, v.outdated], ['240', 'app', 1]);
+    assert.deepEqual([v.latest, v.latestFrom, v.outdated], ['0.239.1', 'app', 1]);
     await s.close();
   });
 
   test('APP_LATEST_VERSION wins over the bundled app', async () => {
     const s = await boot({ APP_LATEST_VERSION: '0.241.0' }, dir);
-    await s.beat({ appVersion: '240' });
+    await s.beat({ appVersion: '0.239.1' });
     const v = await s.admin('versions');
     assert.deepEqual([v.latest, v.latestFrom, v.outdated], ['0.241.0', 'config', 1]);
     await s.close();
@@ -94,12 +94,12 @@ describe('the newest version comes from config, then the app at /app/, then the 
     const r = await fetch(`${s.base}/app/`);
     assert.equal(r.status, 200);
     assert.equal(r.headers.get('cache-control'), 'no-cache');
-    assert.match(await r.text(), /content="240"/);
+    assert.match(await r.text(), /content="0\.239\.1"/);
     assert.equal((await fetch(`${s.base}/app`, { redirect: 'manual' })).status, 301, '/app goes to /app/ so relative links work');
-    assert.equal((await (await fetch(`${s.base}/healthz`)).json()).app, '240');
+    assert.equal((await (await fetch(`${s.base}/healthz`)).json()).app, '0.239.1');
     // A new bundle shows without a restart (the version is read again when the file changes).
-    writeFileSync(join(dir, 'index.html'), '<!doctype html><meta name="ia-version" content="241"><title>app</title>');
-    assert.equal((await (await fetch(`${s.base}/healthz`)).json()).app, '241');
+    writeFileSync(join(dir, 'index.html'), '<!doctype html><meta name="ia-version" content="0.240.0"><title>app</title>');
+    assert.equal((await (await fetch(`${s.base}/healthz`)).json()).app, '0.240.0');
     await s.close();
   });
 

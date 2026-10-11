@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Iron Asylum sabotage runner.
 
-    python3 tests/sabotage.py <candidate.html> tests/sabotage/<vNNN>.json
+    python3 tests/sabotage.py <candidate.html> tests/sabotage/v<M.m.p>.json   (pre-semver specs keep v<N>.json)
 
 Each mutation in the JSON is {"name","anchor","replacement","gate"}:
   - anchor must occur EXACTLY once in the candidate (else NOT-APPLIED — reported

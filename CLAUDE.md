@@ -171,7 +171,7 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
   or changes a row shows as a manifest hunk, and a ruling that names a new row with no manifest hunk is red. A manifest
   hunk that no ruling explains is red in both directions, rows added as well as rows removed. Every new
   gate, and every gate converted by hand, prints its rows through the shared status helper `tests/status.js`.
-  The main session writes the ruling's new rows into the licence file `tests/measure/v<N>_rulings/v<N>_row_ruled.txt`
+  The main session writes the ruling's new rows into the licence file `tests/measure/v<version>_rulings/v<version>_row_ruled.txt`
   (`gate.sh` reads it as `ROW_RULED`) before the draft run, and gatekeeper's brief carries it. A row the ruling's list
   missed is added to the ruling (its saved file and the licence file) before the final run, never licensed on the
   fly (Mario, Post-V235).

@@ -3,7 +3,7 @@
 #
 # Decision (Mario, tests/measure/v233_rulings/post_v233_proof_scope_decisions.md: "script the 'nothing moved' version
 # rows"); CLAUDE.md Proof scope, "Era rows": "A table the ruling does not move gets its reference row from
-# `tests/era_bump.py <N>`, never by hand. A table the ruling moves is written by builder from coach's printed digest
+# `tests/era_bump.py <version>`, never by hand. A table the ruling moves is written by builder from coach's printed digest
 # (standing ruling 5)." and "Previous version": "A row written by the era script does not make a gate edited."
 # Table list: measure mT (tests/measure/v233_rulings/measure_tooling_inventory_mT.md section 1), verified against the
 # V233 rows and tests/edits/v233_e1_era_harness_g193.py, v233_e2_era_g197b_g200_g219.py, v233_e3_era_g199.py.
@@ -246,17 +246,17 @@ def read(relpath):
 
 
 def ver_text(v):
-    """Version v as the command line and the summaries print it: 240 (legacy) or 0.239.1 (dotted)."""
+    """Version v as the command line and the summaries print it: 239 (legacy) or 0.239.1 (dotted)."""
     return '%d' % v.minor if v.legacy else SV.str_(v)
 
 
 def ver_label(v):
-    """The era_bump mark of version v: V240 (legacy, as before semver) or v0.239.1 (dotted, the tag form)."""
+    """The era_bump mark of version v: V239 (legacy, as before semver) or v0.239.1 (dotted, the tag form)."""
     return 'V%d' % v.minor if v.legacy else 'v' + SV.str_(v)
 
 
 def key_text(v):
-    """The row key era_bump writes for version v: 240 (legacy) or '0.239.1' (dotted, quoted)."""
+    """The row key era_bump writes for version v: 239 (legacy) or '0.239.1' (dotted, quoted)."""
     return '%d' % v.minor if v.legacy else "'%s'" % SV.str_(v)
 
 
@@ -290,6 +290,9 @@ def parse_version(s, what):
 
 # ---- mode: bump ------------------------------------------------------------------------------------------------------
 def bump(v, ruling, moved_arg, dry):
+    if v.legacy:
+        die('REFUSED: <V> %s is a pre-semver build number; builds 1 to 239 already have their era rows, and every new '
+            'release is a dotted M.m.p such as 0.239.1 (CLAUDE.md, PRIORITY 1)' % ver_text(v))
     refusals = []
     lab, kt = ver_label(v), key_text(v)
     rp = os.path.abspath(ruling)
