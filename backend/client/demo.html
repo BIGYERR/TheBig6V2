@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connection dot</title>
+  <style>
+    :root { --bg:#F4F1E8; --surface:#FBFAF5; --border:#D5CEBD; --border2:#BCB29B; --text:#181712; --muted:#6B6557; --run:#5e8c54; --signal:#CF4E1A; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; }
+    .top-bar { background:var(--surface); border-bottom:1px solid var(--border); padding:14px 16px; }
+    .app-title { font-weight:800; letter-spacing:.06em; font-size:18px; display:flex; align-items:center; }
+    .app-title span { color:var(--signal); margin-left:.3em; }
+    main { padding:16px; max-width:520px; }
+    dl { display:grid; grid-template-columns:max-content 1fr; gap:6px 14px; font-size:14px; }
+    dt { color:var(--muted); }
+    dd { margin:0; font-family:ui-monospace,'SF Mono',Menlo,monospace; word-break:break-all; }
+    p { color:var(--muted); font-size:14px; line-height:1.45; }
+
+    /* The indicator itself: these rules move into index.html's <style> with the snippet. */
+    .ia-link { display:inline-block; width:7px; height:7px; border-radius:50%; margin-left:8px; flex:none;
+      box-shadow:inset 0 0 0 1.5px var(--border2); transition:background-color .4s, box-shadow .4s; }
+    .ia-link.on { background:var(--run); box-shadow:none; }
+    .ia-link[hidden] { display:none; }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="app-title">THE<span>ASYLUM</span><span id="iaLinkDot" class="ia-link" role="status" aria-label="Connecting" title="Connecting" hidden></span></div>
+  </div>
+  <main>
+    <p>The dot beside the title is the connection indicator as it would sit in the app. Sage means the last
+      heartbeat reached the backend. A hollow ring means it did not, or has not yet. Turn the server off or go
+      offline to watch it change. This page talks to the backend it is served from, or to <code>?api=</code>.</p>
+    <dl>
+      <dt>Backend</dt><dd id="api"></dd>
+      <dt>Device UID</dt><dd id="uid"></dd>
+      <dt>Label</dt><dd id="label"></dd>
+      <dt>Last round trip</dt><dd id="rtt"></dd>
+    </dl>
+  </main>
+  <script>
+    window.IA_BACKEND_URL = new URLSearchParams(location.search).get('api') || location.origin;
+    window.IA_VERSION = 'demo';
+  </script>
+  <script src="ia-link.js"></script>
+  <script>
+    setInterval(function () {
+      document.getElementById('api').textContent = IA_BACKEND_URL;
+      document.getElementById('uid').textContent = iaLinkUid() || 'not issued yet';
+      document.getElementById('label').textContent = iaLinkLabel() + ' · ' + iaLinkPlatform();
+      document.getElementById('rtt').textContent = _iaLink.rtt == null ? 'none yet' : _iaLink.rtt + ' ms';
+    }, 500);
+  </script>
+</body>
+</html>

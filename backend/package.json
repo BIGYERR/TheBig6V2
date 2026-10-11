@@ -1,0 +1,50 @@
+{
+  "name": "iron-asylum-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Iron Asylum backend: the device heartbeat API and the admin vision dashboard.",
+  "type": "module",
+  "main": "server/server.js",
+  "engines": {
+    "node": "26.x"
+  },
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "build": "ng build",
+    "admin:dev": "ng serve",
+    "test": "node --test test/",
+    "docker:up": "docker compose up --build -d --wait",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f api",
+    "heroku": "bash scripts/heroku.sh",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.2",
+    "@angular/cli": "^22.2.2",
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/compiler-cli": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@eslint/js": "^10.0.1",
+    "angular-eslint": "^22.5.0",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.69.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "@parcel/watcher": false,
+    "fsevents": false,
+    "lmdb": false,
+    "msgpackr-extract": false
+  }
+}

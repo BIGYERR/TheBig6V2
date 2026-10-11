@@ -1,0 +1,25 @@
+/* The Asylum design tokens (THE_ASYLUM_DS_REFERENCE.md), the few the admin page uses. */
+:root {
+  --bg: #f4f1e8;
+  --surface: #fbfaf5;
+  --surface2: #ece7da;
+  --border: #d5cebd;
+  --border2: #bcb29b;
+  --text: #181712;
+  --muted: #6b6557;
+  --signal: #cf4e1a;
+  --run: #5e8c54;
+  --red: #9e3328;
+  --warn: #b07a1e;
+  --font-text: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+}
