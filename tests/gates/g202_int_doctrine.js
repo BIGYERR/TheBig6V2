@@ -53,6 +53,7 @@
 const path = require('path');
 const fs = require('fs');
 const { load, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
@@ -70,7 +71,7 @@ const RUN_LABEL_BY_VERSION = [
   { from: 202, to: 207,      ruling: 'pre-D103a',    int: /Interval \(INT\)/,      chi: /Continuous High Intensity \(CHI\)/ },
   { from: 208, to: Infinity, ruling: 'D103a (V208)', int: /Short Interval \(SI\)/, chi: /Long Interval \(LI\)/ },
 ];
-const LBL = RUN_LABEL_BY_VERSION.filter(r => +IA.version >= r.from && +IA.version <= r.to)[0]
+const LBL = RUN_LABEL_BY_VERSION.filter(r => SV.cmp(IA.version, r.from) >= 0 && SV.cmp(IA.version, r.to) <= 0)[0]
   || { ruling: 'NO ROW', int: /(?!)/, chi: /(?!)/ };
 if(LBL.ruling === 'NO ROW'){ FAIL++; console.log('  FAIL LABEL-ERA no RUN_LABEL_BY_VERSION row covers ia-version ' + IA.version
   + ': the run quality labels have no ruled text at this version, so every row that finds a card by label is void'); }
@@ -153,16 +154,16 @@ const handRepsV115 = (w, tw, span) => {
 // 2026-09-23), hoisted to PACE_IMPROVE. This gate's oracle was not on the dispatch list's pin
 // sweep when D186/D187 shipped, so both the rate AND the step divisor/multiplier are era-tabled
 // here on ia-version, standing rule 4: below 225 today's values, from 225 D186+D187's.
-const PACE_CAP_INT_18_35 = (+IA.version >= 225) ? 3 : 5;   // D101 x D187: intermediate x age scale 1.0 (was 5, D187 T1 moves it to 3)
+const PACE_CAP_INT_18_35 = (SV.cmp(IA.version, 225) >= 0) ? 3 : 5;   // D101 x D187: intermediate x age scale 1.0 (was 5, D187 T1 moves it to 3)
 const handPaceRow = (anchor, goalPace, tw) => {
   const target = Math.min(goalPace, anchor);  // a goal already met parks the clock flat
   const bw     = handBuildWks(tw);
   // D186 (V225): N build weeks are N - 1 steps between week 1 and week N, so the gap divides
   // over max(bw - 1, 1) and the realistic target multiplies by max(bw - 1, 0), not bw. Below 225
   // the pre-D186 (one-step-off) arithmetic stands, byte-identical to before this era-table.
-  const steps  = (+IA.version >= 225) ? Math.max(bw - 1, 1) : Math.max(bw, 1);
+  const steps  = (SV.cmp(IA.version, 225) >= 0) ? Math.max(bw - 1, 1) : Math.max(bw, 1);
   const gain   = Math.min((anchor - target) / steps, PACE_CAP_INT_18_35);
-  const real   = +(anchor - gain * ((+IA.version >= 225) ? Math.max(bw - 1, 0) : bw)).toFixed(1);
+  const real   = +(anchor - gain * ((SV.cmp(IA.version, 225) >= 0) ? Math.max(bw - 1, 0) : bw)).toFixed(1);
   const tgt = [];
   for(let w = 1; w <= tw; w++){
     const a = (w > bw) ? real : +(Math.max(anchor - gain * bw, anchor - gain * (w - 1))).toFixed(1);
@@ -504,14 +505,14 @@ const INT_MECHANISM_BY_VERSION = [
     note: 'D113a: four-run as the 212 row; three-run two-quality = one INT + one CHI every week; '
         + 'three-run spacer = INT 1..cross-1 then CHI cross..tw; reps Table 6' }
 ];
-const IAV = +IA.version;
-const INT_ERA = INT_MECHANISM_BY_VERSION.filter(r => IAV <= r.upTo)[0] || null;
+const IAV = SV.parse(IA.version);
+const INT_ERA = INT_MECHANISM_BY_VERSION.filter(r => SV.cmp(IAV, r.upTo) <= 0)[0] || null;
 // V213 (D113a): THE LICENCE IS RETIRED, NOT RENEWED. D113a ships the rule this licence was
 // waiting for, as the era row above, so from 213 the three-run arm is judged by the rule and the
 // crossover pin lives only in the <=212 rows. The constant stays because it is still read: an
 // artifact above 212 that no D113a rule row covers is refused exactly as before.
 const THREE_RUN_LICENCE_TO = 212; // RETIRED at V213 by D113a: the refusal below now fires only when no D113a rule row covers the artifact.
-if(IAV > THREE_RUN_LICENCE_TO && !(INT_ERA && INT_ERA.arm === 'd113a')){
+if(SV.cmp(IAV, THREE_RUN_LICENCE_TO) > 0 && !(INT_ERA && INT_ERA.arm === 'd113a')){
   FAIL++;
   console.log('  FAIL D7-LICENCE the three-run INT card rule in this file pins cross - 1 cards, which is '
     + 'THE ARTIFACT AS SHIPPED AT ia-version ' + THREE_RUN_LICENCE_TO + ' AND NOT THE DOCTRINE AS RULED. '
@@ -562,7 +563,7 @@ const HAND_REPS_ROWS = { 6:  [4,4,5,5,3,3],
 // literal rows. Era-table every row too, standing rule 4: below 225 today's values (verified
 // unchanged), from 225 the D186+D187 values, hand-verified against the real V225 engine (both
 // buildProgram directly and handPaceRow agree, byte for byte, on all six rows below).
-const R225 = +IA.version >= 225;
+const R225 = SV.cmp(IA.version, 225) >= 0;
 const PACE_REPS = [
   { tag: '8:15 mile, 1.5 mi goal',  anchor: 509.3064395186472, goal: 630/1.5, tw: 11,
     cfg: paceGoal({ targetDist:'1.5', targetMins:'10', targetSecs:'30', targetTime:'10:30',
@@ -836,7 +837,7 @@ const INT_NOTE_BY_VERSION = [
   { from: 208, to: Infinity, ruling: 'D103a (V208)', head: 'SI: Zone 5 (95%+ max HR) on work efforts.',
     label: null },                                       // D103a: the INT is the Short Interval; body unchanged
 ];
-const D9_ERA = INT_NOTE_BY_VERSION.filter(r => IAV >= r.from && IAV <= r.to)[0] || null;
+const D9_ERA = INT_NOTE_BY_VERSION.filter(r => SV.cmp(IAV, r.from) >= 0 && SV.cmp(IAV, r.to) <= 0)[0] || null;
 if(!D9_ERA){
   FAIL++;
   console.log(`  FAIL D9-ERA no INT_NOTE_BY_VERSION row covers ia-version ${IAV}: the generic INT note has `

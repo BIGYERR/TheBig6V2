@@ -57,17 +57,18 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const { load, progDigest, fixtures, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const IA = load(ART);
-const VER = +IA.version, ERA = 216;
+const VER = SV.parse(IA.version), ERA = 216;
 const ROWS = ['F1','G1','G2','HM'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = l => { skip++; console.log('SKIP ' + l); };
 const done = () => { if(TMP) try { fs.rmSync(TMP, { recursive:true, force:true }); } catch(e){}
   console.log('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-if(VER < ERA){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D156 (V' + ERA + ').'); ROWS.forEach(r => skipRow(r + ' below the D156 era')); done(); }
+if(SV.cmp(VER, ERA) < 0){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D156 (V' + ERA + ').'); ROWS.forEach(r => skipRow(r + ' below the D156 era')); done(); }
 
 // ── oracles ──────────────────────────────────────────────────────────────────────────────
 const card = y => (y && !y.rest && y.cardio && !Array.isArray(y.cardio)) ? y.cardio : null;
@@ -149,7 +150,7 @@ ok('G2 tier B long days: none prints more than 8 working sets (' + G.bDays + ' d
 // to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
 // D156 (standing ruling 4).
 { const d = progDigest(IA.buildProgram(cl(fixtures.HALF_MANNY)));
-  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  const eraV = SV.parse(IA.version), eraHas = SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) !== undefined, eraRow = eraHas ? SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) : undefined;
   ok('HM HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved)',
      eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && d === eraRow, d + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 done();

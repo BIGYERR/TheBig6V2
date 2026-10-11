@@ -158,6 +158,7 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const { load, fixtures, progDigest } = H;
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -295,15 +296,15 @@ const cnt = (s, sub) => String(s).split(sub).length - 1;
 
 // ── LOAD + VERSION PREDICATE ───────────────────────────────────────────────────────────────────────────────────────
 let IA, STAMP = NaN;
-try { IA = load(ART); STAMP = +IA.version; } catch(e){ Object.keys(R).forEach(k => ok(k, R[k] + ' (boot: ' + e.message + ')', false)); done(); }
+try { IA = load(ART); STAMP = SV.parse(IA.version); } catch(e){ Object.keys(R).forEach(k => ok(k, R[k] + ' (boot: ' + e.message + ')', false)); done(); }
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION !== undefined){
-  if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+  if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   } else console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-console.log('g229 D193 build half (R2 clamp, R7 held test, stripper fifth shape) | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
-if(!(VER >= ERA)){
+console.log('g229 D193 build half (R2 clamp, R7 held test, stripper fifth shape) | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : ''));
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D193 P-CAPRPE\'s build half (V' + ERA + ', D194 R2(1)). No row may pass on it.');
   Object.keys(R).forEach(k => ok(k, R[k] + ' (REFUSED)', false));
   done();
@@ -311,7 +312,7 @@ if(!(VER >= ERA)){
 let BASE_OK = false, baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ BASE_OK = true; FILES.B = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ BASE_OK = true; FILES.B = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!BASE_OK){
   const f = path.join(os.tmpdir(), 'g229_d193_build_v' + BASE_ERA + '_' + process.pid + '.html');
@@ -319,7 +320,7 @@ if(!BASE_OK){
     try { fs.unlinkSync(f); } catch(e){}
     process.on('exit', () => { try { fs.unlinkSync(f); } catch(e){} });
     fs.writeFileSync(f, cp.execFileSync('git', ['-C', ROOT, 'show', V228_COMMIT + ':index.html'], { maxBuffer: 1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ BASE_OK = true; FILES.B = f; baseWhy += 'git show ' + V228_COMMIT.slice(0, 7) + ':index.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ BASE_OK = true; FILES.B = f; baseWhy += 'git show ' + V228_COMMIT.slice(0, 7) + ':index.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 console.log('  V' + BASE_ERA + ' baseline: ' + (BASE_OK ? 'LIVE (' + baseWhy + ')' : 'SETUP FAILED (' + baseWhy + ')'));
@@ -442,7 +443,7 @@ if(!BASE_OK){
   // ── b ──────────────────────────────────────────────────────────────────────────────────────────────────────────
   const MD = H.MANNY_DIGEST_BY_VERSION || {};
   const has = Object.prototype.hasOwnProperty.call(MD, ERA) && typeof MD[ERA] === 'string', ref = has && MD[ERA] === MD[BASE_ERA];
-  const row = MD[VER];
+  const row = SV.lookup(MD, VER);
   const built = progDigest(load(ART).buildProgram(clone(fixtures.HALF_MANNY)));          // the harness way (real clock)
   const builtPin = progDigest(plainVM('C').buildProgram(clone(fixtures.HALF_MANNY)));     // and on the gate's pinned clock
   const mannyOK = has && ref && typeof row === 'string' && built === row && builtPin === row;
@@ -462,7 +463,7 @@ if(!BASE_OK){
   // Row b's two "byte-identical to V228" conjuncts (V231 absorb ruling, dark from `VER >= V231_ERA`) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
   const bKeep = selfAll && B.inj > 0 && movedAll && B.un === UNINJ_N && B.preHold === 0 && mannyOK
     && OB.n > 0 && OB.same === OB.n && OB.rec === OB.n && OB.boot === OB.n && OB.undo === OB.n && OB.pre === 0 && OB.ph === 0 && OB.store === 0;
-  ok('b', R.b + (has ? '' : ' (row MANNY_DIGEST_BY_VERSION[' + ERA + '] ABSENT)') + (VER >= V231_ERA ? ' [V231 split: object row, _preHold, MANNY era row, > 0 moved]' : ''),
+  ok('b', R.b + (has ? '' : ' (row MANNY_DIGEST_BY_VERSION[' + ERA + '] ABSENT)') + (SV.cmp(VER, V231_ERA) >= 0 ? ' [V231 split: object row, _preHold, MANNY era row, > 0 moved]' : ''),
     bKeep,
     'outside ' + B.injSame + '/' + B.inj + ', moved L432 ' + (B.moved.L432 || 0) + ' HB ' + (B.moved.HB || 0) + ' L1 ' + (B.moved.L1 || 0) + '; uninjured ' + B.unSame + '/' + B.un + '; MANNY [' + ERA + ']' + (ref ? '===' : '!==') + '[' + BASE_ERA + '], ' + built + (built === row ? ' == ' : ' != ') + '[' + VER + ']; object row ' + OB.same + '/' + OB.n + ', _preHold ' + OB.pre);
 
@@ -475,7 +476,7 @@ if(!BASE_OK){
   // (the renamed tier is counted on every tree and printed; V230 reads 0).
   const bwSets = !!(D.bwsets && D.bwsets.bySet.L432 > 0 && D.bwsets.bySet.HB > 0 && D.bwsets.bySet.L1 > 0);
   { const d = D.bwsets || newD(); console.log('    d bwsets renamed to a D196 name with the hand hold ' + d.ren + ' (' + fmt(d.renSet) + ') | ' + fmt(d.renTab)); }
-  if(VER >= V231_ERA){ const d = D.bwsets || newD();
+  if(SV.cmp(VER, V231_ERA) >= 0){ const d = D.bwsets || newD();
     ok('dBW', R.dBW + ' [V231 D196-1: ' + D196_BW.same + ' same name + ' + D196_BW.ren + ' renamed to a D196 name = ' + D196_BW.pop + ']',
       selfAll && bwSets && d.pop === D196_BW.pop && d.ok === D196_BW.same && d.ren === D196_BW.ren && d.ok + d.ren === d.pop && d.forb === 0 && d.notSeven === 0,
       d.ok + ' same name + ' + d.ren + ' renamed of ' + d.pop + ' hand hold, ' + d.forb + ' keep FORBID, ' + d.notSeven + ' RPE != 7'); }
@@ -513,7 +514,7 @@ if(!BASE_OK){
   // the row asserts its V229 figures.
   // Row j's "L1 uninjured byte-identical to V228" conjunct (V231 absorb ruling, dark from `VER >= V231_ERA`) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
   console.log('    j L1 held test cards by the candidate\'s final name: ' + J_BURP + ' ' + JJ.burpC + ', ' + J_BED + ' ' + JJ.bed + ' (renamed with R7\'s text ' + JJ.ren + ', from ' + J_BURP + ' ' + JJ.renBurp + ': ' + fmt(JJ.renTab) + ')');
-  if(VER >= V231_ERA){
+  if(SV.cmp(VER, V231_ERA) >= 0){
     ok('j', R.j + ' [V231 D196-1: held ' + J_HELD + ' = ' + J_V231.same + ' same name + ' + J_V231.ren + ' renamed to the bed thrust, final-name Burpees ' + J_V231.burpees + ']',
       selfAll && JJ.held === J_HELD && JJ.heldOK === J_V231.same && JJ.ren === J_V231.ren && JJ.renBurp === J_V231.ren && JJ.heldOK + JJ.ren === JJ.held && JJ.burpC === J_V231.burpees && JJ.bed === J_V231.bed
         && JJ.unheld === J_UNHELD && JJ.unheldSame === J_UNHELD && JJ.r7L1 === J_HELD && JJ.r7Un === 0 && JJ.numOnly === 0 && JJ.l1Un === J_UNINJ && JJ.heldOtherOK === JJ.heldOther && JJ.unheldOtherSame === JJ.unheldOther,
@@ -557,7 +558,7 @@ if(!BASE_OK){
 {
   // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, g229_d193:508 f ABSORB, class A-1; standing
   // rulings 2 and 4): the L9 non-cue population is 1,734 at 231 and up (typed, the ruling's print), 1,722 below.
-  const V231_ERA = 231, NONCUE_V231 = 1734, nonCue = VER >= V231_ERA ? NONCUE_V231 : NONCUE_L9;
+  const V231_ERA = 231, NONCUE_V231 = 1734, nonCue = SV.cmp(VER, V231_ERA) >= 0 ? NONCUE_V231 : NONCUE_L9;
   const lit = n => E(XF, 'typeof ' + n + "==='string'?" + n + ':null');
   const held = lit('INJ_HELD_TEST'), test = lit('TEST_RX_TEXT');
   const litOK = held === R7_T && test === TEST_T;
@@ -574,7 +575,7 @@ if(!BASE_OK){
     + ' | hand strings ' + (STRIP_HAND.length - handBad.length) + '/' + STRIP_HAND.length + ' | L9 non-cue cards false strips ' + falseStrips + '/' + pop.length + ' (ruled ' + nonCue + ') | HALF_MANNY "tank" cards ' + tank.length + ' (ruled ' + MANNY_TANK + '), stripped ' + tankBad
     + ' | distinct non-cue details of every build false strips ' + distBad + '/' + dist.length);
   handBad.forEach(s => console.log('      ' + s)); dEx.forEach(s => console.log('      false strip ' + s));
-  ok('f', R.f + (VER >= V231_ERA ? ' [V231 A-1: L9 non-cue 1,734]' : ''), litOK && viaConst === TEST_T && test !== null && stripAll([test])[0] === TEST_T && handBad.length === 0 && pop.length === nonCue && falseStrips === 0 && tank.length === MANNY_TANK && tankBad === 0 && dist.length > 0 && distBad === 0,
+  ok('f', R.f + (SV.cmp(VER, V231_ERA) >= 0 ? ' [V231 A-1: L9 non-cue 1,734]' : ''), litOK && viaConst === TEST_T && test !== null && stripAll([test])[0] === TEST_T && handBad.length === 0 && pop.length === nonCue && falseStrips === 0 && tank.length === MANNY_TANK && tankBad === 0 && dist.length > 0 && distBad === 0,
     'constants ' + (litOK ? 'as typed' : 'NOT as typed') + ', strip(INJ_HELD_TEST) ' + (viaConst === TEST_T ? '=== TEST_RX_TEXT' : 'WRONG') + ', hand ' + handBad.length + ' wrong, false strips ' + falseStrips + '/' + pop.length + ', tank ' + tankBad + '/' + tank.length + ', distinct ' + distBad + '/' + dist.length);
 }
 

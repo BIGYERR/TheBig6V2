@@ -40,6 +40,7 @@
 const fs   = require('fs');
 const path = require('path');
 const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const FILE = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const RAW  = fs.readFileSync(FILE, 'utf8');
@@ -95,7 +96,7 @@ const TIERS_PLUS  = TIERS.concat(['travel_room_only']);
 const HARVESTED = ['Nordic hamstring curl (anchored)','Single-leg glute bridge','Single-leg hip thrust','Wall sit'];
 const EXCLUDED  = ['Spanish squat hold (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat'];
 const MACHINES  = ['Leg extension','Lying leg curl','Seated leg curl','Leg press','Standing cable hamstring curl'];
-const MANNY_DIGEST = MANNY_DIGEST_BY_VERSION[IA.version];   // era row, not a literal (D89)
+const MANNY_DIGEST = SV.lookup(MANNY_DIGEST_BY_VERSION, IA.version);   // era row, not a literal (D89)
 const HOLD_DOSE_SEC = 25;               // the ACCESSORY hold dose the file already carries
 const SECTION = 'Leg isolation';        // athlete-facing label; D75 renamed the KEY, not this
 
@@ -243,7 +244,7 @@ HF_LEAK_BY_VERSION[236] = HF_LEAK_BY_VERSION[235];   // era_bump V236: ruled UNM
 HF_LEAK_BY_VERSION[237] = HF_LEAK_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 HF_LEAK_BY_VERSION[238] = HF_LEAK_BY_VERSION[237];   // era_bump V238: ruled UNMOVED, reference to [237]; tests/measure/v238_rulings/v238_ruling_d223_d227.md
 HF_LEAK_BY_VERSION[239] = HF_LEAK_BY_VERSION[238];   // era_bump V239: ruled UNMOVED, reference to [238]; tests/measure/v239_rulings/v239_ruling_d233.md
-const HF_LEAK = HF_LEAK_BY_VERSION[(+IA.version <= 209) ? 209 : +IA.version];
+const HF_LEAK = SV.lookup(HF_LEAK_BY_VERSION, (SV.cmp(IA.version, 209) <= 0) ? 209 : IA.version);
 // B5c's same-card duplicate count, keyed by ia-version (D133). 187 through V218 (the bare literal B5c read until V219).
 const B5C_BY_VERSION = { 218: 187 };
 B5C_BY_VERSION[219] = 0;   // D170 then D165: ruled MOVE. D170 (cf170b) 187 -> 185 printed; D165 (cf165b) redraws the lunge slot when it collides with a step-up Main, 185 -> 0
@@ -267,7 +268,7 @@ B5C_BY_VERSION[236] = B5C_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, re
 B5C_BY_VERSION[237] = B5C_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 B5C_BY_VERSION[238] = B5C_BY_VERSION[237];   // era_bump V238: ruled UNMOVED, reference to [237]; tests/measure/v238_rulings/v238_ruling_d223_d227.md
 B5C_BY_VERSION[239] = B5C_BY_VERSION[238];   // era_bump V239: ruled UNMOVED, reference to [238]; tests/measure/v239_rulings/v239_ruling_d233.md
-const B5C_ROW = B5C_BY_VERSION[(+IA.version <= 218) ? 218 : +IA.version];   // no row -> B5c FAILS
+const B5C_ROW = SV.lookup(B5C_BY_VERSION, (SV.cmp(IA.version, 218) <= 0) ? 218 : IA.version);   // no row -> B5c FAILS
 // Survivors of one kind, read off the census and off the row through the same needs() table,
 // compared name for name and count for count: no extras, no missing.
 const hfOfKind = (names, kind) => { const o = {}; Object.keys(names || {}).filter(n => needs(n).indexOf(kind) >= 0).forEach(n => { o[n] = names[n]; }); return o; };

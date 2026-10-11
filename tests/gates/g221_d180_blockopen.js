@@ -82,6 +82,7 @@ globalThis.Date = PD;
 
 const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process'), crypto = require('crypto');
 const { load, progDigest, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
@@ -153,13 +154,13 @@ const R = {
 
 // ── RUN ──────────────────────────────────────────────────────────────────────
 let IA0, STAMP = NaN;
-try { IA0 = load(ART); STAMP = +IA0.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { IA0 = load(ART); STAMP = SV.parse(IA0.version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let VER = STAMP;
-if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
   VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a pre-bump development run, not a ship proof');
 }
-console.log('g221 D180 | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | clock pinned ' + isoOf(new RealDate(PIN)) + ' ' + new RealDate(PIN).toString().slice(0, 24));
-if(!(VER >= ERA)){
+console.log('g221 D180 | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : '') + ' | clock pinned ' + isoOf(new RealDate(PIN)) + ' ' + new RealDate(PIN).toString().slice(0, 24));
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D180 P-BLOCKOPEN (V' + ERA + '). No row may pass on it.');
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();

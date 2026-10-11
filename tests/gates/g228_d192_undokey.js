@@ -125,6 +125,7 @@
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
 const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
@@ -255,16 +256,16 @@ function act(tg, c){
 
 // ── LOAD + VERSION PREDICATE ───────────────────────────────────────────────────────────────────────────────────────
 let IA0, STAMP = NaN;
-try { IA0 = load(ART); STAMP = +IA0.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { IA0 = load(ART); STAMP = SV.parse(IA0.version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION !== undefined){
-  if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+  if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   } else console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-console.log('g228 D192 undokey | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '')
+console.log('g228 D192 undokey | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : '')
   + ' | KW ' + JSON.stringify(KW) + ' | hop4 K4 ' + K4 + ', K4O ' + K4O + ' | hop5 N5 ' + N5);
-if(!(VER >= ERA)){
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D192 P-UNDOKEY (V' + ERA + '). No row may pass on it.');
   [R.CHIP, R.UNDO, R.BOOTU, R.MANNY].forEach(l => ok(l + ' (REFUSED)', false));
   console.log('  INFO D191 P-SWAPREVISIT: not run (REFUSED)');
@@ -276,7 +277,7 @@ if(!(VER >= ERA)){
 let B = null, baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ B = b; FILES.B = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ B = b; FILES.B = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!B){
   const f = path.join(os.tmpdir(), 'g228_d192_undokey_v' + BASE_ERA + '_' + process.pid + '.html');
@@ -284,7 +285,7 @@ if(!B){
     try { fs.unlinkSync(f); } catch(e){}
     process.on('exit', () => { try { fs.unlinkSync(f); } catch(e){} });
     fs.writeFileSync(f, cp.execFileSync('git', ['-C', ROOT, 'show', V227_COMMIT + ':index.html'], { maxBuffer: 1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ B = b; FILES.B = f; baseWhy += 'git show ' + V227_COMMIT.slice(0, 7) + ':index.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ B = b; FILES.B = f; baseWhy += 'git show ' + V227_COMMIT.slice(0, 7) + ':index.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 console.log('  V227 tree: ' + (B ? 'LIVE (' + baseWhy + ')' : 'SETUP FAILED (' + baseWhy + ')'));
@@ -453,7 +454,7 @@ const U = reach.filter(inU), UP = reach.filter(c => !inU(c));
   // row is absent (row existence is a conjunct), and compares the built digest to it. Re-pointing the literal
   // to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
   // D192 (standing ruling 4). Section 3: "literal + row -> row only"; VER is this gate's own version variable.
-  const eraV = VER, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  const eraV = VER, eraHas = SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) !== undefined, eraRow = eraHas ? SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) : undefined;
   const dB = B ? progDigest(fresh('B').buildProgram(clone(fixtures.HALF_MANNY))) : null;
   console.log('    d2-MANNY candidate ' + d1 + ' (self-stable ' + (d1 === d2) + ') | era[' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT') + ' | V227 (INFO) ' + (dB || 'n/a (' + baseWhy + ')')
     + ' | swapOriginOf calls in 2 buildProgram + 1 refreshProgram: ' + nBuild + ', counter wired ' + wired);

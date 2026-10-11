@@ -78,6 +78,7 @@
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
 const { load, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
@@ -165,30 +166,30 @@ function shuffled(arr, key){ const a = arr.slice(), r = mulberry(hstr(key)); for
 
 // ── LOAD + VERSION PREDICATE ───────────────────────────────────────────────────────────────────────────────────────
 let IA, STAMP = NaN;
-try { IA = load(ART); IA.__tag = 'C'; STAMP = +IA.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { IA = load(ART); IA.__tag = 'C'; STAMP = SV.parse(IA.version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let TMPD = null;
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION !== undefined){
-  if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+  if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   } else console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-console.log('g222 D181 chain | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | NU ' + NU + ', N8 ' + N8);
-if(!(VER >= ERA)){
+console.log('g222 D181 chain | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : '') + ' | NU ' + NU + ', N8 ' + N8);
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D181 P-SWAPDURABLE R4\'/R5 (V' + ERA + '). No row may pass on it.');
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();
 }
-const LIC5L = LIC5L_ERAS.includes(VER);
+const LIC5L = LIC5L_ERAS.some(e => SV.cmp(e, VER) === 0);
 console.log('  5L licence: ' + (LIC5L ? 'GRANTED at ia-version ' + VER + ' (eras ' + LIC5L_ERAS.join(', ') + '; residue <= ' + LIC5L_MAX + ', each residue row = MAP boot)' : 'REFUSED at ia-version ' + VER + ' (eras ' + LIC5L_ERAS.join(', ') + ' only, standing ruling 2; above the last listed era ' + LIC5L_ERAS[LIC5L_ERAS.length - 1] + '): residue must be 0 until re-ruled'));
 // V221 baseline for the up_ modes and row 9
 let B = null, baseWhy = '';
 try {
-  if(BASEFILE){ const b = load(BASEFILE); if(+b.version === BASE_ERA){ B = b; FILES.B = BASEFILE; baseWhy = 'argv[3]'; } else baseWhy = 'argv[3] reads ' + b.version + '; '; }
+  if(BASEFILE){ const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ B = b; FILES.B = BASEFILE; baseWhy = 'argv[3]'; } else baseWhy = 'argv[3] reads ' + b.version + '; '; }
   if(!B){
     TMPD = fs.mkdtempSync(path.join(os.tmpdir(), 'g222d181-')); const f = path.join(TMPD, 'v221.html');
     fs.writeFileSync(f, cp.execFileSync('git', ['show', V221_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 27, stdio:['ignore', 'pipe', 'ignore'] }));
-    const b = load(f); if(+b.version === BASE_ERA){ B = b; FILES.B = f; baseWhy += 'git ' + V221_COMMIT.slice(0, 7); } else baseWhy += 'git reads ' + b.version;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ B = b; FILES.B = f; baseWhy += 'git ' + V221_COMMIT.slice(0, 7); } else baseWhy += 'git reads ' + b.version;
   }
 } catch(e){ baseWhy += 'baseline load failed: ' + String(e && e.message || e).slice(0, 160); B = null; }
 if(B) B.__tag = 'B';

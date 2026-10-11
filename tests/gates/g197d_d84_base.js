@@ -85,6 +85,7 @@ const fs   = require('fs');
 const os   = require('os');
 const path = require('path');
 const cp   = require('child_process');
+const SV   = require(path.join(__dirname, '..', 'semver.js'));
 const crypto = require('crypto');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
 
@@ -115,8 +116,8 @@ const BASE_HTML = POS[1] && fs.existsSync(POS[1]) ? POS[1] : null;
 // so a worker never re-resolves and cannot disagree with its parent.
 const V196_PATH = path.join(__dirname, '..', '..', 'baselines', 'V196.html');
 function resolveV196() {
-  if (BASE_HTML && iaVersion(fs.readFileSync(BASE_HTML, 'utf8')) === 196) return BASE_HTML;
-  if (fs.existsSync(V196_PATH) && iaVersion(fs.readFileSync(V196_PATH, 'utf8')) === 196) return V196_PATH;
+  if (BASE_HTML && isV196(fs.readFileSync(BASE_HTML, 'utf8'))) return BASE_HTML;
+  if (fs.existsSync(V196_PATH) && isV196(fs.readFileSync(V196_PATH, 'utf8'))) return V196_PATH;
   return null;
 }
 const V196_HTML = WORKER ? (V196_ARG && fs.existsSync(V196_ARG) ? V196_ARG : null)
@@ -137,9 +138,10 @@ function ok(name, cond, detail) {
 function refuse(name, why) { refused++; console.log('REFUSE ' + name + '  -> ' + why); }
 
 function iaVersion(src) {
-  const m = /<meta name="ia-version" content="(\d+)"/.exec(String(src || ''));
-  return m ? parseInt(m[1], 10) : null;
+  const s = String(src || '');
+  return /<meta name="ia-version" content="/.test(s) ? SV.fromHtml(s) : null;   // no meta: null, as before
 }
+function isV196(src) { const v = iaVersion(src); return v !== null && SV.cmp(v, 196) === 0; }
 
 // ── retaining DOM stub (the V195 lesson): the harness hands out a FRESH element per
 // getElementById, so an innerHTML write lands on a throwaway and a read-back sees
@@ -399,7 +401,7 @@ function afterSweep(bCells, bFell, bRose, bEg, rCells) {
   ];
   const cv = iaVersion(RAW);
   // An unknown ia-version is held to the newest row, as the old predicate held it to the newest text.
-  const eraOf = T => cv === null ? T[T.length - 1] : (T.find(r => cv >= r.from && cv <= r.to) || null);
+  const eraOf = T => cv === null ? T[T.length - 1] : (T.find(r => SV.cmp(cv, r.from) >= 0 && SV.cmp(cv, r.to) <= 0) || null);
   const bRow = eraOf(BUDGET_BEHAVIOUR_BY_ERA), hRow = eraOf(ITEM_HELPERS_BY_ERA);
   const E5_CFGS = E_L.filter(c => c.key.endsWith('|sun+wed|1013')
     && ((c.cfg.liftingFocus === 'hypertrophy') === (c.cfg.experience === 'beginner')));

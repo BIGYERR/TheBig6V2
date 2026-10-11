@@ -36,6 +36,7 @@
 'use strict';
 const path = require('path'), vm = require('vm');
 const { load, fixtures, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 220;
@@ -105,9 +106,9 @@ const NSW_TEST = { name:'G220 NSW', primaryPath:'goal', eventTargeted:false, car
   bench:185, squat:255, deadlift:315, startDate:'2026-09-21', seed:24865 };
 
 try {
-  const IA = load(ART), VER = +IA.version;
+  const IA = load(ART), VER = SV.parse(IA.version);
   console.log('g220 D173 recovery banner | candidate ' + ART + ' ia-version ' + VER);
-  if(!(VER >= ERA)){ console.log('REFUSED: ia-version ' + VER + ' predates D173 (V' + ERA + '). No row may pass on it.');
+  if(!(SV.cmp(VER, ERA) >= 0)){ console.log('REFUSED: ia-version ' + VER + ' predates D173 (V' + ERA + '). No row may pass on it.');
     ROWS.forEach(r => ok(r + ' refused: candidate ' + VER + ' is below the D173 era', false)); done(); }
 
   const SRC = stripComments(IA.js), low = SRC.toLowerCase();

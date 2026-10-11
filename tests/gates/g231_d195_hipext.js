@@ -138,6 +138,7 @@ const crypto = require('crypto');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION, DAYS } = H;
 
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
@@ -295,17 +296,17 @@ function row(key, cj){ cj.forEach(([n, c, d]) => P('    ' + key + ' ' + n + ' ' 
 
 // ── LOAD + VERSION ──────────────────────────────────────────────────────────────────────────────────────────────
 let IA, VER = NaN, CAND_TEXT = '';
-try { IA = load(ART); VER = +IA.version; CAND_TEXT = fs.readFileSync(ART, 'utf8'); }
+try { IA = load(ART); VER = SV.parse(IA.version); CAND_TEXT = fs.readFileSync(ART, 'utf8'); }
 catch(e){ P('FAIL boot: ' + String(e && e.message || e).slice(0, 200)); fail++; ORDER.forEach(k => ok(R[k] + ' (candidate did not boot)', false)); done(); }
-P('g231 D195 P-HIPEXT (Amendment 2 A + B) | candidate ' + ART + ' ia-version ' + VER + (VER >= ERA ? '' : ' (below ' + ERA + ': every row runs and must FAIL by its own conjuncts)'));
+P('g231 D195 P-HIPEXT (Amendment 2 A + B) | candidate ' + ART + ' ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? '' : ' (below ' + ERA + ': every row runs and must FAIL by its own conjuncts)'));
 let BF = null, BASE_TEXT = '', baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!BF){
   try { const f = tmpWrite('v230', cp.execFileSync('git', ['-C', ROOT, 'show', V230_COMMIT + ':index.html'], { maxBuffer:1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ BF = f; baseWhy += 'git show ' + V230_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = f; baseWhy += 'git show ' + V230_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 if(BF) BASE_TEXT = fs.readFileSync(BF, 'utf8');
@@ -314,7 +315,7 @@ P('  V' + BASE_ERA + ' baseline: ' + (BF ? 'LIVE (' + baseWhy + ')' : 'SETUP FAI
 // ── ROW D195-A-a ────────────────────────────────────────────────────────────────────────────────────────────────
 function rowAa(){
   const cj = [];
-  cj.push(['a-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['a-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   // the candidate's HALF_MANNY
   const C = manny(ART), p = C.prog;
   cj.push(['a-digest', C.self && C.dig === DIG_231, 'candidate HALF_MANNY ' + C.dig + (C.self ? ' (self-identical in two VMs)' : ' (NOT self-identical: ' + C.dig2 + ')') + ', ruled ' + DIG_231]);
@@ -372,7 +373,7 @@ function rowAa(){
 // carries no pattern and accrues nothing), REGION_MOVE_CAP.legs = 4; sets 3+2+2+2+2 = 11 <= 14.
 function rowAc(){
   const cj = [];
-  cj.push(['c-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['c-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const L1 = [
     { label:'Main — Front squat', items:[{ name:'Front squat', detail:'3×8 — RPE 7' }] },
     { label:'Leg circuit — runner armor', superset:true, rounds:2, items:[
@@ -511,7 +512,7 @@ const cardLines = day => liveSecs(day).map(s => clean(s.label || s.coreHeader ||
   + s.items.map(it => clean(it.name) + ' ' + clean(it.detail || '') + (it.__bw ? ' [<' + it.__bw.was + ']' : '')).join(' | '));
 function rowAd(){
   const cj = [];
-  cj.push(['d-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['d-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const hands = D_CASES.map(c => c.day.hand);
   cj.push(['d-fix', JSON.stringify(hands) === JSON.stringify([20.5, 22, 23.5]) && D_CASES.every(c => c.day.hand === c.want && c.want > D_CAP), 'hand totals ' + JSON.stringify(hands) + ' (ruled 20.5, 22, 23.5), cap ' + D_CAP]);
   let csb = null, why = '';
@@ -574,7 +575,7 @@ const FB_TO   = "_left";
 const E_RULED = { commercial:0, crossfit:0, home_full:84, home_basic:0, bodyweight:0 }, E_PER = 126, E_PREV_N = 90, E_PREV_FIRE = 0;
 function rowAe(){
   const cj = [];
-  cj.push(['e-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['e-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const LAT_K = [];
   for(const eq of E_TIERS) E_GOALS.forEach((_, gi) => E_FOC.forEach((f, fi) => E_EXPS.forEach((e, ei) => { const si = (gi + fi + ei) % 2;
     LAT_K.push({ eq, f, cfg: eMk(eq, gi, f, e, si ? '55+' : '18-35', si, { region:'knee', tier:'protect' }) }); })));
@@ -731,7 +732,7 @@ function shAn(z){
 }
 function rowAb(){
   const cj = [];
-  cj.push(['b-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['b-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const S = shardBuilds();
   if(!S.ok){ ['b-notA', 'b-shard', 'b-fourth', 'b-add', 'b-rem', 'b-circ', 'b-calf', 'b-nonrun', 'b-knee'].forEach(n => cj.push([n, false, S.why])); row('D195-A-b', cj); return; }
   const progs = S.progs.filter(r => r.x.ab), crashed = progs.filter(r => r.crash.length), naB = progs.filter(r => r.naBuilt), selfN = naB.filter(r => r.selfN).length;
@@ -776,7 +777,7 @@ function rowAb(){
 }
 function rowAf(){
   const cj = [];
-  cj.push(['f-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['f-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const S = shardBuilds();
   if(!S.ok){ ['f-shard', 'f-nonbw', 'f-bwlb', 'f-other'].forEach(n => cj.push([n, false, S.why])); row('D195-A-f', cj); return; }
   const all = S.progs, nLB = all.filter(r => r.x.L === 'INJ-LB').length, built = all.filter(r => !r.crash.length), have = built.filter(r => r.uC && r.uV && r.uV2);

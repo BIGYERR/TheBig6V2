@@ -52,6 +52,7 @@
 
 const path = require('path');
 const { load, fixtures } = require(path.join(__dirname, '..', 'harness'));
+const SV = require(path.join(__dirname, '..', 'semver'));
 
 let pass = 0, fail = 0;
 function check(name, ok, why){ if(ok){ pass++; console.log('ok   ' + name); } else { fail++; console.log('FAIL ' + name + (why ? ': ' + why : '')); } }
@@ -407,7 +408,7 @@ function main(){
     return diffs.length === 0 ? true : 'the render mutated the data: ' + diffs.join(', ');
   });
   // G11b (the pre-D176 bare-remainder row, D176 P-BARERX V220, dark from `VER < D176_ERA`) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). G11f carries the row.
-  const D176_ERA = 220, VER_OK = /^\d+$/.test(String(IA.version)), VER = VER_OK ? parseInt(IA.version, 10) : NaN;
+  const D176_ERA = 220, VER_OK = (() => { try { SV.parse(IA.version); return true; } catch (e) { return false; } })(), VER = VER_OK ? SV.parse(IA.version) : NaN;
   tryCheck('G11c a rounds:null block keeps its rows intact', () => {
     const d = details(renderSecs([SSNULL]));
     const want = SSNULL.items.map(i => i.detail);
@@ -441,7 +442,7 @@ function main(){
   const BARE_D176 = /^\d+(\s*[–-]\s*\d+)?$/;
   const wantD176 = d => { const r = refStrip(d); return r + (BARE_D176.test(r) ? ' reps' : ''); };
   if(!VER_OK) check('G11f era: ia-version is readable', false, 'ia-version ' + JSON.stringify(IA.version) + ' is missing or not an integer, so G11f cannot be keyed');
-  else if(VER < D176_ERA) console.log('SKIP G11f: ia-version ' + VER + ' predates D176 (V' + D176_ERA + '); G11b carries the row');
+  else if(SV.cmp(VER, D176_ERA) < 0) console.log('SKIP G11f: ia-version ' + VER + ' predates D176 (V' + D176_ERA + '); G11b carries the row');
   else {
     const SSF = { label:'Pump', superset:true, rounds:3, items:[
       { name:'Kettlebell swing', detail:'3×10' }, { name:'Goblet squat', detail:'3×8–12' },

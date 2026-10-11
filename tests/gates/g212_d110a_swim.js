@@ -127,9 +127,10 @@
 'use strict';
 const fs = require('fs'), path = require('path');
 const { load, fixtures, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
-const VER = +IA.version;
+const VER = SV.parse(IA.version);
 const ERA = 212;
 
 let pass = 0, fail = 0, skip = 0, scoped = 0, nyb = 0;
@@ -142,7 +143,7 @@ function skipRow(label){ skip++; console.log('SKIP ' + label); }
 // Version scope (post-V233): a row that holds from the D110a era onward is a minimum row, live on every candidate from
 // 212 up. P1n and SH5 are minimum rows.
 function minRow(label, cond, got){
-  if(!(VER >= ERA)){ skipRow(label + ' skipped below the D110a era'); return; }
+  if(!(SV.cmp(VER, ERA) >= 0)){ skipRow(label + ' skipped below the D110a era'); return; }
   ok(label, cond, got);
 }
 function notYet(label){ nyb++; console.log('NOT YET BUILT ' + label); }
@@ -152,7 +153,7 @@ function summary(){
   process.exit(fail ? 1 : 0);
 }
 const LATER = [];
-if(!(VER >= ERA)){
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D110a (V' + ERA + ').');
   ['L0','R1','R1k','R2','R3a','R3b','R3c','R4','N1','N2','N3','N4','N5','SH0','SH1','SH2','SH3','SH4','SH5','SO1','SO2','D1','D2','D3','D6','D7','D8','FL1','GT1','M2a','M2b','M2c','M2d','M2e','M2f','P1n','CP'].forEach(r => skipRow(r + ' skipped below the D110a era'));
   LATER.forEach(r => skipRow(r + ' skipped below the D110a era'));
@@ -424,7 +425,7 @@ const WN = (I, c, audit) => { const w = I.buildProgram(cl(c)).weeks;
 {
   // P0 P1 (D110a: V211 built twice identical; P1's limbs byte-identical to V211 apart from the swim INT note) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
   // P1n runs from the D110a era onward (Version scope): it audits the candidate's own swim INT notes on the P1 builds.
-  const P1N_RAN = (VER >= ERA && (P1.forEach(([, c]) => WN(IA, c, true)), true));
+  const P1N_RAN = (SV.cmp(VER, ERA) >= 0 && (P1.forEach(([, c]) => WN(IA, c, true)), true));
   minRow('P1n every swim INT note on those builds opens with the typed D110a distance note, build to 8 (' + p1n + ' cards)', P1N_RAN && p1n >= 20 && p1nBad.length === 0, P1N_RAN ? p1nBad.join(' | ') : 'NO BASELINE');
 }
 // P2 (D110a: off the swim INT cards the swim time lattice is byte-identical to V211, and INT cards keep V211's rep count) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).

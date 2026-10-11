@@ -43,6 +43,7 @@
 'use strict';
 const path = require('path');
 const { load, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const ERA = 220;
@@ -348,8 +349,8 @@ row('E5f streak and season tiers still draw from their own untagged pools', () =
 // ── RUN ───────────────────────────────────────────────────────────────────────
 function main(){
   let VER = NaN;
-  try { IA = load(ART); VER = +IA.version; } catch(e){ console.log('FAIL boot: ' + e.message); }
-  if(!(VER >= ERA)){
+  try { IA = load(ART); VER = SV.parse(IA.version); } catch(e){ console.log('FAIL boot: ' + e.message); }
+  if(Number.isNaN(VER) || !(SV.cmp(VER, ERA) >= 0)){
     console.log('REFUSED: ia-version ' + VER + ' predates D175 P-POPCOND (V' + ERA + '). No row may pass on it.');
     ROWS.forEach(r => { fail++; console.log('FAIL ' + r.id + ' (REFUSED)'); });
     return done();

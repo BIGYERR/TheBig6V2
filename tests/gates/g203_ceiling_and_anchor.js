@@ -35,6 +35,7 @@
 const path = require('path');
 const crypto = require('crypto');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const FILE = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 
@@ -52,7 +53,7 @@ console.log('g203_ceiling_and_anchor  (D117 ceiling / D118 anchor carry / D119 p
 
 // ── 0. the version predicate ──────────────────────────────────────────────────
 const RULING_V = 203;
-const artifactV = +IA.version;
+const artifactV = SV.parse(IA.version);
 const SURFACE = {
   'steadyCapSec declared':          /function steadyCapSec\(row\)/.test(IA.html),
   'recovery ceiling sentence':      IA.html.indexOf('Do not run faster than ') >= 0,
@@ -65,7 +66,7 @@ const surfacePresent = missing.length === 0;
 
 let SKIP = false;
 console.log('\n0. version predicate (rulings D117/D118/D119 ship on ia-version ' + RULING_V + ')');
-if(artifactV >= RULING_V){
+if(SV.cmp(artifactV, RULING_V) >= 0){
   Object.keys(SURFACE).forEach(k => ok('at ia-version ' + artifactV + ' the D117/D118/D119 surface MUST exist: ' + k, SURFACE[k]));
   if(!surfacePresent) SKIP = true;      // the FAILs above are the report; do not cascade
 } else if(!surfacePresent){
@@ -257,7 +258,7 @@ const BASE_TAIL_BY_VERSION = [
     tail: cap => 'is right for you. Do not run faster than ' + cap + '.',
     read: /is right for you\. Do not run faster than (\d+:[0-5]\d\/mi)\./ },
 ];
-const BASE_ERA = BASE_TAIL_BY_VERSION.filter(r => artifactV >= r.from && artifactV <= r.to)[0] || null;
+const BASE_ERA = BASE_TAIL_BY_VERSION.filter(r => SV.cmp(artifactV, r.from) >= 0 && SV.cmp(artifactV, r.to) <= 0)[0] || null;
 if(!BASE_ERA){
   fail++;
   console.log('  FAIL D109-ERA no BASE_TAIL_BY_VERSION row covers ia-version ' + artifactV + ': the run_base '
@@ -420,7 +421,7 @@ const TAIL = ' Every pace in this program comes from this row.';
 // is kind 'default' with exp 'beginner'. The typed anchors carry exp from 226 because the ruled shape does;
 // the V203 rows stay asserted at <= 225.
 const D189_ERA = 226;
-const ERA_D189 = artifactV >= D189_ERA;
+const ERA_D189 = SV.cmp(artifactV, D189_ERA) >= 0;
 function A(o){ return Object.assign({ anchorSec:630, rawSec:630, clamped:null, row:{}, kind:'entered',
                                       prog:'', n:0, wk:0, from:null, race:'half', goalId:'run_half' }, ERA_D189 ? { exp:'intermediate' } : {}, o); }
 

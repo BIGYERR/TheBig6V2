@@ -104,16 +104,19 @@ jobs:
       - name: Baseline (the previous version, as tagged)
         run: |
           set -euo pipefail
-          N=$(grep -oE 'name="ia-version" content="[0-9]+"' index.html | grep -oE '[0-9]+')
-          git show "V$((N - 1)):index.html" > "$RUNNER_TEMP/base.html"
+          META=$(node tests/semver.js meta index.html) || { echo "::error::index.html has no ia-version meta"; exit 1; }
+          node tests/semver.js str "$META" > /dev/null || { echo "::error::index.html ia-version '$META' is not a version (want N or M.m.p)"; exit 1; }
+          PREV=$(git tag --list 'v*' 'V*' | node tests/semver.js below "$META") || { echo "::error::no version tag below ia-version $META, so there is no baseline"; exit 1; }
+          git show "$PREV:index.html" > "$RUNNER_TEMP/base.html"
           echo "BASE=$RUNNER_TEMP/base.html" >> "$GITHUB_ENV"
-          echo "candidate ia-version $N, baseline V$((N - 1))"
+          echo "candidate ia-version $META, baseline $PREV"
       - name: gate.sh (every gate, the row check, the blast radius)
         # ROW_RULED: the build's row licence, when the candidate's version has one. ROW_MANIFEST_OUT: this run's row
         # manifest, kept in the run log artifact; gatekeeper regenerates tests/row_manifest.txt from it (CLAUDE.md).
         run: |
-          N=$(grep -oE 'name="ia-version" content="[0-9]+"' index.html | grep -oE '[0-9]+')
-          LICENCE="tests/measure/v${N}_rulings/v${N}_row_ruled.txt"
+          META=$(node tests/semver.js meta index.html) || { echo "::error::index.html has no ia-version meta"; exit 1; }
+          node tests/semver.js str "$META" > /dev/null || { echo "::error::index.html ia-version '$META' is not a version (want N or M.m.p)"; exit 1; }
+          LICENCE="tests/measure/v${META}_rulings/v${META}_row_ruled.txt"
           if [ -f "$LICENCE" ]; then export ROW_RULED="$LICENCE"; echo "row licence: $LICENCE"; fi
           mkdir -p temp
           export ROW_MANIFEST_OUT="$GITHUB_WORKSPACE/temp/row_manifest.txt"
@@ -148,8 +151,10 @@ jobs:
       - name: Baseline (the previous version, as tagged)
         run: |
           set -euo pipefail
-          N=$(grep -oE 'name="ia-version" content="[0-9]+"' index.html | grep -oE '[0-9]+')
-          git show "V$((N - 1)):index.html" > "$RUNNER_TEMP/base.html"
+          META=$(node tests/semver.js meta index.html) || { echo "::error::index.html has no ia-version meta"; exit 1; }
+          node tests/semver.js str "$META" > /dev/null || { echo "::error::index.html ia-version '$META' is not a version (want N or M.m.p)"; exit 1; }
+          PREV=$(git tag --list 'v*' 'V*' | node tests/semver.js below "$META") || { echo "::error::no version tag below ia-version $META, so there is no baseline"; exit 1; }
+          git show "$PREV:index.html" > "$RUNNER_TEMP/base.html"
           echo "BASE=$RUNNER_TEMP/base.html" >> "$GITHUB_ENV"
       - name: Identity fuzz
         run: bash -c 'set -eo pipefail; bash tests/fuzz.sh index.html "$BASE"'

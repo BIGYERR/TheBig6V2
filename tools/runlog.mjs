@@ -42,6 +42,7 @@ import {
   writeFileSync,
   writeSync,
 } from 'node:fs';
+import { createRequire } from 'node:module';
 import { homedir, hostname } from 'node:os';
 import { basename, dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -168,9 +169,12 @@ export function context() {
   const changed = git(['status', '--porcelain']).split('\n').filter(Boolean).length;
   let version = '';
   try {
-    version = readFileSync(join(REPO, 'index.html'), 'utf8').slice(0, 20000).match(/name="ia-version" content="(\d+)"/)?.[1] ?? '';
+    const raw = readFileSync(join(REPO, 'index.html'), 'utf8').slice(0, 20000).match(/name="ia-version" content="([^"]*)"/)?.[1] ?? '';
+    // Kept as written (239 stays "239", 0.239.1 stays "0.239.1"), and only when tests/semver.js parses it: parse throws.
+    createRequire(import.meta.url)('../tests/semver.js').parse(raw);
+    version = raw;
   } catch {
-    // No index.html here (a container): leave it out.
+    // No index.html here (a container), no meta, or a meta that is not a version: leave it out.
   }
   return { branch, commit, changed, version, host: hostname().replace(/\.local$/, ''), node: process.version };
 }

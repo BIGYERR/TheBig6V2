@@ -139,6 +139,7 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const { load, fixtures } = H;
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -285,15 +286,15 @@ STAT.declare(ORDER.map(k => ID[k]));   // an ORDER key with no id throws: no sum
 
 // ── LOAD + VERSION PREDICATE ───────────────────────────────────────────────────────────────────────────────────────
 let IA, STAMP = NaN;
-try { IA = load(ART); STAMP = +IA.version; } catch(e){ ORDER.forEach(k => ok(k, R[k] + ' (boot: ' + e.message + ')', false)); done(); }
+try { IA = load(ART); STAMP = SV.parse(IA.version); } catch(e){ ORDER.forEach(k => ok(k, R[k] + ' (boot: ' + e.message + ')', false)); done(); }
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION !== undefined){
-  if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+  if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
     VER = ERA; P('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   } else P('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-P('g229 D194 P-INJLENS part 1 (lens, overlay reach, dormancy pin) | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
-if(!(VER >= ERA)){
+P('g229 D194 P-INJLENS part 1 (lens, overlay reach, dormancy pin) | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : ''));
+if(!(SV.cmp(VER, ERA) >= 0)){
   P('REFUSED: ia-version ' + VER + ' predates D194 P-INJLENS part 1 (V' + ERA + '). No row may pass on it.');
   ORDER.forEach(k => ok(k, R[k] + ' (REFUSED)', false));
   done();
@@ -301,7 +302,7 @@ if(!(VER >= ERA)){
 let FILES = { C:ART, B:null }, baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ FILES.B = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ FILES.B = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!FILES.B){
   const f = path.join(os.tmpdir(), 'g229_d194_lens_v' + BASE_ERA + '_' + process.pid + '.html');
@@ -309,7 +310,7 @@ if(!FILES.B){
     try { fs.unlinkSync(f); } catch(e){}
     process.on('exit', () => { try { fs.unlinkSync(f); } catch(e){} });
     fs.writeFileSync(f, cp.execFileSync('git', ['-C', ROOT, 'show', V228_COMMIT + ':index.html'], { maxBuffer:1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ FILES.B = f; baseWhy += 'git show ' + V228_COMMIT.slice(0, 7) + ':index.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ FILES.B = f; baseWhy += 'git show ' + V228_COMMIT.slice(0, 7) + ':index.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 P('  V' + BASE_ERA + ' baseline: ' + (FILES.B ? 'LIVE (' + baseWhy + ')' : 'SETUP FAILED (' + baseWhy + ')'));
@@ -430,7 +431,7 @@ guard('pUNS', () => { const KN = CFGS.mario; const T = {}, lines = [];
   // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, p-UNSTAMPED SPLIT; standing rulings 2 and 4): at
   // 231 and up the row keeps Thursday-from, travel-only and mario_noinj W3/W5 == V228.
   // Its HALF_MANNY W3/W5 == V228 conjunct (V231 absorb ruling, dark from `VER >= V231_ERA`) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
-  if(VER >= V231_ERA){ const okN = un3.all && un3.n === W.noinj.w3 && un5.all && un5.n === W.noinj.w5;
+  if(SV.cmp(VER, V231_ERA) >= 0){ const okN = un3.all && un3.n === W.noinj.w3 && un5.all && un5.n === W.noinj.w5;
     R.pUNS += ' [V231 split: Thursday-from, travel-only, mario_noinj W3/W5 == V228]';
     RES.pUNS = [SELF && okThu && okTV && okN, 'Thursday-from thu/fri/sat rejected ' + c.thu.rej + '/' + c.fri.rej + '/' + c.sat.rej + ', mon/tue == V228 ' + (eqMon.all && eqTue.all) + (okThu ? '' : ' (Thursday-from not as ruled)') + '; travel ' + eqTV.eq + '/' + eqTV.n + '; mario_noinj W3 ' + un3.eq + '/' + un3.n + ', W5 ' + un5.eq + '/' + un5.n + (okN ? '' : ' MOVED')]; }
   else RES.pUNS = [SELF && okThu && okTV && okU, 'Thursday-from thu/fri/sat rejected ' + c.thu.rej + '/' + c.fri.rej + '/' + c.sat.rej + ', mon/tue == V228 ' + (eqMon.all && eqTue.all) + (okThu ? '' : ' (Thursday-from not as ruled)') + '; travel ' + eqTV.eq + '/' + eqTV.n + '; uninjured ' + (okU ? 'identical' : 'MOVED')];
@@ -470,7 +471,7 @@ Promise.all(WORK).then(rs => {
     // and D196 via the cards; standing rulings 2 and 4): at 231 and up the row asserts at the W231 row counts.
     // Its "pre-from W3 == V228" and "FIX W3+W5 == V228" conjuncts and the row-set symmetry they rest on (V231 absorb
     // ruling, dark from `VER >= V231_ERA`) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
-    if(VER >= V231_ERA){ const w2 = W231[k];
+    if(SV.cmp(VER, V231_ERA) >= 0){ const w2 = W231[k];
       const c2 = allCfg && SELF && S.n5 === w2 && S.st5 === w2 && S.rej === 0 && S.cards === 0 && S.eqFix === w2 && S.fixMiss === 0 && S.n3 > 0 && S.st3 === 0 && S.rej3 > 0 && S.nf > 0;
       R[row] += ' [V231 split: rejected 0, rows 0, OV == FIX ' + w2 + '/' + w2 + ']';
       RES[row] = [c2, 'rejected ' + S.rej + ' of ' + S.offers + ', rows >= 1 rejected ' + S.cards + ' of ' + S.n5 + ', OV == FIX ' + S.eqFix + '/' + S.st5 + (allCfg ? '' : '; L1 sweep incomplete (' + seen.size + ' cfgs)') + (S.rej3 > 0 ? '' : '; judge blind on W3')]; }

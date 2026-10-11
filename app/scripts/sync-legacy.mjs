@@ -6,7 +6,7 @@
 //
 // The root index.html is the live PWA (GitHub Pages) and the file every gate under tests/ boots. This app never
 // edits it. Every build re-derives four pieces from it, byte for byte:
-//   head    every <meta>, <link> and <title> (ia-version included, so the update check reads the same number)
+//   head    every <meta>, <link> and <title> (ia-version included, so the update check reads the same version)
 //   style   the one <style> block                         -> src/legacy/generated/legacy.css
 //   markup  the body markup before and after the script   -> src/legacy/generated/legacy-markup.ts
 //   script  the one inline <script>                        -> public/legacy/app.js
@@ -17,6 +17,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { metaVersion } from './version.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = resolve(APP, '..');
@@ -66,8 +67,9 @@ export function split(html) {
     if (countOf(part, '<script') !== 0) fail(`a second <script> in the body markup (${name} the app script)`);
   }
 
-  const version = (headRest.match(/<meta name="ia-version" content="(\d+)"/) || [])[1];
-  if (!version) fail('no <meta name="ia-version"> in <head>');
+  // As written ("239" stays "239", "0.239.1" stays "0.239.1"); a meta that is not a version throws (scripts/version.mjs).
+  const version = metaVersion(headRest);
+  if (version === null) fail('no <meta name="ia-version"> in <head>');
   return { headRest, css, js, markup: before + after, version };
 }
 

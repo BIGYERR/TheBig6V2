@@ -40,11 +40,12 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { load, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
-const VER = +IA.version;
+const VER = SV.parse(IA.version);
 const D109_ERA = 206;
-const LIVE = VER >= D109_ERA;
+const LIVE = SV.cmp(VER, D109_ERA) >= 0;
 const SRC = fs.readFileSync(ART, 'utf8');
 
 const S = require('../status')('g206_d109_copy');
@@ -233,7 +234,7 @@ const TABLE_SUPERSEDED = [
 const SUP_BAD = {};
 if(ents){
   for(const s of TABLE_SUPERSEDED){
-    if(!(VER >= s.from)) continue;
+    if(!(SV.cmp(VER, s.from) >= 0)) continue;
     const e = ents[s.entry - 1], rg = TABLE_RANGE[s.builder];
     if(!e || !rg || s.entry < rg[0] || s.entry > rg[1] || e.neu !== s.was){
       (SUP_BAD[s.builder] = SUP_BAD[s.builder] || []).push('#' + s.entry + ' (' + s.ruling + ') supersedes text the table does not hold');

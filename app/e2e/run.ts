@@ -22,6 +22,7 @@ import { comparePngs, pngSize } from './parity.ts';
 import { externalRefs, renderReport } from './report.ts';
 import type { CollageInfo, RunReport, StepResult, TargetResult } from './types.ts';
 import { stepLabel } from './types.ts';
+import { metaVersion } from '../scripts/version.mjs';
 
 const E2E = dirname(fileURLToPath(import.meta.url));
 const REPORT = process.env['E2E_REPORT_DIR'] ?? join(E2E, 'report');
@@ -153,7 +154,8 @@ async function main(): Promise<number> {
   for (const f of ['index.html', 'collage.png']) rmSync(join(REPORT, f), { force: true });
 
   const served = await (await fetch(BASE + '/')).text();
-  const version = served.match(/name="ia-version" content="(\d+)"/)?.[1] ?? 'unknown';
+  // As written ("239" or "0.239.1"); 'unknown' only when the page has no meta. A meta that is not a version fails the run.
+  const version = metaVersion(served) ?? 'unknown';
   const sourceSha256 = served.match(/sha256 ([0-9a-f]{64})/)?.[1];
 
   // Chrome's sandbox needs kernel namespaces that Docker's default profile withholds. The container is the boundary

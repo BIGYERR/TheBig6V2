@@ -37,5 +37,7 @@ RUN apt-get update \
  && install -d -o node -g node /report
 COPY app/tsconfig.node.json ./
 COPY app/e2e/ ./e2e/
+# e2e/run.ts reads the served page's ia-version with the app's one version reader.
+COPY app/scripts/version.mjs ./scripts/
 USER node
 CMD ["node", "e2e/run.ts"]

@@ -28,6 +28,7 @@
 'use strict';
 const path = require('path');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 225;
@@ -54,16 +55,16 @@ const done = () => { console.log('  runtime ' + ((Date.now() - t0) / 1000).toFix
 const failAll = (why, detail) => { for(const id of ROW_IDS) S.fail(id, ROWS[id] + ' (' + why + ')', detail); done(); };
 
 let STAMP = NaN;
-try { STAMP = +H.load(ART).version; } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
+try { STAMP = SV.parse(H.load(ART).version); } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
 let VER = STAMP;
-if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
   VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 } else if(process.env.IA_ASSUME_VERSION !== undefined){
   console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-console.log('g225 D187 pacerate | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
+console.log('g225 D187 pacerate | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : ''));
 
-if(!(VER >= ERA)){
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D187 P-PACERATE (V' + ERA + '). No row may pass on it.');
   failAll('REFUSED');
 }

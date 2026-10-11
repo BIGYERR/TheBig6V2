@@ -49,6 +49,7 @@
 const path=require('path'), fs=require('fs'), os=require('os');
 const {fork}=require('child_process');
 const {load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION}=require(path.join(__dirname,'..','harness.js'));
+const SV=require(path.join(__dirname,'..','semver.js'));
 const PINS=require(path.join(__dirname,'..','measure','v200_g200_pins.js'));
 const {MINI_LATTICE, miniLattice}=PINS;
 const ART=path.resolve(process.argv[2]||path.join(__dirname,'..','..','index.html'));
@@ -309,7 +310,7 @@ SWAP_BY_VERSION[236] = SWAP_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, 
 SWAP_BY_VERSION[237] = SWAP_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 SWAP_BY_VERSION[238] = SWAP_BY_VERSION[237];   // era_bump V238: ruled UNMOVED, reference to [237]; tests/measure/v238_rulings/v238_ruling_d223_d227.md
 SWAP_BY_VERSION[239] = SWAP_BY_VERSION[238];   // era_bump V239: ruled UNMOVED, reference to [238]; tests/measure/v239_rulings/v239_ruling_d233.md
-const SWAP_N = SWAP_BY_VERSION[(+IP.version <= 218) ? 218 : +IP.version];
+const SWAP_N = SV.lookup(SWAP_BY_VERSION, (SV.cmp(IP.version, 218) <= 0) ? 218 : IP.version);
 II.eval(SNAP_FN+"globalThis.__G200=null;");
 let inert=0,inertN=0;
 LAT.filter((_,i)=>i%7===0).forEach(L=>{ inertN++;
@@ -333,7 +334,7 @@ ok(vprobeBad.length===0,'A6 the hand VERTICAL-PULL oracle passes its blindness p
 
 console.log('── B. the fixture boots and builds ──');
 const fdig=progDigest(IP.buildProgram(fixtures.HALF_MANNY));
-const MANNY_DIGEST=MANNY_DIGEST_BY_VERSION[IP.version];             // era row, not a literal (D89)
+const MANNY_DIGEST=SV.lookup(MANNY_DIGEST_BY_VERSION,IP.version);             // era row, not a literal (D89)
 ok(!!MANNY_DIGEST&&fdig===MANNY_DIGEST,'B1 HALF_MANNY progDigest matches the V'+IP.version+' row of MANNY_DIGEST_BY_VERSION ('+(MANNY_DIGEST||'NO ROW')+') (got '+fdig+')'+(MANNY_DIGEST?'':' — no MANNY_DIGEST_BY_VERSION row for V'+IP.version+': an unruled digest move'));
 
 const SH=Math.max(1,parseInt(process.env.G200_SHARDS||String(Math.min(4,os.cpus().length)),10));

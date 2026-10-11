@@ -31,6 +31,7 @@
 const path = require('path');
 const fs = require('fs');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
 
@@ -43,10 +44,10 @@ function skipRow(label){ console.log('  SKIP ' + label); }
 function summary(code){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(code); }
 
 const D114_ERA = 205;
-const VER = IA.version;
+const VER = SV.parse(IA.version);
 const HAS = IA.eval("typeof intFromTable6 === 'function' && Array.isArray(NSW_TABLE6_INT)");
 
-if(!HAS && VER < D114_ERA){
+if(!HAS && SV.cmp(VER, D114_ERA) < 0){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D114 (V' + D114_ERA + ').');
   summary(0);
 }
@@ -64,7 +65,7 @@ const RUN_LABEL_BY_VERSION = [
   { from: 204, to: 207,      ruling: 'pre-D103a',    int: /INT/ },
   { from: 208, to: Infinity, ruling: 'D103a (V208)', int: /Short Interval \(SI\)/ },
 ];
-const LBL = RUN_LABEL_BY_VERSION.filter(r => +VER >= r.from && +VER <= r.to)[0]
+const LBL = RUN_LABEL_BY_VERSION.filter(r => SV.cmp(VER, r.from) >= 0 && SV.cmp(VER, r.to) <= 0)[0]
   || { ruling: 'NO ROW', int: /(?!)/ };
 ok('ERA a RUN_LABEL_BY_VERSION row covers ia-version ' + VER + ' (' + LBL.ruling + ')', LBL.ruling !== 'NO ROW',
    'the run INT label has no ruled text at this version, so T8a, T8 and T9 are void');

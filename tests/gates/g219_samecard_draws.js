@@ -56,6 +56,7 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const { load, progDigest, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 let SHARD_I = null, SHARD_N = 0, OUT = '', ART = path.join(__dirname, '..', '..', 'index.html');
 { const a = process.argv.slice(2); const pos = [];
@@ -166,9 +167,9 @@ function done(){ if(SCRATCH) try { fs.rmSync(SCRATCH, { recursive:true, force:tr
   console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); }
 
 function runParent(){
-  const IA = load(ART), VER = +IA.version, ROW = ERA[VER <= 218 ? 218 : VER];
+  const IA = load(ART), VER = SV.parse(IA.version), ROW = SV.lookup(ERA, SV.cmp(VER, 218) <= 0 ? 218 : VER);
   const noRow = ROW ? '' : ' (NO ERA ROW for ia-version ' + VER + ')';
-  console.log('g219_samecard_draws: candidate ' + ART + ' ia-version ' + VER + ' era row ' + (ROW ? (VER <= 218 ? '<=218' : VER) : 'NONE'));
+  console.log('g219_samecard_draws: candidate ' + ART + ' ia-version ' + VER + ' era row ' + (ROW ? (SV.cmp(VER, 218) <= 0 ? '<=218' : VER) : 'NONE'));
   // S1 + F1/F2: the D164 repro fixture, the lattice's own config.
   const FX = U.filter(x => x.eq === 'commercial' && x.ik === 'shoulder/workaround' && x.f === 'hypertrophy' && x.c.experience === 'beginner'
     && x.c.seed === 4242 && x.c.restDays.join('/') === 'sun/wed');

@@ -51,6 +51,7 @@
 'use strict';
 const path = require('path');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
@@ -177,13 +178,13 @@ const R = {
 // ── RUN ──────────────────────────────────────────────────────────────────────
 const t0 = Date.now();
 let IA, STAMP = NaN;
-try { IA = load(ART); STAMP = +IA.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { IA = load(ART); STAMP = SV.parse(IA.version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let VER = STAMP;
-if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
   VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a pre-bump development run, not a ship proof');
 }
-console.log('g221 D178 | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
-if(!(VER >= ERA)){
+console.log('g221 D178 | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : ''));
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D178 P-ACTIVE (V' + ERA + '). No row may pass on it.');
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();

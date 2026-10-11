@@ -26,6 +26,7 @@
 const path = require('path');
 const fs = require('fs');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
 
@@ -38,10 +39,10 @@ function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function summary(code){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(code); }
 
 const HAS = IA.eval("typeof getCHIBike === 'function'");
-const VER = IA.version;
+const VER = SV.parse(IA.version);
 const D128_ERA = 205;
 
-if(!HAS && VER < D128_ERA){
+if(!HAS && SV.cmp(VER, D128_ERA) < 0){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D128 (V' + D128_ERA + ') and has no getCHIBike.');
   for(const r of ['B1','B2','B3','B4']) skipRow(r + ' skipped below the D128 era');
   summary(0);

@@ -3,6 +3,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { isVersion, metaVersion, sameVersion } from './version.mjs';
 
 function countOf(haystack, needle) {
   let n = 0;
@@ -20,18 +21,18 @@ export function checkPwaBuild({ rootIndex, out, name, baseHref, rerun }) {
   };
   const root = readFileSync(rootIndex, 'utf8');
   const sha256 = createHash('sha256').update(root).digest('hex');
-  const version = (root.match(/<meta name="ia-version" content="(\d+)"/) || [])[1];
-  if (!version) fail('the root index.html has no <meta name="ia-version">');
+  const version = metaVersion(root);
+  if (version === null) fail('the root index.html has no <meta name="ia-version">');
 
   const indexPath = join(out, 'index.html');
   if (!existsSync(indexPath)) fail(`no build in ${name}; ${rerun}`);
   const index = readFileSync(indexPath, 'utf8');
 
   // sync-legacy.mjs stamps the source's version and sha256 into the page it generates.
-  const banner = index.match(/from \.\.\/index\.html \(ia-version (\d+), sha256 ([0-9a-f]{64})\)/);
-  if (!banner) fail(`${name}index.html has no generated banner; ${rerun}`);
+  const banner = index.match(/from \.\.\/index\.html \(ia-version ([^,\s]+), sha256 ([0-9a-f]{64})\)/);
+  if (!banner || !isVersion(banner[1])) fail(`${name}index.html has no generated banner; ${rerun}`);
   if (banner[2] !== sha256) {
-    const built = banner[1] === version ? `an older copy of ia-version ${version}` : `ia-version ${banner[1]}`;
+    const built = sameVersion(banner[1], version) ? `an older copy of ia-version ${version}` : `ia-version ${banner[1]}`;
     fail(`${name} was built from ${built}, but the root index.html is ia-version ${version} as it stands; ${rerun}`);
   }
   if (countOf(index, `<meta name="ia-version" content="${version}">`) !== 1) fail(`${name}index.html carries the wrong ia-version`);

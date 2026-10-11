@@ -56,15 +56,16 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const { load, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
-const VER = +IA.version, ERA = 214, V213_COMMIT = 'bc3cccce3f048a9e0e4e45846bfe8315635c8430';
+const VER = SV.parse(IA.version), ERA = 214, V213_COMMIT = 'bc3cccce3f048a9e0e4e45846bfe8315635c8430';
 const ROWS = ['D0','D1','D2','D2v','D3','D4','D8','HM'];
 let pass = 0, fail = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-if(VER < ERA){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D158 (V' + ERA + ').'); ROWS.forEach(r => console.log('SKIP ' + r + ' below the D158 era')); done(); }
+if(SV.cmp(VER, ERA) < 0){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D158 (V' + ERA + ').'); ROWS.forEach(r => console.log('SKIP ' + r + ' below the D158 era')); done(); }
 
 const clone = v => JSON.parse(JSON.stringify(v));
 function canon(v){
@@ -81,12 +82,12 @@ const lifted = x => (x && !x.rest ? x.sections || [] : []).filter(s => (s.items 
 // ── baseline V213, for the pair rows only ──
 let BASE = null, baseWhy = '';
 {   // V214 fix: read for every candidate from 214 up, because D8 (ruling-level) needs it; D5-D7 stay pair-scoped
-  if(BASEFILE && fs.existsSync(BASEFILE)){ const b = load(BASEFILE); if(+b.version === 213){ BASE = b; baseWhy = 'argv ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 213; '; }
+  if(BASEFILE && fs.existsSync(BASEFILE)){ const b = load(BASEFILE); if(SV.cmp(b.version, 213) === 0){ BASE = b; baseWhy = 'argv ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 213; '; }
   if(!BASE){
     try {
       const f = path.join(os.tmpdir(), 'g214_v213_' + process.pid + '.html'); try { fs.unlinkSync(f); } catch(e) {}
       fs.writeFileSync(f, cp.execFileSync('git', ['-C', path.join(__dirname, '..', '..'), 'show', V213_COMMIT + ':index.html'], {maxBuffer: 1 << 27}));
-      const b = load(f); if(+b.version === 213){ BASE = b; baseWhy += 'git ' + V213_COMMIT.slice(0, 7); } else baseWhy += 'git copy reads ' + b.version;
+      const b = load(f); if(SV.cmp(b.version, 213) === 0){ BASE = b; baseWhy += 'git ' + V213_COMMIT.slice(0, 7); } else baseWhy += 'git copy reads ' + b.version;
       try { fs.unlinkSync(f); } catch(e) {}
     } catch(e) { baseWhy += 'git show failed: ' + String(e.message).slice(0, 80); }
   }
@@ -198,7 +199,7 @@ ok(`D4 no hard run at T-1 or T-2, no lift at T-1, exactly one TIME TRIAL and it 
 // to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
 // D158 (standing ruling 4).
 { let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
-  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  const eraV = SV.parse(IA.version), eraHas = SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) !== undefined, eraRow = eraHas ? SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) : undefined;
   ok('HM HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved: an NRC fixture carries no test pin)',
      eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 done();

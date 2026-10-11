@@ -34,6 +34,10 @@ describe('sync-legacy split', () => {
     assert.equal(parts.version, '7');
   });
 
+  it('takes a dotted ia-version out as written: 0.239.1', () => {
+    assert.equal(split(swap('content="7"', 'content="0.239.1"')).version, '0.239.1');
+  });
+
   it('keeps the body markup from both sides of the script, in order', () => {
     assert.equal(parts.markup, '\n<div id="a" onclick="go()">A</div>\n\n<div id="b">B</div>\n');
   });
@@ -51,6 +55,7 @@ describe('sync-legacy split', () => {
     ['a module script', swap('<script>', '<script type="module">'), /plain inline <script>/],
     ['a second body script', swap('<div id="b">B</div>', '<div id="b">B</div><script>x()</script>'), /second <script>/],
     ['no ia-version', swap('<meta name="ia-version" content="7">', ''), /no <meta name="ia-version">/],
+    ['an ia-version that is not a version', swap('content="7"', 'content="0.239"'), /holds "0\.239", which is not a version/],
     ['no </head>', swap('</head>', ''), /no <\/head>/],
   ] as const) {
     it(`fails loudly on ${what}`, () => {
@@ -82,6 +87,17 @@ describe('sync-legacy render', () => {
     assert.ok(ts.includes(`export const LEGACY_SHA256 = "${sha}";`));
     assert.ok(ts.includes(`legacy/app.js?v=7-${sha.slice(0, 12)}`));
     assert.deepEqual(JSON.parse(byName('/legacy-manifest.json')), { version: '7', sha256: sha });
+  });
+
+  it('stamps a dotted ia-version as written: 0.239.1 on the module, the script URL, the manifest and the banner', () => {
+    const page = swap('content="7"', 'content="0.239.1"');
+    const dotted = Object.entries(render(page));
+    const pick = (suffix: string): string => dotted.find(([path]) => path.endsWith(suffix))![1];
+    const s = createHash('sha256').update(page).digest('hex');
+    assert.ok(pick('/legacy-markup.ts').includes('export const LEGACY_VERSION = "0.239.1";'));
+    assert.ok(pick('/legacy-markup.ts').includes(`legacy/app.js?v=0.239.1-${s.slice(0, 12)}`));
+    assert.deepEqual(JSON.parse(pick('/legacy-manifest.json')), { version: '0.239.1', sha256: s });
+    assert.ok(pick('/generated/index.html').includes(`(ia-version 0.239.1, sha256 ${s})`));
   });
 
   it("makes Angular's index page from the head, with ia-root as the body", () => {

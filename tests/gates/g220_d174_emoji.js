@@ -56,6 +56,7 @@
 'use strict';
 const path = require('path'), fs = require('fs'), cp = require('child_process'), vm = require('vm');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 
@@ -349,9 +350,9 @@ function lineOfNeedle(S, needle){ const c = cnt(S.stripped, needle); if(c !== 1)
 
 function main(){
   let IA; try { IA = load(ART); } catch(e){ fail++; console.log('FAIL BOOT harness load of ' + ART + ': ' + ((e && e.message) || e)); return; }
-  const VER = +IA.version;
-  console.log('g220_d174_emoji: candidate ' + ART + ' ia-version ' + VER + ' era ' + (VER >= 220 ? 'D174 (>=220): every row runs' : 'REFUSED (<220)'));
-  if(!(VER >= 220)){ console.log('REFUSED: ia-version ' + VER + ' predates D174 P-EMOJI (V220). No row may pass on it.');
+  const VER = SV.parse(IA.version);
+  console.log('g220_d174_emoji: candidate ' + ART + ' ia-version ' + VER + ' era ' + (SV.cmp(VER, 220) >= 0 ? 'D174 (>=220): every row runs' : 'REFUSED (<220)'));
+  if(!(SV.cmp(VER, 220) >= 0)){ console.log('REFUSED: ia-version ' + VER + ' predates D174 P-EMOJI (V220). No row may pass on it.');
     ROWS.forEach(([id, d]) => { fail++; seen.add(id); console.log('FAIL ' + id + ' ' + d + ' REFUSED: ia-version ' + VER + ' predates D174 (V220)'); }); return; }
   const src = IA.html; let S, A;
 

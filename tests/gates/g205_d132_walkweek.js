@@ -50,6 +50,7 @@
 const path = require('path');
 const fs = require('fs');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
 const SRC = fs.readFileSync(ART, 'utf8').replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
@@ -62,14 +63,14 @@ function ok(label, cond, got){
 }
 function summary(code){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(code); }
 
-const VER = Number(IA.IA_VERSION);
+const VER = SV.parse(IA.IA_VERSION);
 // The predicate, read out of the source. Both modes must be named and the guard must be
 // joined to the pace family, or the claim below is being met by accident.
 const HAS_MODES = /_walkOnly\s*=\s*\(\s*cardioMode\s*===\s*'noimpact'\s*\|\|\s*cardioMode\s*===\s*'noimpact_swim'\s*\)/.test(FLAT);
 const HAS_JOIN  = /PACE_GOALS\.has\(goalId\)\s*&&\s*\(\s*cardioTypes\.length\s*!==\s*1\s*\|\|\s*_walkOnly\s*\)/.test(FLAT);
 const HAS_PARAM = /function sportDayTargets\(cardioTypes, cardioGoals, totalDays, liftGoal, cardioMode\)/.test(FLAT);
 const HAS = HAS_MODES && HAS_JOIN && HAS_PARAM;
-if(VER >= 205){
+if(SV.cmp(VER, 205) >= 0){
   ok('W0 at ia-version ' + VER + ' the D132 walking-week ceiling predicate exists', HAS,
      'modes ' + HAS_MODES + ', pace join ' + HAS_JOIN + ', cardioMode param ' + HAS_PARAM);
   if(!HAS) summary(1);
@@ -93,7 +94,7 @@ const RUN_CARD_ERAS = [
   { hi: 207, name: { int: /Interval \(INT\)/, chi: /Continuous High Intensity \(CHI\)/ }, key: null },
   { lo: 208, name: { int: /Short Interval \(SI\)/, chi: /Long Interval \(LI\)/ }, key: { int: 'int', chi: 'chi' } }
 ];
-const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || VER >= r.lo) && (r.hi === undefined || VER <= r.hi));
+const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || SV.cmp(VER, r.lo) >= 0) && (r.hi === undefined || SV.cmp(VER, r.hi) <= 0));
 if(CARD_ROWS.length !== 1){
   ok('E0 ia-version ' + VER + ' reads its run cards through exactly one era row', false, CARD_ROWS.length + ' rows match');
   summary(1);

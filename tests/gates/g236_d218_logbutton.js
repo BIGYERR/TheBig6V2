@@ -84,6 +84,7 @@
 const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const S = require('../status')('g236_d218_logbutton');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 236;
@@ -125,11 +126,10 @@ const stripComments = t => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S
 
 // ── version, read from the candidate's meta ──────────────────────────────────────────────────────────────────────────
 const HTML = fs.readFileSync(ART, 'utf8');
-const VM = HTML.match(/<meta name="ia-version" content="(\d+)">/);
-const VER = VM ? +VM[1] : 0;
-const verCj = k => [k + '-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA];
+const VER = /<meta name="ia-version" content="/.test(HTML) ? SV.fromHtml(HTML) : 0;   // no meta: 0, as before
+const verCj = k => [k + '-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA];
 S.info('g236 D218-D219 P-LOGBUTTON | candidate ' + ART + ' ia-version ' + VER);
-if(!(VER >= ERA)) S.info('REFUSED: ia-version ' + VER + ' predates D218 / D219 (V' + ERA + '). Every row runs and FAILS by its version conjunct.');
+if(!(SV.cmp(VER, ERA) >= 0)) S.info('REFUSED: ia-version ' + VER + ' predates D218 / D219 (V' + ERA + '). Every row runs and FAILS by its version conjunct.');
 
 // ── ENV (g235_d215_hmszero.js mkEnv, g233 lineage, plus g232's __FORCE hook; program id g236) ───────────────────────
 const RealDate = Date, DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];

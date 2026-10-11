@@ -18,7 +18,12 @@
 # sabotage specs and lists, the tags V232 and V233, the reach map at HEAD) comes from the repo.
 # No real gate runs: gate.sh grades toy gates (it still boots index.html at step 3), sabotage.py trips a toy gate,
 # status.js runs inside toy gates and rows.js reads toy outputs (post-V233 slice M1a); gate.sh step 4b checks toy rows (M1b).
-# Rows scoped to a version read today's ia-version from index.html (CUR) and bump to CUR+1, never a typed version.
+# Rows scoped to a version read today's ia-version from index.html (CUR, the raw meta through tests/semver.js meta) and
+# bump it a patch (NEXT, tests/semver.js bump CUR patch: 239 gives 0.239.1), never a typed version, so the era rows run
+# era_bump.py's dotted path (Post-V239 semver). The version_scope.js toys' base files (V2 to V5) compare CUR in the semver
+# form (SV.cmp(VER, 'CUR') <op> 0, quoted, so valid JS and read at a legacy or a dotted CUR), and debt1 also keeps one
+# legacy hit against a fixed past build (VER === 238); the planted rows (G5, V3, V4) plant SV.cmp(VER, 'NEXT') === 0, a
+# dotted NEXT, so version_scope.js's semver path is exercised (post-V239 slices 2c, 2d).
 # Prints one row per claim, then `PASS n FAIL n`; a missing summary is a crash. Exit 0 only on FAIL 0, 2 on a refusal.
 set -eo pipefail
 
@@ -47,9 +52,15 @@ touch "$W/.start"
 # stamps on the repo root, tests and tests/edits only), so a directory is no evidence either way.
 repo_files() { find "$R" \( -path "$R/.git" -o -path "$R/.claude" \) -prune -o -type f ! -name .DS_Store -print | LC_ALL=C sort > "$1"; }
 repo_files "$W/repo_files.before"
-CUR="$(grep -oE '<meta name="ia-version" content="[0-9]+"' "$R/index.html" | grep -oE '[0-9]+' | tail -1 || true)"
+CUR="$(node "$R/tests/semver.js" meta "$R/index.html" 2>/dev/null || true)"
 if [ -z "$CUR" ]; then echo "setup: index.html carries no ia-version meta (crash)"; exit 1; fi
-NEXT=$((CUR + 1))
+NEXT="$(node "$R/tests/semver.js" bump "$CUR" patch 2>&1)" || { echo "setup: index.html ia-version $CUR does not parse: $NEXT (crash)"; exit 1; }
+# An era row key as era_bump.py writes it: a legacy integer bare ([239]), a dotted version quoted (['0.239.1']); *_KRE is
+# the key as an ERE, NEXT_RE the bare version as an ERE.
+key_of() { case "$1" in *.*) printf "'%s'" "$1" ;; *) printf '%s' "$1" ;; esac; }
+ere() { printf '%s' "$1" | sed 's/[].[\*^$]/\\&/g'; }
+CUR_KEY="$(key_of "$CUR")"; NEXT_KEY="$(key_of "$NEXT")"
+CUR_KRE="$(ere "$CUR_KEY")"; NEXT_KRE="$(ere "$NEXT_KEY")"; NEXT_RE="$(ere "$NEXT")"
 echo "tooling self-test: tools $T"
 echo "   repo $R, today's ia-version $CUR (era rows bump to $NEXT), run dir $W"
 
@@ -181,7 +192,7 @@ chmod +x "$W/shim/xargs"
 mk_gate_tree() { # <root>: gate.sh, version_scope.js and rows.js under test, the repo's harness and lint list, an empty toy
   mkdir -p "$1/tests/gates"     # debt file, and a header-only toy skip_allow.txt (a bootstrapped step 4b still runs
   cp "$T/gate.sh" "$T/version_scope.js" "$T/rows.js" "$1/tests/"   # rows.js check against it: post-V233 M1c)
-  cp "$R/tests/harness.js" "$1/tests/"
+  cp "$R/tests/harness.js" "$R/tests/semver.js" "$1/tests/"   # harness.js and gate.sh require semver.js (Post-V239)
   if [ -f "$R/tests/lint_allow.txt" ]; then cp "$R/tests/lint_allow.txt" "$1/tests/"; fi
   printf '# toy debt file: no toy gate carries debt\n' > "$1/tests/version_scope_debt.txt"
   printf '# toy skip_allow.txt: no entries\n' > "$1/tests/skip_allow.txt"
@@ -201,7 +212,7 @@ printf "console.log('PASS 1 FAIL 0');\n" > "$GA/tests/gates/a_pass.js"
 printf "console.log('  FAIL toy b row, red on purpose');\nconsole.log('PASS 0 FAIL 1');\n" > "$GA/tests/gates/b_fail.js"
 printf "console.log('toy c starts');\nthrow new Error('toy c crashes before its summary');\n" > "$GA/tests/gates/c_crash.js"
 printf "console.log('REFUSED toy d row: it could not be put');\nconsole.log('PASS 1 FAIL 0');\n" > "$GA/tests/gates/d_refused.js"
-printf "const IA = { version: '%s' }, VER = +IA.version;\nif (VER === %s) console.log('planted exact-version row');\nconsole.log('PASS 2 FAIL 0');\n" "$CUR" "$NEXT" > "$GA/tests/gates/e_pass.js"
+printf "const path = require('path'), SV = require(path.join(__dirname, '..', 'semver.js'));\nconst IA = { version: '%s' }, VER = SV.parse(IA.version);\nif (SV.cmp(VER, '%s') === 0) console.log('planted exact-version row');\nconsole.log('PASS 2 FAIL 0');\n" "$CUR" "$NEXT" > "$GA/tests/gates/e_pass.js"
 printf '# toy start times: e_pass.js is left out, so its cost is unknown and it starts first\na_pass.js 1.0\nb_fail.js 3.0\nc_crash.js 2.0\nd_refused.js 5.0\n' > "$GA/tests/gate_times.txt"
 { cat "$R/index.html"; printf '\n<!-- tooling self-test baseline: two lines apart from the candidate -->\n'; } > "$W/base.html"
 gate_run "$W/g_mixed.out" "$W/g_mixed.start" "$GA/tests/gate.sh" "$R/index.html" "$W/base.html"
@@ -353,26 +364,27 @@ NG="$(ls "$VR/gates" | grep -c '\.js$' || true)"
 run "$W/v_repo.out" node "$VR/version_scope.js"
 row "V1 the repo's gates against the repo's debt file: PASS $NG FAIL 0 (one row per gate)" 'rc_is "$W/v_repo.out" 0 && hasX "$W/v_repo.out" "PASS $NG FAIL 0"' "$W/v_repo.out"
 VT="$W/vs_toy/tests"; mkdir -p "$VT/gates" "$W/vs_toy/orig"; cp "$T/version_scope.js" "$VT/"
-HDR="const IA = { version: '$CUR' }, VER = +IA.version;"
-printf '%s\nif (VER >= %s) console.log("a minimum, not a hit");\n' "$HDR" "$CUR" > "$VT/gates/clean.js"
-printf '%s\nif (VER === %s) console.log("one exact row");\n' "$HDR" "$CUR" > "$VT/gates/debt1.js"
-printf '%s\nif (VER === %s) console.log("first exact row");\nif (VER !== %s) console.log("second exact row");\n' "$HDR" "$CUR" "$NEXT" > "$VT/gates/debt2.js"
-printf '# toy debt file\ndebt1.js 1  # toy: one hit\ndebt2.js 2  # toy: two hits\n' > "$VT/version_scope_debt.txt"
+HDR="const path = require('path'), SV = require(path.join(__dirname, '..', 'semver.js'));
+const IA = { version: '$CUR' }, VER = SV.parse(IA.version);"
+printf "%s\nif (SV.cmp(VER, '%s') >= 0) console.log(\"a minimum, not a hit\");\n" "$HDR" "$CUR" > "$VT/gates/clean.js"
+printf "%s\nif (SV.cmp(VER, '%s') === 0) console.log(\"one exact row, the semver form\");\nif (VER === 238) console.log(\"one exact row, the legacy form against a fixed past build\");\n" "$HDR" "$CUR" > "$VT/gates/debt1.js"
+printf "%s\nif (SV.cmp(VER, '%s') === 0) console.log(\"first exact row\");\nif (SV.cmp(VER, '%s') !== 0) console.log(\"second exact row\");\n" "$HDR" "$CUR" "$CUR" > "$VT/gates/debt2.js"
+printf '# toy debt file\ndebt1.js 2  # toy: two hits, the semver form and the legacy form\ndebt2.js 2  # toy: two hits\n' > "$VT/version_scope_debt.txt"
 cp "$VT/gates/"*.js "$W/vs_toy/orig/"
 run "$W/v_toy.out" node "$VT/version_scope.js"
 row "V2 toy tree at its debt (one clean gate, two at their counts): PASS 3 FAIL 0" 'rc_is "$W/v_toy.out" 0 && hasX "$W/v_toy.out" "PASS 3 FAIL 0"' "$W/v_toy.out"
-printf 'if (VER === %s) console.log("planted");\n' "$NEXT" >> "$VT/gates/clean.js"
+printf "if (SV.cmp(VER, '%s') === 0) console.log(\"planted\");\n" "$NEXT" >> "$VT/gates/clean.js"
 run "$W/v_plant.out" node "$VT/version_scope.js"; cp "$W/vs_toy/orig/clean.js" "$VT/gates/"
 row "V3 a row planted in the clean gate is a new exact-version row, red by name" 'rc_is "$W/v_plant.out" 1 && has "$W/v_plant.out" "^FAIL new exact-version row: clean\.js has 1 exact-version hit and no debt line" && hasX "$W/v_plant.out" "PASS 2 FAIL 1"' "$W/v_plant.out"
-printf 'if (VER === %s) console.log("planted");\n' "$NEXT" >> "$VT/gates/debt1.js"
+printf "if (SV.cmp(VER, '%s') === 0) console.log(\"planted\");\n" "$NEXT" >> "$VT/gates/debt1.js"
 run "$W/v_over.out" node "$VT/version_scope.js"; cp "$W/vs_toy/orig/debt1.js" "$VT/gates/"
-row "V4 one hit over a debt count is red by name" 'rc_is "$W/v_over.out" 1 && has "$W/v_over.out" "^FAIL new exact-version row: debt1\.js has 2 exact-version hits, its debt line says 1" && hasX "$W/v_over.out" "PASS 2 FAIL 1"' "$W/v_over.out"
-printf '%s\nif (VER === %s) console.log("first exact row");\nif (VER >= %s) console.log("now a minimum");\n' "$HDR" "$CUR" "$NEXT" > "$VT/gates/debt2.js"
+row "V4 one hit over a debt count is red by name" 'rc_is "$W/v_over.out" 1 && has "$W/v_over.out" "^FAIL new exact-version row: debt1\.js has 3 exact-version hits, its debt line says 2" && hasX "$W/v_over.out" "PASS 2 FAIL 1"' "$W/v_over.out"
+printf "%s\nif (SV.cmp(VER, '%s') === 0) console.log(\"first exact row\");\nif (SV.cmp(VER, '%s') >= 0) console.log(\"now a minimum\");\n" "$HDR" "$CUR" "$CUR" > "$VT/gates/debt2.js"
 run "$W/v_stale.out" node "$VT/version_scope.js"; cp "$W/vs_toy/orig/debt2.js" "$VT/gates/"
 row "V5 one hit removed under a debt line is stale debt, red by name" 'rc_is "$W/v_stale.out" 1 && hasX "$W/v_stale.out" "FAIL stale debt: debt2.js now 1, lower the line" && hasX "$W/v_stale.out" "PASS 2 FAIL 1"' "$W/v_stale.out"
 
 # =====================================================================================================================
-echo "== era_bump.py: a scratch git tree of tests/harness.js + tests/gates (V$CUR rows present, V$NEXT written)"
+echo "== era_bump.py: a scratch git tree of tests/harness.js + tests/gates (rows [$CUR_KEY] present, [$NEXT_KEY] written)"
 # The 11 row-per-version tables (measure mT section 1; CLAUDE.md Proof scope, Era rows). A table added or retired is a
 # ruling, and this list moves with it.
 TABLES='tests/harness.js MANNY_DIGEST_BY_VERSION
@@ -388,9 +400,10 @@ tests/gates/g200_pull_arbitration.js SWAP_BY_VERSION
 tests/gates/g219_samecard_draws.js ERA'
 ER="$W/era"; mkdir -p "$ER/tests"
 cp -R "$R/tests/gates" "$ER/tests/gates"; cp "$R/tests/harness.js" "$ER/tests/"; cp "$T/era_bump.py" "$ER/tests/"
+cp "$R/tests/semver.js" "$R/tests/semver.py" "$ER/tests/"   # harness.js requires semver.js, era_bump.py imports semver.py
 gitc() { git -c user.name=selftest -c user.email=selftest@invalid -c commit.gpgsign=false -c core.hooksPath=/dev/null -c init.defaultBranch=main "$@"; }
 gitc -C "$ER" init -q; gitc -C "$ER" add -A; gitc -C "$ER" commit -q -m "tooling self-test: the tree before the era bump"
-printf 'tooling self-test scratch ruling: V%s moves no table\n' "$NEXT" > "$W/ruling.md"
+printf 'tooling self-test scratch ruling: v%s moves no table\n' "$NEXT" > "$W/ruling.md"
 EB="$ER/tests/era_bump.py"
 every_table() { # <file> <ERE with @F (file) @S (table)>: a line matches it for each of the 11 tables
   local f s pat
@@ -404,21 +417,21 @@ EOF
 tree_clean() { [ -z "$(git -C "$ER" status --porcelain)" ]; }
 added_is() { [ "$(git -C "$ER" diff --numstat | awk '{a += $1; d += $2} END {print a + 0 " " d + 0}')" = "$1 0" ]; }
 run "$W/e_check.out" python3 "$EB" --check "$CUR"
-row "E1 --check $CUR: all 11 tables present, 0 unregistered, exit 0" 'rc_is "$W/e_check.out" 0 && every_table "$W/e_check.out" "^present +@F +@S\[$CUR\] line [0-9]+$" && hasX "$W/e_check.out" "era_bump --check $CUR: 11 present, 0 missing or duplicate, 0 unregistered"' "$W/e_check.out"
+row "E1 --check $CUR: all 11 tables present, 0 unregistered, exit 0" 'rc_is "$W/e_check.out" 0 && every_table "$W/e_check.out" "^present +@F +@S\[$CUR_KRE\] line [0-9]+$" && hasX "$W/e_check.out" "era_bump --check $CUR: 11 present, 0 missing or duplicate, 0 unregistered"' "$W/e_check.out"
 run "$W/e_dry.out" python3 "$EB" "$NEXT" --ruling "$W/ruling.md" --dry-run
-row "E2 $NEXT --dry-run: 11 rows planned, nothing written" 'rc_is "$W/e_dry.out" 0 && hasX "$W/e_dry.out" "era_bump V$NEXT: DRY RUN, 11 row(s) in 6 file(s) would be written; 0 moved; nothing written" && every_table "$W/e_dry.out" "^WOULD +@F +@S\[$NEXT\] = @S\[$CUR\]  after line [0-9]+$" && tree_clean' "$W/e_dry.out"
+row "E2 $NEXT --dry-run: 11 rows planned, nothing written" 'rc_is "$W/e_dry.out" 0 && hasX "$W/e_dry.out" "era_bump v$NEXT: DRY RUN, 11 row(s) in 6 file(s) would be written; 0 moved; nothing written" && every_table "$W/e_dry.out" "^WOULD +@F +@S\[$NEXT_KRE\] = @S\[$CUR_KRE\]  after line [0-9]+$" && tree_clean' "$W/e_dry.out"
 run "$W/e_moved.out" python3 "$EB" "$NEXT" --ruling "$W/ruling.md" --moved MANNY_DIGEST_BY_VERSION
 git -C "$ER" diff > "$W/e_moved.diff"
-row "E3 $NEXT --moved MANNY_DIGEST_BY_VERSION: writes 10, the moved table is left to builder" 'rc_is "$W/e_moved.out" 0 && hasX "$W/e_moved.out" "era_bump V$NEXT: wrote 10 row(s) in 6 file(s); 1 moved (ruling $W/ruling.md)" && has "$W/e_moved.out" "^MOVED +tests/harness\.js +MANNY_DIGEST_BY_VERSION\[$NEXT\]: not written" && added_is 10 && lacks "$W/e_moved.diff" "MANNY_DIGEST_BY_VERSION\[$NEXT\]"' "$W/e_moved.out"
+row "E3 $NEXT --moved MANNY_DIGEST_BY_VERSION: writes 10, the moved table is left to builder" 'rc_is "$W/e_moved.out" 0 && hasX "$W/e_moved.out" "era_bump v$NEXT: wrote 10 row(s) in 6 file(s); 1 moved (ruling $W/ruling.md)" && has "$W/e_moved.out" "^MOVED +tests/harness\.js +MANNY_DIGEST_BY_VERSION\[$NEXT_KRE\]: not written" && added_is 10 && lacks "$W/e_moved.diff" "MANNY_DIGEST_BY_VERSION\[$NEXT_KRE\]"' "$W/e_moved.out"
 git -C "$ER" checkout -q -- .
 run "$W/e_bump.out" python3 "$EB" "$NEXT" --ruling "$W/ruling.md"
 git -C "$ER" diff -U0 > "$W/e_bump.diff"
-row "E4 $NEXT: writes 11 rows, each [$NEXT] = [$CUR] in its own file, nothing removed" 'rc_is "$W/e_bump.out" 0 && hasX "$W/e_bump.out" "era_bump V$NEXT: wrote 11 row(s) in 6 file(s); 0 moved (ruling $W/ruling.md)" && added_is 11 && every_table "$W/e_bump.diff" "^\+[[:space:]]*@S\[$NEXT\] = @S\[$CUR\];   // era_bump V$NEXT: ruled UNMOVED, reference to \[$CUR\]; "' "$W/e_bump.out"
+row "E4 $NEXT: writes 11 rows, each [$NEXT_KEY] = [$CUR_KEY] in its own file, nothing removed" 'rc_is "$W/e_bump.out" 0 && hasX "$W/e_bump.out" "era_bump v$NEXT: wrote 11 row(s) in 6 file(s); 0 moved (ruling $W/ruling.md)" && added_is 11 && every_table "$W/e_bump.diff" "^\+[[:space:]]*@S\[$NEXT_KRE\] = @S\[$CUR_KRE\];   // era_bump v$NEXT_RE: ruled UNMOVED, reference to \[$CUR_KRE\]; "' "$W/e_bump.out"
 run "$W/e_check2.out" python3 "$EB" --check "$NEXT"
 row "E5 the bumped tree reads --check $NEXT: 11 present, exit 0" 'rc_is "$W/e_check2.out" 0 && hasX "$W/e_check2.out" "era_bump --check $NEXT: 11 present, 0 missing or duplicate, 0 unregistered"' "$W/e_check2.out"
 D0="$(git -C "$ER" diff | shasum)"
 run "$W/e_rerun.out" python3 "$EB" "$NEXT" --ruling "$W/ruling.md"
-row "E6 a second $NEXT run refuses every table and writes nothing (exit 2)" 'rc_is "$W/e_rerun.out" 2 && hasX "$W/e_rerun.out" "era_bump V$NEXT: REFUSED, 11 refusal(s); no file written" && [ "$(grep -c "already exists" "$W/e_rerun.out" || true)" = 11 ] && [ "$(git -C "$ER" diff | shasum)" = "$D0" ]' "$W/e_rerun.out"
+row "E6 a second $NEXT run refuses every table and writes nothing (exit 2)" 'rc_is "$W/e_rerun.out" 2 && hasX "$W/e_rerun.out" "era_bump v$NEXT: REFUSED, 11 refusal(s); no file written" && [ "$(grep -c "already exists" "$W/e_rerun.out" || true)" = 11 ] && [ "$(git -C "$ER" diff | shasum)" = "$D0" ]' "$W/e_rerun.out"
 run "$W/e_eod.out" python3 "$EB" --era-only-diff HEAD
 row "E7 --era-only-diff HEAD after the bump: 6 era-only, 0 edited" 'rc_is "$W/e_eod.out" 0 && hasX "$W/e_eod.out" "era_bump --era-only-diff HEAD: 6 era-only, 0 edited"' "$W/e_eod.out"
 printf '// a non-era line, tooling self-test\n' >> "$ER/tests/gates/g219_samecard_draws.js"
@@ -497,7 +510,7 @@ row "S12 --gates, same toy spec: the same run order and GATE_POOL=8, the report 
 echo "== chain.js: a clean clone at HEAD (its gate.sh and harness.js are HEAD's), fixtures from the tags V232 and V233"
 CL="$W/clone"
 git clone -q --shared "$R" "$CL"
-cp "$T/chain.js" "$T/era_bump.py" "$CL/tests/"
+cp "$T/chain.js" "$T/era_bump.py" "$R/tests/semver.js" "$R/tests/semver.py" "$CL/tests/"   # the copied tools' semver helpers
 git -C "$R" show V232:index.html > "$W/V232.html"
 git -C "$R" show V233:index.html > "$W/V233.html"
 oracle chain-cands "$W/V233.html" "$W/cand_getprograms.html" "$W/cand_const.html" "$W/const.line"

@@ -16,10 +16,11 @@
 // re-derived here — which is what "byte-identical to what shipped before" means as a
 // predicate rather than as a diff.
 const fs=require('fs'), path=require('path'), vm=require('vm');
+const SV=require(path.join(__dirname,'..','semver.js'));
 const ROOT=path.join(__dirname,'..','..');
 const HTML=process.argv[2]||path.join(ROOT,'index.html');
 const SRC=fs.readFileSync(HTML,'utf8');
-const VER=parseInt((SRC.match(/name="ia-version" content="(\d+)"/)||[])[1],10);
+const VER=/<meta name="ia-version" content="/.test(SRC)?SV.fromHtml(SRC):NaN;   // no meta: NaN, as before
 
 let P=0,F=0;
 function ok(name,cond,got){ if(cond){P++;console.log('PASS '+name);} else {F++;console.log('FAIL '+name+(got!==undefined?' (got '+got+')':''));} }
@@ -30,7 +31,7 @@ function ok(name,cond,got){ if(cond){P++;console.log('PASS '+name);} else {F++;c
 // carried no version bump - that is why an earlier draft of this comment read 204. The
 // bump is slice 8, so 205 is the first artifact that carries D130 and the predicate below
 // is keyed on it.)
-if(!(VER>=205)){ console.log('SKIP g205_d130_typed: ia-version '+VER+' predates D130 (needs >= 205)'); console.log('PASS 0 FAIL 0'); process.exit(0); }
+if(Number.isNaN(VER)||!(SV.cmp(VER,205)>=0)){ console.log('SKIP g205_d130_typed: ia-version '+VER+' predates D130 (needs >= 205)'); console.log('PASS 0 FAIL 0'); process.exit(0); }
 
 function summary(code){ console.log('PASS '+P+' FAIL '+F); process.exit(code); }
 // ── ERA ROWS: how a run card names its quality session (standing ruling 4) ───────────
@@ -46,7 +47,7 @@ const RUN_CARD_ERAS = [
   { hi: 207, name: { int: /^Interval \(INT\)/, chi: /^Continuous High Intensity \(CHI\)/ }, key: null },
   { lo: 208, name: { int: /^Short Interval \(SI\)/, chi: /^Long Interval \(LI\)/ }, key: { int: 'int', chi: 'chi' } }
 ];
-const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || VER >= r.lo) && (r.hi === undefined || VER <= r.hi));
+const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || SV.cmp(VER, r.lo) >= 0) && (r.hi === undefined || SV.cmp(VER, r.hi) <= 0));
 if(CARD_ROWS.length !== 1){
   ok('E0 ia-version ' + VER + ' reads its run cards through exactly one era row', false, CARD_ROWS.length + ' rows match');
   summary(1);

@@ -24,7 +24,8 @@
 //         skip       a skip-status line (SKIP_STATUS below: SKIP, SCOPED OUT, N/A, NOT APPLICABLE, DEFER and the like)
 //                    whose (gate, key) has no --allow entry (a tally line is not a row: never red, never allowed)
 //         allow      an --allow entry that lacks gate, key or cause, a blanket entry (a wildcard), an entry whose cause
-//                    names a version (VERSION_CAUSE below: a V-number, a 3-digit build number, ia-version, era), and a
+//                    names a version (VERSION_CAUSE below: a V-number, a 3-digit build number, a dotted M.m.p version,
+//                    ia-version, era), and a
 //                    stale entry (one that matched no skip-status line)
 //         ruled      a --ruled line that lacks sign, gate, key or ruling, a blanket line, and a stale line (one that
 //                    matches no actual change: a ruling cannot pre-license a row that never appears)
@@ -89,7 +90,7 @@ const KEY_ONLY = /^([A-Za-z]{0,6}[0-9][A-Za-z0-9.\-]*|L:[0-9a-f]{8})$/;   // an 
 const SKIP_TAG_RE = /^\s*(N\/A|NOT APPLICABLE|DEFERRED|DEFER|SKIPPED|NOT RUN)(?![A-Za-z0-9])/;
 const SKIP_STATUS = new Set(['SKIP', 'SCOPED OUT', 'N/A', 'NOT APPLICABLE', 'DEFER', 'DEFERRED', 'SKIPPED', 'NOT RUN']);
 const TALLY_RE = /^\s*(PASS|FAIL|SKIP|SCOPED OUT|N\/A|NOT APPLICABLE|DEFERRED|DEFER|SKIPPED|NOT RUN|RETIRED)\s+\d+(?:\s+[A-Z][A-Z\/]*(?: [A-Z][A-Z\/]*){0,2}\s+\d+)*\s*$/;   // a count line (TALLY above)
-const VERSION_CAUSE = /\bV\d+\b|\b\d{3}\b|\bia-version\b|\beras?\b/i;   // a V-number, a 3-digit build number, ia-version, era
+const VERSION_CAUSE = /\bV\d+\b|\b\d{3}\b|\bv?\d+\.\d+\.\d+\b|\bia-version\b|\beras?\b/i;   // a V-number, a 3-digit build number, a dotted M.m.p (v optional), ia-version, era
 const GATE_ONLY = /^[A-Za-z0-9_.\-]+$/;
 const WILD = /[*?\[\]{}|^$\\]/;
 
@@ -216,7 +217,7 @@ function readEntries(file, kind, red){
     if(f.some(x => WILD.test(x)) || /^(all|any)$/i.test(f[1] || '')){ red.push('FAIL ' + at + ' — blanket entry (a wildcard): name one gate and one row'); return; }
     if(f.length !== 2 || !GATE_ONLY.test(f[0]) || !KEY_ONLY.test(f[1])){ red.push('FAIL ' + at + ' — malformed: needs exactly <gate> <key> (an id-like key or L:<8 hex>) before the #'); return; }
     if(!why){ red.push('FAIL ' + at + ' — no ' + (kind === 'allow' ? 'cause' : 'ruling') + ' after #'); return; }
-    if(kind === 'allow' && VERSION_CAUSE.test(why)){ red.push('FAIL ' + at + ' — the cause names a version (a V-number, a 3-digit build number, ia-version or era): a cause is the missing input, never a version'); return; }
+    if(kind === 'allow' && VERSION_CAUSE.test(why)){ red.push('FAIL ' + at + ' — the cause names a version (a V-number, a 3-digit build number, a dotted M.m.p version, ia-version or era): a cause is the missing input, never a version'); return; }
     out.push({ sign, gate: gateOf(f[0]), key: f[1], why, at, used: 0 });
   });
   return out;

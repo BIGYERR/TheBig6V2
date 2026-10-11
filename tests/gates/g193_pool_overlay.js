@@ -26,6 +26,7 @@
 const fs = require('fs');
 const path = require('path');
 const { load, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const FILE = process.argv[2] || 'index.html';
 const SRC = fs.readFileSync(FILE, 'utf8');
@@ -50,13 +51,14 @@ const verbose = m => { if (process.env.VERBOSE) S.info('ok ' + m); };
 // rather than muted, and anything NOT listed is a hard failure. A listed entry that stops
 // tripping is ALSO a failure, so the list cannot rot into a permanent excuse.
 const DEBT_FILE = path.join(__dirname, 'g193_pool_overlay_debt.txt');
-// V215: a line may open with an ia-version predicate, '>=N ' or '<=N ' (standing ruling 4: an entry is
+// V215: a line may open with an ia-version predicate, '>=N ' or '<=N ', N a legacy build number or M.m.p
+// (Post-V239; compared through tests/semver.js) (standing ruling 4: an entry is
 // keyed to the build whose code creates the trip). A line whose predicate does not hold for this
 // artifact is not listed for it, so it can neither excuse a trip nor fail as stale on it.
 const DEBT = fs.readFileSync(DEBT_FILE, 'utf8').split('\n')
   .map(l => l.trim()).filter(l => l && l[0] !== '#')
-  .map(l => { const m = l.match(/^(>=|<=)(\d+)\s+(.*)$/); if (!m) return l;
-    const v = +IA.version, n = +m[2]; return (m[1] === '>=' ? v >= n : v <= n) ? m[3] : null; })
+  .map(l => { const m = l.match(/^(>=|<=)(\d+(?:\.\d+\.\d+)?)\s+(.*)$/); if (!m) return l;
+    const v = SV.parse(IA.version), n = m[2]; return (m[1] === '>=' ? SV.cmp(v, n) >= 0 : SV.cmp(v, n) <= 0) ? m[3] : null; })
   .filter(Boolean);
 const DEBT_HIT = Object.create(null);
 function isDebt(key){ if (DEBT.indexOf(key) >= 0){ DEBT_HIT[key] = 1; return true; } return false; }
@@ -76,11 +78,11 @@ const GEAR = {
 // _floorPool() consult it, because they are the two pool forms whose output depends on the tier.
 // GHD names are a station from ia-version 215 (D149: commercial and crossfit own one). Through 214
 // a Glute-ham raise needed the barbell tier and a 45° back extension needed nothing.
-const GEAR_VER = +IA.version;
+const GEAR_VER = SV.parse(IA.version);
 function gearOK(nm, g){
   const n = String(nm).toLowerCase();
   if (/glute[- ]ham|\bghr\b|45° back extension/.test(n))
-    return GEAR_VER >= 215 ? g.hasGHD : (/glute[- ]ham|\bghr\b/.test(n) ? g.hasBarbell : true);
+    return SV.cmp(GEAR_VER, 215) >= 0 ? g.hasGHD : (/glute[- ]ham|\bghr\b/.test(n) ? g.hasBarbell : true);
   if (/\bbarbell\b|^trap bar|^power clean|^hang clean|^rack pull|^back squat|^front squat|^bench press$|close-grip bench/.test(n)) return g.hasBarbell;
   if (/cable|\brope\b|face pull|pulldown|pec deck|\bleg press\b|leg extension|leg curl|hack squat|\bsmith\b|preacher|\bmachine\b/.test(n)) return g.hasCables;
   if (/\bdumbbell|\bdb\b|goblet/.test(n)) return g.hasDumbbells;

@@ -49,6 +49,7 @@ const path = require('path');
 const fs = require('fs');
 const vm = require('vm');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
 const SRC_RAW = fs.readFileSync(ART, 'utf8');
@@ -61,9 +62,9 @@ function ok(label, cond, got){
 }
 function summary(code){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(code); }
 
-const VER = Number(IA.IA_VERSION);
+const VER = SV.parse(IA.IA_VERSION);
 const HAS = /PACE_GOALS/.test(SRC) && /_paceCapped/.test(SRC);
-if(VER >= 205){
+if(SV.cmp(VER, 205) >= 0){
   ok('P0 at ia-version ' + VER + ' the D125 pace-family routing exists', HAS,
      'no PACE_GOALS / _paceCapped: D125 is not in this artifact');
   if(!HAS) summary(1);
@@ -87,7 +88,7 @@ const RUN_CARD_ERAS = [
   { hi: 207, name: { int: /^Interval/, chi: /^Continuous High Intensity/ }, key: null },
   { lo: 208, name: { int: /^Short Interval \(SI\)/, chi: /^Long Interval \(LI\)/ }, key: { int: 'int', chi: 'chi' } }
 ];
-const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || VER >= r.lo) && (r.hi === undefined || VER <= r.hi));
+const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || SV.cmp(VER, r.lo) >= 0) && (r.hi === undefined || SV.cmp(VER, r.hi) <= 0));
 if(CARD_ROWS.length !== 1){
   ok('E0 ia-version ' + VER + ' reads its run cards through exactly one era row', false, CARD_ROWS.length + ' rows match');
   summary(1);
@@ -127,7 +128,7 @@ const NSW_TYPES_BY_ERA = [
   { hi: 212, t: { 2:['lsd_easy','lsd_long'], 3:['lsd_easy','int','lsd_long'], 4:['lsd_easy','int','chi','lsd_long'] } },
   { lo: 213, t: { 2:['lsd_easy','lsd_long'], 3:['int','chi','lsd_long'],      4:['lsd_easy','int','chi','lsd_long'] } }
 ];
-const NSW_TYPES = (NSW_TYPES_BY_ERA.filter(r => (r.lo === undefined || VER >= r.lo) && (r.hi === undefined || VER <= r.hi))[0] || {}).t;
+const NSW_TYPES = (NSW_TYPES_BY_ERA.filter(r => (r.lo === undefined || SV.cmp(VER, r.lo) >= 0) && (r.hi === undefined || SV.cmp(VER, r.hi) <= 0))[0] || {}).t;
 const NSW_FALLBACK3 = ['lsd_easy','int','lsd_long'];
 const TP = { long:'lsd_long', rec:'lsd_easy', s1:'int', s2:'chi' };
 const TN = { long:'nrc_long', rec:'nrc_recovery', s1:'nrc_speed1', s2:'nrc_speed2' };
@@ -158,7 +159,7 @@ try {
   CH = ctx.out.c; GN = ctx.out.gn;
   // the engine's own NSW table must agree with the hand transcription above
   Object.keys(NSW_TYPES).forEach(k => {
-    const got = ctx.out.gs(Number(k), true, false, false, VER >= 213 ? true : undefined);   // V213: the pace flag D113a added
+    const got = ctx.out.gs(Number(k), true, false, false, SV.cmp(VER, 213) >= 0 ? true : undefined);   // V213: the pace flag D113a added
     if(got.join() !== NSW_TYPES[k].join()) SURGERY += ' nDays=' + k + ' engine=' + got.join('/');
   });
 } catch(e){ SURGERY = ' EXTRACTION FAILED: ' + e.message; CH = null; }
@@ -215,7 +216,7 @@ function spaceRaw(train, capDays, T, pinned, _g, _types){
 // Below 213 space() is spaceRaw() unchanged.
 function space(train, capDays, T, pinned, g){
   const all = spaceRaw(train, capDays, T, pinned, g);
-  if(VER >= 213 && T === TP && capDays === 3 && all.length && Math.min(...all.map(c => c.untol)) > 0)
+  if(SV.cmp(VER, 213) >= 0 && T === TP && capDays === 3 && all.length && Math.min(...all.map(c => c.untol)) > 0)
     return spaceRaw(train, capDays, T, pinned, g, NSW_FALLBACK3);
   return all;
 }
@@ -459,7 +460,7 @@ ok('P8b the chooser plan outranks the last-day long-run default in the NSW type 
     const days = p.idxs.map(i => train[i]);
     if(days.find(d => p.typeOf[d] === 'lsd_long') !== days[days.length-1]){
       mid++;
-      if(VER < 213) off++;
+      if(SV.cmp(VER, 213) < 0) off++;
       else {
         // V213 (D113a): the pace arm's long run is a PREFERENCE ranked under the adjacency terms
         // (D125). A mid-week long run is allowed only where the objective chose it: every layout
@@ -470,7 +471,7 @@ ok('P8b the chooser plan outranks the last-day long-run default in the NSW type 
       }
     }
   });
-  if(VER < 213) ok('P8c at the three-run ceiling the long run is still the last run of the week (' + rows + ' calendars)', off === 0, off + ' mid-week');
+  if(SV.cmp(VER, 213) < 0) ok('P8c at the three-run ceiling the long run is still the last run of the week (' + rows + ' calendars)', off === 0, off + ' mid-week');
   else ok('P8c at the three-run ceiling (D113a, INT / CHI / long) a mid-week long run ships only where the D125 objective ranks every long-last layout below it (' + rows + ' calendars, ' + mid + ' mid-week)', off === 0, off + ' mid-week with a long-last layout tied at the top');
 }
 

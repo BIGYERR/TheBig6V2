@@ -75,29 +75,30 @@ const RD = Date; let NOW = new RD(2026, 8, 7, 9, 0, 0).getTime();
 class FD extends RD { constructor(...a){ if(a.length === 0) super(NOW); else super(...a); } static now(){ return NOW; } }
 globalThis.Date = FD;
 const { load, progDigest, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const C = load(ART);
-const VER = +C.version, ERA = 218, V217_COMMIT = '7af6ad9d46f17e216e26901f3e0812797171fa9f';
-const D183_ERA = 223, ERA_V = (process.env.IA_ASSUME_VERSION === String(D183_ERA) && VER === D183_ERA - 1) ? D183_ERA : VER;
-if(ERA_V !== VER) console.log('ASSUMED ia-version ' + ERA_V + ' on a file stamped ' + VER + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
+const VER = SV.parse(C.version), ERA = 218, V217_COMMIT = '7af6ad9d46f17e216e26901f3e0812797171fa9f';
+const D183_ERA = 223, ERA_V = (process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, D183_ERA) === 0 && SV.cmp(VER, D183_ERA - 1) === 0) ? D183_ERA : VER;
+if(SV.cmp(ERA_V, VER) !== 0) console.log('ASSUMED ia-version ' + ERA_V + ' on a file stamped ' + VER + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 const ROWS = ['U1','L1','L2','Z1','ST1','LB1','LB2','OT1','Z2','U2'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = l => { skip++; console.log('SKIP ' + l); };
 const done = () => { if(TMP) try { fs.rmSync(TMP, { recursive:true, force:true }); } catch(e){}
   console.log('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-if(VER < ERA){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D157 (V' + ERA + ').'); ROWS.forEach(r => skipRow(r + ' below the D157 era')); done(); }
+if(SV.cmp(VER, ERA) < 0){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D157 (V' + ERA + ').'); ROWS.forEach(r => skipRow(r + ' below the D157 era')); done(); }
 
 // ── V217 baseline (argv[3] if it reads 217, else git 7af6ad9) ────────────────────────────
 TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'g218d157-'));
 let V217FILE = null, v217err = null;
 try {
-  if(BASEFILE){ const b = load(BASEFILE); if(+b.version === 217) V217FILE = path.resolve(BASEFILE); else v217err = 'argv[3] reads ' + b.version; }
+  if(BASEFILE){ const b = load(BASEFILE); if(SV.cmp(b.version, 217) === 0) V217FILE = path.resolve(BASEFILE); else v217err = 'argv[3] reads ' + b.version; }
   if(!V217FILE){ const f = path.join(TMP, 'v217.html');
     fs.writeFileSync(f, cp.execFileSync('git', ['show', V217_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 26 }));
-    if(+load(f).version === 217) V217FILE = f; else v217err = 'git ' + V217_COMMIT.slice(0, 7) + ' does not read 217'; }
+    if(SV.cmp(load(f).version, 217) === 0) V217FILE = f; else v217err = 'git ' + V217_COMMIT.slice(0, 7) + ' does not read 217'; }
 } catch(e){ v217err = String(e && e.message || e).slice(0, 200); V217FILE = null; }
 if(!V217FILE){ ok('V217 baseline loadable (' + v217err + ')', false); done(); }
 
@@ -137,7 +138,7 @@ const UTWIN = { id:'swim_100_time', label:'Improve 100 Time', swimUnit:'yd', tar
     String(e.warning).includes(HAND) && lenEq(e, t) && be.p.totalWeeks === bt.p.totalWeeks && wsig(be.p) === wsig(bt.p) && be.pure && bt.pure);
   // F0 (unit) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it). It defended D157 on its build pair: V217 sized the unit entry 7 weeks with no swim warning, so U1 could fail.
   // U2 runs from the D157 era onward (Version scope): the unit entry's 8-week after-grid is the candidate's own state.
-  if(VER >= ERA) ok('U2 the unit entry builds ' + be.p.totalWeeks + ' weeks on the candidate (8, the after-grid)', be.p.totalWeeks === 8 && e.weeks === 8);
+  if(SV.cmp(VER, ERA) >= 0) ok('U2 the unit entry builds ' + be.p.totalWeeks + ' weeks on the candidate (8, the after-grid)', be.p.totalWeeks === 8 && e.weeks === 8);
   else skipRow('U2 unit after-grid length below the D157 era'); }
 
 // ── L1: sizer lattice ────────────────────────────────────────────────────────────────────
@@ -210,9 +211,9 @@ const TIMES = { swim_100_time:{ T:[45,50,55,58,59,65,75,90,120], C:[50,56,59,60,
     return m ? { disp:m[1], raw:m[0], txt:strip(m[2]) } : { disp:'MISSING', raw:'', txt:'' }; };
   // the pace line text, one shape per era (standing rulings 2 and 4): D157's at ia-version <= 222 (their era),
   // D183's (P-SAFEPACE amendment 2 (d), "<time> is <pace> per 100 <unit>.") at >= 223
-  const LB_ERA = ERA_V >= D183_ERA ? 'D183 era (ia-version ' + ERA_V + ' >= ' + D183_ERA + '): "<t> is <pace> per 100 <unit>."'
+  const LB_ERA = SV.cmp(ERA_V, D183_ERA) >= 0 ? 'D183 era (ia-version ' + ERA_V + ' >= ' + D183_ERA + '): "<t> is <pace> per 100 <unit>."'
     : 'D157 era (ia-version ' + ERA_V + ' <= ' + (D183_ERA - 1) + '): "<t> — <pace>/100 (<unit>)"';
-  const expTxt = ERA_V >= D183_ERA
+  const expTxt = SV.cmp(ERA_V, D183_ERA) >= 0
     ? (t, goal, unit) => hand(t) + ' is ' + hand(t * 100 / DIST[goal]) + ' per 100 ' + unit + '.'
     : (t, goal, unit) => hand(t) + ' — ' + hand(t * 100 / DIST[goal]) + '/100 (' + unit + ')';
   console.log('  pace line text: ' + LB_ERA);

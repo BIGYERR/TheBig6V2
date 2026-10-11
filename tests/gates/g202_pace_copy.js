@@ -26,6 +26,7 @@
 
 const path = require('path');
 const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
@@ -60,7 +61,7 @@ const RATE_BY_VERSION = [
   { from: 0,   to: 224,      ruling: 'V176 (D9), pre-D186/D187', table: { beginner:3, intermediate:5, advanced:7 }, steps: 9 },
   { from: 225, to: Infinity, ruling: 'D186/D187 (V225)',          table: { beginner:3, intermediate:3, advanced:2 }, steps: 8 },
 ];
-const RATE_ERA = RATE_BY_VERSION.filter(r => +IA.version >= r.from && +IA.version <= r.to)[0] || RATE_BY_VERSION[0];
+const RATE_ERA = RATE_BY_VERSION.filter(r => SV.cmp(IA.version, r.from) >= 0 && SV.cmp(IA.version, r.to) <= 0)[0] || RATE_BY_VERSION[0];
 const EXP_IMPROVE = RATE_ERA.table;
 const AGE_SCALE   = { '18-35':1.0, '36-54':0.85, '55+':0.65 };
 
@@ -87,7 +88,7 @@ const PACE_NOTE_BY_VERSION = [
   { from: 208, to: 224,      ruling: 'D103a (V208)', head: 'SI: ',             labelExempt: false, safeRate: true  },   // the INT is the Short Interval
   { from: 225, to: Infinity, ruling: 'D187 (V225)',  head: 'SI: ',             labelExempt: false, safeRate: false },   // "safe rate" sentence deleted
 ];
-const IAV = +IA.version;
+const IAV = SV.parse(IA.version);
 // ── D103a (V208) ERA ROWS for the run builder's quality labels (standing ruling 4) ──
 // Every row below that finds a run card by its label reads this table. The CHI and the INT were
 // renamed Long Interval (LI) and Short Interval (SI) at V208 (coach, D103a slice 4). An artifact no
@@ -96,11 +97,11 @@ const RUN_LABEL_BY_VERSION = [
   { from: 202, to: 207,      ruling: 'pre-D103a',    int: /Interval \(INT\)/,      chi: /Continuous High Intensity \(CHI\)/ },
   { from: 208, to: Infinity, ruling: 'D103a (V208)', int: /Short Interval \(SI\)/, chi: /Long Interval \(LI\)/ },
 ];
-const LBL = RUN_LABEL_BY_VERSION.filter(r => +IA.version >= r.from && +IA.version <= r.to)[0]
+const LBL = RUN_LABEL_BY_VERSION.filter(r => SV.cmp(IA.version, r.from) >= 0 && SV.cmp(IA.version, r.to) <= 0)[0]
   || { ruling: 'NO ROW', int: /(?!)/, chi: /(?!)/ };
 if(LBL.ruling === 'NO ROW'){ FAIL++; console.log('  FAIL LABEL-ERA no RUN_LABEL_BY_VERSION row covers ia-version ' + IA.version
   + ': the run quality labels have no ruled text at this version, so every row that finds a card by label is void'); }
-const COPY_ERA = PACE_NOTE_BY_VERSION.filter(r => IAV >= r.from && IAV <= r.to)[0] || null;
+const COPY_ERA = PACE_NOTE_BY_VERSION.filter(r => SV.cmp(IAV, r.from) >= 0 && SV.cmp(IAV, r.to) <= 0)[0] || null;
 if(!COPY_ERA){
   FAIL++;
   console.log(`  FAIL C-ERA no PACE_NOTE_BY_VERSION row covers ia-version ${IAV}: the dampened note has no `
@@ -221,7 +222,7 @@ for(const [tag, mb, exp] of FORMS){
     const wantPace = (gid === 'run_pace_goal');
     // the beginner form is ruled to end on its own sentence and take neither tail (ia-version <= 225)
     const mileSecs = (+mb.mileBestMins || 0) * 60 + (+mb.mileBestSecs || 0);   // hand, typed from FORMS
-    const tailRule = IAV >= D188_ERA ? (mileSecs ? 'D188 E1, the mile is read' : 'D189 F9, the level default')
+    const tailRule = SV.cmp(IAV, D188_ERA) >= 0 ? (mileSecs ? 'D188 E1, the mile is read' : 'D189 F9, the level default')
                                      : (v.kind !== 'beginner' ? 'V202 E5' : null);
     if(tailRule){
       const has = s.indexOf(wantPace ? RULED_PACE_TAIL : RULED_CHART_TAIL) >= 0;
@@ -349,7 +350,7 @@ console.log(`  note goal-met x non-zero-shift population: ${classCards.goalMet}/
   + `(${APX_LAT.length}-cfg lattice, shift=${SHIFT_WKS}wk). This is the class slice 5 added and slice 7 rescued.`);
 
 // ── blast radius: copy is copy; no prescribed value moves ────────────────────
-const row = MANNY_DIGEST_BY_VERSION[IA.version];
+const row = SV.lookup(MANNY_DIGEST_BY_VERSION, IA.version);
 const mannyDigest = progDigest(IA.buildProgram(JSON.parse(JSON.stringify(fixtures.HALF_MANNY))));
 ok(!!row && mannyDigest === row,
   `B2 HALF_MANNY matches the V${IA.version} row of MANNY_DIGEST_BY_VERSION (${row || 'NO ROW'}): got ${mannyDigest}. `

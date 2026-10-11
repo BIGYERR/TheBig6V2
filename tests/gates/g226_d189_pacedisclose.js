@@ -38,6 +38,7 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ARG_BASE = process.argv[3] ? path.resolve(process.argv[3]) : null;
@@ -63,16 +64,16 @@ class FD extends RD { constructor(...a){ if(a.length) super(...a); else super(NO
 globalThis.Date = FD;
 
 let STAMP = NaN, IA = null;
-try { IA = H.load(ART); STAMP = +IA.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { IA = H.load(ART); STAMP = SV.parse(IA.version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let VER = STAMP;
-if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
   VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 } else if(process.env.IA_ASSUME_VERSION !== undefined){
   console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-const D189 = VER >= ERA;   // the one predicate every row is keyed on
+const D189 = SV.cmp(VER, ERA) >= 0;   // the one predicate every row is keyed on
 if(!D189){ const ok0 = ok; ok = (l, c, g) => ok0(/\[V225 truth/.test(l) ? l : l + ' [V225 era]', c, g); }
-console.log('g226 ' + TAG + ' pacedisclose | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '')
+console.log('g226 ' + TAG + ' pacedisclose | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : '')
   + ' | era ' + (D189 ? 'D189 (>= 226)' : 'V225 truth (<= 225)'));
 
 // ── hand oracles ──
@@ -181,14 +182,14 @@ let BASE = null, baseWhy = '';
 if(D189){
   try {
     let f = ARG_BASE;
-    if(f && fs.existsSync(f) && /<meta name="ia-version" content="225"/.test(fs.readFileSync(f, 'utf8'))){ /* use it */ }
+    if(f && fs.existsSync(f) && (t => { try { return SV.cmp(SV.fromHtml(t), 225) === 0; } catch(e){ return false; } })(fs.readFileSync(f, 'utf8'))){ /* use it */ }
     else {
       if(f) baseWhy = 'argv baseline ' + f + ' is not stamped 225; ';
       TMPD = fs.mkdtempSync(path.join(os.tmpdir(), 'g226d189-')); f = path.join(TMPD, 'v225.html');
       fs.writeFileSync(f, cp.execFileSync('git', ['show', V225_COMMIT + ':index.html'], { cwd: ROOT, maxBuffer: 1 << 27, stdio: ['ignore', 'pipe', 'ignore'] }));
     }
     BASE = H.load(f);
-    if(+BASE.version !== 225){ baseWhy += 'baseline stamped ' + BASE.version + ', not 225'; BASE = null; }
+    if(SV.cmp(BASE.version, 225) !== 0){ baseWhy += 'baseline stamped ' + BASE.version + ', not 225'; BASE = null; }
     else console.log('  baseline V225: ' + f);
   } catch(e){ baseWhy += 'baseline unavailable: ' + String(e.message).slice(0, 120); BASE = null; }
 }
@@ -210,7 +211,7 @@ guard('G6b', () => {
   let cells = 0, good = 0; const why = {}, ex = [];
   // V231 (absorb ruling section 3, G6b SPLIT): a lifting day is a day's `sections`; a cell's lifting days differ from V225
   // when any week/day's sections JSON differs. Counted on every D189 tree, asserted at 231 and up.
-  const V231 = VER >= V231_ERA; let lcells = 0, lmoved = 0, ldays = 0, outEq = 0;
+  const V231 = SV.cmp(VER, V231_ERA) >= 0; let lcells = 0, lmoved = 0, ldays = 0, outEq = 0;
   const liftDays = (a, b) => { let n = 0; const wa = a.weeks || {}, wb = b.weeks || {};
     new Set(Object.keys(wa).concat(Object.keys(wb))).forEach(w => { const da = wa[w] || {}, db = wb[w] || {};
       new Set(Object.keys(da).concat(Object.keys(db))).forEach(d => { const sa = da[d] && da[d].sections, sb = db[d] && db[d].sections;
@@ -430,7 +431,7 @@ guard('G9', () => {
 // to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
 // D189 (standing ruling 4). Section 3: "literal + row -> row only"; VER is this gate's own version variable.
 guard('G10', () => {
-  const eraV = VER, eraHas = Object.prototype.hasOwnProperty.call(H.MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? H.MANNY_DIGEST_BY_VERSION[eraV] : undefined, built = H.progDigest(build(IA, H.fixtures.HALF_MANNY));
+  const eraV = VER, eraHas = SV.lookup(H.MANNY_DIGEST_BY_VERSION, eraV) !== undefined, eraRow = eraHas ? SV.lookup(H.MANNY_DIGEST_BY_VERSION, eraV) : undefined, built = H.progDigest(build(IA, H.fixtures.HALF_MANNY));
   ok(ROW.G10, eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && built === eraRow, built + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT'));
 });
 

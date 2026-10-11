@@ -37,6 +37,7 @@
 const path = require('path');
 const fs = require('fs');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
 const SRC_RAW = fs.readFileSync(ART, 'utf8');
@@ -49,9 +50,9 @@ function ok(label, cond, got){
 }
 function summary(code){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(code); }
 
-const VER = Number(IA.IA_VERSION);
+const VER = SV.parse(IA.IA_VERSION);
 const HAS = /_paceFam/.test(SRC);
-if(VER >= 205){
+if(SV.cmp(VER, 205) >= 0){
   ok('P0 at ia-version ' + VER + ' the D127 pace-family branch exists in _nrcRunShape', HAS,
      'no _paceFam branch: D127 is not in this artifact');
   if(!HAS) summary(1);
@@ -74,7 +75,7 @@ const RUN_LABEL_BY_VERSION = [
   { from: 204, to: 207,      ruling: 'pre-D103a',    int: /^Interval \(INT\)/,      chi: /^Continuous High Intensity \(CHI\)/ },
   { from: 208, to: Infinity, ruling: 'D103a (V208)', int: /^Short Interval \(SI\)/, chi: /^Long Interval \(LI\)/ },
 ];
-const LBL = RUN_LABEL_BY_VERSION.filter(r => VER >= r.from && VER <= r.to)[0]
+const LBL = RUN_LABEL_BY_VERSION.filter(r => SV.cmp(VER, r.from) >= 0 && SV.cmp(VER, r.to) <= 0)[0]
   || { ruling: 'NO ROW', int: /(?!)/, chi: /(?!)/ };
 ok('P-ERA a RUN_LABEL_BY_VERSION row covers ia-version ' + VER + ' (' + LBL.ruling + ')', LBL.ruling !== 'NO ROW',
    'the run quality labels have no ruled text at this version, so every row that finds a card by label is void');
@@ -232,7 +233,7 @@ const P3B_BY_VERSION = [
   { from: 204, to: 207,      ruling: 'D127 (V205)' },
   { from: 208, to: Infinity, ruling: 'D104a (V208)' },
 ];
-const P3B = P3B_BY_VERSION.filter(r => VER >= r.from && VER <= r.to)[0] || null;
+const P3B = P3B_BY_VERSION.filter(r => SV.cmp(VER, r.from) >= 0 && SV.cmp(VER, r.to) <= 0)[0] || null;
 let baseSeen = 0, baseTot = 0, baseLong = 0, baseShaped = 0, base48 = 0; const baseBad = [];
 [3, 2].forEach(nRest => combos(DAYS, nRest).forEach(rest => SEEDS.forEach(seed => {
   const c = paceCfg(rest, seed);

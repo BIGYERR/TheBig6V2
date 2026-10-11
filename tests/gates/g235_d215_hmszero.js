@@ -78,6 +78,7 @@
 const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const S = require('../status')('g235_d215_hmszero');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 235;
@@ -118,10 +119,9 @@ const LATTICE_FLOOR = 1755;
 
 // ── version, read from the candidate's meta ──────────────────────────────────────────────────────────────────────────
 const HTML = fs.readFileSync(ART, 'utf8');
-const VM = HTML.match(/<meta name="ia-version" content="(\d+)">/);
-const VER = VM ? +VM[1] : 0;
-const verCj = k => [k + '-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA];
-console.log('g235 D215-D217 P-HMSZERO | candidate ' + ART + ' ia-version ' + VER + (VER >= ERA ? '' : ' (below ' + ERA + ': every row FAILS by its version conjunct)'));
+const VER = /<meta name="ia-version" content="/.test(HTML) ? SV.fromHtml(HTML) : 0;   // no meta: 0, as before
+const verCj = k => [k + '-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA];
+console.log('g235 D215-D217 P-HMSZERO | candidate ' + ART + ' ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? '' : ' (below ' + ERA + ': every row FAILS by its version conjunct)'));
 
 // ── ENV (g233_d207_bikewheel.js mkEnv lineage, via the V235 measure; program id g235) ───────────────────────────────
 const RealDate = Date, DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
@@ -275,7 +275,7 @@ guard('D215-rows', () => {
   for(const ci of [1, 2]){ const c = hc[ci] || {}; cj.push(['hms-col' + ci, (c.vals || []).length === 300 && c.wrap === '1', ((c.vals || []).length) + ' items, data-wrap ' + J(c.wrap) + ' (hand 300, "1")']); }
   // V237 (D220): from VER 237 dist and rept column 0 begins with '0' (no dash row) and still does not wrap; VER <= 236 keeps
   // the dash first. Pace keeps its dash on every version (D222). Conjunct names stay.
-  for(const k of ['dist', 'rept', 'pace']){ const c = renderCols(k)[0] || { vals:[] }; const first = (VER >= 237 && k !== 'pace') ? '0' : '';
+  for(const k of ['dist', 'rept', 'pace']){ const c = renderCols(k)[0] || { vals:[] }; const first = (SV.cmp(VER, 237) >= 0 && k !== 'pace') ? '0' : '';
     cj.push([k + '-dash', c.vals[0] === first && c.wrap === '', 'col0 first ' + J(c.vals[0]) + ', data-wrap ' + J(c.wrap) + ' (hand ' + J(first) + ', "")']); }
   row('D215-rows', cj);
 });
@@ -347,7 +347,7 @@ guard('D215-plan', () => {
   // the ruling's claim is row ABSENCE ("column 0 has no '' item"); the exact '0'..'9' list is D215-rows' claim
   handPlan.push(['plan-no-dash-row', c0.length > 0 && c0.indexOf('') < 0, 'hours rows ' + J(c0.slice(0, 11)) + (c0.length > 11 ? ' ... (' + c0.length + ')' : '') + ' (hand: no "" item)']);
   // V236 (D218 "Existing rows that flip"): from VER 236 a rolled draft is stored by the Log tap; VER <= 235 unchanged.
-  const logTap = () => { if(VER >= 236){ C.ev('logCardio()'); C.advance(50); } };
+  const logTap = () => { if(SV.cmp(VER, 236) >= 0){ C.ev('logCardio()'); C.advance(50); } };
   C.roll(o.wh, [[1, '30']]); logTap(); let e = C.entry(1, 'fri') || {};
   handPlan.push(['minutes-30', e.run_mins === '30.00', 'run_mins ' + J(e.run_mins) + ' (hand "30.00")']);
   o = openBlank(1, 'fri', 'log_run_mins'); C.roll(o.wh, [[0, '1']]); logTap(); const mid = (C.entry(1, 'fri') || {}).run_mins;
@@ -418,7 +418,7 @@ guard('D215-clear', () => {
   // dist wheel untouched (the reopened case is P-REOPENSTAMP, not this row: D215 Amendment 1)
   // V236 (D218 "Existing rows that flip"): from VER 236 the log is written by the Log tap before the clear.
   C.use(HALF); C.wipe(); C.open(1, 'sat'); C.roll(C.wheel('log_run_mins'), [[1, '47'], [2, '13']]);
-  if(VER >= 236){ C.ev('logCardio()'); C.advance(50); }
+  if(SV.cmp(VER, 236) >= 0){ C.ev('logCardio()'); C.advance(50); }
   e = C.entry(1, 'sat') || {};
   const stamped = e.run_mins === TAIL_MINS && e.run_dist === LR_DIST && e.run_pace === LR_PACE;
   C.roll(C.wheel('log_run_mins'), [[1, '0'], [2, '0']]); e = C.entry(1, 'sat') || {};
@@ -438,9 +438,9 @@ guard('D215-clear', () => {
 // ── D217-digest ──────────────────────────────────────────────────────────────────────────────────────────────────────
 guard('D217-digest', () => {
   const cj = [];
-  const T = H.MANNY_DIGEST_BY_VERSION || {}, has = Object.prototype.hasOwnProperty.call(T, VER);
+  const T = H.MANNY_DIGEST_BY_VERSION || {}, has = SV.lookup(T, VER) !== undefined;
   cj.push(['era-row', has, 'MANNY_DIGEST_BY_VERSION[' + VER + '] ' + (has ? 'present' : 'MISSING')]);
-  cj.push(['era-value', T[VER] === '2d35e8f743680cfa', J(T[VER]) + ' (ruling 2d35e8f743680cfa)']);
+  cj.push(['era-value', SV.lookup(T, VER) === '2d35e8f743680cfa', J(SV.lookup(T, VER)) + ' (ruling 2d35e8f743680cfa)']);
   const P0 = H.load(ART); const dg = H.progDigest(P0.buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY))));
   cj.push(['built', dg === '2d35e8f743680cfa', 'HALF_MANNY on the candidate ' + dg + ' (ruling 2d35e8f743680cfa)']);
   row('D217-digest', cj);
@@ -451,7 +451,7 @@ guard('D217-others', () => {
   const cj = [verCj('D217-others')];
   let g = FMT('dist', ['', '8', '6']); cj.push(['dist-dash', g === '', 'dist [dash,8,6] -> ' + J(g) + ' (hand "")']);
   g = FMT('rept', ['', '55']); cj.push(['rept-dash', g === '', 'rept [dash,55] -> ' + J(g) + ' (hand "")']);
-  const t = (VER >= 237 ? DEC3_V237 : DEC3).map(([s, w]) => { const r = PARSE('dist', s); return [s, r, w, J(r) === J(w)]; });
+  const t = (SV.cmp(VER, 237) >= 0 ? DEC3_V237 : DEC3).map(([s, w]) => { const r = PARSE('dist', s); return [s, r, w, J(r) === J(w)]; });
   cj.push(['dec3-table', t.every(x => x[3]), t.map(x => J(x[0]) + ' -> ' + J(x[1]) + (x[3] ? '' : ' (hand ' + J(x[2]) + ')')).join(', ')]);
   row('D217-others', cj);
 });

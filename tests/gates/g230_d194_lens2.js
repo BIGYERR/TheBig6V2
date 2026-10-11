@@ -213,6 +213,7 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const { load } = H;
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -768,22 +769,22 @@ STAT.declare(ORDER.map(k => ID[k]));   // an ORDER key with no id throws: no sum
 
 // ── LOAD + VERSION PREDICATE ───────────────────────────────────────────────────────────────────────────────────────
 let IA, STAMP = NaN;
-try { IA = load(ART); STAMP = +IA.version; } catch(e){ ORDER.forEach(k => ok(k, R[k] + ' (boot: ' + e.message + ')', false)); done(); }
+try { IA = load(ART); STAMP = SV.parse(IA.version); } catch(e){ ORDER.forEach(k => ok(k, R[k] + ' (boot: ' + e.message + ')', false)); done(); }
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION !== undefined){
-  if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+  if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
     VER = ERA; P('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   } else P('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-P('g230 D194 P-INJLENS part 2 (the lens alone: D193 live rows on the overlay presentation) | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
-if(!(VER >= ERA)){
+P('g230 D194 P-INJLENS part 2 (the lens alone: D193 live rows on the overlay presentation) | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : ''));
+if(!(SV.cmp(VER, ERA) >= 0)){
   P('REFUSED: ia-version ' + VER + ' predates D194 P-INJLENS part 2 (V' + ERA + '). No row may pass on it.');
   ORDER.forEach(k => ok(k, R[k] + ' (REFUSED)', false));
   done();
 }
 // V231 (tests/measure/v231_rulings/v231_absorb_ruling.md sections 3 and 6; standing rulings 2 and 4): at 231 and up the
 // re-keyed rows print their V231 labels; at 230 every label reads as above.
-if(VER >= V231_ERA) Object.assign(R, {
+if(SV.cmp(VER, V231_ERA) >= 0) Object.assign(R, {
   'd193-k':     'row d193-k      [V231 D196-1] g221 L1 sweep on STAMP (150,989 pairs, 384 configs): hand clamp pairs 1,253, toast == the hand hold variant 1,253 (verbatim 694, unloadable 360, window 199), 0 false same-numbers/effort claims, 0 hold toasts off the clamp set, INFO capped 458 pinned; STAMP == CFG card 0 and toast 0 differ; non-clamp toasts == V229 STAMP 141,557/141,557; bed-thrust donor clamp pairs 10, each the hold variant (V230 0) (V229: 0 hold variants, 1,243 false claims, INFO 728)',
   'd193-l':     'row d193-l      [V231 D196-1] g221 L1 sweep on STAMP, (l)\'s predicate (capped: hand hold of D177\'s card on the stripped donor; uncapped: D177\'s card on the stripped donor), 0 misses, moved counts == CFG\'s and pinned: G3a 839 (529 / 199 / 111), G3c power 0, G3c off grammar 172, G3d 263, G3e 205, G3f 199; bed-thrust donor G3a 7, G3c-off 4, G3e 3 (V230 0) (V229 STAMP: G3a 143, G3c-off 96, G3d 0, G3e 47, G3f 0)',
   'd194-postsweep': 'row d194-postsweep INFO [V231 re-key: D196-1 + D197-1] L432 post-sweep rejects 0 (V230 22: 18 Burpees drops, 4 Pushups re-details) on the candidate, OV1 and fixture (432 builds, 12,960 lifting days each); V229 == the typed table (22 in 11 builds) on OV1 and fixture in the same run; (ii) dropped as vacuous (no reject day exists)',
@@ -791,7 +792,7 @@ if(VER >= V231_ERA) Object.assign(R, {
 let BF = null, baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!BF){
   const f = path.join(os.tmpdir(), 'g230_d194_lens2_v' + BASE_ERA + '_' + process.pid + '.html');
@@ -799,7 +800,7 @@ if(!BF){
     try { fs.unlinkSync(f); } catch(e){}
     process.on('exit', () => { try { fs.unlinkSync(f); } catch(e){} });
     fs.writeFileSync(f, cp.execFileSync('git', ['-C', ROOT, 'show', V229_COMMIT + ':index.html'], { maxBuffer:1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ BF = f; baseWhy += 'git show ' + V229_COMMIT.slice(0, 7) + ':index.html written to os.tmpdir() as g230_d194_lens2_v' + BASE_ERA + '_<pid>.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = f; baseWhy += 'git show ' + V229_COMMIT.slice(0, 7) + ':index.html written to os.tmpdir() as g230_d194_lens2_v' + BASE_ERA + '_<pid>.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 P('  V' + BASE_ERA + ' baseline: ' + (BF ? 'LIVE (' + baseWhy + ')' : 'SETUP FAILED (' + baseWhy + ')'));
@@ -811,7 +812,7 @@ const JOBS = CK7.map(ck => ({ kind:'enum', ck, base:BF })).concat([['C', 'OV5'],
 for(let s = 0; s < L1_SHARDS; s++) JOBS.push({ kind:'l1', shard:s, art:CF, base:BF, cis:L1.map((c, i) => i).filter(i => i % L1_SHARDS === s) });
 // d194-postsweep (D194 Amendment 4; V231 absorb ruling section 6): its population jobs run at 230 and up. Its reach jobs
 // (at 230 only: (ii) and the typed-build re-read) retired Post-V233 under standing ruling 3, with the 230 assertion.
-if(VER >= ERA){
+if(SV.cmp(VER, ERA) >= 0){
   for(let s = 0; s < PS_SHARDS; s++) JOBS.push({ kind:'ps', shard:s, art:CF, base:BF, cis:L432.map((c, i) => i).filter(i => i % PS_SHARDS === s) });
 }
 const ENUM = {};   // ck -> the enumerated chains (an enum job that dies leaves its config absent, and every lattice row FAILS)
@@ -912,7 +913,7 @@ runPool(JOBS).then(res => {
   // (k) toast truth on the overlay shape (STAMP), the hand oracle; STAMP == CFG; non-clamp toasts == V229's
   // V231 (absorb ruling section 3, d193-k ABSORB, class D196-1; standing rulings 2 and 4): at 231 and up the row reads
   // the W231 pins and adds the bed-thrust donor conjunct (clamp pairs 10, each the hold variant; V230 0).
-  { const s = L.CSTAMP, f = L.CCFG; const kv = s.hvK; const V231 = VER >= V231_ERA, WL = V231 ? W231.L1 : W.L1, bt = s.bt;
+  { const s = L.CSTAMP, f = L.CCFG; const kv = s.hvK; const V231 = SV.cmp(VER, V231_ERA) >= 0, WL = V231 ? W231.L1 : W.L1, bt = s.bt;
     P('    d193-k candidate STAMP: pairs ' + s.pairs + ' | clamp pairs ' + s.clamp + ' | hold variants ' + s.hv + ' (verbatim ' + kv.verbatim + ', unloadable ' + kv.unloadable + ', window ' + kv.window + '; clamp pairs without it ' + s.hvMiss + ') | false claims ' + s.fals + ' | hold toasts off the clamp set ' + s.holdOff + ' | INFO capped ' + s.info
       + ' || candidate CFG: hold variants ' + f.hv + ', false ' + f.fals + ', INFO ' + f.info + ' || V229 STAMP: hold variants ' + L.BSTAMP.hv + ', false ' + L.BSTAMP.fals + ', INFO ' + L.BSTAMP.info);
     P('    d193-k STAMP == CFG (candidate): aligned ' + X.sc.align + ', card differs ' + X.sc.card + ', toast differs ' + X.sc.toast + ' of ' + X.sc.n + ' | non-clamp toasts == V229 STAMP ' + X.nc.eq + '/' + X.nc.n + exs('CSTAMP:hv', 'CSTAMP:off', 'sccard', 'sctoast', 'nc'));
@@ -925,7 +926,7 @@ runPool(JOBS).then(res => {
   // (l) D177's verbatim rows beneath the plan's hold, on STAMP, == CFG
   // V231 (absorb ruling section 3, d193-l ABSORB, class D196-1; standing rulings 2 and 4): at 231 and up the row reads
   // the W231 pins and adds the bed-thrust donor conjunct (G3a 7, G3c-off 4, G3e 3; V230 0).
-  { const s = L.CSTAMP, f = L.CCFG; const V231 = VER >= V231_ERA, WLl = V231 ? W231.l : W.l, bt = s.bt; const ln = x => 'G3a ' + x.G3a + ' (' + x.G3aCls.donor + ' / ' + x.G3aCls.window + ' / ' + x.G3aCls.verbatim + ', miss ' + x.G3aMiss + '), G3c power ' + x.powChg + ' of ' + x.pow + ', G3c-off ' + x.off + ' of ' + x.offN + ' (miss ' + x.offMiss + '), G3d ' + x.at + ' of ' + x.atN + ' (miss ' + x.atMiss + '), G3e ' + x.nul + ' of ' + x.nulN + ' (miss ' + x.nulMiss + '), G3f ' + x.win + ' of ' + x.winN + ' (miss ' + x.winMiss + ')';
+  { const s = L.CSTAMP, f = L.CCFG; const V231 = SV.cmp(VER, V231_ERA) >= 0, WLl = V231 ? W231.l : W.l, bt = s.bt; const ln = x => 'G3a ' + x.G3a + ' (' + x.G3aCls.donor + ' / ' + x.G3aCls.window + ' / ' + x.G3aCls.verbatim + ', miss ' + x.G3aMiss + '), G3c power ' + x.powChg + ' of ' + x.pow + ', G3c-off ' + x.off + ' of ' + x.offN + ' (miss ' + x.offMiss + '), G3d ' + x.at + ' of ' + x.atN + ' (miss ' + x.atMiss + '), G3e ' + x.nul + ' of ' + x.nulN + ' (miss ' + x.nulMiss + '), G3f ' + x.win + ' of ' + x.winN + ' (miss ' + x.winMiss + ')';
     const keys = ['main', 'G3a', 'G3aMiss', 'pow', 'powChg', 'offN', 'off', 'offMiss', 'nulN', 'nul', 'nulMiss', 'atN', 'at', 'atMiss', 'winN', 'win', 'winMiss'];
     const eqCFG = keys.every(k => s[k] === f[k]) && ['donor', 'window', 'verbatim'].every(k => s.G3aCls[k] === f.G3aCls[k]);
     P('    d193-l candidate STAMP: ' + ln(s) + '\n    d193-l candidate CFG:   ' + ln(f) + '\n    d193-l V229 STAMP:      ' + ln(L.BSTAMP) + exs('CSTAMP:A', 'CSTAMP:off', 'CSTAMP:null', 'CSTAMP:at', 'CSTAMP:win'));
@@ -1013,7 +1014,7 @@ runPool(JOBS).then(res => {
   // section 6, RE-KEY, classes D196-1 + D197-1; standing rulings 2 and 4): at 231 and up the same population jobs run and
   // the row asserts L432 rejects 0 for the candidate, OV1 and fixture, with V229 reading the typed table in the same run
   // (the instrument is not blind); (ii) is dropped as vacuous (no reject day exists).
-  if(VER >= V231_ERA){ const SJ = JOBS.map((j, i) => j.kind === 'ps' ? res[i] : undefined).filter(x => x !== undefined);
+  if(SV.cmp(VER, V231_ERA) >= 0){ const SJ = JOBS.map((j, i) => j.kind === 'ps' ? res[i] : undefined).filter(x => x !== undefined);
     const N = PS_N, PB = [...new Set(PS_TABLE.map(psBuild))], TS = new Set(PS_TABLE.map(psLine)), K = PS_COMBO.map(([t, p]) => t + ':' + p);
     const NM = { 'C:OV1':'candidate OV1', 'C:CFG1':'candidate fixture', 'B:OV1':'V229 OV1', 'B:CFG1':'V229 fixture' };
     const psOK = SJ.length === PS_SHARDS && SJ.every(Boolean);

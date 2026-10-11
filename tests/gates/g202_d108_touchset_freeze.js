@@ -29,6 +29,7 @@
 
 const path = require('path');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 H.EXPORT_NAMES.push('completedKey', 'logKey', 'entryDay', 'exStoreKey');
 
 const HTML = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
@@ -171,7 +172,7 @@ row('R5', (!SX.after.weeks[laterW] || canon(SX.after.weeks[laterW]) === canon(li
   'week ' + laterW + ' (beyond the cut) is the live build in both scenarios: the cut is a frontier, not a blanket');
 
 // ── R6  this edit moves no prescription: the pinned digest from the ruling ─────────
-const mannyRow = H.MANNY_DIGEST_BY_VERSION[IA.version];
+const mannyRow = SV.lookup(H.MANNY_DIGEST_BY_VERSION, IA.version);
 const manny = H.progDigest(IA.buildProgram(JSON.parse(JSON.stringify(H.fixtures.HALF_MANNY))));
 row('R6', !!mannyRow && manny === mannyRow,
   'HALF MANNY matches the V' + IA.version + ' row of MANNY_DIGEST_BY_VERSION ('

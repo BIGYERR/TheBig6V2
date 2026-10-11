@@ -78,6 +78,7 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const { load, progDigest, fixtures, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const BASEFILE = process.argv[3] || null;
@@ -226,9 +227,9 @@ let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const done = () => { if(TMP) try { fs.rmSync(TMP, { recursive:true, force:true }); } catch(e){}
   console.log('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-const IA = load(ART), VER = +IA.version;
+const IA = load(ART), VER = SV.parse(IA.version);
 console.log('g219 D167/D171 | candidate ' + ART + ' ia-version ' + VER + ' | lattice ' + U.length + ' configs, swept ' + SW.length + ' (' + U.filter(x => !SUNREST(x)).length + ' Sunday-training + every 8th of ' + U.filter(SUNREST).length + ' Sunday-rest)');
-if(VER < ERA){ console.log('REFUSED: ia-version ' + VER + ' predates D167/D171 (V' + ERA + '). No row may pass on it.');
+if(SV.cmp(VER, ERA) < 0){ console.log('REFUSED: ia-version ' + VER + ' predates D167/D171 (V' + ERA + '). No row may pass on it.');
   DUR_ROWS.forEach(r => ok(r + ' refused: candidate ' + VER + ' is below the D167 era', false)); done(); }
 const MONDAY = ['2026-09-21', '2026-10-05'].every(s => new Date(s + 'T12:00:00Z').getUTCDay() === 1);
 
@@ -236,10 +237,10 @@ let setupErr = null, lwErr = null;
 try {
   TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'g219d167-'));
   let vFile = null;
-  if(BASEFILE){ const b = load(BASEFILE); if(+b.version === 218) vFile = path.resolve(BASEFILE); else console.log('  argv[3] reads ' + b.version + ', using git ' + V218_COMMIT.slice(0, 7)); }
+  if(BASEFILE){ const b = load(BASEFILE); if(SV.cmp(b.version, 218) === 0) vFile = path.resolve(BASEFILE); else console.log('  argv[3] reads ' + b.version + ', using git ' + V218_COMMIT.slice(0, 7)); }
   if(!vFile){ vFile = path.join(TMP, 'v218.html'); fs.writeFileSync(vFile, cp.execFileSync('git', ['show', V218_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 27 })); }
   const V = fs.readFileSync(vFile, 'utf8'), C = fs.readFileSync(ART, 'utf8');
-  if(+load(vFile).version !== 218) throw new Error('V218 baseline reads ' + load(vFile).version);
+  if(SV.cmp(load(vFile).version, 218) !== 0) throw new Error('V218 baseline reads ' + load(vFile).version);
   const LOGA = '        it.name=to;\n', LOGI = '        (globalThis.__G219R||(globalThis.__G219R=[])).push([(typeof B!=="undefined"?B:null),it.name]);\n';
   [['V218', V], ['candidate', C]].forEach(([n, s]) => { if(cnt(s, LOGA) !== 1) throw new Error('rename anchor count ' + cnt(s, LOGA) + ' in ' + n); });
   const arts = { v218:vFile, v218i:path.join(TMP, 'v218i.html'), candi:path.join(TMP, 'candi.html'), lw:null };

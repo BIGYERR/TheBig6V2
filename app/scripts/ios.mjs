@@ -19,6 +19,7 @@ import { homedir, tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { attachRun } from '../../tools/runlog.mjs';
+import { canonical, withNativeVersion } from './version.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BUILD_ROOT = process.env.IOS_BUILD_DIR || join(homedir(), 'Library', 'Caches', 'iron-asylum-ios');
@@ -60,20 +61,29 @@ function readConfig() {
   return { xml, bundleId, name };
 }
 
-/** Keeps the native version in step with the root index.html's ia-version (238 -> 1.0.238, build 238). */
+/**
+ * Keeps the native version in step with the root index.html's ia-version: version and build are both its canonical
+ * M.m.p (239 -> 0.239.0, 0.239.1 -> 0.239.1; scripts/version.mjs). Returns that M.m.p.
+ */
 function syncNativeVersion() {
   const manifest = join(APP, 'src', 'legacy', 'generated', 'legacy-manifest.json');
   if (!existsSync(manifest)) fail('no generated legacy manifest; run npm run sync (or drop --no-web)');
   const { version } = JSON.parse(readFileSync(manifest, 'utf8'));
   const { xml } = readConfig();
-  const next = xml
-    .replace(/(<widget[^>]*\sversion=")[^"]*(")/, `$11.0.${version}$2`)
-    .replace(/(<widget[^>]*\sios-CFBundleVersion=")[^"]*(")/, `$1${version}$2`);
+  let native, next;
+  try {
+    native = canonical(version);
+    next = withNativeVersion(xml, version);
+  } catch (err) {
+    fail(`${err.message} (the generated legacy manifest and config.xml)`);
+  }
   if (next !== xml) {
     writeFileSync(CONFIG_XML, next);
-    console.log(`ios: config.xml now version 1.0.${version} (build ${version})`);
+    console.log(`ios: config.xml now version ${native} (build ${native})`);
+  } else {
+    console.log(`ios: config.xml already version ${native} (build ${native})`);
   }
-  return version;
+  return native;
 }
 
 function prepare() {
@@ -169,7 +179,7 @@ function simulator() {
   run('xcrun', ['simctl', 'bootstatus', sim.udid, '-b']);
   run('xcrun', ['simctl', 'install', sim.udid, app]);
   run('xcrun', ['simctl', 'launch', sim.udid, bundleId]);
-  console.log(`\nios: The Asylum 1.0.${version} is running on ${sim.name}.`);
+  console.log(`\nios: The Asylum ${version} is running on ${sim.name}.`);
 }
 
 // ---------------------------------------------------------------------------------------------------- device
@@ -305,7 +315,7 @@ function device() {
     console.error(said.trim());
     fail(`installed on ${target.name}, but it did not launch (see above).`);
   }
-  console.log(`\nios: The Asylum 1.0.${version} is running on ${target.name}.`);
+  console.log(`\nios: The Asylum ${version} is running on ${target.name}.`);
   console.log('ios: built with a free Personal Team? The install expires in 7 days; run this again to renew it.');
 }
 

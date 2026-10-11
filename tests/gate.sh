@@ -31,10 +31,19 @@ if ! printf '%s' "$JOBS" | grep -qE '^[0-9]+$' || [ "$JOBS" -lt 1 ]; then
 fi
 
 echo "== 0. version / filename invariant"
-META="$(grep -oE '<meta name="ia-version" content="[0-9]+"' "$CAND" | grep -oE '[0-9]+' | tail -1)"
-FNV="$(basename "$CAND" | grep -o 'V[0-9]*' | tr -d V || true)"
+# Post-V239 semver: the meta is M.m.p, or a legacy integer N that reads as 0.N.0 (tests/semver.js). META stays the raw
+# meta text, so these lines and the manifest run line print as before on a legacy artifact. The filename carries the
+# legacy V<N> or v<M.m.p> (lowercase v and a dotted triple; v<N> alone names nothing), compared through semver.js cmp.
+META="$(grep -oE '<meta name="ia-version" content="[^"]*"' "$CAND" | tail -1 | cut -d'"' -f4 || true)"
+FNP=v; FNV="$(basename "$CAND" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tr -d v || true)"
+if [ -z "$FNV" ]; then FNP=V; FNV="$(basename "$CAND" | grep -o 'V[0-9]*' | tr -d V || true)"; fi
 echo "   meta=$META filename=${FNV:-index}"
-if [ -n "$FNV" ] && [ "$FNV" != "$META" ]; then echo "FAIL: ia-version ($META) != filename (V$FNV)"; exit 1; fi
+if ! grep -qE '<meta name="ia-version" content="[^"]*"' "$CAND"; then echo "FAIL: ia-version: no <meta name=\"ia-version\"> in $CAND, so the version does not parse"; exit 1; fi
+MSTR="$(node "$HERE/semver.js" str "$META" 2>&1)" || { echo "FAIL: ia-version ($META) does not parse as a version: $MSTR"; exit 1; }
+if [ -n "$FNV" ]; then
+  FCMP="$(node "$HERE/semver.js" cmp "$FNV" "$META" 2>&1)" || { echo "FAIL: ia-version ($META) != filename ($FNP$FNV): the filename version does not parse: $FCMP"; exit 1; }
+  if [ "$FCMP" != "0" ]; then echo "FAIL: ia-version ($META) != filename ($FNP$FNV)"; exit 1; fi
+fi
 
 echo "== 1. syntax"
 rm -f "$TMP/inline.js"

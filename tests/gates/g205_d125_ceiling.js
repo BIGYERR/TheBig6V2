@@ -43,6 +43,7 @@
 const path = require('path');
 const fs = require('fs');
 const { load, weekGrid } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
 const SRC = fs.readFileSync(ART, 'utf8').replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
@@ -54,7 +55,7 @@ function ok(label, cond, got){
 }
 function summary(code){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(code); }
 
-const VER = Number(IA.IA_VERSION);
+const VER = SV.parse(IA.IA_VERSION);
 // The literal, read out of the source and not out of the engine. It is read INSIDE the
 // SPORT_CEILINGS object: three unrelated tables earlier in the file key on the same goal
 // id (program length, taper, long-run cap) and a bare match would read one of those.
@@ -62,7 +63,7 @@ const BLOCK_M = SRC.match(/SPORT_CEILINGS\s*=\s*\{[\s\S]*?\n\s*\};/);
 const CEIL_M = BLOCK_M ? BLOCK_M[0].match(/run_pace_goal:\s*(\d)/) : null;
 const CEIL = CEIL_M ? Number(CEIL_M[1]) : null;
 const HAS = CEIL === 4 && /_paceCapped\s*&&\s*capDays\s*>\s*3/.test(SRC.replace(/\s+/g, ' '));
-if(VER >= 205){
+if(SV.cmp(VER, 205) >= 0){
   ok('P0 at ia-version ' + VER + ' the D125 four-run pace ceiling and its fallback exist', HAS,
      'run_pace_goal ceiling ' + CEIL + ', fallback predicate ' + /_paceCapped\s*&&\s*capDays\s*>\s*3/.test(SRC.replace(/\s+/g,' ')));
   if(!HAS) summary(1);
@@ -86,7 +87,7 @@ const RUN_CARD_ERAS = [
   { hi: 207, name: { int: /Interval \(INT\)/, chi: /Continuous High Intensity \(CHI\)/ }, key: null },
   { lo: 208, name: { int: /Short Interval \(SI\)/, chi: /Long Interval \(LI\)/ }, key: { int: 'int', chi: 'chi' } }
 ];
-const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || VER >= r.lo) && (r.hi === undefined || VER <= r.hi));
+const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || SV.cmp(VER, r.lo) >= 0) && (r.hi === undefined || SV.cmp(VER, r.hi) <= 0));
 if(CARD_ROWS.length !== 1){
   ok('E0 ia-version ' + VER + ' reads its run cards through exactly one era row', false, CARD_ROWS.length + ' rows match');
   summary(1);

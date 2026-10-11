@@ -63,6 +63,7 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const S = require(path.join(__dirname, '..', 'status'))('g239_d233_island');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -103,11 +104,10 @@ const T92 = 92340, TAB92 = '1:32', CS92 = '.34', T93 = 93340, TAB93 = '1:33', ZE
 
 // ── version, read from the candidate's meta ──────────────────────────────────────────────────────────────────────────
 const HTML = fs.readFileSync(ART, 'utf8');
-const VM_ = HTML.match(/<meta name="ia-version" content="(\d+)">/);
-const VER = VM_ ? +VM_[1] : 0;
-const verCj = () => ['ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA];
+const VER = /<meta name="ia-version" content="/.test(HTML) ? SV.fromHtml(HTML) : 0;   // no meta: 0, as before
+const verCj = () => ['ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA];
 S.info('g239 D233 P-ISLAND | candidate ' + ART + ' ia-version ' + VER);
-if(!(VER >= ERA)) S.info('REFUSED: ia-version ' + VER + ' predates D233 (V' + ERA + '). Every row runs and FAILS by its version conjunct.');
+if(!(SV.cmp(VER, ERA) >= 0)) S.info('REFUSED: ia-version ' + VER + ' predates D233 (V' + ERA + '). Every row runs and FAILS by its version conjunct.');
 
 // ── the plugin stub and the pre-boot load ──────────────────────────────────────────────────────────────────────────────
 function mkStub(throwing){

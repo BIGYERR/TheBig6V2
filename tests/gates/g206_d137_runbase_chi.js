@@ -30,9 +30,10 @@
 const path = require('path');
 const fs = require('fs');
 const { load, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
-const VER = +IA.version;
+const VER = SV.parse(IA.version);
 const D137_ERA = 206;
 
 let pass = 0, fail = 0, skip = 0;
@@ -47,7 +48,7 @@ function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function summary(){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); }
 
 const ROWS = ['S1a','S1b','S1c','S1d','S2a','S2b','S2c','S3','S4b','S4c'];
-if(VER < D137_ERA){
+if(SV.cmp(VER, D137_ERA) < 0){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D137 (V' + D137_ERA + ').');
   for(const r of ROWS) skipRow(r + ' skipped below the D137 era');
   summary();
@@ -64,7 +65,7 @@ const RUN_LABEL_BY_VERSION = [
   { from: 206, to: 207,      ruling: 'pre-D103a',    chi: /Continuous High/i },
   { from: 208, to: Infinity, ruling: 'D103a (V208)', chi: /Long Interval \(LI\)/ },
 ];
-const LBL = RUN_LABEL_BY_VERSION.filter(r => VER >= r.from && VER <= r.to)[0]
+const LBL = RUN_LABEL_BY_VERSION.filter(r => SV.cmp(VER, r.from) >= 0 && SV.cmp(VER, r.to) <= 0)[0]
   || { ruling: 'NO ROW', chi: /(?!)/ };
 ok('ERA a RUN_LABEL_BY_VERSION row covers ia-version ' + VER + ' (' + LBL.ruling + ')', LBL.ruling !== 'NO ROW',
    'the run CHI label has no ruled text at this version, so S4a, S4b and S4c are void');

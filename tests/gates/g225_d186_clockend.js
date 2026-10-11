@@ -41,6 +41,7 @@
 'use strict';
 const path = require('path');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 225;
@@ -51,17 +52,17 @@ const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l + (g === undefi
 const done = () => { console.log('  runtime ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s'); console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
 
 let STAMP = NaN;
-try { STAMP = +H.load(ART).version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { STAMP = SV.parse(H.load(ART).version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let VER = STAMP;
-if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
   VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 } else if(process.env.IA_ASSUME_VERSION !== undefined){
   console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-console.log('g225 D186 clockend | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
+console.log('g225 D186 clockend | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : ''));
 
 const ROW_LABELS = ['G1a last==realisticTarget', 'G1b note==fmt(last)', 'G2 taper==last', 'G3 undamp last==goal', 'G4 met all==W1', 'COPY_GUARD sameFmt<->no-needs-more-weeks', 'COPY_GUARD PIN three-conjunct proof', 'TAPER CONTROL hand==engine', 'MET CONTROL hand==engine'];
-if(!(VER >= ERA)){
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D186 P-CLOCKEND (V' + ERA + '). No row may pass on it.');
   ROW_LABELS.forEach(l => ok(l + ' (REFUSED)', false));
   done();
@@ -237,7 +238,7 @@ ok('COPY_GUARD: sameFmt <-> short-form note (coach amendment item 2)', bad.CG.le
   const classify = note => { const m = LONG_RX.exec(note); if(m) return { form: 'long', equal: m[1] === m[2], goal: m[1], target: m[2] }; if(SHORT_RX.test(note)) return { form: 'short' }; return { form: 'other' }; };
   const pinCls = pinNotes().map(classify);
   const pinBad = [];
-  if(STAMP < ERA){
+  if(SV.cmp(STAMP, ERA) < 0){
     // (a) the real pre-D186 engine (V224, natural or under IA_ASSUME_VERSION discrimination on a
     // file genuinely stamped 224): the pin cell must show the redundant long form, goal == target.
     // This is a PURE STRING check (the note's own printed m:ss substrings), never pp fields.

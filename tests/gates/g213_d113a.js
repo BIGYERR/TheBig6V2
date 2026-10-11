@@ -70,10 +70,11 @@
 'use strict';
 const fs = require('fs'), os = require('os'), path = require('path'), cp = require('child_process');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
-const VER = +IA.version;
+const VER = SV.parse(IA.version);
 const ERA = 213;
 const V212_COMMIT = '169537cb615546b6b68c6826887a70fc11e1d5cd';
 
@@ -87,7 +88,7 @@ function skipRow(label){ skip++; console.log('SKIP ' + label); }
 // Version scope (post-V233): a row that holds from the D113a/D146 era onward is a minimum row, live on every candidate
 // from 213 up. R3v is one; the pair rows keep PAIR.
 function minRow(label, cond, got){
-  if(!(VER >= ERA)){ skipRow(label + ' skipped below the D113a/D146 era'); return; }
+  if(!(SV.cmp(VER, ERA) >= 0)){ skipRow(label + ' skipped below the D113a/D146 era'); return; }
   ok(label, cond, got);
 }
 function summary(){
@@ -95,7 +96,7 @@ function summary(){
   console.log('PASS ' + pass + ' FAIL ' + fail);
   process.exit(fail ? 1 : 0);
 }
-if(!(VER >= ERA)){
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D113a/D146 (V' + ERA + ').');
   ['HF','R1','R1v','R2','R2v','R3v','R8','R8n','R8v','R4','R5','R7','R7v'].forEach(r => skipRow(r + ' skipped below the D113a/D146 era'));
   summary();
@@ -174,13 +175,13 @@ const NRC_EX = [{bike:'bike_base'},{bike:'bike_ftp'},{swim:'swim_base'},{swim:'s
 
 // ── the V212 baseline ────────────────────────────────────────────────────────────────────
 let BASE = null, baseWhy = '';
-if(BASEFILE && fs.existsSync(BASEFILE)){ const b = load(BASEFILE); if(+b.version === 212){ BASE = b; baseWhy = 'argv baseline ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 212; '; }
+if(BASEFILE && fs.existsSync(BASEFILE)){ const b = load(BASEFILE); if(SV.cmp(b.version, 212) === 0){ BASE = b; baseWhy = 'argv baseline ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 212; '; }
 if(!BASE){
   try {
     const repo = path.join(__dirname, '..', '..');
     const f = path.join(os.tmpdir(), 'g213_v212_' + process.pid + '.html'); try { fs.unlinkSync(f); } catch(e) {}
     fs.writeFileSync(f, cp.execFileSync('git', ['-C', repo, 'show', V212_COMMIT + ':index.html'], {maxBuffer: 1 << 27}));
-    const b = load(f); if(+b.version === 212){ BASE = b; baseWhy += 'git ' + V212_COMMIT.slice(0, 7); } else baseWhy += 'git copy reads ' + b.version;
+    const b = load(f); if(SV.cmp(b.version, 212) === 0){ BASE = b; baseWhy += 'git ' + V212_COMMIT.slice(0, 7); } else baseWhy += 'git copy reads ' + b.version;
     try { fs.unlinkSync(f); } catch(e) {}
   } catch(e) { baseWhy += 'git show failed: ' + String(e.message).slice(0, 80); }
 }

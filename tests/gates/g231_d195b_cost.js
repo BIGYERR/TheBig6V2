@@ -77,6 +77,7 @@ const cp = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const { load, fixtures, progDigest, DAYS } = H;
 
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
@@ -224,17 +225,17 @@ function row(key, cj){ cj.forEach(([n, c, d]) => P('    ' + key + ' ' + n + ' ' 
 
 // ── LOAD + VERSION ──────────────────────────────────────────────────────────────────────────────────────────────
 let VER = NaN, CAND_TEXT = '';
-try { const IA = load(ART); VER = +IA.version; CAND_TEXT = fs.readFileSync(ART, 'utf8'); }
+try { const IA = load(ART); VER = SV.parse(IA.version); CAND_TEXT = fs.readFileSync(ART, 'utf8'); }
 catch(e){ P('FAIL boot: ' + String(e && e.message || e).slice(0, 200)); fail++; ORDER.forEach(k => ok(R[k] + ' (candidate did not boot)', false)); done(); }
-P('g231 D195 part B (the cost lens) | candidate ' + ART + ' ia-version ' + VER + (VER >= ERA ? '' : ' (below ' + ERA + ': every row runs and must FAIL by its own conjuncts)'));
+P('g231 D195 part B (the cost lens) | candidate ' + ART + ' ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? '' : ' (below ' + ERA + ': every row runs and must FAIL by its own conjuncts)'));
 let BF = null, BASE_TEXT = '', baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!BF){
   try { const f = tmpWrite('v230', cp.execFileSync('git', ['-C', ROOT, 'show', V230_COMMIT + ':index.html'], { maxBuffer:1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ BF = f; baseWhy += 'git show ' + V230_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = f; baseWhy += 'git show ' + V230_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 if(BF) BASE_TEXT = fs.readFileSync(BF, 'utf8');
@@ -247,7 +248,7 @@ P('  B-alone tree: ' + (BALONE ? 'built (V230 + slice 1)' + (SB.ok ? '' : ', but
 // ── ROW D195-B-a ────────────────────────────────────────────────────────────────────────────────────────────────
 function rowBa(){
   const cj = [];
-  cj.push(['a-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['a-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const C = twice(ART, PRT), p = C.prog;
   cj.push(['a-digest', C.self && C.dig === DIG_PRT_231, 'candidate PRT TING ' + C.dig + (C.self ? ' (self-identical in two VMs)' : ' (NOT self-identical: ' + C.dig2 + ')') + ', weeks ' + wkeys(p).length + ', ruled ' + DIG_PRT_231]);
   const tue = (p.weeks[9] || {}).tue, mon = (p.weeks[9] || {}).mon;
@@ -272,7 +273,7 @@ function rowBa(){
 // ── ROW D195-B-b ────────────────────────────────────────────────────────────────────────────────────────────────
 function rowBb(){
   const cj = [];
-  cj.push(['b-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['b-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   cj.push(['b-surgery', !!(SB && SB.ok && BALONE), SB ? (SB.ok ? 'slice 1 anchor count 1 on V230, replacement text count 1 in the candidate' : 'SURGERY: ' + SB.why.join('; ')) : 'no V230 tree: ' + baseWhy]);
   if(!BF || !BALONE){ ['b-self', 'b-bo', 'b-built', 'b-nonempty', 'b-removed', 'b-B3', 'b-added', 'b-detail', 'b-B2', 'b-other'].forEach(n => cj.push([n, false, 'no V230 / B-alone tree'])); row('D195-B-b', cj); return; }
   const LAT = [];
@@ -331,7 +332,7 @@ function rowBb(){
 // ── ROW D195-B-c ────────────────────────────────────────────────────────────────────────────────────────────────
 function rowBc(){
   const cj = [];
-  cj.push(['c-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['c-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   if(!BF || !BALONE){ ['c-cfB', 'c-bytes', 'c-inst'].forEach(n => cj.push([n, false, 'no V230 / B-alone tree: ' + baseWhy])); row('D195-B-c', cj); return; }
   const M = twice(BALONE, fixtures.HALF_MANNY), V = twice(BF, fixtures.HALF_MANNY);
   cj.push(['c-cfB', SB.ok && M.self && M.dig === DIG_MANNY_BALONE, 'B alone = V230 + slice 1: HALF_MANNY ' + M.dig + (M.self ? ' (self-identical in two VMs)' : ' (NOT self-identical: ' + M.dig2 + ')') + ', ruled ' + DIG_MANNY_BALONE + (SB.ok ? '' : ' | SURGERY: ' + SB.why.join('; '))]);

@@ -38,6 +38,7 @@
 const path=require('path'), fs=require('fs'), os=require('os'), crypto=require('crypto');
 const {fork}=require('child_process');
 const {load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION, MANNY_DELOAD_OFF_DIGEST_BY_VERSION}=require(path.join(__dirname,'..','harness.js'));
+const SV=require(path.join(__dirname,'..','semver.js'));
 const ART=path.resolve(process.argv[2]||path.join(__dirname,'..','..','index.html'));
 
 // ── ERA ROWS: the five arbitration counts, keyed by ia-version (D133) ──────────────
@@ -118,7 +119,7 @@ E6_BY_VERSION[210] = E6_BY_VERSION[209];   // D70c/D150: ruled UNMOVED (28; post
 // Row lookup. This gate has no top-level version predicate: the bare 36 ran on EVERY artifact it
 // was ever pointed at. So the 208 row is read for every ia-version at or below 208 (older runs keep
 // reading 36 and do not newly fail), and from 209 each version needs its own row. No row -> E6 FAILS.
-const E6_ROW_FOR = v => E6_BY_VERSION[(+v <= 208) ? 208 : +v];
+const E6_ROW_FOR = v => SV.lookup(E6_BY_VERSION, (SV.cmp(v, 208) <= 0) ? 208 : v);
 // V211 (D155): on a tier B long-run day the deload's one-accessory pick yields to the
 // long-run tier, so the hinge leaves that day by ruling, not by the deload. E1b/E3/G5
 // assert the deload's own behaviour and exclude tier B long-run days (_longRunTier, the
@@ -130,8 +131,8 @@ const E6_ROW_FOR = v => E6_BY_VERSION[(+v <= 208) ? 208 : +v];
 const DELOAD_HINGE_BY_VERSION = {};
 DELOAD_HINGE_BY_VERSION[210] = { E1b: 9771, E3: 60, G5: {'Explosive finisher': 60}, E1a: 12477, G1: 1350 };
 DELOAD_HINGE_BY_VERSION[211] = { E1b: 9334, E3: 44, G5: {'Explosive finisher': 44}, E1a: 12477, G1: 1350 };   // D155: ruled scope change. E1a and G1 added at V215 (D149): the bare literals' values on 210 to 214
-const DELOAD_HINGE_ROW_FOR = v => DELOAD_HINGE_BY_VERSION[(+v <= 210) ? 210 : +v];   // no row -> E1b/E3/G5 FAIL
-const DELOAD_HINGE_EXCLUDES_TIER_B = v => +v >= 211;
+const DELOAD_HINGE_ROW_FOR = v => SV.lookup(DELOAD_HINGE_BY_VERSION, (SV.cmp(v, 210) <= 0) ? 210 : v);   // no row -> E1b/E3/G5 FAIL
+const DELOAD_HINGE_EXCLUDES_TIER_B = v => SV.cmp(v, 211) >= 0;
 DELOAD_ARB_BY_VERSION[211] = DELOAD_ARB_BY_VERSION[210];   // D153/D155: ruled UNMOVED
 E6_BY_VERSION[211] = E6_BY_VERSION[210]; // D155: ruled UNMOVED (28 printed)
 DELOAD_ARB_BY_VERSION[212] = DELOAD_ARB_BY_VERSION[211];   // D110a: ruled UNMOVED, no lift section touched
@@ -523,8 +524,8 @@ const dig=progDigest(IP.buildProgram(fixtures.HALF_MANNY));
 IP.eval("globalThis.__DELOAD_OFF=true;");
 const digOff=progDigest(IP.buildProgram(fixtures.HALF_MANNY));
 IP.eval("globalThis.__DELOAD_OFF=false;");
-const MANNY_DIGEST=MANNY_DIGEST_BY_VERSION[IP.version];             // era row, not a literal (D89)
-const MANNY_OFF=MANNY_DELOAD_OFF_DIGEST_BY_VERSION[IP.version];     // era row, not a literal (D89)
+const MANNY_DIGEST=SV.lookup(MANNY_DIGEST_BY_VERSION,IP.version);             // era row, not a literal (D89)
+const MANNY_OFF=SV.lookup(MANNY_DELOAD_OFF_DIGEST_BY_VERSION,IP.version);     // era row, not a literal (D89)
 ok(!!MANNY_DIGEST&&dig===MANNY_DIGEST,'B1 HALF_MANNY progDigest matches the V'+IP.version+' row of MANNY_DIGEST_BY_VERSION ('+(MANNY_DIGEST||'NO ROW')+') (got '+dig+')'+(MANNY_DIGEST?'':' — no MANNY_DIGEST_BY_VERSION row for V'+IP.version+': an unruled digest move'));
 ok(!!MANNY_OFF&&digOff===MANNY_OFF,'B2 with __DELOAD_OFF the same fixture matches the V'+IP.version+' row of MANNY_DELOAD_OFF_DIGEST_BY_VERSION ('+(MANNY_OFF||'NO ROW')+') (got '+digOff+'): B1 is MEANINGFUL, the fixture does pass through the deload (B1 would be vacuous if the two digests were equal)'+(MANNY_OFF?'':' — no MANNY_DELOAD_OFF_DIGEST_BY_VERSION row for V'+IP.version+': an unruled digest move'));
 ok(dig!==digOff,'B3 the two fixture digests differ');
@@ -544,7 +545,7 @@ function report(){
   const N=R.on, F=R.off;
   // D133. The era row, looked up ONCE. Its existence is a conjunct in every assertion
   // that reads it, so an artifact with no row fails loudly instead of skipping.
-  const ERA=DELOAD_ARB_BY_VERSION[IP.version]||null;
+  const ERA=SV.lookup(DELOAD_ARB_BY_VERSION,IP.version)||null;
   const ERAv=k=>(ERA?ERA[k]:'NO ROW');
   const NOROW=(ERA?'':' — no DELOAD_ARB_BY_VERSION row for V'+IP.version+': an unpinned arbitration count (D133)');
   const g=(o,k)=>(o&&o[k])||0;
@@ -582,10 +583,10 @@ function report(){
   console.log('── F. ACCESSORY-BLOCK CONSERVATION (the ruling adds no sets) ──');
   ok(g(N.lblP2all,'Leg superset A')===14544,'F1 Leg superset A present after the deload == 14,544. DENOMINATOR: all '+N.dayCells+' day builds (non-deload cards pass through recoveryDeload untouched, so they belong in this total); got '+g(N.lblP2all,'Leg superset A'));
   // V231 era for F2 and F3 (tests/measure/v231_rulings/v231_absorb_ruling.md section 3, the g199:561 F2 / :562 F3 row: "ABSORB inline era: `VER>=231 ? 15702 : 15720`, `VER>=231 ? 30246 : 30264` | 15,702 / 30,246 | D196-1/-2/-5 | `IP.version>=231` | V230 reads 15,720/30,264"), a predicate on today's ia-version (standing ruling 2), keyed to D196 P-BWFALLBACK Amendment 1 (tests/measure/v231_rulings/v231_reruling_d195a2_d196a1_d197a1.md, superseding A1–A4 of tests/measure/v231_rulings/v231_ruling_d196_d195a1_d197.md, whose D196 and D197 surgery and D195-B stand) and the absorb ruling's D196 Amendment 2 class text (standing ruling 4): the 18 cells are bodyweight|balanced|{none,run_pace_goal,run_half}|advanced|knee/protect|s1013 W5/W6 wed or thu, where D196-1 renames the Main burpee to the bridge, the D196-2 re-draw takes Single-leg Romanian deadlift (bodyweight) out of Leg superset B (the block goes singleton) and on 6 of them a Calves section appears (D196-5); printed by builder with this gate before this edit: F2 15702 / F3 30246 on the V231 candidate (sha 1249c248a679), F2 15720 / F3 30264 on the V230 baseline (sha 72ac41c8d340). Below 231 both rows print V230's text byte for byte.
-  const F23_V231=IP.version>=231?' (V231 era: 18 below V230, the D196 re-draw on 18 bodyweight knee/protect W5/W6 cells; tests/measure/v231_rulings/v231_absorb_ruling.md)':'';
-  ok(g(N.lblP2all,'Leg superset B')===(IP.version>=231?15702:15720),'F2 Leg superset B present after the deload == '+(IP.version>=231?'15,702':'15,720')+', same all-day-builds denominator'+F23_V231+'; got '+g(N.lblP2all,'Leg superset B'));
-  ok(g(N.lblP2all,'Leg superset A')+g(N.lblP2all,'Leg superset B')===(IP.version>=231?30246:30264),
-    'F3 ACCESSORY-BLOCK CONSERVATION: A + B after the deload == '+(IP.version>=231?'30,246, 18 below the 30,264 V198 shipped as 16,704 + 13,560 and V230 kept'+F23_V231:'30,264, the identical total V198 shipped as 16,704 + 13,560')+'. The ruling SWAPS which block survives, it ADDS NO SETS. Without this a build that kept BOTH blocks would satisfy every other criterion in this file; got '+(g(N.lblP2all,'Leg superset A')+g(N.lblP2all,'Leg superset B')));
+  const F23_V231=SV.cmp(IP.version,231)>=0?' (V231 era: 18 below V230, the D196 re-draw on 18 bodyweight knee/protect W5/W6 cells; tests/measure/v231_rulings/v231_absorb_ruling.md)':'';
+  ok(g(N.lblP2all,'Leg superset B')===(SV.cmp(IP.version,231)>=0?15702:15720),'F2 Leg superset B present after the deload == '+(SV.cmp(IP.version,231)>=0?'15,702':'15,720')+', same all-day-builds denominator'+F23_V231+'; got '+g(N.lblP2all,'Leg superset B'));
+  ok(g(N.lblP2all,'Leg superset A')+g(N.lblP2all,'Leg superset B')===(SV.cmp(IP.version,231)>=0?30246:30264),
+    'F3 ACCESSORY-BLOCK CONSERVATION: A + B after the deload == '+(SV.cmp(IP.version,231)>=0?'30,246, 18 below the 30,264 V198 shipped as 16,704 + 13,560 and V230 kept'+F23_V231:'30,264, the identical total V198 shipped as 16,704 + 13,560')+'. The ruling SWAPS which block survives, it ADDS NO SETS. Without this a build that kept BOTH blocks would satisfy every other criterion in this file; got '+(g(N.lblP2all,'Leg superset A')+g(N.lblP2all,'Leg superset B')));
   ok(g(N.lblP1all,'Leg superset A')===16704,'F3b the swap is exactly 2,160 wide in each direction: A enters on 16,704 cards and leaves on '+g(N.lblP2all,'Leg superset A')+', a loss of '+(g(N.lblP1all,'Leg superset A')-g(N.lblP2all,'Leg superset A'))+'; got '+g(N.lblP1all,'Leg superset A'));
   ok(g(N.lblP2,'Leg superset A')+g(N.lblP2,'Leg superset B')===2880,'F3c on DELOAD cards alone the same two blocks survive '+g(N.lblP2,'Leg superset A')+' + '+g(N.lblP2,'Leg superset B')+' == 2,880 times, one per card. A second, smaller denominator, stated so F1-F3 cannot be misread as a deload-only census');
   ok(N.survCandViol===0,'F4 per-card: exactly one accessory block survives wherever one was available, zero where none was ('+N.survCandViol+' violations of '+D_DAY+' deload day builds)');
@@ -650,7 +651,7 @@ function report(){
   console.log('── I. re-loss downstream of the deload ──');
   ok(N.swapReCap===0,'I1 of the 2,160 newly-surviving swap cells, capRegionalFatigue empties '+N.swapReCap+'');
   // V231 era for I2, and I2c/I2d retired at 231 (tests/measure/v231_rulings/v231_absorb_ruling.md, the g199:627 I2 row: "ABSORB: `VER>=231 ? 0 : 108` | 0 | D196-4 | `IP.version>=231` | V230 108" and "I2c/I2d | RETIRE at ≥231 to SKIP lines (never PASS/FAIL)"), a predicate on today's ia-version (standing ruling 2), keyed to D196 P-BWFALLBACK (standing ruling 4): the 108 V230 cells are all rem[Leg superset B :: Burpees] add[Leg superset B :: Single-leg hip thrust (shoulders on bed)] on bodyweight lowback/protect, so the post-build rename I2c and I2d named no longer happens; printed by builder with this gate before this edit: I2 0 on the V231 candidate (sha 1249c248a679), 108 on the V230 baseline (sha 72ac41c8d340). I2b is unchanged. Below 231 all three rows print V230's text byte for byte; at 231 I2c and I2d print one named SKIP line each (the g228 form), never PASS and never FAIL.
-  const I2_V231=IP.version>=231;
+  const I2_V231=SV.cmp(IP.version,231)>=0;
   ok(N.swapReBudget===(I2_V231?0:108),I2_V231?('I2 of the same 2,160, '+N.swapReBudget+' cells reach the SHIPPED card with no posterior left (V231 era, D196 P-BWFALLBACK: V230 shipped 108, every one the Leg superset B Banded hip thrust renamed to Burpees after capSessionBudget on bodyweight lowback/protect; the V231 card carries Single-leg hip thrust (shoulders on bed) there). I2c and I2d are retired at 231'):('I2 of the same 2,160, '+N.swapReBudget+' cells reach the SHIPPED card with no posterior left, and NOT ONE of them loses it to a trim. capSessionBudget keeps the section and D85\'s floor keeps the item; what they carried entering is '+topn(N.reBudLost,2)+'. I2c names what actually happens to it'));
   // I2c and I2d (the V230 Burpees renamer rows, D196 P-BWFALLBACK, dark from I2_V231 = IP.version>=231) retired Post-V233 under standing ruling 3 (build-scoped; the previous-version run replaces it).
   ok(N.swapReBudgetWeekZero===0,'I2b and not one of those '+N.swapReBudget+' cells leaves its WEEK without posterior ('+N.swapReBudgetWeekZero+'): the coaching claim behind criterion 2 holds at the level it is made');

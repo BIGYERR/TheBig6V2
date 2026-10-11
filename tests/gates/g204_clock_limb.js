@@ -41,6 +41,7 @@
 //     exit, because gate.sh runs every gate against the previous artifact first.
 const path = require('path');
 const { load, fixtures, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
 
@@ -53,10 +54,10 @@ function eq(label, got, want){ ok(label + ' == ' + JSON.stringify(want), got ===
 function skipRow(label){ skip++; console.log('SKIP ' + label); }
 
 const HAS = IA.eval("typeof _clkMS === 'function'");
-const VER = IA.version;
+const VER = SV.parse(IA.version);
 const D126_ERA = 204;
 
-if(!HAS && VER < D126_ERA){
+if(!HAS && SV.cmp(VER, D126_ERA) < 0){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D126 (V' + D126_ERA + ') and has no _clkMS.');
   for(const r of ['C1','C2','C3','C4','C5','C6','C7a','C7b','C7c','C8']) skipRow(r + ' skipped below the D126 era');
   console.log('\nPASS ' + pass + ' FAIL ' + fail);
@@ -161,7 +162,7 @@ const reproDose = reproCards.length ? (reproCards[0].dose || reproCards[0]._dose
 // "8:21/mi" (D187's rate 3; the undated case has bw = tw so D186's steps = bw - 1 = 10 either way,
 // only the rate moved here). Hand-verified against the live V225 engine before landing: W11 THU
 // LI prints tgt 501, "Tempo Pace: 8:21/mi", exactly.
-const C5_TGT = (+VER >= 225) ? 501 : 480, C5_TXT = (+VER >= 225) ? 'Tempo Pace: 8:21/mi' : 'Tempo Pace: 8:00/mi';
+const C5_TGT = (SV.cmp(VER, 225) >= 0) ? 501 : 480, C5_TXT = (SV.cmp(VER, 225) >= 0) ? 'Tempo Pace: 8:21/mi' : 'Tempo Pace: 8:00/mi';
 eq('C5 W11 THU dose.tgt is the prescribed tempo seconds', reproDose.tgt, C5_TGT);
 ok('C5 W11 THU detail prints the tempo pace (' + C5_TXT + ')',
    reproDetail.indexOf(C5_TXT) !== -1, reproDetail.slice(0, 80));
@@ -177,7 +178,7 @@ ok('C5 W11 THU detail carries no :60 seconds limb', !/\d:60\b/.test(reproDetail)
 // printed value is identical pre- and post-D186/D187) to restore the coverage C5 used to give;
 // hand-verified against the live engine on BOTH V224 and V225 before landing: both print W1 THU
 // LI tgt 480, "Tempo Pace: 8:00/mi", identically.
-if(+VER >= 225){
+if(SV.cmp(VER, 225) >= 0){
   const CARRY = IA.buildProgram(mkCfg(7, 24, '6', '00', '1'));
   const carryCards = sessionsOf(CARRY, 1, 'thu');
   ok('C5b the carry config builds a W1 THU cardio session', carryCards.length > 0, String(carryCards.length));
@@ -399,7 +400,7 @@ ok('C7b the NRC formatter domain is still integer over 461 anchors (a fraction h
 // carries: 10:08 for 500 yd = 121.6 s per 100, minus 2 = 119.6 -> "2:00" (the idiom: 1:60).
 //   ia-version <= 211: maxGain 6, x0.97, week 1 2:00 at a 2:03 split.
 //   ia-version  > 211: maxGain 3, -2 s, week 1 2:01 at 2:03, week 6 1:46 at 1:48 (123.2 - 15).
-const SWIM_D110A = +VER > 211;
+const SWIM_D110A = SV.cmp(VER, 211) > 0;
 const SWIM_BASE_SEC = 10*60 + 16;     // 10:16 for 500 yd
 const SWIM_GOAL_SEC = 4*60 + 0;       // 4:00 for 500 yd
 const SWIM_FIXED_DIST = 500;
@@ -534,7 +535,7 @@ ok('C8a every one of ' + c8Half + ' half seconds over [0,7200] prints the round-
 // 659.88 -> 660 -> 11 r 0. The idiom printed 5:60, 7:60 and 10:60. The 1 mi goal sits 84 s
 // under the anchor, as C5b's 7:24 -> 6:00 does.
 const C8_PACE = [ { a: 333, tgt: 360, clock: '6:00' }, { a: 444, tgt: 480, clock: '8:00' }, { a: 611, tgt: 660, clock: '11:00' } ];
-if(+VER >= 225){
+if(SV.cmp(VER, 225) >= 0){
   for(const r of C8_PACE){
     const gl = r.a - 84;
     const p = IA.buildProgram(mkCfg(Math.floor(r.a / 60), r.a % 60, Math.floor(gl / 60), gl % 60, 1));
@@ -619,7 +620,7 @@ ok('C8f no clock among the ' + c8Clocks + ' clock strings on the ' + C8_BUILT.le
 
 // ── HALF_MANNY and cfg purity ──────────────────────────────────────────────
 const H = require(path.join(__dirname, '..', 'harness.js'));
-const ERA = H.MANNY_DIGEST_BY_VERSION[IA.version];
+const ERA = SV.lookup(H.MANNY_DIGEST_BY_VERSION, IA.version);
 ok('MANNY_DIGEST_BY_VERSION has a row for ia-version ' + IA.version, !!ERA, String(ERA));
 eq('HALF_MANNY digest unmoved by D126 (a clock fix may not move a build)',
    progDigest(IA.buildProgram(fixtures.HALF_MANNY)), ERA);

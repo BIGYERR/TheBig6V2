@@ -58,9 +58,10 @@
 'use strict';
 const path = require('path');
 const { load, fixtures, progDigest, DAYS, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
-const VER = +IA.version;
+const VER = SV.parse(IA.version);
 const ERA = 211;
 
 let pass = 0, fail = 0, skip = 0, scoped = 0, fixt = 0;
@@ -75,7 +76,7 @@ function summary(){
   console.log('PASS ' + pass + ' FAIL ' + fail);
   process.exit(fail ? 1 : 0);
 }
-if(!(VER >= ERA)){
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D153/D155 (V' + ERA + ').');
   ['HF','G1','G2','G2v','G5','G6','HM'].forEach(r => skipRow(r + ' skipped below the D153/D155 era'));
   summary();
@@ -201,7 +202,7 @@ run('D153', D153, {tb:100, rec:10});
 // to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
 // D153/D155 (standing ruling 4).
 { const hm = progDigest(IA.buildProgram(cl(fixtures.HALF_MANNY)));
-  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  const eraV = SV.parse(IA.version), eraHas = SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) !== undefined, eraRow = eraHas ? SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) : undefined;
   ok('HM HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved)',
      eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 summary();

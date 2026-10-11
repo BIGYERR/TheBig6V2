@@ -22,6 +22,13 @@
 // alternate is null or undefined, where B is loaded (load(...)) from argv[3], directly or through one binding, and is
 // never bound from the candidate path. The comparison only chooses which pinned file a live row reads as its oracle
 // (g208_d103a_readers' E3e and its V213 tree). --list prints each selector as a `# selector (not a hit)` line.
+// Post-V239 semver (slice 2c): gates compare versions through tests/semver.js, so an exact-version predicate also reads
+// `SV.cmp(A, B) === 0` (or == 0, !== 0, != 0; the 0 on either side). It is a HIT when one argument is a VERSION
+// EXPRESSION and the other a 3-digit literal (or a quoted one), a dotted string literal ('0.239.1', 'v0.239.1'), or an
+// era identifier as above; the selector exemption applies to it unchanged. SV is the name semver.js is bound to: SV, and
+// any name the gate assigns a require of semver.js. An ordered SV.cmp(A, B) < 0 (<= > >=) is not a hit, as VER >= 240
+// is not. SV.parse(x) reads as x, as +x does; a name assigned from SV.fromHtml(...) is a version binding, as one read
+// from the ia-version meta is. So a converted gate counts what its unconverted original counted.
 //
 // The debt file holds one line per gate with hits today: `<gate file> <hit count>  # <comment>`. A gate with hits
 // and no line, or more hits than its line, FAILs by name (a new exact-version row). Fewer hits than its line FAILs
@@ -32,7 +39,9 @@ const GD = path.join(__dirname, 'gates');
 const DEBT = path.join(__dirname, 'version_scope_debt.txt');
 
 // ---- blanking: same length, newlines kept. code: comments, string, template and regex bodies blanked (a body
-// that is exactly 3 digits is kept, so '233' still reads as a literal). nc: comments blanked, the rest kept.
+// that is exactly 3 digits, or a dotted version, is kept, so '233' and '0.239.1' still read as literals). nc: comments
+// blanked, the rest kept.
+const DOTTED = /^[vV]?\d+\.\d+\.\d+$/;
 function blank(src) {
   const n = src.length, code = src.split(''), nc = src.split('');
   const sp = (a, i) => { if (a[i] !== '\n') a[i] = ' '; };
@@ -41,8 +50,8 @@ function blank(src) {
   const regexOk = () => lastSig === '' || /[(,=:\[!&|?{};+\-*%<>~^]$/.test(lastSig) ||
     /\b(return|typeof|case|do|else|in|of|new|delete|void|throw|yield|await)$/.test(lastSig);
   const sigTail = (j) => { let k = j - 1; while (k >= 0 && /\s/.test(code[k])) k--; let s = ''; while (k >= 0 && s.length < 12 && !/\s/.test(code[k])) { s = code[k] + s; k--; } return s; };
-  const body = (from, to) => { // blank code[from..to) unless it is exactly three digits
-    if (/^\d{3}$/.test(src.slice(from, to))) return; for (let k = from; k < to; k++) sp(code, k); };
+  const body = (from, to) => { // blank code[from..to) unless it is exactly three digits or a dotted version
+    if (/^\d{3}$/.test(src.slice(from, to)) || DOTTED.test(src.slice(from, to))) return; for (let k = from; k < to; k++) sp(code, k); };
   function str(q) { const s = i + 1; let k = s; while (k < n && src[k] !== q && src[k] !== '\n') { if (src[k] === '\\') k++; k++; } body(s, Math.min(k, n)); i = k + 1; }
   function tmpl() { // at the char after ` or after the } closing a ${ }
     let k = i, s = i;
@@ -70,11 +79,12 @@ function blank(src) {
 
 // ---- expression helpers over the blanked code ------------------------------------------------------------
 const OPEN = '([{', CLOSE = ')]}';
-function stripWrap(e) {
+function stripWrap(e, svs) { // svs: the gate's semver.js names, so <sv>.parse(x) reads as x (Post-V239)
   let s = e.trim(), prev;
+  const wrap = new RegExp('^(Number|parseInt|String|parseFloat' + [...(svs || [])].map(x => '|' + x.replace(/\$/g, '\\$') + '\\s*\\.\\s*parse').join('') + ')\\s*\\(');
   do { prev = s;
     if (/^\+\s*/.test(s)) s = s.replace(/^\+\s*/, '');
-    let m = /^(Number|parseInt|String|parseFloat)\s*\(/.exec(s);
+    let m = wrap.exec(s);
     if (m && matchClose(s, m[0].length - 1) === s.length - 1) { s = s.slice(m[0].length, -1); s = topSplit(s, ',')[0].trim(); }
     if (s[0] === '(' && matchClose(s, 0) === s.length - 1) s = s.slice(1, -1).trim();
   } while (s !== prev);
@@ -113,16 +123,21 @@ function analyse(src) {
   // not one: comparing its version is provenance, unless the gate copies it into a version binding (BASE_VER).
   const objs = new Set(['IA', 'IB']), vers = new Set(['VER', 'CAND_VER', 'BASE_VER', 'IA_VERSION']), eras = new Set();
   const mentions = (rhs, set) => [...set].some(x => new RegExp('(^|[^\\w$.])' + x.replace(/\$/g, '\\$') + '(?![\\w$])').test(rhs));
+  // semver.js (Post-V239, slice 2c; header): SV by name, and any name the gate assigns a require of semver.js
+  const svs = new Set(['SV']);
+  for (const a of asg) if (/\brequire\s*\(/.test(a.rhs) && /semver(\.js)?['"`]/.test(a.rhsNc)) svs.add(a.name);
+  const SVA = '(?:' + [...svs].map(x => x.replace(/\$/g, '\\$')).join('|') + ')';
+  const FROMHTML = new RegExp('(^|[^\\w$.])' + SVA + '\\s*\\.\\s*fromHtml\\s*\\(');
   const candPath = new Set(); let dm;
   const dre = new RegExp('\\[\\s*(' + ID + ')[^\\]]*\\]\\s*=\\s*process\\s*\\.\\s*argv\\s*\\.\\s*slice\\s*\\(\\s*2\\s*\\)', 'g');
   while ((dm = dre.exec(code))) candPath.add(dm[1]);
   for (const a of asg) if (/\bprocess\s*\.\s*argv\s*\[\s*2\s*\]/.test(a.rhs)) candPath.add(a.name);
   for (const a of asg) if (mentions(a.rhs, candPath) || /\bprocess\s*\.\s*argv\s*\[\s*2\s*\]/.test(a.rhs)) objs.add(a.name);
-  const isVer = e => { const s = stripWrap(e); let mm;
+  const isVer = e => { const s = stripWrap(e, svs); let mm;
     if ((mm = new RegExp('^(' + ID + ')$').exec(s))) return vers.has(mm[1]);
     if ((mm = new RegExp('^(' + ID + ')\\s*\\.\\s*(version|IA_VERSION)$').exec(s))) return objs.has(mm[1]);
     return false; };
-  const isEra = e => { const s = stripWrap(e); let mm;
+  const isEra = e => { const s = stripWrap(e, svs); let mm;
     if (/^\d{3}$/.test(s) || /^(['"])\d{3}\1$/.test(s)) return true;
     if ((mm = new RegExp('^(' + ID + ')$').exec(s))) return eras.has(mm[1]);
     return false; };
@@ -131,7 +146,7 @@ function analyse(src) {
     const t = ternaryBranches(rhs.trim()); return !!t && (isVer(t[1]) || isVer(t[2])); };
   for (const a of asg) if (/^\s*\(?\s*\d{3}\s*\)?\s*$/.test(a.rhs)) eras.add(a.name);
   for (let changed = true; changed;) { changed = false;
-    for (const a of asg) if (!vers.has(a.name) && (fromVer(a.rhs) || (/ia-version/.test(a.rhsNc) && /\.\s*(match|exec)\s*\(/.test(a.rhsNc)))) { vers.add(a.name); changed = true; } }
+    for (const a of asg) if (!vers.has(a.name) && (fromVer(a.rhs) || FROMHTML.test(a.rhs) || (/ia-version/.test(a.rhsNc) && /\.\s*(match|exec)\s*\(/.test(a.rhsNc)))) { vers.add(a.name); changed = true; } }
   // SELECTOR (post-V233 A2; header): a baseline object B loaded from argv[3] (directly or through one binding) and never
   // bound from the candidate path, its version compared to an era in the condition of `cond ? B : null`.
   const ARGV3 = /\bprocess\s*\.\s*argv\s*\[\s*3\s*\]/, ARGV2 = /\bprocess\s*\.\s*argv\s*\[\s*2\s*\]/;
@@ -141,20 +156,30 @@ function analyse(src) {
   baseObjs.delete('IA'); for (const c of candPath) baseObjs.delete(c);
   const selectors = [];
   const selector = (o, verSide) => {
-    const mm = new RegExp('^(' + ID + ')\\s*\\.\\s*(version|IA_VERSION)$').exec(stripWrap(verSide)); if (!mm || !baseObjs.has(mm[1])) return false;
+    const mm = new RegExp('^(' + ID + ')\\s*\\.\\s*(version|IA_VERSION)$').exec(stripWrap(verSide, svs)); if (!mm || !baseObjs.has(mm[1])) return false;
     const a = asg.filter(z => z.from <= o && o < z.to).sort((x, y) => (x.to - x.from) - (y.to - y.from))[0];
     if (!a || vers.has(a.name)) return false;
     const lead = a.rhs.length - a.rhs.replace(/^\s+/, '').length, t = ternaryBranches(a.rhs.trim());
     return !!t && o - a.from < lead + t[0].length && t[1].trim() === mm[1] && /^(null|undefined)$/.test(t[2].trim()); };
+  // the semver.js form (header): <sv>.cmp(A, B) on one side of the equality, 0 on the other; a HIT when one argument is
+  // a version expression and the other a 3-digit literal, a quoted one, a dotted string literal or an era identifier
+  const isExact = e => { const q = /^(['"])(.*)\1$/.exec(stripWrap(e, svs)); return isEra(e) || (!!q && DOTTED.test(q[2])); };
+  const svCmp = (side, zero) => { if (stripWrap(zero, svs) !== '0') return null;
+    const s = stripWrap(side, svs), mm = new RegExp('^' + SVA + '\\s*\\.\\s*cmp\\s*\\(').exec(s);
+    if (!mm || matchClose(s, mm[0].length - 1) !== s.length - 1) return null;
+    const args = topSplit(s.slice(mm[0].length, -1), ','); return args.length === 2 ? args : null; };
+  const svHit = (L, R) => { const c = svCmp(L, R) || svCmp(R, L); if (!c) return null;
+    return (isVer(c[0]) && isExact(c[1])) ? c[0] : (isVer(c[1]) && isExact(c[0])) ? c[1] : null; };
   // equality operands
   const hits = []; const eq = /[!=]==?/g;
   while ((m = eq.exec(code))) {
     const o = m.index, op = m[0], e = o + op.length;
     if (/[=!<>]/.test(code[o - 1] || '') || code[e] === '=' || code[e] === '>') continue;
     const L = operand(code, o, -1), R = operand(code, e, +1);
-    if ((isVer(L) && isEra(R)) || (isVer(R) && isEra(L))) {
+    const vs = ((isVer(L) && isEra(R)) || (isVer(R) && isEra(L))) ? (isVer(L) ? L : R) : svHit(L, R);
+    if (vs) {
       const h = { line: lineAt(o), kind: op, expr: (L.trim() + ' ' + op + ' ' + R.trim()).replace(/\s+/g, ' ') };
-      if (selector(o, isVer(L) ? L : R)) selectors.push(h); else hits.push(h); }
+      if (selector(o, vs)) selectors.push(h); else hits.push(h); }
   }
   // switch (version) { case NNN: }
   const sw = /\bswitch\s*\(/g;

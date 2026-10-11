@@ -57,6 +57,11 @@ describe('renderReport', () => {
     assert.match(renderReport(fakeRun([fakeStep(1)], { collage: null })), /<dt>Collage<\/dt><dd>not written<\/dd>/);
   });
 
+  it('prints the app version as written: 239 and 0.239.1', () => {
+    assert.match(renderReport(fakeRun([fakeStep(1)])), /ia-version 239</);
+    assert.match(renderReport(fakeRun([fakeStep(1)], { version: '0.239.1' })), /ia-version 0\.239\.1</);
+  });
+
   it('shows a parity error in place of a percentage', () => {
     const step = fakeStep(1, { ok: false, parity: { error: 'sizes differ 786×1704 vs 786×1700' } });
     const html = renderReport(fakeRun([step]));

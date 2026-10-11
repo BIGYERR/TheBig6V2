@@ -130,6 +130,7 @@
 'use strict';
 const fs = require('fs'), path = require('path'), cp = require('child_process'), vm = require('vm');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 223;
@@ -163,7 +164,7 @@ const isControl = key => /^Z/.test(key) || ['R3S', 'R4D', 'R4B', 'R6N'].includes
 const RID = { RD: 'RD0' };
 const rowId = (key, tag) => (RID[key] || key) + '.' + tag;
 const childId = tag => 'CHILD0.' + tag;
-const stampOf = f => +((fs.readFileSync(f, 'utf8').match(/<meta name="ia-version" content="(\d+)"/) || [])[1]);
+const stampOf = f => { const s = fs.readFileSync(f, 'utf8'); return /<meta name="ia-version" content="/.test(s) ? SV.fromHtml(s) : NaN; };   // no meta: NaN, as before
 
 // ═════════════════════════════════════════════ PARENT ═════════════════════════════════════════════
 if(!process.env.G184_ZONE){
@@ -178,11 +179,11 @@ if(!process.env.G184_ZONE){
   let STAMP = NaN;
   try { STAMP = stampOf(ART); H.load(ART); } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
   let VER = STAMP;
-  if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+  if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   }
-  console.log('g223 D184 testlen | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
-  if(!(VER >= ERA)){
+  console.log('g223 D184 testlen | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : ''));
+  if(!(SV.cmp(VER, ERA) >= 0)){
     console.log('REFUSED: ia-version ' + VER + ' predates D184 P-TESTLEN (V' + ERA + '). No row may pass on it.');
     failAll('REFUSED');
   }
@@ -343,7 +344,7 @@ const V = mkVM(ART);
 // blocks a real, anchor-less state); it is to assert the refusal itself as the correct outcome on
 // exactly that population, from 225 only. Below 225 every cell in this lattice, including these,
 // keeps asserting D184's original length/pin claim exactly as before.
-const R225_R3 = +V.IA.version >= 225;
+const R225_R3 = SV.cmp(V.IA.version, 225) >= 0;
 { const fmt = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
   const GOALS = [];
   for(const t of [570, 660, 750, 855]) GOALS.push(['1.5mi ' + fmt(t), { id:'run_pace_goal', label:'x', targetDist:'1.5', paceUnit:'mi', targetMins:String(Math.floor(t / 60)), targetSecs:String(t % 60), targetTime:fmt(t) }]);

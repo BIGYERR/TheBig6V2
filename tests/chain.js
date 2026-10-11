@@ -18,6 +18,7 @@
 const fs = require('fs'), path = require('path'), vm = require('vm'), cp = require('child_process');
 const ROOT = path.dirname(__dirname);
 const H = require(path.join(__dirname, 'harness.js'));
+const SV = require(path.join(__dirname, 'semver.js'));  // ia-version is M.m.p; a legacy integer N reads as 0.N.0
 const GD = path.join(__dirname, 'gates');
 const MD = path.join(__dirname, 'measure');
 const THRESHOLD = 20;                                   // more than this many gates => CROSS-CUTTING
@@ -47,10 +48,13 @@ function git(args, okCodes) {
 git(['rev-parse', '--verify', '--quiet', ref + '^{commit}']);
 
 // ---- map -----------------------------------------------------------------------------------------
-const maps = fs.readdirSync(MD).map(f => [f, /^v(\d+)_gate_reach\.json$/.exec(f)]).filter(x => x[1])
-  .sort((a, b) => (+b[1][1]) - (+a[1][1]));
-if (!maps.length) die('no tests/measure/v<N>_gate_reach.json reach map');
-const mapFile = path.join(MD, maps[0][0]), mapVer = +maps[0][1][1];
+// v<N>_gate_reach.json (legacy) or v<M.m.p>_gate_reach.json: the greatest version wins, through semver.js cmp.
+const maps = fs.readdirSync(MD).map(f => [f, /^v(\d+|\d+\.\d+\.\d+)_gate_reach\.json$/.exec(f)]).filter(x => x[1])
+  .map(x => { try { SV.parse(x[1][1]); } catch (e) { die('reach map ' + x[0] + ': its version does not parse (' + e.message + ')'); } return x; })
+  .sort((a, b) => SV.cmp(b[1][1], a[1][1]));
+if (!maps.length) die('no tests/measure/v<N>_gate_reach.json or v<M.m.p>_gate_reach.json reach map');
+const mapFile = path.join(MD, maps[0][0]), mapVer = maps[0][1][1];
+const vlabel = t => (SV.parse(t).legacy ? 'V' : 'v') + t;   // V233 for a legacy integer, v0.240.0 (the tag form) for a dotted one
 let MAP;
 try { MAP = JSON.parse(fs.readFileSync(mapFile, 'utf8')); } catch (e) { die('reach map unreadable: ' + e.message); }
 if (!MAP || typeof MAP.gates !== 'object') die('reach map has no gates object: ' + mapFile);
@@ -151,7 +155,7 @@ function diffLines(a, b) {
 const B = analyse(baseP), C = analyse(candP);
 const rel = p => { const r = path.relative(ROOT, p); return !r ? p : (r.startsWith('..') ? p : r); };
 console.log('chain: base ' + rel(baseP) + ' -> cand ' + rel(candP) + '  ref ' + ref);
-console.log('map: ' + rel(mapFile) + '  built on V' + mapVer + ' (version from the file name; the map records none)  ' +
+console.log('map: ' + rel(mapFile) + '  built on ' + vlabel(mapVer) + ' (version from the file name; the map records none)  ' +
   'candidate ' + MAP.candidate + '  decls ' + MAP.topLevelDecls + '  gates ' + Object.keys(MAP.gates).length +
   '  |  decls now: base ' + (B.fns.length + B.notHoisted.length) + ' cand ' + (C.fns.length + C.notHoisted.length));
 for (const [X, tag] of [[B, 'base'], [C, 'cand']]) if (X.notHoisted.length)
@@ -168,18 +172,19 @@ const isMark = s => s.startsWith(MARK) && s.indexOf(MARK, 1) < 0 && /^[A-Za-z_$]
 const show = s => { s = s.split(MARK).join('<fn '); return s.length > 180 ? s.slice(0, 180) + ' ...' : s; };
 const outsideAll = diffLines(B.skel, C.skel).filter(h =>
   B.skel.slice(h.a0, h.a1).concat(C.skel.slice(h.b0, h.b1)).some(s => !isMark(s)));
-// A hunk confined to the <meta name="ia-version" content="N"> line (one line each side, different, and equal
-// once the number is masked) is the version bump: gate.sh step 0 proves it, so it is not OUTSIDE A FUNCTION and
-// does not make the verdict CROSS-CUTTING. Any other markup hunk, including one that touches the meta line AND
-// anything else, keeps the default.
-const META_RE = /^\s*<meta name="ia-version" content="(\d+)">/;
-const maskVer = s => s.replace(META_RE, m => m.replace(/content="\d+"/, 'content="N"'));
+// A hunk confined to the <meta name="ia-version" content="..."> line (one line each side, the two contents naming
+// different versions through semver.js cmp, a legacy N or a dotted M.m.p, and equal once the version is masked) is
+// the version bump: gate.sh step 0 proves it, so it is not OUTSIDE A FUNCTION and does not make the verdict
+// CROSS-CUTTING. Any other markup hunk, including one that touches the meta line AND anything else, keeps the default.
+const META_RE = /^\s*<meta name="ia-version" content="((?:0|[1-9]\d*)(?:\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))?)">/;
+const maskVer = s => s.replace(META_RE, m => m.replace(/content="[^"]*"/, 'content="N"'));
 const isBump = h => { const a = B.skel.slice(h.a0, h.a1), b = C.skel.slice(h.b0, h.b1);
-  return a.length === 1 && b.length === 1 && META_RE.test(a[0]) && META_RE.test(b[0]) && a[0] !== b[0] && maskVer(a[0]) === maskVer(b[0]); };
+  return a.length === 1 && b.length === 1 && META_RE.test(a[0]) && META_RE.test(b[0]) &&
+    SV.cmp(META_RE.exec(a[0])[1], META_RE.exec(b[0])[1]) !== 0 && maskVer(a[0]) === maskVer(b[0]); };
 const bumps = outsideAll.filter(isBump), outside = outsideAll.filter(h => !isBump(h));
 console.log('VERSION BUMP hunks ' + bumps.length);
-for (const h of bumps) console.log('  VERSION BUMP (gate.sh step 0)  base L' + (h.a0 + 1) + ' V' + META_RE.exec(B.skel[h.a0])[1] +
-  '  cand L' + (h.b0 + 1) + ' V' + META_RE.exec(C.skel[h.b0])[1]);
+for (const h of bumps) console.log('  VERSION BUMP (gate.sh step 0)  base L' + (h.a0 + 1) + ' ' + vlabel(META_RE.exec(B.skel[h.a0])[1]) +
+  '  cand L' + (h.b0 + 1) + ' ' + vlabel(META_RE.exec(C.skel[h.b0])[1]));
 console.log('OUTSIDE A FUNCTION hunks ' + outside.length);
 for (const h of outside) {
   console.log('  OUTSIDE A FUNCTION: classify by hand (default CROSS-CUTTING)  base L' + (h.a0 + 1) + (h.a1 - h.a0 > 1 ? '-' + h.a1 : '') +

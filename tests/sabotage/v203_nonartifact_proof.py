@@ -75,6 +75,7 @@ print('artifact under test: %s' % ART)
 with tempfile.TemporaryDirectory() as td:
     os.makedirs(os.path.join(td, 'gates'))
     shutil.copy2(os.path.join(ROOT, 'tests', HARNESS_REL), os.path.join(td, HARNESS_REL))
+    shutil.copy2(os.path.join(ROOT, 'tests', 'semver.js'), os.path.join(td, 'semver.js'))   # harness.js requires it (Post-V239)
     shutil.copy2(os.path.join(ROOT, 'tests', GATE_REL),    os.path.join(td, GATE_REL))
     pristine = {rel: open(os.path.join(td, rel), encoding='utf-8').read() for rel in (HARNESS_REL, GATE_REL)}
     GATE = os.path.join(td, GATE_REL)

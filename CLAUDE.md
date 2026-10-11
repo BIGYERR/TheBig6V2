@@ -43,21 +43,32 @@ scope lives in handoff §12.
 deploy proof, one session writes to this working tree. Any other session that needs to write (a measure, a queue review,
 a docs pass) works in its own git worktree or waits until the build commits. V238's final hash went red on another
 session's files written into `tests/measure/` mid-proof.
-1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it.
-2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `v<N>_<question>.js`).
+1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it, and print the deploy picture (step 7).
+2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `v<version>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience.
-4. Builder ships: anchor-asserted edits (every anchor `count==1` before writing), `ia-version` bumped by ONE, exactly when Mario says so. **Right before every builder dispatch**, re-read HEAD against `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
+4. **Ask Mario for the bump** (Versioning, below): PATCH, MINOR or MAJOR, before the first builder dispatch. Builder ships: anchor-asserted edits (every anchor `count==1` before writing), `ia-version` set to the version Mario picked, exactly when he says so. **Right before every builder dispatch**, re-read HEAD against `origin/dev` and `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
 5. Gatekeeper proves it as **Pipeline** and **Proof scope** (below) set out: locally inside 60 seconds, then the full suite in CI on the push to `dev`, which Mario reviews. `gate.sh` reports every red, not the first. Green or a NAMED failing gate.
 6. `handoff-update` skill: the seven-element session entry. Then stage the build's files by path (every tracked change and every untracked file the build wrote; **never
-   `git add -A`**, Mario, Post-V238), commit on `dev` (`git commit -m "V<N>: <one line>"`; the pre-commit hook runs the 60-second check) and `git push origin dev`.
+   `git add -A`**, Mario, Post-V238), commit on `dev` (`git commit -m "v<version>: <one line>"`; the pre-commit hook runs the 60-second check) and `git push origin dev`.
    The push runs the full suite in CI; when it has finished, read it (`gh run list --branch dev --limit 1`, `gh run view <id>`, `gh run download <id>`) and
    report the result to Mario. **Mario opens every pull request into `main` himself, by hand, after reviewing those results; no agent ever opens one
-   (Mario, Post-V239).** When he has merged it, tag what merged: `git fetch origin && git tag V<N> origin/main && git push origin V<N>`.
-7. **A merge is not a deploy. "Push" means Mario's phone gets the new version, and it is not done until you have proved that.** Pages can report its last build as `built` with no error while sitting several commits behind — it silently did not fire on V192 or V193. So after the merge, confirm all three, in this order, and never infer a later one from an earlier one. The pipeline's `deploy proof (Pages)` job does exactly this on every merge (`tools/deploy-check.mjs`); read its result, or run `node tools/deploy-check.mjs --expect <N>` yourself:
-   - the remote has it: `git show origin/main:index.html | grep -oE 'content="[0-9]+"'` reads the new version (read it out of `origin/main`, not the working copy);
-   - Pages built THAT commit: `gh api repos/bigyerr/TheBig6V2/pages/builds/latest --jq '.status, .commit'`. If the commit is stale, force it with `gh api -X POST repos/bigyerr/TheBig6V2/pages/builds` and poll until `built` (~40 s);
-   - the live URL serves it: `curl -s "https://bigyerr.github.io/TheBig6V2/?cb=$(date +%s)" | grep -oE 'content="[0-9]+"'`. Cache-bust the query string; `cache-control` is `max-age=600`, so an unbusted fetch can lie for ten minutes.
-   Only then is the version shipped. Tell Mario the live number you read back, not the number you pushed.
+   (Mario, Post-V239).** When he has merged it, tag what merged: `git fetch origin && git tag v<version> origin/main && git push origin v<version>`.
+7. **Report the deploy picture; a lagging deploy does not block** (Mario, Post-V239). A push or a merge is not a deploy:
+   Pages can report `built` with no error while sitting several commits behind (it silently did not fire on V192 or
+   V193). At session start and after every push or merge, read each of these from its own source, never inferring one
+   from another, and print them to Mario as one block:
+   - local: the working copy's `ia-version`, its branch and HEAD, and how far HEAD is ahead of or behind `origin/dev`;
+   - GitHub: `git show origin/dev:index.html` and `git show origin/main:index.html`, each `| grep -oE 'name="ia-version" content="[^"]+"'` (read out of the remote refs, not the working copy);
+   - Pages: `gh api repos/bigyerr/TheBig6V2/pages/builds/latest --jq '.status, .commit'`, and whether that commit is `origin/main`;
+   - live: `curl -s "https://bigyerr.github.io/TheBig6V2/?cb=$(date +%s)" | grep -oE 'name="ia-version" content="[^"]+"'`. Cache-bust the query string; `cache-control` is `max-age=600`, so an unbusted fetch can lie for ten minutes;
+   - any local build that records its own version, when one exists (the native app's `app/config.xml`, a running local PWA server).
+   ```
+   DEPLOY  local 0.239.1 (dev a1b2c3d, +0/-0 origin/dev)  dev 0.239.1  main 0.239.0  pages built e4f5a6b  live 0.239.0  native 0.239.1
+   ```
+   The pipeline's `deploy proof (Pages)` job checks the main, Pages and live legs on every push to `main`
+   (`tools/deploy-check.mjs`); read its result, or run `node tools/deploy-check.mjs --expect <version>` yourself. When
+   live lags `main`, say so and recommend forcing a Pages build (`gh api -X POST repos/bigyerr/TheBig6V2/pages/builds`,
+   ~40 s); Mario may leave it behind. Tell Mario the live number you read back, never the number you pushed.
 
 ## Pipeline (Mario, Post-V239): fast locally, the full suite in CI, `main` only by pull request
 - **Branches.** Work lands on `dev`: commit and push there as often as needed. Every push to `dev` runs the full suite in
@@ -134,16 +145,17 @@ here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_ru
   (`gate.sh` reads it as `ROW_RULED`) before the draft run, and gatekeeper's brief carries it. A row the ruling's list
   missed is added to the ruling (its saved file and the licence file) before the final run, never licensed on the
   fly (Mario, Post-V235).
-- **Era rows.** A table the ruling does not move gets its reference row from `tests/era_bump.py <N>`, never by hand. A
+- **Era rows.** A table the ruling does not move gets its reference row from `tests/era_bump.py <version>`, never by hand. A
   table the ruling moves is written by builder from coach's printed digest (standing ruling 5).
 - **Sabotage.** Every build: anchor-check every mutation in every spec (no gate runs), then trip-run the build's own
   spec, every mutation naming a gate the build edited, and every mutation naming a gate that still has a row scoped to
   one exact `ia-version`. The full sweep trip-runs every spec, old ones included, when 7 days have passed since the last
   one; it runs outside any build's budget and rebuilds the reach map in the same run. Its date goes on the digest line
   as `full sweep YYYY-MM-DD`, and `session-start` reports whether it is due.
-- **Review.** Every 25 builds, measure reruns the gate history analysis (`tests/measure/v232_gate_history.js`, record
-  shaped like `v232_rulings/measure_gate_history_mH.md`), reports which gates have never caught a real bug, and audits
-  every `tests/skip_allow.txt` entry. Last run Post-V232; next due after V257.
+- **Review.** Every 25 releases (a release of any bump counts once), measure reruns the gate history analysis
+  (`tests/measure/v232_gate_history.js`, record shaped like `v232_rulings/measure_gate_history_mH.md`), reports which
+  gates have never caught a real bug, and audits every `tests/skip_allow.txt` entry. Last run Post-V232; seven
+  releases since (V233 to V239), so next due after the 18th release from 0.239.1 on.
 - **Friction report** (Mario, standing from V234). After each build, before the digest line, report to Mario in five
   lines or fewer any of these that happened:
   - the classify call was a judgment call, and which side you came down on and why;
@@ -162,9 +174,10 @@ Each of these was paid for in a session. They are not open questions, and no age
 without new evidence that contradicts the ruling itself.
 
 1. **A tests-only pass is not a version.** `ia-version` does not move, so nothing shipped: commit as
-   `tests: Post-V<N> tooling pass`, cut **no tag** (tags track `ia-version`; a tag on an unmoved artifact
-   points at a lie), run **no deploy proof** (rhythm step 7 does not apply — nothing reaches the phone),
-   and give it a digest line named for what it was, `- **Post-V<N> … — no build.**`, **never a V-number**.
+   `tests: Post-v<version> tooling pass` (`Post-V<N>` before semver), cut **no tag** (tags track `ia-version`; a tag
+   on an unmoved artifact points at a lie), and give it a digest line named for what it was,
+   `- **Post-v<version> … — no build.**`, **never a version of its own**. Nothing reaches the phone, so the deploy
+   picture (rhythm step 7) has nothing new to report.
 2. **A licence is a predicate, never prose.** An assertion pinning a direction a ruling has already found
    wrong carries a real predicate keyed on `ia-version` that REFUSES above its era and blocks `gate.sh`.
    A comment telling a future reader "a trip here is expected after D<N>" expires never and trips never.
@@ -203,9 +216,33 @@ that changes his own program. Siting, form, gate scope, agent order and tooling 
 decide and to record. This narrows WHAT reaches him; it does not soften the rule below that everything
 which does reach him arrives with a recommendation.
 
-## Versioning (hard)
-- `<meta name="ia-version" content="N">` is the ground truth. Bump by one per release, in build order, never out of order, never two sessions on one number. Mario owns the bump.
-- In this repo the only HTML is `index.html` (Pages serves it). The previous build for blast-radius is `git show HEAD:index.html > <scratchpad>/base_v<N-1>.html`. Tag each release: `git tag V<N>`.
+## Versioning (hard; semantic versioning from Post-V239, Mario)
+- `<meta name="ia-version" content="MAJOR.MINOR.PATCH">` is the ground truth: three integers. Code reads and compares
+  versions only through `tests/semver.js` (`tests/semver.py` from Python): `parse`, `cmp`, `lookup`, `fromHtml`. Never
+  `+version`, a string compare, or arithmetic on a version; a version used with a numeric operator throws on purpose.
+  Code that runs without the repo beside it (`backend/` deployed alone to Heroku, a Docker image holding one folder)
+  may carry its own copy of the rule, provided a test in that folder loads `tests/semver.js` at test time and proves
+  the two agree on a shared table of inputs (legacy integers, dotted versions, rejects, ordering), so the copy cannot drift.
+- **Before: builds 1 to 239** each carried one integer N. Every one of them is **v0.N.0** (V239 = 0.239.0). Their
+  tags stay `V<N>`, their digest lines stay `**V<N>**`, their era rows keep integer keys, and their files keep their
+  names (`g<N>_*.js`, `v<N>_rulings/`); never rewrite them. Every reader takes a bare integer N as 0.N.0, so bodies
+  from git history still parse and compare.
+- **After: from 0.239.1 on**, each release bumps exactly one part and zeroes the parts to its right.
+  - **PATCH** (0.239.0 → 0.239.1): a bug fix. No new capability, no change to what a program prescribes, no stored-format change.
+  - **MINOR** (0.239.1 → 0.240.0): a feature or a feature group, or a ruling that changes what a program prescribes.
+  - **MAJOR** (→ 1.0.0): a breaking change (stored data that needs a migration) or a milestone Mario declares. The app
+    is pre-1.0 until he says so.
+- **Mario picks the bump, every release.** Before the first builder dispatch, the main session asks him PATCH, MINOR
+  or MAJOR with `AskUserQuestion`: the recommended option first, every option naming the number it produces and one
+  line on why. A bump is never inferred from the queue, the handoff or an earlier chat. If the build grows past the
+  class he picked, ask again before the meta is written. Never out of order, never two sessions on one number;
+  builder writes the number Mario named and nothing else.
+- Names from 0.239.1 on carry the dotted version with a lowercase v: tag `v0.239.1`, digest line `- **v0.239.1** — …`,
+  `tests/measure/v0.239.1_rulings/`, `tests/edits/v0.239.1_edit.py`, `tests/sabotage/v0.239.1.json`, gates
+  `tests/gates/g0.239.1_<topic>.js`, measure scripts `v0.239.1_<question>.js`, era rows keyed `'0.239.1'`
+  (`tests/era_bump.py 0.239.1`). A tests-only pass after a release is `Post-v0.239.1`.
+- In this repo the only HTML is `index.html` (Pages serves it). The previous version is the release HEAD carries, never
+  "N-1": `git show HEAD:index.html > <scratchpad>/base_v<previous>.html`. Tag each release: `git tag v<version>`.
 - A file version with no digest line in the handoff means a build was dropped. Stop and tell Mario.
 - **Grep the file, never trust a label.** Filename, chat title, memory and handoff can all lag the artifact.
 
@@ -268,11 +305,11 @@ No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declar
 ## Delegation carry (builder and gatekeeper do not load this file)
 Every brief to either carries the per-build items, then the standing lines for that role, pasted, not paraphrased.
 - **Builder, per build:** the ruling verbatim (D-code, what changes, what deliberately does not, the after-grid); the slice
-  (≤4 edits) and what earlier slices landed; the baseline path; whether this slice bumps `ia-version` and to what; the
-  diff classes the ruling licenses.
-- **Gatekeeper, per build:** every ruling in the build, verbatim; the version Mario named; the baseline path; the edit
+  (≤4 edits) and what earlier slices landed; the baseline path; whether this slice writes `ia-version` and the exact
+  `MAJOR.MINOR.PATCH` Mario picked; the diff classes the ruling licenses.
+- **Gatekeeper, per build:** every ruling in the build, verbatim; the version Mario named and its bump class; the baseline path; the edit
   scripts, gates and sabotage specs; the diff classes builder declared; whether `HALF_MANNY` may move and to what digest;
-  the licence file for new gate rows (`v<N>_row_ruled.txt`, written before the draft run); the Proof scope section pasted, with the LOCAL or CROSS-CUTTING call and its gate list, draft run or final run, and
+  the licence file for new gate rows (`v<version>_row_ruled.txt`, written before the draft run); the Proof scope section pasted, with the LOCAL or CROSS-CUTTING call and its gate list, draft run or final run, and
   whether the full sweep is due.
 - **Both, standing:** gate runs are `bash -c 'set -eo pipefail; …'`, no `<(...)`; every gate prints `PASS n FAIL n` and a
   missing summary is a crash; oracles never ask the engine; strip comments before any token-gone scan; pin `cfg.seed`,
@@ -280,8 +317,10 @@ Every brief to either carries the per-build items, then the standing lines for t
   (a licence is a predicate on today's `ia-version`), 3 (wire a dead pin, never re-point it; a build-scoped claim retires at the next build), 4 (a gate is keyed to the
   ruling it defends) and 5 (`HALF_MANNY` moves only by a ruling that printed the digest first). NRC sessions are
   verbatim; no harness asserts taper, volume or rep shape on them. No gate row is scoped to one exact `ia-version`: a
-  range, a minimum, or an era row (Proof scope, Version scope). Temp files go only under the scratch path the brief
-  names, never bare `/tmp`.
+  range, a minimum, or an era row (Proof scope, Version scope). Versions are `MAJOR.MINOR.PATCH`, and a bare integer N
+  means 0.N.0; read and compare them only through `tests/semver.js` (`parse`, `cmp(a, b) <op> 0`, `lookup`,
+  `fromHtml`) or `tests/semver.py`, never `+version` or a numeric operator. Temp files go only under the scratch path
+  the brief names, never bare `/tmp`.
 - **Builder, standing:** standing ruling 7 (a premise refuted mid-slice PARKS the slice: script stays in `tests/edits/`,
   nothing committed; a gate row that cannot pass parks the same way); pool and post-filter reason through one lens, so
   grep the other half; a conditional write with no else is a latch; `exStoreKey` is the only `ia_exw_` writer; race day

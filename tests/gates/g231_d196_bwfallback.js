@@ -108,6 +108,7 @@ const cp = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = H;
 
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
@@ -270,17 +271,17 @@ const info = s => P('    INFO ' + s);
 
 // ── LOAD + VERSION ──────────────────────────────────────────────────────────────────────────────────────────────
 let VER = NaN, CAND_TEXT = '';
-try { const IA = load(ART); VER = +IA.version; CAND_TEXT = fs.readFileSync(ART, 'utf8'); }
+try { const IA = load(ART); VER = SV.parse(IA.version); CAND_TEXT = fs.readFileSync(ART, 'utf8'); }
 catch(e){ P('FAIL boot: ' + String(e && e.message || e).slice(0, 200)); fail++; ROW_ORDER.forEach(k => ok(R[k] + ' (candidate did not boot)', false)); done(); }
-P('g231 D196 P-BWFALLBACK (+ Amendment 1) | candidate ' + ART + ' ia-version ' + VER + (VER >= ERA ? '' : ' (below ' + ERA + ': every row runs and must FAIL by its own conjuncts)'));
+P('g231 D196 P-BWFALLBACK (+ Amendment 1) | candidate ' + ART + ' ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? '' : ' (below ' + ERA + ': every row runs and must FAIL by its own conjuncts)'));
 let BF = null, BASE_TEXT = '', baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!BF){
   try { const f = tmpWrite('v230', cp.execFileSync('git', ['-C', ROOT, 'show', V230_COMMIT + ':index.html'], { maxBuffer:1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ BF = f; baseWhy += 'git show ' + V230_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = f; baseWhy += 'git show ' + V230_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 if(BF) BASE_TEXT = fs.readFileSync(BF, 'utf8');
@@ -340,7 +341,7 @@ const sumAll = m => Object.values(m || {}).reduce((a, x) => a + x, 0);
 // ── ROW D196-a ──────────────────────────────────────────────────────────────────────────────────────────────────
 function rowA(){
   const cj = [];
-  cj.push(['a-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['a-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const m = C.mains.L432 + C.mains.LBW;
   cj.push(['a-main', m === 0, '`Main —` Burpees items: L432 ' + C.mains.L432 + ', LBW ' + C.mains.LBW + ' (by plan ' + fmt(C.mainsByPlan) + ') over ' + BW.length + ' builds, ' + C.days + ' lifting days, ' + C.mainSecs + ' Main sections; ruled 0']);
   cj.push(['a-primer', C.primer.length === 0, '`Primer —` Burpees items on INJ race: ' + C.primer.length + ' (' + C.primerDays + ' days, ' + new Set(C.primer.map(x => x.k)).size + ' builds) over ' + RACE.length + ' race builds (' + RACE.filter(x => x.eq === 'bodyweight').length + ' bodyweight); ruled 0']);
@@ -360,7 +361,7 @@ function rowA(){
 // ── ROW D196-b ──────────────────────────────────────────────────────────────────────────────────────────────────
 function rowB(){
   const cj = [];
-  cj.push(['b-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['b-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const bur = C.mains.L432 + C.mains.LBW + C.primer.length;
   cj.push(['b-burpees', bur === 0, 'carried from D196-a: `Main —` Burpees ' + (C.mains.L432 + C.mains.LBW) + ' + `Primer —` Burpees ' + C.primer.length + '; ruled 0']);
   const t4 = sum4(C, 'thrust');
@@ -386,7 +387,7 @@ function rowB(){
 // ── ROW D196-c ──────────────────────────────────────────────────────────────────────────────────────────────────
 function rowC(){
   const cj = [];
-  cj.push(['c-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['c-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const want = c => JSON.stringify({ label:c.label, items:c.items });
   let instOK = !!B; const instWhy = [];
   for(const X of CELLS_C){
@@ -404,7 +405,7 @@ function rowC(){
 // ── ROW D196-d ──────────────────────────────────────────────────────────────────────────────────────────────────
 function rowD(){
   const cj = [];
-  cj.push(['d-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['d-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const M = manny(ART);
   cj.push(['d-digest', M.self && M.dig === DIG_231, 'candidate HALF_MANNY ' + M.dig + (M.self ? ' (self-identical in two VMs)' : ' (NOT self-identical: ' + M.dig2 + ')') + ', ruled ' + DIG_231]);
   const era = MANNY_DIGEST_BY_VERSION[ERA];

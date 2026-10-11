@@ -41,6 +41,7 @@
 const fs = require('fs');
 const path = require('path');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const FILE = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const SRC = fs.readFileSync(FILE, 'utf8');
@@ -57,17 +58,17 @@ console.log('g224_d185_wctoday  (D185 today-cell color fold: .wc-mark + .chk -> 
 
 // ── version predicate ─────────────────────────────────────────────────────────
 const RULING_V = 224;
-const artifactV = +IA.version;
+const artifactV = SV.parse(IA.version);
 const NEW_RULE = '.wk-day.today .chk,.wk-day.today .wc-mark{color:var(--on-signal);}';
 const SURFACE_PRESENT = SRC.indexOf(NEW_RULE) >= 0;
 
-if (artifactV < RULING_V && !SURFACE_PRESENT) {
+if (SV.cmp(artifactV, RULING_V) < 0 && !SURFACE_PRESENT) {
   na++;
   console.log('  n/a  artifact predates V224 and carries no D185 surface — declining (not a fail)');
   console.log('\nPASS 0 FAIL 0');
   process.exit(0);
 }
-ok('D185 surface present at ia-version >= 224 (or mid-slice)', SURFACE_PRESENT || artifactV < RULING_V, 'new rule missing: ' + NEW_RULE);
+ok('D185 surface present at ia-version >= 224 (or mid-slice)', SURFACE_PRESENT || SV.cmp(artifactV, RULING_V) < 0, 'new rule missing: ' + NEW_RULE);
 
 // ── 1. guardrail: lines 643/644/645/646 stay byte-identical, new line lands right after 645 ──
 // The five hand-typed lines of the V224 block, in V224's order (the literals these rows always carried).

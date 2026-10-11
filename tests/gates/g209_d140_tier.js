@@ -36,9 +36,10 @@
 'use strict';
 const path = require('path');
 const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
-const VER = +IA.version;
+const VER = SV.parse(IA.version);
 const D140_ERA = 209;
 // D188 P-BEGINNERMILE (V226) Class A2 re-keys K1 from 226 (standing rulings 2 and 4): the carry case is a
 // beginner carrying an 8:15 mile, which D188 reads. <= 225 keeps measure's literal.
@@ -53,7 +54,7 @@ function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function summary(){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); }
 
 const ROWS = ['T0','T1','T2','A1','A2','B1','B2','B3','B4','B5','K0','K1','M1'];
-if(!(VER >= D140_ERA)){
+if(!(SV.cmp(VER, D140_ERA) >= 0)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D140 (V' + D140_ERA + ').');
   ROWS.forEach(r => skipRow(r + ' skipped below the D140 era'));
   summary();
@@ -138,10 +139,10 @@ const RESTS = [['sun','wed'], ['sat','sun']];
   // each non-cutback week steps PACE_IMPROVE.intermediate (3) x agePaceScale['18-35'] (1.0) = 3 s
   // further down the chart's recovery column; cutback weeks W4/W8 hold; minutes = mi x tgt / 60
   // on the unchanged ladder 3 3.5 4 2.8 4.5 5 5.5 3.8 6 6.6 7.3). W11 crosses 75 minutes: B -> A.
-  const WANT_MIN = VER >= 225
+  const WANT_MIN = SV.cmp(VER, 225) >= 0
     ? [33.0, 38.3, 43.5, 30.5, 48.5, 53.7, 58.8, 40.6, 63.5, 69.5, 76.5]
     : [33.0, 38.1, 43.3, 30.3, 47.9, 52.8, 57.7, 39.8, 61.8, 67.3, 73.7];
-  const WANT_T = VER >= 225 ? 'CCCCBBBCBBA' : 'CCCCBBBCBBB';
+  const WANT_T = SV.cmp(VER, 225) >= 0 ? 'CCCCBBBCBBA' : 'CCCCBBBCBBB';
   const gotMin = [], gotT = [];
   for(let w = 1; w <= 11; w++){ const c = p.weeks[w] && p.weeks[w].sat && p.weeks[w].sat.cardio; gotMin.push(+minutesOf(c && c.dose).toFixed(1)); gotT.push(handTier(c) || '-'); }
   ok('T0 stand-in Saturdays: long-run minutes by dose arithmetic and the hand tier are the ruling\'s (' + WANT_MIN.join(' ') + ' / ' + WANT_T + ')',
@@ -151,13 +152,13 @@ const RESTS = [['sun','wed'], ['sat','sun']];
   // D187 amendment 2: from 225, W11 flips tier B -> A (76.5 min crosses 75), so it drops out of
   // the tier-B Saturday set entirely; T1b below asserts its new shape instead.
   const B_AFTER = Object.assign({ 5:[DIPS, ROWR], 6:[DIPS, ROWR], 7:[PUSH, ROWB], 9:[PUSH, ROWR], 10:[PUSH, ROWR] },
-    VER >= 225 ? {} : { 11:[DIPS, ROWR] });
+    SV.cmp(VER, 225) >= 0 ? {} : { 11:[DIPS, ROWR] });
   const bBad = [];
   Object.keys(B_AFTER).forEach(w => { const d = p.weeks[w].sat; const want = '[Strength] ' + B_AFTER[w].join(', ');
     if(shape(d) !== want || daySets(d) !== 6) bBad.push('W' + w + ' ' + shape(d) + ' (' + daySets(d) + ' sets)'); });
-  ok('T1 stand-in tier B Saturdays (' + (VER >= 225 ? 'W5 W6 W7 W9 W10' : 'W5 W6 W7 W9 W10 W11') + '): the explosive finisher is gone and the strength pair stays, 6 sets',
+  ok('T1 stand-in tier B Saturdays (' + (SV.cmp(VER, 225) >= 0 ? 'W5 W6 W7 W9 W10' : 'W5 W6 W7 W9 W10 W11') + '): the explosive finisher is gone and the strength pair stays, 6 sets',
      bBad.length === 0, bBad.join(' | '));
-  if(VER >= 225){
+  if(SV.cmp(VER, 225) >= 0){
     const d11 = p.weeks[11].sat, wantShape11 = '[Post-run mobility] Standing calf stretch, Couch stretch, Hip 90/90 stretch, T-spine mobility, Foam roll';
     ok('T1b (D187 amendment 2, Class E, from 225) stand-in W11 flips B -> A: tier A, titled Post-Run Mobility, the mobility shape',
        handTier(d11 && d11.cardio) === 'A' && d11 && d11.title === 'Post-Run Mobility' && shape(d11) === wantShape11,
@@ -224,7 +225,7 @@ ok('K0 no long-run day on any tier carries a carry item, whatever section it rid
   const cc = Object.assign(cl(STAND), { equipment:'crossfit', liftingFocus:'balanced', experience:'beginner', restDays:['sat','sun'] });
   const day = IA.buildProgram(cl(cc)).weeks[6].fri;
   const m = +minutesOf(day.cardio && day.cardio.dose).toFixed(1);
-  if(VER < D188_ERA){
+  if(SV.cmp(VER, D188_ERA) < 0){
   ok('K1 carry case (crossfit, balanced, beginner, rest sat+sun, seed 24865) W6 Fri: 56.4 min, tier B, no carry, the strength pair only',
      m === 56.4 && handTier(day.cardio) === 'B' && carryN(day) === 0 && shape(day) === '[Strength] Dips, Inverted rows (rings)',
      m + ' min, tier ' + handTier(day.cardio) + ', ' + carryN(day) + ' carry, ' + shape(day));
@@ -262,7 +263,7 @@ ok('K0 no long-run day on any tier carries a carry item, whatever section it rid
 // and fails loudly when that row is absent. Re-pointing the literal to a later digest would be the
 // vacuous line standing ruling 3 forbids; deleting the row would be an unruled removal.
 {
-  const row = MANNY_DIGEST_BY_VERSION[VER], rowOk = typeof row === 'string' && /^[0-9a-f]{16}$/.test(row);
+  const row = SV.lookup(MANNY_DIGEST_BY_VERSION, VER), rowOk = typeof row === 'string' && /^[0-9a-f]{16}$/.test(row);
   let hm; try { hm = progDigest(IA.buildProgram(cl(fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
   ok('M1 HALF_MANNY shipped digest is unmoved by D140: it equals its era row MANNY_DIGEST_BY_VERSION[' + VER + '] = ' + row + ', and that row exists',
      rowOk && hm === row, rowOk ? hm : 'NO ERA ROW for ia-version ' + VER + ' (built ' + hm + ')');

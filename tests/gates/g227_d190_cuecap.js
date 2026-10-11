@@ -119,6 +119,7 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const { load, fixtures, progDigest } = H;
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -224,10 +225,10 @@ const fmt = m => Object.keys(m).sort().map(k => k + ' ' + m[k]).join(' | ') || '
 
 // ── LOAD + VERSION PREDICATE ───────────────────────────────────────────────────────────────────────────────────────
 let IA, STAMP = NaN;
-try { IA = load(ART); STAMP = +IA.version; } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
+try { IA = load(ART); STAMP = SV.parse(IA.version); } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION !== undefined){
-  if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+  if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   } else console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
@@ -235,7 +236,7 @@ if(process.env.IA_ASSUME_VERSION !== undefined){
 // artifact's own ia-version, "three" at 228 and above, "two" at 227 and below, so every row still runs on V227. Sited
 // here, after VER (a `let` declared above): the old TYPED ORACLE site would read it in its temporal dead zone. RX8C and
 // HANDS read CUE at load time, so they sit here too (HANDS moved verbatim); the bH1/bH2 labels are filled from RX8C.
-const CUE = VER >= 228 ? ' — hold RPE 7, three in the tank' : ' — hold RPE 7, two in the tank';
+const CUE = SV.cmp(VER, 228) >= 0 ? ' — hold RPE 7, three in the tank' : ' — hold RPE 7, two in the tank';
 const RX8C = RX8 + CUE;
 const HANDS = [
   { key:'bH1', ck:'mario',    w:5, d:'thu', sec:'Leg superset B', donor:KB, donorRx:RX8, hops:[SSDL, GOB],  want:[RX8, RX8C],  toast:[null, null] },
@@ -243,8 +244,8 @@ const HANDS = [
   { key:'bH3', ck:'ankle_wa', w:3, d:'thu', sec:'Leg superset B', donor:KB, donorRx:RX8, hops:[GOB, NORD],  want:[RX8C, BW8],  toast:[TOAST_GOB, null] },
 ];
 R.bH1 = R.bH1.split('{RX8C}').join(RX8C); R.bH2 = R.bH2.split('{RX8C}').join(RX8C);
-console.log('g227 D190 cue <=> cap + pairs | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | NS ' + NS + ', NU ' + NU);
-if(!(VER >= ERA)){
+console.log('g227 D190 cue <=> cap + pairs | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : '') + ' | NS ' + NS + ', NU ' + NU);
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D190 P-SWAPSEAM (V' + ERA + '). No row may pass on it.');
   failAll('REFUSED');
 }
@@ -255,7 +256,7 @@ if(!(VER >= ERA)){
 let B = null, baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ B = b; FILES.B = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ B = b; FILES.B = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!B){
   const f = path.join(os.tmpdir(), 'g227_d190_cuecap_v' + BASE_ERA + '_' + process.pid + '.html');
@@ -263,7 +264,7 @@ if(!B){
     try { fs.unlinkSync(f); } catch(e){}
     process.on('exit', () => { try { fs.unlinkSync(f); } catch(e){} });
     fs.writeFileSync(f, cp.execFileSync('git', ['-C', ROOT, 'show', V226_COMMIT + ':index.html'], { maxBuffer: 1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ B = b; FILES.B = f; baseWhy += 'git show ' + V226_COMMIT.slice(0, 7) + ':index.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ B = b; FILES.B = f; baseWhy += 'git show ' + V226_COMMIT.slice(0, 7) + ':index.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 console.log('  V' + BASE_ERA + ' baseline: ' + (B ? 'LIVE (' + baseWhy + ')' : 'SETUP FAILED (' + baseWhy + ')'));
@@ -417,7 +418,7 @@ for(const h of HANDS){
     // (a and b off V226's window toast), unloadable "No load to add here.", verbatim "Same sets, same reps.", each ending
     // " Your injury plan holds this one at RPE 7.".
     const D193_ERA = 229, D193_CTOAST_PIN = 1706;
-    if(VER >= D193_ERA){
+    if(SV.cmp(VER, D193_ERA) >= 0){
       const HOLD_K = ' Your injury plan holds this one at RPE 7.';
       const CUE_K = / — hold RPE 7, (?:two|three) in the tank$/;
       const R7_K = /^Work up to one working set of 3 to 5 reps at RPE \d+(?:\.\d+)?\. Technique stays crisp\. No grinding\. Log the weight and the reps\. Your injury plan holds this lift, so there is no new baseline here\.$/;
@@ -472,7 +473,7 @@ for(const h of HANDS){
     // V226 moves on manny's W3 tue and W5 tue chains only. Typed pins (the ruling's print, never this run): mario_noinj
     // 0 moved of 719; manny 144 moved of 677, every moved chain on W3 tue or W5 tue. Below 231 the row is unchanged.
     const V231_ERA = 231, UNINJ_PIN = { manny:{ n:677, moved:144 }, mario_noinj:{ n:719, moved:0 } }, UNINJ_DAYS = ['3|tue', '5|tue'];
-    if(VER >= V231_ERA){
+    if(SV.cmp(VER, V231_ERA) >= 0){
       const mvOf = ck => mv.filter(m => m.c.ck === ck), offDay = mv.filter(m => !UNINJ_DAYS.includes(m.c.w + '|' + m.c.d));
       const pinOK = UNINJ_CK.every(ck => POP[ck].length === UNINJ_PIN[ck].n && mvOf(ck).length === UNINJ_PIN[ck].moved);
       console.log('    c-UNINJ V231 (A-1): moved by chain day ' + fmt(tally(mv, m => m.c.ck + ' W' + m.c.w + ' ' + m.c.d)) + ' | moved off W3 tue / W5 tue ' + offDay.length + ' | typed pins ' + UNINJ_CK.map(ck => ck + ' ' + UNINJ_PIN[ck].moved + '/' + UNINJ_PIN[ck].n).join(', '));
@@ -502,17 +503,17 @@ for(const h of HANDS){
     // rulings 2 and 5): at 231 and up manny wants the harness era row MANNY_DIGEST_BY_VERSION[VER] (2d35e8f743680cfa at
     // 231), never this run; an absent row wants the string ABSENT and fails the row by name. mario_noinj still wants V226.
     const V231_ERA = 231, MDV = H.MANNY_DIGEST_BY_VERSION || {};
-    const mannyWant = (Object.prototype.hasOwnProperty.call(MDV, VER) && typeof MDV[VER] === 'string') ? MDV[VER] : 'ABSENT MANNY_DIGEST_BY_VERSION[' + VER + ']';
-    const wantOf = ck => (VER >= V231_ERA && ck === 'manny') ? mannyWant : (VER >= 228 && Object.prototype.hasOwnProperty.call(D193_DIGEST, ck)) ? D193_DIGEST[ck] : DG.B[ck];
-    if(VER >= 228) console.log('    c-DIGEST at ' + VER + ': ' + Object.keys(D193_DIGEST).map(ck => ck + ' want ' + D193_DIGEST[ck]).join(', ') + ' (D193 class (i), measure); ' + (VER >= V231_ERA ? 'manny wants MANNY_DIGEST_BY_VERSION[' + VER + '] ' + mannyWant + ' (V231 A-1, standing ruling 5; V' + BASE_ERA + ' reads ' + DG.B.manny + '), mario_noinj wants V' + BASE_ERA : 'manny, mario_noinj want V' + BASE_ERA));
+    const mannyWant = (SV.lookup(MDV, VER) !== undefined && typeof SV.lookup(MDV, VER) === 'string') ? SV.lookup(MDV, VER) : 'ABSENT MANNY_DIGEST_BY_VERSION[' + VER + ']';
+    const wantOf = ck => (SV.cmp(VER, V231_ERA) >= 0 && ck === 'manny') ? mannyWant : (SV.cmp(VER, 228) >= 0 && Object.prototype.hasOwnProperty.call(D193_DIGEST, ck)) ? D193_DIGEST[ck] : DG.B[ck];
+    if(SV.cmp(VER, 228) >= 0) console.log('    c-DIGEST at ' + VER + ': ' + Object.keys(D193_DIGEST).map(ck => ck + ' want ' + D193_DIGEST[ck]).join(', ') + ' (D193 class (i), measure); ' + (SV.cmp(VER, V231_ERA) >= 0 ? 'manny wants MANNY_DIGEST_BY_VERSION[' + VER + '] ' + mannyWant + ' (V231 A-1, standing ruling 5; V' + BASE_ERA + ' reads ' + DG.B.manny + '), mario_noinj wants V' + BASE_ERA : 'manny, mario_noinj want V' + BASE_ERA));
     const eq = Object.keys(CFGS).filter(ck => !/SELF/.test(DG.C[ck]) && !/SELF/.test(DG.B[ck]) && DG.C[ck] === wantOf(ck)).length;
-    ok('cDIGEST', R.cDIGEST + (VER >= 228 ? ' (at 228 and above: the six injured against the D193 class (i) table)' : '') + (VER >= V231_ERA ? ' (at 231 and above: manny against MANNY_DIGEST_BY_VERSION[' + VER + '], V231 A-1)' : ''), eq === Object.keys(CFGS).length, eq + '/' + Object.keys(CFGS).length + ' configs equal'); }
+    ok('cDIGEST', R.cDIGEST + (SV.cmp(VER, 228) >= 0 ? ' (at 228 and above: the six injured against the D193 class (i) table)' : '') + (SV.cmp(VER, V231_ERA) >= 0 ? ' (at 231 and above: manny against MANNY_DIGEST_BY_VERSION[' + VER + '], V231 A-1)' : ''), eq === Object.keys(CFGS).length, eq + '/' + Object.keys(CFGS).length + ' configs equal'); }
 }
 // ── c-MANNY (standing ruling 5) ───────────────────────────────────────────────────────────────────────────────────
 {
   const MD = H.MANNY_DIGEST_BY_VERSION || {};
   const has = Object.prototype.hasOwnProperty.call(MD, ERA) && typeof MD[ERA] === 'string', ref = has && MD[ERA] === MD[BASE_ERA];
-  const row = MD[VER];
+  const row = SV.lookup(MD, VER);
   const built = progDigest(load(ART).buildProgram(clone(fixtures.HALF_MANNY)));            // the harness way (real clock)
   const builtPin = progDigest(fresh('C').buildProgram(clone(fixtures.HALF_MANNY)));        // and with the gate's pinned clock
   console.log('    c-MANNY MANNY_DIGEST_BY_VERSION[' + ERA + '] ' + (has ? MD[ERA] : 'ABSENT') + ', [' + BASE_ERA + '] ' + MD[BASE_ERA] + ', [' + VER + '] ' + row + ' | HALF_MANNY built ' + built + ', pinned ' + builtPin);

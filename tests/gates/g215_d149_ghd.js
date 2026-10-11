@@ -77,17 +77,18 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const { load, progDigest, fixtures, DAYS, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const IA = load(ART);
-const VER = +IA.version, ERA = 215;
+const VER = SV.parse(IA.version), ERA = 215;
 const ROWS = ['G1','G1v','G1h','G2','G3','G4','L1','F0','F1','F1o','F2','F2o','P1','K3','HM'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = l => { skip++; console.log('SKIP ' + l); };
 const done = () => { if(TMP) try { fs.rmSync(TMP, { recursive:true, force:true }); } catch(e){}
   console.log('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-if(VER < ERA){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D149 (V' + ERA + ').'); ROWS.forEach(r => skipRow(r + ' below the D149 era')); done(); }
+if(SV.cmp(VER, ERA) < 0){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D149 (V' + ERA + ').'); ROWS.forEach(r => skipRow(r + ' below the D149 era')); done(); }
 
 // ── oracles ──────────────────────────────────────────────────────────────────────────────
 const OWNS = {
@@ -267,7 +268,7 @@ TIERS.forEach(t => { const calls = g(K.pr, t + '|calls'), e = g(K.pr, t + '|empt
   const cP = g(K.pr, t + '|calls|prev'), cO = g(K.pr, t + '|calls|other'), eP = g(K.pr, t + '|empty|prev'), eO = g(K.pr, t + '|empty|other');
   console.log('   P1 ' + t + ': reservation reads ' + calls + ', empty ' + e + ', collision drops ' + dr + ' (' + (calls - e ? (100 * dr / (calls - e)).toFixed(1) : '0.0') + '% of non-empty reads); Leg superset B two-item ' + g(K.lsb, t + '|2') + ' of ' + (g(K.lsb, t + '|1') + g(K.lsb, t + '|2')) + '; hip-ext items ' + g(K.hx, t));
   console.log('   P1 ' + t + ' by focus: support_prevention reads ' + cP + ', empty ' + eP + ' | other foci reads ' + cO + ', empty ' + eO);
-  if(VER >= V231_ERA) ok('P1 ' + t + ' knee/protect [V231 D195 A2r: every empty hip-extension read is a support_prevention read, at least one is; no other focus reads empty]',
+  if(SV.cmp(VER, V231_ERA) >= 0) ok('P1 ' + t + ' knee/protect [V231 D195 A2r: every empty hip-extension read is a support_prevention read, at least one is; no other focus reads empty]',
     PROBE.c === 1 && K.probeBad === 0 && calls > 0 && e === eP && eO === 0 && eP > 0,
     PROBE.c !== 1 ? 'probe anchor count ' + PROBE.c : e + ' empty of ' + calls + ' reads (support_prevention ' + eP + ' of ' + cP + ', other foci ' + eO + ' of ' + cO + '), probe copy digest mismatches ' + K.probeBad);
   else ok('P1 ' + t + ' knee/protect: the hip-extension reservation is never empty', PROBE.c === 1 && K.probeBad === 0 && calls > 0 && e === 0,
@@ -282,7 +283,7 @@ TIERS.forEach(t => ok('K3 ' + t + ' knee/protect: no day prints the same movemen
 // to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
 // D149 (standing ruling 4).
 { const hm = progDigest(IA.buildProgram(clone(fixtures.HALF_MANNY)));
-  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  const eraV = SV.parse(IA.version), eraHas = SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) !== undefined, eraRow = eraHas ? SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) : undefined;
   ok('HM HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved)',
      eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 done();

@@ -18,7 +18,7 @@ You run in one of two modes. Say which one at the top of your report.
 
 How you work:
 
-1. **Write the script, keep the script.** Every measure pass is a file at `tests/measure/v<N>_<question>.js`, built on `tests/harness.js` (`load`, `fixtures`, `weekGrid`, `progDigest`). They are kept, not deleted: the before-picture is part of the record. Create them with a Bash heredoc.
+1. **Write the script, keep the script.** Every measure pass is a file at `tests/measure/v<version>_<question>.js` (e.g. `v0.240.0_<question>.js`; pre-semver passes kept `v<N>_`), built on `tests/harness.js` (`load`, `fixtures`, `weekGrid`, `progDigest`). They are kept, not deleted: the before-picture is part of the record. Create them with a Bash heredoc.
 2. **Sweep, do not sample.** One config is an anecdote. Build a lattice (goals × focuses × experience × equipment × rest patterns × seeds, `cfg.seed` pinned) and report the denominator every time: "41.2% of banners fabricated over 1,260 builds / 85,977 superset sections", never "banners are often wrong".
 3. **The instrument is independent of the hypothesis.** Derive the expected value from the authoring contract, a doctrine page, a hand table or date arithmetic — never from the function you suspect. A measurement that asks the suspect what the answer is measures nothing.
 4. **Keep sweeping after you find it.** The reported defect is usually one reader of a value that has several. When you find a bad read, grep for every other site that reads the same thing and measure those too — that is how the second and third readers get found, and they are routinely worse than the reported one.
@@ -45,6 +45,6 @@ UNKNOWN  <what this pass did NOT measure and would need to>
 ```
 
 ## Shell discipline
-**Lattice sweeps and fuzz runs write their output to files under the scratch path your brief names, never bare `/tmp`** (`… > <scratch>/v<N>_<step>.out 2>&1`). Read back only summaries, failures and diffs (the counts with their denominators, the segment table, the failing cases, `diff | head`), never a full report. A report in context is tokens nothing reads.
+**Lattice sweeps and fuzz runs write their output to files under the scratch path your brief names, never bare `/tmp`** (`… > <scratch>/v<version>_<step>.out 2>&1`). Read back only summaries, failures and diffs (the counts with their denominators, the segment table, the failing cases, `diff | head`), never a full report. A report in context is tokens nothing reads.
 The script stays in `tests/measure/`; its output does not.
 Do not investigate one command at a time. Write a single script that gathers everything you need, run it once, then read the output. A turn that only runs echo, grep, sed, cat or ls is a wasted turn. Target under 20 tool calls per task.

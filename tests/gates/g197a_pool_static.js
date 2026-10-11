@@ -40,6 +40,7 @@
 const fs   = require('fs');
 const path = require('path');
 const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const FILE = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const RAW  = fs.readFileSync(FILE, 'utf8');
@@ -95,7 +96,7 @@ const TIERS_PLUS  = TIERS.concat(['travel_room_only']);
 const HARVESTED = ['Nordic hamstring curl (anchored)','Single-leg glute bridge','Single-leg hip thrust','Wall sit'];
 const EXCLUDED  = ['Spanish squat hold (KB)','Step-ups (KB)','Dumbbell Bulgarian split squat'];
 const MACHINES  = ['Leg extension','Lying leg curl','Seated leg curl','Leg press','Standing cable hamstring curl'];
-const MANNY_DIGEST = MANNY_DIGEST_BY_VERSION[IA.version];   // era row, not a literal (D89)
+const MANNY_DIGEST = SV.lookup(MANNY_DIGEST_BY_VERSION, IA.version);   // era row, not a literal (D89)
 const HOLD_DOSE_SEC = 25;               // the ACCESSORY hold dose the file already carries
 const SECTION = 'Leg isolation';        // athlete-facing label; D75 renamed the KEY, not this
 

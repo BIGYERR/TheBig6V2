@@ -78,6 +78,7 @@
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
 const { load, progDigest } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
@@ -132,7 +133,7 @@ const stripRep = s => String(s).replace(REP_TOKEN, (m, sets) => sets + '×#');
 // V228 D193 R1 (split, Mario round 2; Amendment 2 "g227 gates": "`cueBlind` strips both wordings, the same shape as R4"):
 // the cue is recognised by shape, V227's "two" and V228's "three", still only above 226.
 const D190_CUE_RE = / — hold RPE 7, (?:two|three) in the tank$/;
-function cueBlind(s){ if(!(VER > 226 && typeof s === 'string')) return s; const m = D190_CUE_RE.exec(s); return m ? s.slice(0, m.index) : s; }
+function cueBlind(s){ if(!(SV.cmp(VER, 226) > 0 && typeof s === 'string')) return s; const m = D190_CUE_RE.exec(s); return m ? s.slice(0, m.index) : s; }
 function handKind(n, D){
   const W = handFloor(n);
   if(W === null) return { k:'null', W };
@@ -280,13 +281,13 @@ const R = {
 // ── RUN ──────────────────────────────────────────────────────────────────────
 const t0 = Date.now();
 let IA, STAMP = NaN;
-try { IA = load(ART); STAMP = +IA.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { IA = load(ART); STAMP = SV.parse(IA.version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let VER = STAMP;
-if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
   VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a pre-bump development run, not a ship proof');
 }
-console.log('g221 D177 | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | L1 ' + L1.length + ' configs, L2 ' + L2.length);
-if(!(VER >= ERA)){
+console.log('g221 D177 | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : '') + ' | L1 ' + L1.length + ' configs, L2 ' + L2.length);
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D177 P-SWAPFLOOR (V' + ERA + '). No row may pass on it.');
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();
@@ -295,20 +296,20 @@ if(!(VER >= ERA)){
 // G4b and G4c run from D177's era onward (Version scope): the named no-change under _swapDetailFor is against V220 at
 // every version from 221 up, so they load V220 themselves.
 let B4 = null, base4Why = '';
-if(VER >= ERA){
+if(SV.cmp(VER, ERA) >= 0){
   try {
-    if(BASEFILE){ const b = load(BASEFILE); if(+b.version === BASE_ERA) B4 = b; else base4Why = 'argv[3] reads ' + b.version + '; '; }
+    if(BASEFILE){ const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0) B4 = b; else base4Why = 'argv[3] reads ' + b.version + '; '; }
     if(!B4){
       const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'g221d177-')), f = path.join(tmp, 'v220.html');
       fs.writeFileSync(f, cp.execFileSync('git', ['show', V220_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 27 }));
       const b = load(f); fs.rmSync(tmp, { recursive:true, force:true });
-      if(+b.version === BASE_ERA){ B4 = b; base4Why += 'baseline from git ' + V220_COMMIT.slice(0, 7); } else base4Why += 'git reads ' + b.version;
+      if(SV.cmp(b.version, BASE_ERA) === 0){ B4 = b; base4Why += 'baseline from git ' + V220_COMMIT.slice(0, 7); } else base4Why += 'git reads ' + b.version;
     }
   } catch(e){ base4Why += 'baseline load failed: ' + String(e && e.message || e).slice(0, 160); B4 = null; }
 }
 const sdB4 = B4 ? B4.eval('_swapDetailFor') : null;
 const minRow = (key, cond, got) => {
-  if(VER >= ERA && sdB4) return ok(R[key], cond, got);
+  if(SV.cmp(VER, ERA) >= 0 && sdB4) return ok(R[key], cond, got);
   return ok(R[key] + ' (setup: ' + base4Why + ')', false);
 };
 const LS = IA.localStorage;
@@ -392,7 +393,7 @@ for(const cfg of L1){
           if(toast !== wantT){ S.toastBad++; note('toast', where + ' [' + H.k + '] ' + toast); }
           if(/The load runs out before the reps do here/.test(String(toast))) S.t3++;
           // V229 D193 (k), R8 trigger restated (Amendment 4): fixture presentation (`cfg.injury` stored); app equivalence is D194 part 2's row.
-          if(VER >= D193_ERA){
+          if(SV.cmp(VER, D193_ERA) >= 0){
             const Db9 = stripHand(D), capd9 = capHand(cfg, to);
             const conv9 = H.k === 'zero' && CONVERTS_HAND.test(Db9);   // the unloadable reader converts a named rep target only
             const pre9 = conv9 ? bucketHand(Db9) : rpeHand(H.k === 'win' ? handRewrite(Db9, H.W) : Db9);
@@ -417,7 +418,7 @@ for(const cfg of L1){
           if(H.k === 'atfloor'){ S.atN++; if(O !== D){ S.atBad++; note('at', where + ' :: ' + D + ' => ' + O); } }
           if(H.k === 'win'){ S.winN++; if(O !== H.out){ S.winBad++; note('win', where + ' :: ' + D + ' => ' + O); } }
           // V229 D193 (l), Amendment 4 "The rules": fixture presentation (`cfg.injury` stored); app equivalence is D194 part 2's row.
-          if(VER >= D193_ERA){
+          if(SV.cmp(VER, D193_ERA) >= 0){
             const Db9 = stripHand(D), E9 = H.k === 'win' ? handRewrite(Db9, H.W) : Db9, capd9 = capHand(cfg, to), X9 = capd9 ? holdHand(E9) : E9;
             if(capd9) S9.capPairs++;
             if(stripRep(O) !== stripRep(X9)){ S9.bA++; note9('A', where + ' :: ' + D + ' => ' + O + ' | want ' + X9); }
@@ -442,7 +443,7 @@ const crashNote = S.crash.length ? ' | build crashes ' + S.crash.length + ': ' +
 // whole population and pin the moved count (0 on V228). Fixture presentation (`cfg.injury` stored); app equivalence is
 // D194 part 2's row. Below 229 each row asserts exactly as before.
 // V231 (absorb ruling section 3): at 231 and up the six D9 rows read D193_PIN_V231; 229 and 230 read D193_PIN.
-const D9 = VER >= D193_ERA, ERA231 = VER >= D193_V231_ERA, PIN9 = ERA231 ? D193_PIN_V231 : D193_PIN;
+const D9 = SV.cmp(VER, D193_ERA) >= 0, ERA231 = SV.cmp(VER, D193_V231_ERA) >= 0, PIN9 = ERA231 ? D193_PIN_V231 : D193_PIN;
 if(D9) console.log('  D193 era (V' + VER + '): Main pairs on a hand-capped target ' + S9.capPairs + ', hand clamp pairs (toasts) ' + S9.clampT);
 if(D9) console.log('  V231 bed-thrust donor (' + BED_DONOR + ') moved pairs on this tree: G3a ' + BED9.out + ', G3c off grammar ' + BED9.off + ', G3e ' + BED9.nul + ', G6a toast ' + BED9.t + ' | pin table ' + (ERA231 ? 'D193_PIN_V231 (ia-version ' + D193_V231_ERA + ' and up)' : 'D193_PIN (229 and 230)') + ' | swap pairs ' + S.pairs);
 if(D9) ok(R.G3a + ' [V229 D193 Amendment 4 (l): moved ' + S.outside + ' == pin ' + PIN9.G3a + '; card != the hand card beneath the hold ' + S9.bA + ']' + (ERA231 ? ' [V231 D196-1: bed-thrust donor moved ' + BED9.out + ' == ' + BED_PIN_V231.out + ']' : ''), !S.crash.length && S.main > 0 && S9.bA === 0 && S.outside === PIN9.G3a && (!ERA231 || BED9.out === BED_PIN_V231.out), 'moved ' + S.outside + ' of ' + S.main + ' (pin ' + PIN9.G3a + '), beneath-the-hold misses ' + S9.bA + (ERA231 ? ', bed-thrust donor moved ' + BED9.out + ' (pin ' + BED_PIN_V231.out + ')' : '') + crashNote + exs9('A') + exs('out'));

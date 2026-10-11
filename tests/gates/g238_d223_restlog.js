@@ -113,6 +113,7 @@
 const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const S = require('../status')('g238_d223_restlog');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 238;
@@ -184,11 +185,10 @@ const CJ = v => J(canon(v));
 
 // ── version, read from the candidate's meta ──────────────────────────────────────────────────────────────────────────
 const HTML = fs.readFileSync(ART, 'utf8');
-const VM = HTML.match(/<meta name="ia-version" content="(\d+)">/);
-const VER = VM ? +VM[1] : 0;
-const verCj = k => [k + '-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA];
+const VER = /<meta name="ia-version" content="/.test(HTML) ? SV.fromHtml(HTML) : 0;   // no meta: 0, as before
+const verCj = k => [k + '-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA];
 S.info('g238 D223-D227 P-RESTMOVELOG | candidate ' + ART + ' ia-version ' + VER);
-if(!(VER >= ERA)) S.info('REFUSED: ia-version ' + VER + ' predates D223 to D227 (V' + ERA + '). Every row runs and FAILS by its version conjunct.');
+if(!(SV.cmp(VER, ERA) >= 0)) S.info('REFUSED: ia-version ' + VER + ' predates D223 to D227 (V' + ERA + '). Every row runs and FAILS by its version conjunct.');
 
 // ── ENV (g237_d220_distzero.js mkEnv, the g236 / g235 / g233 lineage; program id g238; the clock settable) ───────────
 const RealDate = Date, DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
@@ -708,7 +708,7 @@ guard('D224-hero', () => {
 // ── D227-digest (R11) ────────────────────────────────────────────────────────────────────────────────────────────────
 guard('D227-digest', () => {
   const cj = [verCj('D227-digest')];
-  const T = H.MANNY_DIGEST_BY_VERSION || {}, row238 = T[ERA], rowV = T[VER];
+  const T = H.MANNY_DIGEST_BY_VERSION || {}, row238 = T[ERA], rowV = SV.lookup(T, VER);
   const P = H.load(ART);            // a pristine load: the real clock, no env patches
   const d1 = H.progDigest(P.buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY)))), d2 = H.progDigest(P.buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY))));
   cj.push(['era-238', row238 === HAND_DIGEST_238, 'MANNY_DIGEST_BY_VERSION[' + ERA + '] ' + J(row238 == null ? 'NO ROW' : row238) + ' (hand ' + HAND_DIGEST_238 + ', the ruling\'s printed digest)']);

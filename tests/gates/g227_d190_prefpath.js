@@ -94,6 +94,7 @@
 'use strict';
 const fs = require('fs'), path = require('path'), os = require('os'), cp = require('child_process');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
@@ -154,17 +155,17 @@ const cardTag = c => 'W' + c.w + ' ' + c.d + ' [' + c.si + '][' + c.ii + '] ' + 
 
 // ── LOAD + VERSION PREDICATE ─────────────────────────────────────────────────────────────────────────────────────
 let IA, STAMP = NaN;
-try { IA = load(ART); STAMP = +IA.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { IA = load(ART); STAMP = SV.parse(IA.version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let VER = STAMP;
 if(process.env.IA_ASSUME_VERSION !== undefined){
-  if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+  if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   } else console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
 // V228 D193 R1 (split, Mario round 2; Amendment 2 "g227 gates"): the hand cue literal is version-predicated on the artifact's own ia-version, "three" at 228 and above, "two" at 227 and below, so the row still runs on V227. Sited here, after VER: VER is a `let` declared above, so the old site (the HAND ORACLE / ORACLE block) would read it in its temporal dead zone.
-const CUE = VER >= 228 ? ' — hold RPE 7, three in the tank' : ' — hold RPE 7, two in the tank';
-console.log('g227 D190 pref path | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | baseline ' + (BASEFILE || '(none)'));
-if(!(VER >= ERA)){
+const CUE = SV.cmp(VER, 228) >= 0 ? ' — hold RPE 7, three in the tank' : ' — hold RPE 7, two in the tank';
+console.log('g227 D190 pref path | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : '') + ' | baseline ' + (BASEFILE || '(none)'));
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D190 P-SWAPSEAM (V' + ERA + '). No row may pass on it.');
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();
@@ -176,7 +177,7 @@ if(!(VER >= ERA)){
 let B = null, baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ B = b; FILES.B = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ B = b; FILES.B = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!B){
   const f = path.join(os.tmpdir(), 'g227_d190_prefpath_v' + BASE_ERA + '_' + process.pid + '.html');
@@ -184,7 +185,7 @@ if(!B){
     try { fs.unlinkSync(f); } catch(e){}
     process.on('exit', () => { try { fs.unlinkSync(f); } catch(e){} });
     fs.writeFileSync(f, cp.execFileSync('git', ['-C', ROOT, 'show', V226_COMMIT + ':index.html'], { maxBuffer: 1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ B = b; FILES.B = f; baseWhy += 'git show ' + V226_COMMIT.slice(0, 7) + ':index.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ B = b; FILES.B = f; baseWhy += 'git show ' + V226_COMMIT.slice(0, 7) + ':index.html (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 console.log('  V226 baseline: ' + (B ? 'LIVE (' + baseWhy + ')' : 'SETUP FAILED (' + baseWhy + ')'));
@@ -269,7 +270,7 @@ for(const r of POP){
       // V228 D193 R1 (split), class (i), predicate on VER: at 228 and above the V226 baseline detail's exact suffix
       // ' — hold RPE 7, two in the tank' is read as ' — hold RPE 7, three in the tank' before the byte compare, the word and nothing else;
       // below 228 the compare is unchanged. A cue that appears on or vanishes from a non-target card still moves it.
-      const bDet = (b && VER >= 228 && b.det.endsWith(' — hold RPE 7, two in the tank')) ? b.det.slice(0, b.det.length - ' — hold RPE 7, two in the tank'.length) + ' — hold RPE 7, three in the tank' : (b && b.det);
+      const bDet = (b && SV.cmp(VER, 228) >= 0 && b.det.endsWith(' — hold RPE 7, two in the tank')) ? b.det.slice(0, b.det.length - ' — hold RPE 7, two in the tank'.length) + ' — hold RPE 7, three in the tank' : (b && b.det);
       if(!a || !b || a.n !== b.n || a.det !== bDet) S3.moved.push(id + ' ' + k + ' V226 ' + (b ? b.n + ' ' + JSON.stringify(b.det) : '(none)') + ' => ' + (a ? a.n + ' ' + JSON.stringify(a.det) : '(none)')); } }
 }
 console.log('  built ' + NBUILD + ' programs (' + POP.length + ' pref configs; uninjured+pref references cached by pref: ' + uniCache.size + ')');

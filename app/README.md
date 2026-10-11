@@ -119,7 +119,8 @@ with an iOS Simulator runtime.
 ## iOS
 
 - **Bundle** `com.bigyerr.ironasylum`, display name **The Asylum**, icon from the root `apple-touch-icon.png`.
-- **Version** follows `ia-version`. 238 ships as `1.0.238`, build `238`. `scripts/ios.mjs` keeps `config.xml` in step.
+- **Version** follows `ia-version`: version and build are both its canonical `MAJOR.MINOR.PATCH` (legacy `239` ships as
+  `0.239.0`, `0.239.1` as `0.239.1`; the app is pre-1.0). `scripts/ios.mjs` keeps `config.xml` in step.
 - **Build products go to `~/Library/Caches/iron-asylum-ios`** (`IOS_BUILD_DIR` to change), never into the repo. The repo
   sits in an iCloud-synced Desktop, and iCloud stamps Finder metadata onto a fresh `.app`. codesign then refuses it
   with "resource fork, Finder information, or similar detritus not allowed".

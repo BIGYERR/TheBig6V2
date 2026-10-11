@@ -48,15 +48,16 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os');
 const { load, progDigest, extractInlineJS, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const BASEFILE = process.argv[3] || null;
 const IA = load(ART);
-const VER = +IA.version, ERA = 208;
+const VER = SV.parse(IA.version), ERA = 208;
 let pass = 0, fail = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skip = l => console.log('SKIP ' + l);
 const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-if(VER < ERA){ ['R','H','E','I','S','M'].forEach(r => skip(r + ' rows: ia-version ' + VER + ' predates D103a slice 2 (V' + ERA + ')')); done(); }
+if(SV.cmp(VER, ERA) < 0){ ['R','H','E','I','S','M'].forEach(r => skip(r + ' rows: ia-version ' + VER + ' predates D103a slice 2 (V' + ERA + ')')); done(); }
 const IB = BASEFILE ? load(BASEFILE) : null;
 function canon(v){
   if(v === null || typeof v !== 'object') return JSON.stringify(v) || 'null';
@@ -155,7 +156,7 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
   // pairing and E3e asserts the ruling in its place. Below 214 nothing is excluded.
   const ERA214 = 214, eveOf = cfg => { if(!cfg.raceDate) return null; const [y, m, dd] = cfg.raceDate.split('-').map(Number); const e = new Date(y, m - 1, dd - 1);
     return {w: Math.floor(Math.round((e - START) / 864e5) / 7) + 1, d: ALL[e.getDay()]}; };
-  const d158Eve = (b, w, d) => { if(VER < ERA214 || !b.dated) return false; const e = eveOf(b.cfg); return !!e && +w === e.w && d === e.d; };
+  const d158Eve = (b, w, d) => { if(SV.cmp(VER, ERA214) < 0 || !b.dated) return false; const e = eveOf(b.cfg); return !!e && +w === e.w && d === e.d; };
   let eveOut = 0;
   BASECFG.forEach((b, i) => {
     const pre = get(b.fam, i, 'none'), p = get(b.fam, i, 'easy');
@@ -178,12 +179,12 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
   ok(`E2 an injured athlete in easy mode runs no test: 0 TIME TRIAL cards survive across ${datedProgs} dated programs (${parked.trial || 0}/${total.trial || 0} tests parked)`, datedProgs > 0 && trialsLeft.length === 0 && (total.trial || 0) > 0, trialsLeft.length + ': ' + trialsLeft.slice(0, 3).join('; '));
   ok(`E5 easy mode parks the strides finisher: ${stridesDealt} easy runs left standing carried it, 0 run cards mention strides and 0 subtypes end " + Strides"`, stridesDealt > 0 && stridesLeft.length === 0 && plusLeft.length === 0, stridesLeft.length + ' mention strides, ' + plusLeft.length + ' end + Strides: ' + stridesLeft.concat(plusLeft).slice(0, 3).join('; '));
   ok(`E6 an easy run whose strides were parked keeps its minutes and its dose (${stridesDealt} cards)`, stridesDealt > 0 && doseBad.length === 0, doseBad.length + ': ' + doseBad.slice(0, 3).join('; '));
-  if(VER < ERA214) skip('E3e ia-version ' + VER + ' predates D158 (V' + ERA214 + '); no test eve leaves the E3 pairing');
+  if(SV.cmp(VER, ERA214) < 0) skip('E3e ia-version ' + VER + ' predates D158 (V' + ERA214 + '); no test eve leaves the E3 pairing');
   else {
-    let B213 = (IB && +IB.version === 213) ? IB : null, why = B213 ? 'argv' : '';
+    let B213 = (IB && SV.cmp(IB.version, 213) === 0) ? IB : null, why = B213 ? 'argv' : '';
     if(!B213){ try { const f = path.join(os.tmpdir(), 'g208r_v213_' + process.pid + '.html');
       fs.writeFileSync(f, require('child_process').execFileSync('git', ['-C', path.join(__dirname, '..', '..'), 'show', 'bc3cccce3f048a9e0e4e45846bfe8315635c8430:index.html'], {maxBuffer: 1 << 27}));
-      const x = load(f); try { fs.unlinkSync(f); } catch(e){} if(+x.version === 213){ B213 = x; why = 'git bc3cccc'; } else why = 'git copy reads ' + x.version; } catch(e){ why = 'git show failed: ' + String(e.message).slice(0, 80); } }
+      const x = load(f); try { fs.unlinkSync(f); } catch(e){} if(SV.cmp(x.version, 213) === 0){ B213 = x; why = 'git bc3cccc'; } else why = 'git copy reads ' + x.version; } catch(e){ why = 'git show failed: ' + String(e.message).slice(0, 80); } }
     const isLift = s => !!s && (s.items || []).length && !/mobility|stretch|taper/i.test(s.label || '');
     const sig = x => canon({rest: !x || !!x.rest, lift: !!(x && !x.rest && (x.sections || []).some(isLift)), cards: [].concat((x && x.cardio) || []).filter(Boolean).map(c => c.type + ':' + (c.subtype || '')).sort()});
     let n = 0; const eBad = [];
@@ -193,7 +194,7 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
     ok(`E3e easy mode handles the training-day test eve as V213's rule does: no shakeout card, same lift presence, same rest flag (${n} dated eves, V213 from ${why || 'nowhere'}; ${eveOut} eve cells left the E3 pairing)`,
        !!B213 && n > 0 && eBad.length === 0, (B213 ? '' : 'V213 unavailable: ' + why + '; ') + eBad.length + ': ' + eBad.slice(0, 2).join(' || '));
   }
-  ok(`E3 every keyed easy run is left exactly as dealt in easy mode, strides finisher aside (the 2b text rule) (${(total.easy || 0) - (parked.easy || 0)}/${total.easy || 0}${VER >= ERA214 ? '; from 214 the D158 test eve is E3e\'s' : ''})`, keptBad.length === 0 && (total.easy || 0) > 0, keptBad.length + ': ' + keptBad.slice(0, 3).join('; '));
+  ok(`E3 every keyed easy run is left exactly as dealt in easy mode, strides finisher aside (the 2b text rule) (${(total.easy || 0) - (parked.easy || 0)}/${total.easy || 0}${SV.cmp(VER, ERA214) >= 0 ? '; from 214 the D158 test eve is E3e\'s' : ''})`, keptBad.length === 0 && (total.easy || 0) > 0, keptBad.length + ': ' + keptBad.slice(0, 3).join('; '));
   ok('E4 every "Easy Run (protected)" card that carries a key carries `easy` (easy and reduce)', e4.length === 0, e4.length + ': ' + e4.slice(0, 3).join('; '));
   // E7: outside the injury modes the strides are untouched
   let sN = 0; const sBad = []; BASECFG.forEach((b, i) => cardsOf(get(b.fam, i, 'none')).forEach(({w, d, c}) => { if(!/ \+ Strides$/.test(c.subtype || '')) return; sN++; if(!String(c.detail || '').endsWith(STRIDES_BLOCK)) sBad.push(b.fam + ' #' + i + ' W' + w + ' ' + d); }));
@@ -242,7 +243,7 @@ const cache = new Map(); const get = (fam, i, inj) => { const k = i + '|' + inj;
 // standing ruling 5 governs, so the row compares the built digest to MANNY_DIGEST_BY_VERSION[ia-version]
 // and fails loudly when that row is absent. Re-pointing the literal to a later digest would be the
 // vacuous line standing ruling 3 forbids; deleting the row would be an unruled removal.
-{ const row = MANNY_DIGEST_BY_VERSION[VER], rowOk = typeof row === 'string' && /^[0-9a-f]{16}$/.test(row);
+{ const row = SV.lookup(MANNY_DIGEST_BY_VERSION, VER), rowOk = typeof row === 'string' && /^[0-9a-f]{16}$/.test(row);
   let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
   ok('M1 HALF_MANNY digest equals its era row MANNY_DIGEST_BY_VERSION[' + VER + '] = ' + row + ', and that row exists (NRC: no reader change reaches it)',
      rowOk && hm === row, rowOk ? hm : 'NO ERA ROW for ia-version ' + VER + ' (built ' + hm + ')'); }

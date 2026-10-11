@@ -48,13 +48,14 @@
 process.env.TZ = 'America/New_York';
 const path = require('path');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA0 = H.load(ART);
-const VER = +IA0.version;
+const VER = SV.parse(IA0.version);
 const D106A_ERA = 207;
 const D183_ERA = 223;
-const ERA_V = (process.env.IA_ASSUME_VERSION === String(D183_ERA) && VER === D183_ERA - 1) ? D183_ERA : VER;
-if(ERA_V !== VER) console.log('ASSUMED ia-version ' + ERA_V + ' on a file stamped ' + VER + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
+const ERA_V = (process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, D183_ERA) === 0 && SV.cmp(VER, D183_ERA - 1) === 0) ? D183_ERA : VER;
+if(SV.cmp(ERA_V, VER) !== 0) console.log('ASSUMED ia-version ' + ERA_V + ' on a file stamped ' + VER + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 
 let pass = 0, fail = 0, skip = 0;
 function ok(label, cond, got){
@@ -64,7 +65,7 @@ function ok(label, cond, got){
 function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function summary(){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); }
 const ROWS = ['C3a','C3b','C3c','C3d','C3e','C3f','C3g','C3h','C3i','C3j','C1a','C1b','C1c','C4a','C4b','C4c','C4d','C4e','C4f'];
-if(VER < D106A_ERA){
+if(SV.cmp(VER, D106A_ERA) < 0){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D106a (V' + D106A_ERA + ').');
   for(const r of ROWS) skipRow(r + ' skipped below the D106a era');
   summary();
@@ -224,11 +225,11 @@ function feedback(wd){
 }
 const wdPace = over => Object.assign({cardioTypes:['run'], cardioGoals:pace().cardioGoals, experience:'intermediate', ageBracket:'18-35',
   liftingFocus:'balanced', eventTargeted:true, primaryPath:'event', restDays:['sun','wed']}, over || {});
-const C4_ERA = ERA_V >= D183_ERA
+const C4_ERA = SV.cmp(ERA_V, D183_ERA) >= 0
   ? 'D183 era (ia-version ' + ERA_V + ' >= ' + D183_ERA + '): R3 card copy and colour'
   : 'D106a era (ia-version ' + ERA_V + ' <= ' + (D183_ERA - 1) + '): A4 sentence and the red card';
 console.log('# C4 rows: ' + C4_ERA);
-if(ERA_V < D183_ERA){
+if(SV.cmp(ERA_V, D183_ERA) < 0){
   const h5 = feedback(wdPace({startDate:S_ISO, raceDate:R_ISO}));
   ok('C4a wizard, test inside the goal length (start ' + S_ISO + ', test ' + R_ISO + '): coach\'s sentence verbatim, and "stays intact" is gone',
      h5.includes(A4_5) && !h5.includes(INTACT), h5.slice(0, 160));

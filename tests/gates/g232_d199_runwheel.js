@@ -89,6 +89,7 @@ process.env.TZ = 'America/New_York';
 const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const { load } = H;
 
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
@@ -120,8 +121,8 @@ const DASH_HMS = DASH + ':00:00', DASH_MI = DASH + '.00';
 // V235 (D215): the free time wheel's blank face from 235 is zero, a stopwatch not started. A function, read at use: VER is set
 // after load. V237 (D220, retiring D217): the free miles wheel's blank face is DASH_MI through 236 and the odometer's 0.00
 // from 237 (FREE_MI, read at use the same way).
-const ZERO_HMS = '0:00:00', FREE_HMS = () => VER >= 235 ? ZERO_HMS : DASH_HMS;
-const ZERO_MI = '0.00', FREE_MI = () => VER >= 237 ? ZERO_MI : DASH_MI;
+const ZERO_HMS = '0:00:00', FREE_HMS = () => SV.cmp(VER, 235) >= 0 ? ZERO_HMS : DASH_HMS;
+const ZERO_MI = '0.00', FREE_MI = () => SV.cmp(VER, 237) >= 0 ? ZERO_MI : DASH_MI;
 const pace = (mins, mi) => { const s = Math.round(mins * 60 / mi); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') + '/mi'; };
 const COPY = {
   time:      { label:'Log the run', subs:['Shows the plan. Move it to match the watch.', 'Off the watch.'], caps:['Time', 'Miles'] },
@@ -143,7 +144,7 @@ const LEGACY = [   // [form, stored entry, hand faces by hidden id]
   ['time', { run_mins:'100' }, { log_run_mins:'1:40:00', get log_run_dist(){ return FREE_MI(); } }],
   ['time', { run_mins:'15.333' }, { log_run_mins:'0:15:20', get log_run_dist(){ return FREE_MI(); } }],
   // V233 D208 re-rules D200's shipped hours-only clamp to a whole-face peg (tests/measure/v233_rulings/v233_ruling_d207_d211.md); a getter, so VER is read at use.
-  ['time', { run_mins:'650' }, { get log_run_mins(){ return VER >= 233 ? '9:59:59' : '9:50:00'; }, get log_run_dist(){ return FREE_MI(); } }],
+  ['time', { run_mins:'650' }, { get log_run_mins(){ return SV.cmp(VER, 233) >= 0 ? '9:59:59' : '9:50:00'; }, get log_run_dist(){ return FREE_MI(); } }],
   ['time', { run_mins:'7.5' }, { log_run_mins:'0:07:30', get log_run_dist(){ return FREE_MI(); } }],
 ];
 const W375 = (375 - 2 * 16 - 2 * 1 - 2 * 16 - 12) * 3 / 5;   // 178.2
@@ -178,7 +179,7 @@ const R = {
 const ROW_ORDER = Object.keys(R);
 function row(key, cj){ cj.forEach(([n, c, d]) => P('    ' + key + ' ' + n + ' ' + (c ? 'ok' : 'FAIL') + ' :: ' + d));
   const bad = cj.filter(x => !x[1]).map(x => x[0]); ok(R[key], !bad.length, bad.length ? 'failing conjuncts: ' + bad.join(', ') : cj.length + '/' + cj.length + ' conjuncts'); }
-const verCj = k => [k + '-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA];
+const verCj = k => [k + '-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA];
 const tryv = f => { try { return f(); } catch(e){ return { __err:String(e && e.message || e).slice(0, 120) }; } };
 
 // ── ENV: virtual clock, a DOM stub that parses the rendered markup, scroll-dispatching wheels ────────────────────
@@ -301,9 +302,9 @@ function formShape(k, f, dose){
 
 // ── LOAD + VERSION + BASELINE ────────────────────────────────────────────────────────────────────────────────────
 let VER = NaN, C = null, CAND_TEXT = '';
-try { CAND_TEXT = fs.readFileSync(ART, 'utf8'); C = mkEnv(ART); VER = +C.IA.version; }
+try { CAND_TEXT = fs.readFileSync(ART, 'utf8'); C = mkEnv(ART); VER = SV.parse(C.IA.version); }
 catch(e){ P('FAIL boot: ' + String(e && e.message || e).slice(0, 200)); fail++; ROW_ORDER.forEach(k => ok(R[k] + ' (candidate did not boot)', false)); done(); }
-P('g232 D199–D206 P-RUNWHEEL | candidate ' + ART + ' ia-version ' + VER + (VER >= ERA ? '' : ' (below ' + ERA + ': every behaviour row runs and must FAIL by its own conjuncts)'));
+P('g232 D199–D206 P-RUNWHEEL | candidate ' + ART + ' ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? '' : ' (below ' + ERA + ': every behaviour row runs and must FAIL by its own conjuncts)'));
 const PARSE = (k, s) => C.ev('_iawParse')(k, s), FMT = (k, a) => C.ev('_iawFormat')(k, a);
 
 // ── ROW D199-spec ────────────────────────────────────────────────────────────────────────────────────────────────
@@ -316,7 +317,7 @@ function rowSpec(){
   const cols = []; const cre = /<div class="iaw-col" data-ci="(\d+)" data-wrap="(1?)" data-len="(\d+)"><div class="iaw-pad"><\/div>([\s\S]*?)<div class="iaw-pad"><\/div><\/div>/g; let c;
   while((c = cre.exec(h))){ const rows = [], faces = []; const ire = /<div class="iaw-it(?: nil)?" data-v="([^"]*)">([^<]*)<\/div>/g; let it; while((it = ire.exec(c[4]))){ rows.push(it[1]); faces.push(it[2]); } cols.push({ wrap:c[2], len:c[3], rows, faces }); }
   cj.push(['spec-cols', cols.length === 3 && cls === 'iaw-f3', cols.length + ' columns, class ' + cls + ' (want 3, iaw-f3)']);
-  (VER >= 235 ? HMS_COLS_V235 : HMS_COLS).forEach((o, i) => { const g = cols[i] || {};
+  (SV.cmp(VER, 235) >= 0 ? HMS_COLS_V235 : HMS_COLS).forEach((o, i) => { const g = cols[i] || {};
     cj.push(['spec-c' + i, J(g.rows) === J(o.rows) && J(g.faces) === J(o.faces) && g.wrap === o.wrap && g.len === o.len,
       'column ' + i + ': ' + (g.rows ? g.rows.length : 0) + ' rows (want ' + o.rows.length + '), wrap "' + g.wrap + '" (want "' + o.wrap + '"), len ' + g.len + ' (want ' + o.len + '), first faces ' + J((g.faces || []).slice(0, 3)) + ' (want ' + J(o.faces.slice(0, 3)) + ')']); });
   cj.push(['spec-cap', cap === 'Time', 'cap ' + J(cap) + ' (want "Time")']);
@@ -330,7 +331,7 @@ function rowRt(){
   for(let T = 0; T < 36000; T++){
     const h = Math.floor(T / 3600), m = Math.floor((T % 3600) / 60), s = T % 60, n = Math.floor((10 * T + 3) / 6);
     // V235 (D215): from 235 the zero face is the one excepted: it stores '' and parses back to 0:00:00 (checked below).
-    const want = (VER >= 235 && T === 0) ? '' : Math.floor(n / 100) + '.' + String(n % 100).padStart(2, '0');
+    const want = (SV.cmp(VER, 235) >= 0 && T === 0) ? '' : Math.floor(n / 100) + '.' + String(n % 100).padStart(2, '0');
     const got = tryv(() => FMT('hms', [String(h), String(m), String(s)]));
     const back = typeof got === 'string' ? tryv(() => PARSE('hms', got)) : null;
     if(got === want && back && J(back) === J([String(h), String(m), String(s)])) good++;
@@ -339,7 +340,7 @@ function rowRt(){
   cj.push(['rt-seconds', good === 36000, good + '/36000 seconds format to the integer oracle and parse back' + (bad.length ? ' | e.g. ' + bad.join('; ') : '')]);
   const ex = FMT_EX.map(([a, w]) => { const g = tryv(() => FMT('hms', a)); return [a.join(':'), g, w, g === w]; });
   cj.push(['rt-examples', ex.every(x => x[3]), ex.map(x => x[0] + ' -> ' + J(x[1]) + (x[3] ? '' : ' (want ' + J(x[2]) + ')')).join(', ')]);
-  const st = (VER >= 235 ? HMS_PARSE_V235 : HMS_PARSE).map(([s, w]) => { const g = tryv(() => PARSE('hms', s)); return [s, g, w, J(g) === J(w)]; });
+  const st = (SV.cmp(VER, 235) >= 0 ? HMS_PARSE_V235 : HMS_PARSE).map(([s, w]) => { const g = tryv(() => PARSE('hms', s)); return [s, g, w, J(g) === J(w)]; });
   cj.push(['rt-stored', st.every(x => x[3]), st.map(x => J(x[0]) + ' -> ' + J(x[1]) + (x[3] ? '' : ' (want ' + J(x[2]) + ')')).join(', ')]);
   row('D200-rt', cj);
 }
@@ -347,7 +348,7 @@ function rowRt(){
 // ── ROW D203 ─────────────────────────────────────────────────────────────────────────────────────────────────────
 function rowDec3(){
   const cj = [verCj('dec3')];
-  const t = (VER >= 237 ? DEC3_V237 : DEC3).map(([s, w]) => { const g = tryv(() => PARSE('dist', s)); return [s, g, w, J(g) === J(w)]; });
+  const t = (SV.cmp(VER, 237) >= 0 ? DEC3_V237 : DEC3).map(([s, w]) => { const g = tryv(() => PARSE('dist', s)); return [s, g, w, J(g) === J(w)]; });
   cj.push(['dec3-table', t.every(x => x[3]), t.map(x => J(x[0]) + ' -> ' + J(x[1]) + (x[3] ? '' : ' (want ' + J(x[2]) + ')')).join(', ')]);
   row('D203', cj);
 }
@@ -422,7 +423,7 @@ function rowOpen(){
   let good = 0; const bad = [];
   SURV.lat.forEach(x => { const want = wantFaces(x.k, x.dose); const g = x.inputs === 0 && x.same && J(x.faces) === J(want);
     if(g) good++; else if(bad.length < 5) bad.push(x.name + ' W' + x.w + ' ' + x.d + ' ' + x.k + ' faces ' + J(x.faces) + ' want ' + J(want) + ' inputs ' + x.inputs + ' same ' + x.same); });
-  cj.push(['open-lattice', SURV.latDays > 0 && good === SURV.latDays, good + '/' + SURV.latDays + ' lattice days open writing nothing, fixed face = the plan by hand, free wheel on ' + (VER >= 237 ? 'its blank face (time 0:00:00, miles 0.00)' : VER >= 235 ? 'its blank face (time 0:00:00, miles dash)' : 'the dash') + (bad.length ? ' | ' + bad.join(' | ') : '')]);
+  cj.push(['open-lattice', SURV.latDays > 0 && good === SURV.latDays, good + '/' + SURV.latDays + ' lattice days open writing nothing, fixed face = the plan by hand, free wheel on ' + (SV.cmp(VER, 237) >= 0 ? 'its blank face (time 0:00:00, miles 0.00)' : SV.cmp(VER, 235) >= 0 ? 'its blank face (time 0:00:00, miles dash)' : 'the dash') + (bad.length ? ' | ' + bad.join(' | ') : '')]);
   const lg = (SURV.legacy || []).map(x => { const g = x.inputs === 0 && x.same && J(x.faces) === J(x.want); return [x, g]; });
   cj.push(['open-legacy', lg.length === LEGACY.length && lg.every(y => y[1]), lg.map(([x, g]) => x.k + ' ' + J(x.stored) + ' -> ' + J(x.faces) + (g ? '' : ' (want ' + J(x.want) + ', inputs ' + x.inputs + ', same ' + x.same + ')')).join(', ')]);
   row('D202-open', cj);
@@ -466,7 +467,7 @@ function rowMove(){
     cj.push(['move-back', a === '8.50' && b === '8.00' && n === 2 && pa === null && pb === null && e.run_dist === '8.00', 'away 8.50 then back to the seed face: hidden ' + J(a) + ' then ' + J(b) + ', input events ' + n + ', entry before Log ' + J(pa) + ' / ' + J(pb) + '; Log stores run_dist ' + J(e.run_dist) + ' (want "8.50", "8.00", 2, null / null; "8.00")']);
   };
   step('move-time', () => {
-    if(VER >= 236) return moveTimeV236();
+    if(SV.cmp(VER, 236) >= 0) return moveTimeV236();
     C.ctx.__FORCE = DOSES.time; C.setLog(HW, HD, null); C.open(HW, HD);
     C.move(need('log_run_dist'), 0, '2');
     const e1 = C.entry(HW, HD) || {}, d1 = ddText();
@@ -478,14 +479,14 @@ function rowMove(){
     cj.push(['move-derived', d2.includes(pace(15.5, 2)) && !/assuming/.test(d2) && e2.run_pace === pace(15.5, 2) && dd && Math.round(dd.sec) === 465, 'derived "' + d2 + '", stored run_pace ' + J(e2.run_pace) + ', doseDerived(stored).sec ' + (dd && dd.sec) + ' (want ' + pace(15.5, 2) + ' = 465 s, no assuming)']);
   });
   step('move-dist', () => {
-    if(VER >= 236) return moveDistV236();
+    if(SV.cmp(VER, 236) >= 0) return moveDistV236();
     C.ctx.__FORCE = DOSES.dist; C.setLog(HW, HD, null); C.open(HW, HD); const ws = need('log_run_dist');
     C.move(ws, 1, '2'); C.move(ws, 2, '5');
     const e = C.entry(HW, HD) || {};
     cj.push(['move-fixed-mi', e.run_dist === '8.25', 'fixed 8.00 -> 8.25: stored run_dist ' + J(e.run_dist) + ' (want "8.25")']);
   });
   step('move-back', () => {
-    if(VER >= 236) return moveBackV236();
+    if(SV.cmp(VER, 236) >= 0) return moveBackV236();
     C.ctx.__FORCE = DOSES.dist; C.setLog(HW, HD, null); C.open(HW, HD); const ws = need('log_run_dist');
     C.move(ws, 1, '5'); const a = (C.entry(HW, HD) || {}).run_dist; C.move(ws, 1, '0'); const b = (C.entry(HW, HD) || {}).run_dist;
     cj.push(['move-back', a === '8.50' && b === '8.00' && (C.INPUTS.log_run_dist || 0) === 2, 'away 8.50 then back to the seed face: stored ' + J(a) + ' then ' + J(b) + ', input events ' + (C.INPUTS.log_run_dist || 0) + ' (want "8.50", "8.00", 2)']);

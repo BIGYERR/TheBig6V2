@@ -36,6 +36,7 @@
 const path = require('path');
 const fs = require('fs');
 const { load, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
 
@@ -51,11 +52,11 @@ function skipRow(label){ skip++; console.log('SKIP ' + label); }
 function summary(code){ console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(code); }
 
 const HAS = IA.eval("typeof chiFromTable6 === 'function'");
-const VER = IA.version;
+const VER = SV.parse(IA.version);
 const D128_ERA = 205;
 const ROWS = ['T1','T2','T2b','T3','T4','T5','T6','T7','T8','T9','T10','T11','T12','T13','T14'];
 
-if(!HAS && VER < D128_ERA){
+if(!HAS && SV.cmp(VER, D128_ERA) < 0){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D128 (V' + D128_ERA + ') and has no chiFromTable6.');
   for(const r of ROWS) skipRow(r + ' skipped below the D128 era');
   summary(0);
@@ -72,7 +73,7 @@ const RUN_LABEL_BY_VERSION = [
   { from: 204, to: 207,      ruling: 'pre-D103a',    chi: /CHI|Continuous High/i },
   { from: 208, to: Infinity, ruling: 'D103a (V208)', chi: /Long Interval \(LI\)/ },
 ];
-const LBL = RUN_LABEL_BY_VERSION.filter(r => +VER >= r.from && +VER <= r.to)[0]
+const LBL = RUN_LABEL_BY_VERSION.filter(r => SV.cmp(VER, r.from) >= 0 && SV.cmp(VER, r.to) <= 0)[0]
   || { ruling: 'NO ROW', chi: /(?!)/ };
 ok('ERA a RUN_LABEL_BY_VERSION row covers ia-version ' + VER + ' (' + LBL.ruling + ')', LBL.ruling !== 'NO ROW',
    'the run CHI label has no ruled text at this version, so T11 and T13 are void');

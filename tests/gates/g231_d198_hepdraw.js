@@ -90,6 +90,7 @@ const crypto = require('crypto');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const { load } = H;
 
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
@@ -210,17 +211,17 @@ const info = s => P('    INFO ' + s);
 
 // ── LOAD + VERSION ──────────────────────────────────────────────────────────────────────────────────────────────
 let VER = NaN, CAND_TEXT = '';
-try { const IA = load(ART); VER = +IA.version; CAND_TEXT = fs.readFileSync(ART, 'utf8'); }
+try { const IA = load(ART); VER = SV.parse(IA.version); CAND_TEXT = fs.readFileSync(ART, 'utf8'); }
 catch(e){ P('FAIL boot: ' + String(e && e.message || e).slice(0, 200)); fail++; ROW_ORDER.forEach(k => ok(R[k] + ' (candidate did not boot)', false)); done(); }
-P('g231 D198 P-HEPDRAW | candidate ' + ART + ' ia-version ' + VER + (VER >= ERA ? '' : ' (below ' + ERA + ': every row runs and must FAIL by its own conjuncts)'));
+P('g231 D198 P-HEPDRAW | candidate ' + ART + ' ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? '' : ' (below ' + ERA + ': every row runs and must FAIL by its own conjuncts)'));
 let BF = null, baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot: ' + String(e && e.message || e).slice(0, 120) + '; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!BF){
   try { const f = tmpWrite('v230', cp.execFileSync('git', ['-C', ROOT, 'show', V230_COMMIT + ':index.html'], { maxBuffer:1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ BF = f; baseWhy += 'git show ' + V230_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = f; baseWhy += 'git show ' + V230_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 P('  V' + BASE_ERA + ' baseline: ' + (BF ? 'LIVE (' + baseWhy + ')' : 'SETUP FAILED (' + baseWhy + ')'));
@@ -287,7 +288,7 @@ const CC = (C && B) ? collapses(C, B) : null, QC = (Q && B) ? collapses(Q, B) : 
 // ── ROW D198-a ──────────────────────────────────────────────────────────────────────────────────────────────────
 function rowA(){
   const cj = [];
-  cj.push(['a-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['a-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   cj.push(['a-doubled', C.doubled.length === 0, '(i) hinge slot: days where `Lower strength` has two items and its second names a `Hip extension + push` item: ' + C.doubled.length + ' on ' + progsOf(C.doubled) + ' programs' + (C.doubled.length ? ' | ' + fmt(tally(C.doubled, x => x.eq + ' ' + x.inj + ' W' + x.w)) : '') + ' over ' + SUN.length + ' builds, ' + C.hepDays + ' shipped days carrying both sections; ruled 0 (V230 and pre-D198 70)']);
   cj.push(['a-collapse', !!CC && CC.length === 0, CC ? '(ii) one-item `Hip extension + push` with a hipExtBW hinge and a two-item V230 twin: ' + CC.length + ' on ' + progsOf(CC) + ' programs' + (CC.length ? ' | ' + fmt(tally(CC, x => x.eq + ' ' + x.inj + ' ' + x.hinge)) : '') + ' (resting on the lone-item fallback ' + CC.filter(x => x.lone).length + '); ruled 0 (pre-D198 21)' : 'no V230 twins: ' + baseErr]);
   const nLit = cnt(CAND_TEXT, HIPEXT_LIT);
@@ -313,7 +314,7 @@ function rowA(){
 // ── ROW D198-b ──────────────────────────────────────────────────────────────────────────────────────────────────
 function rowB(){
   const cj = [];
-  cj.push(['b-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['b-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const eq = (got, want, n) => got.length === n && got.every(g => g[0] === want[0] && g[1] === want[1]);
   const show = (C0, got) => C0.at.map(([w, d], i) => 'W' + w + ' ' + d + ': ' + (got[i] ? got[i].join(' // ') : '(no program)')).join(' || ');
   for(const X of CELLS_B){ const got = C.cards[X.tag] || []; const okC = eq(got, X.c231, X.at.length);
@@ -331,7 +332,7 @@ function rowB(){
 // ── ROW D198-c ──────────────────────────────────────────────────────────────────────────────────────────────────
 function rowC(){
   const cj = [];
-  cj.push(['c-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['c-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   cj.push(['c-surgery', SURG.ok && !!Q, SURG.ok ? SURG.why + (Q ? '' : ' | survey failed: ' + preErr) : 'NOT BUILT: ' + SURG.why]);
   info('pre-D198 tree sha256 prefix ' + (SURG.sha || '-') + (SURG.sha ? (SURG.sha === PRE_SHA ? ' == ' : ' != ') + 'the ruling\'s candidate ' + PRE_SHA : '') + ' (INFO: equal only while the candidate is V231 as built)');
   if(!Q){ ['c-doubled', 'c-collapse', 'c-after'].forEach(n => cj.push([n, false, 'pre-D198 tree not surveyed: ' + preErr])); row('D198-c', cj); return; }

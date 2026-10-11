@@ -19,6 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const semver = require(path.join(__dirname, 'semver.js'));   // ia-version is M.m.p; a legacy integer N reads as 0.N.0
 
 const DAYS = ['sun','mon','tue','wed','thu','fri','sat'];
 
@@ -135,8 +136,10 @@ function makeContext(opts){
 function load(htmlPath, opts={}){
   const abs = path.resolve(htmlPath);
   const html = fs.readFileSync(abs, 'utf8');
-  const version = (html.match(/<meta name="ia-version" content="(\d+)"/)||[])[1];
-  if(!version) throw new Error('harness: no ia-version meta in '+abs);
+  const version = (html.match(/<meta name="ia-version" content="([^"]*)"/)||[])[1];
+  if(version === undefined) throw new Error('harness: no ia-version meta in '+abs);
+  try { semver.parse(version); } catch(e){ throw new Error('harness: ia-version meta "'+version+'" does not parse in '+abs+' ('+e.message+')'); }
+  // IA.version stays the raw meta text (gates read it as a string); compare it only through semver.cmp / semver.lookup.
   const js = extractInlineJS(html);
   const exportShim = '\n;globalThis.__IA = {' + EXPORT_NAMES.map(n => `${n}: (typeof ${n}!=='undefined' ? ${n} : undefined)`).join(',') + '};\n';
   const src = js + exportShim;

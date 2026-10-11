@@ -38,13 +38,14 @@
 'use strict';
 const path = require('path');
 const { load, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
-const VER = +IA.version, ERA = 208;
+const VER = SV.parse(IA.version), ERA = 208;
 let pass = 0, fail = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-if(VER < ERA){ ['K0','K1','K2','K2b','K3','K5'].forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates D103a (V' + ERA + ')')); done(); }
+if(SV.cmp(VER, ERA) < 0){ ['K0','K1','K2','K2b','K3','K5'].forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates D103a (V' + ERA + ')')); done(); }
 const clone = v => JSON.parse(JSON.stringify(v));
 const DAYS = ['mon','tue','wed','thu','fri','sat','sun'], ALL = ['sun','mon','tue','wed','thu','fri','sat'];
 const NSW = new Set(['run_base','run_pace_goal','run_mile_time','run_15_under10']);
@@ -140,7 +141,7 @@ ok(`K3 NRC run, bike and swim cards carry no key (${S.other} cards)`, S.other > 
 // to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
 // D103a (standing ruling 4).
 { let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
-  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  const eraV = SV.parse(IA.version), eraHas = SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) !== undefined, eraRow = eraHas ? SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) : undefined;
   ok('K5 HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (NRC: nothing it prints is stamped)',
      eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 done();

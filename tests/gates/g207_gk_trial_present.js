@@ -49,9 +49,10 @@
 'use strict';
 const path = require('path');
 const { load } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
-const VER = +IA.version, ERA = 207;
+const VER = SV.parse(IA.version), ERA = 207;
 // V214 (D158, coach re-pins; standing ruling 4): from ia-version 214 the test eve (T-1) carries a
 // shakeout from the easy-run builder at the week's easy duration and replaces whatever sat there.
 // P6 then reads every day before the test except the eve, and Q3's T-1 half asserts the shakeout.
@@ -60,7 +61,7 @@ const ERA214 = 214;
 let pass = 0, fail = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-if(VER < ERA){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D106a (V' + ERA + ').'); console.log('SKIP P1 P2 P3 P4 P5 P6 skipped below the D106a era'); done(); }
+if(SV.cmp(VER, ERA) < 0){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D106a (V' + ERA + ').'); console.log('SKIP P1 P2 P3 P4 P5 P6 skipped below the D106a era'); done(); }
 function canon(v){
   if(v === null || typeof v !== 'object') return JSON.stringify(v) || 'null';
   if(Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
@@ -73,7 +74,7 @@ const HARD_BY_VERSION = [
   { from: 207, to: 207,      ruling: 'D106a (V207)', re: /^(Interval \(INT\)|Continuous High Intensity \(CHI\))/ },
   { from: 208, to: Infinity, ruling: 'D103a (V208)', re: /^(Short Interval \(SI\)|Long Interval \(LI\))/ },
 ];
-const HARD_ROW = HARD_BY_VERSION.filter(r => VER >= r.from && VER <= r.to)[0] || null;
+const HARD_ROW = HARD_BY_VERSION.filter(r => SV.cmp(VER, r.from) >= 0 && SV.cmp(VER, r.to) <= 0)[0] || null;
 if(!HARD_ROW) ok('P-ERA a HARD_BY_VERSION row covers ia-version ' + VER + ' (the quality-run labels have no ruled text here, so P4, P5 and the Q rows are void)', false, 'no row');
 const HARD = HARD_ROW ? HARD_ROW.re : /(?!)/;
 let hardSeen = 0, p5reach = 0;
@@ -121,11 +122,11 @@ for(const mk of Object.keys(MIX)) for(const rest of [['sun','wed'], ['sat','sun'
   const eveHard = [1, 2].map(k => flat[ti - k]).filter(Boolean).filter(x => { const c = p.weeks[x.w][x.d] && p.weeks[x.w][x.d].cardio; return c && c.type === 'run' && HARD.test(c.subtype || ''); }).map(x => 'W' + x.w + ' ' + x.d);
   ok(`P5 ${tag}: no INT or CHI run at T-1 or T-2`, eveHard.length === 0, eveHard.join(','));
   const moved = [];
-  flat.slice(0, ti).forEach((x, i) => { if(VER >= ERA214 && i === ti - 1) return;   // D158: the eve is the shakeout's
+  flat.slice(0, ti).forEach((x, i) => { if(SV.cmp(VER, ERA214) >= 0 && i === ti - 1) return;   // D158: the eve is the shakeout's
     const a = pre.weeks[x.w] && pre.weeks[x.w][x.d] && pre.weeks[x.w][x.d].cardio;
     if(a && a.type !== 'run'){ const b = p.weeks[x.w][x.d] && p.weeks[x.w][x.d].cardio; if(canon(a) !== canon(b)) moved.push('W' + x.w + ' ' + x.d + ' ' + a.type); } });
   const notRest = DAYS.slice(wd + 1).filter(d => !(p.weeks[tw][d] && p.weeks[tw][d].rest));
-  ok(`P6 ${tag}: bike and swim cards before the test day untouched${VER >= ERA214 ? ' except the eve (D158)' : ''}, every day after it rests`, moved.length === 0 && notRest.length === 0,
+  ok(`P6 ${tag}: bike and swim cards before the test day untouched${SV.cmp(VER, ERA214) >= 0 ? ' except the eve (D158)' : ''}, every day after it rests`, moved.length === 0 && notRest.length === 0,
      'moved ' + (moved.join(',') || 'none') + '; not resting ' + (notRest.join(',') || 'none'));
 }
 
@@ -133,7 +134,7 @@ ok(`P5z the quality-run matcher (${HARD_ROW ? HARD_ROW.ruling : 'NO ROW'}) sees 
 
 // ══ V208 slice 0: Q0-Q7 (see header) ═════════════════════════════════════════════════
 const ERA208 = 208, QROWS = ['Q0','Q1','Q2','Q3','Q4','Q5','Q7','Q8','Q9','Q9x'];
-if(VER < ERA208){ QROWS.forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates the D106a fix-forward (V' + ERA208 + ')')); done(); }
+if(SV.cmp(VER, ERA208) < 0){ QROWS.forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates the D106a fix-forward (V' + ERA208 + ')')); done(); }
 const { progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
 const EASY = c => !!c && c.type === 'run' && !c.legLoad && /^Long Slow Distance/.test(c.subtype || '');
 const LONGC = c => !!c && c.type === 'run' && !!c.legLoad && /^Long Slow Distance/.test(c.subtype || '');
@@ -170,7 +171,7 @@ for(const gk of Object.keys(QGOALS)) for(const mk of Object.keys(QMIX)){
       A.reach++;
       // Q3 oracle: the pre-pin week's easy LSD as dealt, whole card (subtype, dose, detail, legLoad false).
       const ez = [...new Set(DAYS.map(d => runOf(pre.weeks[x.w][d])).filter(EASY).map(canon))];
-      if(VER >= ERA214 && k === 1){
+      if(SV.cmp(VER, ERA214) >= 0 && k === 1){
         // D158: the eve is the shakeout from the easy-run builder at the week's easy duration. The pre-pin
         // long card proves the eve is a training day, so it never rests. Oracle: the card text (plain LSD,
         // legLoad false, a distance dose keyed easy) and the pre-pin week's easy LSD distance when that
@@ -190,7 +191,7 @@ for(const gk of Object.keys(QGOALS)) for(const mk of Object.keys(QMIX)){
   ok(`Q0 ${L}: builds, and the lattice reaches the case (a pre-pin long LSD at T-1 or T-2)`, A.crash.length === 0 && A.reach > 0, 'crash ' + A.crash.slice(0, 2).join('; ') + ' reach ' + A.reach);
   ok(`Q1 ${L}: no run card at T-1 or T-2 has legLoad true (${A.eveRuns} eve run cards)`, A.llEve.length === 0, A.llEve.length + ': ' + A.llEve.slice(0, 3).join('; '));
   ok(`Q2 ${L}: every Shakeout day's run card is the easy LSD, legLoad false (${A.shk} Shakeout days)`, A.shk > 0 && A.shkBad.length === 0, A.shkBad.length + '/' + A.shk + ': ' + A.shkBad.slice(0, 3).join('; '));
-  ok(`Q3 ${L}: ${VER >= ERA214 ? "a long LSD dealt at T-1 became the shakeout from the easy-run builder at the week's easy duration; at T-2 it became" : 'a long LSD dealt at T-1 or T-2 became'} the week's pre-pin easy LSD card, dose and all (${A.repl} replaced, ${A.rest} rest, of ${A.reach})`,
+  ok(`Q3 ${L}: ${SV.cmp(VER, ERA214) >= 0 ? "a long LSD dealt at T-1 became the shakeout from the easy-run builder at the week's easy duration; at T-2 it became" : 'a long LSD dealt at T-1 or T-2 became'} the week's pre-pin easy LSD card, dose and all (${A.repl} replaced, ${A.rest} rest, of ${A.reach})`,
      A.reach > 0 && A.replBad.length === 0, A.replBad.length + ': ' + A.replBad.slice(0, 3).join('; '));
   ok(`Q8 ${L}: T-1 and T-2 carry no lift section (${A.eveDays} eve days; coach: the 1-2 week lift re-deal is a ruled consequence, only this is asserted)`, A.eveDays > 0 && A.liftEve.length === 0, A.liftEve.length + ': ' + A.liftEve.slice(0, 3).join('; '));
 }
@@ -238,7 +239,7 @@ for(const gk of Object.keys(QGOALS)) for(const mk of Object.keys(QMIX)){
 // to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
 // the D106a fix-forward (standing ruling 4).
 { let hm; try { hm = progDigest(IA.buildProgram(clone(IA.fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
-  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  const eraV = SV.parse(IA.version), eraHas = SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) !== undefined, eraRow = eraHas ? SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) : undefined;
   ok('Q7 HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (ruled unmoved: no NRC card moves)',
      eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 // ══ V214 close C: Q9 / Q9x, B4's T-2 limb (from ia-version 214) ═══════════════════════════════
@@ -249,7 +250,7 @@ for(const gk of Object.keys(QGOALS)) for(const mk of Object.keys(QMIX)){
 // true, a TIME TRIAL). The lattice adds week-1 tests and a Wed/Thu/Fri rest calendar, where B4 fires.
 // Q9x: gatekeeper's example, typed: training Mon, Tue, Sat, Sun; test Thursday of week 1; T-2 is W1
 // Tue, dealt an INT or CHI before the pin; it prints the week's easy LSD and nothing hard.
-if(VER < ERA214) ['Q9','Q9x'].forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates D158 (V' + ERA214 + '); B4 owned T-1 as well there'));
+if(SV.cmp(VER, ERA214) < 0) ['Q9','Q9x'].forEach(r => console.log('SKIP ' + r + ' ia-version ' + VER + ' predates D158 (V' + ERA214 + '); B4 owned T-1 as well there'));
 else {
   const HARDC = c => !!c && c.type === 'run' && (HARD.test(c.subtype || '') || /TIME TRIAL/.test(c.subtype || '') || (!!c.legLoad && /^Long Slow Distance/.test(c.subtype || '')));
   const cardsOf = x => [].concat((x && x.cardio) || []).filter(Boolean);

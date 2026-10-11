@@ -70,6 +70,7 @@ class PinnedDate extends RealDate { constructor(...a){ if(a.length === 0) super(
 globalThis.Date = PinnedDate;
 
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const BASEFILE = process.argv[3] ? path.resolve(process.argv[3]) : null;
@@ -82,16 +83,16 @@ const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l + (g === undefi
 const done = () => { console.log('  runtime ' + ((RealDate.now() - t0) / 1000).toFixed(1) + ' s'); console.log('NA ' + na); console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
 
 let IA = null, STAMP = NaN;
-try { IA = H.load(ART); STAMP = +IA.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { IA = H.load(ART); STAMP = SV.parse(IA.version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let VER = STAMP;
-if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
   VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 } else if(process.env.IA_ASSUME_VERSION !== undefined){
   console.log('IA_ASSUME_VERSION=' + process.env.IA_ASSUME_VERSION + ' IGNORED (it lifts only a file stamped exactly ' + (ERA - 1) + ' to ' + ERA + ')');
 }
-const D188 = VER >= ERA;
+const D188 = SV.cmp(VER, ERA) >= 0;
 const TAG = D188 ? 'D188' : 'era truth V225';
-console.log('g226 D188 beginnermile | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | rows assert ' + (D188 ? 'the D188 after-state' : 'the V225 truth'));
+console.log('g226 D188 beginnermile | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : '') + ' | rows assert ' + (D188 ? 'the D188 after-state' : 'the V225 truth'));
 
 // ── hand tables and typed literals ─────────────────────────────────────────────────────────────
 const clk = s => Math.floor(s / 60) + ':' + String(Math.round(s) % 60).padStart(2, '0');
@@ -263,13 +264,13 @@ for(const goal of ['run_pace_goal', 'run_5k', 'run_half', 'run_base']){
 console.log('\nG2 no-mile identity: beginner, no mile, x 6 goals x ' + SEEDS.length + ' seeds (' + TAG + ')');
 let BASE = null, baseWhy = '';
 if(D188){
-  if(BASEFILE && fs.existsSync(BASEFILE)){ try { const b = H.load(BASEFILE); if(+b.version === 225){ BASE = b; baseWhy = 'argv ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 225; '; } catch(e){ baseWhy = 'argv baseline failed to boot: ' + e.message + '; '; } }
+  if(BASEFILE && fs.existsSync(BASEFILE)){ try { const b = H.load(BASEFILE); if(SV.cmp(b.version, 225) === 0){ BASE = b; baseWhy = 'argv ' + BASEFILE; } else baseWhy = 'argv baseline reads ' + b.version + ', not 225; '; } catch(e){ baseWhy = 'argv baseline failed to boot: ' + e.message + '; '; } }
   if(!BASE){
     const f = path.join(os.tmpdir(), 'g226_d188_v225_' + process.pid + '.html');
     try {
       try { fs.unlinkSync(f); } catch(e){}
       fs.writeFileSync(f, cp.execFileSync('git', ['-C', ROOT, 'show', V225_COMMIT + ':index.html'], { maxBuffer: 1 << 27 }));
-      const b = H.load(f); if(+b.version === 225){ BASE = b; baseWhy += 'git ' + V225_COMMIT.slice(0, 7); } else baseWhy += 'git copy reads ' + b.version;
+      const b = H.load(f); if(SV.cmp(b.version, 225) === 0){ BASE = b; baseWhy += 'git ' + V225_COMMIT.slice(0, 7); } else baseWhy += 'git copy reads ' + b.version;
     } catch(e){ baseWhy += 'git show failed: ' + String(e.message).slice(0, 80); }
     try { fs.unlinkSync(f); } catch(e){}
   }

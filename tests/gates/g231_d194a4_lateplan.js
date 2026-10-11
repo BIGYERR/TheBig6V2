@@ -57,6 +57,7 @@ const crypto = require('crypto');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const { load } = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 
 const ERA = 230, RMAX = 8, POOL = 4, WORKER_TIMEOUT_MS = 300000;
 const START = '2026-08-24';
@@ -231,10 +232,10 @@ const NJOBS = PRES.length * CELLS.length;
 async function main(){
   // ── LOAD + VERSION ──
   let VER = NaN, TEXT = '';
-  try { const IA = load(ART); VER = +IA.version; TEXT = fs.readFileSync(ART, 'utf8'); }
+  try { const IA = load(ART); VER = SV.parse(IA.version); TEXT = fs.readFileSync(ART, 'utf8'); }
   catch(e){ P('FAIL boot: ' + String(e && e.message || e).slice(0, 200)); fail++; ORDER.forEach(k => ok(R[k] + ' (candidate did not boot)', false)); return; }
   P('g231 D194 Amendment 5 late-plan boot | candidate ' + ART + ' sha256 ' + sha(TEXT) + ' ia-version ' + VER);
-  if(!(VER >= ERA)){ P('REFUSED: ia-version ' + VER + ' predates the whole-day boot re-filter under _dayPlanCfg (V' + ERA + ', D194 part 2). No row may pass on it.');
+  if(!(SV.cmp(VER, ERA) >= 0)){ P('REFUSED: ia-version ' + VER + ' predates the whole-day boot re-filter under _dayPlanCfg (V' + ERA + ', D194 part 2). No row may pass on it.');
     ORDER.forEach(k => ok(R[k] + ' (REFUSED)', false)); return; }
   // ── THE IN-GATE S32 TREE (a4-ctl) ──
   const CTL = { file:null, ok:false, why:'' };
@@ -254,7 +255,7 @@ async function main(){
   P('  shard wall ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s');
   C.err.slice(0, 4).forEach(x => P('    ERR C ' + x.pres + ' ' + x.k + ' ' + x.err));
   if(Q) Q.err.slice(0, 4).forEach(x => P('    ERR ctl ' + x.pres + ' ' + x.k + ' ' + x.err));
-  const vcj = k => [k + '-ver', VER >= ERA, 'ia-version ' + VER + ' >= ' + ERA];
+  const vcj = k => [k + '-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + ' >= ' + ERA];
   const complete = (S, k, tag) => [k + '-complete', S.n === NJOBS && S.err.length === 0, (tag || 'candidate') + ' shard ' + (S.n - S.err.length) + '/' + NJOBS + ' (presentation, cell) jobs without error'];
   const rows = {
     'a4-dedupe': () => { const cj = [vcj('a4-dedupe'), complete(C, 'a4-dedupe'), ['a4-dedupe-judged', C.judged > 0, C.judged + ' judged days (' + eqT(C.judged, TYPED_JUDGED) + ', INFO)']];

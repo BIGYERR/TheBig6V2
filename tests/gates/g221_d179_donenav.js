@@ -56,6 +56,7 @@
 process.env.TZ = 'America/New_York';
 const path = require('path');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const { load } = H;
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -187,13 +188,13 @@ function mkEnv(file){
 // ── RUN ──────────────────────────────────────────────────────────────────────
 const t0 = Date.now();
 let E, STAMP = NaN;
-try { E = mkEnv(ART); STAMP = +E.IA.version; } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
+try { E = mkEnv(ART); STAMP = SV.parse(E.IA.version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let VER = STAMP;
-if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
   VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a pre-bump development run, not a ship proof');
 }
-console.log('g221 D179 | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : '') + ' | HALF_MANNY ' + E.TRAIN.length + ' training days');
-if(!(VER >= ERA)){
+console.log('g221 D179 | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : '') + ' | HALF_MANNY ' + E.TRAIN.length + ' training days');
+if(!(SV.cmp(VER, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + VER + ' predates D179 P-DONENAV (V' + ERA + '). No row may pass on it.');
   Object.keys(R).forEach(k => ok(R[k] + ' (REFUSED)', false));
   done();
@@ -306,7 +307,7 @@ function wrapSync(){
 }
 function wheelCase(layoutLoss, st, undo){
   const [w, d] = runDay; E.fresh(w, d);
-  const ws = VER >= 236 ? wrapSync() : null;   // V236 (D218): W1 setup only; VER <= 235 never syncs
+  const ws = SV.cmp(VER, 236) >= 0 ? wrapSync() : null;   // V236 (D218): W1 setup only; VER <= 235 never syncs
   if(undo){ E.open(d); if(ws) ws.sync(); E.tap(d, st); ev('popClose()'); }
   E.open(d); els.log_run_pace.value = W_SEED;
   if(ws) ws.sync();
@@ -345,7 +346,7 @@ const seededOk = r => r.seeded[0] === W_SEED_ROWS[0] && r.seeded[1] === W_SEED_R
 if(runDay){
   for(const ll of [false, true]) for(const st of ['complete', 'skipped']){ const r = wheelCase(ll, st, false);
     rec('W1', seededOk(r) && r.atTap === W_SETTLED && r.later === W_SETTLED, st + (ll ? ' layout-loss' : '') + ' ' + JSON.stringify(r)); }
-  if(VER <= 235) for(const st of ['complete', 'skipped']){ const r = wheelCase(false, st, true);
+  if(SV.cmp(VER, 235) <= 0) for(const st of ['complete', 'skipped']){ const r = wheelCase(false, st, true);
     rec('W2', seededOk(r) && r.atTap === W_SEED && r.later === W_SETTLED && r.open, 'undo ' + st + ' ' + JSON.stringify(r)); }
   // V236 (D218): per seed. Stored 9:30 is LIVE: the undo tap saves the form unflushed (9:30), the settle stores 10:30.
   // DOM-only 9:30 is DRAFT: nothing reaches run_pace at the tap or after; the settle lands on the hidden node, 10:30.
@@ -354,7 +355,7 @@ if(runDay){
     rec('W2', seededOk(r) && want && r.open, 'undo ' + st + ' ' + JSON.stringify(r)); }
 }
 row('W1', () => runDay ? tally('W1', 4) : [false, 'no training day renders a log_run_pace wheel']);
-row('W2', () => runDay ? tally('W2', VER >= 236 ? 4 : 2) : [false, 'no training day renders a log_run_pace wheel']);
+row('W2', () => runDay ? tally('W2', SV.cmp(VER, 236) >= 0 ? 4 : 2) : [false, 'no training day renders a log_run_pace wheel']);
 console.log('  timer and wheel done (wheel day ' + JSON.stringify(runDay) + ') | ' + ((Date.now() - t0) / 1000).toFixed(1) + ' s');
 
 // ---- A: hero and strip (S7). A mark here pops, closes if still open, and lets toasts run out: the hero rows read the

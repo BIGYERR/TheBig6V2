@@ -47,6 +47,7 @@
 
 const path = require('path');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const FILE = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 
@@ -144,25 +145,25 @@ console.log('g203_mile_pencil  (D116 — the mile pencil)  artifact ia-version '
 
 // ── 0. the version predicate ──────────────────────────────────────────────────
 const RULING_V = 203;
-const artifactV = +IA.version;
+const artifactV = SV.parse(IA.version);
 // ERA PREDICATE for the re-keyed rows (standing rulings 2 and 4): section 3's D182 race-date rows and
 // section 6's D183 refusal strings read one version, eraV. IA_ASSUME_VERSION=223 lifts a file stamped
 // exactly 222 to 223 for a discrimination run; it is announced and ignored on any other stamp. The D116
 // predicate and the era-row digest read the stamp, never eraV.
 const REKEY_ASSUME = 223;
-const eraV = (process.env.IA_ASSUME_VERSION === String(REKEY_ASSUME) && artifactV === REKEY_ASSUME - 1) ? REKEY_ASSUME : artifactV;
-if(eraV !== artifactV) console.log('ASSUMED ia-version ' + eraV + ' on a file stamped ' + artifactV + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
+const eraV = (process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, REKEY_ASSUME) === 0 && SV.cmp(artifactV, REKEY_ASSUME - 1) === 0) ? REKEY_ASSUME : artifactV;
+if(SV.cmp(eraV, artifactV) !== 0) console.log('ASSUMED ia-version ' + eraV + ' on a file stamped ' + artifactV + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 const D183_ERA = 223;
-const MILE_MSG_TAG = eraV >= D183_ERA ? 'D183' : 'D9';
-const MILE_MSG_ERA = eraV >= D183_ERA
+const MILE_MSG_TAG = SV.cmp(eraV, D183_ERA) >= 0 ? 'D183' : 'D9';
+const MILE_MSG_ERA = SV.cmp(eraV, D183_ERA) >= 0
   ? 'D183 era (ia-version ' + eraV + ' >= ' + D183_ERA + '): P-SAFEPACE amendment 2 (e) strings'
   : 'D9 era (ia-version ' + eraV + ' <= ' + (D183_ERA - 1) + '): V176 (D9) strings';
-const MSG_UNDER_3 = eraV >= D183_ERA ? MSG_UNDER_3_D183 : MSG_UNDER_3_D9;
+const MSG_UNDER_3 = SV.cmp(eraV, D183_ERA) >= 0 ? MSG_UNDER_3_D183 : MSG_UNDER_3_D9;
 // D189 era (ia-version >= 226, P-PACEDISCLOSE F4): the over-25:00 string stops recommending a blank; the
 // under-3:00 string is untouched by D189 and keeps its D183 era above.
 const D189_ERA = 226;
-const OVER_25_TAG = eraV >= D189_ERA ? 'D189' : MILE_MSG_TAG;
-const MSG_OVER_25 = eraV >= D189_ERA ? MSG_OVER_25_D189 : eraV >= D183_ERA ? MSG_OVER_25_D183 : MSG_OVER_25_D9;
+const OVER_25_TAG = SV.cmp(eraV, D189_ERA) >= 0 ? 'D189' : MILE_MSG_TAG;
+const MSG_OVER_25 = SV.cmp(eraV, D189_ERA) >= 0 ? MSG_OVER_25_D189 : SV.cmp(eraV, D183_ERA) >= 0 ? MSG_OVER_25_D183 : MSG_OVER_25_D9;
 const SURFACE = {
   'openMileSheet declared':      typeof IA.eval('typeof openMileSheet === "function" ? openMileSheet : undefined') === 'function',
   'commitMileChange declared':   typeof IA.eval('typeof commitMileChange === "function" ? commitMileChange : undefined') === 'function',
@@ -174,7 +175,7 @@ const SURFACE = {
 const missing = Object.keys(SURFACE).filter(k => !SURFACE[k]);
 
 console.log('\n0. version predicate (D116 ships on ia-version ' + RULING_V + ')');
-if(artifactV >= RULING_V){
+if(SV.cmp(artifactV, RULING_V) >= 0){
   Object.keys(SURFACE).forEach(k => ok('at ia-version ' + artifactV + ' the D116 surface MUST exist: ' + k, SURFACE[k]));
   if(missing.length){
     console.log('\nD116 surface is MISSING at or above its ruling version. Rows above are the report.');
@@ -234,10 +235,10 @@ ok('no re-paced draft wording survives', !/re-pace/i.test(doc.getElementById('mi
 //     by days-from-civil. The host clock supplies today's local y/m/d and nothing else.
 const raceDate = IA.fixtures.HALF_MANNY.raceDate;
 const D182_ERA = 223;
-const RACEDATE_ERA = eraV >= D182_ERA
+const RACEDATE_ERA = SV.cmp(eraV, D182_ERA) >= 0
   ? 'D182 era (ia-version ' + eraV + ' >= ' + D182_ERA + '): hand y/m/d oracle, weekday date, local-parse Days out'
   : 'pre-D182 era (ia-version ' + eraV + ' <= ' + (D182_ERA - 1) + '): UTC-parse oracle, bare month/day/year';
-if(eraV < D182_ERA){
+if(SV.cmp(eraV, D182_ERA) < 0){
   const rd = new Date(raceDate); rd.setHours(0,0,0,0);
   const t0 = new Date(); t0.setHours(0,0,0,0);
   const wantDaysOut = String(Math.round((rd - t0) / MS_DAY));
@@ -281,7 +282,7 @@ const mkProg = cfg => ({ id:'gQ', name:'n', totalWeeks:14, startDate:startDateFo
 // "run_base gains the Run paces group (Mile, Recovery), the sentence, the clipboard line and a pencil"),
 // both typed from tests/measure/v226_rulings/d188_d189_ruling.md.
 const D188_ERA = 226;
-const PENCIL_D188 = eraV >= D188_ERA;
+const PENCIL_D188 = SV.cmp(eraV, D188_ERA) >= 0;
 const PENCIL_GRID = [
   { label: 'run_half / intermediate (chart-reading anchor)', cfg: {}, pencils: 1 },
   PENCIL_D188
@@ -404,9 +405,9 @@ console.log('\n9. D116 is UI and cfg-write only: HALF_MANNY must not move');
 // digest is exactly the duplication the ceiling ruling exists to kill, and the copy
 // that drifts is always the one a gate keeps privately. Row existence is a CONJUNCT
 // below, so a missing row fails loudly rather than making this comparison vacuous.
-const D116_ENTRY_DIGEST = H.MANNY_DIGEST_BY_VERSION[IA.version];
+const D116_ENTRY_DIGEST = SV.lookup(H.MANNY_DIGEST_BY_VERSION, IA.version);
 ok('MANNY_DIGEST_BY_VERSION has a row for ia-version ' + IA.version,
-   !!H.MANNY_DIGEST_BY_VERSION[IA.version], String(H.MANNY_DIGEST_BY_VERSION[IA.version]));
+   !!SV.lookup(H.MANNY_DIGEST_BY_VERSION, IA.version), String(SV.lookup(H.MANNY_DIGEST_BY_VERSION, IA.version)));
 eq('HALF_MANNY digest unmoved by D116 (pinned to the V' + IA.version + ' era row)',
    H.progDigest(IA.buildProgram(IA.fixtures.HALF_MANNY)), D116_ENTRY_DIGEST);
 
@@ -415,6 +416,6 @@ IA.buildProgram(IA.fixtures.HALF_MANNY);
 eq('buildProgram left cfg byte-identical (no _racePin, no scratch)', JSON.stringify(IA.fixtures.HALF_MANNY), cfgBefore);
 
 console.log('\nERA race-date rows: ' + RACEDATE_ERA);
-console.log('ERA mile validator strings: ' + MILE_MSG_ERA + (eraV >= D189_ERA ? '; over-25:00 is D189 era (ia-version ' + eraV + ' >= ' + D189_ERA + '): P-PACEDISCLOSE F4' : ''));
+console.log('ERA mile validator strings: ' + MILE_MSG_ERA + (SV.cmp(eraV, D189_ERA) >= 0 ? '; over-25:00 is D189 era (ia-version ' + eraV + ' >= ' + D189_ERA + '): P-PACEDISCLOSE F4' : ''));
 console.log('PASS ' + pass + ' FAIL ' + fail);
 process.exit(fail ? 1 : 0);

@@ -52,6 +52,7 @@
 'use strict';
 const path = require('path'), cp = require('child_process');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 223;
@@ -92,13 +93,13 @@ if(!process.env.G223_ZONE){
   S.declare(DECL.map(d => d[0]));
   const failAll = (why, detail) => { for(const [id, l] of DECL) S.fail(id, l + ' (' + why + ')', detail); S.summary(); };
   let STAMP = NaN;
-  try { STAMP = +H.load(ART).version; } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
+  try { STAMP = SV.parse(H.load(ART).version); } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
   let VER = STAMP;
-  if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+  if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   }
-  console.log('g223 D182 racedate | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
-  if(!(VER >= ERA)){
+  console.log('g223 D182 racedate | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : ''));
+  if(!(SV.cmp(VER, ERA) >= 0)){
     console.log('REFUSED: ia-version ' + VER + ' predates D182 P-RACEDATE (V' + ERA + '). No row may pass on it.');
     failAll('REFUSED');
   }

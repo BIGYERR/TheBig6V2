@@ -90,6 +90,7 @@ const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const { load, DAYS } = H;
 
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
@@ -228,17 +229,17 @@ function row(key, cj){ cj.forEach(([n, c, d]) => P('    ' + key + ' ' + n + ' ' 
 
 // ── LOAD + VERSION ───────────────────────────────────────────────────────────────────────
 let IA, VER = NaN, CAND_TEXT = '';
-try { IA = load(ART); VER = +IA.version; CAND_TEXT = fs.readFileSync(ART, 'utf8'); }
+try { IA = load(ART); VER = SV.parse(IA.version); CAND_TEXT = fs.readFileSync(ART, 'utf8'); }
 catch(e){ P('FAIL boot: ' + String(e && e.message || e).slice(0, 200)); fail++; ORDER.forEach(k => ok(R[k] + ' (candidate did not boot)', false)); done(); }
-P('g231 D197 P-FILTERLAST | candidate ' + ART + ' ia-version ' + VER + (VER >= ERA ? '' : ' (below ' + ERA + ': every row runs and must FAIL by its own conjuncts)'));
+P('g231 D197 P-FILTERLAST | candidate ' + ART + ' ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? '' : ' (below ' + ERA + ': every row runs and must FAIL by its own conjuncts)'));
 let BF = null, baseWhy = '';
 if(BASEFILE){
   if(!fs.existsSync(BASEFILE)) baseWhy = 'argv[3] ' + BASEFILE + ' missing; ';
-  else { try { const b = load(BASEFILE); if(+b.version === BASE_ERA){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot; '; } }
+  else { try { const b = load(BASEFILE); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = BASEFILE; baseWhy = 'argv[3] ' + BASEFILE; } else baseWhy = 'argv[3] reads ia-version ' + b.version + ', not ' + BASE_ERA + '; '; } catch(e){ baseWhy = 'argv[3] failed to boot; '; } }
 } else baseWhy = 'no argv[3]; ';
 if(!BF){
   try { const f = tmpWrite('v230', cp.execFileSync('git', ['-C', ROOT, 'show', V230_COMMIT + ':index.html'], { maxBuffer:1 << 27 }));
-    const b = load(f); if(+b.version === BASE_ERA){ BF = f; baseWhy += 'git show ' + V230_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
+    const b = load(f); if(SV.cmp(b.version, BASE_ERA) === 0){ BF = f; baseWhy += 'git show ' + V230_COMMIT + ':index.html written to ' + f + ' (fallback)'; } else baseWhy += 'git copy reads ia-version ' + b.version + ', not ' + BASE_ERA;
   } catch(e){ baseWhy += 'git show failed: ' + String(e && e.message || e).slice(0, 80); }
 }
 P('  V' + BASE_ERA + ' baseline: ' + (BF ? 'LIVE (' + baseWhy + ')' : 'SETUP FAILED (' + baseWhy + ')'));
@@ -246,7 +247,7 @@ P('  V' + BASE_ERA + ' baseline: ' + (BF ? 'LIVE (' + baseWhy + ')' : 'SETUP FAI
 // ── ROW D197-a ────────────────────────────────────────────────────────────────────────
 function rowA(){
   const cj = [];
-  cj.push(['a-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['a-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   // the expected candidate card: the typed V230 card with the ruled detail moved RPE 8 -> RPE 7 (exactly one hit)
   const EXP = {}, derBad = [];
   for(const k of Object.keys(A_CARD)){ const c = clone(A_CARD[k]); let n = 0;
@@ -295,7 +296,7 @@ function rowA(){
 // ── ROW D197-c ────────────────────────────────────────────────────────────────────────
 function rowC(){
   const cj = [];
-  cj.push(['c-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['c-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   // the ruled cell, picked out of g215's own LAT_G
   const hits = latG().filter(x => x.eq === 'bodyweight' && x.inj && x.inj.region === 'ankle' && x.inj.tier === 'workaround' && x.cfg.seed === 4242);
   const G = hits.length === 1 ? hits[0].cfg : null;
@@ -380,7 +381,7 @@ function closeOf(s, at){ const open = s[at], shut = open === '{' ? '}' : ')'; le
 const allIdx = (s, re) => { const o = []; let m; const g = new RegExp(re.source, 'g'); while((m = g.exec(s))) o.push({ i:m.index, e:m.index + m[0].length, t:m[0] }); return o; };
 function rowL(){
   const cj = [];
-  cj.push(['L-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA]);
+  cj.push(['L-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA]);
   const opens = allIdx(CAND_TEXT, /<script\b[^>]*>/), shuts = allIdx(CAND_TEXT, /<\/script>/);
   const raw = (opens.length === 1 && shuts.length === 1 && shuts[0].i > opens[0].e) ? CAND_TEXT.slice(opens[0].e, shuts[0].i) : null;
   let S = null, instWhy = '';

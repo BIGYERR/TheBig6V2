@@ -64,9 +64,10 @@
 process.env.TZ = 'America/New_York';
 const path = require('path');
 const { load, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
-const VER = +IA.version;
+const VER = SV.parse(IA.version);
 const D106A_ERA = 207;
 
 let pass = 0, fail = 0, skip = 0;
@@ -84,7 +85,7 @@ const ROWS = ['Z0','H1','H2','H3','H4','H5','H6','H7','H8','H9','F1','F2','F3',
   'T1..T8 (a hand series, b Taper set, c dip set, f finite)',
   'D1','D2','D3','D4','D5','D6','D7','D8','D9','D10','D11',
   'G1','G2','G3','G4','G4b','G4c','G5','G6','G7'];
-if(VER < D106A_ERA){
+if(SV.cmp(VER, D106A_ERA) < 0){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D106a (V' + D106A_ERA + ').');
   for(const r of ROWS) skipRow(r + ' skipped below the D106a era');
   summary();
@@ -103,7 +104,7 @@ const RUN_CARD_ERAS = [
   { hi: 207, name: { int: /^Interval \(INT\)/, chi: /^Continuous High Intensity \(CHI\)/ }, key: null },
   { lo: 208, name: { int: /^Short Interval \(SI\)/, chi: /^Long Interval \(LI\)/ }, key: { int: 'int', chi: 'chi' } }
 ];
-const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || VER >= r.lo) && (r.hi === undefined || VER <= r.hi));
+const CARD_ROWS = RUN_CARD_ERAS.filter(r => (r.lo === undefined || SV.cmp(VER, r.lo) >= 0) && (r.hi === undefined || SV.cmp(VER, r.hi) <= 0));
 if(CARD_ROWS.length !== 1){
   ok('E0 ia-version ' + VER + ' reads its run cards through exactly one era row', false, CARD_ROWS.length + ' rows match');
   summary();
@@ -277,7 +278,7 @@ for(const [lab, tw, date] of [['D8a three-run tw1', 1, '2026-09-27'], ['D8b thre
   // V213 (D113a) ERA ROWS (standing ruling 4). Through 212 the three-run week is easy / INT / long and
   // the row below is the one D106a shipped. From 213 it is INT / CHI / long, so the premise is gone by
   // ruling and the row asserts what D106a's hierarchy does with the new week.
-  if(VER <= 212)
+  if(SV.cmp(VER, 212) <= 0)
   ok(lab + ' Sunday test: premise holds (no CHI dealt, INT on Mon); the trial is on Sun, Mon rests, no INT left, both LSDs kept',
      !preQ.some(q => q === 'chi') && preQ[0] === 'int'
        && JSON.stringify(trials(p)) === JSON.stringify([tw + 'sun']) && !!wk.mon && !!wk.mon.rest
@@ -304,7 +305,7 @@ for(const [lab, tw, date] of [['D8a three-run tw1', 1, '2026-09-27'], ['D8b thre
 // calendar is one of D113a's 7 spacer calendars (g213 derives them from the D130 text); the premise is
 // asserted in the row, so a week that stops dealing the fallback fails here by name.
 for(const [lab, tw, date] of [['D8c spacer Mon/Tue/Wed tw1', 1, '2026-09-24'], ['D8d spacer Mon/Tue/Wed tw2', 2, '2026-10-01']]){
-  if(VER < 213){ skipRow(lab + ' is a D113a-era row (the spacer fallback ships on ia-version 213)'); continue; }
+  if(SV.cmp(VER, 213) < 0){ skipRow(lab + ' is a D113a-era row (the spacer fallback ships on ia-version 213)'); continue; }
   const restS = ['thu','fri','sat','sun'];
   const p = build(pinned({restDays:restS, _raceDateCappedWeeks:tw, _testWeek:tw, raceDate:date}));
   const pre = build(pinned({restDays:restS, _raceDateCappedWeeks:tw, raceDate:date}));
@@ -330,7 +331,7 @@ for(const [lab, tw, date] of [['D8c spacer Mon/Tue/Wed tw1', 1, '2026-09-24'], [
 // to a later digest would be the vacuous line standing ruling 3 forbids; the row stays keyed to
 // D106a (standing ruling 4).
 { let hm; try { hm = progDigest(IA.buildProgram(JSON.parse(JSON.stringify(IA.fixtures.HALF_MANNY)))); } catch(e){ hm = 'CRASH ' + e.message; }
-  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  const eraV = SV.parse(IA.version), eraHas = SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) !== undefined, eraRow = eraHas ? SV.lookup(MANNY_DIGEST_BY_VERSION, eraV) : undefined;
   ok('D9 HALF_MANNY digest is the era row MANNY_DIGEST_BY_VERSION[' + eraV + '] = ' + eraRow + ' (D106a moves no NRC card)',
      eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && hm === eraRow, hm + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT')); }
 function markerDays(p){

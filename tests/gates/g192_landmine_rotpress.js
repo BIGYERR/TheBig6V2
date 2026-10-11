@@ -33,6 +33,7 @@ const path = require('path');
 const fs = require('fs');
 const ROOT = path.resolve(__dirname, '..', '..');
 const { load } = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const FILE = process.argv[2] || path.join(ROOT, 'index.html');
 const IA = load(FILE);
 const SRC = fs.readFileSync(FILE, 'utf8');
@@ -140,11 +141,11 @@ else bad('G4b the rule sits ABOVE the core-exempt alternation', 'new@' + iNew + 
 // inside the _REP_FLOOR table, and only while that regex's other alternatives carry no landmine or press token. The
 // same literal outside the table, the literal on a file below 221, and any other loosened landmine-press regex still
 // fail G4c. The scan itself is unchanged: it sees only regex literals carrying both landmine and press.
-const VER = +IA.version;
+const VER = SV.parse(IA.version);
 const RR4_LIT = 'landmine (reverse lunge|rotational press)';
 const RF_AT = noComments.indexOf('const _REP_FLOOR=['), RF_END = RF_AT < 0 ? -1 : noComments.indexOf('\n];', RF_AT);
 function rr4Licensed(r, at){
-  if(!(VER >= 221) || RF_AT < 0 || RF_END < 0 || !(at > RF_AT && at < RF_END)) return false;
+  if(!(SV.cmp(VER, 221) >= 0) || RF_AT < 0 || RF_END < 0 || !(at > RF_AT && at < RF_END)) return false;
   const side = r.slice(1, -1).split(RR4_LIT);
   if(side.length !== 2) return false;
   if(!(side[0] === '' || side[0].slice(-1) === '|') || !(side[1] === '' || side[1].charAt(0) === '|')) return false;

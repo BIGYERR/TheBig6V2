@@ -55,15 +55,16 @@
 'use strict';
 const path = require('path'), fs = require('fs');
 const { load, progDigest, fixtures, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
-const VER = +IA.version, ERA = 208;
+const VER = SV.parse(IA.version), ERA = 208;
 let pass = 0, fail = 0;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skip = l => console.log('SKIP ' + l);
 const done = () => { console.log('\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
 const ROWS = ['R0','R0b','R1','R2','R3','R4','R5','R6','R8a','M1'];
-if(VER < ERA){ ROWS.forEach(r => skip(r + ' ia-version ' + VER + ' predates D104a (V' + ERA + ')')); done(); }
+if(SV.cmp(VER, ERA) < 0){ ROWS.forEach(r => skip(r + ' ia-version ' + VER + ' predates D104a (V' + ERA + ')')); done(); }
 
 const BASE = 'Nothing heavy lands on your long run or the day before it. Your lifting days were placed around it.';
 const STEADY_DEAD = 'Your hinge day rides your steady run so hard days stay hard.';
@@ -187,7 +188,7 @@ ok('R4 the run_base note obeys the copy rule: two short sentences, no mid-senten
 // standing ruling 5 governs, so the row compares the built digest to MANNY_DIGEST_BY_VERSION[ia-version]
 // and fails loudly when that row is absent. Re-pointing the literal to a later digest would be the
 // vacuous line standing ruling 3 forbids; deleting the row would be an unruled removal.
-{ const row = MANNY_DIGEST_BY_VERSION[VER], rowOk = typeof row === 'string' && /^[0-9a-f]{16}$/.test(row);
+{ const row = SV.lookup(MANNY_DIGEST_BY_VERSION, VER), rowOk = typeof row === 'string' && /^[0-9a-f]{16}$/.test(row);
   let hm; try { hm = progDigest(IA.buildProgram(clone(fixtures.HALF_MANNY))); } catch(e){ hm = 'CRASH ' + e.message; }
   ok('M1 HALF_MANNY digest equals its era row MANNY_DIGEST_BY_VERSION[' + VER + '] = ' + row + ', and that row exists (NRC: D104a does not reach it)',
      rowOk && hm === row, rowOk ? hm : 'NO ERA ROW for ia-version ' + VER + ' (built ' + hm + ')'); }

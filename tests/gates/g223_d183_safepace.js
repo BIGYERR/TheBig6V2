@@ -93,6 +93,7 @@
 'use strict';
 const path = require('path'), cp = require('child_process'), fs = require('fs');
 const H = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 223;
@@ -101,13 +102,13 @@ const ERA = 223;
 // this gate pins. D187 moved it to {3,3,2} at V225. Read the artifact's REAL stamped ia-version
 // directly from its text (independent of the D183 ERA/IA_ASSUME_VERSION machinery below, which is
 // a different, unrelated predicate) so IMPROVE stays the rate the artifact under test actually runs.
-const RATE_STAMP = +((fs.readFileSync(ART, 'utf8').match(/<meta name="ia-version" content="(\d+)"/) || [])[1] || NaN);
+const RATE_STAMP = (s => /<meta name="ia-version" content="/.test(s) ? SV.fromHtml(s) : NaN)(fs.readFileSync(ART, 'utf8'));   // no meta: NaN, as before
 // D188 P-BEGINNERMILE / D189 P-PACEDISCLOSE (V226, tests/measure/v226_rulings/d188_d189_ruling.md), keyed on the
 // same real stamp (standing rulings 2 and 4). D188 E1 reads a beginner's mile like anyone's (the hand oracle's
 // `exp !== 'beginner' && mileSecs` -> `mileSecs`); E2 retires the beginner sentence so a beginner takes the
 // generic form (Mario (b)); D189 F5/F6: while the mile is required and blank (intermediate/advanced pace goal)
 // the feasibility line and the dated card's reach go quiet and a dated test pin keeps its week in the header.
-const D188_STAMP = RATE_STAMP >= 226;
+const D188_STAMP = !Number.isNaN(RATE_STAMP) && SV.cmp(RATE_STAMP, 226) >= 0;
 const ZONES = [['NY', 'America/New_York'], ['UTC', 'UTC']];
 const ZONE_ENV = 'G223_D183_ZONE';
 
@@ -168,13 +169,13 @@ if(!process.env[ZONE_ENV]){
   S.declare(DECL.map(d => d[0]));
   const failAll = (why, detail) => { for(const [id, l] of DECL) S.fail(id, l + ' (' + why + ')', detail); S.summary(); };
   let STAMP = NaN;
-  try { STAMP = +H.load(ART).version; } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
+  try { STAMP = SV.parse(H.load(ART).version); } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
   let VER = STAMP;
-  if(process.env.IA_ASSUME_VERSION === String(ERA) && STAMP === ERA - 1){
+  if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
     VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
   }
-  console.log('g223 D183 safepace | candidate ' + ART + ' ia-version ' + STAMP + (VER !== STAMP ? ' (assumed ' + VER + ')' : ''));
-  if(!(VER >= ERA)){
+  console.log('g223 D183 safepace | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : ''));
+  if(!(SV.cmp(VER, ERA) >= 0)){
     console.log('REFUSED: ia-version ' + VER + ' predates D183 P-SAFEPACE (V' + ERA + '). No row may pass on it.');
     failAll('REFUSED');
   }
@@ -229,7 +230,7 @@ const clk = sec => { const t = Math.round(sec); return Math.floor(t / 60) + ':' 
 // old {3,5,7} (V176 D9, R1's own "3/5/7 s/mi/week paceImprove table") is the ruled rate on every
 // artifact BEFORE that ship. Era-gated by the artifact's REAL stamp, exactly as
 // g202_pace_anchor.js's EXP_IMPROVE_BY_VERSION and g202_pace_copy.js's RATE_BY_VERSION are.
-const IMPROVE = RATE_STAMP >= 225
+const IMPROVE = !Number.isNaN(RATE_STAMP) && SV.cmp(RATE_STAMP, 225) >= 0
   ? { beginner: 3, intermediate: 3, advanced: 2 }    // D187 (V225)
   : { beginner: 3, intermediate: 5, advanced: 7 };   // V176 (D9), pre-D187
 const AGE_SCALE = { '18-35': 1.0, '36-54': 0.85, '55+': 0.65 };           // "the 0.65/0.85 age scalers"
@@ -570,7 +571,7 @@ const W5 = handWeek(TODAY, TEST);
   const fx = H.fixtures.HALF_MANNY; if(fx.seed == null) bad.push('fixture seed is not pinned');
   const d = [0, 1].map(() => tryDo(() => H.progDigest(IA.buildProgram(JSON.parse(JSON.stringify(fx))))));
   if(d[0] !== d[1]) bad.push('not self-stable ' + J(d));
-  const eraV = +IA.version, eraHas = Object.prototype.hasOwnProperty.call(H.MANNY_DIGEST_BY_VERSION, eraV), eraRow = eraHas ? H.MANNY_DIGEST_BY_VERSION[eraV] : undefined;
+  const eraV = SV.parse(IA.version), eraHas = SV.lookup(H.MANNY_DIGEST_BY_VERSION, eraV) !== undefined, eraRow = eraHas ? SV.lookup(H.MANNY_DIGEST_BY_VERSION, eraV) : undefined;
   if(!(eraHas && typeof eraRow === 'string' && /^[0-9a-f]{16}$/.test(eraRow) && d[0] === eraRow)) bad.push('digest ' + J(d[0]) + ' vs era row [' + eraV + '] ' + (eraHas ? eraRow : 'ABSENT'));
   row('HM', bad, 2, 'era row [' + eraV + '] ' + eraRow); }
 

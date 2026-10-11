@@ -93,11 +93,12 @@
 'use strict';
 const path = require('path'), fs = require('fs'), os = require('os'), cp = require('child_process');
 const { load, progDigest, fixtures } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const RAW = load(ART);
-const VER = +RAW.version, ERA = 217, V216_COMMIT = '3dc0146e735e88aafec608d0a7d0f35f67cfa5e3';
+const VER = SV.parse(RAW.version), ERA = 217, V216_COMMIT = '3dc0146e735e88aafec608d0a7d0f35f67cfa5e3';
 const LATS = ['NRC','NRC multi','NSW','injury'];
 const KNAMES = ['K0','K1 gk','K1 multi'];
 const ROWS = ['I0','F0'].concat(LATS.map(l => 'P1 ' + l), ['W1','U1','U2','C1'], KNAMES);
@@ -110,12 +111,12 @@ D160_MULTI_BY_VERSION[218] = D160_MULTI_BY_VERSION[217];   // D157: ruled UNMOVE
 let pass = 0, fail = 0, skip = 0, TMP = null;
 const ok = (l, c, g) => { if(c){ pass++; console.log('PASS ' + l); } else { fail++; console.log('FAIL ' + l + (g === undefined ? '' : ' (got ' + g + ')')); } };
 const skipRow = l => { skip++; console.log('SKIP ' + l); };
-const CALPREV = VER >= 219;   // D167: the candidate's dedupe pairs by calendar
+const CALPREV = SV.cmp(VER, 219) >= 0;   // D167: the candidate's dedupe pairs by calendar
 const ISO7 = ['mon','tue','wed','thu','fri','sat','sun'];
 const calPrev = (w, d) => { const i = ISO7.indexOf(d); return i > 0 ? { w:+w, d:ISO7[i - 1] } : { w:+w - 1, d:'sun' }; };   // Monday-start date arithmetic
 const done = () => { if(TMP) try { fs.rmSync(TMP, { recursive:true, force:true }); } catch(e){}
   console.log('\nSKIP ' + skip + '\nPASS ' + pass + ' FAIL ' + fail); process.exit(fail ? 1 : 0); };
-if(VER < ERA){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D160 (V' + ERA + ').'); ROWS.forEach(r => skipRow(r + ' below the D160 era')); done(); }
+if(SV.cmp(VER, ERA) < 0){ console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D160 (V' + ERA + ').'); ROWS.forEach(r => skipRow(r + ' below the D160 era')); done(); }
 
 // ── instrumented copies (source surgery, anchors count==1) ────────────────────────────────
 TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'g217d160-'));
@@ -137,9 +138,9 @@ const CAND = instrument(RAW.html, 'cand', true);
 if(CAND.err){ ROWS.forEach(r => ok(r + ' (' + CAND.err + ')', false)); done(); }
 let BASE = null, baseErr = '', BASE_RAW_DIGEST = null;
 { let src = null;
-  if(BASEFILE){ const b = load(BASEFILE); if(+b.version === 216) src = b.html; else baseErr = 'argv[3] reads ' + b.version; }
+  if(BASEFILE){ const b = load(BASEFILE); if(SV.cmp(b.version, 216) === 0) src = b.html; else baseErr = 'argv[3] reads ' + b.version; }
   if(!src){ const s = cp.execFileSync('git', ['show', V216_COMMIT + ':index.html'], { cwd:ROOT, maxBuffer:1 << 26 }).toString('utf8');
-    if(/ia-version" content="216"/.test(s)){ src = s; baseErr = ''; } else baseErr = 'git ' + V216_COMMIT.slice(0, 7) + ' does not read 216'; }
+    if(/<meta name="ia-version" content="/.test(s) && SV.cmp(SV.fromHtml(s), 216) === 0){ src = s; baseErr = ''; } else baseErr = 'git ' + V216_COMMIT.slice(0, 7) + ' does not read 216'; }
   if(src){ const r = instrument(src, 'v216', false); if(r.err) baseErr = r.err; else BASE = r.X;
     if(BASE){ const f = path.join(TMP, 'v216_raw.html'); fs.writeFileSync(f, src); BASE_RAW_DIGEST = progDigest(load(f).buildProgram(JSON.parse(JSON.stringify(fixtures.HALF_MANNY)))); } } }
 

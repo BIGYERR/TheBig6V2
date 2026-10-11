@@ -90,6 +90,7 @@
 const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const S = require('../status')('g237_d220_distzero');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 237;
@@ -160,11 +161,10 @@ const NOTE_BARE = 'Counts toward Bike, not Run.', NOTE_KEPT = NOTE_BARE + ' Your
 
 // ── version, read from the candidate's meta ──────────────────────────────────────────────────────────────────────────
 const HTML = fs.readFileSync(ART, 'utf8');
-const VM = HTML.match(/<meta name="ia-version" content="(\d+)">/);
-const VER = VM ? +VM[1] : 0;
-const verCj = k => [k + '-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA];
+const VER = /<meta name="ia-version" content="/.test(HTML) ? SV.fromHtml(HTML) : 0;   // no meta: 0, as before
+const verCj = k => [k + '-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA];
 S.info('g237 D220-D222 P-DISTZERO, P-REOPENSTAMP | candidate ' + ART + ' ia-version ' + VER);
-if(!(VER >= ERA)) S.info('REFUSED: ia-version ' + VER + ' predates D220 / D221 / D222 (V' + ERA + '). Every row runs and FAILS by its version conjunct.');
+if(!(SV.cmp(VER, ERA) >= 0)) S.info('REFUSED: ia-version ' + VER + ' predates D220 / D221 / D222 (V' + ERA + '). Every row runs and FAILS by its version conjunct.');
 
 // ── ENV (g236_d218_logbutton.js mkEnv: g235 / g233 lineage plus g232's __FORCE hook; program id g237) ──────────────
 // Slice 4a's rows call only the pure converters and iaWheelHTML; the device helpers below are the shared env the
@@ -385,13 +385,13 @@ guard('D222-pace', () => {
 // ── D222-digest (era row) ────────────────────────────────────────────────────────────────────────────────────────────
 guard('D222-digest', () => {
   const cj = [verCj('D222-digest')];
-  const T = H.MANNY_DIGEST_BY_VERSION || {}, has = Object.prototype.hasOwnProperty.call(T, VER);
+  const T = H.MANNY_DIGEST_BY_VERSION || {}, has = SV.lookup(T, VER) !== undefined;
   cj.push(['era-row', has, 'MANNY_DIGEST_BY_VERSION[' + VER + '] ' + (has ? 'present' : 'MISSING')]);
-  cj.push(['era-value', T[VER] === HALF_DIGEST, J(T[VER]) + ' (ruling ' + HALF_DIGEST + ')']);
+  cj.push(['era-value', SV.lookup(T, VER) === HALF_DIGEST, J(SV.lookup(T, VER)) + ' (ruling ' + HALF_DIGEST + ')']);
   const P0 = H.load(ART), P1 = H.load(ART);
   const dg0 = H.progDigest(P0.buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY)))), dg1 = H.progDigest(P1.buildProgram(JSON.parse(J(H.fixtures.HALF_MANNY))));
   cj.push(['self-stable', dg0 === dg1 && /^[0-9a-f]{16}$/.test(dg0), 'HALF_MANNY built twice ' + dg0 + ' / ' + dg1 + ' (hand: equal, 16 hex)']);
-  cj.push(['built', dg0 === HALF_DIGEST && dg0 === T[VER], 'HALF_MANNY on the candidate ' + dg0 + ' (ruling ' + HALF_DIGEST + ', era row ' + J(T[VER]) + ')']);
+  cj.push(['built', dg0 === HALF_DIGEST && dg0 === SV.lookup(T, VER), 'HALF_MANNY on the candidate ' + dg0 + ' (ruling ' + HALF_DIGEST + ', era row ' + J(SV.lookup(T, VER)) + ')']);
   row('D222-digest', cj);
 });
 

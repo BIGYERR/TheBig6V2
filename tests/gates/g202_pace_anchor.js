@@ -29,6 +29,7 @@
 
 const path = require('path');
 const { load, fixtures, progDigest, MANNY_DIGEST_BY_VERSION } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
@@ -46,7 +47,7 @@ const EXP_IMPROVE_BY_VERSION = [
   { from: 0,   to: 224,      ruling: 'V176 (D9), pre-D187', table: { beginner:3, intermediate:5, advanced:7 } },
   { from: 225, to: Infinity, ruling: 'D187 (V225)',          table: { beginner:3, intermediate:3, advanced:2 } },
 ];
-const EXP_IMPROVE_ROW = EXP_IMPROVE_BY_VERSION.filter(r => +IA.version >= r.from && +IA.version <= r.to)[0];
+const EXP_IMPROVE_ROW = EXP_IMPROVE_BY_VERSION.filter(r => SV.cmp(IA.version, r.from) >= 0 && SV.cmp(IA.version, r.to) <= 0)[0];
 if(!EXP_IMPROVE_ROW){ FAIL++; console.log('  FAIL RATE-ERA no EXP_IMPROVE_BY_VERSION row covers ia-version ' + IA.version
   + ': the pace-improvement rate has no ruled hand table at this version, so P4/P4b/P4c/P4d are void'); }
 const EXP_IMPROVE = (EXP_IMPROVE_ROW || EXP_IMPROVE_BY_VERSION[0]).table;      // s/mi/wk, unscaled
@@ -160,7 +161,7 @@ const RUN_LABEL_BY_VERSION = [
   { from: 202, to: 207,      ruling: 'pre-D103a',    int: /Interval \(INT\)/,      chi: /Continuous High Intensity \(CHI\)/ },
   { from: 208, to: Infinity, ruling: 'D103a (V208)', int: /Short Interval \(SI\)/, chi: /Long Interval \(LI\)/ },
 ];
-const LBL = RUN_LABEL_BY_VERSION.filter(r => +IA.version >= r.from && +IA.version <= r.to)[0]
+const LBL = RUN_LABEL_BY_VERSION.filter(r => SV.cmp(IA.version, r.from) >= 0 && SV.cmp(IA.version, r.to) <= 0)[0]
   || { ruling: 'NO ROW', int: /(?!)/, chi: /(?!)/ };
 if(LBL.ruling === 'NO ROW'){ FAIL++; console.log('  FAIL LABEL-ERA no RUN_LABEL_BY_VERSION row covers ia-version ' + IA.version
   + ': the run quality labels have no ruled text at this version, so every row that finds a card by label is void'); }
@@ -200,7 +201,7 @@ console.log('sweep: ' + rows.length + ' builds (3 experience x 3 age x 2 unit x 
 // level anchors on the entered mile's own row. P1, P1b and P1d read the anchor through this one switch; P1c
 // (non-beginners) is the same rule on both sides of the line.
 const D188_ERA = 226;
-const D188_ON = +IA.version >= D188_ERA;
+const D188_ON = SV.cmp(IA.version, D188_ERA) >= 0;
 let p1bad = [], p1beg = 0, p1nonbeg = 0;
 for(const r of rows){
   const anchorMile = (r.exp === 'beginner' && !D188_ON) ? EXP_DEFAULT.beginner : hand.secs(r.mb[0], r.mb[1]);
@@ -534,7 +535,7 @@ ok(rMono.length === 0, `R5 the reader is monotone non-decreasing in distance acr
   + `(299 steps)` + (rMono.length ? ' — first miss: ' + rMono[0] : ''));
 
 // ── blast radius: the fixture is ruled UNMOVED by D100/D101 ──
-const row = MANNY_DIGEST_BY_VERSION[IA.version];
+const row = SV.lookup(MANNY_DIGEST_BY_VERSION, IA.version);
 const mannyDigest = progDigest(IA.buildProgram(JSON.parse(JSON.stringify(fixtures.HALF_MANNY))));
 ok(!!row && mannyDigest === row,
   `B1 HALF_MANNY matches the V${IA.version} row of MANNY_DIGEST_BY_VERSION (${row || 'NO ROW'}): got ${mannyDigest}. `

@@ -8,13 +8,17 @@
 // and reports the live number it read back.
 //
 //   node tools/deploy-check.mjs                    prove the current origin/main is live
-//   node tools/deploy-check.mjs --expect 240       and that it is ia-version 240
+//   node tools/deploy-check.mjs --expect 0.240.0   and that it is ia-version 0.240.0 (a bare 240 reads as 0.240.0)
 //   node tools/deploy-check.mjs --no-force         never ask Pages for a build; a stale build fails instead
 //
 // Exit 0 only when all three hold. Needs git, and gh logged in (gh auth status); in GitHub Actions, GH_TOKEN.
 // The pipeline runs it after every merge into main (.github/workflows/pipeline.yml, "deploy proof").
 import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import { attachRun, startRun } from './runlog.mjs';
+
+/** ia-version is read and compared only through tests/semver.js (CommonJS): MAJOR.MINOR.PATCH, a bare N reads as 0.N.0. */
+const SV = createRequire(import.meta.url)('../tests/semver.js');
 
 const args = process.argv.slice(2);
 const has = (f) => args.includes(f);
@@ -41,7 +45,17 @@ const sh = (cmd, cmdArgs) =>
   execFileSync(cmd, cmdArgs, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60_000, maxBuffer: 64 * 1024 * 1024 }).trim();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const short = (sha) => sha.slice(0, 7);
-const VERSION = /<meta name="ia-version" content="(\d+)"/;
+const VERSION = /<meta name="ia-version" content="([^"]*)"/;
+const parses = (v) => {
+  try {
+    SV.parse(v);
+    return true;
+  } catch {
+    return false;
+  }
+};
+/** Both sides parse and name one version (SV.cmp === 0): 239 and 0.239.0 are the same. Messages print them as written. */
+const same = (a, b) => parses(a) && parses(b) && SV.cmp(a, b) === 0;
 
 function done(code, text) {
   say(code === 0 ? 'deploy' : 'fail', text, true);
@@ -64,8 +78,10 @@ async function main() {
   const pushed = process.env.GITHUB_ACTIONS === 'true' ? process.env.GITHUB_SHA : '';
   if (pushed && pushed !== remote) say('remote', `main moved on since ${short(pushed)}; proving ${short(remote)}, its newest commit`);
   const remoteVersion = VERSION.exec(sh('git', ['show', 'origin/main:index.html']))?.[1];
-  if (!remoteVersion) return done(1, `origin/main:index.html has no ia-version meta`);
-  if (expect && remoteVersion !== expect) return done(1, `origin/main is ia-version ${remoteVersion}, not ${expect}`);
+  if (remoteVersion === undefined) return done(1, `origin/main:index.html has no ia-version meta`);
+  if (!parses(remoteVersion)) return done(1, `origin/main:index.html ia-version "${remoteVersion}" is not a version (want N or M.m.p)`);
+  if (expect && !parses(expect)) return done(1, `--expect ${expect} is not a version (want N or M.m.p)`);
+  if (expect && !same(remoteVersion, expect)) return done(1, `origin/main is ia-version ${remoteVersion}, not ${expect}`);
   say('remote', `origin/main ${short(remote)} carries ia-version ${remoteVersion}`);
 
   // 2. Pages built THAT commit
@@ -94,10 +110,10 @@ async function main() {
   for (let attempt = 1; attempt <= 6; attempt++) {
     const res = await fetch(`${live}?cb=${Date.now()}`, { headers: { 'cache-control': 'no-cache' } });
     liveVersion = VERSION.exec(await res.text())?.[1];
-    if (liveVersion === remoteVersion) break;
+    if (same(liveVersion, remoteVersion)) break;
     await sleep(10_000);
   }
-  if (liveVersion !== remoteVersion) return done(1, `${live} serves ia-version ${liveVersion ?? 'none'}, not ${remoteVersion}`);
+  if (!same(liveVersion, remoteVersion)) return done(1, `${live} serves ia-version ${liveVersion ?? 'none'}, not ${remoteVersion}`);
   return done(0, `live: ${live} serves ia-version ${liveVersion} (commit ${short(remote)})`);
 }
 

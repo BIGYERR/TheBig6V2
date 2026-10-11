@@ -92,6 +92,7 @@ process.env.TZ = 'America/New_York';
 const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const { load } = H;
 
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
@@ -119,8 +120,8 @@ const PARSE_HAND = [['600', PEG], ['601', PEG], ['630.5', PEG], ['650', PEG], ['
 const PARSE_HAND_V235 = [['600', PEG], ['601', PEG], ['630.5', PEG], ['650', PEG], ['1200', PEG], ['599.98', PEG], ['599.99', PEG], ['599', ['9', '59', '0']],
   ['45.5', ['0', '45', '30']], ['45', ['0', '45', '0']], ['.5', ['0', '0', '30']], ['', ['0', '0', '0']], ['-1', ['0', '0', '0']], ['abc', ['0', '0', '0']]];
 // V235 (D215): the bike wheel's blank face, chosen at use (VER is set after load): the dash through 234, zero from 235.
-const ZERO_HMS = '0:00:00', BLANK_HMS = () => VER >= 235 ? ZERO_HMS : DASH_HMS;
-const legacyBike = () => VER >= 235 ? LEGACY_BIKE_V235 : LEGACY_BIKE;
+const ZERO_HMS = '0:00:00', BLANK_HMS = () => SV.cmp(VER, 235) >= 0 ? ZERO_HMS : DASH_HMS;
+const legacyBike = () => SV.cmp(VER, 235) >= 0 ? LEGACY_BIKE_V235 : LEGACY_BIKE;
 const RUN_TIME_DOSE = { k:'time', mins:15, tgt:531, key:'chi' };
 const NUDGE = 'You logged this one but never marked it.';
 const BIKEG = ['bike_century', 'bike_50', 'bike_base', 'bike_ftp', 'bike_cals'];
@@ -150,7 +151,7 @@ const R = {
 const ROW_ORDER = Object.keys(R);
 function row(key, cj){ cj.forEach(([n, c, d]) => P('    ' + key + ' ' + n + ' ' + (c ? 'ok' : 'FAIL') + ' :: ' + d));
   const bad = cj.filter(x => !x[1]).map(x => x[0]); ok(R[key], !bad.length, bad.length ? 'failing conjuncts: ' + bad.join(', ') : cj.length + '/' + cj.length + ' conjuncts'); }
-const verCj = k => [k + '-ver', VER >= ERA, 'ia-version ' + VER + (VER >= ERA ? ' >= ' : ' < ') + ERA];
+const verCj = k => [k + '-ver', SV.cmp(VER, ERA) >= 0, 'ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? ' >= ' : ' < ') + ERA];
 const tryv = f => { try { return f(); } catch(e){ return { __err:String(e && e.message || e).slice(0, 120) }; } };
 const stripComments = t => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S]*?-->/g, '').replace(/(^|[^:"'\\])\/\/[^\n]*/gm, '$1');
 
@@ -282,9 +283,9 @@ function copyBad(fm){
 
 // ── LOAD + VERSION + BASELINE ────────────────────────────────────────────────────────────────────────────────────
 let VER = NaN, C = null, CAND_TEXT = '';
-try { CAND_TEXT = fs.readFileSync(ART, 'utf8'); C = mkEnv(ART); VER = +C.IA.version; }
+try { CAND_TEXT = fs.readFileSync(ART, 'utf8'); C = mkEnv(ART); VER = SV.parse(C.IA.version); }
 catch(e){ P('FAIL boot: ' + String(e && e.message || e).slice(0, 200)); fail++; ROW_ORDER.forEach(k => ok(R[k] + ' (candidate did not boot)', false)); done(); }
-P('g233 D207–D211 P-BIKEWHEEL | candidate ' + ART + ' ia-version ' + VER + (VER >= ERA ? '' : ' (below ' + ERA + ': every behaviour row runs and must FAIL by its own conjuncts)'));
+P('g233 D207–D211 P-BIKEWHEEL | candidate ' + ART + ' ia-version ' + VER + (SV.cmp(VER, ERA) >= 0 ? '' : ' (below ' + ERA + ': every behaviour row runs and must FAIL by its own conjuncts)'));
 
 // ── THE OPEN SURVEY (every row reads it) ─────────────────────────────────────────────────────────────────────────
 const SURV = { hand:{}, legacy:[], clampRun:[], clampBike:[], lat:[], progs:{ a:0, b:0, c:0 }, err:{} };
@@ -401,7 +402,7 @@ function rowOpen(){
   const lg = SURV.legacy.map(x => [x, x.inputs === 0 && x.same && x.face === x.want]);
   cj.push(['open-legacy', lg.length === legacyBike().length && lg.every(y => y[1]), lg.map(([x, g]) => J(x.v) + ' -> ' + J(x.face) + (g ? '' : ' (want ' + x.want + ', inputs ' + x.inputs + ', same ' + x.same + ')')).join(', ')]);
   for(const g of ['a', 'b', 'c']){ const L = LG(g), bad = L.filter(x => !(x.inputs === 0 && x.same && x.face === BLANK_HMS()));
-    cj.push(['open-lattice-' + g, L.length > 0 && !bad.length, (L.length - bad.length) + '/' + L.length + ' lattice (' + g + ') bike forms open on ' + (VER >= 235 ? '0:00:00' : 'the dash') + ' writing nothing' + (bad.length ? ' | e.g. ' + bad.slice(0, 3).map(x => x.name + ' W' + x.w + ' ' + x.d + ' face ' + J(x.face) + ' inputs ' + x.inputs + ' same ' + x.same).join(' | ') : '')]); }
+    cj.push(['open-lattice-' + g, L.length > 0 && !bad.length, (L.length - bad.length) + '/' + L.length + ' lattice (' + g + ') bike forms open on ' + (SV.cmp(VER, 235) >= 0 ? '0:00:00' : 'the dash') + ' writing nothing' + (bad.length ? ' | e.g. ' + bad.slice(0, 3).map(x => x.name + ' W' + x.w + ' ' + x.d + ' face ' + J(x.face) + ' inputs ' + x.inputs + ' same ' + x.same).join(' | ') : '')]); }
   row('D207-open', cj);
 }
 
@@ -419,13 +420,13 @@ function rowMove(){
     C.use(HOSTP); C.force(HAND.time.dose); C.setLog(HW, HD, null); C.open(HW, HD);
     C.move(need(), 0, '0'); C.move(need(), 1, '45');
     // V236 (D218): DRAFT until a ride is stored; the moved wheel writes its hidden node, the Log tap stores it.
-    if(VER >= 236){ const p = C.entry(HW, HD), h = hid(), n = C.INPUTS.log_bike_mins || 0; tapLog(); const e = C.entry(HW, HD) || {};
+    if(SV.cmp(VER, 236) >= 0){ const p = C.entry(HW, HD), h = hid(), n = C.INPUTS.log_bike_mins || 0; tapLog(); const e = C.entry(HW, HD) || {};
       cj.push(['move-45', p === null && h === '45.00' && n === 1 && e.bike_mins === '45.00', '0:00:00 -> hours 0 -> minutes 45: entry before Log ' + J(p) + ', hidden ' + J(h) + ', input events ' + n + '; Log stores bike_mins ' + J(e.bike_mins) + ' (want null, "45.00", 1; "45.00")']);
     } else {
     const e = C.entry(HW, HD) || {};
     // V235 (D215): the wheel opens on 0 hours, so the hours step to 0 is a no-move: one input event (minutes 45), not two.
-    const want45 = VER >= 235 ? 1 : 2;
-    cj.push(['move-45', e.bike_mins === '45.00' && hid() === '45.00' && (C.INPUTS.log_bike_mins || 0) === want45, (VER >= 235 ? '0:00:00' : 'dash') + ' -> hours 0 -> minutes 45: stored bike_mins ' + J(e.bike_mins) + ', hidden ' + J(hid()) + ', input events ' + (C.INPUTS.log_bike_mins || 0) + ' (want "45.00", "45.00", ' + want45 + ')']);
+    const want45 = SV.cmp(VER, 235) >= 0 ? 1 : 2;
+    cj.push(['move-45', e.bike_mins === '45.00' && hid() === '45.00' && (C.INPUTS.log_bike_mins || 0) === want45, (SV.cmp(VER, 235) >= 0 ? '0:00:00' : 'dash') + ' -> hours 0 -> minutes 45: stored bike_mins ' + J(e.bike_mins) + ', hidden ' + J(hid()) + ', input events ' + (C.INPUTS.log_bike_mins || 0) + ' (want "45.00", "45.00", ' + want45 + ')']);
     }
     C.ctx.__dots.length = 0; const pr = tryv(() => C.ev('renderProgressScreen')());
     const ch = C.ctx.__dots.find(a => /Weekly Cycling Time/.test(String(a[0])));
@@ -440,8 +441,8 @@ function rowMove(){
     C.setLog(HW, HD, { bike_mins:'45', rpe:'5' }); const b1 = C.logs(); C.open(HW, HD); C.move(need(), 1, '45'); C.move(need(), 0, '0');
     const s1 = C.logs() === b1, i1 = C.inputs(), f1 = C.face(need());
     // V235 (D215, session licence): no dash row from 235; the blank wheel's seed row is hours '0' (the 0:00:00 face).
-    C.setLog(HW, HD, null); C.open(HW, HD); C.move(need(), 0, VER >= 235 ? '0' : ''); const e0 = C.entry(HW, HD), i0 = C.inputs();
-    cj.push(['move-seedonly', s1 && i1 === 0 && f1 === '0:45:00' && e0 === null && i0 === 0, 'stored 45 settles on its seed face 0:45:00 only: ia_logs_ unchanged ' + s1 + ', input events ' + i1 + ', face ' + J(f1) + '; blank settles on ' + (VER >= 235 ? 'its seed face 0:00:00' : 'the dash') + ' only: entry ' + J(e0) + ', input events ' + i0 + ' (want true, 0, 0:45:00; null, 0)']);
+    C.setLog(HW, HD, null); C.open(HW, HD); C.move(need(), 0, SV.cmp(VER, 235) >= 0 ? '0' : ''); const e0 = C.entry(HW, HD), i0 = C.inputs();
+    cj.push(['move-seedonly', s1 && i1 === 0 && f1 === '0:45:00' && e0 === null && i0 === 0, 'stored 45 settles on its seed face 0:45:00 only: ia_logs_ unchanged ' + s1 + ', input events ' + i1 + ', face ' + J(f1) + '; blank settles on ' + (SV.cmp(VER, 235) >= 0 ? 'its seed face 0:00:00' : 'the dash') + ' only: entry ' + J(e0) + ', input events ' + i0 + ' (want true, 0, 0:45:00; null, 0)']);
   });
   step('move-peg', () => {
     C.use(HOSTP); C.force(HAND.time.dose);
@@ -456,7 +457,7 @@ function rowMove(){
 // ── ROW D208-clamp ───────────────────────────────────────────────────────────────────────────────────────────────
 function rowClamp(){
   const cj = [verCj('clamp')].concat(errCj('clamp', ['hosts', 'hand']));
-  const t = (VER >= 235 ? PARSE_HAND_V235 : PARSE_HAND).map(([s, w]) => { const g = tryv(() => Array.from(C.ev('_iawParse')('hms', s))); return [s, g, w, J(g) === J(w)]; });
+  const t = (SV.cmp(VER, 235) >= 0 ? PARSE_HAND_V235 : PARSE_HAND).map(([s, w]) => { const g = tryv(() => Array.from(C.ev('_iawParse')('hms', s))); return [s, g, w, J(g) === J(w)]; });
   cj.push(['clamp-parse', t.every(x => x[3]), t.map(x => J(x[0]) + ' -> ' + J(x[1]) + (x[3] ? '' : ' (want ' + J(x[2]) + ')')).join(', ')]);
   for(const [tag, L, fk] of [['run', SURV.clampRun, 'runFace'], ['bike', SURV.clampBike, 'face']]){
     const g = L.map(x => [x, x.inputs === 0 && x.same && x[fk] === x.want]);

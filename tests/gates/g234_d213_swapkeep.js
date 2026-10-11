@@ -64,6 +64,7 @@
 const fs = require('fs'), path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
 const H = require(path.join(ROOT, 'tests', 'harness.js'));
+const SV = require(path.join(ROOT, 'tests', 'semver.js'));
 const S = require('../status')('g234_d213_swapkeep');
 const ART = path.resolve(process.argv[2] || path.join(ROOT, 'index.html'));
 const ERA = 234;
@@ -110,9 +111,9 @@ const stripComments = t => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/<!--[\s\S
 
 // ── version predicate ───────────────────────────────────────────────────────────────────────────────────────────
 let STAMP = NaN;
-try { STAMP = +H.load(ART).version; } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
+try { STAMP = SV.parse(H.load(ART).version); } catch(e){ failAll('boot', 'the candidate does not load in the harness: ' + e.message); }
 console.log('g234 D213/D214 swapkeep | candidate ' + ART + ' ia-version ' + STAMP);
-if(!(STAMP >= ERA)){
+if(!(SV.cmp(STAMP, ERA) >= 0)){
   console.log('REFUSED: ia-version ' + STAMP + ' predates D213 P-SWAPKEEP and D214 (V' + ERA + '). No row may pass on it.');
   failAll('REFUSED');
 }
@@ -166,7 +167,7 @@ const swap = s => tryv(() => E('setCardioSwap("' + s + '")'));
 // V236 (D218 "Existing rows that flip": type() wrote the node then persisted in DRAFT, which stores no cardio number):
 // from VER 236 the helper's write is the commit the Log tap makes (persistLogFields(day,true)); on a LIVE card that is
 // byte-for-byte the listener's own write. VER <= 235 is unchanged. Setup only: no claim moves.
-const persist = dk => tryv(() => E('persistLogFields("' + dk + '"' + (STAMP >= 236 ? ',true' : '') + ')'));
+const persist = dk => tryv(() => E('persistLogFields("' + dk + '"' + (SV.cmp(STAMP, 236) >= 0 ? ',true' : '') + ')'));
 function type(dk, vals){ for(const f of Object.keys(vals)){ const el = REG.get('log_' + f); if(!el) return 'no input log_' + f; el.value = vals[f]; } persist(dk); return ''; }
 const hid = f => { const el = REG.get('log_' + f); return el ? el.value : null; };
 const fieldIds = () => ((REG.get('cardioFields') || {})._kids || []).filter(id => /^log_(run|bike|swim)_/.test(id));
@@ -196,7 +197,7 @@ const PRE = { sub:E('activeProg.weeks[1].sat.cardio && activeProg.weeks[1].sat.c
 console.log('INFO repro day W1 SAT ' + J(PRE.sub) + ' wrap ' + PRE.wrap + ' strip ' + PRE.strip);
 // D218/D219 Amendment 1 (d): from VER 236 the wrap carries the regime attribute at every render, '0' on an empty store
 // (D218 item 1); the exact-dataset compare is kept.
-const preOk = PRE.sub === 'Long Run' && PRE.wrap === J(STAMP >= 236 ? { planned:'run', active:'run', logged:'0' } : { planned:'run', active:'run' }) && PRE.strip;
+const preOk = PRE.sub === 'Long Run' && PRE.wrap === J(SV.cmp(STAMP, 236) >= 0 ? { planned:'run', active:'run', logged:'0' } : { planned:'run', active:'run' }) && PRE.strip;
 const preWhy = preOk ? '' : 'precondition: W1 SAT is not the ruling\'s Long Run run day with a 3.1 mi strip (' + J(PRE) + ')';
 
 // ── K1, K2, K3, K4, N2 (live), C1: the repro walk ───────────────────────────────────────────────────────────────

@@ -93,17 +93,18 @@
 'use strict';
 const path = require('path');
 const { load, progDigest, MANNY_DIGEST_BY_VERSION, DAYS } = require(path.join(__dirname, '..', 'harness.js'));
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ART = process.argv[2] || path.join(__dirname, '..', '..', 'index.html');
 const IA = load(ART);
-const VER = +IA.version;
+const VER = SV.parse(IA.version);
 const D70C_ERA = 210;
 const SLICES_BUILT = 3;          // slices 1 (D70c-A1..A4), 2 (D70c-B1, B2), 2b, 3 (D150): V210's whole scope. D149 is HELD (licence below).
 const FINAL = 3;                 // V210's scope ends at slice 3: O3z and O6r enforce now
-const EXPIRED = VER > D70C_ERA;  // a later build runs this gate: no row may hide as NOT YET BUILT
+const EXPIRED = SV.cmp(VER, D70C_ERA) > 0;  // a later build runs this gate: no row may hide as NOT YET BUILT
 const D154_SCOPED_TO = 215; // D154 ships on 216: the licence is retired, never renewed. O3r and O3z enforce from 216.
 const D149_SHIPS = 215;   // D149 shipped on V215: the licence is retired, never renewed
-const D154_SCOPED = VER <= D154_SCOPED_TO;  // the D154 licence: the elbow renamer is out of scope through D154_SCOPED_TO only
-const D149_HELD = VER < D149_SHIPS;         // the D149 licence, retired: <= 214 the GHD station is HELD, from 215 its rows enforce.
+const D154_SCOPED = SV.cmp(VER, D154_SCOPED_TO) <= 0;  // the D154 licence: the elbow renamer is out of scope through D154_SCOPED_TO only
+const D149_HELD = SV.cmp(VER, D149_SHIPS) < 0;         // the D149 licence, retired: <= 214 the GHD station is HELD, from 215 its rows enforce.
 
 let pass = 0, fail = 0, skip = 0, nyb = 0, fixt = 0, scoped = 0, held = 0;
 function ok(label, cond, got){
@@ -124,7 +125,7 @@ function summary(){
   console.log('PASS ' + pass + ' FAIL ' + fail);
   process.exit(fail ? 1 : 0);
 }
-if(!(VER >= D70C_ERA)){
+if(!(SV.cmp(VER, D70C_ERA) >= 0)){
   console.log('NOT APPLICABLE: ia-version ' + VER + ' predates D70c (V' + D70C_ERA + ').');
   ['O1','O2f','O2x','O3a','O3n','O3b','O3g','O3g5','O3r','O3z','O4a','O4b','O4t','O4g','O5a','O5c','O5d','O5e',"O5d'",'O5g','O6','O6u','O6r']
     .forEach(r => skipRow(r + ' skipped below the D70c era'));
@@ -382,7 +383,7 @@ const mk2 = (eq, f, e, a, seed, inj) => { const c = mk(eq, f, e, a, 0, inj); c.s
 // standing ruling 5 governs, so the row compares the built digest to MANNY_DIGEST_BY_VERSION[ia-version]
 // and fails loudly when that row is absent. Re-pointing the literal to a later digest would be the
 // vacuous line standing ruling 3 forbids; deleting the row would be an unruled removal.
-const MANNY = MANNY_DIGEST_BY_VERSION[VER], MANNY_ROW = typeof MANNY === 'string' && /^[0-9a-f]{16}$/.test(MANNY);
+const MANNY = SV.lookup(MANNY_DIGEST_BY_VERSION, VER), MANNY_ROW = typeof MANNY === 'string' && /^[0-9a-f]{16}$/.test(MANNY);
 const mp = IA.buildProgram(IA.fixtures.HALF_MANNY), md = progDigest(mp);
 ok('O6 HALF_MANNY digest equals its era row MANNY_DIGEST_BY_VERSION[' + VER + '] = ' + MANNY + ', and that row exists (ruled unmoved)',
    MANNY_ROW && md === MANNY, MANNY_ROW ? md : 'NO ERA ROW for ia-version ' + VER + ' (built ' + md + ')');

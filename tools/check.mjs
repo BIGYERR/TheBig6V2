@@ -23,9 +23,13 @@
 // The check is a logged run (tools/runlog.mjs), type "check": every step and every gate result is an event.
 import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { availableParallelism, setPriority } from 'node:os';
 import { basename, join } from 'node:path';
 import { REPO, ROOT, attachRun, duration, startRun } from './runlog.mjs';
+
+/** ia-version is read and compared only through tests/semver.js (CommonJS): MAJOR.MINOR.PATCH, a bare N reads as 0.N.0. */
+const SV = createRequire(import.meta.url)('../tests/semver.js');
 
 const LIMIT_S = Math.min(60, Number(process.env.IA_CHECK_SECONDS) || 60);
 const FAST_GATE_SECONDS = 12;
@@ -173,22 +177,32 @@ async function step(lane, name, cmd, cmdArgs, cwd) {
 /** The gate suite's quick steps (gate.sh steps 0 to 3), then the fast gates, JOBS at a time. */
 async function gatesLane() {
   const html = readFileSync(join(REPO, 'index.html'), 'utf8');
-  const version = /<meta name="ia-version" content="(\d+)"/.exec(html)?.[1];
-  if (!version) {
+  const version = /<meta name="ia-version" content="([^"]*)"/.exec(html)?.[1];
+  if (version === undefined) {
     failures.push('gates: index.html has no ia-version meta');
     return;
   }
+  try {
+    SV.parse(version);
+  } catch (err) {
+    failures.push(`gates: index.html ia-version "${version}" is not a version (${err.message})`);
+    return;
+  }
   note('gates', `index.html is ia-version ${version}`);
-  // The baseline gates compare against: the previous version, as tagged.
+  // The baseline gates compare against: the previous version, as tagged, which is the greatest tag strictly below this
+  // one (tests/semver.js below), never N - 1. base_v<previous>.html names it as tagged, less its v: base_v238.html.
   const scratch = join(ROOT, 'check');
   mkdirSync(scratch, { recursive: true });
   let base = '';
+  let prev;
   try {
-    base = join(scratch, `base_v${Number(version) - 1}.html`);
-    writeFileSync(base, execFileSync('git', ['-C', REPO, 'show', `V${Number(version) - 1}:index.html`], { maxBuffer: 64 * 1024 * 1024 }));
+    prev = SV.below(execFileSync('git', ['-C', REPO, 'tag', '--list', 'v*', 'V*'], { encoding: 'utf8' }).split(/\r?\n/), version);
+    if (prev === undefined) throw new Error(`no version tag below ia-version ${version}`);
+    base = join(scratch, `base_v${prev.replace(/^[Vv]/, '')}.html`);
+    writeFileSync(base, execFileSync('git', ['-C', REPO, 'show', `${prev}:index.html`], { maxBuffer: 64 * 1024 * 1024 }));
   } catch {
     base = '';
-    note('gates', `no V${Number(version) - 1} tag here; gates run without a baseline`);
+    note('gates', prev === undefined ? `no version tag below ia-version ${version} here; gates run without a baseline` : `${prev}:index.html does not read here; gates run without a baseline`);
   }
   const syntax = `const {extractInlineJS}=require(${JSON.stringify(join(REPO, 'tests', 'harness'))});new (require('vm').Script)(extractInlineJS(require('fs').readFileSync(${JSON.stringify(join(REPO, 'index.html'))},'utf8')))`;
   if (!(await step('gates', 'inline script compiles', process.execPath, ['-e', syntax], REPO))) return;

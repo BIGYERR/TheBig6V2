@@ -44,6 +44,7 @@
 //   * Mario's row is a hand table typed in as literals.
 //   * The 24/93 recBeforeLong displacement count is the ruling's after-grid number.
 const fs = require('fs'), path = require('path'), vm = require('vm');
+const SV = require(path.join(__dirname, '..', 'semver.js'));
 const ROOT = path.join(__dirname, '..', '..');
 const FILE = process.argv[2] || path.join(ROOT, 'index.html');
 // ROWS (post-V233 V2: every row prints through tests/status.js; CLAUDE.md Proof scope, Row manifest). P0 and P0b are
@@ -78,10 +79,10 @@ const src = fs.readFileSync(FILE, 'utf8');
 // row RUNS. The probe reads code with comments stripped, so the V205 comment blocks that
 // name D129 cannot stand in for the terms themselves: _evenKey is rank 6's key and
 // qualRest/qualFirst are ranks 8 and 9 in the candidate record.
-const VER = parseInt((src.match(/name="ia-version" content="(\d+)"/) || [])[1], 10);
+const VER = /<meta name="ia-version" content="/.test(src) ? SV.fromHtml(src) : NaN;   // no meta: NaN, as before
 const _codeOnly = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
 const HAS_D129 = /_evenKey/.test(_codeOnly) && /qualRest\s*,\s*qualFirst/.test(_codeOnly);
-if(VER >= 205){
+if(!Number.isNaN(VER) && SV.cmp(VER, 205) >= 0){
   if(!HAS_D129){
     S.fail('P0', 'licence: ia-version ' + VER + ' is D129 era', 'the tiebreak surface (_evenKey, qualRest, qualFirst) is absent');
     S.summary();
@@ -129,7 +130,7 @@ const TN={long:'nrc_long',rec:'nrc_recovery',s1:'nrc_speed1',s2:'nrc_speed2'};
 // the spacer fallback's easy / INT / long. P6 and P7 pin D129's after-grid on the type set D129
 // was ruled on and read no engine pick, so they keep the engine-table read at every version.
 const PACE3_BY_ERA=[{hi:212,three:null},{lo:213,three:['int','chi','lsd_long'],fallback:['lsd_easy','int','lsd_long']}];
-const PACE3=PACE3_BY_ERA.filter(r=>(r.lo===undefined||VER>=r.lo)&&(r.hi===undefined||VER<=r.hi))[0];
+const PACE3=PACE3_BY_ERA.filter(r=>(r.lo===undefined||SV.cmp(VER,r.lo)>=0)&&(r.hi===undefined||SV.cmp(VER,r.hi)<=0))[0];
 function d130untol(days,typeOf){
   const hd=days.filter(d=>['int','chi','lsd_long'].indexOf(typeOf[d])>=0), L=days.find(d=>typeOf[d]==='lsd_long'); let u=0;
   for(let a=0;a<hd.length;a++) for(let b=a+1;b<hd.length;b++){ const x=hd[a],y=hd[b]; if(circ(x,y)!==1) continue;
