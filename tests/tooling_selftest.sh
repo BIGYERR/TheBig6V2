@@ -12,7 +12,7 @@
 # fixtures, TMPDIR) goes under a fresh <scratch-dir>/selftest.XXXXXX, kept for inspection. Nothing under the repo is
 # written: row X1 proves it (the repo's file list is the same at the end as at the start, and no file under it is newer
 # than the run's start marker; .git and .claude aside), so run the self-test alone, not beside a gate.sh run (that one
-# writes .last_diff.txt).
+# writes temp/last_diff.txt).
 # [tools-dir] (default: the directory this file sits in) holds the seven tools under test. Point it at a copy with one
 # tool sabotaged and that tool's rows go red. Everything else (index.html, harness.js, lint_allow.txt, the gates, the
 # sabotage specs and lists, the tags V232 and V233, the reach map at HEAD) comes from the repo.
@@ -212,7 +212,7 @@ row "G3 the crash after it (no summary) is graded and named" 'has "$O" "^FAIL: c
 row "G4 the REFUSED gate after that is graded red (blocking)" 'has "$O" "^   d_refused\.js: PASS 1 FAIL 0  .*REFUSED \(blocking\)$" && has "$O" "^FAIL: d_refused\.js REFUSED an assertion"' "$O"
 row "G5 step 2b: the planted exact-version row is red by name" 'hasX "$O" "FAIL: version_scope.js: PASS 4 FAIL 1 (exit 1)" && has "$O" "^FAIL new exact-version row: e_pass\.js has 1 exact-version hit and no debt line"' "$O"
 row "G6 every red is listed once: GATES RED 4 of 6 with the four names" 'hasX "$O" "GATES RED 4 of 6: version_scope.js b_fail.js c_crash.js d_refused.js"' "$O"
-row "G7 step 5 runs after the reds (blast-radius diff written)" 'hasX "$O" "== 5. blast-radius diff vs base.html" && has "$O" "^   [0-9]+ hunks, \+[0-9]+/-[0-9]+ lines" && [ -s "$GA/.last_diff.txt" ]' "$O"
+row "G7 step 5 runs after the reds (blast-radius diff written)" 'hasX "$O" "== 5. blast-radius diff vs base.html" && has "$O" "^   [0-9]+ hunks, \+[0-9]+/-[0-9]+ lines" && [ -s "$GA/temp/last_diff.txt" ]' "$O"
 row "G8 no ALL GATES PASS on a red run" 'lacks "$O" "^ALL GATES PASS"' "$O"
 row "G9 start order: the unknown gate first, then longest first (e d b c a)" '[ "$(words "$W/g_mixed.start")" = "e_pass.js d_refused.js b_fail.js c_crash.js a_pass.js" ] && hasF "$O" "not in the file, started first: e_pass.js"' "$W/g_mixed.start"
 row "G10 grade order is glob order (a b c d e)" '[ "$(grade_order "$O")" = "a_pass.js b_fail.js c_crash.js d_refused.js e_pass.js" ]' "$O"

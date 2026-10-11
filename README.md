@@ -7,7 +7,8 @@ Iron Asylum: a hybrid strength and cardio program builder for iPhone.
 | `index.html` | the app: one file, served at https://bigyerr.github.io/TheBig6V2/ | GitHub Pages, on every push to `main` |
 | `app/` | the same app as an Angular project, built three ways: `emulator-ios` and `device-ios` (Cordova), and `pwa-pages` (a web build for `/TheBig6V2/pwa/`) | built on demand; see `app/README.md` |
 | `backend/` | the Node backend: device heartbeat API and the admin vision dashboard | Heroku, with `backend/scripts/heroku.sh deploy`; see `backend/README.md` |
-| `tests/` | the gates every version of `index.html` passes before it ships | run locally (`INSTALL.md`, `CLAUDE.md`) |
+| `tests/` | the gates every version of `index.html` passes before it ships | run locally (`CLAUDE.md`) |
+| `docs/` | reference for agents and Mario: the design system (`docs/design/`) | not shipped; it rides along on Pages with the rest of the repo, and the app never reads it |
 
 ## Backend on Heroku, in short
 

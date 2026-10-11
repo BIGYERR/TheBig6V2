@@ -9,9 +9,14 @@ blast-radius step in CLAUDE.md was unrunnable — a diff of V190 against V190 ei
 Mario's Downloads in the V190 gate session. Losing a baseline costs a whole verification standard:
 without V189 the 28-hunk D39 diff could not be classified and three §5r figures could not be resolved.
 
-**Rule going forward.** Every release drops its artifact here as `V<N>.html` in the same commit that
-ships it, and the commit gets tagged `V<N>`. The tag and the file are two records of one thing; if
-they ever disagree, the file wins — grep the artifact, never trust a label.
+**The rule now.** Git tags are the record of every release from V190 on. Checked 2026-10-11: each
+tag from V190 through V239 checks out an `index.html` that reads its own `ia-version`, so
+`git show V<N>:index.html` gives the previous build for any blast-radius run. Only V188 and V189 are
+wrong (both tags check out V190), so their files here are the only true copies. This folder no
+longer grows with each release. It keeps three files: V188 and V189 for that reason, and V196
+because `tests/gates/g197d_d84_base.js` reads it as its fixed pre-D84 artifact. Add a file here only
+when a gate needs a pinned artifact on disk. If a tag and a file ever disagree, the file wins: grep
+the artifact, never trust a label.
 
 **Use.**
 

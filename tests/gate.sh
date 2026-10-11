@@ -303,7 +303,7 @@ if [ -n "$BASE" ]; then
   HUNKS="$(grep -c '^@@' "$TMP/diff.txt" || true)"
   ADDED="$(grep -c '^+[^+]' "$TMP/diff.txt" || true)"; REMOVED="$(grep -c '^-[^-]' "$TMP/diff.txt" || true)"
   echo "   $HUNKS hunks, +$ADDED/-$REMOVED lines. Every hunk must be classified in the D-code before ship."
-  cp "$TMP/diff.txt" "$HERE/../.last_diff.txt"; echo "   full diff -> .last_diff.txt"
+  mkdir -p "$HERE/../temp"; cp "$TMP/diff.txt" "$HERE/../temp/last_diff.txt"; echo "   full diff -> temp/last_diff.txt"
 fi
 
 # Step 5 ran even if step 2b, step 4 or step 4b was red (its diff is still the blast radius to classify);

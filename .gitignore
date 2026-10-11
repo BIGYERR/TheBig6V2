@@ -1,7 +1,6 @@
 # doctrine text is local reference for the coach agent; keep it out of GitHub Pages
 doctrine/*.txt
-# scratch
-.last_diff.txt
+# dependencies, caches and OS junk
 node_modules/
 __pycache__/
 *.pyc
@@ -13,3 +12,6 @@ profile.txt
 
 # Other sessions work in their own git worktrees here (Mario, Post-V238: one writer per working tree)
 .claude/worktrees/
+
+# gate output and run logs; local, never committed
+/temp/
