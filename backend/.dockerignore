@@ -4,6 +4,7 @@
 !package-lock.json
 !angular.json
 !tsconfig.json
+!tsconfig.server.json
 !admin/
 !site/
 !app-web/

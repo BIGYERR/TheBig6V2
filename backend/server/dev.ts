@@ -1,13 +1,14 @@
-// Live reload for npm run dev (scripts/dev.mjs). On only when IA_DEV=1 (docker-compose.dev.yml and dev.mjs set it),
+// Live reload for npm run dev (scripts/dev.ts). On only when IA_DEV=1 (docker-compose.dev.yml and dev.ts set it),
 // never in the image's own config or on Heroku.
 //
 // - The website, the admin and the app pages are served with one extra script tag, /__dev/reload.js, which listens
 //   on /__dev/events and reloads the page when told to.
-// - dev.mjs POSTs /__dev/reload after each successful rebuild, and every open page reloads.
+// - dev.ts POSTs /__dev/reload after each successful rebuild, and every open page reloads.
 // - A restarted server (a change under server/) has a new boot id; a page that reconnects and sees it reloads too.
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import type { Express, Response } from 'express';
 
 const TAG = '<script src="/__dev/reload.js"></script>';
 
@@ -24,9 +25,9 @@ const CLIENT = `// npm run dev: reload this page when the dev server says a rebu
 `;
 
 /** pages: request path to the folder whose index.html it serves, e.g. { '/app/': appDir }. */
-export function installDevReload(app, pages, log = () => {}) {
+export function installDevReload(app: Express, pages: Record<string, string>, log: (line: string) => void = () => {}) {
   const boot = randomUUID();
-  const clients = new Set();
+  const clients = new Set<Response>();
 
   app.get('/__dev/reload.js', (req, res) => res.type('js').set('Cache-Control', 'no-store').send(CLIENT));
 
@@ -55,7 +56,7 @@ export function installDevReload(app, pages, log = () => {}) {
 
   // The pages themselves, with the reload script added at the end of the body. Never cached.
   app.get(Object.keys(pages), (req, res, next) => {
-    let html;
+    let html: string;
     try {
       html = readFileSync(join(pages[req.path], 'index.html'), 'utf8');
     } catch {

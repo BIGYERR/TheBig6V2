@@ -4,7 +4,7 @@
 // exist. app-web/ is git-ignored: it is made here for local runs and the docker image (npm run docker:up and
 // mac-local-backend run this first), and scripts/heroku.sh deploy adds the same two files from the commit it deploys.
 //
-//   node scripts/app-bundle.mjs        (npm run app:bundle)
+//   node scripts/app-bundle.ts        (npm run app:bundle)
 //
 // On Heroku there is no repo beside backend/, so with no index.html to copy it keeps the app-web/ the deploy brought,
 // and says so. APP_SOURCE_DIR and APP_BUNDLE_DIR move the two folders (the tests use them).
@@ -18,11 +18,11 @@ const OUT = resolve(process.env.APP_BUNDLE_DIR || join(BACKEND, 'app-web'));
 const APP_FILES = ['index.html', 'apple-touch-icon.png'];
 
 /** The ia-version the page declares, as written (239, or 0.240.0 after the semver switch), or ''. */
-function appVersionOf(html) {
+function appVersionOf(html: string): string {
   return /<meta name="ia-version" content="([^"]*)"/.exec(html)?.[1] ?? '';
 }
 
-const say = (msg) => console.log(`app-bundle: ${msg}`);
+const say = (msg: string) => console.log(`app-bundle: ${msg}`);
 
 if (!existsSync(join(SOURCE, 'index.html'))) {
   if (existsSync(join(OUT, 'index.html'))) {

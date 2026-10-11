@@ -1,4 +1,4 @@
-/* The admin UI and the website. The server is plain JavaScript and never compiled. */
+/* The admin UI and the website (Angular). The server has its own: tsconfig.server.json, and tsconfig.test.json. */
 {
   "compileOnSave": false,
   "compilerOptions": {

@@ -94,7 +94,7 @@ if (LIST) {
   console.log(`check: limit ${LIMIT_S} s; ${STAGED ? `staged files: ${paths?.length ?? 0}` : 'everything'}`);
   console.log(`  gates   ${want.gates ? `${fastGates.length} fast gates here, ${ciOnly.length} in CI only (${ciOnly.join(' ')})` : 'not touched'}`);
   console.log(`  app     ${want.app ? 'sync, typecheck, unit, integration, lint' : 'not touched'}`);
-  console.log(`  backend ${want.backend ? 'test, lint' : 'not touched'}`);
+  console.log(`  backend ${want.backend ? 'typecheck, test, lint' : 'not touched'}`);
   process.exit(0);
 }
 
@@ -288,7 +288,10 @@ async function backendLane() {
     failures.push('backend: backend/node_modules is missing; run npm ci in backend/');
     return;
   }
+  const tsc = join(be, 'node_modules', '.bin', 'tsc');
   await Promise.all([
+    step('backend', 'typecheck (server)', tsc, ['-p', 'tsconfig.server.json', '--noEmit'], be),
+    step('backend', 'typecheck (tests, scripts)', tsc, ['-p', 'tsconfig.test.json'], be),
     step('backend', 'tests', process.execPath, ['--test', '--test-reporter=spec', 'test/'], be),
     step('backend', 'lint', join(be, 'node_modules', '.bin', 'eslint'), ['.'], be),
   ]);

@@ -1,16 +1,30 @@
 import express from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { existsSync, readFileSync, statSync } from 'node:fs';
+import type { ServerResponse } from 'node:http';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { createAdminAuth } from './auth.js';
-import { installDevReload } from './dev.js';
-import { cors, jsonBody } from './middleware.js';
-import { normalizeVersion } from './versions.js';
+import { createAdminAuth } from './auth.ts';
+import type { Config } from './config.ts';
+import { installDevReload } from './dev.ts';
+import { cors, jsonBody } from './middleware.ts';
+import { BACKEND_DIR } from './paths.ts';
+import type { DeviceStore } from './store.ts';
+import { normalizeVersion } from './versions.ts';
 
-const ADMIN_DIR = fileURLToPath(new URL('../dist/admin', import.meta.url));
-const CLIENT_DIR = fileURLToPath(new URL('../client', import.meta.url));
-const SITE_DIR = fileURLToPath(new URL('../dist/site', import.meta.url));
-const APP_DIR = fileURLToPath(new URL('../app-web', import.meta.url));
+const ADMIN_DIR = join(BACKEND_DIR, 'dist', 'admin');
+const CLIENT_DIR = join(BACKEND_DIR, 'client');
+const SITE_DIR = join(BACKEND_DIR, 'dist', 'site');
+const APP_DIR = join(BACKEND_DIR, 'app-web');
+
+export interface AppOptions {
+  config: Config;
+  store: DeviceStore;
+  adminDir?: string;
+  siteDir?: string;
+  appDir?: string;
+  startedAt?: number;
+  log?: ((line: string) => void) | null;
+}
 
 /** The kind of device a user agent names, for the request log. */
 export function deviceOf(ua = '') {
@@ -22,9 +36,9 @@ export function deviceOf(ua = '') {
 }
 
 // Built as a function of config and store so the tests can run it on a random port with a fake clock.
-// `log` gets one line per response once it is sent (server.js passes console.log; tests pass nothing, so stay quiet):
+// `log` gets one line per response once it is sent (server.ts passes console.log; tests pass nothing, so stay quiet):
 //   request POST /api/heartbeat 200 3 ms 192.168.1.20 iPhone
-export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_DIR, appDir = APP_DIR, startedAt = Date.now(), log = null }) {
+export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_DIR, appDir = APP_DIR, startedAt = Date.now(), log = null }: AppOptions) {
   const app = express();
   app.disable('x-powered-by');
   if (config.trustProxy) {
@@ -49,13 +63,13 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
   // says whether it reached a local server, docker or Heroku.
   const backend = { kind: config.backendKind, name: config.backendName, version: config.version, commit: config.commit };
 
-  // The app this backend serves at /app/ (scripts/app-bundle.mjs), and its ia-version as the page declares it, read
+  // The app this backend serves at /app/ (scripts/app-bundle.ts), and its ia-version as the page declares it, read
   // again whenever the file changes, so a fresh bundle shows without a restart. Unless APP_LATEST_VERSION says
   // otherwise, that is the newest version: a device below it runs an old build.
   const appPage = join(appDir, 'index.html');
   let appSeen = { mtimeMs: -1, version: '' };
   const appVersion = () => {
-    let mtimeMs;
+    let mtimeMs: number;
     try {
       mtimeMs = statSync(appPage).mtimeMs;
     } catch {
@@ -84,7 +98,7 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
     });
   });
 
-  // npm run dev only: the three pages carry a live reload script (server/dev.js). Before the routers, so it answers
+  // npm run dev only: the three pages carry a live reload script (server/dev.ts). Before the routers, so it answers
   // for /, /admin/ and /app/ first.
   if (config.dev) {
     installDevReload(
@@ -128,7 +142,7 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
 
   // ── Admin vision: the staff login, the dashboard and the API it reads ─────────
   // The page itself is public (it holds no data and draws the login form); every /admin/api route but login and
-  // logout needs a session or Basic auth (server/auth.js).
+  // logout needs a session or Basic auth (server/auth.ts).
   const auth = createAdminAuth(config);
   const admin = express.Router();
   admin.use('/api', (req, res, next) => {
@@ -140,7 +154,9 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
   admin.use('/api', auth.guard);
 
   admin.get('/api/me', (req, res) => {
-    res.json({ ok: true, user: req.admin.user, via: req.admin.via, expiresAt: req.admin.expires });
+    // Set by auth.guard, which every route from here on sits behind.
+    const who = req.admin!;
+    res.json({ ok: true, user: who.user, via: who.via, expiresAt: who.expires });
   });
 
   admin.get('/api/stats', (req, res) => {
@@ -173,7 +189,7 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
 
   admin.get('/api/devices', (req, res) => {
     const q = req.query;
-    const flag = (v) => v === '1' || v === 'true';
+    const flag = (v: unknown) => v === '1' || v === 'true';
     res.json(
       store.list({
         q: String(q.q ?? ''),
@@ -233,8 +249,8 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
     res.status(404).json({ ok: false, error: 'not found' });
   });
 
-  // eslint-disable-next-line no-unused-vars
-  app.use((err, req, res, next) => {
+  // Four parameters, or express does not take it for an error handler.
+  app.use((err: HttpError, req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     if (status >= 500) console.error(err);
     res.status(status).json({ ok: false, error: status >= 500 ? 'server error' : err.message });
@@ -243,13 +259,20 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
   return app;
 }
 
+/** What express and its body parsers throw: a status on the errors they mean, none on a crash. */
+interface HttpError {
+  status?: number;
+  statusCode?: number;
+  message?: string;
+}
+
 // Cache rules for every built folder. A name with a content hash (main-ABCD1234.js, the production build) never
 // changes, so it caches for a year. Pages, and scripts or styles without a hash (a development build), are revalidated
 // on every load, so a rebuild shows at once. Anything else (icons, robots.txt) for an hour. The admin's files are
 // `private`: kept by the browser, never by a shared cache.
 const HASHED = /-[A-Z0-9]{8}\.(?:js|css)$/;
-function cacheFor(scope) {
-  return (res, path) => {
+function cacheFor(scope: 'public' | 'private') {
+  return (res: ServerResponse, path: string) => {
     const value = HASHED.test(path)
       ? `${scope}, max-age=31536000, immutable`
       : /\.(?:html|js|css)$/.test(path)

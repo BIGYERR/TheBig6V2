@@ -1,35 +1,97 @@
 // Devices the backend has heard from, keyed by the UID the backend issued them.
 // In memory, with an optional JSON file behind it (DATA_FILE). A real database replaces this module later;
-// app.js only uses the methods below.
+// app.ts only uses the methods below.
 
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { compareVersions, isOutdated, normalizeVersion, parseVersion } from './versions.js';
+import { compareVersions, isOutdated, normalizeVersion, parseVersion } from './versions.ts';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const RTT_SAMPLES = 50; // per device, newest last
 const MAX_RTT_MS = 60_000;
 const SAVE_DELAY_MS = 2_000;
 
-export function isUid(value) {
+/** One device as the store keeps it (and as the devices file holds it). */
+export interface Device {
+  uid: string;
+  name: string; // given in the admin
+  deviceName: string; // reported by the device, if it ever sends one
+  label: string;
+  platform: string;
+  appVersion: string;
+  screen: string;
+  ua: string;
+  firstSeen: number;
+  lastSeen: number;
+  online: boolean;
+  connectedSince: number;
+  sessions: number;
+  beats: number;
+  rtt: number[];
+}
+
+/** A heartbeat body as the app sends it. Nothing in it is trusted: every field is checked before use. */
+export type Beat = Record<string, unknown>;
+
+export interface StoreOptions {
+  connectedWindowMs?: number;
+  maxDevices?: number;
+  dataFile?: string;
+  now?: () => number;
+}
+
+export interface ListQuery {
+  q?: string;
+  name?: string;
+  connected?: boolean;
+  outdated?: boolean;
+  latest?: string;
+  // Straight from the query string, so anything; clamped to a page that exists.
+  page?: unknown;
+  pageSize?: unknown;
+}
+
+export interface Summary {
+  samples: number;
+  avg: number | null;
+  p50: number | null;
+  p95: number | null;
+  min: number | null;
+  max: number | null;
+}
+
+interface VersionGroup {
+  version: string;
+  semver: string;
+  devices: number;
+  connected: number;
+  lastSeen: number;
+}
+
+export function isUid(value: unknown): value is string {
   return typeof value === 'string' && UUID_RE.test(value);
 }
 
 export class DeviceStore {
-  constructor({ connectedWindowMs = 45_000, maxDevices = 5_000, dataFile = '', now = () => Date.now() } = {}) {
+  connectedWindowMs: number;
+  maxDevices: number;
+  dataFile: string;
+  now: () => number;
+  devices = new Map<string, Device>();
+  beatsTotal = 0;
+  saveTimer: NodeJS.Timeout | undefined = undefined;
+
+  constructor({ connectedWindowMs = 45_000, maxDevices = 5_000, dataFile = '', now = () => Date.now() }: StoreOptions = {}) {
     this.connectedWindowMs = connectedWindowMs;
     this.maxDevices = maxDevices;
     this.dataFile = dataFile;
     this.now = now;
-    this.devices = new Map();
-    this.beatsTotal = 0;
-    this.saveTimer = null;
   }
 
   // One beat from the app. A missing or malformed UID gets a fresh one, which the app keeps from then on.
   // A well-formed UID the store has not seen (issued before a restart wiped memory) is kept: same phone.
-  heartbeat(beat = {}, meta = {}) {
+  heartbeat(beat: Beat = {}, meta: { ua?: string } = {}) {
     const t = this.now();
     let uid = isUid(beat.uid) ? beat.uid.toLowerCase() : null;
     const issued = !uid;
@@ -69,7 +131,7 @@ export class DeviceStore {
   }
 
   // The app went to the background or closed. It stops counting as connected now, not a window later.
-  bye(uid) {
+  bye(uid: unknown) {
     const d = isUid(uid) ? this.devices.get(uid.toLowerCase()) : null;
     if (!d) return false;
     d.online = false;
@@ -77,7 +139,7 @@ export class DeviceStore {
     return true;
   }
 
-  rename(uid, name) {
+  rename(uid: string, name: string) {
     const d = isUid(uid) ? this.devices.get(uid.toLowerCase()) : null;
     if (!d) return null;
     d.name = text(name, 60);
@@ -85,7 +147,7 @@ export class DeviceStore {
     return d;
   }
 
-  isConnected(d, t = this.now()) {
+  isConnected(d: Device, t = this.now()) {
     return d.online && t - d.lastSeen <= this.connectedWindowMs;
   }
 
@@ -105,7 +167,7 @@ export class DeviceStore {
   }
 
   // The newest app version: the one given (APP_LATEST_VERSION), or else the newest any device has reported.
-  latestVersion(given = '') {
+  latestVersion(given = ''): string {
     if (parseVersion(given)) return given;
     let newest = '';
     for (const d of this.devices.values()) if (parseVersion(d.appVersion) && compareVersions(d.appVersion, newest) > 0) newest = d.appVersion;
@@ -117,7 +179,7 @@ export class DeviceStore {
   versions(given = '', from = 'config') {
     const t = this.now();
     const latest = this.latestVersion(given);
-    const groups = new Map();
+    const groups = new Map<string, VersionGroup>();
     for (const d of this.devices.values()) {
       const key = d.appVersion || '';
       const g = groups.get(key) ?? { version: key, semver: normalizeVersion(key), devices: 0, connected: 0, lastSeen: 0 };
@@ -135,7 +197,7 @@ export class DeviceStore {
 
   // q matches any text field; name matches the admin name or the name the device reported; outdated keeps the
   // devices below `latest`.
-  list({ q = '', name = '', connected = false, outdated = false, latest = '', page = 1, pageSize = 25 } = {}) {
+  list({ q = '', name = '', connected = false, outdated = false, latest = '', page = 1, pageSize = 25 }: ListQuery = {}) {
     const t = this.now();
     const needle = q.trim().toLowerCase();
     const nameNeedle = name.trim().toLowerCase();
@@ -162,7 +224,7 @@ export class DeviceStore {
     return { items, total: rows.length, page: current, pageSize: size, pages, latest };
   }
 
-  view(d, t = this.now(), latest = '') {
+  view(d: Device, t = this.now(), latest = '') {
     const { rtt, online, ...rest } = d;
     const connected = this.isConnected(d, t);
     return {
@@ -182,24 +244,27 @@ export class DeviceStore {
     for (const d of oldest.slice(0, this.devices.size - this.maxDevices)) this.devices.delete(d.uid);
   }
 
-  load() {
+  load(): number {
     if (!this.dataFile) return 0;
-    let saved;
+    let saved: { beatsTotal?: unknown; devices?: unknown } | null;
     try {
       saved = JSON.parse(readFileSync(this.dataFile, 'utf8'));
     } catch (err) {
-      if (err.code !== 'ENOENT') console.warn(`store: could not read ${this.dataFile}: ${err.message}`);
+      const e = err as NodeJS.ErrnoException;
+      if (e.code !== 'ENOENT') console.warn(`store: could not read ${this.dataFile}: ${e.message}`);
       return 0;
     }
     this.beatsTotal = Number(saved?.beatsTotal) || 0;
     // Rebuild each record on the blank shape and take only fields of the right type, so a hand-edited or
     // older file cannot crash startup or break search. Nobody is connected across a restart.
-    for (const r of Array.isArray(saved?.devices) ? saved.devices : []) {
+    const records = saved?.devices;
+    for (const r of Array.isArray(records) ? records : []) {
       if (!isUid(r?.uid)) continue;
       const d = blank('', 0);
+      const fields = d as unknown as Record<string, unknown>;
       for (const key of Object.keys(d)) {
-        if (typeof d[key] === 'string' && typeof r[key] === 'string') d[key] = r[key];
-        if (typeof d[key] === 'number' && Number.isFinite(r[key])) d[key] = r[key];
+        if (typeof fields[key] === 'string' && typeof r[key] === 'string') fields[key] = r[key];
+        if (typeof fields[key] === 'number' && Number.isFinite(r[key])) fields[key] = r[key];
       }
       d.uid = r.uid.toLowerCase();
       d.online = false;
@@ -218,7 +283,7 @@ export class DeviceStore {
   // Write to a temp file, then rename over the old one, so a crash mid-write never leaves half a file.
   flush() {
     clearTimeout(this.saveTimer);
-    this.saveTimer = null;
+    this.saveTimer = undefined;
     if (!this.dataFile) return;
     const body = JSON.stringify({ savedAt: this.now(), beatsTotal: this.beatsTotal, devices: [...this.devices.values()] });
     try {
@@ -226,16 +291,16 @@ export class DeviceStore {
       writeFileSync(`${this.dataFile}.tmp`, body);
       renameSync(`${this.dataFile}.tmp`, this.dataFile);
     } catch (err) {
-      console.warn(`store: could not write ${this.dataFile}: ${err.message}`);
+      console.warn(`store: could not write ${this.dataFile}: ${(err as Error).message}`);
     }
   }
 }
 
-export function summarize(samples) {
+export function summarize(samples: number[]): Summary {
   if (!samples.length) return { samples: 0, avg: null, p50: null, p95: null, min: null, max: null };
   const sorted = [...samples].sort((a, b) => a - b);
   // Nearest rank: the smallest sample with at least p of the samples at or below it.
-  const pct = (p) => sorted[Math.min(sorted.length - 1, Math.ceil(p * sorted.length) - 1)];
+  const pct = (p: number) => sorted[Math.min(sorted.length - 1, Math.ceil(p * sorted.length) - 1)];
   return {
     samples: sorted.length,
     avg: Math.round(sorted.reduce((sum, v) => sum + v, 0) / sorted.length),
@@ -246,11 +311,11 @@ export function summarize(samples) {
   };
 }
 
-function blank(uid, t) {
+function blank(uid: string, t: number): Device {
   return {
     uid,
-    name: '', // given in the admin
-    deviceName: '', // reported by the device, if it ever sends one
+    name: '',
+    deviceName: '',
     label: '',
     platform: '',
     appVersion: '',
@@ -266,12 +331,12 @@ function blank(uid, t) {
   };
 }
 
-function text(value, max) {
+function text(value: unknown, max: number): string {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
 }
 
 // A missing or non-numeric value takes the fallback.
-function clamp(value, lo, hi, fallback) {
-  const n = Number.parseInt(value, 10);
+function clamp(value: unknown, lo: number, hi: number, fallback: number): number {
+  const n = Number.parseInt(String(value), 10);
   return Math.min(hi, Math.max(lo, Number.isFinite(n) ? n : fallback));
 }

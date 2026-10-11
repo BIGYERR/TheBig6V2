@@ -1,25 +1,27 @@
-// The staff login (server/auth.js): a form login that sets a session cookie, a logout that ends it on the server,
+// The staff login (server/auth.ts): a form login that sets a session cookie, a logout that ends it on the server,
 // Basic auth still accepted for scripts, the lockout shared by both, and never a WWW-Authenticate challenge.
 import assert from 'node:assert/strict';
+import type { AddressInfo } from 'node:net';
 import { after, before, describe, test } from 'node:test';
-import { createApp } from '../server/app.js';
-import { createAdminAuth } from '../server/auth.js';
-import { loadConfig } from '../server/config.js';
-import { DeviceStore } from '../server/store.js';
+import type { Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import { createApp } from '../server/app.ts';
+import { createAdminAuth } from '../server/auth.ts';
+import { loadConfig } from '../server/config.ts';
+import { DeviceStore } from '../server/store.ts';
 
 async function boot(env = {}) {
   const config = loadConfig({ NODE_ENV: 'production', ADMIN_USER: 'admin', ADMIN_PASSWORD: 'secret', ...env });
   const server = createApp({ config, store: new DeviceStore(config), adminDir: '/nonexistent', siteDir: '/nonexistent' }).listen(0);
   await new Promise((resolve) => server.once('listening', resolve));
-  return { base: `http://127.0.0.1:${server.address().port}`, close: () => new Promise((resolve) => server.close(resolve)) };
+  return { base: `http://127.0.0.1:${(server.address() as AddressInfo).port}`, close: () => new Promise((resolve) => server.close(resolve)) };
 }
 
 const json = { 'Content-Type': 'application/json' };
-const login = (base, user, password) => fetch(`${base}/admin/api/login`, { method: 'POST', headers: json, body: JSON.stringify({ user, password }) });
-const cookieOf = (res) => (res.headers.get('set-cookie') ?? '').split(';')[0];
+const login = (base: string, user: string, password: string) => fetch(`${base}/admin/api/login`, { method: 'POST', headers: json, body: JSON.stringify({ user, password }) });
+const cookieOf = (res: Response) => (res.headers.get('set-cookie') ?? '').split(';')[0];
 
 describe('staff login', () => {
-  let s;
+  let s: Awaited<ReturnType<typeof boot>>;
   before(async () => (s = await boot()));
   after(() => s.close());
 
@@ -36,7 +38,7 @@ describe('staff login', () => {
     assert.equal(r.status, 200);
     const j = await r.json();
     assert.equal(j.user, 'admin');
-    const header = r.headers.get('set-cookie');
+    const header = r.headers.get('set-cookie') ?? '';
     assert.match(header, /^ia_admin=[\w-]{40,};/);
     for (const flag of ['Path=/admin', 'HttpOnly', 'SameSite=Strict', 'Max-Age=43200']) assert.ok(header.includes(flag), flag);
     assert.ok(!header.includes('Secure'), 'Secure only over https, or localhost http would drop the cookie');
@@ -51,7 +53,7 @@ describe('staff login', () => {
 
     const out = await fetch(`${s.base}/admin/api/logout`, { method: 'POST', headers: { cookie } });
     assert.equal(out.status, 200);
-    assert.match(out.headers.get('set-cookie'), /^ia_admin=; .*Max-Age=0/);
+    assert.match(out.headers.get('set-cookie') ?? '', /^ia_admin=; .*Max-Age=0/);
     // A copy of the old cookie is dead, not just cleared in the browser.
     assert.equal((await fetch(`${s.base}/admin/api/stats`, { headers: { cookie } })).status, 401);
     assert.equal((await fetch(`${s.base}/admin/api/logout`, { method: 'POST' })).status, 200, 'logout is safe to repeat');
@@ -95,13 +97,15 @@ describe('sessions expire', () => {
   test('a session past its time is refused and forgotten', () => {
     const clock = { t: 1_000 };
     const auth = createAdminAuth({ adminUser: 'a', adminPassword: 'b', sessionTtlMs: 60_000, now: () => clock.t });
-    const res = { headers: {}, statusCode: 200, body: null };
-    const fakeRes = {
-      set: (k, v) => ((res.headers[k] = v), fakeRes),
-      status: (c) => ((res.statusCode = c), fakeRes),
-      json: (b) => ((res.body = b), fakeRes),
-    };
-    const req = (cookie = '') => ({ ip: '1.1.1.1', secure: false, body: { user: 'a', password: 'b' }, get: (h) => (h === 'cookie' ? cookie : '') });
+    const res: { headers: Record<string, string>; statusCode: number; body: unknown } = { headers: {}, statusCode: 200, body: null };
+    // Only what auth.ts calls on a response and reads from a request.
+    const fakeRes: ExpressResponse = {
+      set: (k: string, v: string) => ((res.headers[k] = v), fakeRes),
+      status: (c: number) => ((res.statusCode = c), fakeRes),
+      json: (b: unknown) => ((res.body = b), fakeRes),
+    } as unknown as ExpressResponse;
+    const req = (cookie = '') =>
+      ({ ip: '1.1.1.1', secure: false, body: { user: 'a', password: 'b' }, get: (h: string) => (h === 'cookie' ? cookie : '') }) as unknown as ExpressRequest;
     auth.login(req(), fakeRes);
     const cookie = res.headers['Set-Cookie'].split(';')[0];
     let passed = false;

@@ -1,23 +1,24 @@
-// The live reload behind npm run dev (server/dev.js): off unless IA_DEV=1, and when on, the three pages carry the
+// The live reload behind npm run dev (server/dev.ts): off unless IA_DEV=1, and when on, the three pages carry the
 // reload script and a POST to /__dev/reload reaches every open page.
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
-import { createApp } from '../server/app.js';
-import { loadConfig } from '../server/config.js';
-import { DeviceStore } from '../server/store.js';
+import { createApp } from '../server/app.ts';
+import { loadConfig } from '../server/config.ts';
+import { DeviceStore } from '../server/store.ts';
 
-async function boot(env, siteDir) {
+async function boot(env: Record<string, string>, siteDir: string) {
   const config = loadConfig({ NODE_ENV: 'production', ...env });
   const server = createApp({ config, store: new DeviceStore(config), adminDir: '/nonexistent', siteDir, appDir: siteDir }).listen(0);
   await new Promise((resolve) => server.once('listening', resolve));
-  return { base: `http://127.0.0.1:${server.address().port}`, close: () => (server.closeAllConnections(), new Promise((r) => server.close(r))) };
+  return { base: `http://127.0.0.1:${(server.address() as AddressInfo).port}`, close: () => (server.closeAllConnections(), new Promise((r) => server.close(r))) };
 }
 
 describe('dev live reload', () => {
-  let dir;
+  let dir: string;
   before(() => {
     dir = mkdtempSync(join(tmpdir(), 'ia-dev-'));
     writeFileSync(join(dir, 'index.html'), '<!doctype html><title>x</title><body><p>page</p></body>');
@@ -42,7 +43,7 @@ describe('dev live reload', () => {
 
     const ctrl = new AbortController();
     const events = await fetch(`${s.base}/__dev/events`, { signal: ctrl.signal });
-    const reader = events.body.getReader();
+    const reader = events.body!.getReader();
     const read = async () => new TextDecoder().decode((await reader.read()).value);
     assert.match(await read(), /^event: hello\ndata: [0-9a-f-]{36}\n\n/);
     assert.equal((await fetch(`${s.base}/__dev/reload`, { method: 'POST' })).status, 204);

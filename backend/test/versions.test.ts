@@ -1,14 +1,15 @@
-// App versions per device (server/versions.js, store.versions) and which backend answered (/healthz, the heartbeat
+// App versions per device (server/versions.ts, store.versions) and which backend answered (/healthz, the heartbeat
 // reply): the two facts that tell who runs an old build, and what a phone or a test run is connected to.
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
-import { createApp } from '../server/app.js';
-import { loadConfig } from '../server/config.js';
-import { DeviceStore } from '../server/store.js';
-import { compareVersions, isOutdated, normalizeVersion } from '../server/versions.js';
+import { createApp } from '../server/app.ts';
+import { loadConfig } from '../server/config.ts';
+import { DeviceStore } from '../server/store.ts';
+import { compareVersions, isOutdated, normalizeVersion } from '../server/versions.ts';
 
 const AUTH = { Authorization: 'Basic ' + Buffer.from('admin:secret').toString('base64') };
 
@@ -17,9 +18,9 @@ async function boot(env = {}, appDir = '/nonexistent') {
   const store = new DeviceStore(config);
   const server = createApp({ config, store, adminDir: '/nonexistent', siteDir: '/nonexistent', appDir }).listen(0);
   await new Promise((resolve) => server.once('listening', resolve));
-  const base = `http://127.0.0.1:${server.address().port}`;
-  const beat = async (body) => (await fetch(`${base}/api/heartbeat`, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(body) })).json();
-  const admin = async (path) => (await fetch(`${base}/admin/api/${path}`, { headers: AUTH })).json();
+  const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  const beat = async (body: unknown) => (await fetch(`${base}/api/heartbeat`, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(body) })).json();
+  const admin = async (path: string) => (await fetch(`${base}/admin/api/${path}`, { headers: AUTH })).json();
   return { base, beat, admin, close: () => new Promise((resolve) => server.close(resolve)) };
 }
 
@@ -35,7 +36,7 @@ describe('version rule', () => {
 });
 
 describe('versions in the admin', () => {
-  let s;
+  let s: Awaited<ReturnType<typeof boot>>;
   before(async () => (s = await boot()));
   after(() => s.close());
 
@@ -48,7 +49,7 @@ describe('versions in the admin', () => {
     const v = await s.admin('versions');
     assert.equal(v.latest, '239');
     assert.equal(v.latestFrom, 'devices', 'nothing configured and no app bundled: the newest reported');
-    assert.deepEqual(v.rows.map((r) => [r.version, r.devices, r.outdated]), [['239', 2, false], ['238', 1, true], ['237', 1, true], ['demo', 1, false]]);
+    assert.deepEqual(v.rows.map((r: { version: string; devices: number; outdated: boolean }) => [r.version, r.devices, r.outdated]), [['239', 2, false], ['238', 1, true], ['237', 1, true], ['demo', 1, false]]);
     assert.equal(v.outdated, 2);
     assert.equal(v.rows[0].semver, '0.239.0');
   });
@@ -56,7 +57,7 @@ describe('versions in the admin', () => {
   test('?outdated=1 lists only the devices on an old build, each flagged', async () => {
     const page = await s.admin('devices?outdated=1');
     assert.equal(page.total, 2);
-    assert.ok(page.items.every((d) => d.outdated && ['237', '238'].includes(d.appVersion)));
+    assert.ok(page.items.every((d: { outdated: boolean; appVersion: string }) => d.outdated && ['237', '238'].includes(d.appVersion)));
     assert.equal(page.latest, '239');
     const stats = await s.admin('stats');
     assert.equal(stats.outdated, 2);
@@ -65,7 +66,7 @@ describe('versions in the admin', () => {
 });
 
 describe('the newest version comes from config, then the app at /app/, then the devices', () => {
-  let dir;
+  let dir: string;
   before(() => {
     dir = mkdtempSync(join(tmpdir(), 'ia-app-'));
     writeFileSync(join(dir, 'index.html'), '<!doctype html><meta name="ia-version" content="240"><title>app</title>');

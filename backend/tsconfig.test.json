@@ -1,0 +1,13 @@
+/* The tests and the build script: type-checked here (npm run typecheck), never emitted. Node runs them as they stand,
+ * with the server's TypeScript imported straight from server/. DOM adds the browser's fetch types the tests read
+ * responses through. */
+{
+  "extends": "./tsconfig.server.json",
+  "compilerOptions": {
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "rootDir": ".",
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["server/**/*.ts", "test/**/*.ts", "scripts/**/*.ts"]
+}

@@ -3,29 +3,31 @@
 // called old. The backend ships without the repo beside it (Heroku, the docker image), so it carries its own copy of
 // the rule in tests/semver.js instead of requiring that file.
 
-// The same reading as tests/semver.js (test/semver-parity.test.js proves they agree): N, VN or vN is 0.N.0;
+// The same reading as tests/semver.js (test/semver-parity.test.ts proves they agree): N, VN or vN is 0.N.0;
 // M.m.p or vM.m.p is semver; no leading zeros, no pre-release or build suffix, no spaces.
 const LEGACY_RE = /^[Vv]?(0|[1-9][0-9]*)$/;
 const DOTTED_RE = /^[Vv]?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/;
 
+export type Version = [major: number, minor: number, patch: number];
+
 /** [major, minor, patch], or null when the value is not a version. */
-export function parseVersion(value) {
+export function parseVersion(value: unknown): Version | null {
   if (typeof value === 'number') return Number.isSafeInteger(value) && value >= 0 ? [0, value, 0] : null;
   if (typeof value !== 'string') return null;
   const legacy = LEGACY_RE.exec(value);
   const dotted = legacy ? null : DOTTED_RE.exec(value);
-  const parts = legacy ? [0, Number(legacy[1]), 0] : dotted ? [Number(dotted[1]), Number(dotted[2]), Number(dotted[3])] : null;
+  const parts: Version | null = legacy ? [0, Number(legacy[1]), 0] : dotted ? [Number(dotted[1]), Number(dotted[2]), Number(dotted[3])] : null;
   return parts && parts.every(Number.isSafeInteger) ? parts : null;
 }
 
 /** MAJOR.MINOR.PATCH, or '' when the text is not a version. */
-export function normalizeVersion(value) {
+export function normalizeVersion(value: unknown): string {
   const v = parseVersion(value);
   return v ? v.join('.') : '';
 }
 
 /** Negative when a is older than b. A version that cannot be read sorts below every one that can. */
-export function compareVersions(a, b) {
+export function compareVersions(a: unknown, b: unknown): number {
   const va = parseVersion(a);
   const vb = parseVersion(b);
   if (!va || !vb) return Number(Boolean(va)) - Number(Boolean(vb));
@@ -34,6 +36,6 @@ export function compareVersions(a, b) {
 }
 
 /** True only when both read as versions and `value` is below `latest`. */
-export function isOutdated(value, latest) {
+export function isOutdated(value: unknown, latest: unknown): boolean {
   return Boolean(parseVersion(value) && parseVersion(latest)) && compareVersions(value, latest) < 0;
 }

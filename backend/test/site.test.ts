@@ -1,26 +1,27 @@
-// The website at `/` (server/app.js): served from a built dist/site, a 503 when it is not built, a 404 page for
+// The website at `/` (server/app.ts): served from a built dist/site, a 503 when it is not built, a 404 page for
 // browsers and JSON for everything else, and a Staff Login that leads to the admin login on the same server.
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
-import { createApp } from '../server/app.js';
-import { loadConfig } from '../server/config.js';
-import { DeviceStore } from '../server/store.js';
+import { createApp } from '../server/app.ts';
+import { loadConfig } from '../server/config.ts';
+import { DeviceStore } from '../server/store.ts';
 
-async function boot(siteDir) {
+async function boot(siteDir: string) {
   const config = loadConfig({ NODE_ENV: 'production', ADMIN_USER: 'admin', ADMIN_PASSWORD: 'secret' });
   const server = createApp({ config, store: new DeviceStore(config), adminDir: '/nonexistent', siteDir }).listen(0);
   await new Promise((resolve) => server.once('listening', resolve));
-  return { base: `http://127.0.0.1:${server.address().port}`, close: () => new Promise((resolve) => server.close(resolve)) };
+  return { base: `http://127.0.0.1:${(server.address() as AddressInfo).port}`, close: () => new Promise((resolve) => server.close(resolve)) };
 }
 
 const HTML = { Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' };
 
 describe('website, built', () => {
-  let dir;
-  let s;
+  let dir: string;
+  let s: Awaited<ReturnType<typeof boot>>;
   before(async () => {
     // A dot folder on the way in, as backend/ has inside a .claude/worktrees checkout: sendFile with an absolute
     // path refuses any dot segment, so the 404 page must be sent relative to its root.
@@ -40,7 +41,7 @@ describe('website, built', () => {
   test('/ serves the site, revalidated on every load', async () => {
     const r = await fetch(`${s.base}/`, { headers: HTML });
     assert.equal(r.status, 200);
-    assert.match(r.headers.get('content-type'), /text\/html/);
+    assert.match(r.headers.get('content-type') ?? '', /text\/html/);
     assert.equal(r.headers.get('cache-control'), 'no-cache');
     assert.match(await r.text(), /<ia-site>/);
   });

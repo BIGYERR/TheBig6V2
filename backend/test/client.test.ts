@@ -3,22 +3,24 @@
 // that too. This is what the app's debug section and bug report will show.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import type { Server } from 'node:http';
+import type { AddressInfo } from 'node:net';
 import { after, before, describe, test } from 'node:test';
 import vm from 'node:vm';
-import { createApp } from '../server/app.js';
-import { loadConfig } from '../server/config.js';
-import { DeviceStore } from '../server/store.js';
+import { createApp } from '../server/app.ts';
+import { loadConfig } from '../server/config.ts';
+import { DeviceStore } from '../server/store.ts';
 
 const SNIPPET = readFileSync(new URL('../client/ia-link.js', import.meta.url), 'utf8');
 
-function page(url) {
-  const storage = new Map();
-  const ctx = {
+function page(url: string) {
+  const storage = new Map<string, string>();
+  const ctx: Record<string, unknown> = {
     IA_BACKEND_URL: url,
     IA_VERSION: '239',
     navigator: { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X)', maxTouchPoints: 5, sendBeacon: () => true },
     document: { visibilityState: 'visible', addEventListener() {}, getElementById: () => null },
-    localStorage: { getItem: (k) => storage.get(k) ?? null, setItem: (k, v) => storage.set(k, String(v)) },
+    localStorage: { getItem: (k: string) => storage.get(k) ?? null, setItem: (k: string, v: unknown) => storage.set(k, String(v)) },
     screen: { width: 393, height: 852 },
     fetch,
     AbortController,
@@ -38,13 +40,13 @@ function page(url) {
 }
 
 describe('ia-link status', () => {
-  let server;
-  let base;
+  let server: Server;
+  let base: string;
   before(async () => {
     const config = loadConfig({ NODE_ENV: 'production', IA_BACKEND_KIND: 'mac-local', IA_BACKEND_NAME: 'studio', GIT_COMMIT: 'abcdef1234' });
     server = createApp({ config, store: new DeviceStore(config), adminDir: '/nonexistent', siteDir: '/nonexistent' }).listen(0);
     await new Promise((resolve) => server.once('listening', resolve));
-    base = `http://127.0.0.1:${server.address().port}`;
+    base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   });
   after(() => new Promise((resolve) => server.close(resolve)));
 

@@ -1,9 +1,11 @@
-# npm run dev (scripts/dev.mjs) lays this over docker-compose.yml: the same container, port and devices volume, but
+# npm run dev (scripts/dev.ts) lays this over docker-compose.yml: the same container, port and devices volume, but
 # serving this checkout's files as the Mac rebuilds them, not the copies baked into the image. Built folders and the
-# app are read per request, so a rebuild shows on the next load; dev.mjs restarts the container when server/ changes.
-# IA_DEV turns on the live reload (server/dev.js). npm run docker:up puts back the plain image.
+# app are read per request, so a rebuild shows on the next load; dev.ts restarts the container when server/ changes.
+# The server runs from its TypeScript source as Node strips the types, so a restart needs no tsc; the image's own CMD
+# runs what tsc compiled. IA_DEV turns on the live reload (server/dev.ts). npm run docker:up puts back the plain image.
 services:
   api:
+    command: ["node", "server/server.ts"]
     environment:
       IA_DEV: "1"
       IA_BACKEND_NAME: ${IA_BACKEND_NAME:-docker dev on this Mac (npm run dev)}

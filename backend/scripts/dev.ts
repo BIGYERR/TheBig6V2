@@ -4,17 +4,19 @@
 //   website  http://localhost:3000/        site/          ng build --watch (development build, about a second)
 //   app      http://localhost:3000/app/    ../index.html  copied to app-web/ on every save (instant)
 //   admin    http://localhost:3000/admin/  admin/         ng build --watch
-//   server                                 server/        the server restarts (about a second)
+//   server                                 server/        type-checked, and the server restarts (about a second)
 //   snippet  http://localhost:3000/client/ client/        served as saved
 //
 // It runs in the docker backend: docker-compose.yml with docker-compose.dev.yml laid over it, so the same container,
 // port and devices volume as npm run docker:up, serving these folders live instead of the image's copies.
 // --no-docker runs the server with this Mac's Node instead. After each change it runs the fast tests that change can
-// break, each set stopped at 3 s, then every open page reloads itself (server/dev.js). It replaces none of the real
+// break, each set stopped at 3 s, then every open page reloads itself (server/dev.ts). The server runs from its
+// TypeScript source as Node strips the types, so a change under server/ is also type-checked (tsc), beside the tests. It replaces none of the real
 // checks: the pre-commit check, CI, and the build paths for devices in app/ (emulator-ios, device-ios, pwa-pages).
 //
 // Ctrl-C stops the watchers. The container keeps serving the last build; npm run docker:up puts back the plain image.
 import { spawn } from 'node:child_process';
+import type { ChildProcess, SpawnOptions } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, statSync, watch } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { dirname, join, resolve } from 'node:path';
@@ -29,20 +31,29 @@ const DOCKER = !process.argv.includes('--no-docker');
 const COMPOSE = ['compose', '-f', 'docker-compose.yml', '-f', 'docker-compose.dev.yml'];
 const TEST_LIMIT_MS = 3_000;
 const NG = join(BACKEND, 'node_modules', '.bin', 'ng');
+const TSC = join(BACKEND, 'node_modules', '.bin', 'tsc');
 // The backend tests that finish in well under a second: no child processes, no git. npm test runs every file.
 const FAST_TESTS = ['server', 'auth', 'versions', 'site', 'client', 'dev', 'request-log', 'semver-parity']
-  .map((name) => `test/${name}.test.js`)
+  .map((name) => `test/${name}.test.ts`)
   .filter((file) => existsSync(join(BACKEND, file)));
 
 // ── Output: one line per event, `time  lane  what` ──────────────────────────────────────────────────────────────
 const TONES = { ok: 32, bad: 31, warn: 33, dim: 2, info: 36 };
-const paint = (tone, s) => (process.stdout.isTTY && tone ? `\x1b[${TONES[tone]}m${s}\x1b[0m` : s);
-function log(lane, msg, tone) {
+type Tone = keyof typeof TONES;
+const paint = (tone: Tone | undefined, s: string) => (process.stdout.isTTY && tone ? `\x1b[${TONES[tone]}m${s}\x1b[0m` : s);
+function log(lane: string, msg: string, tone?: Tone) {
   console.log(`${paint('dim', new Date().toTimeString().slice(0, 8))}  ${lane.padEnd(8)}${paint(tone, msg)}`);
 }
 
+/** How a command ended, and everything it printed. */
+interface Ran {
+  code: number | null;
+  signal?: NodeJS.Signals | null;
+  out: string;
+}
+
 /** Runs a command to the end: { code, out }. */
-function exec(cmd, args, opts = {}) {
+function exec(cmd: string, args: string[], opts: SpawnOptions = {}): Promise<Ran> {
   return new Promise((done) => {
     const child = spawn(cmd, args, { cwd: BACKEND, ...opts });
     let out = '';
@@ -54,15 +65,15 @@ function exec(cmd, args, opts = {}) {
 }
 
 // One change at a time: a burst of saves turns into one rebuild, never two restarts racing.
-let queue = Promise.resolve();
-const enqueue = (job) => (queue = queue.then(job).catch((err) => log('dev', String(err?.stack ?? err), 'bad')));
+let queue: Promise<unknown> = Promise.resolve();
+const enqueue = (job: () => Promise<unknown>) => (queue = queue.then(job).catch((err) => log('dev', String(err?.stack ?? err), 'bad')));
 
 // ── Fast tests: each set stopped at 3 s ─────────────────────────────────────────────────────────────────────────
-async function tests(label, args, cwd) {
+async function tests(label: string, args: string[], cwd: string) {
   const started = Date.now();
   const child = spawn(process.execPath, args, { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
   const stop = setTimeout(() => child.kill('SIGKILL'), TEST_LIMIT_MS);
-  const { code, signal, out } = await new Promise((done) => {
+  const { code, signal, out } = await new Promise<Ran>((done) => {
     let text = '';
     child.stdout.on('data', (d) => (text += d));
     child.stderr.on('data', (d) => (text += d));
@@ -70,7 +81,7 @@ async function tests(label, args, cwd) {
   });
   clearTimeout(stop);
   const secs = ((Date.now() - started) / 1000).toFixed(1);
-  const count = (what) => out.match(new RegExp(`ℹ ${what} (\\d+)`))?.[1] ?? '0';
+  const count = (what: string) => out.match(new RegExp(`ℹ ${what} (\\d+)`))?.[1] ?? '0';
   if (signal) {
     log('tests', `${label}: past the ${TEST_LIMIT_MS / 1000} s limit, stopped (npm test runs them all)`, 'warn');
     return false;
@@ -85,6 +96,22 @@ async function tests(label, args, cwd) {
   return false;
 }
 const backendTests = () => tests('backend', ['--test', ...FAST_TESTS], BACKEND);
+
+// The server's types. Node runs server/ as it stands and ignores the types, so this is where a type error shows in dev
+// mode. About a second, beside the tests; like a failing test, it never holds back the restart.
+async function typecheck() {
+  const started = Date.now();
+  const { code, out } = await exec(TSC, ['-p', 'tsconfig.server.json', '--noEmit']);
+  const secs = ((Date.now() - started) / 1000).toFixed(1);
+  if (code === 0) {
+    log('types', `server: no type errors (${secs} s)`, 'ok');
+    return true;
+  }
+  const errors = out.split('\n').filter((l) => /error TS\d+/.test(l));
+  log('types', `server: ${errors.length || 'some'} type error${errors.length === 1 ? '' : 's'} (npm run typecheck)`, 'bad');
+  for (const line of errors.slice(0, 6)) log('', line.trim(), 'bad');
+  return false;
+}
 const appUnitTests = () =>
   existsSync(join(REPO, 'app', 'node_modules'))
     ? tests('app unit', ['--test', 'test/unit/**/*.test.ts'], join(REPO, 'app'))
@@ -100,20 +127,27 @@ function checkAppScript() {
     log('tests', `app: ${scripts.length} inline script${scripts.length === 1 ? '' : 's'} parse`, 'ok');
     return true;
   } catch (err) {
-    log('tests', `app: the inline script does not parse: ${err.message}`, 'bad');
+    log('tests', `app: the inline script does not parse: ${(err as Error).message}`, 'bad');
     return false;
   }
 }
 
 async function bundleApp() {
-  const { code, out } = await exec(process.execPath, ['scripts/app-bundle.mjs']);
+  const { code, out } = await exec(process.execPath, ['scripts/app-bundle.ts']);
   log('app', code === 0 ? out.trim().replace(/^app-bundle: /, '').replace(` into ${join(BACKEND, 'app-web')}`, '') : out.trim(), code === 0 ? 'ok' : 'bad');
 }
 
 // ── The server: the docker container, or this Mac's Node with --no-docker ───────────────────────────────────────
-let hostServer = null;
+let hostServer: ChildProcess | null = null;
 
-async function healthy(timeoutMs = 20_000) {
+/** What /healthz says, as far as the banner reads it. */
+interface Health {
+  backend: string;
+  name: string;
+  app: string;
+}
+
+async function healthy(timeoutMs = 20_000): Promise<Health> {
   const until = Date.now() + timeoutMs;
   while (Date.now() < until) {
     try {
@@ -133,7 +167,7 @@ async function startServer() {
     if (code !== 0) throw new Error(`docker compose up failed:\n${out}`);
     return;
   }
-  hostServer = spawn(process.execPath, ['server/server.js'], {
+  hostServer = spawn(process.execPath, ['server/server.ts'], {
     cwd: BACKEND,
     stdio: ['ignore', 'pipe', 'pipe'],
     env: {
@@ -150,7 +184,7 @@ async function startServer() {
       DATA_FILE: join(BACKEND, 'data', 'dev', 'devices.json'),
     },
   });
-  createInterface({ input: hostServer.stderr }).on('line', (line) => log('server', line, 'bad'));
+  createInterface({ input: hostServer.stderr! }).on('line', (line) => log('server', line, 'bad'));
 }
 
 async function restartServer() {
@@ -159,7 +193,7 @@ async function restartServer() {
     const { code, out } = await exec('docker', [...COMPOSE, 'restart', 'api']);
     if (code !== 0) throw new Error(`docker compose restart failed:\n${out}`);
   } else {
-    const old = hostServer;
+    const old = hostServer!;
     await new Promise((done) => {
       old.once('close', done);
       old.kill('SIGTERM');
@@ -179,9 +213,14 @@ async function reloadPages() {
 }
 
 // ── Watching ─────────────────────────────────────────────────────────────────────────────────────────────────────
-function watchFolder(dir, { recursive = true, only = () => true } = {}, onChange) {
-  let timer;
-  const changed = new Set();
+interface WatchOptions {
+  recursive?: boolean;
+  only?: (file: string) => boolean;
+}
+
+function watchFolder(dir: string, { recursive = true, only = () => true }: WatchOptions, onChange: (files: string[]) => Promise<void>) {
+  let timer: NodeJS.Timeout | undefined;
+  const changed = new Set<string>();
   watch(dir, { recursive }, (event, file) => {
     if (!file || !only(String(file))) return;
     changed.add(String(file));
@@ -196,8 +235,8 @@ function watchFolder(dir, { recursive = true, only = () => true } = {}, onChange
 
 // ng build --watch, one per Angular app. The two often rebuild together (the admin uses the site's icons), so builds
 // that finish within a quarter second share one test run and one reload.
-const builds = [];
-let afterBuild;
+const builds: ChildProcess[] = [];
+let afterBuild: NodeJS.Timeout | undefined;
 function builtOne() {
   clearTimeout(afterBuild);
   afterBuild = setTimeout(
@@ -209,15 +248,15 @@ function builtOne() {
     250,
   );
 }
-function ngWatch(project) {
+function ngWatch(project: string) {
   const child = spawn(NG, ['build', project, '--watch', '--configuration', 'development'], {
     cwd: BACKEND,
     env: { ...process.env, NG_CLI_ANALYTICS: 'false', NO_COLOR: '1', FORCE_COLOR: '0' },
   });
   builds.push(child);
-  let errors = [];
+  let errors: string[] = [];
   let first = true;
-  const onLine = (line) => {
+  const onLine = (line: string) => {
     const done = /Application bundle generation (complete|failed)\. \[([\d.]+) seconds\]/.exec(line);
     if (done) {
       if (done[1] === 'failed' || errors.length) {
@@ -265,11 +304,11 @@ async function main() {
     snippet  ${BASE}/client/
   Edit site/, admin/, server/, client/ or the repo root index.html; open pages reload by themselves. Ctrl-C stops.
 `);
-  void backendTests();
+  void Promise.all([typecheck(), backendTests()]);
 
   watchFolder(join(BACKEND, 'server'), {}, async (files) => {
     log('server', `changed: ${files.join(', ')}`);
-    await backendTests();
+    await Promise.all([typecheck(), backendTests()]);
     await restartServer();
   });
   watchFolder(join(BACKEND, 'client'), {}, async (files) => {

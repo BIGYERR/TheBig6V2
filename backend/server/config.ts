@@ -3,13 +3,18 @@
 
 import { readFileSync } from 'node:fs';
 import { hostname } from 'node:os';
+import { join } from 'node:path';
+import { BACKEND_DIR } from './paths.ts';
 
-const PKG = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+const PKG = JSON.parse(readFileSync(join(BACKEND_DIR, 'package.json'), 'utf8')) as { version: string };
 
 // The GitHub Pages app, the Cordova iOS app (app://localhost, see app/config.xml), and local dev servers.
 const DEFAULT_ORIGINS = 'https://bigyerr.github.io,app://localhost,http://localhost:*,http://127.0.0.1:*';
 
-export function loadConfig(env = process.env) {
+export type Env = Record<string, string | undefined>;
+export type Config = ReturnType<typeof loadConfig>;
+
+export function loadConfig(env: Env = process.env) {
   const production = env.NODE_ENV === 'production';
   return {
     port: int(env.PORT, 3000),
@@ -41,21 +46,21 @@ export function loadConfig(env = process.env) {
     // Empty keeps devices in memory only. Heroku's disk is wiped on every restart, so set this only where
     // the path survives (the docker compose volume does).
     dataFile: env.DATA_FILE || '',
-    // One stdout line per request (server/app.js). On unless LOG_REQUESTS=0.
+    // One stdout line per request (server/app.ts). On unless LOG_REQUESTS=0.
     logRequests: env.LOG_REQUESTS ? env.LOG_REQUESTS === '1' : true,
-    // npm run dev: pages reload themselves after each rebuild (server/dev.js). Never on otherwise.
+    // npm run dev: pages reload themselves after each rebuild (server/dev.ts). Never on otherwise.
     dev: env.IA_DEV === '1',
     // The indicator demo page at /client/. On by default everywhere but production.
     clientDemo: env.CLIENT_DEMO ? env.CLIENT_DEMO === '1' : !production,
   };
 }
 
-function int(value, fallback) {
+function int(value: string | undefined, fallback: number): number {
   const n = Number.parseInt(value ?? '', 10);
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
-function list(value) {
+function list(value: string): string[] {
   return String(value)
     .split(',')
     .map((s) => s.trim())

@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { createServer } from 'node:net';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
@@ -17,7 +18,7 @@ const SCRIPT = fileURLToPath(new URL('../scripts/mac-local-backend.sh', import.m
 function freePort() {
   return new Promise((resolve, reject) => {
     const srv = createServer().listen(0, '127.0.0.1', () => {
-      const { port } = srv.address();
+      const { port } = srv.address() as AddressInfo;
       srv.close(() => resolve(port));
     });
     srv.on('error', reject);
@@ -25,10 +26,10 @@ function freePort() {
 }
 
 describe('mac-local-backend', { skip: process.platform === 'win32' && 'bash script' }, () => {
-  let dir;
-  let env;
-  let base;
-  const script = (...args) => run('bash', [SCRIPT, ...args], { env, timeout: 30_000 });
+  let dir: string;
+  let env: NodeJS.ProcessEnv;
+  let base: string;
+  const script = (...args: string[]) => run('bash', [SCRIPT, ...args], { env, timeout: 30_000 });
 
   before(async () => {
     dir = mkdtempSync(join(tmpdir(), 'ia-mac-local-'));
@@ -51,7 +52,7 @@ describe('mac-local-backend', { skip: process.platform === 'win32' && 'bash scri
     assert.equal(health.backend, 'mac-local', 'it says which backend it is');
     // up bundles this checkout's app, so /app/ serves the same ia-version as the repo root index.html.
     const root = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
-    assert.equal(health.app, /<meta name="ia-version" content="([^"]*)"/.exec(root)[1]);
+    assert.equal(health.app, /<meta name="ia-version" content="([^"]*)"/.exec(root)![1]);
     assert.equal((await fetch(`${base}/app/`)).status, 200);
   });
 
@@ -89,7 +90,7 @@ describe('mac-local-backend', { skip: process.platform === 'win32' && 'bash scri
     const blocker = createServer().listen(port, '127.0.0.1');
     await new Promise((resolve) => blocker.once('listening', resolve));
     try {
-      await assert.rejects(script('up', '--no-build'), (err) => /already taken/.test(err.stderr));
+      await assert.rejects(script('up', '--no-build'), (err: unknown) => /already taken/.test((err as { stderr: string }).stderr));
     } finally {
       await new Promise((resolve) => blocker.close(resolve));
     }

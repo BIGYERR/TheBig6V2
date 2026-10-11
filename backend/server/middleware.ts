@@ -1,7 +1,9 @@
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
+
 // CORS for the public API. Patterns are exact origins; `*` stands for any run of characters without a slash
 // (`http://localhost:*` covers every port). A request from a browser origin outside the list is refused; a
 // request with no Origin (curl, a health probe, a native client) passes.
-export function cors(patterns) {
+export function cors(patterns: string[]): RequestHandler {
   const allowed = patterns.map((p) => {
     const escaped = p.replace(/[.+?^$|()[\]{}\\]/g, '\\$&').replace(/\*/g, '[^/]*');
     return new RegExp('^' + escaped + '$', 'i');
@@ -27,13 +29,13 @@ export function cors(patterns) {
 
 // The app posts JSON as text/plain on purpose: a "simple" CORS request skips the preflight, so one beat is one
 // round trip and the latency it measures is the real one. Accept either content type here.
-export function jsonBody(req, res, next) {
+export function jsonBody(req: Request, res: Response, next: NextFunction) {
   if (typeof req.body !== 'string' || !req.body) {
     req.body = {};
     return next();
   }
   try {
-    const parsed = JSON.parse(req.body);
+    const parsed: unknown = JSON.parse(req.body);
     req.body = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
     next();
   } catch {

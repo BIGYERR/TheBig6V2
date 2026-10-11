@@ -1,12 +1,13 @@
 // node --test test/   (npm test). Boots the app on a random port with a fake clock; no network beyond localhost.
 import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
-import { createApp } from '../server/app.js';
-import { loadConfig } from '../server/config.js';
-import { DeviceStore, isUid, summarize } from '../server/store.js';
+import { createApp } from '../server/app.ts';
+import { loadConfig } from '../server/config.ts';
+import { DeviceStore, isUid, summarize } from '../server/store.ts';
 
 const AUTH = 'Basic ' + Buffer.from('admin:secret').toString('base64');
 
@@ -15,11 +16,11 @@ async function boot(env = {}, clock = { t: 1_000_000 }) {
   const store = new DeviceStore({ ...config, now: () => clock.t });
   const server = createApp({ config, store, adminDir: '/nonexistent' }).listen(0);
   await new Promise((resolve) => server.once('listening', resolve));
-  const base = `http://127.0.0.1:${server.address().port}`;
+  const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   return { base, store, clock, close: () => new Promise((resolve) => server.close(resolve)) };
 }
 
-function beat(base, body, headers = {}) {
+function beat(base: string, body: unknown, headers: Record<string, string> = {}) {
   return fetch(`${base}/api/heartbeat`, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain', ...headers },
@@ -28,7 +29,7 @@ function beat(base, body, headers = {}) {
 }
 
 describe('public API', () => {
-  let s;
+  let s: Awaited<ReturnType<typeof boot>>;
   before(async () => (s = await boot()));
   after(() => s.close());
 
@@ -48,7 +49,7 @@ describe('public API', () => {
     const j2 = await (await beat(s.base, { uid: j1.uid, rttMs: 84 })).json();
     assert.equal(j2.uid, j1.uid);
     assert.equal(j2.issued, false);
-    const d = s.store.devices.get(j1.uid);
+    const d = s.store.devices.get(j1.uid)!;
     assert.equal(d.beats, 2);
     assert.deepEqual(d.rtt, [84]);
     assert.equal(d.label, 'iPhone · iOS 18.6', 'a beat without a label keeps the old one');
@@ -69,7 +70,7 @@ describe('public API', () => {
     await beat(s.base, { uid, rttMs: -5 });
     await beat(s.base, { uid, rttMs: 'fast' });
     await beat(s.base, { uid, rttMs: 999_999 });
-    assert.deepEqual(s.store.devices.get(uid).rtt, []);
+    assert.deepEqual(s.store.devices.get(uid)!.rtt, []);
   });
 
   test('CORS: an allowed origin is echoed, a foreign one refused, a preflight answered', async () => {
@@ -97,20 +98,20 @@ describe('public API', () => {
 
   test('bye marks the device gone at once; the next beat starts a new session', async () => {
     const { uid } = await (await beat(s.base, {})).json();
-    assert.equal(s.store.isConnected(s.store.devices.get(uid)), true);
+    assert.equal(s.store.isConnected(s.store.devices.get(uid)!), true);
     const r = await fetch(`${s.base}/api/bye`, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ uid }) });
     assert.equal(r.status, 204);
-    assert.equal(s.store.isConnected(s.store.devices.get(uid)), false);
+    assert.equal(s.store.isConnected(s.store.devices.get(uid)!), false);
     await beat(s.base, { uid });
-    assert.equal(s.store.devices.get(uid).sessions, 2);
+    assert.equal(s.store.devices.get(uid)!.sessions, 2);
   });
 });
 
 describe('admin', () => {
-  let s;
+  let s: Awaited<ReturnType<typeof boot>>;
   before(async () => (s = await boot()));
   after(() => s.close());
-  const get = (path, auth = AUTH) => fetch(`${s.base}${path}`, { headers: auth ? { Authorization: auth } : {} });
+  const get = (path: string, auth: string | null = AUTH) => fetch(`${s.base}${path}`, { headers: auth ? { Authorization: auth } : {} });
 
   test('needs the login', async () => {
     const r = await get('/admin/api/stats', null);
@@ -186,7 +187,7 @@ describe('admin', () => {
     let j = await (await get('/admin/api/devices')).json();
     assert.equal(j.items[0].uid, fresh);
     j = await (await get('/admin/api/devices?connected=1')).json();
-    assert.ok(j.items.every((d) => d.connected));
+    assert.ok(j.items.every((d: { connected: boolean }) => d.connected));
   });
 
   test('the admin UI says it is not built when dist is missing', async () => {
@@ -220,7 +221,7 @@ describe('admin lockout and switch', () => {
     const s = await boot({ DYNO: 'web.1' });
     const http = await fetch(`${s.base}/admin/api/stats?x=1`, { redirect: 'manual', headers: { 'X-Forwarded-Proto': 'http' } });
     assert.equal(http.status, 308);
-    assert.match(http.headers.get('location'), /^https:\/\/127\.0\.0\.1:\d+\/admin\/api\/stats\?x=1$/);
+    assert.match(http.headers.get('location') ?? '', /^https:\/\/127\.0\.0\.1:\d+\/admin\/api\/stats\?x=1$/);
     const https = { 'X-Forwarded-Proto': 'https' };
     const bad = 'Basic ' + Buffer.from('admin:wrong').toString('base64');
     for (let i = 0; i < 10; i++) {
@@ -239,7 +240,7 @@ describe('admin lockout and switch', () => {
     s.store.rename(uid, 'Kept');
     const r = await fetch(`${s.base}/admin/api/devices/${uid}`, { method: 'PATCH', headers: { Authorization: AUTH }, body: '{"name":""}' });
     assert.equal(r.status, 400);
-    assert.equal(s.store.devices.get(uid).name, 'Kept');
+    assert.equal(s.store.devices.get(uid)!.name, 'Kept');
     await s.close();
   });
 
@@ -272,7 +273,7 @@ describe('store', () => {
     const store = new DeviceStore();
     const { uid } = store.heartbeat({});
     for (let i = 0; i < 60; i++) store.heartbeat({ uid, rttMs: i });
-    const rtt = store.devices.get(uid).rtt;
+    const rtt = store.devices.get(uid)!.rtt;
     assert.equal(rtt.length, 50);
     assert.equal(rtt[0], 10);
   });
@@ -299,7 +300,7 @@ describe('store', () => {
       a.flush();
       const b = new DeviceStore({ dataFile: file });
       assert.equal(b.load(), 1);
-      const d = b.devices.get(uid);
+      const d = b.devices.get(uid)!;
       assert.equal(d.name, 'Kitchen iPad');
       assert.deepEqual(d.rtt, [42]);
       assert.equal(b.isConnected(d), false);
@@ -319,8 +320,8 @@ describe('store', () => {
       writeFileSync(file, JSON.stringify({ devices: [{ uid, label: 7, rtt: [1, 'x', 3] }, { uid: 'junk' }, null] }));
       const s = new DeviceStore({ dataFile: file });
       assert.equal(s.load(), 1);
-      assert.equal(s.devices.get(uid).label, '');
-      assert.deepEqual(s.devices.get(uid).rtt, [1, 3]);
+      assert.equal(s.devices.get(uid)!.label, '');
+      assert.deepEqual(s.devices.get(uid)!.rtt, [1, 3]);
       assert.equal(s.list({ q: 'anything' }).total, 0, 'search runs over the rebuilt record');
     } finally {
       rmSync(dir, { recursive: true, force: true });

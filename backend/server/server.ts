@@ -1,7 +1,8 @@
-// Entry point: `npm start` locally, `web` in the Procfile on Heroku, CMD in the Dockerfile.
-import { createApp } from './app.js';
-import { loadConfig } from './config.js';
-import { DeviceStore } from './store.js';
+// Entry point, run as tsc compiled it: dist/server/server.js. `npm start` locally, `web` in the Procfile on Heroku, CMD
+// in the Dockerfile.
+import { createApp } from './app.ts';
+import { loadConfig } from './config.ts';
+import { DeviceStore } from './store.ts';
 
 const config = loadConfig();
 const store = new DeviceStore(config);
@@ -20,7 +21,7 @@ const server = createApp({ config, store, log: config.logRequests ? (line) => co
 
 // Heroku sends SIGTERM on every restart and deploy, then waits 30 s. Save, stop taking requests, exit.
 // Save again on the way out: a request still in flight at the signal changes the store after the first save.
-function shutdown(signal) {
+function shutdown(signal: NodeJS.Signals) {
   console.log(`${signal}: saving and closing`);
   store.flush();
   const exit = () => {

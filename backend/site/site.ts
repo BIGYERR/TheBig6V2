@@ -4,7 +4,7 @@ import { Phone } from './phone';
 import { RestClock } from './rest-clock';
 import { Reveal } from './reveal';
 
-// The app, served by this same backend at /app/ (scripts/app-bundle.mjs). Every "open the app" button goes here until
+// The app, served by this same backend at /app/ (scripts/app-bundle.ts). Every "open the app" button goes here until
 // the store builds exist.
 const APP_URL = '/app/';
 

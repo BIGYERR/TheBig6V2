@@ -84,7 +84,7 @@ cmd_setup() {
 }
 
 # backend/ at a ref, plus app-web/ holding that ref's index.html and apple-touch-icon.png: what the server serves at
-# /app/, the same files Pages serves. Locally scripts/app-bundle.mjs fills app-web/ from the working copy instead.
+# /app/, the same files Pages serves. Locally scripts/app-bundle.ts fills app-web/ from the working copy instead.
 deploy_tree() {
   local ref="$1" app_tree file blob
   app_tree="$(

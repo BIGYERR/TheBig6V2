@@ -10,7 +10,8 @@
 #   npm run mac-local-backend -- logs          follow the server log
 #   npm run mac-local-backend -- open          open the site in the browser
 #
-# up takes --build (rebuild the site and admin even if nothing changed) or --no-build (start whatever dist/ holds).
+# up compiles the server (tsc, a second or two) every time, then starts what it compiled: dist/server/server.js. It takes
+# --build (rebuild the site and admin even if nothing changed) or --no-build (serve whatever dist/site and dist/admin hold).
 # API_PORT moves the port (default 3000, the same as docker: stop one before starting the other).
 # ADMIN_USER, ADMIN_PASSWORD, CLIENT_DEMO and CORS_ORIGINS pass through, as they do for docker compose.
 # MAC_LOCAL_DIR moves the pid file, the log and the devices file (default backend/data/mac-local, git-ignored).
@@ -36,7 +37,7 @@ running_pid() {
   local pid
   pid=$(<"$PID_FILE")
   [[ $pid =~ ^[0-9]+$ ]] || return 1
-  ps -p "$pid" -o command= 2>/dev/null | grep -q 'server/server.js' || return 1
+  ps -p "$pid" -o command= 2>/dev/null | grep -q 'server/server.js' || return 1  # dist/server/server.js, or a server started before the TypeScript move
   echo "$pid"
 }
 
@@ -88,10 +89,13 @@ up() {
     npm ci --no-audit --no-fund
   fi
   # The app at /app/ is this checkout's index.html, copied fresh on every start (a copy, so it is instant).
-  node scripts/app-bundle.mjs
+  node scripts/app-bundle.ts
+  # The server is TypeScript; what runs is what tsc compiles from it, so a start never runs a stale copy.
+  say 'compiling the server'
+  npm run --silent build:server
   if [[ $build == always ]] || { [[ $build == auto ]] && needs_build; }; then
     say 'building the website and the admin UI'
-    npm run --silent build
+    npm run --silent build:ui
   fi
 
   mkdir -p "$RUN_DIR"
@@ -105,7 +109,7 @@ up() {
     CLIENT_DEMO=${CLIENT_DEMO:-1} \
     DATA_FILE=$DEVICES_FILE \
     GIT_COMMIT=${GIT_COMMIT:-$(git rev-parse --short HEAD 2>/dev/null || true)} \
-    nohup node server/server.js >>"$LOG_FILE" 2>&1 </dev/null &
+    nohup node --enable-source-maps dist/server/server.js >>"$LOG_FILE" 2>&1 </dev/null &
   pid=$!
   echo "$pid" >"$PID_FILE"
 

@@ -1,23 +1,25 @@
-// The request log (server/app.js): one line per response, once it is sent, never a header or a body.
+// The request log (server/app.ts): one line per response, once it is sent, never a header or a body.
 import assert from 'node:assert/strict';
+import type { Server } from 'node:http';
+import type { AddressInfo } from 'node:net';
 import { after, before, describe, test } from 'node:test';
-import { createApp, deviceOf } from '../server/app.js';
-import { loadConfig } from '../server/config.js';
-import { DeviceStore } from '../server/store.js';
+import { createApp, deviceOf } from '../server/app.ts';
+import { loadConfig } from '../server/config.ts';
+import { DeviceStore } from '../server/store.ts';
 
 const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148';
 const AUTH = 'Basic ' + Buffer.from('admin:secret').toString('base64');
 
 describe('request log', () => {
-  const lines = [];
-  let server;
-  let base;
+  const lines: string[] = [];
+  let server: Server;
+  let base: string;
   before(async () => {
     const config = loadConfig({ NODE_ENV: 'production', ADMIN_USER: 'admin', ADMIN_PASSWORD: 'secret' });
     const store = new DeviceStore(config);
     server = createApp({ config, store, adminDir: '/nonexistent', log: (line) => lines.push(line) }).listen(0);
     await new Promise((resolve) => server.once('listening', resolve));
-    base = `http://127.0.0.1:${server.address().port}`;
+    base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   });
   after(() => new Promise((resolve) => server.close(resolve)));
 
@@ -26,15 +28,15 @@ describe('request log', () => {
   test('logs a heartbeat with its status, time, address and device', async () => {
     await fetch(`${base}/api/heartbeat`, { method: 'POST', headers: { 'content-type': 'application/json', 'user-agent': IPHONE }, body: '{}' });
     await settle();
-    assert.match(lines.at(-1), /^request POST \/api\/heartbeat 200 \d+ ms 127\.0\.0\.1 iPhone$/);
+    assert.match(lines.at(-1) ?? '', /^request POST \/api\/heartbeat 200 \d+ ms 127\.0\.0\.1 iPhone$/);
   });
 
   test('logs refusals and admin calls, and never the password', async () => {
     await fetch(`${base}/nope`);
     await fetch(`${base}/admin/api/stats`, { headers: { authorization: AUTH } });
     await settle();
-    assert.match(lines.at(-2), /^request GET \/nope 404 \d+ ms 127\.0\.0\.1 other$/);
-    assert.match(lines.at(-1), /^request GET \/admin\/api\/stats 200 /);
+    assert.match(lines.at(-2) ?? '', /^request GET \/nope 404 \d+ ms 127\.0\.0\.1 other$/);
+    assert.match(lines.at(-1) ?? '', /^request GET \/admin\/api\/stats 200 /);
     assert.ok(lines.every((l) => !l.includes('secret') && !l.includes(AUTH)));
   });
 

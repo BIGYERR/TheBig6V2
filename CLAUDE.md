@@ -338,7 +338,7 @@ Every brief to either carries the per-build items, then the standing lines for t
   all-trip is as suspicious as a survivor; 100% of blast-radius hunks are classified, and an unruled removal is a regression.
 
 ## Dev mode (Mario, Post-V239): the fastest look at a change, never a proof
-`cd backend && npm run dev` (`backend/scripts/dev.mjs`) serves the website (`/`), the app (`/app/`, the root
+`cd backend && npm run dev` (`backend/scripts/dev.ts`) serves the website (`/`), the app (`/app/`, the root
 `index.html`), the admin (`/admin/`, admin / asylum) and the backend from the docker backend on http://localhost:3000,
 and rebuilds whatever is saved in about a second: site and admin by `ng build --watch`, the app copied on every save
 with its inline script parsed, the server restarted on a `server/` change. After each change it runs only tests that
