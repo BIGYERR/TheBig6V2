@@ -2,7 +2,7 @@
 // deploy tree carries the same two files from the commit it deploys.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
@@ -28,9 +28,18 @@ describe('app-bundle', () => {
     assert.ok(existsSync(join(dir, 'out', 'apple-touch-icon.png')));
   });
 
+  test('refreshes the folder in place, so a container that mounts it (npm run dev) still sees the app', () => {
+    const folder = statSync(join(dir, 'out')).ino;
+    writeFileSync(join(dir, 'out', 'leftover.txt'), 'stale');
+    writeFileSync(join(dir, 'src', 'index.html'), '<meta name="ia-version" content="0.240.1">');
+    assert.match(run(), /bundled app 0\.240\.1/);
+    assert.equal(statSync(join(dir, 'out')).ino, folder);
+    assert.deepEqual(readdirSync(join(dir, 'out')).sort(), ['apple-touch-icon.png', 'index.html']);
+  });
+
   test('with no app to copy (Heroku), it keeps the bundle the deploy brought', () => {
     rmSync(join(dir, 'src'), { recursive: true });
-    assert.match(run(), /keeping the bundled app 0\.240\.0/);
+    assert.match(run(), /keeping the bundled app 0\.240\.1/);
     assert.ok(existsSync(join(dir, 'out', 'index.html')));
   });
 });

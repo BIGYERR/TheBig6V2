@@ -8,7 +8,7 @@
 //
 // On Heroku there is no repo beside backend/, so with no index.html to copy it keeps the app-web/ the deploy brought,
 // and says so. APP_SOURCE_DIR and APP_BUNDLE_DIR move the two folders (the tests use them).
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -33,10 +33,20 @@ if (!existsSync(join(SOURCE, 'index.html'))) {
   process.exit(0);
 }
 
-rmSync(OUT, { recursive: true, force: true });
+// The folder is refreshed in place, never deleted and made again. npm run dev's container mounts app-web/ from this
+// Mac, and a mount holds the folder it was given, not its path: delete it and the container keeps the deleted, empty
+// one, so /app/ answers 503 while the files sit right here. Each file is copied beside itself and renamed over the old
+// one, so the server never reads half a page.
 mkdirSync(OUT, { recursive: true });
 for (const file of APP_FILES) {
-  if (existsSync(join(SOURCE, file))) copyFileSync(join(SOURCE, file), join(OUT, file));
-  else if (file === 'index.html') throw new Error(`missing ${file}`);
+  if (existsSync(join(SOURCE, file))) {
+    copyFileSync(join(SOURCE, file), join(OUT, `${file}.tmp`));
+    renameSync(join(OUT, `${file}.tmp`), join(OUT, file));
+  } else if (file === 'index.html') {
+    throw new Error(`missing ${file}`);
+  } else {
+    rmSync(join(OUT, file), { force: true });
+  }
 }
+for (const stale of readdirSync(OUT).filter((f) => !APP_FILES.includes(f))) rmSync(join(OUT, stale), { recursive: true, force: true });
 say(`bundled app ${appVersionOf(readFileSync(join(OUT, 'index.html'), 'utf8')) || '(no ia-version)'} into ${OUT}`);
