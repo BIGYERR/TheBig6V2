@@ -1,0 +1,9 @@
+# Send only what the image builds from.
+*
+!package.json
+!package-lock.json
+!angular.json
+!tsconfig.json
+!admin/
+!server/
+!client/

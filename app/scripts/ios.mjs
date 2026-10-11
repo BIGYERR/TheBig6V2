@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-// Builds the iOS app with Cordova and Xcode, then installs and launches it.
+// The two iOS build paths (the third, pwa-pages, is scripts/pwa-pages.mjs). Builds with Cordova and Xcode, then
+// installs and launches.
 //
-//   npm run ios:sim                       build, boot the simulator, install, launch
-//   npm run ios:sim -- --sim "iPhone Air" pick a simulator by name (default: IOS_SIM or "iPhone 17 Pro")
-//   npm run ios:device                    build signed for the connected iPhone, install, launch
-//   npm run ios:device -- --udid <id>     pick a device when more than one is connected
-//   npm run ios:device -- --team <id>     Apple team ID (default: IOS_TEAM_ID, or the first team Xcode knows)
-//   npm run ios:open                      open the native project in Xcode
+//   npm run emulator-ios                        build, boot the simulator, install, launch
+//   npm run emulator-ios -- --sim "iPhone Air"  pick a simulator by name (default: IOS_SIM or "iPhone 17 Pro")
+//   npm run device-ios                          build signed for the connected iPhone, install, launch
+//   npm run device-ios -- --udid <id>           pick a device when more than one is connected
+//   npm run device-ios -- --team <id>           Apple team ID (default: IOS_TEAM_ID, or the first team Xcode knows)
+//   npm run xcode-ios                           open the native project in Xcode
 //   add --no-web to skip the Angular build and reuse www/ as it is
 //
 // Build products go to ~/Library/Caches/iron-asylum-ios (IOS_BUILD_DIR to change it), never into the repo:
@@ -215,7 +216,7 @@ function pickDevice() {
       (wanted ? `no connected device ${wanted}.` : 'no iPhone is connected.') +
         '\n  1. Plug the iPhone into this Mac and unlock it; tap Trust if it asks.' +
         '\n  2. On the iPhone: Settings > Privacy & Security > Developer Mode > On (it restarts).' +
-        '\n  3. Run npm run ios:device again.',
+        '\n  3. Run npm run device-ios again.',
     );
   }
   if (devices.length > 1 && !wanted) {
@@ -241,8 +242,8 @@ function checkProfileCovers(app, target) {
   if (devices.includes(target.udid)) return;
   fail(
     `the signing profile Xcode made does not include ${target.name} (${target.udid}), so iOS would refuse the install.\n` +
-      '  Open the project (npm run ios:open), select the App target > Signing & Capabilities, pick your team,\n' +
-      '  choose this iPhone as the run destination and press Run once; then rerun npm run ios:device.',
+      '  Open the project (npm run xcode-ios), select the App target > Signing & Capabilities, pick your team,\n' +
+      '  choose this iPhone as the run destination and press Run once; then rerun npm run device-ios.',
   );
 }
 
@@ -292,7 +293,7 @@ function device() {
         `installed on ${target.name}, but iOS will not open it until you trust the developer certificate (once per Apple ID):\n` +
           '  1. On the iPhone: Settings > General > VPN & Device Management.\n' +
           '  2. Under Developer App, tap your Apple ID, then Trust.\n' +
-          '  3. Open The Asylum from the home screen (or run npm run ios:device again).',
+          '  3. Open The Asylum from the home screen (or run npm run device-ios again).',
       );
     }
     if (/Locked|locked/.test(said)) fail(`installed on ${target.name}, but it is locked; unlock it and open The Asylum.`);
@@ -311,7 +312,7 @@ function openXcode() {
 }
 
 if (process.platform !== 'darwin') fail('iOS builds need macOS with Xcode.');
-if (mode === 'sim') simulator();
+if (mode === 'emulator') simulator();
 else if (mode === 'device') device();
 else if (mode === 'open') openXcode();
-else fail('usage: node scripts/ios.mjs <sim|device|open> [--sim <name>] [--udid <id>] [--team <id>] [--no-web]');
+else fail('usage: node scripts/ios.mjs <emulator|device|open> [--sim <name>] [--udid <id>] [--team <id>] [--no-web]');

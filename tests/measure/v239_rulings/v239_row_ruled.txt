@@ -1,0 +1,14 @@
+# ROW_RULED for V239 (D233 P-ISLAND, R1 as amended by Mario's concurrence). Passed to gate.sh step 4b as ROW_RULED=<this file>.
+# Written by the main session from tests/measure/v239_rulings/v239_ruling_d233.md ("Gate rows" section; Mario concurred 2026-10-09: "iOS version not the PWA", then "Not this build", "Display only", "Rest clock only"), before the draft run.
++ g239_d233_island.js D233-pwa  # D233 concurrence 1 (R1 amended): the PWA rest clock is unchanged
++ g239_d233_island.js D233-native-clock  # D233 R1: inside the native app the rest clock is the wall clock
++ g239_d233_island.js D233-start  # D233 after-table, Start
++ g239_d233_island.js D233-stop  # D233 after-table, Stop
++ g239_d233_island.js D233-resume  # D233 after-table, Resume after Stop
++ g239_d233_island.js D233-reset  # D233 after-table, Reset button; R3
++ g239_d233_island.js D233-donestatus  # D233 after-table, Done / Skip; R3
++ g239_d233_island.js D233-dayopen-stopped  # D233 after-table, Day open, clock stopped and nonzero; R3
++ g239_d233_island.js D233-dayopen-running  # D233 after-table, Day open, clock running
++ g239_d233_island.js D233-hidden  # D233 after-table, Home or wizard (tab hidden); R2
++ g239_d233_island.js D233-boot  # D233 after-table, Relaunch or reload; R3
++ g239_d233_island.js D233-throw  # D233 R2: the island follows the clock, never the reverse

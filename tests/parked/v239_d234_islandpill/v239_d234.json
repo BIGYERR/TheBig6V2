@@ -1,0 +1,128 @@
+[
+ {
+  "name": "P1-D234 hasIsland is read truthy: the string \"1\" draws the pill",
+  "anchor": "_rtPill=!!(_I&&_I.hasIsland===true);",
+  "replacement": "_rtPill=!!(_I&&_I.hasIsland);",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-noisland (hasIsland \"1\" gets the pill class, plain 0:00 and no drag). R1: unknown reads as the tab. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P2-D234 the tab arm's clock format keys on the plugin instead of the island flag",
+  "anchor": "mini.innerHTML=_rtPill?main:_rtStack(main);",
+  "replacement": "mini.innerHTML=window.iaIsland?main:_rtStack(main);",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-noisland (hasIsland false and absent print plain 0:00, not the V238 stack). R1, R6. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P3-D234 the pill class is never added",
+  "anchor": "if(fr)fr.classList.add('rt-pill');",
+  "replacement": "if(fr){}",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-pill (restFloat class empty). R2. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): also trips D234-native-screens. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P4-D234 the glyph is prepended, not appended",
+  "anchor": "tab.appendChild(gl);",
+  "replacement": "tab.insertBefore(gl,tab.firstChild);",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-pill (last child #rtMini, not #rtGlyph). Amendment 2 R2c. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P5-D234 the five-digit step is dropped",
+  "anchor": ";if(_rtPill)mini.classList.toggle('rt-five',main.length>=5);}",
+  "replacement": ";}",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-pill (10:00 and 60:00 without rt-five). Amendment 2 R2d. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P6-D234 the glyph reads pause at idle",
+  "anchor": "var gk=(!_ruRunning&&_ruElapsed>0)?'pause':'timer';",
+  "replacement": "var gk=_ruRunning?'timer':'pause';",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-pill (idle glyph pause, not timer). R2: timer muted at idle. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P7-D234 rtExpand no longer toggles in the pill arm",
+  "anchor": "function rtExpand(){if(_rtPill&&_rtExpanded){rtCollapse();return;}_rtSetExpanded(true);}",
+  "replacement": "function rtExpand(){_rtSetExpanded(true);}",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-tap (a second pill tap leaves the card open). R3. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): also trips D234-native-intro. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P8-D234 the pill hides while the card is open",
+  "anchor": "if(tab)tab.style.display=(v&&!_rtPill)?'none':'flex';",
+  "replacement": "if(tab)tab.style.display=v?'none':'flex';",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-tap (pill display none with the card open). R3: the pill stays visible. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): also trips D234-native-intro. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P9-D234 drag is wired in the pill arm",
+  "anchor": "    _rtSetExpanded(false);_ruRender();\n    return;\n  }\n  _rtWireDrag(tab,true);",
+  "replacement": "    _rtWireDrag(tab,true);_rtWireDrag(card,false);_rtSetExpanded(false);_ruRender();\n    return;\n  }\n  _rtWireDrag(tab,true);",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-nodrag (pointerdown sets _rtDragging, the move sets top 100px, the side snaps left). R3. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P10-D234 the pill arm is dispatched to the tab intro",
+  "anchor": "if(_rtPill){_rtPlayPillIntro();return;}",
+  "replacement": "if(_rtPill){_rtPlayIntro();return;}",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-intro (rtCardIntro with the pill hidden at (1)). Amendment 1 R5b. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P11-D234 reduced motion is ignored in the pill arm",
+  "anchor": "  if(_wkReduceMotion()){\n    _rtIntroTO=setTimeout(function(){\n      _rtSetExpanded(true);",
+  "replacement": "  if(false){\n    _rtIntroTO=setTimeout(function(){\n      _rtSetExpanded(true);",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-intro (point 5: the card animates under reduce). Amendment 1 R5c. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P12-D234 the card-body tap listener is dropped",
+  "anchor": "    card.addEventListener('click',function(e){if(e&&e.target&&e.target.closest&&e.target.closest('.rt-btn,.rt-reset,.rt-collapse'))return;if(_rtIntroTO)rtCollapse();});\n",
+  "replacement": "",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-intro (a card-body tap at 500 leaves the intro running and the card open). Amendment 1 R5b. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P13-D234 the card-body tap closes the card outside the intro too",
+  "anchor": "if(_rtIntroTO)rtCollapse();",
+  "replacement": "rtCollapse();",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-intro (an open card closes on a body tap). Amendment 1 R5b: outside the intro it does nothing. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P14-D234 the fold's timeout is not held in _rtIntroTO",
+  "anchor": "    _rtIntroTO=setTimeout(function(){\n      _rtIntroTO=null;\n      card.style.animation='';",
+  "replacement": "    _rtIntroTO=null;setTimeout(function(){\n      _rtIntroTO=null;\n      card.style.animation='';",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-intro (at 2300, mid-fold, _rtIntroTO is null with the card still open). Amendment 1 R5b. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P15-D234 the pill echo is dropped",
+  "anchor": "tab.style.animation='rtPillEcho .34s cubic-bezier(.34,1.4,.5,1) 1 both';",
+  "replacement": "tab.style.animation='';",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-intro (point 2: no rtPillEcho at 2540). Amendment 1 R5a. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P16-D234 the pill is shown on Home and the wizard",
+  "anchor": "var show=!!activeProg&&(_curScreen==='screenWeek'||",
+  "replacement": "var show=!!activeProg&&(_rtPill||_curScreen==='screenWeek'||",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-native-screens (display block on Home and the wizard). R2. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P17-D234 the pill's render tells the island",
+  "anchor": "gl.classList.toggle('run',_ruRunning);}}",
+  "replacement": "gl.classList.toggle('run',_ruRunning);}_ruIsland();}",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-noislandcall (every pill render adds a call to the log). R6: D234 adds no island call. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): also trips D234-native-intro. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ },
+ {
+  "name": "P18-D234 the pill's glyph carries a word",
+  "anchor": "gl.innerHTML=asyIcon(gk,12);",
+  "replacement": "gl.innerHTML=asyIcon(gk,12)+'Rest';",
+  "gate": "gates/g239_d234_pill.js",
+  "note": "NAMED TRIP: g239_d234_pill.js row D234-copy (glyph text \"Rest\"). R7: no new string. Observed V239 slice F (each mutation alone on a scratch copy, g239_d234 only): trips the named row alone. Ruling: tests/measure/v239_rulings/v239_ruling_d234.md."
+ }
+]

@@ -2,22 +2,24 @@
   "name": "iron-asylum",
   "version": "0.0.0",
   "scripts": {
-    "ng": "ng",
-    "sync": "node scripts/sync-legacy.mjs",
-    "sync:check": "node scripts/sync-legacy.mjs --check",
+    "emulator-ios": "node scripts/ios.mjs emulator",
+    "device-ios": "node scripts/ios.mjs device",
+    "pwa-pages": "node scripts/pwa-pages.mjs",
+    "pwa-pages:check": "node scripts/pwa-pages.mjs --check",
+    "xcode-ios": "node scripts/ios.mjs open",
     "prestart": "npm run sync",
     "start": "ng serve",
     "prebuild": "npm run sync",
     "build": "ng build",
+    "sync": "node scripts/sync-legacy.mjs",
+    "sync:check": "node scripts/sync-legacy.mjs --check",
     "test": "node --test 'test/**/*.test.ts'",
     "pretest": "npm run typecheck",
     "test:unit": "node --test 'test/unit/**/*.test.ts'",
     "test:integration": "node --test 'test/integration/**/*.test.ts'",
     "typecheck": "tsc -p tsconfig.node.json",
     "e2e": "node e2e/launch.ts",
-    "ios:sim": "node scripts/ios.mjs sim",
-    "ios:device": "node scripts/ios.mjs device",
-    "ios:open": "node scripts/ios.mjs open",
+    "ng": "ng",
     "lint": "ng lint",
     "prelint": "npm run sync",
     "lint:legacy": "npm run sync && eslint -c eslint.legacy.config.mjs --format ./scripts/eslint-summary.mjs public/legacy/app.js"
@@ -46,6 +48,7 @@
     "cordova-ios": "^8.1.1",
     "eslint": "^10.9.1",
     "globals": "^17.13.0",
+    "ia-island": "file:plugins-src/ia-island",
     "pixelmatch": "^8.0.0",
     "pngjs": "^7.0.0",
     "prettier": "^3.8.1",
@@ -65,6 +68,9 @@
   "cordova": {
     "platforms": [
       "ios"
-    ]
+    ],
+    "plugins": {
+      "ia-island": {}
+    }
   }
 }

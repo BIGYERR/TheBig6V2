@@ -1,0 +1,49 @@
+// Every setting comes from the environment: Heroku config vars, docker compose, or variables you export locally.
+// backend/.env.example lists them all.
+
+import { readFileSync } from 'node:fs';
+
+const PKG = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+
+// The GitHub Pages app, the Cordova iOS app (app://localhost, see app/config.xml), and local dev servers.
+const DEFAULT_ORIGINS = 'https://bigyerr.github.io,app://localhost,http://localhost:*,http://127.0.0.1:*';
+
+export function loadConfig(env = process.env) {
+  const production = env.NODE_ENV === 'production';
+  return {
+    port: int(env.PORT, 3000),
+    production,
+    // Heroku's router is the one proxy in front, and it sets X-Forwarded-For and X-Forwarded-Proto. Trust them
+    // there only (Heroku sets DYNO on every dyno). Locally and in docker any client could forge them.
+    trustProxy: env.TRUST_PROXY ? env.TRUST_PROXY === '1' : Boolean(env.DYNO),
+    version: PKG.version,
+    // HEROKU_SLUG_COMMIT exists once runtime-dyno-metadata is on (scripts/heroku.sh setup turns it on).
+    commit: env.HEROKU_SLUG_COMMIT || env.GIT_COMMIT || '',
+    release: env.HEROKU_RELEASE_VERSION || '',
+    // Admin is off in production until both are set. Locally it falls back to admin / asylum.
+    adminUser: env.ADMIN_USER || (production ? '' : 'admin'),
+    adminPassword: env.ADMIN_PASSWORD || (production ? '' : 'asylum'),
+    corsOrigins: list(env.CORS_ORIGINS ?? DEFAULT_ORIGINS),
+    // How often the app should beat, and how long after its last beat a device still counts as connected.
+    beatMs: int(env.BEAT_MS, 15_000),
+    connectedWindowMs: int(env.CONNECTED_WINDOW_MS, 45_000),
+    maxDevices: int(env.MAX_DEVICES, 5_000),
+    // Empty keeps devices in memory only. Heroku's disk is wiped on every restart, so set this only where
+    // the path survives (the docker compose volume does).
+    dataFile: env.DATA_FILE || '',
+    // The indicator demo page at /client/. On by default everywhere but production.
+    clientDemo: env.CLIENT_DEMO ? env.CLIENT_DEMO === '1' : !production,
+  };
+}
+
+function int(value, fallback) {
+  const n = Number.parseInt(value ?? '', 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+function list(value) {
+  return String(value)
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}

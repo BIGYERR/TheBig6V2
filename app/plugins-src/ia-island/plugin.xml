@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ia-island: mirrors the rest stopwatch on the iOS Dynamic Island and lock screen as a Live Activity (V239 D233
+  P-ISLAND). The page drives it through window.iaIsland (run / stop / end); its presence is how the page knows it
+  runs inside the native app. The widget extension that draws the activity is a separate target (slice N2) and
+  compiles src/ios/RestTimerAttributes.swift too, so that file stays free of Cordova.
+-->
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="ia-island" version="1.0.0">
+  <name>IA Island</name>
+  <description>Rest stopwatch Live Activity for The Asylum.</description>
+
+  <js-module src="www/island.js" name="island">
+    <clobbers target="iaIsland" />
+  </js-module>
+
+  <platform name="ios">
+    <config-file target="config.xml" parent="/*">
+      <feature name="IAIsland">
+        <param name="ios-package" value="IAIsland" />
+        <param name="onload" value="true" />
+      </feature>
+    </config-file>
+
+    <config-file target="*-Info.plist" parent="NSSupportsLiveActivities">
+      <true/>
+    </config-file>
+
+    <source-file src="src/ios/RestTimerAttributes.swift" />
+    <source-file src="src/ios/IAIsland.swift" />
+
+    <!-- The RestTimerWidget app extension (slice N2). There is no plugin.xml element for an extension target, so
+         this hook adds it after every prepare and copies src/ios/widget/ into platforms/ios/RestTimerWidget/. -->
+    <hook type="after_prepare" src="hooks/add-widget-target.js" />
+  </platform>
+</plugin>
