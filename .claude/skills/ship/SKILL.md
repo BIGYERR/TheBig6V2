@@ -25,5 +25,5 @@ BLAST    …
 FUZZ     …
 VERDICT  GREEN | RED — <what>
 ```
-On GREEN the main session runs `handoff-update`, then stages the build's files by path (never `git add -A`: another session's untracked files stay out; Mario, Post-V238) and runs `git commit -m "v<version>: <title>" && git tag v<version> && git push --tags origin main`, then prints the deploy picture (CLAUDE.md Session rhythm step 7).
+On GREEN the main session runs `handoff-update`, then stages the build's files by path (never `git add -A`: another session's untracked files stay out; Mario, Post-V238) and commits on the local `dev` branch in the main checkout (`git commit -m "v<version>: <title>"`), then pushes that branch only (`git push origin dev`; never from a worktree, never to `main`; CLAUDE.md Pipeline). The tag comes after Mario has merged his own pull request into `main` (`git fetch origin && git tag v<version> origin/main && git push origin v<version>`, CLAUDE.md Session rhythm step 6), then the deploy picture is printed (step 7).
 On RED the build goes back to builder with the named gate. The gate is not edited unless its oracle is shown wrong on a specific line.

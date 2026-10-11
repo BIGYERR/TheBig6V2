@@ -83,7 +83,10 @@ session's files written into `tests/measure/` mid-proof.
   <branch>`), then deletes the worktree and the branch. If a build is in flight in the main checkout (One writer per
   working tree), it waits until that build commits. Its work reaches GitHub with the main checkout's next push. On
   Post-V239 the semver worktree pushed three commits straight to `origin/dev` while the main checkout held four
-  unpushed ones, and `dev` forked (4 ahead, 3 behind) on a project with one developer.
+  unpushed ones, and `dev` forked (4 ahead, 3 behind) on a project with one developer. `.githooks/pre-push` enforces
+  this for pushes to GitHub: it refuses any push from a worktree, and from the main checkout anything but local `dev`'s
+  own commit to `dev`, or a tag. A worktree runs the hooks of the commit it has checked out, so one made from `dev`
+  carries the guard.
 - **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs everything fast enough (the gate suite's quick steps
   and its fast gates, sabotage anchors, the app's and the backend's tests and lint) and stops at 60 s; the pre-commit
   hook (`.githooks/pre-commit`, `--staged`) runs the part a commit touches. A gate still running at 60 s is left to CI,
@@ -360,6 +363,6 @@ session rhythm. The other paths stay for devices, deploys and full builds: `app/
 - `index.html` — the app. `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).
 - `docs/design/THE_ASYLUM_DS_REFERENCE*.md` — design system (bone `#F4F1E8`, ink, signal orange `#CF4E1A`; `asyIcon()` inline SVG, never emoji in chrome).
 - `tests/harness.js` (VM boot + fixtures + `weekGrid` + `progDigest`), `tests/gate.sh` (runner), `tests/gates/*.js` (one file per gate family, each prints `PASS n FAIL n`), `tests/sabotage.py` + `tests/sabotage/*.json`, `tests/measure/` (measure-pass scripts, keep them), `tests/lint_allow.txt` (known dupes = debt).
-- `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit (`git config core.hooksPath .githooks` once per clone). `.github/workflows/pipeline.yml` — the full suite on every push to `dev` and every pull request from `dev` into `main`, and the deploy proof after each merge.
+- `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit, and `.githooks/pre-push` lets only local `dev` and tags reach GitHub (`git config core.hooksPath .githooks` once per clone). `.github/workflows/pipeline.yml` — the full suite on every push to `dev` and every pull request from `dev` into `main`, and the deploy proof after each merge.
 - `tools/` — the run log (`tools/README.md`): every test, build, deploy and server run is a folder under `temp/runs/` (gitignored, kept out of iCloud) with a line in `temp/events.log`; `~/Library/Logs/IronAsylum/orchestration.log` has one line per top-level start on this Mac. When something went wrong, `node tools/logs.mjs` is the first place to look. `tools/deploy-check.mjs` is rhythm step 7 as one command.
 - `doctrine/*.txt` — page-ordered OCR of the NSW guide and the four NRC plans. Gitignored (not published by Pages); regenerate from the archives with `doctrine/README.md` if missing.
