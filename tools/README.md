@@ -28,7 +28,7 @@ output are not in it; the folder it points at has those.
 2026-10-11 16:20:09  you     prompt              "run the e2e again" (claude@61a68a9c, TheBig6V2)  -> <session transcript .jsonl>
 2026-10-11 16:20:12  claude  e2e                 npm run e2e (TheBig6V2/app; main 618605d; ia-version 239)  -> /Users/.../TheBig6V2/temp/runs/2026-10-11_16-20-12-e2e
 2026-10-11 16:31:40  claude  agent               dispatched gatekeeper: Prove the run-log pass (claude@61a68a9c, TheBig6V2)  -> <session>/subagents/
-2026-10-11 16:45:02  you     gate                bash tests/gate.sh index.html (worktree v240; v240 a1b2c3d; ia-version 240)  -> /Users/.../temp/runs/...-gate
+2026-10-11 16:45:02  you     gate                bash tests/gate.sh index.html (worktree v0.240.0; v0.240.0 a1b2c3d; ia-version 0.240.0)  -> /Users/.../temp/runs/...-gate
 <time>               <who>   <what>              <how it was asked for (where; git; version)>  -> <folder to open>
 ```
 

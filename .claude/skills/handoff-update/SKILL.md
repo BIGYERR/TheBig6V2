@@ -2,6 +2,8 @@
 name: handoff-update
 description: Fold a finished Iron Asylum build into IRON_ASYLUM_HANDOFF_1_1.md using the seven-element session entry. Run after gatekeeper reports GREEN, before commit. Also used when Mario says "update the handoff".
 ---
+**PRIORITY 1 (Mario, Post-V239): semantic versioning.** Every version this skill reads, prints or writes is `MAJOR.MINOR.PATCH` with a lowercase v (`v0.240.0`), never a future `V<N>` or a bare integer. `V1` to `V239` are history and keep their names (V239 = 0.239.0). A future `V<N>` found anywhere is a defect: use the dotted form and report the correction. CLAUDE.md, PRIORITY 1, has the names.
+
 The handoff is ONE document with a stable filename, overwritten in place. Never append a session narrative to the top; never create a second changelog. Work the seven elements in order and confirm each landed (grep it back).
 
 0. **Did this session ship a version?** If `ia-version` did not move, it did not. Do NOT bump anything and do NOT invent a version: keep the working-file line where it is, add the session as its own bullet above the previous `Prior work` bullet, and give it a digest line named for what it was (`- **Post-v<version> … session — no build.**`; `Post-V<N>` before semver). Elements 2–5 and 7 apply unchanged. Precedent: `Post-V154 rulings session — no build.`

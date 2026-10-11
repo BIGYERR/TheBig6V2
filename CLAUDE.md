@@ -4,6 +4,25 @@ Read this before touching anything. The long-form record is `IRON_ASYLUM_HANDOFF
 (architecture §3–§8, workflow §9–§10, standing lessons §10b, rulings §11f, open items §12,
 digest at the tail). This file is the short version that must never be violated.
 
+## PRIORITY 1: semantic versioning (Mario, Post-V239). It outranks everything below.
+Every version is `MAJOR.MINOR.PATCH`. **Nobody writes or says a future release as `V<N>` or as a bare integer**: not in
+chat with Mario, a brief, a ruling, a report, a file or folder name, a script, a commit message, the handoff or memory.
+Mario has had to repeat this more than once; a session that makes him say it again has broken this rule.
+- **The past is integer, the future is dotted.** Builds 1 to 239 are `V1` to `V239` (each one is v0.N.0; V239 = 0.239.0)
+  and keep their tags, digest lines, era-row keys and file names. `Post-V239` is the right label for a pass made after
+  V239 and before the first dotted release. Every release from `0.239.1` on is `v<MAJOR.MINOR.PATCH>`. Example: the build
+  once called "V240" is `v0.240.0`, and its files are `tests/measure/v0.240.0_*`.
+- **Names** (Versioning, below, has the full list): tag `v0.240.0`; commit `v0.240.0: <one line>`; digest
+  `- **v0.240.0** — …`; `tests/measure/v0.240.0_rulings/`; `tests/gates/g0.240.0_<topic>.js`;
+  `tests/sabotage/v0.240.0.json`; era rows keyed `'0.240.0'`; baseline `base_v<previous>.html`, where `<previous>` is the
+  version HEAD carries, never "N-1".
+- **Code** reads, compares and prints a version only through `tests/semver.js` or `tests/semver.py`: never `+version`, a
+  string compare, `'V'+n` or arithmetic on a version.
+- **Mario picks PATCH, MINOR or MAJOR** before every release (Versioning). Nobody infers it.
+- **A future `V<N>` anywhere is a defect.** One found in a brief, a template, a handoff line, a file name or an agent's
+  return is corrected to the dotted form before it is used or repeated, and the correction is reported. builder and
+  gatekeeper do not load this file, so every agent file and skill carries this section at its top.
+
 ## What this is
 Single-file vanilla HTML/CSS/JS PWA (`index.html`, ~1.1 MB, one inline `<script>`) that
 generates multi-week hybrid strength + cardio programs from a seeded, deterministic engine
