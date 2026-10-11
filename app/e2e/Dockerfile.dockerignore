@@ -1,4 +1,4 @@
-# Context is the repo root; send only what the e2e image builds from.
+# Context is the repo root; send only what the e2e images build from.
 *
 !index.html
 !apple-touch-icon.png
@@ -7,11 +7,11 @@
 !app/angular.json
 !app/tsconfig.json
 !app/tsconfig.app.json
+!app/tsconfig.node.json
 !app/src/
-!app/public/
 !app/scripts/
-!app/e2e/nginx.conf
+!app/e2e/
 # Generated inputs are rebuilt inside the image from index.html
 app/src/legacy/generated/
-app/public/legacy/
-app/public/apple-touch-icon.png
+# The suite's own output never goes back into an image
+app/e2e/report/

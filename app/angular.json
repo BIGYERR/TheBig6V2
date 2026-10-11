@@ -114,7 +114,8 @@
               "src/**/*.ts",
               "src/**/*.html",
               "scripts/**/*.mjs",
-              "e2e/**/*.mjs"
+              "e2e/**/*.ts",
+              "test/**/*.ts"
             ]
           }
         }

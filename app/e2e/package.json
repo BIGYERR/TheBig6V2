@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Marks e2e/*.ts as ES modules for Node's type stripping and for tsc (nodenext). Dependencies live in ../package.json."
+}

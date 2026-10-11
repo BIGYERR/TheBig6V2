@@ -1,5 +1,5 @@
 // @ts-check
-// npm run lint: the Angular app (TypeScript and templates) and the Node tooling (scripts/, e2e/). Errors fail.
+// npm run lint: the Angular app (TypeScript and templates) and the Node tooling (scripts/, e2e/, test/). Errors fail.
 // The generated legacy script is reported separately by npm run lint:legacy (eslint.legacy.config.mjs), warnings only.
 const eslint = require('@eslint/js');
 const { defineConfig, globalIgnores } = require('eslint/config');
@@ -52,8 +52,8 @@ module.exports = defineConfig([
     rules: {},
   },
   {
-    // Node tooling. e2e files also hold callbacks Puppeteer runs inside the page, so they see browser globals too.
-    files: ['scripts/**/*.mjs', 'e2e/**/*.mjs'],
+    // Node tooling written as plain JavaScript.
+    files: ['scripts/**/*.mjs'],
     extends: [eslint.configs.recommended],
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
     rules: {
@@ -62,7 +62,13 @@ module.exports = defineConfig([
     },
   },
   {
-    files: ['e2e/**/*.mjs'],
+    // The e2e suite and the tests are Node TypeScript (tsconfig.node.json). e2e files also hold callbacks Puppeteer
+    // runs inside the page, so they see browser globals too.
+    files: ['e2e/**/*.ts', 'test/**/*.ts'],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
+    rules: {
+      eqeqeq: ['error', 'smart'],
+      '@typescript-eslint/no-unused-vars': ['error', { args: 'after-used', argsIgnorePattern: '^_' }],
+    },
   },
 ]);

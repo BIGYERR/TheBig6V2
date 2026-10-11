@@ -3,7 +3,7 @@
 Full path: `/Users/CanasBangin/Desktop/TheBig6V2/app`
 
 This folder packages Iron Asylum as an **Angular 22** app and wraps it with **Cordova (cordova-ios 8)** for the iOS
-Simulator and a connected iPhone. It also holds the lint setup and a Docker + Puppeteer e2e suite.
+Simulator and a connected iPhone. It also holds the lint setup, the unit and integration tests, and a Docker + Puppeteer e2e suite.
 
 The live app is still the repo root `index.html`, served by GitHub Pages and booted by every gate under `tests/`.
 Nothing here edits it. The Angular app is **generated from it on every build**, so there is one source of truth and
@@ -46,9 +46,12 @@ with an iOS Simulator runtime.
 | `npm start` | sync, then `ng serve` on http://localhost:4200 |
 | `npm run build` | sync, then a production build into `www/` (Cordova's web root) |
 | `npm run sync:check` | fail if the generated files are stale against `../index.html` |
-| `npm run lint` | ESLint: TypeScript and templates (angular-eslint), plus `scripts/` and `e2e/`; errors fail |
+| `npm run lint` | ESLint: TypeScript and templates (angular-eslint), plus `scripts/`, `e2e/` and `test/`; errors fail |
 | `npm run lint:legacy` | warn-only report on the generated `app.js` (counts per rule, first examples) |
-| `npm run e2e` | Docker builds and serves the app; Puppeteer clicks through it; report at `e2e/report/index.html` |
+| `npm test` | type-check, then every unit and integration test (Node's built-in runner); about 3 s |
+| `npm run test:unit` / `npm run test:integration` | one layer of tests on its own |
+| `npm run typecheck` | `tsc` over the Node TypeScript (`e2e/`, `test/`); Node runs those files without it, so this is the type check |
+| `npm run e2e` | the e2e suite, entirely in Docker; writes `e2e/report/index.html` and `e2e/report/collage.png` |
 | `npm run ios:sim` | build, boot the simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`), install, launch |
 | `npm run ios:device` | signed build for the connected iPhone, install, launch |
 | `npm run ios:open` | open the native project in Xcode |
@@ -83,21 +86,61 @@ device"). The script runs `cordova prepare`, then builds for the connected phone
 with `-allowProvisioningUpdates -allowProvisioningDeviceRegistration`), the way Xcode's Run button does. Before it
 installs, it checks that the phone's UDID is in the embedded profile.
 
+## Tests
+
+`npm test` runs Node's built-in test runner (`node --test`) over `test/**/*.test.ts`, after `npm run typecheck`. Node 26
+runs TypeScript directly by stripping the types, so there is no build step and no test framework dependency.
+`tsconfig.node.json` sets `erasableSyntaxOnly`, which keeps out the TypeScript that stripping cannot run (enums,
+namespaces, parameter properties). `e2e/package.json` and `test/package.json` only mark those folders as ES modules.
+
+- `test/unit/`: pure functions with fixtures, no browser and no files. `sync-legacy`'s split and render, the e2e
+  report (every image embedded, nothing referenced outside the file, everything escaped), the collage layout, pixel
+  parity, and the step list.
+- `test/integration/`: real inputs. `sync-legacy` against the live `../index.html` and as a command, the collage drawn
+  in Chrome and checked pixel by pixel, and the written report opened from disk in Chrome with every request outside
+  the file blocked. These use Puppeteer's Chrome on this machine, which `npm install` downloads.
+
+The Angular code (`src/`) has no unit tests yet. It is a host for the legacy app, and the e2e parity check is its
+proof. When a screen moves into an Angular component, that component's tests go through the Angular CLI's own
+`ng test` builder (`@angular/build:unit-test`, Vitest), which compiles decorators and templates the way the app build
+does. Node cannot import those files directly.
+
 ## e2e
 
-`npm run e2e` (`e2e/run-e2e.mjs`):
-1. `docker compose` builds `e2e/Dockerfile`. The Angular app is built from source in a clean Node container, then
-   served by nginx. The original `index.html` is served beside it at `/reference/`.
-2. Puppeteer runs the same 19 steps (`e2e/flow.mjs`) against both, each in its own browser context:
-   - build a program through the wizard;
-   - open This Week, the rest-day sheet, a day's detail and its run log, the swap sheet, Random Workout, Hurt?,
-     Traveling?, Progress, Bugs and Programs;
-   - relaunch and check the program persisted.
-   Every step is a real tap followed by an assertion.
-3. Each pair of screenshots is compared pixel by pixel. **Default tolerance is 0%.** Clean runs match exactly, and a
+`npm run e2e` (`e2e/launch.ts`) runs the whole suite in Docker. Nothing runs a browser on the host.
+1. `docker compose` builds two images from one `e2e/Dockerfile`, on one shared `npm ci` layer:
+   - **web**: the Angular app built from source in a clean Node container, served by nginx. The original
+     `index.html` is served beside it at `/reference/`.
+   - **runner**: the Puppeteer suite in TypeScript (`e2e/*.ts`, run by Node's type stripping) with the Chrome for
+     Testing build that the lockfile's Puppeteer pins. Chrome for Testing ships native ARM64 Linux builds, so it runs
+     at full speed on Apple silicon.
+2. nginx starts. The runner shares its network, so it reaches the app at `http://127.0.0.1`, the same secure
+   localhost origin a dev server has.
+3. The runner takes five journeys (`e2e/flow.ts`, 46 steps) against both the Angular build and the original. Each
+   journey starts from empty storage in its own browser context, and a failed step stops only its own journey:
+   - **Strength, commercial gym** (19 steps): the wizard, This Week, the rest-day sheet, a day's detail and its run
+     log, the swap sheet, Random Workout, Hurt?, Traveling?, Progress, Bugs, Programs, then a relaunch.
+   - **10K race, Sun Nov 29** (9): a race goal with a race date, the program length box, the week 1 long run, then
+     race week's Saturday shakeout and race day (the Nike plan).
+   - **1.5 mile test, Sat Nov 14** (6): a dated pace test, the program length box, and the test day in week 6 (NSW).
+   - **Bodyweight, then a knee injury** (6): a beginner over 55 with no equipment, Friday before the injury (it holds
+     a jump), Hurt? with the knee chosen, the injury week, and Friday after (no jumps).
+   - **Log a session and relaunch** (6): log two exercises, the effort and a note, close the day out, relaunch, and
+     find all of it kept, in the session and in the Progress journal.
+   Every step is a real tap followed by an assertion. Native date and slider controls, which a user drives through
+   the OS picker, are set directly and fire their events.
+4. Each pair of screenshots is compared pixel by pixel. **Default tolerance is 0%.** Clean runs match exactly, and a
    planted 0.3% title change fails the four screens that show it.
-4. It writes `e2e/report/index.html`, one static page with every screenshot, the pixel diffs and any errors. The PNGs
-   sit beside it in `e2e/report/screenshots/`. Then it tears the container down.
+5. It copies two files out of the runner container into `e2e/report/` (`docker cp`; nothing is bind-mounted, since
+   the repo sits in an iCloud-synced folder), then tears both containers down:
+   - **`index.html`**: one self-contained page. Every screenshot (Angular, original and pixel diff for each step) is
+     embedded as a data URI, and the styles and script are inline. It can be mailed or moved on its own. Click a
+     screenshot to see it full size. The runner refuses to write it if anything in it points outside the file.
+   - **`collage.png`**: every screen of the Angular build on one image, about 9350×9970 px (93 MP) for the 46 screens.
+     Each one sits at native size (786×1704) under a label with its number, page name, journey and step id, and PASS
+     or FAIL. A screen that failed is outlined in red. The numbers match the report's, so "#27 race-10k/race-shakeout"
+     means the same screen in both.
+   - `logs/`: the docker build, up and down output.
 
 Determinism:
 - iPhone viewport, 393×852 @2x;
@@ -106,5 +149,12 @@ Determinism:
 - web fonts and layout settled before each screenshot;
 - the bug form's endpoint is blocked, so a run never files a real report.
 
-Options: `E2E_KEEP=1` leaves the container up, `E2E_BASE_URL=http://127.0.0.1:4280` reuses a running one,
-`E2E_PORT` (default 4280), `E2E_PARITY_MAX` (percent).
+Screenshots come from Chrome on Linux, so text is rendered by Linux's font stack. Both targets are rendered the same
+way, so parity is unaffected. The app's own font (Geist) is a web font and loads the same everywhere. Only glyphs it
+lacks fall back to the image's DejaVu, Liberation and Noto Color Emoji fonts.
+
+Options: `E2E_KEEP=1` leaves nginx up afterwards and prints its address (the original is at `/reference/`),
+`E2E_PORT` pins nginx's host port (default: any free port), `E2E_PARITY_MAX` (percent).
+
+The compose project is named after the checkout (`iron-asylum-e2e-<hash of its path>`), so two checkouts or worktrees
+can run the suite at the same time without sharing containers, images or a port.

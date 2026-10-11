@@ -1,13 +1,35 @@
-name: iron-asylum-e2e
+# The e2e stack. npm run e2e (e2e/launch.ts) drives it and names the project per checkout, so two checkouts (or two
+# sessions) can run the suite at once without sharing containers, images or a host port.
 services:
   web:
     build:
       context: ../..
       dockerfile: app/e2e/Dockerfile
+      target: web
     ports:
-      - "127.0.0.1:${E2E_PORT:-4280}:80"
+      # 0 lets Docker pick a free host port; E2E_PORT pins one. The runner never uses it (see network_mode below).
+      - "127.0.0.1:${E2E_PORT:-0}:80"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
       interval: 1s
       timeout: 2s
       retries: 30
+
+  runner:
+    build:
+      context: ../..
+      dockerfile: app/e2e/Dockerfile
+      target: runner
+    # Shares web's network stack, so the app is at http://127.0.0.1: a secure localhost origin, like a dev server.
+    network_mode: service:web
+    depends_on:
+      web:
+        condition: service_healthy
+    init: true
+    shm_size: 1gb
+    # The report is written inside the container and copied out by launch.ts (docker cp), never bind-mounted: the
+    # repo sits in an iCloud-synced folder, and nothing in the suite needs the host's file system while it runs.
+    environment:
+      E2E_REPORT_DIR: /report
+      E2E_PARITY_MAX: ${E2E_PARITY_MAX:-0}
+      E2E_ONLY: ${E2E_ONLY:-}
