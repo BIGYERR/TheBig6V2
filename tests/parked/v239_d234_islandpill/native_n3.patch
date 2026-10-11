@@ -1,0 +1,104 @@
+--- a/app/plugins-src/ia-island/src/ios/IAIsland.swift
++++ b/app/plugins-src/ia-island/src/ios/IAIsland.swift
+@@ -52,6 +52,43 @@
+         }
+     }
+ 
++    /// D234 R1: whether this phone has a Dynamic Island, read once by island.js before deviceready.
++    /// It touches no activity, so it answers at once rather than through the work chain.
++    @objc(info:)
++    func info(_ command: CDVInvokedUrlCommand) {
++        let model = IAIsland.modelIdentifier()
++        let result = CDVPluginResult(status: .ok, messageAs: [
++            "hasIsland": IAIsland.islandModels.contains(model),
++            "model": model,
++        ])
++        commandDelegate.send(result, callbackId: command.callbackId)
++    }
++
++    /// The phones with a Dynamic Island, by model identifier. A fixed list, so an unknown model (a phone newer than
++    /// this list) reads false and keeps the edge tab. The identifiers match Xcode 26.6's simulator device profiles
++    /// (/Library/Developer/CoreSimulator/Profiles/DeviceTypes/<name>.simdevicetype/Contents/Resources/profile.plist,
++    /// modelIdentifier). Left out: iPhone17,5 (16e, a notch) and iPhone18,5 (17e: no profile field shows an island).
++    private static let islandModels: Set<String> = [
++        "iPhone15,2", "iPhone15,3",                              // 14 Pro, 14 Pro Max
++        "iPhone15,4", "iPhone15,5",                              // 15, 15 Plus
++        "iPhone16,1", "iPhone16,2",                              // 15 Pro, 15 Pro Max
++        "iPhone17,1", "iPhone17,2", "iPhone17,3", "iPhone17,4",  // 16 Pro, 16 Pro Max, 16, 16 Plus
++        "iPhone18,1", "iPhone18,2", "iPhone18,3", "iPhone18,4",  // 17 Pro, 17 Pro Max, 17, Air
++    ]
++
++    /// The model identifier: utsname.machine on a device; in the simulator, the simulated model.
++    private static func modelIdentifier() -> String {
++        #if targetEnvironment(simulator)
++        return ProcessInfo.processInfo.environment["SIMULATOR_MODEL_IDENTIFIER"] ?? ""
++        #else
++        var system = utsname()
++        uname(&system)
++        return withUnsafeBytes(of: &system.machine) { bytes in
++            String(decoding: bytes.prefix(while: { $0 != 0 }), as: UTF8.self)
++        }
++        #endif
++    }
++
+     private func enqueue(_ work: @escaping @Sendable () async -> Void) {
+         tailLock.lock()
+         defer { tailLock.unlock() }
+--- a/app/plugins-src/ia-island/www/island.js
++++ b/app/plugins-src/ia-island/www/island.js
+@@ -4,7 +4,19 @@
+ //   end()              no activity
+ // Fire-and-forget: no callbacks, and any error is swallowed so the stopwatch never breaks on the bridge.
+ // Native applies the calls in arrival order, so the last one wins.
++//
++// hasIsland (D234 R1): true only when native confirms this phone has a Dynamic Island. It is settled before
++// deviceready, once, and never changes after; the page reads it once at the timer's init. Unknown reads false.
+ 
++var channel = require('cordova/channel');
++
++// The pattern cordova-plugin-device uses: deviceready waits for this sticky channel.
++channel.createSticky('onIAIslandReady');
++channel.waitForInitialization('onIAIslandReady');
++
++// A missing or silent native side must never hold deviceready: past this, the answer is "no island".
++var INFO_TIMEOUT_MS = 1000;
++
+ function send(action, args) {
+     try {
+         cordova.exec(null, null, 'IAIsland', action, args);
+@@ -13,7 +25,8 @@
+     }
+ }
+ 
+-module.exports = {
++var island = {
++    hasIsland: false,
+     run: function (startEpochMs) {
+         send('run', [startEpochMs]);
+     },
+@@ -24,3 +37,25 @@
+         send('end', []);
+     }
+ };
++
++channel.onCordovaReady.subscribe(function () {
++    var settled = false;
++    function settle(hasIsland) {
++        if (settled) return;
++        settled = true;
++        island.hasIsland = hasIsland;
++        channel.onIAIslandReady.fire();
++    }
++    setTimeout(function () { settle(false); }, INFO_TIMEOUT_MS);
++    try {
++        cordova.exec(function (info) {
++            settle(!!(info && info.hasIsland));
++        }, function () {
++            settle(false);
++        }, 'IAIsland', 'info', []);
++    } catch (e) {
++        settle(false);
++    }
++});
++
++module.exports = island;

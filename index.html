@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="238"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
+<meta name="ia-version" content="239"><!-- SINGLE SOURCE OF TRUTH for update-check. Bump this one number every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -14014,7 +14014,11 @@ function sessionLogProgress(day){
 // ── Floating count-up rest stopwatch (PiP-style edge tab). Persists app-wide; runs through screen-lock. ──
 let _ruId=null,_ruRunning=false,_ruElapsed=0,_ruStart=0;
 let _rtSide='right',_rtExpanded=false,_rtIntroTO=null,_rtInited=false,_rtDragging=false,_rtIntroPending=false;
-function _ruNow(){return _ruRunning?(performance.now()-_ruStart):_ruElapsed;}
+// V239 (D233, R1 as amended): inside the native app (window.iaIsland present) the rest clock is the wall clock
+// and the island mirrors every seam; on the PWA it stays performance.now() and the island is never called.
+function _ruClock(){return window.iaIsland?Date.now():performance.now();}
+function _ruIsland(){var I=window.iaIsland;if(!I)return;try{if(_ruRunning)I.run(_ruStart);else if(_ruElapsed>0)I.stop(_ruElapsed);else I.end();}catch(e){}}
+function _ruNow(){return _ruRunning?(_ruClock()-_ruStart):_ruElapsed;}
 function _rtPad(n){return(n<10?'0':'')+n;}
 function _rtStack(str){var h='';for(var i=0;i<str.length;i++){var c=str[i];h+='<span>'+(c===':'?'<span style="opacity:.7">:</span>':c)+'</span>';}return h;}
 function _ruRender(){
@@ -14026,12 +14030,12 @@ function _ruRender(){
   var bc=document.getElementById('rtCs');if(bc)bc.textContent='.'+_rtPad(cs);
   var b=document.getElementById('rtToggle');if(b){b.textContent=_ruRunning?'Stop':'Start';b.classList.toggle('running',_ruRunning);}
 }
-function ruStart(){if(_ruRunning)return;_ruRunning=true;_ruStart=performance.now()-_ruElapsed;if(_ruId)clearInterval(_ruId);_ruId=setInterval(_ruRender,33);_ruRender();}
-function ruPause(){if(_ruRunning){_ruElapsed=performance.now()-_ruStart;}_ruRunning=false;if(_ruId){clearInterval(_ruId);_ruId=null;}_ruRender();}
+function ruStart(){if(_ruRunning)return;_ruRunning=true;_ruStart=_ruClock()-_ruElapsed;if(_ruId)clearInterval(_ruId);_ruId=setInterval(_ruRender,33);_ruRender();_ruIsland();}
+function ruPause(){if(_ruRunning){_ruElapsed=_ruClock()-_ruStart;}_ruRunning=false;if(_ruId){clearInterval(_ruId);_ruId=null;}_ruRender();_ruIsland();}
 function ruToggle(){if(_ruRunning)ruPause();else ruStart();}
-function ruReset(){ruPause();_ruElapsed=0;_ruRender();}
+function ruReset(){ruPause();_ruElapsed=0;_ruRender();_ruIsland();}
 // Idle-only reset for day-open: a running rest survives navigation; a cold open starts fresh.
-function ruResetIfIdle(){if(!_ruRunning){_ruElapsed=0;_ruRender();}}
+function ruResetIfIdle(){if(!_ruRunning){_ruElapsed=0;_ruRender();_ruIsland();}}
 
 function _rtDismissIntro(){if(_rtIntroTO){clearTimeout(_rtIntroTO);_rtIntroTO=null;}var c=document.getElementById('rtCard'),t=document.getElementById('rtTab');if(c)c.style.animation='';if(t)t.style.animation='';}
 // First-run discovery sequence: expand the card, pop+wiggle it out from the edge, hold, then fold to the pill.
@@ -18094,6 +18098,10 @@ async function submitBug(){
 
 // INIT
 function init(){
+  // V239 (D233 R3): boot ends every island activity the app owns, so a reload and the island agree. First, so no
+  // later throw in init can skip it; the stopwatch holds its initials here, so this is end() in the native app
+  // and a no-op on the PWA (no window.iaIsland).
+  _ruIsland();
   const _bv=document.getElementById('bugVersion'); if(_bv) _bv.textContent='BUILD v'+IA_VERSION;
   renderProgList();
   const aid=getActiveProgId();const programs=getPrograms();

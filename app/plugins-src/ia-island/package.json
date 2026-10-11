@@ -1,0 +1,12 @@
+{
+  "name": "ia-island",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rest stopwatch Live Activity for The Asylum (local Cordova plugin, V239 D233).",
+  "cordova": {
+    "id": "ia-island",
+    "platforms": [
+      "ios"
+    ]
+  }
+}

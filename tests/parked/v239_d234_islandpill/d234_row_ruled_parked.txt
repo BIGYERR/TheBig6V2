@@ -1,0 +1,24 @@
+# ROW_RULED for V239 (D233 P-ISLAND, R1 as amended by Mario's concurrence). Passed to gate.sh step 4b as ROW_RULED=<this file>.
+# Written by the main session from tests/measure/v239_rulings/v239_ruling_d233.md ("Gate rows" section; Mario concurred 2026-10-09: "iOS version not the PWA", then "Not this build", "Display only", "Rest clock only"), before the draft run.
++ g239_d233_island.js D233-pwa  # D233 concurrence 1 (R1 amended): the PWA rest clock is unchanged
++ g239_d233_island.js D233-native-clock  # D233 R1: inside the native app the rest clock is the wall clock
++ g239_d233_island.js D233-start  # D233 after-table, Start
++ g239_d233_island.js D233-stop  # D233 after-table, Stop
++ g239_d233_island.js D233-resume  # D233 after-table, Resume after Stop
++ g239_d233_island.js D233-reset  # D233 after-table, Reset button; R3
++ g239_d233_island.js D233-donestatus  # D233 after-table, Done / Skip; R3
++ g239_d233_island.js D233-dayopen-stopped  # D233 after-table, Day open, clock stopped and nonzero; R3
++ g239_d233_island.js D233-dayopen-running  # D233 after-table, Day open, clock running
++ g239_d233_island.js D233-hidden  # D233 after-table, Home or wizard (tab hidden); R2
++ g239_d233_island.js D233-boot  # D233 after-table, Relaunch or reload; R3
++ g239_d233_island.js D233-throw  # D233 R2: the island follows the clock, never the reverse
+# D234 P-ISLANDPILL rows (Mario concurred 2026-10-09: island phone; "tab when unsure"; "icon + clock"; intro kept, "i think the intro should be it popping up", ruled as Amendment 1). Gate: tests/gates/g239_d234_pill.js (sibling of g239_d233_island.js, keyed to D234).
++ g239_d234_pill.js D234-pwa-tab  # D234 R1, R6: the PWA keeps the V238 tab, drag and intro
++ g239_d234_pill.js D234-native-noisland  # D234 R1: native without a confirmed island is identical to the PWA tab
++ g239_d234_pill.js D234-native-pill  # D234 R2 as re-ruled by Amendment 2: the pill class, idle 0:00, m:ss with no hundredths, .run only while running, the glyph as the trailing last child at 12, the five-digit step at 10:00, 60:00 at an hour
++ g239_d234_pill.js D234-native-tap  # D234 R3: a pill tap opens the card, the pill stays shown, a second tap or the minimize button closes it
++ g239_d234_pill.js D234-native-nodrag  # D234 R3: no drag in the pill arm
++ g239_d234_pill.js D234-native-intro  # D234 Amendment 1 (R5a-R5c): the drop intro, its cancel, reduced motion; replaces D234-native-nointro
++ g239_d234_pill.js D234-native-screens  # D234 R2, R4: shown on week, progress and bugs; hidden on Home and the wizard
++ g239_d234_pill.js D234-noislandcall  # D234 R6: the pill adds no island call; D233's call log is unchanged
++ g239_d234_pill.js D234-copy  # D234 R7: no new string; text nodes and aria-labels are V238's

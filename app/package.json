@@ -39,6 +39,7 @@
     "cordova-ios": "^8.1.1",
     "eslint": "^10.9.1",
     "globals": "^17.13.0",
+    "ia-island": "file:plugins-src/ia-island",
     "pixelmatch": "^8.0.0",
     "pngjs": "^7.0.0",
     "prettier": "^3.8.1",
@@ -58,6 +59,9 @@
   "cordova": {
     "platforms": [
       "ios"
-    ]
+    ],
+    "plugins": {
+      "ia-island": {}
+    }
   }
 }
