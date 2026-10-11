@@ -75,6 +75,7 @@
 // fallbackLabel() in this order:
 //   quoted values  "...", `...`, “...”, and '...' (a ' after a letter or digit is an apostrophe, not a quote)   -> <q>
 //   clock values   a date 2026-10-06 (with an optional time), a time 12:34 or 1:02:03.5, an elapsed 3.4 s or 120ms -> <t>
+//   versions       a dotted version is one <n>; a V or v prefix is kept, so a label keys as it did at 239      -> <n>
 //   digits         every other run of digits, with its decimals                                                -> <n>
 //   whitespace     runs collapse to one space; the ends are trimmed
 // The key is `L:` and the first 8 hex digits of the label's sha256 (UTF-8): one token, so it sits in the key column of
@@ -119,6 +120,7 @@ function fallbackLabel(rest){
   return String(rest)
     .replace(/"[^"]*"|`[^`]*`|“[^”]*”|(?<![A-Za-z0-9])'[^']*'(?![A-Za-z0-9])/g, '<q>')
     .replace(/(?<![A-Za-z0-9.:])(?:\d{4}-\d{2}-\d{2}(?:[T ]\d{1,2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:Z|[+\-]\d{2}:?\d{2})?)?|\d{1,2}(?::\d{2}){1,2}(?:\.\d+)?|\d+(?:\.\d+)?\s?(?:ms|s))(?![A-Za-z0-9])/g, '<t>')
+    .replace(/\b([vV]?)\d+\.\d+\.\d+\b/g, '$1<n>')   // a dotted version is one <n>, a V/v prefix kept: V0.239.1 keys as V239 did
     .replace(/\d+(?:\.\d+)?/g, '<n>')
     .replace(/\s+/g, ' ').trim();
 }
