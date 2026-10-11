@@ -1,9 +1,11 @@
-# The deployment pipeline. main is what GitHub Pages serves and what Heroku deploys, so main changes only through a pull
-# request from dev, and only when every check below passes (branch protection requires them). dev takes plain pushes
-# with no checks here: the 60-second local check (tools/check.mjs, run by the pre-commit hook) is the gate while working.
+# The pipeline. main is what GitHub Pages serves and what Heroku deploys. Work is committed and pushed to dev, and every
+# push to dev runs the full suite here; nothing waits for it. Mario reviews the results, then opens a pull request from
+# dev into main by hand to release (no agent ever opens one). Branch protection lets main change only through that pull
+# request, and only when every check below passes on it.
 #
-#   pull request dev -> main   every check: the full gate suite with its row check and blast radius, fuzz, sabotage,
-#                              app and backend tests and lint, and the Docker e2e. All must pass to merge.
+#   push to dev                every check: the full gate suite with its row check and blast radius, fuzz, sabotage,
+#                              app and backend tests and lint, and the Docker e2e. A newer push cancels the running one.
+#   pull request dev -> main   the same checks again, plus "PR source is dev". All must pass to merge.
 #   push to main (the merge)   the deploy proof: Pages built that commit and the live URL serves it.
 #   workflow_dispatch          run the checks by hand on any branch.
 #
@@ -15,7 +17,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [dev, main]
   workflow_dispatch:
 
 concurrency:
@@ -48,7 +50,7 @@ jobs:
 
   app-backend:
     name: app and backend
-    if: github.event_name != 'push'
+    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -82,7 +84,7 @@ jobs:
 
   gates:
     name: gate suite
-    if: github.event_name != 'push'
+    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     timeout-minutes: 150
     steps:
@@ -126,7 +128,7 @@ jobs:
 
   fuzz:
     name: fuzz
-    if: github.event_name != 'push'
+    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -161,7 +163,7 @@ jobs:
 
   sabotage:
     name: sabotage
-    if: github.event_name != 'push'
+    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -206,7 +208,7 @@ jobs:
 
   e2e:
     name: e2e
-    if: github.event_name != 'push'
+    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -229,7 +231,7 @@ jobs:
 
   deployed:
     name: deploy proof (Pages)
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:

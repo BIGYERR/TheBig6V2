@@ -6,7 +6,7 @@ Preconditions: builder has produced `index.html` at the new version, a baseline 
 
 **Which of these steps a run includes, and over which gates and mutations, is set by the Proof scope section of CLAUDE.md, the single source** (draft run or final run, LOCAL or CROSS-CUTTING, the dependency chain, the sabotage set). Where this file disagrees with it, CLAUDE.md wins.
 
-**Where each step runs is set by CLAUDE.md's Pipeline section (Mario, Post-V239).** Locally only what finishes inside 60 seconds: `node tools/check.mjs`, plus the build's new and edited gates and their previous-version runs. The full `gate.sh` run, fuzz and the sabotage proof set run in GitHub Actions on the pull request from `dev` into `main`; read them with `gh pr checks` and `gh run download`, never rerun them locally.
+**Where each step runs is set by CLAUDE.md's Pipeline section (Mario, Post-V239).** Locally only what finishes inside 60 seconds: `node tools/check.mjs`, plus the build's new and edited gates and their previous-version runs. The full `gate.sh` run, fuzz and the sabotage proof set run in GitHub Actions on every push to `dev`; read them with `gh run view` and `gh run download`, never rerun them locally. Mario opens the pull request into `main` himself, by hand; no agent ever opens one.
 
 Run the included steps in this order, each as `bash -c 'set -eo pipefail; …'`. A red step ends the run.
 

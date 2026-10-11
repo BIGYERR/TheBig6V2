@@ -31,8 +31,10 @@ live app's and the native app's. The details are in `app/README.md`.
 
 - **Work on `dev`.** Commit and push there freely. Every commit runs the 60-second check on what it touches
   (`tools/check.mjs --staged`, from `.githooks/pre-commit`; turn the hook on once per clone with
-  `git config core.hooksPath .githooks`). `node tools/check.mjs` runs all of it by hand, in about 25 seconds.
-- **Deploy by pull request from `dev` into `main`.** `main` is protected: it changes only through that pull request, and
+  `git config core.hooksPath .githooks`). `node tools/check.mjs` runs all of it by hand, in about 25 seconds. Every push
+  to `dev` also runs the full suite in GitHub Actions (below); nothing waits for it, and its results are there to review.
+- **Release by pull request from `dev` into `main`, opened by hand** after reviewing the push's results in Actions. No
+  agent opens one. `main` is protected: it changes only through that pull request, and
   only when every check in `.github/workflows/pipeline.yml` passes: the full gate suite (every gate, the row check and
   the blast radius), fuzz, sabotage, the app and backend tests and lint, and the Docker e2e. That takes 30 to 45 minutes
   in GitHub Actions; nothing waits for it locally. Merging is the deploy: Pages serves `main`, the pipeline then proves
