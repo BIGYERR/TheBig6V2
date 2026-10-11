@@ -66,6 +66,81 @@
           "defaultConfiguration": "development"
         }
       }
+    },
+    "site": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "site",
+      "prefix": "ia",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": {
+              "base": "dist/site",
+              "browser": ""
+            },
+            "index": "site/index.html",
+            "browser": "site/main.ts",
+            "tsConfig": "tsconfig.json",
+            "baseHref": "/",
+            "styles": ["site/styles.css"],
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "site/public"
+              }
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "250kB",
+                  "maximumError": "400kB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kB",
+                  "maximumError": "10kB"
+                }
+              ],
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": true
+                },
+                "fonts": false
+              },
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "port": 4300,
+            "proxyConfig": "site/proxy.conf.json"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "site:build:production"
+            },
+            "development": {
+              "buildTarget": "site:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        }
+      }
     }
   }
 }

@@ -1,10 +1,12 @@
 import express from 'express';
 import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { basicAuth, cors, jsonBody } from './middleware.js';
 
 const ADMIN_DIR = fileURLToPath(new URL('../dist/admin', import.meta.url));
 const CLIENT_DIR = fileURLToPath(new URL('../client', import.meta.url));
+const SITE_DIR = fileURLToPath(new URL('../dist/site', import.meta.url));
 
 /** The kind of device a user agent names, for the request log. */
 export function deviceOf(ua = '') {
@@ -18,7 +20,7 @@ export function deviceOf(ua = '') {
 // Built as a function of config and store so the tests can run it on a random port with a fake clock.
 // `log` gets one line per response once it is sent (server.js passes console.log; tests pass nothing, so stay quiet):
 //   request POST /api/heartbeat 200 3 ms 192.168.1.20 iPhone
-export function createApp({ config, store, adminDir = ADMIN_DIR, startedAt = Date.now(), log = null }) {
+export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_DIR, startedAt = Date.now(), log = null }) {
   const app = express();
   app.disable('x-powered-by');
   if (config.trustProxy) {
@@ -140,8 +142,26 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, startedAt = Dat
   // The connection indicator on a page of its own, for trying it before it ships in the app.
   if (config.clientDemo) app.use('/client', express.static(CLIENT_DIR, { index: 'demo.html' }));
 
-  app.get('/', (req, res) => res.redirect('/admin/'));
-  app.use((req, res) => res.status(404).json({ ok: false, error: 'not found' }));
+  // ── The website: everything else at the root. Its footer's Staff Login is a plain link to /admin/ above, so
+  // the site and the backend are one server, one deploy, one origin. ─────────────────────────────────────────
+  const siteBuilt = existsSync(join(siteDir, 'index.html'));
+  if (siteBuilt) {
+    app.use(express.static(siteDir, { index: 'index.html', setHeaders: siteCache }));
+  } else {
+    app.get('/', (req, res) =>
+      res.status(503).type('text').send('The website is not built. Run `npm run build` in backend/.'),
+    );
+  }
+
+  // A browser asking for a page gets the site's 404 page; everything else (fetch, curl, the app) gets JSON.
+  // Sent relative to its root: with an absolute path, sendFile refuses any dot folder on the way (.claude/...).
+  const hasNotFoundPage = existsSync(join(siteDir, '404.html'));
+  app.use((req, res) => {
+    if (hasNotFoundPage && req.method === 'GET' && req.accepts(['json', 'html']) === 'html') {
+      return res.status(404).set('Cache-Control', 'no-cache').sendFile('404.html', { root: siteDir });
+    }
+    res.status(404).json({ ok: false, error: 'not found' });
+  });
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
@@ -157,4 +177,12 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, startedAt = Dat
 // every time, so a new deploy shows on the next load.
 function adminCache(res, path) {
   res.setHeader('Cache-Control', path.endsWith('index.html') ? 'no-cache' : 'private, max-age=3600');
+}
+
+// The site's bundles carry a content hash in their names (main-ABCD1234.js), so a deploy changes the name and a
+// year of caching is safe. Pages are revalidated every time; the favicon and robots.txt for an hour.
+const HASHED = /-[A-Z0-9]{8}\.(?:js|css)$/;
+function siteCache(res, path) {
+  const value = path.endsWith('.html') ? 'no-cache' : HASHED.test(path) ? 'public, max-age=31536000, immutable' : 'public, max-age=3600';
+  res.setHeader('Cache-Control', value);
 }

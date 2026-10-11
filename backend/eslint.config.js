@@ -1,6 +1,6 @@
 // @ts-check
-// npm run lint: the admin UI (TypeScript and templates), the server and tests (Node), and the app-side snippet
-// (a classic browser script). Errors fail. Same rule sets as app/eslint.config.js.
+// npm run lint: the admin UI and the website (TypeScript and templates), the server and tests (Node), and the
+// app-side snippet (a classic browser script). Errors fail. Same rule sets as app/eslint.config.js.
 import eslint from '@eslint/js';
 import angular from 'angular-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
@@ -14,9 +14,9 @@ const nodeRules = {
 };
 
 export default defineConfig([
-  globalIgnores(['node_modules/', 'dist/', '.angular/']),
+  globalIgnores(['node_modules/', 'dist/', '.angular/', 'data/', 'site/public/']),
   {
-    files: ['admin/**/*.ts'],
+    files: ['admin/**/*.ts', 'site/**/*.ts'],
     extends: [
       eslint.configs.recommended,
       tseslint.configs.recommended,
@@ -30,7 +30,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['admin/**/*.html'],
+    files: ['admin/**/*.html', 'site/**/*.html'],
     extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
   },
   {

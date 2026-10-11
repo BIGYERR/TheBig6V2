@@ -1,0 +1,65 @@
+<div class="phone-frame">
+  <div class="phone-screen">
+    <div class="island">
+      <span class="island-l"><ia-icon name="timer" [size]="13" /></span>
+      <ia-rest-clock class="island-r" [hundredths]="false" />
+    </div>
+
+    <div class="ph-status">
+      <span>9:41</span>
+      <span class="ph-status-r"><i></i><i></i><i></i><b></b></span>
+    </div>
+
+    <div class="ph-top">
+      <span class="ph-brand">THE ASYLUM</span>
+      <span class="ph-sub">Mile time · 8 weeks</span>
+    </div>
+
+    <div class="ph-hero">
+      <span class="ph-week">WEEK 4</span>
+      <span class="ph-phase">BUILD</span>
+    </div>
+
+    <div class="ph-strip">
+      @for (day of strip; track $index) {
+        <div class="ph-day" [class.today]="day.today" [class.rest]="!day.focus && !day.cardio">
+          <span class="ph-code">{{ day.cardio || '·' }}</span>
+          <span class="ph-d">{{ day.d }}</span>
+          <span class="ph-date">{{ day.date }}</span>
+          <span class="ph-code">{{ day.focus || 'REST' }}</span>
+        </div>
+      }
+    </div>
+
+    <div class="ph-card">
+      <div class="ph-card-k">TODAY · THU 15</div>
+      <div class="ph-card-t">Hinge + Long Interval</div>
+      <div class="ph-count">2/4 LOGGED</div>
+      @for (row of rows; track $index) {
+        <div class="ph-row" [class.done]="row.done">
+          <span class="ph-row-i"><ia-icon [name]="row.done ? 'check' : row.icon" [size]="14" /></span>
+          <span class="ph-row-n">{{ row.name }}</span>
+          <span class="ph-row-rx">{{ row.rx }}</span>
+        </div>
+      }
+      <div class="ph-rest">
+        <span class="ph-rest-k">REST</span>
+        <ia-rest-clock #clock class="ph-rest-t" />
+        <span class="ph-rest-bar"><i [style.transform]="'scaleX(' + clock.progress() + ')'"></i></span>
+      </div>
+    </div>
+
+    <div class="ph-tiles">
+      <div><b>11</b><span>DONE</span></div>
+      <div><b>18.4</b><span>MILES</span></div>
+      <div><b>6</b><span>STREAK</span></div>
+    </div>
+
+    <nav class="ph-tabs">
+      <span><ia-icon name="home" [size]="16" />Programs</span>
+      <span class="on"><ia-icon name="calendar" [size]="16" />This Week</span>
+      <span><ia-icon name="chart" [size]="16" />Progress</span>
+      <span><ia-icon name="bug" [size]="16" />Bugs</span>
+    </nav>
+  </div>
+</div>

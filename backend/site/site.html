@@ -1,0 +1,341 @@
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" [class.scrolled]="scrolled() || menuOpen()" [class.open]="menuOpen()">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top" (click)="closeMenu()" aria-label="Iron Asylum, back to the top">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-word">THE <b>ASYLUM</b></span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#method" (click)="closeMenu()">Method</a>
+      <a href="#features" (click)="closeMenu()">Features</a>
+      <a href="#races" (click)="closeMenu()">Races</a>
+      <a href="#iphone" (click)="closeMenu()">iPhone</a>
+      <a href="#faq" (click)="closeMenu()">FAQ</a>
+    </nav>
+    <a class="btn btn-ink nav-cta" [href]="appUrl">Open the app <ia-icon name="arrowRight" [size]="16" /></a>
+    <button
+      type="button"
+      class="nav-toggle"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="mobile-menu"
+      [attr.aria-label]="menuOpen() ? 'Close the menu' : 'Open the menu'"
+    >
+      <ia-icon [name]="menuOpen() ? 'x' : 'menu'" [size]="22" />
+    </button>
+  </div>
+  <nav id="mobile-menu" class="nav-sheet" aria-label="Menu" [attr.inert]="menuOpen() ? null : ''">
+    <a href="#method" (click)="closeMenu()">Method</a>
+    <a href="#features" (click)="closeMenu()">Features</a>
+    <a href="#races" (click)="closeMenu()">Races</a>
+    <a href="#iphone" (click)="closeMenu()">iPhone</a>
+    <a href="#faq" (click)="closeMenu()">FAQ</a>
+    <a class="btn btn-signal" [href]="appUrl">Open the app <ia-icon name="arrowRight" [size]="18" /></a>
+  </nav>
+</header>
+
+<main id="main">
+  <!-- ── Hero ─────────────────────────────────────────────────────────────── -->
+  <section class="hero" id="top">
+    <div class="hero-grid-bg" aria-hidden="true"></div>
+    <div class="wrap hero-in">
+      <div class="hero-copy">
+        <p class="meta-row reveal-now">
+          <span>Strength</span><span class="slash">/</span><span>Cardio</span><span class="slash">/</span><span>One calendar</span>
+        </p>
+        <h1 class="hero-h">
+          <span class="line"><span>Lift heavy.</span></span>
+          <span class="line"><span>Run far.</span></span>
+          <span class="line"><span class="outline">One plan.</span></span>
+        </h1>
+        <p class="lede reveal-now">
+          Iron Asylum writes your whole training block. Strength and cardio share one calendar, so the lifting works
+          around your running, not against it. Give it a race date. It counts back from there.
+        </p>
+        <div class="hero-ctas reveal-now">
+          <a class="btn btn-signal btn-lg" [href]="appUrl">Build my program <ia-icon name="arrowRight" [size]="18" /></a>
+          <a class="btn btn-line btn-lg" href="#method">See the method</a>
+        </div>
+        <ul class="proof reveal-now" aria-label="At a glance">
+          <li><ia-icon name="shield" [size]="16" /> Built on military test doctrine</li>
+          <li><ia-icon name="flag" [size]="16" /> 5K to marathon</li>
+          <li><ia-icon name="footprints" [size]="16" /> Run, bike, swim</li>
+        </ul>
+      </div>
+
+      <div class="hero-visual">
+        <div class="float-card fc-1">
+          <span class="fc-k">RPE 8</span>
+          <span class="fc-v">Two reps in the tank.</span>
+        </div>
+        <div class="float-card fc-2">
+          <span class="fc-k"><ia-icon name="flag" [size]="14" /> Race day</span>
+          <span class="fc-v">Counted back. 18 weeks.</span>
+        </div>
+        <div class="float-card fc-3">
+          <span class="fc-k"><ia-icon name="flame" [size]="14" /> Streak</span>
+          <span class="fc-v fc-big">6 days</span>
+        </div>
+        <ia-phone />
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Ticker ───────────────────────────────────────────────────────────── -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      @for (word of ticker; track $index) {
+        <span class="ticker-w" [class.outline]="$odd">{{ word }}</span><span class="ticker-x"></span>
+      }
+    </div>
+  </div>
+
+  <!-- ── Numbers ──────────────────────────────────────────────────────────── -->
+  <section class="numbers" aria-label="By the numbers">
+    <div class="wrap numbers-in">
+      @for (item of numbers; track $index) {
+        <div class="num" iaReveal [style.--d]="$index">
+          <span class="num-n">{{ item.n }}</span>
+          <span class="num-l">{{ item.label }}</span>
+          <span class="num-b">{{ item.body }}</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ── Method ───────────────────────────────────────────────────────────── -->
+  <section class="section" id="method">
+    <div class="wrap">
+      <div class="sec-head" iaReveal>
+        <p class="kicker">How it works</p>
+        <h2>Three steps. Then you just train.</h2>
+      </div>
+      <ol class="steps">
+        @for (step of steps; track step.n) {
+          <li class="step" iaReveal [style.--d]="$index">
+            <span class="step-n">{{ step.n }}</span>
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.body }}</p>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ── Features ─────────────────────────────────────────────────────────── -->
+  <section class="section section-alt" id="features">
+    <div class="wrap">
+      <div class="sec-head" iaReveal>
+        <p class="kicker">Features</p>
+        <h2>The rules a good coach follows. Written into the engine.</h2>
+      </div>
+
+      <div class="bento">
+        <article class="tile tile-hero" iaReveal>
+          <div class="tile-hero-copy">
+            <span class="tile-i"><ia-icon name="zap" [size]="22" /></span>
+            <h3>Hard days hard. Easy days easy.</h3>
+            <p>
+              Heavy legs and hinges pair with your speed work. Recovery runs stay recovery runs. That is how you get
+              faster and stronger in the same block.
+            </p>
+          </div>
+          <div class="load" aria-hidden="true">
+            @for (day of week; track day.d) {
+              <div class="load-col" [attr.data-tag]="day.tag">
+                <span class="load-bar"><i></i></span>
+                <span class="load-d">{{ day.d.charAt(0) }}</span>
+              </div>
+            }
+          </div>
+        </article>
+
+        @for (f of features; track f.title) {
+          <article class="tile" [attr.data-span]="f.span" iaReveal [style.--d]="$index % 3">
+            <span class="tile-i"><ia-icon [name]="f.icon" [size]="22" /></span>
+            <h3>{{ f.title }}</h3>
+            <p>{{ f.body }}</p>
+            @if (f.icon === 'timer') {
+              <div class="mini-island" aria-hidden="true">
+                <ia-icon name="timer" [size]="14" />
+                <ia-rest-clock [hundredths]="false" [startAt]="12" />
+              </div>
+            }
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Sample week ──────────────────────────────────────────────────────── -->
+  <section class="section" aria-labelledby="week-h">
+    <div class="wrap">
+      <div class="sec-head" iaReveal>
+        <p class="kicker">A week in the asylum</p>
+        <h2 id="week-h">One calendar. Every session in its place.</h2>
+        <p class="sec-sub">A sample week for a mile time goal, five days a week.</p>
+      </div>
+      <ol class="week" iaReveal>
+        @for (day of week; track day.d) {
+          <li class="wday" [attr.data-tag]="day.tag">
+            <span class="wday-d">{{ day.d }}</span>
+            <span class="wday-tag">{{ day.tag }}</span>
+            @if (day.lift) {
+              <span class="chip chip-lift"><ia-icon name="dumbbell" [size]="14" />{{ day.lift }}</span>
+            }
+            @if (day.run) {
+              <span class="chip chip-run"><ia-icon name="footprints" [size]="14" />{{ day.run }}</span>
+            }
+            @if (!day.lift && !day.run) {
+              <span class="wday-rest">Recover.</span>
+            }
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ── Doctrine ─────────────────────────────────────────────────────────── -->
+  <section class="doctrine" aria-labelledby="doctrine-h">
+    <div class="wrap">
+      <div class="doctrine-head" iaReveal>
+        <p class="kicker kicker-on-ink">The source material</p>
+        <h2 id="doctrine-h">Built on doctrine.<br /><span class="outline-ink">Not vibes.</span></h2>
+        <p class="doctrine-lede">
+          Every prescription traces back to a source. When the engine drifts from the source, the engine gets fixed.
+        </p>
+      </div>
+      <div class="doctrine-cols">
+        @for (col of doctrine; track col.k) {
+          <div class="dcol" iaReveal [style.--d]="$index">
+            <p class="dcol-k">{{ col.k }}</p>
+            <p class="dcol-s">{{ col.source }}</p>
+            <ul>
+              @for (item of col.items; track item) {
+                <li><ia-icon name="check" [size]="16" />{{ item }}</li>
+              }
+            </ul>
+            <p class="dcol-f">{{ col.foot }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Races ────────────────────────────────────────────────────────────── -->
+  <section class="section" id="races">
+    <div class="wrap races-in">
+      <div class="sec-head" iaReveal>
+        <p class="kicker">Race plans</p>
+        <h2>Pick a race. Get the calendar.</h2>
+        <p class="sec-sub">
+          Set a race date and the plan counts back from it, so race week lands on race week. Your lifting bends around
+          the running.
+        </p>
+      </div>
+      <div class="races">
+        @for (race of races; track race.name) {
+          <div class="race" iaReveal [style.--d]="$index">
+            <div class="race-top">
+              <span class="race-n">{{ race.name }}</span>
+              <span class="race-w">{{ race.weeks }} <small>weeks</small></span>
+            </div>
+            <span class="race-track"><i [style.--w]="race.weeks / longest" [style.--n]="race.weeks"></i></span>
+            <p class="race-note">{{ race.note }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── iPhone ───────────────────────────────────────────────────────────── -->
+  <section class="section section-alt" id="iphone">
+    <div class="wrap">
+      <div class="sec-head" iaReveal>
+        <p class="kicker">On your iPhone</p>
+        <h2>Lives on your home screen.</h2>
+      </div>
+      <div class="install">
+        <div class="install-card" iaReveal>
+          <span class="tile-i"><ia-icon name="smartphone" [size]="22" /></span>
+          <h3>The web app</h3>
+          <p>No store. No download. Three taps and it runs full screen like any other app.</p>
+          <ol class="install-steps">
+            <li><span>1</span>Open the app in Safari.</li>
+            <li><span>2</span>Tap <ia-icon name="share" [size]="16" /> Share.</li>
+            <li><span>3</span>Tap <ia-icon name="plusSquare" [size]="16" /> Add to Home Screen.</li>
+          </ol>
+          <a class="btn btn-ink" [href]="appUrl">Open the app <ia-icon name="arrowRight" [size]="16" /></a>
+        </div>
+        <div class="install-card install-card-ink" iaReveal [style.--d]="1">
+          <span class="tile-i"><ia-icon name="timer" [size]="22" /></span>
+          <h3>The native app</h3>
+          <p>
+            The same app, wrapped for iOS. It adds one thing the web cannot do. Your rest clock lives on the Dynamic
+            Island while you set up the next lift.
+          </p>
+          <div class="big-island" aria-hidden="true">
+            <span class="big-island-l"><ia-icon name="timer" [size]="18" /> REST</span>
+            <ia-rest-clock class="big-island-r" [hundredths]="false" [startAt]="64" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ──────────────────────────────────────────────────────────────── -->
+  <section class="section" id="faq">
+    <div class="wrap faq-in">
+      <div class="sec-head" iaReveal>
+        <p class="kicker">FAQ</p>
+        <h2>Straight answers.</h2>
+      </div>
+      <div class="faq">
+        @for (item of faq; track item.q) {
+          <details class="qa" iaReveal>
+            <summary>
+              <span>{{ item.q }}</span>
+              <span class="qa-i" aria-hidden="true"><ia-icon name="plus" [size]="18" /></span>
+            </summary>
+            <p>{{ item.a }}</p>
+          </details>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Final call ───────────────────────────────────────────────────────── -->
+  <section class="final" aria-labelledby="final-h">
+    <div class="wrap final-in" iaReveal>
+      <h2 id="final-h">Get in<br />the asylum.</h2>
+      <p>Your whole block is ready the moment you finish the intake.</p>
+      <a class="btn btn-signal btn-xl" [href]="appUrl">Build my program <ia-icon name="arrowRight" [size]="20" /></a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <span class="brand-word">THE <b>ASYLUM</b></span>
+        <p>Hybrid strength and cardio for iPhone.</p>
+      </div>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="#method">Method</a>
+        <a href="#features">Features</a>
+        <a href="#races">Races</a>
+        <a href="#iphone">iPhone</a>
+        <a href="#faq">FAQ</a>
+        <a [href]="appUrl">Open the app</a>
+      </nav>
+    </div>
+    <p class="foot-word" aria-hidden="true">IRON ASYLUM</p>
+    <div class="foot-bottom">
+      <span>© {{ year }} Iron Asylum</span>
+      <!-- Staff only: the admin vision dashboard behind the admin login, on this same server. Quiet on purpose. -->
+      <a class="staff" href="/admin/" rel="nofollow"><ia-icon name="lock" [size]="12" />Staff Login</a>
+    </div>
+  </div>
+</footer>

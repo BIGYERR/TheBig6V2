@@ -2,10 +2,12 @@
 
 Full path: `/Users/CanasBangin/Desktop/TheBig6V2/backend`
 
-A small Node (Express 5) service with two jobs today:
+A small Node (Express 5) service with three jobs today, all on one server and one origin:
 
-1. **Heartbeat API.** The app checks in with a device UID, and the server tells it whether it is connected.
-2. **Admin vision.** A login-protected dashboard at `/admin/`: how many devices are connected now, how many
+1. **The website.** The public site at `/`: what the app is, how it works, its features, the race plans, how to
+   put it on an iPhone, and an FAQ. A quiet **Staff Login** in its footer leads to the admin.
+2. **Heartbeat API.** The app checks in with a device UID, and the server tells it whether it is connected.
+3. **Admin vision.** A login-protected dashboard at `/admin/`: how many devices are connected now, how many
    unique devices have ever checked in, round-trip latency, and a paginated, searchable table of every device.
 
 The app itself is still the repo root `index.html` on GitHub Pages. Nothing in this folder changes it. The app
@@ -17,10 +19,11 @@ side of the connection (`client/ia-link.js`) is ready, but it reaches the phone 
 | Path | What it is |
 |---|---|
 | `server/server.js` | entry point (`npm start`, the Procfile's `web`, the Dockerfile's `CMD`) |
-| `server/app.js` | routes: `/healthz`, `/api/*`, `/admin/*` |
+| `server/app.js` | routes: `/healthz`, `/api/*`, `/admin/*`, `/client/`, and the website at `/` |
 | `server/store.js` | the device store: in memory, optionally saved to a JSON file |
 | `server/middleware.js` | CORS, the text/plain JSON body, Basic auth with lockout |
 | `server/config.js` | every setting, read from the environment |
+| `site/` | the website: Angular 22, standalone and zoneless like the admin, one page with anchored sections, `site/public/` for the 404 page, favicon and robots.txt |
 | `admin/` | the admin UI: Angular 22, one standalone zoneless component, built with `@angular/build` (esbuild, Vite dev server) |
 | `client/ia-link.js` | the app side: heartbeat plus the connection dot, ready to paste into `index.html` |
 | `client/demo.html` | the dot on a page of its own, served at `/client/` outside production |
@@ -28,6 +31,7 @@ side of the connection (`client/ia-link.js`) is ready, but it reaches the phone 
 | `Procfile` | Heroku: `web: node server/server.js` |
 | `Dockerfile`, `docker-compose.yml` | the same server in a container |
 | `scripts/heroku.sh` | Heroku setup, deploy, verify, status, logs |
+| `scripts/mac-local-backend.sh` | the server on this Mac with no docker: up, down, restart, status, logs |
 
 ## Run it
 
@@ -39,20 +43,24 @@ npm install
 
 | Command | What it does |
 |---|---|
-| `npm run build` | build the admin UI into `dist/admin/` (the server serves it at `/admin/`) |
-| `npm start` | the server on http://localhost:3000 |
+| `npm run build` | build the admin UI into `dist/admin/` and the website into `dist/site/` (the server serves them at `/admin/` and `/`) |
+| `npm start` | the server on http://localhost:3000, in the foreground |
 | `npm run dev` | the same, restarting on every change under `server/` |
+| `npm run site:dev` | the website with live reload on http://localhost:4300/, `/admin` and `/api` proxied to `:3000` (run `npm run dev` beside it) |
 | `npm run admin:dev` | the admin UI with live reload on http://localhost:4200/admin/, its API calls proxied to `:3000` (run `npm run dev` beside it) |
-| `npm test` | the API, auth and store tests |
-| `npm run lint` | ESLint: admin TypeScript and templates (angular-eslint), server and tests, the app-side snippet; errors fail |
+| `npm test` | the API, auth, store, website and mac-local-backend tests |
+| `npm run lint` | ESLint: website and admin TypeScript and templates (angular-eslint), server and tests, the app-side snippet; errors fail |
+| `npm run mac-local-backend` | the server on this Mac with no docker, in the background, on http://localhost:3000 (below) |
+| `npm run mac-local-backend:status` / `:logs` / `:down` | is it up / follow its log / stop it |
 | `npm run docker:up` | build the image and run it on http://localhost:3000, waiting for the health check |
 | `npm run docker:logs` / `npm run docker:down` | follow the logs / stop it |
 | `npm run logs` | the run log (`../tools/README.md`): `npm run logs -- runs`, `npm run logs -- show backend-test`, ... |
 
-**Every run is logged.** `npm test`, `lint`, `dev`, `admin:dev`, `docker:up`, `docker:logs`, `docker:down` and `heroku`
-each record a run in `../temp/runs/` (gitignored) with a line in the shared history, `../temp/events.log`: start,
-finish, failures, and for the servers every request. `npm start` is not wrapped, since Heroku and the Docker image
-run the server directly.
+**Every run is logged.** `npm test`, `lint`, `dev`, `admin:dev`, `site:dev`, `docker:up`, `docker:logs`,
+`docker:down`, `mac-local-backend` (and its `:down`, `:status`, `:logs`) and `heroku` each record a run in
+`../temp/runs/` (gitignored) with a line in the shared history, `../temp/events.log`: start, finish, failures, and
+for the servers every request. `npm start` and `npm run build` are not wrapped, since Heroku and the Docker image run
+them directly. The server mac-local-backend starts in the background writes its own log, which `:logs` follows.
 
 **Request log.** The server prints one line per response on stdout, the same locally, in docker and on Heroku:
 `request POST /api/heartbeat 200 3 ms 192.168.1.20 iPhone` (method, path, status, time, caller, device). Never a
@@ -60,13 +68,53 @@ header or a body, so no password or payload is printed. `LOG_REQUESTS=0` turns i
 
 Locally the admin login is **admin / asylum**, unless `ADMIN_USER` and `ADMIN_PASSWORD` say otherwise. Then:
 
+- http://localhost:3000/ is the website. **Staff Login**, faint at the bottom right of its footer, opens the
+  dashboard below;
 - http://localhost:3000/admin/ is the dashboard;
 - http://localhost:3000/client/ is the connection dot demo. Open it in a second tab and it appears in the
   dashboard as a connected device.
 
+**Mac, no docker.** `npm run mac-local-backend` runs the same server the image runs, with the Mac's own Node
+(26, as `package.json` asks): `NODE_ENV=production`, the local login, the demo page on, and devices kept in
+`data/mac-local/devices.json` across restarts, as the docker volume keeps them. It installs dependencies if
+`node_modules/` is missing, rebuilds the website and admin only when something they build from changed, starts the
+server in the background (it outlives the terminal), and returns once `/healthz` answers. The pid file and the log
+sit beside the devices file; `data/` is git-ignored.
+
+```bash
+npm run mac-local-backend
+```
+
+- `npm run mac-local-backend -- down` stops it with SIGTERM, so the devices file is saved first. `restart`,
+  `status`, `logs` and `open` do what they say. `up` takes `--build` to rebuild everything, or `--no-build`.
+- It and docker both default to port 3000, so only one runs at a time. `up` refuses a port that is taken and says
+  so; `API_PORT=3001 npm run mac-local-backend` moves it. `ADMIN_USER`, `ADMIN_PASSWORD`, `CLIENT_DEMO` and
+  `CORS_ORIGINS` pass through as they do for docker. `MAC_LOCAL_DIR` moves the pid, log and devices file.
+- Unlike docker, which publishes on 127.0.0.1 only, the server listens on every interface (as `npm start` does),
+  so a phone on the same Wi-Fi can reach it at the Mac's address. On a network you do not trust, set
+  `ADMIN_PASSWORD`.
+
 **Docker.** `docker compose` runs the production image (`NODE_ENV=production`) with the local login, the demo page
 on, and `DATA_FILE` on a named volume, so devices survive a restart of the container. `docker compose down -v`
 wipes them. `API_PORT=3001 npm run docker:up` moves the port.
+
+## The website
+
+`site/` is one Angular page at `/`, in the app's own design system (bone, ink, the one burnt orange kept for live
+things, rectilinear corners): a hero with a drawing of the This Week screen whose rest clock runs on the island, the
+method in three steps, the features, a sample week, the doctrine, the race plans, how to put it on an iPhone, an
+FAQ, and a final call to open the app. Every "open the app" button goes to the Pages app. Its copy follows the
+app's copy rule (no dash as punctuation, short sentences, a coach's voice, no third party brand names), and a test
+checks the dash part.
+
+- **Staff Login** is a plain link in the footer's bottom row, faint until hovered or focused, to `/admin/`. The
+  admin's own Basic auth asks for the login there, so the site adds no login of its own and nothing changes for the
+  admin.
+- **Caching.** Pages revalidate on every load; the hashed bundles cache for a year. A deploy changes their names.
+- **404.** A browser asking for a page that does not exist gets the site's 404 page; fetch, curl and the app keep
+  getting the JSON 404. `/api` keeps its JSON 404 for everyone.
+- **Not built** (`dist/site/` missing), `/` answers 503 with the command that builds it. It used to redirect to
+  `/admin/`.
 
 ## API
 
@@ -123,8 +171,8 @@ beats, and latency.
 ## Deploying to Heroku
 
 Heroku runs the `web` process from the `Procfile`: `node server/server.js`, listening on the `PORT` Heroku assigns.
-The Node buildpack installs dependencies, runs `npm run build` (the admin UI), then prunes the dev dependencies, so
-the running slug holds Express and the built admin page, nothing of Angular's toolchain.
+The Node buildpack installs dependencies, runs `npm run build` (the website and the admin UI), then prunes the dev
+dependencies, so the running slug holds Express and the two built pages, nothing of Angular's toolchain.
 
 **Why deploys go through `scripts/heroku.sh`.** The repo root is the GitHub Pages site. Heroku needs
 `package.json` and the `Procfile` at the root of what it receives, so a plain `git push heroku main` would hand it

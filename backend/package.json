@@ -2,7 +2,7 @@
   "name": "iron-asylum-backend",
   "version": "0.1.0",
   "private": true,
-  "description": "Iron Asylum backend: the device heartbeat API and the admin vision dashboard.",
+  "description": "Iron Asylum backend: the website, the device heartbeat API and the admin vision dashboard.",
   "type": "module",
   "main": "server/server.js",
   "engines": {
@@ -11,12 +11,17 @@
   "scripts": {
     "start": "node server/server.js",
     "dev": "node ../tools/run.mjs server-backend-dev -- node --watch server/server.js",
-    "build": "ng build",
-    "admin:dev": "node ../tools/run.mjs server-backend-admin -- ng serve",
+    "build": "ng build admin && ng build site",
+    "admin:dev": "node ../tools/run.mjs server-backend-admin -- ng serve admin",
+    "site:dev": "node ../tools/run.mjs server-backend-site -- ng serve site",
     "test": "node ../tools/run.mjs backend-test -- node --test --test-reporter=spec test/",
     "docker:up": "node ../tools/run.mjs backend-docker-up -- docker compose up --build -d --wait",
     "docker:down": "node ../tools/run.mjs backend-docker-down -- docker compose down",
     "docker:logs": "node ../tools/run.mjs server-backend-docker -- docker compose logs -f --timestamps api",
+    "mac-local-backend": "node ../tools/run.mjs backend-mac-local --sub -- bash scripts/mac-local-backend.sh",
+    "mac-local-backend:down": "node ../tools/run.mjs backend-mac-local-down -- bash scripts/mac-local-backend.sh down",
+    "mac-local-backend:status": "node ../tools/run.mjs backend-mac-local-status -- bash scripts/mac-local-backend.sh status",
+    "mac-local-backend:logs": "node ../tools/run.mjs server-backend-mac-local -- bash scripts/mac-local-backend.sh logs",
     "heroku": "node ../tools/run.mjs heroku --sub -- bash scripts/heroku.sh",
     "lint": "node ../tools/run.mjs backend-lint -- eslint .",
     "logs": "node ../tools/logs.mjs"
