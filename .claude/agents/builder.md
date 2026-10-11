@@ -27,6 +27,11 @@ Procedure for every build:
 5. Write or extend the gate for this change in `tests/gates/g<version>_<topic>.js` and the sabotage spec in `tests/sabotage/v<version>.json` (pre-semver files keep their `g<N>_` / `v<N>` names). A gate reads and compares versions only through `tests/semver.js` (`parse`, `cmp(a, b) <op> 0`, `lookup`, `fromHtml`), never `+IA.version`. The gate's expectations come from the ruling's after-grid and an independent oracle (hand table, date math, doctrine text) — never from calling the engine and asserting it equals itself. Each mutation targets one gate.
 6. Hand off to gatekeeper with: the ruling, the edit script path, the gate + sabotage paths, the baseline path, and the classes of diff you EXPECT (so unclassified hunks stand out).
 
+**Seeing the edit (optional, never proof).** If the full stack dev mode is running (`curl -s localhost:3000/healthz`
+answers), every save to `index.html` is live at http://localhost:3000/app/ within a second, with the app's inline script
+parsed; put that link in your handoff so Mario can look. Never start it yourself (it is a long running watcher), and never
+count what it prints as a check: gatekeeper proves the build.
+
 Rules that bite:
 - `cfg` is never mutated; `buildProgram` stays pure. Per-build scratch on cfg is deleted before store.
 - `prog.weeks` is not a record. Trained days are frozen via `ia_hist_`; a pool-membership change re-rolls unbuilt weeks only, and you say so in the handoff.

@@ -43,6 +43,8 @@ export function loadConfig(env = process.env) {
     dataFile: env.DATA_FILE || '',
     // One stdout line per request (server/app.js). On unless LOG_REQUESTS=0.
     logRequests: env.LOG_REQUESTS ? env.LOG_REQUESTS === '1' : true,
+    // npm run dev: pages reload themselves after each rebuild (server/dev.js). Never on otherwise.
+    dev: env.IA_DEV === '1',
     // The indicator demo page at /client/. On by default everywhere but production.
     clientDemo: env.CLIENT_DEMO ? env.CLIENT_DEMO === '1' : !production,
   };

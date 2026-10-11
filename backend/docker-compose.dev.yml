@@ -1,0 +1,14 @@
+# npm run dev (scripts/dev.mjs) lays this over docker-compose.yml: the same container, port and devices volume, but
+# serving this checkout's files as the Mac rebuilds them, not the copies baked into the image. Built folders and the
+# app are read per request, so a rebuild shows on the next load; dev.mjs restarts the container when server/ changes.
+# IA_DEV turns on the live reload (server/dev.js). npm run docker:up puts back the plain image.
+services:
+  api:
+    environment:
+      IA_DEV: "1"
+      IA_BACKEND_NAME: ${IA_BACKEND_NAME:-docker dev on this Mac (npm run dev)}
+    volumes:
+      - ./server:/srv/server:ro
+      - ./client:/srv/client:ro
+      - ./dist:/srv/dist:ro
+      - ./app-web:/srv/app-web:ro

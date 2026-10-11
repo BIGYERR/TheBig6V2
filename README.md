@@ -6,7 +6,7 @@ Iron Asylum: a hybrid strength and cardio program builder for iPhone.
 |---|---|---|
 | `index.html` | the app: one file, served at https://bigyerr.github.io/TheBig6V2/ | GitHub Pages, on every push to `main` |
 | `app/` | the same app as an Angular project, built four ways: `emulator-ios` and `device-ios` (Cordova), `pwa-pages` (a web build for `/TheBig6V2/pwa/`), and `pwa-local` (the same web build, served from this Mac) | built on demand; see `app/README.md` |
-| `backend/` | the Node backend: device heartbeat API and the admin vision dashboard | Heroku, with `backend/scripts/heroku.sh deploy`; see `backend/README.md` |
+| `backend/` | the Node backend: the website (`/`), the app (`/app/`), the device heartbeat API and the admin vision dashboard (`/admin/`), one server | Heroku, with `backend/scripts/heroku.sh deploy`; see `backend/README.md` |
 | `tests/` | the gates every version of `index.html` passes before it ships | run locally (`CLAUDE.md`) |
 | `docs/` | reference for agents and Mario: the design system (`docs/design/`) | not shipped; it rides along on Pages with the rest of the repo, and the app never reads it |
 | `tools/` | the run log: every test, build, deploy, server and Claude session recorded in `temp/` | see `tools/README.md` |
@@ -14,8 +14,14 @@ Iron Asylum: a hybrid strength and cardio program builder for iPhone.
 
 ## Running the app, in short
 
+**The fastest way to see a change across the whole stack is `cd backend && npm run dev`.** It serves the website, the
+app, the admin and the backend from the docker backend on http://localhost:3000, rebuilds whatever you save in about a
+second, runs only the tests that finish within 3 seconds, and reloads every open page. The paths below are for
+devices, deploys and full builds, and work as before.
+
 | Flow | Command | Where it runs |
 |---|---|---|
+| full stack dev mode: website, app, admin, backend | `cd backend && npm run dev` | http://localhost:3000/ (website), `/app/`, `/admin/` (admin / asylum), rebuilt and reloaded on every save |
 | live app | push `index.html` to `main`, after the gates (`CLAUDE.md`, session rhythm) | https://bigyerr.github.io/TheBig6V2/, once Pages has built that commit |
 | web app on this Mac, and on the iPhone over Wi-Fi | `cd app && npm run pwa-local` | http://localhost:4400/ on the Mac and `http://<Mac name>.local:4400/` on the iPhone. Nothing is committed or pushed |
 | Angular dev server | `cd app && npm start` | http://localhost:4200, this Mac only |

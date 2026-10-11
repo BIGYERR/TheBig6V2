@@ -3,6 +3,7 @@ import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createAdminAuth } from './auth.js';
+import { installDevReload } from './dev.js';
 import { cors, jsonBody } from './middleware.js';
 import { normalizeVersion } from './versions.js';
 
@@ -82,6 +83,16 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
       uptimeS: Math.round((Date.now() - startedAt) / 1000),
     });
   });
+
+  // npm run dev only: the three pages carry a live reload script (server/dev.js). Before the routers, so it answers
+  // for /, /admin/ and /app/ first.
+  if (config.dev) {
+    installDevReload(
+      app,
+      { '/': siteDir, '/index.html': siteDir, '/admin/': adminDir, '/admin/index.html': adminDir, '/app/': appDir, '/app/index.html': appDir },
+      log ?? (() => {}),
+    );
+  }
 
   // ── Public API: what the app calls ────────────────────────────────────────────
   const api = express.Router();

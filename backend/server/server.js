@@ -28,6 +28,8 @@ function shutdown(signal) {
     process.exit(0);
   };
   server.close(exit);
+  // Idle keep-alive sockets would hold close() open until they time out; requests in flight still finish.
+  server.closeIdleConnections();
   setTimeout(exit, 5_000).unref();
 }
 process.on('SIGTERM', shutdown);

@@ -38,6 +38,8 @@ side of the connection (`client/ia-link.js`) is ready, but it reaches the phone 
 | `test/` | `node --test` suite: API, login, store, versions, website, app, the Mac runner, the deploy tree, the client snippet |
 | `Procfile` | Heroku: `web: node server/server.js` |
 | `Dockerfile`, `docker-compose.yml` | the same server in a container |
+| `docker-compose.dev.yml` | laid over it by `npm run dev`: the container serves this checkout's folders live |
+| `scripts/dev.mjs`, `server/dev.js` | the full stack dev mode, and the live reload it switches on (`IA_DEV=1` only) |
 | `scripts/heroku.sh` | Heroku setup, deploy (with the app added as `app-web/`), verify, status, logs, tree |
 | `scripts/app-bundle.mjs` | copies the app into `app-web/` (`npm run app:bundle`; `build`, `docker:up` and the Mac runner run it) |
 | `scripts/mac-local-backend.sh` | the server on this Mac with no docker: up, down, restart, status, logs |
@@ -50,12 +52,42 @@ From this folder (`cd backend`). Node 26 (the same line as `app/` and its e2e im
 npm install
 ```
 
+### The fastest loop: npm run dev
+
+```bash
+npm run dev
+```
+
+One command for the whole stack, rebuilt as you save (`scripts/dev.mjs`). It runs in the docker backend on
+http://localhost:3000, the same container, port and devices volume as `docker:up`, with `docker-compose.dev.yml` laid
+over it so the container serves this checkout's files live instead of the image's copies:
+
+| Save in | What happens | Typical time |
+|---|---|---|
+| `site/` or `admin/` | `ng build --watch` rebuilds it (development build), the fast backend tests run, open pages reload | under a second |
+| the repo root `index.html` | the app is copied to `app-web/`, its inline script is parsed, the app's unit tests run, open pages reload | about a second |
+| `server/` | the fast backend tests run, the container restarts, open pages reload when it is back | about a second |
+| `client/` | the fast backend tests run, open pages reload | under a second |
+
+It prints the links when it is up (website `/`, app `/app/`, admin `/admin/` with admin / asylum, snippet `/client/`)
+and one line per rebuild, test run and restart. **Tests stay fast on purpose:** each set (the backend tests that need
+no child process or git, the app's unit tests, the app script parse) is stopped at 3 seconds; `npm test`, the
+pre-commit check and CI run everything. Pages reload by themselves: in dev mode only (`IA_DEV=1`), the server adds one
+script tag to the three pages (`server/dev.js`), and `dev.mjs` tells it after each rebuild.
+
+- `npm run dev -- --no-docker` runs the server with this Mac's Node instead (kind `local`, devices in `data/dev/`).
+- Ctrl-C stops the watchers. The container keeps serving the last build; `npm run docker:up` puts back the plain
+  image.
+- It replaces none of the build paths for devices: `app/`'s `emulator-ios`, `device-ios`, `pwa-pages` and
+  `pwa-local`, and this folder's `docker:up`, `mac-local-backend` and `heroku.sh deploy` work as before.
+
 | Command | What it does |
 |---|---|
 | `npm run build` | bundle the app into `app-web/`, build the admin UI into `dist/admin/` and the website into `dist/site/` (served at `/app/`, `/admin/` and `/`) |
 | `npm run app:bundle` | copy the repo root `index.html` and its icon into `app-web/`: the app at `/app/` |
 | `npm start` | the server on http://localhost:3000, in the foreground |
-| `npm run dev` | the same, restarting on every change under `server/` |
+| `npm run dev` | **the full stack dev mode** (above): docker backend, every part rebuilt and every page reloaded on save |
+| `npm run dev:server` | the server alone, restarting on every change under `server/` |
 | `npm run site:dev` | the website with live reload on http://localhost:4300/, `/admin` and `/api` proxied to `:3000` (run `npm run dev` beside it) |
 | `npm run admin:dev` | the admin UI with live reload on http://localhost:4200/admin/, its API calls proxied to `:3000` (run `npm run dev` beside it) |
 | `npm test` | the API, auth, store, website and mac-local-backend tests |
@@ -66,7 +98,7 @@ npm install
 | `npm run docker:logs` / `npm run docker:down` | follow the logs / stop it |
 | `npm run logs` | the run log (`../tools/README.md`): `npm run logs -- runs`, `npm run logs -- show backend-test`, ... |
 
-**Every run is logged.** `npm test`, `lint`, `dev`, `admin:dev`, `site:dev`, `docker:up`, `docker:logs`,
+**Every run is logged.** `npm test`, `lint`, `dev`, `dev:server`, `admin:dev`, `site:dev`, `docker:up`, `docker:logs`,
 `docker:down`, `mac-local-backend` (and its `:down`, `:status`, `:logs`) and `heroku` each record a run in
 `../temp/runs/` (gitignored) with a line in the shared history, `../temp/events.log`: start, finish, failures, and
 for the servers every request. `npm start` and `npm run build` are not wrapped, since Heroku and the Docker image run

@@ -25,6 +25,11 @@ CLAUDE.md is not loaded for you (`omitClaudeMd`) and you do not read it. The del
 4. Differential / fuzz: build a lattice (goals × focuses × experience × equipment × rest patterns × a few seeds, `cfg.seed` pinned) on baseline and candidate with `tests/harness.js`; key the comparison on (week, day, label, movement), not position. Every difference must fall into a ruled class; report counts per class and 0 unclassified. Prove the fuzz's own baseline equals itself first. When a fuzz failure clusters at extreme inputs, suspect the reference before the candidate.
 5. Confinement check when the ruling claims one engine only: assert the other engine's dump is byte-identical.
 
+**`npm run dev` is not proof.** The full stack dev mode (`backend/scripts/dev.mjs`) runs a 3 second subset of tests for a
+fast look; nothing it prints counts as a gate, sabotage, row or CI result, and you never cite it. Do not start it during a
+proof. If one is running, it only writes git-ignored output (`backend/dist/`, `backend/app-web/`, `backend/data/`), so
+the tree you hash is unaffected; say in your report that it was running.
+
 Report format, always:
 ```
 GATE     <name>      PASS n FAIL n   (and on baseline: PASS n FAIL n)

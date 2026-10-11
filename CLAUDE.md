@@ -337,6 +337,17 @@ Every brief to either carries the per-build items, then the standing lines for t
   ruling; a sabotage anchor that is not `count==1` is NOT-APPLIED and a no-op mutation is a mutation defect;
   all-trip is as suspicious as a survivor; 100% of blast-radius hunks are classified, and an unruled removal is a regression.
 
+## Dev mode (Mario, Post-V239): the fastest look at a change, never a proof
+`cd backend && npm run dev` (`backend/scripts/dev.mjs`) serves the website (`/`), the app (`/app/`, the root
+`index.html`), the admin (`/admin/`, admin / asylum) and the backend from the docker backend on http://localhost:3000,
+and rebuilds whatever is saved in about a second: site and admin by `ng build --watch`, the app copied on every save
+with its inline script parsed, the server restarted on a `server/` change. After each change it runs only tests that
+finish within 3 s, then every open page reloads itself. When Mario wants to see an edit, check it is running
+(`curl -s localhost:3000/healthz`), start it in the background if not, and hand him the link to the page that changed.
+It shows; it proves nothing: no gate, sabotage, row or CI result comes from it, and a version ships only through the
+session rhythm. The other paths stay for devices, deploys and full builds: `app/` `emulator-ios`, `device-ios`,
+`pwa-pages`, `pwa-local`; `backend/` `docker:up`, `mac-local-backend`, `heroku.sh deploy`.
+
 ## Files
 - `index.html` — the app. `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).
 - `docs/design/THE_ASYLUM_DS_REFERENCE*.md` — design system (bone `#F4F1E8`, ink, signal orange `#CF4E1A`; `asyIcon()` inline SVG, never emoji in chrome).

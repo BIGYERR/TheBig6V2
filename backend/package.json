@@ -10,7 +10,8 @@
   },
   "scripts": {
     "start": "node server/server.js",
-    "dev": "node ../tools/run.mjs server-backend-dev -- node --watch server/server.js",
+    "dev": "node ../tools/run.mjs server-backend-dev -- node scripts/dev.mjs",
+    "dev:server": "node ../tools/run.mjs server-backend-dev-server -- node --watch server/server.js",
     "build": "node scripts/app-bundle.mjs && npm run build:ui",
     "build:ui": "ng build admin && ng build site",
     "app:bundle": "node scripts/app-bundle.mjs",
