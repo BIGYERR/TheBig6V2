@@ -162,7 +162,9 @@ does. Node cannot import those files directly.
    - **`collage.png`**: every screen of the Angular build on one image, about 9350×9970 px (93 MP) for the 46 screens.
      Each one sits at native size (786×1704) under a label with its number, page name, journey and step id, and PASS
      or FAIL. A screen that failed is outlined in red. The numbers match the report's, so "#27 race-10k/race-shakeout"
-     means the same screen in both.
+     means the same screen in both. Chrome draws only the header and the labels; the screenshots are copied in byte
+     for byte by `composeCollage` (pngjs), because a single 93 MP capture is more than the runner's software
+     renderer can do within Puppeteer's timeout.
    - `logs/`: the docker build, up and down output.
 
 Determinism:
@@ -170,13 +172,19 @@ Determinism:
 - the clock frozen at Wed 2026-10-07 07:30 New York (a rest day, so the rest sheet is reachable);
 - seeded `Math.random`, animations off;
 - web fonts and layout settled before each screenshot;
+- Chrome flags for repeatable pixels (fixed sRGB colour, no LCD text, every compositor stage run before a capture),
+  without which fixed layers like the rest timer tab can differ by a colour level between two renders;
 - the bug form's endpoint is blocked, so a run never files a real report.
 
 Screenshots come from Chrome on Linux, so text is rendered by Linux's font stack. Both targets are rendered the same
 way, so parity is unaffected. The app's own font (Geist) is a web font and loads the same everywhere. Only glyphs it
 lacks fall back to the image's DejaVu, Liberation and Noto Color Emoji fonts.
 
-Options: `E2E_KEEP=1` leaves nginx up afterwards and prints its address (the original is at `/reference/`),
+A full run takes about 2.5 minutes once the images are cached (the first build downloads Chrome and takes longer).
+A failed step stops only its own journey, and the run exits 1 if any step fails or the collage cannot be written.
+
+Options: `E2E_ONLY=race-10k,log-session` runs just those journeys (step numbers stay the full suite's),
+`E2E_KEEP=1` leaves nginx up afterwards and prints its address (the original is at `/reference/`),
 `E2E_PORT` pins nginx's host port (default: any free port), `E2E_PARITY_MAX` (percent).
 
 The compose project is named after the checkout (`iron-asylum-e2e-<hash of its path>`), so two checkouts or worktrees
