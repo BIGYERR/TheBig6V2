@@ -589,4 +589,11 @@ def main():
     sys.exit(0 if counts['TRIPPED'] == len(results) and results else 1)
 
 if __name__ == '__main__':
+    # Every run is logged (tools/run.mjs): a folder under temp/runs/ and a start and finish line in temp/events.log.
+    # Stdout, stderr and the exit code are unchanged. IA_RUN_DIR set means a run already holds this one;
+    # IA_NO_RUNLOG=1 turns logging off.
+    import shutil
+    _runlog = os.path.join(ROOT, 'tools', 'run.mjs')
+    if not os.environ.get('IA_RUN_DIR') and not os.environ.get('IA_NO_RUNLOG') and os.path.isfile(_runlog) and shutil.which('node'):
+        os.execvp('node', ['node', _runlog, 'sabotage', '--', sys.executable, os.path.abspath(__file__)] + sys.argv[1:])
     main()

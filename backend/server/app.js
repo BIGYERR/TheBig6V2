@@ -6,8 +6,19 @@ import { basicAuth, cors, jsonBody } from './middleware.js';
 const ADMIN_DIR = fileURLToPath(new URL('../dist/admin', import.meta.url));
 const CLIENT_DIR = fileURLToPath(new URL('../client', import.meta.url));
 
+/** The kind of device a user agent names, for the request log. */
+export function deviceOf(ua = '') {
+  if (/iPhone/.test(ua)) return 'iPhone';
+  if (/iPad/.test(ua)) return 'iPad';
+  if (/Android/.test(ua)) return 'Android';
+  if (/Macintosh/.test(ua)) return 'Mac';
+  return ua ? 'other' : 'no-user-agent';
+}
+
 // Built as a function of config and store so the tests can run it on a random port with a fake clock.
-export function createApp({ config, store, adminDir = ADMIN_DIR, startedAt = Date.now() }) {
+// `log` gets one line per response once it is sent (server.js passes console.log; tests pass nothing, so stay quiet):
+//   request POST /api/heartbeat 200 3 ms 192.168.1.20 iPhone
+export function createApp({ config, store, adminDir = ADMIN_DIR, startedAt = Date.now(), log = null }) {
   const app = express();
   app.disable('x-powered-by');
   if (config.trustProxy) {
@@ -15,6 +26,17 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, startedAt = Dat
     app.set('trust proxy', 1);
     // Heroku answers plain http too. Send every request to https, so the admin password never travels in clear.
     app.use((req, res, next) => (req.secure ? next() : res.redirect(308, `https://${req.get('host')}${req.originalUrl}`)));
+  }
+  // One line per response, the same everywhere it runs: a logged run's output locally (npm run dev), docker's logs,
+  // Heroku's log stream. Never the request body or headers, so no password or device payload is ever printed.
+  if (log) {
+    app.use((req, res, next) => {
+      const started = Date.now();
+      res.on('finish', () =>
+        log(`request ${req.method} ${req.originalUrl} ${res.statusCode} ${Date.now() - started} ms ${(req.ip ?? '?').replace(/^::ffff:/, '')} ${deviceOf(req.get('user-agent'))}`),
+      );
+      next();
+    });
   }
 
   // Liveness for Heroku, docker's HEALTHCHECK and scripts/heroku.sh verify. No auth, nothing about devices.

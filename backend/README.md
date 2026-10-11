@@ -47,6 +47,16 @@ npm install
 | `npm run lint` | ESLint: admin TypeScript and templates (angular-eslint), server and tests, the app-side snippet; errors fail |
 | `npm run docker:up` | build the image and run it on http://localhost:3000, waiting for the health check |
 | `npm run docker:logs` / `npm run docker:down` | follow the logs / stop it |
+| `npm run logs` | the run log (`../tools/README.md`): `npm run logs -- runs`, `npm run logs -- show backend-test`, ... |
+
+**Every run is logged.** `npm test`, `lint`, `dev`, `admin:dev`, `docker:up`, `docker:logs`, `docker:down` and `heroku`
+each record a run in `../temp/runs/` (gitignored) with a line in the shared history, `../temp/events.log`: start,
+finish, failures, and for the servers every request. `npm start` is not wrapped, since Heroku and the Docker image
+run the server directly.
+
+**Request log.** The server prints one line per response on stdout, the same locally, in docker and on Heroku:
+`request POST /api/heartbeat 200 3 ms 192.168.1.20 iPhone` (method, path, status, time, caller, device). Never a
+header or a body, so no password or payload is printed. `LOG_REQUESTS=0` turns it off.
 
 Locally the admin login is **admin / asylum**, unless `ADMIN_USER` and `ADMIN_PASSWORD` say otherwise. Then:
 
@@ -163,13 +173,18 @@ Commit your `backend/` changes, then:
 bash backend/scripts/heroku.sh deploy
 ```
 
-It refuses if `backend/` has uncommitted changes (only committed files deploy). After the push it polls
+It deploys `backend/` exactly as it is on `origin/main`, which only a pull request from `dev` whose checks passed can
+change; `HEROKU_DEPLOY_REF=<ref>` deploys something else in an emergency. After the push it polls
 `/healthz`, cache-busted, until the live dyno reports the commit it pushed, then prints the admin URL. **A push is
 not a deploy:** the deploy counts only when that check passes. If it times out, read the build and boot output:
 
 ```bash
 bash backend/scripts/heroku.sh logs
 ```
+
+`npm run heroku -- logs` (from `backend/`) does the same as a logged `heroku-logs` run, so everything the stream shows
+while it runs is kept in `../temp/runs/`. Heroku itself keeps only the latest 1,500 lines; keeping more without
+watching needs a log drain add-on.
 
 Other commands: `status` (dynos, last releases, `/healthz`), `verify` (the live check on its own), `open` (the
 admin page). To roll back: `heroku releases:rollback -a iron-asylum-api`.
@@ -189,6 +204,7 @@ restarts the dyno.
 | `MAX_DEVICES` | 5000 | devices kept before the least recently seen are dropped |
 | `DATA_FILE` | empty | a JSON file that keeps devices across restarts. Leave it empty on Heroku |
 | `CLIENT_DEMO` | on except in production | `1` serves the dot demo at `/client/` |
+| `LOG_REQUESTS` | on | `0` stops the one stdout line per request |
 | `TRUST_PROXY` | on when `DYNO` is set, so on Heroku only | trust Heroku's `X-Forwarded-For` / `-Proto`: the lockout counts per caller, and plain http redirects to https |
 
 ### What Heroku does not keep

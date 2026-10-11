@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// The two iOS build paths (the third, pwa-pages, is scripts/pwa-pages.mjs). Builds with Cordova and Xcode, then
+// The two iOS build paths (the web ones are scripts/pwa-pages.mjs and scripts/pwa-local.mjs). Builds with Cordova and Xcode, then
 // installs and launches.
 //
 //   npm run emulator-ios                        build, boot the simulator, install, launch
@@ -16,8 +16,9 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { attachRun } from '../../tools/runlog.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const BUILD_ROOT = process.env.IOS_BUILD_DIR || join(homedir(), 'Library', 'Caches', 'iron-asylum-ios');
@@ -100,7 +101,8 @@ const KNOWN_FAILURES = [
 
 /**
  * Runs one build step with its output captured to a log, then turns a known Xcode failure into a plain instruction.
- * The log lands in BUILD_ROOT as xcodebuild-<label>.log.
+ * The log lands in BUILD_ROOT as xcodebuild-<label>.log, and a copy in the run's artifacts/ when this build is a
+ * logged run (npm run emulator-ios and device-ios are), so every build keeps its own log.
  */
 function buildStep(label, cmd, cmdArgs, cwd = APP) {
   const res = spawnSync(cmd, cmdArgs, {
@@ -113,6 +115,9 @@ function buildStep(label, cmd, cmdArgs, cwd = APP) {
   const log = join(BUILD_ROOT, `xcodebuild-${label}.log`);
   mkdirSync(BUILD_ROOT, { recursive: true });
   writeFileSync(log, output);
+  const run = attachRun();
+  run?.saveArtifact(log);
+  run?.event('xcode', `${label} ${res.status === 0 ? 'succeeded' : `failed (exit ${res.status ?? res.signal})`}; log artifacts/${basename(log)}`, { global: res.status !== 0 });
   if (res.status === 0) {
     console.log(`ios: Xcode build succeeded (log: ${log})`);
     return;

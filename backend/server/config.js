@@ -31,6 +31,8 @@ export function loadConfig(env = process.env) {
     // Empty keeps devices in memory only. Heroku's disk is wiped on every restart, so set this only where
     // the path survives (the docker compose volume does).
     dataFile: env.DATA_FILE || '',
+    // One stdout line per request (server/app.js). On unless LOG_REQUESTS=0.
+    logRequests: env.LOG_REQUESTS ? env.LOG_REQUESTS === '1' : true,
     // The indicator demo page at /client/. On by default everywhere but production.
     clientDemo: env.CLIENT_DEMO ? env.CLIENT_DEMO === '1' : !production,
   };

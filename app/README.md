@@ -1,23 +1,24 @@
-# Iron Asylum: Angular app, three build paths and e2e
+# Iron Asylum: Angular app, four build paths and e2e
 
 Full path: `/Users/CanasBangin/Desktop/TheBig6V2/app`
 
 This folder packages Iron Asylum as an **Angular 22** app and wraps it with **Cordova (cordova-ios 8)** for the iOS
 Simulator and a connected iPhone. It also holds the lint setup, the unit and integration tests, and a Docker + Puppeteer e2e suite.
 
-## The three build paths
+## The four build paths
 
-One Angular app, built three ways. Run each from this folder (`cd app`).
+One Angular app, built four ways. Run each from this folder (`cd app`).
 
 | Path | Command | Builds | Where it runs |
 |---|---|---|---|
 | **emulator-ios** | `npm run emulator-ios` | `www/` (Cordova), then a Debug build with Xcode | the iOS Simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`) |
 | **device-ios** | `npm run device-ios` | `www/` (Cordova), then a signed build with Xcode | the connected iPhone (see [First device build](#first-device-build-one-time)) |
 | **pwa-pages** | `npm run pwa-pages` | `../pwa/` with base href `/TheBig6V2/pwa/`; no Cordova | GitHub Pages at https://bigyerr.github.io/TheBig6V2/pwa/, once `pwa/` is committed and pushed |
+| **pwa-local** | `npm run pwa-local` | `dist/pwa-local/` with base href `/`; no Cordova | this Mac, served at http://localhost:4400/ and to the iPhone on the same Wi-Fi; nothing is committed or pushed |
 
 The two iOS paths run the native shell. They get Cordova and the `ia-island` Live Activity on the Dynamic Island.
-pwa-pages is a plain web build. The page detects that Cordova is missing, so it boots at once, and the rest stopwatch
-runs without the island. Every HTML5 and home screen feature works as it does in the live app. Like the live app, it
+pwa-pages and pwa-local are the same plain web build with a different base href. The page detects that Cordova is
+missing, so it boots at once, and the rest stopwatch runs without the island. Every HTML5 and home screen feature works as it does in the live app. Like the live app, it
 has no web manifest and no service worker.
 
 **pwa-pages and the live app share storage.** `pwa/` is served from the same origin as the live app at
@@ -25,6 +26,40 @@ has no web manifest and no service worker.
 the same `app.js` as the root `index.html`. `npm run pwa-pages:check` proves it without building. It fails when `pwa/`
 was built from any other bytes of `index.html`, when a file the page loads is missing, or when the base href is wrong.
 Rebuild and commit `pwa/` with every version, or it goes stale.
+
+### pwa-local: the web build, served from this Mac
+
+`npm run pwa-local` (`scripts/pwa-local.mjs`) syncs from `../index.html`, builds into `dist/pwa-local/` (gitignored),
+runs the same check as `pwa-pages:check` against it, then serves it with a small Node server until you press Ctrl-C.
+It prints the addresses to use:
+
+```
+pwa-local: serving ia-version 239 from dist/pwa-local/
+  this Mac   http://localhost:4400/
+  iPhone     http://<your Mac>.local:4400/   (same Wi-Fi; Share > Add to Home Screen)
+  also       http://10.0.0.37:4400/
+```
+
+- **On the iPhone, open the `.local` address in Safari, then Share > Add to Home Screen.** The address is the origin,
+  and the origin owns the storage. The `.local` name stays the same, while the IP can change when the router hands
+  out a new one. A home screen app saved on the IP would then open empty.
+- **Its storage is its own.** It shares nothing with the live app on GitHub Pages or with the native app. A program
+  made in one does not appear in another.
+- **It works only while the server runs and the phone is on the same network.** The app has no service worker, so
+  nothing is cached for offline use. Away from home, use the live app.
+- **Updates.** Rerun `npm run pwa-local` after `index.html` changes. The in-app update check reads the served page,
+  so an open app offers the new version. The page and `legacy/app.js` are revalidated on every load. Only the hashed
+  Angular bundles are cached for good.
+- **Plain http on the phone.** Safari does not treat `http://<name>.local` as a secure context, so the clipboard API
+  is missing there. The app's one live copy button (`copyProgSel`) then falls back to a textarea copy, so nothing
+  the app does needs https.
+- The first run may ask whether `node` can accept incoming connections. Allow it, or the phone cannot connect.
+- **Every session is logged** as a `server-pwa-local` run in `../temp/runs/`: the build, the addresses, every request
+  it serves (method, path, status, time and whether an iPhone asked) and the stop, each with a timestamp, in the
+  run's `events.log` as they happen. Watch it live from another terminal with
+  `npm run logs -- follow server-pwa-local`; read the last one with `npm run logs -- show server-pwa-local`.
+- Options: `-- --port 4401` (or `PWA_LOCAL_PORT`) picks the port. `-- --no-build` serves the last build without
+  rebuilding, and is still refused if that build is stale.
 
 The live app is still the repo root `index.html`, served by GitHub Pages and booted by every gate under `tests/`.
 Nothing here edits it. The Angular app is **generated from it on every build**, so there is one source of truth and
@@ -69,14 +104,16 @@ with an iOS Simulator runtime.
 | `npm run sync:check` | fail if the generated files are stale against `../index.html` |
 | `npm run lint` | ESLint: TypeScript and templates (angular-eslint), plus `scripts/`, `e2e/` and `test/`; errors fail |
 | `npm run lint:legacy` | warn-only report on the generated `app.js` (counts per rule, first examples) |
-| `npm test` | type-check, then every unit and integration test (Node's built-in runner); about 3 s |
+| `npm test` | type-check, then the unit tests, then the integration tests (Node's built-in runner), each a logged run; about 5 s |
 | `npm run test:unit` / `npm run test:integration` | one layer of tests on its own |
+| `npm run logs` | the run log (`../tools/README.md`): `npm run logs` for the latest history, `npm run logs -- runs`, `npm run logs -- show e2e`, `npm run logs -- follow server-pwa-local` |
 | `npm run typecheck` | `tsc` over the Node TypeScript (`e2e/`, `test/`); Node runs those files without it, so this is the type check |
-| `npm run e2e` | the e2e suite, entirely in Docker; writes `e2e/report/index.html` and `e2e/report/collage.png` |
+| `npm run e2e` | the e2e suite, entirely in Docker; each run's report and collage are kept in `../temp/runs/<stamp>-e2e/artifacts/` (newest: `../temp/latest/e2e/`) |
 | `npm run emulator-ios` | build, boot the simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`), install, launch |
 | `npm run device-ios` | signed build for the connected iPhone, install, launch |
 | `npm run pwa-pages` | sync, then a production build into `../pwa/` for GitHub Pages, then the check below |
 | `npm run pwa-pages:check` | fail unless `../pwa/` was built from the current `../index.html` (no build) |
+| `npm run pwa-local` | sync, then a production build into `dist/pwa-local/`, the same check, then serve it on port 4400 for this Mac and the iPhone |
 | `npm run xcode-ios` | open the native project in Xcode |
 
 ## iOS
@@ -111,7 +148,8 @@ installs, it checks that the phone's UDID is in the embedded profile.
 
 ## Tests
 
-`npm test` runs Node's built-in test runner (`node --test`) over `test/**/*.test.ts`, after `npm run typecheck`. Node 26
+`npm test` runs Node's built-in test runner (`node --test`) over `test/unit/` and then `test/integration/`, after
+`npm run typecheck`. Each is a logged run (`typecheck`, `unit`, `integration` in `../temp/runs/`). Node 26
 runs TypeScript directly by stripping the types, so there is no build step and no test framework dependency.
 `tsconfig.node.json` sets `erasableSyntaxOnly`, which keeps out the TypeScript that stripping cannot run (enums,
 namespaces, parameter properties). `e2e/package.json` and `test/package.json` only mark those folders as ES modules.
@@ -119,7 +157,9 @@ namespaces, parameter properties). `e2e/package.json` and `test/package.json` on
 - `test/unit/`: pure functions with fixtures, no browser and no files. `sync-legacy`'s split and render, the e2e
   report (every image embedded, nothing referenced outside the file, everything escaped), the collage layout, pixel
   parity, and the step list.
-- `test/integration/`: real inputs. `sync-legacy` against the live `../index.html` and as a command, the collage drawn
+- `test/integration/`: real inputs. The `pwa-local` server over real HTTP against a fixture build (content types,
+  caching, the update check's probe, nothing served from outside the build), the build check both web paths share,
+  `sync-legacy` against the live `../index.html` and as a command, the collage drawn
   in Chrome and checked pixel by pixel, and the written report opened from disk in Chrome with every request outside
   the file blocked. These use Puppeteer's Chrome on this machine, which `npm install` downloads.
 
@@ -154,8 +194,9 @@ does. Node cannot import those files directly.
    the OS picker, are set directly and fire their events.
 4. Each pair of screenshots is compared pixel by pixel. **Default tolerance is 0%.** Clean runs match exactly, and a
    planted 0.3% title change fails the four screens that show it.
-5. It copies two files out of the runner container into `e2e/report/` (`docker cp`; nothing is bind-mounted, since
-   the repo sits in an iCloud-synced folder), then tears both containers down:
+5. It copies the report out of the runner container (`docker cp`; nothing is bind-mounted, since the repo sits in an
+   iCloud-synced folder) into the run's own folder, `../temp/runs/<stamp>-e2e/artifacts/`, so every run is kept
+   (`../temp/latest/e2e` is the newest), then tears both containers down:
    - **`index.html`**: one self-contained page. Every screenshot (Angular, original and pixel diff for each step) is
      embedded as a data URI, and the styles and script are inline. It can be mailed or moved on its own. Click a
      screenshot to see it full size. The runner refuses to write it if anything in it points outside the file.
@@ -165,7 +206,10 @@ does. Node cannot import those files directly.
      means the same screen in both. Chrome draws only the header and the labels; the screenshots are copied in byte
      for byte by `composeCollage` (pngjs), because a single 93 MP capture is more than the runner's software
      renderer can do within Puppeteer's timeout.
-   - `logs/`: the docker build, up and down output.
+   - `docker/`: the docker build, up, cp and down output, and `nginx.log`, nginx's own log of every request it
+     served, saved before the container goes.
+   The run's `events.log` has each phase and each step's PASS or FAIL as it happened; `output.log` has everything
+   printed. Run outside the run log (it cannot write `../temp/`), the report goes to `e2e/report/` as before.
 
 Determinism:
 - iPhone viewport, 393×852 @2x;

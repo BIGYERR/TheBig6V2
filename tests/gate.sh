@@ -6,6 +6,14 @@
 # empty or missing output. A gate that prints nothing has failed.
 set -eo pipefail
 
+# Every run is logged (tools/run.mjs): a folder under temp/runs/ with this run's output, its verdict and its
+# blast-radius diff, and a start and finish line in temp/events.log. Stdout, stderr and the exit code are unchanged.
+# IA_RUN_DIR set means a run already holds this one (sabotage, a wrapped caller); IA_NO_RUNLOG=1 turns logging off.
+RUNLOG_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+if [ -z "${IA_RUN_DIR:-}" ] && [ -z "${IA_NO_RUNLOG:-}" ] && [ -f "$RUNLOG_ROOT/tools/run.mjs" ] && command -v node >/dev/null 2>&1; then
+  exec node "$RUNLOG_ROOT/tools/run.mjs" gate --collect "$RUNLOG_ROOT/temp/last_diff.txt" -- bash "$0" "$@"
+fi
+
 CAND="${1:?usage: tests/gate.sh <candidate.html> [baseline.html]}"
 BASE="${2:-}"
 HERE="$(cd "$(dirname "$0")" && pwd)"

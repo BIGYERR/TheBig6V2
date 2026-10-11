@@ -98,6 +98,13 @@
                 "base": "../pwa",
                 "browser": ""
               }
+            },
+            "local": {
+              "baseHref": "/",
+              "outputPath": {
+                "base": "dist/pwa-local",
+                "browser": ""
+              }
             }
           },
           "defaultConfiguration": "production"

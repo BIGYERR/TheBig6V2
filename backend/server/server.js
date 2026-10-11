@@ -11,7 +11,7 @@ if (config.production && (!config.adminUser || !config.adminPassword)) {
   console.warn('admin: ADMIN_USER or ADMIN_PASSWORD is not set, so /admin answers 503 until both are.');
 }
 
-const server = createApp({ config, store }).listen(config.port, () => {
+const server = createApp({ config, store, log: config.logRequests ? (line) => console.log(line) : null }).listen(config.port, () => {
   console.log(
     `iron-asylum-backend ${config.version} listening on :${config.port}` +
       (config.dataFile ? ` (devices file ${config.dataFile}, ${restored} restored)` : ' (devices in memory)'),

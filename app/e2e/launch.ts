@@ -1,9 +1,12 @@
 // npm run e2e: the whole suite in Docker. Builds the two images in e2e/Dockerfile (nginx serving the app, and the
 // Puppeteer runner), starts nginx, runs the runner to completion, copies its report out, then tears both down.
-// It writes e2e/report/:
-//   index.html    the report, one self-contained file (every screenshot embedded)
-//   collage.png   every screen the suite covers on one labelled image
-//   logs/         the docker build, up and down output
+//
+// Every run is a logged run (tools/runlog.mjs), kept under temp/runs/<stamp>-e2e/:
+//   artifacts/index.html     the report, one self-contained file (every screenshot embedded)
+//   artifacts/collage.png    every screen the suite covers on one labelled image
+//   artifacts/docker/        the docker build, up, cp and down output, and nginx's own log of every request it served
+//   events.log, output.log   the run as it happened: each phase, each step's PASS or FAIL, everything printed
+// temp/latest/e2e always points at the newest one.
 //
 //   npm run e2e                  build, run, tear down
 //   E2E_KEEP=1 npm run e2e       leave nginx running afterwards and print its address (the original is at /reference/)
@@ -18,30 +21,46 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { attachRun, duration, startRun } from '../../tools/runlog.mjs';
 
 const E2E = dirname(fileURLToPath(import.meta.url));
-const REPORT = join(E2E, 'report');
-const LOGS = join(REPORT, 'logs');
 const PROJECT = `iron-asylum-e2e-${createHash('sha256').update(E2E).digest('hex').slice(0, 8)}`;
 const RUNNER = `${PROJECT}-runner`;
 const COMPOSE = ['compose', '-f', join(E2E, 'docker-compose.yml'), '-p', PROJECT];
 const KEEP = process.env['E2E_KEEP'] === '1';
 
-const rel = (p: string) => relative(process.cwd(), p) || '.';
+// The run this belongs to: npm run e2e wraps it in one; run directly, it opens its own. If no run can be opened at
+// all, the report goes to e2e/report/ as it used to.
+const attached = attachRun();
+let run = attached;
+if (!run) {
+  try {
+    run = startRun('e2e', { command: 'node e2e/launch.ts' });
+  } catch {
+    run = null;
+  }
+}
+const REPORT = run ? join(run.dir, 'artifacts') : join(E2E, 'report');
+const LOGS = join(REPORT, 'docker');
 
-/** Runs one docker command quietly, its output kept in logs/; throws with the tail of the output on failure. */
+const rel = (p: string) => relative(process.cwd(), p) || '.';
+const note = (subject: string, text: string, global = false) => run?.event(subject, text, { global });
+
+/** Runs one docker command quietly, its output kept in docker/; throws with the tail of the output on failure. */
 function dockerLogged(args: string[], log: string): string {
+  const started = Date.now();
   const res = spawnSync('docker', args, { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
   const out = `${res.stdout ?? ''}${res.stderr ?? ''}${res.error ? `\n${res.error.message}` : ''}`;
   writeFileSync(join(LOGS, log), `$ docker ${args.join(' ')}\n${out}`);
   if (res.status !== 0) {
     process.stderr.write(out.split('\n').slice(-30).join('\n') + '\n');
+    note('docker', `${log.replace(/\.log$/, '')} failed after ${duration(Date.now() - started)} (exit ${res.status ?? 'none'}); see artifacts/docker/${log}`, true);
     throw new Error(`docker ${args.slice(0, 4).join(' ')}… failed (exit ${res.status ?? 'none'}); log: ${rel(join(LOGS, log))}`);
   }
   return res.stdout ?? '';
 }
 
-/** Runs one docker command with its output streamed to this terminal; returns its exit code. */
+/** Runs one docker command with its output streamed to this terminal (and the run's output.log); returns its exit code. */
 function dockerLive(args: string[]): number {
   return spawnSync('docker', args, { stdio: ['ignore', 'inherit', 'inherit'] }).status ?? 1;
 }
@@ -51,42 +70,67 @@ function removeRunner(): void {
   spawnSync('docker', ['rm', '--force', RUNNER], { stdio: 'ignore' });
 }
 
+/** nginx's log of every request it served, saved before the container goes. Never fails the run. */
+function saveNginxLog(): void {
+  const res = spawnSync('docker', [...COMPOSE, 'logs', '--no-color', '--timestamps', 'web'], { encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
+  if (res.status === 0) {
+    writeFileSync(join(LOGS, 'nginx.log'), res.stdout + res.stderr);
+    note('docker', `saved nginx's log (${res.stdout.split('\n').filter(Boolean).length} lines) to artifacts/docker/nginx.log`);
+  }
+}
+
 function main(): number {
-  rmSync(REPORT, { recursive: true, force: true });
+  if (!run) rmSync(REPORT, { recursive: true, force: true });
   mkdirSync(LOGS, { recursive: true });
   removeRunner();
 
+  let t = Date.now();
   console.log(`e2e: building the web and runner images for ${PROJECT} (the first build downloads Chrome; later builds reuse the cache)`);
-  dockerLogged([...COMPOSE, 'build', 'web', 'runner'], 'docker-build.log');
+  note('docker', `building the web and runner images (${PROJECT})`);
+  dockerLogged([...COMPOSE, 'build', 'web', 'runner'], 'build.log');
+  note('docker', `images built in ${duration(Date.now() - t)}`);
   console.log('e2e: starting nginx');
-  dockerLogged([...COMPOSE, 'up', '--detach', '--wait', 'web'], 'docker-up.log');
+  t = Date.now();
+  dockerLogged([...COMPOSE, 'up', '--detach', '--wait', 'web'], 'up.log');
+  note('docker', `nginx up and healthy in ${duration(Date.now() - t)}`);
 
   let status: number;
   try {
+    t = Date.now();
+    note('runner', `started${process.env['E2E_ONLY'] ? ` (E2E_ONLY=${process.env['E2E_ONLY']})` : ''}`);
     status = dockerLive([...COMPOSE, 'run', '--name', RUNNER, 'runner']);
+    note('runner', `exited ${status} after ${duration(Date.now() - t)}`, status !== 0);
     // The report lives in the stopped runner container until it is copied out.
-    dockerLogged(['cp', `${RUNNER}:/report/.`, REPORT], 'docker-cp.log');
+    dockerLogged(['cp', `${RUNNER}:/report/.`, REPORT], 'cp.log');
   } finally {
     removeRunner();
+    saveNginxLog();
     if (KEEP) {
-      const address = dockerLogged([...COMPOSE, 'port', 'web', '80'], 'docker-port.log').trim();
+      const address = dockerLogged([...COMPOSE, 'port', 'web', '80'], 'port.log').trim();
       console.log(`e2e: E2E_KEEP=1, nginx left running: http://${address}/ (the original at /reference/)`);
       console.log(`e2e: stop it with docker compose -p ${PROJECT} down`);
+      note('docker', `nginx left running at http://${address}/ (E2E_KEEP=1)`);
     } else {
-      dockerLogged([...COMPOSE, 'down', '--remove-orphans'], 'docker-down.log');
+      dockerLogged([...COMPOSE, 'down', '--remove-orphans'], 'down.log');
+      note('docker', 'containers removed');
     }
   }
 
   for (const f of ['index.html', 'collage.png']) {
     const p = join(REPORT, f);
     console.log(`e2e: ${existsSync(p) ? rel(p) : `no ${f} was written`}`);
+    note('artifact', existsSync(p) ? `${f} written` : `no ${f} was written`, !existsSync(p));
   }
   return status;
 }
 
+let code: number;
 try {
-  process.exitCode = main();
+  code = main();
 } catch (err) {
   console.error(`e2e: ${err instanceof Error ? err.message : String(err)}`);
-  process.exitCode = 1;
+  code = 1;
 }
+process.exitCode = code;
+// Opened here (not by a wrapper): close it here.
+if (run && !attached) run.finish({ exitCode: code });

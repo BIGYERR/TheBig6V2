@@ -14,6 +14,14 @@
 # abort on before a single result file was read. The fan-out is graded from the FILES.
 set -eo pipefail
 
+# Every run is logged (tools/run.mjs), its shard results kept in the run's artifacts/fuzz unless FUZZ_OUT is set.
+# Stdout, stderr and the exit code are unchanged. IA_RUN_DIR set means a run already holds this one (a gate, a wrapped
+# caller); IA_NO_RUNLOG=1 turns logging off.
+RUNLOG_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+if [ -z "${IA_RUN_DIR:-}" ] && [ -z "${IA_NO_RUNLOG:-}" ] && [ -f "$RUNLOG_ROOT/tools/run.mjs" ] && command -v node >/dev/null 2>&1; then
+  exec node "$RUNLOG_ROOT/tools/run.mjs" fuzz --artifact-env FUZZ_OUT=fuzz -- bash "$0" "$@"
+fi
+
 HERE="$(cd "$(dirname "$0")" && pwd)"
 JS="$HERE/measure/v195_gk_identity_fuzz.js"
 
