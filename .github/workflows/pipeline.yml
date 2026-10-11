@@ -58,6 +58,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+      - name: Let Chrome use its sandbox (Ubuntu 24 blocks unprivileged user namespaces through AppArmor)
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: app (type check, unit and integration tests, lint)
         working-directory: app
         run: |
@@ -186,7 +188,10 @@ jobs:
           BASE_REF: origin/${{ github.base_ref || 'main' }}
         run: |
           set -euo pipefail
-          if IA_NO_RUNLOG=1 python3 tests/sabotage.py --proof-set "$BASE_REF" index.html --dry | grep -q '^PROOF SET 0 mutations'; then
+          # The dry run exits 1 on an empty set, so its output is read, not its exit code.
+          IA_NO_RUNLOG=1 python3 tests/sabotage.py --proof-set "$BASE_REF" index.html --dry > "$RUNNER_TEMP/proofset.txt" 2>&1 || true
+          grep -E '^PROOF SET' "$RUNNER_TEMP/proofset.txt" || true
+          if grep -q '^PROOF SET 0 mutations' "$RUNNER_TEMP/proofset.txt"; then
             echo "No spec added, no gate edited and no backstop gate named since $BASE_REF: no mutation to trip."
           else
             python3 tests/sabotage.py --proof-set "$BASE_REF" index.html

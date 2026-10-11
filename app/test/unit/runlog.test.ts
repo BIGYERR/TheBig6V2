@@ -14,6 +14,9 @@ process.env['IA_RUNS_KEEP'] = '3';
 process.env['IA_RUNS_KEEP_DAYS'] = '10';
 process.env['IA_ORCH_LOG'] = join(root, 'machine', 'orchestration.log');
 delete process.env['IA_RUN_DIR'];
+// The "who" column reads these; each test below sets the case it checks.
+delete process.env['GITHUB_ACTIONS'];
+delete process.env['CLAUDECODE'];
 delete process.env['npm_lifecycle_event'];
 delete process.env['npm_lifecycle_script'];
 // Imported after the environment is set: the module reads IA_RUNS_DIR and the limits once, when it loads.
@@ -172,6 +175,14 @@ describe('the machine orchestration log', () => {
     const run = R.startRun('orch-you');
     run.finish();
     assert.match(orch().at(-1)!, /^\S+ \S+ {2}you {5}orch-you /);
+  });
+
+  it('says "ci" for a run in GitHub Actions', () => {
+    process.env['GITHUB_ACTIONS'] = 'true';
+    const run = R.startRun('orch-ci');
+    delete process.env['GITHUB_ACTIONS'];
+    run.finish();
+    assert.match(orch().at(-1)!, /^\S+ \S+ {2}ci {6}orch-ci /);
   });
 
   it('writes the same columns for Claude\'s own starts', () => {

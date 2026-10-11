@@ -2,7 +2,7 @@
 // GATEKEEPER identity fuzz, V194 -> V195. V195 claims DIGEST NEUTRAL (render/storage only).
 // Baseline proven equal to itself first. Seeds pinned. Clock fields stripped by progDigest.
 // Comparison KEYED on (week, day, label, movement, detail), never on position.
-const {load,progDigest,weekGrid}=require('/Users/CanasBangin/Desktop/TheBig6V2/tests/harness.js');
+const {load,progDigest,weekGrid}=require('../harness.js');
 const crypto=require('crypto');
 const fs=require('fs');
 // ---- argv -----------------------------------------------------------------
