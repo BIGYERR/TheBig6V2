@@ -51,13 +51,12 @@ into its ruling file before briefing builder**, and every brief cites only what 
 the return that was not saved.
 
 ## Session rhythm (do not skip steps)
-**One version per chat; a tests-only pass may precede it** (Mario, Post-V234). Each version starts in a fresh chat.
-A chat never carries past one version, and never past a
-compaction: if it compacts mid-build, stop at the next safe point (a builder slice either landed whole or stays parked
-in `tests/edits/`; nothing merges into `main` that the pipeline has not proved), tell Mario where the build stands, and
-continue in a fresh chat. **A chat ends by handing Mario the next chat's prompt:** one line naming the build and its target
-version, plus anything he has already decided for it. Standing rules live in this file, never in the prompt; per-build
-scope lives in handoff §12.
+**Versions are not tied to chats (Mario, Post-V239).** Semantic versions and git track every release, so a chat may
+carry several versions and tooling passes, and a version may start in any chat. Never ask Mario to open a fresh chat for
+a build. A compaction mid-build is not a stop: re-read the tree state (`git status`, `ia-version`, the handoff's §12 and
+D-CODE REGISTRY lines) before the next step; a builder slice either landed whole or stays parked in `tests/edits/`, and
+nothing merges into `main` that the pipeline has not proved. Standing rules live in this file; per-build scope lives in
+handoff §12.
 **One writer per working tree (Mario, Post-V238).** While a build is in flight, from the first builder dispatch to the
 deploy proof, one session writes to this working tree. Any other session that needs to write (a measure, a queue review,
 a docs pass) works in its own git worktree or waits until the build commits. V238's final hash went red on another
