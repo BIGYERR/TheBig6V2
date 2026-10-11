@@ -151,7 +151,7 @@ const artifactV = SV.parse(IA.version);
 // exactly 222 to 223 for a discrimination run; it is announced and ignored on any other stamp. The D116
 // predicate and the era-row digest read the stamp, never eraV.
 const REKEY_ASSUME = 223;
-const eraV = (process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, REKEY_ASSUME) === 0 && SV.cmp(artifactV, REKEY_ASSUME - 1) === 0) ? REKEY_ASSUME : artifactV;
+const eraV = ((process.env.IA_ASSUME_VERSION || '').trim() !== '' && SV.cmp(process.env.IA_ASSUME_VERSION, REKEY_ASSUME) === 0 && SV.cmp(artifactV, REKEY_ASSUME - 1) === 0) ? REKEY_ASSUME : artifactV;
 if(SV.cmp(eraV, artifactV) !== 0) console.log('ASSUMED ia-version ' + eraV + ' on a file stamped ' + artifactV + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 const D183_ERA = 223;
 const MILE_MSG_TAG = SV.cmp(eraV, D183_ERA) >= 0 ? 'D183' : 'D9';

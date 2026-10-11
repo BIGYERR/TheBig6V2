@@ -54,7 +54,7 @@ const IA0 = H.load(ART);
 const VER = SV.parse(IA0.version);
 const D106A_ERA = 207;
 const D183_ERA = 223;
-const ERA_V = (process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, D183_ERA) === 0 && SV.cmp(VER, D183_ERA - 1) === 0) ? D183_ERA : VER;
+const ERA_V = ((process.env.IA_ASSUME_VERSION || '').trim() !== '' && SV.cmp(process.env.IA_ASSUME_VERSION, D183_ERA) === 0 && SV.cmp(VER, D183_ERA - 1) === 0) ? D183_ERA : VER;
 if(SV.cmp(ERA_V, VER) !== 0) console.log('ASSUMED ia-version ' + ERA_V + ' on a file stamped ' + VER + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 
 let pass = 0, fail = 0, skip = 0;

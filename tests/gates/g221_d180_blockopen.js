@@ -156,7 +156,7 @@ const R = {
 let IA0, STAMP = NaN;
 try { IA0 = load(ART); STAMP = SV.parse(IA0.version); } catch(e){ console.log('FAIL boot: ' + e.message); fail++; done(); }
 let VER = STAMP;
-if(process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
+if((process.env.IA_ASSUME_VERSION || '').trim() !== '' && SV.cmp(process.env.IA_ASSUME_VERSION, ERA) === 0 && SV.cmp(STAMP, ERA - 1) === 0){
   VER = ERA; console.log('ASSUMED ia-version ' + ERA + ' on a file stamped ' + STAMP + ' (IA_ASSUME_VERSION): a pre-bump development run, not a ship proof');
 }
 console.log('g221 D180 | candidate ' + ART + ' ia-version ' + STAMP + (SV.cmp(VER, STAMP) !== 0 ? ' (assumed ' + VER + ')' : '') + ' | clock pinned ' + isoOf(new RealDate(PIN)) + ' ' + new RealDate(PIN).toString().slice(0, 24));

@@ -81,7 +81,7 @@ const ART = process.argv[2] || path.join(ROOT, 'index.html');
 const BASEFILE = process.argv[3] || null;
 const C = load(ART);
 const VER = SV.parse(C.version), ERA = 218, V217_COMMIT = '7af6ad9d46f17e216e26901f3e0812797171fa9f';
-const D183_ERA = 223, ERA_V = (process.env.IA_ASSUME_VERSION !== undefined && SV.cmp(process.env.IA_ASSUME_VERSION, D183_ERA) === 0 && SV.cmp(VER, D183_ERA - 1) === 0) ? D183_ERA : VER;
+const D183_ERA = 223, ERA_V = ((process.env.IA_ASSUME_VERSION || '').trim() !== '' && SV.cmp(process.env.IA_ASSUME_VERSION, D183_ERA) === 0 && SV.cmp(VER, D183_ERA - 1) === 0) ? D183_ERA : VER;
 if(SV.cmp(ERA_V, VER) !== 0) console.log('ASSUMED ia-version ' + ERA_V + ' on a file stamped ' + VER + ' (IA_ASSUME_VERSION): a discrimination run, not a ship proof');
 const ROWS = ['U1','L1','L2','Z1','ST1','LB1','LB2','OT1','Z2','U2'];
 let pass = 0, fail = 0, skip = 0, TMP = null;
