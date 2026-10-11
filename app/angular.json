@@ -91,6 +91,13 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "pages": {
+              "baseHref": "/TheBig6V2/pwa/",
+              "outputPath": {
+                "base": "../pwa",
+                "browser": ""
+              }
             }
           },
           "defaultConfiguration": "production"

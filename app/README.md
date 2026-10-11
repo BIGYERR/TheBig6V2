@@ -1,9 +1,30 @@
-# Iron Asylum: Angular app, iOS build and e2e
+# Iron Asylum: Angular app, three build paths and e2e
 
 Full path: `/Users/CanasBangin/Desktop/TheBig6V2/app`
 
 This folder packages Iron Asylum as an **Angular 22** app and wraps it with **Cordova (cordova-ios 8)** for the iOS
 Simulator and a connected iPhone. It also holds the lint setup and a Docker + Puppeteer e2e suite.
+
+## The three build paths
+
+One Angular app, built three ways. Run each from this folder (`cd app`).
+
+| Path | Command | Builds | Where it runs |
+|---|---|---|---|
+| **emulator-ios** | `npm run emulator-ios` | `www/` (Cordova), then a Debug build with Xcode | the iOS Simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`) |
+| **device-ios** | `npm run device-ios` | `www/` (Cordova), then a signed build with Xcode | the connected iPhone (see [First device build](#first-device-build-one-time)) |
+| **pwa-pages** | `npm run pwa-pages` | `../pwa/` with base href `/TheBig6V2/pwa/`; no Cordova | GitHub Pages at https://bigyerr.github.io/TheBig6V2/pwa/, once `pwa/` is committed and pushed |
+
+The two iOS paths run the native shell. They get Cordova and the `ia-island` Live Activity on the Dynamic Island.
+pwa-pages is a plain web build. The page detects that Cordova is missing, so it boots at once, and the rest stopwatch
+runs without the island. Every HTML5 and home screen feature works as it does in the live app. Like the live app, it
+has no web manifest and no service worker.
+
+**pwa-pages and the live app share storage.** `pwa/` is served from the same origin as the live app at
+`/TheBig6V2/`, so in a Safari tab both read and write the same `localStorage`. That is safe only while `pwa/` runs
+the same `app.js` as the root `index.html`. `npm run pwa-pages:check` proves it without building. It fails when `pwa/`
+was built from any other bytes of `index.html`, when a file the page loads is missing, or when the base href is wrong.
+Rebuild and commit `pwa/` with every version, or it goes stale.
 
 The live app is still the repo root `index.html`, served by GitHub Pages and booted by every gate under `tests/`.
 Nothing here edits it. The Angular app is **generated from it on every build**, so there is one source of truth and
@@ -44,14 +65,16 @@ with an iOS Simulator runtime.
 |---|---|
 | `npm install` | install dependencies (npm 11 asks before running install scripts; `package.json` `allowScripts` approves only Puppeteer's Chrome download and esbuild) |
 | `npm start` | sync, then `ng serve` on http://localhost:4200 |
-| `npm run build` | sync, then a production build into `www/` (Cordova's web root) |
+| `npm run build` | sync, then a production build into `www/` (Cordova's web root; both iOS paths and e2e run it) |
 | `npm run sync:check` | fail if the generated files are stale against `../index.html` |
 | `npm run lint` | ESLint: TypeScript and templates (angular-eslint), plus `scripts/` and `e2e/`; errors fail |
 | `npm run lint:legacy` | warn-only report on the generated `app.js` (counts per rule, first examples) |
 | `npm run e2e` | Docker builds and serves the app; Puppeteer clicks through it; report at `e2e/report/index.html` |
-| `npm run ios:sim` | build, boot the simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`), install, launch |
-| `npm run ios:device` | signed build for the connected iPhone, install, launch |
-| `npm run ios:open` | open the native project in Xcode |
+| `npm run emulator-ios` | build, boot the simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`), install, launch |
+| `npm run device-ios` | signed build for the connected iPhone, install, launch |
+| `npm run pwa-pages` | sync, then a production build into `../pwa/` for GitHub Pages, then the check below |
+| `npm run pwa-pages:check` | fail unless `../pwa/` was built from the current `../index.html` (no build) |
+| `npm run xcode-ios` | open the native project in Xcode |
 
 ## iOS
 
@@ -70,7 +93,7 @@ with an iOS Simulator runtime.
    (Without an account the build stops with "No Accounts".)
 2. Plug in the iPhone, unlock it and tap **Trust**.
 3. On the iPhone, turn on Settings > Privacy & Security > Developer Mode. The phone restarts.
-4. Run `npm run ios:device`. If the phone says "Untrusted Developer", trust your Apple ID under Settings > General >
+4. Run `npm run device-ios`. If the phone says "Untrusted Developer", trust your Apple ID under Settings > General >
    VPN & Device Management.
 
 The team comes from `--team`, `IOS_TEAM_ID`, or the first team Xcode knows, in that order. A Personal Team install
