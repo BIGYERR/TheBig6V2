@@ -48,6 +48,11 @@ describe('mac-local-backend', { skip: process.platform === 'win32' && 'bash scri
     assert.ok(existsSync(join(dir, 'server.pid')));
     const health = await (await fetch(`${base}/healthz`)).json();
     assert.equal(health.ok, true);
+    assert.equal(health.backend, 'mac-local', 'it says which backend it is');
+    // up bundles this checkout's app, so /app/ serves the same ia-version as the repo root index.html.
+    const root = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
+    assert.equal(health.app, /<meta name="ia-version" content="([^"]*)"/.exec(root)[1]);
+    assert.equal((await fetch(`${base}/app/`)).status, 200);
   });
 
   test('it runs as production with the local admin login, like the docker image', async () => {

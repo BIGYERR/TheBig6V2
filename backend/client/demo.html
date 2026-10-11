@@ -31,12 +31,9 @@
     <p>The dot beside the title is the connection indicator as it would sit in the app. Sage means the last
       heartbeat reached the backend. A hollow ring means it did not, or has not yet. Turn the server off or go
       offline to watch it change. This page talks to the backend it is served from, or to <code>?api=</code>.</p>
-    <dl>
-      <dt>Backend</dt><dd id="api"></dd>
-      <dt>Device UID</dt><dd id="uid"></dd>
-      <dt>Label</dt><dd id="label"></dd>
-      <dt>Last round trip</dt><dd id="rtt"></dd>
-    </dl>
+    <p id="summary"></p>
+    <p>Below is everything <code>iaLinkStatus()</code> knows: what the app's debug section and bug report would show.</p>
+    <dl id="status"></dl>
   </main>
   <script>
     window.IA_BACKEND_URL = new URLSearchParams(location.search).get('api') || location.origin;
@@ -45,10 +42,19 @@
   <script src="ia-link.js"></script>
   <script>
     setInterval(function () {
-      document.getElementById('api').textContent = IA_BACKEND_URL;
-      document.getElementById('uid').textContent = iaLinkUid() || 'not issued yet';
-      document.getElementById('label').textContent = iaLinkLabel() + ' · ' + iaLinkPlatform();
-      document.getElementById('rtt').textContent = _iaLink.rtt == null ? 'none yet' : _iaLink.rtt + ' ms';
+      document.getElementById('summary').textContent = iaLinkSummary();
+      var s = iaLinkStatus();
+      var dl = document.getElementById('status');
+      dl.replaceChildren();
+      Object.keys(s).forEach(function (k) {
+        var v = s[k];
+        if ((k === 'lastTryAt' || k === 'lastOkAt') && v) v = new Date(v).toLocaleTimeString();
+        var dt = document.createElement('dt');
+        var dd = document.createElement('dd');
+        dt.textContent = k;
+        dd.textContent = v === null || v === '' ? '–' : String(v);
+        dl.append(dt, dd);
+      });
     }, 500);
   </script>
 </body>

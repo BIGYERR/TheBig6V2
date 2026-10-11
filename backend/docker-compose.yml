@@ -13,6 +13,8 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-asylum}
       CORS_ORIGINS: ${CORS_ORIGINS:-https://bigyerr.github.io,app://localhost,http://localhost:*,http://127.0.0.1:*}
       DATA_FILE: /srv/data/devices.json
+      # The container's own hostname is a random id; name it so the app's debug section and the admin can.
+      IA_BACKEND_NAME: ${IA_BACKEND_NAME:-docker on this Mac}
       CLIENT_DEMO: "1"
     volumes:
       - devices:/srv/data

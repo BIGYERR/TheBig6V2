@@ -115,7 +115,8 @@ describe('admin', () => {
   test('needs the login', async () => {
     const r = await get('/admin/api/stats', null);
     assert.equal(r.status, 401);
-    assert.match(r.headers.get('www-authenticate'), /^Basic /);
+    // No challenge: the admin page draws its own login form, so the browser must never pop up its own box.
+    assert.equal(r.headers.get('www-authenticate'), null);
     const wrong = await get('/admin/api/stats', 'Basic ' + Buffer.from('admin:nope').toString('base64'));
     assert.equal(wrong.status, 401);
     assert.equal((await get('/admin/api/stats')).status, 200);

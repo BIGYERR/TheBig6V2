@@ -6,5 +6,6 @@
 !tsconfig.json
 !admin/
 !site/
+!app-web/
 !server/
 !client/

@@ -2,6 +2,7 @@
 // backend/.env.example lists them all.
 
 import { readFileSync } from 'node:fs';
+import { hostname } from 'node:os';
 
 const PKG = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
@@ -20,9 +21,18 @@ export function loadConfig(env = process.env) {
     // HEROKU_SLUG_COMMIT exists once runtime-dyno-metadata is on (scripts/heroku.sh setup turns it on).
     commit: env.HEROKU_SLUG_COMMIT || env.GIT_COMMIT || '',
     release: env.HEROKU_RELEASE_VERSION || '',
+    // Which backend this is, so the app's debug section, /healthz and the admin header can say so: heroku (Heroku
+    // sets DYNO), docker (the image sets IA_BACKEND_KIND), mac-local (scripts/mac-local-backend.sh sets it), else
+    // local (npm start, npm run dev). The name tells two of a kind apart: the Heroku app, or the machine.
+    backendKind: env.IA_BACKEND_KIND || (env.DYNO ? 'heroku' : 'local'),
+    backendName: env.IA_BACKEND_NAME || env.HEROKU_APP_NAME || hostname(),
     // Admin is off in production until both are set. Locally it falls back to admin / asylum.
     adminUser: env.ADMIN_USER || (production ? '' : 'admin'),
     adminPassword: env.ADMIN_PASSWORD || (production ? '' : 'asylum'),
+    // How long a staff sign in lasts before the admin asks again.
+    sessionTtlMs: int(env.ADMIN_SESSION_MINUTES, 720) * 60_000,
+    // The newest app version, when you want to say so. Empty: the newest version any device has reported.
+    latestAppVersion: env.APP_LATEST_VERSION || '',
     corsOrigins: list(env.CORS_ORIGINS ?? DEFAULT_ORIGINS),
     // How often the app should beat, and how long after its last beat a device still counts as connected.
     beatMs: int(env.BEAT_MS, 15_000),

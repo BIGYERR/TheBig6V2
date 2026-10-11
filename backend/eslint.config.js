@@ -14,7 +14,7 @@ const nodeRules = {
 };
 
 export default defineConfig([
-  globalIgnores(['node_modules/', 'dist/', '.angular/', 'data/', 'site/public/']),
+  globalIgnores(['node_modules/', 'dist/', '.angular/', 'data/', 'app-web/', 'site/public/']),
   {
     files: ['admin/**/*.ts', 'site/**/*.ts'],
     extends: [
@@ -34,7 +34,7 @@ export default defineConfig([
     extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
   },
   {
-    files: ['server/**/*.js', 'test/**/*.js', 'eslint.config.js'],
+    files: ['server/**/*.js', 'test/**/*.js', 'scripts/**/*.mjs', 'eslint.config.js'],
     extends: [eslint.configs.recommended],
     languageOptions: { sourceType: 'module', globals: { ...globals.node } },
     rules: nodeRules,

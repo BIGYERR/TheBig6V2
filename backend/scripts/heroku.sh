@@ -6,12 +6,17 @@
 #   bash backend/scripts/heroku.sh status             dynos, release, /healthz
 #   bash backend/scripts/heroku.sh logs               tail the logs
 #   bash backend/scripts/heroku.sh open               open /admin/ in the browser
+#   bash backend/scripts/heroku.sh tree [ref]         print the tree deploy would push for ref (default HEAD)
 #
 # Why the deploy is not a plain `git push heroku main`: the repo root is the GitHub Pages site, and Heroku wants
 # package.json and the Procfile at the root of what it receives. So deploy makes a commit whose tree is backend/
-# alone (git commit-tree, no git subtree needed) on top of what Heroku already has, and pushes that.
+# alone (git commit-tree, no git subtree needed) on top of what Heroku already has, and pushes that. The app the
+# backend serves at /app/ is added to that tree as app-web/: the root index.html and its icon, from the same commit.
 set -euo pipefail
 
+# Always the checkout this script sits in. Git exports GIT_DIR and friends to hooks; with GIT_DIR set, git takes the
+# current folder for the top of the checkout, the prefix below reads empty, and the deploy tree would be the whole repo.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_PREFIX
 BACKEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$BACKEND_DIR"
 PREFIX="$(git rev-parse --show-prefix)"
@@ -78,6 +83,19 @@ cmd_setup() {
   echo "Next: commit backend/, then run: bash backend/scripts/heroku.sh deploy"
 }
 
+# backend/ at a ref, plus app-web/ holding that ref's index.html and apple-touch-icon.png: what the server serves at
+# /app/, the same files Pages serves. Locally scripts/app-bundle.mjs fills app-web/ from the working copy instead.
+deploy_tree() {
+  local ref="$1" app_tree file blob
+  app_tree="$(
+    for file in index.html apple-touch-icon.png; do
+      blob="$(git rev-parse --verify --quiet "$ref:$file")" || { [ "$file" = index.html ] && die "no index.html at $ref"; continue; }
+      printf '100644 blob %s\t%s\n' "$blob" "$file"
+    done | git mktree
+  )"
+  { git ls-tree --full-tree "$ref:$PREFIX" | grep -v "	app-web$" || true; printf '040000 tree %s\tapp-web\n' "$app_tree"; } | git mktree
+}
+
 cmd_deploy() {
   need_cli
   local app; app="$(app_name)"
@@ -88,8 +106,8 @@ cmd_deploy() {
   if [ "$ref" = "origin/main" ]; then git fetch --quiet origin main || die "cannot read origin/main"; fi
   local source tree parent commit
   source="$(git rev-parse --short "$ref")" || die "no such ref: $ref"
-  tree="$(git rev-parse "$ref:$PREFIX")"
-  if [ "$(git rev-parse "HEAD:$PREFIX" 2>/dev/null)" != "$tree" ] || [ -n "$(git status --porcelain -- .)" ]; then
+  tree="$(deploy_tree "$ref")"
+  if [ "$(git rev-parse "HEAD:$PREFIX" 2>/dev/null)" != "$(git rev-parse "$ref:$PREFIX")" ] || [ -n "$(git status --porcelain -- .)" ]; then
     echo "Note: this checkout's backend/ differs from $ref's. Deploying $ref's; yours ships once it is merged dev -> main."
   fi
   # Build on what Heroku already has, so every deploy is a fast-forward and no force push is needed.
@@ -149,5 +167,6 @@ case "${1:-}" in
   status) cmd_status ;;
   logs) cmd_logs ;;
   open) cmd_open ;;
-  *) sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  tree) deploy_tree "${2:-HEAD}" ;;
+  *) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac

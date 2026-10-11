@@ -4,8 +4,9 @@ import { Phone } from './phone';
 import { RestClock } from './rest-clock';
 import { Reveal } from './reveal';
 
-// The app on GitHub Pages. Every "open the app" button goes here.
-const APP_URL = 'https://bigyerr.github.io/TheBig6V2/';
+// The app, served by this same backend at /app/ (scripts/app-bundle.mjs). Every "open the app" button goes here until
+// the store builds exist.
+const APP_URL = '/app/';
 
 interface Feature {
   icon: IconName;

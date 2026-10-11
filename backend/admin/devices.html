@@ -1,0 +1,74 @@
+<section class="filters" aria-label="Filters">
+  <input type="search" placeholder="Search anything" aria-label="Search anything" [value]="q()" (input)="search('q', $event)" />
+  <input type="search" placeholder="Search by name" aria-label="Search by name" [value]="name()" (input)="search('name', $event)" />
+  <label class="check">
+    <input type="checkbox" [checked]="connectedOnly()" (change)="toggle('connectedOnly', $event)" /> Connected only
+  </label>
+  <label class="check">
+    <input type="checkbox" [checked]="oldOnly()" (change)="toggle('oldOnly', $event)" /> Old builds only
+  </label>
+</section>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th aria-label="Status"></th>
+        <th>Name</th>
+        <th>Device</th>
+        <th>App</th>
+        <th>Last seen</th>
+        <th class="num">Beats</th>
+        <th class="num">RTT</th>
+        <th class="num">p50</th>
+        <th class="num">p95</th>
+        <th>UID</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (d of result()?.items ?? []; track d.uid) {
+        <tr [class.live]="d.connected">
+          <td>
+            <span class="dot" [class.on]="d.connected" [attr.title]="d.connected ? 'Connected for ' + span((state.now() - d.connectedSince) / 1000) : 'Not connected'"></span>
+          </td>
+          <td>
+            <input class="name" [value]="d.name" [placeholder]="d.deviceName || 'Add a name'" aria-label="Name" (change)="rename(d, $event)" (keydown.enter)="$any($event.target).blur()" />
+          </td>
+          <td [title]="d.ua">
+            {{ d.label || '–' }}
+            <small>{{ d.platform }} {{ d.screen }}</small>
+          </td>
+          <td>
+            {{ d.appVersion ? version(d.appVersion, d.appSemver) : '–' }}
+            @if (d.outdated) {
+              <span class="badge old" [title]="'Older than ' + result()?.latest">old</span>
+            }
+          </td>
+          <td [title]="'First seen ' + when(d.firstSeen) + ' · ' + d.sessions + ' sessions'">{{ ago(d.lastSeen) }}</td>
+          <td class="num">{{ d.beats }}</td>
+          <td class="num">{{ ms(d.latency.last) }}</td>
+          <td class="num">{{ ms(d.latency.p50) }}</td>
+          <td class="num">{{ ms(d.latency.p95) }}</td>
+          <td class="uid" [title]="d.uid">{{ d.uid.slice(0, 8) }}</td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="10" class="empty">{{ result() ? 'No devices match.' : 'Loading…' }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (result(); as r) {
+  <footer class="pager">
+    <button type="button" (click)="turn(-1)" [disabled]="r.page <= 1">Prev</button>
+    <span>Page {{ r.page }} of {{ r.pages }} · {{ r.total }} devices</span>
+    <button type="button" (click)="turn(1)" [disabled]="r.page >= r.pages">Next</button>
+    <select aria-label="Rows per page" (change)="setPageSize($event)">
+      @for (n of pageSizes; track n) {
+        <option [value]="n" [selected]="n === pageSize()">{{ n }} per page</option>
+      }
+    </select>
+  </footer>
+}

@@ -1,0 +1,80 @@
+@if (state.stats(); as s) {
+  <section class="cards" aria-label="Summary">
+    <div class="card">
+      <span class="k">Connected now</span>
+      <span class="v">{{ s.connected }}</span>
+    </div>
+    <div class="card">
+      <span class="k">Unique devices</span>
+      <span class="v">{{ s.uniques }}</span>
+    </div>
+    <div class="card">
+      <span class="k">Latency p50</span>
+      <span class="v">{{ ms(s.latency.p50) }}</span>
+    </div>
+    <div class="card">
+      <span class="k">Latency p95</span>
+      <span class="v">{{ ms(s.latency.p95) }}</span>
+    </div>
+    <div class="card">
+      <span class="k">Avg · max</span>
+      <span class="v small">{{ ms(s.latency.avg) }} · {{ ms(s.latency.max) }}</span>
+    </div>
+    <div class="card">
+      <span class="k">Beats received</span>
+      <span class="v">{{ s.beatsTotal }}</span>
+    </div>
+  </section>
+
+  <div class="split">
+    <section class="block" aria-labelledby="ov-versions">
+      <div class="block-head">
+        <h2 id="ov-versions">App versions</h2>
+        <a href="#/versions">All versions</a>
+      </div>
+      @if (state.versions(); as v) {
+        <p class="block-note">
+          Newest: <b>{{ version(v.latest, v.latestSemver) }}</b>.
+          @if (v.outdated) {
+            <a href="#/devices?old=1">{{ v.outdated }} {{ v.outdated === 1 ? 'device runs' : 'devices run' }} an older build.</a>
+          } @else {
+            Every device with a known version is on it.
+          }
+        </p>
+        <table>
+          <thead>
+            <tr><th>Version</th><th class="num">Devices</th><th class="num">Connected</th><th>Last seen</th></tr>
+          </thead>
+          <tbody>
+            @for (r of topVersions(); track r.version) {
+              <tr [class.old]="r.outdated">
+                <td>{{ version(r.version, r.semver) }} @if (r.outdated) { <span class="badge old">old</span> }</td>
+                <td class="num">{{ r.devices }}</td>
+                <td class="num">{{ r.connected }}</td>
+                <td>{{ ago(r.lastSeen, state.now()) }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="4" class="empty">No device has checked in yet.</td></tr>
+            }
+          </tbody>
+        </table>
+      }
+    </section>
+
+    <section class="block" aria-labelledby="ov-backend">
+      <div class="block-head">
+        <h2 id="ov-backend">This backend</h2>
+        <a href="#/server">Details</a>
+      </div>
+      <dl class="facts">
+        <dt>Kind</dt><dd><span class="kind-dot" [attr.data-kind]="s.server.kind"></span>{{ s.server.kind }}</dd>
+        <dt>Name</dt><dd>{{ s.server.name }}</dd>
+        <dt>Build</dt><dd>v{{ s.server.version }}@if (s.server.commit) { · {{ s.server.commit.slice(0, 7) }} }</dd>
+        <dt>Serves the app</dt><dd>{{ s.server.appVersion ? version(s.server.appVersion, s.server.appSemver) + ' at /app/' : 'not bundled' }}</dd>
+        <dt>Devices</dt><dd>{{ s.server.persistent ? 'kept in a file across restarts' : 'in memory, reset on restart' }}</dd>
+      </dl>
+    </section>
+  </div>
+} @else {
+  <p class="empty">Loading…</p>
+}

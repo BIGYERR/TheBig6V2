@@ -11,10 +11,12 @@ RUN npm ci --no-audit --no-fund
 COPY angular.json tsconfig.json ./
 COPY admin/ admin/
 COPY site/ site/
-RUN npm run build
+# The two Angular builds only; the app (app-web/) is bundled on the host by npm run docker:up and copied below.
+RUN npm run build:ui
 
 FROM node:26-bookworm-slim
-ENV NODE_ENV=production PORT=3000
+# IA_BACKEND_KIND: /healthz, each heartbeat reply and the admin header say this backend is the docker one.
+ENV NODE_ENV=production PORT=3000 IA_BACKEND_KIND=docker
 WORKDIR /srv
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
@@ -22,6 +24,8 @@ COPY server/ server/
 COPY client/ client/
 COPY --from=build /srv/dist/admin dist/admin
 COPY --from=build /srv/dist/site dist/site
+# The app served at /app/: npm run docker:up bundles it from the repo root first (scripts/app-bundle.mjs).
+COPY app-web/ app-web/
 # Where DATA_FILE points in docker-compose.yml; owned by node so the volume mounted there is writable.
 RUN mkdir -p /srv/data && chown node:node /srv/data
 USER node

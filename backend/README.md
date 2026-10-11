@@ -2,15 +2,20 @@
 
 Full path: `/Users/CanasBangin/Desktop/TheBig6V2/backend`
 
-A small Node (Express 5) service with three jobs today, all on one server and one origin:
+A small Node (Express 5) service with four jobs today, all on one server and one origin:
 
 1. **The website.** The public site at `/`: what the app is, how it works, its features, the race plans, how to
    put it on an iPhone, and an FAQ. A quiet **Staff Login** in its footer leads to the admin.
-2. **Heartbeat API.** The app checks in with a device UID, and the server tells it whether it is connected.
-3. **Admin vision.** A login-protected dashboard at `/admin/`: how many devices are connected now, how many
-   unique devices have ever checked in, round-trip latency, and a paginated, searchable table of every device.
+2. **The app.** The PWA itself at `/app/`: the repo root `index.html`, the same file GitHub Pages serves, so one
+   backend (docker, this Mac, Heroku) hands people the app before the store builds exist. Every "open the app"
+   button on the website goes here.
+3. **Heartbeat API.** The app checks in with a device UID and its version, and the server tells it whether it is
+   connected and which backend it reached.
+4. **Admin vision.** A staff login at `/admin/`, then a dashboard: who is connected now, round-trip latency, a
+   searchable table of every device, which app versions are in use and who runs an old one, and this backend's
+   own facts. **Log out** ends the session on the server.
 
-The app itself is still the repo root `index.html` on GitHub Pages. Nothing in this folder changes it. The app
+The app's source is still the repo root `index.html`; this folder only copies it (`scripts/app-bundle.mjs`). The app
 side of the connection (`client/ia-link.js`) is ready, but it reaches the phone only through a version build. See
 [The app side](#the-app-side).
 
@@ -19,18 +24,22 @@ side of the connection (`client/ia-link.js`) is ready, but it reaches the phone 
 | Path | What it is |
 |---|---|
 | `server/server.js` | entry point (`npm start`, the Procfile's `web`, the Dockerfile's `CMD`) |
-| `server/app.js` | routes: `/healthz`, `/api/*`, `/admin/*`, `/client/`, and the website at `/` |
-| `server/store.js` | the device store: in memory, optionally saved to a JSON file |
-| `server/middleware.js` | CORS, the text/plain JSON body, Basic auth with lockout |
+| `server/app.js` | routes: `/healthz`, `/api/*`, `/admin/*`, `/app/`, `/client/`, and the website at `/` |
+| `server/store.js` | the device store: in memory, optionally saved to a JSON file; versions per device |
+| `server/auth.js` | the staff login: session cookie, logout, Basic auth for scripts, the lockout |
+| `server/versions.js` | app versions: a bare build number N reads as 0.N.0, else MAJOR.MINOR.PATCH (the rule in `tests/semver.js`) |
+| `server/middleware.js` | CORS and the text/plain JSON body |
 | `server/config.js` | every setting, read from the environment |
 | `site/` | the website: Angular 22, standalone and zoneless like the admin, one page with anchored sections, `site/public/` for the 404 page, favicon and robots.txt |
-| `admin/` | the admin UI: Angular 22, one standalone zoneless component, built with `@angular/build` (esbuild, Vite dev server) |
+| `admin/` | the admin UI: Angular 22, standalone and zoneless; a login page, then a shell (header, left nav, footer) around one inner panel per section: Overview, Devices, Versions, Server |
+| `app-web/` | the app served at `/app/`, copied from the repo root by `scripts/app-bundle.mjs`; git-ignored |
 | `client/ia-link.js` | the app side: heartbeat plus the connection dot, ready to paste into `index.html` |
 | `client/demo.html` | the dot on a page of its own, served at `/client/` outside production |
-| `test/` | `node --test` suite for the API, the auth and the store |
+| `test/` | `node --test` suite: API, login, store, versions, website, app, the Mac runner, the deploy tree, the client snippet |
 | `Procfile` | Heroku: `web: node server/server.js` |
 | `Dockerfile`, `docker-compose.yml` | the same server in a container |
-| `scripts/heroku.sh` | Heroku setup, deploy, verify, status, logs |
+| `scripts/heroku.sh` | Heroku setup, deploy (with the app added as `app-web/`), verify, status, logs, tree |
+| `scripts/app-bundle.mjs` | copies the app into `app-web/` (`npm run app:bundle`; `build`, `docker:up` and the Mac runner run it) |
 | `scripts/mac-local-backend.sh` | the server on this Mac with no docker: up, down, restart, status, logs |
 
 ## Run it
@@ -43,7 +52,8 @@ npm install
 
 | Command | What it does |
 |---|---|
-| `npm run build` | build the admin UI into `dist/admin/` and the website into `dist/site/` (the server serves them at `/admin/` and `/`) |
+| `npm run build` | bundle the app into `app-web/`, build the admin UI into `dist/admin/` and the website into `dist/site/` (served at `/app/`, `/admin/` and `/`) |
+| `npm run app:bundle` | copy the repo root `index.html` and its icon into `app-web/`: the app at `/app/` |
 | `npm start` | the server on http://localhost:3000, in the foreground |
 | `npm run dev` | the same, restarting on every change under `server/` |
 | `npm run site:dev` | the website with live reload on http://localhost:4300/, `/admin` and `/api` proxied to `:3000` (run `npm run dev` beside it) |
@@ -70,7 +80,8 @@ Locally the admin login is **admin / asylum**, unless `ADMIN_USER` and `ADMIN_PA
 
 - http://localhost:3000/ is the website. **Staff Login**, faint at the bottom right of its footer, opens the
   dashboard below;
-- http://localhost:3000/admin/ is the dashboard;
+- http://localhost:3000/app/ is the app;
+- http://localhost:3000/admin/ is the staff login, then the dashboard. **Log out** is at the top right;
 - http://localhost:3000/client/ is the connection dot demo. Open it in a second tab and it appears in the
   dashboard as a connected device.
 
@@ -103,29 +114,72 @@ wipes them. `API_PORT=3001 npm run docker:up` moves the port.
 `site/` is one Angular page at `/`, in the app's own design system (bone, ink, the one burnt orange kept for live
 things, rectilinear corners): a hero with a drawing of the This Week screen whose rest clock runs on the island, the
 method in three steps, the features, a sample week, the doctrine, the race plans, how to put it on an iPhone, an
-FAQ, and a final call to open the app. Every "open the app" button goes to the Pages app. Its copy follows the
+FAQ, and a final call to open the app. Every "open the app" button goes to `/app/` on the same server. Its copy follows the
 app's copy rule (no dash as punctuation, short sentences, a coach's voice, no third party brand names), and a test
 checks the dash part.
 
-- **Staff Login** is a plain link in the footer's bottom row, faint until hovered or focused, to `/admin/`. The
-  admin's own Basic auth asks for the login there, so the site adds no login of its own and nothing changes for the
-  admin.
-- **Caching.** Pages revalidate on every load; the hashed bundles cache for a year. A deploy changes their names.
+- **Staff Login** is a plain link in the footer's bottom row, faint until hovered or focused, to `/admin/`, where
+  the admin draws its own login form.
+- **Caching.** Pages, and scripts or styles without a content hash (development builds), revalidate on every load;
+  hashed bundles cache for a year, and a deploy changes their names. Built folders are read per request, so a build
+  that lands while the server runs is served at once.
 - **404.** A browser asking for a page that does not exist gets the site's 404 page; fetch, curl and the app keep
   getting the JSON 404. `/api` keeps its JSON 404 for everyone.
 - **Not built** (`dist/site/` missing), `/` answers 503 with the command that builds it. It used to redirect to
   `/admin/`.
 
+## The app at /app/
+
+`scripts/app-bundle.mjs` copies the repo root `index.html` and `apple-touch-icon.png`, exactly what Pages serves, into
+`app-web/`, and the server serves that at `/app/` (the page revalidated on every load). Locally `npm run build`,
+`npm run docker:up` and the Mac runner copy it fresh; `heroku.sh deploy` adds the same two files to the tree it
+pushes, from the commit it deploys (`heroku.sh tree <ref>` prints that tree), so Heroku serves the app as of that
+commit. `/healthz` reports the bundled app's version as `app`.
+
+- **Its own origin.** The app at `/app/` keeps its data (programs, logs) in that server's origin, separate from the
+  Pages copy's. A phone that uses both has two separate sets of programs.
+- **Bug reports** go through Web3Forms with a key registered to `bigyerr.github.io`, so the Bugs tab sends only from
+  the Pages app until another domain is registered.
+- **The newest version** the admin compares devices against is, in order: `APP_LATEST_VERSION` if set, else this app's
+  version, else the newest any device reported.
+
+## Admin vision
+
+`/admin/` is public as a page (it holds no data) and draws a login form. Signed in, a dark header carries the
+brand, a badge naming this backend (**heroku**, **docker**, **mac-local** or **local**, each its own colour, with its
+name), the user and **Log out**. The left nav switches the inner panel between **Overview** (counts, latency, the
+versions in use, this backend), **Devices** (search, filters including "Old builds only", names), **Versions**
+(devices per version, newest and old flagged) and **Server** (where it runs, its build, the app it serves, its
+settings), with a link back to the website. The footer repeats the backend's build and uptime. On a narrow screen the
+nav becomes a row of tabs. The address keeps the section (`#/devices`, `#/devices?old=1`), so a section can be
+bookmarked.
+
+**Sign in and out.** The form posts once to `/admin/api/login`; the server answers with a session cookie
+(`ia_admin`: HttpOnly, SameSite=Strict, scoped to `/admin`, Secure over https) good for `ADMIN_SESSION_MINUTES`
+(12 hours). **Log out** deletes the session on the server, so even a copied cookie stops working. A restart signs
+everyone out. Scripts can skip the form and send Basic auth on each call (`curl -u admin:asylum`). No answer carries
+`WWW-Authenticate`, so the browser never shows its own login box.
+
 ## API
 
 | Method and path | Auth | What it does |
 |---|---|---|
-| `GET /healthz` | none | liveness: `ok`, `version`, `commit`, `release`, `uptimeS`. Heroku, docker and `heroku.sh verify` read it |
-| `POST /api/heartbeat` | CORS | the health check with a UID (below) |
+| `GET /healthz` | none | liveness: `ok`, `backend` (the kind), `name`, `app` (the bundled app's version), `version`, `commit`, `release`, `uptimeS`. Heroku, docker and `heroku.sh verify` read it |
+| `POST /api/heartbeat` | CORS | the health check with a UID (below); the reply names the backend |
 | `POST /api/bye` | CORS | `{"uid"}`: the app was hidden or closed; the device stops counting as connected at once |
-| `GET /admin/api/stats` | Basic | `connected`, `uniques`, `beatsTotal`, `latency` (p50, p95, avg, min, max over connected devices), `server` |
-| `GET /admin/api/devices` | Basic | `?q=&name=&connected=1&page=1&pageSize=25` (page size up to 100). Connected devices first, then most recent |
-| `PATCH /admin/api/devices/:uid` | Basic | `{"name"}`: give a device a name. An empty name clears it |
+| `POST /admin/api/login` | none | `{"user", "password"}` as JSON: sets the session cookie. 401 wrong, 429 locked out, 503 admin off |
+| `POST /admin/api/logout` | none | ends the session on the server and clears the cookie; safe to repeat |
+| `GET /admin/api/me` | session or Basic | who is signed in, how (`session` or `basic`), and when the session ends |
+| `GET /admin/api/stats` | session or Basic | `connected`, `uniques`, `beatsTotal`, `latency` (p50, p95, avg, min, max over connected devices), `latestApp`, `outdated`, `server` (kind, name, build, the app it serves, settings) |
+| `GET /admin/api/versions` | session or Basic | devices per app version, newest first: `latest`, where it came from, `outdated`, and `rows` with each version's MAJOR.MINOR.PATCH reading |
+| `GET /admin/api/devices` | session or Basic | `?q=&name=&connected=1&outdated=1&page=1&pageSize=25` (page size up to 100). Connected devices first, then most recent; each flagged `outdated` when below the newest version |
+| `PATCH /admin/api/devices/:uid` | session or Basic | `{"name"}`: give a device a name. An empty name clears it |
+
+**Which backend.** Every backend says what it is: `heroku` on a dyno (Heroku sets `DYNO`), `docker` in the image
+(the Dockerfile sets `IA_BACKEND_KIND`), `mac-local` from the Mac runner, and `local` for `npm start` or `npm run dev`.
+Its name is the Heroku app (`HEROKU_APP_NAME`), `IA_BACKEND_NAME` (docker compose sets "docker on this Mac"), or the
+machine's hostname. `/healthz`, every heartbeat reply (`backend: {kind, name, version, commit}`) and the admin header
+carry it.
 
 **Heartbeat.** The app posts JSON as `text/plain`:
 
@@ -245,6 +299,9 @@ restarts the dyno.
 | Variable | Default | What it does |
 |---|---|---|
 | `ADMIN_USER`, `ADMIN_PASSWORD` | none in production (admin / asylum locally) | the admin login. Without both, `/admin` answers 503 |
+| `ADMIN_SESSION_MINUTES` | 720 | how long a staff sign in lasts |
+| `APP_LATEST_VERSION` | empty | the newest app version, for the old build flags; empty means the app at `/app/`, then the newest reported |
+| `IA_BACKEND_KIND`, `IA_BACKEND_NAME` | heroku on a dyno, else local; the app name or hostname | what this backend calls itself. The image and the Mac runner set the kind |
 | `NODE_ENV` | `production` on Heroku | turns off the local login fallback and the `/client/` demo |
 | `CORS_ORIGINS` | Pages, `app://localhost`, localhost | browser origins allowed to call `/api`; `*` matches anything but a slash |
 | `BEAT_MS` | 15000 | how often the app beats while on screen |
@@ -265,9 +322,11 @@ enough). `server/store.js` is the only module that changes.
 
 ### Security
 
-- The admin login is HTTP Basic over Heroku's HTTPS. On Heroku every plain http request is redirected to https
-  (308), so the password never travels in clear text. Ten wrong passwords from one address lock it out for ten
-  minutes. Use a long password; it is the only gate.
+- The admin login is a form over Heroku's HTTPS, then a session cookie (HttpOnly, SameSite=Strict, Secure over
+  https). On Heroku every plain http request is redirected to https (308), so the password never travels in clear
+  text. Ten wrong passwords from one address, through the form or Basic auth, lock it out for ten minutes. Use a long
+  password; it is the only gate. The login takes JSON only, and `/admin` answers no CORS, so another site cannot
+  post it.
 - Forwarded headers are trusted only on Heroku (`TRUST_PROXY`). Locally and in docker nothing sits in front, so a
   client could forge `X-Forwarded-For` to dodge the lockout. There the lockout counts the socket address instead.
 - Credentials live in Heroku config vars, never in the repo. `.env` is git-ignored; `.env.example` lists names only.
@@ -281,7 +340,14 @@ enough). `server/store.js` is the only module that changes.
 `client/ia-link.js` is the app's half: one heartbeat when the app opens and every 15 s while it is visible, the
 UID kept in `localStorage` as `ia_device_uid`, a goodbye beacon when the app is hidden, and the dot. The dot is 7 px
 next to THE ASYLUM in the top bar: sage (`--run`) when the last beat got through, a hollow ring when it did not.
-Its tooltip says Connected or Not connected. Try it at `/client/` against a local server.
+Its tooltip says Connected or Not connected, and which kind of backend. Try it at `/client/` against a local server.
+
+**Which backend the app is on.** After each beat the snippet keeps what the server said about itself.
+`iaLinkStatus()` returns it as data (URL, connected, kind and where the kind came from, name, server version and
+commit, round trip, beats, failures, last good beat, last error, UID, platform, app version), and `iaLinkSummary()` as
+one line, such as `Connected to docker backend "docker on this Mac" v0.1.0 (2048abf) at http://localhost:3000, 12 ms`.
+Before the first beat the kind is guessed from the URL (localhost and LAN addresses read as local, `herokuapp.com`
+as heroku). The demo page at `/client/` shows both, as the app's debug section will.
 
 It is **not in `index.html` yet**, on purpose. `index.html` is the shipped app, so the snippet lands through a
 version build with the usual gates (`ia-version` bump, `tests/gate.sh`, deploy proof), in its own chat. That build:
@@ -290,6 +356,9 @@ version build with the usual gates (`ia-version` bump, `tests/gate.sh`, deploy p
    two CSS rules plus `<span id="iaLinkDot">` into the top bar;
 2. adds the Heroku origin to `app/config.xml` (`<access origin>`) for the iOS app;
 3. proves the harness boots it with no network: the first beat is behind a 1.5 s timer, every failure is
-   swallowed, and an empty `IA_BACKEND_URL` turns it all off.
+   swallowed, and an empty `IA_BACKEND_URL` turns it all off;
+4. shows `iaLinkSummary()` and the `iaLinkStatus()` fields in the app's debug section (the Bugs tab), and appends the
+   summary to every bug report, so a test phone always says which backend it reached. When the app is served by a
+   backend at `/app/`, `IA_BACKEND_URL` can default to that same origin, so each backend's app talks to that backend.
 
 `ia_device_uid` is a new stored key, so that build counts as cross-cutting under the repo's proof rules.

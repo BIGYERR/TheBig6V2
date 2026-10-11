@@ -71,10 +71,13 @@ describe('website, built', () => {
     assert.equal((await beat.json()).ok, true);
   });
 
-  test('Staff Login goes to /admin/, which asks for the admin login', async () => {
-    const r = await fetch(`${s.base}/admin/`, { headers: HTML });
-    assert.equal(r.status, 401);
-    assert.match(r.headers.get('www-authenticate'), /^Basic /);
+  test('Staff Login goes to /admin/, whose data needs the staff login', async () => {
+    // The page is public (here unbuilt, so 503) and draws the form; its API answers 401 with no browser login box.
+    const page = await fetch(`${s.base}/admin/`, { headers: HTML });
+    assert.equal(page.status, 503);
+    const me = await fetch(`${s.base}/admin/api/me`);
+    assert.equal(me.status, 401);
+    assert.equal(me.headers.get('www-authenticate'), null);
   });
 });
 
@@ -93,6 +96,12 @@ describe('website, not built', () => {
 
 describe('website source', () => {
   const template = readFileSync(new URL('../site/site.html', import.meta.url), 'utf8');
+
+  test('every "open the app" link goes to the app this backend serves at /app/', () => {
+    const ts = readFileSync(new URL('../site/site.ts', import.meta.url), 'utf8');
+    assert.match(ts, /const APP_URL = '\/app\/';/);
+    assert.ok(!/bigyerr\.github\.io/.test(template), 'no hard link to Pages in the template');
+  });
 
   test('the footer carries a Staff Login link to the admin', () => {
     assert.match(template, /<a class="staff" href="\/admin\/"[^>]*>[\s\S]*?Staff Login<\/a>/);

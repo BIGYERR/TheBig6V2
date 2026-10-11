@@ -5,6 +5,7 @@
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { compareVersions, isOutdated, normalizeVersion, parseVersion } from './versions.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const RTT_SAMPLES = 50; // per device, newest last
@@ -103,8 +104,38 @@ export class DeviceStore {
     };
   }
 
-  // q matches any text field; name matches the admin name or the name the device reported.
-  list({ q = '', name = '', connected = false, page = 1, pageSize = 25 } = {}) {
+  // The newest app version: the one given (APP_LATEST_VERSION), or else the newest any device has reported.
+  latestVersion(given = '') {
+    if (parseVersion(given)) return given;
+    let newest = '';
+    for (const d of this.devices.values()) if (parseVersion(d.appVersion) && compareVersions(d.appVersion, newest) > 0) newest = d.appVersion;
+    return newest;
+  }
+
+  // Devices per app version, newest first, each marked old when it is below the newest. `from` says where a given
+  // newest came from (config, or the app this backend serves).
+  versions(given = '', from = 'config') {
+    const t = this.now();
+    const latest = this.latestVersion(given);
+    const groups = new Map();
+    for (const d of this.devices.values()) {
+      const key = d.appVersion || '';
+      const g = groups.get(key) ?? { version: key, semver: normalizeVersion(key), devices: 0, connected: 0, lastSeen: 0 };
+      g.devices += 1;
+      if (this.isConnected(d, t)) g.connected += 1;
+      g.lastSeen = Math.max(g.lastSeen, d.lastSeen);
+      groups.set(key, g);
+    }
+    const rows = [...groups.values()]
+      .sort((a, b) => compareVersions(b.version, a.version) || b.devices - a.devices)
+      .map((g) => ({ ...g, outdated: isOutdated(g.version, latest) }));
+    const outdated = rows.reduce((n, g) => n + (g.outdated ? g.devices : 0), 0);
+    return { latest, latestSemver: normalizeVersion(latest), latestFrom: parseVersion(given) ? from : latest ? 'devices' : '', outdated, rows };
+  }
+
+  // q matches any text field; name matches the admin name or the name the device reported; outdated keeps the
+  // devices below `latest`.
+  list({ q = '', name = '', connected = false, outdated = false, latest = '', page = 1, pageSize = 25 } = {}) {
     const t = this.now();
     const needle = q.trim().toLowerCase();
     const nameNeedle = name.trim().toLowerCase();
@@ -120,21 +151,24 @@ export class DeviceStore {
     if (nameNeedle) {
       rows = rows.filter((d) => `${d.name}\n${d.deviceName}`.toLowerCase().includes(nameNeedle));
     }
+    if (outdated) rows = rows.filter((d) => isOutdated(d.appVersion, latest));
     // Connected first, then most recently seen.
     rows.sort((a, b) => Number(this.isConnected(b, t)) - Number(this.isConnected(a, t)) || b.lastSeen - a.lastSeen);
 
     const size = clamp(pageSize, 1, 100, 25);
     const pages = Math.max(1, Math.ceil(rows.length / size));
     const current = clamp(page, 1, pages, 1);
-    const items = rows.slice((current - 1) * size, current * size).map((d) => this.view(d, t));
-    return { items, total: rows.length, page: current, pageSize: size, pages };
+    const items = rows.slice((current - 1) * size, current * size).map((d) => this.view(d, t, latest));
+    return { items, total: rows.length, page: current, pageSize: size, pages, latest };
   }
 
-  view(d, t = this.now()) {
+  view(d, t = this.now(), latest = '') {
     const { rtt, online, ...rest } = d;
     const connected = this.isConnected(d, t);
     return {
       ...rest,
+      appSemver: normalizeVersion(d.appVersion),
+      outdated: isOutdated(d.appVersion, latest),
       connected,
       connectedSince: connected ? d.connectedSince : 0,
       latency: { last: rtt.length ? rtt[rtt.length - 1] : null, ...summarize(rtt) },

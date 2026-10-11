@@ -87,6 +87,8 @@ up() {
     say 'installing dependencies (npm ci)'
     npm ci --no-audit --no-fund
   fi
+  # The app at /app/ is this checkout's index.html, copied fresh on every start (a copy, so it is instant).
+  node scripts/app-bundle.mjs
   if [[ $build == always ]] || { [[ $build == auto ]] && needs_build; }; then
     say 'building the website and the admin UI'
     npm run --silent build
@@ -96,6 +98,7 @@ up() {
   printf '\n=== %s start, port %s ===\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$PORT" >>"$LOG_FILE"
   # nohup and a closed stdin: the server outlives this script and the terminal that ran it.
   NODE_ENV=production \
+    IA_BACKEND_KIND=mac-local \
     PORT=$PORT \
     ADMIN_USER=${ADMIN_USER:-admin} \
     ADMIN_PASSWORD=${ADMIN_PASSWORD:-asylum} \
@@ -123,6 +126,7 @@ up() {
   [[ -z ${ADMIN_USER:-}${ADMIN_PASSWORD:-} ]] || login='the ADMIN_USER and ADMIN_PASSWORD you set'
   cat <<EOF
   website   $BASE/
+  app       $BASE/app/
   admin     $BASE/admin/   (Staff Login in the site's footer; login $login)
   demo      $BASE/client/
   devices   $DEVICES_FILE

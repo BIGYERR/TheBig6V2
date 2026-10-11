@@ -1,12 +1,15 @@
 import express from 'express';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { basicAuth, cors, jsonBody } from './middleware.js';
+import { createAdminAuth } from './auth.js';
+import { cors, jsonBody } from './middleware.js';
+import { normalizeVersion } from './versions.js';
 
 const ADMIN_DIR = fileURLToPath(new URL('../dist/admin', import.meta.url));
 const CLIENT_DIR = fileURLToPath(new URL('../client', import.meta.url));
 const SITE_DIR = fileURLToPath(new URL('../dist/site', import.meta.url));
+const APP_DIR = fileURLToPath(new URL('../app-web', import.meta.url));
 
 /** The kind of device a user agent names, for the request log. */
 export function deviceOf(ua = '') {
@@ -20,7 +23,7 @@ export function deviceOf(ua = '') {
 // Built as a function of config and store so the tests can run it on a random port with a fake clock.
 // `log` gets one line per response once it is sent (server.js passes console.log; tests pass nothing, so stay quiet):
 //   request POST /api/heartbeat 200 3 ms 192.168.1.20 iPhone
-export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_DIR, startedAt = Date.now(), log = null }) {
+export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_DIR, appDir = APP_DIR, startedAt = Date.now(), log = null }) {
   const app = express();
   app.disable('x-powered-by');
   if (config.trustProxy) {
@@ -41,11 +44,38 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
     });
   }
 
+  // Which backend answered: the app's debug section and the admin header show it, so a phone or a test run always
+  // says whether it reached a local server, docker or Heroku.
+  const backend = { kind: config.backendKind, name: config.backendName, version: config.version, commit: config.commit };
+
+  // The app this backend serves at /app/ (scripts/app-bundle.mjs), and its ia-version as the page declares it, read
+  // again whenever the file changes, so a fresh bundle shows without a restart. Unless APP_LATEST_VERSION says
+  // otherwise, that is the newest version: a device below it runs an old build.
+  const appPage = join(appDir, 'index.html');
+  let appSeen = { mtimeMs: -1, version: '' };
+  const appVersion = () => {
+    let mtimeMs;
+    try {
+      mtimeMs = statSync(appPage).mtimeMs;
+    } catch {
+      return '';
+    }
+    if (mtimeMs !== appSeen.mtimeMs) {
+      appSeen = { mtimeMs, version: /<meta name="ia-version" content="([^"]*)"/.exec(readFileSync(appPage, 'utf8'))?.[1] ?? '' };
+    }
+    return appSeen.version;
+  };
+  const latestGiven = () => config.latestAppVersion || appVersion();
+  const latestFrom = config.latestAppVersion ? 'config' : 'app';
+
   // Liveness for Heroku, docker's HEALTHCHECK and scripts/heroku.sh verify. No auth, nothing about devices.
   app.get('/healthz', (req, res) => {
     res.set('Cache-Control', 'no-store').json({
       ok: true,
       service: 'iron-asylum-backend',
+      backend: config.backendKind,
+      name: config.backendName,
+      app: appVersion(),
       version: config.version,
       commit: config.commit,
       release: config.release,
@@ -72,6 +102,7 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
       issued,
       serverTime: Date.now(),
       nextBeatMs: config.beatMs,
+      backend,
     });
   });
 
@@ -84,34 +115,61 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
   api.use((req, res) => res.status(404).json({ ok: false, error: 'not found' }));
   app.use('/api', api);
 
-  // ── Admin vision: the dashboard and the API it reads, behind one static login ─
+  // ── Admin vision: the staff login, the dashboard and the API it reads ─────────
+  // The page itself is public (it holds no data and draws the login form); every /admin/api route but login and
+  // logout needs a session or Basic auth (server/auth.js).
+  const auth = createAdminAuth(config);
   const admin = express.Router();
-  admin.use(basicAuth(config));
   admin.use('/api', (req, res, next) => {
     res.set('Cache-Control', 'no-store');
     next();
   });
+  admin.post('/api/login', express.json({ limit: '2kb' }), auth.login);
+  admin.post('/api/logout', auth.logout);
+  admin.use('/api', auth.guard);
+
+  admin.get('/api/me', (req, res) => {
+    res.json({ ok: true, user: req.admin.user, via: req.admin.via, expiresAt: req.admin.expires });
+  });
 
   admin.get('/api/stats', (req, res) => {
+    const versions = store.versions(latestGiven(), latestFrom);
     res.json({
       ...store.stats(),
+      latestApp: versions.latest,
+      outdated: versions.outdated,
       server: {
+        kind: config.backendKind,
+        name: config.backendName,
         version: config.version,
         commit: config.commit,
         release: config.release,
+        node: process.versions.node,
         uptimeS: Math.round((Date.now() - startedAt) / 1000),
         persistent: Boolean(config.dataFile),
+        beatMs: config.beatMs,
+        connectedWindowMs: config.connectedWindowMs,
+        maxDevices: config.maxDevices,
+        corsOrigins: config.corsOrigins,
+        sessionMinutes: Math.round(config.sessionTtlMs / 60_000),
+        appVersion: appVersion(),
+        appSemver: normalizeVersion(appVersion()),
       },
     });
   });
 
+  admin.get('/api/versions', (req, res) => res.json(store.versions(latestGiven(), latestFrom)));
+
   admin.get('/api/devices', (req, res) => {
     const q = req.query;
+    const flag = (v) => v === '1' || v === 'true';
     res.json(
       store.list({
         q: String(q.q ?? ''),
         name: String(q.name ?? ''),
-        connected: q.connected === '1' || q.connected === 'true',
+        connected: flag(q.connected),
+        outdated: flag(q.outdated),
+        latest: store.latestVersion(latestGiven()),
         page: q.page,
         pageSize: q.pageSize,
       }),
@@ -125,39 +183,40 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
     }
     const d = store.rename(req.params.uid, req.body.name);
     if (!d) return res.status(404).json({ ok: false, error: 'no such device' });
-    res.json(store.view(d));
+    res.json(store.view(d, undefined, store.latestVersion(latestGiven())));
   });
 
   admin.use('/api', (req, res) => res.status(404).json({ ok: false, error: 'not found' }));
 
-  if (existsSync(adminDir)) {
-    admin.use(express.static(adminDir, { index: 'index.html', setHeaders: adminCache }));
-  } else {
-    admin.get('/', (req, res) =>
-      res.status(503).type('text').send('The admin UI is not built. Run `npm run build` in backend/.'),
-    );
-  }
+  // Built folders are read per request, never checked once at boot, so a build that lands while the server runs
+  // (npm run dev) is served at once. A route below a static folder answers only when that folder has no such file.
+  admin.use(express.static(adminDir, { index: 'index.html', setHeaders: cacheFor('private') }));
+  admin.get('/', (req, res) =>
+    res.status(503).type('text').send('The admin UI is not built. Run `npm run build` in backend/.'),
+  );
   app.use('/admin', admin);
+
+  // ── The app itself: the single file PWA that GitHub Pages serves, so one backend can hand people the app before the
+  // store builds exist. Its own origin here, so its data on this server is separate from the Pages copy's. ─────────
+  app.use('/app', express.static(appDir, { index: 'index.html', setHeaders: cacheFor('public') }));
+  app.get(['/app', '/app/'], (req, res) =>
+    res.status(503).type('text').send('The app is not bundled. Run `npm run app:bundle` in backend/.'),
+  );
 
   // The connection indicator on a page of its own, for trying it before it ships in the app.
   if (config.clientDemo) app.use('/client', express.static(CLIENT_DIR, { index: 'demo.html' }));
 
   // ── The website: everything else at the root. Its footer's Staff Login is a plain link to /admin/ above, so
   // the site and the backend are one server, one deploy, one origin. ─────────────────────────────────────────
-  const siteBuilt = existsSync(join(siteDir, 'index.html'));
-  if (siteBuilt) {
-    app.use(express.static(siteDir, { index: 'index.html', setHeaders: siteCache }));
-  } else {
-    app.get('/', (req, res) =>
-      res.status(503).type('text').send('The website is not built. Run `npm run build` in backend/.'),
-    );
-  }
+  app.use(express.static(siteDir, { index: 'index.html', setHeaders: cacheFor('public') }));
+  app.get('/', (req, res) =>
+    res.status(503).type('text').send('The website is not built. Run `npm run build` in backend/.'),
+  );
 
   // A browser asking for a page gets the site's 404 page; everything else (fetch, curl, the app) gets JSON.
   // Sent relative to its root: with an absolute path, sendFile refuses any dot folder on the way (.claude/...).
-  const hasNotFoundPage = existsSync(join(siteDir, '404.html'));
   app.use((req, res) => {
-    if (hasNotFoundPage && req.method === 'GET' && req.accepts(['json', 'html']) === 'html') {
+    if (req.method === 'GET' && req.accepts(['json', 'html']) === 'html' && existsSync(join(siteDir, '404.html'))) {
       return res.status(404).set('Cache-Control', 'no-cache').sendFile('404.html', { root: siteDir });
     }
     res.status(404).json({ ok: false, error: 'not found' });
@@ -173,16 +232,18 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
   return app;
 }
 
-// Hashed bundles cache for an hour, in the browser only (they sit behind the login); index.html is revalidated
-// every time, so a new deploy shows on the next load.
-function adminCache(res, path) {
-  res.setHeader('Cache-Control', path.endsWith('index.html') ? 'no-cache' : 'private, max-age=3600');
-}
-
-// The site's bundles carry a content hash in their names (main-ABCD1234.js), so a deploy changes the name and a
-// year of caching is safe. Pages are revalidated every time; the favicon and robots.txt for an hour.
+// Cache rules for every built folder. A name with a content hash (main-ABCD1234.js, the production build) never
+// changes, so it caches for a year. Pages, and scripts or styles without a hash (a development build), are revalidated
+// on every load, so a rebuild shows at once. Anything else (icons, robots.txt) for an hour. The admin's files are
+// `private`: kept by the browser, never by a shared cache.
 const HASHED = /-[A-Z0-9]{8}\.(?:js|css)$/;
-function siteCache(res, path) {
-  const value = path.endsWith('.html') ? 'no-cache' : HASHED.test(path) ? 'public, max-age=31536000, immutable' : 'public, max-age=3600';
-  res.setHeader('Cache-Control', value);
+function cacheFor(scope) {
+  return (res, path) => {
+    const value = HASHED.test(path)
+      ? `${scope}, max-age=31536000, immutable`
+      : /\.(?:html|js|css)$/.test(path)
+        ? 'no-cache'
+        : `${scope}, max-age=3600`;
+    res.setHeader('Cache-Control', value);
+  };
 }
