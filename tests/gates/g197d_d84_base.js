@@ -63,11 +63,12 @@
 //   baseline-version-aware, which was only half the fix: every release chain from V199 on
 //   carries a baseline >= 197, so E1h refused on every healthy run, forever. A FIXED
 //   historical claim needs a FIXED artifact, so E1h is now RE-POINTED at
-//   baselines/V196.html (the last release before D84) and no longer reads the moving
-//   release baseline at all. E1g keeps that baseline: 'Calves falls nowhere since the last
+//   V196 (the last release before D84), read from a pinned git commit since Post-V239,
+//   and no longer reads the moving release baseline at all. E1g keeps that baseline: 'Calves falls nowhere since the last
 //   release' is a regression guard and is SUPPOSED to move.
 //   The refusal MACHINERY stays and still blocks (gate.sh greps REFUSED): it now fires
-//   only when no pre-D84 artifact exists, which is a broken checkout and not a healthy
+//   only when V196 cannot be read from its pinned commit (no git, a checkout without the
+//   history, a hash mismatch), which is a broken checkout and not a healthy
 //   run. A no-op assertion is the vacuity defect this repo keeps paying for, so a claim
 //   that cannot be put is still named, counted and red — never quietly skipped.
 //   E5 capSessionBudget was pinned to the baseline under the premise that D84 touched no
@@ -108,17 +109,49 @@ if (WORKER) console.log = function () {};   // a worker writes counters, never a
 const BASE_HTML = POS[1] && fs.existsSync(POS[1]) ? POS[1] : null;
 
 // ── E1h's FIXED artifact. D84's footprint is a historical claim, so it is compared against
-// a pinned pre-D84 release and never against the moving release baseline. baselines/V196.html
-// is the committed copy of V196 (`git show V196:index.html`); it is preferred over extracting
-// the tag at gate time because a gate must not depend on a .git directory, on a tag that can
-// be moved, or on a subprocess per worker — and because this repo's rule is that when file and
-// tag disagree, the file wins. The parent resolves the path once and hands it to every worker,
-// so a worker never re-resolves and cannot disagree with its parent.
-const V196_PATH = path.join(__dirname, '..', '..', 'baselines', 'V196.html');
+// a pinned pre-D84 release and never against the moving release baseline. That release is
+// V196, read from git at a PINNED COMMIT (Post-V239: the committed copy this once read is
+// retired, and tags are the record). The reasons once given for a committed copy are answered
+// here. A commit hash cannot move the way a tag can. V196_SHA256 is the file's identity: bytes
+// that do not hash to it are not V196, whatever their meta says. The PARENT runs `git show`
+// once per process and hands every worker the path through --v196, so no worker runs git or
+// can disagree with its parent. And a checkout without the history (no git, no .git, a
+// shallow clone) gets null, so E1h and the three E5 rows REFUSE by name: never a silent pass,
+// never a fallback to another artifact. A run whose baseline IS V196 keeps reading that file.
+// The bytes go to a private mkdtemp directory under the basename V196.html (E1h's label
+// prints it). That directory has its own exit handler and is NOT tied to SCRATCH: done()
+// clears SCRATCH, and the workers and then E5 must all have read V196 first.
+const V196_COMMIT = '3f5d792d40b503bcfe123ddd9fb9f98e3541f6d4';
+const V196_SHA256 = 'f20b7c39583a3111b10a16024ef97aa675ca51d7c84f3d4b75f1f50dea599aca';
+var V196_DIR = '', V196_GIT, V196_WHY = 'not attempted';   // V196_GIT: undefined until the one attempt, then a path or null
+function v196Cleanup() { try { if (V196_DIR) fs.rmSync(V196_DIR, { recursive: true, force: true }); } catch (e) {} V196_DIR = ''; }
+process.on('exit', v196Cleanup);
+function v196FromGit() {
+  let stage = 'git show ' + V196_COMMIT.slice(0, 7) + ':index.html';
+  try {
+    const buf = cp.execFileSync('git', ['show', V196_COMMIT + ':index.html'],
+      { cwd: path.join(__dirname, '..', '..'), maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] });
+    stage = 'the ia-version check';
+    if (!isV196(buf.toString('utf8'))) { V196_WHY = 'the content does not read ia-version 196'; return null; }
+    const h = crypto.createHash('sha256').update(buf).digest('hex');
+    if (h !== V196_SHA256) { V196_WHY = 'sha256 ' + h.slice(0, 16) + ' is not V196'; return null; }
+    stage = 'writing the private V196.html';
+    V196_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'g197v196-'));
+    const f = path.join(V196_DIR, 'V196.html');
+    fs.writeFileSync(f, buf);
+    V196_WHY = '';
+    return f;
+  } catch (e) {
+    V196_WHY = stage + ' failed: '
+      + String((e && e.stderr && String(e.stderr).trim()) || (e && e.message) || e).split('\n')[0];
+    return null;
+  }
+}
 function resolveV196() {
+  if (WORKER) return V196_ARG && fs.existsSync(V196_ARG) ? V196_ARG : null;   // a worker never runs git
   if (BASE_HTML && isV196(fs.readFileSync(BASE_HTML, 'utf8'))) return BASE_HTML;
-  if (fs.existsSync(V196_PATH) && isV196(fs.readFileSync(V196_PATH, 'utf8'))) return V196_PATH;
-  return null;
+  V196_GIT = V196_GIT === undefined ? v196FromGit() : V196_GIT;   // once per process, a null included
+  return V196_GIT;
 }
 const V196_HTML = WORKER ? (V196_ARG && fs.existsSync(V196_ARG) ? V196_ARG : null)
                          : (BASE_HTML ? resolveV196() : null);
@@ -126,7 +159,7 @@ const V196_HTML = WORKER ? (V196_ARG && fs.existsSync(V196_ARG) ? V196_ARG : nul
 let pass = 0, fail = 0, refused = 0;
 // The number of assertions this file puts with NO baseline at all: E0 (the lattice
 // enumeration) and the three E5 behaviour digests (capSessionBudget, _itemCost, _setCount).
-// All four are answered by the candidate and the committed V196 corpus source alone.
+// All four are answered by the candidate and the pinned V196 corpus source alone.
 // done() enforces it as a floor; see the E0 note in the header.
 const NOBASE_MIN = 4;
 function ok(name, cond, detail) {
@@ -339,9 +372,9 @@ function afterSweep(bCells, bFell, bRose, bEg, rCells) {
          rCells > 0 && bRose > 0, rCells + ' cells compared, ' + bRose + ' rises');
     } else {
       refuse('E1h vs a fixed pre-D84 artifact: Calves rises somewhere',
-        'NOT RUN: no pre-D84 artifact to compare against. E1h needs baselines/V196.html '
-        + '(ia-version 196, the last release before D84); it is missing or carries another '
-        + 'version. Restore it with: git show V196:index.html > baselines/V196.html');
+        'NOT RUN: no pre-D84 artifact to compare against. E1h reads V196 (ia-version 196, the last '
+        + 'release before D84) from git commit ' + V196_COMMIT.slice(0, 7) + ' (sha256 '
+        + V196_SHA256.slice(0, 8) + '...); git show failed or the content did not match: ' + V196_WHY);
     }
   } else {
     console.log('   -- E1g/E1h not run: no baseline argv[3] (gate.sh passes one; sabotage.py does not)');
@@ -362,7 +395,7 @@ function afterSweep(bCells, bFell, bRose, bEg, rCells) {
 // a comment is not budget machinery. tests/sabotage/v198.json M7 is now a behavioural edit.
 //
 // THE CORPUS IS FROZEN. It is every day capSessionBudget is handed while the FIXED V196
-// artifact (baselines/V196.html, the committed file E1h already reads) builds the 144 configs
+// artifact (V196 at its pinned git commit, the same bytes E1h already reads) builds the 144 configs
 // of this gate's own lattice at rest sun+wed and seed 1013: every tier × goal × injury, with
 // focus and experience crossed (hypertrophy/beginner, balanced/advanced). It is captured from
 // V196 and NEVER from the candidate, on purpose: the candidate's days move with every DRAW
@@ -439,8 +472,9 @@ function afterSweep(bCells, bFell, bRose, bEg, rCells) {
       + (e5 ? ' (' + e5.n + ' days, ' + e5.moved + ' trimmed, ' + e5.items + ' items)' : '')
       + ' — nothing since ' + (row ? row.rule : '?') + ' has moved it (' + what + ')';
     if (!E5_SRC) {
-      refuse(label, 'NOT RUN: the corpus is captured from baselines/V196.html (ia-version 196) and it is '
-        + 'missing or carries another version. Restore it with: git show V196:index.html > baselines/V196.html');
+      refuse(label, 'NOT RUN: the corpus is captured from V196 (ia-version 196), read from git commit '
+        + V196_COMMIT.slice(0, 7) + ' (sha256 ' + V196_SHA256.slice(0, 8) + '...); git show failed or the '
+        + 'content did not match: ' + V196_WHY);
     } else if (!e5) {
       ok(label, false, 'corpus capture or replay threw: ' + e5err);
     } else {
