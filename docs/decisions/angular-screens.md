@@ -149,3 +149,24 @@ what is stored.
   the sheet in the photograph with the pace goal picked, then the switch held shut until a distance and a time are
   typed, the typed distance kept, and Keep closing the sheet.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.15 moves the mile pencil's two sheets
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.15.
+- **Moved:** `#mileOverlay` (its header and body) and `#mileLockBody`, in `src/app/screens/mile-sheet/`: `mile-sheet.ts`
+  (the edit sheet; it takes over `openMileSheet` through `LegacyBridge.provide`), `mile-lock.ts` (the lock's body),
+  `mile-sheet-state.ts` (the lock's facts, which the edit sheet lists at the tap and the lock draws before it opens) and
+  `mile-sheet-model.ts` (when a tap locks, what the lock lists, how a stored mile starts a field, the two texts, each
+  the legacy `openMileSheet`'s). The draft stays the legacy `_mileDraft`; saving is still the legacy
+  `commitMileChange`, which reads the two fields by their ids, and closing is still the legacy `closeMileSheet`. The
+  fields stay the same elements from open to open and each open writes the stored mile into them, as the legacy did:
+  a first draft drew them anew on each open, and a local comparison showed the page keeping a focused field's focus
+  across a close and reopen where the draft lost it.
+- **Tests:** `frontends/app/test/unit/mile-sheet.test.ts` (5: when the lock starts, the facts with a race date, race
+  day and behind you in the countdown's words with a date line that throws, the week alone, a stored field). The e2e's
+  1.5 mile test journey gains two steps on both builds: the pencil opens the sheet on the stored 7:30, a change kept
+  back is gone on reopening; then `relaunchOn` (new: the frozen clock moved to a later moment for a relaunch, through
+  the tab's sessionStorage, which the app never reads) brings the athlete back on the Wednesday of week 4, the re-entry
+  reminder is skipped, and the pencil shows the lock: 17 days out, Sat, Nov 14, 2026, week 4 of 6.
+  `tests/unit/e2e-flow.test.ts` holds the helper and the page script to one sessionStorage key.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

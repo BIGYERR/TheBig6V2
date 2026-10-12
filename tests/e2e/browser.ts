@@ -8,6 +8,11 @@ import type { Viewport } from './types.ts';
 /** The moment every run happens at: a Wednesday, so a rest day can be "today" (future rest days are inert). */
 export const FROZEN_NOW = '2026-10-07T07:30:00-04:00';
 export const TIMEZONE = 'America/New_York';
+/**
+ * The sessionStorage key a relaunch on a later day leaves its moment under (flow.ts, relaunchOn): a reload keeps it in the
+ * tab, and the app never reads sessionStorage. installDeterminism spells it out, since it runs in the page.
+ */
+export const LATER_NOW_KEY = 'e2e-now';
 export const VIEWPORT: Viewport = { width: 393, height: 852, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
 
 /** Requests the suite must never send. The bug form posts to Web3Forms; a test must not file a real report. */
@@ -20,7 +25,8 @@ const BENIGN_CONSOLE = [/apple-mobile-web-app-capable.*is deprecated/];
 /** Runs inside the page before any of its scripts, so it must not reference anything from this module. */
 function installDeterminism(frozenIso: string | null): void {
   if (frozenIso !== null) {
-    const fixed = new Date(frozenIso).getTime();
+    const later = Number(sessionStorage.getItem('e2e-now'));
+    const fixed = later || new Date(frozenIso).getTime();
     const RealDate = Date;
     class FrozenDate extends RealDate {
       constructor(...args: unknown[]) {

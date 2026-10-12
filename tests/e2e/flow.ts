@@ -3,6 +3,7 @@
 // A journey's steps run in order on one page, so state carries forward exactly as it does for a real user. Every
 // journey starts from empty storage in its own browser context, so no journey depends on another.
 import type { Page } from 'puppeteer';
+import { LATER_NOW_KEY } from './browser.ts';
 
 const PROGRAM_NAME = 'E2E Run';
 const SETTLE_MS = 150;
@@ -37,6 +38,8 @@ export interface Helpers {
   nameProgram(name: string): Promise<void>;
   /** Taps the wizard's last button and waits through the build to This Week, rest timer intro included. */
   generate(): Promise<void>;
+  /** Relaunches the app (storage kept) with the frozen clock moved to a later moment, as an athlete coming back days later. */
+  relaunchOn(iso: string): Promise<void>;
 }
 
 /** Values one step leaves for a later one (a sheet's id, found by tapping, then closed after the screenshot). */
@@ -199,6 +202,11 @@ export function helpers(page: Page): Helpers {
       await h.screen('screenGenerate');
       await h.screen('screenWeek');
       await h.restTimerSettled();
+    },
+    async relaunchOn(iso) {
+      await page.evaluate((key, ms) => sessionStorage.setItem(key, String(ms)), LATER_NOW_KEY, new Date(iso).getTime());
+      await page.reload({ waitUntil: 'networkidle0' });
+      if ((await page.evaluate(() => Date.now())) !== new Date(iso).getTime()) throw new Error(`the relaunch did not move the clock to ${iso}`);
     },
   };
   return h;
@@ -728,7 +736,81 @@ const TEST: readonly Step[] = [
       await t.closeSheet('detailOverlay');
     },
   },
+  {
+    id: 'test-mile',
+    page: 'Test: the mile pencil, its sheet from the stored 7:30, then a change kept back',
+    async run(t, page) {
+      // The sheet is an Angular component in the app since phase E's eighth step, the legacy markup in the single-file
+      // page: both answer the same. Week 1 of 6 is before the last three weeks, so the pencil opens the edit sheet.
+      await t.tap('#tabHome');
+      await t.screen('screenHome');
+      const card = '#progList .prog-card.active-prog';
+      await t.tap(`${card} .prog-tap`);
+      await t.tap(`${card} [aria-label="Change mile time"]`);
+      await t.overlayOpen('mileOverlay');
+      await t.expectText('#mileOverlay', 'YOUR MILE');
+      await t.expectText('#mileOverlay', 'Put in the mile you can run today.');
+      const fields = await mileFields(page);
+      if (fields !== '7:30') throw new Error(`the mile sheet opened on ${fields}, not the stored 7:30`);
+    },
+    async after(t, page) {
+      // A change kept back is gone the next time: each open starts from the stored mile.
+      await t.tap('#mileSheetMins');
+      await page.keyboard.down('Control');
+      await page.keyboard.press('a');
+      await page.keyboard.up('Control');
+      await page.keyboard.type('9');
+      if ((await mileFields(page)) !== '9:30') throw new Error(`the minutes field holds ${await mileFields(page)} after 9 was typed over it`);
+      await t.tap('#mileOverlay .prog-action-btn:not(#mileCommitBtn)');
+      if ((await t.openOverlays()).includes('mileOverlay')) throw new Error('the mile sheet stayed open after Keep');
+      await t.tap('#progList .prog-card.active-prog [aria-label="Change mile time"]');
+      await t.overlayOpen('mileOverlay');
+      const fields = await mileFields(page);
+      if (fields !== '7:30') throw new Error(`the mile sheet reopened on ${fields}, not the stored 7:30`);
+      await t.tap('#mileOverlay .back-btn');
+      if ((await t.openOverlays()).includes('mileOverlay')) throw new Error('the mile sheet stayed open after Back');
+    },
+  },
+  {
+    id: 'test-lock',
+    page: 'Test: three weeks later, the mile pencil holds the row',
+    async run(t, page) {
+      // The athlete comes back on the Wednesday of week 4 (the plan's first week began Mon Oct 5), inside the last three
+      // weeks, so the pencil shows the lock: 17 days to Sat Nov 14. The lock is a component in the app, legacy markup in
+      // the page. Three weeks away first earns the re-entry reminder for the last missed day, which the athlete skips.
+      await t.relaunchOn('2026-10-28T07:30:00-04:00');
+      await t.screen('screenWeek');
+      await t.expectText('#screenWeek', 'Week 4');
+      await t.overlayOpen('popOverlay');
+      await t.expectText('#popOverlay', 'More than a week off.');
+      await t.expectText('#popOverlay', 'Tuesday, Wk 4');
+      await t.tap('#popActions .pop-act.skip');
+      if ((await t.openOverlays()).includes('popOverlay')) throw new Error('the reminder stayed up after Skip');
+      await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
+      await t.restTimerSettled();
+      await t.tap('#tabHome');
+      await t.screen('screenHome');
+      const card = '#progList .prog-card.active-prog';
+      await t.tap(`${card} .prog-tap`);
+      await t.tap(`${card} [aria-label="Change mile time"]`);
+      await t.overlayOpen('mileLockOverlay');
+      await t.expectText('#mileLockBody', 'THE ROW HOLDS');
+      await t.expectText('#mileLockBody', 'Days out17');
+      await t.expectText('#mileLockBody', 'Race daySat, Nov 14, 2026');
+      await t.expectText('#mileLockBody', 'Week4 of 6');
+      await t.expectText('#mileLockBody', 'You are too close to the race.');
+    },
+    async after(t) {
+      await t.tap('#mileLockBody .prog-action-btn');
+      if ((await t.openOverlays()).includes('mileLockOverlay')) throw new Error('the lock stayed open after Got it');
+    },
+  },
 ];
+
+/** The mile sheet's two fields, as minutes:seconds. */
+function mileFields(page: Page): Promise<string> {
+  return page.evaluate(() => ['mileSheetMins', 'mileSheetSecs'].map((id) => (document.getElementById(id) as HTMLInputElement).value).join(':'));
+}
 
 /** Bodyweight only, a beginner over 55, then a knee injury applied: jumps leave the untrained days. */
 const BODYWEIGHT_KNEE: readonly Step[] = [

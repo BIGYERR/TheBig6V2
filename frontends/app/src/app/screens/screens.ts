@@ -6,6 +6,8 @@ import { ProgramList } from './program-list/program-list';
 import { SwapSheet } from './swap-sheet/swap-sheet';
 import { AddSheet } from './add-sheet/add-sheet';
 import { GoalSheet } from './goal-sheet/goal-sheet';
+import { MileLock } from './mile-sheet/mile-lock';
+import { MileSheet } from './mile-sheet/mile-sheet';
 
 /**
  * The screens and overlays architecture phase E has moved into Angular components, by the legacy element they take over. After the
@@ -21,4 +23,6 @@ export const MOVED_SCREENS: readonly (readonly [screenId: string, component: Typ
   ['swapOverlay', SwapSheet],
   ['addOverlay', AddSheet],
   ['goalBody', GoalSheet],
+  ['mileOverlay', MileSheet],
+  ['mileLockBody', MileLock],
 ];

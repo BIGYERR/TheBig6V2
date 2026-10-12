@@ -88,3 +88,13 @@ describe('e2e PAGE_JOURNEYS (the website and the admin)', () => {
     assert.equal(EXPECTED_STATUS('http://127.0.0.1:3000/favicon.ico', 404), false);
   });
 });
+
+describe('e2e relaunchOn', () => {
+  it('reads the later moment in the page under the key the helper writes it to', () => {
+    const src = readFileSync(join(REPO, 'tests', 'e2e', 'browser.ts'), 'utf8');
+    const key = /export const LATER_NOW_KEY = '([^']+)'/.exec(src)?.[1];
+    assert.ok(key, 'browser.ts names the key');
+    const install = src.slice(src.indexOf('function installDeterminism'));
+    assert.ok(install.includes(`sessionStorage.getItem('${key}')`), `installDeterminism reads sessionStorage '${key}'`);
+  });
+});

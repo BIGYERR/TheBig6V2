@@ -100,8 +100,8 @@ is a component (`src/app/screens/bug-report/`, v0.239.8), and so is the floating
 v0.239.9), which takes over the legacy functions other screens call through `LegacyBridge.provide`, and the celebration
 pop-up (`src/app/screens/pop-up/`, v0.239.10) the home screen's program list (`src/app/screens/program-list/`,
 v0.239.11) the exercise swap sheet (`src/app/screens/swap-sheet/`, v0.239.12), the add-an-exercise sheet
-(`src/app/screens/add-sheet/`, v0.239.13) and the change-a-goal sheet's body (`src/app/screens/goal-sheet/`,
-v0.239.14); every other screen is still the original code. `LegacyBridge` also offers `set` (write a legacy `let`) and `run` (a legacy handler's code). A screen's
+(`src/app/screens/add-sheet/`, v0.239.13), the change-a-goal sheet's body (`src/app/screens/goal-sheet/`,
+v0.239.14) and the mile pencil's edit sheet and lock (`src/app/screens/mile-sheet/`, v0.239.15); every other screen is still the original code. `LegacyBridge` also offers `set` (write a legacy `let`) and `run` (a legacy handler's code). A screen's
 logic sits apart from Angular in `<screen>-model.ts` and is tested by node --test (`test/unit/<screen>.test.ts`;
 `src/app/package.json` marks the app's TypeScript as ES modules for it). Moving a screen goes through the repo's normal
 build process. Each moved screen keeps the e2e

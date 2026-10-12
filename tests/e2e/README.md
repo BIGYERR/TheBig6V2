@@ -25,7 +25,7 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
    - **Admin** (`#A01` to `#A06`, 1440×900): two devices check in first, so every section has rows. Then the login,
      each section after signing in (Overview, Devices, Versions, Server, the list in `../../frontends/admin/admin.ts`, which
      a unit test holds the journey to), and the signed out screen after Log out.
-4. The runner takes five journeys (`e2e/flow.ts`, 49 steps) against both the Angular build and the original. Each
+4. The runner takes five journeys (`e2e/flow.ts`, 51 steps) against both the Angular build and the original. Each
    journey starts from empty storage in its own browser context, and a failed step stops only its own journey:
    - **Strength, commercial gym** (22 steps): the wizard, This Week, the rest-day sheet, a day's detail and its run
      log, the swap sheet and a pick from it, the add-an-exercise sheet and a pick from it, Random Workout, Hurt?, Traveling?, Progress, Bugs, the rest timer (open, start, stop, reset,
@@ -33,7 +33,9 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
      sheet (a pace goal picked, its targets typed, then kept), then a relaunch.
    - **10K race, Sun Nov 29** (9): a race goal with a race date, the program length box, the week 1 long run, then
      race week's Saturday shakeout and race day (the Nike plan).
-   - **1.5 mile test, Sat Nov 14** (6): a dated pace test, the program length box, and the test day in week 6 (NSW).
+   - **1.5 mile test, Sat Nov 14** (8): a dated pace test, the program length box, the test day in week 6 (NSW),
+     the mile pencil (its sheet from the stored 7:30, a change kept back, the stored mile again on reopening), then a
+     relaunch three weeks later, where the pencil shows the lock instead (`relaunchOn` moves the frozen clock).
    - **Bodyweight, then a knee injury** (6): a beginner over 55 with no equipment, Friday before the injury (it holds
      a jump), Hurt? with the knee chosen, the injury week, and Friday after (no jumps).
    - **Log a session and relaunch** (6): log two exercises, the effort and a note, close the day out (the workout
@@ -67,7 +69,8 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
 Determinism (the app journeys; the website and admin keep the real clock, since the admin compares times with a live
 server, and ask for reduced motion, so the site shows every section without scrolling it into view):
 - iPhone viewport, 393×852 @2x;
-- the clock frozen at Wed 2026-10-07 07:30 New York (a rest day, so the rest sheet is reachable);
+- the clock frozen at Wed 2026-10-07 07:30 New York (a rest day, so the rest sheet is reachable), unless a step
+  relaunches the app on a later moment (`relaunchOn`, which leaves it in the tab's sessionStorage for the reload);
 - seeded `Math.random`, animations off;
 - web fonts and layout settled before each screenshot;
 - Chrome flags for repeatable pixels (fixed sRGB colour, no LCD text, every compositor stage run before a capture),
