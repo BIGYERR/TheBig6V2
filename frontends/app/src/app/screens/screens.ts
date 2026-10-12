@@ -2,6 +2,7 @@ import type { Type } from '@angular/core';
 import { BugReport } from './bug-report/bug-report';
 import { RestTimer } from './rest-timer/rest-timer';
 import { PopUp } from './pop-up/pop-up';
+import { RandomWorkout } from './random-workout/random-workout';
 import { ProgramList } from './program-list/program-list';
 import { SwapSheet } from './swap-sheet/swap-sheet';
 import { AddSheet } from './add-sheet/add-sheet';
@@ -31,4 +32,5 @@ export const MOVED_SCREENS: readonly (readonly [screenId: string, component: Typ
   ['swapNudgeOverlay', SwapNudge],
   ['rpeInfoOverlay', RpeInfo],
   ['changeBody', ChangeSheet],
+  ['randOverlay', RandomWorkout],
 ];

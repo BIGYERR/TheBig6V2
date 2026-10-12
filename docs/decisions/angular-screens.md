@@ -214,3 +214,25 @@ what is stored.
   v0.239.16's finding firing on either side of the shutter.
 - **Found, for a ruling (handoff §12):** the injury check-in line asks how "the lower" feels for a lower back.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.18 moves Random Workout
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.18.
+- **Moved:** `#randOverlay` (its header and body): `src/app/screens/random-workout/random-workout.ts` (the Back
+  button, the two filters, the two-tap reset, the badge, title, cardio block, note and the done line or Complete
+  button) and `random-workout-model.ts` (the pool for a goal and filter, the draw that never repeats the last workout,
+  the weekday key, the sheet for a workout, This Week's counter, each the legacy `getActivePool`, `reroll` and
+  `updateRandCounter`'s). It takes over `openRandom` and `updateRandCounter` (This Week calls it too) through
+  `LegacyBridge.provide`; the filter and the pending reset are the component's now (nothing else read the legacy
+  `randFilter` or `resetPending`). The draw keeps the legacy order of `Math.random` calls and still records itself
+  through `_setLastRandIdx`, `_setCurrentRandIdx` and `_setCurrentRandDayKey`. The pools, the done list
+  (`getWildcardDone`, `saveWildcardDone`), the sections (`buildSectionsHTML`, laid in a box with `display: contents`
+  so the sheet's flex column and gap see each section as before), completing (`completeWildcard`) and closing
+  (`closeRandom`) stay legacy.
+- **Tests:** `frontends/app/test/unit/random-workout.test.ts` (5: the pools, the draw, the weekday key, the sheet, the
+  counter). The e2e's random-workout step becomes three on both builds: My Goal; See All (then back to My Goal, a
+  Wildcard completed, the sheet closed, the Wildcard pop-up dismissed and This Week's counter at one); the reset's
+  "Tap again" (then the second tap: the button back, the toast, the counter at none). `closeSheet` also finds a
+  `.back-btn`, the Back button the component draws without the legacy `onclick`.
+- **Found, suspected (handoff §12):** the Wildcard's exercise controls index into the active day's sections.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

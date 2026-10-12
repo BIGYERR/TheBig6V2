@@ -103,7 +103,8 @@ v0.239.11) the exercise swap sheet (`src/app/screens/swap-sheet/`, v0.239.12), t
 (`src/app/screens/add-sheet/`, v0.239.13), the change-a-goal sheet's body (`src/app/screens/goal-sheet/`,
 v0.239.14), the mile pencil's edit sheet and lock (`src/app/screens/mile-sheet/`, v0.239.15), and the swap nudge and
 the RPE card (`src/app/screens/swap-nudge/`, `src/app/screens/rpe-info/`, v0.239.16), and the injury and travel
-sheet's body (`src/app/screens/change-sheet/`, v0.239.17); every other screen is still the original code. `LegacyBridge` also offers `set` (write a legacy `let`) and `run` (a legacy handler's code). A screen's
+sheet's body (`src/app/screens/change-sheet/`, v0.239.17), and Random Workout (`src/app/screens/random-workout/`,
+v0.239.18); every other screen is still the original code. `LegacyBridge` also offers `set` (write a legacy `let`) and `run` (a legacy handler's code). A screen's
 logic sits apart from Angular in `<screen>-model.ts` and is tested by node --test (`test/unit/<screen>.test.ts`;
 `src/app/package.json` marks the app's TypeScript as ES modules for it). Moving a screen goes through the repo's normal
 build process. Each moved screen keeps the e2e

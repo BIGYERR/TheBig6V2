@@ -115,7 +115,7 @@ export function helpers(page: Page): Helpers {
     },
     async closeSheet(id) {
       const closer = await page.$(
-        `#${id} .dh-back, #${id} [onclick^="close"], #${id} [onclick*="Close"], #${id} [onclick*="close"]`,
+        `#${id} .dh-back, #${id} .back-btn, #${id} [onclick^="close"], #${id} [onclick*="Close"], #${id} [onclick*="close"]`,
       );
       if (!closer) throw new Error(`#${id} has no back or close control`);
       await closer.click();
@@ -433,10 +433,52 @@ const STRENGTH: readonly Step[] = [
     id: 'random-workout',
     page: 'Random workout',
     async run(t) {
+      // The sheet is an Angular component in the app since phase E's eleventh step, the legacy markup in the page: both
+      // draw the same workout from the same seeded Math.random.
       await t.tap('.random-btn');
       await t.overlayOpen('randOverlay');
+      await t.expectText('#randFilterBar .rand-filter-btn.active', 'My Goal');
+      await t.expectText('#randBody .rand-badge', 'Wildcard');
     },
-    async after(t) {
+  },
+  {
+    id: 'random-see-all',
+    page: 'Random workout: every pool',
+    async run(t) {
+      await t.tap('#randFilterBar .rand-filter-btn:nth-child(2)');
+      await t.expectText('#randFilterBar .rand-filter-btn.active', 'See All');
+      if (!(await t.text('#randBody .rand-title'))) throw new Error('See All drew no workout');
+    },
+    async after(t, page) {
+      // Back on the goal's own pool, completing the draw logs it: the sheet closes, the Wildcard pop-up comes up, and
+      // This Week's counter counts it.
+      await t.tap('#randFilterBar .rand-filter-btn:nth-child(1)');
+      await t.expectText('#randFilterBar .rand-filter-btn.active', 'My Goal');
+      await t.tap('#randBody .wildcard-complete-btn');
+      if ((await t.openOverlays()).includes('randOverlay')) throw new Error('the sheet stayed open after Complete');
+      await t.overlayOpen('popOverlay');
+      await t.expectText('#popKicker', 'WILDCARD DONE');
+      await t.tap('#popActions .pop-act.go');
+      await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
+      await t.expectMatch('#randCounter', /^1\/\d+$/);
+    },
+  },
+  {
+    id: 'random-reset',
+    page: 'Random workout: the counter reset, asked twice',
+    async run(t) {
+      await t.tap('.random-btn');
+      await t.overlayOpen('randOverlay');
+      await t.tap('#resetRandBtn');
+      await t.expectText('#resetRandBtn', 'Tap again');
+    },
+    async after(t, page) {
+      // The second tap empties the done list: the counter is back to none, and the button to itself.
+      await t.tap('#resetRandBtn');
+      await t.expectText('#resetRandBtn', '↺ Reset');
+      await t.expectText('#toast', 'Wildcard counter reset ✓');
+      await t.expectMatch('#randCounter', /^0\/\d+$/);
+      await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
       await t.closeSheet('randOverlay');
     },
   },
