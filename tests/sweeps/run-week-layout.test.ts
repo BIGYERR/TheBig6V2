@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Run week layout, every lattice whole: the claims tests/integration/run-week-layout.test.js runs on one seed and a
 // sample, here on every seed and every config the rulings were measured on (D125, D130, D132, D113a, D146). CI runs
 // it, the 60-second check does not.
@@ -7,10 +7,10 @@
 // (11), and the day by day sport layout of every multi-sport week under the four excluded injury modes (348 pace and
 // 232 NRC cells). Both were checked once against the build the rulings named as their oracle (V212, 169537c): the
 // names are a subset of V212's on the same lattice and every layout equals V212's.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { matchSnapshot } = require('../support/snapshot.js');
-const R = require('../support/run-week-layout.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { matchSnapshot } from '../support/snapshot.ts';
+import * as R from '../support/run-week-layout.ts';
 const { DAYS } = R;
 
 const CAL64 = R.calendars([0, 1, 2, 3]);

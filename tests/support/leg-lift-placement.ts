@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Helpers for the leg lift placement tests: tests/integration/leg-lift-placement.test.js runs each claim on one seed
 // and a sample, tests/sweeps/leg-lift-placement.test.js runs the lattices whole. Built on tests/support/run-week-layout.js
 // (the app booted with its clock pinned, the week, the pace config, the card readers).
@@ -10,9 +10,9 @@
 //   the run week's shape is read from the built cards by their printed names (handShape);
 //   the notes the placement prints are typed as the rulings wrote them;
 //   T-1 and T-2 of a dated test are found by date arithmetic.
-const R = require('./run-week-layout.js');
+import * as R from './run-week-layout.ts';
 const { DAYS, ISO, clone, build, weeksOf, cards, SI, LI, LSD } = R;
-const { fixtures } = require('./app.js');
+import { fixtures } from './app.ts';
 // ── the lift placement around the run week (D36, D127, D104a) ─────────────────────────────────────────────────────
 /** The day titles, by role, in both label sets. */
 const ROLE_OF = {
@@ -287,7 +287,7 @@ function liftFreeTally(k) {
   return { free, withLift, bad };
 }
 
-module.exports = {
+export {
   ROLE_OF, isoPrev, isoNext, handCost, handShape, D36_NOTE, BASE_NOTE, STEADY_DEAD, TIER48, onTier48, isBaseNote,
   LOWER_MAIN, mainLift, lowerDay, labelLong, keyLong, eveOf, runBaseLattice, readRunBase,
   PACE_TEST, MILE_TEST, datedTestCfg, testEveCells, shortDatedLattice, liftDay, hasLift,

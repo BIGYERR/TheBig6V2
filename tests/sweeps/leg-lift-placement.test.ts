@@ -1,11 +1,10 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Leg lift placement, every lattice whole: the claims tests/integration/leg-lift-placement.test.js runs on one seed and a
 // sample (D36, D127, D104a), here on every seed and every config the rulings were measured on. CI runs it, the
 // 60-second check does not.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const L = require('../support/leg-lift-placement.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import * as L from '../support/leg-lift-placement.ts';
 test('the pace family on 64 calendars by two seeds (1,408 weeks): no leg role on the long run or its eve at any training-day count, every first-week placement cost-minimal, a speed day in every shaped week', () => {
   const T = L.paceEveTally([1001, 2002]);
   assert.deepEqual(Object.keys(T.byDays).map(n => [n, T.byDays[n].weeks, T.byDays[n].eve]), [['4', 770, 0], ['5', 462, 0], ['6', 154, 0], ['7', 22, 0]]);

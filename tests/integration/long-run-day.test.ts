@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The long-run day: what the lifting looks like on the day that carries the week's long run. Rulings:
 //   D18, D140  the run is the day, by time on feet: 75 minutes and up is post-run mobility only (tier A); 45 to 75 is
 //              upper body and trunk, no hinge, leg or plyo item, no power, explosive or carry section, 8 working sets
@@ -15,12 +15,11 @@
 // The tiers, the hinge list, the set count and the stand-in's grid are typed in tests/support/long-run-day.js and
 // below. This file runs the hand fixtures and a sample of each lattice; tests/sweeps/long-run-day.test.js runs the
 // lattices whole (D140's 672 programs; D153's 8,040; D156's further 1,200).
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { progDigest } = require('../support/app.js');
-const R = require('../support/run-week-layout.js');
-const T = require('../support/long-run-day.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { progDigest } from '../support/app.ts';
+import * as R from '../support/run-week-layout.ts';
+import * as T from '../support/long-run-day.ts';
 let STAND_P = null;
 const stand = () => STAND_P || (STAND_P = R.build(T.STAND));
 

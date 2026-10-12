@@ -1,10 +1,9 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The long-run day, every lattice whole: the claims tests/integration/long-run-day.test.js runs on a sample (D140, D153,
 // D155, D156), here on every config the rulings were measured on. CI runs it, the 60-second check does not.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const T = require('../support/long-run-day.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import * as T from '../support/long-run-day.ts';
 test("D140's lattice whole (672 programs): every tier and both limbs populated; tier A mobility only and titled; tier B no leg item, no power, explosive or carry section, no power core pillar, 8 sets or fewer; no carry on any tier", () => {
   const X = T.tierTally(1);
   assert.equal(X.progs, 672);

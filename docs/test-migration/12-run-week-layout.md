@@ -12,22 +12,22 @@ the stand-in's grid, the notes, the V115 crossover, the 14 and the 7 named calen
 
 New files:
 
-- `tests/integration/run-week-layout.test.js` (41 tests, 3.2 to 5.1 s at load averages of 30 to 40): the run day chooser lifted
+- `tests/integration/run-week-layout.test.ts` (41 tests, 3.2 to 5.1 s at load averages of 30 to 40): the run day chooser lifted
   out of the app and scored against an exhaustive search on every routed row (it builds nothing), the source pins,
   the four-run ceiling and the built week on one seed of the 64 calendars, the walking week, the three-run pace week,
   and samples of the D113a and D146 lattices.
-- `tests/integration/leg-lift-placement.test.js` (12 tests, 1.5 to 1.9 s): where the hinge and squat days go around
+- `tests/integration/leg-lift-placement.test.ts` (12 tests, 1.5 to 1.9 s): where the hinge and squat days go around
   the run week: the pace family by the D36 table, run_base by its own run week, the test eve, the lift-free note.
-- `tests/integration/long-run-day.test.js` (12 tests, 2.3 to 3.6 s): the stand-in's grid, the carry
+- `tests/integration/long-run-day.test.ts` (12 tests, 2.3 to 3.6 s): the stand-in's grid, the carry
   case, the hinge list, and samples of the D140, D153 and D156 lattices.
-- `tests/sweeps/run-week-layout.test.js` (12 tests, 45 to 58 s, CI only), `tests/sweeps/leg-lift-placement.test.js`
-  (5 tests, 11 to 14 s), `tests/sweeps/long-run-day.test.js` (5 tests, 54 to 75 s): every lattice whole, every seed.
+- `tests/sweeps/run-week-layout.test.ts` (12 tests, 45 to 58 s, CI only), `tests/sweeps/leg-lift-placement.test.ts`
+  (5 tests, 11 to 14 s), `tests/sweeps/long-run-day.test.ts` (5 tests, 54 to 75 s): every lattice whole, every seed.
 - `tests/snapshots/run-week-layout.json`: the current golden values the sweep compares: the 11 NRC run card names the
   D146 lattice prints, and the day by day sport layout of every multi-sport week under the four excluded injury modes
   (348 pace cells, 232 NRC cells). Both were checked once, on 2026-10-11, against the build the D113a and D146 rulings
   named as their oracle, V212 (`169537c`): the 11 names are the set V212 prints on the same lattice, and 580 of 580
   layouts equal V212's.
-- `tests/support/run-week-layout.js`, `tests/support/leg-lift-placement.js`, `tests/support/long-run-day.js`: the
+- `tests/support/run-week-layout.ts`, `tests/support/leg-lift-placement.ts`, `tests/support/long-run-day.ts`: the
   app booted once with its clock pinned (2026-10-11 12:00 local, as `program-output.test.js` pins it), the source
   surgery that lifts the chooser, the hand oracles, the configs and lattices, the tallies the integration files and the
   sweeps share.
@@ -50,7 +50,7 @@ and "sweep" means the same feature's file in `tests/sweeps/`.
 
 | Row | Held by |
 |---|---|
-| `E1` | `tests/integration/run-week-layout.test.js` › "every NSW run card names its quality the way its dose key does: Short Interval (SI) is int, Long Interval (LI) is chi"; sweep › "64 calendars on three seeds, every week: 6,336 hard run pairs and none untolerated; a tolerated pair only on the 14, and every run card names its key" |
+| `E1` | `tests/integration/run-week-layout.test.ts` › "every NSW run card names its quality the way its dose key does: Short Interval (SI) is int, Long Interval (LI) is chi"; sweep › "64 calendars on three seeds, every week: 6,336 hard run pairs and none untolerated; a tolerated pair only on the 14, and every run card names its key" |
 | `P0` | › "the pace family runs up to four days a week; a walking week or a second sport holds it at three; run_base and NRC keep four"; › "the source: the pace ceiling drops to three only on an untolerated pick, and the rank key is the ruled order, split on the pace family only" |
 | `P1` | › "the pace family runs up to four days a week; a walking week or a second sport holds it at three; run_base and NRC keep four" (the literal inside `SPORT_CEILINGS`, and `sportDayTargets` dealing four) |
 | `P2` | › "four runs ship exactly where an exhaustive search reaches zero untolerated pairs at four: all 64 calendars (35, 21, 7, 1 by training days)" |
@@ -74,7 +74,7 @@ and "sweep" means the same feature's file in `tests/sweeps/`.
 
 | Row | Held by |
 |---|---|
-| `E1` | `tests/integration/run-week-layout.test.js` › "every NSW run card names its quality the way its dose key does: Short Interval (SI) is int, Long Interval (LI) is chi"; sweep › "64 calendars on three seeds, every week: 6,336 hard run pairs and none untolerated; a tolerated pair only on the 14, and every run card names its key" |
+| `E1` | `tests/integration/run-week-layout.test.ts` › "every NSW run card names its quality the way its dose key does: Short Interval (SI) is int, Long Interval (LI) is chi"; sweep › "64 calendars on three seeds, every week: 6,336 hard run pairs and none untolerated; a tolerated pair only on the 14, and every run card names its key" |
 | `P0` | › "the source: PACE_GOALS is the three pace ids, the pace gate takes the whole week and NRC stays strictly below it, and every other goal keeps the even spread" |
 | `P0b` | › "the run day chooser and its session tables lift out of the app and run alone"; › "the NSW run table is Table 7 as the pace family deals it, and the NRC table is one speed day for the marathon, two for every other plan" |
 | `P1` | › "every routed pace layout is a maximum of the full ruled objective, over every subset and every order of its types". The gate's 157 rows (zero to three rest days, ceilings 2 to 4 below the week) are among the test's 283 (zero to five rest days, ceilings at or below the week), scored on all ten ranks, which order every layout the gate's six did |
@@ -102,7 +102,7 @@ and "sweep" means the same feature's file in `tests/sweeps/`.
 
 | Row | Held by |
 |---|---|
-| `P0` | `tests/integration/run-week-layout.test.js` › "the source: the pace ceiling drops to three only on an untolerated pick, and the rank key is the ruled order, split on the pace family only" (the rank key ends identity, spread, rest into the long run, earliest quality; identity reads `_evenKey`) |
+| `P0` | `tests/integration/run-week-layout.test.ts` › "the source: the pace ceiling drops to three only on an untolerated pick, and the rank key is the ruled order, split on the pace family only" (the rank key ends identity, spread, rest into the long run, earliest quality; identity reads `_evenKey`) |
 | `P0b` | › "the run day chooser and its session tables lift out of the app and run alone" |
 | `P1` | › "every routed pace layout is a maximum of the full ruled objective, over every subset and every order of its types" (the gate's 93 rows are among its 283) |
 | `P1b` | › "the day after the long run is never credited as padding it: no pick keeps a day-after easy run over a true eve" |
@@ -131,7 +131,7 @@ holds that the app still deals that row where the pace flag is off.
 
 | Row | Held by |
 |---|---|
-| `D0` | `tests/integration/run-week-layout.test.js` › "the NSW run table is Table 7 as the pace family deals it, and the NRC table is one speed day for the marathon, two for every other plan" |
+| `D0` | `tests/integration/run-week-layout.test.ts` › "the NSW run table is Table 7 as the pace family deals it, and the NRC table is one speed day for the marathon, two for every other plan" |
 | `D1` | › "at four runs on all 64 calendars: no untolerated pair; the 14 pay exactly one tolerated CHI eve, the 50 none and equal the unsplit winner; four of the 14 move the long run off the last day, as ruled" |
 | `D2` | the same test |
 | `D3` | the same test (the pick is the first maximum of the split objective), and › "every routed pace layout is a maximum of the full ruled objective, over every subset and every order of its types" |
@@ -153,14 +153,14 @@ holds that the app still deals that row where the pace flag is off.
 | `D12d` | the same two tests (1,386 weeks on nine seeds; on seed 1001 each of the 14 on all 11 weeks) |
 | `D12e` | the same two tests |
 | `D12f` | the same two tests |
-| `D12g` | the same sweep test; `tests/integration/leg-lift-placement.test.js` › "no leg role lands on the long run's eve at four, five, six or seven training days, nor on the long run itself, in a lattice where a hit was possible in more than 200 weeks" (the same config, seed 1001) |
+| `D12g` | the same sweep test; `tests/integration/leg-lift-placement.test.ts` › "no leg role lands on the long run's eve at four, five, six or seven training days, nor on the long run itself, in a lattice where a hit was possible in more than 200 weeks" (the same config, seed 1001) |
 | `E1` | › "every NSW run card names its quality the way its dose key does: Short Interval (SI) is int, Long Interval (LI) is chi"; the same sweep test |
 
 ## `g205_d132_walkweek.js` (10 rows: 10 mapped)
 
 | Row | Held by |
 |---|---|
-| `E1` | `tests/integration/run-week-layout.test.js` › "a pace week with four cardio sessions always carries an INT and a CHI card; a walking week keeps three, a quality week four; every run card names its key"; sweep › "the walking week, 64 calendars by 4 injury states by 2 seeds (512 programs): four sessions always carry INT and CHI; a walking week keeps three, a quality week four; every run card names its key" |
+| `E1` | `tests/integration/run-week-layout.test.ts` › "a pace week with four cardio sessions always carries an INT and a CHI card; a walking week keeps three, a quality week four; every run card names its key"; sweep › "the walking week, 64 calendars by 4 injury states by 2 seeds (512 programs): four sessions always carry INT and CHI; a walking week keeps three, a quality week four; every run card names its key" |
 | `W0` | › "the source: the walking-week ceiling names both walking modes and is joined to the solo pace family" |
 | `W1` | the same test; › "the pace family runs up to four days a week; a walking week or a second sport holds it at three; run_base and NRC keep four" |
 | `W2` | › "a pace week with four cardio sessions always carries an INT and a CHI card; a walking week keeps three, a quality week four; every run card names its key" (8 calendars by 4 injury states, one seed: 32 programs); the sweep test above (512 programs) |
@@ -176,7 +176,7 @@ holds that the app still deals that row where the pace flag is off.
 | Row | Held by |
 |---|---|
 | `L:5e76685c` (`P-ERA`) | DROPPED: era-row existence (a `RUN_LABEL_BY_VERSION` row covers the version). The current row's names, Short Interval (SI) and Long Interval (LI), are what the hand shape reads, and the run week tests hold them to the dose key |
-| `P0` | `tests/integration/leg-lift-placement.test.js` › "the source: the pace family predicate is declared once with its three ids, isNRC is set in one place, the speed arm names INT and CHI, one shape feeds the placement and the region guard" |
+| `P0` | `tests/integration/leg-lift-placement.test.ts` › "the source: the pace family predicate is declared once with its three ids, isNRC is set in one place, the speed arm names INT and CHI, one shape feeds the placement and the region guard" |
 | `P14` | › "no leg role lands on the long run's eve at four, five, six or seven training days, nor on the long run itself, in a lattice where a hit was possible in more than 200 weeks" (seed 1001: 385, 231, 77, 11 weeks); sweep › "the pace family on 64 calendars by two seeds (1,408 weeks): no leg role on the long run or its eve at any training-day count, every first-week placement cost-minimal, a speed day in every shaped week" |
 | `P15` | the same two tests |
 | `P16` | the same two tests |
@@ -204,7 +204,7 @@ holds that the app still deals that row where the pace flag is off.
 | Row | Held by |
 |---|---|
 | `M1` | DROPPED: the HALF_MANNY digest against `MANNY_DIGEST_BY_VERSION`, held by `tests/integration/program-output.test.js` |
-| `R0` | `tests/integration/leg-lift-placement.test.js` › "the run_base lattice, every twentieth config: every class reached, the label and the key name the same long run, no lower body Main on a long run or its eve, and the notes" (78 programs); sweep › "the run_base lattice whole (1,560 programs): every class reached, label and key agree on every card, no lower body Main on a long run or its eve, the notes, and no steady run note" |
+| `R0` | `tests/integration/leg-lift-placement.test.ts` › "the run_base lattice, every twentieth config: every class reached, the label and the key name the same long run, no lower body Main on a long run or its eve, and the notes" (78 programs); sweep › "the run_base lattice whole (1,560 programs): every class reached, label and key agree on every card, no lower body Main on a long run or its eve, the notes, and no steady run note" |
 | `R0b` | the same two tests |
 | `R1` | the same two tests (the `R1i` line the gate printed was unasserted and is not a row) |
 | `R2` | the same two tests; › "run_base places by its run week: a long-keyed run prints the run_base note, never the D36 note; no long-keyed run keeps the 48 hour rule" |
@@ -218,7 +218,7 @@ holds that the app still deals that row where the pace flag is off.
 
 | Row | Held by |
 |---|---|
-| `A1` | `tests/integration/long-run-day.test.js` › "D140's lattice, every eighth program: tier A is post-run mobility titled so; tier B has no leg item, no power, explosive or carry section, no power core pillar and 8 sets or fewer; no tier carries a carry" (84 programs); sweep › "D140's lattice whole (672 programs): every tier and both limbs populated; tier A mobility only and titled; tier B no leg item, no power, explosive or carry section, no power core pillar, 8 sets or fewer; no carry on any tier" |
+| `A1` | `tests/integration/long-run-day.test.ts` › "D140's lattice, every eighth program: tier A is post-run mobility titled so; tier B has no leg item, no power, explosive or carry section, no power core pillar and 8 sets or fewer; no tier carries a carry" (84 programs); sweep › "D140's lattice whole (672 programs): every tier and both limbs populated; tier A mobility only and titled; tier B no leg item, no power, explosive or carry section, no power core pillar, 8 sets or fewer; no carry on any tier" |
 | `A2` | the same two tests |
 | `B1` | the same two tests |
 | `B2` | the same two tests |
@@ -244,7 +244,7 @@ slice, where D155's days live) and in the sweep whole.
 
 | Row | Held by |
 |---|---|
-| `D153` (7 lines) | `tests/integration/long-run-day.test.js` › "D153's population, every fourth config (where Cable pull-through once printed on a tier B day): no hinge, no empty tier B day, the Upper superset kept"; sweep › "D153's population, 240 configs (where Cable pull-through once printed on a tier B day): no hinge, no empty tier B day, the Upper superset kept" |
+| `D153` (7 lines) | `tests/integration/long-run-day.test.ts` › "D153's population, every fourth config (where Cable pull-through once printed on a tier B day): no hinge, no empty tier B day, the Upper superset kept"; sweep › "D153's population, 240 configs (where Cable pull-through once printed on a tier B day): no hinge, no empty tier B day, the Upper superset kept" |
 | `L:ab0ccea2` (NRC builds) | › "NRC, every hundredth config of 4,200 and every fourteenth of its loaded full-body slice: no tier B long-run day without lifting or with a hinge, 8 sets at most, and the recovery-week loaded full-body day keeps its Upper superset"; sweep › "NRC, 4,200 configs: no tier B long-run day without lifting or with a hinge, 8 sets at most, and the recovery-week loaded full-body day keeps its Upper superset" |
 | `L:d3a84235` (NRC `G1v`) | the same two tests |
 | `L:dfbd23ad` (NRC `G1`) | the same two tests |
@@ -298,7 +298,7 @@ route, so the pinned layouts can fail.
 
 | Row | Held by |
 |---|---|
-| `L:40a94f55` (HF 35 three-day calendars) | `tests/integration/run-week-layout.test.js` › "the hand oracles: 35 three-day calendars, 7 spacer calendars, the D130 pairs, the V115 crossover, the card classes" |
+| `L:40a94f55` (HF 35 three-day calendars) | `tests/integration/run-week-layout.test.ts` › "the hand oracles: 35 three-day calendars, 7 spacer calendars, the D130 pairs, the V115 crossover, the card classes" |
 | `L:ae348b05` (HF the spacer set is the 7 typed) | the same test |
 | `L:216264b4` (HF CHI on the eve tolerated) | the same test |
 | `L:1895f2ef` (HF INT on the eve untolerated) | the same test |
@@ -326,7 +326,7 @@ route, so the pinned layouts can fail.
 
 | Row | Held by |
 |---|---|
-| `F1` (3 lines: NSW, NSW+seeds, NSW multi) | `tests/integration/long-run-day.test.js` › "NSW, every fiftieth config of 3,600: no tier B long-run day without lifting or with a hinge, 8 sets at most, the Upper superset kept, and no Arms or Delts finisher on a long day"; › "the loaded full-body slice on two more seeds and with a bike or a swim: no Arms or Delts finisher on a long day, and every tier B long day lifts, at 8 sets or fewer"; sweep › "NSW, 3,600 configs: the same, and no Arms or Delts finisher on a long day"; › "the loaded full-body slice on two more seeds (960) and with a bike or a swim (240): no Arms or Delts finisher on a long day, and every tier B long day lifts, at 8 sets or fewer" |
+| `F1` (3 lines: NSW, NSW+seeds, NSW multi) | `tests/integration/long-run-day.test.ts` › "NSW, every fiftieth config of 3,600: no tier B long-run day without lifting or with a hinge, 8 sets at most, the Upper superset kept, and no Arms or Delts finisher on a long day"; › "the loaded full-body slice on two more seeds and with a bike or a swim: no Arms or Delts finisher on a long day, and every tier B long day lifts, at 8 sets or fewer"; sweep › "NSW, 3,600 configs: the same, and no Arms or Delts finisher on a long day"; › "the loaded full-body slice on two more seeds (960) and with a bike or a swim (240): no Arms or Delts finisher on a long day, and every tier B long day lifts, at 8 sets or fewer" |
 | `G1` | the same four tests. The gate counted any section not labelled mobility or taper as lifting; the tests apply D155's stricter reading (a lift section with items, not core, hip, mobility or taper), which holds on all three lattices |
 | `G2` | the same four tests |
 | `L:793e1c6e` (`HM`) | DROPPED: the HALF_MANNY digest against `MANNY_DIGEST_BY_VERSION`, held by `tests/integration/program-output.test.js` |

@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Run week layout: which training days carry a run, and which run each one is. Rulings:
 //   D125 (amended)  the NSW pace family (run_pace_goal, run_mile_time, run_15_under10) takes up to four runs, laid out
 //                   by the spacing-aware run day chooser; its long run is a preference, not a pin;
@@ -20,12 +20,12 @@
 // file. Built programs are read by content (the dose key, the printed name, legLoad). This file runs the chooser on
 // every routed row (it builds nothing) and the built-week claims on one seed of each lattice;
 // tests/sweeps/run-week-layout.test.js builds every seed and every lattice whole.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const { progDigest } = require('../support/app.js');
-const R = require('../support/run-week-layout.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { progDigest } from '../support/app.ts';
+import * as R from '../support/run-week-layout.ts';
 const { DAYS, TP, TN, layouts, topBy, cmp, findPick, pickLayout, layoutOf } = R;
 
 const SNAPSHOT = path.join(__dirname, '..', 'snapshots', 'run-week-layout.json');

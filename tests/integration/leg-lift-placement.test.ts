@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Leg lift placement: which training days take the hinge day (pull) and the squat day (legs), given the run week.
 // Rulings:
 //   D36   hard days hard: on an NRC race program the long run and its eve are off limits to both leg roles, the hinge
@@ -12,12 +12,11 @@
 // The cost table, the notes, the role names and the test-week arithmetic are typed in
 // tests/support/leg-lift-placement.js. This file runs each claim on one seed of each lattice and a sample of the
 // run_base and dated lattices; tests/sweeps/leg-lift-placement.test.js runs them whole.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { progDigest } = require('../support/app.js');
-const R = require('../support/run-week-layout.js');
-const L = require('../support/leg-lift-placement.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { progDigest } from '../support/app.ts';
+import * as R from '../support/run-week-layout.ts';
+import * as L from '../support/leg-lift-placement.ts';
 test('a pace program, a run_base program and a dated mile test each equal themselves built twice', () => {
   const cfgs = [R.paceCfg(R.MARIO_REST, 1001), L.runBaseLattice()[0].cfg, L.datedTestCfg(L.MILE_TEST, 'bike', ['sun'], 2, 3)];
   for (const c of cfgs) assert.equal(progDigest(R.build(c)), progDigest(R.build(c)), c.cardioGoals.run.id);

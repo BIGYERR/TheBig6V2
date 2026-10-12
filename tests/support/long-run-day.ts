@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Helpers for the long-run day tests: tests/integration/long-run-day.test.js runs each claim on a sample,
 // tests/sweeps/long-run-day.test.js runs the lattices whole. Built on tests/support/run-week-layout.js (the app booted
 // once with its clock pinned).
@@ -16,8 +16,8 @@
 //   D155           a tier B long-run day in a recovery week, on the loaded full-body day with no Strength or hip
 //                  section left, keeps its Upper superset;
 //   D156           the loaded full-body finisher (Arms finisher, Delts finisher) never prints on a long day.
-const R = require('./run-week-layout.js');
-const { fixtures } = require('./app.js');
+import * as R from './run-week-layout.ts';
+import { fixtures } from './app.ts';
 const { DAYS, ISO, clone, build } = R;
 
 const minutesOf = d => !d ? 0 : d.k === 'time' ? (+d.mins || 0) : (+d.mi || 0) * (+d.tgt || 0) / 60;
@@ -233,7 +233,7 @@ function hingeTally(list) {
   return T;
 }
 
-module.exports = {
+export {
   minutesOf, longKind, handTier, LEG_RX, STRETCH_RX, CARRY_RX, POWER_CORE_RX, HINGE, docSets, items, daySets, carryN,
   shape, live, sectionClass, FINISHER, hasFinisher, d38Window, STAND, tierLattice, readTiers, tierTally,
   hingeLattices, finisherLattices, hingeTally,
