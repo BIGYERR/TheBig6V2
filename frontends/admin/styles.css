@@ -1,30 +1,16 @@
-/* Admin vision. The Asylum design tokens (docs/design/THE_ASYLUM_DS_REFERENCE.md) and the whole admin's styles in one
-   global sheet: the shell (header, left nav, inner panel, footer), the login page, and the sections inside the panel. */
+/* Admin vision. The admin's own Asylum design tokens (docs/design/THE_ASYLUM_DS_REFERENCE.md; the shared ones are in
+   ../common/tokens.css) and the whole admin's styles in one global sheet: the shell (header, left nav, inner panel, footer), the login page, and the sections inside the panel. */
+@import '../common/tokens.css';
+
 :root {
-  --bg: #f4f1e8;
-  --surface: #fbfaf5;
-  --surface2: #ece7da;
-  --surface3: #e0daca;
-  --border: #d5cebd;
-  --border2: #bcb29b;
-  --text: #181712;
-  --text-2: #3a372d;
-  --muted: #6b6557;
-  --on-ink: #f4f1e8;
   --ink-line: rgba(244, 241, 232, 0.16);
   --ink-muted: rgba(244, 241, 232, 0.66);
-  --signal: #cf4e1a;
-  --run: #5e8c54;
-  --run-dim: rgba(94, 140, 84, 0.15);
   --denim: #3f6e96;
   --plum: #7e5e96;
   --ochre: #a6822f;
   --red: #9e3328;
   --warn: #b07a1e;
   --warn-dim: rgba(176, 122, 30, 0.14);
-  --shadow-1: 0 1px 2px rgba(40, 34, 22, 0.06);
-  --shadow-3: 0 8px 24px rgba(40, 34, 22, 0.1), 0 2px 6px rgba(40, 34, 22, 0.06);
-  --font-display: 'Helvetica Now Text', 'Helvetica Neue', Helvetica, 'Geist', Arial, sans-serif;
   --font-text: 'Helvetica Neue', Helvetica, 'Geist', Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
   --bar-h: 60px;

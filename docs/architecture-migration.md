@@ -257,8 +257,12 @@ Heroku tree.
    `frontends/` (without the app) with `backend/heroku/`'s manifest and `Procfile` at its root. The frontends lock
    resolves every package at the version the backend had locked (478 packages, 0 changed). Both bundles are byte for
    byte the same; only Angular's file name hash moved with the source paths.
-3. **`frontends/common/`**: the icon set the admin borrowed from the website moved there in step 2; the design-system
-   tokens and anything else two frontends duplicate follow.
+3. **`frontends/common/`** (done): the icon set the admin borrowed from the website moved there in step 2, and the 16
+   design tokens the website and the admin both declared with the same value are `common/tokens.css`, which each
+   `styles.css` imports first. Proof: each built sheet holds the same tokens with the same values, and everything after
+   them is byte for byte the same. Four tokens share a name but not a value (the text and mono font stacks, the ink
+   line and muted alphas), so each frontend keeps its own until Mario rules which value wins. The app's own tokens
+   (its legacy CSS) join when phase E builds its screens on `frontends/common/`.
 4. **The e2e to `tests/e2e/`**: it drives all three frontends, so it lives with the tests.
 The app joins the `frontends/` workspace later (phase E), when its screens start importing `frontends/common/`; until
 then it stays its own package, because Cordova keeps its platform and plugin list in the project root's

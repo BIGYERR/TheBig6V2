@@ -1,0 +1,23 @@
+/* The Asylum design tokens the frontends share (docs/design/THE_ASYLUM_DS_REFERENCE.md): bone paper, ink, the burnt
+   orange signal, the run green, the warm shadows and the display face. Each frontend imports this first, then sets its
+   own tokens beside it in its styles.css. A token joins this file only when every frontend that uses it has the same
+   value: the text and mono font stacks and the ink line and muted alphas still differ between the website and the
+   admin, so each keeps its own. */
+:root {
+  --bg: #f4f1e8;
+  --surface: #fbfaf5;
+  --surface2: #ece7da;
+  --surface3: #e0daca;
+  --border: #d5cebd;
+  --border2: #bcb29b;
+  --text: #181712;
+  --text-2: #3a372d;
+  --muted: #6b6557;
+  --on-ink: #f4f1e8;
+  --signal: #cf4e1a;
+  --run: #5e8c54;
+  --run-dim: rgba(94, 140, 84, 0.15);
+  --shadow-1: 0 1px 2px rgba(40, 34, 22, 0.06);
+  --shadow-3: 0 8px 24px rgba(40, 34, 22, 0.1), 0 2px 6px rgba(40, 34, 22, 0.06);
+  --font-display: 'Helvetica Now Text', 'Helvetica Neue', Helvetica, 'Geist', Arial, sans-serif;
+}
