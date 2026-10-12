@@ -1,18 +1,27 @@
 'use strict';
-// The floating rest timer: dragging the tab and the card (_rtWireDrag, wired by _rtInit). Rulings:
-// docs/decisions/rest-timer.md (D235: a tap never strands the timer, a cancelled drag docks to an edge).
+// The floating rest timer: dragging the tab and the card (_rtWireDrag, wired by _rtInit), and the rest stopwatch with
+// its mirror on the iPhone island in the native app. Rulings: docs/decisions/rest-timer.md (D235: a tap never strands
+// the timer, a cancelled drag docks to an edge); the handoff §11f and tests/measure/v239_rulings/v239_ruling_d233.md
+// (D233 P-ISLAND: inside the native app the clock is the wall clock and the island is told every seam; on the PWA the
+// clock is performance.now and nothing is called).
 //
-// The app boots in the VM harness with a document that keeps its elements (tests/support/app.js loadApp({dom:true})).
-// The real _rtInit wires the real handlers onto stubs that keep every listener and run it; the test fires pointer
-// events at them and reads every write to the anchor's style.
-//
+// Dragging. The app boots in the VM harness with a document that keeps its elements (tests/support/app.js
+// loadApp({dom:true})). The real _rtInit wires the real handlers onto stubs that keep every listener and run it; the
+// test fires pointer events at them and reads every write to the anchor's style.
 // Oracle: hand geometry, typed here and checked below, never the app's own handler. The frame (#restFloat) is 375 px
 // wide at left 0, window.innerHeight is 852, the anchor (#rtAnchor) is 40 x 60 and sits at top 300 until a drag writes
 // top. The anchor's offsetLeft follows its style as a browser lays it out: a px left reads as written, left '0' reads
 // 0, right '0' reads 375 - 40 = 335.
+//
+// The stopwatch and the island. The rig in tests/support/rest-timer.js boots the app with two fake clocks the test
+// moves by hand, Date and performance.now, by different amounts at every step, so the clock the stopwatch follows is
+// read off its value. A stub plugin (window.iaIsland) logs every run, stop and end. Oracle: hand values, typed below and
+// checked: 92340 ms shows 1:32 and .34, 93340 ms shows 1:33, 0 shows 0:00; the start epoch is the rig's own wall clock
+// at the tap (10:00 local on the day under test, by date arithmetic).
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { loadApp } = require('../support/app.js');
+const { islandStub, loadWithIsland, stopwatchRig } = require('../support/rest-timer.js');
 
 const FRAME_W = 375;
 const INNER_H = 852;
@@ -244,4 +253,278 @@ test('a cancel outside a drag never re-docks', () => {
   assert.equal(t.side(), 'left', 'the side is kept');
   assert.equal(t.dragging(), false, 'only the flag is cleared');
   assert.equal(t.expanded(), false);
+});
+
+// ── the stopwatch and the island ────────────────────────────────────────────────────────────────────────────────────
+const T92 = 92340;
+const T93 = 93340;
+const TAB92 = '1:32';
+const CS92 = '.34';
+const TAB93 = '1:33';
+const ZERO = '0:00';
+/** The other clock's step: 10 minutes, which would read 10:00 if the stopwatch followed it. */
+const SKEW = 600000;
+/** A step for the clock under test's twin that no assertion reads. */
+const NOISE = 7;
+
+test('the stopwatch hand values are self-consistent', () => {
+  const show = (ms) => {
+    const ts = Math.floor(ms / 1000);
+    const s = ts % 60;
+    return Math.floor(ts / 60) + ':' + (s < 10 ? '0' : '') + s;
+  };
+  assert.equal(show(T92), TAB92);
+  assert.equal('.' + (Math.floor(T92 / 10) % 100), CS92);
+  assert.equal(T92 + 1000, T93);
+  assert.equal(show(T93), TAB93);
+  assert.equal(show(0), ZERO);
+  assert.equal(show(SKEW), '10:00');
+});
+
+test('the rig starts on a training day at 10:00 with no plugin and a zeroed stopwatch', () => {
+  const r = stopwatchRig();
+  assert.equal(new Date(r.dayStart()).getHours(), 10);
+  assert.equal(r.eval('typeof window.iaIsland'), 'undefined');
+  assert.equal(r.now(), 0);
+  assert.equal(r.tab().mini, ZERO);
+  assert.equal(r.tab().toggle, 'Start');
+  assert.equal(r.tab().display, 'block', 'This Week shows the tab');
+});
+
+test('on the PWA the stopwatch follows performance.now, never the wall clock', () => {
+  const r = stopwatchRig();
+  assert.equal(r.eval('typeof window.iaIsland'), 'undefined', 'no plugin on the PWA');
+  assert.equal(r.seam('rtToggleBtn()'), null, 'Start');
+  r.adv(SKEW, T92);
+  assert.equal(r.now(), T92, 'running: performance moved 92340, the wall clock 600000');
+  assert.deepEqual(r.tab(), { mini: TAB92, big: TAB92, cs: CS92, toggle: 'Stop', display: 'block' });
+  assert.equal(r.seam('rtToggleBtn()'), null, 'Stop');
+  r.adv(SKEW, 5000);
+  assert.equal(r.now(), T92, 'frozen');
+  assert.deepEqual(r.tab(), { mini: TAB92, big: TAB92, cs: CS92, toggle: 'Start', display: 'block' });
+  assert.equal(r.seam('rtToggleBtn()'), null, 'resume');
+  r.adv(SKEW, 1000);
+  assert.equal(r.now(), T93, 'resumed where it stopped');
+  assert.equal(r.tab().mini, TAB93);
+  assert.equal(r.tab().toggle, 'Stop');
+  assert.equal(r.seam('rtResetBtn()'), null, 'Reset');
+  assert.equal(r.now(), 0);
+  assert.equal(r.tab().mini, ZERO);
+  assert.equal(r.tab().toggle, 'Start');
+  assert.equal(r.eval('typeof window.iaIsland'), 'undefined', 'still no plugin');
+});
+
+test('on the PWA Done and a day open zero the stopwatch, and Home hides the tab while it keeps counting', () => {
+  const r = stopwatchRig();
+  // Done on the open day with the clock running.
+  assert.equal(r.open(), null, 'the day opens');
+  assert.equal(r.seam('rtToggleBtn()'), null);
+  r.adv(SKEW, 4000);
+  assert.equal(r.seam("handleDayStatus('" + r.day + "','x','complete')"), null, 'Done');
+  assert.equal(r.now(), 0, 'Done zeroes the clock');
+  assert.equal(r.tab().mini, ZERO);
+  r.seam('popClose()');
+  // A day open on a stopped clock.
+  r.fresh();
+  r.seam('rtToggleBtn()');
+  r.adv(SKEW, 4000);
+  r.seam('rtToggleBtn()');
+  assert.equal(r.open(), null);
+  assert.equal(r.now(), 0, 'a day open zeroes a stopped clock');
+  assert.equal(r.tab().mini, ZERO);
+  assert.equal(r.isOpen(), true, 'the day opened');
+  r.seam('closeDetail()');
+  // Home with the clock running.
+  r.fresh();
+  r.seam('rtToggleBtn()');
+  assert.equal(r.seam("showScreen('screenHome')"), null);
+  r.adv(SKEW, 30000);
+  assert.equal(r.now(), 30000, 'it keeps counting on performance.now');
+  assert.equal(r.tab().display, 'none', 'Home hides the tab');
+  assert.equal(r.seam("showScreen('screenWeek')"), null);
+  assert.equal(r.seam('rtResetBtn()'), null);
+  assert.equal(r.eval('typeof window.iaIsland'), 'undefined');
+});
+
+test('inside the native app the stopwatch follows the wall clock, never performance.now', () => {
+  const r = stopwatchRig();
+  r.attach(islandStub());
+  assert.equal(r.eval('typeof window.iaIsland'), 'object', 'a plugin installed after boot is seen');
+  r.seam('rtToggleBtn()');
+  r.adv(T92, SKEW);
+  assert.equal(r.now(), T92, 'running: the wall clock moved 92340, performance 600000');
+  assert.equal(r.tab().mini, TAB92);
+  assert.equal(r.tab().cs, CS92);
+  r.seam('rtToggleBtn()');
+  r.adv(5000, SKEW);
+  assert.equal(r.now(), T92, 'frozen');
+  assert.equal(r.tab().mini, TAB92);
+  assert.equal(r.tab().toggle, 'Start');
+  r.seam('rtToggleBtn()');
+  r.adv(1000, SKEW);
+  assert.equal(r.now(), T93, 'resumed where it stopped');
+  assert.equal(r.tab().mini, TAB93);
+});
+
+test('Start tells the island run with the wall-clock time of the tap', () => {
+  const r = stopwatchRig();
+  const s = r.attach(islandStub());
+  assert.equal(r.seam('rtToggleBtn()'), null);
+  assert.deepEqual(s.log, [['run', r.dayStart()]]);
+  assert.equal(r.tab().toggle, 'Stop');
+});
+
+test('Stop tells the island stop with the frozen elapsed time', () => {
+  const r = stopwatchRig();
+  const s = r.attach(islandStub());
+  r.seam('rtToggleBtn()');
+  r.adv(T92, NOISE);
+  r.seam('rtToggleBtn()');
+  assert.deepEqual(s.log, [['run', r.dayStart()], ['stop', T92]]);
+  assert.equal(r.tab().mini, TAB92);
+  assert.equal(r.tab().toggle, 'Start');
+});
+
+test('Start after a Stop tells the island run with the start moved on by the pause', () => {
+  const r = stopwatchRig();
+  const s = r.attach(islandStub());
+  r.seam('rtToggleBtn()');
+  r.adv(T92, NOISE);
+  r.seam('rtToggleBtn()');
+  r.adv(5000, NOISE);
+  r.seam('rtToggleBtn()');
+  // Now is dayStart + 97340 and 92340 has elapsed, so the run started at dayStart + 5000.
+  assert.equal(s.log.length, 3);
+  assert.deepEqual(s.log[2], ['run', r.dayStart() + 5000]);
+  r.adv(1000, NOISE);
+  assert.equal(r.now(), T93);
+  assert.equal(r.tab().mini, TAB93);
+});
+
+test('the reset button ends the island and zeroes the clock, running or stopped', () => {
+  for (const mode of ['running', 'stopped']) {
+    const r = stopwatchRig();
+    const s = r.attach(islandStub());
+    r.seam('rtToggleBtn()');
+    r.adv(T92, NOISE);
+    if (mode === 'stopped') r.seam('rtToggleBtn()');
+    const mark = s.log.length;
+    assert.ok(mark > 0, `${mode}: the island heard the start`);
+    assert.equal(r.seam('rtResetBtn()'), null);
+    const after = s.log.slice(mark);
+    assert.deepEqual(after[after.length - 1], ['end'], `${mode}: the last call is end()`);
+    assert.ok(!after.some((c) => c[0] === 'run'), `${mode}: no run() after the reset`);
+    assert.equal(r.now(), 0, mode);
+    assert.equal(r.tab().mini, ZERO, mode);
+    assert.equal(r.tab().toggle, 'Start', mode);
+  }
+});
+
+test('Done and Skip end the island and zero the clock', () => {
+  for (const status of ['complete', 'skipped']) {
+    const r = stopwatchRig();
+    const s = r.attach(islandStub());
+    assert.equal(r.open(), null, `${status}: the day opens`);
+    r.seam('rtToggleBtn()');
+    r.adv(T92, NOISE);
+    const mark = s.log.length;
+    assert.ok(mark > 0, `${status}: the island heard the start`);
+    assert.equal(r.seam("handleDayStatus('" + r.day + "','x','" + status + "')"), null);
+    const after = s.log.slice(mark);
+    assert.deepEqual(after[after.length - 1], ['end'], `${status}: the last call is end()`);
+    assert.ok(!after.some((c) => c[0] === 'run'), `${status}: no run() after the tap`);
+    assert.equal(r.now(), 0, status);
+    assert.equal(r.tab().mini, ZERO, status);
+    r.seam('popClose()');
+  }
+});
+
+test('opening a day on a stopped clock zeroes it and ends the island', () => {
+  const r = stopwatchRig();
+  const s = r.attach(islandStub());
+  r.seam('rtToggleBtn()');
+  r.adv(T92, NOISE);
+  r.seam('rtToggleBtn()');
+  const mark = s.log.length;
+  assert.equal(r.open(), null);
+  assert.deepEqual(s.log.slice(mark), [['end']], 'the open sends exactly end()');
+  assert.equal(r.now(), 0);
+  assert.equal(r.tab().mini, ZERO);
+  assert.equal(r.isOpen(), true, 'the day opened');
+});
+
+test('opening a day on a running clock leaves it running and tells the island nothing', () => {
+  const r = stopwatchRig();
+  const s = r.attach(islandStub());
+  r.seam('rtToggleBtn()');
+  r.adv(10000, NOISE);
+  assert.equal(s.log.length, 1, 'the start was sent');
+  assert.equal(r.open(), null);
+  assert.deepEqual(s.log.slice(1), [], 'the open sends nothing');
+  r.adv(1000, SKEW);
+  assert.equal(r.now(), 11000, 'it keeps counting on the wall clock');
+  assert.equal(r.tab().toggle, 'Stop');
+  assert.equal(r.isOpen(), true);
+});
+
+test('Home and the wizard hide the tab and tell the island nothing while the clock keeps counting', () => {
+  const r = stopwatchRig();
+  const s = r.attach(islandStub());
+  r.seam('rtToggleBtn()');
+  r.adv(10000, NOISE);
+  assert.equal(s.log.length, 1, 'the start was sent');
+  assert.equal(r.seam("showScreen('screenHome')"), null);
+  r.adv(30000, SKEW);
+  assert.equal(r.now(), 40000, 'Home');
+  assert.equal(r.tab().display, 'none', 'Home hides the tab');
+  assert.equal(r.seam("showScreen('screenWizard')"), null);
+  r.adv(20000, SKEW);
+  assert.equal(r.now(), 60000, 'the wizard');
+  assert.equal(r.tab().display, 'none', 'the wizard hides the tab');
+  assert.equal(r.seam("showScreen('screenWeek')"), null);
+  assert.equal(r.now(), 60000, 'This Week');
+  assert.equal(r.tab().display, 'block', 'This Week shows it again');
+  assert.equal(r.tab().toggle, 'Stop');
+  assert.deepEqual(s.log.slice(1), [], 'nothing was sent while it was hidden');
+});
+
+test('a page load with the island plugin present ends the island and reaches Home', () => {
+  const s = islandStub();
+  const IA = loadWithIsland(s);
+  assert.deepEqual(s.log, [['end']], 'the load sends exactly end()');
+  assert.equal(IA.eval('_curScreen'), 'screenHome', 'no program is stored, so the app opens on Home');
+});
+
+test('an island plugin that throws on every call never breaks the stopwatch or the page load', () => {
+  const r = stopwatchRig();
+  const s = r.attach(islandStub(true));
+  const reads = [];
+  assert.equal(r.seam('rtToggleBtn()'), null, 'Start');
+  r.adv(T92, SKEW);
+  reads.push(r.now());
+  assert.equal(r.seam('rtToggleBtn()'), null, 'Stop');
+  r.adv(5000, SKEW);
+  reads.push(r.now());
+  assert.equal(r.tab().toggle, 'Start');
+  assert.equal(r.open(), null, 'day open');
+  reads.push(r.now());
+  assert.equal(r.seam('rtToggleBtn()'), null, 'Start');
+  r.adv(4000, SKEW);
+  assert.equal(r.seam("handleDayStatus('" + r.day + "','x','complete')"), null, 'Done');
+  reads.push(r.now());
+  r.seam('popClose()');
+  assert.equal(r.seam('rtToggleBtn()'), null, 'Start');
+  r.adv(4000, SKEW);
+  assert.equal(r.seam('rtResetBtn()'), null, 'Reset');
+  reads.push(r.now());
+  assert.deepEqual(reads, [T92, T92, 0, 0, 0]);
+  assert.equal(r.tab().mini, ZERO);
+  // Start, Stop, the open, Start, Done, Start and Reset all reach the plugin, and every call throws.
+  assert.ok(s.log.length >= 6, `${s.log.length} calls reached the plugin`);
+  assert.equal(s.thrown.length, s.log.length, 'every call threw');
+
+  const s2 = islandStub(true);
+  const IA = loadWithIsland(s2);
+  assert.equal(IA.eval('_curScreen'), 'screenHome', 'a load with a throwing plugin reaches Home');
+  assert.deepEqual(s2.thrown, ['end']);
 });
