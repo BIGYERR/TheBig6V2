@@ -356,3 +356,29 @@ what is stored.
   e2e on both builds; a local comparison matched the archived bar, the armed delete, Cancel and a chip switch in
   pixels and in what each left behind.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.25 moves This Week
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.25.
+- **Moved:** `#screenWeek` whole: `src/app/screens/week-view/week-view.ts` (the header, HURT?, the week buttons, the
+  start and race dates, the phase pill, the day strip, the hero, the Wildcard tag, the stat tiles, and the bar with
+  Random Workout and Traveling?) and `week-view-model.ts` (every decision of the legacy `renderWeekView`: the phase by
+  program length, the pill's priority of injury, travel, taper and recovery, the injury wash, the overlay marks on the
+  week buttons, the strip's cells and colours, the hero for a rest day, a session today or a browsed week, and the
+  tiles). It takes over `renderWeekView` through `LegacyBridge.provide`. Each render draws the strip and the days list
+  anew, as the legacy `innerHTML` writes did, then runs the legacy scoot (`_wkStripTarget`, `_wkScoot`,
+  `_wkScootCancel`, the `_wkScootDone` latch) on the new strip, since the scoot repaints the buttons' `active` class by
+  hand. The day codes, the hero's summary, time and travel tag, the Wildcard marks, the streak, the rest-day tip, the
+  race alignment and every store read stay legacy. `#randCounter` and `#changeActiveWrap` are left empty for their
+  legacy writers (`updateRandCounter`, now the RandomWorkout component's, and `renderOverlayChip`), and every id the
+  legacy had stays (`#raceDateInput` is also the wizard's, so document order still decides which one a lookup finds).
+- **Boot:** the legacy boot draws This Week before the components mount, and the mount replaces that drawing. The host
+  now calls a screen's `mounted()` once it is attached; This Week's stops the boot's scoot (animating the removed
+  strip) and draws itself as the first draw, scoot included. The first full e2e without it showed a blank This Week
+  after every relaunch.
+- **Tests:** `frontends/app/test/unit/week-view.test.ts` (8: the phase labels by length; the header, dates and pill;
+  the pill's priority and the wash; the strip's cells; the rest-day hero; today's hero and a closed day; a browsed week
+  with its tags and its move; the tiles). Every journey photographs This Week, in its rest-day, today, browsed, closed,
+  injury, week 4 and week 6 states, at 0 px on both builds. The e2e finds a day cell by its label (`tapDay`, new) and
+  the rest hero's cardio button by its place, the legacy `onclick` attributes it matched being gone from the component.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

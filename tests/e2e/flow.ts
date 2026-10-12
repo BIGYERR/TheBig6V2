@@ -40,6 +40,8 @@ export interface Helpers {
   generate(): Promise<void>;
   /** Relaunches the app (storage kept) with the frozen clock moved to a later moment, as an athlete coming back days later. */
   relaunchOn(iso: string): Promise<void>;
+  /** Taps This Week's strip cell for a weekday ('fri'), found by its label as the athlete reads it. */
+  tapDay(key: string): Promise<void>;
 }
 
 /** Values one step leaves for a later one (a sheet's id, found by tapping, then closed after the screenshot). */
@@ -203,6 +205,17 @@ export function helpers(page: Page): Helpers {
       await h.screen('screenWeek');
       await h.restTimerSettled();
     },
+    async tapDay(key) {
+      const label = key.toUpperCase();
+      for (const cell of await page.$$('.wk-strip .wk-day')) {
+        if ((await cell.$eval('.wk-day-lbl', (e) => (e.textContent ?? '').trim())) !== label) continue;
+        await cell.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+        await cell.click();
+        await sleep(SETTLE_MS);
+        return;
+      }
+      throw new Error(`This Week shows no ${label} cell`);
+    },
     async relaunchOn(iso) {
       await page.evaluate((key, ms) => sessionStorage.setItem(key, String(ms)), LATER_NOW_KEY, new Date(iso).getTime());
       await page.reload({ waitUntil: 'networkidle0' });
@@ -321,7 +334,9 @@ const STRENGTH: readonly Step[] = [
     id: 'rest-sheet',
     page: 'Rest day sheet (today is a rest day)',
     async run(t) {
-      const id = await t.tapOpensSheet(`[onclick*="openRestSheet"][onclick*="'cardio'"]`);
+      // The rest hero's second button logs cardio (This Week is an Angular component in the app since phase E's
+      // eighteenth step, the legacy markup in the page).
+      const id = await t.tapOpensSheet('.wk-rest-acts .wk-rest-act:nth-child(2)');
       if (id !== 'restOverlay') throw new Error(`expected the rest sheet, opened #${id}`);
     },
     async after(t) {
@@ -336,7 +351,7 @@ const STRENGTH: readonly Step[] = [
       if (await page.$eval('#rtCard', (e) => getComputedStyle(e).display !== 'none').catch(() => false)) {
         await t.tap('#rtCard .rt-collapse');
       }
-      await t.tap(`.wk-day[onclick="openDayKey('fri')"]`);
+      await t.tapDay('fri');
       await t.overlayOpen('detailOverlay');
       if (!(await t.count('#detailOverlay .ex-swapbtn'))) throw new Error('the day shows no exercises');
     },
@@ -382,7 +397,7 @@ const STRENGTH: readonly Step[] = [
       const from = stored(state, 'swapFrom');
       const to = stored(state, 'swapTo');
       const toastClear = () => page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
-      await t.tap(`.wk-day[onclick="openDayKey('fri')"]`);
+      await t.tapDay('fri');
       await t.overlayOpen('detailOverlay');
       for (let round = 2; round <= 3; round++) {
         await t.tap('#detailOverlay .ex-swapchip .ex-swapundo');
@@ -411,7 +426,7 @@ const STRENGTH: readonly Step[] = [
     async run(t) {
       // The sheet is an Angular component in the app since phase E's sixth step, the legacy script's in the single-file
       // page: both answer the same.
-      await t.tap(`.wk-day[onclick="openDayKey('fri')"]`);
+      await t.tapDay('fri');
       await t.overlayOpen('detailOverlay');
       await t.tap('#detailAddBtn');
       await t.overlayOpen('addOverlay');
@@ -672,7 +687,7 @@ const STRENGTH: readonly Step[] = [
 
 /** Opens a day on the week strip and waits for its detail sheet. */
 async function openDay(t: Helpers, key: string): Promise<void> {
-  await t.tap(`.wk-day[onclick="openDayKey('${key}')"]`);
+  await t.tapDay(key);
   await t.overlayOpen('detailOverlay');
 }
 

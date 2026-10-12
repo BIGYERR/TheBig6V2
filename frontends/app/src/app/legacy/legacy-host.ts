@@ -44,7 +44,10 @@ export class LegacyHost {
     this.mountScreens();
   }
 
-  /** Puts each moved screen's component inside its legacy screen element, in place of the legacy content. */
+  /**
+   * Puts each moved screen's component inside its legacy screen element, in place of the legacy content. A screen the
+   * legacy boot already drew (This Week) has a mounted() hook, called once it is attached, to draw itself in its place.
+   */
   private mountScreens(): void {
     for (const [screenId, component] of MOVED_SCREENS) {
       const screen = document.getElementById(screenId);
@@ -53,6 +56,8 @@ export class LegacyHost {
       screen.replaceChildren(hostElement);
       const ref = createComponent(component, { environmentInjector: this.injector, hostElement });
       this.appRef.attachView(ref.hostView);
+      const instance = ref.instance as { mounted?: () => void };
+      if (typeof instance.mounted === 'function') instance.mounted();
     }
   }
 }

@@ -363,7 +363,7 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   `LegacyBridge.set`), the add-an-exercise sheet (v0.239.13), the change-a-goal sheet's body (v0.239.14), the mile pencil's edit sheet and lock (v0.239.15), the swap nudge and the RPE card (v0.239.16), the injury and travel sheet's body (v0.239.17), Random Workout (v0.239.18), the toast and the update banner's contents (v0.239.19), the Progress screen's arrangement, journal and estimator
   (v0.239.20; its chips, charts and ledger are still the legacy builders' markup inside it), Progress's weekly dot charts
   (v0.239.21), its run charts (v0.239.22), its Lift Ledger (v0.239.23), its program chips (v0.239.24): the whole Progress screen
-  is Angular components over the legacy data readers.
+  is Angular components over the legacy data readers; This Week (v0.239.25).
 - Suggested order:
   1. bug report (small, proves the pattern);
   2. rest timer;
