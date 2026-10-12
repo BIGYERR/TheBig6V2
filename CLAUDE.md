@@ -137,6 +137,8 @@ session's files written into `tests/measure/` mid-proof.
 - **Folders.** `tests/unit/<feature>.test.js`: pure logic, one function lifted out of `index.html` and run alone
   (`appFunction`). `tests/integration/<feature>.test.js`: the app booted in the VM harness, programs built, behaviour
   checked (`loadApp`, `loadApp({ dom: true })` for a document that keeps its elements, `pinClock`).
+  `tests/sweeps/<feature>.test.js`: the slow ones, a lattice or a fuzz over many programs; CI runs them, the 60-second
+  check does not (a file in `tests/unit` or `tests/integration` runs in a few seconds).
   `tests/snapshots/<feature>.json`: one current golden file per feature for program output. The helpers are
   `tests/support/app.js` and `tests/support/snapshot.js`, built on `tests/harness.js`. `app/e2e` stays as it is.
 - **Run.** `node --test tests/unit tests/integration` (Node's own runner, about a second; no `package.json` at the repo

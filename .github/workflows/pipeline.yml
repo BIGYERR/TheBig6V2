@@ -3,7 +3,7 @@
 # dev into main by hand to release (no agent ever opens one). Branch protection lets main change only through that pull
 # request, and only when every check below passes on it.
 #
-#   push to dev                every check: the unit and integration tests (tests/unit, tests/integration), the full
+#   push to dev                every check: the unit, integration and sweep tests (tests/unit, tests/integration, tests/sweeps), the full
 #                              gate suite with its row check and blast radius, fuzz, sabotage, app and backend tests and
 #                              lint, and the Docker e2e. A newer push cancels the running one.
 #   pull request dev -> main   the same checks again, plus "PR source is dev". All must pass to merge.
@@ -59,8 +59,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: node --test tests/unit tests/integration (index.html against tests/snapshots)
-        run: node tools/run.mjs tests -- node --test --test-reporter=spec tests/unit tests/integration
+      - name: node --test tests/unit tests/integration tests/sweeps (index.html against tests/snapshots)
+        run: node tools/run.mjs tests -- node --test --test-reporter=spec tests/unit tests/integration tests/sweeps
       - name: Keep the run log
         if: always()
         uses: actions/upload-artifact@v4
