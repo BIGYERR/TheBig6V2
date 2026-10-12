@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Hand oracles, the stage recorder and the lattices for the deload tests (tests/integration/deload.test.js and
 // tests/sweeps/deload.test.js). D91: recoveryDeload keeps its one accessory block by PATTERN, not by push order. D93 and
 // D94: the pull side, where a deload pull day keeps Pull superset A (its vertical pull) because its Main is already a
@@ -17,35 +16,36 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import type { CardioGoalId, Cfg, DayKey, Equipment, Experience, Injury, LiftingFocus, Program } from '@ia/core';
 import { loadApp } from './app.ts';
 import type { App } from './app.ts';
 import { appCopy } from './app-copy.ts';
 import { updating, SNAPSHOT_DIR } from './snapshot.ts';
 
 // ── hand oracle: posterior chain ────────────────────────────────────────────────────────────────────────────────────
-const E_PAT = [
+const E_PAT: [string, RegExp][] = [
   ['calf_iso', /calf|calves|plantarflex/i],
   ['hip_ext', /hip thrust|glute bridge|glute-ham|\bghr\b|nordic|back extension|hyperextension|reverse hyper|pull-?through/i],
   ['leg_iso', /leg curl|leg extension|hamstring curl/i],
   ['hinge', /deadlift|\brdl\b|romanian|good morning|\bswing\b|\bclean\b|\bsnatch\b|hinge|rack pull/i],
 ];
-const ePat = (n: any) => {
+const ePat = (n: unknown): string | null => {
   const t = String(n || '');
   for (const [p, r] of E_PAT) if (r.test(t)) return p;
   return null;
 };
 /** {hinge, hip_ext} and nothing else. */
-const isPost = (n: any) => ['hinge', 'hip_ext'].includes(ePat(n));
+const isPost = (n: unknown): boolean => ['hinge', 'hip_ext'].includes(ePat(n) ?? '');
 /** 17 names, expected column typed from the doctrine names: ten negatives (four pull-side) and seven positives. */
-const POST_PROBE = [['Back squat', 0], ['Leg extension', 0], ['Lying leg curl', 0], ['Leg press', 0],
+const POST_PROBE: [string, number][] = [['Back squat', 0], ['Leg extension', 0], ['Lying leg curl', 0], ['Leg press', 0],
   ['Dumbbell standing calf raise', 0], ['Wall sit', 0], ['Barbell row', 0], ['Lat pulldown', 0], ['Chin-up', 0], ['Face pull', 0],
   ['Nordic hamstring curl (anchored)', 1], ['Single-leg glute bridge', 1], ['Barbell Romanian deadlift', 1],
   ['45° back extension', 1], ['Kettlebell swing', 1], ['Dumbbell split-stance deadlift', 1], ['Barbell hip thrust', 1]];
 
 // ── hand oracle: vertical pull (bar, ring or rope above the shoulder); rows, face pulls and pullovers are not ──────
 const V_PULL = /pull-?down|pull-?up|pullup|chin-?up|chinup|lat prayer|muscle-?up|\bhang(ing)? row\b(?!)|kneeling.*pulldown|straight-?arm pulldown|\bpull-?ups?\b/i;
-const isVPull = (n: any) => V_PULL.test(String(n || ''));
-const VPULL_PROBE = [['Lat pulldown', 1], ['Neutral-grip pulldown', 1], ['Chinups', 1], ['Pull-ups', 1], ['Assisted pull-up', 1],
+const isVPull = (n: unknown): boolean => V_PULL.test(String(n || ''));
+const VPULL_PROBE: [string, number][] = [['Lat pulldown', 1], ['Neutral-grip pulldown', 1], ['Chinups', 1], ['Pull-ups', 1], ['Assisted pull-up', 1],
   ['Kneeling band pulldown', 1], ['Straight-arm pulldown', 1], ['Barbell row', 0], ['Pendlay row', 0], ['Chest-supported row', 0],
   ['Face pull', 0], ['Dumbbell pullover', 0], ['Inverted row (supinated, under a table)', 0], ['Kettlebell swing', 0]];
 
@@ -53,7 +53,15 @@ const VPULL_PROBE = [['Lat pulldown', 1], ['Neutral-grip pulldown', 1], ['Chinup
 const KMAIN = /^main\b|^primer|^power\b|^strength\b/;
 const KPREHAB = /hip|mobility|stretch/;
 const KFLUFF = /carry|finisher|conditioning|explosive/;
-function cls(s: any) {
+/**
+ * One section as the stage recorder snapshots it (SNAP_FN): its label, its hip and optional flags, its item names and
+ * each item's _pattern. The probes below write only the fields the candidacy test reads.
+ */
+interface SnapSection { l: string; hip?: boolean; opt?: boolean; n?: string[]; p?: (string | null)[] }
+/** One lifting day's three stages, as the staged copy records them. */
+interface Stage { w: string; d: string; dl: boolean; p1: SnapSection[]; p2: SnapSection[]; p3: SnapSection[] }
+type Klass = 'main' | 'prehab' | 'fluff' | 'none' | 'cand';
+function cls(s: SnapSection): Klass {
   const L = String(s.l || '').toLowerCase();
   if (KMAIN.test(L)) return 'main';
   if (s.hip || KPREHAB.test(L)) return 'prehab';
@@ -62,7 +70,7 @@ function cls(s: any) {
   return 'cand';
 }
 /** Hand-typed sections and their class: every one of the four tests both ways, the pull family lands on cand. */
-const CLS_PROBE = [
+const CLS_PROBE: [SnapSection, Klass][] = [
   [{ l: 'Pull superset A', p: ['pull'] }, 'cand'], [{ l: 'Pull superset B', p: ['pull', 'hinge'] }, 'cand'], [{ l: 'Pull', p: ['hinge'] }, 'cand'],
   [{ l: 'Main strength', p: ['squat'] }, 'main'], [{ l: 'Primer', p: ['power'] }, 'main'], [{ l: 'Power block', p: ['power'] }, 'main'],
   [{ l: 'Strength block', p: ['press'] }, 'main'], [{ l: 'Hip mobility', p: ['hinge'] }, 'prehab'],
@@ -84,31 +92,35 @@ const SNAP_FN = 'globalThis.__SNAP=function(a){return (a||[]).map(function(s){va
   + "n:it.map(function(i){return String((i&&i.name)||'');}),"
   + 'p:it.map(function(i){var q=null;try{q=_pattern(i&&i.name);}catch(e){q=null;}return q?String(q):null;})};});};';
 /** Boots the staged copy of the app under test. stagedBuild(IA, cfg, off) returns { prog, stages }. */
-function loadStaged() {
+function loadStaged(): App {
   const IA = loadApp({ file: appCopy('deload-stages', [[ASSEMBLY, ASSEMBLY_STAGED]]) });
   IA.eval(SNAP_FN + 'globalThis.__STAGES=null;globalThis.__DELOAD_OFF=false;');
   return IA;
 }
-function stagedBuild(IA: any, cfg: any, deloadOff: any) {
+function stagedBuild(IA: App, cfg: Cfg, deloadOff: boolean): { prog: Program; stages: Stage[] } {
   IA.eval('globalThis.__STAGES=[];globalThis.__DELOAD_OFF=' + !!deloadOff + ';');
-  const prog = IA.buildProgram(JSON.parse(JSON.stringify(cfg)));
-  const stages = JSON.parse(JSON.stringify(IA.eval('globalThis.__STAGES')));
+  const prog: Program = IA.buildProgram(JSON.parse(JSON.stringify(cfg)));
+  const stages: Stage[] = JSON.parse(JSON.stringify(IA.eval('globalThis.__STAGES')));
   IA.eval('globalThis.__STAGES=null;globalThis.__DELOAD_OFF=false;');
   return { prog, stages };
 }
 
 // ── D91's lattice: 6 tiers x 2 foci x 2 experiences x 3 goals x 4 injuries x 3 rest patterns x 2 seeds = 1,728 ────
-function deloadLattice() {
-  const TIERS = ['commercial', 'home_full', 'crossfit', 'home_basic', 'bodyweight', 'minimal'];
-  const GOALS = [{ k: 'liftonly', id: null }, { k: 'pace', id: 'run_pace_goal' }, { k: 'half', id: 'run_half' }];
-  const INJ = [{ k: 'healthy', v: null }, { k: 'shoulder/protect', v: { region: 'shoulder', tier: 'protect' } },
+/** One config of a lattice, keyed. */
+interface LatticeRow { key: string; cfg: Cfg }
+function deloadLattice(): LatticeRow[] {
+  const TIERS: Equipment[] = ['commercial', 'home_full', 'crossfit', 'home_basic', 'bodyweight', 'minimal'];
+  const GOALS: { k: string; id: CardioGoalId | null }[] = [{ k: 'liftonly', id: null }, { k: 'pace', id: 'run_pace_goal' }, { k: 'half', id: 'run_half' }];
+  const INJ: { k: string; v: Injury | null }[] = [{ k: 'healthy', v: null }, { k: 'shoulder/protect', v: { region: 'shoulder', tier: 'protect' } },
     { k: 'lowback/protect', v: { region: 'lowback', tier: 'protect' } }, { k: 'knee/protect', v: { region: 'knee', tier: 'protect' } }];
-  const RESTS = [{ k: 'sun', v: ['sun'] }, { k: 'sun+wed', v: ['sun', 'wed'] }, { k: 'sat+sun', v: ['sat', 'sun'] }];
-  const out = [];
-  for (const t of TIERS) for (const f of ['hypertrophy', 'balanced']) for (const x of ['beginner', 'advanced']) for (const g of GOALS)
+  const RESTS: { k: string; v: DayKey[] }[] = [{ k: 'sun', v: ['sun'] }, { k: 'sun+wed', v: ['sun', 'wed'] }, { k: 'sat+sun', v: ['sat', 'sun'] }];
+  const FOCI: LiftingFocus[] = ['hypertrophy', 'balanced'];
+  const EXPS: Experience[] = ['beginner', 'advanced'];
+  const out: LatticeRow[] = [];
+  for (const t of TIERS) for (const f of FOCI) for (const x of EXPS) for (const g of GOALS)
     for (const i of INJ) for (const r of RESTS) for (const seed of [1013, 3039]) {
       const race = !!g.id && /half/.test(g.id);
-      const cfg = { name: 'M', primaryPath: g.id ? (race ? 'event' : 'cardio') : 'lift', cardioTypes: g.id ? ['run'] : [],
+      const cfg: Cfg = { name: 'M', primaryPath: g.id ? (race ? 'event' : 'cardio') : 'lift', cardioTypes: g.id ? ['run'] : [],
         cardioGoals: g.id ? { run: { id: g.id, label: g.k, mileBestMins: '10', mileBestSecs: '30', baselineDist: '5', baseline: '5mi', targetDist: '1.5', targetMins: '11', targetSecs: '0' } } : {},
         eventTargeted: race, raceDate: race ? '2026-12-06' : null, liftingFocus: f, experience: x, ageBracket: '18-35', equipment: t, unit: 'lbs',
         restDays: r.v.slice(), days: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'], bench: 135, squat: 155, deadlift: 185, seed };
@@ -119,58 +131,69 @@ function deloadLattice() {
 }
 
 // ── D93's mini lattice: 5 tiers (no bodyweight) x balanced x 2 experiences x {half, marathon} x 3 rests x seed 1 = 60 ─
-function pullLattice() {
-  const out = [];
-  const GOAL = { half: 'run_half', marathon: 'run_marathon' };
-  const REST = { sun: ['sun'], 'sun+wed': ['sun', 'wed'], 'sat+sun': ['sat', 'sun'] };
-  for (const t of ['commercial', 'home_full', 'crossfit', 'home_basic', 'minimal']) for (const x of ['beginner', 'advanced'])
-    for (const g of ['half', 'marathon']) for (const r of ['sun', 'sun+wed', 'sat+sun']) {
+/** One config of the pull lattice, with its tier, experience, goal and rest pattern. */
+interface PullRow extends LatticeRow { t: Equipment; x: Experience; g: 'half' | 'marathon'; r: string }
+function pullLattice(): PullRow[] {
+  const out: PullRow[] = [];
+  const GOAL: Record<'half' | 'marathon', CardioGoalId> = { half: 'run_half', marathon: 'run_marathon' };
+  const REST: Record<string, DayKey[]> = { sun: ['sun'], 'sun+wed': ['sun', 'wed'], 'sat+sun': ['sat', 'sun'] };
+  const TIERS: Equipment[] = ['commercial', 'home_full', 'crossfit', 'home_basic', 'minimal'];
+  const EXPS: Experience[] = ['beginner', 'advanced'];
+  for (const t of TIERS) for (const x of EXPS)
+    for (const g of ['half', 'marathon'] as const) for (const r of ['sun', 'sun+wed', 'sat+sun']) {
       out.push({ key: [t, x, g, r].join('|'), t, x, g, r, cfg: { name: 'M', primaryPath: 'event', cardioTypes: ['run'],
         cardioGoals: { run: { id: GOAL[g], label: g, mileBestMins: '10', mileBestSecs: '30', baselineDist: '5', baseline: '5mi', targetDist: '1.5', targetMins: '11', targetSecs: '0' } },
         eventTargeted: true, raceDate: '2026-12-06', liftingFocus: 'balanced', experience: x, ageBracket: '18-35', equipment: t, unit: 'lbs',
-        restDays: REST[r].slice(), days: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'], bench: 135, squat: 155, deadlift: 185, seed: 1 } });
+        restDays: REST[r]!.slice(), days: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'], bench: 135, squat: 155, deadlift: 185, seed: 1 } });
     }
   return out;
 }
 
 // ── the D91 census over a lattice, both arms (deload on, and the __DELOAD_OFF counterfactual) ──────────────────────
-const secPost = (s: any) => (s.n || []).reduce((a, n) => a + (isPost(n) ? 1 : 0), 0);
-const cardPost = (c: any) => (c || []).reduce((a, s) => a + secPost(s), 0);
-const hasLab = (c: any, lab: any) => (c || []).some((s) => s.l === lab && (s.n || []).length);
-const sha = (s: any) => crypto.createHash('sha256').update(s).digest('hex').slice(0, 16);
-const bump = (o: any, k: any) => { o[k] = (o[k] || 0) + 1; };
+const secPost = (s: SnapSection): number => (s.n || []).reduce((a, n) => a + (isPost(n) ? 1 : 0), 0);
+const cardPost = (c: SnapSection[] | undefined): number => (c || []).reduce((a, s) => a + secPost(s), 0);
+const hasLab = (c: SnapSection[] | undefined, lab: string): boolean => (c || []).some((s) => s.l === lab && (s.n || []).length);
+const sha = (s: string): string => crypto.createHash('sha256').update(s).digest('hex').slice(0, 16);
+/** Counts by key. */
+type Tally = Record<string, number>;
+const bump = (o: Tally, k: string): void => { o[k] = (o[k] || 0) + 1; };
 const LABELS = ['Leg superset A', 'Leg superset B', 'Leg isolation', 'Explosive finisher'];
 const PLABELS = ['Pull superset A', 'Pull superset B', 'Pull'];
 function blankArm() {
   return { configs: 0, weeks: 0, dayCells: 0, dlDayBuilds: 0, deloadWeeks: 0, nonDeloadWeeks: 0, zeroWeeks: 0, zeroWeeksDeload: 0,
     zeroWeeksNonDeload: 0, postInP1: 0, postOutP2: 0, killedByDeload: 0, killedHeldByFinisher: 0, killedKeepsMain: 0,
-    postInP1X: 0, postOutP2X: 0, killedByDeloadX: 0, killHoldX: {}, tierBDl: 0,
-    lblP1: {}, lblP2: {}, lblP1all: {}, lblP2all: {}, dropped: {}, droppedPost: {}, killHold: {},
+    postInP1X: 0, postOutP2X: 0, killedByDeloadX: 0, killHoldX: {} as Tally, tierBDl: 0,
+    lblP1: {} as Tally, lblP2: {} as Tally, lblP1all: {} as Tally, lblP2all: {} as Tally, dropped: {} as Tally, droppedPost: {} as Tally, killHold: {} as Tally,
     survCandViol: 0, survCandGt1: 0, trapAny: 0, trapCand: 0, trapNoCand: 0, trapSurvViol: 0, trapNoCandSurvViol: 0,
     trapAnyE: 0, trapCandE: 0, trapNoCandE: 0, trapSurvViolE: 0, trapNoCandSurvViolE: 0,
     swapPop: 0, swapBoth: 0, swapReCap: 0, swapReBudget: 0, swapReBudgetWeekZero: 0, capLSBin: 0, capLSBkilled: 0,
-    pullP1all: {}, pullP2all: {}, pullBothP1: 0, pullSwapCensus: {}, orderViol: 0, orderNonVac: 0, legAfterHipViol: 0, trapAndSwap: 0 };
+    pullP1all: {} as Tally, pullP2all: {} as Tally, pullBothP1: 0, pullSwapCensus: {} as Tally, orderViol: 0, orderNonVac: 0, legAfterHipViol: 0, trapAndSwap: 0 };
 }
 /** Runs the D91 census over `lattice` on a staged app. Returns { on, off, wrongWay, endToEnd, dlIdentical, dlTotal, ndIdentical, ndTotal }. */
-function deloadCensus(IA: any, lattice: any) {
+/** One arm's census (deload on, or the counterfactual off). */
+type Arm = ReturnType<typeof blankArm>;
+/** What one arm shipped, per week and per day, for the comparison between the arms. */
+interface Shipped { wkShip: Tally; wkDeload: Record<string, boolean>; wkSha: Record<string, string>; shipPost: Tally }
+interface Census { on: Arm; off: Arm; wrongWay: number; endToEnd: number; ndIdentical: number; ndTotal: number; dlIdentical: number; dlTotal: number }
+function deloadCensus(IA: App, lattice: readonly LatticeRow[]): Census {
   const LT = IA.eval("typeof _longRunTier==='function'?_longRunTier:null");
-  const R = { on: blankArm(), off: blankArm(), wrongWay: 0, endToEnd: 0, ndIdentical: 0, ndTotal: 0, dlIdentical: 0, dlTotal: 0 };
+  const R: Census = { on: blankArm(), off: blankArm(), wrongWay: 0, endToEnd: 0, ndIdentical: 0, ndTotal: 0, dlIdentical: 0, dlTotal: 0 };
   for (const L of lattice) {
-    const arms = {};
-    for (const m of ['on', 'off']) {
+    const arms: Partial<Record<'on' | 'off', Shipped>> = {};
+    for (const m of ['on', 'off'] as const) {
       const { prog, stages } = stagedBuild(IA, L.cfg, m === 'off');
       const S = R[m];
       S.configs++;
       const W = prog.weeks || {};
-      const shipPost = {};
-      const wkShip = {};
-      const wkDeload = {};
-      const wkSha = {};
+      const shipPost: Tally = {};
+      const wkShip: Tally = {};
+      const wkDeload: Record<string, boolean> = {};
+      const wkSha: Record<string, string> = {};
       Object.keys(W).forEach((w) => {
         let tot = 0;
-        Object.keys(W[w]).forEach((d) => {
+        (Object.keys(W[w]!) as DayKey[]).forEach((d) => {
           let n = 0;
-          ((W[w][d] && W[w][d].sections) || []).forEach((sec) => ((sec && sec.items) || []).forEach((it) => { if (isPost(it && it.name)) n++; }));
+          ((W[w]![d] && W[w]![d].sections) || []).forEach((sec) => ((sec && sec.items) || []).forEach((it) => { if (isPost(it && it.name)) n++; }));
           shipPost[w + '|' + d] = n;
           tot += n;
         });
@@ -189,8 +212,8 @@ function deloadCensus(IA: any, lattice: any) {
         if (!r.dl) continue;
         if (hasLab(r.p1, 'Pull superset A') && hasLab(r.p1, 'Pull superset B')) {
           S.pullBothP1++;
-          const pst = (lb) => (r.p1 || []).some((s) => s.l === lb && secPost(s) > 0);
-          const srv = (lb) => hasLab(r.p2, lb);
+          const pst = (lb: string): boolean => (r.p1 || []).some((s) => s.l === lb && secPost(s) > 0);
+          const srv = (lb: string): boolean => hasLab(r.p2, lb);
           bump(S.pullSwapCensus, 'enterPost=' + ((pst('Pull superset A') ? 'A' : '') + (pst('Pull superset B') ? 'B' : '') || 'none')
             + ' surv=' + ((srv('Pull superset A') ? 'A' : '') + (srv('Pull superset B') ? 'B' : '') || 'none'));
         }
@@ -207,7 +230,7 @@ function deloadCensus(IA: any, lattice: any) {
         });
         const killed = a1 > 0 && a2 === 0;
         // D155: on a tier B long-run day the hinge leaves by the long-run ruling, not the deload's; X counts exclude it
-        const day = W[r.w] && W[r.w][r.d];
+        const day = W[r.w]?.[r.d as DayKey];
         const tb = !!(LT && day && LT(day.cardio) === 'B');
         S.tierBDl += tb ? 1 : 0;
         S.postInP1X += tb ? 0 : a1;
@@ -241,7 +264,7 @@ function deloadCensus(IA: any, lattice: any) {
         }
         if (inTrap && inSwap) S.trapAndSwap++;
         // the same trap predicate through the ENGINE's lens ({hinge, hip_ext} per _pattern)
-        const secPostE = (s) => (s.p || []).reduce((a, q) => a + (q === 'hinge' || q === 'hip_ext' ? 1 : 0), 0);
+        const secPostE = (s: SnapSection): number => (s.p || []).reduce((a, q) => a + (q === 'hinge' || q === 'hip_ext' ? 1 : 0), 0);
         const postCandE = (r.p1 || []).filter((s, i) => c1[i] === 'cand' && secPostE(s) > 0).length;
         const mainPostE = (r.p1 || []).some((s, i) => c1[i] === 'main' && secPostE(s) > 0);
         if (mainPostE && postCandE === 0) {
@@ -253,12 +276,12 @@ function deloadCensus(IA: any, lattice: any) {
         let okSub = true;
         (r.p2 || []).forEach((s) => {
           let f = -1;
-          for (let i = pi; i < (r.p1 || []).length; i++) if (r.p1[i].l === s.l) { f = i; break; }
+          for (let i = pi; i < (r.p1 || []).length; i++) if (r.p1[i]!.l === s.l) { f = i; break; }
           if (f < 0) okSub = false; else pi = f + 1;
         });
         if (!okSub) S.orderViol++;
         if ((r.p2 || []).length < (r.p1 || []).length) S.orderNonVac++;
-        const idx = (c, re) => { for (let i = 0; i < (c || []).length; i++) if (re.test(String(c[i].l || ''))) return i; return -1; };
+        const idx = (c: SnapSection[] | undefined, re: RegExp): number => { for (let i = 0; i < (c || []).length; i++) if (re.test(String(c![i]!.l || ''))) return i; return -1; };
         const RLEG = /^Leg superset|^Leg isolation/i;
         const RHIP = /Hip stability|Foot & ankle/i;
         const l1 = idx(r.p1, RLEG), h1 = idx(r.p1, RHIP), l2 = idx(r.p2, RLEG), h2 = idx(r.p2, RHIP);
@@ -271,7 +294,7 @@ function deloadCensus(IA: any, lattice: any) {
       });
       arms[m] = { wkShip, wkDeload, wkSha, shipPost };
     }
-    const { on, off } = arms;
+    const { on, off } = arms as Record<'on' | 'off', Shipped>;
     Object.keys(on.wkShip).forEach((w) => {
       if (on.wkShip[w] === 0 && (off.wkShip[w] || 0) > 0) R.wrongWay++;
       if (on.wkDeload[w]) { R.dlTotal++; if (on.wkSha[w] === off.wkSha[w]) R.dlIdentical++; } else { R.ndTotal++; if (on.wkSha[w] === off.wkSha[w]) R.ndIdentical++; }
@@ -285,18 +308,18 @@ function deloadCensus(IA: any, lattice: any) {
 
 // ── the D93/D94 pull census over the mini lattice ───────────────────────────────────────────────────────────────────
 const FAM = ['Pull superset A', 'Pull superset B', 'Pull'];
-function pullCensus(IA: any, lattice: any) {
-  const S = { configs: 0, dayCells: 0, dlDayBuilds: 0, famP2: 0, famP1: 0, famP2ByLabel: {}, bothEnter: 0, mainPostCards: 0, swapCards: 0,
-    swapItems: {}, census: {}, viol: 0, mainPostSwap: 0, p7VPull: 0, p4Survive: 0 };
-  const secOf = (c, lb) => (c || []).filter((s) => s.l === lb && (s.n || []).length);
-  const labPost = (c, lb) => secOf(c, lb).some((s) => (s.n || []).some(isPost));
+function pullCensus(IA: App, lattice: readonly LatticeRow[]) {
+  const S = { configs: 0, dayCells: 0, dlDayBuilds: 0, famP2: 0, famP1: 0, famP2ByLabel: {} as Tally, bothEnter: 0, mainPostCards: 0, swapCards: 0,
+    swapItems: {} as Tally, census: {} as Tally, viol: 0, mainPostSwap: 0, p7VPull: 0, p4Survive: 0 };
+  const secOf = (c: SnapSection[] | undefined, lb: string): SnapSection[] => (c || []).filter((s) => s.l === lb && (s.n || []).length);
+  const labPost = (c: SnapSection[] | undefined, lb: string): boolean => secOf(c, lb).some((s) => (s.n || []).some(isPost));
   for (const L of lattice) {
     const { prog, stages } = stagedBuild(IA, L.cfg, false);
     const W = prog.weeks || {};
     S.configs++;
     for (const r of stages) {
       S.dayCells++;
-      const day = (W[r.w] || {})[r.d];
+      const day = W[r.w]?.[r.d as DayKey];
       const ship = ((day && day.sections) || []).map((s) => ({ l: String((s && s.label) || ''), n: ((s && s.items) || []).map((i) => String((i && i.name) || '')) }));
       FAM.forEach((lb) => {
         const n2 = secOf(r.p2, lb).length;
@@ -319,10 +342,10 @@ function pullCensus(IA: any, lattice: any) {
       if (act !== exp) S.viol++;
       if (!bPost) continue;
       S.swapCards++;
-      secOf(r.p1, 'Pull superset B').forEach((s) => s.n.forEach((n) => { if (isPost(n)) bump(S.swapItems, n); }));
+      secOf(r.p1, 'Pull superset B').forEach((s) => s.n!.forEach((n) => { if (isPost(n)) bump(S.swapItems, n); }));
       if (mainPost) S.mainPostSwap++;
-      if ([].concat(...ship.map((s) => s.n)).some(isVPull)) S.p7VPull++;
-      const aItems = [].concat(...secOf(r.p1, 'Pull superset A').map((s) => s.n));
+      if (([] as string[]).concat(...ship.map((s) => s.n)).some(isVPull)) S.p7VPull++;
+      const aItems = ([] as string[]).concat(...secOf(r.p1, 'Pull superset A').map((s) => s.n!));
       if (ship.some((s) => s.l === 'Pull superset A' || (s.l === 'Pull' && s.n.length && s.n.every((n) => aItems.includes(n))))) S.p4Survive++;
     }
   }
@@ -332,7 +355,7 @@ function pullCensus(IA: any, lattice: any) {
 // ── a golden file with several keyed entries (one per test that owns a part of it) ──────────────────────────────────
 // tests/support/snapshot.js compares a whole file; the deload feature has two owners of its golden values (the
 // integration file and the CI sweep), so each compares and rewrites only its own key. UPDATE_SNAPSHOTS=1 rewrites it.
-function matchSnapshotKey(feature: any, key: any, actual: any) {
+function matchSnapshotKey(feature: string, key: string, actual: unknown): void {
   const file = path.join(SNAPSHOT_DIR, feature + '.json');
   const cur = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
   const value = JSON.parse(JSON.stringify(actual));

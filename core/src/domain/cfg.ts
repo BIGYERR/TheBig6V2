@@ -106,8 +106,8 @@ export interface Cfg {
   deadlift: number;
   /** Optional: without one the engine seeds from the clock, so a test always pins it. */
   seed?: number;
-  /** Optional: an ISO date (YYYY-MM-DD), only on race goals. */
-  raceDate?: string;
+  /** Optional: an ISO date (YYYY-MM-DD), only on race goals. The wizard writes '' for none; null reads the same. */
+  raceDate?: string | null;
   /** Optional: only on an injured program. */
   injury?: Injury | null;
   /** Optional: written into prog.cfg by buildProgram (LIFTING_FOCUS_TO_GOAL of liftingFocus). */

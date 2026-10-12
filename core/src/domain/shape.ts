@@ -183,7 +183,7 @@ const CFG_FIELDS = {
   equipment: req(oneOf(...EQUIPMENT)), unit: req(oneOf(...UNITS)),
   restDays: req(arrayOf(DAY_KEY)), days: req(arrayOf(DAY_KEY)),
   bench: req(num), squat: req(num), deadlift: req(num),
-  raceDate: opt(str), injury: opt(nullable(INJURY)),
+  raceDate: opt(nullable(str)), injury: opt(nullable(INJURY)),
   exSwapPrefs: opt(recordOf(anyKey, 'a name', str)), startDate: opt(str), raceDateWeeks: opt(nullable(num)),
   _testWeek: opt(nullable(int)), _raceDateCappedWeeks: opt(int),
   _paceShift: opt(recordOf(anyKey, 'a key', anything)), _travel: opt(bool),
