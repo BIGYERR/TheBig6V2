@@ -482,3 +482,21 @@ what is stored.
   "Unmarked" toast, the usual foot back). The log-session journey closes a day with Done and finds "Done ✓ tap to
   undo" after a relaunch. 69/69 at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.32 moves the session sheet's 1RM calculator and range-top nudge
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.32.
+- **Moved:** the sheet's body is now a list of blocks: each legacy builder's markup in a box that makes none of its own
+  (the body is a flex column, and no rule depends on its direct children), and components where a piece has moved.
+  The test-week calculator (the legacy `e1rmCalcHTML`, `e1rmCalcUpdate`, `saveTestMax`): `day-detail/e1rm-card.ts`,
+  prefilled from the logged test set (`e1rmCard`), estimating by Epley (`epley`, a single being itself), reading 0
+  until a field changes as the legacy did, and saving the estimate as the lift's max into the stored program and the
+  active one, with no rebuild. Its two labels stay unassociated with their fields, as the legacy's were (a lint
+  exception says so). The range-top nudge (the legacy `rangeTopNudgeHTML`): `rangeNudge` and the sheet's template,
+  its text cut into the legacy's text runs. The legacy reads both guarded stay guarded.
+- **Tests:** `frontends/app/test/unit/day-detail.test.ts` grows to 8 (the blocks' order with the calculator after the
+  main, Epley, the prefill, the nudge's names and count). No journey reaches a test-lift day or earns the nudge, so a
+  local comparison opened one crafted day in both builds (a bench test, three accessories, two at the top of their
+  range) and matched the sheet, the calculator before and after a typed set, and the saved note, in pixels and facts.
+  69/69 at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

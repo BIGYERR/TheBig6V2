@@ -2,18 +2,40 @@
 // E, step 20: the sheet moves from the legacy openDetail to the DayDetail component). The body's pieces are still the
 // legacy builders' markup; this decides their order and the header's words, as the legacy openDetail did.
 
-/** The body's pieces, each a legacy builder's markup ('' when it has nothing). */
+/** The test-lift 1RM calculator's starting state: the lift, its name, the unit, and the logged test set if any. */
+export interface E1rmCard {
+  lift: string;
+  liftLabel: string;
+  unit: string;
+  weight: string;
+  reps: number;
+}
+
+/** The range-top nudge: the exercises whose last session hit the top of the range on every set. */
+export interface RangeNudge {
+  /** The first two names, shown in bold. */
+  shown: string[];
+  /** The words for the rest: " and N more", or nothing. */
+  extra: string;
+}
+
+/** The body's pieces: the legacy builders' markup ('' when a builder has nothing), the calculator and the nudge. */
 export interface BodyParts {
-  /** The main section, then the rest (the 1RM calculator between them on a test-lift day). */
-  lifts: string;
+  /** The main section's markup and the rest's (the calculator sits between them). */
+  main: string;
+  e1rm: E1rmCard | null;
+  rest: string;
   cardio: string;
   note: string | undefined;
-  rangeNudge: string;
+  nudge: RangeNudge | null;
   wildcardTag: string;
   log: string;
   /** The "logged but never marked" nudge, when the day has a log and no status. */
   logNudge: string;
 }
+
+/** One block of the body: a legacy builder's markup, the 1RM calculator, or the range-top nudge. */
+export type BodyBlock = { kind: 'html'; html: string } | { kind: 'e1rm'; card: E1rmCard } | { kind: 'nudge'; nudge: RangeNudge };
 
 /**
  * Lifting first only when lifting is the priority: on an event program or a support focus the cardio is the point of
@@ -24,12 +46,49 @@ export function liftsFirst(hasSections: boolean, primaryPath: string | undefined
 }
 
 /** The body in the legacy order: the Wildcard tag, the range nudge, the work, the note, the log, the log nudge. */
-export function detailBody(p: BodyParts, first: boolean, hasSections: boolean): string {
-  let html = first ? p.lifts + p.cardio : p.cardio + (hasSections ? p.lifts : '');
-  if (p.note) html += '<div class="note-block">' + p.note + '</div>';
-  if (p.rangeNudge) html = p.rangeNudge + html;
-  if (p.wildcardTag) html = p.wildcardTag + html;
-  return html + p.log + p.logNudge;
+export function detailBody(p: BodyParts, first: boolean, hasSections: boolean): BodyBlock[] {
+  const html = (h: string): BodyBlock[] => (h ? [{ kind: 'html', html: h }] : []);
+  const lifts: BodyBlock[] = hasSections ? [...html(p.main), ...(p.e1rm ? [{ kind: 'e1rm' as const, card: p.e1rm }] : []), ...html(p.rest)] : [];
+  const blocks: BodyBlock[] = first ? [...lifts, ...html(p.cardio)] : [...html(p.cardio), ...lifts];
+  if (p.note) blocks.push(...html('<div class="note-block">' + p.note + '</div>'));
+  if (p.nudge) blocks.unshift({ kind: 'nudge', nudge: p.nudge });
+  if (p.wildcardTag) blocks.unshift(...html(p.wildcardTag));
+  return [...blocks, ...html(p.log), ...html(p.logNudge)];
+}
+
+/** The legacy _epley: a single is itself; otherwise weight × (1 + reps/30), rounded; nothing without a weight. */
+export function epley(weight: number, reps: number): number {
+  if (!(weight > 0)) return 0;
+  return reps <= 1 ? Math.round(weight) : Math.round(weight * (1 + reps / 30));
+}
+
+/** The legacy e1rmCalcHTML's start: the logged test set prefills the weight and its first set's reps (1 to 5, else 3). */
+export function e1rmCard(testLift: string | undefined, unit: string, last: { weight?: string | number; setsDone?: (string | number)[] } | undefined): E1rmCard | null {
+  if (!testLift) return null;
+  let weight = '';
+  let reps = 3;
+  if (last && last.weight) {
+    weight = String(last.weight);
+    if (last.setsDone && last.setsDone.length) reps = Math.min(5, Math.max(1, +last.setsDone[0]! || 3));
+  }
+  return { lift: testLift, liftLabel: ({ bench: 'bench', squat: 'squat', deadlift: 'deadlift' } as Record<string, string>)[testLift] || testLift, unit, weight, reps };
+}
+
+/** The legacy rangeTopNudgeHTML's reading: each "sets×lo–hi" item whose last logged session reached hi on every set. */
+export function rangeNudge(items: { name?: string; detail?: string }[], lastOf: (name: string) => { setsDone?: (string | number)[] } | undefined): RangeNudge | null {
+  const names: string[] = [];
+  for (const it of items) {
+    if (!it || !it.name || !it.detail) continue;
+    const m = /^(\d+)×(\d+)–(\d+)( each)?( @ RPE .*)?$/.exec(it.detail);
+    if (!m) continue;
+    const sets = +m[1]!, hi = +m[3]!;
+    const ent = lastOf(it.name);
+    if (!ent || !ent.setsDone || ent.setsDone.length < sets) continue;
+    const done = ent.setsDone.slice(0, sets).map((x) => +x || 0);
+    if (done.length >= sets && done.every((x) => x >= hi)) names.push(it.name);
+  }
+  if (!names.length) return null;
+  return { shown: names.slice(0, 2), extra: names.length > 2 ? ' and ' + (names.length - 2) + ' more' : '' };
 }
 
 /** Whether a day's log holds anything the athlete wrote: a note, or any run, ride or swim figure. */

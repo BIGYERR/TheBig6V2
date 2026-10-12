@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
-import { detailBody, type FootButton, hasLogged, liftsFirst, loggedCount, logNudge, statusFoot } from './day-detail-model';
+import { type BodyBlock, detailBody, e1rmCard, type FootButton, hasLogged, liftsFirst, loggedCount, logNudge, rangeNudge, statusFoot } from './day-detail-model';
+import { E1rmCard } from './e1rm-card';
 
 /** A scheduled day, as far as the sheet reads it. */
 interface DetailDay {
@@ -19,7 +20,7 @@ interface DetailView {
   title: string;
   tags: SafeHtml;
   counter: string | null;
-  body: SafeHtml;
+  body: (BodyBlock | { kind: 'html'; html: SafeHtml })[];
 }
 
 /** The fields the legacy sheet wired to save as they change. */
@@ -30,8 +31,9 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
  * openDetail that filled it. It takes over openDetail through LegacyBridge.provide, so every open and every re-render
  * (a skip, a swap, an add, a KB size, the nudge) reaches it. The header (the week and day, the title, the tags, the
  * logged count, Back, RPE and the add button) and the frame are the component's, drawn anew on each call as the legacy
- * writes did. The body is still the legacy builders' markup (the sections and their set logging, the 1RM calculator,
- * the cardio card, the note, the nudges, the session log). The foot (Done and Skip, each undoing itself) is the
+ * writes did. The body is a list of blocks: the legacy builders' markup (the sections and their set logging, the cardio
+ * card, the note, the log nudge, the session log), each laid in a box that makes none of its own, and since step 24 the
+ * test-week 1RM calculator (E1rmCard) and the range-top nudge. The foot (Done and Skip, each undoing itself) is the
  * component's since step 23: it takes over renderStatusFoot, which the legacy handleDayStatus calls on every status
  * change. After each draw the legacy wiring runs as before: the log fields save as they change, the wheels start, the derived dose
  * paints. A re-render keeps the reader where they were; a fresh open starts at the top.
@@ -39,6 +41,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
 @Component({
   selector: 'ia-day-detail',
   host: { style: 'display: contents' },
+  imports: [E1rmCard],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @for (v of views(); track v) {
@@ -57,7 +60,15 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
         <button class="dh-addbtn" id="detailAddBtn" (click)="call('openAddSheet')" aria-label="Add an exercise to this day"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Exercise</button>
       </div>
     </div>
-    <div class="detail-body" id="detailBody" [innerHTML]="v.body"></div>
+    <div class="detail-body" id="detailBody">
+      @for (blk of v.body; track $index) {
+        @switch (blk.kind) {
+          @case ('html') { <div style="display:contents" [innerHTML]="blk.html"></div> }
+          @case ('e1rm') { <ia-e1rm-card [card]="blk.card" /> }
+          @case ('nudge') { <div class="prog-nudge"><b>Time to add weight.</b>{{ ' Last session you hit the top of the range on every set of ' }}@for (n of blk.nudge.shown; track $index; let last = $last) {<b>{{ n }}</b>@if (!last) {{{ ' and ' }}}}{{ blk.nudge.extra + '. Go up in weight today and start back at the bottom of the range.' }}</div> }
+        }
+      }
+    </div>
     <div class="detail-foot" id="detailFoot">
       <div id="detailStatusRow">@if (foot(); as f) {<div class="status-stack">@for (btn of f.buttons; track btn.id) {<button [class]="btn.cls" [id]="btn.id" (click)="call('handleDayStatus', f.dayKey, f.title, btn.status)">{{ btn.label }}@if (btn.undo) {<small>tap to undo</small>}</button>}</div>}</div>
     </div>
@@ -88,6 +99,15 @@ export class DayDetail {
     this.cdr.detectChanges();
   }
 
+  /** A legacy read that the legacy sheet guarded: a failure draws nothing for that piece, as before. */
+  private safeRead<T>(read: () => T, fallback: T): T {
+    try {
+      return read();
+    } catch {
+      return fallback;
+    }
+  }
+
   protected call(name: string, ...args: unknown[]): void {
     this.bridge.call(name, ...args);
   }
@@ -112,13 +132,21 @@ export class DayDetail {
     const secs = day.sections || [];
     const status = comp ? comp.status || 'complete' : null;
     const le = b.call<Record<string, Record<string, unknown> | undefined>>('getLogs')[b.call<string>('logKey', week, dayKey)];
-    const html = detailBody({
-      lifts: secs.length
-        ? b.call<string>('buildSectionsHTML', [secs[0]], 0) + (day.testLift ? b.call<string>('e1rmCalcHTML', day) : '') + b.call<string>('buildSectionsHTML', secs.slice(1), 1)
-        : '',
+    const store = this.safeRead(() => b.call<Record<string, { entries?: { weight?: string | number; setsDone?: (string | number)[] }[] } | undefined>>('getExWeights'), {});
+    const lastOf = (name: string | undefined) => {
+      const row = store[b.call<string>('exStoreKey', name)];
+      return ((row && row.entries) || []).slice(-1)[0];
+    };
+    const mainName = this.safeRead(() => (secs[0] as { items: { name?: string }[] }).items[0]!.name, undefined);
+    const unit = (globalThis as Record<string, unknown>)['_unitLabel'] as string || 'lbs';
+    const items = secs.flatMap((sec) => ((sec as { items?: { name?: string; detail?: string }[] }).items || []));
+    const body = detailBody({
+      main: secs.length ? b.call<string>('buildSectionsHTML', [secs[0]], 0) : '',
+      e1rm: day.testLift ? e1rmCard(String(day.testLift), unit, this.safeRead(() => lastOf(mainName), undefined)) : null,
+      rest: secs.length ? b.call<string>('buildSectionsHTML', secs.slice(1), 1) : '',
       cardio: b.call<string>('buildCardioHTML', day.cardio),
       note: day.note,
-      rangeNudge: b.call<string>('rangeTopNudgeHTML', day),
+      nudge: this.safeRead(() => rangeNudge(items, lastOf), null),
       wildcardTag: b.call<string>('wildcardTagHTML', week, dayKey),
       log: b.call<string>('buildLogHTML', dayKey, day.cardio),
       logNudge: !status && hasLogged(le) ? logNudge(dayKey, day.title, b.call<string>('asyIcon', 'notebook', 14)) : '',
@@ -128,7 +156,7 @@ export class DayDetail {
       title: (comp && comp.title) || day.title || 'Training',
       tags: this.sanitizer.bypassSecurityTrustHtml(tags),
       counter: loggedCount(progress),
-      body: this.sanitizer.bypassSecurityTrustHtml(html),
+      body: body.map((blk) => (blk.kind === 'html' ? { kind: 'html' as const, html: this.sanitizer.bypassSecurityTrustHtml(blk.html) } : blk)),
     });
     this.foot.set(null);
     this.cdr.detectChanges();
