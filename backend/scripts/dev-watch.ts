@@ -3,14 +3,15 @@
 // (Dockerfile.dev, docker-compose.dev.yml), so it keeps rebuilding with nothing running on the Mac and comes back
 // whenever Docker does; npm run dev -- --no-docker runs it on the Mac's own Node instead (scripts/dev.ts, either way).
 //
-//   website  /         site/          ng build --watch, a development build (a second or two)
-//   app      /app/     frontends/app/src/legacy/src/   the app's source files, built into app-web/index.html on every save by
-//                                     frontends/app/scripts/build-index.mjs (the function that builds the root index.html), its
-//                                     inline script parsed; the repo root is never written
-//                      index.html     the repo root's, copied to app-web/ on every save, its inline script parsed
-//   admin    /admin/   admin/         ng build --watch
-//   server             server/        the server restarts (under a second), then the type check beside the tests
-//   snippet  /client/  client/        served as saved
+//   website  /         frontends/website/  ng build --watch in frontends/, a development build (a second or two)
+//   admin    /admin/   frontends/admin/    ng build --watch in frontends/ (both read frontends/common/)
+//   app      /app/     frontends/app/src/legacy/src/
+//                                          the app's source files, built into app-web/index.html on every save by
+//                                          frontends/app/scripts/build-index.mjs (the function that builds the root
+//                                          index.html), its inline script parsed; the repo root is never written
+//                      index.html          the repo root's, copied to app-web/ on every save, its inline script parsed
+//   server             server/             the server restarts (under a second), then the type check beside the tests
+//   snippet  /client/  client/             served as saved
 //
 // After each change it runs the fast tests that change can break, each set stopped at 3 s, then every open page
 // reloads itself (server/dev.ts). The server runs from its TypeScript source as Node strips the types, so the type
@@ -19,9 +20,9 @@
 //
 // Saves arrive as file events: through Docker Desktop's mounts they reach the container in tens of milliseconds.
 // IA_DEV_POLL_MS=<ms> polls instead (ng build --poll, and a sweep of the watched folders' file times), for a machine
-// where the events stop arriving. Either way a save is a file whose time or size moved. The checkout sits on an iCloud
-// Desktop, and iCloud rewrites a saved file's attributes 10 to 40 seconds later; that event changes neither, so it
-// restarts nothing, and an Angular rebuild whose output came out the same reloads nothing.
+// where the events stop arriving. Either way a save is a file whose time or size moved. An event that changes neither
+// (a sync tool rewriting a file's attributes) restarts nothing, and an Angular rebuild whose output came out the same
+// reloads nothing.
 //
 // It reads PORT (the server's), APP_SOURCE_DIR (the repo root, where index.html and frontends/app/ are; the folder above
 // backend/ by default), APP_BUNDLE_DIR (where the app is served from; app-web/ by default) and IA_DEV_CONTAINER=1 (set
@@ -48,7 +49,9 @@ const SELF = `http://127.0.0.1:${PORT}`;
 const POLL_MS = Number(process.env.IA_DEV_POLL_MS) || 0;
 const IN_CONTAINER = process.env.IA_DEV_CONTAINER === '1';
 const TEST_LIMIT_MS = 3_000;
-const NG = join(BACKEND, 'node_modules', '.bin', 'ng');
+// The website and the admin: one Angular workspace beside backend/, in the checkout and in the container alike.
+const FRONTENDS = join(BACKEND, '..', 'frontends');
+const NG = join(FRONTENDS, 'node_modules', '.bin', 'ng');
 const TSC = join(BACKEND, 'node_modules', '.bin', 'tsc');
 // The backend tests that finish in well under a second: no child processes, no git. npm test runs every file.
 const FAST_TESTS = ['server', 'auth', 'versions', 'site', 'client', 'dev', 'request-log', 'semver-parity']
@@ -334,14 +337,14 @@ export function watchFolder(dir: string, { recursive = true, only = () => true, 
   return () => (watcher.close(), clearTimeout(timer));
 }
 
-// ng build --watch, one per Angular app. The two often rebuild together (the admin uses the site's icons), so builds
+// ng build --watch, one per Angular app. The two often rebuild together (both use frontends/common/), so builds
 // that finish within a quarter second share one test run and one reload. Angular rebuilds on any event, an attribute
 // change too, so a rebuild whose output is the same as before reloads nothing.
 const builds: ChildProcess[] = [];
 const outputs = new Map<string, string>();
 /** True when the app's built folder differs from what it held at the last look. */
 function outputMoved(project: string) {
-  const dir = join(BACKEND, 'dist', project);
+  const dir = join(FRONTENDS, 'dist', project);
   const hash = createHash('sha1');
   for (const file of [...snapshot(dir).keys()].sort()) hash.update(`${file}\0`).update(readFileSync(join(dir, file)));
   const digest = hash.digest('hex');
@@ -374,7 +377,7 @@ function builtOne(project: string) {
 }
 function ngWatch(project: string, onFirst: () => void) {
   const args = ['build', project, '--watch', '--configuration', 'development', ...(POLL_MS ? ['--poll', String(POLL_MS)] : [])];
-  const child = spawn(NG, args, { cwd: BACKEND, env: { ...process.env, NG_CLI_ANALYTICS: 'false', NO_COLOR: '1', FORCE_COLOR: '0' } });
+  const child = spawn(NG, args, { cwd: FRONTENDS, env: { ...process.env, NG_CLI_ANALYTICS: 'false', NO_COLOR: '1', FORCE_COLOR: '0' } });
   builds.push(child);
   let errors: string[] = [];
   let first = true;
@@ -424,11 +427,11 @@ async function main() {
     if (--building) return;
     enqueue(async () => {
       await Promise.all([typecheck(), backendTests()]);
-      ['site', 'admin'].forEach(outputMoved);
+      ['website', 'admin'].forEach(outputMoved);
       await reloadPages();
     });
   };
-  ngWatch('site', firstBuilt);
+  ngWatch('website', firstBuilt);
   ngWatch('admin', firstBuilt);
 
   // The restart first, so the change shows at once; the type check and the tests follow, and the pages reload as the

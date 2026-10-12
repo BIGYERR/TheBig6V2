@@ -2,9 +2,9 @@
 // deploy tree carries the same two files from the commit it deploys.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { after, before, describe, test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
@@ -45,26 +45,47 @@ describe('app-bundle', () => {
 });
 
 describe('heroku deploy tree', { skip: !existsSync(join(BACKEND, '..', '.git')) && 'not in a git checkout' }, () => {
-  test('is backend/ with app-web/ holding the same commit\'s index.html and icon', () => {
-    const tree = execFileSync('bash', [join(BACKEND, 'scripts', 'heroku.sh'), 'tree', 'HEAD'], { encoding: 'utf8' }).trim();
-    // Without the variables git exports to hooks: with GIT_DIR set, git takes BACKEND for the top of the checkout and
-    // HEAD's listing below would be the whole repo (heroku.sh unsets them for the same reason).
+  test("keeps the repo's layout: backend/ with the app in app-web/, frontends/ without the app, heroku/'s manifest at the root", () => {
+    // Without the variables git exports to hooks: with GIT_DIR set, git takes BACKEND for the top of the checkout
+    // (heroku.sh unsets them for the same reason).
     const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !k.startsWith('GIT_')));
     const git = (...args: string[]) => execFileSync('git', ['-C', BACKEND, ...args], { encoding: 'utf8', env }).trim();
-    const files = git('ls-tree', '--full-tree', '-r', '--name-only', tree).split('\n');
-    for (const f of ['package.json', 'Procfile', 'app-web/index.html', 'app-web/apple-touch-icon.png']) assert.ok(files.includes(f), f);
-    // Every file backend/ holds at HEAD, and only those plus the app. Read off HEAD, never named here: in a pre-commit
-    // check HEAD is the parent commit, so a file the commit adds is not in it yet.
-    const committed = git('ls-tree', '-r', '--name-only', 'HEAD').split('\n').filter((f) => !f.startsWith('app-web/'));
-    assert.deepEqual([...files].sort(), [...committed, 'app-web/apple-touch-icon.png', 'app-web/index.html'].sort());
-    assert.ok(!files.some((f) => f.startsWith('backend/')), 'backend/ is the root, not a folder in it');
-    assert.equal(git('rev-parse', `${tree}:app-web/index.html`), git('rev-parse', 'HEAD:index.html'));
+    // The index, not HEAD: in a pre-commit check HEAD is the parent commit, and the tree must be what is committed.
+    // During a commit git holds the index's lock and names the index being committed in GIT_INDEX_FILE (relative to
+    // the top of the checkout), so the tree is written from a copy of that index, never from the live one.
+    const top = git('rev-parse', '--show-toplevel');
+    const live = process.env.GIT_INDEX_FILE ? resolve(top, process.env.GIT_INDEX_FILE) : join(git('rev-parse', '--absolute-git-dir'), 'index');
+    const scratch = mkdtempSync(join(tmpdir(), 'ia-deploy-tree-'));
+    copyFileSync(live, join(scratch, 'index'));
+    const ref = execFileSync('git', ['-C', BACKEND, 'write-tree'], { encoding: 'utf8', env: { ...env, GIT_INDEX_FILE: join(scratch, 'index') } }).trim();
+    rmSync(scratch, { recursive: true, force: true });
+    const tree = execFileSync('bash', [join(BACKEND, 'scripts', 'heroku.sh'), 'tree', ref], { encoding: 'utf8' }).trim();
+    const list = (t: string) => git('ls-tree', '--full-tree', '-r', '--name-only', t).split('\n');
+    const source = list(ref);
+    const files = list(tree);
+    const expected = [
+      'package.json',
+      'package-lock.json',
+      'Procfile',
+      ...source.filter((f) => f.startsWith('backend/') && !f.startsWith('backend/app-web/')),
+      'backend/app-web/apple-touch-icon.png',
+      'backend/app-web/index.html',
+      ...source.filter((f) => f.startsWith('frontends/') && !f.startsWith('frontends/app/')),
+    ];
+    assert.deepEqual([...files].sort(), expected.sort());
+    for (const f of ['package.json', 'package-lock.json', 'Procfile']) {
+      assert.equal(git('rev-parse', `${tree}:${f}`), git('rev-parse', `${ref}:backend/heroku/${f}`), `${f} is heroku/'s`);
+    }
+    assert.equal(git('rev-parse', `${tree}:backend/app-web/index.html`), git('rev-parse', `${ref}:index.html`));
+    for (const ui of ['website', 'admin', 'common']) assert.ok(files.some((f) => f.startsWith(`frontends/${ui}/`)), `frontends/${ui}/ ships`);
   });
 });
 
-// Heroku gets the TypeScript and compiles it itself: its Node buildpack runs `npm run build` with the dev dependencies
-// installed, then the Procfile starts what tsc wrote. The Dockerfile does the same in its build stage. So the build
-// must compile the server, and every start command must name the file tsc emits for server/server.ts.
+// Heroku gets the TypeScript and compiles it itself: its Node buildpack runs the root `npm run build`
+// (backend/heroku/package.json, at the root of the deploy tree), which builds the frontends, then this folder, with the
+// dev dependencies installed; then the Procfile starts what tsc wrote. The Dockerfile does the same in its build
+// stages. So the build must compile the server, and every start command must name the file tsc emits for
+// server/server.ts.
 describe('compiled server', () => {
   const read = (file: string) => readFileSync(join(BACKEND, file), 'utf8');
   const tsconfig = JSON.parse(read('tsconfig.server.json').replace(/\/\*[\s\S]*?\*\//g, ''));
@@ -81,9 +102,14 @@ describe('compiled server', () => {
     assert.match(pkg.scripts['build:server'], /tsc -p tsconfig\.server\.json$/);
     assert.equal(pkg.main, entry);
     assert.ok(pkg.scripts.start.endsWith(` ${entry}`), pkg.scripts.start);
-    assert.equal(read('Procfile'), `web: node --enable-source-maps ${entry}\n`);
+    const heroku = JSON.parse(read('heroku/package.json'));
+    assert.match(heroku.scripts.build, /npm run build --prefix frontends && .*npm run build --prefix backend/, 'Heroku builds the frontends, then the server');
+    assert.equal(heroku.scripts.start, `cd backend && node --enable-source-maps ${entry}`);
+    assert.equal(read('heroku/Procfile'), `web: cd backend && node --enable-source-maps ${entry}\n`);
+    assert.equal(heroku.engines.node, pkg.engines.node, 'Heroku picks the Node line from the root manifest');
     const docker = read('Dockerfile');
-    assert.ok(docker.includes('RUN npm run build:server && npm run build:ui'), 'the image compiles the server');
+    assert.ok(docker.includes('RUN npm run build:server'), 'the image compiles the server');
+    assert.ok(docker.includes('COPY --from=frontends /srv/frontends/dist /srv/frontends/dist'), 'the image carries the frontends build');
     assert.ok(docker.includes(`CMD ["node", "--enable-source-maps", "${entry}"]`), 'the image runs it');
     assert.ok(read('scripts/mac-local-backend.sh').includes(`nohup node --enable-source-maps ${entry} `), 'the Mac runner runs it');
   });

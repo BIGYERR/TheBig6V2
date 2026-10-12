@@ -24,7 +24,8 @@ services:
   backend:
     # backend/Dockerfile copies app-web/, the app it serves at /app/; launch.ts bundles it from the repo root index.html first.
     build:
-      context: ../../../backend
+      context: ../../..
+      dockerfile: backend/Dockerfile
     network_mode: service:web
     depends_on:
       web:

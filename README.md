@@ -6,7 +6,8 @@ Iron Asylum: a hybrid strength and cardio program builder for iPhone.
 |---|---|---|
 | `index.html` | the app: one file, served at https://bigyerr.github.io/TheBig6V2/ | GitHub Pages, on every push to `main` |
 | `frontends/app/` | the same app as an Angular project, built four ways: `emulator-ios` and `device-ios` (Cordova), `pwa-pages` (a web build for `/TheBig6V2/pwa/`), and `pwa-local` (the same web build, served from this Mac) | built on demand; see `frontends/app/README.md` |
-| `backend/` | the Node backend: the website (`/`), the app (`/app/`), the device heartbeat API and the admin vision dashboard (`/admin/`), one server | Heroku, with `backend/scripts/heroku.sh deploy`; see `backend/README.md` |
+| `frontends/` | the website and the admin dashboard (an Angular workspace), and `common/`, what the frontends share; the app above is `frontends/app/` | served by the backend; see `frontends/README.md` |
+| `backend/` | the Node backend: one server for the website (`/`), the app (`/app/`), the admin dashboard (`/admin/`) and the device heartbeat API | Heroku, with `backend/scripts/heroku.sh deploy`; see `backend/README.md` |
 | `tests/` | the test suite, by feature: unit, integration and sweeps in TypeScript on Vitest, with golden program output in `tests/snapshots/` | `node tools/check.mjs` locally (60 s), the full suite in CI |
 | `docs/` | reference for agents and Mario: the design system (`docs/design/`) | not shipped; it rides along on Pages with the rest of the repo, and the app never reads it |
 | `tools/` | the run log: every test, build, deploy, server and Claude session recorded in `temp/` | see `tools/README.md` |

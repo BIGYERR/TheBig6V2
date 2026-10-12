@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { Icon, IconName } from './icon';
+import { Icon, IconName } from '../common/icon';
 import { RestClock } from './rest-clock';
 
 interface StripDay {

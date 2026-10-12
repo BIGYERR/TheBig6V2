@@ -249,10 +249,16 @@ Heroku tree.
 1. **`app/` to `frontends/app/`** (done). The whole Angular and Cordova project moved as one folder, its
    `node_modules`, `platforms/` and `plugins/` with it; every path that climbs out of it gained a level. The app's
    build (`www/`, 6 files) and the generated legacy pieces (4 files) hash the same before and after.
-2. **The website and the admin to `frontends/website/` and `frontends/admin/`**, out of `backend/`. They become an
-   Angular workspace of their own at `frontends/` (its `package.json` and `angular.json`), so `backend/` holds the
-   server only. The backend's Docker image builds them from the repo root, and Heroku's tree carries them.
-3. **`frontends/common/`**: the design-system tokens and anything else two frontends already duplicate.
+2. **The website and the admin to `frontends/website/` and `frontends/admin/`** (done), out of `backend/`. They are
+   an Angular workspace of their own at `frontends/` (its `package.json`, lock file, `angular.json`, `tsconfig.json`
+   and lint config), built into `frontends/dist/`, so `backend/` holds the server only. The server finds the builds
+   beside it (`../frontends/dist`), and every place it runs keeps the repo's layout for that: the Docker images are
+   built from the repo root into `/srv/backend` and `/srv/frontends`, and Heroku's tree is `backend/` and
+   `frontends/` (without the app) with `backend/heroku/`'s manifest and `Procfile` at its root. The frontends lock
+   resolves every package at the version the backend had locked (478 packages, 0 changed). Both bundles are byte for
+   byte the same; only Angular's file name hash moved with the source paths.
+3. **`frontends/common/`**: the icon set the admin borrowed from the website moved there in step 2; the design-system
+   tokens and anything else two frontends duplicate follow.
 4. **The e2e to `tests/e2e/`**: it drives all three frontends, so it lives with the tests.
 The app joins the `frontends/` workspace later (phase E), when its screens start importing `frontends/common/`; until
 then it stays its own package, because Cordova keeps its platform and plugin list in the project root's

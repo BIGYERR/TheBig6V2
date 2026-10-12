@@ -330,13 +330,13 @@ equals itself before comparing; NRC sessions are verbatim; temp files only under
 ## Dev mode (Mario, Post-V239): the fastest look at a change, never a proof
 The dev container serves the website (`/`), the app (`/app/`, built from `frontends/app/src/legacy/src/`), the admin (`/admin/`,
 admin / asylum) and the backend on http://localhost:3000, and rebuilds whatever is saved by itself, in about a second,
-with nothing running on the Mac: site and admin by `ng build --watch`; the app built from its source files on every
+with nothing running on the Mac: the website and the admin (`frontends/`) by `ng build --watch`; the app built from its source files on every
 save, with the function that builds the root `index.html` (`frontends/app/scripts/build-index.mjs`), into `backend/app-web/`
 only, and the root `index.html` copied when it changes, its inline script parsed either way; the server restarted on a
 `server/` change. A saved source file shows at `/app/` at once; the root file still needs `npm run build:index`. After each change it runs only tests that finish within 3 s, then
 every open page reloads itself. The watcher (`backend/scripts/dev-watch.ts`) runs inside the container
 (`backend/Dockerfile.dev`, `backend/docker-compose.dev.yml`); it reads the checkout read-only and writes only
-`backend/dist/` and `backend/app-web/`. The container comes back by itself whenever Docker starts.
+`backend/dist/`, `backend/app-web/` and `frontends/dist/`. The container comes back by itself whenever Docker starts.
 `cd backend && npm run dev` starts it (building its image when needed) and follows its log: Ctrl-C stops following,
 never the container. `npm run dev:down` stops it; `npm run docker:up` puts back the plain production image. When Mario
 wants to see an edit, check it answers (`curl -s localhost:3000/healthz`), run `npm run dev` in the background if not,
@@ -353,6 +353,9 @@ builds: `frontends/app/` `emulator-ios`, `device-ios`, `pwa-pages`, `pwa-local`;
   together; the root file is never edited by hand.
 - `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).
 - `docs/design/THE_ASYLUM_DS_REFERENCE*.md` — design system (bone `#F4F1E8`, ink, signal orange `#CF4E1A`; `asyIcon()` inline SVG, never emoji in chrome).
+- `frontends/` — every UI: `app/` (above, and the Cordova iOS project), and the website, the admin and `common/` (what
+  more than one frontend uses) as one Angular workspace (`frontends/README.md`), built into `frontends/dist/`, which the
+  backend serves. `backend/` is the server only.
 - `tests/` — the only test suite: `unit/`, `integration/`, `sweeps/` and `snapshots/` (named by feature), `support/`
   (helpers, on `tests/harness.js`), `package.json` (Vitest, TypeScript); `tests/harness.js` (VM boot, fixtures,
   `weekGrid`, `progDigest`), `tests/lattice193.js` (the shared 864-config lattice), `tests/semver.js` (the version

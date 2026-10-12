@@ -2,7 +2,7 @@
   "name": "iron-asylum-backend",
   "version": "0.1.0",
   "private": true,
-  "description": "Iron Asylum backend: the website, the device heartbeat API and the admin vision dashboard.",
+  "description": "Iron Asylum backend: the device heartbeat API and the admin API, serving the website, the admin and the app that frontends/ and the repo root build.",
   "type": "module",
   "main": "dist/server/server.js",
   "engines": {
@@ -13,12 +13,9 @@
     "dev": "node ../tools/run.mjs server-backend-dev -- node scripts/dev.ts",
     "dev:down": "node ../tools/run.mjs backend-dev-down -- docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
     "dev:server": "node ../tools/run.mjs server-backend-dev-server -- node --watch server/server.ts",
-    "build": "node scripts/app-bundle.ts && npm run build:server && npm run build:ui",
+    "build": "node scripts/app-bundle.ts && npm run build:server",
     "build:server": "node -e \"require('node:fs').rmSync('dist/server', { recursive: true, force: true })\" && tsc -p tsconfig.server.json",
-    "build:ui": "ng build admin && ng build site",
     "app:bundle": "node scripts/app-bundle.ts",
-    "admin:dev": "node ../tools/run.mjs server-backend-admin -- ng serve admin",
-    "site:dev": "node ../tools/run.mjs server-backend-site -- ng serve site",
     "pretest": "npm run typecheck",
     "test": "node ../tools/run.mjs backend-test -- node --test --test-reporter=spec test/",
     "typecheck": "node ../tools/run.mjs backend-typecheck -- sh -c 'tsc -p tsconfig.server.json --noEmit && tsc -p tsconfig.test.json'",
@@ -38,29 +35,12 @@
     "express": "^5.3.0"
   },
   "devDependencies": {
-    "@angular/build": "^22.2.2",
-    "@angular/cli": "^22.2.2",
-    "@angular/common": "^22.2.0",
-    "@angular/compiler": "^22.2.0",
-    "@angular/compiler-cli": "^22.2.0",
-    "@angular/core": "^22.2.0",
-    "@angular/platform-browser": "^22.2.0",
     "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.5",
-    "angular-eslint": "^22.5.0",
     "eslint": "^10.12.0",
     "globals": "^17.13.0",
-    "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.69.0"
-  },
-  "allowScripts": {
-    "esbuild@0.28.2": true,
-    "@parcel/watcher": false,
-    "fsevents": false,
-    "lmdb": false,
-    "msgpackr-extract": false
   }
 }

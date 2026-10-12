@@ -1,4 +1,4 @@
-// The website at `/` (server/app.ts): served from a built dist/site, a 503 when it is not built, a 404 page for
+// The website at `/` (server/app.ts): served from its build (frontends/dist/website), a 503 when it is not built, a 404 page for
 // browsers and JSON for everything else, and a Staff Login that leads to the admin login on the same server.
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -87,7 +87,7 @@ describe('website, not built', () => {
     const s = await boot('/nonexistent');
     const r = await fetch(`${s.base}/`, { redirect: 'manual' });
     assert.equal(r.status, 503);
-    assert.match(await r.text(), /npm run build/);
+    assert.equal(await r.text(), 'The website is not built. Run `npm run build` in frontends/.');
     const missing = await fetch(`${s.base}/no-such-page`, { headers: HTML });
     assert.equal(missing.status, 404);
     assert.equal((await missing.json()).ok, false, 'no 404 page without a build, so JSON');
@@ -95,11 +95,12 @@ describe('website, not built', () => {
   });
 });
 
+// The website's source lives in the frontends workspace, beside this folder.
 describe('website source', () => {
-  const template = readFileSync(new URL('../site/site.html', import.meta.url), 'utf8');
+  const template = readFileSync(new URL('../../frontends/website/site.html', import.meta.url), 'utf8');
 
   test('every "open the app" link goes to the app this backend serves at /app/', () => {
-    const ts = readFileSync(new URL('../site/site.ts', import.meta.url), 'utf8');
+    const ts = readFileSync(new URL('../../frontends/website/site.ts', import.meta.url), 'utf8');
     assert.match(ts, /const APP_URL = '\/app\/';/);
     assert.ok(!/bigyerr\.github\.io/.test(template), 'no hard link to Pages in the template');
   });
@@ -113,7 +114,7 @@ describe('website source', () => {
     const text = template.replace(/<!--[\s\S]*?-->/g, '');
     assert.doesNotMatch(text, / [—–-] /);
     for (const file of ['site.ts']) {
-      const src = readFileSync(new URL(`../site/${file}`, import.meta.url), 'utf8').replace(/\/\/.*$/gm, '');
+      const src = readFileSync(new URL(`../../frontends/website/${file}`, import.meta.url), 'utf8').replace(/\/\/.*$/gm, '');
       const strings = src.match(/'[^'\n]*'/g) ?? [];
       assert.deepEqual(strings.filter((str) => /[—–]| - /.test(str)), [], `${file} has a dash in a string`);
     }

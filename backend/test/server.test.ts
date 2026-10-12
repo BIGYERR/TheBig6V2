@@ -190,9 +190,10 @@ describe('admin', () => {
     assert.ok(j.items.every((d: { connected: boolean }) => d.connected));
   });
 
-  test('the admin UI says it is not built when dist is missing', async () => {
+  test('the admin UI says it is not built when dist is missing, and where to build it', async () => {
     const r = await get('/admin/');
     assert.equal(r.status, 503);
+    assert.equal(await r.text(), 'The admin UI is not built. Run `npm run build` in frontends/.');
   });
 });
 

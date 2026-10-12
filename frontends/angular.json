@@ -67,28 +67,28 @@
         }
       }
     },
-    "site": {
+    "website": {
       "projectType": "application",
       "root": "",
-      "sourceRoot": "site",
+      "sourceRoot": "website",
       "prefix": "ia",
       "architect": {
         "build": {
           "builder": "@angular/build:application",
           "options": {
             "outputPath": {
-              "base": "dist/site",
+              "base": "dist/website",
               "browser": ""
             },
-            "index": "site/index.html",
-            "browser": "site/main.ts",
+            "index": "website/index.html",
+            "browser": "website/main.ts",
             "tsConfig": "tsconfig.json",
             "baseHref": "/",
-            "styles": ["site/styles.css"],
+            "styles": ["website/styles.css"],
             "assets": [
               {
                 "glob": "**/*",
-                "input": "site/public"
+                "input": "website/public"
               }
             ]
           },
@@ -128,14 +128,14 @@
           "builder": "@angular/build:dev-server",
           "options": {
             "port": 4300,
-            "proxyConfig": "site/proxy.conf.json"
+            "proxyConfig": "website/proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "buildTarget": "site:build:production"
+              "buildTarget": "website:build:production"
             },
             "development": {
-              "buildTarget": "site:build:development"
+              "buildTarget": "website:build:development"
             }
           },
           "defaultConfiguration": "development"

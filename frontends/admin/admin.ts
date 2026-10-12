@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { Icon, IconName } from '../site/icon';
+import { Icon, IconName } from '../common/icon';
 import { Devices } from './devices';
 import { span } from './format';
 import { Login } from './login';

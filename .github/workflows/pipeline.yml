@@ -4,8 +4,8 @@
 # request, and only when every check below passes on it.
 #
 #   push to dev                every check: index.html is the build of its sources, the type check and the unit,
-#                              integration and sweep tests (tests/unit, tests/integration, tests/sweeps), the app and
-#                              backend tests and lint, and the Docker e2e. A newer push cancels the running one.
+#                              integration and sweep tests (tests/unit, tests/integration, tests/sweeps), the app's,
+#                              the frontends' and the backend's tests, type checks and lint, and the Docker e2e. A newer push cancels the running one.
 #   pull request dev -> main   the same checks again, plus "PR source is dev". All must pass to merge.
 #   push to main (the merge)   the deploy proof: Pages built that commit and the live URL serves it.
 #   workflow_dispatch          run the checks by hand on any branch.
@@ -107,6 +107,13 @@ jobs:
           npm ci --no-audit --no-fund
           npm test
           npm run lint
+      - name: frontends (the website and the admin; type check, lint, build)
+        working-directory: frontends
+        run: |
+          npm ci --no-audit --no-fund
+          npm run typecheck
+          npm run lint
+          npm run build
       - name: backend (tests, lint)
         working-directory: backend
         run: |

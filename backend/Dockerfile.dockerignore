@@ -1,0 +1,15 @@
+# The context is the repo root (docker-compose.yml); send only what Dockerfile builds from.
+*
+!frontends/package.json
+!frontends/package-lock.json
+!frontends/angular.json
+!frontends/tsconfig.json
+!frontends/common/
+!frontends/website/
+!frontends/admin/
+!backend/package.json
+!backend/package-lock.json
+!backend/tsconfig.server.json
+!backend/server/
+!backend/client/
+!backend/app-web/

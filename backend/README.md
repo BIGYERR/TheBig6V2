@@ -33,18 +33,17 @@ side of the connection (`client/ia-link.js`) is ready, but it reaches the phone 
 | `server/config.ts` | every setting, read from the environment |
 | `server/paths.ts` | the backend folder, found the same from `server/` (the source) and `dist/server/` (compiled) |
 | `tsconfig.server.json` | the server's TypeScript: strict, Node only, emitted to `dist/server/` with source maps |
-| `tsconfig.test.json` | type checks the tests and scripts beside the server; emits nothing (`tsconfig.json` is the two Angular apps') |
-| `site/` | the website: Angular 22, standalone and zoneless like the admin, one page with anchored sections, `site/public/` for the 404 page, favicon and robots.txt |
-| `admin/` | the admin UI: Angular 22, standalone and zoneless; a login page, then a shell (header, left nav, footer) around one inner panel per section: Overview, Devices, Versions, Server |
+| `tsconfig.test.json` | type checks the tests and scripts beside the server; emits nothing |
+| `../frontends/website/`, `../frontends/admin/` | the website and the admin UI it serves, an Angular workspace of their own beside this folder (`../frontends/README.md`), built into `../frontends/dist/` |
 | `app-web/` | the app served at `/app/`, copied from the repo root by `scripts/app-bundle.ts`; git-ignored |
 | `client/ia-link.js` | the app side: heartbeat plus the connection dot, ready to paste into `index.html` |
 | `client/demo.html` | the dot on a page of its own, served at `/client/` outside production |
 | `test/` | `node --test` suite, in TypeScript: API, login, store, versions, website, app, the Mac runner, the deploy tree, the client snippet |
-| `Procfile` | Heroku: `web: node --enable-source-maps dist/server/server.js` |
-| `Dockerfile`, `docker-compose.yml` | the same server in a container |
+| `heroku/` | the root of the tree Heroku receives: its `package.json` (builds the frontends, then this folder), lock file and `Procfile` (`web: cd backend && node --enable-source-maps dist/server/server.js`) |
+| `Dockerfile`, `docker-compose.yml` | the same server in a container, built from the repo root in the repo's layout (`/srv/backend`, `/srv/frontends`); `Dockerfile.dockerignore` keeps the context to what it reads |
 | `Dockerfile.dev`, `docker-compose.dev.yml` | the dev container `npm run dev` runs: the toolchain baked in, this checkout mounted read-only, rebuilt as it is saved |
 | `scripts/dev.ts`, `scripts/dev-watch.ts`, `server/dev.ts` | the full stack dev mode: the command, the watcher the container runs, and the live reload it switches on (`IA_DEV=1` only) |
-| `scripts/heroku.sh` | Heroku setup, deploy (with the app added as `app-web/`), verify, status, logs, tree |
+| `scripts/heroku.sh` | Heroku setup, deploy (the repo's layout: this folder with the app added as `app-web/`, the frontends without the app, `heroku/` at the root), verify, status, logs, tree |
 | `scripts/app-bundle.ts` | copies the app into `app-web/` (`npm run app:bundle`; `build`, `docker:up` and the Mac runner run it) |
 | `scripts/mac-local-backend.sh` | the server on this Mac with no docker: up, down, restart, status, logs |
 
@@ -71,7 +70,7 @@ container. `npm run dev:down` stops it, and `npm run docker:up` puts back the pl
 
 | Save in | What happens | Typical time |
 |---|---|---|
-| `site/` or `admin/` | `ng build --watch` rebuilds it (development build), the fast backend tests run, open pages reload | under a second |
+| `frontends/website/`, `frontends/admin/` or `frontends/common/` | `ng build --watch` in the frontends workspace rebuilds it (development build), the fast backend tests run, open pages reload | under a second |
 | `frontends/app/src/legacy/src/` (the app's source files) | the app is built from them into `app-web/index.html` with `frontends/app/scripts/build-index.mjs`, the function that builds the root `index.html` (the repo is never written), its inline script is parsed, open pages reload | under a second |
 | the repo root `index.html` | the app is copied to `app-web/`, its inline script is parsed, open pages reload | under a second |
 | `server/` | the server restarts, open pages reload when it is back, then tsc checks the server's types beside the fast backend tests | under a second |
@@ -86,13 +85,16 @@ tag to the three pages (`server/dev.ts`), and the watcher tells it after each re
 TypeScript source here** (`node server/server.ts`, Node strips the types), so a restart needs no compile; the type
 check after each save is where a type error shows. Every other way to run it runs what tsc compiled.
 
-What the container may touch: the source folders and the repo root (for `index.html`, its icon, and the app's
-source files with their build script) are mounted read-only; `dist/` and `app-web/` are the only folders it writes. Its `node_modules` are the image's own (Linux), and
-the Angular cache is a volume of its own. A change to `package.json`, `package-lock.json`, `angular.json` or a
-tsconfig is baked into the image, so it takes effect at the next `npm run dev`. Saves reach the container as file
+What the container may touch: the source folders (this folder's, and the website, the admin and `common/` from
+`../frontends/`) and the repo root (for `index.html`, its icon, and the app's source files with their build script)
+are mounted read-only; `dist/`, `app-web/` and `../frontends/dist/` are the only folders it writes. It is built from
+the repo root and lays the checkout out as the repo does, `/srv/backend` beside `/srv/frontends`. Its `node_modules`
+are the image's own (Linux), one set for this folder and one for the frontends workspace, and the Angular cache is a
+volume of its own. A change to a `package.json`, a `package-lock.json`, `angular.json` or a tsconfig is baked into the
+image, so it takes effect at the next `npm run dev`. Saves reach the container as file
 events through Docker Desktop's mounts, in tens of milliseconds; should they ever stop arriving,
-`IA_DEV_POLL_MS=500 npm run dev` restarts it polling instead. A file whose attributes alone changed (iCloud rewrites
-them on this Desktop some seconds after a save) restarts and reloads nothing. `LOG_REQUESTS=1 npm run dev` adds a log
+`IA_DEV_POLL_MS=500 npm run dev` restarts it polling instead. A file whose attributes alone changed (a sync tool
+rewriting them some seconds after a save) restarts and reloads nothing. `LOG_REQUESTS=1 npm run dev` adds a log
 line per request.
 
 - `npm run dev -- --no-docker` runs the same watcher with this Mac's Node instead, in the foreground (kind `local`,
@@ -103,25 +105,23 @@ line per request.
 
 | Command | What it does |
 |---|---|
-| `npm run build` | bundle the app into `app-web/`, compile the server into `dist/server/`, build the admin UI into `dist/admin/` and the website into `dist/site/` (served at `/app/`, `/admin/` and `/`) |
+| `npm run build` | bundle the app into `app-web/` and compile the server into `dist/server/`. The website and the admin build in `../frontends/` (`npm run build` there, into `../frontends/dist/`) |
 | `npm run build:server` | compile the server alone (tsc, a second or two): clears `dist/server/`, then emits it |
 | `npm run app:bundle` | copy the repo root `index.html` and its icon into `app-web/`: the app at `/app/` |
 | `npm start` | the compiled server (`dist/server/`, so `npm run build:server` first) on http://localhost:3000, in the foreground |
 | `npm run dev` | **the full stack dev mode** (above): start the dev container, which rebuilds every part and reloads every page on save by itself, and follow its log |
 | `npm run dev:down` | stop the dev container (the devices volume stays) |
 | `npm run dev:server` | the server alone from its TypeScript source, restarting on every change under `server/` |
-| `npm run site:dev` | the website with live reload on http://localhost:4300/, `/admin` and `/api` proxied to `:3000` (run `npm run dev` beside it) |
-| `npm run admin:dev` | the admin UI with live reload on http://localhost:4200/admin/, its API calls proxied to `:3000` (run `npm run dev` beside it) |
 | `npm test` | the type check, then the API, auth, store, website, dev mode, deploy and mac-local-backend tests |
 | `npm run typecheck` | tsc over the server (Node only) and over the tests and scripts; emits nothing |
-| `npm run lint` | ESLint: website and admin TypeScript and templates (angular-eslint), server, tests and scripts (typescript-eslint), the app-side snippet; errors fail |
+| `npm run lint` | ESLint: server, tests and scripts (typescript-eslint), the app-side snippet; errors fail (the website and the admin lint in `../frontends/`) |
 | `npm run mac-local-backend` | the server on this Mac with no docker, in the background, on http://localhost:3000 (below) |
 | `npm run mac-local-backend:status` / `:logs` / `:down` | is it up / follow its log / stop it |
 | `npm run docker:up` | build the image and run it on http://localhost:3000, waiting for the health check |
 | `npm run docker:logs` / `npm run docker:down` | follow the logs / stop it |
 | `npm run logs` | the run log (`../tools/README.md`): `npm run logs -- runs`, `npm run logs -- show backend-test`, ... |
 
-**Every run is logged.** `npm test`, `typecheck`, `lint`, `dev`, `dev:down`, `dev:server`, `admin:dev`, `site:dev`, `docker:up`, `docker:logs`,
+**Every run is logged.** `npm test`, `typecheck`, `lint`, `dev`, `dev:down`, `dev:server`, `docker:up`, `docker:logs`,
 `docker:down`, `mac-local-backend` (and its `:down`, `:status`, `:logs`) and `heroku` each record a run in
 `../temp/runs/` (gitignored) with a line in the shared history, `../temp/events.log`: start, finish, failures, and
 for the servers every request. `npm start` and `npm run build` are not wrapped, since Heroku and the Docker image run
@@ -167,7 +167,7 @@ wipes them. `API_PORT=3001 npm run docker:up` moves the port.
 
 ## The website
 
-`site/` is one Angular page at `/`, in the app's own design system (bone, ink, the one burnt orange kept for live
+`../frontends/website/` is one Angular page at `/`, in the app's own design system (bone, ink, the one burnt orange kept for live
 things, rectilinear corners): a hero with a drawing of the This Week screen whose rest clock runs on the island, the
 method in three steps, the features, a sample week, the doctrine, the race plans, how to put it on an iPhone, an
 FAQ, and a final call to open the app. Every "open the app" button goes to `/app/` on the same server. Its copy follows the
@@ -181,8 +181,8 @@ checks the dash part.
   that lands while the server runs is served at once.
 - **404.** A browser asking for a page that does not exist gets the site's 404 page; fetch, curl and the app keep
   getting the JSON 404. `/api` keeps its JSON 404 for everyone.
-- **Not built** (`dist/site/` missing), `/` answers 503 with the command that builds it. It used to redirect to
-  `/admin/`.
+- **Not built** (`../frontends/dist/website/` missing), `/` answers 503 with the command that builds it (`npm run build`
+  in `frontends/`). It used to redirect to `/admin/`.
 
 ## The app at /app/
 
@@ -280,15 +280,19 @@ beats, and latency.
 
 ## Deploying to Heroku
 
-Heroku runs the `web` process from the `Procfile`: `node --enable-source-maps dist/server/server.js`, listening on the
-`PORT` Heroku assigns. The Node buildpack installs dependencies, runs `npm run build` (the server through tsc, the
-website and the admin UI), then prunes the dev dependencies, so the running slug holds Express, the compiled server
-and the two built pages, nothing of TypeScript's or Angular's toolchain.
+Heroku receives the repo's layout (below) with `heroku/`'s files at its root. It runs the `web` process from that
+`Procfile`: `cd backend && node --enable-source-maps dist/server/server.js`, listening on the `PORT` Heroku assigns.
+The Node buildpack runs the root `npm run build` (`heroku/package.json`): it installs and builds the frontends
+workspace (the website and the admin), drops its `node_modules`, then installs this folder, compiles the server
+through tsc and prunes the dev dependencies, so the running slug holds Express, the compiled server and the two
+built pages, nothing of TypeScript's or Angular's toolchain.
 
 **Why deploys go through `scripts/heroku.sh`.** The repo root is the GitHub Pages site. Heroku needs
 `package.json` and the `Procfile` at the root of what it receives, so a plain `git push heroku main` would hand it
-the wrong folder. `heroku.sh deploy` makes a commit whose tree is `backend/` alone (with `git commit-tree`; `git
-subtree` is not needed and is not installed on this Mac), on top of what Heroku already has, and pushes that. Every
+the wrong folder. `heroku.sh deploy` makes a commit (with `git commit-tree`; `git subtree` is not needed and is not
+installed on this Mac) whose tree keeps the repo's layout, so the server finds the website and the admin where it
+does in a checkout: `backend/` (with the app as `backend/app-web/`), `frontends/` without the app, and `heroku/`'s
+`package.json`, lock file and `Procfile` at the root. It goes on top of what Heroku already has and is pushed. Every
 deploy is a fast-forward; nothing is force-pushed.
 
 ### One-time setup

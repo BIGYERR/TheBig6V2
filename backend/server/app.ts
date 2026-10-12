@@ -11,9 +11,12 @@ import { BACKEND_DIR } from './paths.ts';
 import type { DeviceStore } from './store.ts';
 import { normalizeVersion } from './versions.ts';
 
-const ADMIN_DIR = join(BACKEND_DIR, 'dist', 'admin');
+// The website and the admin are built in frontends/ (npm run build there) into frontends/dist/, beside backend/: in the
+// repo, in the Docker image (/srv/backend, /srv/frontends) and in the Heroku slug, which all keep the repo's layout.
+const UI_DIR = join(BACKEND_DIR, '..', 'frontends', 'dist');
+const ADMIN_DIR = join(UI_DIR, 'admin');
 const CLIENT_DIR = join(BACKEND_DIR, 'client');
-const SITE_DIR = join(BACKEND_DIR, 'dist', 'site');
+const SITE_DIR = join(UI_DIR, 'website');
 const APP_DIR = join(BACKEND_DIR, 'app-web');
 
 export interface AppOptions {
@@ -219,7 +222,7 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
   // (npm run dev) is served at once. A route below a static folder answers only when that folder has no such file.
   admin.use(express.static(adminDir, { index: 'index.html', setHeaders: cacheFor('private') }));
   admin.get('/', (req, res) =>
-    res.status(503).type('text').send('The admin UI is not built. Run `npm run build` in backend/.'),
+    res.status(503).type('text').send('The admin UI is not built. Run `npm run build` in frontends/.'),
   );
   app.use('/admin', admin);
 
@@ -237,7 +240,7 @@ export function createApp({ config, store, adminDir = ADMIN_DIR, siteDir = SITE_
   // the site and the backend are one server, one deploy, one origin. ─────────────────────────────────────────
   app.use(express.static(siteDir, { index: 'index.html', setHeaders: cacheFor('public') }));
   app.get('/', (req, res) =>
-    res.status(503).type('text').send('The website is not built. Run `npm run build` in backend/.'),
+    res.status(503).type('text').send('The website is not built. Run `npm run build` in frontends/.'),
   );
 
   // A browser asking for a page gets the site's 404 page; everything else (fetch, curl, the app) gets JSON.

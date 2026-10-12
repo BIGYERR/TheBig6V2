@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { Icon, IconName } from './icon';
+import { Icon, IconName } from '../common/icon';
 import { Phone } from './phone';
 import { RestClock } from './rest-clock';
 import { Reveal } from './reveal';

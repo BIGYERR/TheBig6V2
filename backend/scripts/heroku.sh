@@ -9,9 +9,12 @@
 #   bash backend/scripts/heroku.sh tree [ref]         print the tree deploy would push for ref (default HEAD)
 #
 # Why the deploy is not a plain `git push heroku main`: the repo root is the GitHub Pages site, and Heroku wants
-# package.json and the Procfile at the root of what it receives. So deploy makes a commit whose tree is backend/
-# alone (git commit-tree, no git subtree needed) on top of what Heroku already has, and pushes that. The app the
-# backend serves at /app/ is added to that tree as app-web/: the root index.html and its icon, from the same commit.
+# package.json and the Procfile at the root of what it receives. So deploy makes a commit (git commit-tree, no git
+# subtree needed) on top of what Heroku already has, and pushes that. Its tree keeps the repo's layout, so the server
+# finds the website and the admin where it does in a checkout: backend/, frontends/ without the app (the website, the
+# admin, common/ and their workspace files), and at the root heroku/'s package.json, lock file and Procfile, which build
+# the frontends and the server and start the server. The app the backend serves at /app/ is added as
+# backend/app-web/: the root index.html and its icon, from the same commit.
 set -euo pipefail
 
 # Always the checkout this script sits in. Git exports GIT_DIR and friends to hooks; with GIT_DIR set, git takes the
@@ -83,17 +86,28 @@ cmd_setup() {
   echo "Next: commit backend/, then run: bash backend/scripts/heroku.sh deploy"
 }
 
-# backend/ at a ref, plus app-web/ holding that ref's index.html and apple-touch-icon.png: what the server serves at
-# /app/, the same files Pages serves. Locally scripts/app-bundle.ts fills app-web/ from the working copy instead.
+# The tree deploy pushes for a ref: backend/ with app-web/ holding that ref's index.html and apple-touch-icon.png (what
+# the server serves at /app/, the same files Pages serves; locally scripts/app-bundle.ts fills app-web/ from the
+# working copy instead), frontends/ without the app, and backend/heroku/'s package.json, package-lock.json and Procfile
+# at the root.
 deploy_tree() {
-  local ref="$1" app_tree file blob
+  local ref="$1" app_tree backend_tree frontends_tree file blob
   app_tree="$(
     for file in index.html apple-touch-icon.png; do
       blob="$(git rev-parse --verify --quiet "$ref:$file")" || { [ "$file" = index.html ] && die "no index.html at $ref"; continue; }
       printf '100644 blob %s\t%s\n' "$blob" "$file"
     done | git mktree
   )"
-  { git ls-tree --full-tree "$ref:$PREFIX" | grep -v "	app-web$" || true; printf '040000 tree %s\tapp-web\n' "$app_tree"; } | git mktree
+  backend_tree="$({ git ls-tree --full-tree "$ref:$PREFIX" | grep -v "	app-web$" || true; printf '040000 tree %s\tapp-web\n' "$app_tree"; } | git mktree)"
+  frontends_tree="$({ git ls-tree --full-tree "$ref:frontends" || die "no frontends/ at $ref"; } | { grep -v "	app$" || true; } | git mktree)"
+  {
+    for file in package.json package-lock.json Procfile; do
+      blob="$(git rev-parse --verify --quiet "$ref:$PREFIX/heroku/$file")" || die "no $PREFIX/heroku/$file at $ref"
+      printf '100644 blob %s\t%s\n' "$blob" "$file"
+    done
+    printf '040000 tree %s\t%s\n' "$backend_tree" "$PREFIX"
+    printf '040000 tree %s\tfrontends\n' "$frontends_tree"
+  } | git mktree
 }
 
 cmd_deploy() {

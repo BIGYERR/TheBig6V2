@@ -197,7 +197,7 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
      page stays one capture), then from the phone the two pages it links to on the same host: Staff Login (`/admin/`)
      and Build my program (`/app/`, the app booting to its home screen).
    - **Admin** (`#A01` to `#A06`, 1440×900): two devices check in first, so every section has rows. Then the login,
-     each section after signing in (Overview, Devices, Versions, Server, the list in `../../backend/admin/admin.ts`, which
+     each section after signing in (Overview, Devices, Versions, Server, the list in `../admin/admin.ts`, which
      a unit test holds the journey to), and the signed out screen after Log out.
 4. The runner takes five journeys (`e2e/flow.ts`, 46 steps) against both the Angular build and the original. Each
    journey starts from empty storage in its own browser context, and a failed step stops only its own journey:

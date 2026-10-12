@@ -5,14 +5,15 @@
 # plain production image.
 #
 # What it may touch: every source folder and the repo root (for index.html, its icon, and the app's source files
-# frontends/app/src/legacy/src/ with frontends/app/scripts/build-index.mjs, which builds them) are mounted read-only; dist/ and app-web/,
-# the two build folders, are the only ones it writes. Its node_modules are the image's own (Linux), and
-# the Angular cache lives in a volume of its own.
+# frontends/app/src/legacy/src/ with frontends/app/scripts/build-index.mjs, which builds them) are mounted read-only;
+# backend/dist/, backend/app-web/ and frontends/dist/, the three build folders, are the only ones it writes. Its
+# node_modules are the image's own (Linux), and the Angular cache lives in a volume of its own. The image is built from
+# the repo root and lays the checkout out as the repo does: /srv/backend and /srv/frontends.
 services:
   api:
     build:
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ..
+      dockerfile: backend/Dockerfile.dev
     image: ${COMPOSE_PROJECT_NAME}-api-dev
     # tini as PID 1: passes docker stop on to the watcher and reaps what the builds leave behind.
     init: true
@@ -29,15 +30,17 @@ services:
       TZ: ${TZ:-UTC}
     volumes:
       - ..:/repo:ro
-      - ./site:/srv/site:ro
-      - ./admin:/srv/admin:ro
-      - ./server:/srv/server:ro
-      - ./client:/srv/client:ro
-      - ./scripts:/srv/scripts:ro
-      - ./test:/srv/test:ro
-      - ./dist:/srv/dist
-      - ./app-web:/srv/app-web
-      - angular-cache:/srv/.angular
+      - ../frontends/website:/srv/frontends/website:ro
+      - ../frontends/admin:/srv/frontends/admin:ro
+      - ../frontends/common:/srv/frontends/common:ro
+      - ./server:/srv/backend/server:ro
+      - ./client:/srv/backend/client:ro
+      - ./scripts:/srv/backend/scripts:ro
+      - ./test:/srv/backend/test:ro
+      - ./dist:/srv/backend/dist
+      - ./app-web:/srv/backend/app-web
+      - ../frontends/dist:/srv/frontends/dist
+      - angular-cache:/srv/frontends/.angular
 
 volumes:
   angular-cache:

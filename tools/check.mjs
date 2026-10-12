@@ -10,6 +10,7 @@
 //            run in CI only). tests/node_modules is installed (npm ci) when it is missing.
 //   build    index.html is the build of frontends/app/src/legacy/src (frontends/app/scripts/build-index.mjs), its ia-version meta reads
 //            as a version, its inline script compiles, and it boots in the harness and builds HALF_MANNY, self-stable.
+//   frontends frontends/ (the website, the admin, common/): type check, lint.
 //   app      frontends/app/: sync from index.html, type check, unit and integration tests, lint.
 //   backend  backend/: type checks, tests, lint.
 //
@@ -58,6 +59,7 @@ const want = {
   // index.html is generated from frontends/app/src/legacy/src (frontends/app/scripts/build-index.mjs); the two must never drift.
   build: touches(/^(index\.html|frontends\/app\/src\/legacy\/src\/|frontends\/app\/scripts\/build-index\.mjs$|tests\/harness\.js$)/),
   app: touches(/^(frontends\/app\/|tools\/|index\.html)/),
+  frontends: touches(/^frontends\/(?!app\/)/),
   backend: touches(/^backend\//),
 };
 
@@ -66,6 +68,7 @@ if (LIST) {
   console.log(`  tests   ${want.tests ? `type check (core, tests), vitest run ${FEATURE_TEST_DIRS.join(' ')} (in tests/)` : 'not touched'}`);
   console.log(`  build   ${want.build ? 'index.html is the build of frontends/app/src/legacy/src; its version, inline script and boot' : 'not touched'}`);
   console.log(`  app     ${want.app ? 'sync, typecheck, unit, integration, lint' : 'not touched'}`);
+  console.log(`  frontends ${want.frontends ? 'typecheck, lint (website, admin, common)' : 'not touched'}`);
   console.log(`  backend ${want.backend ? 'typecheck, test, lint' : 'not touched'}`);
   process.exit(0);
 }
@@ -199,6 +202,19 @@ async function appLane() {
   ]);
 }
 
+/** The frontends workspace (frontends/: the website, the admin and common/); the app beside it has its own lane. */
+async function frontendsLane() {
+  const fe = join(REPO, 'frontends');
+  if (!existsSync(join(fe, 'node_modules'))) {
+    failures.push('frontends: frontends/node_modules is missing; run npm ci in frontends/');
+    return;
+  }
+  await Promise.all([
+    step('frontends', 'typecheck', join(fe, 'node_modules', '.bin', 'tsc'), ['-p', 'tsconfig.json', '--noEmit'], fe),
+    step('frontends', 'lint', join(fe, 'node_modules', '.bin', 'eslint'), ['.'], fe),
+  ]);
+}
+
 async function backendLane() {
   const be = join(REPO, 'backend');
   if (!existsSync(join(be, 'node_modules'))) {
@@ -218,8 +234,9 @@ const lanes = [];
 if (want.tests) lanes.push(testsLane());
 if (want.build) lanes.push(buildLane());
 if (want.app) lanes.push(appLane());
+if (want.frontends) lanes.push(frontendsLane());
 if (want.backend) lanes.push(backendLane());
-const what = [want.tests && 'tests', want.build && 'build', want.app && 'app', want.backend && 'backend'].filter(Boolean).join(', ') || 'nothing (no staged file needs a check)';
+const what = [want.tests && 'tests', want.build && 'build', want.app && 'app', want.frontends && 'frontends', want.backend && 'backend'].filter(Boolean).join(', ') || 'nothing (no staged file needs a check)';
 console.log(`check: ${what}; hard limit ${LIMIT_S} s`);
 await Promise.all(lanes);
 

@@ -11,7 +11,7 @@
 #   npm run mac-local-backend -- open          open the site in the browser
 #
 # up compiles the server (tsc, a second or two) every time, then starts what it compiled: dist/server/server.js. It takes
-# --build (rebuild the site and admin even if nothing changed) or --no-build (serve whatever dist/site and dist/admin hold).
+# --build (rebuild the website and admin even if nothing changed) or --no-build (serve whatever ../frontends/dist holds).
 # API_PORT moves the port (default 3000, the same as docker: stop one before starting the other).
 # ADMIN_USER, ADMIN_PASSWORD, CLIENT_DEMO and CORS_ORIGINS pass through, as they do for docker compose.
 # MAC_LOCAL_DIR moves the pid file, the log and the devices file (default backend/data/mac-local, git-ignored).
@@ -51,13 +51,15 @@ port_taken() {
   lsof -nP -iTCP:"$PORT" -sTCP:LISTEN >/dev/null 2>&1
 }
 
+# The website and the admin are built in the frontends workspace, beside this folder; the server serves its dist/.
+FRONTENDS=../frontends
 # A build is due when either app was never built, or anything it builds from is newer than its last build.
 needs_build() {
   local app out
-  for app in admin site; do
-    out=dist/$app/index.html
+  for app in admin website; do
+    out=$FRONTENDS/dist/$app/index.html
     [[ -f $out ]] || return 0
-    [[ -z $(find "$app" angular.json tsconfig.json package-lock.json -newer "$out" -print -quit) ]] || return 0
+    [[ -z $(find "$FRONTENDS/$app" "$FRONTENDS/common" "$FRONTENDS/angular.json" "$FRONTENDS/tsconfig.json" "$FRONTENDS/package-lock.json" -newer "$out" -print -quit) ]] || return 0
   done
   return 1
 }
@@ -94,8 +96,12 @@ up() {
   say 'compiling the server'
   npm run --silent build:server
   if [[ $build == always ]] || { [[ $build == auto ]] && needs_build; }; then
+    if [[ ! -d $FRONTENDS/node_modules ]]; then
+      say 'installing the frontends dependencies (npm ci in ../frontends)'
+      npm ci --prefix "$FRONTENDS" --no-audit --no-fund
+    fi
     say 'building the website and the admin UI'
-    npm run --silent build:ui
+    npm run --silent --prefix "$FRONTENDS" build
   fi
 
   mkdir -p "$RUN_DIR"

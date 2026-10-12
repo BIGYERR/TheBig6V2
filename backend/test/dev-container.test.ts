@@ -1,5 +1,5 @@
 // The dev container's shape (docker-compose.dev.yml, Dockerfile.dev), read from the files: it rebuilds by itself, comes
-// back with Docker, writes only its two build folders, never loads the Mac's node_modules, and leaves the production
+// back with Docker, writes only its three build folders, never loads the Mac's node_modules, and leaves the production
 // image alone. Read from the checkout, so it runs in npm test and CI, not in the container's own fast set.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -17,7 +17,7 @@ const PROD_IMAGE = code(read('Dockerfile'));
 const mounts = [...DEV.matchAll(/^\s+- (\S+?):(\/\S+?)(?::(ro|rw))?\s*$/gm)].map(([, source, target, mode]) => ({ source, target, mode: mode ?? 'rw' }));
 
 test('the dev overlay builds the dev image and runs its watcher, under init, in dev mode', () => {
-  assert.match(DEV, /dockerfile: Dockerfile\.dev/);
+  assert.match(DEV, /dockerfile: backend\/Dockerfile\.dev/);
   assert.match(DEV, /init: true/);
   assert.match(DEV, /IA_DEV: "1"/);
   assert.match(DEV, /APP_SOURCE_DIR: \/repo\b/);
@@ -32,11 +32,12 @@ test('it comes back whenever Docker starts', () => {
   assert.doesNotMatch(DEV, /restart:/);
 });
 
-test('every source is mounted read-only; it writes only dist/ and app-web/', () => {
+test('every source is mounted read-only; it writes only its three build folders', () => {
   const writable = mounts.filter((m) => m.mode === 'rw' && m.source.startsWith('.')).map((m) => m.source);
-  assert.deepEqual(writable.sort(), ['./app-web', './dist']);
+  assert.deepEqual(writable.sort(), ['../frontends/dist', './app-web', './dist']);
   const readOnly = mounts.filter((m) => m.mode === 'ro').map((m) => `${m.source}:${m.target}`);
-  for (const folder of ['site', 'admin', 'server', 'client', 'scripts', 'test']) assert.ok(readOnly.includes(`./${folder}:/srv/${folder}`), `./${folder} read-only`);
+  for (const folder of ['server', 'client', 'scripts', 'test']) assert.ok(readOnly.includes(`./${folder}:/srv/backend/${folder}`), `./${folder} read-only`);
+  for (const folder of ['website', 'admin', 'common']) assert.ok(readOnly.includes(`../frontends/${folder}:/srv/frontends/${folder}`), `frontends/${folder} read-only`);
   assert.ok(readOnly.includes('..:/repo'), 'the repo root read-only, for index.html and its icon');
 });
 
@@ -52,8 +53,8 @@ test("the app's source files and their build script reach the watcher through th
 
 test("never the Mac's node_modules: the image installs its own", () => {
   assert.ok(!mounts.some((m) => /node_modules/.test(m.source) || /node_modules/.test(m.target)));
-  assert.ok(!mounts.some((m) => m.target === '/srv'), 'the backend folder whole would bring the Mac node_modules with it');
-  assert.match(DEV_IMAGE, /^RUN npm ci\b/m);
+  for (const whole of ['/srv/backend', '/srv/frontends']) assert.ok(!mounts.some((m) => m.target === whole), `${whole} whole would bring the Mac node_modules with it`);
+  assert.equal(DEV_IMAGE.match(/^RUN npm ci\b/gm)?.length, 2, 'the backend and the frontends workspace each install their own');
 });
 
 test('the production image is untouched: the compiled server, no watcher, no dev mode', () => {

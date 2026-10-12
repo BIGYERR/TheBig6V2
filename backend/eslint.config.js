@@ -1,8 +1,7 @@
 // @ts-check
-// npm run lint: the admin UI and the website (TypeScript and templates), the server, tests and scripts (TypeScript on
-// Node), and the app-side snippet (a classic browser script). Errors fail. Same rule sets as frontends/app/eslint.config.js.
+// npm run lint: the server, tests and scripts (TypeScript on Node), and the app-side snippet (a classic browser script).
+// Errors fail. The website and the admin lint in frontends/ (frontends/eslint.config.js).
 import eslint from '@eslint/js';
-import angular from 'angular-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
@@ -14,25 +13,7 @@ const nodeRules = {
 };
 
 export default defineConfig([
-  globalIgnores(['node_modules/', 'dist/', '.angular/', 'data/', 'app-web/', 'site/public/']),
-  {
-    files: ['admin/**/*.ts', 'site/**/*.ts'],
-    extends: [
-      eslint.configs.recommended,
-      tseslint.configs.recommended,
-      tseslint.configs.stylistic,
-      angular.configs.tsRecommended,
-    ],
-    processor: angular.processInlineTemplates,
-    rules: {
-      '@angular-eslint/directive-selector': ['error', { type: 'attribute', prefix: 'ia', style: 'camelCase' }],
-      '@angular-eslint/component-selector': ['error', { type: 'element', prefix: 'ia', style: 'kebab-case' }],
-    },
-  },
-  {
-    files: ['admin/**/*.html', 'site/**/*.html'],
-    extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
-  },
+  globalIgnores(['node_modules/', 'dist/', 'data/', 'app-web/']),
   {
     files: ['server/**/*.ts', 'test/**/*.ts', 'scripts/**/*.ts'],
     extends: [eslint.configs.recommended, tseslint.configs.recommended],

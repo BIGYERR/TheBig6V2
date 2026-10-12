@@ -65,15 +65,15 @@ describe('e2e PAGE_JOURNEYS (the website and the admin)', () => {
     assert.equal(DESKTOP.width, 1440);
     assert.deepEqual([PHONE.width, PHONE.height], [393, 852]);
     // Every same-host link on the site is covered: /admin/ (Staff Login) and /app/ (the app buttons).
-    const html = readFileSync(join(REPO, 'backend', 'site', 'site.html'), 'utf8');
-    const ts = readFileSync(join(REPO, 'backend', 'site', 'site.ts'), 'utf8');
+    const html = readFileSync(join(REPO, 'frontends', 'website', 'site.html'), 'utf8');
+    const ts = readFileSync(join(REPO, 'frontends', 'website', 'site.ts'), 'utf8');
     const hosts = new Set([...html.matchAll(/\shref="(\/[^"#]*)"/g)].map((m) => m[1]!));
     if (/\[href\]="appUrl"/.test(html)) hosts.add(/const APP_URL = '([^']+)'/.exec(ts)?.[1] ?? 'APP_URL not found');
     assert.deepEqual([...hosts].sort(), ['/admin/', '/app/']);
   });
 
   it('opens every admin section the admin defines, after the login and before signing out', () => {
-    const src = readFileSync(join(REPO, 'backend', 'admin', 'admin.ts'), 'utf8');
+    const src = readFileSync(join(REPO, 'frontends', 'admin', 'admin.ts'), 'utf8');
     const sections = [...src.matchAll(/\{ id: '([a-z]+)', label: '([^']+)'/g)].map((m) => m[1]);
     assert.ok(sections.length >= 4, `found the sections in admin.ts: ${sections.join(', ')}`);
     const admin = PAGE_JOURNEYS.find((j) => j.band === 'admin');
