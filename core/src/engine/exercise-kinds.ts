@@ -64,6 +64,8 @@ function isLoadedRepMovement(name: string | null | undefined): boolean{
   if(BW_QUALIFIER.some(q => n.includes(q))) return false;
   return REP_BUT_LOADED.some(k => n.includes(k));
 }
+// swap-prefs asks with the detail too, which this test does not read.
+function isTrackableWeight(name: string | null | undefined, detail?: string): boolean;
 function isTrackableWeight(name: string | null | undefined): boolean {
   if(!name) return false;
   const n = name.toLowerCase();

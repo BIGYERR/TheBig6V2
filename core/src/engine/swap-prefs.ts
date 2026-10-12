@@ -1,12 +1,13 @@
-import { isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
-import { _BW_KEEP_FIXED, _bwSetsFromDetail } from '../../../../../../core/src/engine/power-accessory.ts';
-import { _stripCapCue, applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
-import { _repFloor } from '../../../../../../core/src/engine/region-caps.ts';
+import { isTrackableWeight } from './exercise-kinds.ts';
+import { _BW_KEEP_FIXED, _bwSetsFromDetail } from './power-accessory.ts';
+import { _stripCapCue, applyInjuryFilter } from './injury.ts';
+import { _repFloor } from './region-caps.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+import type { Cfg, Section } from '../domain/index.ts';
 // ── Swap preferences: a swap the athlete made, carried into every build (applySwapPrefs) with its detail and injury check. ──
 // Survives the athlete's injury plan? Wrapped as a throwaway section so the real
 // filter does the judging — no second copy of the drop rules.
-function _swapInjuryOK(name,cfg){
+function _swapInjuryOK(name: string,cfg: Cfg | null | undefined): boolean{
   if(!cfg||!cfg.injury) return true;
   try{
     const out=applyInjuryFilter([{label:'x',items:[{name:name,detail:'3×5'}]}],cfg);
@@ -30,7 +31,7 @@ function _swapInjuryOK(name,cfg){
 // the same conversion bodyweightSweep runs, reached from the swap sheet instead of from
 // the config. (V119. §12 records the general case: 58.7% of unloadable-movement
 // prescriptions still arrive from generation with a fixed rep target on every other tier.)
-function _swapDetailFor(name,detail,out){
+function _swapDetailFor(name: string | null | undefined,detail: string,out?: { win?: [number, number] }): string{
   if(!name||!detail) return detail;
   const fl=(typeof _repFloor==='function')?_repFloor(name):null;
   // V221 D177 (R1, R2). A swapped Main is prescribed the way the engine would have
@@ -66,7 +67,7 @@ function _swapDetailFor(name,detail,out){
   if(!/^\s*\d+\s*[×x]\s*\d/.test(detail)) return detail;  // already open-ended
   return _bwSetsFromDetail(detail);
 }
-function applySwapPrefs(sections,map){
+function applySwapPrefs(sections: Section[],map: Record<string, string> | null | undefined): boolean{
   if(!Array.isArray(sections)||!map) return false;
   let hit=false;
   sections.forEach(sec=>{

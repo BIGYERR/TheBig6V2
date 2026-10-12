@@ -31,8 +31,8 @@ Mario has had to repeat this more than once; a session that makes him say it aga
 Vanilla HTML/CSS/JS PWA served as one page (`index.html`, ~1.3 MB, one inline `<script>`) that
 generates multi-week hybrid strength + cardio programs from a seeded, deterministic engine
 (Engine A → B → C → D inside `buildProgram(cfg)`). **The page is generated** (architecture phase B, Post-v0.239.1):
-`frontends/app/scripts/build-index.mjs` builds it byte for byte from its source files under `frontends/app/src/legacy/src/` (28 JS files,
-9 CSS files and 5 HTML partials) and the engine's TypeScript under `core/src/engine/` (12 files so far, architecture phase D:
+`frontends/app/scripts/build-index.mjs` builds it byte for byte from its source files under `frontends/app/src/legacy/src/` (26 JS files,
+9 CSS files and 5 HTML partials) and the engine's TypeScript under `core/src/engine/` (14 files so far, architecture phase D:
 `order.json` names each `engine/<name>.ts`, and the build strips its types out, `tools/engine-move.mjs` keeping the page's text
 the JavaScript's), joined in the order `order.json` lists, into `dist-github-pages/` (gitignored: the page and
 its icon, what GitHub Pages deploys from the pipeline once its source is "GitHub Actions", what every test boots, what the
@@ -332,7 +332,7 @@ No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declar
 
 ## Token discipline
 **Run a command that takes longer than a minute in the background, its output in a file, and read back only the summary.**
-`index.html` is ~250K tokens and generated: never read it wholesale, never edit it. Code lives in `frontends/app/src/legacy/src/` and, for the engine files phase D has moved, `core/src/engine/`: `grep -rn` the symbol and its consumers in both first. Most source files are small enough to read whole; the four largest (`js/engine-c.js`, `js/cardio-progression.js`, `js/wizard.js`, `js/nsw-cardio.js`, 75 to 110 KB) are read wide at the seam. `str_replace` narrowly in the source file, rebuild, and let the tests be the backstop. Do not re-read the doctrine text mid-session unless verifying a transcription.
+`index.html` is ~250K tokens and generated: never read it wholesale, never edit it. Code lives in `frontends/app/src/legacy/src/` and, for the engine files phase D has moved, `core/src/engine/`: `grep -rn` the symbol and its consumers in both first. Most source files are small enough to read whole; the four largest (`core/src/engine/engine-c.ts`, `core/src/engine/cardio-progression.ts`, `js/wizard.js`, `core/src/engine/nsw-cardio.ts`, 75 to 115 KB) are read wide at the seam. `str_replace` narrowly in the source file, rebuild, and let the tests be the backstop. Do not re-read the doctrine text mid-session unless verifying a transcription.
 
 ## Delegation carry (only when Mario explicitly asks for a builder or gatekeeper agent)
 Builder and gatekeeper agents do not load this file (`omitClaudeMd`). A brief to either carries the ruling verbatim (its

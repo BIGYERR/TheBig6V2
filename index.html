@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.239.4"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.239.5"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -2030,6 +2030,7 @@ function isLoadedRepMovement(name){
   if(BW_QUALIFIER.some(q => n.includes(q))) return false;
   return REP_BUT_LOADED.some(k => n.includes(k));
 }
+// swap-prefs asks with the detail too, which this test does not read.
 function isTrackableWeight(name) {
   if(!name) return false;
   const n = name.toLowerCase();
@@ -8519,6 +8520,13 @@ function injuryDayTitle(role,cfg){
   if((role==='push'||role==='push_light')&&(P.region==='shoulder'||P.region==='elbow')) return 'Rehab + Trunk';
   return null;
 }
+
+/** One week of a lifting wave: sets, reps (a count, or a range like '8–12'), the load as a share of the 1RM, and the taper or deload it carries. */
+/** What Engine C reads of Engine A's timeline (engineA_timeline). */
+/** What Engine C reads of Engine B's cardio (engineB_cardio). */
+/** What a day's sections are built with: the full-body variant, the hard day after, the carry, the day's cardio. */
+/** Engine C: a day's sections by role and week, and the gear lens its pools read. */
+/** One week's movements, drawn per rotation block (getEx). */
 
 // ── ENGINE C — KINEMATIC POOL FILTER (exercise selection + RPE prescription) ─
 // Pure-RPE coaching (scheme()/rpeFromWave()) over Engine-A's wave resolver and

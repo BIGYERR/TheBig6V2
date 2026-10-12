@@ -2,7 +2,7 @@ import { _ssLegal, _ssPartnerOf } from '../../../../../../core/src/engine/exerci
 import { _powerAllowed } from '../../../../../../core/src/engine/power-accessory.ts';
 import { applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
 import { _AUX_FAMILY, _auxFamily, _auxGearOK, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
-import { _swapInjuryOK, applySwapPrefs } from './swap-prefs.js';
+import { _swapInjuryOK, applySwapPrefs } from '../../../../../../core/src/engine/swap-prefs.ts';
 import { _PATTERN_REGION, _compoundTier } from './budget-engine-d.js';
 import { parseRx } from './week-view-sections.js';
 import { dayOverlayInfo } from './overlays.js';

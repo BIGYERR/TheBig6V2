@@ -4,7 +4,7 @@ import { ALL_DAYS_ORDER, _ISO_ORDER } from '../../../../../../core/src/engine/ca
 import { CORE_PILLARS, CORE_SPEED_TYPES } from '../../../../../../core/src/engine/prehab.ts';
 import { applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
 import { _auxGearOK, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
-import { _swapInjuryOK } from './swap-prefs.js';
+import { _swapInjuryOK } from '../../../../../../core/src/engine/swap-prefs.ts';
 import { _compoundTier, d18LongRunDayPass } from './budget-engine-d.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 

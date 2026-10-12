@@ -96,3 +96,20 @@ screen shows or what is stored.
   same line breaks, against both.
 - **Does not change:** any program (the program-output golden files, HALF_MANNY and the 864-config lattice, unchanged);
   any screen; any stored key or value.
+
+## Release scope: v0.239.5 moves swap-prefs and Engine C
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.5.
+- **Moved:** `swap-prefs` (the permanent swaps and their detail) and `engine-c` (`engineC_kinematics`, the pools, the
+  RPE schemes and `buildSections`), typed and never changed. Engine C's own types sit beside it: `WaveEntry` (a week of a
+  lifting wave), `EngineATimeline` and `EngineBCardio` (what it reads of Engines A and B, which move next),
+  `BuildSectionsOpts`, `EngineC`, and the week's movements (`WeekExercises`). Three signatures the moved callers showed
+  were narrower than the code: `isTrackableWeight` gains an overload for the detail `swap-prefs` passes and it does not
+  read; `_bwSetsFromDetail`'s week, experience and prevention flag, and `buildFootAnkleSection`'s race week, are optional
+  as the callers use them; `_cardioInterference` takes any session with a type (a builder's or a program's).
+- **No `@ts-expect-error`** in either file; one `!` reads the pull day's first row as present (`ex.backRow[0]!`), as the
+  code does.
+- **Changes in `index.html`:** 7 comments added and the version. `same-script`: 164,255 tokens equal, with the same line
+  breaks, against v0.239.4; against v0.239.2 the page differs only in its version line and 59 comment or blank lines.
+- **Does not change:** any program (the program-output golden files, HALF_MANNY and the 864-config lattice, unchanged);
+  any screen; any stored key or value.

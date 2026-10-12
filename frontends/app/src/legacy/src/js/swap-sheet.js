@@ -3,7 +3,7 @@ import { esc, resnapshotDayEdit } from './storage.js';
 import { activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.js';
 import { _stripCapCue, applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
 import { _AUX_FAMILY_LABEL, _auxFamily, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
-import { _swapDetailFor, applySwapPrefs } from './swap-prefs.js';
+import { _swapDetailFor, applySwapPrefs } from '../../../../../../core/src/engine/swap-prefs.ts';
 import {
   _dayPlanCfg, addCandidates, addedDetailFor, auxSwapCandidates, bumpSwapCount, clearAdd, clearSkip, clearSwap,
   getSwaps, recordAdd, recordSkip, recordSwap, ssSkipToken, swapCandidates, swapLoadNote,

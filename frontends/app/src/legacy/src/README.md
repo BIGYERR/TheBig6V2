@@ -102,9 +102,9 @@ tests (`docs/decisions/engine-typescript.md`).
 | `js/wizard-generate.js` | `generateProgram`, length warning, mile and swim advisories, `doGenerate` |
 | `js/engine-a-b-calendar.js` | Engine A timeline and split router; Engine B cardio, injury cardio sweep, `planCalendar` |
 | `engine/injury.ts` | injury regions, `injuryPlan`, `applyInjuryFilter`, `injuryDayTitle` |
-| `js/engine-c.js` | Engine C kinematic pool filter |
+| `engine/engine-c.ts` | Engine C kinematic pool filter |
 | `engine/region-caps.ts` | regional fatigue, set and move caps, cardio interference, region and pattern lenses, aux families, rep floor |
-| `js/swap-prefs.js` | a swap the athlete made, carried into every build: `applySwapPrefs`, `_swapDetailFor`, `_swapInjuryOK` |
+| `engine/swap-prefs.ts` | a swap the athlete made, carried into every build: `applySwapPrefs`, `_swapDetailFor`, `_swapInjuryOK` |
 | `js/swaps-edits.js` | exercise swap candidates (`auxSwapCandidates` too), swap store, day edits (add and skip), swap counts (the coach nudge store) |
 | `js/budget-engine-d.js` | compound tiers, deload, posterior-chain lens, session budget, regional fatigue, Engine D, long-run tiers, race eve, sweeps, `buildProgram` |
 | `js/random-wildcard.js` | random workout, Wildcards |

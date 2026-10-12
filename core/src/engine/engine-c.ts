@@ -1,23 +1,36 @@
-import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
+import { asyIcon } from './icons.ts';
 import {
   DEFAULT_1RM, EXLIB, REP_AFFINITY, _carryRx, _expOK, _isOneArmPress, _ssPair, _swapUniverseAdd, pick,
-} from '../../../../../../core/src/engine/exercise-library.ts';
-import { roundWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
+} from './exercise-library.ts';
+import { roundWeight } from './exercise-kinds.ts';
 import {
   CORE_PILLARS, _gearLens, _tierHasBarbell, buildFootAnkleSection, buildHipSection, buildRehabSection,
-} from '../../../../../../core/src/engine/prehab.ts';
-import { _powerAllowed, _powerPrescribe } from '../../../../../../core/src/engine/power-accessory.ts';
-import { TEST_RX_TEXT, _injViewName, injuryPlan } from '../../../../../../core/src/engine/injury.ts';
-import {
-  _auxFamily, _auxGearOK, _cardioInterference, _isUnilateralRow, _pattern, _repFloor,
-} from '../../../../../../core/src/engine/region-caps.ts';
+} from './prehab.ts';
+import { _powerAllowed, _powerPrescribe } from './power-accessory.ts';
+import { TEST_RX_TEXT, _injViewName, injuryPlan } from './injury.ts';
+import { _auxFamily, _auxGearOK, _cardioInterference, _isUnilateralRow, _pattern, _repFloor } from './region-caps.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+import type { Cfg, Goal, Section } from '../domain/index.ts';
+import type { CardioSession } from './nsw-cardio.ts';
+
+/** One week of a lifting wave: sets, reps (a count, or a range like '8–12'), the load as a share of the 1RM, and the taper or deload it carries. */
+export interface WaveEntry { s: number | string; r: string | number; p: number; _taper?: boolean; _deload?: boolean }
+/** What Engine C reads of Engine A's timeline (engineA_timeline). */
+export interface EngineATimeline { goal: Goal; seed: number; denseHypertrophy: boolean; waves: Record<string, WaveEntry[]>; resolveWaveEntry(w: number): WaveEntry; inTaper(w: number): boolean; totalWeeks: number }
+/** What Engine C reads of Engine B's cardio (engineB_cardio). */
+export interface EngineBCardio { includeHip: boolean }
+/** What a day's sections are built with: the full-body variant, the hard day after, the carry, the day's cardio. */
+export interface BuildSectionsOpts { fullVariant?: string; hotNext?: boolean; wantCarry?: boolean; cardio?: CardioSession | null }
+/** Engine C: a day's sections by role and week, and the gear lens its pools read. */
+export interface EngineC { buildSections(role: string, w: number, opts?: BuildSectionsOpts | null): Section[]; gearOK(n: string | null | undefined): boolean }
+/** One week's movements, drawn per rotation block (getEx). */
+interface WeekExercises { chestMain: string; chestAcc: string[]; backMain: string; backRow: (string | null)[]; backPull: string; shoulder: string[]; squat: string; lunge: string[]; hinge: string[]; hipExt: string | null; kneeStab: string; core: string[]; cond: string[]; carry: string[]; fullPush: string; fullPull: string }
 
 // ── ENGINE C — KINEMATIC POOL FILTER (exercise selection + RPE prescription) ─
 // Pure-RPE coaching (scheme()/rpeFromWave()) over Engine-A's wave resolver and
 // equipment-filtered EXLIB pools. Needs includeHip from B for the hip module on
 // leg days. Returns the configured per-day section builder.
-function engineC_kinematics(cfg, A, B){
+function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): EngineC{
   const { goal, seed, denseHypertrophy, waves, resolveWaveEntry, inTaper, totalWeeks } = A;
   const { includeHip } = B;
   // STRENGTH SUPPORT: submaximal strength-maintenance track. Shares the internal 'athletic' goal
@@ -51,7 +64,7 @@ function engineC_kinematics(cfg, A, B){
   const _squatRM=squatRM||expDef.squat;
   const _deadRM=deadRM||expDef.deadlift;
   const _unit = cfg.unit || 'lbs';
-  function wt(rm,w){
+  function wt(rm: number,w: number): number{
     const entry=ageAdjustWaveEntry(resolveWaveEntry(w));
     const rawLbs = rm*(entry.p||0.75)*expPctMod;
     return roundWeight(rawLbs, _unit);
@@ -67,7 +80,7 @@ function engineC_kinematics(cfg, A, B){
   // Coach-style RPE target that CLIMBS with the wave's intensity, so variants/accessories
   // progress in effort terms week to week. Taper/recovery weeks are pulled back explicitly.
   // Returns {rpe, note} where note translates the number into reps-in-reserve plain language.
-  function rpeFromWave(wv){
+  function rpeFromWave(wv: WaveEntry): { rpe: number | string; note: string }{
     if(wv._taper)  return {rpe:'5–6', note:'primer — light and crisp, well short of failure'};
     if(wv._deload) return {rpe:'6',   note:'recovery — leave 4+ reps in the tank'};
     const p = (typeof wv.p==='number') ? wv.p : 0.7;
@@ -76,7 +89,7 @@ function engineC_kinematics(cfg, A, B){
     const rir = Math.max(0, Math.round(10 - rpe));
     return {rpe, note:'leave ~'+rir+' rep'+(rir===1?'':'s')+' in reserve'};
   }
-  function scheme(rm,w,hasReal,exName){
+  function scheme(rm: number,w: number,hasReal: boolean,exName: string): string{
     // Pure RPE coaching for every lift — the app no longer recommends a specific weight.
     // Progression is by climbing RPE + the user's own last-logged number (shown in the log row).
     // (rm/hasReal/exName retained in the signature so existing call sites are untouched.)
@@ -189,14 +202,14 @@ function engineC_kinematics(cfg, A, B){
   // STRENGTH SUPPORT trims accessory/superset volume ~20% (maintenance, not accumulation). Only
   // vsets() reads volMod, so this shrinks accessories — main-lift set counts come from the wave.
   const volMod=expMod*ageMod*(strengthSupport?0.8:1);
-  function vsets(n){
+  function vsets(n: number): number{
     const raw = Math.max(2, Math.round(n * volMod));
     // 36-54: hard cap accessory/superset sets at 3 — prevent 4-round volume fatigue
     if((cfg.ageBracket||'18-35') === '36-54') return Math.min(3, raw);
     return raw;
   }
   // 55+: clamp any wave entry's 1RM% to 0.82 and bump reps +2 to preserve total work output
-  function ageAdjustWaveEntry(wv) {
+  function ageAdjustWaveEntry(wv: WaveEntry): WaveEntry {
     if((cfg.ageBracket||'18-35') !== '55+') return wv;
     if(wv.p <= 0.82) return wv;
     const newReps = typeof wv.r === 'string' && wv.r.includes('–')
@@ -242,11 +255,11 @@ function engineC_kinematics(cfg, A, B){
   // V216 (D154): the predicate body lives in _gearLens (top level) so applyInjuryFilter can ask
   // the same question of an injury rename, for the equipment of the build it filters.
   const _gearOK = _gearLens(equip);
-  const _gear = pool => (pool||[]).filter(_gearOK);
+  const _gear: (pool: string[] | null | undefined) => string[] = pool => (pool||[]).filter(_gearOK);
   // V215 (D149 floors, coach): APPEND ONLY WHEN SHORT. A pool left with fewer than `min` names
   // gets ONE named member appended; a pool that is long enough comes back untouched, so a floor
   // can only fire where its list is actually short. Never a fallback to the raw pool (V197 D70b).
-  const _floorPool = (pool,min,add) => pool.length>=min ? pool : pool.concat([add]);
+  const _floorPool = (pool: string[],min: number,add: string) => pool.length>=min ? pool : pool.concat([add]);
   // ── BODYWEIGHT TIER ("Room only") ──────────────────────────────────────────
   // A hotel room with nothing in it. The existing `minimal` tier still leans on
   // kettlebells and dumbbells, so it is NOT a true no-equipment option. This tier
@@ -259,7 +272,7 @@ function engineC_kinematics(cfg, A, B){
   // No-load pools are authored EASY -> HARD. Rotating the whole range would hand a
   // beginner archer pushups and an advanced athlete incline pushups, so start the
   // athlete on the rung their experience earns and rotate within a window from there.
-  function _bwRung(pool){
+  function _bwRung(pool: string[]): string[]{
     if(!Array.isArray(pool)||pool.length<3) return pool;
     const exp=cfg.experience||'intermediate';
     const top=pool.length-1;
@@ -269,13 +282,13 @@ function engineC_kinematics(cfg, A, B){
                 : Math.max(0,Math.min(pool.length-win,Math.floor(top/2)-(win>2?1:0)));
     return pool.slice(start, start+win);
   }
-  const _bw=(bwPool,other)=>isBW?_bwRung(bwPool):other;
+  const _bw=(bwPool: string[],other: string[])=>isBW?_bwRung(bwPool):other;
   const _bwHTlb=isBW?'Single-leg hip thrust (shoulders on bed)':'Banded hip thrust';
   const _bwHTak=isBW?'Single-leg glute bridge':'Banded hip thrust';
   // Pools where difficulty is NOT the axis (conditioning, carries, plyometrics) must skip
   // the rung narrowing: burpees vs mountain climbers are not rungs, and narrowing them
   // starves call sites that request more items than the window holds.
-  const _bwFlat=(bwPool,other)=>isBW?bwPool:other;
+  const _bwFlat=(bwPool: string[],other: string[])=>isBW?bwPool:other;
   // ── LOAD MODEL ──
   // Three situations, not two. What the athlete can actually add decides how the main
   // lift is prescribed:
@@ -588,7 +601,7 @@ function engineC_kinematics(cfg, A, B){
   // ONLY there. An ankle plan has no business reshuffling the push day, and a shoulder plan
   // has none reshuffling the legs day — running the guard everywhere made an injury in one
   // region silently re-pick movements in another.
-  const _dirty={
+  const _dirty: Record<string, boolean>={
     lower: squatPool!==_preInj.squat||lungePool!==_preInj.lunge||hingePool!==_preInj.hinge
            ||backCompoundPool!==_preInj.back||hipExtPool!==_preInj.hipExt,
     upper: chestCompoundPool!==_preInj.chest||rowPool!==_preInj.row||backCompoundPool!==_preInj.back
@@ -602,7 +615,7 @@ function engineC_kinematics(cfg, A, B){
   // Block = which 2-week period we're in (0, 1, 2 for a 6-week program)
   // For locked goals blockSeed = seed (never changes)
   // For rotating goals blockSeed changes per 2-week block
-  function blockSeed(w) {
+  function blockSeed(w: number): number {
     if(!rotates) return seed;
     const block = Math.floor((w-1)/2); // 0,1,2...
     return (seed + block * 7919) % 100000; // prime offset per block
@@ -611,7 +624,7 @@ function engineC_kinematics(cfg, A, B){
   // Build per-week exercise selections
   // For locked: same exercises all weeks
   // For rotating: recalculate every 2 weeks
-  function getEx(w) {
+  function getEx(w: number): WeekExercises {
     const bs = blockSeed(w);
     // ── SLOT DECONFLICTION (V111) ──────────────────────────────────────────────
     // Structural backstop behind the pool fixes above. Slots used to draw wholly
@@ -628,15 +641,15 @@ function engineC_kinematics(cfg, A, B){
     // output is unchanged wherever no exclusion actually fires.
     // pick() also feeds the swap universe, so the FULL pool is registered before the
     // filtered copy is drawn from — the swap sheet's harvest must not narrow with it.
-    const _took={lower:Object.create(null),upper:Object.create(null)};
-    const _pats={lower:Object.create(null),upper:Object.create(null)};
+    const _took: Record<string, Record<string, number>>={lower:Object.create(null),upper:Object.create(null)};
+    const _pats: Record<string, Record<string, number>>={lower:Object.create(null),upper:Object.create(null)};
     // dom may be a LIST. backMain is simultaneously the pull day's main lift and a
     // lower-body pattern, so it registers in both domains: once as the deadlift slot the
     // legs day must not echo, once as the pull-day movement backPull must not repeat.
     // drop=true means an unsatisfiable slot returns NOTHING rather than repeating a
     // movement the day already has. Used for the hip-extension accessory, whose whole
     // problem was that it duplicated a slot the injury plan had already filled.
-    function _slot(pool,cnt,sd,dom,drop){
+    function _slot(pool: string[] | null | undefined,cnt: number,sd: number,dom: string | string[],drop?: boolean): string[]{
       const D=Array.isArray(dom)?dom:[dom], raw=pool||[];
       _swapUniverseAdd(raw);                       // universe sees the whole pool, always
       // HEALTHY PROGRAMS ARE UNTOUCHED, DELIBERATELY. Every collapse this guard exists to
@@ -682,7 +695,7 @@ function engineC_kinematics(cfg, A, B){
       for(let i=0;i<Math.min(a.length,totalWeeks);i++){
         const m=String(a[i].r||'').match(/(\d+)\s*$/);if(m)mx=Math.max(mx,+m[1]);}
       return mx;})();
-    function _repFit(pool){
+    function _repFit(pool: string[]): string[]{
       const f=pool.filter(n=>{const t=REP_AFFINITY[n];return !t||_waveMaxReps<=t.maxReps;});
       if(!f.length) throw new Error('REP_AFFINITY emptied a wave-main pool (wave max '+_waveMaxReps+' reps): '+pool.join(', '));
       return f;
@@ -774,11 +787,11 @@ function engineC_kinematics(cfg, A, B){
   // Pre-compute for week 1 (used in sections that don't have w context)
   const ex = getEx(1);
 
-  function buildSections(role,w,opts){
+  function buildSections(role: string,w: number,opts?: BuildSectionsOpts | null): Section[]{
     _hotNextDay = !!(opts && opts.hotNext);   // V153 (F2): scheme() reads this for the hinge clamp
     opts=opts||{};
     const fullVariant=opts.fullVariant||'upper';
-    const s=[];
+    const s: Section[]=[];
     const ex=getEx(w); // get exercises for this week's rotation block
     const _wArr=waves[goal]||waves.balanced;
     const wv=resolveWaveEntry(w);
@@ -839,7 +852,7 @@ function engineC_kinematics(cfg, A, B){
         // else on the day competes for it. Both pillars used are low-fatigue and
         // safe for an upper-limb plan; loaded anti-extension (ab wheel, barbell
         // rollout) and the hanging pillar are deliberately not drawn.
-        const _rot=(arr,k)=>arr[(((w-1+k)%arr.length)+arr.length)%arr.length];
+        const _rot=<T>(arr: T[],k: number)=>arr[(((w-1+k)%arr.length)+arr.length)%arr.length];
         // Carries are stripped from the anti-rotation draw on this day. They are the two
         // adjacent members of that pillar, so the rotation could hand out both at once —
         // one loaded-carry stimulus twice — and a heavy carry is a real scapular and grip
@@ -957,7 +970,7 @@ function engineC_kinematics(cfg, A, B){
           // slice deliberately takes only the mechanical fix.
           const _dfPool=_bw(EXLIB.shoulder_iso_bw,_gear(EXLIB.shoulder_iso));
           _swapUniverseAdd(_dfPool);
-          const _dfTaken=Object.create(null);
+          const _dfTaken: Record<string, number>=Object.create(null);
           s.forEach(function(sec){((sec&&sec.items)||[]).forEach(function(it){if(it&&it.name)_dfTaken[it.name]=1;});});
           const _dfFree=_dfPool.filter(function(n){return !_dfTaken[n];});
           if(_dfFree.length)
@@ -1021,10 +1034,10 @@ function engineC_kinematics(cfg, A, B){
       // least 2 and 'Chest + knee' at least 1. Never 0, so the omission branches are crash
       // guards and not fillers. There is no fallback to an unfiltered pool: if a future pool
       // edit ever did empty this, the section is dropped rather than printed illegally.
-      const _accFresh=function(prefs){
-        const t=Object.create(null);
+      const _accFresh=function(prefs: string[]): string | null{
+        const t: Record<string, number>=Object.create(null);
         s.forEach(function(sec){((sec&&sec.items)||[]).forEach(function(it){if(it&&it.name){t[it.name]=1;t[_injViewName(it.name,cfg)]=1;}});});
-        const _fr=function(n){return n&&!t[n]&&!t[_injViewName(n,cfg)];};
+        const _fr=function(n: string){return n&&!t[n]&&!t[_injViewName(n,cfg)];};
         for(let i=0;i<prefs.length;i++){ if(_fr(prefs[i])) return prefs[i]; }
         for(let i=0;i<chestAccPool.length;i++){ if(_fr(chestAccPool[i])) return chestAccPool[i]; }
         return null;
@@ -1052,7 +1065,7 @@ function engineC_kinematics(cfg, A, B){
         // V164 station rule: the pull selection is a single scalar, so the b-walk has
         // one candidate; D3b re-walks the row pool (backRow[1] excluded — Pull B owns
         // it) to keep the superset alive on the pulldown tier before demoting.
-        const _sp=_ssPair(ex.backRow[0],ex.backPull,rowPool.filter(n=>n!==ex.backRow[1]),null);
+        const _sp=_ssPair(ex.backRow[0]!,ex.backPull,rowPool.filter(n=>n!==ex.backRow[1]),null);
         s.push({label:'Pull superset A',superset:_sp.ok,rounds:vsets(3),items:[{name:_sp.a,detail:vsets(3)+'×8'+(_isUnilateralRow(_sp.a)?' each':'')},{name:_sp.b,detail:vsets(3)+'×5–6'}]});
       }
       // "each" follows the MOVEMENT, not the slot. The slot is unilateral by intent
@@ -1181,7 +1194,7 @@ function engineC_kinematics(cfg, A, B){
         // isometric. 25 sec is the number the file already carries for a hold in the
         // ACCESSORY position (ex.kneeStab at 8179/8256/8270/8273). The finisher position
         // is 30 sec and this is not the finisher. No new constant, no new predicate.
-        const _laDose=n=>hsets+'×'+(_auxFamily(n)==='hold'?'25 sec':repB);
+        const _laDose: (n: string) => string=n=>hsets+'×'+(_auxFamily(n)==='hold'?'25 sec':repB);
         const legIso=pick(_laLeft.length>=2?_laLeft:(_laLeft.length?_laLeft:_laGear),2,blockSeed(w)+105);
         // Room Only owns no dumbbells, and neither _gearOK clause blocks a DB name, so the
         // pool has to divert here rather than be filtered. Single-leg off a step is the only
@@ -1262,7 +1275,7 @@ function engineC_kinematics(cfg, A, B){
         // the movements hold for the whole block — consistent with the rotation doctrine.
         // The two full slots of a 6/7-day split differentiate via the variant offset.
         const _fo=(fullVariant==='lower')?40:0;
-        const _noBar=n=>!/^barbell|^pendlay|good morning|swing/i.test(n);
+        const _noBar: (n: string) => boolean=n=>!/^barbell|^pendlay|good morning|swing/i.test(n);
         const _lead=pick(lungePool.filter(_noBar),1,blockSeed(w)+30+_fo)[0]||lungePool[0];
         const _rdl=pick([...hingePool,...hipExtPool].filter(_noBar),1,blockSeed(w)+31+_fo)[0]||hipExtPool[0];
         const _press=pick(EXLIB.chest_acc.filter(n=>/dumbbell|dips/i.test(n)),1,blockSeed(w)+32+_fo)[0];
@@ -1316,7 +1329,7 @@ function engineC_kinematics(cfg, A, B){
           // V170 (D2/D3/D5): reps, cue and rest are all properties of the COST TIER now
           // and come from _powerPrescribe. Roles stay positional and stay 3/5 — that is what
           // a 1.0+ movement is handed — but a 0.5 movement overrides them from either slot.
-          const pwRoles=[[pw[0],3],[pw[1],5]];
+          const pwRoles: [string, number][]=[[pw[0],3],[pw[1],5]];
           // V144 (D4-i/iii): dose comes straight from _powerDose — the budget owns experience
           // AND age, vsets is out of the power path (see _powerDose comment). The V143
           // Math.min(10,...) display clamp is retired with it; the clamp lives in the dose.
@@ -1343,7 +1356,7 @@ function engineC_kinematics(cfg, A, B){
         // V143 GUARD: same single-movement-pool protection as the lower-variant site.
         // V144: budget-owned dose, same as lower-variant site. V170 (D1/D2/D3/D5): reps,
         // cue and rest come from the cost tier via _powerPrescribe, one writer for both sites.
-        const pwRoles=[[pw[0],3],[pw[1],5]];
+        const pwRoles: [string, number][]=[[pw[0],3],[pw[1],5]];
         const _pwOn=pwRoles.filter(r=>r[0]);
         s.push({label:'Power — explosive first',items:_pwOn.map(r=>(
           {name:r[0],detail:_powerPrescribe(r[0],r[1],cfg.experience,cfg.ageBracket)}))});

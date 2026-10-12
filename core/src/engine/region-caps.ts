@@ -59,7 +59,7 @@ const _moveCap: (r: string) => number = r => REGION_MOVE_CAP[r] || 5;
 // (2) session intensity token-scanned from subtype+detail so it survives every naming
 // scheme (run / NRC / bike), and (3) distance/duration. Returns a leg-recovery
 // interference magnitude ≈0.3 (easy spin) … ≈1.6 (hard or long run).
-function _cardioInterference(cardio: Cardio | null | undefined): number{
+function _cardioInterference(cardio: { type: string; subtype?: string; detail?: string; dose?: { key?: string } } | null | undefined): number{
   if(!cardio || !cardio.type) return 0;
   const sub = (cardio.subtype||'').toLowerCase();
   const s = (sub + ' ' + (cardio.detail||'')).toLowerCase();

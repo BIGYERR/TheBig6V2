@@ -218,7 +218,7 @@ function _powerAllowed(name: string, experience: string | null | undefined, inju
   return c <= Math.min(expCap, ageCap);
 }
 const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation/i;
-function _bwSetsFromDetail(detail: string | null | undefined, wk: number, exp: string | null | undefined, prev: boolean): string{
+function _bwSetsFromDetail(detail: string | null | undefined, wk?: number, exp?: string | null, prev?: boolean): string{
   const m=/^(\d+)\s*[×x]/.exec(detail||'');
   const sets=m?Math.min(4,Math.max(2,+m[1])):3;
   let rpe=/rpe\s*6|light|easy/i.test(detail||'')?'6':/rpe\s*7/i.test(detail||'')?'7':'8';

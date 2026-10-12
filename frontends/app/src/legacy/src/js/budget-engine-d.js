@@ -14,11 +14,11 @@ import {
 import { deconflictAdjacentDupes, injectDynamicCore } from './core-legs.js';
 import { engineA_timeline, engineB_cardio, planCalendar } from './engine-a-b-calendar.js';
 import { applyInjuryFilter, injuryDayTitle } from '../../../../../../core/src/engine/injury.ts';
-import { engineC_kinematics } from './engine-c.js';
+import { engineC_kinematics } from '../../../../../../core/src/engine/engine-c.ts';
 import {
   _auxFamily, _cardioInterference, _ceil, _itemRegion, _moveCap, _pattern, _sectionRegion, _setCap,
 } from '../../../../../../core/src/engine/region-caps.ts';
-import { applySwapPrefs } from './swap-prefs.js';
+import { applySwapPrefs } from '../../../../../../core/src/engine/swap-prefs.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 const _PATTERN_REGION = {
   hpress:'push', vpress:'push', delt_iso:'push', tri_iso:'push',

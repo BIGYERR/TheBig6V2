@@ -334,7 +334,7 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
      `power-accessory`, `exercise-kinds`, `injury` (done);
   2. **the cardio engines, v0.239.4:** `nsw-cardio`, `nrc-race-bike-swim`, `cardio-progression`, which import each
      other (done);
-  3. `swap-prefs`, then `engine-c`;
+  3. **`swap-prefs` and `engine-c`, v0.239.5** (done);
   4. Engines A, B and D with `buildProgram`, which import each other: `engine-a-b-calendar`, `core-legs`,
      `budget-engine-d`; then `core/src/engine/index.ts` exports the engine (`@ia/core/engine`).
 - **Then the cleanup pass**, under the tests with ordinary proof rather than the token proof: every `@ts-expect-error`

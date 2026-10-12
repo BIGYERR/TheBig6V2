@@ -25,7 +25,7 @@ function buildHipSection(seed: number,bodyweight: boolean): Section{
 // Two drills a day, fixed prescription, seeded off the hip section's seed so the two
 // prehab blocks never share a draw. Carries hip:true on purpose: every cap exemption,
 // injury-sweep protection and render rule keyed on that flag applies unchanged.
-function buildFootAnkleSection(seed: number,bodyweight: boolean,raceWeek: boolean): Section{
+function buildFootAnkleSection(seed: number,bodyweight: boolean,raceWeek?: boolean): Section{
   const details: Record<string, string>={
     'Tibialis raise (wall lean)':'2×20','Banded dorsiflexion':'2×15 each',
     'Single-leg bent-knee soleus raise':'2×12 each, slow','Standing ankle CARs':'2×5 each direction',
