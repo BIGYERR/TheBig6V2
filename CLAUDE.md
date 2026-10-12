@@ -11,11 +11,17 @@ Mario has had to repeat this more than once; a session that makes him say it aga
 - **The past is integer, the future is dotted.** Builds 1 to 239 are `V1` to `V239` (each one is v0.N.0; V239 = 0.239.0)
   and keep their tags, digest lines, era-row keys and file names. `Post-V239` is the right label for a pass made after
   V239 and before the first dotted release. Every release from `0.239.1` on is `v<MAJOR.MINOR.PATCH>`. Example: the build
-  once called "V240" is `v0.240.0`, and its files are `tests/measure/v0.240.0_*`.
-- **Names** (Versioning, below, has the full list): tag `v0.240.0`; commit `v0.240.0: <one line>`; digest
-  `- **v0.240.0** — …`; `tests/measure/v0.240.0_rulings/`; `tests/gates/g0.240.0_<topic>.js`;
-  `tests/sabotage/v0.240.0.json`; era rows keyed `'0.240.0'`; baseline `base_v<previous>.html`, where `<previous>` is the
-  version HEAD carries, never "N-1".
+  once called "V240" is `v0.240.0`.
+- **Names: a version appears only where a version belongs** (Versioning, below, has the full list): the `ia-version`
+  meta; the tag `v0.240.0`; the commit subject `v0.240.0: <one line>`; the digest line `- **v0.240.0** — …`; the
+  release line of a decision entry in `docs/decisions/<feature>.md`; a scratch copy of a release's body,
+  `base_v<previous>.html`, where `<previous>` is the version HEAD carries, never "N-1"; and, until phase 2 empties them,
+  the legacy suite's era rows, keyed `'0.240.0'`.
+- **Feature files carry no version** (Mario, Post-v0.239.1). Tests are `tests/unit/<feature>.test.js` and
+  `tests/integration/<feature>.test.js`, snapshots `tests/snapshots/<feature>.json`, rulings
+  `docs/decisions/<feature>.md`, measure scripts `tests/measure/<feature>_<question>.js` (Test layout). No new
+  `tests/gates/g<version>_*.js`, `tests/sabotage/v<version>.json`, `tests/edits/` script or `v<version>_rulings/` folder
+  is made. Files written before Post-v0.239.1 keep their names (`g0.239.1_timer_label.js`, `tests/measure/v0.240.0_*`).
 - **Code** reads, compares and prints a version only through `tests/semver.js` or `tests/semver.py`: never `+version`, a
   string compare, `'V'+n` or arithmetic on a version. `SV.tag(v)` prints the label: `V239` for an old build, `v0.239.1` for a new one.
 - **Mario picks PATCH, MINOR or MAJOR** before every release (Versioning). Nobody infers it.
@@ -34,10 +40,12 @@ Mario is the sole developer, product owner and primary user.
 ## Roles (four subagents, see .claude/agents/)
 - **measure** — read-only. Owns the before-picture. Proves a reported bug at the reporter's seed, sweeps a lattice, names the root cause and every other reader of the same value. Reports numbers with denominators. Never rules, never proposes a fix.
 - **coach** — read-only. Owns coaching correctness and doctrine. Rules on WHAT should ship.
-- **builder** — read/write. Owns the edit. Writes anchor-asserted edit scripts. Never invents a ruling.
-- **gatekeeper** — read + bash, never edits. Owns proof. Runs the 60-second local proof and reads the CI run on the push to `dev` for the full suite (`tests/gate.sh`, sabotage, blast radius, fuzz, e2e); see Pipeline.
-**Gatekeeper blocks ship.** No version is done until gatekeeper's final run confirms the shipped artifact
-(Proof scope, below), every mutation the build ran TRIPPED with 0 NOT-APPLIED / 0 CRASH, and every diff hunk is classified.
+- **builder** — read/write. Owns the edit: changes `index.html` directly and narrowly, and writes the feature's tests (Test layout). Never invents a ruling.
+- **gatekeeper** — read + bash, never edits. Owns proof. Runs the 60-second local proof, shows each test written for a changed behaviour fails on the previous release and every changed behaviour has a test, and reads the CI run on the push to `dev` for the full suite (the unit and integration tests; the frozen legacy suite: `tests/gate.sh`, sabotage, blast radius, fuzz; e2e); see Pipeline and Proof for new work.
+**Gatekeeper blocks ship.** No version is done until gatekeeper has read the CI run on the commit Mario releases green,
+shown that each test written for a changed behaviour fails on the previous release, matched every changed behaviour to
+a test, and classified every diff hunk (Proof for new work, below). Where a build also changes the frozen legacy suite
+(an era row, a re-anchored mutation, an edited gate), that part is proved as Proof scope sets out.
 The main session orchestrates and talks to Mario; it does not do measure's, builder's or gatekeeper's job inline.
 **coach rules against evidence coach did not gather** — measure runs before the ruling, not inside it.
 Builder is the only agent holding `Edit`/`Write`. coach, measure and gatekeeper never run below opus:
@@ -47,26 +55,26 @@ Coach runs on fable from V200 as a measured experiment; compare its rulings agai
 **Coach is spawned fresh for each ruling, with a tight brief:** the question, measure's numbers, and the handoff lines
 it needs, nothing else. Never resume a coach (`SendMessage`) after it has gone idle. A follow-up or a re-ruling is a
 new spawn whose brief carries the prior ruling's text. **Coach is read-only, so the main session saves every coach return
-into its ruling file before briefing builder**, and every brief cites only what the saved file says, never a line from
-the return that was not saved.
+into its feature's decision file (`docs/decisions/<feature>.md`, Proof for new work) before briefing builder**, and every
+brief cites only what the saved file says, never a line from the return that was not saved.
 
 ## Session rhythm (do not skip steps)
 **Versions are not tied to chats (Mario, Post-V239).** Semantic versions and git track every release, so a chat may
 carry several versions and tooling passes, and a version may start in any chat. Never ask Mario to open a fresh chat for
 a build. A compaction mid-build is not a stop: re-read the tree state (`git status`, `ia-version`, the handoff's §12 and
-D-CODE REGISTRY lines) before the next step; a builder slice either landed whole or stays parked in `tests/edits/`, and
-nothing merges into `main` that the pipeline has not proved. Standing rules live in this file; per-build scope lives in
+D-CODE REGISTRY lines) before the next step; a builder slice either landed whole or stays parked (its diff saved as a
+patch in the scratchpad, nothing committed), and nothing merges into `main` that the pipeline has not proved. Standing rules live in this file; per-build scope lives in
 handoff §12.
 **One writer per working tree (Mario, Post-V238).** While a build is in flight, from the first builder dispatch to the
 deploy proof, one session writes to this working tree. Any other session that needs to write (a measure, a queue review,
 a docs pass) works in its own git worktree or waits until the build commits. V238's final hash went red on another
 session's files written into `tests/measure/` mid-proof.
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it, and print the deploy picture (step 7).
-2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `v<version>_<question>.js`).
-3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience.
-4. **Ask Mario for the bump** (Versioning, below): PATCH, MINOR or MAJOR, before the first builder dispatch. Builder ships: anchor-asserted edits (every anchor `count==1` before writing), `ia-version` set to the version Mario picked, exactly when he says so. **Right before every builder dispatch**, re-read HEAD against `origin/dev` and `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
-5. Gatekeeper proves it as **Pipeline** and **Proof scope** (below) set out: locally inside 60 seconds, then the full suite in CI on the push to `dev`, which Mario reviews. `gate.sh` reports every red, not the first. Green or a NAMED failing gate.
-6. `handoff-update` skill: the seven-element session entry. Then stage the build's files by path (every tracked change and every untracked file the build wrote; **never
+2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `<feature>_<question>.js`).
+3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience. The main session appends the ruling to its feature's decision file (Proof for new work).
+4. **Ask Mario for the bump** (Versioning, below): PATCH, MINOR or MAJOR, before the first builder dispatch. Builder ships: narrow edits to `index.html` (every text replaced occurs exactly once before it is replaced), the feature's tests (Test layout), `ia-version` set to the version Mario picked, exactly when he says so. **Right before every builder dispatch**, re-read HEAD against `origin/dev` and `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
+5. Gatekeeper proves it as **Pipeline** and **Proof for new work** (below) set out: locally inside 60 seconds, then the full suite in CI on the push to `dev`, which Mario reviews; any change inside the frozen legacy suite as **Proof scope** sets out. `gate.sh` reports every red, not the first. Green or a NAMED failing test or gate.
+6. `handoff-update` skill: the seven-element session entry, with the release line of each decision this version shipped filled in (`docs/decisions/<feature>.md`). Then stage the build's files by path (every tracked change and every untracked file the build wrote; **never
    `git add -A`**, Mario, Post-V238), commit on `dev` (`git commit -m "v<version>: <one line>"`; the pre-commit hook runs the 60-second check) and `git push origin dev`.
    The push runs the full suite in CI; when it has finished, read it (`gh run list --branch dev --limit 1`, `gh run view <id>`, `gh run download <id>`) and
    report the result to Mario. **Mario opens every pull request into `main` himself, by hand, after reviewing those results; no agent ever opens one
@@ -105,12 +113,13 @@ session's files written into `tests/measure/` mid-proof.
   this for pushes to GitHub: it refuses any push from a worktree, and from the main checkout anything but local `dev`'s
   own commit to `dev`, or a tag. A worktree runs the hooks of the commit it has checked out, so one made from `dev`
   carries the guard.
-- **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs everything fast enough (the gate suite's quick steps
-  and its fast gates, sabotage anchors, the app's and the backend's tests and lint) and stops at 60 s; the pre-commit
+- **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs everything fast enough (the unit and integration
+  tests whole, the gate suite's quick steps and its fast gates, sabotage anchors, the app's and the backend's tests and
+  lint) and stops at 60 s; the pre-commit
   hook (`.githooks/pre-commit`, `--staged`) runs the part a commit touches. A gate still running at 60 s is left to CI,
   not failed. No local proof step waits longer than that: anything slower belongs in CI.
 - **The full suite runs in CI** (`.github/workflows/pipeline.yml`) on every push to `dev`, and again on the pull request
-  into `main`: `gate.sh` with
+  into `main`: the unit and integration tests (job `unit and integration tests`); `gate.sh` with
   every gate, the row check (with the version's `ROW_RULED` licence when it exists) and the blast radius against the
   previous tagged version; fuzz; sabotage anchors and the proof set since `main`; the app and backend tests and lint;
   the Docker e2e. Every job must pass to merge, and each uploads its run log (`temp/`) as an artifact; the gate job's
@@ -124,8 +133,55 @@ session's files written into `tests/measure/` mid-proof.
   version, version scope, row manifest rules, era rows, sabotage selection and review stand as written.
 - **The weekly full sweep** stays outside any build and runs by hand until it moves into a scheduled CI job.
 
-## Proof scope (Mario, standing from Post-V233)
-This section is the single source for what a proof runs. `gatekeeper.md` and the `ship` and `session-start` skills point
+## Test layout (Mario, Post-v0.239.1): a test is named for the feature it covers
+- **Folders.** `tests/unit/<feature>.test.js`: pure logic, one function lifted out of `index.html` and run alone
+  (`appFunction`). `tests/integration/<feature>.test.js`: the app booted in the VM harness, programs built, behaviour
+  checked (`loadApp`, `loadApp({ dom: true })` for a document that keeps its elements, `pinClock`).
+  `tests/snapshots/<feature>.json`: one current golden file per feature for program output. The helpers are
+  `tests/support/app.js` and `tests/support/snapshot.js`, built on `tests/harness.js`. `app/e2e` stays as it is.
+- **Run.** `node --test tests/unit tests/integration` (Node's own runner, about a second; no `package.json` at the repo
+  root, which Pages serves). `IA_APP=<file>` runs the same tests against another body of the app.
+- **Naming.** A test file is named for the feature it covers, in lower case words joined by dashes (`rest-timer`,
+  `version-label`, `program-output`), never for a version, a D-code or a gate. A new behaviour goes into its feature's
+  file; a new file is a new feature. A test's name says the behaviour in plain words.
+- **Snapshot update.** Only when a ruling moves program output: `UPDATE_SNAPSHOTS=1 node --test
+  tests/integration/<feature>.test.js`, then review `git diff tests/snapshots/`. The diff is the review, and it ships in
+  the release commit. When HALF_MANNY moves, the regenerated digest equals the one coach printed before the build
+  (standing ruling 5). A snapshot is never regenerated to turn a red test green without a ruling.
+
+## Proof for new work (Mario, Post-v0.239.1)
+- **CI is the gate.** The unit and integration tests run in the 60-second check and in CI on every push to `dev`; the
+  release is proved by the CI run on the commit Mario releases (Pipeline). Gatekeeper reads it, and also:
+  - runs each new or changed test on the commit before the change (`git show <previous>:index.html >
+    <scratch>/base_v<previous>.html`, then `IA_APP=<that file> node --test <file>`): a test written for a changed
+    behaviour must fail there, and one that passes on both is vacuous unless its file says it guards behaviour that
+    must not change;
+  - matches every behaviour the ruling changes to a named test; a changed behaviour with no test is red;
+  - reads every hunk of `git diff` on `index.html` and `tests/snapshots/`, and classifies each against the ruling.
+- **Oracles.** Expected values are typed by hand from the ruling, the doctrine text or date arithmetic, never asked of
+  the app; a snapshot is the one deliberate exception, a golden file in git regenerated only on purpose. Seeds are
+  pinned, clock fields stripped, and a program equals itself built twice before it is compared.
+- **Rulings** live in `docs/decisions/<feature>.md`, one file per feature. The main session appends each ruling as it
+  is made: its date, its D-code, who ruled, the finding, what changes, what deliberately does not, the expected values
+  or after-grid, and the release that shipped it, filled in at ship time. A re-ruling is a new entry naming the one it
+  amends. Measure scripts and their saved reports stay in `tests/measure/`, named `<feature>_<question>`.
+- **No new legacy files.** No new gate, sabotage spec, `tests/edits/` script, row licence or `v<version>_rulings/`
+  folder. Builder edits `index.html` directly and narrowly; the git diff is the record.
+- **The legacy suite is frozen until phase 3** (`tests/gates/`, `tests/gate.sh`, `tests/row_manifest.txt`,
+  `tests/skip_allow.txt`, `ROW_RULED` licences, era rows and `tests/era_bump.py`, `tests/version_scope.js`,
+  `tests/chain.js` and the reach map, `tests/sabotage.py` and `tests/sabotage/*.json`, `tests/edits/`). It keeps
+  running in CI exactly as before and its jobs must pass. Frozen means no new files and no new rows: a new assertion
+  goes into a feature test. An existing gate, table or mutation is still maintained when a ruled change requires it (an
+  era row from `era_bump.py --ruling docs/decisions/<feature>.md`, a re-anchored mutation, a row the ruling rewrites in
+  place under its key), under Proof scope; when that edit is more than a few lines, the gate's feature moves to the new
+  layout instead. Phase 2 moves the gates feature by feature (`docs/test-migration.md`: the map, the order and the
+  parity rule); phase 3 deletes the machinery.
+
+## Proof scope (Mario, standing from Post-V233): the frozen legacy suite only, until phase 3
+New work is proved as Proof for new work sets out (Mario, Post-v0.239.1). This section governs the legacy suite: what
+its CI jobs run, and how a change inside it (an era row, a re-anchored mutation, an edited gate, the row manifest) is
+proved, until phase 3 deletes it.
+This section is the single source for what a legacy proof runs. `gatekeeper.md` and the `ship` and `session-start` skills point
 here, and a brief to gatekeeper carries it pasted. Basis: `tests/measure/v233_rulings/measure_sabotage_history_mS.md`,
 `measure_tooling_inventory_mT.md`, `post_v233_proof_scope_decisions.md`, and `tests/measure/v233_gate_reach.json`.
 - **Budget.** Proof finishes in under 15 minutes of wall time for a LOCAL change and under 30 for a CROSS-CUTTING one.
@@ -266,10 +322,13 @@ which does reach him arrives with a recommendation.
   line on why. A bump is never inferred from the queue, the handoff or an earlier chat. If the build grows past the
   class he picked, ask again before the meta is written. Never out of order, never two sessions on one number;
   builder writes the number Mario named and nothing else.
-- Names from 0.239.1 on carry the dotted version with a lowercase v: tag `v0.239.1`, digest line `- **v0.239.1** — …`,
-  `tests/measure/v0.239.1_rulings/`, `tests/edits/v0.239.1_edit.py`, `tests/sabotage/v0.239.1.json`, gates
-  `tests/gates/g0.239.1_<topic>.js`, measure scripts `v0.239.1_<question>.js`, era rows keyed `'0.239.1'`
-  (`tests/era_bump.py 0.239.1`). A tests-only pass after a release is `Post-v0.239.1`.
+- Names from 0.239.1 on carry the dotted version with a lowercase v, and only where a version belongs (PRIORITY 1): the
+  `ia-version` meta, tag `v0.239.1`, commit subject `v0.239.1: …`, digest line `- **v0.239.1** — …`, the release line
+  of a decision entry, a scratch copy of a release's body, and, until phase 2, the legacy suite's era rows keyed
+  `'0.239.1'` (`tests/era_bump.py 0.239.1`). Files made from Post-v0.239.1 on are named by feature, never by version
+  (Test layout). Files made before keep their names (`tests/measure/v0.239.1_rulings/`, `tests/edits/v0.239.1_edit_s1.py`,
+  `tests/sabotage/v0.239.1.json`, `tests/gates/g0.239.1_timer_label.js`). A tests-only pass after a release is
+  `Post-v0.239.1`.
 - In this repo the only HTML is `index.html` (Pages serves it). The previous version is the release HEAD carries, never
   "N-1": `git show HEAD:index.html > <scratchpad>/base_v<previous>.html`. Tag each release: `git tag v<version>`.
 - A file version with no digest line in the handoff means a build was dropped. Stop and tell Mario.
@@ -335,11 +394,13 @@ No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declar
 Every brief to either carries the per-build items, then the standing lines for that role, pasted, not paraphrased.
 - **Builder, per build:** the ruling verbatim (D-code, what changes, what deliberately does not, the after-grid); the slice
   (≤4 edits) and what earlier slices landed; the baseline path; whether this slice writes `ia-version` and the exact
-  `MAJOR.MINOR.PATCH` Mario picked; the diff classes the ruling licenses.
-- **Gatekeeper, per build:** every ruling in the build, verbatim; the version Mario named and its bump class; the baseline path; the edit
-  scripts, gates and sabotage specs; the diff classes builder declared; whether `HALF_MANNY` may move and to what digest;
-  the licence file for new gate rows (`v<version>_row_ruled.txt`, written before the draft run); the Proof scope section pasted, with the LOCAL or CROSS-CUTTING call and its gate list, draft run or final run, and
-  whether the full sweep is due.
+  `MAJOR.MINOR.PATCH` Mario picked; the diff classes the ruling licenses; the feature's decision file and the test files
+  to write or extend, with the Test layout and Proof for new work sections pasted.
+- **Gatekeeper, per build:** every ruling in the build, verbatim (its decision file entries); the version Mario named and its bump class; the baseline path; the
+  feature tests added or changed, and every behaviour the ruling changes; the diff classes builder declared; whether
+  `HALF_MANNY` may move and to what digest; the Test layout and Proof for new work sections pasted. For any change inside
+  the frozen legacy suite: the gates and specs edited, the era rows written, and the Proof scope section pasted, with the
+  LOCAL or CROSS-CUTTING call and its gate list, draft run or final run, and whether the full sweep is due.
 - **Both, standing:** gate runs are `bash -c 'set -eo pipefail; …'`, no `<(...)`; every gate prints `PASS n FAIL n` and a
   missing summary is a crash; oracles never ask the engine; strip comments before any token-gone scan; pin `cfg.seed`,
   strip clock fields and prove a baseline equals itself before diffing; an empty diff is a failure. Standing rulings 2
@@ -349,16 +410,19 @@ Every brief to either carries the per-build items, then the standing lines for t
   range, a minimum, or an era row (Proof scope, Version scope). Versions are `MAJOR.MINOR.PATCH`, and a bare integer N
   means 0.N.0; read and compare them only through `tests/semver.js` (`parse`, `cmp(a, b) <op> 0`, `lookup`,
   `fromHtml`) or `tests/semver.py`, never `+version` or a numeric operator. Temp files go only under the scratch path
-  the brief names, never bare `/tmp`.
-- **Builder, standing:** standing ruling 7 (a premise refuted mid-slice PARKS the slice: script stays in `tests/edits/`,
-  nothing committed; a gate row that cannot pass parks the same way); pool and post-filter reason through one lens, so
+  the brief names, never bare `/tmp`. Feature tests run with `node --test tests/unit tests/integration`; a test file
+  that crashes before its first test is a failure, and a snapshot changes only by a ruling that moves program output.
+- **Builder, standing:** standing ruling 7 (a premise refuted mid-slice PARKS the slice: its diff stays in the
+  scratchpad as a patch, nothing committed; a test that cannot pass parks the same way); pool and post-filter reason through one lens, so
   grep the other half; a conditional write with no else is a latch; `exStoreKey` is the only `ia_exw_` writer; race day
   is found by subtype; any `\uXXXX` text that must land is built with `chr(92)`, never typed; an era row for a table the
   ruling does not move comes from `tests/era_bump.py`, never by hand; builder never edits `tests/row_manifest.txt`,
-  and every new gate prints its rows through `tests/status.js`; after every app slice builder runs
+  and writes no new gate, sabotage spec or edit script (Test layout); after every app slice builder runs
   `python3 tests/sabotage.py --anchors-only index.html` and re-anchors any old mutation a ruled hunk orphaned (Mario,
   Post-V238).
-- **Gatekeeper, standing:** run every edited gate against the previous version too, and every new gate, and every
+- **Gatekeeper, standing:** run every new or changed feature test on the commit before the change (`IA_APP`); a test
+  written for a changed behaviour that passes there is vacuous, and a changed behaviour with no test is red. For the
+  frozen legacy suite: run every edited gate against the previous version too, and every new gate, and every
   edited gate whose rows expect different results by version, against the previous version's body relabelled to the
   candidate's version; every build anchor-checks
   every spec and trip-runs the Proof scope set; the full sweep runs every spec, old ones included, when it is due;
@@ -380,7 +444,8 @@ session rhythm. The other paths stay for devices, deploys and full builds: `app/
 ## Files
 - `index.html` — the app. `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).
 - `docs/design/THE_ASYLUM_DS_REFERENCE*.md` — design system (bone `#F4F1E8`, ink, signal orange `#CF4E1A`; `asyIcon()` inline SVG, never emoji in chrome).
-- `tests/harness.js` (VM boot + fixtures + `weekGrid` + `progDigest`), `tests/gate.sh` (runner), `tests/gates/*.js` (one file per gate family, each prints `PASS n FAIL n`), `tests/sabotage.py` + `tests/sabotage/*.json`, `tests/measure/` (measure-pass scripts, keep them), `tests/lint_allow.txt` (known dupes = debt).
+- `tests/unit/`, `tests/integration/`, `tests/snapshots/` (the feature tests and their golden files, named by feature), `tests/support/` (their helpers, on `tests/harness.js`); `docs/decisions/<feature>.md` (the rulings, one file per feature); `docs/test-migration.md` (the phase 2 map: every gate, its feature, its target file and its rows; the order; the parity rule). Test layout and Proof for new work.
+- `tests/harness.js` (VM boot + fixtures + `weekGrid` + `progDigest`), `tests/measure/` (measure-pass scripts, keep them), `tests/lint_allow.txt` (known dupes = debt). Frozen legacy suite, no new files (Proof for new work): `tests/gate.sh` (runner), `tests/gates/*.js` (one file per gate family, each prints `PASS n FAIL n`), `tests/sabotage.py` + `tests/sabotage/*.json`.
 - `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit, and `.githooks/pre-push` lets only local `dev` and tags reach GitHub (`git config core.hooksPath .githooks` once per clone). `.github/workflows/pipeline.yml` — the full suite on every push to `dev` and every pull request from `dev` into `main`, and the deploy proof after each merge.
 - `tools/` — the run log (`tools/README.md`): every test, build, deploy and server run is a folder under `temp/runs/` (gitignored, kept out of iCloud) with a line in `temp/events.log`; `~/Library/Logs/IronAsylum/orchestration.log` has one line per top-level start on this Mac. When something went wrong, `node tools/logs.mjs` is the first place to look. `tools/deploy-check.mjs` is rhythm step 7 as one command.
 - `doctrine/*.txt` — page-ordered OCR of the NSW guide and the four NRC plans. Gitignored (not published by Pages); regenerate from the archives with `doctrine/README.md` if missing.
