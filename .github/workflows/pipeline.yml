@@ -3,8 +3,9 @@
 # dev into main by hand to release (no agent ever opens one). Branch protection lets main change only through that pull
 # request, and only when every check below passes on it.
 #
-#   push to dev                every check: the full gate suite with its row check and blast radius, fuzz, sabotage,
-#                              app and backend tests and lint, and the Docker e2e. A newer push cancels the running one.
+#   push to dev                every check: the unit and integration tests (tests/unit, tests/integration), the full
+#                              gate suite with its row check and blast radius, fuzz, sabotage, app and backend tests and
+#                              lint, and the Docker e2e. A newer push cancels the running one.
 #   pull request dev -> main   the same checks again, plus "PR source is dev". All must pass to merge.
 #   push to main (the merge)   the deploy proof: Pages built that commit and the live URL serves it.
 #   workflow_dispatch          run the checks by hand on any branch.
@@ -47,6 +48,26 @@ jobs:
             exit 1
           fi
           echo "from dev: ok"
+
+  tests:
+    name: unit and integration tests
+    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: node --test tests/unit tests/integration (index.html against tests/snapshots)
+        run: node tools/run.mjs tests -- node --test --test-reporter=spec tests/unit tests/integration
+      - name: Keep the run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-run-log
+          path: temp/
+          retention-days: 30
 
   app-backend:
     name: app and backend

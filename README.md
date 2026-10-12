@@ -41,8 +41,9 @@ live app's and the native app's. The details are in `app/README.md`.
   to `dev` also runs the full suite in GitHub Actions (below); nothing waits for it, and its results are there to review.
 - **Release by pull request from `dev` into `main`, opened by hand** after reviewing the push's results in Actions. No
   agent opens one. `main` is protected: it changes only through that pull request, and
-  only when every check in `.github/workflows/pipeline.yml` passes: the full gate suite (every gate, the row check and
-  the blast radius), fuzz, sabotage, the app and backend tests and lint, and the Docker e2e. That takes 30 to 45 minutes
+  only when every check in `.github/workflows/pipeline.yml` passes: the unit and integration tests (`tests/unit`,
+  `tests/integration`), the full gate suite (every gate, the row check and the blast radius), fuzz, sabotage, the app
+  and backend tests and lint, and the Docker e2e. That takes 30 to 45 minutes
   in GitHub Actions; nothing waits for it locally. Merging is the deploy: Pages serves `main`, the pipeline then proves
   the live site serves it, and `backend/scripts/heroku.sh deploy` ships `origin/main`'s `backend/`.
 

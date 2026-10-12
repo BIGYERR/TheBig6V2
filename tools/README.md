@@ -69,6 +69,7 @@ From the repo root (`npm run logs -- <args>` does the same from `app/` or `backe
 
 | Run | Type | Started by |
 |---|---|---|
+| feature tests (`tests/unit`, `tests/integration`, against `tests/snapshots`) | `tests` | `node tools/run.mjs tests -- node --test tests/unit tests/integration` (CI; the check runs them unwrapped) |
 | unit, integration tests, type check, lint (app) | `unit`, `integration`, `typecheck`, `lint` | `npm test`, `npm run test:unit`, ... in `app/` |
 | e2e in Docker | `e2e` (report, collage, docker and nginx logs in artifacts) | `npm run e2e` |
 | PWA on this Mac | `server-pwa-local` (every request, from start to Ctrl-C) | `npm run pwa-local` |
@@ -103,7 +104,7 @@ Anything else can be logged by wrapping it: `node tools/run.mjs <type> -- <comma
 ## In GitHub Actions
 
 Every pipeline job (`.github/workflows/pipeline.yml`) writes the same run log in its workspace and uploads `temp/` as an
-artifact (`gate-run-log`, `fuzz-run-log`, `sabotage-run-log`, `app-backend-run-log`, `e2e-report`, `deploy-run-log`),
+artifact (`tests-run-log`, `gate-run-log`, `fuzz-run-log`, `sabotage-run-log`, `app-backend-run-log`, `e2e-report`, `deploy-run-log`),
 so a red check reads like a local one: `gh run download <run id> -n gate-run-log`, then `summary.txt`, `events.log` and
 `output.log` in its run folder. Runs started there say `ci` in the "who" column.
 
@@ -124,7 +125,7 @@ so a red check reads like a local one: `gh run download <run id> -n gate-run-log
 | `run.mjs` | wraps any command as a run |
 | `logs.mjs` | reads it all back |
 | `deploy-check.mjs` | the Pages deploy proof (CLAUDE.md step 7) as a `deploy-pages` run; the pipeline runs it after every merge |
-| `check.mjs` | the 60-second local proof, a `check` run (`--staged` for the pre-commit hook, `--list`, `--measure`) |
+| `check.mjs` | the 60-second local proof, a `check` run (`--staged` for the pre-commit hook, `--list`, `--measure`): the feature tests whole, the gate suite's fast part, the app, the backend |
 | `check-gate-times.txt` | each gate's measured time; gates at 12 s or less run in the check, the rest only in CI |
 | `agent-hook.mjs` | Claude hooks: sessions and agents into the history |
 
