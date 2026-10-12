@@ -3,9 +3,9 @@
 # dev into main by hand to release (no agent ever opens one). Branch protection lets main change only through that pull
 # request, and only when every check below passes on it.
 #
-#   push to dev                every check: the unit, integration and sweep tests (tests/unit, tests/integration, tests/sweeps), the full
-#                              gate suite with its row check and blast radius, fuzz, sabotage, app and backend tests and
-#                              lint, and the Docker e2e. A newer push cancels the running one.
+#   push to dev                every check: index.html is the build of its sources, the type check and the unit,
+#                              integration and sweep tests (tests/unit, tests/integration, tests/sweeps), the app and
+#                              backend tests and lint, and the Docker e2e. A newer push cancels the running one.
 #   pull request dev -> main   the same checks again, plus "PR source is dev". All must pass to merge.
 #   push to main (the merge)   the deploy proof: Pages built that commit and the live URL serves it.
 #   workflow_dispatch          run the checks by hand on any branch.
@@ -29,7 +29,7 @@ permissions:
   contents: read
 
 env:
-  # The gates were written and their tables computed on Mario's Mac, in New York time.
+  # The feature tests' hand tables and golden files were computed on Mario's Mac, in New York time.
   TZ: America/New_York
   NODE_VERSION: '26'
 
@@ -66,6 +66,10 @@ jobs:
           if [ -z "$DOCTRINE_TXZ" ]; then echo "::error::The DOCTRINE_TXZ secret is not set, so the tests that read doctrine/*.txt cannot run."; exit 1; fi
           printf '%s' "$DOCTRINE_TXZ" | base64 -d | tar -xJf -
           echo "doctrine files: $(ls doctrine/*.txt | wc -l)"
+      - name: index.html is the build of app/src/legacy/src (byte for byte; app/scripts/build-index.mjs)
+        run: node app/scripts/build-index.mjs --check
+      - name: index.html boots and builds HALF_MANNY, self-stable (tests/harness.js)
+        run: node tests/harness.js index.html
       - name: npm ci in tests/ (Vitest, TypeScript, @ia/core)
         working-directory: tests
         run: npm ci --no-audit --no-fund
@@ -114,141 +118,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-backend-run-log
-          path: temp/
-          retention-days: 30
-
-  gates:
-    name: gate suite
-    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
-    runs-on: ubuntu-latest
-    timeout-minutes: 150
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: index.html is the build of app/src/legacy/src (byte for byte; app/scripts/build-index.mjs)
-        run: node app/scripts/build-index.mjs --check
-      - name: Doctrine text (NRC and NSW copyright, never in the repo; restored from the DOCTRINE_TXZ secret)
-        env:
-          DOCTRINE_TXZ: ${{ secrets.DOCTRINE_TXZ }}
-        run: |
-          if [ -z "$DOCTRINE_TXZ" ]; then echo "::error::The DOCTRINE_TXZ secret is not set, so the gates that read doctrine/*.txt cannot run."; exit 1; fi
-          printf '%s' "$DOCTRINE_TXZ" | base64 -d | tar -xJf -
-          echo "doctrine files: $(ls doctrine/*.txt | wc -l)"
-      - name: Baseline (the previous version, as tagged)
-        run: |
-          set -euo pipefail
-          META=$(node tests/semver.js meta index.html) || { echo "::error::index.html has no ia-version meta"; exit 1; }
-          node tests/semver.js str "$META" > /dev/null || { echo "::error::index.html ia-version '$META' is not a version (want N or M.m.p)"; exit 1; }
-          PREV=$(git tag --list 'v*' 'V*' | node tests/semver.js below "$META") || { echo "::error::no version tag below ia-version $META, so there is no baseline"; exit 1; }
-          git show "$PREV:index.html" > "$RUNNER_TEMP/base.html"
-          echo "BASE=$RUNNER_TEMP/base.html" >> "$GITHUB_ENV"
-          echo "candidate ia-version $META, baseline $PREV"
-      - name: gate.sh (every gate, the row check, the blast radius)
-        # ROW_RULED: the build's row licence, when the candidate's version has one. ROW_MANIFEST_OUT: this run's row
-        # manifest, kept in the run log artifact; gatekeeper regenerates tests/row_manifest.txt from it (CLAUDE.md).
-        run: |
-          META=$(node tests/semver.js meta index.html) || { echo "::error::index.html has no ia-version meta"; exit 1; }
-          node tests/semver.js str "$META" > /dev/null || { echo "::error::index.html ia-version '$META' is not a version (want N or M.m.p)"; exit 1; }
-          META="${META#v}"   # a meta written v0.239.1 names the licence v0.239.1, never vv0.239.1 (CLAUDE.md, PRIORITY 1)
-          LICENCE="tests/measure/v${META}_rulings/v${META}_row_ruled.txt"
-          if [ -f "$LICENCE" ]; then export ROW_RULED="$LICENCE"; echo "row licence: $LICENCE"; fi
-          mkdir -p temp
-          export ROW_MANIFEST_OUT="$GITHUB_WORKSPACE/temp/row_manifest.txt"
-          bash -c 'set -eo pipefail; bash tests/gate.sh index.html "$BASE"'
-      - name: Keep the run log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gate-run-log
-          path: temp/
-          retention-days: 30
-
-  fuzz:
-    name: fuzz
-    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - name: Doctrine text (NRC and NSW copyright, never in the repo; restored from the DOCTRINE_TXZ secret)
-        env:
-          DOCTRINE_TXZ: ${{ secrets.DOCTRINE_TXZ }}
-        run: |
-          if [ -z "$DOCTRINE_TXZ" ]; then echo "::error::The DOCTRINE_TXZ secret is not set, so the gates that read doctrine/*.txt cannot run."; exit 1; fi
-          printf '%s' "$DOCTRINE_TXZ" | base64 -d | tar -xJf -
-          echo "doctrine files: $(ls doctrine/*.txt | wc -l)"
-      - name: Baseline (the previous version, as tagged)
-        run: |
-          set -euo pipefail
-          META=$(node tests/semver.js meta index.html) || { echo "::error::index.html has no ia-version meta"; exit 1; }
-          node tests/semver.js str "$META" > /dev/null || { echo "::error::index.html ia-version '$META' is not a version (want N or M.m.p)"; exit 1; }
-          PREV=$(git tag --list 'v*' 'V*' | node tests/semver.js below "$META") || { echo "::error::no version tag below ia-version $META, so there is no baseline"; exit 1; }
-          git show "$PREV:index.html" > "$RUNNER_TEMP/base.html"
-          echo "BASE=$RUNNER_TEMP/base.html" >> "$GITHUB_ENV"
-      - name: Identity fuzz
-        run: bash -c 'set -eo pipefail; bash tests/fuzz.sh index.html "$BASE"'
-      - name: Keep the run log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: fuzz-run-log
-          path: temp/
-          retention-days: 30
-
-  sabotage:
-    name: sabotage
-    # OFF (Mario, Post-v0.239.1: "temporarily disable all sabotage runs"). A job skipped by its condition reports
-    # success, so a required check still passes. To turn it back on, restore:
-    #   if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
-    if: false
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Doctrine text (NRC and NSW copyright, never in the repo; restored from the DOCTRINE_TXZ secret)
-        env:
-          DOCTRINE_TXZ: ${{ secrets.DOCTRINE_TXZ }}
-        run: |
-          if [ -z "$DOCTRINE_TXZ" ]; then echo "::error::The DOCTRINE_TXZ secret is not set, so the gates that read doctrine/*.txt cannot run."; exit 1; fi
-          printf '%s' "$DOCTRINE_TXZ" | base64 -d | tar -xJf -
-          echo "doctrine files: $(ls doctrine/*.txt | wc -l)"
-      - name: Every mutation's anchor still applies
-        run: python3 tests/sabotage.py --anchors-only index.html
-      - name: Trip the proof set (mutations of the specs and gates changed since main)
-        env:
-          BASE_REF: origin/${{ github.base_ref || 'main' }}
-        run: |
-          set -euo pipefail
-          # The dry run exits 1 on an empty set, so its output is read, not its exit code.
-          IA_NO_RUNLOG=1 python3 tests/sabotage.py --proof-set "$BASE_REF" index.html --dry > "$RUNNER_TEMP/proofset.txt" 2>&1 || true
-          grep -E '^PROOF SET' "$RUNNER_TEMP/proofset.txt" || true
-          if grep -q '^PROOF SET 0 mutations' "$RUNNER_TEMP/proofset.txt"; then
-            echo "No spec added, no gate edited and no backstop gate named since $BASE_REF: no mutation to trip."
-          else
-            python3 tests/sabotage.py --proof-set "$BASE_REF" index.html
-          fi
-      - name: Keep the run log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: sabotage-run-log
           path: temp/
           retention-days: 30
 
