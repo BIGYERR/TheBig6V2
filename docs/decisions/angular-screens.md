@@ -80,3 +80,23 @@ what is stored.
   draw by draw). The e2e's log-done step now expects the workout pop-up up with 'WORKOUT COMPLETE' and a dismiss button
   in its photograph, then closes it with that button, on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.11 moves the program list
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.11.
+- **Moved:** `#progList`, the home screen's program cards: `src/app/screens/program-list/program-list.ts` (the cards,
+  their header, rename box, meta line and actions, with both archive confirmations) and `program-list-model.ts` (the
+  cards and their state, the meta line, the empty lines, each the legacy `renderProgList`'s). The program store, the
+  active program and the list's state (open cards, the card being renamed, the archive being confirmed) stay the
+  legacy script's; its actions change them and call `renderProgList`, which `LegacyBridge.provide` hands to the
+  component with `toggleProgCard`. The list draws at once when asked, since `startRename` focuses the new rename box
+  straight after. A card's detail is still `progDetailHTML`'s markup, inserted as it is (its goal, mile and copy buttons
+  keep their handlers); a later step templates it.
+- **Kept as it was, on purpose:** the name is written into the page as the legacy list wrote it (markup in a name is
+  read as markup); an absent name reads 'undefined' on the card and nothing in the rename box. Escaping it would change
+  what a few names show, so it is not this step's.
+- **Tests:** `frontends/app/test/unit/program-list.test.ts` (5: the meta line typed by hand, the cards, the open, active,
+  renamed and confirming states on their own card only, the legacy name rules, the empty lines). The e2e's programs step
+  now opens the run's card and reads its selections, starts a rename (the box takes the caret) and leaves it with
+  Escape, and starts an archive and calls it off, on both builds, the open card in its photograph.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

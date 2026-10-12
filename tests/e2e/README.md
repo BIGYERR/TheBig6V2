@@ -29,7 +29,8 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
    journey starts from empty storage in its own browser context, and a failed step stops only its own journey:
    - **Strength, commercial gym** (20 steps): the wizard, This Week, the rest-day sheet, a day's detail and its run
      log, the swap sheet, Random Workout, Hurt?, Traveling?, Progress, Bugs, the rest timer (open, start, stop, reset,
-     fold, a drag to the left edge), Programs, then a relaunch.
+     fold, a drag to the left edge), Programs (the card opened, a rename and an archive started and called off), then
+     a relaunch.
    - **10K race, Sun Nov 29** (9): a race goal with a race date, the program length box, the week 1 long run, then
      race week's Saturday shakeout and race day (the Nike plan).
    - **1.5 mile test, Sat Nov 14** (6): a dated pace test, the program length box, and the test day in week 6 (NSW).

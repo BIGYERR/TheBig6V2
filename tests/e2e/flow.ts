@@ -428,11 +428,32 @@ const STRENGTH: readonly Step[] = [
   },
   {
     id: 'programs',
-    page: 'Programs (with a program)',
-    async run(t) {
+    page: 'Programs (with a program): the card opened, a rename and an archive started and called off',
+    async run(t, page) {
       await t.tap('#tabHome');
       await t.screen('screenHome');
       await t.expectText('#progList', PROGRAM_NAME);
+      // The list is an Angular component in the app since phase E's fourth step, the legacy script's in the single-file
+      // page: both answer the same. The run's own program is the active card (the list also holds an earlier one); it
+      // opens on a tap and shows its selections.
+      const card = '#progList .prog-card.active-prog';
+      await t.tap(`${card} .prog-tap`);
+      if (!(await t.count(`${card}.open`))) throw new Error('the program card did not open');
+      await t.expectText(card, 'Starting 1RM');
+      // A rename puts the name in a box with the caret in it; Escape leaves the name as it was.
+      await t.tap(`${card} [aria-label="Rename program"]`);
+      if (!(await page.evaluate(() => (document.activeElement?.id || '').startsWith('renameInput_')))) throw new Error('the rename box did not take the caret');
+      await page.keyboard.press('Escape');
+      await new Promise((r) => setTimeout(r, 300));
+      if (await t.count('#progList input')) throw new Error('Escape did not close the rename box');
+      await t.expectText(`${card} .prog-card-name`, PROGRAM_NAME);
+      // Archive asks first; Cancel calls it off.
+      await t.tap(`${card} .prog-action-btn.danger`);
+      // The wizard's name box held its default when the run typed into it, so the name ends with PROGRAM_NAME.
+      await t.expectText(card, 'Archive “');
+      await t.expectText(card, `${PROGRAM_NAME}”?`);
+      await t.tap(`${card} .prog-action-btn:not(.primary)`);
+      await t.expectText(card, 'Active ✓');
     },
   },
   {
