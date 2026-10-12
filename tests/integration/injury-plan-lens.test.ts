@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The injury plan of the day (D194): outside buildProgram the plan that governs a card is the plan of the day the card
 // is on. Since V98 an injury reaches a program only as an overlay, so the sheets (swap, aux, add), the swap tap and the
 // boot replay all read the day's overlay stamp, and D193's hold reaches the athlete the app actually builds. Also the
@@ -10,10 +10,10 @@
 // the fixture does. Every record is seeded and clock-pinned and shown to equal itself before records are compared.
 // ORACLES: the judge (the injury filter on a fully injured cfg, in a separate app) says which listed names a plan
 // rejects; the hand cap table, the R7 text, the hold sentence and every toast are typed.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { pinClock } = require('../support/app.js');
-const I = require('../support/injury-overlays.js');
+import assert from 'node:assert/strict';
+import { test } from 'vitest';
+import { pinClock } from '../support/app.ts';
+import * as I from '../support/injury-overlays.ts';
 
 const { clean, host, E } = I;
 const judge = I.judgeMaker();
@@ -23,9 +23,9 @@ const W1 = '2026-08-24';   // W1 Monday, the program's start
 const KNEE = { region: 'knee', tier: 'workaround' };
 const D8 = '2×6–10 @ RPE 8';
 const D7 = '2×6–10 @ RPE 7';
-const TSAME = (to, from) => `${to} in, ${from.toLowerCase()} out. Same job, same numbers.`;
-const TSAMEH = (to, from) => `${to} in, ${from.toLowerCase()} out. Same sets, same reps.${I.HOLD}`;
-const T119H = (to, from) => `${to} in, ${from.toLowerCase()} out. No load to add here.${I.HOLD}`;
+const TSAME = (to: any, from: any) => `${to} in, ${from.toLowerCase()} out. Same job, same numbers.`;
+const TSAMEH = (to: any, from: any) => `${to} in, ${from.toLowerCase()} out. Same sets, same reps.${I.HOLD}`;
+const T119H = (to: any, from: any) => `${to} in, ${from.toLowerCase()} out. No load to add here.${I.HOLD}`;
 
 // ── the records themselves ──────────────────────────────────────────────────────────────────────────────────────────
 test('a stored record, fixture or overlay, written twice equals itself', () => {
@@ -63,7 +63,7 @@ test('the app\'s overlay writer stamps every carded day of the injured build, an
 });
 
 // ── D193's build half reaches an overlay athlete ────────────────────────────────────────────────────────────────────
-const itemsOf = (X, w) => {
+const itemsOf = (X: any, w: any) => {
   const wk = I.weekOf(X, w);
   const o = [];
   I.ISO_DAYS.forEach((d) => ((wk[d] && wk[d].sections) || []).forEach((s) => (s.items || []).forEach((it) => { if (it && it.name) o.push({ d, n: clean(it.name), det: it.detail || '' }); })));
@@ -195,12 +195,12 @@ const R7ROUTES = {
   'Barbell Romanian deadlift': { hop: { n: 'Barbell Romanian deadlift', d: I.TEST_T, h: I.TEST_T, t: TSAME('Barbell Romanian deadlift', 'Barbell box squat') },
     boot: { n: 'Barbell Romanian deadlift', d: I.TEST_T, h: I.TEST_T }, chip: 'Barbell box squat', undo: { n: 'Barbell box squat', d: I.R7_T, h: null } },
 };
-const slot3 = (s) => ({ n: clean(s.n), d: s.d, h: s.h });
-const hop3 = (h) => { assert.ok(h.offered && h.landed, `${h.n} offered and landed`); return { n: h.n, d: h.d, h: h.h, t: h.t }; };
+const slot3 = (s: any) => ({ n: clean(s.n), d: s.d, h: s.h });
+const hop3 = (h: any) => { assert.ok(h.offered && h.landed, `${h.n} offered and landed`); return { n: h.n, d: h.d, h: h.h, t: h.t }; };
 
 // Three apps, reused: setup() replaces a whole stored state, as a cold boot would (the legacy drivers batched the same way).
 const POOL = [I.sharedApp(W5, 5), I.sharedApp(W5, 6), I.sharedApp(W5, 7)];
-function driveRoutes(pres) {
+function driveRoutes(pres: any) {
   const [A, B, C] = POOL;
   const st = I.stored(A, I.L9.mario, pres, W5MON);
   const load = (Y) => { I.setup(Y, st); return Y; };
@@ -305,7 +305,7 @@ const TYPED_LATE = [
   { id: 'T3', pres: 'OVT', region: 'hip', w: 5, d: 'sat', from: 'Mountain climbers', to: 'Burpees',
     boot: 'Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15}' },
 ];
-const sig = (dy) => (!dy || !dy.sections ? '(none)' : dy.sections.map((s) => clean(s.label) + '{' + (s.items || []).map((it) => clean(it.name) + '|' + (it.detail || '')).join(';') + '}').join(' '));
+const sig = (dy: any) => (!dy || !dy.sections ? '(none)' : dy.sections.map((s) => clean(s.label) + '{' + (s.items || []).map((it) => clean(it.name) + '|' + (it.detail || '')).join(';') + '}').join(' '));
 
 test('a swap made before a late plan boots under the late plan, whole day re-filtered (three typed cards)', () => {
   const OTHER = { knee: 'ankle', ankle: 'hip', hip: 'lowback', lowback: 'shoulder', shoulder: 'elbow', elbow: 'knee' };

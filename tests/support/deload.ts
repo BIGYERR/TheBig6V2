@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Hand oracles, the stage recorder and the lattices for the deload tests (tests/integration/deload.test.js and
 // tests/sweeps/deload.test.js). D91: recoveryDeload keeps its one accessory block by PATTERN, not by push order. D93 and
 // D94: the pull side, where a deload pull day keeps Pull superset A (its vertical pull) because its Main is already a
@@ -13,13 +13,14 @@
 // p2 = recoveryDeload(p1) on a recovery week (p1 otherwise), p3 = capRegionalFatigue(p2). A copy of the app under test
 // (tests/support/app-copy.js) splits that statement in three and records a snapshot of each stage. The copy is inert:
 // the integration test proves it builds the same programs as the app.
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const crypto = require('node:crypto');
-const { loadApp } = require('./app.js');
-const { appCopy } = require('./app-copy.js');
-const { updating, SNAPSHOT_DIR } = require('./snapshot.js');
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { loadApp } from './app.ts';
+import type { App } from './app.ts';
+import { appCopy } from './app-copy.ts';
+import { updating, SNAPSHOT_DIR } from './snapshot.ts';
 
 // ── hand oracle: posterior chain ────────────────────────────────────────────────────────────────────────────────────
 const E_PAT = [
@@ -28,13 +29,13 @@ const E_PAT = [
   ['leg_iso', /leg curl|leg extension|hamstring curl/i],
   ['hinge', /deadlift|\brdl\b|romanian|good morning|\bswing\b|\bclean\b|\bsnatch\b|hinge|rack pull/i],
 ];
-const ePat = (n) => {
+const ePat = (n: any) => {
   const t = String(n || '');
   for (const [p, r] of E_PAT) if (r.test(t)) return p;
   return null;
 };
 /** {hinge, hip_ext} and nothing else. */
-const isPost = (n) => ['hinge', 'hip_ext'].includes(ePat(n));
+const isPost = (n: any) => ['hinge', 'hip_ext'].includes(ePat(n));
 /** 17 names, expected column typed from the doctrine names: ten negatives (four pull-side) and seven positives. */
 const POST_PROBE = [['Back squat', 0], ['Leg extension', 0], ['Lying leg curl', 0], ['Leg press', 0],
   ['Dumbbell standing calf raise', 0], ['Wall sit', 0], ['Barbell row', 0], ['Lat pulldown', 0], ['Chin-up', 0], ['Face pull', 0],
@@ -43,7 +44,7 @@ const POST_PROBE = [['Back squat', 0], ['Leg extension', 0], ['Lying leg curl', 
 
 // ── hand oracle: vertical pull (bar, ring or rope above the shoulder); rows, face pulls and pullovers are not ──────
 const V_PULL = /pull-?down|pull-?up|pullup|chin-?up|chinup|lat prayer|muscle-?up|\bhang(ing)? row\b(?!)|kneeling.*pulldown|straight-?arm pulldown|\bpull-?ups?\b/i;
-const isVPull = (n) => V_PULL.test(String(n || ''));
+const isVPull = (n: any) => V_PULL.test(String(n || ''));
 const VPULL_PROBE = [['Lat pulldown', 1], ['Neutral-grip pulldown', 1], ['Chinups', 1], ['Pull-ups', 1], ['Assisted pull-up', 1],
   ['Kneeling band pulldown', 1], ['Straight-arm pulldown', 1], ['Barbell row', 0], ['Pendlay row', 0], ['Chest-supported row', 0],
   ['Face pull', 0], ['Dumbbell pullover', 0], ['Inverted row (supinated, under a table)', 0], ['Kettlebell swing', 0]];
@@ -52,7 +53,7 @@ const VPULL_PROBE = [['Lat pulldown', 1], ['Neutral-grip pulldown', 1], ['Chinup
 const KMAIN = /^main\b|^primer|^power\b|^strength\b/;
 const KPREHAB = /hip|mobility|stretch/;
 const KFLUFF = /carry|finisher|conditioning|explosive/;
-function cls(s) {
+function cls(s: any) {
   const L = String(s.l || '').toLowerCase();
   if (KMAIN.test(L)) return 'main';
   if (s.hip || KPREHAB.test(L)) return 'prehab';
@@ -88,7 +89,7 @@ function loadStaged() {
   IA.eval(SNAP_FN + 'globalThis.__STAGES=null;globalThis.__DELOAD_OFF=false;');
   return IA;
 }
-function stagedBuild(IA, cfg, deloadOff) {
+function stagedBuild(IA: any, cfg: any, deloadOff: any) {
   IA.eval('globalThis.__STAGES=[];globalThis.__DELOAD_OFF=' + !!deloadOff + ';');
   const prog = IA.buildProgram(JSON.parse(JSON.stringify(cfg)));
   const stages = JSON.parse(JSON.stringify(IA.eval('globalThis.__STAGES')));
@@ -133,11 +134,11 @@ function pullLattice() {
 }
 
 // ── the D91 census over a lattice, both arms (deload on, and the __DELOAD_OFF counterfactual) ──────────────────────
-const secPost = (s) => (s.n || []).reduce((a, n) => a + (isPost(n) ? 1 : 0), 0);
-const cardPost = (c) => (c || []).reduce((a, s) => a + secPost(s), 0);
-const hasLab = (c, lab) => (c || []).some((s) => s.l === lab && (s.n || []).length);
-const sha = (s) => crypto.createHash('sha256').update(s).digest('hex').slice(0, 16);
-const bump = (o, k) => { o[k] = (o[k] || 0) + 1; };
+const secPost = (s: any) => (s.n || []).reduce((a, n) => a + (isPost(n) ? 1 : 0), 0);
+const cardPost = (c: any) => (c || []).reduce((a, s) => a + secPost(s), 0);
+const hasLab = (c: any, lab: any) => (c || []).some((s) => s.l === lab && (s.n || []).length);
+const sha = (s: any) => crypto.createHash('sha256').update(s).digest('hex').slice(0, 16);
+const bump = (o: any, k: any) => { o[k] = (o[k] || 0) + 1; };
 const LABELS = ['Leg superset A', 'Leg superset B', 'Leg isolation', 'Explosive finisher'];
 const PLABELS = ['Pull superset A', 'Pull superset B', 'Pull'];
 function blankArm() {
@@ -151,7 +152,7 @@ function blankArm() {
     pullP1all: {}, pullP2all: {}, pullBothP1: 0, pullSwapCensus: {}, orderViol: 0, orderNonVac: 0, legAfterHipViol: 0, trapAndSwap: 0 };
 }
 /** Runs the D91 census over `lattice` on a staged app. Returns { on, off, wrongWay, endToEnd, dlIdentical, dlTotal, ndIdentical, ndTotal }. */
-function deloadCensus(IA, lattice) {
+function deloadCensus(IA: any, lattice: any) {
   const LT = IA.eval("typeof _longRunTier==='function'?_longRunTier:null");
   const R = { on: blankArm(), off: blankArm(), wrongWay: 0, endToEnd: 0, ndIdentical: 0, ndTotal: 0, dlIdentical: 0, dlTotal: 0 };
   for (const L of lattice) {
@@ -284,7 +285,7 @@ function deloadCensus(IA, lattice) {
 
 // ── the D93/D94 pull census over the mini lattice ───────────────────────────────────────────────────────────────────
 const FAM = ['Pull superset A', 'Pull superset B', 'Pull'];
-function pullCensus(IA, lattice) {
+function pullCensus(IA: any, lattice: any) {
   const S = { configs: 0, dayCells: 0, dlDayBuilds: 0, famP2: 0, famP1: 0, famP2ByLabel: {}, bothEnter: 0, mainPostCards: 0, swapCards: 0,
     swapItems: {}, census: {}, viol: 0, mainPostSwap: 0, p7VPull: 0, p4Survive: 0 };
   const secOf = (c, lb) => (c || []).filter((s) => s.l === lb && (s.n || []).length);
@@ -331,7 +332,7 @@ function pullCensus(IA, lattice) {
 // ── a golden file with several keyed entries (one per test that owns a part of it) ──────────────────────────────────
 // tests/support/snapshot.js compares a whole file; the deload feature has two owners of its golden values (the
 // integration file and the CI sweep), so each compares and rewrites only its own key. UPDATE_SNAPSHOTS=1 rewrites it.
-function matchSnapshotKey(feature, key, actual) {
+function matchSnapshotKey(feature: any, key: any, actual: any) {
   const file = path.join(SNAPSHOT_DIR, feature + '.json');
   const cur = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
   const value = JSON.parse(JSON.stringify(actual));
@@ -346,7 +347,7 @@ function matchSnapshotKey(feature, key, actual) {
   assert.deepStrictEqual(value, cur[key], `"${key}" differs from tests/snapshots/${feature}.json. If a ruling moved it, rerun with UPDATE_SNAPSHOTS=1 and review the git diff.`);
 }
 
-module.exports = {
+export {
   E_PAT, isPost, POST_PROBE, V_PULL, isVPull, VPULL_PROBE, cls, CLS_PROBE, KMAIN,
   ASSEMBLY, loadStaged, stagedBuild, deloadLattice, pullLattice, deloadCensus, pullCensus, matchSnapshotKey,
 };

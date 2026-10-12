@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Injury and travel overlays: what the injury filter renames, drops and holds, and what reaches the athlete through an
 // overlay, the swap sheet and a reboot.
 //   D43 and the heading sync: a renamed item carries its section heading with it.
@@ -15,10 +15,10 @@
 // text, the toasts, the tier inventories, the doctrine of each overlay. The engine's _pattern names a movement's
 // pattern (the classifier is not under test); the expected answer is never read off the engine. Seeds are pinned,
 // clocks are pinned, and every stored record is shown to equal itself before records are compared.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, appScript, fixtures } = require('../support/app.js');
-const I = require('../support/injury-overlays.js');
+import assert from 'node:assert/strict';
+import { test } from 'vitest';
+import { loadApp, appScript, fixtures } from '../support/app.ts';
+import * as I from '../support/injury-overlays.ts';
 
 const IA = loadApp();
 const { clean, host, E } = I;
@@ -29,7 +29,7 @@ const { clean, host, E } = I;
 const SWAP_KEYS = ['Dumbbell bench press', 'Dumbbell skullcrushers', 'Barbell curl', 'Preacher curl', 'Ab wheel rollouts', 'Hanging knee raises', 'L-sit hold', 'L-sit chinups', 'Hanging leg raises'];
 const SHOULDER_WORKAROUND_DELETED = /overhead|arnold|push press|military|pike pushup|handstand|wall walk|\bdips\b|lateral raise/i;
 const EQUIP6 = ['bodyweight', 'minimal', 'home_basic', 'home_full', 'commercial', 'crossfit'];
-const sectionsOf = (prog) => {
+const sectionsOf = (prog: any) => {
   const out = [];
   const total = Object.keys(prog.weeks || {}).length;
   for (const wk of Object.keys(prog.weeks || {})) for (const d of I.DAYS) {
@@ -101,7 +101,7 @@ test('D43 fires on every tier that owns dumbbells: the floor press in, the bench
   assert.ok(EQUIP6.some((e) => e !== 'bodyweight' && HEAD.healthyBench[e] > 0), 'a healthy program on some dumbbell tier prescribes the bench press');
 });
 
-const filterOne = (label, name, detail, injury, extra) => {
+const filterOne = (label: any, name: any, detail: any, injury: any, extra: any) => {
   const cfg = { ...fixtures.HALF_MANNY, ...(extra || {}), ...(injury ? { injury } : {}) };
   const out = IA.applyInjuryFilter([{ label, items: [{ name, detail: detail || '3×10' }] }], cfg);
   return out && out.length ? { label: String(out[0].label || ''), name: clean((out[0].items[0] || {}).name), detail: (out[0].items[0] || {}).detail } : null;
@@ -209,7 +209,7 @@ const OWNS = {   // the inventory per tier, typed from the tier copy the athlete
   home_basic: { BARBELL: 0, DUMBBELL: 1, CABLE: 0, MACHINE: 0, GHD: 0, KETTLEBELL: 1 },
   bodyweight: { BARBELL: 0, DUMBBELL: 0, CABLE: 0, MACHINE: 0, GHD: 0, KETTLEBELL: 0 },
 };
-function implementsOf(name) {
+function implementsOf(name: any) {
   const N = String(name).toLowerCase();
   const c = new Set();
   if (/glute[- ]ham|\bghr\b|\bghd\b|45° back extension|roman chair/.test(N)) c.add('GHD');
@@ -220,11 +220,11 @@ function implementsOf(name) {
   if (/kettlebell|\bkb\b/.test(N)) c.add('KETTLEBELL');
   return c;
 }
-const gearLegal = (t, n) => [...implementsOf(n)].every((c) => OWNS[t][c] !== 0);
+const gearLegal = (t: any, n: any) => [...implementsOf(n)].every((c) => OWNS[t][c] !== 0);
 const SWAPS = { shoulder: { 'Dumbbell bench press': 'Dumbbell floor press' },
   elbow: { 'Dumbbell skullcrushers': 'Cable pushdown', 'Barbell curl': 'Dumbbell hammer curl', 'Preacher curl': 'Cable curl' } };
 const FALLBACK = { 'Cable pushdown': 'Close-grip pushups' };
-const EXPECT = (t, s, to) => (gearLegal(t, s) ? (gearLegal(t, to) ? to : FALLBACK[to] || to) : s);
+const EXPECT = (t: any, s: any, to: any) => (gearLegal(t, s) ? (gearLegal(t, to) ? to : FALLBACK[to] || to) : s);
 const ELBOW_COPY = 'Straight bar work moves to neutral grips. Skullcrushers become pushdowns, or close grip pushups where there is no cable. Dips and carries are out. Pressing holds RPE 7.';
 
 test('the renamer hand table: the fallback lands on the no-cable tiers, and the cells the ruling names agree with the rule', () => {
@@ -297,7 +297,7 @@ test('elbow and shoulder workaround programs print no item the tier does not own
 
 // ── D54: the travel overlay's holds copy asserts no implement ───────────────────────────────────────────────────────
 const IMPLEMENT_WORDS = ['on the bar', 'the bar', 'barbell', 'dumbbell', 'kettlebell', 'plates', 'pair they have', 'machine', 'bands', 'sandbag'];
-function travelHolds(equipment) {
+function travelHolds(equipment: any) {
   const { X } = I.progAt(I.L9.mario_noinj, 'CFG', '2026-09-24');
   E(X, `Object.assign(_ovDraft,{tab:'travel',equipment:${JSON.stringify(equipment)},from:'2026-09-22',to:'2026-09-24'});`);
   const html = String(E(X, '_renderTravelTab()'));
@@ -319,8 +319,8 @@ test('the travel holds copy names no implement on any tier, keeps the single arm
 // ── D197: on bodyweight with an injury, every day is filtered once more after the sweep ────────────────────────────
 const PUSHUPS = 'Pushups (slow 3s eccentric)';
 const A_AFTER = '4 sets — RPE 7 (leave 3 or more in reserve)';
-const cellCfg = (o) => Object.assign(I.clone(I.MARIO), { injury: { region: 'elbow', tier: 'workaround' }, equipment: 'bodyweight', experience: 'advanced' }, o);
-const card = (d) => host((d && d.sections) || []).map((s) => [clean(s.label), (s.items || []).map((i) => [clean(i.name), clean(i.detail)])]);
+const cellCfg = (o: any) => Object.assign(I.clone(I.MARIO), { injury: { region: 'elbow', tier: 'workaround' }, equipment: 'bodyweight', experience: 'advanced' }, o);
+const card = (d: any) => host((d && d.sections) || []).map((s) => [clean(s.label), (s.items || []).map((i) => [clean(i.name), clean(i.detail)])]);
 
 test('elbow workaround on bodyweight: the swept chest volume pushups hold at RPE 7 on the W3 and W4 Mondays of all ten programs', () => {
   const CELLS = [{ liftingFocus: 'support_strength', seed: 76308 }, { liftingFocus: 'support_athletic', seed: 76308 },
@@ -369,8 +369,8 @@ test('the post-sweep re-filter sits inside the bodyweight branch, once, guarded 
 
 // ── D193: the cap cue says three in the tank, and the stripper knows both wordings (R1, R4, R5, R6) ─────────────────
 const NUMWORD = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five' };
-const RIR = (rpe) => Math.round(10 - rpe);   // the hand rule: reps in reserve = 10 − RPE
-const TSAME = (to, from) => `${to} in, ${from.toLowerCase()} out. Same job, same numbers.`;
+const RIR = (rpe: any) => Math.round(10 - rpe);   // the hand rule: reps in reserve = 10 − RPE
+const TSAME = (to: any, from: any) => `${to} in, ${from.toLowerCase()} out. Same job, same numbers.`;
 
 test('the cap cue is "hold RPE 7, three in the tank": three is 10 − 7, the rule the RPE card states', () => {
   const lit = E(IA, 'INJ_CAP_CUE');
@@ -393,7 +393,7 @@ const STRIP_HAND = [
   ['3×13 — RPE 6 (recovery — leave 4+ reps in the tank), ramp up with 2–3 warmup sets, 2–3 min rest', null], ['2 sets — RPE 6 (leave plenty in the tank)', null],
   ['4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 3 min rest', null], ['3×10', null], ['', null],
 ];
-const strip = (X, arr) => { X.ctx.__arr = arr; return host(E(X, '__arr.map(function(d){return _stripCapCue(d);})')); };
+const strip = (X: any, arr: any) => { X.ctx.__arr = arr; return host(E(X, '__arr.map(function(d){return _stripCapCue(d);})')); };
 const L9VM = I.appAt('2026-09-24');
 const L9CARDS = Object.fromEntries(Object.entries(I.L9).map(([k, c]) => [k, I.cardsOf(L9VM.buildProgram(I.clone(c)))]));
 
@@ -471,7 +471,7 @@ test('the clamp writes each of the four hold shapes and R7\'s held test on a cap
 });
 
 /** The filter-lens census of a set of injured builds: cards in U (the judged name's pattern is capped) by what they print. */
-function lensCensus(cfgs) {
+function lensCensus(cfgs: any) {
   const X = I.lensApp();
   const pat = I.patternOf(I.appAt('2026-09-24'));
   const r = { U: 0, hi: [], forbid: [], loadHead: 0, power: 0, powerCued: [], r7: 0, test: 0, r7Uncapped: [], testCapped: [], numOnly: [] };

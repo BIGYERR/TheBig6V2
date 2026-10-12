@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Deload weeks, the slow half: the D91 census over its whole 1,728-config lattice (6 tiers x 2 foci x 2 experiences x
 // 3 goals x 4 injuries x 3 rest patterns x 2 seeds), both arms: the app as shipped and the counterfactual with the
 // deload pass off (globalThis.__DELOAD_OFF). About a minute; CI runs it, the 60-second check does not.
@@ -7,16 +7,16 @@
 // swap populations) are typed below. Counts later rulings moved and pinned per release (the legacy era tables
 // DELOAD_ARB_BY_VERSION, E6_BY_VERSION and DELOAD_HINGE_BY_VERSION) are golden values in tests/snapshots/deload.json
 // under "D91 lattice counts"; a ruling that moves one rewrites it with UPDATE_SNAPSHOTS=1.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const D = require('../support/deload.js');
+import assert from 'node:assert/strict';
+import { test } from 'vitest';
+import * as D from '../support/deload.ts';
 
 const ST = D.loadStaged();
 const LAT = D.deloadLattice();
 const R = D.deloadCensus(ST, LAT);
 const N = R.on;
 const F = R.off;
-const g = (o, k) => (o && o[k]) || 0;
+const g = (o: any, k: any) => (o && o[k]) || 0;
 
 test('the lattice is the ruled 1,728 configs: 17,856 weeks, 2,880 of them deload weeks, 15,360 deload day builds', () => {
   assert.equal(LAT.length, 1728);

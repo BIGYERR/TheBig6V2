@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Deload weeks: recoveryDeload keeps its one accessory block by PATTERN, not push order (D91); on the pull side a deload
 // pull day keeps Pull superset A, the day's vertical pull, because its Main is already a deadlift variant (D93 as
 // narrowed by D94). Rulings: docs/decisions/deload.md when one is written; the parity table is
@@ -10,10 +10,10 @@
 // proved inert below. Golden values (tests/snapshots/deload.json): the deload-off digest of Mario's program and the
 // pull lattice's positive-limb count. The 1,728-config D91 lattice runs in tests/sweeps/deload.test.js; this file runs
 // a 76-config sample of it.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, fixtures, progDigest } = require('../support/app.js');
-const D = require('../support/deload.js');
+import assert from 'node:assert/strict';
+import { test } from 'vitest';
+import { loadApp, fixtures, progDigest } from '../support/app.ts';
+import * as D from '../support/deload.ts';
 
 const IA = loadApp();
 const ST = D.loadStaged();

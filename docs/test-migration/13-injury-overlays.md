@@ -5,26 +5,26 @@ gates stay in `tests/gates/` and keep running in CI until phase 3.
 
 New files:
 
-- `tests/integration/injury-overlays.test.js` (31 tests): what the injury filter renames, drops and holds. The heading
+- `tests/integration/injury-overlays.test.ts` (31 tests): what the injury filter renames, drops and holds. The heading
   sync (D43), the pool lens and floor (D52, D44), the gear-lens renamer (D154), the travel holds copy (D54), the cap
   cue and the stripper (D193 R1, R4, R5, R6), the clamp's hold shapes and the held test (D193 R2, R7), the post-sweep
   re-filter on bodyweight (D197).
-- `tests/integration/injury-plan-lens.test.js` (12 tests): the plan of the day (D194). The overlay writer's records,
+- `tests/integration/injury-plan-lens.test.ts` (12 tests): the plan of the day (D194). The overlay writer's records,
   the build half on the overlay path, the swap, aux and add sheets, the Thursday-from plan, the travel stamp, the
   bridge back, the typed hold routes at the tap and at boot on the overlay and the fixture, a single-hop sample, and the
   late plan's typed cards (D194 Amendment 5).
-- `tests/sweeps/injury-overlays.test.js` (10 tests): the lattices. The D154 renamer lattice (2,160 builds), the D193
+- `tests/sweeps/injury-overlays.test.ts` (10 tests): the lattices. The D154 renamer lattice (2,160 builds), the D193
   filter-lens census (L432, home_basic 108, the travel overlay 216, the D177 lite lattice 384 and 133 uninjured
   builds), the D194 sheets on the lite lattice's 288 injured configs, every capped single hop of the seven D190
   configs, every Main and Power swap pair of the lite lattice (150,989) against the hand hold, the post-sweep population
   on L432, the late-plan presentations, and a sample of the D190 swap chains in three modes.
-- `tests/support/injury-overlays.js`: the fixtures (Mario's shape, L9, L432, the lite lattice), the hand tables (the cap
+- `tests/support/injury-overlays.ts`: the fixtures (Mario's shape, L9, L432, the lite lattice), the hand tables (the cap
   table, the hold shapes, the cue, the held-test text, D177's rep floors, the hold toasts), the app drivers (store,
   boot, hop, undo, the sheets), the judge (the injury filter on a fully injured cfg, in a separate app), the filter
   lens, and the D52 pool-chain reader with its named debt.
 
-Paths below are under `tests/`; `IO` is `integration/injury-overlays.test.js`, `PL` is
-`integration/injury-plan-lens.test.js`, `SW` is `sweeps/injury-overlays.test.js`.
+Paths below are under `tests/`; `IO` is `integration/injury-overlays.test.ts`, `PL` is
+`integration/injury-plan-lens.test.ts`, `SW` is `sweeps/injury-overlays.test.ts`.
 
 **Build-scoped conjuncts.** Several rows below held a "byte-identical to V<N>" or "the baseline reads V<N>'s figure"
 conjunct, read off an older artifact fetched by `git show`. Those conjuncts are build-scoped claims (standing ruling 3:
@@ -68,7 +68,7 @@ the test named. Where a row's figure was a count on the candidate, the count is 
 | `D52-four` | IO › same |
 | `D52-whole` | IO › same |
 | `D52-single` | IO › same |
-| `D52-debt` | IO › "a pool authored with fewer than two members is one the named debt lists, and every listed debt still trips" (the debt file `tests/gates/g193_pool_overlay_debt.txt` is typed into `tests/support/injury-overlays.js`, its 16 entries current at this release) |
+| `D52-debt` | IO › "a pool authored with fewer than two members is one the named debt lists, and every listed debt still trips" (the debt file `tests/gates/g193_pool_overlay_debt.txt` is typed into `tests/support/injury-overlays.ts`, its 16 entries current at this release) |
 
 ## `g216_d154_swap_lens.js` (12 rows)
 

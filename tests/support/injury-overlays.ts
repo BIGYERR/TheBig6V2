@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Fixtures, hand tables and the app drivers for the injury and travel overlay tests (tests/integration/
 // injury-overlays.test.js and tests/sweeps/injury-overlays.test.js).
 //
@@ -10,12 +10,13 @@
 //        stored record is read back from ia_programs (overlay id and created fixed, so two writes compare equal).
 // Every expected value lives in the tests or in the hand tables below (the cap table, the hold shapes, the cue, the
 // held-test text, the toasts). The engine's _pattern only names a movement's pattern; the plan is what is under test.
-const { loadApp, pinClock, fixtures } = require('./app.js');
+import { loadApp, pinClock, fixtures } from './app.ts';
+import type { App } from './app.ts';
 
-const clone = (x) => JSON.parse(JSON.stringify(x));
+const clone = (x: any) => JSON.parse(JSON.stringify(x));
 /** A host-realm copy of a value read out of the app's VM. */
 const host = clone;
-const clean = (s) => String(s == null ? '' : s).replace(/<svg[\s\S]*?<\/svg>\s*/g, '').trim();
+const clean = (s: any) => String(s == null ? '' : s).replace(/<svg[\s\S]*?<\/svg>\s*/g, '').trim();
 const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const ISO_DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const START = '2026-08-24';
@@ -41,14 +42,14 @@ const CAP = {
   shoulder: { workaround: ['hpress', 'vpress', 'delt_iso'], protect: [] },
   elbow: { workaround: ['hpress', 'tri_iso', 'bi_iso', 'row', 'vpull'], protect: ['row', 'vpull'] },
 };
-const capOf = (cfg) => (cfg && cfg.injury ? CAP[cfg.injury.region][cfg.injury.tier] : []);
+const capOf = (cfg: any) => (cfg && cfg.injury ? CAP[cfg.injury.region][cfg.injury.tier] : []);
 /** The largest RPE a detail names (a range by its top), or null. */
-const rpeMax = (d) => {
+const rpeMax = (d: any) => {
   const v = [...String(d || '').matchAll(/RPE\s*([\d.]+)(?:\s*[–-]\s*([\d.]+))?/gi)].map((m) => Math.max(+m[1], m[2] ? +m[2] : 0));
   return v.length ? Math.max(...v) : null;
 };
 /** The hand hold (D193 Amendment 1 §3 four shapes plus R7's fifth): what a capped detail above RPE 7 reads after the clamp. */
-function handHold(d) {
+function handHold(d: any) {
   if (typeof d !== 'string') return d;
   if (TEST_SHAPE.test(d)) return R7_T;
   return d.replace(/RPE (\d+(?:\.\d+)?)(?:–(\d+(?:\.\d+)?))?\+?( \((stop 2 reps short of failure|leave ~\d+ reps? in reserve|heaviest pair you can find)\))?/g, (t, a, b, g, gl) => {
@@ -65,12 +66,12 @@ function handHold(d) {
 const MARIO = { name: 'M', primaryPath: 'lift', cardioTypes: [], cardioGoals: {}, eventTargeted: false, raceDate: null, liftingFocus: 'support_strength',
   experience: 'beginner', ageBracket: '18-35', equipment: 'commercial', unit: 'lbs', restDays: ['sun', 'wed'], days: DAYS.slice(),
   bench: 135, squat: 155, deadlift: 185, seed: 76308 };
-const withInj = (inj, extra) => {
+const withInj = (inj: any, extra: any) => {
   const c = Object.assign(clone(MARIO), extra || {});
   if (inj) c.injury = { ...inj };
   return c;
 };
-const seeded = (c) => { const x = clone(c); if (typeof x.seed !== 'number') x.seed = 76308; return x; };
+const seeded = (c: any) => { const x = clone(c); if (typeof x.seed !== 'number') x.seed = 76308; return x; };
 /** The nine D190 configs: Mario at knee/workaround, HALF_MANNY, Mario uninjured, and each region's plan. */
 const L9 = {
   mario: withInj({ region: 'knee', tier: 'workaround' }), manny: seeded(fixtures.HALF_MANNY), mario_noinj: withInj(null),
@@ -82,7 +83,7 @@ const L9 = {
 const CK7 = ['elbow_wa', 'shoulder_wa', 'lowback_wa', 'hip_wa', 'knee_protect', 'mario', 'ankle_wa'];
 const REGS = ['knee', 'ankle', 'hip', 'lowback', 'shoulder', 'elbow'];
 /** region x tier x equipment x experience x support focus on Mario's shape (L432 on four tiers, 108 on home_basic). */
-function grid(equipments, extra) {
+function grid(equipments: any, extra: any) {
   const r = [];
   for (const g of REGS) for (const t of ['workaround', 'protect']) for (const eq of equipments)
     for (const ex of ['beginner', 'intermediate', 'advanced']) for (const fo of ['support_strength', 'support_athletic', 'support_prevention'])
@@ -119,38 +120,38 @@ const HELP = "globalThis.__T=[];showToast=function(m){__T.push(String(m));};open
   + "globalThis.__dayLists=function(w,d){var day=activeProg.weeks[w]&&activeProg.weeks[w][d];var out=[];if(!day||day.rest||!day.sections)return {stamp:null,rows:out};day.sections.forEach(function(s,si){((s&&s.items)||[]).forEach(function(it,ii){if(!it||!it.name)return;var p=_pattern(it.name);if(p){var c=swapCandidates(it.name,day,w,activeProg);out.push({si:si,ii:ii,n:it.name,k:'pat',L:c.tier1.concat(c.tier2)});}else if(_auxFamily(it.name)){out.push({si:si,ii:ii,n:it.name,k:'aux',L:auxSwapCandidates(it.name,day,activeProg).slice()});}});});var a=addCandidates(day,w,activeProg);out.push({si:-1,ii:-1,n:'(add)',k:'add',L:[].concat(a.gap.map(function(x){return 'g:'+x;}),a.more.map(function(x){return 'm:'+x;}),a.off.map(function(x){return 'o:'+x;}))});return {stamp:day._ovKey?JSON.stringify(day._ovKey):null,rows:out};};"
   + "globalThis.__weekLists=function(w){var o={};['mon','tue','wed','thu','fri','sat','sun'].forEach(function(d){o[d]=__dayLists(w,d);});return JSON.stringify(o);};";
 /** A fresh app with its clock at noon on `clock` and the shim installed. */
-function appAt(clock, file) {
+function appAt(clock: any, file: any) {
   const X = loadApp(file ? { file } : {});
   pinClock(X, new Date(clock + 'T12:00:00'));
   X.eval(HELP);
   return X;
 }
-const E = (X, code) => X.eval(code);
+const E = (X: any, code: any) => X.eval(code);
 const CACHE = new Map();
 /**
  * A shared app at `clock`, one per (clock, slot). A cold VM spends its first build warming up, so tests reuse a few;
  * setup() replaces the whole stored state each time, as a cold boot would.
  */
-function sharedApp(clock, slot = 0) {
+function sharedApp(clock: any, slot: any = 0) {
   const k = clock + '#' + slot;
   if (!CACHE.has(k)) CACHE.set(k, appAt(clock));
   return CACHE.get(k);
 }
 /** Stores a program record and boots it as the active program 'PM'. */
-function setup(X, st) {
+function setup(X: any, st: any) {
   X.localStorage.clear();
   X.ctx.__SP = JSON.parse(st);
   E(X, "savePrograms([__SP]);activeProgId='PM';activeProg=refreshProgram(getPrograms().find(function(x){return x.id==='PM';}));");
 }
 /** Boots `dst` from the storage `src` left (a reload). */
-function bootFrom(src, dst) {
+function bootFrom(src: any, dst: any) {
   const ls = new Map(src.localStorage._map);
   dst.localStorage.clear();
   for (const [k, v] of ls) dst.localStorage.setItem(k, v);
   E(dst, "activeProgId='PM';activeProg=refreshProgram(getPrograms().find(function(x){return x.id==='PM';}));");
 }
 /** The stored record for `cfg`: pres 'CFG' stores the injury in cfg; 'OV' writes it as an overlay from `from` (X pinned). */
-function stored(X, cfg, pres, from) {
+function stored(X: any, cfg: any, pres: any, from: any) {
   const base = clone(cfg);
   delete base.injury;
   const c = pres === 'CFG' ? clone(cfg) : base;
@@ -167,27 +168,27 @@ function stored(X, cfg, pres, from) {
   return j;
 }
 /** The app's injury writer on the active program. */
-function writeInjury(X, inj, from) {
+function writeInjury(X: any, inj: any, from: any) {
   const n0 = +E(X, '(activeProg.overlays||[]).length');
   E(X, `_ovDraft.injRegion=${JSON.stringify(inj.region)};_ovDraft.injTier=${JSON.stringify(inj.tier)};_ovDraft.from=${JSON.stringify(from)};applyInjuryDraft();`);
   if (+E(X, '(activeProg.overlays||[]).length') !== n0 + 1) throw new Error(`overlay not written ${inj.region}/${inj.tier} from ${from}`);
 }
 /** A booted app holding `cfg` at `clock`, presented as pres ('CFG' or 'OV' from `from`). */
-function progAt(cfg, pres, clock, from, slot = 0) {
+function progAt(cfg: any, pres: any, clock: any, from: any, slot: any = 0) {
   const st = stored(sharedApp(clock, 9), cfg, pres, from);
   const X = sharedApp(clock, slot);
   setup(X, st);
   return { X, st };
 }
-const dayOf = (X, w, d) => JSON.parse(E(X, `JSON.stringify(activeProg.weeks[${w}]&&activeProg.weeks[${w}].${d}||null)`));
-const weekOf = (X, w) => JSON.parse(E(X, `JSON.stringify(activeProg.weeks[${w}]||null)`));
-const stampOf = (X, w, d) => E(X, `(function(){var dy=activeProg.weeks[${w}]&&activeProg.weeks[${w}].${d};return dy&&typeof dy._ovKey==='string'?dy._ovKey:null;})()`);
+const dayOf = (X: any, w: any, d: any) => JSON.parse(E(X, `JSON.stringify(activeProg.weeks[${w}]&&activeProg.weeks[${w}].${d}||null)`));
+const weekOf = (X: any, w: any) => JSON.parse(E(X, `JSON.stringify(activeProg.weeks[${w}]||null)`));
+const stampOf = (X: any, w: any, d: any) => E(X, `(function(){var dy=activeProg.weeks[${w}]&&activeProg.weeks[${w}].${d};return dy&&typeof dy._ovKey==='string'?dy._ovKey:null;})()`);
 /** One slot: name, detail, and the kept pre-hold dose if the hold wrote one. */
-function slotOf(X, w, d, si, ii) {
+function slotOf(X: any, w: any, d: any, si: any, ii: any) {
   return JSON.parse(E(X, `(function(){var dy=activeProg.weeks[${w}]&&activeProg.weeks[${w}].${d};var it=dy&&dy.sections&&dy.sections[${si}]&&dy.sections[${si}].items[${ii}];return JSON.stringify(it?{n:it.name,d:it.detail||'',h:(typeof it._preHold==='string')?it._preHold:null}:{n:'(none)',d:'',h:null});})()`));
 }
 /** Finds the one slot named `name` in a section whose label starts `sec` on week w, day d. */
-function findSlot(X, w, d, sec, name) {
+function findSlot(X: any, w: any, d: any, sec: any, name: any) {
   const dy = dayOf(X, w, d);
   let L = null;
   ((dy && dy.sections) || []).forEach((s, si) => {
@@ -197,7 +198,7 @@ function findSlot(X, w, d, sec, name) {
   return L;
 }
 /** The swap sheet's tap: applySwapChoice onto `to`. Returns the slot after, the toasts and whether `to` was offered. */
-function hop(X, c, to) {
+function hop(X: any, c: any, to: any) {
   E(X, `currentWeek=${c.w};currentDayKey='${c.d}';__T.length=0;`);
   const cur = slotOf(X, c.w, c.d, c.si, c.ii);
   const offered = host(E(X, `__cands(activeProg.weeks[${c.w}].${c.d},${c.w},${JSON.stringify(cur.n)})`)).includes(to);
@@ -208,7 +209,7 @@ function hop(X, c, to) {
   return { n: clean(after.n), d: after.d, h: after.h, t: host(E(X, '__T')).join(' / '), offered, landed: clean(after.n) === clean(to) };
 }
 /** Undoes the slot's last swap by its chip. */
-function undoLast(X, c) {
+function undoLast(X: any, c: any) {
   E(X, `currentWeek=${c.w};currentDayKey='${c.d}';`);
   const cur = slotOf(X, c.w, c.d, c.si, c.ii);
   const chip = E(X, `swapOriginOf(${JSON.stringify(cur.n)})`) || '';
@@ -217,12 +218,12 @@ function undoLast(X, c) {
   return { chip, slot: { n: clean(s.n), d: s.d, h: s.h } };
 }
 /** The swap records of day key `wk` ('w5_thu') as from>to with each record's kept-dose field. */
-function swapRecord(X, wk) {
+function swapRecord(X: any, wk: any) {
   const all = JSON.parse(E(X, "localStorage.getItem('ia_swaps_PM')") || '{}');
   return (all[wk] || []).map((e) => e.from + '>' + e.to + ((e && e.rx) || []).map((x) => ' ph=' + (x && typeof x === 'object' && 'ph' in x ? JSON.stringify(x.ph) : '-')).join('')).join(' | ');
 }
 /** Every card of a program (or a week map), with its section label. */
-function cardsOf(prog, build) {
+function cardsOf(prog: any, build: any) {
   const m = [];
   const weeks = (prog && prog.weeks) || {};
   Object.keys(weeks).forEach((w) => Object.keys(weeks[w] || {}).forEach((d) => {
@@ -245,13 +246,13 @@ function lensApp() {
   return X;
 }
 /** Builds cfg in a lens app and returns its cards (pre = the judged name). */
-function lensCards(X, cfg) {
+function lensCards(X: any, cfg: any) {
   X.ctx.__C = clone(cfg);
   const b = E(X, 'globalThis.__BUILD=(globalThis.__BUILD||0)+1');
   return cardsOf(E(X, 'buildProgram(__C)'), b);
 }
 /** The engine's pattern of a name, memoised (the classifier is not under test; the plan is). */
-function patternOf(X) {
+function patternOf(X: any) {
   const memo = {};
   return (n) => (n in memo ? memo[n] : (memo[n] = E(X, `_pattern(${JSON.stringify(clean(n))})`) || '-'));
 }
@@ -267,7 +268,7 @@ const POOL_GEAR = {
   crossfit: { hasBarbell: true, hasCables: false, hasDumbbells: true, isCrossfit: true, hasGHD: true, isBW: false },
 };
 /** The implement a pool member needs, read from its name (GHD names are a station commercial and crossfit own, D149). */
-function poolGearOK(nm, g) {
+function poolGearOK(nm: any, g: any) {
   const n = String(nm).toLowerCase();
   if (/glute[- ]ham|\bghr\b|45° back extension/.test(n)) return g.hasGHD;
   if (/\bbarbell\b|^trap bar|^power clean|^hang clean|^rack pull|^back squat|^front squat|^bench press$|close-grip bench/.test(n)) return g.hasBarbell;
@@ -276,7 +277,7 @@ function poolGearOK(nm, g) {
   return true;
 }
 /** The pool assignments inside the injury override chain (`if(_R==='knee'){ … }` and its else-ifs), comments stripped. */
-function injuryPoolAssignments(src) {
+function injuryPoolAssignments(src: any) {
   const start = src.indexOf("if(_R==='knee'){");
   if (start < 0) return null;
   let end = start;
@@ -311,7 +312,7 @@ function injuryPoolAssignments(src) {
   return out;
 }
 /** A pool expression's members on one tier, or null when it is not statically evaluable (it reads a live pool). */
-function resolvePool(expr, equip) {
+function resolvePool(expr: any, equip: any) {
   const g = POOL_GEAR[equip];
   const src = expr.replace(/;\s*$/, '');
   const skeleton = src.replace(/'[^']*'/g, "''").replace(/"[^"]*"/g, '""').replace(/\/[^/\n]+\/[a-z]*/g, 'RX');
@@ -346,8 +347,8 @@ const POOL_DEBT = [
 
 // ── D194: the plan of the day ──────────────────────────────────────────────────────────────────────────────────────
 /** The sheets a booted program offers on week w: per day, its stamp and every swap, aux and add list. */
-const weekLists = (X, w) => JSON.parse(E(X, `__weekLists(${w})`));
-const rowKey = (d, r) => `${d}|${r.k}|${r.si}_${r.ii}|${r.n}`;
+const weekLists = (X: any, w: any) => JSON.parse(E(X, `__weekLists(${w})`));
+const rowKey = (d: any, r: any) => `${d}|${r.k}|${r.si}_${r.ii}|${r.n}`;
 /**
  * The judge: the ruled definition of a name the plan rejects. A name is rejected under a fully injured cfg when the
  * injury filter, run on it alone in a separate app, drops or renames it. The sheets under test never judge themselves.
@@ -366,7 +367,7 @@ function judgeMaker() {
   });
 }
 /** Rejected names over some days' rows of the given kinds. */
-function rejSum(WL, cfg, kinds, days, judge) {
+function rejSum(WL: any, cfg: any, kinds: any, days: any, judge: any) {
   const r = { rows: 0, offers: 0, rej: 0, ex: [] };
   for (const d of days || ISO_DAYS) for (const row of WL[d].rows.filter((x) => kinds.includes(x.k))) {
     r.rows++;
@@ -378,7 +379,7 @@ function rejSum(WL, cfg, kinds, days, judge) {
   return r;
 }
 /** Rows of A whose lists equal B's on the same key; `all` when every row matches and both sides hold the same rows. */
-function listsEqual(A, B, days) {
+function listsEqual(A: any, B: any, days: any) {
   let n = 0;
   let eq = 0;
   let nb = 0;
@@ -390,9 +391,9 @@ function listsEqual(A, B, days) {
   }
   return { n, eq, nb, all: n > 0 && eq === n && nb === n, ex };
 }
-const stampKey = (inj) => JSON.stringify(['injury', { injury: { region: inj.region, tier: inj.tier } }]);
+const stampKey = (inj: any) => JSON.stringify(['injury', { injury: { region: inj.region, tier: inj.tier } }]);
 /** applyOverlays' output shape, built synthetically: every non-rest carded day stamped with the injury key. */
-function stampWeeks(weeks, key) {
+function stampWeeks(weeks: any, key: any) {
   let n = 0;
   Object.keys(weeks).forEach((w) => Object.keys(weeks[w]).forEach((d) => {
     const dy = weeks[w][d];
@@ -424,12 +425,12 @@ const HAND_FLOOR = [
   [/leg press|hack squat|machine|pulldown/i, [5, 8]],
   [/cable|crossover|pec deck|\bfly\b|flye/i, [8, 12]],
 ];
-const handFloor = (n) => { for (const [re, w] of HAND_FLOOR) if (re.test(String(n || ''))) return w; return null; };
+const handFloor = (n: any) => { for (const [re, w] of HAND_FLOOR) if (re.test(String(n || ''))) return w; return null; };
 const GRAM = /^(\d+)×(\d+)(?:–(\d+))? — RPE /;
 const REP_TOKEN = /^(\d+)×\d+(?:–\d+)?/;
-const handRewrite = (d, w) => d.replace(REP_TOKEN, (m, s) => s + '×' + w[0] + '–' + w[1]);
-const stripRep = (s) => String(s).replace(REP_TOKEN, (m, sets) => sets + '×#');
-function handKind(n, D) {
+const handRewrite = (d: any, w: any) => d.replace(REP_TOKEN, (m, s) => s + '×' + w[0] + '–' + w[1]);
+const stripRep = (s: any) => String(s).replace(REP_TOKEN, (m, sets) => sets + '×#');
+function handKind(n: any, D: any) {
   const W = handFloor(n);
   if (W === null) return { k: 'null', W };
   if (W[1] === 0) return { k: 'zero', W };
@@ -438,24 +439,24 @@ function handKind(n, D) {
   if (+m[2] < W[0]) return { k: 'win', W, out: handRewrite(D, W) };
   return { k: 'atfloor', W };
 }
-const cueBlind = (s) => { if (typeof s !== 'string') return s; const m = CUE_RE.exec(s); return m ? s.slice(0, m.index) : s; };
-const stripHand = (d) => (typeof d !== 'string' ? d : R7_SHAPE.test(d) ? TEST_T : d.replace(CUE_RE, ''));
+const cueBlind = (s: any) => { if (typeof s !== 'string') return s; const m = CUE_RE.exec(s); return m ? s.slice(0, m.index) : s; };
+const stripHand = (d: any) => (typeof d !== 'string' ? d : R7_SHAPE.test(d) ? TEST_T : d.replace(CUE_RE, ''));
 /** The hand hold as the swap sheet writes it: a bare dose gets the cue; RPE above 7 holds by shape; the test holds as R7. */
-function holdHand(d) {
+function holdHand(d: any) {
   if (typeof d !== 'string' || !d) return d;
   if (!/RPE/.test(d)) return d + NEWC;
   return handHold(d);
 }
 const CONVERTS_HAND = /^\s*\d+\s*[×x]\s*\d/;
-const bucketHand = (d) => (/rpe\s*6|light|easy/i.test(String(d || '')) ? 6 : /rpe\s*7/i.test(String(d || '')) ? 7 : 8);
-const claims = (t) => /same numbers|same effort/i.test(String(t));
+const bucketHand = (d: any) => (/rpe\s*6|light|easy/i.test(String(d || '')) ? 6 : /rpe\s*7/i.test(String(d || '')) ? 7 : 8);
+const claims = (t: any) => /same numbers|same effort/i.test(String(t));
 // R8's three hold toasts, typed
-const T3H = (to, from, w) => `${to} in, ${from.toLowerCase()} out. The load runs out before the reps do here. Reps move to ${w[0]} to ${w[1]}.${HOLD}`;
-const T119H = (to, from) => `${to} in, ${from.toLowerCase()} out. No load to add here.${HOLD}`;
-const TSAMEH = (to, from) => `${to} in, ${from.toLowerCase()} out. Same sets, same reps.${HOLD}`;
+const T3H = (to: any, from: any, w: any) => `${to} in, ${from.toLowerCase()} out. The load runs out before the reps do here. Reps move to ${w[0]} to ${w[1]}.${HOLD}`;
+const T119H = (to: any, from: any) => `${to} in, ${from.toLowerCase()} out. No load to add here.${HOLD}`;
+const TSAMEH = (to: any, from: any) => `${to} in, ${from.toLowerCase()} out. Same sets, same reps.${HOLD}`;
 const BED_DONOR = 'Single-leg hip thrust (shoulders on bed)';
 /** Every Main and Power swap pair of one config: live applySwapChoice, read, undoSwap. pres 'STAMP' is the overlay shape. */
-function swapPairs(X, cfg, pres) {
+function swapPairs(X: any, cfg: any, pres: any) {
   const p = X.buildProgram(clone(cfg));
   let prog = Object.assign({}, p, { cfg: clone(cfg) });
   if (pres === 'STAMP' && cfg.injury) {
@@ -510,7 +511,7 @@ function swapPairs(X, cfg, pres) {
   return rows;
 }
 /** The expected card and toast of a swap pair, by hand (D177's floor beneath D193's hold). */
-function classifyPair(cfg, r, pat) {
+function classifyPair(cfg: any, r: any, pat: any) {
   const Hk = handKind(r.to, r.D);
   const Db = stripHand(r.D);
   const capd = capOf(cfg).includes(pat(clean(r.to)));
@@ -525,7 +526,7 @@ function newPairTally() {
     bt: { pairs: 0, clamp: 0, hv: 0, G3a: 0, off: 0, nul: 0 }, pow: 0, powChg: 0, main: 0, G3a: 0, G3aCls: { donor: 0, window: 0, verbatim: 0 }, G3aMiss: 0,
     offN: 0, off: 0, offMiss: 0, nulN: 0, nul: 0, nulMiss: 0, atN: 0, at: 0, atMiss: 0, winN: 0, win: 0, winMiss: 0, ex: [] };
 }
-function tallyPair(S, r, c) {
+function tallyPair(S: any, r: any, c: any) {
   const O = r.O;
   const D = r.D;
   const t = String(r.toast);
@@ -552,7 +553,7 @@ function tallyPair(S, r, c) {
   if (c.Hk.k === 'win') { S.winN++; if (O !== c.Hk.out) S.win++; if (O !== c.X9) { S.winMiss++; note(`window ${r.key} :: ${D} => ${O} | want ${c.X9}`); } }
 }
 
-module.exports = {
+export {
   swapPairs, classifyPair, newPairTally, tallyPair,
   weekLists, rowKey, judgeMaker, rejSum, listsEqual, stampKey, stampWeeks,
   clone, host, clean, DAYS, ISO_DAYS, START, OLDC, NEWC, CUE_RE, TEST_T, R7_T, TEST_SHAPE, R7_SHAPE, HOLD, FORBID, POWER,

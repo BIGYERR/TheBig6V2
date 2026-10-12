@@ -5,13 +5,13 @@ gates stay in `tests/gates/` and keep running in CI until phase 3.
 
 New files:
 
-- `tests/integration/deload.test.js` (17 tests): the hand oracles and their probes, the stage recorder proved inert,
+- `tests/integration/deload.test.ts` (17 tests): the hand oracles and their probes, the stage recorder proved inert,
   HALF_MANNY's deload-off counterfactual digest, the D93/D94 pull census on its 60-config mini lattice, and the D91
   census on a 76-config sample of its lattice (every 23rd key).
-- `tests/sweeps/deload.test.js` (11 tests): the D91 census over its whole 1,728-config lattice, both arms (shipped and
+- `tests/sweeps/deload.test.ts` (11 tests): the D91 census over its whole 1,728-config lattice, both arms (shipped and
   `globalThis.__DELOAD_OFF`), about a minute.
-- `tests/support/deload.js`: the hand posterior and vertical-pull tables, the deload loop's four candidacy tests, the
-  stage recorder (a copy of the app with the day-assembly statement split into p1, p2, p3; `tests/support/app-copy.js`),
+- `tests/support/deload.ts`: the hand posterior and vertical-pull tables, the deload loop's four candidacy tests, the
+  stage recorder (a copy of the app with the day-assembly statement split into p1, p2, p3; `tests/support/app-copy.ts`),
   both lattices, both censuses, and `matchSnapshotKey` (one golden file with a key per owning test; see below).
 - `tests/snapshots/deload.json`:
   - `half-manny deload-off digest`: `145c60296526a949` (`MANNY_DELOAD_OFF_DIGEST_BY_VERSION`, the phase 1 leftover);
@@ -22,10 +22,10 @@ New files:
     G1 1,275).
 
 `tests/support/snapshot.js` compares a whole file, and the deload golden values have two owners (the integration file
-and the CI sweep), so `tests/support/deload.js` adds `matchSnapshotKey(feature, key, value)`: each test compares and,
+and the CI sweep), so `tests/support/deload.ts` adds `matchSnapshotKey(feature, key, value)`: each test compares and,
 under `UPDATE_SNAPSHOTS=1`, rewrites only its own key. `tests/support/snapshot.js` is unchanged.
 
-Paths below are under `tests/`; `I` is `integration/deload.test.js`, `S` is `sweeps/deload.test.js`.
+Paths below are under `tests/`; `I` is `integration/deload.test.ts`, `S` is `sweeps/deload.test.ts`.
 
 ## `g199_deload_arbitration.js` (54 rows)
 
@@ -93,7 +93,7 @@ Paths below are under `tests/`; `I` is `integration/deload.test.js`, `S` is `swe
 | `A1` | I › "the stage recorder is inert: …" (the same recorder records the pull lattice) |
 | `A2` | I › same |
 | `A3` | I › "the pull lattice is 60 configs, 5,120 day builds, 1,120 of them deload day builds" |
-| `A3b` | DROPPED: repeats `A3c`/`A3d`. It checked that the legacy measure module `tests/measure/v200_g200_pins.js` still declared the lattice's sizes; the lattice is now typed once, in `tests/support/deload.js`, and its sizes are asserted by the test that holds `A3c` and `A3d` |
+| `A3b` | DROPPED: repeats `A3c`/`A3d`. It checked that the legacy measure module `tests/measure/v200_g200_pins.js` still declared the lattice's sizes; the lattice is now typed once, in `tests/support/deload.ts`, and its sizes are asserted by the test that holds `A3c` and `A3d` |
 | `A3c` | I › "the pull lattice is 60 configs, 5,120 day builds, 1,120 of them deload day builds" |
 | `A3d` | I › same |
 | `A4` | I › "the hand posterior oracle reads its 17-name probe as typed, four of the negatives pull-side" |
@@ -114,5 +114,5 @@ Paths below are under `tests/`; `I` is `integration/deload.test.js`, `S` is `swe
 - Rows: 72 (`g199` 54, `g200` 18). Mapped 69, dropped 3: 2 HALF_MANNY digest rows held by `program-output.test.js`
   (`g199` `B1`, `g200` `B1`) and 1 repeat of another row of this move (`g200` `A3b`).
 - Mutations: not run (sabotage off).
-- Pass: `node --test tests/integration/deload.test.js` 17 of 17, about 3 s; `node --test tests/sweeps/deload.test.js`
+- Pass: `node --test tests/integration/deload.test.ts` 17 of 17, about 3 s; `node --test tests/sweeps/deload.test.ts`
   11 of 11, about 50 s.

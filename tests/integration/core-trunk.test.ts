@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Core and trunk blocks: the rotational power pillar's own turn counter (D46-a), the protect-tier upper-limb trunk
 // block and its gear gate (D46-c, D49), the trunk floor on the day (D48, D50), and the core-off counterfactual of
 // Mario's program (D89: a drill the app files as family core is never a loaded compound in the session budget).
@@ -10,12 +10,12 @@
 // holds). The 288-cell trunk-floor lattice runs in tests/sweeps/core-trunk.test.js.
 //
 // Seeds are pinned on every config, and a program equals itself built twice before anything is compared.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, appScript, fixtures, progDigest } = require('../support/app.js');
-const { appCopy } = require('../support/app-copy.js');
-const { matchSnapshot } = require('../support/snapshot.js');
-const CT = require('../support/core-trunk.js');
+import assert from 'node:assert/strict';
+import { test } from 'vitest';
+import { loadApp, appScript, fixtures, progDigest } from '../support/app.ts';
+import { appCopy } from '../support/app-copy.ts';
+import { matchSnapshot } from '../support/snapshot.ts';
+import * as CT from '../support/core-trunk.ts';
 
 const IA = loadApp();
 const clean = CT.clean;
@@ -192,7 +192,7 @@ test('the trunk block is drawn from the hand-derived rotation in order, and a co
 
 // ── the trunk floor on the day (D50), at the function contract ──────────────────────────────────────────────────────
 
-const trim = (secs, cardio) => IA.eval('capSessionBudget')(secs, cardio);
+const trim = (secs: any, cardio: any) => IA.eval('capSessionBudget')(secs, cardio);
 
 test('the session budget is the published 20 sets the hand cost model is typed against', () => {
   assert.equal(IA.eval('SESSION_SET_BUDGET'), 20);

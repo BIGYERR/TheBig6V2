@@ -1,11 +1,10 @@
-'use strict';
 // Core and trunk blocks, the slow half: the trunk floor on the day (D50) over the ruled 288-cell lattice (4 injuries x
 // 6 tiers x 2 foci x 2 experiences x 3 seeds, V193's WIDE floor). The seed 76308 slice runs in
 // tests/integration/core-trunk.test.js; CI runs this whole lattice.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, progDigest } = require('../support/app.js');
-const CT = require('../support/core-trunk.js');
+import assert from 'node:assert/strict';
+import { test } from 'vitest';
+import { loadApp, progDigest } from '../support/app.ts';
+import * as CT from '../support/core-trunk.ts';
 
 const IA = loadApp();
 

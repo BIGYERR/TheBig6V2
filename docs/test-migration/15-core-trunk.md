@@ -5,16 +5,16 @@ gates stay in `tests/gates/` and keep running in CI until phase 3.
 
 New files:
 
-- `tests/integration/core-trunk.test.js` (23 tests): the rotational pillar's own clock, the protect-tier trunk block,
+- `tests/integration/core-trunk.test.ts` (23 tests): the rotational pillar's own clock, the protect-tier trunk block,
   the trunk floor at the function contract, the core-off counterfactual digest, and the seed 76308 slice of the
   288-cell trunk-floor lattice.
-- `tests/sweeps/core-trunk.test.js` (1 test): the whole 288-cell trunk-floor lattice.
-- `tests/support/core-trunk.js`: the hand tables (pillar members and rotation order, tier inventories, the session cost
+- `tests/sweeps/core-trunk.test.ts` (1 test): the whole 288-cell trunk-floor lattice.
+- `tests/support/core-trunk.ts`: the hand tables (pillar members and rotation order, tier inventories, the session cost
   model, the long-run tiers, the race window) and the readers.
 - `tests/snapshots/core-trunk.json`: the core-off digest of HALF_MANNY, `5770a4b1c4e2404d` (the engine with the D89
-  family-core clause removed, built from a copy of the app; `tests/support/app-copy.js`).
+  family-core clause removed, built from a copy of the app; `tests/support/app-copy.ts`).
 
-Paths below are under `tests/`; `I` is `integration/core-trunk.test.js`, `S` is `sweeps/core-trunk.test.js`.
+Paths below are under `tests/`; `I` is `integration/core-trunk.test.ts`, `S` is `sweeps/core-trunk.test.ts`.
 
 ## `g193_d50_trunkfloor.js` (14 rows)
 
@@ -84,5 +84,5 @@ and move with it.
 - Mutations: not run (sabotage off). Before the switch was turned off, the 21 group 15 mutations whose anchor occurs
   once in `index.html` were applied to scratch copies once and all 21 made a new test fail; that run is not part of
   this proof.
-- Pass: `node --test tests/integration/core-trunk.test.js` 23 of 23, about 2 s; `node --test tests/sweeps/core-trunk.test.js`
+- Pass: `node --test tests/integration/core-trunk.test.ts` 23 of 23, about 2 s; `node --test tests/sweeps/core-trunk.test.ts`
   1 of 1, about 3 s.

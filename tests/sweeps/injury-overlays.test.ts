@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Injury and travel overlays, the slow half: the lattices behind tests/integration/injury-overlays.test.js and
 // tests/integration/injury-plan-lens.test.js. CI runs them; the 60-second check does not.
 //   the D154 renamer lattice (2,160 builds); the D193 filter-lens census over L432, home_basic, the D177 lite lattice and
@@ -7,10 +7,10 @@
 //   the post-sweep re-filter population (D197); and the late-plan presentations (D194 Amendment 5).
 // Counts the rulings printed are typed beside their assertion. Oracles as in the integration files: hand tables, the
 // judge, typed toasts; the engine's _pattern only names a pattern.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp } = require('../support/app.js');
-const I = require('../support/injury-overlays.js');
+import assert from 'node:assert/strict';
+import { test } from 'vitest';
+import { loadApp } from '../support/app.ts';
+import * as I from '../support/injury-overlays.ts';
 
 const { clean, host, E } = I;
 const W1 = '2026-08-24';
@@ -25,7 +25,7 @@ const OWNS = {
   home_basic: { BARBELL: 0, DUMBBELL: 1, CABLE: 0, MACHINE: 0, GHD: 0, KETTLEBELL: 1 },
   bodyweight: { BARBELL: 0, DUMBBELL: 0, CABLE: 0, MACHINE: 0, GHD: 0, KETTLEBELL: 0 },
 };
-function implementsOf(name) {
+function implementsOf(name: any) {
   const N = String(name).toLowerCase();
   const c = new Set();
   if (/glute[- ]ham|\bghr\b|\bghd\b|45° back extension|roman chair/.test(N)) c.add('GHD');
@@ -36,7 +36,7 @@ function implementsOf(name) {
   if (/kettlebell|\bkb\b/.test(N)) c.add('KETTLEBELL');
   return c;
 }
-const gearLegal = (t, n) => [...implementsOf(n)].every((c) => OWNS[t][c] !== 0);
+const gearLegal = (t: any, n: any) => [...implementsOf(n)].every((c) => OWNS[t][c] !== 0);
 
 test('the renamer lattice: elbow and shoulder workaround programs print only what the tier owns, and the elbow swap lands', () => {
   const GOALS = [['run_5k', {}], ['run_half', {}], ['run_pace_goal', { targetDist: '1.5', targetMins: '10', targetSecs: '0' }], ['run_base', {}], ['run_10k', {}], ['run_marathon', {}]];
@@ -89,7 +89,7 @@ test('the renamer lattice: elbow and shoulder workaround programs print only wha
 });
 
 // ── D193 build half: the filter-lens census ─────────────────────────────────────────────────────────────────────────
-function lensCensus(cfgs) {
+function lensCensus(cfgs: any) {
   const X = I.lensApp();
   const pat = I.patternOf(I.appAt(W5));
   const r = { builds: 0, U: 0, hi: [], forbid: [], loadHead: 0, power: 0, powerCued: [], r7: 0, test: 0, r7Uncapped: [], testCapped: [], numOnly: [], preHold: 0 };
