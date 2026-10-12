@@ -59,6 +59,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+      - name: Doctrine text (NRC and NSW copyright, never in the repo; restored from the DOCTRINE_TXZ secret)
+        env:
+          DOCTRINE_TXZ: ${{ secrets.DOCTRINE_TXZ }}
+        run: |
+          if [ -z "$DOCTRINE_TXZ" ]; then echo "::error::The DOCTRINE_TXZ secret is not set, so the tests that read doctrine/*.txt cannot run."; exit 1; fi
+          printf '%s' "$DOCTRINE_TXZ" | base64 -d | tar -xJf -
+          echo "doctrine files: $(ls doctrine/*.txt | wc -l)"
       - name: npm ci in tests/ (Vitest, TypeScript, @ia/core)
         working-directory: tests
         run: npm ci --no-audit --no-fund
