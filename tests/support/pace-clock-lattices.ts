@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Lattice claims shared by an integration file (a seeded sample that runs in the 60-second check) and a sweep file
 // (the whole lattice, CI only; tests/sweeps/README.md). Each function returns its tests as [name, body] pairs over the
 // lattice it is handed, and the test file registers them, so the sample and the sweep assert exactly the same claims
@@ -581,7 +580,7 @@ function longRunTierLatticeCases(IA: App, label: string, lattice: TierLattice, n
                   for (let w = 1; w <= p.totalWeeks; w++)
                     for (const d of DAYS) {
                       const day = p.weeks[w] && p.weeks[w][d];
-                      const t = day && oracleTier(day);
+                      const t = day ? oracleTier(day) : null;
                       if (!t) continue;
                       days++;
                       seen[t]++;
