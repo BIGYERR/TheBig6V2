@@ -365,7 +365,7 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   (v0.239.21), its run charts (v0.239.22), its Lift Ledger (v0.239.23), its program chips (v0.239.24): the whole Progress screen
   is Angular components over the legacy data readers; This Week (v0.239.25); the wizard's shell and first three steps (v0.239.26), its lifting focus, days and name steps (v0.239.27); the session sheet's frame and header (v0.239.28, its body still
   the legacy builders'); the app's frames: Programs, generating, Progress, the tab bar (v0.239.29); the goal, mile lock and injury/travel
-  sheets' frames (v0.239.30); the session sheet's status foot (v0.239.31); its 1RM calculator and range-top nudge (v0.239.32).
+  sheets' frames (v0.239.30); the session sheet's status foot (v0.239.31); its 1RM calculator and range-top nudge (v0.239.32); its cardio card (v0.239.33).
 - Suggested order:
   1. bug report (small, proves the pattern);
   2. rest timer;

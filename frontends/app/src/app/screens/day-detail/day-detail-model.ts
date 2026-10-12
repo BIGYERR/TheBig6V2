@@ -1,6 +1,7 @@
 // A day's session sheet, kept apart from Angular so the app's node --test suite reads it as it is (architecture phase
 // E, step 20: the sheet moves from the legacy openDetail to the DayDetail component). The body's pieces are still the
 // legacy builders' markup; this decides their order and the header's words, as the legacy openDetail did.
+import type { CardioCardView } from './cardio-card-model.ts';
 
 /** The test-lift 1RM calculator's starting state: the lift, its name, the unit, and the logged test set if any. */
 export interface E1rmCard {
@@ -25,7 +26,7 @@ export interface BodyParts {
   main: string;
   e1rm: E1rmCard | null;
   rest: string;
-  cardio: string;
+  cardio: CardioCardView | null;
   note: string | undefined;
   nudge: RangeNudge | null;
   wildcardTag: string;
@@ -35,7 +36,11 @@ export interface BodyParts {
 }
 
 /** One block of the body: a legacy builder's markup, the 1RM calculator, or the range-top nudge. */
-export type BodyBlock = { kind: 'html'; html: string } | { kind: 'e1rm'; card: E1rmCard } | { kind: 'nudge'; nudge: RangeNudge };
+export type BodyBlock =
+  | { kind: 'html'; html: string }
+  | { kind: 'e1rm'; card: E1rmCard }
+  | { kind: 'nudge'; nudge: RangeNudge }
+  | { kind: 'cardio'; card: CardioCardView };
 
 /**
  * Lifting first only when lifting is the priority: on an event program or a support focus the cardio is the point of
@@ -49,7 +54,8 @@ export function liftsFirst(hasSections: boolean, primaryPath: string | undefined
 export function detailBody(p: BodyParts, first: boolean, hasSections: boolean): BodyBlock[] {
   const html = (h: string): BodyBlock[] => (h ? [{ kind: 'html', html: h }] : []);
   const lifts: BodyBlock[] = hasSections ? [...html(p.main), ...(p.e1rm ? [{ kind: 'e1rm' as const, card: p.e1rm }] : []), ...html(p.rest)] : [];
-  const blocks: BodyBlock[] = first ? [...lifts, ...html(p.cardio)] : [...html(p.cardio), ...lifts];
+  const cardio: BodyBlock[] = p.cardio ? [{ kind: 'cardio', card: p.cardio }] : [];
+  const blocks: BodyBlock[] = first ? [...lifts, ...cardio] : [...cardio, ...lifts];
   if (p.note) blocks.push(...html('<div class="note-block">' + p.note + '</div>'));
   if (p.nudge) blocks.unshift({ kind: 'nudge', nudge: p.nudge });
   if (p.wildcardTag) blocks.unshift(...html(p.wildcardTag));

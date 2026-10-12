@@ -500,3 +500,16 @@ what is stored.
   range) and matched the sheet, the calculator before and after a typed set, and the saved note, in pixels and facts.
   69/69 at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.33 moves the session sheet's cardio card
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.33.
+- **Moved:** the legacy `buildCardioHTML`: `day-detail/cardio-card.ts` and `cardio-card-model.ts` (the classes by
+  sport, the title with its session, a swim's segments with their yards in total, or the detail with its line breaks
+  as breaks, the note, the retest strip). The prescription's words are the engine's markup and stay markup. The
+  retest strip still comes from the legacy `_benchStripHTML`, which reads the logs and the frozen days.
+- **Tests:** `tests/integration/session-sheet.test.ts` (new) lifts `buildCardioHTML` out of the page and requires its
+  markup from the view, byte for byte, over 9 inputs (a long run with a note, a retest, a ride, a segmented swim, a
+  swim with segments but no yards, a swim without segments, another sport, no detail, no cardio).
+  `frontends/app/test/unit/cardio-card.test.ts` (3). The e2e photographs run cards in four journeys at 0 px.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
