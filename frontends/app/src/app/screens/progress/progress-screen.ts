@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { ChartCard } from './charts/chart-card';
+import type { CardSpec } from './charts/chart-card-model';
 import { DotChart } from './charts/dot-chart';
-import { dotChart, type DotSpec } from './charts/dot-chart-model';
+import type { DotSpec } from './charts/dot-chart-model';
 import {
   CALC_LIFTS, chartChunks, type DayLog, estimate1RM, type ExRow, journalWeeks, type ProgressProgram, viewedProgram, weeklySums,
 } from './progress-model';
@@ -23,7 +25,7 @@ interface ScreenView {
   /** 'none' before anything is logged, 'charts' when there is nothing to chart, null when there is. */
   empty: 'none' | 'charts' | null;
   emptyIcon: SafeHtml;
-  charts: ({ kind: 'dot'; spec: DotSpec } | { kind: 'html'; html: SafeHtml })[];
+  charts: ({ kind: 'dot'; spec: DotSpec } | { kind: 'card'; spec: CardSpec } | { kind: 'html'; html: SafeHtml })[];
   journal: { title: SafeHtml; caret: SafeHtml; weeks: { week: number; open: boolean; count: string; entries: EntryView[] }[] } | null;
   estimator: { title: SafeHtml } | null;
 }
@@ -32,13 +34,14 @@ interface ScreenView {
  * The Progress screen's body (architecture phase E, step 13), in place of the legacy renderProgressScreen inside
  * #progressBody. It takes over renderProgressScreen through LegacyBridge.provide (the tab, the program chips, the
  * restore and delete bar all call it). The arrangement, the weekly sums, the Session Journal and the 1RM estimator are
- * the component's, and so are the weekly dot charts (DotChart, step 14); the chips, the other charts and the Lift Ledger
- * are still the legacy builders' markup, each laid in a box that makes none of its own, and move in later steps. The estimator's lift is still the legacy `calcLift`.
+ * the component's, and so are the weekly dot charts (DotChart, step 14) and the run charts (ChartCard, step 15); the
+ * chips and the Lift Ledger are still the legacy builders' markup, each laid in a box that makes none of its own, and
+ * move in later steps. The estimator's lift is still the legacy `calcLift`.
  */
 @Component({
   selector: 'ia-progress-screen',
   host: { style: 'display: contents' },
-  imports: [DotChart],
+  imports: [ChartCard, DotChart],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @for (v of views(); track v) {
@@ -51,10 +54,10 @@ interface ScreenView {
       </div>
     }
     @for (c of v.charts; track $index) {
-      @if (c.kind === 'dot') {
-        <ia-dot-chart [spec]="c.spec" />
-      } @else {
-        <div style="display:contents" [innerHTML]="c.html"></div>
+      @switch (c.kind) {
+        @case ('dot') { <ia-dot-chart [spec]="c.spec" /> }
+        @case ('card') { <ia-chart-card [spec]="c.spec" /> }
+        @case ('html') { <div style="display:contents" [innerHTML]="c.html"></div> }
       }
     }
     @if (v.journal; as j) {
@@ -190,25 +193,25 @@ export class ProgressScreen {
       raceMi: b.global<Record<string, number>>('RACE_DIST_MI')[goalId] || 0,
     }, {
       icon: (n, s) => this.icon(n, s),
-      dotChart,
       ladderWeekly: (...a) => b.call('ladderWeekly', ...a),
-      ladderChart: (...a) => b.call('buildLadderChart', ...a),
       easyVsPrescribed: (...a) => b.call('easyVsPrescribed', ...a),
-      easyZoneChart: (...a) => b.call('buildEasyZoneChart', ...a),
       runsByClass: (...a) => b.call('runsByClass', ...a),
-      easyBandsFallback: (...a) => b.call('buildEasyBandsFallback', ...a),
       easyEffortWeekly: (...a) => b.call('easyEffortWeekly', ...a),
-      easyMinRuns: b.global<number>('EASY_MIN_RUNS'),
-      easyEffortChart: (...a) => b.call('buildEasyEffortChart', ...a),
-      projectionCard: (...a) => b.call('buildProjectionCard', ...a),
       recoveryPaceWeekly: (...a) => b.call('recoveryPaceWeekly', ...a),
-      paceChart: (...a) => b.call('buildPaceChart', ...a),
-      easyEffortEmpty: (...a) => b.call('buildEasyEffortEmpty', ...a),
       plannedVsLogged: (...a) => b.call('plannedVsLogged', ...a),
-      driftChart: (...a) => b.call('buildDriftChart', ...a),
       exWeights: () => b.call('getExWeightsFor', vid),
       ledgerModel: (...a) => b.call('ledgerModel', ...a),
       ledgerCards: (...a) => b.call('buildLedgerCards', ...a),
+      run: {
+        pace: (sec) => b.call<string>('_fmtPaceShort', sec),
+        icon: (n, s) => this.icon(n, s),
+        mileFromRecovery: (sec) => b.call<number | null>('_mileFromRecoverySec', sec),
+        halfFromMile: (sec) => b.call<number | null>('_halfFromMileSec', sec),
+        easyRpeLo: b.global<number>('EASY_RPE_LO'),
+        easyRpeHi: b.global<number>('EASY_RPE_HI'),
+        easyMinRuns: b.global<number>('EASY_MIN_RUNS'),
+        easyZoneMinRuns: b.global<number>('EASY_ZONE_MIN_RUNS'),
+      },
     });
     const labels = b.global<Record<number, string>>('RPE_LABELS');
     const weeks = journalWeeks(b.call<Record<string, DayLog>>('getLogsFor', vid), {
@@ -235,10 +238,10 @@ export class ProgressScreen {
         })),
       }
       : null;
-    const empty = !charts.some((c) => c.kind === 'dot' || c.html) && !journal ? 'charts' : null;
+    const empty = !charts.some((c) => c.kind !== 'html' || c.html) && !journal ? 'charts' : null;
     this.view.set({
       chips, empty, emptyIcon,
-      charts: charts.map((c) => (c.kind === 'dot' ? c : { kind: 'html' as const, html: this.html(c.html) })),
+      charts: charts.map((c) => (c.kind === 'html' ? { kind: 'html' as const, html: this.html(c.html) } : c)),
       journal,
       estimator: { title: this.html(this.icon('🧮', 15) + ' 1RM Estimator') },
     });

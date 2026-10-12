@@ -292,3 +292,26 @@ what is stored.
   draws nothing. The e2e photographs the RPE dot chart (log-session) and the strength journey's Progress on both
   builds at 0 px.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.22 moves Progress's run charts
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.22.
+- **Moved:** the legacy `buildLadderChart`, `buildEasyZoneChart`, `buildEasyBandsFallback`, `buildEasyEffortChart`,
+  `buildEasyEffortEmpty`, `buildProjectionCard`, `buildPaceChart` and `buildDriftChart`. Each is now a pure function
+  in `src/app/screens/progress/charts/run-charts-model.ts` returning a card spec (`chart-card-model.ts`: the title,
+  head, body and footer markup, and the SVG as elements with the attribute strings the legacy wrote, in its order), and
+  one component draws them all (`chart-card.ts`, with `svg-attrs.ts` writing each element's attributes). The readers
+  they take (`ladderWeekly`, `easyVsPrescribed`, `runsByClass`, `easyEffortWeekly`, `recoveryPaceWeekly`,
+  `plannedVsLogged`) and the pace table's helpers stay legacy. The dead `buildClassBandsChart` and `buildMultiDotChart`
+  (nothing calls them) stay behind in the page.
+- **Config:** `frontends/app/tsconfig.app.json` sets `rewriteRelativeImportExtensions`, so a model can import another
+  as `./x.ts`, which node's test runner needs and the Angular build now accepts.
+- **Tests:** `tests/integration/progress-charts.test.ts` lifts each legacy builder out of the page and requires its
+  markup from the new model, byte for byte, over 28 inputs that walk every branch (the nothing cases, the race line,
+  covered distance, the week in progress and the short first week, the aim line, a widened range, coarse and fine
+  grids, twelve and twenty weeks). `frontends/app/test/unit/run-charts.test.ts` (9) holds hand-worked values (the
+  ladder's grid, race line, bars and labels; the drift's bars and net; the zone's head and labels; the bands' verdicts;
+  the projection's finish times; the pace chart's own card). `progress.test.ts` now stubs the readers and checks the
+  chart order. No e2e journey logs runs across weeks, so a local comparison stubbed the readers in both builds over
+  three scenarios and matched all 22 chart cards in pixels at 2×.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

@@ -4,29 +4,32 @@
 // estimate. Every expected value is typed here from the legacy code, the estimate by hand.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { dotChart } from '../../src/app/screens/progress/charts/dot-chart-model.ts';
 import { type ChartBlock, type ChartDeps, type ChartInput, chartChunks, estimate1RM, journalWeeks, rpeColor, viewedProgram, weeklySums } from '../../src/app/screens/progress/progress-model.ts';
 
 const A = { id: 'a' }, B = { id: 'b', archived: true }, C = { id: 'c' };
 
-/** Stub builders: each returns a tag naming its call, so the chart list reads as the legacy call order. */
+/** Stub readers that record each call and return what the case asks; the run charts and dot charts are the real models. */
 function stubs(over: Partial<ChartDeps> = {}): { deps: ChartDeps; calls: string[] } {
   const calls: string[] = [];
-  const tag = (name: string) => (..._a: unknown[]) => (calls.push(name), `<${name}>`);
+  const rec = <T>(name: string, v: T) => (..._a: unknown[]) => (calls.push(name), v);
   const deps: ChartDeps = {
     icon: (n) => `[${n}]`,
-    dotChart,
-    ladderWeekly: () => 'LW', ladderChart: tag('ladder'), easyVsPrescribed: () => 'EZ', easyZoneChart: () => '',
-    runsByClass: () => 'RC', easyBandsFallback: tag('bands'),
-    easyEffortWeekly: () => ({ nRuns: 0, nWeeks: 0 }), easyMinRuns: 6, easyEffortChart: tag('effort'), projectionCard: tag('projection'),
-    recoveryPaceWeekly: () => ({ nWeeks: 0, weekly: {}, tgt: null }), paceChart: tag('pace'), easyEffortEmpty: tag('effortEmpty'),
-    plannedVsLogged: () => 'PVL', driftChart: tag('drift'), exWeights: () => ({}), ledgerModel: () => 'LM', ledgerCards: tag('ledger'),
+    ladderWeekly: rec('ladderWeekly', {}),
+    easyVsPrescribed: rec('easyVsPrescribed', []),
+    runsByClass: rec('runsByClass', {}),
+    easyEffortWeekly: rec('easyEffortWeekly', { weekly: {}, nRuns: 0, nWeeks: 0 }),
+    recoveryPaceWeekly: rec('recoveryPaceWeekly', { nWeeks: 0, weekly: {}, tgt: null }),
+    plannedVsLogged: rec('plannedVsLogged', {}),
+    exWeights: rec('exWeights', {}),
+    ledgerModel: rec('ledgerModel', 'LM'),
+    ledgerCards: (..._a: unknown[]) => (calls.push('ledgerCards'), '<ledger>'),
+    run: { pace: (sec) => `${sec}s`, icon: (n) => `[${n}]`, mileFromRecovery: (sec) => sec * 0.6, halfFromMile: (sec) => sec * 21, easyRpeLo: 3, easyRpeHi: 4, easyMinRuns: 6, easyZoneMinRuns: 4 },
     ...over,
   };
   return { deps, calls };
 }
 /** A block as a line: a dot chart by its title, a legacy builder by its markup. */
-const line = (b: ChartBlock) => (b.kind === 'dot' ? 'dot ' + b.spec.title : b.html);
+const line = (b: ChartBlock) => (b.kind === 'html' ? b.html : b.kind + ' ' + b.spec.title);
 
 function input(over: Partial<ChartInput> = {}): ChartInput {
   const sums = weeklySums({}, {}, 3);
@@ -60,11 +63,18 @@ describe('the Progress screen', () => {
   });
 
   it('charts a run program in the legacy order: mileage, ladder, the zone or its fallback, then the effort trend or its stand-ins, drift', () => {
-    const { deps, calls } = stubs();
+    const { deps, calls } = stubs({
+      ladderWeekly: () => (calls.push('ladderWeekly'), { 1: 4, 2: 6 }),
+      runsByClass: () => (calls.push('runsByClass'), { Easy: [{ sec: 620 }, { sec: 640 }], Tempo: [{ sec: 480 }, { sec: 500 }] }),
+      plannedVsLogged: () => (calls.push('plannedVsLogged'), { 1: { presc: 3, act: 3 }, 2: { presc: 4, act: 5 } }),
+    });
     const sums = weeklySums({ w1_mon: { run_dist: 3 }, w2_mon: { run_dist: 4, rpe: 6 } }, {}, 3);
     const out = chartChunks(input({ sums, cardioTypes: ['run'], skip1: true }), deps);
-    assert.deepEqual(out.map(line), ['dot [🏃] Weekly Running Mileage', '<ladder>', '<bands>', '<drift>', 'dot [💡] Average Session RPE', '<ledger>']);
-    assert.deepEqual(calls, ['ladder', 'bands', 'drift', 'ledger']);
+    assert.deepEqual(out.map(line), [
+      'dot [🏃] Weekly Running Mileage', 'card [🏃] Long Run Ladder', 'card [🏃] Is Your Easy Actually Easy?',
+      'card [🏃] Mileage — Drift From Plan', 'dot [💡] Average Session RPE', '<ledger>',
+    ]);
+    assert.deepEqual(calls, ['ladderWeekly', 'easyVsPrescribed', 'runsByClass', 'easyEffortWeekly', 'recoveryPaceWeekly', 'plannedVsLogged', 'exWeights', 'ledgerModel', 'ledgerCards']);
     const [mileage, , , , rpe] = out;
     assert.ok(mileage?.kind === 'dot' && rpe?.kind === 'dot');
     assert.deepEqual([mileage.spec.points.length, mileage.spec.total, mileage.spec.unit, mileage.spec.color], [1, '4.0', 'mi', 'var(--run)'], 'the short first week withheld');
@@ -72,15 +82,12 @@ describe('the Progress screen', () => {
   });
 
   it('draws the effort chart and the projection once there are enough easy runs over two weeks, and the pace chart or its empty state below that', () => {
-    const run = (o: Partial<ChartDeps>) => {
-      const s = stubs(o);
-      chartChunks(input({ cardioTypes: ['run'] }), s.deps);
-      return s.calls.slice(2, -1);
-    };
-    assert.deepEqual(run({ easyEffortWeekly: () => ({ nRuns: 6, nWeeks: 2 }) }), ['effort', 'projection', 'drift']);
-    assert.deepEqual(run({ easyEffortWeekly: () => ({ nRuns: 5, nWeeks: 3 }), recoveryPaceWeekly: () => ({ nWeeks: 2, weekly: { 2: 540 }, tgt: 600 }) }), ['pace', 'drift']);
-    assert.deepEqual(run({ easyEffortWeekly: () => ({ nRuns: 2, nWeeks: 1 }) }), ['effortEmpty', 'drift']);
-    assert.deepEqual(run({}), ['drift']);
+    const titles = (o: Partial<ChartDeps>) => chartChunks(input({ cardioTypes: ['run'] }), stubs(o).deps).filter((b) => b.kind === 'card').map((b) => (b.kind === 'card' ? b.spec.title : ''));
+    const effort = { weekly: { 1: 660, 2: 640 }, nRuns: 6, nWeeks: 2 };
+    assert.deepEqual(titles({ easyEffortWeekly: () => effort }), ['[🏃] Same Effort, More Speed', '[🏁] Where This Is Heading']);
+    assert.deepEqual(titles({ easyEffortWeekly: () => ({ ...effort, nRuns: 5 }), recoveryPaceWeekly: () => ({ nWeeks: 2, weekly: { 1: 560, 2: 540 }, tgt: 600 }) }), ['[🏃] Recovery Pace — Easy-Effort Trend']);
+    assert.deepEqual(titles({ easyEffortWeekly: () => ({ weekly: {}, nRuns: 2, nWeeks: 1 }) }), ['[🏃] Same Effort, More Speed']);
+    assert.deepEqual(titles({}), [], 'nothing logged, nothing drawn');
   });
 
   it('charts swim and bike when there is something to chart, planned or not, and only the ledger with nothing else', () => {
@@ -89,7 +96,7 @@ describe('the Progress screen', () => {
     assert.deepEqual(planned.map(line), ['dot [🚴] Weekly Cycling Time', '<ledger>'], 'a planned swim with nothing logged draws nothing, as before');
     const logged = chartChunks(input({ sums: weeklySums({ w2_sat: { swim_yards: 800 } }, {}, 3) }), deps);
     assert.deepEqual(logged.map(line), ['dot [🏊] Weekly Swimming Volume', '<ledger>'], 'a logged swim charts without a plan');
-    assert.deepEqual(calls, ['ledger', 'ledger']);
+    assert.deepEqual(calls, ['exWeights', 'ledgerModel', 'ledgerCards', 'exWeights', 'ledgerModel', 'ledgerCards']);
     assert.deepEqual(chartChunks(input(), stubs().deps), [{ kind: 'html', html: '<ledger>' }]);
   });
 
