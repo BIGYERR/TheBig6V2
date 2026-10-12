@@ -336,3 +336,23 @@ what is stored.
   `ledgerModel` in both builds and matched every card in pixels, in pounds and in kilograms. The e2e still shows
   Other Accessory Work in the log-session journey.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.24 moves Progress's program chips and the archived bar
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.24.
+- **Moved:** the legacy `_progChipsHTML` and `_restoreBarHTML`: `src/app/screens/progress/program-chips.ts` (the chips
+  row, the archived bar with Restore and the trash, and the delete's confirmation) and `program-chips-model.ts` (the
+  chips' order: the active program, the live ones newest first, the archived; the labels; the shown chip; which bar
+  an archived program gets). The handlers stay legacy: `setProgressView`, `unarchiveProg` then the screen again,
+  `askPurgeFromProgress`, `deleteProg(id, true)`, `cancelProgressConfirm`; so do `_purgeWarnsCrossProg` and the armed
+  confirmation (`confirmProgId`, `confirmTier`). A chip's label keeps the program name as markup and the confirmation
+  keeps it escaped, as each did (handoff §12's finding 5 covers the chips' name). With this step the whole Progress
+  screen is Angular components; its data readers (the stores, `ledgerModel`, the chart readers) are still legacy.
+- **Tests:** `tests/integration/progress-charts.test.ts` gains seven cases held to the legacy `_progChipsHTML` (four
+  programs in order, an archived program's bar, its armed delete with and without the cross-program warning and with
+  markup in its name, an archive armed elsewhere, one archived program alone, one live program alone); the legacy bar
+  is an indented template literal inside flex rows, so both sides drop the whitespace between tags.
+  `frontends/app/test/unit/program-chips.test.ts` (4). The strength journey's Progress photographs the chips in the
+  e2e on both builds; a local comparison matched the archived bar, the armed delete, Cancel and a chip switch in
+  pixels and in what each left behind.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

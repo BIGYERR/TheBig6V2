@@ -105,8 +105,8 @@ v0.239.14), the mile pencil's edit sheet and lock (`src/app/screens/mile-sheet/`
 the RPE card (`src/app/screens/swap-nudge/`, `src/app/screens/rpe-info/`, v0.239.16), and the injury and travel
 sheet's body (`src/app/screens/change-sheet/`, v0.239.17), Random Workout (`src/app/screens/random-workout/`,
 v0.239.18), and the toast and the update banner's contents (`src/app/screens/toast/`, `src/app/screens/update-banner/`,
-v0.239.19), and the Progress screen (`src/app/screens/progress/`, v0.239.20; its weekly dot charts, run charts and Lift Ledger in
-`charts/`, v0.239.21 to v0.239.23, the program chips still the legacy builder's markup); every other screen is still the original code. `LegacyBridge` also offers `set` (write a legacy `let`) and `run` (a legacy handler's code). A screen's
+v0.239.19), and the Progress screen (`src/app/screens/progress/`, v0.239.20 to v0.239.24: the screen, its program chips, and its
+charts and Lift Ledger in `charts/`; its data readers are still the legacy script's); every other screen is still the original code. `LegacyBridge` also offers `set` (write a legacy `let`) and `run` (a legacy handler's code). A screen's
 logic sits apart from Angular in `<screen>-model.ts` and is tested by node --test (`test/unit/<screen>.test.ts`;
 `src/app/package.json` marks the app's TypeScript as ES modules for it). Moving a screen goes through the repo's normal
 build process. Each moved screen keeps the e2e

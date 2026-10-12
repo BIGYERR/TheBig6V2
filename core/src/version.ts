@@ -5,4 +5,4 @@
  * frontends/app/src/legacy/src/html/head.html, which the build copies into index.html), and tests/unit/semver.test.ts holds the
  * two equal: a release writes both, or the check is red.
  */
-export const VERSION = '0.239.23';
+export const VERSION = '0.239.24';

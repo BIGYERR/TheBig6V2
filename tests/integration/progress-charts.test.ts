@@ -3,8 +3,8 @@
 // architecture phase E step 15). The oracle here is the legacy builder itself, lifted out of the page with appFunction:
 // for every input below, the spec written back out in the legacy markup format is the legacy builder's markup, byte for
 // byte. The inputs walk each builder's branches (the null cases, the race line, the cut and short first week, the
-// target line, coarse and fine grids). The Lift Ledger (ledger-model.ts, step 16) is held the same way to the legacy
-// buildLedgerCards. The app's own unit tests hold hand-worked values for the same functions.
+// target line, coarse and fine grids). The Lift Ledger (ledger-model.ts, step 16) and the program chips
+// (program-chips-model.ts, step 17) are held the same way to the legacy buildLedgerCards and _progChipsHTML. The app's own unit tests hold hand-worked values for the same functions.
 import { describe, test } from 'vitest';
 import assert from 'node:assert/strict';
 import { appFunction } from '../support/app.ts';
@@ -13,6 +13,7 @@ import {
   driftChart, easyBandsFallback, easyEffortChart, easyEffortEmpty, easyZoneChart, ladderChart, paceChart, projectionCard, type RunChartDeps,
 } from '../../frontends/app/src/app/screens/progress/charts/run-charts-model.ts';
 import { type LedgerModel, type LedgerView, ledgerView, type Picture } from '../../frontends/app/src/app/screens/progress/charts/ledger-model.ts';
+import { type ChipProgram, type ChipsView, chipStyle, chipsView } from '../../frontends/app/src/app/screens/progress/program-chips-model.ts';
 
 type Fn = (...a: any[]) => string;
 const icon = (n: string, s: number) => `[${n}/${s}]`;
@@ -200,6 +201,58 @@ describe('the Lift Ledger', () => {
       assert.equal(ledgerMarkup(ledgerView(model, unit, icon)), want);
       if (label === 'nothing at all') assert.equal(want, '');
       else assert.notEqual(want, '');
+    });
+  }
+});
+
+// ── the program chips and the archived bar ─────────────────────────────────────────────────────────────────────────
+// The legacy bar is an indented template literal inside flex rows, so the whitespace between its tags never renders;
+// both sides drop it before comparing.
+
+function chipsLegacy(programs: ChipProgram[], vid: string, g: { activeProgId: string | null; confirmProgId: string | null; confirmTier: number; warns: boolean }): string {
+  const esc = appFunction('esc');
+  const _purgeWarnsCrossProg = () => g.warns;
+  const _restoreBarHTML = appFunction('_restoreBarHTML', { confirmProgId: g.confirmProgId, confirmTier: g.confirmTier, esc, _purgeWarnsCrossProg, asyIcon: icon });
+  return appFunction<(p: ChipProgram[], v: string) => string>('_progChipsHTML', { activeProgId: g.activeProgId, asyIcon: icon, _restoreBarHTML })(programs, vid);
+}
+function chipsMarkup(v: ChipsView): string {
+  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  let out = '';
+  if (v.chips) out += '<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch">'
+    + v.chips.map((c) => `<button onclick="setProgressView('${c.id}')" style="${chipStyle(c.sel)}">${c.label}</button>`).join('') + '</div>';
+  const b = v.bar;
+  if (b && b.kind === 'confirm') {
+    out += '<div style="display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--red);border-radius:4px;padding:10px 12px">'
+      + `<div style="font-size:12px;color:var(--red);line-height:1.5">This erases all logs, weights, and history for “${esc(b.name)}”. It cannot be undone.`
+      + (b.warn ? '<br><span style="color:var(--muted)">Other programs are using these loads as starting points — those will go blank.</span>' : '') + '</div>'
+      + `<div style="display:flex;gap:8px"><button class="prog-action-btn danger" onclick="deleteProg('${b.id}',true)">Delete Forever</button><button class="prog-action-btn" onclick="cancelProgressConfirm()">Cancel</button></div></div>`;
+  } else if (b) {
+    out += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 12px">'
+      + '<div style="font-size:12px;color:var(--muted)">This program is archived — history only.</div>'
+      + `<button class="prog-action-btn" style="flex:0 0 auto" onclick="unarchiveProg('${b.id}');renderProgressScreen()">Restore</button>`
+      + `<button class="prog-action-btn" aria-label="Delete this program forever" title="Delete forever" style="flex:0 0 auto;color:var(--red);padding:8px 10px;display:inline-flex;align-items:center" onclick="askPurgeFromProgress('${b.id}')">${icon('trash', 16)}</button></div>`;
+  }
+  return out;
+}
+const tight = (s: string) => s.replace(/>\s+</g, '><').trim();
+
+describe('the program chips and the archived bar', () => {
+  const live = (id: string, created: number, name?: string): ChipProgram => ({ id, created, ...(name ? { name } : {}) });
+  const P = [live('a', 1, 'Spring Base'), { ...live('b', 3, 'Old Block'), archived: true }, live('c', 2, 'Half Manny'), live('d', 4)];
+  for (const [label, programs, vid, g] of [
+    ['four programs, the active first, the live by newest, the archived last', P, 'c', { activeProgId: 'c', confirmProgId: null, confirmTier: 0, warns: false }],
+    ['an archived program shown, with its bar', P, 'b', { activeProgId: 'a', confirmProgId: null, confirmTier: 0, warns: false }],
+    ['its delete armed, other programs using its loads', P, 'b', { activeProgId: 'a', confirmProgId: 'b', confirmTier: 2, warns: true }],
+    ['its delete armed, nothing else at stake, a name with markup', [{ ...P[1]!, name: 'A <b> & "Q"' }, P[0]!], 'b', { activeProgId: null, confirmProgId: 'b', confirmTier: 2, warns: false }],
+    ['an archive armed elsewhere is not this bar\'s', P, 'b', { activeProgId: 'a', confirmProgId: 'b', confirmTier: 1, warns: true }],
+    ['one archived program alone: the bar, no chips', [P[1]!], 'b', { activeProgId: null, confirmProgId: null, confirmTier: 0, warns: false }],
+    ['one live program alone: nothing', [P[0]!], 'a', { activeProgId: 'a', confirmProgId: null, confirmTier: 0, warns: false }],
+  ] as [string, ChipProgram[], string, { activeProgId: string | null; confirmProgId: string | null; confirmTier: number; warns: boolean }][]) {
+    test(label, () => {
+      const want = tight(chipsLegacy(programs, vid, g));
+      const got = chipsView(programs, vid, { activeId: g.activeProgId, confirmId: g.confirmProgId, confirmTier: g.confirmTier, warnsCrossProg: () => g.warns, icon });
+      assert.equal(tight(chipsMarkup(got)), want);
+      assert.equal(want === '', label.endsWith('nothing'));
     });
   }
 });

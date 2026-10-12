@@ -5,6 +5,8 @@ import { ChartCard } from './charts/chart-card';
 import type { CardSpec } from './charts/chart-card-model';
 import { DotChart } from './charts/dot-chart';
 import { LedgerCards } from './charts/ledger-cards';
+import { ProgramChips } from './program-chips';
+import { type ChipsView, chipsView } from './program-chips-model';
 import type { LedgerModel, LedgerView } from './charts/ledger-model';
 import type { DotSpec } from './charts/dot-chart-model';
 import {
@@ -23,7 +25,8 @@ interface EntryView {
 
 /** One render of the screen. A new object each time, so the template draws the body anew, as the legacy write did. */
 interface ScreenView {
-  chips: SafeHtml;
+  chips: ChipsView;
+  trash: string;
   /** 'none' before anything is logged, 'charts' when there is nothing to chart, null when there is. */
   empty: 'none' | 'charts' | null;
   emptyIcon: SafeHtml;
@@ -37,17 +40,16 @@ interface ScreenView {
  * #progressBody. It takes over renderProgressScreen through LegacyBridge.provide (the tab, the program chips, the
  * restore and delete bar all call it). The arrangement, the weekly sums, the Session Journal and the 1RM estimator are
  * the component's, and so are the weekly dot charts (DotChart, step 14), the run charts (ChartCard, step 15) and the
- * Lift Ledger (LedgerCards, step 16); the program chips are still the legacy builder's markup, laid in a box that makes
- * none of its own, and move in a later step. The estimator's lift is still the legacy `calcLift`.
+ * Lift Ledger (LedgerCards, step 16), and the program chips and the archived bar (ProgramChips, step 17). The estimator's lift is still the legacy `calcLift`.
  */
 @Component({
   selector: 'ia-progress-screen',
   host: { style: 'display: contents' },
-  imports: [ChartCard, DotChart, LedgerCards],
+  imports: [ChartCard, DotChart, LedgerCards, ProgramChips],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @for (v of views(); track v) {
-    <div style="display:contents" [innerHTML]="v.chips"></div>
+    <ia-program-chips [view]="v.chips" [trashIcon]="v.trash" />
     @if (v.empty) {
       <div style="text-align:center;padding:60px 20px;color:var(--muted)">
         <div style="font-size:48px;margin-bottom:16px" [innerHTML]="v.emptyIcon"></div>
@@ -164,7 +166,14 @@ export class ProgressScreen {
     if (reset) b.call('_setProgressViewId', null);
     if (!prog) return;
     const vid = prog.id;
-    const chips = this.html(b.call<string>('_progChipsHTML', all, vid));
+    const chips = chipsView(all, vid, {
+      activeId: b.global<string | null>('activeProgId'),
+      confirmId: b.global<string | null>('confirmProgId'),
+      confirmTier: b.global<number>('confirmTier'),
+      warnsCrossProg: (id) => b.call<boolean>('_purgeWarnsCrossProg', id),
+      icon: (n, s) => this.icon(n, s),
+    });
+    const trash = this.icon('trash', 16);
 
     const exw = b.call<Record<string, ExRow>>('getExWeightsFor', vid);
     const folded = b.call<boolean>('foldExAliasKeys', exw);
@@ -180,7 +189,7 @@ export class ProgressScreen {
     const emptyIcon = this.html(this.icon('📊', 44));
 
     if (!Object.keys(logs).length) {
-      this.view.set({ chips, empty: 'none', emptyIcon, charts: [], journal: null, estimator: null });
+      this.view.set({ chips, trash, empty: 'none', emptyIcon, charts: [], journal: null, estimator: null });
       this.cdr.detectChanges();
       return;
     }
@@ -241,7 +250,7 @@ export class ProgressScreen {
       : null;
     const empty = !charts.some((c) => c.kind !== 'ledger' || c.view.mains || c.view.ladder || c.view.other) && !journal ? 'charts' : null;
     this.view.set({
-      chips, empty, emptyIcon,
+      chips, trash, empty, emptyIcon,
       charts,
       journal,
       estimator: { title: this.html(this.icon('🧮', 15) + ' 1RM Estimator') },
