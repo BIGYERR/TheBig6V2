@@ -5,6 +5,7 @@ import { PopUp } from './pop-up/pop-up';
 import { ProgramList } from './program-list/program-list';
 import { SwapSheet } from './swap-sheet/swap-sheet';
 import { AddSheet } from './add-sheet/add-sheet';
+import { ChangeSheet } from './change-sheet/change-sheet';
 import { GoalSheet } from './goal-sheet/goal-sheet';
 import { MileLock } from './mile-sheet/mile-lock';
 import { MileSheet } from './mile-sheet/mile-sheet';
@@ -29,4 +30,5 @@ export const MOVED_SCREENS: readonly (readonly [screenId: string, component: Typ
   ['mileLockBody', MileLock],
   ['swapNudgeOverlay', SwapNudge],
   ['rpeInfoOverlay', RpeInfo],
+  ['changeBody', ChangeSheet],
 ];

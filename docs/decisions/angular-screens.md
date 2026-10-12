@@ -191,3 +191,26 @@ what is stored.
   is cut short (the e2e waits each toast out); the nudge prints the pattern id ("your hpress"), and its "three
   sessions running" counts trades, not sessions.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.17 moves the injury and travel sheet's body
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.17.
+- **Moved:** `#changeBody` inside `#changeOverlay` (the frame and its Back button stay legacy markup):
+  `src/app/screens/change-sheet/change-sheet.ts` (the head, the date boxes, the choice cards, the effect panel and the
+  foot's button, one template each, shared by both sheets) and `change-sheet-model.ts` (the head for the sheet the
+  draft is on; the travel sheet's dates, tiers and effect, with the full gym's answer and the outside-the-program line;
+  the injury sheet's regions, tiers, effect and the off-ramp; every string the legacy `renderOverlaySheet`,
+  `_renderTravelTab` and `_renderInjuryTab`'s). The draft stays the legacy `_ovDraft`; each choice is still the legacy
+  `_ovSet`, which redraws through `renderOverlaySheet` (provided); the foot is still the legacy `applyOverlayDraft`,
+  `applyInjuryDraft` or `closeOverlaySheet`. The date helpers, the program's range and the resume line are still the
+  legacy `_fmtDate`, `_fmtDateWd`, `_dayCount`, `_dayCountWord`, `overlayWeekRange` and `overlayBackCopy`.
+- **Tests:** `frontends/app/test/unit/change-sheet.test.ts` (7: the heads, a dated trip, a room-only day and an open
+  end, the full gym and dates outside the program, the regions before a pick, a region and tier, the off-ramp). The e2e
+  gains two photographed states on both builds: Hurt? with a lower back to protect (then the neck's off-ramp, which
+  closes and applies nothing), and Traveling? with a room-only day (then a full gym, which asks for no dates and
+  closes). The bodyweight journey taps the knee by its name: the legacy `onclick` it found it by is not in the
+  component. The log-session journey's Done photograph now waits its toast out under the pop-up: the full run failed
+  it once at 0.805% (the toast in one build's photograph, gone in the other's), the never-cancelled toast timer of
+  v0.239.16's finding firing on either side of the shutter.
+- **Found, for a ruling (handoff §12):** the injury check-in line asks how "the lower" feels for a lower back.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

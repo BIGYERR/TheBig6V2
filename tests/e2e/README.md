@@ -25,11 +25,12 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
    - **Admin** (`#A01` to `#A06`, 1440×900): two devices check in first, so every section has rows. Then the login,
      each section after signing in (Overview, Devices, Versions, Server, the list in `../../frontends/admin/admin.ts`, which
      a unit test holds the journey to), and the signed out screen after Log out.
-4. The runner takes five journeys (`e2e/flow.ts`, 53 steps) against both the Angular build and the original. Each
+4. The runner takes five journeys (`e2e/flow.ts`, 55 steps) against both the Angular build and the original. Each
    journey starts from empty storage in its own browser context, and a failed step stops only its own journey:
-   - **Strength, commercial gym** (23 steps): the wizard, This Week, the rest-day sheet, a day's detail and its run
+   - **Strength, commercial gym** (25 steps): the wizard, This Week, the rest-day sheet, a day's detail and its run
      log, the swap sheet and a pick from it, the trade put back and made twice more, and the coach's nudge it earns
-     (declined), the add-an-exercise sheet and a pick from it, Random Workout, Hurt?, Traveling?, Progress, Bugs, the rest timer (open, start, stop, reset,
+     (declined), the add-an-exercise sheet and a pick from it, Random Workout, Hurt? (a lower back to protect, then the
+     neck's off-ramp), Traveling? (a room-only day, then a full gym, which needs nothing), Progress, Bugs, the rest timer (open, start, stop, reset,
      fold, a drag to the left edge), Programs (the card opened, a rename and an archive started and called off), the change-a-goal
      sheet (a pace goal picked, its targets typed, then kept), then a relaunch.
    - **10K race, Sun Nov 29** (9): a race goal with a race date, the program length box, the week 1 long run, then

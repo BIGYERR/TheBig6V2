@@ -444,10 +444,31 @@ const STRENGTH: readonly Step[] = [
     id: 'injury-sheet',
     page: 'Injury sheet ("Hurt?")',
     async run(t, _page, state) {
+      // The sheet's body is an Angular component in the app since phase E's tenth step, the legacy script's in the
+      // single-file page: both answer the same.
       state['injurySheet'] = await t.tapOpensSheet('.hurt-btn');
+      await t.expectText('#changeOverlay', 'Train around it');
     },
-    async after(t, _page, state) {
-      await t.closeSheet(stored(state, 'injurySheet'));
+  },
+  {
+    id: 'injury-protect',
+    page: 'Injury sheet: a lower back to protect',
+    async run(t, page) {
+      await tapNamed(page, '#changeOverlay .ov-eq', '.ov-eq-name', 'Lower Back');
+      await t.expectText('#changeOverlay', 'Working around it · Lower Back');
+      await tapNamed(page, '#changeOverlay .ov-eq', '.ov-eq-name', 'Protect it');
+      await t.expectText('#changeOverlay', 'Protected · Lower Back');
+      await t.expectText('#changeOverlay', 'Nothing loads the spine.');
+      await t.expectText('#changeOverlay', 'Sharp, swollen, or it hurts at rest.');
+    },
+    async after(t, page, state) {
+      // A neck is not the app's to plan around: Got it closes the sheet and applies nothing.
+      await tapNamed(page, '#changeOverlay .ov-eq', '.ov-eq-name', 'Neck / something else');
+      await t.expectText('#changeOverlay', 'That one’s above my pay grade');
+      if (await t.count('#changeOverlay .ov-date')) throw new Error('the off-ramp still offers a date');
+      await t.tap('#changeOverlay .ov-apply');
+      if ((await t.openOverlays()).includes(stored(state, 'injurySheet'))) throw new Error('Got it did not close the Hurt? sheet');
+      await t.expectNoMatch('#screenWeek', /Injury week/);
     },
   },
   {
@@ -455,9 +476,27 @@ const STRENGTH: readonly Step[] = [
     page: 'Travel sheet ("Traveling?")',
     async run(t, _page, state) {
       state['travelSheet'] = await t.tapOpensSheet('.change-btn');
+      await t.expectText('#changeOverlay', 'Temporary change');
+      await t.expectText('#changeOverlay', 'Takes effect Wed Oct 7 through Tue Oct 20. Fourteen days.');
     },
-    async after(t, _page, state) {
-      await t.closeSheet(stored(state, 'travelSheet'));
+  },
+  {
+    id: 'travel-room-only',
+    page: 'Travel sheet: a room-only day',
+    async run(t, page) {
+      await tapNamed(page, '#changeOverlay .ov-eq', '.ov-eq-name', 'Room only');
+      await t.setValue('#changeOverlay .ov-date:nth-child(2) input', '2026-10-07');
+      await t.expectText('#changeOverlay', 'Takes effect Wed Oct 7. One day.');
+      await t.expectText('#changeOverlay', 'Thu Oct 8 picks your program back up.');
+      await t.expectText('#changeOverlay', 'Reps are yours: three sets');
+    },
+    async after(t, page, state) {
+      // A full gym answers the question: no dates, and Got it saves nothing.
+      await tapNamed(page, '#changeOverlay .ov-eq', '.ov-eq-name', 'Full gym');
+      await t.expectText('#changeOverlay', 'You’re set');
+      if (await t.count('#changeOverlay .ov-date')) throw new Error('a full gym still asks for dates');
+      await t.tap('#changeOverlay .ov-apply');
+      if ((await t.openOverlays()).includes(stored(state, 'travelSheet'))) throw new Error('Got it did not close the travel sheet');
     },
   },
   {
@@ -904,10 +943,10 @@ const BODYWEIGHT_KNEE: readonly Step[] = [
   {
     id: 'bw-hurt-knee',
     page: 'Bodyweight: Hurt? with the knee chosen',
-    async run(t) {
+    async run(t, page) {
       const id = await t.tapOpensSheet('.hurt-btn');
       if (id !== 'changeOverlay') throw new Error(`expected the Hurt? sheet, opened #${id}`);
-      await t.tap(`[onclick="_ovSet('injRegion','knee')"]`);
+      await tapNamed(page, '#changeOverlay .ov-eq', '.ov-eq-name', 'Knee');
       await t.expectText('#changeOverlay', 'Working around it');
       await t.expectText('#changeOverlay', 'Jumps are out');
     },
@@ -1014,6 +1053,9 @@ const LOG_SESSION: readonly Step[] = [
         });
       await t.expectText('#popKicker', 'WORKOUT COMPLETE');
       if (!(await t.count('#popActions .pop-act.go'))) throw new Error('the pop-up has no dismiss button');
+      // The Done toast runs under the pop-up. An earlier toast's timer is never cancelled and can hide it early (handoff
+      // §12), so the photograph waits it out: the pop-up stays until dismissed.
+      await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
     },
     async after(t, page) {
       await t.tap('#popActions .pop-act.go');
