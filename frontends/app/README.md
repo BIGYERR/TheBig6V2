@@ -99,8 +99,8 @@ at a time. It gives typed access to the legacy globals (`call` for a function, `
 is a component (`src/app/screens/bug-report/`, v0.239.8), and so is the floating rest timer (`src/app/screens/rest-timer/`,
 v0.239.9), which takes over the legacy functions other screens call through `LegacyBridge.provide`, and the celebration
 pop-up (`src/app/screens/pop-up/`, v0.239.10) the home screen's program list (`src/app/screens/program-list/`,
-v0.239.11) and the exercise swap sheet (`src/app/screens/swap-sheet/`, v0.239.12); every other screen is still the original
-code. `LegacyBridge` also offers `set` (write a legacy `let`) and `run` (a legacy handler's code). A screen's
+v0.239.11) the exercise swap sheet (`src/app/screens/swap-sheet/`, v0.239.12) and the add-an-exercise sheet
+(`src/app/screens/add-sheet/`, v0.239.13); every other screen is still the original code. `LegacyBridge` also offers `set` (write a legacy `let`) and `run` (a legacy handler's code). A screen's
 logic sits apart from Angular in `<screen>-model.ts` and is tested by node --test (`test/unit/<screen>.test.ts`;
 `src/app/package.json` marks the app's TypeScript as ES modules for it). Moving a screen goes through the repo's normal
 build process. Each moved screen keeps the e2e

@@ -348,6 +348,30 @@ const STRENGTH: readonly Step[] = [
     },
   },
   {
+    id: 'add-sheet',
+    page: 'Add an exercise to a day: the sheet, then a pick',
+    async run(t) {
+      // The sheet is an Angular component in the app since phase E's sixth step, the legacy script's in the single-file
+      // page: both answer the same.
+      await t.tap(`.wk-day[onclick="openDayKey('fri')"]`);
+      await t.overlayOpen('detailOverlay');
+      await t.tap('#detailAddBtn');
+      await t.overlayOpen('addOverlay');
+      if (!(await t.count('#addOverlay .swap-cand'))) throw new Error('the add sheet offers nothing');
+      await t.expectText('#addTags', 'SETS');
+    },
+    async after(t, page) {
+      // A pick adds it to the day for this session, under the day's own heading.
+      const picked = await t.text('#addOverlay .swap-cand .swap-cand-name');
+      await t.tap('#addOverlay .swap-cand');
+      if (await page.$eval('#addOverlay', (e) => e.classList.contains('open'))) throw new Error('the add sheet stayed open after the pick');
+      await t.expectText('#detailOverlay', picked);
+      await t.expectText('#detailOverlay', 'Added by you');
+      await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
+      await t.closeSheet('detailOverlay');
+    },
+  },
+  {
     id: 'random-workout',
     page: 'Random workout',
     async run(t) {

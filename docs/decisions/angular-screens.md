@@ -118,3 +118,16 @@ what is stored.
   order). The e2e's swap step now picks the first candidate after the sheet's photograph and finds the day reopened with
   the new name and the sheet closed, on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.13 moves the add-an-exercise sheet
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.13.
+- **Moved:** `#addOverlay`: `src/app/screens/add-sheet/add-sheet.ts` (the header and its tags, the three groups, the
+  empty and foot lines) and `add-sheet-model.ts` (the tags, the groups and their notes, the day's working sets, each the
+  legacy `openAddSheet`'s). The candidates still come from the legacy `addCandidates`, `addedDetailFor` and `parseRx`,
+  and adding one is still the legacy `applyAddChoice`, which closes the sheet through `closeAddSheet`; both
+  `openAddSheet` and `closeAddSheet` reach the component through `LegacyBridge.provide`.
+- **Tests:** `frontends/app/test/unit/add-sheet.test.ts` (3: the tags and fallbacks, the groups and their notes, the
+  working sets). The e2e gains an add-sheet step on both builds (the strength journey's thirteenth): open a day, its
+  `+`, the sheet in the photograph, then a pick that lands on the day under "Added by you".
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
