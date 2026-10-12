@@ -5,7 +5,7 @@
 # plain production image.
 #
 # What it may touch: every source folder and the repo root (for index.html, its icon, and the app's source files
-# app/src/legacy/src/ with app/scripts/build-index.mjs, which builds them) are mounted read-only; dist/ and app-web/,
+# frontends/app/src/legacy/src/ with frontends/app/scripts/build-index.mjs, which builds them) are mounted read-only; dist/ and app-web/,
 # the two build folders, are the only ones it writes. Its node_modules are the image's own (Linux), and
 # the Angular cache lives in a volume of its own.
 services:

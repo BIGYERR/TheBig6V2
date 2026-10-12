@@ -5,7 +5,7 @@ and every test boots) is built from them and is never edited by hand.
 
 ## How to change the app
 
-1. Edit the file under `app/src/legacy/src/` that holds the code (`grep -rn <name> app/src/legacy/src/js` finds it).
+1. Edit the file under `frontends/app/src/legacy/src/` that holds the code (`grep -rn <name> frontends/app/src/legacy/src/js` finds it).
 2. Rebuild the root file: `cd app && npm run build:index`.
 3. Commit the source files and `index.html` together.
 
@@ -17,7 +17,7 @@ saved source file rebuilds the app at http://localhost:3000/app/ within a second
 
 ## How the build works
 
-`app/scripts/build-index.mjs` concatenates the files `order.json` lists, in that order, byte for byte, with nothing
+`frontends/app/scripts/build-index.mjs` concatenates the files `order.json` lists, in that order, byte for byte, with nothing
 added between them. `order.json` is the only list of pieces. A file under `html/`, `css/` or `js/` that it does not
 list fails the build, as does an entry that is missing, listed twice, or not named in lower case words joined by
 dashes. No file name carries a version.

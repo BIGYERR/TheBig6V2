@@ -44,9 +44,9 @@ test("the app's source files and their build script reach the watcher through th
   const WATCH = read('scripts/dev-watch.ts');
   assert.ok(mounts.some((m) => m.source === '..' && m.target === '/repo' && m.mode === 'ro'), 'the repo root read-only');
   assert.ok(!mounts.some((m) => m.target.startsWith('/repo/')), 'nothing under the repo is mounted writable over it');
-  // Under the repo root (APP_SOURCE_DIR=/repo): app/src/legacy/src/ and app/scripts/build-index.mjs.
-  assert.match(WATCH, /const APP_SOURCES = join\(REPO, 'app', 'src', 'legacy', 'src'\);/);
-  assert.match(WATCH, /const BUILD_INDEX = join\(REPO, 'app', 'scripts', 'build-index\.mjs'\);/);
+  // Under the repo root (APP_SOURCE_DIR=/repo): frontends/app/src/legacy/src/ and frontends/app/scripts/build-index.mjs.
+  assert.match(WATCH, /const APP_SOURCES = join\(REPO, 'frontends', 'app', 'src', 'legacy', 'src'\);/);
+  assert.match(WATCH, /const BUILD_INDEX = join\(REPO, 'frontends', 'app', 'scripts', 'build-index\.mjs'\);/);
   assert.match(WATCH, /watchFolder\(APP_SOURCES, /);
 });
 

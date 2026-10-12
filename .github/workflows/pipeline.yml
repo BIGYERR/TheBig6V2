@@ -66,8 +66,8 @@ jobs:
           if [ -z "$DOCTRINE_TXZ" ]; then echo "::error::The DOCTRINE_TXZ secret is not set, so the tests that read doctrine/*.txt cannot run."; exit 1; fi
           printf '%s' "$DOCTRINE_TXZ" | base64 -d | tar -xJf -
           echo "doctrine files: $(ls doctrine/*.txt | wc -l)"
-      - name: index.html is the build of app/src/legacy/src (byte for byte; app/scripts/build-index.mjs)
-        run: node app/scripts/build-index.mjs --check
+      - name: index.html is the build of frontends/app/src/legacy/src (byte for byte; frontends/app/scripts/build-index.mjs)
+        run: node frontends/app/scripts/build-index.mjs --check
       - name: index.html boots and builds HALF_MANNY, self-stable (tests/harness.js)
         run: node tests/harness.js index.html
       - name: npm ci in tests/ (Vitest, TypeScript, @ia/core)
@@ -102,7 +102,7 @@ jobs:
       - name: Let Chrome use its sandbox (Ubuntu 24 blocks unprivileged user namespaces through AppArmor)
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: app (type check, unit and integration tests, lint)
-        working-directory: app
+        working-directory: frontends/app
         run: |
           npm ci --no-audit --no-fund
           npm test
@@ -132,7 +132,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Docker e2e (every journey, 0% parity against the original)
-        working-directory: app
+        working-directory: frontends/app
         run: |
           npm ci --no-audit --no-fund
           npm run e2e

@@ -5,7 +5,7 @@ Iron Asylum: a hybrid strength and cardio program builder for iPhone.
 | Folder | What it is | How it ships |
 |---|---|---|
 | `index.html` | the app: one file, served at https://bigyerr.github.io/TheBig6V2/ | GitHub Pages, on every push to `main` |
-| `app/` | the same app as an Angular project, built four ways: `emulator-ios` and `device-ios` (Cordova), `pwa-pages` (a web build for `/TheBig6V2/pwa/`), and `pwa-local` (the same web build, served from this Mac) | built on demand; see `app/README.md` |
+| `frontends/app/` | the same app as an Angular project, built four ways: `emulator-ios` and `device-ios` (Cordova), `pwa-pages` (a web build for `/TheBig6V2/pwa/`), and `pwa-local` (the same web build, served from this Mac) | built on demand; see `frontends/app/README.md` |
 | `backend/` | the Node backend: the website (`/`), the app (`/app/`), the device heartbeat API and the admin vision dashboard (`/admin/`), one server | Heroku, with `backend/scripts/heroku.sh deploy`; see `backend/README.md` |
 | `tests/` | the test suite, by feature: unit, integration and sweeps in TypeScript on Vitest, with golden program output in `tests/snapshots/` | `node tools/check.mjs` locally (60 s), the full suite in CI |
 | `docs/` | reference for agents and Mario: the design system (`docs/design/`) | not shipped; it rides along on Pages with the rest of the repo, and the app never reads it |
@@ -23,15 +23,15 @@ devices, deploys and full builds, and work as before.
 |---|---|---|
 | full stack dev mode: website, app, admin, backend | `cd backend && npm run dev` | http://localhost:3000/ (website), `/app/`, `/admin/` (admin / asylum), rebuilt and reloaded on every save |
 | live app | push `index.html` to `main`, after the gates (`CLAUDE.md`, session rhythm) | https://bigyerr.github.io/TheBig6V2/, once Pages has built that commit |
-| web app on this Mac, and on the iPhone over Wi-Fi | `cd app && npm run pwa-local` | http://localhost:4400/ on the Mac and `http://<Mac name>.local:4400/` on the iPhone. Nothing is committed or pushed |
-| Angular dev server | `cd app && npm start` | http://localhost:4200, this Mac only |
-| iOS Simulator | `cd app && npm run emulator-ios` | the native app in the simulator |
-| iPhone, native | `cd app && npm run device-ios` | the native app on the plugged-in iPhone |
-| web build on Pages | `cd app && npm run pwa-pages`, then commit `pwa/` and push | https://bigyerr.github.io/TheBig6V2/pwa/ |
+| web app on this Mac, and on the iPhone over Wi-Fi | `cd frontends/app && npm run pwa-local` | http://localhost:4400/ on the Mac and `http://<Mac name>.local:4400/` on the iPhone. Nothing is committed or pushed |
+| Angular dev server | `cd frontends/app && npm start` | http://localhost:4200, this Mac only |
+| iOS Simulator | `cd frontends/app && npm run emulator-ios` | the native app in the simulator |
+| iPhone, native | `cd frontends/app && npm run device-ios` | the native app on the plugged-in iPhone |
+| web build on Pages | `cd frontends/app && npm run pwa-pages`, then commit `pwa/` and push | https://bigyerr.github.io/TheBig6V2/pwa/ |
 
 `pwa-local` serves the app only while it runs and the phone is on the same Wi-Fi. Add it to the home screen from the
 `.local` address, not the IP: each address keeps its own data, and the IP can change. Its data is separate from the
-live app's and the native app's. The details are in `app/README.md`.
+live app's and the native app's. The details are in `frontends/app/README.md`.
 
 ## Branches, checks and deploys
 

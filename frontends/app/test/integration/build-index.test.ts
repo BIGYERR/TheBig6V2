@@ -13,13 +13,13 @@ import { buildIndex, checkIndex, firstDifference, readOrder, SOURCES, TARGET } f
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const LIVE_SOURCES = join(APP, 'src', 'legacy', 'src');
-const LIVE_PAGE = join(APP, '..', 'index.html');
+const LIVE_PAGE = join(APP, '..', '..', 'index.html');
 const sha256 = (buf: Buffer) => createHash('sha256').update(buf).digest('hex');
 
 describe('build-index on the live sources', () => {
   const order = JSON.parse(readFileSync(join(LIVE_SOURCES, 'order.json'), 'utf8')) as string[];
 
-  it('points at app/src/legacy/src and the repo root index.html', () => {
+  it('points at frontends/app/src/legacy/src and the repo root index.html', () => {
     assert.equal(SOURCES, LIVE_SOURCES);
     assert.equal(TARGET, LIVE_PAGE);
   });

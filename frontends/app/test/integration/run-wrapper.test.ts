@@ -8,7 +8,7 @@ import { join, resolve } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
-const WRAPPER = resolve(fileURLToPath(import.meta.url), '../../../../tools/run.mjs');
+const WRAPPER = resolve(fileURLToPath(import.meta.url), '../../../../../tools/run.mjs');
 
 function fresh() {
   const root = mkdtempSync(join(tmpdir(), 'ia-run-'));
@@ -80,7 +80,7 @@ describe('tools/run.mjs', () => {
     const { root, env } = fresh();
     spawnSync(process.execPath, [WRAPPER, 'outer', '--', process.execPath, WRAPPER, 'inner', '--', process.execPath, '-e', '0'], {
       encoding: 'utf8',
-      env: { ...env, npm_lifecycle_event: 'e2e', npm_lifecycle_script: 'node ../tools/run.mjs e2e -- node e2e/launch.ts' },
+      env: { ...env, npm_lifecycle_event: 'e2e', npm_lifecycle_script: 'node ../../tools/run.mjs e2e -- node e2e/launch.ts' },
     });
     const orch = read(root, 'orchestration.log').split('\n').filter(Boolean);
     assert.equal(orch.length, 1);

@@ -43,7 +43,7 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
-# Iron Asylum: generated from ../index.html by scripts/sync-legacy.mjs (npm run sync)
+# Iron Asylum: generated from ../../index.html by scripts/sync-legacy.mjs (npm run sync)
 /src/legacy/generated/
 /public/legacy/
 /public/apple-touch-icon.png

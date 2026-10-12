@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Iron Asylum backend. Stage one compiles the server (TypeScript, tsc) and builds the website and the admin UI; stage
 # two runs the compiled server with production dependencies only.
-# Same Node line as app/e2e/Dockerfile and the engines field in package.json.
+# Same Node line as frontends/app/e2e/Dockerfile and the engines field in package.json.
 
 FROM node:26-bookworm-slim AS build
 ENV CI=1 NG_CLI_ANALYTICS=false

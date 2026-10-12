@@ -95,7 +95,7 @@
             "pages": {
               "baseHref": "/TheBig6V2/pwa/",
               "outputPath": {
-                "base": "../pwa",
+                "base": "../../pwa",
                 "browser": ""
               }
             },

@@ -15,7 +15,7 @@ A small Node (Express 5) service in TypeScript with four jobs today, all on one 
    searchable table of every device, which app versions are in use and who runs an old one, and this backend's
    own facts. **Log out** ends the session on the server.
 
-The app's source is `app/src/legacy/src/`, from which the repo root `index.html` is built; this folder copies the
+The app's source is `frontends/app/src/legacy/src/`, from which the repo root `index.html` is built; this folder copies the
 root file (`scripts/app-bundle.ts`), and in dev mode builds `/app/` from the sources. The app
 side of the connection (`client/ia-link.js`) is ready, but it reaches the phone only through a version build. See
 [The app side](#the-app-side).
@@ -50,7 +50,7 @@ side of the connection (`client/ia-link.js`) is ready, but it reaches the phone 
 
 ## Run it
 
-From this folder (`cd backend`). Node 26 (the same line as `app/` and its e2e image).
+From this folder (`cd backend`). Node 26 (the same line as `frontends/app/` and its e2e image).
 
 ```bash
 npm install
@@ -72,7 +72,7 @@ container. `npm run dev:down` stops it, and `npm run docker:up` puts back the pl
 | Save in | What happens | Typical time |
 |---|---|---|
 | `site/` or `admin/` | `ng build --watch` rebuilds it (development build), the fast backend tests run, open pages reload | under a second |
-| `app/src/legacy/src/` (the app's source files) | the app is built from them into `app-web/index.html` with `app/scripts/build-index.mjs`, the function that builds the root `index.html` (the repo is never written), its inline script is parsed, open pages reload | under a second |
+| `frontends/app/src/legacy/src/` (the app's source files) | the app is built from them into `app-web/index.html` with `frontends/app/scripts/build-index.mjs`, the function that builds the root `index.html` (the repo is never written), its inline script is parsed, open pages reload | under a second |
 | the repo root `index.html` | the app is copied to `app-web/`, its inline script is parsed, open pages reload | under a second |
 | `server/` | the server restarts, open pages reload when it is back, then tsc checks the server's types beside the fast backend tests | under a second |
 | `client/` | the fast backend tests run, open pages reload | under a second |
@@ -80,7 +80,7 @@ container. `npm run dev:down` stops it, and `npm run docker:up` puts back the pl
 It prints the links when it is up (website `/`, app `/app/`, admin `/admin/` with admin / asylum, snippet `/client/`)
 and one line per rebuild, test run, restart and reload. **Tests stay fast on purpose:** each set (the backend tests
 that need no child process or git, the app script parse) is stopped at 3 seconds; `npm test`, the pre-commit check and
-CI run everything. The app's unit tests run only with `--no-docker`: they need `app/`'s own `node_modules`, and the
+CI run everything. The app's unit tests run only with `--no-docker`: they need `frontends/app/`'s own `node_modules`, and the
 container never loads the Mac's. Pages reload by themselves: in dev mode only (`IA_DEV=1`), the server adds one script
 tag to the three pages (`server/dev.ts`), and the watcher tells it after each rebuild. **The server runs from its
 TypeScript source here** (`node server/server.ts`, Node strips the types), so a restart needs no compile; the type
@@ -98,7 +98,7 @@ line per request.
 - `npm run dev -- --no-docker` runs the same watcher with this Mac's Node instead, in the foreground (kind `local`,
   devices in `data/dev/`); Ctrl-C stops it. Stop the container first (`npm run dev:down`), or give it another
   `API_PORT`.
-- It replaces none of the build paths for devices: `app/`'s `emulator-ios`, `device-ios`, `pwa-pages` and
+- It replaces none of the build paths for devices: `frontends/app/`'s `emulator-ios`, `device-ios`, `pwa-pages` and
   `pwa-local`, and this folder's `docker:up`, `mac-local-backend` and `heroku.sh deploy` work as before.
 
 | Command | What it does |
@@ -271,7 +271,7 @@ beats, and latency.
   iOS 16 even a native app gets only "iPhone" unless Apple grants it a special entitlement. So:
 - **The label** is what a web page can tell: device kind and iOS version from the user agent, plus the screen size
   and pixel ratio, which narrow the model (393x852@3 is a 6.1-inch model). **Platform** is `home-screen` (the
-  installed PWA), `browser` (a Safari tab) or `ios-app` (the Cordova build in `app/`).
+  installed PWA), `browser` (a Safari tab) or `ios-app` (the Cordova build in `frontends/app/`).
 - **Names are given in the admin table.** Type into the Name cell; it saves on Enter or when you leave the field.
   The **Search by name** box searches these names. **Search anything** covers name, label, platform, version,
   screen, user agent and UID.
@@ -411,7 +411,7 @@ version build with the usual proof (`ia-version` bump, its feature tests, CI, de
 
 1. pastes `ia-link.js` into the inline script with `IA_BACKEND_URL` set to the Heroku URL from setup, and the dot's
    two CSS rules plus `<span id="iaLinkDot">` into the top bar;
-2. adds the Heroku origin to `app/config.xml` (`<access origin>`) for the iOS app;
+2. adds the Heroku origin to `frontends/app/config.xml` (`<access origin>`) for the iOS app;
 3. proves the harness boots it with no network: the first beat is behind a 1.5 s timer, every failure is
    swallowed, and an empty `IA_BACKEND_URL` turns it all off;
 4. shows `iaLinkSummary()` and the `iaLinkStatus()` fields in the app's debug section (the Bugs tab), and appends the

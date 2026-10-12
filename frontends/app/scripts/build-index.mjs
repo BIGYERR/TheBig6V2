@@ -3,8 +3,8 @@
 // concatenated in that order, byte for byte, with nothing added between them. The root index.html is generated. Code
 // is edited in src/legacy/src/, this rebuilds the root file, and the two are committed together.
 //
-//   node scripts/build-index.mjs            write ../index.html (npm run build:index)
-//   node scripts/build-index.mjs --check    build into a temp file and exit 1 unless it equals ../index.html byte for
+//   node scripts/build-index.mjs            write ../../index.html (npm run build:index)
+//   node scripts/build-index.mjs --check    build into a temp file and exit 1 unless it equals ../../index.html byte for
 //                                           byte, naming the first byte that differs and the source file it comes
 //                                           from (npm run build:index:check; tools/check.mjs and CI run it)
 //
@@ -23,7 +23,7 @@ const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /** The app's source files: html/, css/, js/ and order.json. */
 export const SOURCES = join(APP, 'src', 'legacy', 'src');
 /** The page they build: the repo root index.html, which GitHub Pages serves and every test boots. */
-export const TARGET = join(APP, '..', 'index.html');
+export const TARGET = join(APP, '..', '..', 'index.html');
 
 const FOLDERS = ['html', 'css', 'js'];
 /** html/<name>.html, css/<name>.css, js/<name>.js; <name> is lower case words joined by dashes. */
@@ -146,7 +146,7 @@ export function checkIndex(srcDir = SOURCES, target = TARGET) {
       `  index.html  ${around(committed, offset)}`,
       `  built ${built.length} bytes, sha256 ${sha256(built)}; index.html ${committed.length} bytes, sha256 ${sha256(committed)}`,
       `  the build is kept at ${tmp}`,
-      '  Edit the source files under app/src/legacy/src/, then run npm run build:index in app/. Never edit index.html by hand.',
+      '  Edit the source files under frontends/app/src/legacy/src/, then run npm run build:index in frontends/app/. Never edit index.html by hand.',
     ].join('\n'),
     offset,
     kept: tmp,

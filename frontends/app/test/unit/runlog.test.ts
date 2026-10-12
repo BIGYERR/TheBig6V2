@@ -20,7 +20,7 @@ delete process.env['CLAUDECODE'];
 delete process.env['npm_lifecycle_event'];
 delete process.env['npm_lifecycle_script'];
 // Imported after the environment is set: the module reads IA_RUNS_DIR and the limits once, when it loads.
-const R = await import('../../../tools/runlog.mjs');
+const R = await import('../../../../tools/runlog.mjs');
 
 const lines = (file: string) => readFileSync(file, 'utf8').split('\n').filter(Boolean);
 const EVENT = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} {2}\S.{24} {2}\S.{7} {2}\S/;

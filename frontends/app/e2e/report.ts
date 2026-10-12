@@ -220,7 +220,7 @@ export function renderReport(r: RunReport): string {
 </div>
 <div class="tile" style="margin-bottom:20px"><dl>
   <dt>Ran</dt><dd>${esc(r.ranAt)}</dd>
-  <dt>Served from</dt><dd class="mono">app ${esc(r.baseUrl)} (nginx container); website and admin ${esc(r.backendUrl)} (backend container); app/e2e/docker-compose.yml</dd>
+  <dt>Served from</dt><dd class="mono">app ${esc(r.baseUrl)} (nginx container); website and admin ${esc(r.backendUrl)} (backend container); frontends/app/e2e/docker-compose.yml</dd>
   <dt>Source</dt><dd class="mono">index.html sha256 ${esc(r.sourceSha256 ?? 'unknown')}</dd>
   <dt>Browser</dt><dd>${esc(r.browserVersion)} in the runner container, ${r.viewport.width}×${r.viewport.height} @${r.viewport.deviceScaleFactor}x, touch</dd>
   <dt>Clock</dt><dd>Frozen at ${esc(r.frozenNow)} (${esc(r.timezone)}); Math.random seeded; animations off</dd>

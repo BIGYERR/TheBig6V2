@@ -31,9 +31,9 @@ Mario has had to repeat this more than once; a session that makes him say it aga
 Vanilla HTML/CSS/JS PWA served as one file (`index.html`, ~1.3 MB, one inline `<script>`) that
 generates multi-week hybrid strength + cardio programs from a seeded, deterministic engine
 (Engine A → B → C → D inside `buildProgram(cfg)`). **`index.html` is generated** (architecture phase B, Post-v0.239.1):
-`app/scripts/build-index.mjs` builds it byte for byte from its source files under `app/src/legacy/src/` (35 JS files,
+`frontends/app/scripts/build-index.mjs` builds it byte for byte from its source files under `frontends/app/src/legacy/src/` (35 JS files,
 9 CSS files and 5 HTML partials, joined in the order `order.json` lists). Code is edited in the source files, then
-`cd app && npm run build:index` regenerates the root `index.html`, and both are committed together. The root file is
+`cd frontends/app && npm run build:index` regenerates the root `index.html`, and both are committed together. The root file is
 never edited by hand; the 60-second check and CI fail when it is not the build of the sources. Doctrine: NSW Physical Training Guide for
 test goals (pace, mile, 1.5-mile, base) and Nike Run Club plans for race goals (5K/10K/half/
 marathon). Deployed by GitHub Pages at https://bigyerr.github.io/TheBig6V2/ . iOS-only PWA.
@@ -50,7 +50,7 @@ context at work at a time ... we do NOT spin up agents like that ever again (unl
   - **measure**: the before-picture. Prove a reported bug at the reporter's seed, sweep the configs, name the root
     cause and every other reader of the same value, with numbers and denominators. No ruling, no fix.
   - **coach**: coaching correctness and doctrine; rules on WHAT should ship, against the measured numbers.
-  - **builder**: edits the source files under `app/src/legacy/src/` directly and narrowly, rebuilds `index.html` from
+  - **builder**: edits the source files under `frontends/app/src/legacy/src/` directly and narrowly, rebuilds `index.html` from
     them, and writes the feature's tests (Test layout). Never invents a ruling.
   - **gatekeeper**: proof (Proof for new work): the 60-second check, each test for a changed behaviour fails on the
     previous release, every changed behaviour has a test, every diff hunk is classified, and the CI run is read.
@@ -75,7 +75,7 @@ session's files written into `tests/measure/` mid-proof.
 1. `session-start` skill: confirm `index.html`'s `ia-version`, confirm the handoff header and a digest line agree with it, and print the deploy picture (step 7).
 2. **Measure before designing.** `measure` runs the harness across the relevant configs and prints the before-picture (`node tests/harness.js index.html --grid`, or a purpose-built measure script in `tests/measure/`, kept as `<feature>_<question>.js`).
 3. **Design before coding.** Coach issues a ruling (D-code) with coaching rationale and the before/after week grid. Mario concurs or pushes back. Coaching correctness overrides technical convenience. The main session appends the ruling to its feature's decision file (Proof for new work).
-4. **Ask Mario for the bump** (Versioning, below): PATCH, MINOR or MAJOR, before the first builder dispatch. Builder ships: narrow edits to the source files under `app/src/legacy/src/` (every text replaced occurs exactly once in the file it edits before it is replaced), `index.html` rebuilt from them (`npm run build:index`), the feature's tests (Test layout), `ia-version` set to the version Mario picked, exactly when he says so. **Right before every builder dispatch**, re-read HEAD against `origin/dev` and `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
+4. **Ask Mario for the bump** (Versioning, below): PATCH, MINOR or MAJOR, before the first builder dispatch. Builder ships: narrow edits to the source files under `frontends/app/src/legacy/src/` (every text replaced occurs exactly once in the file it edits before it is replaced), `index.html` rebuilt from them (`npm run build:index`), the feature's tests (Test layout), `ia-version` set to the version Mario picked, exactly when he says so. **Right before every builder dispatch**, re-read HEAD against `origin/dev` and `origin/main`, `index.html`'s `ia-version` and the handoff's D-CODE REGISTRY line: Mario runs concurrent sessions, and V202 shipped from another one mid-design. If the version moved, the ruling goes back to coach before anything is written.
 5. Gatekeeper proves it as **Pipeline** and **Proof for new work** (below) set out: locally inside 60 seconds, then the full suite in CI on the push to `dev`, which Mario reviews. Green, or a NAMED failing test.
 6. `handoff-update` skill: the seven-element session entry, with the release line of each decision this version shipped filled in (`docs/decisions/<feature>.md`). Then stage the build's files by path (every tracked change and every untracked file the build wrote; **never
    `git add -A`**, Mario, Post-V238), commit on `dev` (`git commit -m "v<version>: <one line>"`; the pre-commit hook runs the 60-second check) and `git push origin dev`.
@@ -90,7 +90,7 @@ session's files written into `tests/measure/` mid-proof.
    - GitHub: `git show origin/dev:index.html` and `git show origin/main:index.html`, each `| grep -oE 'name="ia-version" content="[^"]+"'` (read out of the remote refs, not the working copy);
    - Pages: `gh api repos/bigyerr/TheBig6V2/pages/builds/latest --jq '.status, .commit'`, and whether that commit is `origin/main`;
    - live: `curl -s "https://bigyerr.github.io/TheBig6V2/?cb=$(date +%s)" | grep -oE 'name="ia-version" content="[^"]+"'`. Cache-bust the query string; `cache-control` is `max-age=600`, so an unbusted fetch can lie for ten minutes;
-   - any local build that records its own version, when one exists (the native app's `app/config.xml`, a running local PWA server).
+   - any local build that records its own version, when one exists (the native app's `frontends/app/config.xml`, a running local PWA server).
    ```
    DEPLOY  local 0.239.1 (dev a1b2c3d, +0/-0 origin/dev)  dev 0.239.1  main 0.239.0  pages built e4f5a6b  live 0.239.0  native 0.239.1
    ```
@@ -118,7 +118,7 @@ session's files written into `tests/measure/` mid-proof.
   carries the guard.
 - **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs four lanes and stops at 60 s: tests (the type
   check of `core/` and `tests/`, and the unit and integration tests by Vitest), build (`index.html` is the byte-for-byte
-  build of `app/src/legacy/src/`, its version meta, its inline script compiles, it boots and builds HALF_MANNY
+  build of `frontends/app/src/legacy/src/`, its version meta, its inline script compiles, it boots and builds HALF_MANNY
   self-stable), app (sync, type check, tests, lint) and backend (type checks, tests, lint). The pre-commit hook
   (`.githooks/pre-commit`, `--staged`) runs the lanes a commit touches. No local step waits longer than 60 s: anything
   slower belongs in CI.
@@ -138,7 +138,7 @@ session's files written into `tests/measure/` mid-proof.
   `tests/sweeps/program-output.test.ts` holds the digest of every program on the 864-config lattice
   (`tests/snapshots/program-output-lattice.json`), so any change to what the engine prescribes shows as a reviewable diff. The helpers are
   `tests/support/app.ts` and `tests/support/snapshot.ts`, built on `tests/harness.js` (CommonJS, loaded through
-  `createRequire`), and `tests/support/programs.ts`, the seeded configs typed as `Cfg`. `app/e2e` stays as it is.
+  `createRequire`), and `tests/support/programs.ts`, the seeded configs typed as `Cfg`. `frontends/app/e2e` stays as it is.
 - **TypeScript and Vitest** (architecture phase A). Every test is strict TypeScript run by Vitest (`import { describe,
   test } from 'vitest'`, `node:assert/strict` inside). `tests/` is its own package: `tests/package.json` and its
   lockfile are committed, `tests/node_modules` is not. There is still no `package.json` or `tsconfig.json` at the repo
@@ -153,7 +153,7 @@ session's files written into `tests/measure/` mid-proof.
   `tests/integration/program-shape.test.ts` and `tests/sweeps/program-shape.test.ts` walk real programs through them,
   so a field the engine adds, drops or retypes turns a test red until the type is changed to match. A test imports a type or
   shared logic from `@ia/core`, never a copy. The release version lives in `core/src/version.ts`: until the build writes the
-  meta from it, a release writes the same MAJOR.MINOR.PATCH there and in the `ia-version` meta (`app/src/legacy/src/html/head.html`,
+  meta from it, a release writes the same MAJOR.MINOR.PATCH there and in the `ia-version` meta (`frontends/app/src/legacy/src/html/head.html`,
   built into `index.html`), and `tests/unit/semver.test.ts` is red when they differ. From phase D on, new shared logic and the
   engine code moved out of `index.html` go in `core/` (`docs/architecture-migration.md`).
 - **Naming.** A test file is named for the feature it covers, in lower case words joined by dashes (`rest-timer`,
@@ -184,7 +184,7 @@ session's files written into `tests/measure/` mid-proof.
 - **The legacy gate suite is gone** (test-migration phase 3, Post-v0.239.1): `tests/gates/`, `gate.sh`, the row manifest
   and its licences, era rows and `era_bump.py`, sabotage and its specs, the edit scripts and the identity fuzz were
   deleted after every gate row was mapped to a feature test or dropped for a written reason (`docs/test-migration.md`
-  and `docs/test-migration/*.md`). Their history is in git. Builder edits the source files under `app/src/legacy/src/`
+  and `docs/test-migration/*.md`). Their history is in git. Builder edits the source files under `frontends/app/src/legacy/src/`
   directly and narrowly and rebuilds `index.html`; the git diff is the record.
 
 ## Friction report (Mario, standing from V234)
@@ -317,7 +317,7 @@ No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declar
 
 ## Token discipline
 **Run a command that takes longer than a minute in the background, its output in a file, and read back only the summary.**
-`index.html` is ~250K tokens and generated: never read it wholesale, never edit it. Code lives in `app/src/legacy/src/`: `grep -rn` the symbol and its consumers there first. Most source files are small enough to read whole; the four largest (`js/engine-c.js`, `js/cardio-progression.js`, `js/wizard.js`, `js/nsw-cardio.js`, 75 to 110 KB) are read wide at the seam. `str_replace` narrowly in the source file, rebuild, and let the tests be the backstop. Do not re-read the doctrine text mid-session unless verifying a transcription.
+`index.html` is ~250K tokens and generated: never read it wholesale, never edit it. Code lives in `frontends/app/src/legacy/src/`: `grep -rn` the symbol and its consumers there first. Most source files are small enough to read whole; the four largest (`js/engine-c.js`, `js/cardio-progression.js`, `js/wizard.js`, `js/nsw-cardio.js`, 75 to 110 KB) are read wide at the seam. `str_replace` narrowly in the source file, rebuild, and let the tests be the backstop. Do not re-read the doctrine text mid-session unless verifying a transcription.
 
 ## Delegation carry (only when Mario explicitly asks for a builder or gatekeeper agent)
 Builder and gatekeeper agents do not load this file (`omitClaudeMd`). A brief to either carries the ruling verbatim (its
@@ -328,10 +328,10 @@ oracles never ask the engine; a test file that registers no tests is a failure; 
 equals itself before comparing; NRC sessions are verbatim; temp files only under the scratch path the brief names.
 
 ## Dev mode (Mario, Post-V239): the fastest look at a change, never a proof
-The dev container serves the website (`/`), the app (`/app/`, built from `app/src/legacy/src/`), the admin (`/admin/`,
+The dev container serves the website (`/`), the app (`/app/`, built from `frontends/app/src/legacy/src/`), the admin (`/admin/`,
 admin / asylum) and the backend on http://localhost:3000, and rebuilds whatever is saved by itself, in about a second,
 with nothing running on the Mac: site and admin by `ng build --watch`; the app built from its source files on every
-save, with the function that builds the root `index.html` (`app/scripts/build-index.mjs`), into `backend/app-web/`
+save, with the function that builds the root `index.html` (`frontends/app/scripts/build-index.mjs`), into `backend/app-web/`
 only, and the root `index.html` copied when it changes, its inline script parsed either way; the server restarted on a
 `server/` change. A saved source file shows at `/app/` at once; the root file still needs `npm run build:index`. After each change it runs only tests that finish within 3 s, then
 every open page reloads itself. The watcher (`backend/scripts/dev-watch.ts`) runs inside the container
@@ -342,13 +342,13 @@ never the container. `npm run dev:down` stops it; `npm run docker:up` puts back 
 wants to see an edit, check it answers (`curl -s localhost:3000/healthz`), run `npm run dev` in the background if not,
 and hand him the link to the page that changed. It shows; it proves nothing: no test or CI result comes
 from it, and a version ships only through the session rhythm. The other paths stay for devices, deploys and full
-builds: `app/` `emulator-ios`, `device-ios`, `pwa-pages`, `pwa-local`; `backend/` `docker:up`, `mac-local-backend`,
+builds: `frontends/app/` `emulator-ios`, `device-ios`, `pwa-pages`, `pwa-local`; `backend/` `docker:up`, `mac-local-backend`,
 `heroku.sh deploy`.
 
 ## Files
-- `index.html` — the app, generated. Its source is `app/src/legacy/src/`: `js/`, `css/`, `html/` (the `ia-version` meta
+- `index.html` — the app, generated. Its source is `frontends/app/src/legacy/src/`: `js/`, `css/`, `html/` (the `ia-version` meta
   is in `html/head.html`), `order.json` (the one list of pieces, in build order) and a README saying what each file
-  holds. `app/scripts/build-index.mjs` builds it (`cd app && npm run build:index`; `npm run build:index:check` fails,
+  holds. `frontends/app/scripts/build-index.mjs` builds it (`cd frontends/app && npm run build:index`; `npm run build:index:check` fails,
   naming the first differing byte, unless the root file is the build). The sources and the rebuilt file are committed
   together; the root file is never edited by hand.
 - `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).

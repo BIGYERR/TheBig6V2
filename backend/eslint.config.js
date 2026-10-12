@@ -1,6 +1,6 @@
 // @ts-check
 // npm run lint: the admin UI and the website (TypeScript and templates), the server, tests and scripts (TypeScript on
-// Node), and the app-side snippet (a classic browser script). Errors fail. Same rule sets as app/eslint.config.js.
+// Node), and the app-side snippet (a classic browser script). Errors fail. Same rule sets as frontends/app/eslint.config.js.
 import eslint from '@eslint/js';
 import angular from 'angular-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';

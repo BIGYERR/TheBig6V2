@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { metaVersion } from './version.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const REPO = resolve(APP, '..');
+const REPO = resolve(APP, '..', '..');
 const SRC_HTML = join(REPO, 'index.html');
 const SRC_ICON = join(REPO, 'apple-touch-icon.png');
 const GEN = join(APP, 'src', 'legacy', 'generated');

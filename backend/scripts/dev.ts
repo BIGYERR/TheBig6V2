@@ -9,9 +9,9 @@
 // The container is the docker backend's own (docker-compose.yml with docker-compose.dev.yml laid over it): the same
 // name, port and devices volume as npm run docker:up, which puts back the plain production image. It runs
 // scripts/dev-watch.ts from Dockerfile.dev, which rebuilds site/, admin/, server/, client/, the app's source files
-// (app/src/legacy/src/) and the repo root index.html as they are saved, with nothing running on this Mac, and comes back
+// (frontends/app/src/legacy/src/) and the repo root index.html as they are saved, with nothing running on this Mac, and comes back
 // whenever Docker starts (restart: unless-stopped).
-// It shows a change; it proves nothing. The pre-commit check, CI, and the build paths for devices in app/ do that.
+// It shows a change; it proves nothing. The pre-commit check, CI, and the build paths for devices in frontends/app/ do that.
 import { spawn } from 'node:child_process';
 import type { SpawnOptions } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
@@ -67,7 +67,7 @@ function banner(health: Health) {
     app      ${BASE}/app/      (app ${health.app || 'not bundled'})
     admin    ${BASE}/admin/    (${login})
     snippet  ${BASE}/client/
-  Edit site/, admin/, server/, client/ or the app's source files (app/src/legacy/src/); open pages reload by themselves.
+  Edit site/, admin/, server/, client/ or the app's source files (frontends/app/src/legacy/src/); open pages reload by themselves.
   ${DOCKER ? 'Ctrl-C stops following the log; the container keeps rebuilding. npm run dev:down stops it.' : 'Ctrl-C stops.'}
 `);
 }

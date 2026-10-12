@@ -13,7 +13,7 @@ One Angular app, built four ways. Run each from this folder (`cd app`).
 |---|---|---|---|
 | **emulator-ios** | `npm run emulator-ios` | `www/` (Cordova), then a Debug build with Xcode | the iOS Simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`) |
 | **device-ios** | `npm run device-ios` | `www/` (Cordova), then a signed build with Xcode | the connected iPhone (see [First device build](#first-device-build-one-time)) |
-| **pwa-pages** | `npm run pwa-pages` | `../pwa/` with base href `/TheBig6V2/pwa/`; no Cordova | GitHub Pages at https://bigyerr.github.io/TheBig6V2/pwa/, once `pwa/` is committed and pushed |
+| **pwa-pages** | `npm run pwa-pages` | `../../pwa/` with base href `/TheBig6V2/pwa/`; no Cordova | GitHub Pages at https://bigyerr.github.io/TheBig6V2/pwa/, once `pwa/` is committed and pushed |
 | **pwa-local** | `npm run pwa-local` | `dist/pwa-local/` with base href `/`; no Cordova | this Mac, served at http://localhost:4400/ and to the iPhone on the same Wi-Fi; nothing is committed or pushed |
 
 The two iOS paths run the native shell. They get Cordova and the `ia-island` Live Activity on the Dynamic Island.
@@ -29,7 +29,7 @@ Rebuild and commit `pwa/` with every version, or it goes stale.
 
 ### pwa-local: the web build, served from this Mac
 
-`npm run pwa-local` (`scripts/pwa-local.mjs`) syncs from `../index.html`, builds into `dist/pwa-local/` (gitignored),
+`npm run pwa-local` (`scripts/pwa-local.mjs`) syncs from `../../index.html`, builds into `dist/pwa-local/` (gitignored),
 runs the same check as `pwa-pages:check` against it, then serves it with a small Node server until you press Ctrl-C.
 It prints the addresses to use:
 
@@ -102,20 +102,20 @@ with an iOS Simulator runtime.
 | `npm install` | install dependencies (npm 11 asks before running install scripts; `package.json` `allowScripts` approves only Puppeteer's Chrome download and esbuild) |
 | `npm start` | sync, then `ng serve` on http://localhost:4200 |
 | `npm run build` | sync, then a production build into `www/` (Cordova's web root; both iOS paths and e2e run it) |
-| `npm run sync:check` | fail if the generated files are stale against `../index.html` |
-| `npm run build:index` | build `../index.html` from the app's source files in `src/legacy/src/` (`scripts/build-index.mjs`); the root file is never edited by hand |
-| `npm run build:index:check` | fail, naming the first differing byte and its source file, unless `../index.html` is the build of `src/legacy/src/` |
+| `npm run sync:check` | fail if the generated files are stale against `../../index.html` |
+| `npm run build:index` | build `../../index.html` from the app's source files in `src/legacy/src/` (`scripts/build-index.mjs`); the root file is never edited by hand |
+| `npm run build:index:check` | fail, naming the first differing byte and its source file, unless `../../index.html` is the build of `src/legacy/src/` |
 | `npm run lint` | ESLint: TypeScript and templates (angular-eslint), plus `scripts/`, `e2e/` and `test/`; errors fail |
 | `npm run lint:legacy` | warn-only report on the generated `app.js` (counts per rule, first examples) |
 | `npm test` | type-check, then the unit tests, then the integration tests (Node's built-in runner), each a logged run; about 5 s |
 | `npm run test:unit` / `npm run test:integration` | one layer of tests on its own |
-| `npm run logs` | the run log (`../tools/README.md`): `npm run logs` for the latest history, `npm run logs -- runs`, `npm run logs -- show e2e`, `npm run logs -- follow server-pwa-local` |
+| `npm run logs` | the run log (`../../tools/README.md`): `npm run logs` for the latest history, `npm run logs -- runs`, `npm run logs -- show e2e`, `npm run logs -- follow server-pwa-local` |
 | `npm run typecheck` | `tsc` over the Node TypeScript (`e2e/`, `test/`); Node runs those files without it, so this is the type check |
 | `npm run e2e` | the e2e suite, entirely in Docker; each run's report and collage are kept in `../temp/runs/<stamp>-e2e/artifacts/` (newest: `../temp/latest/e2e/`) |
 | `npm run emulator-ios` | build, boot the simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`), install, launch |
 | `npm run device-ios` | signed build for the connected iPhone, install, launch |
-| `npm run pwa-pages` | sync, then a production build into `../pwa/` for GitHub Pages, then the check below |
-| `npm run pwa-pages:check` | fail unless `../pwa/` was built from the current `../index.html` (no build) |
+| `npm run pwa-pages` | sync, then a production build into `../../pwa/` for GitHub Pages, then the check below |
+| `npm run pwa-pages:check` | fail unless `../../pwa/` was built from the current `../../index.html` (no build) |
 | `npm run pwa-local` | sync, then a production build into `dist/pwa-local/`, the same check, then serve it on port 4400 for this Mac and the iPhone |
 | `npm run xcode-ios` | open the native project in Xcode |
 
@@ -163,7 +163,7 @@ namespaces, parameter properties). `e2e/package.json` and `test/package.json` on
   parity, and the step list.
 - `test/integration/`: real inputs. The `pwa-local` server over real HTTP against a fixture build (content types,
   caching, the update check's probe, nothing served from outside the build), the build check both web paths share,
-  `sync-legacy` against the live `../index.html` and as a command, `build-index` against the live source files and
+  `sync-legacy` against the live `../../index.html` and as a command, `build-index` against the live source files and
   fixture folders, the collage drawn
   in Chrome and checked pixel by pixel, and the written report opened from disk in Chrome with every request outside
   the file blocked. These use Puppeteer's Chrome on this machine, which `npm install` downloads.
@@ -177,7 +177,7 @@ does. Node cannot import those files directly.
 
 `npm run e2e` (`e2e/launch.ts`) runs the whole suite in Docker. Nothing runs a browser on the host. It covers three
 surfaces, the collage's three bands: the **website** and the **admin**, as the backend serves them, and the **app**.
-1. It bundles the app for the backend image (`../backend/scripts/app-bundle.ts`, Node alone), then `docker compose`
+1. It bundles the app for the backend image (`../../backend/scripts/app-bundle.ts`, Node alone), then `docker compose`
    builds three images. Two come from one `e2e/Dockerfile`, on one shared `npm ci` layer:
    - **web**: the Angular app built from source in a clean Node container, served by nginx. The original
      `index.html` is served beside it at `/reference/`.
@@ -185,7 +185,7 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
      Testing build that the lockfile's Puppeteer pins. Chrome for Testing ships native ARM64 Linux builds, so it runs
      at full speed on Apple silicon.
 
-   The third is **backend**, from `../backend/Dockerfile`: the website at `/`, the admin at `/admin/` and the app at
+   The third is **backend**, from `../../backend/Dockerfile`: the website at `/`, the admin at `/admin/` and the app at
    `/app/`, started with the project's local development login (admin / asylum) and no stored devices.
 2. nginx and the backend start. The backend and the runner share nginx's network, so the runner reaches the app at
    `http://127.0.0.1` and the backend at `http://127.0.0.1:3000`, the same secure localhost origin a dev server has.
@@ -197,7 +197,7 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
      page stays one capture), then from the phone the two pages it links to on the same host: Staff Login (`/admin/`)
      and Build my program (`/app/`, the app booting to its home screen).
    - **Admin** (`#A01` to `#A06`, 1440×900): two devices check in first, so every section has rows. Then the login,
-     each section after signing in (Overview, Devices, Versions, Server, the list in `../backend/admin/admin.ts`, which
+     each section after signing in (Overview, Devices, Versions, Server, the list in `../../backend/admin/admin.ts`, which
      a unit test holds the journey to), and the signed out screen after Log out.
 4. The runner takes five journeys (`e2e/flow.ts`, 46 steps) against both the Angular build and the original. Each
    journey starts from empty storage in its own browser context, and a failed step stops only its own journey:

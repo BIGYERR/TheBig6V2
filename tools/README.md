@@ -53,7 +53,7 @@ deploy step, and Claude's sessions and agents. A run's own `events.log` also has
 
 ## Reading it
 
-From the repo root (`npm run logs -- <args>` does the same from `app/` or `backend/`):
+From the repo root (`npm run logs -- <args>` does the same from `frontends/app/` or `backend/`):
 
 | Command | Shows |
 |---|---|
@@ -71,13 +71,13 @@ From the repo root (`npm run logs -- <args>` does the same from `app/` or `backe
 |---|---|---|
 | feature tests (`tests/unit`, `tests/integration`, `tests/sweeps`, against `tests/snapshots`; Vitest) | `tests` | `npm test` in `tests/`, or `node ../tools/run.mjs tests -- npx vitest run unit integration sweeps` there (CI; the check runs them unwrapped) |
 | type check of `core/` and `tests/` | `tests-typecheck` | `npm run typecheck` in `tests/` |
-| unit, integration tests, type check, lint (app) | `unit`, `integration`, `typecheck`, `lint` | `npm test`, `npm run test:unit`, ... in `app/` |
+| unit, integration tests, type check, lint (app) | `unit`, `integration`, `typecheck`, `lint` | `npm test`, `npm run test:unit`, ... in `frontends/app/` |
 | e2e in Docker | `e2e` (report, collage, docker and nginx logs in artifacts) | `npm run e2e` |
 | PWA on this Mac | `server-pwa-local` (every request, from start to Ctrl-C) | `npm run pwa-local` |
 | Angular dev server | `server-app-dev` | `npm start` |
 | iOS builds | `build-ios-emulator`, `build-ios-device` (xcodebuild log in artifacts) | `npm run emulator-ios`, `device-ios` |
 | PWA for Pages | `build-pwa-pages` | `npm run pwa-pages` |
-| `index.html` from its source files | `build-index` | `npm run build:index` in `app/` |
+| `index.html` from its source files | `build-index` | `npm run build:index` in `frontends/app/` |
 | backend tests, lint | `backend-test`, `backend-lint` | `npm test`, `npm run lint` in `backend/` |
 | backend servers | `server-backend-dev` (the full stack dev mode: the dev container's log while it is followed, every rebuild, test run and restart), `server-backend-dev-server`, `server-backend-docker`, `server-backend-mac-local` (every request), `server-backend-admin`, `server-backend-site` | `npm run dev`, `dev:server`, `docker:logs`, `mac-local-backend:logs`, `admin:dev`, `site:dev` |
 | backend docker, Mac, Heroku | `backend-docker-up`, `-down`, `backend-dev-down`, `backend-mac-local[-<subcommand>]`, `heroku-<subcommand>` | `npm run docker:up`, `npm run dev:down`, `npm run mac-local-backend -- down`, `npm run heroku -- deploy`, ... |
@@ -130,4 +130,4 @@ so a red check reads like a local one: `gh run download <run id> -n tests-run-lo
 | `check-gate-times.txt` | each gate's measured time; gates at 12 s or less run in the check, the rest only in CI |
 | `agent-hook.mjs` | Claude hooks: sessions and agents into the history |
 
-Tests: `app/test/unit/runlog.test.ts`, `app/test/integration/run-wrapper.test.ts` (run with the app's `npm test`).
+Tests: `frontends/app/test/unit/runlog.test.ts`, `frontends/app/test/integration/run-wrapper.test.ts` (run with the app's `npm test`).

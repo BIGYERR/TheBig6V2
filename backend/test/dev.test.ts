@@ -98,7 +98,7 @@ describe('dev watcher', () => {
 
 });
 
-// The app's source files (app/src/legacy/src/): a save builds the page /app/ serves, with the function that builds the
+// The app's source files (frontends/app/src/legacy/src/): a save builds the page /app/ serves, with the function that builds the
 // root index.html, into app-web/ only.
 describe('dev watcher, the app source files', () => {
   const REPO_ROOT = resolve(process.env.APP_SOURCE_DIR || join(import.meta.dirname, '..', '..'));
@@ -115,7 +115,7 @@ describe('dev watcher, the app source files', () => {
   test('the live source files build the root index.html byte for byte into app-web/, and the root is never written', async () => {
     const before = stamp();
     const out = temp();
-    assert.equal(await buildAppFromSources(join(REPO_ROOT, 'app', 'src', 'legacy', 'src'), out), true);
+    assert.equal(await buildAppFromSources(join(REPO_ROOT, 'frontends', 'app', 'src', 'legacy', 'src'), out), true);
     assert.ok(readFileSync(join(out, 'index.html')).equals(readFileSync(ROOT_PAGE)), 'the page served is the root file, byte for byte');
     assert.deepEqual(stamp(), before, 'the repo root index.html is untouched');
   });

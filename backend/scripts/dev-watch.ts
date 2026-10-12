@@ -4,8 +4,8 @@
 // whenever Docker does; npm run dev -- --no-docker runs it on the Mac's own Node instead (scripts/dev.ts, either way).
 //
 //   website  /         site/          ng build --watch, a development build (a second or two)
-//   app      /app/     app/src/legacy/src/   the app's source files, built into app-web/index.html on every save by
-//                                     app/scripts/build-index.mjs (the function that builds the root index.html), its
+//   app      /app/     frontends/app/src/legacy/src/   the app's source files, built into app-web/index.html on every save by
+//                                     frontends/app/scripts/build-index.mjs (the function that builds the root index.html), its
 //                                     inline script parsed; the repo root is never written
 //                      index.html     the repo root's, copied to app-web/ on every save, its inline script parsed
 //   admin    /admin/   admin/         ng build --watch
@@ -15,7 +15,7 @@
 // After each change it runs the fast tests that change can break, each set stopped at 3 s, then every open page
 // reloads itself (server/dev.ts). The server runs from its TypeScript source as Node strips the types, so the type
 // check is where a type error shows; like a failing test, it never holds back the restart, which comes first. It
-// replaces none of the real checks: the pre-commit check, CI, and the build paths for devices in app/.
+// replaces none of the real checks: the pre-commit check, CI, and the build paths for devices in frontends/app/.
 //
 // Saves arrive as file events: through Docker Desktop's mounts they reach the container in tens of milliseconds.
 // IA_DEV_POLL_MS=<ms> polls instead (ng build --poll, and a sweep of the watched folders' file times), for a machine
@@ -23,9 +23,9 @@
 // Desktop, and iCloud rewrites a saved file's attributes 10 to 40 seconds later; that event changes neither, so it
 // restarts nothing, and an Angular rebuild whose output came out the same reloads nothing.
 //
-// It reads PORT (the server's), APP_SOURCE_DIR (the repo root, where index.html and app/ are; the folder above
+// It reads PORT (the server's), APP_SOURCE_DIR (the repo root, where index.html and frontends/app/ are; the folder above
 // backend/ by default), APP_BUNDLE_DIR (where the app is served from; app-web/ by default) and IA_DEV_CONTAINER=1 (set
-// by Dockerfile.dev). In the container the app's unit tests do not run: they need app/'s own node_modules, and the only
+// by Dockerfile.dev). In the container the app's unit tests do not run: they need frontends/app/'s own node_modules, and the only
 // ones in reach are the Mac's, which a Linux container never loads.
 import { spawn } from 'node:child_process';
 import type { ChildProcess, SpawnOptions } from 'node:child_process';
@@ -41,8 +41,8 @@ const REPO = resolve(process.env.APP_SOURCE_DIR || join(BACKEND, '..'));
 const APP_WEB = resolve(process.env.APP_BUNDLE_DIR || join(BACKEND, 'app-web'));
 // The app's source files, and the script that builds the root index.html from them. In the container both sit in the
 // read-only mount of the repo root.
-const APP_SOURCES = join(REPO, 'app', 'src', 'legacy', 'src');
-const BUILD_INDEX = join(REPO, 'app', 'scripts', 'build-index.mjs');
+const APP_SOURCES = join(REPO, 'frontends', 'app', 'src', 'legacy', 'src');
+const BUILD_INDEX = join(REPO, 'frontends', 'app', 'scripts', 'build-index.mjs');
 const PORT = Number(process.env.PORT || 3000);
 const SELF = `http://127.0.0.1:${PORT}`;
 const POLL_MS = Number(process.env.IA_DEV_POLL_MS) || 0;
@@ -131,8 +131,8 @@ async function typecheck() {
   return false;
 }
 const appUnitTests = () =>
-  !IN_CONTAINER && existsSync(join(REPO, 'app', 'node_modules'))
-    ? tests('app unit', ['--test', 'test/unit/**/*.test.ts'], join(REPO, 'app'))
+  !IN_CONTAINER && existsSync(join(REPO, 'frontends', 'app', 'node_modules'))
+    ? tests('app unit', ['--test', 'test/unit/**/*.test.ts'], join(REPO, 'frontends', 'app'))
     : Promise.resolve(true);
 
 // The app is one HTML file whose inline script is the whole app: a syntax error there is a blank screen. Parsing it
@@ -186,7 +186,7 @@ export async function buildAppFromSources(sources = APP_SOURCES, out = APP_WEB) 
   const current = existsSync(root) && readFileSync(root).equals(page);
   const took = `${Date.now() - started} ms`;
   if (current) log('app', `built app ${version} from the source files (${took}); the root index.html is the same build`, 'ok');
-  else log('app', `built app ${version} from the source files (${took}); the root index.html is not this build yet: cd app && npm run build:index`, 'warn');
+  else log('app', `built app ${version} from the source files (${took}); the root index.html is not this build yet: cd frontends/app && npm run build:index`, 'warn');
   return true;
 }
 
@@ -461,7 +461,7 @@ async function main() {
   }
 
   if (await healthy(60_000)) log('server', `up on :${PORT}`, 'ok');
-  if (IN_CONTAINER) log('tests', "app unit tests: on the Mac only, they need app/'s own node_modules (cd app && npm run test:unit)", 'dim');
+  if (IN_CONTAINER) log('tests', "app unit tests: on the Mac only, they need frontends/app/'s own node_modules (cd frontends/app && npm run test:unit)", 'dim');
 }
 
 async function stop() {

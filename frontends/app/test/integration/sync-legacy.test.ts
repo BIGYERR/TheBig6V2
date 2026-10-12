@@ -10,7 +10,7 @@ import { Script } from 'node:vm';
 import { render, split } from '../../scripts/sync-legacy.mjs';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const SOURCE = join(APP, '..', 'index.html');
+const SOURCE = join(APP, '..', '..', 'index.html');
 const html = readFileSync(SOURCE, 'utf8');
 
 describe('sync-legacy on the live index.html', () => {

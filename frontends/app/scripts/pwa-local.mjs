@@ -2,7 +2,7 @@
 // The pwa-local build path: the same web build as pwa-pages (scripts/pwa-pages.mjs), served from this Mac instead of
 // GitHub Pages. Nothing is committed or pushed.
 //
-//   npm run pwa-local                    sync from ../index.html, build into dist/pwa-local/, check it, serve it
+//   npm run pwa-local                    sync from ../../index.html, build into dist/pwa-local/, check it, serve it
 //   npm run pwa-local -- --port 4401     pick the port (default: PWA_LOCAL_PORT or 4400)
 //   npm run pwa-local -- --no-build      serve the last build as it is (still refused if it is stale)
 //
@@ -26,11 +26,11 @@ import { createServer } from 'node:http';
 import { hostname, networkInterfaces } from 'node:os';
 import { dirname, extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { attachRun, duration, startRun } from '../../tools/runlog.mjs';
+import { attachRun, duration, startRun } from '../../../tools/runlog.mjs';
 import { checkPwaBuild } from './pwa-check.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const REPO = resolve(APP, '..');
+const REPO = resolve(APP, '..', '..');
 const OUT = join(APP, 'dist', 'pwa-local');
 const BASE_HREF = '/';
 

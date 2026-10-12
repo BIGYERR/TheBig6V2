@@ -8,9 +8,9 @@
 //   tests    the feature tests (tests/unit, tests/integration, against tests/snapshots; CLAUDE.md Test layout) by
 //            Vitest, beside the strict TypeScript type check of core/ and tests/ (tests/sweeps is type-checked here and
 //            run in CI only). tests/node_modules is installed (npm ci) when it is missing.
-//   build    index.html is the build of app/src/legacy/src (app/scripts/build-index.mjs), its ia-version meta reads
+//   build    index.html is the build of frontends/app/src/legacy/src (frontends/app/scripts/build-index.mjs), its ia-version meta reads
 //            as a version, its inline script compiles, and it boots in the harness and builds HALF_MANNY, self-stable.
-//   app      app/: sync from index.html, type check, unit and integration tests, lint.
+//   app      frontends/app/: sync from index.html, type check, unit and integration tests, lint.
 //   backend  backend/: type checks, tests, lint.
 //
 //   node tools/check.mjs              every lane
@@ -55,16 +55,16 @@ const FEATURE_TEST_DIRS = ['unit', 'integration'];
 const TESTS = join(REPO, 'tests');
 const want = {
   tests: touches(/^(index\.html|core\/|tests\/harness\.js$|tests\/semver\.js$|tests\/lattice193\.js$)/) || touches(FEATURE_TESTS),
-  // index.html is generated from app/src/legacy/src (app/scripts/build-index.mjs); the two must never drift.
-  build: touches(/^(index\.html|app\/src\/legacy\/src\/|app\/scripts\/build-index\.mjs$|tests\/harness\.js$)/),
-  app: touches(/^(app\/|tools\/|index\.html)/),
+  // index.html is generated from frontends/app/src/legacy/src (frontends/app/scripts/build-index.mjs); the two must never drift.
+  build: touches(/^(index\.html|frontends\/app\/src\/legacy\/src\/|frontends\/app\/scripts\/build-index\.mjs$|tests\/harness\.js$)/),
+  app: touches(/^(frontends\/app\/|tools\/|index\.html)/),
   backend: touches(/^backend\//),
 };
 
 if (LIST) {
   console.log(`check: limit ${LIMIT_S} s; ${STAGED ? `staged files: ${paths?.length ?? 0}` : 'everything'}`);
   console.log(`  tests   ${want.tests ? `type check (core, tests), vitest run ${FEATURE_TEST_DIRS.join(' ')} (in tests/)` : 'not touched'}`);
-  console.log(`  build   ${want.build ? 'index.html is the build of app/src/legacy/src; its version, inline script and boot' : 'not touched'}`);
+  console.log(`  build   ${want.build ? 'index.html is the build of frontends/app/src/legacy/src; its version, inline script and boot' : 'not touched'}`);
   console.log(`  app     ${want.app ? 'sync, typecheck, unit, integration, lint' : 'not touched'}`);
   console.log(`  backend ${want.backend ? 'typecheck, test, lint' : 'not touched'}`);
   process.exit(0);
@@ -160,7 +160,7 @@ async function testsLane() {
 }
 
 /**
- * The root index.html: it is, byte for byte, the build of the source files under app/src/legacy/src; its ia-version
+ * The root index.html: it is, byte for byte, the build of the source files under frontends/app/src/legacy/src; its ia-version
  * meta reads as a version; its inline script compiles; and it boots in the harness and builds HALF_MANNY, self-stable.
  */
 async function buildLane() {
@@ -176,16 +176,16 @@ async function buildLane() {
       failures.push(`build: index.html ia-version "${version}" is not a version (${err.message})`);
     }
   }
-  if (!(await step('build', 'index.html is the build of app/src/legacy/src', process.execPath, ['app/scripts/build-index.mjs', '--check'], REPO))) return;
+  if (!(await step('build', 'index.html is the build of frontends/app/src/legacy/src', process.execPath, ['frontends/app/scripts/build-index.mjs', '--check'], REPO))) return;
   const syntax = `const {extractInlineJS}=require(${JSON.stringify(join(REPO, 'tests', 'harness'))});new (require('vm').Script)(extractInlineJS(require('fs').readFileSync(${JSON.stringify(join(REPO, 'index.html'))},'utf8')))`;
   if (!(await step('build', 'inline script compiles', process.execPath, ['-e', syntax], REPO))) return;
   await step('build', 'boots and builds HALF_MANNY, self-stable', process.execPath, ['tests/harness.js', 'index.html'], REPO);
 }
 
 async function appLane() {
-  const app = join(REPO, 'app');
+  const app = join(REPO, 'frontends', 'app');
   if (!existsSync(join(app, 'node_modules'))) {
-    failures.push('app: app/node_modules is missing; run npm ci in app/');
+    failures.push('app: frontends/app/node_modules is missing; run npm ci in frontends/app/');
     return;
   }
   const bin = (name) => join(app, 'node_modules', '.bin', name);

@@ -10,15 +10,15 @@
 //   npm run xcode-ios                           open the native project in Xcode
 //   add --no-web to skip the Angular build and reuse www/ as it is
 //
-// Build products go to ~/Library/Caches/iron-asylum-ios (IOS_BUILD_DIR to change it), never into the repo:
-// this repo lives in an iCloud-synced folder, and iCloud stamps Finder metadata onto a fresh .app, which codesign
-// refuses ("resource fork, Finder information, or similar detritus not allowed").
+// Build products go to ~/Library/Caches/iron-asylum-ios (IOS_BUILD_DIR to change it), never into the repo: when the
+// repo lived in iCloud-synced ~/Desktop, iCloud stamped Finder metadata onto a fresh .app, which codesign refused
+// ("resource fork, Finder information, or similar detritus not allowed"). It lives in ~/Developer now; the builds stay out.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { attachRun } from '../../tools/runlog.mjs';
+import { attachRun } from '../../../tools/runlog.mjs';
 import { canonical, withNativeVersion } from './version.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -178,8 +178,25 @@ function simulator() {
   run('open', ['-a', 'Simulator', '--args', '-CurrentDeviceUDID', sim.udid]);
   run('xcrun', ['simctl', 'bootstatus', sim.udid, '-b']);
   run('xcrun', ['simctl', 'install', sim.udid, app]);
-  run('xcrun', ['simctl', 'launch', sim.udid, bundleId]);
+  launchOnSimulator(sim, bundleId);
   console.log(`\nios: The Asylum ${version} is running on ${sim.name}.`);
+}
+
+/**
+ * Launches the installed app. A simulator this script has just cold-booted can still be settling after bootstatus
+ * says it is ready, and then it may never start the app: on 2026-10-12 the launch failed ("did not return a process
+ * handle nor launch error"), the splash screen service timed out, and taps on the icon a minute later hung on the
+ * same stuck boot, while a fresh boot launched the same build in under a second. So a failed launch restarts the
+ * simulator once (the install survives a restart) and tries again.
+ */
+function launchOnSimulator(sim, bundleId) {
+  const launch = () => spawnSync('xcrun', ['simctl', 'launch', sim.udid, bundleId], { cwd: APP, stdio: 'inherit' }).status === 0;
+  if (launch()) return;
+  step(`the app did not start on ${sim.name}; restarting the simulator and launching once more`);
+  run('xcrun', ['simctl', 'shutdown', sim.udid]);
+  run('xcrun', ['simctl', 'boot', sim.udid]);
+  run('xcrun', ['simctl', 'bootstatus', sim.udid, '-b']);
+  if (!launch()) fail(`installed on ${sim.name}, but it did not start, twice, the second time after a restart (see above).`);
 }
 
 // ---------------------------------------------------------------------------------------------------- device

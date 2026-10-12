@@ -8,7 +8,7 @@ import { BACKEND_DIR } from './paths.ts';
 
 const PKG = JSON.parse(readFileSync(join(BACKEND_DIR, 'package.json'), 'utf8')) as { version: string };
 
-// The GitHub Pages app, the Cordova iOS app (app://localhost, see app/config.xml), and local dev servers.
+// The GitHub Pages app, the Cordova iOS app (app://localhost, see frontends/app/config.xml), and local dev servers.
 const DEFAULT_ORIGINS = 'https://bigyerr.github.io,app://localhost,http://localhost:*,http://127.0.0.1:*';
 
 export type Env = Record<string, string | undefined>;

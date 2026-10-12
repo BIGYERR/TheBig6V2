@@ -12,14 +12,14 @@ a ruling says so, and Mario's data on his phone (the `ia_` localStorage keys) su
   lines) holding the whole app: 608 top-level functions, 154 top-level `let`/`const`/`var`, and 183 inline event handlers
   (`onclick="fn()"` in the static markup and in HTML built as strings) that call those functions as globals.
 - **Nothing is compiled into it.** The Angular app in `app/` is generated FROM it: `npm run sync` splits the root file byte
-  for byte into four pieces (`app/src/legacy/generated/index.html`, `legacy.css`, `legacy-markup.ts`, `public/legacy/app.js`),
+  for byte into four pieces (`frontends/app/src/legacy/generated/index.html`, `legacy.css`, `legacy-markup.ts`, `public/legacy/app.js`),
   and Angular 22 (`@angular/build:application`) wraps them: `LegacyHost` mounts the markup and loads `app.js` as a classic
   script so its functions stay global; `LegacyBridge` is the seam for moving screens into Angular, unused so far. The only
   real Angular code is `app.ts`, `app.config.ts`, `core/platform.ts`, `legacy-host.ts`, `legacy-bridge.ts`.
 - Who consumes the file today:
   - GitHub Pages serves the root `index.html` directly (Pages source: "legacy", branch `main`, path `/`).
-  - The native iOS app: Angular build of the split pieces, Cordova 13 / cordova-ios 8 (`app/scripts/ios.mjs`).
-  - `pwa-local` / `pwa-pages` builds (`app/scripts/pwa-*.mjs`).
+  - The native iOS app: Angular build of the split pieces, Cordova 13 / cordova-ios 8 (`frontends/app/scripts/ios.mjs`).
+  - `pwa-local` / `pwa-pages` builds (`frontends/app/scripts/pwa-*.mjs`).
   - The backend: `backend/scripts/app-bundle.ts` copies the root file into `app-web/` for `/app/` (dev container, Heroku).
   - Tests: `tests/harness.js` pulls the inline script out and runs it in a Node VM with DOM stubs; the legacy gates and the
     new feature tests (`tests/support/app.js`) both go through it.
@@ -68,26 +68,31 @@ core/                      @ia/core: framework-free TypeScript, the engine and t
                            interface with a localStorage adapter (app) and an in-memory adapter (tests)
     format/                pace, clock, units, dates, the version label
     version.ts             the one place the release version lives; the build writes it into <meta name="ia-version">
-app/                       the Angular workspace: the only UI source
-  src/app/
-    shell/                 app component, tab bar, routing, toasts
-    screens/<screen>/      one folder per screen: <screen>.ts, <screen>.html, <screen>.css
-    components/            shared UI: wheels, sheets, charts, cards (design-system tokens in styles)
-    services/              Angular services wrapping @ia/core (ProgramService, LogService, OverlayService, ...)
-    platform/              native bridge, iOS island, update check
-    legacy/                classic-script code not yet moved to a screen; shrinks to nothing
-  public/                  icon, manifest, static assets
-tests/                     the full TypeScript suite (section 2.3)
-app/e2e/                   journeys and the collage (website, admin, app)
-backend/                   imports @ia/core types (app version, heartbeat) instead of its own copies
+backend/                   the Node server (API, heartbeat, admin API) that serves the frontends' builds; imports
+                           @ia/core types (app version, heartbeat) instead of its own copies
+frontends/                 every UI, each built by Angular
+  common/                  what more than one frontend uses: design-system tokens, the icon set, shared components
+  app/                     the athlete's app, and the Cordova project root (config.xml, www/, platforms/)
+    src/app/
+      shell/               app component, tab bar, routing, toasts
+      screens/<screen>/    one folder per screen: <screen>.ts, <screen>.html, <screen>.css
+      components/          shared UI: wheels, sheets, charts, cards (design-system tokens in styles)
+      services/            Angular services wrapping @ia/core (ProgramService, LogService, OverlayService, ...)
+      platform/            native bridge, iOS island, update check
+      legacy/              classic-script code not yet moved to a screen; shrinks to nothing
+    public/                icon, manifest, static assets
+  website/                 the public site, served at /
+  admin/                   the admin dashboard, served at /admin/
+tests/                     the full TypeScript suite (section 2.3), and the e2e journeys and collage (website, admin,
+                           app) in tests/e2e/
 ```
 
-`core/` sits at the repo root because three consumers import it: the app, the tests and the backend. Each takes it as a
+`core/` sits at the repo root because three consumers import it: the frontends, the tests and the backend. Each takes it as a
 local package (`"@ia/core": "file:../core"`), and TypeScript project references build it once.
 
 ### 2.2 What the build produces (Angular application builder, esbuild)
 
-One build, `ng build`, writes `app/dist/web/browser/`:
+One build, `ng build`, writes `frontends/app/dist/web/browser/`:
 
 ```
 index.html             small: <meta name="ia-version" content="0.N.M"> (written from core/src/version.ts), the
@@ -102,9 +107,9 @@ Every consumer uses that same output:
 | Consumer | How |
 |---|---|
 | GitHub Pages | A pipeline job uploads `dist/web/browser` (`actions/upload-pages-artifact`, `actions/deploy-pages`) on every merge to `main`. The Pages source switches from "branch `main`, `/`" to "GitHub Actions". `<base href="/TheBig6V2/">`. |
-| iOS (Cordova) | The same build with `<base href="./">` goes into `app/www`, then `cordova build ios` (as `ios.mjs` does now with the legacy pieces). |
+| iOS (Cordova) | The same build with `<base href="./">` goes into `frontends/app/www`, then `cordova build ios` (as `ios.mjs` does now with the legacy pieces). |
 | Backend `/app/` | `app-bundle.ts` copies the build folder instead of one file (dev container and Heroku). |
-| Dev | The dev container watches `app/src` and `core/src` and rebuilds; pages reload as they do now. |
+| Dev | The dev container watches `frontends/app/src` and `core/src` and rebuilds; pages reload as they do now. |
 | Update check | Unchanged in spirit: the running app knows its version, re-fetches `index.html` with `no-store` and reads the meta. Hashed file names make every other file cache-safe. Still no service worker. |
 
 **Recommended: multi-file output.** A single self-contained `index.html` (everything inlined after the build) is possible
@@ -119,8 +124,8 @@ chunks that changed.
 - `tests/sweeps/<feature>.test.ts`: lattices and fuzz over many programs; CI only.
 - `tests/snapshots/<feature>.json`: golden program output, regenerated on purpose only.
 - `tests/support/`: typed fixtures (HALF_MANNY and the lattice configs as `Cfg` values), builders, the storage adapter,
-  DOM helpers. Shared with `app/e2e` where useful.
-- `app/e2e/`: unchanged role (journeys, parity, collage).
+  DOM helpers. Shared with `frontends/app/e2e` where useful.
+- `frontends/app/e2e/`: unchanged role (journeys, parity, collage).
 - One runner for every TypeScript test (section 4, decision 3), `tsc -b` type-checking everything in the 60-second check
   and in CI, and the feature names already in place (`docs/test-migration.md`) carried over unchanged.
 - `tests/harness.js` and its VM retire at the end of phase D, when nothing reads the inline script any more.
@@ -144,7 +149,7 @@ Releases keep shipping between phases.
   types. It holds:
   - `src/version.ts`: `VERSION = '0.239.1'`. `tests/unit/semver.test.ts` holds it equal to `index.html`'s meta until
     the build writes the meta from it (phase B builds `index.html` from the sources, and the meta is still written by
-    hand in `app/src/legacy/src/html/head.html`), so a release writes both.
+    hand in `frontends/app/src/legacy/src/html/head.html`), so a release writes both.
   - `src/format/version-label.ts`: `versionLabel`, the rules of the app's `iaVersionLabel`.
   - `src/semver.ts`: `tests/semver.js` in TypeScript (`parse`, `cmp`, `lookup`, `fromHtml`, `str`, `bump`, `below`,
     `tag`, `SemVer`), exported as `semver`; `tests/semver.js` stays for the frozen legacy tools, and a test holds the two
@@ -169,7 +174,7 @@ Releases keep shipping between phases.
   they first need a shared type (phase D, or the backend's version handling).
 
 ### Phase B: split the script into source files, byte-identical (done, Post-v0.239.1)
-- Cut the inline script into about 25 classic-script files under `app/src/legacy/src/`, one per area in section 1 (the
+- Cut the inline script into about 25 classic-script files under `frontends/app/src/legacy/src/`, one per area in section 1 (the
   final cut lines are chosen at function boundaries by a measure pass), the `<style>` block into CSS files, and the markup
   into HTML partials.
 - A build script reassembles them in order. Its output must be **byte-identical** to today's `index.html`, which stays
@@ -179,19 +184,19 @@ Releases keep shipping between phases.
 - **Done when:** the rebuilt file is byte-identical; every test, gate and e2e parity run is unchanged.
 
 **Done (Post-v0.239.1).** The root `index.html` (v0.239.1, 1,341,606 bytes, sha256 `2c9bfd96…9406531ea`) is now the
-build of 49 source files under `app/src/legacy/src/`, byte for byte, and the file itself did not change.
-- **How it is built.** `app/scripts/build-index.mjs` joins the files `order.json` lists, in that order, with nothing
-  between them (`cd app && npm run build:index`). `npm run build:index:check` rebuilds into a temp file and fails,
+build of 49 source files under `frontends/app/src/legacy/src/`, byte for byte, and the file itself did not change.
+- **How it is built.** `frontends/app/scripts/build-index.mjs` joins the files `order.json` lists, in that order, with nothing
+  between them (`cd frontends/app && npm run build:index`). `npm run build:index:check` rebuilds into a temp file and fails,
   naming the first differing byte and the source file it comes from, unless it equals the root file. It runs in the
-  60-second check (`tools/check.mjs`, when `index.html` or anything under `app/src/legacy/src/` is staged, and in the
-  full check), in CI (the gate suite job's first step), and in `app/test/integration/build-index.test.ts`.
+  60-second check (`tools/check.mjs`, when `index.html` or anything under `frontends/app/src/legacy/src/` is staged, and in the
+  full check), in CI (the gate suite job's first step), and in `frontends/app/test/integration/build-index.test.ts`.
 - **How code is edited from now on.** In the source files, never the root `index.html`; then `npm run build:index`,
   and both are committed together. The dev container builds `/app/` from the sources on every save, into
   `backend/app-web/` only (it never writes the repo). `npm run sync` still splits the root file, which is the same bytes.
 - **The cuts are the measure's,** taken from `tests/measure/architecture_split_cutpoints.js` and never cut by hand. Six
   of the seven merges below were applied. **bug-report-init into update-check was not:** the two are not adjacent
   (popups and streaks-reminders sit between them), so merging them would reorder code. That leaves 35 JS files, not 34.
-- **The files, in build order** (what each holds: `app/src/legacy/src/README.md`):
+- **The files, in build order** (what each holds: `frontends/app/src/legacy/src/README.md`):
   - `html/head.html`;
   - CSS: `base`, `shell`, `wizard`, `week-view`, `detail-sheet`, `overlays-components`, `this-week`, `session-sheet`,
     `motion`;
@@ -235,6 +240,24 @@ build of 49 source files under `app/src/legacy/src/`, byte for byte, and the fil
 - So phase C starts with a measure of the engine subgraph. The engine files likely form an acyclic set that can become
   real modules first, while the UI files stay together in one legacy module until phase E takes them apart screen by screen.
 
+### Folder layout: core, backend, frontends, tests (Post-v0.239.1; in progress)
+Mario, Post-v0.239.1: "top level core/backends/frontends and app is just 1 of the frontends now... frontends->app+website".
+The order he agreed: test-migration phases 2 and 3, then this layout, then phase C. Each step moves files and repoints
+paths only, and is proved by identical outputs: `index.html` byte for byte, the app's build hashed before and after,
+the website and admin builds hashed before and after, the iOS build, the e2e collage, the backend's tests and the
+Heroku tree.
+1. **`app/` to `frontends/app/`** (done). The whole Angular and Cordova project moved as one folder, its
+   `node_modules`, `platforms/` and `plugins/` with it; every path that climbs out of it gained a level. The app's
+   build (`www/`, 6 files) and the generated legacy pieces (4 files) hash the same before and after.
+2. **The website and the admin to `frontends/website/` and `frontends/admin/`**, out of `backend/`. They become an
+   Angular workspace of their own at `frontends/` (its `package.json` and `angular.json`), so `backend/` holds the
+   server only. The backend's Docker image builds them from the repo root, and Heroku's tree carries them.
+3. **`frontends/common/`**: the design-system tokens and anything else two frontends already duplicate.
+4. **The e2e to `tests/e2e/`**: it drives all three frontends, so it lives with the tests.
+The app joins the `frontends/` workspace later (phase E), when its screens start importing `frontends/common/`; until
+then it stays its own package, because Cordova keeps its platform and plugin list in the project root's
+`package.json`.
+
 ### Phase C: ES modules with an explicit global surface (2 to 4 sessions)
 - **Prerequisite (met, Post-v0.239.1):** the legacy gates are retired (test-migration phase 3, `830af1e`), because they
   reached into VM globals that this phase removes. The feature tests are the safety net from here.
@@ -272,7 +295,7 @@ build of 49 source files under `app/src/legacy/src/`, byte for byte, and the fil
   6. wizard;
   7. programs and overlays;
   8. progress and charts.
-- **Done when:** `app/src/app/legacy/` is empty and `globals.ts` is gone.
+- **Done when:** `frontends/app/src/app/legacy/` is empty and `globals.ts` is gone.
 
 ### Phase F: delivery from the build (about 1 session; right after phase C)
 - Pages deploys the build output through GitHub Actions; Cordova and the backend take the same output.
@@ -311,7 +334,7 @@ build of 49 source files under `app/src/legacy/src/`, byte for byte, and the fil
 - **Test migration phases 2 and 3 are done** (Post-v0.239.1): every gate row is held by a feature test or dropped for a
   written reason, and the legacy suite is deleted (`830af1e`), so phase C may start. 64 ported test files still carry
   `@ts-nocheck` (`docs/test-migration.md`, Typing debt).
-- **Releases** continue between phases. From phase B on, builder edits `app/src/legacy/src/*`, never the root
+- **Releases** continue between phases. From phase B on, builder edits `frontends/app/src/legacy/src/*`, never the root
   `index.html`; from phase D on it edits TypeScript.
 - **Process docs** (CLAUDE.md, the agent files, the skills) are updated at the end of each phase to say where code lives
   and how it is built.

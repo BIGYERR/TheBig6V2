@@ -76,7 +76,7 @@ describe('version: metaVersion', () => {
   });
 
   it('reads the live index.html: a legacy integer or a dotted M.m.p, as written', () => {
-    const html = readFileSync(join(APP, '..', 'index.html'), 'utf8');
+    const html = readFileSync(join(APP, '..', '..', 'index.html'), 'utf8');
     const meta = /<meta name="ia-version" content="([^"]*)"/.exec(html);
     assert.ok(meta, 'index.html carries an ia-version meta');
     assert.match(meta[1]!, /^(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))?$/);
@@ -126,7 +126,7 @@ describe('version: native (config.xml)', () => {
 });
 
 describe('version: one rule with tests/semver.js', () => {
-  const SV = createRequire(import.meta.url)(join(APP, '..', 'tests', 'semver.js')) as { str(v: string): string; tag(v: unknown): string };
+  const SV = createRequire(import.meta.url)(join(APP, '..', '..', 'tests', 'semver.js')) as { str(v: string): string; tag(v: unknown): string };
 
   it('accepts and refuses the same texts, and gives the same canonical M.m.p', () => {
     for (const text of [...ACCEPTS.map(([t]) => t), ...REJECTS]) {

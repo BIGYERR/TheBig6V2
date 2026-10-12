@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { JOURNEYS } from '../../e2e/flow.ts';
 import { DESKTOP, EXPECTED_STATUS, PAGE_JOURNEYS, PHONE } from '../../e2e/pages.ts';
 
-const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 
 const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
