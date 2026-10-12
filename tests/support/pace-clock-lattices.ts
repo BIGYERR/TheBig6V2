@@ -13,6 +13,7 @@
 //   * the experience defaults 690/570/450 s/mi (V176, D9), the planning rate {beginner 3, intermediate 3, advanced 2}
 //     s/mi/wk (D187, Mario's T1 ruling) scaled by age {18-35 1.0, 36-54 0.85, 55+ 0.65} (D101), and 0.621 mi per km.
 import assert from 'node:assert/strict';
+import { test } from 'vitest';
 import type { Program } from '@ia/core';
 import type { App } from './app.ts';
 import { clone, runSessions } from './pace-clock.ts';
@@ -167,7 +168,7 @@ const SI = /Short Interval \(SI\)/;
 const tag = (r: AnchorRow): string => `${r.exp}/${r.age}/${r.unit} mile ${r.mb.join(':')} goal ${r.goal['targetDist']}${r.unit} ${r.goal['targetMins']}:${r.goal['targetSecs']}`;
 
 /** The pace clock's anchor, target and rate over a lattice (D100 amended, D101, D187, E7, E12). `label` names the lattice. */
-export function anchorLatticeTests(IA: App, label: string, lattice: AnchorLattice): LatticeTest[] {
+function anchorLatticeCases(IA: App, label: string, lattice: AnchorLattice): LatticeTest[] {
   let rows: AnchorRow[] | undefined;
   const all = (): AnchorRow[] => rows || (rows = anchorRows(IA, lattice));
   return [
@@ -290,7 +291,7 @@ export interface AppendixLattice {
  * gap clears the rate), so all three classes are reached. Every cfg is built with no shift and with a two week shift
  * on every week.
  */
-export function appendixLatticeTests(IA: App, label: string, lattice: AppendixLattice): LatticeTest[] {
+function appendixLatticeCases(IA: App, label: string, lattice: AppendixLattice): LatticeTest[] {
   return [
     [`${label}: an injury pace shift appends the PACE CLOCK sentence once, as the tail, to every interval note in every class; no shift, no sentence`, () => {
       const cfgs: Record<string, any>[] = [];
@@ -373,7 +374,7 @@ const clk = (s: number): string => {
 };
 
 /** D188's engine reads over `seeds` (the sweep runs 20 seeds, 1000 + 37 i; a sample runs a few). */
-export function beginnerMileLatticeTests(IA: App, progDigest: (p: any) => string, label: string, seeds: number[]): LatticeTest[] {
+function beginnerMileLatticeCases(IA: App, progDigest: (p: any) => string, label: string, seeds: number[]): LatticeTest[] {
   const build = (cfg: Record<string, any>) => IA.buildProgram(clone(cfg));
   const out: LatticeTest[] = [];
   for (const goal of ['run_5k', 'run_half']) {
@@ -465,7 +466,7 @@ function firstPaced(prog: any): { d: string; c: any } | null {
 }
 
 /** D189 S1 over `seeds` x `rests` (the sweep: 20 seeds x 2 rest patterns, 640 no-mile cells and 720 mile cells). */
-export function disclosureLatticeTests(IA: App, label: string, seeds: number[], rests: string[][], counts?: { noMile: number; mile: number }): LatticeTest[] {
+function disclosureLatticeCases(IA: App, label: string, seeds: number[], rests: string[][], counts?: { noMile: number; mile: number }): LatticeTest[] {
   const build = (cfg: Record<string, any>) => IA.buildProgram(clone(cfg));
   return [
     [`${label}: every no-mile program carries the default sentence once, appended to week 1's first paced run card (intermediate and advanced pace goals are refused first)`, () => {
@@ -557,7 +558,7 @@ export interface TierLattice {
   seeds: number[];
 }
 /** `need` lists the tiers the lattice must reach. */
-export function longRunTierLatticeTests(IA: App, label: string, lattice: TierLattice, need?: ('A' | 'B' | 'C')[]): LatticeTest[] {
+function longRunTierLatticeCases(IA: App, label: string, lattice: TierLattice, need?: ('A' | 'B' | 'C')[]): LatticeTest[] {
   return [
     [`${label}: every long run's tier worked out from its minutes is the tier printed on its day, and each tier holds its content rules`, () => {
       const seen = { A: 0, B: 0, C: 0 };
@@ -600,3 +601,18 @@ export function longRunTierLatticeTests(IA: App, label: string, lattice: TierLat
     }],
   ];
 }
+
+// Each lattice registers its cases as Vitest tests where it is called (as the node:test original did), and returns
+// them too. A caller never registers them a second time.
+function registered<A extends unknown[]>(cases: (...args: A) => LatticeTest[]): (...args: A) => LatticeTest[] {
+  return (...args: A) => {
+    const list = cases(...args);
+    for (const [name, body] of list) test(name, body);
+    return list;
+  };
+}
+export const anchorLatticeTests = registered(anchorLatticeCases);
+export const appendixLatticeTests = registered(appendixLatticeCases);
+export const beginnerMileLatticeTests = registered(beginnerMileLatticeCases);
+export const disclosureLatticeTests = registered(disclosureLatticeCases);
+export const longRunTierLatticeTests = registered(longRunTierLatticeCases);
