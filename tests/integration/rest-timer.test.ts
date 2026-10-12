@@ -1,11 +1,10 @@
-'use strict';
 // The floating rest timer: dragging the tab and the card (_rtWireDrag, wired by _rtInit), and the rest stopwatch with
 // its mirror on the iPhone island in the native app. Rulings: docs/decisions/rest-timer.md (D235: a tap never strands
 // the timer, a cancelled drag docks to an edge); the handoff §11f and tests/measure/v239_rulings/v239_ruling_d233.md
 // (D233 P-ISLAND: inside the native app the clock is the wall clock and the island is told every seam; on the PWA the
 // clock is performance.now and nothing is called).
 //
-// Dragging. The app boots in the VM harness with a document that keeps its elements (tests/support/app.js
+// Dragging. The app boots in the VM harness with a document that keeps its elements (tests/support/app.ts
 // loadApp({dom:true})). The real _rtInit wires the real handlers onto stubs that keep every listener and run it; the
 // test fires pointer events at them and reads every write to the anchor's style.
 // Oracle: hand geometry, typed here and checked below, never the app's own handler. The frame (#restFloat) is 375 px
@@ -13,15 +12,15 @@
 // top. The anchor's offsetLeft follows its style as a browser lays it out: a px left reads as written, left '0' reads
 // 0, right '0' reads 375 - 40 = 335.
 //
-// The stopwatch and the island. The rig in tests/support/rest-timer.js boots the app with two fake clocks the test
+// The stopwatch and the island. The rig in tests/support/rest-timer.ts boots the app with two fake clocks the test
 // moves by hand, Date and performance.now, by different amounts at every step, so the clock the stopwatch follows is
 // read off its value. A stub plugin (window.iaIsland) logs every run, stop and end. Oracle: hand values, typed below and
 // checked: 92340 ms shows 1:32 and .34, 93340 ms shows 1:33, 0 shows 0:00; the start epoch is the rig's own wall clock
 // at the tap (10:00 local on the day under test, by date arithmetic).
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp } = require('../support/app.js');
-const { islandStub, loadWithIsland, stopwatchRig } = require('../support/rest-timer.js');
+import assert from 'node:assert/strict';
+import { test } from 'vitest';
+import { loadApp } from '../support/app.ts';
+import { islandStub, loadWithIsland, stopwatchRig } from '../support/rest-timer.ts';
 
 const FRAME_W = 375;
 const INNER_H = 852;
@@ -40,7 +39,7 @@ const A = { top: '310px', left: '80px' };
 const B = { top: '305px', left: '280px' };
 
 test('the hand geometry is self-consistent', () => {
-  const clamp = (lo, hi, v) => Math.max(lo, Math.min(hi, v));
+  const clamp = (lo: number, hi: number, v: number) => Math.max(lo, Math.min(hi, v));
   const maxTop = INNER_H - ANCHOR_H - 8;
   const maxLeft = FRAME_W - ANCHOR_W;
   assert.equal(maxTop, 784);
@@ -56,39 +55,62 @@ test('the hand geometry is self-consistent', () => {
 // ── stubs ───────────────────────────────────────────────────────────────────────────────────────────────────────────
 const classList = () => ({ add() {}, remove() {}, toggle() {}, contains: () => false });
 
+/** A pointer event as the drag handlers read it. */
+interface PointerEvt {
+  type: string;
+  clientX: number;
+  clientY: number;
+  pointerId: number;
+  cancelable: boolean;
+  preventDefault(): void;
+  target: { closest(): null };
+  currentTarget: Handle;
+}
+type PointerListener = (this: Handle, e: PointerEvt) => void;
+
 /** A drag handle (#rtTab or #rtCard) that keeps every listener so the test can run it. */
-function handle(id) {
-  const listeners = {};
+interface Handle {
+  id: string;
+  listeners: Record<string, PointerListener[]>;
+  [other: string]: unknown;
+}
+
+/** A drag handle (#rtTab or #rtCard) that keeps every listener so the test can run it. */
+function handle(id: string): Handle {
+  const listeners: Record<string, PointerListener[]> = {};
   return {
     id, style: {}, dataset: {}, innerHTML: '', textContent: '', listeners, classList: classList(),
-    addEventListener(type, fn) {
-      if (typeof fn === 'function') (listeners[type] = listeners[type] || []).push(fn);
+    addEventListener(type: string, fn: unknown) {
+      if (typeof fn === 'function') (listeners[type] = listeners[type] || []).push(fn as PointerListener);
     },
     removeEventListener() {}, setPointerCapture() {}, releasePointerCapture() {},
     querySelector: () => null, closest: () => null,
   };
 }
 
+/** The anchor's style as written: top, left, right and transition. */
+type AnchorStyle = Record<string, string | undefined>;
+
 /** #rtAnchor: logs every style write, and lays out offsetTop and offsetLeft the way a browser would. */
 function anchor() {
-  const raw = {};
-  const log = [];
+  const raw: AnchorStyle = {};
+  const log: [string, string][] = [];
   const style = new Proxy(raw, {
     set(o, k, v) {
       log.push([String(k), String(v)]);
-      o[k] = v;
+      o[k as string] = v;
       return true;
     },
   });
   return {
     id: 'rtAnchor', style, raw, log, offsetWidth: ANCHOR_W, offsetHeight: ANCHOR_H, classList: classList(),
     get offsetTop() {
-      return /px$/.test(raw.top || '') ? parseFloat(raw.top) : TOP0;
+      return /px$/.test(raw['top'] || '') ? parseFloat(raw['top'] as string) : TOP0;
     },
     get offsetLeft() {
-      if (/px$/.test(raw.left || '')) return parseFloat(raw.left);
-      if (raw.left === '0') return 0;
-      return raw.right === '0' ? FRAME_W - ANCHOR_W : 0;
+      if (/px$/.test(raw['left'] || '')) return parseFloat(raw['left'] as string);
+      if (raw['left'] === '0') return 0;
+      return raw['right'] === '0' ? FRAME_W - ANCHOR_W : 0;
     },
     addEventListener() {}, removeEventListener() {},
     getBoundingClientRect: () => ({ top: 0, left: 0, width: ANCHOR_W, height: ANCHOR_H, right: ANCHOR_W, bottom: ANCHOR_H }),
@@ -104,8 +126,8 @@ function frame() {
 }
 
 /** Runs every listener of `type` on handle `h` with a pointer event at (x, y); returns how many ran. */
-function fire(h, type, x, y) {
-  const e = {
+function fire(h: Handle, type: string, x: number, y: number): number {
+  const e: PointerEvt = {
     type, clientX: x, clientY: y, pointerId: 1, cancelable: true, preventDefault() {},
     target: { closest: () => null }, currentTarget: h,
   };
@@ -124,21 +146,21 @@ function timer() {
   const card = handle('rtCard');
   const a = anchor();
   Object.assign(IA.els, { rtTab: tab, rtCard: card, rtAnchor: a, restFloat: frame() });
-  IA.ctx.innerHeight = INNER_H;
-  IA.docListeners.touchmove = [];
+  IA.ctx['innerHeight'] = INNER_H;
+  IA.docListeners['touchmove'] = [];
   IA.eval("_rtInited=false;_rtSide='right';_rtExpanded=false;_rtIntroTO=null;_rtDragging=false;_rtInit();");
   for (const h of [tab, card]) {
     for (const type of ['pointerdown', 'pointermove', 'pointerup', 'pointercancel']) {
       assert.equal((h.listeners[type] || []).length, 1, `${h.id} has one ${type} listener`);
     }
   }
-  assert.equal(IA.docListeners.touchmove.length, 1, 'the touchmove guard is registered once');
+  assert.equal(IA.docListeners['touchmove'].length, 1, 'the touchmove guard is registered once');
   return {
     tab, card, anchor: a,
-    state: () => ({ top: a.raw.top, left: a.raw.left, right: a.raw.right }),
-    transition: () => a.raw.transition,
+    state: () => ({ top: a.raw['top'], left: a.raw['left'], right: a.raw['right'] }),
+    transition: () => a.raw['transition'],
     /** The anchor's style writes since `from`, limited to `keys` when given. */
-    writes: (from, keys) => a.log.slice(from).filter((w) => !keys || keys.includes(w[0])),
+    writes: (from: number, keys?: string[]) => a.log.slice(from).filter((w) => !keys || keys.includes(w[0])),
     side: () => IA.eval('_rtSide'),
     expanded: () => IA.eval('_rtExpanded'),
     dragging: () => IA.eval('_rtDragging'),
@@ -146,7 +168,7 @@ function timer() {
     /** Runs the touchmove guard once; returns how many times it prevented the page from scrolling. */
     guard: () => {
       let prevented = 0;
-      for (const fn of IA.docListeners.touchmove) fn({ cancelable: true, preventDefault: () => prevented++ });
+      for (const fn of IA.docListeners['touchmove'] || []) fn({ cancelable: true, preventDefault: () => prevented++ });
       return prevented;
     },
   };
@@ -268,7 +290,7 @@ const SKEW = 600000;
 const NOISE = 7;
 
 test('the stopwatch hand values are self-consistent', () => {
-  const show = (ms) => {
+  const show = (ms: number) => {
     const ts = Math.floor(ms / 1000);
     const s = ts % 60;
     return Math.floor(ts / 60) + ':' + (s < 10 ? '0' : '') + s;
@@ -498,7 +520,7 @@ test('a page load with the island plugin present ends the island and reaches Hom
 test('an island plugin that throws on every call never breaks the stopwatch or the page load', () => {
   const r = stopwatchRig();
   const s = r.attach(islandStub(true));
-  const reads = [];
+  const reads: unknown[] = [];
   assert.equal(r.seam('rtToggleBtn()'), null, 'Start');
   r.adv(T92, SKEW);
   reads.push(r.now());

@@ -39,6 +39,8 @@ const RULES = [
   { re: /^\s*(?:SURVIVED|CRASH)\b.*/, event: (m) => ['fail', m[0].trim(), true] },
   // node --test's closing counts
   { re: /^ℹ (tests|pass|fail|cancelled|skipped|todo) (\d+)$/, count: true },
+  // Vitest's closing counts (" Test Files  8 passed (8)", "      Tests  85 passed (85)")
+  { re: /^\s*(Test Files|Tests) {2,}(\d.*)$/, detail: (m) => `${m[1].toLowerCase()} ${m[2].trim()}` },
   // a request served by pwa-local or the backend ("request GET /index.html 200 3 ms ...")
   { re: /^\s*request (GET|HEAD|POST|PUT|PATCH|DELETE|OPTIONS) .*/, event: (m) => ['request', m[0].trim().slice(8), false] },
   // failures and errors, in the forms the suites print them

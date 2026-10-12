@@ -4,9 +4,11 @@
 // with its row check, fuzz, sabotage, e2e) runs in GitHub Actions on the pull request from dev into main
 // (.github/workflows/pipeline.yml), which must pass before anything deploys.
 //
-// The feature tests (tests/unit, tests/integration, against tests/snapshots; CLAUDE.md Test layout) run here whole,
-// every time they or what they read change: index.html, tests/support, tests/harness.js or tests/semver.js. The legacy
-// gate suite (tests/gates, frozen) does not run for a change that touches only the feature tests' folders.
+// The feature tests (tests/unit, tests/integration, against tests/snapshots; CLAUDE.md Test layout) run here whole, by
+// Vitest, beside the TypeScript type check of core/ and tests/, every time they or what they read change: index.html,
+// core/, tests/support, tests/harness.js, tests/semver.js or the tests package's own files. tests/node_modules is
+// installed (npm ci) when it is missing. tests/sweeps is type-checked here and run in CI only. The legacy gate suite
+// (tests/gates, frozen) does not run for a change that touches only the feature tests' files.
 //
 //   node tools/check.mjs              all of it: the feature tests, the gate suite's fast part, the app, the backend,
 //                                     and that index.html is the build of app/src/legacy/src (app/scripts/build-index.mjs)
@@ -60,12 +62,16 @@ function stagedPaths() {
 }
 const paths = STAGED ? stagedPaths() : null;
 const touches = (re, unless) => paths === null || paths.some((p) => re.test(p) && !(unless && unless.test(p)));
-/** The feature tests' own folders: a change there runs the feature tests, never the frozen gate suite. */
-const FEATURE_TESTS = /^tests\/(unit|integration|snapshots|support)\//;
-/** What `node --test` runs: every *.test.js under these folders. */
-const FEATURE_TEST_DIRS = ['tests/unit', 'tests/integration'];
+/**
+ * The feature tests' own files (their folders and the tests package: package.json, its lockfile, tsconfig.json, the
+ * Vitest config): a change there runs the feature tests, never the frozen gate suite.
+ */
+const FEATURE_TESTS = /^tests\/((unit|integration|sweeps|snapshots|support)\/|package(-lock)?\.json$|tsconfig\.json$|vitest\.config\.mts$)/;
+/** What Vitest runs here, relative to tests/: every *.test.ts under these folders (tests/sweeps runs in CI only). */
+const FEATURE_TEST_DIRS = ['unit', 'integration'];
+const TESTS = join(REPO, 'tests');
 const want = {
-  tests: touches(/^(index\.html|tests\/(unit|integration|snapshots|support)\/|tests\/harness\.js$|tests\/semver\.js$)/),
+  tests: touches(/^(index\.html|core\/|tests\/harness\.js$|tests\/semver\.js$)/) || touches(FEATURE_TESTS),
   gates: touches(/^(index\.html|tests\/)/, FEATURE_TESTS),
   app: touches(/^(app\/|tools\/|index\.html)/),
   backend: touches(/^backend\//),
@@ -104,7 +110,7 @@ const ciOnly = allGates.filter((g) => !fastGates.includes(g));
 
 if (LIST) {
   console.log(`check: limit ${LIMIT_S} s; ${STAGED ? `staged files: ${paths?.length ?? 0}` : 'everything'}`);
-  console.log(`  tests   ${want.tests ? `node --test ${FEATURE_TEST_DIRS.join(' ')}` : 'not touched'}`);
+  console.log(`  tests   ${want.tests ? `type check (core, tests), vitest run ${FEATURE_TEST_DIRS.join(' ')} (in tests/)` : 'not touched'}`);
   console.log(`  gates   ${want.gates ? `${fastGates.length} fast gates here, ${ciOnly.length} in CI only (${ciOnly.join(' ')})` : 'not touched'}`);
   console.log(`  app     ${want.app ? 'sync, typecheck, unit, integration, lint' : 'not touched'}`);
   console.log(`  backend ${want.backend ? 'typecheck, test, lint' : 'not touched'}`);
@@ -189,14 +195,25 @@ async function step(lane, name, cmd, cmdArgs, cwd, env = {}) {
 }
 
 /**
- * The feature tests, whole: Node's own runner over tests/unit and tests/integration. They prove index.html against the
- * committed snapshots, so IA_APP (another body) and UPDATE_SNAPSHOTS (rewrite the goldens) are cleared for this step.
+ * The feature tests, whole: Vitest over tests/unit and tests/integration, and beside it the strict type check of core/
+ * and of tests/ (which includes tests/sweeps). The tests prove index.html against the committed snapshots, so IA_APP
+ * (another body) and UPDATE_SNAPSHOTS (rewrite the goldens) are cleared for this step. tests/node_modules is installed
+ * from the committed lockfile when it is missing, inside the same limit.
  */
 async function testsLane() {
-  await step('tests', 'unit and integration tests', process.execPath, ['--test', '--test-reporter=spec', ...FEATURE_TEST_DIRS], REPO, {
-    IA_APP: undefined,
-    UPDATE_SNAPSHOTS: undefined,
-  });
+  const bin = (name) => join(TESTS, 'node_modules', '.bin', name);
+  if (!existsSync(bin('vitest')) || !existsSync(bin('tsc'))) {
+    note('tests', 'tests/node_modules is missing; installing it (npm ci in tests/)');
+    if (!(await step('tests', 'install (npm ci in tests/)', 'npm', ['ci', '--no-audit', '--no-fund'], TESTS))) return;
+  }
+  await Promise.all([
+    step('tests', 'type check (core)', bin('tsc'), ['-p', join(REPO, 'core')], TESTS),
+    step('tests', 'type check (tests)', bin('tsc'), ['-p', '.'], TESTS),
+    step('tests', 'unit and integration tests', bin('vitest'), ['run', ...FEATURE_TEST_DIRS], TESTS, {
+      IA_APP: undefined,
+      UPDATE_SNAPSHOTS: undefined,
+    }),
+  ]);
 }
 
 /** The gate suite's quick steps (gate.sh steps 0 to 3), then the fast gates, JOBS at a time. */

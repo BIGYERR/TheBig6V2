@@ -69,7 +69,8 @@ From the repo root (`npm run logs -- <args>` does the same from `app/` or `backe
 
 | Run | Type | Started by |
 |---|---|---|
-| feature tests (`tests/unit`, `tests/integration`, against `tests/snapshots`) | `tests` | `node tools/run.mjs tests -- node --test tests/unit tests/integration` (CI; the check runs them unwrapped) |
+| feature tests (`tests/unit`, `tests/integration`, `tests/sweeps`, against `tests/snapshots`; Vitest) | `tests` | `npm test` in `tests/`, or `node ../tools/run.mjs tests -- npx vitest run unit integration sweeps` there (CI; the check runs them unwrapped) |
+| type check of `core/` and `tests/` | `tests-typecheck` | `npm run typecheck` in `tests/` |
 | unit, integration tests, type check, lint (app) | `unit`, `integration`, `typecheck`, `lint` | `npm test`, `npm run test:unit`, ... in `app/` |
 | e2e in Docker | `e2e` (report, collage, docker and nginx logs in artifacts) | `npm run e2e` |
 | PWA on this Mac | `server-pwa-local` (every request, from start to Ctrl-C) | `npm run pwa-local` |

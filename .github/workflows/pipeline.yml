@@ -59,8 +59,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: node --test tests/unit tests/integration tests/sweeps (index.html against tests/snapshots)
-        run: node tools/run.mjs tests -- node --test --test-reporter=spec tests/unit tests/integration tests/sweeps
+      - name: npm ci in tests/ (Vitest, TypeScript, @ia/core)
+        working-directory: tests
+        run: npm ci --no-audit --no-fund
+      - name: Type check (core, tests)
+        working-directory: tests
+        run: npm run typecheck
+      - name: Vitest over tests/unit tests/integration tests/sweeps (index.html against tests/snapshots)
+        working-directory: tests
+        run: node ../tools/run.mjs tests -- npx vitest run unit integration sweeps
       - name: Keep the run log
         if: always()
         uses: actions/upload-artifact@v4

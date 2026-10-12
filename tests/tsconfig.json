@@ -1,0 +1,13 @@
+/* The TypeScript feature tests. Vitest runs them as ES modules whatever the folder's package.json says (tests/ has no
+ * "type" field, so the legacy .js beside them stays CommonJS), so tsc checks them as a bundler would see them:
+ * module preserve, bundler resolution. @ia/core resolves to core/src through the file: link; core's own, stricter
+ * project is checked on its own first (npm run typecheck: tsc -p ../core, then tsc -p .). */
+{
+  "extends": "../core/tsconfig.base.json",
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "types": ["node"]
+  },
+  "include": ["unit", "integration", "sweeps", "support", "vitest.config.mts"]
+}
