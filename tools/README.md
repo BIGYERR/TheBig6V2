@@ -76,6 +76,7 @@ From the repo root (`npm run logs -- <args>` does the same from `app/` or `backe
 | Angular dev server | `server-app-dev` | `npm start` |
 | iOS builds | `build-ios-emulator`, `build-ios-device` (xcodebuild log in artifacts) | `npm run emulator-ios`, `device-ios` |
 | PWA for Pages | `build-pwa-pages` | `npm run pwa-pages` |
+| `index.html` from its source files | `build-index` | `npm run build:index` in `app/` |
 | backend tests, lint | `backend-test`, `backend-lint` | `npm test`, `npm run lint` in `backend/` |
 | backend servers | `server-backend-dev` (the full stack dev mode: the dev container's log while it is followed, every rebuild, test run and restart), `server-backend-dev-server`, `server-backend-docker`, `server-backend-mac-local` (every request), `server-backend-admin`, `server-backend-site` | `npm run dev`, `dev:server`, `docker:logs`, `mac-local-backend:logs`, `admin:dev`, `site:dev` |
 | backend docker, Mac, Heroku | `backend-docker-up`, `-down`, `backend-dev-down`, `backend-mac-local[-<subcommand>]`, `heroku-<subcommand>` | `npm run docker:up`, `npm run dev:down`, `npm run mac-local-backend -- down`, `npm run heroku -- deploy`, ... |

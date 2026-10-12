@@ -8,7 +8,8 @@
 // every time they or what they read change: index.html, tests/support, tests/harness.js or tests/semver.js. The legacy
 // gate suite (tests/gates, frozen) does not run for a change that touches only the feature tests' folders.
 //
-//   node tools/check.mjs              all of it: the feature tests, the gate suite's fast part, the app, the backend
+//   node tools/check.mjs              all of it: the feature tests, the gate suite's fast part, the app, the backend,
+//                                     and that index.html is the build of app/src/legacy/src (app/scripts/build-index.mjs)
 //   node tools/check.mjs --staged     only what the staged files touch (what the pre-commit hook runs)
 //   node tools/check.mjs --list       print what would run, and exit
 //   node tools/check.mjs --measure    time every gate that might be fast (6 at a time, no limit) and rewrite the
@@ -68,6 +69,8 @@ const want = {
   gates: touches(/^(index\.html|tests\/)/, FEATURE_TESTS),
   app: touches(/^(app\/|tools\/|index\.html)/),
   backend: touches(/^backend\//),
+  // index.html is generated from app/src/legacy/src (app/scripts/build-index.mjs); the two must never drift.
+  build: touches(/^(index\.html|app\/src\/legacy\/src\/|app\/scripts\/build-index\.mjs$)/),
 };
 
 // ── Gate selection ─────────────────────────────────────────────────────────────────────────────────────────────
@@ -105,6 +108,7 @@ if (LIST) {
   console.log(`  gates   ${want.gates ? `${fastGates.length} fast gates here, ${ciOnly.length} in CI only (${ciOnly.join(' ')})` : 'not touched'}`);
   console.log(`  app     ${want.app ? 'sync, typecheck, unit, integration, lint' : 'not touched'}`);
   console.log(`  backend ${want.backend ? 'typecheck, test, lint' : 'not touched'}`);
+  console.log(`  build   ${want.build ? 'index.html is the build of app/src/legacy/src' : 'not touched'}`);
   process.exit(0);
 }
 
@@ -320,12 +324,18 @@ async function backendLane() {
   ]);
 }
 
+/** The root index.html is generated: it must be, byte for byte, the build of the source files under app/src/legacy/src. */
+async function buildLane() {
+  await step('build', 'index.html is the build of app/src/legacy/src', process.execPath, ['app/scripts/build-index.mjs', '--check'], REPO);
+}
+
 const lanes = [];
 if (want.tests) lanes.push(testsLane());
 if (want.gates) lanes.push(gatesLane());
 if (want.app) lanes.push(appLane());
 if (want.backend) lanes.push(backendLane());
-const what = [want.tests && 'tests', want.gates && 'gates', want.app && 'app', want.backend && 'backend'].filter(Boolean).join(', ') || 'nothing (no staged file needs a check)';
+if (want.build) lanes.push(buildLane());
+const what = [want.tests && 'tests', want.gates && 'gates', want.app && 'app', want.backend && 'backend', want.build && 'build'].filter(Boolean).join(', ') || 'nothing (no staged file needs a check)';
 console.log(`check: ${what}; hard limit ${LIMIT_S} s`);
 await Promise.all(lanes);
 

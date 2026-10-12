@@ -115,6 +115,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+      - name: index.html is the build of app/src/legacy/src (byte for byte; app/scripts/build-index.mjs)
+        run: node app/scripts/build-index.mjs --check
       - name: Doctrine text (NRC and NSW copyright, never in the repo; restored from the DOCTRINE_TXZ secret)
         env:
           DOCTRINE_TXZ: ${{ secrets.DOCTRINE_TXZ }}
