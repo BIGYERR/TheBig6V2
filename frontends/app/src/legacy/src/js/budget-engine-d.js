@@ -1,6 +1,9 @@
 import { EXLIB, _swapUniverseAdd, _swapUniverseList, _swapUniverseReset } from './exercise-library.js';
-import { _ISO_ORDER } from './wizard.js';
+import { isTrackableWeight } from './exercise-kinds.js';
+import { _ISO_ORDER } from './calendar.js';
+import { _fmtMileAnchor } from './clock-format.js';
 import { PACE_GOALS } from './nrc-race-bike-swim.js';
+import { runAnchorInfo } from './cardio-progression.js';
 import { _BW_GEAR, _BW_SUBS } from './prehab.js';
 import {
   _BW_KEEP_FIXED, _bwSetsFromDetail, accessoryGrammarSweep, bodyweightSweep, hotNextHingeClampSweep,
@@ -13,9 +16,7 @@ import { engineC_kinematics } from './engine-c.js';
 import {
   _auxFamily, _cardioInterference, _ceil, _itemRegion, _moveCap, _pattern, _sectionRegion, _setCap,
 } from './region-caps.js';
-import { applySwapPrefs } from './swaps-edits.js';
-import { isTrackableWeight } from './log-entries.js';
-import { _fmtMileAnchor, runAnchorInfo } from './programs.js';
+import { applySwapPrefs } from './swap-prefs.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 const _PATTERN_REGION = {
   hpress:'push', vpress:'push', delt_iso:'push', tri_iso:'push',

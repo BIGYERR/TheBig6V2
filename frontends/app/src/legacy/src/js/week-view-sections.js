@@ -1,14 +1,16 @@
-import { asyIcon, completedKey, esc, getCompleted, getLogs, logKey } from './storage.js';
-import { activeProg, currentWeek, openRestSheet, restDayEligible, showToast } from './rest-day-shell.js';
-import { ALL_DAYS_ORDER, DAY_FULL, _fmtStartDay } from './wizard.js';
+import { asyIcon } from './icons.js';
+import { completedKey, esc, getCompleted, getLogs, logKey } from './storage.js';
+import {
+  _setCurrentWeek, activeProg, currentWeek, openRestSheet, restDayEligible, showToast,
+} from './rest-day-shell.js';
+import { ALL_DAYS_ORDER, _parseLocalDate, getWeekMonday } from './calendar.js';
+import { DAY_FULL, _fmtStartDay } from './wizard.js';
 import { INJURY_REGIONS } from './injury.js';
 import { updateRandCounter, wildcardMarkHTML, wildcardOn, wildcardTagHTML } from './random-wildcard.js';
 import { buildExItem } from './set-logging.js';
 import { openDetail } from './day-detail.js';
 import { progAlignment } from './programs.js';
-import {
-  _liveInjuryOverlay, _parseLocalDate, dayIsTravel, overlayWeekRange, renderOverlayChip, travelTagHTML,
-} from './overlays.js';
+import { _liveInjuryOverlay, dayIsTravel, overlayWeekRange, renderOverlayChip, travelTagHTML } from './overlays.js';
 import { computeStreak, statusOf } from './popups-streaks-reminders.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
@@ -49,18 +51,6 @@ function _partialWeek1(prog){
   if(!prog||!prog.startDate) return false;
   const sd=_parseLocalDate(prog.startDate); if(!sd) return false;
   return getWeekMonday(prog.startDate).getTime() !== sd.getTime();
-}
-function getWeekMonday(dateStr){
-  // Get the Monday of the week containing the given date string
-  const parts=dateStr.split('-');
-  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
-  d.setHours(0,0,0,0);
-  // getDay(): 0=Sun,1=Mon,...,6=Sat
-  // Days since Monday: Sun=6, Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5
-  const dayOfWeek=d.getDay();
-  const daysSinceMonday=dayOfWeek===0?6:dayOfWeek-1;
-  d.setDate(d.getDate()-daysSinceMonday);
-  return d;
 }
 function calcCurrentWeek(){
   if(!activeProg?.startDate) return 1;
@@ -504,7 +494,7 @@ function renderWeekView(){
       if(_hit) _ovMark=' \u2726';
     }
     b.textContent='Wk '+w+(w===actualWeek?' \u25cf':'')+_ovMark;
-    b.onclick=(wk=>()=>{currentWeek=wk;renderWeekView();})(w);wscroll.appendChild(b);
+    b.onclick=(wk=>()=>{_setCurrentWeek(wk);renderWeekView();})(w);wscroll.appendChild(b);
     if(w===currentWeek) _actBtn=b;
   }
   // Anchor on currentWeek, not actualWeek: the strip is a control for the week you are
@@ -712,13 +702,6 @@ function _stripLeadingSets(d){
     .replace(/^(\d+)\s*sets?\s*(?:\u2014|\u2013|-)\s*/i,'')
     .replace(/^(\d+)\s*sets?\b\s*/i,'');
 }
-function _setLeadingSets(d,n){
-  var s=String(d||''), m=s.match(/^(\d+)\s*[x\u00d7]/);
-  if(m) return n+s.slice(m[1].length);
-  m=s.match(/^(\d+)\s*sets?\b/i);
-  if(m) return n+s.slice(m[1].length);
-  return s;
-}
 function buildSectionsHTML(sections,baseIdx){
   const all=sections||[];
   const _base=baseIdx||0;
@@ -905,6 +888,6 @@ function rxSuffix(rx){
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  _partialWeek1, _progDayDate, _setLeadingSets, _stripLeadingSets, buildSectionsHTML, calcCurrentWeek, dayBeforeStart,
-  dayOffset, getWeekMonday, parseRx, renderWeekView, restLogLines, runSessionCode, rxSuffix, tagMeta,
+  _partialWeek1, _progDayDate, _stripLeadingSets, buildSectionsHTML, calcCurrentWeek, dayBeforeStart, dayOffset,
+  parseRx, renderWeekView, restLogLines, runSessionCode, rxSuffix, tagMeta,
 };

@@ -1,8 +1,11 @@
-import { asyIcon, esc, getDayHistFor, getExWeightsFor, getLogsFor, getPrograms } from './storage.js';
-import { activeProgId, confirmProgId, confirmTier, progressViewId, showScreen } from './rest-day-shell.js';
-import { _clkMS } from './wizard.js';
+import { asyIcon } from './icons.js';
+import { esc, getDayHistFor, getExWeightsFor, getLogsFor, getPrograms } from './storage.js';
+import {
+  _setConfirmProgId, _setConfirmTier, _setProgressViewId, activeProgId, confirmProgId, confirmTier, showScreen,
+} from './rest-day-shell.js';
+import { getWeekMonday } from './calendar.js';
+import { _clkMS } from './clock-format.js';
 import { PACE_CHART } from './cardio-progression.js';
-import { getWeekMonday } from './week-view-sections.js';
 import { _epley } from './day-detail.js';
 import { renderProgressScreen } from './lift-ledger-progress-screen.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
@@ -10,8 +13,8 @@ import { renderProgressScreen } from './lift-ledger-progress-screen.js';
 
 // ── PROGRESS SCREEN ──
 function showProgressScreen() {
-  confirmProgId=null;confirmTier=0;   // V169: never open Progress with a confirm armed
-  progressViewId = null;   // V156: always open on the active program
+  _setConfirmProgId(null);_setConfirmTier(0);   // V169: never open Progress with a confirm armed
+  _setProgressViewId(null);   // V156: always open on the active program
   renderProgressScreen();
   showScreen('screenProgress');
 }
@@ -216,9 +219,9 @@ function _restoreBarHTML(p){
     <button class="prog-action-btn" aria-label="Delete this program forever" title="Delete forever" style="flex:0 0 auto;color:var(--red);padding:8px 10px;display:inline-flex;align-items:center" onclick="askPurgeFromProgress('${p.id}')">${asyIcon('trash',16)}</button>
   </div>`;
 }
-function askPurgeFromProgress(id){confirmProgId=id;confirmTier=2;renderProgressScreen();}
-function cancelProgressConfirm(){confirmProgId=null;confirmTier=0;renderProgressScreen();}
-function setProgressView(id){progressViewId=id;renderProgressScreen();}
+function askPurgeFromProgress(id){_setConfirmProgId(id);_setConfirmTier(2);renderProgressScreen();}
+function cancelProgressConfirm(){_setConfirmProgId(null);_setConfirmTier(0);renderProgressScreen();}
+function setProgressView(id){_setProgressViewId(id);renderProgressScreen();}
 // ══ V165 — PROGRESS SCREEN REBUILD (D1/D2/D3/D5/D7/D8/D9/D10-A/D6) ══════════
 // Six modules replace the V164 run/lift chart stack. Swim and bike dot charts are
 // untouched: D7 named a run-and-lift set, and deleting a sport's only chart would

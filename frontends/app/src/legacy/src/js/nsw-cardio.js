@@ -1,4 +1,4 @@
-import { _clkMS } from './wizard.js';
+import { _clkMS } from './clock-format.js';
 import { NRC_GOALS, PACE_IMPROVE } from './nrc-race-bike-swim.js';
 import { paceChartLookup, rowPaceAt, steadyCapSec, taperWeeksFor } from './cardio-progression.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)

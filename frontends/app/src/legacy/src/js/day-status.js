@@ -1,12 +1,13 @@
 import {
   completedKey, getCompleted, getLogs, getPrograms, logKey, saveCompleted, saveLogs, savePrograms, snapshotDay,
 } from './storage.js';
-import { activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.js';
+import { _setActiveProg, activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.js';
 import { _pattern } from './region-caps.js';
 import { markSwapOffered } from './swaps-edits.js';
 import { renderWeekView } from './week-view-sections.js';
 import {
-  CARDIO_PARK_FIELDS, _curLogDose, _curLogDoseFull, _curLogSub, cardioSwapNoteText, doseDerived, updateDoseDerived,
+  CARDIO_PARK_FIELDS, _curLogDose, _curLogDoseFull, _curLogSub, _setCurLogDose, cardioSwapNoteText, doseDerived,
+  updateDoseDerived,
 } from './log-entries.js';
 import { cardioFieldHTML, iaWheelFlush, iaWheelInit } from './wheel-log.js';
 import { ruReset } from './rest-timer.js';
@@ -44,7 +45,7 @@ function acceptSwapNudge(){
     markSwapOffered(activeProgId,from);
     // Preference lives in cfg, so the rebuild below — and every rebuild after it —
     // reproduces the substitution without any patch store to re-apply.
-    activeProg=refreshProgram(p);
+    _setActiveProg(refreshProgram(p));
   }
   const o=document.getElementById('swapNudgeOverlay');if(o)o.classList.remove('show');
   _nudgeCtx=null;
@@ -275,7 +276,7 @@ function setCardioSwap(sport){
   const fields=document.getElementById('cardioFields');
   // V148: swapping back to the planned sport restores the dose form; any other sport
   // has no prescription here, so it gets the generic fields (null dose).
-  _curLogDose=(sport===planned)?_curLogDoseFull:null;
+  _setCurLogDose((sport===planned)?_curLogDoseFull:null);
   if(fields) fields.innerHTML=cardioFieldHTML(sport, e, _curLogDose, _curLogSub);
   wrap.querySelectorAll('#cardioPicker button[data-sport]').forEach(function(b){
     const on=b.dataset.sport===sport;

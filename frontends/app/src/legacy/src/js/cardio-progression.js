@@ -1,4 +1,5 @@
-import { ALL_DAYS_ORDER, _ISO_ORDER, _clkMS } from './wizard.js';
+import { ALL_DAYS_ORDER, _ISO_ORDER } from './calendar.js';
+import { _clkMS } from './clock-format.js';
 import { buildRunSession, isCardioCutbackWeek, paceGoalTarget } from './nsw-cardio.js';
 import {
   NRC_GOALS, PACE_GOALS, buildBikeSession, buildNRCSession, buildSwimSession, getNRCSessionTypes,
@@ -1347,9 +1348,40 @@ function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, da
   }
   return 1;
 }
+// ── V172 (D7): THE RUN ANCHOR, STATED ────────────────────────────────────────
+// Every run pace the engines print comes from ONE chart row, and that row is picked by a
+// mile anchor the athlete was never shown — the V156 seed writes it into the wizard as if
+// typed, and no surface stated it. These helpers are read-only over cfg; the engines keep
+// their own anchor logic and the assertion suite checks the two agree.
+const _CHART_RUN_GOALS = new Set(['run_half','run_marathon','run_5k','run_10k','run_pace_goal','run_mile_time','run_15_under10','run_base']);
+function runAnchorInfo(cfg){
+  const c = cfg || {};
+  if(!(c.cardioTypes||[]).includes('run')) return null;
+  const g = c.cardioGoals && c.cardioGoals.run;
+  if(!g || !g.id || !_CHART_RUN_GOALS.has(g.id)) return null;      // run_base easy runs pace off this row since V206 (D189)
+  const exp = c.experience || 'intermediate';
+  const expDef = {beginner:690, intermediate:570, advanced:450}[exp] || 570;
+  const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0) : 0;
+  // Same rule as both engines: a falsy entry falls to the default (D188: every level).
+  const rawSec = entered ? entered : expDef;
+  const row = paceChartLookup('mile', rawSec);
+  // The chart CLAMPS: anything at or under its fastest row trains at that row, anything at
+  // or over its slowest trains there. row.mile is the anchor the engines actually use, so
+  // that is the number stated; when it differs from the entry, the sentence says so.
+  const anchorSec = row.mile;
+  const clamped = (!!entered && Math.round(row.mile) !== Math.round(rawSec)) ? (rawSec < row.mile ? 'fast' : 'slow') : null;
+  const src = g.mileBestSrc || null;
+  const kind = !entered ? 'default' : (src && src.kind === 'seeded') ? 'seeded' : (src && src.kind === 'edited') ? 'edited' : 'entered';
+  const race = g.id === 'run_half' ? 'half' : g.id === 'run_marathon' ? 'marathon' : null;
+  // V176 (D10): the fixed target for pace-goal programs. The chip is the prescription;
+  // the measure of progress is the projection card walking toward it.
+  const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
+    ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
+  return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
+}
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  PACE_CHART, buildCardioProgression, isSpeedGoal, paceChartLookup, programTaperWindow, rowPaceAt, sportDayTargets,
-  steadyCapSec, taperWeeksFor,
+  PACE_CHART, buildCardioProgression, isSpeedGoal, paceChartLookup, programTaperWindow, rowPaceAt, runAnchorInfo,
+  sportDayTargets, steadyCapSec, taperWeeksFor,
 };

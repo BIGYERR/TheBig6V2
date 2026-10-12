@@ -1,8 +1,10 @@
-import { asyIcon, getPrograms, savePrograms } from './storage.js';
-import { activeProg, showToast } from './rest-day-shell.js';
+import { asyIcon } from './icons.js';
+import { getPrograms, savePrograms } from './storage.js';
+import { _setActiveProg, activeProg, showToast } from './rest-day-shell.js';
+import { _parseLocalDate, getWeekMonday } from './calendar.js';
 import { INJURY_REGIONS, injuryPlan } from './injury.js';
 import { buildProgram } from './budget-engine-d.js';
-import { _progDayDate, calcCurrentWeek, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { _progDayDate, calcCurrentWeek, renderWeekView } from './week-view-sections.js';
 import { refreshProgram } from './program-manage.js';
 import { popFire } from './popups-streaks-reminders.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
@@ -25,13 +27,6 @@ import { popFire } from './popups-streaks-reminders.js';
 // further notice" cases. Dates are the SOURCE OF TRUTH, weeks are derived — once
 // Suspend lands and pauses the clock, program weeks shift, so anchoring an overlay
 // to a week number would be circular.
-function _parseLocalDate(s){
-  const p=String(s||'').split('-');
-  if(p.length!==3) return null;
-  const d=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
-  if(isNaN(d.getTime())) return null;
-  d.setHours(0,0,0,0); return d;
-}
 // Program week containing a calendar date (1-based, matching the weeks object).
 function weekOfDate(prog, dateStr){
   if(!prog || !prog.startDate) return null;
@@ -289,7 +284,7 @@ function removeOverlay(id){
   activeProg.overlays=activeProg.overlays.filter(o=>o&&o.id!==id);
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   renderWeekView();
   showToast('Change removed \u2713');
 }
@@ -475,7 +470,7 @@ function applyInjuryDraft(){
   activeProg.overlays.push(ov);
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   closeOverlaySheet();
   renderWeekView();
   showToast(T==='protect'?'Protected. Train around it \u2713':'Working around it \u2713');
@@ -507,7 +502,7 @@ function imBackFromInjury(id){
   }
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   renderWeekView();
   const lbl=(INJURY_REGIONS[region]||{}).label||'injury';
   if(!_hadRunSuppression){
@@ -589,7 +584,7 @@ function applyOverlayDraft(){
   activeProg.overlays.push(ov);
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   closeOverlaySheet();
   renderWeekView();
   showToast('Change applied \u2713');
@@ -597,6 +592,6 @@ function applyOverlayDraft(){
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  _isoToday, _liveInjuryOverlay, _parseLocalDate, applyOverlays, dayIsTravel, dayOverlayInfo, overlayWeekRange,
-  paceShiftMap, renderOverlayChip, travelTagHTML,
+  _isoToday, _liveInjuryOverlay, applyOverlays, dayIsTravel, dayOverlayInfo, overlayWeekRange, paceShiftMap,
+  renderOverlayChip, travelTagHTML,
 };

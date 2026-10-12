@@ -1,11 +1,11 @@
 import { _ssLegal, _swapUniverseList, seededRand } from './exercise-library.js';
-import { ALL_DAYS_ORDER, _ISO_ORDER } from './wizard.js';
+import { isTrackableWeight } from './exercise-kinds.js';
+import { ALL_DAYS_ORDER, _ISO_ORDER } from './calendar.js';
 import { CORE_PILLARS, CORE_SPEED_TYPES } from './prehab.js';
 import { applyInjuryFilter } from './injury.js';
 import { _auxGearOK, _pattern } from './region-caps.js';
-import { _swapInjuryOK } from './swaps-edits.js';
+import { _swapInjuryOK } from './swap-prefs.js';
 import { _compoundTier, d18LongRunDayPass } from './budget-engine-d.js';
-import { isTrackableWeight } from './log-entries.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // Build a core finisher block applying the PRIORITY + PLACEMENT rules.

@@ -1,5 +1,6 @@
-import { asyIcon, getDayHistFor, getExWeightsFor, getLogsFor, getPrograms, saveExWeightsFor } from './storage.js';
-import { activeProg, activeProgId, calcLift, progressViewId } from './rest-day-shell.js';
+import { asyIcon } from './icons.js';
+import { getDayHistFor, getExWeightsFor, getLogsFor, getPrograms, saveExWeightsFor } from './storage.js';
+import { _setProgressViewId, activeProg, activeProgId, calcLift, progressViewId } from './rest-day-shell.js';
 import { exStoreKey, foldExAliasKeys } from './exercise-library.js';
 import { _partialWeek1, restLogLines } from './week-view-sections.js';
 import { RPE_LABELS, dedupeExDayEntries } from './log-entries.js';
@@ -313,7 +314,7 @@ function renderProgressScreen() {
   // charts render; null means the active program. Every store read below goes through
   // the *For(_vid) accessors so a viewed program can NEVER leak the active one's data.
   let _vprog = progressViewId ? _allProgs.find(p=>p.id===progressViewId) : null;
-  if(!_vprog){ progressViewId=null; _vprog = (activeProg && _allProgs.find(p=>p.id===activeProgId)) || _allProgs.find(p=>!p.archived) || _allProgs[0]; }
+  if(!_vprog){ _setProgressViewId(null); _vprog = (activeProg && _allProgs.find(p=>p.id===activeProgId)) || _allProgs.find(p=>!p.archived) || _allProgs[0]; }
   if(!_vprog) return;
   const _vid = _vprog.id;
   const _chips = _progChipsHTML(_allProgs, _vid);

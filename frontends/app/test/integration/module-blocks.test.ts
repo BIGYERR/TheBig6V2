@@ -12,7 +12,12 @@ import { fileURLToPath } from 'node:url';
 import { readOrder, SOURCES } from '../../scripts/build-index.mjs';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const acorn = createRequire(import.meta.url)('acorn') as { parse(text: string, o: object): { body: Node[] } };
+const req = createRequire(import.meta.url);
+const acorn = req('acorn') as { parse(text: string, o: object): { body: Node[] } };
+interface Ref { identifier: { name: string }; isWrite(): boolean }
+const escope = req('eslint-scope') as {
+  analyze(ast: object, o: object): { scopes: { type: string; variables: { name: string; defs: { type: string }[]; references: Ref[] }[] }[] };
+};
 interface Node {
   type: string;
   source?: { value: string };
@@ -21,7 +26,7 @@ interface Node {
 
 describe('module blocks', () => {
   const pieces = readOrder().filter((p: string) => p.endsWith('.js'));
-  const asts = new Map(pieces.map((p: string) => [p.slice(3, -3), acorn.parse(readFileSync(join(SOURCES, p), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module' })]));
+  const asts = new Map(pieces.map((p: string) => [p.slice(3, -3), acorn.parse(readFileSync(join(SOURCES, p), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module', ranges: true })]));
 
   it('every JS file\'s blocks are what its code needs (npm run modules:check)', () => {
     const res = spawnSync(process.execPath, ['scripts/module-blocks.mjs', '--check'], { cwd: APP, encoding: 'utf8' });
@@ -50,5 +55,18 @@ describe('module blocks', () => {
       }
     }
     assert.ok(imported > 0, 'the files import from each other');
+  });
+
+  it('no file assigns a name it imports: another file\'s state changes through that file\'s setter (phase C, step 2)', () => {
+    const writes: string[] = [];
+    for (const [file, ast] of asts) {
+      const scopes = escope.analyze(ast, { ecmaVersion: 2022, sourceType: 'module' }).scopes;
+      const module = scopes.find((s) => s.type === 'module')!;
+      for (const v of module.variables) {
+        if (!v.defs.some((d) => d.type === 'ImportBinding')) continue;
+        for (const r of v.references) if (r.isWrite()) writes.push(`${file} assigns ${v.name}`);
+      }
+    }
+    assert.deepEqual(writes, [], 'an ES module cannot assign an import; these would throw once the file runs as a module');
   });
 });

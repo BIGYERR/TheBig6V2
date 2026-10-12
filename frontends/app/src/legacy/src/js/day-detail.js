@@ -1,8 +1,8 @@
+import { asyIcon } from './icons.js';
+import { clearSetDraft, completedKey, getCompleted, getLogs, getPrograms, logKey, savePrograms } from './storage.js';
 import {
-  asyIcon, clearSetDraft, completedKey, getCompleted, getLogs, getPrograms, logKey, savePrograms,
-} from './storage.js';
-import {
-  _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, currentDayKey, currentWeek, showToast,
+  _setCurrentDayKey, _setStaleWarnShown, _setStaleWarnSrc, activeProg, activeProgId, currentDayKey, currentWeek,
+  showToast,
 } from './rest-day-shell.js';
 import { exStoreKey } from './exercise-library.js';
 import { DAY_FULL } from './wizard.js';
@@ -96,7 +96,7 @@ function rangeTopNudgeHTML(day){
     +shown+extra+'. Go up in weight today and start back at the bottom of the range.</div>';
 }
 function openDetail(dayKey,day){
-  _staleWarnShown=false; _staleWarnSrc='';
+  _setStaleWarnShown(false); _setStaleWarnSrc('');
   window._unitLabel=(activeProg&&activeProg.cfg&&activeProg.cfg.unit==='kg')?'kg':'lbs';
   // V152 — A RE-RENDER MUST NOT MOVE THE READER.
   // openDetail is not only an open. It is also the re-render for every in-session edit:
@@ -112,7 +112,7 @@ function openDetail(dayKey,day){
   const _dOv=document.getElementById('detailOverlay');
   const _dFresh=!(_dOv&&_dOv.classList.contains('open')&&currentDayKey===dayKey);
   const _dKeep=_dFresh?0:_dOv.scrollTop;
-  currentDayKey=dayKey;
+  _setCurrentDayKey(dayKey);
   const comp=getCompleted()[completedKey(currentWeek,dayKey)];
   const over=document.getElementById('detailDayName');if(over)over.textContent='Week '+currentWeek+' \u00b7 '+DAY_FULL[dayKey];
   const ttl=document.getElementById('detailDayTitle');if(ttl)ttl.textContent=(comp&&comp.title)||day.title||'Training';

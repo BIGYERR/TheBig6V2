@@ -1,7 +1,9 @@
-import { asyIcon, completedKey, esc, getWildcardDone, saveWildcardDone } from './storage.js';
-import { activeProg, currentRandIdx, showToast } from './rest-day-shell.js';
-import { currentRandDayKey, lastRandIdx } from './wizard.js';
-import { buildSectionsHTML, dayBeforeStart, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { asyIcon } from './icons.js';
+import { completedKey, esc, getWildcardDone, saveWildcardDone } from './storage.js';
+import { _setCurrentRandIdx, activeProg, showToast } from './rest-day-shell.js';
+import { getWeekMonday } from './calendar.js';
+import { _setCurrentRandDayKey, _setLastRandIdx, lastRandIdx } from './wizard.js';
+import { buildSectionsHTML, dayBeforeStart, renderWeekView } from './week-view-sections.js';
 import { computeStreak, popFire } from './popups-streaks-reminders.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
@@ -197,13 +199,13 @@ function reroll(){
   const pool=getActivePool();
   let idx;
   do{idx=Math.floor(Math.random()*pool.length);}while(idx===lastRandIdx&&pool.length>1);
-  lastRandIdx=idx;currentRandIdx=idx;
+  _setLastRandIdx(idx);_setCurrentRandIdx(idx);
   const w=pool[idx];
   const done=getWildcardDone();
   const alreadyDone=done.some(d=>d.title===w.title);
   const now=new Date();
   const dowToKey={0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
-  currentRandDayKey=dowToKey[now.getDay()]||'mon';
+  _setCurrentRandDayKey(dowToKey[now.getDay()]||'mon');
   const goal=activeProg?.goal||'balanced';
   const colors={strength:'var(--lift)',hypertrophy:'var(--hip)',fatloss:'var(--run)',athletic:'var(--bike)',balanced:'var(--accent)',endurance:'var(--run)',support_strength:'var(--lift)',support_athletic:'var(--bike)',support_prevention:'var(--hip)'};
   const color=colors[goal];

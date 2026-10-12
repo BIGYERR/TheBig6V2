@@ -1,8 +1,10 @@
-import { ASY_ICON_PATHS, asyIcon, completedKey, getCompleted, saveCompleted, snapshotDay } from './storage.js';
+import { ASY_ICON_PATHS, asyIcon } from './icons.js';
+import { completedKey, getCompleted, saveCompleted, snapshotDay } from './storage.js';
 import { activeProg, activeProgId, showToast } from './rest-day-shell.js';
-import { ALL_DAYS_ORDER, DAY_FULL } from './wizard.js';
+import { ALL_DAYS_ORDER, getWeekMonday } from './calendar.js';
+import { DAY_FULL } from './wizard.js';
 import { wildcardOn } from './random-wildcard.js';
-import { dayBeforeStart, dayOffset, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { dayBeforeStart, dayOffset, renderWeekView } from './week-view-sections.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 /* ===== REINFORCEMENT POPUPS ===== */
 /* Pools are locked copy. workout + reminder are WIRED this batch; streak + season

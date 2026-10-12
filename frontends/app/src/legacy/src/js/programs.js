@@ -1,18 +1,22 @@
-import { asyIcon, getActiveProgId, getPrograms, savePrograms } from './storage.js';
+import { asyIcon } from './icons.js';
+import { getActiveProgId, getPrograms, savePrograms } from './storage.js';
 import {
-  activeProg, activeProgId, confirmProgId, confirmTier, currentWeek, editProgId, openProgIds, showToast,
+  _setActiveProg, _setCurrentWeek, activeProg, activeProgId, confirmProgId, confirmTier, editProgId, openProgIds,
+  showToast,
 } from './rest-day-shell.js';
+import { DEFAULT_1RM, LIFTING_FOCUS_TO_GOAL } from './exercise-library.js';
+import { ALL_DAYS_ORDER, getWeekMonday } from './calendar.js';
+import { _fmtMileAnchor } from './clock-format.js';
 import {
-  ALL_DAYS_ORDER, CARDIO_GOALS_BY_TYPE, DEFAULT_1RM, HYBRID_EXCLUDED_GOALS, LIFTING_FOCUS_TO_GOAL, _GOAL_RANK,
-  _GOAL_REQ_INPUTS, _clkMS, _fmtStartDay, _rsRace, resolveStartDate,
+  CARDIO_GOALS_BY_TYPE, HYBRID_EXCLUDED_GOALS, _GOAL_RANK, _GOAL_REQ_INPUTS, _fmtStartDay, _rsRace, resolveStartDate,
 } from './wizard.js';
 import { NSW_TABLE6_INT, calcProgramLength } from './nsw-cardio.js';
 import {
   NRC_GOALS, PACE_GOALS, raceAlignment, raceCountdown, raceCountdownWords, testWeekIndex,
 } from './nrc-race-bike-swim.js';
-import { paceChartLookup } from './cardio-progression.js';
+import { runAnchorInfo } from './cardio-progression.js';
 import { _mileEntryState } from './wizard-generate.js';
-import { calcCurrentWeek, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { calcCurrentWeek, renderWeekView } from './week-view-sections.js';
 import { refreshProgram } from './program-manage.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // V188 (D14a): alignment of a built program, from its stored cfg.
@@ -29,8 +33,8 @@ function setProgRace(dateStr){
   activeProg.startDate=_al.start;   // blockOpen stays — the weeks behind you don't move
   const programs=getPrograms();const idx=programs.findIndex(p=>p.id===activeProgId);
   if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
-  activeProg=refreshProgram(activeProg);   // untrained weeks re-pin; trained weeks stay frozen
-  currentWeek=calcCurrentWeek();
+  _setActiveProg(refreshProgram(activeProg));   // untrained weeks re-pin; trained weeks stay frozen
+  _setCurrentWeek(calcCurrentWeek());
   showToast('Race day '+_fmtStartDay(_al.raceIso)+' \u2014 plan starts '+_fmtStartDay(_al.start)+' \u2713');
   renderWeekView();
 }
@@ -63,8 +67,8 @@ function setProgStart(dateStr){
   if(_tp){ activeProg.cfg._testWeek=_tp.tw; activeProg.cfg._raceDateCappedWeeks=_tp.tw||_tp.len; }
   const programs=getPrograms();const idx=programs.findIndex(p=>p.id===activeProgId);
   if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
-  if(_tp) activeProg=refreshProgram(activeProg);   // untrained weeks re-pin; trained weeks stay frozen
-  currentWeek=calcCurrentWeek();
+  if(_tp) _setActiveProg(refreshProgram(activeProg));   // untrained weeks re-pin; trained weeks stay frozen
+  _setCurrentWeek(calcCurrentWeek());
   // D184 (c) Q4: the holdsTest arm is first (a holdsTest return is also partial). Both surfaces read
   // the same resolver return; the toast never went through startResolveCopy. No dashes in the arms.
   showToast(_r.holdsTest ? 'That week holds your test. Nothing left to train before it ✓'
@@ -83,38 +87,6 @@ const _DAYF={sun:'Sun',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sa
 // Single source of truth for a program's recalled onboarding selection.
 // Lifts are experience-derived (DEFAULT_1RM) when not manually stored, so the panel
 // shows the numbers the engine actually anchors to rather than a misleading zero.
-// ── V172 (D7): THE RUN ANCHOR, STATED ────────────────────────────────────────
-// Every run pace the engines print comes from ONE chart row, and that row is picked by a
-// mile anchor the athlete was never shown — the V156 seed writes it into the wizard as if
-// typed, and no surface stated it. These helpers are read-only over cfg; the engines keep
-// their own anchor logic and the assertion suite checks the two agree.
-const _CHART_RUN_GOALS = new Set(['run_half','run_marathon','run_5k','run_10k','run_pace_goal','run_mile_time','run_15_under10','run_base']);
-function runAnchorInfo(cfg){
-  const c = cfg || {};
-  if(!(c.cardioTypes||[]).includes('run')) return null;
-  const g = c.cardioGoals && c.cardioGoals.run;
-  if(!g || !g.id || !_CHART_RUN_GOALS.has(g.id)) return null;      // run_base easy runs pace off this row since V206 (D189)
-  const exp = c.experience || 'intermediate';
-  const expDef = {beginner:690, intermediate:570, advanced:450}[exp] || 570;
-  const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0) : 0;
-  // Same rule as both engines: a falsy entry falls to the default (D188: every level).
-  const rawSec = entered ? entered : expDef;
-  const row = paceChartLookup('mile', rawSec);
-  // The chart CLAMPS: anything at or under its fastest row trains at that row, anything at
-  // or over its slowest trains there. row.mile is the anchor the engines actually use, so
-  // that is the number stated; when it differs from the entry, the sentence says so.
-  const anchorSec = row.mile;
-  const clamped = (!!entered && Math.round(row.mile) !== Math.round(rawSec)) ? (rawSec < row.mile ? 'fast' : 'slow') : null;
-  const src = g.mileBestSrc || null;
-  const kind = !entered ? 'default' : (src && src.kind === 'seeded') ? 'seeded' : (src && src.kind === 'edited') ? 'edited' : 'entered';
-  const race = g.id === 'run_half' ? 'half' : g.id === 'run_marathon' ? 'marathon' : null;
-  // V176 (D10): the fixed target for pace-goal programs. The chip is the prescription;
-  // the measure of progress is the projection card walking toward it.
-  const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
-    ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
-  return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
-}
-function _fmtMileAnchor(sec){ return _clkMS(sec); }   // D126 (V204)
 function runAnchorChips(a){
   const r = a.row;
   const list = a.goalId==='run_base' ? [['Mile',r.mile]] : [['Mile',r.mile],['5K',r.fiveK],['10K',r.tenK],['Tempo',r.tempo]];
@@ -364,8 +336,8 @@ function commitGoalChange(){
   programs[pi].cfg={...programs[pi].cfg,cardioGoals:{...(programs[pi].cfg.cardioGoals||{}),[sport]:next}};
   savePrograms(programs);
   if(activeProgId===_goalDraft.progId){
-    activeProg=refreshProgram(programs[pi]);
-    currentWeek=calcCurrentWeek();
+    _setActiveProg(refreshProgram(programs[pi]));
+    _setCurrentWeek(calcCurrentWeek());
     try{ if(document.getElementById('screenWeek').classList.contains('active')) renderWeekView(); }catch(e){}
   }
   closeGoalSheet();
@@ -444,8 +416,8 @@ function commitMileChange(){
   p.cfg={...p.cfg,cardioGoals:{...(p.cfg.cardioGoals||{}),run:next}};
   savePrograms(programs);
   if(activeProgId===_mileDraft.progId){
-    activeProg=refreshProgram(programs[pi]);
-    currentWeek=calcCurrentWeek();
+    _setActiveProg(refreshProgram(programs[pi]));
+    _setCurrentWeek(calcCurrentWeek());
     try{ if(document.getElementById('screenWeek').classList.contains('active')) renderWeekView(); }catch(e){}
   }
   closeMileSheet();
@@ -544,4 +516,4 @@ function renderProgList(){
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-export { _fmtMileAnchor, progAlignment, progTestPin, renderProgList, runAnchorInfo };
+export { progAlignment, progTestPin, renderProgList };

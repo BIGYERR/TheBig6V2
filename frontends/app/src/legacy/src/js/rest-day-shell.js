@@ -1,8 +1,9 @@
 import { completedKey, getCompleted, getLogs, getPrograms, saveLogs, savePrograms } from './storage.js';
+import { getWeekMonday } from './calendar.js';
 import { DAY_FULL } from './wizard.js';
 import { _pattern } from './region-caps.js';
 import { _PATTERN_REGION } from './budget-engine-d.js';
-import { dayBeforeStart, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { dayBeforeStart, renderWeekView } from './week-view-sections.js';
 import { CARDIO_PARK_FIELDS } from './log-entries.js';
 import { updateRestFloat } from './rest-timer.js';
 import { renderProgList } from './programs.js';
@@ -226,13 +227,28 @@ function restMoveCandidates(w){
   return out;
 }
 let activeProgId=null,currentWeek=1,currentDayKey=null,activeProg=null,calcLift='Deadlift',editProgId=null,progressViewId=null,confirmProgId=null,confirmTier=0;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setActiveProgId(v){ activeProgId=v; }
+function _setCurrentWeek(v){ currentWeek=v; }
+function _setCurrentDayKey(v){ currentDayKey=v; }
+function _setActiveProg(v){ activeProg=v; }
+function _setCalcLift(v){ calcLift=v; }
+function _setEditProgId(v){ editProgId=v; }
+function _setProgressViewId(v){ progressViewId=v; }
+function _setConfirmProgId(v){ confirmProgId=v; }
+function _setConfirmTier(v){ confirmTier=v; }
 // V168 D8 — render-scoped, NOT persisted. The D7 sentence fires on the first stale
 // pill of a rendered day card; every stale pill below it goes dashed and silent.
 // Reset in openDetail, which is also the re-render path for swap/skip/add, so an
 // in-session edit re-arms it exactly once rather than losing it.
 let _staleWarnShown=false,_staleWarnSrc='';
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setStaleWarnShown(v){ _staleWarnShown=v; }
+function _setStaleWarnSrc(v){ _staleWarnSrc=v; }
 let openProgIds=new Set();
 let currentRandIdx=-1;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setCurrentRandIdx(v){ currentRandIdx=v; }
 
 let _curScreen='screenHome';
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);updateTabBar(id);_curScreen=id;updateRestFloat();}
@@ -256,7 +272,9 @@ function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  _curScreen, _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, applyRestDayMoves, calcLift, confirmProgId,
-  confirmTier, currentDayKey, currentRandIdx, currentWeek, editProgId, openProgIds, openRestSheet, progressViewId,
-  restDayEligible, showScreen, showToast,
+  _curScreen, _setActiveProg, _setActiveProgId, _setCalcLift, _setConfirmProgId, _setConfirmTier, _setCurrentDayKey,
+  _setCurrentRandIdx, _setCurrentWeek, _setEditProgId, _setProgressViewId, _setStaleWarnShown, _setStaleWarnSrc,
+  _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, applyRestDayMoves, calcLift, confirmProgId, confirmTier,
+  currentDayKey, currentWeek, editProgId, openProgIds, openRestSheet, progressViewId, restDayEligible, showScreen,
+  showToast,
 };

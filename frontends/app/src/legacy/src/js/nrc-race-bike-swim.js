@@ -1,8 +1,7 @@
-import { _ISO_ORDER, _clkMS, _isoOf } from './wizard.js';
+import { _ISO_ORDER, _isoOf, _parseLocalDate, getWeekMonday } from './calendar.js';
+import { _clkMS } from './clock-format.js';
 import { getCHIBike, getCHISwim, getINTBike, getINTReps, isCardioCutbackWeek } from './nsw-cardio.js';
 import { paceChartLookup, steadyCapSec } from './cardio-progression.js';
-import { getWeekMonday } from './week-view-sections.js';
-import { _parseLocalDate } from './overlays.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ════════════════════════════════════════════════════════════════════

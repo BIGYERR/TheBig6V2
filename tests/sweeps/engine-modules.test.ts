@@ -28,7 +28,6 @@ beforeAll(async () => {
 });
 afterAll(() => {
   vi.useRealTimers();
-  vi.unstubAllGlobals();
 });
 
 test('every program on the 864-config lattice, built by the engine modules, has the digest the classic script builds', () => {

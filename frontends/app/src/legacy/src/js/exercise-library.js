@@ -307,9 +307,26 @@ function _swapUniverseAdd(arr){
 }
 function _swapUniverseList(){return _SWAP_UNIVERSE?Object.keys(_SWAP_UNIVERSE):[];}
 function pick(arr,n,seed){_swapUniverseAdd(arr);const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(seededRand(seed+i)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
+// Lifting focus maps to internal goal for wave/exercise selection
+const LIFTING_FOCUS_TO_GOAL = {
+  strength: 'strength',
+  hypertrophy: 'hypertrophy',
+  fatloss: 'fatloss',
+  balanced: 'balanced',
+  support_strength: 'athletic',
+  support_athletic: 'athletic',
+  support_prevention: 'endurance',
+};
+// Experience-based 1RM defaults — conservative estimates
+const DEFAULT_1RM = {
+  beginner:    {bench:65,  squat:75,  deadlift:95},   // conservative untrained estimates (single source of truth)
+  intermediate:{bench:135, squat:155, deadlift:185},  // been at it a while, consistent
+  advanced:    {bench:225, squat:275, deadlift:315},  // solid lifter, knows the movements
+};
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  EXLIB, EX_KEY_ALIAS, EX_RENAMED_V113, REP_AFFINITY, _carryRx, _expOK, _isOneArmPress, _ssLegal, _ssPair, _ssPartnerOf,
-  _stationClass, _swapUniverseAdd, _swapUniverseList, _swapUniverseReset, exStoreKey, foldExAliasKeys, pick, seededRand,
+  DEFAULT_1RM, EXLIB, EX_KEY_ALIAS, EX_RENAMED_V113, LIFTING_FOCUS_TO_GOAL, REP_AFFINITY, _carryRx, _expOK,
+  _isOneArmPress, _ssLegal, _ssPair, _ssPartnerOf, _stationClass, _swapUniverseAdd, _swapUniverseList,
+  _swapUniverseReset, exStoreKey, foldExAliasKeys, pick, seededRand,
 };

@@ -1,4 +1,4 @@
-import { asyIcon } from './storage.js';
+import { asyIcon } from './icons.js';
 import { PACE_CHART } from './cardio-progression.js';
 import { weeklyBest } from './log-entries.js';
 import {

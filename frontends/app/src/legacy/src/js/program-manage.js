@@ -1,14 +1,16 @@
 import { getActiveProgId, getPrograms, savePrograms, setActiveProgId } from './storage.js';
 import {
-  activeProg, activeProgId, applyRestDayMoves, confirmProgId, confirmTier, currentDayKey, currentWeek, editProgId,
-  progressViewId, showScreen, showToast,
+  _setActiveProg, _setActiveProgId, _setConfirmProgId, _setConfirmTier, _setCurrentDayKey, _setCurrentWeek,
+  _setEditProgId, _setProgressViewId, activeProg, activeProgId, applyRestDayMoves, progressViewId, showScreen,
+  showToast,
 } from './rest-day-shell.js';
+import { _parseLocalDate, getWeekMonday } from './calendar.js';
 import { applyDayEdits, applySessionSwaps, getDayEdits, getSwaps, pruneDayEdits } from './swaps-edits.js';
 import { buildProgram } from './budget-engine-d.js';
-import { calcCurrentWeek, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { calcCurrentWeek, renderWeekView } from './week-view-sections.js';
 import { entryDay } from './log-entries.js';
 import { progTestPin, renderProgList } from './programs.js';
-import { _isoToday, _parseLocalDate, applyOverlays, overlayWeekRange, paceShiftMap } from './overlays.js';
+import { _isoToday, applyOverlays, overlayWeekRange, paceShiftMap } from './overlays.js';
 import { renderProgressScreen } from './lift-ledger-progress-screen.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 function refreshProgram(prog){
@@ -288,11 +290,11 @@ function refreshProgram(prog){
 // no day). It is checked before the lookup, so the archived and unknown refusals cannot fire
 // on it. beforeRefresh, when given, runs once the globals name the new id and before
 // refreshProgram (boot passes its ex-weight alias fold there, the order boot always had).
-function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');activeProgId=null;activeProg=null;currentDayKey=null;currentWeek=1;return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);activeProgId=id;if(beforeRefresh)beforeRefresh();activeProg=refreshProgram(stored);currentWeek=calcCurrentWeek();currentDayKey=null;return true;}
+function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
 // V221 D178: Set Active is the one switch; a switch is complete when This Week shows the new block.
 function setActive(id){if(!loadActiveProgram(id))return;renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
-function startRename(id){editProgId=id;renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
-function cancelRename(){editProgId=null;renderProgList();}
+function startRename(id){_setEditProgId(id);renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
+function cancelRename(){_setEditProgId(null);renderProgList();}
 function commitRename(id){
   const inp=document.getElementById('renameInput_'+id);
   const programs=getPrograms();const p=programs.find(x=>x.id===id);
@@ -304,7 +306,7 @@ function commitRename(id){
       showToast('Renamed ✓');
     }
   }
-  editProgId=null;renderProgList();
+  _setEditProgId(null);renderProgList();
   if(activeProgId===id&&activeProg)renderWeekView();
 }
 function purgeProgData(id){['ia_logs_','ia_comp_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
@@ -327,8 +329,8 @@ function archiveProg(id){
   const programs=getPrograms();const p=programs.find(x=>x.id===id);if(!p)return;
   p.archived=true;p.archivedAt=Date.now();savePrograms(programs);
   _handoffActiveFrom(id,programs);
-  confirmProgId=null;confirmTier=0;
-  if(progressViewId===id)progressViewId=null;
+  _setConfirmProgId(null);_setConfirmTier(0);
+  if(progressViewId===id)_setProgressViewId(null);
   renderProgList();showToast('Program archived');
 }
 function unarchiveProg(id){
@@ -336,9 +338,9 @@ function unarchiveProg(id){
   delete p.archived;delete p.archivedAt;savePrograms(programs);
   renderProgList();showToast('Program restored');
 }
-function askArchive(id){confirmProgId=id;confirmTier=1;renderProgList();}
-function askPurge(id){confirmProgId=id;confirmTier=2;renderProgList();}
-function cancelConfirm(){confirmProgId=null;confirmTier=0;renderProgList();}
+function askArchive(id){_setConfirmProgId(id);_setConfirmTier(1);renderProgList();}
+function askPurge(id){_setConfirmProgId(id);_setConfirmTier(2);renderProgList();}
+function cancelConfirm(){_setConfirmProgId(null);_setConfirmTier(0);renderProgList();}
 // fromProgress is optional: the Programs-list call site passes nothing, so its
 // behaviour is byte-identical to V168.
 function deleteProg(id,fromProgress){
@@ -348,8 +350,8 @@ function deleteProg(id,fromProgress){
   programs=programs.filter(p=>p.id!==id);savePrograms(programs);
   _handoffActiveFrom(id,programs);
   purgeProgData(id);
-  confirmProgId=null;confirmTier=0;
-  if(progressViewId===id)progressViewId=null;
+  _setConfirmProgId(null);_setConfirmTier(0);
+  if(progressViewId===id)_setProgressViewId(null);
   if(fromProgress)renderProgressScreen();else renderProgList();
   showToast('Program deleted');
 }

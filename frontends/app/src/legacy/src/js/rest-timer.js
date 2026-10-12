@@ -3,6 +3,8 @@ import { _curScreen, activeProg } from './rest-day-shell.js';
 // ── Floating count-up rest stopwatch (PiP-style edge tab). Persists app-wide; runs through screen-lock. ──
 let _ruId=null,_ruRunning=false,_ruElapsed=0,_ruStart=0;
 let _rtSide='right',_rtExpanded=false,_rtIntroTO=null,_rtInited=false,_rtDragging=false,_rtIntroPending=false;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setRtIntroPending(v){ _rtIntroPending=v; }
 // V239 (D233, R1 as amended): inside the native app (window.iaIsland present) the rest clock is the wall clock
 // and the island mirrors every seam; on the PWA it stays performance.now() and the island is never called.
 function _ruClock(){return window.iaIsland?Date.now():performance.now();}
@@ -148,4 +150,4 @@ function updateRestFloat(){
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-export { _rtIntroPending, _ruIsland, ruReset, ruResetIfIdle, updateRestFloat };
+export { _ruIsland, _setRtIntroPending, ruReset, ruResetIfIdle, updateRestFloat };

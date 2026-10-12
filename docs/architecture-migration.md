@@ -296,12 +296,16 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
      HALF_MANNY and the nine seeded configs, and `tests/sweeps/engine-modules.test.ts` the 864-config lattice, each
      with the digest the classic script builds (the program-output golden files), in 6.5 s against the VM's 17. Both
      fail on the sources before this step (`buildProgram is not a function`).
-  2. **State modules for the 18 cross-file `let`s** (next). Each gets one owner that exports it with a setter, and the
-     files that assign it call the setter; `index.html` changes, proved by the feature tests, the snapshots and e2e.
-     Then every file runs correctly as a module, not only the engine.
-  3. **The engine's own files.** The 31 engine names that live in mostly-UI files (wizard 6, log-entries 9, storage 3,
-     swaps-edits 3, programs 3, week-view-sections 2, overlays 1) move into engine files, so the engine's files import
-     no UI file and can move to `core/` (phase D).
+  2. **Setters for the 18 cross-file `let`s (done, v0.239.2).** Each `let` another file assigns has a setter beside its
+     declaration, and the 61 assignments from other files call it, so no file assigns a name it imports
+     (`module-blocks.test.ts` holds that; before the step it found 61). A setter rather than a state module: every one
+     of the 61 was a plain assignment statement, and the reads stay live imports, so the smallest change does it.
+  3. **The engine's own files (done, v0.239.2).** The 27 engine names that lived in mostly-UI files moved into engine
+     files, five of them new (`icons`, `calendar`, `clock-format`, `exercise-kinds`, `swap-prefs`), and
+     `auxSwapCandidates` moved the other way. The engine is now 17 files that import only each other: it loads with no
+     page and no UI file (`tests/integration/engine-modules.test.ts`), the move added no load-order hazard (the measure
+     finds 0, in the page and as modules), and every program, screen and stored value is unchanged
+     (`docs/decisions/es-modules.md`).
   4. **Engine tests off the harness.** Tests of engine behaviour import it from the modules, file by file, instead of
      booting the VM; tests that read the script's text become behaviour tests or move with their code.
   5. **The bundle** (with phase F): esbuild builds the app from its entry module, one `globals.ts` registers exactly

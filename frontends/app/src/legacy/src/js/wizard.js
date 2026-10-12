@@ -1,5 +1,9 @@
-import { asyIcon, getPrograms } from './storage.js';
-import { activeProg, calcLift, showScreen, showToast } from './rest-day-shell.js';
+import { asyIcon } from './icons.js';
+import { getPrograms } from './storage.js';
+import { _setCalcLift, activeProg, calcLift, showScreen, showToast } from './rest-day-shell.js';
+import { DEFAULT_1RM, LIFTING_FOCUS_TO_GOAL } from './exercise-library.js';
+import { ALL_DAYS_ORDER, _ISO_ORDER, _isoOf, _parseLocalDate, getWeekMonday } from './calendar.js';
+import { _clkMS } from './clock-format.js';
 import { calcProgramLength, paceGoalTarget } from './nsw-cardio.js';
 import {
   NRC_SHORTER, PACE_GOALS, PACE_IMPROVE, raceAlignment, raceCountdown, raceCountdownWords,
@@ -8,17 +12,14 @@ import { isSpeedGoal, sportDayTargets } from './cardio-progression.js';
 import {
   _mileAdvisoryHTML, _mileEntryState, _mileFieldHelp, _swimAdvisoryHTML, generateProgram,
 } from './wizard-generate.js';
-import { getWeekMonday } from './week-view-sections.js';
 import { _fmtPaceMi } from './log-entries.js';
 import { progTestPin } from './programs.js';
-import { _parseLocalDate } from './overlays.js';
 import { seedFromPriorPrograms } from './progress-data.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // WIZARD
 
 // ── SHARED DAY CONSTANTS ──
-const ALL_DAYS_ORDER=['sun','mon','tue','wed','thu','fri','sat'];
 const DAY_FULL={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
 const DAY_SHORT={sun:'SU',mon:'MO',tue:'TU',wed:'WE',thu:'TH',fri:'FR',sat:'SA'};
 
@@ -32,6 +33,9 @@ const MIN_TRAIN_DAYS = {
 let wizardStep = 0;
 let lastRandIdx = -1;
 let currentRandDayKey = null;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setLastRandIdx(v){ lastRandIdx=v; }
+function _setCurrentRandDayKey(v){ currentRandDayKey=v; }
 
 // ── NEW WIZARD STRUCTURE ──
 // Steps: primary → profile → equipment → cardio_goal → lifting_focus → days → lifts → name
@@ -50,8 +54,6 @@ const WIZARD_STEPS = ['primary','profile','equipment','cardio_goal','lifting_foc
 //   • holdsTest=true (D184 c) when that short week holds the test of a dated test goal: the
 //     test date (from _rsRace) falls from the entered day through that Sunday. That week is
 //     not empty, so it does not snap: the start stays the entered day and week 1 is the test week.
-const _ISO_ORDER = ['mon','tue','wed','thu','fri','sat','sun'];
-function _isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function _isoToday(){ const t=new Date(); t.setHours(0,0,0,0); return _isoOf(t); }
 // D184 (c): the test date the resolver is given, or null. Only a dated test goal has one (the
 // run_pace_goal family, PACE_GOALS); race goals, run_base, undated goals and non run programs get
@@ -314,16 +316,6 @@ const LIFTING_OPTIONS = {
   ],
 };
 
-// Lifting focus maps to internal goal for wave/exercise selection
-const LIFTING_FOCUS_TO_GOAL = {
-  strength: 'strength',
-  hypertrophy: 'hypertrophy',
-  fatloss: 'fatloss',
-  balanced: 'balanced',
-  support_strength: 'athletic',
-  support_athletic: 'athletic',
-  support_prevention: 'endurance',
-};
 
 function startWizard() {
   wizardStep = 0;
@@ -341,12 +333,6 @@ function startWizard() {
 
 
 
-// Experience-based 1RM defaults — conservative estimates
-const DEFAULT_1RM = {
-  beginner:    {bench:65,  squat:75,  deadlift:95},   // conservative untrained estimates (single source of truth)
-  intermediate:{bench:135, squat:155, deadlift:185},  // been at it a while, consistent
-  advanced:    {bench:225, squat:275, deadlift:315},  // solid lifter, knows the movements
-};
 function get1RMDefault(lift){
   return DEFAULT_1RM[WD.experience||'intermediate'][lift]||0;
 }
@@ -376,13 +362,6 @@ function wizardNext() {
   }
 }
 
-// D126 (V204): _clkMS is the SINGLE OWNER of the seconds limb. It rounds the WHOLE value before
-// splitting, so a ':60' limb is structurally impossible rather than corrected after the fact
-// (the technique _fmtHMS already uses). Suffixes belong to the caller: '/mi', '/100', or bare.
-function _clkMS(sec){
-  const t = Math.round(sec);
-  return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0');
-}
 function formatPacePerMile(totalSecs, distMiles) {
   if(!totalSecs || !distMiles || distMiles <= 0) return '';
   const paceSecPerMile = totalSecs / distMiles;
@@ -400,7 +379,7 @@ function runCalc(){
   res.innerHTML='<b style="color:var(--accent)">Estimated '+calcLift+' 1RM: '+est+' '+unit+'</b> <span style="color:var(--muted)">— for your reference; the app coaches by RPE.</span>';
 }
 function setCalcLift(l){
-  calcLift=l;
+  _setCalcLift(l);
   ['Deadlift','Squat','Bench'].forEach(n=>{
     const b=document.getElementById('calcLift_'+n);
     if(b){const on=(n===l);b.style.background=on?'var(--accent)':'transparent';b.style.color=on?'var(--on-ink)':'var(--muted)';}
@@ -1187,7 +1166,7 @@ function renderWizardStep() {
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  ALL_DAYS_ORDER, CARDIO_GOALS_BY_TYPE, DAY_FULL, DEFAULT_1RM, GOAL_RECOMMENDED_DAYS, HYBRID_EXCLUDED_GOALS,
-  LIFTING_FOCUS_TO_GOAL, WD, _GOAL_RANK, _GOAL_REQ_INPUTS, _ISO_ORDER, _applyWizardStart, _clkMS, _fmtStartDay, _isoOf,
-  _rsRace, currentRandDayKey, lastRandIdx, renderWizardStep, resolveStartDate,
+  CARDIO_GOALS_BY_TYPE, DAY_FULL, GOAL_RECOMMENDED_DAYS, HYBRID_EXCLUDED_GOALS, WD, _GOAL_RANK, _GOAL_REQ_INPUTS,
+  _applyWizardStart, _fmtStartDay, _rsRace, _setCurrentRandDayKey, _setLastRandIdx, lastRandIdx, renderWizardStep,
+  resolveStartDate,
 };

@@ -1,11 +1,12 @@
-import { asyIcon, getLogs, logKey } from './storage.js';
+import { asyIcon } from './icons.js';
+import { getLogs, logKey } from './storage.js';
 import { currentDayKey, currentWeek } from './rest-day-shell.js';
 import { exStoreKey } from './exercise-library.js';
 import { tagMeta } from './week-view-sections.js';
 import { exLoggable } from './set-logging.js';
 import {
-  CARDIO_WORD, RPE_LABELS, _curLogDose, _curLogDoseFull, _curLogSub, _doseStripHTML, cardioSwapNoteText, doseFromCardio,
-  entryDay, getExWeights,
+  CARDIO_WORD, RPE_LABELS, _curLogDose, _curLogSub, _doseStripHTML, _setCurLogDose, _setCurLogDoseFull, _setCurLogSub,
+  cardioSwapNoteText, doseFromCardio, entryDay, getExWeights,
 } from './log-entries.js';
 import { cardioEntryLive, cardioLogLabel } from './day-status.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
@@ -330,7 +331,7 @@ function buildLogHTML(dayKey, dayCardio){
   // V148: resolve the dose once per render. Swapped sessions get null on purpose —
   // there is no prescription in the new sport, so the generic form is the honest one.
   const _dose=hasCardio?doseFromCardio(dayCardio):null;
-  _curLogDoseFull=_dose; _curLogSub=(dayCardio&&dayCardio.subtype)||''; _curLogDose=swapped?null:_dose;
+  _setCurLogDoseFull(_dose); _setCurLogSub((dayCardio&&dayCardio.subtype)||''); _setCurLogDose(swapped?null:_dose);
 
   // RPE slider value
   const rpeVal=e.rpe||'';

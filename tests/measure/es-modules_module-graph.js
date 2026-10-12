@@ -25,8 +25,16 @@ const jsFiles = order.filter((f) => f.endsWith('.js'));
 const htmlFiles = order.filter((f) => f.endsWith('.html'));
 let script = '';
 const spans = [];
+// Each JS file between its module blocks (phase C, step 1): what build-index.mjs puts into the page.
+const IMPORTS_END = '// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)\n';
+const EXPORTS_START = '\n// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)\n';
+const classic = (text) => {
+  const i = text.indexOf(IMPORTS_END);
+  const j = text.indexOf(EXPORTS_START);
+  return text.slice(i === -1 ? 0 : i + IMPORTS_END.length, j === -1 ? text.length : j);
+};
 for (const f of jsFiles) {
-  const text = fs.readFileSync(path.join(SRC, f), 'utf8');
+  const text = classic(fs.readFileSync(path.join(SRC, f), 'utf8'));
   spans.push({ file: path.basename(f, '.js'), from: script.length, to: script.length + text.length, bytes: Buffer.byteLength(text) });
   script += text;
 }

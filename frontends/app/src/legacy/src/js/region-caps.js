@@ -1,7 +1,3 @@
-import { _ssLegal, _ssPartnerOf } from './exercise-library.js';
-import { _powerAllowed } from './power-accessory.js';
-import { _dayPlanCfg, _swapInjuryOK } from './swaps-edits.js';
-// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── REGIONAL FATIGUE CAP ────────────────────────────────────────────────────
 // Within-day guard against same-region volume stacking. deconflictSameRegion
@@ -309,25 +305,6 @@ function _auxGearOK(name,equip){
   if(/\bband\b/.test(N)) return equip!=='bodyweight'&&equip!=='minimal';   // V193 (D46): wizard equipment copy gives bands to home_full, home_basic and crossfit
   return true;
 }
-// Candidates for a null-pattern swap: same family, not already on the card, gear-legal,
-// injury-legal through the REAL filter (no second copy of the drop rules), and — for the
-// power family — through _powerAllowed, so age/experience power doctrine cannot be
-// bypassed through the side door of a swap.
-function auxSwapCandidates(outName,day,prog){
-  const fam=_auxFamily(outName); if(!fam) return [];
-  const cfg=_dayPlanCfg(prog,day);   // D194 R1 (equipment unchanged: injury only)
-  const onCard=Object.create(null);
-  ((day&&day.sections)||[]).forEach(function(s){((s&&s.items)||[]).forEach(function(it){if(it&&it.name)onCard[it.name.toLowerCase()]=1;});});
-  const _ssP=_ssPartnerOf(day,outName);   // V164 D5: same partner filter as swapCandidates
-  return Object.keys(_AUX_FAMILY).filter(function(n){
-    if(n===outName||_AUX_FAMILY[n]!==fam) return false;
-    if(onCard[n.toLowerCase()]) return false;
-    if(!_auxGearOK(n,cfg.equipment||'home_full')) return false;
-    if(fam==='power'&&typeof _powerAllowed==='function'&&!_powerAllowed(n,cfg.experience,cfg.injury,cfg.ageBracket)) return false;
-    if(_ssP&&!_ssLegal(n,_ssP)) return false;         // V164 D5
-    return _swapInjuryOK(n,cfg);
-  }).sort();
-}
 // ── MOVEMENT REP FLOOR ───────────────────────────────────────────────────────
 // The wave descends reps (4x6 -> 4x3) on one premise: fewer reps at a higher RPE means
 // MORE WEIGHT on the bar. That premise holds for a barbell comp lift and for nothing
@@ -414,5 +391,5 @@ function _repFloor(name){
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
   _AUX_FAMILY, _AUX_FAMILY_LABEL, _AUX_GEAR, _auxFamily, _auxGearOK, _cardioInterference, _ceil, _isUnilateralRow,
-  _itemRegion, _moveCap, _pattern, _repFloor, _sectionRegion, _setCap, auxSwapCandidates,
+  _itemRegion, _moveCap, _pattern, _repFloor, _sectionRegion, _setCap,
 };

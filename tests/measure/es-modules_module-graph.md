@@ -7,9 +7,13 @@ for the names they use). Two runs print the same report. No app code runs.
 
 ## Reading
 
+(The report below is the before-picture, at `68399d1`. The script now reads each file between its module blocks;
+rerun after phase C steps 2 and 3 (v0.239.2) it finds the engine's 186 names in 17 engine files, no UI file among
+them, and 0 load-order hazards in the page or as modules.)
+
 - **The engine is separable.** `buildProgram` reaches 186 of the 783 top-level names, in 19 of the 35 files, and none
   of those 186 uses a browser API directly. Seven files are wholly engine (nsw-cardio, prehab, core-legs,
-  engine-a-b-calendar, injury, engine-c, and all but one name of power-accessory); 31 engine names live in files that
+  engine-a-b-calendar, injury, engine-c, and all but one name of power-accessory); 27 engine names live in files that
   are mostly UI (wizard 6, log-entries 9, storage 3, swaps-edits 3, programs 3, week-view-sections 2, overlays 1).
   No inline handler calls an engine name.
 - **The UI is one cycle.** 31 of the 35 files form one strongly connected component; 38 file pairs reference each
@@ -44,7 +48,7 @@ Steps:
    files (HALF_MANNY and the nine seeded configs, and the 864-config lattice in a sweep).
 2. The 18 cross-file-written `let`s move into state modules with setters (output changes; proved by the feature tests,
    the snapshots and e2e parity).
-3. The 31 engine names living in UI files move into engine files, so the engine's file set imports no UI file.
+3. The 27 engine names living in UI files move into engine files, so the engine's file set imports no UI file.
 4. Engine tests move from the VM harness to direct imports, file by file.
 
 ## Report

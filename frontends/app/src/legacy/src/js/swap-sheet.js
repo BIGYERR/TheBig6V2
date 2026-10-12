@@ -1,10 +1,12 @@
-import { asyIcon, esc, resnapshotDayEdit } from './storage.js';
+import { asyIcon } from './icons.js';
+import { esc, resnapshotDayEdit } from './storage.js';
 import { activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.js';
 import { _stripCapCue, applyInjuryFilter } from './injury.js';
-import { _AUX_FAMILY_LABEL, _auxFamily, _pattern, auxSwapCandidates } from './region-caps.js';
+import { _AUX_FAMILY_LABEL, _auxFamily, _pattern } from './region-caps.js';
+import { _swapDetailFor, applySwapPrefs } from './swap-prefs.js';
 import {
-  _dayPlanCfg, _swapDetailFor, addCandidates, addedDetailFor, applySwapPrefs, bumpSwapCount, clearAdd, clearSkip,
-  clearSwap, getSwaps, recordAdd, recordSkip, recordSwap, ssSkipToken, swapCandidates, swapLoadNote,
+  _dayPlanCfg, addCandidates, addedDetailFor, auxSwapCandidates, bumpSwapCount, clearAdd, clearSkip, clearSwap,
+  getSwaps, recordAdd, recordSkip, recordSwap, ssSkipToken, swapCandidates, swapLoadNote,
 } from './swaps-edits.js';
 import { _PATTERN_REGION, _compoundTier } from './budget-engine-d.js';
 import { parseRx } from './week-view-sections.js';

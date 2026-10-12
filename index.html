@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.239.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.239.2"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1211,16 +1211,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   </div>
 </div>
 
-<script>
-
+<script>// ── Icons: the Asylum icon set as inline SVG, and the emoji each stands in for. ──
 /* THE ASYLUM icon system — Lucide 2px (DS) + custom fitness marks. */
 const ASY_ICON_PATHS={"trash":"<path d=\"M3 6h18\"/><path d=\"M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2\"/><path d=\"M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6\"/><path d=\"M10 11v6M14 11v6\"/>","medal":"<path d=\"M7.5 3h9l-3 6h-3z\"/><path d=\"M12 9v2\"/><circle cx=\"12\" cy=\"16\" r=\"5\"/><path d=\"M12 14v4M10 16h4\"/>","growth":"<path d=\"M4.5 16a4.5 4.5 0 0 1 4.5 4.5\"/><path d=\"M4.5 11.75a8.75 8.75 0 0 1 8.75 8.75\"/><path d=\"M4.5 7.5a13 13 0 0 1 13 13\"/><path d=\"M13 11 19.5 4.5\"/><path d=\"M14.8 4.5h4.7v4.7\"/>","barbell":"<line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"/><rect x=\"5.5\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><rect x=\"15.9\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><line x1=\"2.5\" y1=\"9.5\" x2=\"2.5\" y2=\"14.5\"/><line x1=\"21.5\" y1=\"9.5\" x2=\"21.5\" y2=\"14.5\"/>","lightbulb":"<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>","brain":"<path d=\"M12 5a3 3 0 0 0-5.5 1.7A3 3 0 0 0 5 12a3 3 0 0 0 1.7 5.3A3 3 0 0 0 12 19\"/><path d=\"M12 5a3 3 0 0 1 5.5 1.7A3 3 0 0 1 19 12a3 3 0 0 1-1.7 5.3A3 3 0 0 1 12 19\"/><path d=\"M12 5v14\"/>","scale":"<line x1=\"12\" y1=\"4\" x2=\"12\" y2=\"20\"/><line x1=\"7\" y1=\"20\" x2=\"17\" y2=\"20\"/><line x1=\"4\" y1=\"7\" x2=\"20\" y2=\"7\"/><path d=\"M4 7 1.6 12.6a2.4 2.4 0 0 0 4.8 0z\"/><path d=\"M20 7l-2.4 5.6a2.4 2.4 0 0 0 4.8 0z\"/>","warning":"<path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13.5\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>","siren":"<path d=\"M8 13a4 4 0 0 1 8 0v1.5H8z\"/><rect x=\"6\" y=\"14.5\" width=\"12\" height=\"5\" rx=\"1\"/><line x1=\"12\" y1=\"14.5\" x2=\"12\" y2=\"19.5\"/><line x1=\"12\" y1=\"6\" x2=\"12\" y2=\"3\"/><line x1=\"18\" y1=\"8.3\" x2=\"20.2\" y2=\"6.1\"/><line x1=\"6\" y1=\"8.3\" x2=\"3.8\" y2=\"6.1\"/><line x1=\"20\" y1=\"13\" x2=\"22.5\" y2=\"13\"/><line x1=\"4\" y1=\"13\" x2=\"1.5\" y2=\"13\"/>","kettlebell":"<path d=\"M7.7 11.3C6.2 8.4 7.6 4.8 12 4.8s5.8 3.6 4.3 6.5\"/><path d=\"M10 10c-.9-1.6-.2-3.3 2-3.3s2.9 1.7 2 3.3\"/><path d=\"M7.7 11.3a5.4 5.4 0 1 0 8.6 0\"/>","flagFinish":"<line x1=\"5\" y1=\"21\" x2=\"5\" y2=\"3\"/><path d=\"M5 4h14v9H5z\"/><line x1=\"5\" y1=\"8.5\" x2=\"19\" y2=\"8.5\"/><line x1=\"9.66\" y1=\"4\" x2=\"9.66\" y2=\"13\"/><line x1=\"14.33\" y1=\"4\" x2=\"14.33\" y2=\"13\"/>","lock":"<rect x=\"4\" y=\"10.5\" width=\"16\" height=\"10.5\" rx=\"2\"/><path d=\"M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5\"/>","notebook":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><line x1=\"9\" y1=\"3\" x2=\"9\" y2=\"21\"/><line x1=\"12\" y1=\"8\" x2=\"16\" y2=\"8\"/><line x1=\"12\" y1=\"12\" x2=\"16\" y2=\"12\"/><line x1=\"12\" y1=\"16\" x2=\"16\" y2=\"16\"/>","calculator":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><rect x=\"8\" y=\"6\" width=\"8\" height=\"3\" rx=\"0.5\"/><line x1=\"8\" y1=\"13\" x2=\"8.01\" y2=\"13\"/><line x1=\"12\" y1=\"13\" x2=\"12.01\" y2=\"13\"/><line x1=\"16\" y1=\"13\" x2=\"16.01\" y2=\"13\"/><line x1=\"8\" y1=\"17\" x2=\"8.01\" y2=\"17\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/><line x1=\"16\" y1=\"17\" x2=\"16.01\" y2=\"17\"/>","home":"<path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/>","dumbbell":"<path d=\"M6.5 6.5v11\"/><path d=\"M3.5 8.5v7\"/><path d=\"M17.5 6.5v11\"/><path d=\"M20.5 8.5v7\"/><line x1=\"6.5\" y1=\"12\" x2=\"17.5\" y2=\"12\"/>","chart":"<line x1=\"12\" y1=\"20\" x2=\"12\" y2=\"10\"/><line x1=\"18\" y1=\"20\" x2=\"18\" y2=\"4\"/><line x1=\"6\" y1=\"20\" x2=\"6\" y2=\"16\"/>","user":"<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>","play":"<polygon points=\"6 3 20 12 6 21 6 3\"/>","pause":"<rect x=\"6\" y=\"4\" width=\"4\" height=\"16\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\"/>","check":"<polyline points=\"20 6 9 17 4 12\"/>","plus":"<line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","minus":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","x":"<line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/>","chevronRight":"<polyline points=\"9 18 15 12 9 6\"/>","chevronLeft":"<polyline points=\"15 18 9 12 15 6\"/>","chevronDown":"<polyline points=\"6 9 12 15 18 9\"/>","clock":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>","flame":"<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/>","trophy":"<path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\"/><path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\"/><path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\"/><path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\"/>","bell":"<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9\"/><path d=\"M13.73 21a2 2 0 0 1-3.46 0\"/>","arrowRight":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/><polyline points=\"12 5 19 12 12 19\"/>","more":"<circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/>","target":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><circle cx=\"12\" cy=\"12\" r=\"6\"/><circle cx=\"12\" cy=\"12\" r=\"2\"/>","zap":"<polygon points=\"13 2 3 14 12 14 11 22 21 10 12 10 13 2\"/>","calendar":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/>","history":"<path d=\"M3 3v5h5\"/><path d=\"M3.05 13A9 9 0 1 0 6 5.3L3 8\"/><polyline points=\"12 7 12 12 15 15\"/>","sliders":"<line x1=\"4\" y1=\"21\" x2=\"4\" y2=\"14\"/><line x1=\"4\" y1=\"10\" x2=\"4\" y2=\"3\"/><line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"3\"/><line x1=\"20\" y1=\"21\" x2=\"20\" y2=\"16\"/><line x1=\"20\" y1=\"12\" x2=\"20\" y2=\"3\"/><line x1=\"1\" y1=\"14\" x2=\"7\" y2=\"14\"/><line x1=\"9\" y1=\"8\" x2=\"15\" y2=\"8\"/><line x1=\"17\" y1=\"16\" x2=\"23\" y2=\"16\"/>","skip":"<polygon points=\"5 4 15 12 5 20 5 4\"/><line x1=\"19\" y1=\"5\" x2=\"19\" y2=\"19\"/>","run":"<circle cx=\"15\" cy=\"5\" r=\"2\"/><path d=\"M14 7l-3 6\"/><path d=\"M14 9l4 1\"/><path d=\"M14 9l-4-1\"/><path d=\"M11 13l3 4-1 4\"/><path d=\"M11 13l-3 3 1 4\"/>","bike":"<circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"15\" cy=\"5\" r=\"1\"/><path d=\"M12 17.5V14l-3-3 4-3 2 3h2\"/>","swim":"<circle cx=\"8\" cy=\"9\" r=\"2\"/><path d=\"M10 10l4-2 3 2\"/><path d=\"M3 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/><path d=\"M3 20c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/>","shield":"<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"/>","sprout":"<path d=\"M7 20h10\"/><path d=\"M10 20c5.5-2.5.8-6.4 3-10\"/><path d=\"M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z\"/><path d=\"M14.1 6c-.9 1-1.3 2.5-1.1 4 1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z\"/>","flag":"<path d=\"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z\"/><line x1=\"4\" y1=\"22\" x2=\"4\" y2=\"15\"/>","dice":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M16 8h.01\"/><path d=\"M8 8h.01\"/><path d=\"M8 16h.01\"/><path d=\"M16 16h.01\"/><path d=\"M12 12h.01\"/>","backpack":"<path d=\"M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z\"/><path d=\"M8 10V6a4 4 0 0 1 8 0v4\"/><path d=\"M8 18h8\"/><path d=\"M8 14h8\"/>","pencil":"<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z\"/>","copy":"<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/>","bandage":"<rect x=\"1.8\" y=\"7.6\" width=\"20.4\" height=\"8.8\" rx=\"4.4\" transform=\"rotate(-45 12 12)\"/><line x1=\"8.6\" y1=\"8.6\" x2=\"15.4\" y2=\"15.4\"/><line x1=\"15.4\" y1=\"8.6\" x2=\"8.6\" y2=\"15.4\"/>","swap":"<line x1=\"3\" y1=\"8.5\" x2=\"17\" y2=\"8.5\"/><polyline points=\"14 5.5 17 8.5 14 11.5\"/><line x1=\"21\" y1=\"15.5\" x2=\"7\" y2=\"15.5\"/><polyline points=\"10 12.5 7 15.5 10 18.5\"/>"};
 const ASY_EMOJI={"🏅":"medal","🏆":"trophy","💪":"growth","🏋":"barbell","🦾":"dumbbell","⚡":"zap","🔥":"flame","⚖":"scale","🛡":"shield","🌱":"sprout","🧠":"brain","💡":"lightbulb","🏠":"home","🎒":"backpack","🤸":"kettlebell","👤":"user","🎯":"target","🏁":"flagFinish","🔒":"lock","⚠":"warning","🚨":"siren","✅":"check","📓":"notebook","🧮":"calculator","🏃":"run","🚴":"bike","🏊":"swim","📅":"calendar","📈":"chart","📊":"chart","🎲":"dice","⏱":"clock"};
+function asyIcon(key,size){size=size||22;var n=String(key||'').replace(/\uFE0F/g,'');n=ASY_EMOJI[n]||n;var p=ASY_ICON_PATHS[n];if(!p)return key||'';return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex:0 0 auto">'+p+'</svg>';}
+
+
 // Exercise names reach markup from the library, from swaps, and now from the add picker.
 // Escaped on the way in so a name containing a quote or angle bracket can never break the
 // attribute it sits in.
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-function asyIcon(key,size){size=size||22;var n=String(key||'').replace(/\uFE0F/g,'');n=ASY_EMOJI[n]||n;var p=ASY_ICON_PATHS[n];if(!p)return key||'';return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex:0 0 auto">'+p+'</svg>';}
 
 // STORAGE
 function getPrograms(){try{return JSON.parse(localStorage.getItem('ia_programs')||'[]');}catch{return[];}}
@@ -1595,13 +1596,28 @@ function restMoveCandidates(w){
   return out;
 }
 let activeProgId=null,currentWeek=1,currentDayKey=null,activeProg=null,calcLift='Deadlift',editProgId=null,progressViewId=null,confirmProgId=null,confirmTier=0;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setActiveProgId(v){ activeProgId=v; }
+function _setCurrentWeek(v){ currentWeek=v; }
+function _setCurrentDayKey(v){ currentDayKey=v; }
+function _setActiveProg(v){ activeProg=v; }
+function _setCalcLift(v){ calcLift=v; }
+function _setEditProgId(v){ editProgId=v; }
+function _setProgressViewId(v){ progressViewId=v; }
+function _setConfirmProgId(v){ confirmProgId=v; }
+function _setConfirmTier(v){ confirmTier=v; }
 // V168 D8 — render-scoped, NOT persisted. The D7 sentence fires on the first stale
 // pill of a rendered day card; every stale pill below it goes dashed and silent.
 // Reset in openDetail, which is also the re-render path for swap/skip/add, so an
 // in-session edit re-arms it exactly once rather than losing it.
 let _staleWarnShown=false,_staleWarnSrc='';
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setStaleWarnShown(v){ _staleWarnShown=v; }
+function _setStaleWarnSrc(v){ _staleWarnSrc=v; }
 let openProgIds=new Set();
 let currentRandIdx=-1;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setCurrentRandIdx(v){ currentRandIdx=v; }
 
 let _curScreen='screenHome';
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);updateTabBar(id);_curScreen=id;updateRestFloat();}
@@ -1931,11 +1947,207 @@ function _swapUniverseAdd(arr){
 }
 function _swapUniverseList(){return _SWAP_UNIVERSE?Object.keys(_SWAP_UNIVERSE):[];}
 function pick(arr,n,seed){_swapUniverseAdd(arr);const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(seededRand(seed+i)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
+// Lifting focus maps to internal goal for wave/exercise selection
+const LIFTING_FOCUS_TO_GOAL = {
+  strength: 'strength',
+  hypertrophy: 'hypertrophy',
+  fatloss: 'fatloss',
+  balanced: 'balanced',
+  support_strength: 'athletic',
+  support_athletic: 'athletic',
+  support_prevention: 'endurance',
+};
+// Experience-based 1RM defaults — conservative estimates
+const DEFAULT_1RM = {
+  beginner:    {bench:65,  squat:75,  deadlift:95},   // conservative untrained estimates (single source of truth)
+  intermediate:{bench:135, squat:155, deadlift:185},  // been at it a while, consistent
+  advanced:    {bench:225, squat:275, deadlift:315},  // solid lifter, knows the movements
+};
+// ── Exercise kinds: timed, rep-only or loaded, what a set logs, and how a weight rounds. ──
+// Equipment token map — single source of truth for how a movement name signals added
+// load. Each family lists every surface form, INCLUDING the parenthetical suffix
+// convention "Movement (ABBR)". Add a new abbreviation once here (e.g. a '(sb' for a
+// safety bar) and every detector below inherits it automatically — no more patching
+// isKBExercise / isDBExercise / isTrackableWeight one at a time.
+const EQUIP_TOKENS = {
+  barbell:    ['barbell','(bb'],
+  dumbbell:   ['dumbbell','db ','db-','(db'],
+  kettlebell: ['kettlebell','kb ','kb-','(kb'],
+  cable:      ['cable','(cable'],
+  machine:    ['machine'],
+  trapbar:    ['trap bar','(trap'],
+  // 'slam' added V122: 'Ball slams' IS med-ball work but named neither 'med ball' nor
+  // 'wall ball', so no equipment token matched and the movement was invisible to the gear
+  // gates while still being handed a weight field by movKeywords.
+  medball:    ['med ball','medicine ball','wall ball','slam'],
+  goblet:     ['goblet'],
+  loaded:     ['weighted','loaded']
+};
+// True if the name carries any external-load token at all.
+function anyEquip(name){
+  const n = (name||'').toLowerCase();
+  for(const fam in EQUIP_TOKENS){ if(EQUIP_TOKENS[fam].some(t => n.includes(t))) return true; }
+  return false;
+}
+function isTimeExercise(name) {
+  if(!name) return false;
+  const n = name.toLowerCase();
+  const timeKeywords = ['plank','hold','wall sit','dead hang','hollow hold',
+    'static hold','isometric hold','bird dog hold','dead bug hold'];
+  return timeKeywords.some(kw => n.includes(kw));
+}
+// Movements whose NAME matches a rep keyword — so `isRepExercise` vetoes the weight
+// field — but which are conventionally performed WITH external load when the name
+// carries no bodyweight qualifier.
+//
+// Root cause, and this is the third instance of the same failure (V101, V103, now):
+// **the name alone cannot say whether a movement is loaded**, because the engine draws
+// the SAME string into a barbell pool and a bodyweight pool. `EXLIB.lunge` holds
+// 'Dumbbell Bulgarian split squat' next to 'Reverse lunge (KB)'; the `_bw()` bodyweight branch
+// holds 'Bulgarian split squat (foot on chair)'. Only the parenthetical distinguishes
+// them, and `isRepExercise` matches the shared substring 'split squat' in both.
+//
+// The convention the library already follows: the BODYWEIGHT variant is explicitly
+// qualified — "(foot on chair)", "(chair)", "(shoulders on bed)", "Assisted ",
+// "Bodyweight ", "Banded " — and the loaded variant is bare. So a bare name in this
+// list gets its load field back; a qualified one keeps the veto.
+//
+// Adding a name here is a COACHING call, not a parser tweak: it asserts the movement is
+// normally performed under external load at any tier that owns equipment. The real fix
+// is to carry loaded-ness down from the POOL rather than re-derive it from the string —
+// see §12. Until then this list is the seam, and it must stay short.
+// V113: 'bulgarian split squat' removed. The bare name is gone from the library — the
+// loaded variant is 'Dumbbell Bulgarian split squat', which anyEquip catches directly.
+// One less name asserted by hand. The seam shrinks as the library gets honest.
+const REP_BUT_LOADED = ['single-leg hip thrust','bench dips'];
+const BW_QUALIFIER = ['(chair','foot on chair','shoulders on bed','assisted ','(assisted','bodyweight','(partner','(anchored','banded ','band ','(bw'];
+function isLoadedRepMovement(name){
+  const n=(name||'').toLowerCase();
+  if(BW_QUALIFIER.some(q => n.includes(q))) return false;
+  return REP_BUT_LOADED.some(k => n.includes(k));
+}
+function isTrackableWeight(name) {
+  if(!name) return false;
+  const n = name.toLowerCase();
+  // Band-only movements — no weight to track
+  if(n.includes('band') && !n.includes('barbell') && !n.includes('db') && !n.includes('kb')) return false;
+  // Explicit external load in the name wins — a loaded variant of a movement that also
+  // reads as a bodyweight/rep exercise (Barbell hip thrust, Dumbbell Bulgarian split squat,
+  // Weighted dips) must still get a weight field. This override beats the bodyweight and
+  // rep vetoes below. Timed holds stay on the SEC field. Tokens come from EQUIP_TOKENS.
+  if(anyEquip(n) && !isTimeExercise(n)) return true;
+  // STACK-LOADED, BUT THE NAME SAYS NOTHING. Cable and selectorised-machine movements the
+  // gym floor calls by their apparatus, not their implement: the athlete picks a pin, so
+  // these are among the MOST loadable movements in the building, yet every keyword list
+  // below misses them — 'face pull' has no equipment token and 'pull' is not a movKeyword,
+  // 'extension' is not a movKeyword at all, and 'pec deck' names neither. They therefore
+  // got no weight field, and as of V121 the unloadable sweep would ALSO have stripped their
+  // rep target, which is exactly backwards.
+  // Deliberately a short explicit list rather than adding a broad /extension/ token: that
+  // token would also flip 'Eccentric wrist extension', which is rehab work that stays
+  // unloaded, and 'Bodyweight back extension', which already names itself. Harvested from
+  // the file — 259 names classified, these four are the whole disagreement.
+  if(_STACK_LOADED.test(n)) return true;
+  // Same class of override, for loaded movements whose name carries no equipment token
+  // at all (bare 'Dumbbell Bulgarian split squat' from the barbell lunge pool). Must sit ABOVE
+  // the isRepExercise veto below — that veto is what removed the field.
+  if(isLoadedRepMovement(n) && !isTimeExercise(n)) return true;
+  // An explicit bodyweight qualifier beats every movement keyword below. Without this,
+  // movKeywords' 'raise' hands a LOAD field to 'Calf raise (bodyweight)', 'squat' hands one
+  // to 'Bodyweight squats', and 'deadlift' to 'Single-leg Romanian deadlift (bodyweight)'.
+  // Sits BELOW the anyEquip check on purpose: 'Single-leg glute bridge (weighted)' and
+  // 'Dumbbell Bulgarian split squat' name their load and keep the field.
+  if(BW_QUALIFIER.some(q => n.includes(q))) return false;
+  // Pure bodyweight / plyometric / cardio
+  const bwKeywords = ['jump squat','box jump','broad jump','burpee','mountain climber',
+    'sprint','run','jog','skipping','jumping jack','high knee',
+    'push-up','pushup','pull-up','pullup','chin-up','chinup',
+    'clamshell','side step','it band','90/90','pigeon','world greatest',
+    'lunge walk','bear crawl','inchworm','hip circle','terminal knee',
+    'inverted row','bound','skater jump','tuck jump',
+    'hanging knee raise','hanging leg raise',
+    'pallof','anti-rotation','bird dog','dead bug','plank'
+  ];
+  if(bwKeywords.some(kw => n.includes(kw))) return false;
+  // PHANTOM LOAD FIELDS (V122). Four movements matched a movKeyword by substring and were
+  // handed a weight field they can never use: 'McGill curl-up' (matched 'curl'),
+  // 'Garhammer raises' and 'Prone Y raise' (matched 'raise'), 'TRX row (if available)'
+  // (matched 'row'). None carries a qualifier BW_QUALIFIER could catch. The pool was
+  // internally inconsistent about it too: 'Prone Y-T-W raises' was already correctly
+  // vetoed by 'y-t-w' while its sibling 'Prone Y raise' was not.
+  // Matched on the whole name, not a substring, so a future 'Dumbbell Y raise' would
+  // still keep its field.
+  const _PHANTOM_LOAD=['mcgill curl-up','garhammer raises','prone y raise','trx row (if available)'];
+  if(_PHANTOM_LOAD.indexOf(n.trim())>=0) return false;
+  // Time-based holds tracked separately
+  if(isTimeExercise(n)) return false;
+  // Rep-based bodyweight tracked separately
+  if(isRepExercise(n)) return false;
+  // Equipment / weighted keywords — order matters, check equipment first
+  const equipKeywords = ['barbell','dumbbell','db ','db-','kettlebell','kb ','kb-',
+    'trap bar','cable','machine','weighted','med ball','medicine ball','wall ball'];
+  const movKeywords = ['press','row','curl','raise','deadlift','squat','bench',
+    'fly','flye','pulldown','upright','lateral','front raise','arnold','goblet',
+    'swing','snatch','clean','rdl','hip thrust','glute bridge','step-up',
+    'good morning','lunge','slam','carry','farmer','suitcase','thruster'];
+  return equipKeywords.some(kw => n.includes(kw)) || movKeywords.some(kw => n.includes(kw));
+}
+function isRepExercise(name) {
+  if(!name) return false;
+  const n = name.toLowerCase();
+  // Was only pullups/pushups/dips, so most no-load work (inverted rows, split squats,
+  // glute bridges, Nordics) fell through to the WEIGHT field or showed no log field at
+  // all — i.e. it could not be logged. Anything performed against bodyweight alone is
+  // logged in REPS, which is also what makes open-ended "sets to RPE" prescriptions work.
+  const repKeywords = ['pull-up','pullup','chin-up','chinup','push-up','pushup','dip','ring dip','muscle-up',
+    'inverted row','split squat','pistol squat','shrimp squat','glute bridge','hip thrust',
+    'nordic','back extension','snow angel','y-t-w','superman','step-up','lunge',
+    'sit-up','situp','leg raise','knee raise','v-up','hollow rock','squat (slow'];
+  return repKeywords.some(kw => n.includes(kw));
+}
+function roundWeight(lbs, unit) {
+  if(unit === 'kg') {
+    const kg = lbs * 0.453592;
+    return Math.round(kg / 2.5) * 2.5;
+  }
+  return Math.round(lbs / 5) * 5;
+}
+// ── Calendar: the day orders, local dates and week Mondays the engine and the screens share. ──
+const ALL_DAYS_ORDER=['sun','mon','tue','wed','thu','fri','sat'];
+const _ISO_ORDER = ['mon','tue','wed','thu','fri','sat','sun'];
+function _isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function getWeekMonday(dateStr){
+  // Get the Monday of the week containing the given date string
+  const parts=dateStr.split('-');
+  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  d.setHours(0,0,0,0);
+  // getDay(): 0=Sun,1=Mon,...,6=Sat
+  // Days since Monday: Sun=6, Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5
+  const dayOfWeek=d.getDay();
+  const daysSinceMonday=dayOfWeek===0?6:dayOfWeek-1;
+  d.setDate(d.getDate()-daysSinceMonday);
+  return d;
+}
+function _parseLocalDate(s){
+  const p=String(s||'').split('-');
+  if(p.length!==3) return null;
+  const d=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  if(isNaN(d.getTime())) return null;
+  d.setHours(0,0,0,0); return d;
+}
+// ── Clock format: m:ss for paces and times, and the mile anchor as it prints. ──
+// D126 (V204): _clkMS is the SINGLE OWNER of the seconds limb. It rounds the WHOLE value before
+// splitting, so a ':60' limb is structurally impossible rather than corrected after the fact
+// (the technique _fmtHMS already uses). Suffixes belong to the caller: '/mi', '/100', or bare.
+function _clkMS(sec){
+  const t = Math.round(sec);
+  return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0');
+}
+function _fmtMileAnchor(sec){ return _clkMS(sec); }   // D126 (V204)
 
 // WIZARD
 
 // ── SHARED DAY CONSTANTS ──
-const ALL_DAYS_ORDER=['sun','mon','tue','wed','thu','fri','sat'];
 const DAY_FULL={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
 const DAY_SHORT={sun:'SU',mon:'MO',tue:'TU',wed:'WE',thu:'TH',fri:'FR',sat:'SA'};
 
@@ -1949,6 +2161,9 @@ const MIN_TRAIN_DAYS = {
 let wizardStep = 0;
 let lastRandIdx = -1;
 let currentRandDayKey = null;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setLastRandIdx(v){ lastRandIdx=v; }
+function _setCurrentRandDayKey(v){ currentRandDayKey=v; }
 
 // ── NEW WIZARD STRUCTURE ──
 // Steps: primary → profile → equipment → cardio_goal → lifting_focus → days → lifts → name
@@ -1967,8 +2182,6 @@ const WIZARD_STEPS = ['primary','profile','equipment','cardio_goal','lifting_foc
 //   • holdsTest=true (D184 c) when that short week holds the test of a dated test goal: the
 //     test date (from _rsRace) falls from the entered day through that Sunday. That week is
 //     not empty, so it does not snap: the start stays the entered day and week 1 is the test week.
-const _ISO_ORDER = ['mon','tue','wed','thu','fri','sat','sun'];
-function _isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function _isoToday(){ const t=new Date(); t.setHours(0,0,0,0); return _isoOf(t); }
 // D184 (c): the test date the resolver is given, or null. Only a dated test goal has one (the
 // run_pace_goal family, PACE_GOALS); race goals, run_base, undated goals and non run programs get
@@ -2231,16 +2444,6 @@ const LIFTING_OPTIONS = {
   ],
 };
 
-// Lifting focus maps to internal goal for wave/exercise selection
-const LIFTING_FOCUS_TO_GOAL = {
-  strength: 'strength',
-  hypertrophy: 'hypertrophy',
-  fatloss: 'fatloss',
-  balanced: 'balanced',
-  support_strength: 'athletic',
-  support_athletic: 'athletic',
-  support_prevention: 'endurance',
-};
 
 function startWizard() {
   wizardStep = 0;
@@ -2258,12 +2461,6 @@ function startWizard() {
 
 
 
-// Experience-based 1RM defaults — conservative estimates
-const DEFAULT_1RM = {
-  beginner:    {bench:65,  squat:75,  deadlift:95},   // conservative untrained estimates (single source of truth)
-  intermediate:{bench:135, squat:155, deadlift:185},  // been at it a while, consistent
-  advanced:    {bench:225, squat:275, deadlift:315},  // solid lifter, knows the movements
-};
 function get1RMDefault(lift){
   return DEFAULT_1RM[WD.experience||'intermediate'][lift]||0;
 }
@@ -2293,13 +2490,6 @@ function wizardNext() {
   }
 }
 
-// D126 (V204): _clkMS is the SINGLE OWNER of the seconds limb. It rounds the WHOLE value before
-// splitting, so a ':60' limb is structurally impossible rather than corrected after the fact
-// (the technique _fmtHMS already uses). Suffixes belong to the caller: '/mi', '/100', or bare.
-function _clkMS(sec){
-  const t = Math.round(sec);
-  return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0');
-}
 function formatPacePerMile(totalSecs, distMiles) {
   if(!totalSecs || !distMiles || distMiles <= 0) return '';
   const paceSecPerMile = totalSecs / distMiles;
@@ -2317,7 +2507,7 @@ function runCalc(){
   res.innerHTML='<b style="color:var(--accent)">Estimated '+calcLift+' 1RM: '+est+' '+unit+'</b> <span style="color:var(--muted)">— for your reference; the app coaches by RPE.</span>';
 }
 function setCalcLift(l){
-  calcLift=l;
+  _setCalcLift(l);
   ['Deadlift','Squat','Bench'].forEach(n=>{
     const b=document.getElementById('calcLift_'+n);
     if(b){const on=(n===l);b.style.background=on?'var(--accent)':'transparent';b.style.color=on?'var(--on-ink)':'var(--muted)';}
@@ -6335,6 +6525,37 @@ function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, da
   }
   return 1;
 }
+// ── V172 (D7): THE RUN ANCHOR, STATED ────────────────────────────────────────
+// Every run pace the engines print comes from ONE chart row, and that row is picked by a
+// mile anchor the athlete was never shown — the V156 seed writes it into the wizard as if
+// typed, and no surface stated it. These helpers are read-only over cfg; the engines keep
+// their own anchor logic and the assertion suite checks the two agree.
+const _CHART_RUN_GOALS = new Set(['run_half','run_marathon','run_5k','run_10k','run_pace_goal','run_mile_time','run_15_under10','run_base']);
+function runAnchorInfo(cfg){
+  const c = cfg || {};
+  if(!(c.cardioTypes||[]).includes('run')) return null;
+  const g = c.cardioGoals && c.cardioGoals.run;
+  if(!g || !g.id || !_CHART_RUN_GOALS.has(g.id)) return null;      // run_base easy runs pace off this row since V206 (D189)
+  const exp = c.experience || 'intermediate';
+  const expDef = {beginner:690, intermediate:570, advanced:450}[exp] || 570;
+  const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0) : 0;
+  // Same rule as both engines: a falsy entry falls to the default (D188: every level).
+  const rawSec = entered ? entered : expDef;
+  const row = paceChartLookup('mile', rawSec);
+  // The chart CLAMPS: anything at or under its fastest row trains at that row, anything at
+  // or over its slowest trains there. row.mile is the anchor the engines actually use, so
+  // that is the number stated; when it differs from the entry, the sentence says so.
+  const anchorSec = row.mile;
+  const clamped = (!!entered && Math.round(row.mile) !== Math.round(rawSec)) ? (rawSec < row.mile ? 'fast' : 'slow') : null;
+  const src = g.mileBestSrc || null;
+  const kind = !entered ? 'default' : (src && src.kind === 'seeded') ? 'seeded' : (src && src.kind === 'edited') ? 'edited' : 'entered';
+  const race = g.id === 'run_half' ? 'half' : g.id === 'run_marathon' ? 'marathon' : null;
+  // V176 (D10): the fixed target for pace-goal programs. The chip is the prescription;
+  // the measure of progress is the projection card walking toward it.
+  const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
+    ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
+  return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
+}
 
 function buildHipSection(seed,bodyweight){
   // Reliable stability dose: the section always draws 2 loaded/active glute-med drills plus
@@ -6985,6 +7206,13 @@ function bodyweightSweep(weeks, _bwExp, _bwPrev){
     day.sections=day.sections.filter(sec=>(sec.items||[]).length>0);
   }));
   return weeks;
+}
+function _setLeadingSets(d,n){
+  var s=String(d||''), m=s.match(/^(\d+)\s*[x\u00d7]/);
+  if(m) return n+s.slice(m[1].length);
+  m=s.match(/^(\d+)\s*sets?\b/i);
+  if(m) return n+s.slice(m[1].length);
+  return s;
 }
 
 // Build a core finisher block applying the PRIORITY + PLACEMENT rules.
@@ -7650,13 +7878,13 @@ function doGenerate(){
     // First program (list empty) arms the rest-timer discovery intro. Gating on list-empty —
     // NOT a localStorage flag — means it re-fires after a delete-all, so it's actually testable
     // and can't get permanently stuck the way ia_rt_seen / ia_rt_intro2 did.
-    _rtIntroPending=(programs.length===0);
+    _setRtIntroPending(programs.length===0);
     programs.push(prog);savePrograms(programs);
     // V221 D178: the wizard commits through the loader; the program is stored on the line
     // above, so the loader reads it. The wizard still lands on week 1: calcCurrentWeek() is
     // later than 1 for a back-dated start (race-aligned NRC), and the landing does not move.
     loadActiveProgram(prog.id);
-    currentWeek=1;
+    _setCurrentWeek(1);
     // Update generate screen to show actual week count
     document.getElementById('generateSub').textContent='Your '+prog.totalWeeks+'-week program is ready!';
     setTimeout(()=>{showScreen('screenWeek');renderWeekView();renderProgList();},600);
@@ -9919,25 +10147,6 @@ function _auxGearOK(name,equip){
   if(/\bband\b/.test(N)) return equip!=='bodyweight'&&equip!=='minimal';   // V193 (D46): wizard equipment copy gives bands to home_full, home_basic and crossfit
   return true;
 }
-// Candidates for a null-pattern swap: same family, not already on the card, gear-legal,
-// injury-legal through the REAL filter (no second copy of the drop rules), and — for the
-// power family — through _powerAllowed, so age/experience power doctrine cannot be
-// bypassed through the side door of a swap.
-function auxSwapCandidates(outName,day,prog){
-  const fam=_auxFamily(outName); if(!fam) return [];
-  const cfg=_dayPlanCfg(prog,day);   // D194 R1 (equipment unchanged: injury only)
-  const onCard=Object.create(null);
-  ((day&&day.sections)||[]).forEach(function(s){((s&&s.items)||[]).forEach(function(it){if(it&&it.name)onCard[it.name.toLowerCase()]=1;});});
-  const _ssP=_ssPartnerOf(day,outName);   // V164 D5: same partner filter as swapCandidates
-  return Object.keys(_AUX_FAMILY).filter(function(n){
-    if(n===outName||_AUX_FAMILY[n]!==fam) return false;
-    if(onCard[n.toLowerCase()]) return false;
-    if(!_auxGearOK(n,cfg.equipment||'home_full')) return false;
-    if(fam==='power'&&typeof _powerAllowed==='function'&&!_powerAllowed(n,cfg.experience,cfg.injury,cfg.ageBracket)) return false;
-    if(_ssP&&!_ssLegal(n,_ssP)) return false;         // V164 D5
-    return _swapInjuryOK(n,cfg);
-  }).sort();
-}
 // ── MOVEMENT REP FLOOR ───────────────────────────────────────────────────────
 // The wave descends reps (4x6 -> 4x3) on one premise: fewer reps at a higher RPE means
 // MORE WEIGHT on the bar. That premise holds for a barbell comp lift and for nothing
@@ -10020,6 +10229,86 @@ function _repFloor(name){
   for(let i=0;i<_REP_FLOOR.length;i++){ if(_REP_FLOOR[i][0].test(N)) return _REP_FLOOR[i][1]; }
   return null;
 }
+// ── Swap preferences: a swap the athlete made, carried into every build (applySwapPrefs) with its detail and injury check. ──
+// Survives the athlete's injury plan? Wrapped as a throwaway section so the real
+// filter does the judging — no second copy of the drop rules.
+function _swapInjuryOK(name,cfg){
+  if(!cfg||!cfg.injury) return true;
+  try{
+    const out=applyInjuryFilter([{label:'x',items:[{name:name,detail:'3×5'}]}],cfg);
+    return !!(out&&out[0]&&out[0].items&&out[0].items.length&&out[0].items[0].name===name);
+  }catch(e){ return true; }
+}
+// Name-level substitution over a day's sections. Returns true when anything changed.
+// Section labels embed the exercise name ("Main — Deadlift"), so they move too, the
+// same way bodyweightSweep handles it.
+// A swap or an add can land on a movement that has no load to move. Between two loaded
+// movements the prescription carries verbatim and stays honest, because pure RPE
+// self-corrects — "4×5 @ RPE 8" means something on any bar. It does not survive the jump
+// to bodyweight: "3×10–12 at RPE 7" on a pushup is a guess at the athlete's capacity, not
+// an instruction, and the sheet's own promise ("whatever you pick keeps 3×10–12 at RPE 7")
+// is then false for anyone who can do thirty of them.
+//
+// No new dialect for this. The three pieces already exist and are already tested:
+// _repFloor knows which movements are unloadable, _BW_KEEP_FIXED protects the ones that
+// legitimately carry a number anyway (timed holds, plyos, carries, core bracing), and
+// _bwSetsFromDetail writes the copy the bodyweight tier has shipped since V94. This is
+// the same conversion bodyweightSweep runs, reached from the swap sheet instead of from
+// the config. (V119. §12 records the general case: 58.7% of unloadable-movement
+// prescriptions still arrive from generation with a fixed rep target on every other tier.)
+function _swapDetailFor(name,detail,out){
+  if(!name||!detail) return detail;
+  const fl=(typeof _repFloor==='function')?_repFloor(name):null;
+  // V221 D177 (R1, R2). A swapped Main is prescribed the way the engine would have
+  // prescribed the candidate in that slot: scheme()'s floor branch, on the wave Main
+  // grammar and nothing else. The detail must start `S×R — RPE ` with R a number or a
+  // lo–hi range, and the low end is compared exactly as scheme() compares it. Under the
+  // window's low end the rep token becomes the window; sets, RPE, note, ramp-up and rest
+  // carry byte for byte. At or above it the donor carries verbatim. The null row never
+  // gets here with a window, so barbell compounds carry verbatim too.
+  // This sits BEFORE the _BW_KEEP_FIXED test on purpose: that regex holds `rotational`,
+  // which would shut out Landmine rotational press, a loaded lift the unilateral row windows.
+  // `out` is optional. A caller that passes one learns the window fired (the swap toast).
+  if(fl&&fl[1]!==0){
+    const m=/^(\d+×)(\d+(?:–\d+)?)( — RPE )/.exec(detail);
+    if(m){
+      const lo=parseInt(m[2],10);
+      if(!(lo>=fl[0])){
+        if(out) out.win=[fl[0],fl[1]];
+        return m[1]+fl[0]+'–'+fl[1]+detail.slice(m[1].length+m[2].length);
+      }
+    }
+    return detail;
+  }
+  if(!(fl&&fl[1]===0)) return detail;                 // movement can express a rep target
+  if(_BW_KEEP_FIXED.test(name)) return detail;        // holds, plyos, carries, core
+  // TWO SYSTEMS HAVE TO AGREE. _repFloor's unloadable clause is a broad regex
+  // (/\bdips\b|pushup/), so it also catches five movements the LOG side is about to hand
+  // a weight field to: Bench dips, Weighted dips, Glute-ham raise, Pushup variation
+  // (weighted), Single-leg glute bridge (weighted). If the app will show you somewhere to
+  // write a number, a rep target is a real instruction and must not be taken away.
+  // Harvested from the file, not hand-listed — five of 217 names disagree.
+  try{ if(typeof isTrackableWeight==='function' && isTrackableWeight(name,detail)) return detail; }catch(e){}
+  if(!/^\s*\d+\s*[×x]\s*\d/.test(detail)) return detail;  // already open-ended
+  return _bwSetsFromDetail(detail);
+}
+function applySwapPrefs(sections,map){
+  if(!Array.isArray(sections)||!map) return false;
+  let hit=false;
+  sections.forEach(sec=>{
+    if(!sec||!Array.isArray(sec.items)) return;
+    sec.items.forEach(it=>{
+      if(!it||!it.name) return;
+      const to=map[it.name];
+      if(!to||to===it.name) return;
+      const was=it.name;
+      it.name=to; hit=true;
+      it.detail=_swapDetailFor(to,_stripCapCue(it.detail));
+      if(sec.label&&sec.label.indexOf(was)>=0) sec.label=sec.label.split(was).join(to);
+    });
+  });
+  return hit;
+}
 // Which region a pattern belongs to (for ceiling bookkeeping + interference).
 // ── EXERCISE SWAP ────────────────────────────────────────────────────────────
 // Session-scoped substitution. The athlete trades one lift for another on the day
@@ -10058,15 +10347,6 @@ function _dayPlanCfg(prog,day){
   const ov=dayOverlayInfo(day);
   if(!ov||!ov.patch||!Object.prototype.hasOwnProperty.call(ov.patch,'injury')) return base;
   return Object.assign({},base,{injury:ov.patch.injury});
-}
-// Survives the athlete's injury plan? Wrapped as a throwaway section so the real
-// filter does the judging — no second copy of the drop rules.
-function _swapInjuryOK(name,cfg){
-  if(!cfg||!cfg.injury) return true;
-  try{
-    const out=applyInjuryFilter([{label:'x',items:[{name:name,detail:'3×5'}]}],cfg);
-    return !!(out&&out[0]&&out[0].items&&out[0].items.length&&out[0].items[0].name===name);
-  }catch(e){ return true; }
 }
 // Candidates for the ADD picker (V109). Same legality machinery as swapCandidates —
 // same universe harvest (travel-spliced, equipment-legal), same injury filter, same
@@ -10202,76 +10482,6 @@ function swapLoadNote(outName,candName){
   const d=_compoundTier(outName)-_compoundTier(candName);
   if(d<2) return '';
   return 'Much lighter than '+outName.toLowerCase()+'. Volume holds, top-end strength does not.';
-}
-// Name-level substitution over a day's sections. Returns true when anything changed.
-// Section labels embed the exercise name ("Main — Deadlift"), so they move too, the
-// same way bodyweightSweep handles it.
-// A swap or an add can land on a movement that has no load to move. Between two loaded
-// movements the prescription carries verbatim and stays honest, because pure RPE
-// self-corrects — "4×5 @ RPE 8" means something on any bar. It does not survive the jump
-// to bodyweight: "3×10–12 at RPE 7" on a pushup is a guess at the athlete's capacity, not
-// an instruction, and the sheet's own promise ("whatever you pick keeps 3×10–12 at RPE 7")
-// is then false for anyone who can do thirty of them.
-//
-// No new dialect for this. The three pieces already exist and are already tested:
-// _repFloor knows which movements are unloadable, _BW_KEEP_FIXED protects the ones that
-// legitimately carry a number anyway (timed holds, plyos, carries, core bracing), and
-// _bwSetsFromDetail writes the copy the bodyweight tier has shipped since V94. This is
-// the same conversion bodyweightSweep runs, reached from the swap sheet instead of from
-// the config. (V119. §12 records the general case: 58.7% of unloadable-movement
-// prescriptions still arrive from generation with a fixed rep target on every other tier.)
-function _swapDetailFor(name,detail,out){
-  if(!name||!detail) return detail;
-  const fl=(typeof _repFloor==='function')?_repFloor(name):null;
-  // V221 D177 (R1, R2). A swapped Main is prescribed the way the engine would have
-  // prescribed the candidate in that slot: scheme()'s floor branch, on the wave Main
-  // grammar and nothing else. The detail must start `S×R — RPE ` with R a number or a
-  // lo–hi range, and the low end is compared exactly as scheme() compares it. Under the
-  // window's low end the rep token becomes the window; sets, RPE, note, ramp-up and rest
-  // carry byte for byte. At or above it the donor carries verbatim. The null row never
-  // gets here with a window, so barbell compounds carry verbatim too.
-  // This sits BEFORE the _BW_KEEP_FIXED test on purpose: that regex holds `rotational`,
-  // which would shut out Landmine rotational press, a loaded lift the unilateral row windows.
-  // `out` is optional. A caller that passes one learns the window fired (the swap toast).
-  if(fl&&fl[1]!==0){
-    const m=/^(\d+×)(\d+(?:–\d+)?)( — RPE )/.exec(detail);
-    if(m){
-      const lo=parseInt(m[2],10);
-      if(!(lo>=fl[0])){
-        if(out) out.win=[fl[0],fl[1]];
-        return m[1]+fl[0]+'–'+fl[1]+detail.slice(m[1].length+m[2].length);
-      }
-    }
-    return detail;
-  }
-  if(!(fl&&fl[1]===0)) return detail;                 // movement can express a rep target
-  if(_BW_KEEP_FIXED.test(name)) return detail;        // holds, plyos, carries, core
-  // TWO SYSTEMS HAVE TO AGREE. _repFloor's unloadable clause is a broad regex
-  // (/\bdips\b|pushup/), so it also catches five movements the LOG side is about to hand
-  // a weight field to: Bench dips, Weighted dips, Glute-ham raise, Pushup variation
-  // (weighted), Single-leg glute bridge (weighted). If the app will show you somewhere to
-  // write a number, a rep target is a real instruction and must not be taken away.
-  // Harvested from the file, not hand-listed — five of 217 names disagree.
-  try{ if(typeof isTrackableWeight==='function' && isTrackableWeight(name,detail)) return detail; }catch(e){}
-  if(!/^\s*\d+\s*[×x]\s*\d/.test(detail)) return detail;  // already open-ended
-  return _bwSetsFromDetail(detail);
-}
-function applySwapPrefs(sections,map){
-  if(!Array.isArray(sections)||!map) return false;
-  let hit=false;
-  sections.forEach(sec=>{
-    if(!sec||!Array.isArray(sec.items)) return;
-    sec.items.forEach(it=>{
-      if(!it||!it.name) return;
-      const to=map[it.name];
-      if(!to||to===it.name) return;
-      const was=it.name;
-      it.name=to; hit=true;
-      it.detail=_swapDetailFor(to,_stripCapCue(it.detail));
-      if(sec.label&&sec.label.indexOf(was)>=0) sec.label=sec.label.split(was).join(to);
-    });
-  });
-  return hit;
 }
 // ── SESSION SWAP STORE ───────────────────────────────────────────────────────
 // Keyed w<N>_<day> exactly like ia_logs_ and ia_comp_, so the freeze's "touched"
@@ -10448,6 +10658,25 @@ function bumpSwapCount(pid,from,to){
 function markSwapOffered(pid,from){
   const c=getSwapCounts(pid);
   if(c[from]){c[from].offered=true;saveSwapCounts(pid,c);}
+}
+// Candidates for a null-pattern swap: same family, not already on the card, gear-legal,
+// injury-legal through the REAL filter (no second copy of the drop rules), and — for the
+// power family — through _powerAllowed, so age/experience power doctrine cannot be
+// bypassed through the side door of a swap.
+function auxSwapCandidates(outName,day,prog){
+  const fam=_auxFamily(outName); if(!fam) return [];
+  const cfg=_dayPlanCfg(prog,day);   // D194 R1 (equipment unchanged: injury only)
+  const onCard=Object.create(null);
+  ((day&&day.sections)||[]).forEach(function(s){((s&&s.items)||[]).forEach(function(it){if(it&&it.name)onCard[it.name.toLowerCase()]=1;});});
+  const _ssP=_ssPartnerOf(day,outName);   // V164 D5: same partner filter as swapCandidates
+  return Object.keys(_AUX_FAMILY).filter(function(n){
+    if(n===outName||_AUX_FAMILY[n]!==fam) return false;
+    if(onCard[n.toLowerCase()]) return false;
+    if(!_auxGearOK(n,cfg.equipment||'home_full')) return false;
+    if(fam==='power'&&typeof _powerAllowed==='function'&&!_powerAllowed(n,cfg.experience,cfg.injury,cfg.ageBracket)) return false;
+    if(_ssP&&!_ssLegal(n,_ssP)) return false;         // V164 D5
+    return _swapInjuryOK(n,cfg);
+  }).sort();
 }
 const _PATTERN_REGION = {
   hpress:'push', vpress:'push', delt_iso:'push', tri_iso:'push',
@@ -11511,13 +11740,13 @@ function reroll(){
   const pool=getActivePool();
   let idx;
   do{idx=Math.floor(Math.random()*pool.length);}while(idx===lastRandIdx&&pool.length>1);
-  lastRandIdx=idx;currentRandIdx=idx;
+  _setLastRandIdx(idx);_setCurrentRandIdx(idx);
   const w=pool[idx];
   const done=getWildcardDone();
   const alreadyDone=done.some(d=>d.title===w.title);
   const now=new Date();
   const dowToKey={0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
-  currentRandDayKey=dowToKey[now.getDay()]||'mon';
+  _setCurrentRandDayKey(dowToKey[now.getDay()]||'mon');
   const goal=activeProg?.goal||'balanced';
   const colors={strength:'var(--lift)',hypertrophy:'var(--hip)',fatloss:'var(--run)',athletic:'var(--bike)',balanced:'var(--accent)',endurance:'var(--run)',support_strength:'var(--lift)',support_athletic:'var(--bike)',support_prevention:'var(--hip)'};
   const color=colors[goal];
@@ -11674,18 +11903,6 @@ function _partialWeek1(prog){
   if(!prog||!prog.startDate) return false;
   const sd=_parseLocalDate(prog.startDate); if(!sd) return false;
   return getWeekMonday(prog.startDate).getTime() !== sd.getTime();
-}
-function getWeekMonday(dateStr){
-  // Get the Monday of the week containing the given date string
-  const parts=dateStr.split('-');
-  const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
-  d.setHours(0,0,0,0);
-  // getDay(): 0=Sun,1=Mon,...,6=Sat
-  // Days since Monday: Sun=6, Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5
-  const dayOfWeek=d.getDay();
-  const daysSinceMonday=dayOfWeek===0?6:dayOfWeek-1;
-  d.setDate(d.getDate()-daysSinceMonday);
-  return d;
 }
 function calcCurrentWeek(){
   if(!activeProg?.startDate) return 1;
@@ -12129,7 +12346,7 @@ function renderWeekView(){
       if(_hit) _ovMark=' \u2726';
     }
     b.textContent='Wk '+w+(w===actualWeek?' \u25cf':'')+_ovMark;
-    b.onclick=(wk=>()=>{currentWeek=wk;renderWeekView();})(w);wscroll.appendChild(b);
+    b.onclick=(wk=>()=>{_setCurrentWeek(wk);renderWeekView();})(w);wscroll.appendChild(b);
     if(w===currentWeek) _actBtn=b;
   }
   // Anchor on currentWeek, not actualWeek: the strip is a control for the week you are
@@ -12336,13 +12553,6 @@ function _stripLeadingSets(d){
     .replace(/^(\d+)\s*sets?\s+of\s+/i,'')
     .replace(/^(\d+)\s*sets?\s*(?:\u2014|\u2013|-)\s*/i,'')
     .replace(/^(\d+)\s*sets?\b\s*/i,'');
-}
-function _setLeadingSets(d,n){
-  var s=String(d||''), m=s.match(/^(\d+)\s*[x\u00d7]/);
-  if(m) return n+s.slice(m[1].length);
-  m=s.match(/^(\d+)\s*sets?\b/i);
-  if(m) return n+s.slice(m[1].length);
-  return s;
 }
 function buildSectionsHTML(sections,baseIdx){
   const all=sections||[];
@@ -13064,7 +13274,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
         _stale=isStaleTs(effEntry&&effEntry.ts);
         const _src=(crossSrc&&crossSrc.progName)||'';
         const _speak=_stale&&!_staleWarnShown;
-        if(_speak){ _staleWarnShown=true; _staleWarnSrc=_src; }
+        if(_speak){ _setStaleWarnShown(true); _setStaleWarnSrc(_src); }
         // Sub-label is age-only. It regains the source program name ONLY when this
         // pill's source differs from the one the sentence named — otherwise the
         // sentence would be speaking for a number it did not come from.
@@ -13175,151 +13385,10 @@ function isWeightedExercise(name) {
   const n = name.toLowerCase();
   return false; // handled by isTimeExercise and weight detection below
 }
-// Equipment token map — single source of truth for how a movement name signals added
-// load. Each family lists every surface form, INCLUDING the parenthetical suffix
-// convention "Movement (ABBR)". Add a new abbreviation once here (e.g. a '(sb' for a
-// safety bar) and every detector below inherits it automatically — no more patching
-// isKBExercise / isDBExercise / isTrackableWeight one at a time.
-const EQUIP_TOKENS = {
-  barbell:    ['barbell','(bb'],
-  dumbbell:   ['dumbbell','db ','db-','(db'],
-  kettlebell: ['kettlebell','kb ','kb-','(kb'],
-  cable:      ['cable','(cable'],
-  machine:    ['machine'],
-  trapbar:    ['trap bar','(trap'],
-  // 'slam' added V122: 'Ball slams' IS med-ball work but named neither 'med ball' nor
-  // 'wall ball', so no equipment token matched and the movement was invisible to the gear
-  // gates while still being handed a weight field by movKeywords.
-  medball:    ['med ball','medicine ball','wall ball','slam'],
-  goblet:     ['goblet'],
-  loaded:     ['weighted','loaded']
-};
 // True if the name carries a token from the given family (e.g. hasEquip(n,'kettlebell')).
 function hasEquip(name, fam){
   const n = (name||'').toLowerCase();
   return (EQUIP_TOKENS[fam]||[]).some(t => n.includes(t));
-}
-// True if the name carries any external-load token at all.
-function anyEquip(name){
-  const n = (name||'').toLowerCase();
-  for(const fam in EQUIP_TOKENS){ if(EQUIP_TOKENS[fam].some(t => n.includes(t))) return true; }
-  return false;
-}
-function isTimeExercise(name) {
-  if(!name) return false;
-  const n = name.toLowerCase();
-  const timeKeywords = ['plank','hold','wall sit','dead hang','hollow hold',
-    'static hold','isometric hold','bird dog hold','dead bug hold'];
-  return timeKeywords.some(kw => n.includes(kw));
-}
-// Movements whose NAME matches a rep keyword — so `isRepExercise` vetoes the weight
-// field — but which are conventionally performed WITH external load when the name
-// carries no bodyweight qualifier.
-//
-// Root cause, and this is the third instance of the same failure (V101, V103, now):
-// **the name alone cannot say whether a movement is loaded**, because the engine draws
-// the SAME string into a barbell pool and a bodyweight pool. `EXLIB.lunge` holds
-// 'Dumbbell Bulgarian split squat' next to 'Reverse lunge (KB)'; the `_bw()` bodyweight branch
-// holds 'Bulgarian split squat (foot on chair)'. Only the parenthetical distinguishes
-// them, and `isRepExercise` matches the shared substring 'split squat' in both.
-//
-// The convention the library already follows: the BODYWEIGHT variant is explicitly
-// qualified — "(foot on chair)", "(chair)", "(shoulders on bed)", "Assisted ",
-// "Bodyweight ", "Banded " — and the loaded variant is bare. So a bare name in this
-// list gets its load field back; a qualified one keeps the veto.
-//
-// Adding a name here is a COACHING call, not a parser tweak: it asserts the movement is
-// normally performed under external load at any tier that owns equipment. The real fix
-// is to carry loaded-ness down from the POOL rather than re-derive it from the string —
-// see §12. Until then this list is the seam, and it must stay short.
-// V113: 'bulgarian split squat' removed. The bare name is gone from the library — the
-// loaded variant is 'Dumbbell Bulgarian split squat', which anyEquip catches directly.
-// One less name asserted by hand. The seam shrinks as the library gets honest.
-const REP_BUT_LOADED = ['single-leg hip thrust','bench dips'];
-const BW_QUALIFIER = ['(chair','foot on chair','shoulders on bed','assisted ','(assisted','bodyweight','(partner','(anchored','banded ','band ','(bw'];
-function isLoadedRepMovement(name){
-  const n=(name||'').toLowerCase();
-  if(BW_QUALIFIER.some(q => n.includes(q))) return false;
-  return REP_BUT_LOADED.some(k => n.includes(k));
-}
-function isTrackableWeight(name) {
-  if(!name) return false;
-  const n = name.toLowerCase();
-  // Band-only movements — no weight to track
-  if(n.includes('band') && !n.includes('barbell') && !n.includes('db') && !n.includes('kb')) return false;
-  // Explicit external load in the name wins — a loaded variant of a movement that also
-  // reads as a bodyweight/rep exercise (Barbell hip thrust, Dumbbell Bulgarian split squat,
-  // Weighted dips) must still get a weight field. This override beats the bodyweight and
-  // rep vetoes below. Timed holds stay on the SEC field. Tokens come from EQUIP_TOKENS.
-  if(anyEquip(n) && !isTimeExercise(n)) return true;
-  // STACK-LOADED, BUT THE NAME SAYS NOTHING. Cable and selectorised-machine movements the
-  // gym floor calls by their apparatus, not their implement: the athlete picks a pin, so
-  // these are among the MOST loadable movements in the building, yet every keyword list
-  // below misses them — 'face pull' has no equipment token and 'pull' is not a movKeyword,
-  // 'extension' is not a movKeyword at all, and 'pec deck' names neither. They therefore
-  // got no weight field, and as of V121 the unloadable sweep would ALSO have stripped their
-  // rep target, which is exactly backwards.
-  // Deliberately a short explicit list rather than adding a broad /extension/ token: that
-  // token would also flip 'Eccentric wrist extension', which is rehab work that stays
-  // unloaded, and 'Bodyweight back extension', which already names itself. Harvested from
-  // the file — 259 names classified, these four are the whole disagreement.
-  if(_STACK_LOADED.test(n)) return true;
-  // Same class of override, for loaded movements whose name carries no equipment token
-  // at all (bare 'Dumbbell Bulgarian split squat' from the barbell lunge pool). Must sit ABOVE
-  // the isRepExercise veto below — that veto is what removed the field.
-  if(isLoadedRepMovement(n) && !isTimeExercise(n)) return true;
-  // An explicit bodyweight qualifier beats every movement keyword below. Without this,
-  // movKeywords' 'raise' hands a LOAD field to 'Calf raise (bodyweight)', 'squat' hands one
-  // to 'Bodyweight squats', and 'deadlift' to 'Single-leg Romanian deadlift (bodyweight)'.
-  // Sits BELOW the anyEquip check on purpose: 'Single-leg glute bridge (weighted)' and
-  // 'Dumbbell Bulgarian split squat' name their load and keep the field.
-  if(BW_QUALIFIER.some(q => n.includes(q))) return false;
-  // Pure bodyweight / plyometric / cardio
-  const bwKeywords = ['jump squat','box jump','broad jump','burpee','mountain climber',
-    'sprint','run','jog','skipping','jumping jack','high knee',
-    'push-up','pushup','pull-up','pullup','chin-up','chinup',
-    'clamshell','side step','it band','90/90','pigeon','world greatest',
-    'lunge walk','bear crawl','inchworm','hip circle','terminal knee',
-    'inverted row','bound','skater jump','tuck jump',
-    'hanging knee raise','hanging leg raise',
-    'pallof','anti-rotation','bird dog','dead bug','plank'
-  ];
-  if(bwKeywords.some(kw => n.includes(kw))) return false;
-  // PHANTOM LOAD FIELDS (V122). Four movements matched a movKeyword by substring and were
-  // handed a weight field they can never use: 'McGill curl-up' (matched 'curl'),
-  // 'Garhammer raises' and 'Prone Y raise' (matched 'raise'), 'TRX row (if available)'
-  // (matched 'row'). None carries a qualifier BW_QUALIFIER could catch. The pool was
-  // internally inconsistent about it too: 'Prone Y-T-W raises' was already correctly
-  // vetoed by 'y-t-w' while its sibling 'Prone Y raise' was not.
-  // Matched on the whole name, not a substring, so a future 'Dumbbell Y raise' would
-  // still keep its field.
-  const _PHANTOM_LOAD=['mcgill curl-up','garhammer raises','prone y raise','trx row (if available)'];
-  if(_PHANTOM_LOAD.indexOf(n.trim())>=0) return false;
-  // Time-based holds tracked separately
-  if(isTimeExercise(n)) return false;
-  // Rep-based bodyweight tracked separately
-  if(isRepExercise(n)) return false;
-  // Equipment / weighted keywords — order matters, check equipment first
-  const equipKeywords = ['barbell','dumbbell','db ','db-','kettlebell','kb ','kb-',
-    'trap bar','cable','machine','weighted','med ball','medicine ball','wall ball'];
-  const movKeywords = ['press','row','curl','raise','deadlift','squat','bench',
-    'fly','flye','pulldown','upright','lateral','front raise','arnold','goblet',
-    'swing','snatch','clean','rdl','hip thrust','glute bridge','step-up',
-    'good morning','lunge','slam','carry','farmer','suitcase','thruster'];
-  return equipKeywords.some(kw => n.includes(kw)) || movKeywords.some(kw => n.includes(kw));
-}
-function isRepExercise(name) {
-  if(!name) return false;
-  const n = name.toLowerCase();
-  // Was only pullups/pushups/dips, so most no-load work (inverted rows, split squats,
-  // glute bridges, Nordics) fell through to the WEIGHT field or showed no log field at
-  // all — i.e. it could not be logged. Anything performed against bodyweight alone is
-  // logged in REPS, which is also what makes open-ended "sets to RPE" prescriptions work.
-  const repKeywords = ['pull-up','pullup','chin-up','chinup','push-up','pushup','dip','ring dip','muscle-up',
-    'inverted row','split squat','pistol squat','shrimp squat','glute bridge','hip thrust',
-    'nordic','back extension','snow angel','y-t-w','superman','step-up','lunge',
-    'sit-up','situp','leg raise','knee raise','v-up','hollow rock','squat (slow'];
-  return repKeywords.some(kw => n.includes(kw));
 }
 function isKBExercise(name) {
   if(!name) return false;
@@ -13471,13 +13540,6 @@ function variantLoadFactor(exName){
   if(n.includes('close-grip')||n.includes('box squat')||n.includes('tempo')) return 0.90;
   return 1;
 }
-function roundWeight(lbs, unit) {
-  if(unit === 'kg') {
-    const kg = lbs * 0.453592;
-    return Math.round(kg / 2.5) * 2.5;
-  }
-  return Math.round(lbs / 5) * 5;
-}
 
 const RPE_LABELS = {1:'Very Easy',2:'Easy',3:'Moderate',4:'Somewhat Hard',5:'Hard',6:'Hard+',7:'Very Hard',8:'Very Hard+',9:'Max Effort',10:'All Out'};
 function updateRPEDisplay(val) {
@@ -13518,6 +13580,10 @@ function cardioSwapNoteText(active, planned, e){
 let _curLogDose=null;      // dose for the sport currently being logged (null when swapped)
 let _curLogDoseFull=null;  // dose of the PLANNED sport, so swapping back restores the form
 let _curLogSub='';         // planned subtype, for the strip label
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setCurLogDose(v){ _curLogDose=v; }
+function _setCurLogDoseFull(v){ _curLogDoseFull=v; }
+function _setCurLogSub(v){ _curLogSub=v; }
 function _fmtPaceMi(sec){ if(!isFinite(sec)||sec<=0) return null; return _clkMS(sec); }   // D126 (V204)
 function _parseClock(t){ // "2:04" or bare seconds -> seconds
   if(!t) return null; t=String(t).trim();
@@ -13945,7 +14011,7 @@ function buildLogHTML(dayKey, dayCardio){
   // V148: resolve the dose once per render. Swapped sessions get null on purpose —
   // there is no prescription in the new sport, so the generic form is the honest one.
   const _dose=hasCardio?doseFromCardio(dayCardio):null;
-  _curLogDoseFull=_dose; _curLogSub=(dayCardio&&dayCardio.subtype)||''; _curLogDose=swapped?null:_dose;
+  _setCurLogDoseFull(_dose); _setCurLogSub((dayCardio&&dayCardio.subtype)||''); _setCurLogDose(swapped?null:_dose);
 
   // RPE slider value
   const rpeVal=e.rpe||'';
@@ -14014,6 +14080,8 @@ function sessionLogProgress(day){
 // ── Floating count-up rest stopwatch (PiP-style edge tab). Persists app-wide; runs through screen-lock. ──
 let _ruId=null,_ruRunning=false,_ruElapsed=0,_ruStart=0;
 let _rtSide='right',_rtExpanded=false,_rtIntroTO=null,_rtInited=false,_rtDragging=false,_rtIntroPending=false;
+// Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
+function _setRtIntroPending(v){ _rtIntroPending=v; }
 // V239 (D233, R1 as amended): inside the native app (window.iaIsland present) the rest clock is the wall clock
 // and the island mirrors every seam; on the PWA it stays performance.now() and the island is never called.
 function _ruClock(){return window.iaIsland?Date.now():performance.now();}
@@ -14238,7 +14306,7 @@ function rangeTopNudgeHTML(day){
     +shown+extra+'. Go up in weight today and start back at the bottom of the range.</div>';
 }
 function openDetail(dayKey,day){
-  _staleWarnShown=false; _staleWarnSrc='';
+  _setStaleWarnShown(false); _setStaleWarnSrc('');
   window._unitLabel=(activeProg&&activeProg.cfg&&activeProg.cfg.unit==='kg')?'kg':'lbs';
   // V152 — A RE-RENDER MUST NOT MOVE THE READER.
   // openDetail is not only an open. It is also the re-render for every in-session edit:
@@ -14254,7 +14322,7 @@ function openDetail(dayKey,day){
   const _dOv=document.getElementById('detailOverlay');
   const _dFresh=!(_dOv&&_dOv.classList.contains('open')&&currentDayKey===dayKey);
   const _dKeep=_dFresh?0:_dOv.scrollTop;
-  currentDayKey=dayKey;
+  _setCurrentDayKey(dayKey);
   const comp=getCompleted()[completedKey(currentWeek,dayKey)];
   const over=document.getElementById('detailDayName');if(over)over.textContent='Week '+currentWeek+' \u00b7 '+DAY_FULL[dayKey];
   const ttl=document.getElementById('detailDayTitle');if(ttl)ttl.textContent=(comp&&comp.title)||day.title||'Training';
@@ -14752,7 +14820,7 @@ function acceptSwapNudge(){
     markSwapOffered(activeProgId,from);
     // Preference lives in cfg, so the rebuild below — and every rebuild after it —
     // reproduces the substitution without any patch store to re-apply.
-    activeProg=refreshProgram(p);
+    _setActiveProg(refreshProgram(p));
   }
   const o=document.getElementById('swapNudgeOverlay');if(o)o.classList.remove('show');
   _nudgeCtx=null;
@@ -14983,7 +15051,7 @@ function setCardioSwap(sport){
   const fields=document.getElementById('cardioFields');
   // V148: swapping back to the planned sport restores the dose form; any other sport
   // has no prescription here, so it gets the generic fields (null dose).
-  _curLogDose=(sport===planned)?_curLogDoseFull:null;
+  _setCurLogDose((sport===planned)?_curLogDoseFull:null);
   if(fields) fields.innerHTML=cardioFieldHTML(sport, e, _curLogDose, _curLogSub);
   wrap.querySelectorAll('#cardioPicker button[data-sport]').forEach(function(b){
     const on=b.dataset.sport===sport;
@@ -15024,8 +15092,8 @@ function setProgRace(dateStr){
   activeProg.startDate=_al.start;   // blockOpen stays — the weeks behind you don't move
   const programs=getPrograms();const idx=programs.findIndex(p=>p.id===activeProgId);
   if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
-  activeProg=refreshProgram(activeProg);   // untrained weeks re-pin; trained weeks stay frozen
-  currentWeek=calcCurrentWeek();
+  _setActiveProg(refreshProgram(activeProg));   // untrained weeks re-pin; trained weeks stay frozen
+  _setCurrentWeek(calcCurrentWeek());
   showToast('Race day '+_fmtStartDay(_al.raceIso)+' \u2014 plan starts '+_fmtStartDay(_al.start)+' \u2713');
   renderWeekView();
 }
@@ -15058,8 +15126,8 @@ function setProgStart(dateStr){
   if(_tp){ activeProg.cfg._testWeek=_tp.tw; activeProg.cfg._raceDateCappedWeeks=_tp.tw||_tp.len; }
   const programs=getPrograms();const idx=programs.findIndex(p=>p.id===activeProgId);
   if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
-  if(_tp) activeProg=refreshProgram(activeProg);   // untrained weeks re-pin; trained weeks stay frozen
-  currentWeek=calcCurrentWeek();
+  if(_tp) _setActiveProg(refreshProgram(activeProg));   // untrained weeks re-pin; trained weeks stay frozen
+  _setCurrentWeek(calcCurrentWeek());
   // D184 (c) Q4: the holdsTest arm is first (a holdsTest return is also partial). Both surfaces read
   // the same resolver return; the toast never went through startResolveCopy. No dashes in the arms.
   showToast(_r.holdsTest ? 'That week holds your test. Nothing left to train before it ✓'
@@ -15078,38 +15146,6 @@ const _DAYF={sun:'Sun',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sa
 // Single source of truth for a program's recalled onboarding selection.
 // Lifts are experience-derived (DEFAULT_1RM) when not manually stored, so the panel
 // shows the numbers the engine actually anchors to rather than a misleading zero.
-// ── V172 (D7): THE RUN ANCHOR, STATED ────────────────────────────────────────
-// Every run pace the engines print comes from ONE chart row, and that row is picked by a
-// mile anchor the athlete was never shown — the V156 seed writes it into the wizard as if
-// typed, and no surface stated it. These helpers are read-only over cfg; the engines keep
-// their own anchor logic and the assertion suite checks the two agree.
-const _CHART_RUN_GOALS = new Set(['run_half','run_marathon','run_5k','run_10k','run_pace_goal','run_mile_time','run_15_under10','run_base']);
-function runAnchorInfo(cfg){
-  const c = cfg || {};
-  if(!(c.cardioTypes||[]).includes('run')) return null;
-  const g = c.cardioGoals && c.cardioGoals.run;
-  if(!g || !g.id || !_CHART_RUN_GOALS.has(g.id)) return null;      // run_base easy runs pace off this row since V206 (D189)
-  const exp = c.experience || 'intermediate';
-  const expDef = {beginner:690, intermediate:570, advanced:450}[exp] || 570;
-  const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0) : 0;
-  // Same rule as both engines: a falsy entry falls to the default (D188: every level).
-  const rawSec = entered ? entered : expDef;
-  const row = paceChartLookup('mile', rawSec);
-  // The chart CLAMPS: anything at or under its fastest row trains at that row, anything at
-  // or over its slowest trains there. row.mile is the anchor the engines actually use, so
-  // that is the number stated; when it differs from the entry, the sentence says so.
-  const anchorSec = row.mile;
-  const clamped = (!!entered && Math.round(row.mile) !== Math.round(rawSec)) ? (rawSec < row.mile ? 'fast' : 'slow') : null;
-  const src = g.mileBestSrc || null;
-  const kind = !entered ? 'default' : (src && src.kind === 'seeded') ? 'seeded' : (src && src.kind === 'edited') ? 'edited' : 'entered';
-  const race = g.id === 'run_half' ? 'half' : g.id === 'run_marathon' ? 'marathon' : null;
-  // V176 (D10): the fixed target for pace-goal programs. The chip is the prescription;
-  // the measure of progress is the projection card walking toward it.
-  const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
-    ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
-  return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
-}
-function _fmtMileAnchor(sec){ return _clkMS(sec); }   // D126 (V204)
 function runAnchorChips(a){
   const r = a.row;
   const list = a.goalId==='run_base' ? [['Mile',r.mile]] : [['Mile',r.mile],['5K',r.fiveK],['10K',r.tenK],['Tempo',r.tempo]];
@@ -15359,8 +15395,8 @@ function commitGoalChange(){
   programs[pi].cfg={...programs[pi].cfg,cardioGoals:{...(programs[pi].cfg.cardioGoals||{}),[sport]:next}};
   savePrograms(programs);
   if(activeProgId===_goalDraft.progId){
-    activeProg=refreshProgram(programs[pi]);
-    currentWeek=calcCurrentWeek();
+    _setActiveProg(refreshProgram(programs[pi]));
+    _setCurrentWeek(calcCurrentWeek());
     try{ if(document.getElementById('screenWeek').classList.contains('active')) renderWeekView(); }catch(e){}
   }
   closeGoalSheet();
@@ -15439,8 +15475,8 @@ function commitMileChange(){
   p.cfg={...p.cfg,cardioGoals:{...(p.cfg.cardioGoals||{}),run:next}};
   savePrograms(programs);
   if(activeProgId===_mileDraft.progId){
-    activeProg=refreshProgram(programs[pi]);
-    currentWeek=calcCurrentWeek();
+    _setActiveProg(refreshProgram(programs[pi]));
+    _setCurrentWeek(calcCurrentWeek());
     try{ if(document.getElementById('screenWeek').classList.contains('active')) renderWeekView(); }catch(e){}
   }
   closeMileSheet();
@@ -15556,13 +15592,6 @@ function renderProgList(){
 // further notice" cases. Dates are the SOURCE OF TRUTH, weeks are derived — once
 // Suspend lands and pauses the clock, program weeks shift, so anchoring an overlay
 // to a week number would be circular.
-function _parseLocalDate(s){
-  const p=String(s||'').split('-');
-  if(p.length!==3) return null;
-  const d=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
-  if(isNaN(d.getTime())) return null;
-  d.setHours(0,0,0,0); return d;
-}
 // Program week containing a calendar date (1-based, matching the weeks object).
 function weekOfDate(prog, dateStr){
   if(!prog || !prog.startDate) return null;
@@ -15820,7 +15849,7 @@ function removeOverlay(id){
   activeProg.overlays=activeProg.overlays.filter(o=>o&&o.id!==id);
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   renderWeekView();
   showToast('Change removed \u2713');
 }
@@ -16006,7 +16035,7 @@ function applyInjuryDraft(){
   activeProg.overlays.push(ov);
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   closeOverlaySheet();
   renderWeekView();
   showToast(T==='protect'?'Protected. Train around it \u2713':'Working around it \u2713');
@@ -16038,7 +16067,7 @@ function imBackFromInjury(id){
   }
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   renderWeekView();
   const lbl=(INJURY_REGIONS[region]||{}).label||'injury';
   if(!_hadRunSuppression){
@@ -16120,7 +16149,7 @@ function applyOverlayDraft(){
   activeProg.overlays.push(ov);
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
-  activeProg=refreshProgram(activeProg);
+  _setActiveProg(refreshProgram(activeProg));
   closeOverlaySheet();
   renderWeekView();
   showToast('Change applied \u2713');
@@ -16402,11 +16431,11 @@ function refreshProgram(prog){
 // no day). It is checked before the lookup, so the archived and unknown refusals cannot fire
 // on it. beforeRefresh, when given, runs once the globals name the new id and before
 // refreshProgram (boot passes its ex-weight alias fold there, the order boot always had).
-function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');activeProgId=null;activeProg=null;currentDayKey=null;currentWeek=1;return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);activeProgId=id;if(beforeRefresh)beforeRefresh();activeProg=refreshProgram(stored);currentWeek=calcCurrentWeek();currentDayKey=null;return true;}
+function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
 // V221 D178: Set Active is the one switch; a switch is complete when This Week shows the new block.
 function setActive(id){if(!loadActiveProgram(id))return;renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
-function startRename(id){editProgId=id;renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
-function cancelRename(){editProgId=null;renderProgList();}
+function startRename(id){_setEditProgId(id);renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
+function cancelRename(){_setEditProgId(null);renderProgList();}
 function commitRename(id){
   const inp=document.getElementById('renameInput_'+id);
   const programs=getPrograms();const p=programs.find(x=>x.id===id);
@@ -16418,7 +16447,7 @@ function commitRename(id){
       showToast('Renamed ✓');
     }
   }
-  editProgId=null;renderProgList();
+  _setEditProgId(null);renderProgList();
   if(activeProgId===id&&activeProg)renderWeekView();
 }
 function purgeProgData(id){['ia_logs_','ia_comp_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
@@ -16441,8 +16470,8 @@ function archiveProg(id){
   const programs=getPrograms();const p=programs.find(x=>x.id===id);if(!p)return;
   p.archived=true;p.archivedAt=Date.now();savePrograms(programs);
   _handoffActiveFrom(id,programs);
-  confirmProgId=null;confirmTier=0;
-  if(progressViewId===id)progressViewId=null;
+  _setConfirmProgId(null);_setConfirmTier(0);
+  if(progressViewId===id)_setProgressViewId(null);
   renderProgList();showToast('Program archived');
 }
 function unarchiveProg(id){
@@ -16450,9 +16479,9 @@ function unarchiveProg(id){
   delete p.archived;delete p.archivedAt;savePrograms(programs);
   renderProgList();showToast('Program restored');
 }
-function askArchive(id){confirmProgId=id;confirmTier=1;renderProgList();}
-function askPurge(id){confirmProgId=id;confirmTier=2;renderProgList();}
-function cancelConfirm(){confirmProgId=null;confirmTier=0;renderProgList();}
+function askArchive(id){_setConfirmProgId(id);_setConfirmTier(1);renderProgList();}
+function askPurge(id){_setConfirmProgId(id);_setConfirmTier(2);renderProgList();}
+function cancelConfirm(){_setConfirmProgId(null);_setConfirmTier(0);renderProgList();}
 // fromProgress is optional: the Programs-list call site passes nothing, so its
 // behaviour is byte-identical to V168.
 function deleteProg(id,fromProgress){
@@ -16462,8 +16491,8 @@ function deleteProg(id,fromProgress){
   programs=programs.filter(p=>p.id!==id);savePrograms(programs);
   _handoffActiveFrom(id,programs);
   purgeProgData(id);
-  confirmProgId=null;confirmTier=0;
-  if(progressViewId===id)progressViewId=null;
+  _setConfirmProgId(null);_setConfirmTier(0);
+  if(progressViewId===id)_setProgressViewId(null);
   if(fromProgress)renderProgressScreen();else renderProgList();
   showToast('Program deleted');
 }
@@ -16471,8 +16500,8 @@ function deleteProg(id,fromProgress){
 
 // ── PROGRESS SCREEN ──
 function showProgressScreen() {
-  confirmProgId=null;confirmTier=0;   // V169: never open Progress with a confirm armed
-  progressViewId = null;   // V156: always open on the active program
+  _setConfirmProgId(null);_setConfirmTier(0);   // V169: never open Progress with a confirm armed
+  _setProgressViewId(null);   // V156: always open on the active program
   renderProgressScreen();
   showScreen('screenProgress');
 }
@@ -16677,9 +16706,9 @@ function _restoreBarHTML(p){
     <button class="prog-action-btn" aria-label="Delete this program forever" title="Delete forever" style="flex:0 0 auto;color:var(--red);padding:8px 10px;display:inline-flex;align-items:center" onclick="askPurgeFromProgress('${p.id}')">${asyIcon('trash',16)}</button>
   </div>`;
 }
-function askPurgeFromProgress(id){confirmProgId=id;confirmTier=2;renderProgressScreen();}
-function cancelProgressConfirm(){confirmProgId=null;confirmTier=0;renderProgressScreen();}
-function setProgressView(id){progressViewId=id;renderProgressScreen();}
+function askPurgeFromProgress(id){_setConfirmProgId(id);_setConfirmTier(2);renderProgressScreen();}
+function cancelProgressConfirm(){_setConfirmProgId(null);_setConfirmTier(0);renderProgressScreen();}
+function setProgressView(id){_setProgressViewId(id);renderProgressScreen();}
 // ══ V165 — PROGRESS SCREEN REBUILD (D1/D2/D3/D5/D7/D8/D9/D10-A/D6) ══════════
 // Six modules replace the V164 run/lift chart stack. Swim and bike dot charts are
 // untouched: D7 named a run-and-lift set, and deleting a sport's only chart would
@@ -17675,7 +17704,7 @@ function renderProgressScreen() {
   // charts render; null means the active program. Every store read below goes through
   // the *For(_vid) accessors so a viewed program can NEVER leak the active one's data.
   let _vprog = progressViewId ? _allProgs.find(p=>p.id===progressViewId) : null;
-  if(!_vprog){ progressViewId=null; _vprog = (activeProg && _allProgs.find(p=>p.id===activeProgId)) || _allProgs.find(p=>!p.archived) || _allProgs[0]; }
+  if(!_vprog){ _setProgressViewId(null); _vprog = (activeProg && _allProgs.find(p=>p.id===activeProgId)) || _allProgs.find(p=>!p.archived) || _allProgs[0]; }
   if(!_vprog) return;
   const _vid = _vprog.id;
   const _chips = _progChipsHTML(_allProgs, _vid);

@@ -1,15 +1,14 @@
-import { asyIcon } from './storage.js';
+import { asyIcon } from './icons.js';
 import {
-  EXLIB, REP_AFFINITY, _carryRx, _expOK, _isOneArmPress, _ssPair, _swapUniverseAdd, pick,
+  DEFAULT_1RM, EXLIB, REP_AFFINITY, _carryRx, _expOK, _isOneArmPress, _ssPair, _swapUniverseAdd, pick,
 } from './exercise-library.js';
-import { DEFAULT_1RM } from './wizard.js';
+import { roundWeight } from './exercise-kinds.js';
 import {
   CORE_PILLARS, _gearLens, _tierHasBarbell, buildFootAnkleSection, buildHipSection, buildRehabSection,
 } from './prehab.js';
 import { _powerAllowed, _powerPrescribe } from './power-accessory.js';
 import { TEST_RX_TEXT, _injViewName, injuryPlan } from './injury.js';
 import { _auxFamily, _auxGearOK, _cardioInterference, _isUnilateralRow, _pattern, _repFloor } from './region-caps.js';
-import { roundWeight } from './log-entries.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── ENGINE C — KINEMATIC POOL FILTER (exercise selection + RPE prescription) ─

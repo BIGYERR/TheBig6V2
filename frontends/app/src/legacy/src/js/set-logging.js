@@ -1,16 +1,15 @@
+import { asyIcon } from './icons.js';
+import { esc, getDayHist, getExWeightsFor, getLogs, getPrograms, readSetDraft, writeSetDraft } from './storage.js';
 import {
-  asyIcon, esc, getDayHist, getExWeightsFor, getLogs, getPrograms, readSetDraft, writeSetDraft,
-} from './storage.js';
-import {
-  _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, currentDayKey, currentWeek,
+  _setStaleWarnShown, _setStaleWarnSrc, _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, currentDayKey,
+  currentWeek,
 } from './rest-day-shell.js';
 import { exStoreKey, foldExAliasKeys } from './exercise-library.js';
-import { _clkMS } from './wizard.js';
+import { isRepExercise, isTimeExercise, isTrackableWeight } from './exercise-kinds.js';
+import { _clkMS } from './clock-format.js';
 import { _auxFamily, _pattern } from './region-caps.js';
 import { _stripLeadingSets, parseRx, rxSuffix } from './week-view-sections.js';
-import {
-  entryDay, getExWeights, isKBExercise, isRepExercise, isTimeExercise, isTrackableWeight,
-} from './log-entries.js';
+import { entryDay, getExWeights, isKBExercise } from './log-entries.js';
 import { saveExWeight } from './day-detail.js';
 import { swapOriginOf } from './swap-sheet.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
@@ -551,7 +550,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
         _stale=isStaleTs(effEntry&&effEntry.ts);
         const _src=(crossSrc&&crossSrc.progName)||'';
         const _speak=_stale&&!_staleWarnShown;
-        if(_speak){ _staleWarnShown=true; _staleWarnSrc=_src; }
+        if(_speak){ _setStaleWarnShown(true); _setStaleWarnSrc(_src); }
         // Sub-label is age-only. It regains the source program name ONLY when this
         // pill's source differs from the one the sentence named — otherwise the
         // sentence would be speaking for a number it did not come from.

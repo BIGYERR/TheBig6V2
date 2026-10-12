@@ -1,11 +1,14 @@
 import { getPrograms, savePrograms } from './storage.js';
-import { currentWeek, showScreen, showToast } from './rest-day-shell.js';
-import { LIFTING_FOCUS_TO_GOAL, WD, _applyWizardStart, _rsRace, renderWizardStep, resolveStartDate } from './wizard.js';
+import { _setCurrentWeek, showScreen, showToast } from './rest-day-shell.js';
+import { LIFTING_FOCUS_TO_GOAL } from './exercise-library.js';
+import { _fmtMileAnchor } from './clock-format.js';
+import { WD, _applyWizardStart, _rsRace, renderWizardStep, resolveStartDate } from './wizard.js';
 import { calcProgramLength } from './nsw-cardio.js';
+import { runAnchorInfo } from './cardio-progression.js';
 import { buildProgram } from './budget-engine-d.js';
 import { renderWeekView } from './week-view-sections.js';
-import { _rtIntroPending } from './rest-timer.js';
-import { _fmtMileAnchor, progTestPin, renderProgList, runAnchorInfo } from './programs.js';
+import { _setRtIntroPending } from './rest-timer.js';
+import { progTestPin, renderProgList } from './programs.js';
 import { loadActiveProgram } from './program-manage.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
@@ -163,13 +166,13 @@ function doGenerate(){
     // First program (list empty) arms the rest-timer discovery intro. Gating on list-empty —
     // NOT a localStorage flag — means it re-fires after a delete-all, so it's actually testable
     // and can't get permanently stuck the way ia_rt_seen / ia_rt_intro2 did.
-    _rtIntroPending=(programs.length===0);
+    _setRtIntroPending(programs.length===0);
     programs.push(prog);savePrograms(programs);
     // V221 D178: the wizard commits through the loader; the program is stored on the line
     // above, so the loader reads it. The wizard still lands on week 1: calcCurrentWeek() is
     // later than 1 for a back-dated start (race-aligned NRC), and the landing does not move.
     loadActiveProgram(prog.id);
-    currentWeek=1;
+    _setCurrentWeek(1);
     // Update generate screen to show actual week count
     document.getElementById('generateSub').textContent='Your '+prog.totalWeeks+'-week program is ready!';
     setTimeout(()=>{showScreen('screenWeek');renderWeekView();renderProgList();},600);
