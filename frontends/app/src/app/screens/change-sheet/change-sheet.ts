@@ -4,8 +4,8 @@ import { LegacyBridge } from '../../legacy/legacy-bridge';
 import { type ChangeSheetView, changeSheetView, type DraftKey, type OverlayDraft, type PreviewOverlay, type SheetAction } from './change-sheet-model';
 
 /**
- * The injury and travel sheet's body (architecture phase E, step 10), in place of the legacy renderOverlaySheet inside
- * #changeBody (the sheet's frame and its Back button stay the legacy markup). The draft stays the legacy `_ovDraft`:
+ * The injury and travel sheet (architecture phase E, step 10; its frame and Back button since step 22), in place of the
+ * legacy #changeOverlay markup and the renderOverlaySheet that filled #changeBody. The draft stays the legacy `_ovDraft`:
  * each choice is still the legacy _ovSet, which redraws through renderOverlaySheet, and the foot's button is still the
  * legacy applyOverlayDraft, applyInjuryDraft or closeOverlaySheet. renderOverlaySheet reaches the component through
  * LegacyBridge.provide and draws at once, before the sheet opens, as the legacy write did.
@@ -16,6 +16,10 @@ import { type ChangeSheetView, changeSheetView, type DraftKey, type OverlayDraft
   imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+  <div class="rand-header">
+    <button class="back-btn" (click)="close()">← Back</button>
+  </div>
+  <div class="rand-body" id="changeBody">
   @if (view(); as v) {
     <div class="ov-kicker">{{ v.kicker }}</div><div class="ov-title">{{ v.title }}</div><div class="ov-intro">{{ v.intro }}</div>
     @if (v.travel; as tr) {
@@ -64,6 +68,7 @@ import { type ChangeSheetView, changeSheetView, type DraftKey, type OverlayDraft
   <ng-template #foot let-a>
     <button class="ov-apply" (click)="act(a)">{{ a === 'close' ? 'Got it' : 'Apply change' }}</button>
   </ng-template>
+  </div>
   `,
 })
 export class ChangeSheet {
@@ -80,6 +85,9 @@ export class ChangeSheet {
   }
   protected date(key: DraftKey, e: Event): void {
     this.bridge.call('_ovSet', key, (e.target as HTMLInputElement).value);
+  }
+  protected close(): void {
+    this.bridge.call('closeOverlaySheet');
   }
   protected act(a: SheetAction): void {
     this.bridge.call(a === 'travel' ? 'applyOverlayDraft' : a === 'injury' ? 'applyInjuryDraft' : 'closeOverlaySheet');

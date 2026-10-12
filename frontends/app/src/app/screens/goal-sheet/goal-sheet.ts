@@ -10,8 +10,8 @@ interface GoalProgram {
 }
 
 /**
- * The change-a-goal sheet's body (architecture phase E, step 7), in place of the legacy renderGoalSheet inside
- * #goalBody (the sheet's frame and its Back button stay the legacy markup). The draft stays the legacy `_goalDraft`,
+ * The change-a-goal sheet (architecture phase E, step 7; its frame and Back button since step 22), in place of the
+ * legacy #goalOverlay markup and the renderGoalSheet that filled #goalBody. The draft stays the legacy `_goalDraft`,
  * and choosing a goal, typing its targets and committing are still the legacy selectGoalOpt, _goalSetInput and
  * commitGoalChange. renderGoalSheet (on opening and on each pick) and _goalRefreshCommit (on each keystroke, which
  * redraws only the commit button, so a typed field keeps its caret) reach the component through LegacyBridge.provide.
@@ -24,6 +24,10 @@ interface GoalProgram {
   host: { style: 'display: contents' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
+  <div class="rand-header">
+    <button class="back-btn" (click)="close()">← Back</button>
+  </div>
+  <div class="rand-body" id="goalBody">
   @if (view(); as v) {
     <div class="det-label" style="font-size:14px;letter-spacing:1px;margin-bottom:4px">{{ v.heading }}</div>
     <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px">Weeks you already trained stay on the books. The rest of the program rebuilds around the new goal.</div>
@@ -55,6 +59,7 @@ interface GoalProgram {
       </div>
     }
   }
+  </div>
   `,
 })
 export class GoalSheet {
@@ -83,6 +88,9 @@ export class GoalSheet {
   }
   protected commit(): void {
     this.bridge.call('commitGoalChange');
+  }
+  protected close(): void {
+    this.bridge.call('closeGoalSheet');
   }
   protected keep(): void {
     this.bridge.call('closeGoalSheet');

@@ -457,3 +457,15 @@ what is stored.
   without it photographed the Programs and This Week tabs unmarked (about a thousand pixels each).
 - **Tests:** no logic of their own to unit-test; every journey photographs the frames, 68/68 at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.30 moves three overlay frames
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.30.
+- **Moved:** the frames (the header with its Back button, and the body) of `#goalOverlay`, `#mileLockOverlay` and
+  `#changeOverlay`: the GoalSheet, MileLock and ChangeSheet components now mount on the overlay and draw the frame,
+  their content inside the body element with the id it had (`#goalBody`, `#mileLockBody`, `#changeBody`). Back still
+  calls the legacy `closeGoalSheet`, `closeMileSheet` and `closeOverlaySheet`. Of the overlays, only the rest-day
+  sheet (`#restOverlay`, the v0.240.0 feature build) keeps legacy markup.
+- **Tests:** the e2e's goal sheet, injury and travel sheets and mile lock steps photograph the frames and close them
+  by Back, 68/68 at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
