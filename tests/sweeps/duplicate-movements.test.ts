@@ -1,15 +1,14 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // One card, one movement, on the full lattices (CI only; tests/integration/duplicate-movements.test.js runs samples).
 // Rulings: D52 slice 5, D159, D164, D165, D166, D198. Helpers and lattices: tests/support/duplicate-movements.js.
 //
 // The three counts the D164 ruling pinned as equalities on the WIDE lattice (Chest + knee sections, those with no
 // chest movement, one-item Biceps on elbow/workaround) are current golden values in tests/snapshots/duplicate-movements.json.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, progDigest } = require('../support/app.js');
-const { matchSnapshot } = require('../support/snapshot.js');
-const D = require('../support/duplicate-movements.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, progDigest } from '../support/app.ts';
+import { matchSnapshot } from '../support/snapshot.ts';
+import * as D from '../support/duplicate-movements.ts';
 const IA = loadApp();
 
 // ── one card, one movement: 8 injury paths x 6 tiers x 2 foci x 3 experience levels x 3 seeds ──────────────────

@@ -1,12 +1,11 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Equipment tiers on the full lattices (CI only; tests/integration/equipment-tiers.test.js runs samples and every
 // hand table). Rulings: D42-c, D44, D46-c, D47, D49, D70c, D150, D149, D196. Helpers: tests/support/equipment-tiers.js.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp } = require('../support/app.js');
-const D = require('../support/duplicate-movements.js');
-const E = require('../support/equipment-tiers.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp } from '../support/app.ts';
+import * as D from '../support/duplicate-movements.ts';
+import * as E from '../support/equipment-tiers.ts';
 const IA = loadApp();
 const once = (f) => { let v; return () => (v === undefined ? (v = f()) : v); };
 

@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Helpers for the equipment-tier tests (tests/integration/equipment-tiers.test.js, tests/sweeps/equipment-tiers.test.js):
 // what a tier does not own never prints on it, and a ruling that selects never deletes. Rulings: D42 (the landmine
 // rotational press and the shoulder slot's side), D43 (the dumbbell floor press), D44, D46-c, D47, D49 (the gear
@@ -9,10 +9,9 @@
 // Every inventory below is typed by hand from the rulings and the tier copy the athlete reads; the engine's own gear
 // lenses (_gearOK, _auxGearOK, hasBarbell) are never consulted except where a test asks a lens directly and the hand
 // table is the answer. Lattices are config input with cfg.seed pinned.
-const H = require('../harness.js');
-const { fixtures } = require('./app.js');
-const D = require('./duplicate-movements.js');
-
+import H from '../harness.js';
+import { fixtures } from './app.ts';
+import * as D from './duplicate-movements.ts';
 const { DAYS } = H;
 
 const { clone, clean } = D;
@@ -645,7 +644,7 @@ function surveyBodyweight(IA, cells, race) {
   return S;
 }
 
-module.exports = {
+export {
   live, itemsOf, candNames, countEq, countBy, firstBy,
   GEAR_TIERS, GEAR_EQUIP, GATED, UNGATED_CORE, ROT_LEGAL, AR_MEMBERS, AR_LEGAL, GEAR_INJ, gearLattice, surveyGear, wizardCards,
   OWNS, INV_TIERS, DENYING_TIERS, denies, implementClass, classOf, deniedOn, invCfg, inventoryLattice, surveyInventory, surveyTravel, squatMains, seedCfg,

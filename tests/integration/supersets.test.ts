@@ -1,25 +1,24 @@
-'use strict';
 // Supersets: the round count is a field, never a substring (D39), and a bare remainder inside a round block reads
 // "N reps" (D176). The resolver (_secRounds), its parsers (_itemSets, _stripLeadingSets, _setLeadingSets), the
 // session time estimate (sessionTimeEst), the renderer (buildSectionsHTML) and the prevention dose sweep
 // (preventionDoseSweep) are read here.
 //
-// Oracles: hand tables typed from the authoring contract, the reference parsers in tests/support/supersets.js, and
+// Oracles: hand tables typed from the authoring contract, the reference parsers in tests/support/supersets.ts, and
 // source scans of the resolver seam with comments stripped. Nothing asks _secRounds what _secRounds should say.
-// The lattice claims run on the 420-cell round-count lattice (tests/support/supersets.js), every cell built once.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp } = require('../support/app.js');
-const S = require('../support/supersets.js');
+// The lattice claims run on the 420-cell round-count lattice (tests/support/supersets.ts), every cell built once.
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp } from '../support/app.ts';
+import * as S from '../support/supersets.ts';
 
 const IA = loadApp();
-const secRounds = (sec) => S.callApp(IA, '_secRounds', sec);
-const timeEst = (day) => S.callApp(IA, 'sessionTimeEst', day);
-const render = (secs) => S.callApp(IA, 'buildSectionsHTML', secs, 0);
+const secRounds = (sec: unknown): unknown => S.callApp(IA, '_secRounds', sec);
+const timeEst = (day: unknown): unknown => S.callApp(IA, 'sessionTimeEst', day);
+const render = (secs: unknown[]): string => S.callApp(IA, 'buildSectionsHTML', secs, 0);
 
 test('the round count resolver: an authored count, then a count in the label, then the members, else none', () => {
   // Legacy rows carry uniform members so this stays a precedence test; the smallest-member rule is tested below.
-  const table = [
+  const table: [string, Record<string, unknown>, number | null][] = [
     ['authored beats label', { label: 'Circuit 4 rounds', superset: true, rounds: 5, items: [{ detail: '2×10' }, { detail: '2×10' }] }, 5],
     ['authored beats members', { label: 'Pump', superset: true, rounds: 5, items: [{ detail: '3×10' }, { detail: '3×10' }] }, 5],
     ['label when no field', { label: 'Superset A — 4 rounds', superset: true, items: [{ detail: '2×10' }, { detail: '2×10' }] }, 4],
@@ -32,7 +31,7 @@ test('the round count resolver: an authored count, then a count in the label, th
 });
 
 // ── the resolver seam carries no fallback constant (source scan, comments stripped) ─────────────────────────────
-function fnBody(js, name) {
+function fnBody(js: string, name: string): string | null {
   const i = js.indexOf('function ' + name + '(');
   if (i < 0) return null;
   const j = js.indexOf('{', i);
@@ -43,7 +42,7 @@ function fnBody(js, name) {
   }
   return js.slice(j, k + 1);
 }
-const literals = (body) =>
+const literals = (body: string): string[] =>
   Array.from(new Set(String(body)
     .replace(/\\u[0-9a-fA-F]{4}/g, '')
     .replace(/^\s*\/\/.*$/gm, '')
@@ -75,7 +74,7 @@ test('the session time estimate shares the resolver instead of carrying its own 
 });
 
 test('a section count is the smallest member count, never the first member', () => {
-  const table = [
+  const table: [string, { detail: string }[], number][] = [
     ['max first', [{ detail: '4×10' }, { detail: '2×10' }, { detail: '3×10' }], 2],
     ['max first, two', [{ detail: '5×8' }, { detail: '3×8' }], 3],
     ['capped last', [{ detail: '4×12' }, { detail: '4×12' }, { detail: '1×12' }], 1],
@@ -85,7 +84,7 @@ test('a section count is the smallest member count, never the first member', () 
 });
 
 test('both authored grammars are read: N×reps and N sets', () => {
-  const table = [
+  const table: [string, { detail: string }[], number][] = [
     ['sets grammar alone', [{ detail: '3 sets — RPE 8' }, { detail: '2 sets — RPE 8' }], 2],
     ['sets grammar uniform', [{ detail: '4 sets — RPE 7 (leave 3 or more in reserve)' }, { detail: '4 sets — RPE 7' }], 4],
     ['mixed grammars', [{ detail: '4×10' }, { detail: '2 sets — RPE 7' }], 2],
@@ -104,13 +103,13 @@ test('rounds: null means not a round block; an omitted count is recovered from t
 test('a label that states its own count beats the not-a-round-block heuristic (D39-ii)', () => {
   const RP = IA.RAND_POOLS;
   assert.ok(RP, 'RAND_POOLS is reachable');
-  const bad = [];
+  const bad: string[] = [];
   for (const k of Object.keys(RP))
     for (const w of RP[k] || [])
       for (const s of w.sections || [])
         if (/(\d+)\s*round/i.test(s.label || '') && s.rounds === null) bad.push(k + '/' + w.title + '/' + s.label);
   assert.deepEqual(bad, [], 'no label that states a count carries rounds: null');
-  const tabata = (RP.fatloss || []).find((x) => x.title === 'Tabata Hell');
+  const tabata = (RP.fatloss || []).find((x: any) => x.title === 'Tabata Hell');
   assert.ok(tabata, 'Tabata Hell is in the fat loss pool');
   assert.equal(secRounds(tabata.sections[0]), 8, 'Tabata Hell resolves 8 from its label');
 });
@@ -129,8 +128,8 @@ test('the nine genuine not-a-round-blocks carry an authored null', () => {
   ];
   const RP = IA.RAND_POOLS;
   for (const [pool, title, label] of NOT_A_ROUND_BLOCK) {
-    const w = (RP[pool] || []).find((x) => x.title === title);
-    const s = w && (w.sections || []).find((x) => x.label === label);
+    const w = (RP[pool] || []).find((x: any) => x.title === title);
+    const s = w && (w.sections || []).find((x: any) => x.label === label);
     assert.ok(s, pool + '/' + title + ' has the section ' + label);
     assert.equal(s.rounds, null, pool + '/' + title);
   }
@@ -138,12 +137,12 @@ test('the nine genuine not-a-round-blocks carry an authored null', () => {
 
 test('the session time estimate reads the item count first, then the section count, then 3 (D39-iii)', () => {
   // The published model: 8 min warmup, a superset item is sets x 1.4 min, rounded to the nearest 5, floored at 5.
-  const mkDay = (rounds, detail, n) => ({
+  const mkDay = (rounds: number | undefined, detail: string, n: number) => ({
     sections: [Object.assign({ label: 'Pump', superset: true }, rounds === undefined ? {} : { rounds },
       { items: Array.from({ length: n }, (_, i) => ({ name: 'Kettlebell swing ' + i, detail })) })],
   });
-  const r5 = (m) => Math.max(5, Math.round(m / 5) * 5);
-  const table = [
+  const r5 = (m: number) => Math.max(5, Math.round(m / 5) * 5);
+  const table: [string, ReturnType<typeof mkDay>, number][] = [
     ['section count drives an uncounted item (2 rounds x 6)', mkDay(2, '10 reps', 6), r5(8 + 6 * 2 * 1.4)],
     ['section count drives an uncounted item (5 rounds x 4)', mkDay(5, '10 reps', 4), r5(8 + 4 * 5 * 1.4)],
     ['item count wins over the section', mkDay(2, '4×10', 6), r5(8 + 6 * 4 * 1.4)],
@@ -160,7 +159,7 @@ const SSNULL = { label: '30 min AMRAP', superset: true, rounds: null, items: [{ 
 
 test('rendering a superset leaves item.detail untouched in the data', () => {
   const out = S.renderAndReturnData(IA, [SS3]);
-  assert.deepEqual(out.after[0].items.map((i) => i.detail), SS3.items.map((i) => i.detail));
+  assert.deepEqual(out.after[0].items.map((i: any) => i.detail), SS3.items.map((i) => i.detail));
 });
 
 test('a rounds: null block prints its member rows whole', () => {

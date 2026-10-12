@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Equipment tiers and the exercise pool: what a tier does not own never prints on it, and a ruling that selects never
 // deletes. Rulings: D42 (Landmine rotational press: name, pattern, injury behaviour, its shoulder-pool gear gate and the
 // side a one-hand press prints), D43 (Dumbbell floor press), D44, D46-c, D47, D49 (the core pillar gear gates, the
@@ -8,12 +8,11 @@
 // Oracles: inventories and pools typed by hand from the rulings and the tier copy, the implement a movement needs read
 // from its name, hand-built sessions with hand-derived outcomes, typed cards, and copies of the app with one ruled line
 // written out. This file runs samples; tests/sweeps/equipment-tiers.test.js runs the lattices.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, fixtures } = require('../support/app.js');
-const D = require('../support/duplicate-movements.js');
-const E = require('../support/equipment-tiers.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, fixtures } from '../support/app.ts';
+import * as D from '../support/duplicate-movements.ts';
+import * as E from '../support/equipment-tiers.ts';
 const IA = loadApp();
 const SRC = D.appText();
 const EXLIB = D.clone(IA.eval('EXLIB'));   // plain data: arrays from the app's realm never deep-equal host arrays

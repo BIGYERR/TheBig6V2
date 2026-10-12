@@ -6,26 +6,26 @@ test or dropped for a written reason (`docs/test-migration.md`, The parity rule)
 
 New files:
 
-- `tests/integration/equipment-tiers.test.js` (38 tests): every hand table (pools, patterns, injury matrices, the
+- `tests/integration/equipment-tiers.test.ts` (38 tests): every hand table (pools, patterns, injury matrices, the
   inventory and the tier copy, the implement classes, the wizard cards, the D47 trim session, the D49 identities, the
   D149 floors, the aux lens, D196's literals and typed Mains), and seeded samples of each lattice: the floor press and
   landmine lattice whole (72 builds), the shoulder-side lattice on 3 seeds, the gear lattice on one seed and one
   experience level, every 40th inventory config, the GHD lattice on its first seed, every 18th knee/protect config on
   the app and its three copies, the four D196 plans on the L432 bodyweight cells.
-- `tests/sweeps/equipment-tiers.test.js` (36 tests, CI only): every lattice whole: the 960-program shoulder-side
+- `tests/sweeps/equipment-tiers.test.ts` (36 tests, CI only): every lattice whole: the 960-program shoulder-side
   lattice, the 288-cell gear lattice (budget live and budget bypassed), the 3,000-config inventory lattice with its
   swap sheet and travel variants and the front squat lattices, the 760-config GHD lattice with its 110 travel
   variants, the 630-config knee/protect lattice on the app and its three copies, the 324 bodyweight cells and the
   1,008 race builds of D196.
-- `tests/support/equipment-tiers.js`: the hand inventories (`GEAR_TIERS`, `OWNS`, `GHD_OWNS`), the gated and gear-free
+- `tests/support/equipment-tiers.ts`: the hand inventories (`GEAR_TIERS`, `OWNS`, `GHD_OWNS`), the gated and gear-free
   core members, the implement class read from a name, the hand floors of D149, the one-hand press table, the D193 cap
   table, the 82 older both-thrust days, D196's literals and typed Mains, every lattice and every survey.
-  It reuses `tests/support/duplicate-movements.js` for the source-surgery loader and the frozen pattern lens.
+  It reuses `tests/support/duplicate-movements.ts` for the source-surgery loader and the frozen pattern lens.
 
 No snapshot: every expected value in this group is a hand table, a typed card or a zero.
 
 D196's (a″) clause read the pattern of a name through V230's `_pattern`; the new tests read the same classifier
-frozen in `tests/support/duplicate-movements.js` (`frozenPattern`, unchanged from V218 through today, checked once).
+frozen in `tests/support/duplicate-movements.ts` (`frozenPattern`, unchanged from V218 through today, checked once).
 The copies D149's rows need (each floor written out, the reservation probe) are made from the app under test by
 `replaceOnce`, which fails unless each anchor occurs exactly once.
 
@@ -36,7 +36,7 @@ Mutations: not run (sabotage off).
 
 ## `g192_floorpress_shoulder_gear.js` (24 rows: 24 mapped)
 
-All rows are held by `tests/integration/equipment-tiers.test.js`.
+All rows are held by `tests/integration/equipment-tiers.test.ts`.
 
 | Row | Held by |
 |---|---|
@@ -67,7 +67,7 @@ All rows are held by `tests/integration/equipment-tiers.test.js`.
 
 ## `g192_landmine_rotpress.js` (20 rows: 20 mapped)
 
-All rows are held by `tests/integration/equipment-tiers.test.js`.
+All rows are held by `tests/integration/equipment-tiers.test.ts`.
 
 | Row | Held by |
 |---|---|
@@ -88,7 +88,7 @@ All rows are held by `tests/integration/equipment-tiers.test.js`.
 
 | Row | Held by |
 |---|---|
-| `L1-builds` | `tests/sweeps/equipment-tiers.test.js` › "the shoulder-side lattice builds whole (960 programs)" |
+| `L1-builds` | `tests/sweeps/equipment-tiers.test.ts` › "the shoulder-side lattice builds whole (960 programs)" |
 | `L2-lattice` | the same test |
 | `S1-onehand-side` | sweep › "the heavy push Main pairing: every one-hand press prints a side, every time, and no two-hand movement claims one"; integration › "every one-hand press in the three shoulder slots prints a side, and no two-hand movement does (sample)" |
 | `S1-onehand-reach` | the same two tests |
@@ -107,8 +107,8 @@ All rows are held by `tests/integration/equipment-tiers.test.js`.
 
 ## `g193_gear_gates.js` (48 rows: 48 mapped)
 
-Lattice rows are held twice: on 48 cells (seed 1013, intermediate) in `tests/integration/equipment-tiers.test.js` and
-on all 288 in `tests/sweeps/equipment-tiers.test.js`. Thresholds set for the whole lattice (more than 3,000 items per
+Lattice rows are held twice: on 48 cells (seed 1013, intermediate) in `tests/integration/equipment-tiers.test.ts` and
+on all 288 in `tests/sweeps/equipment-tiers.test.ts`. Thresholds set for the whole lattice (more than 3,000 items per
 injury path, more than 3,000 core blocks, more than 120 anti-rotation blocks per tier) are asserted in the sweep only.
 
 | Row | Held by |

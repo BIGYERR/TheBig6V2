@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Helpers for the adjacent-day dedupe tests (tests/integration/adjacent-day-dedupe.test.js,
 // tests/sweeps/adjacent-day-dedupe.test.js). deconflictAdjacentDupes renames a loaded accessory that repeats the
 // previous calendar day's name. Rulings:
@@ -14,9 +14,8 @@
 // hand pattern table for D167a, the frozen V218 pattern lens for hinge membership, and D212's family typed by tier.
 // Instrumentation is source surgery on a copy of the app (each anchor must occur exactly once): one logging line at the
 // dedupe's rename writer, and a wrapper around _d18View that counts calls, mutations of its input and returned inputs.
-const { fixtures } = require('./app.js');
-const D = require('./duplicate-movements.js');
-
+import { fixtures } from './app.ts';
+import * as D from './duplicate-movements.ts';
 const { clone } = D;
 const OFF = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
 const ISO = Object.keys(OFF);
@@ -303,7 +302,7 @@ function surveyCalendar(cells, { inst, lw }) {
   return T;
 }
 
-module.exports = {
+export {
   OFF, ISO, calIndex, calPrev, calendarLattice, PHANTOM_LATTICE, multiLimb, instrumentedApp, legacyWalkApp, buildLogged,
   LEGACY_WALK, dayOf, trains, namesOn, calOf, FAM, surveyCalendar,
 };

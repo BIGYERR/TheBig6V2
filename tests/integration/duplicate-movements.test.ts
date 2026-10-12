@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // One card, one movement: no movement prints twice on a card, and none repeats the day's Main in another section.
 // Rulings: D52 slice 5 (the lowback/protect row slot, the carry and pillar subtraction, the Delt finisher, the chest
 // accessories, the light-press chain), D159, D164, D165, D166 (the draw-site twins), D198 (the full-lower hip-extension
@@ -7,11 +7,10 @@
 // Oracles: hand tables of what each tier owns and what each pool holds, the cards themselves, typed cards from the
 // rulings, and a counterfactual copy of the app with the D198 line written out. Nothing asks the engine what a card
 // should be. This file runs samples; tests/sweeps/duplicate-movements.test.js runs the full lattices.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, progDigest } = require('../support/app.js');
-const D = require('../support/duplicate-movements.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, progDigest } from '../support/app.ts';
+import * as D from '../support/duplicate-movements.ts';
 const IA = loadApp();
 const EXLIB = D.clone(IA.eval('EXLIB'));   // plain data: arrays from the app's realm never deep-equal host arrays
 

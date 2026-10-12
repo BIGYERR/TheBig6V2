@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The adjacent-day dedupe on the full calendar lattice (CI only; tests/integration/adjacent-day-dedupe.test.js runs a
 // sample). Rulings: D160, D167, D167a, D171, D212. Helpers and lattice: tests/support/adjacent-day-dedupe.js.
 //
@@ -6,11 +6,10 @@
 // multi-sport limb (gk pace+bike 1,080, NSW multi 4,200), plus the D167 sweep (all 3,900 Sunday-training configs and
 // every 8th of the 11,280 Sunday-rest configs, 1,410), each built once on the instrumented app; the swept configs are
 // also built on the app with the legacy walk put back.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const D = require('../support/duplicate-movements.js');
-const A = require('../support/adjacent-day-dedupe.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import * as D from '../support/duplicate-movements.ts';
+import * as A from '../support/adjacent-day-dedupe.ts';
 const U = A.calendarLattice();
 const CELLS = U.filter((x) => x.swept || A.PHANTOM_LATTICE[x.mix] || A.multiLimb(x.mix));
 let T;

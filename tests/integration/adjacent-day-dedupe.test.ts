@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The adjacent-day dedupe (deconflictAdjacentDupes): a loaded accessory that repeats the previous calendar day's name
 // is renamed. Rulings: D160 (the trigger set is the previous day as it ships, read through _d18View on a copy), D167
 // and D167a (the pairs walk the calendar the week renders), D171 (the hinge clamp reads the calendar's tomorrow),
@@ -7,12 +7,11 @@
 // Oracles: Monday-start date arithmetic, the shipped cards, the old walk typed by hand, the frozen V218 pattern lens,
 // D18's doctrine for the long-run day typed by hand, and D212's family by tier. This file runs a 249-config sample of
 // the 15,180-config calendar lattice; tests/sweeps/adjacent-day-dedupe.test.js runs the lattice.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, fixtures, progDigest } = require('../support/app.js');
-const D = require('../support/duplicate-movements.js');
-const A = require('../support/adjacent-day-dedupe.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, fixtures, progDigest } from '../support/app.ts';
+import * as D from '../support/duplicate-movements.ts';
+import * as A from '../support/adjacent-day-dedupe.ts';
 const IA = loadApp();
 const TEXT = D.appText();
 const INST = A.instrumentedApp(TEXT);
