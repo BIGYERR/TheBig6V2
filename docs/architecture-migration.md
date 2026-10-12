@@ -137,7 +137,7 @@ Releases keep shipping between phases.
 - `tsc -b` in `tools/check.mjs` and in a CI job.
 - **Done when:** every existing test passes as TypeScript and the type check is green. The app is untouched.
 
-### Phase B: split the script into source files, byte-identical (1 to 2 sessions; zero behaviour risk)
+### Phase B: split the script into source files, byte-identical (done, Post-v0.239.1)
 - Cut the inline script into about 25 classic-script files under `app/src/legacy/src/`, one per area in section 1 (the
   final cut lines are chosen at function boundaries by a measure pass), the `<style>` block into CSS files, and the markup
   into HTML partials.
@@ -146,6 +146,32 @@ Releases keep shipping between phases.
   difference.
 - From here, builds edit the source files, never the root `index.html`. `npm run sync` reads the sources.
 - **Done when:** the rebuilt file is byte-identical; every test, gate and e2e parity run is unchanged.
+
+**Done (Post-v0.239.1).** The root `index.html` (v0.239.1, 1,341,606 bytes, sha256 `2c9bfd96…9406531ea`) is now the
+build of 49 source files under `app/src/legacy/src/`, byte for byte, and the file itself did not change.
+- **How it is built.** `app/scripts/build-index.mjs` joins the files `order.json` lists, in that order, with nothing
+  between them (`cd app && npm run build:index`). `npm run build:index:check` rebuilds into a temp file and fails,
+  naming the first differing byte and the source file it comes from, unless it equals the root file. It runs in the
+  60-second check (`tools/check.mjs`, when `index.html` or anything under `app/src/legacy/src/` is staged, and in the
+  full check), in CI (the gate suite job's first step), and in `app/test/integration/build-index.test.ts`.
+- **How code is edited from now on.** In the source files, never the root `index.html`; then `npm run build:index`,
+  and both are committed together. The dev container builds `/app/` from the sources on every save, into
+  `backend/app-web/` only (it never writes the repo). `npm run sync` still splits the root file, which is the same bytes.
+- **The cuts are the measure's,** taken from `tests/measure/architecture_split_cutpoints.js` and never cut by hand. Six
+  of the seven merges below were applied. **bug-report-init into update-check was not:** the two are not adjacent
+  (popups and streaks-reminders sit between them), so merging them would reorder code. That leaves 35 JS files, not 34.
+- **The files, in build order** (what each holds: `app/src/legacy/src/README.md`):
+  - `html/head.html`;
+  - CSS: `base`, `shell`, `wizard`, `week-view`, `detail-sheet`, `overlays-components`, `this-week`, `session-sheet`,
+    `motion`;
+  - `html/screens.html`, `html/overlays.html`;
+  - JS: `storage`, `rest-day-shell`, `exercise-library`, `wizard`, `nsw-cardio`, `nrc-race-bike-swim`,
+    `cardio-progression`, `prehab`, `power-accessory`, `core-legs`, `wizard-generate`, `engine-a-b-calendar`, `injury`,
+    `engine-c`, `region-caps`, `swaps-edits`, `budget-engine-d`, `random-wildcard`, `week-view-sections`,
+    `set-logging`, `log-entries`, `wheel-log`, `rest-timer`, `day-detail`, `swap-sheet`, `day-status`, `programs`,
+    `overlays`, `program-manage`, `progress-data`, `progress-charts`, `lift-ledger-progress-screen`,
+    `bug-report-init`, `popups-streaks-reminders`, `update-check`;
+  - `html/screens-late.html`, `html/popups.html`.
 
 **Measured for phase B (2026-10-11, `tests/measure/architecture_split_cutpoints.js` and its `.out.txt`).**
 - **The split is proven.** 55 pieces (5 markup partials, 9 CSS files, 41 JS files) rebuild `index.html` byte for byte
