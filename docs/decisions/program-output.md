@@ -2,7 +2,7 @@
 
 What `buildProgram` prescribes, held as one golden file: `tests/snapshots/program-output.json` (HALF_MANNY, Mario's
 live program, and nine seeded configs; the digest and the week grid of each), checked by
-`tests/integration/program-output.test.js`. A ruling that moves program output adds an entry here, and the release
+`tests/integration/program-output.test.ts`. A ruling that moves program output adds an entry here, and the release
 that ships it regenerates the snapshot (`UPDATE_SNAPSHOTS=1`) so its git diff shows what moved. When HALF_MANNY moves,
 the new digest is the one coach printed before the build (standing ruling 5).
 

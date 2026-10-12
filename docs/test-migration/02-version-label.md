@@ -5,10 +5,10 @@ running in CI until phase 3 deletes the machinery; this file is what explains it
 
 - **Gate:** the four D236 rows of `g0.239.1_timer_label.js` (D236 P-SEMVERLABEL). Its three D235 rows are group 1
   (`01-rest-timer.md`); with both groups moved, every row of the gate is held.
-- **New tests:** `tests/integration/version-label.test.js` (4 tests): the bug-report page label after boot and the
+- **New tests:** `tests/integration/version-label.test.ts` (4 tests): the bug-report page label after boot and the
   report context `submitBug()` posts, on the body as shipped and on the body relabelled `239` and `v0.239.1` (a
   temporary copy with only its meta rewritten, removed after the run). The formatting rule alone stays in
-  `tests/unit/version-label.test.js` (4 tests, phase 1).
+  `tests/unit/version-label.test.ts` (4 tests, phase 1).
 - **Oracles:** the relabelled rows are strings typed by hand from the ruling. The as-shipped rows expect `v` plus the
   canonical MAJOR.MINOR.PATCH of the file's meta as `tests/semver.js` reads it, the gate's independent reader, so the
   test needs no edit when the next release moves the meta.
@@ -19,7 +19,7 @@ running in CI until phase 3 deletes the machinery; this file is what explains it
 
 The gate's rows enter `tests/row_manifest.txt` from CI; these are the four it declares.
 
-| Gate | Row | Held by (`tests/integration/version-label.test.js` ›) |
+| Gate | Row | Held by (`tests/integration/version-label.test.ts` ›) |
 |---|---|---|
 | `g0.239.1_timer_label.js` | `D236-label` | "the bug-report page shows BUILD and the version as shipped, in semver" |
 | `g0.239.1_timer_label.js` | `D236-context` | "the bug report context carries exactly one build line with the version as shipped" |

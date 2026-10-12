@@ -10,8 +10,8 @@ Preconditions: builder has produced `index.html` at the new version, a baseline 
 
 **New work is proved as CLAUDE.md's Test layout and Proof for new work sections set out; CI is the gate.** Run these first, each as `bash -c 'set -eo pipefail; …'`. A red step ends the run.
 
-A. `node tools/check.mjs` (60 s, hard) and `node --test tests/unit tests/integration`: every test passes.
-B. Each new or changed test file against the previous release: `IA_APP=<scratch>/base_v<previous>.html node --test <file>`. Every test written for a changed behaviour fails there; one that passes on both is vacuous unless its file says it guards behaviour that must not change.
+A. `node tools/check.mjs` (60 s, hard) and `cd tests && npx vitest run unit integration && npm run typecheck`: every test passes and the type check is clean.
+B. Each new or changed test file against the previous release: `cd tests && IA_APP=<scratch>/base_v<previous>.html npx vitest run <file>`. Every test written for a changed behaviour fails there; one that passes on both is vacuous unless its file says it guards behaviour that must not change.
 C. Every behaviour the ruling changes is matched to a named test. A changed behaviour with no test is red.
 D. `git diff` on `index.html` and `tests/snapshots/`: every hunk classified against the ruling. A snapshot moves only when the ruling moves program output, and HALF_MANNY's new digest is the one coach printed.
 E. CI on the push to `dev`: every job green, read with `gh run view` and `gh run download`.

@@ -165,9 +165,9 @@ session's files written into `tests/measure/` mid-proof.
   `Section`, `Item`, `LogEntry`), with runtime shape checks the compiler keeps in step with them;
   `tests/integration/program-shape.test.ts` and `tests/sweeps/program-shape.test.ts` walk real programs through them,
   so a field the engine adds, drops or retypes turns a test red until the type is changed to match. A test imports a type or
-  shared logic from `@ia/core`, never a copy. The release version lives in `core/src/version.ts`: until phase B makes
-  the build write the meta from it, a release writes the same MAJOR.MINOR.PATCH there and in `index.html`'s
-  `ia-version` meta, and `tests/unit/semver.test.ts` is red when they differ. From phase D on, new shared logic and the
+  shared logic from `@ia/core`, never a copy. The release version lives in `core/src/version.ts`: until the build writes the
+  meta from it, a release writes the same MAJOR.MINOR.PATCH there and in the `ia-version` meta (`app/src/legacy/src/html/head.html`,
+  built into `index.html`), and `tests/unit/semver.test.ts` is red when they differ. From phase D on, new shared logic and the
   engine code moved out of `index.html` go in `core/` (`docs/architecture-migration.md`).
 - **Naming.** A test file is named for the feature it covers, in lower case words joined by dashes (`rest-timer`,
   `version-label`, `program-output`), never for a version, a D-code or a gate. A new behaviour goes into its feature's

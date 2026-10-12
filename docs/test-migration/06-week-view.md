@@ -6,43 +6,43 @@ test or dropped for a written reason (`docs/test-migration.md`, The parity rule)
 
 New files:
 
-- `tests/integration/week-view.test.js` (22 tests): the recovery banner is gone and the placement note stays (D173);
+- `tests/integration/week-view.test.ts` (22 tests): the recovery banner is gone and the placement note stays (D173);
   Done, Skip and Mark Done ✓ close the day (D179) on a sample of HALF_MANNY's training days (every seventh, and weeks 1
   and 7 for the hero and the strip).
-- `tests/sweeps/week-view.test.js` (5 tests): the same D179 claims on every one of the 70 training days, as the gate
+- `tests/sweeps/week-view.test.ts` (5 tests): the same D179 claims on every one of the 70 training days, as the gate
   ran them. CI only.
-- `tests/integration/week-freeze.test.js` (9 tests): D108, the touched set reads all four stores.
-- `tests/integration/active-program.test.js` (46 tests): D178, one active program.
-- `tests/support/week-view.js`: the comment-stripping lexer, the virtual-clock week world and the day-close lattices
+- `tests/integration/week-freeze.test.ts` (9 tests): D108, the touched set reads all four stores.
+- `tests/integration/active-program.test.ts` (46 tests): D178, one active program.
+- `tests/support/week-view.ts`: the comment-stripping lexer, the virtual-clock week world and the day-close lattices
   the integration file and the sweep share.
 
-Totals: **89 rows: 88 mapped, 1 dropped** (1 HALF_MANNY digest row, held by `tests/integration/program-output.test.js`).
+Totals: **89 rows: 88 mapped, 1 dropped** (1 HALF_MANNY digest row, held by `tests/integration/program-output.test.ts`).
 
 ## `g202_d108_touchset_freeze.js` (10 rows: 9 mapped, 1 dropped)
 
 | Row | Held by |
 |---|---|
-| `R0` | `tests/integration/week-freeze.test.js` › "the pinned config builds the same program twice" |
-| `R0b` | `tests/integration/week-freeze.test.js` › "the fixture week carries the probe day and the control day" |
-| `R0c` | `tests/integration/week-freeze.test.js` › "each scenario writes exactly one store" |
-| `R1` | `tests/integration/week-freeze.test.js` › "a logged weight alone (ia_exw_) freezes the day: the reboot keeps the stored card byte for byte" |
-| `R1c` | `tests/integration/week-freeze.test.js` › "beside a logged weight, a day with no record is rebuilt to the live build" |
-| `R2` | `tests/integration/week-freeze.test.js` › "a snapshot alone (ia_hist_) freezes the day to the snapshot, byte for byte" |
-| `R2c` | `tests/integration/week-freeze.test.js` › "beside a snapshot, a day with no record is rebuilt to the live build" |
-| `R4` | `tests/integration/week-freeze.test.js` › "the live build of both days differs from the stored sentinels, so a frozen day is a real claim" |
-| `R5` | `tests/integration/week-freeze.test.js` › "the week beyond the freeze cut is the live build in both scenarios" |
-| `R6` | DROPPED: the HALF_MANNY digest against `MANNY_DIGEST_BY_VERSION`, held by `tests/integration/program-output.test.js` |
+| `R0` | `tests/integration/week-freeze.test.ts` › "the pinned config builds the same program twice" |
+| `R0b` | `tests/integration/week-freeze.test.ts` › "the fixture week carries the probe day and the control day" |
+| `R0c` | `tests/integration/week-freeze.test.ts` › "each scenario writes exactly one store" |
+| `R1` | `tests/integration/week-freeze.test.ts` › "a logged weight alone (ia_exw_) freezes the day: the reboot keeps the stored card byte for byte" |
+| `R1c` | `tests/integration/week-freeze.test.ts` › "beside a logged weight, a day with no record is rebuilt to the live build" |
+| `R2` | `tests/integration/week-freeze.test.ts` › "a snapshot alone (ia_hist_) freezes the day to the snapshot, byte for byte" |
+| `R2c` | `tests/integration/week-freeze.test.ts` › "beside a snapshot, a day with no record is rebuilt to the live build" |
+| `R4` | `tests/integration/week-freeze.test.ts` › "the live build of both days differs from the stored sentinels, so a frozen day is a real claim" |
+| `R5` | `tests/integration/week-freeze.test.ts` › "the week beyond the freeze cut is the live build in both scenarios" |
+| `R6` | DROPPED: the HALF_MANNY digest against `MANNY_DIGEST_BY_VERSION`, held by `tests/integration/program-output.test.ts` |
 
 ## `g220_d173_recovbanner.js` (6 rows: 6 mapped)
 
 | Row | Held by |
 |---|---|
-| `B0` | `tests/integration/week-view.test.js` › "the comment strip keeps the code: it compiles and still holds the week renderer and its stats block" |
-| `B1` | `tests/integration/week-view.test.js` › "the app source never prints the recovery spacing banner" |
-| `B2` | `tests/integration/week-view.test.js` › "the app source never prints the recovery spacing banner" |
-| `B3` | `tests/integration/week-view.test.js` › "the app source never prints the recovery spacing banner" |
-| `B4` | `tests/integration/week-view.test.js` › "the program keeps the placement note as a trace, word for word" |
-| `B5` (many) | `tests/integration/week-view.test.js` › "week 1 renders its stats block with no banner, no recycle glyph and no sentence of the note" |
+| `B0` | `tests/integration/week-view.test.ts` › "the comment strip keeps the code: it compiles and still holds the week renderer and its stats block" |
+| `B1` | `tests/integration/week-view.test.ts` › "the app source never prints the recovery spacing banner" |
+| `B2` | `tests/integration/week-view.test.ts` › "the app source never prints the recovery spacing banner" |
+| `B3` | `tests/integration/week-view.test.ts` › "the app source never prints the recovery spacing banner" |
+| `B4` | `tests/integration/week-view.test.ts` › "the program keeps the placement note as a trace, word for word" |
+| `B5` (many) | `tests/integration/week-view.test.ts` › "week 1 renders its stats block with no banner, no recycle glyph and no sentence of the note" |
 
 ## `g221_d178_active.js` (46 rows: 46 mapped)
 
@@ -50,7 +50,7 @@ The five rows the manifest keys by label hash are the boot rows `Ba`, `Bb`, `Bc`
 
 | Row | Held by |
 |---|---|
-| `A01` | `tests/integration/active-program.test.js` › "boot with the pointer on a live program loads it" |
+| `A01` | `tests/integration/active-program.test.ts` › "boot with the pointer on a live program loads it" |
 | `A02` | › "boot with no pointer loads nothing" |
 | `A03` | › "boot with a pointer to a missing program falls back to the first live one and writes it back" |
 | `A04` | › "boot with a pointer to an archived program falls back to the first live one and writes it back" |
@@ -102,12 +102,12 @@ of a 2026-09-07 start, and the dated test successor's test lands in week 7.
 
 ## `g221_d179_donenav.js` (27 rows: 27 mapped)
 
-Each lattice row is held twice: on a sample in `tests/integration/week-view.test.js` (every seventh training day;
-weeks 1 and 7 for the hero and strip rows) and on every training day in `tests/sweeps/week-view.test.js`.
+Each lattice row is held twice: on a sample in `tests/integration/week-view.test.ts` (every seventh training day;
+weeks 1 and 7 for the hero and strip rows) and on every training day in `tests/sweeps/week-view.test.ts`.
 
 | Row | Held by |
 |---|---|
-| `F0` | `tests/integration/week-view.test.js` › "HALF_MANNY has 70 training days, all inside the block, and stores no blockOpen"; › "no render in these lattices shows a day as before signup"; sweep › "HALF_MANNY has the ruling's 70 training days", › "no render shows a day as before signup" |
+| `F0` | `tests/integration/week-view.test.ts` › "HALF_MANNY has 70 training days, all inside the block, and stores no blockOpen"; › "no render in these lattices shows a day as before signup"; sweep › "HALF_MANNY has the ruling's 70 training days", › "no render shows a day as before signup" |
 | `C1` | › "Done, Skip and Mark Done ✓ close the day and land on This Week"; sweep › "every training day: Done, Skip and Mark Done ✓ close to This Week, undo stays, pop-up and toast as ruled" |
 | `C2` | the same two tests |
 | `C3` | the same two tests |

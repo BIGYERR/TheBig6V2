@@ -158,7 +158,8 @@ Releases keep shipping between phases.
 - `tests/` is its own package (Vitest 5, TypeScript 6, `@types/node`, `"@ia/core": "file:../core"`; lockfile committed,
   `tests/node_modules` ignored) with `tests/tsconfig.json` (module `preserve`, bundler resolution) and
   `tests/vitest.config.mts`. Every test file and helper is TypeScript on Vitest; the snapshot file and its
-  `UPDATE_SNAPSHOTS=1` rewrite are unchanged. 40 tests before, 83 in unit and integration after (plus 2 sweeps).
+  `UPDATE_SNAPSHOTS=1` rewrite are unchanged. Phase 2's groups 1 to 7 included: 293 tests in unit and integration
+  before (node:test), 336 after, every old one under its own name; 27 sweeps before, 29 after.
 - The type check is `tsc -p core` then `tsc -p tests` (`npm run typecheck` in `tests/`), not `tsc -b`: project
   references need emitting, composite projects, and nothing here emits.
 - `tools/check.mjs` runs both type checks and Vitest over `tests/unit` and `tests/integration` (installing

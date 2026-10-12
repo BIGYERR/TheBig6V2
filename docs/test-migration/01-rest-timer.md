@@ -5,17 +5,17 @@ running in CI until phase 3 deletes the machinery; this file is what explains th
 
 - **Gates:** `g239_d233_island.js` (12 rows, D233 P-ISLAND) and the three D235 rows of `g0.239.1_timer_label.js`
   (its four D236 rows are group 2, `02-version-label.md`).
-- **New tests:** `tests/integration/rest-timer.test.js` (21 tests: the 6 D235 tests from phase 1 and 15 for the
-  stopwatch and the island), with the rig in `tests/support/rest-timer.js` (fake wall and performance clocks, a
+- **New tests:** `tests/integration/rest-timer.test.ts` (21 tests: the 6 D235 tests from phase 1 and 15 for the
+  stopwatch and the island), with the rig in `tests/support/rest-timer.ts` (fake wall and performance clocks, a
   scheduler, a document that keeps its elements, the island plugin stub, a page load with the plugin present).
 - **Rest sheet:** neither gate tests the rest sheet. Its rulings (D228 to D232) ship in v0.240.0, so
-  `tests/integration/rest-sheet.test.js` is written with that release, not here.
+  `tests/integration/rest-sheet.test.ts` is written with that release, not here.
 - **Version predicates:** every row of both gates carries a version conjunct (REFUSED below its era). The new tests
   assert today's behaviour only, so that conjunct is dropped from each row; it was never a row of its own.
 
 ## Rows
 
-| Gate | Row | Held by (`tests/integration/rest-timer.test.js` ›) |
+| Gate | Row | Held by (`tests/integration/rest-timer.test.ts` ›) |
 |---|---|---|
 | `g0.239.1_timer_label.js` | `D235-jitter` | "a jittery tap under 5 px writes neither top nor left, and the tab tap still expands"; "a jittery tap on the open card collapses it during the intro and does nothing outside it" (phase 1) |
 | `g0.239.1_timer_label.js` | `D235-cancel` | "a drag past 5 px that ends in pointercancel docks to the nearer edge"; "a jitter that ends in pointercancel writes nothing and runs no tap action" (phase 1) |

@@ -1,8 +1,8 @@
 # Version label: decisions
 
 How the app shows its own version: `iaVersionLabel` (next to `IA_VERSION` in `index.html`), used by the bug-report
-page (`BUILD v0.239.1`) and the bug-report context (`build: v0.239.1`). Tests: `tests/unit/version-label.test.js` (the helper alone) and
-`tests/integration/version-label.test.js` (the page and the context, on the shipped meta and on bodies relabelled `239`
+page (`BUILD v0.239.1`) and the bug-report context (`build: v0.239.1`). Tests: `tests/unit/version-label.test.ts` (the helper alone) and
+`tests/integration/version-label.test.ts` (the page and the context, on the shipped meta and on bodies relabelled `239`
 and `v0.239.1`).
 
 ## D236 P-SEMVERLABEL: the app shows its version in semver everywhere

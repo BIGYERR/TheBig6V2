@@ -20,7 +20,7 @@ Run these, in order, and report the seven lines. Do not begin design or edits un
    Uncommitted changes in `index.html` at session start are a red flag: ask Mario before proceeding.
 5. Sabotage sweep due (the frozen legacy suite): `grep -m1 -oE 'full sweep [0-9]{4}-[0-9]{2}-[0-9]{2}' IRON_ASYLUM_HANDOFF_1_1.md` (the digest is newest first) against today's date. The cadence is set by the Proof scope section of CLAUDE.md, the single source; if they disagree, CLAUDE.md wins.
 6. Deploy picture: read local, GitHub, Pages, live and any native build version, each from its own source, as CLAUDE.md Session rhythm step 7 sets out. A lagging deploy is reported, never a blocker.
-7. Feature tests (CLAUDE.md Test layout): `bash -c 'set -eo pipefail; node --test tests/unit tests/integration' 2>&1 | grep -E '^ℹ (tests|pass|fail)|^✖'` (about a second). A red test at session start is reported before any work, never worked around.
+7. Feature tests (CLAUDE.md Test layout): `bash -c 'set -eo pipefail; cd tests && npx vitest run unit integration' 2>&1 | grep -E '^ *(Test Files|Tests) |FAIL'` (a few seconds; `npm ci` in `tests/` first if `tests/node_modules` is missing). A red test at session start is reported before any work, never worked around.
 
 Then print the before-picture for the live program so the session has a baseline in context:
 `bash -c 'set -eo pipefail; node tests/harness.js index.html --grid' | head -40`
