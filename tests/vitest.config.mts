@@ -8,11 +8,19 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    include: ['unit/**/*.test.ts', 'integration/**/*.test.ts', 'sweeps/**/*.test.ts'],
     environment: 'node',
     pool: 'forks',
-    // A test boots the app in the VM, and a sweep builds hundreds of programs: allow for a slow CI machine.
-    testTimeout: 60_000,
-    hookTimeout: 60_000,
+    projects: [
+      // A unit or integration test boots the app in the VM: allow for a slow CI machine, but a hang still fails fast.
+      {
+        extends: true,
+        test: { name: 'fast', include: ['unit/**/*.test.ts', 'integration/**/*.test.ts'], testTimeout: 60_000, hookTimeout: 60_000 },
+      },
+      // A sweep builds hundreds or thousands of programs in one test (some take minutes); CI only.
+      {
+        extends: true,
+        test: { name: 'sweeps', include: ['sweeps/**/*.test.ts'], testTimeout: 900_000, hookTimeout: 900_000 },
+      },
+    ],
   },
 });
