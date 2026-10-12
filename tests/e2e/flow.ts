@@ -395,6 +395,38 @@ const STRENGTH: readonly Step[] = [
     },
   },
   {
+    id: 'rest-timer',
+    page: 'Rest timer: open, start, stop, reset, drag to the left edge',
+    async run(t, page) {
+      // The floating rest timer rides the week, Progress and Bugs screens once a program exists (an Angular component in
+      // the app since phase E's second step, the legacy script's in the single-file page: both answer the same). The
+      // clock in a browser is performance.now(), which runs, so the step reads labels and a reset, never a time.
+      await t.tap('#rtTab');
+      if (!(await page.$eval('#rtCard', (e) => getComputedStyle(e).display === 'block'))) throw new Error('the rest timer did not open');
+      await t.expectText('#rtToggle', 'Start');
+      await t.tap('#rtToggle');
+      await t.expectText('#rtToggle', 'Stop');
+      if (!(await t.count('#rtMini.run'))) throw new Error('the running timer is not marked running');
+      await t.tap('#rtToggle');
+      await t.expectText('#rtToggle', 'Start');
+      await t.tap('#rtCard .rt-reset');
+      await t.expectText('#rtBig', '0:00');
+      await t.expectText('#rtCs', '.00');
+      await t.tap('#rtCard .rt-collapse');
+      if (!(await page.$eval('#rtTab', (e) => getComputedStyle(e).display === 'flex'))) throw new Error('the rest timer did not fold back to its tab');
+      // A drag across the screen docks the tab to the left edge.
+      const box = await (await page.$('#rtTab'))?.boundingBox();
+      if (!box) throw new Error('the rest timer tab has no box');
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(60, box.y + box.height / 2, { steps: 8 });
+      await page.mouse.up();
+      await new Promise((r) => setTimeout(r, 300));
+      const left = await page.$eval('#rtAnchor', (e) => (e as HTMLElement).style.left);
+      if (left !== '0px') throw new Error(`the dragged timer docked at left "${left}", not the left edge`);
+    },
+  },
+  {
     id: 'programs',
     page: 'Programs (with a program)',
     async run(t) {

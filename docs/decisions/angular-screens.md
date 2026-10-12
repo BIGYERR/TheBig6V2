@@ -43,3 +43,22 @@ what is stored.
   step now also sends with nothing typed and expects 'Type what went wrong first.' on both builds. A local headless
   look found the Angular screen and the page's 0 of 334,836 pixels apart, the same label and the same empty-send line.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.9 moves the rest timer
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.9.
+- **Moved:** `#restFloat`, the floating rest timer: `src/app/screens/rest-timer/rest-timer.ts` (the component: the
+  readout and the Start/Stop button follow signals; the docking side, the open card, the intro and the drag write the
+  same inline styles the legacy script wrote) and `rest-timer-model.ts` (the stopwatch, its clock, the readout, the side
+  styles, the drag box, the Live Activity calls, when it shows). The legacy `rest-timer.js` stays in the single-file
+  page.
+- **A component that other legacy code calls:** the rest of the app calls into the timer (`updateRestFloat` on every
+  screen change, `ruReset` when a day closes, `ruResetIfIdle` when one opens, `_ruIsland` at boot, `_setRtIntroPending`
+  after the first program). `LegacyBridge.provide(name, fn)` hands each to the component: a top-level function of a
+  classic script is a writable property of the global object, and every call looks it up afresh.
+- **Tests:** `frontends/app/test/unit/rest-timer.test.ts` (8: the stopwatch on a driven clock, the wall clock with the
+  Live Activity and performance.now() without, what the Live Activity is told, the readout, both sides' styles, the
+  drag box and the docking half, when it shows). The e2e's strength journey gains a rest-timer step on both builds:
+  open, Start (the button reads Stop, the tab marked running), Stop, Reset (0:00 and .00), fold back, and a drag that
+  docks it to the left edge (20/20 steps, every one at 0.000% parity).
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

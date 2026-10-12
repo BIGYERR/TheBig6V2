@@ -358,7 +358,8 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   navigation still shows and hides it. The single-file page keeps the legacy screen until Pages serves the Angular build,
   and the e2e's parity holds the two the same. The markup moves as it is first; the logic moves apart from Angular
   (`<screen>-model.ts`) and is tested by node --test.
-- **Done:** the bug report (v0.239.8).
+- **Done:** the bug report (v0.239.8), the rest timer (v0.239.9, the first a component whose legacy callers it takes
+  over through `LegacyBridge.provide`).
 - Suggested order:
   1. bug report (small, proves the pattern);
   2. rest timer;

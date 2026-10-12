@@ -29,6 +29,17 @@ export class LegacyBridge {
     return (0, eval)(name) as T;
   }
 
+  /**
+   * Hands a legacy global function to Angular: the legacy script's own calls of `name` reach `fn` from now on. A top-level
+   * function of a classic script is a writable property of the global object, and every call looks it up afresh. For a
+   * screen whose component takes over what other legacy code still calls (the rest timer's ruReset, updateRestFloat).
+   */
+  provide(name: string, fn: (...args: never[]) => unknown): void {
+    if (!this.booted()) throw new Error(`legacy app not booted; cannot provide ${name}`);
+    if (typeof (globalThis as Record<string, unknown>)[name] !== 'function') throw new Error(`legacy global ${name} is not a function to take over`);
+    (globalThis as Record<string, unknown>)[name] = fn;
+  }
+
   /** Calls a legacy global function by name; throws if the app has not booted or the name is not a function. */
   call<T = unknown>(name: string, ...args: unknown[]): T {
     if (!this.booted()) throw new Error(`legacy app not booted; cannot call ${name}`);
