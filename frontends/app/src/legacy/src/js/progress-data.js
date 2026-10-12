@@ -5,7 +5,7 @@ import {
 } from './rest-day-shell.js';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
-import { PACE_CHART } from './cardio-progression.js';
+import { PACE_CHART } from '../../../../../../core/src/engine/cardio-progression.ts';
 import { _epley } from './day-detail.js';
 import { renderProgressScreen } from './lift-ledger-progress-screen.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)

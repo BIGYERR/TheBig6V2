@@ -22,7 +22,7 @@ const EQUIP_TOKENS: Record<string, string[]> = {
   loaded:     ['weighted','loaded']
 };
 // True if the name carries any external-load token at all.
-function anyEquip(name: string | null | undefined): boolean {
+function anyEquip(name: string | null | undefined): boolean{
   const n = (name||'').toLowerCase();
   for(const fam in EQUIP_TOKENS){ if(EQUIP_TOKENS[fam].some(t => n.includes(t))) return true; }
   return false;
@@ -59,7 +59,7 @@ function isTimeExercise(name: string | null | undefined): boolean {
 // One less name asserted by hand. The seam shrinks as the library gets honest.
 const REP_BUT_LOADED = ['single-leg hip thrust','bench dips'];
 const BW_QUALIFIER = ['(chair','foot on chair','shoulders on bed','assisted ','(assisted','bodyweight','(partner','(anchored','banded ','band ','(bw'];
-function isLoadedRepMovement(name: string | null | undefined): boolean {
+function isLoadedRepMovement(name: string | null | undefined): boolean{
   const n=(name||'').toLowerCase();
   if(BW_QUALIFIER.some(q => n.includes(q))) return false;
   return REP_BUT_LOADED.some(k => n.includes(k));

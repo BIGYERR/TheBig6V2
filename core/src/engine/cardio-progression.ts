@@ -1,11 +1,35 @@
-import { ALL_DAYS_ORDER, _ISO_ORDER } from '../../../../../../core/src/engine/calendar.ts';
-import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
-import { buildRunSession, isCardioCutbackWeek, paceGoalTarget } from './nsw-cardio.js';
+import { ALL_DAYS_ORDER, _ISO_ORDER } from './calendar.ts';
+import { _clkMS } from './clock-format.ts';
+import { buildRunSession, isCardioCutbackWeek, paceGoalTarget } from './nsw-cardio.ts';
 import {
   NRC_GOALS, PACE_GOALS, buildBikeSession, buildNRCSession, buildSwimSession, getNRCSessionTypes,
-} from './nrc-race-bike-swim.js';
-import { injuryPlan } from '../../../../../../core/src/engine/injury.ts';
+} from './nrc-race-bike-swim.ts';
+import { injuryPlan } from './injury.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+import type { CardioDose, CardioGoal, CardioGoals, CardioType, Cfg, DayKey, Experience, MileBestSource } from '../domain/index.ts';
+import type { RacePin } from './nrc-race-bike-swim.ts';
+import type { CardioSession, TaperStep } from './nsw-cardio.ts';
+
+/** One row of the pace chart: seconds per mile for each pace, total seconds for the *best columns. */
+export interface PaceRow { mile: number; fiveKbest: number; fiveK: number; tenKbest: number; tenK: number; tempo: number; halfBest: number; half: number; marBest: number; marathon: number; recovery: number }
+/** A column of the pace chart. */
+export type PaceCol = keyof PaceRow;
+/** How many days a week each sport gets. */
+export type SportTargets = Record<string, number>;
+/** The taper a program runs: its length in weeks, and each week's place in it. */
+export interface TaperWindow { taperWks: number; inTaper(w: number): boolean; taperFactor(w: number): number }
+/** Each week's cardio, by week number, then by training day. */
+export type CardioSchedule = Record<number, Record<string, CardioSession | null>>;
+/** The cfg as one build carries it: the race week's pin rides along (cfg._racePin), deleted before the cfg is stored. */
+export type EngineCfg = Cfg & { _racePin?: RacePin | null };
+/** What the week view says about the run's pace anchor (runAnchorInfo): the mile pace, where it came from, and the chart row. */
+export interface RunAnchorInfo { anchorSec: number; rawSec: number; clamped: 'fast' | 'slow' | null; row: PaceRow; kind: 'default' | 'seeded' | 'edited' | 'entered'; exp: Experience; prog: string; n: number; wk: number; from: MileBestSource['from'] | null; race: 'half' | 'marathon' | null; goalId: string; goalT: { dist: number; sec: number } | null }
+/** A run-base athlete's frequency ramp: which of the chosen days run each week, and for how many minutes. */
+interface RunBaseFreq { activeByWeek: Record<number, Set<number>>; minsByWeek: Record<number, Record<number, number>>; longCap: number }
+/** The base-cardio plan: the days chosen for cardio and the sport on each. */
+/** A spaced pick of run days (_nrcSpacedRunDays): the chosen indexes, each day's session type, and the ranking it won on. */
+interface NrcPick { idxs: number[]; typeOf: Record<string, string>; coll: number; untol: number; tol: number; longLast: number; speedsAfterRest: number; recBeforeLong: number; canonical: number; identity: number; spread: number; qualRest: number; qualFirst: number; _fbFired?: boolean }
+interface BaseCardioPlan { days: DayKey[]; dayToSport: CardioType[]; freq?: RunBaseFreq }
 
 
 // Speed-responsive goals depend on interval sessions to deliver their pace work.
@@ -16,7 +40,7 @@ import { injuryPlan } from '../../../../../../core/src/engine/injury.ts';
 // below the ~2.5mi doctrine baseline, this is now ~0-1 weeks for nearly everyone — the
 // elaborate couch on-ramp is intentionally gone. Kept as the single source of truth in
 // case a future off-the-couch tier reintroduces a real ramp.
-function runOnRampWeeks(baselineMiles, experience) {
+function runOnRampWeeks(baselineMiles: number | null | undefined, experience: string | null | undefined): number {
   if(experience !== 'beginner') return 0;
   const FLOOR = 2.0, MERGE = 2.5;
   let cur = Math.max(FLOOR, baselineMiles || FLOOR);
@@ -35,7 +59,7 @@ function runOnRampWeeks(baselineMiles, experience) {
 // fitness anchor (a recent race time or mile best) and interpolates the full row,
 // so every workout in either engine derives its target from one input.
 // ─────────────────────────────────────────────────────────────────────────────
-const PACE_CHART = [
+const PACE_CHART: PaceRow[] = [
   // mileBest, 5kBest, 5kAvg, 10kBest, 10kAvg, tempo, halfBest, halfAvg, marBest, marAvg, recovery
   {mile:300, fiveKbest:1025, fiveK:330, tenKbest:2145, tenK:345, tempo:365, halfBest:4680, half:360, marBest:9840,  marathon:375, recovery:420},
   {mile:330, fiveKbest:1125, fiveK:360, tenKbest:2340, tenK:375, tempo:395, halfBest:5100, half:390, marBest:10800, marathon:410, recovery:455},
@@ -57,12 +81,12 @@ const PACE_CHART = [
 // V203 (D117): the single owner of the steady ceiling. Easy days never run faster than
 // the midpoint of Tempo and Recovery Pace; every easy-run cap in the app reads this and
 // nothing else, so there is exactly one place the ceiling can be wrong.
-function steadyCapSec(row){ return Math.round((row.tempo + row.recovery)/2); }
+function steadyCapSec(row: PaceRow): number{ return Math.round((row.tempo + row.recovery)/2); }
 
 // Find the row from any anchor and interpolate between bracketing rows.
 // anchorType: 'mile' | 'fiveKbest' | 'tenKbest' | 'halfBest' | 'marBest'
 // Returns full pace set in sec/mile (avg training paces) + the row's race bests.
-function paceChartLookup(anchorType, anchorSec) {
+function paceChartLookup(anchorType: PaceCol, anchorSec: number): PaceRow {
   const rows = PACE_CHART;
   const key = anchorType;
   // Clamp outside the table
@@ -73,8 +97,8 @@ function paceChartLookup(anchorType, anchorSec) {
     if (anchorSec >= lo[key] && anchorSec <= hi[key]) {
       const span = hi[key] - lo[key];
       const f = span === 0 ? 0 : (anchorSec - lo[key]) / span;
-      const out = {};
-      for (const col of Object.keys(lo)) out[col] = Math.round(lo[col] + (hi[col] - lo[col]) * f);
+      const out = {} as PaceRow;
+      for (const col of Object.keys(lo) as PaceCol[]) out[col] = Math.round(lo[col] + (hi[col] - lo[col]) * f);
       return out;
     }
   }
@@ -94,17 +118,17 @@ function paceChartLookup(anchorType, anchorSec) {
 //     input carries min="0.1" with no max;
 //   * outside the table the value clamps to the table's own bounds at both ends.
 // rowPaceAt(row, 1.0) returns the mile column exactly.
-var ROW_PACE_COLS = [
+var ROW_PACE_COLS: { d: number; k: PaceCol }[] = [
   {d:1,      k:'mile'},
   {d:3.107,  k:'fiveK'},
   {d:6.214,  k:'tenK'},
   {d:13.109, k:'half'},
   {d:26.219, k:'marathon'},
 ];
-function rowPaceAt(row, distMiles) {
+function rowPaceAt(row: PaceRow, distMiles: number | string | null | undefined): number {
   var run = -Infinity;
   var v = ROW_PACE_COLS.map(function(c){ run = Math.max(run, +row[c.k]); return {d:c.d, p:run}; });
-  var d = +distMiles;
+  var d = +distMiles!;
   if (!(d > 0))            return v[0].p;                 // no distance → the mile column
   if (d <= v[0].d)         return v[0].p;                 // below the table → clamp low
   if (d >= v[v.length-1].d) return v[v.length-1].p;       // above the table → clamp high
@@ -117,7 +141,7 @@ function rowPaceAt(row, distMiles) {
   return v[v.length-1].p;
 }
 
-function isSpeedGoal(goalId) {
+function isSpeedGoal(goalId: unknown): boolean {
   return goalId === 'run_pace_goal' || goalId === 'run_5k' || goalId === 'run_10k'
       || goalId === 'swim_500_time' || goalId === 'swim_100_time';
 }
@@ -141,13 +165,13 @@ function isSpeedGoal(goalId) {
 // doctrine requires. bike_ftp / bike_cals stay OUT deliberately: passing them through
 // would hand them the generic bike sessions and half-implement their promise badly —
 // their real fix is a session builder (§12).
-function isPerformanceCardioGoal(g){
+function isPerformanceCardioGoal(g: CardioGoal | null | undefined): boolean{
   if(!g) return false;
   return isSpeedGoal(g.id) || g.id === 'run_half' || g.id === 'run_marathon'
       || g.id === 'bike_century' || g.id === 'bike_50'
       || g.id === 'swim_tri' || g.id === 'swim_mile';
 }
-function isPerformanceRunGoal(g){
+function isPerformanceRunGoal(g: CardioGoal | null | undefined): boolean{
   if(!g) return false;
   return isSpeedGoal(g.id) || g.id === 'run_half' || g.id === 'run_marathon';
 }
@@ -158,20 +182,20 @@ function isPerformanceRunGoal(g){
 // in one place and every reader (cardio + lifting) moves together.
 // V186 (§4b): eventTargeted, OR an NRC 5K/10K plan — its final week is a race or a time
 // trial either way, and the lifting layer treats both as the event (D34 shape).
-function taperEventOn(cfg){
+function taperEventOn(cfg: Cfg | null | undefined): boolean{
   if(!cfg) return true;
   if(cfg.eventTargeted !== false) return true;
   const g = cfg.cardioGoals && cfg.cardioGoals.run;
   return !!(g && (g.id === 'run_5k' || g.id === 'run_10k') && (cfg.cardioTypes||[]).includes('run'));
 }
-function taperWeeksFor(eventOn, isBaseCardio, totalWeeks){
+function taperWeeksFor(eventOn: boolean, isBaseCardio: boolean, totalWeeks: number | null | undefined): number{
   // A program tapers ONLY for a real event, and never for base/complement cardio.
   return (eventOn && !isBaseCardio) ? Math.max(2, Math.round((totalWeeks || 6) * 0.12)) : 0;
 }
 // Resolves the whole taper window for a program. isBaseCardio mirrors the cardio
 // governor in buildCardioProgression (no performance lift path AND no performance
 // cardio goal => base). Returns the week count + the inTaper / taperFactor curve.
-function programTaperWindow(cfg, cardioTypes, cardioGoals, totalWeeks){
+function programTaperWindow(cfg: Cfg, cardioTypes: CardioType[] | null | undefined, cardioGoals: CardioGoals | null | undefined, totalWeeks: number | null | undefined): TaperWindow{
   const tw = totalWeeks || 6;
   const types = cardioTypes || [];
   const _perfLiftPaths = (cfg.goal === 'athletic' || cfg.goal === 'endurance');
@@ -191,8 +215,8 @@ function programTaperWindow(cfg, cardioTypes, cardioGoals, totalWeeks){
   // have the gate — without this, the UI would report "no taper weeks" on a program whose
   // sessions were visibly tapering.
   const taperWks = taperWeeksFor(taperEventOn(cfg), isBaseCardio, tw);   // V186 (§4b)
-  function inTaper(w){ return taperWks > 0 && w > (tw - taperWks); }
-  function taperFactor(w){
+  function inTaper(w: number): boolean{ return taperWks > 0 && w > (tw - taperWks); }
+  function taperFactor(w: number): number{
     if(!inTaper(w)) return 1;
     const t = w - (tw - taperWks);
     return 1 - (t / (taperWks + 1)) * 0.4;
@@ -202,7 +226,7 @@ function programTaperWindow(cfg, cardioTypes, cardioGoals, totalWeeks){
 // Single source of truth for how many day-slots each sport gets. Used by both the
 // allocation engine and the rest-days nudge so the warning can never disagree with
 // what the engine actually builds. Returns {primary, targets:{sport:count}}.
-function sportDayTargets(cardioTypes, cardioGoals, totalDays, liftGoal, cardioMode) {
+function sportDayTargets(cardioTypes: CardioType[] | null | undefined, cardioGoals: CardioGoals, totalDays: number, liftGoal: string | null | undefined, cardioMode: string | null | undefined): { primary: CardioType | null; targets: SportTargets } {
   if(!cardioTypes || !cardioTypes.length || totalDays <= 0) return {primary:null, targets:{}};
   // V187 (F2, ruled "Easy day concur"): Nike's week is FIVE runs on all four plans and
   // every half/marathon ever built was four — the >=5 layouts in getNRCSessionTypes had
@@ -216,7 +240,7 @@ function sportDayTargets(cardioTypes, cardioGoals, totalDays, liftGoal, cardioMo
   const _nrcFive = (liftGoal === 'athletic' || liftGoal === 'endurance') && totalDays >= 6;
   
   // Strict day caps per sport based on the target block
-  const SPORT_CEILINGS = {
+  const SPORT_CEILINGS: Record<string, number> = {
     // run_base: 4 (V159, D4b) — NSW's weekly template is FOUR runs (2 LSD + quality +
     // long), so 4 is the doctrinal transcription; at 4 days the layout deals the chi
     // slot, which makes the V158 benchmark steady-slot obligation reachable and gated.
@@ -234,10 +258,10 @@ function sportDayTargets(cardioTypes, cardioGoals, totalDays, liftGoal, cardioMo
     bike_base: 3, bike_ftp: 3, bike_cals: 3, bike_50: 3, bike_century: 4,
     swim_base: 3, swim_100_time: 3, swim_500_time: 3, swim_mile: 4, swim_tri: 4
   };
-  const targets = {};
+  const targets: SportTargets = {};
   cardioTypes.forEach(t => {
     const goalId = cardioGoals[t]?.id;
-    const ceiling = (_nrcFive && t === 'run' && NRC_GOALS.has(goalId)) ? 5 : (SPORT_CEILINGS[goalId] || 3);   // V187 (F2)
+    const ceiling = (_nrcFive && t === 'run' && NRC_GOALS.has(goalId)) ? 5 : (SPORT_CEILINGS[goalId!] || 3);   // V187 (F2)
     // V205 (D125 amended): the pace family's fourth run is conditional on the spacing
     // chooser returning a collision-free layout, and that chooser only runs on a SOLO
     // cardio week. A multi-sport week never reaches it, so there is no coll==0 to key on
@@ -271,11 +295,11 @@ function sportDayTargets(cardioTypes, cardioGoals, totalDays, liftGoal, cardioMo
 // the NSW principle (run + swim 3×3) applied generally. Tactical/endurance blocks
 // leave cardio uncapped because cardio IS the objective there. Lifting-priority blocks
 // reserve pure-lifting days: strength/size reserve 2, balanced/fat-loss reserve 1.
-function multiSportTargets(cardioTypes, baseTargets, cfg, nDays) {
+function multiSportTargets(cardioTypes: CardioType[], baseTargets: SportTargets, cfg: Cfg, nDays: number): SportTargets {
   const LEG = new Set(['run','bike']);
   // Tactical/endurance: cardio is the goal → no cap, ceilings as-is (NSW stays 3×3).
   if(cfg.goal === 'athletic' || cfg.goal === 'endurance') {
-    const t = {}; cardioTypes.forEach(s => t[s] = baseTargets[s] || 0); return t;
+    const t: SportTargets = {}; cardioTypes.forEach(s => t[s] = baseTargets[s] || 0); return t;
   }
   const isStrengthSize = (cfg.goal === 'strength' || cfg.goal === 'hypertrophy');
   const liftFloor = isStrengthSize ? 2 : 1;
@@ -295,8 +319,8 @@ function multiSportTargets(cardioTypes, baseTargets, cfg, nDays) {
     otherShare = Math.max(0, allowed - legShare);
   }
 
-  const targets = {}; cardioTypes.forEach(s => targets[s] = 0);
-  const spread = (sports, share) => sports.forEach((s, i) => {
+  const targets: SportTargets = {}; cardioTypes.forEach(s => targets[s] = 0);
+  const spread = (sports: CardioType[], share: number) => sports.forEach((s, i) => {
     targets[s] = Math.floor(share / sports.length) + (i < (share % sports.length) ? 1 : 0);
   });
   if(legSports.length) spread(legSports, legShare);
@@ -304,8 +328,8 @@ function multiSportTargets(cardioTypes, baseTargets, cfg, nDays) {
   return targets;
 }
 
-function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalWeeks) {
-  const schedule = {};
+function buildCardioProgression(cardioTypes: CardioType[] | null | undefined, cardioGoals: CardioGoals, trainDays: DayKey[], cfg: EngineCfg, totalWeeks: number | null | undefined): CardioSchedule {
+  const schedule: CardioSchedule = {};
   const tw = totalWeeks || 6;
   for(let w = 1; w <= tw; w++) schedule[w] = {};
   if(!cardioTypes || !cardioTypes.length) return schedule;
@@ -346,7 +370,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     if(_rg && NRC_GOALS.has(_rg)) cardioTrainDays = _ISO_ORDER.filter(d => trainDays.includes(d)); }
   // baseCardioPlan, when set, fully predefines the cardio calendar for base-cardio mode:
   // {days:[dayKey,...], dayToSport:[sport,...]} — bypassing sportDayTargets entirely.
-  let baseCardioPlan = null;
+  let baseCardioPlan: BaseCardioPlan | null = null;
   if(isBaseCardio) {
     // ── EXPLICIT BASE-CARDIO CALENDAR (bypasses sportDayTargets + greedy loop) ──
     // Cardio is active recovery here, so we hand-place AT MOST 2 sessions and force them
@@ -356,7 +380,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // Fri/Sat split. So score every pair by circular distance and take the widest.
     // Tie-break on raw index distance, which keeps the common Mon–Fri week on Mon+Fri.
     const all = trainDays;
-    let chosen;
+    let chosen: DayKey[];
     // ── V159 (Build 3): FREQUENCY GROWTH — run_base only ─────────────────────────
     // The 2-day chop pulled the wrong interference lever. Interference scales with
     // DURATION and INTENSITY of endurance work, not frequency — so the governor now
@@ -380,21 +404,21 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       const m = Math.min(4, N);
       if(m >= N) chosen = all.slice();
       else {
-        const _set = new Set();
+        const _set = new Set<number>();
         for(let k = 0; k < m; k++) _set.add(Math.round(k * (N - 1) / (m - 1)));
         chosen = [..._set].sort((a,b) => a - b).map(i => all[i]);
       }
       const _third = Math.ceil(tw / 3);
       const _runLongCap = tw <= 6 ? 40 : Math.min(60, 40 + Math.floor((tw - 6) / 2) * 5);
-      const _activeByWeek = {}, _minsByWeek = {};
+      const _activeByWeek: Record<number, Set<number>> = {}, _minsByWeek: Record<number, Record<number, number>> = {};
       for(let w = 1; w <= tw; w++){
         let n = w <= _third ? 2 : (w <= 2 * _third ? 3 : 4);
         n = Math.max(1, Math.min(n, chosen.length));
-        let act;
+        let act: number[];
         if(n >= chosen.length) act = chosen.map((_, i) => i);
         else if(n === 1) act = [chosen.length - 1];
         else {
-          const s = new Set();
+          const s = new Set<number>();
           for(let k = 0; k < n; k++) s.add(Math.round(k * (chosen.length - 1) / (n - 1)));
           act = [...s].sort((a,b) => a - b);
         }
@@ -410,7 +434,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
         base = Math.max(15, Math.min(40, base));
         let last = Math.round((b - base * (act.length - 1)) / 5) * 5;
         last = Math.max(15, Math.min(_runLongCap, last));
-        const mins = {};
+        const mins: Record<number, number> = {};
         act.forEach((di, ix) => { mins[di] = (ix === act.length - 1) ? last : base; });
         _activeByWeek[w] = new Set(act); _minsByWeek[w] = mins;
       }
@@ -420,8 +444,8 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     }
     else if(all.length <= 1){ chosen = all.slice(); }              // only one slot exists
     else {
-      const _idx = d => ALL_DAYS_ORDER.indexOf(d);
-      let best = null, bestCirc = -1, bestRaw = -1;
+      const _idx: (d: DayKey) => number = d => ALL_DAYS_ORDER.indexOf(d);
+      let best: DayKey[] | null = null, bestCirc = -1, bestRaw = -1;
       for(let i=0;i<all.length;i++){
         for(let j=i+1;j<all.length;j++){
           const raw = Math.abs(_idx(all[i]) - _idx(all[j]));
@@ -442,7 +466,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // an unconditional write here is the classic latch, and it would silently strip
     // `freq` and ship the old 2-day week under a new version number.
     if(!_runBaseFreq){
-      let dts;
+      let dts: CardioType[];
       if(cardioTypes.length === 1) {
         dts = chosen.map(() => cardioTypes[0]);
       } else {
@@ -501,13 +525,13 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // left is swim_500_time and swim_100_time at exactly three swim days: `isSpeedGoal`
   // carries both, neither is in PACE_GOALS, and neither ruling touches swimming. That is
   // the live consumer, and it is why this function stays.
-  function qualityCrossoverWeek(totalWeeks){
+  function qualityCrossoverWeek(totalWeeks: number | null | undefined): number{
     // First CHI week. NRC 5K crosses at 5-of-8 (62%), 10K at 4-of-8 (50%); 0.55 splits
     // them. A 12-week block runs INT weeks 1-6, CHI weeks 7-12. Floor of 3 so a short
     // block still gets a real interval phase before the switch.
     return Math.max(3, Math.ceil((totalWeeks||6) * 0.55));
   }
-  function getSessionTypes(nDays, protectInt, baseMode, thresholdGoal, paceFam) {
+  function getSessionTypes(nDays: number, protectInt: boolean, baseMode: boolean, thresholdGoal: boolean, paceFam: boolean): string[] {
     if(nDays <= 0) return [];
     // AEROBIC BASE MODE (run_base): true base-building is ~80%+ easy aerobic volume.
     // No hard interval work, no double hard days. The aerobic engine is built on easy
@@ -568,16 +592,16 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // chooser to space. Excluded builds keep the V212 layout byte for byte. halfstep and
   // swimout rewrite some runs, not all, and stay routed. Passed to the chooser as a
   // parameter, never read from a closure.
-  const _d113Excl = !!(_d132Plan && ['noimpact','noimpact_swim','easy','reduce'].includes(_d132Plan.cardioMode));
+  const _d113Excl = !!(_d132Plan && ['noimpact','noimpact_swim','easy','reduce'].includes(_d132Plan.cardioMode!));
   const _alloc = sportDayTargets(cardioTypes, cardioGoals, cardioTrainDays.length, cfg.goal, _d132Plan && _d132Plan.cardioMode);   // V187 (F2): resolved lift goal; V205 (D132): cardioMode
   const primarySport = _alloc.primary;
 
   // dayToSport is the single source of truth — both the per-sport day lists AND the
   // scheduling loop below read from it, so the session-type map can never desync from
   // the actual day assignment.
-  const dayToSport = [];
+  const dayToSport: (CardioType | null)[] = [];
   // V153 (F1): when the spacing-aware chooser ran, it fixes type→day; null otherwise.
-  let _nrcPlan = null;
+  let _nrcPlan: Record<string, string> | null = null;
   // V213 (D146): true when the multi-sport placement below handed the run days to the
   // spacing chooser. spaceHardCardio reads it and leaves that run layout alone.
   let _msFlag = false;
@@ -595,7 +619,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     const solo = cardioTypes[0];
     const nCardio = cardioTrainDays.length;
     let capDays = Math.min(_alloc.targets[solo] || nCardio, nCardio);
-    const chosen = new Set();
+    const chosen = new Set<number>();
     // V153 (F1): NRC run goals route through the spacing-aware chooser whenever the day
     // count is capped below the week — the only case where a choice exists at all.
     const _soloRunGoal = solo==='run' && cardioGoals['run'] && cardioGoals['run'].id;
@@ -661,9 +685,9 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     const targets = multiSportTargets(cardioTypes, _alloc.targets, cfg, cardioTrainDays.length);
     const secondaries = cardioTypes.filter(t => t !== primarySport);
     const iterOrder = [primarySport, ...secondaries];
-    const assigned = {}; cardioTypes.forEach(t => assigned[t] = 0);
+    const assigned: Record<string, number> = {}; cardioTypes.forEach(t => assigned[t] = 0);
     for(let i = 0; i < cardioTrainDays.length; i++) {
-      let pick = null, bestScore = -1;
+      let pick: CardioType | null = null, bestScore = -1;
       for(const t of iterOrder) {
         const left = (targets[t] || 0) - assigned[t];
         if(left <= 0) continue;
@@ -690,7 +714,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   }
 
   // Derive per-sport day lists from the authoritative allocation
-  const sportDayIndices = {}; // {run: [0,3,5], bike: [1,4], swim: [2]}
+  const sportDayIndices: Record<string, number[]> = {}; // {run: [0,3,5], bike: [1,4], swim: [2]}
   dayToSport.forEach((sport, dayIdx) => {
     if(!sport) return; // null = cardio-free day → stays lift-only
     if(!sportDayIndices[sport]) sportDayIndices[sport] = [];
@@ -698,7 +722,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   });
 
   // Build session type map per sport based on its own day count
-  const sportSessionTypes = {};
+  const sportSessionTypes: Record<string, any> = {};
   // ── V153 (F1): SPACING-AWARE NRC RUN-DAY SELECTION ────────────────────────────
   // The even-spread day chooser is collision-blind: on a Mon/Tue/Thu/Fri/Sat athlete it
   // picked {mon,tue,fri,sat}, the one 4-of-5 subset on which NO permutation of the NRC
@@ -737,7 +761,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // ever passed by the chooser's own fallback below. `_excl` is the exclusion key read once
   // in buildCardioProgression (`_d113Excl`); under it the pace arm reads the V212 row, not
   // the D113 row.
-  function _nrcSpacedRunDays(cardioTrainDays, capDays, goalId, paceFam, _fb, _excl){
+  function _nrcSpacedRunDays(cardioTrainDays: DayKey[], capDays: number, goalId: unknown, paceFam: boolean, _fb?: boolean, _excl?: boolean): NrcPick | null{
     const types = paceFam ? (_fb ? ['lsd_easy','int','lsd_long'] : getSessionTypes(capDays, isSpeedGoal(goalId), false, false, !_excl))
                           : getNRCSessionTypes(capDays, goalId);
     // The objective is written once, in tokens. The NSW table's quality pair is INT then
@@ -746,9 +770,9 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       ? {long:'lsd_long', rec:'lsd_easy',       s1:'int',        s2:'chi'}
       : {long:'nrc_long', rec:'nrc_recovery',   s1:'nrc_speed1', s2:'nrc_speed2'};
     const HARD = new Set([T.s1, T.s2, T.long]);
-    const pos = d => ALL_DAYS_ORDER.indexOf(d);
-    const circ = (a,b)=>{ const r=Math.abs(pos(a)-pos(b)); return Math.min(r,7-r); };
-    const prevDay = d => ALL_DAYS_ORDER[(pos(d)+6)%7];
+    const pos: (d: DayKey) => number = d => ALL_DAYS_ORDER.indexOf(d);
+    const circ = (a: DayKey,b: DayKey)=>{ const r=Math.abs(pos(a)-pos(b)); return Math.min(r,7-r); };
+    const prevDay: (d: DayKey) => DayKey = d => ALL_DAYS_ORDER[(pos(d)+6)%7];
     const inTrain = new Set(cardioTrainDays);
     const n = cardioTrainDays.length;
     // V205 (D129): THE EVEN-SPREAD SUBSET, RECOMPUTED HERE VERBATIM. This is the exact
@@ -760,7 +784,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // calendar wins, so a tie never moves a live week. Rank 7 below scores spread as a
     // metric for the ties this subset is not in. Keep the two arms in this order.
     const _evenIdx = (function(){
-      const s = new Set();
+      const s = new Set<number>();
       if(capDays <= 1) s.add(n - 1);
       else for(let k = 0; k < capDays; k++) s.add(Math.round(k * (n - 1) / (capDays - 1)));
       return Array.from(s).sort((a,b)=>a-b);
@@ -774,18 +798,18 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // day, which is the wrong trade.
     // V205 (D125): the pin above is NRC-only. For the pace family every subset is legal
     // and "long on the last training day" is scored instead (longLast, rank 2).
-    const subsets = [];
-    (function sub(start, acc){
+    const subsets: number[][] = [];
+    (function sub(start: number, acc: number[]){
       if(acc.length===capDays){ if(paceFam || acc[acc.length-1]===n-1) subsets.push(acc.slice()); return; }
       for(let i=start;i<n;i++){ acc.push(i); sub(i+1,acc); acc.pop(); }
     })(0,[]);
     // permutations of types
-    const perms = [];
-    (function perm(rem, pre){
+    const perms: string[][] = [];
+    (function perm(rem: string[], pre: string[]){
       if(!rem.length){ perms.push(pre.slice()); return; }
       for(let i=0;i<rem.length;i++){ pre.push(rem[i]); perm(rem.slice(0,i).concat(rem.slice(i+1)), pre); pre.pop(); }
     })(types.slice(), []);
-    let best = null;
+    let best: NrcPick | null = null;
     for(const idxs of subsets){
       const days = idxs.map(i=>cardioTrainDays[i]);
       const lastDay = days[days.length-1]; // idxs ascend, cardioTrainDays is week-ordered
@@ -800,7 +824,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
         // where the day set is forced and the long run's slot is the only lever left. The
         // preference is scored below as longLast, at rank 2, under collisions.
         if(!paceFam && p.includes(T.long) && p[p.length-1] !== T.long) continue;
-        const typeOf = {}; days.forEach((d,i)=>typeOf[d]=p[i]);
+        const typeOf: Record<string, string> = {}; days.forEach((d,i)=>typeOf[d]=p[i]);
         const hardDays = days.filter(d=>HARD.has(typeOf[d]));
         // V205 (D130 amended): RANK 1 IS SPLIT, AND ON THE PACE FAMILY ONLY. Two hard
         // days on adjacent days are not one thing. CHI on the EVE of the long LSD is
@@ -914,7 +938,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
         // V205 (D130 amended): rank 1 is -untol, rank 1b is -tol. Ranks 2..9 are
         // unchanged and keep their shipped order. -c.coll is GONE from the key: a
         // total that mixes a tolerated pair with an untolerated one cannot rank them.
-        const _rank = c => [-c.untol, -c.tol, c.longLast, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualRest, c.qualFirst];
+        const _rank: (c: NrcPick) => number[] = c => [-c.untol, -c.tol, c.longLast, c.speedsAfterRest, c.recBeforeLong, c.canonical, c.identity, c.spread, c.qualRest, c.qualFirst];
         if(!best) best = cand;
         else {
           const ka = _rank(cand), kb = _rank(best);
@@ -1052,7 +1076,7 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   const _tapWks = taperWeeksFor(taperEventOn(cfg), isBaseCardio, tw);   // V186 (§4b)
   // step is 1-based within the taper window, 0 outside it. `of` lets each builder ramp
   // its own reduction across however many taper weeks the block earned.
-  const _taperFor = w => ({ step: (_tapWks > 0 && w > tw - _tapWks) ? (w - (tw - _tapWks)) : 0, of: _tapWks });
+  const _taperFor: (w: number) => TaperStep = w => ({ step: (_tapWks > 0 && w > tw - _tapWks) ? (w - (tw - _tapWks)) : 0, of: _tapWks });
 
   // V157→V159: strides ride the LAST easy run of each week; the benchmark takes the
   // first easy day of wk1 and the last easy day of the final week. V159 makes both
@@ -1061,16 +1085,16 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
   // map. Without the plan the helpers collapse to the V158 statics exactly.
   const _freq = baseCardioPlan && baseCardioPlan.freq;
   const _easyRunDaysAll = (() => {
-    const out = [];
+    const out: number[] = [];
     Object.keys(sportSessionTypes).forEach(k => {
       const p = k.split('_');
       if(p.length === 2 && p[1] === 'run' && sportSessionTypes[k] === 'lsd_easy') out.push(+p[0]);
     });
     return out.sort((a,b) => a - b);
   })();
-  const _activeEasyFor = w => _freq ? _easyRunDaysAll.filter(i => _freq.activeByWeek[w] && _freq.activeByWeek[w].has(i)) : _easyRunDaysAll;
-  const _firstEasyFor = w => { const a = _activeEasyFor(w); return a.length ? a[0] : -1; };
-  const _lastEasyFor  = w => { const a = _activeEasyFor(w); return a.length ? a[a.length - 1] : -1; };
+  const _activeEasyFor: (w: number) => number[] = w => _freq ? _easyRunDaysAll.filter(i => _freq.activeByWeek[w] && _freq.activeByWeek[w].has(i)) : _easyRunDaysAll;
+  const _firstEasyFor: (w: number) => number = w => { const a = _activeEasyFor(w); return a.length ? a[0] : -1; };
+  const _lastEasyFor: (w: number) => number  = w => { const a = _activeEasyFor(w); return a.length ? a[a.length - 1] : -1; };
   // V159 (D4b): the steady-slot arm returns, now REACHABLE — with the run_base ceiling
   // at 4, the unfrozen layout deals a chi day, and the V158 obligation lands here: the
   // benchmark takes the steady slot when one exists (its RPE-6 even effort IS a steady
@@ -1083,21 +1107,21 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     });
     return m;
   })();
-  const _benchDayFor = w => (_chiRunDay >= 0) ? _chiRunDay : ((w === 1) ? _firstEasyFor(w) : _lastEasyFor(w));
+  const _benchDayFor: (w: number) => number = w => (_chiRunDay >= 0) ? _chiRunDay : ((w === 1) ? _firstEasyFor(w) : _lastEasyFor(w));
 
   // V140: per-sport ordinal (0-based) — dayIdx is the GLOBAL cardio index, so on a
   // multi-sport program the first BIKE day may sit at dayIdx 1 or 2 and any predicate
   // keyed on dayIdx===0 silently never fires for it (caught by the fuzz gate: 68
   // bike_ftp weeks with zero sweet-spot sessions). Same days repeat every week, so
   // the ordinal is per-day, computed once here, week-independent.
-  const _sportOrd = {};
+  const _sportOrd: Record<string, number> = {};
   cardioTrainDays.forEach((dayKey, dayIdx) => {
     const type = dayToSport[dayIdx];
     if(!type) { for(let w = 1; w <= tw; w++) schedule[w][dayKey] = null; return; } // lift-only day
     const sportOrdinal = (_sportOrd[type] === undefined) ? (_sportOrd[type] = 0) : (++_sportOrd[type]);
 
     const goal = cardioGoals[type];
-    const _rawBaseline = parseFloat((goal?.baselineDist||'').toString()) || parseFloat((goal?.baseline||'').match(/([0-9.]+)/)?.[1]) || 0;
+    const _rawBaseline = parseFloat((goal?.baselineDist||'').toString()) || parseFloat((goal?.baseline||'').match(/([0-9.]+)/)?.[1]!) || 0;
     const _expBaseDefault = {beginner:1, intermediate:2, advanced:4}[cfg.experience||'intermediate'] || 2;
     const baselineMiles = _rawBaseline || _expBaseDefault;
 
@@ -1128,11 +1152,11 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
         schedule[w][dayKey] = null;
         continue;
       }
-      let session = null;
+      let session: CardioSession | null = null;
       if(type === 'run') {
         // Pre-convert mileBestMins/Secs to total seconds for the pace chart anchor
         const _mileBestSecs = (goal?.mileBestMins !== undefined && goal?.mileBestMins !== '')
-          ? (+goal.mileBestMins||0)*60 + (+goal.mileBestSecs||0)
+          ? (+goal.mileBestMins||0)*60 + (+goal.mileBestSecs!||0)
           : null;
         const _runGoalId = goal?.id || 'run_base';
         if(NRC_GOALS.has(_runGoalId)) {
@@ -1197,25 +1221,25 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
       // is the goal's own trial: distance fixed, the log takes the time, the pace derives. TIME
       // TRIAL in the subtype is what the finder below moves onto the test weekday.
       const _sl = _pin.slots || [];
-      const _inW = t => _sl.find(s => s.w === _pin.w && s.t === t);
+      const _inW: (t: string) => { w: number; d: DayKey; t: string } | undefined = t => _sl.find(s => s.w === _pin.w && s.t === t);
       const _lsdW = _sl.filter(s => s.w === _pin.w && s.t === 'lsd_easy');
       const _q = _inW('chi') || _inW('int') || _inW('lsd_long') || (_lsdW.length === 1 ? _lsdW[0] : null);
       if(_q && wk[_q.d]){
-        const _g = cardioGoals.run || {}, _pt = paceGoalTarget(_g), _u = _g.paceUnit === 'km' ? 'km' : 'mi';
-        const _raw = parseFloat(_g.targetDist) || 1.5;
-        const _dz = {k:'dist', mi: +_pt.tDist.toFixed(2), key:'trial'}; if(_pt.tPacePerMile) _dz.tgt = Math.round(_pt.tPacePerMile);
+        const _g: Partial<CardioGoal> = cardioGoals.run || {}, _pt = paceGoalTarget(_g), _u = _g.paceUnit === 'km' ? 'km' : 'mi';
+        const _raw = parseFloat(_g.targetDist!) || 1.5;
+        const _dz: CardioDose = {k:'dist', mi: +_pt.tDist.toFixed(2), key:'trial'}; if(_pt.tPacePerMile) _dz.tgt = Math.round(_pt.tPacePerMile);
         wk[_q.d] = {type:'run', subtype: _raw + (_u === 'km' ? ' km' : ' Mile') + ' Test — TIME TRIAL',
           detail: _raw + ' ' + _u + '.' + (_pt.tTotalSecs ? ' Goal ' + _clkMS(_pt.tTotalSecs) + ' (' + _clkMS(_pt.tTotalSecs / _raw) + '/' + _u + ').' : ''),
           note: 'TEST DAY: Run it like the real thing. Warm up fully. Log your time. It anchors your next block.',
-          week: _pin.w, goalId: wk[_q.d].goalId, dose: _dz, legLoad: true};
+          week: _pin.w, goalId: wk[_q.d]!.goalId, dose: _dz, legLoad: true};
       }
       // D106a (V207, B4): nothing hard the day before the test or two days out (D38's window,
       // read across the week boundary like raceEveLiftPass). A hard run there becomes that
       // week's untagged easy LSD as it was dealt, captured here before the pin moves anything.
       // A week with no easy LSD rests the day instead. V208: the long LSD is hard here too
       // (legLoad), so it takes the easy dose by the same slot rule as INT and CHI.
-      const _ez = {}; _sl.forEach(s => { if(s.t === 'lsd_easy' && s !== _q && !_ez[s.w] && schedule[s.w][s.d]) _ez[s.w] = schedule[s.w][s.d]; });
-      const _fl = []; [_pin.w - 1, _pin.w].forEach(w => { if(schedule[w]) _ISO_ORDER.forEach(d => _fl.push({w, d})); });
+      const _ez: Record<number, CardioSession> = {}; _sl.forEach(s => { if(s.t === 'lsd_easy' && s !== _q && !_ez[s.w] && schedule[s.w][s.d]) _ez[s.w] = schedule[s.w][s.d]!; });
+      const _fl: { w: number; d: DayKey }[] = []; [_pin.w - 1, _pin.w].forEach(w => { if(schedule[w]) _ISO_ORDER.forEach(d => _fl.push({w, d})); });
       const _ti = _fl.findIndex(x => x.w === _pin.w && x.d === _pin.race);
       for(const _k of [1, 2]){
         const x = _ti - _k >= 0 ? _fl[_ti - _k] : null; if(!x) continue;
@@ -1240,8 +1264,8 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // speed session there and a recovery run sits earlier in the week, they trade days.
     { const rb = _ISO_ORDER.slice(0,_ri).filter(d => wk[d] && wk[d].type==='run');
       const last = rb[rb.length-1];
-      if(last && /^speed run/i.test(wk[last].subtype||'')){
-        const rec = rb.filter(d => /^recovery run/i.test(wk[d].subtype||'')).pop();
+      if(last && /^speed run/i.test(wk[last]!.subtype||'')){
+        const rec = rb.filter(d => /^recovery run/i.test(wk[d]!.subtype||'')).pop();
         if(rec){ const t = wk[last]; wk[last] = wk[rec]; wk[rec] = t; }
       } }
     for(const _k of [1,2]){
@@ -1262,12 +1286,12 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
     // V214 (coach, fix): not under the protect-park modes (the D113a exclusion key: noimpact,
     // noimpact_swim, easy, reduce). A parked test has no race week, so the eve keeps V213's handling.
     if(_pin.test && cardioGoals.run && !_d113Excl){
-      const _efl = []; [_pin.w - 1, _pin.w].forEach(w => { if(schedule[w]) _ISO_ORDER.forEach(d => _efl.push({w, d})); });
+      const _efl: { w: number; d: DayKey }[] = []; [_pin.w - 1, _pin.w].forEach(w => { if(schedule[w]) _ISO_ORDER.forEach(d => _efl.push({w, d})); });
       const _eti = _efl.findIndex(x => x.w === _pin.w && x.d === _pin.race); const _ev = _eti >= 1 ? _efl[_eti - 1] : null;
       if(_ev && trainDays.includes(_ev.d)){
         const _g = cardioGoals.run, _pg = paceGoalTarget(_g);
-        const _rbm = parseFloat((_g.baselineDist||'').toString()) || parseFloat((_g.baseline||'').match(/([0-9.]+)/)?.[1]) || ({beginner:1, intermediate:2, advanced:4}[cfg.experience||'intermediate'] || 2);
-        const _mbs = (_g.mileBestMins !== undefined && _g.mileBestMins !== '') ? (+_g.mileBestMins||0)*60 + (+_g.mileBestSecs||0) : null;
+        const _rbm = parseFloat((_g.baselineDist||'').toString()) || parseFloat((_g.baseline||'').match(/([0-9.]+)/)?.[1]!) || ({beginner:1, intermediate:2, advanced:4}[cfg.experience||'intermediate'] || 2);
+        const _mbs = (_g.mileBestMins !== undefined && _g.mileBestMins !== '') ? (+_g.mileBestMins||0)*60 + (+_g.mileBestSecs!||0) : null;
         const _sh = buildRunSession(_g.id, _ev.w, Math.max(0, cardioTrainDays.indexOf(_ev.d)), tw, _rbm, cfg.experience||'intermediate', null, cfg.eventTargeted !== false, 'lsd_easy',
           _pg.tDist, _pg.tTotalSecs, cfg.ageBracket||'18-35', _mbs, isBaseCardio, null, _taperFor(_ev.w), cfg._paceShift || null, false, false, null);
         if(_sh){ _sh.legLoad = false; schedule[_ev.w][_ev.d] = _sh; if(_ev.w === _pin.w) _pin.rest = (_pin.rest||[]).filter(d => d !== _ev.d); }
@@ -1292,20 +1316,20 @@ function buildCardioProgression(cardioTypes, cardioGoals, trainDays, cfg, totalW
 //
 // Adjacency is CIRCULAR. Sunday and Monday are adjacent. This is the same trap that
 // scored Sun+Sat as maximum separation in the base-cardio placer.
-function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, dayToSport, _skipSport){
+function spaceHardCardio(sportSessionTypes: Record<string, any>, sportDayIndices: Record<string, number[]>, cardioTrainDays: DayKey[], dayToSport: (CardioType | null)[], _skipSport?: string | null): number{
   const HARD = new Set(['int','chi','lsd_long','nrc_long','nrc_speed1','nrc_speed2']);
   const N = cardioTrainDays.length;
   if(N < 3) return 0; // nothing to space
-  const slotAt = i => {
+  const slotAt: (i: number) => string | null = i => {
     const sp = dayToSport[i];
     return sp ? (sportSessionTypes[i + '_' + sp] || 'lsd_easy') : null;
   };
-  const isHard = i => { const s = slotAt(i); return !!s && HARD.has(s) && dayToSport[i] !== 'swim'; };
+  const isHard: (i: number) => boolean = i => { const s = slotAt(i); return !!s && HARD.has(s) && dayToSport[i] !== 'swim'; };
   // Collisions counted over the real calendar week, so a rest day between two hard days
   // correctly breaks the pair. cardioTrainDays holds TRAIN days only, so adjacency is
   // derived from each day's true position in the week.
   const DAY_ORDER = ['mon','tue','wed','thu','fri','sat','sun'];
-  const posOf = i => DAY_ORDER.indexOf(cardioTrainDays[i]);
+  const posOf: (i: number) => number = i => DAY_ORDER.indexOf(cardioTrainDays[i]);
   const collisions = () => {
     let c = 0;
     for(let a = 0; a < N; a++) for(let b = a+1; b < N; b++){
@@ -1321,6 +1345,7 @@ function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, da
   // are attempted before run so the run's long day keeps its late-week placement whenever
   // moving another sport is enough — the long run being last is a real convention, and
   // this pass should spend the cheapest move that fixes the week.
+  // @ts-expect-error boolean arithmetic (true - false is 1); the cleanup pass writes the comparison as numbers
   const sports = Object.keys(sportDayIndices).sort((a,b)=>(a==='run')-(b==='run'));
   let guard = 0;
   for(const sp of sports){
@@ -1354,14 +1379,14 @@ function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, da
 // typed, and no surface stated it. These helpers are read-only over cfg; the engines keep
 // their own anchor logic and the assertion suite checks the two agree.
 const _CHART_RUN_GOALS = new Set(['run_half','run_marathon','run_5k','run_10k','run_pace_goal','run_mile_time','run_15_under10','run_base']);
-function runAnchorInfo(cfg){
-  const c = cfg || {};
+function runAnchorInfo(cfg: Cfg | null | undefined): RunAnchorInfo | null{
+  const c: Partial<Cfg> = cfg || {};
   if(!(c.cardioTypes||[]).includes('run')) return null;
   const g = c.cardioGoals && c.cardioGoals.run;
   if(!g || !g.id || !_CHART_RUN_GOALS.has(g.id)) return null;      // run_base easy runs pace off this row since V206 (D189)
   const exp = c.experience || 'intermediate';
   const expDef = {beginner:690, intermediate:570, advanced:450}[exp] || 570;
-  const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0) : 0;
+  const entered = (g.mileBestMins !== undefined && g.mileBestMins !== '') ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs!||0) : 0;
   // Same rule as both engines: a falsy entry falls to the default (D188: every level).
   const rawSec = entered ? entered : expDef;
   const row = paceChartLookup('mile', rawSec);
@@ -1376,8 +1401,8 @@ function runAnchorInfo(cfg){
   // V176 (D10): the fixed target for pace-goal programs. The chip is the prescription;
   // the measure of progress is the projection card walking toward it.
   const goalT = (g.id === 'run_pace_goal' && g.targetDist && g.targetMins !== undefined && g.targetMins !== '')
-    ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
-  return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
+    ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs!||0)} : null;
+  return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n!) || 0, wk:(src && +src.wk!) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)

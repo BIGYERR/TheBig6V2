@@ -12,7 +12,7 @@ import { dirname, join } from 'node:path';
 import { after, describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
-import { buildIndex, checkIndex, firstDifference, ICON, PAGES_DIR, readOrder, SOURCES, TARGET, writePages } from '../../scripts/build-index.mjs';
+import { buildIndex, checkIndex, collapseTypes, firstDifference, ICON, PAGES_DIR, readOrder, SOURCES, TARGET, writePages } from '../../scripts/build-index.mjs';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const LIVE_SOURCES = join(APP, 'src', 'legacy', 'src');
@@ -32,8 +32,8 @@ function classic(text: string): string {
 }
 /** The engine's TypeScript (architecture phase D): order.json's engine/<name>.ts is core/src/engine/<name>.ts. */
 const LIVE_ENGINE = join(REPO, 'core', 'src', 'engine');
-/** A TypeScript file as the page carries it: Node's own stripper, called here, puts spaces where the types were. */
-const stripped = (code: string) => stripTypeScriptTypes(code, { mode: 'strip' });
+/** A TypeScript file as the page carries it: Node's own stripper, called here, then the build's collapse of the blanks. */
+const stripped = (code: string) => collapseTypes(code, stripTypeScriptTypes(code, { mode: 'strip' }));
 const pieceOnPage = (piece: string) => {
   const bytes = readFileSync(piece.startsWith('engine/') ? join(LIVE_ENGINE, piece.slice('engine/'.length)) : join(LIVE_SOURCES, piece));
   if (piece.endsWith('.ts')) return Buffer.from(stripped(classic(bytes.toString('utf8'))), 'utf8');
@@ -96,6 +96,40 @@ describe('build-index on the live sources', () => {
     assert.equal(res.status, 0, res.stderr);
     const page = readFileSync(LIVE_PAGE);
     assert.equal(res.stdout.trim(), `build-index: index.html is the build of ${order.length} source files: ${page.length} bytes, ia-version ${/<meta name="ia-version" content="([^"]*)"/.exec(page.toString())![1]}, sha256 ${sha256(page)}`);
+  });
+});
+
+describe('collapseTypes: the JavaScript a TypeScript file was written from', () => {
+  // Each case: the TypeScript, and the JavaScript typed by hand. The stripper is Node's own.
+  const cases: [string, string][] = [
+    ['function f(a: number, b?: string): void {}', 'function f(a, b) {}'],
+    ['x = foo(d as DayKey);', 'x = foo(d);'],
+    ['y = a as T || b;', 'y = a || b;'],
+    ['z = bar as T\n  next();', 'z = bar \n  next();'],
+    ["\nimport type { X } from './x.ts';\nfunction g(){}", '\nfunction g(){}'],
+    ['a = 1;\n  interface I { n: number }\nb = 2;', 'a = 1;\nb = 2;'],
+    ['const q = new Set<number>();', 'const q = new Set();'],
+    ['const r: (s: number) => string = s => String(s);', 'const r = s => String(s);'],
+    ['w = m!.x + n!;', 'w = m.x + n;'],
+    ['function h(a: number): number;\nfunction h(a) { return a; }', 'function h(a) { return a; }'],
+    ['const t: Record<string, number>={a:1};', 'const t={a:1};'],
+  ];
+  for (const [ts, js] of cases) {
+    it(`${JSON.stringify(ts)} reads ${JSON.stringify(js)}`, () => assert.equal(collapseTypes(ts, stripTypeScriptTypes(ts, { mode: 'strip' })), js));
+  }
+  it('never takes away a line break that stands between two tokens', () => {
+    const ts = 'let v = w as Q\nnext();';
+    assert.equal(collapseTypes(ts, stripTypeScriptTypes(ts, { mode: 'strip' })), 'let v = w \nnext();');
+    // Where taking a type out would join the next line to the statement, Node's stripper writes the semicolon itself
+    // (a new token, which tools/same-script.mjs would name), and the line break still stands.
+    const call = 'let v = w as Q\n(go)();';
+    assert.equal(collapseTypes(call, stripTypeScriptTypes(call, { mode: 'strip' })), 'let v = w ;\n(go)();');
+  });
+  it('maps each character it keeps to its place in the source', () => {
+    const ts = 'function f(a: A,b){}';
+    const at: number[] = [];
+    assert.equal(collapseTypes(ts, stripTypeScriptTypes(ts, { mode: 'strip' }), at), 'function f(a,b){}');
+    assert.deepEqual(at, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19]);
   });
 });
 
@@ -189,7 +223,7 @@ describe('build-index on fixture sources', () => {
     }
   });
 
-  it('builds an engine file from core/src/engine: its module blocks stripped, then its types, to spaces in place', () => {
+  it('builds an engine file from core/src/engine: its module blocks stripped, then its types, taken out', () => {
     // A copy of the repo's shape: the sources four folders under frontends/, core/src/engine beside them.
     const top = mkdtempSync(join(tmpdir(), 'ia-build-index-engine-'));
     made.push(top);
@@ -203,8 +237,7 @@ describe('build-index on fixture sources', () => {
     writeFileSync(join(dir, 'html/end.html'), '</script>\n');
     writeFileSync(join(dir, 'order.json'), JSON.stringify(['html/top.html', 'engine/pace.ts', 'js/app.js', 'html/end.html']));
     const page = buildIndex(dir).toString('utf8');
-    const code = 'function pace(sec: number, cfg?: Cfg): string { return String(sec as number); }\n';
-    assert.equal(page, `<script>${' '.repeat("import type { Cfg } from '../domain/index.ts';".length)}\n${code.replace(/: number|\?: Cfg|: string| as number/g, (t) => ' '.repeat(t.length))}pace(1);\n</script>\n`);
+    assert.equal(page, '<script>function pace(sec, cfg) { return String(sec); }\npace(1);\n</script>\n', 'the type import line goes whole');
     writeFileSync(join(engine, 'stray.ts'), 'export {};\n');
     assert.throws(() => readOrder(dir), /core\/src\/engine\/stray\.ts is not in order\.json/);
     rmSync(join(engine, 'stray.ts'));

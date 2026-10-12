@@ -323,15 +323,17 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
 ### Phase D: TypeScript, engine first (in progress from Post-v0.239.2; `docs/decisions/engine-typescript.md`)
 - **How (Post-v0.239.2).** The engine's 17 files (phase C step 3) move into `core/src/engine/<name>.ts` a group at a
   time, in the order their imports allow, and stay pieces of the page: `order.json` names each `engine/<name>.ts`, and
-  `build-index.mjs` strips its types with Node's own stripper (strip mode: spaces where the types were, nothing else
-  touched). A move writes types and never changes code, so the page runs the same JavaScript tokens as the release
-  before: `node tools/same-script.mjs <before.html> <after.html>` proves it, and every `index.html` hunk is whitespace, a
-  comment or the version. Each group ships as the next PATCH (Mario's standing answer). The engine is type-checked as its
+  `build-index.mjs` strips its types with Node's own stripper (strip mode) and takes the blanks they leave out
+  (`collapseTypes`). A move writes types and never changes code, and `node tools/engine-move.mjs <name> <ref>` sets the
+  file's blanks so the page carries the JavaScript as it was, text for text but for added comment lines (v0.239.4).
+  `node tools/same-script.mjs <before.html> <after.html>` proves the same tokens with the same line breaks, so every
+  `index.html` hunk is a comment, whitespace or the version. Each group ships as the next PATCH (Mario's standing answer). The engine is type-checked as its
   own project (`core/tsconfig.engine.json`: strict, framework-free, without `noUncheckedIndexedAccess`).
 - **Groups** (the strongly connected parts of the engine's import graph, dependencies first):
   1. **the leaf files, v0.239.3:** `icons`, `exercise-library`, `calendar`, `clock-format`, `prehab`, `region-caps`,
      `power-accessory`, `exercise-kinds`, `injury` (done);
-  2. the cardio engines, which import each other: `nsw-cardio`, `nrc-race-bike-swim`, `cardio-progression`;
+  2. **the cardio engines, v0.239.4:** `nsw-cardio`, `nrc-race-bike-swim`, `cardio-progression`, which import each
+     other (done);
   3. `swap-prefs`, then `engine-c`;
   4. Engines A, B and D with `buildProgram`, which import each other: `engine-a-b-calendar`, `core-legs`,
      `budget-engine-d`; then `core/src/engine/index.ts` exports the engine (`@ia/core/engine`).

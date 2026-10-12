@@ -1,8 +1,27 @@
-import { _ISO_ORDER, _isoOf, _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
-import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
-import { getCHIBike, getCHISwim, getINTBike, getINTReps, isCardioCutbackWeek } from './nsw-cardio.js';
-import { paceChartLookup, steadyCapSec } from './cardio-progression.js';
+import { _ISO_ORDER, _isoOf, _parseLocalDate, getWeekMonday } from './calendar.ts';
+import { _clkMS } from './clock-format.ts';
+import { getCHIBike, getCHISwim, getINTBike, getINTReps, isCardioCutbackWeek } from './nsw-cardio.ts';
+import { paceChartLookup, steadyCapSec } from './cardio-progression.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+import type { CardioDose, CardioGoal, CardioSegment, DayKey, Experience } from '../domain/index.ts';
+import type { PaceCol } from './cardio-progression.ts';
+import type { CardioSession, QualityPhase, TaperStep } from './nsw-cardio.ts';
+
+/** A swim time goal's weekly paces (seconds per 100), and what the progression found on the way. */
+export type SwimPace = number[] & { _dampened?: boolean; _weeklyGain?: number; _realisticTarget?: number; _originalTarget?: number; _goalMet?: boolean; _baseEntered?: boolean; _expDefault?: number; _dist?: number; _goal100?: number | null; _unit?: string };
+
+/** Days and whole weeks from today to a race (raceCountdown). */
+export interface RaceCountdown { days: number; weeks: number }
+/** An NRC race goal laid back from its race date (raceAlignment). */
+export interface RaceAlignment { tw: number; raceIso: string; raceDay: DayKey; raceMon: string; start: string; weeksOut: number; openWeek: number; floor: number; underFloor: boolean; futureWeeks: number; behindWeeks: number }
+/** The race week's pin (raceWeekPin), carried on the cfg for one build (cfg._racePin, deleted before the cfg is stored). */
+export interface RacePin { w: number; race: DayKey; from: string | null; rest: string[]; test?: boolean; slots?: { w: number; d: DayKey; t: string }[]; shakeout?: string }
+/** One week of a Nike Run Club plan, as transcribed: the long run, the speed sessions, the recovery runs (minutes, or a distance). */
+export interface NrcWeek {
+  long: { val: number; unit: 'mi' | 'min'; label: string; race?: boolean; rehearsal?: boolean; peak?: boolean; taper?: boolean; cutback?: boolean; hold?: boolean };
+  speed: { type: string; detail: string; detailIfHalfSlow?: string }[];
+  recovery: (number | { mi: number; label: string })[];
+}
 
 // ════════════════════════════════════════════════════════════════════
 // NRC ENGINE — 5K (8 wk) + 10K (8 wk) + Half Marathon (14 wk) + Marathon (18 wk)
@@ -16,31 +35,32 @@ import { paceChartLookup, steadyCapSec } from './cardio-progression.js';
 // tables; run_pace_goal / run_mile_time / run_15_under10 / run_base are the PST-
 // shaped goals and stay on the NSW engine. NRC_GOALS is the single routing set.
 // ════════════════════════════════════════════════════════════════════
-const NRC_GOALS = new Set(['run_5k', 'run_10k', 'run_half', 'run_marathon']);
+const NRC_GOALS: ReadonlySet<unknown> = new Set(['run_5k', 'run_10k', 'run_half', 'run_marathon']);
 // V205 (D125): the NSW pace family — the test goals whose weekly shape is INT + CHI +
 // long + easy. The wizard aliases run_mile_time / run_15_under10 to run_pace_goal before
 // the engine sees a cfg (_GOAL_ALIAS, V126); both legacy ids are listed anyway so this
 // set answers the question for a cfg from any era. run_base is NOT here: a Lydiard block
 // has no hard day to space, so the spacing chooser has nothing to choose.
-const PACE_GOALS = new Set(['run_pace_goal', 'run_mile_time', 'run_15_under10']);
+const PACE_GOALS: ReadonlySet<unknown> = new Set(['run_pace_goal', 'run_mile_time', 'run_15_under10']);
 // D187: seconds per mile per week, a planning rate, not a limit; the age scalers
 // multiply it; the same number sizes the undated block and caps the clock (D101).
-const PACE_IMPROVE = {beginner:3, intermediate:3, advanced:2};
+const PACE_IMPROVE: Record<string, number> = {beginner:3, intermediate:3, advanced:2};
 // V188 (D14a): race alignment. Count BACK from the race, not forward from today.
 // Plan lengths are the table lengths; floors are the source's own minimums (app copy
 // says "I don't recommend", never names the source — ruled V188).
-const NRC_PLAN_WEEKS = {run_5k:8, run_10k:8, run_half:14, run_marathon:18};
-const NRC_PLAN_FLOOR = {run_5k:4, run_10k:4, run_half:6, run_marathon:12};
-const NRC_SHORTER    = {run_marathon:'run_half', run_half:'run_10k', run_10k:'run_5k'};
+const NRC_PLAN_WEEKS: Record<string, number> = {run_5k:8, run_10k:8, run_half:14, run_marathon:18};
+const NRC_PLAN_FLOOR: Record<string, number> = {run_5k:4, run_10k:4, run_half:6, run_marathon:12};
+const NRC_SHORTER: Record<string, string>    = {run_marathon:'run_half', run_half:'run_10k', run_10k:'run_5k'};
 // D182 (V223): raceCountdown(raceIso, todayIso?) → {days, weeks} from local midnight today
 // to the race, or null when a date is unreadable. Pure like raceAlignment: dates in, numbers
 // out, no DOM, no WD, no program object. It takes the ISO, not an alignment, so a test goal
 // carrying a date (D106a) counts down too. Days are rounded BEFORE weeks are floored, so a
 // span across a DST change still counts whole days (a raw floor of ms/7 days loses a week).
-function raceCountdown(raceIso, todayIso){
+function raceCountdown(raceIso: string | null | undefined, todayIso?: string | null): RaceCountdown | null{
   const race = _parseLocalDate(raceIso); if(!race) return null;
   const today = todayIso ? _parseLocalDate(todayIso) : new Date(); if(!today) return null;
   today.setHours(0,0,0,0);
+  // @ts-expect-error date arithmetic (a Date minus a Date is its milliseconds); the cleanup pass reads getTime()
   const days = Math.round((race - today)/86400000);
   return {days, weeks: Math.floor(days/7)};
 }
@@ -48,7 +68,7 @@ function raceCountdown(raceIso, todayIso){
 // Pure: it takes the countdown, never the program. The ruling's table, key stays "Time out":
 // 7 or more days counts weeks (the unit a plan is built in), race week counts days, day 0 is
 // the header's own "Race day", and past the race is "Behind you" (neutral on whether he ran it).
-function raceCountdownWords(cd){
+function raceCountdownWords(cd: RaceCountdown | null | undefined): { card: string; copy: string } | null{
   if(!cd || !isFinite(cd.days)) return null;
   const d = cd.days, w = cd.weeks;
   if(d >= 7){ const n = w+' week'+(w===1?'':'s'); return {card:n, copy:n+' out'}; }
@@ -59,18 +79,21 @@ function raceCountdownWords(cd){
 // raceAlignment(goalId, raceIso, eventOn, todayIso?) → null when not an aligned goal, else
 // {tw, raceIso, raceDay (ISO key), raceMon, start (Monday ISO), weeksOut, openWeek,
 //  floor, underFloor, futureWeeks}. Pure: dates in, dates out, no DOM, no WD.
-function raceAlignment(goalId, raceIso, eventOn, todayIso){
+function raceAlignment(goalId: string | null | undefined, raceIso: string | null | undefined, eventOn: boolean | null | undefined, todayIso?: string | null): RaceAlignment | null{
   if(!NRC_GOALS.has(goalId) || eventOn === false || !raceIso) return null;
   const race = _parseLocalDate(raceIso); if(!race) return null;
-  const tw = NRC_PLAN_WEEKS[goalId];
+  const tw = NRC_PLAN_WEEKS[goalId!];
   const raceMon = getWeekMonday(raceIso);
   const start = new Date(raceMon); start.setDate(raceMon.getDate() - (tw-1)*7); start.setHours(0,0,0,0);
-  const today = todayIso ? _parseLocalDate(todayIso) : new Date(); today.setHours(0,0,0,0);
+  const today = todayIso ? _parseLocalDate(todayIso)! : new Date(); today.setHours(0,0,0,0);
   const todayMon = getWeekMonday(_isoOf(today));
-  const weeksOut = raceCountdown(raceIso, todayIso).weeks;   // D182: one day-count in the file
+  const weeksOut = raceCountdown(raceIso, todayIso)!.weeks;   // D182: one day-count in the file
+  // @ts-expect-error date arithmetic (a Date minus a Date is its milliseconds); the cleanup pass reads getTime()
   const openWeek = Math.max(1, Math.min(tw, Math.round((todayMon - start)/86400000/7) + 1));
+  // @ts-expect-error date arithmetic (a Date minus a Date is its milliseconds); the cleanup pass reads getTime()
   const futureWeeks = Math.max(0, Math.round((start - todayMon)/86400000/7));
-  const floor = NRC_PLAN_FLOOR[goalId];
+  const floor = NRC_PLAN_FLOOR[goalId!];
+  // @ts-expect-error date arithmetic (a Date minus a Date is its milliseconds); the cleanup pass reads getTime()
   return {tw, raceIso, raceDay:_ISO_ORDER[Math.round((race - raceMon)/86400000)], raceMon:_isoOf(raceMon),
           start:_isoOf(start), weeksOut, openWeek: futureWeeks ? 1 : openWeek, floor, underFloor: weeksOut < floor, futureWeeks,
           behindWeeks: futureWeeks ? 0 : openWeek - 1};
@@ -80,9 +103,10 @@ function raceAlignment(goalId, raceIso, eventOn, todayIso){
 // after. Pure: dates in, a week number out, no DOM, no WD. Local dates only (no UTC parse),
 // and the day count is rounded so a DST change inside the span cannot move the week.
 // Null when a date is unreadable or the test falls before the start.
-function testWeekIndex(startIso, raceIso){
+function testWeekIndex(startIso: string | null | undefined, raceIso: string | null | undefined): number | null{
   const s = _parseLocalDate(startIso), t = _parseLocalDate(raceIso);
   if(!s || !t || t < s) return null;
+  // @ts-expect-error date arithmetic (a Date minus a Date is its milliseconds); the cleanup pass reads getTime()
   const days = Math.round((getWeekMonday(_isoOf(t)) - getWeekMonday(_isoOf(s))) / 86400000);
   return Math.floor(days / 7) + 1;   // week 1 is the week holding the start
 }
@@ -90,7 +114,7 @@ function testWeekIndex(startIso, raceIso){
 // race week rests; the day that held the race session (found by the cardio engine, by
 // subtype — never by position, which fails under the spacer and in multi-sport) rests
 // too and is appended to `rest` there. Null only when there is no alignment.
-function raceWeekPin(align, trainDays){
+function raceWeekPin(align: RaceAlignment | null | undefined, trainDays: DayKey[] | null | undefined): RacePin | null{
   if(!align) return null;
   const iso = _ISO_ORDER.filter(d => (trainDays||[]).includes(d));
   const ri = _ISO_ORDER.indexOf(align.raceDay);
@@ -106,7 +130,7 @@ function raceWeekPin(align, trainDays){
 // from the athlete's chart row. Recovery entries: minutes, or {mi,label} (D4b).
 // Range long runs dose the LOW end of Nike's range (D4d). hold:true = same distance
 // as last week on purpose (D4e).
-const NRC_MARATHON_TABLE = [
+const NRC_MARATHON_TABLE: NrcWeek[] = [
   {long:{val:5,unit:'mi',label:'5 Mile Run'}, speed:[{type:'Intervals',detail:'8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace ({fiveK})\n1:00 easy recovery between every effort'}], recovery:[10,{mi:2,label:'2 Mile'},7]},
   {long:{val:6.2,unit:'mi',label:'10K Run'}, speed:[{type:'Intervals',detail:'Mixed-pace ladder down to Best — 10:00 of work, 10 efforts\n5:00 warm up\n1:00 at 5K Pace ({fiveK})\n2:00 at 10K Pace ({tenK})\n1:00 at 5K Pace ({fiveK})\n2 × 0:45 at Mile Pace ({mile})\n2:00 at 10K Pace ({tenK})\n1:00 at 5K Pace ({fiveK})\n0:45 at Mile Pace ({mile})\n0:30 at Best Pace\n0:15 at Best Pace\n1:00 easy recovery between every effort'}], recovery:[12,{mi:3.1,label:'5K'},{mi:1,label:'1 Mile'}]},
   {long:{val:7,unit:'mi',label:'7 Mile Run'}, speed:[{type:'Fartlek',detail:'21:00 fartlek — 1:00 hard, 2:00 easy\n5:00 warm up\n21:00 fartlek: alternate 1:00 hard running and 2:00 easy running for 21:00'}], recovery:[15,{mi:3.1,label:'5K'},25]},
@@ -127,7 +151,7 @@ const NRC_MARATHON_TABLE = [
   {long:{val:26.2,unit:'mi',label:'THE RACE',race:true}, speed:[{type:'Tempo',detail:'15:00 progression tempo — Recovery Pace down to Best\n5:00 warm up\nRun the next 15:00 as one continuous progression:\n5:00 at Recovery Pace ({recovery})\n4:00 at 10K Pace ({tenK})\n3:00 at 5K Pace ({fiveK})\n2:00 at Mile Pace ({mile})\n1:00 at Best Pace'}], recovery:[{mi:3.1,label:'5K'},25,{mi:1,label:'1 Mile'}]},
 ];
 
-const NRC_HALF_TABLE = [
+const NRC_HALF_TABLE: NrcWeek[] = [
   {long:{val:3.1,unit:'mi',label:'5K Run'}, speed:[{type:'Intervals',detail:'8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace ({fiveK})\n1:00 easy recovery between every effort'},{type:'Fartlek',detail:'21:00 fartlek — 1:00 hard, 2:00 easy\n5:00 warm up\n21:00 fartlek: alternate 1:00 hard running and 2:00 easy running for 21:00'}], recovery:[15,25]},
   {long:{val:4,unit:'mi',label:'4 Mile Run'}, speed:[{type:'Intervals',detail:'Mixed-pace ladder — 9:00 of work, 5 efforts\n5:00 warm up\n1:00 at Mile Pace ({mile})\n2:00 at 5K Pace ({fiveK})\n3:00 at 10K Pace ({tenK})\n2:00 at 5K Pace ({fiveK})\n1:00 at Mile Pace ({mile})\n1:00 easy recovery between every effort'},{type:'Intervals',detail:'5K reps with a Mile-pace kicker — 15:00 of work, 10 efforts\n5:00 warm up\n4 × 1:30 at 5K Pace ({fiveK}) — 0:45 recovery after each\n1 × 1:30 at Mile Pace ({mile}) — 1:00 recovery\n4 × 1:30 at 5K Pace ({fiveK}) — 0:45 recovery after each\n1 × 1:30 at Mile Pace ({mile}) — 1:00 recovery'}], recovery:[15,35]},
   {long:{val:5,unit:'mi',label:'5 Mile Run'}, speed:[{type:'Hills',detail:'Hill workout — 5 rounds of 10K effort into Best effort\n5:00 warm up\n5 rounds of:\n\u00a0\u00a00:45 uphill at 10K Effort — 1:15 recovery\n\u00a0\u00a00:15 uphill at Best Effort — 0:45 recovery'},{type:'Intervals',detail:'3 × 7:00 at 5K Pace — 21:00 of work\n5:00 warm up\n3 × 7:00 at 5K Pace ({fiveK})\n2:30 easy recovery between efforts'}], recovery:[15,30]},
@@ -154,7 +178,7 @@ const NRC_HALF_TABLE = [
 // W1 First Speed Run carries the 5:00 warm up that Nike prints on the half/marathon page
 // of the identically named run (ruled V186 §7a, same doctrine as D31: the source's own
 // numbers). Race week recovery is 5K / 25:00 / 1K — the 1K is the shakeout (F5).
-const NRC_5K_TABLE = [
+const NRC_5K_TABLE: NrcWeek[] = [
   {long:{val:1,unit:'mi',label:'One Mile Run'}, speed:[{type:'Intervals',detail:'8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace ({fiveK})\n1:00 easy recovery between every effort'},{type:'Intervals',detail:'Mixed-pace ladder down to Best — 10:00 of work, 10 efforts\n5:00 warm up\n1:00 at 5K Pace ({fiveK})\n2:00 at 10K Pace ({tenK})\n1:00 at 5K Pace ({fiveK})\n2 × 0:45 at Mile Pace ({mile})\n2:00 at 10K Pace ({tenK})\n1:00 at 5K Pace ({fiveK})\n0:45 at Mile Pace ({mile})\n0:30 at Best Pace\n0:15 at Best Pace\n1:00 easy recovery between every effort'}], recovery:[5,7]},
   {long:{val:15,unit:'min',label:'15 Minute Run'}, speed:[{type:'Intervals',detail:'On the Move — Mile bursts between 5K and 10K reps, 6:00 of work, 7 efforts\n5:00 warm up\n0:30 at Mile Pace ({mile})\n1:00 at 5K Pace ({fiveK})\n0:30 at Mile Pace ({mile})\n2:00 at 10K Pace ({tenK})\n0:30 at Mile Pace ({mile})\n1:00 at 5K Pace ({fiveK})\n0:30 at Mile Pace ({mile})\n0:45 easy recovery between every effort'},{type:'Intervals',detail:'Faster Fun — descending Mile reps with 10K floats, 8:00 of work, 9 efforts\n5:00 warm up\n2:00 at Mile Pace ({mile})\n0:30 at 10K Pace ({tenK})\n1:30 at Mile Pace ({mile})\n0:30 at 10K Pace ({tenK})\n1:00 at Mile Pace ({mile})\n0:30 at 10K Pace ({tenK})\n1:00 at Mile Pace ({mile})\n0:30 at 10K Pace ({tenK})\n0:30 at Best Pace\n0:30 easy recovery between every effort'}], recovery:[10,12]},
   {long:{val:25,unit:'min',label:'Easy Run'}, speed:[{type:'Fartlek',detail:'How Fartlek Can You Go — 9:15 of work, 14 efforts, recovery equals the effort\nContinuous fartlek run — every hard interval is followed by easy running of the SAME length:\n2 × 1:30 at 10K Pace ({tenK}) — 1:30 easy after each\n3 × 1:00 at 5K Pace ({fiveK}) — 1:00 easy after each\n4 × 0:30 at Mile Pace ({mile}) — 0:30 easy after each\n5 × 0:15 at Best Pace — 0:15 easy after each'},{type:'Fartlek',detail:'15:00 fartlek — 1:00 hard, 1:00 easy\n5:00 warm up\n15:00 fartlek: alternate 1:00 hard running and 1:00 easy running for 15:00'}], recovery:[{mi:2,label:'2 Mile'},20]},
@@ -168,7 +192,7 @@ const NRC_5K_TABLE = [
 // V186: NRC 10K plan — Nike's 8-week "10K Training Program". W2 "Another 5K Run" is a
 // hold (D4e shape). W6's long run prints "Seven Mile Run — 11.25K/3.1 Mile Run" on Nike's
 // page: the label and the kilometres both say 7 mi, so 7 is transcribed (ruled V186 §7b).
-const NRC_10K_TABLE = [
+const NRC_10K_TABLE: NrcWeek[] = [
   {long:{val:3.1,unit:'mi',label:'5K Run'}, speed:[{type:'Intervals',detail:'8 × 1:00 at 5K Pace — 8:00 of work\n5:00 warm up\n8 × 1:00 at 5K Pace ({fiveK})\n1:00 easy recovery between every effort'},{type:'Intervals',detail:'Mixed-pace ladder down to Best — 10:00 of work, 10 efforts\n5:00 warm up\n1:00 at 5K Pace ({fiveK})\n2:00 at 10K Pace ({tenK})\n1:00 at 5K Pace ({fiveK})\n2 × 0:45 at Mile Pace ({mile})\n2:00 at 10K Pace ({tenK})\n1:00 at 5K Pace ({fiveK})\n0:45 at Mile Pace ({mile})\n0:30 at Best Pace\n0:15 at Best Pace\n1:00 easy recovery between every effort'}], recovery:[{mi:2,label:'2 Mile'},25]},
   {long:{val:3.1,unit:'mi',label:'5K Run',hold:true}, speed:[{type:'Intervals',detail:'10 × 2:00 at 5K Pace — 20:00 of work\n5:00 warm up\n10 × 2:00 at 5K Pace ({fiveK})\n1:00 easy recovery between efforts — 2:00 after #4 and #8'},{type:'Intervals',detail:'Mile to 10K, then 7:00 easy — 9:00 of work\n6:00 warm up\n1:00 at Mile Pace ({mile}) — 0:30 recovery\n3:00 at 5K Pace ({fiveK}) — 1:30 recovery\n5:00 at 10K Pace ({tenK}) — 2:30 recovery\n7:00 at Recovery Pace ({recovery})'}], recovery:[25,15]},
   {long:{val:4,unit:'mi',label:'4 Mile Run'}, speed:[{type:'Intervals',detail:'Slow Down to Speed Up — descending ladder 10K → 5K → Mile → Best, 15:30 of work, 7 efforts\n5:00 warm up\n2 × 3:30 at 10K Pace ({tenK}) — 1:00 recovery after each\n2 × 2:30 at 5K Pace ({fiveK}) — 1:30 recovery after each\n2 × 1:30 at Mile Pace ({mile}) — 2:00 recovery after each\n0:30 at Best Pace'},{type:'Fartlek',detail:'How Fartlek Can You Go — 9:15 of work, 14 efforts, recovery equals the effort\nContinuous fartlek run — every hard interval is followed by easy running of the SAME length:\n2 × 1:30 at 10K Pace ({tenK}) — 1:30 easy after each\n3 × 1:00 at 5K Pace ({fiveK}) — 1:00 easy after each\n4 × 0:30 at Mile Pace ({mile}) — 0:30 easy after each\n5 × 0:15 at Best Pace — 0:15 easy after each'}], recovery:[35,35]},
@@ -179,12 +203,12 @@ const NRC_10K_TABLE = [
   {long:{val:6.2,unit:'mi',label:'THE RACE',race:true}, speed:[{type:'Tempo',detail:'15:00 progression tempo — Recovery Pace down to Best\n5:00 warm up\nRun the next 15:00 as one continuous progression:\n5:00 at Recovery Pace ({recovery})\n4:00 at 10K Pace ({tenK})\n3:00 at 5K Pace ({fiveK})\n2:00 at Mile Pace ({mile})\n1:00 at Best Pace'}], recovery:[{mi:3.1,label:'5K'},25,{mi:1,label:'1 Mile'}]},
 ];
 
-function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mileBestSecs, recIdx, recSlots, hasSpeed2, recIdxAll, eventOn) {
+function buildNRCSession(goalId: string, week: number, totalWeeks: number, sessionType: string, experience: Experience | null | undefined, mileBestSecs: number | null | undefined, recIdx?: number | null, recSlots?: number | null, hasSpeed2?: boolean, recIdxAll?: number | null, eventOn?: boolean | null): CardioSession {
   const isMarathon = goalId === 'run_marathon';
   // V186: four tables, one engine. The 5K/10K plans share the half's 2-speed layout.
   const table = {run_5k:NRC_5K_TABLE, run_10k:NRC_10K_TABLE, run_half:NRC_HALF_TABLE, run_marathon:NRC_MARATHON_TABLE}[goalId] || NRC_HALF_TABLE;
   const _raceName = {run_5k:'5K', run_10k:'10K', run_half:'Half Marathon', run_marathon:'Marathon'}[goalId] || 'Half Marathon';
-  const _raceKey  = {run_5k:'fiveK', run_10k:'tenK', run_half:'half', run_marathon:'marathon'}[goalId] || 'half';
+  const _raceKey  = {run_5k:'fiveK', run_10k:'tenK', run_half:'half', run_marathon:'marathon'}[goalId] as PaceCol || 'half';
   const _eventOn  = eventOn !== false;   // V186 (§4): false → 5K/10K race day is a time trial
   const wIdx = Math.min(Math.max(week - 1, 0), table.length - 1);
   const wk = table[wIdx];
@@ -193,12 +217,12 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
   const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[experience||'intermediate'] || 570;
   const anchorSec = mileBestSecs ? mileBestSecs : expCurrentPace;
   const chartRow = paceChartLookup('mile', anchorSec);
-  const fmt = s => _clkMS(s) + '/mi';   // D126 (V204): seconds limb owned by _clkMS. Suffix stays here.
+  const fmt: (s: number) => string = s => _clkMS(s) + '/mi';   // D126 (V204): seconds limb owned by _clkMS. Suffix stays here.
   // V171 (D1): {mile} is Nike's first chart column — the row anchor itself. Every "Mile
   // Pace" in both tables printed with no number before this because the key did not exist.
-  const paces = { mile:fmt(chartRow.mile), fiveK:fmt(chartRow.fiveK), tenK:fmt(chartRow.tenK), tempo:fmt(chartRow.tempo),
+  const paces: Record<string, string> = { mile:fmt(chartRow.mile), fiveK:fmt(chartRow.fiveK), tenK:fmt(chartRow.tenK), tempo:fmt(chartRow.tempo),
                   half:fmt(chartRow.half), marathon:fmt(chartRow.marathon), recovery:fmt(chartRow.recovery) };
-  const fillPaces = str => str.replace(/\{(\w+)\}/g, (m,k) => paces[k] || m);
+  const fillPaces: (str: string) => string = str => str.replace(/\{(\w+)\}/g, (m,k) => paces[k] || m);
   const racePace = paces[_raceKey];   // V186: the race's own chart column (5K / 10K / half / marathon)
 
   // V171 (D4a, race week): a week with ONE Nike speed session on a two-speed layout must
@@ -220,7 +244,7 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
   if(_type === 'nrc_speed2' && _single){ _type = 'nrc_recovery'; }
 
   let subtype = '', detail = '', note = '';
-  let _dose = null;   // V148: structured dose (see buildRunSession)
+  let _dose: CardioDose | null = null;   // V148: structured dose (see buildRunSession)
 
   if(_type === 'nrc_long') {
     const L = wk.long;
@@ -274,7 +298,7 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
     detail = fillPaces((sp.detailIfHalfSlow && chartRow.half >= chartRow.marathon) ? sp.detailIfHalfSlow : sp.detail);   // V176 (D31)
     // V171 (D1b): Nike's own framing — each pace is the middle of a range — replaces
     // "hit the prescribed paces precisely". Mile/Best are defined where they are used.
-    const noteByType = {
+    const noteByType: Record<string, string> = {
       Intervals: 'INTERVALS: Hard efforts, easy running between. Each pace is the middle of a range. Slightly faster or slower is fine, you are not a robot. If a pace won\'t hold, shorten the effort rather than grind. Mile Pace is what you could race for one mile (9/10 effort).',
       Tempo: 'TEMPO: A hard but controlled pace, "comfortably uncomfortable." Builds the lactate threshold that lets you hold race pace longer.',
       Fartlek: 'FARTLEK: Swedish for "speed play." Unstructured surges build speed and strength through natural variation. Let effort, not the watch, guide you.',
@@ -321,7 +345,7 @@ function buildNRCSession(goalId, week, totalWeeks, sessionType, experience, mile
 
 // NRC session type assignment. Marathon: 1 speed + 3 recovery + 1 long.
 // Half: 2 speed + 2 recovery + 1 long. Degrades gracefully on fewer days.
-function getNRCSessionTypes(nRunDays, goalId) {
+function getNRCSessionTypes(nRunDays: number, goalId: unknown): string[] {
   const isMarathon = goalId === 'run_marathon';
   if(isMarathon) {
     if(nRunDays >= 5) return ['nrc_recovery','nrc_speed1','nrc_recovery','nrc_recovery','nrc_long'];
@@ -338,7 +362,9 @@ function getNRCSessionTypes(nRunDays, goalId) {
   }
 }
 
-function buildBikeSession(goalId, week, dayIdx, totalWeeks, experience, assignedType, recoveryMode, taper) {
+// The schedule builder hands the bike session its ordinal among the week's bike days as a trailing argument, arguments[8].
+function buildBikeSession(goalId: string, week: number, dayIdx: number, totalWeeks: number, experience: Experience | null | undefined, assignedType: string | null | undefined, recoveryMode: boolean, taper: TaperStep | null | undefined, bikeOrdinal?: number): CardioSession;
+function buildBikeSession(goalId: string, week: number, dayIdx: number, totalWeeks: number, experience: Experience | null | undefined, assignedType: string | null | undefined, recoveryMode: boolean, taper: TaperStep | null | undefined): CardioSession {
   const tw = totalWeeks || 6;
   // ── V140 (Tier-3 Q7 signed): THE FTP CARD DELIVERS FTP WORK ────────────────
   // Before this, a hybrid bike_ftp program under the base-cardio governor emitted
@@ -391,21 +417,21 @@ function buildBikeSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   // ride is where the accumulated fatigue actually lives.
   const _tapStep = (taper && taper.step) || 0;
   const _tapOf   = (taper && taper.of)   || 0;
-  const _tapRamp = (hi, lo) => _tapStep ? (hi - (hi - lo) * ((_tapStep - 1) / Math.max(_tapOf - 1, 1))) : 1;
+  const _tapRamp = (hi: number, lo: number) => _tapStep ? (hi - (hi - lo) * ((_tapStep - 1) / Math.max(_tapOf - 1, 1))) : 1;
   if(_tapStep){
     intReps = Math.max(2, Math.round(intReps * 0.55));
     chi = {reps: Math.max(1, chi.reps - 1), minPerRep: Math.max(8, Math.round(chi.minPerRep * 0.6)), note: chi.note};
   }
   const pct = (week-1) / Math.max(tw-1, 1);
   let lsdBase = Math.round(20 + pct * 40);
-  const lsdMaxes = {bike_century:90, bike_50:70, bike_ftp:50, bike_cals:45, bike_base:45};
+  const lsdMaxes: Record<string, number> = {bike_century:90, bike_50:70, bike_ftp:50, bike_cals:45, bike_base:45};
   let lsdMins = Math.min(lsdMaxes[goalId]||50, lsdBase);
   // LONG-RIDE CEILINGS are event-anchored, not maintenance-anchored. The rule of thumb the
   // endurance world actually rides on: the longest training session reaches roughly 70-80%
   // of expected event duration. 50 mi ~ 3 h at a realistic amateur average -> ~2.5 h. A
   // century is ~6 h -> ~4 h. FTP and calorie goals are intensity blocks, so their long day
   // stays modest — length is not what makes them work.
-  const lsdLongMaxes = {bike_century:240, bike_50:150, bike_ftp:90, bike_cals:60, bike_base:75};
+  const lsdLongMaxes: Record<string, number> = {bike_century:240, bike_50:150, bike_ftp:90, bike_cals:60, bike_base:75};
   // The long ride climbs GEOMETRICALLY at the same safe weekly build rate the program
   // length calculator already uses, rather than linearly from 20 min. Linear interpolation
   // to a 150-minute ceiling produces a 36% week-one jump; percentage growth is how volume
@@ -413,7 +439,7 @@ function buildBikeSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   const _longRate  = {beginner:0.08, intermediate:0.10, advanced:0.12}[experience||'intermediate'] || 0.10;
   const _longStart = {beginner:30,   intermediate:45,   advanced:60  }[experience||'intermediate'] || 45;
   const _longCap   = lsdLongMaxes[goalId] || 90;
-  function _longMinsFor(wk){
+  function _longMinsFor(wk: number): number{
     return Math.min(_longCap, Math.max(20, Math.round(Math.min(_longCap, _longStart) * Math.pow(1 + _longRate, wk - 1))));
   }
   if(_isLongRide) lsdMins = _longMinsFor(week);
@@ -491,13 +517,13 @@ function buildBikeSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   }
   // V148: structured dose. Bike keeps its single minutes input; the dose only feeds
   // the planned strip. INT deliberately emits none — 45s reps have no honest minutes box.
-  let _doseB = null;
+  let _doseB: CardioDose | null = null;
   if(sType === 'lsd') _doseB = {k:'time', mins:lsdMins};
   else if(sType === 'chi') _doseB = (chi.reps === 1) ? {k:'time', mins:chi.minPerRep} : {k:'reps_time', reps:chi.reps, mins:chi.minPerRep};
   return {type:'bike', subtype, detail, note, week, goalId, dose:_doseB||undefined};
 }
 
-function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assignedType, swimGoal, ageBracket, recoveryMode, qPhase, taper) {
+function buildSwimSession(goalId: string, week: number, dayIdx: number, totalWeeks: number, experience: Experience | null | undefined, assignedType: string | null | undefined, swimGoal: CardioGoal | null | undefined, ageBracket: string, recoveryMode: boolean, qPhase: QualityPhase | null | undefined, taper: TaperStep | null | undefined): CardioSession {
   const tw = totalWeeks || 6;
   const sTypes = ['lsd','int','chi','lsd','int','chi','lsd'];
   const rawType = assignedType || sTypes[dayIdx % sTypes.length];
@@ -521,7 +547,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   // buildRunSession and was never handed to anyone else.
   const _tapStep = (taper && taper.step) || 0;
   const _tapOf   = (taper && taper.of)   || 0;
-  const _tapRamp = (hi, lo) => _tapStep ? (hi - (hi - lo) * ((_tapStep - 1) / Math.max(_tapOf - 1, 1))) : 1;
+  const _tapRamp = (hi: number, lo: number) => _tapStep ? (hi - (hi - lo) * ((_tapStep - 1) / Math.max(_tapOf - 1, 1))) : 1;
   if(_tapStep){
     intReps = Math.max(2, Math.round(intReps * 0.55));
     chi = {reps: Math.max(1, chi.reps - 1), minPerRep: Math.max(8, Math.round(chi.minPerRep * 0.6)), note: chi.note};
@@ -533,18 +559,18 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   // Per-100 target splits per week, mirroring the run pace engine: linear improvement
   // toward goal pace, capped by a physiological/age-scaled weekly limit. If the timeline
   // is too short for the full goal, the working target is scaled to what's achievable.
-  let swimPace = null;
+  let swimPace: SwimPace | null = null;
   if((goalId === 'swim_500_time' || goalId === 'swim_100_time') && swimGoal) {
     const fixedDist = goalId === 'swim_500_time' ? 500 : 100;
     const expPace100 = {beginner:150, intermediate:120, advanced:95}[exp] || 120; // sec/100
-    let targetPace100 = null, initialPace100 = expPace100;
+    let targetPace100: number | null = null, initialPace100 = expPace100;
     // D110a (V212, coach): the minutes box is a limb, not the time. A time is entered when its total
     // (minutes*60 + seconds, a missing limb as 0) is above 0, never by the minutes box. The goal time
     // and every current time read through _swimTot.
     // D157 (queued, measure first): the SIZER (calcProgramLength's swim branch) still reads the goal
     // and the current time by the minutes box. The two readers differ ON PURPOSE until D157, so a
     // seconds-only entry changes the cards here and never the program length.
-    const _swimTot = (m, s) => (+m||0)*60 + (+s||0);
+    const _swimTot = (m: string | undefined, s: string | undefined) => (+m!||0)*60 + (+s!||0);
     const _tgtTotal = _swimTot(swimGoal.targetMins, swimGoal.targetSecs);
     if(_tgtTotal > 0) targetPace100 = _tgtTotal / (fixedDist / 100);
     // D144 (V212, coach): the anchor is always a 500. The 500 goal reads its current 500
@@ -554,7 +580,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
     if(_baseTotal > 0) initialPace100 = _baseTotal / 5;
     // D144: the 100 goal's target is the 500 pace moved by the 100 gap. The current 100 is used for
     // this gap, the E7 hold (gap <= 0) and the sizer, nothing else. No current 100 means no gap.
-    let _goal100 = null;
+    let _goal100: number | null = null;
     if(_is100 && targetPace100) {
       const tgt100 = targetPace100, cur100 = _swimTot(swimGoal.baseMins, swimGoal.baseSecs);
       const gap100 = cur100 > 0 ? cur100 - tgt100 : 0;
@@ -583,11 +609,11 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
     }
   }
 
-  const lsdStarts = {swim_tri:{beginner:500,intermediate:800,advanced:1000},swim_mile:{beginner:500,intermediate:700,advanced:900},swim_100_time:{beginner:400,intermediate:600,advanced:800},swim_500_time:{beginner:400,intermediate:600,advanced:800},swim_base:{beginner:400,intermediate:600,advanced:800}};
-  const lsdMaxes = {swim_tri:3000,swim_mile:3500,swim_100_time:2500,swim_500_time:2500,swim_base:2000};
+  const lsdStarts: Record<string, Record<Experience, number>> = {swim_tri:{beginner:500,intermediate:800,advanced:1000},swim_mile:{beginner:500,intermediate:700,advanced:900},swim_100_time:{beginner:400,intermediate:600,advanced:800},swim_500_time:{beginner:400,intermediate:600,advanced:800},swim_base:{beginner:400,intermediate:600,advanced:800}};
+  const lsdMaxes: Record<string, number> = {swim_tri:3000,swim_mile:3500,swim_100_time:2500,swim_500_time:2500,swim_base:2000};
   const lsdStart = (lsdStarts[goalId]||lsdStarts.swim_base)[exp];
   const lsdMax = lsdMaxes[goalId]||2000;
-  function lsdYards(w) {
+  function lsdYards(w: number): number {
     // V136: the ramp was a DECAYING SAWTOOTH. The cutback week wrote cur from last, but
     // the next build week grew from cur (the cutback value) and then clobbered last with
     // it — the pre-cutback peak was permanently lost, so every 4-week cycle topped out
@@ -621,7 +647,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   // consumers — injury sweeps, interference scorer, compact summaries — can never
   // drift from what the athlete sees.
   const _segGoal = (goalId==='swim_tri'||goalId==='swim_mile'||goalId==='swim_100_time'||goalId==='swim_500_time') && !recoveryMode;
-  let segments = null;
+  let segments: CardioSegment[] | null = null;
   const _blk = Math.floor((week-1)/4); // drill rotation rides the existing 4-week cutback clock
   const _GEN_DRILLS = [
     {n:'catch up drill', c:'Slow and deliberate. Full extension before the pull.'},
@@ -694,7 +720,7 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
       const wIdx = Math.min(week-1, tw-1);
       const weekPace = swimPace[wIdx];
       const intPace = weekPace - 2;
-      const fmt = s => _clkMS(s);   // D126 (V204): seconds limb owned by _clkMS. Bare; callers append '/100'.
+      const fmt: (s: number) => string = s => _clkMS(s);   // D126 (V204): seconds limb owned by _clkMS. Bare; callers append '/100'.
       const u = swimPace._unit;
       // D144 (V212): on the 100 goal the rep is keyed to the 500 pace, and the card says so.
       const _is100c = goalId === 'swim_100_time';
@@ -715,9 +741,9 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
           {label:'Cool down', yd:100, text:`100${u} easy.`}
         ];
       }
-      const _anchorLine = swimPace._baseEntered ? '' : `No current ${swimPace._dist}${u} time was entered. This split starts from the ${exp} default of ${fmt(swimPace._expDefault)}/100, not from your own time. `;
-      const _reachSplit = (_qph && _qph.intSpan) ? swimPace[Math.min(_qph.intSpan, tw) - 1] : swimPace._realisticTarget;
-      const _goalPhrase = goalId === 'swim_100_time' ? fmt(swimPace._goal100) + ' for 100' + u : fmt(swimPace._originalTarget) + '/100';
+      const _anchorLine = swimPace._baseEntered ? '' : `No current ${swimPace._dist}${u} time was entered. This split starts from the ${exp} default of ${fmt(swimPace._expDefault!)}/100, not from your own time. `;
+      const _reachSplit = (_qph && _qph.intSpan) ? swimPace[Math.min(_qph.intSpan, tw) - 1] : swimPace._realisticTarget!;
+      const _goalPhrase = goalId === 'swim_100_time' ? fmt(swimPace._goal100!) + ' for 100' + u : fmt(swimPace._originalTarget!) + '/100';
       if(swimPace._goalMet) {
         note = _anchorLine + 'INT: Your goal split is already within your current split. This block holds your split and builds your reps.';
       } else if(swimPace._dampened) {

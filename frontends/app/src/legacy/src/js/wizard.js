@@ -6,11 +6,11 @@ import {
   ALL_DAYS_ORDER, _ISO_ORDER, _isoOf, _parseLocalDate, getWeekMonday,
 } from '../../../../../../core/src/engine/calendar.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
-import { calcProgramLength, paceGoalTarget } from './nsw-cardio.js';
+import { calcProgramLength, paceGoalTarget } from '../../../../../../core/src/engine/nsw-cardio.ts';
 import {
   NRC_SHORTER, PACE_GOALS, PACE_IMPROVE, raceAlignment, raceCountdown, raceCountdownWords,
-} from './nrc-race-bike-swim.js';
-import { isSpeedGoal, sportDayTargets } from './cardio-progression.js';
+} from '../../../../../../core/src/engine/nrc-race-bike-swim.ts';
+import { isSpeedGoal, sportDayTargets } from '../../../../../../core/src/engine/cardio-progression.ts';
 import {
   _mileAdvisoryHTML, _mileEntryState, _mileFieldHelp, _swimAdvisoryHTML, generateProgram,
 } from './wizard-generate.js';

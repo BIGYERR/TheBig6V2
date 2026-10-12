@@ -56,9 +56,12 @@ and every CSS cut sits outside any rule, so each file parses on its own. One nam
 
 The engine moves into `@ia/core` as strict TypeScript, a group of files at a time, in the order its imports allow:
 `order.json` names a moved file `engine/<name>.ts`, which is `core/src/engine/<name>.ts`, and it keeps its place in
-the build. `build-index.mjs` strips its module blocks, then its types, with Node's own stripper (strip mode: a space
-for every character of a type, nothing else touched), so the page runs the same JavaScript tokens it ran before;
-`node tools/same-script.mjs <before.html> <after.html>` proves it against any earlier page. A moved file's type imports
+the build. `build-index.mjs` strips its module blocks, then its types, with Node's own stripper (strip mode), and takes
+the blanks the types leave out (`collapseTypes`), so the page runs the same JavaScript it ran before;
+`node tools/same-script.mjs <before.html> <after.html>` proves the same tokens and line breaks against any earlier page.
+After typing a moved file, `node tools/engine-move.mjs <name> <ref>` sets its blanks so the page reads the JavaScript the
+file was at `<ref>`, text for text but for the comment lines the move added; the tests that read the page's text and the
+variants written against it then read what they read before. A moved file's type imports
 (`import type { Cfg } from '../domain/index.ts';`) sit just below its import block, inside the code, where the build
 strips them with the other types. `module-blocks.mjs` writes each import as the path between the two files
 (`./x.ts` inside the engine, `../../../../../../core/src/engine/x.ts` from a file here), and an engine file never
@@ -90,9 +93,9 @@ tests (`docs/decisions/engine-typescript.md`).
 | `engine/calendar.ts` | the day orders (`ALL_DAYS_ORDER`, `_ISO_ORDER`), local dates (`_isoOf`, `_parseLocalDate`), `getWeekMonday` |
 | `engine/clock-format.ts` | `_clkMS` (m:ss, the one owner of the seconds limb), `_fmtMileAnchor` |
 | `js/wizard.js` | day names, wizard state and steps, start date, race and goal tables, 1RM calculator, pace inputs, `renderWizardStep` |
-| `js/nsw-cardio.js` | `paceGoalTarget`, `calcProgramLength`, run progressions, cutback weeks, NSW Table 6 INT and CHI, `buildRunSession` |
-| `js/nrc-race-bike-swim.js` | NRC goals and tables, race countdown, `raceAlignment`, `raceWeekPin`, `buildNRCSession`; `buildBikeSession`, `buildSwimSession` |
-| `js/cardio-progression.js` | on-ramp, `PACE_CHART`, row pace, performance predicates, taper, multi-sport targets, `buildCardioProgression`, `spaceHardCardio`; the run anchor (`runAnchorInfo`) |
+| `engine/nsw-cardio.ts` | `paceGoalTarget`, `calcProgramLength`, run progressions, cutback weeks, NSW Table 6 INT and CHI, `buildRunSession` |
+| `engine/nrc-race-bike-swim.ts` | NRC goals and tables, race countdown, `raceAlignment`, `raceWeekPin`, `buildNRCSession`; `buildBikeSession`, `buildSwimSession` |
+| `engine/cardio-progression.ts` | on-ramp, `PACE_CHART`, row pace, performance predicates, taper, multi-sport targets, `buildCardioProgression`, `spaceHardCardio`; the run anchor (`runAnchorInfo`) |
 | `engine/prehab.ts` | hip, foot and ankle, and rehab sections, core pillars, gear lens, bodyweight substitutes |
 | `engine/power-accessory.ts` | power and explosive dose and rest, bodyweight sets, accessory grammar, hinge clamp, prevention dose, bodyweight sweep, `_setLeadingSets` |
 | `js/core-legs.js` | dynamic core, `injectDynamicCore`, NRC leg-lift placement, leg, adjacent-day and same-region deconfliction |

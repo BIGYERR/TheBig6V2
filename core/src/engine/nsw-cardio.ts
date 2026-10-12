@@ -1,7 +1,25 @@
-import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
-import { NRC_GOALS, PACE_IMPROVE } from './nrc-race-bike-swim.js';
-import { paceChartLookup, rowPaceAt, steadyCapSec, taperWeeksFor } from './cardio-progression.js';
+import { _clkMS } from './clock-format.ts';
+import { NRC_GOALS, PACE_IMPROVE } from './nrc-race-bike-swim.ts';
+import { paceChartLookup, rowPaceAt, steadyCapSec, taperWeeksFor } from './cardio-progression.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+import type { Cardio, CardioDose, CardioGoal, CardioGoals, CardioType, Experience } from '../domain/index.ts';
+
+/** The cardio goals as the engine passes them: buildProgram adds the athlete's experience and age bracket. */
+export type EngineCardioGoals = CardioGoals & { _experience?: Experience; _ageBracket?: string; _eventTargeted?: boolean };
+/** A pace goal's target (paceGoalTarget): the distance in miles, the total seconds, the pace per mile. */
+export interface PaceTarget { tDist: number; tTotalSecs: number | null; tPacePerMile: number | null }
+/** A CHI dose: how many continuous reps, how many minutes each, and the coach's note a session may add. */
+export interface ChiDose { reps: number; minPerRep: number; note?: string }
+/** A pace goal's weekly paces (seconds per mile), and what the progression found on the way. */
+export type PaceProgression = number[] & { _dampened?: boolean; _weeklyGain?: number; _realisticTarget?: number; _originalTarget?: number; _goalMet?: boolean };
+/** A cardio session as a builder returns it: the scheduler adds legLoad, and the goal id is the cfg's own string. */
+export type CardioSession = Omit<Cardio, 'goalId' | 'legLoad'> & { goalId: string; legLoad?: boolean };
+/** Where a week sits in the taper: its step (1 on, 0 outside it) of how many taper weeks. */
+export interface TaperStep { step: number; of: number }
+/** The compressed 3-day quality phase: INT ramps over intSpan weeks, CHI runs from chiFrom to chiTo. */
+export interface QualityPhase { intSpan: number; chiFrom: number; chiTo: number }
+/** A run goal's weekly distances by session family, and the pace goal's paces. */
+export interface RunProgression { easy: number[]; interval: number[]; tempo: number[]; long: number[]; paceProgression: PaceProgression | null }
 
 
 // CARDIO PROGRESSIONS
@@ -11,20 +29,20 @@ import { paceChartLookup, rowPaceAt, steadyCapSec, taperWeeksFor } from './cardi
 // buildRunSession paces the weeks on it. When they each computed it, a km athlete got a block
 // sized on one target and paced on another. The km conversion lives HERE and nowhere else on
 // this path. Pure: reads the goal object, mutates nothing.
-function parseTimeToSecs(txt) {
+function parseTimeToSecs(txt: string | null | undefined): number | null {
   if(!txt) return null;
   var parts = txt.split(':').map(Number);
   if(parts.length === 2) return parts[0]*60 + parts[1];
   if(parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
   return null;
 }
-function paceGoalTarget(g) {
+function paceGoalTarget(g: Partial<CardioGoal> | null | undefined): PaceTarget {
   g = g || {};
-  var rawDist = parseFloat(g.targetDist) || 1.5;
+  var rawDist = parseFloat(g.targetDist!) || 1.5;
   var tDist = (g.paceUnit === 'km') ? rawDist * 0.621 : rawDist;
   var tTotalSecs = null;
   if(g.targetMins !== undefined && g.targetMins !== '') {
-    tTotalSecs = (+g.targetMins||0)*60 + (+g.targetSecs||0);
+    tTotalSecs = (+g.targetMins||0)*60 + (+g.targetSecs!||0);
   } else if(g.targetTime) {
     tTotalSecs = parseTimeToSecs(g.targetTime);
   }
@@ -36,7 +54,7 @@ function paceGoalTarget(g) {
 }
 
 // ── DYNAMIC PROGRAM LENGTH CALCULATOR ──
-function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
+function calcProgramLength(cardioTypes: CardioType[] | null | undefined, cardioGoals: EngineCardioGoals, liftingGoal?: string | null): { weeks: number; warning: string | null } {
   if(!cardioTypes || !cardioTypes.length) return {weeks:6, warning:null};
 
   const experience = cardioGoals._experience || 'intermediate';
@@ -60,7 +78,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
   const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[experience] || 570;   // V176 (D9): one beginner default, the engine's 690
 
   // Parse helpers
-  function parseMiles(txt) {
+  function parseMiles(txt: string | null | undefined): number | null {
     if(!txt) return null;
     // V146: currently UNREACHABLE with a minutes string — this call sits inside the
     // type==='run' branch and only bike writes a ' min' baseline (see the goal inputs),
@@ -74,14 +92,14 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
     var m3 = txt.match(/([0-9.]+)/); if(m3) return parseFloat(m3[1]);
     return null;
   }
-  function parseYards(txt) {
+  function parseYards(txt: string | null | undefined): number | null {
     if(!txt) return null;
     var m = txt.match(/([0-9]+)\s*(?:yd|yard)/i); if(m) return parseInt(m[1]);
     var m2 = txt.match(/([0-9]+)\s*m(?:eter)?/i); if(m2) return Math.round(parseInt(m2[1])*1.094);
     var m3 = txt.match(/([0-9]+)/); if(m3) return parseInt(m3[1]);
     return null;
   }
-  function parseMins(txt) {
+  function parseMins(txt: string | null | undefined): number | null {
     if(!txt) return null;
     var m = txt.match(/([0-9]+)\s*min/i); if(m) return parseInt(m[1]);
     var m2 = txt.match(/([0-9]+)/); if(m2) return parseInt(m2[1]);
@@ -89,7 +107,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
   }
   // Core distance-build calculator with correct deload logic
   // Short goals (<=6.2mi, <=1760yd, <=90min) use faster progression
-  function weeksToReach(current, target, pct, isShortGoal, absStep) {
+  function weeksToReach(current: number, target: number, pct: number, isShortGoal: boolean, absStep?: number): number {
     absStep = absStep || 0; // run passes 0.5mi; swim/bike omit it (pure % climb)
     if(current >= target * 0.90) return 4;
     var actualPct = isShortGoal ? pct * 1.5 : pct;
@@ -108,7 +126,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
   }
 
   // Pace calculator — caps scale with distance so short goals don't inflate to 24wks
-  function weeksToPace(currentPace, targetPace, improvePerWeek, distMiles) {
+  function weeksToPace(currentPace: number, targetPace: number, improvePerWeek: number, distMiles: number): number {
     var gap = currentPace - targetPace;
     if(gap <= 0) return 4;
     var raw = Math.ceil(gap / improvePerWeek);
@@ -119,7 +137,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
   }
 
   var maxWeeks = 6;
-  var warnings = [];
+  var warnings: string[] = [];
   var _nrcPin = 0, _nrcLbl = '';   // V186 (§3b): set by the run branch for the four NRC goals
 
   cardioTypes.forEach(function(type) {
@@ -130,7 +148,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
     var needed = 6;
 
     if(type === 'run') {
-      var distTargets = {run_5k:3.1, run_10k:6.2, run_half:13.1, run_marathon:26.2, run_base:5.0};
+      var distTargets: Record<string, number> = {run_5k:3.1, run_10k:6.2, run_half:13.1, run_marathon:26.2, run_base:5.0};
 
       if(goalId === 'run_pace_goal') {
         // D100 (V202): one reader, so the block size and the weekly pace targets come
@@ -142,14 +160,14 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         // Use the user's actual mile time if entered, otherwise fall back to experience default.
         // This makes program length consistent with the pace targets shown in sessions.
         var _mileBestSecs = (goal.mileBestMins !== undefined && goal.mileBestMins !== '')
-          ? (+goal.mileBestMins||0)*60 + (+goal.mileBestSecs||0)
+          ? (+goal.mileBestMins||0)*60 + (+goal.mileBestSecs!||0)
           : null;
         var currentPaceForCalc = _mileBestSecs || expCurrentPace;
         if(tPacePerMile) {
           needed = weeksToPace(currentPaceForCalc, tPacePerMile, ageSafePaceImprove, tDist);
         } else {
           // No time entered yet — fall back to distance-based estimate
-          var baselineDist = parseFloat(goal.baselineDist) || parseMiles(baseline) || expBaseRun;
+          var baselineDist = parseFloat(goal.baselineDist!) || parseMiles(baseline) || expBaseRun;
           needed = weeksToReach(baselineDist, tDist * 1.5, weeklyPct, tDist <= 6.2, 0.5);
         }
         // Apply same ageMult, +1 grace week, and distance-scaled cap as all other run goals
@@ -158,7 +176,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         if(experience === 'beginner') {
           // Beginner = some running background (~2mi). Ensure the program is long enough to
           // build the aerobic base (climb from ~2mi to ~5mi), not just close the pace gap.
-          var pgBegBase = Math.max(2.0, parseFloat(goal.baselineDist) || parseMiles(baseline) || 2.0);
+          var pgBegBase = Math.max(2.0, parseFloat(goal.baselineDist!) || parseMiles(baseline) || 2.0);
           var pgBaseBuild = weeksToReach(pgBegBase, 5.0, weeklyPct, false, 0.5);
           needed = Math.max(needed, pgBaseBuild);
           needed = Math.min(26, needed + 1); // doctrine ~26-week ceiling, +1 grace
@@ -175,7 +193,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         var rtgt = distTargets[goalId];
 
         // 1. Smart experience-based baselines — prevents math explosions at low-baseline entries
-        var defaultBaselines = {
+        var defaultBaselines: Record<string, Record<Experience, number>> = {
           run_5k:       {beginner:0.5, intermediate:1.5, advanced:2.5},
           run_10k:      {beginner:1.0, intermediate:3.0, advanced:4.5},
           run_half:     {beginner:3.0, intermediate:5.0, advanced:7.0},
@@ -183,12 +201,12 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
           run_base:     {beginner:0.5, intermediate:1.5, advanced:3.0}
         };
         var expTier = experience || 'intermediate';
-        var rcur;
+        var rcur: number;
         if(expTier === 'beginner') {
           // Beginner ramps from ~2mi (some running background), floored
-          rcur = Math.max(2.0, parseFloat(goal.baselineDist) || parseMiles(baseline) || 2.0);
+          rcur = Math.max(2.0, parseFloat(goal.baselineDist!) || parseMiles(baseline) || 2.0);
         } else {
-          rcur = parseFloat(goal.baselineDist) || parseMiles(baseline) || (defaultBaselines[goalId] || defaultBaselines.run_base)[expTier];
+          rcur = parseFloat(goal.baselineDist!) || parseMiles(baseline) || (defaultBaselines[goalId] || defaultBaselines.run_base)[expTier];
         }
 
         // 2. Compute foundation weeks — flat lookup for short goals, dynamic loop for endurance.
@@ -228,7 +246,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         // computed and discarded for these two goals; run_base still uses it.
         else if(goalId === 'run_5k' || goalId === 'run_10k') { needed = 8; }
         if(!NRC_GOALS.has(goalId)) {
-          var lengthCeil = {run_5k:12, run_10k:16, run_base:26};
+          var lengthCeil: Record<string, number> = {run_5k:12, run_10k:16, run_base:26};
           var ceil = lengthCeil[goalId] || 26;
           needed = Math.min(ceil, needed + 1); // +1 grace week
           needed = Math.max(6, needed);
@@ -237,34 +255,34 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         var lbl2 = {run_5k:'5K',run_10k:'10K',run_half:'Half Marathon',run_marathon:'Full Marathon',run_base:'Running Base'}[goalId];
         // V186: an NRC plan has a fixed length — the sheet should not claim it was
         // derived from the athlete's base. §3b: it also pins the program length.
-        if(NRC_GOALS.has(goalId)) { _nrcPin = needed; _nrcLbl = lbl2; }
+        if(NRC_GOALS.has(goalId)) { _nrcPin = needed; _nrcLbl = lbl2!; }
         if(needed > 6) warnings.push(NRC_GOALS.has(goalId)
           ? lbl2 + ' plan — ' + needed + ' weeks, fixed'
           : lbl2 + ' needs ' + needed + ' weeks from your current base');
       }
 
     } else if(type === 'swim') {
-      var swimTargets = {swim_tri:1700, swim_mile:1760, swim_100_time:800, swim_500_time:1200, swim_base:1000};
+      var swimTargets: Record<string, number> = {swim_tri:1700, swim_mile:1760, swim_100_time:800, swim_500_time:1200, swim_base:1000};
       var stgt = swimTargets[goalId] || 1000;
       var sTier = experience || 'intermediate';
-      var swimCaps   = {swim_tri:18, swim_mile:16, swim_100_time:10, swim_500_time:12, swim_base:12};
-      var swimFloors = {swim_tri:10, swim_mile:8};
+      var swimCaps: Record<string, number>   = {swim_tri:18, swim_mile:16, swim_100_time:10, swim_500_time:12, swim_base:12};
+      var swimFloors: Record<string, number> = {swim_tri:10, swim_mile:8};
       var sCap = swimCaps[goalId] || 12, sFloor = swimFloors[goalId] || 6;
       var swimLbl = {swim_tri:'Triathlon Swim',swim_mile:'Swim a Mile',swim_100_time:'100 Time',swim_500_time:'500 Time',swim_base:'Swim Base'}[goalId];
 
       // Time goals (500/100): if a target time is entered, size by the PER-100 PACE GAP
       // (mirrors run_pace_goal) rather than volume. Fall back to volume if no time given.
       var isSwimTimeGoal = (goalId === 'swim_500_time' || goalId === 'swim_100_time');
-      var swimTimeEntered = isSwimTimeGoal && ((+goal.targetMins||0)*60 + (+goal.targetSecs||0)) > 0;
+      var swimTimeEntered = isSwimTimeGoal && ((+goal.targetMins!||0)*60 + (+goal.targetSecs!||0)) > 0;
       if(swimTimeEntered) {
         var fixedDist = (goalId === 'swim_500_time') ? 500 : 100; // in the chosen unit
-        var tTotal = (+goal.targetMins||0)*60 + (+goal.targetSecs||0);
+        var tTotal = (+goal.targetMins!||0)*60 + (+goal.targetSecs!||0);
         var tPace100 = tTotal / (fixedDist / 100); // target seconds per 100
         // Current per-100 pace: from entered baseline time, else an experience default
         var expSwimPace = {beginner:150, intermediate:120, advanced:95}[sTier] || 120; // sec/100
         var curPace100 = expSwimPace;
         {
-          var bTotal = (+goal.baseMins||0)*60 + (+goal.baseSecs||0);
+          var bTotal = (+goal.baseMins!||0)*60 + (+goal.baseSecs!||0);
           if(bTotal > 0) curPace100 = bTotal / (fixedDist / 100);
         }
         // Safe per-100 improvement per week, dampened by age (analog of run pace logic)
@@ -283,14 +301,14 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         }
       } else {
         // Volume-based (distance goals + time goals with no target entered yet)
-        var swimBaselines = {
+        var swimBaselines: Record<string, Record<Experience, number>> = {
           swim_tri:      {beginner:400, intermediate:800, advanced:1200},
           swim_mile:     {beginner:400, intermediate:800, advanced:1200},
           swim_100_time: {beginner:300, intermediate:500, advanced:800},
           swim_500_time: {beginner:300, intermediate:600, advanced:900},
           swim_base:     {beginner:200, intermediate:500, advanced:800}
         };
-        var scur = parseFloat(goal.baselineDist) || parseYards(baseline) || (swimBaselines[goalId] || swimBaselines.swim_base)[sTier];
+        var scur = parseFloat(goal.baselineDist!) || parseYards(baseline) || (swimBaselines[goalId] || swimBaselines.swim_base)[sTier];
         needed = weeksToReach(scur, stgt, weeklyPct, stgt <= 1000);
         needed = Math.round(needed * ageMult);
         if(needed > 6 && swimLbl) warnings.push(swimLbl + ' needs ' + needed + ' weeks from your current base');
@@ -300,9 +318,9 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
       needed = Math.min(sCap, needed + 1); // +1 grace week
 
     } else if(type === 'bike') {
-      var bikeTargets = {bike_century:180, bike_50:90, bike_ftp:60, bike_cals:45, bike_base:45};
+      var bikeTargets: Record<string, number> = {bike_century:180, bike_50:90, bike_ftp:60, bike_cals:45, bike_base:45};
       var btgt = bikeTargets[goalId] || 45;
-      var bikeBaselines = {
+      var bikeBaselines: Record<string, Record<Experience, number>> = {
         bike_century: {beginner:30, intermediate:60, advanced:90},
         bike_50:      {beginner:25, intermediate:45, advanced:75},
         bike_ftp:     {beginner:20, intermediate:40, advanced:60},
@@ -310,11 +328,11 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
         bike_base:    {beginner:15, intermediate:30, advanced:45}
       };
       var bTier = experience || 'intermediate';
-      var bcur = parseFloat(goal.baselineDist) || parseMins(baseline) || (bikeBaselines[goalId] || bikeBaselines.bike_base)[bTier];
+      var bcur = parseFloat(goal.baselineDist!) || parseMins(baseline) || (bikeBaselines[goalId] || bikeBaselines.bike_base)[bTier];
       needed = weeksToReach(bcur, btgt, weeklyPct, btgt <= 60);
       needed = Math.round(needed * ageMult);
-      var bikeCaps   = {bike_century:20, bike_50:14, bike_ftp:12, bike_cals:10, bike_base:12};
-      var bikeFloors = {bike_century:12, bike_50:8};
+      var bikeCaps: Record<string, number>   = {bike_century:20, bike_50:14, bike_ftp:12, bike_cals:10, bike_base:12};
+      var bikeFloors: Record<string, number> = {bike_century:12, bike_50:8};
       var bCap = bikeCaps[goalId] || 12, bFloor = bikeFloors[goalId] || 6;
       needed = Math.max(bFloor, Math.min(bCap, needed));
       needed = Math.min(bCap, needed + 1); // +1 grace week
@@ -366,7 +384,7 @@ function calcProgramLength(cardioTypes, cardioGoals, liftingGoal) {
 // staggered half-recoveries. Run LSD and swim LSD already cut back on this cadence
 // inside their distance builders; this helper brings the interval/CHI progressions
 // and the bike in line. Final week excluded — taper/peak owns it.
-function isCardioCutbackWeek(week, totalWeeks){
+function isCardioCutbackWeek(week: number, totalWeeks: number | null | undefined): boolean{
   return (totalWeeks||0) >= 10 && week % 4 === 0 && week !== totalWeeks;
 }
 
@@ -393,7 +411,7 @@ function isCardioCutbackWeek(week, totalWeeks){
 // What this replaces: the V115 hand ramp, which spread 4 -> 8 across a `rampSpan` window
 // by POSITION. Table 6 is a CALENDAR progression keyed on the training week, not a
 // phase-relative ramp, which is the same thing D128 found for the CHI column.
-var NSW_TABLE6_INT = [
+var NSW_TABLE6_INT: (number | null)[] = [
   null,                       // index 0 unused: weeks are 1-based
   4, 4,                       // wk 1-2
   5, 5,                       // wk 3-4
@@ -408,12 +426,12 @@ var NSW_TABLE6_INT = [
 // unlike chiFromTable6 there is no object to hand back and nothing a caller could mutate.
 // Math.min(week, 26) is load-bearing doctrine, not defensive clamping: it is Table 6's
 // ">26" row. Math.min(8, row) is Guide A's ceiling.
-function intFromTable6(week){
+function intFromTable6(week: number): number{
   var _w = Math.max(1, Math.min(Math.round(week) || 1, 26));
-  return Math.min(8, NSW_TABLE6_INT[_w]);
+  return Math.min(8, NSW_TABLE6_INT[_w]!);
 }
 
-function getINTReps(week, totalWeeks, isMilGoal, rampSpan) {
+function getINTReps(week: number, totalWeeks: number, isMilGoal: boolean, rampSpan?: number | null): number {
   // D114 (V205): the `isMilGoal && week > 26` limb that used to sit here returned a
   // hardcoded 8, and it was ALREADY UNREACHABLE. calcProgramLength caps run_pace_goal at
   // Math.min(26, ...) — its own comment calls that the doctrine 26-week ceiling — with
@@ -442,7 +460,7 @@ function getINTReps(week, totalWeeks, isMilGoal, rampSpan) {
   // rung landed on the taper week and the athlete topped out at SEVEN repeats, never
   // reaching the eight Guide A tells him to build to. On the calendar table he reaches
   // 8 in week 9 and holds it, which is the progression as written.
-  const ramp = w => intFromTable6(w);
+  const ramp: (w: number) => number = w => intFromTable6(w);
   // Cutback week: interval VOLUME steps back ~40% off the prior build week and never
   // progresses. Callers hold pace — fewer reps at the same target is the cutback
   // prescription; a rep or pace PR during a recovery week is a planning error.
@@ -474,9 +492,9 @@ function getINTReps(week, totalWeeks, isMilGoal, rampSpan) {
 // getINTReps: this ramp is position-based, so the span is the whole of its meaning. The
 // bike caller passes no span, so it defaults to the block length, which is exactly what
 // the old three-argument bike call into the shared reader resolved to.
-function getINTBike(week, totalWeeks, rampSpan) {
+function getINTBike(week: number, totalWeeks: number, rampSpan?: number | null): number {
   const _span = Math.max(2, rampSpan || totalWeeks || 6);
-  const ramp = w => Math.min(8, 4 + Math.floor((w-1) * 4 / Math.max(_span-1,1)));
+  const ramp: (w: number) => number = w => Math.min(8, 4 + Math.floor((w-1) * 4 / Math.max(_span-1,1)));
   // Cutback week: interval VOLUME steps back ~40% off the prior build week and never
   // progresses. Byte-identical to the rule getINTReps still states.
   if(isCardioCutbackWeek(week, totalWeeks)) return Math.max(3, Math.round(ramp(week-1) * 0.6));
@@ -497,7 +515,7 @@ function getINTBike(week, totalWeeks, rampSpan) {
 // Neither the third rep nor the 60 has a source in either guide. Table 6's ceiling is
 // 2 x 20 = 40. The table is a CALENDAR progression keyed on the training week, not a
 // phase-relative ramp.
-var NSW_TABLE6_CHI = [
+var NSW_TABLE6_CHI: (ChiDose | null)[] = [
   null,                                             // index 0 unused: weeks are 1-based
   {reps:1, minPerRep:15}, {reps:1, minPerRep:15},   // wk 1-2
   {reps:1, minPerRep:16}, {reps:1, minPerRep:16},   // wk 3-4
@@ -514,13 +532,13 @@ var NSW_TABLE6_CHI = [
 // The reader. Math.min(week, 26) is load-bearing doctrine, not defensive clamping:
 // it is Table 6's ">26" row. Returns a fresh object every call so no caller can
 // mutate the table.
-function chiFromTable6(week){
+function chiFromTable6(week: number): ChiDose{
   var _w = Math.max(1, Math.min(Math.round(week) || 1, 26));
-  var _row = NSW_TABLE6_CHI[_w];
+  var _row = NSW_TABLE6_CHI[_w]!;
   return { reps: _row.reps, minPerRep: _row.minPerRep };
 }
 
-function getCHI(week, totalWeeks, isMilGoal, phaseFrom, phaseTo, _rowCap) {
+function getCHI(week: number, totalWeeks: number, isMilGoal: boolean, phaseFrom?: number | null, phaseTo?: number | null, _rowCap?: number): ChiDose {
   // D128 (V205): the `isMilGoal && week > 26` limb that used to sit here returned a
   // hardcoded {reps:3, minPerRep:20} — 60 minutes of threshold work against Table 6's
   // 40 at the same week. Its replacement already exists: chiFromTable6 clamps at
@@ -532,7 +550,7 @@ function getCHI(week, totalWeeks, isMilGoal, phaseFrom, phaseTo, _rowCap) {
   // Table 6 is indexed on the training week itself, so a CHI phase that opens in week 7
   // opens on week 7's row (1 x 18) instead of restarting the ramp at its first rung.
   // The V115 phase-relative pct ramp is gone with the 1/2/3 rep ladder it fed.
-  const at = w => chiFromTable6(_rowCap ? Math.min(w, _rowCap) : w);
+  const at: (w: number) => ChiDose = w => chiFromTable6(_rowCap ? Math.min(w, _rowCap) : w);
   // Cutback week: one rep off the prior build week; single-rep sessions cut duration
   // ~30% instead. Intensity target is unchanged — the dose steps back, not the touch.
   if(isCardioCutbackWeek(week, totalWeeks)){
@@ -552,9 +570,9 @@ function getCHI(week, totalWeeks, isMilGoal, phaseFrom, phaseTo, _rowCap) {
 // path. The body below is the V115 ramp unchanged except that the `isMilGoal && week > 26`
 // limb is not carried over — the bike caller passes `false` literally, so that limb was
 // already unreachable from here and dropping it moves no byte of bike output.
-function getCHIBike(week, totalWeeks, phaseFrom, phaseTo) {
+function getCHIBike(week: number, totalWeeks: number, phaseFrom?: number | null, phaseTo?: number | null): ChiDose {
   const _pFrom = phaseFrom || 1, _pTo = Math.max(_pFrom+1, phaseTo || totalWeeks || 6);
-  const atBike = w => {
+  const atBike: (w: number) => ChiDose = w => {
     const pct = Math.max(0, Math.min(1, (w - _pFrom) / Math.max(_pTo - _pFrom, 1)));
     return { reps: pct < 0.35 ? 1 : pct < 0.70 ? 2 : 3, minPerRep: Math.round(15 + pct * 5) };
   };
@@ -575,9 +593,9 @@ function getCHIBike(week, totalWeeks, phaseFrom, phaseTo) {
 // the part of Table 6 that is a rep count rather than a distance. `minPerRep` stays on
 // the V115 ramp for the taper branch that rewrites it; nothing downstream of swim prints
 // it. `chiYards` is untouched by D128.
-function getCHISwim(week, totalWeeks, isMilGoal, phaseFrom, phaseTo) {
+function getCHISwim(week: number, totalWeeks: number, isMilGoal: boolean, phaseFrom?: number | null, phaseTo?: number | null): ChiDose {
   const _pFrom = phaseFrom || 1, _pTo = Math.max(_pFrom+1, phaseTo || totalWeeks || 6);
-  const atSwim = w => {
+  const atSwim: (w: number) => ChiDose = w => {
     const pct = Math.max(0, Math.min(1, (w - _pFrom) / Math.max(_pTo - _pFrom, 1)));
     return { reps: chiFromTable6(w).reps, minPerRep: Math.round(15 + pct * 5) };
   };
@@ -591,8 +609,8 @@ function getCHISwim(week, totalWeeks, isMilGoal, phaseFrom, phaseTo) {
 }
 
 
-function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experience, eventTargeted) {
-  const expBaseCap = {beginner:1.5, intermediate:3, advanced:99};
+function buildRunProgressionForLength(goalId: string, totalWeeks: number, baselineMiles: number | null | undefined, experience: Experience | null | undefined, eventTargeted: boolean): RunProgression {
+  const expBaseCap: Record<string, number> = {beginner:1.5, intermediate:3, advanced:99};
   const cap = expBaseCap[experience||'intermediate']||3;
   const base = Math.min(baselineMiles||1, cap);
   const longCap = {beginner:14, intermediate:20, advanced:22}[experience||'intermediate']||20;
@@ -608,8 +626,8 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
   // tw-4 clamp never bound at six weeks or more, so no longer program moves.
   const taperWeeks = taperWeeksFor(goalId !== 'run_base' && eventTargeted, false, totalWeeks);
   const buildWeeks = totalWeeks - taperWeeks;
-  function build10pct(startMiles, maxMiles) {
-    const weeks = [];
+  function build10pct(startMiles: number, maxMiles: number): number[] {
+    const weeks: number[] = [];
     let current = startMiles;
     let lastBuildVal = startMiles;
     // Deload weeks only make sense on programs long enough to absorb a recovery week.
@@ -649,7 +667,7 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
     }
     return weeks;
   }
-  const longStarts = {
+  const longStarts: Record<string, Record<Experience, number>> = {
     run_marathon:   {beginner:5.0, intermediate:6.0, advanced:8.0},
     run_half:       {beginner:4.0, intermediate:5.0, advanced:6.5},
     run_10k:        {beginner:2.0, intermediate:3.0, advanced:4.0},
@@ -661,7 +679,7 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
     run_pace_goal:  {beginner:1.5, intermediate:2.5, advanced:3.5},
     run_base:       {beginner:1.5, intermediate:2.5, advanced:3.5},
   };
-  const longMaxes = {
+  const longMaxes: Record<string, number> = {
     // Marathon breaks doctrine for civilian prep: long runs build toward ~20mi (the climb
     // reaches what the program's weeks allow). Half peaks near race distance. Doctrine-pure
     // goals stay at the NSW ~8mi base ceiling.
@@ -704,7 +722,7 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
   // Builds a per-week array of realistic target paces with adaptation dampener.
   // If the timeline is too compressed to hit the full goal safely, the working
   // target is scaled back to what's physiologically achievable in totalWeeks.
-  let paceProgression = null;
+  let paceProgression: PaceProgression | null = null;
   if(goalId === 'run_pace_goal') {
     // These are passed in via the cfg object attached to the function call site;
     // fall back to safe defaults if not present so the function stays self-contained.
@@ -761,7 +779,13 @@ function buildRunProgressionForLength(goalId, totalWeeks, baselineMiles, experie
   return {easy:easyArr, interval:intervalArr, tempo:tempoArr, long:longArr, paceProgression};
 }
 
-function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experience, forceType, eventTargeted, sessionOverride) {
+// buildRunSession hands buildRunProgressionForLength the pace goal's inputs as statics on the function (_initialPace and
+// the rest), set just before the call and read inside it.
+declare namespace buildRunProgressionForLength { var _initialPace: number | null | undefined; var _targetPace: number | null | undefined; var _paceImprovePerWeek: number | null | undefined; }
+// The schedule builder hands the run session its later inputs as trailing arguments, read inside as arguments[9] to [19]:
+// target distance and seconds, age bracket, mile best, volume freeze, quality phase, taper, pace shift, strides, benchmark, minutes.
+function buildRunSession(goalId: string, week: number, dayIdx: number, totalWeeks: number, baselineMiles: number | null | undefined, experience: Experience | null | undefined, forceType: string | null | undefined, eventTargeted: boolean, sessionOverride: string | null | undefined, ...trailing: unknown[]): CardioSession;
+function buildRunSession(goalId: string, week: number, dayIdx: number, totalWeeks: number, baselineMiles: number | null | undefined, experience: Experience | null | undefined, forceType: string | null | undefined, eventTargeted: boolean, sessionOverride: string | null | undefined): CardioSession {
   const tw = totalWeeks || 6;
   // V126: the legacy ids are aliased upstream, so this is now simply "is it the pace goal".
   // Kept as a named flag rather than inlined — it reads as intent at four call sites below.
@@ -780,12 +804,12 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
   const _mileBestSecs = arguments[12] ? arguments[12] : null;
   const _anchorSec = _mileBestSecs || _expCurrentPace;
   const _chartRow = paceChartLookup('mile', _anchorSec);
-  const _fmtPace = s => _clkMS(s) + '/mi';   // D126 (V204): seconds limb owned by _clkMS
+  const _fmtPace: (s: number) => string = s => _clkMS(s) + '/mi';   // D126 (V204): seconds limb owned by _clkMS
 
   // Inject pace params onto function for run_pace_goal before calling progression builder
   if(goalId === 'run_pace_goal') {
     const expPaceDefaults = {beginner:690, intermediate:570, advanced:450};   // V176 (D9)
-    const agePaceScale    = {'55+':0.65, '36-54':0.85, '18-35':1.0};
+    const agePaceScale: Record<string, number>    = {'55+':0.65, '36-54':0.85, '18-35':1.0};
     const rawTargetSecs = arguments[10] || null;
     const rawTargetDist = parseFloat(arguments[9]) || 1.5;
     const ageBracket = arguments[11] || '18-35';
@@ -845,7 +869,7 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
   let detail = '', note = '', subtype = '';
   // V148: structured dose. The prescription's fixed dimension, in numbers, so the log
   // form can key on it instead of regexing prose. Text is presentation; dose is data.
-  let _dose = null;
+  let _dose: CardioDose | null = null;
   // V116: taper is handed down from buildCardioProgression (arguments[15]) so all three
   // builders read ONE computation. The local fallback stays for any direct caller.
   const _tapIn = arguments[15] || null;
@@ -1049,10 +1073,10 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
     // turns speed work into a threshold session run on incomplete rest.
     // 1609.344 is the metres in a mile. It is a unit, not a coaching number.
     const _M_PER_MILE = 1609.344;
-    const _intClk = t => _clkMS(t);   // D126 (V204): seconds limb owned by _clkMS. Bare, no suffix.
+    const _intClk: (t: number) => string = t => _clkMS(t);   // D126 (V204): seconds limb owned by _clkMS. Bare, no suffix.
     // tgt is the session's OWN prescribed pace in s/mi, so the recovery, the printed pace
     // and the logged dose all read off one number.
-    const _intRec = (tgt, metres) => {
+    const _intRec = (tgt: number, metres: number) => {
       const work = tgt * metres / _M_PER_MILE;
       const lo = Math.round(work * 2), hi = Math.round(work * 2.5);
       return { lo, hi, txt: 'Recovery: ' + _intClk(lo) + ' to ' + _intClk(hi) + ' of easy jogging or walking. Keep moving.' };
@@ -1083,9 +1107,9 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
         // this guide serves. The CHI branch keeps its x1.08 — that multiplier IS A's own
         // worked example for Long Intervals, a different rule for a different session.
         const INT_PACE_GAIN_SEC_PER_MILE = 16;   // 4 s per 400m x 4 quarters
-        const intPace    = weekPace ? Math.max(pp._realisticTarget - INT_PACE_GAIN_SEC_PER_MILE, weekPace - INT_PACE_GAIN_SEC_PER_MILE) : null;
+        const intPace    = weekPace ? Math.max(pp!._realisticTarget! - INT_PACE_GAIN_SEC_PER_MILE, weekPace - INT_PACE_GAIN_SEC_PER_MILE) : null;
         if(pp && weekPace && intPace) {
-          const fmt = s => _clkMS(s);   // D126 (V204): seconds limb owned by _clkMS. Bare; callers append '/mi'.
+          const fmt: (s: number) => string = s => _clkMS(s);   // D126 (V204): seconds limb owned by _clkMS. Bare; callers append '/mi'.
           const _intTgt = Math.round(intPace);
           const _rec = _intRec(_intTgt, 400);
           // The recovery band prints as a clock in both limbs, so the sentence coach ruled
@@ -1106,9 +1130,9 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
             // lie — the block now ends before the clock gets there. The honest reachable
             // pace is the progression value at the final effective index (last pre-taper
             // week minus the shift standing at taper entry).
-            const goalFmt = fmt(pp._originalTarget);
+            const goalFmt = fmt(pp._originalTarget!);
             const _reachIdx = _psShift > 0 ? Math.max(0, (tw - taperWks - 1) - (_psTap || _psShift)) : null;
-            const reachFmt = fmt(_reachIdx != null && pp[_reachIdx] != null ? pp[_reachIdx] : pp._realisticTarget);
+            const reachFmt = fmt(_reachIdx != null && pp[_reachIdx] != null ? pp[_reachIdx] : pp._realisticTarget!);
             const _sameFmt = goalFmt === reachFmt;   // D186: at the m:ss grain the block lands on the goal. Do not say the goal needs more weeks and then hand it over.
             note = _sameFmt
               ? `SI: Pace moves ${pp._weeklyGain} seconds per mile each week. The target for this block is ${reachFmt}/mi. Hit the prescribed pace precisely.`

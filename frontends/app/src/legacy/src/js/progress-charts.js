@@ -1,5 +1,5 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { PACE_CHART } from './cardio-progression.js';
+import { PACE_CHART } from '../../../../../../core/src/engine/cardio-progression.ts';
 import { weeklyBest } from './log-entries.js';
 import {
   EASY_MIN_RUNS, EASY_RPE_HI, EASY_RPE_LO, RUN_CLASS_COLOR, RUN_CLASS_ORDER, _fmtPaceShort, _halfFromMileSec,

@@ -55,11 +55,20 @@ export interface Injury {
   halfstep?: true;
 }
 
-/** Where a seeded mile best came from (V172 D7b). Optional throughout: only the wizard's seed path writes it. */
+/**
+ * Where a mile best came from: seeded from a finished program (V172 D7b: prog, n), or edited on the goal sheet (at, wk,
+ * and the time it replaced in from). Optional throughout.
+ */
 export interface MileBestSource {
   kind: string;
   prog?: string;
   n?: number;
+  /** Optional: an edit's date (YYYY-MM-DD). */
+  at?: string;
+  /** Optional: the program week an edit was made in. */
+  wk?: number;
+  /** Optional: the mile best an edit replaced, and where that one came from. */
+  from?: { mins: string; secs: string; kind: string };
 }
 
 /**
@@ -101,7 +110,7 @@ export interface Cfg {
   eventTargeted: boolean;
   liftingFocus: LiftingFocus;
   experience: Experience;
-  /** '18-35', '36-45', '46-55' and up. */
+  /** The wizard writes '18-35', '36-54' or '55+'; older configs carry other brackets ('36-45'), which the tables default. */
   ageBracket: string;
   equipment: Equipment;
   unit: Unit;

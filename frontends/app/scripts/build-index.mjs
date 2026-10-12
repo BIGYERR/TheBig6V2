@@ -18,8 +18,9 @@
 //
 // The engine is TypeScript in @ia/core (architecture phase D): order.json lists each of its files as engine/<name>.ts,
 // which is core/src/engine/<name>.ts, and the build strips its module blocks and then its types. Node's own stripper
-// (node:module stripTypeScriptTypes, strip mode) puts spaces where the types were and changes nothing else, so the page
-// runs the same tokens the JavaScript did (tools/same-script.mjs proves it against any earlier page).
+// (node:module stripTypeScriptTypes, strip mode) puts spaces where the types were and changes nothing else, and the
+// build then takes those spaces out (collapseTypes), so the page carries the JavaScript as it was written before its
+// types: the same tokens, and the same text but for comments (tools/same-script.mjs proves it against any earlier page).
 //
 // order.json is the one list of pieces. Every entry is a file under html/, css/ or js/ with that folder's extension,
 // or engine/ with .ts, named in lower case words joined by dashes, listed once; every such file in those folders (and
@@ -117,8 +118,60 @@ export function moduleParts(text) {
 }
 
 /**
+ * The stripped code with each stripped type taken out rather than left as blanks: the JavaScript as it was written
+ * before its types were. `js` is `ts` through stripTypes, character for character the same length, so a character the
+ * stripper erased is one that is a blank in `js` and not in `ts`. Each run of erased characters goes, with the blanks
+ * inside it, and then the blanks around it are evened out without ever taking a line break between two tokens away
+ * (a line break can decide where JavaScript ends a statement):
+ *   - a type-only line (`import type`, an interface, an overload) goes whole, with its indent and its line break;
+ *   - between two spaces, one goes (`a as T || b` reads `a || b`);
+ *   - a space before a run that closes against a token goes too (`f(x as T)` reads `f(x)`).
+ * Every other character is kept as it is. `at`, when given, gets the index in `ts` of each character kept
+ * (tools/engine-move.mjs maps the page back to the source with it).
+ * @param {string} ts
+ * @param {string} js
+ * @param {number[]} [at]
+ * @returns {string}
+ */
+export function collapseTypes(ts, js, at) {
+  if (ts.length !== js.length) throw new Error('collapseTypes: the stripped code is not the length of its source');
+  const blank = (/** @type {string | undefined} */ c) => c === ' ' || c === '\t' || c === '\n' || c === '\r';
+  const space = (/** @type {string | undefined} */ c) => c === ' ' || c === '\t';
+  /** @type {string[]} */
+  const out = [];
+  let i = 0;
+  while (i < js.length) {
+    if (!blank(js[i]) || blank(ts[i])) {
+      out.push(js[i]);
+      at?.push(i);
+      i++;
+      continue;
+    }
+    let end = i;
+    for (let j = i; j < js.length && blank(js[j]); j++) if (!blank(ts[j])) end = j + 1;
+    i = end;
+    // What follows the run: a blank the source wrote (kept so far), a token, or the end.
+    const next = i < js.length ? js[i] : undefined;
+    let k = out.length;
+    while (k > 0 && space(out[k - 1])) k--;
+    const lineBlank = k === 0 || out[k - 1] === '\n';
+    if (lineBlank && (next === '\n' || next === '\r')) {
+      out.length = k;
+      if (at) at.length = k;
+      i += next === '\r' && js[i + 1] === '\n' ? 2 : 1;
+    } else if (space(out[out.length - 1]) && space(next)) {
+      i++;
+    } else if (!lineBlank && space(out[out.length - 1]) && next !== undefined && !blank(next)) {
+      out.pop();
+      at?.pop();
+    }
+  }
+  return out.join('');
+}
+
+/**
  * What a piece adds to the page: an HTML or CSS file as it is, a JS file without its module blocks, a TypeScript file
- * without its module blocks and its types.
+ * without its module blocks and its types (collapseTypes).
  * @param {string} srcDir
  * @param {string} piece
  * @returns {Buffer}
@@ -126,7 +179,10 @@ export function moduleParts(text) {
 export function pieceBytes(srcDir, piece) {
   const bytes = readFileSync(piecePath(srcDir, piece));
   if (piece.endsWith('.js')) return Buffer.from(moduleParts(bytes.toString('utf8')).body, 'utf8');
-  if (piece.endsWith('.ts')) return Buffer.from(stripTypes(moduleParts(bytes.toString('utf8')).body, piece), 'utf8');
+  if (piece.endsWith('.ts')) {
+    const body = moduleParts(bytes.toString('utf8')).body;
+    return Buffer.from(collapseTypes(body, stripTypes(body, piece)), 'utf8');
+  }
   return bytes;
 }
 

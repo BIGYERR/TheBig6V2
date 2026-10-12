@@ -162,7 +162,10 @@ const DAY_KEY = oneOf(...DAY_KEYS);
 const CARDIO_TYPE = oneOf(...CARDIO_TYPES);
 const GOAL = oneOf(...GOALS);
 
-const MILE_BEST_SOURCE = object<MileBestSource>('mileBestSrc', { kind: req(str), prog: opt(str), n: opt(num) });
+const MILE_BEST_FROM = object<NonNullable<MileBestSource['from']>>('mileBestSrc.from', { mins: req(str), secs: req(str), kind: req(str) });
+const MILE_BEST_SOURCE = object<MileBestSource>('mileBestSrc', {
+  kind: req(str), prog: opt(str), n: opt(num), at: opt(str), wk: opt(num), from: opt(MILE_BEST_FROM),
+});
 
 const CARDIO_GOAL = object<CardioGoal>('cardioGoal', {
   id: req(str), label: opt(str),

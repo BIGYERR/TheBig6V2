@@ -59,7 +59,7 @@ const _moveCap: (r: string) => number = r => REGION_MOVE_CAP[r] || 5;
 // (2) session intensity token-scanned from subtype+detail so it survives every naming
 // scheme (run / NRC / bike), and (3) distance/duration. Returns a leg-recovery
 // interference magnitude ≈0.3 (easy spin) … ≈1.6 (hard or long run).
-function _cardioInterference(cardio: Cardio | null | undefined): number {
+function _cardioInterference(cardio: Cardio | null | undefined): number{
   if(!cardio || !cardio.type) return 0;
   const sub = (cardio.subtype||'').toLowerCase();
   const s = (sub + ' ' + (cardio.detail||'')).toLowerCase();
@@ -92,7 +92,7 @@ function _cardioInterference(cardio: Cardio | null | undefined): number {
 }
 // Section-label → region. Labels are deterministic from buildSections regardless
 // of which exercise pick() rotates in, so tagging off the label is stable.
-function _sectionRegion(label: string | null | undefined, role: string | null | undefined): Region | null {
+function _sectionRegion(label: string | null | undefined, role: string | null | undefined): Region | null{
   const L = (label||'').toLowerCase();
   if(/core|anti-rotation|plank|pallof|dynamic core/.test(L)) return 'core';
   if(/carry/.test(L)) return 'grip';
@@ -120,7 +120,7 @@ function _sectionRegion(label: string | null | undefined, role: string | null | 
 // Per-item cost: compound 1.5, isolation 0.75, default 1.0, scaled by set count
 // parsed off the leading "N×..." of the detail string. Off-region items in a
 // mixed superset (e.g. wall sit) contribute to THEIR region, not the host's.
-function _itemRegion(name: string | null | undefined): Region | null {
+function _itemRegion(name: string | null | undefined): Region | null{
   const N=(name||'').toLowerCase();
   if(/wall sit|spanish squat|goblet|terminal knee|knee extension/.test(N)) return 'legs';
   if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation/.test(N)) return 'core';
@@ -140,12 +140,12 @@ function _itemRegion(name: string | null | undefined): Region | null {
 // them that way — its /\brow\b/ entry is commented "DB / KB single-arm row —
 // position-limited". This is the same call, written down once.
 const _UNILAT_ROW=/\bsingle-?arm\b|\bone-?arm\b|^dumbbell row$|^kettlebell row$/i;
-function _isUnilateralRow(name: string | null | undefined): boolean { return _UNILAT_ROW.test(String(name||'').trim()); }
+function _isUnilateralRow(name: string | null | undefined): boolean{ return _UNILAT_ROW.test(String(name||'').trim()); }
 // MOVEMENT PATTERN — the real axis. The unsafe failure mode is saturating ONE
 // pattern (press, press, press), not accumulating DISTINCT patterns (squat,
 // hinge, lunge). So we count per-pattern, and each extra rep of the same pattern
 // costs escalating fatigue while a new pattern starts cheap.
-function _pattern(name: string | null | undefined): Pattern | null {
+function _pattern(name: string | null | undefined): Pattern | null{
   const N=(name||'').toLowerCase();
   if(/wall sit|spanish squat|terminal knee/.test(N)) return null;        // isometric hold — not a fatiguing pattern rep
   if(/l-sit chin|l-sit pull/.test(N)) return 'vpull';                    // V162: an L-sit CHINUP is a vertical pull with a core hold riding along. The /l-sit/ token below must not eat it — same one-token-two-meanings class as the V119 incline bug.
@@ -285,7 +285,7 @@ const _AUX_FAMILY: Record<string, AuxFamily>={
   'Wall sit':'hold','Single-leg wall sit':'hold','Spanish squat hold (KB)':'hold',
   'Cable crossover':'chest_iso','Pec deck':'chest_iso'
 };
-function _auxFamily(name: string | null | undefined): AuxFamily | null {return _AUX_FAMILY[String(name||'').trim()]||null;}
+function _auxFamily(name: string | null | undefined): AuxFamily | null{return _AUX_FAMILY[String(name||'').trim()]||null;}
 const _AUX_FAMILY_LABEL: Record<AuxFamily, string>={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLISTIC',cond:'CONDITIONING',hold:'ISOMETRIC HOLD',chest_iso:'CHEST ISOLATION'};
 // Gear legality for aux candidates. Mirrors the tier truths the engine pools use
 // (hasBarbell = home_full/commercial/crossfit); machines are commercial-only; med
@@ -302,7 +302,7 @@ const _AUX_FAMILY_LABEL: Record<AuxFamily, string>={core:'CORE',carry:'CARRY / G
 // and the movement genuinely runs off one, so the tier set is the /\bband\b/ clause's
 // (everything that owns bands: not bodyweight, not minimal).
 const _AUX_GEAR: Record<string, 'loaded' | 'band'>={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
-function _auxGearOK(name: string | null | undefined,equip: Equipment): boolean {
+function _auxGearOK(name: string | null | undefined,equip: Equipment): boolean{
   const _g=_AUX_GEAR[String(name||'').trim()];
   if(_g==='loaded') return equip!=='bodyweight';
   if(_g==='band') return equip!=='bodyweight'&&equip!=='minimal';
@@ -392,7 +392,7 @@ const _REP_FLOOR: [RegExp, RepWindow | null][]=[
   // it gets an isolation window rather than the barbell wave.
   [/cable|crossover|pec deck|\bfly\b|flye/i,         [8,12]],
 ];
-function _repFloor(name: string | null | undefined): RepWindow | null {
+function _repFloor(name: string | null | undefined): RepWindow | null{
   const N=String(name||'');
   for(let i=0;i<_REP_FLOOR.length;i++){ if(_REP_FLOOR[i][0].test(N)) return _REP_FLOOR[i][1]; }
   return null;

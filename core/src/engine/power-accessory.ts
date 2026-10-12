@@ -50,12 +50,12 @@ const _POWER_COST: [RegExp, number][] = [
   // one movement a workaround athlete keeps.
   [/clean|snatch|jerk|push press|thruster/i,                            1.0], // loaded full-body derivatives
 ];
-function _powerCost(name: string | null | undefined): number {
+function _powerCost(name: string | null | undefined): number{
   const N=String(name||'').toLowerCase();
   for(let i=0;i<_POWER_COST.length;i++){ if(_POWER_COST[i][0].test(N)) return _POWER_COST[i][1]; }
   return 0;                       // 0 means "not power work" — the class is opt-in by name
 }
-function _isPower(name: string | null | undefined): boolean { return _powerCost(name) > 0; }
+function _isPower(name: string | null | undefined): boolean{ return _powerCost(name) > 0; }
 // Budget is FLAT across the block (Mario's call). The cost weights already produce the
 // taper the guide's 10-week table describes: an advanced athlete moving from jump squats
 // at 1.0 to box jumps at 2.0 halves their rep count against the same budget. Stepping the
@@ -108,7 +108,7 @@ const _POWER_AGE_BUDGET_MOD: Record<string, number> = {'18-35':1, '36-54':0.92, 
 // a 3-rep lead movement gives 6 / 7 / 9 sets by experience, and a 2.0-cost box jump
 // gives 4 where a 1.0-cost jump squat gives 9. Ceiling raised to 10 because 10x3 is a
 // standard power protocol and 8 was cutting the advanced case short.
-function _powerDose(name: string, experience: string | null | undefined, repsPerSet: number | null | undefined, shareOfSession: number | null | undefined, ageBracket: string | null | undefined): number {
+function _powerDose(name: string, experience: string | null | undefined, repsPerSet: number | null | undefined, shareOfSession: number | null | undefined, ageBracket: string | null | undefined): number{
   const cost = _powerCost(name) || 1;
   // V144 (D4-i/iii): the budget owns EVERY dose input — experience AND age. vsets is out
   // of the power path entirely: its expMod double-counted experience (the escape the V143
@@ -133,7 +133,7 @@ const _POWER_REST: [number, string][]=[
   [1.0,'~2 min rest'],   // double-leg landings + loaded weightlifting derivatives
   [0.5,'60s rest'],      // no landing to absorb, low CNS — see _powerReps for why
 ];
-function _powerRest(name: string): string {
+function _powerRest(name: string): string{
   const c=_powerCost(name);
   for(let i=0;i<_POWER_REST.length;i++){ if(c>=_POWER_REST[i][0]) return _POWER_REST[i][1]; }
   return '60s rest';
@@ -171,7 +171,7 @@ function _powerRest(name: string): string {
 // (D7): _repFloor asks whether load can track a descending wave, a different question from
 // what a movement needs in order to develop power.
 const _POWER_DENSITY_REPS=10;
-function _powerReps(name: string, roleReps: number): number {
+function _powerReps(name: string, roleReps: number): number{
   return (_powerCost(name)<=0.5) ? _POWER_DENSITY_REPS : roleReps;
 }
 // ONE WRITER for the power prescription string (V170, D5). The literal was duplicated at
@@ -179,7 +179,7 @@ function _powerReps(name: string, roleReps: number): number {
 // the tier picks it, the role breaks ties only above 0.5. 'max intent' stays reserved for
 // loaded triples per V144 Ruling 2; the 0.5 tier's V144 copy ('crisp and explosive')
 // described a triple and is retired along with the triple.
-function _powerPrescribe(name: string, roleReps: number, experience: string | null | undefined, ageBracket: string | null | undefined): string {
+function _powerPrescribe(name: string, roleReps: number, experience: string | null | undefined, ageBracket: string | null | undefined): string{
   const reps=_powerReps(name, roleReps);
   const cue=(_powerCost(name)<=0.5) ? 'fast and crisp' : ((roleReps<=3) ? 'max intent' : 'explosive');
   return _powerDose(name, experience, reps, 0.20, ageBracket)+'×'+reps+' — '+cue+', '+_powerRest(name);
@@ -203,7 +203,7 @@ function _powerPrescribe(name: string, roleReps: number, experience: string | nu
 // Verified against every reader of this label: _labelRegion matches none of its region
 // tokens either way, recoveryDeload's /^power\b/ still hits, and capSessionBudget's
 // _protected / _secRank both key on /^power\b/ too. Nothing reads the phrase itself.
-function _powerAllowed(name: string, experience: string | null | undefined, injury: Injury | null | undefined, ageBracket: string | null | undefined): boolean {
+function _powerAllowed(name: string, experience: string | null | undefined, injury: Injury | null | undefined, ageBracket: string | null | undefined): boolean{
   const c=_powerCost(name);
   if(c===0) return true;                                    // not power work
   // Doctrine says no plyometrics with ANY musculoskeletal injury. Applied by COST rather
@@ -218,7 +218,7 @@ function _powerAllowed(name: string, experience: string | null | undefined, inju
   return c <= Math.min(expCap, ageCap);
 }
 const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation/i;
-function _bwSetsFromDetail(detail: string | null | undefined, wk: number, exp: string | null | undefined, prev: boolean): string {
+function _bwSetsFromDetail(detail: string | null | undefined, wk: number, exp: string | null | undefined, prev: boolean): string{
   const m=/^(\d+)\s*[×x]/.exec(detail||'');
   const sets=m?Math.min(4,Math.max(2,+m[1])):3;
   let rpe=/rpe\s*6|light|easy/i.test(detail||'')?'6':/rpe\s*7/i.test(detail||'')?'7':'8';
@@ -245,7 +245,7 @@ function _bwSetsFromDetail(detail: string | null | undefined, wk: number, exp: s
 // double-progression target. Mains never match (their details carry "— RPE" already).
 const _GRAMMAR_BALLISTIC=/slam|swing|sprawl|thruster|throw|toss|rotary|clean|snatch|jerk|box jump|broad jump/i;
 const _GRAMMAR_RANGE: Record<string, string>={'5':'4–6','6':'5–7','8':'6–10','10':'8–12','12':'10–15','15':'12–15','20':'15–20','25':'20–25'};
-function accessoryGrammarSweep(weeks: WeekGrid, cfg: Cfg | null | undefined): void {
+function accessoryGrammarSweep(weeks: WeekGrid, cfg: Cfg | null | undefined): void{
   const beg=(cfg&&cfg.experience)==='beginner';
   Object.keys(weeks||{}).forEach(w=>{
     // V154 (D1): prevention caps accessory effort at 7 — 'stop 2 reps short of failure'
@@ -280,7 +280,7 @@ function accessoryGrammarSweep(weeks: WeekGrid, cfg: Cfg | null | undefined): vo
 // days whose next calendar day carries legLoad cardio. Rewrites are exact-form (the two
 // known grammars), never a broad regex — the V119 lesson about one pattern serving two
 // families. Clone-on-write per the V137 shared-literal lesson.
-function hotNextHingeClampSweep(weeks: WeekGrid): void {
+function hotNextHingeClampSweep(weeks: WeekGrid): void{
   const _last=ALL_DAYS_ORDER.length-1;
   Object.keys(weeks||{}).forEach(w=>{
     Object.keys(weeks[w]||{}).forEach(d=>{
@@ -307,7 +307,7 @@ function hotNextHingeClampSweep(weeks: WeekGrid): void {
 // not accessories; D2's scope is accessory volume). The rounds banner and the duration
 // estimator both derive from the leading digit, so 2× renders '2 Rounds · 90s rest'
 // with no second writer. Clone-on-write per the V137 shared-literal lesson.
-function preventionDoseSweep(weeks: WeekGrid, cfg: Cfg | null | undefined): void {
+function preventionDoseSweep(weeks: WeekGrid, cfg: Cfg | null | undefined): void{
   if((cfg&&cfg.liftingFocus)!=='support_prevention') return;
   Object.keys(weeks||{}).forEach(w=>Object.keys(weeks[w]||{}).forEach(d=>{
     const day=weeks[w][d]; if(!day||!day.sections) return;
@@ -348,7 +348,7 @@ function preventionDoseSweep(weeks: WeekGrid, cfg: Cfg | null | undefined): void
     });
   }));
 }
-function bodyweightSweep(weeks: WeekGrid, _bwExp: string | null | undefined, _bwPrev: boolean): WeekGrid {
+function bodyweightSweep(weeks: WeekGrid, _bwExp: string | null | undefined, _bwPrev: boolean): WeekGrid{
   Object.keys(weeks||{}).forEach(w=>Object.keys(weeks[w]||{}).forEach(d=>{
     const day=weeks[w][d]; if(!day||!day.sections) return;
     const seen: Record<string, number>={};
@@ -391,7 +391,7 @@ function bodyweightSweep(weeks: WeekGrid, _bwExp: string | null | undefined, _bw
   }));
   return weeks;
 }
-function _setLeadingSets(d: string | null | undefined,n: number): string {
+function _setLeadingSets(d: string | null | undefined,n: number): string{
   var s=String(d||''), m=s.match(/^(\d+)\s*[x\u00d7]/);
   if(m) return n+s.slice(m[1].length);
   m=s.match(/^(\d+)\s*sets?\b/i);

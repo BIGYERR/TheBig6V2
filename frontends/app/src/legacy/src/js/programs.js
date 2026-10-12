@@ -10,11 +10,11 @@ import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.t
 import {
   CARDIO_GOALS_BY_TYPE, HYBRID_EXCLUDED_GOALS, _GOAL_RANK, _GOAL_REQ_INPUTS, _fmtStartDay, _rsRace, resolveStartDate,
 } from './wizard.js';
-import { NSW_TABLE6_INT, calcProgramLength } from './nsw-cardio.js';
+import { NSW_TABLE6_INT, calcProgramLength } from '../../../../../../core/src/engine/nsw-cardio.ts';
 import {
   NRC_GOALS, PACE_GOALS, raceAlignment, raceCountdown, raceCountdownWords, testWeekIndex,
-} from './nrc-race-bike-swim.js';
-import { runAnchorInfo } from './cardio-progression.js';
+} from '../../../../../../core/src/engine/nrc-race-bike-swim.ts';
+import { runAnchorInfo } from '../../../../../../core/src/engine/cardio-progression.ts';
 import { _mileEntryState } from './wizard-generate.js';
 import { calcCurrentWeek, renderWeekView } from './week-view-sections.js';
 import { refreshProgram } from './program-manage.js';

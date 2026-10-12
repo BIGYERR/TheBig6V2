@@ -2,8 +2,8 @@
 import type { DayKey } from '../domain/index.ts';
 const ALL_DAYS_ORDER: DayKey[]=['sun','mon','tue','wed','thu','fri','sat'];
 const _ISO_ORDER: DayKey[] = ['mon','tue','wed','thu','fri','sat','sun'];
-function _isoOf(d: Date): string { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function getWeekMonday(dateStr: string): Date {
+function _isoOf(d: Date): string{ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function getWeekMonday(dateStr: string): Date{
   // Get the Monday of the week containing the given date string
   const parts=dateStr.split('-');
   const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
@@ -15,7 +15,7 @@ function getWeekMonday(dateStr: string): Date {
   d.setDate(d.getDate()-daysSinceMonday);
   return d;
 }
-function _parseLocalDate(s: string | null | undefined): Date | null {
+function _parseLocalDate(s: string | null | undefined): Date | null{
   const p=String(s||'').split('-');
   if(p.length!==3) return null;
   const d=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));

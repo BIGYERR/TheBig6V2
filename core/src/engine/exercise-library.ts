@@ -115,7 +115,7 @@ const EXLIB: Record<string, string[]>={
 // Grammar matches the curated library's house form: distance, then 'each' if the
 // movement is one-handed, then the qualifier behind a comma ('50 yards, heavy').
 const _CARRY_PER_SIDE: Record<string, number>={'Suitcase carry':1,'Overhead carry':1};
-function _carryRx(dist: string,name: string | null | undefined,qual?: string | null): string {
+function _carryRx(dist: string,name: string | null | undefined,qual?: string | null): string{
   return dist + (_CARRY_PER_SIDE[String(name||'').trim()]?' each':'') + (qual?', '+qual:'');
 }
 // ── PRESS SIDE (V192, D42-c) ─────────────────────────────────────────────────
@@ -129,7 +129,7 @@ function _carryRx(dist: string,name: string | null | undefined,qual?: string | n
 // Dumbbell lateral raise and Barbell push press are two-hand or two-side movements
 // and must NOT print 'each'.
 const _PRESS_PER_SIDE: Record<string, number>={'Kettlebell single-arm press':1,'Landmine rotational press':1};
-function _isOneArmPress(name: string | null | undefined): boolean { return !!_PRESS_PER_SIDE[String(name||'').trim()]; }
+function _isOneArmPress(name: string | null | undefined): boolean{ return !!_PRESS_PER_SIDE[String(name||'').trim()]; }
 // ── REP-AFFINITY (V160, D2-b) ────────────────────────────────────────────────────────
 // A movement declares the MAX reps a wave-driven prescription may ask of it.
 // 'Paused back squat' is a positional-strength tool: the dead stop kills the
@@ -145,7 +145,7 @@ const REP_AFFINITY: Record<string, { maxReps: number }>={'Paused back squat':{ma
 // every consumer of the pool inherits it; the power pools already do this by cost.
 const EX_MIN_EXP: Record<string, Experience>={'Zercher single-leg deadlift':'advanced'};
 const _EXP_RANK: Record<string, number>={beginner:0,intermediate:1,advanced:2};
-function _expOK(name: string,experience: string | null | undefined): boolean {const m=EX_MIN_EXP[name];if(!m)return true;return (_EXP_RANK[experience||'intermediate']??1)>=(_EXP_RANK[m]??0);}// V161: box squat is a dead-stop power variant — honest pause dies past ~6 reps (Mario's ruling D1-b)
+function _expOK(name: string,experience: string | null | undefined): boolean{const m=EX_MIN_EXP[name];if(!m)return true;return (_EXP_RANK[experience||'intermediate']??1)>=(_EXP_RANK[m]??0);}// V161: box squat is a dead-stop power variant — honest pause dies past ~6 reps (Mario's ruling D1-b)
 // ── STATION CLASS (V164, D1/D6) ──────────────────────────────────────────────
 // A superset's stimulus is density; a cross-gym walk between members kills it and
 // camps two stations. Classes: RACK (bar + plates territory), STACK (cables and
@@ -153,20 +153,20 @@ function _expOK(name: string,experience: string | null | undefined): boolean {co
 // extension, preacher), PORT (anything you carry to wherever you already are).
 // Rule (_ssLegal): PORT pairs with everything; two fixed classes must MATCH.
 // Sidecar classifier on the NAME, same doctrine as REP_AFFINITY — EXLIB stays flat.
-function _stationClass(name: string | null | undefined): StationClass {
+function _stationClass(name: string | null | undefined): StationClass{
   const N=String(name||'').toLowerCase();
   if(/glute-ham|\bghr\b|45\u00b0 back extension|preacher curl/.test(N)) return 'BENCH';
   if(/cable|machine|pulldown|assisted pullup|leg press|leg extension|leg curl|hack squat|pec deck|^rope |face pull|smith/.test(N)) return 'STACK';
   if(/barbell|trap bar|landmine|pendlay|power clean|^back squat|^front squat|paused back squat|^deadlift|sumo deadlift|good morning|close-grip bench|^incline barbell/.test(N)) return 'RACK';
   return 'PORT';
 }
-function _ssLegal(a: string,b: string): boolean {const ca=_stationClass(a),cb=_stationClass(b);return ca==='PORT'||cb==='PORT'||ca===cb;}
+function _ssLegal(a: string,b: string): boolean{const ca=_stationClass(a),cb=_stationClass(b);return ca==='PORT'||cb==='PORT'||ca===cb;}
 // D2/D3b pair resolver. Commit aPref, walk b candidates in list order; if none is
 // legal, ONE re-walk of a candidates (first station-compatible pairing wins); if
 // both pools are pure and mutually banned, ok:false — the caller prints straight
 // sets (D3 demotion). Walks are plain array order over already-seeded lists, so
 // the outcome is deterministic for a given cfg+seed.
-function _ssPair(aPref: string,bPref: string,aAlts?: string[] | null,bAlts?: string[] | null): { a: string; b: string; ok: boolean } {
+function _ssPair(aPref: string,bPref: string,aAlts?: string[] | null,bAlts?: string[] | null): { a: string; b: string; ok: boolean }{
   const A=[aPref].concat((aAlts||[]).filter(function(x){return x&&x!==aPref;}));
   const B=[bPref].concat((bAlts||[]).filter(function(x){return x&&x!==bPref;}));
   for(let i=0;i<B.length;i++){ if(B[i]!==aPref&&_ssLegal(aPref,B[i])) return {a:aPref,b:B[i],ok:true}; }
@@ -176,7 +176,7 @@ function _ssPair(aPref: string,bPref: string,aAlts?: string[] | null,bAlts?: str
 // D5: the partner of a 2-item superset member, for station-filtering swap
 // candidates. Curated pairs that are ALREADY cross-station are left unfiltered —
 // the filter protects legal pairs, it does not retrofit designed ones.
-function _ssPartnerOf(day: { sections?: Section[] } | null | undefined,outName: string): string | null {
+function _ssPartnerOf(day: { sections?: Section[] } | null | undefined,outName: string): string | null{
   let p: string | null=null;
   ((day&&day.sections)||[]).forEach(function(s){
     if(p||!s||!s.superset||!Array.isArray(s.items)||s.items.length!==2) return;
@@ -258,13 +258,13 @@ const EX_RENAMED_V113: Record<string, string> = {
   'Barbell incline press':'Incline barbell press','Barbell incline bench press':'Incline barbell press',
   'Barbell front squat':'Front squat'
 };
-function _exSlugRaw(n: string | null | undefined): string {return String(n||'').toLowerCase().replace(/[^a-z0-9]/g,'_');}
+function _exSlugRaw(n: string | null | undefined): string{return String(n||'').toLowerCase().replace(/[^a-z0-9]/g,'_');}
 const EX_KEY_ALIAS: Record<string, string>=(function(){const m=Object.create(null);
   for(const o in EX_RENAMED_V113) m[_exSlugRaw(o)]=_exSlugRaw(EX_RENAMED_V113[o]);
   return m;})();
 // The ONLY place a name becomes a store key. Three call sites used to inline this slug;
 // two writers agreeing today is two writers free to disagree later.
-function exStoreKey(name: string | null | undefined): string {const k=_exSlugRaw(name);return EX_KEY_ALIAS[k]||k;}
+function exStoreKey(name: string | null | undefined): string{const k=_exSlugRaw(name);return EX_KEY_ALIAS[k]||k;}
 // Canonical DISPLAY name per store key, derived from the SAME map (single source):
 // the value side of every rename is, by construction, the name today's cards speak.
 const EX_CANON_NAME: Record<string, string>=(function(){const m=Object.create(null);
@@ -276,7 +276,7 @@ const EX_CANON_NAME: Record<string, string>=(function(){const m=Object.create(nu
 // bench-press thread). Folds old-key rows into the canonical key, orders the
 // merged entries, and stamps the canonical name so the row label matches today's cards.
 // Runs at init and before the Progress charts; a folded store is a no-op on re-entry.
-function foldExAliasKeys(store: Record<string, ExWeightRow>): boolean {
+function foldExAliasKeys(store: Record<string, ExWeightRow>): boolean{
   let changed=false;
   Object.keys(store).forEach(k0=>{
     const k=EX_KEY_ALIAS[k0]; if(!k||k===k0) return;
@@ -294,7 +294,7 @@ function foldExAliasKeys(store: Record<string, ExWeightRow>): boolean {
   });
   return changed;
 }
-function seededRand(seed: number): number {let x=Math.sin(seed+1)*10000;return x-Math.floor(x);}
+function seededRand(seed: number): number{let x=Math.sin(seed+1)*10000;return x-Math.floor(x);}
 // ── SWAP UNIVERSE ────────────────────────────────────────────────────────────
 // Every candidate the swap sheet may offer has to be legal for THIS athlete:
 // right equipment tier, right age bias, past the injury filter. All of that logic
@@ -308,13 +308,13 @@ function seededRand(seed: number): number {let x=Math.sin(seed+1)*10000;return x
 // Accumulates across all roles and weeks of one build, so by the time buildProgram
 // returns it holds every exercise this athlete could legitimately be given.
 var _SWAP_UNIVERSE: Record<string, 1> | null=null;
-function _swapUniverseReset(): void {_SWAP_UNIVERSE=Object.create(null);}
-function _swapUniverseAdd(arr: readonly unknown[] | null | undefined): void {
+function _swapUniverseReset(): void{_SWAP_UNIVERSE=Object.create(null);}
+function _swapUniverseAdd(arr: readonly unknown[] | null | undefined): void{
   if(!_SWAP_UNIVERSE||!Array.isArray(arr)) return;
   for(var i=0;i<arr.length;i++){var n=arr[i];if(typeof n==='string'&&n)_SWAP_UNIVERSE[n]=1;}
 }
-function _swapUniverseList(): string[] {return _SWAP_UNIVERSE?Object.keys(_SWAP_UNIVERSE):[];}
-function pick<T>(arr: readonly T[],n: number,seed: number): T[] {_swapUniverseAdd(arr);const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(seededRand(seed+i)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
+function _swapUniverseList(): string[]{return _SWAP_UNIVERSE?Object.keys(_SWAP_UNIVERSE):[];}
+function pick<T>(arr: readonly T[],n: number,seed: number): T[]{_swapUniverseAdd(arr);const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(seededRand(seed+i)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
 // Lifting focus maps to internal goal for wave/exercise selection
 const LIFTING_FOCUS_TO_GOAL: Record<string, Goal> = {
   strength: 'strength',

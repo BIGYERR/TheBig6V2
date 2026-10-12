@@ -31,9 +31,10 @@ Mario has had to repeat this more than once; a session that makes him say it aga
 Vanilla HTML/CSS/JS PWA served as one page (`index.html`, ~1.3 MB, one inline `<script>`) that
 generates multi-week hybrid strength + cardio programs from a seeded, deterministic engine
 (Engine A → B → C → D inside `buildProgram(cfg)`). **The page is generated** (architecture phase B, Post-v0.239.1):
-`frontends/app/scripts/build-index.mjs` builds it byte for byte from its source files under `frontends/app/src/legacy/src/` (31 JS files,
-9 CSS files and 5 HTML partials) and the engine's TypeScript under `core/src/engine/` (9 files so far, architecture phase D:
-`order.json` names each `engine/<name>.ts`, and the build strips its types to spaces), joined in the order `order.json` lists, into `dist-github-pages/` (gitignored: the page and
+`frontends/app/scripts/build-index.mjs` builds it byte for byte from its source files under `frontends/app/src/legacy/src/` (28 JS files,
+9 CSS files and 5 HTML partials) and the engine's TypeScript under `core/src/engine/` (12 files so far, architecture phase D:
+`order.json` names each `engine/<name>.ts`, and the build strips its types out, `tools/engine-move.mjs` keeping the page's text
+the JavaScript's), joined in the order `order.json` lists, into `dist-github-pages/` (gitignored: the page and
 its icon, what GitHub Pages deploys from the pipeline once its source is "GitHub Actions", what every test boots, what the
 backend serves at `/app/`). Until Mario switches the Pages source, Pages serves the branch `main`'s root `index.html`, a
 committed copy of that build: code is edited in the source files, then `cd frontends/app && npm run build:index` writes both,

@@ -128,7 +128,8 @@ so a red check reads like a local one: `gh run download <run id> -n tests-run-lo
 | `logs.mjs` | reads it all back |
 | `deploy-check.mjs` | the Pages deploy proof (CLAUDE.md step 7) as a `deploy-pages` run; the pipeline runs it after every merge |
 | `app-at.mjs` | `node tools/app-at.mjs <ref> <out.html>`: the app's page as any commit had it (its root `index.html`, or the build of its sources), for a test run against the release before |
-| `same-script.mjs` | `node tools/same-script.mjs <before.html> <after.html>`: do two pages run the same code? The rest of the page byte for byte (but for `ia-version`), the inline script token for token; comments are listed, never judged. The proof for each engine move into `core/` (phase D) |
+| `same-script.mjs` | `node tools/same-script.mjs <before.html> <after.html>`: do two pages run the same code? The rest of the page byte for byte (but for `ia-version`), the inline script token for token with a line break between the same pairs of tokens; comments are listed, never judged. The proof for each engine move into `core/` (phase D) |
+| `engine-move.mjs` | `node tools/engine-move.mjs <name> <ref>`: after an engine file has moved to `core/src/engine` and been typed, sets the blanks between its tokens so the page carries its JavaScript at `<ref>`, text for text but for added comment lines (phase D) |
 | `check.mjs` | the 60-second local proof, a `check` run (`--staged` for the pre-commit hook, `--list`, `--measure`): the feature tests whole, the gate suite's fast part, the app, the backend |
 | `check-gate-times.txt` | each gate's measured time; gates at 12 s or less run in the check, the rest only in CI |
 | `agent-hook.mjs` | Claude hooks: sessions and agents into the history |

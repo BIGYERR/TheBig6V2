@@ -4,8 +4,8 @@ import {
 import { isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
 import { _ISO_ORDER } from '../../../../../../core/src/engine/calendar.ts';
 import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.ts';
-import { PACE_GOALS } from './nrc-race-bike-swim.js';
-import { runAnchorInfo } from './cardio-progression.js';
+import { PACE_GOALS } from '../../../../../../core/src/engine/nrc-race-bike-swim.ts';
+import { runAnchorInfo } from '../../../../../../core/src/engine/cardio-progression.ts';
 import { _BW_GEAR, _BW_SUBS } from '../../../../../../core/src/engine/prehab.ts';
 import {
   _BW_KEEP_FIXED, _bwSetsFromDetail, accessoryGrammarSweep, bodyweightSweep, hotNextHingeClampSweep,
