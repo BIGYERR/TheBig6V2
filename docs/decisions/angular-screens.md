@@ -236,3 +236,19 @@ what is stored.
   `.back-btn`, the Back button the component draws without the legacy `onclick`.
 - **Found, suspected (handoff §12):** the Wildcard's exercise controls index into the active day's sections.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.19 moves the toast and the update banner's contents
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.19.
+- **Moved:** the message inside `#toast`: `src/app/screens/toast/toast.ts`, which takes over `showToast` through
+  `LegacyBridge.provide` (every legacy caller reaches it). The message is the app's own markup, as before, laid in a box
+  that makes none of its own. It still hides 2.2 s after it shows, and an earlier toast's timer is still never
+  cancelled: handoff §12's finding (1) is Mario's to rule, and this step moves the toast without changing it. No toast
+  fires during boot, before the component mounts. The two spans inside `#iaUpdateBanner`:
+  `src/app/screens/update-banner/update-banner.ts`; the banner, the check that shows it and its tap to refresh stay
+  legacy (`update-check.js`), and the ✕ still calls `iaDismissUpdate` without the tap reaching the banner.
+- **Tests:** neither has logic of its own to unit-test. The toast is read by the e2e in a dozen steps (its text and its
+  `show`), all at 0 px on both builds. The banner cannot appear in the e2e (the check finds the same version it runs);
+  a local comparison of both builds matched it shown, dismissed by its ✕ (the page did not reload), and staying
+  dismissed for the session, and matched toasts with plain text and with markup, all at 0 px.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

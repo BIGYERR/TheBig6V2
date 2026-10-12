@@ -12,6 +12,8 @@ import { MileLock } from './mile-sheet/mile-lock';
 import { MileSheet } from './mile-sheet/mile-sheet';
 import { RpeInfo } from './rpe-info/rpe-info';
 import { SwapNudge } from './swap-nudge/swap-nudge';
+import { Toast } from './toast/toast';
+import { UpdateBanner } from './update-banner/update-banner';
 
 /**
  * The screens and overlays architecture phase E has moved into Angular components, by the legacy element they take over. After the
@@ -33,4 +35,6 @@ export const MOVED_SCREENS: readonly (readonly [screenId: string, component: Typ
   ['rpeInfoOverlay', RpeInfo],
   ['changeBody', ChangeSheet],
   ['randOverlay', RandomWorkout],
+  ['toast', Toast],
+  ['iaUpdateBanner', UpdateBanner],
 ];
