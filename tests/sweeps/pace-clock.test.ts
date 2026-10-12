@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The pace clock's whole lattices (CI only; tests/integration/pace-clock.test.js runs a sample of each):
 //   the anchor, target and rate over 3 levels x 3 ages x mi and km x 4 entered miles x 5 entered goals (360 builds);
 //   the injury PACE CLOCK appendix over 3 miles x 3 distances x 2 goal times x 3 levels, plus one cfg on schedule.

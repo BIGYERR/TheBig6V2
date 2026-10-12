@@ -25,11 +25,12 @@
 // and runs them alone: they are nested inside the cardio engine, so tests/support/app.ts appFunction cannot reach them.
 import * as vm from 'node:vm';
 import { appScript, loadApp, pinClock } from './app.ts';
+import type { DayKey } from '@ia/core';
 import type { App } from './app.ts';
 import { stripComments } from './week-view.ts';
 
 /** A weekday key, 'sun' to 'sat'. */
-export type Day = string;
+export type Day = DayKey;
 /** A config as these tests write it: the wizard's shape, with the engine's private fields where a ruling needs them. */
 export type RunCfg = Record<string, any>;
 /** What the app's untyped engine returns: a program, a day, a card. */
@@ -49,8 +50,8 @@ export interface Tokens {
   s1: string;
   s2: string;
 }
-/** The type each chosen day carries. */
-export type TypeOf = Record<Day, string>;
+/** The type each chosen day carries (only the chosen days are keys). */
+export type TypeOf = Partial<Record<Day, string>>;
 /** The chooser's return: the chosen indices into the training days, their types, and its scored terms. */
 export interface Pick {
   idxs: number[];

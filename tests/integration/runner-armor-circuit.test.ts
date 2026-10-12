@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The runner armor circuit: on a runner's prevention leg day the circuit (lunge, hold, hinge) gains a fourth item, the
 // prevention hip extension, and the trims know it. Ruling D195 Amendment 2, part A (V231):
 //   A1x the prevention hip extension subset is drawn after the reservation and the whole pool is registered in the swap
@@ -20,6 +19,7 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { fixtures } from '../support/app.ts';
 import * as SB from '../support/session-budget.ts';
+import type { AppDay } from '../support/session-budget.ts';
 import * as RA from '../support/runner-armor-circuit.ts';
 const { clone, clean, DAYS } = SB;
 
@@ -30,7 +30,7 @@ test("HALF_MANNY's W1 to W12 Tuesday circuit carries Single-leg hip thrust 2×6�
   // D195-A-a: a-tue (the fourth item and items 1 to 3)
   assert.ok(C.self && N.self);
   for (let w = 1; w <= 12; w++) {
-    const it = RA.circuitItems(p.weeks[w].tue);
+    const it = RA.circuitItems(p.weeks[w].tue)!;
     assert.equal(it.length, 4, 'W' + w);
     assert.deepEqual(it[3], RA.FOURTH, 'W' + w);
     assert.deepEqual(it.slice(0, 3), RA.TUE[w], 'W' + w);
@@ -44,7 +44,7 @@ test('without the fourth item every HALF_MANNY day is byte-identical: each W1 to
   for (let w = 1; w <= 14; w++) for (const d of DAYS) {
     const a = clone(p.weeks[w][d]);
     if (d === 'tue' && w <= 12) {
-      const si = a.sections.findIndex((s) => RA.CIRCUIT_RE.test(clean(s.label)));
+      const si = a.sections.findIndex((s: AppDay) => RA.CIRCUIT_RE.test(clean(s.label)));
       a.sections[si].items.splice(3, 1);
     } else other++;
     assert.equal(SB.dayJ(a), SB.dayJ(q.weeks[w][d]), 'W' + w + ' ' + d);
@@ -92,13 +92,13 @@ const L1 = [
 // legs set cap falls by round(1.4 x 3) = 4, from 14 to 10, under list (i)'s 11 sets.
 const HARD_RUN = { type: 'run', subtype: 'Speed Run — Intervals', detail: '' };
 const IA = SB.page();
-function crf(list, cardio) {
+function crf(list: AppDay[], cardio: AppDay): AppDay[] {
   const inp = clone(list), before = JSON.stringify(inp);
   const out = IA.eval('capRegionalFatigue')(inp, 'legs', cardio, 'support_prevention');
   assert.equal(JSON.stringify(inp), before, 'the input list is not mutated');
   return JSON.parse(JSON.stringify(out));
 }
-const live = (L) => L.filter((s) => (s.items || []).length);
+const live = (L: AppDay[]): AppDay[] => L.filter((s) => (s.items || []).length);
 
 test('the regional trim reads a hard run at 1.4 interference', () => {
   // D195-A-c: c-hand
@@ -133,8 +133,8 @@ test("on a hard run day the circuit's fourth item leaves, and the lunge, hold, h
 });
 
 // ── the session budget (A6 with B's pricing) ─────────────────────────────────────────────────────────────────────
-const key = (s) => (s && (s.label || s.coreHeader)) || '';
-const proj = (L) => live(L).map((s) => [key(s), s.items.map((i) => [i.name, i.detail])]);
+const key = (s: AppDay): string => (s && (s.label || s.coreHeader)) || '';
+const proj = (L: AppDay[]) => live(L).map((s) => [key(s), s.items.map((i: AppDay) => [i.name, i.detail])]);
 
 test('the hand legs days total 20.5, 22 and 23.5 against a cap of 20', () => {
   // D195-A-d: d-fix
@@ -149,7 +149,7 @@ for (const c of RA.LEGS_DAYS) {
     const out = IA.eval('capSessionBudget')(inp, null);
     assert.equal(JSON.stringify(inp), before, 'the input is not mutated');
     const want = clone(c.day.L);
-    for (const [k, n] of c.gone) { const s = want.find((x) => key(x) === k); s.items.splice(s.items.findIndex((i) => i.name === n), 1); }
+    for (const [k, n] of c.gone) { const s = want.find((x) => key(x) === k); s.items.splice(s.items.findIndex((i: AppDay) => i.name === n), 1); }
     assert.deepEqual(proj(JSON.parse(JSON.stringify(out))), proj(want));
   });
 }
@@ -159,11 +159,11 @@ test('the two typed cells print the cards coach printed: a four-item circuit wit
   const a = SB.twice(null, RA.CELL_F1.cfg).prog.weeks[RA.CELL_F1.w][RA.CELL_F1.d];
   const b = SB.twice(null, RA.CELL_FH.cfg).prog.weeks[RA.CELL_FH.w][RA.CELL_FH.d];
   assert.deepEqual(SB.cardLines(a), RA.CARD_F1);
-  assert.equal(RA.circuitItems(a).length, 4);
+  assert.equal(RA.circuitItems(a)!.length, 4);
   assert.ok(RA.hasSec(a, /^Calf — achilles/) && !RA.hasSec(a, /carry/i));
   assert.deepEqual(SB.cardLines(b), RA.CARD_FH);
-  assert.deepEqual(RA.circuitItems(b).map((x) => x.join(' '))[1], 'Wall sit 2×25 sec');
-  assert.equal(RA.circuitItems(b).length, 3);
+  assert.deepEqual(RA.circuitItems(b)!.map((x) => x.join(' '))[1], 'Wall sit 2×25 sec');
+  assert.equal(RA.circuitItems(b)!.length, 3);
 });
 
 test('without D195 the same two cells print the cards before it: three items, no carry, and on the second the hold and calf cut', () => {
@@ -194,7 +194,7 @@ test("on a sample of the prevention shard part A only appends one item to a runn
   assert.equal(S.length, 23);
   assert.deepEqual(S.filter((r) => r.crash.length).map((r) => r.x.tag), []);
   assert.ok(S.every((r) => r.self && r.hasU));
-  const D = [];
+  const D: RA.AnalysedDay[] = [];
   S.forEach((r) => r.days.forEach((z) => D.push(Object.assign({ r, a: RA.analyse(z) }, z))));
   const run = D.filter((z) => z.r.runner), non = D.filter((z) => !z.r.runner), knee = D.filter((z) => z.r.x.inj === 'knee/protect');
   assert.ok(run.length > 0 && non.length > 0);

@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // D84, Calves is pushed before Leg isolation, the whole comparison. The same claims as the D84 tests in
 // tests/integration/leg-accessory.test.js, which run on 72 configs; this file runs all 1,728 (six tiers x two foci x two
 // experiences x lift only, pace, half x healthy, shoulder, low back and knee protect x three rest patterns x two seeds),

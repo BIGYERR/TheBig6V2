@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Leg lift placement: which training days take the hinge day (pull) and the squat day (legs), given the run week.
 // Rulings:
 //   D36   hard days hard: on an NRC race program the long run and its eve are off limits to both leg roles, the hinge
@@ -31,7 +30,7 @@ test('the source: the pace family predicate is declared once with its three ids,
   assert.equal((src.match(/_nrcRunShape\s*\(/g) || []).length, 3, 'the declaration, the placement and the region guard');
 });
 
-let EVE = null, BASE = null;
+let EVE: L.PaceEveTally | null = null, BASE: L.RunBaseTally | null = null;
 const eve = () => EVE || (EVE = L.paceEveTally([1001]));
 const base = () => BASE || (BASE = L.runBaseTally(20));
 

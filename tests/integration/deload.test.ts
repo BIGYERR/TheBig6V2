@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Deload weeks: recoveryDeload keeps its one accessory block by PATTERN, not push order (D91); on the pull side a deload
 // pull day keeps Pull superset A, the day's vertical pull, because its Main is already a deadlift variant (D93 as
 // narrowed by D94). Rulings: docs/decisions/deload.md when one is written; the parity table is

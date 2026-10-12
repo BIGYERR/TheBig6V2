@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The adjacent-day dedupe (deconflictAdjacentDupes): a loaded accessory that repeats the previous calendar day's name
 // is renamed. Rulings: D160 (the trigger set is the previous day as it ships, read through _d18View on a copy), D167
 // and D167a (the pairs walk the calendar the week renders), D171 (the hinge clamp reads the calendar's tomorrow),
@@ -12,6 +11,7 @@ import assert from 'node:assert/strict';
 import { loadApp, fixtures, progDigest } from '../support/app.ts';
 import * as D from '../support/duplicate-movements.ts';
 import * as A from '../support/adjacent-day-dedupe.ts';
+import type { Cardio, Day, DayKey, Program } from '@ia/core';
 const IA = loadApp();
 const TEXT = D.appText();
 const INST = A.instrumentedApp(TEXT);
@@ -31,17 +31,17 @@ test('the rename logger and the view wrapper change no program', () => {
 // ── _d18View, called directly ─────────────────────────────────────────────────────────────────────────────────
 const VIEW = IA.eval('_d18View');
 const tierFn = IA.eval('_longRunTier');
-const names = (y) => [].concat(...((y && y.sections) || []).map((s) => (s.items || []).map((i) => String((i && i.name) || ''))));
-const objects = (o, set = new Set()) => { if (o && typeof o === 'object') { set.add(o); Object.keys(o).forEach((k) => objects(o[k], set)); } return set; };
+const names = (y: Day | null | undefined): string[] => ([] as string[]).concat(...((y && y.sections) || []).map((s) => (s.items || []).map((i) => String((i && i.name) || ''))));
+const objects = (o: unknown, set = new Set<unknown>()): Set<unknown> => { if (o && typeof o === 'object') { set.add(o); Object.keys(o).forEach((k) => objects((o as Record<string, unknown>)[k], set)); } return set; };
 // One real shipped day per long-run tier (A >= 75 min, B 45 to 75, C under 45) and one training day with a non-long card.
-const EX = {};
+const EX: Record<string, { p: Program; w: string; d: DayKey; card: Cardio }> = {};
 for (const x of SAMPLE.filter((y) => /^NRC/.test(y.mix))) {
   const p = IA.buildProgram(D.clone(x.c));
   for (const w of Object.keys(p.weeks))
     for (const d of A.ISO) {
       const y = p.weeks[w][d];
       if (!y || y.rest || !Array.isArray(y.sections) || !y.cardio || Array.isArray(y.cardio)) continue;
-      const t = tierFn(y.cardio) || 'none';
+      const t: string = tierFn(y.cardio) || 'none';
       if (!EX[t] && (t !== 'none' || y.sections.length)) EX[t] = { p, w, d, card: y.cardio };
     }
   if (['A', 'B', 'C', 'none'].every((t) => EX[t])) break;
@@ -61,11 +61,11 @@ test('_d18View on real shipped days leaves the program untouched and shares no o
 
 test('_d18View reads a hand day the way D18 prints it under each tier, and leaves the day untouched', () => {
   const MOB = ['Standing calf stretch', 'Couch stretch', 'Hip 90/90 stretch', 'T-spine mobility', 'Foam roll'];
-  const hand = (c) => ({ title: 'Hand day', cardio: D.clone(c), tags: ['lift'], sections: [
+  const hand = (c: Cardio) => ({ title: 'Hand day', cardio: D.clone(c), tags: ['lift'], sections: [
     { label: 'Main — Deadlift', items: [{ name: 'Deadlift', detail: '4×5 — RPE 8' }] },
     { label: 'Loaded carry', items: [{ name: 'Farmer carry', detail: '3×40 yd' }] },
     { label: 'Accessory', items: [{ name: 'Dumbbell bench press', detail: '3×10 — RPE 7' }] }] });
-  const want = {
+  const want: Record<string, (n: string[]) => void> = {
     A: (n) => assert.deepEqual(n, MOB, 'tier A prints only the mobility block'),
     B: (n) => assert.ok(n.includes('Dumbbell bench press') && !n.includes('Deadlift') && !n.includes('Farmer carry'), 'tier B keeps the bench only: ' + n),
     C: (n) => assert.ok(n.includes('Deadlift') && n.includes('Dumbbell bench press') && !n.includes('Farmer carry'), 'tier C drops only the carry: ' + n),

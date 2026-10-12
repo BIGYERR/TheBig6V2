@@ -13,6 +13,7 @@
 //                       fix-forward), b4Week (no hard run at T-2), eveShakeout (D158), protectParkEves (D158 skips the
 //                       protect-park injury modes). Each returns a tally the tests assert: the cells that broke a claim
 //                       and how many cells reached the case, so a sample that reaches nothing fails.
+import type { DayKey } from '@ia/core';
 import { loadApp, pinClock } from './app.ts';
 import type { App } from './app.ts';
 
@@ -24,8 +25,8 @@ export type Card = any;
 export type TestCfg = Record<string, any>;
 
 // ── the hand calendar ───────────────────────────────────────────────────────────────────────────────────────────
-export const ISO7 = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];   // program week order, Monday first
-export const JS7 = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];    // Date.getDay() order
+export const ISO7: DayKey[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];   // program week order, Monday first
+export const JS7: DayKey[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];    // Date.getDay() order
 export const WD3 = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const MON3 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 export const ymd = (s: string): [number, number, number] => { const [y = NaN, m = NaN, d = NaN] = String(s).split('-').map(Number); return [y, m, d]; };

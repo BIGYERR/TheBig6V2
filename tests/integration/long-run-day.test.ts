@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The long-run day: what the lifting looks like on the day that carries the week's long run. Rulings:
 //   D18, D140  the run is the day, by time on feet: 75 minutes and up is post-run mobility only (tier A); 45 to 75 is
 //              upper body and trunk, no hinge, leg or plyo item, no power, explosive or carry section, 8 working sets
@@ -16,16 +15,17 @@
 // below. This file runs the hand fixtures and a sample of each lattice; tests/sweeps/long-run-day.test.js runs the
 // lattices whole (D140's 672 programs; D153's 8,040; D156's further 1,200).
 import { test } from 'vitest';
+import type { Program } from '@ia/core';
 import assert from 'node:assert/strict';
 import { progDigest } from '../support/app.ts';
 import * as R from '../support/run-week-layout.ts';
 import * as T from '../support/long-run-day.ts';
-let STAND_P = null;
-const stand = () => STAND_P || (STAND_P = R.build(T.STAND));
+let STAND_P: Program | null = null;
+const stand = (): Program => STAND_P || (STAND_P = R.build(T.STAND));
 
 test('the stand-in, an NRC tier program and a multi-sport NSW program each equal themselves built twice', () => {
-  const cfgs = [T.STAND, T.tierLattice().find(x => x.limb === 'NRC').cfg, T.finisherLattices().multi[0].c];
-  for (const c of cfgs) assert.equal(progDigest(R.build(c)), progDigest(R.build(c)), c.cardioGoals.run.id);
+  const cfgs = [T.STAND, T.tierLattice().find(x => x.limb === 'NRC')!.cfg, T.finisherLattices().multi[0].c];
+  for (const c of cfgs) assert.equal(progDigest(R.build(c)), progDigest(R.build(c)), c.cardioGoals.run!.id);
 });
 
 test("the stand-in's Saturday long runs, by dose arithmetic: 33.0 38.3 43.5 30.5 48.5 53.7 58.8 40.6 63.5 69.5 76.5 minutes, tiers C C C C B B B C B B A", () => {
@@ -41,7 +41,7 @@ test("the stand-in's Saturday long runs, by dose arithmetic: 33.0 38.3 43.5 30.5
 
 test("the stand-in's tier B Saturdays (W5 W6 W7 W9 W10) keep the strength pair at 6 sets and lose the explosive finisher", () => {
   const DIPS = 'Dips', PUSH = 'Pushups (slow tempo)', ROWR = 'Inverted rows (rings)', ROWB = 'Inverted rows (bodyweight)';
-  const WANT = { 5: [DIPS, ROWR], 6: [DIPS, ROWR], 7: [PUSH, ROWB], 9: [PUSH, ROWR], 10: [PUSH, ROWR] };
+  const WANT: Record<string, string[]> = { 5: [DIPS, ROWR], 6: [DIPS, ROWR], 7: [PUSH, ROWB], 9: [PUSH, ROWR], 10: [PUSH, ROWR] };
   for (const w of Object.keys(WANT)) {
     const d = stand().weeks[w].sat;
     assert.equal(T.shape(d), '[Strength] ' + WANT[w].join(', '), 'W' + w);
@@ -58,7 +58,7 @@ test("the stand-in's W11 long run crosses 75 minutes: tier A, titled Post-Run Mo
 
 test("the stand-in's tier C Saturdays (W1 W2 W3 W4 W8) keep a normal day", () => {
   const S = 'Dips', PU = 'Pushups (slow tempo)', RB = 'Inverted rows (bodyweight)', EXP = 'Explosive finisher';
-  const WANT = {
+  const WANT: Record<string, string> = {
     1: '[Strength] ' + S + ', ' + RB + ' ; [' + EXP + '] Ball slams, Kettlebell swing',
     2: '[Strength] ' + S + ', ' + RB + ' ; [' + EXP + '] Ball slams, Kettlebell swing',
     3: '[Strength] ' + PU + ', ' + RB + ' ; [' + EXP + '] Broad jumps, Ball slams',
@@ -76,9 +76,9 @@ test('the carry case (crossfit, balanced, rest Saturday and Sunday) W6 Friday: w
   assert.ok(m < 45, m + ' minutes');
   assert.equal(T.carryN(day), 0);
   const nm = R.clone(cc);
-  nm.cardioGoals.run.mileBestMins = '';
-  nm.cardioGoals.run.mileBestSecs = '';
-  delete nm.cardioGoals.run.mileBestSrc;
+  nm.cardioGoals.run!.mileBestMins = '';
+  nm.cardioGoals.run!.mileBestSecs = '';
+  delete nm.cardioGoals.run!.mileBestSrc;
   const d0 = R.build(nm).weeks[6].fri;
   assert.equal(+T.minutesOf(d0.cardio && d0.cardio.dose).toFixed(1), 56.4);
   assert.equal(T.handTier(d0.cardio), 'B');
@@ -89,9 +89,9 @@ test('the carry case (crossfit, balanced, rest Saturday and Sunday) W6 Friday: w
 test("D140's lattice, every eighth program: tier A is post-run mobility titled so; tier B has no leg item, no power, explosive or carry section, no power core pillar and 8 sets or fewer; no tier carries a carry", () => {
   const X = T.tierTally(8);
   assert.equal(X.progs, 84);
-  for (const t of ['A', 'B', 'C']) for (const limb of ['NSW', 'NRC']) assert.ok(X.n[t][limb] > 0, 'tier ' + t + ' ' + limb + ' ' + JSON.stringify(X.n));
+  for (const t of ['A', 'B', 'C'] as const) for (const limb of ['NSW', 'NRC'] as const) assert.ok(X.n[t][limb] > 0, 'tier ' + t + ' ' + limb + ' ' + JSON.stringify(X.n));
   assert.ok(X.n.cPowerCore > 0, 'tier C days still deal a power core pillar');
-  for (const k of Object.keys(X.bad)) assert.deepEqual(X.bad[k], [], k);
+  for (const k of Object.keys(X.bad) as (keyof T.TierBad)[]) assert.deepEqual(X.bad[k], [], k);
 });
 
 test('the hinge hand list catches every hinge it names and passes every movement that is not one', () => {
@@ -104,7 +104,7 @@ test('the hinge hand list catches every hinge it names and passes every movement
 
 const L = T.hingeLattices();
 /** The D153 and D155 claims on one lattice sample, with how many tier B days and recovery-week loaded Full Body days it must reach. */
-function hingeClaims(name, list, reach) {
+function hingeClaims(name: string, list: T.Seg[], reach: { tb: number; rec: number }): T.HingeTally {
   const X = T.hingeTally(list);
   assert.equal(X.cfg, list.length, name + ' builds');
   assert.ok(X.tb >= reach.tb && X.recFullBody >= reach.rec, name + ': ' + X.tb + ' tier B days, ' + X.recFullBody + ' recovery-week loaded Full Body days');
@@ -119,7 +119,7 @@ function hingeClaims(name, list, reach) {
 }
 
 /** The loaded full-body slice, where D155's recovery-week day lives: commercial or home_full, strength or hypertrophy. */
-const loaded = x => /^(commercial|home_full)$/.test(x.c.equipment) && /^(strength|hypertrophy)$/.test(x.c.liftingFocus);
+const loaded = (x: T.Seg): boolean => /^(commercial|home_full)$/.test(x.c.equipment) && /^(strength|hypertrophy)$/.test(x.c.liftingFocus);
 
 test('NRC, every hundredth config of 4,200 and every fourteenth of its loaded full-body slice: no tier B long-run day without lifting or with a hinge, 8 sets at most, and the recovery-week loaded full-body day keeps its Upper superset', () => {
   hingeClaims('NRC', R.every(L.NRC.filter(x => !loaded(x)), 100).concat(R.every(L.NRC.filter(loaded), 14)), { tb: 50, rec: 1 });
@@ -136,7 +136,7 @@ test("D153's population, every fourth config (where Cable pull-through once prin
 
 test('the loaded full-body slice on two more seeds and with a bike or a swim: no Arms or Delts finisher on a long day, and every tier B long day lifts, at 8 sets or fewer', () => {
   const F = T.finisherLattices();
-  for (const [name, list] of [['seeds', R.every(F.seeds, 40)], ['multi', R.every(F.multi, 10)]]) {
+  for (const [name, list] of [['seeds', R.every(F.seeds, 40)], ['multi', R.every(F.multi, 10)]] satisfies [string, T.Seg[]][]) {
     const X = T.hingeTally(list);
     assert.deepEqual(X.finisher, [], name);
     assert.ok(X.tb > 0, name + ' tier B days');

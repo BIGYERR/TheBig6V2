@@ -169,7 +169,7 @@ const CARDIO_GOAL = object<CardioGoal>('cardioGoal', {
   mileBestMins: opt(str), mileBestSecs: opt(str), mileBestSrc: opt(MILE_BEST_SOURCE),
   baselineDist: opt(str), baseline: opt(str),
   targetDist: opt(str), paceUnit: opt(str), targetMins: opt(str), targetSecs: opt(str), targetTime: opt(str),
-  swimUnit: opt(str), ftp: opt(str),
+  swimUnit: opt(str), baseMins: opt(str), baseSecs: opt(str), base500Mins: opt(str), base500Secs: opt(str), ftp: opt(str),
 });
 const CARDIO_GOALS = object<CardioGoals>('cardioGoals', { run: opt(CARDIO_GOAL), bike: opt(CARDIO_GOAL), swim: opt(CARDIO_GOAL) });
 

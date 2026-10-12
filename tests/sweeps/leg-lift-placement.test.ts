@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Leg lift placement, every lattice whole: the claims tests/integration/leg-lift-placement.test.js runs on one seed and a
 // sample (D36, D127, D104a), here on every seed and every config the rulings were measured on. CI runs it, the
 // 60-second check does not.

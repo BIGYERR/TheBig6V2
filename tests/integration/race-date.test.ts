@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Race dates: the date and the countdown every surface prints, and the days a race-aligned program keeps behind the
 // athlete. Rulings: D180 (P-BLOCKOPEN: refreshProgram's copy-back carries blockOpen, so the days between a race
 // program's counted-back start and the day the athlete walked in stay behind them after a reboot) and D182
@@ -18,6 +17,7 @@
 process.env.TZ = 'America/New_York';
 import { test, describe, beforeAll } from 'vitest';
 import assert from 'node:assert/strict';
+import type { Cfg } from '@ia/core';
 import * as X from '../support/test-week.ts';
 import * as R from '../support/race-date.ts';
 // ── the block open (D180), the clock on Thu 2026-09-24 12:00 ─────────────────────────────────────────────────────
@@ -29,11 +29,11 @@ test('the fixture arithmetic: HALF_MANNY starts Mon 2026-08-31, so W1 and W4 Mon
   // The oracle's own check, engine free: race Sun 2026-12-06, half plan 14 weeks.
   assert.equal(R.handStart('run_half', '2026-12-06'), FIX_START);
   assert.equal(X.dayKey(R.TODAY_ISO), 'thu');
-  const before = w => X.ISO7.filter((d, i) => R.dayISO(FIX_START, w, i) < R.TODAY_ISO).join(' ');
+  const before = (w: number) => X.ISO7.filter((d, i) => R.dayISO(FIX_START, w, i) < R.TODAY_ISO).join(' ');
   assert.equal(before(1), AFTER.W1pre);
   assert.equal(before(4), AFTER.W4pre);
   assert.equal(X.ISO7.filter((d, i) => !['wed', 'sun'].includes(d) && R.dayISO(FIX_START, 4, i) >= R.TODAY_ISO).length, 3, 'W4 training days in the block');
-  const restPre = []; let due = 0;
+  const restPre: [number, string][] = []; let due = 0;
   for (let w = 1; w <= FIX_WEEKS; w++) X.ISO7.forEach((d, i) => {
     const x = R.dayISO(FIX_START, w, i);
     if (['wed', 'sun'].includes(d)) { if (x < R.TODAY_ISO) restPre.push([w, d]); } else if (x === R.TODAY_ISO) due++;
@@ -63,8 +63,8 @@ test('a race program keeps blockOpen through refreshProgram, and the days it hol
 
 test('after a reboot, setting the same race date or the same start leaves the stored blockOpen and the start alone, and memory agrees with storage', () => {
   // I2a, I2b, I2c: HALF_MANNY, and a half marathon 45 days out
-  for (const [name, cfg] of [['HALF_MANNY', Object.assign({}, R.HM)], ['half +45 d', Object.assign({}, R.HM, { raceDate: R.plus(45) })]]) {
-    const hs = R.handStart('run_half', cfg.raceDate);
+  for (const [name, cfg] of [['HALF_MANNY', Object.assign({}, R.HM)], ['half +45 d', Object.assign({}, R.HM, { raceDate: R.plus(45) })]] satisfies [string, Cfg][]) {
+    const hs = R.handStart('run_half', cfg.raceDate!);
     const IA = R.boot(); const id = R.wizard(IA, cfg); const s0 = R.storedP(IA, id), D0 = R.dump(IA);
     assert.deepEqual([s0.blockOpen, s0.startDate], [R.TODAY_ISO, hs], name + ' commit');
     const R1 = R.boot(D0); const m1 = (R1.eval('activeProg') || {}).blockOpen;
@@ -92,7 +92,7 @@ test('the wizard lands on week 1 as it renders after a reboot and as its own pro
       assert.deepEqual([o.stored.blockOpen, o.stored.startDate, R.parseWeek(o.landing).pre], [R.TODAY_ISO, o.hStart, o.hPre], o.row.name);
     }
   }
-  assert.equal(R.parseWeek(out.find(o => /HALF_MANNY/.test(o.row.name)).landing).done, AFTER.W1done);
+  assert.equal(R.parseWeek(out.find(o => /HALF_MANNY/.test(o.row.name))!.landing).done, AFTER.W1done);
 });
 
 test("HALF_MANNY's boot after signing up on Thu 2026-09-24 shows no reminder, and its weeks read as the ruling's After column", () => {
@@ -101,7 +101,7 @@ test("HALF_MANNY's boot after signing up on Thu 2026-09-24 shows no reminder, an
   assert.deepEqual([fix.startDate, fix.blockOpen, fix.totalWeeks], [FIX_START, R.TODAY_ISO, FIX_WEEKS]);
   for (let w = 1; w <= 4; w++) for (const d of X.ISO7) assert.equal(!!fix.weeks[w][d].rest, ['wed', 'sun'].includes(d), 'W' + w + ' ' + d);
   const IA = R.boot(store);
-  assert.deepEqual(JSON.parse(IA.eval('JSON.stringify(__pops)')).filter(p => /^reminder::/.test(p)), [], 'no reminder pop');
+  assert.deepEqual(JSON.parse(IA.eval('JSON.stringify(__pops)')).filter((p: string) => /^reminder::/.test(p)), [], 'no reminder pop');
   assert.equal(IA.localStorage.getItem('ia_reminded_HM1'), null);
   const W1 = R.parseWeek(R.render(IA, 1)), W4 = R.parseWeek(R.render(IA, 4));
   assert.deepEqual([W1.cells, W1.pre, W1.taps, W1.done], [7, AFTER.W1pre, 0, AFTER.W1done], 'W1: every day before signup, none opens');
@@ -120,7 +120,7 @@ test("HALF_MANNY's boot after signing up on Thu 2026-09-24 shows no reminder, an
 // ── the countdown (D182), in both zones ──────────────────────────────────────────────────────────────────────────
 const WEEKDAY_TABLE = { '2026-12-06': 'Sun', '2026-12-05': 'Sat', '2026-11-01': 'Sun', '2026-12-31': 'Thu', '2027-01-01': 'Fri', '2027-03-14': 'Sun',
   '2027-03-15': 'Mon', '2027-06-30': 'Wed', '2028-02-29': 'Tue', '2026-10-10': 'Sat', '2026-09-22': 'Tue', '2026-11-16': 'Mon', '2026-08-31': 'Mon' };
-const RULING_DAYS = [['2026-09-22', '2026-12-06', 75], ['2026-08-31', '2026-12-06', 97], ['2026-11-20', '2026-12-06', 16], ['2026-11-16', '2027-03-15', 119], ['2026-09-22', '2026-12-13', 82]];
+const RULING_DAYS: [string, string, number][] = [['2026-09-22', '2026-12-06', 75], ['2026-08-31', '2026-12-06', 97], ['2026-11-20', '2026-12-06', 16], ['2026-11-16', '2027-03-15', 119], ['2026-09-22', '2026-12-13', 82]];
 const RACE_DATES = ['2026-12-06', '2026-12-05', '2026-11-01', '2026-12-31', '2027-01-01', '2027-03-14', '2027-03-15', '2027-06-30', '2028-02-29', '2026-10-10'];
 const STATE = [
   { clock: '2026-08-31', race: '2026-12-06', days: 97, card: '13 weeks', copy: '13 weeks out', sheet: '97', review: '13 weeks away' },
@@ -137,13 +137,13 @@ const STATE = [
   { clock: '2027-03-07', race: '2027-03-14', days: 7, card: '1 week', copy: '1 week out', sheet: '7', review: '1 week away' },          // race on the spring-forward day
   { clock: '2026-11-01', race: '2026-11-08', days: 7, card: '1 week', copy: '1 week out', sheet: '7', review: '1 week away' },          // the fall-back day
 ];
-const ALIGN = [['2026-11-16', '2027-03-15', 'run_half', 17], ['2027-03-08', '2027-03-15', 'run_5k', 1], ['2027-03-01', '2027-03-15', 'run_10k', 2],
+const ALIGN: [string, string, string, number][] = [['2026-11-16', '2027-03-15', 'run_half', 17], ['2027-03-08', '2027-03-15', 'run_5k', 1], ['2027-03-01', '2027-03-15', 'run_10k', 2],
   ['2027-02-15', '2027-03-15', 'run_half', 4], ['2026-11-16', '2027-03-14', 'run_marathon', 16], ['2026-09-22', '2026-12-06', 'run_half', 10], ['2026-10-25', '2026-11-08', 'run_half', 2]];
 const TEST_GOAL = { id: 'run_pace_goal', label: 'Hit a Pace / Time Goal', mileBestMins: '8', mileBestSecs: '15', targetDist: '1.5', targetMins: '11', targetSecs: '0', paceUnit: 'mi' };
 
-for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]], ['UTC', 'UTC', [0, 0]]]) {
+for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]], ['UTC', 'UTC', [0, 0]]] satisfies [string, string, number[]][]) {
   describe('in ' + zone, () => {
-    let C;
+    let C: R.CountdownVM;
     beforeAll(() => { process.env.TZ = tz; C = R.countdownVM(); });
 
     test('the zone is the one asked for, the clock pin reaches the app, and the hand date oracle agrees with itself and the ruling', () => {

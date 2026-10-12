@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The runner armor circuit, the lattices: the same claims as tests/integration/runner-armor-circuit.test.js, which runs
 // them on samples; this file runs them whole. CI runs it, the 60-second check does not.
 //   - floor (b): g215's knee protect lattice, 630 configs (five tiers x six goals x seven foci x three experiences), each
@@ -40,7 +39,7 @@ test('floor (b) never fires on a prevention config', () => {
 const SH = RA.preventionShard();
 const S = RA.shardBuild(SH);
 const AB = S.filter((r) => r.x.ab);
-const D = [];
+const D: RA.AnalysedDay[] = [];
 AB.forEach((r) => r.days.forEach((z) => D.push(Object.assign({ r, a: RA.analyse(z) }, z))));
 const run = D.filter((z) => z.r.runner), non = D.filter((z) => !z.r.runner), knee = D.filter((z) => z.r.x.inj === 'knee/protect');
 
@@ -86,7 +85,7 @@ test('part A moves no name in any swap universe, and the bodyweight low back pro
 
 test('the shard counts match tests/snapshots/runner-armor-circuit-lattice.json', () => {
   const remIt = run.flatMap((z) => z.a.remIt);
-  const by = (arr, f) => arr.reduce((m, x) => ((m[f(x)] = (m[f(x)] || 0) + 1), m), {});
+  const by = <T>(arr: T[], f: (x: T) => string) => arr.reduce<Record<string, number>>((m, x) => ((m[f(x)] = (m[f(x)] || 0) + 1), m), {});
   matchSnapshot('runner-armor-circuit-lattice', {
     floorB: { fires: FB.fire, configsPerTier: FB.count },
     shard: {

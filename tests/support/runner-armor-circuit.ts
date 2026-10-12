@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Helpers for the runner armor circuit tests (tests/integration/runner-armor-circuit.test.js and
 // tests/sweeps/runner-armor-circuit.test.js). Built on tests/support/session-budget.js (pages, variants, the D195
 // counterfactuals, the coach's lattice constructor).
@@ -8,10 +7,15 @@
 // V230, unchanged since), the three hand legs days and their hand-worked trims, the two typed cells' cards (coach's
 // prints), g215's knee protect lattice and the floor (b) line.
 import { progDigest } from './app.ts';
+import type { App } from './app.ts';
 import * as SB from './session-budget.ts';
+import type { AppDay, AppProgram, LooseCfg } from './session-budget.ts';
 const { clone, clean, DAYS, liveSecs, cardLines } = SB;
 
-const FOURTH = ['Single-leg hip thrust', '2×6–10 each @ RPE 7'];
+/** An item as [name, detail]. */
+type Pair = [string, string];
+
+const FOURTH: Pair = ['Single-leg hip thrust', '2×6–10 each @ RPE 7'];
 const CALF_STR = 'YYY-YYY-YYY---';
 const CARRY_STR = 'YYY-YYY-YYY---';
 const CIRCUIT_RE = /^Leg circuit — runner armor/;
@@ -33,7 +37,7 @@ const UNIVERSE = [
   'Worlds greatest stretch',
 ];
 /** HALF_MANNY's runner armor circuit on W1 to W12 Tuesday before the fourth item: lunge, hold, hinge ([name, detail]). */
-const TUE = {
+const TUE: Record<number, Pair[]> = {
   1: [['Dumbbell Bulgarian split squat', '2×8–12 each @ RPE 7'], ['Spanish squat hold (KB)', '2×25 sec'], ['Barbell Romanian deadlift', '2×6–10 @ RPE 7']],
   2: [['Dumbbell Bulgarian split squat', '2×8–12 each @ RPE 7'], ['Spanish squat hold (KB)', '2×25 sec'], ['Barbell Romanian deadlift', '2×6–10 @ RPE 7']],
   3: [['Dumbbell goblet side lunge', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell swing', '2×8']],
@@ -47,9 +51,9 @@ const TUE = {
   11: [['Step-ups (KB)', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell single-leg deadlift', '2×6–10 @ RPE 7']],
   12: [['Step-ups (KB)', '2×8–12 each @ RPE 7'], ['Wall sit', '2×25 sec'], ['Kettlebell single-leg deadlift', '2×6–10 @ RPE 7']],
 };
-const hasSec = (day, re) => liveSecs(day).some((s) => re.test(clean(s.label)));
-const circuit = (day) => liveSecs(day).find((s) => CIRCUIT_RE.test(clean(s.label))) || null;
-const circuitItems = (day) => { const s = circuit(day); return s ? Array.from(s.items, (i) => [clean(i.name), clean(i.detail)]) : null; };
+const hasSec = (day: AppDay, re: RegExp): boolean => liveSecs(day).some((s) => re.test(clean(s.label)));
+const circuit = (day: AppDay): AppDay | null => liveSecs(day).find((s) => CIRCUIT_RE.test(clean(s.label))) || null;
+const circuitItems = (day: AppDay): Pair[] | null => { const s = circuit(day); return s ? Array.from<AppDay, Pair>(s.items, (i) => [clean(i.name), clean(i.detail)]) : null; };
 
 // ── the hand legs days (D195-A6 with D195-B's pricing) ──────────────────────────────────────────────────────────
 // Pricing: a stretch costs 0; an _isHalf name (carry, wall sit, hold, plank, clamshell, side steps) or a member of the
@@ -58,7 +62,7 @@ const circuitItems = (day) => { const s = circuit(day); return s ? Array.from(s.
 // wall sit or hold 1), ties to the later position. Main and Hip stability are protected; the carry finisher ranks 3;
 // the optional core block ranks 3 while it holds two items and is protected at one (D48); the circuit, the calf and
 // Foot & ankle rank 1. The three days differ only in protected sets, so only the stopping point moves.
-function legsDay(mainN, stepsN, clamN) {
+function legsDay(mainN: number, stepsN: number, clamN: number): { L: AppDay[]; hand: number } {
   const L = [
     { label: 'Main — Back squat', items: [{ name: 'Back squat', detail: mainN + '×12 — RPE 6.5' }] },
     { label: 'Leg circuit — runner armor', superset: true, rounds: 2, items: [
@@ -120,21 +124,23 @@ const CARD_FH_THREE = [CARD_FH[0], 'Leg circuit — runner armor (SS 2) :: Dumbb
 
 // ── floor (b), g215's knee protect lattice ──────────────────────────────────────────────────────────────────────
 const FB_TIERS = ['commercial', 'crossfit', 'home_full', 'home_basic', 'bodyweight'];
-const FB_GOALS = [['run_5k', {}], ['run_half', {}], ['run_pace_goal', { targetDist: '1.5', targetMins: '10', targetSecs: '0' }], ['run_base', {}], ['run_10k', {}], ['run_marathon', {}]];
+const FB_GOALS: [string, Record<string, string>][] = [['run_5k', {}], ['run_half', {}], ['run_pace_goal', { targetDist: '1.5', targetMins: '10', targetSecs: '0' }], ['run_base', {}], ['run_10k', {}], ['run_marathon', {}]];
 const FB_FOC = ['hypertrophy', 'strength', 'fatloss', 'balanced', 'support_strength', 'support_athletic', 'support_prevention'];
 const FB_EXPS = ['beginner', 'intermediate', 'advanced'];
 const FB_RESTS = [['sun', 'wed'], ['sat', 'sun']];
 const FB_SEEDS = [76308, 1234, 4242, 9001, 31337, 555, 8086, 20260];
-function fbMk(eq, gi, f, exp, age, si) {
+function fbMk(eq: string, gi: number, f: string, exp: string, age: string, si: number): LooseCfg {
   const [g, x] = FB_GOALS[gi % FB_GOALS.length];
   return { name: 'M', primaryPath: /^support_/.test(f) ? 'event' : 'goal', cardioTypes: ['run'],
     cardioGoals: { run: Object.assign({ id: g, label: g, mileBestMins: '8', mileBestSecs: '30', baselineDist: '3', baseline: '3mi' }, x) },
     eventTargeted: false, liftingFocus: f, experience: exp, ageBracket: age, equipment: eq, unit: 'lbs', restDays: FB_RESTS[si % 2].slice(),
     days: DAYS.slice(), bench: 135, squat: 155, deadlift: 185, seed: FB_SEEDS[si], injury: { region: 'knee', tier: 'protect' } };
 }
+/** A floor (b) lattice cell: its tier, its focus and its config. */
+interface FbRow { eq: string; f: string; cfg: LooseCfg }
 /** 630 configs: five tiers x six goals x seven foci x three experiences, knee protect. */
-function floorBLattice() {
-  const out = [];
+function floorBLattice(): FbRow[] {
+  const out: FbRow[] = [];
   for (const eq of FB_TIERS) FB_GOALS.forEach((_, gi) => FB_FOC.forEach((f, fi) => FB_EXPS.forEach((e, ei) => {
     const si = (gi + fi + ei) % 2;
     out.push({ eq, f, cfg: fbMk(eq, gi, f, e, si ? '55+' : '18-35', si) });
@@ -145,16 +151,17 @@ const FB_FROM = "(_R==='knee'&&_T==='protect') ? _floorPool(_left,1,'Bodyweight 
 /** The app with floor (b) written out. */
 const noFloorB = () => SB.variant('no-floor-b', [[FB_FROM, '_left']]);
 /** Which configs floor (b) moves: the program differs from the one built without it. */
-function floorBFires(rows) {
+interface FbFires { built: number; crashed: string[]; count: Record<string, number>; fire: Record<string, number>; prevN: number; prevFire: number }
+function floorBFires(rows: FbRow[]): FbFires {
   const C = SB.page(), Q = SB.page(noFloorB());
-  const r = { built: 0, crashed: [], count: {}, fire: {}, prevN: 0, prevFire: 0 };
+  const r: FbFires = { built: 0, crashed: [], count: {}, fire: {}, prevN: 0, prevFire: 0 };
   FB_TIERS.forEach((t) => { r.count[t] = 0; r.fire[t] = 0; });
   for (const x of rows) {
     r.count[x.eq]++;
     const pv = x.f === 'support_prevention';
     if (pv) r.prevN++;
-    let a, b;
-    try { a = progDigest(C.buildProgram(clone(x.cfg))); b = progDigest(Q.buildProgram(clone(x.cfg))); } catch (e) { r.crashed.push(e.message); continue; }
+    let a: string, b: string;
+    try { a = progDigest(C.buildProgram(clone(x.cfg))); b = progDigest(Q.buildProgram(clone(x.cfg))); } catch (e) { r.crashed.push((e as Error).message); continue; }
     r.built++;
     if (a !== b) { r.fire[x.eq]++; if (pv) r.prevFire++; }
   }
@@ -169,10 +176,12 @@ function floorBFires(rows) {
 const SH_FOC = ['hypertrophy', 'strength', 'fatloss', 'balanced', 'support_strength', 'support_athletic', 'support_prevention'];
 const SH_REGS = ['knee', 'ankle', 'hip', 'lowback', 'shoulder', 'elbow'], SH_ITIERS = ['workaround', 'protect'];
 const SH_INJ_REGS = ['shoulder', 'elbow', 'knee', 'ankle'], SH_INJ_EQ = ['commercial', 'bodyweight'];
-const RUNNER = { race: true, test: true, none: false };
+const RUNNER: Record<string, boolean> = { race: true, test: true, none: false };
 const BED_THRUST = 'Single-leg hip thrust (shoulders on bed)';
-function preventionShard() {
-  const out = [];
+/** A prevention shard cell: its lattice (FULL, INJ, INJ-LB), whether it is read A against B, its family, tier, injury, config and tag. */
+export interface ShardRow { L: string; ab: boolean; fam: string; eq: string; inj: string; c: LooseCfg; tag: string }
+function preventionShard(): ShardRow[] {
+  const out: Omit<ShardRow, 'tag'>[] = [];
   for (const f of SH_FOC) for (const fam of Object.keys(SB.SH_FAM)) for (const eq of SB.SH_TIERS) for (let ei = 0; ei < 3; ei++) for (let si = 0; si < 4; si++) for (let ri = 0; ri < 2; ri++) {
     if (f === 'support_prevention' && [76308, 87747].includes(SB.SH_SEEDS[si])) out.push({ L: 'FULL', ab: true, fam, eq, inj: 'none', c: SB.shMk(f, fam, eq, ei, si, ri, null) });
   }
@@ -184,29 +193,34 @@ function preventionShard() {
     if (t === 'protect' && SH_INJ_REGS.includes(r) && SH_INJ_EQ.includes(eq)) out.push({ L: 'INJ', ab: true, fam, eq, inj: r + '/' + t, c: SB.shMk(f, fam, eq, ei, si, ri, { region: r, tier: t }) });
     else if (r === 'lowback' && eq === 'bodyweight' && fam !== 'none') out.push({ L: 'INJ-LB', ab: false, fam, eq, inj: r + '/' + t, c: SB.shMk(f, fam, eq, ei, si, ri, { region: r, tier: t }) });
   }
-  out.forEach((x) => { x.tag = x.L + ' ' + [x.fam, x.eq, x.inj, x.c.experience, 's' + x.c.seed, x.c.restDays.join(',')].join('|'); });
-  return out;
+  return out.map((x) => ({ ...x, tag: x.L + ' ' + [x.fam, x.eq, x.inj, x.c.experience, 's' + x.c.seed, x.c.restDays.join(',')].join('|') }));
 }
-const lab = (s) => clean((s && (s.label || s.coreHeader)) || '');
-const dayItems = (day) => { const o = []; liveSecs(day).forEach((s) => { const lb = lab(s), core = !!(s.core || s.coreHeader); (s.items || []).forEach((it) => { if (it && it.name) o.push({ k: lb + ' :: ' + clean(it.name) + ' :: ' + clean(it.detail || ''), lab: lb, core }); }); }); return o; };
-const circuitLines = (s) => (s ? Array.from(s.items, (i) => clean(i.name) + ' :: ' + clean(i.detail || '')) : []);
-const mdiff = (a, b) => { const m = {}; b.forEach((x) => (m[x] = (m[x] || 0) + 1)); return a.filter((x) => { if (m[x]) { m[x]--; return false; } return true; }); };
+const lab = (s: AppDay): string => clean((s && (s.label || s.coreHeader)) || '');
+/** A day's item: section label :: name :: detail, its section's label, and whether that section is a core block. */
+export interface DayItem { k: string; lab: string; core: boolean }
+const dayItems = (day: AppDay): DayItem[] => { const o: DayItem[] = []; liveSecs(day).forEach((s) => { const lb = lab(s), core = !!(s.core || s.coreHeader); (s.items || []).forEach((it: AppDay) => { if (it && it.name) o.push({ k: lb + ' :: ' + clean(it.name) + ' :: ' + clean(it.detail || ''), lab: lb, core }); }); }); return o; };
+const circuitLines = (s: AppDay): string[] => (s ? Array.from<AppDay, string>(s.items, (i) => clean(i.name) + ' :: ' + clean(i.detail || '')) : []);
+const mdiff = (a: string[], b: string[]): string[] => { const m: Record<string, number> = {}; b.forEach((x) => (m[x] = (m[x] || 0) + 1)); return a.filter((x) => { if (m[x]) { m[x]--; return false; } return true; }); };
 /**
  * Each config built on the app (C) and on the app without D195-A (N, the A step's own before), on fresh pages, N built
  * twice. For every leg day (either app carries the runner armor circuit) the day's items, the circuit, the calf and
  * the byte form are kept; each program's swap universe is kept on both apps.
  */
-function shardBuild(rows) {
+/** One leg day on both apps: the circuit lines, the circuit label, rounds, the calf, every item, and whether the day is byte equal. */
+export interface LegDayRec { tag: string; Ni: string[]; Ci: string[]; labC: string; rn: number | null; rc: number | null; calfN: boolean; calfC: boolean; iN: DayItem[]; iC: DayItem[]; same: boolean }
+/** One shard cell's builds: its crashes, its leg days, the before built equal to itself, and each app's swap universe. */
+export interface ShardRec { x: ShardRow; runner: boolean; crash: string[]; days: LegDayRec[]; self: boolean; uC: Set<string>; uN: Set<string>; hasU: boolean }
+function shardBuild(rows: ShardRow[]): ShardRec[] {
   const XC = SB.page(), XN = SB.page(SB.noHipExtA()), XN2 = SB.page(SB.noHipExtA());
-  const bld = (X, c) => { try { return X.buildProgram(clone(c)); } catch (e) { return { __crash: e.message, weeks: {} }; } };
-  const out = [];
+  const bld = (X: App, c: LooseCfg): AppProgram => { try { return X.buildProgram(clone(c)); } catch (e) { return { __crash: (e as Error).message, weeks: {} }; } };
+  const out: ShardRec[] = [];
   for (const x of rows) {
     const pc = bld(XC, x.c), pn = bld(XN, x.c), pn2 = bld(XN2, x.c);
-    const rec = { x, runner: RUNNER[x.fam], crash: [pc, pn, pn2].filter((p) => p.__crash).map((p) => p.__crash), days: [],
+    const rec: ShardRec = { x, runner: RUNNER[x.fam], crash: [pc, pn, pn2].filter((p) => p.__crash).map((p) => p.__crash as string), days: [],
       self: !pn.__crash && !pn2.__crash && progDigest(pn) === progDigest(pn2),
       uC: new Set(pc._swapUniverse || []), uN: new Set(pn._swapUniverse || []), hasU: Array.isArray(pc._swapUniverse) && Array.isArray(pn._swapUniverse) };
     if (x.ab && !rec.crash.length) {
-      const wks = [...new Set(Object.keys(pn.weeks || {}).concat(Object.keys(pc.weeks || {})))].sort((a, b) => a - b);
+      const wks = [...new Set(Object.keys(pn.weeks || {}).concat(Object.keys(pc.weeks || {})))].sort((a, b) => Number(a) - Number(b));
       for (const w of wks) for (const d of ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']) {
         const N = ((pn.weeks || {})[w] || {})[d], C = ((pc.weeks || {})[w] || {})[d], cn = circuit(N), cc = circuit(C);
         if (!cn && !cc) continue;
@@ -219,19 +233,21 @@ function shardBuild(rows) {
   return out;
 }
 /** One leg day read against the A step's before: what A added and removed, and whether the circuit only grew at the end. */
-function analyse(z) {
+function analyse(z: LegDayRec) {
   const kn = z.iN.map((i) => i.k), kc = z.iC.map((i) => i.k), add = mdiff(kc, kn), rem = mdiff(kn, kc);
-  const remIt = rem.map((k) => z.iN.find((i) => i.k === k));
+  const remIt = rem.map((k) => z.iN.find((i) => i.k === k)!);
   const remBad = remIt.filter((i) => !(/^Loaded carry finisher/.test(i.lab) || i.core));
   const coreEmptied = z.iN.some((i) => i.core) && !z.iC.some((i) => i.core);
   const head = JSON.stringify(z.Ci.slice(0, z.Ni.length)) === JSON.stringify(z.Ni);
   const appended = z.Ni.length > 0 && z.Ci.length === z.Ni.length + 1 && head;
   const addOK = !add.length || (add.length === 1 && appended && add[0] === z.labC + ' :: ' + z.Ci[z.Ci.length - 1]);
-  const nm = (L) => L.map((q) => q.split(' :: ')[0]);
+  const nm = (L: string[]) => L.map((q) => q.split(' :: ')[0]);
   const lit12 = JSON.stringify(nm(z.Ni).slice(0, 2)) === JSON.stringify(nm(z.Ci).slice(0, 2));
   const rounds = !(z.Ni.length && z.Ci.length) || z.rn === z.rc;
   return { add, rem, remIt, remBad, coreEmptied, appended, grew: z.Ci.length > z.Ni.length, addOK, lit12, rounds };
 }
+/** A leg day with its shard record and its analysis, as the tests read it. */
+export type AnalysedDay = LegDayRec & { r: ShardRec; a: ReturnType<typeof analyse> };
 
 export {
   FOURTH, CALF_STR, CARRY_STR, CIRCUIT_RE, UNIVERSE, TUE, hasSec, circuit, circuitItems, LEGS_DAYS, CELL_F1, CELL_FH, CARD_F1, CARD_F1_THREE,

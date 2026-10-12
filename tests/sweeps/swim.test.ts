@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Swim, the lattices. The same claims as tests/integration/swim.test.js, which runs them on samples; this file runs
 // them whole. CI runs it, the 60-second check does not.
 //   - the swim time lattice (504 programs): 500 and 100 goals x three experiences x three ages x five current times
@@ -10,6 +9,7 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { loadApp, pinClock } from '../support/app.ts';
 import * as S from '../support/swim.ts';
+import type { Cfg } from '@ia/core';
 const { clone } = S;
 
 const IA = loadApp();
@@ -28,7 +28,7 @@ test('the swim time lattice builds 504 programs and reaches every kind of goal, 
 test('week 1 is the anchor split, every split is on the hand model within the rate, every repeat is the split less 2 s', () => {
   // R1, R2, R3a, R3b, R3c
   assert.ok(CK.R.w1F >= 100 && CK.R.w1S >= 100);
-  for (const k of ['r1', 'r2', 'r3a', 'r3b', 'r3c']) assert.deepEqual(CK.bad[k], [], k);
+  for (const k of ['r1', 'r2', 'r3a', 'r3b', 'r3c'] as const) assert.deepEqual(CK.bad[k], [], k);
 });
 
 test('goals at or slower than current hold at the anchor with the goal met note; out-of-reach notes quote a printed split', () => {
@@ -78,7 +78,7 @@ test('the sizer lattice: all 7,560 seconds-only entries size as their m:ss twins
   // L1 (both rows)
   const LEN = S.sizer(IA);
   let n = 0, bad = [], label = 0;
-  for (const goal of Object.keys(S.SIZER_TIMES)) for (const exp of ['beginner', 'intermediate', 'advanced']) for (const age of ['18-35', '36-54', '55+'])
+  for (const goal of Object.keys(S.SIZER_TIMES)) for (const exp of ['beginner', 'intermediate', 'advanced'] as const) for (const age of ['18-35', '36-54', '55+'])
     for (const t of S.SIZER_TIMES[goal].T) for (const c of S.SIZER_TIMES[goal].C) {
       const lt = LEN(S.sizerGoal(goal, t, c, 'mss', 'mss'), exp, age);
       for (const tf of S.FORMS) for (const cf of S.FORMS) {
@@ -96,11 +96,11 @@ test('the sizer lattice: all 7,560 seconds-only entries size as their m:ss twins
 
 test('the build lattice: all 192 seconds-only builds equal their m:ss twins, and no cfg is mutated', () => {
   // L2 (both rows)
-  const PAIRS = { swim_100_time: [[55, 59], [75, 90]], swim_500_time: [[420, 480], [540, 600]] };
+  const PAIRS: Record<string, [number, number][]> = { swim_100_time: [[55, 59], [75, 90]], swim_500_time: [[420, 480], [540, 600]] };
   const F2 = [['undef', 'mss'], ['mss', 'undef'], ['undef', 'undef'], ['empty', 'empty']];
-  const run = cfg => { const c = clone(cfg), before = JSON.stringify(c), p = IA.buildProgram(c); return { p, pure: JSON.stringify(c) === before }; };
+  const run = (cfg: Cfg) => { const c = clone(cfg), before = JSON.stringify(c), p = IA.buildProgram(c); return { p, pure: JSON.stringify(c) === before }; };
   let n = 0, impure = 0; const bad = [];
-  for (const goal of Object.keys(PAIRS)) for (const exp of ['beginner', 'intermediate', 'advanced']) for (const age of ['18-35', '55+']) for (const [t, c] of PAIRS[goal]) for (const mix of ['swim', 'run+swim']) {
+  for (const goal of Object.keys(PAIRS)) for (const exp of ['beginner', 'intermediate', 'advanced'] as const) for (const age of ['18-35', '55+']) for (const [t, c] of PAIRS[goal]) for (const mix of ['swim', 'run+swim']) {
     const tw = run(S.sizerCfg({ g: S.sizerGoal(goal, t, c, 'mss', 'mss'), exp, age, mix }));
     if (!tw.pure) impure++;
     for (const [tf, cf] of F2) {

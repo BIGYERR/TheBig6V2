@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The block open lattices whole (CI only): tests/integration/race-date.test.js runs each claim on a sample. Ruling
 // D180 (P-BLOCKOPEN). Oracles as in the integration file: the Nike plan lengths and Monday arithmetic for a race
 // program's start, the days before Thu 2026-09-24 by date arithmetic, and the ruling's blast radius: of the 365 aligned
@@ -29,5 +28,5 @@ test('every wizard row lands on week 1 as it renders after a reboot and as its o
     assert.equal(o.keysDiff, 'overlays', o.row.name);
   }
   for (const o of aligned) assert.deepEqual([o.stored.blockOpen, o.stored.startDate, R.parseWeek(o.landing).pre], [R.TODAY_ISO, o.hStart, o.hPre], o.row.name);
-  assert.equal(R.parseWeek(out.find(o => /HALF_MANNY/.test(o.row.name)).landing).done, '0 /0 DONE');
+  assert.equal(R.parseWeek(out.find(o => /HALF_MANNY/.test(o.row.name))!.landing).done, '0 /0 DONE');
 });

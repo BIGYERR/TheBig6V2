@@ -81,6 +81,12 @@ export interface CardioGoal {
   targetSecs?: string;
   targetTime?: string;
   swimUnit?: string;
+  /** Swim time goals: the current 500 (the 500 goal) or the current 100 (the 100 goal), minutes and seconds. */
+  baseMins?: string;
+  baseSecs?: string;
+  /** The 100 goal: the current 500, the clock's anchor. */
+  base500Mins?: string;
+  base500Secs?: string;
   ftp?: string;
 }
 

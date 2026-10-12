@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Swim: the swim time goal's clock, the goal sheet, the required current time, and the program sizer. Rulings:
 //   D110a one rate on one clock: the weekly split gain is the program sizer's 4 / 3 / 2 s per 100 x the age scale; a goal
 //         not faster than the current split holds; the repeat split is the week's split less 2 s (guide A p12); the
@@ -19,12 +18,13 @@ import assert from 'node:assert/strict';
 import { loadApp, pinClock, progDigest } from '../support/app.ts';
 import { matchSnapshot } from '../support/snapshot.ts';
 import * as S from '../support/swim.ts';
+import type { CardioGoal, Cfg, Day, Program } from '@ia/core';
 const { clone } = S;
 
 const NOON = new Date(2026, 9, 11, 12, 0, 0);
 const IA = loadApp();
 pinClock(IA, NOON);
-const build = cfg => IA.buildProgram(clone(cfg));
+const build = (cfg: Cfg): Program => IA.buildProgram(clone(cfg));
 const fresh = () => { const A = loadApp(); pinClock(A, NOON); return A; };
 
 test('a swim time program equals itself built twice', () => {
@@ -42,7 +42,7 @@ test('the sample reaches every kind of goal: faster, at or slower than current, 
   const { R } = CK;
   assert.equal(R.builds, SAMPLE.length);
   assert.ok(R.ints >= R.builds * 3, R.ints + ' INT cards');
-  for (const k of ['faster', 'slower', 'damp', 'blank', 'rawZero', 'steps', 'w1F', 'w1S']) assert.ok(R[k] > 0, k);
+  for (const k of ['faster', 'slower', 'damp', 'blank', 'rawZero', 'steps', 'w1F', 'w1S'] as (keyof S.ClockTally)[]) assert.ok(R[k] > 0, k);
 });
 
 test('week 1 prints the anchor split, every split is on the hand model, and every step is within the rate', () => {
@@ -115,7 +115,7 @@ test('every distance swim INT note, alone or beside a run, is the distance note:
 test('a 100 goal with a 10:16 500, a 1:30 current 100 and a 1:20 goal: week 1 is 2:03 (616 / 5) with a 2:01 repeat, on the hand line', () => {
   // D1 (both rows)
   const p = build(S.goal100({ base500Mins: '10', base500Secs: '16', baseMins: '1', baseSecs: '30', targetMins: '1', targetSecs: '20' }));
-  const tw = Object.keys(p.weeks).length, s = S.splitsOf(p), w1 = s.find(x => x.w === 1);
+  const tw = Object.keys(p.weeks).length, s = S.splitsOf(p), w1 = s.find(x => x.w === 1)!;
   assert.deepEqual([w1.s, w1.r], ['2:03', '2:01']);
   const E = 616 / 5, gap = 90 - 80, r = Math.min(gap / tw, 3);
   assert.ok(s.length >= 3);
@@ -166,7 +166,7 @@ test('an out-of-reach 100 goal names the goal as "0:50 for 100yd", week 5 splits
     assert.ok(x.n.indexOf('Your full goal of 0:50 for 100yd needs more weeks than this block has.') >= 0);
     assert.ok(x.n.indexOf('The target for this block is 1:51/100.') >= 0);
   }
-  assert.equal(s.find(x => x.w === 5).s, '1:51');
+  assert.equal(s.find(x => x.w === 5)!.s, '1:51');
 });
 
 test('the 100 goal floor: a gap at or past the advanced default holds at 1:35 with a 1:33 repeat, the anchor line and the goal met note', () => {
@@ -191,7 +191,7 @@ test('a seconds-only current 100 (0:58) is read as entered: the gap applies, no 
   // SO1
   const c = S.swimCfg({ goal: 'swim_100_time', exp: 'intermediate', age: '18-35', b500: 300, tgt: 55, unit: 'yd', seed: 76308, raw: { baseMins: '', baseSecs: '58' } });
   const s = S.splitsOf(build(c));
-  assert.equal(s.find(x => x.w === 1).s, '1:00');
+  assert.equal(s.find(x => x.w === 1)!.s, '1:00');
   assert.ok(S.secs(s[s.length - 1].s) < 60);
   assert.ok(!s.some(x => x.n.indexOf(S.GOAL_MET_NOTE) >= 0) && !s.some(x => /No current/.test(x.n)));
 });
@@ -199,15 +199,15 @@ test('a seconds-only current 100 (0:58) is read as entered: the gap applies, no 
 // ── the goal sheet carries each current time to where it lives (D144) ──────────────────────────────────────────────
 const SHEET = fresh();
 const KEYS = ['swimUnit', 'baseMins', 'baseSecs', 'base500Mins', 'base500Secs'];
-const pick = g => { const o = {}; for (const k of KEYS) if (g && g[k] !== undefined) o[k] = g[k]; return o; };
-function sheetChange(prev, sel, tgt) {
+const pick = (g: object | null | undefined): Record<string, unknown> => { const o: Record<string, unknown> = {}; for (const k of KEYS) if (g && (g as Record<string, unknown>)[k] !== undefined) o[k] = (g as Record<string, unknown>)[k]; return o; };
+function sheetChange(prev: CardioGoal, sel: string, tgt: [string, string]): { saved: Cfg | null; err: string } {
   const c = S.swimCfg({ goal: 'swim_500_time', exp: 'intermediate', age: '18-35', tgt: 570, unit: 'm', seed: 76308 });
   c.cardioGoals = { swim: clone(prev) };
-  const pr = SHEET.buildProgram(clone(c)); pr.id = 'p_sheet'; pr.cfg = clone(c);
+  const pr = Object.assign(SHEET.buildProgram(clone(c)), { id: 'p_sheet', cfg: clone(c) });
   SHEET.localStorage.setItem('ia_programs', JSON.stringify([pr]));
   SHEET.eval("_goalDraft={progId:'p_sheet',sport:'swim',sel:'" + sel + "',inputs:{targetMins:'" + tgt[0] + "',targetSecs:'" + tgt[1] + "'}};");
-  let err = ''; try { SHEET.eval('commitGoalChange()'); } catch (e) { err = String(e && e.message || e); }
-  let saved = null; try { saved = JSON.parse(SHEET.localStorage.getItem('ia_programs'))[0].cfg; } catch (e) { /* no write */ }
+  let err = ''; try { SHEET.eval('commitGoalChange()'); } catch (e) { err = String(e && (e as Error).message || e); }
+  let saved: Cfg | null = null; try { saved = JSON.parse(SHEET.localStorage.getItem('ia_programs')!)[0].cfg; } catch (e) { /* no write */ }
   return { saved, err };
 }
 const B500 = { id: 'swim_500_time', label: 'Improve 500 Time', swimUnit: 'm', baseMins: '10', baseSecs: '16', targetMins: '9', targetSecs: '30' };
@@ -215,7 +215,7 @@ const C100 = { id: 'swim_100_time', label: 'Improve 100 Time', swimUnit: 'yd', b
 const C100ONLY = { id: 'swim_100_time', label: 'Improve 100 Time', swimUnit: 'yd', baseMins: '1', baseSecs: '45', targetMins: '1', targetSecs: '30' };
 const TRI = { id: 'swim_tri', label: 'Triathlon Swim', baselineDist: '1000', baseline: '1000m', swimUnit: 'm' };
 // [case, previous goal, new goal, target, the keys the hand table carries]
-const CASES = [
+const CASES: [string, CardioGoal, string, [string, string], Record<string, string>][] = [
   ['500->500 (swimmer B)', B500, 'swim_500_time', ['9', '0'], { swimUnit: 'm', baseMins: '10', baseSecs: '16' }],
   ['500->100', B500, 'swim_100_time', ['1', '50'], { swimUnit: 'm', base500Mins: '10', base500Secs: '16' }],
   ['100->500 with a 500 time', C100, 'swim_500_time', ['9', '0'], { swimUnit: 'yd', baseMins: '9', baseSecs: '50' }],
@@ -223,7 +223,7 @@ const CASES = [
   ['100->100', C100, 'swim_100_time', ['1', '25'], { swimUnit: 'yd', baseMins: '1', baseSecs: '45', base500Mins: '9', base500Secs: '50' }],
   ['tri->500', TRI, 'swim_500_time', ['9', '0'], { swimUnit: 'm' }],
 ];
-const SHEET_OUT = {};
+const SHEET_OUT: Record<string, { saved: Cfg | null; err: string }> = {};
 for (const [lbl, prev, sel, tgt] of CASES) SHEET_OUT[lbl] = sheetChange(prev, sel, tgt);
 
 test('the goal sheet saves every swim goal switch, carries the pool unit, and writes exactly the hand table\'s current times', () => {
@@ -239,14 +239,14 @@ test('the goal sheet saves every swim goal switch, carries the pool unit, and wr
 
 test('a 100 goal switched to a 500 with no 500 on file prints the no current time line', () => {
   // SH3
-  const c = SHEET_OUT['100->500 current 100 only'].saved;
-  const w1 = S.intCards(build(c)).find(x => x.w === 1);
+  const c = SHEET_OUT['100->500 current 100 only'].saved!;
+  const w1 = S.intCards(build(c)).find(x => x.w === 1)!;
   assert.equal(String(w1.c.note || '').indexOf(S.anchorLineOf('yd', 'intermediate')), 0);
 });
 
 test('swimmer B rebuilt after a sheet change to 9:00 prints 100m repeats at 2:01 on a 2:03 split, and its program matches the snapshot', () => {
   // SH4, SH5
-  const p = build(SHEET_OUT['500->500 (swimmer B)'].saved), w1 = S.intCards(p).find(x => x.w === 1), d = String(w1.c.detail || '');
+  const p = build(SHEET_OUT['500->500 (swimmer B)'].saved!), w1 = S.intCards(p).find(x => x.w === 1)!, d = String(w1.c.detail || '');
   assert.match(d, /x 100m at 2:01\/100/);
   assert.match(d, /goal split of 2:03\/100/);
   matchSnapshot('swim', { swimmerBRebuilt: progDigest(p) });
@@ -254,27 +254,27 @@ test('swimmer B rebuilt after a sheet change to 9:00 prints 100m repeats at 2:01
 
 test('the goal sheet carries a seconds-only current 100, both limbs as stored', () => {
   // SO2
-  const SO = [['minutes box empty', { id: 'swim_100_time', label: 'x', swimUnit: 'yd', baseMins: '', baseSecs: '58', targetMins: '0', targetSecs: '55' }, { swimUnit: 'yd', baseMins: '', baseSecs: '58' }],
+  const SO: [string, CardioGoal, Record<string, string>][] = [['minutes box empty', { id: 'swim_100_time', label: 'x', swimUnit: 'yd', baseMins: '', baseSecs: '58', targetMins: '0', targetSecs: '55' }, { swimUnit: 'yd', baseMins: '', baseSecs: '58' }],
     ['no minutes key', { id: 'swim_100_time', label: 'x', swimUnit: 'yd', baseSecs: '58', targetMins: '0', targetSecs: '55' }, { swimUnit: 'yd', baseSecs: '58' }]];
   for (const [lbl, prev, want] of SO) {
     const { saved } = sheetChange(prev, 'swim_100_time', ['0', '54']);
-    assert.deepEqual(pick(saved.cardioGoals.swim), want, lbl);
+    assert.deepEqual(pick(saved!.cardioGoals.swim), want, lbl);
   }
 });
 
 // ── a current time is required (M2) ─────────────────────────────────────────────────────────────────────────────────
 const REAL = 'That is not a real time. Check the minutes and seconds.';
-const REQ = (d, u) => 'Required. Enter your most recent timed ' + d + u + '.';
+const REQ = (d: number, u: string) => 'Required. Enter your most recent timed ' + d + u + '.';
 const FASTER = 'Your 500 pace is faster than your 100 time. Check both entries.';
 const LINE = 'Your repeats key off your 500 pace. Your 100 time sets the goal.';
 
 test('_swimEntryState answers the hand table: the 500 prompt first, the 100 prompt, faster than, not a real time, ok', () => {
   // M2a, M2f
-  const s5 = (m, s) => ({ base500Mins: m, base500Secs: s }), s1 = (m, s) => ({ baseMins: m, baseSecs: s });
-  const G5 = (u, x) => Object.assign({ id: 'swim_500_time', label: 'x', swimUnit: u, targetMins: '9', targetSecs: '0' }, x || {});
-  const G1 = (u, x) => Object.assign({ id: 'swim_100_time', label: 'x', swimUnit: u, targetMins: '1', targetSecs: '20' }, x || {});
+  const s5 = (m: string, s: string) => ({ base500Mins: m, base500Secs: s }), s1 = (m: string, s: string) => ({ baseMins: m, baseSecs: s });
+  const G5 = (u: string, x?: Partial<CardioGoal>) => Object.assign({ id: 'swim_500_time', label: 'x', swimUnit: u, targetMins: '9', targetSecs: '0' }, x || {});
+  const G1 = (u: string, x?: Partial<CardioGoal>) => Object.assign({ id: 'swim_100_time', label: 'x', swimUnit: u, targetMins: '1', targetSecs: '20' }, x || {});
   const OK = { ok: true, blank: false, msg: '' };
-  const T = [
+  const T: [string, CardioGoal | null, { ok: boolean; blank: boolean; msg: string }][] = [
     ['500 goal, blank, yd', G5('yd'), { ok: false, blank: true, msg: REQ(500, 'yd') }],
     ['500 goal, blank, m', G5('m'), { ok: false, blank: true, msg: REQ(500, 'm') }],
     ['500 goal, 0:00', G5('yd', s1('0', '0')), { ok: false, blank: true, msg: REQ(500, 'yd') }],
@@ -298,7 +298,7 @@ test('_swimEntryState answers the hand table: the 500 prompt first, the 100 prom
     ['100 goal, seconds 61 with the 500 blank (not real ahead of blank)', G1('yd', s1('1', '61')), { ok: false, blank: false, msg: REAL }],
   ];
   assert.equal(IA.eval('typeof _swimEntryState'), 'function');
-  const msgs = new Set();
+  const msgs = new Set<string>();
   for (const [lbl, g, want] of T) {
     const got = JSON.parse(IA.eval('JSON.stringify(_swimEntryState(' + JSON.stringify(g) + '))'));
     if (got.msg) msgs.add(got.msg);
@@ -324,12 +324,12 @@ test('doGenerate checks the swim entry before it shows the generate screen, and 
 test('doGenerate refuses a 500 goal with no current time, saving nothing and toasting the prompt; with 10:16 it saves one program', () => {
   // M2d (both rows)
   const A = fresh();
-  const gen = goal => {
+  const gen = (goal: CardioGoal) => {
     const c = S.swimCfg({ goal: 'swim_500_time', exp: 'intermediate', age: '18-35', tgt: 540, unit: 'yd', seed: 76308 });
     c.cardioGoals = { swim: goal };
     A.localStorage.setItem('ia_programs', '[]'); A.eval('WD=' + JSON.stringify(c) + ';');
     A.eval('var __toasts=[]; showToast=function(m){__toasts.push(String(m))};');
-    let err = ''; try { A.eval('doGenerate()'); } catch (e) { err = String(e.message); }
+    let err = ''; try { A.eval('doGenerate()'); } catch (e) { err = String((e as Error).message); }
     A.flushTimers(50);
     return { n: JSON.parse(A.localStorage.getItem('ia_programs') || '[]').length, toast: JSON.parse(A.eval('JSON.stringify(__toasts)')), err };
   };
@@ -341,7 +341,7 @@ test('doGenerate refuses a 500 goal with no current time, saving nothing and toa
 
 test('the swim label is "Your most recent timed <dist><unit>", and the 100 goal\'s 500 label and coach\'s line appear once', () => {
   // M2e
-  const cnt = t => IA.html.split(t).length - 1;
+  const cnt = (t: string) => IA.html.split(t).length - 1;
   assert.equal(cnt("Your most recent timed ${SWIM_GOAL_DIST[g.id]}${g.swimUnit||'yd'}</div>"), 1);
   assert.equal(cnt("Your most recent timed 500${g.swimUnit||'yd'}</div>"), 1);
   assert.equal(cnt(LINE), 1);
@@ -350,14 +350,14 @@ test('the swim label is "Your most recent timed <dist><unit>", and the 100 goal\
 
 // ── the sizer reads the engine's clock (D157) ───────────────────────────────────────────────────────────────────────
 const LEN = S.sizer(IA);
-const lenEq = (a, b) => a.weeks === b.weeks && a.warning === b.warning;
-const weeksOf = cfg => { const c = clone(cfg), before = JSON.stringify(c), p = IA.buildProgram(c); return { p, pure: JSON.stringify(c) === before }; };
+const lenEq = (a: S.Sized, b: S.Sized) => a.weeks === b.weeks && a.warning === b.warning;
+const weeksOf = (cfg: Cfg) => { const c = clone(cfg), before = JSON.stringify(c), p = IA.buildProgram(c); return { p, pure: JSON.stringify(c) === before }; };
 
 test('the unit entry, 0:55 against 0:59 typed as seconds alone, sizes as its m:ss twin: "needs 7 weeks" warned, 8 weeks built', () => {
   // U1, U2
   const e = LEN(S.UNIT, 'advanced', '18-35'), t = LEN(S.UNIT_TWIN, 'advanced', '18-35');
   // by hand: gap 59 - 55 = 4 s/100; advanced 18-35 gains 2 s/100/week; ceil(4 / 2) = 2; round(2 x 1.25) + 4 = 7
-  assert.ok(String(e.warning).includes('100 Time (0:55/100yd) needs 7 weeks'), e.warning);
+  assert.ok(String(e.warning).includes('100 Time (0:55/100yd) needs 7 weeks'), String(e.warning));
   assert.ok(lenEq(e, t));
   const be = weeksOf(S.sizerCfg({ g: S.UNIT, exp: 'advanced', age: '18-35' })), bt = weeksOf(S.sizerCfg({ g: S.UNIT_TWIN, exp: 'advanced', age: '18-35' }));
   assert.equal(be.p.totalWeeks, bt.p.totalWeeks);
@@ -383,7 +383,7 @@ test('every seconds-only sizer entry sizes as its m:ss twin, weeks and warning b
 
 test('every seconds-only full build equals its m:ss twin, and buildProgram leaves the cfg byte-identical (a sample)', () => {
   // L2 (a sample: intermediate 18-35, one time pair per goal; the sweep runs the 192-build lattice)
-  const PAIRS = { swim_100_time: [55, 59], swim_500_time: [420, 480] };
+  const PAIRS: Record<string, [number, number]> = { swim_100_time: [55, 59], swim_500_time: [420, 480] };
   for (const goal of Object.keys(PAIRS)) for (const mix of ['swim', 'run+swim']) {
     const [t, c] = PAIRS[goal], tw = weeksOf(S.sizerCfg({ g: S.sizerGoal(goal, t, c, 'mss', 'mss'), exp: 'intermediate', age: '18-35', mix }));
     assert.ok(tw.pure);
@@ -399,7 +399,7 @@ test('every seconds-only full build equals its m:ss twin, and buildProgram leave
 test('a 0:00 target sizes as no target (no time label), and a 0:00 current time as no current time', () => {
   // Z1
   let n = 0;
-  for (const goal of ['swim_100_time', 'swim_500_time']) for (const exp of ['beginner', 'intermediate', 'advanced']) for (const age of ['18-35', '55+']) {
+  for (const goal of ['swim_100_time', 'swim_500_time']) for (const exp of ['beginner', 'intermediate', 'advanced'] as const) for (const age of ['18-35', '55+']) {
     const base = goal === 'swim_100_time' ? { baseMins: '1', baseSecs: '5', base500Mins: '6', base500Secs: '0' } : { baseMins: '8', baseSecs: '0' };
     const absT = Object.assign({ id: goal, label: goal, swimUnit: 'yd' }, base), la = LEN(absT, exp, age);
     for (const z of S.ZERO_TARGETS) {
@@ -421,11 +421,11 @@ const WLEN = S.sizer(WZ);
 
 test('the pace line and the step\'s first render show a seconds-only target as its m:ss twin, by hand: "<t> is <pace> per 100 <unit>."', () => {
   // LB1, LB2
-  const PT = { swim_100_time: [30, 45, 55, 59, 60, 65, 75, 90, 119, 120, 150], swim_500_time: [240, 300, 330, 420, 540, 599, 600, 660, 900] };
+  const PT: Record<string, number[]> = { swim_100_time: [30, 45, 55, 59, 60, 65, 75, 90, 119, 120, 150], swim_500_time: [240, 300, 330, 420, 540, 599, 600, 660, 900] };
   let twins = 0, forms = 0;
   for (const goal of Object.keys(PT)) for (const unit of ['yd', 'm']) for (const t of PT[goal]) {
-    const mk = form => S.put(Object.assign({ id: goal, label: goal, swimUnit: unit }, S.LABEL_CURRENT[goal]), 'target', t, form);
-    const tw = { W: S.paceLine(WZ, mk('mss')), R: S.paceLineRendered(WZ, mk('mss')) }, want = S.paceLineText(t, goal, unit);
+    const mk = (form: string) => S.put(Object.assign({ id: goal, label: goal, swimUnit: unit }, S.LABEL_CURRENT[goal]), 'target', t, form);
+    const tw: Record<string, { disp: string; txt: string }> = { W: S.paceLine(WZ, mk('mss')), R: S.paceLineRendered(WZ, mk('mss')) }, want = S.paceLineText(t, goal, unit);
     for (const k of ['W', 'R']) { twins++; assert.deepEqual([tw[k].disp, tw[k].txt], ['block', want], `${k} ${goal} ${unit} ${t}`); }
     twins++; assert.ok(String(WLEN(mk('mss'), 'intermediate', '18-35').warning).includes(S.warningLabel(t, goal, unit)), `sizer ${goal} ${unit} ${t}`);
     for (const form of ['undef', 'empty']) for (const k of ['W', 'R']) {
@@ -476,12 +476,12 @@ test('a stored seconds-only program pinned at 7 weeks boots at 7 with every trai
   G.window.__W = WD; G.eval('WD=JSON.parse(JSON.stringify(__W))');
   G.eval('doGenerate()'); G.flushTimers(Infinity);
   assert.equal(G.eval('activeProg').totalWeeks, 8, 'a fresh generate sizes 8');
-  const store = new Map(G.localStorage._map), rec = JSON.parse(store.get('ia_programs'))[0];
+  const store = new Map(G.localStorage._map), rec = JSON.parse(store.get('ia_programs')!)[0];
   rec.cfg._raceDateCappedWeeks = 7;
   const p7 = G.buildProgram(clone(rec.cfg)); rec.weeks = p7.weeks; rec.totalWeeks = p7.totalWeeks;
   assert.equal(rec.totalWeeks, 7);
   store.set('ia_programs', JSON.stringify([rec]));
-  const hist = {}, comp = {};
+  const hist: Record<string, Day> = {}, comp: Record<string, string> = {};
   for (const w of [1, 2, 3]) for (const d of WEEK) {
     if (w === 3 && !['mon', 'tue'].includes(d)) continue;
     const day = rec.weeks[w] && rec.weeks[w][d]; if (!day || day.rest) continue;
@@ -493,7 +493,7 @@ test('a stored seconds-only program pinned at 7 weeks boots at 7 with every trai
   B.eval('activeProg=null; activeProgId=null; init()'); B.flushTimers(50);
   const p = B.eval('activeProg');
   assert.equal(p.totalWeeks, 7);
-  assert.equal(JSON.parse(B.localStorage.getItem('ia_programs'))[0].totalWeeks, 7);
+  assert.equal(JSON.parse(B.localStorage.getItem('ia_programs')!)[0].totalWeeks, 7);
   assert.equal(B.eval('currentWeek'), 3, 'the clock took');
   const keys = Object.keys(hist);
   assert.ok(keys.length > 0);

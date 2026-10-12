@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The mile anchor's whole lattices (CI only; tests/integration/mile-anchor.test.js runs a sample of each):
 //   D188, a beginner's mile in every engine read, over 20 seeds (1000 + 37 i);
 //   D188, long-run tiers for beginners and intermediates with and without a mile, over 384 cfgs;

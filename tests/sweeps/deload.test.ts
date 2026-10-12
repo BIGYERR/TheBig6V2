@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Deload weeks, the slow half: the D91 census over its whole 1,728-config lattice (6 tiers x 2 foci x 2 experiences x
 // 3 goals x 4 injuries x 3 rest patterns x 2 seeds), both arms: the app as shipped and the counterfactual with the
 // deload pass off (globalThis.__DELOAD_OFF). About a minute; CI runs it, the 60-second check does not.

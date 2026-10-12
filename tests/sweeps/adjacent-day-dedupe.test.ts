@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The adjacent-day dedupe on the full calendar lattice (CI only; tests/integration/adjacent-day-dedupe.test.js runs a
 // sample). Rulings: D160, D167, D167a, D171, D212. Helpers and lattice: tests/support/adjacent-day-dedupe.js.
 //
@@ -12,8 +11,8 @@ import * as D from '../support/duplicate-movements.ts';
 import * as A from '../support/adjacent-day-dedupe.ts';
 const U = A.calendarLattice();
 const CELLS = U.filter((x) => x.swept || A.PHANTOM_LATTICE[x.mix] || A.multiLimb(x.mix));
-let T;
-function survey() {
+let T: A.Survey | undefined;
+function survey(): A.Survey {
   if (T) return T;
   const text = D.appText();
   T = A.surveyCalendar(CELLS, { inst: A.instrumentedApp(text), lw: A.legacyWalkApp(text) });
@@ -36,7 +35,7 @@ test('every config builds and buildProgram leaves every config unchanged', () =>
 
 test('no rename dodges a name the shipped long-run previous day does not print, on each D160 lattice', () => {
   const S = survey();
-  const want = { NRC: 3600, 'NRC multi': 600, NSW: 3600, injury: 480 };
+  const want: Record<string, number> = { NRC: 3600, 'NRC multi': 600, NSW: 3600, injury: 480 };
   for (const l of Object.keys(want)) {
     assert.equal(S.phantom[l + ' configs'], want[l], l + ' configs');
     assert.equal(S.phantom[l] || 0, 0, l + ': ' + S.phantomEx.join(' | '));

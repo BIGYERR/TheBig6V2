@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The day a Wildcard is stamped on, across daylight saving changes in seven time zones: New York, London, Sydney, Lord
 // Howe (a half hour change), Chatham (a 12:45 offset), UTC and Kolkata (no change at all). Rulings D64 and D71: the
 // day is resolved from the date, never from the week the athlete is browsing.
