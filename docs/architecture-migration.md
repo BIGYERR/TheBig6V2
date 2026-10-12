@@ -147,6 +147,37 @@ Releases keep shipping between phases.
 - From here, builds edit the source files, never the root `index.html`. `npm run sync` reads the sources.
 - **Done when:** the rebuilt file is byte-identical; every test, gate and e2e parity run is unchanged.
 
+**Measured for phase B (2026-10-11, `tests/measure/architecture_split_cutpoints.js` and its `.out.txt`).**
+- **The split is proven.** 55 pieces (5 markup partials, 9 CSS files, 41 JS files) rebuild `index.html` byte for byte
+  (1,341,606 bytes, same sha256). Every JS cut sits between two top-level statements (acorn, plus a compile of every
+  prefix), and every CSS cut sits at brace depth 0.
+- **41 JS files, not section 1's 15 areas.** The code's real order differs: the wizard is in two places, Engine A starts
+  later, and the Engine C helpers and the compound tiers sit apart from where the table put them. Phase B cannot reorder
+  code, so files follow the real order. Seven adjacent pairs merge with no hazard, giving 34 files (session's call):
+  - bike-swim into nrc-race;
+  - shell into rest-day;
+  - engine-a into engine-b-calendar;
+  - lift-ledger into progress-screen;
+  - popups into streaks-reminders;
+  - sections into week-view;
+  - bug-report-init into update-check.
+- **The CSS stays in its 9 files in source order.** The cascade depends on it, and its sections are not grouped by area.
+- **Load order is safe today.** 0 load-time references reach a name declared later. One name is declared twice:
+  `_isoToday`, in wizard.js and overlays.js. The later one wins in one script; both return the same local date string,
+  and phase C keeps one.
+
+**What this changes for phase C.**
+- The file graph is one big cycle: 37 of the 41 files reach each other, in 249 cross-file edges. They cannot become ES
+  modules one for one without circular imports.
+- 25 `let`/`var` names are used across files, and 18 are written outside their own file (`activeProg`, `currentWeek`,
+  `activeProgId`, the log-dose state, ...). They move into explicit state modules first.
+- The global surface is 113 names across 21 files:
+  - 177 inline handler attributes;
+  - 4 `popFire` action strings;
+  - 2 window properties (`_unitLabel`, `iaIsland`).
+- So phase C starts with a measure of the engine subgraph. The engine files likely form an acyclic set that can become
+  real modules first, while the UI files stay together in one legacy module until phase E takes them apart screen by screen.
+
 ### Phase C: ES modules with an explicit global surface (2 to 4 sessions)
 - **Prerequisite:** the legacy gates are retired (test-migration phase 3), because they reach into VM globals that this
   phase removes. The feature tests are the safety net from here.

@@ -1,0 +1,486 @@
+SOURCE index.html  bytes 1341606  lines 18580  ia-version 0.239.1
+style content lines 15-932  script content lines 1214-18522
+top-level statements 766: {"const":121,"function":608,"let":22,"var":11,"statement":4}  (let/const/var statements 154, names 176)
+top-level names declared more than once: 1 [["_isoToday",2]]
+
+JS CUT PROOF: 40/40 prefixes compile with vm.Script (suffixes parse with acorn); 41/41 pieces compile alone
+CSS CUT PROOF: 8/8 cuts at brace depth 0 outside comments/strings; depth at end 0
+
+BYTE IDENTITY: 55 pieces (5 markup, 9 css, 41 js) -> 1341606 bytes vs 1341606: IDENTICAL  (rebuilt at /private/tmp/claude-501/-Users-CanasBangin-Desktop-TheBig6V2/2347e6b9-02e2-486a-a38c-392c75171917/scratchpad/measureB/split/index.rebuilt.html)
+
+JS FILE TABLE (lines are index.html lines; fn = top-level function declarations; b = top-level let/const/var statements)
+   1 storage.js                1215-1379    165 lines  fn  27  b  2  icons, esc, ia_ program/log/history storage, set drafts, day-history snapshots
+   2 rest-day.js               1380-1596    217 lines  fn  15  b  1  rest-day sheet and rest-day moves (ia_moves_), collisions, eligibility
+   3 shell.js                  1597-1624     28 lines  fn   4  b  6  global UI state (activeProgId, currentWeek, ...), showScreen, tab bar, toast
+   4 exercise-library.js       1626-1933    308 lines  fn  15  b 10  EXLIB, carry/press sides, REP_AFFINITY, min experience, station class, supersets, renames, exStoreKey/EX_KEY_ALIAS, seededRand, swap universe
+   5 wizard.js                 1935-3103   1169 lines  fn  48  b 21  day constants, wizard state and steps, start date, race/goal tables, 1RM calc, pace inputs, renderWizardStep
+   6 nsw-cardio.js             3105-4251   1147 lines  fn  13  b  2  paceGoalTarget, calcProgramLength, run progressions, cutback weeks, NSW Table 6 INT/CHI, buildRunSession
+   7 nrc-race.js               4253-4585    333 lines  fn   7  b 10  NRC goals and tables, race countdown, raceAlignment, raceWeekPin, buildNRCSession
+   8 bike-swim.js              4587-4995    409 lines  fn   2  b  0  buildBikeSession, buildSwimSession
+   9 cardio-progression.js     4997-6337   1341 lines  fn  14  b  2  on-ramp, PACE_CHART, row pace, performance predicates, taper, multi-sport targets, buildCardioProgression, spaceHardCardio
+  10 prehab.js                 6339-6600    262 lines  fn   6  b  4  hip, foot/ankle and rehab sections, core pillars, gear lens, bodyweight subs
+  11 power-accessory.js        6601-6988    388 lines  fn  12  b 11  power/explosive dose and rest, bodyweight sets, accessory grammar, hinge clamp, prevention dose, bodyweight sweep
+  12 core-legs.js              6990-7497    508 lines  fn  12  b  1  dynamic core, injectDynamicCore, NRC leg-lift placement, leg/adjacent/same-region deconfliction
+  13 wizard-generate.js        7499-7664    166 lines  fn  10  b  0  generateProgram, length warning, mile/swim advisories, doGenerate
+  14 engine-a.js               7666-7842    177 lines  fn   1  b  0  Engine A timeline and split router
+  15 engine-b-calendar.js      7844-7990    147 lines  fn   3  b  0  Engine B cardio, injury cardio sweep, planCalendar
+  16 injury.js                 7992-8248    257 lines  fn   6  b  4  injury regions, injuryPlan, applyInjuryFilter, injuryDayTitle
+  17 engine-c.js               8250-9614   1365 lines  fn   1  b  0  Engine C kinematic pool filter
+  18 region-caps.js            9616-10022   407 lines  fn   9  b 11  regional fatigue/set/move caps, cardio interference, region and pattern lenses, aux swap families, rep floor
+  19 swaps-edits.js           10023-10451   429 lines  fn  32  b  1  exercise swap candidates, swap store, day edits (add/skip), swap counts (coach nudge store)
+  20 budget-engine-d.js       10452-11320   869 lines  fn  18  b  3  compound tiers, deload, posterior-chain lens, session budget, regional fatigue, Engine D, long-run tiers, race eve, sweeps, buildProgram
+  21 random-wildcard.js       11322-11638   317 lines  fn  15  b  3  random workout, Wildcards
+  22 week-view.js             11640-12288   649 lines  fn  21  b  7  day/date helpers, start-date partial week, tips, hero, day codes, week strip scoot, renderWeekView
+  23 sections.js              12290-12529   240 lines  fn   9  b  0  RPE key, section rounds, buildSectionsHTML, parseRx
+  24 set-logging.js           12530-13169   640 lines  fn  31  b  2  load recency, set auto-save, collapsed set bar, buildExItem, benchmark read-back, buildCardioHTML
+  25 log-entries.js           13171-13626   456 lines  fn  26  b 11  exercise kind predicates, ex weights, entry day, logExerciseWeight, RPE, cardio dose grammar
+  26 wheel-log.js             13628-14013   386 lines  fn  20  b  4  the wheel, cardio log fields, buildLogHTML, export, session progress
+  27 rest-timer.js            14014-14159   146 lines  fn  22  b  2  floating count-up rest stopwatch
+  28 day-detail.js            14161-14415   255 lines  fn  11  b  1  e1RM calculator, range-top nudge, openDetail, KB chips, ex weight steppers
+  29 swap-sheet.js            14416-14724   309 lines  fn  17  b  1  swap sheet, add/skip handlers, undo swap
+  30 day-status.js            14725-15012   288 lines  fn  19  b  2  swap nudge, closeDetail, RPE info, day status, cardio log, export copy
+  31 programs.js              15013-15539   527 lines  fn  29  b  9  program race/start editing, run anchor, program detail, goal sheet, mile pencil, program list
+  32 overlays.js              15540-16127   588 lines  fn  32  b  6  temporary overlays (injury, travel), pace shift, overlay chip and sheets
+  33 program-manage.js        16128-16469   342 lines  fn  14  b  0  refreshProgram, active program, rename, archive/purge/delete
+  34 progress-data.js         16471-16910   440 lines  fn  24  b  8  progress screen entry, recovery pace trend, wizard seed, progress chips, ladder/class/easy/drift/ledger data
+  35 progress-charts.js       16912-17376   465 lines  fn  15  b  1  chart builders, easy-zone redesign
+  36 lift-ledger.js           17378-17668   291 lines  fn   8  b  0  lift ledger model and cards
+  37 progress-screen.js       17670-18067   398 lines  fn   4  b  0  renderProgressScreen, dot charts
+  38 bug-report-init.js       18069-18130    62 lines  fn   2  b  1  bug report, init
+  39 popups.js                18131-18323   193 lines  fn   9  b  4  reinforcement pop-ups
+  40 streaks-reminders.js     18325-18470   146 lines  fn  20  b  0  streaks, stats, reminders
+  41 update-check.js          18472-18521    50 lines  fn   5  b  3  other 4  version label, update banner and check, boot statements
+CSS FILE TABLE
+   1 base.css                 16-44  @import, tokens, reset, light lock
+   2 shell.css                45-106  tab bar, top bar, program list
+   3 wizard.css               107-149  wizard
+   4 week-view.css            150-281  week view, injury state and week wash
+   5 detail-sheet.css         282-488  detail overlay, wheel, dose log, day status, swap, add/skip, e1RM
+   6 overlays-components.css  489-605  random overlay and filter, toast, update banner, generate screen, cards, summary, cardio blocks, overflow
+   7 this-week.css            606-701  this-week redesign: pills, strip, hero, tiles, up next
+   8 session-sheet.css        702-879  session sheet, set bar, logged state, rest stopwatch
+   9 motion.css               880-931  motion, enriched strip, session journal, RPE modal
+MARKUP PARTIALS
+     head.html                1-15  doctype, <head> metas (ia-version), title, <style> open tag
+     screens.html             932-1056  </style></head><body>, update banner, screens 1-4 (home, wizard, generating, week)
+     overlays.html            1057-1214  detail, add, swap nudge, RPE info, random, rest, change, goal, mile sheets, rest float, <script> open tag
+     screens-late.html        18522-18563  </script>, progress and bug screens, tab bar
+     popups.html              18564-18579  reinforcement popup, confetti, </body></html>
+
+SYNC-LEGACY: split(rebuilt) vs pieces read straight from the sources: {"css":true,"js":true,"markup":true,"headRest":true,"version":"0.239.1"}
+
+INSTRUMENT: 3287 references to top-level names; self-check buildProgram->engineA_timeline true, renderWeekView->activeProg true
+
+PER-FILE DEPENDENCIES (defines n; uses names from earlier files <, later files >)
+  storage.js: defines 29; uses 0 names from 0 earlier files, 4 names from 1 later files; used by 23 files
+    defines: ASY_ICON_PATHS ASY_EMOJI esc asyIcon getPrograms savePrograms getActiveProgId setActiveProgId restNorm restNormAll getLogs getLogsFor getDayHistFor getExWeightsFor saveExWeightsFor saveLogs getCompleted saveCompleted getWildcardDone saveWildcardDone logKey readSetDraft writeSetDraft clearSetDraft completedKey getDayHist saveDayHist resnapshotDayEdit snapshotDay
+    > shell.js: activeProg activeProgId currentDayKey currentWeek
+  rest-day.js: defines 16; uses 6 names from 1 earlier files, 10 names from 6 later files; used by 2 files
+    defines: _restDraft openRestSheet closeRestSheet _rdSet renderRestSheet _renderRestMove _renderRestCardio applyRestMove applyRestCardio getRestMoves saveRestMoves applyRestDayMoves _dayRegion restMoveCollisions restDayEligible restMoveCandidates
+    < storage.js: completedKey getCompleted getLogs getPrograms saveLogs savePrograms
+    > shell.js: activeProg activeProgId showToast
+    > wizard.js: DAY_FULL
+    > region-caps.js: _pattern
+    > budget-engine-d.js: _PATTERN_REGION
+    > week-view.js: dayBeforeStart getWeekMonday renderWeekView
+    > log-entries.js: CARDIO_PARK_FIELDS
+  shell.js: defines 19; uses 0 names from 0 earlier files, 4 names from 4 later files; used by 21 files
+    defines: activeProgId currentWeek currentDayKey activeProg calcLift editProgId progressViewId confirmProgId confirmTier _staleWarnShown _staleWarnSrc openProgIds currentRandIdx _curScreen showScreen TAB_MAP updateTabBar tabGo showToast
+    > week-view.js: renderWeekView
+    > rest-timer.js: updateRestFloat
+    > programs.js: renderProgList
+    > progress-data.js: showProgressScreen
+  exercise-library.js: defines 25; uses 0 names from 0 earlier files, 0 names from 0 later files; used by 13 files
+    defines: EXLIB _CARRY_PER_SIDE _carryRx _PRESS_PER_SIDE _isOneArmPress REP_AFFINITY EX_MIN_EXP _EXP_RANK _expOK _stationClass _ssLegal _ssPair _ssPartnerOf EX_RENAMED_V113 _exSlugRaw EX_KEY_ALIAS exStoreKey EX_CANON_NAME foldExAliasKeys seededRand _SWAP_UNIVERSE _swapUniverseReset _swapUniverseAdd _swapUniverseList pick
+  wizard.js: defines 69; uses 6 names from 2 earlier files, 20 names from 9 later files; used by 22 files
+    defines: ALL_DAYS_ORDER DAY_FULL DAY_SHORT MIN_TRAIN_DAYS wizardStep lastRandIdx currentRandDayKey WIZARD_STEPS _ISO_ORDER _isoOf _isoToday _rsRace resolveStartDate _fmtStartDay _fmtSpan startResolveCopy startSummaryVal wizardAlignment wizardTestPin progLenLineHTML _RACE_NAME _RACE_GOAL_LBL alignedStartCopy alignedPipsHTML offerShorterPlan updateStartResolve _applyWizardStart WD CARDIO_GOALS_BY_TYPE HYBRID_EXCLUDED_GOALS _GOAL_RANK _GOAL_REQ_INPUTS GOAL_RECOMMENDED_DAYS goalLabel LIFTING_OPTIONS LIFTING_FOCUS_TO_GOAL startWizard DEFAULT_1RM get1RMDefault resolveRM wizardBack wizardNext _clkMS formatPacePerMile runCalc setCalcLift setUnit updateRaceDateFeedback setPaceUnit SWIM_GOAL_DIST setSwimUnit formatPacePer100 updateSwimPaceDisplay updatePaceTime updatePaceDisplay assessRunPaceCeiling paceCeilingSentence paceCeilingOfferHTML updatePaceFeasibility getDayAdvisories getMinTrainDays getMinTrainDaysLabel toggleRestDay toggleCardioTypeSport setCardioGoal _seedBannerHTML applySeedData dismissSeedData renderWizardStep
+    < storage.js: asyIcon getPrograms
+    < shell.js: activeProg calcLift showScreen showToast
+    > nsw-cardio.js: calcProgramLength paceGoalTarget
+    > nrc-race.js: NRC_SHORTER PACE_GOALS PACE_IMPROVE raceAlignment raceCountdown raceCountdownWords
+    > cardio-progression.js: isSpeedGoal sportDayTargets
+    > wizard-generate.js: _mileAdvisoryHTML _mileEntryState _mileFieldHelp _swimAdvisoryHTML generateProgram
+    > week-view.js: getWeekMonday
+    > log-entries.js: _fmtPaceMi
+    > programs.js: progTestPin
+    > overlays.js: _parseLocalDate
+    > progress-data.js: seedFromPriorPrograms
+  nsw-cardio.js: defines 15; uses 1 names from 1 earlier files, 6 names from 2 later files; used by 6 files
+    defines: parseTimeToSecs paceGoalTarget calcProgramLength isCardioCutbackWeek NSW_TABLE6_INT intFromTable6 getINTReps getINTBike NSW_TABLE6_CHI chiFromTable6 getCHI getCHIBike getCHISwim buildRunProgressionForLength buildRunSession
+    < wizard.js: _clkMS
+    > nrc-race.js: NRC_GOALS PACE_IMPROVE
+    > cardio-progression.js: paceChartLookup rowPaceAt steadyCapSec taperWeeksFor
+  nrc-race.js: defines 17; uses 3 names from 1 earlier files, 4 names from 3 later files; used by 6 files
+    defines: NRC_GOALS PACE_GOALS PACE_IMPROVE NRC_PLAN_WEEKS NRC_PLAN_FLOOR NRC_SHORTER raceCountdown raceCountdownWords raceAlignment testWeekIndex raceWeekPin NRC_MARATHON_TABLE NRC_HALF_TABLE NRC_5K_TABLE NRC_10K_TABLE buildNRCSession getNRCSessionTypes
+    < wizard.js: _ISO_ORDER _clkMS _isoOf
+    > cardio-progression.js: paceChartLookup steadyCapSec
+    > week-view.js: getWeekMonday
+    > overlays.js: _parseLocalDate
+  bike-swim.js: defines 2; uses 6 names from 2 earlier files, 0 names from 0 later files; used by 1 files
+    defines: buildBikeSession buildSwimSession
+    < wizard.js: _clkMS
+    < nsw-cardio.js: getCHIBike getCHISwim getINTBike getINTReps isCardioCutbackWeek
+  cardio-progression.js: defines 16; uses 12 names from 4 earlier files, 1 names from 1 later files; used by 8 files
+    defines: runOnRampWeeks PACE_CHART steadyCapSec paceChartLookup ROW_PACE_COLS rowPaceAt isSpeedGoal isPerformanceCardioGoal isPerformanceRunGoal taperEventOn taperWeeksFor programTaperWindow sportDayTargets multiSportTargets buildCardioProgression spaceHardCardio
+    < wizard.js: ALL_DAYS_ORDER _ISO_ORDER _clkMS
+    < nsw-cardio.js: buildRunSession isCardioCutbackWeek paceGoalTarget
+    < nrc-race.js: NRC_GOALS PACE_GOALS buildNRCSession getNRCSessionTypes
+    < bike-swim.js: buildBikeSession buildSwimSession
+    > injury.js: injuryPlan
+  prehab.js: defines 10; uses 2 names from 1 earlier files, 0 names from 0 later files; used by 5 files
+    defines: buildHipSection buildFootAnkleSection buildRehabSection CORE_PILLARS CORE_SPEED_TYPES _tierHasBarbell _gearLens _BW_SUBS _BW_GEAR _bwFallback
+    < exercise-library.js: EXLIB pick
+  power-accessory.js: defines 23; uses 5 names from 2 earlier files, 2 names from 2 later files; used by 5 files
+    defines: _STACK_LOADED _POWER_COST _powerCost _isPower _POWER_BUDGET _POWER_MAX_COST _POWER_AGE_MAX_COST _POWER_AGE_BUDGET_MOD _powerDose _POWER_REST _powerRest _POWER_DENSITY_REPS _powerReps _powerPrescribe _powerAllowed _BW_KEEP_FIXED _bwSetsFromDetail _GRAMMAR_BALLISTIC _GRAMMAR_RANGE accessoryGrammarSweep hotNextHingeClampSweep preventionDoseSweep bodyweightSweep
+    < wizard.js: ALL_DAYS_ORDER _ISO_ORDER
+    < prehab.js: _BW_GEAR _BW_SUBS _bwFallback
+    > region-caps.js: _pattern
+    > sections.js: _setLeadingSets
+  core-legs.js: defines 13; uses 7 names from 3 earlier files, 7 names from 5 later files; used by 2 files
+    defines: getDynamicCoreBlock LEG_HEAVY_ROLES roleIsLegHeavy _coreTomorrowHot injectDynamicCore _nrcRunShape _nrcLegCost nrcLegLiftPlacement deconflictLegLiftDays _adjDayPairs _d18View deconflictAdjacentDupes deconflictSameRegion
+    < exercise-library.js: _ssLegal _swapUniverseList seededRand
+    < wizard.js: ALL_DAYS_ORDER _ISO_ORDER
+    < prehab.js: CORE_PILLARS CORE_SPEED_TYPES
+    > injury.js: applyInjuryFilter
+    > region-caps.js: _auxGearOK _pattern
+    > swaps-edits.js: _swapInjuryOK
+    > budget-engine-d.js: _compoundTier d18LongRunDayPass
+    > log-entries.js: isTrackableWeight
+  wizard-generate.js: defines 10; uses 12 names from 4 earlier files, 8 names from 5 later files; used by 2 files
+    defines: generateProgram showLengthWarning _mileEntryState _mileFieldHelp _mileAdvisoryHTML updateMileAdvisory _swimEntryState _swimAdvisoryHTML updateSwimAdvisory doGenerate
+    < storage.js: getPrograms savePrograms
+    < shell.js: currentWeek showScreen showToast
+    < wizard.js: LIFTING_FOCUS_TO_GOAL WD _applyWizardStart _rsRace renderWizardStep resolveStartDate
+    < nsw-cardio.js: calcProgramLength
+    > budget-engine-d.js: buildProgram
+    > week-view.js: renderWeekView
+    > rest-timer.js: _rtIntroPending
+    > programs.js: _fmtMileAnchor progTestPin renderProgList runAnchorInfo
+    > program-manage.js: loadActiveProgram
+  engine-a.js: defines 1; uses 4 names from 3 earlier files, 0 names from 0 later files; used by 1 files
+    defines: engineA_timeline
+    < wizard.js: ALL_DAYS_ORDER LIFTING_FOCUS_TO_GOAL
+    < nsw-cardio.js: calcProgramLength
+    < cardio-progression.js: programTaperWindow
+  engine-b-calendar.js: defines 3; uses 8 names from 4 earlier files, 2 names from 2 later files; used by 1 files
+    defines: engineB_cardio injurySweepCardio planCalendar
+    < wizard.js: _ISO_ORDER
+    < nrc-race.js: PACE_GOALS raceAlignment raceWeekPin
+    < cardio-progression.js: buildCardioProgression programTaperWindow
+    < core-legs.js: deconflictLegLiftDays deconflictSameRegion
+    > injury.js: injuryPlan
+    > overlays.js: _parseLocalDate
+  injury.js: defines 10; uses 1 names from 1 earlier files, 1 names from 1 later files; used by 9 files
+    defines: INJURY_REGIONS injuryPlan _injViewName INJ_CAP_CUE TEST_RX_TEXT INJ_HELD_TEST _stripCapCue _capRpeClamp applyInjuryFilter injuryDayTitle
+    < prehab.js: _gearLens
+    > region-caps.js: _pattern
+  engine-c.js: defines 1; uses 21 names from 6 earlier files, 7 names from 2 later files; used by 1 files
+    defines: engineC_kinematics
+    < storage.js: asyIcon
+    < exercise-library.js: EXLIB REP_AFFINITY _carryRx _expOK _isOneArmPress _ssPair _swapUniverseAdd pick
+    < wizard.js: DEFAULT_1RM
+    < prehab.js: CORE_PILLARS _gearLens _tierHasBarbell buildFootAnkleSection buildHipSection buildRehabSection
+    < power-accessory.js: _powerAllowed _powerPrescribe
+    < injury.js: TEST_RX_TEXT _injViewName injuryPlan
+    > region-caps.js: _auxFamily _auxGearOK _cardioInterference _isUnilateralRow _pattern _repFloor
+    > log-entries.js: roundWeight
+  region-caps.js: defines 20; uses 3 names from 2 earlier files, 2 names from 1 later files; used by 10 files
+    defines: REGION_CEILING _ceil REGION_SET_CAP _setCap REGION_MOVE_CAP _moveCap _cardioInterference _sectionRegion _itemRegion _UNILAT_ROW _isUnilateralRow _pattern _AUX_FAMILY _auxFamily _AUX_FAMILY_LABEL _AUX_GEAR _auxGearOK auxSwapCandidates _REP_FLOOR _repFloor
+    < exercise-library.js: _ssLegal _ssPartnerOf
+    < power-accessory.js: _powerAllowed
+    > swaps-edits.js: _dayPlanCfg _swapInjuryOK
+  swaps-edits.js: defines 33; uses 8 names from 4 earlier files, 5 names from 4 later files; used by 6 files
+    defines: swapUniverseFor _dayPlanCfg _swapInjuryOK addCandidates _addRxKind addedDetailFor swapCandidates swapLoadNote _swapDetailFor applySwapPrefs editStoreKey getDayEdits saveDayEdits _editEntry recordSkip clearSkip recordAdd clearAdd ssSkipToken applyDayEdits pruneDayEdits swapStoreKey getSwaps saveSwaps recordSwap clearSwap applySessionSwaps SWAP_NUDGE_AT swapCountKey getSwapCounts saveSwapCounts bumpSwapCount markSwapOffered
+    < exercise-library.js: _ssLegal _ssPartnerOf
+    < power-accessory.js: _BW_KEEP_FIXED _bwSetsFromDetail
+    < injury.js: _stripCapCue applyInjuryFilter
+    < region-caps.js: _pattern _repFloor
+    > budget-engine-d.js: _PATTERN_REGION _compoundTier
+    > sections.js: parseRx
+    > log-entries.js: isTrackableWeight
+    > overlays.js: dayOverlayInfo
+  budget-engine-d.js: defines 21; uses 31 names from 12 earlier files, 3 names from 2 later files; used by 7 files
+    defines: _PATTERN_REGION _isCompound _compoundTier _isIsolation _setCount _itemCost _isPostChain recoveryDeload SESSION_SET_BUDGET capSessionBudget capRegionalFatigue engineD_synthesis _longRunTier _d18MobilityBlock _D18_LEG_RX d189DefaultAnchorNote d18LongRunDayPass raceEveLiftPass singletonSupersetSweep unloadableRxSweep buildProgram
+    < exercise-library.js: EXLIB _swapUniverseAdd _swapUniverseList _swapUniverseReset
+    < wizard.js: _ISO_ORDER
+    < nrc-race.js: PACE_GOALS
+    < prehab.js: _BW_GEAR _BW_SUBS
+    < power-accessory.js: _BW_KEEP_FIXED _bwSetsFromDetail accessoryGrammarSweep bodyweightSweep hotNextHingeClampSweep preventionDoseSweep
+    < core-legs.js: deconflictAdjacentDupes injectDynamicCore
+    < engine-a.js: engineA_timeline
+    < engine-b-calendar.js: engineB_cardio planCalendar
+    < injury.js: applyInjuryFilter injuryDayTitle
+    < engine-c.js: engineC_kinematics
+    < region-caps.js: _auxFamily _cardioInterference _ceil _itemRegion _moveCap _pattern _sectionRegion _setCap
+    < swaps-edits.js: applySwapPrefs
+    > log-entries.js: isTrackableWeight
+    > programs.js: _fmtMileAnchor runAnchorInfo
+  random-wildcard.js: defines 18; uses 10 names from 3 earlier files, 6 names from 4 later files; used by 3 files
+    defines: RAND_POOLS randFilter getActivePool openRandom buildRandFilterBar setRandFilter reroll wildcardDayFor wildcardDaySet wildcardOn wildcardMarkHTML wildcardTagHTML fireWildcardPopup completeWildcard closeRandom resetPending resetWildcardCounter updateRandCounter
+    < storage.js: asyIcon completedKey esc getWildcardDone saveWildcardDone
+    < shell.js: activeProg currentRandIdx showToast
+    < wizard.js: currentRandDayKey lastRandIdx
+    > week-view.js: dayBeforeStart getWeekMonday renderWeekView
+    > sections.js: buildSectionsHTML
+    > popups.js: popFire
+    > streaks-reminders.js: computeStreak
+  week-view.js: defines 32; uses 18 names from 6 earlier files, 12 names from 5 later files; used by 16 files
+    defines: allDaysList dayOffset tagMeta _progDayDate dayBeforeStart _partialWeek1 getWeekMonday calcCurrentWeek STRETCH_TIPS NUTRITION_TIPS restDayTip heroSummary sessionTimeEst buildHeroPreview openDayKey liftFocusCode runSessionCode dayCode _onGold _wkScootDone _wkScootRaf _wkScootTmr _wkScootEl _wkReduceMotion _wkStripTarget _wkScootCancel _wkScootEase _WK_OVERSHOOT_PX _WK_SPLIT _wkScoot restLogLines renderWeekView
+    < storage.js: asyIcon completedKey getCompleted getLogs logKey
+    < rest-day.js: openRestSheet restDayEligible
+    < shell.js: activeProg currentWeek showToast
+    < wizard.js: ALL_DAYS_ORDER DAY_FULL _fmtStartDay
+    < injury.js: INJURY_REGIONS
+    < random-wildcard.js: updateRandCounter wildcardMarkHTML wildcardOn wildcardTagHTML
+    > sections.js: _itemSets _secRounds
+    > day-detail.js: openDetail
+    > programs.js: progAlignment
+    > overlays.js: _liveInjuryOverlay _parseLocalDate dayIsTravel overlayWeekRange renderOverlayChip travelTagHTML
+    > streaks-reminders.js: computeStreak statusOf
+  sections.js: defines 9; uses 2 names from 1 earlier files, 1 names from 1 later files; used by 7 files
+    defines: liftRpeKeyHTML _itemSets _secRounds _stripLeadingSets _setLeadingSets buildSectionsHTML _parseRxLoose parseRx rxSuffix
+    < storage.js: asyIcon esc
+    > set-logging.js: buildExItem
+  set-logging.js: defines 33; uses 22 names from 6 earlier files, 8 names from 3 later files; used by 3 files
+    defines: STALE_LOAD_DAYS recencyBucket recencyLabel isStaleTs crossProgLastEntry exLoggable rawSetVals exKeyFromRow autoSaveSets commitSetsLive stepSet setDelta reuseWeight _rxCache toDispW toStoreW setsVaried flatDiverged setsSummary setsSubLabel toggleSets setWeightVals markTopSet cascadeSetWeights onSetWeight fillAllSetWeights setRepVals refreshSetSummary exControlFlags buildExItem _benchmarkEntryFor _benchStripHTML buildCardioHTML
+    < storage.js: asyIcon esc getDayHist getExWeightsFor getLogs getPrograms readSetDraft writeSetDraft
+    < shell.js: _staleWarnShown _staleWarnSrc activeProg activeProgId currentDayKey currentWeek
+    < exercise-library.js: exStoreKey foldExAliasKeys
+    < wizard.js: _clkMS
+    < region-caps.js: _auxFamily _pattern
+    < sections.js: _stripLeadingSets parseRx rxSuffix
+    > log-entries.js: entryDay getExWeights isKBExercise isRepExercise isTimeExercise isTrackableWeight
+    > day-detail.js: saveExWeight
+    > swap-sheet.js: swapOriginOf
+  log-entries.js: defines 37; uses 9 names from 6 earlier files, 2 names from 1 later files; used by 14 files
+    defines: isWeightedExercise EQUIP_TOKENS hasEquip anyEquip isTimeExercise REP_BUT_LOADED BW_QUALIFIER isLoadedRepMovement isTrackableWeight isRepExercise isKBExercise isDBExercise getExWeights saveExWeights _ENTRY_DAY_ORDER entryDay weeklyBest logExerciseWeight dedupeExDayEntries variantLoadFactor roundWeight RPE_LABELS updateRPEDisplay CARDIO_WORD CARDIO_PARK_FIELDS cardioSwapNoteText _curLogDose _curLogDoseFull _curLogSub _fmtPaceMi _parseClock doseFromCardio doseDerived _doseStripHTML updateDoseDerived doseRep _DOSE_INPUT_STYLE
+    < storage.js: esc snapshotDay
+    < shell.js: activeProgId currentDayKey currentWeek
+    < exercise-library.js: exStoreKey
+    < wizard.js: _clkMS
+    < power-accessory.js: _STACK_LOADED
+    < week-view.js: runSessionCode
+    > day-status.js: cardioLive persistLogFields
+  wheel-log.js: defines 24; uses 18 names from 6 earlier files, 2 names from 1 later files; used by 2 files
+    defines: _IAW_ROW _IAW_SPEC _IAW_REPS _iawWraps _iawList _iawHome _iawRows _iawFace _iawParse _iawFormat iaWheelHTML _iawShape _iawRecenter _iawSel _iawCommit iaWheelFlush iaWheelInit cardioFieldHTML cardioSwapChip buildLogHTML buildExportHTML MOD_PAL modTagsHTML sessionLogProgress
+    < storage.js: asyIcon getLogs logKey
+    < shell.js: currentDayKey currentWeek
+    < exercise-library.js: exStoreKey
+    < week-view.js: tagMeta
+    < set-logging.js: exLoggable
+    < log-entries.js: CARDIO_WORD RPE_LABELS _curLogDose _curLogDoseFull _curLogSub _doseStripHTML cardioSwapNoteText doseFromCardio entryDay getExWeights
+    > day-status.js: cardioEntryLive cardioLogLabel
+  rest-timer.js: defines 32; uses 2 names from 1 earlier files, 0 names from 0 later files; used by 5 files
+    defines: _ruId _ruRunning _ruElapsed _ruStart _rtSide _rtExpanded _rtIntroTO _rtInited _rtDragging _rtIntroPending _ruClock _ruIsland _ruNow _rtPad _rtStack _ruRender ruStart ruPause ruToggle ruReset ruResetIfIdle _rtDismissIntro _rtPlayIntro _rtApplySide _rtSetExpanded rtExpand rtCollapse rtToggleBtn rtResetBtn _rtWireDrag _rtInit updateRestFloat
+    < shell.js: _curScreen activeProg
+  day-detail.js: defines 12; uses 32 names from 10 earlier files, 4 names from 2 later files; used by 5 files
+    defines: _epley e1rmCalcHTML e1rmCalcUpdate saveTestMax rangeTopNudgeHTML openDetail selectKBSize _kbPending buildKBChips selectKBByKey stepExVal saveExWeight
+    < storage.js: asyIcon clearSetDraft completedKey getCompleted getLogs getPrograms logKey savePrograms
+    < shell.js: _staleWarnShown _staleWarnSrc activeProg activeProgId currentDayKey currentWeek showToast
+    < exercise-library.js: exStoreKey
+    < wizard.js: DAY_FULL
+    < random-wildcard.js: wildcardTagHTML
+    < sections.js: buildSectionsHTML
+    < set-logging.js: buildCardioHTML refreshSetSummary setWeightVals toStoreW
+    < log-entries.js: getExWeights isKBExercise logExerciseWeight updateDoseDerived
+    < wheel-log.js: buildLogHTML iaWheelInit modTagsHTML sessionLogProgress
+    < rest-timer.js: ruResetIfIdle
+    > day-status.js: cardioLive persistLogFields renderStatusFoot
+    > overlays.js: travelTagHTML
+  swap-sheet.js: defines 18; uses 34 names from 8 earlier files, 1 names from 1 later files; used by 1 files
+    defines: _swapCtx swapOriginOf _rxShort _swapRow openSwapSheet closeSwapSheet applySwapChoice _liveDay _afterEdit skipExercise unskipExercise skipSuperset unskipSuperset removeAddedExercise openAddSheet closeAddSheet applyAddChoice undoSwap
+    < storage.js: asyIcon esc resnapshotDayEdit
+    < shell.js: activeProg activeProgId currentDayKey currentWeek showToast
+    < injury.js: _stripCapCue applyInjuryFilter
+    < region-caps.js: _AUX_FAMILY_LABEL _auxFamily _pattern auxSwapCandidates
+    < swaps-edits.js: _dayPlanCfg _swapDetailFor addCandidates addedDetailFor applySwapPrefs bumpSwapCount clearAdd clearSkip clearSwap getSwaps recordAdd recordSkip recordSwap ssSkipToken swapCandidates swapLoadNote
+    < budget-engine-d.js: _PATTERN_REGION _compoundTier
+    < sections.js: parseRx
+    < day-detail.js: openDetail
+    > day-status.js: showSwapNudge
+  day-status.js: defines 21; uses 29 names from 9 earlier files, 5 names from 2 later files; used by 4 files
+    defines: _nudgeCtx showSwapNudge dismissSwapNudge acceptSwapNudge closeDetail showRpeInfo hideRpeInfo toggleComplete markDayComplete handleDayStatus statusFootHTML renderStatusFoot cardioEntryLive cardioLogLabel cardioLive persistLogFields CARDIO_LOGGED_TOAST logCardio toggleCardioPicker setCardioSwap copyExport
+    < storage.js: completedKey getCompleted getLogs getPrograms logKey saveCompleted saveLogs savePrograms snapshotDay
+    < shell.js: activeProg activeProgId currentDayKey currentWeek showToast
+    < region-caps.js: _pattern
+    < swaps-edits.js: markSwapOffered
+    < week-view.js: renderWeekView
+    < log-entries.js: CARDIO_PARK_FIELDS _curLogDose _curLogDoseFull _curLogSub cardioSwapNoteText doseDerived updateDoseDerived
+    < wheel-log.js: cardioFieldHTML iaWheelFlush iaWheelInit
+    < rest-timer.js: ruReset
+    < day-detail.js: openDetail
+    > program-manage.js: refreshProgram
+    > streaks-reminders.js: finalScheduledDay fireCompletionPopup releaseSeasonShown statusOf
+  programs.js: defines 38; uses 36 names from 8 earlier files, 1 names from 1 later files; used by 7 files
+    defines: progAlignment setProgRace progTestPin setProgStart _FOCUS_LABELS _PATH_LABELS _EQUIP_LABELS _CARDIO_LABELS _GOAL_LABELS _DAYF _CHART_RUN_GOALS runAnchorInfo _fmtMileAnchor runAnchorChips runAnchorSentence runAnchorLine progSelData progDetailHTML _goalDraft openGoalSheet closeGoalSheet _goalCurWeek _goalSetInput _goalInputsValid _goalRefreshCommit selectGoalOpt renderGoalSheet commitGoalChange _mileDraft openMileSheet closeMileSheet commitMileChange toggleProgCard _progCopyFallback progSelLines copyProgSel _progActionsHTML renderProgList
+    < storage.js: asyIcon getActiveProgId getPrograms savePrograms
+    < shell.js: activeProg activeProgId confirmProgId confirmTier currentWeek editProgId openProgIds showToast
+    < wizard.js: ALL_DAYS_ORDER CARDIO_GOALS_BY_TYPE DEFAULT_1RM HYBRID_EXCLUDED_GOALS LIFTING_FOCUS_TO_GOAL _GOAL_RANK _GOAL_REQ_INPUTS _clkMS _fmtStartDay _rsRace resolveStartDate
+    < nsw-cardio.js: NSW_TABLE6_INT calcProgramLength
+    < nrc-race.js: NRC_GOALS PACE_GOALS raceAlignment raceCountdown raceCountdownWords testWeekIndex
+    < cardio-progression.js: paceChartLookup
+    < wizard-generate.js: _mileEntryState
+    < week-view.js: calcCurrentWeek getWeekMonday renderWeekView
+    > program-manage.js: refreshProgram
+  overlays.js: defines 38; uses 13 names from 6 earlier files, 2 names from 2 later files; used by 7 files
+    defines: _parseLocalDate weekOfDate overlayWeekRange paceShiftMap applyOverlays dayOverlayInfo dayIsTravel travelTagHTML _fmtDateWd _DAY_WORDS _dayCount _dayCountWord overlaySpanLabel overlayBackCopy OVERLAY_TYPE_LABEL renderOverlayChip removeOverlay _ovDraft _EQUIP_OPTS _isoToday _addDaysIso _fmtDate openOverlaySheet openInjurySheet _liveInjuryOverlay closeOverlaySheet _ovSet renderOverlaySheet _INJ_EFFECT _INJ_SAFETY _renderTravelTab _renderInjuryTab applyInjuryDraft imBackFromInjury injReassess injSnooze _saveOverlays applyOverlayDraft
+    < storage.js: asyIcon getPrograms savePrograms
+    < shell.js: activeProg showToast
+    < wizard.js: _isoToday
+    < injury.js: INJURY_REGIONS injuryPlan
+    < budget-engine-d.js: buildProgram
+    < week-view.js: _progDayDate calcCurrentWeek getWeekMonday renderWeekView
+    > program-manage.js: refreshProgram
+    > popups.js: popFire
+  program-manage.js: defines 14; uses 32 names from 10 earlier files, 1 names from 1 later files; used by 5 files
+    defines: refreshProgram loadActiveProgram setActive startRename cancelRename commitRename purgeProgData _handoffActiveFrom archiveProg unarchiveProg askArchive askPurge cancelConfirm deleteProg
+    < storage.js: getActiveProgId getPrograms savePrograms setActiveProgId
+    < rest-day.js: applyRestDayMoves
+    < shell.js: activeProg activeProgId confirmProgId confirmTier currentDayKey currentWeek editProgId progressViewId showScreen showToast
+    < wizard.js: _isoToday
+    < swaps-edits.js: applyDayEdits applySessionSwaps getDayEdits getSwaps pruneDayEdits
+    < budget-engine-d.js: buildProgram
+    < week-view.js: calcCurrentWeek getWeekMonday renderWeekView
+    < log-entries.js: entryDay
+    < programs.js: progTestPin renderProgList
+    < overlays.js: _parseLocalDate applyOverlays overlayWeekRange paceShiftMap
+    > progress-screen.js: renderProgressScreen
+  progress-data.js: defines 33; uses 15 names from 6 earlier files, 1 names from 1 later files; used by 4 files
+    defines: showProgressScreen SEED_WINDOW_DAYS SEED_MIN_RUNS _mileFromRecoverySec seedFromPriorPrograms _paceStrToSec _recoveryPaceEntry recoveryPaceWeekly _fmtPaceShort buildPaceChart _progChipsHTML _purgeWarnsCrossProg _restoreBarHTML askPurgeFromProgress cancelProgressConfirm setProgressView RACE_DIST_MI EASY_RPE_LO EASY_RPE_HI EASY_MIN_RUNS _halfFromMileSec _progWeekNow _cutWeek _runClass RUN_CLASS_ORDER RUN_CLASS_COLOR ladderWeekly runsByClass easyEffortWeekly plannedVsLogged _LEDGER_MAIN _entryBestE1RM ledgerRows
+    < storage.js: asyIcon esc getDayHistFor getExWeightsFor getLogsFor getPrograms
+    < shell.js: activeProgId confirmProgId confirmTier progressViewId showScreen
+    < wizard.js: _clkMS
+    < cardio-progression.js: PACE_CHART
+    < week-view.js: getWeekMonday
+    < day-detail.js: _epley
+    > progress-screen.js: renderProgressScreen
+  progress-charts.js: defines 16; uses 13 names from 4 earlier files, 0 names from 0 later files; used by 2 files
+    defines: _iaCard _axTx buildLadderChart buildClassBandsChart buildEasyEffortChart buildEasyEffortEmpty buildProjectionCard _fmtHMS buildDriftChart _ledgerSpark buildLedgerCard _steadyCeilingFor easyVsPrescribed EASY_ZONE_MIN_RUNS buildEasyZoneChart buildEasyBandsFallback
+    < storage.js: asyIcon
+    < cardio-progression.js: PACE_CHART
+    < log-entries.js: weeklyBest
+    < progress-data.js: EASY_MIN_RUNS EASY_RPE_HI EASY_RPE_LO RUN_CLASS_COLOR RUN_CLASS_ORDER _fmtPaceShort _halfFromMileSec _mileFromRecoverySec _paceStrToSec _runClass
+  lift-ledger.js: defines 8; uses 4 names from 3 earlier files, 0 names from 0 later files; used by 1 files
+    defines: _slotOfEntry _rxRangeFor _setsOf ledgerModel buildMainLiftBlock _ladderTrack _ladderRow buildLedgerCards
+    < storage.js: asyIcon
+    < exercise-library.js: exStoreKey
+    < progress-charts.js: _axTx _iaCard
+  progress-screen.js: defines 4; uses 35 names from 8 earlier files, 0 names from 0 later files; used by 2 files
+    defines: renderProgressScreen parseLiftEntry buildDotChart buildMultiDotChart
+    < storage.js: asyIcon getDayHistFor getExWeightsFor getLogsFor getPrograms saveExWeightsFor
+    < shell.js: activeProg activeProgId calcLift progressViewId
+    < exercise-library.js: foldExAliasKeys
+    < week-view.js: _partialWeek1 restLogLines
+    < log-entries.js: RPE_LABELS dedupeExDayEntries
+    < progress-data.js: EASY_MIN_RUNS RACE_DIST_MI _cutWeek _progChipsHTML buildPaceChart easyEffortWeekly ladderWeekly plannedVsLogged recoveryPaceWeekly runsByClass
+    < progress-charts.js: buildDriftChart buildEasyBandsFallback buildEasyEffortChart buildEasyEffortEmpty buildEasyZoneChart buildLadderChart buildProjectionCard easyVsPrescribed
+    < lift-ledger.js: buildLedgerCards ledgerModel
+  bug-report-init.js: defines 3; uses 13 names from 8 earlier files, 3 names from 2 later files; used by 1 files
+    defines: BUG_FORM_KEY submitBug init
+    < storage.js: getActiveProgId getPrograms
+    < shell.js: activeProg currentWeek showScreen showToast
+    < exercise-library.js: foldExAliasKeys
+    < week-view.js: renderWeekView
+    < log-entries.js: getExWeights saveExWeights
+    < rest-timer.js: _ruIsland
+    < programs.js: renderProgList
+    < program-manage.js: loadActiveProgram
+    > streaks-reminders.js: maybeShowReminder
+    > update-check.js: IA_VERSION iaVersionLabel
+  popups.js: defines 13; uses 4 names from 2 earlier files, 2 names from 1 later files; used by 3 files
+    defines: POP_POOLS POP_CFG POP_KNICKS POP_DISMISS popDismissText popContext popText popEligible popPick popFire popClose popDismissBg popConfetti
+    < storage.js: ASY_ICON_PATHS asyIcon
+    < shell.js: activeProg activeProgId
+    > streaks-reminders.js: _todayStamp dayDateFor
+  streaks-reminders.js: defines 20; uses 18 names from 6 earlier files, 0 names from 0 later files; used by 5 files
+    defines: dayDateFor scheduledDays statusOf computeStreak completedCount fireWorkoutPopup skippedCount streakMilestone fireStreakPopup finalScheduledDay seasonShown markSeasonShown releaseSeasonShown fireSeasonPopup fireCompletionPopup remindedSet markReminded _todayStamp maybeShowReminder resolveReminder
+    < storage.js: asyIcon completedKey getCompleted saveCompleted snapshotDay
+    < shell.js: activeProg activeProgId showToast
+    < wizard.js: ALL_DAYS_ORDER DAY_FULL
+    < random-wildcard.js: wildcardOn
+    < week-view.js: dayBeforeStart dayOffset getWeekMonday renderWeekView
+    < popups.js: popClose popFire popPick
+  update-check.js: defines 8; uses 1 names from 1 earlier files, 0 names from 0 later files; used by 1 files
+    defines: IA_VERSION iaVersionLabel _iaUpdateDismissed _iaUpdateShown iaShowUpdateBanner iaDismissUpdate iaDoUpdate iaCheckForUpdate
+    < bug-report-init.js: init
+
+FILE GRAPH: 249 file->file edges (171 to earlier files, 78 to later files); strongly connected components with >1 file: 2; largest 37 files
+  cycle of 37: storage.js rest-day.js shell.js wizard.js nsw-cardio.js nrc-race.js bike-swim.js cardio-progression.js power-accessory.js core-legs.js wizard-generate.js engine-a.js engine-b-calendar.js injury.js engine-c.js region-caps.js swaps-edits.js budget-engine-d.js random-wildcard.js week-view.js sections.js set-logging.js log-entries.js wheel-log.js rest-timer.js day-detail.js swap-sheet.js day-status.js programs.js overlays.js program-manage.js progress-data.js progress-charts.js lift-ledger.js progress-screen.js popups.js streaks-reminders.js
+  cycle of 2: bug-report-init.js update-check.js
+
+LOAD-TIME REFERENCES: 12 references to top-level names execute while the script loads (top level, IIFE or eager array callback)
+  to a name declared LATER in the script: 0 {}; in a later FILE 0 {}; later in the same file 0
+    load-time _isoToday[function wizard.js:1972] used at wizard.js:2148 in WD
+    load-time ALL_DAYS_ORDER[const wizard.js:1938] used at week-view.js:11641 in allDaysList
+    load-time iaCheckForUpdate[function update-check.js:18502] used at update-check.js:18516 in statement
+    load-time EX_RENAMED_V113[const exercise-library.js:1817] used at exercise-library.js:1879 in EX_KEY_ALIAS
+    load-time _exSlugRaw[function exercise-library.js:1877] used at exercise-library.js:1879 in EX_KEY_ALIAS
+    load-time _exSlugRaw[function exercise-library.js:1877] used at exercise-library.js:1879 in EX_KEY_ALIAS
+    load-time EX_RENAMED_V113[const exercise-library.js:1817] used at exercise-library.js:1879 in EX_KEY_ALIAS
+    load-time EX_RENAMED_V113[const exercise-library.js:1817] used at exercise-library.js:1887 in EX_CANON_NAME
+    load-time EX_RENAMED_V113[const exercise-library.js:1817] used at exercise-library.js:1887 in EX_CANON_NAME
+    load-time _exSlugRaw[function exercise-library.js:1877] used at exercise-library.js:1887 in EX_CANON_NAME
+    load-time init[function bug-report-init.js:18114] used at update-check.js:18520 in statement
+    load-time init[function bug-report-init.js:18114] used at update-check.js:18520 in statement
+  DUPLICATE _isoToday: declared at wizard.js:1972 and overlays.js:15838 (the last one wins today); references by file {"wizard.js":3,"overlays.js":4,"program-manage.js":1}
+  TRANSITIVE: a load-time call reaches a let/const/var declared after the triggering statement: 0 (any depth, deferred inner closures included, so an upper bound)
+  PHASE C ONLY (hoisted today): load-time calls/refs to a function declared in a later file: 0
+
+MUTABLE TOP-LEVEL STATE (let/var) read or written outside its file
+  let activeProgId (shell.js): written in [program-manage.js] read in [storage.js rest-day.js set-logging.js log-entries.js day-detail.js swap-sheet.js day-status.js programs.js program-manage.js progress-data.js progress-screen.js popups.js streaks-reminders.js]  WRITTEN OUTSIDE ITS FILE
+  let currentWeek (shell.js): written in [wizard-generate.js week-view.js programs.js program-manage.js] read in [storage.js week-view.js set-logging.js log-entries.js wheel-log.js day-detail.js swap-sheet.js day-status.js bug-report-init.js]  WRITTEN OUTSIDE ITS FILE
+  let currentDayKey (shell.js): written in [day-detail.js program-manage.js] read in [storage.js set-logging.js log-entries.js wheel-log.js day-detail.js swap-sheet.js day-status.js]  WRITTEN OUTSIDE ITS FILE
+  let activeProg (shell.js): written in [day-status.js programs.js overlays.js program-manage.js] read in [storage.js rest-day.js shell.js wizard.js random-wildcard.js week-view.js set-logging.js rest-timer.js day-detail.js swap-sheet.js day-status.js programs.js overlays.js program-manage.js progress-screen.js bug-report-init.js popups.js streaks-reminders.js]  WRITTEN OUTSIDE ITS FILE
+  let calcLift (shell.js): written in [wizard.js] read in [wizard.js progress-screen.js]  WRITTEN OUTSIDE ITS FILE
+  let editProgId (shell.js): written in [program-manage.js] read in [programs.js]  WRITTEN OUTSIDE ITS FILE
+  let progressViewId (shell.js): written in [program-manage.js progress-data.js progress-screen.js] read in [program-manage.js progress-screen.js]  WRITTEN OUTSIDE ITS FILE
+  let confirmProgId (shell.js): written in [program-manage.js progress-data.js] read in [programs.js progress-data.js]  WRITTEN OUTSIDE ITS FILE
+  let confirmTier (shell.js): written in [program-manage.js progress-data.js] read in [programs.js progress-data.js]  WRITTEN OUTSIDE ITS FILE
+  let _staleWarnShown (shell.js): written in [set-logging.js day-detail.js] read in [set-logging.js]  WRITTEN OUTSIDE ITS FILE
+  let _staleWarnSrc (shell.js): written in [set-logging.js day-detail.js] read in [set-logging.js]  WRITTEN OUTSIDE ITS FILE
+  let openProgIds (shell.js): written in [] read in [programs.js]
+  let currentRandIdx (shell.js): written in [random-wildcard.js] read in []  WRITTEN OUTSIDE ITS FILE
+  let _curScreen (shell.js): written in [shell.js] read in [rest-timer.js]
+  let lastRandIdx (wizard.js): written in [random-wildcard.js] read in [random-wildcard.js]  WRITTEN OUTSIDE ITS FILE
+  let currentRandDayKey (wizard.js): written in [random-wildcard.js] read in []  WRITTEN OUTSIDE ITS FILE
+  let WD (wizard.js): written in [wizard.js] read in [wizard.js wizard-generate.js]
+  var NSW_TABLE6_INT (nsw-cardio.js): written in [] read in [nsw-cardio.js programs.js]
+  let _curLogDose (log-entries.js): written in [wheel-log.js day-status.js] read in [log-entries.js wheel-log.js day-status.js]  WRITTEN OUTSIDE ITS FILE
+  let _curLogDoseFull (log-entries.js): written in [wheel-log.js] read in [day-status.js]  WRITTEN OUTSIDE ITS FILE
+  let _curLogSub (log-entries.js): written in [wheel-log.js] read in [wheel-log.js day-status.js]  WRITTEN OUTSIDE ITS FILE
+  let _rtIntroPending (rest-timer.js): written in [wizard-generate.js rest-timer.js] read in [rest-timer.js]  WRITTEN OUTSIDE ITS FILE
+  var EASY_RPE_LO (progress-data.js): written in [] read in [progress-data.js progress-charts.js]
+  var EASY_RPE_HI (progress-data.js): written in [] read in [progress-data.js progress-charts.js]
+  var EASY_MIN_RUNS (progress-data.js): written in [] read in [progress-charts.js progress-screen.js]
+  total let/var names 54; used outside their file 25; written outside their file 18
+CONST OBJECTS MUTATED (member write or mutating call): 4 names; from outside their file 0
+
+INLINE HANDLERS: 181 attributes {"onclick":138,"onchange":10,"oninput":29,"onblur":3,"onkeydown":1} by place {"markup-before":32,"script":142,"markup-after":7}
+GLOBAL SURFACE: 113 distinct top-level names referenced from inline handlers, across 21 files; non-app names called: [["Date",1],["String",2]]
+  rest-day.js (6): _rdSet _restDraft(const) applyRestCardio applyRestMove closeRestSheet openRestSheet
+  shell.js (1): tabGo
+  wizard.js (20): WD(let) applySeedData dismissSeedData offerShorterPlan renderWizardStep runCalc setCalcLift setCardioGoal setPaceUnit setSwimUnit setUnit startWizard toggleCardioTypeSport toggleRestDay updatePaceTime updateRaceDateFeedback updateStartResolve updateSwimPaceDisplay wizardBack wizardNext
+  wizard-generate.js (2): updateMileAdvisory updateSwimAdvisory
+  random-wildcard.js (5): closeRandom completeWildcard openRandom resetWildcardCounter setRandFilter
+  week-view.js (1): openDayKey
+  set-logging.js (8): autoSaveSets cascadeSetWeights fillAllSetWeights onSetWeight reuseWeight setDelta stepSet toggleSets
+  log-entries.js (2): doseRep updateRPEDisplay
+  rest-timer.js (3): rtCollapse rtResetBtn rtToggleBtn
+  day-detail.js (4): e1rmCalcUpdate saveExWeight saveTestMax selectKBByKey
+  swap-sheet.js (12): applyAddChoice applySwapChoice closeAddSheet closeSwapSheet openAddSheet openSwapSheet removeAddedExercise skipExercise skipSuperset undoSwap unskipExercise unskipSuperset
+  day-status.js (9): acceptSwapNudge closeDetail dismissSwapNudge handleDayStatus hideRpeInfo logCardio setCardioSwap showRpeInfo toggleCardioPicker
+  programs.js (12): _goalSetInput closeGoalSheet closeMileSheet commitGoalChange commitMileChange copyProgSel openGoalSheet openMileSheet selectGoalOpt setProgRace setProgStart toggleProgCard
+  overlays.js (8): _ovSet applyInjuryDraft applyOverlayDraft closeOverlaySheet imBackFromInjury injSnooze openInjurySheet openOverlaySheet
+  program-manage.js (10): archiveProg askArchive askPurge cancelConfirm cancelRename commitRename deleteProg setActive startRename unarchiveProg
+  progress-data.js (3): askPurgeFromProgress cancelProgressConfirm setProgressView
+  progress-screen.js (1): renderProgressScreen
+  bug-report-init.js (1): submitBug
+  popups.js (2): popClose popDismissBg
+  streaks-reminders.js (1): resolveReminder
+  update-check.js (2): iaDismissUpdate iaDoUpdate
+CROSS-CHECK: raw identifier scan finds 113 top-level functions in handler values; not in the parsed surface: 2 ["pick@exercise-library.js","esc@storage.js"]
+property handlers assigned in script (el.onX = fn, not inline, no global needed): 6
+handlers naming no app function: 7 e.g. 1115:onclick="event.stopPropagation()" | 14829:onclick="'+call('skipped')+'" | 14830:onclick="'+call('complete')+'" | 14834:onclick="'+call('complete')+'" | 14835:onclick="'+call('skipped')+'" | 18284:onclick="${...}" | 18566:onclick="event.stopPropagation()"
+OTHER GLOBAL SEAMS: string timers 0; window.<app name> references 0 []; window.<other> [["scrollTo",1],["matchMedia",4],["_unitLabel",7],["requestAnimationFrame",2],["iaIsland",4],["innerHeight",2],["innerWidth",1]]
+
+RESULT: all proofs held
