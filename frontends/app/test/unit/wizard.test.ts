@@ -4,7 +4,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
-  daysView, equipmentChoices, liftingView, MOVED_STEPS, nameSummary, primaryChoices, profileView, unitStyle, wizardShell, WIZARD_STEPS,
+  daysView, equipmentChoices, liftingView, nameSummary, primaryChoices, profileView, unitStyle, wizardShell, WIZARD_STEPS,
 } from '../../src/app/screens/wizard/wizard-model.ts';
 
 describe('the wizard', () => {
@@ -15,7 +15,6 @@ describe('the wizard', () => {
     assert.deepEqual([wizardShell(1, 'body').label, wizardShell(2, 'body').label, wizardShell(4, 'body').label, wizardShell(4, 'both').label], ['2/6', '2/6', '4/6', '5/7']);
     assert.deepEqual(wizardShell(6, 'body'), { fill: '100%', label: '6/6', next: 'Generate Program →' });
     assert.deepEqual([...WIZARD_STEPS], ['primary', 'profile', 'equipment', 'cardio_goal', 'lifting_focus', 'days', 'name']);
-    assert.deepEqual([...MOVED_STEPS], ['primary', 'profile', 'equipment', 'lifting_focus', 'days', 'name']);
   });
 
   it('offers the three paths and marks the draft\'s', () => {

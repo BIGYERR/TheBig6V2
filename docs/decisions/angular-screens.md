@@ -513,3 +513,25 @@ what is stored.
   swim with segments but no yards, a swim without segments, another sport, no detail, no cardio).
   `frontends/app/test/unit/cardio-card.test.ts` (3). The e2e photographs run cards in four journeys at 0 px.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.34 moves the wizard's cardio goal step
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.34.
+- **Moved:** the cardio goal branch of the legacy `renderWizardStep`, the last step it drew: `wizard/cardio-goal-model.ts`
+  and the Wizard component's template (the three sports and their goals, hybrid's taper goals hidden; a swim time
+  goal's distance, unit, target and pace per 100, its current time and, for the 100, the 500; a pace goal's distance,
+  unit, target and pace per mile; the baseline; the current mile time; the program length and the race date box). The
+  draft is prepared as before (a race date of today when one is wanted, no week count without one, no taper goal on
+  hybrid). The step is drawn afresh on every render, as the legacy `innerHTML` was, because `updateRaceDateFeedback`,
+  `updatePaceDisplay`, `updatePaceFeasibility`, `updateSwimPaceDisplay`, `updateMileAdvisory` and `updateSwimAdvisory`
+  repaint its lines in place by id between renders; they stay legacy, and each field writes the draft and calls them
+  as its legacy handler did. The seed banner, the advisories, the mile help and the length line are still the legacy
+  helpers' markup. With it the legacy renderer is no longer called from the Angular build.
+- **Tests:** `frontends/app/test/unit/cardio-goal.test.ts` (7). A local comparison drew 15 drafts in both builds (no
+  sport, a sport with no goal, a 10K with and without a date, a pace goal dated, in km with no mile, and out of reach,
+  three sports on hybrid, a 100 swim in metres, a swim with an impossible time, two base goals, the seed banner offered
+  and applied, a past date) and ran 28 taps and keystrokes (the race date buttons and dates, typing every kind of
+  field, the unit buttons, the seed banner's buttons, sports and goals on and off), matching the markup as read, the
+  draft and the pixels after each. The e2e finds the sport, the goal and each field by its words now, not by its
+  legacy handler; 69/69 at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

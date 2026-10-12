@@ -1,8 +1,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
 import {
-  type Choice, daysView, equipmentChoices, LIFT_LABELS, type LiftOption, liftingView, MOVED_STEPS, nameSummary, primaryChoices, profileView,
+  baselineSuffix, type CardioDraft, type CardioField, type CardioGoalDraft, type CardioReads, cardioStep, type CardioStep, type GoalChoice, localIso,
+  prepareCardioDraft, raceButtonStyle, unitButtonStyle,
+} from './cardio-goal-model';
+import {
+  type Choice, daysView, equipmentChoices, LIFT_LABELS, type LiftOption, liftingView, nameSummary, primaryChoices, profileView,
   unitStyle, type WizardDraft, wizardShell, WIZARD_STEPS,
 } from './wizard-model';
 
@@ -19,6 +24,7 @@ type StepView =
   | { step: 'primary'; choices: Choice[] }
   | { step: 'profile'; profile: ReturnType<typeof profileView> }
   | { step: 'equipment'; choices: Choice[] }
+  | { step: 'cardio_goal'; cardio: CardioStep }
   | { step: 'lifting_focus'; lifting: ReturnType<typeof liftingView> }
   | { step: 'days'; days: ReturnType<typeof daysView> }
   | { step: 'name'; name: NameView };
@@ -26,15 +32,17 @@ type StepView =
 /**
  * The new-program wizard (architecture phase E, step 19), in place of the legacy #screenWizard markup and the
  * renderWizardStep that drew into it. It takes over renderWizardStep through LegacyBridge.provide. The shell (Back, the
- * progress bar, the step count, the next button) and the moved steps (MOVED_STEPS: all but the cardio goal) are the
- * component's; a step not yet moved is still drawn by the legacy renderWizardStep, captured before it was replaced,
- * into a #wizardBody of its own, so neither ever writes into the other's. The name step's start date repaints only its
- * explanation and its summary row on a change (updateStartResolve, provided), so the native date picker stays open. The draft is still the
- * legacy `WD`, the step the legacy `wizardStep`, and moving between steps the legacy wizardBack and wizardNext.
+ * progress bar, the step count, the next button) and every step are the component's. The name step's start date
+ * repaints only its explanation and its summary row on a change (updateStartResolve, provided), so the native date
+ * picker stays open. The cardio goal step is drawn afresh on every render, as the legacy one was, because the legacy
+ * updaters (updateRaceDateFeedback and the pace, swim and mile lines) repaint parts of it in place between renders; its
+ * fields write the draft and call those updaters as the legacy handlers did. The draft is still the legacy `WD`, the
+ * step the legacy `wizardStep`, and moving between steps the legacy wizardBack and wizardNext.
  */
 @Component({
   selector: 'ia-wizard',
   host: { style: 'display: contents' },
+  imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   <div class="wizard-bar">
@@ -109,6 +117,135 @@ type StepView =
                 </div>
               }
             </div>
+          }
+        }
+        @case ('cardio_goal') {
+          @if (v.step === 'cardio_goal') {
+            @for (c of [v.cardio]; track c) {
+              <div class="wizard-title">Cardio goals</div>
+              <div class="wizard-subtitle">Select all sports you want to train. Set a goal for each.</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                @for (s of c.sports; track s.id) {
+                  <div [attr.style]="'background:var(--surface);border:1.5px solid ' + (s.sel ? 'var(--accent)' : 'var(--border)') + ';border-radius:4px;overflow:hidden'">
+                    <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -- the legacy sport header, kept as it was -->
+                    <div (click)="call('toggleCardioTypeSport', s.id)" [attr.style]="'display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:' + (s.sel ? 'var(--accent-dim)' : 'transparent')">
+                      <div [innerHTML]="icon(s.icon, 24)"></div>
+                      <div style="flex:1">
+                        <div [attr.style]="'font-family:var(--font-display);font-size:16px;font-weight:700;color:' + (s.sel ? 'var(--accent)' : 'var(--text)')">{{ s.name }}</div>
+                        <div style="font-size:11px;color:var(--muted);margin-top:2px">{{ s.desc }}</div>
+                      </div>
+                      <div style="font-size:20px;color:var(--accent)" [style.opacity]="s.sel ? 1 : 0">✓</div>
+                    </div>
+                    @if (s.sel) {
+                      <div style="padding:0 14px 14px;border-top:1px solid var(--border)">
+                        <div style="padding-top:10px;display:flex;flex-direction:column;gap:6px">
+                          @for (go of s.goals; track go.id) {
+                            <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -- the legacy goal option, kept as it was -->
+                            <div [class]="'goal-option' + (go.sel ? ' selected' : '')" (click)="call('setCardioGoal', s.id, go.id)">
+                              <div class="goal-option-label">{{ go.label }}</div>
+                              <div class="goal-option-desc">{{ go.desc }}</div>
+                            </div>
+                          }
+                        </div>
+                        @if (s.form; as f) {
+                          @if (f.kind === 'swim') {
+                            <div style="margin-top:10px">
+                              <div class="input-label" style="margin-bottom:6px">Distance</div>
+                              <div style="display:flex;gap:0;align-items:stretch">
+                                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1;background:var(--surface2);color:var(--muted)" [value]="f.dist" readonly>
+                                <div style="display:flex;gap:0;border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;overflow:hidden;flex-shrink:0">
+                                  <button (click)="call('setSwimUnit', 'yd')" [attr.style]="unitBtn(f.unit === 'yd', false)">yd</button>
+                                  <button (click)="call('setSwimUnit', 'm')" [attr.style]="unitBtn(f.unit === 'm', true)">m</button>
+                                </div>
+                              </div>
+                            </div>
+                            <div style="margin-top:10px">
+                              <div class="input-label" style="margin-bottom:6px">Target time</div>
+                              <ng-container [ngTemplateOutlet]="pair" [ngTemplateOutletContext]="{ $implicit: f.target, sport: 'swim' }" />
+                              <div id="swimPaceLine" style="font-size:12px;color:var(--accent);margin-top:6px" [style.display]="f.paceShown ? 'block' : 'none'" [innerHTML]="html(f.paceLine)"></div>
+                            </div>
+                            <div style="margin-top:8px">
+                              <div class="input-label" style="margin-bottom:6px">{{ f.baseLabel }}</div>
+                              <ng-container [ngTemplateOutlet]="flatPair" [ngTemplateOutletContext]="{ mins: f.baseMins, secs: f.baseSecs, minsKey: 'baseMins', secsKey: 'baseSecs' }" />
+                              <div style="display:contents" [innerHTML]="html(f.advisory)"></div>
+                            </div>
+                            @if (f.base500; as b) {
+                              <div style="margin-top:8px">
+                                <div class="input-label" style="margin-bottom:6px">{{ b.label }}</div>
+                                <div style="font-size:11px;line-height:1.45;color:var(--muted);margin-bottom:6px">Your repeats key off your 500 pace. Your 100 time sets the goal.</div>
+                                <ng-container [ngTemplateOutlet]="flatPair" [ngTemplateOutletContext]="{ mins: b.mins, secs: b.secs, minsKey: 'base500Mins', secsKey: 'base500Secs' }" />
+                              </div>
+                            }
+                          } @else if (f.kind === 'pace') {
+                            <div style="margin-top:10px">
+                              <div class="input-label" style="margin-bottom:6px">Target distance</div>
+                              <div style="display:flex;gap:0;align-items:stretch">
+                                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1" placeholder="e.g. 1.5" [value]="f.dist" (input)="edit('runDist', 'run', 'targetDist', $event)" min="0.1" step="0.1">
+                                <div style="display:flex;gap:0;border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;overflow:hidden;flex-shrink:0">
+                                  <button (click)="call('setPaceUnit', 'mi')" [attr.style]="unitBtn(f.unit === 'mi', false)">mi</button>
+                                  <button (click)="call('setPaceUnit', 'km')" [attr.style]="unitBtn(f.unit === 'km', true)">km</button>
+                                </div>
+                              </div>
+                            </div>
+                            <div style="margin-top:10px">
+                              <div class="input-label" style="margin-bottom:6px">Target time</div>
+                              <ng-container [ngTemplateOutlet]="pair" [ngTemplateOutletContext]="{ $implicit: f.target, sport: 'run' }" />
+                              <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px" [style.display]="f.paceShown ? 'block' : 'none'" [innerHTML]="html(f.paceLine)"></div>
+                              <div id="paceFeasLine" style="display:none"></div>
+                            </div>
+                            @if (f.seed) {<div style="display:contents" [innerHTML]="html(f.seed)"></div>}
+                            <div class="input-group" style="margin-top:8px">
+                              <div class="input-label">How far can you currently run? (optional)</div>
+                              <div style="display:flex;gap:8px;align-items:center">
+                                <input type="number" class="input-field" style="flex:1" placeholder="e.g. 1.5" [value]="f.baseline" (input)="edit('paceBaseline', 'run', 'baselineDist', $event)" min="0" step="0.1">
+                                <span style="font-size:13px;color:var(--muted);flex-shrink:0">{{ f.unit }}</span>
+                              </div>
+                            </div>
+                            <ng-container [ngTemplateOutlet]="mile" [ngTemplateOutletContext]="{ $implicit: f.mile }" />
+                          } @else {
+                            @if (f.seed) {<div style="display:contents" [innerHTML]="html(f.seed)"></div>}
+                            <div class="input-group" style="margin-top:10px">
+                              <div class="input-label">{{ f.question + ' (optional)' }}</div>
+                              <div style="display:flex;gap:8px;align-items:center">
+                                <input type="number" class="input-field" style="flex:1" [attr.placeholder]="f.placeholder" [value]="f.baseline" (input)="edit('baseline', s.id, 'baselineDist', $event)" min="0" [attr.step]="f.step">
+                                <span style="font-size:13px;color:var(--muted);flex-shrink:0">{{ f.unitWord }}</span>
+                              </div>
+                            </div>
+                            @if (f.mile; as m) {
+                              <ng-container [ngTemplateOutlet]="mile" [ngTemplateOutletContext]="{ $implicit: m }" />
+                            }
+                          }
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+              @if (c.footer; as ft) {
+                <div style="background:var(--surface);border:1px solid var(--border2);border-radius:4px;padding:12px 14px;margin-top:4px">
+                  <div style="font-size:12px;color:var(--muted);line-height:1.6"><span id="progLenLine" [innerHTML]="html(ft.progLen)"></span>@if (ft.multi) {<br>Sessions rotate across training days. Each sport gets its own days. }</div>
+                  @if (ft.race; as r) {
+                    <div style="margin-top:10px">
+                      <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Race date</div>
+                      <div style="display:flex;gap:0;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;overflow:hidden;margin-bottom:8px">
+                        <button (click)="raceDate(true)" [attr.style]="raceBtn(r.targeted)">✓ I have a race date</button>
+                        <button (click)="raceDate(false)" [attr.style]="raceBtn(!r.targeted)">✕ Just building fitness</button>
+                      </div>
+                      @if (r.targeted) {
+                        <div>
+                          <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Race date</div>
+                          <input type="date" id="raceDateInput" [value]="r.value" [attr.min]="r.min" (input)="setRaceDate($event)" style="width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:4px;color:var(--text);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:0.04em;padding:13px 14px;outline:none;box-sizing:border-box;color-scheme:dark;-webkit-appearance:none;cursor:pointer">
+                          <div id="raceDateFeedback" style="margin-top:8px"></div>
+                          <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Tap to open the calendar. The final weeks taper so you arrive fresh.</div>
+                        </div>
+                      } @else {
+                        <div style="font-size:11px;color:var(--muted);line-height:1.5">{{ r.copy }}</div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            }
           }
         }
         @case ('lifting_focus') {
@@ -191,17 +328,44 @@ type StepView =
     <div class="wizard-body" id="wizardBody"></div>
   }
   <button class="wizard-next" id="wizardNext" (click)="call('wizardNext')" [textContent]="shell().next"></button>
+  <ng-template #pair let-p let-sport="sport">
+    <div style="display:flex;align-items:center;gap:6px">
+      <div style="flex:1;text-align:center">
+        <input type="number" class="input-field" style="text-align:center" placeholder="min" [value]="p.mins" (input)="edit(p.field, sport, p.minsKey, $event)" [attr.min]="p.lo" [attr.max]="p.hi">
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">minutes</div>
+      </div>
+      <div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div>
+      <div style="flex:1;text-align:center">
+        <input type="number" class="input-field" style="text-align:center" placeholder="sec" [value]="p.secs" (input)="edit(p.field, sport, p.secsKey, $event)" min="0" max="59">
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #flatPair let-mins="mins" let-secs="secs" let-minsKey="minsKey" let-secsKey="secsKey">
+    <div style="display:flex;align-items:center;gap:6px">
+      <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="min" [value]="mins" (input)="edit('swimBase', 'swim', minsKey, $event)" min="0" max="99">
+      <div style="font-size:20px;color:var(--muted);font-weight:300;flex-shrink:0">:</div>
+      <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="sec" [value]="secs" (input)="edit('swimBase', 'swim', secsKey, $event)" min="0" max="59">
+    </div>
+  </ng-template>
+  <ng-template #mile let-m>
+    <div class="input-group" style="margin-top:8px">
+      <div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400" [innerHTML]="html(m.help)"></span></div>
+      <ng-container [ngTemplateOutlet]="pair" [ngTemplateOutletContext]="{ $implicit: m.pair, sport: 'run' }" />
+      <div style="display:contents" [innerHTML]="html(m.advisory)"></div>
+    </div>
+  </ng-template>
   `,
 })
 export class Wizard {
   private readonly bridge = inject(LegacyBridge);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly sanitizer = inject(DomSanitizer);
-  /** The legacy renderWizardStep, kept for the steps not yet moved. */
-  private readonly legacyRender: () => void;
   protected readonly shell = signal<{ fill: string | null; label: string; next: string }>({ fill: null, label: '1 / 6', next: 'Continue →' });
   protected readonly view = signal<StepView | null>(null);
   protected readonly unit = unitStyle;
+  protected readonly unitBtn = unitButtonStyle;
+  protected readonly raceBtn = raceButtonStyle;
   /** The name step's start explanation and summary rows, repainted alone when the start date changes. */
   protected readonly resolveCopy = signal('');
   protected readonly rows = signal<{ k: string; v: string }[]>([]);
@@ -211,7 +375,6 @@ export class Wizard {
   private nameInput: Parameters<typeof nameSummary>[1] | null = null;
 
   constructor() {
-    this.legacyRender = this.bridge.global<() => void>('renderWizardStep');
     this.bridge.provide('renderWizardStep', () => this.render());
     this.bridge.provide('updateStartResolve', () => this.updateStart());
   }
@@ -243,6 +406,51 @@ export class Wizard {
     this.updateStart();
   }
 
+  /** A cardio goal field, as the legacy handler wrote it: the draft's value, then what that field repainted. */
+  protected edit(field: CardioField, sport: string, key: string, e: Event): void {
+    const v = (e.target as HTMLInputElement).value;
+    const b = this.bridge;
+    const g = (b.global<CardioDraft>('WD').cardioGoals[sport] as CardioGoalDraft);
+    g[key] = v;
+    if (field === 'swimTarget') {
+      b.call('updatePaceTime', 'swim');
+      b.call('updateSwimPaceDisplay');
+    } else if (field === 'swimBase') {
+      b.call('updateSwimAdvisory');
+    } else if (field === 'runDist') {
+      b.call('updateRaceDateFeedback');
+    } else if (field === 'runTarget') {
+      b.call('updatePaceTime', 'run');
+      b.call('updateRaceDateFeedback');
+    } else if (field === 'paceBaseline') {
+      g.baseline = v + (g.paceUnit || 'mi');
+      b.call('updateRaceDateFeedback');
+    } else if (field === 'mile') {
+      g.mileBestSrc = { kind: 'entered' };
+      b.call('updateRaceDateFeedback');
+      b.call('updateMileAdvisory');
+    } else {
+      g.baseline = v + baselineSuffix(sport);
+      if (sport === 'run') b.call('updateRaceDateFeedback');
+    }
+  }
+  /** The race date buttons: a date (today when none is picked yet), or none and no week count, then the step again. */
+  protected raceDate(targeted: boolean): void {
+    const d = this.bridge.global<CardioDraft>('WD');
+    d.eventTargeted = targeted;
+    if (targeted) {
+      if (!d.raceDate) d.raceDate = localIso(new Date());
+    } else {
+      d.raceDate = '';
+      d.raceDateWeeks = null;
+    }
+    this.render();
+  }
+  protected setRaceDate(e: Event): void {
+    this.bridge.global<CardioDraft>('WD').raceDate = (e.target as HTMLInputElement).value;
+    this.bridge.call('updateRaceDateFeedback');
+  }
+
   protected icon(name: string, size: number): SafeHtml {
     const key = name + '/' + size;
     let h = this.icons.get(key);
@@ -261,23 +469,48 @@ export class Wizard {
     this.render();
   }
 
-  /** The legacy renderWizardStep: the shell and a moved step drawn at once, or the legacy step drawn in its own body. */
+  /** The legacy renderWizardStep: the shell and the step, drawn at once. */
   private render(): void {
     const step = this.bridge.global<number>('wizardStep');
     const draft = this.bridge.global<WizardDraft>('WD');
     const name = WIZARD_STEPS[step]!;
     this.shell.set(wizardShell(step, draft.primaryPath));
     this.view.set(
-      !MOVED_STEPS.has(name) ? null
-        : name === 'primary' ? { step: 'primary', choices: primaryChoices(draft) }
-          : name === 'profile' ? { step: 'profile', profile: profileView(draft) }
-            : name === 'equipment' ? { step: 'equipment', choices: equipmentChoices(draft) }
+      name === 'primary' ? { step: 'primary', choices: primaryChoices(draft) }
+        : name === 'profile' ? { step: 'profile', profile: profileView(draft) }
+          : name === 'equipment' ? { step: 'equipment', choices: equipmentChoices(draft) }
+            : name === 'cardio_goal' ? { step: 'cardio_goal', cardio: this.cardio() }
               : name === 'lifting_focus' ? { step: 'lifting_focus', lifting: liftingView(draft, this.bridge.global<{ body: LiftOption[]; event: LiftOption[] }>('LIFTING_OPTIONS')) }
                 : name === 'days' ? { step: 'days', days: this.days(draft) }
                   : { step: 'name', name: this.name(draft) },
     );
     this.cdr.detectChanges();
-    if (!MOVED_STEPS.has(name)) this.legacyRender();
+    // The legacy step's one repaint, in the same tick, once every line it paints is on the page.
+    if (name === 'cardio_goal') this.bridge.call('updateRaceDateFeedback');
+  }
+
+  /** The cardio goal step: the draft prepared as the legacy step prepared it, then its reads from the legacy helpers. */
+  private cardio(): CardioStep {
+    const b = this.bridge;
+    const draft = b.global<CardioDraft>('WD');
+    const today = localIso(new Date());
+    const hybridExcluded = b.global<ReadonlySet<string>>('HYBRID_EXCLUDED_GOALS');
+    prepareCardioDraft(draft, hybridExcluded, today);
+    const reads: CardioReads = {
+      goalsByType: b.global<Record<string, GoalChoice[]>>('CARDIO_GOALS_BY_TYPE'),
+      hybridExcluded,
+      swimDist: b.global<Record<string, number>>('SWIM_GOAL_DIST'),
+      icon: (key, size) => b.call<string>('asyIcon', key, size),
+      clock: (secs) => b.call<string>('_clkMS', secs),
+      paceTarget: (g) => b.call<{ tTotalSecs?: number; tPacePerMile?: number }>('paceGoalTarget', g),
+      seedBanner: () => b.call<string>('_seedBannerHTML'),
+      swimAdvisory: () => b.call<string>('_swimAdvisoryHTML'),
+      mileHelp: () => b.call<string>('_mileFieldHelp'),
+      mileAdvisory: () => b.call<string>('_mileAdvisoryHTML'),
+      progLen: () => b.call<string>('progLenLineHTML'),
+      today,
+    };
+    return cardioStep(draft, reads);
   }
 
   /** The days step's reads: the advisories, the floor and the goals' names, from their legacy helpers. */

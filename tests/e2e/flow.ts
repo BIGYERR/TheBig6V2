@@ -48,6 +48,12 @@ export interface Helpers {
   cardSelected(label: string): Promise<boolean>;
   /** Taps the wizard's rest-day toggle for a weekday ('wed'), found by its two letters. */
   tapRest(key: string): Promise<void>;
+  /** Taps the cardio goal step's sport card whose name reads `name` ('Running'), as the athlete reads it. */
+  tapSport(name: string): Promise<void>;
+  /** Taps the cardio goal step's goal whose label reads `label` ('Run a 10K'). */
+  tapGoal(label: string): Promise<void>;
+  /** Taps the index-th field under the wizard label that starts with `label` ('Target time', 1 for its seconds) and types into it. */
+  typeField(label: string, text: string, index?: number): Promise<void>;
 }
 
 /** Values one step leaves for a later one (a sheet's id, found by tapping, then closed after the screenshot). */
@@ -237,6 +243,33 @@ export function helpers(page: Page): Helpers {
         return;
       }
       throw new Error(`the wizard shows no ${short} toggle`);
+    },
+    async tapSport(name) {
+      for (const el of await page.$$('#wizardBody div')) {
+        if (!(await el.evaluate((e, n) => e.childElementCount === 0 && (e.textContent ?? '').trim() === n, name))) continue;
+        await el.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+        await el.click();
+        await sleep(SETTLE_MS);
+        return;
+      }
+      throw new Error(`the wizard shows no sport reading ${name}`);
+    },
+    async tapGoal(label) {
+      await tapNamed(page, '#wizardBody .goal-option', '.goal-option-label', label);
+    },
+    async typeField(label, text, index = 0) {
+      for (const lbl of await page.$$('#wizardBody .input-label')) {
+        if (!(await lbl.evaluate((e, l) => (e.textContent ?? '').replace(/\s+/g, ' ').trim().startsWith(l), label))) continue;
+        const field = (await lbl.evaluateHandle((e) => e.parentElement)).asElement();
+        const input = field && (await field.$$('input'))[index];
+        if (!input) throw new Error(`the ${label} field has no input ${index}`);
+        await input.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+        await input.click();
+        await page.keyboard.type(text);
+        await sleep(SETTLE_MS);
+        return;
+      }
+      throw new Error(`the wizard shows no field labelled ${label}`);
     },
     async cardSelected(label) {
       return (await wizardCard(page, label)).evaluate((e) => e.classList.contains('selected'));
@@ -796,8 +829,8 @@ const RACE: readonly Step[] = [
       await t.tap('#wizardNext');
       await t.tap('#wizardNext');
       await t.expectText('#wizardBody', 'Cardio goals');
-      await t.tap(`[onclick="toggleCardioTypeSport('run')"]`);
-      await t.tap(`[onclick="setCardioGoal('run','run_10k')"]`);
+      await t.tapSport('Running');
+      await t.tapGoal('Run a 10K');
       await t.setValue('#wizardBody #raceDateInput', '2026-11-29');
       await t.expectText('#wizardBody', 'Program length: 8 weeks');
     },
@@ -894,13 +927,13 @@ const TEST: readonly Step[] = [
       await t.tap('#wizardNext');
       await t.tapCard('Commercial Gym');
       await t.tap('#wizardNext');
-      await t.tap(`[onclick="toggleCardioTypeSport('run')"]`);
-      await t.tap(`[onclick="setCardioGoal('run','run_pace_goal')"]`);
-      await t.typeInto(`#wizardBody input[oninput*="targetDist"]`, '1.5');
-      await t.typeInto(`#wizardBody input[oninput*="targetMins"]`, '10');
-      await t.typeInto(`#wizardBody input[oninput*="targetSecs"]`, '30');
-      await t.typeInto(`#wizardBody input[oninput*="mileBestMins"]`, '7');
-      await t.typeInto(`#wizardBody input[oninput*="mileBestSecs"]`, '30');
+      await t.tapSport('Running');
+      await t.tapGoal('Hit a Pace / Time Goal');
+      await t.typeField('Target distance', '1.5');
+      await t.typeField('Target time', '10');
+      await t.typeField('Target time', '30', 1);
+      await t.typeField('Current mile time', '7');
+      await t.typeField('Current mile time', '30', 1);
       await t.setValue('#wizardBody #raceDateInput', '2026-11-14');
       await t.expectText('#wizardBody', '10:30 is 7:00 per mile');
       await t.expectText('#wizardBody', 'Your test is in week 6');

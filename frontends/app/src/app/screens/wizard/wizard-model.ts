@@ -1,15 +1,12 @@
 // The new-program wizard, kept apart from Angular so the app's node --test suite reads it as it is (architecture phase
-// E, step 19: the wizard moves from the legacy renderWizardStep to the Wizard component, a few steps at a time). The
-// draft stays the legacy `WD` and the step the legacy `wizardStep`; moving between steps and generating the program
-// are still the legacy wizardBack, wizardNext and generateProgram. This decides what the shell and the moved steps
-// show, each word the legacy renderWizardStep's.
+// E, step 19: the wizard moves from the legacy renderWizardStep to the Wizard component; the cardio goal step, the
+// last, has its own model in cardio-goal-model.ts). The draft stays the legacy `WD` and the step the legacy
+// `wizardStep`; moving between steps and generating the program are still the legacy wizardBack, wizardNext and
+// generateProgram. This decides what the shell and the steps show, each word the legacy renderWizardStep's.
 
 /** The steps, in the legacy order. */
 export const WIZARD_STEPS = ['primary', 'profile', 'equipment', 'cardio_goal', 'lifting_focus', 'days', 'name'] as const;
 export type WizardStep = (typeof WIZARD_STEPS)[number];
-
-/** The steps the Wizard component draws; the rest are still drawn by the legacy renderWizardStep. */
-export const MOVED_STEPS: ReadonlySet<string> = new Set(['primary', 'profile', 'equipment', 'lifting_focus', 'days', 'name']);
 
 /** The draft, as far as the moved steps read it. */
 export interface WizardDraft {

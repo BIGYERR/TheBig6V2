@@ -107,9 +107,9 @@ sheet's body (`src/app/screens/change-sheet/`, v0.239.17), Random Workout (`src/
 v0.239.18), and the toast and the update banner's contents (`src/app/screens/toast/`, `src/app/screens/update-banner/`,
 v0.239.19), and the Progress screen (`src/app/screens/progress/`, v0.239.20 to v0.239.24: the screen, its program chips, and its
 charts and Lift Ledger in `charts/`; its data readers are still the legacy script's), This Week
-(`src/app/screens/week-view/`, v0.239.25), and the wizard (`src/app/screens/wizard/`, v0.239.26 and
-v0.239.27; its cardio goal step is still the legacy renderer's, drawn inside it), and the session sheet
-(`src/app/screens/day-detail/`, v0.239.28; its body is still the legacy builders' markup), and the app's frames (`src/app/screens/frames/`,
+(`src/app/screens/week-view/`, v0.239.25), and the wizard (`src/app/screens/wizard/`, v0.239.26,
+v0.239.27 and v0.239.34, its cardio goal step last), and the session sheet
+(`src/app/screens/day-detail/`, v0.239.28 to v0.239.33; its set rows and session log are still the legacy builders' markup), and the app's frames (`src/app/screens/frames/`,
 v0.239.29: the Programs screen around the program list, the generating screen, the Progress frame, the tab bar);
 every other screen is still the original code. `LegacyBridge` also offers `set` (write a legacy `let`) and `run` (a legacy handler's code). A screen's
 logic sits apart from Angular in `<screen>-model.ts` and is tested by node --test (`test/unit/<screen>.test.ts`;
