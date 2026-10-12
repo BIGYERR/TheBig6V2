@@ -1,0 +1,26 @@
+{
+  "floorMovedByTheHold": {
+    "outsideTheRepToken": 839,
+    "power": 0,
+    "offGrammar": 172,
+    "atOrAboveTheFloor": 263,
+    "nullRow": 205,
+    "underTheWindow": 199,
+    "toast": 1253,
+    "bedThrustDonor": {
+      "out": 7,
+      "off": 4,
+      "nul": 3,
+      "t": 10
+    }
+  },
+  "injuredLatticeDigests": {
+    "knee_wa": "39679fdc5762f2b5",
+    "ankle_wa": "24fea086fe087454",
+    "hip_wa": "6c73687da203475a",
+    "lowback_wa": "d6e7e7178c37c073",
+    "shoulder_wa": "7cd72ca7e37a6f29",
+    "elbow_wa": "9a1b2079ac9cf7bd",
+    "mario_noinj": "d59b65f1d978a263"
+  }
+}

@@ -140,13 +140,9 @@ are the same on today's `index.html`.
 
 ## Mutations
 
-Every mutation in `tests/sabotage/*.json` that names one of the four gates was applied to a scratch copy of today's
-`index.html` (every anchor occurs exactly once) and the three new integration files were run against it with
-`IA_APP`: **35 of 35 caught** (at least one test failed on each).
+Mutations: not run (sabotage off). Parity rests on the row mapping above and the new tests passing on today's
+`index.html`.
 
-| Spec | Gate | Caught |
-|---|---|---|
-| `v202.json` M25, M26 | `g202_d108_touchset_freeze` | 2/2 |
-| `v220_d173.json` S1 to S3 | `g220_d173_recovbanner` | 3/3 |
-| `v221_d178.json` (14) | `g221_d178_active` | 14/14 |
-| `v221_d179.json` (16) | `g221_d179_donenav` | 16/16 |
+For the record only, not part of this proof: before sabotage was switched off (Mario, Post-v0.239.1), one scratch run
+applied the 35 mutations that name these four gates to copies of `index.html` and ran the three integration files
+against each with `IA_APP`; every one made at least one test fail (35 of 35).
