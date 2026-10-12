@@ -1,10 +1,10 @@
-import { asyIcon } from './icons.js';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { esc, getDayHistFor, getExWeightsFor, getLogsFor, getPrograms } from './storage.js';
 import {
   _setConfirmProgId, _setConfirmTier, _setProgressViewId, activeProgId, confirmProgId, confirmTier, showScreen,
 } from './rest-day-shell.js';
-import { getWeekMonday } from './calendar.js';
-import { _clkMS } from './clock-format.js';
+import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
+import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
 import { PACE_CHART } from './cardio-progression.js';
 import { _epley } from './day-detail.js';
 import { renderProgressScreen } from './lift-ledger-progress-screen.js';

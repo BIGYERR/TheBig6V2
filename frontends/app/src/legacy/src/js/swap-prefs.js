@@ -1,7 +1,7 @@
-import { isTrackableWeight } from './exercise-kinds.js';
-import { _BW_KEEP_FIXED, _bwSetsFromDetail } from './power-accessory.js';
-import { _stripCapCue, applyInjuryFilter } from './injury.js';
-import { _repFloor } from './region-caps.js';
+import { isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
+import { _BW_KEEP_FIXED, _bwSetsFromDetail } from '../../../../../../core/src/engine/power-accessory.ts';
+import { _stripCapCue, applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
+import { _repFloor } from '../../../../../../core/src/engine/region-caps.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── Swap preferences: a swap the athlete made, carried into every build (applySwapPrefs) with its detail and injury check. ──
 // Survives the athlete's injury plan? Wrapped as a throwaway section so the real

@@ -1,12 +1,13 @@
-import { _STACK_LOADED } from './power-accessory.js';
+import { _STACK_LOADED } from './power-accessory.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+import type { Unit } from '../domain/index.ts';
 // ── Exercise kinds: timed, rep-only or loaded, what a set logs, and how a weight rounds. ──
 // Equipment token map — single source of truth for how a movement name signals added
 // load. Each family lists every surface form, INCLUDING the parenthetical suffix
 // convention "Movement (ABBR)". Add a new abbreviation once here (e.g. a '(sb' for a
 // safety bar) and every detector below inherits it automatically — no more patching
 // isKBExercise / isDBExercise / isTrackableWeight one at a time.
-const EQUIP_TOKENS = {
+const EQUIP_TOKENS: Record<string, string[]> = {
   barbell:    ['barbell','(bb'],
   dumbbell:   ['dumbbell','db ','db-','(db'],
   kettlebell: ['kettlebell','kb ','kb-','(kb'],
@@ -21,12 +22,12 @@ const EQUIP_TOKENS = {
   loaded:     ['weighted','loaded']
 };
 // True if the name carries any external-load token at all.
-function anyEquip(name){
+function anyEquip(name: string | null | undefined): boolean {
   const n = (name||'').toLowerCase();
   for(const fam in EQUIP_TOKENS){ if(EQUIP_TOKENS[fam].some(t => n.includes(t))) return true; }
   return false;
 }
-function isTimeExercise(name) {
+function isTimeExercise(name: string | null | undefined): boolean {
   if(!name) return false;
   const n = name.toLowerCase();
   const timeKeywords = ['plank','hold','wall sit','dead hang','hollow hold',
@@ -58,12 +59,12 @@ function isTimeExercise(name) {
 // One less name asserted by hand. The seam shrinks as the library gets honest.
 const REP_BUT_LOADED = ['single-leg hip thrust','bench dips'];
 const BW_QUALIFIER = ['(chair','foot on chair','shoulders on bed','assisted ','(assisted','bodyweight','(partner','(anchored','banded ','band ','(bw'];
-function isLoadedRepMovement(name){
+function isLoadedRepMovement(name: string | null | undefined): boolean {
   const n=(name||'').toLowerCase();
   if(BW_QUALIFIER.some(q => n.includes(q))) return false;
   return REP_BUT_LOADED.some(k => n.includes(k));
 }
-function isTrackableWeight(name) {
+function isTrackableWeight(name: string | null | undefined): boolean {
   if(!name) return false;
   const n = name.toLowerCase();
   // Band-only movements — no weight to track
@@ -129,7 +130,7 @@ function isTrackableWeight(name) {
     'good morning','lunge','slam','carry','farmer','suitcase','thruster'];
   return equipKeywords.some(kw => n.includes(kw)) || movKeywords.some(kw => n.includes(kw));
 }
-function isRepExercise(name) {
+function isRepExercise(name: string | null | undefined): boolean {
   if(!name) return false;
   const n = name.toLowerCase();
   // Was only pullups/pushups/dips, so most no-load work (inverted rows, split squats,
@@ -142,7 +143,7 @@ function isRepExercise(name) {
     'sit-up','situp','leg raise','knee raise','v-up','hollow rock','squat (slow'];
   return repKeywords.some(kw => n.includes(kw));
 }
-function roundWeight(lbs, unit) {
+function roundWeight(lbs: number, unit: Unit | string | null | undefined): number {
   if(unit === 'kg') {
     const kg = lbs * 0.453592;
     return Math.round(kg / 2.5) * 2.5;

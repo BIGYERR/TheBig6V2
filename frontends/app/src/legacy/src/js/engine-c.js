@@ -1,14 +1,16 @@
-import { asyIcon } from './icons.js';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import {
   DEFAULT_1RM, EXLIB, REP_AFFINITY, _carryRx, _expOK, _isOneArmPress, _ssPair, _swapUniverseAdd, pick,
-} from './exercise-library.js';
-import { roundWeight } from './exercise-kinds.js';
+} from '../../../../../../core/src/engine/exercise-library.ts';
+import { roundWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
 import {
   CORE_PILLARS, _gearLens, _tierHasBarbell, buildFootAnkleSection, buildHipSection, buildRehabSection,
-} from './prehab.js';
-import { _powerAllowed, _powerPrescribe } from './power-accessory.js';
-import { TEST_RX_TEXT, _injViewName, injuryPlan } from './injury.js';
-import { _auxFamily, _auxGearOK, _cardioInterference, _isUnilateralRow, _pattern, _repFloor } from './region-caps.js';
+} from '../../../../../../core/src/engine/prehab.ts';
+import { _powerAllowed, _powerPrescribe } from '../../../../../../core/src/engine/power-accessory.ts';
+import { TEST_RX_TEXT, _injViewName, injuryPlan } from '../../../../../../core/src/engine/injury.ts';
+import {
+  _auxFamily, _auxGearOK, _cardioInterference, _isUnilateralRow, _pattern, _repFloor,
+} from '../../../../../../core/src/engine/region-caps.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── ENGINE C — KINEMATIC POOL FILTER (exercise selection + RPE prescription) ─

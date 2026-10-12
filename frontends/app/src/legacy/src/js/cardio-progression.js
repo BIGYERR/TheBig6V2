@@ -1,10 +1,10 @@
-import { ALL_DAYS_ORDER, _ISO_ORDER } from './calendar.js';
-import { _clkMS } from './clock-format.js';
+import { ALL_DAYS_ORDER, _ISO_ORDER } from '../../../../../../core/src/engine/calendar.ts';
+import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
 import { buildRunSession, isCardioCutbackWeek, paceGoalTarget } from './nsw-cardio.js';
 import {
   NRC_GOALS, PACE_GOALS, buildBikeSession, buildNRCSession, buildSwimSession, getNRCSessionTypes,
 } from './nrc-race-bike-swim.js';
-import { injuryPlan } from './injury.js';
+import { injuryPlan } from '../../../../../../core/src/engine/injury.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 

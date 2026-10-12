@@ -31,8 +31,9 @@ Mario has had to repeat this more than once; a session that makes him say it aga
 Vanilla HTML/CSS/JS PWA served as one page (`index.html`, ~1.3 MB, one inline `<script>`) that
 generates multi-week hybrid strength + cardio programs from a seeded, deterministic engine
 (Engine A → B → C → D inside `buildProgram(cfg)`). **The page is generated** (architecture phase B, Post-v0.239.1):
-`frontends/app/scripts/build-index.mjs` builds it byte for byte from its source files under `frontends/app/src/legacy/src/` (40 JS files,
-9 CSS files and 5 HTML partials, joined in the order `order.json` lists) into `dist-github-pages/` (gitignored: the page and
+`frontends/app/scripts/build-index.mjs` builds it byte for byte from its source files under `frontends/app/src/legacy/src/` (31 JS files,
+9 CSS files and 5 HTML partials) and the engine's TypeScript under `core/src/engine/` (9 files so far, architecture phase D:
+`order.json` names each `engine/<name>.ts`, and the build strips its types to spaces), joined in the order `order.json` lists, into `dist-github-pages/` (gitignored: the page and
 its icon, what GitHub Pages deploys from the pipeline once its source is "GitHub Actions", what every test boots, what the
 backend serves at `/app/`). Until Mario switches the Pages source, Pages serves the branch `main`'s root `index.html`, a
 committed copy of that build: code is edited in the source files, then `cd frontends/app && npm run build:index` writes both,
@@ -56,7 +57,7 @@ context at work at a time ... we do NOT spin up agents like that ever again (unl
   - **measure**: the before-picture. Prove a reported bug at the reporter's seed, sweep the configs, name the root
     cause and every other reader of the same value, with numbers and denominators. No ruling, no fix.
   - **coach**: coaching correctness and doctrine; rules on WHAT should ship, against the measured numbers.
-  - **builder**: edits the source files under `frontends/app/src/legacy/src/` directly and narrowly, rebuilds `index.html` from
+  - **builder**: edits the source files under `frontends/app/src/legacy/src/` and `core/src/engine/` directly and narrowly, rebuilds `index.html` from
     them, and writes the feature's tests (Test layout). Never invents a ruling.
   - **gatekeeper**: proof (Proof for new work): the 60-second check, each test for a changed behaviour fails on the
     previous release, every changed behaviour has a test, every diff hunk is classified, and the CI run is read.
@@ -183,7 +184,9 @@ session's files written into `tests/measure/` mid-proof.
     must not change;
   - matches every behaviour the ruling changes to a named test; a changed behaviour with no test is red;
   - reads every hunk of the diff on the page (`git diff` on the root copy; after the Pages switch, `tools/app-at.mjs` of
-    both commits) and on `tests/snapshots/`, and classifies each against the ruling.
+    both commits) and on `tests/snapshots/`, and classifies each against the ruling. A release meant to change no
+    behaviour (a phase D engine move) is classified whole by `node tools/same-script.mjs <previous page> <this page>`:
+    the same script tokens, so every hunk is whitespace, a comment or the version.
 - **Oracles.** Expected values are typed by hand from the ruling, the doctrine text or date arithmetic, never asked of
   the app; a snapshot is the one deliberate exception, a golden file in git regenerated only on purpose. Seeds are
   pinned, clock fields stripped, and a program equals itself built twice before it is compared.
@@ -328,7 +331,7 @@ No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declar
 
 ## Token discipline
 **Run a command that takes longer than a minute in the background, its output in a file, and read back only the summary.**
-`index.html` is ~250K tokens and generated: never read it wholesale, never edit it. Code lives in `frontends/app/src/legacy/src/`: `grep -rn` the symbol and its consumers there first. Most source files are small enough to read whole; the four largest (`js/engine-c.js`, `js/cardio-progression.js`, `js/wizard.js`, `js/nsw-cardio.js`, 75 to 110 KB) are read wide at the seam. `str_replace` narrowly in the source file, rebuild, and let the tests be the backstop. Do not re-read the doctrine text mid-session unless verifying a transcription.
+`index.html` is ~250K tokens and generated: never read it wholesale, never edit it. Code lives in `frontends/app/src/legacy/src/` and, for the engine files phase D has moved, `core/src/engine/`: `grep -rn` the symbol and its consumers in both first. Most source files are small enough to read whole; the four largest (`js/engine-c.js`, `js/cardio-progression.js`, `js/wizard.js`, `js/nsw-cardio.js`, 75 to 110 KB) are read wide at the seam. `str_replace` narrowly in the source file, rebuild, and let the tests be the backstop. Do not re-read the doctrine text mid-session unless verifying a transcription.
 
 ## Delegation carry (only when Mario explicitly asks for a builder or gatekeeper agent)
 Builder and gatekeeper agents do not load this file (`omitClaudeMd`). A brief to either carries the ruling verbatim (its

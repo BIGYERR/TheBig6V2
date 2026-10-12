@@ -1,13 +1,13 @@
-import { asyIcon } from './icons.js';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { esc, getDayHist, getExWeightsFor, getLogs, getPrograms, readSetDraft, writeSetDraft } from './storage.js';
 import {
   _setStaleWarnShown, _setStaleWarnSrc, _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, currentDayKey,
   currentWeek,
 } from './rest-day-shell.js';
-import { exStoreKey, foldExAliasKeys } from './exercise-library.js';
-import { isRepExercise, isTimeExercise, isTrackableWeight } from './exercise-kinds.js';
-import { _clkMS } from './clock-format.js';
-import { _auxFamily, _pattern } from './region-caps.js';
+import { exStoreKey, foldExAliasKeys } from '../../../../../../core/src/engine/exercise-library.ts';
+import { isRepExercise, isTimeExercise, isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
+import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
+import { _auxFamily, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _stripLeadingSets, parseRx, rxSuffix } from './week-view-sections.js';
 import { entryDay, getExWeights, isKBExercise } from './log-entries.js';
 import { saveExWeight } from './day-detail.js';

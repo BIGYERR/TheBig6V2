@@ -1,21 +1,23 @@
-import { EXLIB, _swapUniverseAdd, _swapUniverseList, _swapUniverseReset } from './exercise-library.js';
-import { isTrackableWeight } from './exercise-kinds.js';
-import { _ISO_ORDER } from './calendar.js';
-import { _fmtMileAnchor } from './clock-format.js';
+import {
+  EXLIB, _swapUniverseAdd, _swapUniverseList, _swapUniverseReset,
+} from '../../../../../../core/src/engine/exercise-library.ts';
+import { isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
+import { _ISO_ORDER } from '../../../../../../core/src/engine/calendar.ts';
+import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.ts';
 import { PACE_GOALS } from './nrc-race-bike-swim.js';
 import { runAnchorInfo } from './cardio-progression.js';
-import { _BW_GEAR, _BW_SUBS } from './prehab.js';
+import { _BW_GEAR, _BW_SUBS } from '../../../../../../core/src/engine/prehab.ts';
 import {
   _BW_KEEP_FIXED, _bwSetsFromDetail, accessoryGrammarSweep, bodyweightSweep, hotNextHingeClampSweep,
   preventionDoseSweep,
-} from './power-accessory.js';
+} from '../../../../../../core/src/engine/power-accessory.ts';
 import { deconflictAdjacentDupes, injectDynamicCore } from './core-legs.js';
 import { engineA_timeline, engineB_cardio, planCalendar } from './engine-a-b-calendar.js';
-import { applyInjuryFilter, injuryDayTitle } from './injury.js';
+import { applyInjuryFilter, injuryDayTitle } from '../../../../../../core/src/engine/injury.ts';
 import { engineC_kinematics } from './engine-c.js';
 import {
   _auxFamily, _cardioInterference, _ceil, _itemRegion, _moveCap, _pattern, _sectionRegion, _setCap,
-} from './region-caps.js';
+} from '../../../../../../core/src/engine/region-caps.ts';
 import { applySwapPrefs } from './swap-prefs.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 const _PATTERN_REGION = {

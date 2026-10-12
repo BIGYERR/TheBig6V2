@@ -1,10 +1,10 @@
-import { LIFTING_FOCUS_TO_GOAL } from './exercise-library.js';
-import { ALL_DAYS_ORDER, _ISO_ORDER, _parseLocalDate } from './calendar.js';
+import { LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
+import { ALL_DAYS_ORDER, _ISO_ORDER, _parseLocalDate } from '../../../../../../core/src/engine/calendar.ts';
 import { calcProgramLength } from './nsw-cardio.js';
 import { PACE_GOALS, raceAlignment, raceWeekPin } from './nrc-race-bike-swim.js';
 import { buildCardioProgression, programTaperWindow } from './cardio-progression.js';
 import { deconflictLegLiftDays, deconflictSameRegion } from './core-legs.js';
-import { injuryPlan } from './injury.js';
+import { injuryPlan } from '../../../../../../core/src/engine/injury.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ============================================================================

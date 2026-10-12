@@ -1,7 +1,7 @@
 import { completedKey, getCompleted, getLogs, getPrograms, saveLogs, savePrograms } from './storage.js';
-import { getWeekMonday } from './calendar.js';
+import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL } from './wizard.js';
-import { _pattern } from './region-caps.js';
+import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _PATTERN_REGION } from './budget-engine-d.js';
 import { dayBeforeStart, renderWeekView } from './week-view-sections.js';
 import { CARDIO_PARK_FIELDS } from './log-entries.js';

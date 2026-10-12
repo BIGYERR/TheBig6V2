@@ -1,8 +1,8 @@
 import { esc, snapshotDay } from './storage.js';
 import { activeProgId, currentDayKey, currentWeek } from './rest-day-shell.js';
-import { exStoreKey } from './exercise-library.js';
-import { EQUIP_TOKENS } from './exercise-kinds.js';
-import { _clkMS } from './clock-format.js';
+import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
+import { EQUIP_TOKENS } from '../../../../../../core/src/engine/exercise-kinds.ts';
+import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
 import { runSessionCode } from './week-view-sections.js';
 import { cardioLive, persistLogFields } from './day-status.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)

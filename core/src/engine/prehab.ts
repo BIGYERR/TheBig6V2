@@ -1,7 +1,8 @@
-import { EXLIB, pick } from './exercise-library.js';
+import { EXLIB, pick } from './exercise-library.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+import type { Equipment, Section } from '../domain/index.ts';
 
-function buildHipSection(seed,bodyweight){
+function buildHipSection(seed: number,bodyweight: boolean): Section {
   // Reliable stability dose: the section always draws 2 loaded/active glute-med drills plus
   // 1 mobility piece, so a leg day can never come up all-stretches with zero abductor work.
   // Bodyweight tier ("Room only") swaps banded drills for equipment-free glute-med equivalents.
@@ -11,7 +12,7 @@ function buildHipSection(seed,bodyweight){
   const stab=pick(stabPool,2,seed);
   const mob=pick(EXLIB.hip_mobility,1,seed+7);
   const selected=[...stab,...mob];
-  const details={
+  const details: Record<string, string>={
     "Clamshells w/ band":"2×15 each","Banded side steps":"2×20 each","Banded monster walks":"2×15 each","Standing band hip abduction":"2×15 each",
     "Hip airplane (light KB)":"2×6 each, slow","Seated banded hip flexion":"2×15 each","Weighted 90/90 hip switch":"2×6 each",
     "Side-lying leg raises":"2×15 each","Clamshells (bodyweight)":"2×20 each","Fire hydrants":"2×15 each","Standing hip abduction":"2×20 each",
@@ -24,8 +25,8 @@ function buildHipSection(seed,bodyweight){
 // Two drills a day, fixed prescription, seeded off the hip section's seed so the two
 // prehab blocks never share a draw. Carries hip:true on purpose: every cap exemption,
 // injury-sweep protection and render rule keyed on that flag applies unchanged.
-function buildFootAnkleSection(seed,bodyweight,raceWeek){
-  const details={
+function buildFootAnkleSection(seed: number,bodyweight: boolean,raceWeek: boolean): Section {
+  const details: Record<string, string>={
     'Tibialis raise (wall lean)':'2×20','Banded dorsiflexion':'2×15 each',
     'Single-leg bent-knee soleus raise':'2×12 each, slow','Standing ankle CARs':'2×5 each direction',
     'Toe yoga (splay + big-toe lifts)':'2×10 each foot'
@@ -57,8 +58,8 @@ function buildFootAnkleSection(seed,bodyweight,raceWeek){
 // every banded movement on non-commercial tiers, and a band is the one implement a
 // hotel-room athlete can reasonably be assumed to own for rehab. Bodyweight tier gets
 // its own equipment-free list instead.
-function buildRehabSection(region,seed,bodyweight){
-  const BW={
+function buildRehabSection(region: string,seed: number,bodyweight: boolean): Section[] {
+  const BW: Record<string, string[]>={
     shoulder:['Side-lying external rotation (bodyweight)','Prone Y raise','Scapular pushup','Wall slide'],
     elbow:['Wrist extensor isometric hold','Towel grip squeeze','Wrist circles (slow)','Eccentric wrist extension']
   };
@@ -67,7 +68,7 @@ function buildRehabSection(region,seed,bodyweight){
   const mobPool  = EXLIB[region+'_mobility']||EXLIB.shoulder_mobility;
   const stab=pick(stabPool,3,seed);
   const mob =pick(mobPool,2,seed+11);
-  const details={
+  const details: Record<string, string>={
     'Band external rotation (arm at side)':'3×15 each, slow, elbow pinned to the ribs',
     'Side-lying dumbbell external rotation':'3×12 each, light',
     'Band pull-apart':'3×20',
@@ -177,12 +178,12 @@ const CORE_SPEED_TYPES = new Set(['int','nrc_speed1','nrc_speed2']);
 // V193 (D44): which tiers own a barbell. buildProgram computed this inline and the answer
 // was unreachable from week assembly, where the core injector runs — so the one pool that
 // is injected after the pool block had no gear gate at all. One definition, two readers.
-function _tierHasBarbell(equip){ return equip==='home_full'||equip==='commercial'||equip==='crossfit'; }
+function _tierHasBarbell(equip: Equipment): boolean { return equip==='home_full'||equip==='commercial'||equip==='crossfit'; }
 // V216 (D154): THE GEAR LENS, one predicate for every reader. Engine C's pools read it as _gearOK;
 // applyInjuryFilter reads it for the build's own equipment, so an injury rename is judged by the
 // same lens the draw was. The four flags derive from the tier exactly as Engine C derives its own.
 // A pure function of the tier name; the body below moved here verbatim from Engine C.
-function _gearLens(equip){
+function _gearLens(equip: Equipment): (n: string | null | undefined) => boolean {
   const hasBarbell=_tierHasBarbell(equip);
   const hasCables=equip==='commercial';
   const hasGHD=equip==='commercial'||equip==='crossfit';
@@ -227,7 +228,7 @@ function _gearLens(equip){
 // so this is a final catch-all: walk the built program and substitute anything that
 // still names equipment. Explicit map first, then a keyword fallback so a NEW gear
 // movement added later degrades to something safe instead of leaking.
-const _BW_SUBS={
+const _BW_SUBS: Record<string, string>={
   // V178: loaded prehab/core names whose _bwFallback would land on Burpees or a row. 'Landmine
   // rotations' was unreachable before D6 rotated the hot-tomorrow pillar; it goes to a
   // rotational drill, NOT to the Dead bug the other two rotational members already sub to,
@@ -241,6 +242,7 @@ const _BW_SUBS={
   'Ball slams OR Kettlebell swings':'Burpees',
   'Ball slams':'Burpees',
   'Kettlebell swing':'Jump squats',
+  // @ts-expect-error TS1117, a key written twice with the same value: dead, and left as it ran (phase D moves code, never changes it)
   'Kettlebell swing':'Jump squats',
   'Clamshells w/ band':'Clamshells (bodyweight)',
   'Banded side steps':'Side-lying leg raises',
@@ -252,7 +254,7 @@ const _BW_SUBS={
   'Dumbbell goblet side lunge':'Side lunge (bodyweight)'
 };
 const _BW_GEAR=/kettlebell|dumbbell|barbell|\bKB\b|\bDB\b|medicine ball|ball slam|cable|machine|trap bar|bumper|wall ball|weighted|weight vest|rucksack|sled|bench press|close-grip bench|skullcrush|preacher|lat pull|leg press|leg extension|leg curl|hack squat|pec deck|\bband(?!\s*stretch)/i;
-function _bwFallback(name){
+function _bwFallback(name: string | null | undefined): string {
   const N=(name||'').toLowerCase();
   if(/press|pushup|dip/.test(N))            return 'Pushups (slow 3s eccentric)';
   if(/row|pull|chin/.test(N))               return 'Inverted row (under a table)';

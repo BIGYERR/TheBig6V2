@@ -43,6 +43,9 @@ export interface Program {
 
 export type Weeks = Record<string, Week>;
 
+/** The weeks as the engine's passes walk them: Object.keys hands them the week and the day keys as plain strings. */
+export type WeekGrid = Record<string, Record<string, Day>>;
+
 /** One week: all seven days, rest days included. */
 export type Week = Record<DayKey, Day>;
 
@@ -103,6 +106,11 @@ export interface Section {
   pillar?: string;
   /** Optional: only on core finishers. */
   coreHeader?: string;
+  /**
+   * Legacy, never written today: a section some older build stored with type 'superset' in place of the superset flag.
+   * The engine's passes and the screens still read it, so a stored program from then keeps its supersets.
+   */
+  type?: 'superset';
 }
 
 /** One exercise as prescribed: its name and its prescription text ('3×12 — RPE 6.5 ...'). */

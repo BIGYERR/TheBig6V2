@@ -1,7 +1,7 @@
-import { asyIcon } from './icons.js';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { completedKey, esc, getWildcardDone, saveWildcardDone } from './storage.js';
 import { _setCurrentRandIdx, activeProg, showToast } from './rest-day-shell.js';
-import { getWeekMonday } from './calendar.js';
+import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { _setCurrentRandDayKey, _setLastRandIdx, lastRandIdx } from './wizard.js';
 import { buildSectionsHTML, dayBeforeStart, renderWeekView } from './week-view-sections.js';
 import { computeStreak, popFire } from './popups-streaks-reminders.js';

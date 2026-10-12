@@ -1,12 +1,12 @@
-import { asyIcon } from './icons.js';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { getActiveProgId, getPrograms, savePrograms } from './storage.js';
 import {
   _setActiveProg, _setCurrentWeek, activeProg, activeProgId, confirmProgId, confirmTier, editProgId, openProgIds,
   showToast,
 } from './rest-day-shell.js';
-import { DEFAULT_1RM, LIFTING_FOCUS_TO_GOAL } from './exercise-library.js';
-import { ALL_DAYS_ORDER, getWeekMonday } from './calendar.js';
-import { _fmtMileAnchor } from './clock-format.js';
+import { DEFAULT_1RM, LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
+import { ALL_DAYS_ORDER, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
+import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.ts';
 import {
   CARDIO_GOALS_BY_TYPE, HYBRID_EXCLUDED_GOALS, _GOAL_RANK, _GOAL_REQ_INPUTS, _fmtStartDay, _rsRace, resolveStartDate,
 } from './wizard.js';

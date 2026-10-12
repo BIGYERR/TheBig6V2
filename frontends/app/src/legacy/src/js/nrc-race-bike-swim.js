@@ -1,5 +1,5 @@
-import { _ISO_ORDER, _isoOf, _parseLocalDate, getWeekMonday } from './calendar.js';
-import { _clkMS } from './clock-format.js';
+import { _ISO_ORDER, _isoOf, _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
+import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
 import { getCHIBike, getCHISwim, getINTBike, getINTReps, isCardioCutbackWeek } from './nsw-cardio.js';
 import { paceChartLookup, steadyCapSec } from './cardio-progression.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)

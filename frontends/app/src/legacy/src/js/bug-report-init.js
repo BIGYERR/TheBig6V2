@@ -1,6 +1,6 @@
 import { getActiveProgId, getPrograms } from './storage.js';
 import { activeProg, currentWeek, showScreen, showToast } from './rest-day-shell.js';
-import { foldExAliasKeys } from './exercise-library.js';
+import { foldExAliasKeys } from '../../../../../../core/src/engine/exercise-library.ts';
 import { renderWeekView } from './week-view-sections.js';
 import { getExWeights, saveExWeights } from './log-entries.js';
 import { _ruIsland } from './rest-timer.js';

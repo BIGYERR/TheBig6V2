@@ -198,7 +198,7 @@ const ITEM = object<Item>('item', { name: req(str), detail: req(str) });
 const SECTION = object<Section>('section', {
   label: req(str), items: req(arrayOf(ITEM)),
   superset: opt(bool), rounds: opt(int), optional: opt(oneOf(true)), hip: opt(oneOf(true)), core: opt(oneOf(true)),
-  pillar: opt(str), coreHeader: opt(str),
+  pillar: opt(str), coreHeader: opt(str), type: opt(oneOf('superset')),
 });
 
 const DOSE_RANGE = object<DoseRange>('doseRange', { lo: req(num), hi: req(num) });

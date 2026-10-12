@@ -1,7 +1,7 @@
 import { getPrograms, savePrograms } from './storage.js';
 import { _setCurrentWeek, showScreen, showToast } from './rest-day-shell.js';
-import { LIFTING_FOCUS_TO_GOAL } from './exercise-library.js';
-import { _fmtMileAnchor } from './clock-format.js';
+import { LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
+import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.ts';
 import { WD, _applyWizardStart, _rsRace, renderWizardStep, resolveStartDate } from './wizard.js';
 import { calcProgramLength } from './nsw-cardio.js';
 import { runAnchorInfo } from './cardio-progression.js';

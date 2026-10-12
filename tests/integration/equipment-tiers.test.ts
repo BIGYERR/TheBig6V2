@@ -136,7 +136,8 @@ test('the landmine rule is exact-anchored live code above the core exemption, wi
   // `landmine (reverse lunge|rotational press)` inside the _REP_FLOOR table, whose other alternatives carry no landmine
   // or press token.
   const LIT = 'landmine (reverse lunge|rotational press)';
-  const rfAt = noComments.indexOf('const _REP_FLOOR=['), rfEnd = rfAt < 0 ? -1 : noComments.indexOf('\n];', rfAt);
+  // The table's type annotation (core/src/engine/region-caps.ts) strips to spaces between its name and the `=`.
+  const rfAt = noComments.search(/const _REP_FLOOR\s*=\[/), rfEnd = rfAt < 0 ? -1 : noComments.indexOf('\n];', rfAt);
   const authored = (r: string, at: number) => {
     if (rfAt < 0 || rfEnd < 0 || !(at > rfAt && at < rfEnd)) return false;
     const side = r.slice(1, -1).split(LIT);

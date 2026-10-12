@@ -128,7 +128,8 @@ chunks that changed.
 - `tests/e2e/`: the Docker e2e (journeys, parity, collage), moved from the app in the folder layout's step 4.
 - One runner for every TypeScript test (section 4, decision 3), `tsc -b` type-checking everything in the 60-second check
   and in CI, and the feature names already in place (`docs/test-migration.md`) carried over unchanged.
-- `tests/harness.js` and its VM retire at the end of phase D, when nothing reads the inline script any more.
+- `tests/harness.js` and its VM retire at the end of phase E, when no test drives the legacy page any more (phase D moves the
+  engine-only tests off it; the 51 page-driving test files move with their screens).
 
 ## 3. Phases
 
@@ -319,18 +320,32 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
      script and shrinks screen by screen in phase E; Angular's own build bundles everything else.
 - **Done when:** no code depends on implicit globals except through `globals.ts`.
 
-### Phase D: TypeScript, engine first (incremental, many sessions, interleaved with releases)
-- Rename modules to `.ts` and move the framework-free ones into `core/`. Order:
-  1. format and pace;
-  2. doctrine data (NRC verbatim and the NSW tables, byte-checked against `doctrine/`);
-  3. storage keys (`exStoreKey` stays the single `ia_exw_` writer);
-  4. Engines A to D and `buildProgram`;
-  5. overlays, deload, supersets, budget;
-  6. logging, history and freeze, ledger and streak services.
+### Phase D: TypeScript, engine first (in progress from Post-v0.239.2; `docs/decisions/engine-typescript.md`)
+- **How (Post-v0.239.2).** The engine's 17 files (phase C step 3) move into `core/src/engine/<name>.ts` a group at a
+  time, in the order their imports allow, and stay pieces of the page: `order.json` names each `engine/<name>.ts`, and
+  `build-index.mjs` strips its types with Node's own stripper (strip mode: spaces where the types were, nothing else
+  touched). A move writes types and never changes code, so the page runs the same JavaScript tokens as the release
+  before: `node tools/same-script.mjs <before.html> <after.html>` proves it, and every `index.html` hunk is whitespace, a
+  comment or the version. Each group ships as the next PATCH (Mario's standing answer). The engine is type-checked as its
+  own project (`core/tsconfig.engine.json`: strict, framework-free, without `noUncheckedIndexedAccess`).
+- **Groups** (the strongly connected parts of the engine's import graph, dependencies first):
+  1. **the leaf files, v0.239.3:** `icons`, `exercise-library`, `calendar`, `clock-format`, `prehab`, `region-caps`,
+     `power-accessory`, `exercise-kinds`, `injury` (done);
+  2. the cardio engines, which import each other: `nsw-cardio`, `nrc-race-bike-swim`, `cardio-progression`;
+  3. `swap-prefs`, then `engine-c`;
+  4. Engines A, B and D with `buildProgram`, which import each other: `engine-a-b-calendar`, `core-legs`,
+     `budget-engine-d`; then `core/src/engine/index.ts` exports the engine (`@ia/core/engine`).
+- **Then the cleanup pass**, under the tests with ordinary proof rather than the token proof: every `@ts-expect-error`
+  the move left, `noUncheckedIndexedAccess`, and the loose types (`any`) tightened file by file.
+- **Then the engine-only tests** (21 files, `tests/measure/es-modules_test-harness-use.md`) import `@ia/core/engine`
+  through one support loader instead of booting the page. The other 51 drive the page's screens by global name, so they
+  move with phase E, and the VM harness retires when the last of them has.
+- The rest of the original list (storage keys, logging, history and freeze, the ledger and streak services) is UI-side
+  code today and moves with the screens that own it, in phase E, into `@ia/core` services.
 - Domain types are written from the code and from real built programs, and a test checks that real programs match them,
   so the types cannot drift from what the engine produces.
-- Tests switch from the VM to importing `@ia/core`. The harness retires when the last one moves.
-- **Done when:** `core/` is strict TypeScript, the app and tests import it, and no test boots the inline script.
+- **Done when:** the engine is strict TypeScript in `core/src/engine`, the page and the tests build programs from it, and
+  no engine-only test boots the inline script.
 
 ### Phase E: screens into Angular components (one screen per release where possible)
 - Through `LegacyBridge`, each screen becomes a component (`.ts`, `.html`, `.css`) using `@ia/core` services, and its

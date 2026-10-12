@@ -1,11 +1,11 @@
-import { asyIcon } from './icons.js';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { completedKey, esc, getCompleted, getLogs, logKey } from './storage.js';
 import {
   _setCurrentWeek, activeProg, currentWeek, openRestSheet, restDayEligible, showToast,
 } from './rest-day-shell.js';
-import { ALL_DAYS_ORDER, _parseLocalDate, getWeekMonday } from './calendar.js';
+import { ALL_DAYS_ORDER, _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL, _fmtStartDay } from './wizard.js';
-import { INJURY_REGIONS } from './injury.js';
+import { INJURY_REGIONS } from '../../../../../../core/src/engine/injury.ts';
 import { updateRandCounter, wildcardMarkHTML, wildcardOn, wildcardTagHTML } from './random-wildcard.js';
 import { buildExItem } from './set-logging.js';
 import { openDetail } from './day-detail.js';

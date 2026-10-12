@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.239.2"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.239.3"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1213,9 +1213,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
 <script>// ── Icons: the Asylum icon set as inline SVG, and the emoji each stands in for. ──
 /* THE ASYLUM icon system — Lucide 2px (DS) + custom fitness marks. */
-const ASY_ICON_PATHS={"trash":"<path d=\"M3 6h18\"/><path d=\"M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2\"/><path d=\"M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6\"/><path d=\"M10 11v6M14 11v6\"/>","medal":"<path d=\"M7.5 3h9l-3 6h-3z\"/><path d=\"M12 9v2\"/><circle cx=\"12\" cy=\"16\" r=\"5\"/><path d=\"M12 14v4M10 16h4\"/>","growth":"<path d=\"M4.5 16a4.5 4.5 0 0 1 4.5 4.5\"/><path d=\"M4.5 11.75a8.75 8.75 0 0 1 8.75 8.75\"/><path d=\"M4.5 7.5a13 13 0 0 1 13 13\"/><path d=\"M13 11 19.5 4.5\"/><path d=\"M14.8 4.5h4.7v4.7\"/>","barbell":"<line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"/><rect x=\"5.5\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><rect x=\"15.9\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><line x1=\"2.5\" y1=\"9.5\" x2=\"2.5\" y2=\"14.5\"/><line x1=\"21.5\" y1=\"9.5\" x2=\"21.5\" y2=\"14.5\"/>","lightbulb":"<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>","brain":"<path d=\"M12 5a3 3 0 0 0-5.5 1.7A3 3 0 0 0 5 12a3 3 0 0 0 1.7 5.3A3 3 0 0 0 12 19\"/><path d=\"M12 5a3 3 0 0 1 5.5 1.7A3 3 0 0 1 19 12a3 3 0 0 1-1.7 5.3A3 3 0 0 1 12 19\"/><path d=\"M12 5v14\"/>","scale":"<line x1=\"12\" y1=\"4\" x2=\"12\" y2=\"20\"/><line x1=\"7\" y1=\"20\" x2=\"17\" y2=\"20\"/><line x1=\"4\" y1=\"7\" x2=\"20\" y2=\"7\"/><path d=\"M4 7 1.6 12.6a2.4 2.4 0 0 0 4.8 0z\"/><path d=\"M20 7l-2.4 5.6a2.4 2.4 0 0 0 4.8 0z\"/>","warning":"<path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13.5\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>","siren":"<path d=\"M8 13a4 4 0 0 1 8 0v1.5H8z\"/><rect x=\"6\" y=\"14.5\" width=\"12\" height=\"5\" rx=\"1\"/><line x1=\"12\" y1=\"14.5\" x2=\"12\" y2=\"19.5\"/><line x1=\"12\" y1=\"6\" x2=\"12\" y2=\"3\"/><line x1=\"18\" y1=\"8.3\" x2=\"20.2\" y2=\"6.1\"/><line x1=\"6\" y1=\"8.3\" x2=\"3.8\" y2=\"6.1\"/><line x1=\"20\" y1=\"13\" x2=\"22.5\" y2=\"13\"/><line x1=\"4\" y1=\"13\" x2=\"1.5\" y2=\"13\"/>","kettlebell":"<path d=\"M7.7 11.3C6.2 8.4 7.6 4.8 12 4.8s5.8 3.6 4.3 6.5\"/><path d=\"M10 10c-.9-1.6-.2-3.3 2-3.3s2.9 1.7 2 3.3\"/><path d=\"M7.7 11.3a5.4 5.4 0 1 0 8.6 0\"/>","flagFinish":"<line x1=\"5\" y1=\"21\" x2=\"5\" y2=\"3\"/><path d=\"M5 4h14v9H5z\"/><line x1=\"5\" y1=\"8.5\" x2=\"19\" y2=\"8.5\"/><line x1=\"9.66\" y1=\"4\" x2=\"9.66\" y2=\"13\"/><line x1=\"14.33\" y1=\"4\" x2=\"14.33\" y2=\"13\"/>","lock":"<rect x=\"4\" y=\"10.5\" width=\"16\" height=\"10.5\" rx=\"2\"/><path d=\"M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5\"/>","notebook":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><line x1=\"9\" y1=\"3\" x2=\"9\" y2=\"21\"/><line x1=\"12\" y1=\"8\" x2=\"16\" y2=\"8\"/><line x1=\"12\" y1=\"12\" x2=\"16\" y2=\"12\"/><line x1=\"12\" y1=\"16\" x2=\"16\" y2=\"16\"/>","calculator":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><rect x=\"8\" y=\"6\" width=\"8\" height=\"3\" rx=\"0.5\"/><line x1=\"8\" y1=\"13\" x2=\"8.01\" y2=\"13\"/><line x1=\"12\" y1=\"13\" x2=\"12.01\" y2=\"13\"/><line x1=\"16\" y1=\"13\" x2=\"16.01\" y2=\"13\"/><line x1=\"8\" y1=\"17\" x2=\"8.01\" y2=\"17\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/><line x1=\"16\" y1=\"17\" x2=\"16.01\" y2=\"17\"/>","home":"<path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/>","dumbbell":"<path d=\"M6.5 6.5v11\"/><path d=\"M3.5 8.5v7\"/><path d=\"M17.5 6.5v11\"/><path d=\"M20.5 8.5v7\"/><line x1=\"6.5\" y1=\"12\" x2=\"17.5\" y2=\"12\"/>","chart":"<line x1=\"12\" y1=\"20\" x2=\"12\" y2=\"10\"/><line x1=\"18\" y1=\"20\" x2=\"18\" y2=\"4\"/><line x1=\"6\" y1=\"20\" x2=\"6\" y2=\"16\"/>","user":"<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>","play":"<polygon points=\"6 3 20 12 6 21 6 3\"/>","pause":"<rect x=\"6\" y=\"4\" width=\"4\" height=\"16\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\"/>","check":"<polyline points=\"20 6 9 17 4 12\"/>","plus":"<line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","minus":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","x":"<line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/>","chevronRight":"<polyline points=\"9 18 15 12 9 6\"/>","chevronLeft":"<polyline points=\"15 18 9 12 15 6\"/>","chevronDown":"<polyline points=\"6 9 12 15 18 9\"/>","clock":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>","flame":"<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/>","trophy":"<path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\"/><path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\"/><path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\"/><path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\"/>","bell":"<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9\"/><path d=\"M13.73 21a2 2 0 0 1-3.46 0\"/>","arrowRight":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/><polyline points=\"12 5 19 12 12 19\"/>","more":"<circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/>","target":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><circle cx=\"12\" cy=\"12\" r=\"6\"/><circle cx=\"12\" cy=\"12\" r=\"2\"/>","zap":"<polygon points=\"13 2 3 14 12 14 11 22 21 10 12 10 13 2\"/>","calendar":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/>","history":"<path d=\"M3 3v5h5\"/><path d=\"M3.05 13A9 9 0 1 0 6 5.3L3 8\"/><polyline points=\"12 7 12 12 15 15\"/>","sliders":"<line x1=\"4\" y1=\"21\" x2=\"4\" y2=\"14\"/><line x1=\"4\" y1=\"10\" x2=\"4\" y2=\"3\"/><line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"3\"/><line x1=\"20\" y1=\"21\" x2=\"20\" y2=\"16\"/><line x1=\"20\" y1=\"12\" x2=\"20\" y2=\"3\"/><line x1=\"1\" y1=\"14\" x2=\"7\" y2=\"14\"/><line x1=\"9\" y1=\"8\" x2=\"15\" y2=\"8\"/><line x1=\"17\" y1=\"16\" x2=\"23\" y2=\"16\"/>","skip":"<polygon points=\"5 4 15 12 5 20 5 4\"/><line x1=\"19\" y1=\"5\" x2=\"19\" y2=\"19\"/>","run":"<circle cx=\"15\" cy=\"5\" r=\"2\"/><path d=\"M14 7l-3 6\"/><path d=\"M14 9l4 1\"/><path d=\"M14 9l-4-1\"/><path d=\"M11 13l3 4-1 4\"/><path d=\"M11 13l-3 3 1 4\"/>","bike":"<circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"15\" cy=\"5\" r=\"1\"/><path d=\"M12 17.5V14l-3-3 4-3 2 3h2\"/>","swim":"<circle cx=\"8\" cy=\"9\" r=\"2\"/><path d=\"M10 10l4-2 3 2\"/><path d=\"M3 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/><path d=\"M3 20c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/>","shield":"<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"/>","sprout":"<path d=\"M7 20h10\"/><path d=\"M10 20c5.5-2.5.8-6.4 3-10\"/><path d=\"M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z\"/><path d=\"M14.1 6c-.9 1-1.3 2.5-1.1 4 1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z\"/>","flag":"<path d=\"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z\"/><line x1=\"4\" y1=\"22\" x2=\"4\" y2=\"15\"/>","dice":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M16 8h.01\"/><path d=\"M8 8h.01\"/><path d=\"M8 16h.01\"/><path d=\"M16 16h.01\"/><path d=\"M12 12h.01\"/>","backpack":"<path d=\"M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z\"/><path d=\"M8 10V6a4 4 0 0 1 8 0v4\"/><path d=\"M8 18h8\"/><path d=\"M8 14h8\"/>","pencil":"<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z\"/>","copy":"<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/>","bandage":"<rect x=\"1.8\" y=\"7.6\" width=\"20.4\" height=\"8.8\" rx=\"4.4\" transform=\"rotate(-45 12 12)\"/><line x1=\"8.6\" y1=\"8.6\" x2=\"15.4\" y2=\"15.4\"/><line x1=\"15.4\" y1=\"8.6\" x2=\"8.6\" y2=\"15.4\"/>","swap":"<line x1=\"3\" y1=\"8.5\" x2=\"17\" y2=\"8.5\"/><polyline points=\"14 5.5 17 8.5 14 11.5\"/><line x1=\"21\" y1=\"15.5\" x2=\"7\" y2=\"15.5\"/><polyline points=\"10 12.5 7 15.5 10 18.5\"/>"};
-const ASY_EMOJI={"🏅":"medal","🏆":"trophy","💪":"growth","🏋":"barbell","🦾":"dumbbell","⚡":"zap","🔥":"flame","⚖":"scale","🛡":"shield","🌱":"sprout","🧠":"brain","💡":"lightbulb","🏠":"home","🎒":"backpack","🤸":"kettlebell","👤":"user","🎯":"target","🏁":"flagFinish","🔒":"lock","⚠":"warning","🚨":"siren","✅":"check","📓":"notebook","🧮":"calculator","🏃":"run","🚴":"bike","🏊":"swim","📅":"calendar","📈":"chart","📊":"chart","🎲":"dice","⏱":"clock"};
-function asyIcon(key,size){size=size||22;var n=String(key||'').replace(/\uFE0F/g,'');n=ASY_EMOJI[n]||n;var p=ASY_ICON_PATHS[n];if(!p)return key||'';return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex:0 0 auto">'+p+'</svg>';}
+const ASY_ICON_PATHS                        ={"trash":"<path d=\"M3 6h18\"/><path d=\"M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2\"/><path d=\"M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6\"/><path d=\"M10 11v6M14 11v6\"/>","medal":"<path d=\"M7.5 3h9l-3 6h-3z\"/><path d=\"M12 9v2\"/><circle cx=\"12\" cy=\"16\" r=\"5\"/><path d=\"M12 14v4M10 16h4\"/>","growth":"<path d=\"M4.5 16a4.5 4.5 0 0 1 4.5 4.5\"/><path d=\"M4.5 11.75a8.75 8.75 0 0 1 8.75 8.75\"/><path d=\"M4.5 7.5a13 13 0 0 1 13 13\"/><path d=\"M13 11 19.5 4.5\"/><path d=\"M14.8 4.5h4.7v4.7\"/>","barbell":"<line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\"/><rect x=\"5.5\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><rect x=\"15.9\" y=\"7.5\" width=\"2.6\" height=\"9\" rx=\"0.6\"/><line x1=\"2.5\" y1=\"9.5\" x2=\"2.5\" y2=\"14.5\"/><line x1=\"21.5\" y1=\"9.5\" x2=\"21.5\" y2=\"14.5\"/>","lightbulb":"<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>","brain":"<path d=\"M12 5a3 3 0 0 0-5.5 1.7A3 3 0 0 0 5 12a3 3 0 0 0 1.7 5.3A3 3 0 0 0 12 19\"/><path d=\"M12 5a3 3 0 0 1 5.5 1.7A3 3 0 0 1 19 12a3 3 0 0 1-1.7 5.3A3 3 0 0 1 12 19\"/><path d=\"M12 5v14\"/>","scale":"<line x1=\"12\" y1=\"4\" x2=\"12\" y2=\"20\"/><line x1=\"7\" y1=\"20\" x2=\"17\" y2=\"20\"/><line x1=\"4\" y1=\"7\" x2=\"20\" y2=\"7\"/><path d=\"M4 7 1.6 12.6a2.4 2.4 0 0 0 4.8 0z\"/><path d=\"M20 7l-2.4 5.6a2.4 2.4 0 0 0 4.8 0z\"/>","warning":"<path d=\"M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z\"/><line x1=\"12\" y1=\"9\" x2=\"12\" y2=\"13.5\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/>","siren":"<path d=\"M8 13a4 4 0 0 1 8 0v1.5H8z\"/><rect x=\"6\" y=\"14.5\" width=\"12\" height=\"5\" rx=\"1\"/><line x1=\"12\" y1=\"14.5\" x2=\"12\" y2=\"19.5\"/><line x1=\"12\" y1=\"6\" x2=\"12\" y2=\"3\"/><line x1=\"18\" y1=\"8.3\" x2=\"20.2\" y2=\"6.1\"/><line x1=\"6\" y1=\"8.3\" x2=\"3.8\" y2=\"6.1\"/><line x1=\"20\" y1=\"13\" x2=\"22.5\" y2=\"13\"/><line x1=\"4\" y1=\"13\" x2=\"1.5\" y2=\"13\"/>","kettlebell":"<path d=\"M7.7 11.3C6.2 8.4 7.6 4.8 12 4.8s5.8 3.6 4.3 6.5\"/><path d=\"M10 10c-.9-1.6-.2-3.3 2-3.3s2.9 1.7 2 3.3\"/><path d=\"M7.7 11.3a5.4 5.4 0 1 0 8.6 0\"/>","flagFinish":"<line x1=\"5\" y1=\"21\" x2=\"5\" y2=\"3\"/><path d=\"M5 4h14v9H5z\"/><line x1=\"5\" y1=\"8.5\" x2=\"19\" y2=\"8.5\"/><line x1=\"9.66\" y1=\"4\" x2=\"9.66\" y2=\"13\"/><line x1=\"14.33\" y1=\"4\" x2=\"14.33\" y2=\"13\"/>","lock":"<rect x=\"4\" y=\"10.5\" width=\"16\" height=\"10.5\" rx=\"2\"/><path d=\"M7.5 10.5V7a4.5 4.5 0 0 1 9 0v3.5\"/>","notebook":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><line x1=\"9\" y1=\"3\" x2=\"9\" y2=\"21\"/><line x1=\"12\" y1=\"8\" x2=\"16\" y2=\"8\"/><line x1=\"12\" y1=\"12\" x2=\"16\" y2=\"12\"/><line x1=\"12\" y1=\"16\" x2=\"16\" y2=\"16\"/>","calculator":"<rect x=\"5\" y=\"3\" width=\"14\" height=\"18\" rx=\"1.5\"/><rect x=\"8\" y=\"6\" width=\"8\" height=\"3\" rx=\"0.5\"/><line x1=\"8\" y1=\"13\" x2=\"8.01\" y2=\"13\"/><line x1=\"12\" y1=\"13\" x2=\"12.01\" y2=\"13\"/><line x1=\"16\" y1=\"13\" x2=\"16.01\" y2=\"13\"/><line x1=\"8\" y1=\"17\" x2=\"8.01\" y2=\"17\"/><line x1=\"12\" y1=\"17\" x2=\"12.01\" y2=\"17\"/><line x1=\"16\" y1=\"17\" x2=\"16.01\" y2=\"17\"/>","home":"<path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/>","dumbbell":"<path d=\"M6.5 6.5v11\"/><path d=\"M3.5 8.5v7\"/><path d=\"M17.5 6.5v11\"/><path d=\"M20.5 8.5v7\"/><line x1=\"6.5\" y1=\"12\" x2=\"17.5\" y2=\"12\"/>","chart":"<line x1=\"12\" y1=\"20\" x2=\"12\" y2=\"10\"/><line x1=\"18\" y1=\"20\" x2=\"18\" y2=\"4\"/><line x1=\"6\" y1=\"20\" x2=\"6\" y2=\"16\"/>","user":"<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>","play":"<polygon points=\"6 3 20 12 6 21 6 3\"/>","pause":"<rect x=\"6\" y=\"4\" width=\"4\" height=\"16\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\"/>","check":"<polyline points=\"20 6 9 17 4 12\"/>","plus":"<line x1=\"12\" y1=\"5\" x2=\"12\" y2=\"19\"/><line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","minus":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/>","x":"<line x1=\"18\" y1=\"6\" x2=\"6\" y2=\"18\"/><line x1=\"6\" y1=\"6\" x2=\"18\" y2=\"18\"/>","chevronRight":"<polyline points=\"9 18 15 12 9 6\"/>","chevronLeft":"<polyline points=\"15 18 9 12 15 6\"/>","chevronDown":"<polyline points=\"6 9 12 15 18 9\"/>","clock":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>","flame":"<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/>","trophy":"<path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\"/><path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\"/><path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\"/><path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\"/>","bell":"<path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9\"/><path d=\"M13.73 21a2 2 0 0 1-3.46 0\"/>","arrowRight":"<line x1=\"5\" y1=\"12\" x2=\"19\" y2=\"12\"/><polyline points=\"12 5 19 12 12 19\"/>","more":"<circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/>","target":"<circle cx=\"12\" cy=\"12\" r=\"10\"/><circle cx=\"12\" cy=\"12\" r=\"6\"/><circle cx=\"12\" cy=\"12\" r=\"2\"/>","zap":"<polygon points=\"13 2 3 14 12 14 11 22 21 10 12 10 13 2\"/>","calendar":"<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" ry=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/>","history":"<path d=\"M3 3v5h5\"/><path d=\"M3.05 13A9 9 0 1 0 6 5.3L3 8\"/><polyline points=\"12 7 12 12 15 15\"/>","sliders":"<line x1=\"4\" y1=\"21\" x2=\"4\" y2=\"14\"/><line x1=\"4\" y1=\"10\" x2=\"4\" y2=\"3\"/><line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"3\"/><line x1=\"20\" y1=\"21\" x2=\"20\" y2=\"16\"/><line x1=\"20\" y1=\"12\" x2=\"20\" y2=\"3\"/><line x1=\"1\" y1=\"14\" x2=\"7\" y2=\"14\"/><line x1=\"9\" y1=\"8\" x2=\"15\" y2=\"8\"/><line x1=\"17\" y1=\"16\" x2=\"23\" y2=\"16\"/>","skip":"<polygon points=\"5 4 15 12 5 20 5 4\"/><line x1=\"19\" y1=\"5\" x2=\"19\" y2=\"19\"/>","run":"<circle cx=\"15\" cy=\"5\" r=\"2\"/><path d=\"M14 7l-3 6\"/><path d=\"M14 9l4 1\"/><path d=\"M14 9l-4-1\"/><path d=\"M11 13l3 4-1 4\"/><path d=\"M11 13l-3 3 1 4\"/>","bike":"<circle cx=\"5.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"18.5\" cy=\"17.5\" r=\"3.5\"/><circle cx=\"15\" cy=\"5\" r=\"1\"/><path d=\"M12 17.5V14l-3-3 4-3 2 3h2\"/>","swim":"<circle cx=\"8\" cy=\"9\" r=\"2\"/><path d=\"M10 10l4-2 3 2\"/><path d=\"M3 16c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/><path d=\"M3 20c1.5 1 3 1 4.5 0s3-1 4.5 0 3 1 4.5 0 3-1 4.5 0\"/>","shield":"<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10\"/>","sprout":"<path d=\"M7 20h10\"/><path d=\"M10 20c5.5-2.5.8-6.4 3-10\"/><path d=\"M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z\"/><path d=\"M14.1 6c-.9 1-1.3 2.5-1.1 4 1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z\"/>","flag":"<path d=\"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z\"/><line x1=\"4\" y1=\"22\" x2=\"4\" y2=\"15\"/>","dice":"<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\"/><path d=\"M16 8h.01\"/><path d=\"M8 8h.01\"/><path d=\"M8 16h.01\"/><path d=\"M16 16h.01\"/><path d=\"M12 12h.01\"/>","backpack":"<path d=\"M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z\"/><path d=\"M8 10V6a4 4 0 0 1 8 0v4\"/><path d=\"M8 18h8\"/><path d=\"M8 14h8\"/>","pencil":"<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z\"/>","copy":"<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"/><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"/>","bandage":"<rect x=\"1.8\" y=\"7.6\" width=\"20.4\" height=\"8.8\" rx=\"4.4\" transform=\"rotate(-45 12 12)\"/><line x1=\"8.6\" y1=\"8.6\" x2=\"15.4\" y2=\"15.4\"/><line x1=\"15.4\" y1=\"8.6\" x2=\"8.6\" y2=\"15.4\"/>","swap":"<line x1=\"3\" y1=\"8.5\" x2=\"17\" y2=\"8.5\"/><polyline points=\"14 5.5 17 8.5 14 11.5\"/><line x1=\"21\" y1=\"15.5\" x2=\"7\" y2=\"15.5\"/><polyline points=\"10 12.5 7 15.5 10 18.5\"/>"};
+const ASY_EMOJI                        ={"🏅":"medal","🏆":"trophy","💪":"growth","🏋":"barbell","🦾":"dumbbell","⚡":"zap","🔥":"flame","⚖":"scale","🛡":"shield","🌱":"sprout","🧠":"brain","💡":"lightbulb","🏠":"home","🎒":"backpack","🤸":"kettlebell","👤":"user","🎯":"target","🏁":"flagFinish","🔒":"lock","⚠":"warning","🚨":"siren","✅":"check","📓":"notebook","🧮":"calculator","🏃":"run","🚴":"bike","🏊":"swim","📅":"calendar","📈":"chart","📊":"chart","🎲":"dice","⏱":"clock"};
+function asyIcon(key                           , size         )         {size=size||22;var n=String(key||'').replace(/\uFE0F/g,'');n=ASY_EMOJI[n]||n;var p=ASY_ICON_PATHS[n];if(!p)return key||'';return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;flex:0 0 auto">'+p+'</svg>';}
 
 
 // Exercise names reach markup from the library, from swaps, and now from the add picker.
@@ -1639,8 +1639,16 @@ function tabGo(target){
 }
 function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
 
+                                                                              
+
+/** Where a movement is done (V164): a superset never pairs two fixed stations of different classes. */
+                                                               
+/** One logged set of a movement in ia_exw_ (the loads a movement has been worked at, by week). */
+                                                                     
+/** One movement's thread in ia_exw_, under its store key (exStoreKey). */
+                                                                       
 // EXERCISE LIBRARY
-const EXLIB={
+const EXLIB                          ={
   chest_compound:['Barbell bench press','Incline barbell press','Close-grip bench press','Dumbbell bench press'],
   chest_acc:['Dumbbell incline press','Dumbbell bench press','Dips','Pushups (slow tempo)','Diamond pushups','Dumbbell decline press','Dumbbell floor press'],
   chest_acc_joint:['Dumbbell incline press','Dumbbell bench press','Machine chest press','Cable crossover','Pec deck','Dumbbell decline press','Dumbbell floor press'],
@@ -1746,8 +1754,8 @@ const EXLIB={
 // knows a carry is one-handed. Farmer is two hands and must NOT print 'each'.
 // Grammar matches the curated library's house form: distance, then 'each' if the
 // movement is one-handed, then the qualifier behind a comma ('50 yards, heavy').
-const _CARRY_PER_SIDE={'Suitcase carry':1,'Overhead carry':1};
-function _carryRx(dist,name,qual){
+const _CARRY_PER_SIDE                        ={'Suitcase carry':1,'Overhead carry':1};
+function _carryRx(dist        ,name                           ,qual                )         {
   return dist + (_CARRY_PER_SIDE[String(name||'').trim()]?' each':'') + (qual?', '+qual:'');
 }
 // ── PRESS SIDE (V192, D42-c) ─────────────────────────────────────────────────
@@ -1760,8 +1768,8 @@ function _carryRx(dist,name,qual){
 // that knows a press is one-handed. Barbell overhead press, Dumbbell Arnold press,
 // Dumbbell lateral raise and Barbell push press are two-hand or two-side movements
 // and must NOT print 'each'.
-const _PRESS_PER_SIDE={'Kettlebell single-arm press':1,'Landmine rotational press':1};
-function _isOneArmPress(name){ return !!_PRESS_PER_SIDE[String(name||'').trim()]; }
+const _PRESS_PER_SIDE                        ={'Kettlebell single-arm press':1,'Landmine rotational press':1};
+function _isOneArmPress(name                           )          { return !!_PRESS_PER_SIDE[String(name||'').trim()]; }
 // ── REP-AFFINITY (V160, D2-b) ────────────────────────────────────────────────────────
 // A movement declares the MAX reps a wave-driven prescription may ask of it.
 // 'Paused back squat' is a positional-strength tool: the dead stop kills the
@@ -1770,14 +1778,14 @@ function _isOneArmPress(name){ return !!_PRESS_PER_SIDE[String(name||'').trim()]
 // not quads — wrong limiter — so it must never ride the endurance/hypertrophy/
 // fatloss/balanced waves. SIDECAR MAP on purpose: EXLIB stays flat strings and
 // every existing consumer is byte-identical. Untagged = unconstrained.
-const REP_AFFINITY={'Paused back squat':{maxReps:6},'Barbell box squat':{maxReps:6}};
+const REP_AFFINITY                                     ={'Paused back squat':{maxReps:6},'Barbell box squat':{maxReps:6}};
 // ── MIN EXPERIENCE (V178, D4) ─────────────────────────────────────────────────────
 // Same sidecar shape as REP_AFFINITY. A movement declares the LEAST experience tier
 // that may be handed it. Untagged = any. Applied at pool construction (buildEx) so
 // every consumer of the pool inherits it; the power pools already do this by cost.
-const EX_MIN_EXP={'Zercher single-leg deadlift':'advanced'};
-const _EXP_RANK={beginner:0,intermediate:1,advanced:2};
-function _expOK(name,experience){const m=EX_MIN_EXP[name];if(!m)return true;return (_EXP_RANK[experience||'intermediate']??1)>=(_EXP_RANK[m]??0);}// V161: box squat is a dead-stop power variant — honest pause dies past ~6 reps (Mario's ruling D1-b)
+const EX_MIN_EXP                            ={'Zercher single-leg deadlift':'advanced'};
+const _EXP_RANK                        ={beginner:0,intermediate:1,advanced:2};
+function _expOK(name        ,experience                           )          {const m=EX_MIN_EXP[name];if(!m)return true;return (_EXP_RANK[experience||'intermediate']??1)>=(_EXP_RANK[m]??0);}// V161: box squat is a dead-stop power variant — honest pause dies past ~6 reps (Mario's ruling D1-b)
 // ── STATION CLASS (V164, D1/D6) ──────────────────────────────────────────────
 // A superset's stimulus is density; a cross-gym walk between members kills it and
 // camps two stations. Classes: RACK (bar + plates territory), STACK (cables and
@@ -1785,20 +1793,20 @@ function _expOK(name,experience){const m=EX_MIN_EXP[name];if(!m)return true;retu
 // extension, preacher), PORT (anything you carry to wherever you already are).
 // Rule (_ssLegal): PORT pairs with everything; two fixed classes must MATCH.
 // Sidecar classifier on the NAME, same doctrine as REP_AFFINITY — EXLIB stays flat.
-function _stationClass(name){
+function _stationClass(name                           )               {
   const N=String(name||'').toLowerCase();
   if(/glute-ham|\bghr\b|45\u00b0 back extension|preacher curl/.test(N)) return 'BENCH';
   if(/cable|machine|pulldown|assisted pullup|leg press|leg extension|leg curl|hack squat|pec deck|^rope |face pull|smith/.test(N)) return 'STACK';
   if(/barbell|trap bar|landmine|pendlay|power clean|^back squat|^front squat|paused back squat|^deadlift|sumo deadlift|good morning|close-grip bench|^incline barbell/.test(N)) return 'RACK';
   return 'PORT';
 }
-function _ssLegal(a,b){const ca=_stationClass(a),cb=_stationClass(b);return ca==='PORT'||cb==='PORT'||ca===cb;}
+function _ssLegal(a        ,b        )          {const ca=_stationClass(a),cb=_stationClass(b);return ca==='PORT'||cb==='PORT'||ca===cb;}
 // D2/D3b pair resolver. Commit aPref, walk b candidates in list order; if none is
 // legal, ONE re-walk of a candidates (first station-compatible pairing wins); if
 // both pools are pure and mutually banned, ok:false — the caller prints straight
 // sets (D3 demotion). Walks are plain array order over already-seeded lists, so
 // the outcome is deterministic for a given cfg+seed.
-function _ssPair(aPref,bPref,aAlts,bAlts){
+function _ssPair(aPref        ,bPref        ,aAlts                  ,bAlts                  )                                        {
   const A=[aPref].concat((aAlts||[]).filter(function(x){return x&&x!==aPref;}));
   const B=[bPref].concat((bAlts||[]).filter(function(x){return x&&x!==bPref;}));
   for(let i=0;i<B.length;i++){ if(B[i]!==aPref&&_ssLegal(aPref,B[i])) return {a:aPref,b:B[i],ok:true}; }
@@ -1808,8 +1816,8 @@ function _ssPair(aPref,bPref,aAlts,bAlts){
 // D5: the partner of a 2-item superset member, for station-filtering swap
 // candidates. Curated pairs that are ALREADY cross-station are left unfiltered —
 // the filter protects legal pairs, it does not retrofit designed ones.
-function _ssPartnerOf(day,outName){
-  let p=null;
+function _ssPartnerOf(day                                             ,outName        )                {
+  let p               =null;
   ((day&&day.sections)||[]).forEach(function(s){
     if(p||!s||!s.superset||!Array.isArray(s.items)||s.items.length!==2) return;
     let i=-1;
@@ -1830,7 +1838,7 @@ function _ssPartnerOf(day,outName){
 // is migrated, so a rollback to V112 finds its data exactly where it left it. It also
 // collapses the duplicate-spelling splits for free ('Barbell bench' vs 'Barbell bench press',
 // 'Kettlebell swings' vs 'Kettlebell swing') without touching a single stored record.
-const EX_RENAMED_V113 = {
+const EX_RENAMED_V113                         = {
   'Push press':'Barbell push press','Overhead press':'Barbell overhead press',
   'Good mornings':'Barbell good mornings','Romanian deadlift':'Barbell Romanian deadlift',
   'Box squat':'Barbell box squat','Thrusters':'Barbell thrusters',
@@ -1890,16 +1898,16 @@ const EX_RENAMED_V113 = {
   'Barbell incline press':'Incline barbell press','Barbell incline bench press':'Incline barbell press',
   'Barbell front squat':'Front squat'
 };
-function _exSlugRaw(n){return String(n||'').toLowerCase().replace(/[^a-z0-9]/g,'_');}
-const EX_KEY_ALIAS=(function(){const m=Object.create(null);
+function _exSlugRaw(n                           )         {return String(n||'').toLowerCase().replace(/[^a-z0-9]/g,'_');}
+const EX_KEY_ALIAS                        =(function(){const m=Object.create(null);
   for(const o in EX_RENAMED_V113) m[_exSlugRaw(o)]=_exSlugRaw(EX_RENAMED_V113[o]);
   return m;})();
 // The ONLY place a name becomes a store key. Three call sites used to inline this slug;
 // two writers agreeing today is two writers free to disagree later.
-function exStoreKey(name){const k=_exSlugRaw(name);return EX_KEY_ALIAS[k]||k;}
+function exStoreKey(name                           )         {const k=_exSlugRaw(name);return EX_KEY_ALIAS[k]||k;}
 // Canonical DISPLAY name per store key, derived from the SAME map (single source):
 // the value side of every rename is, by construction, the name today's cards speak.
-const EX_CANON_NAME=(function(){const m=Object.create(null);
+const EX_CANON_NAME                        =(function(){const m=Object.create(null);
   for(const o in EX_RENAMED_V113){const v=EX_RENAMED_V113[o];m[_exSlugRaw(v)]=v;}
   return m;})();
 // One-time (lazy, idempotent) heal of ia_exw_: rows logged under a pre-rename spelling
@@ -1908,7 +1916,7 @@ const EX_CANON_NAME=(function(){const m=Object.create(null);
 // bench-press thread). Folds old-key rows into the canonical key, orders the
 // merged entries, and stamps the canonical name so the row label matches today's cards.
 // Runs at init and before the Progress charts; a folded store is a no-op on re-entry.
-function foldExAliasKeys(store){
+function foldExAliasKeys(store                             )          {
   let changed=false;
   Object.keys(store).forEach(k0=>{
     const k=EX_KEY_ALIAS[k0]; if(!k||k===k0) return;
@@ -1926,7 +1934,7 @@ function foldExAliasKeys(store){
   });
   return changed;
 }
-function seededRand(seed){let x=Math.sin(seed+1)*10000;return x-Math.floor(x);}
+function seededRand(seed        )         {let x=Math.sin(seed+1)*10000;return x-Math.floor(x);}
 // ── SWAP UNIVERSE ────────────────────────────────────────────────────────────
 // Every candidate the swap sheet may offer has to be legal for THIS athlete:
 // right equipment tier, right age bias, past the injury filter. All of that logic
@@ -1939,16 +1947,16 @@ function seededRand(seed){let x=Math.sin(seed+1)*10000;return x-Math.floor(x);}
 // generation, for free, and it can never disagree with what the engine would pick.
 // Accumulates across all roles and weeks of one build, so by the time buildProgram
 // returns it holds every exercise this athlete could legitimately be given.
-var _SWAP_UNIVERSE=null;
-function _swapUniverseReset(){_SWAP_UNIVERSE=Object.create(null);}
-function _swapUniverseAdd(arr){
+var _SWAP_UNIVERSE                          =null;
+function _swapUniverseReset()       {_SWAP_UNIVERSE=Object.create(null);}
+function _swapUniverseAdd(arr                                       )       {
   if(!_SWAP_UNIVERSE||!Array.isArray(arr)) return;
   for(var i=0;i<arr.length;i++){var n=arr[i];if(typeof n==='string'&&n)_SWAP_UNIVERSE[n]=1;}
 }
-function _swapUniverseList(){return _SWAP_UNIVERSE?Object.keys(_SWAP_UNIVERSE):[];}
-function pick(arr,n,seed){_swapUniverseAdd(arr);const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(seededRand(seed+i)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
+function _swapUniverseList()           {return _SWAP_UNIVERSE?Object.keys(_SWAP_UNIVERSE):[];}
+function pick   (arr              ,n        ,seed        )      {_swapUniverseAdd(arr);const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(seededRand(seed+i)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
 // Lifting focus maps to internal goal for wave/exercise selection
-const LIFTING_FOCUS_TO_GOAL = {
+const LIFTING_FOCUS_TO_GOAL                       = {
   strength: 'strength',
   hypertrophy: 'hypertrophy',
   fatloss: 'fatloss',
@@ -1958,18 +1966,19 @@ const LIFTING_FOCUS_TO_GOAL = {
   support_prevention: 'endurance',
 };
 // Experience-based 1RM defaults — conservative estimates
-const DEFAULT_1RM = {
+const DEFAULT_1RM                                               = {
   beginner:    {bench:65,  squat:75,  deadlift:95},   // conservative untrained estimates (single source of truth)
   intermediate:{bench:135, squat:155, deadlift:185},  // been at it a while, consistent
   advanced:    {bench:225, squat:275, deadlift:315},  // solid lifter, knows the movements
 };
+                                               
 // ── Exercise kinds: timed, rep-only or loaded, what a set logs, and how a weight rounds. ──
 // Equipment token map — single source of truth for how a movement name signals added
 // load. Each family lists every surface form, INCLUDING the parenthetical suffix
 // convention "Movement (ABBR)". Add a new abbreviation once here (e.g. a '(sb' for a
 // safety bar) and every detector below inherits it automatically — no more patching
 // isKBExercise / isDBExercise / isTrackableWeight one at a time.
-const EQUIP_TOKENS = {
+const EQUIP_TOKENS                           = {
   barbell:    ['barbell','(bb'],
   dumbbell:   ['dumbbell','db ','db-','(db'],
   kettlebell: ['kettlebell','kb ','kb-','(kb'],
@@ -1984,12 +1993,12 @@ const EQUIP_TOKENS = {
   loaded:     ['weighted','loaded']
 };
 // True if the name carries any external-load token at all.
-function anyEquip(name){
+function anyEquip(name                           )          {
   const n = (name||'').toLowerCase();
   for(const fam in EQUIP_TOKENS){ if(EQUIP_TOKENS[fam].some(t => n.includes(t))) return true; }
   return false;
 }
-function isTimeExercise(name) {
+function isTimeExercise(name                           )          {
   if(!name) return false;
   const n = name.toLowerCase();
   const timeKeywords = ['plank','hold','wall sit','dead hang','hollow hold',
@@ -2021,12 +2030,12 @@ function isTimeExercise(name) {
 // One less name asserted by hand. The seam shrinks as the library gets honest.
 const REP_BUT_LOADED = ['single-leg hip thrust','bench dips'];
 const BW_QUALIFIER = ['(chair','foot on chair','shoulders on bed','assisted ','(assisted','bodyweight','(partner','(anchored','banded ','band ','(bw'];
-function isLoadedRepMovement(name){
+function isLoadedRepMovement(name                           )          {
   const n=(name||'').toLowerCase();
   if(BW_QUALIFIER.some(q => n.includes(q))) return false;
   return REP_BUT_LOADED.some(k => n.includes(k));
 }
-function isTrackableWeight(name) {
+function isTrackableWeight(name                           )          {
   if(!name) return false;
   const n = name.toLowerCase();
   // Band-only movements — no weight to track
@@ -2092,7 +2101,7 @@ function isTrackableWeight(name) {
     'good morning','lunge','slam','carry','farmer','suitcase','thruster'];
   return equipKeywords.some(kw => n.includes(kw)) || movKeywords.some(kw => n.includes(kw));
 }
-function isRepExercise(name) {
+function isRepExercise(name                           )          {
   if(!name) return false;
   const n = name.toLowerCase();
   // Was only pullups/pushups/dips, so most no-load work (inverted rows, split squats,
@@ -2105,7 +2114,7 @@ function isRepExercise(name) {
     'sit-up','situp','leg raise','knee raise','v-up','hollow rock','squat (slow'];
   return repKeywords.some(kw => n.includes(kw));
 }
-function roundWeight(lbs, unit) {
+function roundWeight(lbs        , unit                                  )         {
   if(unit === 'kg') {
     const kg = lbs * 0.453592;
     return Math.round(kg / 2.5) * 2.5;
@@ -2113,10 +2122,11 @@ function roundWeight(lbs, unit) {
   return Math.round(lbs / 5) * 5;
 }
 // ── Calendar: the day orders, local dates and week Mondays the engine and the screens share. ──
-const ALL_DAYS_ORDER=['sun','mon','tue','wed','thu','fri','sat'];
-const _ISO_ORDER = ['mon','tue','wed','thu','fri','sat','sun'];
-function _isoOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
-function getWeekMonday(dateStr){
+                                                 
+const ALL_DAYS_ORDER          =['sun','mon','tue','wed','thu','fri','sat'];
+const _ISO_ORDER           = ['mon','tue','wed','thu','fri','sat','sun'];
+function _isoOf(d      )         { return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function getWeekMonday(dateStr        )       {
   // Get the Monday of the week containing the given date string
   const parts=dateStr.split('-');
   const d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
@@ -2128,7 +2138,7 @@ function getWeekMonday(dateStr){
   d.setDate(d.getDate()-daysSinceMonday);
   return d;
 }
-function _parseLocalDate(s){
+function _parseLocalDate(s                           )              {
   const p=String(s||'').split('-');
   if(p.length!==3) return null;
   const d=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
@@ -2139,11 +2149,11 @@ function _parseLocalDate(s){
 // D126 (V204): _clkMS is the SINGLE OWNER of the seconds limb. It rounds the WHOLE value before
 // splitting, so a ':60' limb is structurally impossible rather than corrected after the fact
 // (the technique _fmtHMS already uses). Suffixes belong to the caller: '/mi', '/100', or bare.
-function _clkMS(sec){
+function _clkMS(sec        )         {
   const t = Math.round(sec);
   return Math.floor(t/60) + ':' + String(t%60).padStart(2,'0');
 }
-function _fmtMileAnchor(sec){ return _clkMS(sec); }   // D126 (V204)
+function _fmtMileAnchor(sec        )         { return _clkMS(sec); }   // D126 (V204)
 
 // WIZARD
 
@@ -6556,8 +6566,9 @@ function runAnchorInfo(cfg){
     ? {dist:+g.targetDist, sec:(+g.targetMins||0)*60 + (+g.targetSecs||0)} : null;
   return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
 }
+                                                             
 
-function buildHipSection(seed,bodyweight){
+function buildHipSection(seed        ,bodyweight         )          {
   // Reliable stability dose: the section always draws 2 loaded/active glute-med drills plus
   // 1 mobility piece, so a leg day can never come up all-stretches with zero abductor work.
   // Bodyweight tier ("Room only") swaps banded drills for equipment-free glute-med equivalents.
@@ -6567,7 +6578,7 @@ function buildHipSection(seed,bodyweight){
   const stab=pick(stabPool,2,seed);
   const mob=pick(EXLIB.hip_mobility,1,seed+7);
   const selected=[...stab,...mob];
-  const details={
+  const details                        ={
     "Clamshells w/ band":"2×15 each","Banded side steps":"2×20 each","Banded monster walks":"2×15 each","Standing band hip abduction":"2×15 each",
     "Hip airplane (light KB)":"2×6 each, slow","Seated banded hip flexion":"2×15 each","Weighted 90/90 hip switch":"2×6 each",
     "Side-lying leg raises":"2×15 each","Clamshells (bodyweight)":"2×20 each","Fire hydrants":"2×15 each","Standing hip abduction":"2×20 each",
@@ -6580,8 +6591,8 @@ function buildHipSection(seed,bodyweight){
 // Two drills a day, fixed prescription, seeded off the hip section's seed so the two
 // prehab blocks never share a draw. Carries hip:true on purpose: every cap exemption,
 // injury-sweep protection and render rule keyed on that flag applies unchanged.
-function buildFootAnkleSection(seed,bodyweight,raceWeek){
-  const details={
+function buildFootAnkleSection(seed        ,bodyweight         ,raceWeek         )          {
+  const details                        ={
     'Tibialis raise (wall lean)':'2×20','Banded dorsiflexion':'2×15 each',
     'Single-leg bent-knee soleus raise':'2×12 each, slow','Standing ankle CARs':'2×5 each direction',
     'Toe yoga (splay + big-toe lifts)':'2×10 each foot'
@@ -6613,8 +6624,8 @@ function buildFootAnkleSection(seed,bodyweight,raceWeek){
 // every banded movement on non-commercial tiers, and a band is the one implement a
 // hotel-room athlete can reasonably be assumed to own for rehab. Bodyweight tier gets
 // its own equipment-free list instead.
-function buildRehabSection(region,seed,bodyweight){
-  const BW={
+function buildRehabSection(region        ,seed        ,bodyweight         )            {
+  const BW                          ={
     shoulder:['Side-lying external rotation (bodyweight)','Prone Y raise','Scapular pushup','Wall slide'],
     elbow:['Wrist extensor isometric hold','Towel grip squeeze','Wrist circles (slow)','Eccentric wrist extension']
   };
@@ -6623,7 +6634,7 @@ function buildRehabSection(region,seed,bodyweight){
   const mobPool  = EXLIB[region+'_mobility']||EXLIB.shoulder_mobility;
   const stab=pick(stabPool,3,seed);
   const mob =pick(mobPool,2,seed+11);
-  const details={
+  const details                        ={
     'Band external rotation (arm at side)':'3×15 each, slow, elbow pinned to the ribs',
     'Side-lying dumbbell external rotation':'3×12 each, light',
     'Band pull-apart':'3×20',
@@ -6733,12 +6744,12 @@ const CORE_SPEED_TYPES = new Set(['int','nrc_speed1','nrc_speed2']);
 // V193 (D44): which tiers own a barbell. buildProgram computed this inline and the answer
 // was unreachable from week assembly, where the core injector runs — so the one pool that
 // is injected after the pool block had no gear gate at all. One definition, two readers.
-function _tierHasBarbell(equip){ return equip==='home_full'||equip==='commercial'||equip==='crossfit'; }
+function _tierHasBarbell(equip           )          { return equip==='home_full'||equip==='commercial'||equip==='crossfit'; }
 // V216 (D154): THE GEAR LENS, one predicate for every reader. Engine C's pools read it as _gearOK;
 // applyInjuryFilter reads it for the build's own equipment, so an injury rename is judged by the
 // same lens the draw was. The four flags derive from the tier exactly as Engine C derives its own.
 // A pure function of the tier name; the body below moved here verbatim from Engine C.
-function _gearLens(equip){
+function _gearLens(equip           )                                            {
   const hasBarbell=_tierHasBarbell(equip);
   const hasCables=equip==='commercial';
   const hasGHD=equip==='commercial'||equip==='crossfit';
@@ -6783,7 +6794,7 @@ function _gearLens(equip){
 // so this is a final catch-all: walk the built program and substitute anything that
 // still names equipment. Explicit map first, then a keyword fallback so a NEW gear
 // movement added later degrades to something safe instead of leaking.
-const _BW_SUBS={
+const _BW_SUBS                        ={
   // V178: loaded prehab/core names whose _bwFallback would land on Burpees or a row. 'Landmine
   // rotations' was unreachable before D6 rotated the hot-tomorrow pillar; it goes to a
   // rotational drill, NOT to the Dead bug the other two rotational members already sub to,
@@ -6797,6 +6808,7 @@ const _BW_SUBS={
   'Ball slams OR Kettlebell swings':'Burpees',
   'Ball slams':'Burpees',
   'Kettlebell swing':'Jump squats',
+  // @ts-expect-error TS1117, a key written twice with the same value: dead, and left as it ran (phase D moves code, never changes it)
   'Kettlebell swing':'Jump squats',
   'Clamshells w/ band':'Clamshells (bodyweight)',
   'Banded side steps':'Side-lying leg raises',
@@ -6808,7 +6820,7 @@ const _BW_SUBS={
   'Dumbbell goblet side lunge':'Side lunge (bodyweight)'
 };
 const _BW_GEAR=/kettlebell|dumbbell|barbell|\bKB\b|\bDB\b|medicine ball|ball slam|cable|machine|trap bar|bumper|wall ball|weighted|weight vest|rucksack|sled|bench press|close-grip bench|skullcrush|preacher|lat pull|leg press|leg extension|leg curl|hack squat|pec deck|\bband(?!\s*stretch)/i;
-function _bwFallback(name){
+function _bwFallback(name                           )         {
   const N=(name||'').toLowerCase();
   if(/press|pushup|dip/.test(N))            return 'Pushups (slow 3s eccentric)';
   if(/row|pull|chin/.test(N))               return 'Inverted row (under a table)';
@@ -6819,6 +6831,7 @@ function _bwFallback(name){
   if(/raise|fly|delt/.test(N))              return 'Prone Y-T-W raises';
   return 'Burpees';
 }
+                                                                        
 // Strength work performed against bodyweight has no load to prescribe, so a fixed rep
 // count is a guess at the athlete's capacity. Accessories are generated by the same
 // shared builders the loaded tiers use, so they arrive with hardcoded reps (3×8, 3×12)
@@ -6852,7 +6865,7 @@ const _STACK_LOADED=/^(face pull|pec deck|leg extension|rope tricep extension)\b
 // Weighted, an athlete doing only double-leg jumps hits 90/110/130 exactly as the guide
 // prescribes, and the guide's own volume-DOWN-as-intensity-climbs progression falls out
 // of the arithmetic instead of needing a second rule.
-const _POWER_COST = [
+const _POWER_COST                     = [
   [/depth jump|depth fall|box jump|in-?depth/i,                         2.0], // shock: landing from height. V178: 'depth fall' — same drop, same landing
   [/single-?leg landing|\bsl landing\b/i,                                1.5], // V178 (D2): a bilateral takeoff that LANDS on one leg is priced by the landing
   [/single-?leg hop|single-?arm k[bB] snatch|bounding|split-?squat jump/i, 1.5], // unilateral landing
@@ -6866,36 +6879,36 @@ const _POWER_COST = [
   // one movement a workaround athlete keeps.
   [/clean|snatch|jerk|push press|thruster/i,                            1.0], // loaded full-body derivatives
 ];
-function _powerCost(name){
+function _powerCost(name                           )         {
   const N=String(name||'').toLowerCase();
   for(let i=0;i<_POWER_COST.length;i++){ if(_POWER_COST[i][0].test(N)) return _POWER_COST[i][1]; }
   return 0;                       // 0 means "not power work" — the class is opt-in by name
 }
-function _isPower(name){ return _powerCost(name) > 0; }
+function _isPower(name                           )          { return _powerCost(name) > 0; }
 // Budget is FLAT across the block (Mario's call). The cost weights already produce the
 // taper the guide's 10-week table describes: an advanced athlete moving from jump squats
 // at 1.0 to box jumps at 2.0 halves their rep count against the same budget. Stepping the
 // budget down as well would reduce twice and leave a peak week doing almost nothing.
-const _POWER_BUDGET = {beginner:90, intermediate:110, advanced:130};
+const _POWER_BUDGET                         = {beginner:90, intermediate:110, advanced:130};
 // The guide gates plyometrics on squatting 1.5-2x bodyweight and warns that premature
 // plyometric training may cause injury. The app has cfg.squat (often 0) and never asks
 // bodyweight, so `experience` is the proxy (Mario's call) and it maps onto the cost tiers
 // directly: the gate is "which weights are unlocked", one comparison rather than a
 // subsystem. ACCEPTED RESIDUAL (§12): a heavy beginner is the highest-risk athlete in the
 // guide's terms and experience will not catch them.
-const _POWER_MAX_COST = {beginner:1.0, intermediate:1.5, advanced:2.0};
+const _POWER_MAX_COST                         = {beginner:1.0, intermediate:1.5, advanced:2.0};
 // V144 (D4-ii): age caps IMPACT, not volume. Power is the first quality aging steals —
 // RFD declines faster than strength — so masters athletes need the work MORE, dosed like
 // athletes. What age legitimately changes is tissue tolerance for landings. 36-54 loses
 // the shock tier (no depth/box jumps from height, any experience); 55+ holds at 1.0 (no
 // landings from height, no unilateral landings — keeps jumps, swings, derivatives).
 // Effective cap is min(experience, age).
-const _POWER_AGE_MAX_COST = {'18-35':2.0, '36-54':1.5, '55+':1.0};
+const _POWER_AGE_MAX_COST                         = {'18-35':2.0, '36-54':1.5, '55+':1.0};
 // V144 (D4-i): age scales the BUDGET, not the display. Reuses the ruled age-mod values.
 // Before this, 36-54 power was capped at 3 sets by the vsets ACCESSORY rule (written for
 // supersets) while 55+ got 0.82× and landed near 6 — a 60-year-old was prescribed double
 // the power volume of a 45-year-old. Nobody ruled that; it was plumbing.
-const _POWER_AGE_BUDGET_MOD = {'18-35':1, '36-54':0.92, '55+':0.82};
+const _POWER_AGE_BUDGET_MOD                         = {'18-35':1, '36-54':0.92, '55+':0.82};
 // ── DOSE FROM THE BUDGET (V130) ──────────────────────────────────────────────
 // The power block used to prescribe a hardcoded 5x3 and 4x5 — 35 reps regardless of who
 // was training or what the movement cost. Measured against the doctrine that was roughly
@@ -6924,7 +6937,7 @@ const _POWER_AGE_BUDGET_MOD = {'18-35':1, '36-54':0.92, '55+':0.82};
 // a 3-rep lead movement gives 6 / 7 / 9 sets by experience, and a 2.0-cost box jump
 // gives 4 where a 1.0-cost jump squat gives 9. Ceiling raised to 10 because 10x3 is a
 // standard power protocol and 8 was cutting the advanced case short.
-function _powerDose(name, experience, repsPerSet, shareOfSession, ageBracket){
+function _powerDose(name        , experience                           , repsPerSet                           , shareOfSession                           , ageBracket                           )         {
   const cost = _powerCost(name) || 1;
   // V144 (D4-i/iii): the budget owns EVERY dose input — experience AND age. vsets is out
   // of the power path entirely: its expMod double-counted experience (the escape the V143
@@ -6943,13 +6956,13 @@ function _powerDose(name, experience, repsPerSet, shareOfSession, ageBracket){
 // _POWER_COST already encodes exactly what rest is FOR — landing absorption and CNS drain
 // — so this reads it rather than growing a second classification of the same fact.
 // Descending-threshold scan, same idiom as _POWER_COST itself.
-const _POWER_REST=[
+const _POWER_REST                    =[
   [2.0,'~3 min rest'],   // shock landings: connective tissue sets the clock, not the athlete
   [1.5,'~2 min rest'],   // unilateral landings
   [1.0,'~2 min rest'],   // double-leg landings + loaded weightlifting derivatives
   [0.5,'60s rest'],      // no landing to absorb, low CNS — see _powerReps for why
 ];
-function _powerRest(name){
+function _powerRest(name        )         {
   const c=_powerCost(name);
   for(let i=0;i<_POWER_REST.length;i++){ if(c>=_POWER_REST[i][0]) return _POWER_REST[i][1]; }
   return '60s rest';
@@ -6987,7 +7000,7 @@ function _powerRest(name){
 // (D7): _repFloor asks whether load can track a descending wave, a different question from
 // what a movement needs in order to develop power.
 const _POWER_DENSITY_REPS=10;
-function _powerReps(name, roleReps){
+function _powerReps(name        , roleReps        )         {
   return (_powerCost(name)<=0.5) ? _POWER_DENSITY_REPS : roleReps;
 }
 // ONE WRITER for the power prescription string (V170, D5). The literal was duplicated at
@@ -6995,7 +7008,7 @@ function _powerReps(name, roleReps){
 // the tier picks it, the role breaks ties only above 0.5. 'max intent' stays reserved for
 // loaded triples per V144 Ruling 2; the 0.5 tier's V144 copy ('crisp and explosive')
 // described a triple and is retired along with the triple.
-function _powerPrescribe(name, roleReps, experience, ageBracket){
+function _powerPrescribe(name        , roleReps        , experience                           , ageBracket                           )         {
   const reps=_powerReps(name, roleReps);
   const cue=(_powerCost(name)<=0.5) ? 'fast and crisp' : ((roleReps<=3) ? 'max intent' : 'explosive');
   return _powerDose(name, experience, reps, 0.20, ageBracket)+'×'+reps+' — '+cue+', '+_powerRest(name);
@@ -7019,7 +7032,7 @@ function _powerPrescribe(name, roleReps, experience, ageBracket){
 // Verified against every reader of this label: _labelRegion matches none of its region
 // tokens either way, recoveryDeload's /^power\b/ still hits, and capSessionBudget's
 // _protected / _secRank both key on /^power\b/ too. Nothing reads the phrase itself.
-function _powerAllowed(name, experience, injury, ageBracket){
+function _powerAllowed(name        , experience                           , injury                           , ageBracket                           )          {
   const c=_powerCost(name);
   if(c===0) return true;                                    // not power work
   // Doctrine says no plyometrics with ANY musculoskeletal injury. Applied by COST rather
@@ -7034,7 +7047,7 @@ function _powerAllowed(name, experience, injury, ageBracket){
   return c <= Math.min(expCap, ageCap);
 }
 const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation/i;
-function _bwSetsFromDetail(detail, wk, exp, prev){
+function _bwSetsFromDetail(detail                           , wk        , exp                           , prev         )         {
   const m=/^(\d+)\s*[×x]/.exec(detail||'');
   const sets=m?Math.min(4,Math.max(2,+m[1])):3;
   let rpe=/rpe\s*6|light|easy/i.test(detail||'')?'6':/rpe\s*7/i.test(detail||'')?'7':'8';
@@ -7060,8 +7073,8 @@ function _bwSetsFromDetail(detail, wk, exp, prev){
 // and conditioning names that predate that regex — conditioning reps are dose, not a
 // double-progression target. Mains never match (their details carry "— RPE" already).
 const _GRAMMAR_BALLISTIC=/slam|swing|sprawl|thruster|throw|toss|rotary|clean|snatch|jerk|box jump|broad jump/i;
-const _GRAMMAR_RANGE={'5':'4–6','6':'5–7','8':'6–10','10':'8–12','12':'10–15','15':'12–15','20':'15–20','25':'20–25'};
-function accessoryGrammarSweep(weeks, cfg){
+const _GRAMMAR_RANGE                        ={'5':'4–6','6':'5–7','8':'6–10','10':'8–12','12':'10–15','15':'12–15','20':'15–20','25':'20–25'};
+function accessoryGrammarSweep(weeks          , cfg                        )       {
   const beg=(cfg&&cfg.experience)==='beginner';
   Object.keys(weeks||{}).forEach(w=>{
     // V154 (D1): prevention caps accessory effort at 7 — 'stop 2 reps short of failure'
@@ -7096,12 +7109,12 @@ function accessoryGrammarSweep(weeks, cfg){
 // days whose next calendar day carries legLoad cardio. Rewrites are exact-form (the two
 // known grammars), never a broad regex — the V119 lesson about one pattern serving two
 // families. Clone-on-write per the V137 shared-literal lesson.
-function hotNextHingeClampSweep(weeks){
+function hotNextHingeClampSweep(weeks          )       {
   const _last=ALL_DAYS_ORDER.length-1;
   Object.keys(weeks||{}).forEach(w=>{
     Object.keys(weeks[w]||{}).forEach(d=>{
       const day=weeks[w][d]; if(!day||!day.sections) return;
-      const _di=_ISO_ORDER.indexOf(d);
+      const _di=_ISO_ORDER.indexOf(d          );
       const _nw=_di===_last?(+w+1):+w, _ndk=_ISO_ORDER[(_di+1)%7];
       const nx=weeks[_nw]&&weeks[_nw][_ndk];
       if(!(nx&&nx.cardio&&nx.cardio.legLoad)) return;
@@ -7123,7 +7136,7 @@ function hotNextHingeClampSweep(weeks){
 // not accessories; D2's scope is accessory volume). The rounds banner and the duration
 // estimator both derive from the leading digit, so 2× renders '2 Rounds · 90s rest'
 // with no second writer. Clone-on-write per the V137 shared-literal lesson.
-function preventionDoseSweep(weeks, cfg){
+function preventionDoseSweep(weeks          , cfg                        )       {
   if((cfg&&cfg.liftingFocus)!=='support_prevention') return;
   Object.keys(weeks||{}).forEach(w=>Object.keys(weeks[w]||{}).forEach(d=>{
     const day=weeks[w][d]; if(!day||!day.sections) return;
@@ -7164,10 +7177,10 @@ function preventionDoseSweep(weeks, cfg){
     });
   }));
 }
-function bodyweightSweep(weeks, _bwExp, _bwPrev){
+function bodyweightSweep(weeks          , _bwExp                           , _bwPrev         )           {
   Object.keys(weeks||{}).forEach(w=>Object.keys(weeks[w]||{}).forEach(d=>{
     const day=weeks[w][d]; if(!day||!day.sections) return;
-    const seen={};
+    const seen                        ={};
     day.sections.forEach(sec=>{
       (sec.items||[]).forEach((it,_ii)=>{
         if(!it||!it.name) return;
@@ -7207,7 +7220,7 @@ function bodyweightSweep(weeks, _bwExp, _bwPrev){
   }));
   return weeks;
 }
-function _setLeadingSets(d,n){
+function _setLeadingSets(d                           ,n        )         {
   var s=String(d||''), m=s.match(/^(\d+)\s*[x\u00d7]/);
   if(m) return n+s.slice(m[1].length);
   m=s.match(/^(\d+)\s*sets?\b/i);
@@ -8216,6 +8229,24 @@ function planCalendar(cfg, A, B){
   const recoveryNote = [legRecoveryNote, regionRecoveryNote].filter(Boolean).join(' ') || null;
   return { dayRoles, legRecoveryNote: recoveryNote };
 }
+                                                                         
+
+/** What an injury does to a build (injuryPlan): the patterns dropped and capped, the names dropped and swapped, the flags. */
+                             
+                 
+                                
+                                              
+                    
+                                   
+                   
+                           
+                                           
+                   
+                   
+                         
+                                                                                                                           
+                            
+ 
 
 // ── INJURY OVERLAY — COACHING PLAN (region × tier → engine effects) ─────────
 // cfg.injury = { region, tier }. Two tiers, matching how injuries actually behave:
@@ -8229,7 +8260,7 @@ function planCalendar(cfg, A, B){
 // Cardio is handled separately in engineB (injurySweepCardio): lower-limb protect
 // reroutes running to time-matched non-impact work so the aerobic base and the
 // progression clock survive the injury. See INJURY_OVERLAY_COACHING_SPEC.md.
-const INJURY_REGIONS={
+const INJURY_REGIONS                                   ={
   shoulder:{label:'Shoulder'},
   elbow:{label:'Elbow / Wrist'},
   lowback:{label:'Lower Back'},
@@ -8237,7 +8268,7 @@ const INJURY_REGIONS={
   knee:{label:'Knee'},
   ankle:{label:'Ankle / Foot / Shin'}
 };
-function injuryPlan(cfg){
+function injuryPlan(cfg                        )                    {
   const inj=cfg&&cfg.injury;
   if(!inj||!inj.region||!INJURY_REGIONS[inj.region]) return null;
   const T=inj.tier==='protect'?'protect':'workaround';
@@ -8258,7 +8289,7 @@ function injuryPlan(cfg){
   // in-place variant swaps (workaround tiers). Flags: noJumps kills jump/plyo
   // conditioning, noCarry kills loaded carries, spineSafeCore swaps flexion/hanging
   // core for McGill-style anti-extension/anti-rotation work.
-  const P={region:R,tier:T,drop:new Set(),cap:new Set(),dropNames:null,swapNames:null,
+  const P            ={region:R,tier:T,drop:new Set(),cap:new Set(),dropNames:null,swapNames:null,
            noJumps:false,noCarry:false,spineSafeCore:false,cardioMode:null};
   if(R==='knee'){
     P.noJumps=true;
@@ -8375,7 +8406,7 @@ function injuryPlan(cfg){
 // pattern and by name, swaps variants, appends the RPE 7 coach note to fixed-detail
 // accessories on capped patterns (wave lifts are clamped inside scheme() instead,
 // so their printed RPE is already correct and gets no note).
-function _injViewName(n,cfg){ if(!cfg||!cfg.injury) return n; const P=injuryPlan(cfg); if(!P||!P.swapNames||!P.swapNames[n]) return n; const g=_gearLens((cfg&&cfg.equipment)||'home_full'); if(!g(n)) return n; const to=P.swapNames[n]; const FB={'Cable pushdown':'Close-grip pushups'}; return g(to)?to:(FB[to]||to); }
+function _injViewName(n        ,cfg                        )         { if(!cfg||!cfg.injury) return n; const P=injuryPlan(cfg); if(!P||!P.swapNames||!P.swapNames[n]) return n; const g=_gearLens((cfg&&cfg.equipment)||'home_full'); if(!g(n)) return n; const to=P.swapNames[n]; const FB                        ={'Cable pushdown':'Close-grip pushups'}; return g(to)?to:(FB[to]||to); }
 // V227 D190 P-SWAPSEAM (R2): the plan's cap cue is one literal, read by the appender in applyInjuryFilter and by
 // the stripper both swap hops run before _swapDetailFor, so the carry never sees it and the filter alone writes it.
 // V228 D193 P-CAPRPE R1 (split, Mario round 2): the cue says three, rpeFromWave's rir at RPE 7 and _bwSetsFromDetail's RPE 7 line.
@@ -8389,14 +8420,14 @@ const INJ_HELD_TEST='Work up to one working set of 3 to 5 reps at RPE 7. Techniq
 // tank', V228 writes 'three'. One regex, both wordings, no constant to expire; every other detail comes back unchanged.
 // V229 D193 (Amendment 3 section 2): it also reads beneath R7's held-test text, matched by shape (its fixed clauses, the
 // RPE number free) and returned as TEST_RX_TEXT. The test text itself and every non-cue detail still come back unchanged.
-function _stripCapCue(d){ if(typeof d!=='string') return d; if(/^Work up to one working set of 3 to 5 reps at RPE [\d.]+\. Technique stays crisp\. No grinding\. Log the weight and the reps\. Your injury plan holds this lift, so there is no new baseline here\.$/.test(d)) return TEST_RX_TEXT; const m=/ — hold RPE 7, (?:two|three) in the tank$/.exec(d); return m?d.slice(0,m.index):d; }
+function _stripCapCue   (d   )             { if(typeof d!=='string') return d; if(/^Work up to one working set of 3 to 5 reps at RPE [\d.]+\. Technique stays crisp\. No grinding\. Log the weight and the reps\. Your injury plan holds this lift, so there is no new baseline here\.$/.test(d)) return TEST_RX_TEXT; const m=/ — hold RPE 7, (?:two|three) in the tank$/.exec(d); return m?d.slice(0,m.index):d; }
 // V229 D193 P-CAPRPE (R2, R7): on a capped pattern a named RPE above 7 (a range by its top) is held at 7, and the reserve
 // gloss it carried is restated by the file's own RPE 7 line for that shape: bwsets (_bwSetsFromDetail's RPE 7 branch),
 // wave (rpeFromWave at 7, rir 3), loadCapped (scheme()'s _effEase line). The @ RPE grammar never glosses and gets none.
 // R7 (D193-HELDTEST), checked first: a detail of the strength test's shape (TEST_RX_TEXT, any RPE number) becomes
 // INJ_HELD_TEST, the hold in words. Any other detail at or under 7 comes back byte-identical. Read only by
 // applyInjuryFilter, the plan's single writer (D190).
-function _capRpeClamp(d){
+function _capRpeClamp   (d   )             {
   if(typeof d!=='string') return d;
   if(/^Work up to one heavy set of 3 to 5 reps at RPE [\d.]+\. Technique stays crisp\. No grinding\. Log the weight and the reps\. That set is your new baseline\.$/.test(d)) return INJ_HELD_TEST;
   return d.replace(/RPE\s*(\d+(?:\.\d+)?)(?:[–-](\d+(?:\.\d+)?))?\+?( \((?:stop 2 reps short of failure|leave ~\d+ reps? in reserve|heaviest pair you can find)\))?/g,function(t,lo,hi,g){
@@ -8405,16 +8436,16 @@ function _capRpeClamp(d){
     return 'RPE 7'+(/^ \(stop/.test(g)?' (leave 3 or more in reserve)':/^ \(heaviest/.test(g)?' (leave ~3 in reserve)':' (leave ~3 reps in reserve)');
   });
 }
-function applyInjuryFilter(sections,cfg){
+function applyInjuryFilter(sections           ,cfg                        )            {
   const P=injuryPlan(cfg);
   if(!P||!Array.isArray(sections)) return sections;
-  const SPINE_SWAP={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs'};
+  const SPINE_SWAP                               ={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs'};
   const JUMPS=/jump|burpee|broad|bound|box jump|high knees|tuck/i;
-  const out=[];
+  const out           =[];
   sections.forEach(s=>{
     if(!s||!Array.isArray(s.items)){out.push(s);return;}
     const seen=new Set();
-    const items=[];
+    const items        =[];
     // Section-local copy of the heading. Rewritten below when a swap renames the
     // item the heading names; s itself is never mutated (this pass runs several
     // times per day and must stay idempotent).
@@ -8438,7 +8469,7 @@ function applyInjuryFilter(sections,cfg){
       // swap the copy promises still lands. A target with no fallback row renames as it always did.
       if(P.swapNames&&P.swapNames[name]){
         const _gOK=_gearLens((cfg&&cfg.equipment)||'home_full');
-        const SWAP_GEAR_FALLBACK={'Cable pushdown':'Close-grip pushups'};
+        const SWAP_GEAR_FALLBACK                        ={'Cable pushdown':'Close-grip pushups'};
         if(_gOK(name)){ const to=P.swapNames[name]; name=_gOK(to)?to:(SWAP_GEAR_FALLBACK[to]||to); }
       }
       if(pat&&P.cap.has(pat)&&detail) detail=/RPE/.test(detail)?_capRpeClamp(detail):detail+INJ_CAP_CUE;   // V229 D193 (R2, R7)
@@ -8461,7 +8492,7 @@ function applyInjuryFilter(sections,cfg){
 }
 // Repurposed-day titles for protect tier — the athlete should read intent, not a
 // gutted card. Returns null when the standard title stands.
-function injuryDayTitle(role,cfg){
+function injuryDayTitle(role        ,cfg                        )                {
   const P=injuryPlan(cfg);
   if(!P||P.tier!=='protect') return null;
   if(role==='legs'){
@@ -9841,6 +9872,16 @@ function engineC_kinematics(cfg, A, B){
   return { buildSections, gearOK:_gearOK };
 }
 
+                                                            
+
+/** A day's training region, as the regional caps count it; core and grip are tagged and never capped. */
+                                                                
+/** A fatiguing movement pattern (_pattern); holds, carries, core, ballistic and conditioning work have none. */
+                                                                                                                                                                   
+/** The swap sheet's like-for-like family for an accessory with no pattern (V162). */
+                                                                                   
+/** A rep window [lo, hi]; [0, 0] is unloadable (reps emerge from the effort prescribed). */
+                                         
 // ── REGIONAL FATIGUE CAP ────────────────────────────────────────────────────
 // Within-day guard against same-region volume stacking. deconflictSameRegion
 // spaces press/leg days ACROSS the week; this caps the load WITHIN a single day.
@@ -9858,8 +9899,8 @@ function engineC_kinematics(cfg, A, B){
 // scored but NEVER trimmed; cardio always survives; item-level trim drops only
 // the same-region movement from a mixed superset (wall sit on a press superset
 // survives — we punish the redundant press, not the off-region hold).
-const REGION_CEILING = { push: 18, pull: 20, legs: 16 }; // tuned to measured saturation scores: a clean leg day (~12) passes; a stacked press day (~26–29) trims back toward main + one secondary press + delts
-const _ceil = r => REGION_CEILING[r] || 18;
+const REGION_CEILING                         = { push: 18, pull: 20, legs: 16 }; // tuned to measured saturation scores: a clean leg day (~12) passes; a stacked press day (~26–29) trims back toward main + one secondary press + delts
+const _ceil                        = r => REGION_CEILING[r] || 18;
 
 // ── HARD DAILY WORKING-SET CAP (per region, per single session) ──
 // Second, INDEPENDENT guard alongside REGION_CEILING. The ceiling scores PATTERN
@@ -9869,8 +9910,8 @@ const _ceil = r => REGION_CEILING[r] || 18;
 // one day. This cap reads the RAW working-set tally per region and forces a trim once a
 // muscle group blows past a sane single-session ceiling, regardless of pattern variety.
 // Non-hypertrophy only (hypertrophy is exempt upstream — it opts into the volume).
-const REGION_SET_CAP = { push: 15, pull: 16, legs: 14 }; // per-region, per-DAY working-set ceiling (pull tolerates most; legs least, esp. under concurrent running)
-const _setCap = r => REGION_SET_CAP[r] || 14;
+const REGION_SET_CAP                         = { push: 15, pull: 16, legs: 14 }; // per-region, per-DAY working-set ceiling (pull tolerates most; legs least, esp. under concurrent running)
+const _setCap                        = r => REGION_SET_CAP[r] || 14;
 
 // ── DISTINCT-MOVEMENT CAP (per region, per single session) ──
 // Third guard. The set cap governs VOLUME; this governs SPRAWL — how many distinct loaded
@@ -9880,8 +9921,8 @@ const _setCap = r => REGION_SET_CAP[r] || 14;
 // fatigue / warm-up / CNS cost for almost no extra stimulus. Push/pull tolerate one more
 // angle (5). Counts ONLY pattern-bearing lifting items — CORE, HIP-mobility, carries and
 // holds are pattern-null / off-region, so they are NEVER counted here nor eligible to trim.
-const REGION_MOVE_CAP = { push: 5, pull: 5, legs: 4 };
-const _moveCap = r => REGION_MOVE_CAP[r] || 5;
+const REGION_MOVE_CAP                         = { push: 5, pull: 5, legs: 4 };
+const _moveCap                        = r => REGION_MOVE_CAP[r] || 5;
 
 // ── DYNAMIC CARDIO INTERFERENCE ──
 // A shared-day cardio session steals recovery from that day's lifting. The old model
@@ -9891,7 +9932,7 @@ const _moveCap = r => REGION_MOVE_CAP[r] || 5;
 // (2) session intensity token-scanned from subtype+detail so it survives every naming
 // scheme (run / NRC / bike), and (3) distance/duration. Returns a leg-recovery
 // interference magnitude ≈0.3 (easy spin) … ≈1.6 (hard or long run).
-function _cardioInterference(cardio){
+function _cardioInterference(cardio                           )         {
   if(!cardio || !cardio.type) return 0;
   const sub = (cardio.subtype||'').toLowerCase();
   const s = (sub + ' ' + (cardio.detail||'')).toLowerCase();
@@ -9901,7 +9942,7 @@ function _cardioInterference(cardio){
   // the session, so it classifies FIRST — an NRC "Long Run" whose detail reads "average
   // Recovery Pace" is a long run, not a recovery run. The combined string only decides
   // when the subtype says nothing (a Benchmark Run's "steady" lives in its detail).
-  const _sc = t => {
+  const _sc                               = t => {
     if(/interval|\bint\b|speed run|sprint|stride|zone 5|400m|800m|max effort|rpe 9/.test(t)) return 1.4;   // hard quality
     if(/tempo pace|threshold|\bchi\b|fartlek|\bhills?\b|zone 3|zone 4|rpe 8/.test(t))        return 1.05;  // threshold (NOTE: 'tempo pace', not bare 'tempo' — easy-run copy says "not a tempo")
     if(/recovery|active recovery|zone 1|shakeout|very easy|\beasy\b/.test(t))                return 0.55;  // easy/recovery
@@ -9924,7 +9965,7 @@ function _cardioInterference(cardio){
 }
 // Section-label → region. Labels are deterministic from buildSections regardless
 // of which exercise pick() rotates in, so tagging off the label is stable.
-function _sectionRegion(label, role){
+function _sectionRegion(label                           , role                           )                {
   const L = (label||'').toLowerCase();
   if(/core|anti-rotation|plank|pallof|dynamic core/.test(L)) return 'core';
   if(/carry/.test(L)) return 'grip';
@@ -9952,7 +9993,7 @@ function _sectionRegion(label, role){
 // Per-item cost: compound 1.5, isolation 0.75, default 1.0, scaled by set count
 // parsed off the leading "N×..." of the detail string. Off-region items in a
 // mixed superset (e.g. wall sit) contribute to THEIR region, not the host's.
-function _itemRegion(name){
+function _itemRegion(name                           )                {
   const N=(name||'').toLowerCase();
   if(/wall sit|spanish squat|goblet|terminal knee|knee extension/.test(N)) return 'legs';
   if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation/.test(N)) return 'core';
@@ -9972,12 +10013,12 @@ function _itemRegion(name){
 // them that way — its /\brow\b/ entry is commented "DB / KB single-arm row —
 // position-limited". This is the same call, written down once.
 const _UNILAT_ROW=/\bsingle-?arm\b|\bone-?arm\b|^dumbbell row$|^kettlebell row$/i;
-function _isUnilateralRow(name){ return _UNILAT_ROW.test(String(name||'').trim()); }
+function _isUnilateralRow(name                           )          { return _UNILAT_ROW.test(String(name||'').trim()); }
 // MOVEMENT PATTERN — the real axis. The unsafe failure mode is saturating ONE
 // pattern (press, press, press), not accumulating DISTINCT patterns (squat,
 // hinge, lunge). So we count per-pattern, and each extra rep of the same pattern
 // costs escalating fatigue while a new pattern starts cheap.
-function _pattern(name){
+function _pattern(name                           )                 {
   const N=(name||'').toLowerCase();
   if(/wall sit|spanish squat|terminal knee/.test(N)) return null;        // isometric hold — not a fatiguing pattern rep
   if(/l-sit chin|l-sit pull/.test(N)) return 'vpull';                    // V162: an L-sit CHINUP is a vertical pull with a core hold riding along. The /l-sit/ token below must not eat it — same one-token-two-meanings class as the V119 incline bug.
@@ -10094,7 +10135,7 @@ function _pattern(name){
 // mountain climbers") intentionally match nothing and stay skip-only.
 // Rehab drills, band correctives and stretches are intentionally ABSENT (ruling D6):
 // the injury overlay prescribed those deliberately; skip is the only exit offered.
-const _AUX_FAMILY={
+const _AUX_FAMILY                           ={
   'Ab wheel rollouts':'core','Bird dogs':'core','Dead bugs':'core','Dead bug (slow tempo)':'core',
   'Garhammer raises':'core','Hanging knee raises':'core','Hanging leg raises':'core','Hanging hold':'core',
   'L-sit hold':'core','McGill curl-up':'core','Pallof press':'core','Plank hold':'core','RKC plank':'core',
@@ -10117,8 +10158,8 @@ const _AUX_FAMILY={
   'Wall sit':'hold','Single-leg wall sit':'hold','Spanish squat hold (KB)':'hold',
   'Cable crossover':'chest_iso','Pec deck':'chest_iso'
 };
-function _auxFamily(name){return _AUX_FAMILY[String(name||'').trim()]||null;}
-const _AUX_FAMILY_LABEL={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLISTIC',cond:'CONDITIONING',hold:'ISOMETRIC HOLD',chest_iso:'CHEST ISOLATION'};
+function _auxFamily(name                           )                   {return _AUX_FAMILY[String(name||'').trim()]||null;}
+const _AUX_FAMILY_LABEL                           ={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLISTIC',cond:'CONDITIONING',hold:'ISOMETRIC HOLD',chest_iso:'CHEST ISOLATION'};
 // Gear legality for aux candidates. Mirrors the tier truths the engine pools use
 // (hasBarbell = home_full/commercial/crossfit); machines are commercial-only; med
 // balls live where med balls live. Anything unmatched is bodyweight-legal everywhere.
@@ -10133,8 +10174,8 @@ const _AUX_FAMILY_LABEL={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLIST
 // bodyweight athlete. Band, not cable, is the right tag: the band is the looser implement
 // and the movement genuinely runs off one, so the tier set is the /\bband\b/ clause's
 // (everything that owns bands: not bodyweight, not minimal).
-const _AUX_GEAR={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
-function _auxGearOK(name,equip){
+const _AUX_GEAR                                   ={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
+function _auxGearOK(name                           ,equip           )          {
   const _g=_AUX_GEAR[String(name||'').trim()];
   if(_g==='loaded') return equip!=='bodyweight';
   if(_g==='band') return equip!=='bodyweight'&&equip!=='minimal';
@@ -10192,7 +10233,7 @@ function _auxGearOK(name,equip){
 // barbell comp lifts are listed FIRST and anchored, so no generic rule can ever capture
 // one: 'Barbell Romanian deadlift' is the bar and exits immediately, 'Dumbbell Romanian deadlift'
 // falls through to the dumbbell window.
-const _REP_FLOOR=[
+const _REP_FLOOR                              =[
   // The wave was written for exactly these. Explicit allowlist, exact match, no floor.
   [/^(barbell bench press|incline barbell press|close-grip bench press|barbell row|pendlay row|deadlift|sumo deadlift|trap bar deadlift|romanian deadlift|back squat|front squat|paused back squat|box squat|overhead press|push press|good mornings)$/i, null],
   // Unloadable — sets and effort are prescribed, reps emerge.
@@ -10224,7 +10265,7 @@ const _REP_FLOOR=[
   // it gets an isolation window rather than the barbell wave.
   [/cable|crossover|pec deck|\bfly\b|flye/i,         [8,12]],
 ];
-function _repFloor(name){
+function _repFloor(name                           )                   {
   const N=String(name||'');
   for(let i=0;i<_REP_FLOOR.length;i++){ if(_REP_FLOOR[i][0].test(N)) return _REP_FLOOR[i][1]; }
   return null;

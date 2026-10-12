@@ -4,7 +4,7 @@ import {
   _setEditProgId, _setProgressViewId, activeProg, activeProgId, applyRestDayMoves, progressViewId, showScreen,
   showToast,
 } from './rest-day-shell.js';
-import { _parseLocalDate, getWeekMonday } from './calendar.js';
+import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { applyDayEdits, applySessionSwaps, getDayEdits, getSwaps, pruneDayEdits } from './swaps-edits.js';
 import { buildProgram } from './budget-engine-d.js';
 import { calcCurrentWeek, renderWeekView } from './week-view-sections.js';

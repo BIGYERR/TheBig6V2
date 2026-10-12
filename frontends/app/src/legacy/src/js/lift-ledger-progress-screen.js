@@ -1,7 +1,7 @@
-import { asyIcon } from './icons.js';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { getDayHistFor, getExWeightsFor, getLogsFor, getPrograms, saveExWeightsFor } from './storage.js';
 import { _setProgressViewId, activeProg, activeProgId, calcLift, progressViewId } from './rest-day-shell.js';
-import { exStoreKey, foldExAliasKeys } from './exercise-library.js';
+import { exStoreKey, foldExAliasKeys } from '../../../../../../core/src/engine/exercise-library.ts';
 import { _partialWeek1, restLogLines } from './week-view-sections.js';
 import { RPE_LABELS, dedupeExDayEntries } from './log-entries.js';
 import {

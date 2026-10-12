@@ -1,10 +1,10 @@
-import { asyIcon } from './icons.js';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { clearSetDraft, completedKey, getCompleted, getLogs, getPrograms, logKey, savePrograms } from './storage.js';
 import {
   _setCurrentDayKey, _setStaleWarnShown, _setStaleWarnSrc, activeProg, activeProgId, currentDayKey, currentWeek,
   showToast,
 } from './rest-day-shell.js';
-import { exStoreKey } from './exercise-library.js';
+import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
 import { DAY_FULL } from './wizard.js';
 import { wildcardTagHTML } from './random-wildcard.js';
 import { buildSectionsHTML } from './week-view-sections.js';

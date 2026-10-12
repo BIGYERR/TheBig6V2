@@ -1,8 +1,8 @@
-import { asyIcon } from './icons.js';
+import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { getPrograms, savePrograms } from './storage.js';
 import { _setActiveProg, activeProg, showToast } from './rest-day-shell.js';
-import { _parseLocalDate, getWeekMonday } from './calendar.js';
-import { INJURY_REGIONS, injuryPlan } from './injury.js';
+import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
+import { INJURY_REGIONS, injuryPlan } from '../../../../../../core/src/engine/injury.ts';
 import { buildProgram } from './budget-engine-d.js';
 import { _progDayDate, calcCurrentWeek, renderWeekView } from './week-view-sections.js';
 import { refreshProgram } from './program-manage.js';

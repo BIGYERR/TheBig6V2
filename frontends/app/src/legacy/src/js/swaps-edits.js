@@ -1,7 +1,7 @@
-import { _ssLegal, _ssPartnerOf } from './exercise-library.js';
-import { _powerAllowed } from './power-accessory.js';
-import { applyInjuryFilter } from './injury.js';
-import { _AUX_FAMILY, _auxFamily, _auxGearOK, _pattern } from './region-caps.js';
+import { _ssLegal, _ssPartnerOf } from '../../../../../../core/src/engine/exercise-library.ts';
+import { _powerAllowed } from '../../../../../../core/src/engine/power-accessory.ts';
+import { applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
+import { _AUX_FAMILY, _auxFamily, _auxGearOK, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _swapInjuryOK, applySwapPrefs } from './swap-prefs.js';
 import { _PATTERN_REGION, _compoundTier } from './budget-engine-d.js';
 import { parseRx } from './week-view-sections.js';

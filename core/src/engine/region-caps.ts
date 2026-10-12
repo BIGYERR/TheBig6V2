@@ -1,4 +1,14 @@
 
+import type { Cardio, Equipment } from '../domain/index.ts';
+
+/** A day's training region, as the regional caps count it; core and grip are tagged and never capped. */
+export type Region = 'push' | 'pull' | 'legs' | 'core' | 'grip';
+/** A fatiguing movement pattern (_pattern); holds, carries, core, ballistic and conditioning work have none. */
+export type Pattern = 'vpull' | 'hpress' | 'vpress' | 'row' | 'hinge' | 'hip_ext' | 'lunge' | 'squat' | 'leg_iso' | 'calf_iso' | 'bi_iso' | 'tri_iso' | 'delt_iso';
+/** The swap sheet's like-for-like family for an accessory with no pattern (V162). */
+export type AuxFamily = 'core' | 'carry' | 'power' | 'cond' | 'hold' | 'chest_iso';
+/** A rep window [lo, hi]; [0, 0] is unloadable (reps emerge from the effort prescribed). */
+export type RepWindow = [number, number];
 // ── REGIONAL FATIGUE CAP ────────────────────────────────────────────────────
 // Within-day guard against same-region volume stacking. deconflictSameRegion
 // spaces press/leg days ACROSS the week; this caps the load WITHIN a single day.
@@ -16,8 +26,8 @@
 // scored but NEVER trimmed; cardio always survives; item-level trim drops only
 // the same-region movement from a mixed superset (wall sit on a press superset
 // survives — we punish the redundant press, not the off-region hold).
-const REGION_CEILING = { push: 18, pull: 20, legs: 16 }; // tuned to measured saturation scores: a clean leg day (~12) passes; a stacked press day (~26–29) trims back toward main + one secondary press + delts
-const _ceil = r => REGION_CEILING[r] || 18;
+const REGION_CEILING: Record<string, number> = { push: 18, pull: 20, legs: 16 }; // tuned to measured saturation scores: a clean leg day (~12) passes; a stacked press day (~26–29) trims back toward main + one secondary press + delts
+const _ceil: (r: string) => number = r => REGION_CEILING[r] || 18;
 
 // ── HARD DAILY WORKING-SET CAP (per region, per single session) ──
 // Second, INDEPENDENT guard alongside REGION_CEILING. The ceiling scores PATTERN
@@ -27,8 +37,8 @@ const _ceil = r => REGION_CEILING[r] || 18;
 // one day. This cap reads the RAW working-set tally per region and forces a trim once a
 // muscle group blows past a sane single-session ceiling, regardless of pattern variety.
 // Non-hypertrophy only (hypertrophy is exempt upstream — it opts into the volume).
-const REGION_SET_CAP = { push: 15, pull: 16, legs: 14 }; // per-region, per-DAY working-set ceiling (pull tolerates most; legs least, esp. under concurrent running)
-const _setCap = r => REGION_SET_CAP[r] || 14;
+const REGION_SET_CAP: Record<string, number> = { push: 15, pull: 16, legs: 14 }; // per-region, per-DAY working-set ceiling (pull tolerates most; legs least, esp. under concurrent running)
+const _setCap: (r: string) => number = r => REGION_SET_CAP[r] || 14;
 
 // ── DISTINCT-MOVEMENT CAP (per region, per single session) ──
 // Third guard. The set cap governs VOLUME; this governs SPRAWL — how many distinct loaded
@@ -38,8 +48,8 @@ const _setCap = r => REGION_SET_CAP[r] || 14;
 // fatigue / warm-up / CNS cost for almost no extra stimulus. Push/pull tolerate one more
 // angle (5). Counts ONLY pattern-bearing lifting items — CORE, HIP-mobility, carries and
 // holds are pattern-null / off-region, so they are NEVER counted here nor eligible to trim.
-const REGION_MOVE_CAP = { push: 5, pull: 5, legs: 4 };
-const _moveCap = r => REGION_MOVE_CAP[r] || 5;
+const REGION_MOVE_CAP: Record<string, number> = { push: 5, pull: 5, legs: 4 };
+const _moveCap: (r: string) => number = r => REGION_MOVE_CAP[r] || 5;
 
 // ── DYNAMIC CARDIO INTERFERENCE ──
 // A shared-day cardio session steals recovery from that day's lifting. The old model
@@ -49,7 +59,7 @@ const _moveCap = r => REGION_MOVE_CAP[r] || 5;
 // (2) session intensity token-scanned from subtype+detail so it survives every naming
 // scheme (run / NRC / bike), and (3) distance/duration. Returns a leg-recovery
 // interference magnitude ≈0.3 (easy spin) … ≈1.6 (hard or long run).
-function _cardioInterference(cardio){
+function _cardioInterference(cardio: Cardio | null | undefined): number {
   if(!cardio || !cardio.type) return 0;
   const sub = (cardio.subtype||'').toLowerCase();
   const s = (sub + ' ' + (cardio.detail||'')).toLowerCase();
@@ -59,7 +69,7 @@ function _cardioInterference(cardio){
   // the session, so it classifies FIRST — an NRC "Long Run" whose detail reads "average
   // Recovery Pace" is a long run, not a recovery run. The combined string only decides
   // when the subtype says nothing (a Benchmark Run's "steady" lives in its detail).
-  const _sc = t => {
+  const _sc: (t: string) => number | null = t => {
     if(/interval|\bint\b|speed run|sprint|stride|zone 5|400m|800m|max effort|rpe 9/.test(t)) return 1.4;   // hard quality
     if(/tempo pace|threshold|\bchi\b|fartlek|\bhills?\b|zone 3|zone 4|rpe 8/.test(t))        return 1.05;  // threshold (NOTE: 'tempo pace', not bare 'tempo' — easy-run copy says "not a tempo")
     if(/recovery|active recovery|zone 1|shakeout|very easy|\beasy\b/.test(t))                return 0.55;  // easy/recovery
@@ -82,7 +92,7 @@ function _cardioInterference(cardio){
 }
 // Section-label → region. Labels are deterministic from buildSections regardless
 // of which exercise pick() rotates in, so tagging off the label is stable.
-function _sectionRegion(label, role){
+function _sectionRegion(label: string | null | undefined, role: string | null | undefined): Region | null {
   const L = (label||'').toLowerCase();
   if(/core|anti-rotation|plank|pallof|dynamic core/.test(L)) return 'core';
   if(/carry/.test(L)) return 'grip';
@@ -110,7 +120,7 @@ function _sectionRegion(label, role){
 // Per-item cost: compound 1.5, isolation 0.75, default 1.0, scaled by set count
 // parsed off the leading "N×..." of the detail string. Off-region items in a
 // mixed superset (e.g. wall sit) contribute to THEIR region, not the host's.
-function _itemRegion(name){
+function _itemRegion(name: string | null | undefined): Region | null {
   const N=(name||'').toLowerCase();
   if(/wall sit|spanish squat|goblet|terminal knee|knee extension/.test(N)) return 'legs';
   if(/plank|pallof|dead bug|ab wheel|bird dog|l-sit|hanging|hollow|rotation/.test(N)) return 'core';
@@ -130,12 +140,12 @@ function _itemRegion(name){
 // them that way — its /\brow\b/ entry is commented "DB / KB single-arm row —
 // position-limited". This is the same call, written down once.
 const _UNILAT_ROW=/\bsingle-?arm\b|\bone-?arm\b|^dumbbell row$|^kettlebell row$/i;
-function _isUnilateralRow(name){ return _UNILAT_ROW.test(String(name||'').trim()); }
+function _isUnilateralRow(name: string | null | undefined): boolean { return _UNILAT_ROW.test(String(name||'').trim()); }
 // MOVEMENT PATTERN — the real axis. The unsafe failure mode is saturating ONE
 // pattern (press, press, press), not accumulating DISTINCT patterns (squat,
 // hinge, lunge). So we count per-pattern, and each extra rep of the same pattern
 // costs escalating fatigue while a new pattern starts cheap.
-function _pattern(name){
+function _pattern(name: string | null | undefined): Pattern | null {
   const N=(name||'').toLowerCase();
   if(/wall sit|spanish squat|terminal knee/.test(N)) return null;        // isometric hold — not a fatiguing pattern rep
   if(/l-sit chin|l-sit pull/.test(N)) return 'vpull';                    // V162: an L-sit CHINUP is a vertical pull with a core hold riding along. The /l-sit/ token below must not eat it — same one-token-two-meanings class as the V119 incline bug.
@@ -252,7 +262,7 @@ function _pattern(name){
 // mountain climbers") intentionally match nothing and stay skip-only.
 // Rehab drills, band correctives and stretches are intentionally ABSENT (ruling D6):
 // the injury overlay prescribed those deliberately; skip is the only exit offered.
-const _AUX_FAMILY={
+const _AUX_FAMILY: Record<string, AuxFamily>={
   'Ab wheel rollouts':'core','Bird dogs':'core','Dead bugs':'core','Dead bug (slow tempo)':'core',
   'Garhammer raises':'core','Hanging knee raises':'core','Hanging leg raises':'core','Hanging hold':'core',
   'L-sit hold':'core','McGill curl-up':'core','Pallof press':'core','Plank hold':'core','RKC plank':'core',
@@ -275,8 +285,8 @@ const _AUX_FAMILY={
   'Wall sit':'hold','Single-leg wall sit':'hold','Spanish squat hold (KB)':'hold',
   'Cable crossover':'chest_iso','Pec deck':'chest_iso'
 };
-function _auxFamily(name){return _AUX_FAMILY[String(name||'').trim()]||null;}
-const _AUX_FAMILY_LABEL={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLISTIC',cond:'CONDITIONING',hold:'ISOMETRIC HOLD',chest_iso:'CHEST ISOLATION'};
+function _auxFamily(name: string | null | undefined): AuxFamily | null {return _AUX_FAMILY[String(name||'').trim()]||null;}
+const _AUX_FAMILY_LABEL: Record<AuxFamily, string>={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLISTIC',cond:'CONDITIONING',hold:'ISOMETRIC HOLD',chest_iso:'CHEST ISOLATION'};
 // Gear legality for aux candidates. Mirrors the tier truths the engine pools use
 // (hasBarbell = home_full/commercial/crossfit); machines are commercial-only; med
 // balls live where med balls live. Anything unmatched is bodyweight-legal everywhere.
@@ -291,8 +301,8 @@ const _AUX_FAMILY_LABEL={core:'CORE',carry:'CARRY / GRIP',power:'POWER / BALLIST
 // bodyweight athlete. Band, not cable, is the right tag: the band is the looser implement
 // and the movement genuinely runs off one, so the tier set is the /\bband\b/ clause's
 // (everything that owns bands: not bodyweight, not minimal).
-const _AUX_GEAR={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
-function _auxGearOK(name,equip){
+const _AUX_GEAR: Record<string, 'loaded' | 'band'>={'Farmer carry':'loaded','Suitcase carry':'loaded','Overhead carry':'loaded','Pallof press':'band'};
+function _auxGearOK(name: string | null | undefined,equip: Equipment): boolean {
   const _g=_AUX_GEAR[String(name||'').trim()];
   if(_g==='loaded') return equip!=='bodyweight';
   if(_g==='band') return equip!=='bodyweight'&&equip!=='minimal';
@@ -350,7 +360,7 @@ function _auxGearOK(name,equip){
 // barbell comp lifts are listed FIRST and anchored, so no generic rule can ever capture
 // one: 'Barbell Romanian deadlift' is the bar and exits immediately, 'Dumbbell Romanian deadlift'
 // falls through to the dumbbell window.
-const _REP_FLOOR=[
+const _REP_FLOOR: [RegExp, RepWindow | null][]=[
   // The wave was written for exactly these. Explicit allowlist, exact match, no floor.
   [/^(barbell bench press|incline barbell press|close-grip bench press|barbell row|pendlay row|deadlift|sumo deadlift|trap bar deadlift|romanian deadlift|back squat|front squat|paused back squat|box squat|overhead press|push press|good mornings)$/i, null],
   // Unloadable — sets and effort are prescribed, reps emerge.
@@ -382,7 +392,7 @@ const _REP_FLOOR=[
   // it gets an isolation window rather than the barbell wave.
   [/cable|crossover|pec deck|\bfly\b|flye/i,         [8,12]],
 ];
-function _repFloor(name){
+function _repFloor(name: string | null | undefined): RepWindow | null {
   const N=String(name||'');
   for(let i=0;i<_REP_FLOOR.length;i++){ if(_REP_FLOOR[i][0].test(N)) return _REP_FLOOR[i][1]; }
   return null;

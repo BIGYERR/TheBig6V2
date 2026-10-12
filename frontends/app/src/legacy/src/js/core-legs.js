@@ -1,9 +1,9 @@
-import { _ssLegal, _swapUniverseList, seededRand } from './exercise-library.js';
-import { isTrackableWeight } from './exercise-kinds.js';
-import { ALL_DAYS_ORDER, _ISO_ORDER } from './calendar.js';
-import { CORE_PILLARS, CORE_SPEED_TYPES } from './prehab.js';
-import { applyInjuryFilter } from './injury.js';
-import { _auxGearOK, _pattern } from './region-caps.js';
+import { _ssLegal, _swapUniverseList, seededRand } from '../../../../../../core/src/engine/exercise-library.ts';
+import { isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
+import { ALL_DAYS_ORDER, _ISO_ORDER } from '../../../../../../core/src/engine/calendar.ts';
+import { CORE_PILLARS, CORE_SPEED_TYPES } from '../../../../../../core/src/engine/prehab.ts';
+import { applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
+import { _auxGearOK, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _swapInjuryOK } from './swap-prefs.js';
 import { _compoundTier, d18LongRunDayPass } from './budget-engine-d.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)

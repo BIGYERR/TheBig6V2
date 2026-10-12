@@ -1,6 +1,24 @@
-import { _gearLens } from './prehab.js';
-import { _pattern } from './region-caps.js';
+import { _gearLens } from './prehab.ts';
+import { _pattern } from './region-caps.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+import type { Cfg, InjuryTier, Item, Section } from '../domain/index.ts';
+
+/** What an injury does to a build (injuryPlan): the patterns dropped and capped, the names dropped and swapped, the flags. */
+export interface InjuryPlan {
+  region: string;
+  tier: InjuryTier | 'halfstep';
+  /** Patterns (_pattern) removed outright. */
+  drop: Set<string>;
+  /** Patterns clamped to RPE 7. */
+  cap: Set<string>;
+  dropNames: RegExp | null;
+  swapNames: Record<string, string> | null;
+  noJumps: boolean;
+  noCarry: boolean;
+  spineSafeCore: boolean;
+  /** How the cardio bends: 'halfstep', 'noimpact', 'noimpact_swim', 'easy', 'reduce', 'swimout', or null for no change. */
+  cardioMode: string | null;
+}
 
 // ── INJURY OVERLAY — COACHING PLAN (region × tier → engine effects) ─────────
 // cfg.injury = { region, tier }. Two tiers, matching how injuries actually behave:
@@ -14,7 +32,7 @@ import { _pattern } from './region-caps.js';
 // Cardio is handled separately in engineB (injurySweepCardio): lower-limb protect
 // reroutes running to time-matched non-impact work so the aerobic base and the
 // progression clock survive the injury. See INJURY_OVERLAY_COACHING_SPEC.md.
-const INJURY_REGIONS={
+const INJURY_REGIONS: Record<string, { label: string }>={
   shoulder:{label:'Shoulder'},
   elbow:{label:'Elbow / Wrist'},
   lowback:{label:'Lower Back'},
@@ -22,7 +40,7 @@ const INJURY_REGIONS={
   knee:{label:'Knee'},
   ankle:{label:'Ankle / Foot / Shin'}
 };
-function injuryPlan(cfg){
+function injuryPlan(cfg: Cfg | null | undefined): InjuryPlan | null {
   const inj=cfg&&cfg.injury;
   if(!inj||!inj.region||!INJURY_REGIONS[inj.region]) return null;
   const T=inj.tier==='protect'?'protect':'workaround';
@@ -43,7 +61,7 @@ function injuryPlan(cfg){
   // in-place variant swaps (workaround tiers). Flags: noJumps kills jump/plyo
   // conditioning, noCarry kills loaded carries, spineSafeCore swaps flexion/hanging
   // core for McGill-style anti-extension/anti-rotation work.
-  const P={region:R,tier:T,drop:new Set(),cap:new Set(),dropNames:null,swapNames:null,
+  const P: InjuryPlan={region:R,tier:T,drop:new Set(),cap:new Set(),dropNames:null,swapNames:null,
            noJumps:false,noCarry:false,spineSafeCore:false,cardioMode:null};
   if(R==='knee'){
     P.noJumps=true;
@@ -160,7 +178,7 @@ function injuryPlan(cfg){
 // pattern and by name, swaps variants, appends the RPE 7 coach note to fixed-detail
 // accessories on capped patterns (wave lifts are clamped inside scheme() instead,
 // so their printed RPE is already correct and gets no note).
-function _injViewName(n,cfg){ if(!cfg||!cfg.injury) return n; const P=injuryPlan(cfg); if(!P||!P.swapNames||!P.swapNames[n]) return n; const g=_gearLens((cfg&&cfg.equipment)||'home_full'); if(!g(n)) return n; const to=P.swapNames[n]; const FB={'Cable pushdown':'Close-grip pushups'}; return g(to)?to:(FB[to]||to); }
+function _injViewName(n: string,cfg: Cfg | null | undefined): string { if(!cfg||!cfg.injury) return n; const P=injuryPlan(cfg); if(!P||!P.swapNames||!P.swapNames[n]) return n; const g=_gearLens((cfg&&cfg.equipment)||'home_full'); if(!g(n)) return n; const to=P.swapNames[n]; const FB: Record<string, string>={'Cable pushdown':'Close-grip pushups'}; return g(to)?to:(FB[to]||to); }
 // V227 D190 P-SWAPSEAM (R2): the plan's cap cue is one literal, read by the appender in applyInjuryFilter and by
 // the stripper both swap hops run before _swapDetailFor, so the carry never sees it and the filter alone writes it.
 // V228 D193 P-CAPRPE R1 (split, Mario round 2): the cue says three, rpeFromWave's rir at RPE 7 and _bwSetsFromDetail's RPE 7 line.
@@ -174,14 +192,14 @@ const INJ_HELD_TEST='Work up to one working set of 3 to 5 reps at RPE 7. Techniq
 // tank', V228 writes 'three'. One regex, both wordings, no constant to expire; every other detail comes back unchanged.
 // V229 D193 (Amendment 3 section 2): it also reads beneath R7's held-test text, matched by shape (its fixed clauses, the
 // RPE number free) and returned as TEST_RX_TEXT. The test text itself and every non-cue detail still come back unchanged.
-function _stripCapCue(d){ if(typeof d!=='string') return d; if(/^Work up to one working set of 3 to 5 reps at RPE [\d.]+\. Technique stays crisp\. No grinding\. Log the weight and the reps\. Your injury plan holds this lift, so there is no new baseline here\.$/.test(d)) return TEST_RX_TEXT; const m=/ — hold RPE 7, (?:two|three) in the tank$/.exec(d); return m?d.slice(0,m.index):d; }
+function _stripCapCue<T>(d: T): T | string { if(typeof d!=='string') return d; if(/^Work up to one working set of 3 to 5 reps at RPE [\d.]+\. Technique stays crisp\. No grinding\. Log the weight and the reps\. Your injury plan holds this lift, so there is no new baseline here\.$/.test(d)) return TEST_RX_TEXT; const m=/ — hold RPE 7, (?:two|three) in the tank$/.exec(d); return m?d.slice(0,m.index):d; }
 // V229 D193 P-CAPRPE (R2, R7): on a capped pattern a named RPE above 7 (a range by its top) is held at 7, and the reserve
 // gloss it carried is restated by the file's own RPE 7 line for that shape: bwsets (_bwSetsFromDetail's RPE 7 branch),
 // wave (rpeFromWave at 7, rir 3), loadCapped (scheme()'s _effEase line). The @ RPE grammar never glosses and gets none.
 // R7 (D193-HELDTEST), checked first: a detail of the strength test's shape (TEST_RX_TEXT, any RPE number) becomes
 // INJ_HELD_TEST, the hold in words. Any other detail at or under 7 comes back byte-identical. Read only by
 // applyInjuryFilter, the plan's single writer (D190).
-function _capRpeClamp(d){
+function _capRpeClamp<T>(d: T): T | string {
   if(typeof d!=='string') return d;
   if(/^Work up to one heavy set of 3 to 5 reps at RPE [\d.]+\. Technique stays crisp\. No grinding\. Log the weight and the reps\. That set is your new baseline\.$/.test(d)) return INJ_HELD_TEST;
   return d.replace(/RPE\s*(\d+(?:\.\d+)?)(?:[–-](\d+(?:\.\d+)?))?\+?( \((?:stop 2 reps short of failure|leave ~\d+ reps? in reserve|heaviest pair you can find)\))?/g,function(t,lo,hi,g){
@@ -190,16 +208,16 @@ function _capRpeClamp(d){
     return 'RPE 7'+(/^ \(stop/.test(g)?' (leave 3 or more in reserve)':/^ \(heaviest/.test(g)?' (leave ~3 in reserve)':' (leave ~3 reps in reserve)');
   });
 }
-function applyInjuryFilter(sections,cfg){
+function applyInjuryFilter(sections: Section[],cfg: Cfg | null | undefined): Section[] {
   const P=injuryPlan(cfg);
   if(!P||!Array.isArray(sections)) return sections;
-  const SPINE_SWAP={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs'};
+  const SPINE_SWAP: Record<string, string | null>={'Ab wheel rollouts':'Dead bugs','Hanging knee raises':'Bird dogs','L-sit hold':'Plank hold','L-sit chinups':null,'Hanging leg raises':'Bird dogs'};
   const JUMPS=/jump|burpee|broad|bound|box jump|high knees|tuck/i;
-  const out=[];
+  const out: Section[]=[];
   sections.forEach(s=>{
     if(!s||!Array.isArray(s.items)){out.push(s);return;}
     const seen=new Set();
-    const items=[];
+    const items: Item[]=[];
     // Section-local copy of the heading. Rewritten below when a swap renames the
     // item the heading names; s itself is never mutated (this pass runs several
     // times per day and must stay idempotent).
@@ -223,7 +241,7 @@ function applyInjuryFilter(sections,cfg){
       // swap the copy promises still lands. A target with no fallback row renames as it always did.
       if(P.swapNames&&P.swapNames[name]){
         const _gOK=_gearLens((cfg&&cfg.equipment)||'home_full');
-        const SWAP_GEAR_FALLBACK={'Cable pushdown':'Close-grip pushups'};
+        const SWAP_GEAR_FALLBACK: Record<string, string>={'Cable pushdown':'Close-grip pushups'};
         if(_gOK(name)){ const to=P.swapNames[name]; name=_gOK(to)?to:(SWAP_GEAR_FALLBACK[to]||to); }
       }
       if(pat&&P.cap.has(pat)&&detail) detail=/RPE/.test(detail)?_capRpeClamp(detail):detail+INJ_CAP_CUE;   // V229 D193 (R2, R7)
@@ -246,7 +264,7 @@ function applyInjuryFilter(sections,cfg){
 }
 // Repurposed-day titles for protect tier — the athlete should read intent, not a
 // gutted card. Returns null when the standard title stands.
-function injuryDayTitle(role,cfg){
+function injuryDayTitle(role: string,cfg: Cfg | null | undefined): string | null {
   const P=injuryPlan(cfg);
   if(!P||P.tier!=='protect') return null;
   if(role==='legs'){

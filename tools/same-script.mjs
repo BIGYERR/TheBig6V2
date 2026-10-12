@@ -5,11 +5,12 @@
 //   node tools/same-script.mjs <before.html> <after.html>
 //
 // The page outside its inline script must be byte for byte the same, but for the ia-version meta (a release moves it).
-// The inline script is read as JavaScript tokens (acorn's tokenizer) and its comments: both lists must be equal, token
-// by token, as the source text of each token. Whitespace between tokens is free, so types stripped to spaces pass and
-// anything else does not: a renamed variable, a changed literal, an added or removed semicolon. Exit 0 when the two
-// run the same code, 1 naming the first difference, 2 on bad arguments. Make the earlier page with
-// `node tools/app-at.mjs <ref> <file>`.
+// The inline script is read as JavaScript tokens (acorn's tokenizer): the two lists must be equal, token by token, as
+// the source text of each token. Whitespace between tokens is free, so types stripped to spaces pass and anything else
+// does not: a renamed variable, a changed literal, an added or removed semicolon. Comments never run, so they are
+// listed, not judged: every comment added or removed is printed (a TypeScript directive such as @ts-expect-error is
+// one). Exit 0 when the two run the same code, 1 naming the first difference, 2 on bad arguments. Make the earlier
+// page with `node tools/app-at.mjs <ref> <file>`.
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
@@ -59,8 +60,20 @@ for (let i = 0; i < n; i++) {
   }
 }
 if (x.tokens.length !== y.tokens.length) fail(`${a} has ${x.tokens.length} tokens and ${b} ${y.tokens.length}; the first ${n} are the same`);
-for (let i = 0; i < Math.max(x.comments.length, y.comments.length); i++) {
-  if (x.comments[i] !== y.comments[i]) fail(`comment ${i} differs:\n  ${a}: ${JSON.stringify(x.comments[i])}\n  ${b}: ${JSON.stringify(y.comments[i])}`);
-}
+/** What `from` holds that `to` does not, counted (a comment can appear more than once). */
+const minus = (from, to) => {
+  const left = new Map();
+  for (const c of to) left.set(c, (left.get(c) ?? 0) + 1);
+  return from.filter((c) => {
+    const k = left.get(c) ?? 0;
+    if (k) left.set(c, k - 1);
+    return !k;
+  });
+};
+const added = minus(y.comments, x.comments);
+const removed = minus(x.comments, y.comments);
 const ws = y.script.length - x.script.length;
-console.log(`same-script: the same code: ${n} tokens and ${x.comments.length} comments, in order; the script is ${Math.abs(ws)} bytes ${ws >= 0 ? 'longer' : 'shorter'} in whitespace; the rest of the page is the same but for ia-version ${x.version} -> ${y.version}`);
+console.log(`same-script: the same code: ${n} tokens, in order; the script is ${Math.abs(ws)} bytes ${ws >= 0 ? 'longer' : 'shorter'} in whitespace and comments; the rest of the page is the same but for ia-version ${x.version} -> ${y.version}`);
+console.log(`same-script: comments: ${x.comments.length} before, ${y.comments.length} after; ${added.length} added, ${removed.length} removed`);
+for (const c of added) console.log(`  + ${JSON.stringify(c).slice(0, 160)}`);
+for (const c of removed) console.log(`  - ${JSON.stringify(c).slice(0, 160)}`);
