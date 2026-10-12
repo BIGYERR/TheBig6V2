@@ -114,7 +114,7 @@ function testWeekIndex(startIso: string | null | undefined, raceIso: string | nu
 // race week rests; the day that held the race session (found by the cardio engine, by
 // subtype — never by position, which fails under the spacer and in multi-sport) rests
 // too and is appended to `rest` there. Null only when there is no alignment.
-function raceWeekPin(align: RaceAlignment | null | undefined, trainDays: DayKey[] | null | undefined): RacePin | null{
+function raceWeekPin(align: Pick<RaceAlignment, 'tw' | 'raceDay'> | null | undefined, trainDays: DayKey[] | null | undefined): RacePin | null{
   if(!align) return null;
   const iso = _ISO_ORDER.filter(d => (trainDays||[]).includes(d));
   const ri = _ISO_ORDER.indexOf(align.raceDay);

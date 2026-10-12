@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.239.5"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.239.6"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -6600,6 +6600,8 @@ function runAnchorInfo(cfg){
   return {anchorSec, rawSec, clamped, row, kind, exp, prog:(src && src.prog) || '', n:(src && +src.n) || 0, wk:(src && +src.wk) || 0, from:(src && src.from) || null, race, goalId:g.id, goalT};
 }
 
+/** The four core pillars' drills: anti-extension in a static and a loaded tier, the other three in one list each. */
+
 function buildHipSection(seed,bodyweight){
   // Reliable stability dose: the section always draws 2 loaded/active glute-med drills plus
   // 1 mobility piece, so a leg day can never come up all-stretches with zero abductor work.
@@ -7259,6 +7261,10 @@ function _setLeadingSets(d,n){
   return s;
 }
 
+/** The NRC week's run shape (_nrcRunShape): the long run, its eve and the day after, and the speed and easy days. */
+/** Two adjacent days: week and day of the first, week and day of the second, and the pair's index in the program. */
+/** A day as the core injector reads and writes it: its sections, its tags and its cardio. */
+
 // Build a core finisher block applying the PRIORITY + PLACEMENT rules.
 //  week           — weekly pillar/exercise rotation
 //  role           — today's lift role
@@ -7390,6 +7396,7 @@ function roleIsLegHeavy(role){ return LEG_HEAVY_ROLES.has(role); }
 function _coreTomorrowHot(weekObj, dayRoles, orderedTrain, idx){
   const next = orderedTrain[(idx+1) % orderedTrain.length];
   const nc = weekObj[next] && weekObj[next].cardio;
+  // @ts-expect-error a read nothing writes: no session carries assignedType, so this test is always false (handoff §12, for a ruling)
   const hotCardio = !!(nc && (nc.legLoad || CORE_SPEED_TYPES.has(nc.assignedType)));
   const hotLift = roleIsLegHeavy(dayRoles[next]); // heavy squat / deadlift days
   return hotCardio || hotLift;
@@ -7404,6 +7411,7 @@ function injectDynamicCore(weekObj, dayRoles, trainDays, week, equip){
   const ordered = ALL_DAYS_ORDER.filter(d => trainDays.includes(d) && dayRoles[d] && dayRoles[d]!=='active' && !_hasTrunk(d));
   if(!ordered.length) return;
   const dist=(a,b)=>{const r=Math.abs(ALL_DAYS_ORDER.indexOf(a)-ALL_DAYS_ORDER.indexOf(b));return Math.min(r,7-r);};
+  // @ts-expect-error a read nothing writes: no session carries assignedType, so this test is always false (handoff §12, for a ruling)
   const isHardRun=d=>{const c=weekObj[d]&&weekObj[d].cardio;return !!(c&&CORE_SPEED_TYPES.has(c.assignedType));};
   const LIGHT=new Set(['push','push_light','full']); // prefer upper/light days; keep trunk off heavy legs/pull when possible
   const chosen=[];
@@ -7934,6 +7942,11 @@ function doGenerate(){
     setTimeout(()=>{showScreen('screenWeek');renderWeekView();renderProgList();},600);
   },2400);
 }
+
+/** Engine A's timeline: the program's id and length, its days, its goals, the waves and the deload and taper resolvers. */
+/** Engine B's cardio: the schedule, the hip prehab flag and the taper. */
+/** Each training day's lifting role ('push', 'pull', 'legs', 'push_light', 'full', 'active'), by day key. */
+/** The calendar plan: the roles, and the note the leg and region deconfliction leaves (or null). */
 
 // ============================================================================
 // PROGRAM GENERATION PIPELINE  (decoupled A -> B -> C -> D)
@@ -10736,6 +10749,7 @@ function auxSwapCandidates(outName,day,prog){
     return _swapInjuryOK(n,cfg);
   }).sort();
 }
+/** The parts of a session the passes read: its sport, its name and text, its dose, whether it is a Nike plan session. */
 const _PATTERN_REGION = {
   hpress:'push', vpress:'push', delt_iso:'push', tri_iso:'push',
   row:'pull', vpull:'pull', bi_iso:'pull',

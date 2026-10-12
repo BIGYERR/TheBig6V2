@@ -98,15 +98,15 @@ tests (`docs/decisions/engine-typescript.md`).
 | `engine/cardio-progression.ts` | on-ramp, `PACE_CHART`, row pace, performance predicates, taper, multi-sport targets, `buildCardioProgression`, `spaceHardCardio`; the run anchor (`runAnchorInfo`) |
 | `engine/prehab.ts` | hip, foot and ankle, and rehab sections, core pillars, gear lens, bodyweight substitutes |
 | `engine/power-accessory.ts` | power and explosive dose and rest, bodyweight sets, accessory grammar, hinge clamp, prevention dose, bodyweight sweep, `_setLeadingSets` |
-| `js/core-legs.js` | dynamic core, `injectDynamicCore`, NRC leg-lift placement, leg, adjacent-day and same-region deconfliction |
+| `engine/core-legs.ts` | dynamic core, `injectDynamicCore`, NRC leg-lift placement, leg, adjacent-day and same-region deconfliction |
 | `js/wizard-generate.js` | `generateProgram`, length warning, mile and swim advisories, `doGenerate` |
-| `js/engine-a-b-calendar.js` | Engine A timeline and split router; Engine B cardio, injury cardio sweep, `planCalendar` |
+| `engine/engine-a-b-calendar.ts` | Engine A timeline and split router; Engine B cardio, injury cardio sweep, `planCalendar` |
 | `engine/injury.ts` | injury regions, `injuryPlan`, `applyInjuryFilter`, `injuryDayTitle` |
 | `engine/engine-c.ts` | Engine C kinematic pool filter |
 | `engine/region-caps.ts` | regional fatigue, set and move caps, cardio interference, region and pattern lenses, aux families, rep floor |
 | `engine/swap-prefs.ts` | a swap the athlete made, carried into every build: `applySwapPrefs`, `_swapDetailFor`, `_swapInjuryOK` |
 | `js/swaps-edits.js` | exercise swap candidates (`auxSwapCandidates` too), swap store, day edits (add and skip), swap counts (the coach nudge store) |
-| `js/budget-engine-d.js` | compound tiers, deload, posterior-chain lens, session budget, regional fatigue, Engine D, long-run tiers, race eve, sweeps, `buildProgram` |
+| `engine/budget-engine-d.ts` | compound tiers, deload, posterior-chain lens, session budget, regional fatigue, Engine D, long-run tiers, race eve, sweeps, `buildProgram` |
 | `js/random-wildcard.js` | random workout, Wildcards |
 | `js/week-view-sections.js` | day helpers, start-date partial week, tips, hero, day codes, week strip, `renderWeekView`; RPE key, section rounds, `buildSectionsHTML`, `parseRx` |
 | `js/set-logging.js` | load recency, set auto-save, collapsed set bar, `buildExItem`, benchmark read-back, `buildCardioHTML` |

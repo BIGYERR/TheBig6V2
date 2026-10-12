@@ -3,7 +3,7 @@ import { _powerAllowed } from '../../../../../../core/src/engine/power-accessory
 import { applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
 import { _AUX_FAMILY, _auxFamily, _auxGearOK, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _swapInjuryOK, applySwapPrefs } from '../../../../../../core/src/engine/swap-prefs.ts';
-import { _PATTERN_REGION, _compoundTier } from './budget-engine-d.js';
+import { _PATTERN_REGION, _compoundTier } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { parseRx } from './week-view-sections.js';
 import { dayOverlayInfo } from './overlays.js';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)

@@ -1,19 +1,31 @@
-import { _ssLegal, _swapUniverseList, seededRand } from '../../../../../../core/src/engine/exercise-library.ts';
-import { isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
-import { ALL_DAYS_ORDER, _ISO_ORDER } from '../../../../../../core/src/engine/calendar.ts';
-import { CORE_PILLARS, CORE_SPEED_TYPES } from '../../../../../../core/src/engine/prehab.ts';
-import { applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
-import { _auxGearOK, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
-import { _swapInjuryOK } from '../../../../../../core/src/engine/swap-prefs.ts';
-import { _compoundTier, d18LongRunDayPass } from './budget-engine-d.js';
+import { _ssLegal, _swapUniverseList, seededRand } from './exercise-library.ts';
+import { isTrackableWeight } from './exercise-kinds.ts';
+import { ALL_DAYS_ORDER, _ISO_ORDER } from './calendar.ts';
+import { CORE_PILLARS, CORE_SPEED_TYPES } from './prehab.ts';
+import { applyInjuryFilter } from './injury.ts';
+import { _auxGearOK, _pattern } from './region-caps.ts';
+import { _swapInjuryOK } from './swap-prefs.ts';
+import { _compoundTier, d18LongRunDayPass } from './budget-engine-d.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+import type { Cardio, Cfg, Day, DayKey, Equipment, Item, Section, WeekGrid } from '../domain/index.ts';
+import type { CardioSchedule } from './cardio-progression.ts';
+import type { DayRoles } from './engine-a-b-calendar.ts';
+import type { CardioSession } from './nsw-cardio.ts';
+import type { CorePillars } from './prehab.ts';
+
+/** The NRC week's run shape (_nrcRunShape): the long run, its eve and the day after, and the speed and easy days. */
+interface NrcRunShape { long: DayKey; eve: DayKey; after: DayKey; speed: Set<DayKey>; easy: Set<DayKey>; forbidden: Set<DayKey>; base: boolean }
+/** Two adjacent days: week and day of the first, week and day of the second, and the pair's index in the program. */
+type AdjPair = [number, DayKey, number, DayKey, number];
+/** A day as the core injector reads and writes it: its sections, its tags and its cardio. */
+type CoreDayView = { sections?: Section[]; tags?: string[]; cardio?: Cardio | null; rest?: boolean };
 
 // Build a core finisher block applying the PRIORITY + PLACEMENT rules.
 //  week           — weekly pillar/exercise rotation
 //  role           — today's lift role
 //  isHardRunToday — today carries a speed/interval run
 //  tomorrowHot    — next training day is a speed run or heavy dead/squat day
-function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equip, onCard){
+function getDynamicCoreBlock(week: number, role: string, isHardRunToday: boolean, tomorrowHot: boolean, slot: number, equip?: Equipment, onCard?: Record<string, number> | null): Section{
   const P = CORE_PILLARS;
   // V193 (D44): CORE_PILLARS is injected at WEEK ASSEMBLY, downstream of the pool block,
   // so _gearOK never saw it and 'Landmine rotations' printed on home_basic and minimal —
@@ -67,8 +79,8 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equi
   // never exceed a minimal count on the same pillar. Counts in comments are claims with no
   // gate behind them and they go stale silently, so the executable checks own this one:
   // the anti-rotation floor gate, and tests/measure/v193_d49_antirotation.js.
-  const _onCard = onCard || Object.create(null);
-  const _pi = key => {
+  const _onCard: Record<string, number> = onCard || Object.create(null);
+  const _pi: (key: 'anti_rotation' | 'dynamic_bracing' | 'rotational_power') => Item[] = key => {
     const g = equip===undefined
       ? (P[key].items||[])
       : (P[key].items||[]).filter(it=>_auxGearOK(it.name, equip));
@@ -80,9 +92,9 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equi
   // always was — clock R — so every caller below reads identically. A pillar that only turns
   // on some steps of R passes its OWN turn count instead, which is the whole D46 fix: the
   // index must count the pillar's turns, not the global step.
-  const rotOn = (clock,arr,n)=>arr[(((clock-1+n)%arr.length)+arr.length)%arr.length];
-  const rot = (arr,n)=>rotOn(R,arr,n);
-  let pillar, items;
+  const rotOn = (clock: number,arr: Item[],n: number)=>arr[(((clock-1+n)%arr.length)+arr.length)%arr.length];
+  const rot = (arr: Item[],n: number)=>rotOn(R,arr,n);
+  let pillar: keyof CorePillars, items: Item[];
   if(isHardRunToday){
     // PLACEMENT: hard-run day → low-fatigue STATIC stability to protect the spine.
     // Never loaded (ab wheel) and never hip-flexion grinding right after a speed session.
@@ -108,7 +120,7 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equi
   } else {
     // PLACEMENT: clear-runway upper/lighter day → rotate the higher-fatigue pillars in here,
     // and ONLY here. Loaded anti-extension and dynamic bracing are confined to this branch.
-    const key = ['dynamic_bracing','anti_extension_loaded','rotational_power'][((R-1)%3+3)%3];
+    const key = ['dynamic_bracing','anti_extension_loaded','rotational_power'][((R-1)%3+3)%3] as 'dynamic_bracing' | 'anti_extension_loaded' | 'rotational_power';
     if(key==='anti_extension_loaded'){
       pillar='anti_extension';
       items=[rot(P.anti_extension.loaded, R), rot(P.anti_extension.static, R)];
@@ -133,29 +145,31 @@ function getDynamicCoreBlock(week, role, isHardRunToday, tomorrowHot, slot, equi
 // deadlift day ('pull'). Single source of truth shared by the core-placement engine AND
 // the hard-day leg buffer, so the two can never disagree about what counts as leg-heavy.
 const LEG_HEAVY_ROLES = new Set(['legs','pull']);
-function roleIsLegHeavy(role){ return LEG_HEAVY_ROLES.has(role); }
+function roleIsLegHeavy(role: string): boolean{ return LEG_HEAVY_ROLES.has(role); }
 
 // Is the training day AFTER orderedTrain[idx] high-fatigue (no heavy trunk before it)?
-function _coreTomorrowHot(weekObj, dayRoles, orderedTrain, idx){
+function _coreTomorrowHot(weekObj: Record<string, CoreDayView>, dayRoles: DayRoles, orderedTrain: DayKey[], idx: number): boolean{
   const next = orderedTrain[(idx+1) % orderedTrain.length];
   const nc = weekObj[next] && weekObj[next].cardio;
+  // @ts-expect-error a read nothing writes: no session carries assignedType, so this test is always false (handoff §12, for a ruling)
   const hotCardio = !!(nc && (nc.legLoad || CORE_SPEED_TYPES.has(nc.assignedType)));
   const hotLift = roleIsLegHeavy(dayRoles[next]); // heavy squat / deadlift days
   return hotCardio || hotLift;
 }
 
 // Inject up to 2 deconflicted core finishers into one week's day map, in place.
-function injectDynamicCore(weekObj, dayRoles, trainDays, week, equip){
+function injectDynamicCore(weekObj: Record<string, CoreDayView>, dayRoles: DayRoles, trainDays: DayKey[], week: number, equip: Equipment): void{
   // The protect-tier rehab day builds its own full trunk block, so it is excluded here
   // rather than receiving a second 2-item finisher on top. Detected off the built
   // sections instead of re-deriving the injury plan, so the two can never disagree.
-  const _hasTrunk = d => ((weekObj[d]&&weekObj[d].sections)||[]).some(sec=>sec&&/^Trunk /.test(sec.label||''));
+  const _hasTrunk: (d: DayKey) => boolean = d => ((weekObj[d]&&weekObj[d].sections)||[]).some(sec=>sec&&/^Trunk /.test(sec.label||''));
   const ordered = ALL_DAYS_ORDER.filter(d => trainDays.includes(d) && dayRoles[d] && dayRoles[d]!=='active' && !_hasTrunk(d));
   if(!ordered.length) return;
-  const dist=(a,b)=>{const r=Math.abs(ALL_DAYS_ORDER.indexOf(a)-ALL_DAYS_ORDER.indexOf(b));return Math.min(r,7-r);};
-  const isHardRun=d=>{const c=weekObj[d]&&weekObj[d].cardio;return !!(c&&CORE_SPEED_TYPES.has(c.assignedType));};
+  const dist=(a: DayKey,b: DayKey)=>{const r=Math.abs(ALL_DAYS_ORDER.indexOf(a)-ALL_DAYS_ORDER.indexOf(b));return Math.min(r,7-r);};
+  // @ts-expect-error a read nothing writes: no session carries assignedType, so this test is always false (handoff §12, for a ruling)
+  const isHardRun: (d: DayKey) => boolean=d=>{const c=weekObj[d]&&weekObj[d].cardio;return !!(c&&CORE_SPEED_TYPES.has(c.assignedType));};
   const LIGHT=new Set(['push','push_light','full']); // prefer upper/light days; keep trunk off heavy legs/pull when possible
-  const chosen=[];
+  const chosen: DayKey[]=[];
   const hr=ordered.find(isHardRun);
   if(hr) chosen.push(hr); // slot 1: spine-protect the hard-run day
   // remaining slots: furthest-spread day, preferring light/upper roles
@@ -179,7 +193,7 @@ function injectDynamicCore(weekObj, dayRoles, trainDays, week, equip){
     // sections rather than re-derived, so the core draw and the section builder can never
     // disagree about what is on the card. Lowercased on the same axis the bodyweight
     // dedupe sweep uses.
-    const _onCardNames=Object.create(null);
+    const _onCardNames: Record<string, number>=Object.create(null);
     ((weekObj[day]&&weekObj[day].sections)||[]).forEach(function(sec){
       ((sec&&sec.items)||[]).forEach(function(it){ if(it&&it.name) _onCardNames[String(it.name).trim().toLowerCase()]=1; });
     });
@@ -216,8 +230,8 @@ function injectDynamicCore(weekObj, dayRoles, trainDays, week, equip){
 // tight and the NSW rule below runs as before. D127 (V205) widened the door: NRC race
 // programs and the NSW pace family enter here. D104a (V208): so does run_base, by its keys.
 // Every other NSW goal gets a null shape and the 48h rule runs unchanged.
-function _nrcRunShape(wk1, trainDays){
-  const iso = d => _ISO_ORDER.indexOf(d);
+function _nrcRunShape(wk1: Record<string, CardioSession | null>, trainDays: DayKey[]): NrcRunShape | null{
+  const iso: (d: DayKey) => number = d => _ISO_ORDER.indexOf(d);
   // D127 (V205): the pace family reaches this same shape through its own lens. The NSW
   // engine sets no isNRC (that flag means Nike-verbatim and is not faked here) and names
   // BOTH of its easy runs `Long Slow Distance (LSD)`, so the long run is told from the
@@ -225,8 +239,8 @@ function _nrcRunShape(wk1, trainDays){
   // (lsd_long true, lsd_easy false). INT and CHI are the speed days. Scoped to
   // run_pace_goal and its two V126 aliases. run_base has its own arm below (D104a); every
   // other NSW goal falls through with a null shape and keeps the 48h rule below.
-  const _paceFam = g => g==='run_pace_goal' || g==='run_mile_time' || g==='run_15_under10';
-  let long = null, base = false; const speed = new Set(), easy = new Set();
+  const _paceFam: (g: string) => boolean = g => g==='run_pace_goal' || g==='run_mile_time' || g==='run_15_under10';
+  let long = null as DayKey | null, base = false; const speed = new Set<DayKey>(), easy = new Set<DayKey>();
   trainDays.forEach(d => { const c = wk1[d]; if(!c || c.type!=='run') return;
     if(c.isNRC){
       if(/^long run/i.test(c.subtype||'')) long = d; else if(/^speed run/i.test(c.subtype||'')) speed.add(d); else easy.add(d);
@@ -252,9 +266,9 @@ function _nrcRunShape(wk1, trainDays){
 }
 // One cost table, two readers: the placement below and deconflictSameRegion's guard, so a
 // region swap can never undo a placement (it did, before the guard read this table).
-function _nrcLegCost(shape, role, d){
+function _nrcLegCost(shape: NrcRunShape, role: string, d: DayKey): number{
   if(shape.forbidden.has(d)) return Infinity;
-  const iso = x => _ISO_ORDER.indexOf(x);
+  const iso: (x: DayKey) => number = x => _ISO_ORDER.indexOf(x);
   const prev = _ISO_ORDER[(iso(d)+6)%7], next = _ISO_ORDER[(iso(d)+1)%7];
   let c = 0;
   if(shape.speed.has(d)) c += role==='pull' ? 0.5 : 1.5;
@@ -264,14 +278,14 @@ function _nrcLegCost(shape, role, d){
   if(d===shape.after) c += 2;
   return c;
 }
-function nrcLegLiftPlacement(dayRoles, trainDays, wk1){
+function nrcLegLiftPlacement(dayRoles: DayRoles, trainDays: DayKey[], wk1: Record<string, CardioSession | null>): { legRecoveryNote: string } | null{
   const shape = _nrcRunShape(wk1, trainDays); if(!shape) return null;
   const roles = ['pull','legs'].filter(r => trainDays.some(d => dayRoles[d]===r));
   if(!roles.length) return null;
-  const iso = d => _ISO_ORDER.indexOf(d);
-  const cost = (role, d) => _nrcLegCost(shape, role, d);
-  const dist = (a,b) => { const r = Math.abs(iso(a)-iso(b)); return Math.min(r, 7-r); };
-  let best = null;
+  const iso: (d: DayKey) => number = d => _ISO_ORDER.indexOf(d);
+  const cost = (role: string, d: DayKey) => _nrcLegCost(shape, role, d);
+  const dist = (a: DayKey,b: DayKey) => { const r = Math.abs(iso(a)-iso(b)); return Math.min(r, 7-r); };
+  let best = null as { c: number; sp?: number; days: Record<string, DayKey> } | null;
   if(roles.length===1){
     trainDays.forEach(d => { const c = cost(roles[0], d); if(c<Infinity && (!best || c<best.c)) best = {c, days:{[roles[0]]:d}}; });
   } else {
@@ -279,7 +293,7 @@ function nrcLegLiftPlacement(dayRoles, trainDays, wk1){
       if(p===l) return;
       const c = cost('pull',p) + cost('legs',l); if(c===Infinity) return;
       const sp = dist(p,l);
-      if(!best || c<best.c || (c===best.c && sp>best.sp) || (c===best.c && sp===best.sp && iso(l)<iso(best.days.legs))) best = {c, sp, days:{pull:p, legs:l}};
+      if(!best || c<best.c || (c===best.c && sp>best.sp!) || (c===best.c && sp===best.sp && iso(l)<iso(best.days.legs))) best = {c, sp, days:{pull:p, legs:l}};
     }));
   }
   if(!best) return null;
@@ -287,21 +301,21 @@ function nrcLegLiftPlacement(dayRoles, trainDays, wk1){
   const rest = trainDays.filter(d => !roleIsLegHeavy(dayRoles[d])).map(d => dayRoles[d]);
   const taken = new Set(Object.values(best.days));
   const open = trainDays.filter(d => !taken.has(d));
-  Object.keys(best.days).forEach(r => { dayRoles[best.days[r]] = r; });
+  Object.keys(best.days).forEach(r => { dayRoles[best!.days[r]] = r; });
   open.forEach((d,i) => { dayRoles[d] = rest[i] || 'full'; });
   // D104a (V208): run_base speaks of its own week.
   return { legRecoveryNote: shape.base ? 'Nothing heavy lands on your long run or the day before it. Your lifting days were placed around it.'
     : 'Your hinge day rides a speed session so hard days stay hard. Nothing heavy lands the day before your long run.' };
 }
-function deconflictLegLiftDays(dayRoles, trainDays, cardioSchedule){
+function deconflictLegLiftDays(dayRoles: DayRoles, trainDays: DayKey[], cardioSchedule: CardioSchedule): { legRecoveryNote: string | null }{
   // D104a (V208): the placement reads the FIRST week whose runs carry a `long` key, on every NSW
   // arm (a test is not the long run, so the placement reads the next real one). NRC, bike and
   // swim carry no key, so they keep week 1, as does a program with no long-keyed run.
   const _lw = Object.keys(cardioSchedule).map(Number).filter(n => n >= 1).sort((a,b) => a-b)
-    .find(n => trainDays.some(d => { const c = (cardioSchedule[n] || {})[d]; return !!(c && c.dose && c.dose.key === 'long'); }));
-  const wk1 = cardioSchedule[_lw || 1] || {};
-  const _i = d => ALL_DAYS_ORDER.indexOf(d);
-  const _dist = (a,b)=>{ const r=Math.abs(_i(a)-_i(b)); return Math.min(r,7-r); };
+    .find(n => trainDays.some(d => { const c = (cardioSchedule[n] || {} as Record<string, CardioSession | null>)[d]; return !!(c && c.dose && c.dose.key === 'long'); }));
+  const wk1: Record<string, CardioSession | null> = cardioSchedule[_lw || 1] || {};
+  const _i: (d: DayKey) => number = d => ALL_DAYS_ORDER.indexOf(d);
+  const _dist = (a: DayKey,b: DayKey)=>{ const r=Math.abs(_i(a)-_i(b)); return Math.min(r,7-r); };
 
   // V189 (D36): race programs place by run shape. D127 (V205): so does the pace family —
   // routing is by the shape, not by a second goal test here, so there is exactly one place
@@ -311,14 +325,14 @@ function deconflictLegLiftDays(dayRoles, trainDays, cardioSchedule){
   // around. A null shape (every other NSW goal, any program with no long run) falls through.
   const _nrc = nrcLegLiftPlacement(dayRoles, trainDays, wk1);
   if(_nrc) return _nrc;
-  const legTaxing = new Set();
+  const legTaxing = new Set<DayKey>();
   trainDays.forEach(d => { const c = wk1[d]; if(c && c.legLoad) legTaxing.add(d); });
   if(!legTaxing.size) return { legRecoveryNote:null };
 
   // d conflicts if it sits on, or within 48h of, any leg-taxing cardio day.
-  const conflicted = d => legTaxing.has(d) || [...legTaxing].some(t=>_dist(d,t)===1);
+  const conflicted: (d: DayKey) => boolean = d => legTaxing.has(d) || [...legTaxing].some(t=>_dist(d,t)===1);
   // A swap target must not itself be leg-heavy or active, and must pass the handed test.
-  const findSafe = (liftDay, test) => trainDays.find(d =>
+  const findSafe = (liftDay: DayKey, test: (d: DayKey) => boolean) => trainDays.find(d =>
     d!==liftDay && !roleIsLegHeavy(dayRoles[d]) && dayRoles[d]!=='active' && !test(d));
 
   // V153 (F2): three honest tiers. The old fallback branch emitted the full-success
@@ -372,11 +386,11 @@ function deconflictLegLiftDays(dayRoles, trainDays, cardioSchedule){
 // makes the swap sheet trustworthy. The prescription rides along verbatim; pure RPE is
 // what makes that honest. Deterministic from cfg + seed like everything else in the
 // pipeline: rank by load distance, then a seeded choice among the top three.
-function _adjDayPairs(totalWeeks){
+function _adjDayPairs(totalWeeks: number): AdjPair[]{
   // Calendar-adjacent training-day pairs across the whole block, INCLUDING the Saturday ->
   // Sunday week boundary. Weeks are built independently, so week w's Saturday must be
   // compared against week w+1's Sunday, never against week w's own Sunday.
-  const out=[];
+  const out: AdjPair[]=[];
   for(let w=1;w<=totalWeeks;w++){
     for(let i=1;i<_ISO_ORDER.length;i++) out.push([w,_ISO_ORDER[i-1],w,_ISO_ORDER[i],(w-1)*7+(i<6?i:0)]);
     if(w<totalWeeks) out.push([w,'sun',w+1,'mon',(w-1)*7+6]);
@@ -384,13 +398,13 @@ function _adjDayPairs(totalWeeks){
   return out;
 }
 // V217 (D160): the previous day as it will ship past d18LongRunDayPass, read off a deep copy — the live week is never touched.
-function _d18View(A, wA, dA){
+function _d18View(A: Day, wA: number, dA: DayKey): Day{
   if(!A) return A;
-  const o={}; o[wA]={}; o[wA][dA]=JSON.parse(JSON.stringify(A));
+  const o: WeekGrid={}; o[wA]={}; o[wA][dA]=JSON.parse(JSON.stringify(A));
   d18LongRunDayPass(o);
   return o[wA][dA];
 }
-function deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks){
+function deconflictAdjacentDupes(weeks: WeekGrid, cfg: Cfg, seed: number, totalWeeks: number): number{
   const universe=(typeof _swapUniverseList==='function')?_swapUniverseList():[];
   if(!universe.length) return 0;
   let moved=0;
@@ -400,11 +414,11 @@ function deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks){
   // holding 'Double Kettlebell deadlift 8×3 — max intent' in a block that exists because
   // it was filtered to no-landing work. Repeating an explosive movement across adjacent
   // days is legitimate anyway: power is a practiced quality, same reasoning as mains.
-  const isMainSec=sec=>/^(main|primer|power)/i.test((sec&&sec.label)||'');
-  const nameSet=day=>{const s=Object.create(null);
+  const isMainSec: (sec: Section) => boolean=sec=>/^(main|primer|power)/i.test((sec&&sec.label)||'');
+  const nameSet: (day: Day | null | undefined) => Record<string, number>=day=>{const s=Object.create(null);
     ((day&&day.sections)||[]).forEach(sec=>((sec&&sec.items)||[]).forEach(it=>{if(it&&it.name)s[it.name.toLowerCase()]=1;}));
     return s;};
-  const touched=Object.create(null);
+  const touched: Record<string, number>=Object.create(null);
   _adjDayPairs(totalWeeks).forEach(function(pair,pi){
     const wA=pair[0], dA=pair[1], wB=pair[2], dB=pair[3];
     const A=weeks[wA]&&weeks[wA][dA], B=weeks[wB]&&weeks[wB][dB];
@@ -465,24 +479,24 @@ function deconflictAdjacentDupes(weeks, cfg, seed, totalWeeks){
   return moved;
 }
 
-function deconflictSameRegion(dayRoles, trainDays, cardioSchedule){
+function deconflictSameRegion(dayRoles: DayRoles, trainDays: DayKey[], cardioSchedule: CardioSchedule): { regionRecoveryNote: string | null }{
   const PRESS = new Set(['push','push_light']);
   const ALL = ALL_DAYS_ORDER.filter(d => trainDays.includes(d));
-  const _i = d => ALL_DAYS_ORDER.indexOf(d);
-  const _dist = (a,b) => { const r = Math.abs(_i(a)-_i(b)); return Math.min(r, 7-r); };
+  const _i: (d: DayKey) => number = d => ALL_DAYS_ORDER.indexOf(d);
+  const _dist = (a: DayKey,b: DayKey) => { const r = Math.abs(_i(a)-_i(b)); return Math.min(r, 7-r); };
   // cardio leg-load conflict set -- a swap may never re-introduce a leg/run collision
-  const wk1 = cardioSchedule[1] || {};
-  const legTaxing = new Set(); trainDays.forEach(d => { const c = wk1[d]; if(c && c.legLoad) legTaxing.add(d); });
-  const cardioConflicted = d => legTaxing.has(d) || [...legTaxing].some(t => _dist(d,t)===1);
+  const wk1: Record<string, CardioSession | null> = cardioSchedule[1] || {};
+  const legTaxing = new Set<DayKey>(); trainDays.forEach(d => { const c = wk1[d]; if(c && c.legLoad) legTaxing.add(d); });
+  const cardioConflicted: (d: DayKey) => boolean = d => legTaxing.has(d) || [...legTaxing].some(t => _dist(d,t)===1);
   // V189 (D36): on NRC programs the leg roles are scored by the placement's own cost table
   // (forbidden days weigh 10), so a region swap can never make the placement worse. D127
   // (V205): the pace family now produces a shape too, so the same guard holds there and the
   // long-run eve stays forbidden through the region pass. Where _nrcRunShape is null the
   // count is the V30 one, byte-identical.
   const _shape = _nrcRunShape(wk1, trainDays);
-  const cardioConflicts = dr => ALL.reduce((n,d) => n + (roleIsLegHeavy(dr[d]) ? (_shape ? Math.min(10, _nrcLegCost(_shape, dr[d], d)) : (cardioConflicted(d) ? 1 : 0)) : 0), 0);
-  const regionOf = role => PRESS.has(role) ? 'press' : (role==='full' ? 'full' : null);
-  const collisions = dr => {
+  const cardioConflicts: (dr: DayRoles) => number = dr => ALL.reduce((n,d) => n + (roleIsLegHeavy(dr[d]) ? (_shape ? Math.min(10, _nrcLegCost(_shape, dr[d], d)) : (cardioConflicted(d) ? 1 : 0)) : 0), 0);
+  const regionOf: (role: string) => string | null = role => PRESS.has(role) ? 'press' : (role==='full' ? 'full' : null);
+  const collisions: (dr: DayRoles) => number = dr => {
     let n = 0;
     for(let a=0;a<ALL.length;a++) for(let b=a+1;b<ALL.length;b++){
       const ra = regionOf(dr[ALL[a]]), rb = regionOf(dr[ALL[b]]);
@@ -492,7 +506,7 @@ function deconflictSameRegion(dayRoles, trainDays, cardioSchedule){
   };
   if(collisions(dayRoles)===0) return { regionRecoveryNote:null };
   const cardioBase = cardioConflicts(dayRoles);   // never let a region swap worsen this
-  let note = null, guard = 0;
+  let note: string | null = null, guard = 0;
   while(collisions(dayRoles) > 0 && guard++ < 30){
     const before = collisions(dayRoles);
     let improved = false;

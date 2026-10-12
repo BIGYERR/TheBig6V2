@@ -1,11 +1,24 @@
-import { LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
-import { ALL_DAYS_ORDER, _ISO_ORDER, _parseLocalDate } from '../../../../../../core/src/engine/calendar.ts';
-import { calcProgramLength } from '../../../../../../core/src/engine/nsw-cardio.ts';
-import { PACE_GOALS, raceAlignment, raceWeekPin } from '../../../../../../core/src/engine/nrc-race-bike-swim.ts';
-import { buildCardioProgression, programTaperWindow } from '../../../../../../core/src/engine/cardio-progression.ts';
-import { deconflictLegLiftDays, deconflictSameRegion } from './core-legs.js';
-import { injuryPlan } from '../../../../../../core/src/engine/injury.ts';
+import { LIFTING_FOCUS_TO_GOAL } from './exercise-library.ts';
+import { ALL_DAYS_ORDER, _ISO_ORDER, _parseLocalDate } from './calendar.ts';
+import { calcProgramLength } from './nsw-cardio.ts';
+import { PACE_GOALS, raceAlignment, raceWeekPin } from './nrc-race-bike-swim.ts';
+import { buildCardioProgression, programTaperWindow } from './cardio-progression.ts';
+import { deconflictLegLiftDays, deconflictSameRegion } from './core-legs.ts';
+import { injuryPlan } from './injury.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+import type { CardioGoal, CardioType, Cfg, DayKey } from '../domain/index.ts';
+import type { CardioSchedule, EngineCfg } from './cardio-progression.ts';
+import type { EngineATimeline, EngineBCardio, WaveEntry } from './engine-c.ts';
+import type { CardioSession, EngineCardioGoals } from './nsw-cardio.ts';
+
+/** Engine A's timeline: the program's id and length, its days, its goals, the waves and the deload and taper resolvers. */
+export interface EngineA extends EngineATimeline { id: string; cardioTypes: CardioType[]; cardioGoals: EngineCardioGoals; allDaysList: DayKey[]; trainDays: DayKey[]; isRecoveryWeek(w: number): boolean }
+/** Engine B's cardio: the schedule, the hip prehab flag and the taper. */
+export interface EngineB extends EngineBCardio { cardioSchedule: CardioSchedule; taperWks: number; inTaper(w: number): boolean }
+/** Each training day's lifting role ('push', 'pull', 'legs', 'push_light', 'full', 'active'), by day key. */
+export type DayRoles = Record<string, string>;
+/** The calendar plan: the roles, and the note the leg and region deconfliction leaves (or null). */
+export interface CalendarPlan { dayRoles: DayRoles; legRecoveryNote: string | null }
 
 // ============================================================================
 // PROGRAM GENERATION PIPELINE  (decoupled A -> B -> C -> D)
@@ -20,7 +33,7 @@ import { injuryPlan } from '../../../../../../core/src/engine/injury.ts';
 // ── ENGINE A — TIMELINE & SPLIT ROUTER (structural core) ────────────────────
 // Owns: program length, training days, the wave tables, and the deload/taper
 // resolver. Pure structure — no cardio, no exercise selection.
-function engineA_timeline(cfg){
+function engineA_timeline(cfg: EngineCfg): EngineA{
   const id='prog_'+Date.now();const seed=(cfg.seed!=null?cfg.seed:Date.now()%100000);
   // Resolve internal goal from liftingFocus
   const goal=LIFTING_FOCUS_TO_GOAL[cfg.liftingFocus]||cfg.liftingFocus||'balanced';
@@ -40,11 +53,11 @@ function engineA_timeline(cfg){
   // one statement retires all eight. `cfg` itself is not mutated: buildProgram must stay a
   // pure function of the cfg it was handed, and the freeze/refresh path re-derives from the
   // stored cfg on every boot.
-  const _GOAL_ALIAS = {run_mile_time:'run_pace_goal', run_15_under10:'run_pace_goal'};
+  const _GOAL_ALIAS: Record<string, string> = {run_mile_time:'run_pace_goal', run_15_under10:'run_pace_goal'};
   const cardioGoals = (()=>{
-    const src = cfg.cardioGoals || {};
+    const src: Record<string, CardioGoal> = cfg.cardioGoals || {};
     let hit = false;
-    const out = {};
+    const out: Record<string, CardioGoal & { _aliasedFrom?: string }> = {};
     Object.keys(src).forEach(k=>{
       const g = src[k];
       const to = g && _GOAL_ALIAS[g.id];
@@ -74,8 +87,8 @@ function engineA_timeline(cfg){
   // read like a feature. Deriving a live 1RM from logs would change prescriptions
   // mid-block, which is a coaching decision and gets its own ruling if ever wanted (§12).
   // Build dynamic waves supporting up to 26 weeks
-  const makeWave = (base, tw) => Array.from({length: Math.max(6,tw)}, (_, i) => base[i % base.length]);
-  const waveBase = {
+  const makeWave = (base: WaveEntry[], tw: number) => Array.from({length: Math.max(6,tw)}, (_, i) => base[i % base.length]);
+  const waveBase: Record<string, WaveEntry[]> = {
     strength:   [{s:4,r:'6',p:.75},{s:4,r:'5',p:.78},{s:4,r:'4',p:.80},{s:4,r:'3',p:.83},{s:4,r:'2',p:.87},{s:3,r:'1',p:.90},{s:4,r:'5',p:.78},{s:4,r:'4',p:.82},{s:4,r:'3',p:.85},{s:4,r:'2',p:.88},{s:4,r:'2',p:.90},{s:3,r:'1',p:.93}],
     // V137 (Tier-3 Q2, signed): hypertrophy is ACCUMULATION, not intensification. The old
     // arc ran reps DOWN (3×12 → 5×6) and total volume down with it — a strength wave
@@ -94,7 +107,7 @@ function engineA_timeline(cfg){
     balanced:   [{s:3,r:'8',p:.72},{s:4,r:'6',p:.77},{s:4,r:'5',p:.80},{s:5,r:'5',p:.82},{s:4,r:'4',p:.85},{s:4,r:'3',p:.88},{s:3,r:'8',p:.75},{s:4,r:'6',p:.78},{s:5,r:'5',p:.82},{s:5,r:'5',p:.85},{s:4,r:'4',p:.87},{s:4,r:'3',p:.90}],
     endurance:  [{s:3,r:'12',p:.52},{s:3,r:'12',p:.55},{s:3,r:'10',p:.57},{s:3,r:'10',p:.60},{s:3,r:'8',p:.62},{s:3,r:'8',p:.65},{s:3,r:'10',p:.55},{s:3,r:'10',p:.58},{s:3,r:'8',p:.60},{s:3,r:'8',p:.62},{s:2,r:'8',p:.58},{s:2,r:'6',p:.55}],
   };
-  const waves = {};
+  const waves: Record<string, WaveEntry[]> = {};
   ['strength','hypertrophy','fatloss','athletic','balanced','endurance'].forEach(g => {
     waves[g] = makeWave(waveBase[g], totalWeeks);
   });
@@ -138,13 +151,13 @@ function engineA_timeline(cfg){
   const _taperWks    = _taperWindow.taperWks;
   const inTaper      = _taperWindow.inTaper;
   const taperFactor  = _taperWindow.taperFactor;
-  function isRecoveryWeek(w){
+  function isRecoveryWeek(w: number): boolean{
     // taper weeks own the wind-down — don't also fire the mid-cycle recovery here
     return _deloadActive && (w % 4 === 0) && (w !== totalWeeks) && !inTaper(w);
   }
   // Opening p of the ascending sub-block week w sits in. The 12-entry waveBase is
   // two 6-week ascending runs ([0..5],[6..11]); openers are idx0 and idx6.
-  function _blockOpenerP(w){
+  function _blockOpenerP(w: number): number{
     const base = waveBase[goal] || waveBase.balanced;
     const L = base.length, half = Math.max(1, Math.floor(L / 2));
     const tileIdx = (w - 1) % L;
@@ -155,7 +168,7 @@ function engineA_timeline(cfg){
   // the recovery week — the transform is derived from the untouched base tile +
   // block opener and never written back, so week w+1 resumes the real curve with
   // no double-jeopardy and no permanent downshift.
-  function resolveWaveEntry(w){
+  function resolveWaveEntry(w: number): WaveEntry{
     const waveArr = waves[goal] || waves.balanced;
     const base = waveArr[Math.min(w - 1, waveArr.length - 1)] || waveArr[waveArr.length - 1];
     // Race taper takes precedence over the mid-cycle deload: cut BOTH volume and
@@ -189,7 +202,7 @@ function engineA_timeline(cfg){
 // Hoisted ahead of C. Depends only on Engine-A structural outputs. Returns the
 // compiled cardio schedule, which IS the read-only leg-load footprint consumed
 // downstream by calendar planning and deconfliction.
-function engineB_cardio(cfg, A){
+function engineB_cardio(cfg: EngineCfg, A: EngineA): EngineB{
   const { cardioTypes, cardioGoals, trainDays, goal, totalWeeks } = A;
   // B owns and PUBLISHES the taper window. The cardio schedule built here and the
   // barbell wave (A / C / D) read the same source — they cannot disagree.
@@ -204,7 +217,7 @@ function engineB_cardio(cfg, A){
   const _tRun = (!_align && cardioTypes.includes('run') && cardioGoals.run && PACE_GOALS.has(cardioGoals.run.id)
     && cfg._testWeek && cfg._testWeek === totalWeeks) ? _parseLocalDate(cfg.raceDate) : null;
   const _racePin = (_align && _align.tw === totalWeeks) ? raceWeekPin(_align, trainDays)
-    : _tRun ? Object.assign(raceWeekPin({tw: totalWeeks, raceDay: _ISO_ORDER[(_tRun.getDay() + 6) % 7]}, trainDays), {test: true}) : null;
+    : _tRun ? Object.assign(raceWeekPin({tw: totalWeeks, raceDay: _ISO_ORDER[(_tRun.getDay() + 6) % 7]}, trainDays)!, {test: true}) : null;
   if(_racePin) cfg._racePin = _racePin;
   const cardioSchedule=buildCardioProgression(cardioTypes,cardioGoals,trainDays,{...cfg,goal},totalWeeks);
   // Injury reroute runs AFTER the schedule is built: it substitutes sessions in place
@@ -221,13 +234,13 @@ function engineB_cardio(cfg, A){
 // protect) — same but swim preferred over bike; easy — hard runs regressed to easy
 // conversational volume; reduce (ankle workaround) — easy AND shortened; swimout
 // (shoulder) — swim sessions rerouted to run/bike, running untouched.
-function injurySweepCardio(schedule,cfg){
+function injurySweepCardio(schedule: CardioSchedule,cfg: Cfg): void{
   const P=injuryPlan(cfg);
   if(!P||!P.cardioMode||!schedule) return;
   const types=cfg.cardioTypes||[];
   const mode=P.cardioMode;
-  const pickAlt=prefer=>prefer.find(t=>types.includes(t))||null;
-  const minsOf=s=>{const m=/(\d{1,3})\s*[-–]?\s*min/i.exec(s.detail||'');const v=m?+m[1]:0;return (v>=10&&v<=180)?v:35;};
+  const pickAlt: (prefer: CardioType[]) => CardioType | null=prefer=>prefer.find(t=>types.includes(t))||null;
+  const minsOf: (s: CardioSession) => number=s=>{const m=/(\d{1,3})\s*[-–]?\s*min/i.exec(s.detail||'');const v=m?+m[1]:0;return (v>=10&&v<=180)?v:35;};
   const HARD=/interval|tempo|speed|hill|fartlek|repeat|race pace|threshold/i;
   // D103a (V208): a keyed NSW run is judged by its key, never by a word in its copy ("Not a
   // tempo" read every NSW easy run as hard). Two sets, two jobs. Halfstep halves the quality
@@ -236,7 +249,7 @@ function injurySweepCardio(schedule,cfg){
   // Unkeyed sessions (NRC, bike, frozen pre-V208 days) keep legLoad or the scan exactly.
   const _HALFSTEP_HARD_KEYS=new Set(['int','chi','long','steady']);
   const _PROTECT_PARK_KEYS=new Set(['int','chi','long','steady','bench','trial']);
-  const _hardBy=(s,keys)=>{const k=s.dose&&s.dose.key;return k?keys.has(k):!!(s.legLoad||HARD.test((s.subtype||'')+' '+(s.detail||'')));};
+  const _hardBy=(s: CardioSession,keys: Set<string>)=>{const k=s.dose&&s.dose.key;return k?keys.has(k):!!(s.legLoad||HARD.test((s.subtype||'')+' '+(s.detail||'')));};
   Object.keys(schedule).forEach(w=>{
     const wk=schedule[w]; if(!wk) return;
     Object.keys(wk).forEach(d=>{
@@ -302,12 +315,12 @@ function injurySweepCardio(schedule,cfg){
 // Finalizes dayRoles ONCE, with the cardio leg-load schedule as a read-only
 // input. After this returns, dayRoles is immutable for the rest of the build —
 // Kinematics reads it, Synthesis reads it, neither mutates it.
-function planCalendar(cfg, A, B){
+function planCalendar(cfg: Cfg, A: EngineA, B: EngineB): CalendarPlan{
   const { trainDays } = A;
   const { cardioSchedule } = B;
   // Assign roles to training days
   const nDays=trainDays.length;
-  const roleTemplates={
+  const roleTemplates: Record<number, string[]>={
     1:['full'],
     2:['push','pull'],
     3:['push','pull','legs'],
@@ -317,7 +330,7 @@ function planCalendar(cfg, A, B){
     7:['push','pull','legs','full','push_light','full','active'] // fulls separated (same-region spacing)
   };
   const roles=roleTemplates[Math.min(7,Math.max(1,nDays))]||roleTemplates[4];
-  const dayRoles={};
+  const dayRoles: DayRoles={};
   trainDays.forEach((d,i)=>dayRoles[d]=roles[i%roles.length]);
 
   // ── HARD-DAY DECONFLICTION (48h buffer) ──

@@ -8,7 +8,7 @@ import {
   _dayPlanCfg, addCandidates, addedDetailFor, auxSwapCandidates, bumpSwapCount, clearAdd, clearSkip, clearSwap,
   getSwaps, recordAdd, recordSkip, recordSwap, ssSkipToken, swapCandidates, swapLoadNote,
 } from './swaps-edits.js';
-import { _PATTERN_REGION, _compoundTier } from './budget-engine-d.js';
+import { _PATTERN_REGION, _compoundTier } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { parseRx } from './week-view-sections.js';
 import { openDetail } from './day-detail.js';
 import { showSwapNudge } from './day-status.js';

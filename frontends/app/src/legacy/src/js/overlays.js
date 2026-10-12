@@ -3,7 +3,7 @@ import { getPrograms, savePrograms } from './storage.js';
 import { _setActiveProg, activeProg, showToast } from './rest-day-shell.js';
 import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { INJURY_REGIONS, injuryPlan } from '../../../../../../core/src/engine/injury.ts';
-import { buildProgram } from './budget-engine-d.js';
+import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { _progDayDate, calcCurrentWeek, renderWeekView } from './week-view-sections.js';
 import { refreshProgram } from './program-manage.js';
 import { popFire } from './popups-streaks-reminders.js';

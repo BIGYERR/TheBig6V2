@@ -19,7 +19,7 @@ export type SportTargets = Record<string, number>;
 /** The taper a program runs: its length in weeks, and each week's place in it. */
 export interface TaperWindow { taperWks: number; inTaper(w: number): boolean; taperFactor(w: number): number }
 /** Each week's cardio, by week number, then by training day. */
-export type CardioSchedule = Record<number, Record<string, CardioSession | null>>;
+export type CardioSchedule = Record<string, Record<string, CardioSession | null>>;
 /** The cfg as one build carries it: the race week's pin rides along (cfg._racePin), deleted before the cfg is stored. */
 export type EngineCfg = Cfg & { _racePin?: RacePin | null };
 /** What the week view says about the run's pace anchor (runAnchorInfo): the mile pace, where it came from, and the chart row. */

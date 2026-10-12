@@ -1,31 +1,46 @@
-import {
-  EXLIB, _swapUniverseAdd, _swapUniverseList, _swapUniverseReset,
-} from '../../../../../../core/src/engine/exercise-library.ts';
-import { isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
-import { _ISO_ORDER } from '../../../../../../core/src/engine/calendar.ts';
-import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.ts';
-import { PACE_GOALS } from '../../../../../../core/src/engine/nrc-race-bike-swim.ts';
-import { runAnchorInfo } from '../../../../../../core/src/engine/cardio-progression.ts';
-import { _BW_GEAR, _BW_SUBS } from '../../../../../../core/src/engine/prehab.ts';
+import { EXLIB, _swapUniverseAdd, _swapUniverseList, _swapUniverseReset } from './exercise-library.ts';
+import { isTrackableWeight } from './exercise-kinds.ts';
+import { _ISO_ORDER } from './calendar.ts';
+import { _fmtMileAnchor } from './clock-format.ts';
+import { PACE_GOALS } from './nrc-race-bike-swim.ts';
+import { runAnchorInfo } from './cardio-progression.ts';
+import { _BW_GEAR, _BW_SUBS } from './prehab.ts';
 import {
   _BW_KEEP_FIXED, _bwSetsFromDetail, accessoryGrammarSweep, bodyweightSweep, hotNextHingeClampSweep,
   preventionDoseSweep,
-} from '../../../../../../core/src/engine/power-accessory.ts';
-import { deconflictAdjacentDupes, injectDynamicCore } from './core-legs.js';
-import { engineA_timeline, engineB_cardio, planCalendar } from './engine-a-b-calendar.js';
-import { applyInjuryFilter, injuryDayTitle } from '../../../../../../core/src/engine/injury.ts';
-import { engineC_kinematics } from '../../../../../../core/src/engine/engine-c.ts';
+} from './power-accessory.ts';
+import { deconflictAdjacentDupes, injectDynamicCore } from './core-legs.ts';
+import { engineA_timeline, engineB_cardio, planCalendar } from './engine-a-b-calendar.ts';
+import { applyInjuryFilter, injuryDayTitle } from './injury.ts';
+import { engineC_kinematics } from './engine-c.ts';
 import {
   _auxFamily, _cardioInterference, _ceil, _itemRegion, _moveCap, _pattern, _sectionRegion, _setCap,
-} from '../../../../../../core/src/engine/region-caps.ts';
-import { applySwapPrefs } from '../../../../../../core/src/engine/swap-prefs.ts';
+} from './region-caps.ts';
+import { applySwapPrefs } from './swap-prefs.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-const _PATTERN_REGION = {
+import type { Cardio, Cfg, DayKey, DayTag, Item, Program, Section, Week, WeekGrid, Weeks } from '../domain/index.ts';
+import type { EngineCfg } from './cardio-progression.ts';
+import type { CalendarPlan, EngineA, EngineB } from './engine-a-b-calendar.ts';
+import type { EngineC } from './engine-c.ts';
+
+declare global {
+  // The tests' switches for the caps (tests/support): each turns one pass off when set on globalThis.
+  var __CAP_OFF: boolean | undefined;
+  var __DELOAD_OFF: boolean | undefined;
+  var __BUDGET_OFF: boolean | undefined;
+  var __REGIONAL_OFF: boolean | undefined;
+  // `[].concat(a, b)` collects into a fresh array: TypeScript reads a bare [] as never[], so this overload gives the
+  // result the type of what is collected. It applies only to a never[] receiver.
+  interface Array<T> { concat<U>(this: never[], ...items: (U | ConcatArray<U>)[]): U[] }
+}
+/** The parts of a session the passes read: its sport, its name and text, its dose, whether it is a Nike plan session. */
+type SessionView = Pick<Cardio, 'type' | 'subtype' | 'detail' | 'dose' | 'isNRC'>;
+const _PATTERN_REGION: Record<string, string> = {
   hpress:'push', vpress:'push', delt_iso:'push', tri_iso:'push',
   row:'pull', vpull:'pull', bi_iso:'pull',
   squat:'legs', hinge:'legs', lunge:'legs', leg_iso:'legs', calf_iso:'legs', hip_ext:'legs'
 };
-function _isCompound(name){
+function _isCompound(name: string | null | undefined): boolean{
   return /bench|squat|deadlift|press|row|pull|clean|snatch|lunge|dip|chinup|pullup|hinge|romanian|thruster/.test((name||'').toLowerCase())
       && !/lateral|front raise|rear delt|face pull|curl|extension|pushdown|skullcrush|fly|calf|raise/.test((name||'').toLowerCase());
 }
@@ -50,7 +65,7 @@ function _isCompound(name){
 // correctly stay tier 3. Loadable movements with bare names (`Split squat`, `Reverse lunge`,
 // `Squat (slow 3s tempo)`) are deliberately NOT in the unloaded list — on a barbell tier they
 // carry a bar, and demoting them would make real leg work trimmable.
-function _compoundTier(name){
+function _compoundTier(name: string | null | undefined): number{
   if(!_isCompound(name)) return 0;
   // V200 (D89): a drill declared family 'core' in _AUX_FAMILY is a core drill, never a loaded
   // compound. `Pallof press` cleared _isCompound on the bare substring `press` and then fell
@@ -64,14 +79,14 @@ function _compoundTier(name){
      && /\bdips?\b|chinup|pullup|pull-up|chin-up|inverted row|nordic|glute bridge|back extension|wall sit|\bband\b/.test(N)) return 1;
   return 3; // barbell / unspecified-barbell compound (back squat, deadlift, bench, overhead press, row)
 }
-function _isIsolation(name){
+function _isIsolation(name: string | null | undefined): boolean{
   return /lateral|front raise|rear delt|face pull|curl|extension|pushdown|skullcrush|fly|calf raise|kickback/.test((name||'').toLowerCase());
 }
-function _setCount(detail){
+function _setCount(detail: string | null | undefined): number{
   const m=(detail||'').match(/(\d+)\s*[×x]/);
   return m?Math.max(1,parseInt(m[1],10)):3;
 }
-function _itemCost(it, sectionRegion){
+function _itemCost(it: Item, sectionRegion?: string | null): number{
   const sets=_setCount(it.detail);
   let mult=1.0;
   if(_isCompound(it.name)) mult=1.5;
@@ -100,16 +115,16 @@ function _itemCost(it, sectionRegion){
 // edit to budget machinery. The placement is inert: a top-level function declaration
 // hoists, and both callers (recoveryDeload below, capSessionBudget further down) sit
 // after this point in source order anyway.
-function _isPostChain(n){ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; }
+function _isPostChain(n: string | null | undefined): boolean{ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; }
 
-function recoveryDeload(sections, cardio){
+function recoveryDeload(sections: Section[], cardio: SessionView | null | undefined): Section[]{
   // Test-only bypass. Per-pass since V123 — __CAP_OFF used to gate THREE passes at once
   // (this one, capSessionBudget and capRegionalFatigue), so any harness that toggled it to
   // isolate one of them silently measured all three. That produced a false reading of the
   // regional cap's footprint. __CAP_OFF is kept as a master switch for all three.
   if(typeof globalThis!=='undefined' && (globalThis.__CAP_OFF || globalThis.__DELOAD_OFF)) return sections;
   if(!Array.isArray(sections)||!sections.length) return sections;
-  const keep=[]; let accessoryKept=false;
+  const keep: Section[]=[]; let accessoryKept=false;
   // D91: the surviving accessory block is chosen by PATTERN, not by push order. The
   // builder pushes 'Leg superset A' (lunge + knee hold, a unilateral SQUAT pattern) before
   // 'Leg superset B' (the day's hinge/hip_ext), so first-come cost every deload leg day its
@@ -153,7 +168,7 @@ function recoveryDeload(sections, cardio){
   // tier B strips the Main's hinge too. Candidacy is D91's own four tests in the loop's order. If
   // no block is admitted, D91's pick stands. Every other day never enters this branch.
   if(_longRunTier(cardio)==='B'){
-    const _tierAdmits=s=>!/power|explosive/i.test(s.label||'')&&!/power|explosive/i.test(s.coreHeader||'')
+    const _tierAdmits: (s: Section) => boolean=s=>!/power|explosive/i.test(s.label||'')&&!/power|explosive/i.test(s.coreHeader||'')
       &&!(s.items||[]).some(it=>it&&_D18_LEG_RX.test(it.name||''));
     for(let i=0;i<sections.length;i++){
       const s=sections[i]; if(!s) continue;
@@ -204,14 +219,14 @@ function recoveryDeload(sections, cardio){
 // (Mario ruling), and barbell-tier compounds. Trim order: carries → optional/
 // finisher/conditioning → pump/isolation → remaining accessories, latest first.
 const SESSION_SET_BUDGET = 20;
-function capSessionBudget(sections, cardio){
+function capSessionBudget(sections: Section[], cardio: SessionView | null | undefined): Section[]{
   // Test-only bypass, per-pass since V123. See recoveryDeload for why.
   if(typeof globalThis!=='undefined' && (globalThis.__CAP_OFF || globalThis.__BUDGET_OFF)) return sections;
   if(!Array.isArray(sections)||!sections.length) return sections;
-  const _isStretch=n=>/stretch|mobility|90\/90|foam|worlds greatest/i.test(n||'');
-  const _isHalf=n=>/carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises/i.test(n||'');
-  const _prehabHalf=new Set([].concat(EXLIB.hip_stability,EXLIB.knee_stability,EXLIB.foot_ankle,EXLIB.foot_ankle_bw)); const _cost=it=>{ if(!it||_isStretch(it.name)) return 0; const s=_setCount(it.detail); return (_isHalf(it.name)||_prehabHalf.has(it.name))?s*0.5:s; };
-  const _total=list=>list.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+_cost(it),0),0);
+  const _isStretch: (n: string | null | undefined) => boolean=n=>/stretch|mobility|90\/90|foam|worlds greatest/i.test(n||'');
+  const _isHalf: (n: string | null | undefined) => boolean=n=>/carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises/i.test(n||'');
+  const _prehabHalf=new Set([].concat(EXLIB.hip_stability,EXLIB.knee_stability,EXLIB.foot_ankle,EXLIB.foot_ankle_bw)); const _cost: (it: Item) => number=it=>{ if(!it||_isStretch(it.name)) return 0; const s=_setCount(it.detail); return (_isHalf(it.name)||_prehabHalf.has(it.name))?s*0.5:s; };
+  const _total: (list: Section[]) => number=list=>list.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+_cost(it),0),0);
   const cap=Math.max(12, SESSION_SET_BUDGET - Math.round(_cardioInterference(cardio)*2));
   if(_total(sections)<=cap) return sections;
   const out=sections.map(s=>({...s, items:((s&&s.items)||[]).map(it=>({...it}))}));
@@ -239,7 +254,7 @@ function capSessionBudget(sections, cardio){
   //   * Carve-out 4, the floor is not raised. <=1 is the boundary between nonempty and
   //     empty, not a chosen number. One hard trunk piece is the target; the second item of
   //     a pair stays budget fodder, which is why the D51 thin-core share barely moves.
-  const _isTrunkSec=s=>/^Trunk /.test((s&&s.label)||'');
+  const _isTrunkSec: (s: Section) => boolean=s=>/^Trunk /.test((s&&s.label)||'');
   const _trunkItems=()=>out.reduce((a,s)=>a+(_isTrunkSec(s)?((s&&s.items)||[]).length:0),0);
   // CARVE-OUT 2 — THE RUN IS THE DAY. d18LongRunDayPass owns a long-run day (tier A post
   // run mobility only, tier B upper and trunk capped at 8 sets, tier C carry ban). Tier B
@@ -255,7 +270,7 @@ function capSessionBudget(sections, cardio){
   // name. A trunk floor does not outrank the race.
   const _trunkFloor = !_longRunTier(cardio)
     && !/race day|time trial/i.test((cardio&&cardio.subtype)||'');
-  const _protected=s=>{
+  const _protected: (s: Section) => boolean=s=>{
     // V193 (D50): the day's LAST trunk item is not budget fodder. Tested before the D47
     // optional clause because the floor is a fact about the day, not about who owns the
     // section — an optional trunk block down to its last item is held for the same reason.
@@ -285,14 +300,14 @@ function capSessionBudget(sections, cardio){
     const L=((s&&s.label)||'').toLowerCase();
     return s.core||s.hip||/^main\b|^primer|^power\b|^strength\b/.test(L)||/hip|mobility|stretch/.test(L);
   };
-  const _secRank=s=>{
+  const _secRank: (s: Section) => number=s=>{
     if(_protected(s)) return -1;
     const L=((s&&s.label)||'').toLowerCase();
     if(s.optional||/carry|finisher|conditioning|explosive/.test(L)) return 3;
     if(/superset b|isolation|calves|pump|accessory/.test(L)) return 2;
     return 1;
   };
-  const _itemRank=n=>/carry/i.test(n||'')?2:(/wall sit|\bhold\b/i.test(n||'')?1:0);
+  const _itemRank: (n: string | null | undefined) => number=n=>/carry/i.test(n||'')?2:(/wall sit|\bhold\b/i.test(n||'')?1:0);
   // ── V198 (D85): THE BUDGET MAY NOT SPEND THE DAY'S LAST POSTERIOR CHAIN ITEM ────
   // Same shape as D50's trunk floor, same boundary, different training quality. The
   // three regional guards and the lowback/protect pool override do their work correctly
@@ -341,7 +356,7 @@ function capSessionBudget(sections, cardio){
   let guard=0;
   while(_total(out)>cap && guard++<16){
     const _postLeft=_postItems();                          // live, re-read every iteration
-    let best=null;
+    let best=null as { si: number; ii: number; score: number; pos: number } | null;
     out.forEach((s,si)=>{
       const sr=_secRank(s); if(sr<0) return;
       (s.items||[]).forEach((it,ii)=>{
@@ -362,7 +377,7 @@ function capSessionBudget(sections, cardio){
   return out;
 }
 
-function capRegionalFatigue(sections, role, cardio, goal){
+function capRegionalFatigue(sections: Section[], role: string, cardio: SessionView | null | undefined, goal: string): Section[]{
   // Test-only bypass, per-pass since V123. __REGIONAL_OFF isolates THIS pass; __CAP_OFF
   // remains the master switch that disables recoveryDeload and capSessionBudget too.
   // Never set in production. Use the specific flag when measuring this function alone —
@@ -387,7 +402,7 @@ function capRegionalFatigue(sections, role, cardio, goal){
   // same rank an accessory block would have carried had it been labelled honestly.
   // Ranks 1-3 are unaffected: those sections are already trimmable at every index, so
   // reading the index there would change nothing.
-  const rank=(label, itemIdx)=>{
+  const rank=(label: string, itemIdx: number)=>{
     const L=(label||'').toLowerCase();
     if(/^main|^primer|^power\b|^strength\b/.test(L)) return (itemIdx>0) ? 2 : 0;  // protect the main lift ONLY
     if(/secondary compound|conditioning|delts|chest volume|pull superset a|leg superset a/.test(L)) return 1;
@@ -404,8 +419,8 @@ function capRegionalFatigue(sections, role, cardio, goal){
   // present": the same lifting day that passes dry gets trimmed when a run is stacked on it.
   const _legCut = Math.round(_interf * 3);
   const _uppCut = Math.round(_interf * 1.5);
-  const _capFor = r => Math.max(6, _setCap(r) - (r==='legs' ? _legCut : _uppCut));
-  const _moveCapFor = r => _moveCap(r) + ((role==='legs' && r==='legs' && out.some(s=>/^leg circuit/i.test((s&&s.label)||'')&&((s&&s.items)||[]).length>=4)) ? 1 : 0);
+  const _capFor: (r: string) => number = r => Math.max(6, _setCap(r) - (r==='legs' ? _legCut : _uppCut));
+  const _moveCapFor: (r: string) => number = r => _moveCap(r) + ((role==='legs' && r==='legs' && out.some(s=>/^leg circuit/i.test((s&&s.label)||'')&&((s&&s.items)||[]).length>=4)) ? 1 : 0);
 
   // 1) Score each REGION two ways in a single pass:
   //    • regionScore — PATTERN SATURATION. Distinct patterns are cheap; the 2nd+ movement
@@ -414,11 +429,11 @@ function capRegionalFatigue(sections, role, cardio, goal){
   //    • regionSets — RAW working-set tally, blind to pattern distinctness. This is the
   //      number the hard cap reads, and the only one that catches five DISTINCT leg
   //      movements piling real sets onto the legs.
-  function scoreRegions(sectionList){
-    const patternCount={};   // pattern -> how many movements of it seen so far
-    const regionScore={};    // pattern-saturation fatigue score per region
-    const regionSets={};     // raw working-set count per region
-    const regionMoves={};    // distinct loaded-movement count per region (sprawl axis)
+  function scoreRegions(sectionList: Section[]): { regionScore: Record<string, number>; regionSets: Record<string, number>; regionMoves: Record<string, number> }{
+    const patternCount: Record<string, number>={};   // pattern -> how many movements of it seen so far
+    const regionScore: Record<string, number>={};    // pattern-saturation fatigue score per region
+    const regionSets: Record<string, number>={};     // raw working-set count per region
+    const regionMoves: Record<string, number>={};    // distinct loaded-movement count per region (sprawl axis)
     sectionList.forEach(s=>{
       const baseRegion=_sectionRegion(s.label, role);
       (s.items||[]).forEach(it=>{
@@ -455,7 +470,7 @@ function capRegionalFatigue(sections, role, cardio, goal){
     // How far past its guards a region sits (each axis normalised so they compete fairly
     // when picking which region to trim first). Trigger is the OR below: pattern-saturation
     // ceiling, hard (cardio-adjusted) set cap, OR the distinct-movement cap.
-    const overAmt=r=>Math.max(
+    const overAmt: (r: string) => number=r=>Math.max(
       (regionScore[r]||0)-_ceil(r),
       ((regionSets[r]||0)-_capFor(r))*1.5,
       ((regionMoves[r]||0)-_moveCapFor(r))*4
@@ -468,7 +483,7 @@ function capRegionalFatigue(sections, role, cardio, goal){
     // Protected compound: highest-tier compound in the region (barbell > dumbbell/machine >
     // bodyweight), earliest position on ties. Never eligible to trim, even if it landed in a
     // "Secondary compound" rather than a "Main —" section.
-    let protTier=0, protKey=null;
+    let protTier=0, protKey=null as number | null;
     out.forEach((s,si)=>{
       const baseRegion=_sectionRegion(s.label, role);
       (s.items||[]).forEach((it,ii)=>{
@@ -480,7 +495,7 @@ function capRegionalFatigue(sections, role, cardio, goal){
     });
     // In-region pattern occurrence counts, so within a rank we can still drop the most
     // REDUNDANT movement first (kills stacked presses before it touches leg variety).
-    const patCount={};
+    const patCount: Record<string, number>={};
     out.forEach((s,si)=>{
       const baseRegion=_sectionRegion(s.label, role);
       (s.items||[]).forEach(it=>{
@@ -491,7 +506,7 @@ function capRegionalFatigue(sections, role, cardio, goal){
     });
     const _postLeft=out.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+(_isPostChain(it&&it.name)?1:0),0),0);
     // Every trimmable item in the region: rank>0, has a pattern, not the protected compound.
-    const cands=[];
+    const cands: { si: number; ii: number; rk: number; sat: number; pos: number }[]=[];
     out.forEach((s,si)=>{
       const baseRegion=_sectionRegion(s.label, role);
       (s.items||[]).forEach((it,ii)=>{
@@ -521,16 +536,16 @@ function capRegionalFatigue(sections, role, cardio, goal){
 // Compiles A/B/plan/C into the week grid: lifting sections + cardio per day,
 // then deconflicted dynamic-core finishers. Reads everything, mutates nothing
 // upstream. Emits the final program object written to state.
-function engineD_synthesis(cfg, A, B, plan, C){
+function engineD_synthesis(cfg: EngineCfg, A: EngineA, B: EngineB, plan: CalendarPlan, C: EngineC): Program{
   const { id, seed, goal, allDaysList, trainDays, totalWeeks,
           cardioTypes, cardioGoals, isRecoveryWeek } = A;
   const { cardioSchedule, includeHip, inTaper } = B;
   const { dayRoles, legRecoveryNote } = plan;
   const { buildSections, gearOK } = C;
   const includeCore=true;
-  const weeks={};
+  const weeks: Weeks={};
   for(let w=1;w<=totalWeeks;w++){
-    weeks[w]={};
+    weeks[w]={} as Week;
     // Lifting keys off the TRUE program week (not a cycled 1-6 index) so the wave
     // tiles across the full program, exercise rotation keeps advancing, and the
     // deload cadence + "↓ Recovery Week" badge stay in sync with the actual load.
@@ -554,11 +569,11 @@ function engineD_synthesis(cfg, A, B, plan, C){
       const role=dayRoles[d]||'full';
       let fullVariant='upper';
       if(role==='full'){ fullVariant=(fullSeen%2===0)?'upper':'lower'; fullSeen++; }
-      const cardio=cardioSchedule[w]?.[d]||null;
-      const roleLabels={push:'Push',pull:'Pull',legs:'Legs',push_light:'Push (light)',full:'Full Body',active:'Active Recovery'};
+      const cardio=cardioSchedule[w]?.[d] as Cardio||null;
+      const roleLabels: Record<string, string>={push:'Push',pull:'Pull',legs:'Legs',push_light:'Push (light)',full:'Full Body',active:'Active Recovery'};
       const isEndurance=goal==='endurance';
-      const roleLabelMap=isEndurance?{push:'Strength Support',pull:'Posterior Chain',legs:'Leg Strength + Mobility',push_light:'Recovery Lift',full:'Full Body Support',active:'Active Recovery'}:{push:'Push',pull:'Pull',legs:'Legs',push_light:'Push (light)',full:'Full Body',active:'Active Recovery'};
-      const tags=['lift'];
+      const roleLabelMap: Record<string, string>=isEndurance?{push:'Strength Support',pull:'Posterior Chain',legs:'Leg Strength + Mobility',push_light:'Recovery Lift',full:'Full Body Support',active:'Active Recovery'}:{push:'Push',pull:'Pull',legs:'Legs',push_light:'Push (light)',full:'Full Body',active:'Active Recovery'};
+      const tags: DayTag[]=['lift'];
       if(cardio)tags.push(cardio.type);
       if(role==='legs'&&includeHip)tags.push('hip');
       // V139 (Tier-3 Q6 signed, Mario's amendment): Test Week / Peak Week ride the TAG
@@ -600,12 +615,12 @@ function engineD_synthesis(cfg, A, B, plan, C){
     // more pass over the finished week — spine-safe swaps and drops apply to injected
     // finishers too. applyInjuryFilter is idempotent (RPE-note append is guarded), so
     // re-filtering already-filtered sections changes nothing.
-    if(cfg.injury) Object.keys(weeks[w]).forEach(_d=>{ const _day=weeks[w][_d]; if(_day&&Array.isArray(_day.sections)) _day.sections=applyInjuryFilter(_day.sections,cfg); });
+    if(cfg.injury) Object.keys(weeks[w]).forEach(_d=>{ const _day=weeks[w][_d as DayKey]; if(_day&&Array.isArray(_day.sections)) _day.sections=applyInjuryFilter(_day.sections,cfg); });
     // FINAL SESSION-BUDGET PASS — runs after hip/core injection and the injury
     // refilter so it sees the WHOLE day, including work the regional guards
     // deliberately exempt from fatigue scoring (holds, carries, core, activation).
     // Recovery weeks arrive already slimmed by recoveryDeload and pass untouched.
-    Object.keys(weeks[w]).forEach(_d=>{ const _day=weeks[w][_d]; if(_day&&Array.isArray(_day.sections)) _day.sections=capSessionBudget(_day.sections,_day.cardio); });
+    Object.keys(weeks[w]).forEach(_d=>{ const _day=weeks[w][_d as DayKey]; if(_day&&Array.isArray(_day.sections)) _day.sections=capSessionBudget(_day.sections,_day.cardio); });
     // ── PERMANENT SWAP PREFERENCES ─────────────────────────────────────────
     // Accepted from the coach nudge after the athlete has traded the same lift off
     // three sessions running. Lives in cfg, NOT in a patch store, which is the whole
@@ -618,16 +633,16 @@ function engineD_synthesis(cfg, A, B, plan, C){
     // not walk a barbell hinge back into a program that stripped hinges for a bad back.
     if(cfg.exSwapPrefs && Object.keys(cfg.exSwapPrefs).length){
       Object.keys(weeks[w]).forEach(_d=>{
-        const _day=weeks[w][_d]; if(!_day||!Array.isArray(_day.sections)) return;
+        const _day=weeks[w][_d as DayKey]; if(!_day||!Array.isArray(_day.sections)) return;
         if(applySwapPrefs(_day.sections,cfg.exSwapPrefs) && cfg.injury){
           _day.sections=applyInjuryFilter(_day.sections,cfg);
         }
       });
     }
   }
-  const liftRecoveryWeeks=[];
+  const liftRecoveryWeeks: number[]=[];
   for(let _w=1;_w<=totalWeeks;_w++){ if(isRecoveryWeek(_w)) liftRecoveryWeeks.push(_w); }
-  const taperWeeks=[];
+  const taperWeeks: number[]=[];
   for(let _w=1;_w<=totalWeeks;_w++){ if(inTaper(_w)) taperWeeks.push(_w); }
   // SAME-EXERCISE ADJACENT-DAY SPACING (V117) — runs after every subsystem that can add
   // or substitute a movement (core injection, injury refilter, session budget, swap prefs)
@@ -638,7 +653,7 @@ function engineD_synthesis(cfg, A, B, plan, C){
   // Final catch-all for the "Room only" tier — see bodyweightSweep. Runs AFTER core/hip
   // injection so it catches gear arriving from those subsystems too.
   if(cfg.equipment==='bodyweight'){ bodyweightSweep(weeks, cfg.experience, cfg.liftingFocus==='support_prevention');
-    if(cfg.injury) Object.keys(weeks).forEach(_w=>Object.keys(weeks[_w]||{}).forEach(_d=>{ const _day=weeks[_w][_d]; if(_day&&Array.isArray(_day.sections)) _day.sections=applyInjuryFilter(_day.sections,cfg); })); }
+    if(cfg.injury) Object.keys(weeks).forEach(_w=>Object.keys(weeks[_w]||{}).forEach(_d=>{ const _day=weeks[_w][_d as DayKey]; if(_day&&Array.isArray(_day.sections)) _day.sections=applyInjuryFilter(_day.sections,cfg); })); }
   // LAST. Must run after every pass that can change a NAME — bodyweightSweep substitutes
   // gear names, the injury filter swaps movements, the deconflicts move them between days.
   // The predicate is name-derived, so sweeping earlier would judge a movement that is not
@@ -694,7 +709,7 @@ function engineD_synthesis(cfg, A, B, plan, C){
 // ANY long-run day regardless of length. Race day is left to raceEveLiftPass (V189, D38
 // overturned D34's primer); the dress rehearsal is tier A on every row (D34) — you don't
 // lift after simulating the race.
-function _longRunTier(cardio){
+function _longRunTier(cardio: SessionView | null | undefined): 'A' | 'B' | 'C' | null{
   if(!cardio || !cardio.dose) return null;
   if(cardio.isNRC){
     if(!/^long run/i.test(cardio.subtype||'')) return null;
@@ -702,13 +717,13 @@ function _longRunTier(cardio){
     if(/rehearsal/i.test(cardio.detail||'')) return 'A';
   } else if(cardio.type!=='run' || cardio.dose.key!=='long') return null;   // D140 (V209): the NSW long run, by its key
   const d = cardio.dose;
-  const m = d.k==='time' ? (+d.mins||0) : (+d.mi||0) * (+d.tgt||0) / 60;
+  const m = d.k==='time' ? (+d.mins!||0) : (+d.mi!||0) * (+d.tgt!||0) / 60;
   if(!m) return null;
   return m>=75 ? 'A' : m>=45 ? 'B' : 'C';
 }
 // Tier A block, verbatim from the ruling: calves, hip flexors, 90/90, T-spine, foam
 // roll — ~12 minutes, logged complete/skip like any other item.
-function _d18MobilityBlock(){
+function _d18MobilityBlock(): Section{
   return {label:'Post-run mobility', items:[
     {name:'Standing calf stretch', detail:'2×45 sec each side — knee straight, then bent'},
     {name:'Couch stretch', detail:'2×45 sec each side — hip flexors; squeeze the trailing glute'},
@@ -723,7 +738,7 @@ const _D18_LEG_RX=/swing|clean|snatch|deadlift|romanian|\brdl\b|good morning|hip
 // V226 (D189 S1): a program anchored on the experience default says so once, on the first paced
 // run of week 1, appended after the app-owned note (the V171 text stays an exact prefix). Self-
 // expiring: kind 'default' only, so a pencil edit rebuilds the future weeks and the sentence is gone.
-function d189DefaultAnchorNote(weeks, cfg){
+function d189DefaultAnchorNote(weeks: WeekGrid, cfg: Cfg): void{
   const a = runAnchorInfo(cfg); if(!a || a.kind !== 'default') return;
   const w1 = weeks['1'] || weeks[1]; if(!w1) return;
   for(const d of _ISO_ORDER){ const day = w1[d]; if(!day || day.rest) continue;
@@ -734,7 +749,7 @@ function d189DefaultAnchorNote(weeks, cfg){
       c.note = (c.note ? c.note+' ' : '') + 'Paces here start from '+art+' '+m+' mile, the '+a.exp+' default. Tap the pencil on your program card to enter your mile time. Every run ahead of you rebuilds off it.';
       return; } }
 }
-function d18LongRunDayPass(weeks){
+function d18LongRunDayPass(weeks: WeekGrid): void{
   Object.keys(weeks).forEach(w=>{
     const wk=weeks[w]; if(!wk) return;
     Object.keys(wk).forEach(dk=>{
@@ -745,8 +760,8 @@ function d18LongRunDayPass(weeks){
       // is label '' with coreHeader 'Core — …'). Farmer, Suitcase and Overhead carry are the
       // three threads, and every carry the engine names says carry. The label and coreHeader
       // tests stay as belt. A section the ban empties drops; an untouched one is kept as is.
-      const _isCarry=it=>/carry/i.test((it&&it.name)||'');
-      let secs=[];
+      const _isCarry: (it: Item) => boolean=it=>/carry/i.test((it&&it.name)||'');
+      let secs: Section[]=[];
       day.sections.forEach(sec=>{
         if(/carry/i.test(sec.label||'')||/carry/i.test(sec.coreHeader||'')) return;
         const its=sec.items||[], kept=its.filter(it=>!_isCarry(it));
@@ -774,8 +789,8 @@ function d18LongRunDayPass(weeks){
         // ≤8 working sets: keep in document order (mains first), stretches are free.
         // D140 (V209) F2: "3 sets — RPE 7" is three sets. The counter used to read only the N× form
         // and counted every "N sets" prescription as one, so a tier B day could keep 12.
-        const _n=det=>{let m=/^(\d+)\s*[x×]/.exec(det||'');if(m)return +m[1];m=/\b(\d+)\s*sets?\b/i.exec(det||'');return m?+m[1]:1;};
-        const _isStr=nm=>/stretch|mobility|90\/90|foam|worlds greatest/i.test(nm||'');
+        const _n: (det: string | null | undefined) => number=det=>{let m=/^(\d+)\s*[x×]/.exec(det||'');if(m)return +m[1];m=/\b(\d+)\s*sets?\b/i.exec(det||'');return m?+m[1]:1;};
+        const _isStr: (nm: string | null | undefined) => boolean=nm=>/stretch|mobility|90\/90|foam|worlds greatest/i.test(nm||'');
         let budget=8;
         secs.forEach(sec=>{ sec.items=(sec.items||[]).filter(it=>{ if(_isStr(it.name)) return true; const c=_n(it.detail); if(budget-c<0) return false; budget-=c; return true; }); });
         day.sections=secs.filter(sec=>(sec.items||[]).length||/taper/i.test(sec.label||''));
@@ -792,8 +807,8 @@ function d18LongRunDayPass(weeks){
 // week. The 5K/10K time trial is the race for every reader (V186 S4b) and takes the same
 // pass. A lift-only train day inside the window becomes a rest day; a run day keeps its run,
 // loses its lifting, and is titled for what it is.
-function raceEveLiftPass(weeks, totalWeeks){
-  const flat = [];
+function raceEveLiftPass(weeks: WeekGrid, totalWeeks: number): void{
+  const flat: { w: number; d: string }[] = [];
   [totalWeeks-1, totalWeeks].forEach(w => { if(weeks[w]) _ISO_ORDER.forEach(d => flat.push({w,d})); });
   const ri = flat.findIndex(x => { const day = weeks[x.w][x.d]; return !!(day && day.cardio && /RACE DAY|TIME TRIAL/i.test(day.cardio.subtype||'')); });
   if(ri < 0) return;
@@ -815,7 +830,7 @@ function raceEveLiftPass(weeks, totalWeeks){
     day.title = k===0 ? (PACE_GOALS.has(day.cardio.goalId) ? 'Test Day' : 'Race Day') : (_rec && (ri-k)===lr) ? 'Shakeout' : _rec ? 'Easy Run' : keep.length ? day.title : String(day.cardio.subtype||'Run').split(' — ')[0];
   }
 }
-function singletonSupersetSweep(weeks){
+function singletonSupersetSweep(weeks: WeekGrid): WeekGrid{
   Object.keys(weeks||{}).forEach(w=>Object.keys(weeks[w]||{}).forEach(d=>{
     const day=weeks[w][d]; if(!day||!Array.isArray(day.sections)) return;
     day.sections.forEach(sec=>{
@@ -853,7 +868,7 @@ function singletonSupersetSweep(weeks){
 // only, which makes it purely additive and unable to regress the tier with the most
 // history. Guard reads `!== 'bodyweight'` rather than a tier allowlist so a new tier is
 // swept by default; forgetting to sweep is the worse failure.
-function unloadableRxSweep(weeks, _uCfg){
+function unloadableRxSweep(weeks: WeekGrid, _uCfg: Cfg | null | undefined): void{
   Object.keys(weeks||{}).forEach(w=>Object.keys(weeks[w]||{}).forEach(d=>{
     const day=weeks[w][d]; if(!day||!day.sections) return;
     day.sections.forEach(sec=>{
@@ -880,7 +895,7 @@ function unloadableRxSweep(weeks, _uCfg){
   }));
 }
 // ── ORCHESTRATOR — reads as a clean A -> B -> C -> D pipeline ────────────────
-function buildProgram(cfg){
+function buildProgram(cfg: EngineCfg): Program{
   _swapUniverseReset();                   // harvest THIS cfg's legal exercise set (see pick)
   const A    = engineA_timeline(cfg);     // structure, weeks, wave/deload/taper resolver
   const B    = engineB_cardio(cfg, A);    // cardio schedule = read-only leg-load footprint

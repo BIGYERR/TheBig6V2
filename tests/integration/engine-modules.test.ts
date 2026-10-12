@@ -17,6 +17,7 @@ import type { Cfg, Program } from '@ia/core';
 import { progDigest } from '../support/app.ts';
 import { PROGRAMS } from '../support/programs.ts';
 import { ENGINE_FILES, engineFile, loadEngineModules } from '../support/engine-modules.ts';
+import * as engine from '@ia/core/engine';
 
 const SNAPSHOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'snapshots', 'program-output.json');
 /** The day the golden file was built on (tests/integration/program-output.test.ts pins the same local noon). */
@@ -54,4 +55,13 @@ test('buildProgram imports from the module sources and builds every seeded progr
     assert.equal(Object.keys(prog.weeks).length, golden.programs[name]!.weeks, `${name}: weeks`);
     assert.equal(progDigest(prog), golden.programs[name]!.digest, `${name}: the digest the classic script builds`);
   }
+});
+
+test('the engine is @ia/core/engine, strict TypeScript: imported by its package name, it builds every seeded program the page builds (phase D)', () => {
+  const golden = JSON.parse(readFileSync(SNAPSHOT, 'utf8')) as { programs: Record<string, { digest: string; weeks: number }> };
+  for (const [name, cfg] of Object.entries(PROGRAMS)) {
+    const prog: Program = engine.buildProgram(structuredClone(cfg));
+    assert.equal(progDigest(prog), golden.programs[name]!.digest, `${name}: the digest the page builds`);
+  }
+  assert.deepEqual(ENGINE_FILES.filter((f) => !engineFile(f).endsWith('.ts')), [], 'every engine file is TypeScript in core/src/engine');
 });

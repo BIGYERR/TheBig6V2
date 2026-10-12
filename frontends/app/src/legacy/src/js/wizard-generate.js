@@ -5,7 +5,7 @@ import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.t
 import { WD, _applyWizardStart, _rsRace, renderWizardStep, resolveStartDate } from './wizard.js';
 import { calcProgramLength } from '../../../../../../core/src/engine/nsw-cardio.ts';
 import { runAnchorInfo } from '../../../../../../core/src/engine/cardio-progression.ts';
-import { buildProgram } from './budget-engine-d.js';
+import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { renderWeekView } from './week-view-sections.js';
 import { _setRtIntroPending } from './rest-timer.js';
 import { progTestPin, renderProgList } from './programs.js';

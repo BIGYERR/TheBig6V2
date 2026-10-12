@@ -1,6 +1,14 @@
 import { EXLIB, pick } from './exercise-library.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-import type { Equipment, Section } from '../domain/index.ts';
+import type { Equipment, Item, Section } from '../domain/index.ts';
+
+/** The four core pillars' drills: anti-extension in a static and a loaded tier, the other three in one list each. */
+export interface CorePillars {
+  anti_extension: { name: string; static: Item[]; loaded: Item[] };
+  anti_rotation: { name: string; items: Item[] };
+  dynamic_bracing: { name: string; items: Item[] };
+  rotational_power: { name: string; items: Item[] };
+}
 
 function buildHipSection(seed: number,bodyweight: boolean): Section{
   // Reliable stability dose: the section always draws 2 loaded/active glute-med drills plus
@@ -100,7 +108,7 @@ function buildRehabSection(region: string,seed: number,bodyweight: boolean): Sec
 // to tomorrow and refuse to stack high-fatigue trunk work the day before a speed
 // run or heavy posterior-chain lift. 4-pillar functional taxonomy.
 // ─────────────────────────────────────────────────────────────────────────────
-const CORE_PILLARS = {
+const CORE_PILLARS: CorePillars = {
   // Doctrine-anchored: NSW Physical Training Guide Table 3 (Plank, Side Plank, Bird Dog,
   // Superman, Wipers, Bridge) + hanging knee-raise/sit-up + McGill Big 3 (curl-up, side
   // plank, bird dog). Loaded/cable/carry options are standard S&C progressions beyond the

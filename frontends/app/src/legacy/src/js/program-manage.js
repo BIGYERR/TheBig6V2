@@ -6,7 +6,7 @@ import {
 } from './rest-day-shell.js';
 import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { applyDayEdits, applySessionSwaps, getDayEdits, getSwaps, pruneDayEdits } from './swaps-edits.js';
-import { buildProgram } from './budget-engine-d.js';
+import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';
 import { calcCurrentWeek, renderWeekView } from './week-view-sections.js';
 import { entryDay } from './log-entries.js';
 import { progTestPin, renderProgList } from './programs.js';

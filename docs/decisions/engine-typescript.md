@@ -113,3 +113,26 @@ screen shows or what is stored.
   breaks, against v0.239.4; against v0.239.2 the page differs only in its version line and 59 comment or blank lines.
 - **Does not change:** any program (the program-output golden files, HALF_MANNY and the 864-config lattice, unchanged);
   any screen; any stored key or value.
+
+## Release scope: v0.239.6 moves Engines A, B and D, and the engine is whole in @ia/core
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.6.
+- **Moved:** `engine-a-b-calendar` (Engines A and B, the injury cardio sweep, `planCalendar`), `core-legs` (the core
+  injector, the leg and region deconfliction, the adjacent-day dedupe) and `budget-engine-d` (the deload, the session and
+  regional caps, Engine D and `buildProgram`), the three files that import each other, typed and never changed. All 17
+  engine files are now strict TypeScript in `core/src/engine`, and `core/src/engine/index.ts` exports `buildProgram`
+  (`@ia/core/engine`). New types: `EngineA`, `EngineB`, `DayRoles`, `CalendarPlan`, `CorePillars` (the precise shape
+  of `CORE_PILLARS`), and the passes' own (`NrcRunShape`, `AdjPair`, `CoreDayView`, `SessionView`). `CardioSchedule` is
+  keyed by string (the passes walk it with `Object.keys`). `raceWeekPin` takes the two fields it reads.
+- **Two global declarations, both erased:** the tests' cap switches on `globalThis` (`__CAP_OFF` and the rest), and an
+  overload of `Array.prototype.concat` for a `never[]` receiver, so `[].concat(a, b)` (the engine's idiom for collecting
+  into a fresh array) is typed by what it collects.
+- **Two `@ts-expect-error`**, both on one finding: `core-legs` reads `cardio.assignedType`, which no session carries, so
+  the core injector's hard-run slot never fires (handoff §12, for a ruling; the move types the read as it runs).
+- **Test:** `tests/integration/engine-modules.test.ts` imports the engine by its package name and builds every seeded
+  program to the page's digest (it fails on v0.239.5, whose `@ia/core/engine` exported nothing), and checks every
+  engine file is TypeScript in `core/src/engine`.
+- **Changes in `index.html`:** 11 comments added and the version. `same-script`: 164,255 tokens equal, with the same
+  line breaks, against v0.239.5.
+- **Does not change:** any program (the program-output golden files, HALF_MANNY and the 864-config lattice, unchanged);
+  any screen; any stored key or value.
