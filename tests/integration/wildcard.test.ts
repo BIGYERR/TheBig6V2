@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The Wildcard: a substitute the athlete chose, never a session they finished. It is attendance, so it rescues a skipped
 // day's streak; its mark (a flame and a W) and its tag show on the day it was done; on today's orange cell the mark and
 // the completion tick turn to the on-signal colour. Rulings D64, D71 and D71b (the Wildcard), D185 (the today cell).
@@ -14,13 +14,12 @@
 // entity rules written out here, the flame path, and the colour tokens. The colour on the today cell is resolved by a
 // small CSS cascade resolver over the app's <style> text, never by the app. The day lattice across daylight saving
 // changes runs here in New York (a child process with TZ set); tests/sweeps/wildcard.test.js runs it in seven zones.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const {
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { 
   DK, WEEK, PID, iso, addDays, wildcardBench, stripOf, stripCells, DST_CASES, dstLatticeIn,
   styleText, cssRules, parseCompound, colorCandidates, winningColor, el, contrast,
-} = require('../support/wildcard.js');
-
+ } from '../support/wildcard.ts';
 const J = JSON.stringify;
 const B = wildcardBench();
 const { IA, ev } = B;

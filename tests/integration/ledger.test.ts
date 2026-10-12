@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The Lift Ledger on the Progress screen keeps every session: an unloaded main lift is still a main lift, plotted in
 // reps; the footer accounts for every session it kept off the line in two clauses; a blank Load box costs the point,
 // never carries a weight forward; and the cards and the swap sheet stop calling heavy lifts accessories or main lifts
@@ -10,13 +10,12 @@
 // Oracles are hand tables and arithmetic over them, stated beside each store; every expected string is typed from the
 // ruling; the swap sheet's main slot is the slot rule stated in words (item 0 of a section whose label starts with Main,
 // not a superset) and the heavy compound is one named barbell lift, Barbell Romanian deadlift.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { fixtures, progDigest } = require('../support/app.js');
-const {
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { fixtures, progDigest } from '../support/app.ts';
+import { 
   ledgerBench, cardTitled, blocks, blockFor, footerOf, countOf, textOf, weekLabels, disclosed,
-} = require('../support/ledger.js');
-
+ } from '../support/ledger.ts';
 const J = JSON.stringify;
 const L = ledgerBench();
 const sum = (a) => a.reduce((x, y) => x + y, 0);

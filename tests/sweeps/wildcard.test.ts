@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The day a Wildcard is stamped on, across daylight saving changes in seven time zones: New York, London, Sydney, Lord
 // Howe (a half hour change), Chatham (a 12:45 offset), UTC and Kolkata (no change at all). Rulings D64 and D71: the
 // day is resolved from the date, never from the week the athlete is browsing.
@@ -10,10 +10,9 @@
 // never a millisecond division), then mapped back through dayDateFor. Eleven edges follow: the Sunday wrap, rest days,
 // the first and last days, the days outside the block, and programs with a missing day, no start date or no program.
 // tests/integration/wildcard.test.js runs the same lattice in New York.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { TZ_LATTICE, DST_CASES, dstLatticeIn } = require('../support/wildcard.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { TZ_LATTICE, DST_CASES, dstLatticeIn } from '../support/wildcard.ts';
 const ROWS = DST_CASES.map((c) => c[0]).concat([
   'dst15-sunday-wrap', 'dst16-rest-resolves', 'dst17-sched-drops-rest', 'dst18-before-start', 'dst19-week1-monday',
   'dst20-first-day', 'dst21-last-day', 'dst22-after-end', 'dst23-missing-day', 'dst24-no-start', 'dst25-no-prog',

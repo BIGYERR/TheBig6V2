@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Progress: the main lift progress line states a number and a unit and never an implement (D53), and a lift's place in
 // the Range Ladder is decided by the most recent session that carries a rep range, never by whichever session was logged
 // last (D55). The app knows a number in a log field, not what the athlete picked up; a primer week, prescribed fixed low
@@ -11,11 +11,10 @@
 // plotted session); the kg line from the app's rounding rule done here (round(w x 0.453592 x 2) / 2: 80 lbs is 36.5 kg,
 // 60 lbs is 27 kg, a gain of 9.5 kg); a list of implement words the log field cannot know; and the prescription grammar,
 // where "3×8–12" carries a range and "3×6" does not.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp } = require('../support/app.js');
-const { ladderLog } = require('../support/ledger.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp } from '../support/app.ts';
+import { ladderLog } from '../support/ledger.ts';
 const IA = loadApp();
 const ledgerModel = IA.eval('typeof ledgerModel==="function"?ledgerModel:null');
 const buildMainLiftBlock = IA.eval('typeof buildMainLiftBlock==="function"?buildMainLiftBlock:null');

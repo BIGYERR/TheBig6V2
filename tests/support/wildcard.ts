@@ -1,50 +1,123 @@
-'use strict';
-// The Wildcard, for tests/integration/wildcard.test.js and tests/sweeps/wildcard.test.js.
+// The Wildcard, for tests/integration/wildcard.test.ts and tests/sweeps/wildcard.test.ts.
 //
 // Three things live here, none of which asks the app what it should have done:
 //   - a hand calendar: date arithmetic through the Date(y, m, d + n) constructor, never a millisecond division, so it
 //     cannot share a daylight saving bug with the code under test;
-//   - a bench: the app booted with a document that keeps its elements (tests/support/app.js loadApp, so IA_APP is
+//   - a bench: the app booted with a document that keeps its elements (tests/support/app.ts loadApp, so IA_APP is
 //     honoured), the pop-ups replaced by spies, and a hand-built six-week program whose start is fourteen days before
 //     a pinned today, so today sits in week 3 whatever weekday it is;
 //   - the day lattice for wildcardDayFor across daylight saving changes, run in a child process per time zone
-//     (`TZ=<zone> node tests/support/wildcard.js --dst` prints one JSON line), and a small CSS cascade resolver that
+//     (`TZ=<zone> node tests/support/wildcard.ts --dst` prints one JSON line), and a small CSS cascade resolver that
 //     reads the app's <style> text and says which rule colours a hand-built element.
-const { loadApp, pinClock } = require('./app.js');
+import { spawnSync } from 'node:child_process';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { loadApp, pinClock } from './app.ts';
+import type { App, StorageStub } from './app.ts';
 
-const DK = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']; // index = days after Monday
+export const DK = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']; // index = days after Monday
 const J = JSON.stringify;
+const SELF = fileURLToPath(import.meta.url);
 
 // ── the hand calendar ────────────────────────────────────────────────────────────────────────────────────────────────
-const monIdx = (d) => (d.getDay() + 6) % 7; // Mon=0 ... Sun=6
-const iso = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-function midnight(d) {
+const monIdx = (d: Date): number => (d.getDay() + 6) % 7; // Mon=0 ... Sun=6
+export const iso = (d: Date): string => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+export function midnight(d: Date): Date {
   const x = new Date(d);
   x.setHours(0, 0, 0, 0);
   return x;
 }
-function addDays(d, n) {
+export function addDays(d: Date, n: number): Date {
   const x = new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
   x.setHours(0, 0, 0, 0);
   return x;
 }
-const mondayOf = (d) => addDays(midnight(d), -monIdx(midnight(d)));
-const dayCount = (a, b) => Math.round((midnight(b).getTime() - midnight(a).getTime()) / 86400000);
+export const mondayOf = (d: Date): Date => addDays(midnight(d), -monIdx(midnight(d)));
+export const dayCount = (a: Date, b: Date): number => Math.round((midnight(b).getTime() - midnight(a).getTime()) / 86400000);
 
 /** The seven todays the bench is run on: Monday 2026-09-14 to Sunday 2026-09-20, each at local noon. */
-const WEEK = DK.map((_, i) => new Date(2026, 8, 14 + i, 12, 0, 0));
+export const WEEK: Date[] = DK.map((_, i) => new Date(2026, 8, 14 + i, 12, 0, 0));
 
 // ── the bench ────────────────────────────────────────────────────────────────────────────────────────────────────────
-const PID = 'wildcard';
-const TOTAL_WEEKS = 6;
-const VIEWED_WEEK = 6; // the week the athlete is browsing: deliberately not today's week
+export const PID = 'wildcard';
+export const TOTAL_WEEKS = 6;
+export const VIEWED_WEEK = 6; // the week the athlete is browsing: deliberately not today's week
+
+/** A hand-built program: the fields the Wildcard flow reads. */
+export interface HandProg {
+  id: string;
+  name: string;
+  totalWeeks: number;
+  startDate?: string;
+  weeks: Record<number, Record<string, Record<string, unknown>>>;
+  goal: string;
+  cfg: Record<string, unknown>;
+}
+/** One scheduled day of the hand walk. */
+export interface HandDay {
+  week: number;
+  d: string;
+  date: Date;
+}
+/** The hand fixture for one pinned today. */
+export interface WildcardDay {
+  TODAY: Date;
+  TODAY_KEY: string;
+  START: Date;
+  START_MON: Date;
+  EXP_WEEK: number;
+  VIEWED_WEEK: number;
+  /** Rest days that leave today a training day. */
+  TRAINS: string[];
+  /** Rest days that make today a rest day. */
+  RESTS: string[];
+  mkProg(restDays: string[], title: string): HandProg;
+  handScheduled(restDays: string[]): HandDay[];
+}
+/** A pop-up the spy caught. */
+export interface Popup {
+  tier: string;
+  opts: Record<string, any>;
+}
+/** A record of the Wildcard store, ia_wild_. */
+export interface WildRecord {
+  title: string;
+  ts: number;
+  week?: number | null;
+  dayKey?: string | null;
+}
+/** The world wildcardBench() returns. */
+export interface WildcardBench {
+  IA: App;
+  ev: App['eval'];
+  LS: StorageStub;
+  PID: string;
+  at(today: Date): WildcardDay;
+  install(prog: HandProg, comp: Record<string, unknown> | null, viewWeek?: number): void;
+  cap(): Popup | null;
+  seasonFired(): number;
+  completionFired(): number;
+  setWild(records: WildRecord[]): void;
+  wild(): WildRecord[];
+  comp(): string | null;
+  hist(): string | null;
+  setComp(comp: Record<string, unknown>): void;
+  weekHTML(): string;
+  detailHTML(): string;
+  barHTML(): string;
+  randBodyHTML(): string;
+  counterText(): string | null;
+  streak(): number;
+  completed(): number;
+  skipped(): number;
+}
 
 /**
  * Boots the app once. `at(today)` pins the app's clock to `today` and returns the hand fixture for that day: today's
  * key and week (3), two rest sets (one where today trains, one where today rests), a program builder, the hand list of
  * scheduled days, and the readers of what the app rendered and stored.
  */
-function wildcardBench() {
+export function wildcardBench(): WildcardBench {
   const IA = loadApp({ dom: true });
   const ev = IA.eval;
   const LS = IA.localStorage;
@@ -54,12 +127,12 @@ function wildcardBench() {
   const resetDom = () => {
     for (const k of Object.keys(IA.els)) delete IA.els[k];
   };
-  const html = (id) => (IA.els[id] ? String(IA.els[id].innerHTML || '') : '');
+  const html = (id: string): string => (IA.els[id] ? String(IA.els[id].innerHTML || '') : '');
 
-  function at(today) {
+  function at(today: Date): WildcardDay {
     pinClock(IA, today);
     const TODAY = midnight(today);
-    const TODAY_KEY = DK[monIdx(TODAY)];
+    const TODAY_KEY = DK[monIdx(TODAY)] as string;
     const START = addDays(TODAY, -14);
     const START_MON = mondayOf(START);
     const EXP_WEEK = Math.floor(dayCount(START_MON, TODAY) / 7) + 1;
@@ -67,19 +140,19 @@ function wildcardBench() {
     const TRAINS = [TODAY_KEY === 'sun' ? 'sat' : 'sun', TODAY_KEY === 'wed' ? 'thu' : 'wed'];
     const RESTS = [TODAY_KEY, TODAY_KEY === 'sun' ? 'wed' : 'sun'];
 
-    function mkProg(restDays, title) {
-      const weeks = {};
+    function mkProg(restDays: string[], title: string): HandProg {
+      const weeks: HandProg['weeks'] = {};
       for (let w = 1; w <= TOTAL_WEEKS; w++) {
-        weeks[w] = {};
+        const wk: Record<string, Record<string, unknown>> = (weeks[w] = {});
         DK.forEach((d) => {
-          weeks[w][d] = restDays.includes(d) ? { title: 'Rest', rest: true, tags: ['rest'] } : { title, sections: [], tags: ['lift'] };
+          wk[d] = restDays.includes(d) ? { title: 'Rest', rest: true, tags: ['rest'] } : { title, sections: [], tags: ['lift'] };
         });
       }
       return { id: PID, name: 'WILDCARD BLOCK', totalWeeks: TOTAL_WEEKS, startDate: iso(START), weeks, goal: 'balanced', cfg: {} };
     }
     /** Every non-rest day of the fixture from the start date to today, ascending: the hand walk. */
-    function handScheduled(restDays) {
-      const out = [];
+    function handScheduled(restDays: string[]): HandDay[] {
+      const out: HandDay[] = [];
       for (let w = 1; w <= TOTAL_WEEKS; w++) {
         DK.forEach((d, off) => {
           if (restDays.includes(d)) return;
@@ -88,13 +161,13 @@ function wildcardBench() {
           out.push({ week: w, d, date: dt });
         });
       }
-      return out.sort((a, b) => a.date - b.date);
+      return out.sort((a, b) => a.date.getTime() - b.date.getTime());
     }
     return { TODAY, TODAY_KEY, START, START_MON, EXP_WEEK, VIEWED_WEEK, TRAINS, RESTS, mkProg, handScheduled };
   }
 
   /** Stores the program as the active one with an optional ia_comp_ record set, viewing `viewWeek` (week 6 if absent). */
-  function install(prog, comp, viewWeek) {
+  function install(prog: HandProg, comp: Record<string, unknown> | null, viewWeek?: number): void {
     LS.clear();
     ev("activeProgId='" + PID + "'");
     ev('activeProg=' + J(prog));
@@ -127,7 +200,7 @@ function wildcardBench() {
     detailHTML: () => html('detailBody'),
     barHTML: () => html('randFilterBar'),
     randBodyHTML: () => html('randBody'),
-    counterText: () => (IA.els.randCounter ? IA.els.randCounter.textContent : null),
+    counterText: () => (IA.els['randCounter'] ? IA.els['randCounter'].textContent : null),
     streak: () => ev('computeStreak()'),
     completed: () => ev('completedCount()'),
     skipped: () => ev('skippedCount()'),
@@ -135,7 +208,7 @@ function wildcardBench() {
 }
 
 /** The rendered week strip: from the strip's opener to the hero. */
-function stripOf(h) {
+export function stripOf(h: string): string {
   const a = h.indexOf('<div class="wk-strip">');
   const b = h.indexOf('<div class="wk-hero');
   return a < 0 || b < 0 ? '' : h.slice(a, b);
@@ -144,11 +217,11 @@ function stripOf(h) {
  * The strip split into one blob per weekday, keyed by the day label it prints. The split is a lookahead for a cell
  * opener (the class followed by a space or the closing quote), so the child divs (wk-day-lbl, wk-day-num) never split it.
  */
-function stripCells(h) {
-  const cells = {};
+export function stripCells(h: string): Record<string, string> {
+  const cells: Record<string, string> = {};
   stripOf(h).split(/(?=<div class="wk-day[ "])/).forEach((p) => {
     const m = p.match(/<div class="wk-day-lbl">([A-Z]{3})<\/div>/);
-    if (m) cells[m[1].toLowerCase()] = p;
+    if (m && m[1]) cells[m[1].toLowerCase()] = p;
   });
   return cells;
 }
@@ -157,7 +230,7 @@ function stripCells(h) {
 // Windows are chosen so a transition falls inside the program, and so some programs start on a transition date.
 // 2026 transitions: US spring 2026-03-08, US fall 2026-11-01, EU spring 2026-03-29, EU fall 2026-10-25, southern
 // autumn 2026-04-05, southern spring 2026-10-04 (Lord Howe and Chatham track Australia and New Zealand).
-const DST_CASES = [
+export const DST_CASES: [string, string, string, number][] = [
   ['dst1-us-spring', 'spring forward inside the window (US)', '2026-02-16', 12],
   ['dst2-us-fall', 'fall back inside the window (US)', '2026-10-05', 12],
   ['dst3-eu-spring', 'spring forward inside the window (EU)', '2026-03-09', 8],
@@ -174,43 +247,54 @@ const DST_CASES = [
   ['dst14-leap', 'a leap February', '2028-02-14', 6],
 ];
 /** The seven zones the lattice is run in. */
-const TZ_LATTICE = ['America/New_York', 'Europe/London', 'Australia/Sydney', 'Australia/Lord_Howe', 'Pacific/Chatham', 'UTC', 'Asia/Kolkata'];
+export const TZ_LATTICE = ['America/New_York', 'Europe/London', 'Australia/Sydney', 'Australia/Lord_Howe', 'Pacific/Chatham', 'UTC', 'Asia/Kolkata'];
+
+/** One lattice case's result. */
+export interface DstRow {
+  ok: boolean;
+  detail: string;
+}
+/** A day as wildcardDayFor returns it. */
+interface Slot {
+  week: number;
+  dayKey: string;
+}
 
 /**
  * Runs the lattice in this process's time zone against a booted app. Returns { <row id>: { ok, detail } } for the 14
  * windows and the eleven edges (Sunday wrap, rest days, the first and last days, degenerate programs).
  */
-function dstLattice(IA) {
+export function dstLattice(IA: App): Record<string, DstRow> {
   const DPID = 'wildcarddst';
-  const out = {};
-  const put = (prog) => {
+  const out: Record<string, DstRow> = {};
+  const put = (prog: HandProg | Record<string, unknown>) => {
     IA.localStorage.clear();
     IA.eval("activeProgId='" + DPID + "'");
     IA.eval('activeProg=' + J(prog));
     IA.eval('currentWeek=1');
   };
-  const call = (d) => IA.eval('JSON.stringify(wildcardDayFor(new Date(' + d.getFullYear() + ',' + d.getMonth() + ',' + d.getDate() + ',12,0,0)))');
-  const mk = (startIso, tw, rest) => {
-    const weeks = {};
+  const call = (d: Date): string => IA.eval('JSON.stringify(wildcardDayFor(new Date(' + d.getFullYear() + ',' + d.getMonth() + ',' + d.getDate() + ',12,0,0)))');
+  const mk = (startIso: string, tw: number, rest: string[]): HandProg => {
+    const weeks: HandProg['weeks'] = {};
     for (let w = 1; w <= tw; w++) {
-      weeks[w] = {};
+      const wk: Record<string, Record<string, unknown>> = (weeks[w] = {});
       DK.forEach((d) => {
-        weeks[w][d] = rest.includes(d) ? { title: 'Rest', rest: true } : { title: 'Session', sections: [] };
+        wk[d] = rest.includes(d) ? { title: 'Rest', rest: true } : { title: 'Session', sections: [] };
       });
     }
     return { id: DPID, name: 'DST', totalWeeks: tw, startDate: startIso, weeks, goal: 'balanced', cfg: { seed: 1 } };
   };
-  const rec = (id, ok, detail) => {
+  const rec = (id: string, ok: unknown, detail: unknown) => {
     out[id] = { ok: !!ok, detail: ok ? '' : String(detail) };
   };
   for (const [id, , start, tw] of DST_CASES) {
     put(mk(start, tw, ['sun']));
     const SD = new Date(+start.slice(0, 4), +start.slice(5, 7) - 1, +start.slice(8, 10));
     const SMON = mondayOf(SD);
-    const bad = [];
+    const bad: string[] = [];
     for (let off = -10; off < tw * 7 + 10; off++) {
       const d = addDays(SMON, off);
-      const got = JSON.parse(call(d));
+      const got: Slot | null = JSON.parse(call(d));
       // the hand expectation: calendar arithmetic only
       const w = Math.floor(off / 7) + 1;
       const dk = DK[((off % 7) + 7) % 7];
@@ -229,13 +313,13 @@ function dstLattice(IA) {
   }
   // Sunday, weekday index 6, is the one a modulo slip drops off the end
   put(mk('2026-04-06', 4, ['wed']));
-  let got = JSON.parse(call(new Date(2026, 3, 12)));
+  let got: Slot | null = JSON.parse(call(new Date(2026, 3, 12)));
   rec('dst15-sunday-wrap', got && got.week === 1 && got.dayKey === 'sun', J(got));
   // a rest day still resolves; scheduledDays is what drops it
   put(mk('2026-04-06', 4, ['wed', 'sun']));
   got = JSON.parse(call(new Date(2026, 3, 8)));
   rec('dst16-rest-resolves', got && got.week === 1 && got.dayKey === 'wed', J(got));
-  const sched = IA.eval("JSON.stringify(scheduledDays(new Date(2026,3,30)).filter(function(x){return x.d==='wed';}))");
+  const sched: string = IA.eval("JSON.stringify(scheduledDays(new Date(2026,3,30)).filter(function(x){return x.d==='wed';}))");
   rec('dst17-sched-drops-rest', sched === '[]', sched);
   // edges of a block that starts on a Wednesday: week 1 is short
   put(mk('2026-04-08', 4, ['sun']));
@@ -248,7 +332,7 @@ function dstLattice(IA) {
   rec('dst22-after-end', call(addDays(new Date(2026, 3, 6), 28)) === 'null', call(addDays(new Date(2026, 3, 6), 28)));
   // degenerate program shapes
   const p = mk('2026-04-06', 4, ['sun']);
-  delete p.weeks[2].thu;
+  delete p.weeks[2]?.['thu'];
   put(p);
   rec('dst23-missing-day', call(new Date(2026, 3, 16)) === 'null', call(new Date(2026, 3, 16)));
   const p2 = mk('2026-04-06', 4, ['sun']);
@@ -260,13 +344,19 @@ function dstLattice(IA) {
   return out;
 }
 
+/** What one zone's lattice child reported: `ran` is false when it printed no result line. */
+export interface DstRun {
+  ran: boolean;
+  offset?: number;
+  rows: Record<string, DstRow>;
+  error: string;
+}
 /**
- * Runs the lattice in a child process with TZ set to `zone`, so the zone is in force before Node reads the clock.
- * Returns { ran, offset, rows, error }: `ran` is false when the child printed no result line.
+ * Runs the lattice in a child process with TZ set to `zone`, so the zone is in force before Node reads the clock. The
+ * child is plain Node running this file (Node strips its types), whatever runner spawned it.
  */
-function dstLatticeIn(zone) {
-  const cp = require('node:child_process');
-  const r = cp.spawnSync(process.execPath, [__filename, '--dst'], {
+export function dstLatticeIn(zone: string): DstRun {
+  const r = spawnSync(process.execPath, [SELF, '--dst'], {
     env: Object.assign({}, process.env, { TZ: zone }),
     encoding: 'utf8',
     maxBuffer: 16 * 1024 * 1024,
@@ -274,7 +364,7 @@ function dstLatticeIn(zone) {
   });
   const line = String(r.stdout || '').split('\n').find((l) => l.startsWith('WILDCARD_DST '));
   if (!line) return { ran: false, rows: {}, error: String(r.stderr || r.error || 'no result line').trim().split('\n').slice(0, 3).join(' | ') };
-  const got = JSON.parse(line.slice('WILDCARD_DST '.length));
+  const got: { offset: number; rows: Record<string, DstRow> } = JSON.parse(line.slice('WILDCARD_DST '.length));
   return { ran: true, offset: got.offset, rows: got.rows, error: '' };
 }
 
@@ -284,18 +374,54 @@ function dstLatticeIn(zone) {
 // selectors, so it is not modelled; @media blocks are kept apart (the light theme is the one resolved). It never runs
 // the app's render code.
 
-/** The <style> text of the page with its comments stripped. */
-const styleText = (src) => [...src.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');
+/** One declaration: property, value, and whether it is !important. */
+export interface Decl {
+  p: string;
+  v: string;
+  imp: boolean;
+}
+/** One selector of a rule (a comma list is split into one rule per selector), its declarations and source order. */
+export interface Rule {
+  sel: string;
+  decls: Decl[];
+  media: string | null;
+  order: number;
+}
+/** A hand-built element: tag, classes, parent. */
+export interface El {
+  tag: string;
+  cls: string[];
+  id: string | null;
+  parent: El | null;
+}
+/** A rule whose `color` applies to an element, with its specificity. */
+export interface Candidate {
+  sel: string;
+  v: string;
+  imp: boolean;
+  spec: [number, number, number];
+  order: number;
+}
+interface Compound {
+  tag: string | null;
+  ids: string[];
+  cls: string[];
+  attrs: string[];
+  pseudo: string[];
+}
 
-function cssRules(src) {
-  const rules = [];
+/** The <style> text of the page with its comments stripped. */
+export const styleText = (src: string): string => [...src.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');
+
+export function cssRules(src: string): { rules: Rule[]; rootVars: Record<string, string>; resolveVar: (v: string) => string } {
+  const rules: Rule[] = [];
   let order = 0;
-  (function parse(txt, media) {
+  (function parse(txt: string, media: string | null) {
     let i = 0;
     while (i < txt.length) {
       const ob = txt.indexOf('{', i);
       if (ob < 0) break;
-      const head = txt.slice(i, ob).split(';').pop().trim();
+      const head = (txt.slice(i, ob).split(';').pop() || '').trim();
       let depth = 1;
       let j = ob + 1;
       while (j < txt.length && depth) {
@@ -306,7 +432,7 @@ function cssRules(src) {
       const body = txt.slice(ob + 1, j - 1);
       if (head.startsWith('@media')) parse(body, head);
       else if (!head.startsWith('@')) {
-        const decls = [];
+        const decls: Decl[] = [];
         body.split(';').forEach((d) => {
           const k = d.indexOf(':');
           if (k < 0) return;
@@ -320,20 +446,23 @@ function cssRules(src) {
       i = j;
     }
   })(styleText(src), null);
-  const rootVars = {};
+  const rootVars: Record<string, string> = {};
   rules.filter((r) => r.sel === ':root' && !r.media).forEach((r) => r.decls.forEach((d) => {
     if (d.p.startsWith('--')) rootVars[d.p] = d.v;
   }));
-  const resolveVar = (v, depth = 0) => (depth > 5 ? v : v.replace(/var\((--[\w-]+)(?:\s*,\s*([^)]+))?\)/g, (m, n, fb) => (rootVars[n] !== undefined ? resolveVar(rootVars[n], depth + 1) : fb || m)));
-  return { rules, rootVars, resolveVar };
+  const resolveVar = (v: string, depth = 0): string => (depth > 5 ? v : v.replace(/var\((--[\w-]+)(?:\s*,\s*([^)]+))?\)/g, (m: string, n: string, fb: string | undefined) => {
+    const root = rootVars[n];
+    return root !== undefined ? resolveVar(root, depth + 1) : fb || m;
+  }));
+  return { rules, rootVars, resolveVar: (v: string) => resolveVar(v) };
 }
 
-function parseCompound(c) {
-  const o = { tag: null, ids: [], cls: [], attrs: [], pseudo: [] };
+export function parseCompound(c: string): Compound {
+  const o: Compound = { tag: null, ids: [], cls: [], attrs: [], pseudo: [] };
   const re = /([#.]?[\w-]+|\*|\[[^\]]+\]|::?[\w-]+(?:\([^)]*\))?)/g;
-  let m;
+  let m: RegExpExecArray | null;
   while ((m = re.exec(c))) {
-    const t = m[1];
+    const t = m[1] ?? '';
     if (t === '*') continue;
     if (t[0] === '#') o.ids.push(t.slice(1));
     else if (t[0] === '.') o.cls.push(t.slice(1));
@@ -343,7 +472,7 @@ function parseCompound(c) {
   }
   return o;
 }
-function specificity(sel) {
+export function specificity(sel: string): [number, number, number] {
   let a = 0;
   let b = 0;
   let c = 0;
@@ -355,17 +484,17 @@ function specificity(sel) {
   });
   return [a, b, c];
 }
-function matchCompound(o, node) {
+function matchCompound(o: Compound, node: El): boolean {
   if (o.tag && o.tag !== node.tag) return false;
   if (o.ids.some((i) => node.id !== i)) return false;
   if (o.cls.some((k) => !node.cls.includes(k))) return false;
   if (o.pseudo.length) return false; // :active and :hover never hold at rest
   return true;
 }
-function matches(sel, node) {
+export function matches(sel: string, node: El): boolean {
   const parts = sel.replace(/\s*>\s*/g, ' > ').split(/\s+/).filter(Boolean);
-  function rec(pi, n) {
-    const o = parseCompound(parts[pi]);
+  function rec(pi: number, n: El | null): boolean {
+    const o = parseCompound(parts[pi] ?? '');
     if (!n || !matchCompound(o, n)) return false;
     if (pi === 0) return true;
     if (parts[pi - 1] === '>') return pi - 2 >= 0 && rec(pi - 2, n.parent);
@@ -375,8 +504,8 @@ function matches(sel, node) {
   return rec(parts.length - 1, node);
 }
 /** Every rule outside @media that declares `color` and matches `node`. */
-const colorCandidates = (rules, node) => {
-  const out = [];
+export const colorCandidates = (rules: Rule[], node: El): Candidate[] => {
+  const out: Candidate[] = [];
   rules.forEach((r) => {
     if (r.media) return;
     r.decls.forEach((d) => {
@@ -386,36 +515,29 @@ const colorCandidates = (rules, node) => {
   return out;
 };
 /** The rule whose `color` wins on `node`, by the cascade, or null. */
-function winningColor(rules, node) {
+export function winningColor(rules: Rule[], node: El): Candidate | null {
   const c = colorCandidates(rules, node);
-  c.sort((x, y) => y.imp - x.imp || y.spec[0] - x.spec[0] || y.spec[1] - x.spec[1] || y.spec[2] - x.spec[2] || y.order - x.order);
+  c.sort((x, y) => Number(y.imp) - Number(x.imp) || y.spec[0] - x.spec[0] || y.spec[1] - x.spec[1] || y.spec[2] - x.spec[2] || y.order - x.order);
   return c[0] || null;
 }
 /** A hand-built element: tag, classes, parent. */
-const el = (tag, cls, parent) => ({ tag, cls, id: null, parent: parent || null });
+export const el = (tag: string, cls: string[], parent?: El | null): El => ({ tag, cls, id: null, parent: parent || null });
 
 /** WCAG 2 contrast ratio of two #rrggbb colours. */
-function contrast(a, b) {
-  const lum = (hex) => {
+export function contrast(a: string, b: string): number {
+  const lum = (hex: string): number => {
     let h = hex.replace('#', '');
     if (h.length === 3) h = h.split('').map((c) => c + c).join('');
     const c = [0, 2, 4].map((i) => parseInt(h.substr(i, 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
-    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    return 0.2126 * (c[0] ?? 0) + 0.7152 * (c[1] ?? 0) + 0.0722 * (c[2] ?? 0);
   };
   const x = lum(a);
   const y = lum(b);
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 }
 
-module.exports = {
-  DK, WEEK, PID, TOTAL_WEEKS, VIEWED_WEEK, iso, midnight, addDays, mondayOf, dayCount,
-  wildcardBench, stripOf, stripCells,
-  DST_CASES, TZ_LATTICE, dstLattice, dstLatticeIn,
-  styleText, cssRules, parseCompound, specificity, matches, colorCandidates, winningColor, el, contrast,
-};
-
-// The lattice child: `TZ=<zone> node tests/support/wildcard.js --dst` prints `WILDCARD_DST {offset, rows}`.
-if (require.main === module && process.argv.includes('--dst')) {
+// The lattice child: `TZ=<zone> node tests/support/wildcard.ts --dst` prints `WILDCARD_DST {offset, rows}`.
+if (process.argv[1] && resolve(process.argv[1]) === SELF && process.argv.includes('--dst')) {
   const rows = dstLattice(loadApp());
   process.stdout.write('WILDCARD_DST ' + J({ offset: new Date().getTimezoneOffset(), rows }) + '\n');
 }
