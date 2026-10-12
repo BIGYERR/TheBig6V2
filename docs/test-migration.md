@@ -4,11 +4,14 @@ Mario, Post-v0.239.1: "tests should be made that are not named per gate.... they
 organized like such... the versioning is redundant because we are using git and semver... switch to our more modern
 unit//integration/e2e test maintenance flow + dev branch pushes".
 
-The legacy suite is 104 gate files in `tests/gates/`, each named for the build and ruling that wrote it, with the
-machinery that keeps them honest across versions: `tests/gate.sh`, the row manifest, the skip allow list, `ROW_RULED`
+**Done (Post-v0.239.1): phase 3 deleted the legacy suite in `830af1e`; the feature tests are the only suite.** This file
+is now the record of how every gate row was carried over or dropped.
+
+The legacy suite was 104 gate files in `tests/gates/`, each named for the build and ruling that wrote it, with the
+machinery that kept them honest across versions: `tests/gate.sh`, the row manifest, the skip allow list, `ROW_RULED`
 licences, era rows and `tests/era_bump.py`, `tests/version_scope.js`, `tests/chain.js` and the reach map,
 `tests/sabotage.py` with its specs, and `tests/edits/`. Git and semver now carry what that machinery carried by hand, so
-the tests move to the layout CLAUDE.md's Test layout section sets out: `tests/unit/<feature>.test.ts`,
+the tests moved to the layout CLAUDE.md's Test layout section sets out: `tests/unit/<feature>.test.ts`,
 `tests/integration/<feature>.test.ts`, `tests/snapshots/<feature>.json`, strict TypeScript run by Vitest
 (`cd tests && npx vitest run unit integration`; architecture phase A, `docs/architecture-migration.md`).
 
@@ -29,13 +32,21 @@ the tests move to the layout CLAUDE.md's Test layout section sets out: `tests/un
    Architecture phase A (Post-v0.239.1) moved every file above, and the phase 2 files written since, from `.js` and
    `node --test` to TypeScript and Vitest, with the same tests and the same golden file; the names below are the
    TypeScript ones. A moved gate's tests are written in TypeScript from the start.
-2. **Phase 2 (next).** Move the gates feature by feature, in the order below. Each move proves every old row is held by
-   a new test or dropped with a written reason (the parity rule), and deletes the gate in the same commit.
-3. **Phase 3 (last).** Delete the machinery once no gate is left: `gate.sh`, `rows.js`, `status.js`,
+2. **Phase 2 (done, Post-v0.239.1).** The gates moved feature by feature, in the order below. Each move proved every old
+   row is held by a new test or dropped with a written reason (the parity rule), and deleted the gate in the same
+   commit. Groups 1 to 18 are done; their parity tables are `docs/test-migration/01-rest-timer.md` to
+   `18-session-budget.md`. 64 files ported from JavaScript late in phase 2 still open with `// @ts-nocheck` (Typing
+   debt, below).
+3. **Phase 3 (done, Post-v0.239.1, `830af1e`).** Deleted the machinery once no gate was left: `gate.sh`, `rows.js`, `status.js`,
    `row_manifest.txt`, `skip_allow.txt`, the `ROW_RULED` licences, the era tables and `era_bump.py`,
    `version_scope.js` and its debt list, `chain.js` and the reach map, `sabotage.py` and its specs, `tests/edits/`, the
-   gate, sabotage and row steps of `tools/check.mjs` and of the pipeline, and CLAUDE.md's Proof scope section. The fuzz driver (`tests/fuzz.sh`) is decided then: kept as a CI sweep with its own test, or replaced by the
-   snapshot lattice.
+   gate, sabotage and row steps of `tools/check.mjs` and of the pipeline, and CLAUDE.md's Proof scope section (789 tracked files). The identity fuzz (`tests/fuzz.sh`) is replaced by the
+   snapshot lattice: `tests/sweeps/program-output.test.ts` builds all 864 configs of `tests/lattice193.js` twice, checks
+   each equals itself and leaves its config untouched, and holds every digest in
+   `tests/snapshots/program-output-lattice.json`, so any change to what the engine prescribes is a reviewable diff.
+   `g_fuzz_shard_equiv.js` (17 rows) went with the fuzz driver: it proved the driver's sharding, not the app.
+   `tools/check.mjs` keeps the build lane (the byte-for-byte rebuild, the meta, the inline script compiling, the
+   HALF_MANNY boot) and CI's tests job runs the same two steps before Vitest.
 
 ## Feature groups
 
@@ -63,7 +74,7 @@ Rows are from `tests/row_manifest.txt` (2,130 rows over 103 gates, generated fro
 | 17 | Equipment tiers and the exercise pool | 7 | 159 | `integration/equipment-tiers.test.ts` |
 | 18 | Session budget and accessory blocks | 9 | 188 | `integration/session-budget.test.ts` |
 | 19 | Program output | (the HALF_MANNY era check in 37 gates) | (part of their rows) | `integration/program-output.test.ts` (done) |
-| | Test tooling, not an app feature | 1 | 17 | `unit/fuzz-sharding.test.ts`, or dropped with `tests/fuzz.sh` (phase 3) |
+| | Test tooling, not an app feature | 1 | 17 | dropped with `tests/fuzz.sh` (phase 3); the lattice snapshot replaces the fuzz |
 | | **Total** | **104** | **2,137** | |
 
 `g0.239.1_timer_label.js` is counted once, under group 1; `g194_implement_and_range.js` once, under group 8 (its D54
@@ -91,9 +102,9 @@ rows go to group 13).
     movements**, 17. **Equipment tiers.** Engine pools and filters, each a lattice over goals, tiers and plans.
 18. **Session budget and accessory blocks.** The slowest sweeps (`g197b_sweep.js`, `g197c_d84_cmp.js`) go last, once the
     pattern for large lattices is settled.
-19. **Test tooling.** Decided with the fuzz driver in phase 3.
+19. **Test tooling.** Dropped with the fuzz driver in phase 3.
 
-**One decision phase 2 needs before group 12:** where a sweep that takes more than a few seconds lives, since
+**Decided before group 12 (the recommendation below was taken):** where a sweep that takes more than a few seconds lives, since
 `tools/check.mjs` runs `tests/unit` and `tests/integration` whole inside its 60 seconds. Recommendation: a seeded sample
 in the integration file, and the full lattice in a CI-only folder (`tests/sweeps/<feature>.test.ts`) that the check
 skips.
@@ -233,6 +244,18 @@ What each gate checks is read from its header. Target files are under `tests/`.
 | `g238_d223_restlog.js` | 11 | a rest-day jog is its own record and the moved-in session starts empty (D223 to D227) | Logging | `tests/integration/logging.test.ts` |
 | `g239_d233_island.js` | 12 | the rest stopwatch on the iPhone island in the native app only (D233) | Rest timer and rest sheet | `tests/integration/rest-timer.test.ts` |
 | `g_fuzz_shard_equiv.js` | 17 | the sharded fuzz driver equals the sequential run (tests/fuzz.sh) | Test tooling (not an app feature) | `tests/unit/fuzz-sharding.test.ts` |
+
+## Typing debt
+
+Phase 2's later groups were ported from JavaScript mechanically, and 64 files still open with
+`// @ts-nocheck: ported from JavaScript in phase 2; typing pending`. They run and pass, but the compiler does not check
+them. Each is typed in its own commit (types from `@ia/core`, never a local copy), the marker removed and the type
+check kept green; a file touched by a release is typed in that release. The list shrinks to nothing:
+
+- `tests/support/` (14): `adjacent-day-dedupe.ts`, `core-trunk.ts`, `deload.ts`, `equipment-tiers.ts`, `injury-overlays.ts`, `leg-accessory.ts`, `leg-lift-placement.ts`, `long-run-day.ts`, `pace-clock-lattices.ts`, `pace-wizard.ts`, `race-date.ts`, `run-session-class.ts`, `runner-armor-circuit.ts`, `swim.ts`.
+- `tests/unit/` (1): `clock-format.test.ts`.
+- `tests/integration/` (28): `adjacent-day-dedupe.test.ts`, `cardio-sessions.test.ts`, `clock-format.test.ts`, `compound-tier.test.ts`, `core-trunk.test.ts`, `deload.test.ts`, `duplicate-movements.test.ts`, `easy-run-ceiling.test.ts`, `equipment-tiers.test.ts`, `injury-overlays.test.ts`, `injury-plan-lens.test.ts`, `ledger.test.ts`, `leg-accessory.test.ts`, `leg-lift-placement.test.ts`, `long-run-day.test.ts`, `mile-anchor.test.ts`, `mile-pencil.test.ts`, `pace-clock.test.ts`, `pace-wizard.test.ts`, `progress.test.ts`, `race-date.test.ts`, `run-session-class.test.ts`, `run-week-layout.test.ts`, `runner-armor-circuit.test.ts`, `swim.test.ts`, `test-length.test.ts`, `test-week.test.ts`, `wildcard.test.ts`.
+- `tests/sweeps/` (21): `adjacent-day-dedupe.test.ts`, `cardio-sessions.test.ts`, `deload.test.ts`, `duplicate-movements.test.ts`, `equipment-tiers.test.ts`, `injury-overlays.test.ts`, `leg-accessory-trim-order.test.ts`, `leg-accessory.test.ts`, `leg-lift-placement.test.ts`, `long-run-day.test.ts`, `mile-anchor.test.ts`, `pace-clock.test.ts`, `race-date.test.ts`, `run-session-class.test.ts`, `run-week-layout.test.ts`, `runner-armor-circuit.test.ts`, `session-budget.test.ts`, `swim.test.ts`, `test-length.test.ts`, `test-week.test.ts`, `wildcard.test.ts`.
 
 ## Moved
 

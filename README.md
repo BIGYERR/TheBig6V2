@@ -7,10 +7,10 @@ Iron Asylum: a hybrid strength and cardio program builder for iPhone.
 | `index.html` | the app: one file, served at https://bigyerr.github.io/TheBig6V2/ | GitHub Pages, on every push to `main` |
 | `app/` | the same app as an Angular project, built four ways: `emulator-ios` and `device-ios` (Cordova), `pwa-pages` (a web build for `/TheBig6V2/pwa/`), and `pwa-local` (the same web build, served from this Mac) | built on demand; see `app/README.md` |
 | `backend/` | the Node backend: the website (`/`), the app (`/app/`), the device heartbeat API and the admin vision dashboard (`/admin/`), one server | Heroku, with `backend/scripts/heroku.sh deploy`; see `backend/README.md` |
-| `tests/` | the gates every version of `index.html` passes before it ships | run locally (`CLAUDE.md`) |
+| `tests/` | the test suite, by feature: unit, integration and sweeps in TypeScript on Vitest, with golden program output in `tests/snapshots/` | `node tools/check.mjs` locally (60 s), the full suite in CI |
 | `docs/` | reference for agents and Mario: the design system (`docs/design/`) | not shipped; it rides along on Pages with the rest of the repo, and the app never reads it |
 | `tools/` | the run log: every test, build, deploy, server and Claude session recorded in `temp/` | see `tools/README.md` |
-| `temp/` | the run log's output and the gate's last blast-radius diff, `temp/last_diff.txt` (gitignored, kept out of iCloud) | written by every run |
+| `temp/` | the run log's output (gitignored, kept out of iCloud) | written by every run |
 
 ## Running the app, in short
 
@@ -42,8 +42,8 @@ live app's and the native app's. The details are in `app/README.md`.
 - **Release by pull request from `dev` into `main`, opened by hand** after reviewing the push's results in Actions. No
   agent opens one. `main` is protected: it changes only through that pull request, and
   only when every check in `.github/workflows/pipeline.yml` passes: the unit and integration tests (`tests/unit`,
-  `tests/integration`), the full gate suite (every gate, the row check and the blast radius), fuzz, sabotage, the app
-  and backend tests and lint, and the Docker e2e. That takes 30 to 45 minutes
+  `tests/integration`) and the sweeps (`tests/sweeps`), the app
+  and backend tests and lint, and the Docker e2e. That takes about 15 minutes
   in GitHub Actions; nothing waits for it locally. Merging is the deploy: Pages serves `main`, the pipeline then proves
   the live site serves it, and `backend/scripts/heroku.sh deploy` ships `origin/main`'s `backend/`.
 

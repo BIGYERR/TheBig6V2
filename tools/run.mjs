@@ -4,13 +4,11 @@
 //
 //   node tools/run.mjs <type> [--sub] [--collect <file>]... -- <command> [args...]
 //
-//   <type>             what the run is, lower-case words joined by dashes: unit, e2e, gate, server-pwa-local, ...
+//   <type>             what the run is, lower-case words joined by dashes: unit, e2e, server-pwa-local, ...
 //   --sub              add the command's last argument to the type when it is a plain word (heroku + deploy ->
 //                      heroku-deploy), so a script with subcommands gets one type per subcommand
-//   --collect <file>   copy this file into the run's artifacts/ at the end if the run wrote it (gate.sh's
-//                      temp/last_diff.txt)
+//   --collect <file>   copy this file into the run's artifacts/ at the end if the run wrote it
 //   --artifact-env NAME=sub   give the command NAME=<this run's artifacts>/sub unless NAME is already set
-//                      (fuzz.sh keeps its shard results in FUZZ_OUT)
 //
 // The command's stdout and stderr pass through unchanged, byte for byte, and its exit code is this process's exit
 // code, so wrapping changes nothing a caller parses. This script adds nothing to either stream unless a person is
@@ -29,14 +27,8 @@ const RULES = [
   // e2e steps (the runner prints "  PASS #09 strength/rest-sheet  parity 0.000% (0 px)", and "  PASS #W02 ..." for a
   // website or admin page: the band's letter, then the number)
   { re: /^\s*(PASS|FAIL) #[A-Z]?\d+\s.*/, event: (m) => ['step', m[0].trim(), m[1] === 'FAIL'] },
-  // gate.sh's verdict
-  { re: /^(ALL GATES PASS|GATES RED .*)$/, event: (m) => ['verdict', m[0], true], detail: (m) => m[0] },
   // e2e's verdict
   { re: /^e2e: (\d+\/\d+ steps passed.*)$/, event: (m) => ['verdict', m[1], true], detail: (m) => m[1] },
-  // fuzz, sabotage and single-gate summaries
-  { re: /^(FUZZTOTAL .*|ANCHORS \d+ checked.*|PASS \d+ FAIL \d+)$/, detail: (m) => m[1] },
-  { re: /^SABOTAGE (tripped=.*)$/, event: (m) => ['verdict', m[0], true], detail: (m) => m[1] },
-  { re: /^\s*(?:SURVIVED|CRASH)\b.*/, event: (m) => ['fail', m[0].trim(), true] },
   // node --test's closing counts
   { re: /^ℹ (tests|pass|fail|cancelled|skipped|todo) (\d+)$/, count: true },
   // Vitest's closing counts (" Test Files  8 passed (8)", "      Tests  85 passed (85)")

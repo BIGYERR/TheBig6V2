@@ -11,7 +11,7 @@ temp/
       events.log                     this run's events as they happened (a live server keeps appending)
       output.log                     everything it printed, stdout and stderr, each line timestamped
       artifacts/                     what it made: e2e report and collage, docker and nginx logs, xcodebuild
-                                     logs, fuzz shards, gate.sh's blast-radius diff, ...
+                                     logs, ...
   latest/<type>                      link to the newest run of each type
   hooks/<event>.json                 the last raw input of each Claude hook (for checking what Claude sent)
   orchestration.log                  link to the machine's orchestration log (next section)
@@ -28,7 +28,7 @@ output are not in it; the folder it points at has those.
 2026-10-11 16:20:09  you     prompt              "run the e2e again" (claude@61a68a9c, TheBig6V2)  -> <session transcript .jsonl>
 2026-10-11 16:20:12  claude  e2e                 npm run e2e (TheBig6V2/app; main 618605d; ia-version 239)  -> /Users/.../TheBig6V2/temp/runs/2026-10-11_16-20-12-e2e
 2026-10-11 16:31:40  claude  agent               dispatched gatekeeper: Prove the run-log pass (claude@61a68a9c, TheBig6V2)  -> <session>/subagents/
-2026-10-11 16:45:02  you     gate                bash tests/gate.sh index.html (worktree v0.240.0; v0.240.0 a1b2c3d; ia-version 0.240.0)  -> /Users/.../temp/runs/...-gate
+2026-10-11 16:45:02  you     unit                npx vitest run unit integration (TheBig6V2/tests; dev a1b2c3d; ia-version 0.239.1)  -> /Users/.../temp/runs/...-unit
 <time>               <who>   <what>              <how it was asked for (where; git; version)>  -> <folder to open>
 ```
 
@@ -81,7 +81,6 @@ From the repo root (`npm run logs -- <args>` does the same from `app/` or `backe
 | backend tests, lint | `backend-test`, `backend-lint` | `npm test`, `npm run lint` in `backend/` |
 | backend servers | `server-backend-dev` (the full stack dev mode: the dev container's log while it is followed, every rebuild, test run and restart), `server-backend-dev-server`, `server-backend-docker`, `server-backend-mac-local` (every request), `server-backend-admin`, `server-backend-site` | `npm run dev`, `dev:server`, `docker:logs`, `mac-local-backend:logs`, `admin:dev`, `site:dev` |
 | backend docker, Mac, Heroku | `backend-docker-up`, `-down`, `backend-dev-down`, `backend-mac-local[-<subcommand>]`, `heroku-<subcommand>` | `npm run docker:up`, `npm run dev:down`, `npm run mac-local-backend -- down`, `npm run heroku -- deploy`, ... |
-| the gate suite | `gate` (blast-radius diff in artifacts), `fuzz` (shards in artifacts), `sabotage` | `bash tests/gate.sh`, `tests/fuzz.sh`, `python3 tests/sabotage.py`, however they are called |
 | Pages deploy proof | `deploy-pages` | `node tools/deploy-check.mjs [--expect <N>]` |
 | Claude sessions, agents | `claude@<session>` lines in the history (transcript paths included) | hooks in `.claude/settings.json` |
 
@@ -90,11 +89,11 @@ Anything else can be logged by wrapping it: `node tools/run.mjs <type> -- <comma
 ## How it stays out of the way
 
 - **Nothing a caller reads changes.** The wrapper passes stdout, stderr and the exit code through byte for byte, and
-  adds nothing to either stream unless a person is watching a terminal. The gate scripts were checked with logging
-  on and off: identical output and exit codes.
+  adds nothing to either stream unless a person is watching a terminal. Checked with logging on and off:
+  identical output and exit codes.
 - **Logging never fails a run.** If `temp/` cannot be written, the command runs exactly as it would unwrapped.
-- **No nesting.** A logged command started inside another run (gate.sh under sabotage, `ng build` inside pwa-local)
-  adds a step to that run instead of opening its own (`IA_RUN_DIR`). `IA_NO_RUNLOG=1` turns the gate scripts' own
+- **No nesting.** A logged command started inside another run (`ng build` inside pwa-local)
+  adds a step to that run instead of opening its own (`IA_RUN_DIR`). `IA_NO_RUNLOG=1` turns a script's own
   logging off.
 - **Not in git, not in iCloud.** `/temp/` is in `.gitignore`, and every run re-applies the File Provider ignore
   attribute (`com.apple.fileprovider.ignore#P`) to the folder, which iCloud honours on this Mac (measured:
@@ -106,8 +105,8 @@ Anything else can be logged by wrapping it: `node tools/run.mjs <type> -- <comma
 ## In GitHub Actions
 
 Every pipeline job (`.github/workflows/pipeline.yml`) writes the same run log in its workspace and uploads `temp/` as an
-artifact (`tests-run-log`, `gate-run-log`, `fuzz-run-log`, `sabotage-run-log`, `app-backend-run-log`, `e2e-report`, `deploy-run-log`),
-so a red check reads like a local one: `gh run download <run id> -n gate-run-log`, then `summary.txt`, `events.log` and
+artifact (`tests-run-log`, `app-backend-run-log`, `e2e-report`, `deploy-run-log`),
+so a red check reads like a local one: `gh run download <run id> -n tests-run-log`, then `summary.txt`, `events.log` and
 `output.log` in its run folder. Runs started there say `ci` in the "who" column.
 
 ## Deployed servers

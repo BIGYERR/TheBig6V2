@@ -236,8 +236,8 @@ build of 49 source files under `app/src/legacy/src/`, byte for byte, and the fil
   real modules first, while the UI files stay together in one legacy module until phase E takes them apart screen by screen.
 
 ### Phase C: ES modules with an explicit global surface (2 to 4 sessions)
-- **Prerequisite:** the legacy gates are retired (test-migration phase 3), because they reach into VM globals that this
-  phase removes. The feature tests are the safety net from here.
+- **Prerequisite (met, Post-v0.239.1):** the legacy gates are retired (test-migration phase 3, `830af1e`), because they
+  reached into VM globals that this phase removes. The feature tests are the safety net from here.
 - Each file becomes an ES module with explicit imports and exports. The 154 top-level variables move into explicit state
   modules. One `globals.ts` registers exactly the functions the 183 inline handlers call; a test lists every handler name
   in the markup and in the HTML strings and fails if any is missing.
@@ -308,8 +308,9 @@ build of 49 source files under `app/src/legacy/src/`, byte for byte, and the fil
 
 ## 6. How it fits with the work in flight
 
-- **Test migration phase 2** (feature tests for the 104 legacy gates) keeps going. Its `.js` files become `.ts` in
-  phase A. Phase 3, deleting the legacy gates, must finish before phase C.
+- **Test migration phases 2 and 3 are done** (Post-v0.239.1): every gate row is held by a feature test or dropped for a
+  written reason, and the legacy suite is deleted (`830af1e`), so phase C may start. 64 ported test files still carry
+  `@ts-nocheck` (`docs/test-migration.md`, Typing debt).
 - **Releases** continue between phases. From phase B on, builder edits `app/src/legacy/src/*`, never the root
   `index.html`; from phase D on it edits TypeScript.
 - **Process docs** (CLAUDE.md, the agent files, the skills) are updated at the end of each phase to say where code lives
@@ -318,7 +319,7 @@ build of 49 source files under `app/src/legacy/src/`, byte for byte, and the fil
 | Phase | Size (rough) | Behaviour risk | Proof |
 |---|---|---|---|
 | A (done) | 1 session | none (no app change) | tests pass as TypeScript, the type check green |
-| B | 1–2 sessions | none | byte-identical rebuild |
+| B (done) | 1–2 sessions | none | byte-identical rebuild |
 | C | 2–4 sessions | low | feature tests, snapshots, 0% e2e parity, device check |
 | F | 1 session | low | deploy proof reads the live built version |
 | D | many, incremental | low per module | strict types, tests import `@ia/core`, snapshots unchanged |

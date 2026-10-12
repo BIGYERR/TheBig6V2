@@ -407,7 +407,7 @@ Before the first beat the kind is guessed from the URL (localhost and LAN addres
 as heroku). The demo page at `/client/` shows both, as the app's debug section will.
 
 It is **not in `index.html` yet**, on purpose. `index.html` is the shipped app, so the snippet lands through a
-version build with the usual gates (`ia-version` bump, `tests/gate.sh`, deploy proof), in its own chat. That build:
+version build with the usual proof (`ia-version` bump, its feature tests, CI, deploy proof). That build:
 
 1. pastes `ia-link.js` into the inline script with `IA_BACKEND_URL` set to the Heroku URL from setup, and the dot's
    two CSS rules plus `<span id="iaLinkDot">` into the top bar;
