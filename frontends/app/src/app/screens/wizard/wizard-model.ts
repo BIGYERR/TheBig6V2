@@ -9,7 +9,7 @@ export const WIZARD_STEPS = ['primary', 'profile', 'equipment', 'cardio_goal', '
 export type WizardStep = (typeof WIZARD_STEPS)[number];
 
 /** The steps the Wizard component draws; the rest are still drawn by the legacy renderWizardStep. */
-export const MOVED_STEPS: ReadonlySet<string> = new Set(['primary', 'profile', 'equipment']);
+export const MOVED_STEPS: ReadonlySet<string> = new Set(['primary', 'profile', 'equipment', 'lifting_focus', 'days', 'name']);
 
 /** The draft, as far as the moved steps read it. */
 export interface WizardDraft {
@@ -18,6 +18,13 @@ export interface WizardDraft {
   ageBracket?: string;
   unit?: string;
   equipment?: string;
+  liftingFocus?: string;
+  cardioTypes?: string[];
+  cardioGoals?: Record<string, { id?: string; label?: string } | undefined>;
+  restDays?: string[];
+  name?: string;
+  startDate?: string;
+  raceDate?: string;
 }
 
 /** The shell: the progress bar's width, the step count, and the next button's words. */
@@ -90,4 +97,110 @@ export function equipmentChoices(d: WizardDraft): Choice[] {
     { id: 'crossfit', icon: '🤸', label: 'CrossFit Box', desc: 'Barbells, rig, bumpers, kettlebells, rower/bike, wall balls, bands' },
     { id: 'bodyweight', icon: '👤', label: 'Bodyweight only', desc: 'You, the floor, and something to pull on. No weights.' },
   ].map((c) => ({ ...c, sel: d.equipment === c.id }));
+}
+
+/** A lifting focus, as the legacy LIFTING_OPTIONS listed it. */
+export interface LiftOption {
+  id: string;
+  icon: string;
+  label: string;
+  desc: string;
+}
+
+/** The lifting focus step: the focuses for the path, and on a lifting-first program the optional cardio add-on. */
+export function liftingView(d: WizardDraft, options: { body: LiftOption[]; event: LiftOption[] }): {
+  subtitle: string;
+  choices: Choice[];
+  addOn: { sports: { id: string; icon: string; label: string; sel: boolean }[]; liftOnly: boolean } | null;
+} {
+  const isEvent = d.primaryPath === 'event';
+  const types = d.cardioTypes || [];
+  return {
+    subtitle: isEvent ? 'Lifting supports your cardio goal — it should not compete with it.' : 'This is your primary focus. Cardio is optional and added next.',
+    choices: options[isEvent ? 'event' : 'body'].map((o) => ({ ...o, sel: d.liftingFocus === o.id })),
+    addOn: d.primaryPath === 'body'
+      ? {
+        sports: [{ id: 'run', icon: '🏃', label: 'Running' }, { id: 'bike', icon: '🚴', label: 'Cycling' }, { id: 'swim', icon: '🏊', label: 'Swimming' }].map((t) => ({ ...t, sel: types.includes(t.id) })),
+        liftOnly: !types.length,
+      }
+      : null,
+  };
+}
+
+/** The week as the legacy ALL_DAYS_ORDER runs it, Sunday first. */
+export const ALL_DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
+const DAY_SHORT: Record<string, string> = { sun: 'SU', mon: 'MO', tue: 'TU', wed: 'WE', thu: 'TH', fri: 'FR', sat: 'SA' };
+
+/** What the days step reads beside the draft: the advisories, the floor, and the goals' names. */
+export interface DaysInput {
+  advisories: string[];
+  minDays: number;
+  goalLabel(id: string | undefined): string;
+}
+
+/** The days step: each day training or rest, the days the floor locks, the count, and why the floor holds. */
+export function daysView(d: WizardDraft, i: DaysInput): {
+  days: { key: string; short: string; rest: boolean; blocked: boolean }[];
+  count: string;
+  floor: { reason: string | null; min: number } | null;
+  advisories: string[];
+} {
+  const rest = d.restDays || [];
+  const train = ALL_DAYS.filter((x) => !rest.includes(x));
+  const atFloor = train.length <= i.minDays;
+  const labels: string[] = [];
+  (d.cardioTypes || []).forEach((t) => {
+    const g = (d.cardioGoals || {})[t];
+    if (g) labels.push(i.goalLabel(g.id));
+  });
+  return {
+    days: ALL_DAYS.map((x) => ({ key: x, short: DAY_SHORT[x]!, rest: rest.includes(x), blocked: !rest.includes(x) && atFloor })),
+    count: train.length + ' training day' + (train.length === 1 ? '' : 's'),
+    floor: atFloor ? { reason: labels.length ? labels.join(' + ') : null, min: i.minDays } : null,
+    advisories: i.advisories.length && !atFloor ? i.advisories : [],
+  };
+}
+
+/** The lifting focus as the summary names it. */
+export const LIFT_LABELS: Record<string, string> = {
+  strength: 'Strength', hypertrophy: 'Size', fatloss: 'Fat Loss', balanced: 'Balanced',
+  support_strength: 'Strength Support', support_athletic: 'Athletic Support', support_prevention: 'Injury Prevention',
+};
+const PATH_LABELS: Record<string, string> = { event: 'Race / Event', body: 'Strength / Physique', both: 'Hybrid' };
+const EQUIP_LABELS: Record<string, string> = {
+  home_full: 'Home Full', home_basic: 'Home Basic', commercial: 'Commercial Gym', crossfit: 'CrossFit Box', bodyweight: 'Bodyweight only', minimal: 'Minimal / Travel',
+};
+
+/** What the name step reads beside the draft, each from its legacy helper. */
+export interface NameInput {
+  /** The program's length in weeks. */
+  weeks: number;
+  /** The cardio row's markup: each sport's icon, name and goal, or "Lift only". */
+  cardio: string;
+  /** The race date row's words, when the program is for a race. */
+  raceRow: string | null;
+  /** The resolved start's summary words. */
+  startSummary: string;
+  /** On a race-aligned program: the derived start and the copy and pips under it. */
+  aligned: { start: string; warn: boolean; copy: string; pips: string } | null;
+  /** Otherwise: the start date field's value and the copy under it. */
+  resolveCopy: string;
+}
+
+/** The name step's summary rows (a row's value may be markup, as the legacy wrote it). */
+export function nameSummary(d: WizardDraft, i: NameInput): { k: string; v: string }[] {
+  const train = ALL_DAYS.filter((x) => !(d.restDays || []).includes(x));
+  return [
+    { k: 'Path', v: String(PATH_LABELS[d.primaryPath || '']) },
+    ...(i.raceRow !== null ? [{ k: 'Race date', v: i.raceRow }] : []),
+    { k: 'Lifting', v: LIFT_LABELS[d.liftingFocus || ''] || String(d.liftingFocus) },
+    { k: 'Cardio', v: i.cardio },
+    { k: 'Program length', v: i.weeks + (i.weeks === 1 ? ' week' : ' weeks') },
+    { k: 'Start date', v: '<span id="sumStartDate">' + i.startSummary + '</span>' },
+    { k: 'Training days', v: train.map((x) => DAY_SHORT[x]).join(' · ') },
+    { k: 'Rest days', v: (d.restDays || []).length ? (d.restDays || []).map((x) => DAY_SHORT[x]).join(' · ') : 'None' },
+    { k: 'Experience', v: String(d.experience) },
+    { k: 'Age range', v: String(d.ageBracket) },
+    { k: 'Equipment', v: EQUIP_LABELS[d.equipment || ''] || String(d.equipment) },
+  ];
 }

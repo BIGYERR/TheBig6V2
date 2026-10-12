@@ -46,6 +46,8 @@ export interface Helpers {
   tapCard(label: string): Promise<void>;
   /** Whether the wizard card whose label reads `label` is the one chosen. */
   cardSelected(label: string): Promise<boolean>;
+  /** Taps the wizard's rest-day toggle for a weekday ('wed'), found by its two letters. */
+  tapRest(key: string): Promise<void>;
 }
 
 /** Values one step leaves for a later one (a sheet's id, found by tapping, then closed after the screenshot). */
@@ -226,6 +228,16 @@ export function helpers(page: Page): Helpers {
       await card.click();
       await sleep(SETTLE_MS);
     },
+    async tapRest(key) {
+      const short = key.slice(0, 2).toUpperCase();
+      for (const day of await page.$$('#wizardBody .day-toggle')) {
+        if ((await day.$eval('div', (e) => (e.textContent ?? '').trim())) !== short) continue;
+        await day.click();
+        await sleep(SETTLE_MS);
+        return;
+      }
+      throw new Error(`the wizard shows no ${short} toggle`);
+    },
     async cardSelected(label) {
       return (await wizardCard(page, label)).evaluate((e) => e.classList.contains('selected'));
     },
@@ -315,8 +327,8 @@ const STRENGTH: readonly Step[] = [
     async run(t) {
       await t.tap('#wizardNext');
       await t.expectText('#wizardBody', 'Lifting focus');
-      await t.tap(`[onclick*="liftingFocus='balanced'"]`);
-      await t.tap(`[onclick="toggleCardioTypeSport('run')"]`);
+      await t.tapCard('Balanced');
+      await t.tapCard('Running');
     },
   },
   {
@@ -325,20 +337,34 @@ const STRENGTH: readonly Step[] = [
     async run(t) {
       await t.tap('#wizardNext');
       await t.expectText('#wizardBody', 'Rest days');
-      await t.tap(`[onclick="toggleRestDay('wed')"]`);
-      await t.tap(`[onclick="toggleRestDay('sun')"]`);
+      await t.tapRest('wed');
+      await t.tapRest('sun');
       await t.expectText('#wizardBody', '5 training days');
     },
   },
   {
     id: 'wizard-name',
     page: 'New program: name and start',
-    async run(t, page) {
+    async run(t, page, state) {
       await t.tap('#wizardNext');
       await t.expectText('#wizardBody', 'Name your program');
       await t.tap('#wizardBody input[type=text]');
       await page.keyboard.type(PROGRAM_NAME);
       await t.expectText('#wizardNext', 'Generate');
+      // A Friday start (the name step is an Angular component in the app since phase E's nineteenth step): the line
+      // under the date and the summary's start row change, and nothing else is drawn again. The photograph shows it.
+      state['startCopy'] = await t.text('#startResolve');
+      state['startRow'] = await t.text('#sumStartDate');
+      await t.setValue('#wizStartDate', '2026-10-09');
+      await t.expectText('#sumStartDate', 'Fri, Oct 9, 2026');
+      if ((await t.text('#startResolve')) === state['startCopy']) throw new Error('the start explanation did not change with the date');
+      if ((await page.$eval('#wizardBody input[type=text]', (e) => (e as HTMLInputElement).value)).endsWith(PROGRAM_NAME) === false) throw new Error('the name was lost when the date changed');
+    },
+    async after(t, _page, state) {
+      // Back to today, so the journey goes on with the program it always built.
+      await t.setValue('#wizStartDate', '2026-10-07');
+      if ((await t.text('#startResolve')) !== stored(state, 'startCopy')) throw new Error('the start explanation did not come back');
+      if ((await t.text('#sumStartDate')) !== stored(state, 'startRow')) throw new Error('the summary start did not come back');
     },
   },
   {
@@ -754,9 +780,9 @@ const RACE: readonly Step[] = [
     page: 'Race: name and start',
     async run(t) {
       await t.tap('#wizardNext');
-      await t.tap(`[onclick*="liftingFocus='support_prevention'"]`);
+      await t.tapCard('Injury Prevention');
       await t.tap('#wizardNext');
-      await t.tap(`[onclick="toggleRestDay('mon')"]`);
+      await t.tapRest('mon');
       await t.tap('#wizardNext');
       await t.nameProgram('E2E Race');
       await t.expectText('#wizardBody', 'Your 10K is Sun, Nov 29');
@@ -858,7 +884,7 @@ const TEST: readonly Step[] = [
     page: 'Test: name and start',
     async run(t) {
       await t.tap('#wizardNext');
-      await t.tap(`[onclick*="liftingFocus='support_strength'"]`);
+      await t.tapCard('Strength Support');
       await t.tap('#wizardNext');
       await t.tap('#wizardNext');
       await t.nameProgram('E2E Test');

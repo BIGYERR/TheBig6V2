@@ -402,3 +402,22 @@ what is stored.
   `cardSelected`, new), the legacy `onclick` attributes being gone from the moved steps; all four journeys that build a
   program photograph the moved steps at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.27 moves the wizard's lifting focus, days and name steps
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.27.
+- **Moved:** the steps "Lifting focus" (the focuses for the path, and on a lifting-first program the optional cardio
+  add-on with Lift Only), "Rest days" (the toggles, the floor's lock and why it holds, the advisories) and "Name your
+  program" (the name, the start date or the race-derived start with its copy and pips, the summary): `wizard.ts` and
+  `wizard-model.ts` (`liftingView`, `daysView`, `nameSummary`). The legacy readers stay legacy: `LIFTING_OPTIONS`,
+  `toggleCardioTypeSport`, `toggleRestDay`, `getDayAdvisories`, `getMinTrainDays`, `goalLabel`, `wizardTestPin`,
+  `calcProgramLength`, `resolveStartDate`, `startResolveCopy`, `startSummaryVal`, `wizardAlignment`,
+  `alignedStartCopy`, `alignedPipsHTML`, `raceCountdown`. The name step still writes its default name and start into
+  the draft before it reads, as the legacy did. The component takes over `updateStartResolve`: a start date change
+  repaints only the explanation and the summary's start row, so the native date picker stays open (the legacy wrote
+  the two nodes by id for the same reason). Only the cardio goal step is left to the legacy renderer.
+- **Tests:** `frontends/app/test/unit/wizard.test.ts` grows to 7 (the focuses and the add-on, the days and the floor,
+  the summary). The e2e taps a rest day by its two letters (`tapRest`, new) and a focus by its words; the strength
+  journey's name step now moves the start to a Friday, checks the explanation and the summary's start row change and
+  the typed name stays, photographs it, and puts the start back before generating. 68/68 at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
