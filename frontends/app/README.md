@@ -87,13 +87,19 @@ The generated `app.js` is byte-identical to what `tests/harness.js` extracts and
 At runtime, `ia-root` renders `ia-legacy-host` (`src/app/legacy/legacy-host.ts`), which:
 1. waits for Cordova's `deviceready` inside the native app (`src/app/core/platform.ts`; a browser skips this);
 2. writes the markup into its host element (not through `[innerHTML]`, so the inline `onclick` handlers survive);
-3. loads `legacy/app.js` as a classic script, so its top-level functions stay globals for those handlers.
+3. loads `legacy/app.js` as a classic script, so its top-level functions stay globals for those handlers;
+4. puts each screen phase E has moved (`src/app/screens/screens.ts`, `MOVED_SCREENS`) inside its legacy screen element,
+   in place of the legacy content; the legacy navigation still shows and hides the element.
 
 `LegacyBridge` (`src/app/legacy/legacy-bridge.ts`) is the seam for moving screens into native Angular components one
-at a time. It gives typed access to the legacy globals, the source version and its sha256.
+at a time. It gives typed access to the legacy globals (`call` for a function, `global` for a top-level `let` or
+`const` such as `activeProg`), the source version and its sha256.
 
-**This is a hosted port, not a rewrite.** Every screen is still the original code. Moving a screen into an Angular
-component is follow-up work, and it goes through the repo's normal build process. Each moved screen keeps the e2e
+**A hosted port, moving screen by screen** (architecture phase E, `docs/decisions/angular-screens.md`). The bug report
+is a component (`src/app/screens/bug-report/`, v0.239.8); every other screen is still the original code. A screen's
+logic sits apart from Angular in `<screen>-model.ts` and is tested by node --test (`test/unit/<screen>.test.ts`;
+`src/app/package.json` marks the app's TypeScript as ES modules for it). Moving a screen goes through the repo's normal
+build process. Each moved screen keeps the e2e
 parity check below as its proof.
 
 ## Commands

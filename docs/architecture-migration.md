@@ -350,9 +350,15 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
 - **Done when:** the engine is strict TypeScript in `core/src/engine`, the page and the tests build programs from it, and
   no engine-only test boots the inline script.
 
-### Phase E: screens into Angular components (one screen per release where possible)
+### Phase E: screens into Angular components (one screen per release; in progress from v0.239.8, `docs/decisions/angular-screens.md`)
 - Through `LegacyBridge`, each screen becomes a component (`.ts`, `.html`, `.css`) using `@ia/core` services, and its
   string-built HTML and inline handlers disappear.
+- **How (v0.239.8):** the Angular app keeps hosting the legacy app whole and, once it has booted, puts each moved
+  screen's component inside that screen's element (`src/app/screens/screens.ts`, `MOVED_SCREENS`); the legacy
+  navigation still shows and hides it. The single-file page keeps the legacy screen until Pages serves the Angular build,
+  and the e2e's parity holds the two the same. The markup moves as it is first; the logic moves apart from Angular
+  (`<screen>-model.ts`) and is tested by node --test.
+- **Done:** the bug report (v0.239.8).
 - Suggested order:
   1. bug report (small, proves the pattern);
   2. rest timer;

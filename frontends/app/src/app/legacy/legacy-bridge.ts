@@ -18,6 +18,17 @@ export class LegacyBridge {
     this.booted.set(true);
   }
 
+  /**
+   * Reads a legacy top-level binding by name: a function, or a `let` or `const` (`activeProg`, `currentWeek`,
+   * `IA_VERSION`), which a classic script keeps in the global scope but not on globalThis. An indirect eval runs in that
+   * scope; the name must be a plain identifier, so nothing but a name is ever evaluated. Throws before the app has booted.
+   */
+  global<T = unknown>(name: string): T {
+    if (!this.booted()) throw new Error(`legacy app not booted; cannot read ${name}`);
+    if (!/^[A-Za-z_$][\w$]*$/.test(name)) throw new Error(`not a legacy binding name: ${name}`);
+    return (0, eval)(name) as T;
+  }
+
   /** Calls a legacy global function by name; throws if the app has not booted or the name is not a function. */
   call<T = unknown>(name: string, ...args: unknown[]): T {
     if (!this.booted()) throw new Error(`legacy app not booted; cannot call ${name}`);

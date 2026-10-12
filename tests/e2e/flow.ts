@@ -388,6 +388,10 @@ const STRENGTH: readonly Step[] = [
       await t.screen('screenBugs');
       if (!(await t.count('#bugSubmit'))) throw new Error('the bug form has no send button');
       await t.expectText('#bugVersion', 'BUILD v');
+      // Sending with nothing typed asks for the text and posts nothing (the screen is an Angular component in the app
+      // since phase E's first step, the legacy script's in the single-file page: both answer the same).
+      await t.tap('#bugSubmit');
+      await t.expectText('#bugStatus', 'Type what went wrong first.');
     },
   },
   {
