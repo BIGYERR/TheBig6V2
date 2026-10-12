@@ -131,3 +131,21 @@ what is stored.
   working sets). The e2e gains an add-sheet step on both builds (the strength journey's thirteenth): open a day, its
   `+`, the sheet in the photograph, then a pick that lands on the day under "Added by you".
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.14 moves the change-a-goal sheet's body
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.14.
+- **Moved:** `#goalBody` inside `#goalOverlay` (the overlay's frame and its Back button stay legacy markup):
+  `src/app/screens/goal-sheet/goal-sheet.ts` (the heading, the option rows, the decision panel, its target fields and
+  buttons) and `goal-sheet-model.ts` (which options show, which are bigger, and the decision's title, text, fields and
+  button labels, each the legacy `renderGoalSheet`'s). The draft stays the legacy `_goalDraft`; picking, typing and
+  committing are still the legacy `selectGoalOpt`, `_goalSetInput`, `_goalInputsValid` and `commitGoalChange`.
+  `renderGoalSheet` and `_goalRefreshCommit` reach the component through `LegacyBridge.provide`; a keystroke redraws
+  only the commit button's state, so a field keeps its caret, and a pick draws the decision panel anew, so a field typed
+  for one goal never shows under the next (the legacy write cleared it the same way).
+- **Tests:** `frontends/app/test/unit/goal-sheet.test.ts` (6: the heading and option marks, the hybrid exclusions, a
+  step up started and fresh, a step down with the pace fields, a program with no goal and a time goal, a pick not on
+  offer). The e2e gains a goal-sheet step on both builds (the strength journey's twenty-first): the run goal's pencil,
+  the sheet in the photograph with the pace goal picked, then the switch held shut until a distance and a time are
+  typed, the typed distance kept, and Keep closing the sheet.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

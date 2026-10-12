@@ -488,6 +488,36 @@ const STRENGTH: readonly Step[] = [
     },
   },
   {
+    id: 'goal-sheet',
+    page: 'Change the run goal: the sheet, a pace goal picked, its targets typed, then kept',
+    async run(t, page) {
+      // The sheet's body is an Angular component in the app since phase E's seventh step, the legacy script's in the
+      // single-file page: both answer the same. The open card's run row carries the pencil.
+      await t.tap('#progList .prog-card.active-prog [aria-label="Change Run goal"]');
+      await t.overlayOpen('goalOverlay');
+      await t.expectText('#goalBody', 'CHANGE RUN GOAL');
+      const labels = await page.$$eval('#goalBody .goal-option-label', (es) => es.map((e) => e.textContent ?? ''));
+      const pace = labels.findIndex((l) => l.startsWith('Hit a Pace'));
+      if (pace < 0) throw new Error(`the sheet offers no pace goal: ${labels.join(' | ')}`);
+      await t.tapNth('#goalBody .goal-option', pace);
+      await t.expectText('#goalBody', 'Switch to Hit a Pace / Time Goal');
+    },
+    async after(t, page) {
+      // The switch waits for a distance and a time; typing them lets it go ahead, and the field keeps what was typed.
+      const commit = () => page.$eval('#goalCommitBtn', (e) => (e as HTMLElement).style.opacity);
+      if ((await commit()) !== '0.4') throw new Error('the switch was open before the targets were typed');
+      await t.typeInto('#goalBody input[placeholder="dist e.g. 1.5"]', '1.5');
+      if ((await commit()) !== '0.4') throw new Error('the switch opened on a distance alone');
+      await t.typeInto('#goalBody input[placeholder="min"]', '10');
+      if ((await commit()) !== '1') throw new Error('the switch stayed shut with a distance and a time typed');
+      const typed = await page.$eval('#goalBody input[placeholder="dist e.g. 1.5"]', (e) => (e as HTMLInputElement).value);
+      if (typed !== '1.5') throw new Error(`the distance field shows "${typed}" after the time was typed`);
+      // Keeping the current goal closes the sheet and changes nothing.
+      await t.tap('#goalBody .prog-action-btn:not(#goalCommitBtn)');
+      if ((await t.openOverlays()).includes('goalOverlay')) throw new Error('the goal sheet stayed open after Keep');
+    },
+  },
+  {
     id: 'relaunch',
     page: 'This Week after a relaunch (storage kept)',
     async run(t, page) {
