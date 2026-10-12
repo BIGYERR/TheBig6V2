@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The mile anchor: the mile time a run plan's paces are read from, and what the athlete is told about it.
 //   The anchor sentence on the program card and its clipboard line (V202 E5/E6, D119 provenance, D189 defaults):
 //     a pace goal scopes its claim to week 1, a chart goal keeps the program-wide claim, run_base names its easy runs.
@@ -15,37 +14,38 @@ import crypto from 'node:crypto';
 import { fixtures, progDigest } from '../support/app.ts';
 import { loadAppAt, clone, stripComments } from '../support/pace-clock.ts';
 import * as L from '../support/pace-clock-lattices.ts';
+import type { CardioGoal } from '@ia/core';
 const IA = loadAppAt(new Date(2026, 9, 11, 12, 0, 0));
-const strip = (h) => String(h || '').replace(/<[^>]+>/g, '');
+const strip = (h: unknown): string => String(h || '').replace(/<[^>]+>/g, '');
 const MID_DASH = /\s[—–-]\s/;
-const midDash = (s) => /[A-Za-z0-9,)]\s*[—-]\s*[A-Za-z0-9(]/.test(s);
+const midDash = (s: string) => /[A-Za-z0-9,)]\s*[—-]\s*[A-Za-z0-9(]/.test(s);
 const COPY_RX = /\w\s?[-–—]\s?\w/;
-const ASSERTED = []; // every athlete-facing string this file asserts, for the copy test at the end
-const keep = (s) => typeof s === 'string' && s && ASSERTED.push(s);
+const ASSERTED: string[] = []; // every athlete-facing string this file asserts, for the copy test at the end
+const keep = (s: unknown) => typeof s === 'string' && s && ASSERTED.push(s);
 
 const TAIL_PACE = ' Week 1 runs off this row. Every week after it moves toward your goal.';
 const TAIL_CHART = ' Every pace in this program comes from this row.';
 const TAIL_BASE = ' Your easy runs take their pace and their ceiling from this row. Benchmark runs prescribe no pace.';
 
 /** The card sentence and clipboard line the app renders for a cfg (runAnchorInfo, runAnchorSentence, runAnchorLine). */
-const say = (cfg) => {
+const say = (cfg: Record<string, any>): { s: string; l: string; kind: string } | null => {
   const a = IA.runAnchor(cfg);
   return a ? { s: strip(IA.sentence(a)), l: strip(IA.line(a)), kind: a.kind } : null;
 };
 IA.runAnchor = IA.eval('runAnchorInfo');
 IA.sentence = IA.eval('runAnchorSentence');
 IA.line = IA.eval('runAnchorLine');
-const runGoal = (g, over) => L.prtTing(Object.assign({ cardioGoals: { run: g } }, over || {}));
+const runGoal = (g: Partial<CardioGoal>, over?: Record<string, unknown>) => L.prtTing(Object.assign({ cardioGoals: { run: g } }, over || {}));
 const PINNED = runGoal({
   id: 'run_pace_goal', label: 'Hit a Pace / Time Goal', paceUnit: 'mi', baselineDist: '3', baseline: '3mi', targetDist: '1.5', targetMins: '10',
   targetSecs: '30', targetTime: '10:30', mileBestMins: '8', mileBestSecs: '15', mileBestSrc: { kind: 'entered' },
 });
 
 test('a pace goal\'s card says the anchor sets week 1 only; HALF_MANNY\'s chart card keeps the program-wide claim', () => {
-  const pv = say(PINNED);
+  const pv = say(PINNED)!;
   assert.equal(pv.s, 'Anchored on an 8:15 mile, the time you entered.' + TAIL_PACE);
   assert.ok(pv.l.includes(TAIL_PACE.trim()), 'the clipboard line carries the week 1 scope');
-  const mv = say(fixtures.HALF_MANNY);
+  const mv = say(fixtures.HALF_MANNY)!;
   assert.equal(mv.s, 'Anchored on a 10:30 mile, the time you entered.' + TAIL_CHART);
   keep(pv.s);
   keep(pv.l);
@@ -80,12 +80,12 @@ test('every provenance form on every chart goal takes its own tail, never the ot
 });
 
 // D119: the provenance sentence, every kind typed in full, on a hand-built anchor record.
-const A = (o) => Object.assign({ anchorSec: 630, rawSec: 630, clamped: null, row: {}, kind: 'entered', exp: 'intermediate', prog: '', n: 0, wk: 0, from: null, race: 'half', goalId: 'run_half' }, o);
-const sentenceOf = (a) => {
+const A = (o: Record<string, unknown>) => Object.assign({ anchorSec: 630, rawSec: 630, clamped: null, row: {}, kind: 'entered', exp: 'intermediate', prog: '', n: 0, wk: 0, from: null, race: 'half', goalId: 'run_half' }, o);
+const sentenceOf = (a: unknown) => {
   try {
     return IA.sentence(a);
   } catch (e) {
-    return 'THREW ' + e.message;
+    return 'THREW ' + (e as Error).message;
   }
 };
 
@@ -126,21 +126,21 @@ test('the entered, seeded, default and clamped forms read as typed; a clamp beat
 const GS = loadAppAt(new Date(2026, 9, 11, 12, 0, 0));
 GS.eval('renderGoalSheet = function(){}; renderProgList = function(){}; showToast = function(){};');
 const SRC_EDIT = { kind: 'edited', wk: 3, at: '2026-09-01', from: { kind: 'entered', mins: '11', secs: '00' } };
-function seedProgram(runGoalOver) {
+function seedProgram(runGoalOver?: Partial<CardioGoal>) {
   const cfg = clone(fixtures.HALF_MANNY);
   cfg.cardioGoals.run = Object.assign({ id: 'run_half', label: 'Half Marathon', baselineDist: '5', baseline: '5mi', mileBestMins: '10', mileBestSecs: '30', mileBestSrc: clone(SRC_EDIT) }, runGoalOver || {});
   cfg.cardioTypes = ['run', 'bike'];
   cfg.cardioGoals.bike = { id: 'bike_ftp', label: 'Improve FTP / Power', baseline: '200w', baselineDist: '20' };
   GS.localStorage.setItem('ia_programs', JSON.stringify([{ id: 'gR', name: 'THE HALF MANNY', totalWeeks: 14, startDate: '2026-09-07', cfg }]));
 }
-function switchGoal(sport, sel, inputs) {
+function switchGoal(sport: string, sel: string, inputs?: Record<string, string>) {
   GS.eval('openGoalSheet')('gR', sport);
   GS.eval('selectGoalOpt')(sel);
   for (const [k, v] of Object.entries(inputs || {})) GS.eval('_goalSetInput')(k, v);
   GS.eval('commitGoalChange')();
-  return JSON.parse(GS.localStorage.getItem('ia_programs'))[0].cfg;
+  return JSON.parse(GS.localStorage.getItem('ia_programs')!)[0].cfg;
 }
-const weeksDigest = (prog) => crypto.createHash('sha256').update(JSON.stringify(prog.weeks)).digest('hex').slice(0, 16);
+const weeksDigest = (prog: { weeks: unknown }) => crypto.createHash('sha256').update(JSON.stringify(prog.weeks)).digest('hex').slice(0, 16);
 
 test('switching the run goal keeps the mile and its provenance, still drops the baseline, and writes no target the goal does not need', () => {
   seedProgram();
@@ -167,7 +167,7 @@ test('a run goal with no mile gains no phantom anchor when switched', () => {
 
 test('switching the bike goal leaves the run goal byte-identical and gives the bike no mile', () => {
   seedProgram();
-  const before = JSON.stringify(JSON.parse(GS.localStorage.getItem('ia_programs'))[0].cfg.cardioGoals.run);
+  const before = JSON.stringify(JSON.parse(GS.localStorage.getItem('ia_programs')!)[0].cfg.cardioGoals.run);
   const after = switchGoal('bike', 'bike_50');
   assert.equal(after.cardioGoals.bike.id, 'bike_50');
   assert.equal(JSON.stringify(after.cardioGoals.run), before);
@@ -179,10 +179,10 @@ test('switching the bike goal leaves the run goal byte-identical and gives the b
 test('half, then a 1.5 mi pace goal, then half again rebuilds the original program', () => {
   // run_15_under10 is the pre-alias id of the 1.5 mi pace goal; the picker never offers it, so the round trip uses
   // run_pace_goal, 1.5 mi in 10:00.
-  assert.ok(!GS.eval('CARDIO_GOALS_BY_TYPE').run.some((o) => o.id === 'run_15_under10'), 'run_15_under10 is not a picker option');
+  assert.ok(!GS.eval('CARDIO_GOALS_BY_TYPE').run.some((o: { id: string }) => o.id === 'run_15_under10'), 'run_15_under10 is not a picker option');
   assert.match(GS.html, /_GOAL_ALIAS\s*=\s*\{[^}]*run_15_under10:\s*'run_pace_goal'/, 'the app aliases run_15_under10 to run_pace_goal');
   seedProgram();
-  const cfg0 = JSON.parse(GS.localStorage.getItem('ia_programs'))[0].cfg;
+  const cfg0 = JSON.parse(GS.localStorage.getItem('ia_programs')!)[0].cfg;
   const d0 = weeksDigest(GS.buildProgram(clone(cfg0)));
   const cfg1 = switchGoal('run', 'run_pace_goal', { targetDist: '1.5', targetMins: '10', targetSecs: '0', paceUnit: 'mi' });
   assert.equal(cfg1.cardioGoals.run.id, 'run_pace_goal');
@@ -205,7 +205,7 @@ L.beginnerMileLatticeTests(B, progDigest, 'sample (seeds 1000 and 1037)', [1000,
 
 test('a beginner\'s 1.5 mi pace goal in 13:30 runs 9 weeks from a 9:00 mile and 11 weeks with none', () => {
   // 9:00 is 540 s/mi = the goal pace, gap 0: the beginner base floor, 9. No mile: (690 - 540) / 3 = 50 weeks, capped at 11.
-  const len = (mile) => B.buildProgram(L.mileCfg('run_pace_goal', 'beginner', 1000, mile, ['13', '30'])).totalWeeks;
+  const len = (mile: number) => B.buildProgram(L.mileCfg('run_pace_goal', 'beginner', 1000, mile, ['13', '30'])).totalWeeks;
   assert.equal(len(540), 9);
   assert.equal(len(0), 11);
 });
@@ -228,9 +228,9 @@ test('a beginner\'s 9:00 mile reaches the pace ceiling: 1.5 mi in 10:30 runs 11 
 });
 
 test('the mile validator judges a beginner\'s mile like anyone\'s, on every run goal, and the pace goal still requires one past beginner', () => {
-  const state = (g, exp) => JSON.parse(B.eval(`JSON.stringify(_mileEntryState(${JSON.stringify(g)}, ${JSON.stringify(exp)}))`));
+  const state = (g: Partial<CardioGoal>, exp: string) => JSON.parse(B.eval(`JSON.stringify(_mileEntryState(${JSON.stringify(g)}, ${JSON.stringify(exp)}))`));
   const goals = ['run_pace_goal', 'run_5k', 'run_10k', 'run_half', 'run_base'];
-  const mile = (id, mm, ss) => ({ id, mileBestMins: mm, mileBestSecs: ss });
+  const mile = (id: string, mm: string, ss: string) => ({ id, mileBestMins: mm, mileBestSecs: ss });
   const UNDER3 = 'Under 3:00 is not a mile time. The world record is 3:43. Check the entry.';
   const OVER25 = 'Over 25:00 reads as a walk, not a run. Check the entry.';
   const SLOW = 'At 13:00 your paces come from the 12:00 row, the chart’s slowest. Consider a base block first.';
@@ -279,7 +279,7 @@ L.disclosureLatticeTests(D, 'sample (seed 1000, rest Sunday and Wednesday)', [10
 
 test('the hand defaults format to 11:30, 9:30 and 7:30, and a no-mile build equals itself', () => {
   assert.deepEqual(L.DEF_MILE, { beginner: '11:30', intermediate: '9:30', advanced: '7:30' });
-  for (const [e, s] of Object.entries({ beginner: 690, intermediate: 570, advanced: 450 })) assert.equal(Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'), L.DEF_MILE[e]);
+  for (const [e, s] of Object.entries({ beginner: 690, intermediate: 570, advanced: 450 })) assert.equal(Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'), (L.DEF_MILE as Record<string, string>)[e]);
   const c0 = L.discloseCfg('run_5k', 'intermediate', 0, 1000, ['sun', 'wed']);
   assert.equal(progDigest(D.buildProgram(clone(c0))), progDigest(D.buildProgram(clone(c0))));
 });
@@ -294,16 +294,18 @@ test('an intermediate or advanced pace goal with no mile is refused with the req
 });
 
 // The program card (progDetailHTML) and its clipboard lines (progSelLines), the production renderers.
-function card(cfg) {
+function card(cfg: Record<string, any>) {
   const html = String(D.eval('progDetailHTML')({ id: 'g226', name: 'M', cfg: clone(cfg) }));
   const grp = /<div class="det-label"[^>]*>Run paces([\s\S]*?)<div class="det-src">([\s\S]*?)<\/div><\/div>/.exec(html);
   const chips = grp ? (grp[1].match(/<div class="lc-k">([^<]*)<\/div>/g) || []).map((s) => s.replace(/<[^>]+>/g, '')) : null;
   const pencils = grp ? (grp[0].match(/aria-label="Change mile time"/g) || []).length : 0;
-  const lines = D.eval('progSelLines')({ id: 'g226', name: 'M', cfg: clone(cfg) }).filter((l) => /^Run anchor:/.test(l));
+  const lines = D.eval('progSelLines')({ id: 'g226', name: 'M', cfg: clone(cfg) }).filter((l: string) => /^Run anchor:/.test(l));
   return { sentence: grp ? strip(grp[2]) : null, chips, pencils, clip: lines.length === 1 ? lines[0] : lines.length ? 'MANY ' + lines.length : null };
 }
 // The 5K chart rows (doctrine/nikerunclub5k.txt): mile -> 5K, 10K, tempo, half, recovery per-mile paces.
-const CHART = {
+/** A 5K chart row: the 5K, 10K, tempo, half and recovery paces per mile. */
+interface ChartRow { k5: string; k10: string; tempo: string; half: string; rec: string }
+const CHART: Record<string, ChartRow> = {
   '5:00': { k5: '5:30', k10: '5:45', tempo: '6:05', half: '6:00', rec: '7:00' },
   '7:30': { k5: '8:05', k10: '8:25', tempo: '8:50', half: '8:45', rec: '9:55' },
   '9:00': { k5: '9:40', k10: '10:00', tempo: '10:30', half: '10:40', rec: '11:35' },
@@ -312,17 +314,19 @@ const CHART = {
   '11:30': { k5: '12:15', k10: '12:35', tempo: '13:00', half: '13:15', rec: '14:05' },
   '12:00': { k5: '12:40', k10: '13:05', tempo: '13:35', half: '14:05', rec: '14:30' },
 };
-const clipOf = (m, prov, keys, scope) => 'Run anchor: ' + m + ' mile (' + prov + ') → ' + keys.map(([k, v]) => k + ' ' + v).join(' / ') + (scope || '');
-const chartKeys = (m, race) => {
+const clipOf = (m: string, prov: string, keys: [string, string][], scope?: string) => 'Run anchor: ' + m + ' mile (' + prov + ') → ' + keys.map(([k, v]) => k + ' ' + v).join(' / ') + (scope || '');
+const chartKeys = (m: string, race?: boolean): [string, string][] => {
   const r = CHART[m];
-  return [['5k', r.k5], ['10k', r.k10], ['tempo', r.tempo]].concat(race ? [['half', r.half]] : []).concat([['recovery', r.rec]]);
+  const head: [string, string][] = [['5k', r.k5], ['10k', r.k10], ['tempo', r.tempo]];
+  return head.concat(race ? [['half', r.half]] : []).concat([['recovery', r.rec]]);
 };
-const DEFAULT_CELLS = [];
+const DEFAULT_CELLS: [string, string][] = [];
 for (const exp of ['beginner', 'intermediate', 'advanced']) for (const goal of ['run_5k', 'run_half', 'run_base']) DEFAULT_CELLS.push([goal, exp]);
 DEFAULT_CELLS.push(['run_pace_goal', 'beginner']);
-function wantDefault(goal, exp) {
+function wantDefault(goal: string, exp: string) {
   const m = L.DEF_MILE[exp];
-  const keys = goal === 'run_base' ? [['recovery', CHART[m].rec]] : goal === 'run_pace_goal' ? [['mile', m]].concat(chartKeys(m, false)) : chartKeys(m, goal === 'run_half');
+  const mileKey: [string, string][] = [['mile', m]];
+  const keys: [string, string][] = goal === 'run_base' ? [['recovery', CHART[m].rec]] : goal === 'run_pace_goal' ? mileKey.concat(chartKeys(m, false)) : chartKeys(m, goal === 'run_half');
   const tail = goal === 'run_pace_goal' ? TAIL_PACE : goal === 'run_base' ? TAIL_BASE : TAIL_CHART;
   return {
     sentence: `Anchored on ${L.ART_OF[exp]} ${m} mile, the ${exp} default. No mile time was entered. Tap the pencil to enter one.` + tail,
@@ -363,7 +367,7 @@ test('HALF_MANNY\'s card and clipboard read the entered form verbatim', () => {
 });
 
 test('seeded, clamped and edited forms keep their wording, and a beginner\'s entered or seeded mile is read as his', () => {
-  const F = [
+  const F: [string, string, number, Record<string, unknown>, string, string][] = [
     ['seeded 9:00', 'intermediate', 540, { kind: 'seeded', prog: 'PRIOR', n: 6 }, 'Anchored on a 9:00 mile, worked back from 6 recovery runs you logged in PRIOR.' + TAIL_CHART, clipOf('9:00', 'seeded from PRIOR, 6 logged recovery runs', chartKeys('9:00'))],
     ['clamped slow 13:00', 'intermediate', 780, { kind: 'entered' }, 'Anchored on a 12:00 mile, the 13:00 you entered is slower than the chart goes, so its slowest row is used.' + TAIL_CHART, clipOf('12:00', "entry 13:00 clamped to the chart's slowest row", chartKeys('12:00'))],
     ['clamped fast 4:30', 'advanced', 270, { kind: 'entered' }, 'Anchored on a 5:00 mile, the 4:30 you entered is faster than the chart goes, so its fastest row is used.' + TAIL_CHART, clipOf('5:00', "entry 4:30 clamped to the chart's fastest row", chartKeys('5:00'))],

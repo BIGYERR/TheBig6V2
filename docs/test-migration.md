@@ -247,17 +247,14 @@ What each gate checks is read from its header. Target files are under `tests/`.
 
 ## Typing debt
 
-Phase 2's later groups were ported from JavaScript mechanically, and 64 files opened with
-`// @ts-nocheck: ported from JavaScript in phase 2; typing pending`. They ran and passed, but the compiler did not
-check them. Each is typed with the types from `@ia/core` (never a local copy) and named interfaces for the lattices,
-tallies and surveys, the marker removed and the type check kept green; a file touched by a release is typed in that
-release. Post-v0.239.2, 56 are typed: every support file, the unit test, and all but eight test files. Typing them
-moved two things in `@ia/core`: `Cfg.raceDate` may be null, and a `CardioGoal` carries the swim time goals' current
-times (`baseMins`, `baseSecs`, `base500Mins`, `base500Secs`), which the wizard writes and the engine reads. Still open:
-
-- `tests/integration/` (7): `injury-overlays.test.ts`, `injury-plan-lens.test.ts`, `mile-anchor.test.ts`,
-  `pace-wizard.test.ts`, `run-week-layout.test.ts`, `test-length.test.ts`, `wildcard.test.ts`.
-- `tests/sweeps/` (1): `injury-overlays.test.ts`.
+Done (Post-v0.239.2). Phase 2's later groups were ported from JavaScript mechanically, and 64 files opened with
+`// @ts-nocheck: ported from JavaScript in phase 2; typing pending`: 14 support files, one unit test, 28 integration
+files and 21 sweeps. All 64 are typed and none carries the marker. Days, sections, items, cards and configs are the
+`@ia/core` types (never a local copy); every lattice row, tally, audit and survey is a named interface; values read back
+from the app's VM stay `any` only where the harness hands them over untyped. Typing them moved two things in
+`@ia/core`: `Cfg.raceDate` may be null, and a `CardioGoal` carries the swim time goals' current times (`baseMins`,
+`baseSecs`, `base500Mins`, `base500Secs`), which the wizard writes and the engine reads. A new test is written typed;
+`@ts-nocheck` is not used.
 
 ## Moved
 

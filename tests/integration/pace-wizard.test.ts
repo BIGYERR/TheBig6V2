@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The wizard's cardio goal step for a run goal: the program length header, the race-date card, the pace line and the
 // feasibility frame, and the mile field.
 //   D183 (P-SAFEPACE): the goal is the athlete's; the coach says what the block reaches from his mile ("In N weeks that
@@ -19,34 +18,39 @@ import assert from 'node:assert/strict';
 import { fixtures } from '../support/app.ts';
 import { loadAppAt, stripComments } from '../support/pace-clock.ts';
 import { wizardRig, txt } from '../support/pace-wizard.ts';
-const J = (v) => JSON.stringify(v);
+import type { App } from '../support/app.ts';
+import type { CardioGoal } from '@ia/core';
+/** The wizard rig and what its screen() reads back. */
+type Rig = ReturnType<typeof wizardRig>;
+type Screen = ReturnType<Rig['screen']>;
+const J = (v: unknown) => JSON.stringify(v);
 const RD = Date;
-const ymd = (s) => s.split('-').map(Number);
-const dayNo = (iso) => {
+const ymd = (s: string) => s.split('-').map(Number);
+const dayNo = (iso: string) => {
   const [y, m, d] = ymd(iso);
   return RD.UTC(y, m - 1, d) / 864e5;
 };
-const dow = (iso) => {
+const dow = (iso: string) => {
   const [y, m, d] = ymd(iso);
   return new RD(RD.UTC(y, m - 1, d)).getUTCDay();
 };
-const monNo = (iso) => dayNo(iso) - ((dow(iso) + 6) % 7);
+const monNo = (iso: string) => dayNo(iso) - ((dow(iso) + 6) % 7);
 const WD3 = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MON3 = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 /** The program week holding the test (week 1 holds the start); null when the test falls before the start. */
-const handWeek = (startIso, testIso) => (dayNo(testIso) < dayNo(startIso) ? null : (monNo(testIso) - monNo(startIso)) / 7 + 1);
-const handWeeksUntil = (todayIso, testIso) => Math.floor((dayNo(testIso) - dayNo(todayIso)) / 7);
-const clk = (sec) => {
+const handWeek = (startIso: string, testIso: string): number | null => (dayNo(testIso) < dayNo(startIso) ? null : (monNo(testIso) - monNo(startIso)) / 7 + 1);
+const handWeeksUntil = (todayIso: string, testIso: string) => Math.floor((dayNo(testIso) - dayNo(todayIso)) / 7);
+const clk = (sec: number): string => {
   const t = Math.round(sec);
   return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
 };
-const IMPROVE = { beginner: 3, intermediate: 3, advanced: 2 };
-const AGE_SCALE = { '18-35': 1.0, '36-54': 0.85, '55+': 0.65 };
-const DEFAULT_MILE = { beginner: 690, intermediate: 570, advanced: 450 };
+const IMPROVE: Record<string, number> = { beginner: 3, intermediate: 3, advanced: 2 };
+const AGE_SCALE: Record<string, number> = { '18-35': 1.0, '36-54': 0.85, '55+': 0.65 };
+const DEFAULT_MILE: Record<string, number> = { beginner: 690, intermediate: 570, advanced: 450 };
 const TOLERANCE = 45;
 const KM_MI = 0.621;
 /** R1 inverted, typed from the ruling, for 18-35 (age multiplier 1.0). */
-function handReach(L, exp, mileSecs, dist, unit, goalSecs) {
+function handReach(L: number, exp: string, mileSecs: number | null, dist: number, unit: string, goalSecs: number) {
   const cur = mileSecs || DEFAULT_MILE[exp];
   const improvingWeeks = Math.max(0, ((L - 1) / 1.0 - 4) / 1.25);
   const ach = cur - improvingWeeks * +(IMPROVE[exp] * AGE_SCALE['18-35']).toFixed(2);
@@ -54,8 +58,8 @@ function handReach(L, exp, mileSecs, dist, unit, goalSecs) {
   const tPace = goalSecs / mi;
   return { L, cur, ach, total: ach * mi, gap: ach - tPace, shows: tPace < cur && ach - tPace >= TOLERANCE, fromMile: !!mileSecs, exp, distLabel: dist + ' ' + unit, goalSecs };
 }
-const wk = (L) => L + (L === 1 ? ' week' : ' weeks');
-function handSentence(r) {
+const wk = (L: number) => L + (L === 1 ? ' week' : ' weeks');
+function handSentence(r: ReturnType<typeof handReach>) {
   const reach = ' In ' + wk(r.L) + ' that reaches about ' + r.distLabel + ' in ' + clk(r.total) + '. Your goal is ' + clk(r.goalSecs) + '.';
   if (r.fromMile) return 'Your mile is ' + clk(r.cur) + '.' + reach + ' Keep it or change it above.';
   return 'You have not entered a mile time. The ' + r.exp + ' default is ' + clk(r.cur) + ' per mile.' + reach + ' Enter your mile above and this updates.';
@@ -68,11 +72,11 @@ const V = {
   A3: 'You have not entered a mile time. The intermediate default is 9:30 per mile. In 11 weeks that reaches about 1.5 mi in 13:53. Your goal is 10:30. Enter your mile above and this updates.',
   A4: 'You have not entered a mile time. The beginner default is 11:30 per mile. In 11 weeks that reaches about 1.5 mi in 16:53. Your goal is 12:00. Enter your mile above and this updates.',
 };
-const CARD_TW = (w) => 'Your test is in week ' + w + '. The program ends on it. The taper lands in front of it.';
+const CARD_TW = (w: number) => 'Your test is in week ' + w + '. The program ends on it. The taper lands in front of it.';
 const CARD_TW1 = 'Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.';
 const CARD_NULL = 'Your test is before your first training day. This program starts after it and does not include it.';
-const HDR_TEST = (n) => 'Program length: ' + wk(n) + '. Your test sets it.';
-const HDR_GOAL = (n) => 'Program length: ' + wk(n) + '. Set by your longest cardio goal and your experience.';
+const HDR_TEST = (n: number) => 'Program length: ' + wk(n) + '. Your test sets it.';
+const HDR_GOAL = (n: number) => 'Program length: ' + wk(n) + '. Set by your longest cardio goal and your experience.';
 const REACH = 'that reaches about';
 const TODAY = '2026-09-22';
 const TEST = '2026-10-20';
@@ -80,9 +84,9 @@ const TEST_TW1 = '2026-09-25';
 const START_AFTER = '2026-10-26';
 const RED_PAST = 'That date has already passed.';
 const RED_WEEK = 'Less than a week away. Not enough time to train.';
-const dashHits = (t) => String(t).match(/—| - /g) || [];
-const svgN = (h) => (String(h || '').match(/<svg\b/g) || []).length;
-const framed = (h) => /padding:9px 11px/.test(String(h || ''));
+const dashHits = (t: unknown) => String(t).match(/—| - /g) || [];
+const svgN = (h: unknown) => (String(h || '').match(/<svg\b/g) || []).length;
+const framed = (h: unknown) => /padding:9px 11px/.test(String(h || ''));
 
 // ── The oracles and the predicates, zone free ──
 test('the hand oracles reproduce the ruling\'s printed numbers and coach\'s sentences', () => {
@@ -115,7 +119,7 @@ test('the hand oracles reproduce the ruling\'s printed numbers and coach\'s sent
 });
 
 test('the dash predicate trips typed dashes and passes compound numerals and en dash ranges', () => {
-  const CASES = [
+  const CASES: [string, number][] = [
     ['Program length: 6 weeks — based on your longest cardio goal', 1],
     ['Tap to open calendar - the final weeks taper', 1],
     ['12:00 — 8:00/mi per mile', 1],
@@ -130,21 +134,21 @@ const G = loadAppAt(new Date(2026, 8, 22, 21, 16, 0));
 const gEls = new Map();
 {
   const mk = G.window.document.createElement;
-  G.window.document.getElementById = (id) => {
+  G.window.document.getElementById = (id: string) => {
     if (!gEls.has(id)) gEls.set(id, Object.assign(mk('div'), { id }));
     return gEls.get(id);
   };
   G.eval('showToast = function(){}');
 }
 const G_BOOT_WD = G.eval('JSON.stringify(WD)');
-const goalObj = (goal, mile) => {
-  const g = { id: goal, label: goal, baselineDist: '', baseline: '' };
+const goalObj = (goal: string, mile: number) => {
+  const g: CardioGoal = { id: goal, label: goal, baselineDist: '', baseline: '' };
   if (goal === 'run_pace_goal') Object.assign(g, { targetDist: '1.5', paceUnit: 'mi', targetMins: '12', targetSecs: '0' });
   if (mile) Object.assign(g, { mileBestMins: String(Math.floor(mile / 60)), mileBestSecs: String(mile % 60), mileBestSrc: { kind: 'entered' } });
   return g;
 };
-const gTxt = (h) => String(h || '').replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').replace(/ ([,.;])/g, '$1').trim();
-function wiz(goal, exp, mile) {
+const gTxt = (h: unknown) => String(h || '').replace(/<svg[\s\S]*?<\/svg>/g, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').replace(/ ([,.;])/g, '$1').trim();
+function wiz(goal: string, exp: string, mile: number) {
   const wd = Object.assign(JSON.parse(G_BOOT_WD), {
     name: 'M', primaryPath: 'hybrid', cardioTypes: ['run'], liftingFocus: 'balanced', experience: exp, ageBracket: '18-35', equipment: 'crossfit', unit: 'lbs',
     restDays: ['sun', 'wed'], eventTargeted: false, raceDate: '', seed: 1000,
@@ -165,10 +169,10 @@ function wiz(goal, exp, mile) {
     feasShown: !!pf && pf.style.display === 'block', feas: pf ? (pf.style.display === 'none' ? '' : gTxt(pf.innerHTML)) : '', adv: adv ? adv[1] : null,
   };
 }
-const SEEN = []; // athlete-facing strings the mile field tests assert, for the copy test
-const keep = (s) => typeof s === 'string' && s && SEEN.push(s);
+const SEEN: string[] = []; // athlete-facing strings the mile field tests assert, for the copy test
+const keep = (s: unknown) => typeof s === 'string' && s && SEEN.push(s);
 const HELP_REQ = 'Required. Your paces and your program length start from it.';
-const HELP_OPT = {
+const HELP_OPT: Record<string, string> = {
   beginner: 'Optional. Leave it blank and your paces come from an 11:30 mile, the beginner default. Enter a mile only if you have timed one.',
   intermediate: 'Optional. Leave it blank and your paces come from a 9:30 mile, the intermediate default. Enter a mile only if you have timed one.',
   advanced: 'Optional. Leave it blank and your paces come from a 7:30 mile, the advanced default. Enter a mile only if you have timed one.',
@@ -264,7 +268,7 @@ test('the button is gone: no applySuggestedPace, achievablePacePerMile, secsToMM
 });
 
 test('one repaint, one caller each: updatePaceFeasibility, updatePaceDisplay and assessRunPaceCeiling once, updateRaceDateFeedback 13 times', () => {
-  const calls = (nm) => (SRC.match(new RegExp('\\b' + nm + '\\s*\\(', 'g')) || []).length - (SRC.match(new RegExp('\\bfunction\\s+' + nm + '\\s*\\(', 'g')) || []).length;
+  const calls = (nm: string) => (SRC.match(new RegExp('\\b' + nm + '\\s*\\(', 'g')) || []).length - (SRC.match(new RegExp('\\bfunction\\s+' + nm + '\\s*\\(', 'g')) || []).length;
   assert.deepEqual(
     ['updatePaceFeasibility', 'updatePaceDisplay', 'assessRunPaceCeiling', 'updateRaceDateFeedback'].map(calls),
     [1, 1, 1, 13],
@@ -274,10 +278,10 @@ test('one repaint, one caller each: updatePaceFeasibility, updatePaceDisplay and
 const SYSTEM_TZ = process.env.TZ;
 for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
   describe(`[${tag}] the cardio goal step under TZ=${tz}`, () => {
-    let IA;
-    let W;
-    let BOOT_WD;
-    const STATES = [];
+    let IA: App;
+    let W: Rig;
+    let BOOT_WD: string;
+    const STATES: { label: string; fam: string; text: string; card: string | null; feas: string | null; adv: string }[] = [];
     beforeAll(() => {
       process.env.TZ = tz;
       IA = loadAppAt(new Date(2026, 8, 22, 21, 16, 0));
@@ -289,44 +293,44 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
       else process.env.TZ = SYSTEM_TZ;
     });
     const BASE = { primaryPath: 'event', cardioTypes: ['run'], experience: 'intermediate', ageBracket: '18-35', eventTargeted: true, raceDate: TEST, liftingFocus: 'support_prevention', equipment: 'crossfit', restDays: ['sun', 'wed'], unit: 'lbs', seed: 4242, name: 'M', startDate: TODAY };
-    const mileOf = (s) => ({ mileBestMins: String(Math.floor(s / 60)), mileBestSecs: String(s % 60).padStart(2, '0') });
-    const goalOf = (s) => ({ targetMins: String(Math.floor(s / 60)), targetSecs: String(s % 60).padStart(2, '0'), targetTime: clk(s) });
-    const runGoal = (o) => Object.assign({ id: 'run_pace_goal', label: 'Hit a Pace / Time Goal', targetDist: '1.5', paceUnit: 'mi' }, o || {});
-    const setWD = (over, run) => {
+    const mileOf = (s: number) => ({ mileBestMins: String(Math.floor(s / 60)), mileBestSecs: String(s % 60).padStart(2, '0') });
+    const goalOf = (s: number) => ({ targetMins: String(Math.floor(s / 60)), targetSecs: String(s % 60).padStart(2, '0'), targetTime: clk(s) });
+    const runGoal = (o?: Record<string, string>) => Object.assign({ id: 'run_pace_goal', label: 'Hit a Pace / Time Goal', targetDist: '1.5', paceUnit: 'mi' }, o || {});
+    const setWD = (over?: Record<string, unknown> | null, run?: Record<string, string>) => {
       const wd = Object.assign(JSON.parse(BOOT_WD), BASE, over || {});
       wd.cardioGoals = { run: runGoal(run) };
       IA.eval('WD = ' + JSON.stringify(wd) + ';');
     };
-    const setWDg = (over, goals) => {
+    const setWDg = (over: Record<string, unknown> | null, goals: Record<string, unknown>) => {
       const wd = Object.assign(JSON.parse(BOOT_WD), BASE, over || {});
       wd.cardioGoals = JSON.parse(JSON.stringify(goals));
       IA.eval('WD = ' + JSON.stringify(wd) + ';');
     };
-    const cardCase = (over, run) => {
+    const cardCase = (over: Record<string, unknown>, run?: Record<string, string>) => {
       setWD(over, run);
       W.renderStep('cardio_goal', true);
       return W.screen();
     };
-    const snap = (label, fam) => {
+    const snap = (label: string, fam: string) => {
       const adv = W.reg.get('mileAdvisory');
       STATES.push({ label, fam, text: W.sweepText(), card: W.liveNode('raceDateFeedback'), feas: W.liveNode('paceFeasLine'), adv: adv ? String(adv.textContent || '') : '' });
     };
-    const expectCard = (s, color, text, header) => {
+    const expectCard = (s: Screen, color: string, text: string, header?: string) => {
       assert.equal(s.cardColor, color, 'card colour');
       assert.equal(s.cardText, text);
       if (header !== undefined) assert.equal(s.header, header);
     };
-    const hdrN = (h) => {
+    const hdrN = (h: string | null | undefined): number | null => {
       const m = /Program length: (\d+) weeks?/.exec(h || '');
       return m ? +m[1] : null;
     };
-    const addDays = (iso, k) => new RD((dayNo(iso) + k) * 864e5).toISOString().slice(0, 10);
+    const addDays = (iso: string, k: number) => new RD((dayNo(iso) + k) * 864e5).toISOString().slice(0, 10);
     const BIKE = { bike: { id: 'bike_century', label: 'Century Ride (100mi)' } };
     const U = { eventTargeted: false, raceDate: '' };
     const W5 = 5;
 
     test('the zone is the one asked for and the app\'s clock reads 2026-09-22 21:16', () => {
-      const off = (y, m, d) => new RD(y, m - 1, d, 12).getTimezoneOffset();
+      const off = (y: number, m: number, d: number) => new RD(y, m - 1, d, 12).getTimezoneOffset();
       assert.deepEqual([off(2026, 9, 22), off(2026, 12, 1)], tag === 'NY' ? [240, 300] : [0, 0]);
       assert.equal(IA.eval('(function(){ const d = new Date(); return [d.getFullYear(), d.getMonth() + 1, d.getDate(), d.getHours(), d.getMinutes(), Date.now() === d.getTime()].join(","); })()'), '2026,9,22,21,16,true');
     });
@@ -350,7 +354,7 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
     test('168 edits of the mile and goal fields, then the date: the header and the card both say week 5, no red, no Recommended, no button', () => {
       const HDR = HDR_TEST(W5);
       const OPEN = 'Your test is in week ' + W5 + '.';
-      const check = (where) => {
+      const check = (where: string) => {
         for (const id of ['progLenLine', 'raceDateFeedback']) assert.ok(W.inBody(id) && W.painted(id), `${where}: #${id} repainted`);
         const pd = W.reg.get('paceDisplayLine');
         assert.ok(W.painted('paceDisplayLine') || (pd && pd.style.display === 'none'), `${where}: #paceDisplayLine repainted`);
@@ -427,7 +431,7 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
     });
 
     test('undated, the feasibility frame reads the ruled sentence in accent with no button and no "safe"; a required blank mile leaves it empty', () => {
-      for (const [lbl, exp, run, want] of [['A2', 'intermediate', Object.assign(mileOf(480), goalOf(570)), V.A2], ['A4', 'beginner', goalOf(720), V.A4]]) {
+      for (const [lbl, exp, run, want] of [['A2', 'intermediate', Object.assign(mileOf(480), goalOf(570)), V.A2], ['A4', 'beginner', goalOf(720), V.A4]] satisfies [string, string, Record<string, string>, string][]) {
         const s = cardCase({ experience: exp, eventTargeted: false, raceDate: '' }, run);
         const el = W.reg.get('paceFeasLine');
         assert.ok(W.inBody('paceFeasLine') && el && el.style.display === 'block', `${lbl}: shown`);
@@ -451,8 +455,8 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
     });
 
     test('the name step\'s Program length reads "5 weeks" for Mario and "1 week" for a test this week', () => {
-      const kv = (html) => {
-        const out = {};
+      const kv = (html: unknown) => {
+        const out: Record<string, string[]> = {};
         for (const m of String(html).matchAll(/<span class="(?:k|summary-key)">([^<]*)<\/span><span class="(?:v|summary-val)"[^>]*>([^<]*)<\/span>/g)) (out[m[1]] = out[m[1]] || []).push(m[2]);
         return out;
       };
@@ -464,12 +468,12 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
     });
 
     test('a dated bike century reads the ruled sentence and colour at +2, +1, 0, -1 weeks and 1 week out, and red under a week', () => {
-      const bike = (raceDate) => {
+      const bike = (raceDate: string) => {
         setWDg({ cardioTypes: ['bike'], raceDate }, BIKE);
         W.renderStep('cardio_goal', true);
         return W.screen();
       };
-      const N = hdrN(bike(addDays(TODAY, 7 * 40 + 2)).header);
+      const N = hdrN(bike(addDays(TODAY, 7 * 40 + 2)).header)!;
       assert.ok(N >= 4, `N from the header (${N})`);
       for (const [lbl, w, color, want] of [
         ['+2', N + 2, 'var(--run)', 'Your ' + N + '-week program finishes 2 weeks before race day. Use the extra time to stay sharp.'],
@@ -477,7 +481,7 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
         ['0', N, 'var(--run)', 'Perfect timing. Your ' + N + '-week program peaks on race day.'],
         ['-1', N - 1, 'var(--accent)', wk(N - 1) + ' is short for this goal. The floor is ' + N + '. Your full ' + N + '-week program stays intact. Your race lands in week ' + (N - 1) + '.'],
         ['1 week out', 1, 'var(--red)', '1 week is short for this goal. The floor is ' + N + '. Your full ' + N + '-week program stays intact. Your race lands in week 1.'],
-      ]) {
+      ] satisfies [string, number, string, string][]) {
         const date = addDays(TODAY, 7 * w + 2);
         assert.equal(handWeeksUntil(TODAY, date), w, `${date} is ${w} weeks out`);
         const s = bike(date);
@@ -495,18 +499,18 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
 
     test('HALF_MANNY\'s half reads the plan start and race week, in progress and from a future date, by Monday arithmetic', () => {
       const NRC_HALF_WEEKS = 14;
-      const handAlign = (race) => {
+      const handAlign = (race: string) => {
         const start = monNo(race) - (NRC_HALF_WEEKS - 1) * 7;
         const todayMon = monNo(TODAY);
         const fw = Math.max(0, (start - todayMon) / 7);
         return { start, fw, open: fw ? 1 : Math.max(1, Math.min(NRC_HALF_WEEKS, (todayMon - start) / 7 + 1)), weeksOut: handWeeksUntil(TODAY, race), raceNo: dayNo(race) };
       };
-      const dayRe = (no) => {
+      const dayRe = (no: number) => {
         const d = new RD(no * 864e5);
         return WD3[d.getUTCDay()] + ',? ' + MON3[d.getUTCMonth()] + ' ' + d.getUTCDate();
       };
-      const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      for (const [race, wantFw, wantOpen] of [[fixtures.HALF_MANNY.raceDate, 0, 4], ['2027-01-10', 2, 1]]) {
+      const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      for (const [race, wantFw, wantOpen] of [[fixtures.HALF_MANNY.raceDate!, 0, 4], ['2027-01-10', 2, 1]] satisfies [string, number, number][]) {
         const a = handAlign(race);
         assert.deepEqual([a.fw, a.open], [wantFw, wantOpen], `${race}: the hand alignment`);
         IA.eval('WD = ' + JSON.stringify(Object.assign(JSON.parse(BOOT_WD), JSON.parse(JSON.stringify(fixtures.HALF_MANNY)), { startDate: TODAY, raceDate: race })) + ';');
@@ -529,14 +533,14 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
       for (const [lbl, over, swim, mile, goal, where] of [
         ['dated', { cardioTypes: ['run'] }, false, 480, 630, 'card'],
         ['undated run and swim', Object.assign({ cardioTypes: ['run', 'swim'] }, U), true, 480, 570, 'feas'],
-      ]) {
-        const goals = { run: runGoal(Object.assign(mileOf(mile), goalOf(goal))) };
+      ] satisfies [string, Record<string, unknown>, boolean, number, number, string][]) {
+        const goals: Record<string, unknown> = { run: runGoal(Object.assign(mileOf(mile), goalOf(goal))) };
         if (swim) goals.swim = SWIM500;
         setWDg(over, goals);
         W.renderStep('cardio_goal', true);
         snap('L1 ' + lbl, 'L1');
         const s = W.screen();
-        const hN = hdrN(s.header);
+        const hN = hdrN(s.header)!;
         const t = where === 'card' ? s.cardText : s.feasText;
         const sm = /In (\d+) weeks? that reaches about/.exec(t);
         assert.ok(hN > 0, `${lbl}: a header number`);
@@ -549,12 +553,12 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
     });
 
     test('a 2 km goal in 12:00 reads "12:00 is 9:40 per mile." as rendered, repainted and after the distance handler; 1.5 mi reads 8:00', () => {
-      const want = (tot, dist, unit) => clk(tot) + ' is ' + clk(tot / (unit === 'km' ? dist * KM_MI : dist)) + ' per mile.';
+      const want = (tot: number, dist: number, unit: string) => clk(tot) + ' is ' + clk(tot / (unit === 'km' ? dist * KM_MI : dist)) + ' per mile.';
       const inline = () => {
         const m = /<div id="paceDisplayLine"[^>]*>([\s\S]*?)<\/div>/.exec(W.bodyHTML());
         return m ? txt(m[1]) : null;
       };
-      const live = () => (W.painted('paceDisplayLine') ? txt(W.reg.get('paceDisplayLine').innerHTML) : null);
+      const live = () => (W.painted('paceDisplayLine') ? txt(W.reg.get('paceDisplayLine')!.innerHTML) : null);
       for (const [dist, unit] of [['2', 'km'], ['1.5', 'mi']]) {
         setWD({}, Object.assign({ targetDist: dist, paceUnit: unit }, mileOf(480), goalOf(720)));
         W.renderStep('cardio_goal', true);
@@ -575,7 +579,7 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
     });
 
     test('a 500 in 7:00 reads "7:00 is 1:24 per 100 yd." (and m) as rendered and from updateSwimPaceDisplay', () => {
-      const swimWD = (unit, mins) =>
+      const swimWD = (unit: string, mins: string) =>
         setWDg(Object.assign({ cardioTypes: ['swim'] }, U), { swim: { id: 'swim_500_time', label: 'Improve 500 Time', swimUnit: unit, targetMins: mins, targetSecs: '00', targetTime: mins ? mins + ':00' : '', baseMins: '12', baseSecs: '00' } });
       for (const unit of ['yd', 'm']) {
         const want = '7:00 is 1:24 per 100 ' + unit + '.';
@@ -591,15 +595,15 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
         snap('swim updateSwimPaceDisplay ' + unit, 'swim');
         const el = W.reg.get('swimPaceLine');
         assert.equal(el && el.style.display, 'block');
-        assert.equal(txt(el.innerHTML), want, `${unit} from updateSwimPaceDisplay`);
+        assert.equal(txt(el!.innerHTML), want, `${unit} from updateSwimPaceDisplay`);
       }
     });
 
     test('an undated beginner\'s run baseline handler repaints the header, 9 weeks at a 1 mi baseline to 6 at 4, as a fresh render would', () => {
       const H1 = 'Program length: 9 weeks. Set by your longest cardio goal and your experience.';
       const H4 = 'Program length: 6 weeks. Set by your longest cardio goal and your experience.';
-      const blWD = (bd) => setWD(Object.assign({ experience: 'beginner' }, U), { targetDist: '1.5', paceUnit: 'mi', mileBestMins: '', mileBestSecs: '', targetMins: '', targetSecs: '', baselineDist: bd });
-      const fresh = (bd) => {
+      const blWD = (bd: string) => setWD(Object.assign({ experience: 'beginner' }, U), { targetDist: '1.5', paceUnit: 'mi', mileBestMins: '', mileBestSecs: '', targetMins: '', targetSecs: '', baselineDist: bd });
+      const fresh = (bd: string) => {
         blWD(bd);
         W.renderStep('cardio_goal', true);
         snap('baseline fresh ' + bd, 'beginner');
@@ -625,7 +629,7 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
         ['past date, test goal', () => setWD({ raceDate: PAST }, Object.assign(mileOf(480), goalOf(720))), RED_PAST],
         ['past date, bike century', () => setWDg({ cardioTypes: ['bike'], raceDate: PAST }, BIKE), RED_PAST],
         ['3 days out, bike century', () => setWDg({ cardioTypes: ['bike'], raceDate: addDays(TODAY, 3) }, BIKE), RED_WEEK],
-      ]) {
+      ] satisfies [string, () => void, string][]) {
         set();
         W.renderStep('cardio_goal', true);
         snap(lbl, 'entry error');
@@ -649,7 +653,7 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
         ['A3', 'undated gap', U, goalOf(630)],
         ['A4', 'beginner', Object.assign({ experience: 'beginner' }, U), goalOf(720)],
         ['S9', 'km', {}, Object.assign({ targetDist: '2', paceUnit: 'km' }, mileOf(480), goalOf(510))],
-      ]) {
+      ] satisfies [string, string, Record<string, unknown>, Record<string, string>][]) {
         setWD(over, run);
         W.renderStep('cardio_goal', true);
         snap(lbl, fam);
@@ -684,9 +688,9 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
     });
 
     test('over the whole sweep: no button on the card or frame, no dash in the step\'s text, no "safe progression", no icon or bare check in a frame', () => {
-      const fams = {};
+      const fams: Record<string, number> = {};
       for (const st of STATES) fams[st.fam] = (fams[st.fam] || 0) + 1;
-      const NEED = { lattice: 336, NRC: 2, swim: 5, 'mile advisory': 5, 'mile handler': 5, beginner: 1, 'undated gap': 1, bike: 1, km: 1, 'seed banner': 2, 'entry error': 3 };
+      const NEED: Record<string, number> = { lattice: 336, NRC: 2, swim: 5, 'mile advisory': 5, 'mile handler': 5, beginner: 1, 'undated gap': 1, bike: 1, km: 1, 'seed banner': 2, 'entry error': 3 };
       for (const [f, min] of Object.entries(NEED)) assert.ok((fams[f] || 0) >= min, `coverage: ${fams[f] || 0} ${f} states, want ${min}`);
       assert.ok(STATES.filter((s) => s.fam === 'mile handler' && s.adv).length >= 5, 'the mile advisory wrote its text through the handlers');
       assert.ok(STATES.filter((s) => s.fam === 'seed banner' && /Seed from|Estimated from/.test(s.text)).length >= 2, 'the seed banner shows');
@@ -696,7 +700,7 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
       let cards = 0;
       let frames = 0;
       for (const st of STATES)
-        for (const [k, nm] of [['card', '#raceDateFeedback'], ['feas', '#paceFeasLine']]) {
+        for (const [k, nm] of [['card', '#raceDateFeedback'], ['feas', '#paceFeasLine']] satisfies ['card' | 'feas', string][]) {
           if (!framed(st[k])) continue;
           if (k === 'card') cards++;
           else frames++;

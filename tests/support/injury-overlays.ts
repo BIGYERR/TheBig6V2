@@ -155,7 +155,7 @@ function bootFrom(src: App, dst: App): void {
 /** The stored record for `cfg`: pres 'CFG' stores the injury in cfg; 'OV' writes it as an overlay from `from` (X pinned). */
 /** How an injury reaches the stored program: in cfg, or written as an overlay. */
 type Pres = 'CFG' | 'OV';
-function stored(X: App, cfg: Cfg, pres: Pres, from: string): string {
+function stored(X: App, cfg: Cfg, pres: Pres, from?: string): string {
   const base = clone(cfg);
   delete base.injury;
   const c = pres === 'CFG' ? clone(cfg) : base;
@@ -164,7 +164,7 @@ function stored(X: App, cfg: Cfg, pres: Pres, from: string): string {
   let j = JSON.stringify(s);
   if (pres === 'OV' && cfg.injury) {
     setup(X, j);
-    writeInjury(X, cfg.injury, from);
+    writeInjury(X, cfg.injury, from!);
     const o = JSON.parse(E(X, "localStorage.getItem('ia_programs')")).find((x: { id: string }) => x.id === 'PM');
     (o.overlays || []).forEach((v: { id: string; created: number }) => { v.id = 'ov_fixed'; v.created = 1; });
     j = JSON.stringify(o);
@@ -178,7 +178,7 @@ function writeInjury(X: App, inj: Injury, from: string): void {
   if (+E(X, '(activeProg.overlays||[]).length') !== n0 + 1) throw new Error(`overlay not written ${inj.region}/${inj.tier} from ${from}`);
 }
 /** A booted app holding `cfg` at `clock`, presented as pres ('CFG' or 'OV' from `from`). */
-function progAt(cfg: Cfg, pres: Pres, clock: string, from: string, slot = 0): { X: App; st: string } {
+function progAt(cfg: Cfg, pres: Pres, clock: string, from?: string, slot = 0): { X: App; st: string } {
   const st = stored(sharedApp(clock, 9), cfg, pres, from);
   const X = sharedApp(clock, slot);
   setup(X, st);
@@ -593,3 +593,4 @@ export {
   lensApp, lensCards, patternOf,
   POOL_GEAR, injuryPoolAssignments, resolvePool, POOL_DEBT,
 };
+export type { Pres, Slot, SlotAt };

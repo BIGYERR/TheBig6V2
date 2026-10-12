@@ -234,7 +234,7 @@ export const C_POINTS = SNAP_LATTICE.filter(x => x.c);
 /** The (c) cells of the 1.5 mi goal: the ones the builds, the name step and the card run on. */
 export const C_CELLS = C_POINTS.filter(x => x.gl === G15);
 export const tagC = (x: SnapPoint): string => 'today ' + x.today + ' entered ' + x.start + ' rest ' + x.rk + ' test ' + x.race;
-export const snapCfg = (x: Pick<SnapPoint, 'start' | 'rk' | 'race' | 'gl'>, exp: string): TestCfg => ({ primaryPath: 'event', cardioTypes: ['run'], experience: exp, ageBracket: '18-35', eventTargeted: true, raceDate: x.race,
+export const snapCfg = (x: Partial<Pick<SnapPoint, 'today' | 'start'>> & Pick<SnapPoint, 'rk' | 'race' | 'gl'>, exp: string): TestCfg => ({ primaryPath: 'event', cardioTypes: ['run'], experience: exp, ageBracket: '18-35', eventTargeted: true, raceDate: x.race,
   liftingFocus: 'support_prevention', equipment: 'crossfit', restDays: RESTS[x.rk], unit: 'lbs', seed: 4242, name: 'M', startDate: x.start, cardioGoals: { run: SNAP_GOALS[x.gl] } });
 
 /** resolveStartDate on every point, with the test date and without: (c) points keep the entered day with holdsTest; no other point moves. */

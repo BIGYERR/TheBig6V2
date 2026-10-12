@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Run week layout: which training days carry a run, and which run each one is. Rulings:
 //   D125 (amended)  the NSW pace family (run_pace_goal, run_mile_time, run_15_under10) takes up to four runs, laid out
 //                   by the spacing-aware run day chooser; its long run is a preference, not a pin;
@@ -34,7 +33,7 @@ const SNAPSHOT = path.join(__dirname, '..', 'snapshots', 'run-week-layout.json')
 
 test('the run day chooser and its session tables lift out of the app and run alone', () => {
   const C = R.chooser();
-  for (const f of ['choose', 'sessionTypes', 'nrcTypes', 'isSpeedGoal']) assert.equal(typeof C[f], 'function', f);
+  for (const f of ['choose', 'sessionTypes', 'nrcTypes', 'isSpeedGoal'] as const) assert.equal(typeof C[f], 'function', f);
   const p = C.choose(['mon', 'tue', 'thu', 'fri', 'sat'], 4, 'run_pace_goal', true);
   assert.ok(p && Array.isArray(p.idxs) && p.idxs.length === 4, 'a four-run pick');
 });
@@ -50,7 +49,7 @@ test('the NSW run table is Table 7 as the pace family deals it, and the NRC tabl
 });
 
 /** The routed pace rows: rest-day calendars with zero to five rest days, at a ceiling of two, three or four runs. */
-const PACE_ALL = [];
+const PACE_ALL: (R.Calendar & { cap: number })[] = [];
 R.calendars([0, 1, 2, 3, 4, 5]).forEach(c => [2, 3, 4].forEach(cap => { if (cap <= c.train.length) PACE_ALL.push(Object.assign({ cap }, c)); }));
 /** D129's rows: three or four runs, capped strictly below the training week (93 rows). */
 const PACE_ROWS = PACE_ALL.filter(r => r.cap >= 3 && r.cap < r.train.length);
@@ -61,7 +60,7 @@ test('every routed pace layout is a maximum of the full ruled objective, over ev
   for (const r of PACE_ALL) {
     const all = layouts(r.train, r.cap, R.paceTypes(r.train, r.cap), TP, true);
     const pick = C.choose(r.train, r.cap, 'run_pace_goal', true);
-    const got = findPick(all, r.train, pick);
+    const got = findPick(all, r.train, pick)!;
     const best = topBy(all, 'rank')[0];
     if (!got || cmp(got.rank, best.rank) !== 0) bad.push(r.key + ' cap ' + r.cap + ': ' + pickLayout(r.train, pick) + ' rank ' + (got ? got.rank : 'off the space') + ' best ' + best.rank);
   }
@@ -80,7 +79,7 @@ test('the day after the long run is never credited as padding it: no pick keeps 
     const afterOnly = days.some(d => pick.typeOf[d] === 'lsd_easy' && d === R.nextDay(L)) && !days.some(d => pick.typeOf[d] === 'lsd_easy' && d === R.prevDay(L));
     if (!afterOnly) continue;
     const all = layouts(r.train, r.cap, R.paceTypes(r.train, r.cap), TP, true);
-    const got = findPick(all, r.train, pick);
+    const got = findPick(all, r.train, pick)!;
     const better = all.find(c => cmp(c.ruled.slice(0, 4), got.ruled.slice(0, 4)) === 0 && c.ruled[4] > got.ruled[4]);
     if (better) bad.push(r.key + ' cap ' + r.cap + ' kept ' + pickLayout(r.train, pick) + ' over ' + layoutOf(better));
   }
@@ -88,7 +87,7 @@ test('the day after the long run is never credited as padding it: no pick keeps 
 });
 
 /** The NRC rows: every plan, zero to five rest days, every ceiling from two to one below the training week (804 rows). */
-const NRC_ROWS = [];
+const NRC_ROWS: (R.Calendar & { g: string; cap: number })[] = [];
 R.NRC_PLANS.forEach(g => R.calendars([0, 1, 2, 3, 4, 5]).forEach(c => { for (let cap = 2; cap < c.train.length; cap++) NRC_ROWS.push(Object.assign({ g, cap }, c)); }));
 
 test('NRC keeps both long run pins: on every NRC layout the long run is the last training day, and the pace family uses the escape', () => {
@@ -99,7 +98,7 @@ test('NRC keeps both long run pins: on every NRC layout the long run is the last
     if (R.nrcTypesHand(cap, g).length !== cap) continue;
     rows++;
     const p = C.choose(c.train, cap, g, false);
-    const L = Object.keys(p.typeOf).find(d => p.typeOf[d] === 'nrc_long');
+    const L = (Object.keys(p.typeOf) as R.Day[]).find(d => p.typeOf[d] === 'nrc_long');
     if (L && L !== c.train[c.train.length - 1]) unpinned.push(g + ' ' + c.key + ' cap ' + cap);
   }
   assert.equal(rows, 660);
@@ -108,7 +107,7 @@ test('NRC keeps both long run pins: on every NRC layout the long run is the last
   for (const c of R.calendars([0, 1, 2, 3])) {
     if (c.train.length <= 4) continue;
     const p = C.choose(c.train, 4, 'run_pace_goal', true);
-    const L = Object.keys(p.typeOf).find(d => p.typeOf[d] === 'lsd_long');
+    const L = (Object.keys(p.typeOf) as R.Day[]).find(d => p.typeOf[d] === 'lsd_long');
     if (L && L !== c.train[c.train.length - 1]) escapes++;
   }
   assert.ok(escapes > 0, 'the pace family moves its long run off the last training day somewhere');
@@ -121,7 +120,7 @@ test('every NRC layout is a maximum of its five ruled terms, with the shipped ea
     const all = layouts(r.train, r.cap, R.nrcTypesHand(r.cap, r.g), TN, false);
     if (!all.length) continue;
     const pick = C.choose(r.train, r.cap, r.g, false);
-    const got = findPick(all, r.train, pick);
+    const got = findPick(all, r.train, pick)!;
     if (!got || cmp(got.ruled, topBy(all, 'ruled')[0].ruled) !== 0) bad.push(r.g + ' ' + r.key + ' cap ' + r.cap);
     if (pick.untol !== pick.coll || pick.tol !== 0) split.push(r.g + ' ' + r.key + ' cap ' + r.cap + ' coll ' + pick.coll + ' untol ' + pick.untol);
   }
@@ -172,7 +171,7 @@ test('spread: among ties without the even spread subset, the pace family takes t
     const tied = topBy(all, 'ruled');
     if (tied.some(c => c.idxs.join(',') === R.evenIdx(r.train.length, r.cap).join(','))) continue;
     n++;
-    const got = findPick(all, r.train, C.choose(r.train, r.cap, 'run_pace_goal', true));
+    const got = findPick(all, r.train, C.choose(r.train, r.cap, 'run_pace_goal', true))!;
     if (!got || got.lf !== Math.min(...tied.map(c => c.lf))) loose.push(r.key + ' cap ' + r.cap);
   }
   assert.equal(n, 56);
@@ -183,7 +182,7 @@ test("Mario's calendar (rest Sunday and Wednesday) at four runs: MON INT, THU CH
   const train = DAYS.filter(d => !R.MARIO_REST.includes(d));
   const pick = R.chooser().choose(train, 4, 'run_pace_goal', true);
   assert.equal(pickLayout(train, pick), 'mon:int thu:chi fri:lsd_easy sat:lsd_long');
-  const got = findPick(layouts(train, 4, R.NSW_RUN_TYPES[4], TP, true), train, pick);
+  const got = findPick(layouts(train, 4, R.NSW_RUN_TYPES[4], TP, true), train, pick)!;
   assert.deepEqual({ untol: got.untol, tol: got.tol }, { untol: 0, tol: 0 });
   // the five ruled terms of D129: the head -(10 x untolerated + tolerated), the long run last, quality after rest, the
   // easy eve, INT before CHI
@@ -195,7 +194,7 @@ test('rest Friday at four runs: MON INT, WED CHI, THU easy, SAT long, with three
   const train = DAYS.filter(d => d !== 'fri');
   const pick = R.chooser().choose(train, 4, 'run_pace_goal', true);
   assert.equal(pickLayout(train, pick), 'mon:int wed:chi thu:lsd_easy sat:lsd_long');
-  assert.equal(findPick(layouts(train, 4, R.NSW_RUN_TYPES[4], TP, true), train, pick).qr, 3);
+  assert.equal(findPick(layouts(train, 4, R.NSW_RUN_TYPES[4], TP, true), train, pick)!.qr, 3);
 });
 
 test('the eve correction moves 24 of the 93 pace rows on the type set D129 was ruled on', () => {
@@ -228,10 +227,10 @@ test('ties after rank 9: 2 of 93 rows, both spanning two day sets with the hard 
 
 /** The 64 rest-day calendars with zero to three rest days. */
 const CAL64 = R.calendars([0, 1, 2, 3]);
-const minColl = list => Math.min(...list.map(c => c.coll));
+const minColl = (list: R.Layout[]) => Math.min(...list.map(c => c.coll));
 
 test('the unsplit search space at four runs: 50 of 64 calendars reach zero pairs (21/35, 21/21, 7/7, 1/1); the 14 that do not are four-day calendars one pair short', () => {
-  const zero = { 4: 0, 5: 0, 6: 0, 7: 0 }, tot = { 4: 0, 5: 0, 6: 0, 7: 0 }, losers = [];
+  const zero: Record<number, number> = { 4: 0, 5: 0, 6: 0, 7: 0 }, tot: Record<number, number> = { 4: 0, 5: 0, 6: 0, 7: 0 }, losers: { n: number; m: number }[] = [];
   for (const c of CAL64) {
     const n = c.train.length;
     tot[n]++;
@@ -245,7 +244,7 @@ test('the unsplit search space at four runs: 50 of 64 calendars reach zero pairs
 });
 
 test('the long run pin: pinned, 19 of 35 four-day and 18 of 21 five-day calendars reach zero; relaxing it rescues the five ruled calendars, the subset half alone none, the permutation half two', () => {
-  const pinZero = { 4: 0, 5: 0 }, rescued = [], permRescue = [];
+  const pinZero: Record<number, number> = { 4: 0, 5: 0 }, rescued: string[] = [], permRescue: string[] = [];
   const z = { free: 0, subset: 0, perm: 0, both: 0 };
   for (const c of CAL64) {
     const n = c.train.length, last = c.train[n - 1];
@@ -258,7 +257,7 @@ test('the long run pin: pinned, 19 of 35 four-day and 18 of 21 five-day calendar
     if (n in pinZero && b === 0) pinZero[n]++;
     if (f === 0 && b > 0) rescued.push(c.rest.join('+'));
     if (f === 0 && p > 0) permRescue.push(c.rest.join('+'));
-    z.free += f === 0; z.subset += s === 0; z.perm += p === 0; z.both += b === 0;
+    z.free += +(f === 0); z.subset += +(s === 0); z.perm += +(p === 0); z.both += +(b === 0);
     assert.ok(!(f === 0 && s > 0), c.key + ': the subset half rescues nothing');
   }
   assert.deepEqual(pinZero, { 4: 19, 5: 18 });
@@ -276,13 +275,13 @@ test('at four runs on all 64 calendars: no untolerated pair; the 14 pay exactly 
     'mon,tue,wed': 'sun:int thu:chi fri:lsd_long sat:lsd_easy',
   };
   const T14 = new Set(R.TOL14);
-  const unsplit = c => [-c.coll].concat(c.rank.slice(2));
-  const notBest = [], untol = [], tolOn = [], cleanOff = [], unsplitOff = [], offLast = {};
+  const unsplit = (c: R.Layout) => [-c.coll].concat(c.rank.slice(2));
+  const notBest: string[] = [], untol: string[] = [], tolOn: string[] = [], cleanOff: string[] = [], unsplitOff: string[] = [], offLast: Record<string, string> = {};
   for (const c of CAL64) {
     const all = layouts(c.train, 4, R.NSW_RUN_TYPES[4], TP, true).map(x => Object.assign(x, { unsplit: unsplit(x) }));
     const pick = C.choose(c.train, 4, 'run_pace_goal', true);
     const built = pickLayout(c.train, pick);
-    const got = findPick(all, c.train, pick);
+    const got = findPick(all, c.train, pick)!;
     if (built !== layoutOf(topBy(all, 'rank')[0])) notBest.push(c.key);
     if (got.untol) untol.push(c.key);
     if (got.tol) tolOn.push(c.key);
@@ -349,7 +348,7 @@ test('the source: the walking-week ceiling names both walking modes and is joine
 // ── the ceiling and the built week ───────────────────────────────────────────────────────────────────────────────
 
 test('the pace family runs up to four days a week; a walking week or a second sport holds it at three; run_base and NRC keep four', () => {
-  const T = (goal, types, mode) => R.app().sportDayTargets(types || ['run'], { run: { id: goal }, bike: { id: 'bike_base' } }, 7, 'balanced', mode || null).targets.run;
+  const T = (goal: string, types?: string[] | null, mode?: string | null) => R.app().sportDayTargets(types || ['run'], { run: { id: goal }, bike: { id: 'bike_base' } }, 7, 'balanced', mode || null).targets.run;
   for (const g of R.PACE_IDS) {
     assert.equal(T(g), 4, g);
     assert.equal(T(g, null, 'noimpact'), 3, g + ' on a protected knee');
@@ -364,8 +363,8 @@ test('the pace family runs up to four days a week; a walking week or a second sp
 });
 
 /** The 64 calendars built once on seed 1001, every week. */
-let CEIL = null;
-function ceilingLattice() {
+let CEIL: (R.Calendar & { p: R.AppProgram })[] | null = null;
+function ceilingLattice(): (R.Calendar & { p: R.AppProgram })[] {
   if (!CEIL) CEIL = CAL64.map(c => Object.assign({ p: R.build(R.paceCfg(c.rest, 1001)) }, c));
   return CEIL;
 }
@@ -376,7 +375,7 @@ test('a pace, run_base, NRC and multi-sport program each equal themselves built 
 });
 
 test('four runs ship exactly where an exhaustive search reaches zero untolerated pairs at four: all 64 calendars (35, 21, 7, 1 by training days)', () => {
-  const seen = { 4: 0, 5: 0, 6: 0, 7: 0 }, four = { 4: 0, 5: 0, 6: 0, 7: 0 }, mismatch = [];
+  const seen: Record<number, number> = { 4: 0, 5: 0, 6: 0, 7: 0 }, four: Record<number, number> = { 4: 0, 5: 0, 6: 0, 7: 0 }, mismatch: string[] = [];
   for (const c of ceilingLattice()) {
     const n = R.runDays(R.runLayout(c.p.weeks[1])).length;
     seen[c.train.length]++;
@@ -408,7 +407,7 @@ test('no built pace week carries an untolerated hard pair; the 14 pay one tolera
   for (const c of ceilingLattice()) for (const w of R.weeksOf(c.p)) {
     const lay = R.runLayout(c.p.weeks[w]), days = R.runDays(lay);
     const s = R.classify(days, lay);
-    const hard = days.filter(d => ['int', 'chi', 'lsd_long'].includes(lay[d])).length;
+    const hard = days.filter(d => ['int', 'chi', 'lsd_long'].includes(lay[d] ?? '')).length;
     weeks++;
     pairs += hard * (hard - 1) / 2;
     if (days.length !== 4) notFour.push(c.key + ' W' + w);
@@ -494,7 +493,7 @@ test("run_base on Mario's calendar ends its week on the long run and carries no 
 
 test('a pace week with four cardio sessions always carries an INT and a CHI card; a walking week keeps three, a quality week four; every run card names its key', () => {
   const cals = R.every(CAL64, 8);
-  const tally = {}, bad = [];
+  const tally: Record<string, Record<string, number>> = {}, bad: string[] = [];
   let progs = 0;
   for (const inj of R.WALK_INJ) {
     tally[inj.k] = {};
@@ -518,7 +517,7 @@ test('the walking-week ceiling leaves run_half, run_base and multi-sport pace al
   const INJ = R.WALK_INJ.filter(i => i.k !== 'shoulder/protect');
   const cals = R.every(R.calendars([3, 1]), 14);
   for (const row of R.WALK_OUT_OF_SCOPE) {
-    const sig = {};
+    const sig: Record<string, string> = {};
     for (const inj of INJ) sig[inj.k] = cals.map(c => { const p = R.build(R.walkCfg(c.rest, 1013, inj.v, row.types, row.goal)); return R.weeksOf(p).map(w => R.scanWeek(p.weeks[w]).n).join(''); }).join('|');
     for (const inj of INJ) assert.equal(sig[inj.k], sig.healthy, row.name + ' ' + inj.k);
   }
@@ -550,11 +549,11 @@ test('the hand oracles: 35 three-day calendars, 7 spacer calendars, the D130 pai
 });
 
 /** One three-day solo pace build: the spacer calendars keep one quality a week crossing INT to CHI; the rest run INT, CHI and long. */
-function threeDayClaim(cal, tw, f) {
+function threeDayClaim(cal: R.Day[], tw: number, f: string) {
   const rest = DAYS.filter(d => !cal.includes(d));
   const p = R.build(R.mkCfg('run_pace_goal', {}, rest, f, { _raceDateCappedWeeks: tw }));
   const per = R.weeksOf(p).map(w => R.runsOf(p.weeks[w]));
-  const cnt = (Rr, t) => Rr.filter(r => r.t === t).length;
+  const cnt = (Rr: R.WeekRun[], t: string) => Rr.filter(r => r.t === t).length;
   const where = cal.join('+') + ' tw ' + tw + ' ' + f;
   assert.equal(p.totalWeeks, tw, where);
   assert.equal(per.length, tw, where);
@@ -595,8 +594,8 @@ test('pace, solo and multi-sport: no week carries an untolerated hard run pair, 
 });
 
 /** Every thirty-third config of the NRC multi-sport lattice of D146, built once. */
-let NRC_SAMPLE = null;
-const nrcSample = () => NRC_SAMPLE || (NRC_SAMPLE = R.every(R.nrcLattice146(), 33).map(x => Object.assign({ p: R.build(x.cfg) }, x)));
+let NRC_SAMPLE: (ReturnType<typeof R.nrcLattice146>[number] & { p: R.AppProgram })[] | null = null;
+const nrcSample = (): (ReturnType<typeof R.nrcLattice146>[number] & { p: R.AppProgram })[] => NRC_SAMPLE || (NRC_SAMPLE = R.every(R.nrcLattice146(), 33).map(x => Object.assign({ p: R.build(x.cfg) }, x)));
 
 test('NRC multi-sport: no week carries an untolerated hard run pair, and the long run is the last run of its ISO week', () => {
   const lat = nrcSample();
@@ -632,7 +631,7 @@ test('NRC run card names are only the names in tests/snapshots/run-week-layout.j
 test('the excluded injury modes are all reached on the pace lattice, each with multi-sport builds', () => {
   const plan = R.app().eval('injuryPlan');
   const EXC = [{}, { bike: 'bike_base' }, { swim: 'swim_base' }, { bike: 'bike_ftp', swim: 'swim_mile' }];
-  const reach = {}, multi = {};
+  const reach: Record<string, number> = {}, multi: Record<string, number> = {};
   EXC.forEach((e, j) => R.EXCL_INJ.forEach(inj => R.every(R.CALS99, 9).forEach((rest, i) => {
     const mode = (plan(R.clone(R.mkCfg('run_pace_goal', e, rest, R.FOCI[(i + j) % 3], { injury: inj }))) || {}).cardioMode || 'none';
     if (!R.EXCLUDED_MODES.includes(mode)) return;
@@ -645,7 +644,7 @@ test('the excluded injury modes are all reached on the pace lattice, each with m
 test('under the excluded modes a multi-sport week keeps its unrouted day layout (tests/snapshots/run-week-layout.json); uninjured, the same week takes the chooser\'s run days', () => {
   const snap = snapshot().excludedLayouts;
   const C = R.chooser();
-  for (const row of ['pace', 'nrc']) {
+  for (const row of ['pace', 'nrc'] as const) {
     const pop = R.excludedPopulation(row);
     const cells = R.every(pop.cells, 16);
     for (const cell of cells) assert.equal(R.layoutCode(R.build(cell.cfg), cell.cfg), snap[row][cell.key], row + ' ' + cell.key);

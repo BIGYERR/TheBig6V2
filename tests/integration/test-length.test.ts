@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // How long a dated NSW test goal's program is, and where it starts. Rulings: D106a (doGenerate writes the test pin from
 // the resolved start; a stored dated test goal with no pin backfills it on boot; setProgStart re-pins), D183 (the race
 // date card's sentences), D184 (P-TESTLEN: the pin holds whenever the test week is a row of Table 6, weeks 1 to 26; one
@@ -21,12 +20,13 @@ import assert from 'node:assert/strict';
 import { appScript, fixtures } from '../support/app.ts';
 import * as X from '../support/test-week.ts';
 import * as L from '../support/test-length.ts';
+import type { Section } from '@ia/core';
 import { stripComments, compiles } from '../support/week-view.ts';
 const { J } = L;
 const { clone, canon, own } = X;
 
 // ── the wizard writes the pin (D106a, D184) ──────────────────────────────────────────────────────────────────────
-function generate(V, fields) {
+function generate(V: L.WizardVM, fields: X.TestCfg) {
   V.IA.window.__F = fields;
   V.IA.eval('Object.assign(WD, JSON.parse(JSON.stringify(__F)))');
   V.IA.eval('doGenerate()');
@@ -40,7 +40,7 @@ test('the wizard pins a dated test goal to its test week, 1 to 26, and the gener
   // G1 to G5, on one WD in order, so a pin written only when set would survive into the next row (the latch rule).
   const V = L.wizardVM('2026-09-14', 12, 0);
   const base = X.prtTing(); delete base.seed;
-  const runs = [
+  const runs: [string, X.TestCfg, number | null, number, string, string | null][] = [
     // [row, fields, test week by hand, length, resolved start, generate line]
     ['G1', Object.assign({}, base, { seed: 24865 }), 5, 5, '2026-09-21', 'Building your 5-week program...'],
     ['G2', { eventTargeted: false, raceDate: '' }, null, 11, '2026-09-21', 'Building your 11-week program...'],
@@ -66,7 +66,7 @@ test('the wizard pins a dated test goal to its test week, 1 to 26, and the gener
   for (const [row, f] of [
     ['G6 run_base', { startDate: '2026-09-21', raceDate: '2026-10-19', eventTargeted: true, cardioGoals: { run: { id: 'run_base', label: 'Build Running Base', baselineDist: '2', baseline: '2mi' } } }],
     ['G7 NRC 5K', { startDate: '2026-09-21', raceDate: '2026-11-22', eventTargeted: true, cardioGoals: { run: { id: 'run_5k', label: '5K', mileBestMins: '8', mileBestSecs: '15' } } }],
-  ]) {
+  ] satisfies [string, X.TestCfg][]) {
     const r = generate(V, f), c = (r.prog && r.prog.cfg) || {};
     assert.equal(r.n, before + 1, row + ': a program was stored');
     before = r.n;
@@ -91,21 +91,21 @@ test('the hand dates of the backfill are what the calendar says', () => {
   assert.deepEqual([X.handWeek(S, R), X.handWeek(S7, R), X.handWeek(PAST_START, PAST_TEST), X.handWeek(S, W15), X.handWeek(S, W14), X.handWeek(S, W28)], [5, 4, 5, 15, 14, 28]);
 });
 
-const pace = over => X.prtTing(Object.assign({ raceDate: R }, over || {}));
+const pace = (over?: X.TestCfg) => X.prtTing(Object.assign({ raceDate: R }, over || {}));
 /** A stored program in a fresh VM, with a trained W1 Monday (a sentinel) proved by its ia_hist_ snapshot. */
-function stored(cfg, startIso, id) {
+function stored(cfg: X.TestCfg, startIso: string, id: string) {
   const V = L.wizardVM(TODAY, 12, 0), IA = V.IA;
   const p = clone(IA.buildProgram(clone(cfg)));
   p.id = id; p.startDate = startIso;
   const day = p.weeks[1].mon;
   day.title = 'SENTINEL MON w1';
-  const first = (day.sections || []).find(s => (s.items || []).length); if (first) first.items[0].name = 'Sentinel movement';
+  const first = (day.sections || []).find((s: Section) => (s.items || []).length); if (first) first.items[0].name = 'Sentinel movement';
   const SENT = clone(day);
   IA.localStorage.setItem('ia_programs', JSON.stringify([p]));
   IA.localStorage.setItem('ia_active', p.id);
-  const h = {}; h[IA.eval('completedKey')(1, 'mon')] = clone(SENT);
+  const h: Record<string, unknown> = {}; h[IA.eval('completedKey')(1, 'mon')] = clone(SENT);
   IA.localStorage.setItem('ia_hist_' + p.id, JSON.stringify(h));
-  const read = () => JSON.parse(IA.localStorage.getItem('ia_programs'))[0];
+  const read = () => JSON.parse(IA.localStorage.getItem('ia_programs')!)[0];
   return { V, IA, p, SENT, read };
 }
 
@@ -169,7 +169,7 @@ test('a stored null pin with the test in week 14 of 11 re-pins to 14 and keeps t
   assert.deepEqual([jj.cfg._raceDateCappedWeeks, jj.totalWeeks], [11, 11]);
 });
 
-function moveStart(Q, iso) {
+function moveStart(Q: ReturnType<typeof stored>, iso: string) {
   Q.IA.eval('activeProgId = ' + J(Q.p.id) + '; activeProg = JSON.parse(localStorage.getItem("ia_programs"))[0];');
   Q.IA.eval('setProgStart(' + J(iso) + ')');
   return Q.IA.eval('activeProg');
@@ -186,14 +186,14 @@ test('moving the start a week later re-pins test week 4, builds 4 weeks, persist
 
 // ── the race date card on the cardio goal step (D183, D184) ──────────────────────────────────────────────────────
 const INTACT = 'stays intact';
-function feedback(wd) {
+function feedback(wd: X.TestCfg) {
   const V = L.wizardVM(TODAY, 12, 0, { absent: ['raceDateInput'] });
   V.IA.window.__W = wd;
   V.IA.eval('Object.assign(WD, JSON.parse(JSON.stringify(__W)))');
   V.IA.eval('updateRaceDateFeedback()');
   return String(V.els.get('raceDateFeedback').innerHTML || '');
 }
-const wdPace = over => Object.assign({ cardioTypes: ['run'], cardioGoals: pace().cardioGoals, experience: 'intermediate', ageBracket: '18-35',
+const wdPace = (over?: X.TestCfg) => Object.assign({ cardioTypes: ['run'], cardioGoals: pace().cardioGoals, experience: 'intermediate', ageBracket: '18-35',
   liftingFocus: 'balanced', eventTargeted: true, primaryPath: 'event', restDays: ['sun', 'wed'] }, over || {});
 const CARD = {
   w5: 'Your test is in week 5. The program ends on it. The taper lands in front of it.',
@@ -242,7 +242,7 @@ test("Table 6's last row is read in one place, progTestPin, and no week gate of 
 
 test('the snap lattice holds 120,050 points, 1,206 of them a short week that holds the test, split as the ruling counts them', () => {
   // R1's oracle against the ruling's typed counts (zone free: date arithmetic only)
-  const seg = {}, byRest = {};
+  const seg: Record<string, number> = {}, byRest: Record<string, number> = {};
   for (const x of L.C_POINTS) { seg[L.segOf(x.eo)] = (seg[L.segOf(x.eo)] || 0) + 1; byRest[x.rk] = (byRest[x.rk] || 0) + 1; }
   assert.equal(L.SNAP_LATTICE.length, 120050);
   assert.equal(L.C_POINTS.length, 1206);
@@ -256,11 +256,11 @@ const INTERIM_TYPED = 'Your test is in week 27. The test block is 26 weeks. This
 const Q4 = 'That week holds your test. Nothing left to train before it ✓';
 const WEEKDAYS = { '2026-09-21': 'mon', '2026-09-22': 'tue', '2026-11-01': 'sun', '2026-12-28': 'mon', '2027-02-04': 'thu', '2027-03-14': 'sun',
   '2027-03-15': 'mon', '2027-03-18': 'thu', '2027-03-22': 'mon', '2027-03-25': 'thu', '2027-04-15': 'thu' };
-const RULING_WEEKS = [['2027-02-04', 20], ['2026-12-28', 15], ['2027-03-15', 26], ['2027-03-18', 26], ['2027-03-22', 27], ['2027-03-25', 27], ['2026-09-14', null]];
+const RULING_WEEKS: [string, number | null][] = [['2027-02-04', 20], ['2026-12-28', 15], ['2027-03-15', 26], ['2027-03-18', 26], ['2027-03-22', 27], ['2027-03-25', 27], ['2026-09-14', null]];
 
-for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]], ['UTC', 'UTC', [0, 0]]]) {
+for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]], ['UTC', 'UTC', [0, 0]]] satisfies [string, string, number[]][]) {
   describe('in ' + zone, () => {
-    let V;
+    let V: L.WizardVM;
     beforeAll(() => { process.env.TZ = tz; V = L.wizardVM('2026-09-22', 21, 16); });
 
     test('the zone is the one asked for, the clock pin reaches the app, and the hand week oracle agrees with the ruling', () => {
@@ -285,8 +285,8 @@ for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]],
         liftingFocus: 'support_prevention', equipment: 'crossfit', restDays: ['sun', 'wed'], unit: 'lbs', seed: 4242, name: 'M', startDate: L.W1MON,
         cardioGoals: { run: { id: 'run_pace_goal', label: 'x', targetDist: '1', paceUnit: 'mi', targetMins: '6', targetSecs: '0', targetTime: '6:00' } } });
       const g = L.gen(V);
-      assert.ok(!g.err, g.err);
-      assert.deepEqual([g.p.startDate, g.p.totalWeeks, g.cfg._testWeek, g.cfg._raceDateCappedWeeks], [L.W1MON, 20, 20, 20]);
+      assert.ok(!g.err, String(g.err));
+      assert.deepEqual([g.p.startDate, g.p.totalWeeks, g.cfg!._testWeek, g.cfg!._raceDateCappedWeeks], [L.W1MON, 20, 20, 20]);
       assert.deepEqual(L.trialCards(g.p), ['W20 thu 1 Mile Test — TIME TRIAL']);
       assert.equal(g.sub, 'Building your 20-week program...');
     });
@@ -311,7 +311,7 @@ for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]],
       assert.ok(n >= 8);
       const o = X.prtTing({ raceDate: '2027-03-25' });
       L.setWD(V, o); const c = L.copy(V); L.setWD(V, o); const g = L.gen(V);
-      assert.ok(!c.err && !g.err, c.err || g.err);
+      assert.ok(!c.err && !g.err, String(c.err || g.err));
       assert.equal(c.fb, INTERIM_TYPED);
       assert.deepEqual([c.hdr, c.name, g.sub, g.p.totalWeeks, L.trialCards(g.p).length], [11, 11, 'Building your 11-week program...', 11, 0]);
     });
@@ -328,8 +328,8 @@ for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]],
     test('a program built from such a start is one week, starts on the entered day and carries only the trial, on the test weekday', () => {
       // R2 on a sample: every seventh (c) cell of the 1.5 mi goal, the experience level rotating
       const cells = X.every(L.C_CELLS, 7);
-      let r = { n: 0, seg: {}, bad: [] };
-      L.EXPERIENCE.forEach((exp, i) => { const s = L.snapBuilds(V, cells.filter((_, k) => k % 3 === i), [exp]); r.n += s.n; r.bad.push(...s.bad); for (const k in s.seg) r.seg[k] = (r.seg[k] || 0) + s.seg[k]; });
+      const r = { n: 0, seg: {} as Record<string, number>, bad: [] as string[] };
+      L.EXPERIENCE.forEach((exp, i) => { const s = L.snapBuilds(V, cells.filter((_, k) => k % 3 === i), [exp]); r.n += s.n; r.bad.push(...s.bad); for (const k in s.seg) r.seg[k] = (r.seg[k] || 0) + s.seg[k as L.Seg]!; });
       assert.deepEqual(Object.keys(r.seg).sort(), ['<', '==', '>'], 'entered before, on and after today');
       assert.deepEqual(r.bad, []);
     });
@@ -351,7 +351,7 @@ for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]],
 
     test('the race date card on such a week says the test is in week 1 with nothing left to train, in the signal colour, with no Primer or shakeout', () => {
       // R4 on a sample, and the two cells the ruling names: A (today Thu 2026-09-24, entered today, test Sat) and B (entered Thu 2026-10-08, test Sat 2026-10-10)
-      const has = (t, s, rk, q) => L.C_CELLS.find(x => x.today === t && x.start === s && x.rk === rk && x.race === q);
+      const has = (t: string, s: string, rk: string, q: string) => L.C_CELLS.find(x => x.today === t && x.start === s && x.rk === rk && x.race === q);
       const A = has('2026-09-24', '2026-09-24', 'thu..sun', '2026-09-26'), Bc = has('2026-09-21', '2026-10-08', 'thu..sun', '2026-10-10');
       assert.ok(A && Bc, 'cells A and B are (c) cells');
       const r = L.snapCallout(V, X.every(L.C_CELLS, 7).concat([A, Bc]));
@@ -363,7 +363,7 @@ for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]],
       // R4D: today Mon 2026-09-21, no start chosen, Sunday rest, test Thu 2026-09-24 (week 1, not a (c) cell).
       // R4B: today Mon 2026-09-21, no start chosen, Thursday to Sunday rest, test Sat 2026-10-10 (week 3).
       for (const [rk, race, week, want] of [['sun', '2026-09-24', 1, 'Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.'],
-        ['thu..sun', '2026-10-10', 3, 'Your test is in week 3. The program ends on it. The taper lands in front of it.']]) {
+        ['thu..sun', '2026-10-10', 3, 'Your test is in week 3. The program ends on it. The taper lands in front of it.']] satisfies [string, string, number, string][]) {
         const x = { today: '2026-09-21', rk, race, gl: L.G15 };
         assert.ok(!L.isC(x.today, L.RESTS[rk], race) && X.handWeek(x.today, race) === week);
         V.today(x.today); L.setWD(V, L.snapCfg(x, 'intermediate'));
@@ -374,11 +374,11 @@ for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]],
     test('moving the start into a week that holds the test keeps the entered day, pins week 1 and says so: on, after and before today', () => {
       // R6: cells A (==), B (>) and C (<)
       for (const [seg, today, rk, race, built, entered] of [['==', '2026-09-24', 'thu..sun', '2026-09-26', '2026-09-28', '2026-09-24'],
-        ['>', '2026-09-21', 'thu..sun', '2026-10-10', undefined, '2026-10-08'], ['<', '2026-09-27', 'sat,sun', '2026-09-27', '2026-09-28', '2026-09-26']]) {
+        ['>', '2026-09-21', 'thu..sun', '2026-10-10', undefined, '2026-10-08'], ['<', '2026-09-27', 'sat,sun', '2026-09-27', '2026-09-28', '2026-09-26']] satisfies [string, string, string, string, string | undefined, string][]) {
         assert.ok(L.isC(entered, L.RESTS[rk], race) && X.handWeek(entered, race) === 1 && L.segOf(X.civI(entered) - X.civI(today)) === seg, 'oracle ' + seg);
         V.today(today);
         const r = L.redate(V, L.snapCfg({ today, start: built, rk, race, gl: L.G15 }, 'intermediate'), entered);
-        assert.ok(!r.err, r.err);
+        assert.ok(!r.err, String(r.err));
         assert.deepEqual([r.start, r.tw, r.cap, r.toasts], [entered, 1, 1, [Q4]], seg);
         assert.ok(!r.toasts.some(m => m.includes('—')));
       }
@@ -388,7 +388,7 @@ for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]],
       // R6S: the R3S cell, built from Mon 2026-09-21, re-dated to Thu 2026-09-24.
       V.today('2026-09-24');
       const r = L.redate(V, L.snapCfg({ today: '2026-09-24', start: '2026-09-21', rk: 'thu..sun', race: '2026-09-29', gl: L.G15 }, 'intermediate'), '2026-09-24');
-      assert.ok(!r.err, r.err);
+      assert.ok(!r.err, String(r.err));
       assert.equal(r.start, '2026-09-28');
       assert.deepEqual(r.toasts, ['Nothing to train that week. Starts ' + L.dayU('2026-09-28') + ' ✓']);
     });
@@ -396,10 +396,10 @@ for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]],
     test("a race goal moved into its race week still snaps: HALF_MANNY with Thursday to Sunday rest, re-dated to Thu 2026-12-03", () => {
       // R6N: the (c) shape by date, but a race goal has no test date for the resolver; it snaps to Mon 2026-12-07.
       const o = Object.assign(clone(fixtures.HALF_MANNY), { restDays: ['thu', 'fri', 'sat', 'sun'] });
-      assert.ok(o.cardioGoals.run.id === 'run_half' && o.raceDate === '2026-12-06' && L.isC('2026-12-03', o.restDays, o.raceDate));
+      assert.ok(o.cardioGoals.run!.id === 'run_half' && o.raceDate === '2026-12-06' && L.isC('2026-12-03', o.restDays, o.raceDate));
       V.today('2026-09-22');
       const r = L.redate(V, o, '2026-12-03');
-      assert.ok(!r.err, r.err);
+      assert.ok(!r.err, String(r.err));
       assert.equal(r.start, '2026-12-07');
       assert.equal(r.toasts.length, 1);
       assert.ok(r.toasts[0].startsWith('Nothing to train that week') && r.toasts[0] !== Q4, r.toasts[0]);

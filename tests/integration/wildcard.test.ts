@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The Wildcard: a substitute the athlete chose, never a session they finished. It is attendance, so it rescues a skipped
 // day's streak; its mark (a flame and a W) and its tag show on the day it was done; on today's orange cell the mark and
 // the completion tick turn to the on-signal colour. Rulings D64, D71 and D71b (the Wildcard), D185 (the today cell).
@@ -20,21 +19,22 @@ import {
   DK, WEEK, PID, iso, addDays, wildcardBench, stripOf, stripCells, DST_CASES, dstLatticeIn,
   styleText, cssRules, parseCompound, colorCandidates, winningColor, el, contrast,
  } from '../support/wildcard.ts';
+import type { HandDay, WildcardDay, WildRecord } from '../support/wildcard.ts';
 const J = JSON.stringify;
 const B = wildcardBench();
 const { IA, ev } = B;
 const C = { title: 'Recovery Lift', ts: 1, status: 'complete' };
 const S = { title: 'Recovery Lift', ts: 1, status: 'skipped' };
-const K = (x) => 'w' + x.week + '_' + x.d;
-const stripJs = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+const K = (x: { week: number; d: string }) => 'w' + x.week + '_' + x.d;
+const stripJs = (s: string): string => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
 
 /** Stores the Wildcard 'Chaos Workout' through completeWildcard and runs its queued pop-up. */
 function completeChaos() {
-  let threw = null;
+  let threw: string | null = null;
   try {
     ev("completeWildcard('Chaos Workout')");
   } catch (e) {
-    threw = e.message;
+    threw = (e as Error).message;
   }
   IA.flushTimers();
   return threw;
@@ -42,9 +42,9 @@ function completeChaos() {
 
 // ── a Wildcard on a rest day ─────────────────────────────────────────────────────────────────────────────────────────
 // Today rests; the two scheduled days before it are complete, so the hand walk gives a streak of 2.
-function restDay(F) {
+function restDay(F: WildcardDay) {
   const sched = F.handScheduled(F.RESTS);
-  const seed = {};
+  const seed: Record<string, unknown> = {};
   sched.slice(-2).forEach((x) => { seed[K(x)] = C; });
   B.install(F.mkProg(F.RESTS, 'Recovery Lift'), seed);
   const before = { comp: B.comp(), streak: B.streak(), count: B.completed() };
@@ -96,9 +96,9 @@ test('the rest day pop-up says WILDCARD DONE, You showed up. That is the whole g
 
 // ── a Wildcard on a training day ─────────────────────────────────────────────────────────────────────────────────────
 // Today trains and is the last scheduled day; the two scheduled days before it are complete: a streak of 2 before.
-function trainingDay(F) {
+function trainingDay(F: WildcardDay) {
   const sched = F.handScheduled(F.TRAINS);
-  const seed = {};
+  const seed: Record<string, unknown> = {};
   sched.slice(-3, -1).forEach((x) => { seed[K(x)] = C; });
   B.install(F.mkProg(F.TRAINS, 'Recovery Lift'), seed);
   const before = { comp: B.comp(), streak: B.streak() };
@@ -166,7 +166,7 @@ test('an unstamped record renders no mark and no tag on any day', () => {
 
 // ── the week strip ───────────────────────────────────────────────────────────────────────────────────────────────────
 /** Today trains, a Wildcard is stamped on today, and week 3 is rendered. */
-function stripWithWildcard(F) {
+function stripWithWildcard(F: WildcardDay) {
   B.install(F.mkProg(F.TRAINS, 'Recovery Lift'), null, 3);
   B.setWild([{ title: 'Chaos Workout', ts: 1, week: 3, dayKey: F.TODAY_KEY }]);
   ev('renderWeekView()');
@@ -255,8 +255,8 @@ test('with no Wildcard stored the week view prints no tag', () => {
 // ── the day detail tag ───────────────────────────────────────────────────────────────────────────────────────────────
 const TITLES = ['Recovery Lift', "Farmer's & Rower's Day", 'Push & Pull', "Coach's Choice"];
 /** The HTML entity rules, written out by hand. */
-const handEsc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-const openToday = (F) => ev('openDetail(' + J(F.TODAY_KEY) + ', activeProg.weeks[3][' + J(F.TODAY_KEY) + '])');
+const handEsc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+const openToday = (F: WildcardDay) => ev('openDetail(' + J(F.TODAY_KEY) + ', activeProg.weeks[3][' + J(F.TODAY_KEY) + '])');
 
 test('the day detail opens with the Wildcard tag, naming the session with apostrophes and ampersands escaped', () => {
   for (const today of WEEK) {
@@ -293,12 +293,12 @@ test('the day detail carries no Wildcard tag when none is stored', () => {
 // The skip describes the prescribed session, the Wildcard what the athlete did; the streak measures attendance. Today
 // trains and is the last scheduled day (t0); t1 and t2 are the two scheduled days before it. Hand walks, from the end:
 // a skip breaks, a complete or a Wildcard counts, a pending day is transparent.
-function streakCase(F) {
+function streakCase(F: WildcardDay) {
   const s = F.handScheduled(F.TRAINS);
   const t = [s[s.length - 1], s[s.length - 2], s[s.length - 3]];
-  const W = (x) => ({ title: 'Chaos Workout', ts: 1, week: x.week, dayKey: x.d });
+  const W = (x: HandDay): WildRecord => ({ title: 'Chaos Workout', ts: 1, week: x.week, dayKey: x.d });
   const prog = F.mkProg(F.TRAINS, 'Recovery Lift');
-  return { t, W, set: (comp, wild) => { B.install(prog, comp, 3); if (wild) B.setWild(wild); } };
+  return { t, W, set: (comp: Record<string, unknown> | null, wild?: WildRecord[]) => { B.install(prog, comp, 3); if (wild) B.setWild(wild); } };
 }
 
 test('a skipped day with no Wildcard breaks the streak to 0, with one skip and two completions counted', () => {
@@ -382,7 +382,7 @@ test('a rest day Wildcard is invisible to the streak, even on a rest day marked 
 });
 
 // ── the completion writers stay out of the flow ──────────────────────────────────────────────────────────────────────
-const fnSrc = (name) => stripJs(ev(name + '.toString()'));
+const fnSrc = (name: string) => stripJs(ev(name + '.toString()'));
 
 test('completeWildcard calls no completion writer and no completion or season pop-up', () => {
   const src = fnSrc('completeWildcard');
@@ -438,10 +438,10 @@ const RULED = {
   popSubTrain: 'Streak: 3.',
   filterLabel: 'My Goal',
 };
-function harvest(F) {
-  const out = {};
-  const sub = (h) => { const m = h.match(/<div class="wc-tag-sub">([\s\S]*?)<\/div>/); return m ? m[1] : null; };
-  const lbl = (h) => { const m = h.match(/<div class="wc-tag-lbl">([\s\S]*?)<\/div>/); return m ? m[1] : null; };
+function harvest(F: WildcardDay) {
+  const out: Record<string, string | null> = {};
+  const sub = (h: string) => { const m = h.match(/<div class="wc-tag-sub">([\s\S]*?)<\/div>/); return m ? m[1] : null; };
+  const lbl = (h: string) => { const m = h.match(/<div class="wc-tag-lbl">([\s\S]*?)<\/div>/); return m ? m[1] : null; };
   B.install(F.mkProg(F.RESTS, 'Recovery Lift'), null, 3);
   completeChaos();
   ev('currentWeek=3; renderWeekView()');
@@ -452,7 +452,7 @@ function harvest(F) {
   out.popMsg = c && c.opts.msg;
   out.popSubRest = c && c.opts.sub;
   const s = F.handScheduled(F.TRAINS);
-  const seed = {};
+  const seed: Record<string, unknown> = {};
   s.slice(-3, -1).forEach((x) => { seed[K(x)] = C; });
   B.install(F.mkProg(F.TRAINS, 'Recovery Lift'), seed, 3);
   completeChaos();
@@ -476,7 +476,7 @@ test('every Wildcard string the app rendered or popped reads the ruled text', ()
 test('no rendered Wildcard string carries a dash, Nike, skipped, or a claim of a completion or a PR', () => {
   const got = Object.values(harvest(B.at(WEEK[0])));
   assert.equal(got.filter((s) => typeof s === 'string').length, Object.keys(RULED).length, 'every string was harvested');
-  for (const s of got) {
+  for (const s of got as string[]) {
     assert.ok(!/\S\s*[—–-]\s*\S/.test(s), s);
     assert.ok(!s.includes('Nike'), s);
     assert.ok(!s.toLowerCase().includes('skipped'), s);
@@ -508,7 +508,7 @@ test('with no endurance pool, an endurance goal\'s My Goal draw falls back to th
 test('the x/y counter counts records with and without a day stamp', () => {
   const F = B.at(WEEK[0]);
   B.install(F.mkProg(['sun'], 'Recovery Lift'), null, 3);
-  const pool = IA.RAND_POOLS.balanced.map((w) => w.title);
+  const pool: string[] = IA.RAND_POOLS.balanced.map((w: { title: string }) => w.title);
   B.setWild([{ title: pool[0], ts: 1 }, { title: pool[1], ts: 2, week: 3, dayKey: F.TODAY_KEY }]);
   ev('updateRandCounter()');
   assert.equal(B.counterText(), '2/' + pool.length);
@@ -517,7 +517,7 @@ test('the x/y counter counts records with and without a day stamp', () => {
 test('the Done Before badge reads the title whatever the record shape, and an empty store offers the Complete button', () => {
   const F = B.at(WEEK[0]);
   B.install(F.mkProg(['sun'], 'Recovery Lift'), null, 3);
-  const pool = IA.RAND_POOLS.balanced.map((w) => w.title);
+  const pool: string[] = IA.RAND_POOLS.balanced.map((w: { title: string }) => w.title);
   B.setWild(pool.map((t, i) => (i % 2 ? { title: t, ts: i } : { title: t, ts: i, week: 3, dayKey: F.TODAY_KEY })));
   ev("randFilter='mine'; reroll();");
   let h = B.randBodyHTML();
@@ -530,7 +530,7 @@ test('the Done Before badge reads the title whatever the record shape, and an em
 
 // ── the day a date resolves to, across daylight saving changes (New York) ────────────────────────────────────────────
 const NY = dstLatticeIn('America/New_York');
-const nyRows = (ids) => ids.filter((id) => !(NY.rows[id] && NY.rows[id].ok)).map((id) => id + ': ' + (NY.rows[id] ? NY.rows[id].detail : 'no result'));
+const nyRows = (ids: string[]) => ids.filter((id) => !(NY.rows[id] && NY.rows[id].ok)).map((id) => id + ': ' + (NY.rows[id] ? NY.rows[id].detail : 'no result'));
 
 test('in New York every day of a block resolves to the hand calendar and back, across the spring and fall changes, odd starts, a new year and a leap February', () => {
   assert.ok(NY.ran, NY.error);
@@ -568,7 +568,7 @@ const GLYPH_BLOCK = [
   TODAY_RULE,
   '.wc-mark-w{font-family:var(--font-display);font-weight:800;font-size:11px;letter-spacing:0;}',
 ];
-const cellNum = (today) => el('div', ['wk-day-num'], el('div', ['wk-day'].concat(today ? ['today'] : [])));
+const cellNum = (today: boolean) => el('div', ['wk-day-num'], el('div', ['wk-day'].concat(today ? ['today'] : [])));
 const NODES = {
   todayMark: el('span', ['wc-mark'], cellNum(true)),
   todayChk: el('span', ['chk'], cellNum(true)),
@@ -576,11 +576,11 @@ const NODES = {
   otherMark: el('span', ['wc-mark'], cellNum(false)),
   otherChk: el('span', ['chk'], cellNum(false)),
 };
-const win = (k) => {
+const win = (k: keyof typeof NODES) => {
   const w = winningColor(CSS.rules, NODES[k]);
   return { sel: w && w.sel, hex: w && CSS.resolveVar(w.v) };
 };
-const tok = (n) => CSS.resolveVar(CSS.rootVars[n]).toLowerCase();
+const tok = (n: string) => CSS.resolveVar(CSS.rootVars[n]).toLowerCase();
 
 test('the five glyph colour rules sit together in the stylesheet once each, in order: tick, W mark, mark base, the today rule, the W letter', () => {
   const st = styleText(IA.html);
@@ -611,7 +611,7 @@ test('on any other day the W mark stays signal and the tick stays run', () => {
 test('the skip glyph on today\'s cell takes on-signal from the today date rule, and no tick or W rule reaches it', () => {
   const sels = colorCandidates(CSS.rules, NODES.todayNum).map((c) => c.sel);
   assert.deepEqual(sels.filter((s) => {
-    const o = parseCompound(s.trim().split(/\s+/).pop());
+    const o = parseCompound(s.trim().split(/\s+/).pop()!);
     return o.cls.includes('chk') || o.cls.includes('wc-mark');
   }), []);
   assert.deepEqual(win('todayNum'), { sel: '.wk-day.today .wk-day-num', hex: '#FBF6EE' });
@@ -621,16 +621,16 @@ test('on today\'s cell the W mark and the tick read at the skip glyph\'s contras
   const signal = '#CF4E1A';
   const skip = contrast('#FBF6EE', signal);
   assert.ok(Math.abs(skip - 4.10) < 0.01, skip.toFixed(4));
-  for (const k of ['todayMark', 'todayChk']) {
-    const c = contrast(win(k).hex, signal);
+  for (const k of ['todayMark', 'todayChk'] as const) {
+    const c = contrast(win(k).hex!, signal);
     assert.equal(+c.toFixed(4), +skip.toFixed(4), k);
     assert.ok(c >= 3, k + ' ' + c.toFixed(2));
   }
 });
 
 test('off today the W mark reads about 3.91:1 and the tick between 3 and 3.6 on the page background', () => {
-  const mark = contrast(win('otherMark').hex, '#f4f1e8');
-  const chk = contrast(win('otherChk').hex, '#f4f1e8');
+  const mark = contrast(win('otherMark').hex!, '#f4f1e8');
+  const chk = contrast(win('otherChk').hex!, '#f4f1e8');
   assert.ok(Math.abs(mark - 3.91) < 0.05, mark.toFixed(2));
   assert.ok(chk > 3 && chk < 3.6, chk.toFixed(2));
 });

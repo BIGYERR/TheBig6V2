@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The injury plan of the day (D194): outside buildProgram the plan that governs a card is the plan of the day the card
 // is on. Since V98 an injury reaches a program only as an overlay, so the sheets (swap, aux, add), the swap tap and the
 // boot replay all read the day's overlay stamp, and D193's hold reaches the athlete the app actually builds. Also the
@@ -14,13 +13,15 @@ import assert from 'node:assert/strict';
 import { test } from 'vitest';
 import { pinClock } from '../support/app.ts';
 import * as I from '../support/injury-overlays.ts';
+import type { App } from '../support/app.ts';
+import type { Cfg, Day, DayKey, Injury, Item, Section } from '@ia/core';
 
 const { clean, host, E } = I;
 const judge = I.judgeMaker();
 const W5 = '2026-09-24';   // W5 Thursday
 const W5MON = '2026-09-21';
 const W1 = '2026-08-24';   // W1 Monday, the program's start
-const KNEE = { region: 'knee', tier: 'workaround' };
+const KNEE: Injury = { region: 'knee', tier: 'workaround' };
 const D8 = '2×6–10 @ RPE 8';
 const D7 = '2×6–10 @ RPE 7';
 const TSAME = (to: any, from: any) => `${to} in, ${from.toLowerCase()} out. Same job, same numbers.`;
@@ -29,7 +30,7 @@ const T119H = (to: any, from: any) => `${to} in, ${from.toLowerCase()} out. No l
 
 // ── the records themselves ──────────────────────────────────────────────────────────────────────────────────────────
 test('a stored record, fixture or overlay, written twice equals itself', () => {
-  for (const ck of ['mario', 'elbow_wa']) for (const [pres, clock, from] of [['CFG', W5], ['CFG', W1], ['OV', W5, W5MON], ['OV', W1, W1]]) {
+  for (const ck of ['mario', 'elbow_wa']) for (const [pres, clock, from] of [['CFG', W5], ['CFG', W1], ['OV', W5, W5MON], ['OV', W1, W1]] satisfies [I.Pres, string, string?][]) {
     const a = I.stored(I.sharedApp(clock, 3), I.L9[ck], pres, from);
     assert.equal(I.stored(I.sharedApp(clock, 4), I.L9[ck], pres, from), a, `${ck} ${pres} ${clock}`);
     assert.ok(a.length > 1000);
@@ -45,9 +46,9 @@ test('the app\'s overlay writer stamps every carded day of the injured build, an
     const fxW = JSON.parse(E(fx, 'JSON.stringify(activeProg.weeks)'));
     // the synthetic stamp (applyOverlays' output shape) equals the writer's program on every day
     const syn = I.clone(I.sharedApp(W1, 3).buildProgram(I.clone(cfg)));
-    const stamped = I.stampWeeks(syn.weeks, I.stampKey(cfg.injury));
+    const stamped = I.stampWeeks(syn.weeks, I.stampKey(cfg.injury!));
     assert.ok(stamped > 0);
-    for (const w of Object.keys(syn.weeks)) for (const d of Object.keys(syn.weeks[w])) assert.equal(JSON.stringify(syn.weeks[w][d]), JSON.stringify(ovW[w] && ovW[w][d]), `${ck} W${w} ${d} stamp`);
+    for (const w of Object.keys(syn.weeks)) for (const d of Object.keys(syn.weeks[w]) as DayKey[]) assert.equal(JSON.stringify(syn.weeks[w][d]), JSON.stringify(ovW[w] && ovW[w][d]), `${ck} W${w} ${d} stamp`);
     let carded = 0;
     for (const w of Object.keys(fxW)) for (const d of Object.keys(fxW[w])) {
       const a = fxW[w][d];
@@ -63,22 +64,22 @@ test('the app\'s overlay writer stamps every carded day of the injured build, an
 });
 
 // ── D193's build half reaches an overlay athlete ────────────────────────────────────────────────────────────────────
-const itemsOf = (X: any, w: any) => {
-  const wk = I.weekOf(X, w);
-  const o = [];
+const itemsOf = (X: App, w: number) => {
+  const wk = I.weekOf(X, w)!;
+  const o: { d: string; n: string; det: string }[] = [];
   I.ISO_DAYS.forEach((d) => ((wk[d] && wk[d].sections) || []).forEach((s) => (s.items || []).forEach((it) => { if (it && it.name) o.push({ d, n: clean(it.name), det: it.detail || '' }); })));
   const carded = I.ISO_DAYS.filter((d) => wk[d] && wk[d].sections && wk[d].sections.length);
-  return { o, carded: carded.length, stamped: carded.filter((d) => wk[d]._ovKey).length };
+  return { o, carded: carded.length, stamped: carded.filter((d) => (wk[d] as Day & { _ovKey?: string })._ovKey).length };
 };
 const pat = I.patternOf(I.sharedApp(W5, 3));
 
 test('on the overlay path no capped card prints above RPE 7, and every overlay card equals the fixture\'s card', () => {
   const lowbackBW = I.withInj({ region: 'lowback', tier: 'workaround' }, { equipment: 'bodyweight' });
-  for (const [cfg, n, cue] of [[I.L9.mario, 31, 1], [lowbackBW, 30, null]]) {
+  for (const [cfg, n, cue] of [[I.L9.mario, 31, 1], [lowbackBW, 30, null]] satisfies [Cfg, number, number | null][]) {
     const cap = I.capOf(cfg);
     const a = itemsOf(I.progAt(cfg, 'OV', W5, W5MON).X, 5);
     const b = itemsOf(I.progAt(cfg, 'CFG', W5, undefined, 1).X, 5);
-    assert.deepEqual(a.o.filter((i) => cap.includes(pat(i.n)) && I.rpeMax(i.det) > 7).map((i) => `${i.d} ${i.n}`), []);
+    assert.deepEqual(a.o.filter((i) => cap.includes(pat(i.n)) && I.rpeMax(i.det)! > 7).map((i) => `${i.d} ${i.n}`), []);
     if (cue !== null) assert.equal(a.o.filter((i) => I.CUE_RE.test(i.det)).length, cue, 'the cue prints once on Mario\'s W5');
     assert.equal(a.o.length, n);
     assert.deepEqual(a.o, b.o);
@@ -90,7 +91,7 @@ test('on the overlay path a held lift does not test: the knee plan\'s W6 box squ
   const cfg = I.withInj(KNEE, { liftingFocus: 'strength' });
   const { X } = I.progAt(cfg, 'OV', W5, W5MON);
   assert.equal(E(X, 'activeProg.totalWeeks'), 6);
-  const main = (d) => { const s = I.dayOf(X, 6, d).sections[0]; return [clean(s.label), s.items[0].detail]; };
+  const main = (d: string) => { const s = I.dayOf(X, 6, d)!.sections![0]; return [clean(s.label), s.items[0].detail]; };
   assert.deepEqual(main('thu'), ['Main — Barbell box squat', I.R7_T]);
   assert.deepEqual(main('tue'), ['Main — Barbell Romanian deadlift', I.TEST_T]);
   const a = itemsOf(X, 6);
@@ -137,7 +138,7 @@ test('a travel-only overlay stamps its days with the substitute patch and no inj
   E(X, "_ovDraft.equipment='minimal';_ovDraft.from='2026-09-22';_ovDraft.to='2026-09-24';applyOverlayDraft();");
   const st = I.ISO_DAYS.filter((d) => /substitute/.test(String(I.stampOf(X, 5, d) || '')));
   assert.deepEqual(st, ['tue', 'thu']);
-  assert.ok(st.every((d) => !/injury/.test(I.stampOf(X, 5, d))));
+  assert.ok(st.every((d) => !/injury/.test(I.stampOf(X, 5, d)!)));
 });
 
 test('coming back from the injury: the bridge days offer nothing the knee plan rejects, then the half step', () => {
@@ -145,7 +146,7 @@ test('coming back from the injury: the bridge days offer nothing the knee plan r
   pinClock(X, new Date(W5 + 'T12:01:00'));   // a minute on, so the new overlays get ids of their own
   const id = E(X, "activeProg.overlays.find(function(o){return o.type==='injury';}).id");
   E(X, `imBackFromInjury(${JSON.stringify(id)});`);
-  const kinds = { bridge: [], halfstep: [] };
+  const kinds: Record<string, string[]> = { bridge: [], halfstep: [] };
   let rej = 0;
   let offers = 0;
   for (const w of [5, 6, 7]) for (const d of I.DAYS) {
@@ -203,14 +204,14 @@ const POOL = [I.sharedApp(W5, 5), I.sharedApp(W5, 6), I.sharedApp(W5, 7)];
 function driveRoutes(pres: any) {
   const [A, B, C] = POOL;
   const st = I.stored(A, I.L9.mario, pres, W5MON);
-  const load = (Y) => { I.setup(Y, st); return Y; };
-  const bootSlot = (Y, c, into) => { I.bootFrom(Y, into); return slot3(I.slotOf(into, c.w, c.d, c.si, c.ii)); };
+  const load = (Y: App) => { I.setup(Y, st); return Y; };
+  const bootSlot = (Y: App, c: I.SlotAt, into: App) => { I.bootFrom(Y, into); return slot3(I.slotOf(into, c.w, c.d, c.si, c.ii)); };
   load(A);
-  const c = I.findSlot(A, 5, 'thu', 'Leg superset B', 'Single-leg hip thrust');
+  const c = I.findSlot(A, 5, 'thu', 'Leg superset B', 'Single-leg hip thrust')!;
   assert.deepEqual(c && [c.si, c.ii], [3, 1]);
   assert.deepEqual(slot3(I.slotOf(A, 5, 'thu', 3, 1)), { n: 'Single-leg hip thrust', d: D8, h: null });
   const before = JSON.stringify(I.dayOf(A, 5, 'thu'));
-  const got = {};
+  const got: Record<string, unknown> = {};
   { const Y = load(A); const hops = ['Barbell hip thrust', 'Leg extension', 'Barbell good mornings'].map((to) => hop3(I.hop(Y, c, to)));
     const rec = I.swapRecord(Y, 'w5_thu'); const boot = bootSlot(Y, c, B); const u = I.undoLast(Y, c);
     got.U0 = { hops, rec, boot, chip: u.chip, undo: u.slot, undoBoot: bootSlot(Y, c, B) }; }
@@ -229,10 +230,10 @@ function driveRoutes(pres: any) {
   const stS = I.stored(A, cfgS, pres, W5MON);
   const XS = A;
   I.setup(XS, stS);
-  const cS = I.findSlot(XS, 6, 'thu', 'Main — Barbell box squat', 'Barbell box squat');
+  const cS = I.findSlot(XS, 6, 'thu', 'Main — Barbell box squat', 'Barbell box squat')!;
   assert.ok(cS, `${pres}: W6 thu Main — Barbell box squat`);
   assert.deepEqual(slot3(I.slotOf(XS, 6, 'thu', cS.si, cS.ii)), { n: 'Barbell box squat', d: I.R7_T, h: null });
-  const r7 = {};
+  const r7: Record<string, unknown> = {};
   for (const to of Object.keys(R7ROUTES)) {
     const Y = A;
     I.setup(Y, stS);
@@ -264,22 +265,22 @@ test('Mario\'s capped single hops hold at RPE 7 with the hold toast, live and at
   const stOv = I.stored(I.sharedApp(W1, 3), cfg, 'OV', W1);
   const Q = I.sharedApp(W1, 3);
   I.setup(Q, stFix);
-  const pairs = [];
+  const pairs: (I.SlotAt & { from: string; to: string })[] = [];
   const W = JSON.parse(E(Q, 'JSON.stringify(activeProg.weeks)'));
   for (const w of Object.keys(W)) for (const d of Object.keys(W[w])) {
     const dy = W[w][d];
     if (!dy || !Array.isArray(dy.sections)) continue;
-    dy.sections.forEach((s, si) => (s.items || []).forEach((it, ii) => {
-      if (!it || typeof it.detail !== 'string' || !(I.CUE_RE.test(it.detail) || I.rpeMax(it.detail) > 7)) return;
+    dy.sections.forEach((s: Section, si: number) => (s.items || []).forEach((it: Item, ii: number) => {
+      if (!it || typeof it.detail !== 'string' || !(I.CUE_RE.test(it.detail) || I.rpeMax(it.detail)! > 7)) return;
       E(Q, `currentWeek=${w};currentDayKey='${d}';`);
-      host(E(Q, `__cands(activeProg.weeks[${w}].${d},${w},${JSON.stringify(it.name)})`)).forEach((to) => { if (cap.includes(pat(to))) pairs.push({ w: +w, d, si, ii, from: clean(it.name), to }); });
+      host(E(Q, `__cands(activeProg.weeks[${w}].${d},${w},${JSON.stringify(it.name)})`)).forEach((to: string) => { if (cap.includes(pat(to))) pairs.push({ w: +w, d, si, ii, from: clean(it.name), to }); });
     }));
   }
   assert.ok(pairs.length >= 10, `${pairs.length} capped single hops`);
   const step = Math.max(1, Math.floor(pairs.length / 30));
   const A = I.sharedApp(W1, 0);
   const B = I.sharedApp(W1, 1);
-  const run = (st, p) => {
+  const run = (st: string, p: I.SlotAt & { to: string }) => {
     I.setup(A, st);
     const h = I.hop(A, p, p.to);
     I.bootFrom(A, B);
@@ -290,7 +291,7 @@ test('Mario\'s capped single hops hold at RPE 7 with the hold toast, live and at
     const f = run(stFix, p);
     assert.ok(o.stamp, `W${p.w} ${p.d} is stamped on the overlay`);
     assert.deepEqual({ live: o.live, t: o.t, boot: o.boot }, { live: f.live, t: f.t, boot: f.boot }, `W${p.w} ${p.d} ${p.from} > ${p.to}`);
-    assert.ok(!(I.rpeMax(o.live.d) > 7) && !(I.rpeMax(o.boot.d) > 7), `W${p.w} ${p.d} ${p.from} > ${p.to}: ${o.live.d}`);
+    assert.ok(!(I.rpeMax(o.live.d)! > 7) && !(I.rpeMax(o.boot.d)! > 7), `W${p.w} ${p.d} ${p.from} > ${p.to}: ${o.live.d}`);
     assert.equal(o.live.d, o.boot.d, 'live == boot');
     assert.ok(o.t.endsWith(I.HOLD) || I.CUE_RE.test(o.live.d), `the hold is announced or cued: ${o.t}`);
   }
@@ -305,12 +306,12 @@ const TYPED_LATE = [
   { id: 'T3', pres: 'OVT', region: 'hip', w: 5, d: 'sat', from: 'Mountain climbers', to: 'Burpees',
     boot: 'Strength{Decline pushups|2 sets — RPE 7 (leave 3 or more in reserve);Inverted rows (rings)|2 sets — RPE 8 (stop 2 reps short of failure)} Explosive finisher{Burpees|2×15}' },
 ];
-const sig = (dy: any) => (!dy || !dy.sections ? '(none)' : dy.sections.map((s) => clean(s.label) + '{' + (s.items || []).map((it) => clean(it.name) + '|' + (it.detail || '')).join(';') + '}').join(' '));
+const sig = (dy: any) => (!dy || !dy.sections ? '(none)' : dy.sections.map((s: Section) => clean(s.label) + '{' + (s.items || []).map((it: Item) => clean(it.name) + '|' + (it.detail || '')).join(';') + '}').join(' '));
 
 test('a swap made before a late plan boots under the late plan, whole day re-filtered (three typed cards)', () => {
-  const OTHER = { knee: 'ankle', ankle: 'hip', hip: 'lowback', lowback: 'shoulder', shoulder: 'elbow', elbow: 'knee' };
+  const OTHER: Record<string, string> = { knee: 'ankle', ankle: 'hip', hip: 'lowback', lowback: 'shoulder', shoulder: 'elbow', elbow: 'knee' };
   for (const T of TYPED_LATE) {
-    const late = T.pres === 'OVOV' ? { region: OTHER[T.region], tier: 'workaround' } : T.pres === 'OVT' ? { region: T.region, tier: 'protect' } : { region: T.region, tier: 'workaround' };
+    const late: Injury = T.pres === 'OVOV' ? { region: OTHER[T.region], tier: 'workaround' } : T.pres === 'OVT' ? { region: T.region, tier: 'protect' } : { region: T.region, tier: 'workaround' };
     const base = I.withInj({ region: T.region, tier: 'workaround' });
     // PRE1: an uninjured program; OVOV and OVT: the region's workaround overlay from W1 already on it
     const st = T.pres === 'PRE1' ? I.stored(I.sharedApp(W1, 3), I.L9.mario_noinj, 'CFG') : I.stored(I.sharedApp(W1, 3), base, 'OV', W1);

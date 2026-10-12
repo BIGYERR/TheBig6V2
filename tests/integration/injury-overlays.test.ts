@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Injury and travel overlays: what the injury filter renames, drops and holds, and what reaches the athlete through an
 // overlay, the swap sheet and a reboot.
 //   D43 and the heading sync: a renamed item carries its section heading with it.
@@ -19,6 +18,7 @@ import assert from 'node:assert/strict';
 import { test } from 'vitest';
 import { loadApp, appScript, fixtures } from '../support/app.ts';
 import * as I from '../support/injury-overlays.ts';
+import type { DayKey, Equipment, Item, Section } from '@ia/core';
 
 const IA = loadApp();
 const { clean, host, E } = I;
@@ -28,19 +28,19 @@ const { clean, host, E } = I;
 // (overhead range, dips, pike and handstand, lateral raise), a parked class that may leave a heading behind.
 const SWAP_KEYS = ['Dumbbell bench press', 'Dumbbell skullcrushers', 'Barbell curl', 'Preacher curl', 'Ab wheel rollouts', 'Hanging knee raises', 'L-sit hold', 'L-sit chinups', 'Hanging leg raises'];
 const SHOULDER_WORKAROUND_DELETED = /overhead|arnold|push press|military|pike pushup|handstand|wall walk|\bdips\b|lateral raise/i;
-const EQUIP6 = ['bodyweight', 'minimal', 'home_basic', 'home_full', 'commercial', 'crossfit'];
+const EQUIP6: Equipment[] = ['bodyweight', 'minimal', 'home_basic', 'home_full', 'commercial', 'crossfit'];
 const sectionsOf = (prog: any) => {
-  const out = [];
+  const out: { wk: number; lastWk: number; d: DayKey; label: string; names: string[] }[] = [];
   const total = Object.keys(prog.weeks || {}).length;
   for (const wk of Object.keys(prog.weeks || {})) for (const d of I.DAYS) {
     const day = prog.weeks[wk][d];
-    if (day) for (const s of day.sections || []) out.push({ wk: +wk, lastWk: total, d, label: String(s.label || ''), names: (s.items || []).map((i) => clean(i.name)) });
+    if (day) for (const s of day.sections || []) out.push({ wk: +wk, lastWk: total, d, label: String(s.label || ''), names: (s.items || []).map((i: Item) => clean(i.name)) });
   }
   return out;
 };
 const HEAD = (() => {
   const vocab = new Set(SWAP_KEYS);
-  const healthyBench = {};
+  const healthyBench: Record<string, number> = {};
   let healthySections = 0;
   for (const equipment of EQUIP6) {
     healthyBench[equipment] = 0;
@@ -52,7 +52,7 @@ const HEAD = (() => {
       }
     }
   }
-  const r = { vocab, healthySections, healthyBench, injSections: 0, claims: 0, primer: 0, raceWeekPrimer: 0, latch: [], unexplained: [], floor: {}, bench: {} };
+  const r = { vocab, healthySections, healthyBench, injSections: 0, claims: 0, primer: 0, raceWeekPrimer: 0, latch: [] as string[], unexplained: [] as string[], floor: {} as Record<string, number>, bench: {} as Record<string, number> };
   for (const equipment of EQUIP6) {
     r.floor[equipment] = 0;
     r.bench[equipment] = 0;
@@ -101,26 +101,26 @@ test('D43 fires on every tier that owns dumbbells: the floor press in, the bench
   assert.ok(EQUIP6.some((e) => e !== 'bodyweight' && HEAD.healthyBench[e] > 0), 'a healthy program on some dumbbell tier prescribes the bench press');
 });
 
-const filterOne = (label: any, name: any, detail: any, injury: any, extra: any) => {
+const filterOne = (label: any, name: any, detail: any, injury: any, extra?: any) => {
   const cfg = { ...fixtures.HALF_MANNY, ...(extra || {}), ...(injury ? { injury } : {}) };
   const out = IA.applyInjuryFilter([{ label, items: [{ name, detail: detail || '3×10' }] }], cfg);
   return out && out.length ? { label: String(out[0].label || ''), name: clean((out[0].items[0] || {}).name), detail: (out[0].items[0] || {}).detail } : null;
 };
 
 test('the shoulder workaround renames the bench press to the floor press, and its heading follows', () => {
-  const r = filterOne('Main — Dumbbell bench press', 'Dumbbell bench press', '4×5', { region: 'shoulder', tier: 'workaround' });
+  const r = filterOne('Main — Dumbbell bench press', 'Dumbbell bench press', '4×5', { region: 'shoulder', tier: 'workaround' })!;
   assert.deepEqual([r.name, r.label], ['Dumbbell floor press', 'Main — Dumbbell floor press']);
 });
 
 test('the spine-safe swap renames ab wheel rollouts to dead bugs, and its heading follows', () => {
-  const r = filterOne('Core — Ab wheel rollouts', 'Ab wheel rollouts', '3×10', { region: 'lowback', tier: 'workaround' });
+  const r = filterOne('Core — Ab wheel rollouts', 'Ab wheel rollouts', '3×10', { region: 'lowback', tier: 'workaround' })!;
   assert.deepEqual([r.name, r.label], ['Dead bugs', 'Core — Dead bugs']);
 });
 
 test('the rename leaves a healthy card alone, leaves a generic heading as written, and is idempotent', () => {
-  const h = filterOne('Main — Dumbbell bench press', 'Dumbbell bench press', '4×5', null);
+  const h = filterOne('Main — Dumbbell bench press', 'Dumbbell bench press', '4×5', null)!;
   assert.deepEqual([h.name, h.label], ['Dumbbell bench press', 'Main — Dumbbell bench press']);
-  const g = filterOne('Pump', 'Dumbbell bench press', '4×5', { region: 'shoulder', tier: 'workaround' });
+  const g = filterOne('Pump', 'Dumbbell bench press', '4×5', { region: 'shoulder', tier: 'workaround' })!;
   assert.deepEqual([g.name, g.label], ['Dumbbell floor press', 'Pump']);
   const cfg = { ...fixtures.HALF_MANNY, injury: { region: 'shoulder', tier: 'workaround' } };
   const once = IA.applyInjuryFilter([{ label: 'Main — Dumbbell bench press', items: [{ name: 'Dumbbell bench press', detail: '4×5' }] }], cfg);
@@ -132,8 +132,8 @@ test('the rename leaves a healthy card alone, leaves a generic heading as writte
 const SRC = appScript();
 const ASSIGNS = I.injuryPoolAssignments(SRC);
 const survives = (() => {
-  const memo = {};
-  return (nm, region, tier) => {
+  const memo: Record<string, boolean> = {};
+  return (nm: string, region: string, tier: string) => {
     const k = `${region}|${tier}|${nm}`;
     if (!(k in memo)) {
       const out = IA.applyInjuryFilter([{ label: 'Probe', items: [{ name: nm, detail: '3×5' }] }], { ...fixtures.HALF_MANNY, seed: 76308, injury: { region, tier } });
@@ -143,10 +143,10 @@ const survives = (() => {
   };
 })();
 const POOL = (() => {
-  const r = { lens: 0, lensBad: [], floor: 0, floorBad: [], thinBad: [], hit: new Set() };
+  const r = { lens: 0, lensBad: [] as string[], floor: 0, floorBad: [] as string[], thinBad: [] as string[], hit: new Set<string>() };
   for (const a of ASSIGNS || []) {
     if (!a.region || !a.tier) continue;
-    const names = new Set();
+    const names = new Set<string>();
     for (const e of EQUIP6) { const v = I.resolvePool(a.expr, e); if (v) v.forEach((n) => names.add(n)); }
     if (!names.size) (a.expr.match(/'[^']*'/g) || []).forEach((q) => { const nm = q.slice(1, -1); if (/[a-z]/i.test(nm) && nm.length > 3) names.add(nm); });
     for (const nm of names) {
@@ -166,7 +166,7 @@ const POOL = (() => {
         continue;
       }
       r.floor++;
-      const alive = v.filter((nm) => survives(nm, a.region, a.tier));
+      const alive = v.filter((nm) => survives(nm, a.region!, a.tier!));
       if (alive.length < 2) r.floorBad.push(`${a.region}/${a.tier} ${a.name} on ${e}: ${alive.length} of [${v.join(', ')}]`);
     }
   }
@@ -202,16 +202,16 @@ test('the lowback/protect vertical pull holds four or more members, no L-sit chi
 });
 
 // ── D154: the injury renamer reads the gear lens ────────────────────────────────────────────────────────────────────
-const OWNS = {   // the inventory per tier, typed from the tier copy the athlete reads
+const OWNS: Record<string, Record<string, number>> = {   // the inventory per tier, typed from the tier copy the athlete reads
   commercial: { BARBELL: 1, DUMBBELL: 1, CABLE: 1, MACHINE: 1, GHD: 1, KETTLEBELL: 1 },
   crossfit: { BARBELL: 1, DUMBBELL: 1, CABLE: 0, MACHINE: 0, GHD: 1, KETTLEBELL: 1 },
   home_full: { BARBELL: 1, DUMBBELL: 1, CABLE: 0, MACHINE: 0, GHD: 0, KETTLEBELL: 1 },
   home_basic: { BARBELL: 0, DUMBBELL: 1, CABLE: 0, MACHINE: 0, GHD: 0, KETTLEBELL: 1 },
   bodyweight: { BARBELL: 0, DUMBBELL: 0, CABLE: 0, MACHINE: 0, GHD: 0, KETTLEBELL: 0 },
 };
-function implementsOf(name: any) {
+function implementsOf(name: any): Set<string> {
   const N = String(name).toLowerCase();
-  const c = new Set();
+  const c = new Set<string>();
   if (/glute[- ]ham|\bghr\b|\bghd\b|45° back extension|roman chair/.test(N)) c.add('GHD');
   if (/\bbarbell\b|^back squat|^front squat|^bench press|close-grip bench|trap bar|power clean|hang clean|rack pull|landmine|\bez[- ]?bar|^good mornings?\b|^deadlift|^pendlay|^hip thrust$/.test(N)) c.add('BARBELL');
   if (/dumbbell|\bdb\b/.test(N) || (/goblet/.test(N) && !/kettlebell|\bkb\b/.test(N))) c.add('DUMBBELL');
@@ -221,9 +221,9 @@ function implementsOf(name: any) {
   return c;
 }
 const gearLegal = (t: any, n: any) => [...implementsOf(n)].every((c) => OWNS[t][c] !== 0);
-const SWAPS = { shoulder: { 'Dumbbell bench press': 'Dumbbell floor press' },
+const SWAPS: Record<string, Record<string, string>> = { shoulder: { 'Dumbbell bench press': 'Dumbbell floor press' },
   elbow: { 'Dumbbell skullcrushers': 'Cable pushdown', 'Barbell curl': 'Dumbbell hammer curl', 'Preacher curl': 'Cable curl' } };
-const FALLBACK = { 'Cable pushdown': 'Close-grip pushups' };
+const FALLBACK: Record<string, string> = { 'Cable pushdown': 'Close-grip pushups' };
 const EXPECT = (t: any, s: any, to: any) => (gearLegal(t, s) ? (gearLegal(t, to) ? to : FALLBACK[to] || to) : s);
 const ELBOW_COPY = 'Straight bar work moves to neutral grips. Skullcrushers become pushdowns, or close grip pushups where there is no cable. Dips and carries are out. Pressing holds RPE 7.';
 
@@ -231,23 +231,23 @@ test('the renamer hand table: the fallback lands on the no-cable tiers, and the 
   for (const t of ['crossfit', 'home_full', 'home_basic', 'bodyweight']) assert.ok(!gearLegal(t, 'Cable pushdown'), t);
   assert.ok(gearLegal('commercial', 'Cable pushdown'));
   for (const t of Object.keys(OWNS)) assert.ok(gearLegal(t, 'Close-grip pushups'), t);
-  const LIT = [['commercial', 'Dumbbell skullcrushers', 'Cable pushdown'], ['crossfit', 'Dumbbell skullcrushers', 'Close-grip pushups'],
+  const LIT: [string, string, string][] = [['commercial', 'Dumbbell skullcrushers', 'Cable pushdown'], ['crossfit', 'Dumbbell skullcrushers', 'Close-grip pushups'],
     ['home_full', 'Dumbbell skullcrushers', 'Close-grip pushups'], ['home_basic', 'Dumbbell skullcrushers', 'Close-grip pushups'],
     ['bodyweight', 'Dumbbell skullcrushers', 'Dumbbell skullcrushers'], ['bodyweight', 'Dumbbell bench press', 'Dumbbell bench press'],
     ['home_basic', 'Dumbbell bench press', 'Dumbbell floor press'], ['crossfit', 'Preacher curl', 'Preacher curl'],
     ['commercial', 'Preacher curl', 'Cable curl'], ['home_basic', 'Barbell curl', 'Barbell curl'], ['home_full', 'Barbell curl', 'Dumbbell hammer curl']];
   for (const [t, s, want] of LIT) {
-    const r = Object.keys(SWAPS).find((k) => SWAPS[k][s]);
+    const r = Object.keys(SWAPS).find((k) => SWAPS[k][s])!;
     assert.equal(EXPECT(t, s, SWAPS[r][s]), want, `${t} ${s}`);
   }
 });
 
 test('only the shoulder and elbow workaround plans rename, and they rename exactly the ruled pairs', () => {
   const plan = IA.eval('injuryPlan');
-  const got = {};
+  const got: Record<string, unknown> = {};
   for (const r of Object.keys(SWAPS)) got[r] = host((plan({ injury: { region: r, tier: 'workaround' } }) || {}).swapNames);
   assert.deepEqual(got, SWAPS);
-  const others = [];
+  const others: string[] = [];
   for (const r of ['lowback', 'hip', 'knee', 'ankle', 'shoulder', 'elbow']) for (const ti of ['workaround', 'protect']) {
     if (ti === 'workaround' && SWAPS[r]) continue;
     const P = plan({ injury: { region: r, tier: ti } });
@@ -320,7 +320,7 @@ test('the travel holds copy names no implement on any tier, keeps the single arm
 const PUSHUPS = 'Pushups (slow 3s eccentric)';
 const A_AFTER = '4 sets — RPE 7 (leave 3 or more in reserve)';
 const cellCfg = (o: any) => Object.assign(I.clone(I.MARIO), { injury: { region: 'elbow', tier: 'workaround' }, equipment: 'bodyweight', experience: 'advanced' }, o);
-const card = (d: any) => host((d && d.sections) || []).map((s) => [clean(s.label), (s.items || []).map((i) => [clean(i.name), clean(i.detail)])]);
+const card = (d: any): [string, [string, string][]][] => host((d && d.sections) || []).map((s: Section): [string, [string, string][]] => [clean(s.label), (s.items || []).map((i: Item): [string, string] => [clean(i.name), clean(i.detail)])]);
 
 test('elbow workaround on bodyweight: the swept chest volume pushups hold at RPE 7 on the W3 and W4 Mondays of all ten programs', () => {
   const CELLS = [{ liftingFocus: 'support_strength', seed: 76308 }, { liftingFocus: 'support_athletic', seed: 76308 },
@@ -368,7 +368,7 @@ test('the post-sweep re-filter sits inside the bodyweight branch, once, guarded 
 });
 
 // ── D193: the cap cue says three in the tank, and the stripper knows both wordings (R1, R4, R5, R6) ─────────────────
-const NUMWORD = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five' };
+const NUMWORD: Record<number, string> = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five' };
 const RIR = (rpe: any) => Math.round(10 - rpe);   // the hand rule: reps in reserve = 10 − RPE
 const TSAME = (to: any, from: any) => `${to} in, ${from.toLowerCase()} out. Same job, same numbers.`;
 
@@ -400,7 +400,7 @@ const L9CARDS = Object.fromEntries(Object.entries(I.L9).map(([k, c]) => [k, I.ca
 test('the stripper takes either cue wording and the held-test text back to the bare dose, and leaves everything else alone', () => {
   const outs = strip(IA, STRIP_HAND.map((r) => r[0]));
   STRIP_HAND.forEach(([d, w], i) => assert.equal(outs[i], w === null ? d : w, JSON.stringify(d)));
-  const pop = [];
+  const pop: string[] = [];
   Object.values(L9CARDS).forEach((cs) => cs.forEach((c) => { if (!I.CUE_RE.test(c.det) && c.det !== I.R7_T) pop.push(c.det); }));
   assert.ok(pop.length > 1000, `${pop.length} non-cue cards`);
   const po = strip(IA, pop);
@@ -420,19 +420,19 @@ test('a card stored with the old "two" cue keeps it on a past week, and a live s
   // Mario at knee/workaround, stored with W5 thu Step-ups (KB) carrying the retired wording, booted in W6 (W5 is past)
   const st0 = I.clone(I.appAt('2026-09-24').buildProgram(I.clone(I.L9.mario)));
   let n = 0;
-  st0.weeks[5].thu.sections.forEach((s) => s.items.forEach((it) => {
+  st0.weeks[5].thu.sections!.forEach((s) => s.items.forEach((it) => {
     if (it.name === 'Step-ups (KB)' && it.detail === '2×10 each' + I.NEWC) { it.detail = '2×10 each' + I.OLDC; n++; }
   }));
   assert.equal(n, 1, 'W5 thu Leg superset A carries Step-ups (KB) under the cue');
   Object.assign(st0, { id: 'PM', name: 'M', created: 1, startDate: I.START, cfg: I.clone(I.L9.mario) });
   const pat = I.patternOf(IA);
   assert.deepEqual(['Step-ups (KB)', 'Reverse lunge (KB)', 'Barbell good mornings'].map(pat), ['lunge', 'lunge', 'hinge']);
-  const WANT = { 'Reverse lunge (KB)': '2×10 each' + I.NEWC, 'Barbell good mornings': '2×10 each' };
+  const WANT: Record<string, string> = { 'Reverse lunge (KB)': '2×10 each' + I.NEWC, 'Barbell good mornings': '2×10 each' };
   for (const to of Object.keys(WANT)) {
     const X = I.appAt('2026-10-01');
     I.setup(X, JSON.stringify(st0));
     assert.equal(E(X, 'calcCurrentWeek()'), 6);
-    const L = I.findSlot(X, 5, 'thu', 'Leg superset A', 'Step-ups (KB)');
+    const L = I.findSlot(X, 5, 'thu', 'Leg superset A', 'Step-ups (KB)')!;
     assert.equal(I.slotOf(X, 5, 'thu', L.si, L.ii).d, '2×10 each' + I.OLDC, 'the stored words show on the past week');
     const h = I.hop(X, L, to);
     assert.ok(h.offered && h.landed, `${to} offered and landed`);
@@ -464,7 +464,7 @@ test('the clamp writes each of the four hold shapes and R7\'s held test on a cap
   assert.equal(pat('Barbell box squat'), 'squat');
   assert.equal(pat('Barbell Romanian deadlift'), 'hinge');
   for (const [name, d, want] of ins) {
-    if (name === 'Barbell box squat' && I.rpeMax(d) > 7) assert.equal(I.handHold(d), want, `the hand hold of ${d}`);
+    if (name === 'Barbell box squat' && I.rpeMax(d)! > 7) assert.equal(I.handHold(d), want, `the hand hold of ${d}`);
     const out = IA.applyInjuryFilter([{ label: 'x', items: [{ name, detail: d }] }], I.clone(I.L9.mario));
     assert.deepEqual([clean(out[0].items[0].name), out[0].items[0].detail], [name, want], `${name} ${d}`);
   }
@@ -474,7 +474,7 @@ test('the clamp writes each of the four hold shapes and R7\'s held test on a cap
 function lensCensus(cfgs: any) {
   const X = I.lensApp();
   const pat = I.patternOf(I.appAt('2026-09-24'));
-  const r = { U: 0, hi: [], forbid: [], loadHead: 0, power: 0, powerCued: [], r7: 0, test: 0, r7Uncapped: [], testCapped: [], numOnly: [] };
+  const r = { U: 0, hi: [] as string[], forbid: [] as string[], loadHead: 0, power: 0, powerCued: [] as string[], r7: 0, test: 0, r7Uncapped: [] as string[], testCapped: [] as string[], numOnly: [] as string[] };
   for (const c of cfgs) {
     const cap = I.capOf(c);
     for (const k of I.lensCards(X, c)) {
@@ -482,7 +482,7 @@ function lensCensus(cfgs: any) {
       const where = `${c.injury ? c.injury.region + '/' + c.injury.tier : 'healthy'} ${c.equipment} W${k.w} ${k.d} ${k.n} :: ${k.det}`;
       if (inU) {
         r.U++;
-        if (I.rpeMax(k.det) > 7) r.hi.push(where);
+        if (I.rpeMax(k.det)! > 7) r.hi.push(where);
         if (I.FORBID.some((f) => k.det.includes(f))) r.forbid.push(where);
         if (k.det.startsWith('3 sets of 8 to 12 — RPE 7 (leave ~3 in reserve)')) r.loadHead++;
       }
@@ -528,16 +528,16 @@ test('an uninjured program keeps no pre-hold dose: not after a build, two live s
   for (const c of [I.L9.mario_noinj, I.L9.manny]) assert.doesNotMatch(JSON.stringify(I.appAt('2026-09-24').buildProgram(I.clone(c))), /"_preHold"/);
   const { X, st } = I.progAt(I.L9.mario_noinj, 'CFG', '2026-09-24');
   const Y = I.appAt('2026-09-24');
-  const W5 = I.weekOf(X, 5);
+  const W5 = I.weekOf(X, 5)!;
   let slots = 0;
-  for (const d of Object.keys(W5)) ((W5[d] && W5[d].sections) || []).forEach((s, si) => (s.items || []).forEach((it, ii) => {
+  for (const d of Object.keys(W5) as DayKey[]) ((W5[d] && W5[d].sections) || []).forEach((s, si) => (s.items || []).forEach((it, ii) => {
     if (!it || !it.name) return;
     I.setup(X, st);
     const c = { w: 5, d, si, ii };
     const tg = host(E(X, `__cands(activeProg.weeks[5].${d},5,${JSON.stringify(it.name)})`));
     if (!tg.length) return;
     slots++;
-    tg.slice(0, 2).forEach((to) => I.hop(X, c, to));
+    tg.slice(0, 2).forEach((to: string) => I.hop(X, c, to));
     I.bootFrom(X, Y);
     I.undoLast(X, c);
     const blobs = [JSON.stringify(I.dayOf(X, 5, d)), JSON.stringify(I.dayOf(Y, 5, d))]
