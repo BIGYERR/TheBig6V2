@@ -130,12 +130,42 @@ chunks that changed.
 Each phase lands on `dev` in small commits, goes through CI and reaches `main` only through Mario's pull request.
 Releases keep shipping between phases.
 
-### Phase A: the TypeScript foundation (about 1 session; no app change)
+### Phase A: the TypeScript foundation (about 1 session; no app change) — done, Post-v0.239.1
 - Create `core/` (package, strict tsconfig, `erasableSyntaxOnly`), a base tsconfig shared by `core`, `app`, `tests` and
   `backend`, and the chosen test runner (decision 3).
 - Convert `tests/unit`, `tests/integration`, `tests/support` from `.js` to `.ts` (mechanical; the phase 2 test files).
 - `tsc -b` in `tools/check.mjs` and in a CI job.
 - **Done when:** every existing test passes as TypeScript and the type check is green. The app is untouched.
+
+**What landed.** `index.html`, `tests/harness.js` and the legacy suite are unchanged.
+- `core/` is `@ia/core` (`"type": "module"`, exports `src/index.ts`, no dependencies). `core/tsconfig.base.json` is the
+  shared strict base (ES2024, `nodenext`, `erasableSyntaxOnly`, `verbatimModuleSyntax`, `.ts` import extensions, no
+  emit); `core/tsconfig.json` adds `noUncheckedIndexedAccess` and no DOM or Node types. Node runs it by stripping
+  types. It holds:
+  - `src/version.ts`: `VERSION = '0.239.1'`. `tests/unit/semver.test.ts` holds it equal to `index.html`'s meta until
+    the build writes the meta from it (phase B builds `index.html` from the sources, and the meta is still written by
+    hand in `app/src/legacy/src/html/head.html`), so a release writes both.
+  - `src/format/version-label.ts`: `versionLabel`, the rules of the app's `iaVersionLabel`.
+  - `src/semver.ts`: `tests/semver.js` in TypeScript (`parse`, `cmp`, `lookup`, `fromHtml`, `str`, `bump`, `below`,
+    `tag`, `SemVer`), exported as `semver`; `tests/semver.js` stays for the frozen legacy tools, and a test holds the two
+    in agreement.
+  - `src/domain/`: `Cfg`, `Program`, `Week`, `Day` (`RestDay` or `TrainingDay`), `Section`, `Item`, `Cardio`,
+    `CardioDose`, `LogEntry` and `LogBook`, written from the engine's code and from real builds (HALF_MANNY, the
+    program-output configs, the 864-config lattice, every cardio goal crossed with every lifting focus). Runtime shape
+    checks (`checkProgram`, `checkCfg`, `checkLogEntry`, `checkLogBook`, `isProgram`) are bound to the types by the
+    compiler (one rule per field, its optionality and its value type), and `tests/integration/program-shape.test.ts`
+    and `tests/sweeps/program-shape.test.ts` walk real programs and a log the app writes through them.
+- `tests/` is its own package (Vitest 5, TypeScript 6, `@types/node`, `"@ia/core": "file:../core"`; lockfile committed,
+  `tests/node_modules` ignored) with `tests/tsconfig.json` (module `preserve`, bundler resolution) and
+  `tests/vitest.config.mts`. Every test file and helper is TypeScript on Vitest; the snapshot file and its
+  `UPDATE_SNAPSHOTS=1` rewrite are unchanged. 40 tests before, 83 in unit and integration after (plus 2 sweeps).
+- The type check is `tsc -p core` then `tsc -p tests` (`npm run typecheck` in `tests/`), not `tsc -b`: project
+  references need emitting, composite projects, and nothing here emits.
+- `tools/check.mjs` runs both type checks and Vitest over `tests/unit` and `tests/integration` (installing
+  `tests/node_modules` when it is missing); CI's "unit and integration tests" job runs `npm ci` in `tests/`, the type
+  check, then Vitest over unit, integration and sweeps.
+- Not yet: the app and the backend do not extend `core/tsconfig.base.json` or import `@ia/core`; they adopt it when
+  they first need a shared type (phase D, or the backend's version handling).
 
 ### Phase B: split the script into source files, byte-identical (done, Post-v0.239.1)
 - Cut the inline script into about 25 classic-script files under `app/src/legacy/src/`, one per area in section 1 (the
@@ -286,7 +316,7 @@ build of 49 source files under `app/src/legacy/src/`, byte for byte, and the fil
 
 | Phase | Size (rough) | Behaviour risk | Proof |
 |---|---|---|---|
-| A | 1 session | none (no app change) | tests pass as TypeScript, `tsc -b` green |
+| A (done) | 1 session | none (no app change) | tests pass as TypeScript, the type check green |
 | B | 1–2 sessions | none | byte-identical rebuild |
 | C | 2–4 sessions | low | feature tests, snapshots, 0% e2e parity, device check |
 | F | 1 session | low | deploy proof reads the live built version |

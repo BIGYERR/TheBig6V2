@@ -17,8 +17,8 @@ Mario has had to repeat this more than once; a session that makes him say it aga
   release line of a decision entry in `docs/decisions/<feature>.md`; a scratch copy of a release's body,
   `base_v<previous>.html`, where `<previous>` is the version HEAD carries, never "N-1"; and, until phase 2 empties them,
   the legacy suite's era rows, keyed `'0.240.0'`.
-- **Feature files carry no version** (Mario, Post-v0.239.1). Tests are `tests/unit/<feature>.test.js` and
-  `tests/integration/<feature>.test.js`, snapshots `tests/snapshots/<feature>.json`, rulings
+- **Feature files carry no version** (Mario, Post-v0.239.1). Tests are `tests/unit/<feature>.test.ts` and
+  `tests/integration/<feature>.test.ts`, snapshots `tests/snapshots/<feature>.json`, rulings
   `docs/decisions/<feature>.md`, measure scripts `tests/measure/<feature>_<question>.js` (Test layout). No new
   `tests/gates/g<version>_*.js`, `tests/sabotage/v<version>.json`, `tests/edits/` script or `v<version>_rulings/` folder
   is made. Files written before Post-v0.239.1 keep their names (`g0.239.1_timer_label.js`, `tests/measure/v0.240.0_*`).
@@ -144,28 +144,45 @@ session's files written into `tests/measure/` mid-proof.
 - **The weekly full sweep** stays outside any build and runs by hand until it moves into a scheduled CI job.
 
 ## Test layout (Mario, Post-v0.239.1): a test is named for the feature it covers
-- **Folders.** `tests/unit/<feature>.test.js`: pure logic, one function lifted out of `index.html` and run alone
-  (`appFunction`). `tests/integration/<feature>.test.js`: the app booted in the VM harness, programs built, behaviour
-  checked (`loadApp`, `loadApp({ dom: true })` for a document that keeps its elements, `pinClock`).
-  `tests/sweeps/<feature>.test.js`: the slow ones, a lattice or a fuzz over many programs; CI runs them, the 60-second
-  check does not (a file in `tests/unit` or `tests/integration` runs in a few seconds).
-  `tests/snapshots/<feature>.json`: one current golden file per feature for program output. The helpers are
-  `tests/support/app.js` and `tests/support/snapshot.js`, built on `tests/harness.js`. `app/e2e` stays as it is.
-- **Run.** `node --test tests/unit tests/integration` (Node's own runner, about a second; no `package.json` at the repo
-  root, which Pages serves). `IA_APP=<file>` runs the same tests against another body of the app.
+- **Folders.** `tests/unit/<feature>.test.ts`: pure logic, one function lifted out of `index.html` and run alone
+  (`appFunction`), or one imported from `@ia/core`. `tests/integration/<feature>.test.ts`: the app booted in the VM
+  harness, programs built, behaviour checked (`loadApp`, `loadApp({ dom: true })` for a document that keeps its
+  elements, `pinClock`). `tests/sweeps/<feature>.test.ts`: the slow ones, a lattice or a fuzz over many programs; CI
+  runs them, the 60-second check only type-checks them (a file in `tests/unit` or `tests/integration` runs in a few
+  seconds). `tests/snapshots/<feature>.json`: one current golden file per feature for program output. The helpers are
+  `tests/support/app.ts` and `tests/support/snapshot.ts`, built on `tests/harness.js` (CommonJS, loaded through
+  `createRequire`), and `tests/support/programs.ts`, the seeded configs typed as `Cfg`. `app/e2e` stays as it is.
+- **TypeScript and Vitest** (architecture phase A). Every test is strict TypeScript run by Vitest (`import { describe,
+  test } from 'vitest'`, `node:assert/strict` inside). `tests/` is its own package: `tests/package.json` and its
+  lockfile are committed, `tests/node_modules` is not. There is still no `package.json` or `tsconfig.json` at the repo
+  root, which Pages serves; the shared strict base is `core/tsconfig.base.json`.
+- **Run.** `cd tests && npx vitest run unit integration` (a few seconds; `npx vitest run` adds the sweeps; `npm ci`
+  there first on a fresh clone, which the 60-second check does by itself), and the type check `cd tests && npm run
+  typecheck` (strict `tsc` over `core/`, then `tests/`). `IA_APP=<file>` runs the same tests against another body of
+  the app (an absolute path, or one relative to `tests/`).
+- **Shared types and code.** `core/` is the local package `@ia/core`: framework-free TypeScript, imported by the
+  tests as `"@ia/core": "file:../core"`. The domain types live in `core/src/domain` (`Cfg`, `Program`, `Week`, `Day`,
+  `Section`, `Item`, `LogEntry`), with runtime shape checks the compiler keeps in step with them;
+  `tests/integration/program-shape.test.ts` and `tests/sweeps/program-shape.test.ts` walk real programs through them,
+  so a field the engine adds, drops or retypes turns a test red until the type is changed to match. A test imports a type or
+  shared logic from `@ia/core`, never a copy. The release version lives in `core/src/version.ts`: until phase B makes
+  the build write the meta from it, a release writes the same MAJOR.MINOR.PATCH there and in `index.html`'s
+  `ia-version` meta, and `tests/unit/semver.test.ts` is red when they differ. From phase D on, new shared logic and the
+  engine code moved out of `index.html` go in `core/` (`docs/architecture-migration.md`).
 - **Naming.** A test file is named for the feature it covers, in lower case words joined by dashes (`rest-timer`,
   `version-label`, `program-output`), never for a version, a D-code or a gate. A new behaviour goes into its feature's
   file; a new file is a new feature. A test's name says the behaviour in plain words.
-- **Snapshot update.** Only when a ruling moves program output: `UPDATE_SNAPSHOTS=1 node --test
-  tests/integration/<feature>.test.js`, then review `git diff tests/snapshots/`. The diff is the review, and it ships in
+- **Snapshot update.** Only when a ruling moves program output: `cd tests && UPDATE_SNAPSHOTS=1 npx vitest run
+  integration/<feature>.test.ts`, then review `git diff tests/snapshots/`. These are the suite's own JSON files, not
+  Vitest's snapshots, so `vitest -u` changes nothing here. The diff is the review, and it ships in
   the release commit. When HALF_MANNY moves, the regenerated digest equals the one coach printed before the build
   (standing ruling 5). A snapshot is never regenerated to turn a red test green without a ruling.
 
 ## Proof for new work (Mario, Post-v0.239.1)
-- **CI is the gate.** The unit and integration tests run in the 60-second check and in CI on every push to `dev`; the
-  release is proved by the CI run on the commit Mario releases (Pipeline). Gatekeeper reads it, and also:
+- **CI is the gate.** The unit and integration tests and the type check run in the 60-second check and in CI on every
+  push to `dev`; the release is proved by the CI run on the commit Mario releases (Pipeline). Gatekeeper reads it, and also:
   - runs each new or changed test on the commit before the change (`git show <previous>:index.html >
-    <scratch>/base_v<previous>.html`, then `IA_APP=<that file> node --test <file>`): a test written for a changed
+    <scratch>/base_v<previous>.html`, then `cd tests && IA_APP=<that file> npx vitest run <file>`): a test written for a changed
     behaviour must fail there, and one that passes on both is vacuous unless its file says it guards behaviour that
     must not change;
   - matches every behaviour the ruling changes to a named test; a changed behaviour with no test is red;
@@ -423,7 +440,7 @@ Every brief to either carries the per-build items, then the standing lines for t
   range, a minimum, or an era row (Proof scope, Version scope). Versions are `MAJOR.MINOR.PATCH`, and a bare integer N
   means 0.N.0; read and compare them only through `tests/semver.js` (`parse`, `cmp(a, b) <op> 0`, `lookup`,
   `fromHtml`) or `tests/semver.py`, never `+version` or a numeric operator. Temp files go only under the scratch path
-  the brief names, never bare `/tmp`. Feature tests run with `node --test tests/unit tests/integration`; a test file
+  the brief names, never bare `/tmp`. Feature tests run with `cd tests && npx vitest run unit integration`; a test file
   that crashes before its first test is a failure, and a snapshot changes only by a ruling that moves program output.
 - **Builder, standing:** standing ruling 7 (a premise refuted mid-slice PARKS the slice: its diff stays in the
   scratchpad as a patch, nothing committed; a test that cannot pass parks the same way); pool and post-filter reason through one lens, so
@@ -469,7 +486,7 @@ builds: `app/` `emulator-ios`, `device-ios`, `pwa-pages`, `pwa-local`; `backend/
   together; the root file is never edited by hand.
 - `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).
 - `docs/design/THE_ASYLUM_DS_REFERENCE*.md` — design system (bone `#F4F1E8`, ink, signal orange `#CF4E1A`; `asyIcon()` inline SVG, never emoji in chrome).
-- `tests/unit/`, `tests/integration/`, `tests/snapshots/` (the feature tests and their golden files, named by feature), `tests/support/` (their helpers, on `tests/harness.js`); `docs/decisions/<feature>.md` (the rulings, one file per feature); `docs/test-migration.md` (the phase 2 map: every gate, its feature, its target file and its rows; the order; the parity rule). Test layout and Proof for new work.
+- `tests/unit/`, `tests/integration/`, `tests/snapshots/` (the feature tests and their golden files, named by feature), `tests/support/` (their helpers, on `tests/harness.js`), `tests/package.json` (Vitest and TypeScript); `core/` (`@ia/core`: the release version, semver, the domain types in `core/src/domain`); `docs/decisions/<feature>.md` (the rulings, one file per feature); `docs/test-migration.md` (the phase 2 map: every gate, its feature, its target file and its rows; the order; the parity rule). Test layout and Proof for new work.
 - `tests/harness.js` (VM boot + fixtures + `weekGrid` + `progDigest`), `tests/measure/` (measure-pass scripts, keep them), `tests/lint_allow.txt` (known dupes = debt). Frozen legacy suite, no new files (Proof for new work): `tests/gate.sh` (runner), `tests/gates/*.js` (one file per gate family, each prints `PASS n FAIL n`), `tests/sabotage.py` + `tests/sabotage/*.json`.
 - `tools/check.mjs` — the 60-second local proof (Pipeline). `.githooks/pre-commit` runs it on every commit, and `.githooks/pre-push` lets only local `dev` and tags reach GitHub (`git config core.hooksPath .githooks` once per clone). `.github/workflows/pipeline.yml` — the full suite on every push to `dev` and every pull request from `dev` into `main`, and the deploy proof after each merge.
 - `tools/` — the run log (`tools/README.md`): every test, build, deploy and server run is a folder under `temp/runs/` (gitignored, kept out of iCloud) with a line in `temp/events.log`; `~/Library/Logs/IronAsylum/orchestration.log` has one line per top-level start on this Mac. When something went wrong, `node tools/logs.mjs` is the first place to look. `tools/deploy-check.mjs` is rhythm step 7 as one command.
