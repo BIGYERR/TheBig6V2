@@ -3,8 +3,9 @@
 The floating rest timer: the tab and the card the athlete drags (`_rtWireDrag`, wired by `_rtInit`), and the rest
 stopwatch. Tests: `tests/integration/rest-timer.test.js`.
 
-Earlier decisions on this feature (D233 P-ISLAND, V239, and before) are in the handoff (§11f) and
-`tests/measure/v239_rulings/`; they join this file when the feature's gates move (`docs/test-migration.md`).
+**D233 P-ISLAND (V239, Mario).** In the native iOS app the rest stopwatch runs on the wall clock and mirrors to an iOS
+Live Activity; the PWA stopwatch is unchanged. Full ruling and amendments: handoff §11f and `tests/measure/v239_rulings/`.
+Tests: the island and PWA clock tests in `tests/integration/rest-timer.test.js` (moved from the legacy gate in phase 2).
 
 ## D235 P-TIMERDRAG: a tap never strands the timer, and a cancelled drag docks to an edge
 
