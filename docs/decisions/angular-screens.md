@@ -62,3 +62,21 @@ what is stored.
   open, Start (the button reads Stop, the tab marked running), Stop, Reset (0:00 and .00), fold back, and a drag that
   docks it to the left edge (20/20 steps, every one at 0.000% parity).
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.10 moves the celebration pop-up
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.10.
+- **Moved:** `#popOverlay`'s card: `src/app/screens/pop-up/pop-up.ts` (the component; the kicker, message, sub, stats and
+  buttons follow signals, drawn at once before the overlay opens, as the legacy writes were) and `pop-up-model.ts` (what
+  a call shows, and the confetti, each drawing Math.random in the legacy order, so a seeded random falls the same). The
+  pools, `POP_CFG` and the line pickers stay in the legacy script, which `tests/integration/pop-ups.test.ts` reads.
+- **Legacy callers:** `popFire` (a closed day, a streak, the season, a reminder, the injury check-ins, Random Workout),
+  `popClose` and `popDismissBg` (the overlay's own onclick) reach the component through `LegacyBridge.provide`. An action
+  button runs the handler code its caller wrote (`"popClose();injSnooze('p1')"`) through `LegacyBridge.run`, in the
+  global scope, as the legacy onclick attribute did. The icon and a stat's label are the app's own markup (an icon's
+  SVG), kept as they are (`bypassSecurityTrustHtml`); the card keeps a tap to itself, as before.
+- **Tests:** `frontends/app/test/unit/pop-up.test.ts` (4: a tier with its picked line and the pickers' order, a caller's
+  own content and buttons, the dismiss word, an unknown tier and the season shake, and the confetti's draw order checked
+  draw by draw). The e2e's log-done step now expects the workout pop-up up with 'WORKOUT COMPLETE' and a dismiss button
+  in its photograph, then closes it with that button, on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

@@ -1,6 +1,7 @@
 import type { Type } from '@angular/core';
 import { BugReport } from './bug-report/bug-report';
 import { RestTimer } from './rest-timer/rest-timer';
+import { PopUp } from './pop-up/pop-up';
 
 /**
  * The screens and overlays architecture phase E has moved into Angular components, by the legacy element they take over. After the
@@ -11,4 +12,5 @@ import { RestTimer } from './rest-timer/rest-timer';
 export const MOVED_SCREENS: readonly (readonly [screenId: string, component: Type<unknown>])[] = [
   ['screenBugs', BugReport],
   ['restFloat', RestTimer],
+  ['popOverlay', PopUp],
 ];

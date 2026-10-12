@@ -40,6 +40,15 @@ export class LegacyBridge {
     (globalThis as Record<string, unknown>)[name] = fn;
   }
 
+  /**
+   * Runs a legacy handler's code, as an inline onclick attribute would have: in the global scope. Only for code the legacy
+   * app itself wrote into a handler (the pop-up's action buttons, "popClose();injSnooze('...')"), never for user input.
+   */
+  run(code: string): void {
+    if (!this.booted()) throw new Error('legacy app not booted; cannot run a handler');
+    (0, eval)(code);
+  }
+
   /** Calls a legacy global function by name; throws if the app has not booted or the name is not a function. */
   call<T = unknown>(name: string, ...args: unknown[]): T {
     if (!this.booted()) throw new Error(`legacy app not booted; cannot call ${name}`);

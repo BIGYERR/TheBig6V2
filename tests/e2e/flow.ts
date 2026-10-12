@@ -772,6 +772,19 @@ const LOG_SESSION: readonly Step[] = [
           throw new Error('the day did not close after Done');
         });
       await t.expectText('#screenWeek', 'Closed out');
+      // Closing the day out celebrates it (the pop-up is an Angular component in the app since phase E's third step, the
+      // legacy script's in the single-file page: both answer the same). It stays up for the photograph.
+      await page
+        .waitForFunction(() => document.getElementById('popOverlay')?.classList.contains('show'), { timeout: 3000 })
+        .catch(() => {
+          throw new Error('no pop-up after the day closed');
+        });
+      await t.expectText('#popKicker', 'WORKOUT COMPLETE');
+      if (!(await t.count('#popActions .pop-act.go'))) throw new Error('the pop-up has no dismiss button');
+    },
+    async after(t, page) {
+      await t.tap('#popActions .pop-act.go');
+      if (await page.$eval('#popOverlay', (e) => e.classList.contains('show'))) throw new Error('the pop-up did not close on its button');
     },
   },
   {

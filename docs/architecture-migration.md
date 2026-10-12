@@ -359,7 +359,7 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   and the e2e's parity holds the two the same. The markup moves as it is first; the logic moves apart from Angular
   (`<screen>-model.ts`) and is tested by node --test.
 - **Done:** the bug report (v0.239.8), the rest timer (v0.239.9, the first a component whose legacy callers it takes
-  over through `LegacyBridge.provide`).
+  over through `LegacyBridge.provide`), the celebration pop-up (v0.239.10).
 - Suggested order:
   1. bug report (small, proves the pattern);
   2. rest timer;

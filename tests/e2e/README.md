@@ -35,8 +35,8 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
    - **1.5 mile test, Sat Nov 14** (6): a dated pace test, the program length box, and the test day in week 6 (NSW).
    - **Bodyweight, then a knee injury** (6): a beginner over 55 with no equipment, Friday before the injury (it holds
      a jump), Hurt? with the knee chosen, the injury week, and Friday after (no jumps).
-   - **Log a session and relaunch** (6): log two exercises, the effort and a note, close the day out, relaunch, and
-     find all of it kept, in the session and in the Progress journal.
+   - **Log a session and relaunch** (6): log two exercises, the effort and a note, close the day out (the workout
+     pop-up up, then its dismiss button), relaunch, and find all of it kept, in the session and in the Progress journal.
    Every step is a real tap followed by an assertion. Native date and slider controls, which a user drives through
    the OS picker, are set directly and fire their events.
 5. Each pair of app screenshots is compared pixel by pixel. **Default tolerance is 0%.** Clean runs match exactly, and a
