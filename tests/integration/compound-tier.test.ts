@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The compound tier: _compoundTier ranks a movement 0 to 3, and tier 3 is a loaded compound the session budget never
 // trims, the swap sheet tags HEAVY COMPOUND and the load note measures a swap against. Ruling D89 (V200): a drill
 // declared family 'core' in _AUX_FAMILY is a core drill, never a loaded compound (the clause in _compoundTier returns
@@ -11,11 +11,11 @@
 //
 // Oracles are typed by hand: the 23 declared-core names, the D96 control tiers, the load note sentence, the ruled card
 // shape on the 49-config lattice (one cell: HALF_MANNY W11 Monday, Pallof press to Plank shoulder taps).
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock, fixtures, weekGrid, progDigest } = require('../support/app.js');
-const { matchSnapshot } = require('../support/snapshot.js');
-const SB = require('../support/session-budget.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, pinClock, fixtures, weekGrid, progDigest } from '../support/app.ts';
+import { matchSnapshot } from '../support/snapshot.ts';
+import * as SB from '../support/session-budget.ts';
 const { clone, DAYS, countIn } = SB;
 
 const CLAUSE = "  if(_auxFamily(name)==='core') return 0;\n";

@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Helpers for the leg accessory tests (tests/integration/leg-accessory.test.js, tests/sweeps/leg-accessory.test.js,
 // tests/sweeps/leg-accessory-trim-order.test.js). Built on tests/support/session-budget.js (pages, variants, clock).
 //
@@ -6,8 +6,7 @@
 // wizard copy the athlete reads, never from _gearOK or EQUIP_TOKENS; the four names D75 harvested, the three coach
 // excluded and the five machines; the 25-second hold; the leg movement vocabulary for the bodyweight section; the
 // posterior chain table and the budget cost rule D84's comparison reads.
-const { clone, clean, page, variant, appHtml, countIn } = require('./session-budget.js');
-
+import { clone, clean, page, variant, appHtml, countIn } from './session-budget.ts';
 // ── gear legality ───────────────────────────────────────────────────────────────────────────────────────────────
 const NEEDS = [
   ['machine', /\bmachine\b|hack squat|\bsmith\b|pec deck|\bleg press\b|leg extension|lying leg curl|seated leg curl|preacher/i],
@@ -225,7 +224,7 @@ function trimCompare(rows) {
   return r;
 }
 
-module.exports = {
+export {
   clone, clean, page, variant, appHtml, countIn, NEEDS, needs, OWNS, TIERS, TIERS_PLUS, HARVESTED, EXCLUDED, MACHINES, HOLD_DOSE_SEC,
   SECTION, LEG_WORDS, FOCUSES, EXPS, SEEDS, RESTS, GOALS, mkCfg, lattice, fullLattice, trainingDays, legSweep,
   CALF_PUSH, ISO_PUSH, isoFirst, trimLattice, ePat, eZeroP, eCost, CALF_SLOT_MAX, CAP, eScan, trimCompare,

@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The leg accessory blocks: the "Leg isolation" slot and its pool (EXLIB.leg_accessory), and the Calves block beside it.
 // Rulings:
 //   D70b the equipment filter is not advisory: a pool that filters to nothing is never handed back whole (a leg press
@@ -20,11 +20,11 @@
 // Oracles are typed by hand (tests/support/leg-accessory.js): the gear table from the wizard copy, the harvested,
 // excluded and machine names, the hold dose, the leg vocabulary, the posterior table and cost rule. D84's comparison is
 // the app with the two pushes swapped back.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock, fixtures } = require('../support/app.js');
-const LA = require('../support/leg-accessory.js');
-const { CLOCK } = require('../support/session-budget.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, pinClock, fixtures } from '../support/app.ts';
+import * as LA from '../support/leg-accessory.ts';
+import { CLOCK } from '../support/session-budget.ts';
 const { clone, HARVESTED, EXCLUDED, MACHINES, SECTION } = LA;
 
 const IA = LA.page();

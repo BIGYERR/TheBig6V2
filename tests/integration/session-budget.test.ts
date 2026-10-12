@@ -1,4 +1,3 @@
-'use strict';
 // The session budget: capSessionBudget trims a day that costs more than the cap (20 sets, less for a hard cardio day)
 // and the floors that say what it may never take. Rulings:
 //   D47, D48 an optional section is budget fodder only while it has more than one item (the core finisher keeps one);
@@ -12,26 +11,27 @@
 // The record is in the handoff and tests/measure/v193_rulings/ to v231_rulings/.
 //
 // This file runs the hand sessions, the frozen budget corpus, the counterfactuals the rulings printed, and a sample of
-// each lattice. tests/sweeps/session-budget.test.js runs the 288-cell census and the 650-config D195-B shard whole.
+// each lattice. tests/sweeps/session-budget.test.ts runs the 288-cell census and the 650-config D195-B shard whole.
 //
 // Oracles are typed by hand: the hand sessions and their hand-derived trims, the ruling digests (PRT TING and
 // HALF_MANNY with and without each part of D195), the PRT cards the ruling printed, the hand posterior regex. The
 // corpus digests are golden values in tests/snapshots/session-budget.json (the legacy era rows, current).
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { progDigest, fixtures } = require('../support/app.js');
-const { matchSnapshot } = require('../support/snapshot.js');
-const SB = require('../support/session-budget.js');
-const { clone, clean, page, variant, countIn, DAYS } = SB;
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { progDigest, fixtures } from '../support/app.ts';
+import { matchSnapshot } from '../support/snapshot.ts';
+import * as SB from '../support/session-budget.ts';
+import type { AppDay, LooseCfg, Sections } from '../support/session-budget.ts';
+const { clone, page, variant, countIn, DAYS } = SB;
 
 const IA = page();
-const csb = IA.eval('capSessionBudget');
-const TIER = (n) => IA.eval('_compoundTier')(n);
-const PAT = (n) => IA.eval('_pattern')(n);
-const run = (secs, cardio) => csb(clone(secs), cardio === undefined ? null : cardio);
-const names = (out) => [].concat(...(out || []).map((s) => (s.items || []).map((i) => i.name)));
-const sets = (d) => { const m = String(d || '').match(/(\d+)\s*[×x]/); return m ? parseInt(m[1], 10) : 3; };
-const cost = (out) => [].concat(...(out || []).map((s) => s.items || [])).reduce((a, i) => a + sets(i.detail), 0);
+const csb: (s: Sections, cardio: unknown) => Sections = IA.eval('capSessionBudget');
+const TIER = (n: string): number => IA.eval('_compoundTier')(n);
+const PAT = (n: string): string | null => IA.eval('_pattern')(n);
+const run = (secs: Sections, cardio?: unknown): Sections => csb(clone(secs), cardio === undefined ? null : cardio);
+const names = (out: Sections): string[] => ([] as string[]).concat(...(out || []).map((s: AppDay) => (s.items || []).map((i: AppDay) => i.name)));
+const sets = (d: unknown): number => { const m = String(d || '').match(/(\d+)\s*[×x]/); return m ? parseInt(m[1] || '3', 10) : 3; };
+const cost = (out: Sections): number => ([] as AppDay[]).concat(...(out || []).map((s: AppDay) => s.items || [])).reduce((a: number, i: AppDay) => a + sets(i.detail), 0);
 
 // ── the trim order, by hand ──────────────────────────────────────────────────────────────────────────────────────
 test('the cap is 20 sets, declared once', () => {
@@ -63,7 +63,7 @@ test('a tie in score goes to the later position, whatever the label', () => {
 
 test('the trim stops at the first total at or under the cap: a day at 20 is untouched, 21 loses one item', () => {
   // E4m (the trim is a threshold loop, not a minimiser)
-  const day = (n) => [{ label: 'Main lift', items: [{ name: 'Back squat', detail: n + '×5' }] },
+  const day = (n: number): Sections => [{ label: 'Main lift', items: [{ name: 'Back squat', detail: n + '×5' }] },
     { label: 'Accessory', items: [{ name: 'Dumbbell curl', detail: '3×12' }, { name: 'Hammer curl', detail: '3×12' }] }];
   const at = day(14);
   assert.equal(csb(at, null), at, 'a day at the cap comes back as it went in');
@@ -73,8 +73,8 @@ test('the trim stops at the first total at or under the cap: a day at 20 is unto
 
 // ── the posterior floor (D85) ────────────────────────────────────────────────────────────────────────────────────
 const MAIN = { label: 'Main — Lower', items: [{ name: 'Back squat', detail: '5×5' }] };
-const fin = (list) => ({ label: 'Finisher', items: list.map((n) => ({ name: n[0], detail: n[1] })) });
-const BASE5 = [['Dumbbell lateral raise', '4×12'], ['Cable triceps pushdown', '4×12'], ['Hammer curl', '4×12'], ['Face pull', '4×15']];
+const fin = (list: [string, string][]) => ({ label: 'Finisher', items: list.map((n) => ({ name: n[0], detail: n[1] })) });
+const BASE5: [string, string][] = [['Dumbbell lateral raise', '4×12'], ['Cable triceps pushdown', '4×12'], ['Hammer curl', '4×12'], ['Face pull', '4×15']];
 
 test('the movements the floor cases rest on: tiers and patterns', () => {
   // A0a to A0e
@@ -125,13 +125,13 @@ test('when only the last hinge and a barbell compound are left, the day ships ov
 const CALLSITE = "    Object.keys(weeks[w]).forEach(_d=>{ const _day=weeks[w][_d]; if(_day&&Array.isArray(_day.sections)) _day.sections=capSessionBudget(_day.sections,_day.cardio); });\n";
 const CALLSITE_REC = "    Object.keys(weeks[w]).forEach(_d=>{ const _day=weeks[w][_d]; if(_day&&Array.isArray(_day.sections)){ var __gb=_day.sections; _day.sections=capSessionBudget(_day.sections,_day.cardio); if(typeof globalThis!=='undefined'&&globalThis.__GREC) globalThis.__GREC.push({b:__gb,a:_day.sections}); } });\n";
 /** Six tiers x {healthy, low back, shoulder, knee protect}, lift only, balanced advanced, seed 1013 (24 configs). */
-function floorLattice() {
-  const out = [];
+function floorLattice(): { tag: string; cfg: LooseCfg }[] {
+  const out: { tag: string; cfg: LooseCfg }[] = [];
   for (const t of ['commercial', 'home_full', 'home_basic', 'bodyweight', 'crossfit', 'minimal']) {
     for (const inj of [null, { region: 'lowback', tier: 'protect' }, { region: 'shoulder', tier: 'protect' }, { region: 'knee', tier: 'protect' }]) {
-      const cfg = { name: 'M', primaryPath: 'lift', cardioTypes: [], cardioGoals: {}, eventTargeted: false, raceDate: null, liftingFocus: 'balanced',
+      const cfg: LooseCfg = { name: 'M', primaryPath: 'lift', cardioTypes: [], cardioGoals: {}, eventTargeted: false, raceDate: null, liftingFocus: 'balanced',
         experience: 'advanced', ageBracket: '18-35', equipment: t, unit: 'lbs', restDays: ['sun'], days: DAYS.slice(), bench: 135, squat: 155, deadlift: 185, seed: 1013 };
-      if (inj) cfg.injury = inj;
+      if (inj) cfg['injury'] = inj;
       out.push({ tag: t + '/' + (inj ? inj.region : 'healthy'), cfg });
     }
   }
@@ -140,7 +140,7 @@ function floorLattice() {
 // HAND regexes: {hinge, hip_ext} by name (leg_iso and calf_iso deliberately absent), and the three leg_iso machines.
 const POST = /deadlift|\brdl\b|romanian|good morning|\bswing\b|\bclean\b|\bsnatch\b|hinge|rack pull|hip thrust|glute bridge|glute-ham|\bghr\b|nordic|back extension|hyperextension|reverse hyper|pull-?through/i;
 const ISO = /leg extension|lying leg curl|seated leg curl/i;
-const countIf = (secs, re) => [].concat(...(secs || []).map((s) => (s.items || []).map((i) => String(i.name || '')))).filter((n) => re.test(n)).length;
+const countIf = (secs: Sections, re: RegExp): number => ([] as string[]).concat(...(secs || []).map((s: AppDay) => (s.items || []).map((i: AppDay) => String(i.name || '')))).filter((n) => re.test(n)).length;
 
 test('on built programs, a day that reaches the budget with posterior chain leaves with it, and the floor is exercised', () => {
   // B0 to B4, A6b: the budget's call site recorded on 24 configs
@@ -168,7 +168,7 @@ test('the leg_iso exclusion: _pattern agrees with the hand table, and folding le
   // A6a, A6b0, A6c: the lens is _isPostChain, one writer; folding leg_iso in changes 0 of 24 programs (doctrine-only)
   const LENS = "function _isPostChain(n){ const p=_pattern(n); return p==='hinge'||p==='hip_ext'; }";
   assert.equal(countIn(LENS), 1);
-  const HAND = { 'Leg extension': true, 'Lying leg curl': true, 'Seated leg curl': true, 'Leg press': false };
+  const HAND: Record<string, boolean> = { 'Leg extension': true, 'Lying leg curl': true, 'Seated leg curl': true, 'Leg press': false };
   for (const [n, isIso] of Object.entries(HAND)) assert.equal(PAT(n) === 'leg_iso', isIso, n);
   const V = page(variant('leg-iso-posterior', [[LENS, "function _isPostChain(n){ const p=_pattern(n); return p==='hinge'||p==='hip_ext'||p==='leg_iso'; }"]]));
   const moved = floorLattice().filter(({ cfg }) => progDigest(IA.buildProgram(clone(cfg))) !== progDigest(V.buildProgram(clone(cfg)))).map((x) => x.tag);
@@ -189,7 +189,7 @@ test('a program equals itself when built twice: HALF_MANNY on commercial and an 
   // B6, B6b
   for (const over of [{ equipment: 'commercial', seed: 76308 },
     { equipment: 'commercial', seed: 76308, liftingFocus: 'hypertrophy', experience: 'advanced', injury: { region: 'shoulder', tier: 'protect' } }]) {
-    const cfg = Object.assign(clone(fixtures.HALF_MANNY), over);
+    const cfg: LooseCfg = Object.assign(clone(fixtures.HALF_MANNY), over);
     assert.equal(progDigest(IA.buildProgram(clone(cfg))), progDigest(IA.buildProgram(clone(cfg))));
   }
 });
@@ -199,8 +199,8 @@ test('on the census sample: 18 core sections on every healthy program, no empty 
   const P = page();
   const on = SB.census(P, false, SB.SAMPLE), off = SB.census(P, true, SB.SAMPLE);
   assert.equal(on.cellsSwept, 48);
-  for (const c of SB.SAMPLE.filter((x) => x.inj === 'healthy')) assert.equal(on.cells[c.key].coreSec, SB.CORE_PER_BUILD, c.tag);
-  for (const e of SB.EQUIP) assert.equal(on.tiers[e].emptySec, 0, e);
+  for (const c of SB.SAMPLE.filter((x) => x.inj === 'healthy')) assert.equal(on.cells[c.key]?.coreSec, SB.CORE_PER_BUILD, c.tag);
+  for (const e of SB.EQUIP) assert.equal(on.tiers[e]?.emptySec, 0, e);
   const T = SB.tally(off, on);
   assert.equal(T.added, 0, 'sections that appeared after the budget');
   assert.ok(Object.keys(T.kinds).length > 0, 'the budget deleted something on the sample');
@@ -240,7 +240,7 @@ test('without the cost lens PRT TING is the program the ruling measured before i
   assert.equal(N.dig, '3a053a2ac8cb2b44');
   assert.deepEqual(SB.cardLines(N.prog.weeks[9].tue), TUE_9_WITHOUT);
   assert.deepEqual(SB.cardLines(N.prog.weeks[9].mon), MON_9_WITHOUT);
-  const differ = [];
+  const differ: string[] = [];
   let cells = 0;
   for (const w of SB.weekKeys(N.prog)) for (const d of DAYS) { cells++; if (SB.daySig(N.prog.weeks[w][d]) !== SB.daySig(C.prog.weeks[w][d])) differ.push('W' + w + ' ' + d); }
   assert.equal(cells, 77);
@@ -271,9 +271,11 @@ test('on a sample of the shard the lens only adds back what the budget had cut, 
   assert.deepEqual(r.details.filter((x) => !x.isB2).map((x) => x.s), []);
   assert.equal(r.b2, 1);
   assert.deepEqual(r.other, []);
-  const secA = r.b3.a.filter((x) => x[2] === SB.B3.label).map((x) => x[0]), secB = r.b3.b.filter((x) => x[2] === SB.B3.label).map((x) => x[0]);
+  const b3 = r.b3;
+  assert.ok(b3, 'the B-3 cell changed');
+  const secA = b3.a.filter((x) => x[2] === SB.B3.label).map((x) => x[0]), secB = b3.b.filter((x) => x[2] === SB.B3.label).map((x) => x[0]);
   assert.deepEqual(secA, [SB.B3.gone]);
   assert.deepEqual(secB.slice().sort(), [SB.B3.partner, SB.B3.restored].sort());
   assert.ok(SB.HINGE_HAND.test(SB.B3.gone) && SB.HINGE_HAND.test(SB.B3.partner));
-  assert.ok(r.b3.bo.map((x) => x[0]).includes(SB.B3.restored));
+  assert.ok(b3.bo.map((x) => x[0]).includes(SB.B3.restored));
 });

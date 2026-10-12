@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Helpers for the runner armor circuit tests (tests/integration/runner-armor-circuit.test.js and
 // tests/sweeps/runner-armor-circuit.test.js). Built on tests/support/session-budget.js (pages, variants, the D195
 // counterfactuals, the coach's lattice constructor).
@@ -7,8 +7,8 @@
 // calf and carry strings), HALF_MANNY's swap universe (86 names) and its W1 to W12 Tuesday circuits (typed once off
 // V230, unchanged since), the three hand legs days and their hand-worked trims, the two typed cells' cards (coach's
 // prints), g215's knee protect lattice and the floor (b) line.
-const { progDigest } = require('./app.js');
-const SB = require('./session-budget.js');
+import { progDigest } from './app.ts';
+import * as SB from './session-budget.ts';
 const { clone, clean, DAYS, liveSecs, cardLines } = SB;
 
 const FOURTH = ['Single-leg hip thrust', '2×6–10 each @ RPE 7'];
@@ -233,7 +233,7 @@ function analyse(z) {
   return { add, rem, remIt, remBad, coreEmptied, appended, grew: z.Ci.length > z.Ni.length, addOK, lit12, rounds };
 }
 
-module.exports = {
+export {
   FOURTH, CALF_STR, CARRY_STR, CIRCUIT_RE, UNIVERSE, TUE, hasSec, circuit, circuitItems, LEGS_DAYS, CELL_F1, CELL_FH, CARD_F1, CARD_F1_THREE,
   CARD_FH, CARD_FH_THREE, cardLines, FB_TIERS, FB_FROM, floorBLattice, noFloorB, floorBFires, preventionShard, BED_THRUST, RUNNER, shardBuild, analyse,
 };

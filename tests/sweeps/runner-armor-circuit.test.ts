@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The runner armor circuit, the lattices: the same claims as tests/integration/runner-armor-circuit.test.js, which runs
 // them on samples; this file runs them whole. CI runs it, the 60-second check does not.
 //   - floor (b): g215's knee protect lattice, 630 configs (five tiers x six goals x seven foci x three experiences), each
@@ -8,11 +8,10 @@
 //     part A, and 8 bodyweight low back programs for the universe. Counts today are golden values in
 //     tests/snapshots/runner-armor-circuit-lattice.json (how many runner leg days carry the fourth item, what part A
 //     took off them, by section).
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { matchSnapshot } = require('../support/snapshot.js');
-const RA = require('../support/runner-armor-circuit.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { matchSnapshot } from '../support/snapshot.ts';
+import * as RA from '../support/runner-armor-circuit.ts';
 // ── floor (b) ────────────────────────────────────────────────────────────────────────────────────────────────────
 const LAT = RA.floorBLattice();
 const FB = RA.floorBFires(LAT);

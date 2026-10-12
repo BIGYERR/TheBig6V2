@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The session budget, the lattices. The same claims as tests/integration/session-budget.test.js, which runs them on a
 // sample; this file runs them whole. CI runs it, the 60-second check does not.
 //   - the census: HALF_MANNY on 288 cells ({healthy, shoulder, low back, elbow protect} x six tiers x two foci x two
@@ -10,11 +10,11 @@
 // on. Golden values, current, in tests/snapshots/session-budget-lattice.json: the per-tier census, what the budget
 // deletes per tier and per class, the thin core shares and the long-run carve-out, and the shard's tallies. A ruling
 // that moves them regenerates the file.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { progDigest } = require('../support/app.js');
-const { matchSnapshot } = require('../support/snapshot.js');
-const SB = require('../support/session-budget.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { progDigest } from '../support/app.ts';
+import { matchSnapshot } from '../support/snapshot.ts';
+import * as SB from '../support/session-budget.ts';
 const { EQUIP, clone } = SB;
 
 const P = SB.page();

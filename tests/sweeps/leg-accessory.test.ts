@@ -1,15 +1,14 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The leg accessory blocks, the lattice: the same claims as tests/integration/leg-accessory.test.js, which runs them on
 // a 56-config sample; this file runs all 3,528 configs (six tiers plus travel Room-only x seven foci x three
 // experiences x four goals x three seeds x two rest patterns). CI runs it, the 60-second check does not.
 // Golden values, current, in tests/snapshots/leg-accessory-lattice.json: the denial census per tier (machine and cable
 // items a tier does not own; 0 everywhere since D70c), the same-card duplicates (0 since D165), the section, Wall sit
 // and bodyweight name counts. A ruling that moves them regenerates the file.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { matchSnapshot } = require('../support/snapshot.js');
-const LA = require('../support/leg-accessory.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { matchSnapshot } from '../support/snapshot.ts';
+import * as LA from '../support/leg-accessory.ts';
 const L = LA.fullLattice();
 const S = LA.legSweep(LA.page(), L);
 

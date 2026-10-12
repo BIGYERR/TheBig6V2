@@ -11,7 +11,7 @@ baseline ratchets) are not ported; the current values they compared are golden v
 Three ports change how a claim is read, not what it claims:
 
 - **Counterfactuals on today's code, not on old releases.** g231's two gates built their before trees from V230
-  (`git show 71c76d8`). The new tests take the ruled text back out of the app as it stands (`tests/support/session-budget.js`
+  (`git show 71c76d8`). The new tests take the ruled text back out of the app as it stands (`tests/support/session-budget.ts`
   `noCostLens()`, `noHipExtA()`, `noD195()`), and those trees reproduce every digest the D195 ruling printed:
   HALF_MANNY without part B `f5ed630033ebe3db`, without part A `0ac7da6b1691a8e1`, without both `0ac7da6b1691a8e1`;
   PRT TING without the cost lens `3a053a2ac8cb2b44`, without part A `1119727db3f37832`. The D195-B shard (V230 against
@@ -42,30 +42,30 @@ Three ports change how a claim is read, not what it claims:
 
 Times on a loaded machine (load average 15 to 25), each file run alone.
 
-- `tests/integration/session-budget.test.js`: 20 tests, about 2.3 s. The hand sessions and trims, the posterior floor,
+- `tests/integration/session-budget.test.ts`: 20 tests, about 2.3 s. The hand sessions and trims, the posterior floor,
   the frozen corpus, a 48-cell census sample, D195-B's cost lens (PRT TING, HALF_MANNY, a 14-config shard sample).
-- `tests/integration/compound-tier.test.js`: 10 tests, about 1.1 s. D89 whole: the tier table, the load note, the swap
+- `tests/integration/compound-tier.test.ts`: 10 tests, about 1.1 s. D89 whole: the tier table, the load note, the swap
   sheet tags, the counterfactual and its 49-config lattice.
-- `tests/integration/leg-accessory.test.js`: 14 tests, about 2.6 s. The pool, the render surfaces, HALF_MANNY, a
+- `tests/integration/leg-accessory.test.ts`: 14 tests, about 2.6 s. The pool, the render surfaces, HALF_MANNY, a
   56-config sample of the leg accessory lattice and a 72-config sample of D84's comparison.
-- `tests/integration/runner-armor-circuit.test.js`: 17 tests, about 1.5 s. D195-A: HALF_MANNY, the hand lists and days,
+- `tests/integration/runner-armor-circuit.test.ts`: 17 tests, about 1.5 s. D195-A: HALF_MANNY, the hand lists and days,
   the typed cells, samples of floor (b) (42 configs) and of the prevention shard (23 programs).
-- `tests/sweeps/session-budget.test.js`: 16 tests, about 17 s (CI only). The 288-cell and 30-cell censuses, D195-B's
+- `tests/sweeps/session-budget.test.ts`: 16 tests, about 17 s (CI only). The 288-cell and 30-cell censuses, D195-B's
   650-config shard.
-- `tests/sweeps/leg-accessory.test.js`: 8 tests, about 14 s (CI only). The 3,528-config lattice.
-- `tests/sweeps/leg-accessory-trim-order.test.js`: 8 tests, about 26 s (CI only). D84's 1,728-config comparison.
-- `tests/sweeps/runner-armor-circuit.test.js`: 9 tests, about 13 s (CI only). Floor (b)'s 630 configs and the
+- `tests/sweeps/leg-accessory.test.ts`: 8 tests, about 14 s (CI only). The 3,528-config lattice.
+- `tests/sweeps/leg-accessory-trim-order.test.ts`: 8 tests, about 26 s (CI only). D84's 1,728-config comparison.
+- `tests/sweeps/runner-armor-circuit.test.ts`: 9 tests, about 13 s (CI only). Floor (b)'s 630 configs and the
   272-program prevention shard.
 - `tests/snapshots/session-budget.json` (the corpus digests), `session-budget-corpus.json` (the frozen corpus, input),
   `session-budget-lattice.json`, `compound-tier.json` (HALF_MANNY without the core clause, `5770a4b1c4e2404d`, the
   legacy `MANNY_CORE_OFF_DIGEST_BY_VERSION` row), `leg-accessory-lattice.json`, `leg-accessory-trim-order.json`,
   `runner-armor-circuit-lattice.json`.
-- `tests/support/session-budget.js` (variants and pages, the census lattice and its V192 and V197 tables, the hand
-  sessions, the corpus, D195's texts and shard), `tests/support/leg-accessory.js` (the gear table, the lattice and
-  sweep, D84's comparison), `tests/support/runner-armor-circuit.js` (D195-A's typed tables, hand days, cells, floor (b)
+- `tests/support/session-budget.ts` (variants and pages, the census lattice and its V192 and V197 tables, the hand
+  sessions, the corpus, D195's texts and shard), `tests/support/leg-accessory.ts` (the gear table, the lattice and
+  sweep, D84's comparison), `tests/support/runner-armor-circuit.ts` (D195-A's typed tables, hand days, cells, floor (b)
   and the prevention shard).
 
-The group's map names one file, `tests/integration/session-budget.test.js`. Its claims are split by feature so each
+The group's map names one file, `tests/integration/session-budget.test.ts`. Its claims are split by feature so each
 file runs in a few seconds: the budget itself, the compound tier the budget skips, the leg accessory blocks, and the
 runner armor circuit.
 
@@ -75,7 +75,7 @@ runner armor circuit.
 
 | Row | Held by |
 |---|---|
-| `B1a` | `tests/integration/session-budget.test.js` › "on the census sample: 18 core sections on every healthy program, no empty section, and the budget only removes"; `tests/sweeps/session-budget.test.js` › "every healthy cell carries 18 core sections" |
+| `B1a` | `tests/integration/session-budget.test.ts` › "on the census sample: 18 core sections on every healthy program, no empty section, and the budget only removes"; `tests/sweeps/session-budget.test.ts` › "every healthy cell carries 18 core sections" |
 | `B1b` | sweep › "core sections off the long-run days stay at or above the V192 census on every injury path (the run's days carved out by _longRunTier)" (the V192 floor the gate used with no baseline); the carve-out's denominators (2,808 long-run days, 270 core sections) pinned by › "the census matches tests/snapshots/session-budget-lattice.json (per tier, per class, thin core, the long-run carve-out)". The live-baseline lines (the same carve-out on both versions; no cell lost a core section against the previous release) are past-build comparisons, not ported. |
 | `B2` | the integration census sample test; sweep › "no section renders with no items, on either lattice" |
 | `B3` | sweep › "prehab never falls below the V192 census, per tier and in aggregate, on both lattices"; › "prehab outside the four D85 names stays at or above V197, and the D47 rail inside hip sections holds, on every tier"; the per-tier values the release ratchet compared are pinned by › "the census matches tests/snapshots/session-budget-lattice.json …" |
@@ -89,21 +89,21 @@ runner armor circuit.
 | `B4g0` | the same test (41 + 855 = 896 asserted) |
 | `B4g1` | DROPPED: past build. The live ratchet on leg compound emptyings against the previous release. Today's count (none) is pinned by the snapshot test's per-class table. |
 | `B5` | sweep › "the census matches tests/snapshots/session-budget-lattice.json …" (thin core per tier and per injury path on the wide lattice, per tier on the narrow; report only in the gate, pinned now) |
-| `B6` | `tests/integration/session-budget.test.js` › "a program equals itself when built twice: HALF_MANNY on commercial and an injured wide cell" |
+| `B6` | `tests/integration/session-budget.test.ts` › "a program equals itself when built twice: HALF_MANNY on commercial and an injured wide cell" |
 | `B6b` | the same test |
 | `B6c` | DROPPED: past build. The baseline artifact equal to itself before any diff. Every counterfactual in the new files is built twice and compared the same way. |
 | `L0` | sweep › "the census lattice is the ruled 288 cells and the narrow sweep 30, and every cell built" |
 | `L0a` | the same test (the gate's opt-in 864-cell mode is not ported; the lattice in use is the ruled 288) |
 | `L0b` | the same test |
 | `L1` | the same test |
-| `L:0b5eb763` | `tests/integration/session-budget.test.js` › "an optional core block keeps its last item: the D48 hand session trims as hand-derived" |
+| `L:0b5eb763` | `tests/integration/session-budget.test.ts` › "an optional core block keeps its last item: the D48 hand session trims as hand-derived" |
 | `L:28c176a1` | › "with no optional flag the same session trims in the hand-derived non-optional order" |
 
 ### `g197a_pool_static.js` (20 rows: 19 mapped, 1 dropped)
 
 | Row | Held by |
 |---|---|
-| `A1` | `tests/integration/leg-accessory.test.js` › "the pool is EXLIB.leg_accessory: the five machines and the four harvested names, nine in all; leg_iso is gone" |
+| `A1` | `tests/integration/leg-accessory.test.ts` › "the pool is EXLIB.leg_accessory: the five machines and the four harvested names, nine in all; leg_iso is gone" |
 | `A2` | the same test |
 | `A3` | the same test |
 | `A4` | the same test |
@@ -111,7 +111,7 @@ runner armor circuit.
 | `A6` | the same test |
 | `A7` | › "every tier, travel Room-only included, owns at least two members of the pool; with no gear at all it is the four harvested names" |
 | `A8` | the same test |
-| `A9` | › "on the sample no tier prints a machine or cable item it does not own (the filter is not advisory)"; `tests/sweeps/leg-accessory.test.js` › "no tier prints a machine or cable item it does not own, and no leg machine reaches a tier without cables". The gate read `_gear`'s source for the fallback; the tests read what the fallback did. |
+| `A9` | › "on the sample no tier prints a machine or cable item it does not own (the filter is not advisory)"; `tests/sweeps/leg-accessory.test.ts` › "no tier prints a machine or cable item it does not own, and no leg machine reaches a tier without cables". The gate read `_gear`'s source for the fallback; the tests read what the fallback did. |
 | `A10` | the same two tests (the filter still filters) |
 | `A11` | › "the bodyweight sweep has nothing to substitute for a harvested name (D78)" (`_BW_GEAR` and `_BW_SUBS` read from the app, not parsed) |
 | `A12` | the same test |
@@ -126,8 +126,8 @@ runner armor circuit.
 
 ### `g197b_sweep.js` (27 rows: 26 mapped, 1 dropped)
 
-Every row is held twice: on a 56-config sample in `tests/integration/leg-accessory.test.js` and on all 3,528 configs
-in `tests/sweeps/leg-accessory.test.js`.
+Every row is held twice: on a 56-config sample in `tests/integration/leg-accessory.test.ts` and on all 3,528 configs
+in `tests/sweeps/leg-accessory.test.ts`.
 
 | Row | Held by |
 |---|---|
@@ -161,14 +161,14 @@ in `tests/sweeps/leg-accessory.test.js`.
 
 ### `g197c_d84_cmp.js` (33 rows: 33 mapped)
 
-The comparison app is the app with the two pushes swapped back (`tests/support/leg-accessory.js` `isoFirst()`). Rows of
-the sweep are held on all 1,728 configs in `tests/sweeps/leg-accessory-trim-order.test.js` and, where marked, on 72 in
-`tests/integration/leg-accessory.test.js` (the sample test below):
+The comparison app is the app with the two pushes swapped back (`tests/support/leg-accessory.ts` `isoFirst()`). Rows of
+the sweep are held on all 1,728 configs in `tests/sweeps/leg-accessory-trim-order.test.ts` and, where marked, on 72 in
+`tests/integration/leg-accessory.test.ts` (the sample test below):
 › "on a sample of the comparison Calves never falls and does rise; only Calves and Leg isolation move; a changed day costs 0 to 4 sets more".
 
 | Row | Held by |
 |---|---|
-| `E0a` | `tests/integration/leg-accessory.test.js` › "Calves is pushed before Leg isolation: each push is one line, and on a built day Calves comes first" |
+| `E0a` | `tests/integration/leg-accessory.test.ts` › "Calves is pushed before Leg isolation: each push is one line, and on a built day Calves comes first" |
 | `E0b` | the same test |
 | `E0c` | the same test |
 | `E0d` | the same test (and `isoFirst()` throws unless the pair occurs exactly once) |
@@ -188,17 +188,17 @@ the sweep are held on all 1,728 configs in `tests/sweeps/leg-accessory-trim-orde
 | `E3e` | sweep › "every posterior-free leg cell in the app, caused or not, carries low back protect, inside the ruling ceilings"; the sample test |
 | `E3f` | the same sweep test (at most 186 cells) |
 | `E3g` | the same sweep test (at most 33 config keys) |
-| `E4a` | `tests/integration/session-budget.test.js` › "the cap is 20 sets, declared once" |
+| `E4a` | `tests/integration/session-budget.test.ts` › "the cap is 20 sets, declared once" |
 | `E4b` | the same test |
-| `E4c` | `tests/integration/session-budget.test.js` › "a tie in score goes to the later position, whatever the label" |
+| `E4c` | `tests/integration/session-budget.test.ts` › "a tie in score goes to the later position, whatever the label" |
 | `E4d` | sweep › "a day the order changes costs 0 to 4 sets more, one Calves slot at most, never less"; the sample test |
 | `E4h` | integration › "the Calves block is one item dosed 4 sets for an advanced athlete and 3 otherwise, so one slot costs at most 4 sets" |
 | `E4i` | the same test |
 | `E4j` | the same test |
-| `E4k` | `tests/integration/session-budget.test.js` › "the cap is 20 sets, declared once" (the cap read from the app) |
+| `E4k` | `tests/integration/session-budget.test.ts` › "the cap is 20 sets, declared once" (the cap read from the app) |
 | `E4l` | sweep › "a day the order changes costs 0 to 4 sets more, one Calves slot at most, never less"; the sample test |
-| `E4m` | `tests/integration/session-budget.test.js` › "the trim stops at the first total at or under the cap: a day at 20 is untouched, 21 loses one item" |
-| `E4n` | `tests/integration/session-budget.test.js` › "when only the last hinge and a barbell compound are left, the day ships over the cap and nothing spins" |
+| `E4m` | `tests/integration/session-budget.test.ts` › "the trim stops at the first total at or under the cap: a day at 20 is untouched, 21 loses one item" |
+| `E4n` | `tests/integration/session-budget.test.ts` › "when only the last hinge and a barbell compound are left, the day ships over the cap and nothing spins" |
 | `E4o` | sweep › "days over the cap are older than D84: some are untouched by it, and they outnumber every day it changed"; the cap census pinned by › "the comparison counts match tests/snapshots/leg-accessory-trim-order.json" |
 | `E4p` | the same two tests |
 
@@ -206,16 +206,16 @@ the sweep are held on all 1,728 configs in `tests/sweeps/leg-accessory-trim-orde
 
 | Row | Held by |
 |---|---|
-| `E0` | `tests/sweeps/leg-accessory-trim-order.test.js` › "the comparison lattice is the full 1,728-config product, every tier and injury state built on both apps" |
+| `E0` | `tests/sweeps/leg-accessory-trim-order.test.ts` › "the comparison lattice is the full 1,728-config product, every tier and injury state built on both apps" |
 | `E1g` | DROPPED: past build. Calves falls on no day against the previous release. Its current half, Calves falls on no day against the app with the pushes swapped back, is `E1e`. |
 | `E1h` | DROPPED: past build. D84's footprint against V196, read from git. Its current half, Calves rises against the swapped-back app, is `E1f`. |
-| `E5` | `tests/integration/session-budget.test.js` › "capSessionBudget, _itemCost and _setCount replay the frozen corpus to the digests in tests/snapshots/session-budget.json" (the corpus frozen as `tests/snapshots/session-budget-corpus.json`; the three era rows, current) |
+| `E5` | `tests/integration/session-budget.test.ts` › "capSessionBudget, _itemCost and _setCount replay the frozen corpus to the digests in tests/snapshots/session-budget.json" (the corpus frozen as `tests/snapshots/session-budget-corpus.json`; the three era rows, current) |
 
 ### `g198_posterior_floor.js` (29 rows: 28 mapped, 1 dropped)
 
 | Row | Held by |
 |---|---|
-| `A0a` | `tests/integration/session-budget.test.js` › "the movements the floor cases rest on: tiers and patterns" |
+| `A0a` | `tests/integration/session-budget.test.ts` › "the movements the floor cases rest on: tiers and patterns" |
 | `A0b` | the same test |
 | `A0c` | the same test |
 | `A0d` | the same test |
@@ -247,7 +247,7 @@ the sweep are held on all 1,728 configs in `tests/sweeps/leg-accessory-trim-orde
 
 ### `g200_core_tier.js` (43 rows: 42 mapped, 1 dropped)
 
-All in `tests/integration/compound-tier.test.js`.
+All in `tests/integration/compound-tier.test.ts`.
 
 | Row | Held by |
 |---|---|
@@ -301,8 +301,8 @@ Each row is a conjunction; the version conjunct (`*-ver`) is not ported anywhere
 
 | Row | Held by |
 |---|---|
-| `D195-A-a` | `tests/integration/runner-armor-circuit.test.js` › "HALF_MANNY's W1 to W12 Tuesday circuit carries Single-leg hip thrust 2×6–10 each @ RPE 7 after its three" (a-tue); › "without the fourth item every HALF_MANNY day is byte-identical: each W1 to W12 Tuesday less item 4, and every other day whole" (a-tue, a-other: against the app without part A, where the gate read typed V230 day hashes); › "the Tuesday calf and carry strings read YYY-YYY-YYY--- over the 14 weeks" (a-calf, a-carry); › "HALF_MANNY's swap universe is the 86 names, with the fourth item and without it" (a-uni); › "part A without part B is f5ed630033ebe3db, part B without part A is 0ac7da6b1691a8e1 (the ruling printed both)" (a-cfA, a-cfB). a-digest and a-era are the HALF_MANNY digest, held by `tests/integration/program-output.test.js`; a-inst re-read V230 (past build), and the counterfactuals reproducing the ruling's digests take its place. |
-| `D195-A-b` | `tests/sweeps/runner-armor-circuit.test.js` › "the shard is 264 programs (216 FULL, 48 injured) plus 8 bodyweight low back, each built on both apps, the before twice and equal" (b-notA, b-shard); › "part A appends one item to a runner's circuit and grows no circuit on a non-runner or knee protect day" (b-fourth, b-add, b-knee); › "part A takes only from the loaded carry finisher or the core block, and never empties the core block" (b-rem); › "the circuit's first two names and its rounds stay, the calf stays wherever it was, and non-runner leg days are byte-identical" (b-circ, b-calf, b-nonrun); › "the shard counts match tests/snapshots/runner-armor-circuit-lattice.json" (the A-4 tallies the gate printed); on 23 programs, `tests/integration/runner-armor-circuit.test.js` › "on a sample of the prevention shard part A only appends one item to a runner's circuit, takes only from the carry or core block, and moves no universe". NOT-A is the app without part A (the gate built it as V230 plus slices 1, 4, 5 and 6). |
+| `D195-A-a` | `tests/integration/runner-armor-circuit.test.ts` › "HALF_MANNY's W1 to W12 Tuesday circuit carries Single-leg hip thrust 2×6–10 each @ RPE 7 after its three" (a-tue); › "without the fourth item every HALF_MANNY day is byte-identical: each W1 to W12 Tuesday less item 4, and every other day whole" (a-tue, a-other: against the app without part A, where the gate read typed V230 day hashes); › "the Tuesday calf and carry strings read YYY-YYY-YYY--- over the 14 weeks" (a-calf, a-carry); › "HALF_MANNY's swap universe is the 86 names, with the fourth item and without it" (a-uni); › "part A without part B is f5ed630033ebe3db, part B without part A is 0ac7da6b1691a8e1 (the ruling printed both)" (a-cfA, a-cfB). a-digest and a-era are the HALF_MANNY digest, held by `tests/integration/program-output.test.js`; a-inst re-read V230 (past build), and the counterfactuals reproducing the ruling's digests take its place. |
+| `D195-A-b` | `tests/sweeps/runner-armor-circuit.test.ts` › "the shard is 264 programs (216 FULL, 48 injured) plus 8 bodyweight low back, each built on both apps, the before twice and equal" (b-notA, b-shard); › "part A appends one item to a runner's circuit and grows no circuit on a non-runner or knee protect day" (b-fourth, b-add, b-knee); › "part A takes only from the loaded carry finisher or the core block, and never empties the core block" (b-rem); › "the circuit's first two names and its rounds stay, the calf stays wherever it was, and non-runner leg days are byte-identical" (b-circ, b-calf, b-nonrun); › "the shard counts match tests/snapshots/runner-armor-circuit-lattice.json" (the A-4 tallies the gate printed); on 23 programs, `tests/integration/runner-armor-circuit.test.ts` › "on a sample of the prevention shard part A only appends one item to a runner's circuit, takes only from the carry or core block, and moves no universe". NOT-A is the app without part A (the gate built it as V230 plus slices 1, 4, 5 and 6). |
 | `D195-A-c` | integration › "the regional trim reads a hard run at 1.4 interference" (c-hand); › "a four-item circuit and the calf pass the regional trim untouched with no cardio" (c-i); › "a three-item circuit with a leg isolation item (five moves, no four-item circuit) loses exactly one item" (c-ii); › "on a hard run day the circuit's fourth item leaves, and the lunge, hold, hinge and calf stay" (c-iii) |
 | `D195-A-d` | integration › "the hand legs days total 20.5, 22 and 23.5 against a cap of 20" (d-fix); › "at 20.5 the budget takes Farmer carry, never the hold or the calf", › "at 22 the budget takes Farmer carry, then Plank shoulder taps, never the hold or the calf", › "at 23.5 the budget takes Farmer carry, then Plank shoulder taps, then Single-leg hip thrust, never the hold or the calf" (d-20.5, d-22, d-23.5); › "the two typed cells print the cards coach printed: a four-item circuit with the calf and no carry; Wall sit second of three" (d-cellA, d-cellB); › "without D195 the same two cells print the cards before it: three items, no carry, and on the second the hold and calf cut" (d-inst, on the app without parts A and B instead of V230) |
 | `D195-A-e` | sweep › "the knee protect lattice is 630 configs, 126 per tier, 90 of them prevention, and every one builds on both apps" (e-anchor, e-lattice); › "floor (b) fires on home_full 84 of 126 and on no other tier" (e-home_full, e-others); › "floor (b) never fires on a prevention config" (e-prev); on 42 configs, integration › "on a sample of the knee protect lattice floor (b) fires on home_full only, and never on a prevention config" |
@@ -312,8 +312,8 @@ Each row is a conjunction; the version conjunct (`*-ver`) is not ported anywhere
 
 | Row | Held by |
 |---|---|
-| `D195-B-a` | `tests/integration/session-budget.test.js` › "the cost lens prices the prehab rails at half, so PRT TING keeps what the ruling printed (W9 Tuesday and Monday)" (a-digest, a-tue, a-mon); › "without the cost lens PRT TING is the program the ruling measured before it, and 9 of 77 days differ" (a-cells, and a-v230 and a-before on the app without the lens: `3a053a2ac8cb2b44` and the before cards); › "the cost lens alone is PRT TING whole, and moves no byte of HALF_MANNY" (a-cfB) |
-| `D195-B-b` | `tests/sweeps/session-budget.test.js` › "the shard is 648 configs plus the two typed cells, every one built on all three apps" (b-surgery, b-bo, b-built, b-nonempty); › "every program in the shard equals itself on a second page, with and without the lens (every eighth config and the typed cells)" (b-self); › "the lens removes one item on the whole shard: B-3, a superset partner re-picked beside the restored Glute-ham raise" (b-removed, b-B3); › "every item the lens adds is on the same day of the budget-off card (B-1)" (b-added); › "the one detail the lens changes is B-2, and no day changes any other way" (b-detail, b-B2, b-other); the shard's tallies in › "the census matches tests/snapshots/session-budget-lattice.json …"; on 14 configs, integration › "on a sample of the shard the lens only adds back what the budget had cut, plus the two ruled changes" |
+| `D195-B-a` | `tests/integration/session-budget.test.ts` › "the cost lens prices the prehab rails at half, so PRT TING keeps what the ruling printed (W9 Tuesday and Monday)" (a-digest, a-tue, a-mon); › "without the cost lens PRT TING is the program the ruling measured before it, and 9 of 77 days differ" (a-cells, and a-v230 and a-before on the app without the lens: `3a053a2ac8cb2b44` and the before cards); › "the cost lens alone is PRT TING whole, and moves no byte of HALF_MANNY" (a-cfB) |
+| `D195-B-b` | `tests/sweeps/session-budget.test.ts` › "the shard is 648 configs plus the two typed cells, every one built on all three apps" (b-surgery, b-bo, b-built, b-nonempty); › "every program in the shard equals itself on a second page, with and without the lens (every eighth config and the typed cells)" (b-self); › "the lens removes one item on the whole shard: B-3, a superset partner re-picked beside the restored Glute-ham raise" (b-removed, b-B3); › "every item the lens adds is on the same day of the budget-off card (B-1)" (b-added); › "the one detail the lens changes is B-2, and no day changes any other way" (b-detail, b-B2, b-other); the shard's tallies in › "the census matches tests/snapshots/session-budget-lattice.json …"; on 14 configs, integration › "on a sample of the shard the lens only adds back what the budget had cut, plus the two ruled changes" |
 | `D195-B-c` | integration › "the cost lens alone is PRT TING whole, and moves no byte of HALF_MANNY" (c-cfB, c-bytes; c-inst on the app without parts A and B, `0ac7da6b1691a8e1`) |
 
 ## Not ported

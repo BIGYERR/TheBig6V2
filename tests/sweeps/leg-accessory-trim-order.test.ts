@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // D84, Calves is pushed before Leg isolation, the whole comparison. The same claims as the D84 tests in
 // tests/integration/leg-accessory.test.js, which run on 72 configs; this file runs all 1,728 (six tiers x two foci x two
 // experiences x lift only, pace, half x healthy, shoulder, low back and knee protect x three rest patterns x two seeds),
@@ -7,11 +7,10 @@
 // Ceilings typed from the ruling's census (V197, tests/measure/v197_d84_census.js): the order made 120 cells over 18
 // config keys posterior-free, 186 over 33 in all, every one carrying low back protect. They are down-only; the counts
 // today are golden values in tests/snapshots/leg-accessory-trim-order.json with the label delta and the cap census.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { matchSnapshot } = require('../support/snapshot.js');
-const LA = require('../support/leg-accessory.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { matchSnapshot } from '../support/snapshot.ts';
+import * as LA from '../support/leg-accessory.ts';
 const L = LA.trimLattice();
 const R = LA.trimCompare(L);
 

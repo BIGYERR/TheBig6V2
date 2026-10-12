@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The runner armor circuit: on a runner's prevention leg day the circuit (lunge, hold, hinge) gains a fourth item, the
 // prevention hip extension, and the trims know it. Ruling D195 Amendment 2, part A (V231):
 //   A1x the prevention hip extension subset is drawn after the reservation and the whole pool is registered in the swap
@@ -16,11 +16,11 @@
 //
 // Oracles are typed by hand (tests/support/runner-armor-circuit.js): the ruling's strings and digests, HALF_MANNY's
 // universe and Tuesday circuits, the hand lists and their verdicts, the hand days and their trim walks, the cell cards.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { fixtures } = require('../support/app.js');
-const SB = require('../support/session-budget.js');
-const RA = require('../support/runner-armor-circuit.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { fixtures } from '../support/app.ts';
+import * as SB from '../support/session-budget.ts';
+import * as RA from '../support/runner-armor-circuit.ts';
 const { clone, clean, DAYS } = SB;
 
 const C = SB.twice(null, fixtures.HALF_MANNY), N = SB.twice(SB.noHipExtA(), fixtures.HALF_MANNY);
