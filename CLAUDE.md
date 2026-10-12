@@ -433,15 +433,20 @@ Every brief to either carries the per-build items, then the standing lines for t
   all-trip is as suspicious as a survivor; 100% of blast-radius hunks are classified, and an unruled removal is a regression.
 
 ## Dev mode (Mario, Post-V239): the fastest look at a change, never a proof
-`cd backend && npm run dev` (`backend/scripts/dev.ts`) serves the website (`/`), the app (`/app/`, the root
-`index.html`), the admin (`/admin/`, admin / asylum) and the backend from the docker backend on http://localhost:3000,
-and rebuilds whatever is saved in about a second: site and admin by `ng build --watch`, the app copied on every save
-with its inline script parsed, the server restarted on a `server/` change. After each change it runs only tests that
-finish within 3 s, then every open page reloads itself. When Mario wants to see an edit, check it is running
-(`curl -s localhost:3000/healthz`), start it in the background if not, and hand him the link to the page that changed.
-It shows; it proves nothing: no gate, sabotage, row or CI result comes from it, and a version ships only through the
-session rhythm. The other paths stay for devices, deploys and full builds: `app/` `emulator-ios`, `device-ios`,
-`pwa-pages`, `pwa-local`; `backend/` `docker:up`, `mac-local-backend`, `heroku.sh deploy`.
+The dev container serves the website (`/`), the app (`/app/`, the root `index.html`), the admin (`/admin/`, admin /
+asylum) and the backend on http://localhost:3000, and rebuilds whatever is saved by itself, in about a second, with
+nothing running on the Mac: site and admin by `ng build --watch`, the app copied on every save with its inline script
+parsed, the server restarted on a `server/` change. After each change it runs only tests that finish within 3 s, then
+every open page reloads itself. The watcher (`backend/scripts/dev-watch.ts`) runs inside the container
+(`backend/Dockerfile.dev`, `backend/docker-compose.dev.yml`); it reads the checkout read-only and writes only
+`backend/dist/` and `backend/app-web/`. The container comes back by itself whenever Docker starts.
+`cd backend && npm run dev` starts it (building its image when needed) and follows its log: Ctrl-C stops following,
+never the container. `npm run dev:down` stops it; `npm run docker:up` puts back the plain production image. When Mario
+wants to see an edit, check it answers (`curl -s localhost:3000/healthz`), run `npm run dev` in the background if not,
+and hand him the link to the page that changed. It shows; it proves nothing: no gate, sabotage, row or CI result comes
+from it, and a version ships only through the session rhythm. The other paths stay for devices, deploys and full
+builds: `app/` `emulator-ios`, `device-ios`, `pwa-pages`, `pwa-local`; `backend/` `docker:up`, `mac-local-backend`,
+`heroku.sh deploy`.
 
 ## Files
 - `index.html` — the app. `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).

@@ -41,8 +41,8 @@ side of the connection (`client/ia-link.js`) is ready, but it reaches the phone 
 | `test/` | `node --test` suite, in TypeScript: API, login, store, versions, website, app, the Mac runner, the deploy tree, the client snippet |
 | `Procfile` | Heroku: `web: node --enable-source-maps dist/server/server.js` |
 | `Dockerfile`, `docker-compose.yml` | the same server in a container |
-| `docker-compose.dev.yml` | laid over it by `npm run dev`: the container serves this checkout's folders live |
-| `scripts/dev.ts`, `server/dev.ts` | the full stack dev mode, and the live reload it switches on (`IA_DEV=1` only) |
+| `Dockerfile.dev`, `docker-compose.dev.yml` | the dev container `npm run dev` runs: the toolchain baked in, this checkout mounted read-only, rebuilt as it is saved |
+| `scripts/dev.ts`, `scripts/dev-watch.ts`, `server/dev.ts` | the full stack dev mode: the command, the watcher the container runs, and the live reload it switches on (`IA_DEV=1` only) |
 | `scripts/heroku.sh` | Heroku setup, deploy (with the app added as `app-web/`), verify, status, logs, tree |
 | `scripts/app-bundle.ts` | copies the app into `app-web/` (`npm run app:bundle`; `build`, `docker:up` and the Mac runner run it) |
 | `scripts/mac-local-backend.sh` | the server on this Mac with no docker: up, down, restart, status, logs |
@@ -61,28 +61,41 @@ npm install
 npm run dev
 ```
 
-One command for the whole stack, rebuilt as you save (`scripts/dev.ts`). It runs in the docker backend on
-http://localhost:3000, the same container, port and devices volume as `docker:up`, with `docker-compose.dev.yml` laid
-over it so the container serves this checkout's files live instead of the image's copies:
+The whole stack on http://localhost:3000, rebuilt as you save, by the **dev container**: the docker backend's own
+container, port and devices volume, run from `Dockerfile.dev` with `docker-compose.dev.yml` laid over
+`docker-compose.yml`. The container watches this checkout and rebuilds by itself (`scripts/dev-watch.ts`), so nothing
+on the Mac has to run, and it comes back whenever Docker starts (`restart: unless-stopped`). `npm run dev` brings it up,
+building its image when something baked into it changed, then follows its log; Ctrl-C stops following, not the
+container. `npm run dev:down` stops it, and `npm run docker:up` puts back the plain production image.
 
 | Save in | What happens | Typical time |
 |---|---|---|
 | `site/` or `admin/` | `ng build --watch` rebuilds it (development build), the fast backend tests run, open pages reload | under a second |
-| the repo root `index.html` | the app is copied to `app-web/`, its inline script is parsed, the app's unit tests run, open pages reload | about a second |
-| `server/` | tsc checks the server's types beside the fast backend tests, the container restarts, open pages reload when it is back | about a second |
+| the repo root `index.html` | the app is copied to `app-web/`, its inline script is parsed, open pages reload | under a second |
+| `server/` | the server restarts, open pages reload when it is back, then tsc checks the server's types beside the fast backend tests | under a second |
 | `client/` | the fast backend tests run, open pages reload | under a second |
 
 It prints the links when it is up (website `/`, app `/app/`, admin `/admin/` with admin / asylum, snippet `/client/`)
-and one line per rebuild, test run and restart. **Tests stay fast on purpose:** each set (the backend tests that need
-no child process or git, the app's unit tests, the app script parse) is stopped at 3 seconds; `npm test`, the
-pre-commit check and CI run everything. Pages reload by themselves: in dev mode only (`IA_DEV=1`), the server adds one
-script tag to the three pages (`server/dev.ts`), and `dev.ts` tells it after each rebuild. **The server runs from its
+and one line per rebuild, test run, restart and reload. **Tests stay fast on purpose:** each set (the backend tests
+that need no child process or git, the app script parse) is stopped at 3 seconds; `npm test`, the pre-commit check and
+CI run everything. The app's unit tests run only with `--no-docker`: they need `app/`'s own `node_modules`, and the
+container never loads the Mac's. Pages reload by themselves: in dev mode only (`IA_DEV=1`), the server adds one script
+tag to the three pages (`server/dev.ts`), and the watcher tells it after each rebuild. **The server runs from its
 TypeScript source here** (`node server/server.ts`, Node strips the types), so a restart needs no compile; the type
 check after each save is where a type error shows. Every other way to run it runs what tsc compiled.
 
-- `npm run dev -- --no-docker` runs the server with this Mac's Node instead (kind `local`, devices in `data/dev/`).
-- Ctrl-C stops the watchers. The container keeps serving the last build; `npm run docker:up` puts back the plain
-  image.
+What the container may touch: the source folders and the repo root (for `index.html` and its icon) are mounted
+read-only; `dist/` and `app-web/` are the only folders it writes. Its `node_modules` are the image's own (Linux), and
+the Angular cache is a volume of its own. A change to `package.json`, `package-lock.json`, `angular.json` or a
+tsconfig is baked into the image, so it takes effect at the next `npm run dev`. Saves reach the container as file
+events through Docker Desktop's mounts, in tens of milliseconds; should they ever stop arriving,
+`IA_DEV_POLL_MS=500 npm run dev` restarts it polling instead. A file whose attributes alone changed (iCloud rewrites
+them on this Desktop some seconds after a save) restarts and reloads nothing. `LOG_REQUESTS=1 npm run dev` adds a log
+line per request.
+
+- `npm run dev -- --no-docker` runs the same watcher with this Mac's Node instead, in the foreground (kind `local`,
+  devices in `data/dev/`); Ctrl-C stops it. Stop the container first (`npm run dev:down`), or give it another
+  `API_PORT`.
 - It replaces none of the build paths for devices: `app/`'s `emulator-ios`, `device-ios`, `pwa-pages` and
   `pwa-local`, and this folder's `docker:up`, `mac-local-backend` and `heroku.sh deploy` work as before.
 
@@ -92,7 +105,8 @@ check after each save is where a type error shows. Every other way to run it run
 | `npm run build:server` | compile the server alone (tsc, a second or two): clears `dist/server/`, then emits it |
 | `npm run app:bundle` | copy the repo root `index.html` and its icon into `app-web/`: the app at `/app/` |
 | `npm start` | the compiled server (`dist/server/`, so `npm run build:server` first) on http://localhost:3000, in the foreground |
-| `npm run dev` | **the full stack dev mode** (above): docker backend, every part rebuilt and every page reloaded on save |
+| `npm run dev` | **the full stack dev mode** (above): start the dev container, which rebuilds every part and reloads every page on save by itself, and follow its log |
+| `npm run dev:down` | stop the dev container (the devices volume stays) |
 | `npm run dev:server` | the server alone from its TypeScript source, restarting on every change under `server/` |
 | `npm run site:dev` | the website with live reload on http://localhost:4300/, `/admin` and `/api` proxied to `:3000` (run `npm run dev` beside it) |
 | `npm run admin:dev` | the admin UI with live reload on http://localhost:4200/admin/, its API calls proxied to `:3000` (run `npm run dev` beside it) |
@@ -105,7 +119,7 @@ check after each save is where a type error shows. Every other way to run it run
 | `npm run docker:logs` / `npm run docker:down` | follow the logs / stop it |
 | `npm run logs` | the run log (`../tools/README.md`): `npm run logs -- runs`, `npm run logs -- show backend-test`, ... |
 
-**Every run is logged.** `npm test`, `typecheck`, `lint`, `dev`, `dev:server`, `admin:dev`, `site:dev`, `docker:up`, `docker:logs`,
+**Every run is logged.** `npm test`, `typecheck`, `lint`, `dev`, `dev:down`, `dev:server`, `admin:dev`, `site:dev`, `docker:up`, `docker:logs`,
 `docker:down`, `mac-local-backend` (and its `:down`, `:status`, `:logs`) and `heroku` each record a run in
 `../temp/runs/` (gitignored) with a line in the shared history, `../temp/events.log`: start, finish, failures, and
 for the servers every request. `npm start` and `npm run build` are not wrapped, since Heroku and the Docker image run
@@ -216,7 +230,7 @@ everyone out. Scripts can skip the form and send Basic auth on each call (`curl 
 | `PATCH /admin/api/devices/:uid` | session or Basic | `{"name"}`: give a device a name. An empty name clears it |
 
 **Which backend.** Every backend says what it is: `heroku` on a dyno (Heroku sets `DYNO`), `docker` in the image
-(the Dockerfile sets `IA_BACKEND_KIND`), `mac-local` from the Mac runner, and `local` for `npm start` or `npm run dev`.
+(the Dockerfile sets `IA_BACKEND_KIND`), `mac-local` from the Mac runner, and `local` for `npm start` or `npm run dev -- --no-docker`.
 Its name is the Heroku app (`HEROKU_APP_NAME`), `IA_BACKEND_NAME` (docker compose sets "docker on this Mac"), or the
 machine's hostname. `/healthz`, every heartbeat reply (`backend: {kind, name, version, commit}`) and the admin header
 carry it.
