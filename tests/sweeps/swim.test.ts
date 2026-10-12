@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Swim, the lattices. The same claims as tests/integration/swim.test.js, which runs them on samples; this file runs
 // them whole. CI runs it, the 60-second check does not.
 //   - the swim time lattice (504 programs): 500 and 100 goals x three experiences x three ages x five current times
@@ -6,10 +6,10 @@
 //     anchor entries; the distance and untimed swim goals at three seeds; the other goals beside a swim (78 programs);
 //   - the sizer lattice (7,560 seconds-only entries against their m:ss twins, every experience and age) and the full
 //     build lattice (192 seconds-only builds against 48 twins).
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock } = require('../support/app.js');
-const S = require('../support/swim.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, pinClock } from '../support/app.ts';
+import * as S from '../support/swim.ts';
 const { clone } = S;
 
 const IA = loadApp();

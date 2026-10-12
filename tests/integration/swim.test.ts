@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Swim: the swim time goal's clock, the goal sheet, the required current time, and the program sizer. Rulings:
 //   D110a one rate on one clock: the weekly split gain is the program sizer's 4 / 3 / 2 s per 100 x the age scale; a goal
 //         not faster than the current split holds; the repeat split is the week's split less 2 s (guide A p12); the
@@ -14,11 +14,11 @@
 // example, the sentences, the sizer's hand row and the m:ss twins of every seconds-only entry. This file runs each
 // claim on hand fixtures and a sample of each lattice; tests/sweeps/swim.test.js runs the lattices whole. Swimmer B's
 // rebuilt program digest is the golden value in tests/snapshots/swim.json (coach's surgery print, a0f2e847ed9473d7).
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock, progDigest } = require('../support/app.js');
-const { matchSnapshot } = require('../support/snapshot.js');
-const S = require('../support/swim.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, pinClock, progDigest } from '../support/app.ts';
+import { matchSnapshot } from '../support/snapshot.ts';
+import * as S from '../support/swim.ts';
 const { clone } = S;
 
 const NOON = new Date(2026, 9, 11, 12, 0, 0);

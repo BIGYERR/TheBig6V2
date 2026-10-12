@@ -22,28 +22,28 @@ table and hand model, the sheet's hand table, the M2 messages, the sizer's hand 
 
 ## New files
 
-The group's map names two files, `tests/integration/cardio-sessions.test.js` and `tests/integration/swim.test.js`. The
+The group's map names two files, `tests/integration/cardio-sessions.test.ts` and `tests/integration/swim.test.ts`. The
 three D103a gates (`g208_d103a_*`) are their own feature, the run session's class key and what reads it, so they move to
-`tests/integration/run-session-class.test.js`. Times on a loaded machine (load average 20 to 90):
+`tests/integration/run-session-class.test.ts`. Times on a loaded machine (load average 20 to 90):
 
-- `tests/integration/cardio-sessions.test.js`: 38 tests, about 0.6 s. Table 6's two columns and their readers, the bike
+- `tests/integration/cardio-sessions.test.ts`: 38 tests, about 0.6 s. Table 6's two columns and their readers, the bike
   and swim readers, Mario's blocks, run_base's steady hold, the Short Interval doctrine on a sample of the pace lattice
   (one goal per entered mile, the 6:46 mile, PRT TING) and five of the 35 three-training-day calendars, the D109 copy
   rule.
-- `tests/integration/run-session-class.test.js`: 18 tests, about 0.8 s. The chip, the key, the readers and the rename
+- `tests/integration/run-session-class.test.ts`: 18 tests, about 0.8 s. The chip, the key, the readers and the rename
   surgery on a sample of each lattice.
-- `tests/integration/swim.test.js`: 35 tests, about 1.0 s. The swim clock on every seventh entry of the lattice, D144's
+- `tests/integration/swim.test.ts`: 35 tests, about 1.0 s. The swim clock on every seventh entry of the lattice, D144's
   fixtures, the goal sheet, M2, the sizer (one experience and age of its lattice, a sample of the build lattice), the
   wizard's pace line, the stored program.
-- `tests/sweeps/cardio-sessions.test.js`: 5 tests, about 0.7 s (CI only). The 55-program pace lattice and the SI card
+- `tests/sweeps/cardio-sessions.test.ts`: 5 tests, about 0.7 s (CI only). The 55-program pace lattice and the SI card
   rule on 56 four-run blocks and all 35 three-run calendars.
-- `tests/sweeps/run-session-class.test.js`: 4 tests, about 7 s (CI only). The 354-program key lattice, the 180-program
+- `tests/sweeps/run-session-class.test.ts`: 4 tests, about 7 s (CI only). The 354-program key lattice, the 180-program
   chip lattice, the 96-config readers' lattice under four injury modes, the rename surgery on its 180 pace programs.
-- `tests/sweeps/swim.test.js`: 9 tests, about 4.5 s (CI only). The 504-program swim time lattice, the distance goals at
+- `tests/sweeps/swim.test.ts`: 9 tests, about 4.5 s (CI only). The 504-program swim time lattice, the distance goals at
   three seeds, the other goals beside a swim (78 programs), the 7,560-entry sizer lattice, the 192-build lattice.
 - `tests/snapshots/swim.json`: swimmer B's rebuilt program digest after a goal sheet change, `a0f2e847ed9473d7`, the
   value coach printed from a source surgery copy before D110a slice 3 (the gate's `SH5`).
-- `tests/support/cardio-sessions.js`, `tests/support/run-session-class.js`, `tests/support/swim.js`: the hand oracles,
+- `tests/support/cardio-sessions.ts`, `tests/support/run-session-class.ts`, `tests/support/swim.ts`: the hand oracles,
   the configs, the lattices and the audits.
 
 Every file pins the app's clock (2026-10-11 noon; the stored program test generates on 2026-09-07 and boots on
@@ -67,7 +67,7 @@ codes, no key on an unkeyed session, the strides finisher without an injury, the
 
 ### `g202_int_doctrine.js` (27 rows: 27 mapped)
 
-`tests/integration/cardio-sessions.test.js` unless the row names the sweep (`tests/sweeps/cardio-sessions.test.js`).
+`tests/integration/cardio-sessions.test.ts` unless the row names the sweep (`tests/sweeps/cardio-sessions.test.ts`).
 
 | Row | Held by |
 |---|---|
@@ -105,7 +105,7 @@ The gate's `LABEL-ERA`, `D7-LICENCE` and `D9-ERA` lines printed only on a failur
 
 | Row | Held by |
 |---|---|
-| `B1` | `tests/integration/cardio-sessions.test.js` › "every bike CHI and INT card prints the bike's position ramp, on weeks where Table 6 would print otherwise" |
+| `B1` | `tests/integration/cardio-sessions.test.ts` › "every bike CHI and INT card prints the bike's position ramp, on weeks where Table 6 would print otherwise" |
 | `B2a` | the same test |
 | `B2b` | the same test |
 | `B3` | the same test |
@@ -125,8 +125,8 @@ The gate's `LABEL-ERA`, `D7-LICENCE` and `D9-ERA` lines printed only on a failur
 
 | Row | Held by |
 |---|---|
-| `L:3a283592` | DROPPED: era-row existence check (a `RUN_LABEL_BY_VERSION` row covers the artifact's ia-version). The LI label it supplied is typed in `tests/support/cardio-sessions.js`. |
-| `T1a` | `tests/integration/cardio-sessions.test.js` › "the CHI table reader and the per-sport readers exist, and the stored column is 26 rows" |
+| `L:3a283592` | DROPPED: era-row existence check (a `RUN_LABEL_BY_VERSION` row covers the artifact's ia-version). The LI label it supplied is typed in `tests/support/cardio-sessions.ts`. |
+| `T1a` | `tests/integration/cardio-sessions.test.ts` › "the CHI table reader and the per-sport readers exist, and the stored column is 26 rows" |
 | `T1b` | the same test |
 | `T1c` | the same test |
 | `T2` | › "chiFromTable6 returns the hand transcription for weeks 1 to 26 and row 26 past it" |
@@ -160,7 +160,7 @@ The gate's `LABEL-ERA`, `D7-LICENCE` and `D9-ERA` lines printed only on a failur
 | Row | Held by |
 |---|---|
 | `L:3a283592` | DROPPED: era-row existence check (a `RUN_LABEL_BY_VERSION` row covers the artifact's ia-version). The SI label is typed in the support file. |
-| `T1` | `tests/integration/cardio-sessions.test.js` › "the INT column is stored raw, 26 rows, and intFromTable6 reads it under guide A's cap of 8" |
+| `T1` | `tests/integration/cardio-sessions.test.ts` › "the INT column is stored raw, 26 rows, and intFromTable6 reads it under guide A's cap of 8" |
 | `T2a` | the same test |
 | `T2` | the same test |
 | `T3` | the same test |
@@ -185,7 +185,7 @@ unconditionally; a supersession whose "was" is not the entry's text at that poin
 
 | Row | Held by |
 |---|---|
-| `D109-S-run` | `tests/integration/cardio-sessions.test.js` › "no line of the four cardio builders carries an em-dash and no literal a letter-hyphen-letter, names aside" |
+| `D109-S-run` | `tests/integration/cardio-sessions.test.ts` › "no line of the four cardio builders carries an em-dash and no literal a letter-hyphen-letter, names aside" |
 | `D109-S-nrc` | the same test |
 | `D109-S-bike` | the same test |
 | `D109-S-swim` | the same test |
@@ -204,7 +204,7 @@ unconditionally; a supersession whose "was" is not the entry's text at that poin
 | Row | Held by |
 |---|---|
 | `L:3a283592` | DROPPED: era-row existence check (a `RUN_LABEL_BY_VERSION` row covers the artifact's ia-version). |
-| `S1a` | `tests/integration/cardio-sessions.test.js` › "run_base's Steady Aerobic Run reads the ruling's 16-week series and holds 20 min from week 13" |
+| `S1a` | `tests/integration/cardio-sessions.test.ts` › "run_base's Steady Aerobic Run reads the ruling's 16-week series and holds 20 min from week 13" |
 | `S1b` | the same test |
 | `S1c` | the same test |
 | `S1d` | the same test |
@@ -217,7 +217,7 @@ unconditionally; a supersession whose "was" is not the entry's text at that poin
 
 ### `g208_d103a_chip.js` (10 rows: 9 mapped, 1 dropped)
 
-`tests/integration/run-session-class.test.js` unless the row names the sweep (`tests/sweeps/run-session-class.test.js`).
+`tests/integration/run-session-class.test.ts` unless the row names the sweep (`tests/sweeps/run-session-class.test.ts`).
 
 | Row | Held by |
 |---|---|
@@ -236,7 +236,7 @@ unconditionally; a supersession whose "was" is not the entry's text at that poin
 
 | Row | Held by |
 |---|---|
-| `K0` | `tests/integration/run-session-class.test.js` › "the sample reaches every key, the budgeted long easy run, and both LI and SI heads plain and Taper"; sweep › "the key lattice: every key reached, every NSW run card keyed by its label, NRC, bike and swim unkeyed" |
+| `K0` | `tests/integration/run-session-class.test.ts` › "the sample reaches every key, the budgeted long easy run, and both LI and SI heads plain and Taper"; sweep › "the key lattice: every key reached, every NSW run card keyed by its label, NRC, bike and swim unkeyed" |
 | `K2b` | the same two tests |
 | `K1` | › "every NSW run card carries the key its label goes with"; the sweep's key lattice test |
 | `K2` | the same two tests |
@@ -250,7 +250,7 @@ The sweep's readers test is
 
 | Row | Held by |
 |---|---|
-| `H1` | `tests/integration/run-session-class.test.js` › "halfstep cuts a keyed NSW run exactly when its key is int, chi, long or steady; never an easy run, the test or the benchmark"; the sweep's readers test |
+| `H1` | `tests/integration/run-session-class.test.ts` › "halfstep cuts a keyed NSW run exactly when its key is int, chi, long or steady; never an easy run, the test or the benchmark"; the sweep's readers test |
 | `H2` | the same two tests |
 | `H3` | the same two tests |
 | `E1` | › "easy mode parks a keyed NSW run exactly when its key is int, chi, long, steady, bench or trial, so no test survives"; the sweep's readers test |
@@ -272,7 +272,7 @@ The sweep's readers test is
 
 ### `g212_d110a_swim.js` (37 rows: 37 mapped)
 
-`tests/integration/swim.test.js` unless the row names the sweep (`tests/sweeps/swim.test.js`). The integration file
+`tests/integration/swim.test.ts` unless the row names the sweep (`tests/sweeps/swim.test.ts`). The integration file
 runs the lattice claims on every seventh entry with each kind of goal reached; the sweep holds the gate's own counts
 (at least 100 faster, 100 slower, 50 out of reach, 50 blank, 500 steps, 1,000 notes).
 
@@ -322,9 +322,9 @@ The gate's retired build-pair rows (`P0`, `P1`, `P2`, `D4`, `D5`, `GT1b`, `HM`) 
 
 | Row | Held by |
 |---|---|
-| `U1` | `tests/integration/swim.test.js` › "the unit entry, 0:55 against 0:59 typed as seconds alone, sizes as its m:ss twin: "needs 7 weeks" warned, 8 weeks built" |
+| `U1` | `tests/integration/swim.test.ts` › "the unit entry, 0:55 against 0:59 typed as seconds alone, sizes as its m:ss twin: "needs 7 weeks" warned, 8 weeks built" |
 | `U2` | the same test |
-| `L1` | › "every seconds-only sizer entry sizes as its m:ss twin, weeks and warning byte for byte (advanced, 18-35)"; `tests/sweeps/swim.test.js` › "the sizer lattice: all 7,560 seconds-only entries size as their m:ss twins, weeks and warning byte for byte" (both `L1` lines) |
+| `L1` | › "every seconds-only sizer entry sizes as its m:ss twin, weeks and warning byte for byte (advanced, 18-35)"; `tests/sweeps/swim.test.ts` › "the sizer lattice: all 7,560 seconds-only entries size as their m:ss twins, weeks and warning byte for byte" (both `L1` lines) |
 | `L2` | › "every seconds-only full build equals its m:ss twin, and buildProgram leaves the cfg byte-identical (a sample)"; sweep › "the build lattice: all 192 seconds-only builds equal their m:ss twins, and no cfg is mutated" (both `L2` lines) |
 | `Z1` | › "a 0:00 target sizes as no target (no time label), and a 0:00 current time as no current time" |
 | `LB1` | › "the pace line and the step's first render show a seconds-only target as its m:ss twin, by hand: "<t> is <pace> per 100 <unit>."" |

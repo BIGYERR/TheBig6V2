@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The run session's class, the lattices. The same claims as tests/integration/run-session-class.test.js, which runs
 // them on samples; this file runs them whole. CI runs it, the 60-second check does not.
 //   - the key lattice (354 programs): pace and mile goals undated and dated to a test in week 3 or 5 on three weekdays,
@@ -7,11 +7,10 @@
 //   - the chip lattice (180 programs): pace, run_base and NRC (marathon too) under no injury, halfstep and easy;
 //   - the readers' lattice (96 configs, 60 of them pace goals, under no injury, halfstep, easy and reduce), and the rename surgery on every pace
 //     program of it under no injury, halfstep and easy (180 programs per swap, four swaps).
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock } = require('../support/app.js');
-const X = require('../support/run-session-class.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, pinClock } from '../support/app.ts';
+import * as X from '../support/run-session-class.ts';
 const NOON = new Date(2026, 9, 11, 12, 0, 0);
 const IA = loadApp();
 pinClock(IA, NOON);

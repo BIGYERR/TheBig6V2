@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The run session's class: D103a. Every NSW run session carries a class key on its dose (int, chi, steady, long, easy,
 // bench, trial). The chip and the run history read it, and print today's codes (the LI and SI rename: keyed chi wears
 // LI, keyed int SI, the test TEST); the readers go key-first (the week shape, the interference cost, the halfstep and
@@ -10,10 +10,10 @@
 // the halfstep and park sets, the strides text rule, the V176 interference arithmetic; and, for the rename, the same
 // app with one label swapped by source surgery. This file runs each claim on a sample of each lattice;
 // tests/sweeps/run-session-class.test.js runs the three lattices whole.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock, fixtures } = require('../support/app.js');
-const X = require('../support/run-session-class.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, pinClock, fixtures } from '../support/app.ts';
+import * as X from '../support/run-session-class.ts';
 const { clone } = X;
 
 const NOON = new Date(2026, 9, 11, 12, 0, 0);

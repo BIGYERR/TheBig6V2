@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Helpers for the swim tests (tests/integration/swim.test.js and tests/sweeps/swim.test.js): the swim time goal's clock
 // (D110a, D144), the program sizer that reads the same clock (D157), the goal sheet and the wizard's pace line.
 //
@@ -12,8 +12,7 @@
 //   model  week w's split is E - r(w - 1), r = min((E - T) / weeks, rate); a goal not faster than E holds at E.
 //   rep    guide A p12: the repeat split is the week's split less 2 s (500 in 10:30 is 2:06, the rep 2:04).
 //   clock  m:ss, rounding the whole value first.
-const { loadApp, fixtures } = require('./app.js');
-
+import { loadApp, fixtures } from './app.ts';
 const clone = v => JSON.parse(JSON.stringify(v));
 const E_DEFAULT = { beginner: 150, intermediate: 120, advanced: 95 };
 const RATE = { beginner: 4, intermediate: 3, advanced: 2 };
@@ -301,7 +300,7 @@ const LABEL_CURRENT = { swim_100_time: { baseMins: '2', baseSecs: '0', base500Mi
 const ZERO_TARGETS = [{ targetMins: '0', targetSecs: '0' }, { targetMins: '0', targetSecs: '' }, { targetMins: '', targetSecs: '0' }, { targetMins: '', targetSecs: '' }, { targetSecs: '0' }];
 const ZERO_CURRENTS = [{ baseMins: '0', baseSecs: '0' }, { baseMins: '0', baseSecs: '' }, { baseMins: '', baseSecs: '0' }, { baseMins: '', baseSecs: '' }, { baseSecs: '0' }];
 
-module.exports = {
+export {
   clone, E_DEFAULT, RATE, AGE_SCALE, DIST, handClock, secs, tot, DET_REP, DET_SPLIT, SEG_REP, SEG_SPLIT, DASH,
   GOAL_MET_NOTE, CAP8_TIME, CAP8_DIST, DIST_NOTE, anchorLineOf, swimCfg, goal100, cardsOfDay, isInt, intCards, splitsOf,
   swimLattice, anchorEntered, auditNotes, clockAudit, distanceGoals, otherGoals, distanceNoteAudit,

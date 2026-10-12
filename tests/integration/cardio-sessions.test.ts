@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Cardio sessions: the NSW run, bike and swim session builders read their doses from the guides. Rulings:
 //   D111, D112 the Short Interval (SI) follows guide A (16 s/mi under the week's goal pace, recovery 2 to 2.5 x the work,
 //        build 4 to 8 repeats), guide B fills A's silence (the warm-up); D9 the generic SI note states A's cap of 8;
@@ -13,10 +13,10 @@
 // text when it is present (it is gitignored, so those tests skip by name without it); guide A's 4 s per 400 m, the
 // recovery multipliers and the cap of 8; the cutback, taper and V115 arithmetic; the ruled sentences. This file runs
 // each claim on hand fixtures and a sample of the pace lattice; tests/sweeps/cardio-sessions.test.js runs the lattice whole.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock, appScript, fixtures, progDigest } = require('../support/app.js');
-const X = require('../support/cardio-sessions.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, pinClock, appScript, fixtures, progDigest } from '../support/app.ts';
+import * as X from '../support/cardio-sessions.ts';
 const { clone, DAYS } = X;
 
 const IA = loadApp();

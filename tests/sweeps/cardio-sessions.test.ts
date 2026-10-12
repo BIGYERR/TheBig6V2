@@ -1,15 +1,14 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Cardio sessions, the lattice. The same Short Interval claims as tests/integration/cardio-sessions.test.js, which runs
 // them on a sample; this file runs them whole. CI runs it, the 60-second check does not.
 //   - the pace lattice: six entered miles (5:30 to 12:00) x three goal distances (1, 1.5, 3 mi) x three seeds, plus the
 //     6:46 mile at seed 76308 that reaches the minute carry (55 programs);
 //   - the SI card rule over that lattice, PRT TING's own goal, and PRT TING's athlete on all 35 three-training-day
 //     calendars (7 spacer calendars, 28 two-quality).
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock } = require('../support/app.js');
-const X = require('../support/cardio-sessions.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, pinClock } from '../support/app.ts';
+import * as X from '../support/cardio-sessions.ts';
 const IA = loadApp();
 pinClock(IA, new Date(2026, 9, 11, 12, 0, 0));
 const build = cfg => ({ cfg, prog: IA.buildProgram(X.clone(cfg)) });

@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Helpers for the run session class tests (tests/integration/run-session-class.test.js and
 // tests/sweeps/run-session-class.test.js). D103a: every NSW run session carries a class key on its dose (int, chi,
 // steady, long, easy, bench, trial); the chip and the run history print by it; the readers (the week shape, the
@@ -7,11 +7,10 @@
 //
 // The oracles are hand tables: the label each key goes with, the chip each key wears, the two injury sets, the strides
 // text rule, the V176 interference arithmetic. The lattices are the three the gates swept; each returns {fam, cfg}.
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
-const { loadApp, fixtures } = require('./app.js');
-
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { loadApp, fixtures } from './app.ts';
 const ALL = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const WEEK = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const clone = v => JSON.parse(JSON.stringify(v));
@@ -326,7 +325,7 @@ function renameAudit(IA, html, lattice, get, prepare) {
   }) };
 }
 
-module.exports = {
+export {
   ALL, WEEK, clone, canon, NSW, VOCAB, keyOf, nswRun, keyFor, labelChip, KEYCHIP, keyedChip,
   HALFSTEP_SET, PARK_SET, INJ, withInj, STRIDES_BLOCK, withoutStrides, handInterference,
   START, isoOff, PACE, MILE, paceCfg, runBaseFreq, runBase55, keyLattice, chipLattice, readersLattice,
