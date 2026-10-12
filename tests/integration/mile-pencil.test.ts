@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The mile pencil (D116): the program card's pencil opens a sheet that changes the mile mid-program, through the
 // wizard's own validator, stores it as typed with an "edited" provenance that always records what it replaced, and
 // locks for the last three weeks ("three weeks out the work is done"). D188 makes the pencil unconditional (every
@@ -12,31 +11,34 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { fixtures } from '../support/app.ts';
 import { loadAppAt, domRegistry, clone } from '../support/pace-clock.ts';
+import type { Cfg } from '@ia/core';
 const TODAY = { y: 2026, m: 10, d: 11 };
 const IA = loadAppAt(new Date(TODAY.y, TODAY.m - 1, TODAY.d, 12, 0, 0));
 const reg = domRegistry(IA);
 const doc = IA.window.document;
-const toasts = [];
-IA.window.__toast = (m) => toasts.push(m);
+const toasts: string[] = [];
+IA.window.__toast = (m: string) => toasts.push(m);
 IA.eval('showToast = function(m){ __toast(m); }');
 
 const LOCK_HEADER = 'THE ROW HOLDS';
 const LOCK_BODY = 'You are too close to the race. Three weeks out the work is done. Changing your mile now would reset the pace of every session left, and those sessions have one job. Get you to the line fresh.';
 const LOCK_BTN = 'Got it';
-const COMMIT_TOAST = 'Mile updated. Every run still ahead of you now reads from your new row.';
-const MSG_UNDER_3 = 'Under 3:00 is not a mile time. The world record is 3:43. Check the entry.';
-const MSG_OVER_25 = 'Over 25:00 reads as a walk, not a run. Check the entry.';
+const COMMIT_TOAST: string = 'Mile updated. Every run still ahead of you now reads from your new row.';
+const MSG_UNDER_3: string = 'Under 3:00 is not a mile time. The world record is 3:43. Check the entry.';
+const MSG_OVER_25: string = 'Over 25:00 reads as a walk, not a run. Check the entry.';
 
 const SEP = String.fromCharCode(1);
-const textOf = (h) => String(h).replace(/<[^>]+>/g, SEP).split(SEP).map((s) => s.trim()).filter(Boolean).join('\n');
+const textOf = (h: unknown): string => String(h).replace(/<[^>]+>/g, SEP).split(SEP).map((s) => s.trim()).filter(Boolean).join('\n');
 /** The Monday that makes today fall in week `wk`: date arithmetic on the pinned today (a Sunday, 2026-10-11). */
-function startDateForWeek(wk) {
+function startDateForWeek(wk: number): string {
   const today = new Date(TODAY.y, TODAY.m - 1, TODAY.d);
   const d = new Date(today.getTime() - (wk - 1) * 7 * 864e5);
   while (d.getDay() !== 1) d.setDate(d.getDate() - 1);
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
-function seed(opts = {}) {
+/** A stored program's setup: its config overrides, no race, its length, and the week today falls in. */
+interface SeedOpts { cfg?: Partial<Cfg>; noRace?: boolean; tw?: number; wk?: number }
+function seed(opts: SeedOpts = {}) {
   reg.clear();
   toasts.length = 0;
   const cfg = Object.assign(clone(fixtures.HALF_MANNY), opts.cfg || {});
@@ -49,9 +51,9 @@ function seed(opts = {}) {
   IA.localStorage.setItem('ia_programs', JSON.stringify([p]));
   return p;
 }
-const isOpen = (id) => doc.getElementById(id)._cls.has('open');
+const isOpen = (id: string) => doc.getElementById(id)._cls.has('open');
 const openSheet = () => IA.eval('openMileSheet')('gP');
-const stored = () => JSON.parse(IA.localStorage.getItem('ia_programs'))[0].cfg.cardioGoals.run;
+const stored = () => JSON.parse(IA.localStorage.getItem('ia_programs')!)[0].cfg.cardioGoals.run;
 
 test('the pencil\'s sheet, its lock popup and their fields are in the app', () => {
   for (const f of ['openMileSheet', 'closeMileSheet', 'commitMileChange']) assert.equal(typeof IA.eval(f), 'function', f);
@@ -65,7 +67,7 @@ test('the last three weeks lock the mile: the hand table of weeks', () => {
   ];
   for (const r of LOCK) {
     seed({ tw: r.tw, wk: r.wk });
-    assert.equal(IA.eval('_goalCurWeek')(JSON.parse(IA.localStorage.getItem('ia_programs'))[0]), r.wk, `week ${r.wk}/${r.tw} resolves`);
+    assert.equal(IA.eval('_goalCurWeek')(JSON.parse(IA.localStorage.getItem('ia_programs')!)[0]), r.wk, `week ${r.wk}/${r.tw} resolves`);
     openSheet();
     assert.equal(isOpen('mileLockOverlay'), r.locked, `week ${r.wk} of ${r.tw}: the lock`);
     assert.equal(isOpen('mileOverlay'), !r.locked, `week ${r.wk} of ${r.tw}: the edit sheet`);
@@ -81,19 +83,19 @@ test('the lock popup reads the ruled header, body and button, with the days out,
   assert.equal(lock[lock.length - 1], LOCK_BTN);
   assert.doesNotMatch(doc.getElementById('mileLockBody').innerHTML, /re-pace/i);
   // Days out: days-from-civil(race) - days-from-civil(today); the race day's weekday by Sakamoto's algorithm.
-  const civ = (y, m, d) => {
+  const civ = (y: number, m: number, d: number) => {
     y -= m <= 2 ? 1 : 0;
     const era = Math.floor(y / 400);
     const yoe = y - era * 400;
     const doy = Math.floor((153 * (m + (m > 2 ? -3 : 9)) + 2) / 5) + d - 1;
     return era * 146097 + yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy - 719468;
   };
-  const sakamoto = (y, m, d) => {
+  const sakamoto = (y: number, m: number, d: number) => {
     const t = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4];
     if (m < 3) y -= 1;
     return (y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) + t[m - 1] + d) % 7;
   };
-  const [ry, rm, rd] = fixtures.HALF_MANNY.raceDate.split('-').map(Number);
+  const [ry, rm, rd] = fixtures.HALF_MANNY.raceDate!.split('-').map(Number);
   const days = civ(ry, rm, rd) - civ(TODAY.y, TODAY.m, TODAY.d);
   assert.equal(days, 56, '2026-10-11 to 2026-12-06');
   const WD3 = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -115,8 +117,8 @@ test('with no race date the lock popup drops the two date lines and keeps the we
 
 test('every run goal\'s card carries one pencil labelled "Change mile time" and a Run paces group, at every level', () => {
   const detail = IA.eval('progDetailHTML');
-  const mkProg = (cfg) => ({ id: 'gQ', name: 'n', totalWeeks: 14, startDate: startDateForWeek(3), cfg: Object.assign(clone(fixtures.HALF_MANNY), cfg) });
-  const GRID = [
+  const mkProg = (cfg: Partial<Cfg>) => ({ id: 'gQ', name: 'n', totalWeeks: 14, startDate: startDateForWeek(3), cfg: Object.assign(clone(fixtures.HALF_MANNY), cfg) });
+  const GRID: [string, Partial<Cfg>][] = [
     ['run_half, intermediate', {}],
     ['run_base', { cardioGoals: { run: { id: 'run_base', label: 'Build a Base' } } }],
     ['run_half, beginner', { experience: 'beginner' }],
@@ -128,14 +130,14 @@ test('every run goal\'s card carries one pencil labelled "Change mile time" and 
     assert.match(h, /det-label[^>]*>Run paces/, `${label}: the Run paces group`);
   }
   // D188 G4: a beginner's card with his 10:30 mile, a beginner's run_5k with none, and an intermediate's.
-  const card = (over) => detail({ id: 'gQ', name: 'n', totalWeeks: 14, startDate: '2026-09-28', cfg: Object.assign(clone(fixtures.HALF_MANNY), over) });
+  const card = (over: Partial<Cfg>) => detail({ id: 'gQ', name: 'n', totalWeeks: 14, startDate: '2026-09-28', cfg: Object.assign(clone(fixtures.HALF_MANNY), over) });
   const PENCIL = /aria-label="Change mile time"/g;
   assert.equal((card({ experience: 'beginner' }).match(PENCIL) || []).length, 1);
   assert.equal((card({ experience: 'beginner', cardioGoals: { run: { id: 'run_5k', label: '5K' } } }).match(PENCIL) || []).length, 1);
   assert.equal((card({}).match(PENCIL) || []).length, 1);
 });
 
-function commit(mm, ss, opts) {
+function commit(mm: string, ss: string, opts?: SeedOpts) {
   seed(Object.assign({ tw: 14, wk: 3 }, opts || {}));
   openSheet();
   doc.getElementById('mileSheetMins').value = mm;
@@ -164,7 +166,7 @@ test('a commit over an entered mile records the prior time, toasts the ruled sen
   assert.equal(g.mileBestMins + ':' + g.mileBestSecs, '9:45');
   assert.equal(toasts[0], COMMIT_TOAST);
   assert.ok(g.mileBestMins !== '' && g.mileBestMins !== undefined, 'a pencil never un-anchors the goal');
-  const a = IA.eval('runAnchorInfo')(JSON.parse(IA.localStorage.getItem('ia_programs'))[0].cfg);
+  const a = IA.eval('runAnchorInfo')(JSON.parse(IA.localStorage.getItem('ia_programs')!)[0].cfg);
   assert.equal(a && a.kind, 'edited');
   assert.match(IA.eval('runAnchorSentence')(a), /Before that it was/);
 });
@@ -201,7 +203,7 @@ test('the validator still reads the wizard draft when called with no arguments',
 });
 
 test('an edited mile is read as typed and interpolated, never snapped to a chart row', () => {
-  const at = (sec) => JSON.stringify(IA.eval('paceChartLookup')('mile', sec));
+  const at = (sec: number) => JSON.stringify(IA.eval('paceChartLookup')('mile', sec));
   assert.notEqual(at(510), at(480), '8:30 is not the 8:00 row');
   assert.notEqual(at(510), at(540), '8:30 is not the 9:00 row');
   const x = commit('8', '30');
@@ -209,7 +211,7 @@ test('an edited mile is read as typed and interpolated, never snapped to a chart
 });
 
 test('the lock body and the toast carry no mid-sentence dash and no Nike, and ship in the app as typed', () => {
-  const midDash = (s) => /[A-Za-z0-9,)]\s*[—-]\s*[A-Za-z0-9(]/.test(s.replace(/\d+–\d+/g, ''));
+  const midDash = (s: string) => /[A-Za-z0-9,)]\s*[—-]\s*[A-Za-z0-9(]/.test(s.replace(/\d+–\d+/g, ''));
   assert.ok(!midDash(LOCK_BODY));
   assert.ok(!midDash(COMMIT_TOAST));
   assert.ok(IA.html.includes(LOCK_BODY));

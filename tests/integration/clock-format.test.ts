@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Every clock a run or swim card prints goes through the one carrying m:ss helper (D126), so no card ever reads :60.
 // The helper alone is held by tests/unit/clock-format.test.js; this file reads the clocks off built programs: the
 // tempo card, the NSW interval card (pace limb, recovery band and note), the NRC race plan, the swim interval card,
@@ -18,21 +17,23 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { fixtures } from '../support/app.ts';
 import { loadAppAt, clone, cardioOf, sessions } from '../support/pace-clock.ts';
+import type { Session } from '../support/pace-clock.ts';
+import type { Cfg, Program } from '@ia/core';
 const IA = loadAppAt(new Date(2026, 9, 11, 12, 0, 0));
 const WELL = /^-?\d+:[0-5]\d$/;
-function handClock(sec) {
+function handClock(sec: number): string {
   const t = Math.round(sec);
   const r = t % 60;
   return (t - r) / 60 + ':' + (r < 10 ? '0' + r : String(r));
 }
-const secsOf = (c) => {
+const secsOf = (c: string): number => {
   const p = c.split(':');
   return +p[0] * 60 + +p[1];
 };
-const doseOf = (s) => s.dose || s._dose || {};
+const doseOf = (s: Session) => s.dose || s._dose || {};
 
 /** An undated 1.5 mi pace goal (or `dist`), intermediate, 18-35, seed 76308, from a mile anchor mm:ss. */
-function paceCfg(anchorMins, anchorSecs, goalMins = '9', goalSecs = '30', dist = '1.5') {
+function paceCfg(anchorMins: number | string, anchorSecs: number | string, goalMins: number | string = '9', goalSecs: number | string = '30', dist: number | string = '1.5'): Cfg {
   const c = clone(fixtures.HALF_MANNY);
   Object.assign(c, { experience: 'intermediate', seed: 76308, primaryPath: 'goal', eventTargeted: false, ageBracket: '18-35' });
   delete c.raceDate;
@@ -44,7 +45,7 @@ function paceCfg(anchorMins, anchorSecs, goalMins = '9', goalSecs = '30', dist =
   };
   return c;
 }
-const build = (cfg) => IA.buildProgram(clone(cfg));
+const build = (cfg: Cfg): Program => IA.buildProgram(clone(cfg));
 
 test('the tempo card at week 11 prints the clock of its dose: 494.306 - 3 x 10 = 464.306, x 1.08 = 501.44 -> 8:21/mi', () => {
   // An 8:00 mile, a 1.5 mi goal of 9:30, undated: 11 weeks, 10 steps at the intermediate rate of 3 s/mi/wk from the
@@ -97,8 +98,8 @@ const M_PER_MILE = 1609.344; // a unit
 test('every NSW interval card prints its pace, the 16 s/mi rule, the 2x-2.5x recovery band and clean note clocks', () => {
   let cards = 0;
   let notes = 0;
-  const bad = { pace: [], rule: [], recNum: [], recStr: [], note: [], frac: [] };
-  const push = (k, v) => bad[k].length < 5 && bad[k].push(v);
+  const bad: Record<'pace' | 'rule' | 'recNum' | 'recStr' | 'note' | 'frac', string[]> = { pace: [], rule: [], recNum: [], recStr: [], note: [], frac: [] };
+  const push = (k: keyof typeof bad, v: string) => bad[k].length < 5 && bad[k].push(v);
   for (let mins = 5; mins <= 12; mins++) {
     for (const secs of [0, 17, 30, 44, 59]) {
       for (const { w, d, s } of sessions(build(paceCfg(mins, secs, 9, 30, 1.5)))) {
@@ -140,7 +141,7 @@ test('an interval note quotes a 2 mi goal of 13:59 (419.5 s/mi) as 7:00/mi (the 
     }
   }
   assert.ok(note, 'an interval note quotes the goal');
-  assert.equal(note.match(INT_GOAL)[1], '7:00');
+  assert.equal(note.match(INT_GOAL)![1], '7:00');
 });
 
 test('the NRC half plan at an 8:00 mile prints exactly the chart row and its steady ceiling, and nothing else per mile', () => {
@@ -177,7 +178,7 @@ test('the NRC formatter is only ever handed whole seconds (so it can never meet 
 const SWIM_DIST = 500;
 const SWIM_RATE = 3; // s per 100 per week (D110a: the sizer's rate, age scale 1.0)
 const SWIM_TARGET = 240 / (SWIM_DIST / 100); // 48 s per 100
-const swimInt = (wp) => wp - 2; // D110a, Guide A p12
+const swimInt = (wp: number): number => wp - 2; // D110a, Guide A p12
 function swimCfg(baseMins = '10', baseSecs = '16') {
   const c = clone(fixtures.HALF_MANNY);
   Object.assign(c, { cardioTypes: ['swim'], experience: 'intermediate', seed: 76308, ageBracket: '18-35', primaryPath: 'goal', eventTargeted: false });
@@ -187,8 +188,8 @@ function swimCfg(baseMins = '10', baseSecs = '16') {
 }
 const SWIM_MAIN = /at (\d+:\d+)\/100/;
 const SWIM_SPLIT = /goal split of (\d+:\d+)\/100/;
-const isSwimInt = (s) => s.type === 'swim' && /Interval/.test(String(s.subtype || ''));
-function firstSwimInt(prog, wk) {
+const isSwimInt = (s: Session): boolean => s.type === 'swim' && /Interval/.test(String(s.subtype || ''));
+function firstSwimInt(prog: Program, wk: number | string): string {
   for (const d of ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']) for (const s of cardioOf(prog, wk, d)) if (isSwimInt(s)) return String(s.detail || '');
   return '';
 }
@@ -230,7 +231,7 @@ test('a swim base of 10:08 carries week 1 to 2:00/100 (608 / 5 - 2 = 119.6; the 
 });
 
 // The rounding edges, read off rendered cards. Every program built here is kept for the last test.
-const EDGE_BUILT = [];
+const EDGE_BUILT: Program[] = [];
 
 test('pace: mile anchors whose week 1 tempo lands on m:59.5 or past print the carried clock', () => {
   // 333 x 1.08 = 359.64 -> 6:00; 444 x 1.08 = 479.52 -> 8:00; 611 x 1.08 = 659.88 -> 11:00 (the idiom: 5:60, 7:60, 10:60).

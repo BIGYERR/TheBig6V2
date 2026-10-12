@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Equipment tiers and the exercise pool: what a tier does not own never prints on it, and a ruling that selects never
 // deletes. Rulings: D42 (Landmine rotational press: name, pattern, injury behaviour, its shoulder-pool gear gate and the
 // side a one-hand press prints), D43 (Dumbbell floor press), D44, D46-c, D47, D49 (the core pillar gear gates, the
@@ -13,10 +12,11 @@ import assert from 'node:assert/strict';
 import { loadApp, fixtures } from '../support/app.ts';
 import * as D from '../support/duplicate-movements.ts';
 import * as E from '../support/equipment-tiers.ts';
+import type { Cfg, Day, InjuryTier, Item, Program } from '@ia/core';
 const IA = loadApp();
 const SRC = D.appText();
 const EXLIB = D.clone(IA.eval('EXLIB'));   // plain data: arrays from the app's realm never deep-equal host arrays
-const filterOne = (name, region, tier, detail = '3×10') => {
+const filterOne = (name: string, region?: string | null, tier?: string | null, detail = '3×10'): Item | null => {
   const out = IA.applyInjuryFilter([{ label: 'T', items: [{ name, detail }] }], region ? { injury: { region, tier } } : {});
   const it = out && out[0] && out[0].items && out[0].items[0];
   return it ? { name: it.name, detail: it.detail } : null;
@@ -29,8 +29,8 @@ const FP = 'Dumbbell floor press', LM = 'Landmine rotational press';
 test('the floor press is the last member of both chest accessory pools, the earlier members unchanged', () => {
   assert.deepEqual(EXLIB.chest_acc, ['Dumbbell incline press', 'Dumbbell bench press', 'Dips', 'Pushups (slow tempo)', 'Diamond pushups', 'Dumbbell decline press', FP]);
   assert.deepEqual(EXLIB.chest_acc_joint, ['Dumbbell incline press', 'Dumbbell bench press', 'Machine chest press', 'Cable crossover', 'Pec deck', 'Dumbbell decline press', FP]);
-  assert.equal(EXLIB.chest_acc.filter((x) => x === FP).length, 1);
-  assert.equal(EXLIB.chest_acc_joint.filter((x) => x === FP).length, 1);
+  assert.equal(EXLIB.chest_acc.filter((x: string) => x === FP).length, 1);
+  assert.equal(EXLIB.chest_acc_joint.filter((x: string) => x === FP).length, 1);
 });
 
 test('the new names carry no mid-word hyphen, dash or brand', () => {
@@ -63,14 +63,14 @@ test('shoulder/workaround swaps the dumbbell bench to the floor press, with no s
 test('the injury filter swaps the bench, prints an RPE cap on it, drops the floor press under protect, and leaves a healthy bench alone', () => {
   const swapped = filterOne('Dumbbell bench press', 'shoulder', 'workaround');
   assert.equal(swapped && swapped.name, FP);
-  assert.match(swapped.detail, /RPE/);
+  assert.match(swapped!.detail, /RPE/);
   assert.equal(filterOne(FP, 'shoulder', 'protect'), null);
-  assert.equal(filterOne('Dumbbell bench press').name, 'Dumbbell bench press');
+  assert.equal(filterOne('Dumbbell bench press')!.name, 'Dumbbell bench press');
 });
 
 test('the landmine press prints only on barbell tiers, and the floor press on loaded tiers but never bodyweight', () => {
   const BARBELL = ['home_full', 'commercial', 'crossfit'], NO_BARBELL = ['bodyweight', 'minimal', 'home_basic'];
-  const lm = {}, fp = {};
+  const lm: Record<string, number> = {}, fp: Record<string, number> = {};
   for (const eq of BARBELL.concat(NO_BARBELL)) {
     lm[eq] = 0; fp[eq] = 0;
     for (const f of ['support_strength', 'support_athletic']) for (const seed of [76308, 11111, 4242, 909, 1234, 5678]) {
@@ -95,7 +95,7 @@ test('the shoulder pool\'s no-barbell branch is EXLIB.shoulder without the landm
 
 // ══ D42: Landmine rotational press, name, pattern, injury behaviour ════════════════════════════════════════════
 test('the landmine press is a horizontal press; rotational core drills keep their own verdicts', () => {
-  const table = [[LM, 'hpress'], ['Landmine rotations', null], ['Pallof press', null], ['Windshield wipers', null], ['Thoracic rotations', null],
+  const table: [string, string | null][] = [[LM, 'hpress'], ['Landmine rotations', null], ['Pallof press', null], ['Windshield wipers', null], ['Thoracic rotations', null],
     ['Landmine reverse lunge', 'lunge'], ['Barbell overhead press', 'vpress'], ['Kettlebell single-arm press', 'vpress'], ['Barbell bench press', 'hpress']];
   for (const [n, want] of table) assert.equal(IA._pattern(n), want, n);
   assert.notEqual(IA._pattern(LM), 'vpress');
@@ -106,7 +106,7 @@ test('the landmine press ends EXLIB.shoulder and lives in no other pool', () => 
   assert.deepEqual(Object.keys(EXLIB).filter((k) => Array.isArray(EXLIB[k]) && EXLIB[k].includes(LM)), ['shoulder']);
 });
 
-const verdict = (name, region, tier) => {
+const verdict = (name: string, region: string | null, tier: string | null) => {
   const it = filterOne(name, region, tier, '3×5');
   if (!it) return 'DROPPED';
   if (it.name !== name) return 'SWAPPED:' + it.name;
@@ -137,7 +137,7 @@ test('the landmine rule is exact-anchored live code above the core exemption, wi
   // or press token.
   const LIT = 'landmine (reverse lunge|rotational press)';
   const rfAt = noComments.indexOf('const _REP_FLOOR=['), rfEnd = rfAt < 0 ? -1 : noComments.indexOf('\n];', rfAt);
-  const authored = (r, at) => {
+  const authored = (r: string, at: number) => {
     if (rfAt < 0 || rfEnd < 0 || !(at > rfAt && at < rfEnd)) return false;
     const side = r.slice(1, -1).split(LIT);
     if (side.length !== 2) return false;
@@ -155,7 +155,7 @@ const SIDE = E.surveyShoulderSide(IA, E.shoulderLattice(3));
 
 test('every one-hand press in the three shoulder slots prints a side, and no two-hand movement does (sample)', () => {
   assert.deepEqual(SIDE.errors, []);
-  for (const site of ['S1', 'S2', 'S3']) {
+  for (const site of ['S1', 'S2', 'S3'] as const) {
     const t = SIDE.seen[site];
     const one = E.ONE_HAND.filter((n) => t[n]), two = E.TWO_HAND.filter((n) => t[n]);
     assert.ok(one.length > 0, site + ': a one-hand press reaches the slot');
@@ -240,7 +240,7 @@ test('the five wizard equipment cards read verbatim, and the two D44 rewrote add
     commercial: 'Full gym — cables, machines, barbells, everything',
     crossfit: 'Barbells, rig, bumpers, kettlebells, rower/bike, wall balls, bands',
   });
-  for (const id of ['home_full', 'crossfit']) assert.doesNotMatch(CARDS[id].replace(/pull-up|rower\/bike/g, ''), /—|–| - /);
+  for (const id of ['home_full', 'crossfit'] as const) assert.doesNotMatch(CARDS[id].replace(/pull-up|rower\/bike/g, ''), /—|–| - /);
 });
 
 test('a tier prescribed band work names bands on its card, and the banded prehab rail stays on home_full and crossfit (sample)', () => {
@@ -253,7 +253,7 @@ test('a tier prescribed band work names bands on its card, and the banded prehab
 });
 
 test('over budget, an optional core finisher pays before the prehab rail; a fixed core section is protected (D47)', () => {
-  const session = (optional) => [
+  const session = (optional: boolean) => [
     { label: 'Main', items: [{ name: 'Barbell back squat', detail: '6×5' }] },
     { label: 'Chest + knee', superset: true, items: [{ name: 'Dumbbell lateral raise', detail: '5×12' }, { name: 'Spanish squat hold (KB)', detail: '4×30 sec' }, { name: 'Wall sit', detail: '4×45 sec' }] },
     Object.assign({ label: '', core: true, coreHeader: 'Core — Rotational Power', items: [{ name: 'Standing torso rotations (slow)', detail: '5×10 each' }, { name: 'Side plank thread-the-needle', detail: '4×10 each' }] }, optional ? { optional: true } : {}),
@@ -262,9 +262,11 @@ test('over budget, an optional core finisher pays before the prehab rail; a fixe
   IA.ctx.__et_opt = session(true);
   IA.ctx.__et_fix = session(false);
   const opt = D.clone(IA.eval('capSessionBudget(__et_opt, null)')), fix = D.clone(IA.eval('capSessionBudget(__et_fix, null)'));
-  const names = (secs, pred) => secs.filter(pred).reduce((a, s) => a.concat((s.items || []).map((i) => i.name)), []);
-  const core = (s) => !!(s && s.core), rail = (s) => s && s.label === 'Chest + knee', main = (s) => s && s.label === 'Main';
-  const count = (secs) => secs.reduce((a, s) => a + ((s && s.items) || []).length, 0);
+  /** A section as the hand session writes it and capSessionBudget returns it. */
+  type Sec = { label: string; core?: boolean; items?: { name: string }[] };
+  const names = (secs: Sec[], pred: (s: Sec) => unknown): string[] => secs.filter(pred).reduce<string[]>((a, s) => a.concat((s.items || []).map((i) => i.name)), []);
+  const core = (s: Sec) => !!(s && s.core), rail = (s: Sec) => s && s.label === 'Chest + knee', main = (s: Sec) => s && s.label === 'Main';
+  const count = (secs: Sec[]) => secs.reduce((a, s) => a + ((s && s.items) || []).length, 0);
   assert.ok(count(opt) < 6 && count(fix) < 6, 'the hand session is over budget');
   assert.ok(names(opt, core).length < 2, 'the optional finisher pays');
   assert.deepEqual(names(opt, rail), names(session(true), rail), 'the rail is intact');
@@ -294,7 +296,7 @@ test('the anti-rotation draw stays legal, varied and mixed static and dynamic on
 });
 
 test('the D49 members keep one storage identity and the dose they inherit', () => {
-  const sk = (n) => IA.exStoreKey(n);
+  const sk = (n: string) => IA.exStoreKey(n);
   assert.equal(sk('Bird dog'), sk('Bird dogs'));
   for (const n of ['Bird dogs', 'Plank shoulder taps', 'Side plank', 'Pallof press']) {
     const alias = IA.eval('EX_KEY_ALIAS[_exSlugRaw(' + JSON.stringify(n) + ')]');
@@ -306,10 +308,10 @@ test('the D49 members keep one storage identity and the dose they inherit', () =
 });
 
 // ══ D70c / D150: the inventory binds ══════════════════════════════════════════════════════════════════════════
-const copyOf = (id) => { const m = SRC.match(new RegExp("\\{id:'" + id + "',[^}]*desc:'([^']*)'")); return m ? m[1] : null; };
+const copyOf = (id: string): string | null => { const m = SRC.match(new RegExp("\\{id:'" + id + "',[^}]*desc:'([^']*)'")); return m ? m[1] : null; };
 
 test('the typed inventory agrees with every token the live tier copy states', () => {
-  const rows = [['home_basic', /No barbell\./, 'BARBELL', 0], ['home_basic', /Dumbbells/, 'DUMBBELL', 1], ['home_basic', /kettlebells/, 'KETTLEBELL', 1], ['home_basic', /bands/, 'BAND', 1],
+  const rows: [string, RegExp, string, number][] = [['home_basic', /No barbell\./, 'BARBELL', 0], ['home_basic', /Dumbbells/, 'DUMBBELL', 1], ['home_basic', /kettlebells/, 'KETTLEBELL', 1], ['home_basic', /bands/, 'BAND', 1],
     ['home_full', /^Barbell\b/, 'BARBELL', 1], ['home_full', /dumbbells/, 'DUMBBELL', 1], ['home_full', /kettlebells/, 'KETTLEBELL', 1], ['home_full', /bands/, 'BAND', 1],
     ['commercial', /cables, machines/, 'CABLE', 1], ['commercial', /cables, machines/, 'MACHINE', 1], ['crossfit', /^Barbells\b/, 'BARBELL', 1], ['crossfit', /kettlebells/, 'KETTLEBELL', 1],
     ['crossfit', /wall balls/, 'MEDBALL', 1], ['crossfit', /bands/, 'BAND', 1], ['bodyweight', /No weights\./, 'DUMBBELL', 0], ['bodyweight', /No weights\./, 'KETTLEBELL', 0],
@@ -318,7 +320,7 @@ test('the typed inventory agrees with every token the live tier copy states', ()
     assert.match(copyOf(t) || '', rx, t);
     assert.equal(E.OWNS[t][c], v, t + ' ' + c);
   }
-  for (const t of ['home_full', 'crossfit']) assert.doesNotMatch(copyOf(t), /cable|machine/i, t);
+  for (const t of ['home_full', 'crossfit']) assert.doesNotMatch(copyOf(t)!, /cable|machine/i, t);
 });
 
 test('the implement class read from a movement name: the typed table holds', () => {
@@ -351,7 +353,7 @@ test('HALF_MANNY\'s swap universe holds 86 names: commercial owns everything, so
 });
 
 test('the swap sheet withholds the front squat under every shoulder and elbow plan, and offers it with none', () => {
-  let prog = null, day = null, wk = null, main = null;
+  let prog: Program | null = null, day: Day | null = null, wk: string | null = null, main: string | null = null;
   for (const sd of E.INV_SEEDS) {
     const p = IA.buildProgram(E.seedCfg('crossfit', 'strength', 'intermediate', '18-35', sd));
     if (!(p._swapUniverse || []).includes('Front squat')) continue;
@@ -363,9 +365,9 @@ test('the swap sheet withholds the front squat under every shoulder and elbow pl
   }
   assert.ok(prog, 'a crossfit strength program holds the front squat in its universe and a squat main');
   const swapCandidates = IA.swapCandidates || IA.eval('swapCandidates');
-  const offer = (patch) => E.candNames(swapCandidates(main, day, wk, Object.assign({}, prog, { cfg: Object.assign({}, prog.cfg, patch) }))).includes('Front squat');
+  const offer = (patch: Partial<Cfg>) => E.candNames(swapCandidates(main, day, wk, Object.assign({}, prog, { cfg: Object.assign({}, prog!.cfg, patch) }))).includes('Front squat');
   assert.equal(offer({}), true, 'control: offered with no plan');
-  for (const [r, t] of [['shoulder', 'workaround'], ['shoulder', 'protect'], ['elbow', 'workaround'], ['elbow', 'protect']])
+  for (const [r, t] of [['shoulder', 'workaround'], ['shoulder', 'protect'], ['elbow', 'workaround'], ['elbow', 'protect']] satisfies [string, InjuryTier][])
     assert.equal(offer({ injury: { region: r, tier: t } }), false, r + '/' + t);
 });
 
@@ -415,7 +417,7 @@ test('the app carries each of D196\'s five literals exactly once', () => {
 });
 
 test('the frozen lens reads the ruled names as the D196 measure printed them, and lowback caps hip extension', () => {
-  const want = { 'Banded hip thrust': 'hip_ext', Burpees: null, [D.BRIDGE]: 'hip_ext', [D.BED]: 'hip_ext' };
+  const want: Record<string, string | null> = { 'Banded hip thrust': 'hip_ext', Burpees: null, [D.BRIDGE]: 'hip_ext', [D.BED]: 'hip_ext' };
   for (const n of Object.keys(want)) assert.equal(D.frozenPattern(n), want[n], n);
   assert.ok(E.CAP.lowback.protect.includes('hip_ext') && E.CAP.lowback.workaround.includes('hip_ext'));
 });

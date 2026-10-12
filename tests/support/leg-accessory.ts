@@ -185,9 +185,9 @@ const ePat = (n: unknown): string | null => { const t = String(n || ''); for (co
 const E_POSTERIOR = new Set(['hinge', 'hip_ext']);
 /** One trained day as eScan reads it: its section labels, its item names, and each item's name and detail. */
 interface ECell { labels: string[]; names: string[]; items: { n: string; d: string }[] }
-const eLegCell = (o: ECell): boolean => o.labels.indexOf('Calves') >= 0 || o.labels.indexOf('Leg isolation') >= 0;
+const eLegCell = (o: Pick<ECell, 'labels'>): boolean => o.labels.indexOf('Calves') >= 0 || o.labels.indexOf('Leg isolation') >= 0;
 /** A leg cell (either leg accessory label) with no name that reads as hinge or hip extension. */
-const eZeroP = (o: ECell): boolean => eLegCell(o) && !o.names.some((n) => E_POSTERIOR.has(ePat(n) ?? ''));
+const eZeroP = (o: Pick<ECell, 'labels' | 'names'>): boolean => eLegCell(o) && !o.names.some((n) => E_POSTERIOR.has(ePat(n) ?? ''));
 // The budget's cost rule by hand: stretch is free, holds and carries are half, everything else its set count, and a
 // detail with no N× reads as three.
 const eSets = (d: unknown): number => { const m = String(d || '').match(/(\d+)\s*[×x]/); return m ? Math.max(1, parseInt(m[1], 10)) : 3; };

@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The session budget, the lattices. The same claims as tests/integration/session-budget.test.js, which runs them on a
 // sample; this file runs them whole. CI runs it, the 60-second check does not.
 //   - the census: HALF_MANNY on 288 cells ({healthy, shoulder, low back, elbow protect} x six tiers x two foci x two
@@ -21,7 +20,7 @@ const P = SB.page();
 const ON = SB.census(P, false, SB.WIDE), OFF = SB.census(P, true, SB.WIDE);
 const ON_N = SB.census(P, false, SB.NARROW), OFF_N = SB.census(P, true, SB.NARROW);
 const DEL = SB.tally(OFF, ON);
-const sum = (o) => Object.values(o).reduce((a, b) => a + b, 0);
+const sum = (o: Record<string, number>): number => Object.values(o).reduce((a, b) => a + b, 0);
 
 test('the census lattice is the ruled 288 cells and the narrow sweep 30, and every cell built', () => {
   // L0, L0a, L0b, L1
@@ -54,7 +53,7 @@ test('no section renders with no items, on either lattice', () => {
 
 test('prehab never falls below the V192 census, per tier and in aggregate, on both lattices', () => {
   // B3 (the V192 floor; the hand sum cross-checked)
-  for (const [lat, cen] of [['wide', ON], ['narrow', ON_N]]) {
+  for (const [lat, cen] of [['wide', ON], ['narrow', ON_N]] satisfies ['wide' | 'narrow', SB.Census][]) {
     assert.equal(sum(SB.V192_PREHAB[lat]), SB.V192_PREHAB_SUM[lat], lat + ': the transcribed table sums to its floor constant');
     for (const e of EQUIP) assert.ok(cen.tiers[e].prehab >= SB.V192_PREHAB[lat][e], lat + ' ' + e + ' ' + cen.tiers[e].prehab);
     assert.ok(EQUIP.reduce((a, e) => a + cen.tiers[e].prehab, 0) >= SB.V192_PREHAB_SUM[lat], lat);
@@ -101,7 +100,7 @@ test('the leg compounds are emptied no more often than V197 emptied them (D81)',
 test('the census matches tests/snapshots/session-budget-lattice.json (per tier, per class, thin core, the long-run carve-out)', () => {
   // B3 and B4 (the per-tier values the release-to-release ratchets compared), B4g1, B5 (thin core, both lattices),
   // B1b (the carve-out's denominators)
-  const tierView = (cen) => Object.fromEntries(EQUIP.map((e) => {
+  const tierView = (cen: SB.Census) => Object.fromEntries(EQUIP.map((e) => {
     const t = cen.tiers[e];
     const other = Object.keys(t.prehabName).filter((n) => SB.D85_DISPLACED_NAMES.indexOf(n) < 0).reduce((a, n) => a + t.prehabName[n], 0);
     return [e, { sections: t.sections, items: t.items, coreSections: t.coreSec, thinCore: t.thinCore, prehab: t.prehab, prehabInHipSections: t.prehabHip, prehabOutsideD85Names: other }];
@@ -145,11 +144,11 @@ test('every program in the shard equals itself on a second page, with and withou
 test('the lens removes one item on the whole shard: B-3, a superset partner re-picked beside the restored Glute-ham raise', () => {
   // b-removed, b-B3
   assert.deepEqual(R.removed.map((x) => [x.row.tag, x.w, x.d, x.lab, x.n]), [[SB.B3.tag, SB.B3.w, SB.B3.d, SB.B3.label, SB.B3.gone]]);
-  const secA = R.b3.a.filter((x) => x[2] === SB.B3.label).map((x) => x[0]), secB = R.b3.b.filter((x) => x[2] === SB.B3.label).map((x) => x[0]);
+  const secA = R.b3!.a.filter((x) => x[2] === SB.B3.label).map((x) => x[0]), secB = R.b3!.b.filter((x) => x[2] === SB.B3.label).map((x) => x[0]);
   assert.deepEqual(secA, [SB.B3.gone]);
   assert.deepEqual(secB.slice().sort(), [SB.B3.partner, SB.B3.restored].sort());
   assert.ok(SB.HINGE_HAND.test(SB.B3.gone) && SB.HINGE_HAND.test(SB.B3.partner));
-  assert.ok(R.b3.bo.map((x) => x[0]).includes(SB.B3.restored));
+  assert.ok(R.b3!.bo.map((x) => x[0]).includes(SB.B3.restored));
 });
 
 test('every item the lens adds is on the same day of the budget-off card (B-1)', () => {

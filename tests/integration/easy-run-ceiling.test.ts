@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The easy-day ceiling (D117): every Recovery Run and every non-race Long Run of an NRC plan prints a ceiling and
 // carries it as dose.cap; speed runs, race day and the time trial carry none. run_base's two easy-run sites print the
 // same ceiling beside their "Around" pace (slice D; the form after D109: "Around X is right for you. Do not run
@@ -12,28 +11,30 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { fixtures } from '../support/app.ts';
 import { loadAppAt, clone, runSessions } from '../support/pace-clock.ts';
+import type { Session } from '../support/pace-clock.ts';
 const IA = loadAppAt(new Date(2026, 9, 11, 12, 0, 0));
-const paceStr = (sec) => {
+const paceStr = (sec: number): string => {
   const t = Math.round(sec);
   return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0') + '/mi';
 };
-const ROWS = [
+/** A PACE_CHART row typed by hand, with its ceiling: the midpoint of tempo and recovery, and that as a clock. */
+interface Row { mileSec: number; mile: string; tempo: number; recovery: number; cap: number; capStr: string }
+const ROWS: Row[] = [
   { mileSec: 480, mile: '8:00', tempo: 565, recovery: 630 },
   { mileSec: 630, mile: '10:30', tempo: 720, recovery: 800 }, // HALF_MANNY's row
   { mileSec: 570, mile: '9:30', tempo: 660, recovery: 730 }, // the intermediate default row
-];
-for (const r of ROWS) {
-  r.cap = Math.round((r.tempo + r.recovery) / 2);
-  r.capStr = paceStr(r.cap);
-}
-const REC_TAIL = (cap) => 'Do not run faster than ' + cap + '.';
-const LONG_TAIL = (cap) => 'Average no faster than ' + cap + '.';
-const midDash = (s) => /[A-Za-z0-9,)]\s*[—-]\s*[A-Za-z0-9(]/.test(s);
+].map((r) => {
+  const cap = Math.round((r.tempo + r.recovery) / 2);
+  return { ...r, cap, capStr: paceStr(cap) };
+});
+const REC_TAIL = (cap: string) => 'Do not run faster than ' + cap + '.';
+const LONG_TAIL = (cap: string) => 'Average no faster than ' + cap + '.';
+const midDash = (s: string) => /[A-Za-z0-9,)]\s*[—-]\s*[A-Za-z0-9(]/.test(s);
 
 test('the hand rows match PACE_CHART, and the ceiling is the midpoint of tempo and recovery', () => {
   const chart = IA.eval('PACE_CHART');
   for (const r of ROWS) {
-    const row = chart.find((x) => x.mile === r.mileSec);
+    const row = chart.find((x: { mile: number }) => x.mile === r.mileSec);
     assert.ok(row, `PACE_CHART has an exact row at ${r.mile}`);
     assert.equal(row.tempo, r.tempo, `${r.mile} tempo`);
     assert.equal(row.recovery, r.recovery, `${r.mile} recovery`);
@@ -44,7 +45,7 @@ test('the hand rows match PACE_CHART, and the ceiling is the midpoint of tempo a
   assert.ok(ROWS.every((r) => r.cap > r.tempo && r.cap < r.recovery), 'it sits between tempo and recovery');
 });
 
-function nrcRuns(goal, row, raceDate) {
+function nrcRuns(goal: string, row: Row, raceDate?: string | null) {
   const cfg = clone(fixtures.HALF_MANNY);
   const [mm, ss] = row.mile.split(':');
   cfg.cardioGoals.run = { id: goal, label: goal, mileBestMins: mm, mileBestSecs: ss };
@@ -116,12 +117,12 @@ test('the two ceiling sentences carry no mid-sentence dash and no Nike, and ship
 });
 
 // run_base holds one chart row for the whole block. Its two easy-run sites are told apart by the sentence each owns.
-const IS_L = (c) => /This is the longest run of your week/.test(String(c.detail)); // the long easy run
-const IS_E = (c) => /Distance is not the goal; time on feet is\./.test(String(c.detail)); // the week's other easy runs
-const BASE_TAIL = (cap) => 'is right for you. Do not run faster than ' + cap + '.';
-const AROUND = (c) => (String(c.detail).match(/Around (\d+:[0-5]\d\/mi) is right for you/) || [])[1];
-const CAPSTR = (c) => (String(c.detail).match(/is right for you\. Do not run faster than (\d+:[0-5]\d\/mi)\./) || [])[1];
-function baseRuns(row) {
+const IS_L = (c: Session) => /This is the longest run of your week/.test(String(c.detail)); // the long easy run
+const IS_E = (c: Session) => /Distance is not the goal; time on feet is\./.test(String(c.detail)); // the week's other easy runs
+const BASE_TAIL = (cap: string) => 'is right for you. Do not run faster than ' + cap + '.';
+const AROUND = (c: Session) => (String(c.detail).match(/Around (\d+:[0-5]\d\/mi) is right for you/) || [])[1];
+const CAPSTR = (c: Session) => (String(c.detail).match(/is right for you\. Do not run faster than (\d+:[0-5]\d\/mi)\./) || [])[1];
+function baseRuns(row: Row) {
   const cfg = clone(fixtures.HALF_MANNY);
   const [mm, ss] = row.mile.split(':');
   cfg.cardioGoals.run = { id: 'run_base', label: 'Build Running Base', baselineDist: '5', baseline: '5mi', mileBestMins: mm, mileBestSecs: ss };
@@ -130,7 +131,7 @@ function baseRuns(row) {
   cfg.eventTargeted = false;
   return runSessions(IA.buildProgram(cfg)).map((r) => r.s);
 }
-const baseCaps = [];
+const baseCaps: string[] = [];
 for (const r of [ROWS[0], ROWS[1]]) {
   test(`run_base at ${r.mile}: both easy-run sites print Around ${paceStr(r.recovery)} and the ceiling ${r.capStr} from the same row; benchmarks carry none`, () => {
     const all = baseRuns(r);

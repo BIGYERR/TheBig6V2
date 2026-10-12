@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The run session's class: D103a. Every NSW run session carries a class key on its dose (int, chi, steady, long, easy,
 // bench, trial). The chip and the run history read it, and print today's codes (the LI and SI rename: keyed chi wears
 // LI, keyed int SI, the test TEST); the readers go key-first (the week shape, the interference cost, the halfstep and
@@ -14,13 +13,14 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { loadApp, pinClock, fixtures } from '../support/app.ts';
 import * as X from '../support/run-session-class.ts';
+import type { Cfg, Program } from '@ia/core';
 const { clone } = X;
 
 const NOON = new Date(2026, 9, 11, 12, 0, 0);
 const IA = loadApp();
 pinClock(IA, NOON);
 const R = X.chipReaders(IA);
-const build = (fam, cfg) => ({ fam, cfg, prog: IA.buildProgram(clone(cfg)) });
+const build = (fam: string, cfg: Cfg): { fam: string; cfg: Cfg; prog: Program } => ({ fam, cfg, prog: IA.buildProgram(clone(cfg)) });
 
 // ── the chip and the run history ────────────────────────────────────────────────────────────────────────────────────
 test('both label eras of the LI and the SI, plain, Taper and re-entry, wear one chip and class as one in the run history', () => {
@@ -53,9 +53,9 @@ test('the test and the benchmark stay out of the run history', () => {
 
 // the chip sample: per injury mode (none, halfstep, easy) a dated pace goal, a mile goal with a swim, run_base on the
 // frequency plan, run_base 55+, and an NRC 10K with a bike
-const CHIP = [];
+const CHIP: { fam: string; cfg: Cfg; prog: Program }[] = [];
 for (const inj of [null, X.INJ.halfstep, X.INJ.easy]) {
-  const put = (fam, c) => { if (inj) c.injury = clone(inj); CHIP.push(build(fam, c)); };
+  const put = (fam: string, c: Cfg) => { if (inj) c.injury = clone(inj); CHIP.push(build(fam, c)); };
   put('pace', X.paceCfg('C', X.PACE, '', ['sun', 'wed'], 3, 3, true));
   put('pace', X.paceCfg('C', X.MILE, 'swim', ['sun'], 1, 3, true));
   put('run_base freq', X.runBaseFreq('C', '', 'intermediate', ['sun', 'wed'], 24865, false, true));
@@ -179,7 +179,7 @@ test('a keyed SI costs 1.4 and a keyed LI 1.05 plus the distance bump, by hand, 
 test('the week shape reads the speed days by key: the test is in no role, and a week whose only leg-load card is the test has no long run', () => {
   // S1, S1b, S1c
   const SH = IA.eval('_nrcRunShape');
-  const card = (sub, key, legLoad) => ({ type: 'run', subtype: sub, goalId: 'run_pace_goal', legLoad, dose: { k: 'dist', mi: 1.5, key } });
+  const card = (sub: string, key: string, legLoad: boolean) => ({ type: 'run', subtype: sub, goalId: 'run_pace_goal', legLoad, dose: { k: 'dist', mi: 1.5, key } });
   const wk = { mon: card('Long Slow Distance (LSD) — Taper', 'long', true), wed: card('Interval (INT)', 'int', true),
     fri: card('Long Slow Distance (LSD)', 'easy', false), sat: card('1.5 Mile Test — TIME TRIAL', 'trial', true) };
   const s = SH(clone(wk), ['mon', 'wed', 'fri', 'sat']);

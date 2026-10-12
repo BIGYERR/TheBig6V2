@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Equipment tiers on the full lattices (CI only; tests/integration/equipment-tiers.test.js runs samples and every
 // hand table). Rulings: D42-c, D44, D46-c, D47, D49, D70c, D150, D149, D196. Helpers: tests/support/equipment-tiers.js.
 import { test } from 'vitest';
@@ -6,8 +5,9 @@ import assert from 'node:assert/strict';
 import { loadApp } from '../support/app.ts';
 import * as D from '../support/duplicate-movements.ts';
 import * as E from '../support/equipment-tiers.ts';
+import type { Experience, LiftingFocus } from '@ia/core';
 const IA = loadApp();
-const once = (f) => { let v; return () => (v === undefined ? (v = f()) : v); };
+const once = <T>(f: () => T) => { let v: T | undefined; return (): T => (v === undefined ? (v = f()) : v); };
 
 // ══ D42-c: the shoulder slot prints a side (6 tiers x 4 foci x 40 seeds) ═══════════════════════════════════════
 const side = once(() => E.surveyShoulderSide(IA, E.shoulderLattice(40)));
@@ -17,7 +17,7 @@ test('the shoulder-side lattice builds whole (960 programs)', () => {
   assert.equal(side().builds, 960);
 });
 
-for (const [site, what] of [['S1', 'the heavy push Main pairing'], ['S2', 'the light push Main pairing'], ['S3', 'the push Accessory superset']]) {
+for (const [site, what] of [['S1', 'the heavy push Main pairing'], ['S2', 'the light push Main pairing'], ['S3', 'the push Accessory superset']] satisfies ['S1' | 'S2' | 'S3', string][]) {
   test(what + ': every one-hand press prints a side, every time, and no two-hand movement claims one', () => {
     const t = side().seen[site];
     const one = E.ONE_HAND.filter((n) => t[n]), two = E.TWO_HAND.filter((n) => t[n]);
@@ -170,8 +170,8 @@ test('the denial selects: the removed names still print on commercial, the named
 });
 
 test('advanced 55+ hypertrophy on crossfit and home_full draws one squat per program, goblet or front squat, both across seeds', () => {
-  for (const t of ['crossfit', 'home_full']) {
-    const seen = {};
+  for (const t of ['crossfit', 'home_full'] as const) {
+    const seen: Record<string, number> = {};
     for (const sd of E.INV_SEEDS) {
       const ks = Object.keys(E.squatMains(IA.buildProgram(E.seedCfg(t, 'hypertrophy', 'advanced', '55+', sd))));
       assert.equal(ks.length, 1, t + ' seed ' + sd + ': ' + ks.join(', '));
@@ -183,13 +183,13 @@ test('advanced 55+ hypertrophy on crossfit and home_full draws one squat per pro
 });
 
 test('older hypertrophy below advanced 55+ on crossfit and home_full squats the goblet only; commercial never draws a front squat', () => {
-  for (const t of ['crossfit', 'home_full']) {
-    const other = {};
-    for (const [e, a] of [['beginner', '55+'], ['intermediate', '55+'], ['beginner', '36-54'], ['intermediate', '36-54'], ['advanced', '36-54']])
+  for (const t of ['crossfit', 'home_full'] as const) {
+    const other: Record<string, number> = {};
+    for (const [e, a] of [['beginner', '55+'], ['intermediate', '55+'], ['beginner', '36-54'], ['intermediate', '36-54'], ['advanced', '36-54']] satisfies [Experience, string][])
       for (const sd of E.INV_SEEDS) Object.keys(E.squatMains(IA.buildProgram(E.seedCfg(t, 'hypertrophy', e, a, sd)))).forEach((k) => { other[k] = 1; });
     assert.deepEqual(Object.keys(other), ['Dumbbell goblet squat'], t);
   }
-  const com = {};
+  const com: Record<string, number> = {};
   for (const e of E.INV_EXPS) for (const a of ['36-54', '55+']) for (const sd of E.INV_SEEDS)
     Object.keys(E.squatMains(IA.buildProgram(E.seedCfg('commercial', 'hypertrophy', e, a, sd)))).forEach((k) => { com[k] = 1; });
   assert.ok(Object.keys(com).length > 0 && !com['Front squat'], JSON.stringify(com));
@@ -198,15 +198,15 @@ test('older hypertrophy below advanced 55+ on crossfit and home_full squats the 
 test('under a shoulder or elbow plan no front squat prints, sits in the universe or is offered, and the squat slot is kept', () => {
   const swapCandidates = IA.swapCandidates || IA.eval('swapCandidates');
   let n = 0, calls = 0;
-  for (const eq of ['commercial', 'crossfit', 'home_full']) for (const r of ['shoulder', 'elbow']) for (const tr of ['workaround', 'protect'])
-    for (const [f, e, a] of [['strength', 'intermediate', '18-35'], ['balanced', 'advanced', '18-35'], ['hypertrophy', 'beginner', '18-35'], ['hypertrophy', 'advanced', '55+']])
+  for (const eq of ['commercial', 'crossfit', 'home_full'] as const) for (const r of ['shoulder', 'elbow']) for (const tr of ['workaround', 'protect'] as const)
+    for (const [f, e, a] of [['strength', 'intermediate', '18-35'], ['balanced', 'advanced', '18-35'], ['hypertrophy', 'beginner', '18-35'], ['hypertrophy', 'advanced', '55+']] satisfies [LiftingFocus, Experience, string][])
       for (const sd of E.INV_SEEDS) {
         const tag = eq + ' ' + r + '/' + tr + ' ' + f + ' seed ' + sd;
         const ph = IA.buildProgram(E.seedCfg(eq, f, e, a, sd)), pi = IA.buildProgram(E.seedCfg(eq, f, e, a, sd, { region: r, tier: tr }));
         n++;
         const mi = E.squatMains(pi), mh = E.squatMains(ph);
         assert.ok(!mi['Front squat'], tag + ': a front squat main');
-        const sum = (o) => Object.values(o).reduce((x, y) => x + y, 0);
+        const sum = (o: Record<string, number>) => Object.values(o).reduce((x, y) => x + y, 0);
         assert.equal(sum(mi), sum(mh), tag + ': the squat slot is kept');
         assert.ok(!(pi._swapUniverse || []).includes('Front squat'), tag + ': universe');
         for (const w of Object.keys(pi.weeks)) for (const d of D.DAYS) for (const s of ((pi.weeks[w][d] && pi.weeks[w][d].sections) || [])) {
@@ -319,7 +319,7 @@ test('no bodyweight Main and no race Primer is Burpees, and no capped hip extens
 
 test('a stamped, reused app builds every probe cell as a plain fresh one does', () => {
   const X = E.d196App();
-  const J = (p) => JSON.stringify(p, (k, v) => (k === '__pre' || k === 'id' || k === 'created' ? undefined : v));
+  const J = (p: unknown) => JSON.stringify(p, (k, v) => (k === '__pre' || k === 'id' || k === 'created' ? undefined : v));
   for (const i of [0, 37, 74, 111, 148, 185, 222, 259, 296]) {
     X.eval('__BUILD++');
     X.ctx.__C = D.clone(BW[i].c);

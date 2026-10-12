@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The compound tier: _compoundTier ranks a movement 0 to 3, and tier 3 is a loaded compound the session budget never
 // trims, the swap sheet tags HEAVY COMPOUND and the load note measures a swap against. Ruling D89 (V200): a drill
 // declared family 'core' in _AUX_FAMILY is a core drill, never a loaded compound (the clause in _compoundTier returns
@@ -16,15 +15,17 @@ import assert from 'node:assert/strict';
 import { loadApp, pinClock, fixtures, weekGrid, progDigest } from '../support/app.ts';
 import { matchSnapshot } from '../support/snapshot.ts';
 import * as SB from '../support/session-budget.ts';
+import type { App } from '../support/app.ts';
+import type { Cfg, Section } from '@ia/core';
 const { clone, DAYS, countIn } = SB;
 
 const CLAUSE = "  if(_auxFamily(name)==='core') return 0;\n";
 const IA = SB.page();
 const MO = SB.page(SB.variant('no-core-clause', [[CLAUSE, '']]));
-const fn = (X, n) => X.eval(n);
-const T = (n) => fn(IA, '_compoundTier')(n), MT = (n) => fn(MO, '_compoundTier')(n);
-const LN = (a, b) => fn(IA, 'swapLoadNote')(a, b), MLN = (a, b) => fn(MO, 'swapLoadNote')(a, b);
-const note = (out) => 'Much lighter than ' + out.toLowerCase() + '. Volume holds, top-end strength does not.';
+const fn = (X: App, n: string) => X.eval(n);
+const T = (n: string) => fn(IA, '_compoundTier')(n), MT = (n: string) => fn(MO, '_compoundTier')(n);
+const LN = (a: string, b: string) => fn(IA, 'swapLoadNote')(a, b), MLN = (a: string, b: string) => fn(MO, 'swapLoadNote')(a, b);
+const note = (out: string) => 'Much lighter than ' + out.toLowerCase() + '. Volume holds, top-end strength does not.';
 
 // Typed off the _AUX_FAMILY literal once: the names the author filed as family 'core'.
 const CORE23 = ['Ab wheel rollouts', 'Bird dogs', 'Dead bugs', 'Dead bug (slow tempo)', 'Garhammer raises', 'Hanging knee raises',
@@ -44,7 +45,7 @@ test('the 23 names declared core in _AUX_FAMILY are the hand table, and every on
 
 test("D96's controls keep their tiers: the ruling selects a family, it deletes no tier", () => {
   // B1, B2, B3
-  const CTRL = [['Jump squats', 3], ['TRX row (if available)', 3], ['Straight-arm pulldown', 3], ['Back squat', 3], ['Bench press', 3],
+  const CTRL: [string, number][] = [['Jump squats', 3], ['TRX row (if available)', 3], ['Straight-arm pulldown', 3], ['Back squat', 3], ['Bench press', 3],
     ['Overhead press', 3], ['Barbell row', 3], ['Barbell deadlift', 3], ['Dumbbell bench press', 2], ['Chinups', 1], ['Band pull-apart', 1]];
   for (const [n, t] of CTRL) assert.equal(T(n), t, n);
 });
@@ -74,18 +75,17 @@ test('without the clause Pallof press is tier 3 and the same swap reads the old 
 });
 
 /** The swap sheet's tags for one item on a built day (a fresh page that keeps its document). */
-function swapTags(file, sections, si, ii) {
+function swapTags(file: string | null, sections: Section[], si: number, ii: number): string {
   const X = loadApp(file ? { file, dom: true } : { dom: true });
   pinClock(X, SB.CLOCK);
-  const cfg = clone(fixtures.HALF_MANNY), p = X.buildProgram(clone(cfg));
-  p.cfg = cfg;
+  const cfg = clone(fixtures.HALF_MANNY), p = Object.assign(X.buildProgram(clone(cfg)), { cfg });
   p.weeks[1].mon = Object.assign({}, p.weeks[1].mon, { rest: false, sections: clone(sections) });
   X.ctx.__P = p;
   X.eval("activeProg=__P;activeProgId='P1';currentWeek=1;currentDayKey='mon';");
   X.eval('openSwapSheet(' + si + ',' + ii + ')');
   return String(X.els.swapTags.innerHTML);
 }
-const DAY = [
+const DAY: Section[] = [
   { label: 'Main — Back squat', items: [{ name: 'Back squat', detail: '5×5' }] },
   { label: 'Accessory', items: [{ name: 'Back squat', detail: '3×8' }, { name: 'Dumbbell bench press', detail: '3×10' }, { name: 'Pallof press', detail: '3×10' }] },
 ];
@@ -113,9 +113,9 @@ test("HALF_MANNY without the clause matches tests/snapshots/compound-tier.json",
 });
 
 // ── the 49-config lattice: HALF_MANNY plus six tiers x two foci x two experiences x two seeds, lift only ───────────
-const CFGS = [clone(fixtures.HALF_MANNY)];
-for (const e of ['commercial', 'home_full', 'crossfit', 'home_basic', 'bodyweight', 'minimal']) for (const f of ['balanced', 'support_prevention'])
-  for (const x of ['intermediate', 'advanced']) for (const sd of [4242, 9001]) {
+const CFGS: Cfg[] = [clone(fixtures.HALF_MANNY)];
+for (const e of ['commercial', 'home_full', 'crossfit', 'home_basic', 'bodyweight', 'minimal'] as const) for (const f of ['balanced', 'support_prevention'] as const)
+  for (const x of ['intermediate', 'advanced'] as const) for (const sd of [4242, 9001]) {
     CFGS.push({ name: 'L', primaryPath: 'lift', cardioTypes: [], cardioGoals: {}, eventTargeted: false, raceDate: null, liftingFocus: f, experience: x,
       ageBracket: '18-35', equipment: e, unit: 'lbs', restDays: ['sun'], days: DAYS.slice(), bench: 135, squat: 155, deadlift: 185, seed: sd });
   }
@@ -125,7 +125,7 @@ const HOOK = "var __CRF=function(j){ return JSON.stringify(capRegionalFatigue(JS
   + "var __SC=function(n,dj,w,pj){ return JSON.stringify(swapCandidates(n,JSON.parse(dj),w,JSON.parse(pj))); };"
   + "var __AC=function(dj,w,pj){ return JSON.stringify(addCandidates(JSON.parse(dj),w,JSON.parse(pj))); };";
 IA.eval(HOOK); MO.eval(HOOK);
-const L = { lines: 0, changed: [], pallof: 0, coreLost: 0, lenMismatch: 0, other: [], r1: [0, 0], r2: [0, 0], r3: [0, 0], r4: [0, 0] };
+const L = { lines: 0, changed: [] as string[], pallof: 0, coreLost: 0, lenMismatch: 0, other: [] as string[], r1: [0, 0], r2: [0, 0], r3: [0, 0], r4: [0, 0] };
 CFGS.forEach((cfg, ci) => {
   const pc = IA.buildProgram(clone(cfg)), pm = MO.buildProgram(clone(cfg));
   const gc = weekGrid(pc).split('\n'), gm = weekGrid(pm).split('\n');
@@ -151,7 +151,7 @@ CFGS.forEach((cfg, ci) => {
     if (!day || !day.sections || !day.sections.length) continue;
     const sj = JSON.stringify(day.sections);
     L.r1[1]++; if (IA.eval('__CRF')(sj) !== MO.eval('__CRF')(sj)) L.r1[0]++;
-    const nm = [].concat(...day.sections.map((s) => (s.items || []).map((i) => i.name)));
+    const nm = ([] as string[]).concat(...day.sections.map((s) => (s.items || []).map((i) => i.name)));
     if (nm.indexOf('Pallof press') < 0) continue;
     const dj = JSON.stringify(day);
     L.r4[1]++; if (IA.eval('__AC')(dj, +wk, pj) !== MO.eval('__AC')(dj, +wk, pj)) L.r4[0]++;

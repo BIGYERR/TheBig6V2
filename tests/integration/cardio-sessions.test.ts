@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Cardio sessions: the NSW run, bike and swim session builders read their doses from the guides. Rulings:
 //   D111, D112 the Short Interval (SI) follows guide A (16 s/mi under the week's goal pace, recovery 2 to 2.5 x the work,
 //        build 4 to 8 repeats), guide B fills A's silence (the warm-up); D9 the generic SI note states A's cap of 8;
@@ -21,12 +20,12 @@ const { clone, DAYS } = X;
 
 const IA = loadApp();
 pinClock(IA, new Date(2026, 9, 11, 12, 0, 0));
-const J = v => JSON.parse(JSON.stringify(v));
-const call = (fn, ...args) => J(IA.eval(fn)(...args));
-const build = cfg => IA.buildProgram(clone(cfg));
+const J = (v: unknown) => JSON.parse(JSON.stringify(v));
+const call = (fn: string, ...args: unknown[]) => J(IA.eval(fn)(...args));
+const build = (cfg: X.AnyCfg): X.Prog => IA.buildProgram(clone(cfg));
 const SRC = appScript();
 const SRC_NC = SRC.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
-const count = (s, t) => s.split(t).length - 1;
+const count = (s: string, t: string) => s.split(t).length - 1;
 
 test('a seeded program equals itself built twice: pace, run_base, swim and bike', () => {
   for (const cfg of [X.PINNED(), X.runBase55(fixtures.HALF_MANNY, true), X.swimMile(), X.bikeGoal('bike_50', 40)]) {
@@ -35,9 +34,9 @@ test('a seeded program equals itself built twice: pace, run_base, swim and bike'
 });
 
 // ── the doctrine text ────────────────────────────────────────────────────────────────────────────────────────────────
-test('guide A still says what the interval rules are typed from', { skip: X.needsDoctrine(X.GUIDE_A, X.GUIDE_A_TABLES, X.GUIDE_B) }, () => {
+test('guide A still says what the interval rules are typed from', { skip: !!X.needsDoctrine(X.GUIDE_A, X.GUIDE_A_TABLES, X.GUIDE_B) }, () => {
   // A0, A0b, A0c, A0d
-  const a = X.doctrineText(X.GUIDE_A), t = X.doctrineText(X.GUIDE_A_TABLES), b = X.doctrineText(X.GUIDE_B);
+  const a = X.doctrineText(X.GUIDE_A)!, t = X.doctrineText(X.GUIDE_A_TABLES)!, b = X.doctrineText(X.GUIDE_B)!;
   assert.ok(a.indexOf('400m interval pace should be about 4 seconds') >= 0, 'A 251-252: 4 s per 400 m');
   assert.ok(a.indexOf('completing 8 intervals') >= 0, 'A 259-263: build toward 8 intervals');
   assert.equal((t.match(/Recovery period: 2-2\.5 x the work time/g) || []).length, 2, 'both hand-transcribed table headers');
@@ -45,9 +44,9 @@ test('guide A still says what the interval rules are typed from', { skip: X.need
     'guide B p8 warm-up');
 });
 
-test('the Table 6 hand transcription reproduces all 26 rows of guide B, both columns, and its tail rule', { skip: X.needsDoctrine(X.GUIDE_B) }, () => {
+test('the Table 6 hand transcription reproduces all 26 rows of guide B, both columns, and its tail rule', { skip: !!X.needsDoctrine(X.GUIDE_B) }, () => {
   // chi T2b, T2b2; int T2b, T2c; steady S2a, S2b
-  const T = X.table6FromText(X.doctrineText(X.GUIDE_B));
+  const T = X.table6FromText(X.doctrineText(X.GUIDE_B)!);
   for (let w = 1; w <= 26; w++) {
     assert.deepEqual(T.chi[w], X.t6Chi(w), 'CHI week ' + w);
     assert.equal(T.int[w], X.t6IntRaw(w), 'INT week ' + w);
@@ -55,8 +54,8 @@ test('the Table 6 hand transcription reproduces all 26 rows of guide B, both col
   assert.equal(T.int.length, 27, 'the INT column yields 26 rows');
   assert.ok(T.tail, 'the ">26: do not increase" line');
   // the single-piece rows end at 12: the first "2 x" row is 13
-  assert.deepEqual(T.chiRaw.slice(1, 13).map(c => +c), [15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20]);
-  assert.equal(T.chiRaw.findIndex((c, i) => i >= 1 && /^2\s*x\s*\d+$/.test(c)), 13);
+  assert.deepEqual(T.chiRaw.slice(1, 13).map(c => +c!), [15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20]);
+  assert.equal(T.chiRaw.findIndex((c, i) => i >= 1 && /^2\s*x\s*\d+$/.test(c!)), 13);
 });
 
 // ── Table 6, the CHI column (D128) ──────────────────────────────────────────────────────────────────────────────────
@@ -78,8 +77,8 @@ test('chiFromTable6 returns the hand transcription for weeks 1 to 26 and row 26 
 test('the heaviest Table 6 CHI cell is 40 minutes of work and no row prescribes more than 2 pieces', () => {
   // T4a, T4b
   const raw = J(IA.eval('NSW_TABLE6_CHI')).slice(1);
-  assert.equal(Math.max(...raw.map(r => r.reps * r.minPerRep)), 40);
-  assert.equal(Math.max(...raw.map(r => r.reps)), 2);
+  assert.equal(Math.max(...raw.map((r: { reps: number; minPerRep: number }) => r.reps * r.minPerRep)), 40);
+  assert.equal(Math.max(...raw.map((r: { reps: number }) => r.reps)), 2);
 });
 
 test('getCHI reads Table 6 by calendar week for every phase window, and steps back on a cutback week', () => {
@@ -104,7 +103,7 @@ test('getCHI never prescribes 3 pieces or more than 40 minutes, and past week 26
     const g = call('getCHI', w, tw, true, null, null);
     assert.ok(g.reps <= 2 && g.reps * g.minPerRep <= 40, `tw${tw} wk${w} ${g.reps}x${g.minPerRep}`);
   }
-  for (const [w, tw] of [[27, 30], [27, null], [30, 40], [31, 40], [40, null], [45, 52], [99, 104]]) {
+  for (const [w, tw] of [[27, 30], [27, null], [30, 40], [31, 40], [40, null], [45, 52], [99, 104]] satisfies [number, number | null][]) {
     const want = tw && X.isCutback(w, tw) ? X.chiCutOf(X.t6Chi(26)) : X.t6Chi(26);
     assert.deepEqual(X.pieces(call('getCHI', w, tw, true, null, null)), want, `wk${w} tw${tw}`);
   }
@@ -118,7 +117,7 @@ test('the INT column is stored raw, 26 rows, and intFromTable6 reads it under gu
   const got = J(IA.eval('NSW_TABLE6_INT'));
   assert.equal(got.length, 27); assert.equal(got[0], null);
   for (let w = 1; w <= 26; w++) assert.equal(got[w], X.t6IntRaw(w), 'stored week ' + w);
-  const rd = w => IA.eval('intFromTable6')(w);
+  const rd = (w: number) => IA.eval('intFromTable6')(w);
   for (const w of [27, 28, 30, 40, 52, 104, 1000]) assert.equal(rd(w), 8, 'week ' + w);
   assert.ok(X.t6IntRaw(11) > 8 && X.t6IntRaw(13) > 8, 'the raw column climbs past 8, so the cap is a live bound');
   let max = 0, firstEight = 0;
@@ -148,8 +147,8 @@ test('getCHIBike keeps the bike\'s own position ramp, which is not Table 6', () 
   assert.notDeepEqual(X.pieces(call('getCHIBike', 16, 16)), X.t6Chi(16));
 });
 
-function bikeCards(prog) {
-  const chi = [], int = [];
+function bikeCards(prog: X.Prog) {
+  const chi: { w: number; reps: number; mins: number }[] = [], int: { w: number; reps: number }[] = [];
   Object.keys(prog.weeks).sort((a, b) => +a - +b).forEach(w => DAYS.forEach(d => {
     const day = prog.weeks[w][d]; if (!day || day.rest) return;
     for (const c of X.cardsOfDay(day)) {
@@ -157,7 +156,7 @@ function bikeCards(prog) {
       const det = String(c.detail || '').replace(/\s+/g, ' ');
       const many = det.match(/^(\d+)\s*x\s*(\d+)\s*min at RPE 8-9, high resistance/i);
       const one = det.match(/^(\d+)\s*min sustained hard effort, high resistance/i);
-      if (many || one) chi.push({ w: +w, reps: many ? +many[1] : 1, mins: many ? +many[2] : +one[1] });
+      if (many || one) chi.push({ w: +w, reps: many ? +many[1] : 1, mins: many ? +many[2] : +one![1] });
       const m = det.match(/^(\d+) x .+ max effort \/ .+ easy spin recovery/i);
       if (m) int.push({ w: +w, reps: +m[1] });
     }
@@ -217,7 +216,7 @@ test('getCHISwim takes Table 6\'s pieces (1 to week 12, 2 from week 13) and keep
 test('swim_mile CHI cards keep the yard ramp, quantised to 25s with a 150 floor, at Table 6\'s piece count', () => {
   // T12a, T12b
   const p = build(X.swimMile()), tw = p.totalWeeks;
-  const yardOf = w => (X.isCutback(w, tw) ? Math.max(150, Math.round((200 + ((w - 2) / Math.max(tw - 1, 1)) * 600) * 0.7))
+  const yardOf = (w: number) => (X.isCutback(w, tw) ? Math.max(150, Math.round((200 + ((w - 2) / Math.max(tw - 1, 1)) * 600) * 0.7))
     : Math.round(200 + ((w - 1) / Math.max(tw - 1, 1)) * 600));
   let n = 0;
   Object.keys(p.weeks).forEach(w => DAYS.forEach(d => {
@@ -240,7 +239,7 @@ test('swim_mile CHI cards keep the yard ramp, quantised to 25s with a 150 floor,
 test('Mario\'s 11-week pace block prints the Table 6 LI dose on every card, never 3 x 20', () => {
   // T11a, T11b, T11c, T11d
   const p = build(X.marioPace());
-  const cards = [];
+  const cards: X.CardioCard[] = [];
   Object.keys(p.weeks).sort((a, b) => +a - +b).forEach(w => DAYS.forEach(d => {
     const day = p.weeks[w][d]; if (!day || day.rest) return;
     for (const c of X.cardsOfDay(day)) if (X.LI.test(String(c.subtype || c.type || ''))) cards.push({ w: +w, detail: String(c.detail || '').replace(/\s+/g, ' ') });
@@ -261,7 +260,7 @@ test('Mario\'s 11-week pace block prints the Table 6 LI dose on every card, neve
 test('Mario\'s crossfit pace block prints one SI card a week reading 4,4,5,3,6,6,7,4,8,8,8, and reaches 8 before the last week', () => {
   // d114 T8a, T8, T9
   const p = build(X.marioPaceCrossfit());
-  const cards = [];
+  const cards: X.CardioCard[] = [];
   for (const wk of Object.keys(p.weeks).map(Number).sort((a, b) => a - b)) for (const d of DAYS) {
     const c = p.weeks[wk][d] && p.weeks[wk][d].cardio;
     if (c && !Array.isArray(c) && X.SI.test(c.subtype || '')) cards.push({ wk, reps: c.dose && c.dose.reps, detail: String(c.detail || '') });
@@ -282,10 +281,10 @@ test('HALF_MANNY is an NRC plan and builds no LI card, and buildProgram leaves i
 });
 
 // ── run_base holds the last single-piece row (D137) ─────────────────────────────────────────────────────────────────
-const isSteady = c => c.type === 'run' && /^Steady Aerobic Run/.test(String(c.subtype || ''));
-const steadyMin = d => { const m = d.match(/^(\d+) min steady/); return m ? m[1] : '?'; };
-const isRunLI = c => c.type === 'run' && X.LI.test(String(c.subtype || ''));
-const liDose = d => { const m = d.match(/^(?:(\d+)\s*x\s*)?(\d+)\s*min/); return m ? (m[1] ? m[1] + 'x' + m[2] : m[2]) : '?'; };
+const isSteady = (c: X.CardioCard) => c.type === 'run' && /^Steady Aerobic Run/.test(String(c.subtype || ''));
+const steadyMin = (d: string) => { const m = d.match(/^(\d+) min steady/); return m ? m[1] : '?'; };
+const isRunLI = (c: X.CardioCard) => c.type === 'run' && X.LI.test(String(c.subtype || ''));
+const liDose = (d: string) => { const m = d.match(/^(?:(\d+)\s*x\s*)?(\d+)\s*min/); return m ? (m[1] ? m[1] + 'x' + m[2] : m[2]) : '?'; };
 
 test('run_base\'s Steady Aerobic Run reads the ruling\'s 16-week series and holds 20 min from week 13', () => {
   // S1a, S1b, S1c, S1d, S3
@@ -303,8 +302,8 @@ test('exactly one run call site passes run_base the single-piece cap, and it is 
   // S2c
   const lits = SRC_NC.match(/getCHI\(week,[^;\n]*goalId\s*===\s*'run_base'\s*\?\s*(\d+)\s*:\s*0\s*\)/g) || [];
   assert.equal(lits.length, 1);
-  assert.equal(+lits[0].match(/\?\s*(\d+)\s*:/)[1], 12);
-  assert.equal(X.T6_CHI.findIndex((r, i) => i >= 1 && r.reps === 2) - 1, 12, 'the hand table agrees');
+  assert.equal(+lits[0].match(/\?\s*(\d+)\s*:/)![1], 12);
+  assert.equal(X.T6_CHI.findIndex((r, i) => i >= 1 && r!.reps === 2) - 1, 12, 'the hand table agrees');
 });
 
 test('the cap stays on run_base: a pace goal reads Table 6 rows 1 to 11 with cutbacks, and rows 13 and 14 as 2 x 12', () => {
@@ -379,7 +378,7 @@ test('PRT TING prints one SI card a week, each the ruled sentence on the hand re
   assert.equal(a.arm, 'four-run');
   const cards = X.siCards(p);
   assert.deepEqual(cards.map(c => c.w), a.want);
-  a.want.forEach((w, i) => {
+  a.want!.forEach((w, i) => {
     const g = { w, reps: X.handRepsT6(w, a.tw), tgt: pace[w - 1], cb: X.isCutback(w, a.tw) }, c = cards[i], hr = X.handRec(g.tgt);
     assert.deepEqual([c.dose.reps, c.dose.tgt, c.dose.rec.lo, c.dose.rec.hi], [g.reps, g.tgt, hr.lo, hr.hi], 'W' + w);
     assert.equal(c.detail, X.ruledIntDetail(g), 'W' + w);
@@ -391,7 +390,7 @@ test('the six pace representatives log their hand rows to the second', () => {
   for (const r of X.PACE_REPS()) {
     const p = build(r.cfg), a = X.armOf(p);
     assert.equal(a.tw, r.tw, r.tag);
-    assert.deepEqual(X.siCards(p).map(c => c.dose && c.dose.tgt), a.want.map(w => r.row[w - 1]), r.tag);
+    assert.deepEqual(X.siCards(p).map(c => c.dose && c.dose.tgt), a.want!.map(w => r.row[w - 1]), r.tag);
   }
 });
 
@@ -407,7 +406,7 @@ test('the SI card count is a rule: one a week at four runs; at three runs one SI
 test('W10 LI keeps A\'s x1.08 worked example (524 s/mi, 8:44/mi), W1 LSD keeps 10:59/mi, and neither carries a recovery band', () => {
   // D8, D8b, D8c
   const all = X.runSessions(build(X.PINNED()));
-  const li10 = all.find(r => r.w === 10 && X.LI.test(r.st)), lsd1 = all.find(r => r.w === 1 && /Long Slow Distance/.test(r.st));
+  const li10 = all.find(r => r.w === 10 && X.LI.test(r.st))!, lsd1 = all.find(r => r.w === 1 && /Long Slow Distance/.test(r.st))!;
   assert.equal(li10.dose.tgt, 524); assert.ok(li10.detail.indexOf('8:44/mi') >= 0);
   assert.equal(lsd1.dose.tgt, 659); assert.ok(lsd1.detail.indexOf('10:59/mi') >= 0);
   assert.ok(!li10.dose.rec && !lsd1.dose.rec);
@@ -454,7 +453,7 @@ test('no line of the four cardio builders carries an em-dash and no literal a le
   for (const [k, fn] of Object.entries(X.BUILDERS)) {
     const b = X.builderBody(SRC, fn);
     assert.ok(!b.err, k + ': ' + b.err);
-    const a = X.copyRuleAudit(b.text);
+    const a = X.copyRuleAudit(b.text!);
     assert.ok(a.lits > 0, k);
     assert.deepEqual(a.em, [], k + ' em-dash lines');
     assert.deepEqual(a.hy, [], k + ' hyphenated literals');
@@ -464,11 +463,11 @@ test('no line of the four cardio builders carries an em-dash and no literal a le
 test('each builder carries coach\'s copy rule replacement texts as later rulings left them, as often as the table says, and no old text', () => {
   // D109-T-run, D109-T-nrc, D109-T-bike, D109-T-swim
   const E = X.d109Entries();
-  assert.ok(!E.err, E.err);
+  assert.ok(!E.err, String(E.err));
   for (const [k, fn] of Object.entries(X.BUILDERS)) {
-    const body = X.builderBody(SRC, fn).text, [lo, hi] = X.D109_RANGE[k], bad = [];
+    const body = X.builderBody(SRC, fn).text!, [lo, hi] = X.D109_RANGE[k], bad = [];
     for (let i = lo; i <= hi; i++) {
-      const e = E.ents[i - 1];
+      const e = E.ents![i - 1];
       const nNew = count(body, e.neu), nOld = count(body, e.old), nGone = e.gone.reduce((a, g) => a + count(body, g), 0);
       if (nNew !== e.n || nOld !== 0 || nGone !== 0) bad.push(`#${i}${e.by ? ' (' + e.by + ')' : ''} new ${nNew}/${e.n} old ${nOld} superseded ${nGone}`);
     }
@@ -478,13 +477,13 @@ test('each builder carries coach\'s copy rule replacement texts as later rulings
 
 test('no cardio card\'s note or detail breaks the copy rule, NRC Speed Run tables aside, on five fixtures', () => {
   // D109-R-HALF-MANNY, D109-R-run-base, D109-R-pace-goal, D109-R-bike, D109-R-swim
-  const FIX = [['HALF_MANNY', 'run', clone(fixtures.HALF_MANNY)],
+  const FIX: [string, string, X.AnyCfg][] = [['HALF_MANNY', 'run', clone(fixtures.HALF_MANNY)],
     ['run_base', 'run', Object.assign(clone(fixtures.HALF_MANNY), { name: 'RB', primaryPath: 'fitness',
       cardioGoals: { run: { id: 'run_base', label: 'Build Running Base', baselineDist: '0.1', baseline: '0.1mi' } },
       eventTargeted: true, raceDate: '2027-06-01', ageBracket: '55+' })],
     ['pace_goal', 'run', X.PINNED()], ['bike', 'bike', X.bikeGoal('bike_50', 30)], ['swim', 'swim', X.swimMile()]];
   for (const [tag, type, cfg] of FIX) {
-    const p = build(cfg); let typed = 0, texts = 0; const hits = [];
+    const p = build(cfg); let typed = 0, texts = 0; const hits: string[] = [];
     Object.keys(p.weeks).forEach(w => DAYS.forEach(d => {
       for (const c of X.cardsOfDay(p.weeks[w][d])) {
         if (c.type === type) typed++;

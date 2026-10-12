@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The pace clock of a pace goal (run_pace_goal): where it starts, what it walks toward, how fast, where the block
 // ends, and what the interval note says about it.
 //   D100 (amended): the clock anchors on the athlete's own chart row read at the distance entered, and walks toward
@@ -16,10 +15,13 @@
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { loadAppAt, clone, runSessions, sessions, stripComments } from '../support/pace-clock.ts';
+import type { CardioGoal, Program } from '@ia/core';
+import type { ChartRow } from '../support/pace-clock-lattices.ts';
 import { HAND, handRow, handRowPaceAt, paceGoal, prtTing, progression, anchorLatticeTests, appendixLatticeTests } from '../support/pace-clock-lattices.ts';
 const IA = loadAppAt(new Date(2026, 9, 11, 12, 0, 0));
-const build = (cfg) => IA.buildProgram(clone(cfg));
-const clock = (s) => {
+/** Builds a lattice config (the lattices write them loosely, as the wizard does). */
+const build = (cfg: Record<string, any>): Program => IA.buildProgram(clone(cfg));
+const clock = (s: number): string => {
   const t = Math.round(s);
   return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
 };
@@ -100,7 +102,7 @@ test('the pinned block\'s dampened interval note is the ruled sentence, with no 
 });
 
 test('the chart row reader returns the mile column at one mile, converts the beginner default, holds the running maximum and both clamps', () => {
-  const rowAt = (row, d) => IA.eval(`rowPaceAt(${JSON.stringify(row)}, ${d})`);
+  const rowAt = (row: ChartRow, d: number) => IA.eval(`rowPaceAt(${JSON.stringify(row)}, ${d})`);
   const R495 = handRow(495);
   assert.equal(rowAt(R495, 1.0), R495.mile, 'a one mile goal reads the mile column exactly');
   const RBEG = handRow(HAND.EXP_DEFAULT.beginner);
@@ -137,7 +139,7 @@ const GEN = loadAppAt(new Date(2026, 8, 22, 21, 16, 0));
 {
   const els = new Map();
   const mk = GEN.window.document.createElement;
-  GEN.window.document.getElementById = (id) => {
+  GEN.window.document.getElementById = (id: string) => {
     if (!els.has(id)) els.set(id, Object.assign(mk('div'), { id }));
     return els.get(id);
   };
@@ -147,8 +149,10 @@ const GEN = loadAppAt(new Date(2026, 8, 22, 21, 16, 0));
   GEN.__els = els;
 }
 const W1MON = Date.UTC(2026, 8, 21);
-const raceFor = (wk) => new Date(W1MON + ((wk - 1) * 7 + 3) * 864e5).toISOString().slice(0, 10);
-function generate(o) {
+const raceFor = (wk: number): string => new Date(W1MON + ((wk - 1) * 7 + 3) * 864e5).toISOString().slice(0, 10);
+/** What the wizard is given: experience, age, whether the run is dated, the race date and the run goal. */
+interface GenOpts { exp: string; age: string; ev: boolean; race: string; run: CardioGoal }
+function generate(o: GenOpts) {
   GEN.eval(`WD = { primaryPath: "event", cardioTypes: ["run"], experience: ${JSON.stringify(o.exp)}, ageBracket: ${JSON.stringify(o.age)}, eventTargeted: ${o.ev}, raceDate: ${JSON.stringify(o.race || '')}, liftingFocus: "support_prevention", equipment: "crossfit", restDays: ["sun","wed"], unit: "lbs", seed: 24865, name: "M", cardioGoals: { run: ${JSON.stringify(o.run)} }, startDate: undefined }; __PPS = {};`);
   GEN.__els.clear();
   GEN.localStorage._map.clear();
@@ -170,16 +174,18 @@ function generate(o) {
   }
   return { L: p.totalWeeks, taper: (p.taperWeeks || []).length, pp, tgt: [...tgt], kinds: [...kinds] };
 }
-const DEF = { beginner: 690, intermediate: 570, advanced: 450 };
-function cell(c) {
+const DEF: Record<string, number> = { beginner: 690, intermediate: 570, advanced: 450 };
+/** A clock-end cell: its label, distance, experience, age, mile (null: none entered), goal offset and dated week (0: undated). */
+interface CellSpec { lbl: string; dist: number; exp: string; age: string; mile: number | null; off: number; dt: number }
+function cell(c: CellSpec) {
   const anchor = c.mile || DEF[c.exp];
   const goalPace = anchor - c.off;
   const tot = Math.round(goalPace * c.dist);
-  const run = { id: 'run_pace_goal', label: 'Hit a Pace / Time Goal', targetDist: String(c.dist), paceUnit: 'mi', targetMins: String(Math.floor(tot / 60)), targetSecs: String(tot % 60), targetTime: clock(tot) };
+  const run: CardioGoal = { id: 'run_pace_goal', label: 'Hit a Pace / Time Goal', targetDist: String(c.dist), paceUnit: 'mi', targetMins: String(Math.floor(tot / 60)), targetSecs: String(tot % 60), targetTime: clock(tot) };
   if (c.mile) Object.assign(run, { mileBestMins: String(Math.floor(c.mile / 60)), mileBestSecs: String(c.mile % 60), mileBestSrc: { kind: 'entered' } });
   return { o: { exp: c.exp, age: c.age, ev: !!c.dt, race: c.dt ? raceFor(c.dt) : '', run }, goalPace };
 }
-const CELLS = [
+const CELLS: CellSpec[] = [
   { lbl: 'beginner 55+, no mile, goal 11:20, 8 weeks dated', dist: 1.0, exp: 'beginner', age: '55+', mile: null, off: 10, dt: 8 },
   { lbl: 'dampened dated', dist: 3.1, exp: 'advanced', age: '55+', mile: 420, off: 100, dt: 12 },
   { lbl: 'dampened undated', dist: 3.1, exp: 'advanced', age: '55+', mile: 420, off: 100, dt: 0 },
@@ -198,7 +204,7 @@ const CELLS = [
   { lbl: 'undampened dated advanced', dist: 1.5, exp: 'advanced', age: '18-35', mile: 420, off: 5, dt: 4 },
   { lbl: 'undampened undated 1 mi', dist: 1.0, exp: 'intermediate', age: '18-35', mile: 480, off: 3, dt: 0 },
 ];
-let clockEnd;
+let clockEnd: ({ c: CellSpec } & ReturnType<typeof cell> & { r: ReturnType<typeof generate> })[] | undefined;
 const clockEndCells = () => clockEnd || (clockEnd = CELLS.map((c) => Object.assign({ c }, cell(c), { r: generate(cell(c).o) })));
 
 test('a dated pace goal tapers max(2, round(0.12 L)) weeks and an undated one none; a goal at or slower than week 1 is met', () => {
@@ -229,7 +235,7 @@ test('an undampened block lands on the entered goal by its last build week; a me
     const bw = r.L - r.taper;
     if (r.pp.met) {
       met++;
-      assert.ok(r.pp.arr.every((v) => v === r.pp.arr[0]), `${c.lbl}: ${r.pp.arr.join(' ')}`);
+      assert.ok(r.pp.arr.every((v: number) => v === r.pp.arr[0]), `${c.lbl}: ${r.pp.arr.join(' ')}`);
     } else if (!r.pp.d) {
       undamped++;
       assert.ok(Math.abs(r.pp.arr[bw - 1] - r.pp.ot) <= 0.1, `${c.lbl}: last build week ${clock(r.pp.arr[bw - 1])} vs goal ${clock(r.pp.ot)}`);
@@ -293,7 +299,7 @@ test('neither the run interval note nor the swim interval note calls a rate safe
 });
 
 test('a blank mile is refused on an intermediate pace goal, and only there', () => {
-  const state = (g, exp) => JSON.parse(IA.eval(`JSON.stringify(_mileEntryState(${JSON.stringify(g)}, ${JSON.stringify(exp)}))`));
+  const state = (g: Partial<CardioGoal>, exp: string) => JSON.parse(IA.eval(`JSON.stringify(_mileEntryState(${JSON.stringify(g)}, ${JSON.stringify(exp)}))`));
   const r1 = state({ id: 'run_pace_goal' }, 'intermediate');
   assert.equal(r1.ok, false);
   assert.equal(r1.blank, true);

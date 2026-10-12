@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Run week layout, every lattice whole: the claims tests/integration/run-week-layout.test.js runs on one seed and a
 // sample, here on every seed and every config the rulings were measured on (D125, D130, D132, D113a, D146). CI runs
 // it, the 60-second check does not.
@@ -11,6 +10,7 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { matchSnapshot } from '../support/snapshot.ts';
 import * as R from '../support/run-week-layout.ts';
+import type { DayKey } from '@ia/core';
 const { DAYS } = R;
 
 const CAL64 = R.calendars([0, 1, 2, 3]);
@@ -24,7 +24,7 @@ test('64 calendars on three seeds, every week: 6,336 hard run pairs and none unt
     for (const r of R.runCards(p)) { cardsN++; if (!R.cardNameAgrees(r.c)) names.push(c.key + ' ' + r.c.subtype); }
     for (const w of R.weeksOf(p)) {
       const lay = R.runLayout(p.weeks[w]), days = R.runDays(lay);
-      const hard = days.filter(d => ['int', 'chi', 'lsd_long'].includes(lay[d])).length;
+      const hard = days.filter(d => ['int', 'chi', 'lsd_long'].includes(lay[d] ?? '')).length;
       const s = R.classify(days, lay);
       weeks++;
       pairs += hard * (hard - 1) / 2;
@@ -43,7 +43,7 @@ test('the 14 on three seeds: four runs in every one of 462 weeks, each paying ex
   let weeks = 0;
   const bad = [];
   for (const key of R.TOL14) for (const seed of [1001, 4004, 7007]) {
-    const p = R.build(R.paceCfg(key.split(','), seed));
+    const p = R.build(R.paceCfg(key.split(',') as DayKey[], seed));
     for (const w of R.weeksOf(p)) {
       const lay = R.runLayout(p.weeks[w]), days = R.runDays(lay), s = R.classify(days, lay);
       weeks++;
@@ -58,7 +58,7 @@ test('64 calendars on nine seeds, every week (6,336): four runs, no untolerated 
   const SEEDS = [1001, 2002, 3003, 4004, 5005, 6006, 7007, 8008, 9009];
   const HEAVY = new Set(['Posterior Chain', 'Leg Strength + Mobility']);
   let weeks = 0, tolWeeks = 0;
-  const notFour = [], untol = [], perCal = {}, heavy = [], names = [];
+  const notFour: string[] = [], untol: string[] = [], perCal: Record<string, number> = {}, heavy: string[] = [], names: string[] = [];
   for (const c of CAL64) {
     perCal[c.key] = 0;
     for (const seed of SEEDS) {
@@ -85,7 +85,7 @@ test('64 calendars on nine seeds, every week (6,336): four runs, no untolerated 
 });
 
 test('multi-sport pace reaches the three-run week on 29 of 64 calendars with a bike and 29 with a swim, each free of untolerated pairs', () => {
-  for (const other of ['bike', 'swim']) {
+  for (const other of ['bike', 'swim'] as const) {
     let three = 0;
     const dirty = [];
     for (const c of CAL64) {
@@ -100,7 +100,7 @@ test('multi-sport pace reaches the three-run week on 29 of 64 calendars with a b
 });
 
 test('the walking week, 64 calendars by 4 injury states by 2 seeds (512 programs): four sessions always carry INT and CHI; a walking week keeps three, a quality week four; every run card names its key', () => {
-  const tally = {}, bad = [];
+  const tally: Record<string, Record<string, number>> = {}, bad: string[] = [];
   let progs = 0;
   for (const c of CAL64) for (const inj of R.WALK_INJ) for (const seed of R.WALK_SEEDS) {
     const p = R.build(R.walkCfg(c.rest, seed, inj.v));
@@ -122,7 +122,7 @@ test('the walking-week ceiling leaves run_half, run_base and multi-sport pace al
   const INJ = R.WALK_INJ.filter(i => i.k !== 'shoulder/protect');
   const cals = R.calendars([3, 1]);
   for (const row of R.WALK_OUT_OF_SCOPE) {
-    const sig = {};
+    const sig: Record<string, string> = {};
     for (const inj of INJ) sig[inj.k] = cals.map(c => { const p = R.build(R.walkCfg(c.rest, 1013, inj.v, row.types, row.goal)); return R.weeksOf(p).map(w => R.scanWeek(p.weeks[w]).n).join(''); }).join('|');
     for (const inj of INJ) assert.equal(sig[inj.k], sig.healthy, row.name + ' ' + inj.k);
   }
@@ -134,7 +134,7 @@ test('three-run pace weeks, 35 calendars by 4 block lengths by 3 focuses (420 bu
     const rest = DAYS.filter(d => !cal.includes(d));
     const p = R.build(R.mkCfg('run_pace_goal', {}, rest, f, { _raceDateCappedWeeks: tw }));
     const per = R.weeksOf(p).map(w => R.runsOf(p.weeks[w]));
-    const cnt = (Rr, t) => Rr.filter(r => r.t === t).length;
+    const cnt = (Rr: R.WeekRun[], t: string) => Rr.filter(r => r.t === t).length;
     const where = cal.join('+') + ' tw ' + tw + ' ' + f;
     assert.equal(per.length, tw, where);
     if (R.SPACER_TYPED.includes(cal.join('+'))) {
@@ -169,11 +169,13 @@ test('the pace lattice of D113a (1,584 configs, solo and with 15 second sports):
 });
 
 /** The D146 lattice, built once: the NRC multi-sport claims, and the run card names it prints. */
-let NRC146 = null;
-function nrc146() {
+/** The D146 lattice's tallies: long-run weeks, weeks with an untolerated pair, weeks whose long run is not last, the run names. */
+interface Nrc146 { longWeeks: number; pairs: string[]; notLast: string[]; names: string[] }
+let NRC146: Nrc146 | null = null;
+function nrc146(): Nrc146 {
   if (NRC146) return NRC146;
   let longWeeks = 0;
-  const pairs = [], notLast = [], names = new Set();
+  const pairs: string[] = [], notLast: string[] = [], names = new Set<string>();
   for (const x of R.nrcLattice146()) {
     const p = R.build(x.cfg);
     for (const w of R.weeksOf(p)) {
@@ -200,7 +202,7 @@ test('the NRC multi-sport lattice of D146 (1,980 configs): no week with an untol
 test('every excluded injury mode is reached on the pace lattice of D113a, each with multi-sport builds', () => {
   const plan = R.app().eval('injuryPlan');
   const EXC = [{}, { bike: 'bike_base' }, { swim: 'swim_base' }, { bike: 'bike_ftp', swim: 'swim_mile' }];
-  const reach = {}, multi = {};
+  const reach: Record<string, number> = {}, multi: Record<string, number> = {};
   EXC.forEach((e, j) => R.EXCL_INJ.forEach(inj => R.CALS99.forEach((rest, i) => {
     const cfg = R.mkCfg('run_pace_goal', e, rest, R.FOCI[(i + j) % 3], { injury: inj });
     const mode = (plan(R.clone(cfg)) || {}).cardioMode || 'none';
@@ -213,16 +215,18 @@ test('every excluded injury mode is reached on the pace lattice of D113a, each w
 });
 
 /** The exclusion key's populations, built once: every cell's layout code, the twins' routing, the chooser's alternative. */
-let EXCL = null;
-function excluded() {
+/** One exclusion row's population read (see excluded). */
+interface ExclRow { cells: number; twins: number; layouts: Record<string, string>; reach: Record<string, number>; moved: number; routable: number; routed: number; twinOff: string[] }
+let EXCL: Record<string, ExclRow> | null = null;
+function excluded(): Record<string, ExclRow> {
   if (EXCL) return EXCL;
   const C = R.chooser();
   EXCL = {};
-  for (const row of ['pace', 'nrc']) {
+  for (const row of ['pace', 'nrc'] as const) {
     const pop = R.excludedPopulation(row);
-    const layouts = {}, reach = {};
+    const layouts: Record<string, string> = {}, reach: Record<string, number> = {};
     let moved = 0, routable = 0, routed = 0;
-    const twinOff = [];
+    const twinOff: string[] = [];
     for (const cell of pop.cells) {
       const p = R.build(cell.cfg), train = R.cardioTrainDays(cell.cfg);
       layouts[cell.key] = R.layoutCode(p, cell.cfg);

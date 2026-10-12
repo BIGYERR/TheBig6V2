@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The test week lattices whole (CI only): tests/integration/test-week.test.js runs each claim on a sample. Rulings:
 // D106a (the trial week, slice E, and the V208 fix-forward at T-1 and T-2) and D158 (the eve shakeout, and the
 // protect-park injury modes it skips). Oracles as in the integration file: date arithmetic, the pre-pin week of the
@@ -17,7 +16,7 @@ test('every cell of the trial week lattice carries one trial on the test day, ti
   assert.equal(T.n, 108);
   assert.equal(T.p4reach, 72, 'cells whose test week dealt no quality run');
   assert.ok(T.hardSeen > 0 && T.p5reach > 0);
-  for (const k of ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']) assert.deepEqual(T[k], [], k);
+  for (const k of ['P1', 'P2', 'P3', 'P4', 'P5', 'P6'] as const) assert.deepEqual(T[k], [], k);
 });
 
 for (const goal of Object.keys(X.EVE_GOALS)) {
@@ -27,7 +26,7 @@ for (const goal of Object.keys(X.EVE_GOALS)) {
       const A = X.eveWeek(IA, X.EVE_CELLS.filter(x => x.goal === goal && x.mix === mix));
       assert.equal(A.progs, 60);
       assert.ok(A.reach > 0 && A.shk > 0 && A.eveDays > 0, JSON.stringify({ reach: A.reach, shk: A.shk }));
-      for (const k of ['Q1', 'Q2', 'Q3', 'Q8']) assert.deepEqual(A[k], [], k);
+      for (const k of ['Q1', 'Q2', 'Q3', 'Q8'] as const) assert.deepEqual(A[k], [], k);
     });
   }
 }
@@ -45,9 +44,9 @@ test('every training-day eve of the shakeout lattice carries the shakeout at the
   const A = X.eveShakeout(IA, X.SHAKEOUT_CELLS);
   assert.equal(A.n, 784);
   assert.ok(A.te > 0 && A.re > 0 && A.tePrev > 0);
-  for (const k of ['bike', 'swim', 'run', 'lift']) assert.ok(A.pre[k] > 0, k);
+  for (const k of ['bike', 'swim', 'run', 'lift'] as const) assert.ok(A.pre[k] > 0, k);
   assert.ok(A.d2reach * 2 >= A.te, `${A.d2reach} of ${A.te}`);
-  for (const k of ['D1', 'D2', 'D3', 'D4']) assert.deepEqual(A[k], [], k);
+  for (const k of ['D1', 'D2', 'D3', 'D4'] as const) assert.deepEqual(A[k], [], k);
 });
 
 test('under the protect-park injury modes every training-day eve matches tests/snapshots/test-week.json', () => {

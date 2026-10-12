@@ -247,15 +247,17 @@ What each gate checks is read from its header. Target files are under `tests/`.
 
 ## Typing debt
 
-Phase 2's later groups were ported from JavaScript mechanically, and 64 files still open with
-`// @ts-nocheck: ported from JavaScript in phase 2; typing pending`. They run and pass, but the compiler does not check
-them. Each is typed in its own commit (types from `@ia/core`, never a local copy), the marker removed and the type
-check kept green; a file touched by a release is typed in that release. The list shrinks to nothing:
+Phase 2's later groups were ported from JavaScript mechanically, and 64 files opened with
+`// @ts-nocheck: ported from JavaScript in phase 2; typing pending`. They ran and passed, but the compiler did not
+check them. Each is typed with the types from `@ia/core` (never a local copy) and named interfaces for the lattices,
+tallies and surveys, the marker removed and the type check kept green; a file touched by a release is typed in that
+release. Post-v0.239.2, 56 are typed: every support file, the unit test, and all but eight test files. Typing them
+moved two things in `@ia/core`: `Cfg.raceDate` may be null, and a `CardioGoal` carries the swim time goals' current
+times (`baseMins`, `baseSecs`, `base500Mins`, `base500Secs`), which the wizard writes and the engine reads. Still open:
 
-- `tests/support/` (14): `adjacent-day-dedupe.ts`, `core-trunk.ts`, `deload.ts`, `equipment-tiers.ts`, `injury-overlays.ts`, `leg-accessory.ts`, `leg-lift-placement.ts`, `long-run-day.ts`, `pace-clock-lattices.ts`, `pace-wizard.ts`, `race-date.ts`, `run-session-class.ts`, `runner-armor-circuit.ts`, `swim.ts`.
-- `tests/unit/` (1): `clock-format.test.ts`.
-- `tests/integration/` (28): `adjacent-day-dedupe.test.ts`, `cardio-sessions.test.ts`, `clock-format.test.ts`, `compound-tier.test.ts`, `core-trunk.test.ts`, `deload.test.ts`, `duplicate-movements.test.ts`, `easy-run-ceiling.test.ts`, `equipment-tiers.test.ts`, `injury-overlays.test.ts`, `injury-plan-lens.test.ts`, `ledger.test.ts`, `leg-accessory.test.ts`, `leg-lift-placement.test.ts`, `long-run-day.test.ts`, `mile-anchor.test.ts`, `mile-pencil.test.ts`, `pace-clock.test.ts`, `pace-wizard.test.ts`, `progress.test.ts`, `race-date.test.ts`, `run-session-class.test.ts`, `run-week-layout.test.ts`, `runner-armor-circuit.test.ts`, `swim.test.ts`, `test-length.test.ts`, `test-week.test.ts`, `wildcard.test.ts`.
-- `tests/sweeps/` (21): `adjacent-day-dedupe.test.ts`, `cardio-sessions.test.ts`, `deload.test.ts`, `duplicate-movements.test.ts`, `equipment-tiers.test.ts`, `injury-overlays.test.ts`, `leg-accessory-trim-order.test.ts`, `leg-accessory.test.ts`, `leg-lift-placement.test.ts`, `long-run-day.test.ts`, `mile-anchor.test.ts`, `pace-clock.test.ts`, `race-date.test.ts`, `run-session-class.test.ts`, `run-week-layout.test.ts`, `runner-armor-circuit.test.ts`, `session-budget.test.ts`, `swim.test.ts`, `test-length.test.ts`, `test-week.test.ts`, `wildcard.test.ts`.
+- `tests/integration/` (7): `injury-overlays.test.ts`, `injury-plan-lens.test.ts`, `mile-anchor.test.ts`,
+  `pace-wizard.test.ts`, `run-week-layout.test.ts`, `test-length.test.ts`, `wildcard.test.ts`.
+- `tests/sweeps/` (1): `injury-overlays.test.ts`.
 
 ## Moved
 

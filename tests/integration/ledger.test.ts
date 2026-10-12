@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The Lift Ledger on the Progress screen keeps every session: an unloaded main lift is still a main lift, plotted in
 // reps; the footer accounts for every session it kept off the line in two clauses; a blank Load box costs the point,
 // never carries a weight forward; and the cards and the swap sheet stop calling heavy lifts accessories or main lifts
@@ -16,9 +15,11 @@ import { fixtures, progDigest } from '../support/app.ts';
 import { 
   ledgerBench, cardTitled, blocks, blockFor, footerOf, countOf, textOf, weekLabels, disclosed,
  } from '../support/ledger.ts';
+import type { Movement } from '../support/ledger.ts';
+import type { DayKey, Section } from '@ia/core';
 const J = JSON.stringify;
 const L = ledgerBench();
-const sum = (a) => a.reduce((x, y) => x + y, 0);
+const sum = (a: number[]): number => a.reduce((x, y) => x + y, 0);
 
 // ── A. the bodyweight program ────────────────────────────────────────────────────────────────────────────────────────
 // Ten movements, never loaded, each the item 0 main lift of its own day: five weekdays by two week parities. Chin-up
@@ -37,7 +38,7 @@ const A_PLAN = [
   { name: 'Chin-up', day: 'fri', weeks: [1, 3, 5, 7], top: 0 },
   { name: 'Dip', day: 'fri', weeks: [2, 4, 6, 8], top: 0 },
 ];
-const A_TABLE = A_PLAN.map((p) => ({
+const A_TABLE: Movement[] = A_PLAN.map((p) => ({
   name: p.name,
   sessions: p.weeks.map((w) => ({ week: w, day: p.day, slot: 'main', weight: 0, sets: w === p.top ? [13, 13, 13] : [10, 10, 10], setsReps: '3×10', detail: '3 sets to effort' })),
 }));
@@ -52,11 +53,11 @@ const A_CARD = cardTitled(A_HTML, 'Main Lifts');
 // Plotted 4 (in reps), accessory day 4, no load 0: 4 + 4 + 0 = 8.
 // The card: plotted 9, accessory day 10, no load 5, entries 24. Reps on no line: 5 blank main sessions at 5 + 5 + 5 = 15
 // and 6 accessory sessions at 6 + 5 + 5 = 16: 75 + 96 = 171.
-const B_DBB = { name: 'Dumbbell bench press', sessions: [] };
+const B_DBB: Movement = { name: 'Dumbbell bench press', sessions: [] };
 [1, 2, 3, 4, 5].forEach((w) => B_DBB.sessions.push({ week: w, day: 'mon', slot: 'main', weight: 0, sets: [5, 5, 5], setsReps: '3×5' }));
 [[6, 45], [7, 50], [8, 55], [9, 60], [10, 65]].forEach((p) => B_DBB.sessions.push({ week: p[0], day: 'mon', slot: 'main', weight: p[1], sets: [8, 8, 8], setsReps: '3×8' }));
 [1, 2, 3, 4, 5, 6].forEach((w) => B_DBB.sessions.push({ week: w, day: 'thu', slot: 'acc', weight: 30, sets: [6, 5, 5], setsReps: '3×6' }));
-const B_GOB = { name: 'Dumbbell goblet squat', sessions: [] };
+const B_GOB: Movement = { name: 'Dumbbell goblet squat', sessions: [] };
 [1, 2, 3, 4].forEach((w) => B_GOB.sessions.push({ week: w, day: 'tue', slot: 'main', weight: 0, sets: [12, 12, 12], setsReps: '3×12' }));
 [1, 2, 3, 4].forEach((w) => B_GOB.sessions.push({ week: w, day: 'sat', slot: 'acc', weight: 40, sets: [10, 10, 10], setsReps: '3×10' }));
 const B_TABLE = [B_DBB, B_GOB];
@@ -69,7 +70,7 @@ const B_DBB_BLOCK = blockFor(B_CARD, 'Dumbbell bench press');
 // ── C. every routing case in one store ───────────────────────────────────────────────────────────────────────────────
 // An unloaded main (Push-up), a loaded main (Barbell back squat), a ranged accessory (lateral raise, 3×8–12: the Range
 // Ladder), a plain accessory (pushdown, "2 sets of 10") and an unloaded accessory (hanging knee raise).
-const C_TABLE = [
+const C_TABLE: Movement[] = [
   { name: 'Push-up', sessions: [1, 2, 3].map((w) => ({ week: w, day: 'mon', slot: 'main', weight: 0, sets: [20, 18, 15], setsReps: '3×20' })) },
   { name: 'Barbell back squat', sessions: [1, 2, 3].map((w) => ({ week: w, day: 'tue', slot: 'main', weight: 135 + w * 10, sets: [5, 5, 5], setsReps: '3×5' })) },
   { name: 'Dumbbell lateral raise', sessions: [1, 2, 3, 4].map((w) => ({ week: w, day: 'wed', slot: 'acc', weight: w < 3 ? 15 : 20, sets: [12, 12, 12], setsReps: '3×12', detail: '3×8–12 @ RPE 8' })) },
@@ -81,7 +82,7 @@ const C_STORE = L.buildStore(C_TABLE);
 // ── D. singular counts ───────────────────────────────────────────────────────────────────────────────────────────────
 // Barbell overhead press: week 1 main blank, week 2 accessory loaded 75, week 3 main loaded 95. Plotted 1, accessory day
 // 1, no load 1, entries 3. One point means a headline and no chart.
-const D_TABLE = [{
+const D_TABLE: Movement[] = [{
   name: 'Barbell overhead press',
   sessions: [
     { week: 1, day: 'mon', slot: 'main', weight: 0, sets: [5, 5, 5], setsReps: '3×5' },
@@ -98,11 +99,11 @@ const F_TITLE = F_CARD.slice(0, F_CARD.indexOf('</div>') + 6);
 
 test('the hand tables add up: 48 bodyweight sessions and 1476 reps under ten store keys, 24 mixed entries and 171 reps off the line', () => {
   const sessions = A_TABLE.reduce((a, m) => a + m.sessions.length, 0);
-  const reps = A_TABLE.reduce((a, m) => a + m.sessions.reduce((x, s) => x + sum(s.sets), 0), 0);
+  const reps = A_TABLE.reduce((a, m) => a + m.sessions.reduce((x, s) => x + sum(s.sets!), 0), 0);
   assert.deepEqual([sessions, reps], [48, 1476]);
   assert.equal(A_STORE.keys.length, 10, 'exStoreKey keeps the ten movements apart');
   assert.equal(B_TABLE.reduce((a, m) => a + m.sessions.length, 0), 24);
-  const offLine = B_DBB.sessions.filter((s) => s.slot === 'acc' || !s.weight).reduce((a, s) => a + sum(s.sets), 0);
+  const offLine = B_DBB.sessions.filter((s) => s.slot === 'acc' || !s.weight).reduce((a, s) => a + sum(s.sets!), 0);
   assert.equal(offLine, 5 * 15 + 6 * 16);
   assert.equal(offLine, 171);
 });
@@ -178,8 +179,8 @@ test('per lift, plotted + accessory day + no load equals its entries, as the han
 
 test('every populated store key lands in exactly one bucket', () => {
   const m = L.model(C_STORE);
-  const seen = {};
-  ['mains', 'ladder', 'plain', 'unloaded'].forEach((b) => m[b].forEach((r) => { seen[r.name] = (seen[r.name] || 0) + 1; }));
+  const seen: Record<string, number> = {};
+  (['mains', 'ladder', 'plain', 'unloaded'] as const).forEach((b) => m[b].forEach((r) => { seen[r.name] = (seen[r.name] || 0) + 1; }));
   assert.deepEqual(C_TABLE.map((t) => [t.name, seen[t.name]]), C_TABLE.map((t) => [t.name, 1]));
 });
 
@@ -190,7 +191,7 @@ test('an unloaded main lift is a main lift, never Other Accessory Work', () => {
 });
 
 test('a main lift chart plots its main slot sessions only, never the lighter accessory days', () => {
-  const db = L.model(B_STORE).mains.find((x) => x.name === 'Dumbbell bench press');
+  const db = L.model(B_STORE).mains.find((x) => x.name === 'Dumbbell bench press')!;
   assert.deepEqual(db.series, [{ w: 6, v: 45 }, { w: 7, v: 50 }, { w: 8, v: 55 }, { w: 9, v: 60 }, { w: 10, v: 65 }]);
 });
 
@@ -233,17 +234,19 @@ test('the Range Ladder head line says across these lifts this block, never acros
 
 // ── G. the swap sheet tags ───────────────────────────────────────────────────────────────────────────────────────────
 const G_PROG = L.IA.buildProgram(JSON.parse(J(fixtures.HALF_MANNY)));
-let G_SLOT = null;
-let G_TIER = null;
-Object.keys(G_PROG.weeks).forEach((wk) => Object.keys(G_PROG.weeks[wk]).forEach((dk) => {
+/** Where a swap sheet item sits: week, day, section index, item index, and the item's name. */
+type Slot = [string, DayKey, number, number, string];
+let G_SLOT = null as Slot | null; // set inside the walk below
+let G_TIER = null as Slot | null;
+Object.keys(G_PROG.weeks).forEach((wk) => (Object.keys(G_PROG.weeks[wk]) as DayKey[]).forEach((dk) => {
   (G_PROG.weeks[wk][dk].sections || []).forEach((sec, si) => (sec.items || []).forEach((it, ii) => {
     if (!it || !it.name) return;
-    const mainSlot = ii === 0 && !(sec.superset || sec.type === 'superset') && /^main/i.test(sec.label || '');
+    const mainSlot = ii === 0 && !(sec.superset || (sec as Section & { type?: string }).type === 'superset') && /^main/i.test(sec.label || '');
     if (mainSlot && !G_SLOT) G_SLOT = [wk, dk, si, ii, it.name];
     if (!mainSlot && !G_TIER && it.name === 'Barbell Romanian deadlift') G_TIER = [wk, dk, si, ii, it.name];
   }));
 }));
-const tagsAt = (p) => L.swapTags(G_PROG, p[0], p[1], p[2], p[3]);
+const tagsAt = (p: Slot) => L.swapTags(G_PROG, p[0], p[1], p[2], p[3]);
 
 test("Mario's program builds the same twice and offers a main slot lift and a Barbell Romanian deadlift outside the main slot", () => {
   assert.equal(G_PROG.seed, 76308);
@@ -253,14 +256,14 @@ test("Mario's program builds the same twice and offers a main slot lift and a Ba
 });
 
 test('the swap sheet tags a main slot lift MAIN LIFT, never HEAVY COMPOUND', () => {
-  const t = tagsAt(G_SLOT);
-  assert.ok(t.includes('>MAIN LIFT<'), G_SLOT[4] + ': ' + textOf(t));
+  const t = tagsAt(G_SLOT!);
+  assert.ok(t.includes('>MAIN LIFT<'), G_SLOT![4] + ': ' + textOf(t));
   assert.ok(!t.includes('HEAVY COMPOUND'), textOf(t));
 });
 
 test('the swap sheet tags a barbell compound outside the main slot HEAVY COMPOUND, never MAIN LIFT, among its three tags', () => {
-  const t = tagsAt(G_TIER);
-  assert.ok(t.includes('>HEAVY COMPOUND<'), G_TIER[4] + ' at item ' + G_TIER[3] + ': ' + textOf(t));
+  const t = tagsAt(G_TIER!);
+  assert.ok(t.includes('>HEAVY COMPOUND<'), G_TIER![4] + ' at item ' + G_TIER![3] + ': ' + textOf(t));
   assert.ok(!t.includes('MAIN LIFT'), textOf(t));
   assert.equal(countOf(t, 'class="swap-tag"'), 3);
 });
@@ -275,7 +278,7 @@ test('the ledger copy carries no em-dash, no spaced hyphen, no Nike and no sente
       if (m) strings.push(textOf(m[1]));
     });
   });
-  strings.push(textOf(F_TITLE), textOf(F_CARD).slice(0, 300), textOf(tagsAt(G_TIER)));
+  strings.push(textOf(F_TITLE), textOf(F_CARD).slice(0, 300), textOf(tagsAt(G_TIER!)));
   const got = strings.filter((s) => s && s.length);
   assert.ok(got.length >= 8, 'harvested ' + got.length + ' strings');
   assert.deepEqual(got.filter((s) => s.includes('—') || / - /.test(s) || / – /.test(s)), []);

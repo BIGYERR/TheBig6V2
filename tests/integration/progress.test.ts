@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Progress: the main lift progress line states a number and a unit and never an implement (D53), and a lift's place in
 // the Range Ladder is decided by the most recent session that carries a rep range, never by whichever session was logged
 // last (D55). The app knows a number in a log field, not what the athlete picked up; a primer week, prescribed fixed low
@@ -15,15 +14,16 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { loadApp } from '../support/app.ts';
 import { ladderLog } from '../support/ledger.ts';
+import type { LadderRow } from '../support/ledger.ts';
 const IA = loadApp();
 const ledgerModel = IA.eval('typeof ledgerModel==="function"?ledgerModel:null');
 const buildMainLiftBlock = IA.eval('typeof buildMainLiftBlock==="function"?buildMainLiftBlock:null');
-const plain = (x) => JSON.parse(JSON.stringify(x));
-const text = (h) => String(h).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+const plain = <T>(x: T): T => JSON.parse(JSON.stringify(x));
+const text = (h: unknown): string => String(h).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 
 /** Words that name a physical object the log field does not identify. */
 const IMPLEMENT_WORDS = ['on the bar', 'the bar', 'barbell', 'dumbbell', 'kettlebell', 'plates', 'pair they have', 'machine', 'bands', 'sandbag'];
-const implementClaims = (s) => IMPLEMENT_WORDS.filter((w) => s.toLowerCase().includes(w));
+const implementClaims = (s: string): string[] => IMPLEMENT_WORDS.filter((w) => s.toLowerCase().includes(w));
 
 // A bench press opened at 60 x 12 in week 1 and reached 80 x 12 in week 3.
 const MODEL = {
@@ -71,7 +71,11 @@ test('the progress line has one conditional, the numeric gain test, and names no
 
 // ── the Range Ladder reads the most recent session that carries a range ──────────────────────────────────────────────
 const NAME = 'Dumbbell curl';
-const ladderOf = (rows) => {
+/** A Range Ladder row: the lift, its range, the last session's weight and sets, and whether it is ready to move up. */
+interface LadderLine { name: string; lo: number; hi: number; wt: number; sets: number[]; ready: boolean }
+/** The ledger's two lists, as the test reads them: the Range Ladder and the plain rows. */
+interface LedgerLists { ladder: LadderLine[]; plain: { name: string }[] }
+const ladderOf = (rows: LadderRow[]): LedgerLists => {
   const f = ladderLog(rows);
   return plain(ledgerModel({ k1: { name: rows[0].name, entries: f.entries } }, f.hist));
 };

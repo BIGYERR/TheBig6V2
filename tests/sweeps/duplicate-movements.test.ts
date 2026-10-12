@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // One card, one movement, on the full lattices (CI only; tests/integration/duplicate-movements.test.js runs samples).
 // Rulings: D52 slice 5, D159, D164, D165, D166, D198. Helpers and lattices: tests/support/duplicate-movements.js.
 //
@@ -12,7 +11,7 @@ import * as D from '../support/duplicate-movements.ts';
 const IA = loadApp();
 
 // ── one card, one movement: 8 injury paths x 6 tiers x 2 foci x 3 experience levels x 3 seeds ──────────────────
-let SC;
+let SC: D.SamecardSurvey | undefined;
 const samecard = () => SC || (SC = D.surveySamecard(IA, D.samecardLattice([1013, 3039, 76308])));
 
 test('the same-card lattice builds whole (864 builds)', () => {
@@ -50,7 +49,7 @@ test('the subtraction selects another name and never deletes a section', () => {
 });
 
 // ── the draw-site twins on the WIDE lattice (13,104 configs) ────────────────────────────────────────────────
-let WT;
+let WT: D.DrawSurvey | undefined;
 const WIDE = D.wideLattice();
 const wide = () => WT || (WT = D.surveyDraws(IA, WIDE));
 
@@ -86,14 +85,14 @@ test('the D164 counts on the WIDE lattice match tests/snapshots/duplicate-moveme
 
 // ── D198 on the deload lattice's 576 `sun` cells, the app and the pre-D198 copy ─────────────────────────────
 const HEP_CELLS = D.hepLattice();
-let HT;
-function hep() {
+let HT: { trees: ReturnType<typeof D.hepTrees>; cand: D.HepSurvey; pre: D.HepSurvey } | undefined;
+function hep(): { trees: ReturnType<typeof D.hepTrees>; cand: D.HepSurvey; pre: D.HepSurvey } {
   if (HT) return HT;
   const trees = D.hepTrees();
   HT = { trees, cand: D.surveyHep(trees.cand, HEP_CELLS), pre: D.surveyHep(trees.pre, HEP_CELLS) };
   return HT;
 }
-const dayKey = (x) => x.key + ' W' + x.w + ' ' + x.d;
+const dayKey = (x: D.HepDay) => x.key + ' W' + x.w + ' ' + x.d;
 
 test('a full-lower day never holds its hinge in both Lower strength and Hip extension + push', () => {
   const H = hep();

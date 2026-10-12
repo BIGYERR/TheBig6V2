@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The run session's class, the lattices. The same claims as tests/integration/run-session-class.test.js, which runs
 // them on samples; this file runs them whole. CI runs it, the 60-second check does not.
 //   - the key lattice (354 programs): pace and mile goals undated and dated to a test in week 3 or 5 on three weekdays,
@@ -14,7 +13,7 @@ import * as X from '../support/run-session-class.ts';
 const NOON = new Date(2026, 9, 11, 12, 0, 0);
 const IA = loadApp();
 pinClock(IA, NOON);
-const buildAll = L => L.map(e => ({ fam: e.fam, cfg: e.cfg, prog: IA.buildProgram(X.clone(e.cfg)) }));
+const buildAll = (L: X.FamCfg[]) => L.map(e => ({ fam: e.fam, cfg: e.cfg, prog: IA.buildProgram(X.clone(e.cfg)) }));
 
 test('the key lattice: every key reached, every NSW run card keyed by its label, NRC, bike and swim unkeyed', () => {
   // K0, K1, K2, K2b, K3

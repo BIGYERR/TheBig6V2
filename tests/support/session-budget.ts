@@ -19,6 +19,7 @@ import crypto from 'node:crypto';
 import { APP, loadApp, pinClock, fixtures, progDigest } from './app.ts';
 import type { App } from './app.ts';
 import { SNAPSHOT_DIR } from './snapshot.ts';
+import type { DayKey } from '@ia/core';
 
 /** A day, section or item as the app builds it, read through the VM: untyped app data. */
 export type AppDay = any;
@@ -30,7 +31,7 @@ export type AppProgram = any;
 export type Sections = any[];
 
 export const CLOCK = new Date(2026, 7, 24, 12, 0, 0);
-export const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+export const DAYS: DayKey[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 export const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x));
 export const clean = (s: unknown): string => String(s == null ? '' : s).replace(/<svg[\s\S]*?<\/svg>\s*/g, '').replace(/<[^>]+>/g, '').trim();
 export const sha16 = (t: string): string => crypto.createHash('sha256').update(t).digest('hex').slice(0, 16);

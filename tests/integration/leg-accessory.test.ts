@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The leg accessory blocks: the "Leg isolation" slot and its pool (EXLIB.leg_accessory), and the Calves block beside it.
 // Rulings:
 //   D70b the equipment filter is not advisory: a pool that filters to nothing is never handed back whole (a leg press
@@ -24,6 +23,7 @@ import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { loadApp, pinClock, fixtures } from '../support/app.ts';
 import * as LA from '../support/leg-accessory.ts';
+import type { Day, Section } from '@ia/core';
 import { CLOCK } from '../support/session-budget.ts';
 const { clone, HARVESTED, EXCLUDED, MACHINES, SECTION } = LA;
 
@@ -64,9 +64,9 @@ test('the bodyweight sweep has nothing to substitute for a harvested name (D78)'
 // section (14 days).
 const R = loadApp({ dom: true });
 pinClock(R, CLOCK);
-const renderDays = [];
+const renderDays: { tier: string; sec: Section; day: Day }[] = [];
 {
-  const seen = {};
+  const seen: Record<string, number> = {};
   for (const c of LA.fullLattice()) {
     if (renderDays.length >= LA.TIERS_PLUS.length * 2) break;
     if (seen[c.tier] && seen['core_' + c.tier]) continue;
@@ -83,8 +83,8 @@ const renderDays = [];
   }
 }
 // buildExItem writes one name slot per item: ex-name for a live row, ex-skipped-name for a struck one.
-const slotText = (h) => [...String(h).matchAll(/<span class="ex-(?:skipped-)?name">([\s\S]*?)<\/span>/g)].map((m) => m[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim());
-const sectionsHTML = (sec) => { R.ctx.__SEC = [sec]; return String(R.eval('buildSectionsHTML(__SEC,0)')); };
+const slotText = (h: unknown): string[] => [...String(h).matchAll(/<span class="ex-(?:skipped-)?name">([\s\S]*?)<\/span>/g)].map((m) => m[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim());
+const sectionsHTML = (sec: Section): string => { R.ctx.__SEC = [sec]; return String(R.eval('buildSectionsHTML(__SEC,0)')); };
 
 test('on the four render surfaces every item reaches the card as its own row with a name, and the 25-second hold prints', () => {
   // C1, C3 (and a throw on any surface fails the test)
@@ -107,8 +107,8 @@ test('on the four render surfaces every item reaches the card as its own row wit
 
 test('the blank-row detector is not blind: a nameless second item renders as a blank row', () => {
   // C2
-  const rd = renderDays.find((d) => d.sec && (d.sec.items || []).length > 0);
-  const probe = Object.assign({}, rd.sec, { items: (rd.sec.items || []).slice(0, 1).concat([{ name: undefined, detail: '3×12' }]) });
+  const rd = renderDays.find((d) => d.sec && (d.sec.items || []).length > 0)!;
+  const probe = Object.assign({}, rd.sec, { items: (rd.sec.items || []).slice(0, 1).concat([{ name: undefined as unknown as string, detail: '3×12' }]) });
   const got = slotText(sectionsHTML(probe));
   assert.equal(got.length, 2);
   assert.equal(got.filter((n) => !n).length, 1);

@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Core and trunk blocks: the rotational power pillar's own turn counter (D46-a), the protect-tier upper-limb trunk
 // block and its gear gate (D46-c, D49), the trunk floor on the day (D48, D50), and the core-off counterfactual of
 // Mario's program (D89: a drill the app files as family core is never a loaded compound in the session budget).
@@ -16,6 +15,7 @@ import { loadApp, appScript, fixtures, progDigest } from '../support/app.ts';
 import { appCopy } from '../support/app-copy.ts';
 import { matchSnapshot } from '../support/snapshot.ts';
 import * as CT from '../support/core-trunk.ts';
+import type { Cardio, Section } from '@ia/core';
 
 const IA = loadApp();
 const clean = CT.clean;
@@ -23,7 +23,7 @@ const clean = CT.clean;
 // ── the rotational power pillar (D46-a) ─────────────────────────────────────────────────────────────────────────────
 
 test('the rotational power pillar holds its seven members in the hand-typed rotation order', () => {
-  const live = CT.host(IA.eval('CORE_PILLARS').rotational_power.items.map((i) => i.name));
+  const live = CT.host(IA.eval('CORE_PILLARS').rotational_power.items.map((i: { name: string }) => i.name));
   assert.deepEqual(live, CT.ROT_ORDER);
 });
 
@@ -31,7 +31,7 @@ test('on a hot-tomorrow day the rotational pair walks the pillar by its own turn
   for (const [R, want] of Object.entries(CT.ROT_HOT_TABLE)) {
     const b = IA.eval(`getDynamicCoreBlock(${R}, 'push', false, true, 0, 'commercial')`);
     assert.equal(b.pillar, 'rotational_power', `R=${R} selects the rotational pillar`);
-    assert.deepEqual(CT.host((b.items || []).map((i) => clean(i.name))), want, `R=${R}`);
+    assert.deepEqual(CT.host((b.items || []).map((i: { name: string }) => clean(i.name))), want, `R=${R}`);
   }
 });
 
@@ -39,16 +39,16 @@ test('on a clear-runway day the rotational pair walks the pillar on its three-wa
   for (const [R, want] of Object.entries(CT.ROT_RUN_TABLE)) {
     const b = IA.eval(`getDynamicCoreBlock(${R}, 'push', false, false, 0, 'commercial')`);
     assert.equal(b.pillar, 'rotational_power', `R=${R} selects the rotational pillar`);
-    assert.deepEqual(CT.host((b.items || []).map((i) => clean(i.name))), want, `R=${R}`);
+    assert.deepEqual(CT.host((b.items || []).map((i: { name: string }) => clean(i.name))), want, `R=${R}`);
   }
 });
 
 test('the hot-tomorrow pair takes every value its tier legal list allows over twelve weeks, never one frozen pair', () => {
-  for (const tier of ['commercial', 'home_full', 'home_basic']) {
-    const pairs = new Set();
+  for (const tier of ['commercial', 'home_full', 'home_basic'] as const) {
+    const pairs = new Set<string>();
     for (const R of [2, 4, 6, 8, 10, 12]) {
       const b = IA.eval(`getDynamicCoreBlock(${R}, 'push', false, true, 0, '${tier}')`);
-      pairs.add((b.items || []).map((i) => clean(i.name)).sort().join(' + '));
+      pairs.add((b.items || []).map((i: { name: string }) => clean(i.name)).sort().join(' + '));
     }
     const want = CT.expectedRotPairs(CT.ROT_LEGAL[tier].length);
     assert.ok(want >= 2, `${tier}: the hand table leaves a rotating pair`);
@@ -57,8 +57,8 @@ test('the hot-tomorrow pair takes every value its tier legal list allows over tw
 });
 
 test('every gear legal rotational member is reachable on its tier, and the cable chop prints on the cable tier', () => {
-  const seen = {};
-  const chop = {};
+  const seen: Record<string, Set<string>> = {};
+  const chop: Record<string, number> = {};
   for (const e of CT.EQUIP) {
     seen[e] = new Set();
     chop[e] = 0;
@@ -98,8 +98,8 @@ test('the rotational draw is not the first two members forever, and both own-tur
 
 test('the anti-rotation and anti-extension pillars hold the hand-typed members in rotation order', () => {
   const P = IA.eval('CORE_PILLARS');
-  assert.deepEqual(CT.host(P.anti_rotation.items.map((i) => i.name)), CT.AR_MEMBERS.map((m) => m.name));
-  assert.deepEqual(CT.host(P.anti_extension.static.map((i) => i.name)), CT.AE_MEMBERS);
+  assert.deepEqual(CT.host(P.anti_rotation.items.map((i: { name: string }) => i.name)), CT.AR_MEMBERS.map((m) => m.name));
+  assert.deepEqual(CT.host(P.anti_extension.static.map((i: { name: string }) => i.name)), CT.AE_MEMBERS);
 });
 
 test('every tier keeps at least two anti-rotation names the anti-extension section cannot claim (hand count)', () => {
@@ -118,7 +118,7 @@ test('the protect-tier trunk lattice is thick enough to see the seam, and no car
 });
 
 test('a band movement never prints on a tier without bands, and still reaches every tier that owns one', () => {
-  const per = {};
+  const per: Record<string, typeof TRUNK.rows> = {};
   CT.EQUIP.forEach((e) => (per[e] = TRUNK.rows.filter((r) => r.equipment === e)));
   for (const m of CT.AR_MEMBERS) {
     if (m.need === null || /carry/i.test(m.name)) continue;
@@ -143,7 +143,7 @@ test('one card, one movement: no trunk name prints twice across the two trunk se
   for (const r of TRUNK.rows) {
     const union = r.ar.concat(r.ae);
     if (new Set(union).size !== union.length) twice.push(`${r.key} ar=${r.ar} ae=${r.ae}`);
-    const cnt = {};
+    const cnt: Record<string, number> = {};
     r.all.forEach((n) => (cnt[n] = (cnt[n] || 0) + 1));
     if (Object.keys(cnt).some((n) => cnt[n] > 1 && union.includes(n))) elsewhere.push(r.key);
   }
@@ -214,7 +214,7 @@ test('trunk relocated into one section is still floored by items, not labels', (
 });
 
 test('the floor is inert on an NRC long-run tier day: the run owns the day', () => {
-  const lr = { isNRC: true, subtype: 'Long Run', dose: { k: 'time', mins: 60 }, detail: '' };
+  const lr: Partial<Cardio> = { isNRC: true, subtype: 'Long Run', dose: { k: 'time', mins: 60 }, detail: '' };
   assert.equal(CT.handLongRunTier(lr), 'B');
   assert.equal(CT.trunkItems(trim(CT.trunkDay(CT.AR2(), CT.AE2()), lr)), 0);
 });
@@ -231,7 +231,7 @@ test('a day under budget comes back unchanged: the floor adds nothing and remove
     { label: 'Trunk — anti-rotation', items: CT.AR2() },
   ];
   assert.ok(CT.handTotal(day) <= 20);
-  const shape = (secs) => JSON.stringify(secs.map((s) => [s.label, (s.items || []).map((i) => i.name)]));
+  const shape = (secs: Section[]) => JSON.stringify(secs.map((s) => [s.label, (s.items || []).map((i) => i.name)]));
   assert.equal(shape(trim(day, null)), shape(day));
 });
 

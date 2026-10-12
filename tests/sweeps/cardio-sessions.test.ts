@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Cardio sessions, the lattice. The same Short Interval claims as tests/integration/cardio-sessions.test.js, which runs
 // them on a sample; this file runs them whole. CI runs it, the 60-second check does not.
 //   - the pace lattice: six entered miles (5:30 to 12:00) x three goal distances (1, 1.5, 3 mi) x three seeds, plus the
@@ -11,7 +10,7 @@ import { loadApp, pinClock } from '../support/app.ts';
 import * as X from '../support/cardio-sessions.ts';
 const IA = loadApp();
 pinClock(IA, new Date(2026, 9, 11, 12, 0, 0));
-const build = cfg => ({ cfg, prog: IA.buildProgram(X.clone(cfg)) });
+const build = (cfg: X.AnyCfg) => ({ cfg, prog: IA.buildProgram(X.clone(cfg)) });
 const LAT = X.paceLattice().map(build);
 const AUD = X.intDoctrineAudit(LAT);
 

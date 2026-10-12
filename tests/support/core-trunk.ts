@@ -162,7 +162,7 @@ const AE2 = (): Item[] => [{ name: 'Plank hold', detail: '3×45 sec' }, { name: 
 const trunkItems = (secs: readonly Section[]): number => secs.filter((s) => /^Trunk /.test((s && s.label) || '')).reduce((a, s) => a + (s.items || []).length, 0);
 const trunkSecs = (secs: readonly Section[]): number => secs.filter((s) => /^Trunk /.test((s && s.label) || '')).length;
 /** D18/D33 by hand: NRC long runs only; >= 75 min A, 45 to 75 B, under 45 C; a dress rehearsal is A; race day is never one. */
-function handLongRunTier(c: Cardio | null | undefined): 'A' | 'B' | 'C' | null {
+function handLongRunTier(c: Partial<Cardio> | null | undefined): 'A' | 'B' | 'C' | null {
   if (!c || !c.isNRC || !c.dose) return null;
   if (!/^long run/i.test(c.subtype || '')) return null;
   if (/race day|time trial/i.test(c.subtype || '')) return null;

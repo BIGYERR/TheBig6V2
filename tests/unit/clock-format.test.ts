@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The m:ss clock helper: _clkMS in index.html, the one owner of every seconds limb the app prints (D126). It rounds
 // the WHOLE number of seconds first, then splits it: minutes are the quotient by 60, seconds the remainder, padded to
 // two digits. So a seconds limb of 60 cannot be built (the old idiom floored the minutes off the raw value and rounded
@@ -14,13 +13,13 @@ const clk = appFunction('_clkMS');
 /** A clock is minutes, a colon and a two digit seconds limb in 00..59. */
 const WELL = /^-?\d+:[0-5]\d$/;
 /** The contract, written here: round the whole value, then split at 60. */
-function handClock(sec) {
+function handClock(sec: number): string {
   const t = Math.round(sec);
   const r = t % 60;
   return (t - r) / 60 + ':' + (r < 10 ? '0' + r : String(r));
 }
 /** The idiom D126 replaced, retyped: floor the minutes off the raw value, then round the remainder. */
-const IDIOM = (s) => Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0');
+const IDIOM = (s: number): string => Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0');
 
 test('the clock helper is a function', () => {
   assert.equal(typeof clk, 'function');

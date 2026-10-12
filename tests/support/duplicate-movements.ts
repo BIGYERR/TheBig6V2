@@ -9,6 +9,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { APP, fixtures, loadApp } from './app.ts';
+import type { DayKey } from '@ia/core';
 import type { App } from './app.ts';
 
 /** A config as these tests write it, built by the app: untyped app input. */
@@ -17,9 +18,9 @@ export type CfgRec = Record<string, any>;
 export type AppData = any;
 
 /** The weekdays in the harness's order (Sunday first). */
-export const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+export const DAYS: DayKey[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 /** The weekdays in the order a week renders (Monday first). */
-export const ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+export const ORDER: DayKey[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 // ── shared plumbing ─────────────────────────────────────────────────────────────────────────────────────────────
 export const clone = <T>(o: T): T => JSON.parse(JSON.stringify(o));

@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The test week of a dated NSW test goal: the program ends on the week that holds the test, the trial sits on the test
 // day, the taper lands in front of it, and the days before it are a shakeout and rest. Rulings: D106a (a dated test
 // goal ends on its test week; slice A the taper window, slice B the test week, slice E the trial taken from the
@@ -21,11 +20,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fixtures, progDigest } from '../support/app.ts';
 import * as X from '../support/test-week.ts';
+import type { Section } from '@ia/core';
 const { ISO7, clone, canon, cards, runOf, isTrial, isEasy, isLong, quality, isQualityRun, isHardRun, trials, prtTing, build } = X;
 
 const IA = X.engine('2026-09-21');
-const SEEN = [];   // every program this file builds, for the card name test
-const B = (cfg) => { const p = build(IA, cfg); SEEN.push(p); return p; };
+const SEEN: X.Prog[] = [];   // every program this file builds, for the card name test
+const B = (cfg: X.TestCfg): X.Prog => { const p = build(IA, cfg); SEEN.push(p); return p; };
 const SNAP = path.join(__dirname, '..', 'snapshots', 'test-week.json');
 
 test('a dated test program equals itself built twice, so the comparisons below compare programs, not runs', () => {
@@ -40,7 +40,7 @@ test('the test week is counted in Monday weeks from the start, across both dayli
   // Z0: the DST rows below are live only if this process observes DST.
   assert.notEqual(new Date(2026, 2, 2).getTimezoneOffset(), new Date(2026, 2, 9).getTimezoneOffset(), 'America/New_York observes 2026-03-08');
   const twi = IA.eval('testWeekIndex');
-  const HAND = [
+  const HAND: [string, string, number | null][] = [
     ['2026-09-21', '2026-10-19', 5],      // H1 a Monday test four weeks after a Monday start
     ['2026-09-21', '2026-10-18', 4],      // H2 the Sunday before that Monday
     ['2026-09-21', '2026-09-24', 1],      // H3 a Thursday test in the start week
@@ -58,8 +58,8 @@ test('the test week is counted in Monday weeks from the start, across both dayli
 });
 
 // ── PRT TING, the taper and the long run (D106a slice A) ─────────────────────────────────────────────────────────
-const longOf = (p, w) => { const ds = ISO7.flatMap(d => cards(p.weeks[w] && p.weeks[w][d])).filter(X.isLSD).map(c => parseFloat(String(c.detail || ''))); return ds.length ? Math.max(...ds) : null; };
-const taperSet = p => { const s = []; for (let w = 1; w <= p.totalWeeks; w++) if (ISO7.some(d => cards(p.weeks[w][d]).some(c => /Taper/.test(String(c.subtype || ''))))) s.push(w); return s; };
+const longOf = (p: X.Prog, w: number): number | null => { const ds = ISO7.flatMap(d => cards(p.weeks[w] && p.weeks[w][d])).filter(X.isLSD).map(c => parseFloat(String(c.detail || ''))); return ds.length ? Math.max(...ds) : null; };
+const taperSet = (p: X.Prog): number[] => { const s = []; for (let w = 1; w <= p.totalWeeks; w++) if (ISO7.some(d => cards(p.weeks[w][d]).some(c => /Taper/.test(String(c.subtype || ''))))) s.push(w); return s; };
 
 test('PRT TING pinned to its week 5 test builds 5 weeks, the same goal undated builds 11, and weeks 1 to 3 carry the same cardio', () => {
   // F1, F3
@@ -67,7 +67,7 @@ test('PRT TING pinned to its week 5 test builds 5 weeks, the same goal undated b
   assert.equal(p5.totalWeeks, 5);
   assert.equal(p5.weeks[6], undefined);
   assert.equal(p0.totalWeeks, 11, 'the goal length');
-  const sig = (p, w) => JSON.stringify(ISO7.map(d => cards((p.weeks[w] || {})[d]).map(c => [c.subtype, c.dose])));
+  const sig = (p: X.Prog, w: number) => JSON.stringify(ISO7.map(d => cards((p.weeks[w] || {})[d]).map(c => [c.subtype, c.dose])));
   for (const w of [1, 2, 3]) assert.equal(sig(p5, w), sig(p0, w), 'week ' + w);
 });
 
@@ -76,7 +76,7 @@ test('PRT TING with the length pin alone prints the taper on weeks 4 and 5', () 
   assert.deepEqual(taperSet(B(prtTing({ _raceDateCappedWeeks: 5 }))), [4, 5]);
 });
 
-const LONG_HAND = { 1: [2.2], 2: [2.2, 1.8], 3: [3, 2.6, 2.2], 4: [3, 3.5, 3.0, 2.6], 5: [3, 3.5, 4, 3.5, 2.9],
+const LONG_HAND: Record<number, number[]> = { 1: [2.2], 2: [2.2, 1.8], 3: [3, 2.6, 2.2], 4: [3, 3.5, 3.0, 2.6], 5: [3, 3.5, 4, 3.5, 2.9],
   6: [3, 3.5, 4, 4.5, 3.9, 3.3], 7: [3, 3.5, 4, 4.5, 5, 4.3, 3.7], 8: [3, 3.5, 4, 4.5, 5, 5.5, 4.8, 4.0] };
 const LONG_START = 2.5;
 for (let tw = 1; tw <= 8; tw++) {
@@ -84,11 +84,11 @@ for (let tw = 1; tw <= 8; tw++) {
     // T<tw>a, T<tw>b, T<tw>c, T<tw>f (the length pin only)
     const p = B(prtTing({ _raceDateCappedWeeks: tw }));
     assert.equal(p.totalWeeks, tw);
-    const L = []; for (let w = 1; w <= tw; w++) L.push(longOf(p, w));
+    const L: number[] = []; for (let w = 1; w <= tw; w++) L.push(longOf(p, w)!);
     assert.deepEqual(L, LONG_HAND[tw], 'the long run read off the cards');
-    const win = []; for (let w = Math.max(1, tw - 1); w <= tw; w++) win.push(w);
+    const win: number[] = []; for (let w = Math.max(1, tw - 1); w <= tw; w++) win.push(w);
     assert.deepEqual(taperSet(p), win, 'the Taper-labelled weeks are the hand window');
-    const dips = []; let hi = LONG_START;
+    const dips: number[] = []; let hi = LONG_START;
     L.forEach((v, i) => { if (v < hi) dips.push(i + 1); if (v > hi) hi = v; });
     assert.deepEqual(dips, win, 'the weeks whose long run dips below every earlier week (and the start) are the window');
     const bad = [];
@@ -101,9 +101,9 @@ for (let tw = 1; tw <= 8; tw++) {
 // ── the test week (D106a slice B) ────────────────────────────────────────────────────────────────────────────────
 const TRIAL_DETAIL = '1.5 mi. Goal 11:00 (7:20/mi).';
 const TRIAL_NOTE = 'TEST DAY: Run it like the real thing. Warm up fully. Log your time. It anchors your next block.';
-const tpin = over => prtTing(Object.assign({ _raceDateCappedWeeks: 5, _testWeek: 5 }, over || {}));
-const runCells = (p, w) => ISO7.filter(d => { const x = p.weeks[w][d]; return x && !x.rest && x.cardio && x.cardio.type === 'run'; });
-const notRest = (p, w, days) => days.filter(d => !(p.weeks[w][d] && p.weeks[w][d].rest));
+const tpin = (over?: X.TestCfg) => prtTing(Object.assign({ _raceDateCappedWeeks: 5, _testWeek: 5 }, over || {}));
+const runCells = (p: X.Prog, w: number) => ISO7.filter(d => { const x = p.weeks[w][d]; return x && !x.rest && x.cardio && x.cardio.type === 'run'; });
+const notRest = (p: X.Prog, w: number, days: string[]) => days.filter(d => !(p.weeks[w][d] && p.weeks[w][d].rest));
 
 test('a Monday test: week 5 carries one run, the time trial on Monday, titled Test Day with no sections, and the rest of the week rests', () => {
   // D1, D2
@@ -122,7 +122,7 @@ test('two days before a Monday test is a Shakeout with no sections, and three da
   const p = B(tpin()), sat = p.weeks[4].sat, fri = p.weeks[4].fri;
   assert.equal(sat.title, 'Shakeout');
   assert.equal((sat.sections || []).length, 0);
-  assert.ok((fri.sections || []).some(s => /^Primer/.test(s.label || '')), JSON.stringify((fri.sections || []).map(s => s.label)));
+  assert.ok((fri.sections || []).some((s: Section) => /^Primer/.test(s.label || '')), JSON.stringify((fri.sections || []).map((s: Section) => s.label)));
 });
 
 test("the trial card prints coach's text exactly, with no dash in either string", () => {
@@ -133,7 +133,7 @@ test("the trial card prints coach's text exactly, with no dash in either string"
   assert.doesNotMatch(mc.detail + mc.note, /[-‐-―]/);
 });
 
-const TEST_DAY = {};
+const TEST_DAY: Record<string, X.Prog> = {};
 for (const [date, day, name] of [['2026-10-20', 'tue', 'Tuesday'], ['2026-10-22', 'thu', 'Thursday'], ['2026-10-24', 'sat', 'Saturday']]) {
   test(`a ${name} test, ${date}: the only time trial in the program sits on week 5 ${name}`, () => {
     // D5a, D5b, D5c
@@ -167,11 +167,11 @@ test("a Tuesday test: Monday is the Shakeout, the week's easy run at 2.3 mi, and
 test('a Sunday test on a three-run week: the trial takes the long interval slot, no long interval is left, an interval run sits three or more days out, nothing hard at T-1 or T-2', () => {
   // D8a (test week 1), D8b (test week 2). D113a deals the three-run week interval, long interval and long run.
   const rest = ['sun', 'tue', 'thu', 'sat'];
-  for (const [tw, date] of [[1, '2026-09-27'], [2, '2026-10-04']]) {
+  for (const [tw, date] of [[1, '2026-09-27'], [2, '2026-10-04']] satisfies [number, string][]) {
     assert.equal(X.dayKey(date), 'sun');
     const p = B(prtTing({ restDays: rest, _raceDateCappedWeeks: tw, _testWeek: tw, raceDate: date }));
     const pre = B(prtTing({ restDays: rest, _raceDateCappedWeeks: tw, raceDate: date }));
-    const preW = pre.weeks[tw], wk = p.weeks[tw], q = (W, d) => (W[d] && !W[d].rest && W[d].cardio ? quality(W[d].cardio) : null);
+    const preW = pre.weeks[tw], wk = p.weeks[tw], q = (W: Record<string, X.Day>, d: string) => (W[d] && !W[d].rest && W[d].cardio ? quality(W[d].cardio) : null);
     const preQ = ISO7.map(d => q(preW, d));
     assert.ok(preQ.includes('int') && preQ.includes('chi'), 'premise: the week dealt an interval run and a long interval');
     assert.ok(ISO7.some(d => isLong(preW[d] && preW[d].cardio)), 'premise: and a long run');
@@ -186,11 +186,11 @@ test('a Sunday test on a three-run week: the trial takes the long interval slot,
 test('a Thursday test on a Monday, Tuesday, Wednesday spacer week: the trial takes the interval slot, no quality run is left, nothing hard at T-1 or T-2', () => {
   // D8c (test week 1), D8d (test week 2). D113a's spacer fallback deals easy, interval and long, no long interval.
   const rest = ['thu', 'fri', 'sat', 'sun'];
-  for (const [tw, date] of [[1, '2026-09-24'], [2, '2026-10-01']]) {
+  for (const [tw, date] of [[1, '2026-09-24'], [2, '2026-10-01']] satisfies [number, string][]) {
     assert.equal(X.dayKey(date), 'thu');
     const p = B(prtTing({ restDays: rest, _raceDateCappedWeeks: tw, _testWeek: tw, raceDate: date }));
     const pre = B(prtTing({ restDays: rest, _raceDateCappedWeeks: tw, raceDate: date }));
-    const preW = pre.weeks[tw], wk = p.weeks[tw], q = (W, d) => (W[d] && !W[d].rest && W[d].cardio ? quality(W[d].cardio) : null);
+    const preW = pre.weeks[tw], wk = p.weeks[tw], q = (W: Record<string, X.Day>, d: string) => (W[d] && !W[d].rest && W[d].cardio ? quality(W[d].cardio) : null);
     const preQ = ISO7.map(d => q(preW, d));
     assert.equal(preQ.filter(v => v === 'int').length, 1, 'premise: one interval run');
     assert.ok(!preQ.includes('chi'), 'premise: no long interval');
@@ -202,8 +202,8 @@ test('a Thursday test on a Monday, Tuesday, Wednesday spacer week: the trial tak
 });
 
 // ── NRC keeps its race day (D106a confinement) ───────────────────────────────────────────────────────────────────
-function markerDays(p) {
-  const flat = []; [p.totalWeeks - 1, p.totalWeeks].forEach(w => { if (p.weeks[w]) ISO7.forEach(d => flat.push({ w, d })); });
+function markerDays(p: X.Prog) {
+  const flat: { w: number; d: string }[] = []; [p.totalWeeks - 1, p.totalWeeks].forEach(w => { if (p.weeks[w]) ISO7.forEach(d => flat.push({ w, d })); });
   const ri = flat.findIndex(x => { const y = p.weeks[x.w][x.d]; return y && y.cardio && /RACE DAY|TIME TRIAL/i.test(y.cardio.subtype || ''); });
   return { flat, ri };
 }
@@ -292,8 +292,8 @@ test("PRT TING's stand-in, test Mon 2026-10-26: W4 Saturday is the Shakeout and 
 test('raceEveLiftPass titles the eve by its card: a long run is never a Shakeout, the easy run and an NRC recovery run are', () => {
   // Q5, on a hand-built two-week block: test Monday of week 2, the eve is W1 Sunday.
   const REP = IA.eval('raceEveLiftPass');
-  const eve = card => {
-    const w = { 1: {}, 2: {} };
+  const eve = (card: X.Card) => {
+    const w: Record<number, Record<string, X.Day>> = { 1: {}, 2: {} };
     ISO7.forEach(d => { w[1][d] = { title: 'Rest', rest: true, tags: ['rest'] }; w[2][d] = { title: 'Rest', rest: true, tags: ['rest'] }; });
     w[2].mon = { title: 'X', tags: ['run'], sections: [], cardio: { type: 'run', subtype: '1.5 Mile Test — TIME TRIAL', goalId: 'run_pace_goal', legLoad: true } };
     w[1].sun = { title: 'Pull', tags: ['run', 'lift'], sections: [{ label: 'Main — Pull', items: [{ name: 'Row', detail: '3×8' }] }], cardio: card };
@@ -332,7 +332,7 @@ test('every training-day eve carries the shakeout and nothing else: one easy run
   // D0 (every cell builds, and the sample reaches eves of each kind), D1
   assert.ok(SHK.n >= 60, SHK.n + ' cells');
   assert.ok(SHK.te > 0 && SHK.re > 0 && SHK.tePrev > 0, JSON.stringify({ te: SHK.te, re: SHK.re, tePrev: SHK.tePrev }));
-  for (const k of ['bike', 'swim', 'run', 'lift']) assert.ok(SHK.pre[k] > 0, 'the pre-pin eve held ' + k + ': ' + JSON.stringify(SHK.pre));
+  for (const k of ['bike', 'swim', 'run', 'lift'] as const) assert.ok(SHK.pre[k] > 0, 'the pre-pin eve held ' + k + ': ' + JSON.stringify(SHK.pre));
   assert.deepEqual(SHK.D1, []);
 });
 
@@ -367,6 +367,6 @@ test("every run card names the same quality session in its NSW name and its dose
     if (byKey !== quality(c)) bad.push(c.subtype + ' key ' + (c.dose && c.dose.key));
   }
   assert.ok(n > 100, n + ' run cards');
-  assert.ok(SEEN.some(p => Object.values(p.weeks).some(wk => ISO7.some(d => isQualityRun(wk[d] && wk[d].cardio)))), 'some card is a quality run');
+  assert.ok(SEEN.some(p => (Object.values(p.weeks) as Record<string, X.Day>[]).some((wk) => ISO7.some(d => isQualityRun(wk[d] && wk[d].cardio)))), 'some card is a quality run');
   assert.deepEqual(bad, []);
 });

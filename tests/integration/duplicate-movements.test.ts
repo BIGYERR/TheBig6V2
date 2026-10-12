@@ -1,4 +1,3 @@
-// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // One card, one movement: no movement prints twice on a card, and none repeats the day's Main in another section.
 // Rulings: D52 slice 5 (the lowback/protect row slot, the carry and pillar subtraction, the Delt finisher, the chest
 // accessories, the light-press chain), D159, D164, D165, D166 (the draw-site twins), D198 (the full-lower hip-extension
@@ -32,15 +31,15 @@ const AR_MEMBERS = [
   { name: 'Pallof press', need: 'band' }, { name: 'Dumbbell renegade rows', need: 'load' },
   { name: 'Farmer carry', need: 'load' }, { name: 'Suitcase carry', need: 'load' },
 ];
-const BANDS = { bodyweight: false, minimal: false, home_basic: true, home_full: true, commercial: true, crossfit: true };
+const BANDS: Record<string, boolean> = { bodyweight: false, minimal: false, home_basic: true, home_full: true, commercial: true, crossfit: true };
 
 test('the anti-rotation pillar keeps two members on every tier even when the card holds both carries', () => {
   for (const e of D.EQUIP) {
-    const legal = AR_MEMBERS.filter((m) => m.need === null || (m.need === 'band' ? BANDS[e] : D.TIERS[e][m.need])).map((m) => m.name);
+    const legal = AR_MEMBERS.filter((m) => m.need === null || (m.need === 'band' ? BANDS[e] : D.TIERS[e][m.need as keyof D.RowTier])).map((m) => m.name);
     const worst = legal.filter((n) => n !== 'Farmer carry' && n !== 'Suitcase carry').length;
     assert.ok(legal.length >= 2 && worst >= 2, e + ': ' + worst + ' left of ' + legal.length);
   }
-  assert.deepEqual(D.clone(IA.eval('CORE_PILLARS').anti_rotation.items).map((i) => i.name), AR_MEMBERS.map((m) => m.name), 'the live pillar is the hand list, in rotation order');
+  assert.deepEqual(D.clone(IA.eval('CORE_PILLARS').anti_rotation.items).map((i: { name: string }) => i.name), AR_MEMBERS.map((m) => m.name), 'the live pillar is the hand list, in rotation order');
 });
 
 test('the Delt finisher keeps a member on every tier once the card\'s own shoulder pick is subtracted', () => {
@@ -113,10 +112,10 @@ test('the D164 repro is on the WIDE lattice once and builds identically twice', 
 });
 
 test('the D164 repro\'s W1 Monday Chest volume is a pec deck, and no name prints twice on that card', () => {
-  const card = IA.buildProgram(D.clone(WIDE.find(D.isD164Repro).c)).weeks[1].mon;
+  const card = IA.buildProgram(D.clone(WIDE.find(D.isD164Repro)!.c)).weeks[1].mon;
   const cv = D.live(card).filter((s) => s.label === 'Chest volume');
   assert.equal(cv.length, 1);
-  assert.deepEqual(D.clone(cv[0].items).map((i) => D.clean(i.name) + ' ' + i.detail), ['Pec deck 3×12–15 @ RPE 6–7']);
+  assert.deepEqual(D.clone(cv[0].items).map((i: { name: string; detail: string }) => D.clean(i.name) + ' ' + i.detail), ['Pec deck 3×12–15 @ RPE 6–7']);
   assert.deepEqual(D.cardInfo(card).dup, []);
 });
 
