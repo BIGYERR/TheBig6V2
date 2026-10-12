@@ -3,16 +3,12 @@
 @import '../common/tokens.css';
 
 :root {
-  --ink-line: rgba(244, 241, 232, 0.16);
-  --ink-muted: rgba(244, 241, 232, 0.66);
   --denim: #3f6e96;
   --plum: #7e5e96;
   --ochre: #a6822f;
   --red: #9e3328;
   --warn: #b07a1e;
   --warn-dim: rgba(176, 122, 30, 0.14);
-  --font-text: 'Helvetica Neue', Helvetica, 'Geist', Arial, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
   --bar-h: 60px;
   --side-w: 224px;
 }
