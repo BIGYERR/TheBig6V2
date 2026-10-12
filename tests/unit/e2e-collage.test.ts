@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, it } from 'vitest';
 import {
   BAND_GAP,
   BAND_H,
@@ -17,11 +17,11 @@ import {
   fitShot,
   headerHtml,
   labelsHtml,
-} from '../../e2e/collage.ts';
-import type { CollageLayout, CollageTile, LayoutBand, Placement, Size } from '../../e2e/collage.ts';
-import { pngSize } from '../../e2e/parity.ts';
-import { externalRefs } from '../../e2e/report.ts';
-import { pixels, solidPng } from '../helpers.ts';
+} from '../e2e/collage.ts';
+import type { CollageLayout, CollageTile, LayoutBand, Placement, Size } from '../e2e/collage.ts';
+import { pngSize } from '../e2e/parity.ts';
+import { externalRefs } from '../e2e/report.ts';
+import { pixels, solidPng } from '../support/e2e.ts';
 
 /** The app band's real shape: screens of 393×852 @2x. */
 const W = 786;

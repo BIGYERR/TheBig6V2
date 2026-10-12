@@ -3,24 +3,24 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { after, before, describe, it } from 'node:test';
+import { afterAll, beforeAll, describe, it } from 'vitest';
 import { pathToFileURL } from 'node:url';
 import puppeteer from 'puppeteer';
 import type { Browser } from 'puppeteer';
-import { BAND_H, LABEL_H, PAD, renderCollage } from '../../e2e/collage.ts';
-import type { CollageBand, CollageTile } from '../../e2e/collage.ts';
-import { pngSize } from '../../e2e/parity.ts';
-import { renderReport } from '../../e2e/report.ts';
-import { fakeRun, fakeStep, pixels, solidPng } from '../helpers.ts';
-import type { Rgb } from '../helpers.ts';
+import { BAND_H, LABEL_H, PAD, renderCollage } from '../e2e/collage.ts';
+import type { CollageBand, CollageTile } from '../e2e/collage.ts';
+import { pngSize } from '../e2e/parity.ts';
+import { renderReport } from '../e2e/report.ts';
+import { fakeRun, fakeStep, pixels, solidPng } from '../support/e2e.ts';
+import type { Rgb } from '../support/e2e.ts';
 
 const BONE: Rgb = [0xf4, 0xf1, 0xe8];
 
 let browser: Browser;
-before(async () => {
+beforeAll(async () => {
   browser = await puppeteer.launch({ headless: true });
 });
-after(async () => {
+afterAll(async () => {
   await browser?.close();
 });
 

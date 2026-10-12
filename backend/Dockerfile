@@ -3,7 +3,7 @@
 # and /srv/frontends, so the server finds the website and the admin where it does in a checkout. Stage one builds the
 # website and the admin (frontends/), stage two compiles the server (TypeScript, tsc); the last runs the compiled server
 # with production dependencies only. Dockerfile.dockerignore, beside this file, keeps the context to what they read.
-# Same Node line as frontends/app/e2e/Dockerfile and the engines field in package.json.
+# Same Node line as tests/e2e/Dockerfile and the engines field in package.json.
 
 FROM node:26-bookworm-slim AS frontends
 ENV CI=1 NG_CLI_ANALYTICS=false

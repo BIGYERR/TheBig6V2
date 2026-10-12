@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
-import { externalRefs, renderReport } from '../../e2e/report.ts';
-import { embeddedPngs, fakePage, fakeRun, fakeStep, solidPng } from '../helpers.ts';
+import { describe, it } from 'vitest';
+import { externalRefs, renderReport } from '../e2e/report.ts';
+import { embeddedPngs, fakePage, fakeRun, fakeStep, solidPng } from '../support/e2e.ts';
 
 describe('renderReport', () => {
   it('embeds every screenshot and diff as a data: URI, byte for byte', () => {

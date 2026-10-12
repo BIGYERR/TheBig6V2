@@ -23,10 +23,10 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { attachRun, duration, startRun } from '../../../tools/runlog.mjs';
+import { attachRun, duration, startRun } from '../../tools/runlog.mjs';
 
 const E2E = dirname(fileURLToPath(import.meta.url));
-const REPO = join(E2E, '..', '..', '..');
+const REPO = join(E2E, '..', '..');
 const PROJECT = `iron-asylum-e2e-${createHash('sha256').update(E2E).digest('hex').slice(0, 8)}`;
 const RUNNER = `${PROJECT}-runner`;
 const COMPOSE = ['compose', '-f', join(E2E, 'docker-compose.yml'), '-p', PROJECT];

@@ -32,7 +32,7 @@ import { comparePngs, pngSize } from './parity.ts';
 import { externalRefs, renderReport } from './report.ts';
 import type { CollageInfo, PageBand, PageStepResult, RunReport, StepResult, TargetResult } from './types.ts';
 import { BAND_PREFIX, pageLabel, stepLabel } from './types.ts';
-import { metaVersion, tag } from '../scripts/version.mjs';
+import { semver } from '@ia/core';
 
 const E2E = dirname(fileURLToPath(import.meta.url));
 const REPORT = process.env['E2E_REPORT_DIR'] ?? join(E2E, 'report');
@@ -230,8 +230,9 @@ async function main(): Promise<number> {
   for (const f of ['index.html', 'collage.png']) rmSync(join(REPORT, f), { force: true });
 
   const served = await (await fetch(BASE + '/')).text();
-  // As written ("239" or "0.239.1"); 'unknown' only when the page has no meta. A meta that is not a version fails the run.
-  const version = metaVersion(served) ?? 'unknown';
+  // As written ("239" or "0.239.1"), read by @ia/core's semver; 'unknown' only when the page has no meta. A meta that
+  // is not a version fails the run.
+  const version = /<meta name="ia-version"/.test(served) ? String(semver.fromHtml(served)) : 'unknown';
   const sourceSha256 = served.match(/sha256 ([0-9a-f]{64})/)?.[1];
 
   // Chrome's sandbox needs kernel namespaces that Docker's default profile withholds. The container is the boundary
@@ -353,7 +354,7 @@ async function main(): Promise<number> {
       ];
       const bands = all.filter((b) => b.tiles.length);
       const subtitle =
-        `${tag(version)} · ${passed}/${total} steps passed: ${byBand} · ${ranAt.slice(0, 16).replace('T', ' ')} UTC · ` +
+        `${semver.tag(version)} · ${passed}/${total} steps passed: ${byBand} · ${ranAt.slice(0, 16).replace('T', ' ')} UTC · ` +
         `source sha256 ${(sourceSha256 ?? 'unknown').slice(0, 12)}`;
       const { png, layout } = await renderCollage(browser, bands, { title: 'IRON ASYLUM e2e screens', subtitle });
       writeFileSync(join(REPORT, 'collage.png'), png);

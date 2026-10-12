@@ -1,9 +1,10 @@
-# Iron Asylum: Angular app, four build paths and e2e
+# Iron Asylum: Angular app and its four build paths
 
 Full path: `/Users/CanasBangin/Developer/TheBig6V2/app`
 
 This folder packages Iron Asylum as an **Angular 22** app and wraps it with **Cordova (cordova-ios 8)** for the iOS
-Simulator and a connected iPhone. It also holds the lint setup, the unit and integration tests, and a Docker + Puppeteer e2e suite.
+Simulator and a connected iPhone. It also holds the lint setup and the unit and integration tests. The Docker + Puppeteer e2e suite that covers it lives
+in `../../tests/e2e/`.
 
 ## The four build paths
 
@@ -105,13 +106,12 @@ with an iOS Simulator runtime.
 | `npm run sync:check` | fail if the generated files are stale against `../../index.html` |
 | `npm run build:index` | build `../../index.html` from the app's source files in `src/legacy/src/` (`scripts/build-index.mjs`); the root file is never edited by hand |
 | `npm run build:index:check` | fail, naming the first differing byte and its source file, unless `../../index.html` is the build of `src/legacy/src/` |
-| `npm run lint` | ESLint: TypeScript and templates (angular-eslint), plus `scripts/`, `e2e/` and `test/`; errors fail |
+| `npm run lint` | ESLint: TypeScript and templates (angular-eslint), plus `scripts/` and `test/`; errors fail |
 | `npm run lint:legacy` | warn-only report on the generated `app.js` (counts per rule, first examples) |
 | `npm test` | type-check, then the unit tests, then the integration tests (Node's built-in runner), each a logged run; about 5 s |
 | `npm run test:unit` / `npm run test:integration` | one layer of tests on its own |
 | `npm run logs` | the run log (`../../tools/README.md`): `npm run logs` for the latest history, `npm run logs -- runs`, `npm run logs -- show e2e`, `npm run logs -- follow server-pwa-local` |
-| `npm run typecheck` | `tsc` over the Node TypeScript (`e2e/`, `test/`); Node runs those files without it, so this is the type check |
-| `npm run e2e` | the e2e suite, entirely in Docker; each run's report and collage are kept in `../temp/runs/<stamp>-e2e/artifacts/` (newest: `../temp/latest/e2e/`) |
+| `npm run typecheck` | `tsc` over the Node TypeScript (`test/`); Node runs those files without it, so this is the type check |
 | `npm run emulator-ios` | build, boot the simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`), install, launch |
 | `npm run device-ios` | signed build for the connected iPhone, install, launch |
 | `npm run pwa-pages` | sync, then a production build into `../../pwa/` for GitHub Pages, then the check below |
@@ -156,17 +156,14 @@ installs, it checks that the phone's UDID is in the embedded profile.
 `npm run typecheck`. Each is a logged run (`typecheck`, `unit`, `integration` in `../temp/runs/`). Node 26
 runs TypeScript directly by stripping the types, so there is no build step and no test framework dependency.
 `tsconfig.node.json` sets `erasableSyntaxOnly`, which keeps out the TypeScript that stripping cannot run (enums,
-namespaces, parameter properties). `e2e/package.json` and `test/package.json` only mark those folders as ES modules.
+namespaces, parameter properties). `test/package.json` only marks that folder as ES modules.
 
-- `test/unit/`: pure functions with fixtures, no browser and no files. `sync-legacy`'s split and render, the e2e
-  report (every image embedded, nothing referenced outside the file, everything escaped), the collage layout, pixel
-  parity, and the step list.
+- `test/unit/`: pure functions with fixtures, no browser and no files: `sync-legacy`'s split and render, the version
+  rule, the run log. The e2e's own tests moved with it to `../../tests/`.
 - `test/integration/`: real inputs. The `pwa-local` server over real HTTP against a fixture build (content types,
   caching, the update check's probe, nothing served from outside the build), the build check both web paths share,
   `sync-legacy` against the live `../../index.html` and as a command, `build-index` against the live source files and
-  fixture folders, the collage drawn
-  in Chrome and checked pixel by pixel, and the written report opened from disk in Chrome with every request outside
-  the file blocked. These use Puppeteer's Chrome on this machine, which `npm install` downloads.
+  fixture folders, and the run log's wrapper.
 
 The Angular code (`src/`) has no unit tests yet. It is a host for the legacy app, and the e2e parity check is its
 proof. When a screen moves into an Angular component, that component's tests go through the Angular CLI's own
@@ -175,88 +172,5 @@ does. Node cannot import those files directly.
 
 ## e2e
 
-`npm run e2e` (`e2e/launch.ts`) runs the whole suite in Docker. Nothing runs a browser on the host. It covers three
-surfaces, the collage's three bands: the **website** and the **admin**, as the backend serves them, and the **app**.
-1. It bundles the app for the backend image (`../../backend/scripts/app-bundle.ts`, Node alone), then `docker compose`
-   builds three images. Two come from one `e2e/Dockerfile`, on one shared `npm ci` layer:
-   - **web**: the Angular app built from source in a clean Node container, served by nginx. The original
-     `index.html` is served beside it at `/reference/`.
-   - **runner**: the Puppeteer suite in TypeScript (`e2e/*.ts`, run by Node's type stripping) with the Chrome for
-     Testing build that the lockfile's Puppeteer pins. Chrome for Testing ships native ARM64 Linux builds, so it runs
-     at full speed on Apple silicon.
-
-   The third is **backend**, from `../../backend/Dockerfile`: the website at `/`, the admin at `/admin/` and the app at
-   `/app/`, started with the project's local development login (admin / asylum) and no stored devices.
-2. nginx and the backend start. The backend and the runner share nginx's network, so the runner reaches the app at
-   `http://127.0.0.1` and the backend at `http://127.0.0.1:3000`, the same secure localhost origin a dev server has.
-3. The runner takes the website and the admin (`e2e/pages.ts`, 10 steps), one target each, so no parity. A step
-   passes when the page it shows answered 200, its heading or landmark is on screen, its content has rendered, and
-   nothing failed on the way (no console error, no uncaught exception, no same-origin request that failed or answered
-   an error the step did not expect). Each step is photographed full height, top to bottom:
-   - **Website** (`#W01` to `#W04`): the home page at 1440×900 and at the app's phone width (393×852, @1x so a full
-     page stays one capture), then from the phone the two pages it links to on the same host: Staff Login (`/admin/`)
-     and Build my program (`/app/`, the app booting to its home screen).
-   - **Admin** (`#A01` to `#A06`, 1440×900): two devices check in first, so every section has rows. Then the login,
-     each section after signing in (Overview, Devices, Versions, Server, the list in `../admin/admin.ts`, which
-     a unit test holds the journey to), and the signed out screen after Log out.
-4. The runner takes five journeys (`e2e/flow.ts`, 46 steps) against both the Angular build and the original. Each
-   journey starts from empty storage in its own browser context, and a failed step stops only its own journey:
-   - **Strength, commercial gym** (19 steps): the wizard, This Week, the rest-day sheet, a day's detail and its run
-     log, the swap sheet, Random Workout, Hurt?, Traveling?, Progress, Bugs, Programs, then a relaunch.
-   - **10K race, Sun Nov 29** (9): a race goal with a race date, the program length box, the week 1 long run, then
-     race week's Saturday shakeout and race day (the Nike plan).
-   - **1.5 mile test, Sat Nov 14** (6): a dated pace test, the program length box, and the test day in week 6 (NSW).
-   - **Bodyweight, then a knee injury** (6): a beginner over 55 with no equipment, Friday before the injury (it holds
-     a jump), Hurt? with the knee chosen, the injury week, and Friday after (no jumps).
-   - **Log a session and relaunch** (6): log two exercises, the effort and a note, close the day out, relaunch, and
-     find all of it kept, in the session and in the Progress journal.
-   Every step is a real tap followed by an assertion. Native date and slider controls, which a user drives through
-   the OS picker, are set directly and fire their events.
-5. Each pair of app screenshots is compared pixel by pixel. **Default tolerance is 0%.** Clean runs match exactly, and a
-   planted 0.3% title change fails the four screens that show it.
-6. It copies the report out of the runner container (`docker cp`; nothing is bind-mounted, since the repo sits in an
-   iCloud-synced folder) into the run's own folder, `../temp/runs/<stamp>-e2e/artifacts/`, so every run is kept
-   (`../temp/latest/e2e` is the newest), then tears the containers down:
-   - **`index.html`**: one self-contained page. Every screenshot (Angular, original and pixel diff for each step) is
-     embedded as a data URI, and the styles and script are inline. It can be mailed or moved on its own. Click a
-     screenshot to see it full size. The runner refuses to write it if anything in it points outside the file.
-   - **`collage.png`**: every screen on one image, about 9350×25400 px (238 MP), in three titled bands read top to
-     bottom: WEBSITE, ADMIN, APP. Each band's bar names it, says what it shows and counts its passes; the header
-     carries the totals and the app version as a label (V239, v0.239.1). Each band has its own tile width: the app's
-     46 screens sit at native size (786×1704, 11 across, as before), the website and admin pages at their full size
-     (1440 wide, or 393 for the phone, under a label never narrower than an app screen). A page taller than its band
-     allows (14000 px for the website, 4000 for the admin) is scaled down to fit, never cropped. Every screen sits
-     under a label with its number, page name, journey and step id, and PASS or FAIL; one that failed is outlined in
-     red. The numbers match the report's, so "#27 race-10k/race-shakeout" or "#W02 website-phone/site-home-phone"
-     means the same screen in both. Chrome draws only the header, the band bars and the labels; `composeCollage`
-     copies the screenshots in on an RGB canvas (pngjs), because one capture of the whole image is more than the
-     runner's software renderer can do within Puppeteer's timeout.
-   - `docker/`: the app bundle, the docker build, up, cp and down output, and `nginx.log` and `backend.log`, each
-     server's own log of every request it served, saved before the containers go.
-   The run's `events.log` has each phase and each step's PASS or FAIL as it happened; `output.log` has everything
-   printed. Run outside the run log (it cannot write `../temp/`), the report goes to `e2e/report/` as before.
-
-Determinism (the app journeys; the website and admin keep the real clock, since the admin compares times with a live
-server, and ask for reduced motion, so the site shows every section without scrolling it into view):
-- iPhone viewport, 393×852 @2x;
-- the clock frozen at Wed 2026-10-07 07:30 New York (a rest day, so the rest sheet is reachable);
-- seeded `Math.random`, animations off;
-- web fonts and layout settled before each screenshot;
-- Chrome flags for repeatable pixels (fixed sRGB colour, no LCD text, every compositor stage run before a capture),
-  without which fixed layers like the rest timer tab can differ by a colour level between two renders;
-- the bug form's endpoint is blocked, so a run never files a real report.
-
-Screenshots come from Chrome on Linux, so text is rendered by Linux's font stack. Both targets are rendered the same
-way, so parity is unaffected. The app's own font (Geist) is a web font and loads the same everywhere. Only glyphs it
-lacks fall back to the image's DejaVu, Liberation and Noto Color Emoji fonts.
-
-A full run takes about 2.5 minutes once the images are cached (the first build downloads Chrome and takes longer).
-A failed step stops only its own journey, and the run exits 1 if any step fails or the collage cannot be written.
-
-Options: `E2E_ONLY=race-10k,log-session` runs just those journeys (`website-desktop`, `website-phone` and `admin`
-name the others; step numbers stay the full suite's), `E2E_KEEP=1` leaves nginx and the backend up afterwards and
-prints their addresses (the original is at `/reference/`), `E2E_PORT` and `E2E_BACKEND_PORT` pin their host ports
-(default: any free port), `E2E_PARITY_MAX` (percent).
-
-The compose project is named after the checkout (`iron-asylum-e2e-<hash of its path>`), so two checkouts or worktrees
-can run the suite at the same time without sharing containers, images or a port.
+The Docker e2e that covers the website, the admin and this app lives in `../../tests/e2e/` (its README). It builds
+this app from source in its own image, the same way `npm run build` does.

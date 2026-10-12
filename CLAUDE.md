@@ -138,7 +138,9 @@ session's files written into `tests/measure/` mid-proof.
   `tests/sweeps/program-output.test.ts` holds the digest of every program on the 864-config lattice
   (`tests/snapshots/program-output-lattice.json`), so any change to what the engine prescribes shows as a reviewable diff. The helpers are
   `tests/support/app.ts` and `tests/support/snapshot.ts`, built on `tests/harness.js` (CommonJS, loaded through
-  `createRequire`), and `tests/support/programs.ts`, the seeded configs typed as `Cfg`. `frontends/app/e2e` stays as it is.
+  `createRequire`), and `tests/support/programs.ts`, the seeded configs typed as `Cfg`. `tests/e2e/`: the Docker e2e (journeys, parity, the
+  collage over the website, the admin and the app; `cd tests && npm run e2e`, its README), whose own code is tested
+  in `tests/unit/e2e-*.test.ts` and `tests/integration/e2e-browser.test.ts`.
 - **TypeScript and Vitest** (architecture phase A). Every test is strict TypeScript run by Vitest (`import { describe,
   test } from 'vitest'`, `node:assert/strict` inside). `tests/` is its own package: `tests/package.json` and its
   lockfile are committed, `tests/node_modules` is not. There is still no `package.json` or `tsconfig.json` at the repo

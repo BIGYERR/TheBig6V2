@@ -1,5 +1,5 @@
 // @ts-check
-// npm run lint: the Angular app (TypeScript and templates) and the Node tooling (scripts/, e2e/, test/). Errors fail.
+// npm run lint: the Angular app (TypeScript and templates) and the Node tooling (scripts/, test/). Errors fail.
 // The generated legacy script is reported separately by npm run lint:legacy (eslint.legacy.config.mjs), warnings only.
 const eslint = require('@eslint/js');
 const { defineConfig, globalIgnores } = require('eslint/config');
@@ -18,7 +18,6 @@ module.exports = defineConfig([
     // The app's source files: the pieces of the root index.html (scripts/build-index.mjs), not Angular templates.
     'src/legacy/src/',
     'public/legacy/',
-    'e2e/report/',
   ]),
   {
     files: ['**/*.ts'],
@@ -66,7 +65,7 @@ module.exports = defineConfig([
   {
     // The e2e suite and the tests are Node TypeScript (tsconfig.node.json). e2e files also hold callbacks Puppeteer
     // runs inside the page, so they see browser globals too.
-    files: ['e2e/**/*.ts', 'test/**/*.ts'],
+    files: ['test/**/*.ts'],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
     rules: {
       eqeqeq: ['error', 'smart'],

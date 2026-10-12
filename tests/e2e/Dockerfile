@@ -2,8 +2,8 @@
 # The e2e images. Build context is the repo root (see docker-compose.yml), because the app is generated from
 # the repo root index.html. Dockerfile.dockerignore keeps the context to the files these stages read.
 #   web     the Angular app built from source, served by nginx at /, with the original index.html at /reference/
-#   runner  the Puppeteer suite (TypeScript, run by Node's type stripping) and the Chrome for Testing it pins
-# Both start from one npm ci layer, so a dependency change rebuilds once.
+#   runner  the Puppeteer suite (TypeScript, run by Node's type stripping) in the tests package, with @ia/core, which it
+#           reads versions through, and the Chrome for Testing its Puppeteer pins
 
 FROM node:26-bookworm-slim AS deps
 ENV CI=1 NG_CLI_ANALYTICS=false PUPPETEER_SKIP_DOWNLOAD=1
@@ -19,14 +19,20 @@ COPY index.html apple-touch-icon.png /repo/
 RUN npm run build
 
 FROM nginx:1.29-alpine AS web
-COPY frontends/app/e2e/nginx.conf /etc/nginx/conf.d/default.conf
+COPY tests/e2e/nginx.conf /etc/nginx/conf.d/default.conf
 # The Angular build under test, at /
 COPY --from=build /repo/frontends/app/www /usr/share/nginx/html
 # The original single-file app, at /reference/, as the reference the Angular screens are compared against
 COPY index.html apple-touch-icon.png /srv/reference/
 
-FROM deps AS runner
-ENV PUPPETEER_CACHE_DIR=/opt/puppeteer HOME=/tmp
+FROM node:26-bookworm-slim AS runner
+ENV CI=1 PUPPETEER_SKIP_DOWNLOAD=1 PUPPETEER_CACHE_DIR=/opt/puppeteer HOME=/tmp
+WORKDIR /repo/tests
+# The tests package links @ia/core (file:../core), so core sits where the repo keeps it before npm ci.
+COPY core/package.json core/tsconfig.json core/tsconfig.base.json /repo/core/
+COPY core/src/ /repo/core/src/
+COPY tests/package.json tests/package-lock.json ./
+RUN npm ci --no-audit --no-fund
 # Chrome for Testing at the exact build the lockfile's Puppeteer pins, with the system libraries it needs
 # (--install-deps), unzip to unpack it, and fonts for any glyph the app's web font (Geist) does not cover.
 RUN apt-get update \
@@ -35,9 +41,6 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/* \
  && chmod -R a+rX /opt/puppeteer \
  && install -d -o node -g node /report
-COPY frontends/app/tsconfig.node.json ./
-COPY frontends/app/e2e/ ./e2e/
-# e2e/run.ts reads the served page's ia-version with the app's one version reader.
-COPY frontends/app/scripts/version.mjs ./scripts/
+COPY tests/e2e/ ./e2e/
 USER node
 CMD ["node", "e2e/run.ts"]

@@ -1,4 +1,4 @@
-/* The Node side of the app folder: the e2e suite (e2e/) and the unit and integration tests (test/).
+/* The Node side of the app folder: the unit and integration tests (test/). The e2e lives in tests/e2e/.
  * Node runs these .ts files directly by stripping the types, so nothing is emitted. tsc only type-checks
  * (npm run typecheck), and erasableSyntaxOnly keeps out the TypeScript that stripping cannot run (enums,
  * namespaces, parameter properties). The Angular app keeps its own tsconfig.app.json. */
@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true
   },
-  "include": ["e2e/**/*.ts", "test/**/*.ts"]
+  "include": ["test/**/*.ts"]
 }

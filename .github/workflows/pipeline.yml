@@ -70,7 +70,9 @@ jobs:
         run: node frontends/app/scripts/build-index.mjs --check
       - name: index.html boots and builds HALF_MANNY, self-stable (tests/harness.js)
         run: node tests/harness.js index.html
-      - name: npm ci in tests/ (Vitest, TypeScript, @ia/core)
+      - name: Let Chrome use its sandbox (Ubuntu 24 blocks unprivileged user namespaces through AppArmor; the e2e's own tests draw in Chrome)
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+      - name: npm ci in tests/ (Vitest, TypeScript, @ia/core, Puppeteer and its Chrome)
         working-directory: tests
         run: npm ci --no-audit --no-fund
       - name: Type check (core, tests)
@@ -139,7 +141,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Docker e2e (every journey, 0% parity against the original)
-        working-directory: frontends/app
+        working-directory: tests
         run: |
           npm ci --no-audit --no-fund
           npm run e2e

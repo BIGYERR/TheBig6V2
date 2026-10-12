@@ -2,7 +2,7 @@
 // the one script are inline, so the file opens anywhere on its own: mailed, attached, or moved out of report/.
 import type { PageStepResult, Parity, RunReport, Status, StepResult, TargetResult } from './types.ts';
 import { pageLabel, stepLabel } from './types.ts';
-import { tag } from '../scripts/version.mjs';
+import { semver } from '@ia/core';
 
 const esc = (s: unknown): string =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] ?? c);
@@ -214,13 +214,13 @@ export function renderReport(r: RunReport): string {
 <div class="verdict ${r.ok ? 'pass' : 'fail'}">${r.ok ? 'All checks passed' : 'Failed'}</div>
 <div class="summary">
   <div class="tile"><div class="muted">Steps passed</div><div class="v">${passed} / ${total}</div>${r.pages.length ? `<div class="muted">website ${tally(website)} · admin ${tally(admin)} · app ${tally(r.steps)}</div>` : ''}</div>
-  <div class="tile"><div class="muted">App version</div><div class="v">${esc(tag(r.version))}</div></div>
+  <div class="tile"><div class="muted">App version</div><div class="v">${esc(semver.tag(r.version))}</div></div>
   <div class="tile"><div class="muted">Worst parity</div><div class="v">${r.worstParityPct == null ? 'n/a' : r.worstParityPct.toFixed(3) + '%'}</div><div class="muted">limit ${r.parityMaxPct}%</div></div>
   <div class="tile"><div class="muted">Run time</div><div class="v">${(r.durationMs / 1000).toFixed(1)} s</div></div>
 </div>
 <div class="tile" style="margin-bottom:20px"><dl>
   <dt>Ran</dt><dd>${esc(r.ranAt)}</dd>
-  <dt>Served from</dt><dd class="mono">app ${esc(r.baseUrl)} (nginx container); website and admin ${esc(r.backendUrl)} (backend container); frontends/app/e2e/docker-compose.yml</dd>
+  <dt>Served from</dt><dd class="mono">app ${esc(r.baseUrl)} (nginx container); website and admin ${esc(r.backendUrl)} (backend container); tests/e2e/docker-compose.yml</dd>
   <dt>Source</dt><dd class="mono">index.html sha256 ${esc(r.sourceSha256 ?? 'unknown')}</dd>
   <dt>Browser</dt><dd>${esc(r.browserVersion)} in the runner container, ${r.viewport.width}×${r.viewport.height} @${r.viewport.deviceScaleFactor}x, touch</dd>
   <dt>Clock</dt><dd>Frozen at ${esc(r.frozenNow)} (${esc(r.timezone)}); Math.random seeded; animations off</dd>

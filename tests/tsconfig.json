@@ -1,13 +1,18 @@
 /* The TypeScript feature tests. Vitest runs them as ES modules whatever the folder's package.json says (tests/ has no
  * "type" field, so the legacy .js beside them stays CommonJS), so tsc checks them as a bundler would see them:
  * module preserve, bundler resolution. @ia/core resolves to core/src through the file: link; core's own, stricter
- * project is checked on its own first (npm run typecheck: tsc -p ../core, then tsc -p .). */
+ * project is checked on its own first (npm run typecheck: tsc -p ../core, then tsc -p .). DOM is in for the e2e's
+ * callbacks that Puppeteer runs in the page, and for the tests that check what they draw. allowJs lets the e2e
+ * import the run log (tools/runlog.mjs), typed from its JSDoc and never checked here. */
 {
   "extends": "../core/tsconfig.base.json",
   "compilerOptions": {
     "module": "preserve",
     "moduleResolution": "bundler",
-    "types": ["node"]
+    "types": ["node"],
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "checkJs": false
   },
-  "include": ["unit", "integration", "sweeps", "support", "vitest.config.mts"]
+  "include": ["unit", "integration", "sweeps", "support", "e2e", "vitest.config.mts"]
 }

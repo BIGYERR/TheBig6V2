@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
-import { comparePngs, pngSize } from '../../e2e/parity.ts';
-import { solidPng } from '../helpers.ts';
+import { describe, it } from 'vitest';
+import { comparePngs, pngSize } from '../e2e/parity.ts';
+import { solidPng } from '../support/e2e.ts';
 
 describe('comparePngs', () => {
   it('finds no changed pixels between identical screenshots', () => {

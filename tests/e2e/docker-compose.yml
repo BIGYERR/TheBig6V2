@@ -7,8 +7,8 @@
 services:
   web:
     build:
-      context: ../../..
-      dockerfile: frontends/app/e2e/Dockerfile
+      context: ../..
+      dockerfile: tests/e2e/Dockerfile
       target: web
     ports:
       # 0 lets Docker pick a free host port; E2E_PORT pins one. The runner never uses it (see network_mode below).
@@ -24,7 +24,7 @@ services:
   backend:
     # backend/Dockerfile copies app-web/, the app it serves at /app/; launch.ts bundles it from the repo root index.html first.
     build:
-      context: ../../..
+      context: ../..
       dockerfile: backend/Dockerfile
     network_mode: service:web
     depends_on:
@@ -44,8 +44,8 @@ services:
 
   runner:
     build:
-      context: ../../..
-      dockerfile: frontends/app/e2e/Dockerfile
+      context: ../..
+      dockerfile: tests/e2e/Dockerfile
       target: runner
     # Shares web's network stack, so the app is at http://127.0.0.1: a secure localhost origin, like a dev server.
     network_mode: service:web

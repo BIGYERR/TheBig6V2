@@ -50,7 +50,7 @@ function stagedPaths() {
 const paths = STAGED ? stagedPaths() : null;
 const touches = (re) => paths === null || paths.some((p) => re.test(p));
 /** The feature tests' own files: their folders and the tests package (package.json, its lockfile, tsconfig, Vitest config). */
-const FEATURE_TESTS = /^tests\/((unit|integration|sweeps|snapshots|support)\/|package(-lock)?\.json$|tsconfig\.json$|vitest\.config\.mts$)/;
+const FEATURE_TESTS = /^tests\/((unit|integration|sweeps|snapshots|support|e2e)\/|package(-lock)?\.json$|tsconfig\.json$|vitest\.config\.mts$)/;
 /** What Vitest runs here, relative to tests/: every *.test.ts under these folders (tests/sweeps runs in CI only). */
 const FEATURE_TEST_DIRS = ['unit', 'integration'];
 const TESTS = join(REPO, 'tests');

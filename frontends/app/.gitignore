@@ -53,5 +53,3 @@ Thumbs.db
 /plugins/
 # Local signing settings for device builds
 /build.json
-# e2e output
-/e2e/report/

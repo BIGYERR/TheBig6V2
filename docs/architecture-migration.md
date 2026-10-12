@@ -124,8 +124,8 @@ chunks that changed.
 - `tests/sweeps/<feature>.test.ts`: lattices and fuzz over many programs; CI only.
 - `tests/snapshots/<feature>.json`: golden program output, regenerated on purpose only.
 - `tests/support/`: typed fixtures (HALF_MANNY and the lattice configs as `Cfg` values), builders, the storage adapter,
-  DOM helpers. Shared with `frontends/app/e2e` where useful.
-- `frontends/app/e2e/`: unchanged role (journeys, parity, collage).
+  DOM helpers. Shared with `tests/e2e` where useful.
+- `tests/e2e/`: the Docker e2e (journeys, parity, collage), moved from the app in the folder layout's step 4.
 - One runner for every TypeScript test (section 4, decision 3), `tsc -b` type-checking everything in the 60-second check
   and in CI, and the feature names already in place (`docs/test-migration.md`) carried over unchanged.
 - `tests/harness.js` and its VM retire at the end of phase D, when nothing reads the inline script any more.
@@ -263,7 +263,12 @@ Heroku tree.
    them is byte for byte the same. Four tokens share a name but not a value (the text and mono font stacks, the ink
    line and muted alphas), so each frontend keeps its own until Mario rules which value wins. The app's own tokens
    (its legacy CSS) join when phase E builds its screens on `frontends/common/`.
-4. **The e2e to `tests/e2e/`**: it drives all three frontends, so it lives with the tests.
+4. **The e2e to `tests/e2e/`** (done): it drives all three frontends, so it lives with the tests. It is part of the
+   tests package now (Puppeteer, pngjs and pixelmatch at the versions the app had locked), reads versions through
+   `@ia/core`'s semver instead of the app's copy, and its five self-test files run under Vitest as
+   `tests/unit/e2e-{collage,flow,parity,report}.test.ts` and `tests/integration/e2e-browser.test.ts`, each with the
+   test count it had under `node --test` (28, 9, 6, 20, 4). Its Docker runner installs the tests package with
+   `core/` beside it.
 The app joins the `frontends/` workspace later (phase E), when its screens start importing `frontends/common/`; until
 then it stays its own package, because Cordova keeps its platform and plugin list in the project root's
 `package.json`.
