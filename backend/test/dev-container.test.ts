@@ -40,6 +40,16 @@ test('every source is mounted read-only; it writes only dist/ and app-web/', () 
   assert.ok(readOnly.includes('..:/repo'), 'the repo root read-only, for index.html and its icon');
 });
 
+test("the app's source files and their build script reach the watcher through the read-only repo mount", () => {
+  const WATCH = read('scripts/dev-watch.ts');
+  assert.ok(mounts.some((m) => m.source === '..' && m.target === '/repo' && m.mode === 'ro'), 'the repo root read-only');
+  assert.ok(!mounts.some((m) => m.target.startsWith('/repo/')), 'nothing under the repo is mounted writable over it');
+  // Under the repo root (APP_SOURCE_DIR=/repo): app/src/legacy/src/ and app/scripts/build-index.mjs.
+  assert.match(WATCH, /const APP_SOURCES = join\(REPO, 'app', 'src', 'legacy', 'src'\);/);
+  assert.match(WATCH, /const BUILD_INDEX = join\(REPO, 'app', 'scripts', 'build-index\.mjs'\);/);
+  assert.match(WATCH, /watchFolder\(APP_SOURCES, /);
+});
+
 test("never the Mac's node_modules: the image installs its own", () => {
   assert.ok(!mounts.some((m) => /node_modules/.test(m.source) || /node_modules/.test(m.target)));
   assert.ok(!mounts.some((m) => m.target === '/srv'), 'the backend folder whole would bring the Mac node_modules with it');

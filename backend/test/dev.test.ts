@@ -1,14 +1,16 @@
 // npm run dev. The live reload (server/dev.ts): off unless IA_DEV=1, and when on, the three pages carry the reload
 // script and a POST to /__dev/reload reaches every open page and says how many. The watcher (scripts/dev-watch.ts),
-// which runs in the dev container: what it hears as a save, by file events or by polling, and which server lines it
-// leaves out of its log. The container's own shape is test/dev-container.test.ts.
+// which runs in the dev container: what it hears as a save, by file events or by polling, which server lines it leaves
+// out of its log, and how it builds the app from its source files. The container's own shape is
+// test/dev-container.test.ts.
 import assert from 'node:assert/strict';
-import { chmodSync, mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, utimesSync, writeFileSync } from 'node:fs';
 import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { after, before, describe, test } from 'node:test';
-import { changedBetween, quiet, snapshot, watchFolder } from '../scripts/dev-watch.ts';
+import { buildAppFromSources, changedBetween, quiet, snapshot, watchFolder } from '../scripts/dev-watch.ts';
 import { createApp } from '../server/app.ts';
 import { loadConfig } from '../server/config.ts';
 import { DeviceStore } from '../server/store.ts';
@@ -94,6 +96,51 @@ describe('dev watcher', () => {
     assert.deepEqual(changedBetween(all, all), []);
   });
 
+});
+
+// The app's source files (app/src/legacy/src/): a save builds the page /app/ serves, with the function that builds the
+// root index.html, into app-web/ only.
+describe('dev watcher, the app source files', () => {
+  const REPO_ROOT = resolve(process.env.APP_SOURCE_DIR || join(import.meta.dirname, '..', '..'));
+  const ROOT_PAGE = join(REPO_ROOT, 'index.html');
+  const made: string[] = [];
+  after(() => made.forEach((dir) => rmSync(dir, { recursive: true, force: true })));
+  const temp = () => {
+    const dir = mkdtempSync(join(tmpdir(), 'ia-dev-app-'));
+    made.push(dir);
+    return dir;
+  };
+  const stamp = () => ({ sha: createHash('sha256').update(readFileSync(ROOT_PAGE)).digest('hex'), mtime: statSync(ROOT_PAGE).mtimeMs });
+
+  test('the live source files build the root index.html byte for byte into app-web/, and the root is never written', async () => {
+    const before = stamp();
+    const out = temp();
+    assert.equal(await buildAppFromSources(join(REPO_ROOT, 'app', 'src', 'legacy', 'src'), out), true);
+    assert.ok(readFileSync(join(out, 'index.html')).equals(readFileSync(ROOT_PAGE)), 'the page served is the root file, byte for byte');
+    assert.deepEqual(stamp(), before, 'the repo root index.html is untouched');
+  });
+
+  test('a saved source file shows in the page it builds; a list naming a missing file builds nothing', async () => {
+    const before = stamp();
+    const src = temp();
+    const out = temp();
+    for (const folder of ['html', 'css', 'js']) mkdirSync(join(src, folder));
+    writeFileSync(join(src, 'html', 'top.html'), '<!doctype html><meta name="ia-version" content="0.1.0"><body><script>');
+    writeFileSync(join(src, 'js', 'app.js'), "var saved = 'one';\n");
+    writeFileSync(join(src, 'html', 'end.html'), '</script></body>\n');
+    writeFileSync(join(src, 'order.json'), JSON.stringify(['html/top.html', 'js/app.js', 'html/end.html']));
+    assert.equal(await buildAppFromSources(src, out), true);
+    assert.match(readFileSync(join(out, 'index.html'), 'utf8'), /var saved = 'one';/);
+
+    writeFileSync(join(src, 'js', 'app.js'), "var saved = 'two';\n");
+    assert.equal(await buildAppFromSources(src, out), true);
+    assert.equal(readFileSync(join(out, 'index.html'), 'utf8'), "<!doctype html><meta name=\"ia-version\" content=\"0.1.0\"><body><script>var saved = 'two';\n</script></body>\n");
+
+    writeFileSync(join(src, 'order.json'), JSON.stringify(['html/top.html', 'js/gone.js', 'html/end.html']));
+    assert.equal(await buildAppFromSources(src, out), false);
+    assert.match(readFileSync(join(out, 'index.html'), 'utf8'), /'two'/, 'a failed build leaves the last page served');
+    assert.deepEqual(stamp(), before, 'the repo root index.html is untouched');
+  });
 });
 
 // The two ways it hears a save, side by side, each in a folder of its own.

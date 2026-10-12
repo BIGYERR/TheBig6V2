@@ -15,7 +15,8 @@ A small Node (Express 5) service in TypeScript with four jobs today, all on one 
    searchable table of every device, which app versions are in use and who runs an old one, and this backend's
    own facts. **Log out** ends the session on the server.
 
-The app's source is still the repo root `index.html`; this folder only copies it (`scripts/app-bundle.ts`). The app
+The app's source is `app/src/legacy/src/`, from which the repo root `index.html` is built; this folder copies the
+root file (`scripts/app-bundle.ts`), and in dev mode builds `/app/` from the sources. The app
 side of the connection (`client/ia-link.js`) is ready, but it reaches the phone only through a version build. See
 [The app side](#the-app-side).
 
@@ -71,6 +72,7 @@ container. `npm run dev:down` stops it, and `npm run docker:up` puts back the pl
 | Save in | What happens | Typical time |
 |---|---|---|
 | `site/` or `admin/` | `ng build --watch` rebuilds it (development build), the fast backend tests run, open pages reload | under a second |
+| `app/src/legacy/src/` (the app's source files) | the app is built from them into `app-web/index.html` with `app/scripts/build-index.mjs`, the function that builds the root `index.html` (the repo is never written), its inline script is parsed, open pages reload | under a second |
 | the repo root `index.html` | the app is copied to `app-web/`, its inline script is parsed, open pages reload | under a second |
 | `server/` | the server restarts, open pages reload when it is back, then tsc checks the server's types beside the fast backend tests | under a second |
 | `client/` | the fast backend tests run, open pages reload | under a second |
@@ -84,8 +86,8 @@ tag to the three pages (`server/dev.ts`), and the watcher tells it after each re
 TypeScript source here** (`node server/server.ts`, Node strips the types), so a restart needs no compile; the type
 check after each save is where a type error shows. Every other way to run it runs what tsc compiled.
 
-What the container may touch: the source folders and the repo root (for `index.html` and its icon) are mounted
-read-only; `dist/` and `app-web/` are the only folders it writes. Its `node_modules` are the image's own (Linux), and
+What the container may touch: the source folders and the repo root (for `index.html`, its icon, and the app's
+source files with their build script) are mounted read-only; `dist/` and `app-web/` are the only folders it writes. Its `node_modules` are the image's own (Linux), and
 the Angular cache is a volume of its own. A change to `package.json`, `package-lock.json`, `angular.json` or a
 tsconfig is baked into the image, so it takes effect at the next `npm run dev`. Saves reach the container as file
 events through Docker Desktop's mounts, in tens of milliseconds; should they ever stop arriving,

@@ -4,7 +4,10 @@
 // whenever Docker does; npm run dev -- --no-docker runs it on the Mac's own Node instead (scripts/dev.ts, either way).
 //
 //   website  /         site/          ng build --watch, a development build (a second or two)
-//   app      /app/     index.html     the repo root's, copied to app-web/ on every save, its inline script parsed
+//   app      /app/     app/src/legacy/src/   the app's source files, built into app-web/index.html on every save by
+//                                     app/scripts/build-index.mjs (the function that builds the root index.html), its
+//                                     inline script parsed; the repo root is never written
+//                      index.html     the repo root's, copied to app-web/ on every save, its inline script parsed
 //   admin    /admin/   admin/         ng build --watch
 //   server             server/        the server restarts (under a second), then the type check beside the tests
 //   snippet  /client/  client/        served as saved
@@ -20,20 +23,26 @@
 // Desktop, and iCloud rewrites a saved file's attributes 10 to 40 seconds later; that event changes neither, so it
 // restarts nothing, and an Angular rebuild whose output came out the same reloads nothing.
 //
-// It reads PORT (the server's), APP_SOURCE_DIR (the repo root, where index.html is; the folder above backend/ by
-// default) and IA_DEV_CONTAINER=1 (set by Dockerfile.dev). In the container the app's unit tests do not run: they need
-// app/'s own node_modules, and the only ones in reach are the Mac's, which a Linux container never loads.
+// It reads PORT (the server's), APP_SOURCE_DIR (the repo root, where index.html and app/ are; the folder above
+// backend/ by default), APP_BUNDLE_DIR (where the app is served from; app-web/ by default) and IA_DEV_CONTAINER=1 (set
+// by Dockerfile.dev). In the container the app's unit tests do not run: they need app/'s own node_modules, and the only
+// ones in reach are the Mac's, which a Linux container never loads.
 import { spawn } from 'node:child_process';
 import type { ChildProcess, SpawnOptions } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, watch } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, watch, writeFileSync } from 'node:fs';
 import { createInterface } from 'node:readline';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import vm from 'node:vm';
 
 const BACKEND = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = resolve(process.env.APP_SOURCE_DIR || join(BACKEND, '..'));
+const APP_WEB = resolve(process.env.APP_BUNDLE_DIR || join(BACKEND, 'app-web'));
+// The app's source files, and the script that builds the root index.html from them. In the container both sit in the
+// read-only mount of the repo root.
+const APP_SOURCES = join(REPO, 'app', 'src', 'legacy', 'src');
+const BUILD_INDEX = join(REPO, 'app', 'scripts', 'build-index.mjs');
 const PORT = Number(process.env.PORT || 3000);
 const SELF = `http://127.0.0.1:${PORT}`;
 const POLL_MS = Number(process.env.IA_DEV_POLL_MS) || 0;
@@ -127,9 +136,11 @@ const appUnitTests = () =>
     : Promise.resolve(true);
 
 // The app is one HTML file whose inline script is the whole app: a syntax error there is a blank screen. Parsing it
-// takes about 40 ms.
+// takes about 40 ms. It parses the page /app/ serves, whichever way it got there.
 function checkAppScript() {
-  const html = readFileSync(join(REPO, 'index.html'), 'utf8');
+  const page = join(APP_WEB, 'index.html');
+  if (!existsSync(page)) return false;
+  const html = readFileSync(page, 'utf8');
   const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type="(?!text\/javascript)[^"]*")[^>]*>([\s\S]*?)<\/script>/g)];
   try {
     scripts.forEach((m, i) => new vm.Script(m[1], { filename: `index.html, inline script ${i + 1}` }));
@@ -144,6 +155,39 @@ function checkAppScript() {
 async function bundleApp() {
   const { code, out } = await exec(process.execPath, ['scripts/app-bundle.ts']);
   log('app', code === 0 ? out.trim().replace(/^app-bundle: /, '').replace(` into ${join(BACKEND, 'app-web')}`, '') : out.trim(), code === 0 ? 'ok' : 'bad');
+}
+
+/** build-index.mjs's build function, loaded again whenever the script itself was saved since the last load. */
+async function loadBuild(): Promise<(srcDir: string) => Buffer> {
+  const { buildIndex } = (await import(`${pathToFileURL(BUILD_INDEX).href}?t=${statSync(BUILD_INDEX).mtimeMs}`)) as { buildIndex: (srcDir: string) => Buffer };
+  return buildIndex;
+}
+
+/**
+ * Builds the page /app/ serves from the app's source files, with the function that builds the root index.html, and
+ * writes it to `out` (app-web/) only: the repo root is never written. Written beside itself and renamed over the old
+ * page, so the server never reads half of one. Says when the root index.html is not this build yet. False when the
+ * sources do not build.
+ */
+export async function buildAppFromSources(sources = APP_SOURCES, out = APP_WEB) {
+  const started = Date.now();
+  let page: Buffer;
+  try {
+    page = (await loadBuild())(sources);
+  } catch (err) {
+    log('app', `the source files do not build: ${(err as Error).message}`, 'bad');
+    return false;
+  }
+  mkdirSync(out, { recursive: true });
+  writeFileSync(join(out, 'index.html.tmp'), page);
+  renameSync(join(out, 'index.html.tmp'), join(out, 'index.html'));
+  const version = /<meta name="ia-version" content="([^"]*)"/.exec(page.toString('utf8'))?.[1] ?? '(no ia-version)';
+  const root = join(REPO, 'index.html');
+  const current = existsSync(root) && readFileSync(root).equals(page);
+  const took = `${Date.now() - started} ms`;
+  if (current) log('app', `built app ${version} from the source files (${took}); the root index.html is the same build`, 'ok');
+  else log('app', `built app ${version} from the source files (${took}); the root index.html is not this build yet: cd app && npm run build:index`, 'warn');
+  return true;
 }
 
 // ── The server: a child process, restarted on a change under server/ ───────────────────────────────────────────
@@ -369,6 +413,8 @@ async function main() {
   log('dev', `watching ${where}, ${POLL_MS ? `polling every ${POLL_MS} ms` : 'by file events'}`, 'info');
   mkdirSync(join(BACKEND, 'dist'), { recursive: true });
   await bundleApp();
+  // The source files are where the app is edited, so /app/ starts from their build (the root file's icon stays).
+  if (existsSync(APP_SOURCES)) await buildAppFromSources();
   checkAppScript();
   startServer();
   // The start's own test run waits for both first builds: run beside them, it would be slowed past the 3 s limit. A
@@ -405,6 +451,14 @@ async function main() {
     await appUnitTests();
     await reloadPages();
   });
+  // The app's source files: a save builds the page /app/ serves from them, into app-web/ only.
+  if (existsSync(APP_SOURCES)) {
+    watchFolder(APP_SOURCES, { only: (f) => /\.(html|css|js|json)$/.test(f) }, async (files) => {
+      log('app', `changed: ${files.join(', ')}`);
+      if (await buildAppFromSources()) checkAppScript();
+      await reloadPages();
+    });
+  }
 
   if (await healthy(60_000)) log('server', `up on :${PORT}`, 'ok');
   if (IN_CONTAINER) log('tests', "app unit tests: on the Mac only, they need app/'s own node_modules (cd app && npm run test:unit)", 'dim');
