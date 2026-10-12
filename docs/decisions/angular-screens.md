@@ -100,3 +100,21 @@ what is stored.
   now opens the run's card and reads its selections, starts a rename (the box takes the caret) and leaves it with
   Escape, and starts an archive and calls it off, on both builds, the open card in its photograph.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.12 moves the exercise swap sheet
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.12.
+- **Moved:** `#swapOverlay`, the swap sheet: `src/app/screens/swap-sheet/swap-sheet.ts` (the header, its tags and what a
+  pick keeps, the same-job and different-job rows, the empty and foot lines) and `swap-sheet-model.ts` (the tags, the
+  short prescription, the implement order in a one-implement round, the rows and their notes, each the legacy
+  `openSwapSheet`'s). The candidates still come from the legacy `swapCandidates`, `auxSwapCandidates` and
+  `swapLoadNote`, and a pick is still the legacy `applySwapChoice`.
+- **A legacy `let` written from Angular:** `applySwapChoice` reads the swap's context from `let _swapCtx`, which only
+  code in the global scope can assign. `LegacyBridge.set(name, value)` writes it (an indirect eval of the validated name,
+  the value through a temporary global). `openSwapSheet` and `closeSwapSheet` reach the component through
+  `LegacyBridge.provide`; the sheet draws before it opens.
+- **Tests:** `frontends/app/test/unit/swap-sheet.test.ts` (6: the tags and fallbacks, the short prescription, the
+  implement, the whole sheet with its load note and cautions, the main lift and an aux family, the one-implement
+  order). The e2e's swap step now picks the first candidate after the sheet's photograph and finds the day reopened with
+  the new name and the sheet closed, on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

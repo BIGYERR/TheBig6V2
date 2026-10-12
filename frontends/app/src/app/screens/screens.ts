@@ -3,6 +3,7 @@ import { BugReport } from './bug-report/bug-report';
 import { RestTimer } from './rest-timer/rest-timer';
 import { PopUp } from './pop-up/pop-up';
 import { ProgramList } from './program-list/program-list';
+import { SwapSheet } from './swap-sheet/swap-sheet';
 
 /**
  * The screens and overlays architecture phase E has moved into Angular components, by the legacy element they take over. After the
@@ -15,4 +16,5 @@ export const MOVED_SCREENS: readonly (readonly [screenId: string, component: Typ
   ['restFloat', RestTimer],
   ['popOverlay', PopUp],
   ['progList', ProgramList],
+  ['swapOverlay', SwapSheet],
 ];

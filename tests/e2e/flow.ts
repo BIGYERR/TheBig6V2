@@ -335,8 +335,15 @@ const STRENGTH: readonly Step[] = [
       await t.overlayOpen('swapOverlay');
       if (!(await t.count('#swapOverlay .swap-cand'))) throw new Error('the swap sheet offers no candidates');
     },
-    async after(t) {
-      await t.closeSheet('swapOverlay');
+    async after(t, page) {
+      // A pick swaps the exercise for this session (the sheet is an Angular component in the app since phase E's fifth
+      // step, the pick still the legacy applySwapChoice): the sheet closes and the day reopens showing the new name.
+      const picked = await t.text('#swapOverlay .swap-cand .swap-cand-name');
+      await t.tap('#swapOverlay .swap-cand');
+      await t.overlayOpen('detailOverlay');
+      await t.expectText('#detailOverlay', picked);
+      if (await page.$eval('#swapOverlay', (e) => e.classList.contains('open'))) throw new Error('the swap sheet stayed open after the pick');
+      await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
       await t.closeSheet('detailOverlay');
     },
   },

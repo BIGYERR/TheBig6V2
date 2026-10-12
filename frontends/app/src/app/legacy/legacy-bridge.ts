@@ -30,6 +30,22 @@ export class LegacyBridge {
   }
 
   /**
+   * Writes a legacy top-level `let` (`_swapCtx`), which only code in the global scope can assign. The value goes through a
+   * temporary global, so nothing but the validated name is ever evaluated.
+   */
+  set(name: string, value: unknown): void {
+    if (!this.booted()) throw new Error(`legacy app not booted; cannot write ${name}`);
+    if (!/^[A-Za-z_$][\w$]*$/.test(name)) throw new Error(`not a legacy binding name: ${name}`);
+    const g = globalThis as Record<string, unknown>;
+    g['__iaBridgeValue'] = value;
+    try {
+      (0, eval)(`${name} = globalThis.__iaBridgeValue`);
+    } finally {
+      delete g['__iaBridgeValue'];
+    }
+  }
+
+  /**
    * Hands a legacy global function to Angular: the legacy script's own calls of `name` reach `fn` from now on. A top-level
    * function of a classic script is a writable property of the global object, and every call looks it up afresh. For a
    * screen whose component takes over what other legacy code still calls (the rest timer's ruReset, updateRestFloat).
