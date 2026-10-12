@@ -8,6 +8,7 @@ import { ProgramList } from './program-list/program-list';
 import { SwapSheet } from './swap-sheet/swap-sheet';
 import { AddSheet } from './add-sheet/add-sheet';
 import { ChangeSheet } from './change-sheet/change-sheet';
+import { DayDetail } from './day-detail/day-detail';
 import { GoalSheet } from './goal-sheet/goal-sheet';
 import { MileLock } from './mile-sheet/mile-lock';
 import { MileSheet } from './mile-sheet/mile-sheet';
@@ -43,4 +44,5 @@ export const MOVED_SCREENS: readonly (readonly [screenId: string, component: Typ
   ['progressBody', ProgressScreen],
   ['screenWeek', WeekView],
   ['screenWizard', Wizard],
+  ['detailOverlay', DayDetail],
 ];

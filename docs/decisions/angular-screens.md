@@ -421,3 +421,22 @@ what is stored.
   journey's name step now moves the start to a Friday, checks the explanation and the summary's start row change and
   the typed name stays, photographs it, and puts the start back before generating. 68/68 at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.28 moves the session sheet's frame and header
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.28.
+- **Moved:** `#detailOverlay`: `src/app/screens/day-detail/day-detail.ts` (Back, the logged count, RPE, the week and
+  day, the title, the tags, the add button, and the body and foot frames) and `day-detail-model.ts` (lifting first only
+  when lifting is the priority, the body's order, the "logged but never marked" nudge, the count). It takes over
+  `openDetail` through `LegacyBridge.provide`, so every open and every re-render (a skip, a swap, an add, a KB size,
+  the nudge) reaches it. The sheet is drawn anew on each call, as the legacy writes did; a re-render keeps the reader's
+  place and a fresh open starts at the top, decided from the sheet's own state as before. The body is still the legacy
+  builders' markup (`buildSectionsHTML` with its set logging, `e1rmCalcHTML`, `buildCardioHTML`, `rangeTopNudgeHTML`,
+  `wildcardTagHTML`, `buildLogHTML`), called in the legacy order, since a stale-load warning shows only on the first
+  row that earns it; the foot is still `renderStatusFoot`'s. After each draw the component runs the legacy wiring: the
+  log fields save as they change (`persistLogFields`, a cardio field once its card is live), the wheels start
+  (`iaWheelInit`), the derived dose paints (`updateDoseDerived`).
+- **Tests:** `frontends/app/test/unit/day-detail.test.ts` (4: lifting first, the body's order, the nudge, the count).
+  Every journey that opens a day photographs the sheet at 0 px on both builds; the log-session journey logs two
+  exercises, an effort and a note through it and finds them after a relaunch, so the wiring holds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
