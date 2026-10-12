@@ -1,3 +1,14 @@
+import { asyIcon, getLogs, logKey } from './storage.js';
+import { currentDayKey, currentWeek } from './rest-day-shell.js';
+import { exStoreKey } from './exercise-library.js';
+import { tagMeta } from './week-view-sections.js';
+import { exLoggable } from './set-logging.js';
+import {
+  CARDIO_WORD, RPE_LABELS, _curLogDose, _curLogDoseFull, _curLogSub, _doseStripHTML, cardioSwapNoteText, doseFromCardio,
+  entryDay, getExWeights,
+} from './log-entries.js';
+import { cardioEntryLive, cardioLogLabel } from './day-status.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── V182: the wheel (D1-D6) ───────────────────────────────────────────────────
 // One writer for all three wheel sites. Each wheel drives a HIDDEN input that keeps
@@ -385,3 +396,6 @@ function sessionLogProgress(day){
   });});
   return {done:done,total:total};
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { buildLogHTML, cardioFieldHTML, iaWheelFlush, iaWheelInit, modTagsHTML, sessionLogProgress };

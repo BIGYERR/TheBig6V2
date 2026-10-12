@@ -1,3 +1,6 @@
+import { _gearLens } from './prehab.js';
+import { _pattern } from './region-caps.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── INJURY OVERLAY — COACHING PLAN (region × tier → engine effects) ─────────
 // cfg.injury = { region, tier }. Two tiers, matching how injuries actually behave:
@@ -256,3 +259,6 @@ function injuryDayTitle(role,cfg){
   if((role==='push'||role==='push_light')&&(P.region==='shoulder'||P.region==='elbow')) return 'Rehab + Trunk';
   return null;
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { INJURY_REGIONS, TEST_RX_TEXT, _injViewName, _stripCapCue, applyInjuryFilter, injuryDayTitle, injuryPlan };

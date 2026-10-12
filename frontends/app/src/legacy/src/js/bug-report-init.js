@@ -1,3 +1,14 @@
+import { getActiveProgId, getPrograms } from './storage.js';
+import { activeProg, currentWeek, showScreen, showToast } from './rest-day-shell.js';
+import { foldExAliasKeys } from './exercise-library.js';
+import { renderWeekView } from './week-view-sections.js';
+import { getExWeights, saveExWeights } from './log-entries.js';
+import { _ruIsland } from './rest-timer.js';
+import { renderProgList } from './programs.js';
+import { loadActiveProgram } from './program-manage.js';
+import { maybeShowReminder } from './popups-streaks-reminders.js';
+import { IA_VERSION, iaVersionLabel } from './update-check.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // BUG REPORT — posts to Web3Forms (static-site friendly; no backend).
 // Set BUG_FORM_KEY to your free Web3Forms access key (web3forms.com → enter your
@@ -61,3 +72,6 @@ function init(){
   if(aid)loadActiveProgram(null);
   showScreen('screenHome');
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { init };

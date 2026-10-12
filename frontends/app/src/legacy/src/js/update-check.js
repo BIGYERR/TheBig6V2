@@ -1,3 +1,5 @@
+import { init } from './bug-report-init.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 /* ═══════════════════════════════════════════
    UPDATE CHECK — detects a newer index.html on GitHub Pages
@@ -49,3 +51,6 @@ setInterval(()=>{ if(document.visibilityState==='visible') iaCheckForUpdate(); }
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
 
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { IA_VERSION, iaVersionLabel };

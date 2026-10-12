@@ -1,3 +1,11 @@
+import { asyIcon } from './storage.js';
+import { PACE_CHART } from './cardio-progression.js';
+import { weeklyBest } from './log-entries.js';
+import {
+  EASY_MIN_RUNS, EASY_RPE_HI, EASY_RPE_LO, RUN_CLASS_COLOR, RUN_CLASS_ORDER, _fmtPaceShort, _halfFromMileSec,
+  _mileFromRecoverySec, _paceStrToSec, _runClass,
+} from './progress-data.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── V165 chart builders ─────────────────────────────────────────────────────
 // D2 (ruled): static SVG, no interaction layer. D5: bars where composition or a
@@ -464,3 +472,9 @@ function buildEasyBandsFallback(byClass){
     headHtml+'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+s+'</svg>',
     'The two bars should not touch. The space between them is the whole point of running two different speeds.');
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  _axTx, _iaCard, _steadyCeilingFor, buildDriftChart, buildEasyBandsFallback, buildEasyEffortChart,
+  buildEasyEffortEmpty, buildEasyZoneChart, buildLadderChart, buildProjectionCard, easyVsPrescribed,
+};

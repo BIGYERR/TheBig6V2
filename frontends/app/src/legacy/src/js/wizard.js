@@ -1,3 +1,19 @@
+import { asyIcon, getPrograms } from './storage.js';
+import { activeProg, calcLift, showScreen, showToast } from './rest-day-shell.js';
+import { calcProgramLength, paceGoalTarget } from './nsw-cardio.js';
+import {
+  NRC_SHORTER, PACE_GOALS, PACE_IMPROVE, raceAlignment, raceCountdown, raceCountdownWords,
+} from './nrc-race-bike-swim.js';
+import { isSpeedGoal, sportDayTargets } from './cardio-progression.js';
+import {
+  _mileAdvisoryHTML, _mileEntryState, _mileFieldHelp, _swimAdvisoryHTML, generateProgram,
+} from './wizard-generate.js';
+import { getWeekMonday } from './week-view-sections.js';
+import { _fmtPaceMi } from './log-entries.js';
+import { progTestPin } from './programs.js';
+import { _parseLocalDate } from './overlays.js';
+import { seedFromPriorPrograms } from './progress-data.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // WIZARD
 
@@ -1168,3 +1184,10 @@ function renderWizardStep() {
     </div>`;
   }
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  ALL_DAYS_ORDER, CARDIO_GOALS_BY_TYPE, DAY_FULL, DEFAULT_1RM, GOAL_RECOMMENDED_DAYS, HYBRID_EXCLUDED_GOALS,
+  LIFTING_FOCUS_TO_GOAL, WD, _GOAL_RANK, _GOAL_REQ_INPUTS, _ISO_ORDER, _applyWizardStart, _clkMS, _fmtStartDay, _isoOf,
+  _rsRace, currentRandDayKey, lastRandIdx, renderWizardStep, resolveStartDate,
+};

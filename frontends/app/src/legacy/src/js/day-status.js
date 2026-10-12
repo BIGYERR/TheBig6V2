@@ -1,3 +1,19 @@
+import {
+  completedKey, getCompleted, getLogs, getPrograms, logKey, saveCompleted, saveLogs, savePrograms, snapshotDay,
+} from './storage.js';
+import { activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.js';
+import { _pattern } from './region-caps.js';
+import { markSwapOffered } from './swaps-edits.js';
+import { renderWeekView } from './week-view-sections.js';
+import {
+  CARDIO_PARK_FIELDS, _curLogDose, _curLogDoseFull, _curLogSub, cardioSwapNoteText, doseDerived, updateDoseDerived,
+} from './log-entries.js';
+import { cardioFieldHTML, iaWheelFlush, iaWheelInit } from './wheel-log.js';
+import { ruReset } from './rest-timer.js';
+import { openDetail } from './day-detail.js';
+import { refreshProgram } from './program-manage.js';
+import { finalScheduledDay, fireCompletionPopup, releaseSeasonShown, statusOf } from './popups-streaks-reminders.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── COACH NUDGE ──────────────────────────────────────────────────────────────
 // Third time in a row is a preference, not a bad night's sleep. Offered once, and
 // only once — declining marks it handled so the athlete is never asked again.
@@ -286,3 +302,6 @@ function copyExport(){
   const txt=document.getElementById('exportText')?.innerText||'';
   navigator.clipboard.writeText(txt).then(()=>showToast('Copied ✓')).catch(()=>{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('Copied ✓');});
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { cardioEntryLive, cardioLive, cardioLogLabel, persistLogFields, renderStatusFoot, showSwapNudge };

@@ -1,3 +1,11 @@
+import { esc, snapshotDay } from './storage.js';
+import { activeProgId, currentDayKey, currentWeek } from './rest-day-shell.js';
+import { exStoreKey } from './exercise-library.js';
+import { _clkMS } from './wizard.js';
+import { _STACK_LOADED } from './power-accessory.js';
+import { runSessionCode } from './week-view-sections.js';
+import { cardioLive, persistLogFields } from './day-status.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // Smart weight rounding — lbs to nearest 5, kg to nearest 2.5
 // Detect if an exercise uses trackable weight
@@ -455,3 +463,11 @@ function doseRep(delta){
   updateDoseDerived();
 }
 const _DOSE_INPUT_STYLE='width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-size:16px;padding:9px 12px;outline:none';
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  CARDIO_PARK_FIELDS, CARDIO_WORD, RPE_LABELS, _curLogDose, _curLogDoseFull, _curLogSub, _doseStripHTML, _fmtPaceMi,
+  cardioSwapNoteText, dedupeExDayEntries, doseDerived, doseFromCardio, entryDay, getExWeights, isKBExercise,
+  isRepExercise, isTimeExercise, isTrackableWeight, logExerciseWeight, roundWeight, saveExWeights, updateDoseDerived,
+  weeklyBest,
+};

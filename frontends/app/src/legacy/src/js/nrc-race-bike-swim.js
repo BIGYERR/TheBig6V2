@@ -1,3 +1,9 @@
+import { _ISO_ORDER, _clkMS, _isoOf } from './wizard.js';
+import { getCHIBike, getCHISwim, getINTBike, getINTReps, isCardioCutbackWeek } from './nsw-cardio.js';
+import { paceChartLookup, steadyCapSec } from './cardio-progression.js';
+import { getWeekMonday } from './week-view-sections.js';
+import { _parseLocalDate } from './overlays.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ════════════════════════════════════════════════════════════════════
 // NRC ENGINE — 5K (8 wk) + 10K (8 wk) + Half Marathon (14 wk) + Marathon (18 wk)
@@ -742,3 +748,9 @@ function buildSwimSession(goalId, week, dayIdx, totalWeeks, experience, assigned
   if(segments) detail = segments.map(sg => sg.label + ': ' + sg.text).join('\n');
   return {type:'swim', subtype, detail, note, week, goalId, segments: segments || undefined};
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  NRC_10K_TABLE, NRC_5K_TABLE, NRC_GOALS, NRC_SHORTER, PACE_GOALS, PACE_IMPROVE, buildBikeSession, buildNRCSession,
+  buildSwimSession, getNRCSessionTypes, raceAlignment, raceCountdown, raceCountdownWords, raceWeekPin, testWeekIndex,
+};

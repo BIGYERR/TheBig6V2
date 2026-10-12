@@ -1,3 +1,22 @@
+import { EXLIB, _swapUniverseAdd, _swapUniverseList, _swapUniverseReset } from './exercise-library.js';
+import { _ISO_ORDER } from './wizard.js';
+import { PACE_GOALS } from './nrc-race-bike-swim.js';
+import { _BW_GEAR, _BW_SUBS } from './prehab.js';
+import {
+  _BW_KEEP_FIXED, _bwSetsFromDetail, accessoryGrammarSweep, bodyweightSweep, hotNextHingeClampSweep,
+  preventionDoseSweep,
+} from './power-accessory.js';
+import { deconflictAdjacentDupes, injectDynamicCore } from './core-legs.js';
+import { engineA_timeline, engineB_cardio, planCalendar } from './engine-a-b-calendar.js';
+import { applyInjuryFilter, injuryDayTitle } from './injury.js';
+import { engineC_kinematics } from './engine-c.js';
+import {
+  _auxFamily, _cardioInterference, _ceil, _itemRegion, _moveCap, _pattern, _sectionRegion, _setCap,
+} from './region-caps.js';
+import { applySwapPrefs } from './swaps-edits.js';
+import { isTrackableWeight } from './log-entries.js';
+import { _fmtMileAnchor, runAnchorInfo } from './programs.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 const _PATTERN_REGION = {
   hpress:'push', vpress:'push', delt_iso:'push', tri_iso:'push',
   row:'pull', vpull:'pull', bi_iso:'pull',
@@ -867,3 +886,6 @@ function buildProgram(cfg){
   const D    = engineD_synthesis(cfg, A, B, plan, C); // synthesize week grid + emit program
   return D;
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { _PATTERN_REGION, _compoundTier, buildProgram, d18LongRunDayPass, engineD_synthesis, singletonSupersetSweep };

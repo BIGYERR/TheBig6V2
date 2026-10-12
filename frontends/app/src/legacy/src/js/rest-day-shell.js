@@ -1,3 +1,13 @@
+import { completedKey, getCompleted, getLogs, getPrograms, saveLogs, savePrograms } from './storage.js';
+import { DAY_FULL } from './wizard.js';
+import { _pattern } from './region-caps.js';
+import { _PATTERN_REGION } from './budget-engine-d.js';
+import { dayBeforeStart, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { CARDIO_PARK_FIELDS } from './log-entries.js';
+import { updateRestFloat } from './rest-timer.js';
+import { renderProgList } from './programs.js';
+import { showProgressScreen } from './progress-data.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── REST-DAY SHEET ───────────────────────────────────────────────────────────
 const _restDraft={w:null,day:null,view:'menu',pick:null,type:null,mins:30,dist:'',rpe:5};
 function openRestSheet(w,dayKey,view){
@@ -243,3 +253,10 @@ function tabGo(target){
   if(target==='screenProgress'){showProgressScreen();return;}
 }
 function showToast(msg){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  _curScreen, _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, applyRestDayMoves, calcLift, confirmProgId,
+  confirmTier, currentDayKey, currentRandIdx, currentWeek, editProgId, openProgIds, openRestSheet, progressViewId,
+  restDayEligible, showScreen, showToast,
+};

@@ -1,3 +1,13 @@
+import { getPrograms, savePrograms } from './storage.js';
+import { currentWeek, showScreen, showToast } from './rest-day-shell.js';
+import { LIFTING_FOCUS_TO_GOAL, WD, _applyWizardStart, _rsRace, renderWizardStep, resolveStartDate } from './wizard.js';
+import { calcProgramLength } from './nsw-cardio.js';
+import { buildProgram } from './budget-engine-d.js';
+import { renderWeekView } from './week-view-sections.js';
+import { _rtIntroPending } from './rest-timer.js';
+import { _fmtMileAnchor, progTestPin, renderProgList, runAnchorInfo } from './programs.js';
+import { loadActiveProgram } from './program-manage.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // PROGRAM GENERATOR
 function generateProgram(){
@@ -165,3 +175,6 @@ function doGenerate(){
     setTimeout(()=>{showScreen('screenWeek');renderWeekView();renderProgList();},600);
   },2400);
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { _mileAdvisoryHTML, _mileEntryState, _mileFieldHelp, _swimAdvisoryHTML, doGenerate, generateProgram };

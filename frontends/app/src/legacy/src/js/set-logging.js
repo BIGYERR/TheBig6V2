@@ -1,3 +1,19 @@
+import {
+  asyIcon, esc, getDayHist, getExWeightsFor, getLogs, getPrograms, readSetDraft, writeSetDraft,
+} from './storage.js';
+import {
+  _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, currentDayKey, currentWeek,
+} from './rest-day-shell.js';
+import { exStoreKey, foldExAliasKeys } from './exercise-library.js';
+import { _clkMS } from './wizard.js';
+import { _auxFamily, _pattern } from './region-caps.js';
+import { _stripLeadingSets, parseRx, rxSuffix } from './week-view-sections.js';
+import {
+  entryDay, getExWeights, isKBExercise, isRepExercise, isTimeExercise, isTrackableWeight,
+} from './log-entries.js';
+import { saveExWeight } from './day-detail.js';
+import { swapOriginOf } from './swap-sheet.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // Human recency for the reuse pill — never program-week numbers.
 // V168 D6 — its own constant. SEED_WINDOW_DAYS happens to share the number today;
 // coupling them would mean retuning the run seed silently retunes lift warnings.
@@ -638,3 +654,6 @@ function buildCardioHTML(cardio){
   // the day header, so a workout referencing "RPE 8" doesn't repeat the whole key.
   return `<div class="${blockCls}">${inner}</div>`;
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { buildCardioHTML, buildExItem, exControlFlags, exLoggable, refreshSetSummary, setWeightVals, toStoreW };

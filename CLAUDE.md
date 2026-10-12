@@ -33,7 +33,10 @@ generates multi-week hybrid strength + cardio programs from a seeded, determinis
 (Engine A → B → C → D inside `buildProgram(cfg)`). **`index.html` is generated** (architecture phase B, Post-v0.239.1):
 `frontends/app/scripts/build-index.mjs` builds it byte for byte from its source files under `frontends/app/src/legacy/src/` (35 JS files,
 9 CSS files and 5 HTML partials, joined in the order `order.json` lists). Code is edited in the source files, then
-`cd frontends/app && npm run build:index` regenerates the root `index.html`, and both are committed together. The root file is
+`cd frontends/app && npm run build:index` regenerates the root `index.html`, and both are committed together. Each JS
+source file is also an ES module (architecture phase C, step 1): `npm run build:index` first rewrites its import and
+export blocks from the code (`scripts/module-blocks.mjs`), the build strips them, and the tests can import the engine
+straight from the sources (`tests/support/engine-modules.ts`). The root file is
 never edited by hand; the 60-second check and CI fail when it is not the build of the sources. Doctrine: NSW Physical Training Guide for
 test goals (pace, mile, 1.5-mile, base) and Nike Run Club plans for race goals (5K/10K/half/
 marathon). Deployed by GitHub Pages at https://bigyerr.github.io/TheBig6V2/ . iOS-only PWA.

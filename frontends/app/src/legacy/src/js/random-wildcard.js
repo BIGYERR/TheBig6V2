@@ -1,3 +1,9 @@
+import { asyIcon, completedKey, esc, getWildcardDone, saveWildcardDone } from './storage.js';
+import { activeProg, currentRandIdx, showToast } from './rest-day-shell.js';
+import { currentRandDayKey, lastRandIdx } from './wizard.js';
+import { buildSectionsHTML, dayBeforeStart, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { computeStreak, popFire } from './popups-streaks-reminders.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // RANDOM POOLS - 30+ per goal
 const RAND_POOLS={
@@ -316,3 +322,6 @@ function updateRandCounter(){
   const el=document.getElementById('randCounter');if(el) el.textContent=myDone+'/'+pool.length;
   if(!resetPending){const rb=document.getElementById('resetRandBtn');if(rb){rb.textContent='↺ Reset';rb.style.color='';}}
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { RAND_POOLS, updateRandCounter, wildcardMarkHTML, wildcardOn, wildcardTagHTML };

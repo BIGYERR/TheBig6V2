@@ -1,3 +1,17 @@
+import { asyIcon, getDayHistFor, getExWeightsFor, getLogsFor, getPrograms, saveExWeightsFor } from './storage.js';
+import { activeProg, activeProgId, calcLift, progressViewId } from './rest-day-shell.js';
+import { exStoreKey, foldExAliasKeys } from './exercise-library.js';
+import { _partialWeek1, restLogLines } from './week-view-sections.js';
+import { RPE_LABELS, dedupeExDayEntries } from './log-entries.js';
+import {
+  EASY_MIN_RUNS, RACE_DIST_MI, _cutWeek, _progChipsHTML, buildPaceChart, easyEffortWeekly, ladderWeekly,
+  plannedVsLogged, recoveryPaceWeekly, runsByClass,
+} from './progress-data.js';
+import {
+  _axTx, _iaCard, buildDriftChart, buildEasyBandsFallback, buildEasyEffortChart, buildEasyEffortEmpty,
+  buildEasyZoneChart, buildLadderChart, buildProjectionCard, easyVsPrescribed,
+} from './progress-charts.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── V167: LIFT LEDGER REBUILD (D7 revised / D10-A / D11) ────────────────────
 // V165's ledger led with e1RM. Two things were wrong with that. First, the app
@@ -689,3 +703,6 @@ function buildMultiDotChart(title, weeks, series) {
     </svg>
   </div>`;
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { renderProgressScreen };

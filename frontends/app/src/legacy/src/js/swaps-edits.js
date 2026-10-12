@@ -1,3 +1,12 @@
+import { _ssLegal, _ssPartnerOf } from './exercise-library.js';
+import { _BW_KEEP_FIXED, _bwSetsFromDetail } from './power-accessory.js';
+import { _stripCapCue, applyInjuryFilter } from './injury.js';
+import { _pattern, _repFloor } from './region-caps.js';
+import { _PATTERN_REGION, _compoundTier } from './budget-engine-d.js';
+import { parseRx } from './week-view-sections.js';
+import { isTrackableWeight } from './log-entries.js';
+import { dayOverlayInfo } from './overlays.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // Which region a pattern belongs to (for ceiling bookkeeping + interference).
 // ── EXERCISE SWAP ────────────────────────────────────────────────────────────
 // Session-scoped substitution. The athlete trades one lift for another on the day
@@ -427,3 +436,10 @@ function markSwapOffered(pid,from){
   const c=getSwapCounts(pid);
   if(c[from]){c[from].offered=true;saveSwapCounts(pid,c);}
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  _dayPlanCfg, _swapDetailFor, _swapInjuryOK, addCandidates, addedDetailFor, applyDayEdits, applySessionSwaps,
+  applySwapPrefs, bumpSwapCount, clearAdd, clearSkip, clearSwap, getDayEdits, getSwaps, markSwapOffered, pruneDayEdits,
+  recordAdd, recordSkip, recordSwap, ssSkipToken, swapCandidates, swapLoadNote,
+};

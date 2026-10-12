@@ -1,3 +1,7 @@
+import { _ssLegal, _ssPartnerOf } from './exercise-library.js';
+import { _powerAllowed } from './power-accessory.js';
+import { _dayPlanCfg, _swapInjuryOK } from './swaps-edits.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── REGIONAL FATIGUE CAP ────────────────────────────────────────────────────
 // Within-day guard against same-region volume stacking. deconflictSameRegion
@@ -406,3 +410,9 @@ function _repFloor(name){
   for(let i=0;i<_REP_FLOOR.length;i++){ if(_REP_FLOOR[i][0].test(N)) return _REP_FLOOR[i][1]; }
   return null;
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  _AUX_FAMILY, _AUX_FAMILY_LABEL, _AUX_GEAR, _auxFamily, _auxGearOK, _cardioInterference, _ceil, _isUnilateralRow,
+  _itemRegion, _moveCap, _pattern, _repFloor, _sectionRegion, _setCap, auxSwapCandidates,
+};

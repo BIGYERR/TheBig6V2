@@ -1,3 +1,16 @@
+import { asyIcon, completedKey, esc, getCompleted, getLogs, logKey } from './storage.js';
+import { activeProg, currentWeek, openRestSheet, restDayEligible, showToast } from './rest-day-shell.js';
+import { ALL_DAYS_ORDER, DAY_FULL, _fmtStartDay } from './wizard.js';
+import { INJURY_REGIONS } from './injury.js';
+import { updateRandCounter, wildcardMarkHTML, wildcardOn, wildcardTagHTML } from './random-wildcard.js';
+import { buildExItem } from './set-logging.js';
+import { openDetail } from './day-detail.js';
+import { progAlignment } from './programs.js';
+import {
+  _liveInjuryOverlay, _parseLocalDate, dayIsTravel, overlayWeekRange, renderOverlayChip, travelTagHTML,
+} from './overlays.js';
+import { computeStreak, statusOf } from './popups-streaks-reminders.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // WEEK VIEW
 const allDaysList=ALL_DAYS_ORDER;
@@ -889,3 +902,9 @@ function rxSuffix(rx){
   if(rx.kind==='dist') return rx.perSide?'yd/side':'yd';
   return rx.perSide?'/side':'';
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  _partialWeek1, _progDayDate, _setLeadingSets, _stripLeadingSets, buildSectionsHTML, calcCurrentWeek, dayBeforeStart,
+  dayOffset, getWeekMonday, parseRx, renderWeekView, restLogLines, runSessionCode, rxSuffix, tagMeta,
+};

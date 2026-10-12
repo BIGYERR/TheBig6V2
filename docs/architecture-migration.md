@@ -240,7 +240,7 @@ build of 49 source files under `frontends/app/src/legacy/src/`, byte for byte, a
 - So phase C starts with a measure of the engine subgraph. The engine files likely form an acyclic set that can become
   real modules first, while the UI files stay together in one legacy module until phase E takes them apart screen by screen.
 
-### Folder layout: core, backend, frontends, tests (Post-v0.239.1; in progress)
+### Folder layout: core, backend, frontends, tests (done, Post-v0.239.1)
 Mario, Post-v0.239.1: "top level core/backends/frontends and app is just 1 of the frontends now... frontends->app+website".
 The order he agreed: test-migration phases 2 and 3, then this layout, then phase C. Each step moves files and repoints
 paths only, and is proved by identical outputs: `index.html` byte for byte, the app's build hashed before and after,
@@ -273,16 +273,39 @@ The app joins the `frontends/` workspace later (phase E), when its screens start
 then it stays its own package, because Cordova keeps its platform and plugin list in the project root's
 `package.json`.
 
-### Phase C: ES modules with an explicit global surface (2 to 4 sessions)
+### Phase C: ES modules, in place first (in progress, Post-v0.239.1)
 - **Prerequisite (met, Post-v0.239.1):** the legacy gates are retired (test-migration phase 3, `830af1e`), because they
   reached into VM globals that this phase removes. The feature tests are the safety net from here.
-- Each file becomes an ES module with explicit imports and exports. The 154 top-level variables move into explicit state
-  modules. One `globals.ts` registers exactly the functions the 183 inline handlers call; a test lists every handler name
-  in the markup and in the HTML strings and fails if any is missing.
-- esbuild (through the Angular builder) bundles them; the output is no longer byte-identical, so the proof becomes:
-  every feature test and snapshot passes, e2e parity is 0% against the pre-phase build, and Mario checks the app on his
-  phone.
-- **Phase F can follow straight after,** so Pages serves the bundled app.
+- **Measured first** (`tests/measure/es-modules_module-graph.md`). The engine is separable: `buildProgram` reaches 186
+  of the 783 top-level names, in 19 of the 35 files, and none of them uses a browser API; no inline handler calls an
+  engine name. The UI is one cycle (31 of 35 files), 18 `let`s are written from other files, and nothing is looked up
+  dynamically. Loading the files runs almost nothing once the boot is left to an entry. But the tests reach the app by
+  name (389 `IA.eval` calls) and by text (about 20 files read the script's text), so a bundler that reprints the code
+  or wraps its names (the original plan: esbuild and one `globals.ts` at once) would break hundreds of tests in one
+  step.
+- **So the sources become ES modules in place, and the build strips the module syntax back out.** Each step keeps
+  `index.html` byte for byte, or changes it only where a step means to and proves that with the feature tests, the
+  snapshots and e2e parity. The bundle that replaces the classic script comes last, with phase F, once the tests no
+  longer read the script's text or reach it by global name.
+  1. **Imports and exports in place (done, Post-v0.239.1).** Every JS file has an import block naming what it uses
+     from the other files and an export block naming what they and the tests (`EXPORT_NAMES`) use from it: 612
+     imported names, 330 exported. `frontends/app/scripts/module-blocks.mjs` writes them from the code;
+     `build-index.mjs` strips them, so `index.html` is unchanged (sha256 `2c9bfd96…9406531ea`); every file parses as a
+     module and every import names an export (`frontends/app/test/integration/module-blocks.test.ts`). The engine now
+     loads straight from the sources in Node and Vitest, with no VM: `tests/integration/engine-modules.test.ts` builds
+     HALF_MANNY and the nine seeded configs, and `tests/sweeps/engine-modules.test.ts` the 864-config lattice, each
+     with the digest the classic script builds (the program-output golden files), in 6.5 s against the VM's 17. Both
+     fail on the sources before this step (`buildProgram is not a function`).
+  2. **State modules for the 18 cross-file `let`s** (next). Each gets one owner that exports it with a setter, and the
+     files that assign it call the setter; `index.html` changes, proved by the feature tests, the snapshots and e2e.
+     Then every file runs correctly as a module, not only the engine.
+  3. **The engine's own files.** The 31 engine names that live in mostly-UI files (wizard 6, log-entries 9, storage 3,
+     swaps-edits 3, programs 3, week-view-sections 2, overlays 1) move into engine files, so the engine's files import
+     no UI file and can move to `core/` (phase D).
+  4. **Engine tests off the harness.** Tests of engine behaviour import it from the modules, file by file, instead of
+     booting the VM; tests that read the script's text become behaviour tests or move with their code.
+  5. **The bundle** (with phase F): esbuild builds the app from its entry module, one `globals.ts` registers exactly
+     the 64 names the 107 inline handlers call, and Pages serves the build.
 - **Done when:** no code depends on implicit globals except through `globals.ts`.
 
 ### Phase D: TypeScript, engine first (incremental, many sessions, interleaved with releases)

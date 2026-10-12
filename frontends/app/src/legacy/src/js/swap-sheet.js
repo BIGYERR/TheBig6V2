@@ -1,3 +1,16 @@
+import { asyIcon, esc, resnapshotDayEdit } from './storage.js';
+import { activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.js';
+import { _stripCapCue, applyInjuryFilter } from './injury.js';
+import { _AUX_FAMILY_LABEL, _auxFamily, _pattern, auxSwapCandidates } from './region-caps.js';
+import {
+  _dayPlanCfg, _swapDetailFor, addCandidates, addedDetailFor, applySwapPrefs, bumpSwapCount, clearAdd, clearSkip,
+  clearSwap, getSwaps, recordAdd, recordSkip, recordSwap, ssSkipToken, swapCandidates, swapLoadNote,
+} from './swaps-edits.js';
+import { _PATTERN_REGION, _compoundTier } from './budget-engine-d.js';
+import { parseRx } from './week-view-sections.js';
+import { openDetail } from './day-detail.js';
+import { showSwapNudge } from './day-status.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── SWAP SHEET ───────────────────────────────────────────────────────────────
 let _swapCtx=null;
 // What did this lift replace on today's card? Drives the "SWAPPED IN" chip.
@@ -307,3 +320,6 @@ function undoSwap(from){
   openDetail(currentDayKey,day);
   showToast(from+' is back on the card.');
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { swapOriginOf };

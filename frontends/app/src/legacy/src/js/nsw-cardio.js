@@ -1,3 +1,7 @@
+import { _clkMS } from './wizard.js';
+import { NRC_GOALS, PACE_IMPROVE } from './nrc-race-bike-swim.js';
+import { paceChartLookup, rowPaceAt, steadyCapSec, taperWeeksFor } from './cardio-progression.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 
 // CARDIO PROGRESSIONS
@@ -1146,3 +1150,9 @@ function buildRunSession(goalId, week, dayIdx, totalWeeks, baselineMiles, experi
   if(_dose && _key) _dose.key = _key;   // D103a: readers go key first; NRC, bike and swim carry none
   return {type:'run', subtype, detail, note, week, goalId, dose:_dose||undefined};
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  NSW_TABLE6_INT, buildRunSession, calcProgramLength, getCHIBike, getCHISwim, getINTBike, getINTReps,
+  isCardioCutbackWeek, paceGoalTarget,
+};

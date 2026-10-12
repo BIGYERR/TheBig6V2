@@ -6,7 +6,8 @@ and every test boots) is built from them and is never edited by hand.
 ## How to change the app
 
 1. Edit the file under `frontends/app/src/legacy/src/` that holds the code (`grep -rn <name> frontends/app/src/legacy/src/js` finds it).
-2. Rebuild the root file: `cd app && npm run build:index`.
+2. Rebuild the root file: `cd frontends/app && npm run build:index`. It first rewrites each JS file's module blocks
+   (below) from the code, then builds.
 3. Commit the source files and `index.html` together.
 
 `npm run build:index:check` fails unless `index.html` is exactly the build of these files, and prints the first byte
@@ -22,14 +23,27 @@ added between them. `order.json` is the only list of pieces. A file under `html/
 list fails the build, as does an entry that is missing, listed twice, or not named in lower case words joined by
 dashes. No file name carries a version.
 
-The files carry no header of their own: every byte in them is a byte of `index.html`. A piece starts and ends where
+The HTML and CSS files carry no header of their own: every byte in them is a byte of `index.html`. So does every JS
+file between its module blocks (below), which the build strips. A piece starts and ends where
 the page does: `head.html` ends with the `<style>` open tag, `overlays.html` with the `<script>` open tag, and
 `screens-late.html` starts with `</script>`.
 
-## One script, one scope
+## One script, one scope, and ES modules too
 
-The JS files are not modules. The build puts them back into the page's one inline `<script>`, so a top-level name in
-one file is visible in every other, and an inline handler (`onclick="openDetail(...)"`) calls it as a global. Function
+The build puts the JS files back into the page's one inline `<script>`, so a top-level name in one file is visible in
+every other, and an inline handler (`onclick="openDetail(...)"`) calls it as a global.
+
+Each JS file is also an ES module (architecture phase C, step 1). An import block at its top names every top-level
+name of another file it uses (`import { EXLIB, pick } from './exercise-library.js';`), and ends on the line
+`// end of the module imports (...)`; an export block at its bottom starts on the line `// the module exports (...)`
+and names every top-level name another file, or the tests through `tests/harness.js`'s `EXPORT_NAMES`, uses from it.
+`frontends/app/scripts/module-blocks.mjs` writes both from the code (acorn and eslint-scope), so never edit them by hand:
+`npm run build:index` rewrites them, and `npm run modules:check` (in the app's tests) fails when one is stale. The
+build strips both, so the page is unchanged by them. As modules, the files load in Node and Vitest without the page:
+the tests import the engine straight from here (`tests/support/engine-modules.ts`) and it builds every program the
+page builds. Eighteen top-level `let`s are still written from another file (`activeProg`, `currentWeek`, ...), which
+a module cannot do to an import; they work in the page's one script, and phase C's next step moves them into state
+modules (`tests/measure/es-modules_module-graph.md`). Function
 declarations are hoisted across the whole script, but a `let` or `const` must be declared before a statement that
 runs at load time reads it, so the order in `order.json` matters. Every cut sits between two top-level statements,
 and every CSS cut sits outside any rule, so each file parses on its own. One name is declared twice today:

@@ -1,3 +1,5 @@
+import { _curScreen, activeProg } from './rest-day-shell.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── Floating count-up rest stopwatch (PiP-style edge tab). Persists app-wide; runs through screen-lock. ──
 let _ruId=null,_ruRunning=false,_ruElapsed=0,_ruStart=0;
 let _rtSide='right',_rtExpanded=false,_rtIntroTO=null,_rtInited=false,_rtDragging=false,_rtIntroPending=false;
@@ -144,3 +146,6 @@ function updateRestFloat(){
     _rtPlayIntro();
   }
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { _rtIntroPending, _ruIsland, ruReset, ruResetIfIdle, updateRestFloat };

@@ -1,3 +1,9 @@
+import { ASY_ICON_PATHS, asyIcon, completedKey, getCompleted, saveCompleted, snapshotDay } from './storage.js';
+import { activeProg, activeProgId, showToast } from './rest-day-shell.js';
+import { ALL_DAYS_ORDER, DAY_FULL } from './wizard.js';
+import { wildcardOn } from './random-wildcard.js';
+import { dayBeforeStart, dayOffset, getWeekMonday, renderWeekView } from './week-view-sections.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 /* ===== REINFORCEMENT POPUPS ===== */
 /* Pools are locked copy. workout + reminder are WIRED this batch; streak + season
    are staged for the next batch (no trigger fires them yet). */
@@ -338,3 +344,9 @@ function resolveReminder(week,dayKey,title,status){
   showToast(labels[status]||'Updated');
   if(status==='complete') setTimeout(()=>fireCompletionPopup(week,dayKey),380);
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  completedCount, computeStreak, finalScheduledDay, fireCompletionPopup, maybeShowReminder, popFire, releaseSeasonShown,
+  statusOf,
+};

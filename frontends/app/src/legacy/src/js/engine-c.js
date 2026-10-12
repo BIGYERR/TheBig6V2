@@ -1,3 +1,16 @@
+import { asyIcon } from './storage.js';
+import {
+  EXLIB, REP_AFFINITY, _carryRx, _expOK, _isOneArmPress, _ssPair, _swapUniverseAdd, pick,
+} from './exercise-library.js';
+import { DEFAULT_1RM } from './wizard.js';
+import {
+  CORE_PILLARS, _gearLens, _tierHasBarbell, buildFootAnkleSection, buildHipSection, buildRehabSection,
+} from './prehab.js';
+import { _powerAllowed, _powerPrescribe } from './power-accessory.js';
+import { TEST_RX_TEXT, _injViewName, injuryPlan } from './injury.js';
+import { _auxFamily, _auxGearOK, _cardioInterference, _isUnilateralRow, _pattern, _repFloor } from './region-caps.js';
+import { roundWeight } from './log-entries.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── ENGINE C — KINEMATIC POOL FILTER (exercise selection + RPE prescription) ─
 // Pure-RPE coaching (scheme()/rpeFromWave()) over Engine-A's wave resolver and
@@ -1364,3 +1377,6 @@ function engineC_kinematics(cfg, A, B){
   // Build cardio schedule
   return { buildSections, gearOK:_gearOK };
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { engineC_kinematics };

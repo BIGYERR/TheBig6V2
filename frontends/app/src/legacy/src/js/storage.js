@@ -1,3 +1,5 @@
+import { activeProg, activeProgId, currentDayKey, currentWeek } from './rest-day-shell.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 
 /* THE ASYLUM icon system — Lucide 2px (DS) + custom fitness marks. */
@@ -164,3 +166,11 @@ function snapshotDay(week,dayKey){
     saveDayHist(h);
   }catch(e){ console.error('day snapshot failed',week,dayKey,e); }
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  ASY_ICON_PATHS, asyIcon, clearSetDraft, completedKey, esc, getActiveProgId, getCompleted, getDayHist, getDayHistFor,
+  getExWeightsFor, getLogs, getLogsFor, getPrograms, getWildcardDone, logKey, readSetDraft, resnapshotDayEdit,
+  saveCompleted, saveExWeightsFor, saveLogs, savePrograms, saveWildcardDone, setActiveProgId, snapshotDay,
+  writeSetDraft,
+};

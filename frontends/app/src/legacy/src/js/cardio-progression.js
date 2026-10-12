@@ -1,3 +1,10 @@
+import { ALL_DAYS_ORDER, _ISO_ORDER, _clkMS } from './wizard.js';
+import { buildRunSession, isCardioCutbackWeek, paceGoalTarget } from './nsw-cardio.js';
+import {
+  NRC_GOALS, PACE_GOALS, buildBikeSession, buildNRCSession, buildSwimSession, getNRCSessionTypes,
+} from './nrc-race-bike-swim.js';
+import { injuryPlan } from './injury.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 
 // Speed-responsive goals depend on interval sessions to deliver their pace work.
@@ -1340,3 +1347,9 @@ function spaceHardCardio(sportSessionTypes, sportDayIndices, cardioTrainDays, da
   }
   return 1;
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  PACE_CHART, buildCardioProgression, isSpeedGoal, paceChartLookup, programTaperWindow, rowPaceAt, sportDayTargets,
+  steadyCapSec, taperWeeksFor,
+};

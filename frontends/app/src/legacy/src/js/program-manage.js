@@ -1,3 +1,16 @@
+import { getActiveProgId, getPrograms, savePrograms, setActiveProgId } from './storage.js';
+import {
+  activeProg, activeProgId, applyRestDayMoves, confirmProgId, confirmTier, currentDayKey, currentWeek, editProgId,
+  progressViewId, showScreen, showToast,
+} from './rest-day-shell.js';
+import { applyDayEdits, applySessionSwaps, getDayEdits, getSwaps, pruneDayEdits } from './swaps-edits.js';
+import { buildProgram } from './budget-engine-d.js';
+import { calcCurrentWeek, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { entryDay } from './log-entries.js';
+import { progTestPin, renderProgList } from './programs.js';
+import { _isoToday, _parseLocalDate, applyOverlays, overlayWeekRange, paceShiftMap } from './overlays.js';
+import { renderProgressScreen } from './lift-ledger-progress-screen.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 function refreshProgram(prog){
   if(!prog || !prog.cfg) return prog;
   // SEED FALLBACK: older programs baked seed at the program level but not into cfg.
@@ -340,3 +353,6 @@ function deleteProg(id,fromProgress){
   if(fromProgress)renderProgressScreen();else renderProgList();
   showToast('Program deleted');
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { loadActiveProgram, refreshProgram };

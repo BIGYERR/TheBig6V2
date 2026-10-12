@@ -1,3 +1,20 @@
+import { asyIcon, getActiveProgId, getPrograms, savePrograms } from './storage.js';
+import {
+  activeProg, activeProgId, confirmProgId, confirmTier, currentWeek, editProgId, openProgIds, showToast,
+} from './rest-day-shell.js';
+import {
+  ALL_DAYS_ORDER, CARDIO_GOALS_BY_TYPE, DEFAULT_1RM, HYBRID_EXCLUDED_GOALS, LIFTING_FOCUS_TO_GOAL, _GOAL_RANK,
+  _GOAL_REQ_INPUTS, _clkMS, _fmtStartDay, _rsRace, resolveStartDate,
+} from './wizard.js';
+import { NSW_TABLE6_INT, calcProgramLength } from './nsw-cardio.js';
+import {
+  NRC_GOALS, PACE_GOALS, raceAlignment, raceCountdown, raceCountdownWords, testWeekIndex,
+} from './nrc-race-bike-swim.js';
+import { paceChartLookup } from './cardio-progression.js';
+import { _mileEntryState } from './wizard-generate.js';
+import { calcCurrentWeek, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { refreshProgram } from './program-manage.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // V188 (D14a): alignment of a built program, from its stored cfg.
 function progAlignment(p){
   const c=p&&p.cfg; if(!c||!c.cardioTypes||!c.cardioTypes.includes('run')||!c.cardioGoals||!c.cardioGoals.run) return null;
@@ -525,3 +542,6 @@ function renderProgList(){
     </div>`;
   }).join('');
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { _fmtMileAnchor, progAlignment, progTestPin, renderProgList, runAnchorInfo };

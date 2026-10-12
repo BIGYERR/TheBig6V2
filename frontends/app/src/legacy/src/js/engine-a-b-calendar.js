@@ -1,3 +1,11 @@
+import { ALL_DAYS_ORDER, LIFTING_FOCUS_TO_GOAL, _ISO_ORDER } from './wizard.js';
+import { calcProgramLength } from './nsw-cardio.js';
+import { PACE_GOALS, raceAlignment, raceWeekPin } from './nrc-race-bike-swim.js';
+import { buildCardioProgression, programTaperWindow } from './cardio-progression.js';
+import { deconflictLegLiftDays, deconflictSameRegion } from './core-legs.js';
+import { injuryPlan } from './injury.js';
+import { _parseLocalDate } from './overlays.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ============================================================================
 // PROGRAM GENERATION PIPELINE  (decoupled A -> B -> C -> D)
@@ -324,3 +332,6 @@ function planCalendar(cfg, A, B){
   const recoveryNote = [legRecoveryNote, regionRecoveryNote].filter(Boolean).join(' ') || null;
   return { dayRoles, legRecoveryNote: recoveryNote };
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { engineA_timeline, engineB_cardio, planCalendar };

@@ -307,3 +307,9 @@ function _swapUniverseAdd(arr){
 }
 function _swapUniverseList(){return _SWAP_UNIVERSE?Object.keys(_SWAP_UNIVERSE):[];}
 function pick(arr,n,seed){_swapUniverseAdd(arr);const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(seededRand(seed+i)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,n);}
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  EXLIB, EX_KEY_ALIAS, EX_RENAMED_V113, REP_AFFINITY, _carryRx, _expOK, _isOneArmPress, _ssLegal, _ssPair, _ssPartnerOf,
+  _stationClass, _swapUniverseAdd, _swapUniverseList, _swapUniverseReset, exStoreKey, foldExAliasKeys, pick, seededRand,
+};

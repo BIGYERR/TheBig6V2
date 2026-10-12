@@ -1,3 +1,5 @@
+import { EXLIB, pick } from './exercise-library.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 function buildHipSection(seed,bodyweight){
   // Reliable stability dose: the section always draws 2 loaded/active glute-med drills plus
@@ -261,3 +263,9 @@ function _bwFallback(name){
   if(/raise|fly|delt/.test(N))              return 'Prone Y-T-W raises';
   return 'Burpees';
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  CORE_PILLARS, CORE_SPEED_TYPES, _BW_GEAR, _BW_SUBS, _bwFallback, _gearLens, _tierHasBarbell, buildFootAnkleSection,
+  buildHipSection, buildRehabSection,
+};

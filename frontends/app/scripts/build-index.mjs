@@ -8,6 +8,10 @@
 //                                           byte, naming the first byte that differs and the source file it comes
 //                                           from (npm run build:index:check; tools/check.mjs and CI run it)
 //
+// Each JS file is also an ES module (architecture phase C): scripts/module-blocks.mjs writes an import block at its top
+// and an export block at its bottom, each ending or starting on a fixed marker line. The build strips both blocks, so
+// the page carries the classic script, byte for byte what the code between the markers says.
+//
 // order.json is the one list of pieces. Every entry is a file under html/, css/ or js/ with that folder's extension,
 // named in lower case words joined by dashes, listed once; every such file in those folders must be listed, so no
 // source file can sit outside the build. buildIndex() is exported for the dev container (backend/scripts/dev-watch.ts),
@@ -30,6 +34,44 @@ const FOLDERS = ['html', 'css', 'js'];
 const PIECE_RE = /^(html|css|js)\/[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*\.\1$/;
 /** A word that is a version (v0, v239): a release number never goes in a file name. */
 const VERSION_WORD_RE = /(?:^|[/-])v\d/;
+
+/** The line that ends a JS file's import block: everything above it, and the line itself, is the module's imports. */
+export const MODULE_IMPORTS_END = '// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)\n';
+/** The line, newline first, that starts a JS file's export block: it and everything below it is the module's exports. */
+export const MODULE_EXPORTS_START = '\n// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)\n';
+
+/**
+ * A JS source file split into its import block (`head`, '' when it has none), the classic script between the markers
+ * (`body`) and its export block (`tail`, '' when it has none). Throws when a marker appears twice, or when the head or
+ * the tail holds anything but module syntax, so a stray line can never slip into or out of the page.
+ * @param {string} text
+ * @returns {{ head: string, body: string, tail: string }}
+ */
+export function moduleParts(text) {
+  const twice = (marker) => { const i = text.indexOf(marker); return i !== -1 && text.indexOf(marker, i + 1) !== -1; };
+  if (twice(MODULE_IMPORTS_END) || twice(MODULE_EXPORTS_START)) throw new Error('a module marker appears twice');
+  const i = text.indexOf(MODULE_IMPORTS_END);
+  const from = i === -1 ? 0 : i + MODULE_IMPORTS_END.length;
+  const j = text.indexOf(MODULE_EXPORTS_START, from);
+  const to = j === -1 ? text.length : j;
+  const head = text.slice(0, from);
+  const tail = text.slice(to);
+  const imports = head.slice(0, head.length - (i === -1 ? 0 : MODULE_IMPORTS_END.length));
+  if (!/^(?:import \{[^}]*\} from '\.\/[a-z0-9-]+\.js';\n)*$/.test(imports)) throw new Error('the import block holds something other than import lines');
+  if (tail && !/^\n\/\/ the module exports [^\n]*\nexport \{[^}]*\};\n$/.test(tail)) throw new Error('the export block holds something other than one export list');
+  return { head, body: text.slice(from, to), tail };
+}
+
+/**
+ * What a piece adds to the page: an HTML or CSS file as it is, a JS file without its module blocks.
+ * @param {string} srcDir
+ * @param {string} piece
+ * @returns {Buffer}
+ */
+export function pieceBytes(srcDir, piece) {
+  const bytes = readFileSync(join(srcDir, piece));
+  return piece.endsWith('.js') ? Buffer.from(moduleParts(bytes.toString('utf8')).body, 'utf8') : bytes;
+}
 
 /**
  * The pieces in build order, as order.json lists them. Throws on anything that would quietly build a different page:
@@ -61,12 +103,13 @@ export function readOrder(srcDir = SOURCES) {
 }
 
 /**
- * The page: every piece's bytes in order.json's order, nothing added between them.
+ * The page: every piece's bytes in order.json's order, the JS files without their module blocks, nothing added
+ * between them.
  * @param {string} [srcDir]
  * @returns {Buffer}
  */
 export function buildIndex(srcDir = SOURCES) {
-  return Buffer.concat(readOrder(srcDir).map((piece) => readFileSync(join(srcDir, piece))));
+  return Buffer.concat(readOrder(srcDir).map((piece) => pieceBytes(srcDir, piece)));
 }
 
 /**
@@ -130,9 +173,11 @@ export function checkIndex(srcDir = SOURCES, target = TARGET) {
   let from = 'past the last source file';
   let start = 0;
   for (const piece of order) {
-    const bytes = readFileSync(join(srcDir, piece));
+    const bytes = pieceBytes(srcDir, piece);
     if (offset < start + bytes.length) {
-      from = `${piece} line ${lineCol(bytes, offset - start).line}`;
+      // A line in the file as it is on disk: the import block's lines come first.
+      const head = piece.endsWith('.js') ? moduleParts(readFileSync(join(srcDir, piece), 'utf8')).head : '';
+      from = `${piece} line ${lineCol(bytes, offset - start).line + (head.match(/\n/g) ?? []).length}`;
       break;
     }
     start += bytes.length;

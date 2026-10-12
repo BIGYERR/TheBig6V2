@@ -1,3 +1,11 @@
+import { asyIcon, getPrograms, savePrograms } from './storage.js';
+import { activeProg, showToast } from './rest-day-shell.js';
+import { INJURY_REGIONS, injuryPlan } from './injury.js';
+import { buildProgram } from './budget-engine-d.js';
+import { _progDayDate, calcCurrentWeek, getWeekMonday, renderWeekView } from './week-view-sections.js';
+import { refreshProgram } from './program-manage.js';
+import { popFire } from './popups-streaks-reminders.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // Re-run the engine for an EXISTING program on load so it reflects the CURRENT engine rather
 // than whatever was baked when it was first generated — e.g. a program created under the old
 // weight model picks up the new RPE prescriptions on next open. buildProgram is pure
@@ -586,3 +594,9 @@ function applyOverlayDraft(){
   renderWeekView();
   showToast('Change applied \u2713');
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  _isoToday, _liveInjuryOverlay, _parseLocalDate, applyOverlays, dayIsTravel, dayOverlayInfo, overlayWeekRange,
+  paceShiftMap, renderOverlayChip, travelTagHTML,
+};

@@ -1,3 +1,20 @@
+import {
+  asyIcon, clearSetDraft, completedKey, getCompleted, getLogs, getPrograms, logKey, savePrograms,
+} from './storage.js';
+import {
+  _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, currentDayKey, currentWeek, showToast,
+} from './rest-day-shell.js';
+import { exStoreKey } from './exercise-library.js';
+import { DAY_FULL } from './wizard.js';
+import { wildcardTagHTML } from './random-wildcard.js';
+import { buildSectionsHTML } from './week-view-sections.js';
+import { buildCardioHTML, refreshSetSummary, setWeightVals, toStoreW } from './set-logging.js';
+import { getExWeights, isKBExercise, logExerciseWeight, updateDoseDerived } from './log-entries.js';
+import { buildLogHTML, iaWheelInit, modTagsHTML, sessionLogProgress } from './wheel-log.js';
+import { ruResetIfIdle } from './rest-timer.js';
+import { cardioLive, persistLogFields, renderStatusFoot } from './day-status.js';
+import { travelTagHTML } from './overlays.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── V139: TEST-WEEK e1RM CALCULATOR + RANGE-TOP NUDGE ────────────────────────
 // Epley with the honest edge case: a true single IS the max, no formula inflation.
@@ -254,3 +271,6 @@ function saveExWeight(exKey, exName, setsReps, quiet) {
   // set four lines above. Two writers agreeing today is two writers free to disagree later.
   refreshSetSummary(exKey);
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export { _epley, openDetail, saveExWeight };

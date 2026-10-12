@@ -1,3 +1,11 @@
+import { asyIcon, esc, getDayHistFor, getExWeightsFor, getLogsFor, getPrograms } from './storage.js';
+import { activeProgId, confirmProgId, confirmTier, progressViewId, showScreen } from './rest-day-shell.js';
+import { _clkMS } from './wizard.js';
+import { PACE_CHART } from './cardio-progression.js';
+import { getWeekMonday } from './week-view-sections.js';
+import { _epley } from './day-detail.js';
+import { renderProgressScreen } from './lift-ledger-progress-screen.js';
+// end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 
 // ── PROGRESS SCREEN ──
@@ -439,3 +447,10 @@ function ledgerRows(exw, cfg){
   mains.sort((a,b)=>(b.cur-b.base)-(a.cur-a.base));
   return {mains, accessories};
 }
+
+// the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
+export {
+  EASY_MIN_RUNS, EASY_RPE_HI, EASY_RPE_LO, RACE_DIST_MI, RUN_CLASS_COLOR, RUN_CLASS_ORDER, _cutWeek, _fmtPaceShort,
+  _halfFromMileSec, _mileFromRecoverySec, _paceStrToSec, _progChipsHTML, _runClass, buildPaceChart, easyEffortWeekly,
+  ladderWeekly, plannedVsLogged, recoveryPaceWeekly, runsByClass, seedFromPriorPrograms, showProgressScreen,
+};
