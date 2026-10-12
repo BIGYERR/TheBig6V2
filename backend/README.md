@@ -1,6 +1,6 @@
 # Iron Asylum backend
 
-Full path: `/Users/CanasBangin/Desktop/TheBig6V2/backend`
+Full path: `/Users/CanasBangin/Developer/TheBig6V2/backend`
 
 A small Node (Express 5) service in TypeScript with four jobs today, all on one server and one origin:
 

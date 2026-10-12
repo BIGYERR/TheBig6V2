@@ -1,6 +1,6 @@
 # Iron Asylum: Angular app, four build paths and e2e
 
-Full path: `/Users/CanasBangin/Desktop/TheBig6V2/app`
+Full path: `/Users/CanasBangin/Developer/TheBig6V2/app`
 
 This folder packages Iron Asylum as an **Angular 22** app and wraps it with **Cordova (cordova-ios 8)** for the iOS
 Simulator and a connected iPhone. It also holds the lint setup, the unit and integration tests, and a Docker + Puppeteer e2e suite.
