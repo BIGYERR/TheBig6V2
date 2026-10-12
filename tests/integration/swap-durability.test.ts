@@ -1,9 +1,8 @@
-'use strict';
 // A swap stays made until the athlete undoes it. Ruling D181 (P-SWAPDURABLE, V222): R1 a swap and an undo fold into
 // the day's ia_hist_ record, R2 the per-exercise Log is a first touch, R3' no prune deletes a record below the freeze
 // cut, R5 the boot never re-applies a swap onto a day the freeze restored from ia_hist_ (the record is kept), and the
 // three things the fix must not do. The record is in the handoff and tests/measure/v222_rulings/p_swapdurable_ruling.md.
-// The chain claims of the same ruling (R4', the replay order) are in tests/integration/swaps.test.js.
+// The chain claims of the same ruling (R4', the replay order) are in tests/integration/swaps.test.ts.
 //
 // Fixture: Mario's config (commercial, support_strength, beginner, lift only, knee workaround, seed 76308), W5 Thu
 // Main, Barbell box squat 4×3. Oracle, typed by hand: the athlete's last live action (the name last chosen, the card
@@ -11,11 +10,11 @@
 // 4×8–12, the leg press carrying the goblet's dose, Front squat keeping 4×3 as a null row); the clocks by date
 // arithmetic (2026-08-24 is a Monday, so W5 Thu is 2026-09-24).
 //
-// This file runs a sample of each lattice; tests/sweeps/swaps.test.js runs the whole of each (504 cells, 42 add and skip
+// This file runs a sample of each lattice; tests/sweeps/swaps.test.ts runs the whole of each (504 cells, 42 add and skip
 // orderings, 36 untouched cells).
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const X = require('../support/swaps.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import * as X from '../support/swaps.ts';
 
 const { DUR } = X;
 const V = X.durableWorld();
@@ -23,7 +22,7 @@ const WD = DUR.DONOR + ' :: ' + DUR.DONOR_M, WG = DUR.GOB + ' :: ' + DUR.EXPG, W
 
 test('the hand clocks: 2026-08-24 is a Monday and W5 Thursday is 2026-09-24', () => {
   assert.equal(new Date(2026, 7, 24).getDay(), 1);
-  assert.equal(Math.floor((new Date(2026, 8, 24) - new Date(2026, 7, 24)) / 864e5 / 7) + 1, 5);
+  assert.equal(Math.floor((new Date(2026, 8, 24).getTime() - new Date(2026, 7, 24).getTime()) / 864e5 / 7) + 1, 5);
   assert.equal(new Date(2026, 8, 24).getDay(), 4);
 });
 

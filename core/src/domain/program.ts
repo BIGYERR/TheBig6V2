@@ -46,6 +46,10 @@ export type Weeks = Record<string, Week>;
 /** One week: all seven days, rest days included. */
 export type Week = Record<DayKey, Day>;
 
+/**
+ * A rest day or a training day. Each side names the other's fields as absent (`?: never`), so `day.rest`, `day.cardio`
+ * and `day.sections` read on any day without narrowing first, and the shape check refuses a day that mixes the two.
+ */
 export type Day = RestDay | TrainingDay;
 
 export interface RestDay {
@@ -53,6 +57,10 @@ export interface RestDay {
   dot: 'rest';
   tags: 'rest'[];
   rest: true;
+  cardio?: never;
+  sections?: never;
+  note?: never;
+  testLift?: never;
 }
 
 /** The dot the week view shows: the cardio's sport, or 'lift' on a day with no cardio. */
@@ -75,6 +83,7 @@ export interface TrainingDay {
   note?: string;
   /** Optional: only on a strength test day. */
   testLift?: TestLift;
+  rest?: never;
 }
 
 export interface Section {

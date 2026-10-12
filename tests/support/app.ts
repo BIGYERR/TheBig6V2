@@ -38,16 +38,27 @@ export interface App {
   window: Record<string, any>;
   ctx: VM.Context;
   flushTimers(n?: number): number;
-  /** Runs `code` in the app's context: reaches any name, exported or not. */
-  eval(code: string): unknown;
+  /**
+   * Runs `code` in the app's context: reaches any name, exported or not. What comes back is whatever the app's own
+   * (untyped) script returns, so it is typed any; a test asserts on it.
+   */
+  eval(code: string): any;
   fixtures: { HALF_MANNY: Cfg };
+  /**
+   * The engine. A config typed as Cfg gives a typed Program; a looser record (a test building a shape the wizard never
+   * writes, then editing the program in place) gives the app's untyped value.
+   */
   buildProgram(cfg: Cfg): Program;
+  buildProgram(cfg: Record<string, any>): any;
   /** With loadApp({ dom: true }): one element stub per id the app asked for. */
   els: Record<string, any>;
   /** With loadApp({ dom: true }): every document listener the app added, by event type. */
   docListeners: Record<string, ((e: any) => void)[]>;
-  /** Every other name the harness exports (EXPORT_NAMES), undefined when the app has no such name. */
-  [name: string]: unknown;
+  /**
+   * Every other name the harness exports (EXPORT_NAMES), undefined when the app has no such name: the app's own
+   * functions and tables, untyped until phase D moves them into @ia/core.
+   */
+  [name: string]: any;
 }
 
 interface Harness {
@@ -76,7 +87,7 @@ export function appScript(): string {
  * The declaration must start a line (`function name(`) and appear exactly once. It ends at the first closing brace
  * after which the text compiles by itself; a prefix that stops at an inner brace never does.
  */
-export function appFunction<F extends (...args: any[]) => unknown>(name: string, globals: Record<string, unknown> = {}): F {
+export function appFunction<F extends (...args: any[]) => unknown = (...args: any[]) => any>(name: string, globals: Record<string, unknown> = {}): F {
   const js = appScript();
   const starts = [...js.matchAll(new RegExp('(^|\\n)function ' + name + '\\s*\\(', 'g'))];
   const first = starts[0];

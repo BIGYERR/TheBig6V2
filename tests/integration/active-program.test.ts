@@ -1,4 +1,3 @@
-'use strict';
 // The active program: one program is active, one place says so, one button makes it so. Ruling D178 (P-ACTIVE, V221,
 // with its amendment and re-ruling: a stale pointer at boot, the legacy delete backfill). The record is in the handoff
 // and tests/measure/v221_rulings/p_active_ruling.md.
@@ -8,10 +7,19 @@
 // week by date arithmetic on the pinned clock. Every path is the app's own (init, setActive, archiveProg, deleteProg,
 // unarchiveProg, tabGo, doGenerate, renderProgList, renderWizardStep and the six guarded functions) in the VM harness,
 // each on a fresh app whose clock is pinned before the boot under test.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock, appScript, fixtures } = require('../support/app.js');
-const { stripComments } = require('../support/week-view.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import type { Cfg, Program, ProgramCfg } from '@ia/core';
+import { loadApp, pinClock, appScript, fixtures } from '../support/app.ts';
+import type { App, StorageStub } from '../support/app.ts';
+import { stripComments } from '../support/week-view.ts';
+
+/** The three places that name the active program: ia_active, activeProgId, activeProg.id. */
+interface Triple {
+  ia: string | null;
+  id: unknown;
+  pid: unknown;
+}
 
 // ── hand oracle ──────────────────────────────────────────────────────────────────────────────────────────────────
 const T_GUARD = 'No active program. Tap Set Active or build a new one.';
@@ -20,23 +28,23 @@ const T_SET = 'Active program updated';
 const RUN_L = 'Hit a Pace / Time Goal', BIKE_L = 'Build Cycling Base';
 const EXP_CARD = '[icon] ' + RUN_L + ' + [icon] ' + BIKE_L;
 const EXP_WIZ = '[icon] Run: ' + RUN_L + ' + [icon] Bike: ' + BIKE_L;
-const SET_BTN = id => '<button class="prog-action-btn primary" onclick="setActive(\'' + id + '\')">Set Active</button>';
+const SET_BTN = (id: string) => '<button class="prog-action-btn primary" onclick="setActive(\'' + id + '\')">Set Active</button>';
 const ACTIVE_LBL = '>Active ✓</button>';
 const START = '2026-09-07';   // a Monday; every fixture program starts here unless named otherwise
 
 // Local date math on the pinned clock: Sunday 2026-10-11, noon.
 const TODAY = new Date(2026, 9, 11, 12, 0, 0);
-const pad = n => String(n).padStart(2, '0');
-const iso = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
-const monOf = s => { const [y, m, d] = s.split('-').map(Number); const x = new Date(y, m - 1, d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); x.setHours(0, 0, 0, 0); return x; };
+const pad = (n: number) => String(n).padStart(2, '0');
+const iso = (d: Date) => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const addDays = (d: Date, n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const monOf = (s: string) => { const [y, m, d] = s.split('-').map(Number); const x = new Date(y, m - 1, d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); x.setHours(0, 0, 0, 0); return x; };
 const DAY0 = (() => { const d = new Date(TODAY); d.setHours(0, 0, 0, 0); return d; })();
-const dayDiff = (a, b) => Math.round((a - b) / 86400000);
-const DATE_WEEK = (startIso, tw) => { const diff = dayDiff(DAY0, monOf(startIso)); return diff < 0 ? 1 : Math.min(tw, Math.floor(diff / 7) + 1); };
+const dayDiff = (a: Date, b: Date) => Math.round((a.getTime() - b.getTime()) / 86400000);
+const DATE_WEEK = (startIso: string, tw: number) => { const diff = dayDiff(DAY0, monOf(startIso)); return diff < 0 ? 1 : Math.min(tw, Math.floor(diff / 7) + 1); };
 const MON_NOW = monOf(iso(DAY0));
 const T2_START = iso(MON_NOW), T2_RACE = iso(addDays(MON_NOW, 43));   // the test sits on Tuesday of week 7
 const T2_WEEK = Math.floor(dayDiff(monOf(T2_RACE), monOf(T2_START)) / 7) + 1;
-const plusD = n => iso(addDays(DAY0, n));
+const plusD = (n: number) => iso(addDays(DAY0, n));
 
 test('the date oracle agrees with itself: 2026-09-07 is a Monday, today sits in its week 5, the test lands in week 7', () => {
   assert.equal(new Date(2026, 8, 7).getDay(), 1);
@@ -50,44 +58,45 @@ test('the date oracle agrees with itself: 2026-09-07 is a Monday, today sits in 
 function app() { const IA = loadApp(); pinClock(IA, TODAY); return IA; }
 const IA0 = app();
 const HMF = fixtures.HALF_MANNY;
-const bld = (over, id, extra) => { const p = IA0.buildProgram(Object.assign({}, HMF, over)); p.id = id; p.name = id; p.startDate = START; return Object.assign(p, extra || {}); };
+const bld = (over: Partial<Cfg>, id: string, extra?: Record<string, unknown>) => { const p = IA0.buildProgram(Object.assign({}, HMF, over)); p.id = id; p.name = id; p.startDate = START; return Object.assign(p, extra || {}); };
 const LIFT = { cardioTypes: [], cardioGoals: {}, eventTargeted: false, primaryPath: 'lift', raceDate: undefined };
 const cP = [bld({ seed: 1000 }, 'P0'), bld({ seed: 1001 }, 'P1'), bld({ seed: 1002 }, 'P2', { archived: true })];
 const C_JSON = JSON.stringify(cP), C_JSON_P1A = JSON.stringify(cP.map(p => p.id === 'P1' ? Object.assign({}, p, { archived: true }) : p));
 const sP = [cP[0], bld(Object.assign({ seed: 1001 }, LIFT), 'P1'), cP[2]];   // P1 lift only: its grid differs from P0's
 const S_JSON = JSON.stringify(sP);
 const A1 = bld({ seed: 4242 }, 'A1', { archived: true, archivedAt: 1 }), L1P = bld({ seed: 4242 }, 'L1'), D1 = bld({ seed: 4242 }, 'D1');
-const LG = (() => { const p = bld({ seed: 4242 }, 'L2'); p.seed = p.cfg.seed; delete p.cfg.seed; return p; })();
-const runG = (id, extra) => ({ run: Object.assign({ id, label: id, mileBestMins: '10', mileBestSecs: '30', baselineDist: '5', baseline: '5mi' }, extra || {}) });
+const LG = (() => { const p = bld({ seed: 4242 }, 'L2'); p.seed = p.cfg.seed; delete (p.cfg as Partial<ProgramCfg>).seed; return p; })();
+const runG = (id: string, extra?: Record<string, string>) => ({ run: Object.assign({ id, label: id, mileBestMins: '10', mileBestSecs: '30', baselineDist: '5', baseline: '5mi' }, extra || {}) });
 const PG = runG('run_pace_goal', { targetMins: '9', targetSecs: '00' });
 const T2 = (() => {
   const p = IA0.buildProgram(Object.assign({}, HMF, { seed: 4343, cardioTypes: ['run'], cardioGoals: PG, eventTargeted: true, raceDate: T2_RACE }));
-  p.id = 'T2'; p.name = 'T2'; p.startDate = T2_START; p.seed = 4343; delete p.cfg.seed; delete p.cfg._testWeek; return p;
+  p.id = 'T2'; p.name = 'T2'; p.startDate = T2_START; p.seed = 4343; delete (p.cfg as Partial<ProgramCfg>).seed; delete p.cfg._testWeek; return p;
 })();
 const W_P0 = JSON.stringify([cP[0]]);
 const ELS = '(function(){var m={};var g=document.getElementById;document.getElementById=function(id){if(!m[id]){m[id]=g(id);m[id].id=id;}return m[id];};globalThis.__els=m;})()';
 const TOASTS = 'globalThis.__toasts=[];(function(){var o=showToast;showToast=function(m){__toasts.push(String(m));return o(m);};})()';
-const triple = (LS, ev) => ({ ia: LS.getItem('ia_active'), id: ev('activeProgId'), pid: ev('activeProg?activeProg.id:null') });
-const holds = s => [s.ia, s.id, s.pid].every(v => v === null) || (s.ia !== null && s.ia === s.id && s.id === s.pid);
-const seg = (html, id) => { const i = html.indexOf('id="pcard_' + id + '"'); if (i < 0) return ''; const j = html.indexOf('id="pcard_', i + 1); return html.slice(i, j < 0 ? html.length : j); };
-const ICON = s => s.replace(/<svg[^>]*>[\s\S]*?<\/svg>/g, '[icon]');
-const titles = o => Object.keys(o || {}).map(k => k + ':' + (o[k] && o[k].title)).join('|');
-const assertTriple = (s, want, msg) => {
+const triple = (LS: StorageStub, ev: App['eval']) => ({ ia: LS.getItem('ia_active'), id: ev('activeProgId'), pid: ev('activeProg?activeProg.id:null') });
+const holds = (s: Triple) => [s.ia, s.id, s.pid].every(v => v === null) || (s.ia !== null && s.ia === s.id && s.id === s.pid);
+const seg = (html: string, id: string) => { const i = html.indexOf('id="pcard_' + id + '"'); if (i < 0) return ''; const j = html.indexOf('id="pcard_', i + 1); return html.slice(i, j < 0 ? html.length : j); };
+const ICON = (s: string) => s.replace(/<svg[^>]*>[\s\S]*?<\/svg>/g, '[icon]');
+const titles = (o: any) => Object.keys(o || {}).map(k => k + ':' + (o[k] && o[k].title)).join('|');
+const assertTriple = (s: Triple, want: string | null, msg: string) => {
   assert.ok(holds(s), msg + ': the three stores agree (' + JSON.stringify(s) + ')');
   assert.equal(s.id, want, msg + ': they name ' + want);
 };
 
 // ── the invariant census: every path the athlete can take ────────────────────────────────────────────────────────
-function cWorld(json, active) {
+function cWorld(json: string, active: string | null) {
   const I = app(), LS = I.localStorage, ev = I.eval;
   LS.setItem('ia_programs', json); if (active === null) LS.removeItem('ia_active'); else LS.setItem('ia_active', active);
   ev('activeProgId=null;activeProg=null;');
-  const run = s => { try { ev(s); return ''; } catch (e) { return /openProg is not defined/.test(e.message) ? 'ABSENT' : 'THREW ' + e.message; } };
+  const run = (s: string) => { try { ev(s); return ''; } catch (e) { return /openProg is not defined/.test((e as Error).message) ? 'ABSENT' : 'THREW ' + (e as Error).message; } };
   return { I, LS, ev, run };
 }
-const reboot = w => { w.ev('activeProgId=null;activeProg=null;'); return w.run('init()'); };
+type World = ReturnType<typeof cWorld>;
+const reboot = (w: World) => { w.ev('activeProgId=null;activeProg=null;'); return w.run('init()'); };
 const WIZ_CFG = JSON.stringify(Object.assign({}, HMF, { seed: 4242 }));
-const CENSUS = [
+const CENSUS: [string, string, string, string | null, (w: World) => string, string | null, boolean?][] = [
   ['A01', 'boot with the pointer on a live program loads it', C_JSON, 'P0', w => w.run('init()'), 'P0'],
   ['A02', 'boot with no pointer loads nothing', C_JSON, null, w => w.run('init()'), null],
   ['A03', 'boot with a pointer to a missing program falls back to the first live one and writes it back', C_JSON, 'PX', w => w.run('init()'), 'P0'],
@@ -112,7 +121,7 @@ for (const [key, name, json, active, act, want, absent] of CENSUS) {
     const w = cWorld(json, active), note = act(w), s = triple(w.LS, w.ev);
     let wantId = want;
     if (want === 'NEW') {
-      const ids = JSON.parse(w.LS.getItem('ia_programs') || '[]').map(p => p.id).filter(x => !/^P[012]$/.test(x));
+      const ids = JSON.parse(w.LS.getItem('ia_programs') || '[]').map((p: Program) => p.id).filter((x: string) => !/^P[012]$/.test(x));
       assert.equal(ids.length, 1, key + ': one new program stored');
       wantId = ids[0];
     }
@@ -125,10 +134,10 @@ for (const [key, name, json, active, act, want, absent] of CENSUS) {
 function sWorld() {
   const I = app(), LS = I.localStorage, ev = I.eval, ctx = I.ctx;
   LS.setItem('ia_programs', S_JSON); LS.setItem('ia_active', 'P0'); ev(ELS);
-  const calls = [];
+  const calls: string[] = [];
   ['renderProgList', 'renderWeekView', 'showScreen', 'showToast'].forEach(n => {
     const f = ctx[n]; if (typeof f !== 'function') return;
-    ctx[n] = function (...a) { let t = n + '(' + (a.length ? String(a[0]) : '') + ')'; if (n === 'renderWeekView') t += '@' + ev('activeProg?activeProg.id:null'); calls.push(t); return f.apply(this, a); };
+    ctx[n] = function (this: unknown, ...a: unknown[]) { let t = n + '(' + (a.length ? String(a[0]) : '') + ')'; if (n === 'renderWeekView') t += '@' + ev('activeProg?activeProg.id:null'); calls.push(t); return f.apply(this, a); };
   });
   ev('activeProgId=null;activeProg=null;'); ev('init()'); I.flushTimers(20); calls.length = 0;
   const snap = () => JSON.stringify({ ia: LS.getItem('ia_active'), id: ev('activeProgId'), pid: ev('activeProg?activeProg.id:null'), cw: ev('currentWeek'), dk: ev('currentDayKey'), scr: ev('_curScreen'), stored: LS.getItem('ia_programs') });
@@ -165,7 +174,7 @@ test("Set Active shows the new program's own week at the week today's date falls
 for (const [key, name, id, toast] of [
   ['S2', 'Set Active on an archived program says "Restore this program first" once and moves nothing', 'P2', T_RESTORE],
   ['S3', 'Set Active on an unknown id is refused silently and moves nothing', 'PX', null],
-]) {
+] as const) {
   test(name, () => {
     // key: S2, S3
     const w = sWorld(); w.ev('currentWeek=2;currentDayKey="tue";showScreen("screenHome")'); w.calls.length = 0;
@@ -211,7 +220,7 @@ const Y = (() => {
   I.localStorage.setItem('ia_programs', JSON.stringify([p])); I.localStorage.setItem('ia_active', 'P0');
   ev('renderProgList()');
   const meta = (String(ev('__els.progList.innerHTML')).match(/<div class="prog-card-meta">([\s\S]*?)<\/div>/) || [])[1] || '';
-  const card = ICON(meta.split('<br>').pop()).trim();
+  const card = ICON(meta.split('<br>').pop() as string).trim();
   ev('Object.assign(WD,' + JSON.stringify(Object.assign({}, cfg, { primaryPath: 'both', name: 'X', startDate: plusD(7) })) + ");wizardStep=WIZARD_STEPS.indexOf('name');renderWizardStep();");
   const m = String(ev('__els.wizardBody.innerHTML')).match(/<span class="summary-key">Cardio<\/span><span class="summary-val">([\s\S]*?)<\/span><\/div>/);
   return { card, wiz: m ? ICON(m[1]).trim() : 'NOT FOUND' };
@@ -246,14 +255,15 @@ test('the old Open copy is gone from the code', () => {
 });
 
 // ── boot with a stale pointer ────────────────────────────────────────────────────────────────────────────────────
-function bootM(store) {
+function bootM(store: Record<string, string>) {
   const I = app(), LS = I.localStorage; LS.clear();
   if (store) for (const [k, v] of Object.entries(store)) LS.setItem(k, v);
   I.eval(ELS); I.eval(TOASTS); I.eval('activeProgId=null;activeProg=null;'); I.eval('init()'); I.flushTimers(30); return I;
 }
-const bsnap = I => Object.assign(triple(I.localStorage, I.eval), { scr: I.eval('_curScreen'), cw: I.eval('currentWeek'), dk: I.eval('currentDayKey') });
+const bsnap = (I: App) => Object.assign(triple(I.localStorage, I.eval), { scr: I.eval('_curScreen'), cw: I.eval('currentWeek'), dk: I.eval('currentDayKey') });
+type Snap = ReturnType<typeof bsnap>;
 const BA = (() => {
-  const I = bootM({ ia_programs: JSON.stringify([A1]), ia_active: 'A1' }); const out = { s0: bsnap(I) };
+  const I = bootM({ ia_programs: JSON.stringify([A1]), ia_active: 'A1' }); const out = { s0: bsnap(I) } as { s0: Snap; offers: boolean; label: boolean; t1: string[]; s1: Snap; s2: Snap };
   I.eval("unarchiveProg('A1')"); const sA = seg(String(I.eval('__els.progList&&__els.progList.innerHTML') || ''), 'A1');
   out.offers = sA.includes(SET_BTN('A1')); out.label = sA.includes(ACTIVE_LBL);
   I.eval('__toasts.length=0'); I.eval("tabGo('screenWeek')"); out.t1 = Array.from(I.eval('__toasts.slice()')); out.s1 = bsnap(I);
@@ -288,7 +298,7 @@ for (const [key, name, st, want, scr] of [
   ['Bc', 'boot with a pointer to a deleted program loads the live one and opens This Week', { ia_programs: JSON.stringify([L1P]), ia_active: 'GONE' }, 'L1', 'screenWeek'],
   ['Bd', 'boot with a pointer to an archived program loads the live one and opens This Week', { ia_programs: JSON.stringify([A1, L1P]), ia_active: 'A1' }, 'L1', 'screenWeek'],
   ['Be', 'boot with the pointer on the live program loads it and opens This Week', { ia_programs: JSON.stringify([L1P]), ia_active: 'L1' }, 'L1', 'screenWeek'],
-]) {
+] as const) {
   test(name, () => {
     // key: Bb, Bb2, Bc, Bd, Be
     const s = bsnap(bootM(st));
@@ -301,11 +311,11 @@ for (const [key, name, st, want, scr] of [
 for (const [key, name, succ, wantSeed, wantTW] of [
   ['L1', 'deleting the active program keeps a legacy successor\'s seed in storage and makes it active', LG, 4242, undefined],
   ['L2', 'deleting the active program keeps a legacy dated test successor\'s seed and test week in storage', T2, 4343, T2_WEEK],
-]) {
+] as const) {
   test(name, () => {
     // key: L1, L2
     const I = bootM({ ia_programs: JSON.stringify([D1, succ]), ia_active: 'D1' }); I.eval("deleteProg('D1')");
-    const st = JSON.parse(I.localStorage.getItem('ia_programs') || '[]').find(x => x.id === succ.id);
+    const st = JSON.parse(I.localStorage.getItem('ia_programs') || '[]').find((x: Program) => x.id === succ.id);
     const c = (st && st.cfg) || {};
     assert.equal(c.seed, wantSeed);
     assert.equal(c._testWeek, wantTW);
@@ -316,7 +326,7 @@ for (const [key, name, succ, wantSeed, wantTW] of [
 // ── the wizard landing ───────────────────────────────────────────────────────────────────────────────────────────
 test('building a program in the wizard makes it active, on week 1 of This Week, for six goal shapes', () => {
   // W1
-  const WB = (() => { const b = Object.assign({}, HMF); delete b.raceDate; delete b.cardioGoals; delete b.name; return b; })();
+  const WB = (() => { const b: Partial<Cfg> = Object.assign({}, HMF); delete b.raceDate; delete b.cardioGoals; delete b.name; return b; })();
   const ROWS = [
     ['lift only', Object.assign({}, WB, { seed: 5000, cardioTypes: [], cardioGoals: {}, primaryPath: 'lift', eventTargeted: false })],
     ['run_base, start -10d', Object.assign({}, WB, { seed: 5005, cardioTypes: ['run'], cardioGoals: runG('run_base'), eventTargeted: false, startDate: plusD(-10) })],
@@ -324,7 +334,7 @@ test('building a program in the wizard makes it active, on week 1 of This Week, 
     ['run_half, race +6w', Object.assign({}, WB, { seed: 5020, cardioTypes: ['run'], cardioGoals: runG('run_half'), eventTargeted: true, raceDate: plusD(45) })],
     ['run_pace_goal test +4w, start +10d', Object.assign({}, WB, { seed: 5040, cardioTypes: ['run'], cardioGoals: PG, eventTargeted: true, raceDate: plusD(31), startDate: plusD(10) })],
     ['run_half + bike_base, race +10w', Object.assign({}, WB, { seed: 5045, cardioTypes: ['run', 'bike'], cardioGoals: Object.assign(runG('run_half'), { bike: { id: 'bike_base', label: BIKE_L } }), eventTargeted: true, raceDate: plusD(73) })],
-  ];
+  ] as const;
   for (const [nm, cfg] of ROWS) {
     const I = app(), LS = I.localStorage, ev = I.eval;
     LS.setItem('ia_programs', W_P0); LS.setItem('ia_active', 'P0'); ev('activeProgId=null;activeProg=null;'); ev('init()'); I.flushTimers(20);

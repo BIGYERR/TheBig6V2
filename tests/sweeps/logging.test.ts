@@ -1,17 +1,18 @@
-'use strict';
 // The log form over whole lattices of programs: every run or bike day opened, rolled and logged the way the athlete
-// does it (tests/support/log-form.js). The hand-driven cases and a sample of each lattice are in
-// tests/integration/logging.test.js; this file is slow (tens of seconds), so CI runs it and the 60-second check does not.
+// does it (tests/support/log-form.ts). The hand-driven cases and a sample of each lattice are in
+// tests/integration/logging.test.ts; this file is slow (tens of seconds), so CI runs it and the 60-second check does not.
 //
 // Oracles are typed by hand: the faces from the plan (hmsFace, miFace), 0:00:00 and 0.00 on a free wheel, the stored
 // 47.22 for a 0:47:13 roll, the ruled form shapes (runFormShape, bikeShape, bikeCopyBad). The floors are measure's hand
 // counts of the classes each sweep must reach, so a sweep that silently shrinks fails.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { fixtures } = require('../support/app.js');
-const {
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { fixtures } from '../support/app.ts';
+import {
   DAYS, mkCfg, cardioOf, sportOf, weeksOf, hmsFace, logForm, readForm, runFormShape, runOpenFaces, bikeShape, bikeCopyBad,
-} = require('../support/log-form.js');
+} from '../support/log-form.ts';
+import type { SportSpec } from '../support/log-form.ts';
+import type { Program } from '@ia/core';
 
 const J = JSON.stringify;
 const C = logForm('sweep');
@@ -19,10 +20,10 @@ const HALF_CFG = fixtures.HALF_MANNY;
 
 test('every run day with a time or distance dose, over the run goals, opens on its plan in the ruled shape, writing nothing', () => {
   // HALF_MANNY plus 6 run goals x beginner, advanced (balanced, commercial, rest sun and wed, seed 24865)
-  const GOALS = [['run_5k', {}], ['run_10k', {}], ['run_half', {}], ['run_marathon', {}], ['run_pace_goal', { targetDist: '1.5', targetMins: '10', targetSecs: '30' }], ['run_base', {}]];
-  const progs = [['HALF_MANNY', HALF_CFG]];
+  const GOALS: [string, Record<string, string>][] = [['run_5k', {}], ['run_10k', {}], ['run_half', {}], ['run_marathon', {}], ['run_pace_goal', { targetDist: '1.5', targetMins: '10', targetSecs: '30' }], ['run_base', {}]];
+  const progs: [string, object][] = [['HALF_MANNY', HALF_CFG]];
   for (const g of GOALS) for (const ex of ['beginner', 'advanced']) progs.push([g[0] + ' ' + ex, mkCfg([['run', g[0], g[1]]], 'balanced', ex, 'commercial', 24865)]);
-  const n = { time: 0, dist: 0 };
+  const n: Record<string, number> = { time: 0, dist: 0 };
   for (const [name, cfg] of progs) {
     const p = C.build(cfg);
     C.use(p);
@@ -37,7 +38,7 @@ test('every run day with a time or distance dose, over the run goals, opens on i
         C.open(w, d);
         const tag = name + ' W' + w + ' ' + d + ' ' + dose.k;
         assert.deepEqual(runFormShape(dose.k, readForm(C.form()), dose), [], tag);
-        const faces = {};
+        const faces: Record<string, string> = {};
         C.wheels().forEach((wh) => { faces[wh.hid] = C.face(wh); });
         assert.deepEqual(faces, runOpenFaces(dose.k, dose), tag);
         assert.equal(C.inputs(), 0, tag);
@@ -50,8 +51,8 @@ test('every run day with a time or distance dose, over the run goals, opens on i
 });
 
 test('every bike form, over the bike goals, injured multi-sport programs and swapped-in days, is one wheel that opens on 0:00:00 writing nothing', () => {
-  const forms = { a: [], b: [], c: [] };
-  const open = (grp, name, p, pick, stored) => {
+  const forms: Record<string, { tag: string; k: string; ct: boolean; shape: string[]; copy: string[]; face: string | null; inputs: number; same: boolean }[]> = { a: [], b: [], c: [] };
+  const open = (grp: string, name: string, p: Program, pick: (x: any) => boolean, stored?: Record<string, string>) => {
     C.use(p);
     C.unforce();
     for (const w of weeksOf(p)) {
@@ -75,7 +76,7 @@ test('every bike form, over the bike goals, injured multi-sport programs and swa
     for (const eq of ['commercial', 'home_basic']) for (const sd of [76308, 24865]) open('a', [g, f, ex, eq, sd].join('|'), C.build(mkCfg([['bike', g]], f, ex, eq, sd)), (x) => sportOf(x) === 'bike');
   }
   // (b) four multi-sport pairs with a knee or a shoulder injury, where Cross-Train bike days appear
-  const PAIRS = [[['run', 'run_half'], ['bike', 'bike_base']], [['run', 'run_5k'], ['bike', 'bike_ftp']], [['swim', 'swim_mile'], ['bike', 'bike_base']], [['swim', 'swim_base'], ['bike', 'bike_50']]];
+  const PAIRS: SportSpec[][] = [[['run', 'run_half'], ['bike', 'bike_base']], [['run', 'run_5k'], ['bike', 'bike_ftp']], [['swim', 'swim_mile'], ['bike', 'bike_base']], [['swim', 'swim_base'], ['bike', 'bike_50']]];
   for (const pr of PAIRS) {
     for (const inj of [{ region: 'knee', tier: 'protect' }, { region: 'shoulder', tier: 'protect' }]) {
       open('b', pr.map((s) => s[1]).join('+') + '|' + inj.region, C.build(Object.assign(mkCfg(pr, 'balanced', 'intermediate', 'commercial', 76308), { injury: inj })), (x) => sportOf(x) === 'bike');
@@ -102,11 +103,11 @@ test('every bike form, over the bike goals, injured multi-sport programs and swa
 test('every time wheel on a run or bike day opens on its plan or 0:00:00 writing nothing, and a free one rolled to 0:47:13 stores 47.22 through Done', () => {
   // HALF_MANNY plus 11 goals x 2 focus x 2 experience x 2 seeds (commercial). Floor: 1,755 free time wheels, measure's
   // count of the hms forms that opened on the dash before the zero face (D215).
-  const GOALS = [['bike', 'bike_century'], ['bike', 'bike_50'], ['bike', 'bike_base'], ['bike', 'bike_ftp'], ['bike', 'bike_cals'],
+  const GOALS: SportSpec[] = [['bike', 'bike_century'], ['bike', 'bike_50'], ['bike', 'bike_base'], ['bike', 'bike_ftp'], ['bike', 'bike_cals'],
     ['run', 'run_5k'], ['run', 'run_10k'], ['run', 'run_half'], ['run', 'run_marathon'], ['run', 'run_base'], ['run', 'run_pace_goal']];
-  const progs = [['HALF_MANNY', HALF_CFG]];
+  const progs: [string, object][] = [['HALF_MANNY', HALF_CFG]];
   for (const g of GOALS) for (const f of ['balanced', 'strength']) for (const ex of ['beginner', 'advanced']) for (const sd of [76308, 24865]) progs.push([g[1] + '|' + f + '|' + ex + '|' + sd, mkCfg([g], f, ex, 'commercial', sd)]);
-  const field = { log_bike_mins: 'bike_mins', log_run_mins: 'run_mins' };
+  const field: Record<string, string> = { log_bike_mins: 'bike_mins', log_run_mins: 'run_mins' };
   const n = { open: 0, plan: 0, tail: 0 };
   for (const [name, cfg] of progs) {
     const p = C.build(cfg);
@@ -143,7 +144,7 @@ test('every time wheel on a run or bike day opens on its plan or 0:00:00 writing
 test('no miles or rep time wheel on any run day of the run-goal lattice carries a dash row', () => {
   // 6 run goals x 2 focus x 2 experience x 2 seeds, HALF_MANNY, a run + bike + swim program at both seeds, and three
   // injured run + bike programs: 54 programs. Floors: 1,908 miles wheels and 48 rep time wheels (measure's counts).
-  const progs = [['HALF_MANNY', HALF_CFG]];
+  const progs: [string, object][] = [['HALF_MANNY', HALF_CFG]];
   for (const g of ['run_5k', 'run_10k', 'run_half', 'run_marathon', 'run_base', 'run_pace_goal']) {
     for (const f of ['balanced', 'strength']) for (const ex of ['beginner', 'advanced']) for (const sd of [76308, 24865]) progs.push([g + '|' + f + '|' + ex + '|' + sd, mkCfg([['run', g]], f, ex, 'commercial', sd)]);
   }
@@ -152,7 +153,7 @@ test('no miles or rep time wheel on any run day of the run-goal lattice carries 
     progs.push(['injury ' + reg, Object.assign(mkCfg([['run', 'run_10k'], ['bike', 'bike_base']], 'balanced', 'intermediate', 'commercial', 76308), { injury: { region: reg, tier: 'protect' } })]);
   }
   assert.equal(progs.length, 54);
-  const n = { dist: 0, rept: 0 };
+  const n: Record<string, number> = { dist: 0, rept: 0 };
   for (const [name, cfg] of progs) {
     const p = C.build(cfg);
     C.use(p);

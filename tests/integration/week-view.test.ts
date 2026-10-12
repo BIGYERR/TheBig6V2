@@ -1,21 +1,20 @@
-'use strict';
 // The week view and closing a day. Rulings: D173 (P-RECOVBANNER: the week view stops explaining the placement; the
 // placement and its program field stay) and D179 (P-DONENAV: Done, Skip and Mark Done ✓ close the day and land on This
 // Week, with its amendment: the hero status copy, the skipped strip ✕, the rest timer on a close, no Done toast under
 // the pop-up). The record is in the handoff and tests/measure/v220_rulings/, tests/measure/v221_rulings/.
 //
 // The day-close claims run here on a sample of HALF_MANNY's 70 training days (every seventh, and two whole weeks for
-// the hero and the strip); tests/sweeps/week-view.test.js runs every training day.
+// the hero and the strip); tests/sweeps/week-view.test.ts runs every training day.
 //
 // Oracles, typed by hand: the D36 placement sentence; the two hero strings and the Skip toast label from the D179
 // amendment; the weekday names; the cell's day of month by date arithmetic; the pace wheel's row table; the idle rest
 // timer print. The app is driven through its own handlers (handleDayStatus, openDayKey, closeDetail, renderWeekView,
 // iaWheelInit, rtToggleBtn, popClose) in the VM harness, with a virtual clock that runs every timer callback.
 process.env.TZ = 'America/New_York';
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock, appScript, fixtures } = require('../support/app.js');
-const W = require('../support/week-view.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadApp, pinClock, appScript, fixtures } from '../support/app.ts';
+import * as W from '../support/week-view.ts';
 
 // ── the recovery banner is gone; the placement trace stays (D173) ────────────────────────────────────────────────
 const D36 = 'Your hinge day rides a speed session so hard days stay hard. Nothing heavy lands the day before your long run.';
@@ -52,7 +51,7 @@ test('week 1 renders its stats block with no banner, no recycle glyph and no sen
     liftingFocus: 'balanced', experience: 'intermediate', ageBracket: '18-35', equipment: 'home_full', unit: 'lbs', restDays: ['sun', 'wed'],
     days: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'], bench: 185, squat: 255, deadlift: 315, startDate: '2026-09-21', seed: 24865,
   };
-  const sentences = s => s.split('. ').map(x => x.replace(/\.$/, '')).filter(Boolean);
+  const sentences = (s: string) => s.split('. ').map(x => x.replace(/\.$/, '')).filter(Boolean);
   for (const [name, cfg] of [['HALF_MANNY', fixtures.HALF_MANNY], ['NSW pace test', NSW_TEST]]) {
     const IA = loadApp({ dom: true });
     pinClock(IA, new Date(2026, 9, 11, 12, 0, 0));
@@ -73,7 +72,7 @@ test('week 1 renders its stats block with no banner, no recycle glyph and no sen
 // ── closing a day (D179) ─────────────────────────────────────────────────────────────────────────────────────────
 const E = W.weekEnv();
 const SAMPLE = E.TRAIN.filter((_, i) => i % 7 === 0);
-const allPass = (q, k, n) => {
+const allPass = (q: W.Tally, k: string, n: number) => {
   const t = q.get(k);
   assert.equal(t.fail, 0, k + ' failed: ' + t.examples.join(' | '));
   assert.equal(t.pass, n, k + ' ran ' + t.pass + ' cases, want ' + n);
@@ -181,7 +180,7 @@ test('no render in these lattices shows a day as before signup', () => {
 
 // ── the close copy in the source (comments stripped) ─────────────────────────────────────────────────────────────
 const OLD_SKIP = 'Skipped ✕ — the week moves on';
-const body = name => { const i = SRC.indexOf('function ' + name + '('), k = SRC.indexOf('\nfunction ', i + 1); return i < 0 ? '' : SRC.slice(i, k < 0 ? undefined : k); };
+const body = (name: string) => { const i = SRC.indexOf('function ' + name + '('), k = SRC.indexOf('\nfunction ', i + 1); return i < 0 ? '' : SRC.slice(i, k < 0 ? undefined : k); };
 
 test('the old em-dash Skip label survives only in resolveReminder', () => {
   // K1

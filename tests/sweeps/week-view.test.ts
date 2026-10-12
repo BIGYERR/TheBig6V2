@@ -1,16 +1,15 @@
-'use strict';
 // Closing a day, every training day of HALF_MANNY (the D179 ruling's "70 Done taps"). The same claims as
-// tests/integration/week-view.test.js, which runs them on a sample; this file runs the whole lattice. CI runs it, the
+// tests/integration/week-view.test.ts, which runs them on a sample; this file runs the whole lattice. CI runs it, the
 // 60-second check does not.
 process.env.TZ = 'America/New_York';
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const W = require('../support/week-view.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import * as W from '../support/week-view.ts';
 
 const RULING_TRAIN = 70;
 const E = W.weekEnv();
 const SUB = E.TRAIN.filter((_, i) => i % 7 === 0);
-const allPass = (q, k, n) => {
+const allPass = (q: W.Tally, k: string, n: number) => {
   const t = q.get(k);
   assert.equal(t.fail, 0, k + ' failed: ' + t.examples.join(' | '));
   assert.equal(t.pass, n, k + ' ran ' + t.pass + ' cases, want ' + n);

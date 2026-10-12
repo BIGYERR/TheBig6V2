@@ -1,10 +1,9 @@
-'use strict';
 // The pop-ups: what they say, which icon they show, and which line the draw may pick. Rulings D174 (P-EMOJI: emoji
 // stay on the celebration tiers, workout, streak, season and Wildcard; reminders and injury calls show the notebook,
 // shield and warning icons; the chrome outside the pop-up shows icons; the dash fixes in the copy) and D175
 // (P-POPCOND: the pop-up judges the day the athlete trained, not the minute he tapped).
 //
-// D174 reads the app's source through the emoji scanner (tests/support/pop-ups.js) and renders popFire and four chrome
+// D174 reads the app's source through the emoji scanner (tests/support/pop-ups.ts) and renders popFire and four chrome
 // sites in the VM. D175 draws from the real popPick, fireCompletionPopup and maybeShowReminder with the clock pinned and
 // Math.random pinned to (k + 0.5) / 64 for k = 0..63 with the rotation memory cleared before each draw, so the eligible
 // set is read exactly (the pool has at most 27 lines).
@@ -12,10 +11,29 @@
 // Oracles are typed by hand: the ruled copy, the tag table (which workout lines need a weekend, a morning, a cardio day
 // or a lift day), its eligible-size table, and a calendar (2026-09-14 is a Monday). Every emoji and typographic mark the
 // D174 tests look for is built in code from its code point (CP), so a glyph typed here can never satisfy a scan.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp } = require('../support/app.js');
-const P = require('../support/pop-ups.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import type { DayKey } from '@ia/core';
+import { loadApp } from '../support/app.ts';
+import * as P from '../support/pop-ups.ts';
+
+/** What the trained day was, as the D175 tag table reads it. */
+interface Cell {
+  known: boolean;
+  weekend: boolean;
+  hour: number;
+  today: boolean;
+  cardio: boolean;
+  lift: boolean;
+}
+/** A hand-built program for the draws: weeks of days the app reads (rest days, cardio, sections). */
+interface HandProg {
+  id: string;
+  name: string;
+  startDate: string | null;
+  totalWeeks: number;
+  weeks: Record<number, Record<string, any>>;
+}
 
 const { CP, BS, MD, LQ, RQ, cnt } = P;
 const J = JSON.stringify;
@@ -25,7 +43,7 @@ const IA = loadApp();
 const SRC = IA.html;
 const S = P.scan(SRC);
 const A = P.classify(S);
-const T = (s, ...cps) => s + (cps.length ? ' ' + CP(...cps) : '');
+const T = (s: string, ...cps: number[]) => s + (cps.length ? ' ' + CP(...cps) : '');
 
 test('the emoji scanner reads the whole app: over 10,000 literals, both icon tables, no pictograph in code', () => {
   const literals = S.toks.filter((t) => t.type !== 'code').length;
@@ -44,7 +62,7 @@ test('every allowance resolves its anchor once and allows at least one emoji', (
 });
 
 test('the emoji allowlist lets a celebration line through and catches the nudge and the reminder pool', () => {
-  const firstStr = (ext) => {
+  const firstStr = (ext: [number, number] | null | undefined) => {
     if (!ext) return null;
     for (let i = P.tokIdxFrom(S, ext[0]); i < S.toks.length && S.toks[i].a < ext[1]; i++) if (S.toks[i].type === 'str') return S.toks[i];
     return null;
@@ -77,10 +95,10 @@ const EDITED = [
   ['reminder', 4, 'You disappeared on a workout. Your record, your call. Fix it.'],
   ['season', 3, T('You saw it through. Rare as fuck. Most quit at week two like little bitches.', 0x1F414)],
   ['season', 7, T('You outlasted every weak ass excuse your brain coughed up. Respect, animal.', 0x1F9E0, 0x274C)],
-];
-const strs = [];
+] as const;
+const strs: string[] = [];
 S.toks.forEach((t, ti) => { if (t.type === 'str') strs.push(S.tokText(ti)); });
-const nTok = (s) => strs.filter((x) => x === s).length;
+const nTok = (s: string) => strs.filter((x) => x === s).length;
 
 test('the nine edited pop-up lines read exactly as ruled, once each, and the reminder line carries no emoji', () => {
   for (const [pool, i, line] of EDITED) {
@@ -106,7 +124,7 @@ test('the short-gap reminder line "This one got away from you" is gone', () => {
 
 test('the wizard seed caption reads Estimated from "the program". Edit if you know better., with no em-dash', () => {
   const L = P.lineOfNeedle(S, 'Estimated from ');
-  assert.ok(!L.err, L.err);
+  assert.ok(!L.err, L.err as string);
   const a = L.line.indexOf('`');
   const b = L.line.lastIndexOf('`');
   const tpl = a >= 0 && b > a ? L.line.slice(a, b + 1) : '';
@@ -120,7 +138,7 @@ test('the reminder pool is five plain ASCII lines', () => {
   const pools = P.literalAt(S, 'const POP_POOLS=');
   assert.ok(pools);
   assert.equal(pools.reminder.length, 5);
-  assert.deepEqual(pools.reminder.map(P.popText).filter((s) => [...String(s)].some((ch) => ch.codePointAt(0) > 0x7F)), []);
+  assert.deepEqual(pools.reminder.map(P.popText).filter((s: unknown) => [...String(s)].some((ch) => (ch.codePointAt(0) as number) > 0x7F)), []);
 });
 
 test('the reminder pop-up shows the notebook icon', () => {
@@ -140,23 +158,23 @@ test('the injury check-ins show the shield, or the warning when trending worse',
 
 /** popFire with #popIcon recording every innerHTML and textContent write, and asyIcon spied (not replaced). */
 function popIconWrites() {
-  let els = {};
-  const mk = (id) => {
-    const w = [];
+  let els: Record<string, any> = {};
+  const mk = (id: string) => {
+    const w: [string, string][] = [];
     let html = '';
     let text = '';
     const e = { id, className: '', style: {}, offsetWidth: 0, writes: w, classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
-      appendChild(c) { return c; }, removeChild(c) { return c; }, remove() {}, setAttribute() {}, addEventListener() {} };
+      appendChild(c: unknown) { return c; }, removeChild(c: unknown) { return c; }, remove() {}, setAttribute() {}, addEventListener() {} };
     Object.defineProperty(e, 'innerHTML', { get() { return html; }, set(v) { html = String(v); w.push(['html', html]); } });
     Object.defineProperty(e, 'textContent', { get() { return text; }, set(v) { text = String(v); w.push(['text', text]); } });
     return e;
   };
   const doc = IA.window.document;
   const orig = doc.getElementById;
-  doc.getElementById = (id) => (els[id] = els[id] || mk(id));
+  doc.getElementById = (id: string) => (els[id] = els[id] || mk(id));
   IA.eval('(function(){ if(globalThis.__popSpy) return; globalThis.__popSpy=1; var real = asyIcon; globalThis.__popCalls = []; asyIcon = function(k, s){ globalThis.__popCalls.push([String(k), s]); return real(k, s); }; })()');
   const popFire = IA.eval('popFire');
-  const fire = (tier, opts) => {
+  const fire = (tier: string, opts: Record<string, string>) => {
     els = {};
     IA.eval('__popCalls.length = 0');
     popFire(tier, opts);
@@ -164,14 +182,14 @@ function popIconWrites() {
   };
   return { fire, restore: () => { doc.getElementById = orig; } };
 }
-const svgOnly = (r) => r.w.length === 1 && r.w[0][0] === 'html' && r.w[0][1].indexOf('<svg') === 0;
+const svgOnly = (r: { w: [string, string][] }) => r.w.length === 1 && r.w[0][0] === 'html' && r.w[0][1].indexOf('<svg') === 0;
 
 test('a reminder pop-up writes the notebook SVG into its icon, not text', () => {
   const p = popIconWrites();
   const r = p.fire('reminder', { msg: 'm', sub: 's', dismiss: 'ok' });
   p.restore();
   assert.ok(svgOnly(r), J(r.w).slice(0, 120));
-  assert.ok(r.calls.some((c) => c[0] === 'notebook' && c[1] === 52), J(r.calls));
+  assert.ok(r.calls.some((c: [string, unknown]) => c[0] === 'notebook' && c[1] === 52), J(r.calls));
 });
 
 test('an injury pop-up writes the shield or warning SVG into its icon', () => {
@@ -187,15 +205,15 @@ test('the workout, streak and season pop-ups show the party popper, fire and tro
   for (const [tier, e] of [['workout', CP(0x1F389)], ['streak', CP(0x1F525)], ['season', CP(0x1F3C6)]]) {
     const r = p.fire(tier, { msg: 'm', dismiss: 'ok' });
     assert.deepEqual(r.w, [['text', e]], tier);
-    assert.ok(!r.calls.some((c) => P.pictos(c[0]).length), tier + ' ' + J(r.calls));
+    assert.ok(!r.calls.some((c: [string, unknown]) => P.pictos(c[0]).length), tier + ' ' + J(r.calls));
   }
   p.restore();
 });
 
 test('the chrome shows icons where it had emoji: the seed caption and header, the log nudge, the archived chip', () => {
-  const clean = (r) => P.pictos(r).length === 0;
+  const clean = (r: string) => P.pictos(r).length === 0;
   const Q = LQ + 'Old Program' + RQ;
-  const cases = [
+  const cases: [string, string, string, (L: string) => string, (r: string) => boolean][] = [
     ['seed caption', 'Estimated from ', "asyIcon('chart',",
       (L) => { const a = L.indexOf('`'); const b = L.lastIndexOf('`'); return '(function(s){ return ' + L.slice(a, b + 1) + '; })({progName:"Old Program"})'; },
       (r) => { const k = r.indexOf('</svg> Estimated from ' + Q + '. Edit if you know better.</div>'); return k > 0 && r.lastIndexOf('<svg', k) > 0 && clean(r); }],
@@ -223,18 +241,18 @@ test('the chrome shows icons where it had emoji: the seed caption and header, th
 
 // ── D175: which workout line the pop-up may draw ─────────────────────────────────────────────────────────────────────
 // The tag table: workout pool index -> what the trained day must be. The other 21 lines are untagged and always open.
-const HAND_TAGS = { 1: { when: 'weekend' }, 3: { when: 'morning' }, 8: { when: 'weekend', type: 'cardio' }, 15: { when: 'weekend' }, 25: { type: 'lift' }, 26: { type: 'lift' } };
+const HAND_TAGS: Record<number, { when?: string; type?: string }> = { 1: { when: 'weekend' }, 3: { when: 'morning' }, 8: { when: 'weekend', type: 'cardio' }, 15: { when: 'weekend' }, 25: { type: 'lift' }, 26: { type: 'lift' } };
 const TAGGED = [1, 3, 8, 15, 25, 26];
 const UNTAGGED = [...Array(27).keys()].filter((i) => !TAGGED.includes(i));
-const TAG_ANCHOR = { 1: 'hangover said stay down', 3: "half the city's still asleep", 8: 'talk all the shit you want at brunch',
+const TAG_ANCHOR: Record<number, string> = { 1: 'hangover said stay down', 3: "half the city's still asleep", 8: 'talk all the shit you want at brunch',
   15: "showed up hungover, didn't die", 25: 'dead ugly on that last set', 26: 'ten minutes lifting' };
 // The day shapes as the ruling's lens reads them: cardio = the day has a cardio session; lift = a section that is not
 // core, hip, mobility or taper and has items.
-const SHAPE = { liftOnly: { cardio: false, lift: true }, runLift: { cardio: true, lift: true }, runMob: { cardio: true, lift: false }, runOnly: { cardio: true, lift: false } };
+const SHAPE: Record<string, { cardio: boolean; lift: boolean }> = { liftOnly: { cardio: false, lift: true }, runLift: { cardio: true, lift: true }, runMob: { cardio: true, lift: false }, runOnly: { cardio: true, lift: false } };
 const SHAPES = Object.keys(SHAPE);
 // Eligible lines per shape, typed: weekday >= 9h, weekday < 9h, weekend >= 9h, weekend < 9h (the trained day is today).
-const COUNT_1C = { liftOnly: [23, 24, 25, 26], runLift: [23, 24, 26, 27], runMob: [21, 22, 24, 25], runOnly: [21, 22, 24, 25] };
-function handElig(i, cell) {
+const COUNT_1C: Record<string, number[]> = { liftOnly: [23, 24, 25, 26], runLift: [23, 24, 26, 27], runMob: [21, 22, 24, 25], runOnly: [21, 22, 24, 25] };
+function handElig(i: number, cell: Cell) {
   const t = HAND_TAGS[i];
   if (!t) return true;
   if (!cell.known) return false;
@@ -244,33 +262,33 @@ function handElig(i, cell) {
   if (t.type === 'lift' && !cell.lift) return false;
   return true;
 }
-const handSet = (cell) => [...Array(27).keys()].filter((i) => handElig(i, cell));
+const handSet = (cell: Cell) => [...Array(27).keys()].filter((i) => handElig(i, cell));
 
 // The hand calendar. 2026-09-14 is a Monday. Week k (1..4) holds one shape on wed, sat and sun.
-const HAND_WEEK = { liftOnly: 1, runLift: 2, runMob: 3, runOnly: 4 };
-const DATES = { 1: { wed: [2026, 9, 16], sat: [2026, 9, 19], sun: [2026, 9, 20] }, 2: { wed: [2026, 9, 23], sat: [2026, 9, 26], sun: [2026, 9, 27] },
+const HAND_WEEK: Record<string, number> = { liftOnly: 1, runLift: 2, runMob: 3, runOnly: 4 };
+const DATES: Record<string, Record<string, number[]>> = { 1: { wed: [2026, 9, 16], sat: [2026, 9, 19], sun: [2026, 9, 20] }, 2: { wed: [2026, 9, 23], sat: [2026, 9, 26], sun: [2026, 9, 27] },
   3: { wed: [2026, 9, 30], sat: [2026, 10, 3], sun: [2026, 10, 4] }, 4: { wed: [2026, 10, 7], sat: [2026, 10, 10], sun: [2026, 10, 11] } };
 // A later tap: wed + 3 = a Saturday, sat + 2 and sun + 1 = a Monday (a tap-clock weekend points the wrong way both ways).
-const PAST = { 1: { wed: [2026, 9, 19], sat: [2026, 9, 21], sun: [2026, 9, 21] }, 2: { wed: [2026, 9, 26], sat: [2026, 9, 28], sun: [2026, 9, 28] },
+const PAST: Record<string, Record<string, number[]>> = { 1: { wed: [2026, 9, 19], sat: [2026, 9, 21], sun: [2026, 9, 21] }, 2: { wed: [2026, 9, 26], sat: [2026, 9, 28], sun: [2026, 9, 28] },
   3: { wed: [2026, 10, 3], sat: [2026, 10, 5], sun: [2026, 10, 5] }, 4: { wed: [2026, 10, 10], sat: [2026, 10, 12], sun: [2026, 10, 12] } };
-const WEEKEND_KEY = { wed: false, sat: true, sun: true };
-const DOW = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
-const OFF = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
-const WEEKDAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const WEEKEND_KEY: Record<string, boolean> = { wed: false, sat: true, sun: true };
+const DOW: Record<string, number> = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
+const OFF: Record<string, number> = { mon: 0, tue: 1, wed: 2, thu: 3, fri: 4, sat: 5, sun: 6 };
+const WEEKDAYS: DayKey[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const PID = 'popups';
-const cl = (o) => JSON.parse(JSON.stringify(o));
+const cl = (o: unknown) => JSON.parse(JSON.stringify(o));
 
 const CORE = { label: 'Core', core: true, coreHeader: 'Core', items: [{ name: 'Plank', rx: '3×30s' }] };
 const HIP = { label: 'Hip', hip: true, items: [{ name: 'Clamshell', rx: '2×15' }] };
-const RUN = (sub) => ({ type: 'run', subtype: sub, label: 'Run' });
-const DAY = {
+const RUN = (sub: string) => ({ type: 'run', subtype: sub, label: 'Run' });
+const DAY: Record<string, unknown> = {
   liftOnly: { title: 'Upper Strength', sections: [{ label: 'Main', items: [{ name: 'Bench press', rx: '4×5' }] }, CORE] },
   runLift: { title: 'Easy Run + Primer', cardio: RUN('easy'), sections: [{ label: 'Race-week Primer', items: [{ name: 'Goblet squat', rx: '2×8' }] }, CORE] },
   runMob: { title: 'Long Run', cardio: RUN('long'), sections: [{ label: 'Post-run mobility', items: [{ name: 'Couch stretch', rx: '2×45s' }] }, CORE, HIP, { label: 'Main', items: [] }] },
   runOnly: { title: 'Shakeout', cardio: RUN('shakeout'), sections: [] },
 };
-function handProg() {
-  const weeks = {};
+function handProg(): HandProg {
+  const weeks: HandProg['weeks'] = {};
   for (let w = 1; w <= 5; w++) { weeks[w] = {}; WEEKDAYS.forEach((d) => { weeks[w][d] = { rest: true, title: 'Rest', sections: [] }; }); }
   SHAPES.forEach((sh) => ['wed', 'sat', 'sun'].forEach((d) => { weeks[HAND_WEEK[sh]][d] = cl(DAY[sh]); }));
   weeks[5].sat = cl(DAY.runOnly);
@@ -279,12 +297,12 @@ function handProg() {
 }
 // The reminder program: every day an Easy Run + Lower from Monday 2026-09-14; the clock Thursday 2026-10-01 (W3 thu).
 const REM_TITLE = 'Easy Run + Lower';
-function remProg() {
-  const weeks = {};
+function remProg(): HandProg {
+  const weeks: HandProg['weeks'] = {};
   for (let w = 1; w <= 4; w++) { weeks[w] = {}; WEEKDAYS.forEach((d) => { weeks[w][d] = cl(DAY.runLift); weeks[w][d].title = REM_TITLE; }); }
   return { id: PID, name: 'POPR', startDate: '2026-09-14', totalWeeks: 4, weeks };
 }
-const comp = (keys) => { const c = {}; keys.forEach((k) => { c[k] = { title: REM_TITLE, ts: 1, status: 'complete' }; }); return c; };
+const comp = (keys: string[]) => { const c: Record<string, { title: string; ts: number; status: string }> = {}; keys.forEach((k) => { c[k] = { title: REM_TITLE, ts: 1, status: 'complete' }; }); return c; };
 const WK = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const COMP_GAP3 = comp(WK.map((d) => 'w1_' + d).concat(WK.map((d) => 'w2_' + d))); // W3 mon, tue, wed unresolved
 const COMP_GAP8 = comp(WK.map((d) => 'w1_' + d).concat(['w2_mon', 'w2_tue'])); // W2 wed .. W3 wed unresolved
@@ -294,25 +312,25 @@ const REM_FIXED = 'More than a week off. Mark what happened, then ease back in. 
 const REM_ANCHOR = ['you ghosted a session', 'left a day hanging unmarked', 'unfinished business sitting on your calendar', "that day didn't log itself", 'you disappeared on a workout'];
 
 // The ruling's lens, typed, for the real HALF_MANNY days.
-function lens(day) {
+function lens(day: any) {
   const c = !!day.cardio;
-  const raw = (day.sections || []).filter((s) => !s.core && !s.hip && (s.items || []).length);
-  const lift = raw.filter((s) => !/mobility|taper/i.test(s.label || ''));
+  const raw = (day.sections || []).filter((s: any) => !s.core && !s.hip && (s.items || []).length);
+  const lift = raw.filter((s: any) => !/mobility|taper/i.test(s.label || ''));
   if (c && lift.length) return 'runLift';
   if (c && raw.length) return 'runMob';
   if (c) return 'runOnly';
   if (lift.length) return 'liftOnly';
   return 'UNPLACEABLE';
 }
-function monOf(iso) {
+function monOf(iso: string) {
   const p = iso.split('-').map(Number);
   const d = new Date(p[0], p[1] - 1, p[2]);
   const w = d.getDay();
   d.setDate(d.getDate() - (w === 0 ? 6 : w - 1));
   return d;
 }
-const tup = (d) => [d.getFullYear(), d.getMonth() + 1, d.getDate()];
-const addDays = (t, n) => { const d = new Date(t[0], t[1] - 1, t[2]); d.setDate(d.getDate() + n); return tup(d); };
+const tup = (d: Date): number[] => [d.getFullYear(), d.getMonth() + 1, d.getDate()];
+const addDays = (t: number[], n: number) => { const d = new Date(t[0], t[1] - 1, t[2]); d.setDate(d.getDate() + n); return tup(d); };
 
 // The VM: a retaining DOM stub for #popMsg, #popSub, #popKicker; a pinned clock (new Date() and Date.now() read
 // __pcNow); Math.random pinned to __pcFix when set, else a seeded Park-Miller LCG on a fresh Math object.
@@ -333,14 +351,14 @@ Q.eval('(function(){ var RD=Date; globalThis.__pcRD=RD; globalThis.__pcNow=RD.no
   + ' return new (Function.prototype.bind.apply(RD,[null].concat([].slice.call(arguments))))(); }'
   + ' FD.prototype=RD.prototype; FD.now=function(){return globalThis.__pcNow;}; FD.parse=RD.parse; FD.UTC=RD.UTC;'
   + ' globalThis.Date=FD; })();');
-const setNow = (t, h) => Q.eval('globalThis.__pcNow=new __pcRD(' + t[0] + ',' + (t[1] - 1) + ',' + t[2] + ',' + h + ',0,0).getTime()');
+const setNow = (t: number[], h: number) => Q.eval('globalThis.__pcNow=new __pcRD(' + t[0] + ',' + (t[1] - 1) + ',' + t[2] + ',' + h + ',0,0).getTime()');
 setNow([2026, 9, 24], 10);
 const WTXT = JSON.parse(Q.eval("JSON.stringify(POP_POOLS.workout.map(function(e){return (e&&typeof e==='object')?e.t:e;}))"));
 // The real HALF_MANNY days: the first day of each shape by the lens, never the final scheduled day. buildProgram leaves
 // startDate to the wizard, so week 1's Monday is back-dated by hand so Race Day (found by subtype) lands on raceDate.
 const REAL = (() => {
   const prog = Q.buildProgram(cl(Q.fixtures.HALF_MANNY));
-  let race = null;
+  let race = null as 'many' | { w: number; d: DayKey } | null;
   Object.keys(prog.weeks).forEach((w) => WEEKDAYS.forEach((d) => {
     const y = prog.weeks[w][d];
     const c = y && !y.rest && y.cardio;
@@ -348,12 +366,12 @@ const REAL = (() => {
     if (/race day/i.test(sub)) race = race ? 'many' : { w: +w, d };
   }));
   if (race && race !== 'many') {
-    const rd = Q.fixtures.HALF_MANNY.raceDate.split('-').map(Number);
+    const rd = (Q.fixtures.HALF_MANNY.raceDate as string).split('-').map(Number);
     const m = new Date(rd[0], rd[1] - 1, rd[2]);
     m.setDate(m.getDate() - ((race.w - 1) * 7 + OFF[race.d]));
     prog.startDate = m.getFullYear() + '-' + String(m.getMonth() + 1).padStart(2, '0') + '-' + String(m.getDate()).padStart(2, '0');
   }
-  const all = [];
+  const all: { w: number; d: DayKey; date: number[]; t: number; k: string }[] = [];
   if (prog.startDate) {
     const mon = monOf(prog.startDate);
     Object.keys(prog.weeks).map(Number).sort((a, b) => a - b).forEach((w) => WEEKDAYS.forEach((d) => {
@@ -365,7 +383,7 @@ const REAL = (() => {
     }));
   }
   all.sort((a, b) => a.t - b.t);
-  const pick = {};
+  const pick: Record<string, (typeof all)[number]> = {};
   const body = all.slice(0, -1);
   SHAPES.forEach((s) => { const x = body.find((z) => z.k === s); if (x) pick[s] = x; });
   return { prog, pick, race };
@@ -376,16 +394,16 @@ Q.eval("(function(){ var M=Object.create(Math); globalThis.__pcFix=null; globalT
   + ' globalThis.Math=M; })();');
 
 const MEMKEY = 'ia_pop_idx_' + PID;
-function install(prog, c) {
+function install(prog: unknown, c?: unknown) {
   LS.clear();
   Q.eval("activeProgId='" + PID + "'");
   Q.eval('activeProg=' + JSON.stringify(prog));
   if (c) LS.setItem('ia_comp_' + PID, JSON.stringify(c));
   Q.eval(DOM_STUB);
 }
-const el = (id) => Q.eval('__pcEls.' + id + ' ? __pcEls.' + id + '.textContent : null');
+const el = (id: string) => Q.eval('__pcEls.' + id + ' ? __pcEls.' + id + '.textContent : null');
 /** The exact eligible set: 64 draws at r = (k + 0.5) / 64, the rotation memory reset (or preset to `mem`) before each. */
-function sweep(drawExpr, mem, readMsg) {
+function sweep(drawExpr: string, mem?: Record<string, number> | null, readMsg?: boolean) {
   const got = new Set();
   for (let k = 0; k < 64; k++) {
     if (mem) LS.setItem(MEMKEY, JSON.stringify(mem));
@@ -414,11 +432,11 @@ test('the hand calendar agrees with the host clock: 2026-09-14 is a Monday, and 
 });
 
 test('HALF_MANNY reads 14 lift-only, 45 run and lift, 9 run and mobility and 2 run-only days, and its long run is a Saturday with mobility', () => {
-  const n = { liftOnly: 0, runLift: 0, runMob: 0, runOnly: 0, UNPLACEABLE: 0 };
+  const n: Record<string, number> = { liftOnly: 0, runLift: 0, runMob: 0, runOnly: 0, UNPLACEABLE: 0 };
   Object.keys(REAL.prog.weeks).forEach((w) => WEEKDAYS.forEach((d) => { const y = REAL.prog.weeks[w][d]; if (y && !y.rest) n[lens(y)]++; }));
   assert.deepEqual(n, { liftOnly: 14, runLift: 45, runMob: 9, runOnly: 2, UNPLACEABLE: 0 });
   assert.deepEqual(REAL.race, { w: 14, d: 'sun' }, 'one Race Day, W14 sun');
-  const sd = REAL.prog.startDate.split('-').map(Number);
+  const sd = (REAL.prog.startDate as string).split('-').map(Number);
   assert.equal(new Date(sd[0], sd[1] - 1, sd[2]).getDay(), 1, 'week 1 starts on a Monday');
   assert.ok(SHAPES.every((s) => REAL.pick[s]), J(Object.keys(REAL.pick)));
   const m = REAL.pick.runMob;
@@ -442,7 +460,7 @@ test('the hand rule reproduces the eligible-size table, and a later tap reads li
 test('the workout line is drawn from what the trained day was: its weekday, the morning only when it is today, cardio or lifting', () => {
   for (const sh of SHAPES) {
     for (const d of ['wed', 'sat', 'sun']) {
-      for (const [when, TAB] of [['today', DATES], ['later', PAST]]) {
+      for (const [when, TAB] of [['today', DATES], ['later', PAST]] as const) {
         for (const h of [7, 10]) {
           const w = HAND_WEEK[sh];
           const exp = handSet(Object.assign({ known: true, weekend: WEEKEND_KEY[d], hour: h, today: when === 'today' }, SHAPE[sh]));
@@ -493,7 +511,7 @@ test('a lift-only Saturday never draws the weekend cardio line, and can draw the
   assert.deepEqual(got, handSet(Object.assign({ known: true, weekend: true, hour: 10, today: true }, SHAPE.liftOnly)));
 });
 
-function reminder(c) {
+function reminder(c: Record<string, unknown>) {
   install(remProg(), c);
   setNow([2026, 10, 1], 10);
   Q.eval('maybeShowReminder()');
@@ -513,7 +531,7 @@ test('the short-gap reminder rotates: no line twice in a row, and the draw is re
   install(remProg(), COMP_GAP3);
   setNow([2026, 10, 1], 10);
   Q.eval('globalThis.__pcSeed=76308');
-  const seen = [];
+  const seen: string[] = [];
   for (let k = 0; k < 12; k++) {
     LS.removeItem('ia_remind_last_' + PID);
     LS.removeItem('ia_reminded_' + PID);
@@ -555,7 +573,7 @@ test('the pools hold 27 workout, 5 reminder, 5 streak and 9 season lines', () =>
 test('each tagged workout line sits at its index', () => {
   for (const i of TAGGED) {
     assert.ok(String(WTXT[i] || '').toLowerCase().includes(TAG_ANCHOR[i]), i + ' ' + WTXT[i]);
-    assert.equal(WTXT.filter((t) => String(t).toLowerCase().includes(TAG_ANCHOR[i])).length, 1, TAG_ANCHOR[i]);
+    assert.equal(WTXT.filter((t: unknown) => String(t).toLowerCase().includes(TAG_ANCHOR[i])).length, 1, TAG_ANCHOR[i]);
   }
 });
 

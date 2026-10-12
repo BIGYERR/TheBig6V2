@@ -1,9 +1,8 @@
-'use strict';
 // Logging a session on the day card: the wheels the run and bike forms are made of, opening a day, rolling a wheel,
 // the Log button, Done and Skip, the sport chip, and a jog logged on a rest day. Rulings D199 to D227 (the run and bike
 // wheels, the zero faces, the Log button, the rest-day log).
 //
-// The app is driven the way the athlete drives it on the phone (tests/support/log-form.js): openDayKey renders the
+// The app is driven the way the athlete drives it on the phone (tests/support/log-form.ts): openDayKey renders the
 // form, the wheels settle and commit on a virtual clock, logCardio, handleDayStatus, setCardioSwap and the rest sheet
 // are the app's own. Every program is stored as starting Monday 2026-09-21 with the clock on that Monday 10:00.
 // HALF_MANNY (seed 76308) week 1: mon Speed Run (no dose), tue lifting, wed rest, fri Recovery Run (time, 25 min),
@@ -11,16 +10,32 @@
 //
 // Oracles are typed by hand: 0:47:13 is 47 + 13/60 = 47.2167 min, stored "47.22"; 47.22 min = 2833.2 s, so 3.1 mi is
 // 913.9 s/mi, "15:14/mi"; every other pace is whole seconds per mile by hand (paceHand). Faces are typed strings. The
-// app's converters are compared only to those literals. The lattices over many programs are tests/sweeps/logging.test.js;
+// app's converters are compared only to those literals. The lattices over many programs are tests/sweeps/logging.test.ts;
 // this file opens HALF_MANNY's run days and the hand hosts.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const { APP, fixtures } = require('../support/app.js');
-const {
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { APP, fixtures } from '../support/app.ts';
+import {
   DAYS, NUDGE, mkCfg, cardioOf, sportOf, weeksOf, paceHand, logForm, readForm, renderedColumns, stripComments,
   DOSES, runFormShape, runOpenFaces, BIKE_GLYPH, bikeShape, bikeCopyBad,
-} = require('../support/log-form.js');
+} from '../support/log-form.ts';
+import type { Roll, SportSpec } from '../support/log-form.ts';
+import type { DayKey, Program } from '@ia/core';
+
+/** A rest-day jog as the rest sheet takes it. */
+interface Jog {
+  type: string;
+  mins: number;
+  dist: string;
+  rpe: number;
+  stale?: boolean;
+}
+/** A Session Journal row: the day and the text segments between tags. */
+interface JournalRow {
+  day: string;
+  segs: string[];
+}
 
 const J = JSON.stringify;
 const HTML = fs.readFileSync(APP, 'utf8');
@@ -32,8 +47,8 @@ const SAT_PACE = '15:14/mi'; // 2833.2 s / 3.1 mi = 913.9 s/mi
 const COPY = { log: 'Log', logged: 'Logged ✓', run: 'Run logged ✓', bike: 'Ride logged ✓', swim: 'Swim logged ✓', empty: 'Nothing to log yet.', slider: 'Move slider' };
 const SEVEN = ['run_dist', 'run_pace', 'run_mins', 'run_reps', 'run_rep_time', 'bike_mins', 'swim_yards'];
 const ZERO3 = ['0', '0', '0'];
-const seq = (a, b) => { const o = []; for (let v = a; v <= b; v++) o.push(String(v)); return o; };
-const rep5 = (a) => [].concat(a, a, a, a, a);
+const seq = (a: number, b: number) => { const o: string[] = []; for (let v = a; v <= b; v++) o.push(String(v)); return o; };
+const rep5 = (a: string[]) => ([] as string[]).concat(a, a, a, a, a);
 
 const REPS_DIST = { k: 'reps_dist', reps: 6, m: 400, tgt: 480 };
 
@@ -41,17 +56,17 @@ const REPS_DIST = { k: 'reps_dist', reps: 6, m: 400, tgt: 480 };
 const C = logForm('logging');
 const HALF = C.build(fixtures.HALF_MANNY);
 const fresh = () => { C.use(HALF); C.unforce(); };
-const subOf = (p, w, d) => String((cardioOf(p.weeks[w] && p.weeks[w][d]) || {}).subtype || '');
+const subOf = (p: Program, w: number, d: DayKey) => String((cardioOf(p.weeks[w] && p.weeks[w][d]) || {}).subtype || '');
 /** The first run day of HALF_MANNY (W1 mon). */
-const RUN_HOST = (() => {
+const RUN_HOST = ((): [number, DayKey] | null => {
   for (const w of weeksOf(HALF)) for (const d of DAYS) if (sportOf(HALF.weeks[w][d]) === 'run') return [w, d];
   return null;
 })();
 /** Opens with an empty store and reports what the open wrote. */
-function openFresh(w, d) {
+function openFresh(w: number, d: string) {
   C.wipe();
   C.open(w, d);
-  const wrote = [];
+  const wrote: string[] = [];
   if (C.inputs()) wrote.push(C.inputs() + ' input events');
   if (C.LS.getItem('ia_logs_' + C.id) != null) wrote.push('ia_logs_ ' + C.LS.getItem('ia_logs_' + C.id));
   if (C.histRaw() != null) wrote.push('ia_hist_');
@@ -61,8 +76,8 @@ function openFresh(w, d) {
 // ── the wheels ───────────────────────────────────────────────────────────────────────────────────────────────────────
 const iawFormat = C.ev('_iawFormat');
 const iawParse = C.ev('_iawParse');
-const FMT = (k, v) => iawFormat(k, v);
-const PARSE = (k, s) => Array.from(iawParse(k, s));
+const FMT = (k: string, v: unknown) => iawFormat(k, v);
+const PARSE = (k: string, s: string) => Array.from(iawParse(k, s));
 
 test('the time wheel shows hours 0 to 9 with no dash and no wrap, minutes and seconds 00 to 59 wrapping, capped Time', () => {
   const { html, cols } = renderedColumns(C, 'hms');
@@ -124,7 +139,7 @@ test('the pace wheel keeps its dash: minutes dash then 4 to 17, seconds wrapping
 
 test('hours, whole miles and rep minutes never wrap; every other column wraps unless it carries a dash', () => {
   const SPEC = C.ev('_IAW_SPEC');
-  const wraps = (k) => Array.from(SPEC[k].cols, (c) => C.ev('_iawWraps')(c));
+  const wraps = (k: string) => Array.from(SPEC[k].cols, (c) => C.ev('_iawWraps')(c));
   assert.deepEqual(wraps('hms'), [false, true, true]);
   assert.deepEqual(wraps('dist'), [false, true, true]);
   assert.deepEqual(wraps('rept'), [false, true]);
@@ -141,7 +156,7 @@ test('every second from 0:00:01 to 9:59:59 stores as decimal minutes to two plac
     const back = PARSE('hms', got);
     if (J(back) !== J([String(h), String(m), String(s)])) assert.fail(`${got} reads back ${J(back)}`);
   }
-  const EX = [[['0', '7', '30'], '7.50'], [['0', '15', '20'], '15.33'], [['0', '30', '0'], '30.00'], [['0', '47', '13'], '47.22'],
+  const EX: [string[], string][] = [[['0', '7', '30'], '7.50'], [['0', '15', '20'], '15.33'], [['0', '30', '0'], '30.00'], [['0', '47', '13'], '47.22'],
     [['0', '0', '30'], '0.50'], [['0', '1', '0'], '1.00'], [['1', '0', '0'], '60.00'], [['0', '59', '59'], '59.98'], [['9', '59', '59'], '599.98']];
   for (const [v, want] of EX) assert.equal(FMT('hms', v), want, v.join(':'));
 });
@@ -154,22 +169,22 @@ test('the zero time face 0:00:00 stores nothing, and a blank or malformed time o
 
 test('a stored time reads back to its nearest second, and anything at or over 9:59:59 pegs there', () => {
   const PEG = ['9', '59', '59'];
-  const TABLE = [['15.333', ['0', '15', '20']], ['100', ['1', '40', '0']], ['7.5', ['0', '7', '30']], ['47.22', ['0', '47', '13']],
+  const TABLE: [string, string[]][] = [['15.333', ['0', '15', '20']], ['100', ['1', '40', '0']], ['7.5', ['0', '7', '30']], ['47.22', ['0', '47', '13']],
     ['45.5', ['0', '45', '30']], ['45', ['0', '45', '0']], ['.5', ['0', '0', '30']], ['599', ['9', '59', '0']],
     ['599.98', PEG], ['599.99', PEG], ['600', PEG], ['601', PEG], ['630.5', PEG], ['650', PEG], ['1200', PEG]];
   for (const [s, want] of TABLE) assert.deepEqual(PARSE('hms', s), want, s);
 });
 
 test('a stored distance reads back by its first two decimals, clamps at 99, and a blank or malformed one lands on 0.00', () => {
-  const TABLE = [['.86', ['0', '8', '6']], ['3.1', ['3', '1', '0']], ['3.456', ['3', '4', '5']], ['100', ['99', '0', '0']],
+  const TABLE: [string, string[]][] = [['.86', ['0', '8', '6']], ['3.1', ['3', '1', '0']], ['3.456', ['3', '4', '5']], ['100', ['99', '0', '0']],
     ['abc', ZERO3], ['.', ZERO3], ['-1', ZERO3], ['', ZERO3], ['0', ZERO3], ['0.00', ZERO3]];
   for (const [s, want] of TABLE) assert.deepEqual(PARSE('dist', s), want, J(s));
 });
 
 test('the miles and rep time wheels store their faces, and their zero faces store nothing', () => {
-  const DIST = [[['0', '7', '5'], '0.75'], [['3', '1', '0'], '3.10'], [['13', '1', '0'], '13.10'], [['99', '9', '9'], '99.99'], [['0', '0', '1'], '0.01']];
+  const DIST: [string[], string][] = [[['0', '7', '5'], '0.75'], [['3', '1', '0'], '3.10'], [['13', '1', '0'], '13.10'], [['99', '9', '9'], '99.99'], [['0', '0', '1'], '0.01']];
   for (const [v, want] of DIST) assert.equal(FMT('dist', v), want, v.join(','));
-  const REPT = [[['0', '45'], '0:45'], [['1', '5'], '1:05'], [['9', '59'], '9:59']];
+  const REPT: [string[], string][] = [[['0', '45'], '0:45'], [['1', '5'], '1:05'], [['9', '59'], '9:59']];
   for (const [v, want] of REPT) assert.equal(FMT('rept', v), want, v.join(','));
   assert.equal(FMT('dist', ['0', '0', '0']), '');
   assert.equal(FMT('rept', ['0', '0']), '');
@@ -193,7 +208,7 @@ test('a stacked wheel is capped at 178.2 px, three fifths of a 375 pt row after 
   const css = HTML.replace(/\/\*[\s\S]*?\*\//g, '');
   const rules = css.match(/\.iaw-solo\{max-width:([\d.]+)px;?\}/g) || [];
   assert.equal(rules.length, 1);
-  assert.equal(parseFloat(rules[0].match(/max-width:([\d.]+)px/)[1]), W375);
+  assert.equal(parseFloat((rules[0].match(/max-width:([\d.]+)px/) as RegExpMatchArray)[1] as string), W375);
   const PREMISES = ['.detail-body{padding:16px 16px 20px !important;', '.log-section{background:var(--surface) !important;border:1px solid var(--border) !important;',
     '.log-body{padding:14px 16px;', '.iaw-wrap{display:flex;gap:12px;', '.iaw-cell{flex:1;min-width:0;}', '.iaw-cell.iaw-f3{flex:3;}', '.iaw-cell.iaw-f2{flex:2;}',
     '.iaw{display:flex;', 'border:1px solid var(--border2);border-radius:4px;position:relative;'];
@@ -201,15 +216,15 @@ test('a stacked wheel is capped at 178.2 px, three fifths of a 375 pt row after 
 });
 
 // ── the run form: shape and copy ─────────────────────────────────────────────────────────────────────────────────────
-const facesNow = () => { const o = {}; C.wheels().forEach((w) => { o[w.hid] = C.face(w); }); return o; };
+const facesNow = () => { const o: Record<string, string> = {}; C.wheels().forEach((w) => { o[w.hid] = C.face(w); }); return o; };
 
 test('the run time, distance and rep forms are wheels, the fixed one showing the plan, each alone in its row', () => {
   assert.ok(RUN_HOST, 'HALF_MANNY has a run day');
   C.use(HALF);
   for (const k of ['time', 'dist', 'reps_time']) {
     C.force(DOSES[k]);
-    C.setLog(RUN_HOST[0], RUN_HOST[1], null);
-    C.open(RUN_HOST[0], RUN_HOST[1]);
+    C.setLog(RUN_HOST![0], RUN_HOST![1], null);
+    C.open(RUN_HOST![0], RUN_HOST![1]);
     assert.deepEqual(runFormShape(k, readForm(C.form()), DOSES[k]), [], k);
   }
   C.unforce();
@@ -222,9 +237,9 @@ test('opening a run form with nothing stored writes nothing and shows the plan o
   for (const k of ['time', 'dist', 'reps_time']) {
     C.force(DOSES[k]);
     for (const stored of [null, { run_mins: '', run_dist: '', rpe: '', notes: '' }]) {
-      C.setLog(RUN_HOST[0], RUN_HOST[1], stored);
+      C.setLog(RUN_HOST![0], RUN_HOST![1], stored);
       const before = C.logs();
-      C.open(RUN_HOST[0], RUN_HOST[1]);
+      C.open(RUN_HOST![0], RUN_HOST![1]);
       const tag = k + (stored ? ' stored blank' : ' no entry');
       assert.deepEqual(facesNow(), runOpenFaces(k, DOSES[k]), tag);
       assert.equal(C.inputs(), 0, tag + ': input events');
@@ -237,7 +252,7 @@ test('opening a run form with nothing stored writes nothing and shows the plan o
 });
 
 test('an older stored run opens on its own faces and writes nothing', () => {
-  const LEGACY = [ // [form, stored, faces by hand]
+  const LEGACY: [string, Record<string, string>, Record<string, string>][] = [ // [form, stored, faces by hand]
     ['dist', { run_dist: '3.456' }, { log_run_dist: '3.45', log_run_mins: '0:00:00' }],
     ['dist', { run_dist: '.86' }, { log_run_dist: '0.86', log_run_mins: '0:00:00' }],
     ['dist', { run_dist: '100' }, { log_run_dist: '99.00', log_run_mins: '0:00:00' }],
@@ -249,9 +264,9 @@ test('an older stored run opens on its own faces and writes nothing', () => {
   C.use(HALF);
   for (const [k, stored, want] of LEGACY) {
     C.force(DOSES[k]);
-    C.setLog(RUN_HOST[0], RUN_HOST[1], Object.assign({ rpe: '5' }, stored));
+    C.setLog(RUN_HOST![0], RUN_HOST![1], Object.assign({ rpe: '5' }, stored));
     const before = C.logs();
-    C.open(RUN_HOST[0], RUN_HOST[1]);
+    C.open(RUN_HOST![0], RUN_HOST![1]);
     assert.deepEqual(facesNow(), want, J(stored));
     assert.equal(C.inputs(), 0, J(stored));
     assert.equal(C.logs(), before, J(stored));
@@ -285,7 +300,7 @@ test('every HALF_MANNY run day with a time or distance dose opens on its plan, i
 });
 
 test('the run forms read Log the run, Shows the plan, Off the watch, and Miles in the work reps, with no dash', () => {
-  const COPY_RUN = {
+  const COPY_RUN: Record<string, { label: string; subs: string[]; caps: string[] }> = {
     time: { label: 'Log the run', subs: ['Shows the plan. Move it to match the watch.', 'Off the watch.'], caps: ['Time', 'Miles'] },
     dist: { label: 'Log the run', subs: ['Shows the plan. Move it to match the watch.', 'Off the watch.'], caps: ['Miles', 'Time'] },
     reps_time: { label: 'Miles in the work reps', subs: ['Leave out the easy jog between reps.'], caps: ['Miles'] },
@@ -294,8 +309,8 @@ test('the run forms read Log the run, Shows the plan, Off the watch, and Miles i
   const all = [];
   for (const k of Object.keys(COPY_RUN)) {
     C.force(DOSES[k]);
-    C.setLog(RUN_HOST[0], RUN_HOST[1], null);
-    C.open(RUN_HOST[0], RUN_HOST[1]);
+    C.setLog(RUN_HOST![0], RUN_HOST![1], null);
+    C.open(RUN_HOST![0], RUN_HOST![1]);
     const f = readForm(C.form());
     const labels = f.labels.filter((l) => l !== 'Reps completed');
     assert.deepEqual(labels, [COPY_RUN[k].label], k + ' label');
@@ -312,7 +327,7 @@ test('the run forms read Log the run, Shows the plan, Off the watch, and Miles i
 
 // ── the run form: rolling the wheels ─────────────────────────────────────────────────────────────────────────────────
 test('a rolled run wheel waits for the Log tap, which stores two-decimal minutes and miles and the derived pace', () => {
-  const [W, D] = RUN_HOST;
+  const [W, D] = RUN_HOST!;
   C.use(HALF);
   // free miles to 2 on the 15 min time form
   C.force(DOSES.time); C.setLog(W, D, null); C.open(W, D);
@@ -350,7 +365,7 @@ test('a rolled run wheel waits for the Log tap, which stores two-decimal minutes
 });
 
 test('away from the plan and back to it commits both moves; settling on the plan alone writes nothing', () => {
-  const [W, D] = RUN_HOST;
+  const [W, D] = RUN_HOST!;
   C.use(HALF);
   C.force(DOSES.dist); C.setLog(W, D, null); C.open(W, D);
   C.roll(C.need('log_run_dist'), [[1, '5']]);
@@ -506,7 +521,7 @@ test('a fresh run form opens on 3.10 and 0:00:00, 0:25:00 and 0.00, a rep time o
   wr = openFresh(1, 'fri');
   assert.ok(C.wheel('log_run_pace') && !C.wheel('log_run_mins'), 'a null dose renders the generic form');
   assert.deepEqual([C.faceText(C.wheel('log_run_dist')), wr], ['0.00', []]);
-  assert.equal(C.colValue(C.wheel('log_run_pace'), 0), '', 'the pace minutes sit on the dash');
+  assert.equal(C.colValue(C.wheel('log_run_pace')!, 0), '', 'the pace minutes sit on the dash');
   assert.equal(C.faceText(C.wheel('log_run_pace')), '—:00');
   C.unforce();
 });
@@ -605,7 +620,7 @@ test('on a logged long run, miles rolled to 0.00 fall back to the planned 3.1 an
 // strings, as the DOM does.
 const STAMPED = { rpe: '', run_dist: SAT_DIST, run_pace: SAT_PACE, run_mins: TAIL, run_reps: '', run_rep_time: '', bike_mins: '', swim_yards: '', notes: '', week: 1, swapFrom: '', swapTo: '' };
 const STR_IDS = ['log_run_reps', 'log_run_dist', 'log_run_mins', 'log_run_rep_time', 'log_bike_mins', 'log_run_pace', 'log_rpe', 'log_swim_yards', 'log_notes'];
-function openS(w, d) {
+function openS(w: number, d: string) {
   C.open(w, d);
   for (const k of STR_IDS) {
     const el = C.els[k];
@@ -617,14 +632,14 @@ function openS(w, d) {
 }
 const T4713 = () => C.moveTo('log_run_mins', [[0, '0'], [1, '47'], [2, '13']]);
 const TZERO = () => C.moveTo('log_run_mins', [[0, '0'], [1, '0'], [2, '0']]);
-const stampOk = (e) => e.run_dist === SAT_DIST && e.run_mins === TAIL && e.run_pace === SAT_PACE;
-function stampSat(way) {
+const stampOk = (e: any) => e.run_dist === SAT_DIST && e.run_mins === TAIL && e.run_pace === SAT_PACE;
+function stampSat(way: string) {
   fresh(); C.wipe();
   if (way === 'log') { openS(1, 'sat'); T4713(); C.log(); C.back(); } else { C.setLog(1, 'sat', Object.assign({}, STAMPED)); C.ev("snapshotDay(1,'sat')"); C.back(); }
   return C.entry(1, 'sat') || {};
 }
-const seven = (e) => (e ? SEVEN.map((k) => e[k]) : null);
-const allBlank = (e) => !!e && SEVEN.every((k) => e[k] === '');
+const seven = (e: any) => (e ? SEVEN.map((k) => e[k]) : null);
+const allBlank = (e: any) => !!e && SEVEN.every((k) => e[k] === '');
 /** The week view's MILES tile, Progress W1 miles, plannedVsLogged W1 actual, and the days the rest sheet offers. */
 function readers() {
   C.ev('renderWeekView()');
@@ -636,11 +651,11 @@ function readers() {
   }
   const c = C.chart('Weekly Running Mileage', 1);
   const pv = C.ev('plannedVsLogged')(JSON.parse(C.logs()), JSON.parse(C.histRaw() || '{}'), Object.keys(HALF.weeks).length, 0, false);
-  return { wk, prog: c.drawn ? (c.v == null ? 0 : +c.v) : '(no chart)', pvl: pv && pv[1] ? +pv[1].act : '(no week 1)', rest: Array.from(C.ev('restMoveCandidates(1)')).map((x) => x.day) };
+  return { wk, prog: c.drawn ? (c.v == null ? 0 : +c.v) : '(no chart)', pvl: pv && pv[1] ? +pv[1].act : '(no week 1)', rest: Array.from(C.ev('restMoveCandidates(1)')).map((x: any) => x.day) };
 }
 
 test('a reopened stamp shows the plan face 3.10 with an empty hidden node and writes nothing; rolled miles seed their own', () => {
-  const openSeed = (entry) => {
+  const openSeed = (entry: unknown) => {
     fresh(); C.wipe(); C.setLog(1, 'sat', entry);
     const before = C.logs();
     openS(1, 'sat');
@@ -722,7 +737,7 @@ test('on a reopened stamp the RPE moves no session number, and a new time re-sta
 });
 
 test('rolled miles survive a time clear as a miles-only log; a two-decimal plan stored as its own stamp drops on the next write', () => {
-  const ROLLED = { '3.10': SAT_PACE, '4.20': P.p420 };
+  const ROLLED: Record<string, string> = { '3.10': SAT_PACE, '4.20': P.p420 };
   for (const md of Object.keys(ROLLED)) {
     fresh(); C.wipe(); C.setLog(1, 'sat', Object.assign({}, STAMPED, { run_dist: md, run_pace: ROLLED[md] }));
     openS(1, 'sat');
@@ -772,7 +787,7 @@ test('a reopened stamp parks with its minutes on chip Bike and comes back unchan
   const NOTE_BARE = 'Counts toward Bike, not Run.';
   const NOTE_KEPT = NOTE_BARE + ' Your Run numbers are kept. Switch back and they return.';
   const noteTxt = () => (C.els.cardioSwapNote && C.els.cardioSwapNote.textContent) || '';
-  const noClock = (e) => (e ? Object.fromEntries(Object.entries(e).filter(([k]) => k !== 'ts').sort()) : null);
+  const noClock = (e: any) => (e ? Object.fromEntries(Object.entries(e).filter(([k]) => k !== 'ts').sort()) : null);
   for (const way of ['log', 'seed']) {
     stampSat(way);
     openS(1, 'sat');
@@ -802,7 +817,7 @@ test('a reopened stamp parks with its minutes on chip Bike and comes back unchan
 // Hosts: the first bike day with a time dose on bike_base (balanced, intermediate, commercial, seed 24865), and
 // HALF_MANNY's first run day. Hand doses: time 45 (Long Ride), reps_time 3 x 15 (Sweet Spot), none (Interval).
 const BIKE_BASE = C.build(mkCfg([['bike', 'bike_base']], 'balanced', 'intermediate', 'commercial', 24865));
-const BIKE_HOST = (() => {
+const BIKE_HOST = ((): [number, DayKey] | null => {
   for (const w of weeksOf(BIKE_BASE)) {
     for (const d of DAYS) {
       if (sportOf(BIKE_BASE.weeks[w][d]) !== 'bike') continue;
@@ -812,9 +827,9 @@ const BIKE_HOST = (() => {
   }
   return null;
 })();
-const HAND_BIKE = { time: { dose: { k: 'time', mins: 45 }, sub: 'Long Ride (LSD)' }, reps_time: { dose: { k: 'reps_time', reps: 3, mins: 15 }, sub: 'Sweet Spot' }, none: { dose: null, sub: 'Interval' } };
+const HAND_BIKE: Record<string, { dose: Record<string, unknown> | null; sub: string }> = { time: { dose: { k: 'time', mins: 45 }, sub: 'Long Ride (LSD)' }, reps_time: { dose: { k: 'reps_time', reps: 3, mins: 15 }, sub: 'Sweet Spot' }, none: { dose: null, sub: 'Interval' } };
 /** Opens week w day d over `stored` and reads the bike form, its face and what the open wrote. */
-function openBike(w, d, stored) {
+function openBike(w: number, d: string, stored: unknown) {
   C.setLog(w, d, stored);
   const before = C.logs();
   C.open(w, d);
@@ -824,10 +839,10 @@ function openBike(w, d, stored) {
 }
 /** Every bike form of program p in the weeks listed (every week when none are) on the days `pick` takes, opened over
  * `stored` (the swapped-in case) or nothing. */
-function bikeForms(p, pick, stored, weeks) {
+function bikeForms(p: Program, pick: (x: any) => boolean, stored: Record<string, string> | null, weeks?: number[]) {
   C.use(p);
   C.unforce();
-  const out = [];
+  const out: (ReturnType<typeof openBike> & { tag: string; k: string; ct: boolean; hasDose: boolean })[] = [];
   for (const w of weeksOf(p).filter((n) => !weeks || weeks.includes(n))) {
     for (const d of DAYS) {
       const x = p.weeks[w][d];
@@ -841,7 +856,7 @@ function bikeForms(p, pick, stored, weeks) {
   return out;
 }
 const SWAPPED_IN = { swapTo: 'bike', bike_mins: '', run_mins: '', run_dist: '', swim_yards: '', rpe: '', notes: '' };
-let bikeSample = null;
+let bikeSample: Record<string, ReturnType<typeof bikeForms>> | null = null;
 /** A sample of the bike lattice (the full one is the sweep): weeks 1 and 6 of a bike goal, which reach every dose kind
  * (time, none, and reps_time from W6), weeks 1 and 2 of an injured run and bike pair whose bike days include
  * Cross-Train, and HALF_MANNY's week 1 and 2 run days opened as a swapped-in bike. */
@@ -872,7 +887,7 @@ test('the bike form is one H:MM:SS wheel for the ride, alone in its row, with no
   const ct = S.b.filter((x) => x.ct);
   assert.ok(ct.length > 0 && ct.every((x) => x.k === 'time(parsed)'), 'Cross-Train bike days read a parsed time dose');
   // a live chip to Bike on a HALF_MANNY run day
-  C.use(HALF); C.unforce(); C.setLog(RUN_HOST[0], RUN_HOST[1], null); C.open(RUN_HOST[0], RUN_HOST[1]);
+  C.use(HALF); C.unforce(); C.setLog(RUN_HOST![0], RUN_HOST![1], null); C.open(RUN_HOST![0], RUN_HOST![1]);
   C.chip('bike');
   assert.deepEqual(bikeShape(C.els.cardioFields._html, false), []);
   assert.equal(C.face(C.need('log_bike_mins')), '0:00:00');
@@ -886,7 +901,7 @@ test('the bike form reads Log the ride after the bike glyph, with no sub-label',
   }
   const S = sampleBikeForms();
   for (const g of ['a', 'b', 'c']) for (const x of S[g]) assert.deepEqual(bikeCopyBad(x.fm), [], g + ' ' + x.tag);
-  C.use(HALF); C.unforce(); C.setLog(RUN_HOST[0], RUN_HOST[1], null); C.open(RUN_HOST[0], RUN_HOST[1]);
+  C.use(HALF); C.unforce(); C.setLog(RUN_HOST![0], RUN_HOST![1], null); C.open(RUN_HOST![0], RUN_HOST![1]);
   C.chip('bike');
   assert.deepEqual(bikeCopyBad(C.els.cardioFields._html), []);
   assert.equal((SRC.match(/Bike — actual duration/g) || []).length, 0);
@@ -895,7 +910,7 @@ test('the bike form reads Log the ride after the bike glyph, with no sub-label',
 
 test('opening a bike day writes nothing: a blank ride opens on 0:00:00, a stored one on its own face, pegged at 9:59:59', () => {
   assert.ok(BIKE_HOST, 'bike_base has a time-dosed bike day');
-  const [W, D] = BIKE_HOST;
+  const [W, D] = BIKE_HOST!;
   C.use(BIKE_BASE);
   for (const k of Object.keys(HAND_BIKE)) {
     C.force(HAND_BIKE[k].dose);
@@ -920,19 +935,19 @@ test('the run time and bike forms seed 650, 600 and 630.5 at 9:59:59, 599 at 9:5
   const CLAMP = [['650', '9:59:59'], ['600', '9:59:59'], ['630.5', '9:59:59'], ['599', '9:59:00'], ['45.5', '0:45:30']];
   C.use(BIKE_BASE); C.force(HAND_BIKE.time.dose);
   for (const [v, want] of CLAMP) {
-    const r = openBike(BIKE_HOST[0], BIKE_HOST[1], { bike_mins: v, rpe: '5' });
+    const r = openBike(BIKE_HOST![0], BIKE_HOST![1], { bike_mins: v, rpe: '5' });
     assert.deepEqual([r.face, r.inputs, r.same], [want, 0, true], 'bike ' + v);
   }
   C.use(HALF); C.force(DOSES.time);
   for (const [v, want] of CLAMP) {
-    const r = openBike(RUN_HOST[0], RUN_HOST[1], { run_mins: v, rpe: '5' });
+    const r = openBike(RUN_HOST![0], RUN_HOST![1], { run_mins: v, rpe: '5' });
     assert.deepEqual([r.runFace, r.inputs, r.same], [want, 0, true], 'run ' + v);
   }
   C.unforce();
 });
 
 test('a rolled ride waits for the Log tap; then Progress and the unmarked nudge read it, and a blank ride gets no nudge', () => {
-  const [W, D] = BIKE_HOST;
+  const [W, D] = BIKE_HOST!;
   C.use(BIKE_BASE); C.force(HAND_BIKE.time.dose); C.setLog(W, D, null); C.open(W, D);
   C.roll(C.need('log_bike_mins'), [[0, '0']]);
   C.roll(C.need('log_bike_mins'), [[1, '45']]);
@@ -952,7 +967,7 @@ test('a rolled ride waits for the Log tap; then Progress and the unmarked nudge 
 });
 
 test('settling a bike wheel on the face it opened on writes nothing, stored or blank', () => {
-  const [W, D] = BIKE_HOST;
+  const [W, D] = BIKE_HOST!;
   C.use(BIKE_BASE); C.force(HAND_BIKE.time.dose);
   C.setLog(W, D, { bike_mins: '45', rpe: '5' });
   const b1 = C.logs();
@@ -968,7 +983,7 @@ test('settling a bike wheel on the face it opened on writes nothing, stored or b
 });
 
 test('a stored ride over the dial opens pegged at 9:59:59, and touching it commits 599.97 then 599.98', () => {
-  const [W, D] = BIKE_HOST;
+  const [W, D] = BIKE_HOST!;
   C.use(BIKE_BASE); C.force(HAND_BIKE.time.dose);
   C.setLog(W, D, { bike_mins: '630.5', rpe: '5' });
   C.open(W, D);
@@ -985,7 +1000,7 @@ test('a stored ride over the dial opens pegged at 9:59:59, and touching it commi
 // A cardio card is a draft until it holds a session number; the Log tap stores it. Copy: Log, Logged ✓, Run logged ✓,
 // Ride logged ✓, Swim logged ✓, Nothing to log yet. An untouched RPE slider stores no RPE.
 /** The first day of `sport` in a fresh program from cfg. */
-function hostOf(cfg, sport) {
+function hostOf(cfg: object, sport: string) {
   const p = C.build(cfg);
   for (let w = 1; w <= (p.totalWeeks || 20); w++) {
     for (const d of DAYS) if (p.weeks[w] && sportOf(p.weeks[w][d]) === sport) return { p, w, d };
@@ -1110,7 +1125,7 @@ test('typed swim yards wait for the Log tap, which stores them and says Swim log
 test('a rep stepper step waits for the Log tap, which stores the reps and the miles they make', () => {
   // 7 x 400 m = 2800 m / 1609.344 = 1.7398 -> "1.74"; 7 x 3 min has no distance to derive
   const REPS_TIME = { k: 'reps_time', reps: 6, mins: 3, tgt: 480 };
-  for (const [D, dist] of [[REPS_DIST, '1.74'], [REPS_TIME, '']]) {
+  for (const [D, dist] of [[REPS_DIST, '1.74'], [REPS_TIME, '']] as const) {
     fresh(); C.force(D); C.open(1, 'fri');
     C.ev('doseRep(1)'); C.advance(50);
     assert.deepEqual([String(C.els.log_run_reps.value), C.entry(1, 'fri')], ['7', null], D.k);
@@ -1154,7 +1169,7 @@ test('a lifting day has no Log button and its RPE saves on the move', () => {
 });
 
 test('the Log button copy is exact in the source, with a real check mark, no dash and no brand', () => {
-  const body = (name) => { const i = SRC.indexOf(name); if (i < 0) return ''; const j = SRC.indexOf('\n}', i); return SRC.slice(i, j < 0 ? i + 600 : j + 2); };
+  const body = (name: string) => { const i = SRC.indexOf(name); if (i < 0) return ''; const j = SRC.indexOf('\n}', i); return SRC.slice(i, j < 0 ? i + 600 : j + 2); };
   const lab = body('function cardioLogLabel(');
   const lc = body('function logCardio(');
   assert.ok(lab.includes("'" + COPY.logged + "'") && lab.includes("'" + COPY.log + "'"), lab.slice(0, 200));
@@ -1212,9 +1227,9 @@ test('a blank RPE counts for nothing: the RPE chart, the journal, a swap-only da
   fresh(); C.open(1, 'fri');
   C.roll(C.need('log_run_mins'), [[1, '47'], [2, '13']]);
   C.log();
-  assert.deepEqual(Array.from(C.ev('restMoveCandidates(1)')).map((c) => c.day), ['mon', 'tue', 'thu', 'sat'], 'a logged Friday is not offered');
+  assert.deepEqual(Array.from(C.ev('restMoveCandidates(1)')).map((c: any) => c.day), ['mon', 'tue', 'thu', 'sat'], 'a logged Friday is not offered');
   fresh(); C.open(1, 'fri'); C.tap('fri', 'complete');
-  assert.ok(!Array.from(C.ev('restMoveCandidates(1)')).map((c) => c.day).includes('fri'), 'nor a completed one');
+  assert.ok(!Array.from(C.ev('restMoveCandidates(1)')).map((c: any) => c.day).includes('fri'), 'nor a completed one');
 });
 
 // ── a jog logged on a rest day ───────────────────────────────────────────────────────────────────────────────────────
@@ -1227,10 +1242,10 @@ test('a blank RPE counts for nothing: the RPE chart, the journal, a swap-only da
 // a rest day and that sport's day. Every goal of these configs carries the run baseline fields, as the wizard's
 // multi-sport form writes them.
 const RUN_FIELDS = { mileBestMins: '8', mileBestSecs: '30', baselineDist: '3', baseline: '3mi' };
-const restCfg = (sports, f, ex, eq, rd, sd) => mkCfg(sports.map((s) => [s[0], s[1], Object.assign({}, RUN_FIELDS, s[2] || {})]), f, ex, eq, sd, rd);
+const restCfg = (sports: SportSpec[], f: string, ex: string, eq: string, rd: string[], sd: number) => mkCfg(sports.map((s): SportSpec => [s[0], s[1], Object.assign({}, RUN_FIELDS, s[2] || {})]), f, ex, eq, sd, rd);
 const MULTI_CFG = restCfg([['run', 'run_10k'], ['bike', 'bike_base'], ['swim', 'swim_base']], 'balanced', 'intermediate', 'commercial', ['sun', 'wed'], 76308);
 const MULTI = C.build(MULTI_CFG);
-const cellOf = (sport) => {
+const cellOf = (sport: string): { w: number; rest: DayKey; day: DayKey } | null => {
   for (const w of weeksOf(MULTI)) {
     const rest = DAYS.find((d) => MULTI.weeks[w][d] && MULTI.weeks[w][d].rest);
     const day = DAYS.find((d) => sportOf(MULTI.weeks[w][d]) === sport);
@@ -1240,7 +1255,7 @@ const cellOf = (sport) => {
 };
 const BIKE_CELL = cellOf('bike');
 const SWIM_CELL = cellOf('swim');
-const JOG = {
+const JOG: Record<string, Jog> = {
   run: { type: 'run', mins: 37, dist: '3.7', rpe: 7 },
   runNoDist: { type: 'run', mins: 37, dist: '', rpe: 7 },
   walk: { type: 'walk', mins: 37, dist: '', rpe: 7 },
@@ -1251,7 +1266,7 @@ const JOG = {
   rowDist: { type: 'row', mins: 37, dist: '9.5', rpe: 7 },
   swim: { type: 'swim', mins: 37, dist: '1370', rpe: 7 },
 };
-const RL = {
+const RL: Record<string, Record<string, Record<string, number>>> = {
   run: { run: { mins: 37, dist: 3.7, rpe: 7 } },
   runNoDist: { run: { mins: 37, rpe: 7 } },
   walk: { walk: { mins: 37, rpe: 7 } },
@@ -1263,16 +1278,16 @@ const RL = {
   swim: { swim: { mins: 37, dist: 1370, rpe: 7 } },
 };
 const TOP_ABSENT = ['rpe', 'run_dist', 'bike_mins', 'swim_yards', 'rest_cardio', 'rest_type', 'rest_mins'];
-const SESS = { dist: [[0, '5'], [1, '2'], [2, '0']], dist2: [[0, '2'], [1, '0'], [2, '0']], bike45: [[0, '0'], [1, '45'], [2, '0']] };
-const LINE = (mins, word, rpe) => mins + ' min ' + word + ' logged · RPE ' + rpe; // the hero sentence
+const SESS: Record<string, Roll[]> = { dist: [[0, '5'], [1, '2'], [2, '0']], dist2: [[0, '2'], [1, '0'], [2, '0']], bike45: [[0, '0'], [1, '45'], [2, '0']] };
+const LINE = (mins: number, word: string, rpe: number | string) => mins + ' min ' + word + ' logged · RPE ' + rpe; // the hero sentence
 const JOG_LINE_RE = /^\d+ min (run|ride|swim|row|walk) logged · RPE (\d+|—)$/;
 const LABEL_WORDS = ['Very Easy', 'Easy', 'Moderate', 'Somewhat Hard', 'Hard', 'Hard+', 'Very Hard', 'Very Hard+', 'Max Effort', 'All Out'];
-const near = (a, b) => typeof a === 'number' && Number.isFinite(a) && Math.abs(a - b) < 1e-9;
-const canon = (v) => (Array.isArray(v) ? v.map(canon) : v && typeof v === 'object' ? Object.keys(v).sort().reduce((o, k) => { o[k] = canon(v[k]); return o; }, {}) : v);
-const CJ = (v) => J(canon(v));
+const near = (a: unknown, b: number) => typeof a === 'number' && Number.isFinite(a) && Math.abs(a - b) < 1e-9;
+const canon = (v: any): any => (Array.isArray(v) ? v.map(canon) : v && typeof v === 'object' ? Object.keys(v).sort().reduce((o, k) => { o[k] = canon(v[k]); return o; }, {} as Record<string, any>) : v);
+const CJ = (v: unknown) => J(canon(v));
 
 /** The rest sheet's Log it, filled as the athlete fills it. */
-function sheetJog(w, d, j) {
+function sheetJog(w: number, d: string, j: Jog) {
   C.ev('_restDraft.w=null; _restDraft.day=null;');
   C.ev('openRestSheet(' + w + ",'" + d + "','cardio')");
   const dr = C.ev('({w:_restDraft.w, day:_restDraft.day})');
@@ -1284,8 +1299,8 @@ function sheetJog(w, d, j) {
   C.advance(50);
 }
 /** "Training anyway?": the move sheet, the pick, Move it here. Whether the pick was offered and landed. */
-function sheetMove(w, d, pick) {
-  const offered = Array.from(C.ev('restMoveCandidates(' + w + ')') || []).map((c) => c.day).includes(pick);
+function sheetMove(w: number, d: string, pick: string) {
+  const offered = Array.from(C.ev('restMoveCandidates(' + w + ')') || []).map((c: any) => c.day).includes(pick);
   C.ev('_restDraft.w=null; _restDraft.day=null;');
   C.ev('openRestSheet(' + w + ",'" + d + "','move')");
   C.ev("_rdSet('pick','" + pick + "')");
@@ -1294,7 +1309,7 @@ function sheetMove(w, d, pick) {
   return { offered, moved: C.ev('(activeProg.weeks[' + w + ']["' + d + '"]||{}).movedFrom') === pick };
 }
 /** A fresh store, the clock on the rest day, the jog, then the move and the moved-in form open when `pick` is given. */
-function drive(prog, w, rest, j, pick) {
+function drive(prog: Program, w: number, rest: DayKey, j: Jog, pick: string | null) {
   C.use(prog);
   C.setNow(C.at(w, rest));
   sheetJog(w, rest, j);
@@ -1302,24 +1317,24 @@ function drive(prog, w, rest, j, pick) {
   if (pick) C.open(w, rest);
   return mv;
 }
-const restLogOf = (w, d) => (C.entry(w, d) || {}).restLog;
-const milesTile = (w) => {
+const restLogOf = (w: number, d: string) => (C.entry(w, d) || {}).restLog;
+const milesTile = (w: number) => {
   C.ev('currentWeek=' + w + '; renderWeekView()');
   const m = /color:var\(--run\)">([\d.]+)<\/div><div class="wk-stat-lbl">MILES/.exec(C.els.daysList.innerHTML || '');
   return m ? m[1] : null;
 };
 const progress = () => { C.ctx.__dots.length = 0; C.ev('progressViewId=null; renderProgressScreen()'); return C.els.progressBody.innerHTML || ''; };
-const chartVal = (title, w) => {
+const chartVal = (title: string, w: number) => {
   for (const a of C.ctx.__dots) {
     if (String(a[0]).indexOf(title) < 0) continue;
     return { drawn: true, v: Array.from(a[2])[Array.from(a[1]).indexOf(w)] };
   }
   return { drawn: false, v: undefined };
 };
-const ladder = (w) => (C.ev('ladderWeekly(getLogs(), activeProg.totalWeeks||99, null, false)') || {})[w];
+const ladder = (w: number) => (C.ev('ladderWeekly(getLogs(), activeProg.totalWeeks||99, null, false)') || {})[w];
 /** The Session Journal: week -> rows [{day, segs}], the text segments between tags. */
-function journal(html) {
-  const out = {};
+function journal(html: string) {
+  const out: Record<number, JournalRow[]> = {};
   for (let p of html.split('<details class="journal-week"').slice(1)) {
     p = p.slice(0, p.indexOf('</details>') < 0 ? p.length : p.indexOf('</details>'));
     const wm = p.match(/<span>Week (\d+)<\/span>/);
@@ -1329,12 +1344,12 @@ function journal(html) {
   }
   return out;
 }
-const rowOf = (jr, w, day) => (jr[w] || []).find((r) => r.day === day) || null;
-const jogLinesOf = (r) => (r ? r.segs.filter((s) => JOG_LINE_RE.test(s)) : []);
-const labelHits = (r) => (r ? LABEL_WORDS.filter((L) => r.segs.some((s) => s.indexOf(L) >= 0)) : []);
-const headOf = (r) => (r ? r.segs.filter((s) => /^RPE \d+ — /.test(s)) : []);
+const rowOf = (jr: Record<number, JournalRow[]>, w: number, day: string) => (jr[w] || []).find((r) => r.day === day) || null;
+const jogLinesOf = (r: JournalRow | null) => (r ? r.segs.filter((s) => JOG_LINE_RE.test(s)) : []);
+const labelHits = (r: JournalRow | null) => (r ? LABEL_WORDS.filter((L) => r.segs.some((s) => s.indexOf(L) >= 0)) : []);
+const headOf = (r: JournalRow | null) => (r ? r.segs.filter((s) => /^RPE \d+ — /.test(s)) : []);
 /** The rest hero on the week view: its logged lines and its button. */
-function heroOf(w, d) {
+function heroOf(w: number, d: string) {
   C.ev('currentWeek=' + w + '; renderWeekView()');
   const h = C.els.daysList.innerHTML || '';
   const lines = [...h.matchAll(/<div class="wk-rest-logged">([^<]*)<\/div>/g)].map((m) => m[1]);
@@ -1355,9 +1370,9 @@ test('the hosts are as typed: HALF_MANNY W1 has a rest Wednesday, a lifting Tues
 });
 
 test('a rest-day jog stores exactly its own record: restLog with minutes, distance when typed and RPE, the week and a time', () => {
-  const CELLS = [['run', HALF, 1, 'wed'], ['runNoDist', HALF, 1, 'wed'], ['walk', HALF, 1, 'wed'], ['walkStale', HALF, 1, 'wed'],
-    ['bike', MULTI, BIKE_CELL.w, BIKE_CELL.rest], ['bikeDist', MULTI, BIKE_CELL.w, BIKE_CELL.rest], ['row', MULTI, BIKE_CELL.w, BIKE_CELL.rest],
-    ['rowDist', MULTI, BIKE_CELL.w, BIKE_CELL.rest], ['swim', MULTI, SWIM_CELL.w, SWIM_CELL.rest]];
+  const CELLS: [string, Program, number, DayKey][] = [['run', HALF, 1, 'wed'], ['runNoDist', HALF, 1, 'wed'], ['walk', HALF, 1, 'wed'], ['walkStale', HALF, 1, 'wed'],
+    ['bike', MULTI, BIKE_CELL!.w, BIKE_CELL!.rest], ['bikeDist', MULTI, BIKE_CELL!.w, BIKE_CELL!.rest], ['row', MULTI, BIKE_CELL!.w, BIKE_CELL!.rest],
+    ['rowDist', MULTI, BIKE_CELL!.w, BIKE_CELL!.rest], ['swim', MULTI, SWIM_CELL!.w, SWIM_CELL!.rest]];
   for (const [nm, prog, w, d] of CELLS) {
     drive(prog, w, d, JOG[nm], null);
     const e = C.entry(w, d) || {};
@@ -1401,13 +1416,13 @@ test('a session moved onto a jog day leaves the jog whole through Done, an RPE, 
 });
 
 test('a session moved onto a jog day opens empty: every node blank, Log, no nudge, the slider unmoved; Done stores blanks', () => {
-  const FORMS = [['dist', HALF, 1, 'wed', 'sat', JOG.run], ['generic', HALF, 1, 'wed', 'mon', JOG.run], ['time', HALF, 1, 'wed', 'fri', JOG.run],
-    ['bike', MULTI, BIKE_CELL.w, BIKE_CELL.rest, BIKE_CELL.day, JOG.bike], ['swim', MULTI, SWIM_CELL.w, SWIM_CELL.rest, SWIM_CELL.day, JOG.swim]];
+  const FORMS: [string, Program, number, DayKey, string, Jog][] = [['dist', HALF, 1, 'wed', 'sat', JOG.run], ['generic', HALF, 1, 'wed', 'mon', JOG.run], ['time', HALF, 1, 'wed', 'fri', JOG.run],
+    ['bike', MULTI, BIKE_CELL!.w, BIKE_CELL!.rest, BIKE_CELL!.day, JOG.bike], ['swim', MULTI, SWIM_CELL!.w, SWIM_CELL!.rest, SWIM_CELL!.day, JOG.swim]];
   for (const [nm, prog, w, rest, pick, j] of FORMS) {
     const mv = drive(prog, w, rest, j, pick);
     assert.deepEqual([mv.offered, mv.moved], [true, true], nm);
     const html = C.els.detailBody.innerHTML || '';
-    const ids = [...new Set((html.match(/\sid="log_(?:run|bike|swim)_[a-z_]+"/g) || []).map((s) => s.slice(5, -1)))];
+    const ids = [...new Set<string>((html.match(/\sid="log_(?:run|bike|swim)_[a-z_]+"/g) || []).map((s: string) => s.slice(5, -1)))];
     assert.ok(ids.length > 0, nm + ' has cardio nodes');
     assert.deepEqual(ids.filter((k) => (C.els[k] || {}).value !== ''), [], nm + ' nothing seeded');
     assert.deepEqual([C.logged(), C.label(), html.includes(NUDGE)], ['0', COPY.log, false], nm);
@@ -1430,11 +1445,11 @@ test('the week MILES tile adds the jog: 3.7 + 5.2 moved in = 8.9, 3.7 under a li
   C.tap('wed', 'complete');
   assert.ok(mv.offered && mv.moved && C.status(1, 'wed') === 'complete');
   assert.equal(milesTile(1), '3.7');
-  mv = drive(MULTI, BIKE_CELL.w, BIKE_CELL.rest, JOG.run, BIKE_CELL.day);
+  mv = drive(MULTI, BIKE_CELL!.w, BIKE_CELL!.rest, JOG.run, BIKE_CELL!.day);
   C.roll(C.need('log_bike_mins'), SESS.bike45); C.log(); C.back();
   assert.ok(mv.offered && mv.moved);
-  assert.equal(+(C.entry(BIKE_CELL.w, BIKE_CELL.rest) || {}).bike_mins, 45);
-  assert.equal(milesTile(BIKE_CELL.w), '3.7');
+  assert.equal(+(C.entry(BIKE_CELL!.w, BIKE_CELL!.rest) || {}).bike_mins, 45);
+  assert.equal(milesTile(BIKE_CELL!.w), '3.7');
 });
 
 test('Progress sums the jog with the session, the plan drift ignores it, and the maxima take it as one candidate', () => {
@@ -1449,17 +1464,17 @@ test('Progress sums the jog with the session, the plan drift ignores it, and the
   assert.ok(pv && near(pv.presc, 3.1) && near(pv.act, 5.2), 'drift ' + J(pv && { presc: pv.presc, act: pv.act }));
   assert.ok(near(ladder(1), 5.2), 'ladder max(5.2, 3.7) ' + ladder(1));
   // bike total
-  mv = drive(MULTI, BIKE_CELL.w, BIKE_CELL.rest, JOG.bike, BIKE_CELL.day);
+  mv = drive(MULTI, BIKE_CELL!.w, BIKE_CELL!.rest, JOG.bike, BIKE_CELL!.day);
   C.roll(C.need('log_bike_mins'), SESS.bike45); C.log(); C.back();
   progress();
-  c = chartVal('Weekly Cycling Time', BIKE_CELL.w);
+  c = chartVal('Weekly Cycling Time', BIKE_CELL!.w);
   assert.ok(mv.offered && mv.moved && c.drawn && near(c.v, 82), 'bike 37 + 45 ' + J(c));
   // swim total
-  mv = drive(MULTI, SWIM_CELL.w, SWIM_CELL.rest, JOG.swim, SWIM_CELL.day);
+  mv = drive(MULTI, SWIM_CELL!.w, SWIM_CELL!.rest, JOG.swim, SWIM_CELL!.day);
   C.type('log_swim_yards', '1500'); C.log(); C.back();
-  assert.equal((C.entry(SWIM_CELL.w, SWIM_CELL.rest) || {}).swim_yards, '1500');
+  assert.equal((C.entry(SWIM_CELL!.w, SWIM_CELL!.rest) || {}).swim_yards, '1500');
   progress();
-  c = chartVal('Weekly Swimming Volume', SWIM_CELL.w);
+  c = chartVal('Weekly Swimming Volume', SWIM_CELL!.w);
   assert.ok(mv.offered && mv.moved && c.drawn && near(c.v, 2870), 'swim 1370 + 1500 ' + J(c));
   // average RPE over two efforts
   drive(HALF, 1, 'wed', JOG.run, null); C.open(1, 'mon'); C.rpe('6'); C.back();
@@ -1471,7 +1486,7 @@ test('Progress sums the jog with the session, the plan drift ignores it, and the
   c = chartVal('Average Session RPE', 1);
   assert.ok(mv.offered && mv.moved && c.drawn && near(c.v, 7.5), 'jog 7 and the moved-in 8 ' + J(c));
   // maxDist: three pace-only recovery runs, then the jog; then a 5.2 session on the jog's day
-  const REC = [];
+  const REC: [number, DayKey][] = [];
   for (const w of weeksOf(HALF)) for (const d of DAYS) if (REC.length < 3 && !(w === 1 && d === 'wed') && /recovery/i.test(subOf(HALF, w, d)) && sportOf(HALF.weeks[w][d]) === 'run') REC.push([w, d]);
   C.use(HALF); C.setNow(C.at(1, 'wed'));
   REC.forEach(([w, d], i) => {
@@ -1526,15 +1541,15 @@ test('the journal prints a jog as the hero sentence, never an RPE label; an old 
 
 test('a day swapped away from its sport is never offered to the rest sheet; swapped back it is offered only if nothing was logged', () => {
   // seven configs (seed 76308), each W1 run, bike or swim day; the arriving sport is the first of bike, run, swim not planned
-  const SRC_CFGS = [['HALF_MANNY', fixtures.HALF_MANNY], ['run10k+bike+swim', MULTI_CFG],
+  const SRC_CFGS: [string, object][] = [['HALF_MANNY', fixtures.HALF_MANNY], ['run10k+bike+swim', MULTI_CFG],
     ['run_pace', restCfg([['run', 'run_pace_goal', { targetDist: '1.5', targetMins: '10', targetSecs: '30' }]], 'balanced', 'intermediate', 'commercial', ['sun', 'wed'], 76308)],
     ['run_base', restCfg([['run', 'run_base']], 'balanced', 'intermediate', 'commercial', ['sun', 'wed'], 76308)],
     ['swim_base', restCfg([['swim', 'swim_base']], 'balanced', 'intermediate', 'commercial', ['sun', 'wed'], 76308)],
     ['bike_ftp', restCfg([['bike', 'bike_ftp']], 'balanced', 'intermediate', 'commercial', ['sun', 'wed'], 76308)],
     ['run_5k', restCfg([['run', 'run_5k']], 'strength', 'advanced', 'commercial', ['sat', 'sun'], 76308)]];
   const PRIMARY = ['log_run_dist', 'log_bike_mins', 'log_swim_yards', 'log_run_rep_time', 'log_run_mins'];
-  const offeredOn = (w, d) => Array.from(C.ev('restMoveCandidates(' + w + ')') || []).map((c) => c.day).includes(d);
-  const held = (e) => SEVEN.filter((k) => e[k]);
+  const offeredOn = (w: number, d: string) => Array.from(C.ev('restMoveCandidates(' + w + ')') || []).map((c: any) => c.day).includes(d);
+  const held = (e: any) => SEVEN.filter((k) => e[k]);
   let formHtml = '';
   // one session value on the form as it stands: a wheel's column 0 rolled to its first positive row other than the
   // one it shows, or the yards box typed 1500
@@ -1554,7 +1569,7 @@ test('a day swapped away from its sport is never offered to the rest sheet; swap
     }
     return null;
   };
-  const days = [];
+  const days: [string, Program, DayKey, DayKey, string][] = [];
   let cfgs = 0;
   for (const [nm, cfg] of SRC_CFGS) {
     const prog = C.build(cfg);
@@ -1565,7 +1580,7 @@ test('a day swapped away from its sport is never offered to the rest sheet; swap
   }
   assert.deepEqual([cfgs, days.length], [7, 22], 'seven configs with a W1 rest day, 22 W1 run, bike or swim days');
   for (const [nm, prog, rest, d, ct] of days) {
-    const t = ['bike', 'run', 'swim'].find((s) => s !== ct);
+    const t = ['bike', 'run', 'swim'].find((s) => s !== ct) as string;
     for (const mode of ['logged-then-swap', 'swap-blank', 'logged-under-swap']) {
       const tag = nm + ' W1 ' + d + ' ' + ct + '>' + t + ' ' + mode;
       C.use(prog); C.setNow(C.at(1, rest)); C.open(1, d);
@@ -1606,10 +1621,10 @@ test('a day swapped away from its sport is never offered to the rest sheet; swap
 });
 
 test('Log more on a rest day never overwrites: a second run adds minutes and miles and keeps the higher RPE; a ride sits beside it', () => {
-  const ARMS = [
+  const ARMS: [string, Program, number, DayKey, Jog[], Record<string, Record<string, number>>][] = [
     ['run then run, higher first', HALF, 1, 'wed', [JOG.run, { type: 'run', mins: 20, dist: '2', rpe: 5 }], { run: { mins: 57, dist: 5.7, rpe: 7 } }],
     ['run then run, higher last', HALF, 1, 'wed', [{ type: 'run', mins: 37, dist: '3.7', rpe: 5 }, { type: 'run', mins: 20, dist: '2', rpe: 9 }], { run: { mins: 57, dist: 5.7, rpe: 9 } }],
-    ['run then ride', MULTI, BIKE_CELL.w, BIKE_CELL.rest, [JOG.run, { type: 'bike', mins: 20, dist: '', rpe: 5 }], { run: { mins: 37, dist: 3.7, rpe: 7 }, bike: { mins: 20, rpe: 5 } }],
+    ['run then ride', MULTI, BIKE_CELL!.w, BIKE_CELL!.rest, [JOG.run, { type: 'bike', mins: 20, dist: '', rpe: 5 }], { run: { mins: 37, dist: 3.7, rpe: 7 }, bike: { mins: 20, rpe: 5 } }],
   ];
   for (const [nm, prog, w, d, steps, want] of ARMS) {
     C.use(prog); C.setNow(C.at(w, d));
@@ -1669,7 +1684,7 @@ test('a jog stored in the older flat shape reads as a rest log everywhere, and n
 });
 
 test('the rest hero prints one line per logged type with Log more, and Log cardio when nothing is logged', () => {
-  const CASES = [
+  const CASES: [string, object | null, string[], string][] = [
     ['none', null, [], 'Log cardio'],
     ['a rest log', { restLog: { run: { mins: 37, dist: 3.7, rpe: 7 } }, week: 1, ts: C.at(1, 'wed', 9) }, [LINE(37, 'run', 7)], 'Log more'],
     ['an older single jog', { rest_cardio: true, rest_type: 'run', rest_mins: 37, rpe: 7, run_dist: 3.7 }, [LINE(37, 'run', 7)], 'Log more'],

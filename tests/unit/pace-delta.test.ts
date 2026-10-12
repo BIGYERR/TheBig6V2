@@ -1,4 +1,3 @@
-'use strict';
 // The pace gap under a logged run: updateDoseDerived's note in #doseDerived, "on target", "<n>s/mi faster than target"
 // or "<m>:<ss>/mi slower than target". Ruling D40: a gap of a minute or more prints m:ss.
 //
@@ -14,10 +13,10 @@
 //
 // Oracles: a hand table typed from the ruling; a sweep that decodes the printed m:ss back to seconds (min * 60 + sec,
 // the inverse written here); the copy rule from CLAUDE.md. None asks the app what the answer should be.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const { APP, appFunction } = require('../support/app.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { APP, appFunction } from '../support/app.ts';
 
 const TGT = 600; // 10:00/mi
 const DOSE = { k: 'dist', mi: 60, tgt: TGT };
@@ -27,12 +26,12 @@ const _fmtPaceMi = appFunction('_fmtPaceMi', { _clkMS });
 const _parseClock = appFunction('_parseClock');
 const doseDerived = appFunction('doseDerived', { _parseClock, _fmtPaceMi });
 
-const els = {};
-const document = { getElementById: (id) => els[id] || (els[id] = { id, value: '', innerHTML: '' }) };
+const els: Record<string, { id: string; value: string; innerHTML: string }> = {};
+const document = { getElementById: (id: string) => els[id] || (els[id] = { id, value: '', innerHTML: '' }) };
 const updateDoseDerived = appFunction('updateDoseDerived', { document, doseDerived, _curLogDose: DOSE });
 
 /** The note under the derived pace for a run of `actSec` seconds per mile against the 10:00 target, or null. */
-function noteFor(actSec) {
+function noteFor(actSec: number) {
   for (const k of Object.keys(els)) delete els[k];
   document.getElementById('log_run_mins').value = String(actSec);
   document.getElementById('log_run_dist').value = '60';
@@ -45,7 +44,7 @@ function noteFor(actSec) {
 
 test('the gap reads as the hand table says, seconds under a minute and m:ss from a minute', () => {
   // [actual - target in s/mi, the note]
-  const TABLE = [
+  const TABLE: [number, string][] = [
     [0, 'on target'],
     [+4, 'on target'],
     [-4, 'on target'],

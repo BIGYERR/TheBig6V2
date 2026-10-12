@@ -1,4 +1,3 @@
-'use strict';
 // Swaps and undo: the swap sheet, the card it prescribes, the toast, the undo chip, the boot that replays the athlete's
 // swaps, the build-time swap preference, and the sport chip on a cardio day. Rulings:
 //   D177 (P-SWAPFLOOR) a swapped Main is prescribed the way the engine would prescribe it in that slot;
@@ -10,18 +9,19 @@
 //   D213, D214 (P-SWAPKEEP) the sport chip credits, it never erases; the note says what is kept.
 // The record is in the handoff and tests/measure/v221_rulings/ to v234_rulings/.
 //
-// This file runs each claim on hand fixtures and a small seeded sample of chains; tests/sweeps/swaps.test.js runs the
+// This file runs each claim on hand fixtures and a small seeded sample of chains; tests/sweeps/swaps.test.ts runs the
 // lattices (every Main and Power pair of 384 configs, the chain walk over eight configs, the 504-cell durability
 // lattice, every preference build) with the pinned counts in tests/snapshots/swaps.json.
 //
-// Oracles are typed by hand (tests/support/swaps.js): the floor table and window rewrite, the toast sentences, the cue
+// Oracles are typed by hand (tests/support/swaps.ts): the floor table and window rewrite, the toast sentences, the cue
 // and the hold, the cap table, the chain tuple (the chip is the last hop's `from`; the store after an undo is the
 // first n-1 hops), the day as the athlete last saw it before the boot, the ia_hist_ record as written.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const { appScript, progDigest, fixtures } = require('../support/app.js');
-const X = require('../support/swaps.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { appScript, progDigest, fixtures } from '../support/app.ts';
+import type { App } from '../support/app.ts';
+import * as X from '../support/swaps.ts';
 const { clean, clone, JS, E } = X;
 
 const EXPG = '4×8–12 — RPE 7 (leave ~3 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest';
@@ -32,8 +32,8 @@ const DONOR = 'Barbell box squat', GOB = 'Dumbbell goblet squat', LP = 'Leg pres
 // ── the swap floor (D177) ────────────────────────────────────────────────────────────────────────────────────────
 const F = X.floorPage();
 const sdE = F.eval('_swapDetailFor'), rfE = F.eval('_repFloor');
-const mainIdx = day => (day.sections || []).findIndex(s => /^main/i.test(clean(s && s.label)));
-function liveSwap(prog, w, d, si, ii, to) {
+const mainIdx = (day: any) => (day.sections || []).findIndex((s: any) => /^main/i.test(clean(s && s.label)));
+function liveSwap(prog: any, w: number, d: string, si: number, ii: number, to: string) {
   F.ctx.__P = prog; const it = prog.weeks[w][d].sections[si].items[ii];
   F.ctx.__c = { secIdx: si, itemIdx: ii, name: it.name, detail: it.detail || '' };
   F.eval("activeProg=__P;activeProgId='P1';currentWeek=" + (+w) + ";currentDayKey='" + d + "';globalThis.__T=null;_swapCtx=__c;applySwapChoice(" + JSON.stringify(to) + ')');
@@ -54,7 +54,7 @@ test("Mario's W5 Thursday box squat swapped to a goblet squat moves the reps to 
 
 test('the rep floor table, by movement', () => {
   // G2: the RR1 rows, the RR4 landmine literal, the swing kept at 10 to 15 (Mario 2026-09-23)
-  const HAND = [['Dumbbell goblet squat', [8, 12]], ['Kettlebell swing', [10, 15]], ['Barbell hip thrust', [6, 10]],
+  const HAND: [string, number[] | null][] = [['Dumbbell goblet squat', [8, 12]], ['Kettlebell swing', [10, 15]], ['Barbell hip thrust', [6, 10]],
     ['Zercher single-leg deadlift', [6, 10]], ['Landmine reverse lunge', [6, 10]], ['Landmine rotational press', [6, 10]],
     ['Landmine rotations', null], ['Dumbbell row', [6, 10]], ['Dumbbell bench press', [5, 8]], ['Leg press', [5, 8]],
     ['Cable lateral raise', [8, 12]], ['Back squat', null], ['Barbell box squat', null], ['Step-ups (KB)', [6, 10]]];
@@ -77,7 +77,7 @@ test('the add path fallback is 3×10 — RPE 7, in the Main grammar and at or ab
   assert.ok(m, 'addedDetailFor ends in a literal return');
   const lit = Function('"use strict";return ' + m[1])();
   assert.equal(lit, '3×10 — RPE 7');
-  const g = X.GRAM.exec(lit), maxLo = Math.max(...X.HAND_FLOOR.filter(r => r[1] && r[1][1] !== 0).map(r => r[1][0]));
+  const g = X.GRAM.exec(lit), maxLo = Math.max(...X.HAND_FLOOR.filter(r => r[1] && r[1][1] !== 0).map(r => (r[1] as number[])[0]));
   assert.ok(g && +g[2] >= maxLo);
   for (const n of ['Dumbbell goblet squat', 'Kettlebell swing', 'Barbell hip thrust', 'Landmine rotational press', 'Dumbbell row', 'Leg press', 'Cable lateral raise']) assert.equal(sdE(n, lit), lit, n);
 });
@@ -94,12 +94,12 @@ const L1_SAMPLE = [
   X.l1Cfg('crossfit', 'hypertrophy', 'advanced', 'half', { region: 'shoulder', tier: 'protect' }),
 ];
 const S = X.floorLattice(L1_SAMPLE);
-const ex = k => (S.ex[k] || []).join(' | ');
+const ex = (k: string) => (S.ex[k] || []).join(' | ');
 
 test('the sample lattice ran: every config built, Main and Power pairs of every kind present', () => {
   assert.deepEqual(S.crash, []);
   assert.equal(S.cfgs, L1_SAMPLE.length);
-  for (const k of ['main', 'pow', 'winN', 'atN', 'nullN', 'offN', 'zeroChg', 'capPairs', 'clampT']) assert.ok(S[k] > 0, k + ' > 0');
+  for (const k of ['main', 'pow', 'winN', 'atN', 'nullN', 'offN', 'zeroChg', 'capPairs', 'clampT'] as const) assert.ok(S[k] > 0, k + ' > 0');
 });
 
 test('a swapped Main card is the donor beneath its hold, with the window applied, and the hold on a capped target', () => {
@@ -149,9 +149,9 @@ function fixtureM() {
   F.localStorage.clear(); const cfg = X.MARIO(), p = F.buildProgram(cfg), prog = Object.assign({}, p, { cfg }), day = prog.weeks[5].thu, si = mainIdx(day);
   F.ctx.__P = prog; F.eval("activeProg=__P;activeProgId='P1';currentWeek=5;currentDayKey='thu';"); return { prog, day, si };
 }
-function tap(day, si, ii, to) { const it = day.sections[si].items[ii]; F.ctx.__c = { secIdx: si, itemIdx: ii, name: it.name, detail: it.detail || '' }; F.eval('_swapCtx=__c;applySwapChoice(' + JSON.stringify(to) + ')'); }
+function tap(day: any, si: number, ii: number, to: string) { const it = day.sections[si].items[ii]; F.ctx.__c = { secIdx: si, itemIdx: ii, name: it.name, detail: it.detail || '' }; F.eval('_swapCtx=__c;applySwapChoice(' + JSON.stringify(to) + ')'); }
 const DUP = '2×4 — RPE 8 (leave ~2 reps in reserve), 3 min rest';   // hand-written, differs from the donor, under the goblet window
-function inject(day, si) { const n = day.sections[si].items[0].name, tsi = day.sections.findIndex((s, k) => k !== si && s && Array.isArray(s.items)); day.sections[tsi].items.push({ name: n, detail: DUP }); return { n, tsi, tii: day.sections[tsi].items.length - 1 }; }
+function inject(day: any, si: number) { const n = day.sections[si].items[0].name, tsi = day.sections.findIndex((s: any, k: number) => k !== si && s && Array.isArray(s.items)); day.sections[tsi].items.push({ name: n, detail: DUP }); return { n, tsi, tii: day.sections[tsi].items.length - 1 }; }
 
 test('on a day carrying the same lift twice, undo puts both cards back: one tap, both taps, a boot replay', () => {
   // G5c
@@ -169,16 +169,16 @@ test('undo of a legacy record with no rx puts the name back, throws nothing and 
   // G5d
   const { day, si } = fixtureM(), n = day.sections[si].items[0].name;
   tap(day, si, 0, GOB);
-  const s = store(); s.w5_thu = (s.w5_thu || []).map(e => ({ from: e.from, to: e.to, ts: e.ts })); F.localStorage.setItem('ia_swaps_P1', JSON.stringify(s));
+  const s = store(); s.w5_thu = (s.w5_thu || []).map((e: any) => ({ from: e.from, to: e.to, ts: e.ts })); F.localStorage.setItem('ia_swaps_P1', JSON.stringify(s));
   F.eval('undoSwap(' + JSON.stringify(n) + ')');
   assert.equal(day.sections[si].items[0].name, n);
   assert.equal(store().w5_thu, undefined);
 });
 
-function namedPair(cfg, w, d, fromName, to) {
+function namedPair(cfg: Record<string, any>, w: number, d: string, fromName: string, to: string) {
   F.localStorage.clear(); const p = F.buildProgram(cfg), prog = Object.assign({}, p, { cfg }), day = prog.weeks[w][d];
   let si = -1, ii = -1;
-  day.sections.forEach((s, a) => { if (si < 0 && /^main/i.test(clean(s.label))) (s.items || []).forEach((x, b) => { if (ii < 0 && clean(x.name) === fromName) { si = a; ii = b; } }); });
+  day.sections.forEach((s: any, a: number) => { if (si < 0 && /^main/i.test(clean(s.label))) (s.items || []).forEach((x: any, b: number) => { if (ii < 0 && clean(x.name) === fromName) { si = a; ii = b; } }); });
   assert.ok(si >= 0, 'a Main ' + fromName + ' on W' + w + ' ' + d);
   const D = day.sections[si].items[ii].detail, r = liveSwap(prog, w, d, si, ii, to); return { D, O: r.item.detail, toast: r.toast };
 }
@@ -207,15 +207,15 @@ test('a swap preference in the config prints the window on every week it lands, 
   const c0 = X.MARIO(), p0 = F.buildProgram(c0), cP = Object.assign(X.MARIO(), { exSwapPrefs: Object.assign({}, PREF) }), cPj = JSON.stringify(cP);
   const pp = F.buildProgram(cP);
   assert.equal(JSON.stringify(cP), cPj, 'buildProgram leaves the config unchanged');
-  const slots = [];
+  const slots: { w: string; d: string; k: number; j: number; D: string }[] = [];
   Object.keys(p0.weeks).forEach(w => Object.keys(p0.weeks[w]).forEach(d => {
     const a = p0.weeks[w][d]; if (!a || !Array.isArray(a.sections)) return;
-    a.sections.forEach((s, k) => (s.items || []).forEach((x, j) => { if (x.name === DONOR) slots.push({ w, d, k, j, D: x.detail }); }));
+    a.sections.forEach((s: any, k: number) => (s.items || []).forEach((x: any, j: number) => { if (x.name === DONOR) slots.push({ w, d, k, j, D: x.detail }); }));
   }));
-  const want = sl => { const H = X.handKind(GOB, sl.D); return H.k === 'win' ? H.out : sl.D; };
+  const want = (sl: (typeof slots)[number]) => { const H = X.handKind(GOB, sl.D); return H.k === 'win' ? H.out : sl.D; };
   assert.ok(slots.length > 1);
   assert.ok(slots.some(sl => X.handKind(GOB, sl.D).k === 'win'), 'some slot is under the window');
-  const at = (P, sl) => { const y = P.weeks[sl.w] && P.weeks[sl.w][sl.d]; return (y && y.sections && y.sections[sl.k] && y.sections[sl.k].items[sl.j]) || {}; };
+  const at = (P: any, sl: (typeof slots)[number]) => { const y = P.weeks[sl.w] && P.weeks[sl.w][sl.d]; return (y && y.sections && y.sections[sl.k] && y.sections[sl.k].items[sl.j]) || {}; };
   for (const sl of slots) { const x = at(pp, sl); assert.equal(x.name, GOB, 'build W' + sl.w + ' ' + sl.d); assert.equal(x.detail, want(sl), 'build W' + sl.w + ' ' + sl.d); }
   const w1 = slots.find(sl => +sl.w === 1);
   assert.ok(w1, 'W1 carries a box squat');
@@ -232,7 +232,7 @@ test('the injury filter still runs after a preference: Box jumps lands when heal
   // G7-1b
   assert.ok(F.html.replace(/^\s*\/\/.*$/gm, '').includes('Jumps are out.'), 'the doctrine line is in the app');
   const PREF = { [DONOR]: 'Box jumps' };
-  const count = P => { let n = 0; Object.values(P.weeks).forEach(W => Object.values(W).forEach(D => ((D && D.sections) || []).forEach(s => ((s && s.items) || []).forEach(x => { if (x && /jump/i.test(x.name || '')) n++; })))); return n; };
+  const count = (P: any) => { let n = 0; Object.values(P.weeks).forEach((W: any) => Object.values(W).forEach((D: any) => ((D && D.sections) || []).forEach((s: any) => ((s && s.items) || []).forEach((x: any) => { if (x && /jump/i.test(x.name || '')) n++; })))); return n; };
   const h = X.MARIO(); delete h.injury; h.exSwapPrefs = Object.assign({}, PREF);
   const k = Object.assign(X.MARIO(), { exSwapPrefs: Object.assign({}, PREF) });
   assert.ok(count(F.buildProgram(h)) > 0);
@@ -269,15 +269,15 @@ test('a boot equals itself and a fresh-page boot (Mario, the ankle plan, HALF_MA
 /** Mario's W5 Thursday, untouched, with the box squat's slot. */
 function marioThu() {
   const A = X.page(); X.setup(A, 'knee_wa', X.CFGS.knee_wa); X.boot(A); X.view(A, 5, 'thu');
-  let L0 = null;
-  (X.dayOf(A, 5, 'thu').sections || []).forEach((s, si) => (s.items || []).forEach((it, ii) => { if (!L0 && clean(it.name) === DONOR) L0 = { si, ii }; }));
+  let L0 = null as { si: number; ii: number } | null;
+  (X.dayOf(A, 5, 'thu').sections || []).forEach((s: any, si: number) => (s.items || []).forEach((it: any, ii: number) => { if (!L0 && clean(it.name) === DONOR) L0 = { si, ii }; }));
   assert.ok(L0, 'the box squat is on Mario W5 Thursday');
-  const slot = T => { const it = X.dayOf(T, 5, 'thu').sections[L0.si].items[L0.ii]; return clean(it.name) + ' | ' + clean(it.detail); };
-  const daySig = T => X.sig(X.dayOf(T, 5, 'thu'));
-  const swapTo = (T, to) => X.hop(T, 5, 'thu', { si: L0.si, ii: L0.ii, to });
-  const chip = T => { X.view(T, 5, 'thu'); return E(T, 'swapOriginOf(' + JSON.stringify(clean(X.dayOf(T, 5, 'thu').sections[L0.si].items[L0.ii].name)) + ')') || '-'; };
-  const undo = (T, from) => { X.view(T, 5, 'thu'); E(T, 'undoSwap(' + JSON.stringify(from) + ');'); };
-  const rb = T => { const R = X.reboot(T); X.view(R, 5, 'thu'); return R; };
+  const slot = (T: App) => { const it = X.dayOf(T, 5, 'thu').sections[L0!.si].items[L0!.ii]; return clean(it.name) + ' | ' + clean(it.detail); };
+  const daySig = (T: App) => X.sig(X.dayOf(T, 5, 'thu'));
+  const swapTo = (T: App, to: string) => X.hop(T, 5, 'thu', { si: L0!.si, ii: L0!.ii, to });
+  const chip = (T: App) => { X.view(T, 5, 'thu'); return E(T, 'swapOriginOf(' + JSON.stringify(clean(X.dayOf(T, 5, 'thu').sections[L0!.si].items[L0!.ii].name)) + ')') || '-'; };
+  const undo = (T: App, from: string) => { X.view(T, 5, 'thu'); E(T, 'undoSwap(' + JSON.stringify(from) + ');'); };
+  const rb = (T: App) => { const R = X.reboot(T); X.view(R, 5, 'thu'); return R; };
   return { A, slot, daySig, swapTo, chip, undo, rb };
 }
 
@@ -315,12 +315,12 @@ test('a two-step cycle back to the box squat boots as the last live card, twice'
 // of Mario (knee) and HALF_MANNY. The sweep walks eight configs, W3 and W5, every day.
 const SAMPLE_CK = ['knee_wa', 'manny'];
 const ONE = { hop1: 1, hop2: 1, cyc2: 1, hop3: 1, cyc3: 1, collide2: 1, exch3: 1 };
-const CHAINS = [].concat(...SAMPLE_CK.map(ck => X.enumerate(ck, [5], ['thu', 'sat'], ONE)));
-const RES = new Map();
+const CHAINS = ([] as X.Chain[]).concat(...SAMPLE_CK.map(ck => X.enumerate(ck, [5], ['thu', 'sat'], ONE)));
+const RES = new Map<string, X.ChainRun>();
 for (const ck of SAMPLE_CK) X.runChains(CHAINS.filter(c => c.ck === ck), 'u', true).forEach((v, k) => RES.set(k, v));
 const ROWS = CHAINS.map(c => Object.assign({ c }, RES.get(c.id)));
 const REACH = ROWS.filter(r => !r.unreach);
-const tagOf = r => r.c.ck + ' W' + r.c.w + ' ' + r.c.d + ' ' + r.c.cls + ' ' + r.c.hops[0].from + ' > ' + r.c.hops.map(h => h.to).join(' > ');
+const tagOf = (r: { c: X.Chain }) => r.c.ck + ' W' + r.c.w + ' ' + r.c.d + ' ' + r.c.cls + ' ' + r.c.hops[0].from + ' > ' + r.c.hops.map(h => h.to).join(' > ');
 
 test('the chain sample reaches every class', () => {
   for (const cls of X.CLASSES) assert.ok(REACH.some(r => r.c.cls === cls), cls);
@@ -363,7 +363,7 @@ test('the undo chip names the lift that just left: the last hop\'s from', () => 
 test('one undo puts the day back as it was before the last hop, and on a complete store leaves the first hops recorded', () => {
   // undokey d2-UNDO, seam d-U's undo half
   assert.deepEqual(REACH.filter(r => !r.undoEq).map(tagOf), []);
-  assert.deepEqual(REACH.filter(r => X.inU(r.c) && r.recAfter.join('|') !== X.handStore(r.c).join('|')).map(r => tagOf(r) + ' ' + r.recAfter.join(',')), []);
+  assert.deepEqual(REACH.filter(r => X.inU(r.c) && r.recAfter!.join('|') !== X.handStore(r.c).join('|')).map(r => tagOf(r) + ' ' + r.recAfter!.join(',')), []);
 });
 
 test('after an undo on a complete store, a fresh boot shows the day the athlete sees', () => {
@@ -371,7 +371,7 @@ test('after an undo on a complete store, a fresh boot shows the day the athlete 
   assert.deepEqual(REACH.filter(r => X.inU(r.c) && r.bootAfterUndoJ !== r.afterJ).map(tagOf), []);
 });
 
-const patOf = (() => { const P = X.page(), c = {}; return n => (n in c) ? c[n] : (c[n] = E(P, '_pattern(' + JSON.stringify(n) + ')') || null); })();
+const patOf = (() => { const P = X.page(), c: Record<string, any> = {}; return (n: string) => (n in c) ? c[n] : (c[n] = E(P, '_pattern(' + JSON.stringify(n) + ')') || null); })();
 
 // The four natively cued items (D190 (e)): Mario W3 Thu Reverse lunge (KB), W5 Thu Step-ups (KB), both in Leg superset
 // A; the ankle plan's Dumbbell Bulgarian split squat, W3 and W5 Thu. Each is a lunge pattern, capped on both plans.
@@ -382,27 +382,27 @@ const CUED = [
   { ck: 'ankle_wa', w: 5, d: 'thu', sec: null, name: 'Dumbbell Bulgarian split squat', pat: 'lunge' },
 ];
 const LOC = CUED.map(h => {
-  const A = X.page(); X.setup(A, h.ck, X.CFGS[h.ck]); X.boot(A); const hits = [];
-  ((X.dayOf(A, h.w, h.d) || {}).sections || []).forEach((s, si) => (s.items || []).forEach((it, ii) => { if (it && clean(it.name) === h.name) hits.push({ si, ii, label: clean(s.label), detail: it.detail || '' }); }));
+  const A = X.page(); X.setup(A, h.ck, X.CFGS[h.ck]); X.boot(A); const hits: { si: number; ii: number; label: string; detail: string }[] = [];
+  ((X.dayOf(A, h.w, h.d) || {}).sections || []).forEach((s: any, si: number) => (s.items || []).forEach((it: any, ii: number) => { if (it && clean(it.name) === h.name) hits.push({ si, ii, label: clean(s.label), detail: it.detail || '' }); }));
   return { h, hits };
 });
 // The chains off the cued items: every hop1, one hop2 and one cyc2 per item (the sweep takes every chain).
-const CUED_REACH = [];
+const CUED_REACH: ({ c: X.Chain } & X.ChainRun)[] = [];
 for (const ck of ['knee_wa', 'ankle_wa']) {
   const all = X.enumerate(ck, [3, 5], ['thu'], { hop1: Infinity, hop2: Infinity, cyc2: Infinity });
-  const mine = [];
+  const mine: X.Chain[] = [];
   for (const L of LOC.filter(x => x.h.ck === ck && x.hits.length === 1)) {
     const from = all.filter(c => c.w === L.h.w && c.hops[0].si === L.hits[0].si && c.hops[0].ii === L.hits[0].ii);
     mine.push(...from.filter(c => c.cls === 'hop1'), ...from.filter(c => c.cls === 'hop2').slice(0, 1), ...from.filter(c => c.cls === 'cyc2').slice(0, 1));
   }
   const res = X.runChains(mine, 'u', false);
-  for (const c of mine) { const r = res.get(c.id); if (!r.unreach) CUED_REACH.push(Object.assign({ c }, r)); }
+  for (const c of mine) { const r = res.get(c.id) as X.ChainRun; if (!r.unreach) CUED_REACH.push(Object.assign({ c }, r)); }
 }
 
 test('after every live swap the card carries the plan\'s cue exactly when the plan caps the movement now on it', () => {
   // cuecap b-ALL (the chain sample and the chains off the cued items); an uninjured athlete never sees the cue
   let hops = 0, cued = 0, offCued = 0, plain = 0;
-  const bad = [];
+  const bad: string[] = [];
   for (const r of REACH.concat(CUED_REACH)) {
     const region = X.REGION(r.c.ck);
     r.c.hops.forEach((h, k) => {
@@ -425,7 +425,7 @@ test("a touched day boots byte for byte as its ia_hist_ record, with no name twi
       const res = X.runChains(chains, mode, false);
       let n = 0;
       for (const c of chains) {
-        const r = res.get(c.id); if (r.unreach) continue; n++;
+        const r = res.get(c.id) as X.ChainRun; if (r.unreach) continue; n++;
         assert.ok(r.histJ, mode + ' ' + ck + ' ' + c.cls + ': a snapshot was written');
         assert.equal(r.bootJ, r.histJ, mode + ' ' + ck + ' ' + c.cls + ': the boot is the snapshot');
         assert.equal(r.dup, null, mode + ' ' + ck + ' ' + c.cls + ': no name twice');
@@ -456,12 +456,12 @@ test('every chain off a natively cued item boots as the live day', () => {
 test("HALF_MANNY W3 Thursday trap bar deadlift to RDL to deadlift to RDL: the chip says Deadlift and one undo walks back one step", () => {
   // undokey PIN (the D192 ruling's own chain)
   const A = X.page(); X.setup(A, 'manny', X.CFGS.manny); X.boot(A);
-  const hits = [];
-  (X.dayOf(A, 3, 'thu').sections || []).forEach((s, si) => (s.items || []).forEach((it, ii) => { if (it && it.name === 'Trap bar deadlift' && clean(s.label).startsWith('Main')) hits.push({ si, ii }); }));
+  const hits: { si: number; ii: number }[] = [];
+  (X.dayOf(A, 3, 'thu').sections || []).forEach((s: any, si: number) => (s.items || []).forEach((it: any, ii: number) => { if (it && it.name === 'Trap bar deadlift' && clean(s.label).startsWith('Main')) hits.push({ si, ii }); }));
   assert.equal(hits.length, 1);
   const { si, ii } = hits[0], seq = ['Trap bar deadlift', 'Barbell Romanian deadlift', 'Deadlift', 'Barbell Romanian deadlift'];
   const c = { id: 'pin', ck: 'manny', cls: 'hop3', w: 3, d: 'thu', hops: seq.slice(1).map((to, k) => ({ si, ii, from: seq[k], to })) };
-  const r = X.runChains([c], 'u', true).get('pin');
+  const r = X.runChains([c], 'u', true).get('pin') as X.ChainRun;
   assert.equal(r.unreach, 0);
   assert.equal(r.chip, 'Deadlift');
   assert.ok(r.undoEq);
@@ -486,7 +486,7 @@ test('no build and no boot reads the undo chip', () => {
 
 // ── the cue on the ruling's own chains (D190 (b)) ────────────────────────────────────────────────────────────────
 const KB = 'Kettlebell swing', SSDL = 'Dumbbell split-stance deadlift', NORD = 'Nordic hamstring curl (anchored)';
-const PAT_TYPED = { [KB]: 'hinge', [SSDL]: 'hinge', [GOB]: 'squat', [NORD]: 'hip_ext' };
+const PAT_TYPED: Record<string, string> = { [KB]: 'hinge', [SSDL]: 'hinge', [GOB]: 'squat', [NORD]: 'hip_ext' };
 const RX8 = '2×8', RX8C = RX8 + X.CUE, BW8 = '2 sets — RPE 8 (stop 2 reps short of failure)';
 const TOAST_GOB = 'Dumbbell goblet squat in, kettlebell swing out. Same job, same numbers.';
 for (const h of [
@@ -497,10 +497,10 @@ for (const h of [
   test(h.name + ', and each hop boots as the live card', () => {
     // cuecap b-HAND-1, b-HAND-2, b-HAND-3 (Leg superset B, donor Kettlebell swing 2×8)
     const r = X.REGION(h.ck);
-    h.hops.forEach((to, k) => assert.equal(X.CAP[r].includes(PAT_TYPED[to]), h.want[k].endsWith(X.CUE), 'the typed oracle agrees with itself'));
+    h.hops.forEach((to, k) => assert.equal(X.CAP[r as string].includes(PAT_TYPED[to]), h.want[k].endsWith(X.CUE), 'the typed oracle agrees with itself'));
     for (const n of [KB].concat(h.hops)) assert.equal(patOf(n), PAT_TYPED[n], n);
-    const A = X.page(); X.setup(A, h.ck, X.CFGS[h.ck]); X.boot(A); const d0 = X.dayOf(A, h.w, 'thu'); let L = null;
-    (d0.sections || []).forEach((s, si) => { if (!clean(s.label).startsWith('Leg superset B')) return; (s.items || []).forEach((it, ii) => { if (!L && clean(it.name) === KB) L = { si, ii }; }); });
+    const A = X.page(); X.setup(A, h.ck, X.CFGS[h.ck]); X.boot(A); const d0 = X.dayOf(A, h.w, 'thu'); let L = null as { si: number; ii: number } | null;
+    (d0.sections || []).forEach((s: any, si: number) => { if (!clean(s.label).startsWith('Leg superset B')) return; (s.items || []).forEach((it: any, ii: number) => { if (!L && clean(it.name) === KB) L = { si, ii }; }); });
     assert.ok(L, 'a kettlebell swing in Leg superset B');
     assert.deepEqual(X.slotOf(d0, L.si, L.ii), { n: KB, d: RX8 });
     for (let k = 1; k <= h.hops.length; k++) {
@@ -517,8 +517,8 @@ for (const h of [
 }
 
 // ── the build-time preference keeps the cue on the plan and the movement on the card (D190 build path) ─────────
-const capped = (reg, n) => { const p = patOf(n); return !!p && X.CAP[reg].includes(p); };
-const cueViol = (reg, c) => c.det.endsWith(X.CUE) !== (capped(reg, c.n) && !/RPE/.test(X.stripCue(c.det)));
+const capped = (reg: string, n: string) => { const p = patOf(n); return !!p && X.CAP[reg].includes(p); };
+const cueViol = (reg: string, c: X.Card) => c.det.endsWith(X.CUE) !== (capped(reg, c.n) && !/RPE/.test(X.stripCue(c.det)));
 
 test("a preference for Reverse lunge (KB) on a knee plan prints the deadlift's own dose; Dumbbell incline press to Cable pushdown on a shoulder plan likewise", () => {
   // prefpath c2-hand: W3 and W4 Thu Leg superset A `2×8–12 each @ RPE 7`; W1 Mon `3×8–12 @ RPE 6–7`
@@ -548,7 +548,7 @@ const PREF_BUILDS = PREFS.map(r => ({ r, A: X.cards(X.prefCfg(r.reg, { [r.src]: 
 test('every card of a preference build carries the cue exactly when the plan caps it and its dose names no RPE', () => {
   // prefpath c2-i
   for (const reg of X.PREF_REGIONS) assert.ok(PREFS.some(r => r.reg === reg), reg + ' contributes a preference build');
-  const bad = [];
+  const bad: string[] = [];
   let n = 0;
   for (const { r, A } of PREF_BUILDS) for (const c of A.values()) { n++; if (cueViol(r.reg, c)) bad.push(r.reg + ' {' + r.src + ' -> ' + r.tgt + '} W' + c.w + ' ' + c.d + ' ' + c.n + ' ' + c.det); }
   assert.ok(n > 0);
@@ -558,7 +558,7 @@ test('every card of a preference build carries the cue exactly when the plan cap
 test('an uncapped preference target prints what the uninjured build with the same preference prints in that slot', () => {
   // prefpath c2-ii (reference: the uninjured build with the same preference, which never meets a cue)
   let pop = 0;
-  const bad = [];
+  const bad: string[] = [];
   for (const { r, A } of PREF_BUILDS) {
     const U = X.cards(X.prefCfg(null, { [r.src]: r.tgt }));
     for (const a of A.values()) {

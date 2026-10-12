@@ -116,8 +116,8 @@ export interface Cfg {
   exSwapPrefs?: Record<string, string>;
   /** Optional: the wizard's start date (YYYY-MM-DD); moved onto the program and deleted from cfg before storing. */
   startDate?: string;
-  /** Optional and uncertain: read once by buildProgram, never written by the wizard today. */
-  raceDateWeeks?: number;
+  /** Optional and uncertain: read once by buildProgram; the wizard's "no race" button writes null. */
+  raceDateWeeks?: number | null;
   /** Optional: a test goal's pinned test week (doGenerate), null when nothing pins. */
   _testWeek?: number | null;
   /** Optional: the program length doGenerate settled on. */

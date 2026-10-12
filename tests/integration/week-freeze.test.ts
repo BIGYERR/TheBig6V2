@@ -1,4 +1,3 @@
-'use strict';
 // The week freeze: a day the athlete has seen keeps its card across a reboot. Ruling D108 (V202, E14): the touched set
 // reads all four stores, so a day is frozen by any store that proves the athlete saw it. ia_exw_ is a load written
 // against a prescription (selectKBSize writes it and nothing else); ia_hist_ is the snapshot of the card shown.
@@ -11,21 +10,22 @@
 // Oracle: the fixture's own stored bytes (the sentinel week written to ia_programs, the snapshot written to ia_hist_).
 // The engine is never asked what the frozen card should be; one test proves the live build differs from the sentinel,
 // so "frozen" is a real claim, and the control day proves a day with nothing stored still rebuilds.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadApp, pinClock, progDigest } = require('../support/app.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import type { Program } from '@ia/core';
+import { loadApp, pinClock, progDigest } from '../support/app.ts';
 
 const TODAY = new Date(2026, 9, 11, 12, 0, 0);
-const clone = v => JSON.parse(JSON.stringify(v));
+const clone = (v: unknown) => JSON.parse(JSON.stringify(v));
 // A recursive key sort (JSON.stringify with a key list is an allowlist at every level and would strip the sections).
-function canon(v) {
+function canon(v: any): string {
   if (v === null || typeof v !== 'object') return JSON.stringify(v) || 'null';
   if (Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
   return '{' + Object.keys(v).sort().map(k => JSON.stringify(k) + ':' + canon(v[k])).join(',') + '}';
 }
-const exNamesOf = day => {
-  const out = [];
-  ((day && day.sections) || []).forEach(s => (s.items || []).forEach(i => { if (i && i.name) out.push(i.name); }));
+const exNamesOf = (day: any) => {
+  const out: string[] = [];
+  ((day && day.sections) || []).forEach((s: any) => (s.items || []).forEach((i: any) => { if (i && i.name) out.push(i.name); }));
   return out;
 };
 
@@ -44,7 +44,7 @@ const CONTROL = 'thu'; // nothing written
 function app() { const IA = loadApp(); pinClock(IA, TODAY); IA.eval('showToast=function(){};'); return IA; }
 
 /** A stored program whose week WK carries sentinels, with exactly one store written for the probe day; then a reboot. */
-function scenario(only) {
+function scenario(only: string) {
   const V = app();
   const stored = clone(V.buildProgram(clone(CFG)));
   stored.id = 'p_freeze_' + only;
@@ -53,16 +53,16 @@ function scenario(only) {
   for (const d of [PROBE, CONTROL]) {
     const day = stored.weeks[WK][d];
     day.title = 'SENTINEL ' + d.toUpperCase() + ' w' + WK;
-    const first = (day.sections || []).find(s => (s.items || []).length);
+    const first = (day.sections || []).find((s: any) => (s.items || []).length);
     if (first) first.items[0].name = 'Sentinel movement ' + d;
   }
   const SENT = clone(stored.weeks[WK]);
   V.localStorage.setItem('ia_programs', JSON.stringify([stored]));
   V.localStorage.setItem('ia_active', stored.id);
-  let HIST = null, histKey = null;
+  let HIST: Record<string, unknown> | null = null, histKey: string | null = null;
   if (only === 'hist') {
     histKey = V.eval('completedKey(' + WK + ",'" + PROBE + "')");
-    HIST = { [histKey]: clone(SENT[PROBE]) };
+    HIST = { [histKey as string]: clone(SENT[PROBE]) };
     V.localStorage.setItem('ia_hist_' + stored.id, JSON.stringify(HIST));
   } else {
     // keyed by exercise slug through the app's one writer of that slug; the week and day live on the entry
@@ -71,7 +71,7 @@ function scenario(only) {
     V.localStorage.setItem('ia_exw_' + stored.id, JSON.stringify(EXW));
   }
   const stores = ['ia_comp_', 'ia_logs_', 'ia_hist_', 'ia_exw_'].filter(p => V.localStorage.getItem(p + stored.id) !== null);
-  const after = V.refreshProgram(JSON.parse(V.localStorage.getItem('ia_programs'))[0]);
+  const after = V.refreshProgram(JSON.parse(V.localStorage.getItem('ia_programs') as string)[0]);
   return { SENT, HIST, histKey, after, A: (after.weeks && after.weeks[WK]) || {}, stores };
 }
 
@@ -117,7 +117,7 @@ test('beside a logged weight, a day with no record is rebuilt to the live build'
 test('a snapshot alone (ia_hist_) freezes the day to the snapshot, byte for byte', () => {
   // R2
   assert.ok(SH.A[PROBE]);
-  assert.equal(canon(SH.A[PROBE]), canon(SH.HIST[SH.histKey]));
+  assert.equal(canon(SH.A[PROBE]), canon((SH.HIST as Record<string, unknown>)[SH.histKey as string]));
 });
 
 test('beside a snapshot, a day with no record is rebuilt to the live build', () => {

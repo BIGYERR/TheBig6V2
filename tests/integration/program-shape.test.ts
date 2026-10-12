@@ -38,7 +38,7 @@ describe('every config builds a program with the domain shape', () => {
       let items = 0;
       for (const week of Object.values(prog.weeks)) {
         for (const day of Object.values(week)) {
-          for (const s of ('sections' in day ? day.sections : [])) {
+          for (const s of day.sections || []) {
             sections++;
             items += s.items.length;
           }

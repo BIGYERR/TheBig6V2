@@ -1,6 +1,5 @@
-'use strict';
-// Helpers for the week view, day close and active program tests (tests/integration/week-view.test.js,
-// tests/sweeps/week-view.test.js, tests/integration/active-program.test.js). Built on tests/support/app.js.
+// Helpers for the week view, day close and active program tests (tests/integration/week-view.test.ts,
+// tests/sweeps/week-view.test.ts, tests/integration/active-program.test.ts). Built on tests/support/app.ts.
 //
 //   stripComments(src)   the inline script with every comment blanked by a small lexer that knows strings, template
 //                        literals (with ${} nesting) and regex literals, so a "this token is gone" scan never counts a
@@ -13,14 +12,71 @@
 //   closeTaps(E, days), timerTaps(E, days), wheelTaps(E), heroAndStrip(E, weeks)
 //                        the day-close lattices, each returning a tally per claim. The integration file runs them on
 //                        a sample of days; the sweep runs every training day.
-const vm = require('node:vm');
-const { loadApp, fixtures } = require('./app.js');
+import { createRequire } from 'node:module';
+import type * as VM from 'node:vm';
+
+/** The same node:vm module object harness.js calls, so a hook placed on it reaches the harness. */
+const vm: typeof VM = createRequire(import.meta.url)('node:vm');
+import type { DayKey, Program } from '@ia/core';
+import { loadApp, fixtures } from './app.ts';
+import type { App, StorageStub } from './app.ts';
+
+/** A stand-in for a DOM node or a wheel part: the app's untyped script reads and writes it freely. */
+type Stub = any;
+
+/** A queued callback on the virtual clock. */
+interface Timer {
+  fn: () => void;
+  at: number;
+  every: number;
+  kind: string;
+}
+
+/** The day-close world weekEnv() returns. */
+export interface WeekEnv {
+  IA: App;
+  ev: App['eval'];
+  LS: StorageStub;
+  els: Record<string, Stub>;
+  /** Runs every timer due in the next `ms` of virtual time, in time order. */
+  advance(ms: number): void;
+  T: Map<number, Timer>;
+  errs: string[];
+  /** The wheel columns #detailOverlay reports (a test places a hand-built wheel's columns here). */
+  cols: Stub[];
+  toastShows: { t: number; html: string }[];
+  vnow(): number;
+  setNow(t: number): void;
+  /** Mario's program as stored for every case: id 'measure', start 2026-09-21, no blockOpen. */
+  p: Program & { blockOpen?: unknown; createdAt?: unknown };
+  setup(): void;
+  /** Every training day of the program, [week, day], in order. */
+  TRAIN: [number, DayKey][];
+  OPEN(): boolean;
+  POP(): boolean;
+  TOAST(): boolean;
+  WEEK(): boolean;
+  html(): string;
+  clearMarks(): void;
+  fresh(w: number, d: DayKey, plus?: number): void;
+  open(d: DayKey): void;
+  tap(d: DayKey, st: string): unknown;
+  status(w: number, d: DayKey): any;
+  PRE: { n: number; renders: number };
+  notePre(h: string): void;
+}
+
+/** A tally per claim: pass count, fail count, the first two failures. */
+export interface Tally {
+  rec(k: string, c: boolean, why: string): void;
+  get(k: string): { pass: number; fail: number; examples: string[] };
+}
 
 const BS = String.fromCharCode(92);
 
 /** The source with every comment replaced (line comments dropped, block comments by one space). */
-function stripComments(src) {
-  const out = [], n = src.length, tpl = [];
+function stripComments(src: string): string {
+  const out: string[] = [], n = src.length, tpl: number[] = [];
   let i = 0, depth = 0, prevSig = '', prevWord = '';
   const RX_PREV = new Set('(,=:[!&|?{};+-*%<>~^'.split(''));
   const RX_WORDS = new Set(['return', 'typeof', 'case', 'do', 'else', 'in', 'of', 'new', 'delete', 'void', 'throw', 'instanceof', 'yield', 'await']);
@@ -73,79 +129,79 @@ function stripComments(src) {
 }
 
 /** True when `src` compiles as a script. */
-function compiles(src) {
+function compiles(src: string): boolean {
   try { new vm.Script(src); return true; } catch { return false; }
 }
 
-const count = (s, t) => s.split(t).length - 1;
+const count = (s: string, t: string): number => s.split(t).length - 1;
 
 // ── the day-close world ─────────────────────────────────────────────────────────────────────────────────────────────
-const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
-const FULL = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
+const DAYS: DayKey[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const FULL: Record<DayKey, string> = { mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', fri: 'Friday', sat: 'Saturday', sun: 'Sunday' };
 const START_ISO = '2026-09-21';   // a Monday
 const RealDate = Date;
 /** 10:00 local on week w, day d of the block (plus `plus` days). */
-const dateOf = (w, d, plus) => new RealDate(2026, 8, 21 + (w - 1) * 7 + DAYS.indexOf(d) + (plus || 0), 10, 0, 0).getTime();
+const dateOf = (w: number, d: DayKey, plus?: number): number => new RealDate(2026, 8, 21 + (w - 1) * 7 + DAYS.indexOf(d) + (plus || 0), 10, 0, 0).getTime();
 
 // The pace wheel's row table (V184 D5): minutes ['', '4'..'17'] with no wrap; seconds '0'..'59' five times, home 120.
 // Seeded `9:30` is minutes row 6, seconds row 150; minutes row 7 settles `10:30`.
 const MIN_ROWS = ['', ...Array.from({ length: 14 }, (_, i) => String(4 + i))];
-const SEC_ROWS = [].concat(...Array(5).fill(Array.from({ length: 60 }, (_, i) => String(i))));
+const SEC_ROWS: string[] = ([] as string[]).concat(...Array(5).fill(Array.from({ length: 60 }, (_, i) => String(i))));
 const WROW = 44, W_SEED = '9:30', W_SEED_ROWS = [6, 150], W_TARGET_ROW = 7, W_SETTLED = '10:30';
 
-function weekEnv() {
+function weekEnv(): WeekEnv {
   const IA = loadApp(), ctx = IA.ctx, ev = IA.eval, LS = IA.localStorage, src = IA.html;
   let VNOW = dateOf(1, 'mon');
-  class FD extends RealDate { constructor(...a) { if (a.length) super(...a); else super(VNOW); } static now() { return VNOW; } }
+  class FD extends RealDate { constructor(...a: unknown[]) { if (a.length) super(...(a as [string])); else super(VNOW); } static override now() { return VNOW; } }
   ctx.Date = FD; ctx.performance = { now: () => VNOW };
-  let tid = 1; const T = new Map(), errs = [];
-  const sched = (fn, ms, every, kind) => { const id = tid++; T.set(id, { fn, at: VNOW + Math.max(0, +ms || 0), every, kind }); return id; };
-  ctx.setTimeout = (fn, ms) => sched(fn, ms, 0, 'timeout');
-  ctx.setInterval = (fn, ms) => sched(fn, ms, Math.max(1, +ms || 1), 'interval');
-  ctx.requestAnimationFrame = fn => sched(() => fn(VNOW), 16, 0, 'raf');
-  ctx.clearTimeout = id => { T.delete(id); }; ctx.clearInterval = id => { T.delete(id); }; ctx.cancelAnimationFrame = id => { T.delete(id); };
-  const advance = ms => {
+  let tid = 1; const T = new Map<number, Timer>(), errs: string[] = [];
+  const sched = (fn: () => void, ms: number, every: number, kind: string): number => { const id = tid++; T.set(id, { fn, at: VNOW + Math.max(0, +ms || 0), every, kind }); return id; };
+  ctx.setTimeout = (fn: () => void, ms: number) => sched(fn, ms, 0, 'timeout');
+  ctx.setInterval = (fn: () => void, ms: number) => sched(fn, ms, Math.max(1, +ms || 1), 'interval');
+  ctx.requestAnimationFrame = (fn: (t: number) => void) => sched(() => fn(VNOW), 16, 0, 'raf');
+  ctx.clearTimeout = (id: number) => { T.delete(id); }; ctx.clearInterval = (id: number) => { T.delete(id); }; ctx.cancelAnimationFrame = (id: number) => { T.delete(id); };
+  const advance = (ms: number): void => {
     const end = VNOW + ms;
     for (let n = 0; n < 200000; n++) {
-      let b = null; for (const [id, t] of T) if (t.at <= end && (!b || t.at < b[1].at)) b = [id, t];
+      let b: [number, Timer] | null = null; for (const [id, t] of T) if (t.at <= end && (!b || t.at < b[1].at)) b = [id, t];
       if (!b) break;
       const [id, t] = b; VNOW = t.at; if (t.every) t.at += t.every; else T.delete(id);
-      try { t.fn(); } catch (e) { errs.push(e.message); }
+      try { t.fn(); } catch (e) { errs.push((e as Error).message); }
     }
     VNOW = end;
   };
-  if (ev('typeof Event') === 'undefined') ctx.Event = class { constructor(t) { this.type = t; } };
-  const els = {};
-  function mk(id) {
-    const cls = new Set(), lis = {};
+  if (ev('typeof Event') === 'undefined') ctx.Event = class { type: string; constructor(t: string) { this.type = t; } };
+  const els: Record<string, Stub> = {};
+  function mk(id: string): Stub {
+    const cls = new Set<string>(), lis: Record<string, ((e: Stub) => void)[]> = {};
     const e = {
       id, value: '', innerHTML: '', textContent: '', style: {}, dataset: {}, children: [], offsetWidth: 0, offsetHeight: 0, offsetTop: 0, offsetLeft: 0,
       classList: {
-        add: (...c) => c.forEach(x => cls.add(x)), remove: (...c) => c.forEach(x => cls.delete(x)),
-        toggle: (c, f) => { const on = f === undefined ? !cls.has(c) : !!f; if (on) cls.add(c); else cls.delete(c); return on; }, contains: c => cls.has(c),
+        add: (...c: string[]) => c.forEach(x => cls.add(x)), remove: (...c: string[]) => c.forEach(x => cls.delete(x)),
+        toggle: (c: string, f?: boolean) => { const on = f === undefined ? !cls.has(c) : !!f; if (on) cls.add(c); else cls.delete(c); return on; }, contains: (c: string) => cls.has(c),
       },
-      addEventListener: (t, fn) => { (lis[t] = lis[t] || []).push(fn); }, removeEventListener() {},
-      dispatchEvent: evt => { (lis[evt.type] || []).forEach(f => f({ target: e, currentTarget: e, type: evt.type })); return true; },
+      addEventListener: (t: string, fn: (e: Stub) => void) => { (lis[t] = lis[t] || []).push(fn); }, removeEventListener() {},
+      dispatchEvent: (evt: { type: string }) => { (lis[evt.type] || []).forEach(f => f({ target: e, currentTarget: e, type: evt.type })); return true; },
       setAttribute() {}, getAttribute() { return null; }, appendChild() {}, removeChild() {}, remove() {}, insertAdjacentHTML() {},
       querySelector() { return null; }, querySelectorAll() { return []; }, closest() { return null; }, setPointerCapture() {},
       getBoundingClientRect() { return { top: 0, left: 0, width: 0, height: 0, bottom: 0, right: 0 }; }, scrollIntoView() {}, focus() {}, blur() {},
-      get className() { return [...cls].join(' '); }, set className(v) { cls.clear(); String(v).split(/\s+/).filter(Boolean).forEach(x => cls.add(x)); },
+      get className() { return [...cls].join(' '); }, set className(v: string) { cls.clear(); String(v).split(/\s+/).filter(Boolean).forEach(x => cls.add(x)); },
     };
     return e;
   }
-  const doc = ctx.document; doc.getElementById = id => (els[id] || (els[id] = mk(id)));
+  const doc = ctx.document; doc.getElementById = (id: string) => (els[id] || (els[id] = mk(id)));
   ['popOverlay', 'toast', 'detailOverlay', 'detailBody', 'detailStatusRow', 'rtMini', 'rtToggle', 'restFloat', 'log_notes', 'log_run_pace', 'screenWeek', 'daysList'].forEach(i => doc.getElementById(i));
-  const SCREENS = [...new Set((src.match(/class="screen[^"]*" id="(\w+)"/g) || []).map(s => s.match(/id="(\w+)"/)[1]))];
+  const SCREENS = [...new Set((src.match(/class="screen[^"]*" id="(\w+)"/g) || []).map(s => (s.match(/id="(\w+)"/) as RegExpMatchArray)[1] as string))];
   SCREENS.forEach(s => doc.getElementById(s).classList.add('screen'));
-  const E = { IA, ev, LS, els, advance, T, errs, cols: [], toastShows: [], vnow: () => VNOW, setNow: t => { VNOW = t; } };
-  doc.querySelectorAll = sel => sel === '.screen' ? SCREENS.map(s => els[s])
+  const E = { IA, ev, LS, els, advance, T, errs, cols: [] as Stub[], toastShows: [] as WeekEnv['toastShows'], vnow: () => VNOW, setNow: (t: number) => { VNOW = t; } } as WeekEnv;
+  doc.querySelectorAll = (sel: string) => sel === '.screen' ? SCREENS.map(s => els[s])
     : sel === '.screen.with-tabbar' ? SCREENS.map(s => els[s]).filter(x => x.classList.contains('with-tabbar'))
       : sel === '.iaw-col' ? E.cols : [];
-  els.detailOverlay.querySelectorAll = sel => sel === '.iaw-col' ? E.cols : [];
+  els.detailOverlay.querySelectorAll = (sel: string) => sel === '.iaw-col' ? E.cols : [];
   ctx.popConfetti = function () {}; ev('popConfetti=globalThis.popConfetti;');
-  { const t = els.toast, add = t.classList.add; t.classList.add = (...c) => { if (c.includes('show')) E.toastShows.push({ t: VNOW, html: t.innerHTML }); return add(...c); }; }
+  { const t = els.toast, add = t.classList.add; t.classList.add = (...c: string[]) => { if (c.includes('show')) E.toastShows.push({ t: VNOW, html: t.innerHTML }); return add(...c); }; }
   const cfg = JSON.parse(JSON.stringify(fixtures.HALF_MANNY));
-  const p = IA.buildProgram(cfg); p.id = 'measure'; p.startDate = START_ISO; delete p.blockOpen; delete p.created; delete p.createdAt;
+  const p: WeekEnv['p'] = IA.buildProgram(cfg); p.id = 'measure'; p.startDate = START_ISO; delete p.blockOpen; delete (p as Partial<Program>).created; delete p.createdAt;
   E.p = p;
   E.setup = () => {
     [...LS._map.keys()].forEach(k => LS.removeItem(k)); LS.setItem('ia_programs', JSON.stringify([p]));
@@ -173,11 +229,11 @@ function weekEnv() {
 }
 
 /** A tally per claim: pass count, fail count, the first two failures. */
-function tallies() {
-  const Q = {};
+function tallies(): Tally {
+  const Q: Record<string, [number, number, string[]]> = {};
   return {
-    rec(k, c, why) { const q = Q[k] = Q[k] || [0, 0, []]; if (c) q[0]++; else { q[1]++; if (q[2].length < 2) q[2].push(why); } },
-    get(k) { const q = Q[k] || [0, 0, []]; return { pass: q[0], fail: q[1], examples: q[2] }; },
+    rec(k: string, c: boolean, why: string) { const q = Q[k] = Q[k] || [0, 0, []]; if (c) q[0]++; else { q[1]++; if (q[2].length < 2) q[2].push(why); } },
+    get(k: string) { const q = Q[k] || [0, 0, []]; return { pass: q[0], fail: q[1], examples: q[2] }; },
   };
 }
 
@@ -187,7 +243,7 @@ const SKIP_LBL = 'Skipped ✕ The week moves on';
 const UNMARKED = 'Unmarked';
 
 /** Mark Done ✓: the day is logged and unmarked, revisited the next day; returns the nudge's own onclick, or null. */
-function markDoneCall(E, w, d) {
+function markDoneCall(E: WeekEnv, w: number, d: DayKey): string | null {
   const { ev, LS, els } = E;
   const lk = ev('logKey(' + w + ",'" + d + "')"), logs = JSON.parse(LS.getItem('ia_logs_measure') || '{}');
   logs[lk] = { notes: 'ran it', week: w, ts: E.vnow() }; LS.setItem('ia_logs_measure', JSON.stringify(logs));
@@ -197,7 +253,7 @@ function markDoneCall(E, w, d) {
 }
 
 /** C1 to C6, T1, T2 over `days` ([week, day] pairs). */
-function closeTaps(E, days) {
+function closeTaps(E: WeekEnv, days: [number, DayKey][]): Tally {
   const { ev, els, advance } = E, q = tallies();
   for (const [w, d] of days) {
     E.fresh(w, d); E.open(d); E.toastShows.length = 0; E.notePre(E.html());
@@ -239,10 +295,10 @@ function closeTaps(E, days) {
 const RT_ZERO = '0:00', RT_START = 'Start';
 
 /** B1d, B1s, B1m, B2u, B2b over `days`. */
-function timerTaps(E, days) {
+function timerTaps(E: WeekEnv, days: [number, DayKey][]): Tally {
   const { ev, els, advance } = E, q = tallies();
   const rt = () => ({ running: ev('_ruRunning'), id: ev('_ruId'), el: ev('_ruElapsed'), mini: String(els.rtMini.innerHTML || '').replace(/<[^>]+>/g, ''), tog: els.rtToggle.textContent, fl: els.restFloat.style.display });
-  const prep = {
+  const prep: Record<string, (w: number, d: DayKey) => () => void> = {
     B1d: (w, d) => { E.open(d); return () => E.tap(d, 'complete'); },
     B1s: (w, d) => { E.open(d); return () => E.tap(d, 'skipped'); },
     B1m: (w, d) => { const c = markDoneCall(E, w, d); return () => { if (c) ev(c); }; },
@@ -267,52 +323,52 @@ function timerTaps(E, days) {
 
 // ── the pace wheel flushed by a close ─────────────────────────────────────────────────────────────────────────────
 /** A hand-built pace wheel the real iaWheelInit drives; with layoutLoss its columns read 0 once the day closes. */
-function fakeWheel(E, layoutLoss) {
+function fakeWheel(E: WeekEnv, layoutLoss: boolean): { wh: Stub; cols: Stub[] } {
   const lost = () => layoutLoss && !E.els.detailOverlay.classList.contains('open');
-  const mkCol = (rows, attrs) => {
-    const lis = {}, items = rows.map(v => ({ style: {}, getAttribute: k => k === 'data-v' ? v : null })); let st = 0;
+  const mkCol = (rows: string[], attrs: Record<string, string>) => {
+    const lis: Record<string, (() => void)[]> = {}, items = rows.map(v => ({ style: {}, getAttribute: (k: string) => k === 'data-v' ? v : null })); let st = 0;
     return {
-      style: {}, _lis: lis, getAttribute: k => attrs[k] == null ? null : attrs[k], querySelectorAll: s => s === '.iaw-it' ? items : [],
-      addEventListener: (t, fn) => { (lis[t] = lis[t] || []).push(fn); },
-      get scrollTop() { return lost() ? 0 : st; }, set scrollTop(v) { if (!lost()) st = v; },
+      style: {}, _lis: lis, getAttribute: (k: string) => attrs[k] == null ? null : attrs[k], querySelectorAll: (s: string) => s === '.iaw-it' ? items : [],
+      addEventListener: (t: string, fn: () => void) => { (lis[t] = lis[t] || []).push(fn); },
+      get scrollTop() { return lost() ? 0 : st; }, set scrollTop(v: number) { if (!lost()) st = v; },
     };
   };
   const c0 = mkCol(MIN_ROWS, { 'data-wrap': '', 'data-len': '15' }), c1 = mkCol(SEC_ROWS, { 'data-wrap': '1', 'data-len': '60' });
-  const wh = { _iawOn: false, getAttribute: k => ({ 'data-kind': 'pace', 'data-for': 'log_run_pace' })[k] || null, querySelectorAll: s => s === '.iaw-col' ? [c0, c1] : [] };
+  const wh = { _iawOn: false, getAttribute: (k: string) => ({ 'data-kind': 'pace', 'data-for': 'log_run_pace' } as Record<string, string>)[k] || null, querySelectorAll: (s: string) => s === '.iaw-col' ? [c0, c1] : [] };
   return { wh, cols: [c0, c1] };
 }
 
 /** The card's regime reads #cardioSwapWrap's data-* attributes, which this stub never parses: copy them from the markup. */
-function wrapSync(E) {
+function wrapSync(E: WeekEnv): { wrap: Stub; sync(): void; restore(): void } {
   const wrap = E.IA.ctx.document.getElementById('cardioSwapWrap'), keep = Object.assign({}, wrap.dataset);
   return {
     wrap,
     sync: () => {
       const m = (E.els.detailBody.innerHTML || '').match(/<div\b[^>]*\sid="cardioSwapWrap"[^>]*>/);
       if (!m) throw new Error('no #cardioSwapWrap in the rendered day');
-      let a; const re = /\sdata-([a-z]+)="([^"]*)"/g; while ((a = re.exec(m[0]))) wrap.dataset[a[1]] = a[2];
+      let a: RegExpExecArray | null; const re = /\sdata-([a-z]+)="([^"]*)"/g; while ((a = re.exec(m[0]))) wrap.dataset[a[1]] = a[2];
     },
     restore: () => { for (const k of Object.keys(wrap.dataset)) delete wrap.dataset[k]; Object.assign(wrap.dataset, keep); },
   };
 }
 
 /** W1 and W2 on the first training day that renders a pace wheel. */
-function wheelTaps(E) {
+function wheelTaps(E: WeekEnv): { q: Tally; runDay: [number, DayKey] | null } {
   const { ev, els, LS, advance } = E, q = tallies();
-  let runDay = null;
+  let runDay: [number, DayKey] | null = null;
   E.setup();
   for (const [w, d] of E.TRAIN) { E.fresh(w, d); E.open(d); if (/data-for="log_run_pace"/.test(els.detailBody.innerHTML)) { runDay = [w, d]; break; } }
   if (!runDay) return { q, runDay };
-  const readPace = (w, d) => { const l = JSON.parse(LS.getItem('ia_logs_measure') || '{}')[ev('logKey(' + w + ",'" + d + "')")]; return l ? l.run_pace : '(no entry)'; };
-  const turn = cols => { cols[0].scrollTop = W_TARGET_ROW * WROW; (cols[0]._lis.scroll || []).forEach(f => f()); advance(40); };
-  const seededOk = r => r.seeded[0] === W_SEED_ROWS[0] && r.seeded[1] === W_SEED_ROWS[1] && r.pending;
+  const readPace = (w: number, d: DayKey) => { const l = JSON.parse(LS.getItem('ia_logs_measure') || '{}')[ev('logKey(' + w + ",'" + d + "')")]; return l ? l.run_pace : '(no entry)'; };
+  const turn = (cols: Stub[]) => { cols[0].scrollTop = W_TARGET_ROW * WROW; (cols[0]._lis.scroll || []).forEach((f: () => void) => f()); advance(40); };
+  const seededOk = (r: { seeded: number[]; pending: boolean }) => r.seeded[0] === W_SEED_ROWS[0] && r.seeded[1] === W_SEED_ROWS[1] && r.pending;
   // W1: a wheel scrolled 9:30 -> 10:30, Done or Skip tapped 40 ms into its 90 ms settle window, saves 10:30.
   for (const layoutLoss of [false, true]) for (const st of ['complete', 'skipped']) {
-    const [w, d] = runDay; E.fresh(w, d);
+    const [w, d] = runDay as [number, DayKey]; E.fresh(w, d);
     const ws = wrapSync(E);
     E.open(d); els.log_run_pace.value = W_SEED; ws.sync();
     const { wh, cols } = fakeWheel(E, layoutLoss); E.cols = cols;
-    ev('iaWheelInit')({ querySelectorAll: s => s === '.iaw' ? [wh] : [] }); advance(40);
+    ev('iaWheelInit')({ querySelectorAll: (s: string) => s === '.iaw' ? [wh] : [] }); advance(40);
     const seeded = [cols[0].scrollTop / WROW, cols[1].scrollTop / WROW];
     turn(cols);
     const pending = [...E.T.values()].some(t => t.kind === 'timeout');
@@ -325,7 +381,7 @@ function wheelTaps(E) {
   // (9:30) and the wheel's own settle stores 10:30 later. A 9:30 only on the hidden node is a draft: nothing reaches
   // run_pace at the tap or after, and the settle lands on the hidden node, 10:30.
   for (const st of ['complete', 'skipped']) for (const seed of ['store', 'dom']) {
-    const [w, d] = runDay, ws = wrapSync(E);
+    const [w, d] = runDay as [number, DayKey], ws = wrapSync(E);
     E.fresh(w, d); E.open(d); ws.sync(); els.log_run_pace.value = ''; E.tap(d, st); ev('popClose()');
     if (seed === 'store') {
       const lk = ev('logKey(' + w + ",'" + d + "')"), logs = JSON.parse(LS.getItem('ia_logs_measure') || '{}');
@@ -333,7 +389,7 @@ function wheelTaps(E) {
     }
     E.open(d); ws.sync(); els.log_run_pace.value = W_SEED;
     const { wh, cols } = fakeWheel(E, false); E.cols = cols;
-    ev('iaWheelInit')({ querySelectorAll: s => s === '.iaw' ? [wh] : [] }); advance(40);
+    ev('iaWheelInit')({ querySelectorAll: (s: string) => s === '.iaw' ? [wh] : [] }); advance(40);
     const seeded = [cols[0].scrollTop / WROW, cols[1].scrollTop / WROW];
     turn(cols);
     const pending = [...E.T.values()].some(t => t.kind === 'timeout');
@@ -351,16 +407,16 @@ function wheelTaps(E) {
 const DONE_STR = 'Done ✓ Closed out. Open the session to undo.';
 const SKIP_STR = 'Skipped ✕ The week moves on. Open the session to undo.';
 
-const cells = h => {
-  const o = {};
+const cells = (h: string): Record<string, { cls?: string; center?: string }> => {
+  const o: Record<string, { cls?: string; center?: string }> = {};
   (h.match(/<div class="wk-day[^"]*"[^>]*>[\s\S]*?<div class="wk-day-bot"[^>]*>[\s\S]*?<\/div><\/div>/g) || []).forEach(c => {
     const lbl = (c.match(/wk-day-lbl">(\w+)</) || [])[1]; if (!lbl) return;
     o[lbl.toLowerCase()] = { cls: (c.match(/class="(wk-day[^"]*)"/) || [])[1], center: (c.match(/wk-day-num">([\s\S]*?)<\/div>/) || [])[1] };
   });
   return o;
 };
-const heroBlock = h => (h.match(/<div class="wk-hero[\s\S]*?(?=<div class="wc-tag|<div class="wk-stats"|$)/) || [''])[0];
-const hero = h => {
+const heroBlock = (h: string): string => (h.match(/<div class="wk-hero[\s\S]*?(?=<div class="wc-tag|<div class="wk-stats"|$)/) || [''])[0];
+const hero = (h: string) => {
   const b = heroBlock(h), txt = b.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   return {
     cls: (b.match(/class="(wk-hero[^"]*)"/) || [])[1] || '', over: (b.match(/wk-hero-over">([^<]*)</) || [])[1] || '',
@@ -370,11 +426,11 @@ const hero = h => {
 };
 
 /** A1a, A1b, A1c, A2, A3a to A3d over the given weeks: every training day as today, and every (today, previous) pair. */
-function heroAndStrip(E, weeks) {
+function heroAndStrip(E: WeekEnv, weeks: number[]): { q: Tally; pairs: number; todays: number } {
   const { ev, els, LS, advance } = E, q = tallies();
-  const at = (w, today) => { E.T.clear(); E.setNow(dateOf(w, today)); ev('currentWeek=' + w + ';'); els.popOverlay.classList.remove('show'); };
+  const at = (w: number, today: DayKey) => { E.T.clear(); E.setNow(dateOf(w, today)); ev('currentWeek=' + w + ';'); els.popOverlay.classList.remove('show'); };
   const settle = () => { ev('popClose()'); if (E.OPEN()) ev('closeDetail()'); advance(3000); };
-  const markA = (dk, st) => { E.open(dk); E.tap(dk, st); settle(); };
+  const markA = (dk: DayKey, st: string) => { E.open(dk); E.tap(dk, st); settle(); };
   E.setup();
   let pairs = 0, todays = 0;
   for (const w of weeks) {
@@ -396,7 +452,7 @@ function heroAndStrip(E, weeks) {
     for (let i = 1; i < tr.length; i++) {
       pairs++;
       const T0 = tr[i], P0 = tr[i - 1];
-      for (const [which, dk] of [['today', T0], ['past', P0]]) {
+      for (const [which, dk] of [['today', T0], ['past', P0]] as const) {
         const dom = String(new RealDate(dateOf(w, dk)).getDate()), wantCls = which === 'today' ? 'wk-day today' : 'wk-day dim';
         for (const st of ['complete', 'skipped']) {
           E.clearMarks(); at(w, T0); ev('renderWeekView()'); const hb = heroBlock(E.html());
@@ -419,7 +475,7 @@ function heroAndStrip(E, weeks) {
   return { q, pairs, todays };
 }
 
-module.exports = {
+export {
   stripComments, compiles, count,
   DAYS, FULL, START_ISO, dateOf, MIN_ROWS, SEC_ROWS, W_SEED, W_SEED_ROWS, W_TARGET_ROW, W_SETTLED,
   SKIP_LBL, UNMARKED, RT_ZERO, RT_START, DONE_STR, SKIP_STR,

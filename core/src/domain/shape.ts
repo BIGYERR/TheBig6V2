@@ -62,6 +62,11 @@ const bool = make<boolean>((v, at, r) => {
   if (typeof v !== 'boolean') r.problems.push(`${at}: want a boolean, got ${kindOf(v)}`);
 });
 const anything = make<unknown>(() => {});
+/** A field the type names as absent (`?: never`): any value there is a problem. */
+const absent = (kind: string): Check<never> =>
+  make<never>((_v, at, r) => {
+    r.problems.push(`${at}: not a field of ${kind}`);
+  });
 
 function oneOf<const V extends readonly (string | number | boolean)[]>(...values: V): Check<V[number]> {
   return make<V[number]>((v, at, r) => {
@@ -179,7 +184,7 @@ const CFG_FIELDS = {
   restDays: req(arrayOf(DAY_KEY)), days: req(arrayOf(DAY_KEY)),
   bench: req(num), squat: req(num), deadlift: req(num),
   raceDate: opt(str), injury: opt(nullable(INJURY)),
-  exSwapPrefs: opt(recordOf(anyKey, 'a name', str)), startDate: opt(str), raceDateWeeks: opt(num),
+  exSwapPrefs: opt(recordOf(anyKey, 'a name', str)), startDate: opt(str), raceDateWeeks: opt(nullable(num)),
   _testWeek: opt(nullable(int)), _raceDateCappedWeeks: opt(int),
   _paceShift: opt(recordOf(anyKey, 'a key', anything)), _travel: opt(bool),
 } satisfies Omit<Fields<Cfg>, 'goal' | 'seed'>;
@@ -209,11 +214,14 @@ const CARDIO = object<Cardio>('cardio', {
   dose: opt(DOSE), segments: opt(arrayOf(SEGMENT)), isNRC: opt(oneOf(true)),
 });
 
-const REST_DAY = object<RestDay>('day', { title: req(str), dot: req(oneOf('rest')), tags: req(arrayOf(oneOf('rest'))), rest: req(oneOf(true)) });
+const REST_DAY = object<RestDay>('day', {
+  title: req(str), dot: req(oneOf('rest')), tags: req(arrayOf(oneOf('rest'))), rest: req(oneOf(true)),
+  cardio: opt(absent('day')), sections: opt(absent('day')), note: opt(absent('day')), testLift: opt(absent('day')),
+});
 const TRAINING_DAY = object<TrainingDay>('day', {
   title: req(str), dot: req(oneOf('lift', ...CARDIO_TYPES)), tags: req(arrayOf(oneOf(...DAY_TAGS))),
   cardio: req(nullable(CARDIO)), sections: req(arrayOf(SECTION)),
-  note: opt(str), testLift: opt(oneOf(...TEST_LIFTS)),
+  note: opt(str), testLift: opt(oneOf(...TEST_LIFTS)), rest: opt(absent('day')),
 });
 const DAY = either(REST_DAY, TRAINING_DAY);
 

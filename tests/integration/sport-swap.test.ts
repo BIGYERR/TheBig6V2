@@ -1,4 +1,3 @@
-'use strict';
 // The sport chip on a cardio day: swapping a run for a bike or a swim credits the new sport and never erases what the
 // athlete typed. Rulings D213 (P-SWAPKEEP: the leaving sport's numbers park under parked[sport] and come back when the
 // athlete switches back; a moved-in day parks under its own key) and D214 (the swap note says what is kept), V234.
@@ -9,11 +8,11 @@
 // and 45 / 6 = 7:30/mi, the four D214 notes, W1 MILES 5 or 0 and DONE 1/5 (one 5 mi log; W1 rests Sun and Wed, so five
 // training days). The app is driven through openDetail, setCardioSwap, persistLogFields, handleDayStatus,
 // renderWeekView and applyRestMove; the engine is never asked for an expected value.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const { APP, fixtures } = require('../support/app.js');
-const S = require('../support/sport-swap.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { APP, fixtures } from '../support/app.ts';
+import * as S from '../support/sport-swap.ts';
 
 const J = JSON.stringify;
 const RUN_PARKED = { run_dist: '5', run_mins: '45', run_pace: '9:00/mi' };
@@ -25,13 +24,13 @@ const NOTE = {
   swim2: 'Counts toward Swim, not Run. Your Run numbers are kept. Switch back and they return.',
 };
 const PLAN_FACE = '3.1 mi';
-const sameMap = (a, b) => assert.deepEqual(Object.fromEntries(Object.entries(a).map(([k, v]) => [k, String(v)])), b);
-const noTs = L => { if (!L) return L; const o = Object.assign({}, L); delete o.ts; return J(o); };
+const sameMap = (a: Record<string, unknown>, b: Record<string, string>) => assert.deepEqual(Object.fromEntries(Object.entries(a).map(([k, v]) => [k, String(v)])), b);
+const noTs = (L: any) => { if (!L) return L; const o = Object.assign({}, L); delete o.ts; return J(o); };
 
 const W = S.sportWorld();
 const MANNY = JSON.parse(J(fixtures.HALF_MANNY)), PID = 'p_sport', K = 'w1_sat';
 const fresh = () => { W.install(MANNY, PID); return W.open('sat'); };
-const NOTES_SEEN = [];
+const NOTES_SEEN: any[] = [];
 
 test('the repro day is W1 SAT Long Run, planned run, with its 3.1 mi strip', () => {
   fresh();
@@ -41,7 +40,8 @@ test('the repro day is W1 SAT Long Run, planned run, with its 3.1 mi strip', () 
 });
 
 // The repro walk: type 45 / 5, swap to bike, type bike 40, reopen, swap back, reopen.
-const R = {};
+/** What the repro walk read at each step: raw store entries and form reads. */
+const R: Record<string, any> = {};
 {
   fresh();
   W.type('sat', { run_mins: '45', run_dist: '5' }); R.L0 = W.entry(PID, K); R.w0 = W.weekStats();
@@ -105,7 +105,7 @@ test('the note while swapped says the run numbers are kept, live and when the da
   assert.deepEqual(R.rn, { display: 'block', text: NOTE.bike2 });
   assert.deepEqual(R.rn2, { display: 'none', text: '' });
   const b = noteWalk('bike', true);
-  assert.equal(b.live.text, NOTE.bike2); assert.equal(b.ren.text, NOTE.bike2);
+  assert.equal(b.live!.text, NOTE.bike2); assert.equal(b.ren!.text, NOTE.bike2);
 });
 
 test('Mark Done while swapped keeps the entry as it was and marks the day complete', () => {
@@ -191,14 +191,14 @@ test('a wheel still settling at the swap parks the value it settles to (6 miles,
   // the input listener's body (persistLogFields and updateDoseDerived)
   const col = { _iawT: 1, ran: 0, _iawSettle() { this._iawT = 0; this.ran++; const h = W.REG.get('log_run_dist'); if (h) h.value = '6'; W.E('persistLogFields(currentDayKey); updateDoseDerived();'); } };
   const wrap = W.REG.get('cardioSwapWrap'), q0 = wrap.querySelectorAll;
-  wrap.querySelectorAll = sel => /iaw-col/.test(sel) ? [col] : q0.call(wrap, sel);
+  wrap.querySelectorAll = (sel: string) => /iaw-col/.test(sel) ? [col] : q0.call(wrap, sel);
   W.swap('bike'); const L = W.entry(PID, K);
   assert.equal(col.ran, 1);
   sameMap(S.nonBlank(L.parked.run), RUN_PARKED6);
   assert.ok(S.topBlank(L, 'run'));
 });
 
-function noteWalk(target, typed) {
+function noteWalk(target: string, typed: boolean) {
   fresh(); if (typed) W.type('sat', { run_mins: '45', run_dist: '5' });
   W.swap(target); const live = W.liveNote(); W.open('sat'); const ren = W.renderNote();
   NOTES_SEEN.push(live && live.text, ren && ren.text); return { live, ren };
@@ -213,7 +213,7 @@ test('a swap with nothing typed says only where it counts, live and on reopen', 
 
 test('a swim swap prints both notes the same way', () => {
   // N3
-  for (const [typed, want] of [[false, NOTE.swim1], [true, NOTE.swim2]]) {
+  for (const [typed, want] of [[false, NOTE.swim1], [true, NOTE.swim2]] as const) {
     const w = noteWalk('swim', typed);
     assert.deepEqual(w.live, { display: 'block', text: want }); assert.deepEqual(w.ren, { display: 'block', text: want });
   }
