@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The wizard's cardio goal step rig for tests/integration/pace-wizard.test.js (lifted from the legacy gate
 // g223_d183_safepace.js). It renders the step with the production renderer and reads what an athlete would see:
 //   * getElementById keeps one element per id until a render clears them. The four nodes the step's repaint owns
@@ -141,4 +141,4 @@ function wizardRig(IA) {
   return { reg, doc, bodyHTML, painted, inBody, seed, composedHTML, liveNode, screen, sweepText, renderStep, drain, lifted, runHandler, openTagRe, colorOf, headerOf };
 }
 
-module.exports = { wizardRig, txt, PAINTED };
+export { wizardRig, txt, PAINTED };

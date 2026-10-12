@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The easy-day ceiling (D117): every Recovery Run and every non-race Long Run of an NRC plan prints a ceiling and
 // carries it as dose.cap; speed runs, race day and the time trial carry none. run_base's two easy-run sites print the
 // same ceiling beside their "Around" pace (slice D; the form after D109: "Around X is right for you. Do not run
@@ -8,11 +8,10 @@
 // 9:25 = 565, recovery 10:30 = 630; 10:30 is 12:00 = 720 and 13:20 = 800; 9:30 is 11:00 = 660 and 12:10 = 730), the
 // ruled ceiling (the midpoint of tempo and recovery, rounded), and the two ruled sentences. steadyCapSec is never
 // called; the hand rows are first checked against PACE_CHART so a chart edit fails a named test.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { fixtures } = require('../support/app.js');
-const { loadAppAt, clone, runSessions } = require('../support/pace-clock.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { fixtures } from '../support/app.ts';
+import { loadAppAt, clone, runSessions } from '../support/pace-clock.ts';
 const IA = loadAppAt(new Date(2026, 9, 11, 12, 0, 0));
 const paceStr = (sec) => {
   const t = Math.round(sec);

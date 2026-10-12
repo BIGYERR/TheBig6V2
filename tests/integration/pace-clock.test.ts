@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The pace clock of a pace goal (run_pace_goal): where it starts, what it walks toward, how fast, where the block
 // ends, and what the interval note says about it.
 //   D100 (amended): the clock anchors on the athlete's own chart row read at the distance entered, and walks toward
@@ -13,11 +13,10 @@
 //
 // Oracles: the hand chart and rates in tests/support/pace-clock-lattices.js, the ruled sentences typed from the
 // rulings, hand clocks, and date arithmetic. The pinned PRT TING row is the ruling's after-grid, re-derived by hand.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { loadAppAt, clone, runSessions, sessions, stripComments } = require('../support/pace-clock.js');
-const { HAND, handRow, handRowPaceAt, paceGoal, prtTing, progression, anchorLatticeTests, appendixLatticeTests } = require('../support/pace-clock-lattices.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { loadAppAt, clone, runSessions, sessions, stripComments } from '../support/pace-clock.ts';
+import { HAND, handRow, handRowPaceAt, paceGoal, prtTing, progression, anchorLatticeTests, appendixLatticeTests } from '../support/pace-clock-lattices.ts';
 const IA = loadAppAt(new Date(2026, 9, 11, 12, 0, 0));
 const build = (cfg) => IA.buildProgram(clone(cfg));
 const clock = (s) => {

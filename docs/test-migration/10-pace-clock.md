@@ -11,19 +11,19 @@ running in CI until phase 3 deletes the machinery; this file is what explains th
 
   | File | Tests | Wall (alone) | Holds |
   |---|---|---|---|
-  | `tests/unit/clock-format.test.js` | 6 | 0.1 s | `_clkMS`, the one m:ss owner (D126) |
-  | `tests/integration/clock-format.test.js` | 15 | 0.8 s | every clock printed on tempo, NSW interval, NRC and swim cards, the seeded mile |
-  | `tests/integration/pace-clock.test.js` | 25 | 1.0 s | the pace goal's clock: anchor, target, rate, block end, notes, injury appendix (D100, D101, D186, D187, E7, E12, D2b-iii) |
-  | `tests/integration/easy-run-ceiling.test.js` | 10 | 0.2 s | the easy-day ceiling on NRC and run_base cards (D117) |
-  | `tests/integration/mile-anchor.test.js` | 34 | 1.0 s | the anchor sentence and clipboard line, a goal change carrying the mile, the beginner's mile, the default disclosed (E5, E6, D118, D119, D188, D189) |
-  | `tests/integration/mile-pencil.test.js` | 12 | 0.2 s | the mile pencil, its lock and its validator (D116) |
-  | `tests/integration/pace-wizard.test.js` | 54 | 1.0 s | the wizard's cardio goal step (D183 under TZ=America/New_York and TZ=UTC, D188, D189) |
-  | `tests/sweeps/pace-clock.test.js` | 10 | 3.3 s | the anchor lattice (360 builds) and the appendix lattice (55 cfgs) |
-  | `tests/sweeps/mile-anchor.test.js` | 12 | 12.4 s | D188 over 20 seeds, long-run tiers over 384 cfgs, D189 S1 over 640 and 720 cells |
+  | `tests/unit/clock-format.test.ts` | 6 | 0.1 s | `_clkMS`, the one m:ss owner (D126) |
+  | `tests/integration/clock-format.test.ts` | 15 | 0.8 s | every clock printed on tempo, NSW interval, NRC and swim cards, the seeded mile |
+  | `tests/integration/pace-clock.test.ts` | 25 | 1.0 s | the pace goal's clock: anchor, target, rate, block end, notes, injury appendix (D100, D101, D186, D187, E7, E12, D2b-iii) |
+  | `tests/integration/easy-run-ceiling.test.ts` | 10 | 0.2 s | the easy-day ceiling on NRC and run_base cards (D117) |
+  | `tests/integration/mile-anchor.test.ts` | 34 | 1.0 s | the anchor sentence and clipboard line, a goal change carrying the mile, the beginner's mile, the default disclosed (E5, E6, D118, D119, D188, D189) |
+  | `tests/integration/mile-pencil.test.ts` | 12 | 0.2 s | the mile pencil, its lock and its validator (D116) |
+  | `tests/integration/pace-wizard.test.ts` | 54 | 1.0 s | the wizard's cardio goal step (D183 under TZ=America/New_York and TZ=UTC, D188, D189) |
+  | `tests/sweeps/pace-clock.test.ts` | 10 | 3.3 s | the anchor lattice (360 builds) and the appendix lattice (55 cfgs) |
+  | `tests/sweeps/mile-anchor.test.ts` | 12 | 12.4 s | D188 over 20 seeds, long-run tiers over 384 cfgs, D189 S1 over 640 and 720 cells |
 
-  Helpers: `tests/support/pace-clock.js` (a boot with the clock pinned from its first line, card readers, a DOM
-  registry, the comment stripper), `tests/support/pace-clock-lattices.js` (the lattice claims an integration sample and
-  its sweep share, with their hand tables), `tests/support/pace-wizard.js` (the cardio goal step rig lifted from g223).
+  Helpers: `tests/support/pace-clock.ts` (a boot with the clock pinned from its first line, card readers, a DOM
+  registry, the comment stripper), `tests/support/pace-clock-lattices.ts` (the lattice claims an integration sample and
+  its sweep share, with their hand tables), `tests/support/pace-wizard.ts` (the cardio goal step rig lifted from g223).
 - **Clocks.** Every app is booted with its clock pinned: 2026-10-11 12:00 local (the today of the other program tests),
   or the gate's own pin where it had one (2026-09-22 21:16 for g223, g225 D186 and g226 D189; 2026-09-30 09:00 for g226
   D188). g203_mile_pencil read the host clock; its start dates and its days-out count are now worked out from the pin.

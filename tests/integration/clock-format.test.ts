@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Every clock a run or swim card prints goes through the one carrying m:ss helper (D126), so no card ever reads :60.
 // The helper alone is held by tests/unit/clock-format.test.js; this file reads the clocks off built programs: the
 // tempo card, the NSW interval card (pace limb, recovery band and note), the NRC race plan, the swim interval card,
@@ -14,11 +14,10 @@
 //   * the swim progression re-derived from the cfg: 100 split = 500 yd time / 5, falling 3 s per 100 a week, never
 //     past the realistic target, and the interval 2 s faster than the week's split (D110a, Guide A p12).
 // The app's clock is pinned to 2026-10-11 12:00 local, the today every other program test builds on.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { fixtures } = require('../support/app.js');
-const { loadAppAt, clone, cardioOf, sessions } = require('../support/pace-clock.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { fixtures } from '../support/app.ts';
+import { loadAppAt, clone, cardioOf, sessions } from '../support/pace-clock.ts';
 const IA = loadAppAt(new Date(2026, 9, 11, 12, 0, 0));
 const WELL = /^-?\d+:[0-5]\d$/;
 function handClock(sec) {

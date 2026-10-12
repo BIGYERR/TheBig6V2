@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The wizard's cardio goal step for a run goal: the program length header, the race-date card, the pace line and the
 // feasibility frame, and the mile field.
 //   D183 (P-SAFEPACE): the goal is the athlete's; the coach says what the block reaches from his mile ("In N weeks that
@@ -14,12 +14,11 @@
 // Oracles, never asked of the app: Monday-week arithmetic by Date.UTC; the R1 inversion typed from the ruling (the rate
 // {3,3,2} s/mi/wk, the age scalers, the defaults 690/570/450, "undo the +1 grace, the age multiplier and raw x 1.25 + 4",
 // the 45 s/mi tolerance, 0.621 mi per km); coach's sentences, typed verbatim.
-const { test, describe, before, after } = require('node:test');
-const assert = require('node:assert/strict');
-const { fixtures } = require('../support/app.js');
-const { loadAppAt, stripComments } = require('../support/pace-clock.js');
-const { wizardRig, txt } = require('../support/pace-wizard.js');
-
+import { test, describe, beforeAll, afterAll } from 'vitest';
+import assert from 'node:assert/strict';
+import { fixtures } from '../support/app.ts';
+import { loadAppAt, stripComments } from '../support/pace-clock.ts';
+import { wizardRig, txt } from '../support/pace-wizard.ts';
 const J = (v) => JSON.stringify(v);
 const RD = Date;
 const ymd = (s) => s.split('-').map(Number);
@@ -279,13 +278,13 @@ for (const [tag, tz] of [['NY', 'America/New_York'], ['UTC', 'UTC']]) {
     let W;
     let BOOT_WD;
     const STATES = [];
-    before(() => {
+    beforeAll(() => {
       process.env.TZ = tz;
       IA = loadAppAt(new Date(2026, 8, 22, 21, 16, 0));
       W = wizardRig(IA);
       BOOT_WD = IA.eval('JSON.stringify(WD)');
     });
-    after(() => {
+    afterAll(() => {
       if (SYSTEM_TZ === undefined) delete process.env.TZ;
       else process.env.TZ = SYSTEM_TZ;
     });

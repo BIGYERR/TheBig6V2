@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The mile anchor: the mile time a run plan's paces are read from, and what the athlete is told about it.
 //   The anchor sentence on the program card and its clipboard line (V202 E5/E6, D119 provenance, D189 defaults):
 //     a pace goal scopes its claim to week 1, a chart goal keeps the program-wide claim, run_base names its easy runs.
@@ -9,13 +9,12 @@
 //
 // Oracles: every sentence typed from its ruling; the chart rows typed from doctrine/nikerunclub5k.txt; the
 // experience defaults 690/570/450 s formatted by hand; the comment-stripped source for the token-gone checks.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const crypto = require('node:crypto');
-const { fixtures, progDigest } = require('../support/app.js');
-const { loadAppAt, clone, stripComments } = require('../support/pace-clock.js');
-const L = require('../support/pace-clock-lattices.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import { fixtures, progDigest } from '../support/app.ts';
+import { loadAppAt, clone, stripComments } from '../support/pace-clock.ts';
+import * as L from '../support/pace-clock-lattices.ts';
 const IA = loadAppAt(new Date(2026, 9, 11, 12, 0, 0));
 const strip = (h) => String(h || '').replace(/<[^>]+>/g, '');
 const MID_DASH = /\s[—–-]\s/;

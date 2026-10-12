@@ -1,25 +1,35 @@
-'use strict';
-// Helpers for the pace clock and mile anchor tests (tests/unit/clock-format.test.js, tests/integration/clock-format,
+// Helpers for the pace clock and mile anchor tests (tests/unit/clock-format.test.ts, tests/integration/clock-format,
 // pace-clock, easy-run-ceiling, mile-anchor, mile-pencil and pace-wizard, and their tests/sweeps lattices).
 // They hold mechanics only (a pinned boot, card readers, a DOM registry, the comment stripper). Every expected value
-// stays in the test that asserts it, typed by hand. tests/support/app.js and tests/harness.js are not changed.
-const { loadApp } = require('./app.js');
+// stays in the test that asserts it, typed by hand. tests/support/app.ts and tests/harness.js are not changed.
+import { loadApp } from './app.ts';
+import type { App } from './app.ts';
 
-const RealDate = Date;
-const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-const MON_SUN = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+export const RealDate = Date;
+export const DAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+export const MON_SUN = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+/** A cardio session or a program as the app's untyped script builds them: tests read them freely. */
+export type Session = any;
+/** One cardio session of a program, with its week and day. */
+export interface Placed {
+  w: number;
+  d: string;
+  s: Session;
+}
 
 /** A Date class whose `new Date()` and `Date.now()` read `t`; a Date built from arguments is unchanged. */
-function pinnedDateClass(t) {
-  return class PinnedDate extends RealDate {
-    constructor(...a) {
+export function pinnedDateClass(t: number): DateConstructor {
+  class PinnedDate extends RealDate {
+    constructor(...a: unknown[]) {
       if (a.length === 0) super(t);
-      else super(...a);
+      else super(...(a as [string | number]));
     }
-    static now() {
+    static override now(): number {
       return t;
     }
-  };
+  }
+  return PinnedDate as DateConstructor;
 }
 
 /**
@@ -27,9 +37,9 @@ function pinnedDateClass(t) {
  * so the global is swapped for exactly the one load and restored. `at` is a local date and time (a Date or what the
  * Date constructor takes), so a test reads the same day in every time zone. `opts` goes to loadApp ({ dom: true }).
  */
-function loadAppAt(at, opts = {}) {
+export function loadAppAt(at: Date | string | number, opts: { dom?: boolean } = {}): App {
   const t = (at instanceof RealDate ? at : new RealDate(at)).getTime();
-  if (!Number.isFinite(t)) throw new Error(`loadAppAt: ${at} is not a date`);
+  if (!Number.isFinite(t)) throw new Error(`loadAppAt: ${String(at)} is not a date`);
   const saved = globalThis.Date;
   globalThis.Date = pinnedDateClass(t);
   try {
@@ -39,47 +49,50 @@ function loadAppAt(at, opts = {}) {
   }
 }
 
-/** A deep copy, so a build can never write into a fixture. */
-const clone = (v) => JSON.parse(JSON.stringify(v));
+/** A deep copy, so a build can never write into a fixture. Untyped, as the app's own records are. */
+export const clone = (v: unknown): any => JSON.parse(JSON.stringify(v));
 
 /** The cardio sessions of one day, as an array. */
-function cardioOf(prog, wk, day) {
+export function cardioOf(prog: any, wk: number | string, day: string): Session[] {
   const w = (prog && prog.weeks && (prog.weeks[wk] || prog.weeks[String(wk)])) || {};
   const d = w[day];
   if (!d || !d.cardio) return [];
   return Array.isArray(d.cardio) ? d.cardio : [d.cardio];
 }
 
-/** Every cardio session of a program, week by week (ascending), day sun..sat: [{ w, d, s }]. */
-function sessions(prog) {
-  const out = [];
+/** Every cardio session of a program, week by week (ascending), day sun..sat. */
+export function sessions(prog: any): Placed[] {
+  const out: Placed[] = [];
   const weeks = Object.keys((prog && prog.weeks) || {}).sort((a, b) => +a - +b);
   for (const w of weeks) for (const d of DAYS) for (const s of cardioOf(prog, w, d)) if (s) out.push({ w: +w, d, s });
   return out;
 }
 
 /** The run sessions of a program, as sessions() gives them. */
-const runSessions = (prog) => sessions(prog).filter((x) => x.s.type === 'run');
+export const runSessions = (prog: any): Placed[] => sessions(prog).filter((x) => x.s.type === 'run');
+
+/** An element of the registry: the stub the harness makes, plus a classList that keeps its classes. */
+export type RegEl = any;
 
 /**
  * Makes document.getElementById keep one element per id, with a working classList (kept in el._cls). Returns the
  * registry (a Map). A fresh registry each call; `reg.clear()` drops every element so the next read makes a new one.
  */
-function domRegistry(IA) {
-  const doc = IA.window.document;
-  const reg = new Map();
+export function domRegistry(IA: App): Map<string, RegEl> {
+  const doc = IA.window['document'];
+  const reg = new Map<string, RegEl>();
   const make = doc.createElement;
-  doc.getElementById = function (id) {
+  doc.getElementById = function (id: string): RegEl {
     if (!reg.has(id)) {
       const el = make('div');
       el.id = id;
-      const cls = new Set();
+      const cls = new Set<string>();
       el._cls = cls;
       el.classList = {
-        add: (c) => cls.add(c),
-        remove: (c) => cls.delete(c),
-        toggle: (c, f) => ((f === undefined ? !cls.has(c) : f) ? cls.add(c) : cls.delete(c)),
-        contains: (c) => cls.has(c),
+        add: (c: string) => cls.add(c),
+        remove: (c: string) => cls.delete(c),
+        toggle: (c: string, f?: boolean) => ((f === undefined ? !cls.has(c) : f) ? cls.add(c) : cls.delete(c)),
+        contains: (c: string) => cls.has(c),
       };
       reg.set(id, el);
     }
@@ -91,19 +104,20 @@ function domRegistry(IA) {
 // The app's script with its comments removed, so a token scan never counts a comment. Strings, template literals and
 // regex literals are kept intact. Lifted verbatim from the legacy gates (g221_d178_active.js, g223_d183_safepace.js).
 const BS = String.fromCharCode(92);
-function stripComments(src) {
-  const out = [];
+export function stripComments(src: string): string {
+  const out: string[] = [];
   const n = src.length;
-  const tpl = [];
+  const tpl: number[] = [];
   let i = 0;
   let depth = 0;
   let prevSig = '';
   let prevWord = '';
   const RX_PREV = new Set('(,=:[!&|?{};+-*%<>~^'.split(''));
   const RX_WORDS = new Set(['return', 'typeof', 'case', 'do', 'else', 'in', 'of', 'new', 'delete', 'void', 'throw', 'instanceof', 'yield', 'await']);
-  const readTemplate = () => {
+  const at = (k: number): string => src[k] ?? '';
+  const readTemplate = (): void => {
     while (i < n) {
-      const c = src[i];
+      const c = at(i);
       if (c === BS) {
         out.push(src.substr(i, 2));
         i += 2;
@@ -114,7 +128,7 @@ function stripComments(src) {
         i++;
         return;
       }
-      if (c === '$' && src[i + 1] === '{') {
+      if (c === '$' && at(i + 1) === '{') {
         out.push('${');
         i += 2;
         tpl.push(depth);
@@ -126,10 +140,10 @@ function stripComments(src) {
     }
   };
   while (i < n) {
-    const c = src[i];
-    const d = src[i + 1];
+    const c = at(i);
+    const d = at(i + 1);
     if (c === '/' && d === '/') {
-      while (i < n && src[i] !== '\n') i++;
+      while (i < n && at(i) !== '\n') i++;
       continue;
     }
     if (c === '/' && d === '*') {
@@ -140,8 +154,8 @@ function stripComments(src) {
     }
     if (c === "'" || c === '"') {
       let j = i + 1;
-      while (j < n && src[j] !== c && src[j] !== '\n') {
-        if (src[j] === BS) j++;
+      while (j < n && at(j) !== c && at(j) !== '\n') {
+        if (at(j) === BS) j++;
         j++;
       }
       out.push(src.slice(i, j + 1));
@@ -182,8 +196,8 @@ function stripComments(src) {
       if (prevSig === '' || prevSig === '}' || RX_PREV.has(prevSig) || RX_WORDS.has(prevWord)) {
         let j = i + 1;
         let cls = false;
-        while (j < n && src[j] !== '\n') {
-          const x = src[j];
+        while (j < n && at(j) !== '\n') {
+          const x = at(j);
           if (x === BS) {
             j += 2;
             continue;
@@ -195,7 +209,7 @@ function stripComments(src) {
           j++;
         }
         j++;
-        while (j < n && /[a-z]/i.test(src[j])) j++;
+        while (j < n && /[a-z]/i.test(at(j))) j++;
         out.push(src.slice(i, j));
         i = j;
         prevSig = 'r';
@@ -210,7 +224,7 @@ function stripComments(src) {
     }
     if (/[A-Za-z0-9_$]/.test(c)) {
       let j = i;
-      while (j < n && /[A-Za-z0-9_$]/.test(src[j])) j++;
+      while (j < n && /[A-Za-z0-9_$]/.test(at(j))) j++;
       const w = src.slice(i, j);
       out.push(w);
       i = j;
@@ -227,5 +241,3 @@ function stripComments(src) {
   }
   return out.join('');
 }
-
-module.exports = { RealDate, DAYS, MON_SUN, pinnedDateClass, loadAppAt, clone, cardioOf, sessions, runSessions, domRegistry, stripComments };

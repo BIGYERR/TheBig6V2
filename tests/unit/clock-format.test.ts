@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The m:ss clock helper: _clkMS in index.html, the one owner of every seconds limb the app prints (D126). It rounds
 // the WHOLE number of seconds first, then splits it: minutes are the quotient by 60, seconds the remainder, padded to
 // two digits. So a seconds limb of 60 cannot be built (the old idiom floored the minutes off the raw value and rounded
@@ -6,10 +6,9 @@
 //
 // Every expected string below was worked out by hand from that contract and typed in. The test never asks the app
 // what a clock should read. The printed clocks on cards are held by tests/integration/clock-format.test.js.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { appFunction } = require('../support/app.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { appFunction } from '../support/app.ts';
 const clk = appFunction('_clkMS');
 
 /** A clock is minutes, a colon and a two digit seconds limb in 00..59. */

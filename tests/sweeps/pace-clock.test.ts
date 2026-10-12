@@ -1,11 +1,10 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The pace clock's whole lattices (CI only; tests/integration/pace-clock.test.js runs a sample of each):
 //   the anchor, target and rate over 3 levels x 3 ages x mi and km x 4 entered miles x 5 entered goals (360 builds);
 //   the injury PACE CLOCK appendix over 3 miles x 3 distances x 2 goal times x 3 levels, plus one cfg on schedule.
 // The claims and their hand oracles live in tests/support/pace-clock-lattices.js.
-const { loadAppAt } = require('../support/pace-clock.js');
-const { anchorLatticeTests, appendixLatticeTests } = require('../support/pace-clock-lattices.js');
-
+import { loadAppAt } from '../support/pace-clock.ts';
+import { anchorLatticeTests, appendixLatticeTests } from '../support/pace-clock-lattices.ts';
 const IA = loadAppAt(new Date(2026, 9, 11, 12, 0, 0));
 
 anchorLatticeTests(IA, 'full lattice (360 builds)', {

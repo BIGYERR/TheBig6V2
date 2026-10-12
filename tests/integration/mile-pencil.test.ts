@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The mile pencil (D116): the program card's pencil opens a sheet that changes the mile mid-program, through the
 // wizard's own validator, stores it as typed with an "edited" provenance that always records what it replaced, and
 // locks for the last three weeks ("three weeks out the work is done"). D188 makes the pencil unconditional (every
@@ -8,11 +8,10 @@
 // lock as a hand table (the last three weeks of a program lock: weeks 12 to 14 of 14, weeks 4 to 6 of 6); the
 // days-out count and the race-day date from y/m/d integers (days-from-civil, Sakamoto's weekday, a typed month table).
 // The app's clock is pinned to 2026-10-11 12:00 local, and each program's start date is worked out from that day.
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const { fixtures } = require('../support/app.js');
-const { loadAppAt, domRegistry, clone } = require('../support/pace-clock.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import { fixtures } from '../support/app.ts';
+import { loadAppAt, domRegistry, clone } from '../support/pace-clock.ts';
 const TODAY = { y: 2026, m: 10, d: 11 };
 const IA = loadAppAt(new Date(TODAY.y, TODAY.m - 1, TODAY.d, 12, 0, 0));
 const reg = domRegistry(IA);
