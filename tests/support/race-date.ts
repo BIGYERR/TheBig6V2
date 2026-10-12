@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Helpers for the race date tests (tests/integration/race-date.test.js, tests/sweeps/race-date.test.js). Built on
 // tests/support/app.js, tests/support/test-week.js (the hand calendar) and tests/support/test-length.js (the document
 // that keeps its elements).
@@ -12,10 +12,9 @@
 //                         the 46 wizard rows, each with its hand expectation: an aligned race goal's start is the
 //                         Monday of race week minus (plan - 1) weeks, and the days its flag holds outside are its
 //                         days dated start <= d < 2026-09-24.
-const { loadApp, pinClock, fixtures } = require('./app.js');
-const T = require('./test-week.js');
-const { registryDom } = require('./test-length.js');
-
+import { loadApp, pinClock, fixtures } from './app.ts';
+import * as T from './test-week.ts';
+import { registryDom } from './test-length.ts';
 // ── the countdown (D182) ────────────────────────────────────────────────────────────────────────────────────────
 function countdownVM() {
   const IA = loadApp();
@@ -215,7 +214,7 @@ function fixtureStore() {
   return { fix, store: { ia_programs: JSON.stringify([fix]), ia_active: 'HM1' } };
 }
 
-module.exports = {
+export {
   countdownVM, kv, one, cfgOf, progOf, card, copyLine, eventParts, sheet, review,
   TODAY_ISO, PIN, PLAN_WEEKS, handStart, plus, dayISO, boot, dump, storedP, weekHTML, render, text, wizard, parseWeek,
   HM, runG, LROWS, lattice, WROWS, wizardRun, fixtureStore,

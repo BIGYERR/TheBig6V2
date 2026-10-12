@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The test week of a dated NSW test goal: the program ends on the week that holds the test, the trial sits on the test
 // day, the taper lands in front of it, and the days before it are a shakeout and rest. Rulings: D106a (a dated test
 // goal ends on its test week; slice A the taper window, slice B the test week, slice E the trial taken from the
@@ -15,12 +15,12 @@
 // trial card text (11:00 over 1.5 mi is 440 s/mi, a 7:20 mile by hand); the week's easy distance read off the same cfg
 // built without the test pin (the pre-pin week, which the pin post-pass is the only thing to change).
 process.env.TZ = 'America/New_York';
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const { fixtures, progDigest } = require('../support/app.js');
-const X = require('../support/test-week.js');
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fixtures, progDigest } from '../support/app.ts';
+import * as X from '../support/test-week.ts';
 const { ISO7, clone, canon, cards, runOf, isTrial, isEasy, isLong, quality, isQualityRun, isHardRun, trials, prtTing, build } = X;
 
 const IA = X.engine('2026-09-21');

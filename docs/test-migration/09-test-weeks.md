@@ -6,27 +6,27 @@ test or dropped for a written reason (`docs/test-migration.md`, The parity rule)
 
 New files:
 
-- `tests/integration/test-week.test.js` (38 tests): what the test week of a dated NSW test goal looks like. The test
+- `tests/integration/test-week.test.ts` (38 tests): what the test week of a dated NSW test goal looks like. The test
   week index, the taper and the long run for test blocks of 1 to 8 weeks (D106a slice A), the test week itself (slice
   B), the trial taken from the week's hardest run across mixes (slice E), T-1 and T-2 (the V208 fix-forward), B4 at
   T-2, the eve shakeout and the protect-park modes it skips (D158). Hand fixtures and a sample of each lattice.
-- `tests/integration/test-length.test.js` (39 tests): how long the program is and where it starts. doGenerate's pin
+- `tests/integration/test-length.test.ts` (39 tests): how long the program is and where it starts. doGenerate's pin
   (D106a, D184), the boot backfill and setProgStart's re-pin (D106a slice C, D184), the race date card (D183), one
   owner for Table 6's last row, one length on every surface and the start whose week holds the test (D184), the last
   two in New York and in UTC.
-- `tests/integration/race-date.test.js` (18 tests): blockOpen through refreshProgram and a reboot (D180), and the race
+- `tests/integration/race-date.test.ts` (18 tests): blockOpen through refreshProgram and a reboot (D180), and the race
   date and its countdown on four surfaces (D182) in New York and in UTC.
-- `tests/sweeps/test-week.test.js` (10 tests, CI only): every lattice whole: 108 trial week cells, 360 eve cells (one
+- `tests/sweeps/test-week.test.ts` (10 tests, CI only): every lattice whole: 108 trial week cells, 360 eve cells (one
   test per goal and mix), 456 B4 cells, 784 shakeout cells, 672 protect-park cells.
-- `tests/sweeps/test-length.test.js` (8 tests, CI only), in both zones: the 1,440-cell length lattice with its exact
+- `tests/sweeps/test-length.test.ts` (8 tests, CI only), in both zones: the 1,440-cell length lattice with its exact
   refusal population (416 and 64), the 120,050-point snap lattice, every (c) cell's 1,809 builds, its 603 start
   sentences and race date cards.
-- `tests/sweeps/race-date.test.js` (2 tests, CI only): the 402-row refreshProgram lattice with the ruling's blast
+- `tests/sweeps/race-date.test.ts` (2 tests, CI only): the 402-row refreshProgram lattice with the ruling's blast
   radius (365 aligned, 209 moving: 5K 25, 10K 25, half 67, marathon 91, HALF_MANNY 1) and the 46 wizard rows.
 - `tests/snapshots/test-week.json`: the training-day eve under the protect-park injury modes (264 cells: easy,
   noimpact, noimpact_swim, reduce, 66 each). D158's ruling names V213 as the oracle; the snapshot was checked once
   against V213 (`bc3cccc`) when written, 264 of 264 equal, so the gate's current claim is held without a past build.
-- `tests/support/test-week.js`, `tests/support/test-length.js`, `tests/support/race-date.js`: the hand calendar
+- `tests/support/test-week.ts`, `tests/support/test-length.ts`, `tests/support/race-date.ts`: the hand calendar
   (integer civil days, Sakamoto's weekday), the card readers, the fixtures, the lattices and their runners, the
   keeping document, the wizard and setProgStart drivers, the countdown surfaces and the block open boot.
 
@@ -45,12 +45,12 @@ Totals: **205 rows: 198 mapped, 7 dropped** (3 HALF_MANNY digest rows, held by
 
 ## `g207_gk_trial_present.js` (17 rows: 16 mapped, 1 dropped)
 
-Lattice rows are held twice: on a sample in `tests/integration/test-week.test.js` (every fifth trial week cell, every
-seventh eve cell, every eleventh B4 cell) and whole in `tests/sweeps/test-week.test.js`.
+Lattice rows are held twice: on a sample in `tests/integration/test-week.test.ts` (every fifth trial week cell, every
+seventh eve cell, every eleventh B4 cell) and whole in `tests/sweeps/test-week.test.ts`.
 
 | Row | Held by |
 |---|---|
-| `P1` | `tests/integration/test-week.test.js` › "a dated test goal that ends on its test week carries one time trial, on the test day, titled Test Day with no section: run only, with a bike, with a swim"; sweep › "every cell of the trial week lattice carries one trial on the test day, titled Test Day, and the week around it is clean" |
+| `P1` | `tests/integration/test-week.test.ts` › "a dated test goal that ends on its test week carries one time trial, on the test day, titled Test Day with no section: run only, with a bike, with a swim"; sweep › "every cell of the trial week lattice carries one trial on the test day, titled Test Day, and the week around it is clean" |
 | `P2` | the same two tests |
 | `P3` | the same two tests |
 | `P4` | › "when the test week dealt no quality run, the trial is the long card and no long card is left"; the sweep test (72 of 108 cells reach it) |
@@ -75,7 +75,7 @@ are a version predicate's other arm.
 
 | Row | Held by |
 |---|---|
-| `C1a` | `tests/integration/test-length.test.js` › "moving the start a week later re-pins test week 4, builds 4 weeks, persists the pin and keeps the trained day frozen; an NRC program gets no pin" |
+| `C1a` | `tests/integration/test-length.test.ts` › "moving the start a week later re-pins test week 4, builds 4 weeks, persists the pin and keeps the trained day frozen; an NRC program gets no pin" |
 | `C1b` | the same test |
 | `C1c` | the same test |
 | `C3a` | › "a stored dated test goal with no pin backfills it on refresh: test week 5, 5 weeks, both pins persisted, the trained day frozen, the trial on the test day" |
@@ -97,11 +97,11 @@ are a version predicate's other arm.
 
 ## `g207_test_week.js` (73 rows: 72 mapped, 1 dropped)
 
-The G rows live in `tests/integration/test-length.test.js`, every other row in `tests/integration/test-week.test.js`.
+The G rows live in `tests/integration/test-length.test.ts`, every other row in `tests/integration/test-week.test.ts`.
 
 | Row | Held by |
 |---|---|
-| `Z0` | `tests/integration/test-week.test.js` › "the test week is counted in Monday weeks from the start, across both daylight saving changes" |
+| `Z0` | `tests/integration/test-week.test.ts` › "the test week is counted in Monday weeks from the start, across both daylight saving changes" |
 | `H1` to `H9` (9 rows) | the same test, one hand row each, every one also checked against the hand calendar |
 | `F1` | › "PRT TING pinned to its week 5 test builds 5 weeks, the same goal undated builds 11, and weeks 1 to 3 carry the same cardio" |
 | `F2` | › "PRT TING with the length pin alone prints the taper on weeks 4 and 5" |
@@ -127,14 +127,14 @@ The G rows live in `tests/integration/test-length.test.js`, every other row in `
 | `D10` | › "an NRC 5K time trial with no race date is still titled Race Day" |
 | `D11` | › "an NRC 5K with a bike goal: the bike long ride in the race eve window keeps its own title" |
 | `E1` | › "every run card names the same quality session in its NSW name and its dose key" (every run card the file builds; the gate's era table that chose between names and keys is a version predicate) |
-| `G1` | `tests/integration/test-length.test.js` › "the wizard pins a dated test goal to its test week, 1 to 26, and the generate screen names that length; undated, before the start or past 26 keeps the 11-week goal" |
+| `G1` | `tests/integration/test-length.test.ts` › "the wizard pins a dated test goal to its test week, 1 to 26, and the generate screen names that length; undated, before the start or past 26 keeps the 11-week goal" |
 | `G2`, `G3`, `G4`, `G4b`, `G4c`, `G5`, `G6`, `G7` | the same test, one row each, in the gate's order on one WD |
 
 ## `g214_d158_eve.js` (8 rows: 7 mapped, 1 dropped)
 
 | Row | Held by |
 |---|---|
-| `D0` | `tests/integration/test-week.test.js` › "every training-day eve carries the shakeout and nothing else: one easy run, distance keyed easy, titled Shakeout, no lift" (every eleventh cell; reach of each eve kind); sweep › "every training-day eve of the shakeout lattice carries the shakeout at the week easy distance; every rest-day eve rests" (784 programs) |
+| `D0` | `tests/integration/test-week.test.ts` › "every training-day eve carries the shakeout and nothing else: one easy run, distance keyed easy, titled Shakeout, no lift" (every eleventh cell; reach of each eve kind); sweep › "every training-day eve of the shakeout lattice carries the shakeout at the week easy distance; every rest-day eve rests" (784 programs) |
 | `D1` | the same two tests |
 | `D2` | › "the shakeout's distance is the week's easy distance, read off the other days of the week before the pin"; the sweep test |
 | `D2v` | the same two tests |
@@ -147,7 +147,7 @@ The G rows live in `tests/integration/test-length.test.js`, every other row in `
 
 | Row | Held by |
 |---|---|
-| `C0` | `tests/integration/race-date.test.js` › "the pinned clock reaches the app: Date.now() is the pin and today is Thursday 2026-09-24" |
+| `C0` | `tests/integration/race-date.test.ts` › "the pinned clock reaches the app: Date.now() is the pin and today is Thursday 2026-09-24" |
 | `I1a` | › "a race program keeps blockOpen through refreshProgram, and the days it holds outside are the days before today from its counted-back start" (HALF_MANNY and every eleventh row); sweep › "every row of the refreshProgram lattice: aligned rows carry blockOpen, others carry no key, and the days held outside are the date-arithmetic set" (365 of 365) |
 | `I1b` | the same two tests (37 of 37 in the sweep) |
 | `I1c` | the same two tests (the ruling's blast radius, 209 moving rows by goal, in the sweep) |
@@ -163,7 +163,7 @@ The G rows live in `tests/integration/test-length.test.js`, every other row in `
 
 ## `g223_d182_racedate.js` (30 rows: 28 mapped, 2 dropped)
 
-Each row printed once per zone; each `.NY` row is held by `tests/integration/race-date.test.js` › "in New York" › the
+Each row printed once per zone; each `.NY` row is held by `tests/integration/race-date.test.ts` › "in New York" › the
 test named, each `.UTC` row by › "in UTC" › the same test.
 
 | Row | Held by |
@@ -180,9 +180,9 @@ test named, each `.UTC` row by › "in UTC" › the same test.
 
 ## `g223_d184_testlen.js` (36 rows: 34 mapped, 2 dropped)
 
-Each row printed once per zone; each `.NY` row is held by `tests/integration/test-length.test.js` › "in New York" ›
+Each row printed once per zone; each `.NY` row is held by `tests/integration/test-length.test.ts` › "in New York" ›
 the test named, each `.UTC` row by › "in UTC" › the same test, and each lattice row also by the matching test in
-`tests/sweeps/test-length.test.js` (both zones).
+`tests/sweeps/test-length.test.ts` (both zones).
 
 | Row | Held by |
 |---|---|

@@ -1,15 +1,14 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The test week lattices whole (CI only): tests/integration/test-week.test.js runs each claim on a sample. Rulings:
 // D106a (the trial week, slice E, and the V208 fix-forward at T-1 and T-2) and D158 (the eve shakeout, and the
 // protect-park injury modes it skips). Oracles as in the integration file: date arithmetic, the pre-pin week of the
 // same cfg, the card text. tests/snapshots/test-week.json pins the eve under the protect-park modes: every cell matched
 // V213's eve (the build before D158, git bc3cccc, the ruling's named oracle) when the snapshot was written.
 process.env.TZ = 'America/New_York';
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const X = require('../support/test-week.js');
-const { matchSnapshot } = require('../support/snapshot.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import * as X from '../support/test-week.ts';
+import { matchSnapshot } from '../support/snapshot.ts';
 const IA = X.engine('2026-09-21');
 
 test('every cell of the trial week lattice carries one trial on the test day, titled Test Day, and the week around it is clean', () => {

@@ -1,13 +1,12 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The block open lattices whole (CI only): tests/integration/race-date.test.js runs each claim on a sample. Ruling
 // D180 (P-BLOCKOPEN). Oracles as in the integration file: the Nike plan lengths and Monday arithmetic for a race
 // program's start, the days before Thu 2026-09-24 by date arithmetic, and the ruling's blast radius: of the 365 aligned
 // rows, 209 hold days outside (5K 25, 10K 25, half 67, marathon 91, HALF_MANNY 1).
 process.env.TZ = 'America/New_York';
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const R = require('../support/race-date.js');
-
+import { test } from 'vitest';
+import assert from 'node:assert/strict';
+import * as R from '../support/race-date.ts';
 test('every row of the refreshProgram lattice: aligned rows carry blockOpen, others carry no key, and the days held outside are the date-arithmetic set', () => {
   // I1a, I1b, I1c: 402 rows
   const L = R.lattice(R.LROWS);

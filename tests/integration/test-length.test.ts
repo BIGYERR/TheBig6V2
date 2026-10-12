@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // How long a dated NSW test goal's program is, and where it starts. Rulings: D106a (doGenerate writes the test pin from
 // the resolved start; a stored dated test goal with no pin backfills it on boot; setProgStart re-pins), D183 (the race
 // date card's sentences), D184 (P-TESTLEN: the pin holds whenever the test week is a row of Table 6, weeks 1 to 26; one
@@ -16,12 +16,12 @@
 // row, typed from the ruling; the ruling's After cells, sentences and toasts; dates printed by Intl in UTC from the ISO
 // date, never by the app's formatter; the goal length past week 26 is what the same inputs build with no test date.
 process.env.TZ = 'America/New_York';
-const { test, describe, before } = require('node:test');
-const assert = require('node:assert/strict');
-const { appScript, fixtures } = require('../support/app.js');
-const X = require('../support/test-week.js');
-const L = require('../support/test-length.js');
-const { stripComments, compiles } = require('../support/week-view.js');
+import { test, describe, beforeAll } from 'vitest';
+import assert from 'node:assert/strict';
+import { appScript, fixtures } from '../support/app.ts';
+import * as X from '../support/test-week.ts';
+import * as L from '../support/test-length.ts';
+import { stripComments, compiles } from '../support/week-view.ts';
 const { J } = L;
 const { clone, canon, own } = X;
 
@@ -261,7 +261,7 @@ const RULING_WEEKS = [['2027-02-04', 20], ['2026-12-28', 15], ['2027-03-15', 26]
 for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]], ['UTC', 'UTC', [0, 0]]]) {
   describe('in ' + zone, () => {
     let V;
-    before(() => { process.env.TZ = tz; V = L.wizardVM('2026-09-22', 21, 16); });
+    beforeAll(() => { process.env.TZ = tz; V = L.wizardVM('2026-09-22', 21, 16); });
 
     test('the zone is the one asked for, the clock pin reaches the app, and the hand week oracle agrees with the ruling', () => {
       // Z0, Z1, Z2

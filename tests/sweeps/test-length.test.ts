@@ -1,16 +1,15 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // The test length lattices whole (CI only), in both zones: tests/integration/test-length.test.js runs each claim on a
 // sample. Ruling D184 (P-TESTLEN), with D187 R3's refusal. Oracles as in the integration file: Monday week arithmetic
 // on integer civil days, 26 typed from the ruling, the ruling's sentences, dates printed by Intl in UTC.
 process.env.TZ = 'America/New_York';
-const { test, describe, before } = require('node:test');
-const assert = require('node:assert/strict');
-const L = require('../support/test-length.js');
-
+import { test, describe, beforeAll } from 'vitest';
+import assert from 'node:assert/strict';
+import * as L from '../support/test-length.ts';
 for (const [zone, tz] of [['New York', 'America/New_York'], ['UTC', 'UTC']]) {
   describe('in ' + zone, () => {
     let V;
-    before(() => { process.env.TZ = tz; V = L.wizardVM('2026-09-22', 21, 16); });
+    beforeAll(() => { process.env.TZ = tz; V = L.wizardVM('2026-09-22', 21, 16); });
 
     test('the length lattice: weeks 1 to 26 print the test week on every surface, 27 to 30 the goal length and the interim sentence', () => {
       // B1248 and K27: 8 goals x 3 experience x 2 mile states x test weeks 1..30 = 1,440 cells; the refusal population

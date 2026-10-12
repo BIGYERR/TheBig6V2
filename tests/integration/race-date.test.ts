@@ -1,4 +1,4 @@
-'use strict';
+// @ts-nocheck: ported from JavaScript in phase 2; typing pending (docs/test-migration.md, "Typing debt").
 // Race dates: the date and the countdown every surface prints, and the days a race-aligned program keeps behind the
 // athlete. Rulings: D180 (P-BLOCKOPEN: refreshProgram's copy-back carries blockOpen, so the days between a race
 // program's counted-back start and the day the athlete walked in stay behind them after a reboot) and D182
@@ -16,11 +16,10 @@
 // Nike plan lengths (5K 8, 10K 8, half 14, marathon 18 weeks) and Monday arithmetic for a race program's start; the
 // After column of the D180 ruling's table, typed from the fixture's arithmetic.
 process.env.TZ = 'America/New_York';
-const { test, describe, before } = require('node:test');
-const assert = require('node:assert/strict');
-const X = require('../support/test-week.js');
-const R = require('../support/race-date.js');
-
+import { test, describe, beforeAll } from 'vitest';
+import assert from 'node:assert/strict';
+import * as X from '../support/test-week.ts';
+import * as R from '../support/race-date.ts';
 // ── the block open (D180), the clock on Thu 2026-09-24 12:00 ─────────────────────────────────────────────────────
 const FIX_START = '2026-08-31', FIX_WEEKS = 14;
 const AFTER = { W1pre: 'mon tue wed thu fri sat sun', W1done: '0 /0 DONE', toast: 'Before your start date', W4pre: 'mon tue wed', W4taps: 4, W4done: '0 /3 DONE', sched: 1, streak: 0 };
@@ -145,7 +144,7 @@ const TEST_GOAL = { id: 'run_pace_goal', label: 'Hit a Pace / Time Goal', mileBe
 for (const [zone, tz, offsets] of [['New York', 'America/New_York', [300, 240]], ['UTC', 'UTC', [0, 0]]]) {
   describe('in ' + zone, () => {
     let C;
-    before(() => { process.env.TZ = tz; C = R.countdownVM(); });
+    beforeAll(() => { process.env.TZ = tz; C = R.countdownVM(); });
 
     test('the zone is the one asked for, the clock pin reaches the app, and the hand date oracle agrees with itself and the ruling', () => {
       // Z0, Z1, Z2
