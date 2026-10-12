@@ -212,6 +212,20 @@ export function helpers(page: Page): Helpers {
   return h;
 }
 
+/** Taps the control in the row whose name reads `name` (the row itself without a control), failing loudly if none does. */
+async function tapNamed(page: Page, rows: string, nameSel: string, name: string, control?: string): Promise<void> {
+  for (const row of await page.$$(rows)) {
+    if ((await row.$eval(nameSel, (e) => (e.textContent ?? '').trim()).catch(() => null)) !== name) continue;
+    const target = control ? await row.$(control) : row;
+    if (!target) throw new Error(`the ${name} row has no ${control}`);
+    await target.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+    await target.click();
+    await sleep(SETTLE_MS);
+    return;
+  }
+  throw new Error(`no ${rows} reads ${name}`);
+}
+
 /** Reads a value an earlier step stored, failing loudly if that step never stored it. */
 function stored(state: FlowState, key: string): string {
   const v = state[key];
@@ -343,15 +357,51 @@ const STRENGTH: readonly Step[] = [
       await t.overlayOpen('swapOverlay');
       if (!(await t.count('#swapOverlay .swap-cand'))) throw new Error('the swap sheet offers no candidates');
     },
-    async after(t, page) {
+    async after(t, page, state) {
       // A pick swaps the exercise for this session (the sheet is an Angular component in the app since phase E's fifth
       // step, the pick still the legacy applySwapChoice): the sheet closes and the day reopens showing the new name.
       const picked = await t.text('#swapOverlay .swap-cand .swap-cand-name');
+      state['swapFrom'] = await t.text('#swapOutName');
+      state['swapTo'] = picked;
       await t.tap('#swapOverlay .swap-cand');
       await t.overlayOpen('detailOverlay');
       await t.expectText('#detailOverlay', picked);
       if (await page.$eval('#swapOverlay', (e) => e.classList.contains('open'))) throw new Error('the swap sheet stayed open after the pick');
       await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
+      await t.closeSheet('detailOverlay');
+    },
+  },
+  {
+    id: 'swap-nudge',
+    page: 'The coach\'s nudge after the same trade made three times',
+    async run(t, page, state) {
+      // The athlete puts week 1's trade back and makes it again, twice: the third time, the coach offers to make it the
+      // plan (the trade count is per lift and pick, so the same Friday serves). The card is an Angular component in the
+      // app since phase E's ninth step, the legacy markup in the page. Each toast clears before the next tap: a toast's
+      // timer is never cancelled, so one shown inside another's 2.2 s is cut short, and the photograph would race it.
+      const from = stored(state, 'swapFrom');
+      const to = stored(state, 'swapTo');
+      const toastClear = () => page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
+      await t.tap(`.wk-day[onclick="openDayKey('fri')"]`);
+      await t.overlayOpen('detailOverlay');
+      for (let round = 2; round <= 3; round++) {
+        await t.tap('#detailOverlay .ex-swapchip .ex-swapundo');
+        await toastClear();
+        await tapNamed(page, '#detailOverlay .ex-namerow', '.ex-name', from, '.ex-swapbtn');
+        await t.overlayOpen('swapOverlay');
+        await tapNamed(page, '#swapOverlay .swap-cand', '.swap-cand-name', to);
+        await t.overlayOpen('detailOverlay');
+        await t.expectText('#detailOverlay', to);
+        if (round === 2) await toastClear();
+      }
+      await t.overlayOpen('swapNudgeOverlay');
+      await toastClear();
+      await t.expectText('#swapNudgeOverlay', `That is three sessions running you have traded ${from.toLowerCase()} for ${to.toLowerCase()}.`);
+    },
+    async after(t) {
+      // Leaving the plan alone closes the card and keeps the day as traded.
+      await t.tap('#swapNudgeOverlay .swap-nudge-no');
+      if ((await t.openOverlays()).includes('swapNudgeOverlay')) throw new Error('the nudge stayed up after Leave the plan alone');
       await t.closeSheet('detailOverlay');
     },
   },
@@ -913,6 +963,25 @@ const LOG_SESSION: readonly Step[] = [
       // Each exercise's set header carries its status in its own span: "logged", "nothing logged" or "as prescribed".
       const logged = await page.$$eval('#detailOverlay .exset-head-sub', (subs) => subs.filter((e) => e.textContent?.trim() === 'logged').length);
       if (logged !== 2) throw new Error(`expected 2 exercises marked logged, found ${logged}`);
+    },
+  },
+  {
+    id: 'log-rpe-card',
+    page: 'Log: what RPE means',
+    async run(t) {
+      // The ⓘ beside the effort opens the app-wide RPE card (an Angular component in the app since phase E's ninth step,
+      // the legacy markup in the page).
+      await t.tap('#detailOverlay [aria-label="What is RPE?"]');
+      await t.overlayOpen('rpeInfoOverlay');
+      await t.expectText('#rpeInfoOverlay', 'RPE — Rate of Perceived Exertion');
+      await t.expectText('#rpeInfoOverlay', 'RPE 8 ≈ 2 reps left in the tank');
+    },
+    async after(t) {
+      // Got it closes the card and leaves the day open on its log.
+      await t.tap('#rpeInfoOverlay .rpe-info-close');
+      const open = await t.openOverlays();
+      if (open.includes('rpeInfoOverlay')) throw new Error('the RPE card stayed up after Got it');
+      if (!open.includes('detailOverlay')) throw new Error('the day closed with the RPE card');
     },
   },
   {

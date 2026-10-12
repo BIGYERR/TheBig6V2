@@ -170,3 +170,24 @@ what is stored.
   reminder is skipped, and the pencil shows the lock: 17 days out, Sat, Nov 14, 2026, week 4 of 6.
   `tests/unit/e2e-flow.test.ts` holds the helper and the page script to one sessionStorage key.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.16 moves the swap nudge and the RPE card
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.16.
+- **Moved:** the card inside `#swapNudgeOverlay`: `src/app/screens/swap-nudge/swap-nudge.ts` and `swap-nudge-model.ts`
+  (the two paragraphs and the slot words, each the legacy `showSwapNudge`'s). It takes over `showSwapNudge` through
+  `LegacyBridge.provide`, writing the legacy `_nudgeCtx` first as before; accepting and declining are still the legacy
+  `acceptSwapNudge` and `dismissSwapNudge`, and when to offer it is still the legacy `bumpSwapCount`. The card inside
+  `#rpeInfoOverlay`: `src/app/screens/rpe-info/rpe-info.ts` (static); opening it and the overlay's tap outside stay the
+  legacy `showRpeInfo` and `hideRpeInfo`. The overlays themselves stay legacy markup. The space between the nudge's two
+  buttons is kept (`&ngsp;`), so the card's text reads as the page's does.
+- **Tests:** `frontends/app/test/unit/swap-nudge.test.ts` (2: the paragraphs, the slot words). The e2e reaches the nudge
+  for real in the strength journey: the swap step records the trade, then the athlete puts it back and makes it again
+  twice on the same Friday, and the third trade earns the nudge, which is declined. The log-session journey opens the
+  RPE card from the effort's ⓘ and closes it with Got it, the day still open. A local comparison of both builds also
+  matched: the nudge declined and accepted with no program, the RPE card kept by a tap inside, closed by Got it and by
+  the backdrop.
+- **Found, for a ruling (handoff §12):** `showToast` never cancels an earlier timer, so a toast inside another's 2.2 s
+  is cut short (the e2e waits each toast out); the nudge prints the pattern id ("your hpress"), and its "three
+  sessions running" counts trades, not sessions.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
