@@ -340,7 +340,13 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
 - **Done when:** `frontends/app/src/app/legacy/` is empty and `globals.ts` is gone.
 
 ### Phase F: delivery from the build (about 1 session; right after phase C)
-- Pages deploys the build output through GitHub Actions; Cordova and the backend take the same output.
+- Pages deploys the build output through GitHub Actions, from a defined `dist-github-pages/` folder (the app's
+  `index.html` and its icon, nothing else; Mario, 2026-10-12: Pages stays until Heroku is set up). Cordova and the
+  backend take the same output. Mario switches the Pages source to GitHub Actions in the same merge that deletes the
+  root file, or the live app breaks.
+- Every reader of the root file (about 25: the test harness and `tests/support/app.ts`, `tools/check.mjs`, the CI
+  pipeline, `tools/deploy-check.mjs`, the app's sync, PWA and iOS scripts, the backend's dev watcher and Heroku bundle)
+  reads the build output instead.
 - `tools/deploy-check.mjs` reads the version from the live built `index.html`.
 - The root `index.html`, `sync-legacy` and the split-piece generator are deleted.
 - CLAUDE.md drops "single-file" from "What this is" and keeps every invariant below.
@@ -374,8 +380,8 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
 ## 6. How it fits with the work in flight
 
 - **Test migration phases 2 and 3 are done** (Post-v0.239.1): every gate row is held by a feature test or dropped for a
-  written reason, and the legacy suite is deleted (`830af1e`), so phase C may start. 64 ported test files still carry
-  `@ts-nocheck` (`docs/test-migration.md`, Typing debt).
+  written reason, and the legacy suite is deleted (`830af1e`), so phase C may start. The 64 test files phase 2 ported with
+  `@ts-nocheck` are typed (Post-v0.239.2); no test carries the marker (`docs/test-migration.md`, Typing debt).
 - **Releases** continue between phases. From phase B on, builder edits `frontends/app/src/legacy/src/*`, never the root
   `index.html`; from phase D on it edits TypeScript.
 - **Process docs** (CLAUDE.md, the agent files, the skills) are updated at the end of each phase to say where code lives
