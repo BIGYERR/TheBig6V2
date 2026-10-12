@@ -3,7 +3,7 @@
 // never marked" nudge and the logged count. Every expected value is typed here from the legacy code.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { detailBody, hasLogged, liftsFirst, loggedCount, logNudge } from '../../src/app/screens/day-detail/day-detail-model.ts';
+import { detailBody, hasLogged, liftsFirst, loggedCount, logNudge, statusFoot } from '../../src/app/screens/day-detail/day-detail-model.ts';
 
 const P = { lifts: '<L>', cardio: '<C>', note: undefined, rangeNudge: '', wildcardTag: '', log: '<LOG>', logNudge: '' };
 
@@ -30,4 +30,12 @@ describe('the session sheet', () => {
   it('counts what is logged, and hides the count with nothing to log', () => {
     assert.deepEqual([loggedCount({ done: 2, total: 7 }), loggedCount({ done: 0, total: 0 })], ['2 / 7 LOGGED', null]);
   });
+
+  it('puts the day\'s status on the big button, undoable, and the other status on the small one', () => {
+    const row = (cur: string | null) => statusFoot(cur).map((b) => [b.id, b.cls, b.label, b.undo, b.status]);
+    assert.deepEqual(row(null), [['statusBtn_complete', 'day-done', 'Done', false, 'complete'], ['statusBtn_skipped', 'day-skip', 'Skip', false, 'skipped']]);
+    assert.deepEqual(row('complete'), [['statusBtn_complete', 'day-done is', 'Done ✓ ', true, 'complete'], ['statusBtn_skipped', 'day-skip', 'Skip', false, 'skipped']]);
+    assert.deepEqual(row('skipped'), [['statusBtn_skipped', 'day-done skipped', 'Skipped ✕ ', true, 'skipped'], ['statusBtn_complete', 'day-skip', 'Done', false, 'complete']]);
+  });
 });
+

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
-import { detailBody, hasLogged, liftsFirst, loggedCount, logNudge } from './day-detail-model';
+import { detailBody, type FootButton, hasLogged, liftsFirst, loggedCount, logNudge, statusFoot } from './day-detail-model';
 
 /** A scheduled day, as far as the sheet reads it. */
 interface DetailDay {
@@ -31,8 +31,9 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
  * (a skip, a swap, an add, a KB size, the nudge) reaches it. The header (the week and day, the title, the tags, the
  * logged count, Back, RPE and the add button) and the frame are the component's, drawn anew on each call as the legacy
  * writes did. The body is still the legacy builders' markup (the sections and their set logging, the 1RM calculator,
- * the cardio card, the note, the nudges, the session log) and the foot still the legacy renderStatusFoot's, and after
- * each draw the legacy wiring runs as before: the log fields save as they change, the wheels start, the derived dose
+ * the cardio card, the note, the nudges, the session log). The foot (Done and Skip, each undoing itself) is the
+ * component's since step 23: it takes over renderStatusFoot, which the legacy handleDayStatus calls on every status
+ * change. After each draw the legacy wiring runs as before: the log fields save as they change, the wheels start, the derived dose
  * paints. A re-render keeps the reader where they were; a fresh open starts at the top.
  */
 @Component({
@@ -58,7 +59,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
     </div>
     <div class="detail-body" id="detailBody" [innerHTML]="v.body"></div>
     <div class="detail-foot" id="detailFoot">
-      <div id="detailStatusRow"></div>
+      <div id="detailStatusRow">@if (foot(); as f) {<div class="status-stack">@for (btn of f.buttons; track btn.id) {<button [class]="btn.cls" [id]="btn.id" (click)="call('handleDayStatus', f.dayKey, f.title, btn.status)">{{ btn.label }}@if (btn.undo) {<small>tap to undo</small>}</button>}</div>}</div>
     </div>
   }
   `,
@@ -72,9 +73,19 @@ export class DayDetail {
     const v = this.view();
     return v ? [v] : [];
   });
+  /** The status foot's two buttons, for the day the sheet shows. */
+  protected readonly foot = signal<{ dayKey: string; title: string; buttons: FootButton[] } | null>(null);
 
   constructor() {
     this.bridge.provide('openDetail', (dayKey: string, day: DetailDay) => this.open(dayKey, day));
+    this.bridge.provide('renderStatusFoot', (dayKey: string, title: string) => this.renderFoot(dayKey, title));
+  }
+
+  /** The legacy renderStatusFoot: the foot drawn again for the day's status, once the sheet has been drawn. */
+  private renderFoot(dayKey: string, title: string): void {
+    if (!this.view()) return;
+    this.foot.set({ dayKey, title: title || '', buttons: statusFoot(this.bridge.call<string | undefined>('statusOf', this.bridge.global<number>('currentWeek'), dayKey)) });
+    this.cdr.detectChanges();
   }
 
   protected call(name: string, ...args: unknown[]): void {
@@ -119,9 +130,10 @@ export class DayDetail {
       counter: loggedCount(progress),
       body: this.sanitizer.bypassSecurityTrustHtml(html),
     });
+    this.foot.set(null);
     this.cdr.detectChanges();
 
-    b.call('renderStatusFoot', dayKey, day.title || '');
+    this.renderFoot(dayKey, day.title || '');
     for (const id of LOG_FIELDS) {
       const el = document.getElementById(id);
       const free = id === 'log_rpe' || id === 'log_notes';

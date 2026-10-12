@@ -469,3 +469,16 @@ what is stored.
 - **Tests:** the e2e's goal sheet, injury and travel sheets and mile lock steps photograph the frames and close them
   by Back, 68/68 at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.31 moves the session sheet's status foot
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.31.
+- **Moved:** the legacy `statusFootHTML` and `renderStatusFoot`: the DayDetail component draws the foot (the big button
+  carries the day's status and undoes it, the small one the other status; a pending day offers Done and Skip) from
+  `statusFoot` in `day-detail-model.ts`, and takes over `renderStatusFoot` through `LegacyBridge.provide`, which the
+  legacy `handleDayStatus` calls on every status change. Each button still calls the legacy `handleDayStatus`.
+- **Tests:** `frontends/app/test/unit/day-detail.test.ts` gains the foot's three states. The strength journey gains a
+  step (`day-skip`): Friday skipped (the day closes, its toast), reopened with "Skipped ✕ tap to undo", undone (the
+  "Unmarked" toast, the usual foot back). The log-session journey closes a day with Done and finds "Done ✓ tap to
+  undo" after a relaunch. 69/69 at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

@@ -495,6 +495,33 @@ const STRENGTH: readonly Step[] = [
     },
   },
   {
+    id: 'day-skip',
+    page: 'A day skipped, then undone',
+    async run(t, page) {
+      // Skip closes the day with its toast; reopened, the foot carries the skip and undoes it (the foot is part of the
+      // session sheet's component in the app since phase E's twenty-third step, the legacy markup in the page).
+      await t.tapDay('fri');
+      await t.overlayOpen('detailOverlay');
+      await t.expectText('#statusBtn_skipped', 'Skip');
+      await t.tap('#statusBtn_skipped');
+      if ((await t.openOverlays()).includes('detailOverlay')) throw new Error('the day stayed open after Skip');
+      await t.expectText('#toast', 'Skipped ✕ The week moves on');
+      await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
+      await t.tapDay('fri');
+      await t.overlayOpen('detailOverlay');
+      await t.expectText('#statusBtn_skipped', 'Skipped ✕ tap to undo');
+      await t.expectText('#statusBtn_complete', 'Done');
+    },
+    async after(t, page) {
+      // The undo tap leaves the day pending again, open, with its usual foot.
+      await t.tap('#statusBtn_skipped');
+      await t.expectText('#toast', 'Unmarked');
+      await t.expectText('#statusBtn_skipped', 'Skip');
+      await page.waitForFunction(() => !document.getElementById('toast')?.classList.contains('show'), { timeout: 5000 });
+      await t.closeSheet('detailOverlay');
+    },
+  },
+  {
     id: 'random-workout',
     page: 'Random workout',
     async run(t) {

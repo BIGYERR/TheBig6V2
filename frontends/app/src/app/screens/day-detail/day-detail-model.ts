@@ -49,3 +49,30 @@ export function logNudge(dayKey: string, title: string | undefined, icon: string
 export function loggedCount(p: { done: number; total: number }): string | null {
   return p.total > 0 ? p.done + ' / ' + p.total + ' LOGGED' : null;
 }
+
+/** One of the foot's two buttons: its id, its classes, its words (with the small undo line or not), and the status it sets. */
+export interface FootButton {
+  id: string;
+  cls: string;
+  label: string;
+  undo: boolean;
+  status: 'complete' | 'skipped';
+}
+
+/**
+ * The legacy statusFootHTML: the big button carries the day's status (and undoes it), the small one under it the other.
+ * A pending day offers Done big and Skip small.
+ */
+export function statusFoot(cur: string | null | undefined): [FootButton, FootButton] {
+  if (cur === 'skipped') {
+    return [
+      { id: 'statusBtn_skipped', cls: 'day-done skipped', label: 'Skipped ✕ ', undo: true, status: 'skipped' },
+      { id: 'statusBtn_complete', cls: 'day-skip', label: 'Done', undo: false, status: 'complete' },
+    ];
+  }
+  const done = cur === 'complete';
+  return [
+    { id: 'statusBtn_complete', cls: done ? 'day-done is' : 'day-done', label: done ? 'Done ✓ ' : 'Done', undo: done, status: 'complete' },
+    { id: 'statusBtn_skipped', cls: 'day-skip', label: 'Skip', undo: false, status: 'skipped' },
+  ];
+}
