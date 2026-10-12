@@ -1,0 +1,51 @@
+[
+ {
+  "name": "S1-D235 the pointermove threshold no longer holds: a sub-threshold jitter writes top and left",
+  "anchor": "    if(!moved)return;\n",
+  "replacement": "",
+  "gate": "gates/g0.239.1_timer_label.js",
+  "note": "NAMED TRIP: g0.239.1_timer_label.js row D235-jitter (the 3 px tab jitter's first move writes top 302px and left 335px, clamped at 375 - 40, where the hand is no write: the timer stays docked at left auto, right 0). D235 item 1. Expected by hand, not run in slice 3 (the sweep is gatekeeper's): also trips D235-cancel (its C-jitter arm writes top and left before the cancel). Ruling: tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md."
+ },
+ {
+  "name": "S2-D235 pointercancel stops snapping: a cancelled drag is left where the finger was",
+  "anchor": "    if(dragging){snap();}\n    else{_rtDragging=false;}\n",
+  "replacement": "    dragging=false;_rtDragging=false;\n",
+  "gate": "gates/g0.239.1_timer_label.js",
+  "note": "NAMED TRIP: g0.239.1_timer_label.js row D235-cancel (case A stays at left 80px, side right, transition none, where the hand is docked left: left writes '' then '0', snap transition). D235 item 2; this is the V239 handler body. Expected by hand, not run in slice 3 (the sweep is gatekeeper's): trips the named row alone. Ruling: tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md."
+ },
+ {
+  "name": "S3-D235 pointercancel snaps outside a drag too: a stray cancel re-docks the timer",
+  "anchor": "    if(dragging){snap();}\n    else{_rtDragging=false;}\n",
+  "replacement": "    snap();\n",
+  "gate": "gates/g0.239.1_timer_label.js",
+  "note": "NAMED TRIP: g0.239.1_timer_label.js row D235-idlecancel (the cancel with no drag in flight writes the transition, left '' and the dock values to the anchor, where the hand is no write). D235 item 2 (a cancel ends the drag; outside a drag it only clears the flag). Expected by hand, not run in slice 3 (the sweep is gatekeeper's): trips the named row alone. Ruling: tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md."
+ },
+ {
+  "name": "S4-D236 the bug-report page label prints the raw meta after a v again",
+  "anchor": "_bv.textContent='BUILD '+iaVersionLabel(IA_VERSION);",
+  "replacement": "_bv.textContent='BUILD v'+IA_VERSION;",
+  "gate": "gates/g0.239.1_timer_label.js",
+  "note": "NAMED TRIP: g0.239.1_timer_label.js row D236-legacy (the body relabelled 239 reads BUILD v239, where the hand is BUILD v0.239.0). D236 item 2. Expected by hand, not run in slice 3 (the sweep is gatekeeper's): also trips D236-vprefix (BUILD vv0.239.1). D236-label holds on a dotted meta by design: 'BUILD v' + 0.239.1 reads as the hand. Ruling: tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md."
+ },
+ {
+  "name": "S5-D236 the report context prints the raw meta after a v again",
+  "anchor": "+'build: '+iaVersionLabel(IA_VERSION)+'\\n'",
+  "replacement": "+'build: v'+IA_VERSION+'\\n'",
+  "gate": "gates/g0.239.1_timer_label.js",
+  "note": "NAMED TRIP: g0.239.1_timer_label.js row D236-legacy (the body relabelled 239 posts build: v239, where the hand is build: v0.239.0). D236 item 2. Expected by hand, not run in slice 3 (the sweep is gatekeeper's): also trips D236-vprefix (build: vv0.239.1). D236-context holds on a dotted meta by design. Ruling: tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md."
+ },
+ {
+  "name": "S6-D236 the helper drops the legacy rule: an integer meta N prints vN, not v0.N.0",
+  "anchor": "?'v0.'+t+'.0':'v'+t;",
+  "replacement": "?'v'+t:'v'+t;",
+  "gate": "gates/g0.239.1_timer_label.js",
+  "note": "NAMED TRIP: g0.239.1_timer_label.js row D236-legacy (the body relabelled 239 reads BUILD v239 and build: v239, where the hand is v0.239.0). D236 item 1 (239 prints v0.239.0). Expected by hand, not run in slice 3 (the sweep is gatekeeper's): trips the named row alone. Ruling: tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md."
+ },
+ {
+  "name": "S7-D236 the helper keeps a leading v: a meta written v0.239.1 prints vv0.239.1",
+  "anchor": "var s=String(ver),t=/^[vV]/.test(s)?s.slice(1):s;",
+  "replacement": "var s=String(ver),t=s;",
+  "gate": "gates/g0.239.1_timer_label.js",
+  "note": "NAMED TRIP: g0.239.1_timer_label.js row D236-vprefix (the body relabelled v0.239.1 reads BUILD vv0.239.1 and build: vv0.239.1, where the hand is v0.239.1, never vv). D236 item 1 (exactly one v, never vv). Expected by hand, not run in slice 3 (the sweep is gatekeeper's): trips the named row alone. Ruling: tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md."
+ }
+]

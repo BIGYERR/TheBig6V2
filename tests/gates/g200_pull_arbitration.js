@@ -310,6 +310,7 @@ SWAP_BY_VERSION[236] = SWAP_BY_VERSION[235];   // era_bump V236: ruled UNMOVED, 
 SWAP_BY_VERSION[237] = SWAP_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 SWAP_BY_VERSION[238] = SWAP_BY_VERSION[237];   // era_bump V238: ruled UNMOVED, reference to [237]; tests/measure/v238_rulings/v238_ruling_d223_d227.md
 SWAP_BY_VERSION[239] = SWAP_BY_VERSION[238];   // era_bump V239: ruled UNMOVED, reference to [238]; tests/measure/v239_rulings/v239_ruling_d233.md
+SWAP_BY_VERSION['0.239.1'] = SWAP_BY_VERSION[239];   // era_bump v0.239.1: ruled UNMOVED, reference to [239]; tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md
 const SWAP_N = SV.lookup(SWAP_BY_VERSION, (SV.cmp(IP.version, 218) <= 0) ? 218 : IP.version);
 II.eval(SNAP_FN+"globalThis.__G200=null;");
 let inert=0,inertN=0;

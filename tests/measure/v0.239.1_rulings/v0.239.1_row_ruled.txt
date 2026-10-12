@@ -1,0 +1,9 @@
+# ROW_RULED for v0.239.1 (D235 P-TIMERDRAG and D236 P-SEMVERLABEL, both Mario's). Passed to gate.sh step 4b as ROW_RULED=<this file>.
+# Written by the main session from tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md ("Gate rows" section), before the draft run.
++ g0.239.1_timer_label.js D236-label  # D236 After: the bug-report page reads BUILD v<canonical meta>
++ g0.239.1_timer_label.js D236-context  # D236 After: the report context reads build: v<canonical meta>
++ g0.239.1_timer_label.js D236-legacy  # D236 After: on a legacy 239 meta both labels read v0.239.0, never v239
++ g0.239.1_timer_label.js D236-vprefix  # D236.1: a meta written with its own v prints one v, never vv
++ g0.239.1_timer_label.js D235-jitter  # D235.1: a tap under 5 px writes neither top nor left; the tab tap still expands
++ g0.239.1_timer_label.js D235-cancel  # D235.2: a cancelled drag docks to the nearer edge as pointerup does
++ g0.239.1_timer_label.js D235-idlecancel  # D235.2: a cancel outside a drag never re-docks the timer

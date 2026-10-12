@@ -159,6 +159,7 @@ ERA[236] = ERA[235];   // era_bump V236: ruled UNMOVED, reference to [235]; test
 ERA[237] = ERA[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 ERA[238] = ERA[237];   // era_bump V238: ruled UNMOVED, reference to [237]; tests/measure/v238_rulings/v238_ruling_d223_d227.md
 ERA[239] = ERA[238];   // era_bump V239: ruled UNMOVED, reference to [238]; tests/measure/v239_rulings/v239_ruling_d233.md
+ERA['0.239.1'] = ERA[239];   // era_bump v0.239.1: ruled UNMOVED, reference to [239]; tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md
 function shardCount(){ const raw = process.env.G219_SHARDS === undefined ? '' : String(process.env.G219_SHARDS);
   if(raw === '') return 4;
   if(!/^[0-9]+$/.test(raw) || parseInt(raw, 10) < 1){ fail++; console.log("FAIL: CONFIG: G219_SHARDS must be a positive integer, or empty/unset which means 4; got '" + raw + "'"); return 0; }

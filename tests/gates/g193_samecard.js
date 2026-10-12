@@ -326,6 +326,7 @@ OPEN_UNRULED_BY_VERSION[236] = OPEN_UNRULED_BY_VERSION[235];   // era_bump V236:
 OPEN_UNRULED_BY_VERSION[237] = OPEN_UNRULED_BY_VERSION[236];   // era_bump V237: ruled UNMOVED, reference to [236]; tests/measure/v237_rulings/v237_ruling_d220_d222.md
 OPEN_UNRULED_BY_VERSION[238] = OPEN_UNRULED_BY_VERSION[237];   // era_bump V238: ruled UNMOVED, reference to [237]; tests/measure/v238_rulings/v238_ruling_d223_d227.md
 OPEN_UNRULED_BY_VERSION[239] = OPEN_UNRULED_BY_VERSION[238];   // era_bump V239: ruled UNMOVED, reference to [238]; tests/measure/v239_rulings/v239_ruling_d233.md
+OPEN_UNRULED_BY_VERSION['0.239.1'] = OPEN_UNRULED_BY_VERSION[239];   // era_bump v0.239.1: ruled UNMOVED, reference to [239]; tests/measure/v0.239.1_rulings/v0.239.1_ruling_d235_d236.md
 const OPEN_UNRULED = SV.lookup(OPEN_UNRULED_BY_VERSION, (SV.cmp(IA.version, 218) <= 0) ? 218 : IA.version);
 // A missing row is a NAMED FAIL with the summary printed, never a throw (post-V233, Mario:
 // "Make g193 fail cleanly instead of crashing"). Nothing below can be graded without it.
