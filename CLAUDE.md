@@ -29,6 +29,12 @@ Mario has had to repeat this more than once; a session that makes him say it aga
   return is corrected to the dotted form before it is used or repeated, and the correction is reported. builder and
   gatekeeper do not load this file, so every agent file and skill carries this section at its top.
 
+## Sabotage is OFF (Mario, Post-v0.239.1)
+Mario: "can you temporarily disable all sabatoge runs/scripts? lets focus on the migration archtecture". CI's sabotage job is off (`if: false`, which still reports success to a required check),
+the 60-second check skips its anchor step, and nobody runs `tests/sabotage.py` in any mode, writes or edits a spec,
+or runs the weekly full sweep. Every sabotage rule elsewhere in this file is suspended until Mario turns it back on;
+phase 3 of the test migration deletes the machinery. Focus: the architecture migration (`docs/architecture-migration.md`).
+
 ## What this is
 Single-file vanilla HTML/CSS/JS PWA (`index.html`, ~1.1 MB, one inline `<script>`) that
 generates multi-week hybrid strength + cardio programs from a seeded, deterministic engine

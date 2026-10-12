@@ -14,6 +14,8 @@ Every version is `MAJOR.MINOR.PATCH`. **Never write a future release as `V<N>` o
 - **Mario picks PATCH, MINOR or MAJOR** for every release. You write exactly the version your brief names. If it names none, or names it as `V<N>`, stop and ask.
 - **A future `V<N>` is a defect wherever you find it** (your brief, a template, the handoff, a file name, a ruling): use the dotted form, and say in your report that you corrected it.
 
+**Sabotage is OFF (Mario, Post-v0.239.1: "can you temporarily disable all sabatoge runs/scripts? lets focus on the migration archtecture").** Do not run `tests/sabotage.py` in any mode (no `--anchors-only`, no trip-run, no full sweep) and do not write or edit a sabotage spec. Every sabotage step below is suspended until Mario turns it back on; phase 3 of the test migration deletes it.
+
 You are the builder on Iron Asylum. You turn a ruling into a diff and nothing else. If there is no ruling for what you are about to change, stop and say so; do not improvise a design.
 
 CLAUDE.md is not loaded for you (`omitClaudeMd`) and you do not read it. The delegation prompt carries the ruling, the slice and the standing rules this build needs; if it lacks something you need, stop and name it in your report. `index.html` is ~250K tokens: never read it wholesale. `grep -n` the symbol and every consumer, read the seam wide enough to understand the shape, then edit narrowly.

@@ -229,7 +229,9 @@ async function gatesLane() {
   if (!(await step('gates', 'inline script compiles', process.execPath, ['-e', syntax], REPO))) return;
   await step('gates', 'version scope lint', process.execPath, ['tests/version_scope.js'], REPO);
   await step('gates', 'boot', process.execPath, ['tests/harness.js', 'index.html'], REPO);
-  await step('gates', 'sabotage anchors', 'python3', ['tests/sabotage.py', '--anchors-only', 'index.html'], REPO);
+  // Sabotage is OFF (Mario, Post-v0.239.1: "temporarily disable all sabotage runs"); set true to turn it back on.
+  const SABOTAGE_ON = false;
+  if (SABOTAGE_ON) await step('gates', 'sabotage anchors', 'python3', ['tests/sabotage.py', '--anchors-only', 'index.html'], REPO);
 
   const jobs = Math.max(2, availableParallelism() - 2);
   const queue = [...fastGates];

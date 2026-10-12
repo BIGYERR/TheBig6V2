@@ -190,7 +190,10 @@ jobs:
 
   sabotage:
     name: sabotage
-    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
+    # OFF (Mario, Post-v0.239.1: "temporarily disable all sabotage runs"). A job skipped by its condition reports
+    # success, so a required check still passes. To turn it back on, restore:
+    #   if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
+    if: false
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:

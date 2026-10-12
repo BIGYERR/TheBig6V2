@@ -4,6 +4,8 @@ description: Verify the canonical Iron Asylum artifact and handoff agree before 
 ---
 **PRIORITY 1 (Mario, Post-V239): semantic versioning.** Every version this skill reads, prints or writes is `MAJOR.MINOR.PATCH` with a lowercase v (`v0.240.0`), never a future `V<N>` or a bare integer. `V1` to `V239` are history and keep their names (V239 = 0.239.0). A future `V<N>` found anywhere is a defect: use the dotted form and report the correction. CLAUDE.md, PRIORITY 1, has the names.
 
+**Sabotage is OFF (Mario, Post-v0.239.1).** Skip every sabotage step and the full-sweep check in this skill until Mario turns it back on.
+
 Run these, in order, and report the seven lines. Do not begin design or edits until the first four agree.
 
 1. Version on disk:
