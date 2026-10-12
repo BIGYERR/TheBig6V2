@@ -275,3 +275,20 @@ what is stored.
   both builds.
 - **Found, for a ruling (handoff §12):** journal notes are written into the page as markup.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.21 moves Progress's weekly dot charts
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.21.
+- **Moved:** the legacy `buildDotChart` (Weekly Running Mileage, Weekly Swimming Volume, Weekly Cycling Time, Average
+  Session RPE): `src/app/screens/progress/charts/dot-chart.ts` draws the card and its SVG, and `dot-chart-model.ts`
+  works out every coordinate with the legacy builder's arithmetic (the 320 × 120 box and its padding, the top at 1.2
+  times the peak or the given one, the dashed line between neighbouring logged weeks, the week labels every one, two
+  or four weeks, the total and the peak to one place). A series with nothing logged draws nothing, as before. The
+  Progress model now returns chart blocks (a dot chart to draw, or a legacy builder's markup) and takes `dotChart`
+  through its deps, so the models import only each other's types. The legacy builder stays in the single-file page.
+- **Tests:** `frontends/app/test/unit/dot-chart.test.ts` (4: the scale, gridlines, points, line and labels worked by
+  hand; a broken line and a fixed top; the label spacing past eight and sixteen weeks and a lone week; nothing logged
+  and an all-zero series). `progress.test.ts`'s chart cases now read blocks, and a planned swim with nothing logged
+  draws nothing. The e2e photographs the RPE dot chart (log-session) and the strength journey's Progress on both
+  builds at 0 px.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

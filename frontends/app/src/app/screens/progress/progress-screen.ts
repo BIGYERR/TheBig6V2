@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { DotChart } from './charts/dot-chart';
+import { dotChart, type DotSpec } from './charts/dot-chart-model';
 import {
   CALC_LIFTS, chartChunks, type DayLog, estimate1RM, type ExRow, journalWeeks, type ProgressProgram, viewedProgram, weeklySums,
 } from './progress-model';
@@ -21,7 +23,7 @@ interface ScreenView {
   /** 'none' before anything is logged, 'charts' when there is nothing to chart, null when there is. */
   empty: 'none' | 'charts' | null;
   emptyIcon: SafeHtml;
-  charts: SafeHtml[];
+  charts: ({ kind: 'dot'; spec: DotSpec } | { kind: 'html'; html: SafeHtml })[];
   journal: { title: SafeHtml; caret: SafeHtml; weeks: { week: number; open: boolean; count: string; entries: EntryView[] }[] } | null;
   estimator: { title: SafeHtml } | null;
 }
@@ -30,12 +32,13 @@ interface ScreenView {
  * The Progress screen's body (architecture phase E, step 13), in place of the legacy renderProgressScreen inside
  * #progressBody. It takes over renderProgressScreen through LegacyBridge.provide (the tab, the program chips, the
  * restore and delete bar all call it). The arrangement, the weekly sums, the Session Journal and the 1RM estimator are
- * the component's; the chips, every chart and the Lift Ledger are still the legacy builders' markup, each laid in a box
- * that makes none of its own, and move in later steps. The estimator's lift is still the legacy `calcLift`.
+ * the component's, and so are the weekly dot charts (DotChart, step 14); the chips, the other charts and the Lift Ledger
+ * are still the legacy builders' markup, each laid in a box that makes none of its own, and move in later steps. The estimator's lift is still the legacy `calcLift`.
  */
 @Component({
   selector: 'ia-progress-screen',
   host: { style: 'display: contents' },
+  imports: [DotChart],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @for (v of views(); track v) {
@@ -48,7 +51,11 @@ interface ScreenView {
       </div>
     }
     @for (c of v.charts; track $index) {
-      <div style="display:contents" [innerHTML]="c"></div>
+      @if (c.kind === 'dot') {
+        <ia-dot-chart [spec]="c.spec" />
+      } @else {
+        <div style="display:contents" [innerHTML]="c.html"></div>
+      }
     }
     @if (v.journal; as j) {
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">
@@ -183,7 +190,7 @@ export class ProgressScreen {
       raceMi: b.global<Record<string, number>>('RACE_DIST_MI')[goalId] || 0,
     }, {
       icon: (n, s) => this.icon(n, s),
-      dotChart: (...a) => b.call('buildDotChart', ...a),
+      dotChart,
       ladderWeekly: (...a) => b.call('ladderWeekly', ...a),
       ladderChart: (...a) => b.call('buildLadderChart', ...a),
       easyVsPrescribed: (...a) => b.call('easyVsPrescribed', ...a),
@@ -228,10 +235,10 @@ export class ProgressScreen {
         })),
       }
       : null;
-    const empty = !charts.join('') && !journal ? 'charts' : null;
+    const empty = !charts.some((c) => c.kind === 'dot' || c.html) && !journal ? 'charts' : null;
     this.view.set({
       chips, empty, emptyIcon,
-      charts: charts.map((c) => this.html(c)),
+      charts: charts.map((c) => (c.kind === 'dot' ? c : { kind: 'html' as const, html: this.html(c.html) })),
       journal,
       estimator: { title: this.html(this.icon('🧮', 15) + ' 1RM Estimator') },
     });

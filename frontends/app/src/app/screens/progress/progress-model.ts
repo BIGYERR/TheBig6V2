@@ -2,8 +2,10 @@
 // (architecture phase E, step 13: the screen moves from the legacy renderProgressScreen to the ProgressScreen
 // component). The stores, the program chips, every chart and the Lift Ledger are still the legacy script's builders;
 // this decides which program is shown, sums each week, picks the charts in the legacy order with the legacy arguments,
-// and lays out the Session Journal and the 1RM estimator. Strings the legacy wrote into the page as markup stay
-// markup here (the notes, the swap line and the jog lines), so the page reads as it did.
+// and lays out the Session Journal and the 1RM estimator. The weekly dot charts are the DotChart component's since
+// step 14 (charts/dot-chart-model.ts). Strings the legacy wrote into the page as markup stay markup here (the notes, the swap line and the jog lines), so the page reads as it did.
+
+import type { DotSpec } from './charts/dot-chart-model.ts';
 
 /** A stored program, as far as the screen reads it. */
 export interface ProgressProgram {
@@ -100,7 +102,8 @@ export function weeklySums(logs: Record<string, DayLog>, exw: Record<string, ExR
 /** The legacy builders and readers the charts come from, each called as the legacy screen called it. */
 export interface ChartDeps {
   icon(name: string, size: number): string;
-  dotChart(title: string, weeks: number[], data: (number | null)[], color: string, label: string, unit: string, maxY?: number): string;
+  /** The weekly dot chart (charts/dot-chart-model.ts's dotChart). */
+  dotChart(title: string, weeks: number[], data: (number | null)[], color: string, unit: string, maxY?: number): DotSpec | null;
   ladderWeekly(logs: unknown, tw: number, cut: number, skip1: boolean): unknown;
   ladderChart(weekly: unknown, tw: number, raceMi: number, cut: number, skip1: boolean): string;
   easyVsPrescribed(logs: unknown, hist: unknown, tw: number): unknown;
@@ -134,46 +137,53 @@ export interface ChartInput {
   cfg: NonNullable<ProgressProgram['cfg']>;
 }
 
-/** The charts and the Lift Ledger, in the legacy order, each the legacy builder's markup. */
-export function chartChunks(c: ChartInput, d: ChartDeps): string[] {
-  const out: string[] = [];
+/** One chart on the screen: a weekly dot chart to draw, or a legacy builder's markup. */
+export type ChartBlock = { kind: 'dot'; spec: DotSpec } | { kind: 'html'; html: string };
+
+/** The charts and the Lift Ledger, in the legacy order. A dot chart with nothing logged is left out, as the legacy drew nothing. */
+export function chartChunks(c: ChartInput, d: ChartDeps): ChartBlock[] {
+  const out: ChartBlock[] = [];
+  const html = (h: string) => out.push({ kind: 'html', html: h });
+  const dot = (spec: DotSpec | null) => {
+    if (spec) out.push({ kind: 'dot', spec });
+  };
   const tw = c.totalWeeks;
   const weeks = Array.from({ length: tw }, (_, i) => i + 1);
   const loggedAny = (s: 'run' | 'bike' | 'swim') => weeks.some((w) => (c.sums[w]![s] || 0) > 0);
   if (c.cardioTypes.includes('run') || loggedAny('run')) {
     const runData = weeks.map((w) => (c.skip1 && w === 1 ? null : c.sums[w]!.run || null));
-    out.push(d.dotChart(d.icon('🏃', 15) + ' Weekly Running Mileage', weeks, runData, 'var(--run)', 'miles', 'mi'));
-    out.push(d.ladderChart(d.ladderWeekly(c.logs, tw, c.cut, c.skip1), tw, c.raceMi, c.cut, c.skip1));
+    dot(d.dotChart(d.icon('🏃', 15) + ' Weekly Running Mileage', weeks, runData, 'var(--run)', 'mi'));
+    html(d.ladderChart(d.ladderWeekly(c.logs, tw, c.cut, c.skip1), tw, c.raceMi, c.cut, c.skip1));
     const zone = d.easyZoneChart(d.easyVsPrescribed(c.logs, c.hist, tw));
-    out.push(zone || d.easyBandsFallback(d.runsByClass(c.logs, c.hist, tw)));
+    html(zone || d.easyBandsFallback(d.runsByClass(c.logs, c.hist, tw)));
   }
   if (c.cardioTypes.includes('run')) {
     const ee = d.easyEffortWeekly(c.logs, c.hist, tw);
     if (ee.nRuns >= d.easyMinRuns && ee.nWeeks >= 2) {
-      out.push(d.easyEffortChart(ee, tw));
+      html(d.easyEffortChart(ee, tw));
       const mg = c.cfg.cardioGoals && c.cfg.cardioGoals.run;
       const mile = mg ? (+mg.mileBestMins! || 0) * 60 + (+mg.mileBestSecs! || 0) : 0;
-      out.push(d.projectionCard(ee, tw, mile));
+      html(d.projectionCard(ee, tw, mile));
     } else {
       const rp = d.recoveryPaceWeekly(c.logs, c.hist, tw);
       if (rp.nWeeks >= 2) {
         const rpData = weeks.map((w) => (rp.weekly[w] != null ? rp.weekly[w]! : null));
-        out.push(d.paceChart(d.icon('🏃', 15) + ' Recovery Pace — Easy-Effort Trend', weeks, rpData, rp.tgt, 'var(--run)'));
+        html(d.paceChart(d.icon('🏃', 15) + ' Recovery Pace — Easy-Effort Trend', weeks, rpData, rp.tgt, 'var(--run)'));
       } else if (ee.nRuns > 0) {
-        out.push(d.easyEffortEmpty(ee));
+        html(d.easyEffortEmpty(ee));
       }
     }
-    out.push(d.driftChart(d.plannedVsLogged(c.logs, c.hist, tw, c.cut, c.skip1), tw, c.cut, c.skip1));
+    html(d.driftChart(d.plannedVsLogged(c.logs, c.hist, tw, c.cut, c.skip1), tw, c.cut, c.skip1));
   }
   if (c.cardioTypes.includes('swim') || loggedAny('swim')) {
-    out.push(d.dotChart(d.icon('🏊', 15) + ' Weekly Swimming Volume', weeks, weeks.map((w) => c.sums[w]!.swim || null), '#3f6e96', 'yards', 'yd'));
+    dot(d.dotChart(d.icon('🏊', 15) + ' Weekly Swimming Volume', weeks, weeks.map((w) => c.sums[w]!.swim || null), '#3f6e96', 'yd'));
   }
   if (c.cardioTypes.includes('bike') || loggedAny('bike')) {
-    out.push(d.dotChart(d.icon('🚴', 15) + ' Weekly Cycling Time', weeks, weeks.map((w) => c.sums[w]!.bike || null), '#f0a050', 'minutes', 'min'));
+    dot(d.dotChart(d.icon('🚴', 15) + ' Weekly Cycling Time', weeks, weeks.map((w) => c.sums[w]!.bike || null), '#f0a050', 'min'));
   }
   const rpeData = weeks.map((w) => c.sums[w]!.rpe || null);
-  if (rpeData.some((v) => v !== null)) out.push(d.dotChart(d.icon('💡', 15) + ' Average Session RPE', weeks, rpeData, '#7e5e96', 'RPE', '', 10));
-  out.push(d.ledgerCards(d.ledgerModel(d.exWeights(), c.hist), c.cfg.unit || 'lbs'));
+  if (rpeData.some((v) => v !== null)) dot(d.dotChart(d.icon('💡', 15) + ' Average Session RPE', weeks, rpeData, '#7e5e96', '', 10));
+  html(d.ledgerCards(d.ledgerModel(d.exWeights(), c.hist), c.cfg.unit || 'lbs'));
   return out;
 }
 
