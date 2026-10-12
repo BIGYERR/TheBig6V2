@@ -71,8 +71,11 @@ interface Harness {
 const H: Harness = require('../harness.js');
 
 export const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
-/** The app under test: the repo's index.html, or the file IA_APP names. */
-export const APP = resolve(process.env['IA_APP'] || join(REPO, 'index.html'));
+/**
+ * The app under test: dist-github-pages/index.html, the build of the sources that GitHub Pages deploys (support/global-setup.ts
+ * builds it fresh before every run), or the file IA_APP names.
+ */
+export const APP = resolve(process.env['IA_APP'] || join(REPO, 'dist-github-pages', 'index.html'));
 
 let script: string | undefined;
 /** The app's inline script, read once. */

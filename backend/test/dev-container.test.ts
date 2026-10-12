@@ -38,7 +38,7 @@ test('every source is mounted read-only; it writes only its three build folders'
   const readOnly = mounts.filter((m) => m.mode === 'ro').map((m) => `${m.source}:${m.target}`);
   for (const folder of ['server', 'client', 'scripts', 'test']) assert.ok(readOnly.includes(`./${folder}:/srv/backend/${folder}`), `./${folder} read-only`);
   for (const folder of ['website', 'admin', 'common']) assert.ok(readOnly.includes(`../frontends/${folder}:/srv/frontends/${folder}`), `frontends/${folder} read-only`);
-  assert.ok(readOnly.includes('..:/repo'), 'the repo root read-only, for index.html and its icon');
+  assert.ok(readOnly.includes('..:/repo'), "the repo root read-only, for the app's source files and its icon");
 });
 
 test("the app's source files and their build script reach the watcher through the read-only repo mount", () => {

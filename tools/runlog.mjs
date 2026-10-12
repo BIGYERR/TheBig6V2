@@ -169,12 +169,13 @@ export function context() {
   const changed = git(['status', '--porcelain']).split('\n').filter(Boolean).length;
   let version = '';
   try {
-    const raw = readFileSync(join(REPO, 'index.html'), 'utf8').slice(0, 20000).match(/name="ia-version" content="([^"]*)"/)?.[1] ?? '';
+    // The page's meta, read from its source (html/head.html), so a run is labelled with no build.
+    const raw = readFileSync(join(REPO, 'frontends', 'app', 'src', 'legacy', 'src', 'html', 'head.html'), 'utf8').match(/name="ia-version" content="([^"]*)"/)?.[1] ?? '';
     // Kept as written (239 stays "239", 0.239.1 stays "0.239.1"), and only when tests/semver.js parses it: parse throws.
     createRequire(import.meta.url)('../tests/semver.js').parse(raw);
     version = raw;
   } catch {
-    // No index.html here (a container), no meta, or a meta that is not a version: leave it out.
+    // No sources here (a container), no meta, or a meta that is not a version: leave it out.
   }
   return { branch, commit, changed, version, host: hostname().replace(/\.local$/, ''), node: process.version };
 }

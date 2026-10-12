@@ -1,7 +1,7 @@
-// The root index.html's ia-version, read one way across app/ (Post-V239, Mario): MAJOR.MINOR.PATCH, or the legacy
+// The page's ia-version (its meta, written in src/legacy/src/html/head.html), read one way across frontends/app/ (Post-V239, Mario): MAJOR.MINOR.PATCH, or the legacy
 // integer N every build through V239 carries, which reads as 0.N.0 (239 is 0.239.0). The rule is tests/semver.js's, and
 // test/unit/version.test.ts holds the two to the same answer for every input. It lives here as well because the Docker
-// e2e images are built from app/ and index.html alone and never see tests/.
+// e2e images are built from frontends/app/ alone and never see tests/.
 //
 //   metaVersion(html)              the ia-version meta's content as written ('239' stays '239'); null when the page has
 //                                  no meta; throws when the meta holds anything that is not a version

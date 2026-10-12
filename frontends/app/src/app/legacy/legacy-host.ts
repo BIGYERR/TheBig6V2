@@ -4,7 +4,7 @@ import { LegacyBridge } from './legacy-bridge';
 import { LEGACY_MARKUP, LEGACY_SCRIPT_URL } from '../../legacy/generated/legacy-markup';
 
 /**
- * Mounts the Iron Asylum app generated from the root index.html.
+ * Mounts the Iron Asylum app generated from its page (built from src/legacy/src by scripts/build-index.mjs).
  *
  * Order matters and mirrors what the browser does with the original page: the body markup goes in first, then the
  * app script runs as a classic script so its top-level functions stay globals for the markup's inline handlers.

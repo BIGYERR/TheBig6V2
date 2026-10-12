@@ -34,7 +34,7 @@ RUN npm ci --omit=dev --no-audit --no-fund && npm cache clean --force
 COPY backend/client/ client/
 COPY --from=server /srv/backend/dist/server dist/server
 COPY --from=frontends /srv/frontends/dist /srv/frontends/dist
-# The app served at /app/: npm run docker:up bundles it from the repo root first (scripts/app-bundle.ts).
+# The app served at /app/: npm run docker:up first builds it into app-web/ from the app's source files (scripts/app-bundle.ts).
 COPY backend/app-web/ app-web/
 # Where DATA_FILE points in docker-compose.yml; owned by node so the volume mounted there is writable.
 RUN mkdir -p /srv/data && chown node:node /srv/data

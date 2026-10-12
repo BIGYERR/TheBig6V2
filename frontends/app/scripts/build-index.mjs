@@ -1,12 +1,16 @@
 #!/usr/bin/env node
-// Builds the app, the repo root index.html, from its source files: the pieces src/legacy/src/order.json lists,
-// concatenated in that order, byte for byte, with nothing added between them. The root index.html is generated. Code
-// is edited in src/legacy/src/, this rebuilds the root file, and the two are committed together.
+// Builds the app's page from its source files: the pieces src/legacy/src/order.json lists, concatenated in that order,
+// byte for byte, with nothing added between them. Code is edited in src/legacy/src/; the page is generated.
 //
-//   node scripts/build-index.mjs            write ../../index.html (npm run build:index)
+//   node scripts/build-index.mjs            write ../../dist-github-pages/ (the page and its icon: what GitHub Pages
+//                                           deploys, what the tests boot, what the backend serves at /app/) and the
+//                                           repo root index.html, its committed copy (npm run build:index)
 //   node scripts/build-index.mjs --check    build into a temp file and exit 1 unless it equals ../../index.html byte for
 //                                           byte, naming the first byte that differs and the source file it comes
 //                                           from (npm run build:index:check; tools/check.mjs and CI run it)
+//
+// The root index.html is the copy GitHub Pages serves while its source is the branch `main`. It goes, with --check, in
+// the merge where Mario switches the Pages source to GitHub Actions, which then deploys dist-github-pages/ (handoff §12).
 //
 // Each JS file is also an ES module (architecture phase C): scripts/module-blocks.mjs writes an import block at its top
 // and an export block at its bottom, each ending or starting on a fixed marker line. The build strips both blocks, so
@@ -16,9 +20,9 @@
 // named in lower case words joined by dashes, listed once; every such file in those folders must be listed, so no
 // source file can sit outside the build. buildIndex() is exported for the dev container (backend/scripts/dev-watch.ts),
 // which builds the page it serves from the same sources and never writes the repo root. Nothing is read or written
-// unless this file is run as a script.
+// unless this file is run as a script; writePages() is exported for the tests' global setup and the backend.
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -26,8 +30,12 @@ import { fileURLToPath } from 'node:url';
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /** The app's source files: html/, css/, js/ and order.json. */
 export const SOURCES = join(APP, 'src', 'legacy', 'src');
-/** The page they build: the repo root index.html, which GitHub Pages serves and every test boots. */
+/** The page's committed copy at the repo root, which GitHub Pages serves while its source is the branch `main`. */
 export const TARGET = join(APP, '..', '..', 'index.html');
+/** The folder GitHub Pages deploys from GitHub Actions (Mario, 2026-10-12): the page and its icon, nothing else. Built, never committed. */
+export const PAGES_DIR = join(APP, '..', '..', 'dist-github-pages');
+/** The page's icon (the page links apple-touch-icon.png beside itself). */
+export const ICON = join(APP, '..', '..', 'apple-touch-icon.png');
 
 const FOLDERS = ['html', 'css', 'js'];
 /** html/<name>.html, css/<name>.css, js/<name>.js; <name> is lower case words joined by dashes. */
@@ -110,6 +118,26 @@ export function readOrder(srcDir = SOURCES) {
  */
 export function buildIndex(srcDir = SOURCES) {
   return Buffer.concat(readOrder(srcDir).map((piece) => pieceBytes(srcDir, piece)));
+}
+
+/**
+ * Writes the deploy folder: index.html, the build of the sources, and the icon beside it. Each file is written beside
+ * itself and renamed over the old one, so a reader never sees half a page. Returns the page.
+ * @param {string} [outDir]
+ * @param {string} [srcDir]
+ * @returns {Buffer}
+ */
+export function writePages(outDir = PAGES_DIR, srcDir = SOURCES) {
+  const page = buildIndex(srcDir);
+  mkdirSync(outDir, { recursive: true });
+  const put = (/** @type {string} */ name, /** @type {(tmp: string) => void} */ write) => {
+    const tmp = join(outDir, `${name}.${process.pid}.tmp`);
+    write(tmp);
+    renameSync(tmp, join(outDir, name));
+  };
+  put('index.html', (tmp) => writeFileSync(tmp, page));
+  put('apple-touch-icon.png', (tmp) => copyFileSync(ICON, tmp));
+  return page;
 }
 
 /**
@@ -209,8 +237,9 @@ function main() {
     return;
   }
   const order = readOrder();
-  const built = buildIndex();
+  const built = writePages();
   const what = `${order.length} source files: ${built.length} bytes, ia-version ${versionOf(built)}, sha256 ${sha256(built)}`;
+  console.log(`build-index: wrote dist-github-pages/ (index.html and apple-touch-icon.png) from ${what}`);
   if (existsSync(TARGET) && Buffer.compare(readFileSync(TARGET), built) === 0) {
     console.log(`build-index: index.html is unchanged, the build of ${what}`);
     return;

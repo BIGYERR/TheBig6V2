@@ -1,4 +1,4 @@
-// Screen parity: the Angular build's screenshot against the original index.html's, pixel by pixel.
+// Screen parity: the Angular build's screenshot against the single-file page's, pixel by pixel.
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 import type { Parity } from './types.ts';

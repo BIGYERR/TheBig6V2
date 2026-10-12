@@ -306,10 +306,17 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
      page and no UI file (`tests/integration/engine-modules.test.ts`), the move added no load-order hazard (the measure
      finds 0, in the page and as modules), and every program, screen and stored value is unchanged
      (`docs/decisions/es-modules.md`).
-  4. **Engine tests off the harness.** Tests of engine behaviour import it from the modules, file by file, instead of
-     booting the VM; tests that read the script's text become behaviour tests or move with their code.
-  5. **The bundle** (with phase F): esbuild builds the app from its entry module, one `globals.ts` registers exactly
-     the 64 names the 107 inline handlers call, and Pages serves the build.
+  4. **Engine tests off the harness: folded into phase D (Post-v0.239.2).** Measured first
+     (`tests/measure/es-modules_test-harness-use.md`): of 82 test files, 51 drive the page by global name (`activeProg`,
+     `WD`, the swap sheet, the wizard) and only 21 reach the app for engine code alone, 19 of them by source surgery
+     (variants written against the app's text, hooks set through `eval`). Moving those 21 onto the legacy modules now and
+     again onto `@ia/core` in phase D is the same work twice, so each moves once, in phase D, as its code moves, through
+     one support module (the engine's loader) that phase D repoints.
+  5. **The bundle: dropped (Post-v0.239.2).** An esbuild bundle of the legacy script would hide its names in module
+     scope and cut off the 51 page-driving test files at once. It is not needed: the Angular app already hosts the
+     legacy script as it is (`frontends/app/src/app/legacy/`: `LegacyHost` mounts the markup and loads `legacy/app.js` as
+     a classic script, `LegacyBridge` is the seam), and it is what the native app runs. The legacy script stays a classic
+     script and shrinks screen by screen in phase E; Angular's own build bundles everything else.
 - **Done when:** no code depends on implicit globals except through `globals.ts`.
 
 ### Phase D: TypeScript, engine first (incremental, many sessions, interleaved with releases)
@@ -339,7 +346,7 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   8. progress and charts.
 - **Done when:** `frontends/app/src/app/legacy/` is empty and `globals.ts` is gone.
 
-### Phase F: delivery from the build (about 1 session; right after phase C)
+### Phase F: delivery from the build (about 1 session; right after phase C). The delivery half: done, Post-v0.239.2
 - Pages deploys the build output through GitHub Actions, from a defined `dist-github-pages/` folder (the app's
   `index.html` and its icon, nothing else; Mario, 2026-10-12: Pages stays until Heroku is set up). Cordova and the
   backend take the same output. Mario switches the Pages source to GitHub Actions in the same merge that deletes the
@@ -348,6 +355,14 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   pipeline, `tools/deploy-check.mjs`, the app's sync, PWA and iOS scripts, the backend's dev watcher and Heroku bundle)
   reads the build output instead.
 - `tools/deploy-check.mjs` reads the version from the live built `index.html`.
+- **Done, Post-v0.239.2:** `frontends/app/scripts/build-index.mjs` writes `dist-github-pages/` (the page and its icon);
+  the tests boot it (Vitest's global setup builds it first), and the check, CI, the app's sync and PWA scripts, the
+  backend's bundle, dev watcher and Heroku tree, and the e2e image read the build, not the root file. The pipeline's
+  "Pages" job builds it on every merge into `main` and deploys it once the Pages source is "GitHub Actions"; the deploy
+  proof reads either source. `tools/app-at.mjs <ref> <file>` writes the page as any commit had it (gatekeeper's
+  previous release). **Left:** Mario switches the Pages source (Settings, Pages, Source: GitHub Actions), and in that
+  merge the root `index.html` and `build-index`'s root copy and `--check` go. Until the first screen moves into Angular,
+  Pages deploys the single-file page (byte for byte today's live app); from then on, the Angular build.
 - The root `index.html`, `sync-legacy` and the split-piece generator are deleted.
 - CLAUDE.md drops "single-file" from "What this is" and keeps every invariant below.
 

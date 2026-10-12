@@ -77,7 +77,7 @@ From the repo root (`npm run logs -- <args>` does the same from `frontends/app/`
 | Angular dev server | `server-app-dev` | `npm start` |
 | iOS builds | `build-ios-emulator`, `build-ios-device` (xcodebuild log in artifacts) | `npm run emulator-ios`, `device-ios` |
 | PWA for Pages | `build-pwa-pages` | `npm run pwa-pages` |
-| `index.html` from its source files | `build-index` | `npm run build:index` in `frontends/app/` |
+| the page (`dist-github-pages/` and the root copy) from its source files | `build-index` | `npm run build:index` in `frontends/app/` |
 | backend tests, lint | `backend-test`, `backend-lint` | `npm test`, `npm run lint` in `backend/` |
 | backend servers | `server-backend-dev` (the full stack dev mode: the dev container's log while it is followed, every rebuild, test run and restart), `server-backend-dev-server`, `server-backend-docker`, `server-backend-mac-local` (every request) | `npm run dev`, `dev:server`, `docker:logs`, `mac-local-backend:logs` |
 | website and admin (the frontends workspace) | `server-website`, `server-admin`, `frontends-typecheck`, `frontends-lint` | `npm run website:dev`, `admin:dev`, `typecheck`, `lint` in `frontends/` |

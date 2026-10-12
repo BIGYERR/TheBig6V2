@@ -7,7 +7,7 @@
 //   ADMIN    the staff admin the backend serves at /admin/: the login, every section after signing in, and the
 //            signed out screen, full height at desktop width (pages.ts). One target, no parity.
 //   APP      the five app journeys (flow.ts). Two targets run the same steps in separate browser contexts (separate
-//            storage): the Angular build at / and the original index.html at /reference/. A step passes when both
+//            storage): the Angular build at / and the single-file page at /reference/. A step passes when both
 //            targets pass its assertions with no console error or uncaught exception, and their screenshots differ by
 //            no more than E2E_PARITY_MAX percent of pixels (default 0: clean runs match exactly, and a planted 0.3%
 //            title change must fail).
@@ -340,7 +340,7 @@ async function main(): Promise<number> {
         },
         {
           title: 'APP',
-          subtitle: `the Angular build through every journey, 0% parity against the original index.html · ${VIEWPORT.width}×${VIEWPORT.height} @${VIEWPORT.deviceScaleFactor}x`,
+          subtitle: `the Angular build through every journey, 0% parity against the single-file page · ${VIEWPORT.width}×${VIEWPORT.height} @${VIEWPORT.deviceScaleFactor}x`,
           box: shot,
           missing: shot,
           tiles: steps.map((s) => ({

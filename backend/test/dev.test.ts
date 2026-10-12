@@ -98,11 +98,13 @@ describe('dev watcher', () => {
 
 });
 
-// The app's source files (frontends/app/src/legacy/src/): a save builds the page /app/ serves, with the function that builds the
-// root index.html, into app-web/ only.
+// The app's source files (frontends/app/src/legacy/src/): a save builds the page /app/ serves, with the one builder
+// (frontends/app/scripts/build-index.mjs, which also builds what GitHub Pages deploys), into app-web/ only.
 describe('dev watcher, the app source files', () => {
   const REPO_ROOT = resolve(process.env.APP_SOURCE_DIR || join(import.meta.dirname, '..', '..'));
-  const ROOT_PAGE = join(REPO_ROOT, 'index.html');
+  const SOURCES = join(REPO_ROOT, 'frontends', 'app', 'src', 'legacy', 'src');
+  // A source file the watcher reads and must never write: the repo is read-only to it (in the container, a read-only mount).
+  const WATCHED = join(SOURCES, 'order.json');
   const made: string[] = [];
   after(() => made.forEach((dir) => rmSync(dir, { recursive: true, force: true })));
   const temp = () => {
@@ -110,14 +112,15 @@ describe('dev watcher, the app source files', () => {
     made.push(dir);
     return dir;
   };
-  const stamp = () => ({ sha: createHash('sha256').update(readFileSync(ROOT_PAGE)).digest('hex'), mtime: statSync(ROOT_PAGE).mtimeMs });
+  const stamp = () => ({ sha: createHash('sha256').update(readFileSync(WATCHED)).digest('hex'), mtime: statSync(WATCHED).mtimeMs });
 
-  test('the live source files build the root index.html byte for byte into app-web/, and the root is never written', async () => {
+  test('the live source files build into app-web/ the page the builder builds, byte for byte, and the sources are never written', async () => {
     const before = stamp();
     const out = temp();
-    assert.equal(await buildAppFromSources(join(REPO_ROOT, 'frontends', 'app', 'src', 'legacy', 'src'), out), true);
-    assert.ok(readFileSync(join(out, 'index.html')).equals(readFileSync(ROOT_PAGE)), 'the page served is the root file, byte for byte');
-    assert.deepEqual(stamp(), before, 'the repo root index.html is untouched');
+    assert.equal(await buildAppFromSources(SOURCES, out), true);
+    const { buildIndex } = (await import(join(REPO_ROOT, 'frontends', 'app', 'scripts', 'build-index.mjs'))) as { buildIndex: (srcDir: string) => Buffer };
+    assert.ok(readFileSync(join(out, 'index.html')).equals(buildIndex(SOURCES)), 'the page served is the build, byte for byte');
+    assert.deepEqual(stamp(), before, 'the source files are untouched');
   });
 
   test('a saved source file shows in the page it builds; a list naming a missing file builds nothing', async () => {
@@ -139,7 +142,7 @@ describe('dev watcher, the app source files', () => {
     writeFileSync(join(src, 'order.json'), JSON.stringify(['html/top.html', 'js/gone.js', 'html/end.html']));
     assert.equal(await buildAppFromSources(src, out), false);
     assert.match(readFileSync(join(out, 'index.html'), 'utf8'), /'two'/, 'a failed build leaves the last page served');
-    assert.deepEqual(stamp(), before, 'the repo root index.html is untouched');
+    assert.deepEqual(stamp(), before, 'the source files are untouched');
   });
 });
 

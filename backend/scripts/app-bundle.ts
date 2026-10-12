@@ -1,16 +1,19 @@
 #!/usr/bin/env node
-// Copies the app (the repo root's index.html and its icon, exactly what GitHub Pages serves) into app-web/, which the
-// server serves at /app/. So one backend gives the website, the admin and the app itself, until the store builds
-// exist. app-web/ is git-ignored: it is made here for local runs and the docker image (npm run docker:up and
-// mac-local-backend run this first), and scripts/heroku.sh deploy adds the same two files from the commit it deploys.
+// Writes the app into app-web/, which the server serves at /app/: the page built from the app's source files
+// (frontends/app/src/legacy/src, by frontends/app/scripts/build-index.mjs, the one builder; exactly what GitHub Pages
+// deploys) and its icon. So one backend gives the website, the admin and the app itself, until the store builds exist.
+// app-web/ is git-ignored: it is made here for local runs and the docker image (npm run docker:up and mac-local-backend
+// run this first), and scripts/heroku.sh deploy adds the same two files, built from the commit it deploys. Nothing is
+// written outside app-web/ (the dev container mounts the repo read-only).
 //
 //   node scripts/app-bundle.ts        (npm run app:bundle)
 //
-// On Heroku there is no repo beside backend/, so with no index.html to copy it keeps the app-web/ the deploy brought,
-// and says so. APP_SOURCE_DIR and APP_BUNDLE_DIR move the two folders (the tests use them).
-import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync } from 'node:fs';
+// APP_SOURCE_DIR is the repo root (the folder above backend/ by default). With the builder there, the page is built;
+// with a ready index.html there instead (the deploy test's folder), it is copied; on Heroku, with neither, the
+// app-web/ the deploy brought is kept, and it says so. APP_BUNDLE_DIR moves app-web/.
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const BACKEND = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE = resolve(process.env.APP_SOURCE_DIR || join(BACKEND, '..'));
@@ -23,6 +26,28 @@ function appVersionOf(html: string): string {
 }
 
 const say = (msg: string) => console.log(`app-bundle: ${msg}`);
+
+/** The one builder, beside the sources in a checkout (absent on Heroku, where backend/ is deployed alone). */
+const BUILDER = join(SOURCE, 'frontends', 'app', 'scripts', 'build-index.mjs');
+interface Builder {
+  buildIndex(srcDir?: string): Buffer;
+  SOURCES: string;
+  ICON: string;
+}
+
+if (existsSync(BUILDER)) {
+  const { buildIndex, SOURCES, ICON } = (await import(pathToFileURL(BUILDER).href)) as Builder;
+  const page = buildIndex(SOURCES);
+  // Refreshed in place, each file written beside itself and renamed over the old one (see below).
+  mkdirSync(OUT, { recursive: true });
+  writeFileSync(join(OUT, 'index.html.tmp'), page);
+  renameSync(join(OUT, 'index.html.tmp'), join(OUT, 'index.html'));
+  copyFileSync(ICON, join(OUT, 'apple-touch-icon.png.tmp'));
+  renameSync(join(OUT, 'apple-touch-icon.png.tmp'), join(OUT, 'apple-touch-icon.png'));
+  for (const stale of readdirSync(OUT).filter((f) => !APP_FILES.includes(f))) rmSync(join(OUT, stale), { recursive: true, force: true });
+  say(`built app ${appVersionOf(page.toString('utf8')) || '(no ia-version)'} from the source files into ${OUT}`);
+  process.exit(0);
+}
 
 if (!existsSync(join(SOURCE, 'index.html'))) {
   if (existsSync(join(OUT, 'index.html'))) {

@@ -1,5 +1,5 @@
-// How the app reaches /app/: scripts/app-bundle.ts copies it for local runs and the docker image, and heroku.sh's
-// deploy tree carries the same two files from the commit it deploys.
+// How the app reaches /app/: scripts/app-bundle.ts builds it from the source files (or copies a ready page) for local
+// runs and the docker image, and heroku.sh's deploy tree carries the page built from the commit it deploys, with its icon.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
@@ -76,7 +76,21 @@ describe('heroku deploy tree', { skip: !existsSync(join(BACKEND, '..', '.git')) 
     for (const f of ['package.json', 'package-lock.json', 'Procfile']) {
       assert.equal(git('rev-parse', `${tree}:${f}`), git('rev-parse', `${ref}:backend/heroku/${f}`), `${f} is heroku/'s`);
     }
-    assert.equal(git('rev-parse', `${tree}:backend/app-web/index.html`), git('rev-parse', `${ref}:index.html`));
+    // The page is the build of the ref's source files. While the repo still carries its committed copy at the root (until
+    // the Pages source switch, handoff §12) that copy is the oracle, since the 60-second check holds the two equal; after,
+    // the test builds the ref's sources itself, from an archive of them, with the ref's own builder.
+    const page = (() => {
+      try {
+        return git('rev-parse', '--verify', `${ref}:index.html`);
+      } catch {
+        const out = mkdtempSync(join(tmpdir(), 'ia-deploy-page-'));
+        execFileSync('sh', ['-c', `git -C "${top}" archive ${ref} frontends/app/scripts/build-index.mjs frontends/app/src/legacy/src | tar -x -C "${out}"`], { env });
+        const built = execFileSync(process.execPath, ['--input-type=module', '-e', 'process.stdout.write((await import(process.argv[1])).buildIndex())', join(out, 'frontends/app/scripts/build-index.mjs')]);
+        rmSync(out, { recursive: true, force: true });
+        return execFileSync('git', ['-C', BACKEND, 'hash-object', '--stdin'], { input: built, encoding: 'utf8', env }).trim();
+      }
+    })();
+    assert.equal(git('rev-parse', `${tree}:backend/app-web/index.html`), page);
     for (const ui of ['website', 'admin', 'common']) assert.ok(files.some((f) => f.startsWith(`frontends/${ui}/`)), `frontends/${ui}/ ships`);
   });
 });

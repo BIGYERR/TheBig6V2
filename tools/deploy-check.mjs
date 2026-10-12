@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 // The GitHub Pages deploy proof (CLAUDE.md, session rhythm step 7) as one logged run, temp/runs/<stamp>-deploy-pages/.
 // A push is not a deploy: this proves, in order, and never infers a later step from an earlier one,
-//   1. the remote has it:   origin/main's index.html carries the ia-version (work happens on dev and reaches main
-//                           only by a pull request, so origin/main is what deploys; a local main may lag behind it)
-//   2. Pages built THAT commit (if its last build is another commit, it asks for a build and waits, up to 5 minutes)
+//   1. the remote has it:   origin/main's page carries the ia-version (its meta, in html/head.html of the sources; an
+//                           older main's root index.html), since work happens on dev and reaches main only by a pull
+//                           request, so origin/main is what deploys; a local main may lag behind it
+//   2. Pages deployed THAT commit: with the source "GitHub Actions", the pipeline's Pages deployment of it succeeded;
+//                           with the source "branch main" (until the switch, handoff §12), Pages built it (if its last
+//                           build is another commit, it asks for a build); either way it waits, up to 5 minutes
 //   3. the live URL serves it (cache-busted, since Pages answers with max-age=600)
 // and reports the live number it read back.
 //
@@ -77,14 +80,42 @@ async function main() {
   // In GitHub Actions (the deploy proof after a merge) a newer merge may already be on main; this proves main as it is.
   const pushed = process.env.GITHUB_ACTIONS === 'true' ? process.env.GITHUB_SHA : '';
   if (pushed && pushed !== remote) say('remote', `main moved on since ${short(pushed)}; proving ${short(remote)}, its newest commit`);
-  const remoteVersion = VERSION.exec(sh('git', ['show', 'origin/main:index.html']))?.[1];
-  if (remoteVersion === undefined) return done(1, `origin/main:index.html has no ia-version meta`);
-  if (!parses(remoteVersion)) return done(1, `origin/main:index.html ia-version "${remoteVersion}" is not a version (want N or M.m.p)`);
+  const showable = (path) => {
+    try {
+      return sh('git', ['show', `origin/main:${path}`]);
+    } catch {
+      return null;
+    }
+  };
+  const HEAD_HTML = 'frontends/app/src/legacy/src/html/head.html';
+  const [where, text] = showable(HEAD_HTML) !== null ? [HEAD_HTML, showable(HEAD_HTML)] : ['index.html', showable('index.html') ?? ''];
+  const remoteVersion = VERSION.exec(text)?.[1];
+  if (remoteVersion === undefined) return done(1, `origin/main:${where} has no ia-version meta`);
+  if (!parses(remoteVersion)) return done(1, `origin/main:${where} ia-version "${remoteVersion}" is not a version (want N or M.m.p)`);
   if (expect && !parses(expect)) return done(1, `--expect ${expect} is not a version (want N or M.m.p)`);
   if (expect && !same(remoteVersion, expect)) return done(1, `origin/main is ia-version ${remoteVersion}, not ${expect}`);
   say('remote', `origin/main ${short(remote)} carries ia-version ${remoteVersion}`);
 
-  // 2. Pages built THAT commit
+  // 2. Pages deployed THAT commit
+  const source = sh('gh', ['api', `repos/${owner}/${repo}/pages`, '--jq', '.build_type']);
+  if (source === 'workflow') {
+    // The pipeline's "Pages" job deploys dist-github-pages/; its deployment of origin/main must have succeeded.
+    const deployed = () => {
+      const [id, sha] = sh('gh', ['api', `repos/${owner}/${repo}/deployments?environment=github-pages&per_page=1`, '--jq', '.[0] | "\(.id) \(.sha)"']).split(' ');
+      const state = id && id !== 'null' ? sh('gh', ['api', `repos/${owner}/${repo}/deployments/${id}/statuses?per_page=1`, '--jq', '.[0].state // "pending"']) : 'none';
+      return { sha, state };
+    };
+    const until = Date.now() + 5 * 60_000;
+    let d = deployed();
+    while (!(d.sha === remote && d.state === 'success')) {
+      if (d.sha === remote && (d.state === 'failure' || d.state === 'error')) return done(1, `the Pages deployment of ${short(remote)} ended ${d.state}`);
+      if (Date.now() > until) return done(1, `Pages did not deploy ${short(remote)} within 5 minutes (last: ${short(d.sha ?? '')} ${d.state})`);
+      await sleep(10_000);
+      d = deployed();
+    }
+    say('pages', `Pages deployed ${short(remote)} from GitHub Actions`);
+    return proveLive(live, remote, remoteVersion);
+  }
   const api = `repos/${owner}/${repo}/pages/builds`;
   const latest = () => {
     const [status, commit] = sh('gh', ['api', `${api}/latest`, '--jq', '.status + " " + .commit']).split(' ');
@@ -104,8 +135,11 @@ async function main() {
     b = latest();
   }
   say('pages', `Pages built ${short(remote)}`);
+  return proveLive(live, remote, remoteVersion);
+}
 
-  // 3. the live URL serves it
+/** 3. the live URL serves it */
+async function proveLive(live, remote, remoteVersion) {
   let liveVersion;
   for (let attempt = 1; attempt <= 6; attempt++) {
     const res = await fetch(`${live}?cb=${Date.now()}`, { headers: { 'cache-control': 'no-cache' } });

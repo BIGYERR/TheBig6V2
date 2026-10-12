@@ -7,9 +7,8 @@
 //   admin    /admin/   frontends/admin/    ng build --watch in frontends/ (both read frontends/common/)
 //   app      /app/     frontends/app/src/legacy/src/
 //                                          the app's source files, built into app-web/index.html on every save by
-//                                          frontends/app/scripts/build-index.mjs (the function that builds the root
-//                                          index.html), its inline script parsed; the repo root is never written
-//                      index.html          the repo root's, copied to app-web/ on every save, its inline script parsed
+//                                          frontends/app/scripts/build-index.mjs (the one builder, which also builds
+//                                          what GitHub Pages deploys), its inline script parsed; the repo is never written
 //   server             server/             the server restarts (under a second), then the type check beside the tests
 //   snippet  /client/  client/             served as saved
 //
@@ -24,7 +23,7 @@
 // (a sync tool rewriting a file's attributes) restarts nothing, and an Angular rebuild whose output came out the same
 // reloads nothing.
 //
-// It reads PORT (the server's), APP_SOURCE_DIR (the repo root, where index.html and frontends/app/ are; the folder above
+// It reads PORT (the server's), APP_SOURCE_DIR (the repo root, where frontends/app/ is; the folder above
 // backend/ by default), APP_BUNDLE_DIR (where the app is served from; app-web/ by default) and IA_DEV_CONTAINER=1 (set
 // by Dockerfile.dev). In the container the app's unit tests do not run: they need frontends/app/'s own node_modules, and the only
 // ones in reach are the Mac's, which a Linux container never loads.
@@ -40,8 +39,8 @@ import vm from 'node:vm';
 const BACKEND = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = resolve(process.env.APP_SOURCE_DIR || join(BACKEND, '..'));
 const APP_WEB = resolve(process.env.APP_BUNDLE_DIR || join(BACKEND, 'app-web'));
-// The app's source files, and the script that builds the root index.html from them. In the container both sit in the
-// read-only mount of the repo root.
+// The app's source files, and the script that builds the page from them. In the container both sit in the read-only
+// mount of the repo root.
 const APP_SOURCES = join(REPO, 'frontends', 'app', 'src', 'legacy', 'src');
 const BUILD_INDEX = join(REPO, 'frontends', 'app', 'scripts', 'build-index.mjs');
 const PORT = Number(process.env.PORT || 3000);
@@ -167,10 +166,9 @@ async function loadBuild(): Promise<(srcDir: string) => Buffer> {
 }
 
 /**
- * Builds the page /app/ serves from the app's source files, with the function that builds the root index.html, and
- * writes it to `out` (app-web/) only: the repo root is never written. Written beside itself and renamed over the old
- * page, so the server never reads half of one. Says when the root index.html is not this build yet. False when the
- * sources do not build.
+ * Builds the page /app/ serves from the app's source files, with the one builder, and writes it to `out` (app-web/)
+ * only: the repo is never written. Written beside itself and renamed over the old page, so the server never reads half
+ * of one. False when the sources do not build.
  */
 export async function buildAppFromSources(sources = APP_SOURCES, out = APP_WEB) {
   const started = Date.now();
@@ -185,11 +183,7 @@ export async function buildAppFromSources(sources = APP_SOURCES, out = APP_WEB) 
   writeFileSync(join(out, 'index.html.tmp'), page);
   renameSync(join(out, 'index.html.tmp'), join(out, 'index.html'));
   const version = /<meta name="ia-version" content="([^"]*)"/.exec(page.toString('utf8'))?.[1] ?? '(no ia-version)';
-  const root = join(REPO, 'index.html');
-  const current = existsSync(root) && readFileSync(root).equals(page);
-  const took = `${Date.now() - started} ms`;
-  if (current) log('app', `built app ${version} from the source files (${took}); the root index.html is the same build`, 'ok');
-  else log('app', `built app ${version} from the source files (${took}); the root index.html is not this build yet: cd frontends/app && npm run build:index`, 'warn');
+  log('app', `built app ${version} from the source files (${Date.now() - started} ms)`, 'ok');
   return true;
 }
 
@@ -415,9 +409,8 @@ async function main() {
   const where = IN_CONTAINER ? 'in the dev container' : "on this Mac's Node";
   log('dev', `watching ${where}, ${POLL_MS ? `polling every ${POLL_MS} ms` : 'by file events'}`, 'info');
   mkdirSync(join(BACKEND, 'dist'), { recursive: true });
+  // The bundle builds /app/ from the source files, where the app is edited, and writes its icon beside it.
   await bundleApp();
-  // The source files are where the app is edited, so /app/ starts from their build (the root file's icon stays).
-  if (existsSync(APP_SOURCES)) await buildAppFromSources();
   checkAppScript();
   startServer();
   // The start's own test run waits for both first builds: run beside them, it would be slowed past the 3 s limit. A
@@ -446,19 +439,12 @@ async function main() {
     await backendTests();
     await reloadPages();
   });
-  // The repo root, for its two app files only. (macOS can name a deeper index.html on this folder's watch, the site's own
-  // build; the root file's time and size then have not moved, so watchFolder lets it pass.)
-  watchFolder(REPO, { recursive: false, only: (f) => f === 'index.html' || f === 'apple-touch-icon.png' }, async () => {
-    await bundleApp();
-    checkAppScript();
-    await appUnitTests();
-    await reloadPages();
-  });
   // The app's source files: a save builds the page /app/ serves from them, into app-web/ only.
   if (existsSync(APP_SOURCES)) {
     watchFolder(APP_SOURCES, { only: (f) => /\.(html|css|js|json)$/.test(f) }, async (files) => {
       log('app', `changed: ${files.join(', ')}`);
       if (await buildAppFromSources()) checkAppScript();
+      await appUnitTests();
       await reloadPages();
     });
   }

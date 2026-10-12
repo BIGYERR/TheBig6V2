@@ -28,12 +28,15 @@ Mario has had to repeat this more than once; a session that makes him say it aga
   gatekeeper do not load this file, so every agent file and skill carries this section at its top.
 
 ## What this is
-Vanilla HTML/CSS/JS PWA served as one file (`index.html`, ~1.3 MB, one inline `<script>`) that
+Vanilla HTML/CSS/JS PWA served as one page (`index.html`, ~1.3 MB, one inline `<script>`) that
 generates multi-week hybrid strength + cardio programs from a seeded, deterministic engine
-(Engine A → B → C → D inside `buildProgram(cfg)`). **`index.html` is generated** (architecture phase B, Post-v0.239.1):
-`frontends/app/scripts/build-index.mjs` builds it byte for byte from its source files under `frontends/app/src/legacy/src/` (35 JS files,
-9 CSS files and 5 HTML partials, joined in the order `order.json` lists). Code is edited in the source files, then
-`cd frontends/app && npm run build:index` regenerates the root `index.html`, and both are committed together. Each JS
+(Engine A → B → C → D inside `buildProgram(cfg)`). **The page is generated** (architecture phase B, Post-v0.239.1):
+`frontends/app/scripts/build-index.mjs` builds it byte for byte from its source files under `frontends/app/src/legacy/src/` (40 JS files,
+9 CSS files and 5 HTML partials, joined in the order `order.json` lists) into `dist-github-pages/` (gitignored: the page and
+its icon, what GitHub Pages deploys from the pipeline once its source is "GitHub Actions", what every test boots, what the
+backend serves at `/app/`). Until Mario switches the Pages source, Pages serves the branch `main`'s root `index.html`, a
+committed copy of that build: code is edited in the source files, then `cd frontends/app && npm run build:index` writes both,
+and the sources and the root copy are committed together (handoff §12 has the switch). Each JS
 source file is also an ES module (architecture phase C, step 1): `npm run build:index` first rewrites its import and
 export blocks from the code (`scripts/module-blocks.mjs`), the build strips them, and the tests can import the engine
 straight from the sources (`tests/support/engine-modules.ts`). The root file is
@@ -90,7 +93,7 @@ session's files written into `tests/measure/` mid-proof.
    V193). At session start and after every push or merge, read each of these from its own source, never inferring one
    from another, and print them to Mario as one block:
    - local: the working copy's `ia-version`, its branch and HEAD, and how far HEAD is ahead of or behind `origin/dev`;
-   - GitHub: `git show origin/dev:index.html` and `git show origin/main:index.html`, each `| grep -oE 'name="ia-version" content="[^"]+"'` (read out of the remote refs, not the working copy);
+   - GitHub: `git show origin/dev:frontends/app/src/legacy/src/html/head.html` and the same for `origin/main` (a `main` from before phase B: its `index.html`), each `| grep -oE 'name="ia-version" content="[^"]+"'` (read out of the remote refs, not the working copy);
    - Pages: `gh api repos/bigyerr/TheBig6V2/pages/builds/latest --jq '.status, .commit'`, and whether that commit is `origin/main`;
    - live: `curl -s "https://bigyerr.github.io/TheBig6V2/?cb=$(date +%s)" | grep -oE 'name="ia-version" content="[^"]+"'`. Cache-bust the query string; `cache-control` is `max-age=600`, so an unbusted fetch can lie for ten minutes;
    - any local build that records its own version, when one exists (the native app's `frontends/app/config.xml`, a running local PWA server).
@@ -120,9 +123,9 @@ session's files written into `tests/measure/` mid-proof.
   own commit to `dev`, or a tag. A worktree runs the hooks of the commit it has checked out, so one made from `dev`
   carries the guard.
 - **Local proof is 60 seconds, hard.** `node tools/check.mjs` runs four lanes and stops at 60 s: tests (the type
-  check of `core/` and `tests/`, and the unit and integration tests by Vitest), build (`index.html` is the byte-for-byte
-  build of `frontends/app/src/legacy/src/`, its version meta, its inline script compiles, it boots and builds HALF_MANNY
-  self-stable), app (sync, type check, tests, lint) and backend (type checks, tests, lint). The pre-commit hook
+  check of `core/` and `tests/`, and the unit and integration tests by Vitest), build (the page builds from
+  `frontends/app/src/legacy/src/` into `dist-github-pages/`, its version meta, its inline script compiles, it boots and builds
+  HALF_MANNY self-stable, and the root copy is that build byte for byte), app (sync, type check, tests, lint) and backend (type checks, tests, lint). The pre-commit hook
   (`.githooks/pre-commit`, `--staged`) runs the lanes a commit touches. No local step waits longer than 60 s: anything
   slower belongs in CI.
 - **The full suite runs in CI** (`.github/workflows/pipeline.yml`) on every push to `dev`, and again on the pull request
@@ -173,12 +176,14 @@ session's files written into `tests/measure/` mid-proof.
 ## Proof for new work (Mario, Post-v0.239.1)
 - **CI is the gate.** The unit and integration tests and the type check run in the 60-second check and in CI on every
   push to `dev`; the release is proved by the CI run on the commit Mario releases (Pipeline). Gatekeeper reads it, and also:
-  - runs each new or changed test on the commit before the change (`git show <previous>:index.html >
-    <scratch>/base_v<previous>.html`, then `cd tests && IA_APP=<that file> npx vitest run <file>`): a test written for a changed
+  - runs each new or changed test on the commit before the change (`node tools/app-at.mjs <previous>
+    <scratch>/base_v<previous>.html`: that commit's root copy, or the build of its sources; then `cd tests && IA_APP=<that
+    file> npx vitest run <file>`): a test written for a changed
     behaviour must fail there, and one that passes on both is vacuous unless its file says it guards behaviour that
     must not change;
   - matches every behaviour the ruling changes to a named test; a changed behaviour with no test is red;
-  - reads every hunk of `git diff` on `index.html` and `tests/snapshots/`, and classifies each against the ruling.
+  - reads every hunk of the diff on the page (`git diff` on the root copy; after the Pages switch, `tools/app-at.mjs` of
+    both commits) and on `tests/snapshots/`, and classifies each against the ruling.
 - **Oracles.** Expected values are typed by hand from the ruling, the doctrine text or date arithmetic, never asked of
   the app; a snapshot is the one deliberate exception, a golden file in git regenerated only on purpose. Seeds are
   pinned, clock fields stripped, and a program equals itself built twice before it is compared.
@@ -263,8 +268,9 @@ which does reach him arrives with a recommendation.
   of a decision entry, and a scratch copy of a release's body. Files made from Post-v0.239.1 on are named by feature,
   never by version (Test layout). Files made before keep their names (`tests/measure/v0.239.1_rulings/`). A tests-only pass after a release is
   `Post-v0.239.1`.
-- In this repo the only HTML is `index.html` (Pages serves it). The previous version is the release HEAD carries, never
-  "N-1": `git show HEAD:index.html > <scratchpad>/base_v<previous>.html`. Tag each release: `git tag v<version>`.
+- The app's one HTML page is `index.html`, built from `frontends/app/src/legacy/src/` (Pages deploys it). The previous version
+  is the release HEAD carries, never "N-1": `node tools/app-at.mjs HEAD <scratchpad>/base_v<previous>.html`. Tag each
+  release: `git tag v<version>`.
 - A file version with no digest line in the handoff means a build was dropped. Stop and tell Mario.
 - **Grep the file, never trust a label.** Filename, chat title, memory and handoff can all lag the artifact.
 
@@ -336,9 +342,9 @@ equals itself before comparing; NRC sessions are verbatim; temp files only under
 The dev container serves the website (`/`), the app (`/app/`, built from `frontends/app/src/legacy/src/`), the admin (`/admin/`,
 admin / asylum) and the backend on http://localhost:3000, and rebuilds whatever is saved by itself, in about a second,
 with nothing running on the Mac: the website and the admin (`frontends/`) by `ng build --watch`; the app built from its source files on every
-save, with the function that builds the root `index.html` (`frontends/app/scripts/build-index.mjs`), into `backend/app-web/`
-only, and the root `index.html` copied when it changes, its inline script parsed either way; the server restarted on a
-`server/` change. A saved source file shows at `/app/` at once; the root file still needs `npm run build:index`. After each change it runs only tests that finish within 3 s, then
+save, with the one builder (`frontends/app/scripts/build-index.mjs`), into `backend/app-web/` only, its inline script
+parsed; the server restarted on a `server/` change. A saved source file shows at `/app/` at once; the root copy still needs
+`npm run build:index`. After each change it runs only tests that finish within 3 s, then
 every open page reloads itself. The watcher (`backend/scripts/dev-watch.ts`) runs inside the container
 (`backend/Dockerfile.dev`, `backend/docker-compose.dev.yml`); it reads the checkout read-only and writes only
 `backend/dist/`, `backend/app-web/` and `frontends/dist/`. The container comes back by itself whenever Docker starts.
@@ -351,11 +357,12 @@ builds: `frontends/app/` `emulator-ios`, `device-ios`, `pwa-pages`, `pwa-local`;
 `heroku.sh deploy`.
 
 ## Files
-- `index.html` — the app, generated. Its source is `frontends/app/src/legacy/src/`: `js/`, `css/`, `html/` (the `ia-version` meta
+- `index.html` — the app's page, generated. Its source is `frontends/app/src/legacy/src/`: `js/`, `css/`, `html/` (the `ia-version` meta
   is in `html/head.html`), `order.json` (the one list of pieces, in build order) and a README saying what each file
-  holds. `frontends/app/scripts/build-index.mjs` builds it (`cd frontends/app && npm run build:index`; `npm run build:index:check` fails,
-  naming the first differing byte, unless the root file is the build). The sources and the rebuilt file are committed
-  together; the root file is never edited by hand.
+  holds. `frontends/app/scripts/build-index.mjs` builds it into `dist-github-pages/` (gitignored) and writes the root copy
+  Pages serves until its source switch (`cd frontends/app && npm run build:index`; `npm run build:index:check` fails,
+  naming the first differing byte, unless the root copy is the build). The sources and the root copy are committed
+  together; the root copy is never edited by hand. `tools/app-at.mjs <ref> <file>` writes the page as any commit had it.
 - `IRON_ASYLUM_HANDOFF_1_1.md` — the record (stable name, overwrite in place, ONE digest line per version at the tail, never a narrative at the top).
 - `docs/design/THE_ASYLUM_DS_REFERENCE*.md` — design system (bone `#F4F1E8`, ink, signal orange `#CF4E1A`; `asyIcon()` inline SVG, never emoji in chrome).
 - `frontends/` — every UI: `app/` (above, and the Cordova iOS project), and the website, the admin and `common/` (what

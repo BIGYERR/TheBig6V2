@@ -7,9 +7,9 @@ import { LEGACY_SHA256, LEGACY_VERSION } from '../../legacy/generated/legacy-mar
  */
 @Injectable({ providedIn: 'root' })
 export class LegacyBridge {
-  /** The root index.html's ia-version this build was generated from. */
+  /** The page's ia-version this build was generated from (the page is built from src/legacy/src). */
   readonly version = LEGACY_VERSION;
-  /** sha256 of that index.html, so a build can be traced to the exact source. */
+  /** sha256 of that page, so a build can be traced to the exact source. */
   readonly sourceSha256 = LEGACY_SHA256;
   /** True once the legacy script has run and init() has drawn the first screen. */
   readonly booted = signal(false);

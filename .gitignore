@@ -15,3 +15,5 @@ profile.txt
 
 # gate output and run logs; local, never committed
 /temp/
+# the app as GitHub Pages deploys it, built from the sources (frontends/app/scripts/build-index.mjs); never committed
+/dist-github-pages/

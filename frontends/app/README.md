@@ -1,6 +1,6 @@
 # Iron Asylum: Angular app and its four build paths
 
-Full path: `/Users/CanasBangin/Developer/TheBig6V2/app`
+Full path: `/Users/CanasBangin/Developer/TheBig6V2/frontends/app`
 
 This folder packages Iron Asylum as an **Angular 22** app and wraps it with **Cordova (cordova-ios 8)** for the iOS
 Simulator and a connected iPhone. It also holds the lint setup and the unit and integration tests. The Docker + Puppeteer e2e suite that covers it lives
@@ -8,7 +8,7 @@ in `../../tests/e2e/`.
 
 ## The four build paths
 
-One Angular app, built four ways. Run each from this folder (`cd app`).
+One Angular app, built four ways. Run each from this folder (`cd frontends/app`).
 
 | Path | Command | Builds | Where it runs |
 |---|---|---|---|
@@ -24,13 +24,14 @@ has no web manifest and no service worker.
 
 **pwa-pages and the live app share storage.** `pwa/` is served from the same origin as the live app at
 `/TheBig6V2/`, so in a Safari tab both read and write the same `localStorage`. That is safe only while `pwa/` runs
-the same `app.js` as the root `index.html`. `npm run pwa-pages:check` proves it without building. It fails when `pwa/`
-was built from any other bytes of `index.html`, when a file the page loads is missing, or when the base href is wrong.
+the same `app.js` as the live page (the build of `src/legacy/src/`). `npm run pwa-pages:check` proves it without
+building. It fails when `pwa/` was built from any other bytes of the page, when a file the page loads is missing, or when
+the base href is wrong.
 Rebuild and commit `pwa/` with every version, or it goes stale.
 
 ### pwa-local: the web build, served from this Mac
 
-`npm run pwa-local` (`scripts/pwa-local.mjs`) syncs from `../../index.html`, builds into `dist/pwa-local/` (gitignored),
+`npm run pwa-local` (`scripts/pwa-local.mjs`) syncs from the page (built from `src/legacy/src/`), builds into `dist/pwa-local/` (gitignored),
 runs the same check as `pwa-pages:check` against it, then serves it with a small Node server until you press Ctrl-C.
 It prints the addresses to use:
 
@@ -48,7 +49,7 @@ pwa-local: serving ia-version 239 from dist/pwa-local/
   made in one does not appear in another.
 - **It works only while the server runs and the phone is on the same network.** The app has no service worker, so
   nothing is cached for offline use. Away from home, use the live app.
-- **Updates.** Rerun `npm run pwa-local` after `index.html` changes. The in-app update check reads the served page,
+- **Updates.** Rerun `npm run pwa-local` after the source files change. The in-app update check reads the served page,
   so an open app offers the new version. The page and `legacy/app.js` are revalidated on every load. Only the hashed
   Angular bundles are cached for good.
 - **Plain http on the phone.** Safari does not treat `http://<name>.local` as a secure context, so the clipboard API
@@ -62,15 +63,17 @@ pwa-local: serving ia-version 239 from dist/pwa-local/
 - Options: `-- --port 4401` (or `PWA_LOCAL_PORT`) picks the port. `-- --no-build` serves the last build without
   rebuilding, and is still refused if that build is stale.
 
-The live app is still the repo root `index.html`, served by GitHub Pages and booted by every gate under `tests/`.
-It is built from the app's source files in `src/legacy/src/` (`npm run build:index`; the README there lists them), and
-nothing else edits it. The Angular app is **generated from it on every build**, so there is one source of truth and
-the gates keep proving the code this app runs.
+The live app is still the single-file page, `index.html`, served by GitHub Pages and booted by every test under
+`tests/`. It is built from the app's source files in `src/legacy/src/` (`scripts/build-index.mjs`, the one builder;
+the README there lists them) into `../../dist-github-pages/` (what Pages deploys once its source is GitHub Actions)
+and, until that switch, a committed copy at the repo root (`npm run build:index` writes both). The Angular app is
+**generated from the same page on every build**, so there is one source of truth and the tests keep proving the code
+this app runs.
 
-## How the Angular app is built from index.html
+## How the Angular app is built from the page
 
-`npm run sync` (`scripts/sync-legacy.mjs`) splits the root `index.html` into four pieces, byte for byte, and checks
-that each one occurs exactly once:
+`npm run sync` (`scripts/sync-legacy.mjs`) builds the page from the source files and splits it into four pieces, byte
+for byte, and checks that each one occurs exactly once:
 
 | Piece | Goes to | Used as |
 |---|---|---|
@@ -79,7 +82,7 @@ that each one occurs exactly once:
 | body markup before and after the script | `src/legacy/generated/legacy-markup.ts` | mounted by `LegacyHost` |
 | the one inline `<script>` | `public/legacy/app.js` | loaded by `LegacyHost` as a classic script |
 
-The generated `app.js` is byte-identical to what `tests/harness.js` extracts and the gates boot.
+The generated `app.js` is byte-identical to what `tests/harness.js` extracts and the tests boot.
 
 At runtime, `ia-root` renders `ia-legacy-host` (`src/app/legacy/legacy-host.ts`), which:
 1. waits for Cordova's `deviceready` inside the native app (`src/app/core/platform.ts`; a browser skips this);
@@ -95,7 +98,7 @@ parity check below as its proof.
 
 ## Commands
 
-All of these run from this folder (`cd app`). Prerequisites: Node 22.22+/24.15+/26+, npm, Docker Desktop, and Xcode
+All of these run from this folder (`cd frontends/app`). Prerequisites: Node 22.22+/24.15+/26+, npm, Docker Desktop, and Xcode
 with an iOS Simulator runtime.
 
 | Command | What it does |
@@ -103,8 +106,8 @@ with an iOS Simulator runtime.
 | `npm install` | install dependencies (npm 11 asks before running install scripts; `package.json` `allowScripts` approves only Puppeteer's Chrome download and esbuild) |
 | `npm start` | sync, then `ng serve` on http://localhost:4200 |
 | `npm run build` | sync, then a production build into `www/` (Cordova's web root; both iOS paths and e2e run it) |
-| `npm run sync:check` | fail if the generated files are stale against `../../index.html` |
-| `npm run build:index` | build `../../index.html` from the app's source files in `src/legacy/src/` (`scripts/build-index.mjs`); the root file is never edited by hand |
+| `npm run sync:check` | fail if the generated files are stale against the page the source files build |
+| `npm run build:index` | build the page from the app's source files in `src/legacy/src/` (`scripts/build-index.mjs`) into `../../dist-github-pages/` and its committed root copy `../../index.html`; the root copy is never edited by hand |
 | `npm run build:index:check` | fail, naming the first differing byte and its source file, unless `../../index.html` is the build of `src/legacy/src/` |
 | `npm run lint` | ESLint: TypeScript and templates (angular-eslint), plus `scripts/` and `test/`; errors fail |
 | `npm run lint:legacy` | warn-only report on the generated `app.js` (counts per rule, first examples) |
@@ -115,7 +118,7 @@ with an iOS Simulator runtime.
 | `npm run emulator-ios` | build, boot the simulator (default iPhone 17 Pro; `-- --sim "iPhone Air"`), install, launch |
 | `npm run device-ios` | signed build for the connected iPhone, install, launch |
 | `npm run pwa-pages` | sync, then a production build into `../../pwa/` for GitHub Pages, then the check below |
-| `npm run pwa-pages:check` | fail unless `../../pwa/` was built from the current `../../index.html` (no build) |
+| `npm run pwa-pages:check` | fail unless `../../pwa/` was built from the page as the source files build it now (no build) |
 | `npm run pwa-local` | sync, then a production build into `dist/pwa-local/`, the same check, then serve it on port 4400 for this Mac and the iPhone |
 | `npm run xcode-ios` | open the native project in Xcode |
 
@@ -162,8 +165,8 @@ namespaces, parameter properties). `test/package.json` only marks that folder as
   rule, the run log. The e2e's own tests moved with it to `../../tests/`.
 - `test/integration/`: real inputs. The `pwa-local` server over real HTTP against a fixture build (content types,
   caching, the update check's probe, nothing served from outside the build), the build check both web paths share,
-  `sync-legacy` against the live `../../index.html` and as a command, `build-index` against the live source files and
-  fixture folders, and the run log's wrapper.
+  `sync-legacy` against the live page and as a command, `build-index` (the page, `writePages`, the root copy) against
+  the live source files and fixture folders, and the run log's wrapper.
 
 The Angular code (`src/`) has no unit tests yet. It is a host for the legacy app, and the e2e parity check is its
 proof. When a screen moves into an Angular component, that component's tests go through the Angular CLI's own

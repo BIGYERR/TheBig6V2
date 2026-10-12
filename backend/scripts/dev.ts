@@ -9,7 +9,7 @@
 // The container is the docker backend's own (docker-compose.yml with docker-compose.dev.yml laid over it): the same
 // name, port and devices volume as npm run docker:up, which puts back the plain production image. It runs
 // scripts/dev-watch.ts from Dockerfile.dev, which rebuilds frontends/website/, frontends/admin/, server/, client/, the app's source files
-// (frontends/app/src/legacy/src/) and the repo root index.html as they are saved, with nothing running on this Mac, and comes back
+// (frontends/app/src/legacy/src/) as they are saved, with nothing running on this Mac, and comes back
 // whenever Docker starts (restart: unless-stopped).
 // It shows a change; it proves nothing. The pre-commit check, CI, and the build paths for devices in frontends/app/ do that.
 import { spawn } from 'node:child_process';

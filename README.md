@@ -4,7 +4,7 @@ Iron Asylum: a hybrid strength and cardio program builder for iPhone.
 
 | Folder | What it is | How it ships |
 |---|---|---|
-| `index.html` | the app: one file, served at https://bigyerr.github.io/TheBig6V2/ | GitHub Pages, on every push to `main` |
+| `index.html` | the app: one page, built from `frontends/app/src/legacy/src/` into `dist-github-pages/` (with its icon), served at https://bigyerr.github.io/TheBig6V2/; the root `index.html` is its committed copy until the Pages source switches to GitHub Actions | GitHub Pages, on every merge into `main` (the pipeline's Pages job, once the source is switched; the branch `main` until then) |
 | `frontends/app/` | the same app as an Angular project, built four ways: `emulator-ios` and `device-ios` (Cordova), `pwa-pages` (a web build for `/TheBig6V2/pwa/`), and `pwa-local` (the same web build, served from this Mac) | built on demand; see `frontends/app/README.md` |
 | `frontends/` | the website and the admin dashboard (an Angular workspace), and `common/`, what the frontends share; the app above is `frontends/app/` | served by the backend; see `frontends/README.md` |
 | `backend/` | the Node backend: one server for the website (`/`), the app (`/app/`), the admin dashboard (`/admin/`) and the device heartbeat API | Heroku, with `backend/scripts/heroku.sh deploy`; see `backend/README.md` |
@@ -23,7 +23,7 @@ devices, deploys and full builds, and work as before.
 | Flow | Command | Where it runs |
 |---|---|---|
 | full stack dev mode: website, app, admin, backend | `cd backend && npm run dev` | http://localhost:3000/ (website), `/app/`, `/admin/` (admin / asylum), rebuilt and reloaded on every save |
-| live app | push `index.html` to `main`, after the gates (`CLAUDE.md`, session rhythm) | https://bigyerr.github.io/TheBig6V2/, once Pages has built that commit |
+| live app | a pull request from `dev` into `main`, after the pipeline (`CLAUDE.md`, session rhythm) | https://bigyerr.github.io/TheBig6V2/, once Pages has deployed that commit (`node tools/deploy-check.mjs`) |
 | web app on this Mac, and on the iPhone over Wi-Fi | `cd frontends/app && npm run pwa-local` | http://localhost:4400/ on the Mac and `http://<Mac name>.local:4400/` on the iPhone. Nothing is committed or pushed |
 | Angular dev server | `cd frontends/app && npm start` | http://localhost:4200, this Mac only |
 | iOS Simulator | `cd frontends/app && npm run emulator-ios` | the native app in the simulator |

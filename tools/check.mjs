@@ -26,6 +26,7 @@ import { execFileSync, spawn } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { basename, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { REPO, attachRun, duration, startRun } from './runlog.mjs';
 
 /** ia-version is read and compared only through tests/semver.js (CommonJS): MAJOR.MINOR.PATCH, a bare N reads as 0.N.0. */
@@ -66,7 +67,7 @@ const want = {
 if (LIST) {
   console.log(`check: limit ${LIMIT_S} s; ${STAGED ? `staged files: ${paths?.length ?? 0}` : 'everything'}`);
   console.log(`  tests   ${want.tests ? `type check (core, tests), vitest run ${FEATURE_TEST_DIRS.join(' ')} (in tests/)` : 'not touched'}`);
-  console.log(`  build   ${want.build ? 'index.html is the build of frontends/app/src/legacy/src; its version, inline script and boot' : 'not touched'}`);
+  console.log(`  build   ${want.build ? 'dist-github-pages/ built from frontends/app/src/legacy/src; its version, inline script and boot; the root index.html is that build' : 'not touched'}`);
   console.log(`  app     ${want.app ? 'sync, typecheck, unit, integration, lint' : 'not touched'}`);
   console.log(`  frontends ${want.frontends ? 'typecheck, lint (website, admin, common)' : 'not touched'}`);
   console.log(`  backend ${want.backend ? 'typecheck, test, lint' : 'not touched'}`);
@@ -163,26 +164,31 @@ async function testsLane() {
 }
 
 /**
- * The root index.html: it is, byte for byte, the build of the source files under frontends/app/src/legacy/src; its ia-version
- * meta reads as a version; its inline script compiles; and it boots in the harness and builds HALF_MANNY, self-stable.
+ * The page: the source files under frontends/app/src/legacy/src build into dist-github-pages/ (what GitHub Pages deploys
+ * and every test boots); its ia-version meta reads as a version; its inline script compiles; it boots in the harness and
+ * builds HALF_MANNY, self-stable; and the root index.html, the copy Pages serves while its source is the branch main, is
+ * that build byte for byte. Nothing tracked is written.
  */
 async function buildLane() {
-  const html = readFileSync(join(REPO, 'index.html'), 'utf8');
+  const builder = pathToFileURL(join(REPO, 'frontends', 'app', 'scripts', 'build-index.mjs')).href;
+  if (!(await step('build', 'dist-github-pages/ from frontends/app/src/legacy/src', process.execPath, ['--input-type=module', '-e', `(await import(${JSON.stringify(builder)})).writePages()`], REPO))) return;
+  const page = join(REPO, 'dist-github-pages', 'index.html');
+  const html = readFileSync(page, 'utf8');
   const version = /<meta name="ia-version" content="([^"]*)"/.exec(html)?.[1];
   if (version === undefined) {
-    failures.push('build: index.html has no ia-version meta');
+    failures.push('build: the page has no ia-version meta');
   } else {
     try {
       SV.parse(version);
-      note('build', `index.html is ia-version ${version}`);
+      note('build', `the page is ia-version ${version}`);
     } catch (err) {
-      failures.push(`build: index.html ia-version "${version}" is not a version (${err.message})`);
+      failures.push(`build: the page's ia-version "${version}" is not a version (${err.message})`);
     }
   }
-  if (!(await step('build', 'index.html is the build of frontends/app/src/legacy/src', process.execPath, ['frontends/app/scripts/build-index.mjs', '--check'], REPO))) return;
-  const syntax = `const {extractInlineJS}=require(${JSON.stringify(join(REPO, 'tests', 'harness'))});new (require('vm').Script)(extractInlineJS(require('fs').readFileSync(${JSON.stringify(join(REPO, 'index.html'))},'utf8')))`;
+  if (!(await step('build', 'the root index.html is that build', process.execPath, ['frontends/app/scripts/build-index.mjs', '--check'], REPO))) return;
+  const syntax = `const {extractInlineJS}=require(${JSON.stringify(join(REPO, 'tests', 'harness'))});new (require('vm').Script)(extractInlineJS(require('fs').readFileSync(${JSON.stringify(page)},'utf8')))`;
   if (!(await step('build', 'inline script compiles', process.execPath, ['-e', syntax], REPO))) return;
-  await step('build', 'boots and builds HALF_MANNY, self-stable', process.execPath, ['tests/harness.js', 'index.html'], REPO);
+  await step('build', 'boots and builds HALF_MANNY, self-stable', process.execPath, ['tests/harness.js', 'dist-github-pages/index.html'], REPO);
 }
 
 async function appLane() {
@@ -192,7 +198,7 @@ async function appLane() {
     return;
   }
   const bin = (name) => join(app, 'node_modules', '.bin', name);
-  if (!(await step('app', 'sync from index.html', process.execPath, ['scripts/sync-legacy.mjs'], app))) return;
+  if (!(await step('app', 'sync from the page (the build of src/legacy/src)', process.execPath, ['scripts/sync-legacy.mjs'], app))) return;
   // Independent once the sync is done, so they run together.
   await Promise.all([
     step('app', 'typecheck', bin('tsc'), ['-p', 'tsconfig.node.json'], app),

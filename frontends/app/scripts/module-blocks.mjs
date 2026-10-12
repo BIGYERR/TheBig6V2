@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // The ES-module blocks of the app's JS source files (architecture phase C, step 1; docs/architecture-migration.md).
-// Each file under src/legacy/src/js is a classic script that build-index.mjs joins into the root index.html, and also an
+// Each file under src/legacy/src/js is a classic script that build-index.mjs joins into the page (index.html), and also an
 // ES module: an import block at its top names every top-level name of another file it uses, and an export block at its
 // bottom names every top-level name another file uses, and those the tests reach through tests/harness.js's
 // EXPORT_NAMES. build-index.mjs strips both blocks (MODULE_IMPORTS_END, MODULE_EXPORTS_START), so the page is the

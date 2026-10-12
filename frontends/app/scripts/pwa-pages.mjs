@@ -2,22 +2,23 @@
 // The pwa-pages build path: the same Angular app as the two iOS paths (scripts/ios.mjs), built for GitHub Pages
 // instead of Cordova.
 //
-//   npm run pwa-pages          sync from ../../index.html, build into ../../pwa/, then check the result
-//   npm run pwa-pages:check    exit 1 unless ../../pwa/ was built from the current ../../index.html (no build)
+//   npm run pwa-pages          sync from the page (the build of src/legacy/src), build into ../../pwa/, then check it
+//   npm run pwa-pages:check    exit 1 unless ../../pwa/ was built from the page as the sources build it now (no build)
 //
 // Pages serves main as committed (branch build, path /), so ../../pwa/ goes live at
-// https://bigyerr.github.io/TheBig6V2/pwa/ once it is committed and pushed. The root index.html stays the live app at
-// /TheBig6V2/; nothing here touches it.
+// https://bigyerr.github.io/TheBig6V2/pwa/ once it is committed and pushed, while the Pages source is the branch main. The
+// single-file page stays the live app at /TheBig6V2/; nothing here touches it.
 //
 // No Cordova and no native plugins. Platform boots at once outside app://, and the page finds no window.iaIsland, so
 // the rest stopwatch runs without the Dynamic Island. Every HTML5 and home-screen feature is the live app's own.
 //
 // pwa/ shares an origin with the live app, so in a Safari tab both read and write the same localStorage. That is safe
-// only while pwa/ runs the same app.js as the root index.html, and that is what the check proves.
+// only while pwa/ runs the same app.js as the live page (the build of src/legacy/src), and that is what the check proves.
 import { spawnSync } from 'node:child_process';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkPwaBuild } from './pwa-check.mjs';
+import { PAGES_DIR, writePages } from './build-index.mjs';
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const REPO = resolve(APP, '..', '..');
@@ -35,12 +36,13 @@ function run(cmd, cmdArgs) {
   if (res.status !== 0) fail(`${cmd} ${cmdArgs.join(' ')} failed (exit ${res.status ?? res.signal})`);
 }
 
-/** Proves pwa/ is a complete build of the current root index.html, served from the Pages subpath. */
+/** Proves pwa/ is a complete build of the page as the sources build it now, served from the Pages subpath. */
 function check() {
   let version;
   try {
+    writePages();
     version = checkPwaBuild({
-      rootIndex: join(REPO, 'index.html'),
+      pageFile: join(PAGES_DIR, 'index.html'),
       out: OUT,
       name: 'pwa/',
       baseHref: BASE_HREF,

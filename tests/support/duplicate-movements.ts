@@ -26,7 +26,7 @@ export const ORDER: DayKey[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 export const clone = <T>(o: T): T => JSON.parse(JSON.stringify(o));
 export const clean = (n: unknown): string => String(n == null ? '' : n).replace(/<svg[\s\S]*?<\/svg>\s*/g, '').replace(/<[^>]+>/g, '').trim();
 export const count = (text: string, s: string): number => text.split(s).length - 1;
-/** The app under test as text (IA_APP or the repo's index.html). */
+/** The app under test as text (IA_APP, or the page built from the sources: support/app.ts's APP). */
 export const appText = (): string => readFileSync(APP, 'utf8');
 
 /** Replaces `from` with `to` in `text`; `from` must occur exactly once, or the copy is not the one the test means. */

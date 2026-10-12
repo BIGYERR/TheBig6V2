@@ -1,19 +1,18 @@
-// sync-legacy against the real root index.html (the live PWA), and its command line.
+// sync-legacy against the real page (built from src/legacy/src; what GitHub Pages deploys), and its command line.
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
 import { render, split } from '../../scripts/sync-legacy.mjs';
+import { buildIndex } from '../../scripts/build-index.mjs';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const SOURCE = join(APP, '..', '..', 'index.html');
-const html = readFileSync(SOURCE, 'utf8');
+const html = buildIndex().toString('utf8');
 
-describe('sync-legacy on the live index.html', () => {
+describe('sync-legacy on the live page', () => {
   const parts = split(html);
 
   it('reads the same ia-version as the page meta', () => {

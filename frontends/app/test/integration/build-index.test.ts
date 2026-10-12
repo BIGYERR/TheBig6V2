@@ -1,19 +1,22 @@
-// build-index: the root index.html is the build of src/legacy/src/, byte for byte, and the check names the first byte
-// that drifts. The live sources against the live page, then fixture source folders for every way the list can be wrong.
+// build-index: the page is the build of src/legacy/src/, byte for byte (the test strips and joins the files itself);
+// writePages() writes it and its icon into the folder GitHub Pages deploys; and the check that the root index.html is
+// that build names the first byte that drifts. The live sources, then fixture source folders for every way the list can
+// be wrong.
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { after, describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import { Script } from 'node:vm';
-import { buildIndex, checkIndex, firstDifference, readOrder, SOURCES, TARGET } from '../../scripts/build-index.mjs';
+import { buildIndex, checkIndex, firstDifference, ICON, PAGES_DIR, readOrder, SOURCES, TARGET, writePages } from '../../scripts/build-index.mjs';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const LIVE_SOURCES = join(APP, 'src', 'legacy', 'src');
 const LIVE_PAGE = join(APP, '..', '..', 'index.html');
+const REPO = join(APP, '..', '..');
 const sha256 = (buf: Buffer) => createHash('sha256').update(buf).digest('hex');
 /**
  * A JS source file as the page carries it: without its module blocks (architecture phase C), cut at the two marker lines
@@ -34,22 +37,40 @@ const pieceOnPage = (piece: string) => {
 describe('build-index on the live sources', () => {
   const order = JSON.parse(readFileSync(join(LIVE_SOURCES, 'order.json'), 'utf8')) as string[];
 
-  it('points at frontends/app/src/legacy/src and the repo root index.html', () => {
+  it('points at frontends/app/src/legacy/src, the repo root index.html, dist-github-pages/ and the icon beside the root', () => {
     assert.equal(SOURCES, LIVE_SOURCES);
     assert.equal(TARGET, LIVE_PAGE);
+    assert.equal(PAGES_DIR, join(REPO, 'dist-github-pages'));
+    assert.equal(ICON, join(REPO, 'apple-touch-icon.png'));
   });
 
-  it('the files order.json lists, read straight from disk and joined (the JS files without their module blocks), are index.html byte for byte', () => {
+  it('the files order.json lists, read straight from disk and joined (the JS files without their module blocks), are the page byte for byte', () => {
     // Independent of the build function: the test strips and joins the files itself.
     const joined = Buffer.concat(order.map(pieceOnPage));
-    const page = readFileSync(LIVE_PAGE);
+    const page = buildIndex();
     assert.equal(joined.length, page.length);
     assert.equal(sha256(joined), sha256(page));
-    assert.ok(buildIndex().equals(page));
+  });
+
+  it('writePages writes the page and its icon into a folder, and nothing else', () => {
+    const out = mkdtempSync(join(tmpdir(), 'build-index-pages-'));
+    try {
+      const page = writePages(join(out, 'site'));
+      assert.deepEqual(readdirSync(join(out, 'site')).sort(), ['apple-touch-icon.png', 'index.html']);
+      assert.ok(readFileSync(join(out, 'site', 'index.html')).equals(Buffer.concat(order.map(pieceOnPage))));
+      assert.ok(readFileSync(join(out, 'site', 'index.html')).equals(page));
+      assert.ok(readFileSync(join(out, 'site', 'apple-touch-icon.png')).equals(readFileSync(ICON)));
+    } finally {
+      rmSync(out, { recursive: true, force: true });
+    }
+  });
+
+  it('the root index.html, while the repo carries it, is the page byte for byte', { skip: !existsSync(LIVE_PAGE) && 'no root index.html' }, () => {
+    assert.ok(readFileSync(LIVE_PAGE).equals(Buffer.concat(order.map(pieceOnPage))));
   });
 
   it('the JS files are the inline script, in order, and each compiles on its own', () => {
-    const html = readFileSync(LIVE_PAGE, 'utf8');
+    const html = buildIndex().toString('utf8');
     const script = html.split('<script>')[1]!.split('</script>')[0];
     const js = order.filter((piece) => piece.startsWith('js/'));
     assert.equal(js.map((piece) => pieceOnPage(piece).toString('utf8')).join(''), script);

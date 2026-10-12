@@ -31,10 +31,10 @@ describe('the release version', () => {
     assert.match(VERSION, /^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/);
   });
 
-  test("core/src/version.ts equals index.html's ia-version meta, so a release writes both", () => {
-    const html = readFileSync(join(REPO, 'index.html'), 'utf8');
+  test("core/src/version.ts equals the page's ia-version meta (its source, html/head.html), so a release writes both", () => {
+    const html = readFileSync(join(REPO, 'frontends', 'app', 'src', 'legacy', 'src', 'html', 'head.html'), 'utf8');
     const metas = [...html.matchAll(/<meta name="ia-version" content="([^"]*)"/g)].map((m) => m[1]);
-    assert.equal(metas.length, 1, 'index.html carries one ia-version meta');
+    assert.equal(metas.length, 1, 'html/head.html carries one ia-version meta');
     assert.equal(metas[0], VERSION, 'the meta is written exactly as core/src/version.ts writes it');
   });
 });

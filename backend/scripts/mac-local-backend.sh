@@ -90,7 +90,7 @@ up() {
     say 'installing dependencies (npm ci)'
     npm ci --no-audit --no-fund
   fi
-  # The app at /app/ is this checkout's index.html, copied fresh on every start (a copy, so it is instant).
+  # The app at /app/ is built from this checkout's source files on every start (in memory, under a second).
   node scripts/app-bundle.ts
   # The server is TypeScript; what runs is what tsc compiles from it, so a start never runs a stale copy.
   say 'compiling the server'

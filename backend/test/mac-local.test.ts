@@ -50,8 +50,8 @@ describe('mac-local-backend', { skip: process.platform === 'win32' && 'bash scri
     const health = await (await fetch(`${base}/healthz`)).json();
     assert.equal(health.ok, true);
     assert.equal(health.backend, 'mac-local', 'it says which backend it is');
-    // up bundles this checkout's app, so /app/ serves the same ia-version as the repo root index.html.
-    const root = readFileSync(new URL('../../index.html', import.meta.url), 'utf8');
+    // up builds this checkout's app from its source files, so /app/ serves the ia-version its html/head.html declares.
+    const root = readFileSync(new URL('../../frontends/app/src/legacy/src/html/head.html', import.meta.url), 'utf8');
     assert.equal(health.app, /<meta name="ia-version" content="([^"]*)"/.exec(root)![1]);
     assert.equal((await fetch(`${base}/app/`)).status, 200);
   });

@@ -4,7 +4,7 @@ Every UI of Iron Asylum, each built by Angular.
 
 | Folder | What it is | Served at |
 |---|---|---|
-| `app/` | the athlete's app: its source (`app/src/legacy/src/`, built into the repo root `index.html`), the Angular host, the Cordova iOS project and the e2e (`app/README.md`). Its own package for now, because Cordova keeps its platform and plugin list in the project root's `package.json`. | GitHub Pages, and `/app/` on the backend |
+| `app/` | the athlete's app: its source (`app/src/legacy/src/`, built into its page: `../dist-github-pages/`, and the repo root `index.html`, its committed copy until the Pages switch), the Angular host, the Cordova iOS project and the e2e (`app/README.md`). Its own package for now, because Cordova keeps its platform and plugin list in the project root's `package.json`. | GitHub Pages, and `/app/` on the backend |
 | `website/` | the public site | `/` on the backend |
 | `admin/` | the admin dashboard | `/admin/` on the backend |
 | `common/` | what more than one frontend uses: the icon set (`icon.ts`) and the design tokens every frontend shares (`tokens.css`, imported first by each `styles.css`) | |

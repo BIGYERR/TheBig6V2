@@ -4,12 +4,14 @@
 //   npx vitest run integration/rest-timer   one feature
 // Each test file runs in its own process (the default forks pool), so a file that patches node:vm or the app's globals
 // never reaches another. The golden files in snapshots/ are this suite's own (support/snapshot.ts), not Vitest's.
+// Before any test, support/global-setup.ts builds the app from its sources into dist-github-pages/, the page every test boots.
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
     environment: 'node',
     pool: 'forks',
+    globalSetup: ['./support/global-setup.ts'],
     projects: [
       // A unit or integration test boots the app in the VM: allow for a slow CI machine, but a hang still fails fast.
       {

@@ -6,7 +6,7 @@ A small Node (Express 5) service in TypeScript with four jobs today, all on one 
 
 1. **The website.** The public site at `/`: what the app is, how it works, its features, the race plans, how to
    put it on an iPhone, and an FAQ. A quiet **Staff Login** in its footer leads to the admin.
-2. **The app.** The PWA itself at `/app/`: the repo root `index.html`, the same file GitHub Pages serves, so one
+2. **The app.** The PWA itself at `/app/`: the page built from the app's source files, the same page GitHub Pages serves, so one
    backend (docker, this Mac, Heroku) hands people the app before the store builds exist. Every "open the app"
    button on the website goes here.
 3. **Heartbeat API.** The app checks in with a device UID and its version, and the server tells it whether it is
@@ -15,8 +15,8 @@ A small Node (Express 5) service in TypeScript with four jobs today, all on one 
    searchable table of every device, which app versions are in use and who runs an old one, and this backend's
    own facts. **Log out** ends the session on the server.
 
-The app's source is `frontends/app/src/legacy/src/`, from which the repo root `index.html` is built; this folder copies the
-root file (`scripts/app-bundle.ts`), and in dev mode builds `/app/` from the sources. The app
+The app's source is `frontends/app/src/legacy/src/`, from which its page is built (`frontends/app/scripts/build-index.mjs`);
+this folder builds `/app/` from the sources too (`scripts/app-bundle.ts`, and in dev mode on every save). The app
 side of the connection (`client/ia-link.js`) is ready, but it reaches the phone only through a version build. See
 [The app side](#the-app-side).
 
@@ -71,8 +71,7 @@ container. `npm run dev:down` stops it, and `npm run docker:up` puts back the pl
 | Save in | What happens | Typical time |
 |---|---|---|
 | `frontends/website/`, `frontends/admin/` or `frontends/common/` | `ng build --watch` in the frontends workspace rebuilds it (development build), the fast backend tests run, open pages reload | under a second |
-| `frontends/app/src/legacy/src/` (the app's source files) | the app is built from them into `app-web/index.html` with `frontends/app/scripts/build-index.mjs`, the function that builds the root `index.html` (the repo is never written), its inline script is parsed, open pages reload | under a second |
-| the repo root `index.html` | the app is copied to `app-web/`, its inline script is parsed, open pages reload | under a second |
+| `frontends/app/src/legacy/src/` (the app's source files) | the app is built from them into `app-web/index.html` with `frontends/app/scripts/build-index.mjs`, the one builder (the repo is never written), its inline script is parsed, the app's unit tests run, open pages reload | under a second |
 | `server/` | the server restarts, open pages reload when it is back, then tsc checks the server's types beside the fast backend tests | under a second |
 | `client/` | the fast backend tests run, open pages reload | under a second |
 
@@ -86,7 +85,7 @@ TypeScript source here** (`node server/server.ts`, Node strips the types), so a 
 check after each save is where a type error shows. Every other way to run it runs what tsc compiled.
 
 What the container may touch: the source folders (this folder's, and the website, the admin and `common/` from
-`../frontends/`) and the repo root (for `index.html`, its icon, and the app's source files with their build script)
+`../frontends/`) and the repo root (for the app's icon, and the app's source files with their build script)
 are mounted read-only; `dist/`, `app-web/` and `../frontends/dist/` are the only folders it writes. It is built from
 the repo root and lays the checkout out as the repo does, `/srv/backend` beside `/srv/frontends`. Its `node_modules`
 are the image's own (Linux), one set for this folder and one for the frontends workspace, and the Angular cache is a
@@ -107,7 +106,7 @@ line per request.
 |---|---|
 | `npm run build` | bundle the app into `app-web/` and compile the server into `dist/server/`. The website and the admin build in `../frontends/` (`npm run build` there, into `../frontends/dist/`) |
 | `npm run build:server` | compile the server alone (tsc, a second or two): clears `dist/server/`, then emits it |
-| `npm run app:bundle` | copy the repo root `index.html` and its icon into `app-web/`: the app at `/app/` |
+| `npm run app:bundle` | build the app's page from its source files, with its icon, into `app-web/`: the app at `/app/` |
 | `npm start` | the compiled server (`dist/server/`, so `npm run build:server` first) on http://localhost:3000, in the foreground |
 | `npm run dev` | **the full stack dev mode** (above): start the dev container, which rebuilds every part and reloads every page on save by itself, and follow its log |
 | `npm run dev:down` | stop the dev container (the devices volume stays) |
@@ -186,10 +185,10 @@ checks the dash part.
 
 ## The app at /app/
 
-`scripts/app-bundle.ts` copies the repo root `index.html` and `apple-touch-icon.png`, exactly what Pages serves, into
-`app-web/`, and the server serves that at `/app/` (the page revalidated on every load). Locally `npm run build`,
-`npm run docker:up` and the Mac runner copy it fresh; `heroku.sh deploy` adds the same two files to the tree it
-pushes, from the commit it deploys (`heroku.sh tree <ref>` prints that tree), so Heroku serves the app as of that
+`scripts/app-bundle.ts` builds the app's page from its source files and copies `apple-touch-icon.png` beside it, exactly
+what Pages serves, into `app-web/`, and the server serves that at `/app/` (the page revalidated on every load). Locally
+`npm run build`, `npm run docker:up` and the Mac runner build it fresh; `heroku.sh deploy` adds the same two files to the
+tree it pushes, the page built from the commit it deploys (`heroku.sh tree <ref>` prints that tree), so Heroku serves the app as of that
 commit. `/healthz` reports the bundled app's version as `app`.
 
 - **Its own origin.** The app at `/app/` keeps its data (programs, logs) in that server's origin, separate from the

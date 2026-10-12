@@ -14,7 +14,7 @@
 # finds the website and the admin where it does in a checkout: backend/, frontends/ without the app (the website, the
 # admin, common/ and their workspace files), and at the root heroku/'s package.json, lock file and Procfile, which build
 # the frontends and the server and start the server. The app the backend serves at /app/ is added as
-# backend/app-web/: the root index.html and its icon, from the same commit.
+# backend/app-web/: the page built from the same commit's source files (what Pages deploys from it) and its icon.
 set -euo pipefail
 
 # Always the checkout this script sits in. Git exports GIT_DIR and friends to hooks; with GIT_DIR set, git takes the
@@ -86,18 +86,40 @@ cmd_setup() {
   echo "Next: commit backend/, then run: bash backend/scripts/heroku.sh deploy"
 }
 
-# The tree deploy pushes for a ref: backend/ with app-web/ holding that ref's index.html and apple-touch-icon.png (what
-# the server serves at /app/, the same files Pages serves; locally scripts/app-bundle.ts fills app-web/ from the
-# working copy instead), frontends/ without the app, and backend/heroku/'s package.json, package-lock.json and Procfile
-# at the root.
+# The page /app/ serves for a ref, as a blob: built from that ref's source files with that ref's own builder
+# (frontends/app/scripts/build-index.mjs; exactly what Pages deploys from that commit); a ref from before the sources
+# existed carries it as its root index.html.
+# Runs in a command substitution, which set -e does not reach, so every step that can fail dies by name.
+app_page_blob() {
+  local ref="$1" tmp
+  if git cat-file -e "$ref:frontends/app/scripts/build-index.mjs" 2>/dev/null; then
+    tmp="$(mktemp -d)"
+    # git archive takes paths from the current folder (backend/); from the top they name the repo's layout.
+    git -C "$(git rev-parse --show-toplevel)" archive "$ref" frontends/app/scripts/build-index.mjs frontends/app/src/legacy/src |
+      tar -x -C "$tmp" || die "cannot extract the app's source files at $ref"
+    node --input-type=module -e "process.stdout.write((await import(process.argv[1])).buildIndex())" \
+      "$tmp/frontends/app/scripts/build-index.mjs" > "$tmp/index.html" || die "the app's source files at $ref do not build"
+    [ -s "$tmp/index.html" ] || die "the page built at $ref is empty"
+    git hash-object -w "$tmp/index.html" || die "cannot store the page built at $ref"
+    rm -rf "$tmp"
+  else
+    git rev-parse --verify --quiet "$ref:index.html" || die "no index.html at $ref"
+  fi
+}
+
+# The tree deploy pushes for a ref: backend/ with app-web/ holding the page built from that ref and its
+# apple-touch-icon.png (what the server serves at /app/, the same files Pages deploys; locally scripts/app-bundle.ts
+# fills app-web/ from the working copy instead), frontends/ without the app, and backend/heroku/'s package.json,
+# package-lock.json and Procfile at the root.
 deploy_tree() {
-  local ref="$1" app_tree backend_tree frontends_tree file blob
+  local ref="$1" app_tree backend_tree frontends_tree file blob page icon
+  page="$(app_page_blob "$ref")" || exit 1
+  icon="$(git rev-parse --verify --quiet "$ref:apple-touch-icon.png" || git rev-parse --verify --quiet "$ref:frontends/app/public/apple-touch-icon.png" || true)"
   app_tree="$(
-    for file in index.html apple-touch-icon.png; do
-      blob="$(git rev-parse --verify --quiet "$ref:$file")" || { [ "$file" = index.html ] && die "no index.html at $ref"; continue; }
-      printf '100644 blob %s\t%s\n' "$blob" "$file"
-    done | git mktree
+    printf '100644 blob %s\t%s\n' "$page" index.html
+    if [ -n "$icon" ]; then printf '100644 blob %s\t%s\n' "$icon" apple-touch-icon.png; fi
   )"
+  app_tree="$(printf '%s\n' "$app_tree" | git mktree)"
   backend_tree="$({ git ls-tree --full-tree "$ref:$PREFIX" | grep -v "	app-web$" || true; printf '040000 tree %s\tapp-web\n' "$app_tree"; } | git mktree)"
   frontends_tree="$({ git ls-tree --full-tree "$ref:frontends" || die "no frontends/ at $ref"; } | { grep -v "	app$" || true; } | git mktree)"
   {

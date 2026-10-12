@@ -1,7 +1,9 @@
 # syntax=docker/dockerfile:1
-# The e2e images. Build context is the repo root (see docker-compose.yml), because the app is generated from
-# the repo root index.html. Dockerfile.dockerignore keeps the context to the files these stages read.
-#   web     the Angular app built from source, served by nginx at /, with the original index.html at /reference/
+# The e2e images. Build context is the repo root (see docker-compose.yml), because the app's page is built from its
+# source files (frontends/app/src/legacy/src) and its icon sits at the root. Dockerfile.dockerignore keeps the context
+# to the files these stages read.
+#   web     the Angular app built from source, served by nginx at /, with the single-file page (what GitHub Pages
+#           deploys, built from the same sources) at /reference/
 #   runner  the Puppeteer suite (TypeScript, run by Node's type stripping) in the tests package, with @ia/core, which it
 #           reads versions through, and the Chrome for Testing its Puppeteer pins
 
@@ -15,15 +17,17 @@ FROM deps AS build
 COPY frontends/app/angular.json frontends/app/tsconfig.json frontends/app/tsconfig.app.json ./
 COPY frontends/app/scripts/ ./scripts/
 COPY frontends/app/src/ ./src/
-COPY index.html apple-touch-icon.png /repo/
+COPY apple-touch-icon.png /repo/
+# The single-file page and its icon, as GitHub Pages deploys them (frontends/app/scripts/build-index.mjs)
+RUN node --input-type=module -e "(await import('./scripts/build-index.mjs')).writePages()"
 RUN npm run build
 
 FROM nginx:1.29-alpine AS web
 COPY tests/e2e/nginx.conf /etc/nginx/conf.d/default.conf
 # The Angular build under test, at /
 COPY --from=build /repo/frontends/app/www /usr/share/nginx/html
-# The original single-file app, at /reference/, as the reference the Angular screens are compared against
-COPY index.html apple-touch-icon.png /srv/reference/
+# The single-file page, at /reference/, as the reference the Angular screens are compared against
+COPY --from=build /repo/dist-github-pages/ /srv/reference/
 
 FROM node:26-bookworm-slim AS runner
 ENV CI=1 PUPPETEER_SKIP_DOWNLOAD=1 PUPPETEER_CACHE_DIR=/opt/puppeteer HOME=/tmp

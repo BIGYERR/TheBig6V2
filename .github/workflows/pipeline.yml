@@ -3,11 +3,14 @@
 # dev into main by hand to release (no agent ever opens one). Branch protection lets main change only through that pull
 # request, and only when every check below passes on it.
 #
-#   push to dev                every check: index.html is the build of its sources, the type check and the unit,
+#   push to dev                every check: the page builds from its sources (dist-github-pages/, and the root
+#                              index.html is that build while Pages serves the branch), the type check and the unit,
 #                              integration and sweep tests (tests/unit, tests/integration, tests/sweeps), the app's,
 #                              the frontends' and the backend's tests, type checks and lint, and the Docker e2e. A newer push cancels the running one.
 #   pull request dev -> main   the same checks again, plus "PR source is dev". All must pass to merge.
-#   push to main (the merge)   the deploy proof: Pages built that commit and the live URL serves it.
+#   push to main (the merge)   Pages: dist-github-pages/ is built from the sources and, once the Pages source is "GitHub
+#                              Actions" (Mario's setting, handoff §12), deployed; then the deploy proof: Pages has that
+#                              commit and the live URL serves it.
 #   workflow_dispatch          run the checks by hand on any branch.
 #
 # Every job keeps its run log (temp/, tools/runlog.mjs) as an artifact, so a red check can be read the same way as a
@@ -66,10 +69,12 @@ jobs:
           if [ -z "$DOCTRINE_TXZ" ]; then echo "::error::The DOCTRINE_TXZ secret is not set, so the tests that read doctrine/*.txt cannot run."; exit 1; fi
           printf '%s' "$DOCTRINE_TXZ" | base64 -d | tar -xJf -
           echo "doctrine files: $(ls doctrine/*.txt | wc -l)"
-      - name: index.html is the build of frontends/app/src/legacy/src (byte for byte; frontends/app/scripts/build-index.mjs)
+      - name: Build dist-github-pages/ from frontends/app/src/legacy/src (the page every test boots; frontends/app/scripts/build-index.mjs)
+        run: node --input-type=module -e "(await import('./frontends/app/scripts/build-index.mjs')).writePages()"
+      - name: The root index.html is that build, byte for byte (the copy Pages serves while its source is the branch main)
         run: node frontends/app/scripts/build-index.mjs --check
-      - name: index.html boots and builds HALF_MANNY, self-stable (tests/harness.js)
-        run: node tests/harness.js index.html
+      - name: The page boots and builds HALF_MANNY, self-stable (tests/harness.js)
+        run: node tests/harness.js dist-github-pages/index.html
       - name: Let Chrome use its sandbox (Ubuntu 24 blocks unprivileged user namespaces through AppArmor; the e2e's own tests draw in Chrome)
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: npm ci in tests/ (Vitest, TypeScript, @ia/core, Puppeteer and its Chrome)
@@ -78,7 +83,7 @@ jobs:
       - name: Type check (core, tests)
         working-directory: tests
         run: npm run typecheck
-      - name: Vitest over tests/unit tests/integration tests/sweeps (index.html against tests/snapshots)
+      - name: Vitest over tests/unit tests/integration tests/sweeps (the page against tests/snapshots)
         working-directory: tests
         run: node ../tools/run.mjs tests -- npx vitest run unit integration sweeps
       - name: Keep the run log
@@ -153,8 +158,43 @@ jobs:
           path: temp/
           retention-days: 30
 
+  pages:
+    name: Pages (dist-github-pages)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Build dist-github-pages/ from frontends/app/src/legacy/src (the page and its icon, nothing else)
+        run: node --input-type=module -e "(await import('./frontends/app/scripts/build-index.mjs')).writePages()"
+      - name: The Pages source ("workflow" deploys from here; "legacy" still serves the branch main's root index.html)
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: echo "type=$(gh api repos/${{ github.repository }}/pages --jq .build_type)" >> "$GITHUB_OUTPUT"
+      - name: Upload dist-github-pages/
+        if: steps.source.outputs.type == 'workflow'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-github-pages
+      - name: Deploy it
+        id: deploy
+        if: steps.source.outputs.type == 'workflow'
+        uses: actions/deploy-pages@v4
+
   deployed:
     name: deploy proof (Pages)
+    needs: pages
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15

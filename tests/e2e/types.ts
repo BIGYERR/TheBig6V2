@@ -2,7 +2,7 @@
 
 export type Status = 'pass' | 'fail' | 'skipped';
 
-/** One step on one target (the Angular build or the original index.html). */
+/** One step on one target (the Angular build or the single-file page). */
 export interface TargetResult {
   status: Status;
   error?: string;

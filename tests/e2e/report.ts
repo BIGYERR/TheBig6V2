@@ -54,7 +54,7 @@ function card(s: StepResult, r: RunReport): string {
   ${notes(s)}
   <div class="shots">
     ${figure(s.angular.png, 'Angular build')}
-    ${figure(s.reference.png, 'Original index.html')}
+    ${figure(s.reference.png, 'Single-file page')}
     ${figure(diff, 'Pixel difference (red)', 'Not compared')}
   </div>
 </section>`;
@@ -210,7 +210,7 @@ export function renderReport(r: RunReport): string {
 <body>
 <main>
 <h1>Iron Asylum <span>e2e</span></h1>
-<div class="muted">The website and the admin, served by the backend, photographed full height; then the Angular build, driven by Puppeteer through every journey and compared screen by screen with the original index.html. All of it runs in Docker. This file is self-contained: every screenshot is embedded.</div>
+<div class="muted">The website and the admin, served by the backend, photographed full height; then the Angular build, driven by Puppeteer through every journey and compared screen by screen with the single-file page (what GitHub Pages deploys). All of it runs in Docker. This file is self-contained: every screenshot is embedded.</div>
 <div class="verdict ${r.ok ? 'pass' : 'fail'}">${r.ok ? 'All checks passed' : 'Failed'}</div>
 <div class="summary">
   <div class="tile"><div class="muted">Steps passed</div><div class="v">${passed} / ${total}</div>${r.pages.length ? `<div class="muted">website ${tally(website)} · admin ${tally(admin)} · app ${tally(r.steps)}</div>` : ''}</div>
@@ -221,7 +221,7 @@ export function renderReport(r: RunReport): string {
 <div class="tile" style="margin-bottom:20px"><dl>
   <dt>Ran</dt><dd>${esc(r.ranAt)}</dd>
   <dt>Served from</dt><dd class="mono">app ${esc(r.baseUrl)} (nginx container); website and admin ${esc(r.backendUrl)} (backend container); tests/e2e/docker-compose.yml</dd>
-  <dt>Source</dt><dd class="mono">index.html sha256 ${esc(r.sourceSha256 ?? 'unknown')}</dd>
+  <dt>Source</dt><dd class="mono">page sha256 ${esc(r.sourceSha256 ?? 'unknown')}</dd>
   <dt>Browser</dt><dd>${esc(r.browserVersion)} in the runner container, ${r.viewport.width}×${r.viewport.height} @${r.viewport.deviceScaleFactor}x, touch</dd>
   <dt>Clock</dt><dd>Frozen at ${esc(r.frozenNow)} (${esc(r.timezone)}); Math.random seeded; animations off</dd>
   <dt>Blocked</dt><dd>${r.blocked.length ? esc(r.blocked.join(', ')) : 'No requests needed blocking (the bug form was never sent)'}</dd>

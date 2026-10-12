@@ -1,5 +1,5 @@
-// scripts/version.mjs, the app's one reader of the root index.html's ia-version, against a hand table, the real
-// config.xml and the live index.html, and against tests/semver.js (the gates' reader): both give every input one answer.
+// scripts/version.mjs, the app's one reader of the page's ia-version, against a hand table, the real config.xml and the
+// page's meta (html/head.html), and against tests/semver.js (the gates' reader): both give every input one answer.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -75,10 +75,10 @@ describe('version: metaVersion', () => {
     assert.throws(() => metaVersion(page('')), /holds "", which is not a version/);
   });
 
-  it('reads the live index.html: a legacy integer or a dotted M.m.p, as written', () => {
-    const html = readFileSync(join(APP, '..', '..', 'index.html'), 'utf8');
+  it("reads the page's meta (its source, html/head.html): a legacy integer or a dotted M.m.p, as written", () => {
+    const html = readFileSync(join(APP, 'src', 'legacy', 'src', 'html', 'head.html'), 'utf8');
     const meta = /<meta name="ia-version" content="([^"]*)"/.exec(html);
-    assert.ok(meta, 'index.html carries an ia-version meta');
+    assert.ok(meta, 'html/head.html carries an ia-version meta');
     assert.match(meta[1]!, /^(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*))?$/);
     assert.equal(metaVersion(html), meta[1]);
   });

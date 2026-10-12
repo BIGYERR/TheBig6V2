@@ -62,7 +62,7 @@ function readConfig() {
 }
 
 /**
- * Keeps the native version in step with the root index.html's ia-version: version and build are both its canonical
+ * Keeps the native version in step with the page's ia-version: version and build are both its canonical
  * M.m.p (239 -> 0.239.0, 0.239.1 -> 0.239.1; scripts/version.mjs). Returns that M.m.p.
  */
 function syncNativeVersion() {

@@ -1,20 +1,21 @@
 # The app's source files
 
-These files are Iron Asylum's source. The repo root `index.html` (the page GitHub Pages serves, the native app wraps
-and every test boots) is built from them and is never edited by hand.
+These files are Iron Asylum's source. Its page, `index.html` (what GitHub Pages serves, the native app wraps and every
+test boots), is built from them into `dist-github-pages/` by `frontends/app/scripts/build-index.mjs`, with a committed
+copy at the repo root until the Pages source switches to GitHub Actions; neither is ever edited by hand.
 
 ## How to change the app
 
 1. Edit the file under `frontends/app/src/legacy/src/` that holds the code (`grep -rn <name> frontends/app/src/legacy/src/js` finds it).
-2. Rebuild the root file: `cd frontends/app && npm run build:index`. It first rewrites each JS file's module blocks
-   (below) from the code, then builds.
-3. Commit the source files and `index.html` together.
+2. Rebuild: `cd frontends/app && npm run build:index`. It first rewrites each JS file's module blocks (below) from the
+   code, then builds the page into `dist-github-pages/` and the root copy.
+3. Commit the source files and the root `index.html` together.
 
 `npm run build:index:check` fails unless `index.html` is exactly the build of these files, and prints the first byte
 that differs and the source file it comes from. The 60-second check (`tools/check.mjs`) and CI run it, so a hand edit
 to `index.html`, or a source edit that was never rebuilt, cannot land. In dev mode (`cd backend && npm run dev`) a
-saved source file rebuilds the app at http://localhost:3000/app/ within a second; the root file still needs
-`npm run build:index`.
+saved source file rebuilds the app at http://localhost:3000/app/ within a second; the root copy still needs
+`npm run build:index`. The tests build the page themselves before every run (`tests/support/global-setup.ts`).
 
 ## How the build works
 

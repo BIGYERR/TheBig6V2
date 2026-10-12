@@ -83,8 +83,8 @@ function saveLog(service: string, file: string): void {
 }
 
 /**
- * backend/Dockerfile copies app-web/, the app the backend serves at /app/, which is made on the host from the repo's
- * index.html (backend/scripts/app-bundle.ts, Node alone, no install). Done here so the image never needs a step by
+ * backend/Dockerfile copies app-web/, the app the backend serves at /app/, which is built on the host from the app's
+ * source files (backend/scripts/app-bundle.ts, Node alone, no install). Done here so the image never needs a step by
  * hand, locally or in CI.
  */
 function bundleApp(): void {
