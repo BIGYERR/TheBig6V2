@@ -4,6 +4,8 @@ import { LegacyBridge } from '../../legacy/legacy-bridge';
 import { ChartCard } from './charts/chart-card';
 import type { CardSpec } from './charts/chart-card-model';
 import { DotChart } from './charts/dot-chart';
+import { LedgerCards } from './charts/ledger-cards';
+import type { LedgerModel, LedgerView } from './charts/ledger-model';
 import type { DotSpec } from './charts/dot-chart-model';
 import {
   CALC_LIFTS, chartChunks, type DayLog, estimate1RM, type ExRow, journalWeeks, type ProgressProgram, viewedProgram, weeklySums,
@@ -25,7 +27,7 @@ interface ScreenView {
   /** 'none' before anything is logged, 'charts' when there is nothing to chart, null when there is. */
   empty: 'none' | 'charts' | null;
   emptyIcon: SafeHtml;
-  charts: ({ kind: 'dot'; spec: DotSpec } | { kind: 'card'; spec: CardSpec } | { kind: 'html'; html: SafeHtml })[];
+  charts: ({ kind: 'dot'; spec: DotSpec } | { kind: 'card'; spec: CardSpec } | { kind: 'ledger'; view: LedgerView })[];
   journal: { title: SafeHtml; caret: SafeHtml; weeks: { week: number; open: boolean; count: string; entries: EntryView[] }[] } | null;
   estimator: { title: SafeHtml } | null;
 }
@@ -34,14 +36,14 @@ interface ScreenView {
  * The Progress screen's body (architecture phase E, step 13), in place of the legacy renderProgressScreen inside
  * #progressBody. It takes over renderProgressScreen through LegacyBridge.provide (the tab, the program chips, the
  * restore and delete bar all call it). The arrangement, the weekly sums, the Session Journal and the 1RM estimator are
- * the component's, and so are the weekly dot charts (DotChart, step 14) and the run charts (ChartCard, step 15); the
- * chips and the Lift Ledger are still the legacy builders' markup, each laid in a box that makes none of its own, and
- * move in later steps. The estimator's lift is still the legacy `calcLift`.
+ * the component's, and so are the weekly dot charts (DotChart, step 14), the run charts (ChartCard, step 15) and the
+ * Lift Ledger (LedgerCards, step 16); the program chips are still the legacy builder's markup, laid in a box that makes
+ * none of its own, and move in a later step. The estimator's lift is still the legacy `calcLift`.
  */
 @Component({
   selector: 'ia-progress-screen',
   host: { style: 'display: contents' },
-  imports: [ChartCard, DotChart],
+  imports: [ChartCard, DotChart, LedgerCards],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @for (v of views(); track v) {
@@ -57,7 +59,7 @@ interface ScreenView {
       @switch (c.kind) {
         @case ('dot') { <ia-dot-chart [spec]="c.spec" /> }
         @case ('card') { <ia-chart-card [spec]="c.spec" /> }
-        @case ('html') { <div style="display:contents" [innerHTML]="c.html"></div> }
+        @case ('ledger') { <ia-ledger-cards [view]="c.view" /> }
       }
     }
     @if (v.journal; as j) {
@@ -200,8 +202,7 @@ export class ProgressScreen {
       recoveryPaceWeekly: (...a) => b.call('recoveryPaceWeekly', ...a),
       plannedVsLogged: (...a) => b.call('plannedVsLogged', ...a),
       exWeights: () => b.call('getExWeightsFor', vid),
-      ledgerModel: (...a) => b.call('ledgerModel', ...a),
-      ledgerCards: (...a) => b.call('buildLedgerCards', ...a),
+      ledgerModel: (...a) => b.call<LedgerModel>('ledgerModel', ...a),
       run: {
         pace: (sec) => b.call<string>('_fmtPaceShort', sec),
         icon: (n, s) => this.icon(n, s),
@@ -238,10 +239,10 @@ export class ProgressScreen {
         })),
       }
       : null;
-    const empty = !charts.some((c) => c.kind !== 'html' || c.html) && !journal ? 'charts' : null;
+    const empty = !charts.some((c) => c.kind !== 'ledger' || c.view.mains || c.view.ladder || c.view.other) && !journal ? 'charts' : null;
     this.view.set({
       chips, empty, emptyIcon,
-      charts: charts.map((c) => (c.kind === 'html' ? { kind: 'html' as const, html: this.html(c.html) } : c)),
+      charts,
       journal,
       estimator: { title: this.html(this.icon('🧮', 15) + ' 1RM Estimator') },
     });

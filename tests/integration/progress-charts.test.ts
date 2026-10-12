@@ -3,7 +3,8 @@
 // architecture phase E step 15). The oracle here is the legacy builder itself, lifted out of the page with appFunction:
 // for every input below, the spec written back out in the legacy markup format is the legacy builder's markup, byte for
 // byte. The inputs walk each builder's branches (the null cases, the race line, the cut and short first week, the
-// target line, coarse and fine grids). The app's own unit tests hold hand-worked values for the same functions.
+// target line, coarse and fine grids). The Lift Ledger (ledger-model.ts, step 16) is held the same way to the legacy
+// buildLedgerCards. The app's own unit tests hold hand-worked values for the same functions.
 import { describe, test } from 'vitest';
 import assert from 'node:assert/strict';
 import { appFunction } from '../support/app.ts';
@@ -11,6 +12,7 @@ import type { CardSpec, SvgEl } from '../../frontends/app/src/app/screens/progre
 import {
   driftChart, easyBandsFallback, easyEffortChart, easyEffortEmpty, easyZoneChart, ladderChart, paceChart, projectionCard, type RunChartDeps,
 } from '../../frontends/app/src/app/screens/progress/charts/run-charts-model.ts';
+import { type LedgerModel, type LedgerView, ledgerView, type Picture } from '../../frontends/app/src/app/screens/progress/charts/ledger-model.ts';
 
 type Fn = (...a: any[]) => string;
 const icon = (n: string, s: number) => `[${n}/${s}]`;
@@ -116,3 +118,88 @@ same('Recovery Pace, Easy-Effort Trend', [
   ['twenty weeks, no two neighbours', () => legacy.pace('t', Array.from({ length: 20 }, (_, i) => i + 1), Array.from({ length: 20 }, (_, i) => (i % 2 ? null : 700 - i)), 0, '#7e5e96'), () => paceChart('t', Array.from({ length: 20 }, (_, i) => i + 1), Array.from({ length: 20 }, (_, i) => (i % 2 ? null : 700 - i)), 0, '#7e5e96', d)],
   ['nothing: one week', () => legacy.pace('t', [1, 2], [600, null], 610, 'var(--run)'), () => paceChart('t', [1, 2], [600, null], 610, 'var(--run)', d)],
 ]);
+
+// ── the Lift Ledger ─────────────────────────────────────────────────────────────────────────────────────────────
+const _axTx = base._axTx;
+const _ladderTrack = appFunction('_ladderTrack', { _axTx });
+const legacyLedger = appFunction<(m: LedgerModel, unit: string) => string>('buildLedgerCards', {
+  ...base, buildMainLiftBlock: appFunction('buildMainLiftBlock', { _axTx }), _ladderRow: appFunction('_ladderRow', { _ladderTrack }),
+});
+
+/** A ledger view written out as buildLedgerCards wrote it. */
+function ledgerMarkup(v: LedgerView): string {
+  const el = (e: SvgEl) => {
+    const attrs = Object.entries(e.a).map(([k, val]) => ` ${k}="${val}"`).join('');
+    return e.el === 'text' ? `<text${attrs}>${e.text}</text>` : `<${e.el}${attrs}/>`;
+  };
+  const pic = (p: Picture) => `<svg viewBox="${p.viewBox}" style="${p.style}">${p.els.map(el).join('')}</svg>`;
+  const card = (title: string, color: string, inner: string, foot: string) =>
+    '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">'
+    + `<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:${color};margin-bottom:12px">${title}</div>`
+    + inner + `<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">${foot}</div></div>`;
+  let out = '';
+  if (v.mains) {
+    out += card(v.mains.title, 'var(--lift)', v.mains.blocks.map((b) => '<div style="padding:12px 0;border-bottom:1px solid var(--border)">'
+      + '<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">'
+      + `<div style="font-size:13px;color:var(--text);font-weight:600;line-height:1.3">${b.name}</div>`
+      + `<div style="font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--lift);white-space:nowrap">${b.top}</div></div>`
+      + `<div style="font-size:11px;color:var(--muted);margin:2px 0 8px">Opened at <b style="color:var(--text)">${b.opened}</b>${b.afterOpened}`
+      + (b.gain ? `<b style="color:var(--lift)">${b.gain}</b>${b.afterGain}` : '') + '</div>' + (b.chart ? pic(b.chart) : '') + '</div>').join(''), v.mains.foot);
+  }
+  if (v.ladder) {
+    const l = v.ladder;
+    const head = '<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:2px">'
+      + `<div style="font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:-0.02em;color:${l.ready ? 'var(--signal)' : 'var(--muted)'};line-height:1.05">${l.ready}</div>`
+      + '<div style="font-size:13px;color:var(--text);font-weight:600">ready to move up</div></div>'
+      + '<div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px">'
+      + (l.ups ? `You have stepped the weight up <b style="color:var(--text)">${l.ups} time${l.ups === 1 ? '' : 's'}</b> across these lifts this block. ` : '')
+      + 'Hit the top of the range on every set, then add weight and start back at the bottom.</div>';
+    const rows = l.rows.map((r) => '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">'
+      + '<div style="flex:1;min-width:0">'
+      + `<div style="font-size:12px;color:var(--text);font-weight:500;line-height:1.3">${r.name}</div>`
+      + `<div style="font-size:10px;color:var(--muted);margin-top:2px"><b style="color:var(--text)">${r.weight}</b>${r.detail}</div>`
+      + '<div style="margin-top:3px">' + (r.ready
+        ? '<span style="font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--signal)">Add weight</span>'
+        : `<span style="font-size:10px;color:var(--muted)">${r.toGo} to go</span>`) + '</div></div>'
+      + `<div style="flex-shrink:0">${pic(r.track)}</div></div>`).join('');
+    out += card(l.title, 'var(--lift)', head + rows, l.foot);
+  }
+  if (v.other) {
+    out += card(v.other.title, 'var(--muted)', v.other.rows.map((r) => '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">'
+      + `<div style="font-size:12px;color:var(--text)">${r.name}</div><div style="font-size:10px;color:var(--muted);white-space:nowrap">${r.meta}</div></div>`).join(''), v.other.foot);
+  }
+  return out;
+}
+
+const LEDGER: LedgerModel = {
+  mains: [
+    { name: 'Back squat', mode: 'load', series: [{ w: 1, v: 225 }, { w: 2, v: 235 }, { w: 3, v: 245 }, { w: 5, v: 240 }], heavy: { v: 245, reps: 5, week: 3 }, first: { v: 225, reps: 5, week: 1 }, accessoryDay: 1, noLoad: 2 },
+    { name: 'Barbell bench press', mode: 'load', series: [{ w: 2, v: 185 }], heavy: { v: 185, reps: null, week: 2 }, first: { v: 185, reps: null, week: 2 }, accessoryDay: 0, noLoad: 1 },
+    { name: 'Pullups', mode: 'reps', series: [{ w: 1, v: 8 }, { w: 2, v: 10 }], heavy: { v: 10, reps: null, week: 2 }, first: { v: 8, reps: null, week: 1 }, accessoryDay: 0, noLoad: 0 },
+  ],
+  ladder: [
+    { name: 'Dumbbell row', wt: 70, lo: 8, hi: 12, sets: [12, 12, 12], ready: true, ups: 2, sessions: 4 },
+    { name: 'Lateral raise', wt: 20, lo: 10, hi: 15, sets: [12, 12, 10], ready: false, ups: 0, sessions: 3 },
+    { name: 'Face pull', wt: 40, lo: 15, hi: 15, sets: [15], ready: true, ups: 1, sessions: 1 },
+  ],
+  plain: [{ name: 'Farmer carry', wt: 70, sets: [], sessions: 3, range: [60, 70] }, { name: 'Sled push', wt: 90, sets: [], sessions: 1, range: [90, 90] }],
+  unloaded: [{ name: 'Plank hold', sessions: 4, reps: 0 }, { name: 'Pushups', sessions: 2, reps: 1250 }],
+};
+
+describe('the Lift Ledger', () => {
+  for (const [label, model, unit] of [
+    ['every card, in pounds', LEDGER, 'lbs'],
+    ['every card, in kilograms', LEDGER, 'kg'],
+    ['main lifts alone, nothing kept off the line', { ...LEDGER, mains: [LEDGER.mains[2]!], ladder: [], plain: [], unloaded: [] }, 'lbs'],
+    ['the ladder alone, nothing stepped up, nothing ready', { mains: [], ladder: [{ ...LEDGER.ladder[1]!, ups: 0 }], plain: [], unloaded: [] }, 'lbs'],
+    ['other work alone', { mains: [], ladder: [], plain: [], unloaded: LEDGER.unloaded }, 'lbs'],
+    ['nothing at all', { mains: [], ladder: [], plain: [], unloaded: [] }, 'lbs'],
+  ] as [string, LedgerModel, string][]) {
+    test(label, () => {
+      const want = legacyLedger(model, unit);
+      assert.equal(ledgerMarkup(ledgerView(model, unit, icon)), want);
+      if (label === 'nothing at all') assert.equal(want, '');
+      else assert.notEqual(want, '');
+    });
+  }
+});

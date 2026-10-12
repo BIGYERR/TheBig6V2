@@ -2,12 +2,13 @@
 // (architecture phase E, step 13: the screen moves from the legacy renderProgressScreen to the ProgressScreen
 // component). This decides which program is shown, sums each week, picks the charts in the legacy order, and lays out
 // the Session Journal and the 1RM estimator. The weekly dot charts (charts/dot-chart-model.ts, step 14) and the run
-// charts (charts/run-charts-model.ts, step 15) are drawn by components; the stores, the readers the charts take, the
-// program chips and the Lift Ledger are still the legacy script's. Strings the legacy wrote into the page as markup
+// charts (charts/run-charts-model.ts, step 15) and the Lift Ledger (charts/ledger-model.ts, step 16) are drawn by
+// components; the stores, the readers the charts take and the program chips are still the legacy script's. Strings the legacy wrote into the page as markup
 // stay markup here (the notes, the swap line and the jog lines), so the page reads as it did.
 
 import type { CardSpec } from './charts/chart-card-model.ts';
 import { dotChart, type DotSpec } from './charts/dot-chart-model.ts';
+import { type LedgerModel, type LedgerView, ledgerView } from './charts/ledger-model.ts';
 import {
   driftChart, type EasyEffort, easyBandsFallback, easyEffortChart, easyEffortEmpty, easyZoneChart, ladderChart, paceChart, type PlannedVsLogged,
   projectionCard, type RunChartDeps, type RunsByClass, type ZoneRun,
@@ -105,7 +106,7 @@ export function weeklySums(logs: Record<string, DayLog>, exw: Record<string, ExR
   return wd;
 }
 
-/** The legacy readers the charts take, the run charts' pieces, and the Lift Ledger's builder, still legacy. */
+/** The legacy readers the charts take, and the run charts' pieces. */
 export interface ChartDeps {
   icon(name: string, size: number): string;
   ladderWeekly(logs: unknown, tw: number, cut: number, skip1: boolean): Record<number, number>;
@@ -115,8 +116,7 @@ export interface ChartDeps {
   recoveryPaceWeekly(logs: unknown, hist: unknown, tw: number): { nWeeks: number; weekly: Record<number, number | null | undefined>; tgt: number | null };
   plannedVsLogged(logs: unknown, hist: unknown, tw: number, cut: number, skip1: boolean): PlannedVsLogged;
   exWeights(): unknown;
-  ledgerModel(exw: unknown, hist: unknown): unknown;
-  ledgerCards(model: unknown, unit: string): string;
+  ledgerModel(exw: unknown, hist: unknown): LedgerModel;
   run: RunChartDeps;
 }
 
@@ -133,8 +133,8 @@ export interface ChartInput {
   cfg: NonNullable<ProgressProgram['cfg']>;
 }
 
-/** One chart on the screen: a weekly dot chart, a chart card, or the Lift Ledger's legacy markup. */
-export type ChartBlock = { kind: 'dot'; spec: DotSpec } | { kind: 'card'; spec: CardSpec } | { kind: 'html'; html: string };
+/** One chart on the screen: a weekly dot chart, a chart card, or the Lift Ledger. */
+export type ChartBlock = { kind: 'dot'; spec: DotSpec } | { kind: 'card'; spec: CardSpec } | { kind: 'ledger'; view: LedgerView };
 
 /** The charts and the Lift Ledger, in the legacy order. A chart with nothing to show is left out, as the legacy drew nothing. */
 export function chartChunks(c: ChartInput, d: ChartDeps): ChartBlock[] {
@@ -181,7 +181,7 @@ export function chartChunks(c: ChartInput, d: ChartDeps): ChartBlock[] {
   }
   const rpeData = weeks.map((w) => c.sums[w]!.rpe || null);
   if (rpeData.some((v) => v !== null)) dot(dotChart(d.icon('💡', 15) + ' Average Session RPE', weeks, rpeData, '#7e5e96', '', 10));
-  out.push({ kind: 'html', html: d.ledgerCards(d.ledgerModel(d.exWeights(), c.hist), c.cfg.unit || 'lbs') });
+  out.push({ kind: 'ledger', view: ledgerView(d.ledgerModel(d.exWeights(), c.hist), c.cfg.unit || 'lbs', d.icon) });
   return out;
 }
 

@@ -21,15 +21,14 @@ function stubs(over: Partial<ChartDeps> = {}): { deps: ChartDeps; calls: string[
     recoveryPaceWeekly: rec('recoveryPaceWeekly', { nWeeks: 0, weekly: {}, tgt: null }),
     plannedVsLogged: rec('plannedVsLogged', {}),
     exWeights: rec('exWeights', {}),
-    ledgerModel: rec('ledgerModel', 'LM'),
-    ledgerCards: (..._a: unknown[]) => (calls.push('ledgerCards'), '<ledger>'),
+    ledgerModel: rec('ledgerModel', { mains: [], ladder: [], plain: [], unloaded: [{ name: 'Plank hold', sessions: 2, reps: 0 }] }),
     run: { pace: (sec) => `${sec}s`, icon: (n) => `[${n}]`, mileFromRecovery: (sec) => sec * 0.6, halfFromMile: (sec) => sec * 21, easyRpeLo: 3, easyRpeHi: 4, easyMinRuns: 6, easyZoneMinRuns: 4 },
     ...over,
   };
   return { deps, calls };
 }
 /** A block as a line: a dot chart by its title, a legacy builder by its markup. */
-const line = (b: ChartBlock) => (b.kind === 'html' ? b.html : b.kind + ' ' + b.spec.title);
+const line = (b: ChartBlock) => (b.kind === 'ledger' ? 'ledger' : b.kind + ' ' + b.spec.title);
 
 function input(over: Partial<ChartInput> = {}): ChartInput {
   const sums = weeklySums({}, {}, 3);
@@ -72,9 +71,9 @@ describe('the Progress screen', () => {
     const out = chartChunks(input({ sums, cardioTypes: ['run'], skip1: true }), deps);
     assert.deepEqual(out.map(line), [
       'dot [🏃] Weekly Running Mileage', 'card [🏃] Long Run Ladder', 'card [🏃] Is Your Easy Actually Easy?',
-      'card [🏃] Mileage — Drift From Plan', 'dot [💡] Average Session RPE', '<ledger>',
+      'card [🏃] Mileage — Drift From Plan', 'dot [💡] Average Session RPE', 'ledger',
     ]);
-    assert.deepEqual(calls, ['ladderWeekly', 'easyVsPrescribed', 'runsByClass', 'easyEffortWeekly', 'recoveryPaceWeekly', 'plannedVsLogged', 'exWeights', 'ledgerModel', 'ledgerCards']);
+    assert.deepEqual(calls, ['ladderWeekly', 'easyVsPrescribed', 'runsByClass', 'easyEffortWeekly', 'recoveryPaceWeekly', 'plannedVsLogged', 'exWeights', 'ledgerModel']);
     const [mileage, , , , rpe] = out;
     assert.ok(mileage?.kind === 'dot' && rpe?.kind === 'dot');
     assert.deepEqual([mileage.spec.points.length, mileage.spec.total, mileage.spec.unit, mileage.spec.color], [1, '4.0', 'mi', 'var(--run)'], 'the short first week withheld');
@@ -93,11 +92,12 @@ describe('the Progress screen', () => {
   it('charts swim and bike when there is something to chart, planned or not, and only the ledger with nothing else', () => {
     const { deps, calls } = stubs();
     const planned = chartChunks(input({ sums: weeklySums({ w3_fri: { bike_mins: 30 } }, {}, 3), cardioTypes: ['swim'] }), deps);
-    assert.deepEqual(planned.map(line), ['dot [🚴] Weekly Cycling Time', '<ledger>'], 'a planned swim with nothing logged draws nothing, as before');
+    assert.deepEqual(planned.map(line), ['dot [🚴] Weekly Cycling Time', 'ledger'], 'a planned swim with nothing logged draws nothing, as before');
     const logged = chartChunks(input({ sums: weeklySums({ w2_sat: { swim_yards: 800 } }, {}, 3) }), deps);
-    assert.deepEqual(logged.map(line), ['dot [🏊] Weekly Swimming Volume', '<ledger>'], 'a logged swim charts without a plan');
-    assert.deepEqual(calls, ['exWeights', 'ledgerModel', 'ledgerCards', 'exWeights', 'ledgerModel', 'ledgerCards']);
-    assert.deepEqual(chartChunks(input(), stubs().deps), [{ kind: 'html', html: '<ledger>' }]);
+    assert.deepEqual(logged.map(line), ['dot [🏊] Weekly Swimming Volume', 'ledger'], 'a logged swim charts without a plan');
+    assert.deepEqual(calls, ['exWeights', 'ledgerModel', 'exWeights', 'ledgerModel']);
+    const lone = chartChunks(input(), stubs().deps);
+    assert.deepEqual([lone.length, lone[0]?.kind === 'ledger' && lone[0].view.other?.rows], [1, [{ name: 'Plank hold', meta: '2 sessions' }]]);
   });
 
   it('groups the journal by week in time, opens only the latest week, and keeps markup as markup', () => {

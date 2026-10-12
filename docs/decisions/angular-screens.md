@@ -315,3 +315,24 @@ what is stored.
   chart order. No e2e journey logs runs across weeks, so a local comparison stubbed the readers in both builds over
   three scenarios and matched all 22 chart cards in pixels at 2×.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.23 moves Progress's Lift Ledger
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.23.
+- **Moved:** the legacy `buildLedgerCards`, `buildMainLiftBlock`, `_ladderRow` and `_ladderTrack`:
+  `src/app/screens/progress/charts/ledger-cards.ts` (Main Lifts, the Range Ladder, Other Accessory Work, in the legacy
+  markup), `ledger-model.ts` (each card's words and numbers, a main lift's line and an accessory's rep-range track as
+  SVG elements), `card-shell.ts` (the legacy `_iaCard` as a shell around projected content) and `svg-picture.ts` (an
+  SVG from elements, shared). The rows still come from the legacy `ledgerModel`. With this step no chart on the
+  screen is legacy markup; the Progress model's blocks are dot charts, chart cards and the ledger.
+- **Text runs:** a run of text the legacy wrote as one text node stays one: the first draft split " in week 2 ·
+  heaviest in week 2" around an `@if` into two nodes, and Chrome placed the letters across the join a pixel apart (13
+  to 21 pixels in a card). The model now hands back each run as the legacy markup cut it.
+- **Tests:** `tests/integration/progress-charts.test.ts` gains six ledgers written back out in the legacy format and
+  held to `buildLedgerCards` byte for byte (every card in pounds and kilograms, a reps main alone, an unready ladder
+  with nothing stepped up, other work alone, nothing at all). `frontends/app/test/unit/ledger.test.ts` (6) holds
+  hand-worked values (the unit conversion, the gain and the bold dot, a single session and a reps main, the track's
+  ticks and nudged dots, a ready track, every card's words). No e2e journey logs loads, so a local comparison stubbed
+  `ledgerModel` in both builds and matched every card in pixels, in pounds and in kilograms. The e2e still shows
+  Other Accessory Work in the log-session journey.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
