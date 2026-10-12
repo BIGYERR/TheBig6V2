@@ -1,144 +1,41 @@
 #!/usr/bin/env node
-// npm run dev: the whole stack on this Mac, rebuilt as you edit. Start it once and leave it running.
+// npm run dev: the whole stack on http://localhost:3000, rebuilt as you save, by the dev container.
 //
-//   website  http://localhost:3000/        site/          ng build --watch (development build, about a second)
-//   app      http://localhost:3000/app/    ../index.html  copied to app-web/ on every save (instant)
-//   admin    http://localhost:3000/admin/  admin/         ng build --watch
-//   server                                 server/        type-checked, and the server restarts (about a second)
-//   snippet  http://localhost:3000/client/ client/        served as saved
+//   npm run dev                  start the dev container (building its image when something baked into it changed),
+//                                then follow its log. Ctrl-C stops following; the container keeps running and rebuilding
+//   npm run dev:down             stop it (the devices volume stays)
+//   npm run dev -- --no-docker   the same watcher on this Mac's Node instead, in the foreground; Ctrl-C stops it
 //
-// It runs in the docker backend: docker-compose.yml with docker-compose.dev.yml laid over it, so the same container,
-// port and devices volume as npm run docker:up, serving these folders live instead of the image's copies.
-// --no-docker runs the server with this Mac's Node instead. After each change it runs the fast tests that change can
-// break, each set stopped at 3 s, then every open page reloads itself (server/dev.ts). The server runs from its
-// TypeScript source as Node strips the types, so a change under server/ is also type-checked (tsc), beside the tests. It replaces none of the real
-// checks: the pre-commit check, CI, and the build paths for devices in app/ (emulator-ios, device-ios, pwa-pages).
-//
-// Ctrl-C stops the watchers. The container keeps serving the last build; npm run docker:up puts back the plain image.
+// The container is the docker backend's own (docker-compose.yml with docker-compose.dev.yml laid over it): the same
+// name, port and devices volume as npm run docker:up, which puts back the plain production image. It runs
+// scripts/dev-watch.ts from Dockerfile.dev, which rebuilds site/, admin/, server/, client/ and the repo root index.html
+// as they are saved, with nothing running on this Mac, and comes back whenever Docker starts (restart: unless-stopped).
+// It shows a change; it proves nothing. The pre-commit check, CI, and the build paths for devices in app/ do that.
 import { spawn } from 'node:child_process';
-import type { ChildProcess, SpawnOptions } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, statSync, watch } from 'node:fs';
-import { createInterface } from 'node:readline';
+import type { SpawnOptions } from 'node:child_process';
+import { existsSync, mkdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import vm from 'node:vm';
 
 const BACKEND = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const REPO = resolve(BACKEND, '..');
 const PORT = Number(process.env.API_PORT || 3000);
 const BASE = `http://localhost:${PORT}`;
 const DOCKER = !process.argv.includes('--no-docker');
 const COMPOSE = ['compose', '-f', 'docker-compose.yml', '-f', 'docker-compose.dev.yml'];
-const TEST_LIMIT_MS = 3_000;
-const NG = join(BACKEND, 'node_modules', '.bin', 'ng');
-const TSC = join(BACKEND, 'node_modules', '.bin', 'tsc');
-// The backend tests that finish in well under a second: no child processes, no git. npm test runs every file.
-const FAST_TESTS = ['server', 'auth', 'versions', 'site', 'client', 'dev', 'request-log', 'semver-parity']
-  .map((name) => `test/${name}.test.ts`)
-  .filter((file) => existsSync(join(BACKEND, file)));
 
-// ── Output: one line per event, `time  lane  what` ──────────────────────────────────────────────────────────────
-const TONES = { ok: 32, bad: 31, warn: 33, dim: 2, info: 36 };
-type Tone = keyof typeof TONES;
-const paint = (tone: Tone | undefined, s: string) => (process.stdout.isTTY && tone ? `\x1b[${TONES[tone]}m${s}\x1b[0m` : s);
-function log(lane: string, msg: string, tone?: Tone) {
-  console.log(`${paint('dim', new Date().toTimeString().slice(0, 8))}  ${lane.padEnd(8)}${paint(tone, msg)}`);
-}
+const say = (msg: string) => console.log(`  ${msg}`);
 
-/** How a command ended, and everything it printed. */
-interface Ran {
-  code: number | null;
-  signal?: NodeJS.Signals | null;
-  out: string;
-}
-
-/** Runs a command to the end: { code, out }. */
-function exec(cmd: string, args: string[], opts: SpawnOptions = {}): Promise<Ran> {
+/** Runs a command to the end and returns its exit code and everything it printed. */
+function exec(cmd: string, args: string[], opts: SpawnOptions = {}): Promise<{ code: number; out: string }> {
   return new Promise((done) => {
     const child = spawn(cmd, args, { cwd: BACKEND, ...opts });
     let out = '';
     child.stdout?.on('data', (d) => (out += d));
     child.stderr?.on('data', (d) => (out += d));
     child.on('error', (err) => done({ code: 127, out: String(err) }));
-    child.on('close', (code, signal) => done({ code: code ?? 128, signal, out }));
+    child.on('close', (code) => done({ code: code ?? 128, out }));
   });
 }
-
-// One change at a time: a burst of saves turns into one rebuild, never two restarts racing.
-let queue: Promise<unknown> = Promise.resolve();
-const enqueue = (job: () => Promise<unknown>) => (queue = queue.then(job).catch((err) => log('dev', String(err?.stack ?? err), 'bad')));
-
-// ── Fast tests: each set stopped at 3 s ─────────────────────────────────────────────────────────────────────────
-async function tests(label: string, args: string[], cwd: string) {
-  const started = Date.now();
-  const child = spawn(process.execPath, args, { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
-  const stop = setTimeout(() => child.kill('SIGKILL'), TEST_LIMIT_MS);
-  const { code, signal, out } = await new Promise<Ran>((done) => {
-    let text = '';
-    child.stdout.on('data', (d) => (text += d));
-    child.stderr.on('data', (d) => (text += d));
-    child.on('close', (c, s) => done({ code: c, signal: s, out: text }));
-  });
-  clearTimeout(stop);
-  const secs = ((Date.now() - started) / 1000).toFixed(1);
-  const count = (what: string) => out.match(new RegExp(`ℹ ${what} (\\d+)`))?.[1] ?? '0';
-  if (signal) {
-    log('tests', `${label}: past the ${TEST_LIMIT_MS / 1000} s limit, stopped (npm test runs them all)`, 'warn');
-    return false;
-  }
-  if (code === 0) {
-    log('tests', `${label}: ${count('pass')} passed in ${secs} s`, 'ok');
-    return true;
-  }
-  log('tests', `${label}: ${count('fail')} failed, ${count('pass')} passed`, 'bad');
-  const failing = [...new Set(out.split('\n').filter((l) => /^\s*✖ /.test(l)).map((l) => l.trim()))].slice(0, 6);
-  for (const line of failing) log('', line, 'bad');
-  return false;
-}
-const backendTests = () => tests('backend', ['--test', ...FAST_TESTS], BACKEND);
-
-// The server's types. Node runs server/ as it stands and ignores the types, so this is where a type error shows in dev
-// mode. About a second, beside the tests; like a failing test, it never holds back the restart.
-async function typecheck() {
-  const started = Date.now();
-  const { code, out } = await exec(TSC, ['-p', 'tsconfig.server.json', '--noEmit']);
-  const secs = ((Date.now() - started) / 1000).toFixed(1);
-  if (code === 0) {
-    log('types', `server: no type errors (${secs} s)`, 'ok');
-    return true;
-  }
-  const errors = out.split('\n').filter((l) => /error TS\d+/.test(l));
-  log('types', `server: ${errors.length || 'some'} type error${errors.length === 1 ? '' : 's'} (npm run typecheck)`, 'bad');
-  for (const line of errors.slice(0, 6)) log('', line.trim(), 'bad');
-  return false;
-}
-const appUnitTests = () =>
-  existsSync(join(REPO, 'app', 'node_modules'))
-    ? tests('app unit', ['--test', 'test/unit/**/*.test.ts'], join(REPO, 'app'))
-    : Promise.resolve(true);
-
-// The app is one HTML file whose inline script is the whole app: a syntax error there is a blank screen. Parsing it
-// takes about 40 ms.
-function checkAppScript() {
-  const html = readFileSync(join(REPO, 'index.html'), 'utf8');
-  const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*type="(?!text\/javascript)[^"]*")[^>]*>([\s\S]*?)<\/script>/g)];
-  try {
-    scripts.forEach((m, i) => new vm.Script(m[1], { filename: `index.html, inline script ${i + 1}` }));
-    log('tests', `app: ${scripts.length} inline script${scripts.length === 1 ? '' : 's'} parse`, 'ok');
-    return true;
-  } catch (err) {
-    log('tests', `app: the inline script does not parse: ${(err as Error).message}`, 'bad');
-    return false;
-  }
-}
-
-async function bundleApp() {
-  const { code, out } = await exec(process.execPath, ['scripts/app-bundle.ts']);
-  log('app', code === 0 ? out.trim().replace(/^app-bundle: /, '').replace(` into ${join(BACKEND, 'app-web')}`, '') : out.trim(), code === 0 ? 'ok' : 'bad');
-}
-
-// ── The server: the docker container, or this Mac's Node with --no-docker ───────────────────────────────────────
-let hostServer: ChildProcess | null = null;
 
 /** What /healthz says, as far as the banner reads it. */
 interface Health {
@@ -147,204 +44,101 @@ interface Health {
   app: string;
 }
 
-async function healthy(timeoutMs = 20_000): Promise<Health> {
+async function healthy(timeoutMs: number): Promise<Health | null> {
   const until = Date.now() + timeoutMs;
   while (Date.now() < until) {
     try {
       const r = await fetch(`${BASE}/healthz`, { signal: AbortSignal.timeout(1000) });
-      if (r.ok) return r.json();
+      if (r.ok) return (await r.json()) as Health;
     } catch {
       // not up yet
     }
-    await new Promise((r) => setTimeout(r, 200));
+    await new Promise((r) => setTimeout(r, 250));
   }
-  throw new Error(`no answer from ${BASE}/healthz after ${timeoutMs / 1000} s`);
+  return null;
 }
 
-async function startServer() {
-  if (DOCKER) {
-    const { code, out } = await exec('docker', [...COMPOSE, 'up', '-d', '--wait']);
-    if (code !== 0) throw new Error(`docker compose up failed:\n${out}`);
-    return;
+function banner(health: Health) {
+  const login = process.env.ADMIN_USER || process.env.ADMIN_PASSWORD ? 'your ADMIN_USER / ADMIN_PASSWORD' : 'admin / asylum';
+  console.log(`
+  Iron Asylum, served by the ${health.backend} backend "${health.name}"
+    website  ${BASE}/
+    app      ${BASE}/app/      (app ${health.app || 'not bundled'})
+    admin    ${BASE}/admin/    (${login})
+    snippet  ${BASE}/client/
+  Edit site/, admin/, server/, client/ or the repo root index.html; open pages reload by themselves.
+  ${DOCKER ? 'Ctrl-C stops following the log; the container keeps rebuilding. npm run dev:down stops it.' : 'Ctrl-C stops.'}
+`);
+}
+
+// ── The dev container ────────────────────────────────────────────────────────────────────────────────────────────
+async function docker() {
+  if ((await exec('docker', ['info'])).code !== 0) {
+    say('docker is not running. Start Docker Desktop, or run: npm run dev -- --no-docker');
+    process.exit(1);
   }
-  hostServer = spawn(process.execPath, ['server/server.ts'], {
+  // The two folders the container writes, mounted from here.
+  for (const dir of ['dist', 'app-web']) mkdirSync(join(BACKEND, dir), { recursive: true });
+  say('starting the dev container (its first build installs every dependency, a minute or two)');
+  const started = Date.now();
+  // The Mac's time zone, so the container's log reads in the Mac's time.
+  const env = { ...process.env, TZ: process.env.TZ || Intl.DateTimeFormat().resolvedOptions().timeZone };
+  const up = await exec('docker', [...COMPOSE, 'up', '--build', '--detach'], { env });
+  if (up.code !== 0) {
+    console.log(up.out.trimEnd());
+    say('docker compose up failed (above)');
+    process.exit(1);
+  }
+  say(`dev container up (${((Date.now() - started) / 1000).toFixed(1)} s); its log follows`);
+
+  const logs = spawn('docker', [...COMPOSE, 'logs', '--follow', '--no-log-prefix', '--tail', '40', 'api'], {
     cwd: BACKEND,
-    stdio: ['ignore', 'pipe', 'pipe'],
+    stdio: ['ignore', 'inherit', 'inherit'],
+  });
+  const leave = () => {
+    logs.kill('SIGTERM');
+    console.log('\n  Stopped following. The dev container keeps running and rebuilding: npm run dev follows it again, npm run dev:down stops it.');
+    process.exit(0);
+  };
+  process.on('SIGINT', leave);
+  process.on('SIGTERM', leave);
+  logs.on('close', (code) => process.exit(code ?? 0));
+
+  const health = await healthy(90_000);
+  if (health) banner(health);
+  else say(`no answer from ${BASE}/healthz after 90 s; the log says why`);
+}
+
+// ── --no-docker: the watcher on this Mac ─────────────────────────────────────────────────────────────────────────
+async function local() {
+  if (!existsSync(join(BACKEND, 'node_modules'))) {
+    say('installing dependencies (npm ci)');
+    if ((await exec('npm', ['ci', '--no-audit', '--no-fund'], { stdio: 'inherit' })).code) process.exit(1);
+  }
+  const watcher = spawn(process.execPath, ['scripts/dev-watch.ts'], {
+    cwd: BACKEND,
+    stdio: 'inherit',
     env: {
       ...process.env,
-      NODE_ENV: 'production',
       PORT: String(PORT),
-      IA_DEV: '1',
       IA_BACKEND_KIND: 'local',
       IA_BACKEND_NAME: 'npm run dev on this Mac',
       ADMIN_USER: process.env.ADMIN_USER || 'admin',
       ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'asylum',
       CLIENT_DEMO: '1',
-      LOG_REQUESTS: '0',
+      LOG_REQUESTS: process.env.LOG_REQUESTS || '0',
       DATA_FILE: join(BACKEND, 'data', 'dev', 'devices.json'),
     },
   });
-  createInterface({ input: hostServer.stderr! }).on('line', (line) => log('server', line, 'bad'));
-}
-
-async function restartServer() {
-  const started = Date.now();
-  if (DOCKER) {
-    const { code, out } = await exec('docker', [...COMPOSE, 'restart', 'api']);
-    if (code !== 0) throw new Error(`docker compose restart failed:\n${out}`);
-  } else {
-    const old = hostServer!;
-    await new Promise((done) => {
-      old.once('close', done);
-      old.kill('SIGTERM');
-    });
-    await startServer();
-  }
-  await healthy();
-  log('server', `restarted in ${((Date.now() - started) / 1000).toFixed(1)} s`, 'ok');
-}
-
-async function reloadPages() {
-  try {
-    await fetch(`${BASE}/__dev/reload`, { method: 'POST', signal: AbortSignal.timeout(2000) });
-  } catch {
-    // the server is restarting; pages reload themselves when it is back
-  }
-}
-
-// ── Watching ─────────────────────────────────────────────────────────────────────────────────────────────────────
-interface WatchOptions {
-  recursive?: boolean;
-  only?: (file: string) => boolean;
-}
-
-function watchFolder(dir: string, { recursive = true, only = () => true }: WatchOptions, onChange: (files: string[]) => Promise<void>) {
-  let timer: NodeJS.Timeout | undefined;
-  const changed = new Set<string>();
-  watch(dir, { recursive }, (event, file) => {
-    if (!file || !only(String(file))) return;
-    changed.add(String(file));
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      const files = [...changed];
-      changed.clear();
-      enqueue(() => onChange(files));
-    }, 150);
-  });
-}
-
-// ng build --watch, one per Angular app. The two often rebuild together (the admin uses the site's icons), so builds
-// that finish within a quarter second share one test run and one reload.
-const builds: ChildProcess[] = [];
-let afterBuild: NodeJS.Timeout | undefined;
-function builtOne() {
-  clearTimeout(afterBuild);
-  afterBuild = setTimeout(
-    () =>
-      enqueue(async () => {
-        await backendTests();
-        await reloadPages();
-      }),
-    250,
-  );
-}
-function ngWatch(project: string) {
-  const child = spawn(NG, ['build', project, '--watch', '--configuration', 'development'], {
-    cwd: BACKEND,
-    env: { ...process.env, NG_CLI_ANALYTICS: 'false', NO_COLOR: '1', FORCE_COLOR: '0' },
-  });
-  builds.push(child);
-  let errors: string[] = [];
-  let first = true;
-  const onLine = (line: string) => {
-    const done = /Application bundle generation (complete|failed)\. \[([\d.]+) seconds\]/.exec(line);
-    if (done) {
-      if (done[1] === 'failed' || errors.length) {
-        log(project, `build failed in ${done[2]} s:`, 'bad');
-        for (const e of errors.slice(0, 12)) log('', e, 'bad');
-      } else {
-        log(project, `built in ${done[2]} s`, 'ok');
-        if (!first) builtOne();
-      }
-      errors = [];
-      first = false;
-    } else if (/\[ERROR\]|✘|Error:/.test(line) || (errors.length && line.trim())) {
-      errors.push(line.trimEnd());
-    }
-  };
-  createInterface({ input: child.stdout }).on('line', onLine);
-  createInterface({ input: child.stderr }).on('line', onLine);
-  child.on('close', (code) => code && log(project, `ng build --watch exited (${code})`, 'bad'));
-}
-
-// ── Start ────────────────────────────────────────────────────────────────────────────────────────────────────────
-async function main() {
-  log('dev', `full stack dev mode, ${DOCKER ? 'docker backend' : 'this Mac\'s Node (--no-docker)'}`, 'info');
-  if (!existsSync(join(BACKEND, 'node_modules'))) {
-    log('setup', 'installing dependencies (npm ci)');
-    if ((await exec('npm', ['ci', '--no-audit', '--no-fund'], { stdio: 'inherit' })).code) process.exit(1);
-  }
-  if (DOCKER && (await exec('docker', ['info'])).code !== 0) {
-    log('docker', 'docker is not running. Start Docker Desktop, or run: npm run dev -- --no-docker', 'bad');
-    process.exit(1);
-  }
-  mkdirSync(join(BACKEND, 'dist'), { recursive: true });
-  await bundleApp();
-  checkAppScript();
-  ngWatch('site');
-  ngWatch('admin');
-  await startServer();
+  // Ctrl-C reaches the watcher too (same process group); it stops the server and the builds, then exits.
+  process.on('SIGINT', () => {});
+  process.on('SIGTERM', () => watcher.kill('SIGTERM'));
+  watcher.on('close', (code) => process.exit(code ?? 0));
   const health = await healthy(60_000);
-  const login = process.env.ADMIN_USER || process.env.ADMIN_PASSWORD ? 'your ADMIN_USER / ADMIN_PASSWORD' : 'admin / asylum';
-  console.log(`
-  ${paint('info', `Iron Asylum, served by the ${health.backend} backend "${health.name}"`)}
-    website  ${BASE}/
-    app      ${BASE}/app/      (app ${health.app || 'not bundled'})
-    admin    ${BASE}/admin/    (${login})
-    snippet  ${BASE}/client/
-  Edit site/, admin/, server/, client/ or the repo root index.html; open pages reload by themselves. Ctrl-C stops.
-`);
-  void Promise.all([typecheck(), backendTests()]);
-
-  watchFolder(join(BACKEND, 'server'), {}, async (files) => {
-    log('server', `changed: ${files.join(', ')}`);
-    await Promise.all([typecheck(), backendTests()]);
-    await restartServer();
-  });
-  watchFolder(join(BACKEND, 'client'), {}, async (files) => {
-    log('client', `changed: ${files.join(', ')}`);
-    await backendTests();
-    await reloadPages();
-  });
-  // macOS can report a deeper index.html (the site's own build) on this folder's watch, so act only when the root files
-  // themselves changed.
-  const appStamp = () => ['index.html', 'apple-touch-icon.png'].map((f) => statSync(join(REPO, f), { throwIfNoEntry: false })?.mtimeMs ?? 0).join();
-  let appSeen = appStamp();
-  watchFolder(REPO, { recursive: false, only: (f) => f === 'index.html' || f === 'apple-touch-icon.png' }, async () => {
-    const now = appStamp();
-    if (now === appSeen) return;
-    appSeen = now;
-    await bundleApp();
-    checkAppScript();
-    await appUnitTests();
-    await reloadPages();
-  });
+  if (health) banner(health);
 }
 
-function stop() {
-  for (const child of builds) child.kill('SIGTERM');
-  hostServer?.kill('SIGTERM');
-  console.log(
-    DOCKER
-      ? '\n  Stopped watching. The container keeps serving the last build; npm run docker:up puts back the plain image.'
-      : '\n  Stopped.',
-  );
-  process.exit(0);
-}
-process.on('SIGINT', stop);
-process.on('SIGTERM', stop);
-
-main().catch((err) => {
-  log('dev', err.message, 'bad');
-  stop();
+(DOCKER ? docker() : local()).catch((err) => {
+  say(String(err?.message ?? err));
+  process.exit(1);
 });

@@ -1,16 +1,42 @@
-# npm run dev (scripts/dev.ts) lays this over docker-compose.yml: the same container, port and devices volume, but
-# serving this checkout's files as the Mac rebuilds them, not the copies baked into the image. Built folders and the
-# app are read per request, so a rebuild shows on the next load; dev.ts restarts the container when server/ changes.
-# The server runs from its TypeScript source as Node strips the types, so a restart needs no tsc; the image's own CMD
-# runs what tsc compiled. IA_DEV turns on the live reload (server/dev.ts). npm run docker:up puts back the plain image.
+# npm run dev (scripts/dev.ts) lays this over docker-compose.yml: the same container, port and devices volume, run from
+# the dev image (Dockerfile.dev) instead of the production one. The container watches this checkout and rebuilds what
+# is saved by itself (scripts/dev-watch.ts), so nothing on the Mac has to run, and restart: unless-stopped (from
+# docker-compose.yml) brings it back whenever Docker starts. npm run dev:down stops it; npm run docker:up puts back the
+# plain production image.
+#
+# What it may touch: every source folder and the repo root (for index.html and its icon) are mounted read-only; dist/
+# and app-web/, the two build folders, are the only ones it writes. Its node_modules are the image's own (Linux), and
+# the Angular cache lives in a volume of its own.
 services:
   api:
-    command: ["node", "server/server.ts"]
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: ${COMPOSE_PROJECT_NAME}-api-dev
+    # tini as PID 1: passes docker stop on to the watcher and reaps what the builds leave behind.
+    init: true
     environment:
       IA_DEV: "1"
       IA_BACKEND_NAME: ${IA_BACKEND_NAME:-docker dev on this Mac (npm run dev)}
+      # Where index.html is: the repo root, mounted read-only below.
+      APP_SOURCE_DIR: /repo
+      # The log carries rebuilds, tests, restarts and reloads; LOG_REQUESTS=1 npm run dev adds a line per request.
+      LOG_REQUESTS: ${LOG_REQUESTS:-0}
+      # Saves arrive as file events through the mounts. IA_DEV_POLL_MS=500 npm run dev polls instead, should they stop.
+      IA_DEV_POLL_MS: ${IA_DEV_POLL_MS:-}
+      # The Mac's time zone (npm run dev passes it), so the log's times read as the Mac's clock.
+      TZ: ${TZ:-UTC}
     volumes:
+      - ..:/repo:ro
+      - ./site:/srv/site:ro
+      - ./admin:/srv/admin:ro
       - ./server:/srv/server:ro
       - ./client:/srv/client:ro
-      - ./dist:/srv/dist:ro
-      - ./app-web:/srv/app-web:ro
+      - ./scripts:/srv/scripts:ro
+      - ./test:/srv/test:ro
+      - ./dist:/srv/dist
+      - ./app-web:/srv/app-web
+      - angular-cache:/srv/.angular
+
+volumes:
+  angular-cache:

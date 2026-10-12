@@ -11,6 +11,7 @@
   "scripts": {
     "start": "node --enable-source-maps dist/server/server.js",
     "dev": "node ../tools/run.mjs server-backend-dev -- node scripts/dev.ts",
+    "dev:down": "node ../tools/run.mjs backend-dev-down -- docker compose -f docker-compose.yml -f docker-compose.dev.yml down",
     "dev:server": "node ../tools/run.mjs server-backend-dev-server -- node --watch server/server.ts",
     "build": "node scripts/app-bundle.ts && npm run build:server && npm run build:ui",
     "build:server": "node -e \"require('node:fs').rmSync('dist/server', { recursive: true, force: true })\" && tsc -p tsconfig.server.json",

@@ -1,9 +1,9 @@
-// Live reload for npm run dev (scripts/dev.ts). On only when IA_DEV=1 (docker-compose.dev.yml and dev.ts set it),
+// Live reload for npm run dev (scripts/dev-watch.ts). On only when IA_DEV=1 (the watcher sets it for the server),
 // never in the image's own config or on Heroku.
 //
 // - The website, the admin and the app pages are served with one extra script tag, /__dev/reload.js, which listens
 //   on /__dev/events and reloads the page when told to.
-// - dev.ts POSTs /__dev/reload after each successful rebuild, and every open page reloads.
+// - The watcher POSTs /__dev/reload after each successful rebuild, and every open page reloads.
 // - A restarted server (a change under server/) has a new boot id; a page that reconnects and sees it reloads too.
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -34,7 +34,8 @@ export function installDevReload(app: Express, pages: Record<string, string>, lo
   app.get('/__dev/events', (req, res) => {
     res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive' });
     res.flushHeaders();
-    res.write(`event: hello\ndata: ${boot}\n\n`);
+    // retry: a page whose server restarted reconnects in half a second, not the browser's default three or more.
+    res.write(`retry: 500\nevent: hello\ndata: ${boot}\n\n`);
     clients.add(res);
     const ping = setInterval(() => res.write(': ping\n\n'), 25_000);
     req.on('close', () => {
@@ -48,10 +49,11 @@ export function installDevReload(app: Express, pages: Record<string, string>, lo
     for (const c of clients) c.end();
   });
 
+  // The reply says how many pages it reached, for the watcher's log.
   app.post('/__dev/reload', (req, res) => {
     for (const c of clients) c.write(`event: reload\ndata: ${Date.now()}\n\n`);
     log(`dev: reloaded ${clients.size} page${clients.size === 1 ? '' : 's'}`);
-    res.status(204).end();
+    res.json({ ok: true, pages: clients.size });
   });
 
   // The pages themselves, with the reload script added at the end of the body. Never cached.
