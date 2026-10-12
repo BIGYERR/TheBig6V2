@@ -1,7 +1,8 @@
 // The e2e result as one self-contained HTML page. Every screenshot is embedded as a data: URI and the styles and
 // the one script are inline, so the file opens anywhere on its own: mailed, attached, or moved out of report/.
-import type { Parity, RunReport, Status, StepResult, TargetResult } from './types.ts';
-import { stepLabel } from './types.ts';
+import type { PageStepResult, Parity, RunReport, Status, StepResult, TargetResult } from './types.ts';
+import { pageLabel, stepLabel } from './types.ts';
+import { tag } from '../scripts/version.mjs';
 
 const esc = (s: unknown): string =>
   String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] ?? c);
@@ -59,6 +60,55 @@ function card(s: StepResult, r: RunReport): string {
 </section>`;
 }
 
+/** A website or admin step's card: its checks' notes and its one full-page screenshot. */
+function pageCard(s: PageStepResult): string {
+  const r = s.result;
+  const out: string[] = [];
+  if (r.error) out.push(`<li class="err">${esc(r.error)}</li>`);
+  for (const p of r.problems) out.push(`<li class="err">${esc(p)}</li>`);
+  for (const w of r.warnings) out.push(`<li class="warn">${esc(w)}</li>`);
+  return `<section class="card" id="${esc(s.id)}">
+  <header>
+    <div><span class="step">#${pageLabel(s)}</span> <span class="muted">${esc(s.journey)}</span><h2>${esc(s.page)}</h2><div class="muted mono">${esc(s.journeyId)}/${esc(s.id)}</div></div>
+    <div class="right">${badge(s.ok ? 'pass' : r.status === 'skipped' ? 'skipped' : 'fail')}<div class="muted">${esc(s.viewport)}</div></div>
+  </header>
+  ${out.length ? `<ul class="notes">${out.join('')}</ul>` : ''}
+  <div class="shots one">
+    ${figure(r.png, `Full page${s.url ? `, ${s.url}` : ''}`)}
+  </div>
+</section>`;
+}
+
+/** The website and admin steps: a table and a card each, under one heading per band. */
+function pageSections(r: RunReport): string {
+  const bands: [string, string, PageStepResult[]][] = [
+    ['Website', 'The public site the backend serves at /, full height, and the pages it links to on the same host.', r.pages.filter((s) => s.band === 'website')],
+    ['Admin', 'The staff admin at /admin/: the login, every section after signing in, and the signed out screen.', r.pages.filter((s) => s.band === 'admin')],
+  ];
+  return bands
+    .filter(([, , steps]) => steps.length)
+    .map(
+      ([name, about, steps]) => `<h2 class="band">${name} <span class="muted">${steps.filter((s) => s.ok).length} / ${steps.length} passed</span></h2>
+<div class="muted">${esc(about)} One target each, so no parity: a step passes when its page answered 200, shows what it should, and logged no error.</div>
+<div class="table-wrap"><table>
+  <thead><tr><th class="num">#</th><th>Page</th><th>Result</th><th>Viewport</th><th class="num">ms</th></tr></thead>
+  <tbody>${steps
+    .map(
+      (s) => `<tr>
+    <td class="num">#${pageLabel(s)}</td>
+    <td><a href="#${esc(s.id)}">${esc(s.page)}</a><div class="muted mono">${esc(s.journeyId)}/${esc(s.id)}</div></td>
+    <td>${badge(s.ok ? 'pass' : s.result.status === 'skipped' ? 'skipped' : 'fail')}</td>
+    <td>${esc(s.viewport)}</td>
+    <td class="num">${s.result.ms ?? ''}</td>
+  </tr>`,
+    )
+    .join('')}</tbody>
+</table></div>
+${steps.map(pageCard).join('\n')}`,
+    )
+    .join('\n');
+}
+
 /** A table row naming the journey, before the first step of each one. */
 function journeyRow(s: StepResult, prev: StepResult | undefined): string {
   if (prev && prev.journeyId === s.journeyId) return '';
@@ -108,6 +158,8 @@ tr.journey td{background:var(--bone);font-weight:700;padding-top:14px}
 .step{font-size:13px;letter-spacing:.06em;color:var(--signal);font-weight:700;font-variant-numeric:tabular-nums}
 .notes{margin:12px 0 0;padding-left:18px}.notes .err{color:var(--fail)}.notes .warn{color:var(--warn)}
 .shots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.shots.one{grid-template-columns:minmax(0,420px)}
+h2.band{font-size:22px;margin:34px 0 4px}h2.band .muted{font-size:15px;font-weight:400}
 figure{margin:0}
 figure img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:zoom-in}
 figure.empty div{aspect-ratio:393/852;border:1px dashed var(--line);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
@@ -138,9 +190,14 @@ zoom.addEventListener('close', () => zoom.querySelector('img').removeAttribute('
 `;
 
 export function renderReport(r: RunReport): string {
-  const passed = r.steps.filter((s) => s.ok).length;
+  const passed = r.steps.filter((s) => s.ok).length + r.pages.filter((s) => s.ok).length;
+  const total = r.steps.length + r.pages.length;
+  const tally = (steps: { ok: boolean }[]) => `${steps.filter((s) => s.ok).length}/${steps.length}`;
+  const website = r.pages.filter((s) => s.band === 'website');
+  const admin = r.pages.filter((s) => s.band === 'admin');
+  const bands = r.collage?.bands?.length ? `, in bands top to bottom: ${r.collage.bands.map((b) => `${esc(b.title)} (${b.screens})`).join(', ')}` : '';
   const collage = r.collage
-    ? `${esc(r.collage.file)} beside this file: ${r.collage.width}×${r.collage.height} px (${((r.collage.width * r.collage.height) / 1e6).toFixed(1)} MP), ${r.collage.screens} screens from the Angular build, labelled with the step numbers used here`
+    ? `${esc(r.collage.file)} beside this file: ${r.collage.width}×${r.collage.height} px (${((r.collage.width * r.collage.height) / 1e6).toFixed(1)} MP), ${r.collage.screens} screens${bands}, labelled with the step numbers used here`
     : 'not written';
   return `<!doctype html>
 <html lang="en">
@@ -153,24 +210,26 @@ export function renderReport(r: RunReport): string {
 <body>
 <main>
 <h1>Iron Asylum <span>e2e</span></h1>
-<div class="muted">The Angular build, served from Docker, driven by Puppeteer through every journey and compared screen by screen with the original index.html. This file is self-contained: every screenshot is embedded.</div>
+<div class="muted">The website and the admin, served by the backend, photographed full height; then the Angular build, driven by Puppeteer through every journey and compared screen by screen with the original index.html. All of it runs in Docker. This file is self-contained: every screenshot is embedded.</div>
 <div class="verdict ${r.ok ? 'pass' : 'fail'}">${r.ok ? 'All checks passed' : 'Failed'}</div>
 <div class="summary">
-  <div class="tile"><div class="muted">Steps passed</div><div class="v">${passed} / ${r.steps.length}</div></div>
-  <div class="tile"><div class="muted">App version</div><div class="v">ia-version ${esc(r.version)}</div></div>
+  <div class="tile"><div class="muted">Steps passed</div><div class="v">${passed} / ${total}</div>${r.pages.length ? `<div class="muted">website ${tally(website)} · admin ${tally(admin)} · app ${tally(r.steps)}</div>` : ''}</div>
+  <div class="tile"><div class="muted">App version</div><div class="v">${esc(tag(r.version))}</div></div>
   <div class="tile"><div class="muted">Worst parity</div><div class="v">${r.worstParityPct == null ? 'n/a' : r.worstParityPct.toFixed(3) + '%'}</div><div class="muted">limit ${r.parityMaxPct}%</div></div>
   <div class="tile"><div class="muted">Run time</div><div class="v">${(r.durationMs / 1000).toFixed(1)} s</div></div>
 </div>
 <div class="tile" style="margin-bottom:20px"><dl>
   <dt>Ran</dt><dd>${esc(r.ranAt)}</dd>
-  <dt>Served from</dt><dd class="mono">${esc(r.baseUrl)} (nginx container, app/e2e/docker-compose.yml)</dd>
+  <dt>Served from</dt><dd class="mono">app ${esc(r.baseUrl)} (nginx container); website and admin ${esc(r.backendUrl)} (backend container); app/e2e/docker-compose.yml</dd>
   <dt>Source</dt><dd class="mono">index.html sha256 ${esc(r.sourceSha256 ?? 'unknown')}</dd>
   <dt>Browser</dt><dd>${esc(r.browserVersion)} in the runner container, ${r.viewport.width}×${r.viewport.height} @${r.viewport.deviceScaleFactor}x, touch</dd>
   <dt>Clock</dt><dd>Frozen at ${esc(r.frozenNow)} (${esc(r.timezone)}); Math.random seeded; animations off</dd>
   <dt>Blocked</dt><dd>${r.blocked.length ? esc(r.blocked.join(', ')) : 'No requests needed blocking (the bug form was never sent)'}</dd>
-  <dt>Journeys</dt><dd>${[...new Set(r.steps.map((s) => s.journey))].map(esc).join('; ')}, each from empty storage</dd>
+  <dt>Journeys</dt><dd>${[...new Set([...r.pages, ...r.steps].map((s) => s.journey))].map(esc).join('; ')}, each from empty storage</dd>
   <dt>Collage</dt><dd>${collage}</dd>
 </dl></div>
+${pageSections(r)}
+${r.pages.length ? `<h2 class="band">App <span class="muted">${tally(r.steps).replace('/', ' / ')} passed</span></h2>` : ''}
 <div class="table-wrap"><table>
   <thead><tr><th class="num">#</th><th>Page</th><th>Angular</th><th>Reference</th><th>Parity</th><th class="num">ms</th></tr></thead>
   <tbody>${r.steps.map((s, i) => journeyRow(s, r.steps[i - 1]) + row(s, r)).join('')}</tbody>

@@ -1,7 +1,7 @@
 // Fixtures shared by the unit and integration tests: tiny PNGs built pixel by pixel, and e2e results shaped like a
 // real run's, so report and collage code is tested without a browser run.
 import { PNG } from 'pngjs';
-import type { RunReport, StepResult, TargetResult } from '../e2e/types.ts';
+import type { PageBand, PageStepResult, RunReport, StepResult, TargetResult } from '../e2e/types.ts';
 
 export type Rgb = [number, number, number];
 
@@ -50,13 +50,33 @@ export function fakeStep(n: number, over: Partial<StepResult> = {}): StepResult 
   };
 }
 
-export function fakeRun(steps: StepResult[], over: Partial<RunReport> = {}): RunReport {
+/** A website or admin step shaped like a real run's: one target, one full-page screenshot. */
+export function fakePage(band: PageBand, n: number, over: Partial<PageStepResult> = {}): PageStepResult {
   return {
-    ok: steps.every((s) => s.ok),
+    band,
+    n,
+    journeyId: `${band}-journey`,
+    journey: `The ${band}`,
+    id: `${band}-page-${n}`,
+    page: `${band} page ${n}`,
+    viewport: '1440×900 @1x',
+    url: `http://127.0.0.1:3000/${band}/${n}`,
+    result: passTarget(solidPng(6, 20, [n * 10, 200, 100])),
+    ok: true,
+    ...over,
+  };
+}
+
+export function fakeRun(steps: StepResult[], over: Partial<RunReport> = {}): RunReport {
+  const pages = over.pages ?? [];
+  return {
+    ok: steps.every((s) => s.ok) && pages.every((s) => s.ok),
     steps,
+    pages,
     version: '239',
     sourceSha256: 'a'.repeat(64),
     baseUrl: 'http://127.0.0.1',
+    backendUrl: 'http://127.0.0.1:3000',
     browserVersion: 'Chrome/155.0.8059.39',
     viewport: { width: 393, height: 852, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
     frozenNow: '2026-10-07T07:30:00-04:00',

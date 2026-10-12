@@ -7,8 +7,8 @@ import { after, before, describe, it } from 'node:test';
 import { pathToFileURL } from 'node:url';
 import puppeteer from 'puppeteer';
 import type { Browser } from 'puppeteer';
-import { LABEL_H, renderCollage } from '../../e2e/collage.ts';
-import type { CollageTile } from '../../e2e/collage.ts';
+import { BAND_H, LABEL_H, PAD, renderCollage } from '../../e2e/collage.ts';
+import type { CollageBand, CollageTile } from '../../e2e/collage.ts';
 import { pngSize } from '../../e2e/parity.ts';
 import { renderReport } from '../../e2e/report.ts';
 import { fakeRun, fakeStep, pixels, solidPng } from '../helpers.ts';
@@ -37,34 +37,51 @@ describe('renderCollage in Chrome', () => {
     ...colours.map((c, i) => ({ n: i + 1, id: `s${i + 1}`, title: `Screen ${i + 1}`, status: 'pass' as const, png: solidPng(W, H, c) })),
     { n: 5, id: 's5', title: 'Screen 5', status: 'fail' },
   ];
+  const page: CollageTile = { n: 1, prefix: 'W', id: 'web/home', title: 'Website: home', status: 'pass', png: solidPng(2 * W, 3 * H, [90, 40, 140]) };
+  const bands: CollageBand[] = [
+    { title: 'WEBSITE', subtitle: 'the site', box: { width: 2 * W, height: 3 * H }, missing: { width: 2 * W, height: H }, tiles: [page] },
+    { title: 'APP', subtitle: 'the app', box: { width: W, height: H }, missing: { width: W, height: H }, tiles },
+  ];
+  const draw = () => renderCollage(browser, bands, { title: 't', subtitle: 's' });
 
   it('draws a PNG exactly the size of its layout', async () => {
-    const { png, layout } = await renderCollage(browser, tiles, { title: 't', subtitle: 's' }, { width: W, height: H });
+    const { png, layout } = await draw();
     assert.deepEqual(pngSize(png), { width: layout.width, height: layout.height });
   });
 
-  it('places every screenshot pixel for pixel at its slot, unscaled', async () => {
-    const { png, layout } = await renderCollage(browser, tiles, { title: 't', subtitle: 's' }, { width: W, height: H });
+  it('places every screenshot pixel for pixel at its slot, unscaled, in its band', async () => {
+    const { png, layout } = await draw();
     const pixelAt = pixels(png);
+    const web = layout.bands[0]!.placements[0]!;
+    assert.deepEqual([web.shotWidth, web.shotHeight], [2 * W, 3 * H]);
+    assert.deepEqual(pixelAt(web.shotX + 2 * W - 1, web.shotY + 3 * H - 1), [90, 40, 140]);
     colours.forEach((c, i) => {
-      const p = layout.placements[i]!;
+      const p = layout.bands[1]!.placements[i]!;
       for (const [dx, dy] of [[0, 0], [W - 1, 0], [0, H - 1], [W - 1, H - 1], [W >> 1, H >> 1]] as const) {
         assert.deepEqual(pixelAt(p.shotX + dx, p.shotY + dy), c, `screen ${i + 1} at +${dx},+${dy}`);
       }
     });
   });
 
-  it('draws a label over each screen and a placeholder where one is missing', async () => {
-    const { png, layout } = await renderCollage(browser, tiles, { title: 't', subtitle: 's' }, { width: W, height: H });
+  it('draws each band a title bar, a label over each screen, and a placeholder where one is missing', async () => {
+    const { png, layout } = await draw();
     const pixelAt = pixels(png);
-    for (const [i, p] of layout.placements.entries()) {
+    for (const band of layout.bands) {
+      // The bar is ink with bone text: dark at its left edge, and both dark and light inside.
+      assert.ok(pixelAt(PAD + 2, band.y + 2).every((v) => v < 60), 'the bar is dark');
+      let light = 0;
+      for (let x = PAD; x < PAD + 600; x += 3) if (pixelAt(x, band.y + (BAND_H >> 1)).every((v) => v > 180)) light++;
+      assert.ok(light > 0, 'the bar has its title in light text');
+    }
+    const all = layout.bands.flatMap((b) => b.placements);
+    for (const [i, p] of all.entries()) {
       let ink = 0;
       for (let y = p.y + 10; y < p.y + LABEL_H - 10; y += 4) {
-        for (let x = p.x; x < p.x + W; x += 2) if (pixelAt(x, y).join() !== BONE.join()) ink++;
+        for (let x = p.x; x < p.x + p.cellWidth; x += 2) if (pixelAt(x, y).join() !== BONE.join()) ink++;
       }
       assert.ok(ink > 0, `label ${i + 1} has text`);
     }
-    const missing = layout.placements[4]!;
+    const missing = layout.bands[1]!.placements[4]!;
     const centre = pixelAt(missing.shotX + (W >> 1), missing.shotY + (H >> 1));
     assert.ok(!colours.some((c) => c.join() === centre.join()), 'the missing screen shows no other screen');
   });

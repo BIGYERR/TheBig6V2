@@ -10,7 +10,8 @@
 //   canonical('239')               '0.239.0'; canonical('0.239.1') is '0.239.1'
 //   sameVersion('239', '0.239.0')  true
 //   withNativeVersion(xml, v)      config.xml with version and ios-CFBundleVersion both set to canonical(v)
-// Displays print a version as written; only the native build number is canonical.
+//   tag('239')                     'V239'; tag('0.239.1') is 'v0.239.1': a version as a label prints it (tests/semver.js tag)
+// Labels (the e2e report and collage) print tag(); only the native build number is canonical.
 
 const LEGACY_RE = /^[Vv]?(0|[1-9][0-9]*)$/;
 const DOTTED_RE = /^[Vv]?(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/;
@@ -78,6 +79,19 @@ export function metaVersion(html) {
   if (m === null) return null;
   if (!isVersion(m[1])) throw new Error(`the <meta name="ia-version"> holds ${JSON.stringify(m[1])}, which is not a version (${WANT})`);
   return m[1];
+}
+
+/**
+ * `text` as a label (CLAUDE.md, PRIORITY 1): a pre-semver build is V<N> (V239), a dotted version is v<M.m.p>
+ * (v0.239.1). Display only; never compare or key on it. Never throws: what does not parse prints as 'V' + text, as
+ * tests/semver.js's tag does.
+ * @param {unknown} text
+ * @returns {string}
+ */
+export function tag(text) {
+  const v = read(typeof text === 'number' ? String(text) : text);
+  if (v === null) return `V${String(text)}`;
+  return v.legacy ? `V${v.minor}` : `v${v.major}.${v.minor}.${v.patch}`;
 }
 
 /**

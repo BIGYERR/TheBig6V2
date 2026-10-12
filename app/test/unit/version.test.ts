@@ -6,7 +6,7 @@ import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { canonical, isVersion, metaVersion, parseVersion, sameVersion, withNativeVersion } from '../../scripts/version.mjs';
+import { canonical, isVersion, metaVersion, parseVersion, sameVersion, tag, withNativeVersion } from '../../scripts/version.mjs';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -84,6 +84,20 @@ describe('version: metaVersion', () => {
   });
 });
 
+describe('version: tag', () => {
+  it('prints a legacy build as V<N> and a dotted version as v<M.m.p>', () => {
+    assert.equal(tag('239'), 'V239');
+    assert.equal(tag('V239'), 'V239');
+    assert.equal(tag('0.239.1'), 'v0.239.1');
+    assert.equal(tag('v0.240.0'), 'v0.240.0');
+  });
+
+  it('never throws: what is not a version prints as V and the text', () => {
+    assert.equal(tag('unknown'), 'Vunknown');
+    assert.equal(tag(''), 'V');
+  });
+});
+
 describe('version: native (config.xml)', () => {
   const xml = readFileSync(join(APP, 'config.xml'), 'utf8');
   const widgetLine = (s: string) => s.split('\n').findIndex((l) => l.startsWith('<widget '));
@@ -112,7 +126,7 @@ describe('version: native (config.xml)', () => {
 });
 
 describe('version: one rule with tests/semver.js', () => {
-  const SV = createRequire(import.meta.url)(join(APP, '..', 'tests', 'semver.js')) as { str(v: string): string };
+  const SV = createRequire(import.meta.url)(join(APP, '..', 'tests', 'semver.js')) as { str(v: string): string; tag(v: unknown): string };
 
   it('accepts and refuses the same texts, and gives the same canonical M.m.p', () => {
     for (const text of [...ACCEPTS.map(([t]) => t), ...REJECTS]) {
@@ -124,5 +138,9 @@ describe('version: one rule with tests/semver.js', () => {
       }
       assert.equal(isVersion(text) ? canonical(text) : null, theirs, JSON.stringify(text));
     }
+  });
+
+  it('prints the same label for every text, version or not', () => {
+    for (const text of [...ACCEPTS.map(([t]) => t), ...REJECTS]) assert.equal(tag(text), SV.tag(text), JSON.stringify(text));
   });
 });

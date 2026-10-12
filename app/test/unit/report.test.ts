@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { externalRefs, renderReport } from '../../e2e/report.ts';
-import { embeddedPngs, fakeRun, fakeStep, solidPng } from '../helpers.ts';
+import { embeddedPngs, fakePage, fakeRun, fakeStep, solidPng } from '../helpers.ts';
 
 describe('renderReport', () => {
   it('embeds every screenshot and diff as a data: URI, byte for byte', () => {
@@ -57,9 +57,36 @@ describe('renderReport', () => {
     assert.match(renderReport(fakeRun([fakeStep(1)], { collage: null })), /<dt>Collage<\/dt><dd>not written<\/dd>/);
   });
 
-  it('prints the app version as written: 239 and 0.239.1', () => {
-    assert.match(renderReport(fakeRun([fakeStep(1)])), /ia-version 239</);
-    assert.match(renderReport(fakeRun([fakeStep(1)], { version: '0.239.1' })), /ia-version 0\.239\.1</);
+  it('prints the app version as a label: V239 for a legacy build, v0.239.1 for a dotted one', () => {
+    assert.match(renderReport(fakeRun([fakeStep(1)])), /<div class="v">V239<\/div>/);
+    assert.match(renderReport(fakeRun([fakeStep(1)], { version: '0.239.1' })), /<div class="v">v0\.239\.1<\/div>/);
+  });
+
+  it('shows the website and admin before the app, each step numbered in its band, with its full-page screenshot', () => {
+    const pages = [fakePage('website', 1), fakePage('website', 2), fakePage('admin', 1)];
+    const html = renderReport(fakeRun([fakeStep(1)], { pages }));
+    const at = (text: string) => html.indexOf(text);
+    assert.ok(at('<h2 class="band">Website') > 0 && at('<h2 class="band">Website') < at('<h2 class="band">Admin'));
+    assert.ok(at('<h2 class="band">Admin') < at('<h2 class="band">App'));
+    for (const label of ['#W01', '#W02', '#A01']) assert.match(html, new RegExp(`<span class="step">${label}</span>`));
+    const pngs = embeddedPngs(html);
+    assert.equal(pngs.length, 3 + 3, 'one image per page, then the app step\'s three');
+    assert.ok(pngs[0]!.equals(pages[0]!.result.png!), 'the first image is the first website page');
+    assert.deepEqual(externalRefs(html), []);
+  });
+
+  it('counts every band in the totals, and fails the run on a failed page', () => {
+    const failed = fakePage('admin', 2, { ok: false, result: { status: 'fail', error: 'expected .sec-head h1 on screen', problems: ['HTTP 500 for GET http://127.0.0.1:3000/admin/api/stats'], warnings: [] } });
+    const html = renderReport(fakeRun([fakeStep(1), fakeStep(2)], { pages: [fakePage('website', 1), fakePage('admin', 1), failed] }));
+    assert.match(html, /<div class="v">4 \/ 5<\/div><div class="muted">website 1\/1 · admin 1\/2 · app 2\/2<\/div>/);
+    assert.match(html, /class="verdict fail">Failed</);
+    assert.match(html, /expected \.sec-head h1 on screen/);
+    assert.match(html, /HTTP 500 for GET http:\/\/127\.0\.0\.1:3000\/admin\/api\/stats/);
+  });
+
+  it('names the collage\'s bands', () => {
+    const collage = { file: 'collage.png', width: 9350, height: 25000, screens: 56, bands: [{ title: 'WEBSITE', screens: 4 }, { title: 'ADMIN', screens: 6 }, { title: 'APP', screens: 46 }] };
+    assert.match(renderReport(fakeRun([fakeStep(1)], { collage })), /56 screens, in bands top to bottom: WEBSITE \(4\), ADMIN \(6\), APP \(46\)/);
   });
 
   it('shows a parity error in place of a percentage', () => {

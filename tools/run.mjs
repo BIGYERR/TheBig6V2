@@ -26,8 +26,9 @@ import { REPO, ROOT, attachRun, oneLine, startRun } from './runlog.mjs';
 
 /** Lines worth an event. Each rule returns [subject, text, global?] or a detail for the summary. */
 const RULES = [
-  // e2e steps (the runner prints "  PASS #09 strength/rest-sheet  parity 0.000% (0 px)")
-  { re: /^\s*(PASS|FAIL) #\d+\s.*/, event: (m) => ['step', m[0].trim(), m[1] === 'FAIL'] },
+  // e2e steps (the runner prints "  PASS #09 strength/rest-sheet  parity 0.000% (0 px)", and "  PASS #W02 ..." for a
+  // website or admin page: the band's letter, then the number)
+  { re: /^\s*(PASS|FAIL) #[A-Z]?\d+\s.*/, event: (m) => ['step', m[0].trim(), m[1] === 'FAIL'] },
   // gate.sh's verdict
   { re: /^(ALL GATES PASS|GATES RED .*)$/, event: (m) => ['verdict', m[0], true], detail: (m) => m[0] },
   // e2e's verdict
