@@ -136,3 +136,17 @@ screen shows or what is stored.
   line breaks, against v0.239.5.
 - **Does not change:** any program (the program-output golden files, HALF_MANNY and the 864-config lattice, unchanged);
   any screen; any stored key or value.
+
+## Release scope: v0.239.7, the cleanup pass's first part: seven directives become code
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.7.
+- **Changes, each the same value by the language's own rule:** five date differences read `getTime()` (`race - today`
+  became `race.getTime() - today.getTime()`; a Date minus a Date subtracts exactly those numbers), one comparison of
+  booleans reads `Number(...)` (`(a==='run')-(b==='run')`; `true - false` is `Number(true) - Number(false)`), and
+  `_BW_SUBS`'s second `'Kettlebell swing':'Jump squats'` is gone (same key, same value, and the key keeps its first
+  place). Their seven `@ts-expect-error` go with them; the two on the `assignedType` finding stay until it is ruled.
+- **Proof:** not the token proof (tokens change on purpose): every hunk of the page's diff against v0.239.6 is one of
+  the seven rewrites or a removed directive; the fast tests (1,131), the sweeps (244, the 864-config lattice among them)
+  and the golden program output unchanged.
+- **Still for the cleanup pass:** `noUncheckedIndexedAccess` and the loose `any` (`sportSessionTypes`, the engine's few
+  `Record<string, any>`), file by file, each its own proof.

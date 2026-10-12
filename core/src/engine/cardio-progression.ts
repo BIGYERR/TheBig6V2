@@ -1345,8 +1345,7 @@ function spaceHardCardio(sportSessionTypes: Record<string, any>, sportDayIndices
   // are attempted before run so the run's long day keeps its late-week placement whenever
   // moving another sport is enough — the long run being last is a real convention, and
   // this pass should spend the cheapest move that fixes the week.
-  // @ts-expect-error boolean arithmetic (true - false is 1); the cleanup pass writes the comparison as numbers
-  const sports = Object.keys(sportDayIndices).sort((a,b)=>(a==='run')-(b==='run'));
+  const sports = Object.keys(sportDayIndices).sort((a,b)=>Number(a==='run')-Number(b==='run'));
   let guard = 0;
   for(const sp of sports){
     if(sp === _skipSport) continue;   // V213 (D146): chooser-planned run week, left as planned

@@ -250,8 +250,6 @@ const _BW_SUBS: Record<string, string>={
   'Ball slams OR Kettlebell swings':'Burpees',
   'Ball slams':'Burpees',
   'Kettlebell swing':'Jump squats',
-  // @ts-expect-error TS1117, a key written twice with the same value: dead, and left as it ran (phase D moves code, never changes it)
-  'Kettlebell swing':'Jump squats',
   'Clamshells w/ band':'Clamshells (bodyweight)',
   'Banded side steps':'Side-lying leg raises',
   'Terminal knee extension (band)':'Wall sit',

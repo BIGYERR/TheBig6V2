@@ -60,8 +60,7 @@ function raceCountdown(raceIso: string | null | undefined, todayIso?: string | n
   const race = _parseLocalDate(raceIso); if(!race) return null;
   const today = todayIso ? _parseLocalDate(todayIso) : new Date(); if(!today) return null;
   today.setHours(0,0,0,0);
-  // @ts-expect-error date arithmetic (a Date minus a Date is its milliseconds); the cleanup pass reads getTime()
-  const days = Math.round((race - today)/86400000);
+  const days = Math.round((race.getTime() - today.getTime())/86400000);
   return {days, weeks: Math.floor(days/7)};
 }
 // D182 (V223): raceCountdownWords(cd) → {card, copy} for a raceCountdown result, null on null.
@@ -88,13 +87,10 @@ function raceAlignment(goalId: string | null | undefined, raceIso: string | null
   const today = todayIso ? _parseLocalDate(todayIso)! : new Date(); today.setHours(0,0,0,0);
   const todayMon = getWeekMonday(_isoOf(today));
   const weeksOut = raceCountdown(raceIso, todayIso)!.weeks;   // D182: one day-count in the file
-  // @ts-expect-error date arithmetic (a Date minus a Date is its milliseconds); the cleanup pass reads getTime()
-  const openWeek = Math.max(1, Math.min(tw, Math.round((todayMon - start)/86400000/7) + 1));
-  // @ts-expect-error date arithmetic (a Date minus a Date is its milliseconds); the cleanup pass reads getTime()
-  const futureWeeks = Math.max(0, Math.round((start - todayMon)/86400000/7));
+  const openWeek = Math.max(1, Math.min(tw, Math.round((todayMon.getTime() - start.getTime())/86400000/7) + 1));
+  const futureWeeks = Math.max(0, Math.round((start.getTime() - todayMon.getTime())/86400000/7));
   const floor = NRC_PLAN_FLOOR[goalId!];
-  // @ts-expect-error date arithmetic (a Date minus a Date is its milliseconds); the cleanup pass reads getTime()
-  return {tw, raceIso, raceDay:_ISO_ORDER[Math.round((race - raceMon)/86400000)], raceMon:_isoOf(raceMon),
+  return {tw, raceIso, raceDay:_ISO_ORDER[Math.round((race.getTime() - raceMon.getTime())/86400000)], raceMon:_isoOf(raceMon),
           start:_isoOf(start), weeksOut, openWeek: futureWeeks ? 1 : openWeek, floor, underFloor: weeksOut < floor, futureWeeks,
           behindWeeks: futureWeeks ? 0 : openWeek - 1};
 }
@@ -106,8 +102,7 @@ function raceAlignment(goalId: string | null | undefined, raceIso: string | null
 function testWeekIndex(startIso: string | null | undefined, raceIso: string | null | undefined): number | null{
   const s = _parseLocalDate(startIso), t = _parseLocalDate(raceIso);
   if(!s || !t || t < s) return null;
-  // @ts-expect-error date arithmetic (a Date minus a Date is its milliseconds); the cleanup pass reads getTime()
-  const days = Math.round((getWeekMonday(_isoOf(t)) - getWeekMonday(_isoOf(s))) / 86400000);
+  const days = Math.round((getWeekMonday(_isoOf(t)).getTime() - getWeekMonday(_isoOf(s)).getTime()) / 86400000);
   return Math.floor(days / 7) + 1;   // week 1 is the week holding the start
 }
 // The race-week pin: race day is the entered date's weekday; every train day AFTER it in
