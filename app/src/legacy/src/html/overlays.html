@@ -1,0 +1,158 @@
+<!-- DETAIL OVERLAY -->
+<div class="overlay" id="detailOverlay">
+  <div class="detail-header">
+    <div class="dh-toprow">
+      <button class="dh-back" onclick="closeDetail()">‹ Back</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="dh-counter" id="detailCounter"></span>
+        <button class="dh-rpe-btn" onclick="showRpeInfo()" aria-label="What is RPE?">RPE <span style="font-size:12px">ⓘ</span></button>
+      </div>
+    </div>
+    <div class="dh-over"><span class="dh-over-txt" id="detailDayName"></span></div>
+    <div class="dh-title" id="detailDayTitle"></div>
+    <!-- The add button rides the modality-chip row, not the overline. #detailTags is
+         rewritten wholesale by modTagsHTML on every openDetail, so the button CANNOT
+         live inside it — it needs this sibling wrapper or it is wiped on first render. -->
+    <div class="dh-tagrow">
+      <div class="dh-tags" id="detailTags"></div>
+      <button class="dh-addbtn" id="detailAddBtn" onclick="openAddSheet()" aria-label="Add an exercise to this day"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Exercise</button>
+    </div>
+  </div>
+  <div class="detail-body" id="detailBody"></div>
+  <div class="detail-foot" id="detailFoot">
+    <div id="detailStatusRow"></div>
+  </div>
+</div>
+
+<!-- RPE INFO MODAL (single app-wide reference) -->
+<div class="overlay" id="swapOverlay">
+  <div class="detail-header">
+    <div class="dh-toprow">
+      <button class="dh-back" onclick="closeSwapSheet()">‹ Back</button>
+    </div>
+    <div class="dh-over">SWAP OUT</div>
+    <div class="dh-title" id="swapOutName"></div>
+    <div class="swap-tags" id="swapTags"></div>
+  </div>
+  <div class="swap-body" id="swapBody"></div>
+</div>
+<div class="overlay" id="addOverlay">
+  <div class="detail-header">
+    <div class="dh-toprow">
+      <button class="dh-back" onclick="closeAddSheet()">‹ Back</button>
+    </div>
+    <div class="dh-over"><span class="dh-over-txt">Add an exercise</span></div>
+    <div class="dh-title" id="addOutName"></div>
+    <div class="swap-tags" id="addTags"></div>
+  </div>
+  <div class="swap-body" id="addBody"></div>
+</div>
+<div class="pop-overlay" id="swapNudgeOverlay">
+  <div class="swap-nudge-card">
+    <div class="swap-nudge-hd">Noticed something</div>
+    <div class="swap-nudge-body" id="swapNudgeBody"></div>
+    <button class="swap-nudge-yes" onclick="acceptSwapNudge()">Make the change</button>
+    <button class="swap-nudge-no" onclick="dismissSwapNudge()">Leave the plan alone</button>
+  </div>
+</div>
+<div class="rpe-overlay" id="rpeInfoOverlay" onclick="hideRpeInfo(event)">
+  <div class="rpe-info-card" onclick="event.stopPropagation()">
+    <div class="rpe-info-title">RPE — Rate of Perceived Exertion</div>
+    <div class="rpe-info-sub">How hard it feels on a 1–10 scale. Use the talk test to place your effort:</div>
+    <div class="rpe-info-scale">
+      <div><b>1–3</b><span>Easy — can hold a full conversation</span></div>
+      <div><b>4–6</b><span>Moderate — short sentences only</span></div>
+      <div><b>7–8</b><span>Hard — a few words at a time</span></div>
+      <div><b>9–10</b><span>Max — can't talk, all-out</span></div>
+    </div>
+    <div class="rpe-info-note">Lifting uses the same feel — it's how many reps you leave in reserve (RPE 8 ≈ 2 reps left in the tank).</div>
+    <div class="rpe-info-note">Rest between sets: 2–3 minutes on main lifts, 60–90 seconds on everything else unless the card says otherwise.</div>
+    <div class="rpe-info-note">Accessories: hit the top of the rep range on every set, then add weight and start back at the bottom of the range.</div>
+    <button class="rpe-info-close" onclick="hideRpeInfo()">Got it</button>
+  </div>
+</div>
+
+<!-- RANDOM OVERLAY -->
+<div class="rand-overlay" id="randOverlay">
+  <div class="rand-header">
+    <button class="back-btn" onclick="closeRandom()">← Back</button>
+    <div class="rand-filter-bar" id="randFilterBar" style="flex:1;margin-left:12px;margin-bottom:0"></div>
+    <button class="rand-reset-btn" onclick="resetWildcardCounter()" id="resetRandBtn" aria-label="Reset wildcard counter" title="Reset wildcard counter">↺ Reset</button>
+  </div>
+  <div class="rand-body" id="randBody"></div>
+</div>
+
+<div class="rand-overlay" id="restOverlay">
+  <div class="rand-header">
+    <button class="back-btn" onclick="closeRestSheet()">← Back</button>
+  </div>
+  <div class="rand-body" id="restBody"></div>
+</div>
+
+<div class="rand-overlay" id="changeOverlay">
+  <div class="rand-header">
+    <button class="back-btn" onclick="closeOverlaySheet()">← Back</button>
+  </div>
+  <div class="rand-body" id="changeBody"></div>
+</div>
+
+<div class="rand-overlay" id="goalOverlay">
+  <div class="rand-header">
+    <button class="back-btn" onclick="closeGoalSheet()">← Back</button>
+  </div>
+  <div class="rand-body" id="goalBody"></div>
+</div>
+
+<!-- D116 (V203): the mile pencil. Two sheets, one pencil. mileOverlay edits the
+     anchor; mileLockOverlay is what the last three weeks of a program show
+     instead. The lock is evaluated at tap in openMileSheet, never at render. -->
+<div class="rand-overlay" id="mileOverlay">
+  <div class="rand-header">
+    <button class="back-btn" onclick="closeMileSheet()">← Back</button>
+  </div>
+  <div class="rand-body">
+    <div style="font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.03em;color:var(--text)">YOUR MILE</div>
+    <div id="mileSheetIntro" style="font-size:13px;color:var(--text);line-height:1.5;margin-top:6px"></div>
+    <div style="display:flex;gap:6px;margin-top:12px">
+      <input type="number" class="input-field" id="mileSheetMins" style="flex:1;text-align:center" placeholder="min" min="0" max="99">
+      <input type="number" class="input-field" id="mileSheetSecs" style="flex:1;text-align:center" placeholder="sec" min="0" max="59">
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button id="mileCommitBtn" class="prog-action-btn primary" style="flex:1" onclick="commitMileChange()">Update my mile</button>
+      <button class="prog-action-btn" style="flex:1" onclick="closeMileSheet()">Keep what I have</button>
+    </div>
+  </div>
+</div>
+
+<div class="rand-overlay" id="mileLockOverlay">
+  <div class="rand-header">
+    <button class="back-btn" onclick="closeMileSheet()">← Back</button>
+  </div>
+  <div class="rand-body" id="mileLockBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FLOATING REST TIMER (PiP-style, app-wide) -->
+<div id="restFloat">
+  <div id="rtAnchor">
+    <div id="rtTab" role="button" tabindex="0" aria-label="Rest timer, tap to open">
+      <span id="rtChev">&#8249;</span>
+      <div id="rtMini"></div>
+    </div>
+    <div id="rtCard">
+      <div id="rtNub"></div>
+      <div class="rt-head">
+        <span class="rt-cap">Rest Timer</span>
+        <button class="rt-collapse" type="button" onclick="rtCollapse()" aria-label="Minimize">&#8250;</button>
+      </div>
+      <div class="rt-readout"><span id="rtBig">0:00</span><span id="rtCs">.00</span></div>
+      <div class="rt-actions">
+        <button id="rtToggle" class="rt-btn" type="button" onclick="rtToggleBtn()">Start</button>
+        <button class="rt-reset" type="button" onclick="rtResetBtn()">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>

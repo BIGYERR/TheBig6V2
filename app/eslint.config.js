@@ -15,6 +15,8 @@ module.exports = defineConfig([
     'node_modules/',
     '.angular/',
     'src/legacy/generated/',
+    // The app's source files: the pieces of the root index.html (scripts/build-index.mjs), not Angular templates.
+    'src/legacy/src/',
     'public/legacy/',
     'e2e/report/',
   ]),

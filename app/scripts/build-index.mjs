@@ -1,0 +1,186 @@
+#!/usr/bin/env node
+// Builds the app, the repo root index.html, from its source files: the pieces src/legacy/src/order.json lists,
+// concatenated in that order, byte for byte, with nothing added between them. The root index.html is generated. Code
+// is edited in src/legacy/src/, this rebuilds the root file, and the two are committed together.
+//
+//   node scripts/build-index.mjs            write ../index.html (npm run build:index)
+//   node scripts/build-index.mjs --check    build into a temp file and exit 1 unless it equals ../index.html byte for
+//                                           byte, naming the first byte that differs and the source file it comes
+//                                           from (npm run build:index:check; tools/check.mjs and CI run it)
+//
+// order.json is the one list of pieces. Every entry is a file under html/, css/ or js/ with that folder's extension,
+// named in lower case words joined by dashes, listed once; every such file in those folders must be listed, so no
+// source file can sit outside the build. buildIndex() is exported for the dev container (backend/scripts/dev-watch.ts),
+// which builds the page it serves from the same sources and never writes the repo root. Nothing is read or written
+// unless this file is run as a script.
+import { createHash } from 'node:crypto';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+/** The app's source files: html/, css/, js/ and order.json. */
+export const SOURCES = join(APP, 'src', 'legacy', 'src');
+/** The page they build: the repo root index.html, which GitHub Pages serves and every test boots. */
+export const TARGET = join(APP, '..', 'index.html');
+
+const FOLDERS = ['html', 'css', 'js'];
+/** html/<name>.html, css/<name>.css, js/<name>.js; <name> is lower case words joined by dashes. */
+const PIECE_RE = /^(html|css|js)\/[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*\.\1$/;
+/** A word that is a version (v0, v239): a release number never goes in a file name. */
+const VERSION_WORD_RE = /(?:^|[/-])v\d/;
+
+/**
+ * The pieces in build order, as order.json lists them. Throws on anything that would quietly build a different page:
+ * a missing or repeated entry, a badly named one, or a source file the list leaves out.
+ * @param {string} [srcDir]
+ * @returns {string[]}
+ */
+export function readOrder(srcDir = SOURCES) {
+  const order = JSON.parse(readFileSync(join(srcDir, 'order.json'), 'utf8'));
+  if (!Array.isArray(order) || !order.length) throw new Error('order.json must be a list of piece paths');
+  const listed = new Set();
+  for (const piece of order) {
+    if (typeof piece !== 'string' || !PIECE_RE.test(piece) || VERSION_WORD_RE.test(piece)) {
+      throw new Error(`order.json: ${JSON.stringify(piece)} is not html/, css/ or js/ plus a file named in lower case words joined by dashes`);
+    }
+    if (listed.has(piece)) throw new Error(`order.json lists ${piece} twice`);
+    if (!existsSync(join(srcDir, piece))) throw new Error(`order.json lists ${piece}, which does not exist`);
+    listed.add(piece);
+  }
+  for (const folder of FOLDERS) {
+    const files = existsSync(join(srcDir, folder)) ? readdirSync(join(srcDir, folder)) : [];
+    for (const file of files) {
+      if (file.endsWith(`.${folder}`) && !listed.has(`${folder}/${file}`)) {
+        throw new Error(`${folder}/${file} is not in order.json, so the build would leave it out`);
+      }
+    }
+  }
+  return order;
+}
+
+/**
+ * The page: every piece's bytes in order.json's order, nothing added between them.
+ * @param {string} [srcDir]
+ * @returns {Buffer}
+ */
+export function buildIndex(srcDir = SOURCES) {
+  return Buffer.concat(readOrder(srcDir).map((piece) => readFileSync(join(srcDir, piece))));
+}
+
+/**
+ * The first byte offset at which two buffers differ, or -1 when they are equal. When one is a prefix of the other, the
+ * offset is the shorter one's length.
+ * @param {Buffer} a
+ * @param {Buffer} b
+ * @returns {number}
+ */
+export function firstDifference(a, b) {
+  if (Buffer.compare(a, b) === 0) return -1;
+  const n = Math.min(a.length, b.length);
+  for (let i = 0; i < n; i++) if (a[i] !== b[i]) return i;
+  return n;
+}
+
+/**
+ * Line and column (both from 1) of a byte offset.
+ * @param {Buffer} buf
+ * @param {number} offset
+ */
+function lineCol(buf, offset) {
+  let line = 1;
+  let lineStart = 0;
+  for (let i = buf.indexOf(10); i !== -1 && i < offset; i = buf.indexOf(10, i + 1)) {
+    line++;
+    lineStart = i + 1;
+  }
+  return { line, column: offset - lineStart + 1 };
+}
+
+const sha256 = (/** @type {Buffer} */ buf) => createHash('sha256').update(buf).digest('hex');
+const versionOf = (/** @type {Buffer} */ buf) => /<meta name="ia-version" content="([^"]*)"/.exec(buf.toString('utf8'))?.[1] ?? '(none)';
+const around = (/** @type {Buffer} */ buf, /** @type {number} */ at) => JSON.stringify(buf.subarray(Math.max(0, at - 20), at + 20).toString('utf8'));
+
+/**
+ * Builds into a temp file and compares it with `target`, byte for byte, as cmp would.
+ * @param {string} [srcDir]
+ * @param {string} [target]
+ * @returns {{ ok: boolean, message: string, offset: number, kept: string | null }}
+ */
+export function checkIndex(srcDir = SOURCES, target = TARGET) {
+  const order = readOrder(srcDir);
+  const dir = mkdtempSync(join(tmpdir(), 'ia-build-index-'));
+  const tmp = join(dir, 'index.html');
+  writeFileSync(tmp, buildIndex(srcDir));
+  const built = readFileSync(tmp);
+  if (!existsSync(target)) return { ok: false, message: `no ${target} to compare with; the build is kept at ${tmp}`, offset: 0, kept: tmp };
+  const committed = readFileSync(target);
+  const offset = firstDifference(built, committed);
+  if (offset === -1) {
+    rmSync(dir, { recursive: true, force: true });
+    return {
+      ok: true,
+      message: `index.html is the build of ${order.length} source files: ${built.length} bytes, ia-version ${versionOf(built)}, sha256 ${sha256(built)}`,
+      offset,
+      kept: null,
+    };
+  }
+  // The source file the differing byte comes from, and its line there.
+  let from = 'past the last source file';
+  let start = 0;
+  for (const piece of order) {
+    const bytes = readFileSync(join(srcDir, piece));
+    if (offset < start + bytes.length) {
+      from = `${piece} line ${lineCol(bytes, offset - start).line}`;
+      break;
+    }
+    start += bytes.length;
+  }
+  const at = lineCol(committed, offset);
+  return {
+    ok: false,
+    message: [
+      `index.html is not the build of the source files: the first difference is byte ${offset} (index.html line ${at.line}, column ${at.column}; ${from})`,
+      `  built       ${around(built, offset)}`,
+      `  index.html  ${around(committed, offset)}`,
+      `  built ${built.length} bytes, sha256 ${sha256(built)}; index.html ${committed.length} bytes, sha256 ${sha256(committed)}`,
+      `  the build is kept at ${tmp}`,
+      '  Edit the source files under app/src/legacy/src/, then run npm run build:index in app/. Never edit index.html by hand.',
+    ].join('\n'),
+    offset,
+    kept: tmp,
+  };
+}
+
+function main() {
+  if (process.argv.includes('--check')) {
+    const result = checkIndex();
+    if (!result.ok) {
+      console.error(`build-index: ${result.message}`);
+      process.exit(1);
+    }
+    console.log(`build-index: ${result.message}`);
+    return;
+  }
+  const order = readOrder();
+  const built = buildIndex();
+  const what = `${order.length} source files: ${built.length} bytes, ia-version ${versionOf(built)}, sha256 ${sha256(built)}`;
+  if (existsSync(TARGET) && Buffer.compare(readFileSync(TARGET), built) === 0) {
+    console.log(`build-index: index.html is unchanged, the build of ${what}`);
+    return;
+  }
+  // Written beside itself and renamed over the old file, so nothing ever reads half a page.
+  writeFileSync(`${TARGET}.tmp`, built);
+  renameSync(`${TARGET}.tmp`, TARGET);
+  console.log(`build-index: wrote index.html from ${what}`);
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try {
+    main();
+  } catch (err) {
+    console.error(`build-index: ${err instanceof Error ? err.message : err}`);
+    process.exit(1);
+  }
+}

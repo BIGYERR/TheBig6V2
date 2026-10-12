@@ -62,7 +62,8 @@ pwa-local: serving ia-version 239 from dist/pwa-local/
   rebuilding, and is still refused if that build is stale.
 
 The live app is still the repo root `index.html`, served by GitHub Pages and booted by every gate under `tests/`.
-Nothing here edits it. The Angular app is **generated from it on every build**, so there is one source of truth and
+It is built from the app's source files in `src/legacy/src/` (`npm run build:index`; the README there lists them), and
+nothing else edits it. The Angular app is **generated from it on every build**, so there is one source of truth and
 the gates keep proving the code this app runs.
 
 ## How the Angular app is built from index.html
@@ -102,6 +103,8 @@ with an iOS Simulator runtime.
 | `npm start` | sync, then `ng serve` on http://localhost:4200 |
 | `npm run build` | sync, then a production build into `www/` (Cordova's web root; both iOS paths and e2e run it) |
 | `npm run sync:check` | fail if the generated files are stale against `../index.html` |
+| `npm run build:index` | build `../index.html` from the app's source files in `src/legacy/src/` (`scripts/build-index.mjs`); the root file is never edited by hand |
+| `npm run build:index:check` | fail, naming the first differing byte and its source file, unless `../index.html` is the build of `src/legacy/src/` |
 | `npm run lint` | ESLint: TypeScript and templates (angular-eslint), plus `scripts/`, `e2e/` and `test/`; errors fail |
 | `npm run lint:legacy` | warn-only report on the generated `app.js` (counts per rule, first examples) |
 | `npm test` | type-check, then the unit tests, then the integration tests (Node's built-in runner), each a logged run; about 5 s |
@@ -160,7 +163,8 @@ namespaces, parameter properties). `e2e/package.json` and `test/package.json` on
   parity, and the step list.
 - `test/integration/`: real inputs. The `pwa-local` server over real HTTP against a fixture build (content types,
   caching, the update check's probe, nothing served from outside the build), the build check both web paths share,
-  `sync-legacy` against the live `../index.html` and as a command, the collage drawn
+  `sync-legacy` against the live `../index.html` and as a command, `build-index` against the live source files and
+  fixture folders, the collage drawn
   in Chrome and checked pixel by pixel, and the written report opened from disk in Chrome with every request outside
   the file blocked. These use Puppeteer's Chrome on this machine, which `npm install` downloads.
 
