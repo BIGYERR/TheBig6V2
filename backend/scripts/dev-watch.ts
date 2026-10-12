@@ -42,6 +42,8 @@ const APP_WEB = resolve(process.env.APP_BUNDLE_DIR || join(BACKEND, 'app-web'));
 // The app's source files, and the script that builds the page from them. In the container both sit in the read-only
 // mount of the repo root.
 const APP_SOURCES = join(REPO, 'frontends', 'app', 'src', 'legacy', 'src');
+/** The engine's TypeScript (architecture phase D), which the page is built from beside APP_SOURCES. */
+const CORE_ENGINE = join(REPO, 'core', 'src', 'engine');
 const BUILD_INDEX = join(REPO, 'frontends', 'app', 'scripts', 'build-index.mjs');
 const PORT = Number(process.env.PORT || 3000);
 const SELF = `http://127.0.0.1:${PORT}`;
@@ -439,15 +441,16 @@ async function main() {
     await backendTests();
     await reloadPages();
   });
-  // The app's source files: a save builds the page /app/ serves from them, into app-web/ only.
-  if (existsSync(APP_SOURCES)) {
-    watchFolder(APP_SOURCES, { only: (f) => /\.(html|css|js|json)$/.test(f) }, async (files) => {
-      log('app', `changed: ${files.join(', ')}`);
-      if (await buildAppFromSources()) checkAppScript();
-      await appUnitTests();
-      await reloadPages();
-    });
-  }
+  // The app's source files, and the engine's TypeScript in core/src/engine: a save builds the page /app/ serves from
+  // them, into app-web/ only.
+  const appChanged = async (files: string[]) => {
+    log('app', `changed: ${files.join(', ')}`);
+    if (await buildAppFromSources()) checkAppScript();
+    await appUnitTests();
+    await reloadPages();
+  };
+  if (existsSync(APP_SOURCES)) watchFolder(APP_SOURCES, { only: (f) => /\.(html|css|js|json)$/.test(f) }, appChanged);
+  if (existsSync(CORE_ENGINE)) watchFolder(CORE_ENGINE, { only: (f) => /\.ts$/.test(f) }, appChanged);
 
   if (await healthy(60_000)) log('server', `up on :${PORT}`, 'ok');
   if (IN_CONTAINER) log('tests', "app unit tests: on the Mac only, they need frontends/app/'s own node_modules (cd frontends/app && npm run test:unit)", 'dim');

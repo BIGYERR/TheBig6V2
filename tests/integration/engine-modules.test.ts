@@ -16,7 +16,7 @@ import { afterAll, beforeAll, test, vi } from 'vitest';
 import type { Cfg, Program } from '@ia/core';
 import { progDigest } from '../support/app.ts';
 import { PROGRAMS } from '../support/programs.ts';
-import { ENGINE_FILES, ENGINE_SOURCES, loadEngineModules } from '../support/engine-modules.ts';
+import { ENGINE_FILES, engineFile, loadEngineModules } from '../support/engine-modules.ts';
 
 const SNAPSHOT = join(dirname(fileURLToPath(import.meta.url)), '..', 'snapshots', 'program-output.json');
 /** The day the golden file was built on (tests/integration/program-output.test.ts pins the same local noon). */
@@ -32,7 +32,9 @@ afterAll(() => {
 });
 
 test('the engine\'s files import only each other: buildProgram reaches no UI file (phase C, step 3)', () => {
-  const importsOf = (file: string) => [...readFileSync(join(ENGINE_SOURCES, `${file}.js`), 'utf8').matchAll(/^} from '\.\/([a-z0-9-]+)\.js';$|^import \{[^}]*\} from '\.\/([a-z0-9-]+)\.js';$/gm)].map((m) => (m[1] ?? m[2])!);
+  // An import names './x.js' (an app file), './x.ts' (an engine file in core/) or the path into core/src/engine.
+  const SPEC = /^(?:} |import \{[^}]*\} )from '(?:\.\/|(?:\.\.\/)+core\/src\/engine\/)([a-z0-9-]+)\.(?:js|ts)';$/gm;
+  const importsOf = (file: string) => [...readFileSync(engineFile(file as (typeof ENGINE_FILES)[number]), 'utf8').matchAll(SPEC)].map((m) => m[1]!);
   const reached = new Set<string>(['budget-engine-d']);
   for (const file of reached) for (const next of importsOf(file)) reached.add(next);
   const outside = [...reached].filter((f) => !(ENGINE_FILES as readonly string[]).includes(f));

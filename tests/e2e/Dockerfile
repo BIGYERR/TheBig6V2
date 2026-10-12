@@ -17,6 +17,7 @@ FROM deps AS build
 COPY frontends/app/angular.json frontends/app/tsconfig.json frontends/app/tsconfig.app.json ./
 COPY frontends/app/scripts/ ./scripts/
 COPY frontends/app/src/ ./src/
+COPY core/src/ /repo/core/src/
 COPY apple-touch-icon.png /repo/
 # The single-file page and its icon, as GitHub Pages deploys them (frontends/app/scripts/build-index.mjs)
 RUN node --input-type=module -e "(await import('./scripts/build-index.mjs')).writePages()"

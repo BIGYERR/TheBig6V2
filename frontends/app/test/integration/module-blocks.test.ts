@@ -6,10 +6,11 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
+import { stripTypeScriptTypes } from 'node:module';
+import { dirname, join, resolve } from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { readOrder, SOURCES } from '../../scripts/build-index.mjs';
+import { piecePath, readOrder, SOURCES } from '../../scripts/build-index.mjs';
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const req = createRequire(import.meta.url);
@@ -25,13 +26,22 @@ interface Node {
 }
 
 describe('module blocks', () => {
-  const pieces = readOrder().filter((p: string) => p.endsWith('.js'));
-  const asts = new Map(pieces.map((p: string) => [p.slice(3, -3), acorn.parse(readFileSync(join(SOURCES, p), 'utf8'), { ecmaVersion: 'latest', sourceType: 'module', ranges: true })]));
+  // The app's JS files and the engine's TypeScript (core/src/engine, architecture phase D), the latter read as the
+  // JavaScript it runs: Node's own stripper puts spaces where the types were, and a type import is all spaces.
+  const pieces = readOrder().filter((p: string) => /\.(js|ts)$/.test(p));
+  const nameOf = (p: string) => p.replace(/^(js|engine)\//, '').replace(/\.(js|ts)$/, '');
+  const fileOf = new Map(pieces.map((p: string) => [piecePath(SOURCES, p), nameOf(p)]));
+  const code = (p: string) => {
+    const text = readFileSync(piecePath(SOURCES, p), 'utf8');
+    return p.endsWith('.ts') ? stripTypeScriptTypes(text, { mode: 'strip' }) : text;
+  };
+  const asts = new Map(pieces.map((p: string) => [nameOf(p), acorn.parse(code(p), { ecmaVersion: 'latest', sourceType: 'module', ranges: true })]));
+  const pieceOf = new Map(pieces.map((p: string) => [nameOf(p), p]));
 
   it('every JS file\'s blocks are what its code needs (npm run modules:check)', () => {
     const res = spawnSync(process.execPath, ['scripts/module-blocks.mjs', '--check'], { cwd: APP, encoding: 'utf8' });
     assert.equal(res.status, 0, res.stderr);
-    assert.match(res.stdout, /every block matches its code \(\d+ JS files, \d+ imported names, \d+ exported\)/);
+    assert.match(res.stdout, /every block matches its code \(\d+ JS files and \d+ TypeScript, \d+ imported names, \d+ exported\)/);
   });
 
   it('every JS file parses as an ES module, and every import names an export of the file it comes from', () => {
@@ -46,8 +56,10 @@ describe('module blocks', () => {
     for (const [file, ast] of asts) {
       for (const n of ast.body) {
         if (n.type !== 'ImportDeclaration') continue;
-        const from = /^\.\/([a-z0-9-]+)\.js$/.exec(n.source!.value)?.[1];
+        // The specifier is the path from the importing file to a source file: resolved here, it must name one.
+        const from = fileOf.get(resolve(dirname(piecePath(SOURCES, pieceOf.get(file)!)), n.source!.value));
         assert.ok(from && exportsOf.has(from), `${file} imports from ${n.source!.value}, which is not a source file`);
+        if (pieceOf.get(file)!.startsWith('engine/')) assert.ok(pieceOf.get(from)!.startsWith('engine/'), `${file}, an engine file, imports from the app's ${from}`);
         for (const s of n.specifiers ?? []) {
           imported++;
           assert.ok(exportsOf.get(from)!.has(s.imported!.name), `${file} imports ${s.imported!.name} from ${from}, which does not export it`);

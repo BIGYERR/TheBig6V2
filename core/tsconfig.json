@@ -1,9 +1,11 @@
-/* @ia/core: framework-free, so no DOM and no Node types; an index read can be undefined, and the code has to say so. */
+/* @ia/core: framework-free, so no DOM and no Node types; an index read can be undefined, and the code has to say so.
+ * The engine (src/engine) is checked by tsconfig.engine.json instead. */
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "types": [],
     "noUncheckedIndexedAccess": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/engine"]
 }

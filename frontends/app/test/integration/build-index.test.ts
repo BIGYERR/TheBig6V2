@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { stripTypeScriptTypes } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { after, describe, it } from 'node:test';
@@ -29,8 +30,13 @@ function classic(text: string): string {
   const j = text.indexOf(EXPORTS_START);
   return text.slice(i === -1 ? 0 : i + IMPORTS_END.length, j === -1 ? text.length : j);
 }
+/** The engine's TypeScript (architecture phase D): order.json's engine/<name>.ts is core/src/engine/<name>.ts. */
+const LIVE_ENGINE = join(REPO, 'core', 'src', 'engine');
+/** A TypeScript file as the page carries it: Node's own stripper, called here, puts spaces where the types were. */
+const stripped = (code: string) => stripTypeScriptTypes(code, { mode: 'strip' });
 const pieceOnPage = (piece: string) => {
-  const bytes = readFileSync(join(LIVE_SOURCES, piece));
+  const bytes = readFileSync(piece.startsWith('engine/') ? join(LIVE_ENGINE, piece.slice('engine/'.length)) : join(LIVE_SOURCES, piece));
+  if (piece.endsWith('.ts')) return Buffer.from(stripped(classic(bytes.toString('utf8'))), 'utf8');
   return piece.endsWith('.js') ? Buffer.from(classic(bytes.toString('utf8')), 'utf8') : bytes;
 };
 
@@ -69,10 +75,10 @@ describe('build-index on the live sources', () => {
     assert.ok(readFileSync(LIVE_PAGE).equals(Buffer.concat(order.map(pieceOnPage))));
   });
 
-  it('the JS files are the inline script, in order, and each compiles on its own', () => {
+  it('the JS files and the engine\'s TypeScript are the inline script, in order, and each compiles on its own', () => {
     const html = buildIndex().toString('utf8');
     const script = html.split('<script>')[1]!.split('</script>')[0];
-    const js = order.filter((piece) => piece.startsWith('js/'));
+    const js = order.filter((piece) => piece.startsWith('js/') || piece.startsWith('engine/'));
     assert.equal(js.map((piece) => pieceOnPage(piece).toString('utf8')).join(''), script);
     for (const piece of js) assert.doesNotThrow(() => new Script(pieceOnPage(piece).toString('utf8'), { filename: piece }), piece);
   });
@@ -80,6 +86,7 @@ describe('build-index on the live sources', () => {
   it('lists every source file once, and no file name carries a version', () => {
     assert.deepEqual(readOrder(), order);
     const onDisk = ['html', 'css', 'js'].flatMap((folder) => readdirSync(join(LIVE_SOURCES, folder)).map((f) => `${folder}/${f}`));
+    if (existsSync(LIVE_ENGINE)) onDisk.push(...readdirSync(LIVE_ENGINE).filter((f) => f.endsWith('.ts') && f !== 'index.ts').map((f) => `engine/${f}`));
     assert.deepEqual([...onDisk].sort(), [...order].sort());
     for (const piece of order) assert.doesNotMatch(piece, /(?:^|[/-])v\d/, piece);
   });
@@ -178,7 +185,30 @@ describe('build-index on fixture sources', () => {
     assert.throws(() => readOrder(dir), /lists html\/top\.html twice/);
     for (const bad of ['js/App.js', 'js/app.css', 'lib/app.js', 'js/../app.js', 'js/engine-v239.js', 'js/app_x.js']) {
       withList([...list, bad]);
-      assert.throws(() => readOrder(dir), /is not html\/, css\/ or js\/ plus a file named in lower case words joined by dashes/, bad);
+      assert.throws(() => readOrder(dir), /is not html\/, css\/, js\/ or engine\/ plus a file named in lower case words joined by dashes/, bad);
     }
+  });
+
+  it('builds an engine file from core/src/engine: its module blocks stripped, then its types, to spaces in place', () => {
+    // A copy of the repo's shape: the sources four folders under frontends/, core/src/engine beside them.
+    const top = mkdtempSync(join(tmpdir(), 'ia-build-index-engine-'));
+    made.push(top);
+    const dir = join(top, 'frontends', 'app', 'src', 'legacy', 'src');
+    const engine = join(top, 'core', 'src', 'engine');
+    for (const folder of ['html', 'js']) mkdirSync(join(dir, folder), { recursive: true });
+    mkdirSync(engine, { recursive: true });
+    writeFileSync(join(dir, 'html/top.html'), '<script>');
+    writeFileSync(join(engine, 'pace.ts'), `import type { Cfg } from '../domain/index.ts';\nfunction pace(sec: number, cfg?: Cfg): string { return String(sec as number); }\n${EXPORTS_START}export { pace };\n`);
+    writeFileSync(join(dir, 'js/app.js'), `import { pace } from '../../../../../../core/src/engine/pace.ts';\n${IMPORTS_END}pace(1);\n`);
+    writeFileSync(join(dir, 'html/end.html'), '</script>\n');
+    writeFileSync(join(dir, 'order.json'), JSON.stringify(['html/top.html', 'engine/pace.ts', 'js/app.js', 'html/end.html']));
+    const page = buildIndex(dir).toString('utf8');
+    const code = 'function pace(sec: number, cfg?: Cfg): string { return String(sec as number); }\n';
+    assert.equal(page, `<script>${' '.repeat("import type { Cfg } from '../domain/index.ts';".length)}\n${code.replace(/: number|\?: Cfg|: string| as number/g, (t) => ' '.repeat(t.length))}pace(1);\n</script>\n`);
+    writeFileSync(join(engine, 'stray.ts'), 'export {};\n');
+    assert.throws(() => readOrder(dir), /core\/src\/engine\/stray\.ts is not in order\.json/);
+    rmSync(join(engine, 'stray.ts'));
+    writeFileSync(join(engine, 'index.ts'), "export { pace } from './pace.ts';\n");
+    assert.doesNotThrow(() => readOrder(dir), 'the engine\'s index.ts is the package entry, never a piece');
   });
 });

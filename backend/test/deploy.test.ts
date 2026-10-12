@@ -84,7 +84,9 @@ describe('heroku deploy tree', { skip: !existsSync(join(BACKEND, '..', '.git')) 
         return git('rev-parse', '--verify', `${ref}:index.html`);
       } catch {
         const out = mkdtempSync(join(tmpdir(), 'ia-deploy-page-'));
-        execFileSync('sh', ['-c', `git -C "${top}" archive ${ref} frontends/app/scripts/build-index.mjs frontends/app/src/legacy/src | tar -x -C "${out}"`], { env });
+        // The engine's files are TypeScript in core/src/engine from architecture phase D on, built into the same page.
+        const core = (() => { try { git('cat-file', '-e', `${ref}:core/src`); return ' core/src'; } catch { return ''; } })();
+        execFileSync('sh', ['-c', `git -C "${top}" archive ${ref} frontends/app/scripts/build-index.mjs frontends/app/src/legacy/src${core} | tar -x -C "${out}"`], { env });
         const built = execFileSync(process.execPath, ['--input-type=module', '-e', 'process.stdout.write((await import(process.argv[1])).buildIndex())', join(out, 'frontends/app/scripts/build-index.mjs')]);
         rmSync(out, { recursive: true, force: true });
         return execFileSync('git', ['-C', BACKEND, 'hash-object', '--stdin'], { input: built, encoding: 'utf8', env }).trim();

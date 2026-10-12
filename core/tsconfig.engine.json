@@ -1,0 +1,12 @@
+/* @ia/core's engine (src/engine, architecture phase D): the app's engine files, turned TypeScript one group at a time.
+ * Strict, framework-free (no DOM, no Node types), like the rest of core/, but without noUncheckedIndexedAccess: the
+ * types are written onto the code as it ran, and the build strips them to spaces (tools/same-script.mjs proves the page
+ * runs the same tokens), so a check that needs a guard or a ! at every index read would mean changing the code itself.
+ * That tightening comes after the move, file by file, under the tests. */
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "types": []
+  },
+  "include": ["src/engine"]
+}

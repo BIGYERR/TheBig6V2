@@ -16,13 +16,19 @@
 // and an export block at its bottom, each ending or starting on a fixed marker line. The build strips both blocks, so
 // the page carries the classic script, byte for byte what the code between the markers says.
 //
+// The engine is TypeScript in @ia/core (architecture phase D): order.json lists each of its files as engine/<name>.ts,
+// which is core/src/engine/<name>.ts, and the build strips its module blocks and then its types. Node's own stripper
+// (node:module stripTypeScriptTypes, strip mode) puts spaces where the types were and changes nothing else, so the page
+// runs the same tokens the JavaScript did (tools/same-script.mjs proves it against any earlier page).
+//
 // order.json is the one list of pieces. Every entry is a file under html/, css/ or js/ with that folder's extension,
-// named in lower case words joined by dashes, listed once; every such file in those folders must be listed, so no
-// source file can sit outside the build. buildIndex() is exported for the dev container (backend/scripts/dev-watch.ts),
+// or engine/ with .ts, named in lower case words joined by dashes, listed once; every such file in those folders (and
+// every .ts file in core/src/engine but its index.ts) must be listed, so no source file can sit outside the build. buildIndex() is exported for the dev container (backend/scripts/dev-watch.ts),
 // which builds the page it serves from the same sources and never writes the repo root. Nothing is read or written
 // unless this file is run as a script; writePages() is exported for the tests' global setup and the backend.
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { stripTypeScriptTypes } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -38,8 +44,48 @@ export const PAGES_DIR = join(APP, '..', '..', 'dist-github-pages');
 export const ICON = join(APP, '..', '..', 'apple-touch-icon.png');
 
 const FOLDERS = ['html', 'css', 'js'];
-/** html/<name>.html, css/<name>.css, js/<name>.js; <name> is lower case words joined by dashes. */
-const PIECE_RE = /^(html|css|js)\/[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*\.\1$/;
+/** html/<name>.html, css/<name>.css, js/<name>.js, engine/<name>.ts; <name> is lower case words joined by dashes. */
+const PIECE_RE = /^(?:(html|css|js)\/[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*\.\1|engine\/[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*\.ts)$/;
+
+/**
+ * core/src/engine beside a sources folder: the repo's core/ when `srcDir` is the repo's sources, and a copy's when it
+ * is a copy of the repo's shape (a test's variant). order.json's engine/<name>.ts is <this>/<name>.ts.
+ * @param {string} [srcDir]
+ */
+export function engineDir(srcDir = SOURCES) {
+  return join(srcDir, '..', '..', '..', '..', '..', 'core', 'src', 'engine');
+}
+
+/**
+ * Where a piece lives on disk.
+ * @param {string} srcDir
+ * @param {string} piece
+ */
+export function piecePath(srcDir, piece) {
+  return piece.startsWith('engine/') ? join(engineDir(srcDir), piece.slice('engine/'.length)) : join(srcDir, piece);
+}
+
+/**
+ * TypeScript as the JavaScript it runs: every type replaced by spaces (and newlines kept), nothing else touched, so the
+ * tokens are the ones the code had before its types were written. Node marks the stripper experimental and warns once
+ * a process; that warning says nothing about the page, so it is kept out of the build's output.
+ * @param {string} code
+ * @param {string} [what]
+ * @returns {string}
+ */
+export function stripTypes(code, what = 'the code') {
+  const emit = process.emitWarning;
+  process.emitWarning = /** @type {typeof process.emitWarning} */ ((warning, ...rest) => {
+    if (!/stripTypeScriptTypes/.test(String(typeof warning === 'string' ? warning : warning.message))) emit.call(process, warning, .../** @type {any[]} */ (rest));
+  });
+  try {
+    return stripTypeScriptTypes(code, { mode: 'strip' });
+  } catch (err) {
+    throw new Error(`${what}: the types could not be stripped: ${err instanceof Error ? err.message : err}`, { cause: err });
+  } finally {
+    process.emitWarning = emit;
+  }
+}
 /** A word that is a version (v0, v239): a release number never goes in a file name. */
 const VERSION_WORD_RE = /(?:^|[/-])v\d/;
 
@@ -65,20 +111,23 @@ export function moduleParts(text) {
   const head = text.slice(0, from);
   const tail = text.slice(to);
   const imports = head.slice(0, head.length - (i === -1 ? 0 : MODULE_IMPORTS_END.length));
-  if (!/^(?:import \{[^}]*\} from '\.\/[a-z0-9-]+\.js';\n)*$/.test(imports)) throw new Error('the import block holds something other than import lines');
+  if (!/^(?:import \{[^}]*\} from '(?:\.\/[a-z0-9-]+\.(?:js|ts)|(?:\.\.\/)+core\/src\/engine\/[a-z0-9-]+\.ts)';\n)*$/.test(imports)) throw new Error('the import block holds something other than import lines');
   if (tail && !/^\n\/\/ the module exports [^\n]*\nexport \{[^}]*\};\n$/.test(tail)) throw new Error('the export block holds something other than one export list');
   return { head, body: text.slice(from, to), tail };
 }
 
 /**
- * What a piece adds to the page: an HTML or CSS file as it is, a JS file without its module blocks.
+ * What a piece adds to the page: an HTML or CSS file as it is, a JS file without its module blocks, a TypeScript file
+ * without its module blocks and its types.
  * @param {string} srcDir
  * @param {string} piece
  * @returns {Buffer}
  */
 export function pieceBytes(srcDir, piece) {
-  const bytes = readFileSync(join(srcDir, piece));
-  return piece.endsWith('.js') ? Buffer.from(moduleParts(bytes.toString('utf8')).body, 'utf8') : bytes;
+  const bytes = readFileSync(piecePath(srcDir, piece));
+  if (piece.endsWith('.js')) return Buffer.from(moduleParts(bytes.toString('utf8')).body, 'utf8');
+  if (piece.endsWith('.ts')) return Buffer.from(stripTypes(moduleParts(bytes.toString('utf8')).body, piece), 'utf8');
+  return bytes;
 }
 
 /**
@@ -93,10 +142,10 @@ export function readOrder(srcDir = SOURCES) {
   const listed = new Set();
   for (const piece of order) {
     if (typeof piece !== 'string' || !PIECE_RE.test(piece) || VERSION_WORD_RE.test(piece)) {
-      throw new Error(`order.json: ${JSON.stringify(piece)} is not html/, css/ or js/ plus a file named in lower case words joined by dashes`);
+      throw new Error(`order.json: ${JSON.stringify(piece)} is not html/, css/, js/ or engine/ plus a file named in lower case words joined by dashes`);
     }
     if (listed.has(piece)) throw new Error(`order.json lists ${piece} twice`);
-    if (!existsSync(join(srcDir, piece))) throw new Error(`order.json lists ${piece}, which does not exist`);
+    if (!existsSync(piecePath(srcDir, piece))) throw new Error(`order.json lists ${piece}, which does not exist`);
     listed.add(piece);
   }
   for (const folder of FOLDERS) {
@@ -105,6 +154,12 @@ export function readOrder(srcDir = SOURCES) {
       if (file.endsWith(`.${folder}`) && !listed.has(`${folder}/${file}`)) {
         throw new Error(`${folder}/${file} is not in order.json, so the build would leave it out`);
       }
+    }
+  }
+  const engine = engineDir(srcDir);
+  for (const file of existsSync(engine) ? readdirSync(engine) : []) {
+    if (file.endsWith('.ts') && file !== 'index.ts' && !listed.has(`engine/${file}`)) {
+      throw new Error(`core/src/engine/${file} is not in order.json, so the build would leave it out`);
     }
   }
   return order;
@@ -204,7 +259,7 @@ export function checkIndex(srcDir = SOURCES, target = TARGET) {
     const bytes = pieceBytes(srcDir, piece);
     if (offset < start + bytes.length) {
       // A line in the file as it is on disk: the import block's lines come first.
-      const head = piece.endsWith('.js') ? moduleParts(readFileSync(join(srcDir, piece), 'utf8')).head : '';
+      const head = /\.(js|ts)$/.test(piece) ? moduleParts(readFileSync(piecePath(srcDir, piece), 'utf8')).head : '';
       from = `${piece} line ${lineCol(bytes, offset - start).line + (head.match(/\n/g) ?? []).length}`;
       break;
     }

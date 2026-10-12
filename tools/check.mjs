@@ -6,9 +6,9 @@
 //
 // Lanes, each run only when what it checks changed (or always, without --staged):
 //   tests    the feature tests (tests/unit, tests/integration, against tests/snapshots; CLAUDE.md Test layout) by
-//            Vitest, beside the strict TypeScript type check of core/ and tests/ (tests/sweeps is type-checked here and
+//            Vitest, beside the strict TypeScript type check of core/, its engine and tests/ (tests/sweeps is type-checked here and
 //            run in CI only). tests/node_modules is installed (npm ci) when it is missing.
-//   build    index.html is the build of frontends/app/src/legacy/src (frontends/app/scripts/build-index.mjs), its ia-version meta reads
+//   build    index.html is the build of frontends/app/src/legacy/src and core/src/engine (frontends/app/scripts/build-index.mjs), its ia-version meta reads
 //            as a version, its inline script compiles, and it boots in the harness and builds HALF_MANNY, self-stable.
 //   frontends frontends/ (the website, the admin, common/): type check, lint.
 //   app      frontends/app/: sync from index.html, type check, unit and integration tests, lint.
@@ -58,8 +58,8 @@ const TESTS = join(REPO, 'tests');
 const want = {
   tests: touches(/^(index\.html|core\/|tests\/harness\.js$|tests\/semver\.js$|tests\/lattice193\.js$)/) || touches(FEATURE_TESTS),
   // index.html is generated from frontends/app/src/legacy/src (frontends/app/scripts/build-index.mjs); the two must never drift.
-  build: touches(/^(index\.html|frontends\/app\/src\/legacy\/src\/|frontends\/app\/scripts\/build-index\.mjs$|tests\/harness\.js$)/),
-  app: touches(/^(frontends\/app\/|tools\/|index\.html)/),
+  build: touches(/^(index\.html|frontends\/app\/src\/legacy\/src\/|core\/src\/engine\/|frontends\/app\/scripts\/build-index\.mjs$|tests\/harness\.js$)/),
+  app: touches(/^(frontends\/app\/|core\/src\/engine\/|tools\/|index\.html)/),
   frontends: touches(/^frontends\/(?!app\/)/),
   backend: touches(/^backend\//),
 };
@@ -155,6 +155,7 @@ async function testsLane() {
   }
   await Promise.all([
     step('tests', 'type check (core)', bin('tsc'), ['-p', join(REPO, 'core')], TESTS),
+    step('tests', 'type check (engine)', bin('tsc'), ['-p', join(REPO, 'core', 'tsconfig.engine.json')], TESTS),
     step('tests', 'type check (tests)', bin('tsc'), ['-p', '.'], TESTS),
     step('tests', 'unit and integration tests', bin('vitest'), ['run', ...FEATURE_TEST_DIRS], TESTS, {
       IA_APP: undefined,

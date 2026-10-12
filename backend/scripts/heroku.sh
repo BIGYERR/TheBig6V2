@@ -94,8 +94,11 @@ app_page_blob() {
   local ref="$1" tmp
   if git cat-file -e "$ref:frontends/app/scripts/build-index.mjs" 2>/dev/null; then
     tmp="$(mktemp -d)"
-    # git archive takes paths from the current folder (backend/); from the top they name the repo's layout.
-    git -C "$(git rev-parse --show-toplevel)" archive "$ref" frontends/app/scripts/build-index.mjs frontends/app/src/legacy/src |
+    # git archive takes paths from the current folder (backend/); from the top they name the repo's layout. The
+    # engine's files are TypeScript in core/src/engine from architecture phase D on, built into the same page.
+    local core=""
+    git cat-file -e "$ref:core/src" 2>/dev/null && core="core/src"
+    git -C "$(git rev-parse --show-toplevel)" archive "$ref" frontends/app/scripts/build-index.mjs frontends/app/src/legacy/src $core |
       tar -x -C "$tmp" || die "cannot extract the app's source files at $ref"
     node --input-type=module -e "process.stdout.write((await import(process.argv[1])).buildIndex())" \
       "$tmp/frontends/app/scripts/build-index.mjs" > "$tmp/index.html" || die "the app's source files at $ref do not build"

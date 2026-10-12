@@ -179,7 +179,8 @@ function scan(src: string): Scan {
   toks.forEach(t => { if(t.type !== 'code') return; for(const x of decode(t.a, t.b, 'js')){ const kl = klass(x.cp, null); if(kl === 'A' || kl === 'A2') codeHits++; } });
   let stripped = '', last = 0; comments.slice().sort((p, q) => p[0] - q[0]).forEach(([a, b]) => { stripped += src.slice(last, a) + src.slice(a, b).replace(/[^\n]/g, ' '); last = b; });
   stripped += src.slice(last);
-  const tbl = (name: string) => { const m = new RegExp('const ' + name + '=(' + BS + '{.*?' + BS + '});').exec(src); try { return m ? JSON.parse(m[1]) : null; } catch(e){ return null; } };
+  // A table's type annotation (a TypeScript file in @ia/core) strips to spaces between its name and the `=`.
+  const tbl = (name: string) => { const m = new RegExp('const ' + name + BS + 's*=(' + BS + '{.*?' + BS + '});').exec(src); try { return m ? JSON.parse(m[1]) : null; } catch(e){ return null; } };
   return { src, toks, hits, lineOf, stripped, tokText, codeHits, PATHS:tbl('ASY_ICON_PATHS'), EMAP:tbl('ASY_EMOJI') };
 }
 function tokIdxFrom(S: Scan, off: number){ let lo = 0, hi = S.toks.length; while(lo < hi){ const m = (lo + hi) >> 1; if(S.toks[m].b <= off) lo = m + 1; else hi = m; } return lo; }
@@ -197,7 +198,13 @@ const within = (ext: Extent | null | undefined, off: number) => !!ext && off >= 
 const prevCode = (S: Scan, ti: number) => (ti > 0 && S.toks[ti - 1].type === 'code') ? S.src.slice(S.toks[ti - 1].a, S.toks[ti - 1].b) : '';
 const nextCode = (S: Scan, ti: number) => (ti + 1 < S.toks.length && S.toks[ti + 1].type === 'code') ? S.src.slice(S.toks[ti + 1].a, S.toks[ti + 1].b) : '';
 const mapsToSvg = (S: Scan, txt: unknown) => { const k = String(txt).split(CP(0xFE0F)).join(''); return !!(S.EMAP && S.PATHS && S.EMAP[k] && S.PATHS[S.EMAP[k]]); };
-function uniq(S: Scan, needle: string, errs: string[], label: string){ const c = cnt(S.stripped, needle); if(c !== 1){ errs.push(label + ': anchor ' + JSON.stringify(needle) + ' found ' + c + 'x'); return -1; } return S.stripped.indexOf(needle); }
+// An anchor `const NAME=` also finds `const NAME   =`: a type annotation in a TypeScript file strips to spaces there.
+function uniq(S: Scan, needle: string, errs: string[], label: string){
+  const re = new RegExp(needle.replace(/[.*+?^${}()|[\]\\]/g, BS + '$&').replace(/=$/, BS + 's*='), 'g');
+  const at = [...S.stripped.matchAll(re)].map(m => m.index);
+  if(at.length !== 1){ errs.push(label + ': anchor ' + JSON.stringify(needle) + ' found ' + at.length + 'x'); return -1; }
+  return at[0]!;
+}
 // String tokens inside the FIRST argument of every asyIcon( call.
 function asyArgTokens(S: Scan){
   const set = new Set<number>();
