@@ -2,13 +2,15 @@ import type { Type } from '@angular/core';
 import { BugReport } from './bug-report/bug-report';
 import { RestTimer } from './rest-timer/rest-timer';
 import { PopUp } from './pop-up/pop-up';
-import { ProgressScreen } from './progress/progress-screen';
 import { RandomWorkout } from './random-workout/random-workout';
-import { ProgramList } from './program-list/program-list';
 import { SwapSheet } from './swap-sheet/swap-sheet';
 import { AddSheet } from './add-sheet/add-sheet';
 import { ChangeSheet } from './change-sheet/change-sheet';
 import { DayDetail } from './day-detail/day-detail';
+import { GeneratingScreen } from './frames/generating-screen';
+import { HomeScreen } from './frames/home-screen';
+import { ProgressFrame } from './frames/progress-frame';
+import { TabBar } from './frames/tab-bar';
 import { GoalSheet } from './goal-sheet/goal-sheet';
 import { MileLock } from './mile-sheet/mile-lock';
 import { MileSheet } from './mile-sheet/mile-sheet';
@@ -29,7 +31,7 @@ export const MOVED_SCREENS: readonly (readonly [screenId: string, component: Typ
   ['screenBugs', BugReport],
   ['restFloat', RestTimer],
   ['popOverlay', PopUp],
-  ['progList', ProgramList],
+  ['screenHome', HomeScreen],
   ['swapOverlay', SwapSheet],
   ['addOverlay', AddSheet],
   ['goalBody', GoalSheet],
@@ -41,7 +43,9 @@ export const MOVED_SCREENS: readonly (readonly [screenId: string, component: Typ
   ['randOverlay', RandomWorkout],
   ['toast', Toast],
   ['iaUpdateBanner', UpdateBanner],
-  ['progressBody', ProgressScreen],
+  ['screenProgress', ProgressFrame],
+  ['screenGenerate', GeneratingScreen],
+  ['tabBar', TabBar],
   ['screenWeek', WeekView],
   ['screenWizard', Wizard],
   ['detailOverlay', DayDetail],

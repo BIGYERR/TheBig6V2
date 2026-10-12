@@ -440,3 +440,20 @@ what is stored.
   Every journey that opens a day photographs the sheet at 0 px on both builds; the log-session journey logs two
   exercises, an effort and a note through it and finds them after a relaunch, so the wiring holds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.29 moves the app's frames
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.29.
+- **Moved:** `src/app/screens/frames/`: `home-screen.ts` (`#screenHome`: the title, the program list, the Build New
+  Program button), `generating-screen.ts` (`#screenGenerate`: the lifting figure and its title; the line under it is
+  still written by the legacy `generateProgram`), `progress-frame.ts` (`#screenProgress`: the title and the scrolling
+  body) and `tab-bar.ts` (the four buttons inside `#tabBar`). Their templates were derived from the legacy partials by
+  script, each `onclick` becoming a `(click)` that calls the same legacy function (`startWizard`, `tabGo`). The
+  ProgramList and ProgressScreen components are now the frames' children, not mounts of their own. The tab bar's
+  showing and its active tab are still the legacy `updateTabBar`'s, on the buttons' ids.
+- **Host:** the host now draws each mounted component at once, so a child (the program list) has taken over its
+  legacy function before any legacy call can reach it. The legacy boot marks the active tab on the buttons the mount
+  then removes; the tab bar's `mounted()` runs `updateTabBar` again for the screen the boot showed. The first e2e run
+  without it photographed the Programs and This Week tabs unmarked (about a thousand pixels each).
+- **Tests:** no logic of their own to unit-test; every journey photographs the frames, 68/68 at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
