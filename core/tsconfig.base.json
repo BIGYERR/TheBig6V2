@@ -1,0 +1,24 @@
+/* The shared base for the repo's TypeScript projects: core/ and tests/ extend it today, the app and the backend when
+ * they start importing @ia/core. Strict, and limited to the TypeScript that Node can run by stripping types
+ * (erasableSyntaxOnly: no enums, namespaces or parameter properties), with .ts import extensions. Nothing is emitted:
+ * Node and Vitest run the .ts files as they are, and tsc only checks them. It sits inside core/ because the repo root
+ * holds no package.json or tsconfig.json (GitHub Pages serves the root). */
+{
+  "compilerOptions": {
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  }
+}
