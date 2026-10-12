@@ -360,7 +360,8 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   (`<screen>-model.ts`) and is tested by node --test.
 - **Done:** the bug report (v0.239.8), the rest timer (v0.239.9, the first a component whose legacy callers it takes
   over through `LegacyBridge.provide`), the celebration pop-up (v0.239.10), the program list (v0.239.11), the swap sheet (v0.239.12, the first to write a legacy `let`, through
-  `LegacyBridge.set`), the add-an-exercise sheet (v0.239.13), the change-a-goal sheet's body (v0.239.14), the mile pencil's edit sheet and lock (v0.239.15), the swap nudge and the RPE card (v0.239.16), the injury and travel sheet's body (v0.239.17), Random Workout (v0.239.18), the toast and the update banner's contents (v0.239.19).
+  `LegacyBridge.set`), the add-an-exercise sheet (v0.239.13), the change-a-goal sheet's body (v0.239.14), the mile pencil's edit sheet and lock (v0.239.15), the swap nudge and the RPE card (v0.239.16), the injury and travel sheet's body (v0.239.17), Random Workout (v0.239.18), the toast and the update banner's contents (v0.239.19), the Progress screen's arrangement, journal and estimator
+  (v0.239.20; its chips, charts and ledger are still the legacy builders' markup inside it).
 - Suggested order:
   1. bug report (small, proves the pattern);
   2. rest timer;

@@ -252,3 +252,26 @@ what is stored.
   a local comparison of both builds matched it shown, dismissed by its ✕ (the page did not reload), and staying
   dismissed for the session, and matched toasts with plain text and with markup, all at 0 px.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.20 moves the Progress screen's arrangement, journal and estimator
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.20.
+- **Moved:** `#progressBody`: `src/app/screens/progress/progress-screen.ts`, which takes over `renderProgressScreen`
+  through `LegacyBridge.provide` (the tab, the chips, the restore and delete bar call it), and `progress-model.ts`
+  (the program shown, the weekly sums, the charts in the legacy order with the legacy arguments, the Session Journal,
+  the RPE colours, the 1RM estimate, each the legacy `renderProgressScreen`, `runCalc` and `setCalcLift`'s). The
+  empty states, the journal and the estimator are the component's template. The program chips and the restore bar
+  (`_progChipsHTML`), every chart builder and the Lift Ledger (`buildLedgerCards`) are still legacy markup, each laid
+  in a box with `display: contents` so the screen's flex column and gap see them as before; each moves in a later step.
+  The stores, the fold and dedupe of loads, and the readers the charts take are still legacy. The estimator's lift is
+  still the legacy `calcLift`, through `_setCalcLift`. Each render draws the body anew (a fresh view object keys the
+  template), as the legacy write did: a folded journal week or a typed estimate resets on a re-render, as before.
+  Strings the legacy wrote as markup (the notes, the swap line, the jog lines) stay markup.
+- **Tests:** `frontends/app/test/unit/progress.test.ts` (8: the program shown; the weekly sums with the rest-day jog,
+  the running mean RPE and the big-three loads; a run program's chart order with the short first week withheld; the
+  effort chart, projection, pace chart and empty state by coverage; swim and bike charts and the ledger alone; the
+  journal by week with markup kept; the RPE colours; the estimate). The e2e's log-session journey checks the journal's
+  open week (its day, RPE words and quoted note) and gains an estimator step (225 for 5 estimates 265, then Squat), on
+  both builds.
+- **Found, for a ruling (handoff §12):** journal notes are written into the page as markup.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

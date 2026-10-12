@@ -25,7 +25,7 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
    - **Admin** (`#A01` to `#A06`, 1440×900): two devices check in first, so every section has rows. Then the login,
      each section after signing in (Overview, Devices, Versions, Server, the list in `../../frontends/admin/admin.ts`, which
      a unit test holds the journey to), and the signed out screen after Log out.
-4. The runner takes five journeys (`e2e/flow.ts`, 57 steps) against both the Angular build and the original. Each
+4. The runner takes five journeys (`e2e/flow.ts`, 58 steps) against both the Angular build and the original. Each
    journey starts from empty storage in its own browser context, and a failed step stops only its own journey:
    - **Strength, commercial gym** (27 steps): the wizard, This Week, the rest-day sheet, a day's detail and its run
      log, the swap sheet and a pick from it, the trade put back and made twice more, and the coach's nudge it earns
@@ -41,8 +41,9 @@ surfaces, the collage's three bands: the **website** and the **admin**, as the b
      relaunch three weeks later, where the pencil shows the lock instead (`relaunchOn` moves the frozen clock).
    - **Bodyweight, then a knee injury** (6): a beginner over 55 with no equipment, Friday before the injury (it holds
      a jump), Hurt? with the knee chosen, the injury week, and Friday after (no jumps).
-   - **Log a session and relaunch** (7): log two exercises, the RPE card, the effort and a note, close the day out (the workout
-     pop-up up, then its dismiss button), relaunch, and find all of it kept, in the session and in the Progress journal.
+   - **Log a session and relaunch** (8): log two exercises, the RPE card, the effort and a note, close the day out (the workout
+     pop-up up, then its dismiss button), relaunch, and find all of it kept, in the session and in the Progress journal, then the 1RM estimator (a set
+     typed, the lift switched).
    Every step is a real tap followed by an assertion. Native date and slider controls, which a user drives through
    the OS picker, are set directly and fire their events.
 5. Each pair of app screenshots is compared pixel by pixel. **Default tolerance is 0%.** Clean runs match exactly, and a

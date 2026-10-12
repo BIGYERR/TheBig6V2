@@ -1125,9 +1125,27 @@ const LOG_SESSION: readonly Step[] = [
     id: 'log-progress',
     page: 'Log: Progress journal',
     async run(t) {
+      // The screen is an Angular component in the app since phase E's thirteenth step (its charts still the legacy
+      // builders' markup), the legacy script's in the page: both answer the same.
       await t.tap('#tabProgress');
       await t.screen('screenProgress');
-      await t.expectText('#screenProgress', 'Felt strong.');
+      await t.expectText('#progressBody details.journal-week[open]', 'Week 1');
+      await t.expectText('#progressBody details.journal-week[open]', 'RPE 7 — Very Hard');
+      await t.expectText('#progressBody details.journal-week[open]', '"Felt strong."');
+    },
+  },
+  {
+    id: 'log-estimator',
+    page: 'Log: the 1RM estimator',
+    shot: '#calc_result',
+    async run(t) {
+      // A set of 225 for 5 estimates 225 × (1 + 5/30) = 262.5, to the nearest 5: 265.
+      await t.tap('#progressBody details:not(.journal-week) > summary');
+      await t.typeInto('#calc_weight', '225');
+      await t.typeInto('#calc_reps', '5');
+      await t.expectText('#calc_result', 'Estimated Deadlift 1RM: 265 lbs — for your reference; the app coaches by RPE.');
+      await t.tap('#calcLift_Squat');
+      await t.expectText('#calc_result', 'Estimated Squat 1RM: 265 lbs');
     },
   },
 ];
