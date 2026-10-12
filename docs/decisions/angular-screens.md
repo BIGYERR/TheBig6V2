@@ -382,3 +382,23 @@ what is stored.
   injury, week 4 and week 6 states, at 0 px on both builds. The e2e finds a day cell by its label (`tapDay`, new) and
   the rest hero's cardio button by its place, the legacy `onclick` attributes it matched being gone from the component.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.26 moves the wizard's shell and its first three steps
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.26.
+- **Moved:** `#screenWizard`: `src/app/screens/wizard/wizard.ts` (the Back button, the progress bar, the step count,
+  the next button, and the steps "What are you training for?", "About you" and "Your equipment") and
+  `wizard-model.ts` (the shell's progress and count, a lifting-only program skipping the cardio step, and the moved
+  steps' cards and hints, each the legacy `renderWizardStep`'s). It takes over `renderWizardStep` through
+  `LegacyBridge.provide`. The four steps not yet moved (the cardio goal, lifting focus, days, name) are drawn by the
+  original legacy `renderWizardStep`, captured before it was replaced, into a `#wizardBody` of their own: the
+  component swaps the body element when a step moves between the two, so neither writes into the other's. The legacy
+  renderer also writes the shell's count and next label; the component binds those as `textContent`, so a write from
+  either side holds, and both write the same words. The draft is still the legacy `WD` (a card writes its field and
+  draws the step again, as the legacy handler did), the step the legacy `wizardStep`, and moving between steps
+  `wizardBack`, `wizardNext` and `setUnit`.
+- **Tests:** `frontends/app/test/unit/wizard.test.ts` (4: the shell's progress, counts and labels; the paths; the
+  profile's cards, hints and units; the equipment). The e2e finds a wizard card by the words on it (`tapCard`,
+  `cardSelected`, new), the legacy `onclick` attributes being gone from the moved steps; all four journeys that build a
+  program photograph the moved steps at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

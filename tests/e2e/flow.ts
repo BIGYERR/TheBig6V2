@@ -42,6 +42,10 @@ export interface Helpers {
   relaunchOn(iso: string): Promise<void>;
   /** Taps This Week's strip cell for a weekday ('fri'), found by its label as the athlete reads it. */
   tapDay(key: string): Promise<void>;
+  /** Taps the wizard card whose label reads `label`, as the athlete reads it. */
+  tapCard(label: string): Promise<void>;
+  /** Whether the wizard card whose label reads `label` is the one chosen. */
+  cardSelected(label: string): Promise<boolean>;
 }
 
 /** Values one step leaves for a later one (a sheet's id, found by tapping, then closed after the screenshot). */
@@ -216,6 +220,15 @@ export function helpers(page: Page): Helpers {
       }
       throw new Error(`This Week shows no ${label} cell`);
     },
+    async tapCard(label) {
+      const card = await wizardCard(page, label);
+      await card.evaluate((e) => e.scrollIntoView({ block: 'center', inline: 'center' }));
+      await card.click();
+      await sleep(SETTLE_MS);
+    },
+    async cardSelected(label) {
+      return (await wizardCard(page, label)).evaluate((e) => e.classList.contains('selected'));
+    },
     async relaunchOn(iso) {
       await page.evaluate((key, ms) => sessionStorage.setItem(key, String(ms)), LATER_NOW_KEY, new Date(iso).getTime());
       await page.reload({ waitUntil: 'networkidle0' });
@@ -223,6 +236,15 @@ export function helpers(page: Page): Helpers {
     },
   };
   return h;
+}
+
+/** The wizard card (an option or an equipment card) whose label reads `label`. */
+async function wizardCard(page: Page, label: string) {
+  for (const card of await page.$$('#wizardBody .option-card, #wizardBody .cardio-type-card')) {
+    const text = await card.$eval('.option-label, .cardio-type-name', (e) => (e.textContent ?? '').trim()).catch(() => null);
+    if (text === label) return card;
+  }
+  throw new Error(`the wizard shows no card reading ${label}`);
 }
 
 /** Taps the control in the row whose name reads `name` (the row itself without a control), failing loudly if none does. */
@@ -261,8 +283,10 @@ const STRENGTH: readonly Step[] = [
     async run(t) {
       await t.tap('.new-prog-btn');
       await t.wizardStep('1/');
-      await t.tap(`[onclick*="primaryPath='body'"]`);
-      if (!(await t.count(`.option-card.selected[onclick*="primaryPath='body'"]`))) throw new Error('Strength / Physique did not select');
+      // The wizard's first three steps are an Angular component in the app since phase E's nineteenth step, the legacy
+      // script's in the page: their cards are found by the words on them.
+      await t.tapCard('Strength / Physique');
+      if (!(await t.cardSelected('Strength / Physique'))) throw new Error('Strength / Physique did not select');
     },
   },
   {
@@ -271,8 +295,8 @@ const STRENGTH: readonly Step[] = [
     async run(t) {
       await t.tap('#wizardNext');
       await t.wizardStep('2/');
-      await t.tap(`[onclick*="experience='intermediate'"]`);
-      await t.tap(`[onclick*="ageBracket='36-54'"]`);
+      await t.tapCard('Intermediate');
+      await t.tapCard('36-54');
       await t.expectText('#wizardBody', 'Slightly more rest');
     },
   },
@@ -282,7 +306,7 @@ const STRENGTH: readonly Step[] = [
     async run(t) {
       await t.tap('#wizardNext');
       await t.expectText('#wizardBody', 'Your equipment');
-      await t.tap(`[onclick*="equipment='commercial'"]`);
+      await t.tapCard('Commercial Gym');
     },
   },
   {
@@ -707,8 +731,8 @@ const RACE: readonly Step[] = [
     async run(t) {
       await t.tap('.new-prog-btn');
       await t.wizardStep('1/');
-      await t.tap(`[onclick*="primaryPath='event'"]`);
-      if (!(await t.count(`.option-card.selected[onclick*="primaryPath='event'"]`))) throw new Error('Race / Event did not select');
+      await t.tapCard('Race / Event');
+      if (!(await t.cardSelected('Race / Event'))) throw new Error('Race / Event did not select');
     },
   },
   {
@@ -811,11 +835,11 @@ const TEST: readonly Step[] = [
     page: 'Test: 1.5 mile goal and test date',
     async run(t) {
       await t.tap('.new-prog-btn');
-      await t.tap(`[onclick*="primaryPath='event'"]`);
+      await t.tapCard('Race / Event');
       await t.tap('#wizardNext');
-      await t.tap(`[onclick*="ageBracket='36-54'"]`);
+      await t.tapCard('36-54');
       await t.tap('#wizardNext');
-      await t.tap(`[onclick*="equipment='commercial'"]`);
+      await t.tapCard('Commercial Gym');
       await t.tap('#wizardNext');
       await t.tap(`[onclick="toggleCardioTypeSport('run')"]`);
       await t.tap(`[onclick="setCardioGoal('run','run_pace_goal')"]`);
@@ -966,11 +990,11 @@ const BODYWEIGHT_KNEE: readonly Step[] = [
     async run(t) {
       await t.tap('.new-prog-btn');
       await t.tap('#wizardNext');
-      await t.tap(`[onclick*="experience='beginner'"]`);
-      await t.tap(`[onclick*="ageBracket='55+'"]`);
+      await t.tapCard('Beginner');
+      await t.tapCard('55+');
       await t.tap('#wizardNext');
-      await t.tap(`[onclick*="equipment='bodyweight'"]`);
-      if (!(await t.count(`.selected[onclick*="equipment='bodyweight'"]`))) throw new Error('Bodyweight only did not select');
+      await t.tapCard('Bodyweight only');
+      if (!(await t.cardSelected('Bodyweight only'))) throw new Error('Bodyweight only did not select');
     },
   },
   {

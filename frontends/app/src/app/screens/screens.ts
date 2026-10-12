@@ -16,6 +16,7 @@ import { SwapNudge } from './swap-nudge/swap-nudge';
 import { Toast } from './toast/toast';
 import { UpdateBanner } from './update-banner/update-banner';
 import { WeekView } from './week-view/week-view';
+import { Wizard } from './wizard/wizard';
 
 /**
  * The screens and overlays architecture phase E has moved into Angular components, by the legacy element they take over. After the
@@ -41,4 +42,5 @@ export const MOVED_SCREENS: readonly (readonly [screenId: string, component: Typ
   ['iaUpdateBanner', UpdateBanner],
   ['progressBody', ProgressScreen],
   ['screenWeek', WeekView],
+  ['screenWizard', Wizard],
 ];
