@@ -47,26 +47,28 @@ test goals (pace, mile, 1.5-mile, base) and Nike Run Club plans for race goals (
 marathon). Deployed by GitHub Pages at https://bigyerr.github.io/TheBig6V2/ . iOS-only PWA.
 Mario is the sole developer, product owner and primary user.
 
-## Roles (four subagents, see .claude/agents/)
-- **measure** — read-only. Owns the before-picture. Proves a reported bug at the reporter's seed, sweeps a lattice, names the root cause and every other reader of the same value. Reports numbers with denominators. Never rules, never proposes a fix.
-- **coach** — read-only. Owns coaching correctness and doctrine. Rules on WHAT should ship.
-- **builder** — read/write. Owns the edit: changes the source files under `app/src/legacy/src/` directly and narrowly, rebuilds `index.html` from them, and writes the feature's tests (Test layout). Never invents a ruling.
-- **gatekeeper** — read + bash, never edits. Owns proof. Runs the 60-second local proof, shows each test written for a changed behaviour fails on the previous release and every changed behaviour has a test, and reads the CI run on the push to `dev` for the full suite (the unit and integration tests; the frozen legacy suite: `tests/gate.sh`, sabotage, blast radius, fuzz; e2e); see Pipeline and Proof for new work.
-**Gatekeeper blocks ship.** No version is done until gatekeeper has read the CI run on the commit Mario releases green,
-shown that each test written for a changed behaviour fails on the previous release, matched every changed behaviour to
-a test, and classified every diff hunk (Proof for new work, below). Where a build also changes the frozen legacy suite
-(an era row, a re-anchored mutation, an edited gate), that part is proved as Proof scope sets out.
-The main session orchestrates and talks to Mario; it does not do measure's, builder's or gatekeeper's job inline.
-**coach rules against evidence coach did not gather** — measure runs before the ruling, not inside it.
-Builder is the only agent holding `Edit`/`Write`. coach, measure and gatekeeper never run below opus:
-their output is judgement no gate can check (coach), or the judgement that a gate is lying (gatekeeper).
-Coach runs on fable from V200 as a measured experiment; compare its rulings against V198 and V199
-(retractions, reds, and whether measure refutes a premise) before deciding whether it stays.
-**Coach is spawned fresh for each ruling, with a tight brief:** the question, measure's numbers, and the handoff lines
-it needs, nothing else. Never resume a coach (`SendMessage`) after it has gone idle. A follow-up or a re-ruling is a
-new spawn whose brief carries the prior ruling's text. **Coach is read-only, so the main session saves every coach return
-into its feature's decision file (`docs/decisions/<feature>.md`, Proof for new work) before briefing builder**, and every
-brief cites only what the saved file says, never a line from the return that was not saved.
+## Roles: four hats, ONE context, no subagents (Mario, 2026-10-12)
+Mario: "please stop using multi-agent? our context required is too big and it is much cheaper and efficient to have just 1
+context at work at a time ... we do NOT spin up agents like that ever again (unless I explicitly ask for it)".
+- **The main session does all the work itself, in this one context.** No subagents, no parallel agents, no agent worktrees,
+  unless Mario explicitly asks for one in chat. `.claude/settings.json` makes every `Agent`/`Task` launch ask Mario
+  first; never ask to launch one on your own initiative.
+- **The four roles are hats the main session wears in order,** and the files in `.claude/agents/` are their checklists
+  (read the one you are switching to):
+  - **measure**: the before-picture. Prove a reported bug at the reporter's seed, sweep the configs, name the root
+    cause and every other reader of the same value, with numbers and denominators. No ruling, no fix.
+  - **coach**: coaching correctness and doctrine; rules on WHAT should ship, against the measured numbers.
+  - **builder**: edits the source files under `app/src/legacy/src/` directly and narrowly, rebuilds `index.html` from
+    them, and writes the feature's tests (Test layout). Never invents a ruling.
+  - **gatekeeper**: proof (Proof for new work): the 60-second check, each test for a changed behaviour fails on the
+    previous release, every changed behaviour has a test, every diff hunk is classified, and the CI run is read.
+- **The order still binds:** measure, then the ruling written to `docs/decisions/<feature>.md` (Mario concurs on
+  doctrine), then the edit, then the proof. **Proof blocks ship:** no version is done until the CI run on the commit Mario
+  releases is green, each test for a changed behaviour fails on the previous release, every changed behaviour has a test,
+  and every diff hunk is classified. Where a build also changes the frozen legacy suite, that part is proved as Proof scope
+  sets out.
+- **Keep the context small:** grep before reading, read narrowly, keep long command output in files and read back only
+  summaries, and write scripts that gather everything in one run.
 
 ## Session rhythm (do not skip steps)
 **Versions are not tied to chats (Mario, Post-V239).** Semantic versions and git track every release, so a chat may
@@ -421,6 +423,7 @@ No mid-sentence hyphens or em-dashes in anything the athlete reads. Short declar
 `index.html` is ~250K tokens and generated: never read it wholesale, never edit it. Code lives in `app/src/legacy/src/`: `grep -rn` the symbol and its consumers there first. Most source files are small enough to read whole; the four largest (`js/engine-c.js`, `js/cardio-progression.js`, `js/wizard.js`, `js/nsw-cardio.js`, 75 to 110 KB) are read wide at the seam. `str_replace` narrowly in the source file, rebuild, and let the tests be the backstop. Do not re-read the doctrine text mid-session unless verifying a transcription.
 
 ## Delegation carry (builder and gatekeeper do not load this file)
+Applies only when Mario has explicitly asked for a builder or gatekeeper agent (Roles: one context, no subagents).
 Every brief to either carries the per-build items, then the standing lines for that role, pasted, not paraphrased.
 - **Builder, per build:** the ruling verbatim (D-code, what changes, what deliberately does not, the after-grid); the slice
   (≤4 edits) and what earlier slices landed; the baseline path; whether this slice writes `ia-version` and the exact
