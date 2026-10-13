@@ -585,3 +585,22 @@ what is stored.
   rep, a load cell and the load, the reuse and fill pills, Log, skip and put back, a swap), matching the markup, the
   stores, the render-time state, the open sheets and the pixels. 69/69 at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.37 moves a program card's detail
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.37.
+- **Moved:** the legacy `progDetailHTML`: `program-list/program-detail.ts` and `program-detail-model.ts` (the focus,
+  profile and schedule rows, the starting maxes marked as estimated when none was entered, the run paces with their
+  pencil and the sentence naming their source, each sport's goal with its pencil or Lift only, the race with its date
+  and time out, the seed and the copy button). The selections stay the legacy `progSelData`'s and the paces the legacy
+  `runAnchorChips`' and `runAnchorSentence`'s. The pencils and copy call the legacy `openMileSheet`, `openGoalSheet`
+  and `copyProgSel` and keep the tap from the card, as before. The list draws each card's detail once per render
+  instead of on every check.
+- **Tests:** `tests/integration/program-detail.test.ts` (new): the booted app's `progDetailHTML` against the model's
+  detail written out in the legacy markup, byte for byte, for each of the ten seeded programs and eleven edits of
+  Mario's (no maxes, a race with no date, a race date, a past one, a seed on the program only, no seed, no rest day and
+  unknown labels, every day off, a goal with no label, lift only, an edited mile), each feature required to appear.
+  `frontends/app/test/unit/program-detail.test.ts` (3). A local comparison drew three programs' cards in both builds,
+  shut and open, and tapped a goal pencil, the mile pencil, copy and a card's toggle: the markup, the sheets opened,
+  the store and the pixels matched. 69/69 at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

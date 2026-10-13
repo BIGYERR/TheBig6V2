@@ -3,6 +3,8 @@ import { NgTemplateOutlet } from '@angular/common';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
 import { EMPTY_HTML, type ListedProgram, type ProgramCard, programList } from './program-list-model';
+import { ProgramDetail } from './program-detail';
+import { type DetailChip, programDetail, type ProgramDetailView, type ProgSel } from './program-detail-model';
 
 /**
  * The home screen's program list (architecture phase E, step 4), in place of the legacy renderProgList inside
@@ -10,13 +12,13 @@ import { EMPTY_HTML, type ListedProgram, type ProgramCard, programList } from '.
  * state stay the legacy script's: its actions (setActive, startRename, commitRename, askArchive, archiveProg, ...)
  * change them and call renderProgList, which LegacyBridge.provide hands to this component, and so does toggleProgCard,
  * which used to flip a card's class in place. The list draws at once when asked, as the legacy one did, because its
- * callers reach into it straight after (startRename focuses the rename box). A card's detail is still the legacy
- * progDetailHTML's markup, inserted as it is (its buttons keep their handlers); a later step templates it.
+ * callers reach into it straight after (startRename focuses the rename box). A card's detail is the ProgramDetail
+ * component (step 29; the legacy progDetailHTML's markup until then), drawn from the legacy progSelData.
  */
 @Component({
   selector: 'ia-program-list',
   host: { style: 'display: contents' },
-  imports: [NgTemplateOutlet],
+  imports: [NgTemplateOutlet, ProgramDetail],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @if (empty(); as why) {
@@ -29,7 +31,7 @@ import { EMPTY_HTML, type ListedProgram, type ProgramCard, programList } from '.
       } @else {
         <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -- the legacy card's tap target, kept as it was (a focusable div would draw a focus ring) -->
         <div class="prog-tap" (click)="toggle(c.id)"><ng-container [ngTemplateOutlet]="headMeta" [ngTemplateOutletContext]="{ $implicit: c }" /></div>
-        <div style="display:contents" [innerHTML]="detail(c.id)"></div>
+        @if (details().get(c.id); as dv) {<ia-program-detail [detail]="dv" />}
       }
       @switch (c.confirm) {
         @case (1) {
@@ -91,6 +93,8 @@ export class ProgramList {
   private readonly sanitizer = inject(DomSanitizer);
   protected readonly empty = signal<'none' | 'archived' | null>(null);
   protected readonly cards = signal<ProgramCard[]>([]);
+  /** Each card's detail, drawn with the list as the legacy one was. */
+  protected readonly details = signal<Map<string, ProgramDetailView>>(new Map());
   private programs: ListedProgram[] = [];
 
   constructor() {
@@ -112,6 +116,7 @@ export class ProgramList {
     }, icon);
     this.empty.set(v.empty);
     this.cards.set(v.cards);
+    this.details.set(new Map(v.cards.map((c) => [c.id, this.detail(this.programs.find((p) => p.id === c.id)!)])));
   }
 
   /** The legacy renderProgList: drawn at once, since its callers read the new list straight after. */
@@ -145,8 +150,12 @@ export class ProgramList {
   protected emptyHtml(why: 'none' | 'archived'): SafeHtml {
     return this.markup(EMPTY_HTML[why]);
   }
-  protected detail(id: string): SafeHtml {
-    return this.markup(this.bridge.call<string>('progDetailHTML', this.programs.find((p) => p.id === id)));
+  /** The legacy progDetailHTML's reads: the selections, the day and goal names, and the run paces when the run reads the chart. */
+  private detail(p: ListedProgram): ProgramDetailView {
+    const b = this.bridge;
+    const s = b.call<ProgSel>('progSelData', p);
+    const paces = s.runAnchor ? { chips: b.call<DetailChip[]>('runAnchorChips', s.runAnchor), sentence: b.call<string>('runAnchorSentence', s.runAnchor) } : null;
+    return programDetail(p.id, s, { dayNames: b.global('_DAYF'), goalLabels: b.global('_GOAL_LABELS') }, paces);
   }
   protected archiveQuestion(name: string): SafeHtml {
     return this.markup(`Archive “${name}”?<br><span style="color:var(--muted);font-size:12px">It leaves your program list but its history stays. View it anytime under Progress.</span>`);
