@@ -57,7 +57,6 @@ function seedFromPriorPrograms(now?: any){
   now = (typeof now==='number'&&now>0) ? now : Date.now();
   const cut = now - SEED_WINDOW_DAYS*86400000;
   let best: any=null;
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   (getPrograms()||[]).forEach(p=>{
     if(!p||!p.id) return;
     const logs=getLogsFor(p.id), hist=getDayHistFor(p.id);
@@ -152,7 +151,7 @@ function buildPaceChart(title: any, weeks: any, data: any, tgt: any, color: any)
     svg+='<line x1="'+padL+'" y1="'+ty.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+ty.toFixed(1)+'" stroke="'+color+'" stroke-width="1" stroke-dasharray="2,4" opacity="0.55"/>'
        +'<text x="'+(W-padR-2)+'" y="'+(ty-3).toFixed(1)+'" font-size="7.5" fill="'+color+'" text-anchor="end" opacity="0.85">PLAN '+_fmtPaceShort(tgt)+'/mi</text>';
   }
-  let path='', prev: any=null, dots='', lastPt=null;
+  let path='', prev: any=null, dots='', lastPt: any=null;
   data.forEach((v: any,i: any)=>{
     if(v===null){ prev=null; return; }
     const x=padL+i*xStep, y=Y(v);
@@ -162,7 +161,6 @@ function buildPaceChart(title: any, weeks: any, data: any, tgt: any, color: any)
   });
   if(path) svg+='<path d="'+path+'" stroke="'+color+'" stroke-width="1.5" stroke-dasharray="1,3" fill="none"/>';
   svg+=dots;
-  // @ts-expect-error TS2339 Property 'x' does not exist on type 'never'.
   if(lastPt) svg+='<text x="'+lastPt.x.toFixed(1)+'" y="'+(lastPt.y-8).toFixed(1)+'" font-size="8" font-weight="700" fill="'+color+'" text-anchor="middle">'+_fmtPaceShort(lastPt.v)+'</text>';
   const xLabelStep=n<=8?1:n<=16?2:4;
   weeks.forEach((w: any,i: any)=>{ if(i%xLabelStep!==0) return;
@@ -349,8 +347,7 @@ function ladderWeekly(logs: any, totalWeeks: any, cut: any, skip1: any){
 // resolvable class becomes one dot. Swapped sessions are excluded on the same grounds
 // V155 excludes them — a swapped session is not the prescribed run.
 function runsByClass(logs: any, hist: any, totalWeeks: any){
-  const out={};
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
+  const out: Record<string, any>={};
   RUN_CLASS_ORDER.forEach(c=>out[c]=[]);
   Object.entries(logs||{}).forEach(([key,e])=>{
     // @ts-expect-error TS2339 Property 'run_pace' does not exist on type '{}'.
@@ -363,7 +360,6 @@ function runsByClass(logs: any, hist: any, totalWeeks: any){
     const cls=_runClass(snap.cardio.subtype); if(!cls) return;
     // @ts-expect-error TS2339 Property 'run_pace' does not exist on type '{}'.
     const sec=_paceStrToSec(e.run_pace); if(!sec) return;
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type '"Tempo" | "Recovery" | "Interval" | "L
     out[cls].push({w, sec});
   });
   return out;

@@ -8,7 +8,7 @@ import { computeStreak, popFire } from './popups-streaks-reminders.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // RANDOM POOLS - 30+ per goal
-const RAND_POOLS={
+const RAND_POOLS: Record<string, any>={
   strength:[
     {title:'Max Effort Bench',sections:[{label:'Main',items:[{name:'Barbell bench press',detail:'Work to 1–3RM, then 3×3 @ RPE 9'}]},{label:'Accessory',superset:true,items:[{name:'Dumbbell incline press',detail:'3×8'},{name:'Barbell row',detail:'3×8'}]},{label:'Core',items:[{name:'Ab wheel rollouts',detail:'4×8'},{name:'Plank hold',detail:'3×40 sec'}]}]},
     {title:'Max Effort Squat',sections:[{label:'Main',items:[{name:'Back squat',detail:'Work to heavy 3RM, then 3×3 @ RPE 9'}]},{label:'Accessory',superset:true,items:[{name:'Dumbbell Bulgarian split squat',detail:'3×6 each'},{name:'Kettlebell goblet squat',detail:'3×12'}]}]},
@@ -173,25 +173,21 @@ let randFilter='mine';
 
 function getActivePool(){
   const goal=activeProg?.goal||'balanced';
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ st
   if(randFilter==='mine') return RAND_POOLS[goal]||RAND_POOLS.balanced;
   return Object.values(RAND_POOLS).flat();
 }
 
 function openRandom(){
   buildRandFilterBar();reroll();
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('randOverlay').classList.add('open');
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('randOverlay').scrollTop=0;
+  document.getElementById('randOverlay')!.classList.add('open');
+  document.getElementById('randOverlay')!.scrollTop=0;
 }
 
 function buildRandFilterBar(){
   // V195 (D64): the parenthetical named a pool that does not exist. getActivePool falls
   // back to RAND_POOLS.balanced for every goal RAND_POOLS has no key for, so the label
   // was describing a draw the athlete was not getting. The pool gap itself is D66.
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('randFilterBar').innerHTML=[
+  document.getElementById('randFilterBar')!.innerHTML=[
     {id:'mine',label:'My Goal'},
     {id:'all',label:'See All'},
   ].map(f=>`<button class="rand-filter-btn${randFilter===f.id?' active':''}" onclick="setRandFilter('${f.id}')">${f.label}</button>`).join('');
@@ -206,15 +202,12 @@ function reroll(){
   _setLastRandIdx(idx);_setCurrentRandIdx(idx);
   const w=pool[idx];
   const done=getWildcardDone();
-  // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
   const alreadyDone=done.some(d=>d.title===w.title);
   const now=new Date();
-  const dowToKey={0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
+  const dowToKey: Record<string, string>={0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
   _setCurrentRandDayKey(dowToKey[now.getDay()]||'mon');
   const goal=activeProg?.goal||'balanced';
-  const colors={strength:'var(--lift)',hypertrophy:'var(--hip)',fatloss:'var(--run)',athletic:'var(--bike)',balanced:'var(--accent)',endurance:'var(--run)',support_strength:'var(--lift)',support_athletic:'var(--bike)',support_prevention:'var(--hip)'};
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ st
+  const colors: Record<string, string>={strength:'var(--lift)',hypertrophy:'var(--hip)',fatloss:'var(--run)',athletic:'var(--bike)',balanced:'var(--accent)',endurance:'var(--run)',support_strength:'var(--lift)',support_athletic:'var(--bike)',support_prevention:'var(--hip)'};
   const color=colors[goal];
   let html=`<div style="text-align:center;padding:4px 0 16px">
     <div class="rand-badge" style="background:${color}22;color:${color}">${alreadyDone?'Done Before ✓':'Wildcard'}</div>
@@ -226,13 +219,11 @@ function reroll(){
     const labelCls=ctype.includes('swim')?'cardio-label-swim':ctype.includes('run')?'cardio-label-run':ctype.includes('bike')?'cardio-label-bike':'cardio-label-general';
     html+=`<div class="${blockCls}"><div class="cardio-type-label ${labelCls}">${w.cardio.type}</div><div class="cardio-detail">${w.cardio.detail}</div></div>`;
   }
-  // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
   html+=buildSectionsHTML(w.sections);
   if(w.note) html+=`<div class="note-block">${w.note}</div>`;
   if(alreadyDone) html+=`<div class="wildcard-done-block">✓ You've done this one before</div>`;
   else html+=`<button class="wildcard-complete-btn" onclick="completeWildcard('${(w.title||'').replace(/'/g,"\\'")}')">${asyIcon('✅',14)} Complete — Mark Done</button>`;
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('randBody').innerHTML=html;
+  document.getElementById('randBody')!.innerHTML=html;
 }
 
 // ── V195 (D64/D71): A WILDCARD IS A SUBSTITUTE, NOT A COMPLETION ─────────────
@@ -267,14 +258,12 @@ function wildcardDayFor(now: any){
 // the done block, never the Complete button), so one title carries at most one day stamp.
 // Pre-V195 entries have no week/dayKey and simply render no mark.
 function wildcardDaySet(){
-  const m={};
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
+  const m: Record<string, any>={};
   getWildcardDone().forEach(x=>{ if(x&&x.week&&x.dayKey) m[completedKey(x.week,x.dayKey)]=x; });
   return m;
 }
 function wildcardOn(week: any,dayKey: any){
   if(!week||!dayKey) return null;
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
   return wildcardDaySet()[completedKey(week,dayKey)]||null;
 }
 // Flame plus a W, signal orange, inline SVG from the icon table. Never emoji.
@@ -307,7 +296,6 @@ function fireWildcardPopup(isTraining: any){
 function completeWildcard(title: any){
   const done=getWildcardDone();
   const slot=wildcardDayFor(new Date());
-  // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
   if(!done.some(d=>d.title===title)) done.push({title,ts:Date.now(),week:slot?slot.week:null,dayKey:slot?slot.dayKey:null});
   saveWildcardDone(done);
   const day=(slot&&activeProg&&activeProg.weeks&&activeProg.weeks[slot.week])?activeProg.weeks[slot.week][slot.dayKey]:null;
@@ -316,8 +304,7 @@ function completeWildcard(title: any){
   if(activeProg) renderWeekView();
   setTimeout(()=>fireWildcardPopup(isTraining),380);
 }
-// @ts-expect-error TS2531 Object is possibly 'null'.
-function closeRandom(){document.getElementById('randOverlay').classList.remove('open');}
+function closeRandom(){document.getElementById('randOverlay')!.classList.remove('open');}
 
 let resetPending=false;
 function resetWildcardCounter(){
@@ -332,9 +319,8 @@ function resetWildcardCounter(){
 function updateRandCounter(){
   const done=getWildcardDone();
   const goal=activeProg?.goal||'balanced';
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ st
   const pool=RAND_POOLS[goal]||RAND_POOLS.balanced;
-  // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
+  // @ts-expect-error TS7006 Parameter 'w' implicitly has an 'any' type.
   const myDone=done.filter(d=>pool.some(w=>w.title===d.title)).length;
   const el=document.getElementById('randCounter');if(el) el.textContent=myDone+'/'+pool.length;
   if(!resetPending){const rb=document.getElementById('resetRandBtn');if(rb){rb.textContent='↺ Reset';rb.style.color='';}}

@@ -123,3 +123,28 @@ screen shows or what is stored.
   and a write to a `const` (each refusal an `@ts-expect-error`, so a type that let one through fails the compile).
   `test/unit/legacy-bundle.test.ts` reads `topLevel`'s writable names. The app's type check is the rest of the proof:
   every bridge call in the components is now checked.
+
+## The type debt halved by narrow types (Post-v0.239.44, no build)
+
+- **Date:** 2026-10-12. **Decided by:** the session. **Shipped:** no version: the page is byte for byte v0.239.44's and
+  both Angular bundles carry the same tokens (below).
+- **Why:** a marker line silences every error on the line below it, so a line with one known gap hid any new error
+  written on it later. Where a type exists that names the one gap, it now stands in the marker's place and the check
+  sees the rest of the line.
+- **What:** new `tools/ts-narrow.mjs` takes the markers out of the app files and writes, before `tools/ts-expect.mjs`
+  marks what is left: a non-null assertion (`x!`) where the code reads a value TypeScript thinks may be null or
+  undefined (146); `Record<string, ...>` on a lookup table indexed by a key TypeScript cannot check (59); `Record<string,
+  any>` on an object declared empty and filled later, and `any` on a variable started as `null` and set inside a
+  callback, which TypeScript's flow analysis cannot see (7). By hand: `getPrograms` and `getWildcardDone` return
+  `any[]` (they parse a stored array, and 26 callbacks over them read their elements untyped), `WD.cardioTypes` is an
+  `any[]` (both of WD's writers set one), and `_ovDraft` is typed with its seven fields (a plain `Record` lost them, and
+  the change sheet reads them). An empty object literal is never typed a string table (`ts-expect.mjs` had the same
+  gap; it typed no empty table at v0.239.44, checked).
+- **The debt:** 622 marker lines to 317. Left, by error: TS7006 (an arrow's lone parameter) the most, then TS2339 (a
+  property a type does not declare, mostly a DOM element read as an input), TS7053, TS18046 and a tail of single digits.
+- **The proof:** the page: every app file carries v0.239.42's JavaScript text for text (`tools/engine-move.mjs`), and
+  `tools/same-script.mjs` against v0.239.43 finds the same tokens; `git diff index.html` is empty. The Angular build:
+  the legacy bundle, unminified, is the same 191,916 tokens as from HEAD's sources; minified, both bundles are the same
+  length and the main bundle the same 173,359 tokens with binding names chosen differently (esbuild picks short names
+  from the source text's character counts, which the annotations change). The app's type check, its 282 tests, lint,
+  and the repo's 1,218 tests pass.

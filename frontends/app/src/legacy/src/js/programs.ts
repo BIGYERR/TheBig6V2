@@ -31,7 +31,6 @@ function setProgRace(dateStr: any){
   const _al=progAlignment(activeProg);
   if(!_al){ activeProg.cfg.raceDate=before; showToast('That date didn\u2019t resolve'); return; }
   activeProg.startDate=_al.start;   // blockOpen stays — the weeks behind you don't move
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const programs=getPrograms();const idx=programs.findIndex(p=>p.id===activeProgId);
   if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
   _setActiveProg(refreshProgram(activeProg));   // untrained weeks re-pin; trained weeks stay frozen
@@ -53,8 +52,7 @@ function progTestPin(cfg: any, startIso: any){
   const len = calcProgramLength(c.cardioTypes, {...c.cardioGoals, _experience:c.experience||'intermediate', _ageBracket:c.ageBracket||'18-35', _eventTargeted:c.eventTargeted},
     LIFTING_FOCUS_TO_GOAL[c.liftingFocus]||c.liftingFocus||'balanced').weeks;
   const week = testWeekIndex(startIso, c.raceDate), cap = NSW_TABLE6_INT.length - 1;
-  // @ts-expect-error TS18047 'week' is possibly 'null'.
-  return {tw: (week >= 1 && week <= cap) ? week : null, len, week, cap};
+  return {tw: (week! >= 1 && week! <= cap) ? week : null, len, week, cap};
 }
 function setProgStart(dateStr: any){
   if(!dateStr||!activeProg) return;
@@ -67,7 +65,6 @@ function setProgStart(dateStr: any){
   // weeks re-pin; trained weeks stay frozen (refreshProgram), the same as setProgRace.
   const _tp=progTestPin(activeProg.cfg,_r.start);
   if(_tp){ activeProg.cfg._testWeek=_tp.tw; activeProg.cfg._raceDateCappedWeeks=_tp.tw||_tp.len; }
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const programs=getPrograms();const idx=programs.findIndex(p=>p.id===activeProgId);
   if(idx>=0){programs[idx]=activeProg;savePrograms(programs);}
   if(_tp) _setActiveProg(refreshProgram(activeProg));   // untrained weeks re-pin; trained weeks stay frozen
@@ -82,12 +79,12 @@ function setProgStart(dateStr: any){
 }
 
 // PROGRAM LIST
-const _FOCUS_LABELS={strength:'Strength',hypertrophy:'Size',fatloss:'Fat Loss',balanced:'Balanced',support_strength:'Strength Support',support_athletic:'Athletic Support',support_prevention:'Injury Prevention'};
-const _PATH_LABELS={event:'Race / Event',body:'Strength / Physique',both:'Hybrid'};
-const _EQUIP_LABELS={home_full:'Home Gym — Full',home_basic:'Home Gym — Basic',commercial:'Commercial Gym',crossfit:'CrossFit Box',bodyweight:'Bodyweight only',minimal:'Minimal / Travel'};
-const _CARDIO_LABELS={run:'Run',bike:'Bike',swim:'Swim'};
+const _FOCUS_LABELS: Record<string, string>={strength:'Strength',hypertrophy:'Size',fatloss:'Fat Loss',balanced:'Balanced',support_strength:'Strength Support',support_athletic:'Athletic Support',support_prevention:'Injury Prevention'};
+const _PATH_LABELS: Record<string, string>={event:'Race / Event',body:'Strength / Physique',both:'Hybrid'};
+const _EQUIP_LABELS: Record<string, string>={home_full:'Home Gym — Full',home_basic:'Home Gym — Basic',commercial:'Commercial Gym',crossfit:'CrossFit Box',bodyweight:'Bodyweight only',minimal:'Minimal / Travel'};
+const _CARDIO_LABELS: Record<string, string>={run:'Run',bike:'Bike',swim:'Swim'};
 const _GOAL_LABELS: Record<string, string>={strength:'Strength',hypertrophy:'Size',fatloss:'Fat Loss',athletic:'Athletic',balanced:'Balanced'};
-const _DAYF={sun:'Sun',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat'};
+const _DAYF: Record<string, string>={sun:'Sun',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat'};
 // Single source of truth for a program's recalled onboarding selection.
 // Lifts are experience-derived (DEFAULT_1RM) when not manually stored, so the panel
 // shows the numbers the engine actually anchors to rather than a misleading zero.
@@ -99,9 +96,8 @@ function runAnchorChips(a: any){
   // V187 (F7): Nike's six-speed effort scale, printed on the unit line of NRC programs
   // only — NSW's CHI calls its tempo RPE 8–9 (different doctrine, same word), so the
   // chips stay bare there rather than print two numbers for one pace.
-  const _eff = {Mile:'9/10', '5K':'7–8/10', '10K':'6–7/10', Tempo:'6/10', Recovery:'4–5/10'};
+  const _eff: Record<string, string> = {Mile:'9/10', '5K':'7–8/10', '10K':'6–7/10', Tempo:'6/10', Recovery:'4–5/10'};
   const _nrc = !!(a.goalId && NRC_GOALS.has(a.goalId));
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ Mi
   const chips = list.map(([k,v])=>({k, v:_fmtMileAnchor(v), u:(_nrc && _eff[k]) ? '/mi · '+_eff[k] : '/mi'}));
   if(a.goalT) chips.unshift({k:'Goal', v:_fmtMileAnchor(a.goalT.sec), u:a.goalT.dist+' mi'});   // V176 (D10)
   return chips;
@@ -158,12 +154,9 @@ function progSelData(p: any){
   return {
     name:p.name||'My Program',
     goal:(p.goal||c.goal||''),
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ st
     liftLabel:_FOCUS_LABELS[c.liftingFocus]||c.liftingFocus||'—',
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ev
     pathLabel:_PATH_LABELS[c.primaryPath]||c.primaryPath||'—',
     experience:exp, ageBracket:c.ageBracket||'18-35',
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ho
     equipLabel:_EQUIP_LABELS[c.equipment]||c.equipment||'—',
     unit, lifts,
     trainDays:order.filter(d=>!rest.includes(d)),
@@ -179,9 +172,7 @@ function progSelData(p: any){
 }
 function progDetailHTML(p: any){
   const s=progSelData(p);
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
   const days=s.trainDays.map(d=>_DAYF[d]||d).join(' · ')||'—';
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
   const rest=s.restDays.map(d=>_DAYF[d]||d).join(' · ')||'None';
   const row=(k: any,v: any)=>`<div class="det-row"><span class="k">${k}</span><span class="v">${v}</span></div>`;
   // D5 (V145): each cardio row carries an edit pencil — same visual language as the
@@ -219,15 +210,12 @@ function progDetailHTML(p: any){
 // distance build warns.
 let _goalDraft={progId:null,sport:null,sel:null,inputs:{}};
 function openGoalSheet(progId: any,sport: any){
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const p=getPrograms().find(x=>x.id===progId); if(!p) return;
   _goalDraft={progId,sport,sel:null,inputs:{}};
   renderGoalSheet();
-  // @ts-expect-error TS18047 'o' is possibly 'null'.
-  const o=document.getElementById('goalOverlay'); o.classList.add('open'); o.scrollTop=0;
+  const o=document.getElementById('goalOverlay'); o!.classList.add('open'); o!.scrollTop=0;
 }
-// @ts-expect-error TS2531 Object is possibly 'null'.
-function closeGoalSheet(){document.getElementById('goalOverlay').classList.remove('open');}
+function closeGoalSheet(){document.getElementById('goalOverlay')!.classList.remove('open');}
 function _goalCurWeek(p: any){
   // Same local computation refreshProgram uses — cannot rely on calcCurrentWeek's
   // global activeProg because the sheet edits ANY program, not just the active one.
@@ -258,7 +246,6 @@ function _goalRefreshCommit(){
 function selectGoalOpt(id: any){_goalDraft.sel=id; _goalDraft.inputs={}; renderGoalSheet();}
 function renderGoalSheet(){
   const body=document.getElementById('goalBody'); if(!body) return;
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const p=getPrograms().find(x=>x.id===_goalDraft.progId); if(!p){body.innerHTML='';return;}
   const sport=_goalDraft.sport;
   // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.
@@ -337,7 +324,6 @@ function renderGoalSheet(){
 function commitGoalChange(){
   if(!_goalInputsValid()) return;
   const programs=getPrograms();
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const pi=programs.findIndex(x=>x.id===_goalDraft.progId); if(pi<0) return;
   const sport=_goalDraft.sport;
   // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.
@@ -384,8 +370,7 @@ function commitGoalChange(){
   if(activeProgId===_goalDraft.progId){
     _setActiveProg(refreshProgram(programs[pi]));
     _setCurrentWeek(calcCurrentWeek());
-    // @ts-expect-error TS2531 Object is possibly 'null'.
-    try{ if(document.getElementById('screenWeek').classList.contains('active')) renderWeekView(); }catch(e){}
+    try{ if(document.getElementById('screenWeek')!.classList.contains('active')) renderWeekView(); }catch(e){}
   }
   closeGoalSheet();
   renderProgList();
@@ -400,7 +385,6 @@ function commitGoalChange(){
 // experience default, so runAnchorSentence can name what it replaced.
 var _mileDraft: any=null;
 function openMileSheet(progId: any){
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const p=getPrograms().find(x=>x.id===progId); if(!p) return;
   const tw=p.totalWeeks||6;
   const curWk=_goalCurWeek(p);
@@ -416,8 +400,7 @@ function openMileSheet(progId: any){
       // countdown is an unreadable date: no date rows, as before.
       const cd=raceCountdown(c.raceDate);
       if(cd && isFinite(cd.days)){
-        // @ts-expect-error TS2531 Object is possibly 'null'.
-        const out=cd.days>=1 ? String(cd.days) : raceCountdownWords(cd).card;
+        const out=cd.days>=1 ? String(cd.days) : raceCountdownWords(cd)!.card;
         let rs=''; try{ rs=_fmtStartDay(c.raceDate, true); }catch(_){ rs=String(c.raceDate); }
         facts+='<div class="det-row"><span class="k">Days out</span><span class="v">'+out+'</span></div>';
         facts+='<div class="det-row"><span class="k">Race day</span><span class="v">'+rs+'</span></div>';
@@ -450,7 +433,6 @@ function closeMileSheet(){
 function commitMileChange(){
   if(!_mileDraft) return;
   const programs=getPrograms();
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const pi=programs.findIndex(x=>x.id===_mileDraft.progId); if(pi<0) return;
   const p=programs[pi];
   const mEl=document.getElementById('mileSheetMins'), sEl=document.getElementById('mileSheetSecs');
@@ -471,8 +453,7 @@ function commitMileChange(){
   if(activeProgId===_mileDraft.progId){
     _setActiveProg(refreshProgram(programs[pi]));
     _setCurrentWeek(calcCurrentWeek());
-    // @ts-expect-error TS2531 Object is possibly 'null'.
-    try{ if(document.getElementById('screenWeek').classList.contains('active')) renderWeekView(); }catch(e){}
+    try{ if(document.getElementById('screenWeek')!.classList.contains('active')) renderWeekView(); }catch(e){}
   }
   closeMileSheet();
   renderProgList();
@@ -494,7 +475,6 @@ function progSelLines(p: any){
     'Name: '+s.name,
     'Goal: '+(_GOAL_LABELS[s.goal]||s.goal||'—')+' | Lift focus: '+s.liftLabel+' | Path: '+s.pathLabel,
     'Experience: '+s.experience+' | Age: '+s.ageBracket+' | Equip: '+s.equipLabel+' | Units: '+s.unit,
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
     'Train days: '+(s.trainDays.map(d=>_DAYF[d]||d).join(', ')||'—')+' | Rest: '+(s.restDays.map(d=>_DAYF[d]||d).join(', ')||'none')+' | Length: '+s.length+' wks',
     'Starting 1RM'+(s.lifts.estimated?' (est. from experience)':'')+': squat '+s.lifts.squat+' / bench '+s.lifts.bench+' / deadlift '+s.lifts.deadlift+' '+s.unit,
     // @ts-expect-error TS7006 Parameter 'c' implicitly has an 'any' type.
@@ -506,7 +486,6 @@ function progSelLines(p: any){
   return lines;
 }
 function copyProgSel(id: any){
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const p=getPrograms().find(x=>x.id===id);if(!p)return;
   const txt=progSelLines(p).join('\n');
   const done=()=>{try{showToast('Selections copied ✓');}catch(_){}};
@@ -542,18 +521,15 @@ function _progActionsHTML(p: any,isActive: any){
 }
 function renderProgList(){
   const _all=getPrograms();const list=document.getElementById('progList');
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const programs=_all.filter(p=>!p.archived);   // V156: archived live under Progress
   if(!programs.length){
-    // @ts-expect-error TS18047 'list' is possibly 'null'.
-    list.innerHTML=_all.length
+    list!.innerHTML=_all.length
       ?'<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;">All programs archived.<br>View them under Progress, or build a new one below.</div>'
       :'<div style="text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;">No programs yet.<br>Tap below to build your first.</div>';
     return;
   }
   const goalLabels: Record<string, string>={strength:'Strength',hypertrophy:'Size',fatloss:'Fat Loss',athletic:'Athletic',balanced:'Balanced'};
-  // @ts-expect-error TS18047 'list' is possibly 'null'.
-  list.innerHTML=programs.map(p=>{
+  list!.innerHTML=programs.map(p=>{
     const isActive=p.id===getActiveProgId();
     const _cts=p.cfg?.cardioTypes||[];
     const cardioSummary=_cts.length

@@ -41,17 +41,12 @@ function _rtPlayIntro(){
   if(_rtIntroTO)clearTimeout(_rtIntroTO);
   _rtIntroTO=setTimeout(function(){
     _rtIntroTO=null;
-    // @ts-expect-error TS18047 'card' is possibly 'null'.
-    card.style.animation='';
+    card!.style.animation='';
     _rtSetExpanded(false);
-    // @ts-expect-error TS18047 'tab' is possibly 'null'.
-    tab.style.transformOrigin='right center';
-    // @ts-expect-error TS18047 'tab' is possibly 'null'.
-    tab.style.animation='none';void tab.offsetWidth;
-    // @ts-expect-error TS18047 'tab' is possibly 'null'.
-    tab.style.animation='rtPillSettle .34s cubic-bezier(.34,1.4,.5,1) 1 both';
-    // @ts-expect-error TS18047 'tab' is possibly 'null'.
-    setTimeout(function(){tab.style.animation='';tab.style.transformOrigin='';},420);
+    tab!.style.transformOrigin='right center';
+    tab!.style.animation='none';void tab!.offsetWidth;
+    tab!.style.animation='rtPillSettle .34s cubic-bezier(.34,1.4,.5,1) 1 both';
+    setTimeout(function(){tab!.style.animation='';tab!.style.transformOrigin='';},420);
   },2200);
 }
 function _rtApplySide(){
@@ -59,17 +54,13 @@ function _rtApplySide(){
   if(!anchor)return;
   if(_rtSide==='right'){
     anchor.style.right='0';anchor.style.left='auto';
-    // @ts-expect-error TS18047 'tab' is possibly 'null'.
-    tab.style.borderRadius='14px 0 0 14px';tab.style.borderRight='none';tab.style.borderLeft='1.5px solid var(--signal)';
-    // @ts-expect-error TS18047 'card' is possibly 'null'.
-    card.style.borderRadius='12px 0 0 12px';card.style.borderRight='none';card.style.borderLeft='2px solid var(--signal)';
+    tab!.style.borderRadius='14px 0 0 14px';tab!.style.borderRight='none';tab!.style.borderLeft='1.5px solid var(--signal)';
+    card!.style.borderRadius='12px 0 0 12px';card!.style.borderRight='none';card!.style.borderLeft='2px solid var(--signal)';
     if(chev)chev.innerHTML='&#8249;';if(nub){nub.style.left='18px';nub.style.right='auto';}
   }else{
     anchor.style.left='0';anchor.style.right='auto';
-    // @ts-expect-error TS18047 'tab' is possibly 'null'.
-    tab.style.borderRadius='0 14px 14px 0';tab.style.borderLeft='none';tab.style.borderRight='1.5px solid var(--signal)';
-    // @ts-expect-error TS18047 'card' is possibly 'null'.
-    card.style.borderRadius='0 12px 12px 0';card.style.borderLeft='none';card.style.borderRight='2px solid var(--signal)';
+    tab!.style.borderRadius='0 14px 14px 0';tab!.style.borderLeft='none';tab!.style.borderRight='1.5px solid var(--signal)';
+    card!.style.borderRadius='0 12px 12px 0';card!.style.borderLeft='none';card!.style.borderRight='2px solid var(--signal)';
     if(chev)chev.innerHTML='&#8250;';if(nub){nub.style.right='18px';nub.style.left='auto';}
   }
 }
@@ -90,11 +81,9 @@ function _rtWireDrag(handle: any,isTab: any){
   handle.addEventListener('pointerdown',function(e: any){
     if(e.target.closest('.rt-btn,.rt-reset,.rt-collapse'))return;
     var anchor=document.getElementById('rtAnchor');
-    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
-    dragging=true;_rtDragging=true;moved=false;sx=e.clientX;sy=e.clientY;sTop=anchor.offsetTop;
+    dragging=true;_rtDragging=true;moved=false;sx=e.clientX;sy=e.clientY;sTop=anchor!.offsetTop;
     if(e.cancelable)e.preventDefault();
-    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
-    anchor.style.transition='none';try{handle.setPointerCapture(e.pointerId);}catch(_){}
+    anchor!.style.transition='none';try{handle.setPointerCapture(e.pointerId);}catch(_){}
   });
   handle.addEventListener('pointermove',function(e: any){
     if(!dragging)return;
@@ -104,31 +93,23 @@ function _rtWireDrag(handle: any,isTab: any){
     if(Math.abs(dx)>5||Math.abs(dy)>5)moved=true;
     // v0.239.1 (D235.1): below the 5 px threshold nothing is written, so a jittery tap leaves the timer docked.
     if(!moved)return;
-    // @ts-expect-error TS18047 'frame' is possibly 'null'.
-    var fb=frame.getBoundingClientRect();
-    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
-    var maxT=window.innerHeight-anchor.offsetHeight-8;
-    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
-    anchor.style.top=Math.max(8,Math.min(maxT,sTop+dy))+'px';
-    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
-    var w=anchor.offsetWidth;
+    var fb=frame!.getBoundingClientRect();
+    var maxT=window.innerHeight-anchor!.offsetHeight-8;
+    anchor!.style.top=Math.max(8,Math.min(maxT,sTop+dy))+'px';
+    var w=anchor!.offsetWidth;
     var x=Math.max(0,Math.min(fb.width-w,e.clientX-fb.left-w/2));
-    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
-    anchor.style.left=x+'px';anchor.style.right='auto';
+    anchor!.style.left=x+'px';anchor!.style.right='auto';
   });
   // v0.239.1 (D235.2): one end-of-drag path for pointerup and pointercancel. It ends the drag, restores the
   // snap transition and, when the drag moved, docks the timer to the nearer edge. It returns moved.
   function snap(){
     dragging=false;_rtDragging=false;
     var anchor=document.getElementById('rtAnchor'),frame=document.getElementById('restFloat');
-    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
-    anchor.style.transition='left .18s cubic-bezier(.34,1.3,.5,1),right .18s cubic-bezier(.34,1.3,.5,1)';
+    anchor!.style.transition='left .18s cubic-bezier(.34,1.3,.5,1),right .18s cubic-bezier(.34,1.3,.5,1)';
     if(moved){
-      // @ts-expect-error TS18047 'anchor' is possibly 'null'.
-      var center=anchor.offsetLeft+anchor.offsetWidth/2,fb=frame.getBoundingClientRect();
+      var center=anchor!.offsetLeft+anchor!.offsetWidth/2,fb=frame!.getBoundingClientRect();
       _rtSide=(center<fb.width/2)?'left':'right';
-      // @ts-expect-error TS18047 'anchor' is possibly 'null'.
-      anchor.style.left='';_rtApplySide();
+      anchor!.style.left='';_rtApplySide();
     }
     return moved;
   }

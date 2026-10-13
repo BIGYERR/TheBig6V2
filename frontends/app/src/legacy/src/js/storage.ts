@@ -8,7 +8,7 @@ import { activeProg, activeProgId, currentDayKey, currentWeek } from './rest-day
 function esc(s: any){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 // STORAGE
-function getPrograms(){try{return JSON.parse(localStorage.getItem('ia_programs')||'[]');}catch{return[];}}
+function getPrograms(): any[]{try{return JSON.parse(localStorage.getItem('ia_programs')||'[]');}catch{return[];}}
 function savePrograms(p: any){localStorage.setItem('ia_programs',JSON.stringify(p));}
 function getActiveProgId(){return localStorage.getItem('ia_active')||null;}
 function setActiveProgId(id: any){localStorage.setItem('ia_active',id);}
@@ -28,32 +28,22 @@ function restNorm(e: any){
   const FLAT=['rest_cardio','rest_type','rest_mins','rpe','run_dist','bike_mins','swim_yards'];
   // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const num=v=>(+v>0?+v:0), t=e.rest_type||'';
-  const M={}, D={}, R={};
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+  const M: Record<string, any>={}, D: Record<string, any>={}, R: Record<string, any>={};
   if(t&&num(e.rest_mins)) M[t]=num(e.rest_mins);
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   if(t&&e.rpe!=null&&e.rpe!==''&&isFinite(+e.rpe)) R[t]=+e.rpe;
-  // @ts-expect-error TS2339 Property 'run' does not exist on type '{}'.
   if(num(e.run_dist)) D.run=num(e.run_dist);
-  // @ts-expect-error TS2339 Property 'swim' does not exist on type '{}'.
   if(num(e.swim_yards)) D.swim=num(e.swim_yards);
-  // @ts-expect-error TS2339 Property 'bike' does not exist on type '{}'.
   if(num(e.bike_mins)) M.bike=num(e.bike_mins);
-  const rl={};
+  const rl: Record<string, any>={};
   [t,'run','swim','bike'].forEach(function(s,i,a){
     if(!s||a.indexOf(s)!==i) return;
-    const o={};
-    // @ts-expect-error TS2339 Property 'mins' does not exist on type '{}'.
+    const o: Record<string, any>={};
     if(s in M) o.mins=M[s];
-    // @ts-expect-error TS2339 Property 'dist' does not exist on type '{}'.
     if(s in D) o.dist=D[s];
-    // @ts-expect-error TS2339 Property 'rpe' does not exist on type '{}'.
     if(s in R) o.rpe=R[s];
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
     if(Object.keys(o).length) rl[s]=o;
   });
-  const out={restLog:rl};
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
+  const out: Record<string, any>={restLog:rl};
   Object.keys(e).forEach(function(k){ if(FLAT.indexOf(k)<0) out[k]=e[k]; });
   return out;
 }
@@ -73,7 +63,7 @@ function saveExWeightsFor(pid: any,obj: any){localStorage.setItem('ia_exw_'+pid,
 function saveLogs(l: any){localStorage.setItem('ia_logs_'+activeProgId,JSON.stringify(l));}
 function getCompleted(){try{return JSON.parse(localStorage.getItem('ia_comp_'+activeProgId)||'{}');}catch{return{};}}
 function saveCompleted(c: any){localStorage.setItem('ia_comp_'+activeProgId,JSON.stringify(c));}
-function getWildcardDone(){try{return JSON.parse(localStorage.getItem('ia_wild_'+activeProgId)||'[]');}catch{return[];}}
+function getWildcardDone(): any[]{try{return JSON.parse(localStorage.getItem('ia_wild_'+activeProgId)||'[]');}catch{return[];}}
 function saveWildcardDone(a: any){localStorage.setItem('ia_wild_'+activeProgId,JSON.stringify(a));}
 function logKey(w: any,d: any){return 'w'+w+'_'+d;}
 

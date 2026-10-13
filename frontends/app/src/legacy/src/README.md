@@ -80,8 +80,9 @@ lookup table indexed by an unchecked key is typed `Record<string, ...>`, and eve
 `// @ts-expect-error TS<code> <message>` line above it, which the build strips with the types. An error inside a
 template literal that spans lines cannot carry a marker, and gets a type by hand where the value it reads is declared.
 `node tools/engine-move.mjs js/<name> <ref>` sets the blanks as for an engine file, and `node tools/same-script.mjs`
-proves the page's tokens. Each marker is type debt named where it lies; taking one out is the next pass's work, under
-the tests (`docs/decisions/app-typescript.md`). A new type is written onto the code; changing the code is a release with
+proves the page's tokens. Each marker is type debt named where it lies. `node tools/ts-narrow.mjs` takes the markers
+out and writes the narrow type where one exists (`x!`, a typed table), then `ts-expect.mjs` marks the rest
+(`docs/decisions/app-typescript.md`). A new type is written onto the code; changing the code is a release with
 its own proof.
 
 ## The files, in build order

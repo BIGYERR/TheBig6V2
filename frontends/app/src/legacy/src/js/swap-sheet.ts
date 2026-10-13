@@ -86,11 +86,9 @@ function openSwapSheet(secIdx: any,itemIdx: any){
   // MAIN LIFTS, one tag for both tests made the app contradict itself in the athlete's hand.
   const isMainSlot=(itemIdx===0&&!(sec.superset||sec.type==='superset')&&/^main/i.test(sec.label||''));
   const isHeavyCompound=!isMainSlot&&_compoundTier(item.name)>=3;
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('swapOutName').textContent=item.name;
+  document.getElementById('swapOutName')!.textContent=item.name;
   const rxs=_rxShort(_swapCtx.detail);
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('swapTags').innerHTML=
+  document.getElementById('swapTags')!.innerHTML=
     '<span class="swap-tag">'+(_fam?_AUX_FAMILY_LABEL[_fam]:tagOf(c.pattern))+'</span>'
     +'<span class="swap-tag">'+regionOf(c.region)+'</span>'
     +(isMainSlot?'<span class="swap-tag">MAIN LIFT</span>':(isHeavyCompound?'<span class="swap-tag">HEAVY COMPOUND</span>':''))
@@ -112,10 +110,8 @@ function openSwapSheet(secIdx: any,itemIdx: any){
   }else{
     h+='<div class="swap-foot">Swaps hold for this session only. Next week says what it always said.</div>';
   }
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('swapBody').innerHTML=h;
-  // @ts-expect-error TS18047 'o' is possibly 'null'.
-  const o=document.getElementById('swapOverlay');o.classList.add('open');o.scrollTop=0;
+  document.getElementById('swapBody')!.innerHTML=h;
+  const o=document.getElementById('swapOverlay');o!.classList.add('open');o!.scrollTop=0;
 }
 function closeSwapSheet(){const o=document.getElementById('swapOverlay');if(o)o.classList.remove('open');_swapCtx=null;}
 function applySwapChoice(to: any){
@@ -148,7 +144,7 @@ function applySwapChoice(to: any){
   // V229 D193 (R3): the dose that travels is the dose beneath the hold: the kept pre-hold dose when this card has one,
   // else the card as it stands, read beneath the cue or the held-test text.
   const _base=_stripCapCue((typeof item._preHold==='string')?item._preHold:_wasDetail);
-  const _rx={};
+  const _rx: Record<string, any>={};
   item.detail=_swapDetailFor(to,_base,_rx);
   const _reRx=(item.detail!==_base);
   // V229 D193 (R3, R8; Amendment 3 section 4): on an injured program the tap keeps the dose before the re-filter beside the
@@ -175,16 +171,12 @@ function applySwapChoice(to: any){
   // Never on the unloadable branch, which keeps its V119 copy, never on a verbatim pair.
   // V229 D193 (R8): when the plan's clamp changed the number, the toast names the hold in the same branch's words.
   showToast(_held
-    // @ts-expect-error TS2339 Property 'win' does not exist on type '{}'.
     ? (_rx.win
-      // @ts-expect-error TS2339 Property 'win' does not exist on type '{}'.
       ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'. Your injury plan holds this one at RPE 7.'
       : _reRx
       ? to+' in, '+from.toLowerCase()+' out. No load to add here. Your injury plan holds this one at RPE 7.'
       : to+' in, '+from.toLowerCase()+' out. Same sets, same reps. Your injury plan holds this one at RPE 7.')
-    // @ts-expect-error TS2339 Property 'win' does not exist on type '{}'.
     : _rx.win
-    // @ts-expect-error TS2339 Property 'win' does not exist on type '{}'.
     ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Same sets, same effort. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'.'
     : _reRx
     ? to+' in, '+from.toLowerCase()+' out. No load to add here, so take the sets to the same effort.'
@@ -244,16 +236,14 @@ function openAddSheet(){
   const day=_liveDay();
   if(!day||!activeProg){showToast('Nothing to add to here');return;}
   const c=addCandidates(day,currentWeek,activeProg);
-  // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ pu
   const regionLbl={push:'PUSH DAY',pull:'PULL DAY',legs:'LEG DAY'}[c.region]||'TODAY';
   let setCount=0;
   ((day.sections)||[]).forEach(function(s: any){(s.items||[]).forEach(function(it: any){
     if(!it||it._skipped) return; const rx=parseRx(it.detail||'',it.name||''); if(rx&&!rx.open) setCount+=rx.sets;
   });});
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('addOutName').textContent=(day.title||'Training');
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('addTags').innerHTML=
+  document.getElementById('addOutName')!.textContent=(day.title||'Training');
+  document.getElementById('addTags')!.innerHTML=
     '<span class="swap-tag">WEEK '+currentWeek+'</span><span class="swap-tag">'+regionLbl+'</span>'
     +'<span class="swap-tag">'+setCount+' SETS</span>'
     +'<div class="swap-keeps">Added work matches the closest thing to it in your week.</div>';
@@ -290,10 +280,8 @@ function openAddSheet(){
   }
   if(!h) h='<div class="swap-empty">Nothing left in your kit that isn\'t already on this card.</div>';
   else h+='<div class="swap-foot">Added work holds for this session only. It logs and counts like anything else on the card. Next week says what it always said.</div>';
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('addBody').innerHTML=h;
-  // @ts-expect-error TS18047 'o' is possibly 'null'.
-  const o=document.getElementById('addOverlay');o.classList.add('open');o.scrollTop=0;
+  document.getElementById('addBody')!.innerHTML=h;
+  const o=document.getElementById('addOverlay');o!.classList.add('open');o!.scrollTop=0;
 }
 function closeAddSheet(){const o=document.getElementById('addOverlay');if(o)o.classList.remove('open');}
 function applyAddChoice(name: any){
@@ -319,8 +307,7 @@ function undoSwap(from: any){
   // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
   const hit=list.filter(e=>e&&e.from===from)[0];
   if(!hit) return;
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
-  const back={}; back[hit.to]=from;
+  const back: Record<string, any>={}; back[hit.to]=from;
   applySwapPrefs(day.sections,back);
   // V221 D177 (R4): the name is back; now the donor's own detail. Each stored detail goes
   // to the item at its stored position if that item carries `from` again, else to the

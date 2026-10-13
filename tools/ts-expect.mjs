@@ -111,7 +111,7 @@ function typeTables(file, text, ids) {
       if (node.type === 'VariableDeclarator' && node.id.type === 'Identifier' && node.id.name === id && node.init?.type === 'ObjectExpression') found.push(node);
     });
     if (found.length !== 1 || /^\s*:/.test(text.slice(found[0].id.end))) continue;
-    const strings = found[0].init.properties.every((p) => p.type === 'Property' && p.value.type === 'Literal' && typeof p.value.value === 'string');
+    const strings = found[0].init.properties.length > 0 && found[0].init.properties.every((p) => p.type === 'Property' && p.value.type === 'Literal' && typeof p.value.value === 'string');
     at.push([found[0].id.end, `: Record<string, ${strings ? 'string' : 'any'}>`]);
   }
   let out = text;

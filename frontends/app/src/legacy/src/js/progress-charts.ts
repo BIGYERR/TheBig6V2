@@ -10,7 +10,7 @@ import {
 // ── V165 chart builders ─────────────────────────────────────────────────────
 // D2 (ruled): static SVG, no interaction layer. D5: bars where composition or a
 // zero line carries the meaning, dot-and-dash where the existing grammar holds.
-function _iaCard(title: any, color: any, inner: any, footer: any){
+function _iaCard(title: any, color: any, inner: any, footer?: any){
   return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">'
     + '<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;'
     + 'text-transform:uppercase;color:'+(color||'var(--accent)')+';margin-bottom:12px">'+title+'</div>'
@@ -18,7 +18,7 @@ function _iaCard(title: any, color: any, inner: any, footer: any){
     + (footer?'<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">'+footer+'</div>':'')
     + '</div>';
 }
-function _axTx(x: any,y: any,s: any,size: any,anchor: any,fill: any,weight: any){
+function _axTx(x: any,y: any,s: any,size?: any,anchor?: any,fill?: any,weight?: any){
   return '<text x="'+(+x).toFixed(1)+'" y="'+(+y).toFixed(1)+'" fill="'+(fill||'rgba(24,23,18,0.3)')
     +'" font-size="'+(size||8)+'" text-anchor="'+(anchor||'end')+'" font-family="Helvetica Neue,Helvetica,Geist,sans-serif"'
     +(weight?' font-weight="'+weight+'"':'')+'>'+s+'</text>';
@@ -38,7 +38,6 @@ function buildLadderChart(wk: any, totalWeeks: any, raceMi: any, cut: any, skip1
   for(let yv=0; yv<=mx; yv+=step){
     const cy=padT+plotH-(yv/mx)*plotH;
     s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
     s+=_axTx(padL-5, cy+3, yv);
   }
   if(raceMi>0&&raceMi<=mx){
@@ -56,7 +55,6 @@ function buildLadderChart(wk: any, totalWeeks: any, raceMi: any, cut: any, skip1
     s+='<rect x="'+x.toFixed(1)+'" y="'+(padT+plotH-h).toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+h.toFixed(1)+'" fill="var(--run)" opacity="'+(v===best?0.95:0.62)+'"/>';
   }
   const lblStep=Math.ceil(totalWeeks/7);
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   for(let i=0;i<totalWeeks;i++) if(i%lblStep===0) s+=_axTx(padL+i*slot+slot/2, H-8, 'W'+(i+1), 8, 'middle');
   const bestW=vals.filter(w=>wk[w]===best)[0];
   let foot='Furthest so far <b style="color:var(--run)">'+best.toFixed(1)+' mi</b> in W'+bestW;
@@ -89,7 +87,6 @@ function buildClassBandsChart(byClass: any){
   for(let pv=first; pv<=hi; pv+=tickStep){
     const cy=yof(pv);
     s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
     s+=_axTx(padL-5, cy+3, _fmtPaceShort(pv));
   }
   active.forEach((c,ci)=>{
@@ -101,7 +98,6 @@ function buildClassBandsChart(byClass: any){
       s+='<circle cx="'+jx.toFixed(1)+'" cy="'+yof(p).toFixed(1)+'" r="2.6" fill="'+col+'" opacity="0.72"/>';
     });
     s+=_axTx(cx, H-padB+16, c, 8, 'middle', col, '700');
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
     s+=_axTx(cx, H-padB+26, pts.length+(pts.length===1?' run':' runs'), 7, 'middle');
   });
   let foot='Each dot is one logged run, placed by pace and grouped by the intensity the plan asked for.';
@@ -137,10 +133,8 @@ function buildEasyEffortChart(ee: any, totalWeeks: any){
   for(let pv=first; pv<=hi; pv+=tickStep){
     const cy=yof(pv);
     s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
     s+=_axTx(padL-5, cy+3, _fmtPaceShort(pv));
   }
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   s+=_axTx(padL, padT-6, '↑ faster', 7, 'start');
   let path='', prev: any=null;
   ws.forEach(w=>{
@@ -155,7 +149,6 @@ function buildEasyEffortChart(ee: any, totalWeeks: any){
     s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="7" fill="var(--run)" opacity="0.15"/>';
   });
   const lblStep=Math.ceil(totalWeeks/7);
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   for(let i=0;i<totalWeeks;i++) if(i%lblStep===0) s+=_axTx(padL+i*xs, H-8, 'W'+(i+1), 8, 'middle');
   const d=ee.weekly[ws[0]]-ee.weekly[ws[ws.length-1]];
   let foot='Easy and recovery runs at RPE '+EASY_RPE_LO+'–'+EASY_RPE_HI+' only, so effort is held and pace is the one free variable. ';
@@ -167,7 +160,6 @@ function buildEasyEffortChart(ee: any, totalWeeks: any){
 }
 function buildEasyEffortEmpty(ee: any){
   const need=EASY_MIN_RUNS-ee.nRuns;
-  // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
   return _iaCard(asyIcon('🏃',15)+' Same Effort, More Speed','var(--muted)',
     '<div style="font-size:12px;color:var(--muted);line-height:1.6">This chart holds effort constant so pace is the only thing that can move — it needs '
     +'<b style="color:var(--text)">'+EASY_MIN_RUNS+'</b> easy or recovery runs logged with an RPE of '+EASY_RPE_LO+'–'+EASY_RPE_HI+'. '
@@ -178,18 +170,16 @@ function buildEasyEffortEmpty(ee: any){
 function buildProjectionCard(ee: any, totalWeeks: any, intakeMileSec: any){
   const ws=Object.keys(ee.weekly).map(Number).sort((a,b)=>a-b);
   if(ws.length<2) return '';
-  const proj={}; let any=false;
+  const proj: Record<string, any>={}; let any=false;
   ws.forEach(w=>{
     const mile=_mileFromRecoverySec(ee.weekly[w]);
     const half=mile?_halfFromMileSec(mile):null;
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(half){ proj[w]=half; any=true; }
   });
   if(!any) return '';
   const pws=Object.keys(proj).map(Number).sort((a,b)=>a-b);
   if(pws.length<2) return '';
   const claimed=(intakeMileSec>0)?_halfFromMileSec(intakeMileSec):null;
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   let vals=pws.map(w=>proj[w]); if(claimed) vals=vals.concat([claimed]);
   let lo=Math.min.apply(null,vals), hi=Math.max.apply(null,vals);
   const pad=Math.max(180,(hi-lo)*0.25); lo-=pad; hi+=pad;
@@ -202,7 +192,6 @@ function buildProjectionCard(ee: any, totalWeeks: any, intakeMileSec: any){
   for(let tv=Math.ceil(lo/600)*600; tv<=hi; tv+=600){
     const cy=yof(tv);
     s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
     s+=_axTx(padL-5, cy+3, Math.floor(tv/3600)+':'+String(Math.floor((tv%3600)/60)).padStart(2,'0'));
   }
   if(claimed){
@@ -211,25 +200,19 @@ function buildProjectionCard(ee: any, totalWeeks: any, intakeMileSec: any){
     s+=_axTx(W-padR, cy-5, 'your '+_fmtPaceShort(intakeMileSec)+' mile', 8, 'end', 'var(--muted)', '700');
   }
   let up='', dn='';
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   pws.forEach(w=>{ up+=(padL+(w-1)*xs).toFixed(1)+','+yof(proj[w]*0.975).toFixed(1)+' '; });
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   for(let i=pws.length-1;i>=0;i--){ const w=pws[i]; dn+=(padL+(w-1)*xs).toFixed(1)+','+yof(proj[w]*1.025).toFixed(1)+' '; }
   s+='<polygon points="'+up+dn+'" fill="var(--hip)" opacity="0.13"/>';
   let path='', prev: any=null;
   pws.forEach(w=>{
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     const x=padL+(w-1)*xs, y=yof(proj[w]);
     if(prev) path+=' M'+prev[0].toFixed(1)+','+prev[1].toFixed(1)+' L'+x.toFixed(1)+','+y.toFixed(1);
     prev=[x,y];
   });
   s+='<path d="'+path+'" stroke="var(--hip)" stroke-width="1.5" stroke-dasharray="3,3" fill="none" opacity="0.7"/>';
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   pws.forEach(w=>{ s+='<circle cx="'+(padL+(w-1)*xs).toFixed(1)+'" cy="'+yof(proj[w]).toFixed(1)+'" r="3.2" fill="var(--hip)" opacity="0.9"/>'; });
   const lblStep=Math.ceil(totalWeeks/7);
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   for(let i=0;i<totalWeeks;i++) if(i%lblStep===0) s+=_axTx(padL+i*xs, H-8, 'W'+(i+1), 8, 'middle');
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   const last=proj[pws[pws.length-1]], firstP=proj[pws[0]];
   const big='<div style="font-family:var(--font-display);font-size:26px;font-weight:700;letter-spacing:-0.02em;color:var(--hip);line-height:1.1">'
     +_fmtHMS(last*0.975)+' – '+_fmtHMS(last*1.025)+'</div>'
@@ -262,12 +245,10 @@ function buildDriftChart(pv: any, totalWeeks: any, cut: any, skip1: any){
     if(Math.abs(yv)<1e-9) continue;
     const cy=yof(yv);
     s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
     s+=_axTx(padL-5, cy+3, (yv>0?'+':'')+yv);
   }
   const zy=yof(0);
   s+='<line x1="'+padL+'" y1="'+zy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+zy.toFixed(1)+'" stroke="var(--border2)" stroke-width="1.2"/>';
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 6.
   s+=_axTx(padL-5, zy+3, 'as written', 7, 'end', 'var(--muted)');
   ws.forEach(w=>{
     const d=pv[w].act-pv[w].presc;
@@ -276,7 +257,6 @@ function buildDriftChart(pv: any, totalWeeks: any, cut: any, skip1: any){
       +'" fill="'+(d>=0?'var(--run)':'var(--red)')+'" opacity="0.85"/>';
   });
   const lblStep=Math.ceil(totalWeeks/7);
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   for(let i=0;i<totalWeeks;i++) if(i%lblStep===0) s+=_axTx(padL+i*slot+slot/2, H-8, 'W'+(i+1), 8, 'middle');
   let tp=0, ta=0; ws.forEach(w=>{ tp+=pv[w].presc; ta+=pv[w].act; });
   const net=ta-tp;
@@ -411,10 +391,8 @@ function easyVsPrescribed(logs: any, hist: any, totalWeeks: any){
     // @ts-expect-error TS2339 Property 'run_pace' does not exist on type '{}'.
     const sec=_paceStrToSec(e.run_pace); if(!sec) return;
     const cap=(+d.cap>0)?+d.cap:_steadyCeilingFor(tgt);
-    // @ts-expect-error TS18047 'cap' is possibly 'null'.
-    if(!(cap>0)) return;
-    // @ts-expect-error TS18047 'cap' is possibly 'null'.
-    runs.push({w, sec, tgt, cap, hot:sec<cap});       // fewer seconds = too fast
+    if(!(cap!>0)) return;
+    runs.push({w, sec, tgt, cap, hot:sec<cap!});       // fewer seconds = too fast
   });
   runs.sort((a,b)=>a.w-b.w);
   return runs;
@@ -457,7 +435,6 @@ function buildEasyZoneChart(runs: any){
     s+='<line x1="'+padL+'" y1="'+tgtY.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+tgtY.toFixed(1)+'" stroke="var(--run)" stroke-width="1" stroke-dasharray="2,3" opacity="0.7"/>';
     s+=_axTx(W-padR, tgtY+12, 'aim '+_fmtPaceShort(tgt), 8, 'end', 'var(--run)', '700');
   }
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
   for(let pv=Math.ceil(lo/60)*60; pv<=hi; pv+=60) s+=_axTx(padL-5, yof(pv)+3, _fmtPaceShort(pv));
   runs.forEach((r: any,i: any)=>{
     const x=padL+i*xs, y=yof(r.sec), c=r.hot?'var(--red)':'var(--run)';
@@ -465,7 +442,6 @@ function buildEasyZoneChart(runs: any){
     s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="7.5" fill="'+c+'" opacity="0.16"/>';
   });
   const lblStep=Math.max(1,Math.ceil(n/6));
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   runs.forEach((r: any,i: any)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-8, 'W'+r.w, 8, 'middle'); });
   const headHtml='<div style="font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-0.02em;color:'
     +col+';line-height:1.15;margin-bottom:4px">'+head+'</div>'
@@ -498,12 +474,9 @@ function buildEasyBandsFallback(byClass: any){
   let s='';
   for(let pv=Math.ceil(lo/60)*60; pv<=hi; pv+=60){
     s+='<line x1="'+xof(pv).toFixed(1)+'" y1="'+(padT-6)+'" x2="'+xof(pv).toFixed(1)+'" y2="'+(padT+58)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
     s+=_axTx(xof(pv), padT+74, _fmtPaceShort(pv), 8, 'middle');
   }
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   s+=_axTx(padL, padT-12, '\u2190 faster', 7, 'start');
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   s+=_axTx(W-padR, padT-12, 'slower \u2192', 7, 'end');
   [['HARD',hard,'var(--lift)'],['EASY',easy,'var(--run)']].forEach((row,i)=>{
     const y=padT+i*30, x1=xof(Math.min.apply(null,row[1])), x2=xof(Math.max.apply(null,row[1]));

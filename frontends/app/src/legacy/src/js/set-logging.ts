@@ -33,7 +33,7 @@ function recencyBucket(ts: any){
   else i=6;
   return {i:i,days:days};
 }
-function recencyLabel(ts: any,form: any){
+function recencyLabel(ts: any,form?: any){
   const b=recencyBucket(ts), d=b.days;
   if(b.i<0) return form==='age'?'from an earlier block':'last time';
   if(form==='age'){
@@ -41,21 +41,17 @@ function recencyLabel(ts: any,form: any){
     if(b.i===1) return 'from yesterday';
     if(b.i===2) return 'about '+d+' days old';
     if(b.i===3) return 'about a week old';
-    // @ts-expect-error TS18047 'd' is possibly 'null'.
-    if(b.i===4) return 'about '+Math.floor(d/7)+' weeks old';
+    if(b.i===4) return 'about '+Math.floor(d!/7)+' weeks old';
     if(b.i===5) return 'about a month old';
-    // @ts-expect-error TS18047 'd' is possibly 'null'.
-    return 'about '+Math.floor(d/30)+' months old';
+    return 'about '+Math.floor(d!/30)+' months old';
   }
   if(b.i===0) return 'earlier today';
   if(b.i===1) return 'yesterday';
   if(b.i===2) return d+' days ago';
   if(b.i===3) return 'last week';
-  // @ts-expect-error TS18047 'd' is possibly 'null'.
-  if(b.i===4) return Math.floor(d/7)+' weeks ago';
+  if(b.i===4) return Math.floor(d!/7)+' weeks ago';
   if(b.i===5) return 'last month';
-  // @ts-expect-error TS18047 'd' is possibly 'null'.
-  return Math.floor(d/30)+' months ago';
+  return Math.floor(d!/30)+' months ago';
 }
 function isStaleTs(ts: any){
   const b=recencyBucket(ts);
@@ -146,11 +142,10 @@ function setDelta(id: any){
   // through this path and no other, so the refresh must fire on EVERY branch below.
   const key=String(id).replace(/^exset_/,'').replace(/_\d+$/,'');
   if(!d){ refreshSetSummary(key); return; }
-  // @ts-expect-error TS18047 'el' is possibly 'null'.
-  const rxa=el.getAttribute('data-rx');
+  const rxa=el!.getAttribute('data-rx');
   if(rxa===null||rxa===''){ d.className='exset-delta'; d.textContent=''; refreshSetSummary(key); return; }
-  // @ts-expect-error TS18047 'el' is possibly 'null'.
-  const rx=+rxa; let v=parseInt(el.value||'0',10); if(isNaN(v))v=0;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
+  const rx=+rxa; let v=parseInt(el!.value||'0',10); if(isNaN(v))v=0;
   const diff=v-rx;
   if(diff===0){ d.className='exset-delta'; d.textContent=''; }
   else if(diff<0){ d.className='exset-delta down'; d.textContent=String(diff); }
@@ -173,7 +168,7 @@ function reuseWeight(exKey: any,val: any){
 // helpers are the only border between them — do not convert anywhere else.
 // Prescription per card, cached at render so the live summary can restate
 // "4 × 8" when a ladder flattens back out. Render-scoped, never persisted.
-const _rxCache={};
+const _rxCache: Record<string, any>={};
 function toDispW(lbs: any){
   if(lbs===''||lbs==null) return '';
   // @ts-expect-error TS2339 Property '_unitLabel' does not exist on type 'Window & typeof globalThis'.
@@ -349,7 +344,6 @@ function refreshSetSummary(exKey: any){
   const a=setWeightVals(exKey), r=setRepVals(exKey);
   const vary=document.getElementById('exvary_'+exKey);
   const sub=document.getElementById('exsumsub_'+exKey);
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   const rx=_rxCache[exKey]||null;
   // The `logged` half of the line is the card's own class — the same fact buildExItem
   // used to stamp it, and the only live signal available here.
@@ -385,7 +379,7 @@ function exControlFlags(sec: any,itemIdx: any,it: any){
   const canSkip=!isNote&&!isMainSlot;
   return {isNote:isNote,inSS:inSS,isMainSlot:isMainSlot,canSwap:canSwap,canSkip:canSkip};
 }
-function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds: any){
+function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds?: any){
   // V190 (D39): inside a block that draws a round count, the row states reps and effort
   // only — the count is on the header. `_dispDetail` is the RENDERED string; i.detail is
   // left alone so parseRx and every one of its five callers see what they always saw.
@@ -506,7 +500,6 @@ function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds: any){
     const _headW=wkW.map(function(x: any){return (x!=null&&x!=='')?x:0;});
     if(rx){
       const suf=rxSuffix(rx);
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
       _rxCache[exKey]=rx;
       html+='<button type="button" class="exset-head" onclick="toggleSets(\''+exKey+'\')">'
         +'<span class="exset-head-lbl">Sets</span>'
@@ -578,7 +571,6 @@ function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds: any){
         // pill's source differs from the one the sentence named — otherwise the
         // sentence would be speaking for a number it did not come from.
         const _nameIt=_stale&&_src&&_src!==_staleWarnSrc;
-        // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
         const rec=recencyLabel(effEntry&&effEntry.ts)+(_nameIt?' \u00b7 '+esc(_src):'');
         html+='<button type="button" class="ex-reuse'+(_stale?' is-stale':'')+'" onclick="reuseWeight(\''+exKey+'\','+dispLast+')">'
           +'<span class="ex-reuse-ico">\u21ba</span>'
@@ -598,7 +590,6 @@ function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds: any){
         // inside one card — one flag, both render paths.
         html+='<button type="button" class="ex-reuse ex-reuse-fill'+(_stale?' is-stale':'')+'" onclick="fillAllSetWeights(\''+exKey+'\','+dispLast+')">'
           +'<span class="ex-reuse-ico">\u21ba</span>'
-          // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
           +'<span class="ex-reuse-txt">Fill every set with '+dispLast+' '+wunit+'<small>'+recencyLabel(effEntry&&effEntry.ts)+'</small></span>'
           +'</button>';
       }
@@ -666,8 +657,7 @@ function buildCardioHTML(cardio: any){
   const ctype=(cardio.type||'').toLowerCase();
   const blockCls=ctype==='swim'?'swim-block':ctype==='run'?'run-block':ctype==='bike'?'bike-block':'cardio-block';
   const labelCls=ctype==='swim'?'cardio-label-swim':ctype==='run'?'cardio-label-run':ctype==='bike'?'cardio-label-bike':'cardio-label-general';
-  const typeNames={run:'Run',bike:'Bike / Spin',swim:'Swim'};
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
+  const typeNames: Record<string, string>={run:'Run',bike:'Bike / Spin',swim:'Swim'};
   const typeName=typeNames[ctype]||cardio.type;
   const subLabel=cardio.subtype?' — '+cardio.subtype.replace(/_/g,' '):'';
   let inner=`<div class="cardio-type-label ${labelCls}">${typeName}${subLabel}</div>`;

@@ -24,7 +24,6 @@ function refreshProgram(prog: any){
   if(prog.cfg.seed == null){
     if(prog.seed == null) return prog; // truly seedless → leave baked
     prog.cfg.seed = prog.seed;
-    // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
     try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,seed:prog.seed}; savePrograms(_ps); } }catch(e){}
   }
   // D106a (V207), D184 (V223): BACKFILL. A stored program whose _testWeek is null or absent
@@ -41,7 +40,6 @@ function refreshProgram(prog: any){
       if(!(_rd && _td && _rd < _td)){   // a past test pins nothing and writes nothing
         prog.cfg._testWeek = _tp.tw;
         prog.cfg._raceDateCappedWeeks = _tp.tw;
-        // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
         try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,_testWeek:prog.cfg._testWeek,_raceDateCappedWeeks:prog.cfg._raceDateCappedWeeks}; savePrograms(_ps); } }catch(e){}
       }
     }
@@ -134,7 +132,7 @@ function refreshProgram(prog: any){
         // at all still contributes 'w<N>_', which raises _maxTouched (the regex below
         // matches it) but can never equal a real _dk(w,d) key, so it moves the frontier
         // without ever falsely freezing a named day.
-        const _touched = {};
+        const _touched: Record<string, any> = {};
         try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_comp_'+prog.id)||'{}')); }catch(e){}
         try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_logs_'+prog.id)||'{}')); }catch(e){}
         try{ Object.assign(_touched, JSON.parse(localStorage.getItem('ia_hist_'+prog.id)||'{}')); }catch(e){}
@@ -146,7 +144,6 @@ function refreshProgram(prog: any){
             _ents.forEach(_e=>{
               const _wn = +(_e && _e.week);
               if(!(_wn > 0)) return;
-              // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
               _touched['w'+_wn+'_'+(entryDay(_e)||'')] = true;
             });
           });
@@ -207,7 +204,7 @@ function refreshProgram(prog: any){
         // ia_hist_ holds the day exactly as rendered at first touch, so it is the real
         // record; prog.weeks is only the fallback for days touched before snapshots
         // shipped, and (below the pierce boundary) for untouched days in past weeks.
-        const _hist = {};
+        const _hist: Record<string, any> = {};
         try{ Object.assign(_hist, JSON.parse(localStorage.getItem('ia_hist_'+prog.id)||'{}')); }catch(e){}
         const _dk = (w: any,d: any) => 'w'+w+'_'+d;
         for(let w=1; w<_cut; w++){
@@ -228,13 +225,11 @@ function refreshProgram(prog: any){
           } else {
             _days = Object.keys(_stored);
           }
-          const _merged = {};
+          const _merged: Record<string, any> = {};
           _days.forEach(d=>{
             const k = _dk(w,d);
             // 1. Snapshot = what was actually on screen. Always wins, every week.
-            // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
             const _snap = _hist[k];
-            // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
             if(_snap){ _merged[d] = _snap; _histRestored.add(k); return; }
             // 2. Touched with no snapshot = trained before snapshots shipped, so what
             //    was on screen is unrecoverable. LEGACY CARVE-OUT: on an injury-covered
@@ -245,19 +240,18 @@ function refreshProgram(prog: any){
             if(Object.prototype.hasOwnProperty.call(_touched, k)){
               // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Week
               if(_injCovers(w) && _live[d]){ _merged[d] = _live[d]; return; }
-              // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+              // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Week
               _merged[d] = _stored[d] || _live[d];
               return;
             }
             // 3. No record of any kind. Nothing to protect — take the live build.
             // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Week
             if(_pierce && _live[d]){ _merged[d] = _live[d]; return; }
-            // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+            // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Week
             _merged[d] = _stored[d] || _live[d];
           });
-          // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
           Object.keys(_merged).forEach(d=>{ if(!_merged[d]) delete _merged[d]; });
-          // @ts-expect-error TS2740 Type '{}' is missing the following properties from type 'Week': sun, mon, tue, wed, and 3 more.
+          // @ts-expect-error TS2740 Type 'Record<string, any>' is missing the following properties from type 'Week': sun, mon, tue, wed, an
           rebuilt.weeks[w] = _merged;
         }
       }
@@ -281,8 +275,7 @@ function refreshProgram(prog: any){
     // freeze took from the stored grid (touched with no snapshot, or past and
     // untouched) still get the replay.
     try{
-      const _sw=getSwaps(prog.id)||{}, _swLive={};
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
+      const _sw=getSwaps(prog.id)||{}, _swLive: Record<string, any>={};
       Object.keys(_sw).forEach(k=>{ if(!_histRestored.has(k)) _swLive[k]=_sw[k]; });
       if(Object.keys(_swLive).length) applySessionSwaps(rebuilt,_swLive);
     }catch(e){}
@@ -309,7 +302,6 @@ function refreshProgram(prog: any){
 // no day). It is checked before the lookup, so the archived and unknown refusals cannot fire
 // on it. beforeRefresh, when given, runs once the globals name the new id and before
 // refreshProgram (boot passes its ex-weight alias fold there, the order boot always had).
-// @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
 function loadActiveProgram(id: any,beforeRefresh?: any){if(id===null){localStorage.removeItem('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
 // V221 D178: Set Active is the one switch; a switch is complete when This Week shows the new block.
 function setActive(id: any){if(!loadActiveProgram(id))return;renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
@@ -318,7 +310,6 @@ function startRename(id: any){_setEditProgId(id);renderProgList();const inp=docu
 function cancelRename(){_setEditProgId(null);renderProgList();}
 function commitRename(id: any){
   const inp=document.getElementById('renameInput_'+id);
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const programs=getPrograms();const p=programs.find(x=>x.id===id);
   if(inp&&p){
     // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
@@ -350,7 +341,6 @@ function _handoffActiveFrom(id: any,programs: any){
   }
 }
 function archiveProg(id: any){
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const programs=getPrograms();const p=programs.find(x=>x.id===id);if(!p)return;
   p.archived=true;p.archivedAt=Date.now();savePrograms(programs);
   _handoffActiveFrom(id,programs);
@@ -359,7 +349,6 @@ function archiveProg(id: any){
   renderProgList();showToast('Program archived');
 }
 function unarchiveProg(id: any){
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const programs=getPrograms();const p=programs.find(x=>x.id===id);if(!p)return;
   delete p.archived;delete p.archivedAt;savePrograms(programs);
   renderProgList();showToast('Program restored');
@@ -373,7 +362,6 @@ function deleteProg(id: any,fromProgress?: any){
   let programs=getPrograms();
   // V221 D178: save before the handoff (archiveProg's order). The loader persists the next
   // program's backfill; saving the stale array after it would overwrite that write.
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   programs=programs.filter(p=>p.id!==id);savePrograms(programs);
   _handoffActiveFrom(id,programs);
   purgeProgData(id);

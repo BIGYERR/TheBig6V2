@@ -63,7 +63,7 @@ function overlayWeekRange(prog: any, ov: any, totalWeeks: any){
 function paceShiftMap(prog: any){
   const tw=prog&&prog.totalWeeks||0;
   if(!tw||!prog.startDate||!Array.isArray(prog.overlays)||!prog.overlays.length) return null;
-  const SUP={easy:1,reduce:1,noimpact:1,noimpact_swim:1};
+  const SUP: Record<string, any>={easy:1,reduce:1,noimpact:1,noimpact_swim:1};
   const today=new Date(); today.setHours(0,0,0,0);
   const mon=getWeekMonday(prog.startDate);
   const end=new Date(mon.getTime()+tw*7*86400000-86400000);
@@ -75,7 +75,6 @@ function paceShiftMap(prog: any){
     if(inj.halfstep) return;
     // @ts-expect-error TS2345 Argument of type '{ injury: { region: any; tier: any; }; }' is not assignable to parameter of type 'Cfg
     const P=injuryPlan({injury:{region:inj.region,tier:inj.tier}});
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
     if(!P||!P.cardioMode||!SUP[P.cardioMode]) return;
     const f=_parseLocalDate(ov.from); if(!f) return;
     // Open-ended live injury: every day hurt so far counts. The map grows as the
@@ -119,7 +118,7 @@ function applyOverlays(prog: any, rebuilt: any){
   const ovs = Array.isArray(prog && prog.overlays) ? prog.overlays : [];
   if(!ovs.length) return rebuilt;
   const totalWeeks = rebuilt.totalWeeks || prog.totalWeeks || 0;
-  const _variantCache = {};
+  const _variantCache: Record<string, any> = {};
   // @ts-expect-error TS7006 Parameter 'ov' implicitly has an 'any' type.
   ovs.slice().sort((a: any,b: any)=>((a&&a.created)||0)-((b&&b.created)||0)).forEach(ov=>{
     try{
@@ -133,9 +132,7 @@ function applyOverlays(prog: any, rebuilt: any){
       // gym with adjustable dumbbells and trains normally. Set here rather than in the
       // patch so it applies to overlays saved before this existed. TRAVEL-ONLY semantic:
       // injury variants build clean so home equipment keeps meaning what the wizard said.
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
       if(!_variantCache[ck]) _variantCache[ck] = buildProgram(ov.type==='substitute' ? {...prog.cfg, ...ov.patch, _travel:true} : {...prog.cfg, ...ov.patch});
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
       const variant = _variantCache[ck];
       if(!variant || !variant.weeks) return;
       // V175 (D27): THE UNIT IS THE DAY. Dates are the source of truth (§6b) and the
@@ -231,7 +228,7 @@ function overlayBackCopy(prog: any, ov: any){
   return _fmtDateWd(next)+' picks your program back up.';
 }
 
-const OVERLAY_TYPE_LABEL={substitute:'TRAVEL',injury:'INJURY',reduce:'LESS TIME',suspend:'SUSPENDED'};
+const OVERLAY_TYPE_LABEL: Record<string, string>={substitute:'TRAVEL',injury:'INJURY',reduce:'LESS TIME',suspend:'SUSPENDED'};
 // Renders the active-overlay chip on the week screen (only overlays whose range is still live).
 function renderOverlayChip(){
   const wrap=document.getElementById('changeActiveWrap'); if(!wrap) return;
@@ -263,10 +260,9 @@ function renderOverlayChip(){
     const div=document.createElement('div');
     div.className='change-chip';
     const _backBtn=(_isInj&&!_isBridge)?'<div class="change-chip-act" role="button" data-ovid="'+ov.id+'">I\u2019M BACK</div>':'';
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ su
     div.innerHTML='<div class="change-chip-body"><div class="change-chip-ttl">'+(_isBridge?'RETURN WEEK':(OVERLAY_TYPE_LABEL[ov.type]||'CHANGE'))+' \u00b7 '+overlaySpanLabel(activeProg,ov)+'</div><div class="change-chip-sub">'+patchLbl+(_isBridge?'':'.')+_tail+'</div>'+_backBtn+'</div><div class="change-chip-x" role="button" aria-label="Remove change" data-ovid="'+ov.id+'">\u2715</div>';
-    // @ts-expect-error TS2531 Object is possibly 'null'.
-    div.querySelector('.change-chip-x').onclick=()=>removeOverlay(ov.id);
+    // @ts-expect-error TS2339 Property 'onclick' does not exist on type 'Element'.
+    div.querySelector('.change-chip-x')!.onclick=()=>removeOverlay(ov.id);
     // @ts-expect-error TS2339 Property 'onclick' does not exist on type 'Element'.
     const _bb=div.querySelector('.change-chip-act'); if(_bb)_bb.onclick=()=>imBackFromInjury(ov.id);
     wrap.appendChild(div);
@@ -297,7 +293,6 @@ function removeOverlay(id: any){
   if(!activeProg||!Array.isArray(activeProg.overlays)) return;
   // @ts-expect-error TS7006 Parameter 'o' implicitly has an 'any' type.
   activeProg.overlays=activeProg.overlays.filter(o=>o&&o.id!==id);
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
   _setActiveProg(refreshProgram(activeProg));
@@ -306,7 +301,7 @@ function removeOverlay(id: any){
 }
 
 // ── SOMETHING-CHANGED SHEET (overlay authoring — MVP: Substitute / equipment) ──
-const _ovDraft={type:'substitute',from:null,to:null,equipment:'minimal',tab:'travel',injRegion:null,injTier:'workaround'};
+const _ovDraft: { type: any; from: any; to: any; equipment: any; tab: any; injRegion: any; injTier: any; [k: string]: any }={type:'substitute',from:null,to:null,equipment:'minimal',tab:'travel',injRegion:null,injTier:'workaround'};
 // Travel tiers, in the order you'd actually encounter them. Deliberately THREE — these
 // cover essentially every work-travel setup, and more options is just more deciding.
 // Descriptions are the real UI: you should be able to self-identify in about a second.
@@ -322,14 +317,11 @@ function openOverlaySheet(){
   if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}
   _ovDraft.type='substitute';
   _ovDraft.tab='travel';
-  // @ts-expect-error TS2322 Type 'string' is not assignable to type 'null'.
   _ovDraft.from=_ovDraft.from||_isoToday();
-  // @ts-expect-error TS2322 Type 'string' is not assignable to type 'null'.
   _ovDraft.to=_ovDraft.to||_addDaysIso(_ovDraft.from,13);
   _ovDraft.equipment='home_basic';   // hotel gym is the most common work-travel reality
   renderOverlaySheet();
-  // @ts-expect-error TS18047 'o' is possibly 'null'.
-  const o=document.getElementById('changeOverlay');o.classList.add('open');o.scrollTop=0;
+  const o=document.getElementById('changeOverlay');o!.classList.add('open');o!.scrollTop=0;
 }
 // Injury has its own entry point (the HURT? button beside WEEK N) rather than a tab
 // inside the travel sheet. An injury is the one change that needs to be one tap away,
@@ -342,11 +334,9 @@ function openInjurySheet(){
   else { _ovDraft.injRegion=null; _ovDraft.injTier='workaround'; }
   _ovDraft.type='injury';
   _ovDraft.tab='injury';
-  // @ts-expect-error TS2322 Type 'string' is not assignable to type 'null'.
   _ovDraft.from=_isoToday();
   renderOverlaySheet();
-  // @ts-expect-error TS18047 'o' is possibly 'null'.
-  const o=document.getElementById('changeOverlay');o.classList.add('open');o.scrollTop=0;
+  const o=document.getElementById('changeOverlay');o!.classList.add('open');o!.scrollTop=0;
 }
 // The live, non-bridge injury overlay for the active program, or null.
 function _liveInjuryOverlay(){
@@ -361,10 +351,8 @@ function _liveInjuryOverlay(){
     return !!overlayWeekRange(activeProg,ov,tw);
   })||null;
 }
-// @ts-expect-error TS2531 Object is possibly 'null'.
-function closeOverlaySheet(){document.getElementById('changeOverlay').classList.remove('open');}
-// @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ty
-function _ovSet(k: any,v: any){_ovDraft[k]=v; if(k==='from'&&_ovDraft.to&&_parseLocalDate(_ovDraft.to)<_parseLocalDate(v)) _ovDraft.to=_addDaysIso(v,13); renderOverlaySheet();}
+function closeOverlaySheet(){document.getElementById('changeOverlay')!.classList.remove('open');}
+function _ovSet(k: any,v: any){_ovDraft[k]=v; if(k==='from'&&_ovDraft.to&&_parseLocalDate(_ovDraft.to)!<_parseLocalDate(v)!) _ovDraft.to=_addDaysIso(v,13); renderOverlaySheet();}
 function renderOverlaySheet(){
   const body=document.getElementById('changeBody'); if(!body) return;
   const inj=(_ovDraft.tab||'travel')==='injury';
@@ -380,7 +368,7 @@ function renderOverlaySheet(){
 }
 // Per-region, per-tier effect copy for the injury tab — coach voice, sets the
 // expectation BEFORE commit so a throttled week reads as protection, not a bug.
-const _INJ_EFFECT={
+const _INJ_EFFECT: Record<string, any>={
   knee:{workaround:'Squats and lunges stay but move to easier variants held at RPE 7. Jumps are out. Running goes easy only, no speed work.',
         protect:'Leg day becomes a posterior chain day. Hip thrusts, glute work, hamstrings. No squatting, no lunging, no jumping. Runs become easy rides or swims so your engine keeps building.'},
   ankle:{workaround:'Calf work is out and single leg work moves to variants that keep the foot planted. Runs get shorter and stay easy.',
@@ -492,7 +480,6 @@ function applyInjuryDraft(){
   const ov={id:'ov_'+Date.now(),type:'injury',from,to:null,patch:{injury:{region:R,tier:T}},note:'',created:Date.now()};
   if(!Array.isArray(activeProg.overlays)) activeProg.overlays=[];
   activeProg.overlays.push(ov);
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
   _setActiveProg(refreshProgram(activeProg));
@@ -530,7 +517,6 @@ function imBackFromInjury(id: any){
     activeProg.overlays.push({id:'ov_'+(Date.now()+1),type:'injury',from:_addDaysIso(today,7),to:_addDaysIso(today,13),
       patch:{injury:{region,tier:'workaround',halfstep:true}},note:'',created:Date.now()+1});
   }
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
   _setActiveProg(refreshProgram(activeProg));
@@ -599,7 +585,6 @@ function injSnooze(id: any){
   showToast('Staying on the plan. It will ask again in two weeks.');
 }
 function _saveOverlays(){
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
 }
@@ -610,14 +595,12 @@ function applyOverlayDraft(){
   if(_ovDraft.equipment==='commercial'){ closeOverlaySheet(); return; }
   const from=_ovDraft.from, to=_ovDraft.to;
   if(!from||!to){showToast('Pick both dates');return;}
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  if(_parseLocalDate(to)<_parseLocalDate(from)){showToast('“Through” can’t be before “From”');return;}
+  if(_parseLocalDate(to)!<_parseLocalDate(from)!){showToast('“Through” can’t be before “From”');return;}
   const tw=activeProg.totalWeeks||0;
   if(!overlayWeekRange(activeProg,{type:'substitute',from,to,patch:{equipment:_ovDraft.equipment}},tw)){showToast('That range is outside your program');return;}
   const ov={id:'ov_'+Date.now(),type:'substitute',from,to,patch:{equipment:_ovDraft.equipment},note:'',created:Date.now()};
   if(!Array.isArray(activeProg.overlays)) activeProg.overlays=[];
   activeProg.overlays.push(ov);
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].overlays=activeProg.overlays; savePrograms(progs); }
   _setActiveProg(refreshProgram(activeProg));

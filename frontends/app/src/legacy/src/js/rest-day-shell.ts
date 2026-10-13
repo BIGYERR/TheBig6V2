@@ -10,25 +10,22 @@ import { renderProgList } from './programs.ts';
 import { showProgressScreen } from './progress-data.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── REST-DAY SHEET ───────────────────────────────────────────────────────────
-const _restDraft={w:null,day:null,view:'menu',pick:null,type:null,mins:30,dist:'',rpe:5};
-function openRestSheet(w: any,dayKey: any,view: any){
+const _restDraft: Record<string, any>={w:null,day:null,view:'menu',pick:null,type:null,mins:30,dist:'',rpe:5};
+function openRestSheet(w: any,dayKey: any,view?: any){
   if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}
   if(!restDayEligible(w,dayKey)){showToast('That rest day has not come around yet');return;}
   _restDraft.w=w; _restDraft.day=dayKey; _restDraft.view=view||'menu'; _restDraft.pick=null;
   const types=(activeProg.cfg&&activeProg.cfg.cardioTypes)||[];
   _restDraft.type=types[0]||'run'; _restDraft.mins=30; _restDraft.dist=''; _restDraft.rpe=5;
   renderRestSheet();
-  // @ts-expect-error TS18047 'o' is possibly 'null'.
-  const o=document.getElementById('restOverlay'); o.classList.add('open'); o.scrollTop=0;
+  const o=document.getElementById('restOverlay'); o!.classList.add('open'); o!.scrollTop=0;
 }
-// @ts-expect-error TS2531 Object is possibly 'null'.
-function closeRestSheet(){document.getElementById('restOverlay').classList.remove('open');}
-// @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ w:
+function closeRestSheet(){document.getElementById('restOverlay')!.classList.remove('open');}
 function _rdSet(k: any,v: any){_restDraft[k]=v;renderRestSheet();}
 function renderRestSheet(){
   const body=document.getElementById('restBody'); if(!body) return;
   const w=_restDraft.w, dk=_restDraft.day;
-  // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ su
   const dayName=DAY_FULL[dk]||dk;
   if(_restDraft.view==='move')      body.innerHTML=_renderRestMove(w,dk,dayName);
   else if(_restDraft.view==='cardio') body.innerHTML=_renderRestCardio(w,dk,dayName);
@@ -68,7 +65,7 @@ function _renderRestMove(w: any,dk: any,dayName: any){
 function _renderRestCardio(w: any,dk: any,dayName: any){
   const types=((activeProg.cfg&&activeProg.cfg.cardioTypes)||[]).slice();
   if(!types.includes('walk')) types.push('walk');   // walk is what most rest-day movement is
-  const LBL={run:'Run',bike:'Bike',swim:'Swim',row:'Row',walk:'Walk'};
+  const LBL: Record<string, string>={run:'Run',bike:'Bike',swim:'Swim',row:'Row',walk:'Walk'};
   // @ts-expect-error TS7006 Parameter 't' implicitly has an 'any' type.
   const chips=types.map(t=>'<div class="rd-chip'+(_restDraft.type===t?' sel':'')+'" onclick="_rdSet(\'type\',\''+t+'\')">'+(LBL[t]||t)+'</div>').join('');
   // RPE, not a separate easy/hard vocabulary — the whole app prescribes in RPE, so the
@@ -99,10 +96,10 @@ function applyRestMove(){
   moves[completedKey(w,day)]={from:pick,ts:Date.now()};
   saveRestMoves(moves);
   applyRestDayMoves(activeProg,moves);
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const progs=getPrograms(); const i=progs.findIndex(p=>p.id===activeProg.id);
   if(i>=0){ progs[i].weeks=activeProg.weeks; savePrograms(progs); }
   closeRestSheet(); renderWeekView();
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ su
   showToast('Moved. '+(DAY_FULL[pick]||pick)+' is your rest now \u2713');
 }
 function applyRestCardio(){
@@ -118,19 +115,14 @@ function applyRestCardio(){
   // only when the box took one (parseFloat > 0), never on walk. "Log more" never overwrites: the
   // same type adds mins and dist and keeps the higher RPE; another type gets its own key. week
   // and ts are stamped the way writeSetDraft stamps them.
-  // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.
-  const rl=Object.assign({},e.restLog||{}), was=rl[type]||{}, o={};
+  const rl=Object.assign({},e.restLog||{}), was=rl[type]||{}, o: Record<string, any>={};
   // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const fin=v=>(v!=null&&v!==''&&isFinite(+v))?+v:null;
   const d=parseFloat(dist), dd=(type!=='walk'&&d>0)?d:0, wd=(+was.dist>0)?+was.dist:0;
-  // @ts-expect-error TS2339 Property 'mins' does not exist on type '{}'.
   o.mins=((+was.mins>0)?+was.mins:0)+m;
-  // @ts-expect-error TS2339 Property 'dist' does not exist on type '{}'.
   if(type!=='walk'&&wd+dd>0) o.dist=wd+dd;
   const r0=fin(was.rpe), r1=fin(rpe);
-  // @ts-expect-error TS2339 Property 'rpe' does not exist on type '{}'.
   if(r0!=null||r1!=null) o.rpe=Math.max(r0==null?-Infinity:r0, r1==null?-Infinity:r1);
-  // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.
   rl[type]=o; e.restLog=rl; e.week=w; e.ts=Date.now();
   logs[k]=e; saveLogs(logs);
   closeRestSheet(); renderWeekView();
@@ -174,16 +166,14 @@ function applyRestDayMoves(prog: any,moves: any){
 // legs silently undoes that. We warn rather than block — same posture as everywhere else.
 function _dayRegion(day: any){
   if(!day||day.rest||!Array.isArray(day.sections)) return null;
-  const tally={};
+  const tally: Record<string, any>={};
   // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
   day.sections.forEach(s=>(s.items||[]).forEach(it=>{
     const p=it&&it.name?_pattern(it.name):null; if(!p) return;
     const r=_PATTERN_REGION[p]; if(!r) return;
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
     tally[r]=(tally[r]||0)+1;
   }));
   let best=null,n=0;
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
   Object.keys(tally).forEach(r=>{ if(tally[r]>n){n=tally[r];best=r;} });
   return n>=2?best:null;   // one stray item is not a region day
 }
@@ -237,7 +227,6 @@ function restMoveCandidates(w: any){
     // V238 (D225): a live swap (swapTo) or parked numbers (parked) are a log too, so a swapped-away day is never
     // offered as a move origin. A chip tapped back to the planned sport leaves swapTo '' and no parked key
     // (setCardioSwap deletes an empty park), so that day is judged on its session fields alone again.
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
     if(lg&&(lg.rpe||lg.notes||lg.swapTo||lg.parked||Object.keys(CARDIO_PARK_FIELDS).some(function(s){ return CARDIO_PARK_FIELDS[s].some(function(f: any){ return !!lg[f]; }); }))) return;
     // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
     out.push({day:d,label:DAY_FULL[d]||d,title:day.title||'Training'});
@@ -269,17 +258,14 @@ let currentRandIdx=-1;
 function _setCurrentRandIdx(v: any){ currentRandIdx=v; }
 
 let _curScreen='screenHome';
-// @ts-expect-error TS2531 Object is possibly 'null'.
-function showScreen(id: any){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);updateTabBar(id);_curScreen=id;updateRestFloat();}
-const TAB_MAP={screenHome:'tabHome',screenWeek:'tabWeek',screenProgress:'tabProgress',screenBugs:'tabBugs'};
+function showScreen(id: any){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id)!.classList.add('active');window.scrollTo(0,0);updateTabBar(id);_curScreen=id;updateRestFloat();}
+const TAB_MAP: Record<string, string>={screenHome:'tabHome',screenWeek:'tabWeek',screenProgress:'tabProgress',screenBugs:'tabBugs'};
 function updateTabBar(id: any){
   const isDest=Object.prototype.hasOwnProperty.call(TAB_MAP,id);
   const bar=document.getElementById('tabBar');if(bar)bar.classList.toggle('show',isDest);
   document.querySelectorAll('.screen.with-tabbar').forEach(s=>s.classList.remove('with-tabbar'));
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  if(isDest)document.getElementById(id).classList.add('with-tabbar');
+  if(isDest)document.getElementById(id)!.classList.add('with-tabbar');
   Object.values(TAB_MAP).forEach(tid=>{const t=document.getElementById(tid);if(t)t.classList.remove('active');});
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ sc
   if(isDest){const t=document.getElementById(TAB_MAP[id]);if(t)t.classList.add('active');}
 }
 function tabGo(target: any){
@@ -289,8 +275,7 @@ function tabGo(target: any){
   if(target==='screenWeek'){showScreen('screenWeek');renderWeekView();return;}
   if(target==='screenProgress'){showProgressScreen();return;}
 }
-// @ts-expect-error TS18047 't' is possibly 'null'.
-function showToast(msg: any){const t=document.getElementById('toast');t.innerHTML=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function showToast(msg: any){const t=document.getElementById('toast');t!.innerHTML=msg;t!.classList.add('show');setTimeout(()=>t!.classList.remove('show'),2200);}
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {

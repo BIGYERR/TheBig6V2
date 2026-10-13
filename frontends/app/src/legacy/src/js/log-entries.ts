@@ -144,16 +144,13 @@ function dedupeExDayEntries(store: any) {
   Object.values(store).forEach(ex => {
     // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     if(!ex.entries || ex.entries.length < 2) return;
-    const byKey = {};
+    const byKey: Record<string, any> = {};
     // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     ex.entries.forEach(e => {
       const k = String(e.week) + '|' + entryDay(e);
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
       const prev = byKey[k];
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
       if(!prev || (e.ts||0) >= (prev.ts||0)) byKey[k] = e;
     });
-    // @ts-expect-error TS18046 'a' is of type 'unknown'.
     const merged = Object.values(byKey).sort((a,b) => (a.week-b.week) || ((a.ts||0)-(b.ts||0)));
     // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     if(merged.length !== ex.entries.length) { ex.entries = merged; changed = true; }
@@ -188,20 +185,18 @@ function updateRPEDisplay(val: any) {
   const r = document.getElementById('log_rpe');
   if(r) r.dataset.touched = '1';
 }
-const CARDIO_WORD={run:'Run',bike:'Bike',swim:'Swim'};
+const CARDIO_WORD: Record<string, string>={run:'Run',bike:'Bike',swim:'Swim'};
 // V234 (D213): the field set each sport owns at the top level of a log entry. Only the active
 // chip's set sits at top level, so only it is credited. A sport change through the picker moves
 // the leaving set whole into entry.parked[sport] and brings the arriving sport's parked set back.
 // `parked` is read by the form render (setCardioSwap, buildLogHTML's note) and carried by
 // persistLogFields; no other reader names it, so every other reader is blind to it.
-const CARDIO_PARK_FIELDS={run:['run_dist','run_pace','run_mins','run_reps','run_rep_time'],bike:['bike_mins'],swim:['swim_yards']};
+const CARDIO_PARK_FIELDS: Record<string, any>={run:['run_dist','run_pace','run_mins','run_reps','run_rep_time'],bike:['bike_mins'],swim:['swim_yards']};
 // V234 (D214): the swap note, one source for both sites. The second sentence prints only when
 // the planned sport has a parked set holding a number.
 function cardioSwapNoteText(active: any, planned: any, e: any){
   const p=e&&e.parked&&e.parked[planned];
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   const kept=!!p&&(CARDIO_PARK_FIELDS[planned]||[]).some(function(f: any){ return p[f]!=null&&p[f]!==''; });
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   return `Counts toward ${CARDIO_WORD[active]}, not ${CARDIO_WORD[planned]}.`+(kept?` Your ${CARDIO_WORD[planned]} numbers are kept. Switch back and they return.`:'');
 }
 
@@ -271,10 +266,8 @@ function doseDerived(dose: any, v: any){
     return {sec:sec, pace:_fmtPaceMi(sec)+'/mi', tgt:dose.tgt, dist:(dist>0?null:useD), assumed:dist>0?null:('assuming planned '+dose.mi+' mi')};
   }
   if(dose.k==='reps_dist'){
-    const out={};
-    // @ts-expect-error TS2339 Property 'dist' does not exist on type '{}'.
+    const out: Record<string, any>={};
     if(reps!=null&&reps>0){ out.dist=+((reps*dose.m)/1609.34).toFixed(2); out.vol=reps+' × '+dose.m+'m'; }
-    // @ts-expect-error TS2339 Property 'sec' does not exist on type '{}'.
     if(repS){ const sec=repS/(dose.m/1609.34); out.sec=sec; out.pace=_fmtPaceMi(sec)+'/mi'; out.tgt=dose.tgt; }
     return out;
   }
@@ -293,7 +286,6 @@ function _doseStripHTML(sport: any, dose: any, sub: any){
   else if(dose.k==='reps_dist') v=dose.reps+' × '+dose.m+'m';
   else if(dose.k==='reps_time') v=dose.reps+' × '+dose.mins+' min';
   if(dose.tgt&&sport==='run') v+=' @ '+_fmtPaceMi(dose.tgt)+'/mi';
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   return '<div class="plan-strip'+(sport==='bike'?' bike-strip':'')+'"><span class="ps-lbl">'+(CARDIO_WORD[sport]||sport)+(code&&code!=='RUN'?' — '+code:'')+' · Planned</span><span class="ps-val">'+esc(v)+'</span></div>';
 }
 // Live derived readout under the dose form. No-op when the generic form is showing.
@@ -305,7 +297,6 @@ function updateDoseDerived(){
   const d=doseDerived(_curLogDose,{mins:g('log_run_mins'),dist:g('log_run_dist'),reps:g('log_run_reps'),rep:g('log_run_rep_time')});
   if(!d){ el.innerHTML=''; return; }
   let rows='';
-  // @ts-expect-error TS2339 Property 'vol' does not exist on type '{ sec?: undefined; pace?: undefined; tgt?: undefined; assumed?: 
   if(d.vol) rows+='<div class="derived"><span class="d-lbl">Work volume — derived</span><span class="d-val">'+(d.dist!=null?d.dist+' mi':'')+'<small>'+d.vol+'</small></span></div>';
   if(d.pace){
     let delta='';
@@ -314,7 +305,6 @@ function updateDoseDerived(){
     // Under a minute stays in seconds — that is the runner-native unit at that scale.
     if(d.tgt&&d.sec){ const df=Math.round(d.sec-d.tgt), ad=Math.abs(df); const mag=ad<60?(ad+'s/mi'):(Math.floor(ad/60)+':'+String(ad%60).padStart(2,'0')+'/mi'); delta=ad<5?'on target':(mag+' '+(df<0?'faster than target':'slower than target')); }
     const note=[d.assumed,delta,(d.workMin?('over '+d.workMin+' work min'):null)].filter(Boolean).join(' · ');
-    // @ts-expect-error TS2339 Property 'vol' does not exist on type '{ sec: number; pace: string; tgt: any; assumed: string | null; d
     rows+='<div class="derived"'+(d.vol?' style="border-top:none;padding-top:0"':'')+'><span class="d-lbl">Pace — derived</span><span class="d-val">'+d.pace+(note?'<small>'+note+'</small>':'')+'</span></div>';
   }
   if(!rows) rows='<div class="derived"><span class="d-lbl">'+(_curLogDose.k==='reps_dist'?'Rep pace — derived':'Pace — derived')+'</span><span class="d-val empty">'+(_curLogDose.k==='dist'?'enter minutes':(_curLogDose.k==='reps_dist'?'enter a rep time':'enter distance'))+'</span></div>';

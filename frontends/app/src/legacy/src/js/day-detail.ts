@@ -61,7 +61,6 @@ function saveTestMax(lift: any){
   const v=e1rmCalcUpdate();
   if(!(v>0)) return;
   const programs=getPrograms();
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const p=programs.filter(x=>x&&x.id===activeProgId)[0];
   if(p&&p.cfg){
     p.cfg[lift]=v;
@@ -164,8 +163,7 @@ function openDetail(dayKey: any,day: any){
   if(!curStatus && _hasLog){
     html+='<div class="log-nudge"><span>'+asyIcon('notebook',14)+' You logged this one but never marked it.</span><button class="log-nudge-btn" onclick="handleDayStatus(\''+dayKey+'\',\''+escTitle+'\',\'complete\')">Mark Done \u2713</button></div>';
   }
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('detailBody').innerHTML=html;
+  document.getElementById('detailBody')!.innerHTML=html;
 
   renderStatusFoot(dayKey, day.title||'');   // V181 (D1/D2)
 
@@ -196,11 +194,10 @@ function selectKBSize(exKey: any, size: any, unit: any, exName: any, setsReps: a
   if(wkData && currentDayKey && wkData[currentDayKey]) openDetail(currentDayKey, wkData[currentDayKey]);
 }
 // Kettlebell size data stored globally for lookup by exKey
-const _kbPending = {};
+const _kbPending: Record<string, any> = {};
 function buildKBChips(exKey: any, lastW: any, weekLabel: any, unit: any, exName: any, setsReps: any) {
   const kbSizes = unit==='kg' ? [8,12,16,20,24,28,32,36,40] : [15,20,25,35,44,53,62,70,80];
   const kbUnit  = unit==='kg' ? 'kg' : 'lb';
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   _kbPending[exKey] = {exName, setsReps, kbUnit};
   const lastTxt = lastW ? ' · Last: '+lastW+' '+kbUnit+weekLabel : '';
   let html = `<div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Bell size${lastTxt}</div>`;
@@ -216,7 +213,6 @@ function buildKBChips(exKey: any, lastW: any, weekLabel: any, unit: any, exName:
   return html;
 }
 function selectKBByKey(exKey: any, size: any) {
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   const p = _kbPending[exKey];
   if(!p) return;
   selectKBSize(exKey, size, p.kbUnit, p.exName, p.setsReps);

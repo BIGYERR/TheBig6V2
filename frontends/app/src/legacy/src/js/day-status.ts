@@ -22,8 +22,7 @@ let _nudgeCtx: any=null;
 function showSwapNudge(from: any,to: any){
   _nudgeCtx={from:from,to:to};
   const o=document.getElementById('swapNudgeOverlay');if(!o)return;
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('swapNudgeBody').innerHTML=
+  document.getElementById('swapNudgeBody')!.innerHTML=
     'That is three sessions running you have traded '+from.toLowerCase()+' for '+to.toLowerCase()+'.'
     +'<br><br>Want me to make '+to.toLowerCase()+' your '+((_pattern(from)||'main')+'').replace(/_/g,' ')
     +' from here on? I will rebuild the rest of the block around it.';
@@ -38,7 +37,6 @@ function acceptSwapNudge(){
   if(!_nudgeCtx||!activeProgId){dismissSwapNudge();return;}
   const from=_nudgeCtx.from,to=_nudgeCtx.to;
   const programs=getPrograms();
-  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const p=programs.filter(x=>x&&x.id===activeProgId)[0];
   if(p&&p.cfg){
     p.cfg.exSwapPrefs={...(p.cfg.exSwapPrefs||{})};
@@ -55,8 +53,7 @@ function acceptSwapNudge(){
   if(day) openDetail(currentDayKey,day); else renderWeekView();
   showToast('Done. '+to+' is your '+((_pattern(from)||'main')+'').replace(/_/g,' ')+' from here.');
 }
-// @ts-expect-error TS2531 Object is possibly 'null'.
-function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');renderWeekView();}
+function closeDetail(){document.getElementById('detailOverlay')!.classList.remove('open');renderWeekView();}
 // Single, app-wide RPE reference — opened from the ⓘ button in the day header, so the
 // effort scale lives in one place instead of being reprinted inside every workout.
 function showRpeInfo(){const o=document.getElementById('rpeInfoOverlay');if(o)o.classList.add('show');}
@@ -102,7 +99,7 @@ function handleDayStatus(dayKey: any,title: any,status: any){
   c[k]={title:title||null,ts:Date.now(),status};
   saveCompleted(c);renderWeekView();
   renderStatusFoot(dayKey,title);
-  const labels={complete:'Done ✓',skipped:'Skipped ✕ The week moves on'};
+  const labels: Record<string, string>={complete:'Done ✓',skipped:'Skipped ✕ The week moves on'};
   // V221 (D179): setting a status closes the session. The rest clock stops and zeroes (‹ Back
   // and tab moves are navigation and keep it running, see ruResetIfIdle); the overlay closes
   // through ‹ Back's own exit, so the day lands on This Week; the pop-up sits over the week.
@@ -111,8 +108,7 @@ function handleDayStatus(dayKey: any,title: any,status: any){
   ruReset();
   closeDetail();
   if(status==='complete') fireCompletionPopup(currentWeek,dayKey);
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  if(!document.getElementById('popOverlay').classList.contains('show')) showToast(labels[status]||'Updated ✓');
+  if(!document.getElementById('popOverlay')!.classList.contains('show')) showToast(labels[status]||'Updated ✓');
 }
 // The footer is rebuilt wholesale on every status change: the primary button always
 // carries the CURRENT state (and toggles it off), the small button beneath is always
@@ -148,7 +144,6 @@ function renderStatusFoot(dayKey: any,title: any){
 // (the chip re-renders #cardioFields only; the button sits outside it and setCardioSwap's last
 // write lands here). No wrap (a lift day) is never live, and has no cardio node to read either way.
 function cardioEntryLive(e: any, sport: any){
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   return !!e&&(CARDIO_PARK_FIELDS[sport]||[]).some(function(f: any){ return !!e[f]; });
 }
 function cardioLogLabel(live: any){ return live?'Logged ✓':'Log'; }
@@ -235,7 +230,7 @@ function persistLogFields(dayKey: any, commit?: any){
 // the active sport blank on the form) writes nothing and says so. Otherwise the form is committed
 // through persistLogFields, whose tail recomputes the regime and relabels the button, and the
 // toast names the sport the chip credits.
-var CARDIO_LOGGED_TOAST={run:'Run logged ✓',bike:'Ride logged ✓',swim:'Swim logged ✓'};
+var CARDIO_LOGGED_TOAST: Record<string, string>={run:'Run logged ✓',bike:'Ride logged ✓',swim:'Swim logged ✓'};
 function logCardio(){
   const wrap=document.getElementById('cardioSwapWrap');
   if(!wrap) return;
@@ -243,10 +238,8 @@ function logCardio(){
   const sport=wrap.dataset.active||wrap.dataset.planned||'';
   // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const g=v=>document.getElementById(v)?.value||'';
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
   if((CARDIO_PARK_FIELDS[sport]||[]).every(function(f: any){ return g('log_'+f)===''; })){ showToast('Nothing to log yet.'); return; }
   persistLogFields(currentDayKey,true);
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
   showToast(CARDIO_LOGGED_TOAST[sport]);
 }
 // Reveal the sport picker under the prescribed cardio field.
@@ -274,13 +267,10 @@ function setCardioSwap(sport: any){
   const e=logs[key]||{};
   if(sport!==leaving){
     const P=Object.assign({},e.parked||{});
-    const out={};
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
+    const out: Record<string, any>={};
     (CARDIO_PARK_FIELDS[leaving]||[]).forEach(function(f: any){ out[f]=(e[f]==null?'':String(e[f])); e[f]=''; });
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
     if(Object.keys(out).some(function(f){ return out[f]!==''; })) P[leaving]=out; else delete P[leaving];
     const back=P[sport]||null;
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
     (CARDIO_PARK_FIELDS[sport]||[]).forEach(function(f: any){ e[f]=(back&&back[f]!=null)?back[f]:''; });
     delete P[sport];
     if(Object.keys(P).length) e.parked=P; else delete e.parked;

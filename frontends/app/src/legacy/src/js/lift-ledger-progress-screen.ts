@@ -203,7 +203,6 @@ function buildMainLiftBlock(m: any, unit: any){
     for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step){
       const cy=yof(v);
       s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
-      // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
       s+=_axTx(padL-5, cy+3, disp(v));
     }
     let d='';
@@ -214,7 +213,6 @@ function buildMainLiftBlock(m: any, unit: any){
       s+='<circle cx="'+(padL+i*xs).toFixed(1)+'" cy="'+yof(p.v).toFixed(1)+'" r="'+(top?4.5:3.2)+'" fill="var(--lift)" opacity="'+(top?1:0.72)+'"/>';
     });
     const lblStep=Math.max(1,Math.ceil(m.series.length/6));
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
     m.series.forEach((p: any,i: any)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-4, 'W'+p.w, 8, 'middle'); });
     chart='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+s+'</svg>';
   }
@@ -245,15 +243,13 @@ function _ladderTrack(r: any){
   if(fill>0) s+='<rect x="0" y="10" width="'+fill.toFixed(1)+'" height="4" fill="'+col+'" opacity="0.5" rx="2"/>';
   if(r.ready) s+='<rect x="0" y="10" width="'+track+'" height="4" fill="'+col+'" opacity="0.75" rx="2"/>';
   // sets that landed on the same rep count are nudged apart so three dots never read as one
-  const seen={};
+  const seen: Record<string, any>={};
   // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   r.sets.forEach(v=>{
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
     const x=xof(v); const n=(seen[v]=(seen[v]||0)+1);
     const off=(n-1)*5.5;
     s+='<circle cx="'+(x-off).toFixed(1)+'" cy="12" r="3.6" fill="'+col+'" opacity="0.92"/>';
   });
-  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   s+=_axTx(0, 25, r.lo, 8, 'start');
   s+=_axTx(track, 25, r.hi, 8, 'end', r.ready?'var(--signal)':'rgba(24,23,18,0.3)', r.ready?'700':'');
   return '<svg viewBox="-8 0 '+(track+16)+' '+H+'" style="width:'+track+'px;height:'+H+'px;overflow:visible">'+s+'</svg>';
@@ -345,9 +341,7 @@ function renderProgressScreen() {
   // V156: Progress is per-program (G1 ruling). progressViewId picks which program's
   // charts render; null means the active program. Every store read below goes through
   // the *For(_vid) accessors so a viewed program can NEVER leak the active one's data.
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   let _vprog = progressViewId ? _allProgs.find(p=>p.id===progressViewId) : null;
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   if(!_vprog){ _setProgressViewId(null); _vprog = (activeProg && _allProgs.find(p=>p.id===activeProgId)) || _allProgs.find(p=>!p.archived) || _allProgs[0]; }
   if(!_vprog) return;
   const _vid = _vprog.id;
@@ -368,9 +362,8 @@ function renderProgressScreen() {
   const isStrength = liftingFocus === 'strength' || liftingFocus === 'hypertrophy';
 
   // Build weekly data arrays
-  const weeklyData = {};
+  const weeklyData: Record<string, any> = {};
   for(let w = 1; w <= totalWeeks; w++) {
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     weeklyData[w] = {run:0, bike:0, swim:0, bench:null, squat:null, dead:null, rpe:null, sessions:0};
   }
 
@@ -379,7 +372,6 @@ function renderProgressScreen() {
     const match = key.match(/^w(\d+)_/);
     if(!match) return;
     const w = parseInt(match[1]);
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(!weeklyData[w]) return;
     // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     if(entry.run_dist && +entry.run_dist > 0) weeklyData[w].run += +entry.run_dist;
@@ -389,7 +381,7 @@ function renderProgressScreen() {
     if(entry.swim_yards && +entry.swim_yards > 0) weeklyData[w].swim += +entry.swim_yards;
     // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     if(entry.rpe && +entry.rpe > 0) {
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
+      // @ts-expect-error TS18046 'entry' is of type 'unknown'.
       weeklyData[w].rpe = weeklyData[w].rpe ? (+weeklyData[w].rpe + +entry.rpe)/2 : +entry.rpe;
     }
     // V238 (D224, Amendment 1 A4): the rest-day jog (restLog) is its own record on the day and the
@@ -398,21 +390,16 @@ function renderProgressScreen() {
     // more effort in the average, after the day's session RPE when that is set.
     // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     const _rl = (entry.restLog && typeof entry.restLog === 'object') ? entry.restLog : {};
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(_rl.run && +_rl.run.dist > 0) weeklyData[w].run += +_rl.run.dist;
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(_rl.bike && +_rl.bike.mins > 0) weeklyData[w].bike += +_rl.bike.mins;
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(_rl.swim && +_rl.swim.dist > 0) weeklyData[w].swim += +_rl.swim.dist;
     Object.keys(_rl).forEach(t => {
       const r = _rl[t] ? +_rl[t].rpe : 0;
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
       if(r > 0) weeklyData[w].rpe = weeklyData[w].rpe ? (+weeklyData[w].rpe + r)/2 : r;
     });
     // Count session if ANY meaningful data was logged
     // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     if(entry.rpe||entry.run_dist||entry.bike_mins||entry.swim_yards||entry.notes) {
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
       weeklyData[w].sessions++;
     }
   });
@@ -432,10 +419,8 @@ function renderProgressScreen() {
     // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     (ex.entries||[]).forEach(en => {
       const w = en.week;
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       if(!weeklyData[w]) return;
       const wt = +en.weight || 0;
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       if(wt > 0) weeklyData[w][lift] = Math.max(weeklyData[w][lift]||0, wt);
     });
   });
@@ -473,9 +458,7 @@ function renderProgressScreen() {
     // Weekly volume retained from V164. D7 selected NEW modules; it never ruled this
     // one out, and nothing else on the screen reports total mileage — the ladder is a
     // single-run metric and drift covers distance-prescribed runs only.
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     const runData = weeks.map(w => (_skip1 && w===1) ? null : (weeklyData[w].run || null));   // V174 D26
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 6.
     html += buildDotChart(asyIcon('🏃',15)+' Weekly Running Mileage', weeks, runData, 'var(--run)', 'miles', 'mi');
     html += buildLadderChart(ladderWeekly(logs, totalWeeks, _cut, _skip1), totalWeeks, _raceMi, _cut, _skip1);
     // V166 (ruled C): the prescribed-zone chart is the primary. It can only place runs
@@ -512,23 +495,18 @@ function renderProgressScreen() {
 
   // ── Swimming yardage chart ──
   if(cardioTypes.includes('swim') || loggedAny('swim')) {
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     const swimData = weeks.map(w => weeklyData[w].swim || null);
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 6.
     html += buildDotChart(asyIcon('🏊',15)+' Weekly Swimming Volume', weeks, swimData, '#3f6e96', 'yards', 'yd');
   }
 
   // ── Bike minutes chart ──
   if(cardioTypes.includes('bike') || loggedAny('bike')) {
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     const bikeData = weeks.map(w => weeklyData[w].bike || null);
-    // @ts-expect-error TS2554 Expected 7 arguments, but got 6.
     html += buildDotChart(asyIcon('🚴',15)+' Weekly Cycling Time', weeks, bikeData, '#f0a050', 'minutes', 'min');
   }
 
   // ── RPE trend ──
   if(hasAnyData) {
-    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     const rpeData = weeks.map(w => weeklyData[w].rpe || null);
     if(rpeData.some(v => v !== null)) {
       html += buildDotChart(asyIcon('💡',15)+' Average Session RPE', weeks, rpeData, '#7e5e96', 'RPE', '', 10);
@@ -566,18 +544,16 @@ function renderProgressScreen() {
     // Group entries by week so each week collapses independently. Past weeks stay
     // collapsed to keep the page short; only the most recent logged week is open by
     // default (tap any week to read its entries, tap again to fold it back).
-    const byWeek = {};
+    const byWeek: Record<string, any> = {};
     const weekOrder: any[] = [];
     journalEntries.forEach(je => {
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       if(!byWeek[je.w]) { byWeek[je.w] = []; weekOrder.push(je.w); }
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       byWeek[je.w].push(je);
     });
     const openWeek = weekOrder[weekOrder.length - 1];
 
     const journalHtml = weekOrder.map(w => {
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
+      // @ts-expect-error TS7031 Binding element 'dayKey' implicitly has an 'any' type.
       const entriesHtml = byWeek[w].map(({dayKey, entry}) => {
         const rpeColor = !entry.rpe ? 'var(--muted)' : +entry.rpe >= 9 ? 'var(--red)' : +entry.rpe >= 7 ? 'var(--lift)' : +entry.rpe >= 5 ? 'var(--accent)' : 'var(--run)';
         // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ su
@@ -599,7 +575,6 @@ function renderProgressScreen() {
           ${entry.notes ? `<div style="font-size:12px;color:var(--muted);line-height:1.5;font-style:italic">"${entry.notes}"</div>` : ''}
         </div>`;
       }).join('');
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       const n = byWeek[w].length;
       return `<details class="journal-week"${w===openWeek?' open':''}>
         <summary style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted)">
@@ -651,7 +626,7 @@ function parseLiftEntry(str: any) {
   return m2 ? parseFloat(m2[1]) : null;
 }
 
-function buildDotChart(title: any, weeks: any, data: any, color: any, label: any, unit: any, maxY: any) {
+function buildDotChart(title: any, weeks: any, data: any, color: any, label: any, unit: any, maxY?: any) {
   // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const validData = data.filter(v => v !== null);
   if(!validData.length) return '';

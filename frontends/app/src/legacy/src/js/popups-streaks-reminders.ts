@@ -9,7 +9,7 @@ import { dayBeforeStart, dayOffset, renderWeekView } from './week-view-sections.
 /* ===== REINFORCEMENT POPUPS ===== */
 /* Pools are locked copy. workout + reminder are WIRED this batch; streak + season
    are staged for the next batch (no trigger fires them yet). */
-const POP_POOLS={
+const POP_POOLS: Record<string, any>={
   workout:[
     "Congrats... you actually showed up. Just, you know, faster next time. 🎉",
     {t:"Hangover said stay down. You told it to go fuck itself. Respect. 🍺🪦", when:'weekend'},
@@ -65,7 +65,7 @@ const POP_POOLS={
     "You crossed the line most people piss themselves at and bail. Built different. 💪"
   ]
 };
-const POP_CFG={
+const POP_CFG: Record<string, any>={
   workout: {icon:'🎉',kicker:'WORKOUT COMPLETE',kClass:'',glow:'rgba(24,23,18,0.35)',confetti:72,shake:false},
   reminder:{icon:'notebook',kicker:'UNFINISHED BUSINESS',kClass:'',glow:'rgba(24,23,18,0.30)',confetti:0,shake:false},
   streak:  {icon:'🔥',kicker:'STREAK ALIVE',kClass:'streak',glow:'rgba(166,130,47,0.4)',confetti:100,shake:false},
@@ -85,10 +85,8 @@ const POP_DISMISS=[
 ];
 function popDismissText(){
   const key='ia_pop_dismiss_'+activeProgId; const today=_todayStamp();
-  let st={}; try{ st=JSON.parse(localStorage.getItem(key)||'{}'); }catch{}
-  // @ts-expect-error TS2339 Property 'date' does not exist on type '{}'.
+  let st: Record<string, any>={}; try{ st=JSON.parse(localStorage.getItem(key)||'{}'); }catch{}
   if(st.date===today && typeof st.idx==='number' && POP_DISMISS[st.idx]) return POP_DISMISS[st.idx];
-  // @ts-expect-error TS2339 Property 'idx' does not exist on type '{}'.
   let i; do{ i=Math.floor(Math.random()*POP_DISMISS.length); }while(POP_DISMISS.length>1 && i===st.idx);
   try{ localStorage.setItem(key,JSON.stringify({date:today,idx:i})); }catch{}
   return POP_DISMISS[i];
@@ -131,68 +129,51 @@ function popEligible(e: any,ctx: any){
   return true;
 }
 function popPick(tier: any,week: any,dayKey: any){
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ wo
   const pool=POP_POOLS[tier]; if(!pool||!pool.length) return '';
   const ctx=popContext(week,dayKey);
   const elig: any[]=[]; pool.forEach((e: any,idx: any)=>{ if(popEligible(e,ctx)) elig.push(idx); });
   if(!elig.length) return popText(pool[0]);
   if(elig.length===1) return popText(pool[elig[0]]);
-  const memKey='ia_pop_idx_'+activeProgId; let mem={};
+  const memKey='ia_pop_idx_'+activeProgId; let mem: Record<string, any>={};
   try{ mem=JSON.parse(localStorage.getItem(memKey)||'{}'); }catch{}
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   const last=(typeof mem[tier]==='number')?mem[tier]:-1;
   let choices=elig.filter(i=>i!==last); if(!choices.length) choices=elig;
   const i=choices[Math.floor(Math.random()*choices.length)];
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   mem[tier]=i; try{ localStorage.setItem(memKey,JSON.stringify(mem)); }catch{}
   return popText(pool[i]);
 }
 function popFire(tier: any,opts: any){
   opts=opts||{};
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ wo
   const cfg=POP_CFG[tier]||POP_CFG.workout;
   // V220 (D174): an ASY_ICON_PATHS name ('notebook', 'shield', 'warning') renders as SVG at the
   // .pop-icon size; anything else, i.e. the celebration emoji, is written as text exactly as
   // before. An emoji never goes through asyIcon: ASY_EMOJI maps the fire and trophy to SVG.
   const ic=opts.icon||cfg.icon; const icEl=document.getElementById('popIcon');
-  // @ts-expect-error TS18047 'icEl' is possibly 'null'.
-  if(Object.prototype.hasOwnProperty.call(ASY_ICON_PATHS,ic)) icEl.innerHTML=asyIcon(ic,52);
-  // @ts-expect-error TS18047 'icEl' is possibly 'null'.
-  else icEl.textContent=ic;
-  // @ts-expect-error TS18047 'k' is possibly 'null'.
-  const k=document.getElementById('popKicker'); k.textContent=opts.kicker||cfg.kicker; k.className='pop-kicker '+(cfg.kClass||'');
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('popMsg').textContent=opts.msg||popPick(tier,opts.week,opts.dayKey);   // V220 (D175) the trained day
-  // @ts-expect-error TS18047 'sub' is possibly 'null'.
-  const sub=document.getElementById('popSub'); sub.textContent=opts.sub||''; sub.style.display=opts.sub?'block':'none';
+  if(Object.prototype.hasOwnProperty.call(ASY_ICON_PATHS,ic)) icEl!.innerHTML=asyIcon(ic,52);
+  else icEl!.textContent=ic;
+  const k=document.getElementById('popKicker'); k!.textContent=opts.kicker||cfg.kicker; k!.className='pop-kicker '+(cfg.kClass||'');
+  document.getElementById('popMsg')!.textContent=opts.msg||popPick(tier,opts.week,opts.dayKey);   // V220 (D175) the trained day
+  const sub=document.getElementById('popSub'); sub!.textContent=opts.sub||''; sub!.style.display=opts.sub?'block':'none';
   const row=document.getElementById('popStatRow'); const stats=opts.stats||[];
-  // @ts-expect-error TS18047 'row' is possibly 'null'.
-  row.innerHTML=stats.map(s=>`<div class="pop-stat"><div class="pop-stat-num ${s.cls||''}">${s.n}</div><div class="pop-stat-lbl">${s.l}</div></div>`).join('');
-  // @ts-expect-error TS18047 'row' is possibly 'null'.
-  row.style.display=stats.length?'flex':'none';
+  // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
+  row!.innerHTML=stats.map(s=>`<div class="pop-stat"><div class="pop-stat-num ${s.cls||''}">${s.n}</div><div class="pop-stat-lbl">${s.l}</div></div>`).join('');
+  row!.style.display=stats.length?'flex':'none';
   const acts=document.getElementById('popActions');
   if(opts.actions&&opts.actions.length){
-    // @ts-expect-error TS18047 'acts' is possibly 'null'.
-    acts.className='pop-actions'+(opts.triple?' triple':'');
-    // @ts-expect-error TS18047 'acts' is possibly 'null'.
-    acts.innerHTML=opts.actions.map(a=>`<button class="pop-act ${a.cls||''}" onclick="${a.onclick}">${a.label}</button>`).join('');
+    acts!.className='pop-actions'+(opts.triple?' triple':'');
+    // @ts-expect-error TS7006 Parameter 'a' implicitly has an 'any' type.
+    acts!.innerHTML=opts.actions.map(a=>`<button class="pop-act ${a.cls||''}" onclick="${a.onclick}">${a.label}</button>`).join('');
   } else {
-    // @ts-expect-error TS18047 'acts' is possibly 'null'.
-    acts.className='pop-actions';
-    // @ts-expect-error TS18047 'acts' is possibly 'null'.
-    acts.innerHTML=`<button class="pop-act go" onclick="popClose()">${opts.dismiss||popDismissText()}</button>`;
+    acts!.className='pop-actions';
+    acts!.innerHTML=`<button class="pop-act go" onclick="popClose()">${opts.dismiss||popDismissText()}</button>`;
   }
   const modal=document.getElementById('popModal');
-  // @ts-expect-error TS18047 'modal' is possibly 'null'.
-  modal.className='pop-modal'+(cfg.shake?' shake':'');
-  // @ts-expect-error TS18047 'modal' is possibly 'null'.
-  void modal.offsetWidth;
-  // @ts-expect-error TS2531 Object is possibly 'null'.
-  document.getElementById('popOverlay').classList.add('show');
+  modal!.className='pop-modal'+(cfg.shake?' shake':'');
+  void modal!.offsetWidth;
+  document.getElementById('popOverlay')!.classList.add('show');
   popConfetti(cfg.confetti||0);
 }
-// @ts-expect-error TS2531 Object is possibly 'null'.
-function popClose(){ document.getElementById('popOverlay').classList.remove('show'); }
+function popClose(){ document.getElementById('popOverlay')!.classList.remove('show'); }
 function popDismissBg(e: any){ if(e.target.id==='popOverlay') popClose(); }
 function popConfetti(count: any){
   if(!count) return;
@@ -217,8 +198,7 @@ function popConfetti(count: any){
       p.style.transform=`rotate(${Math.random()*360}deg)`;
       if(Math.random()>0.6) p.style.borderRadius='50%';
     }
-    // @ts-expect-error TS18047 'box' is possibly 'null'.
-    box.appendChild(p);
+    box!.appendChild(p);
     setTimeout(()=>p.remove(),3600);
   }
 }
@@ -227,12 +207,11 @@ function popConfetti(count: any){
 function dayDateFor(week: any,d: any){
   if(!activeProg?.startDate) return null;
   const weekMon=getWeekMonday(activeProg.startDate);
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ mo
   const dt=new Date(weekMon); dt.setDate(weekMon.getDate()+(week-1)*7+dayOffset[d]); dt.setHours(0,0,0,0);
   return dt;
 }
 // Scheduled (non-rest) training days with date <= cutoff, ascending by date.
-function scheduledDays(cutoff: any){
+function scheduledDays(cutoff?: any){
   const out: any[]=[]; if(!activeProg?.weeks) return out;
   const tw=activeProg.totalWeeks||Object.keys(activeProg.weeks).length;
   for(let w=1;w<=tw;w++){ const wk=activeProg.weeks[w]; if(!wk) continue;
@@ -294,7 +273,6 @@ function fireStreakPopup(streak: any){
   });
 }
 // Season = (A): fires when the final scheduled training day of the program is completed. Once ever.
-// @ts-expect-error TS2554 Expected 1 arguments, but got 0.
 function finalScheduledDay(){ const a=scheduledDays(); return a.length?a[a.length-1]:null; }
 function seasonShown(){ return localStorage.getItem('ia_season_shown_'+activeProgId)==='1'; }
 function markSeasonShown(){ try{localStorage.setItem('ia_season_shown_'+activeProgId,'1');}catch{} }
@@ -370,8 +348,7 @@ function resolveReminder(week: any,dayKey: any,title: any,status: any){
   markReminded(week,dayKey);
   popClose();
   renderWeekView();
-  const labels={complete:'Locked in ✓',skipped:'Skipped ✕ — the week moves on'};   // V181 (D3)
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ co
+  const labels: Record<string, string>={complete:'Locked in ✓',skipped:'Skipped ✕ — the week moves on'};   // V181 (D3)
   showToast(labels[status]||'Updated');
   if(status==='complete') setTimeout(()=>fireCompletionPopup(week,dayKey),380);
 }

@@ -47,8 +47,8 @@ async function submitBug(){
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify({access_key:BUG_FORM_KEY,subject:'The Asylum — Bug Report',from_name:'Asylum Bug Reporter',message:txt+ctx})
     });
-    let j={};try{j=await r.json();}catch(e){}
-    // @ts-expect-error TS2339 Property 'success' does not exist on type '{}'.
+    let j: Record<string, any>={};try{j=await r.json();}catch(e){}
+    // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     if(r.ok&&j&&j.success){ta.value='';status.style.color='var(--green)';status.textContent='Sent ✓ — thanks, I got it.';showToast('Bug sent ✓');}
     else{status.style.color='var(--red)';status.textContent='Could not send — try again in a sec.';}
   }catch(e){
@@ -70,7 +70,6 @@ function init(){
   const aid=getActiveProgId();const programs=getPrograms();
   // V221 D178: boot switches through the loader, so a fallback pick is written back to ia_active.
   // The alias fold rides in as the loader's pre-refresh step: after activeProgId, before refreshProgram.
-  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   if(aid&&programs.length){const stored=programs.find(p=>p.id===aid&&!p.archived)||programs.find(p=>!p.archived);if(stored&&loadActiveProgram(stored.id,()=>{try{const _x=getExWeights();if(foldExAliasKeys(_x))saveExWeights(_x);}catch(e){}})){showScreen('screenWeek');renderWeekView();setTimeout(maybeShowReminder,600);return;}}
   // V221 D178: a pointer that resolved to nothing loadable (every program archived, or none
   // stored) is cleared through the loader before Home, so ia_active never names a program that

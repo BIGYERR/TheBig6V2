@@ -23,7 +23,7 @@ const _IAW_ROW=44;
 // clears the fastest interval by a minute and 17 clears the slowest LSD by 2:30.
 // Rep time: the only reps_dist distances are 400m and 800m, which at those same paces
 // span 0:55-8:27 — a 4:00 floor would be unreachable there, so it gets its own 0-9.
-const _IAW_SPEC={
+const _IAW_SPEC: Record<string, any>={
   dist:{fmt:'dec3',  cap:'Miles',        cols:[{min:0,max:99,wrap:false},{min:0,max:9,dot:true},{min:0,max:9}]},
   pace:{fmt:'clock', cap:'Pace / mile',  cols:[{min:4,max:17,nil:true},{min:0,max:59,pad:2}]},
   rept:{fmt:'clock', cap:'Typical rep',  cols:[{min:0,max:9, wrap:false},{min:0,max:59,pad:2}]},
@@ -70,7 +70,6 @@ function _iawFace(c: any,v: any){
 // clamp for DISPLAY only; nothing is written back until the athlete actually scrolls,
 // so reopening a day can never silently rewrite what was logged.
 function _iawParse(kind: any,val: any){
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ di
   var sp=_IAW_SPEC[kind], s=String(val==null?'':val).trim();
   // V232 (D200): run minutes stay stored as DECIMAL MINUTES; this reads them back as a clock.
   // A bare integer, a decimal or a leading-dot decimal (D203); never a colon. Rounded to the
@@ -110,7 +109,6 @@ function _iawParse(kind: any,val: any){
 // seconds to two digits, which is exactly what _paceStrToSec requires — a wheel cannot
 // emit the "9:3" shape that the old text box accepted and the chart then dropped.
 function _iawFormat(kind: any,vals: any){
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ di
   var sp=_IAW_SPEC[kind];
   if(vals[0]==='') return '';
   var b=vals[1]===''?'0':vals[1];
@@ -134,7 +132,6 @@ function _iawFormat(kind: any,vals: any){
 // V232 (D202): `plan` is the fixed dimension's planned value. It rides on the wheel as
 // data-plan and seeds the face when storage is blank; it is display only, never written.
 function iaWheelHTML(kind: any, hiddenId: any, val: any, capOverride?: any, plan?: any){
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ di
   var sp=_IAW_SPEC[kind];
   var cols=sp.cols.map(function(c: any){
     return '<div class="iaw-col" data-ci="'+sp.cols.indexOf(c)+'" data-wrap="'+(_iawWraps(c)?'1':'')+'" data-len="'+_iawRows(c).length+'"><div class="iaw-pad"></div>'
@@ -236,7 +233,6 @@ function iaWheelInit(root?: any){
       },{passive:true});
       // Seed into the MIDDLE copy so there is runway in both directions before the
       // first recentre; on a non-wrapping column _iawHome is 0 and this is unchanged.
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ di
       var home=_iawHome(_IAW_SPEC[kind].cols[ci]);
       var items=col.querySelectorAll('.iaw-it'), idx=home;
       for(var k=home;k<items.length;k++) if(items[k].getAttribute('data-v')===seed[ci]){ idx=k; break; }
@@ -323,7 +319,6 @@ function cardioFieldHTML(sport: any, e: any, dose: any, sub: any){
 function cardioSwapChip(sport: any, active: any, planned: any){
   const on=sport===active;
   const tag=sport===planned?' · planned':'';
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   return `<button type="button" data-sport="${sport}" onclick="setCardioSwap('${sport}')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:4px;cursor:pointer;border:1px solid ${on?'var(--accent)':'var(--border2)'};background:${on?'rgba(24,23,18,0.12)':'var(--surface2)'};color:${on?'var(--accent)':'var(--muted)'};font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.02em">${asyIcon(sport,15)}<span>${CARDIO_WORD[sport]}${tag}</span></button>`;
 }
 

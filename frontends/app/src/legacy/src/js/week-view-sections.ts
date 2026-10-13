@@ -18,8 +18,8 @@ import { computeStreak, statusOf } from './popups-streaks-reminders.ts';
 const allDaysList=ALL_DAYS_ORDER;
 // dayOffset: days from Monday to reach each day (Mon=0...Sun=6)
 // Used to calculate actual calendar date for each training day
-const dayOffset={mon:0,tue:1,wed:2,thu:3,fri:4,sat:5,sun:6};
-const tagMeta={test:{cls:'t-test',label:'Test Week'},peak:{cls:'t-peak',label:'Peak Week'},run:{cls:'t-run',label:'Run'},bike:{cls:'t-bike',label:'Bike'},swim:{cls:'t-swim',label:'Swim'},lift:{cls:'t-lift',label:'Lift'},hip:{cls:'t-hip',label:'Hip'},core:{cls:'t-core',label:'Core'}};
+const dayOffset: Record<string, any>={mon:0,tue:1,wed:2,thu:3,fri:4,sat:5,sun:6};
+const tagMeta: Record<string, any>={test:{cls:'t-test',label:'Test Week'},peak:{cls:'t-peak',label:'Peak Week'},run:{cls:'t-run',label:'Run'},bike:{cls:'t-bike',label:'Bike'},swim:{cls:'t-swim',label:'Swim'},lift:{cls:'t-lift',label:'Lift'},hip:{cls:'t-hip',label:'Hip'},core:{cls:'t-core',label:'Core'}};
 
 // ── V174 (D24/D26): before-start days and the partial first week ──────────────
 // A start on any weekday leaves week 1 with days BEFORE the start. They are outside
@@ -180,18 +180,12 @@ function sessionTimeEst(day: any){
       var sets=_itemSets(it.detail);
       if(sets==null) sets=(_secR!=null?_secR:3);
       var n=(it.name||'').toLowerCase();
-      // @ts-expect-error TS18047 'sets' is possibly 'null'.
-      if(/stretch|mobility|90\/90|foam|worlds greatest/.test(n)) mins+=sets*0.75;
-      // @ts-expect-error TS18047 'sets' is possibly 'null'.
-      else if(/carry/.test(n)) mins+=sets*1.2;
-      // @ts-expect-error TS18047 'sets' is possibly 'null'.
-      else if(/plank|pallof|dead bug|bird dog|wall sit|\bhold\b|hang|wiper|hollow|clamshell|side steps|side-lying|leg raises/.test(n)) mins+=sets*1.0;
-      // @ts-expect-error TS18047 'sets' is possibly 'null'.
-      else if(isMain) mins+=sets*3.2;
-      // @ts-expect-error TS18047 'sets' is possibly 'null'.
-      else if(isSuper) mins+=sets*1.4;
-      // @ts-expect-error TS18047 'sets' is possibly 'null'.
-      else mins+=sets*2.0;
+      if(/stretch|mobility|90\/90|foam|worlds greatest/.test(n)) mins+=sets!*0.75;
+      else if(/carry/.test(n)) mins+=sets!*1.2;
+      else if(/plank|pallof|dead bug|bird dog|wall sit|\bhold\b|hang|wiper|hollow|clamshell|side steps|side-lying|leg raises/.test(n)) mins+=sets!*1.0;
+      else if(isMain) mins+=sets!*3.2;
+      else if(isSuper) mins+=sets!*1.4;
+      else mins+=sets!*2.0;
     });
   });
   if(day.cardio){
@@ -242,7 +236,6 @@ function openDayKey(d: any){
   if(dayBeforeStart(activeProg,currentWeek,d)){ showToast('Before your start date'); return; }   // V174 (D24)
   // Rest days used to dead-end here. Today's and past rest days now open the rest sheet
   // so an unplanned session or a bonus run has somewhere to go; future ones stay inert.
-  // @ts-expect-error TS2554 Expected 3 arguments, but got 2.
   if(day.rest){ if(restDayEligible(currentWeek,d)) openRestSheet(currentWeek,d); return; }
   openDetail(d,day);
 }
@@ -263,8 +256,7 @@ function runSessionCode(sub: any, key: any, type: any){
   // CHI is the Long Interval (LI) and the INT the Short Interval (SI). long and easy have no row:
   // their chip is the label's (LSD on the pace family, EASY on run_base). The test wears TEST, as
   // the benchmark does.
-  var K={int:'SI', chi:'LI', steady:'STDY', bench:'TEST', trial:'TEST'};
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ in
+  var K: Record<string, string>={int:'SI', chi:'LI', steady:'STDY', bench:'TEST', trial:'TEST'};
   if(key && K[key]) return K[key];
   var s=(sub||'').toLowerCase(), run=!type||type==='run';
   // Unkeyed and frozen strings, before the generic interval test ("long interval" contains
@@ -391,8 +383,7 @@ function _wkScoot(el: any,to: any,cur: any){
 // with no mins (a legacy lensed run that kept only its distance) has no line: the lens invents nothing.
 function restLogLines(rl: any){
   if(!rl||typeof rl!=='object') return [];
-  const W={run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'};
-  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
+  const W: Record<string, string>={run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'};
   return Object.keys(rl).filter(t=>rl[t]&&+rl[t].mins>0).map(t=>rl[t].mins+' min '+(W[t]||t)+' logged · RPE '+(rl[t].rpe||'—'));
 }
 function renderWeekView(){
@@ -459,35 +450,24 @@ function renderWeekView(){
   }catch(e){}
   if(_injWk){
     const _rl=(INJURY_REGIONS[_injWk.region]||{}).label||'Injury';
-    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-    _pill.textContent='Injury Week \u00b7 '+_rl;
-    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-    _pill.classList.add('phase-pill--injury');
+    _pill!.textContent='Injury Week \u00b7 '+_rl;
+    _pill!.classList.add('phase-pill--injury');
   } else if(_isTravelWk){
-    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-    _pill.textContent='Maintenance Week';
-    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-    _pill.classList.add('phase-pill--recovery');
+    _pill!.textContent='Maintenance Week';
+    _pill!.classList.add('phase-pill--recovery');
   } else if(_isTaper){
-    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-    _pill.innerHTML=(currentWeek===totalWeeks?asyIcon('🏁',13)+' Race Week':asyIcon('🏁',13)+' Race Taper');
-    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-    _pill.classList.add('phase-pill--recovery');
+    _pill!.innerHTML=(currentWeek===totalWeeks?asyIcon('🏁',13)+' Race Week':asyIcon('🏁',13)+' Race Taper');
+    _pill!.classList.add('phase-pill--recovery');
   } else if(_isRecov){
-    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-    _pill.textContent='↓ Recovery Week';
-    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-    _pill.classList.add('phase-pill--recovery');
+    _pill!.textContent='↓ Recovery Week';
+    _pill!.classList.add('phase-pill--recovery');
   } else {
-    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-    _pill.textContent=phaseLabel||'';
+    _pill!.textContent=phaseLabel||'';
   }
   // Reset modifiers that don't apply to THIS render — week switching reuses the node,
   // so a stale class would tint a healthy week orange or an ordinary week red.
-  // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-  if(!_injWk) _pill.classList.remove('phase-pill--injury');
-  // @ts-expect-error TS18047 '_pill' is possibly 'null'.
-  if(_injWk||(!_isTravelWk&&!_isTaper&&!_isRecov)) _pill.classList.remove('phase-pill--recovery');
+  if(!_injWk) _pill!.classList.remove('phase-pill--injury');
+  if(_injWk||(!_isTravelWk&&!_isTaper&&!_isRecov)) _pill!.classList.remove('phase-pill--recovery');
   // ── INJURY WASH + SHORTCUT STATE ──
   // One flag drives both, so the tint and the button can never disagree about whether
   // the athlete is hurt. Wash is scoped to the week screen; a healthy week renders
@@ -508,8 +488,7 @@ function renderWeekView(){
   const wscroll=document.getElementById('weekScroll');
   // A scoot in flight is measuring and writing to nodes this render is about to destroy.
   _wkScootCancel();
-  // @ts-expect-error TS18047 'wscroll' is possibly 'null'.
-  wscroll.innerHTML='';
+  wscroll!.innerHTML='';
   const actualWeek=calcCurrentWeek();
   let _actBtn=null;
   for(let w=1;w<=totalWeeks;w++){
@@ -527,16 +506,14 @@ function renderWeekView(){
       if(_hit) _ovMark=' \u2726';
     }
     b.textContent='Wk '+w+(w===actualWeek?' \u25cf':'')+_ovMark;
-    // @ts-expect-error TS18047 'wscroll' is possibly 'null'.
-    b.onclick=(wk=>()=>{_setCurrentWeek(wk);renderWeekView();})(w);wscroll.appendChild(b);
+    b.onclick=(wk=>()=>{_setCurrentWeek(wk);renderWeekView();})(w);wscroll!.appendChild(b);
     if(w===currentWeek) _actBtn=b;
   }
   // Anchor on currentWeek, not actualWeek: the strip is a control for the week you are
   // LOOKING AT. Anchoring on today would scroll away from week 3 the moment you tapped it.
   const _wkTo=_wkStripTarget(wscroll,_actBtn);
   if(_wkTo!==null){
-    // @ts-expect-error TS18047 'wscroll' is possibly 'null'.
-    if(_wkScootDone||_wkReduceMotion()){ wscroll.scrollLeft=_wkTo; _wkScootDone=true; }
+    if(_wkScootDone||_wkReduceMotion()){ wscroll!.scrollLeft=_wkTo; _wkScootDone=true; }
     else { _wkScootDone=true; _wkScoot(wscroll,_wkTo,currentWeek); }
   }
   updateRandCounter();
@@ -566,11 +543,10 @@ function renderWeekView(){
   let weekMon=null;
   if(activeProg.startDate){weekMon=getWeekMonday(activeProg.startDate);}
 
-  // @ts-expect-error TS18047 'list' is possibly 'null'.
-  const list=document.getElementById('daysList');list.innerHTML='';
+  const list=document.getElementById('daysList');list!.innerHTML='';
   if(!wkData){return;}
 
-  const MOD={lift:['#bc6a43','rgba(188,106,67,0.15)'],run:['#5e8c54','rgba(94,140,84,0.15)'],bike:['#3f6e96','rgba(63,110,150,0.15)'],swim:['#3f6e96','rgba(63,110,150,0.15)'],hip:['#7e5e96','rgba(126,94,150,0.15)'],core:['#a6822f','rgba(166,130,47,0.15)'],rest:['#2c2c2e','rgba(24,23,18,0.05)']};
+  const MOD: Record<string, any>={lift:['#bc6a43','rgba(188,106,67,0.15)'],run:['#5e8c54','rgba(94,140,84,0.15)'],bike:['#3f6e96','rgba(63,110,150,0.15)'],swim:['#3f6e96','rgba(63,110,150,0.15)'],hip:['#7e5e96','rgba(126,94,150,0.15)'],core:['#a6822f','rgba(166,130,47,0.15)'],rest:['#2c2c2e','rgba(24,23,18,0.05)']};
   // @ts-expect-error TS7006 Parameter 'k' implicitly has an 'any' type.
   const modColor=k=>(MOD[k]?MOD[k][0]:'#3a3a3c');
   // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
@@ -657,9 +633,7 @@ function renderWeekView(){
     const over=(heroMode==='today'?'Today \u00b7 ':'Week '+currentWeek+' \u00b7 ')+DAY_FULL[heroKey]+(_heroMovedFrom?' \u00b7 moved from '+_heroMovedFrom:'');
     // @ts-expect-error TS7006 Parameter 't' implicitly has an 'any' type.
     const tags=(day.tags||[]).filter(t=>t!=='rest').map(t=>{
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ li
       const col=MOD[t]?MOD[t][0]:'#181712';const dim=MOD[t]?MOD[t][1]:'rgba(24,23,18,0.15)';
-      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ te
       return '<span class="wk-tag" style="color:'+col+';background:'+dim+'">'+((tagMeta[t]&&tagMeta[t].label)||t)+'</span>';
     }).join('');
     const summ=heroSummary(day);
@@ -698,8 +672,7 @@ function renderWeekView(){
     +'</div>';
 
   const _wcTag=wildcardTagHTML(currentWeek,heroKey);   // V195 (D64)
-  // @ts-expect-error TS18047 'list' is possibly 'null'.
-  list.innerHTML=strip+hero+_wcTag+stats;
+  list!.innerHTML=strip+hero+_wcTag+stats;
 }
 
 // DETAIL VIEW
@@ -752,7 +725,7 @@ function _stripLeadingSets(d: any){
     .replace(/^(\d+)\s*sets?\s*(?:\u2014|\u2013|-)\s*/i,'')
     .replace(/^(\d+)\s*sets?\b\s*/i,'');
 }
-function buildSectionsHTML(sections: any,baseIdx: any){
+function buildSectionsHTML(sections: any,baseIdx?: any){
   const all=sections||[];
   const _base=baseIdx||0;
   // Only the MAIN lift (and the taper Primer) keeps a section label — every other block renders
@@ -773,7 +746,6 @@ function buildSectionsHTML(sections: any,baseIdx: any){
       // The athlete's own additions render in their own block, in signal orange, so they
       // never masquerade as something the engine programmed.
       h+=`<div class="section-label" style="color:var(--signal)">${sec.label||'Added by you'}</div><div class="section-block">`;
-      // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
       sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
       h+=`</div>`;
     } else if(sec.hip){
@@ -781,12 +753,10 @@ function buildSectionsHTML(sections: any,baseIdx: any){
       // stands as its own logged card. The section still carries hip:true, so capRegionalFatigue
       // keeps shielding this prehab from deload/high-fatigue trimming.
       h+=`<div class="section-label" style="color:var(--hip)">${sec.label||'Hip stability'}</div><div class="section-block">`;
-      // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
       sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
       h+=`</div>`;
     } else if(sec.core){
       h+=`<div class="core-block"><div class="core-header">${sec.coreHeader||'Core'}</div>`;
-      // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
       sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
       h+=`</div>`;
     } else if((sec.superset||sec.type==='superset')&&(sec.items||[]).length>1){
@@ -810,9 +780,7 @@ function buildSectionsHTML(sections: any,baseIdx: any){
           :(_d?(rounds+'\xd7'+_d.replace(/^(\d+)\s*reps?\b/,'$1')):(rounds+' sets'));
         h+=`<div class="section-label" style="color:var(--muted)">${esc(sec.label||'Round')} \u2014 reduced to straight sets</div><div class="section-block">`;
         sec.items.forEach((i2: any,_ii: any)=>{
-          // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
           if(i2._skipped){h+=buildExItem(i2,_secIdx,_ii);return;}
-          // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
           h+=buildExItem({...i2,detail:_mapped},_secIdx,_ii);
         });
         h+=`</div></div>`;
@@ -831,7 +799,6 @@ function buildSectionsHTML(sections: any,baseIdx: any){
       h+=`</div>`;
     } else {
       h+=`<div class="section-block">`;
-      // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
       sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
       h+=`</div>`;
     }
