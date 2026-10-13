@@ -625,3 +625,23 @@ what is stored.
   (plain, travel, two Wildcards, a note, the nudge, three retest strips) and tapped Mark Done: markup, stores, sheets,
   toast and pixels matched, each scenario drawing its mark. 69/69 at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.39 moves This Week's marks and the wizard's small builders
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.39.
+- **Moved:** This Week's day cells (the date, a check once done, the Wildcard mark, a cross once skipped), the hero's
+  travel tag and the Wildcard tag; the Wildcard mark and tag are shared components (`screens/marks/wildcard.ts`, the
+  legacy `wildcardMarkHTML` and `wildcardTagHTML`) used by This Week and the session sheet. The wizard's seed banner
+  (`_seedBannerHTML`: the seed read once per wizard and kept on the draft as before, its buttons calling the legacy
+  `applySeedData` and `dismissSeedData`), the mile and swim advisories (`_mileAdvisoryHTML`, `_swimAdvisoryHTML`, from
+  the legacy entry checks; still repainted in place by `updateMileAdvisory` and `updateSwimAdvisory`), and the start
+  pips (`alignedPipsHTML`). The program length line and the copy functions (start and race sentences, the mile help)
+  stay the legacy helpers' words.
+- **Tests:** `tests/integration/wizard-builders.test.ts` (new, 4): the mile advisory over eleven drafts (hidden,
+  refused, required, noted) and the swim advisory over nine, the seed banner dismissed, absent, failing, offered with
+  and without its longest run and pace, already read, and applied (the draft left as the legacy banner left it), and
+  the pips for four opening weeks and a later start, each against its legacy builder in the booted app. Unit tests:
+  `cardio-goal.test.ts` gains 3 and This Week's gains the travel flag. Local comparisons matched This Week plain, with
+  a Wildcard, on a travel day and with all three, and the name step's pips near and far (6 states), and the cardio step
+  again (15 drafts, 28 interactions, its seed banner among them). 69/69 at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

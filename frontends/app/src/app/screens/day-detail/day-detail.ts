@@ -6,6 +6,7 @@ import { type BenchEntry, benchNotes, modTags, type TagChip, wildcardSub } from 
 import { E1rmCard } from './e1rm-card';
 import { CardioCard } from './cardio-card';
 import { cardioCard, type CardioRx } from './cardio-card-model';
+import { WildcardTag } from '../marks/wildcard';
 import { SessionLog } from './session-log';
 import { SessionSections } from './session-sections';
 import { type ExSection, sectionsView } from './session-sections-model';
@@ -51,7 +52,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
 @Component({
   selector: 'ia-day-detail',
   host: { style: 'display: contents' },
-  imports: [CardioCard, E1rmCard, SessionLog, SessionSections],
+  imports: [CardioCard, E1rmCard, SessionLog, SessionSections, WildcardTag],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @for (v of views(); track v) {
@@ -74,7 +75,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
       @for (blk of v.body; track $index) {
         @switch (blk.kind) {
           @case ('sections') { <ia-session-sections [sections]="blk.sections" /> }
-          @case ('wildcard') { <div class="wc-tag"><span class="wc-mark" aria-label="Wildcard done" [innerHTML]="markInner()"></span><div class="wc-tag-txt"><div class="wc-tag-lbl">WILDCARD DONE</div><div class="wc-tag-sub">{{ blk.sub }}</div></div></div> }
+          @case ('wildcard') { <ia-wildcard-tag [sub]="blk.sub" /> }
           @case ('note') { <div class="note-block" [innerHTML]="html(blk.html)"></div> }
           @case ('logNudge') { <div class="log-nudge"><span [innerHTML]="nudgeLine()"></span><button class="log-nudge-btn" (click)="call('handleDayStatus', blk.dayKey, blk.title, 'complete')">Mark Done ✓</button></div> }
           @case ('e1rm') { <ia-e1rm-card [card]="blk.card" /> }
@@ -137,12 +138,9 @@ export class DayDetail {
     }
     return h;
   }
-  /** The travel tag's backpack and word, the Wildcard mark's flame and W, and the log nudge's notebook and line. */
+  /** The travel tag's backpack and word, and the log nudge's notebook and line. */
   protected travelInner(): SafeHtml {
     return this.html(this.bridge.call<string>('asyIcon', 'backpack', 11) + '<span>Travel</span>');
-  }
-  protected markInner(): SafeHtml {
-    return this.html(this.bridge.call<string>('asyIcon', 'flame', 16) + '<span class="wc-mark-w">W</span>');
   }
   protected nudgeLine(): SafeHtml {
     return this.html(this.bridge.call<string>('asyIcon', 'notebook', 14) + ' You logged this one but never marked it.');

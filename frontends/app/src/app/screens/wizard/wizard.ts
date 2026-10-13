@@ -3,8 +3,8 @@ import { NgTemplateOutlet } from '@angular/common';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
 import {
-  baselineSuffix, type CardioDraft, type CardioField, type CardioGoalDraft, type CardioReads, cardioStep, type CardioStep, type GoalChoice, localIso,
-  prepareCardioDraft, raceButtonStyle, unitButtonStyle,
+  alignedPips, baselineSuffix, type CardioDraft, type CardioField, type CardioGoalDraft, type CardioReads, cardioStep, type CardioStep, type GoalChoice, localIso,
+  mileAdvisory, prepareCardioDraft, raceButtonStyle, type Seed, seedView, swimAdvisory, unitButtonStyle,
 } from './cardio-goal-model';
 import {
   type Choice, daysView, equipmentChoices, LIFT_LABELS, type LiftOption, liftingView, nameSummary, primaryChoices, profileView,
@@ -15,7 +15,7 @@ import {
 interface NameView {
   name: string;
   startDate: string;
-  aligned: { start: string; warn: boolean; copy: string; pips: string } | null;
+  aligned: { start: string; warn: boolean; copy: string; pips: string[] | null } | null;
   rows: { k: string; v: string }[];
 }
 
@@ -167,7 +167,7 @@ type StepView =
                             <div style="margin-top:8px">
                               <div class="input-label" style="margin-bottom:6px">{{ f.baseLabel }}</div>
                               <ng-container [ngTemplateOutlet]="flatPair" [ngTemplateOutletContext]="{ mins: f.baseMins, secs: f.baseSecs, minsKey: 'baseMins', secsKey: 'baseSecs' }" />
-                              <div style="display:contents" [innerHTML]="html(f.advisory)"></div>
+                              <div id="swimAdvisory" style="font-size:11px;line-height:1.45;margin-top:6px" [style.display]="f.advisory.text ? 'block' : 'none'" [style.color]="f.advisory.color">{{ f.advisory.text }}</div>
                             </div>
                             @if (f.base500; as b) {
                               <div style="margin-top:8px">
@@ -193,7 +193,7 @@ type StepView =
                               <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px" [style.display]="f.paceShown ? 'block' : 'none'" [innerHTML]="html(f.paceLine)"></div>
                               <div id="paceFeasLine" style="display:none"></div>
                             </div>
-                            @if (f.seed) {<div style="display:contents" [innerHTML]="html(f.seed)"></div>}
+                            @if (f.seed; as sd) {<ng-container [ngTemplateOutlet]="seedBanner" [ngTemplateOutletContext]="{ $implicit: sd }" />}
                             <div class="input-group" style="margin-top:8px">
                               <div class="input-label">How far can you currently run? (optional)</div>
                               <div style="display:flex;gap:8px;align-items:center">
@@ -203,7 +203,7 @@ type StepView =
                             </div>
                             <ng-container [ngTemplateOutlet]="mile" [ngTemplateOutletContext]="{ $implicit: f.mile }" />
                           } @else {
-                            @if (f.seed) {<div style="display:contents" [innerHTML]="html(f.seed)"></div>}
+                            @if (f.seed; as sd) {<ng-container [ngTemplateOutlet]="seedBanner" [ngTemplateOutletContext]="{ $implicit: sd }" />}
                             <div class="input-group" style="margin-top:10px">
                               <div class="input-label">{{ f.question + ' (optional)' }}</div>
                               <div style="display:flex;gap:8px;align-items:center">
@@ -312,7 +312,7 @@ type StepView =
             <div class="wizard-subtitle">Give it something you will recognize, and tell it when to begin.</div>
             <div class="input-group"><div class="input-label">Program name</div><input type="text" class="input-field" [value]="v.name.name" (input)="setName($event)" maxlength="40"></div>
             @if (v.name.aligned; as al) {
-              <div class="input-group"><div class="input-label">Start date</div><div class="input-field derived"><span>{{ al.start }}</span><span class="src">set by race date</span></div><div [class]="'start-resolve' + (al.warn ? ' warn' : '')" id="startResolve" [innerHTML]="html(al.copy)"></div>@if (al.pips) {<span style="display:contents" [innerHTML]="html(al.pips)"></span>}</div>
+              <div class="input-group"><div class="input-label">Start date</div><div class="input-field derived"><span>{{ al.start }}</span><span class="src">set by race date</span></div><div [class]="'start-resolve' + (al.warn ? ' warn' : '')" id="startResolve" [innerHTML]="html(al.copy)"></div>@if (al.pips; as ps) {<div class="start-pips">@for (c of ps; track $index) {<i [attr.class]="c"></i>}</div>}</div>
             } @else {
               <div class="input-group"><div class="input-label">Start date</div><input type="date" class="input-field" id="wizStartDate" [value]="v.name.startDate" (change)="setStart($event)"><div class="start-resolve" id="startResolve" [innerHTML]="html(resolveCopy())"></div></div>
             }
@@ -348,11 +348,25 @@ type StepView =
       <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="sec" [attr.value]="secs" (input)="edit('swimBase', 'swim', secsKey, $event)" min="0" max="59">
     </div>
   </ng-template>
+  <ng-template #seedBanner let-sd>
+    @if (sd.applied) {
+      <div style="font-size:11px;color:var(--muted);margin:2px 0 8px" [innerHTML]="seedLine(12, ' Estimated from “' + sd.prog + '”. Edit if you know better.')"></div>
+    } @else {
+      <div style="background:var(--surface);border:1px solid var(--accent);border-radius:4px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--text);margin-bottom:4px" [innerHTML]="seedLine(13, ' Seed from “' + sd.prog + '”?')"></div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:10px">{{ sd.found }}</div>
+        <div style="display:flex;gap:8px">
+          <button class="prog-action-btn primary" style="flex:1" (click)="call('applySeedData')">Use this data</button>
+          <button class="prog-action-btn" style="flex:1" (click)="call('dismissSeedData')">Start fresh</button>
+        </div>
+      </div>
+    }
+  </ng-template>
   <ng-template #mile let-m>
     <div class="input-group" style="margin-top:8px">
       <div class="input-label">Current mile time <span style="color:var(--muted);font-weight:400" [innerHTML]="html(m.help)"></span></div>
       <ng-container [ngTemplateOutlet]="pair" [ngTemplateOutletContext]="{ $implicit: m.pair, sport: 'run' }" />
-      <div style="display:contents" [innerHTML]="html(m.advisory)"></div>
+      <div id="mileAdvisory" style="font-size:11px;line-height:1.45;margin-top:6px" [style.display]="m.advisory.text ? 'block' : 'none'" [style.color]="m.advisory.color">{{ m.advisory.text }}</div>
     </div>
   </ng-template>
   `,
@@ -451,6 +465,11 @@ export class Wizard {
     this.bridge.call('updateRaceDateFeedback');
   }
 
+  /** A seed banner line: the chart icon, then its words (the program's name read as markup, as the legacy banner read it). */
+  protected seedLine(size: number, words: string): SafeHtml {
+    return this.html(this.bridge.call<string>('asyIcon', 'chart', size) + words);
+  }
+
   protected icon(name: string, size: number): SafeHtml {
     const key = name + '/' + size;
     let h = this.icons.get(key);
@@ -503,10 +522,10 @@ export class Wizard {
       icon: (key, size) => b.call<string>('asyIcon', key, size),
       clock: (secs) => b.call<string>('_clkMS', secs),
       paceTarget: (g) => b.call<{ tTotalSecs?: number; tPacePerMile?: number }>('paceGoalTarget', g),
-      seedBanner: () => b.call<string>('_seedBannerHTML'),
-      swimAdvisory: () => b.call<string>('_swimAdvisoryHTML'),
+      seed: () => seedView(draft as CardioDraft & { _seedDismissed?: boolean; _seed?: Seed | null; _seedApplied?: boolean }, () => b.call<Seed | null>('seedFromPriorPrograms'), (sec) => b.call<string | null>('_fmtPaceMi', sec)),
+      swimAdvisory: () => swimAdvisory(b.call('_swimEntryState')),
       mileHelp: () => b.call<string>('_mileFieldHelp'),
-      mileAdvisory: () => b.call<string>('_mileAdvisoryHTML'),
+      mileAdvisory: () => mileAdvisory(b.call('_mileEntryState')),
       progLen: () => b.call<string>('progLenLineHTML'),
       today,
     };
@@ -540,7 +559,7 @@ export class Wizard {
     if (!draft.name) draft.name = liftLabel + ' Block ' + (b.call<unknown[]>('getPrograms').length + 1);
     if (!draft.startDate) draft.startDate = b.call<string>('_isoToday');
     const sr = b.call('resolveStartDate', draft.startDate, draft.restDays || [], b.call('_rsRace', draft));
-    const al = b.call<{ start: string; underFloor?: boolean } | null>('wizardAlignment');
+    const al = b.call<{ start: string; underFloor?: boolean; tw: number; openWeek: number; futureWeeks?: number } | null>('wizardAlignment');
     let raceRow: string | null = null;
     if (draft.primaryPath === 'event' && draft.raceDate) {
       const cd = b.call<{ days: number } | null>('raceCountdown', draft.raceDate);
@@ -555,7 +574,7 @@ export class Wizard {
     return {
       name: draft.name,
       startDate: draft.startDate,
-      aligned: al ? { start: b.call<string>('_fmtStartDay', al.start, true), warn: !!al.underFloor, copy: b.call<string>('alignedStartCopy', al), pips: b.call<string>('alignedPipsHTML', al) } : null,
+      aligned: al ? { start: b.call<string>('_fmtStartDay', al.start, true), warn: !!al.underFloor, copy: b.call<string>('alignedStartCopy', al), pips: alignedPips(al) } : null,
       rows: [],
     };
   }

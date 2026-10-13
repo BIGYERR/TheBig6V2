@@ -2,7 +2,9 @@
 // phase E: the last step the legacy renderWizardStep drew moves to the Wizard component). Each word and each style is
 // the legacy step's. The lines the legacy updaters repaint in place (the program length, the pace lines, the race date
 // card, the mile and swim advisories) keep their ids and start as the legacy step drew them; updateRaceDateFeedback,
-// updatePaceDisplay, updateSwimPaceDisplay, updateMileAdvisory and updateSwimAdvisory still repaint them.
+// updatePaceDisplay, updateSwimPaceDisplay, updateMileAdvisory and updateSwimAdvisory still repaint them. The seed
+// banner and the advisories are drawn here since step 31 (the legacy _seedBannerHTML, _mileAdvisoryHTML and
+// _swimAdvisoryHTML until then).
 
 export type Sport = 'run' | 'bike' | 'swim';
 
@@ -54,11 +56,11 @@ export interface CardioReads {
   clock: (secs: number) => string;
   /** The legacy paceGoalTarget: the run goal's total time and pace per mile. */
   paceTarget: (g: CardioGoalDraft | undefined) => { tTotalSecs?: number; tPacePerMile?: number };
-  /** The legacy _seedBannerHTML, _swimAdvisoryHTML, _mileFieldHelp, _mileAdvisoryHTML and progLenLineHTML. */
-  seedBanner: () => string;
-  swimAdvisory: () => string;
+  /** The seed banner (seedView over the legacy seed reader), the advisories (from the legacy entry checks), the legacy _mileFieldHelp and progLenLineHTML. */
+  seed: () => SeedView | null;
+  swimAdvisory: () => Advisory;
   mileHelp: () => string;
-  mileAdvisory: () => string;
+  mileAdvisory: () => Advisory;
   progLen: () => string;
   /** Today, as the legacy step wrote it (local year-month-day). */
   today: string;
@@ -83,7 +85,7 @@ export interface TimePair {
 export interface MileField {
   help: string;
   pair: TimePair;
-  advisory: string;
+  advisory: Advisory;
 }
 
 export type CardioForm =
@@ -97,7 +99,7 @@ export type CardioForm =
     baseLabel: string;
     baseMins: string;
     baseSecs: string;
-    advisory: string;
+    advisory: Advisory;
     base500: { label: string; mins: string; secs: string } | null;
   }
   | {
@@ -107,13 +109,13 @@ export type CardioForm =
     target: TimePair;
     paceShown: boolean;
     paceLine: string;
-    seed: string;
+    seed: SeedView | null;
     baseline: string;
     mile: MileField;
   }
   | {
     kind: 'other';
-    seed: string;
+    seed: SeedView | null;
     question: string;
     placeholder: string;
     step: string;
@@ -223,7 +225,7 @@ function swimForm(g: CardioGoalDraft, r: CardioReads): CardioForm {
 function paceForm(g: CardioGoalDraft, run: CardioGoalDraft | undefined, r: CardioReads): CardioForm {
   const t = r.paceTarget(run);
   const paceLine = r.icon('🎯', 13) + ' ' + (t.tPacePerMile ? r.clock(t.tTotalSecs as number) + ' is ' + r.clock(t.tPacePerMile) + ' per mile.' : '');
-  const seed = r.seedBanner();
+  const seed = r.seed();
   return {
     kind: 'pace',
     unit: run?.paceUnit || 'mi',
@@ -238,7 +240,7 @@ function paceForm(g: CardioGoalDraft, run: CardioGoalDraft | undefined, r: Cardi
 }
 
 function otherForm(sport: Sport, g: CardioGoalDraft, r: CardioReads): CardioForm {
-  const seed = sport === 'run' ? r.seedBanner() : '';
+  const seed = sport === 'run' ? r.seed() : null;
   const b = BASELINE[sport];
   return {
     kind: 'other',
@@ -291,4 +293,59 @@ export function cardioStep(d: CardioDraft, r: CardioReads): CardioStep {
 /** Today as the legacy step wrote it: the local year, month and day. */
 export function localIso(t: Date): string {
   return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+}
+
+/** An advisory under a field: its words (none hides it) and its color. */
+export interface Advisory {
+  text: string;
+  color: string;
+}
+
+/** The legacy _mileAdvisoryHTML's line from the legacy _mileEntryState: a refusal in signal orange, a blank or a note muted. */
+export function mileAdvisory(st: { ok?: boolean; msg?: string; adv?: string; blank?: boolean }): Advisory {
+  return { text: st.msg || st.adv || '', color: st.msg && !st.blank ? 'var(--signal)' : 'var(--muted)' };
+}
+
+/** The legacy _swimAdvisoryHTML's line from the legacy _swimEntryState: nothing when the times are fine. */
+export function swimAdvisory(st: { ok?: boolean; msg?: string; blank?: boolean }): Advisory {
+  return { text: st.ok ? '' : st.msg || '', color: st.blank ? 'var(--muted)' : 'var(--signal)' };
+}
+
+/** A seed found in an earlier program: its name, its recovery runs, their average pace, the longest run. */
+export interface Seed {
+  progName?: string;
+  n?: number;
+  avgRecSec?: number;
+  maxDist?: number;
+}
+
+/** The seed banner: the offer (with its numbers), or once applied the line saying where the numbers came from. */
+export type SeedView = { applied: true; prog: string } | { applied: false; prog: string; found: string };
+
+/**
+ * The legacy _seedBannerHTML: nothing once dismissed or with no seed; the seed is read once per wizard and kept on the
+ * draft, as the legacy one was (`find` is the legacy seedFromPriorPrograms, `pace` its _fmtPaceMi).
+ */
+export function seedView(d: { _seedDismissed?: boolean; _seed?: Seed | null; _seedApplied?: boolean }, find: () => Seed | null, pace: (sec: number | undefined) => string | null): SeedView | null {
+  if (d._seedDismissed) return null;
+  if (d._seed === undefined) {
+    try {
+      d._seed = find();
+    } catch {
+      d._seed = null;
+    }
+  }
+  const s = d._seed;
+  if (!s) return null;
+  if (d._seedApplied) return { applied: true, prog: String(s.progName) };
+  const distLine = s.maxDist ? ', longest run ' + s.maxDist + ' mi' : '';
+  return { applied: false, prog: String(s.progName), found: 'Recent logs found: ' + s.n + ' recovery runs, avg ' + (pace(s.avgRecSec) || '') + '/mi' + distLine + ' over your last 3 weeks.' };
+}
+
+/** The legacy alignedPipsHTML: one pip per week of the race plan (behind, the opening week, the race), none when it starts later. */
+export function alignedPips(al: { futureWeeks?: number; tw: number; openWeek: number }): string[] | null {
+  if (al.futureWeeks) return null;
+  const out: string[] = [];
+  for (let w = 1; w <= al.tw; w++) out.push(w < al.openWeek ? 'behind' : w === al.openWeek ? 'open' : w === al.tw ? 'race' : '');
+  return out;
 }

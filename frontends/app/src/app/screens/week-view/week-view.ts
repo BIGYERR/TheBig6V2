@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, type ElementRef, inject, signal, viewChild } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { wildcardSub } from '../day-detail/sheet-marks-model';
+import { WildcardMark, WildcardTag } from '../marks/wildcard';
 import { type DayLog, type Overlay, type WeekDay, type WeekProgram, type WeekView as View, weekView } from './week-view-model';
 
 /** The screen before any program is drawn, as the legacy markup stood. */
@@ -22,6 +24,7 @@ const BLANK: View = {
 @Component({
   selector: 'ia-week-view',
   host: { style: 'display: contents' },
+  imports: [WildcardMark, WildcardTag],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @let v = view();
@@ -65,7 +68,7 @@ const BLANK: View = {
             <div class="wk-day pre" aria-label="Before your start date"><div class="wk-day-lbl">{{ c.label }}</div><div class="wk-day-top">—</div><div class="wk-day-num">{{ c.num }}</div><div class="wk-day-bot">—</div></div>
           } @else {
             <!-- eslint-disable-next-line @angular-eslint/template/click-events-have-key-events, @angular-eslint/template/interactive-supports-focus -- the legacy day cell, kept as it was -->
-            <div [class]="c.cls" (click)="call('openDayKey', c.key)"><div class="wk-day-lbl">{{ c.label }}</div><div class="wk-day-top" [style.color]="c.topColor">{{ c.top }}</div><div class="wk-day-num" [innerHTML]="html(c.center)"></div><div class="wk-day-bot" [style.color]="c.botColor">{{ c.bot }}</div></div>
+            <div [class]="c.cls" (click)="call('openDayKey', c.key)"><div class="wk-day-lbl">{{ c.label }}</div><div class="wk-day-top" [style.color]="c.topColor">{{ c.top }}</div><div class="wk-day-num">@switch (c.center.kind) {@case ('check') {<span class="chk">✓</span>} @case ('wild') {<ia-wildcard-mark [size]="14" />} @case ('skip') {✕} @default {{{ c.center.kind === 'num' ? c.center.text : '' }}}}</div><div class="wk-day-bot" [style.color]="c.botColor">{{ c.bot }}</div></div>
           }
         }
       </div>
@@ -78,14 +81,14 @@ const BLANK: View = {
         }
         @case ('day') {
           @if (d.hero.kind === 'day') {
-            <div [class]="'wk-hero' + (d.hero.today ? ' is-today' : '')"><div class="wk-hero-pad"><div class="wk-hero-over">{{ d.hero.over }}</div><div class="wk-hero-title">{{ d.hero.title }}</div><div class="wk-hero-tags"><span class="wk-tag wk-time">{{ d.hero.time }}</span>@for (t of d.hero.tags; track $index) {<span class="wk-tag" [attr.style]="t.style">{{ t.label }}</span>}@if (d.hero.travelTag) {<span style="display:contents" [innerHTML]="html(d.hero.travelTag)"></span>}</div></div>@if (d.hero.summary) {<div class="wk-hero-summary" [innerHTML]="html(d.hero.summary)"></div>}@if (d.hero.status) {<div class="wk-hero-status">{{ d.hero.status }}</div>}<div class="wk-hero-cta-wrap"><button class="wk-hero-cta" (click)="call('openDayKey', d.hero.key)">{{ d.hero.cta }}</button></div></div>
+            <div [class]="'wk-hero' + (d.hero.today ? ' is-today' : '')"><div class="wk-hero-pad"><div class="wk-hero-over">{{ d.hero.over }}</div><div class="wk-hero-title">{{ d.hero.title }}</div><div class="wk-hero-tags"><span class="wk-tag wk-time">{{ d.hero.time }}</span>@for (t of d.hero.tags; track $index) {<span class="wk-tag" [attr.style]="t.style">{{ t.label }}</span>}@if (d.hero.travel) {<span class="wk-tag wk-travel" [innerHTML]="travelInner()"></span>}</div></div>@if (d.hero.summary) {<div class="wk-hero-summary" [innerHTML]="html(d.hero.summary)"></div>}@if (d.hero.status) {<div class="wk-hero-status">{{ d.hero.status }}</div>}<div class="wk-hero-cta-wrap"><button class="wk-hero-cta" (click)="call('openDayKey', d.hero.key)">{{ d.hero.cta }}</button></div></div>
           }
         }
         @default {
           <div class="wk-hero"><div class="wk-rest-pad"><div class="wk-rest-title" style="font-size:30px">NO SESSIONS</div><div class="wk-rest-sub">This week has no scheduled training.</div></div></div>
         }
       }
-      @if (d.wildcardTag) {<div style="display:contents" [innerHTML]="html(d.wildcardTag)"></div>}
+      @if (d.wildcard !== null) {<ia-wildcard-tag [sub]="d.wildcard" />}
       <div class="wk-stats"><div class="wk-stat"><div class="wk-stat-num">{{ d.stats.done }}<span class="den">{{ '/' + d.stats.of }}</span></div><div class="wk-stat-lbl">DONE</div></div><div class="wk-stat"><div class="wk-stat-num" style="color:var(--run)">{{ d.stats.miles }}</div><div class="wk-stat-lbl">MILES</div></div><div class="wk-stat"><div class="wk-stat-num" style="color:var(--accent)">{{ d.stats.streak }}</div><div class="wk-stat-lbl">DAY STREAK</div></div></div>
     }
   </div>
@@ -145,6 +148,10 @@ export class WeekView {
     }
     return h;
   }
+  /** The travel tag's backpack and word. */
+  protected travelInner(): SafeHtml {
+    return this.html(this.bridge.call<string>('asyIcon', 'backpack', 11) + '<span>Travel</span>');
+  }
 
   protected call(name: string, ...args: unknown[]): void {
     this.bridge.call(name, ...args);
@@ -188,15 +195,13 @@ export class WeekView {
       dayCode: (day) => b.call('dayCode', day),
       onGold: (hex) => b.call<string>('_onGold', hex),
       wildcardOn: (w, d) => b.call<boolean>('wildcardOn', w, d),
-      wildcardMark: (s) => b.call<string>('wildcardMarkHTML', s),
       statusOf: (w, d) => b.call<string | undefined>('statusOf', w, d),
       heroSummary: (day) => b.call<string>('heroSummary', day),
       sessionTime: (day) => b.call<number>('sessionTimeEst', day),
-      travelTag: (day) => b.call<string>('travelTagHTML', day),
       restTip: () => b.call('restDayTip'),
       restLines: (rl) => b.call<string[]>('restLogLines', rl),
       streak: () => b.call<number>('computeStreak'),
-      wildcardTag: (w, k) => b.call<string>('wildcardTagHTML', w, k),
+      wildcardSub: (w, k) => wildcardSub(b.call('wildcardOn', w, k), (prog && prog.weeks && prog.weeks[w] ? prog.weeks[w]![k as string] : null) as { rest?: unknown; title?: string } | null),
       liveInjury: () => ((b.call<{ patch?: { injury?: { region: string } } } | null>('_liveInjuryOverlay') || {}).patch || {}).injury || null,
       alignment: () => b.call('progAlignment', prog),
       raceDay: (iso) => b.call<string>('_fmtStartDay', iso, true),

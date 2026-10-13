@@ -51,15 +51,14 @@ export interface WeekDeps {
   dayCode(day: WeekDay | undefined): { top: string; topColor: string; bot: string; botColor: string };
   onGold(hex: string): string;
   wildcardOn(week: number, d: string): boolean;
-  wildcardMark(size: number): string;
   statusOf(week: number, d: string): string | undefined;
   heroSummary(day: WeekDay): string;
   sessionTime(day: WeekDay): number;
-  travelTag(day: WeekDay): string;
   restTip(): { label: string; text: string; src: string };
   restLines(rl: DayLog['restLog']): string[];
   streak(): number;
-  wildcardTag(week: number, heroKey: string | null): string;
+  /** The words under WILDCARD DONE for the hero's day (sheet-marks-model's wildcardSub), or null with no Wildcard. */
+  wildcardSub(week: number, heroKey: string | null): string | null;
   liveInjury(): { region: string } | null;
   alignment(): { raceIso: string } | null;
   raceDay(iso: string): string;
@@ -84,14 +83,17 @@ export interface WeekInput {
 /** One cell of the day strip. */
 export type StripCell =
   | { pre: true; label: string; num: string }
-  | { pre: false; key: string; cls: string; label: string; top: string; topColor: string; center: string; bot: string; botColor: string };
+  | { pre: false; key: string; cls: string; label: string; top: string; topColor: string; center: CellCenter; bot: string; botColor: string };
+
+/** A day cell's middle: its date, a check once done, the Wildcard mark, or a cross once skipped. */
+export type CellCenter = { kind: 'num'; text: string } | { kind: 'check' } | { kind: 'wild' } | { kind: 'skip' };
 
 /** The big card under the strip: today's rest, a session today or a week browsed, or none. */
 export type Hero =
   | { kind: 'rest'; key: string; over: string; lines: string[]; logLabel: string; tip: { label: string; text: string; src: string } }
   | {
     kind: 'day'; key: string; today: boolean; over: string; title: string; time: string;
-    tags: { label: string; style: string }[]; travelTag: string; summary: string; status: string; cta: string;
+    tags: { label: string; style: string }[]; travel: boolean; summary: string; status: string; cta: string;
   }
   | { kind: 'none' };
 
@@ -99,7 +101,8 @@ export type Hero =
 export interface DaysView {
   strip: StripCell[];
   hero: Hero;
-  wildcardTag: string;
+  /** The words under WILDCARD DONE, when a Wildcard stands in the hero's day. */
+  wildcard: string | null;
   stats: { done: number; of: number; miles: number; streak: number };
 }
 
@@ -224,10 +227,10 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
     if (d.beforeStart(week, x)) return { pre: true, label: x.toUpperCase(), num: dnum };
     const comp = i.completed[d.completedKey(week, x)];
     const st = comp ? comp.status || 'complete' : null;
-    let center = dnum;
-    if (st === 'complete' || st === 'partial') center = '<span class="chk">✓</span>';
-    else if (d.wildcardOn(week, x)) center = d.wildcardMark(14);
-    else if (st === 'skipped') center = '✕';
+    let center: CellCenter = { kind: 'num', text: dnum };
+    if (st === 'complete' || st === 'partial') center = { kind: 'check' };
+    else if (d.wildcardOn(week, x)) center = { kind: 'wild' };
+    else if (st === 'skipped') center = { kind: 'skip' };
     const dim = !isToday && (isPast || !day || !!day.rest);
     const code = d.dayCode(day);
     return {
@@ -284,7 +287,7 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
         label: TAG_LABEL[t] || t,
         style: 'color:' + (MOD[t] ? MOD[t][0] : '#181712') + ';background:' + (MOD[t] ? MOD[t][1] : 'rgba(24,23,18,0.15)'),
       })),
-      travelTag: d.travelTag(day),
+      travel: !!d.isTravel(day),
       summary: d.heroSummary(day),
       status,
       cta: mode === 'today' && !status ? 'START SESSION' : 'OPEN SESSION',
@@ -309,7 +312,7 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
   view.days = {
     strip,
     hero,
-    wildcardTag: d.wildcardTag(week, heroKey),
+    wildcard: d.wildcardSub(week, heroKey),
     stats: { done, of: trainDays.length, miles: Math.round(miles * 10) / 10, streak: d.streak() },
   };
   return view;

@@ -19,9 +19,9 @@ const deps = (over: Partial<WeekDeps> = {}): WeekDeps => ({
   weekRange: () => null, parseDate: (iso) => new Date(iso + 'T00:00:00'), isTravel: () => false, beforeStart: () => false,
   regionLabel: (r) => ({ knee: 'Knee' })[r], icon: (n, s) => `[${n}/${s}]`,
   dayCode: (day) => (!day || day.rest ? { top: '', topColor: '#5f5f62', bot: 'REST', botColor: '#5f5f62' } : { top: 'RUN', topColor: '#5e8c54', bot: 'PUSH', botColor: '#bc6a43' }),
-  onGold: (hex) => `gold(${hex})`, wildcardOn: () => false, wildcardMark: (s) => `<W${s}>`, statusOf: () => undefined,
-  heroSummary: (day) => `${day.title}<br>summary`, sessionTime: () => 45, travelTag: () => '', restTip: () => ({ label: 'Fuel', text: 'Eat.', src: 'NSW' }),
-  restLines: (rl) => Object.keys(rl || {}).map((t) => `20 min ${t} logged`), streak: () => 3, wildcardTag: (w, k) => `<tag ${w} ${k}>`,
+  onGold: (hex) => `gold(${hex})`, wildcardOn: () => false, statusOf: () => undefined,
+  heroSummary: (day) => `${day.title}<br>summary`, sessionTime: () => 45, restTip: () => ({ label: 'Fuel', text: 'Eat.', src: 'NSW' }),
+  restLines: (rl) => Object.keys(rl || {}).map((t) => `20 min ${t} logged`), streak: () => 3, wildcardSub: (w, k) => `sub ${w} ${k}`,
   liveInjury: () => null, alignment: () => null, raceDay: (iso) => `day(${iso})`, completedKey: (w, d) => `w${w}_${d}`, logKey: (w, d) => `w${w}_${d}`,
   ...over,
 });
@@ -64,8 +64,8 @@ describe('This Week', () => {
     const v = weekView(input({ completed: { w1_mon: { status: 'complete' }, w1_thu: { status: 'skipped' } } }), deps({ wildcardOn: (w, d) => d === 'tue' }));
     const cells = v.days!.strip;
     assert.deepEqual(cells.map((c) => (c.pre ? 'pre' : [c.key, c.cls, c.center])), [
-      ['mon', 'wk-day dim', '<span class="chk">✓</span>'], ['tue', 'wk-day dim', '<W14>'], ['wed', 'wk-day today', '7'],
-      ['thu', 'wk-day', '✕'], ['fri', 'wk-day', '9'], ['sat', 'wk-day', '10'], ['sun', 'wk-day dim', '11'],
+      ['mon', 'wk-day dim', { kind: 'check' }], ['tue', 'wk-day dim', { kind: 'wild' }], ['wed', 'wk-day today', { kind: 'num', text: '7' }],
+      ['thu', 'wk-day', { kind: 'skip' }], ['fri', 'wk-day', { kind: 'num', text: '9' }], ['sat', 'wk-day', { kind: 'num', text: '10' }], ['sun', 'wk-day dim', { kind: 'num', text: '11' }],
     ]);
     const wed = cells[2]!, fri = cells[4]!, mon = cells[0]!;
     assert.ok(!wed.pre && !fri.pre && !mon.pre);
@@ -78,7 +78,7 @@ describe('This Week', () => {
   it('makes today\'s rest day the hero, with its jog lines and the tip', () => {
     const v = weekView(input({ logs: { w1_wed: { restLog: { walk: { mins: 20 } } } } }), deps());
     assert.deepEqual(v.days!.hero, { kind: 'rest', key: 'wed', over: 'Today · Wednesday', lines: ['20 min walk logged'], logLabel: 'Log more', tip: { label: 'Fuel', text: 'Eat.', src: 'NSW' } });
-    assert.equal(v.days!.wildcardTag, '<tag 1 wed>');
+    assert.equal(v.days!.wildcard, 'sub 1 wed');
   });
 
   it('makes today\'s session the hero with START SESSION, and a closed day OPEN SESSION with its status', () => {
@@ -89,6 +89,9 @@ describe('This Week', () => {
     const closed = weekView(input({ today: new Date(2026, 9, 9) }), deps({ statusOf: () => 'complete' })).days!.hero;
     assert.ok(closed.kind === 'day');
     assert.deepEqual([closed.status, closed.cta], ['Done ✓ Closed out. Open the session to undo.', 'OPEN SESSION']);
+    assert.equal(h.travel, false);
+    const away = weekView(input({ today: new Date(2026, 9, 9) }), deps({ isTravel: (day) => !!day && day.title === 'Push' })).days!.hero;
+    assert.ok(away.kind === 'day' && away.travel, 'a travel day carries the travel tag');
   });
 
   it('browses another week from its first training day, with its tags and where it moved from', () => {
