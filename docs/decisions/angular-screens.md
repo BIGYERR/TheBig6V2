@@ -535,3 +535,24 @@ what is stored.
   draft and the pixels after each. The e2e finds the sport, the goal and each field by its words now, not by its
   legacy handler; 69/69 at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.35 moves the session sheet's log
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.35.
+- **Moved:** the legacy `buildLogHTML`: `day-detail/session-log.ts` and `session-log-model.ts` (the RPE slider and its
+  words, the day's cardio with the sport the log holds, the "different activity" picker with its sport chips and swap
+  note, its Log button, and the notes, written into the box as markup as before). The read sequence is the legacy
+  one: the dose is set in full for the planned sport and to none for a swapped one before the fields are drawn, so the
+  derived readouts read what they read before. The cardio fields (the dose form and the wheels) stay the legacy
+  `cardioFieldHTML`'s markup; `updateRPEDisplay`, `toggleCardioPicker`, `setCardioSwap`, `cardioLive` and `logCardio`
+  stay legacy and still change the section in place, so it keeps the legacy ids and data attributes and is drawn
+  afresh on every open.
+- **Tests:** `tests/integration/session-sheet.test.ts` gains 11 cases: the booted app's own `buildLogHTML` against the
+  log drawn from the model through the same helpers, byte for byte, with the dose it leaves set (a lifting day blank
+  and logged with notes written as markup, a recovery run, a long run logged, intervals with no dose, race day, a run
+  logged as a ride with the run's numbers parked, a run logged as a swim, a ride, a swim, another sport), each also
+  stating by hand whether a cardio block shows and reads as logged. `frontends/app/test/unit/session-log.test.ts` (5).
+  A local comparison opened 9 days in both builds and ran 13 interactions (the slider, the picker and every chip, a
+  swap back with its parked numbers, Log on an empty and a full card, typing notes, the RPE card), matching the
+  section's markup, the stored logs, the dose, the slider's touched mark, the open sheets, the toast and the pixels.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

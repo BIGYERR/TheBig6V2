@@ -6,8 +6,9 @@ import { describe, it } from 'node:test';
 import { type BodyBlock, detailBody, e1rmCard, epley, hasLogged, liftsFirst, loggedCount, logNudge, rangeNudge, statusFoot } from '../../src/app/screens/day-detail/day-detail-model.ts';
 
 const CARD = { blockCls: 'run-block', labelCls: 'cardio-label-run', label: 'Run', segments: null, total: null, detail: '3 mi', note: null, bench: '' };
-const P = { main: '<M>', e1rm: null, rest: '<R>', cardio: CARD, note: undefined, nudge: null, wildcardTag: '', log: '<LOG>', logNudge: '' };
-/** A block as a line: markup as itself, the calculator and the nudge by name. */
+const LOG = { view: { rpeValue: '5', rpeText: 'Move slider', cardio: null, notes: '' }, fields: '' };
+const P = { main: '<M>', e1rm: null, rest: '<R>', cardio: CARD, note: undefined, nudge: null, wildcardTag: '', log: LOG, logNudge: '' };
+/** A block as a line: markup as itself, the other blocks by name. */
 const line = (b: BodyBlock) => (b.kind === 'html' ? b.html : b.kind);
 
 describe('the session sheet', () => {
@@ -19,13 +20,13 @@ describe('the session sheet', () => {
   });
 
   it('orders the body: the Wildcard tag, the range nudge, the work (the calculator after the main), the note, the log, the log nudge', () => {
-    assert.deepEqual(detailBody(P, true, true).map(line), ['<M>', '<R>', 'cardio', '<LOG>']);
-    assert.deepEqual(detailBody(P, false, true).map(line), ['cardio', '<M>', '<R>', '<LOG>']);
-    assert.deepEqual(detailBody({ ...P, main: 'unused' }, false, false).map(line), ['cardio', '<LOG>'], 'a day with no sections is its cardio');
+    assert.deepEqual(detailBody(P, true, true).map(line), ['<M>', '<R>', 'cardio', 'log']);
+    assert.deepEqual(detailBody(P, false, true).map(line), ['cardio', '<M>', '<R>', 'log']);
+    assert.deepEqual(detailBody({ ...P, main: 'unused' }, false, false).map(line), ['cardio', 'log'], 'a day with no sections is its cardio');
     const card = { lift: 'bench', liftLabel: 'bench', unit: 'lbs', weight: '', reps: 3 };
     const all = detailBody({ ...P, e1rm: card, note: 'Easy <b>day</b>', nudge: { shown: ['Row'], extra: '' }, wildcardTag: '<W>', logNudge: '<N>' }, true, true);
-    assert.deepEqual(all.map(line), ['<W>', 'nudge', '<M>', 'e1rm', '<R>', 'cardio', '<div class="note-block">Easy <b>day</b></div>', '<LOG>', '<N>']);
-    assert.deepEqual(detailBody({ ...P, cardio: null, rest: '' }, true, true).map(line), ['<M>', '<LOG>'], 'a builder with nothing adds no block');
+    assert.deepEqual(all.map(line), ['<W>', 'nudge', '<M>', 'e1rm', '<R>', 'cardio', '<div class="note-block">Easy <b>day</b></div>', 'log', '<N>']);
+    assert.deepEqual(detailBody({ ...P, cardio: null, rest: '' }, true, true).map(line), ['<M>', 'log'], 'a builder with nothing adds no block');
   });
 
   it('estimates a test max by Epley, a single being itself', () => {

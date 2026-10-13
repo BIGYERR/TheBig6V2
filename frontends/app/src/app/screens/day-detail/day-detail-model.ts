@@ -1,7 +1,8 @@
 // A day's session sheet, kept apart from Angular so the app's node --test suite reads it as it is (architecture phase
-// E, step 20: the sheet moves from the legacy openDetail to the DayDetail component). The body's pieces are still the
-// legacy builders' markup; this decides their order and the header's words, as the legacy openDetail did.
+// E, step 20: the sheet moves from the legacy openDetail to the DayDetail component). Some of the body's pieces are still
+// the legacy builders' markup; this decides their order and the header's words, as the legacy openDetail did.
 import type { CardioCardView } from './cardio-card-model.ts';
+import type { SessionLogData } from './session-log-model.ts';
 
 /** The test-lift 1RM calculator's starting state: the lift, its name, the unit, and the logged test set if any. */
 export interface E1rmCard {
@@ -30,17 +31,18 @@ export interface BodyParts {
   note: string | undefined;
   nudge: RangeNudge | null;
   wildcardTag: string;
-  log: string;
+  log: SessionLogData;
   /** The "logged but never marked" nudge, when the day has a log and no status. */
   logNudge: string;
 }
 
-/** One block of the body: a legacy builder's markup, the 1RM calculator, or the range-top nudge. */
+/** One block of the body: a legacy builder's markup, the 1RM calculator, the range-top nudge, the cardio card or the log. */
 export type BodyBlock =
   | { kind: 'html'; html: string }
   | { kind: 'e1rm'; card: E1rmCard }
   | { kind: 'nudge'; nudge: RangeNudge }
-  | { kind: 'cardio'; card: CardioCardView };
+  | { kind: 'cardio'; card: CardioCardView }
+  | { kind: 'log'; log: SessionLogData };
 
 /**
  * Lifting first only when lifting is the priority: on an event program or a support focus the cardio is the point of
@@ -59,7 +61,7 @@ export function detailBody(p: BodyParts, first: boolean, hasSections: boolean): 
   if (p.note) blocks.push(...html('<div class="note-block">' + p.note + '</div>'));
   if (p.nudge) blocks.unshift({ kind: 'nudge', nudge: p.nudge });
   if (p.wildcardTag) blocks.unshift(...html(p.wildcardTag));
-  return [...blocks, ...html(p.log), ...html(p.logNudge)];
+  return [...blocks, { kind: 'log', log: p.log }, ...html(p.logNudge)];
 }
 
 /** The legacy _epley: a single is itself; otherwise weight × (1 + reps/30), rounded; nothing without a weight. */

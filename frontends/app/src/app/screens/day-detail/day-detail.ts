@@ -5,6 +5,8 @@ import { type BodyBlock, detailBody, e1rmCard, type FootButton, hasLogged, lifts
 import { E1rmCard } from './e1rm-card';
 import { CardioCard } from './cardio-card';
 import { cardioCard, type CardioRx } from './cardio-card-model';
+import { SessionLog } from './session-log';
+import { type LogEntry, sessionLog, type SessionLogData } from './session-log-model';
 
 /** A scheduled day, as far as the sheet reads it. */
 interface DetailDay {
@@ -34,8 +36,9 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
  * (a skip, a swap, an add, a KB size, the nudge) reaches it. The header (the week and day, the title, the tags, the
  * logged count, Back, RPE and the add button) and the frame are the component's, drawn anew on each call as the legacy
  * writes did. The body is a list of blocks: the legacy builders' markup (the sections and their set logging, the note,
- * the log nudge, the session log), each laid in a box that makes none of its own, the test-week 1RM calculator
- * (E1rmCard) and the range-top nudge since step 24, and the cardio card (CardioCard) since step 25. The foot (Done and Skip, each undoing itself) is the
+ * the log nudge), each laid in a box that makes none of its own, the test-week 1RM calculator (E1rmCard) and the
+ * range-top nudge since step 24, the cardio card (CardioCard) since step 25, and the session log (SessionLog) since
+ * step 27. The foot (Done and Skip, each undoing itself) is the
  * component's since step 23: it takes over renderStatusFoot, which the legacy handleDayStatus calls on every status
  * change. After each draw the legacy wiring runs as before: the log fields save as they change, the wheels start, the derived dose
  * paints. A re-render keeps the reader where they were; a fresh open starts at the top.
@@ -43,7 +46,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
 @Component({
   selector: 'ia-day-detail',
   host: { style: 'display: contents' },
-  imports: [CardioCard, E1rmCard],
+  imports: [CardioCard, E1rmCard, SessionLog],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @for (v of views(); track v) {
@@ -68,6 +71,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
           @case ('html') { <div style="display:contents" [innerHTML]="blk.html"></div> }
           @case ('e1rm') { <ia-e1rm-card [card]="blk.card" /> }
           @case ('cardio') { <ia-cardio-card [card]="blk.card" /> }
+          @case ('log') { <ia-session-log [log]="blk.log" /> }
           @case ('nudge') { <div class="prog-nudge"><b>Time to add weight.</b>{{ ' Last session you hit the top of the range on every set of ' }}@for (n of blk.nudge.shown; track $index; let last = $last) {<b>{{ n }}</b>@if (!last) {{{ ' and ' }}}}{{ blk.nudge.extra + '. Go up in weight today and start back at the bottom of the range.' }}</div> }
         }
       }
@@ -115,6 +119,23 @@ export class DayDetail {
     this.bridge.call(name, ...args);
   }
 
+  /** The legacy buildLogHTML's reads: the day's entry, then the log drawn from it through the legacy helpers. */
+  private log(dayKey: string, cardio: { type?: string; subtype?: string } | undefined): SessionLogData {
+    const b = this.bridge;
+    const entry = b.call<Record<string, LogEntry | undefined>>('getLogs')[b.call<string>('logKey', b.global<number>('currentWeek'), dayKey)] || {};
+    return sessionLog(entry, cardio, {
+      rpeLabels: b.global<Record<number, string>>('RPE_LABELS'),
+      dose: (c) => b.call('doseFromCardio', c),
+      setDoseFull: (d) => b.call('_setCurLogDoseFull', d),
+      setSub: (s) => b.call('_setCurLogSub', s),
+      setDose: (d) => b.call('_setCurLogDose', d),
+      fields: (sport, e, dose, sub) => b.call<string>('cardioFieldHTML', sport, e, dose, sub),
+      live: (e, sport) => b.call<boolean>('cardioEntryLive', e, sport),
+      noteText: (active, planned, e) => b.call<string>('cardioSwapNoteText', active, planned, e),
+      logLabel: (live) => b.call<string>('cardioLogLabel', live),
+    });
+  }
+
   /** The legacy openDetail: the sheet drawn anew, the legacy wiring run on it, then shown where the reader was. */
   private open(dayKey: string, day: DetailDay): void {
     const b = this.bridge;
@@ -151,7 +172,7 @@ export class DayDetail {
       note: day.note,
       nudge: this.safeRead(() => rangeNudge(items, lastOf), null),
       wildcardTag: b.call<string>('wildcardTagHTML', week, dayKey),
-      log: b.call<string>('buildLogHTML', dayKey, day.cardio),
+      log: this.log(dayKey, day.cardio as { type?: string; subtype?: string } | undefined),
       logNudge: !status && hasLogged(le) ? logNudge(dayKey, day.title, b.call<string>('asyIcon', 'notebook', 14)) : '',
     }, liftsFirst(secs.length > 0, prog?.primaryPath, prog?.liftingFocus), secs.length > 0);
     this.view.set({
