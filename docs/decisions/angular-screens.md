@@ -672,3 +672,25 @@ what is stored.
   and went, and the reference page against itself shows the same pixel, so it is the browser's. 69/69 at 0 px on both
   builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.41 makes the page's skeleton the Angular shell's
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.41.
+- **Moved:** the page's skeleton. `LegacyHost`'s template draws the page's top-level elements (the update banner, the
+  four screens, the session sheet, the swap and add sheets, the swap nudge, the RPE card, Random Workout, the rest
+  sheet, the change, goal, mile and mile-lock sheets, the toast, the rest timer, Progress, the bug report, the tab bar,
+  the pop-up and its confetti), in the page's order with the page's classes, ids and the three taps the page puts on
+  them, and each one's component inside it. `MOVED_SCREENS` and the mount that replaced the legacy markup are gone.
+- **The boot order:** the shell draws the skeleton, writes the rest sheet's markup into its element (still the page's;
+  it moves with v0.240.0), runs the legacy script without its last line (`scripts/sync-legacy.mjs` drops the page's
+  boot line from the Angular build's copy, and fails unless it is the script's one last line), draws every component
+  (each takes over its legacy functions), then calls the legacy `init()`. The boot now draws once, onto the
+  components, as the single-file page draws onto its own markup; This Week's and the tab bar's `mounted()` hooks, which
+  redrew what the boot had drawn onto legacy markup, are gone.
+- **Tests:** `frontends/app/test/integration/app-shell.test.ts` (new, 2): the shell's top-level elements against the
+  page's, read off the built page and the template, tag, classes, id and tap in order, and the three container taps.
+  `frontends/app/test/unit/sync-legacy.test.ts` gains the boot line's and the rest sheet's checks (the script loses
+  exactly its last line; a missing, doubled or misplaced boot line and a missing, doubled or open rest sheet fail
+  loudly). A local boot of both builds, empty and with a program, drew the same screens with no page error. 69/69 at 0
+  px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

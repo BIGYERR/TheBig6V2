@@ -9,8 +9,11 @@
 // re-derives four pieces from it, byte for byte:
 //   head    every <meta>, <link> and <title> (ia-version included, so the update check reads the same version)
 //   style   the one <style> block                         -> src/legacy/generated/legacy.css
-//   markup  the body markup before and after the script   -> src/legacy/generated/legacy-markup.ts
-//   script  the one inline <script>                        -> public/legacy/app.js
+//   markup  the rest sheet's markup, the one legacy markup -> src/legacy/generated/legacy-markup.ts
+//           the Angular shell does not draw (the page's whole body markup stays in split()'s result)
+//   script  the one inline <script>, but its last line     -> public/legacy/app.js
+// The script's last line boots the page (init() once the document has loaded); the Angular shell calls init() itself,
+// once its components are in place (src/app/legacy/legacy-host.ts), so the copy it loads ends one line earlier.
 // The split follows the HTML parser's own rule: a script ends at the first "</script>". Each piece is asserted to
 // occur exactly once; anything else fails loudly rather than producing a quietly different app.
 // split() and render() are exported for test/; nothing is read or written unless this file is run as a script.
@@ -72,6 +75,33 @@ export function split(html) {
   return { headRest, css, js, markup: before + after, version };
 }
 
+/** The page's own boot, the script's last line. */
+export const BOOT_LINE = "if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}";
+/** The open tag of the one legacy overlay whose markup the Angular shell still takes from the page. */
+export const REST_OVERLAY_OPEN = '<div class="rand-overlay" id="restOverlay">';
+
+/** The script without its boot line, which must be its last line and occur once. */
+export function withoutBoot(js) {
+  if (countOf(js, BOOT_LINE) !== 1) fail(`the script's boot line occurs ${countOf(js, BOOT_LINE)} times (want 1)`);
+  const at = js.lastIndexOf(BOOT_LINE);
+  if (js.slice(at + BOOT_LINE.length).trim() !== '') fail("the boot line is not the script's last line");
+  return js.slice(0, at) + js.slice(at + BOOT_LINE.length);
+}
+
+/** The markup between an element's open tag (which must occur once) and its matching close, divs counted. */
+export function innerOf(markup, open) {
+  if (countOf(markup, open) !== 1) fail(`${open} occurs ${countOf(markup, open)} times in the body markup (want 1)`);
+  const start = markup.indexOf(open) + open.length;
+  let depth = 1;
+  const tag = /<(\/?)div\b[^>]*>/g;
+  tag.lastIndex = start;
+  for (let m = tag.exec(markup); m; m = tag.exec(markup)) {
+    depth += m[1] ? -1 : 1;
+    if (depth === 0) return markup.slice(start, m.index);
+  }
+  fail(`${open} never closes`);
+}
+
 export function render(src) {
   const parts = split(src);
   const sha256 = createHash('sha256').update(src).digest('hex');
@@ -87,14 +117,14 @@ export function render(src) {
     `export const LEGACY_VERSION = ${JSON.stringify(parts.version)};\n` +
     `export const LEGACY_SHA256 = ${JSON.stringify(sha256)};\n` +
     `export const LEGACY_SCRIPT_URL = ${JSON.stringify(`legacy/app.js?v=${parts.version}-${sha256.slice(0, 12)}`)};\n` +
-    `export const LEGACY_MARKUP = ${JSON.stringify(parts.markup)};\n`;
+    `export const LEGACY_REST_OVERLAY = ${JSON.stringify(innerOf(parts.markup, REST_OVERLAY_OPEN))};\n`;
 
   return {
     [join(GEN, 'index.html')]: indexHtml,
     [join(GEN, 'legacy.css')]: `/* ${banner} */\n` + parts.css,
     [join(GEN, 'legacy-markup.ts')]: markupTs,
     [join(GEN, 'legacy-manifest.json')]: JSON.stringify({ version: parts.version, sha256 }, null, 2) + '\n',
-    [join(PUB, 'legacy', 'app.js')]: parts.js,
+    [join(PUB, 'legacy', 'app.js')]: withoutBoot(parts.js),
   };
 }
 

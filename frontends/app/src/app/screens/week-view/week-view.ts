@@ -127,18 +127,6 @@ export class WeekView {
     this.bridge.provide('renderWeekView', () => this.render());
   }
 
-  /**
-   * Called by the host once the screen is attached. The legacy boot drew This Week before the mount replaced it, and
-   * started the strip's one-time scoot on the strip the mount removed: that scoot is stopped, and this first draw takes
-   * its place, scoot included.
-   */
-  mounted(): void {
-    if (!this.bridge.global('activeProg')) return;
-    this.bridge.call('_wkScootCancel');
-    this.bridge.set('_wkScootDone', false);
-    this.render();
-  }
-
   /** Markup from the legacy helpers, made ready for the page once per string. */
   protected html(s: string): SafeHtml {
     let h = this.safe.get(s);

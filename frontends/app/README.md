@@ -79,17 +79,22 @@ for byte, and checks that each one occurs exactly once:
 |---|---|---|
 | `<head>` metas, links, title (`ia-version` included) | `src/legacy/generated/index.html` | Angular's index page |
 | the one `<style>` block | `src/legacy/generated/legacy.css` | global stylesheet |
-| body markup before and after the script | `src/legacy/generated/legacy-markup.ts` | mounted by `LegacyHost` |
-| the one inline `<script>` | `public/legacy/app.js` | loaded by `LegacyHost` as a classic script |
+| the rest sheet's markup (the one legacy markup the shell does not draw) | `src/legacy/generated/legacy-markup.ts` | written into `#restOverlay` by `LegacyHost` |
+| the one inline `<script>`, but its last line (the page's boot) | `public/legacy/app.js` | loaded by `LegacyHost` as a classic script |
 
-The generated `app.js` is byte-identical to what `tests/harness.js` extracts and the tests boot.
+The generated `app.js` is byte-identical to what `tests/harness.js` extracts and the tests boot, but for its last line,
+`if(document.readyState==='loading'){...}else{init();}`, which `LegacyHost` runs itself (v0.239.41).
 
-At runtime, `ia-root` renders `ia-legacy-host` (`src/app/legacy/legacy-host.ts`), which:
-1. waits for Cordova's `deviceready` inside the native app (`src/app/core/platform.ts`; a browser skips this);
-2. writes the markup into its host element (not through `[innerHTML]`, so the inline `onclick` handlers survive);
-3. loads `legacy/app.js` as a classic script, so its top-level functions stay globals for those handlers;
-4. puts each screen phase E has moved (`src/app/screens/screens.ts`, `MOVED_SCREENS`) inside its legacy screen element,
-   in place of the legacy content; the legacy navigation still shows and hides the element.
+At runtime, `ia-root` renders `ia-legacy-host` (`src/app/legacy/legacy-host.ts`), which (since v0.239.41):
+1. draws the page's skeleton (its screens, sheets, toast, rest timer, tab bar and pop-up, in the page's order, with the
+   page's classes, ids and taps; `test/integration/app-shell.test.ts` holds it to the page);
+2. waits for Cordova's `deviceready` inside the native app (`src/app/core/platform.ts`; a browser skips this);
+3. writes the rest sheet's markup into `#restOverlay` (not through `[innerHTML]`, so its inline `onclick` handlers
+   survive);
+4. loads `legacy/app.js` as a classic script, so its top-level functions stay globals for those handlers and for
+   `LegacyBridge`;
+5. draws every screen's component in its element, each taking over the legacy functions it replaces;
+6. runs the legacy `init()`, which draws the boot onto the components, as the page draws it onto its own markup.
 
 `LegacyBridge` (`src/app/legacy/legacy-bridge.ts`) is the seam for moving screens into native Angular components one
 at a time. It gives typed access to the legacy globals (`call` for a function, `global` for a top-level `let` or

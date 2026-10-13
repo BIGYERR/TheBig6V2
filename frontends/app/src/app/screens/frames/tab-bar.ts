@@ -4,7 +4,7 @@ import { LegacyBridge } from '../../legacy/legacy-bridge';
 /**
  * The tab bar's buttons (architecture phase E, step 21), in place of the legacy buttons inside #tabBar. Each still goes
  * through the legacy tabGo; showing the bar and marking the active tab are still the legacy updateTabBar's, on the
- * buttons' ids, run once more at the mount for the screen the boot showed.
+ * buttons' ids (the boot runs once the bar is drawn, since step 33).
  */
 @Component({
   selector: 'ia-tab-bar',
@@ -22,11 +22,5 @@ export class TabBar {
 
   protected call(name: string, ...args: unknown[]): void {
     this.bridge.call(name, ...args);
-  }
-
-  /** Called by the host once the bar is attached: the legacy boot marked the active tab on the buttons the mount removed. */
-  mounted(): void {
-    const current = this.bridge.global<string | null>('_curScreen');
-    if (current) this.bridge.call('updateTabBar', current);
   }
 }

@@ -354,8 +354,9 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
 - Through `LegacyBridge`, each screen becomes a component (`.ts`, `.html`, `.css`) using `@ia/core` services, and its
   string-built HTML and inline handlers disappear.
 - **How (v0.239.8):** the Angular app keeps hosting the legacy app whole and, once it has booted, puts each moved
-  screen's component inside that screen's element (`src/app/screens/screens.ts`, `MOVED_SCREENS`); the legacy
-  navigation still shows and hides it. The single-file page keeps the legacy screen until Pages serves the Angular build,
+  screen's component inside that screen's element (`src/app/screens/screens.ts`, `MOVED_SCREENS`, until v0.239.41,
+  when the shell's template took over the page's skeleton and the legacy `init()` began to run after the components);
+  the legacy navigation still shows and hides it. The single-file page keeps the legacy screen until Pages serves the Angular build,
   and the e2e's parity holds the two the same. The markup moves as it is first; the logic moves apart from Angular
   (`<screen>-model.ts`) and is tested by node --test.
 - **Done:** the bug report (v0.239.8), the rest timer (v0.239.9, the first a component whose legacy callers it takes
@@ -365,7 +366,11 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   (v0.239.21), its run charts (v0.239.22), its Lift Ledger (v0.239.23), its program chips (v0.239.24): the whole Progress screen
   is Angular components over the legacy data readers; This Week (v0.239.25); the wizard's shell and first three steps (v0.239.26), its lifting focus, days and name steps (v0.239.27); the session sheet's frame and header (v0.239.28, its body still
   the legacy builders'); the app's frames: Programs, generating, Progress, the tab bar (v0.239.29); the goal, mile lock and injury/travel
-  sheets' frames (v0.239.30); the session sheet's status foot (v0.239.31); its 1RM calculator and range-top nudge (v0.239.32); its cardio card (v0.239.33); the wizard's cardio goal step (v0.239.34): the whole wizard is Angular; the session sheet's log (v0.239.35); its sections and exercise cards, also drawn in Random Workout (v0.239.36): every screen and sheet is Angular, over the legacy logic and handlers; a program card's detail (v0.239.37); the session sheet's tags, Wildcard tag, note, log nudge and retest strip (v0.239.38); This Week's marks and the wizard's seed banner, advisories and start pips (v0.239.39); the session log's cardio fields and wheels, with the sport picker's swap (v0.239.40): no legacy markup builder draws inside a screen any more.
+  sheets' frames (v0.239.30); the session sheet's status foot (v0.239.31); its 1RM calculator and range-top nudge (v0.239.32); its cardio card (v0.239.33); the wizard's cardio goal step (v0.239.34): the whole wizard is Angular; the session sheet's log (v0.239.35); its sections and exercise cards, also drawn in Random Workout (v0.239.36): every screen and sheet is Angular, over the legacy logic and handlers; a program card's detail (v0.239.37); the session sheet's tags, Wildcard tag, note, log nudge and retest strip (v0.239.38); This Week's marks and the wizard's seed banner, advisories and start pips (v0.239.39); the session log's cardio fields and wheels, with the sport picker's swap (v0.239.40): no legacy markup builder draws inside a screen any more; the page's skeleton is the shell's template, and the legacy boot runs after the components (v0.239.41).
+- **Left for phase E's "done when":** the rest sheet (its own build, v0.240.0); then the legacy logic itself, which still
+  runs as the page's classic script under `LegacyBridge` (280 legacy names used, 227 of them functions called, and 29 functions taken over, counted at v0.239.41): it moves into TypeScript
+  modules the components import, by the phase D method (types first, the same tokens proved by `tools/same-script.mjs`),
+  then the bridge's calls become imports and the takeovers become the modules' own seams, file by file.
 - Suggested order:
   1. bug report (small, proves the pattern);
   2. rest timer;

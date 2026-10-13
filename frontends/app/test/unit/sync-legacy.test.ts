@@ -1,9 +1,13 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { describe, it } from 'node:test';
-import { render, split } from '../../scripts/sync-legacy.mjs';
+import { BOOT_LINE, innerOf, render, split, withoutBoot } from '../../scripts/sync-legacy.mjs';
 
-/** The smallest page with every piece the split expects. The script holds a "</div>" to prove only "</script>" ends it. */
+/**
+ * The smallest page with every piece the split expects: a rest sheet whose markup the Angular shell takes (nested, to
+ * prove its divs are counted) and a script ending on the page's boot line. The script holds a "</div>" to prove only
+ * "</script>" ends it.
+ */
 const PAGE = `<!doctype html>
 <html lang="en">
 <head>
@@ -14,7 +18,9 @@ const PAGE = `<!doctype html>
 </head>
 <body>
 <div id="a" onclick="go()">A</div>
-<script>function go(){ return '</div>'; }</script>
+<div class="rand-overlay" id="restOverlay"><div class="x"><div>in</div></div><span onclick="r()">s</span></div>
+<script>function go(){ return '</div>'; }
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}</script>
 <div id="b">B</div>
 </body>
 </html>
@@ -30,7 +36,7 @@ describe('sync-legacy split', () => {
 
   it('takes the style, the script and the version out whole', () => {
     assert.equal(parts.css, 'body{color:red}');
-    assert.equal(parts.js, "function go(){ return '</div>'; }");
+    assert.equal(parts.js, "function go(){ return '</div>'; }\n" + BOOT_LINE);
     assert.equal(parts.version, '7');
   });
 
@@ -39,7 +45,7 @@ describe('sync-legacy split', () => {
   });
 
   it('keeps the body markup from both sides of the script, in order', () => {
-    assert.equal(parts.markup, '\n<div id="a" onclick="go()">A</div>\n\n<div id="b">B</div>\n');
+    assert.equal(parts.markup, '\n<div id="a" onclick="go()">A</div>\n<div class="rand-overlay" id="restOverlay"><div class="x"><div>in</div></div><span onclick="r()">s</span></div>\n\n<div id="b">B</div>\n');
   });
 
   it('keeps every other head tag and drops the style block from it', () => {
@@ -77,8 +83,25 @@ describe('sync-legacy render', () => {
     assert.equal(Object.keys(files).length, 5);
   });
 
-  it('passes the script through byte for byte', () => {
-    assert.equal(byName('/public/legacy/app.js'), "function go(){ return '</div>'; }");
+  it('passes the script through byte for byte but its boot line, which the Angular shell runs itself', () => {
+    assert.equal(byName('/public/legacy/app.js'), "function go(){ return '</div>'; }\n");
+  });
+
+  it('takes the rest sheet\'s markup, its nested divs counted, as the one legacy markup the shell writes in', () => {
+    assert.ok(byName('/legacy-markup.ts').includes('export const LEGACY_REST_OVERLAY = "<div class=\\"x\\"><div>in</div></div><span onclick=\\"r()\\">s</span>";'));
+    assert.ok(!byName('/legacy-markup.ts').includes('LEGACY_MARKUP'));
+  });
+
+  it('refuses a script whose boot line is missing, doubled or not last, and a rest sheet that is missing, doubled or open', () => {
+    assert.throws(() => withoutBoot('init();'), /boot line occurs 0 times/);
+    assert.throws(() => withoutBoot(BOOT_LINE + BOOT_LINE), /boot line occurs 2 times/);
+    assert.throws(() => withoutBoot(BOOT_LINE + '\nmore();'), /not the script's last line/);
+    assert.equal(withoutBoot('a();\n' + BOOT_LINE + '\n'), 'a();\n\n');
+    const open = '<div id="r">';
+    assert.throws(() => innerOf('<p></p>', open), /occurs 0 times/);
+    assert.throws(() => innerOf(open + '</div>' + open + '</div>', open), /occurs 2 times/);
+    assert.throws(() => innerOf(open + '<div>', open), /never closes/);
+    assert.equal(innerOf('x' + open + '<div><div></div></div>y</div>z', open), '<div><div></div></div>y');
   });
 
   it('stamps the version and the source sha256 on the markup module and the manifest', () => {
