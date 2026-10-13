@@ -1,5 +1,5 @@
 // The rest timer's logic (src/app/screens/rest-timer/rest-timer-model.ts, architecture phase E step 2), against the
-// legacy rest-timer.js it replaces. Expected values are typed here from the legacy code's arithmetic, never asked of the
+// legacy rest-timer.ts it replaces. Expected values are typed here from the legacy code's arithmetic, never asked of the
 // model: the stopwatch on a clock the test drives, the m:ss readout, the docking styles, the drag box and the Live
 // Activity calls.
 import assert from 'node:assert/strict';

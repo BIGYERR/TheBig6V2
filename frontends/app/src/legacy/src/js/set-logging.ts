@@ -1,5 +1,5 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { esc, getDayHist, getExWeightsFor, getLogs, getPrograms, readSetDraft, writeSetDraft } from './storage.js';
+import { esc, getDayHist, getExWeightsFor, getLogs, getPrograms, readSetDraft, writeSetDraft } from './storage.ts';
 import {
   _setStaleWarnShown, _setStaleWarnSrc, _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, currentDayKey,
   currentWeek,
@@ -8,10 +8,10 @@ import { exStoreKey, foldExAliasKeys } from '../../../../../../core/src/engine/e
 import { isRepExercise, isTimeExercise, isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
 import { _auxFamily, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
-import { _stripLeadingSets, parseRx, rxSuffix } from './week-view-sections.js';
-import { entryDay, getExWeights, isKBExercise } from './log-entries.js';
-import { saveExWeight } from './day-detail.js';
-import { swapOriginOf } from './swap-sheet.js';
+import { _stripLeadingSets, parseRx, rxSuffix } from './week-view-sections.ts';
+import { entryDay, getExWeights, isKBExercise } from './log-entries.ts';
+import { saveExWeight } from './day-detail.ts';
+import { swapOriginOf } from './swap-sheet.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // Human recency for the reuse pill — never program-week numbers.
 // V168 D6 — its own constant. SEED_WINDOW_DAYS happens to share the number today;
@@ -20,7 +20,7 @@ const STALE_LOAD_DAYS=21;
 // ONE days computation, ONE bucket table. recencyLabel renders two strings off it:
 // 'ago' (the pill sub-label, unchanged) and 'age' (the D7 sentence). Split into two
 // functions they would drift, and the gate asserts they cannot disagree on a bucket.
-function recencyBucket(ts){
+function recencyBucket(ts: any){
   if(!ts) return {i:-1,days:null};
   const days=Math.floor((Date.now()-ts)/86400000);
   let i;
@@ -33,7 +33,7 @@ function recencyBucket(ts){
   else i=6;
   return {i:i,days:days};
 }
-function recencyLabel(ts,form){
+function recencyLabel(ts: any,form: any){
   const b=recencyBucket(ts), d=b.days;
   if(b.i<0) return form==='age'?'from an earlier block':'last time';
   if(form==='age'){
@@ -41,19 +41,23 @@ function recencyLabel(ts,form){
     if(b.i===1) return 'from yesterday';
     if(b.i===2) return 'about '+d+' days old';
     if(b.i===3) return 'about a week old';
+    // @ts-expect-error TS18047 'd' is possibly 'null'.
     if(b.i===4) return 'about '+Math.floor(d/7)+' weeks old';
     if(b.i===5) return 'about a month old';
+    // @ts-expect-error TS18047 'd' is possibly 'null'.
     return 'about '+Math.floor(d/30)+' months old';
   }
   if(b.i===0) return 'earlier today';
   if(b.i===1) return 'yesterday';
   if(b.i===2) return d+' days ago';
   if(b.i===3) return 'last week';
+  // @ts-expect-error TS18047 'd' is possibly 'null'.
   if(b.i===4) return Math.floor(d/7)+' weeks ago';
   if(b.i===5) return 'last month';
+  // @ts-expect-error TS18047 'd' is possibly 'null'.
   return Math.floor(d/30)+' months ago';
 }
-function isStaleTs(ts){
+function isStaleTs(ts: any){
   const b=recencyBucket(ts);
   return b.days!=null && b.days>STALE_LOAD_DAYS;
 }
@@ -65,9 +69,9 @@ function isStaleTs(ts){
 //     because the seed averages >=3 runs.
 // D5: aliases are folded on a CLONE. foldExAliasKeys mutates, and the log screen must
 //     never become a second writer into a foreign program's store.
-function crossProgLastEntry(exKey){
-  let best=null,bestName='';
-  getPrograms().forEach(function(p){
+function crossProgLastEntry(exKey: any){
+  let best: any=null,bestName='';
+  getPrograms().forEach(function(p: any){
     if(!p||!p.id||p.id===activeProgId) return;
     let store=null;
     try{ store=JSON.parse(JSON.stringify(getExWeightsFor(p.id)||{})); }catch(e){ return; }
@@ -75,7 +79,7 @@ function crossProgLastEntry(exKey){
     try{ foldExAliasKeys(store); }catch(e){}
     const row=store[exKey];
     if(!row) return;
-    (row.entries||[]).forEach(function(e){
+    (row.entries||[]).forEach(function(e: any){
       if(!(+e.weight>0)) return;
       if(!best||(+e.ts||0)>(+best.ts||0)){ best=e; bestName=p.name||''; }
     });
@@ -84,7 +88,7 @@ function crossProgLastEntry(exKey){
 }
 // Same predicate buildExItem uses to decide a row is loggable — shared so the
 // This Week completion counter (sessionLogProgress) stays in sync.
-function exLoggable(name,detail){
+function exLoggable(name: any,detail: any){
   if(parseRx(detail,name)) return true;
   if(isKBExercise(name)) return true;
   if(isTrackableWeight(name)) return true;
@@ -94,52 +98,58 @@ function exLoggable(name,detail){
 // Raw cell contents, '' for untouched. Deliberately NOT setRepVals/setWeightVals —
 // those resolve an empty cell to its placeholder, which is exactly the inference a
 // draft must not make.
-function rawSetVals(prefix,exKey){
+function rawSetVals(prefix: any,exKey: any){
   const out=[];
   for(let s=0;;s++){
     const el=document.getElementById(prefix+exKey+'_'+s);
     if(!el) break;
+    // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     out.push(el.value==null?'':String(el.value));
   }
   return out;
 }
-function exKeyFromRow(id){ return String(id).replace(/^exset_/,'').replace(/_\d+$/,''); }
+function exKeyFromRow(id: any){ return String(id).replace(/^exset_/,'').replace(/_\d+$/,''); }
 // One tap, two meanings. BEFORE the exercise is logged an edit is a draft: there is
 // no confirmed weight yet, so committing would have to guess one. AFTER it is logged
 // the weight is already real, nothing is left to guess, and the edit commits straight
 // through — a tick sitting over a number that is not in the record is the single
 // state this feature must never be able to produce.
-function autoSaveSets(exKey){
+function autoSaveSets(exKey: any){
   if(!exKey) return;
   const card=document.getElementById('excard_'+exKey);
   if(card&&card.classList.contains('logged')){ commitSetsLive(exKey); return; }
   const wEl=document.getElementById('exw_'+exKey);
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   writeSetDraft(exKey, rawSetVals('exset_',exKey), rawSetVals('exsetw_',exKey), wEl?wEl.value:'');
 }
 // Re-log in place, silently. Reuses saveExWeight rather than a parallel writer —
 // two paths into ia_exw_ that agree today are two paths free to disagree later.
 // setsReps is carried from the existing entry so a quiet re-save cannot blank the
 // prescription string the record was written with.
-function commitSetsLive(exKey){
+function commitSetsLive(exKey: any){
   const rec=getExWeights()[exKey];
   if(!rec||!rec.name) return;
-  const prev=(rec.entries||[]).filter(function(e){return +e.week===+currentWeek&&entryDay(e)===currentDayKey;})[0];
+  const prev=(rec.entries||[]).filter(function(e: any){return +e.week===+currentWeek&&entryDay(e)===currentDayKey;})[0];
   saveExWeight(exKey, rec.name, (prev&&prev.setsReps)||'', true);
 }
-function stepSet(id,step){
+function stepSet(id: any,step: any){
   const el=document.getElementById(id); if(!el) return;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   let v=parseInt((el.value!==''?el.value:el.placeholder)||'0',10); if(isNaN(v))v=0;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   v+=step; if(v<0)v=0; el.value=v; el.classList.remove('bw-blank'); setDelta(id);
   autoSaveSets(exKeyFromRow(id));
 }
-function setDelta(id){
+function setDelta(id: any){
   const el=document.getElementById(id), d=document.getElementById(id+'_d');
   // Rep edits move the collapsed summary too — an unloaded movement reports divergence
   // through this path and no other, so the refresh must fire on EVERY branch below.
   const key=String(id).replace(/^exset_/,'').replace(/_\d+$/,'');
   if(!d){ refreshSetSummary(key); return; }
+  // @ts-expect-error TS18047 'el' is possibly 'null'.
   const rxa=el.getAttribute('data-rx');
   if(rxa===null||rxa===''){ d.className='exset-delta'; d.textContent=''; refreshSetSummary(key); return; }
+  // @ts-expect-error TS18047 'el' is possibly 'null'.
   const rx=+rxa; let v=parseInt(el.value||'0',10); if(isNaN(v))v=0;
   const diff=v-rx;
   if(diff===0){ d.className='exset-delta'; d.textContent=''; }
@@ -147,8 +157,9 @@ function setDelta(id){
   else{ d.className='exset-delta up'; d.textContent='+'+diff; }
   refreshSetSummary(key);
 }
-function reuseWeight(exKey,val){
+function reuseWeight(exKey: any,val: any){
   const el=document.getElementById('exw_'+exKey); if(!el) return;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   el.value=val;
   cascadeSetWeights(exKey);
   autoSaveSets(exKey);
@@ -163,18 +174,20 @@ function reuseWeight(exKey,val){
 // Prescription per card, cached at render so the live summary can restate
 // "4 × 8" when a ladder flattens back out. Render-scoped, never persisted.
 const _rxCache={};
-function toDispW(lbs){
+function toDispW(lbs: any){
   if(lbs===''||lbs==null) return '';
+  // @ts-expect-error TS2339 Property '_unitLabel' does not exist on type 'Window & typeof globalThis'.
   return (window._unitLabel==='kg') ? Math.round((+lbs)*0.453592*2)/2 : +lbs;
 }
-function toStoreW(disp){
+function toStoreW(disp: any){
   if(disp===''||disp==null) return 0;
+  // @ts-expect-error TS2339 Property '_unitLabel' does not exist on type 'Window & typeof globalThis'.
   return (window._unitLabel==='kg') ? Math.round((+disp)*2.20462) : +disp;
 }
 // Varied = the ladder is not flat. One value, or none, is not varied.
-function setsVaried(arr){
+function setsVaried(arr: any){
   if(!arr||arr.length<2) return false;
-  return arr.some(function(x){return +x!==+arr[0];});
+  return arr.some(function(x: any){return +x!==+arr[0];});
 }
 // Flat, but not where it was aimed. `setsVaried` asks "did the ladder tilt"; this asks
 // "did the flat ladder land somewhere else". The bar was only ever asking the first, so
@@ -187,14 +200,14 @@ function setsVaried(arr){
 // The v>0 guard is load-bearing, not defensive: an untouched open row has placeholder
 // "max", which parses to 0, so every unlogged open card arrives here as [0,0,0]. Without
 // the guard it would report "3 × 0".
-function flatDiverged(rx,arr){
+function flatDiverged(rx: any,arr: any){
   if(!rx||!arr||!arr.length) return false;
   if(setsVaried(arr)) return false;
   const v=+arr[0];
   if(!(v>0)) return false;
   if(arr.length!==rx.sets) return true;
   if(rx.open) return true;
-  if(rx.targets) return rx.targets.some(function(t){return t==null||+t!==v;});
+  if(rx.targets) return rx.targets.some(function(t: any){return t==null||+t!==v;});
   return v!==+rx.target;
 }
 // Collapsed headline. A flat or unlogged exercise states the prescription; a varied one
@@ -205,7 +218,7 @@ function flatDiverged(rx,arr){
 // V105 hole: 2×45 sec logged as 45 and 75 read back as "2 × 45 sec, as prescribed",
 // because divergence was keyed on `setsW` only. It is now keyed on whichever dimension
 // actually moved, so bodyweight and timed work get the same honesty as a drop set.
-function setsSummary(rx,wkW,wkR){
+function setsSummary(rx: any,wkW: any,wkR: any){
   if(!rx) return '';
   const suf=rxSuffix(rx);
   // V150 (Mario's ruling): the SETS line speaks REPS, period. Weight already has three
@@ -224,13 +237,13 @@ function setsSummary(rx,wkW,wkR){
   if(rx.open) return rx.sets+' \u00d7 max';
   // A ladder PRESCRIPTION is itself varied — stating it as "5 × 10" would be a lie
   // before a single rep is logged.
-  if(rx.targets) return rx.targets.map(function(t){return t==null?'max':t;}).join(' / ')+(suf?' '+suf:'');
+  if(rx.targets) return rx.targets.map(function(t: any){return t==null?'max':t;}).join(' / ')+(suf?' '+suf:'');
   return rx.sets+' \u00d7 '+rx.target+(suf?' '+suf:'');
 }
 // Reads flatDiverged rather than re-deriving "is this on plan", which is the whole point:
 // the headline one line above now states the real number, and "as prescribed" underneath
 // it was a straight contradiction.
-function setsSubLabel(rx,wkW,wkR,logged){
+function setsSubLabel(rx: any,wkW: any,wkR: any,logged: any){
   // V150: keys on reps only, matching the headline it annotates. A weight ladder under
   // flat on-plan reps now reads “4 × 3 · logged” — the weight story lives in the
   // VARIED badge and Top set surfaces, not here.
@@ -240,18 +253,19 @@ function setsSubLabel(rx,wkW,wkR,logged){
   if(rx&&rx.open) return 'nothing logged';
   return 'as prescribed';
 }
-function toggleSets(exKey){
+function toggleSets(exKey: any){
   const box=document.getElementById('exlog_'+exKey); if(!box) return;
   box.classList.toggle('exset-open');
   if(box.classList.contains('exset-open')) markTopSet(exKey);
 }
 // Every per-set load cell, in display units. An untouched cell falls back to its
 // placeholder — the collapsed Load — so an unexpanded ladder still reads as uniform.
-function setWeightVals(exKey){
+function setWeightVals(exKey: any){
   const out=[];
   for(let s=0;;s++){
     const el=document.getElementById('exsetw_'+exKey+'_'+s);
     if(!el) break;
+    // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     const raw=(el.value!==''?el.value:el.placeholder);
     const v=parseFloat(raw);
     out.push(isNaN(v)?0:v);
@@ -265,7 +279,7 @@ function setWeightVals(exKey){
 // chip exactly: same underlying fact, so they appear and disappear together.
 // When varied, EVERY row at max is tagged — badging one of two equal top sets is the
 // same confusion in a smaller costume.
-function markTopSet(exKey){
+function markTopSet(exKey: any){
   const a=setWeightVals(exKey);
   const foot=document.getElementById('extop_'+exKey);
   const lbl=document.getElementById('extoplbl_'+exKey);
@@ -282,28 +296,32 @@ function markTopSet(exKey){
 }
 // Collapsed Load cascades into every set the user has not individually overridden.
 // Overridden cells keep their value — cascade must never clobber a typed drop set.
-function cascadeSetWeights(exKey){
+function cascadeSetWeights(exKey: any){
   const w=document.getElementById('exw_'+exKey); if(!w) return;
   // '' not '0'. The Load field no longer pre-fills last session's number (V131), so
   // an untouched field is genuinely empty and cascading a 0 into every set cell would
   // reintroduce the anchor this change exists to remove.
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   const v=(w.value!==''?w.value:w.placeholder)||'';
   for(let s=0;;s++){
     const el=document.getElementById('exsetw_'+exKey+'_'+s);
     if(!el) break;
+    // @ts-expect-error TS2339 Property 'placeholder' does not exist on type 'HTMLElement'.
     if(el.classList.contains('exw-inherit')) el.placeholder=v;
   }
   markTopSet(exKey);
 }
-function onSetWeight(exKey,s){
+function onSetWeight(exKey: any,s: any){
   const el=document.getElementById('exsetw_'+exKey+'_'+s); if(!el) return;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   el.classList.toggle('exw-inherit',el.value==='');
   markTopSet(exKey);
 }
-function fillAllSetWeights(exKey,val){
+function fillAllSetWeights(exKey: any,val: any){
   for(let s=0;;s++){
     const el=document.getElementById('exsetw_'+exKey+'_'+s);
     if(!el) break;
+    // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     el.value=val; el.classList.remove('exw-inherit');
   }
   markTopSet(exKey);
@@ -311,11 +329,12 @@ function fillAllSetWeights(exKey,val){
 }
 // Every per-set rep/time cell. Blank falls back to its prescribed placeholder, matching
 // what saveExWeight will actually persist for an untouched set.
-function setRepVals(exKey){
+function setRepVals(exKey: any){
   const out=[];
   for(let s=0;;s++){
     const el=document.getElementById('exset_'+exKey+'_'+s);
     if(!el) break;
+    // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     const raw=(el.value!==''?el.value:el.placeholder);
     const v=parseInt(raw||'0',10);
     out.push(isNaN(v)?0:v);
@@ -325,11 +344,12 @@ function setRepVals(exKey){
 // Keep the collapsed headline honest while the card is open, so folding it back
 // never hides a ladder the user just typed. Reads BOTH dimensions — an unloaded
 // movement has no weight ladder and would otherwise never report divergence.
-function refreshSetSummary(exKey){
+function refreshSetSummary(exKey: any){
   const sum=document.getElementById('exsum_'+exKey); if(!sum) return;
   const a=setWeightVals(exKey), r=setRepVals(exKey);
   const vary=document.getElementById('exvary_'+exKey);
   const sub=document.getElementById('exsumsub_'+exKey);
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   const rx=_rxCache[exKey]||null;
   // The `logged` half of the line is the card's own class — the same fact buildExItem
   // used to stamp it, and the only live signal available here.
@@ -356,7 +376,7 @@ function refreshSetSummary(exKey){
 //            and (b) note-items, the icon-prefixed coaching copy (D5). Primer lost
 //            protection by ruling; superset members carry their own minus now.
 //   canSwap: real lift patterns, PLUS the V162 aux families. Notes never.
-function exControlFlags(sec,itemIdx,it){
+function exControlFlags(sec: any,itemIdx: any,it: any){
   const name=(it&&it.name)||'';
   const isNote=/^\s*<svg/i.test(name);
   const inSS=!!(sec&&(sec.superset||sec.type==='superset'));
@@ -365,7 +385,7 @@ function exControlFlags(sec,itemIdx,it){
   const canSkip=!isNote&&!isMainSlot;
   return {isNote:isNote,inSS:inSS,isMainSlot:isMainSlot,canSwap:canSwap,canSkip:canSkip};
 }
-function buildExItem(i,secIdx,itemIdx,_ssRounds){
+function buildExItem(i: any,secIdx: any,itemIdx: any,_ssRounds: any){
   // V190 (D39): inside a block that draws a round count, the row states reps and effort
   // only — the count is on the header. `_dispDetail` is the RENDERED string; i.detail is
   // left alone so parseRx and every one of its five callers see what they always saw.
@@ -386,7 +406,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
   // entry that actually HAS one. Keyed on the last entry outright, a single weightless
   // log — which V131 makes possible, since the Load field no longer supplies a number
   // on its own — blanked the pill and stranded the athlete's own history.
-  const lastWEntry=entries.filter(function(e){return +e.weight>0;}).slice(-1)[0]||null;
+  const lastWEntry=entries.filter(function(e: any){return +e.weight>0;}).slice(-1)[0]||null;
   const lastW=(lastWEntry&&lastWEntry.weight)||'';
   const weekLabel=lastWEntry?'W'+lastWEntry.week:'';
   // V168 D4 — the fallback is consulted only when this program has nothing.
@@ -399,6 +419,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
   // This week's own entry, if it exists. Drives restore-on-reopen: the collapsed bar
   // states what was actually logged, and expanding shows those numbers rather than
   // resetting to the prescription. Distinct from lastEntry, which may be a prior week.
+  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
   const thisDayEntry=entries.filter(e=>+e.week===+currentWeek&&entryDay(e)===currentDayKey)[0]||null;
   // Derived from thisDayEntry, NOT re-tested against entries. These were two separate
   // predicates over the same fact — one strict-equal on week, one numeric — so a
@@ -406,6 +427,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
   // `.logged` class. refreshSetSummary now READS that class to decide the same thing,
   // which makes any drift between them a live contradiction rather than a latent one.
   const loggedThisDay=!!thisDayEntry;
+  // @ts-expect-error TS2339 Property '_unitLabel' does not exist on type 'Window & typeof globalThis'.
   const unit=window._unitLabel||'lbs';
   const step=unit==='kg'?2.5:5;
   const isTime=isTimeExercise(i.name||'');
@@ -458,10 +480,10 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
     const _draft=thisDayEntry?null:readSetDraft(exKey);
     let _draftLoad='';
     if(_draft){
-      const _nz=function(x){return x!=null&&x!=='';};
+      const _nz=function(x: any){return x!=null&&x!=='';};
       const _dR=_draft.r||[], _dW=_draft.w||[];
-      if(_dR.some(_nz)) wkR=_dR.map(function(x){return _nz(x)?x:null;});
-      if(_dW.some(_nz)) wkW=_dW.map(function(x){return _nz(x)?x:null;});
+      if(_dR.some(_nz)) wkR=_dR.map(function(x: any){return _nz(x)?x:null;});
+      if(_dW.some(_nz)) wkW=_dW.map(function(x: any){return _nz(x)?x:null;});
       _draftLoad=_draft.L||'';
     }
     // V148 (Mario's call): a weight logged TODAY stays visible in the Load box, solid.
@@ -475,15 +497,16 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
     // its prescribed target. The collapsed HEADLINE wants those rungs resolved, because
     // it states the whole set, not which cells happen to be filled — feeding it nulls
     // would read +null as 0 and report a flat ladder as Varied.
-    const _headR=wkR.map(function(x,ix){
+    const _headR=wkR.map(function(x: any,ix: any){
       if(x!=null&&x!=='') return x;
       if(!rx) return 0;
       const t=(rx.targets&&rx.targets[ix]!==undefined)?rx.targets[ix]:rx.target;
       return t==null?0:t;
     });
-    const _headW=wkW.map(function(x){return (x!=null&&x!=='')?x:0;});
+    const _headW=wkW.map(function(x: any){return (x!=null&&x!=='')?x:0;});
     if(rx){
       const suf=rxSuffix(rx);
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
       _rxCache[exKey]=rx;
       html+='<button type="button" class="exset-head" onclick="toggleSets(\''+exKey+'\')">'
         +'<span class="exset-head-lbl">Sets</span>'
@@ -555,6 +578,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
         // pill's source differs from the one the sentence named — otherwise the
         // sentence would be speaking for a number it did not come from.
         const _nameIt=_stale&&_src&&_src!==_staleWarnSrc;
+        // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
         const rec=recencyLabel(effEntry&&effEntry.ts)+(_nameIt?' \u00b7 '+esc(_src):'');
         html+='<button type="button" class="ex-reuse'+(_stale?' is-stale':'')+'" onclick="reuseWeight(\''+exKey+'\','+dispLast+')">'
           +'<span class="ex-reuse-ico">\u21ba</span>'
@@ -574,6 +598,7 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
         // inside one card — one flag, both render paths.
         html+='<button type="button" class="ex-reuse ex-reuse-fill'+(_stale?' is-stale':'')+'" onclick="fillAllSetWeights(\''+exKey+'\','+dispLast+')">'
           +'<span class="ex-reuse-ico">\u21ba</span>'
+          // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
           +'<span class="ex-reuse-txt">Fill every set with '+dispLast+' '+wunit+'<small>'+recencyLabel(effEntry&&effEntry.ts)+'</small></span>'
           +'</button>';
       }
@@ -591,18 +616,21 @@ function buildExItem(i,secIdx,itemIdx,_ssRounds){
 // artifact), a swapped session is excluded, and a missing snapshot excludes — never
 // guesses. Nothing is written anywhere; the strip exists only in the rendered card,
 // so frozen days stay byte-identical.
-function _benchmarkEntryFor(weekWanted){
+function _benchmarkEntryFor(weekWanted: any){
   try{
     const logs=getLogs(), hist=getDayHist();
     let out=null;
     Object.entries(logs||{}).forEach(([key,e])=>{
+      // @ts-expect-error TS2339 Property 'swapTo' does not exist on type '{}'.
       if(!e || e.swapTo) return;
       const m=key.match(/^w(\d+)_(.+)$/); if(!m || +m[1]!==weekWanted) return;
       const snap=hist&&hist[key]; if(!snap||!snap.cardio) return;
       const c=snap.cardio;
       if(String(c.type||'').toLowerCase()!=='run') return;
       if(!/^Benchmark Run/.test(String(c.subtype||''))) return;
+      // @ts-expect-error TS2339 Property 'run_dist' does not exist on type '{}'.
       const dist=parseFloat(e.run_dist); if(!(dist>0)) return;
+      // @ts-expect-error TS2339 Property 'run_mins' does not exist on type '{}'.
       const loggedMins=parseFloat(e.run_mins);
       const mins=(loggedMins>0)?loggedMins:((c.dose&&c.dose.mins>0)?c.dose.mins:20);
       out={dist:+dist.toFixed(2), mins, sec:mins*60/dist};
@@ -610,39 +638,45 @@ function _benchmarkEntryFor(weekWanted){
     return out;
   }catch(err){ return null; }
 }
-function _benchStripHTML(cardio){
+function _benchStripHTML(cardio: any){
   if(!/^Benchmark Run — Retest/.test(String(cardio.subtype||''))) return '';
+  // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
   const fmt=s=>_clkMS(s);   // D126 (V204): logged dist/duration is an open domain; _clkMS owns the limb
   const base=_benchmarkEntryFor(1);
   if(!base){
     return '<div class="cardio-note">No week 1 benchmark was logged — today\u2019s result becomes your baseline for the next block. Run it exactly as written.</div>';
   }
+  // @ts-expect-error TS2339 Property 'dist' does not exist on type 'never'.
   let html='<div class="cardio-note"><b>WEEK 1 BASELINE:</b> '+base.dist+' mi in '+base.mins+' min — '+fmt(base.sec)+'/mi. Same even effort today; the distance difference is your gain.</div>';
   const now=_benchmarkEntryFor(cardio.week);
   if(now){
+    // @ts-expect-error TS2339 Property 'sec' does not exist on type 'never'.
     const df=Math.round(base.sec-now.sec);
     const verdict = Math.abs(df)<5
       ? 'Even with week 1 — fitness held through a full build, which on this recovery budget is a result.'
       : (df>0 ? df+' sec/mi FASTER at the same effort. The aerobic engine grew — the block worked.'
               : Math.abs(df)+' sec/mi slower at the same effort. An off day happens; look at sleep, fuel, and heat before doubting six weeks of work.');
+    // @ts-expect-error TS2339 Property 'dist' does not exist on type 'never'.
     html+='<div class="cardio-note"><b>RETEST:</b> '+now.dist+' mi — '+fmt(now.sec)+'/mi. '+verdict+'</div>';
   }
   return html;
 }
-function buildCardioHTML(cardio){
+function buildCardioHTML(cardio: any){
   if(!cardio) return '';
   const ctype=(cardio.type||'').toLowerCase();
   const blockCls=ctype==='swim'?'swim-block':ctype==='run'?'run-block':ctype==='bike'?'bike-block':'cardio-block';
   const labelCls=ctype==='swim'?'cardio-label-swim':ctype==='run'?'cardio-label-run':ctype==='bike'?'cardio-label-bike':'cardio-label-general';
   const typeNames={run:'Run',bike:'Bike / Spin',swim:'Swim'};
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   const typeName=typeNames[ctype]||cardio.type;
   const subLabel=cardio.subtype?' — '+cardio.subtype.replace(/_/g,' '):'';
   let inner=`<div class="cardio-type-label ${labelCls}">${typeName}${subLabel}</div>`;
   // V141: segmented swim render — WU / drill / main / CD rows with a yardage total.
   // Flat fallback covers everything else, including frozen pre-V141 days.
   if(ctype==='swim' && Array.isArray(cardio.segments) && cardio.segments.length){
+    // @ts-expect-error TS7006 Parameter 'sg' implicitly has an 'any' type.
     inner+=cardio.segments.map(sg=>`<div class="swim-seg"><div class="swim-seg-label">${sg.label}</div><div class="swim-seg-body">${sg.text}</div></div>`).join('');
-    const _tot=cardio.segments.reduce((a,sg)=>a+(+sg.yd||0),0);
+    const _tot=cardio.segments.reduce((a: any,sg: any)=>a+(+sg.yd||0),0);
     if(_tot) inner+=`<div class="swim-total">${_tot.toLocaleString()} yd total</div>`;
   } else {
     inner+=`<div class="cardio-detail">${(cardio.detail||'').replace(/\n/g,'<br>')}</div>`;

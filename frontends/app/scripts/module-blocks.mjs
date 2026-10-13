@@ -17,7 +17,7 @@
 // never imports the app (a core file importing an app file is an error). A TypeScript file's type imports are written
 // by hand below the import block, inside the code, where the build strips them with the other types.
 //
-// A name declared in two files (only _isoToday today, in wizard.js and overlays.js) is imported from the later one,
+// A name declared in two files (only _isoToday today, in wizard.ts and overlays.ts) is imported from the later one,
 // which is the one the classic script runs; the earlier file keeps using its own. Both return the same date string.
 // Nothing is read or written unless this file is run as a script.
 import { readFileSync, writeFileSync } from 'node:fs';

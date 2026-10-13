@@ -1,17 +1,17 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { getDayHistFor, getExWeightsFor, getLogsFor, getPrograms, saveExWeightsFor } from './storage.js';
+import { getDayHistFor, getExWeightsFor, getLogsFor, getPrograms, saveExWeightsFor } from './storage.ts';
 import { _setProgressViewId, activeProg, activeProgId, calcLift, progressViewId } from './rest-day-shell.ts';
 import { exStoreKey, foldExAliasKeys } from '../../../../../../core/src/engine/exercise-library.ts';
-import { _partialWeek1, restLogLines } from './week-view-sections.js';
-import { RPE_LABELS, dedupeExDayEntries } from './log-entries.js';
+import { _partialWeek1, restLogLines } from './week-view-sections.ts';
+import { RPE_LABELS, dedupeExDayEntries } from './log-entries.ts';
 import {
   EASY_MIN_RUNS, RACE_DIST_MI, _cutWeek, _progChipsHTML, buildPaceChart, easyEffortWeekly, ladderWeekly,
   plannedVsLogged, recoveryPaceWeekly, runsByClass,
-} from './progress-data.js';
+} from './progress-data.ts';
 import {
   _axTx, _iaCard, buildDriftChart, buildEasyBandsFallback, buildEasyEffortChart, buildEasyEffortEmpty,
   buildEasyZoneChart, buildLadderChart, buildProjectionCard, easyVsPrescribed,
-} from './progress-charts.js';
+} from './progress-charts.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── V167: LIFT LEDGER REBUILD (D7 revised / D10-A / D11) ────────────────────
@@ -32,15 +32,16 @@ import {
 // Tie-break is main-if-ever, per Mario: if the app ever made it your main lift, it was
 // one. The MAIN CHART then reads only main-slot sessions — blending the lighter
 // accessory-day sets into the same line makes the progression jump for no reason.
-function _slotOfEntry(hist, name, en){
+function _slotOfEntry(hist: any, name: any, en: any){
   if(!en||!en.week||!en.day) return null;
   const snap=hist&&hist['w'+en.week+'_'+en.day];
   if(!snap||!snap.sections) return null;
   const key=exStoreKey(name);
-  let seen=null;
+  let seen: any=null;
+  // @ts-expect-error TS7006 Parameter 'sec' implicitly has an 'any' type.
   snap.sections.forEach(sec=>{
     const isMain=/^main/i.test(sec.label||'');
-    (sec.items||[]).forEach((it,ii)=>{
+    (sec.items||[]).forEach((it: any,ii: any)=>{
       if(!it||!it.name) return;
       if(exStoreKey(it.name)!==key) return;
       if(isMain&&ii===0) seen='main';
@@ -54,12 +55,13 @@ function _slotOfEntry(hist, name, en){
 // fixed reps, timed holds, and the open-set bodyweight form all correctly yield no
 // range — measured at ~50% of accessory rows carrying one, so the no-range path is the
 // common case and degrades to a plain row rather than an empty card.
-function _rxRangeFor(hist, name, en){
+function _rxRangeFor(hist: any, name: any, en: any){
   if(!en||!en.week||!en.day) return null;
   const snap=hist&&hist['w'+en.week+'_'+en.day];
   if(!snap||!snap.sections) return null;
   const key=exStoreKey(name);
-  let det=null;
+  let det: any=null;
+  // @ts-expect-error TS7006 Parameter 'sec' implicitly has an 'any' type.
   snap.sections.forEach(sec=>(sec.items||[]).forEach(it=>{
     if(it&&it.name&&exStoreKey(it.name)===key&&!det) det=it.detail||'';
   }));
@@ -70,19 +72,23 @@ function _rxRangeFor(hist, name, en){
   if(!(hi>lo)) return null;
   return {sets:+m[1], lo:lo, hi:hi};
 }
-function _setsOf(en){
+function _setsOf(en: any){
   const sd=(en&&en.setsDone)||[];
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const out=sd.map(Number).filter(v=>v>0);
   if(out.length) return out;
   const m=String((en&&en.setsReps)||'').match(/(\d+)\s*$/);
   return m?[+m[1]]:[];
 }
-function ledgerModel(exw, hist){
-  const mains=[], ladder=[], plain=[], unloaded=[];
+function ledgerModel(exw: any, hist: any){
+  const mains: any[]=[], ladder: any[]=[], plain: any[]=[], unloaded: any[]=[];
   Object.values(exw||{}).forEach(ex=>{
+    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     const name=ex.name||'';
-    const all=(ex.entries||[]).slice().sort((a,b)=>(a.week-b.week)||((a.ts||0)-(b.ts||0)));
+    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
+    const all=(ex.entries||[]).slice().sort((a: any,b: any)=>(a.week-b.week)||((a.ts||0)-(b.ts||0)));
     if(!all.length) return;
+    // @ts-expect-error TS7006 Parameter 'en' implicitly has an 'any' type.
     const mainEns=all.filter(en=>_slotOfEntry(hist,name,en)==='main');
     if(mainEns.length){
       // V196 D57: an unloaded main lift is still a main lift. The old code returned
@@ -95,8 +101,10 @@ function ledgerModel(exw, hist){
       // plotted + accessoryDay + noLoad == entries — so the footer can account for all
       // of them. `hidden: all.length-mainEns.length` could not see the sessions the
       // return above had already discarded.
+      // @ts-expect-error TS7006 Parameter 'en' implicitly has an 'any' type.
       const loaded=mainEns.filter(en=>+en.weight>0);
       const accessoryDay=all.length-mainEns.length;
+      // @ts-expect-error TS7006 Parameter 'en' implicitly has an 'any' type.
       const topOf=en=>{const s=_setsOf(en); return s.length?Math.max.apply(null,s):0;};
       if(loaded.length){
         // V196 D59: a blank Load box costs the POINT, not the session. Nothing is
@@ -104,7 +112,8 @@ function ledgerModel(exw, hist){
         // earned and makes a missed entry read as a plateau (V167 killed e1RM off this
         // card for the same reason). The blank sessions are disclosed in the footer.
         const first=loaded[0];
-        const heavy=loaded.reduce((a,b)=>(+b.weight>+a.weight?b:a),loaded[0]);
+        const heavy=loaded.reduce((a: any,b: any)=>(+b.weight>+a.weight?b:a),loaded[0]);
+        // @ts-expect-error TS7006 Parameter 'en' implicitly has an 'any' type.
         mains.push({name, mode:'load', series:loaded.map(en=>({w:en.week, v:+en.weight})),
           heavy:{v:+heavy.weight, reps:topOf(heavy)||null, week:heavy.week},
           first:{v:+first.weight, reps:topOf(first)||null, week:first.week},
@@ -112,10 +121,12 @@ function ledgerModel(exw, hist){
           noLoad:mainEns.length-loaded.length, entries:all.length});
         return;
       }
+      // @ts-expect-error TS7006 Parameter 'en' implicitly has an 'any' type.
       const repEns=mainEns.filter(en=>topOf(en)>0);
       if(repEns.length){
         const first=repEns[0];
-        const heavy=repEns.reduce((a,b)=>(topOf(b)>topOf(a)?b:a),repEns[0]);
+        const heavy=repEns.reduce((a: any,b: any)=>(topOf(b)>topOf(a)?b:a),repEns[0]);
+        // @ts-expect-error TS7006 Parameter 'en' implicitly has an 'any' type.
         mains.push({name, mode:'reps', series:repEns.map(en=>({w:en.week, v:topOf(en)})),
           heavy:{v:topOf(heavy), reps:null, week:heavy.week},
           first:{v:topOf(first), reps:null, week:first.week},
@@ -131,7 +142,7 @@ function ledgerModel(exw, hist){
     const sets=_setsOf(last);
     const wt=+last.weight||0;
     if(!(wt>0)){ unloaded.push({name, sessions:all.length,
-      reps: all.reduce((s,en)=>s+_setsOf(en).reduce((a,b)=>a+b,0),0)}); return; }
+      reps: all.reduce((s: any,en: any)=>s+_setsOf(en).reduce((a: any,b: any)=>a+b,0),0)}); return; }
     // V194 D55: the range that decides Range Ladder vs Other Accessory Work is read from
     // the most recent session that CARRIES one, not strictly the last. A primer or taper
     // week is prescribed fixed low reps, so reading only `last` let the least
@@ -141,13 +152,17 @@ function ledgerModel(exw, hist){
     for(let i=all.length-1;i>=0&&!rng;i--) rng=_rxRangeFor(hist,name,all[i]);
     if(rng&&sets.length){
       // step-ups: how many times the working weight rose across the block
-      let ups=0, prev=null;
+      let ups=0, prev: any=null;
+      // @ts-expect-error TS7006 Parameter 'en' implicitly has an 'any' type.
       all.forEach(en=>{ const w=+en.weight||0; if(prev!==null&&w>prev) ups++; if(w>0) prev=w; });
       ladder.push({name, wt, lo:rng.lo, hi:rng.hi, sets,
+        // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
         ready: sets.length>0 && sets.every(r=>r>=rng.hi), ups, sessions:all.length});
     } else {
       plain.push({name, wt, sets, sessions:all.length,
+        // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
         range:[Math.min.apply(null,all.map(e=>+e.weight||0).filter(v=>v>0).concat([wt])),
+               // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
                Math.max.apply(null,all.map(e=>+e.weight||0).concat([wt]))]});
     }
   });
@@ -163,11 +178,13 @@ function ledgerModel(exw, hist){
 // carries load or the top set in reps; the padding, the gridline step and the
 // series>=2 rule are the SAME expressions in both modes. Reps are never unit
 // converted — `disp` is the identity on a reps block.
-function buildMainLiftBlock(m, unit){
+function buildMainLiftBlock(m: any, unit: any){
   const isReps=(m.mode==='reps');
+  // @ts-expect-error TS7006 Parameter 'w' implicitly has an 'any' type.
   const disp=w=>isReps?w:((unit==='kg')?Math.round(w*0.453592*2)/2:Math.round(w));
   const u=isReps?'reps':((unit==='kg')?'kg':'lbs');
   const hv=m.heavy, fs=m.first;
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const lblOf=p=>isReps?(p.v+' reps'):(disp(p.v)+(p.reps?'×'+p.reps:''));
   const hLbl=lblOf(hv);
   const fLbl=lblOf(fs);
@@ -175,26 +192,30 @@ function buildMainLiftBlock(m, unit){
   if(m.series.length>=2){
     const W=320,H=108,padL=34,padR=10,padT=14,padB=20;
     const plotW=W-padL-padR, plotH=H-padT-padB;
+    // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
     const ws=m.series.map(p=>p.v);
     let lo=Math.min.apply(null,ws), hi=Math.max.apply(null,ws);
     const pad=Math.max((hi-lo)*0.25,10); lo-=pad; hi+=pad;
     const xs=plotW/(m.series.length-1);
+    // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
     const yof=v=>padT+plotH-((v-lo)/(hi-lo))*plotH;
     let s='', step=(hi-lo)>90?25:10;
     for(let v=Math.ceil(lo/step)*step; v<=hi; v+=step){
       const cy=yof(v);
       s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+      // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
       s+=_axTx(padL-5, cy+3, disp(v));
     }
     let d='';
-    m.series.forEach((p,i)=>{ d+=(i?' L':'M')+(padL+i*xs).toFixed(1)+','+yof(p.v).toFixed(1); });
+    m.series.forEach((p: any,i: any)=>{ d+=(i?' L':'M')+(padL+i*xs).toFixed(1)+','+yof(p.v).toFixed(1); });
     s+='<path d="'+d+'" stroke="var(--lift)" stroke-width="1.5" fill="none" opacity="0.55"/>';
-    m.series.forEach((p,i)=>{
+    m.series.forEach((p: any,i: any)=>{
       const top=(p.v===hv.v&&p.w===hv.week);
       s+='<circle cx="'+(padL+i*xs).toFixed(1)+'" cy="'+yof(p.v).toFixed(1)+'" r="'+(top?4.5:3.2)+'" fill="var(--lift)" opacity="'+(top?1:0.72)+'"/>';
     });
     const lblStep=Math.max(1,Math.ceil(m.series.length/6));
-    m.series.forEach((p,i)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-4, 'W'+p.w, 8, 'middle'); });
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
+    m.series.forEach((p: any,i: any)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-4, 'W'+p.w, 8, 'middle'); });
     chart='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+s+'</svg>';
   }
   const gain=disp(hv.v)-disp(fs.v);
@@ -211,8 +232,9 @@ function buildMainLiftBlock(m, unit){
 }
 
 // ── accessory range ladder ─────────────────────────────────────────────────
-function _ladderTrack(r){
+function _ladderTrack(r: any){
   const track=140, H=26, span=(r.hi-r.lo)||1;
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const xof=v=>(Math.max(Math.min(v,r.hi),r.lo)-r.lo)/span*track;
   const col=r.ready?'var(--signal)':'var(--lift)';
   let s='';
@@ -224,16 +246,20 @@ function _ladderTrack(r){
   if(r.ready) s+='<rect x="0" y="10" width="'+track+'" height="4" fill="'+col+'" opacity="0.75" rx="2"/>';
   // sets that landed on the same rep count are nudged apart so three dots never read as one
   const seen={};
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   r.sets.forEach(v=>{
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
     const x=xof(v); const n=(seen[v]=(seen[v]||0)+1);
     const off=(n-1)*5.5;
     s+='<circle cx="'+(x-off).toFixed(1)+'" cy="12" r="3.6" fill="'+col+'" opacity="0.92"/>';
   });
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   s+=_axTx(0, 25, r.lo, 8, 'start');
   s+=_axTx(track, 25, r.hi, 8, 'end', r.ready?'var(--signal)':'rgba(24,23,18,0.3)', r.ready?'700':'');
   return '<svg viewBox="-8 0 '+(track+16)+' '+H+'" style="width:'+track+'px;height:'+H+'px;overflow:visible">'+s+'</svg>';
 }
-function _ladderRow(r, unit){
+function _ladderRow(r: any, unit: any){
+  // @ts-expect-error TS7006 Parameter 'w' implicitly has an 'any' type.
   const disp=w=>(unit==='kg')?Math.round(w*0.453592*2)/2:Math.round(w);
   const u=(unit==='kg')?'kg':'lbs';
   const status=r.ready
@@ -247,7 +273,8 @@ function _ladderRow(r, unit){
     +'<div style="margin-top:3px">'+status+'</div></div>'
     +'<div style="flex-shrink:0">'+_ladderTrack(r)+'</div></div>';
 }
-function buildLedgerCards(model, unit){
+function buildLedgerCards(model: any, unit: any){
+  // @ts-expect-error TS7006 Parameter 'w' implicitly has an 'any' type.
   const disp=w=>(unit==='kg')?Math.round(w*0.453592*2)/2:Math.round(w);
   const u=(unit==='kg')?'kg':'lbs';
   let html='';
@@ -258,9 +285,10 @@ function buildLedgerCards(model, unit){
     // it. plotted + accessoryDay + noLoad == entries, per movement and in the sum.
     // V196 D56: the title keeps the name MAIN LIFTS (Mario: "Top Lifts" is misleading),
     // so the disambiguation line in this footer does that work alone.
-    const accDay=model.mains.reduce((a,m)=>a+m.accessoryDay,0);
-    const noLoad=model.mains.reduce((a,m)=>a+m.noLoad,0);
+    const accDay=model.mains.reduce((a: any,m: any)=>a+m.accessoryDay,0);
+    const noLoad=model.mains.reduce((a: any,m: any)=>a+m.noLoad,0);
     html+=_iaCard(asyIcon('🏋',15)+' Main Lifts','var(--lift)',
+      // @ts-expect-error TS7006 Parameter 'm' implicitly has an 'any' type.
       model.mains.map(m=>buildMainLiftBlock(m,unit)).join(''),
       'The top set you actually did. No estimated maxes: a formula that '
       +'inflates with reps would rank a heavy single below a lighter double.'
@@ -272,8 +300,9 @@ function buildLedgerCards(model, unit){
   }
   const L=model.ladder;
   if(L.length){
+    // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
     const ready=L.filter(r=>r.ready).length;
-    const ups=L.reduce((a,r)=>a+r.ups,0);
+    const ups=L.reduce((a: any,r: any)=>a+r.ups,0);
     const head='<div style="display:flex;align-items:baseline;gap:9px;margin-bottom:2px">'
       +'<div style="font-family:var(--font-display);font-size:30px;font-weight:700;letter-spacing:-0.02em;color:'
       +(ready?'var(--signal)':'var(--muted)')+';line-height:1.05">'+ready+'</div>'
@@ -282,18 +311,21 @@ function buildLedgerCards(model, unit){
       +(ups?'You have stepped the weight up <b style="color:var(--text)">'+ups+' time'+(ups===1?'':'s')+'</b> across these lifts this block. ':'')
       +'Hit the top of the range on every set, then add weight and start back at the bottom.</div>';
     html+=_iaCard(asyIcon('🏋',15)+' Range Ladder','var(--lift)',
+      // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
       head+L.map(r=>_ladderRow(r,unit)).join(''),
       'Each track is the rep range your session was written with. Dots are that session’s sets. When every set '
       +'reaches the top, the movement is ready for more weight.');
   }
   if(model.plain.length||model.unloaded.length){
     let rows='';
+    // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
     model.plain.forEach(r=>{
       const lo=disp(r.range[0]), hi=disp(r.range[1]);
       rows+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">'
         +'<div style="font-size:12px;color:var(--text)">'+r.name+'</div>'
         +'<div style="font-size:10px;color:var(--muted);white-space:nowrap">'+(hi>lo?lo+'–'+hi:lo)+' '+u+' · '+r.sessions+' sessions</div></div>';
     });
+    // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
     model.unloaded.forEach(r=>{
       rows+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">'
         +'<div style="font-size:12px;color:var(--text)">'+r.name+'</div>'
@@ -313,7 +345,9 @@ function renderProgressScreen() {
   // V156: Progress is per-program (G1 ruling). progressViewId picks which program's
   // charts render; null means the active program. Every store read below goes through
   // the *For(_vid) accessors so a viewed program can NEVER leak the active one's data.
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   let _vprog = progressViewId ? _allProgs.find(p=>p.id===progressViewId) : null;
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   if(!_vprog){ _setProgressViewId(null); _vprog = (activeProg && _allProgs.find(p=>p.id===activeProgId)) || _allProgs.find(p=>!p.archived) || _allProgs[0]; }
   if(!_vprog) return;
   const _vid = _vprog.id;
@@ -336,6 +370,7 @@ function renderProgressScreen() {
   // Build weekly data arrays
   const weeklyData = {};
   for(let w = 1; w <= totalWeeks; w++) {
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     weeklyData[w] = {run:0, bike:0, swim:0, bench:null, squat:null, dead:null, rpe:null, sessions:0};
   }
 
@@ -344,27 +379,40 @@ function renderProgressScreen() {
     const match = key.match(/^w(\d+)_/);
     if(!match) return;
     const w = parseInt(match[1]);
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(!weeklyData[w]) return;
+    // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     if(entry.run_dist && +entry.run_dist > 0) weeklyData[w].run += +entry.run_dist;
+    // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     if(entry.bike_mins && +entry.bike_mins > 0) weeklyData[w].bike += +entry.bike_mins;
+    // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     if(entry.swim_yards && +entry.swim_yards > 0) weeklyData[w].swim += +entry.swim_yards;
+    // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     if(entry.rpe && +entry.rpe > 0) {
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
       weeklyData[w].rpe = weeklyData[w].rpe ? (+weeklyData[w].rpe + +entry.rpe)/2 : +entry.rpe;
     }
     // V238 (D224, Amendment 1 A4): the rest-day jog (restLog) is its own record on the day and the
     // weekly sums credit it: run adds restLog.run.dist, bike adds restLog.bike.mins, swim adds
     // restLog.swim.dist (yards). Walk and row credit no total. Each jog type with an RPE is one
     // more effort in the average, after the day's session RPE when that is set.
+    // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     const _rl = (entry.restLog && typeof entry.restLog === 'object') ? entry.restLog : {};
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(_rl.run && +_rl.run.dist > 0) weeklyData[w].run += +_rl.run.dist;
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(_rl.bike && +_rl.bike.mins > 0) weeklyData[w].bike += +_rl.bike.mins;
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(_rl.swim && +_rl.swim.dist > 0) weeklyData[w].swim += +_rl.swim.dist;
     Object.keys(_rl).forEach(t => {
       const r = _rl[t] ? +_rl[t].rpe : 0;
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
       if(r > 0) weeklyData[w].rpe = weeklyData[w].rpe ? (+weeklyData[w].rpe + r)/2 : r;
     });
     // Count session if ANY meaningful data was logged
+    // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     if(entry.rpe||entry.run_dist||entry.bike_mins||entry.swim_yards||entry.notes) {
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
       weeklyData[w].sessions++;
     }
   });
@@ -374,16 +422,20 @@ function renderProgressScreen() {
   // Same name-matching as saveExWeight's 1RM derivation. Stored weight is already in lbs.
   const exwStore = (typeof getExWeightsFor==='function') ? getExWeightsFor(_vid) : {};
   Object.values(exwStore).forEach(ex => {
+    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     const n = (ex.name||'').toLowerCase();
     const isBench = n.includes('bench') && !n.includes('db') && !n.includes('dumbbell') && !n.includes('bench dip');
     const isSquat = (n.includes('back squat')||n.includes('front squat')||n.includes('box squat')) && !n.includes('goblet') && !n.includes('jump');
     const isDead  = n.includes('deadlift') && !n.includes('single-leg') && !n.includes('romanian');
     if(!(isBench||isSquat||isDead)) return;
     const lift = isBench ? 'bench' : isSquat ? 'squat' : 'dead';
+    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     (ex.entries||[]).forEach(en => {
       const w = en.week;
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       if(!weeklyData[w]) return;
       const wt = +en.weight || 0;
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       if(wt > 0) weeklyData[w][lift] = Math.max(weeklyData[w][lift]||0, wt);
     });
   });
@@ -404,6 +456,7 @@ function renderProgressScreen() {
 
   // Show a cardio chart if the sport is in the plan OR any volume was logged for it
   // (a swapped-in activity surfaces its own chart even when it isn't part of the plan).
+  // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
   const loggedAny = s => weeks.some(w => (weeklyData[w][s]||0) > 0);
 
   // ── V165 endurance stack (D7) ──
@@ -413,13 +466,16 @@ function renderProgressScreen() {
   const _cut  = _cutWeek(_vprog);                    // D6: 0 when nothing to withhold
   const _skip1 = _partialWeek1(_vprog);              // V174 D26: short first week withheld from sums/maxes
   const _goalId = (cfg.cardioGoals && cfg.cardioGoals.run && cfg.cardioGoals.run.id) || '';
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   const _raceMi = RACE_DIST_MI[_goalId] || 0;
 
   if(cardioTypes.includes('run') || loggedAny('run')) {
     // Weekly volume retained from V164. D7 selected NEW modules; it never ruled this
     // one out, and nothing else on the screen reports total mileage — the ladder is a
     // single-run metric and drift covers distance-prescribed runs only.
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     const runData = weeks.map(w => (_skip1 && w===1) ? null : (weeklyData[w].run || null));   // V174 D26
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 6.
     html += buildDotChart(asyIcon('🏃',15)+' Weekly Running Mileage', weeks, runData, 'var(--run)', 'miles', 'mi');
     html += buildLadderChart(ladderWeekly(logs, totalWeeks, _cut, _skip1), totalWeeks, _raceMi, _cut, _skip1);
     // V166 (ruled C): the prescribed-zone chart is the primary. It can only place runs
@@ -444,6 +500,7 @@ function renderProgressScreen() {
     } else {
       const _rp = recoveryPaceWeekly(logs, _hist, totalWeeks);
       if(_rp.nWeeks >= 2) {
+        // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
         const rpData = weeks.map(w => _rp.weekly[w] != null ? _rp.weekly[w] : null);
         html += buildPaceChart(asyIcon('🏃',15)+' Recovery Pace — Easy-Effort Trend', weeks, rpData, _rp.tgt, 'var(--run)');
       } else if(_ee.nRuns > 0) {
@@ -455,18 +512,23 @@ function renderProgressScreen() {
 
   // ── Swimming yardage chart ──
   if(cardioTypes.includes('swim') || loggedAny('swim')) {
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     const swimData = weeks.map(w => weeklyData[w].swim || null);
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 6.
     html += buildDotChart(asyIcon('🏊',15)+' Weekly Swimming Volume', weeks, swimData, '#3f6e96', 'yards', 'yd');
   }
 
   // ── Bike minutes chart ──
   if(cardioTypes.includes('bike') || loggedAny('bike')) {
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     const bikeData = weeks.map(w => weeklyData[w].bike || null);
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 6.
     html += buildDotChart(asyIcon('🚴',15)+' Weekly Cycling Time', weeks, bikeData, '#f0a050', 'minutes', 'min');
   }
 
   // ── RPE trend ──
   if(hasAnyData) {
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     const rpeData = weeks.map(w => weeklyData[w].rpe || null);
     if(rpeData.some(v => v !== null)) {
       html += buildDotChart(asyIcon('💡',15)+' Average Session RPE', weeks, rpeData, '#7e5e96', 'RPE', '', 10);
@@ -484,16 +546,18 @@ function renderProgressScreen() {
 
   // ── Session Journal ──
   const allLogs = getLogsFor(_vid);
-  const journalEntries = [];
+  const journalEntries: any[] = [];
   Object.entries(allLogs).forEach(([key, entry]) => {
     // V236 (D219 item 3): a swap with no RPE and no note keeps its row, the isSwap line below.
     // V238 (D224 journal, Amendment 1 A4): a day with a rest-day jog (restLog) keeps its row too, so a walk
     // or row jog alone still reaches the journal and Progress does not fall back to its empty state.
+    // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     if(!entry.notes && !entry.rpe && !(entry.swapFrom && entry.swapTo) && !(entry.restLog && Object.keys(entry.restLog).length)) return;
     const match = key.match(/^w(\d+)_(\w+)$/);
     if(!match) return;
     const w = parseInt(match[1]);
     const dayKey = match[2];
+    // @ts-expect-error TS18046 'entry' is of type 'unknown'.
     journalEntries.push({w, dayKey, entry, ts: entry.ts||0});
   });
   journalEntries.sort((a,b) => a.w - b.w || a.ts - b.ts);
@@ -503,18 +567,23 @@ function renderProgressScreen() {
     // collapsed to keep the page short; only the most recent logged week is open by
     // default (tap any week to read its entries, tap again to fold it back).
     const byWeek = {};
-    const weekOrder = [];
+    const weekOrder: any[] = [];
     journalEntries.forEach(je => {
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       if(!byWeek[je.w]) { byWeek[je.w] = []; weekOrder.push(je.w); }
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       byWeek[je.w].push(je);
     });
     const openWeek = weekOrder[weekOrder.length - 1];
 
     const journalHtml = weekOrder.map(w => {
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       const entriesHtml = byWeek[w].map(({dayKey, entry}) => {
         const rpeColor = !entry.rpe ? 'var(--muted)' : +entry.rpe >= 9 ? 'var(--red)' : +entry.rpe >= 7 ? 'var(--lift)' : +entry.rpe >= 5 ? 'var(--accent)' : 'var(--run)';
+        // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ su
         const dayName = ({sun:'Sun',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat'})[dayKey]||dayKey;
         const isSwap = entry.swapFrom && entry.swapTo;
+        // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
         const swapWord = s => ({run:'Run',bike:'Bike',swim:'Swim'})[s]||s;
         // V238 (D224 journal, A3): each jog type with mins prints one line, the rest hero's own sentence
         // (restLogLines), never an RPE_LABELS word: the sheet's effort words are not the label table's.
@@ -530,6 +599,7 @@ function renderProgressScreen() {
           ${entry.notes ? `<div style="font-size:12px;color:var(--muted);line-height:1.5;font-style:italic">"${entry.notes}"</div>` : ''}
         </div>`;
       }).join('');
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
       const n = byWeek[w].length;
       return `<details class="journal-week"${w===openWeek?' open':''}>
         <summary style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted)">
@@ -570,7 +640,7 @@ function renderProgressScreen() {
   </div>`) + estimatorHtml;
 }
 
-function parseLiftEntry(str) {
+function parseLiftEntry(str: any) {
   if(!str) return null;
   const m = str.match(/([0-9.]+)\s*[x×]\s*([0-9]+)/);
   if(m) {
@@ -581,7 +651,8 @@ function parseLiftEntry(str) {
   return m2 ? parseFloat(m2[1]) : null;
 }
 
-function buildDotChart(title, weeks, data, color, label, unit, maxY) {
+function buildDotChart(title: any, weeks: any, data: any, color: any, label: any, unit: any, maxY: any) {
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const validData = data.filter(v => v !== null);
   if(!validData.length) return '';
   const max = maxY || Math.max(...validData) * 1.2 || 10;
@@ -593,7 +664,7 @@ function buildDotChart(title, weeks, data, color, label, unit, maxY) {
   const xStep = plotW / Math.max(n-1, 1);
 
   // Build points
-  const points = data.map((v, i) => {
+  const points: any[] = data.map((v: any, i: any) => {
     if(v === null) return null;
     const x = padL + i * xStep;
     const y = padT + plotH - ((v - min) / (max - min)) * plotH;
@@ -602,8 +673,8 @@ function buildDotChart(title, weeks, data, color, label, unit, maxY) {
 
   // Build dotted line path
   let pathD = '';
-  let prevPt = null;
-  data.forEach((v, i) => {
+  let prevPt: any = null;
+  data.forEach((v: any, i: any) => {
     if(v === null) { prevPt = null; return; }
     const x = padL + i * xStep;
     const y = padT + plotH - ((v - min) / (max - min)) * plotH;
@@ -634,16 +705,17 @@ function buildDotChart(title, weeks, data, color, label, unit, maxY) {
         <circle cx="${pt.x}" cy="${pt.y}" r="7" fill="${color}" opacity="0.15"/>
       `).join('')}
       <!-- X axis week labels -->
-      ${weeks.map((w,i) => i%xLabelStep===0 ? `<text x="${padL+i*xStep}" y="${H-4}" fill="rgba(24,23,18,0.3)" font-size="8" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W${w}</text>` : '').join('')}
+      ${weeks.map((w: any,i: any) => i%xLabelStep===0 ? `<text x="${padL+i*xStep}" y="${H-4}" fill="rgba(24,23,18,0.3)" font-size="8" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W${w}</text>` : '').join('')}
     </svg>
     <div style="font-size:11px;color:var(--muted);margin-top:4px">
-      Total logged: <b style="color:${color}">${validData.reduce((a,b)=>a+b,0).toFixed(1)} ${unit}</b>
+      Total logged: <b style="color:${color}">${validData.reduce((a: any,b: any)=>a+b,0).toFixed(1)} ${unit}</b>
       · Peak week: <b style="color:${color}">${Math.max(...validData).toFixed(1)} ${unit}</b>
     </div>
   </div>`;
 }
 
-function buildMultiDotChart(title, weeks, series) {
+function buildMultiDotChart(title: any, weeks: any, series: any) {
+  // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
   const allVals = series.flatMap(s => s.data.filter(v=>v!==null));
   if(!allVals.length) return '';
   const max = Math.max(...allVals) * 1.15;
@@ -666,10 +738,11 @@ function buildMultiDotChart(title, weeks, series) {
   }).join('');
 
   // Each series
+  // @ts-expect-error TS7031 Binding element 'label' implicitly has an 'any' type.
   series.forEach(({label, data, color}) => {
     let pathD = '';
-    let prevPt = null;
-    data.forEach((v,i) => {
+    let prevPt: any = null;
+    data.forEach((v: any,i: any) => {
       if(v===null){prevPt=null;return;}
       const x = padL + i*xStep;
       const y = padT + plotH - ((v-min)/(max-min))*plotH;
@@ -677,7 +750,7 @@ function buildMultiDotChart(title, weeks, series) {
       prevPt={x,y};
     });
     svgContent += `<path d="${pathD}" stroke="${color}" stroke-width="1.5" stroke-dasharray="3,3" fill="none" opacity="0.7"/>`;
-    data.forEach((v,i) => {
+    data.forEach((v: any,i: any) => {
       if(v===null) return;
       const x = padL + i*xStep;
       const y = padT + plotH - ((v-min)/(max-min))*plotH;
@@ -686,13 +759,13 @@ function buildMultiDotChart(title, weeks, series) {
   });
 
   // X axis
-  svgContent += weeks.map((w,i) => i%xLabelStep===0
+  svgContent += weeks.map((w: any,i: any) => i%xLabelStep===0
     ? `<text x="${padL+i*xStep}" y="${H-padB+14}" fill="rgba(24,23,18,0.3)" font-size="8" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W${w}</text>`
     : '').join('');
 
   // Legend
   const legendY = H - 8;
-  const legendItems = series.map((s,i) =>
+  const legendItems = series.map((s: any,i: any) =>
     `<circle cx="${padL+i*80+4}" cy="${legendY}" r="3" fill="${s.color}"/>
      <text x="${padL+i*80+11}" y="${legendY+4}" fill="${s.color}" font-size="8" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">${s.label}</text>`
   ).join('');

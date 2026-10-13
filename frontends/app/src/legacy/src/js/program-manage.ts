@@ -1,19 +1,19 @@
-import { getActiveProgId, getPrograms, savePrograms, setActiveProgId } from './storage.js';
+import { getActiveProgId, getPrograms, savePrograms, setActiveProgId } from './storage.ts';
 import {
   _setActiveProg, _setActiveProgId, _setConfirmProgId, _setConfirmTier, _setCurrentDayKey, _setCurrentWeek,
   _setEditProgId, _setProgressViewId, activeProg, activeProgId, applyRestDayMoves, progressViewId, showScreen,
   showToast,
 } from './rest-day-shell.ts';
 import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
-import { applyDayEdits, applySessionSwaps, getDayEdits, getSwaps, pruneDayEdits } from './swaps-edits.js';
+import { applyDayEdits, applySessionSwaps, getDayEdits, getSwaps, pruneDayEdits } from './swaps-edits.ts';
 import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';
-import { calcCurrentWeek, renderWeekView } from './week-view-sections.js';
-import { entryDay } from './log-entries.js';
-import { progTestPin, renderProgList } from './programs.js';
-import { _isoToday, applyOverlays, overlayWeekRange, paceShiftMap } from './overlays.js';
-import { renderProgressScreen } from './lift-ledger-progress-screen.js';
+import { calcCurrentWeek, renderWeekView } from './week-view-sections.ts';
+import { entryDay } from './log-entries.ts';
+import { progTestPin, renderProgList } from './programs.ts';
+import { _isoToday, applyOverlays, overlayWeekRange, paceShiftMap } from './overlays.ts';
+import { renderProgressScreen } from './lift-ledger-progress-screen.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-function refreshProgram(prog){
+function refreshProgram(prog: any){
   if(!prog || !prog.cfg) return prog;
   // SEED FALLBACK: older programs baked seed at the program level but not into cfg.
   // The detail card already displays prog.seed when cfg.seed is missing, so this
@@ -24,6 +24,7 @@ function refreshProgram(prog){
   if(prog.cfg.seed == null){
     if(prog.seed == null) return prog; // truly seedless → leave baked
     prog.cfg.seed = prog.seed;
+    // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
     try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,seed:prog.seed}; savePrograms(_ps); } }catch(e){}
   }
   // D106a (V207), D184 (V223): BACKFILL. A stored program whose _testWeek is null or absent
@@ -40,6 +41,7 @@ function refreshProgram(prog){
       if(!(_rd && _td && _rd < _td)){   // a past test pins nothing and writes nothing
         prog.cfg._testWeek = _tp.tw;
         prog.cfg._raceDateCappedWeeks = _tp.tw;
+        // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
         try{ const _ps=getPrograms(); const _pi=_ps.findIndex(p=>p&&p.id===prog.id); if(_pi>=0){ _ps[_pi].cfg={..._ps[_pi].cfg,_testWeek:prog.cfg._testWeek,_raceDateCappedWeeks:prog.cfg._raceDateCappedWeeks}; savePrograms(_ps); } }catch(e){}
       }
     }
@@ -62,8 +64,10 @@ function refreshProgram(prog){
     rebuilt.created = prog.created;
     rebuilt.startDate = prog.startDate;
     // D180 (V221): blockOpen is where the block opened (D14a §2); a rebuild keeps pre-signup days outside.
+    // @ts-expect-error TS2339 Property 'blockOpen' does not exist on type 'Program'.
     rebuilt.blockOpen = prog.blockOpen;
     rebuilt.seed = prog.seed;
+    // @ts-expect-error TS2339 Property 'overlays' does not exist on type 'Program'.
     rebuilt.overlays = Array.isArray(prog.overlays) ? prog.overlays : [];
 
     // Overlays splice BEFORE the freeze, never after — the freeze must have the last
@@ -104,6 +108,7 @@ function refreshProgram(prog){
         if(_hasClock){
           const _mon = getWeekMonday(prog.startDate);
           const _today = new Date(); _today.setHours(0,0,0,0);
+          // @ts-expect-error TS2362 The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type
           const _diff = Math.floor((_today - _mon)/86400000);
           _curWk = _diff < 0 ? 1 : Math.min(_tw, Math.floor(_diff/7)+1);
         }
@@ -137,9 +142,11 @@ function refreshProgram(prog){
           const _exw = JSON.parse(localStorage.getItem('ia_exw_'+prog.id)||'{}');
           Object.keys(_exw).forEach(_slug=>{
             const _ents = (_exw[_slug] && _exw[_slug].entries) || [];
+            // @ts-expect-error TS7006 Parameter '_e' implicitly has an 'any' type.
             _ents.forEach(_e=>{
               const _wn = +(_e && _e.week);
               if(!(_wn > 0)) return;
+              // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
               _touched['w'+_wn+'_'+(entryDay(_e)||'')] = true;
             });
           });
@@ -189,9 +196,12 @@ function refreshProgram(prog){
         //     dead record and rewriting its skipped days buys nothing.
         //   • The hybrid risk is real and is NOT repaired here. Measured, not patched.
         const _injRanges = (Array.isArray(prog.overlays) ? prog.overlays : [])
+          // @ts-expect-error TS7006 Parameter 'ov' implicitly has an 'any' type.
           .filter(ov => ov && ov.type==='injury' && ov.patch && ov.patch.injury)
+          // @ts-expect-error TS7006 Parameter 'ov' implicitly has an 'any' type.
           .map(ov => { try{ return overlayWeekRange(prog, ov, _tw); }catch(e){ return null; } })
           .filter(Boolean);
+        // @ts-expect-error TS7006 Parameter 'w' implicitly has an 'any' type.
         const _injCovers = w => _injRanges.some(r => w >= r.fromWeek && w <= r.toWeek);
         // ── HISTORY SOURCE ─────────────────────────────────────────────────────
         // ia_hist_ holds the day exactly as rendered at first touch, so it is the real
@@ -199,7 +209,7 @@ function refreshProgram(prog){
         // shipped, and (below the pierce boundary) for untouched days in past weeks.
         const _hist = {};
         try{ Object.assign(_hist, JSON.parse(localStorage.getItem('ia_hist_'+prog.id)||'{}')); }catch(e){}
-        const _dk = (w,d) => 'w'+w+'_'+d;
+        const _dk = (w: any,d: any) => 'w'+w+'_'+d;
         for(let w=1; w<_cut; w++){
           if(!prog.weeks[w]) continue;
           const _stored = prog.weeks[w];
@@ -210,7 +220,7 @@ function refreshProgram(prog){
           // not in the creation-day store — which is what a train-day change produces —
           // was dropped out of the frozen week entirely. Past weeks keep the stored key
           // set so a schedule change cannot retroactively add days to a dead week.
-          let _days;
+          let _days: any[];
           if(_pierce){
             _days = []; const _seen = new Set();
             Object.keys(_stored).forEach(d=>{ if(!_seen.has(d)){ _seen.add(d); _days.push(d); } });
@@ -222,7 +232,9 @@ function refreshProgram(prog){
           _days.forEach(d=>{
             const k = _dk(w,d);
             // 1. Snapshot = what was actually on screen. Always wins, every week.
+            // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
             const _snap = _hist[k];
+            // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
             if(_snap){ _merged[d] = _snap; _histRestored.add(k); return; }
             // 2. Touched with no snapshot = trained before snapshots shipped, so what
             //    was on screen is unrecoverable. LEGACY CARVE-OUT: on an injury-covered
@@ -231,15 +243,21 @@ function refreshProgram(prog){
             //    wrong answers. This is the one behaviour the old injury pierce had
             //    that the general rule does not, and it is kept deliberately.
             if(Object.prototype.hasOwnProperty.call(_touched, k)){
+              // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Week
               if(_injCovers(w) && _live[d]){ _merged[d] = _live[d]; return; }
+              // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
               _merged[d] = _stored[d] || _live[d];
               return;
             }
             // 3. No record of any kind. Nothing to protect — take the live build.
+            // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Week
             if(_pierce && _live[d]){ _merged[d] = _live[d]; return; }
+            // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
             _merged[d] = _stored[d] || _live[d];
           });
+          // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
           Object.keys(_merged).forEach(d=>{ if(!_merged[d]) delete _merged[d]; });
+          // @ts-expect-error TS2740 Type '{}' is missing the following properties from type 'Week': sun, mon, tue, wed, and 3 more.
           rebuilt.weeks[w] = _merged;
         }
       }
@@ -264,6 +282,7 @@ function refreshProgram(prog){
     // untouched) still get the replay.
     try{
       const _sw=getSwaps(prog.id)||{}, _swLive={};
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
       Object.keys(_sw).forEach(k=>{ if(!_histRestored.has(k)) _swLive[k]=_sw[k]; });
       if(Object.keys(_swLive).length) applySessionSwaps(rebuilt,_swLive);
     }catch(e){}
@@ -290,15 +309,19 @@ function refreshProgram(prog){
 // no day). It is checked before the lookup, so the archived and unknown refusals cannot fire
 // on it. beforeRefresh, when given, runs once the globals name the new id and before
 // refreshProgram (boot passes its ex-weight alias fold there, the order boot always had).
-function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
+// @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
+function loadActiveProgram(id: any,beforeRefresh?: any){if(id===null){localStorage.removeItem('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
 // V221 D178: Set Active is the one switch; a switch is complete when This Week shows the new block.
-function setActive(id){if(!loadActiveProgram(id))return;renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
-function startRename(id){_setEditProgId(id);renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
+function setActive(id: any){if(!loadActiveProgram(id))return;renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
+// @ts-expect-error TS2551 Property 'select' does not exist on type 'HTMLElement'. Did you mean 'onselect'?
+function startRename(id: any){_setEditProgId(id);renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
 function cancelRename(){_setEditProgId(null);renderProgList();}
-function commitRename(id){
+function commitRename(id: any){
   const inp=document.getElementById('renameInput_'+id);
+  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const programs=getPrograms();const p=programs.find(x=>x.id===id);
   if(inp&&p){
+    // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     const nn=(inp.value||'').trim().slice(0,40);
     if(nn&&nn!==p.name){
       p.name=nn;savePrograms(programs);
@@ -309,14 +332,15 @@ function commitRename(id){
   _setEditProgId(null);renderProgList();
   if(activeProgId===id&&activeProg)renderWeekView();
 }
-function purgeProgData(id){['ia_logs_','ia_comp_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
+function purgeProgData(id: any){['ia_logs_','ia_comp_','ia_hist_','ia_wild_','ia_exw_','ia_moves_','ia_swaps_','ia_swapct_','ia_edits_','ia_pop_dismiss_','ia_pop_idx_','ia_season_shown_','ia_reminded_','ia_remind_last_'].forEach(p=>localStorage.removeItem(p+id));}
 // ── V156: ARCHIVE vs DELETE (D1b ruling) ──────────────────────────────────
 // Archive = the program leaves the home list but every store survives; its history
 // stays viewable under Progress and feeds the wizard seed. purgeProgData fires ONLY
 // from the second confirm tier. Archiving the active program hands active to the
 // first non-archived program, exactly as delete always did.
-function _handoffActiveFrom(id,programs){
+function _handoffActiveFrom(id: any,programs: any){
   if(getActiveProgId()===id||activeProgId===id){
+    // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
     const nx=programs.find(p=>p.id!==id&&!p.archived);
     // V221 D178: both arms switch through the loader. Next program: the loader sets
     // currentWeek=calcCurrentWeek() and currentDayKey=null, the values this arm set. None left:
@@ -325,7 +349,8 @@ function _handoffActiveFrom(id,programs){
     else loadActiveProgram(null);
   }
 }
-function archiveProg(id){
+function archiveProg(id: any){
+  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const programs=getPrograms();const p=programs.find(x=>x.id===id);if(!p)return;
   p.archived=true;p.archivedAt=Date.now();savePrograms(programs);
   _handoffActiveFrom(id,programs);
@@ -333,20 +358,22 @@ function archiveProg(id){
   if(progressViewId===id)_setProgressViewId(null);
   renderProgList();showToast('Program archived');
 }
-function unarchiveProg(id){
+function unarchiveProg(id: any){
+  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const programs=getPrograms();const p=programs.find(x=>x.id===id);if(!p)return;
   delete p.archived;delete p.archivedAt;savePrograms(programs);
   renderProgList();showToast('Program restored');
 }
-function askArchive(id){_setConfirmProgId(id);_setConfirmTier(1);renderProgList();}
-function askPurge(id){_setConfirmProgId(id);_setConfirmTier(2);renderProgList();}
+function askArchive(id: any){_setConfirmProgId(id);_setConfirmTier(1);renderProgList();}
+function askPurge(id: any){_setConfirmProgId(id);_setConfirmTier(2);renderProgList();}
 function cancelConfirm(){_setConfirmProgId(null);_setConfirmTier(0);renderProgList();}
 // fromProgress is optional: the Programs-list call site passes nothing, so its
 // behaviour is byte-identical to V168.
-function deleteProg(id,fromProgress){
+function deleteProg(id: any,fromProgress: any){
   let programs=getPrograms();
   // V221 D178: save before the handoff (archiveProg's order). The loader persists the next
   // program's backfill; saving the stale array after it would overwrite that write.
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   programs=programs.filter(p=>p.id!==id);savePrograms(programs);
   _handoffActiveFrom(id,programs);
   purgeProgData(id);

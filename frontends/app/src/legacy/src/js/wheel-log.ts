@@ -1,14 +1,14 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { getLogs, logKey } from './storage.js';
+import { getLogs, logKey } from './storage.ts';
 import { currentDayKey, currentWeek } from './rest-day-shell.ts';
 import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
-import { tagMeta } from './week-view-sections.js';
-import { exLoggable } from './set-logging.js';
+import { tagMeta } from './week-view-sections.ts';
+import { exLoggable } from './set-logging.ts';
 import {
   CARDIO_WORD, RPE_LABELS, _curLogDose, _curLogSub, _doseStripHTML, _setCurLogDose, _setCurLogDoseFull, _setCurLogSub,
   cardioSwapNoteText, doseFromCardio, entryDay, getExWeights,
-} from './log-entries.js';
-import { cardioEntryLive, cardioLogLabel } from './day-status.js';
+} from './log-entries.ts';
+import { cardioEntryLive, cardioLogLabel } from './day-status.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── V182: the wheel (D1-D6) ───────────────────────────────────────────────────
@@ -48,20 +48,20 @@ const _IAW_SPEC={
 // turn a 0:45 rep into 9:45. The three carry wrap:false, honoured first; every other column
 // derives from nil as above.
 const _IAW_REPS=5;
-function _iawWraps(c){ if(c.wrap===false) return false; return !c.nil; }
-function _iawList(c){
+function _iawWraps(c: any){ if(c.wrap===false) return false; return !c.nil; }
+function _iawList(c: any){
   var base=_iawRows(c);
   if(!_iawWraps(c)) return base;
-  var out=[]; for(var r=0;r<_IAW_REPS;r++) out=out.concat(base);
+  var out: any[]=[]; for(var r=0;r<_IAW_REPS;r++) out=out.concat(base);
   return out;
 }
-function _iawHome(c){ return _iawWraps(c) ? Math.floor(_IAW_REPS/2)*_iawRows(c).length : 0; }
-function _iawRows(c){
+function _iawHome(c: any){ return _iawWraps(c) ? Math.floor(_IAW_REPS/2)*_iawRows(c).length : 0; }
+function _iawRows(c: any){
   var out=[]; if(c.nil) out.push('');
   for(var v=c.min;v<=c.max;v++) out.push(String(v));
   return out;
 }
-function _iawFace(c,v){
+function _iawFace(c: any,v: any){
   if(v==='') return '\u2014';
   if(c.dot) return '.'+v;
   return c.pad===2?('00'+v).slice(-2):v;
@@ -69,7 +69,8 @@ function _iawFace(c,v){
 // Stored string -> one row value per column. Out-of-range and malformed legacy values
 // clamp for DISPLAY only; nothing is written back until the athlete actually scrolls,
 // so reopening a day can never silently rewrite what was logged.
-function _iawParse(kind,val){
+function _iawParse(kind: any,val: any){
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ di
   var sp=_IAW_SPEC[kind], s=String(val==null?'':val).trim();
   // V232 (D200): run minutes stay stored as DECIMAL MINUTES; this reads them back as a clock.
   // A bare integer, a decimal or a leading-dot decimal (D203); never a colon. Rounded to the
@@ -108,7 +109,8 @@ function _iawParse(kind,val){
 // Row values -> the string that goes in the hidden input. The clock form always pads
 // seconds to two digits, which is exactly what _paceStrToSec requires — a wheel cannot
 // emit the "9:3" shape that the old text box accepted and the chart then dropped.
-function _iawFormat(kind,vals){
+function _iawFormat(kind: any,vals: any){
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ di
   var sp=_IAW_SPEC[kind];
   if(vals[0]==='') return '';
   var b=vals[1]===''?'0':vals[1];
@@ -131,9 +133,10 @@ function _iawFormat(kind,vals){
 }
 // V232 (D202): `plan` is the fixed dimension's planned value. It rides on the wheel as
 // data-plan and seeds the face when storage is blank; it is display only, never written.
-function iaWheelHTML(kind, hiddenId, val, capOverride, plan){
+function iaWheelHTML(kind: any, hiddenId: any, val: any, capOverride?: any, plan?: any){
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ di
   var sp=_IAW_SPEC[kind];
-  var cols=sp.cols.map(function(c){
+  var cols=sp.cols.map(function(c: any){
     return '<div class="iaw-col" data-ci="'+sp.cols.indexOf(c)+'" data-wrap="'+(_iawWraps(c)?'1':'')+'" data-len="'+_iawRows(c).length+'"><div class="iaw-pad"></div>'
       + _iawList(c).map(function(v){
           return '<div class="iaw-it'+(v===''?' nil':'')+'" data-v="'+v+'">'+_iawFace(c,v)+'</div>';
@@ -148,7 +151,7 @@ function iaWheelHTML(kind, hiddenId, val, capOverride, plan){
 // touching all of them per frame janks on device, so only the rows that can actually be
 // seen are shaped. Distance from the centre drives scale and opacity — no rotateX, the
 // type simply recedes, which is what the eye reads as a drum turning away.
-function _iawShape(col){
+function _iawShape(col: any){
   var items=col.querySelectorAll('.iaw-it'), c=col.scrollTop;
   var mid=Math.round(c/_IAW_ROW), lo=Math.max(0,mid-4), hi=Math.min(items.length-1,mid+4);
   for(var i=lo;i<=hi;i++){
@@ -164,14 +167,14 @@ function _iawShape(col){
 // rewriting scrollTop during momentum cancels the scroll on iOS. The selected VALUE is
 // identical across copies, so the jump is invisible and _iawCommit's dedupe means it
 // cannot fire a spurious input event.
-function _iawRecenter(col){
+function _iawRecenter(col: any){
   if(!col.getAttribute('data-wrap')) return;
   var len=+col.getAttribute('data-len'), i=Math.round(col.scrollTop/_IAW_ROW);
   var half=Math.floor(_IAW_REPS/2)*len*_IAW_ROW;
   if(i<len) col.scrollTop+=half;
   else if(i>len*(_IAW_REPS-1)) col.scrollTop-=half;
 }
-function _iawSel(col){
+function _iawSel(col: any){
   var items=col.querySelectorAll('.iaw-it');
   if(!items.length) return '';
   var i=Math.round(col.scrollTop/_IAW_ROW);
@@ -180,7 +183,7 @@ function _iawSel(col){
 }
 // Commit on scroll-settle, never per frame. Writes the hidden node then dispatches
 // 'input'; from V236 (D218) the listener saves only on a LIVE card (cardioLive).
-function _iawCommit(w){
+function _iawCommit(w: any){
   var kind=w.getAttribute('data-kind');
   var cols=w.querySelectorAll('.iaw-col');
   var vals=[]; for(var i=0;i<cols.length;i++) vals.push(_iawSel(cols[i]));
@@ -192,7 +195,9 @@ function _iawCommit(w){
   // the one it was seeded on, nothing is written: opening a day never writes, whatever the
   // stored string. The first rest elsewhere marks it moved; from then on only the dedupe gates.
   if(!w._iawMoved){ if(next===w._iawSeedFace) return; w._iawMoved=true; }
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   if(h.value===next) return;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   h.value=next;
   h.dispatchEvent(new Event('input',{bubbles:true}));
 }
@@ -201,14 +206,14 @@ function _iawCommit(w){
 // before persistLogFields reads the nodes, and its timer is cleared so nothing commits once
 // the overlay is gone. A live _iawT means scrolled and not yet committed (the settle clears
 // it); an untouched or already settled wheel is left alone and never writes.
-function iaWheelFlush(root){
+function iaWheelFlush(root: any){
   var cols=(root||document).querySelectorAll('.iaw-col');
   for(var i=0;i<cols.length;i++){ var c=cols[i];
     if(c._iawT&&c._iawSettle){ clearTimeout(c._iawT); c._iawSettle(); } }
 }
 // Idempotent: safe to call after any re-render. Seeds each column from the hidden
 // input's current value and paints the selected row without committing.
-function iaWheelInit(root){
+function iaWheelInit(root: any){
   var scope=root||document;
   var wheels=scope.querySelectorAll('.iaw');
   for(var n=0;n<wheels.length;n++){ (function(w){
@@ -217,6 +222,7 @@ function iaWheelInit(root){
     var h=document.getElementById(w.getAttribute('data-for'));
     // V232 (D202): blank storage seeds from the plan when the wheel carries one. Display only:
     // the plan face becomes the seed face, so _iawCommit's guard keeps an untouched open unwritten.
+    // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     var hv=h?h.value:'', seed=_iawParse(kind, hv!==''?hv:(w.getAttribute('data-plan')||''));
     var cols=w.querySelectorAll('.iaw-col'), landed=[];
     for(var i=0;i<cols.length;i++){ (function(col,ci){
@@ -230,6 +236,7 @@ function iaWheelInit(root){
       },{passive:true});
       // Seed into the MIDDLE copy so there is runway in both directions before the
       // first recentre; on a non-wrapping column _iawHome is 0 and this is unchanged.
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ di
       var home=_iawHome(_IAW_SPEC[kind].cols[ci]);
       var items=col.querySelectorAll('.iaw-it'), idx=home;
       for(var k=home;k<items.length;k++) if(items[k].getAttribute('data-v')===seed[ci]){ idx=k; break; }
@@ -246,7 +253,7 @@ function iaWheelInit(root){
 // session is swapped to a different activity (the swap re-renders this in place).
 // `dose` selects the grammar for run; null (unknown dose, complex NRC speed work, or a
 // swapped session with no prescription in the new sport) falls back to the generic form.
-function cardioFieldHTML(sport, e, dose, sub){
+function cardioFieldHTML(sport: any, e: any, dose: any, sub: any){
   e=e||{};
   if(sport==='run'&&dose){
     const strip=_doseStripHTML('run',dose,sub||'');
@@ -313,13 +320,14 @@ function cardioFieldHTML(sport, e, dose, sub){
   return '';
 }
 // One sport chip in the swap picker.
-function cardioSwapChip(sport, active, planned){
+function cardioSwapChip(sport: any, active: any, planned: any){
   const on=sport===active;
   const tag=sport===planned?' · planned':'';
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   return `<button type="button" data-sport="${sport}" onclick="setCardioSwap('${sport}')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border-radius:4px;cursor:pointer;border:1px solid ${on?'var(--accent)':'var(--border2)'};background:${on?'rgba(24,23,18,0.12)':'var(--surface2)'};color:${on?'var(--accent)':'var(--muted)'};font-family:var(--font-display);font-size:10px;font-weight:700;letter-spacing:0.02em">${asyIcon(sport,15)}<span>${CARDIO_WORD[sport]}${tag}</span></button>`;
 }
 
-function buildLogHTML(dayKey, dayCardio){
+function buildLogHTML(dayKey: any, dayCardio: any){
   const logs=getLogs();const key=logKey(currentWeek,dayKey);const e=logs[key]||{};
   // Day-level cardio gating — show the field only for the cardio THIS day actually programs,
   // not whenever the program includes that sport somewhere. Null cardio = lift-only day = no cardio field.
@@ -378,22 +386,23 @@ const MOD_PAL={test:['#CF4E1A','rgba(207,78,26,0.15)'],peak:['#CF4E1A','rgba(207
 // translucent-black chip — 1.01:1 on the dark day header, i.e. invisible. Any tag added
 // to the engine without a MOD_PAL entry hit this. On-ink instead: 7.6:1 on the dark
 // header and still legible on the bone week list.
-function modTagsHTML(tags){return (tags||[]).filter(t=>t!=='rest').map(function(t){var p=MOD_PAL[t]||['#7d7668','rgba(125,118,104,0.12)'];return '<span class="wk-tag" style="color:'+p[0]+';background:'+p[1]+'">'+((tagMeta[t]&&tagMeta[t].label)||t)+'</span>';}).join('');}
-function sessionLogProgress(day){
+// @ts-expect-error TS7006 Parameter 't' implicitly has an 'any' type.
+function modTagsHTML(tags: any){return (tags||[]).filter(t=>t!=='rest').map(function(t: any){var p=MOD_PAL[t]||['#7d7668','rgba(125,118,104,0.12)'];return '<span class="wk-tag" style="color:'+p[0]+';background:'+p[1]+'">'+((tagMeta[t]&&tagMeta[t].label)||t)+'</span>';}).join('');}
+function sessionLogProgress(day: any){
   const stored=getExWeights();var total=0,done=0;
-  (day.sections||[]).forEach(function(sec){
+  (day.sections||[]).forEach(function(sec: any){
     // A skipped block or item is not part of today's work, so it must not sit in the
     // denominator — otherwise skipping one thing makes "6 / 6 LOGGED" unreachable and
     // the counter reads as failure for the rest of the session.
     if(sec&&sec._skipped) return;
-    (sec.items||[]).forEach(function(i){
+    (sec.items||[]).forEach(function(i: any){
     if(i&&i._skipped)return;
     var name=i.name||'';
     if(!exLoggable(name, i.detail||''))return;
     total++;
     var exKey=exStoreKey(name);
     var entries=(stored[exKey]&&stored[exKey].entries)||[];
-    if(entries.some(function(e){return +e.week===+currentWeek&&entryDay(e)===currentDayKey;}))done++;
+    if(entries.some(function(e: any){return +e.week===+currentWeek&&entryDay(e)===currentDayKey;}))done++;
   });});
   return {done:done,total:total};
 }

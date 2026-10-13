@@ -1,15 +1,15 @@
-import { getPrograms, savePrograms } from './storage.js';
+import { getPrograms, savePrograms } from './storage.ts';
 import { _setCurrentWeek, showScreen, showToast } from './rest-day-shell.ts';
 import { LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
 import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.ts';
-import { WD, _applyWizardStart, _rsRace, renderWizardStep, resolveStartDate } from './wizard.js';
+import { WD, _applyWizardStart, _rsRace, renderWizardStep, resolveStartDate } from './wizard.ts';
 import { calcProgramLength } from '../../../../../../core/src/engine/nsw-cardio.ts';
 import { runAnchorInfo } from '../../../../../../core/src/engine/cardio-progression.ts';
 import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';
-import { renderWeekView } from './week-view-sections.js';
-import { _setRtIntroPending } from './rest-timer.js';
-import { progTestPin, renderProgList } from './programs.js';
-import { loadActiveProgram } from './program-manage.js';
+import { renderWeekView } from './week-view-sections.ts';
+import { _setRtIntroPending } from './rest-timer.ts';
+import { progTestPin, renderProgList } from './programs.ts';
+import { loadActiveProgram } from './program-manage.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // PROGRAM GENERATOR
@@ -25,7 +25,7 @@ function generateProgram(){
   }
   doGenerate();
 }
-function showLengthWarning(msg, weeks, onConfirm){
+function showLengthWarning(msg: any, weeks: any, onConfirm: any){
   // Remove any existing instance so repeated triggers don't stack backdrops
   const existing=document.getElementById('lengthWarnOverlay');
   if(existing) existing.remove();
@@ -45,18 +45,20 @@ function showLengthWarning(msg, weeks, onConfirm){
   // Go Back: fully remove the overlay (backdrop included) and return to the wizard
   // on the step the user was on. The earlier bug removed only the inner content box
   // via closest('div[style]'), leaving the full-screen backdrop blocking the UI.
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('lengthWarnBack').onclick=()=>{
     overlay.remove();
     showScreen('screenWizard');
     renderWizardStep();
   };
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('confirmGenBtn').onclick=()=>{overlay.remove();onConfirm();};
 }
 // ── V176 (D9): mile-time validation. The chart clamps silently (5:00–12:00 rows);
 // impossible entries are rejected here, and out-of-chart entries are told what the
 // clamp will do BEFORE the build. D188: beginners see the field too and their
 // entry is read, so D9 judges it at every level; a blank stays optional for them.
-function _mileEntryState(g, exp){
+function _mileEntryState(g?: any, exp?: any){
   // V203 (D116): (g, exp) default to the wizard draft so the mid-program mile
   // sheet and the wizard share ONE validator and one set of strings.
   if(g===undefined) g=(typeof WD!=='undefined'&&WD.cardioGoals)?WD.cardioGoals.run:null;
@@ -82,6 +84,7 @@ function _mileEntryState(g, exp){
 function _mileFieldHelp(){
   const g=(WD.cardioGoals&&WD.cardioGoals.run)||{}; const exp=WD.experience||'intermediate';
   if(g.id==='run_pace_goal' && exp!=='beginner') return 'Required. Your paces and your program length start from it.';
+  // @ts-expect-error TS2322 Type 'string' is not assignable to type '"beginner" | "intermediate" | "advanced"'.
   const a=runAnchorInfo({cardioTypes:['run'],cardioGoals:{run:{id:g.id||'run_base'}},experience:exp}); if(!a) return 'Optional.';
   const m=_fmtMileAnchor(a.anchorSec), art=/^(8|11|18):/.test(m)?'an':'a';
   return 'Optional. Leave it blank and your paces come from '+art+' '+m+' mile, the '+exp+' default. Enter a mile only if you have timed one.';
@@ -99,14 +102,15 @@ function updateMileAdvisory(){
 // D110a M2 (V212, Mario: make it required): a swim time goal needs a real current time. One
 // validator in the D9 shape, shared by the advisory and the doGenerate refusal. The 500 goal reads
 // baseMins/baseSecs; the 100 goal reads baseMins/baseSecs (the 100) and base500Mins/base500Secs.
-function _swimEntryState(g){
+function _swimEntryState(g?: any){
   if(g===undefined) g=(typeof WD!=='undefined'&&WD.cardioGoals)?WD.cardioGoals.swim:null;
   if(!g||(g.id!=='swim_500_time'&&g.id!=='swim_100_time')) return {ok:true};
   const unit=g.swimUnit||'yd', is100=g.id==='swim_100_time';
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const num=v=>(v===undefined||v===null||v==='')?0:+v;
   const fields=is100?['baseMins','baseSecs','base500Mins','base500Secs']:['baseMins','baseSecs'];
   for(const k of fields){ const v=num(g[k]); if(!isFinite(v)||(/Secs$/.test(k)&&v>=60)) return {ok:false,msg:'That is not a real time. Check the minutes and seconds.'}; }
-  const tot=(m,s)=>num(g[m])*60+num(g[s]);
+  const tot=(m: any,s: any)=>num(g[m])*60+num(g[s]);
   const t500=is100?tot('base500Mins','base500Secs'):tot('baseMins','baseSecs');
   if(!(t500>0)) return {ok:false,blank:true,msg:'Required. Enter your most recent timed 500'+unit+'.'};
   if(is100){
@@ -147,18 +151,22 @@ function doGenerate(){
   WD._testWeek = (_tp && _tp.tw) || null;
   WD._raceDateCappedWeeks = WD._testWeek || totalWeeksPreview;
   totalWeeksPreview = WD._raceDateCappedWeeks;   // the screen names the length that builds
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('generateSub').textContent='Building your '+totalWeeksPreview+'-week program...';
   const msgs=['Analyzing your goals...','Building cardio progressions...','Selecting exercises...','Calculating weights...','Assembling '+totalWeeksPreview+' weeks...','Almost done...'];
   let i=0;const sub=document.getElementById('generateSub');
+  // @ts-expect-error TS18047 'sub' is possibly 'null'.
   const iv=setInterval(()=>{if(i<msgs.length)sub.textContent=msgs[i++];},380);
   setTimeout(()=>{
     clearInterval(iv);
     let prog;
     try {
+      // @ts-expect-error TS2345 Argument of type '{ primaryPath: string; cardioTypes: never[]; cardioGoals: {}; eventTargeted: boolean;
       prog = buildProgram(WD);
       _applyWizardStart(prog, WD);              // V174: resolved start on the program, field off cfg
     } catch(err) {
       console.error('buildProgram error:', err);
+      // @ts-expect-error TS2531 Object is possibly 'null'.
       document.getElementById('generateSub').textContent = 'Error: ' + err.message;
       return;
     }
@@ -174,6 +182,7 @@ function doGenerate(){
     loadActiveProgram(prog.id);
     _setCurrentWeek(1);
     // Update generate screen to show actual week count
+    // @ts-expect-error TS2531 Object is possibly 'null'.
     document.getElementById('generateSub').textContent='Your '+prog.totalWeeks+'-week program is ready!';
     setTimeout(()=>{showScreen('screenWeek');renderWeekView();renderProgList();},600);
   },2400);

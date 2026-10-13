@@ -1,16 +1,16 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { PACE_CHART } from '../../../../../../core/src/engine/cardio-progression.ts';
-import { weeklyBest } from './log-entries.js';
+import { weeklyBest } from './log-entries.ts';
 import {
   EASY_MIN_RUNS, EASY_RPE_HI, EASY_RPE_LO, RUN_CLASS_COLOR, RUN_CLASS_ORDER, _fmtPaceShort, _halfFromMileSec,
   _mileFromRecoverySec, _paceStrToSec, _runClass,
-} from './progress-data.js';
+} from './progress-data.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── V165 chart builders ─────────────────────────────────────────────────────
 // D2 (ruled): static SVG, no interaction layer. D5: bars where composition or a
 // zero line carries the meaning, dot-and-dash where the existing grammar holds.
-function _iaCard(title, color, inner, footer){
+function _iaCard(title: any, color: any, inner: any, footer: any){
   return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:14px 16px">'
     + '<div style="font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;'
     + 'text-transform:uppercase;color:'+(color||'var(--accent)')+';margin-bottom:12px">'+title+'</div>'
@@ -18,14 +18,14 @@ function _iaCard(title, color, inner, footer){
     + (footer?'<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">'+footer+'</div>':'')
     + '</div>';
 }
-function _axTx(x,y,s,size,anchor,fill,weight){
+function _axTx(x: any,y: any,s: any,size: any,anchor: any,fill: any,weight: any){
   return '<text x="'+(+x).toFixed(1)+'" y="'+(+y).toFixed(1)+'" fill="'+(fill||'rgba(24,23,18,0.3)')
     +'" font-size="'+(size||8)+'" text-anchor="'+(anchor||'end')+'" font-family="Helvetica Neue,Helvetica,Geist,sans-serif"'
     +(weight?' font-weight="'+weight+'"':'')+'>'+s+'</text>';
 }
 
 // 1 — LONG RUN LADDER
-function buildLadderChart(wk, totalWeeks, raceMi, cut, skip1){
+function buildLadderChart(wk: any, totalWeeks: any, raceMi: any, cut: any, skip1: any){
   const vals=Object.keys(wk).map(Number);
   if(vals.length<2) return '';
   const best=Math.max.apply(null, vals.map(w=>wk[w]));
@@ -38,6 +38,7 @@ function buildLadderChart(wk, totalWeeks, raceMi, cut, skip1){
   for(let yv=0; yv<=mx; yv+=step){
     const cy=padT+plotH-(yv/mx)*plotH;
     s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
     s+=_axTx(padL-5, cy+3, yv);
   }
   if(raceMi>0&&raceMi<=mx){
@@ -55,6 +56,7 @@ function buildLadderChart(wk, totalWeeks, raceMi, cut, skip1){
     s+='<rect x="'+x.toFixed(1)+'" y="'+(padT+plotH-h).toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+h.toFixed(1)+'" fill="var(--run)" opacity="'+(v===best?0.95:0.62)+'"/>';
   }
   const lblStep=Math.ceil(totalWeeks/7);
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   for(let i=0;i<totalWeeks;i++) if(i%lblStep===0) s+=_axTx(padL+i*slot+slot/2, H-8, 'W'+(i+1), 8, 'middle');
   const bestW=vals.filter(w=>wk[w]===best)[0];
   let foot='Furthest so far <b style="color:var(--run)">'+best.toFixed(1)+' mi</b> in W'+bestW;
@@ -68,16 +70,18 @@ function buildLadderChart(wk, totalWeeks, raceMi, cut, skip1){
 }
 
 // 2 — IS YOUR EASY ACTUALLY EASY?
-function buildClassBandsChart(byClass){
+function buildClassBandsChart(byClass: any){
   const active=RUN_CLASS_ORDER.filter(c=>(byClass[c]||[]).length>0);
   if(active.length<2) return '';
-  let all=[]; active.forEach(c=>{ all=all.concat(byClass[c].map(r=>r.sec)); });
+  // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
+  let all: any[]=[]; active.forEach(c=>{ all=all.concat(byClass[c].map(r=>r.sec)); });
   if(all.length<4) return '';
   let lo=Math.min.apply(null,all), hi=Math.max.apply(null,all);
   const pad=Math.max(20,(hi-lo)*0.12); lo-=pad; hi+=pad;
   const W=320,H=178,padL=40,padR=10,padT=12,padB=40;
   const plotW=W-padL-padR, plotH=H-padT-padB;
   const colW=plotW/active.length;
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const yof=p=>padT+((p-lo)/(hi-lo))*plotH;      // slower = lower
   let s='';
   const tickStep=(hi-lo)>420?120:60;
@@ -85,20 +89,25 @@ function buildClassBandsChart(byClass){
   for(let pv=first; pv<=hi; pv+=tickStep){
     const cy=yof(pv);
     s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
     s+=_axTx(padL-5, cy+3, _fmtPaceShort(pv));
   }
   active.forEach((c,ci)=>{
+    // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
     const cx=padL+ci*colW+colW/2, pts=byClass[c].map(r=>r.sec), col=RUN_CLASS_COLOR[c]||'var(--accent)';
     s+='<line x1="'+cx.toFixed(1)+'" y1="'+yof(Math.min.apply(null,pts)).toFixed(1)+'" x2="'+cx.toFixed(1)+'" y2="'+yof(Math.max.apply(null,pts)).toFixed(1)+'" stroke="'+col+'" stroke-width="1" opacity="0.28"/>';
-    pts.forEach((p,k)=>{
+    pts.forEach((p: any,k: any)=>{
       const jx=cx+((k%5)-2)*4.2;
       s+='<circle cx="'+jx.toFixed(1)+'" cy="'+yof(p).toFixed(1)+'" r="2.6" fill="'+col+'" opacity="0.72"/>';
     });
     s+=_axTx(cx, H-padB+16, c, 8, 'middle', col, '700');
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
     s+=_axTx(cx, H-padB+26, pts.length+(pts.length===1?' run':' runs'), 7, 'middle');
   });
   let foot='Each dot is one logged run, placed by pace and grouped by the intensity the plan asked for.';
+  // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
   const easy=(byClass.Easy||[]).concat(byClass.Recovery||[]).map(r=>r.sec);
+  // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
   const hard=(byClass.Tempo||[]).concat(byClass.Interval||[]).map(r=>r.sec);
   if(easy.length&&hard.length){
     const gap=Math.min.apply(null,easy)-Math.max.apply(null,hard);
@@ -111,7 +120,7 @@ function buildClassBandsChart(byClass){
 }
 
 // 3 — SAME EFFORT, MORE SPEED  (coverage-gated)
-function buildEasyEffortChart(ee, totalWeeks){
+function buildEasyEffortChart(ee: any, totalWeeks: any){
   const ws=Object.keys(ee.weekly).map(Number).sort((a,b)=>a-b);
   if(ws.length<2) return '';
   const vals=ws.map(w=>ee.weekly[w]);
@@ -120,6 +129,7 @@ function buildEasyEffortChart(ee, totalWeeks){
   const W=320,H=136,padL=40,padR=12,padT=18,padB=26;
   const plotW=W-padL-padR, plotH=H-padT-padB;
   const xs=plotW/Math.max(1,totalWeeks-1);
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const yof=p=>padT+((p-lo)/(hi-lo))*plotH;
   let s='';
   const tickStep=(hi-lo)>240?60:30;
@@ -127,10 +137,12 @@ function buildEasyEffortChart(ee, totalWeeks){
   for(let pv=first; pv<=hi; pv+=tickStep){
     const cy=yof(pv);
     s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
     s+=_axTx(padL-5, cy+3, _fmtPaceShort(pv));
   }
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   s+=_axTx(padL, padT-6, '↑ faster', 7, 'start');
-  let path='', prev=null;
+  let path='', prev: any=null;
   ws.forEach(w=>{
     const x=padL+(w-1)*xs, y=yof(ee.weekly[w]);
     if(prev) path+=' M'+prev[0].toFixed(1)+','+prev[1].toFixed(1)+' L'+x.toFixed(1)+','+y.toFixed(1);
@@ -143,6 +155,7 @@ function buildEasyEffortChart(ee, totalWeeks){
     s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="7" fill="var(--run)" opacity="0.15"/>';
   });
   const lblStep=Math.ceil(totalWeeks/7);
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   for(let i=0;i<totalWeeks;i++) if(i%lblStep===0) s+=_axTx(padL+i*xs, H-8, 'W'+(i+1), 8, 'middle');
   const d=ee.weekly[ws[0]]-ee.weekly[ws[ws.length-1]];
   let foot='Easy and recovery runs at RPE '+EASY_RPE_LO+'–'+EASY_RPE_HI+' only, so effort is held and pace is the one free variable. ';
@@ -152,8 +165,9 @@ function buildEasyEffortChart(ee, totalWeeks){
   return _iaCard(asyIcon('🏃',15)+' Same Effort, More Speed','var(--run)',
     '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+s+'</svg>', foot);
 }
-function buildEasyEffortEmpty(ee){
+function buildEasyEffortEmpty(ee: any){
   const need=EASY_MIN_RUNS-ee.nRuns;
+  // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
   return _iaCard(asyIcon('🏃',15)+' Same Effort, More Speed','var(--muted)',
     '<div style="font-size:12px;color:var(--muted);line-height:1.6">This chart holds effort constant so pace is the only thing that can move — it needs '
     +'<b style="color:var(--text)">'+EASY_MIN_RUNS+'</b> easy or recovery runs logged with an RPE of '+EASY_RPE_LO+'–'+EASY_RPE_HI+'. '
@@ -161,30 +175,34 @@ function buildEasyEffortEmpty(ee){
 }
 
 // 4 — WHERE THIS IS HEADING  (D8: forward claim, intake number plotted alongside)
-function buildProjectionCard(ee, totalWeeks, intakeMileSec){
+function buildProjectionCard(ee: any, totalWeeks: any, intakeMileSec: any){
   const ws=Object.keys(ee.weekly).map(Number).sort((a,b)=>a-b);
   if(ws.length<2) return '';
   const proj={}; let any=false;
   ws.forEach(w=>{
     const mile=_mileFromRecoverySec(ee.weekly[w]);
     const half=mile?_halfFromMileSec(mile):null;
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(half){ proj[w]=half; any=true; }
   });
   if(!any) return '';
   const pws=Object.keys(proj).map(Number).sort((a,b)=>a-b);
   if(pws.length<2) return '';
   const claimed=(intakeMileSec>0)?_halfFromMileSec(intakeMileSec):null;
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   let vals=pws.map(w=>proj[w]); if(claimed) vals=vals.concat([claimed]);
   let lo=Math.min.apply(null,vals), hi=Math.max.apply(null,vals);
   const pad=Math.max(180,(hi-lo)*0.25); lo-=pad; hi+=pad;
   const W=320,H=146,padL=46,padR=12,padT=16,padB=26;
   const plotW=W-padL-padR, plotH=H-padT-padB;
   const xs=plotW/Math.max(1,totalWeeks-1);
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const yof=v=>padT+((v-lo)/(hi-lo))*plotH;
   let s='';
   for(let tv=Math.ceil(lo/600)*600; tv<=hi; tv+=600){
     const cy=yof(tv);
     s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
     s+=_axTx(padL-5, cy+3, Math.floor(tv/3600)+':'+String(Math.floor((tv%3600)/60)).padStart(2,'0'));
   }
   if(claimed){
@@ -193,19 +211,25 @@ function buildProjectionCard(ee, totalWeeks, intakeMileSec){
     s+=_axTx(W-padR, cy-5, 'your '+_fmtPaceShort(intakeMileSec)+' mile', 8, 'end', 'var(--muted)', '700');
   }
   let up='', dn='';
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   pws.forEach(w=>{ up+=(padL+(w-1)*xs).toFixed(1)+','+yof(proj[w]*0.975).toFixed(1)+' '; });
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   for(let i=pws.length-1;i>=0;i--){ const w=pws[i]; dn+=(padL+(w-1)*xs).toFixed(1)+','+yof(proj[w]*1.025).toFixed(1)+' '; }
   s+='<polygon points="'+up+dn+'" fill="var(--hip)" opacity="0.13"/>';
-  let path='', prev=null;
+  let path='', prev: any=null;
   pws.forEach(w=>{
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     const x=padL+(w-1)*xs, y=yof(proj[w]);
     if(prev) path+=' M'+prev[0].toFixed(1)+','+prev[1].toFixed(1)+' L'+x.toFixed(1)+','+y.toFixed(1);
     prev=[x,y];
   });
   s+='<path d="'+path+'" stroke="var(--hip)" stroke-width="1.5" stroke-dasharray="3,3" fill="none" opacity="0.7"/>';
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   pws.forEach(w=>{ s+='<circle cx="'+(padL+(w-1)*xs).toFixed(1)+'" cy="'+yof(proj[w]).toFixed(1)+'" r="3.2" fill="var(--hip)" opacity="0.9"/>'; });
   const lblStep=Math.ceil(totalWeeks/7);
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   for(let i=0;i<totalWeeks;i++) if(i%lblStep===0) s+=_axTx(padL+i*xs, H-8, 'W'+(i+1), 8, 'middle');
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   const last=proj[pws[pws.length-1]], firstP=proj[pws[0]];
   const big='<div style="font-family:var(--font-display);font-size:26px;font-weight:700;letter-spacing:-0.02em;color:var(--hip);line-height:1.1">'
     +_fmtHMS(last*0.975)+' – '+_fmtHMS(last*1.025)+'</div>'
@@ -215,13 +239,13 @@ function buildProjectionCard(ee, totalWeeks, intakeMileSec){
   return _iaCard(asyIcon('🏁',15)+' Where This Is Heading','var(--hip)',
     big+'<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;overflow:visible">'+s+'</svg>', foot);
 }
-function _fmtHMS(sec){
+function _fmtHMS(sec: any){
   sec=Math.round(sec);
   return Math.floor(sec/3600)+':'+String(Math.floor((sec%3600)/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');
 }
 
 // 5 — DRIFT FROM PLAN
-function buildDriftChart(pv, totalWeeks, cut, skip1){
+function buildDriftChart(pv: any, totalWeeks: any, cut: any, skip1: any){
   const ws=Object.keys(pv).map(Number).sort((a,b)=>a-b);
   if(ws.length<2) return '';
   const deltas=ws.map(w=>pv[w].act-pv[w].presc);
@@ -230,6 +254,7 @@ function buildDriftChart(pv, totalWeeks, cut, skip1){
   const W=320,H=128,padL=36,padR=10,padT=12,padB=26;
   const plotW=W-padL-padR, plotH=H-padT-padB;
   const slot=plotW/totalWeeks, barW=slot*0.58;
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const yof=v=>padT+plotH-((v-lo)/(hi-lo))*plotH;
   let s='';
   const span=hi-lo, step=span>16?5:(span>6?2:1);
@@ -237,10 +262,12 @@ function buildDriftChart(pv, totalWeeks, cut, skip1){
     if(Math.abs(yv)<1e-9) continue;
     const cy=yof(yv);
     s+='<line x1="'+padL+'" y1="'+cy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+cy.toFixed(1)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
     s+=_axTx(padL-5, cy+3, (yv>0?'+':'')+yv);
   }
   const zy=yof(0);
   s+='<line x1="'+padL+'" y1="'+zy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+zy.toFixed(1)+'" stroke="var(--border2)" stroke-width="1.2"/>';
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 6.
   s+=_axTx(padL-5, zy+3, 'as written', 7, 'end', 'var(--muted)');
   ws.forEach(w=>{
     const d=pv[w].act-pv[w].presc;
@@ -249,6 +276,7 @@ function buildDriftChart(pv, totalWeeks, cut, skip1){
       +'" fill="'+(d>=0?'var(--run)':'var(--red)')+'" opacity="0.85"/>';
   });
   const lblStep=Math.ceil(totalWeeks/7);
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   for(let i=0;i<totalWeeks;i++) if(i%lblStep===0) s+=_axTx(padL+i*slot+slot/2, H-8, 'W'+(i+1), 8, 'middle');
   let tp=0, ta=0; ws.forEach(w=>{ tp+=pv[w].presc; ta+=pv[w].act; });
   const net=ta-tp;
@@ -262,9 +290,10 @@ function buildDriftChart(pv, totalWeeks, cut, skip1){
 }
 
 // 6 — LIFT LEDGER
-function _ledgerSpark(entries, unit){
+function _ledgerSpark(entries: any, unit: any){
   const pts=weeklyBest(entries);
   if(pts.length<2) return '';
+  // @ts-expect-error TS7006 Parameter 'w' implicitly has an 'any' type.
   const disp=w=>(unit==='kg')?Math.round(w*0.453592*2)/2:w;
   const vs=pts.map(e=>disp(+e.weight||0));
   const lo=Math.min.apply(null,vs), hi=Math.max.apply(null,vs), rng=(hi-lo)||1;
@@ -275,11 +304,13 @@ function _ledgerSpark(entries, unit){
     +'<path d="'+d+'" fill="none" stroke="var(--lift)" stroke-width="1.4" opacity="0.7"/>'
     +'<circle cx="'+((pts.length-1)*xs).toFixed(1)+'" cy="'+(H-((vs[vs.length-1]-lo)/rng)*H).toFixed(1)+'" r="2.6" fill="var(--lift)"/></svg>';
 }
-function buildLedgerCard(led, unit){
+function buildLedgerCard(led: any, unit: any){
   if(!led.mains.length&&!led.accessories.length) return '';
   const u=(unit==='kg')?'kg':'lbs';
+  // @ts-expect-error TS7006 Parameter 'w' implicitly has an 'any' type.
   const disp=w=>(unit==='kg')?Math.round(w*0.453592*2)/2:Math.round(w);
   let rows='';
+  // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
   led.mains.forEach(r=>{
     const d=r.cur-r.base;
     const pct=r.base>0?Math.round(d/r.base*100):0;
@@ -301,6 +332,7 @@ function buildLedgerCard(led, unit){
       +'<span>'+led.accessories.length+' accessory movement'+(led.accessories.length===1?'':'s')+'</span>'
       +'<span style="font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text)">Show</span></summary>'
       +'<div style="padding-top:4px">'
+      // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
       +led.accessories.map(r=>'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border)">'
         +'<div style="font-size:12px;color:var(--text)">'+r.name+'</div>'
         +'<div style="font-size:11px;color:var(--muted);white-space:nowrap">best <b style="color:var(--text)">'+disp(r.cur)+' e1RM</b></div></div>').join('')
@@ -334,7 +366,7 @@ function buildLedgerCard(led, unit){
 // set of rows needing it is closed and only shrinks as old history ages out.
 // It reproduces steadyCapSec's own formula off PACE_CHART's tempo column rather than
 // inventing a constant: the number the engine itself would have written at the time.
-function _steadyCeilingFor(recSec){
+function _steadyCeilingFor(recSec: any){
   const rows=(typeof PACE_CHART!=='undefined')?PACE_CHART:null;
   if(!rows||!rows.length||!(recSec>0)) return null;
   // tempo and recovery must stay a MATCHED PAIR — the engine's formula reads both from
@@ -361,9 +393,10 @@ function _steadyCeilingFor(recSec){
 // A run with no `tgt` in its freeze CANNOT be placed and is excluded, never guessed —
 // same discipline as V155/V156. That is correct behaviour and it shrinks the sample,
 // which is why the B-variant band chart stays behind this one as a fallback.
-function easyVsPrescribed(logs, hist, totalWeeks){
-  const runs=[];
+function easyVsPrescribed(logs: any, hist: any, totalWeeks: any){
+  const runs: any[]=[];
   Object.entries(logs||{}).forEach(([key,e])=>{
+    // @ts-expect-error TS2339 Property 'run_pace' does not exist on type '{}'.
     if(!e||!e.run_pace||e.swapTo) return;
     const m=key.match(/^w(\d+)_(.+)$/); if(!m) return;
     const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
@@ -375,9 +408,12 @@ function easyVsPrescribed(logs, hist, totalWeeks){
     const d=c.dose||{};
     const tgt=(+d.tgt>0)?+d.tgt:0;
     if(!tgt) return;                                  // no anchor -> excluded
+    // @ts-expect-error TS2339 Property 'run_pace' does not exist on type '{}'.
     const sec=_paceStrToSec(e.run_pace); if(!sec) return;
     const cap=(+d.cap>0)?+d.cap:_steadyCeilingFor(tgt);
+    // @ts-expect-error TS18047 'cap' is possibly 'null'.
     if(!(cap>0)) return;
+    // @ts-expect-error TS18047 'cap' is possibly 'null'.
     runs.push({w, sec, tgt, cap, hot:sec<cap});       // fewer seconds = too fast
   });
   runs.sort((a,b)=>a.w-b.w);
@@ -386,13 +422,14 @@ function easyVsPrescribed(logs, hist, totalWeeks){
 var EASY_ZONE_MIN_RUNS = 4;   // below this the zone chart has nothing to say
 
 // Variant C — easy runs against the plan's own ceiling and aim.
-function buildEasyZoneChart(runs){
+function buildEasyZoneChart(runs: any){
   if(runs.length<EASY_ZONE_MIN_RUNS) return '';
+  // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
   const hot=runs.filter(r=>r.hot);
   const ok=hot.length===0;
   const col=ok?'var(--run)':'var(--red)';
-  const tgt=Math.round(runs.reduce((a,r)=>a+r.tgt,0)/runs.length);
-  const cap=Math.round(runs.reduce((a,r)=>a+r.cap,0)/runs.length);
+  const tgt=Math.round(runs.reduce((a: any,r: any)=>a+r.tgt,0)/runs.length);
+  const cap=Math.round(runs.reduce((a: any,r: any)=>a+r.cap,0)/runs.length);
   const head=ok?'Yes — every one':(hot.length+' of '+runs.length+' were too fast');
   const sub=ok
     ? 'Every easy run came in at or below the ceiling the plan set. Nothing to fix.'
@@ -401,10 +438,13 @@ function buildEasyZoneChart(runs){
        +'costs the recovery those days exist for.');
   const W=320,H=150,padL=40,padR=10,padT=22,padB=26;
   const plotW=W-padL-padR, plotH=H-padT-padB;
+  // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
   let lo=Math.min.apply(null,runs.map(r=>Math.min(r.sec,r.cap)))-40;
+  // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
   let hi=Math.max.apply(null,runs.map(r=>Math.max(r.sec,r.tgt)))+45;
   if(hi-lo<90){ const mid=(hi+lo)/2; lo=mid-45; hi=mid+45; }
   const n=runs.length, xs=plotW/Math.max(1,n-1);
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const yof=p=>padT+((p-lo)/(hi-lo))*plotH;
   const capY=Math.max(yof(cap),padT), tgtY=yof(tgt);
   let s='';
@@ -417,14 +457,16 @@ function buildEasyZoneChart(runs){
     s+='<line x1="'+padL+'" y1="'+tgtY.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+tgtY.toFixed(1)+'" stroke="var(--run)" stroke-width="1" stroke-dasharray="2,3" opacity="0.7"/>';
     s+=_axTx(W-padR, tgtY+12, 'aim '+_fmtPaceShort(tgt), 8, 'end', 'var(--run)', '700');
   }
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 3.
   for(let pv=Math.ceil(lo/60)*60; pv<=hi; pv+=60) s+=_axTx(padL-5, yof(pv)+3, _fmtPaceShort(pv));
-  runs.forEach((r,i)=>{
+  runs.forEach((r: any,i: any)=>{
     const x=padL+i*xs, y=yof(r.sec), c=r.hot?'var(--red)':'var(--run)';
     s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="4" fill="'+c+'" opacity="0.9"/>';
     s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="7.5" fill="'+c+'" opacity="0.16"/>';
   });
   const lblStep=Math.max(1,Math.ceil(n/6));
-  runs.forEach((r,i)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-8, 'W'+r.w, 8, 'middle'); });
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
+  runs.forEach((r: any,i: any)=>{ if(i%lblStep===0) s+=_axTx(padL+i*xs, H-8, 'W'+r.w, 8, 'middle'); });
   const headHtml='<div style="font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-0.02em;color:'
     +col+';line-height:1.15;margin-bottom:4px">'+head+'</div>'
     +'<div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:12px">'+sub+'</div>';
@@ -435,8 +477,10 @@ function buildEasyZoneChart(runs){
 
 // Variant B — fallback when too few runs carry a prescribed anchor. Ranges on one pace
 // axis; the rule is a sentence a runner already owns: these two bars should not touch.
-function buildEasyBandsFallback(byClass){
+function buildEasyBandsFallback(byClass: any){
+  // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
   const easy=(byClass.Easy||[]).concat(byClass.Recovery||[]).map(r=>r.sec);
+  // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
   const hard=(byClass.Tempo||[]).concat(byClass.Interval||[]).map(r=>r.sec);
   if(easy.length<2||hard.length<2) return '';
   const gap=Math.min.apply(null,easy)-Math.max.apply(null,hard);
@@ -449,13 +493,17 @@ function buildEasyBandsFallback(byClass){
   const plotW=W-padL-padR;
   const all=easy.concat(hard);
   const lo=Math.min.apply(null,all)-40, hi=Math.max.apply(null,all)+40;
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const xof=p=>padL+((p-lo)/(hi-lo))*plotW;
   let s='';
   for(let pv=Math.ceil(lo/60)*60; pv<=hi; pv+=60){
     s+='<line x1="'+xof(pv).toFixed(1)+'" y1="'+(padT-6)+'" x2="'+xof(pv).toFixed(1)+'" y2="'+(padT+58)+'" stroke="rgba(24,23,18,0.06)" stroke-width="1"/>';
+    // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
     s+=_axTx(xof(pv), padT+74, _fmtPaceShort(pv), 8, 'middle');
   }
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   s+=_axTx(padL, padT-12, '\u2190 faster', 7, 'start');
+  // @ts-expect-error TS2554 Expected 7 arguments, but got 5.
   s+=_axTx(W-padR, padT-12, 'slower \u2192', 7, 'end');
   [['HARD',hard,'var(--lift)'],['EASY',easy,'var(--run)']].forEach((row,i)=>{
     const y=padT+i*30, x1=xof(Math.min.apply(null,row[1])), x2=xof(Math.max.apply(null,row[1]));

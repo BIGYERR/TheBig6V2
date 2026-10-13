@@ -5,7 +5,7 @@ import {
 } from './rest-timer-model';
 
 /**
- * The floating rest timer (architecture phase E, step 2), in place of the legacy script's rest-timer.js inside
+ * The floating rest timer (architecture phase E, step 2), in place of the legacy script's rest-timer.ts inside
  * #restFloat. The markup is the legacy one, element for element; the readout and the Start/Stop button follow signals,
  * and the docking side, the open card, the intro and the drag write the same inline styles the legacy script wrote.
  * The legacy calls into the timer from the rest of the app (updateRestFloat on every screen change, ruReset when a day

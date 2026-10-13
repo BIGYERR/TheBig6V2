@@ -4,8 +4,8 @@ import { applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
 import { _AUX_FAMILY, _auxFamily, _auxGearOK, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _swapInjuryOK, applySwapPrefs } from '../../../../../../core/src/engine/swap-prefs.ts';
 import { _PATTERN_REGION, _compoundTier } from '../../../../../../core/src/engine/budget-engine-d.ts';
-import { parseRx } from './week-view-sections.js';
-import { dayOverlayInfo } from './overlays.js';
+import { parseRx } from './week-view-sections.ts';
+import { dayOverlayInfo } from './overlays.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // Which region a pattern belongs to (for ceiling bookkeeping + interference).
 // ── EXERCISE SWAP ────────────────────────────────────────────────────────────
@@ -26,7 +26,7 @@ import { dayOverlayInfo } from './overlays.js';
 // the same buildProgram, so their keyed universes are too. They are then run through
 // applyInjuryFilter so an active injury plan governs the swap sheet exactly as it
 // governs generation.
-function swapUniverseFor(prog,week,day){
+function swapUniverseFor(prog: any,week: any,day: any){
   if(!prog) return [];
   // V175 (D27): keyed by the DAY's overlay stamp, not by week — a one-day trip leaves
   // the rest of the week on the rack. A base day, or a frozen day whose overlay has
@@ -40,7 +40,7 @@ function swapUniverseFor(prog,week,day){
 // Outside buildProgram the injury is read off the day's own overlay stamp (_ovKey via dayOverlayInfo, the carrier
 // swapUniverseFor already keys on). A day whose stamp carries no injury key (no stamp, or a travel stamp) keeps
 // prog.cfg's injury, which is what that day's build used. Injury only: every other field is prog.cfg's.
-function _dayPlanCfg(prog,day){
+function _dayPlanCfg(prog: any,day: any){
   const base=(prog&&prog.cfg)||{};
   const ov=dayOverlayInfo(day);
   if(!ov||!ov.patch||!Object.prototype.hasOwnProperty.call(ov.patch,'injury')) return base;
@@ -54,18 +54,18 @@ function _dayPlanCfg(prog,day){
 // week" is a real request, and a push day should still offer them; blocking the athlete
 // is paternalistic, offering it silently is negligent. So off-region candidates appear,
 // with what they actually collide with stated on the row.
-function addCandidates(day,week,prog){
+function addCandidates(day: any,week: any,prog: any){
   const cfg=_dayPlanCfg(prog,day);   // D194 R1
   const onCard=Object.create(null), patsOnCard=Object.create(null);
-  let dayRegion=null;
-  ((day&&day.sections)||[]).forEach(function(s){((s&&s.items)||[]).forEach(function(it){
+  let dayRegion: any=null;
+  ((day&&day.sections)||[]).forEach(function(s: any){((s&&s.items)||[]).forEach(function(it: any){
     if(!it||!it.name) return;
     onCard[it.name.toLowerCase()]=1;
     const p=_pattern(it.name);
     if(p){ patsOnCard[p]=(patsOnCard[p]||0)+1; if(!dayRegion) dayRegion=_PATTERN_REGION[p]; }
   });});
-  const gap=[],more=[],off=[];
-  swapUniverseFor(prog,week,day).forEach(function(n){
+  const gap: any[]=[],more: any[]=[],off: any[]=[];
+  swapUniverseFor(prog,week,day).forEach(function(n: any){
     if(!n) return;
     if(onCard[n.toLowerCase()]) return;
     const p=_pattern(n); if(!p) return;
@@ -74,7 +74,7 @@ function addCandidates(day,week,prog){
     if(r&&dayRegion&&r!==dayRegion){ off.push(n); return; }
     if(patsOnCard[p]) more.push(n); else gap.push(n);
   });
-  const rank=function(a,b){const ta=_compoundTier(a),tb=_compoundTier(b);if(ta!==tb)return tb-ta;return a.localeCompare(b);};
+  const rank=function(a: any,b: any){const ta=_compoundTier(a),tb=_compoundTier(b);if(ta!==tb)return tb-ta;return a.localeCompare(b);};
   return {gap:gap.sort(rank).slice(0,6),more:more.sort(rank).slice(0,5),off:off.sort(rank).slice(0,6),
           region:dayRegion,pats:patsOnCard};
 }
@@ -88,7 +88,7 @@ function addCandidates(day,week,prog){
 // sections never donate — added work is accessory by nature — and supersets, core and hip
 // blocks keep their V109 exclusion. Deload-awareness survives by construction: every donor
 // is read from the live week, so a lighter week donates lighter doses.
-function _addRxKind(detail,name){
+function _addRxKind(detail: any,name: any){
   // D2 type fence: a rep lift may only inherit a rep dose or an open RPE-set dose. Distance
   // and time shapes are refused by STRING as well as by parse — spelled-out units ('yards',
   // 'meters') defeat parseRx's unit token and come back dressed as reps.
@@ -99,15 +99,15 @@ function _addRxKind(detail,name){
   if(rx.kind==='dist'||rx.kind==='sec') return null;
   return rx.open?'open':'reps';
 }
-function addedDetailFor(day,name,week,prog){
+function addedDetailFor(day: any,name: any,week: any,prog: any){
   const pat=_pattern(name)||null;
   const region=pat?_PATTERN_REGION[pat]:null;
-  const donors=function(d){
-    const out=[];
-    ((d&&d.sections)||[]).forEach(function(s){
+  const donors=function(d: any){
+    const out: any[]=[];
+    ((d&&d.sections)||[]).forEach(function(s: any){
       if(!s||s._added||s.core||s.hip||s.superset||s.type==='superset') return;
       if(/^(main|primer)/i.test(s.label||'')) return;
-      (s.items||[]).forEach(function(it){
+      (s.items||[]).forEach(function(it: any){
         if(!it||!it.name||!it.detail) return;
         if(!_addRxKind(it.detail,it.name)) return;
         out.push(it);
@@ -124,7 +124,7 @@ function addedDetailFor(day,name,week,prog){
   const wk=(prog&&prog.weeks&&prog.weeks[week])||null;
   if(wk&&pat){
     const order=['mon','tue','wed','thu','fri','sat','sun'];
-    const days=[]; order.forEach(function(k){if(wk[k])days.push(wk[k]);});
+    const days: any[]=[]; order.forEach(function(k){if(wk[k])days.push(wk[k]);});
     for(let i=0;i<days.length;i++){
       const ds=donors(days[i]);
       for(let j=0;j<ds.length;j++) if(_pattern(ds[j].name)===pat) return ds[j].detail;
@@ -142,15 +142,17 @@ function addedDetailFor(day,name,week,prog){
   // offers — defensive, not reachable from the sheet.
   return '3\u00d710 \u2014 RPE 7';
 }
-function swapCandidates(outName,day,week,prog){
+function swapCandidates(outName: any,day: any,week: any,prog: any){
   const cfg=_dayPlanCfg(prog,day);   // D194 R1
   const outPat=_pattern(outName);
   const outRegion=outPat?_PATTERN_REGION[outPat]:null;
   // Already on today's card — never offer a duplicate movement.
   const onCard=Object.create(null);
+  // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
   ((day&&day.sections)||[]).forEach(s=>((s&&s.items)||[]).forEach(it=>{if(it&&it.name)onCard[it.name.toLowerCase()]=1;}));
-  const t1=[],t2=[];
+  const t1: any[]=[],t2: any[]=[];
   const _ssP=_ssPartnerOf(day,outName);   // V164 D5: superset members only offer station-legal partners
+  // @ts-expect-error TS7006 Parameter 'n' implicitly has an 'any' type.
   swapUniverseFor(prog,week,day).forEach(n=>{
     if(!n||n===outName) return;
     if(onCard[n.toLowerCase()]) return;
@@ -164,7 +166,7 @@ function swapCandidates(outName,day,week,prog){
   // Rank by how close the candidate is in LOAD to the lift being replaced, so the top
   // of the list is always the nearest like-for-like rather than whatever sorts first.
   const outTier=_compoundTier(outName);
-  const rank=(a,b)=>{
+  const rank=(a: any,b: any)=>{
     const da=Math.abs(_compoundTier(a)-outTier),db=Math.abs(_compoundTier(b)-outTier);
     if(da!==db) return da-db;
     const ta=_compoundTier(a),tb=_compoundTier(b);
@@ -176,7 +178,7 @@ function swapCandidates(outName,day,week,prog){
 // Honest note when a candidate is materially lighter than what it replaces. Not a
 // reason to hide it — an athlete with a tweaked shoulder may want exactly this — but
 // it should not read as a like-for-like trade when it isn't.
-function swapLoadNote(outName,candName){
+function swapLoadNote(outName: any,candName: any){
   const d=_compoundTier(outName)-_compoundTier(candName);
   if(d<2) return '';
   return 'Much lighter than '+outName.toLowerCase()+'. Volume holds, top-end strength does not.';
@@ -198,40 +200,40 @@ function swapLoadNote(outName,candName){
 // from cfg+seed, and edits are re-applied ON TOP of the rebuild, exactly like rest-day
 // moves and swaps. Adding a lift on Tuesday therefore does NOT change next Tuesday —
 // that is the standing-preference feature, deliberately not built yet.
-function editStoreKey(pid){return 'ia_edits_'+pid;}
-function getDayEdits(pid){try{return JSON.parse(localStorage.getItem(editStoreKey(pid))||'{}');}catch(e){return {};}}
-function saveDayEdits(pid,v){try{localStorage.setItem(editStoreKey(pid),JSON.stringify(v));}catch(e){}}
-function _editEntry(s,k){const e=s[k]||{};if(!Array.isArray(e.add))e.add=[];if(!Array.isArray(e.skip))e.skip=[];s[k]=e;return e;}
-function recordSkip(pid,week,dayKey,name){
+function editStoreKey(pid: any){return 'ia_edits_'+pid;}
+function getDayEdits(pid: any){try{return JSON.parse(localStorage.getItem(editStoreKey(pid))||'{}');}catch(e){return {};}}
+function saveDayEdits(pid: any,v: any){try{localStorage.setItem(editStoreKey(pid),JSON.stringify(v));}catch(e){}}
+function _editEntry(s: any,k: any){const e=s[k]||{};if(!Array.isArray(e.add))e.add=[];if(!Array.isArray(e.skip))e.skip=[];s[k]=e;return e;}
+function recordSkip(pid: any,week: any,dayKey: any,name: any){
   const s=getDayEdits(pid),k='w'+week+'_'+dayKey,e=_editEntry(s,k);
   if(e.skip.indexOf(name)<0) e.skip.push(name);
   saveDayEdits(pid,s); return s;
 }
-function clearSkip(pid,week,dayKey,name){
+function clearSkip(pid: any,week: any,dayKey: any,name: any){
   const s=getDayEdits(pid),k='w'+week+'_'+dayKey; if(!s[k]) return s;
-  s[k].skip=(s[k].skip||[]).filter(function(x){return x!==name;});
+  s[k].skip=(s[k].skip||[]).filter(function(x: any){return x!==name;});
   if(!s[k].skip.length&&!(s[k].add||[]).length) delete s[k];
   saveDayEdits(pid,s); return s;
 }
-function recordAdd(pid,week,dayKey,name,detail){
+function recordAdd(pid: any,week: any,dayKey: any,name: any,detail: any){
   const s=getDayEdits(pid),k='w'+week+'_'+dayKey,e=_editEntry(s,k);
-  if(!e.add.some(function(a){return a&&a.name===name;})) e.add.push({name:name,detail:detail,ts:Date.now()});
+  if(!e.add.some(function(a: any){return a&&a.name===name;})) e.add.push({name:name,detail:detail,ts:Date.now()});
   saveDayEdits(pid,s); return s;
 }
-function clearAdd(pid,week,dayKey,name){
+function clearAdd(pid: any,week: any,dayKey: any,name: any){
   const s=getDayEdits(pid),k='w'+week+'_'+dayKey; if(!s[k]) return s;
-  s[k].add=(s[k].add||[]).filter(function(a){return a&&a.name!==name;});
+  s[k].add=(s[k].add||[]).filter(function(a: any){return a&&a.name!==name;});
   if(!s[k].add.length&&!(s[k].skip||[]).length) delete s[k];
   saveDayEdits(pid,s); return s;
 }
 // A skipped superset is stored as '__ss:<sectionIndex>' rather than by name, because the
 // whole block goes: its items are interdependent (rounds with no rest between them), so
 // pulling one movement changes the work:rest ratio, which IS the prescription.
-function ssSkipToken(secIdx){return '__ss:'+secIdx;}
+function ssSkipToken(secIdx: any){return '__ss:'+secIdx;}
 // Re-applied at the very end of refreshProgram beside moves and swaps. Idempotent by
 // construction: skip marks a flag rather than splicing (so a second pass re-marks the
 // same item), and add checks for the name before pushing.
-function applyDayEdits(prog,store){
+function applyDayEdits(prog: any,store: any){
   if(!prog||!prog.weeks||!store) return;
   Object.keys(store).forEach(function(k){
     const m=/^w(\d+)_(.+)$/.exec(k); if(!m) return;
@@ -242,7 +244,7 @@ function applyDayEdits(prog,store){
     // Skipped items are FLAGGED, never removed. The struck-through stub is what tells
     // the athlete the difference between "the engine never programmed this" and "I
     // bailed on this", and it is the only affordance for putting it back.
-    day.sections.forEach(function(sec,si){
+    day.sections.forEach(function(sec: any,si: any){
       // The athlete's own added block is never subject to skip flagging. Add and skip are
       // disjoint operations — an added movement is taken off with clearAdd, not skipped —
       // and enforcing that here is what makes this pass ORDER-INDEPENDENT. Without it, a
@@ -252,18 +254,18 @@ function applyDayEdits(prog,store){
       if(sec._added) return;
       const ssKilled=skips.indexOf(ssSkipToken(si))>=0;
       if(sec.superset) sec._skipped=ssKilled||undefined;
-      (sec.items||[]).forEach(function(it){
+      (sec.items||[]).forEach(function(it: any){
         // V162 (ruling R2): members of a live round skip individually by name. The
         // block token above still kills the whole round; both survive a re-apply.
         it._skipped = (skips.indexOf(it.name)>=0) || undefined;
       });
     });
     if(adds.length){
-      let bucket=day.sections.filter(function(s){return s._added;})[0];
+      let bucket=day.sections.filter(function(s: any){return s._added;})[0];
       if(!bucket){ bucket={label:'Added by you',_added:true,items:[]}; day.sections.push(bucket); }
-      adds.forEach(function(a){
+      adds.forEach(function(a: any){
         if(!a||!a.name) return;
-        if(bucket.items.some(function(it){return it.name===a.name;})) return;
+        if(bucket.items.some(function(it: any){return it.name===a.name;})) return;
         bucket.items.push({name:a.name,detail:a.detail||'',_addedByUser:true});
       });
     }
@@ -276,30 +278,34 @@ function applyDayEdits(prog,store){
 // store and pushes adds deduped by name only), so on a touched week this prune is what
 // keeps the store from arguing with a record resnapshotDayEdit has already folded the
 // edit into.
-function pruneDayEdits(pid,cutWeek){
+function pruneDayEdits(pid: any,cutWeek: any){
   const s=getDayEdits(pid); let changed=false;
   Object.keys(s).forEach(function(k){const m=/^w(\d+)_/.exec(k);if(m&&+m[1]<cutWeek){delete s[k];changed=true;}});
   if(changed) saveDayEdits(pid,s);
 }
-function swapStoreKey(pid){return 'ia_swaps_'+pid;}
-function getSwaps(pid){try{return JSON.parse(localStorage.getItem(swapStoreKey(pid))||'{}');}catch(e){return {};}}
-function saveSwaps(pid,v){try{localStorage.setItem(swapStoreKey(pid),JSON.stringify(v));}catch(e){}}
-function recordSwap(pid,week,dayKey,from,to,rx){
+function swapStoreKey(pid: any){return 'ia_swaps_'+pid;}
+function getSwaps(pid: any){try{return JSON.parse(localStorage.getItem(swapStoreKey(pid))||'{}');}catch(e){return {};}}
+function saveSwaps(pid: any,v: any){try{localStorage.setItem(swapStoreKey(pid),JSON.stringify(v));}catch(e){}}
+function recordSwap(pid: any,week: any,dayKey: any,from: any,to: any,rx: any){
   const s=getSwaps(pid),k='w'+week+'_'+dayKey;
   // V221 D177 (R4). `rx` is optional: [{s,i,d}], section index, item index and detail of
   // every item named `from` before the rename. It is for undoSwap and nothing else; every
   // other reader takes .from/.to only, and a record without it is read exactly as before.
   // Re-tapping the same pair on the same day keeps the earlier tap's items it did not see.
+  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
   const was=(s[k]||[]).filter(e=>e&&e.from===from&&e.to===to&&Array.isArray(e.rx))[0];
+  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
   const list=(s[k]||[]).filter(e=>e&&e.from!==from);
   const ent={from:from,to:to,ts:Date.now()};
+  // @ts-expect-error TS2339 Property 'rx' does not exist on type '{ from: any; to: any; ts: number; }'.
   if(Array.isArray(rx)&&rx.length) ent.rx=(was?was.rx.filter(p=>!rx.some(q=>q.s===p.s&&q.i===p.i)):[]).concat(rx);
   list.push(ent);
   s[k]=list; saveSwaps(pid,s); return s;
 }
-function clearSwap(pid,week,dayKey,from){
+function clearSwap(pid: any,week: any,dayKey: any,from: any){
   const s=getSwaps(pid),k='w'+week+'_'+dayKey;
   if(!s[k]) return s;
+  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
   s[k]=s[k].filter(e=>e&&e.from!==from);
   if(!s[k].length) delete s[k];
   saveSwaps(pid,s); return s;
@@ -310,7 +316,7 @@ function clearSwap(pid,week,dayKey,from){
 // recordSwap keeps by push) through the same _swapDetailFor the sheet used, so the booted
 // card is the card the athlete built. Days the freeze restored from ia_hist_ never reach
 // this function (R5).
-function applySessionSwaps(prog,store){
+function applySessionSwaps(prog: any,store: any){
   if(!prog||!prog.weeks||!store) return;
   Object.keys(store).forEach(k=>{
     const m=/^w(\d+)_(.+)$/.exec(k); if(!m) return;
@@ -319,12 +325,15 @@ function applySessionSwaps(prog,store){
     if(!day||!Array.isArray(day.sections)) return;
     // V222 D181 (R4'). Records replay in recording order, one per pass, through the same
     // _swapDetailFor the sheet used, so each hop's detail comes from the hop before it.
+    // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
     const list=(store[k]||[]).filter(e=>e&&e.from&&e.to);
     let hit=false;
-    const _renamed=[];   // V229 D193 (A3 s4) / D194 R6: the items this replay renamed, by identity
+    const _renamed: any[]=[];   // V229 D193 (A3 s4) / D194 R6: the items this replay renamed, by identity
+    // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
     list.forEach(e=>{
       const m1=Object.create(null); m1[e.from]=e.to;
-      const _was=[]; day.sections.forEach(s=>((s&&s.items)||[]).forEach(it=>{ if(it&&it.name===e.from) _was.push(it); }));
+      // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
+      const _was: any[]=[]; day.sections.forEach(s=>((s&&s.items)||[]).forEach(it=>{ if(it&&it.name===e.from) _was.push(it); }));
       if(applySwapPrefs(day.sections,m1)) hit=true;
       _was.forEach(it=>{ if(it.name!==e.from&&_renamed.indexOf(it)<0) _renamed.push(it); });
     });
@@ -341,10 +350,10 @@ function applySessionSwaps(prog,store){
 // athlete re-swap it every week for the rest of the block. Counts consecutive
 // swaps of the same lift TO the same replacement; any other choice resets it.
 const SWAP_NUDGE_AT=3;
-function swapCountKey(pid){return 'ia_swapct_'+pid;}
-function getSwapCounts(pid){try{return JSON.parse(localStorage.getItem(swapCountKey(pid))||'{}');}catch(e){return {};}}
-function saveSwapCounts(pid,v){try{localStorage.setItem(swapCountKey(pid),JSON.stringify(v));}catch(e){}}
-function bumpSwapCount(pid,from,to){
+function swapCountKey(pid: any){return 'ia_swapct_'+pid;}
+function getSwapCounts(pid: any){try{return JSON.parse(localStorage.getItem(swapCountKey(pid))||'{}');}catch(e){return {};}}
+function saveSwapCounts(pid: any,v: any){try{localStorage.setItem(swapCountKey(pid),JSON.stringify(v));}catch(e){}}
+function bumpSwapCount(pid: any,from: any,to: any){
   const c=getSwapCounts(pid);
   const cur=c[from];
   if(cur&&cur.to===to&&!cur.offered) cur.n=(cur.n||0)+1;
@@ -353,7 +362,7 @@ function bumpSwapCount(pid,from,to){
   const e=c[from];
   return (e&&!e.offered&&e.n>=SWAP_NUDGE_AT)?e:null;
 }
-function markSwapOffered(pid,from){
+function markSwapOffered(pid: any,from: any){
   const c=getSwapCounts(pid);
   if(c[from]){c[from].offered=true;saveSwapCounts(pid,c);}
 }
@@ -361,11 +370,11 @@ function markSwapOffered(pid,from){
 // injury-legal through the REAL filter (no second copy of the drop rules), and — for the
 // power family — through _powerAllowed, so age/experience power doctrine cannot be
 // bypassed through the side door of a swap.
-function auxSwapCandidates(outName,day,prog){
+function auxSwapCandidates(outName: any,day: any,prog: any){
   const fam=_auxFamily(outName); if(!fam) return [];
   const cfg=_dayPlanCfg(prog,day);   // D194 R1 (equipment unchanged: injury only)
   const onCard=Object.create(null);
-  ((day&&day.sections)||[]).forEach(function(s){((s&&s.items)||[]).forEach(function(it){if(it&&it.name)onCard[it.name.toLowerCase()]=1;});});
+  ((day&&day.sections)||[]).forEach(function(s: any){((s&&s.items)||[]).forEach(function(it: any){if(it&&it.name)onCard[it.name.toLowerCase()]=1;});});
   const _ssP=_ssPartnerOf(day,outName);   // V164 D5: same partner filter as swapCandidates
   return Object.keys(_AUX_FAMILY).filter(function(n){
     if(n===outName||_AUX_FAMILY[n]!==fam) return false;

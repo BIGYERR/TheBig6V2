@@ -226,7 +226,7 @@ build of 49 source files under `frontends/app/src/legacy/src/`, byte for byte, a
   - bug-report-init into update-check.
 - **The CSS stays in its 9 files in source order.** The cascade depends on it, and its sections are not grouped by area.
 - **Load order is safe today.** 0 load-time references reach a name declared later. One name is declared twice:
-  `_isoToday`, in wizard.js and overlays.js. The later one wins in one script; both return the same local date string,
+  `_isoToday`, in wizard.ts and overlays.ts. The later one wins in one script; both return the same local date string,
   and phase C keeps one.
 
 **What this changes for phase C.**
@@ -377,12 +377,12 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   still a piece of the page), by the phase D method: `tools/ts-expect.mjs` types an untyped name `any` where it is
   declared and marks every other error with a `// @ts-expect-error` line the build strips, so no token changes, and
   `tools/same-script.mjs` proves it (`docs/decisions/app-typescript.md`). `frontends/app/tsconfig.legacy.json` checks
-  them in the app's type check. Done: `rest-day-shell`, `update-check`, `bug-report-init` (v0.239.43).
-- **Left for phase E's "done when":** the rest sheet (its own build, v0.240.0); then the legacy logic itself, still
-  JavaScript reached through `LegacyBridge` by name (280 legacy names used, 227 of them functions called, and 29
-  functions taken over, counted at v0.239.41): it moves into TypeScript by the phase D method (types first, the same
-  tokens proved by `tools/same-script.mjs`), then the bridge's calls become typed imports, file by file, and
-  `frontends/app/src/app/legacy/` empties.
+  them in the app's type check. Done: `rest-day-shell`, `update-check`, `bug-report-init` (v0.239.43); the other 20
+  (v0.239.44): every app file is TypeScript, its type debt 629 marker lines.
+- **Left for phase E's "done when":** the rest sheet (its own build, v0.240.0); then the legacy logic itself, TypeScript
+  since v0.239.44 but still reached through `LegacyBridge` by name (280 legacy names used, 227 of them functions called, and 29
+  functions taken over, counted at v0.239.41): the bridge's calls become typed, file by file, the type debt is worked off
+  under the tests, and `frontends/app/src/app/legacy/` empties.
 - Suggested order:
   1. bug report (small, proves the pattern);
   2. rest timer;

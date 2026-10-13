@@ -1,5 +1,5 @@
 // The Progress chart card, kept apart from Angular so the app's node --test suite reads it as it is (architecture
-// phase E, step 15). The legacy chart builders (progress-charts.js, buildPaceChart) wrote a card, an optional head,
+// phase E, step 15). The legacy chart builders (progress-charts.ts, buildPaceChart) wrote a card, an optional head,
 // an SVG made element by element, an optional body and an optional footer, every number formatted as it went. A
 // CardSpec is that card as data: each SVG element keeps the attributes the legacy wrote, as the strings it wrote, in
 // the order it wrote them, so the ChartCard component draws the same picture.

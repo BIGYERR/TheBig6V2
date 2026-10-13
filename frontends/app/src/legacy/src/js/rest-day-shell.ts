@@ -1,13 +1,13 @@
-import { completedKey, getCompleted, getLogs, getPrograms, saveLogs, savePrograms } from './storage.js';
+import { completedKey, getCompleted, getLogs, getPrograms, saveLogs, savePrograms } from './storage.ts';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
-import { DAY_FULL } from './wizard.js';
+import { DAY_FULL } from './wizard.ts';
 import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _PATTERN_REGION } from '../../../../../../core/src/engine/budget-engine-d.ts';
-import { dayBeforeStart, renderWeekView } from './week-view-sections.js';
-import { CARDIO_PARK_FIELDS } from './log-entries.js';
-import { updateRestFloat } from './rest-timer.js';
-import { renderProgList } from './programs.js';
-import { showProgressScreen } from './progress-data.js';
+import { dayBeforeStart, renderWeekView } from './week-view-sections.ts';
+import { CARDIO_PARK_FIELDS } from './log-entries.ts';
+import { updateRestFloat } from './rest-timer.ts';
+import { renderProgList } from './programs.ts';
+import { showProgressScreen } from './progress-data.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── REST-DAY SHEET ───────────────────────────────────────────────────────────
 const _restDraft={w:null,day:null,view:'menu',pick:null,type:null,mins:30,dist:'',rpe:5};
@@ -244,7 +244,7 @@ function restMoveCandidates(w: any){
   });
   return out;
 }
-let activeProgId: any=null,currentWeek=1,currentDayKey=null,activeProg: any=null,calcLift='Deadlift',editProgId=null,progressViewId=null,confirmProgId=null,confirmTier=0;
+let activeProgId: any=null,currentWeek=1,currentDayKey: any=null,activeProg: any=null,calcLift='Deadlift',editProgId: any=null,progressViewId: any=null,confirmProgId: any=null,confirmTier=0;
 // Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
 function _setActiveProgId(v: any){ activeProgId=v; }
 function _setCurrentWeek(v: any){ currentWeek=v; }

@@ -1,5 +1,5 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { esc, resnapshotDayEdit } from './storage.js';
+import { esc, resnapshotDayEdit } from './storage.ts';
 import { activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.ts';
 import { _stripCapCue, applyInjuryFilter } from '../../../../../../core/src/engine/injury.ts';
 import { _AUX_FAMILY_LABEL, _auxFamily, _pattern } from '../../../../../../core/src/engine/region-caps.ts';
@@ -7,26 +7,27 @@ import { _swapDetailFor, applySwapPrefs } from '../../../../../../core/src/engin
 import {
   _dayPlanCfg, addCandidates, addedDetailFor, auxSwapCandidates, bumpSwapCount, clearAdd, clearSkip, clearSwap,
   getSwaps, recordAdd, recordSkip, recordSwap, ssSkipToken, swapCandidates, swapLoadNote,
-} from './swaps-edits.js';
+} from './swaps-edits.ts';
 import { _PATTERN_REGION, _compoundTier } from '../../../../../../core/src/engine/budget-engine-d.ts';
-import { parseRx } from './week-view-sections.js';
-import { openDetail } from './day-detail.js';
-import { showSwapNudge } from './day-status.js';
+import { parseRx } from './week-view-sections.ts';
+import { openDetail } from './day-detail.ts';
+import { showSwapNudge } from './day-status.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── SWAP SHEET ───────────────────────────────────────────────────────────────
-let _swapCtx=null;
+let _swapCtx: any=null;
 // What did this lift replace on today's card? Drives the "SWAPPED IN" chip.
-function swapOriginOf(name){
+function swapOriginOf(name: any){
   if(!activeProgId||!currentDayKey) return null;
   const list=(getSwaps(activeProgId)['w'+currentWeek+'_'+currentDayKey])||[];
   // V228 D192 P-UNDOKEY: the most recent record whose `to` is the card's name, so the chip names the lift that just left.
+  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
   const hit=list.filter(e=>e&&e.to===name).pop();
   return hit?hit.from:null;
 }
 // Compact form of a prescription, for the one place the sheet states it. Real detail
 // strings run to 59 characters ("3 sets — RPE 8 (stop 2 reps short of failure), 2–3 min
 // rest"), so the full text cannot sit on a candidate row.
-function _rxShort(detail){
+function _rxShort(detail: any){
   const D=String(detail||'');
   const head=(D.match(/^\s*(\d+\s*sets|\d+\s*[×x]\s*[\d–\-+]+)/i)||[])[1];
   const rpe=(D.match(/RPE\s*([\d.]+)/i)||[])[1];
@@ -40,7 +41,7 @@ function _rxShort(detail){
 // it is identical on every row, and at up to 59 characters with nowrap it forced the row
 // wider than the phone and set the whole sheet scrolling sideways. Stated once in the
 // header instead.
-function _swapRow(name,caution,outName){
+function _swapRow(name: any,caution: any,outName: any){
   const safe=name.replace(/'/g,"\\'");
   const load=outName?swapLoadNote(outName,name):'';
   const note=caution?'Different job. Region volume holds.':load;
@@ -49,7 +50,7 @@ function _swapRow(name,caution,outName){
     +(note?'<span class="swap-cand-note">'+note+'</span>':'')
     +'</button>';
 }
-function openSwapSheet(secIdx,itemIdx){
+function openSwapSheet(secIdx: any,itemIdx: any){
   const day=activeProg&&activeProg.weeks&&activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];
   const sec=day&&day.sections&&day.sections[secIdx];
   const item=sec&&sec.items&&sec.items[itemIdx];
@@ -65,17 +66,19 @@ function openSwapSheet(secIdx,itemIdx){
   // swapping mid-complex has already decided the flow is not happening as written.
   let _flowNote='';
   if(sec&&(sec.superset||sec.type==='superset')&&c.tier1.length){
-    const _impl=function(n){const N=String(n||'').toLowerCase();return /kettlebell|\(kb/.test(N)?'kb':(/dumbbell|\(db/.test(N)?'db':(/barbell|trap bar/.test(N)?'bb':null));};
+    const _impl=function(n: any){const N=String(n||'').toLowerCase();return /kettlebell|\(kb/.test(N)?'kb':(/dumbbell|\(db/.test(N)?'db':(/barbell|trap bar/.test(N)?'bb':null));};
     const _mine=_impl(item.name);
-    if(_mine&&(sec.items||[]).some(function(x){return x&&x.name!==item.name&&_impl(x.name)===_mine;})){
+    if(_mine&&(sec.items||[]).some(function(x: any){return x&&x.name!==item.name&&_impl(x.name)===_mine;})){
       const _same=c.tier1.filter(function(n){return _impl(n)===_mine;}), _cross=c.tier1.filter(function(n){return _impl(n)!==_mine;});
       c.tier1=_same.concat(_cross);
       if(_cross.length) _flowNote='<div class="swap-sec-sub">This round runs on one implement \u2014 picks lower down break that flow.</div>';
     }
   }
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const tagOf=p=>({hinge:'HINGE',squat:'SQUAT',lunge:'LUNGE',hip_ext:'HIP EXTENSION',row:'ROW',vpull:'VERTICAL PULL',
     hpress:'HORIZONTAL PRESS',vpress:'VERTICAL PRESS',bi_iso:'BICEPS',tri_iso:'TRICEPS',delt_iso:'DELTS',
     leg_iso:'LEG ISOLATION',calf_iso:'CALVES'}[p]||'LIFT');
+  // @ts-expect-error TS7006 Parameter 'r' implicitly has an 'any' type.
   const regionOf=r=>({push:'PUSH DAY',pull:'PULL DAY',legs:'LEG DAY'}[r]||'TODAY');
   // V196 D56: two arms, two meanings. MAIN LIFT is reserved for the SLOT test — item 0
   // of a /^main/i section, the same test _slotOfEntry freezes into the ledger. The tier
@@ -83,8 +86,10 @@ function openSwapSheet(secIdx,itemIdx){
   // MAIN LIFTS, one tag for both tests made the app contradict itself in the athlete's hand.
   const isMainSlot=(itemIdx===0&&!(sec.superset||sec.type==='superset')&&/^main/i.test(sec.label||''));
   const isHeavyCompound=!isMainSlot&&_compoundTier(item.name)>=3;
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('swapOutName').textContent=item.name;
   const rxs=_rxShort(_swapCtx.detail);
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('swapTags').innerHTML=
     '<span class="swap-tag">'+(_fam?_AUX_FAMILY_LABEL[_fam]:tagOf(c.pattern))+'</span>'
     +'<span class="swap-tag">'+regionOf(c.region)+'</span>'
@@ -107,11 +112,13 @@ function openSwapSheet(secIdx,itemIdx){
   }else{
     h+='<div class="swap-foot">Swaps hold for this session only. Next week says what it always said.</div>';
   }
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('swapBody').innerHTML=h;
+  // @ts-expect-error TS18047 'o' is possibly 'null'.
   const o=document.getElementById('swapOverlay');o.classList.add('open');o.scrollTop=0;
 }
 function closeSwapSheet(){const o=document.getElementById('swapOverlay');if(o)o.classList.remove('open');_swapCtx=null;}
-function applySwapChoice(to){
+function applySwapChoice(to: any){
   if(!_swapCtx||!activeProg||!activeProgId){closeSwapSheet();return;}
   const day=activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];
   const sec=day&&day.sections&&day.sections[_swapCtx.secIdx];
@@ -128,9 +135,10 @@ function applySwapChoice(to){
   // V221 D177 (R4): the donor's own prescription, by position, taken before anything is
   // renamed. Every item named `from` is kept, because undo is name keyed and the reboot
   // path renames them all. undoSwap writes these back; nothing replays them on a build.
-  const _undoRx=[];
-  (day.sections||[]).forEach(function(s,si){((s&&s.items)||[]).forEach(function(it,ii){
+  const _undoRx: any[]=[];
+  (day.sections||[]).forEach(function(s: any,si: any){((s&&s.items)||[]).forEach(function(it: any,ii: any){
     // V229 D193 (Amendment 3 section 4): the from-card's kept dose rides beside its detail as `ph`, only when it has one.
+    // @ts-expect-error TS2339 Property 'ph' does not exist on type '{ s: any; i: any; d: any; }'.
     if(it&&it.name===from&&typeof it.detail==='string'){ const _e={s:si,i:ii,d:it.detail}; if(typeof it._preHold==='string') _e.ph=it._preHold; _undoRx.push(_e); }
   });});
   item.name=to;
@@ -167,12 +175,16 @@ function applySwapChoice(to){
   // Never on the unloadable branch, which keeps its V119 copy, never on a verbatim pair.
   // V229 D193 (R8): when the plan's clamp changed the number, the toast names the hold in the same branch's words.
   showToast(_held
+    // @ts-expect-error TS2339 Property 'win' does not exist on type '{}'.
     ? (_rx.win
+      // @ts-expect-error TS2339 Property 'win' does not exist on type '{}'.
       ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'. Your injury plan holds this one at RPE 7.'
       : _reRx
       ? to+' in, '+from.toLowerCase()+' out. No load to add here. Your injury plan holds this one at RPE 7.'
       : to+' in, '+from.toLowerCase()+' out. Same sets, same reps. Your injury plan holds this one at RPE 7.')
+    // @ts-expect-error TS2339 Property 'win' does not exist on type '{}'.
     : _rx.win
+    // @ts-expect-error TS2339 Property 'win' does not exist on type '{}'.
     ? to+' in, '+from.toLowerCase()+' out. The load runs out before the reps do here. Same sets, same effort. Reps move to '+_rx.win[0]+' to '+_rx.win[1]+'.'
     : _reRx
     ? to+' in, '+from.toLowerCase()+' out. No load to add here, so take the sets to the same effort.'
@@ -186,45 +198,45 @@ function applySwapChoice(to){
 // freeze restores from it, so an edit that is not folded into the snapshot silently vanishes
 // on the next boot.
 function _liveDay(){return activeProg&&activeProg.weeks&&activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];}
-function _afterEdit(day,msg){
+function _afterEdit(day: any,msg: any){
   resnapshotDayEdit(currentWeek,currentDayKey);
   openDetail(currentDayKey,day);
   if(msg) showToast(msg);
 }
-function skipExercise(name){
+function skipExercise(name: any){
   const day=_liveDay(); if(!day||!activeProgId) return;
   let hit=null;
-  (day.sections||[]).forEach(function(s){(s.items||[]).forEach(function(it){if(it&&it.name===name){it._skipped=true;hit=it;}});});
+  (day.sections||[]).forEach(function(s: any){(s.items||[]).forEach(function(it: any){if(it&&it.name===name){it._skipped=true;hit=it;}});});
   if(!hit) return;
   recordSkip(activeProgId,currentWeek,currentDayKey,name);
   _afterEdit(day,name+' is off today. Tap to put it back.');
 }
-function unskipExercise(name){
+function unskipExercise(name: any){
   const day=_liveDay(); if(!day||!activeProgId) return;
-  (day.sections||[]).forEach(function(s){(s.items||[]).forEach(function(it){if(it&&it.name===name)it._skipped=undefined;});});
+  (day.sections||[]).forEach(function(s: any){(s.items||[]).forEach(function(it: any){if(it&&it.name===name)it._skipped=undefined;});});
   clearSkip(activeProgId,currentWeek,currentDayKey,name);
   _afterEdit(day,name+' is back on the card.');
 }
-function skipSuperset(secIdx){
+function skipSuperset(secIdx: any){
   const day=_liveDay(); if(!day||!activeProgId) return;
   const sec=(day.sections||[])[secIdx]; if(!sec) return;
   sec._skipped=true;
   recordSkip(activeProgId,currentWeek,currentDayKey,ssSkipToken(secIdx));
   _afterEdit(day,'Round is off today. Tap to put it back.');
 }
-function unskipSuperset(secIdx){
+function unskipSuperset(secIdx: any){
   const day=_liveDay(); if(!day||!activeProgId) return;
   const sec=(day.sections||[])[secIdx]; if(sec) sec._skipped=undefined;
   clearSkip(activeProgId,currentWeek,currentDayKey,ssSkipToken(secIdx));
   _afterEdit(day,'Round is back on the card.');
 }
-function removeAddedExercise(name){
+function removeAddedExercise(name: any){
   const day=_liveDay(); if(!day||!activeProgId) return;
-  (day.sections||[]).forEach(function(s){
+  (day.sections||[]).forEach(function(s: any){
     if(!s._added) return;
-    s.items=(s.items||[]).filter(function(it){return !(it&&it.name===name);});
+    s.items=(s.items||[]).filter(function(it: any){return !(it&&it.name===name);});
   });
-  day.sections=(day.sections||[]).filter(function(s){return !(s._added&&!(s.items||[]).length);});
+  day.sections=(day.sections||[]).filter(function(s: any){return !(s._added&&!(s.items||[]).length);});
   clearAdd(activeProgId,currentWeek,currentDayKey,name);
   _afterEdit(day,name+' removed.');
 }
@@ -232,17 +244,20 @@ function openAddSheet(){
   const day=_liveDay();
   if(!day||!activeProg){showToast('Nothing to add to here');return;}
   const c=addCandidates(day,currentWeek,activeProg);
+  // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.
   const regionLbl={push:'PUSH DAY',pull:'PULL DAY',legs:'LEG DAY'}[c.region]||'TODAY';
   let setCount=0;
-  ((day.sections)||[]).forEach(function(s){(s.items||[]).forEach(function(it){
+  ((day.sections)||[]).forEach(function(s: any){(s.items||[]).forEach(function(it: any){
     if(!it||it._skipped) return; const rx=parseRx(it.detail||'',it.name||''); if(rx&&!rx.open) setCount+=rx.sets;
   });});
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('addOutName').textContent=(day.title||'Training');
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('addTags').innerHTML=
     '<span class="swap-tag">WEEK '+currentWeek+'</span><span class="swap-tag">'+regionLbl+'</span>'
     +'<span class="swap-tag">'+setCount+' SETS</span>'
     +'<div class="swap-keeps">Added work matches the closest thing to it in your week.</div>';
-  const row=function(n,cls,note){
+  const row=function(n: any,cls: any,note: any){
     return '<button type="button" class="swap-cand'+(cls?' '+cls:'')+'" onclick="applyAddChoice(\''+n.replace(/'/g,"\\'")+'\')">'
       +'<span class="swap-cand-name">'+esc(n)+'</span>'
       +(note?'<span class="swap-cand-'+(cls?'note':'sub')+'">'+esc(note)+'</span>':'')+'</button>';
@@ -267,38 +282,44 @@ function openAddSheet(){
     h+='<div class="swap-sec-lbl caution">'+asyIcon('warning',13)+' NOT WHAT TODAY IS FOR</div>'
       +'<div class="swap-sec-sub">Different region than this day trains. Fine once, but watch what it lands next to.</div>'
       +c.off.map(function(n){
+        // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.
         const r=_PATTERN_REGION[_pattern(n)];
+        // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ pu
         return row(n,'caution',({push:'Push',pull:'Pull',legs:'Leg'}[r]||'That')+' work on a '+(({push:'push',pull:'pull',legs:'leg'}[c.region])||'training')+' day. Check what it sits next to in the week.');
       }).join('');
   }
   if(!h) h='<div class="swap-empty">Nothing left in your kit that isn\'t already on this card.</div>';
   else h+='<div class="swap-foot">Added work holds for this session only. It logs and counts like anything else on the card. Next week says what it always said.</div>';
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('addBody').innerHTML=h;
+  // @ts-expect-error TS18047 'o' is possibly 'null'.
   const o=document.getElementById('addOverlay');o.classList.add('open');o.scrollTop=0;
 }
 function closeAddSheet(){const o=document.getElementById('addOverlay');if(o)o.classList.remove('open');}
-function applyAddChoice(name){
+function applyAddChoice(name: any){
   const day=_liveDay();
   if(!day||!activeProgId){closeAddSheet();return;}
   // The dose is resolved by type against the live week (V163 D1), then shaped for the
   // movement: right as a rep target on a loaded add, converted to open RPE sets on an
   // unloadable one, same as a swap.
   const detail=_swapDetailFor(name,addedDetailFor(day,name,currentWeek,activeProg));
-  let bucket=(day.sections||[]).filter(function(s){return s._added;})[0];
+  let bucket=(day.sections||[]).filter(function(s: any){return s._added;})[0];
   if(!bucket){ bucket={label:'Added by you',_added:true,items:[]}; day.sections.push(bucket); }
-  if(!bucket.items.some(function(it){return it.name===name;}))
+  if(!bucket.items.some(function(it: any){return it.name===name;}))
     bucket.items.push({name:name,detail:detail,_addedByUser:true});
   recordAdd(activeProgId,currentWeek,currentDayKey,name,detail);
   closeAddSheet();
   _afterEdit(day,name+' added at '+detail+'.');
 }
-function undoSwap(from){
+function undoSwap(from: any){
   if(!activeProg||!activeProgId) return;
   const day=activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][currentDayKey];
   if(!day) return;
   const list=(getSwaps(activeProgId)['w'+currentWeek+'_'+currentDayKey])||[];
+  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
   const hit=list.filter(e=>e&&e.from===from)[0];
   if(!hit) return;
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   const back={}; back[hit.to]=from;
   applySwapPrefs(day.sections,back);
   // V221 D177 (R4): the name is back; now the donor's own detail. Each stored detail goes
@@ -306,12 +327,12 @@ function undoSwap(from){
   // first `from` item not yet written. A record from before V221 has no rx, so the name
   // alone comes back, exactly as before. No migration.
   if(Array.isArray(hit.rx)){
-    const _put=[];
-    hit.rx.forEach(function(p){
+    const _put: any[]=[];
+    hit.rx.forEach(function(p: any){
       if(!p||typeof p.d!=='string') return;
       const ps=day.sections[p.s], at=ps&&ps.items&&ps.items[p.i];
       let it=(at&&at.name===from&&_put.indexOf(at)<0)?at:null;
-      if(!it) (day.sections||[]).some(function(s){return ((s&&s.items)||[]).some(function(x){
+      if(!it) (day.sections||[]).some(function(s: any){return ((s&&s.items)||[]).some(function(x: any){
         if(x&&x.name===from&&_put.indexOf(x)<0){it=x;return true;} return false;});});
       // V229 D193 (Amendment 3 section 4) / D194 R6: the kept dose comes back from the record with the card, or nothing is kept.
       if(it){it.detail=p.d;if(typeof p.ph==='string') it._preHold=p.ph; else delete it._preHold;_put.push(it);}

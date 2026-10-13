@@ -1,12 +1,12 @@
-import { getActiveProgId, getPrograms } from './storage.js';
+import { getActiveProgId, getPrograms } from './storage.ts';
 import { activeProg, currentWeek, showScreen, showToast } from './rest-day-shell.ts';
 import { foldExAliasKeys } from '../../../../../../core/src/engine/exercise-library.ts';
-import { renderWeekView } from './week-view-sections.js';
-import { getExWeights, saveExWeights } from './log-entries.js';
-import { _ruIsland } from './rest-timer.js';
-import { renderProgList } from './programs.js';
-import { loadActiveProgram } from './program-manage.js';
-import { maybeShowReminder } from './popups-streaks-reminders.js';
+import { renderWeekView } from './week-view-sections.ts';
+import { getExWeights, saveExWeights } from './log-entries.ts';
+import { _ruIsland } from './rest-timer.ts';
+import { renderProgList } from './programs.ts';
+import { loadActiveProgram } from './program-manage.ts';
+import { maybeShowReminder } from './popups-streaks-reminders.ts';
 import { IA_VERSION, iaVersionLabel } from './update-check.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 

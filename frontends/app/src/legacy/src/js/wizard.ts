@@ -1,5 +1,5 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { getPrograms } from './storage.js';
+import { getPrograms } from './storage.ts';
 import { _setCalcLift, activeProg, calcLift, showScreen, showToast } from './rest-day-shell.ts';
 import { DEFAULT_1RM, LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
 import {
@@ -13,17 +13,17 @@ import {
 import { isSpeedGoal, sportDayTargets } from '../../../../../../core/src/engine/cardio-progression.ts';
 import {
   _mileAdvisoryHTML, _mileEntryState, _mileFieldHelp, _swimAdvisoryHTML, generateProgram,
-} from './wizard-generate.js';
-import { _fmtPaceMi } from './log-entries.js';
-import { progTestPin } from './programs.js';
-import { seedFromPriorPrograms } from './progress-data.js';
+} from './wizard-generate.ts';
+import { _fmtPaceMi } from './log-entries.ts';
+import { progTestPin } from './programs.ts';
+import { seedFromPriorPrograms } from './progress-data.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // WIZARD
 
 // ── SHARED DAY CONSTANTS ──
 const DAY_FULL={sun:'Sunday',mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday'};
-const DAY_SHORT={sun:'SU',mon:'MO',tue:'TU',wed:'WE',thu:'TH',fri:'FR',sat:'SA'};
+const DAY_SHORT: Record<string, string>={sun:'SU',mon:'MO',tue:'TU',wed:'WE',thu:'TH',fri:'FR',sat:'SA'};
 
 // ── MINIMUM TRAINING DAYS PER GOAL ──
 const MIN_TRAIN_DAYS = {
@@ -36,8 +36,8 @@ let wizardStep = 0;
 let lastRandIdx = -1;
 let currentRandDayKey = null;
 // Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
-function _setLastRandIdx(v){ lastRandIdx=v; }
-function _setCurrentRandDayKey(v){ currentRandDayKey=v; }
+function _setLastRandIdx(v: any){ lastRandIdx=v; }
+function _setCurrentRandDayKey(v: any){ currentRandDayKey=v; }
 
 // ── NEW WIZARD STRUCTURE ──
 // Steps: primary → profile → equipment → cardio_goal → lifting_focus → days → lifts → name
@@ -60,15 +60,16 @@ function _isoToday(){ const t=new Date(); t.setHours(0,0,0,0); return _isoOf(t);
 // D184 (c): the test date the resolver is given, or null. Only a dated test goal has one (the
 // run_pace_goal family, PACE_GOALS); race goals, run_base, undated goals and non run programs get
 // null, so the D25 snap is unchanged for them.
-function _rsRace(c){
+function _rsRace(c: any){
   const g = c && c.cardioGoals && c.cardioGoals.run;
   return (c && (c.cardioTypes||[]).includes('run') && g && PACE_GOALS.has(g.id) && c.eventTargeted !== false && c.raceDate) ? c.raceDate : null;
 }
-function resolveStartDate(dateStr, restDays, raceIso){
+function resolveStartDate(dateStr: any, restDays: any, raceIso: any){
   const rest = new Set(Array.isArray(restDays) ? restDays : []);
   let d = _parseLocalDate(dateStr);
   if(!d){ d = new Date(); d.setHours(0,0,0,0); }
   const mon = getWeekMonday(_isoOf(d));
+  // @ts-expect-error TS2362 The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type
   const offset = Math.round((d - mon)/86400000);          // 0 = Monday … 6 = Sunday
   const partial = offset > 0;
   const week1Train = _ISO_ORDER.slice(offset).filter(k => !rest.has(k));
@@ -88,17 +89,18 @@ function resolveStartDate(dateStr, restDays, raceIso){
           week1Train, nextMon:_isoOf(nm)};
   return holdsTest ? {...r, holdsTest:true} : r;   // the key exists only when true: every other return is unchanged
 }
-function _fmtStartDay(iso, withYear){
+function _fmtStartDay(iso: any, withYear?: any){
   const d=_parseLocalDate(iso); if(!d) return iso;
   return d.toLocaleDateString('en-US', withYear ? {weekday:'short',month:'short',day:'numeric',year:'numeric'} : {weekday:'short',month:'short',day:'numeric'});
 }
-function _fmtSpan(isoFrom, isoTo){
+function _fmtSpan(isoFrom: any, isoTo: any){
   const a=_parseLocalDate(isoFrom), b=_parseLocalDate(isoTo); if(!a||!b) return '';
   return a.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' \u2013 '+b.toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
 // The one sentence under the picker (D21/D25, D184 c). The setProgStart toast never called
 // this function; the two surfaces agree because both read the same resolveStartDate return.
-function startResolveCopy(r){
+function startResolveCopy(r: any){
+  // @ts-expect-error TS7006 Parameter 'iso' implicitly has an 'any' type.
   const sunOf = iso => { const m=_parseLocalDate(iso); const s=new Date(m); s.setDate(m.getDate()+6); return _isoOf(s); };
   if(r.holdsTest){
     return 'That week holds your test, so this starts <b>'+_fmtStartDay(r.start)+'</b>. Nothing is left to train before it. Week 1 is the test week.';
@@ -107,6 +109,7 @@ function startResolveCopy(r){
     return 'Nothing left to train that week, so this starts <b>'+_fmtStartDay(r.start)+'</b>. Week 1 runs <b>'+_fmtSpan(r.start, sunOf(r.start))+'</b>.';
   }
   if(r.partial){
+    // @ts-expect-error TS7006 Parameter 'k' implicitly has an 'any' type.
     const days = r.week1Train.map(k => '<b>'+_fmtStartDay(_isoOf((()=>{ const m=_parseLocalDate(r.mon); const x=new Date(m); x.setDate(m.getDate()+_ISO_ORDER.indexOf(k)); return x; })()))+'</b>');
     const list = days.length===1 ? days[0] : days.slice(0,-1).join(', ')+' and '+days[days.length-1];
     return 'Week 1 is short \u2014 you\u2019ll train '+list+', then a full week from <b>'+_fmtStartDay(r.nextMon)+'</b>.';
@@ -114,7 +117,7 @@ function startResolveCopy(r){
   return 'Week 1 runs <b>'+_fmtSpan(r.start, sunOf(r.start))+'</b>.';
 }
 // Summary-row value: the resolved start, flagged when the first week is short.
-function startSummaryVal(r){
+function startSummaryVal(r: any){
   if(r && r.aligned) return _fmtStartDay(r.start, true) + ' \u2014 set by race date';
   return _fmtStartDay(r.start, true) + (r.partial ? ' \u2014 short first week' : '');
 }
@@ -135,12 +138,13 @@ function wizardTestPin(){
   if(!WD) return null;
   const r = resolveStartDate(WD.startDate, WD.restDays||[], _rsRace(WD));
   const p = progTestPin(WD, r.start);
+  // @ts-expect-error TS2339 Property 'holdsTest' does not exist on type '{ start: string; entered: string; mon: string; partial: bo
   return (p && r.holdsTest) ? {...p, holdsTest:true} : p;
 }
 // D183 (P-SAFEPACE R3/R5): the header sentence on the cardio goal step. A dated test goal prints its
 // test week, which is the length that builds; every other goal prints its goal length. The repaint
 // passes the pin and the length it already computed; the template calls it bare.
-function progLenLineHTML(p, len){
+function progLenLineHTML(p?: any, len?: any){
   if(p === undefined) p = wizardTestPin();
   if(len === undefined) len = p ? p.len : ((WD.cardioTypes||[]).length ? calcProgramLength(WD.cardioTypes, {...WD.cardioGoals, _experience:WD.experience||'intermediate', _ageBracket:WD.ageBracket||'18-35', _eventTargeted:WD.eventTargeted}, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks : 6);
   // D189 (P-PACEDISCLOSE F5): a required mile left blank has no length to print yet. A dated test pin
@@ -151,8 +155,10 @@ function progLenLineHTML(p, len){
 }
 const _RACE_NAME = {run_5k:'5K', run_10k:'10K', run_half:'half', run_marathon:'marathon'};
 const _RACE_GOAL_LBL = {run_5k:'5K plan', run_10k:'10K plan', run_half:'half marathon plan', run_marathon:'marathon plan'};
-function alignedStartCopy(al){
+function alignedStartCopy(al: any){
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   const g = WD.cardioGoals.run.id, nm = _RACE_NAME[g] || 'race';
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ mo
   const dayName = {mon:'Monday',tue:'Tuesday',wed:'Wednesday',thu:'Thursday',fri:'Friday',sat:'Saturday',sun:'Sunday'}[al.raceDay];
   const raceTxt = '<b>'+_fmtStartDay(al.raceIso)+'</b>, '+al.weeksOut+' week'+(al.weeksOut===1?'':'s')+' out';
   if(al.futureWeeks){
@@ -164,17 +170,18 @@ function alignedStartCopy(al){
   if(al.underFloor){
     const sh = NRC_SHORTER[g];
     t += ' I don\u2019t recommend under '+al.floor+' weeks for the '+nm+'.';
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
     if(sh) t += ' The <a onclick="offerShorterPlan(\''+sh+'\')">'+_RACE_GOAL_LBL[sh]+'</a> fits this window better.';
   }
   return t;
 }
-function alignedPipsHTML(al){
+function alignedPipsHTML(al: any){
   if(al.futureWeeks) return '';
   let h='<div class="start-pips">';
   for(let w=1;w<=al.tw;w++){ h+='<i class="'+(w<al.openWeek?'behind':w===al.openWeek?'open':w===al.tw?'race':'')+'"></i>'; }
   return h+'</div>';
 }
-function offerShorterPlan(goalId){
+function offerShorterPlan(goalId: any){
   const def = (CARDIO_GOALS_BY_TYPE.run || []).find(x=>x.id===goalId);
   if(!def || !WD.cardioGoals.run) return;
   WD.cardioGoals.run.id = def.id; WD.cardioGoals.run.label = def.label;
@@ -193,7 +200,7 @@ function updateStartResolve(){
 // Generate path: the program's startDate is the RESOLVED start; the wizard field is
 // stripped from the stored cfg so buildProgram stays a pure function of the training
 // selections and refresh cannot read a stale copy.
-function _applyWizardStart(prog, wd){
+function _applyWizardStart(prog: any, wd: any){
   // V188 (D14a): a race goal with a race date derives its start from the race — Monday of
   // race week minus (plan − 1) weeks. Days between that start and today are "behind you";
   // prog.blockOpen (today) marks where the block actually opened. No race → V174 path.
@@ -211,7 +218,7 @@ function _applyWizardStart(prog, wd){
   return r;
 }
 
-let WD = {
+let WD: { restDays: any[]; [k: string]: any } = {
   // Primary path
   primaryPath: 'body',       // 'event' | 'body' | 'both'
   // Cardio
@@ -235,7 +242,7 @@ let WD = {
   startDate: _isoToday(),    // V174 (D20): prefilled, editable, never null
 };
 
-const CARDIO_GOALS_BY_TYPE = {
+const CARDIO_GOALS_BY_TYPE: Record<string, any[]> = {
   run: [
     {id:'run_5k',        label:'Run a 5K',              desc:'3.1 miles without stopping'},
     {id:'run_10k',       label:'Run a 10K',             desc:'6.2 miles. A solid aerobic base.'},
@@ -296,7 +303,7 @@ const GOAL_RECOMMENDED_DAYS = {
   swim_mile: 4, swim_tri: 5,
 };
 // Look up a goal's display label from CARDIO_GOALS_BY_TYPE across all sports.
-function goalLabel(goalId) {
+function goalLabel(goalId: any) {
   for(const sport in CARDIO_GOALS_BY_TYPE) {
     const found = CARDIO_GOALS_BY_TYPE[sport].find(g => g.id === goalId);
     if(found) return found.label;
@@ -335,10 +342,11 @@ function startWizard() {
 
 
 
-function get1RMDefault(lift){
+function get1RMDefault(lift: any){
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type 'Reco
   return DEFAULT_1RM[WD.experience||'intermediate'][lift]||0;
 }
-function resolveRM(val, lift){
+function resolveRM(val: any, lift: any){
   // If user entered a value use it, otherwise use experience default
   if(val && val > 0) return val;
   return get1RMDefault(lift);
@@ -364,14 +372,16 @@ function wizardNext() {
   }
 }
 
-function formatPacePerMile(totalSecs, distMiles) {
+function formatPacePerMile(totalSecs: any, distMiles: any) {
   if(!totalSecs || !distMiles || distMiles <= 0) return '';
   const paceSecPerMile = totalSecs / distMiles;
   return _clkMS(paceSecPerMile) + '/mi';
 }
 // ── 1RM CALCULATOR FUNCTIONS ──
 function runCalc(){
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   const w=+document.getElementById('calc_weight')?.value||0;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   const r=+document.getElementById('calc_reps')?.value||0;
   const res=document.getElementById('calc_result');
   if(!res) return;
@@ -380,7 +390,7 @@ function runCalc(){
   const unit=(activeProg&&activeProg.cfg&&activeProg.cfg.unit)||WD.unit||'lbs';
   res.innerHTML='<b style="color:var(--accent)">Estimated '+calcLift+' 1RM: '+est+' '+unit+'</b> <span style="color:var(--muted)">— for your reference; the app coaches by RPE.</span>';
 }
-function setCalcLift(l){
+function setCalcLift(l: any){
   _setCalcLift(l);
   ['Deadlift','Squat','Bench'].forEach(n=>{
     const b=document.getElementById('calcLift_'+n);
@@ -388,7 +398,7 @@ function setCalcLift(l){
   });
   runCalc();
 }
-function setUnit(u){
+function setUnit(u: any){
   if(u===WD.unit) return;
   WD.unit=u;
   renderWizardStep();
@@ -403,6 +413,7 @@ function updateRaceDateFeedback() {
   // updatePaceFeasibility are its internals. No timer.
   const input = document.getElementById('raceDateInput');
   // Sync WD.raceDate from input if present
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   if(input && input.value) WD.raceDate = input.value;
   const p = wizardTestPin();
   const len = p ? p.len : ((WD.cardioTypes||[]).length ? calcProgramLength(WD.cardioTypes, {...WD.cardioGoals, _experience:WD.experience||'intermediate', _ageBracket:WD.ageBracket||'18-35', _eventTargeted:WD.eventTargeted}, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').weeks : 6);
@@ -433,7 +444,7 @@ function updateRaceDateFeedback() {
     return;
   }
 
-  const card = (color, html) => '<div style="color:'+color+';font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:'+color+'18;border-radius:4px;border:1px solid '+color+'44">'+html+'</div>';
+  const card = (color: any, html: any) => '<div style="color:'+color+';font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:'+color+'18;border-radius:4px;border:1px solid '+color+'44">'+html+'</div>';
 
   // D183 (P-SAFEPACE R3, first amendment's null rows, amendment 3 F4(i)): a dated test goal. Every week
   // number is the pin's. Never red (the weeks are not his to change) and no glyph on a framed row. The
@@ -441,10 +452,12 @@ function updateRaceDateFeedback() {
   // the first training day or past the program's end.
   if(p) {
     const reach = _f ? '<div style="margin-top:5px">'+paceCeilingSentence(_f)+'</div>' : '';
+    // @ts-expect-error TS18047 'p.tw' is possibly 'null'.
     if(p.tw >= 2) feedback.innerHTML = card(_f ? 'var(--accent)' : 'var(--run)', 'Your test is in week '+p.tw+'. The program ends on it. The taper lands in front of it.'+reach);
     // D184 (P-TESTLEN c' Q3): the entered week holds the test (the resolver's holdsTest, carried by
     // wizardTestPin), so week 1 has no training day before it. Ordered before the tw 1 row, whose
     // primer and shakeout sentence is false here. "In week 1", not "this week": true for a future start.
+    // @ts-expect-error TS2339 Property 'holdsTest' does not exist on type '{ tw: number | null; len: number; week: number | null; cap
     else if(p.tw === 1 && p.holdsTest) feedback.innerHTML = card('var(--signal)', 'Your test is in week 1. Nothing is left to train before it. You get the test week only.'+reach);
     else if(p.tw === 1) feedback.innerHTML = card('var(--accent)', 'Your test is this week. You get the test week only. Primer lifts, a shakeout, then the test.'+reach);
     else if(p.week === null) feedback.innerHTML = card('var(--signal)', 'Your test is before your first training day. This program starts after it and does not include it.');
@@ -485,21 +498,21 @@ function updateRaceDateFeedback() {
   feedback.innerHTML = card(color, cd.weeks+(cd.weeks === 1 ? ' week' : ' weeks')+' is short for this goal. The floor is '+len+'. Your full '+len+'-week program stays intact. Your race lands in week '+cd.weeks+'.');
 }
 
-function setPaceUnit(unit) {
+function setPaceUnit(unit: any) {
   if(!WD.cardioGoals['run']) WD.cardioGoals['run'] = {};
   WD.cardioGoals['run'].paceUnit = unit;
   // Convert stored baseline if switching
   renderWizardStep();
 }
 // Fixed distances for swim time goals (in the selected unit — yd or m).
-const SWIM_GOAL_DIST = { swim_500_time: 500, swim_100_time: 100 };
-function setSwimUnit(unit) {
+const SWIM_GOAL_DIST: Record<string, any> = { swim_500_time: 500, swim_100_time: 100 };
+function setSwimUnit(unit: any) {
   if(!WD.cardioGoals['swim']) WD.cardioGoals['swim'] = {};
   WD.cardioGoals['swim'].swimUnit = unit;
   renderWizardStep();
 }
 // Format a total time over a distance as a per-100 pace (e.g. 500 in 10:00 -> 2:00/100).
-function formatPacePer100(totalSecs, dist) {
+function formatPacePer100(totalSecs: any, dist: any) {
   if(!totalSecs || !dist || dist <= 0) return '';
   const per100 = totalSecs / (dist / 100);
   return _clkMS(per100) + '/100';
@@ -516,7 +529,7 @@ function updateSwimPaceDisplay() {
   el.innerHTML = asyIcon('🎯',13)+' ' + _clkMS(totalSecs) + ' is ' + _clkMS(totalSecs/(dist/100)) + ' per 100 ' + unit + '.';   // V218 (D157): label from the total
   el.style.display = 'block';
 }
-function updatePaceTime(type) {
+function updatePaceTime(type: any) {
   if(!WD.cardioGoals[type]) return;
   const mins = WD.cardioGoals[type].targetMins || 0;
   const secs = WD.cardioGoals[type].targetSecs || 0;
@@ -534,6 +547,7 @@ function updatePaceDisplay() {
   // mile, because sessions print /mi. '<time> is <pace> per mile.' One unit word, once.
   const _t = paceGoalTarget(g);
   if(!_t.tPacePerMile) { el.style.display='none'; return; }
+  // @ts-expect-error TS2345 Argument of type 'number | null' is not assignable to parameter of type 'number'.
   el.innerHTML = asyIcon('🎯',13)+' ' + _clkMS(_t.tTotalSecs) + ' is ' + _clkMS(_t.tPacePerMile) + ' per mile.';
   el.style.display = 'block';
 }
@@ -544,7 +558,7 @@ function updatePaceDisplay() {
 // when the goal is not a run pace goal, when the target is no faster than the current pace, or when it
 // sits within ~45 s/mi of what L weeks reach; otherwise {L, achievable, safeTotal, tTotal, cur, fromMile,
 // exp, distLabel}, which paceCeilingSentence reads.
-function assessRunPaceCeiling(L) {
+function assessRunPaceCeiling(L: any) {
   const g = WD.cardioGoals['run'];
   if(!g || g.id !== 'run_pace_goal' || g.targetMins===undefined || g.targetMins==='' || !g.targetDist) return null;
   const exp = WD.experience || 'intermediate';
@@ -558,6 +572,7 @@ function assessRunPaceCeiling(L) {
   // present (any level since D188), otherwise the experience-default. Using the SAME baseline the
   // length engine uses is essential — otherwise a fast runner who entered a quick mile time
   // gets told to slow below their current pace.
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ be
   const expCurrentPace = {beginner:690, intermediate:570, advanced:450}[exp] || 570;   // V176 (D9)
   const mileBest = (g.mileBestMins !== undefined && g.mileBestMins !== '')
     ? (+g.mileBestMins||0)*60 + (+g.mileBestSecs||0)
@@ -567,8 +582,10 @@ function assessRunPaceCeiling(L) {
   // Fastest pace reachable in L weeks FROM THE USER'S ACTUAL CURRENT PACE: the length engine's
   // forward pipeline inverted (undo the +1 grace, the age multiplier and raw*1.25 + 4).
   const paceImprove = PACE_IMPROVE[exp] || PACE_IMPROVE.intermediate;
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ '5
   const agePaceScale = {'55+':0.65, '36-54':0.85, '18-35':1.0}[age] || 1.0;
   const ageSafePaceImprove = +(paceImprove * agePaceScale).toFixed(2);
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ '5
   const ageMult = {'55+':1.15, '36-54':1.07, '18-35':1.0}[age] || 1.0;
   const improvingWeeks = Math.max(0, ((L - 1) / ageMult - 4) / 1.25);
   const achievable = Math.max(currentPace - improvingWeeks * ageSafePaceImprove, 240);
@@ -581,7 +598,7 @@ function assessRunPaceCeiling(L) {
 // D183 (P-SAFEPACE R1, amendment 2 (a)/(b)): the one sentence that reads the athlete. Digits, every time
 // through _clkMS, singular at 1 week. It says what L weeks reach from where he is and leaves the goal his.
 // It prints inside the undated frame below and on the dated card's tw rows (amendment 2 (c)).
-function paceCeilingSentence(f) {
+function paceCeilingSentence(f: any) {
   const wk = f.L + (f.L === 1 ? ' week' : ' weeks');
   const reach = ' In '+wk+' that reaches about '+f.distLabel+' in '+_clkMS(f.safeTotal)+'. Your goal is '+_clkMS(f.tTotal)+'.';
   if(f.fromMile) return 'Your mile is '+_clkMS(f.cur)+'.'+reach+' Keep it or change it above.';
@@ -589,7 +606,7 @@ function paceCeilingSentence(f) {
 }
 // D183 (amendment 3): the undated #paceFeasLine frame. The accent frame around the R1 sentence and nothing
 // else: no icon, no heading, no button. The dated card prints the same sentence inside its own row.
-function paceCeilingOfferHTML(f) {
+function paceCeilingOfferHTML(f: any) {
   return '<div style="color:var(--accent);font-size:12px;line-height:1.55;margin-top:6px;padding:9px 11px;background:var(--accent)18;border-radius:4px;border:1px solid var(--accent)44">'+
     paceCeilingSentence(f)+
     '</div>';
@@ -598,7 +615,7 @@ function paceCeilingOfferHTML(f) {
 // messaging (the card carries the sentence), so this stays hidden to avoid a
 // double sentence. D183 (R2): an internal of updateRaceDateFeedback, which passes the ceiling
 // it computed once; this line never computes its own.
-function updatePaceFeasibility(f) {
+function updatePaceFeasibility(f: any) {
   const el = document.getElementById('paceFeasLine');
   if(!el) return;
   const hide = () => { el.style.display = 'none'; el.innerHTML = ''; };
@@ -627,8 +644,10 @@ function getDayAdvisories() {
   }
 
   // 2. Cardio goal volume (distance/endurance goals need the days for weekly mileage)
+  // @ts-expect-error TS7006 Parameter 'sport' implicitly has an 'any' type.
   cardioTypes.forEach(sport => {
     const goal = cardioGoals[sport];
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
     const rec = goal && GOAL_RECOMMENDED_DAYS[goal.id];
     if(rec && nDays < rec) {
       out.push(asyIcon('flag',14) + ' Your <b>' + goalLabel(goal.id) + '</b> goal trains best with <b>' + rec + '+ days</b> for the weekly volume — you have ' + nDays + '.');
@@ -638,20 +657,24 @@ function getDayAdvisories() {
   // 3. Interval protection for speed goals — sport-aware. Any sport carrying a speed/
   // time goal needs >= 3 of its own day-slots or the interval block can't fit without
   // doubling up. Reuses the same sportDayTargets the engine allocates from.
+  // @ts-expect-error TS2554 Expected 5 arguments, but got 4.
   const _targets = sportDayTargets(cardioTypes, cardioGoals, nDays, LIFTING_FOCUS_TO_GOAL[WD.liftingFocus]||'balanced').targets;   // V187 (F2)
   const sportWord = {run:'running', bike:'cycling', swim:'swimming'};
   const sportIcon = {run:'🏃', bike:'🚴', swim:'🏊'};
+  // @ts-expect-error TS7006 Parameter 'sport' implicitly has an 'any' type.
   cardioTypes.forEach(sport => {
     const goal = cardioGoals[sport];
     if(!goal || !isSpeedGoal(goal.id)) return;
     const slots = _targets[sport] || 0;
     if(slots < 3) {
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
       const word = sportWord[sport] || sport;
       const multi = cardioTypes.length > 1;
       const why = multi
         ? 'with ' + cardioTypes.length + ' sports sharing the week, ' + word + ' gets ' + slots + ' day' + (slots === 1 ? '' : 's')
         : 'you have ' + slots + ' ' + word + ' day' + (slots === 1 ? '' : 's');
       const fix = multi ? 'Add a training day or drop a sport' : 'Add a training day';
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
       out.push(asyIcon(sportIcon[sport] || '⏱', 14) + ' Your <b>' + goalLabel(goal.id) + '</b> goal needs <b>3+ ' + word + ' days</b> for interval (speed) work — ' + why + '. ' + fix + '.');
     }
   });
@@ -676,9 +699,12 @@ function getMinTrainDays() {
   let floor = 3; // absolute minimum — three days or it is not a program
   const cardioTypes = WD.cardioTypes || [];
   const cardioGoals = WD.cardioGoals || {};
+  // @ts-expect-error TS7006 Parameter 'sport' implicitly has an 'any' type.
   cardioTypes.forEach(sport => {
     const goal = cardioGoals[sport];
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
     if(goal && CARDIO_FLOORS[goal.id]) {
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
       floor = Math.max(floor, CARDIO_FLOORS[goal.id]);
     }
   });
@@ -690,7 +716,8 @@ function getMinTrainDaysLabel() {
   // The persistent banner on the rest-day screen carries the full explanation.
   const cardioTypes = WD.cardioTypes || [];
   const cardioGoals = WD.cardioGoals || {};
-  const goalLabels = [];
+  const goalLabels: any[] = [];
+  // @ts-expect-error TS7006 Parameter 'sport' implicitly has an 'any' type.
   cardioTypes.forEach(sport => {
     const goal = cardioGoals[sport];
     if(goal) goalLabels.push(goalLabel(goal.id));
@@ -700,7 +727,7 @@ function getMinTrainDaysLabel() {
   return 'Three days is the floor. Two gives you the same session twice.';
 }
 
-function toggleRestDay(d) {
+function toggleRestDay(d: any) {
   const wouldRest = !WD.restDays.includes(d);
   const trainingLeft = ALL_DAYS_ORDER.filter(x => !WD.restDays.includes(x)).length;
   if(wouldRest) {
@@ -719,8 +746,9 @@ function toggleRestDay(d) {
   renderWizardStep();
 }
 
-function toggleCardioTypeSport(t) {
+function toggleCardioTypeSport(t: any) {
   if(WD.cardioTypes.includes(t)) {
+    // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
     WD.cardioTypes = WD.cardioTypes.filter(x => x !== t);
     delete WD.cardioGoals[t];
   } else {
@@ -728,7 +756,7 @@ function toggleCardioTypeSport(t) {
   }
   renderWizardStep();
 }
-function setCardioGoal(type, id) {
+function setCardioGoal(type: any, id: any) {
   if(!WD.cardioGoals[type]) WD.cardioGoals[type] = {};
   const goalData = (CARDIO_GOALS_BY_TYPE[type] || []).find(g => g.id === id);
   WD.cardioGoals[type].id = id;
@@ -777,10 +805,13 @@ function renderWizardStep() {
   // Adjust displayed total for body path (skips cardio_goal)
   const displayTotal = WD.primaryPath === 'body' ? total - 1 : total;
   const displayStep = WD.primaryPath === 'body' && wizardStep > 1 ? wizardStep : wizardStep + 1;
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('wizardFill').style.width = ((wizardStep+1)/total*100) + '%';
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('wizardStepLabel').textContent = displayStep + '/' + displayTotal;
   const body = document.getElementById('wizardBody');
   const step = WIZARD_STEPS[wizardStep];
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('wizardNext').textContent = step === 'name' ? 'Generate Program →' : 'Continue →';
   // Default raceDate to today on the cardio goal step if not set, so the card shows on first open.
   // D183 (P-SAFEPACE R2): the repaint runs synchronously from this step's tail below; no timer.
@@ -792,6 +823,7 @@ function renderWizardStep() {
   }
 
   if(step === 'primary') {
+    // @ts-expect-error TS18047 'body' is possibly 'null'.
     body.innerHTML = `<div class="wizard-title">What are you training for?</div>
     <div class="wizard-subtitle">This shapes everything! Program length, lifting focus, and cardio structure.</div>
     <div style="display:flex;flex-direction:column;gap:10px">
@@ -806,16 +838,17 @@ function renderWizardStep() {
     </div>`;
 
   } else if(step === 'profile') {
-    const expHints = {
+    const expHints: Record<string, string> = {
       beginner:'Lower volume, longer rest, technique focus. Progressions are conservative.',
       intermediate:'Balanced volume and intensity. Standard progressions with room to push.',
       advanced:'Higher intensity, more volume, shorter rest. Progressions push harder.'
     };
-    const ageHints = {
+    const ageHints: Record<string, string> = {
       '18-35':'Standard progressions. Peak recovery.',
       '36-54':'Slightly more rest. Volume tapers a touch.',
       '55+':'More deload frequency, conservative volume increases, joint-friendly emphasis.'
     };
+    // @ts-expect-error TS18047 'body' is possibly 'null'.
     body.innerHTML = `<div class="wizard-title">About you</div>
     <div class="wizard-subtitle">Calibrates volume, intensity, and program length to your fitness level.</div>
     <div class="input-label" style="margin-bottom:8px">Training experience</div>
@@ -848,6 +881,7 @@ function renderWizardStep() {
     </div>`;
 
   } else if(step === 'equipment') {
+    // @ts-expect-error TS18047 'body' is possibly 'null'.
     body.innerHTML = `<div class="wizard-title">Your equipment</div>
     <div class="wizard-subtitle">The program only prescribes exercises you can actually do.</div>
     <div style="display:flex;flex-direction:column;gap:10px">
@@ -865,10 +899,10 @@ function renderWizardStep() {
     </div>`;
 
   } else if(step === 'cardio_goal') {
-    const sportIcons = {run:'🏃', bike:'🚴', swim:'🏊'};
-    const sportNames = {run:'Running', bike:'Cycling / Spin', swim:'Swimming'};
+    const sportIcons: Record<string, string> = {run:'🏃', bike:'🚴', swim:'🏊'};
+    const sportNames: Record<string, string> = {run:'Running', bike:'Cycling / Spin', swim:'Swimming'};
     const sportColors = {run:'var(--run)', bike:'var(--bike)', swim:'var(--swim)'};
-    const sportDescs = {
+    const sportDescs: Record<string, string> = {
       run:'Outdoor or treadmill. Pace, distance and race goals.',
       bike:'Spin bike or outdoor. Intervals, FTP and distance.',
       swim:'Lap pool or open water. Structured sets.'
@@ -881,6 +915,7 @@ function renderWizardStep() {
     // HYBRID: drop any previously-selected taper-dependent race goal (e.g. chosen on the Event
     // path, then switched to Hybrid) so it can't silently carry through to the build.
     if(WD.primaryPath==='both'){ for(const sp of Object.keys(WD.cardioGoals||{})){ if(WD.cardioGoals[sp] && HYBRID_EXCLUDED_GOALS.has(WD.cardioGoals[sp].id)) delete WD.cardioGoals[sp]; } }
+    // @ts-expect-error TS18047 'body' is possibly 'null'.
     body.innerHTML = `<div class="wizard-title">Cardio goals</div>
     <div class="wizard-subtitle">Select all sports you want to train. Set a goal for each.</div>
     <div style="display:flex;flex-direction:column;gap:10px">
@@ -970,7 +1005,7 @@ function renderWizardStep() {
                   <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
                 </div>
               </div>
-              <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(WD.cardioGoals['run']?.targetMins!==undefined&&WD.cardioGoals['run']?.targetMins!==''&&WD.cardioGoals['run']?.targetDist)?'block':'none'}">${asyIcon('🎯',13)} ${(()=>{ const _t=paceGoalTarget(WD.cardioGoals['run']); return _t.tPacePerMile ? _clkMS(_t.tTotalSecs)+' is '+_clkMS(_t.tPacePerMile)+' per mile.' : ''; })()}</div>
+              <div id="paceDisplayLine" style="font-size:12px;color:var(--accent);margin-top:6px;display:${(WD.cardioGoals['run']?.targetMins!==undefined&&WD.cardioGoals['run']?.targetMins!==''&&WD.cardioGoals['run']?.targetDist)?'block':'none'}">${asyIcon('🎯',13)} ${(()=>{ const _t: any=paceGoalTarget(WD.cardioGoals['run']); return _t.tPacePerMile ? _clkMS(_t.tTotalSecs)+' is '+_clkMS(_t.tPacePerMile)+' per mile.' : ''; })()}</div>
               <div id="paceFeasLine" style="display:none"></div>
             </div>
             ${_seedBannerHTML()}<div class="input-group" style="margin-top:8px">
@@ -1053,6 +1088,7 @@ function renderWizardStep() {
     const subtitle = isEvent
       ? 'Lifting supports your cardio goal — it should not compete with it.'
       : 'This is your primary focus. Cardio is optional and added next.';
+    // @ts-expect-error TS18047 'body' is possibly 'null'.
     body.innerHTML = `<div class="wizard-title">Lifting focus</div>
     <div class="wizard-subtitle">${subtitle}</div>
     <div style="display:flex;flex-direction:column;gap:10px">
@@ -1066,8 +1102,8 @@ function renderWizardStep() {
       <div style="padding:10px 14px;font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">Optional cardio add-on</div>
       <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
         ${['run','bike','swim'].map(t => {
-          const icons={run:'🏃',bike:'🚴',swim:'🏊'};
-          const names={run:'Running',bike:'Cycling',swim:'Swimming'};
+          const icons: Record<string, string>={run:'🏃',bike:'🚴',swim:'🏊'};
+          const names: Record<string, string>={run:'Running',bike:'Cycling',swim:'Swimming'};
           const sel = WD.cardioTypes.includes(t);
           return `<div class="cardio-type-card${sel?' selected':''}" onclick="toggleCardioTypeSport('${t}')" style="padding:10px 14px">
             <div style="flex-shrink:0">${asyIcon(icons[t],22)}</div>
@@ -1095,7 +1131,8 @@ function renderWizardStep() {
     const _floorReason = (()=>{
       const cardioTypes = WD.cardioTypes || [];
       const cardioGoals = WD.cardioGoals || {};
-      const labels = [];
+      const labels: any[] = [];
+      // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
       cardioTypes.forEach(s => { if(cardioGoals[s]) labels.push(goalLabel(cardioGoals[s].id)); });
       if(labels.length) return labels.join(' + ');
       return null;
@@ -1117,6 +1154,7 @@ function renderWizardStep() {
           _advisories.map(a => '<div style="font-size:12px;color:var(--accent);line-height:1.5">' + a + '</div>').join('') +
         '</div>'
       : '';
+    // @ts-expect-error TS18047 'body' is possibly 'null'.
     body.innerHTML = `<div class="wizard-title">Rest days</div>
     <div class="wizard-subtitle">All days are training days by default. Tap to mark as rest.</div>
     <div class="day-grid">${ALL_DAYS_ORDER.map(d => {
@@ -1131,8 +1169,10 @@ function renderWizardStep() {
 
   } else if(step === 'name') {
     const internalGoal = LIFTING_FOCUS_TO_GOAL[WD.liftingFocus] || WD.liftingFocus;
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ st
     const liftLabel = ({strength:'Strength',hypertrophy:'Size',fatloss:'Fat Loss',balanced:'Balanced',support_strength:'Strength Support',support_athletic:'Athletic Support',support_prevention:'Injury Prevention'})[WD.liftingFocus]||WD.liftingFocus;
     const cardioSummary = WD.cardioTypes.length
+      // @ts-expect-error TS7006 Parameter 't' implicitly has an 'any' type.
       ? WD.cardioTypes.map(t => asyIcon(({run:'🏃',bike:'🚴',swim:'🏊'})[t],15)+' '+({run:'Run',bike:'Bike',swim:'Swim'})[t] + (WD.cardioGoals[t]?.label?': '+WD.cardioGoals[t].label:'')).join(' + ')
       : 'Lift only';
     const trainDays = ALL_DAYS_ORDER.filter(d => !WD.restDays.includes(d));
@@ -1141,6 +1181,7 @@ function renderWizardStep() {
     if(!WD.name) WD.name = liftLabel + ' Block ' + (getPrograms().length+1);
     if(!WD.startDate) WD.startDate = _isoToday();                         // V174 (D20): never empty
     const _sr = resolveStartDate(WD.startDate, WD.restDays||[], _rsRace(WD));   // V174 (D21/D24/D25), D184 (c)
+    // @ts-expect-error TS18047 'body' is possibly 'null'.
     body.innerHTML = `<div class="wizard-title">Name your program</div>
     <div class="wizard-subtitle">Give it something you will recognize, and tell it when to begin.</div>
     <div class="input-group"><div class="input-label">Program name</div><input type="text" class="input-field" value="${WD.name}" oninput="WD.name=this.value" maxlength="40"></div>
@@ -1150,8 +1191,8 @@ function renderWizardStep() {
     <div class="summary-block">
       <div class="summary-block-header">Program Summary</div>
       ${[
-        ['Path', ({event:'Race / Event',body:'Strength / Physique',both:'Hybrid'})[WD.primaryPath]],
-        ...(WD.primaryPath==='event'&&WD.raceDate?[['Race date', _fmtStartDay(WD.raceDate, true)+(()=>{ /* D182 (V223): the number is raceCountdown's, so this row and the card cannot drift; past the race, "behind you" */ const cd=raceCountdown(WD.raceDate), w=raceCountdownWords(cd); return !w ? '' : cd.days<=0 ? ' ('+w.copy+')' : ' ('+w.card+' away)'; })()]]:WD.primaryPath==='event'?[['Race date','No date set — no taper']]:[] ),
+        ['Path', ({event:'Race / Event',body:'Strength / Physique',both:'Hybrid'} as Record<string, string>)[WD.primaryPath]],
+        ...(WD.primaryPath==='event'&&WD.raceDate?[['Race date', _fmtStartDay(WD.raceDate, true)+(()=>{ /* D182 (V223): the number is raceCountdown's, so this row and the card cannot drift; past the race, "behind you" */ const cd: any=raceCountdown(WD.raceDate), w=raceCountdownWords(cd); return !w ? '' : cd.days<=0 ? ' ('+w.copy+')' : ' ('+w.card+' away)'; })()]]:WD.primaryPath==='event'?[['Race date','No date set — no taper']]:[] ),
         ['Lifting', liftLabel],
         ['Cardio', cardioSummary],
         ['Program length', programWeeks + (programWeeks === 1 ? ' week' : ' weeks')],
@@ -1160,7 +1201,7 @@ function renderWizardStep() {
         ['Rest days', WD.restDays.length?WD.restDays.map(d=>DAY_SHORT[d]).join(' · '):'None'],
         ['Experience', WD.experience],
         ['Age range', WD.ageBracket],
-        ['Equipment', ({home_full:'Home Full',home_basic:'Home Basic',commercial:'Commercial Gym',crossfit:'CrossFit Box',bodyweight:'Bodyweight only',minimal:'Minimal / Travel'})[WD.equipment]||WD.equipment],
+        ['Equipment', ({home_full:'Home Full',home_basic:'Home Basic',commercial:'Commercial Gym',crossfit:'CrossFit Box',bodyweight:'Bodyweight only',minimal:'Minimal / Travel'} as Record<string, string>)[WD.equipment]||WD.equipment],
       ].map(([k,v]) => `<div class="summary-row"><span class="summary-key">${k}</span><span class="summary-val">${v}</span></div>`).join('')}
     </div>`;
   }

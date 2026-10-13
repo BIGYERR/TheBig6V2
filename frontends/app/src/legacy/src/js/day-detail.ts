@@ -1,26 +1,27 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { clearSetDraft, completedKey, getCompleted, getLogs, getPrograms, logKey, savePrograms } from './storage.js';
+import { clearSetDraft, completedKey, getCompleted, getLogs, getPrograms, logKey, savePrograms } from './storage.ts';
 import {
   _setCurrentDayKey, _setStaleWarnShown, _setStaleWarnSrc, activeProg, activeProgId, currentDayKey, currentWeek,
   showToast,
 } from './rest-day-shell.ts';
 import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
-import { DAY_FULL } from './wizard.js';
-import { wildcardTagHTML } from './random-wildcard.js';
-import { buildSectionsHTML } from './week-view-sections.js';
-import { buildCardioHTML, refreshSetSummary, setWeightVals, toStoreW } from './set-logging.js';
-import { getExWeights, isKBExercise, logExerciseWeight, updateDoseDerived } from './log-entries.js';
-import { buildLogHTML, iaWheelInit, modTagsHTML, sessionLogProgress } from './wheel-log.js';
-import { ruResetIfIdle } from './rest-timer.js';
-import { cardioLive, persistLogFields, renderStatusFoot } from './day-status.js';
-import { travelTagHTML } from './overlays.js';
+import { DAY_FULL } from './wizard.ts';
+import { wildcardTagHTML } from './random-wildcard.ts';
+import { buildSectionsHTML } from './week-view-sections.ts';
+import { buildCardioHTML, refreshSetSummary, setWeightVals, toStoreW } from './set-logging.ts';
+import { getExWeights, isKBExercise, logExerciseWeight, updateDoseDerived } from './log-entries.ts';
+import { buildLogHTML, iaWheelInit, modTagsHTML, sessionLogProgress } from './wheel-log.ts';
+import { ruResetIfIdle } from './rest-timer.ts';
+import { cardioLive, persistLogFields, renderStatusFoot } from './day-status.ts';
+import { travelTagHTML } from './overlays.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // ── V139: TEST-WEEK e1RM CALCULATOR + RANGE-TOP NUDGE ────────────────────────
 // Epley with the honest edge case: a true single IS the max, no formula inflation.
-function _epley(wt,reps){ if(!(wt>0)) return 0; return reps<=1 ? Math.round(wt) : Math.round(wt*(1+reps/30)); }
-function e1rmCalcHTML(day){
+function _epley(wt: any,reps: any){ if(!(wt>0)) return 0; return reps<=1 ? Math.round(wt) : Math.round(wt*(1+reps/30)); }
+function e1rmCalcHTML(day: any){
   if(!day||!day.testLift) return '';
+  // @ts-expect-error TS2339 Property '_unitLabel' does not exist on type 'Window & typeof globalThis'.
   const unit=window._unitLabel||'lbs';
   // Prefill from the logged test set when one exists. The main is section 0 item 0.
   let pw='',pr=3;
@@ -30,6 +31,7 @@ function e1rmCalcHTML(day){
     const ent=((_row&&_row.entries)||[]).slice(-1)[0];
     if(ent&&ent.weight){ pw=ent.weight; if(ent.setsDone&&ent.setsDone.length) pr=Math.min(5,Math.max(1,+ent.setsDone[0]||3)); }
   }catch(e){}
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ be
   const liftLabel={bench:'bench',squat:'squat',deadlift:'deadlift'}[day.testLift]||day.testLift;
   let opts='';for(let i=1;i<=5;i++)opts+='<option'+(i===pr?' selected':'')+'>'+i+'</option>';
   return '<div class="e1rm" id="e1rmCard">'
@@ -45,17 +47,21 @@ function e1rmCalcHTML(day){
     +'</div>';
 }
 function e1rmCalcUpdate(){
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement | {}'.
   const w=parseFloat((document.getElementById('e1w')||{}).value)||0;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement | {}'.
   const r=parseInt((document.getElementById('e1r')||{}).value)||1;
   const v=_epley(w,r);
   const o=document.getElementById('e1out');
+  // @ts-expect-error TS2339 Property '_unitLabel' does not exist on type 'Window & typeof globalThis'.
   if(o)o.innerHTML=v+' <span>'+(window._unitLabel||'lbs')+'</span>';
   return v;
 }
-function saveTestMax(lift){
+function saveTestMax(lift: any){
   const v=e1rmCalcUpdate();
   if(!(v>0)) return;
   const programs=getPrograms();
+  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const p=programs.filter(x=>x&&x.id===activeProgId)[0];
   if(p&&p.cfg){
     p.cfg[lift]=v;
@@ -67,16 +73,18 @@ function saveTestMax(lift){
   }
   const b=document.getElementById('e1save'),m=document.getElementById('e1saved');
   if(b)b.style.display='none';
+  // @ts-expect-error TS2339 Property '_unitLabel' does not exist on type 'Window & typeof globalThis'.
   if(m){m.textContent='Saved. Your next block anchors off '+v+' '+(window._unitLabel||'lbs')+'.';m.style.display='block';}
 }
 // One banner per day, and only when the log has earned it: the LAST logged session for
 // that exercise shows every set at or above the top of the prescribed range. Reads the
 // same ia_exw_ store the set logger writes; parses the range straight off the detail.
-function rangeTopNudgeHTML(day){
+function rangeTopNudgeHTML(day: any){
   if(!day||!day.sections) return '';
-  const names=[];
+  const names: any[]=[];
   try{
     const store=getExWeights();
+    // @ts-expect-error TS7006 Parameter 'sec' implicitly has an 'any' type.
     day.sections.forEach(sec=>(sec.items||[]).forEach(it=>{
       if(!it||!it.name||!it.detail) return;
       const m=/^(\d+)×(\d+)–(\d+)( each)?( @ RPE .*)?$/.exec(it.detail);
@@ -85,7 +93,9 @@ function rangeTopNudgeHTML(day){
       const _row=store[exStoreKey(it.name)];
       const ent=((_row&&_row.entries)||[]).slice(-1)[0];
       if(!ent||!ent.setsDone||ent.setsDone.length<sets) return;
+      // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
       const done=ent.setsDone.slice(0,sets).map(x=>+x||0);
+      // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
       if(done.length>=sets && done.every(x=>x>=hi)) names.push(it.name);
     }));
   }catch(e){}
@@ -95,8 +105,9 @@ function rangeTopNudgeHTML(day){
   return '<div class="prog-nudge"><b>Time to add weight.</b> Last session you hit the top of the range on every set of '
     +shown+extra+'. Go up in weight today and start back at the bottom of the range.</div>';
 }
-function openDetail(dayKey,day){
+function openDetail(dayKey: any,day: any){
   _setStaleWarnShown(false); _setStaleWarnSrc('');
+  // @ts-expect-error TS2339 Property '_unitLabel' does not exist on type 'Window & typeof globalThis'.
   window._unitLabel=(activeProg&&activeProg.cfg&&activeProg.cfg.unit==='kg')?'kg':'lbs';
   // V152 — A RE-RENDER MUST NOT MOVE THE READER.
   // openDetail is not only an open. It is also the re-render for every in-session edit:
@@ -114,6 +125,7 @@ function openDetail(dayKey,day){
   const _dKeep=_dFresh?0:_dOv.scrollTop;
   _setCurrentDayKey(dayKey);
   const comp=getCompleted()[completedKey(currentWeek,dayKey)];
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ su
   const over=document.getElementById('detailDayName');if(over)over.textContent='Week '+currentWeek+' \u00b7 '+DAY_FULL[dayKey];
   const ttl=document.getElementById('detailDayTitle');if(ttl)ttl.textContent=(comp&&comp.title)||day.title||'Training';
   const tg=document.getElementById('detailTags');if(tg)tg.innerHTML=modTagsHTML(day.tags)+travelTagHTML(day);   // V175 (D30)
@@ -152,6 +164,7 @@ function openDetail(dayKey,day){
   if(!curStatus && _hasLog){
     html+='<div class="log-nudge"><span>'+asyIcon('notebook',14)+' You logged this one but never marked it.</span><button class="log-nudge-btn" onclick="handleDayStatus(\''+dayKey+'\',\''+escTitle+'\',\'complete\')">Mark Done \u2713</button></div>';
   }
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('detailBody').innerHTML=html;
 
   renderStatusFoot(dayKey, day.title||'');   // V181 (D1/D2)
@@ -162,8 +175,10 @@ function openDetail(dayKey,day){
   ['log_rpe','log_run_dist','log_run_pace','log_run_mins','log_run_rep_time','log_bike_mins','log_swim_yards','log_notes'].forEach(function(id){
     var el=document.getElementById(id);
     var free=(id==='log_rpe'||id==='log_notes');
+    // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
     if(el) el.addEventListener('input',function(){ if(free||cardioLive(dayKey)) persistLogFields(dayKey); updateDoseDerived(); });
   });
+  // @ts-expect-error TS2554 Expected 1 arguments, but got 0.
   iaWheelInit();         // V182 (D3): wheels drive the hidden nodes wired just above
   updateDoseDerived();   // V148: initial paint of the derived readout
   if(_dOv){
@@ -174,7 +189,7 @@ function openDetail(dayKey,day){
     _dOv.scrollTop=_dFresh?0:_dKeep;
   }
 }
-function selectKBSize(exKey, size, unit, exName, setsReps) {
+function selectKBSize(exKey: any, size: any, unit: any, exName: any, setsReps: any) {
   // Store Kettlebell size directly
   logExerciseWeight(exName, size, setsReps, currentWeek, null, null, currentDayKey);
   showToast(size + ' ' + unit + ' bell logged ✓');
@@ -184,9 +199,10 @@ function selectKBSize(exKey, size, unit, exName, setsReps) {
 }
 // Kettlebell size data stored globally for lookup by exKey
 const _kbPending = {};
-function buildKBChips(exKey, lastW, weekLabel, unit, exName, setsReps) {
+function buildKBChips(exKey: any, lastW: any, weekLabel: any, unit: any, exName: any, setsReps: any) {
   const kbSizes = unit==='kg' ? [8,12,16,20,24,28,32,36,40] : [15,20,25,35,44,53,62,70,80];
   const kbUnit  = unit==='kg' ? 'kg' : 'lb';
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   _kbPending[exKey] = {exName, setsReps, kbUnit};
   const lastTxt = lastW ? ' · Last: '+lastW+' '+kbUnit+weekLabel : '';
   let html = `<div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Bell size${lastTxt}</div>`;
@@ -201,20 +217,23 @@ function buildKBChips(exKey, lastW, weekLabel, unit, exName, setsReps) {
   html += '</div>';
   return html;
 }
-function selectKBByKey(exKey, size) {
+function selectKBByKey(exKey: any, size: any) {
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   const p = _kbPending[exKey];
   if(!p) return;
   selectKBSize(exKey, size, p.kbUnit, p.exName, p.setsReps);
 }
-function stepExVal(exKey, delta) {
+function stepExVal(exKey: any, delta: any) {
   const input = document.getElementById('exw_' + exKey);
   if(!input) return;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   const current = parseFloat(input.value) || 0;
   const next = Math.max(0, current + delta);
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   input.value = next;
 }
 // `quiet` is the live-after-log path: same write, no toast. Not a second writer.
-function saveExWeight(exKey, exName, setsReps, quiet) {
+function saveExWeight(exKey: any, exName: any, setsReps: any, quiet: any) {
   const unit = activeProg?.cfg?.unit || 'lbs';
   // Per-set actual reps (or seconds/yards) — read every row, empty falls back to its
   // prescribed placeholder so an untouched set logs as prescribed.
@@ -231,6 +250,7 @@ function saveExWeight(exKey, exName, setsReps, quiet) {
   const wInput = document.getElementById('exw_'+exKey);
   let storedW = 0, hasW = false, dispW = 0;
   if(wInput){
+    // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     const raw = (wInput.value!=='' ? wInput.value : wInput.placeholder);
     const v = parseFloat(raw);
     if(!isNaN(v) && v>0){ dispW = v; storedW = (unit==='kg') ? Math.round(v*2.20462) : v; hasW = true; }
@@ -240,7 +260,7 @@ function saveExWeight(exKey, exName, setsReps, quiet) {
   // are volume. setsW carries the full ladder alongside so nothing is lost, but every
   // existing consumer — big-3 weekly max, per-exercise chart, reuse pill — keeps
   // reading the single `weight` scalar and needs no change.
-  let setsW = [];
+  let setsW: any[] = [];
   if(dispSets.length && dispSets.some(function(x){return x>0;})){
     setsW = dispSets.map(toStoreW);
     const top = Math.max.apply(null, setsW);
@@ -259,6 +279,7 @@ function saveExWeight(exKey, exName, setsReps, quiet) {
     // V148: keep the logged number SOLID in the box (was demoted to a grey placeholder,
     // which then vanished entirely on the next render — the render path now restores it,
     // and the in-place path matches so the two can never disagree about the same state).
+    // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     wInput.value=String(dispW); wInput.placeholder=String(dispW);
     const wunit=isKBExercise(exName)?(unit==='kg'?'kg':'lb'):unit;
     const numEl=document.getElementById('exreusenum_'+exKey); if(numEl)numEl.textContent=dispW+' '+wunit;

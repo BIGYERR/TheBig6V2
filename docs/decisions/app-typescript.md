@@ -50,3 +50,37 @@ screen shows or what is stored.
   and the Docker e2e ran on the release.
 - **Does not change:** the page (only its version meta); the Angular build's behaviour (its bundle is built from the
   same JavaScript); any program; any stored key or value.
+
+## Every app file is TypeScript (v0.239.44)
+
+- **Date:** 2026-10-12. **Decided by:** the session, inside Mario's standing answer ("PATCH each, in order"); the batch
+  size is the session's (one release for the remaining 20 files rather than ten, since every file gets the same proof).
+  **Shipped:** v0.239.44.
+- **Moved:** the other 20 files of `js/` (`storage`, `rest-timer`, `wizard`, `wizard-generate`, `programs`,
+  `program-manage`, `overlays`, `swaps-edits`, `swap-sheet`, `random-wildcard`, `week-view-sections`, `set-logging`,
+  `log-entries`, `wheel-log`, `day-detail`, `day-status`, `progress-data`, `progress-charts`,
+  `lift-ledger-progress-screen`, `popups-streaks-reminders`). Every app file is TypeScript; the legacy type check covers
+  all 23 and the engine's 17.
+- **`tools/ts-expect.mjs` learned four types it writes instead of a marker,** each an annotation the build strips:
+  - a name another file imports untyped (TS7034 on the import line: `let currentDayKey=null`) is typed `any` where it is
+    declared, when that file is TypeScript already;
+  - a parameter some call leaves out (TS2554, "Expected 5 arguments, but got 3": JavaScript passes `undefined`, and the
+    legacy code relies on it) is typed optional where the function is declared (`b?: any`), from the first one the call
+    leaves out;
+  - a lookup table indexed by a key TypeScript cannot check against it, inside a template literal (TS7053), is typed
+    `Record<string, string>` (`Record<string, any>` when its values are not all strings) where it is declared;
+  - a marker that no longer marks an error (TS2578, because a file it reads gained types) is deleted, a comment line.
+- **Typed by hand,** where an error sat inside a template literal that spans lines and the tool could not reach it: five
+  inline lookup tables cast where they are read (`({sun:'Su',...} as Record<string, string>)[d]`, a cast the build
+  strips), and `RPE_LABELS`, `CARDIO_GOALS_BY_TYPE` (`any[]` values), `WD` (`{ restDays: any[]; [k: string]: any }`),
+  `points`, `trainDays`, `_t` and `cd` typed where they are declared.
+- **The debt:** 629 marker lines across the 23 files. By error: TS7006 160 (an arrow's lone parameter, `p=>`, which
+  cannot take a type without adding parentheses), TS7053 139, TS2339 117, TS18047 81, TS2554 43, TS2531 36, TS18046 19,
+  TS2538 12, TS2362 7, TS2345 5, TS2322 5, TS7031 1. 884 names typed `any` (40 of them `any[]`), 19 parameters
+  optional, 13 tables typed `Record<string, ...>`, 5 casts.
+- **The proof:** `tools/same-script.mjs` against v0.239.43: the same 164,293 tokens and 6,355 comments, the page's
+  diff the version line. The Angular build bundles the same files with esbuild; its legacy bundle, built unminified
+  from v0.239.43's sources and from these, is the same 191,916 tokens (comments aside, and each piece's name in the
+  entry's list, `.js` against `.ts`). The six local comparisons matched (119 states) and the e2e ran 69/69 at 0 px.
+- **Does not change:** the page (only its version meta); the Angular build's behaviour; any program; any stored key or
+  value.

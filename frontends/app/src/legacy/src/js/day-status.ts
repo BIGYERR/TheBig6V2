@@ -1,27 +1,28 @@
 import {
   completedKey, getCompleted, getLogs, getPrograms, logKey, saveCompleted, saveLogs, savePrograms, snapshotDay,
-} from './storage.js';
+} from './storage.ts';
 import { _setActiveProg, activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.ts';
 import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
-import { markSwapOffered } from './swaps-edits.js';
-import { renderWeekView } from './week-view-sections.js';
+import { markSwapOffered } from './swaps-edits.ts';
+import { renderWeekView } from './week-view-sections.ts';
 import {
   CARDIO_PARK_FIELDS, _curLogDose, _curLogDoseFull, _curLogSub, _setCurLogDose, cardioSwapNoteText, doseDerived,
   updateDoseDerived,
-} from './log-entries.js';
-import { cardioFieldHTML, iaWheelFlush, iaWheelInit } from './wheel-log.js';
-import { ruReset } from './rest-timer.js';
-import { openDetail } from './day-detail.js';
-import { refreshProgram } from './program-manage.js';
-import { finalScheduledDay, fireCompletionPopup, releaseSeasonShown, statusOf } from './popups-streaks-reminders.js';
+} from './log-entries.ts';
+import { cardioFieldHTML, iaWheelFlush, iaWheelInit } from './wheel-log.ts';
+import { ruReset } from './rest-timer.ts';
+import { openDetail } from './day-detail.ts';
+import { refreshProgram } from './program-manage.ts';
+import { finalScheduledDay, fireCompletionPopup, releaseSeasonShown, statusOf } from './popups-streaks-reminders.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── COACH NUDGE ──────────────────────────────────────────────────────────────
 // Third time in a row is a preference, not a bad night's sleep. Offered once, and
 // only once — declining marks it handled so the athlete is never asked again.
-let _nudgeCtx=null;
-function showSwapNudge(from,to){
+let _nudgeCtx: any=null;
+function showSwapNudge(from: any,to: any){
   _nudgeCtx={from:from,to:to};
   const o=document.getElementById('swapNudgeOverlay');if(!o)return;
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('swapNudgeBody').innerHTML=
     'That is three sessions running you have traded '+from.toLowerCase()+' for '+to.toLowerCase()+'.'
     +'<br><br>Want me to make '+to.toLowerCase()+' your '+((_pattern(from)||'main')+'').replace(/_/g,' ')
@@ -37,6 +38,7 @@ function acceptSwapNudge(){
   if(!_nudgeCtx||!activeProgId){dismissSwapNudge();return;}
   const from=_nudgeCtx.from,to=_nudgeCtx.to;
   const programs=getPrograms();
+  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   const p=programs.filter(x=>x&&x.id===activeProgId)[0];
   if(p&&p.cfg){
     p.cfg.exSwapPrefs={...(p.cfg.exSwapPrefs||{})};
@@ -53,17 +55,18 @@ function acceptSwapNudge(){
   if(day) openDetail(currentDayKey,day); else renderWeekView();
   showToast('Done. '+to+' is your '+((_pattern(from)||'main')+'').replace(/_/g,' ')+' from here.');
 }
+// @ts-expect-error TS2531 Object is possibly 'null'.
 function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');renderWeekView();}
 // Single, app-wide RPE reference — opened from the ⓘ button in the day header, so the
 // effort scale lives in one place instead of being reprinted inside every workout.
 function showRpeInfo(){const o=document.getElementById('rpeInfoOverlay');if(o)o.classList.add('show');}
-function hideRpeInfo(e){const o=document.getElementById('rpeInfoOverlay');if(!o)return;if(e&&e.currentTarget!==e.target)return;o.classList.remove('show');}
-function toggleComplete(wk,dayKey,title){
+function hideRpeInfo(e: any){const o=document.getElementById('rpeInfoOverlay');if(!o)return;if(e&&e.currentTarget!==e.target)return;o.classList.remove('show');}
+function toggleComplete(wk: any,dayKey: any,title: any){
   snapshotDay(wk,dayKey);
   const c=getCompleted();const k=completedKey(wk,dayKey);
   if(c[k])delete c[k];else c[k]={title,ts:Date.now(),status:'complete'};saveCompleted(c);renderWeekView();
 }
-function markDayComplete(wk,dayKey,title){
+function markDayComplete(wk: any,dayKey: any,title: any){
   snapshotDay(wk,dayKey);
   const c=getCompleted();c[completedKey(wk,dayKey)]={title,ts:Date.now(),status:'complete'};saveCompleted(c);renderWeekView();
 }
@@ -72,7 +75,7 @@ function markDayComplete(wk,dayKey,title){
 // stays, the streak and the week strip recompute, and if this was the final scheduled
 // day the one-shot season latch is released so a fat-thumbed Done cannot burn the
 // block-end banner. Legacy `partial` records (pre-V181) read as complete everywhere.
-function handleDayStatus(dayKey,title,status){
+function handleDayStatus(dayKey: any,title: any,status: any){
   snapshotDay(currentWeek,dayKey);
   // V221 (D179): a status-setting tap closes the day, so a run wheel still settling commits
   // first; the saved log at the moment of close is the log. statusOf===status is the undo
@@ -108,14 +111,16 @@ function handleDayStatus(dayKey,title,status){
   ruReset();
   closeDetail();
   if(status==='complete') fireCompletionPopup(currentWeek,dayKey);
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   if(!document.getElementById('popOverlay').classList.contains('show')) showToast(labels[status]||'Updated ✓');
 }
 // The footer is rebuilt wholesale on every status change: the primary button always
 // carries the CURRENT state (and toggles it off), the small button beneath is always
 // the OTHER state. No hint copy — there is nothing to grade.
-function statusFootHTML(dayKey,title){
+function statusFootHTML(dayKey: any,title: any){
   const cur=statusOf(currentWeek,dayKey);
   const esc=(title||'').replace(/'/g,"\\'");
+  // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
   const call=s=>"handleDayStatus('"+dayKey+"','"+esc+"','"+s+"')";
   if(cur==='skipped'){
     return '<div class="status-stack">'
@@ -128,7 +133,7 @@ function statusFootHTML(dayKey,title){
     +'<button class="day-skip" id="statusBtn_skipped" onclick="'+call('skipped')+'">Skip</button>'
     +'</div>';
 }
-function renderStatusFoot(dayKey,title){
+function renderStatusFoot(dayKey: any,title: any){
   const foot=document.getElementById('detailStatusRow');
   if(foot) foot.innerHTML=statusFootHTML(dayKey,title);
 }
@@ -142,11 +147,12 @@ function renderStatusFoot(dayKey,title){
 // .logged class with it, so every write and every chip re-render relabels through this one place
 // (the chip re-renders #cardioFields only; the button sits outside it and setCardioSwap's last
 // write lands here). No wrap (a lift day) is never live, and has no cardio node to read either way.
-function cardioEntryLive(e, sport){
-  return !!e&&(CARDIO_PARK_FIELDS[sport]||[]).some(function(f){ return !!e[f]; });
+function cardioEntryLive(e: any, sport: any){
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
+  return !!e&&(CARDIO_PARK_FIELDS[sport]||[]).some(function(f: any){ return !!e[f]; });
 }
-function cardioLogLabel(live){ return live?'Logged ✓':'Log'; }
-function cardioLive(dayKey){
+function cardioLogLabel(live: any){ return live?'Logged ✓':'Log'; }
+function cardioLive(dayKey: any){
   const wrap=document.getElementById('cardioSwapWrap');
   if(!wrap) return false;
   const sport=wrap.dataset.active||wrap.dataset.planned||'';
@@ -166,15 +172,17 @@ function cardioLive(dayKey){
 // after the write. V236 (D219): the slider value is stored only once #log_rpe carries
 // data-touched="1" (set by updateRPEDisplay); untouched, the entry's own rpe is carried,
 // '' for a new entry, so the thumb resting at 5 is never a number.
-function persistLogFields(dayKey, commit){
+function persistLogFields(dayKey: any, commit: any){
   // Writing a log entry marks the day touched for the freeze all on its own, with or
   // without a status tap — so the snapshot has to happen here too, not just in
   // handleDayStatus. snapshotDay is first-touch-wins, so the double call is a no-op.
   snapshotDay(currentWeek,dayKey);
   const logs=getLogs();const key=logKey(currentWeek,dayKey);
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const g=v=>document.getElementById(v)?.value||'';
   // V236 (D218): the regime is read from the store before the write.
   const _live=!!commit||cardioLive(dayKey);
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const gc=v=>_live?g(v):'';
   // Record a cardio swap (prescribed sport ≠ the one actually logged) so the entry
   // knows which sport to credit and the journal can show what was swapped.
@@ -233,9 +241,12 @@ function logCardio(){
   if(!wrap) return;
   iaWheelFlush(document.getElementById('detailOverlay'));
   const sport=wrap.dataset.active||wrap.dataset.planned||'';
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const g=v=>document.getElementById(v)?.value||'';
-  if((CARDIO_PARK_FIELDS[sport]||[]).every(function(f){ return g('log_'+f)===''; })){ showToast('Nothing to log yet.'); return; }
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
+  if((CARDIO_PARK_FIELDS[sport]||[]).every(function(f: any){ return g('log_'+f)===''; })){ showToast('Nothing to log yet.'); return; }
   persistLogFields(currentDayKey,true);
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
   showToast(CARDIO_LOGGED_TOAST[sport]);
 }
 // Reveal the sport picker under the prescribed cardio field.
@@ -249,7 +260,7 @@ function toggleCardioPicker(){
 // it never erases. Only the active sport's fields sit at top level (a swapped bike never
 // lands on the run chart), the leaving sport's numbers park on the entry, and switching
 // back brings them back to the form. Tapping the active chip moves nothing.
-function setCardioSwap(sport){
+function setCardioSwap(sport: any){
   const wrap=document.getElementById('cardioSwapWrap');
   if(!wrap) return;
   const planned=wrap.dataset.planned||'';
@@ -258,16 +269,20 @@ function setCardioSwap(sport){
   // leaving sport, before anything moves.
   const leaving=wrap.dataset.active||planned;
   iaWheelFlush(wrap);
+  // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
   persistLogFields(currentDayKey);
   const logs=getLogs();const key=logKey(currentWeek,currentDayKey);
   const e=logs[key]||{};
   if(sport!==leaving){
     const P=Object.assign({},e.parked||{});
     const out={};
-    (CARDIO_PARK_FIELDS[leaving]||[]).forEach(function(f){ out[f]=(e[f]==null?'':String(e[f])); e[f]=''; });
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
+    (CARDIO_PARK_FIELDS[leaving]||[]).forEach(function(f: any){ out[f]=(e[f]==null?'':String(e[f])); e[f]=''; });
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
     if(Object.keys(out).some(function(f){ return out[f]!==''; })) P[leaving]=out; else delete P[leaving];
     const back=P[sport]||null;
-    (CARDIO_PARK_FIELDS[sport]||[]).forEach(function(f){ e[f]=(back&&back[f]!=null)?back[f]:''; });
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
+    (CARDIO_PARK_FIELDS[sport]||[]).forEach(function(f: any){ e[f]=(back&&back[f]!=null)?back[f]:''; });
     delete P[sport];
     if(Object.keys(P).length) e.parked=P; else delete e.parked;
     logs[key]=e; saveLogs(logs);
@@ -279,9 +294,13 @@ function setCardioSwap(sport){
   _setCurLogDose((sport===planned)?_curLogDoseFull:null);
   if(fields) fields.innerHTML=cardioFieldHTML(sport, e, _curLogDose, _curLogSub);
   wrap.querySelectorAll('#cardioPicker button[data-sport]').forEach(function(b){
+    // @ts-expect-error TS2339 Property 'dataset' does not exist on type 'Element'.
     const on=b.dataset.sport===sport;
+    // @ts-expect-error TS2339 Property 'style' does not exist on type 'Element'.
     b.style.border='1px solid '+(on?'var(--accent)':'var(--border2)');
+    // @ts-expect-error TS2339 Property 'style' does not exist on type 'Element'.
     b.style.background=on?'rgba(24,23,18,0.12)':'var(--surface2)';
+    // @ts-expect-error TS2339 Property 'style' does not exist on type 'Element'.
     b.style.color=on?'var(--accent)':'var(--muted)';
   });
   const note=document.getElementById('cardioSwapNote');
@@ -293,10 +312,13 @@ function setCardioSwap(sport){
   // persist only once the card is LIVE; on a DRAFT the node and the readout are all that move.
   ['log_run_dist','log_run_pace','log_run_mins','log_run_rep_time','log_bike_mins','log_swim_yards'].forEach(function(id){
     const el=document.getElementById(id);
+    // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
     if(el) el.addEventListener('input',function(){ if(cardioLive(currentDayKey)) persistLogFields(currentDayKey); updateDoseDerived(); });
   });
+  // @ts-expect-error TS2554 Expected 1 arguments, but got 0.
   iaWheelInit();         // V182 (D3): swap injects fresh markup, so re-seed the wheels
   updateDoseDerived();
+  // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
   persistLogFields(currentDayKey);
 }
 function copyExport(){

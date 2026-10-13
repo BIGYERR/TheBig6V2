@@ -1,10 +1,10 @@
 import { ASY_ICON_PATHS, asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { completedKey, getCompleted, saveCompleted, snapshotDay } from './storage.js';
+import { completedKey, getCompleted, saveCompleted, snapshotDay } from './storage.ts';
 import { activeProg, activeProgId, showToast } from './rest-day-shell.ts';
 import { ALL_DAYS_ORDER, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
-import { DAY_FULL } from './wizard.js';
-import { wildcardOn } from './random-wildcard.js';
-import { dayBeforeStart, dayOffset, renderWeekView } from './week-view-sections.js';
+import { DAY_FULL } from './wizard.ts';
+import { wildcardOn } from './random-wildcard.ts';
+import { dayBeforeStart, dayOffset, renderWeekView } from './week-view-sections.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 /* ===== REINFORCEMENT POPUPS ===== */
 /* Pools are locked copy. workout + reminder are WIRED this batch; streak + season
@@ -86,7 +86,9 @@ const POP_DISMISS=[
 function popDismissText(){
   const key='ia_pop_dismiss_'+activeProgId; const today=_todayStamp();
   let st={}; try{ st=JSON.parse(localStorage.getItem(key)||'{}'); }catch{}
+  // @ts-expect-error TS2339 Property 'date' does not exist on type '{}'.
   if(st.date===today && typeof st.idx==='number' && POP_DISMISS[st.idx]) return POP_DISMISS[st.idx];
+  // @ts-expect-error TS2339 Property 'idx' does not exist on type '{}'.
   let i; do{ i=Math.floor(Math.random()*POP_DISMISS.length); }while(POP_DISMISS.length>1 && i===st.idx);
   try{ localStorage.setItem(key,JSON.stringify({date:today,idx:i})); }catch{}
   return POP_DISMISS[i];
@@ -101,7 +103,7 @@ function popDismissText(){
 //                   (D18's vocabulary: a Post-run mobility day is not lifting, a Primer is)
 // Both tags must pass. With no resolvable day (no week/dayKey, no startDate, no day object)
 // the context is unknown: every tagged entry sits out, untagged entries stay eligible.
-function popContext(week,dayKey){
+function popContext(week: any,dayKey: any){
   const day=(week!=null&&dayKey&&activeProg?.weeks)?activeProg.weeks[week]?.[dayKey]:null;
   const dt=day?dayDateFor(week,dayKey):null;
   if(!dt) return { known:false };
@@ -112,11 +114,12 @@ function popContext(week,dayKey){
     weekend:(dow===0||dow===6),
     morning:(now.getHours()<9&&dt.getTime()===today.getTime()),
     cardio:!!day.cardio,
+    // @ts-expect-error TS7006 Parameter 's' implicitly has an 'any' type.
     lift:(day.sections||[]).some(s=>!s.core&&!s.hip&&(s.items||[]).length&&!/mobility|taper/i.test(s.label||''))
   };
 }
-function popText(e){ return (e&&typeof e==='object')?e.t:e; }
-function popEligible(e,ctx){
+function popText(e: any){ return (e&&typeof e==='object')?e.t:e; }
+function popEligible(e: any,ctx: any){
   const tag=(e&&typeof e==='object')?e:null;
   const when=tag?tag.when:null, type=tag?tag.type:null;
   if(!when&&!type) return true;
@@ -127,52 +130,71 @@ function popEligible(e,ctx){
   if(type==='lift'&&!ctx.lift) return false;
   return true;
 }
-function popPick(tier,week,dayKey){
+function popPick(tier: any,week: any,dayKey: any){
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ wo
   const pool=POP_POOLS[tier]; if(!pool||!pool.length) return '';
   const ctx=popContext(week,dayKey);
-  const elig=[]; pool.forEach((e,idx)=>{ if(popEligible(e,ctx)) elig.push(idx); });
+  const elig: any[]=[]; pool.forEach((e: any,idx: any)=>{ if(popEligible(e,ctx)) elig.push(idx); });
   if(!elig.length) return popText(pool[0]);
   if(elig.length===1) return popText(pool[elig[0]]);
   const memKey='ia_pop_idx_'+activeProgId; let mem={};
   try{ mem=JSON.parse(localStorage.getItem(memKey)||'{}'); }catch{}
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   const last=(typeof mem[tier]==='number')?mem[tier]:-1;
   let choices=elig.filter(i=>i!==last); if(!choices.length) choices=elig;
   const i=choices[Math.floor(Math.random()*choices.length)];
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{}'.
   mem[tier]=i; try{ localStorage.setItem(memKey,JSON.stringify(mem)); }catch{}
   return popText(pool[i]);
 }
-function popFire(tier,opts){
+function popFire(tier: any,opts: any){
   opts=opts||{};
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ wo
   const cfg=POP_CFG[tier]||POP_CFG.workout;
   // V220 (D174): an ASY_ICON_PATHS name ('notebook', 'shield', 'warning') renders as SVG at the
   // .pop-icon size; anything else, i.e. the celebration emoji, is written as text exactly as
   // before. An emoji never goes through asyIcon: ASY_EMOJI maps the fire and trophy to SVG.
   const ic=opts.icon||cfg.icon; const icEl=document.getElementById('popIcon');
+  // @ts-expect-error TS18047 'icEl' is possibly 'null'.
   if(Object.prototype.hasOwnProperty.call(ASY_ICON_PATHS,ic)) icEl.innerHTML=asyIcon(ic,52);
+  // @ts-expect-error TS18047 'icEl' is possibly 'null'.
   else icEl.textContent=ic;
+  // @ts-expect-error TS18047 'k' is possibly 'null'.
   const k=document.getElementById('popKicker'); k.textContent=opts.kicker||cfg.kicker; k.className='pop-kicker '+(cfg.kClass||'');
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('popMsg').textContent=opts.msg||popPick(tier,opts.week,opts.dayKey);   // V220 (D175) the trained day
+  // @ts-expect-error TS18047 'sub' is possibly 'null'.
   const sub=document.getElementById('popSub'); sub.textContent=opts.sub||''; sub.style.display=opts.sub?'block':'none';
   const row=document.getElementById('popStatRow'); const stats=opts.stats||[];
+  // @ts-expect-error TS18047 'row' is possibly 'null'.
   row.innerHTML=stats.map(s=>`<div class="pop-stat"><div class="pop-stat-num ${s.cls||''}">${s.n}</div><div class="pop-stat-lbl">${s.l}</div></div>`).join('');
+  // @ts-expect-error TS18047 'row' is possibly 'null'.
   row.style.display=stats.length?'flex':'none';
   const acts=document.getElementById('popActions');
   if(opts.actions&&opts.actions.length){
+    // @ts-expect-error TS18047 'acts' is possibly 'null'.
     acts.className='pop-actions'+(opts.triple?' triple':'');
+    // @ts-expect-error TS18047 'acts' is possibly 'null'.
     acts.innerHTML=opts.actions.map(a=>`<button class="pop-act ${a.cls||''}" onclick="${a.onclick}">${a.label}</button>`).join('');
   } else {
+    // @ts-expect-error TS18047 'acts' is possibly 'null'.
     acts.className='pop-actions';
+    // @ts-expect-error TS18047 'acts' is possibly 'null'.
     acts.innerHTML=`<button class="pop-act go" onclick="popClose()">${opts.dismiss||popDismissText()}</button>`;
   }
   const modal=document.getElementById('popModal');
+  // @ts-expect-error TS18047 'modal' is possibly 'null'.
   modal.className='pop-modal'+(cfg.shake?' shake':'');
+  // @ts-expect-error TS18047 'modal' is possibly 'null'.
   void modal.offsetWidth;
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('popOverlay').classList.add('show');
   popConfetti(cfg.confetti||0);
 }
+// @ts-expect-error TS2531 Object is possibly 'null'.
 function popClose(){ document.getElementById('popOverlay').classList.remove('show'); }
-function popDismissBg(e){ if(e.target.id==='popOverlay') popClose(); }
-function popConfetti(count){
+function popDismissBg(e: any){ if(e.target.id==='popOverlay') popClose(); }
+function popConfetti(count: any){
   if(!count) return;
   const box=document.getElementById('popConfetti');
   // Trophy easter egg: only on a random ~1-in-4 celebration does a handful of mini trophies
@@ -195,21 +217,23 @@ function popConfetti(count){
       p.style.transform=`rotate(${Math.random()*360}deg)`;
       if(Math.random()>0.6) p.style.borderRadius='50%';
     }
+    // @ts-expect-error TS18047 'box' is possibly 'null'.
     box.appendChild(p);
     setTimeout(()=>p.remove(),3600);
   }
 }
 
 /* ===== STREAK / STATS / REMINDER HELPERS ===== */
-function dayDateFor(week,d){
+function dayDateFor(week: any,d: any){
   if(!activeProg?.startDate) return null;
   const weekMon=getWeekMonday(activeProg.startDate);
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ mo
   const dt=new Date(weekMon); dt.setDate(weekMon.getDate()+(week-1)*7+dayOffset[d]); dt.setHours(0,0,0,0);
   return dt;
 }
 // Scheduled (non-rest) training days with date <= cutoff, ascending by date.
-function scheduledDays(cutoff){
-  const out=[]; if(!activeProg?.weeks) return out;
+function scheduledDays(cutoff: any){
+  const out: any[]=[]; if(!activeProg?.weeks) return out;
   const tw=activeProg.totalWeeks||Object.keys(activeProg.weeks).length;
   for(let w=1;w<=tw;w++){ const wk=activeProg.weeks[w]; if(!wk) continue;
     ALL_DAYS_ORDER.forEach(d=>{ const day=wk[d]; if(!day||day.rest) return;
@@ -220,7 +244,7 @@ function scheduledDays(cutoff){
   }
   out.sort((a,b)=>a.date-b.date); return out;
 }
-function statusOf(week,d){ const c=getCompleted()[completedKey(week,d)]; if(!c) return null; const s=c.status||'complete'; return s==='partial'?'complete':s; }   // V181 (D1): legacy partial → complete
+function statusOf(week: any,d: any){ const c=getCompleted()[completedKey(week,d)]; if(!c) return null; const s=c.status||'complete'; return s==='partial'?'complete':s; }   // V181 (D1): legacy partial → complete
 // Streak: trailing run of scheduled days. Precedence, highest first (V195 D71b):
 //   complete / partial -> counts (a day holding BOTH a completion and a Wildcard counts ONCE)
 //   Wildcard           -> counts, even when the day is marked skipped
@@ -244,22 +268,24 @@ function computeStreak(){
 }
 function completedCount(){
   let n=0; const c=getCompleted();
+  // @ts-expect-error TS2339 Property 'status' does not exist on type '{}'.
   Object.values(c).forEach(v=>{ const s=v?.status||'complete'; if(s==='complete'||s==='partial') n++; });
   return n;
 }
-function fireWorkoutPopup(week,dayKey){
+function fireWorkoutPopup(week: any,dayKey: any){
   popFire('workout',{ week:week, dayKey:dayKey, stats:[   // V181 (D4): block tally dropped — a raw count next to a streak said nothing the streak didn't
     {n:String(computeStreak()), l:'Day Streak '+asyIcon('🔥',12), cls:'streak'}
   ]});
 }
 function skippedCount(){
   let n=0; const c=getCompleted();
+  // @ts-expect-error TS2339 Property 'status' does not exist on type '{}'.
   Object.values(c).forEach(v=>{ if((v?.status)==='skipped') n++; });
   return n;
 }
 // Milestones: 3, 7, 14, 30, then every 30 (60, 90, …).
-function streakMilestone(n){ return n===3||n===7||n===14||n===30||(n>30&&n%30===0); }
-function fireStreakPopup(streak){
+function streakMilestone(n: any){ return n===3||n===7||n===14||n===30||(n>30&&n%30===0); }
+function fireStreakPopup(streak: any){
   popFire('streak',{
     kicker: streak+'-DAY STREAK 🔥',
     stats:[   // V181 (D4)
@@ -268,6 +294,7 @@ function fireStreakPopup(streak){
   });
 }
 // Season = (A): fires when the final scheduled training day of the program is completed. Once ever.
+// @ts-expect-error TS2554 Expected 1 arguments, but got 0.
 function finalScheduledDay(){ const a=scheduledDays(); return a.length?a[a.length-1]:null; }
 function seasonShown(){ return localStorage.getItem('ia_season_shown_'+activeProgId)==='1'; }
 function markSeasonShown(){ try{localStorage.setItem('ia_season_shown_'+activeProgId,'1');}catch{} }
@@ -282,7 +309,7 @@ function fireSeasonPopup(){
   });
 }
 // One dispatcher for every fresh complete. Precedence: season > milestone > workout.
-function fireCompletionPopup(week,dayKey){
+function fireCompletionPopup(week: any,dayKey: any){
   const f=finalScheduledDay();
   if(f && f.week===week && f.d===dayKey && !seasonShown()){
     markSeasonShown();
@@ -295,7 +322,7 @@ function fireCompletionPopup(week,dayKey){
 }
 // Day-after reminder: most recent strictly-past pending non-rest day not yet reminded.
 function remindedSet(){ try{return JSON.parse(localStorage.getItem('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
-function markReminded(week,d){ const m=remindedSet(); m[completedKey(week,d)]=true; try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
+function markReminded(week: any,d: any){ const m=remindedSet(); m[completedKey(week,d)]=true; try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
 function _todayStamp(){ const t=new Date(); return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate(); }
 function maybeShowReminder(){
   if(!activeProg?.startDate) return;
@@ -325,6 +352,7 @@ function maybeShowReminder(){
   const _remMsg=_gap>=7
     ? 'More than a week off. Mark what happened, then ease back in. First sessions back at reduced effort. Never chase missed work.'
     : popPick('reminder',target.week,target.d);
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ su
   const _remSub=DAY_FULL[target.d]+', Wk '+target.week+' · '+(day.title||'Workout');
   popFire('reminder',{
     msg:_remMsg,
@@ -336,13 +364,14 @@ function maybeShowReminder(){
     triple:true
   });
 }
-function resolveReminder(week,dayKey,title,status){
+function resolveReminder(week: any,dayKey: any,title: any,status: any){
   snapshotDay(week,dayKey);
   const c=getCompleted(); c[completedKey(week,dayKey)]={title:title||null,ts:Date.now(),status}; saveCompleted(c);
   markReminded(week,dayKey);
   popClose();
   renderWeekView();
   const labels={complete:'Locked in ✓',skipped:'Skipped ✕ — the week moves on'};   // V181 (D3)
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ co
   showToast(labels[status]||'Updated');
   if(status==='complete') setTimeout(()=>fireCompletionPopup(week,dayKey),380);
 }

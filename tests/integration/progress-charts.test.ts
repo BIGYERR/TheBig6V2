@@ -1,4 +1,4 @@
-// Progress's run charts moved from the legacy builders (progress-charts.js, buildPaceChart in progress-data.js) to
+// Progress's run charts moved from the legacy builders (progress-charts.ts, buildPaceChart in progress-data.ts) to
 // card specs the app's ChartCard component draws (frontends/app/src/app/screens/progress/charts/run-charts-model.ts,
 // architecture phase E step 15). The oracle here is the legacy builder itself, lifted out of the page with appFunction:
 // for every input below, the spec written back out in the legacy markup format is the legacy builder's markup, byte for

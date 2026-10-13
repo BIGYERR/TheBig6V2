@@ -1,30 +1,30 @@
-import { esc, snapshotDay } from './storage.js';
+import { esc, snapshotDay } from './storage.ts';
 import { activeProgId, currentDayKey, currentWeek } from './rest-day-shell.ts';
 import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
 import { EQUIP_TOKENS } from '../../../../../../core/src/engine/exercise-kinds.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
-import { runSessionCode } from './week-view-sections.js';
-import { cardioLive, persistLogFields } from './day-status.js';
+import { runSessionCode } from './week-view-sections.ts';
+import { cardioLive, persistLogFields } from './day-status.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // Smart weight rounding — lbs to nearest 5, kg to nearest 2.5
 // Detect if an exercise uses trackable weight
-function isWeightedExercise(name) {
+function isWeightedExercise(name: any) {
   if(!name) return false;
   const n = name.toLowerCase();
   return false; // handled by isTimeExercise and weight detection below
 }
 // True if the name carries a token from the given family (e.g. hasEquip(n,'kettlebell')).
-function hasEquip(name, fam){
+function hasEquip(name: any, fam: any){
   const n = (name||'').toLowerCase();
   return (EQUIP_TOKENS[fam]||[]).some(t => n.includes(t));
 }
-function isKBExercise(name) {
+function isKBExercise(name: any) {
   if(!name) return false;
   const n = name.toLowerCase();
   return hasEquip(name,'kettlebell');
 }
-function isDBExercise(name) {
+function isDBExercise(name: any) {
   if(!name) return false;
   const n = name.toLowerCase();
   // Dumbbell tokens live in EQUIP_TOKENS (covers "DB bench", "db-row", "Dumbbell press",
@@ -35,7 +35,7 @@ function isDBExercise(name) {
 
 // Get stored exercise weights for this program
 function getExWeights(){try{return JSON.parse(localStorage.getItem('ia_exw_'+activeProgId)||'{}');}catch{return{};}}
-function saveExWeights(obj){localStorage.setItem('ia_exw_'+activeProgId,JSON.stringify(obj));}
+function saveExWeights(obj: any){localStorage.setItem('ia_exw_'+activeProgId,JSON.stringify(obj));}
 
 
 // ── DAY RESOLUTION FOR LOG ENTRIES (V117) ────────────────────────────────────
@@ -50,7 +50,7 @@ function saveExWeights(obj){localStorage.setItem('ia_exw_'+activeProgId,JSON.str
 // migrated or rewritten, so a rollback stays clean and existing history keeps its
 // place on the day view instead of vanishing.
 const _ENTRY_DAY_ORDER=['sun','mon','tue','wed','thu','fri','sat'];
-function entryDay(e){
+function entryDay(e: any){
   if(!e) return '';
   if(e.day) return e.day;
   if(e.ts){ try{ return _ENTRY_DAY_ORDER[new Date(e.ts).getDay()]||''; }catch(_){ return ''; } }
@@ -60,9 +60,9 @@ function entryDay(e){
 // The big-3 chart already did this via Math.max per week; the per-exercise history chart
 // plotted one dot per entry and would otherwise show two dots both labelled W5 the moment
 // day granularity landed. Ties break to the later timestamp.
-function weeklyBest(entries){
+function weeklyBest(entries: any){
   const byWeek=Object.create(null);
-  (entries||[]).forEach(function(e){
+  (entries||[]).forEach(function(e: any){
     if(!e) return;
     const w=+e.week||0, prev=byWeek[w];
     if(!prev) { byWeek[w]=e; return; }
@@ -77,7 +77,7 @@ function weeklyBest(entries){
 // `weight` remains the scalar every downstream consumer reads and is always
 // max(setsW) when a ladder is present. Pre-V105 entries simply have no setsW and
 // render as uniform — nothing is migrated or rewritten, so a rollback stays clean.
-function logExerciseWeight(exName, weight, setsReps, week, setsDone, setsW, dayKey) {
+function logExerciseWeight(exName: any, weight: any, setsReps: any, week: any, setsDone: any, setsW: any, dayKey: any) {
   if(!exName) return;
   if(!weight && !(setsDone && setsDone.length)) return;
   const store = getExWeights();
@@ -97,6 +97,7 @@ function logExerciseWeight(exName, weight, setsReps, week, setsDone, setsW, dayK
   // not plot as a phantom duplicate dot. But two DIFFERENT days inside one week are two
   // sessions and must stay two records — keying this on `week` alone silently destroyed
   // the earlier one. Latest log for the day wins.
+  // @ts-expect-error TS7006 Parameter 'e' implicitly has an 'any' type.
   const existing = entries.find(e => +e.week === +w && entryDay(e) === dk);
   if(existing) {
     existing.weight = +weight;
@@ -121,9 +122,9 @@ function logExerciseWeight(exName, weight, setsReps, week, setsDone, setsW, dayK
   // 3x/week movement reached the old cap at week 18 and `shift()` dropped from the FRONT
   // of the array — the baseline the whole chart is measured against. Capping on week span
   // keeps the same one-year intent regardless of how often the movement recurs.
-  const _wMax = entries.reduce(function(m,e){return Math.max(m, +e.week||0);}, 0);
+  const _wMax = entries.reduce(function(m: any,e: any){return Math.max(m, +e.week||0);}, 0);
   if(_wMax > 52){
-    const _keep = entries.filter(function(e){ return (+e.week||0) > _wMax - 52; });
+    const _keep = entries.filter(function(e: any){ return (+e.week||0) > _wMax - 52; });
     if(_keep.length !== entries.length) store[key].entries = _keep;
   }
   saveExWeights(store);
@@ -132,7 +133,7 @@ function logExerciseWeight(exName, weight, setsReps, week, setsDone, setsW, dayK
 // Collapse any legacy duplicate entries so each exercise keeps ONE entry per week
 // (most recently logged wins). Cleans up duplicate points created before the
 // per-week overwrite fix above. Returns true if anything actually changed.
-function dedupeExDayEntries(store) {
+function dedupeExDayEntries(store: any) {
   // KEYED ON WEEK + DAY (V117). This function WRITES BACK to localStorage, so while it
   // keyed on `week` alone it was a third writer whose whole job was to destroy exactly
   // the records day granularity creates — it would have eaten the earlier day's session
@@ -141,14 +142,20 @@ function dedupeExDayEntries(store) {
   // two different training days into one.
   let changed = false;
   Object.values(store).forEach(ex => {
+    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     if(!ex.entries || ex.entries.length < 2) return;
     const byKey = {};
+    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     ex.entries.forEach(e => {
       const k = String(e.week) + '|' + entryDay(e);
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
       const prev = byKey[k];
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
       if(!prev || (e.ts||0) >= (prev.ts||0)) byKey[k] = e;
     });
+    // @ts-expect-error TS18046 'a' is of type 'unknown'.
     const merged = Object.values(byKey).sort((a,b) => (a.week-b.week) || ((a.ts||0)-(b.ts||0)));
+    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     if(merged.length !== ex.entries.length) { ex.entries = merged; changed = true; }
   });
   return changed;
@@ -158,7 +165,7 @@ function dedupeExDayEntries(store) {
 // priced from (the engine prices every squat/bench/deadlift variant off the ONE big-3 1RM).
 // Scale the prescribed load so a paused/front/box squat, incline/close-grip press, or RDL
 // reads at a realistic working weight instead of the full competition-lift percentage.
-function variantLoadFactor(exName){
+function variantLoadFactor(exName: any){
   if(!exName) return 1;
   const n=exName.toLowerCase();
   if(n.includes('romanian')) return 0.65;                     // RDL — hip hinge, far lighter than a pull
@@ -170,8 +177,8 @@ function variantLoadFactor(exName){
   return 1;
 }
 
-const RPE_LABELS = {1:'Very Easy',2:'Easy',3:'Moderate',4:'Somewhat Hard',5:'Hard',6:'Hard+',7:'Very Hard',8:'Very Hard+',9:'Max Effort',10:'All Out'};
-function updateRPEDisplay(val) {
+const RPE_LABELS: Record<string, string> = {1:'Very Easy',2:'Easy',3:'Moderate',4:'Somewhat Hard',5:'Hard',6:'Hard+',7:'Very Hard',8:'Very Hard+',9:'Max Effort',10:'All Out'};
+function updateRPEDisplay(val: any) {
   const el = document.getElementById('rpeDisplay');
   if(el) el.textContent = val + ' — ' + (RPE_LABELS[+val]||'');
   // V236 (D219): a moved slider is a claimed RPE. Its only caller is the range's own oninput,
@@ -190,9 +197,11 @@ const CARDIO_WORD={run:'Run',bike:'Bike',swim:'Swim'};
 const CARDIO_PARK_FIELDS={run:['run_dist','run_pace','run_mins','run_reps','run_rep_time'],bike:['bike_mins'],swim:['swim_yards']};
 // V234 (D214): the swap note, one source for both sites. The second sentence prints only when
 // the planned sport has a parked set holding a number.
-function cardioSwapNoteText(active, planned, e){
+function cardioSwapNoteText(active: any, planned: any, e: any){
   const p=e&&e.parked&&e.parked[planned];
-  const kept=!!p&&(CARDIO_PARK_FIELDS[planned]||[]).some(function(f){ return p[f]!=null&&p[f]!==''; });
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
+  const kept=!!p&&(CARDIO_PARK_FIELDS[planned]||[]).some(function(f: any){ return p[f]!=null&&p[f]!==''; });
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   return `Counts toward ${CARDIO_WORD[active]}, not ${CARDIO_WORD[planned]}.`+(kept?` Your ${CARDIO_WORD[planned]} numbers are kept. Switch back and they return.`:'');
 }
 
@@ -206,15 +215,15 @@ function cardioSwapNoteText(active, planned, e){
 // snapshots predate the field, so doseFromCardio falls back to parsing the detail
 // prose — regex-on-prose is the "80 mi" bug's pattern family, hence every regex here
 // is \b-anchored and the whole parser is under the dose↔detail agreement sweep.
-let _curLogDose=null;      // dose for the sport currently being logged (null when swapped)
-let _curLogDoseFull=null;  // dose of the PLANNED sport, so swapping back restores the form
+let _curLogDose: any=null;      // dose for the sport currently being logged (null when swapped)
+let _curLogDoseFull: any=null;  // dose of the PLANNED sport, so swapping back restores the form
 let _curLogSub='';         // planned subtype, for the strip label
 // Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
-function _setCurLogDose(v){ _curLogDose=v; }
-function _setCurLogDoseFull(v){ _curLogDoseFull=v; }
-function _setCurLogSub(v){ _curLogSub=v; }
-function _fmtPaceMi(sec){ if(!isFinite(sec)||sec<=0) return null; return _clkMS(sec); }   // D126 (V204)
-function _parseClock(t){ // "2:04" or bare seconds -> seconds
+function _setCurLogDose(v: any){ _curLogDose=v; }
+function _setCurLogDoseFull(v: any){ _curLogDoseFull=v; }
+function _setCurLogSub(v: any){ _curLogSub=v; }
+function _fmtPaceMi(sec: any){ if(!isFinite(sec)||sec<=0) return null; return _clkMS(sec); }   // D126 (V204)
+function _parseClock(t: any){ // "2:04" or bare seconds -> seconds
   if(!t) return null; t=String(t).trim();
   if(t.indexOf(':')>=0){ const q=t.split(':'); if(q.length===2&&q[0]!==''&&isFinite(+q[0])&&isFinite(+q[1])) return (+q[0])*60+(+q[1]); return null; }
   const n=+t; return isFinite(n)&&n>0?n:null;
@@ -222,7 +231,7 @@ function _parseClock(t){ // "2:04" or bare seconds -> seconds
 // Structured dose for a cardio session: the emitted field when present, else a
 // \b-anchored parse of the frozen detail prose. Run and bike only; swim keeps its
 // yardage form and the segmented grammar owns its presentation.
-function doseFromCardio(c){
+function doseFromCardio(c: any){
   if(!c) return null;
   if(c.dose && c.dose.k) return c.dose;
   const t=(c.type||'').toLowerCase();
@@ -246,7 +255,7 @@ function doseFromCardio(c){
 }
 // Pure derivation shared by the live readout and persistLogFields. Fixed dimension
 // falls back to planned; the FREE dimension must have been entered or nothing derives.
-function doseDerived(dose, v){
+function doseDerived(dose: any, v: any){
   if(!dose) return null;
   const dist=parseFloat(v.dist)||0, mins=parseFloat(v.mins)||0;
   const reps=(v.reps===''||v.reps==null)?null:(+v.reps||0);
@@ -263,7 +272,9 @@ function doseDerived(dose, v){
   }
   if(dose.k==='reps_dist'){
     const out={};
+    // @ts-expect-error TS2339 Property 'dist' does not exist on type '{}'.
     if(reps!=null&&reps>0){ out.dist=+((reps*dose.m)/1609.34).toFixed(2); out.vol=reps+' × '+dose.m+'m'; }
+    // @ts-expect-error TS2339 Property 'sec' does not exist on type '{}'.
     if(repS){ const sec=repS/(dose.m/1609.34); out.sec=sec; out.pace=_fmtPaceMi(sec)+'/mi'; out.tgt=dose.tgt; }
     return out;
   }
@@ -274,7 +285,7 @@ function doseDerived(dose, v){
   }
   return null;
 }
-function _doseStripHTML(sport, dose, sub){
+function _doseStripHTML(sport: any, dose: any, sub: any){
   const code=runSessionCode(sub||'', dose&&dose.key, sport);
   let v='';
   if(dose.k==='time') v=dose.mins+' min';
@@ -282,16 +293,19 @@ function _doseStripHTML(sport, dose, sub){
   else if(dose.k==='reps_dist') v=dose.reps+' × '+dose.m+'m';
   else if(dose.k==='reps_time') v=dose.reps+' × '+dose.mins+' min';
   if(dose.tgt&&sport==='run') v+=' @ '+_fmtPaceMi(dose.tgt)+'/mi';
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
   return '<div class="plan-strip'+(sport==='bike'?' bike-strip':'')+'"><span class="ps-lbl">'+(CARDIO_WORD[sport]||sport)+(code&&code!=='RUN'?' — '+code:'')+' · Planned</span><span class="ps-val">'+esc(v)+'</span></div>';
 }
 // Live derived readout under the dose form. No-op when the generic form is showing.
 function updateDoseDerived(){
   const el=document.getElementById('doseDerived'); if(!el) return;
   if(!_curLogDose){ el.innerHTML=''; return; }
+  // @ts-expect-error TS7006 Parameter 'id' implicitly has an 'any' type.
   const g=id=>document.getElementById(id)?.value||'';
   const d=doseDerived(_curLogDose,{mins:g('log_run_mins'),dist:g('log_run_dist'),reps:g('log_run_reps'),rep:g('log_run_rep_time')});
   if(!d){ el.innerHTML=''; return; }
   let rows='';
+  // @ts-expect-error TS2339 Property 'vol' does not exist on type '{ sec?: undefined; pace?: undefined; tgt?: undefined; assumed?: 
   if(d.vol) rows+='<div class="derived"><span class="d-lbl">Work volume — derived</span><span class="d-val">'+(d.dist!=null?d.dist+' mi':'')+'<small>'+d.vol+'</small></span></div>';
   if(d.pace){
     let delta='';
@@ -300,6 +314,7 @@ function updateDoseDerived(){
     // Under a minute stays in seconds — that is the runner-native unit at that scale.
     if(d.tgt&&d.sec){ const df=Math.round(d.sec-d.tgt), ad=Math.abs(df); const mag=ad<60?(ad+'s/mi'):(Math.floor(ad/60)+':'+String(ad%60).padStart(2,'0')+'/mi'); delta=ad<5?'on target':(mag+' '+(df<0?'faster than target':'slower than target')); }
     const note=[d.assumed,delta,(d.workMin?('over '+d.workMin+' work min'):null)].filter(Boolean).join(' · ');
+    // @ts-expect-error TS2339 Property 'vol' does not exist on type '{ sec: number; pace: string; tgt: any; assumed: string | null; d
     rows+='<div class="derived"'+(d.vol?' style="border-top:none;padding-top:0"':'')+'><span class="d-lbl">Pace — derived</span><span class="d-val">'+d.pace+(note?'<small>'+note+'</small>':'')+'</span></div>';
   }
   if(!rows) rows='<div class="derived"><span class="d-lbl">'+(_curLogDose.k==='reps_dist'?'Rep pace — derived':'Pace — derived')+'</span><span class="d-val empty">'+(_curLogDose.k==='dist'?'enter minutes':(_curLogDose.k==='reps_dist'?'enter a rep time':'enter distance'))+'</span></div>';
@@ -308,13 +323,17 @@ function updateDoseDerived(){
 // Rep stepper for interval / multi-rep forms. Hidden input starts '' (untouched) so an
 // unmoved stepper never claims completed volume — the display shows planned, storage
 // stays honest until the athlete actually engages.
-function doseRep(delta){
+function doseRep(delta: any){
   const h=document.getElementById('log_run_reps'); if(!h||!_curLogDose) return;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   const base=(h.value==='')?(_curLogDose.reps||0):(+h.value||0);
   const v=Math.max(0, Math.min(30, base+delta));
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   h.value=v;
+  // @ts-expect-error TS2322 Type 'number' is not assignable to type 'string'.
   const s=document.getElementById('doseRepVal'); if(s) s.textContent=v;
   // V236 (D218): on a DRAFT card the stepper is form only; the Log tap commits it.
+  // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
   if(cardioLive(currentDayKey)) persistLogFields(currentDayKey);
   updateDoseDerived();
 }

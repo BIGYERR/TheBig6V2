@@ -1,17 +1,17 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { completedKey, esc, getCompleted, getLogs, logKey } from './storage.js';
+import { completedKey, esc, getCompleted, getLogs, logKey } from './storage.ts';
 import {
   _setCurrentWeek, activeProg, currentWeek, openRestSheet, restDayEligible, showToast,
 } from './rest-day-shell.ts';
 import { ALL_DAYS_ORDER, _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
-import { DAY_FULL, _fmtStartDay } from './wizard.js';
+import { DAY_FULL, _fmtStartDay } from './wizard.ts';
 import { INJURY_REGIONS } from '../../../../../../core/src/engine/injury.ts';
-import { updateRandCounter, wildcardMarkHTML, wildcardOn, wildcardTagHTML } from './random-wildcard.js';
-import { buildExItem } from './set-logging.js';
-import { openDetail } from './day-detail.js';
-import { progAlignment } from './programs.js';
-import { _liveInjuryOverlay, dayIsTravel, overlayWeekRange, renderOverlayChip, travelTagHTML } from './overlays.js';
-import { computeStreak, statusOf } from './popups-streaks-reminders.js';
+import { updateRandCounter, wildcardMarkHTML, wildcardOn, wildcardTagHTML } from './random-wildcard.ts';
+import { buildExItem } from './set-logging.ts';
+import { openDetail } from './day-detail.ts';
+import { progAlignment } from './programs.ts';
+import { _liveInjuryOverlay, dayIsTravel, overlayWeekRange, renderOverlayChip, travelTagHTML } from './overlays.ts';
+import { computeStreak, statusOf } from './popups-streaks-reminders.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // WEEK VIEW
@@ -26,14 +26,15 @@ const tagMeta={test:{cls:'t-test',label:'Test Week'},peak:{cls:'t-peak',label:'P
 // the block: not missed, not pending, no reminder, no tap. Only week 1 can hold them
 // (week 1 is the week containing the start by construction), but the predicate is
 // written on dates so a back-dated setProgStart resolves the same way.
-function _progDayDate(prog, week, d){
+function _progDayDate(prog: any, week: any, d: any){
   if(!prog||!prog.startDate) return null;
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ mo
   const off = {mon:0,tue:1,wed:2,thu:3,fri:4,sat:5,sun:6}[d]; if(off==null) return null;
   const mon = getWeekMonday(prog.startDate);
   const dt = new Date(mon); dt.setDate(mon.getDate()+(week-1)*7+off); dt.setHours(0,0,0,0);
   return dt;
 }
-function dayBeforeStart(prog, week, d){
+function dayBeforeStart(prog: any, week: any, d: any){
   if(!prog||!prog.startDate) return false;
   const dt = _progDayDate(prog, week, d); if(!dt) return false;
   const sd = _parseLocalDate(prog.startDate); if(!sd) return false;
@@ -47,7 +48,7 @@ function dayBeforeStart(prog, week, d){
 // D26: a program whose start is not a Monday has a short week 1. Accumulating Progress
 // metrics (sums, maxes) skip it the way they skip the D6 cut week — a 2-day week is not
 // a light week, it is a truncated one. Means and per-observation modules keep it.
-function _partialWeek1(prog){
+function _partialWeek1(prog: any){
   if(!prog||!prog.startDate) return false;
   const sd=_parseLocalDate(prog.startDate); if(!sd) return false;
   return getWeekMonday(prog.startDate).getTime() !== sd.getTime();
@@ -57,6 +58,7 @@ function calcCurrentWeek(){
   // Anchor to the Monday of the start date's week
   const weekMon=getWeekMonday(activeProg.startDate);
   const today=new Date();today.setHours(0,0,0,0);
+  // @ts-expect-error TS2362 The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type
   const diff=Math.floor((today-weekMon)/86400000);
   if(diff<0) return 1;
   const totalWeeks=activeProg.totalWeeks||6;
@@ -125,13 +127,14 @@ function restDayTip(){
 // it is what the app has actually been showing. Removed rather than left in place so the
 // next reader does not debug the version that never ran.
 // ── Up to 3 preview rows for the hero card: cardio first, then top lifts. ──
-function heroSummary(day){
-  var names=[];
-  (day.sections||[]).forEach(function(sec){(sec.items||[]).forEach(function(it){if(it.name)names.push(it.name);});});
+function heroSummary(day: any){
+  var names: any[]=[];
+  (day.sections||[]).forEach(function(sec: any){(sec.items||[]).forEach(function(it: any){if(it.name)names.push(it.name);});});
   var parts=[];
   if(names.length){ parts.push(names.length>1?names[0]+' + '+(names.length-1)+' more':names[0]); }
   if(day.cardio){
     var ct=(day.cardio.type||'').toLowerCase();
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
     var tn={run:'run',bike:'bike',swim:'swim'}[ct]||ct||'cardio';
     var d=(day.cardio.detail||'').split('\n')[0].replace(/<[^>]+>/g,'');
     // V146: the old pair was /\s*mi/i tested BEFORE /\s*min/i, and "mi" with no word
@@ -158,13 +161,13 @@ function heroSummary(day){
   // Breaking at the seam gives two deliberate lines instead of two ragged ones.
   return parts.join('<br>');
 }
-function sessionTimeEst(day){
+function sessionTimeEst(day: any){
   // Honest model: main-lift sets carry their full 2–3 min rest, supersets absorb
   // rest by alternating, holds/prehab are quick, cardio is timed off the printed
   // pace when one exists. The old flat 1.6 min/set undercounted heavy rest and
   // shipped a ~65 on days that ran 85+ in the real world.
   var mins=8; // warmup
-  (day.sections||[]).forEach(function(sec){
+  (day.sections||[]).forEach(function(sec: any){
     var L=((sec&&sec.label)||'').toLowerCase();
     var isMain=/^main\b|^primer|^power\b|^strength\b/.test(L);
     var isSuper=!!(sec&&sec.superset)||/superset|rounds|circuit|conditioning/.test(L);
@@ -173,15 +176,21 @@ function sessionTimeEst(day){
     // were 2 or 4, and 45.7% of days shipped a wrong estimate. Item first (it holds the
     // true per-item count in BOTH grammars now), then the section, and only then 3.
     var _secR=_secRounds(sec);
-    ((sec&&sec.items)||[]).forEach(function(it){
+    ((sec&&sec.items)||[]).forEach(function(it: any){
       var sets=_itemSets(it.detail);
       if(sets==null) sets=(_secR!=null?_secR:3);
       var n=(it.name||'').toLowerCase();
+      // @ts-expect-error TS18047 'sets' is possibly 'null'.
       if(/stretch|mobility|90\/90|foam|worlds greatest/.test(n)) mins+=sets*0.75;
+      // @ts-expect-error TS18047 'sets' is possibly 'null'.
       else if(/carry/.test(n)) mins+=sets*1.2;
+      // @ts-expect-error TS18047 'sets' is possibly 'null'.
       else if(/plank|pallof|dead bug|bird dog|wall sit|\bhold\b|hang|wiper|hollow|clamshell|side steps|side-lying|leg raises/.test(n)) mins+=sets*1.0;
+      // @ts-expect-error TS18047 'sets' is possibly 'null'.
       else if(isMain) mins+=sets*3.2;
+      // @ts-expect-error TS18047 'sets' is possibly 'null'.
       else if(isSuper) mins+=sets*1.4;
+      // @ts-expect-error TS18047 'sets' is possibly 'null'.
       else mins+=sets*2.0;
     });
   });
@@ -197,10 +206,11 @@ function sessionTimeEst(day){
   mins=Math.round(mins/5)*5;
   return Math.max(5,mins);
 }
-function buildHeroPreview(day){
+function buildHeroPreview(day: any){
   const rows=[];
   if(day.cardio){
     const ct=(day.cardio.type||'').toLowerCase();
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
     const tn={run:'Run',bike:'Bike',swim:'Swim'}[ct]||(day.cardio.type||'Cardio');
     const sub=day.cardio.subtype?day.cardio.subtype.replace(/_/g,' '):'';
     // V141: a segmented swim's flat detail begins with the warmup line — the preview
@@ -208,16 +218,17 @@ function buildHeroPreview(day){
     // segment when one exists. Flat sessions are untouched.
     let _src=(day.cardio.detail||'');
     if(day.cardio.segments&&day.cardio.segments.length){
-      const _m=day.cardio.segments.find(function(sg){return /^main/i.test(sg.label||'');});
+      const _m=day.cardio.segments.find(function(sg: any){return /^main/i.test(sg.label||'');});
       if(_m) _src=_m.text||_src;
     }
     let det=_src.split('\n')[0].replace(/<[^>]+>/g,'').trim();
     if(det.length>26) det=det.slice(0,26)+'\u2026';
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ ru
     const cc={run:'var(--run)',bike:'var(--bike)',swim:'var(--swim)'}[ct]||'var(--accent)';
     rows.push('<div class="wk-presc-row"><span class="wk-presc-name" style="color:'+cc+'">'+tn+(sub?' \u00b7 '+sub:'')+'</span><span class="wk-presc-det" style="color:'+cc+'">'+(det||'\u2014')+'</span></div>');
   }
-  const items=[];
-  (day.sections||[]).forEach(function(sec){(sec.items||[]).forEach(function(it){if(it.name)items.push(it);});});
+  const items: any[]=[];
+  (day.sections||[]).forEach(function(sec: any){(sec.items||[]).forEach(function(it: any){if(it.name)items.push(it);});});
   const room=Math.max(0,3-rows.length);
   items.slice(0,room).forEach(function(it){
     rows.push('<div class="wk-presc-row"><span class="wk-presc-name">'+it.name+'</span><span class="wk-presc-det">'+(it.detail||'')+'</span></div>');
@@ -225,17 +236,18 @@ function buildHeroPreview(day){
   return rows.join('');
 }
 // ── Open a day's session sheet from the strip / hero / up-next. ──
-function openDayKey(d){
+function openDayKey(d: any){
   const day=activeProg&&activeProg.weeks&&activeProg.weeks[currentWeek]&&activeProg.weeks[currentWeek][d];
   if(!day) return;
   if(dayBeforeStart(activeProg,currentWeek,d)){ showToast('Before your start date'); return; }   // V174 (D24)
   // Rest days used to dead-end here. Today's and past rest days now open the rest sheet
   // so an unplanned session or a bonus run has somewhere to go; future ones stay inert.
+  // @ts-expect-error TS2554 Expected 3 arguments, but got 2.
   if(day.rest){ if(restDayEligible(currentWeek,d)) openRestSheet(currentWeek,d); return; }
   openDetail(d,day);
 }
 // ── Day codes for the week strip (cardio modality above, focus below). ──
-function liftFocusCode(t){
+function liftFocusCode(t: any){
   t=(t||'').toLowerCase();
   if(/full body|full upper|full lower|\bfull\b/.test(t)) return 'FULL';
   if(/upper/.test(t)) return 'UPPER';
@@ -246,12 +258,13 @@ function liftFocusCode(t){
   var w=(t.replace(/[^a-z ]/g,' ').trim().split(/\s+/)[0]||'lift');
   return w.slice(0,5).toUpperCase();
 }
-function runSessionCode(sub, key, type){
+function runSessionCode(sub: any, key: any, type: any){
   // D103a (V208): a keyed NSW session wears the chip of its key, whatever its label says. The
   // CHI is the Long Interval (LI) and the INT the Short Interval (SI). long and easy have no row:
   // their chip is the label's (LSD on the pace family, EASY on run_base). The test wears TEST, as
   // the benchmark does.
   var K={int:'SI', chi:'LI', steady:'STDY', bench:'TEST', trial:'TEST'};
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ in
   if(key && K[key]) return K[key];
   var s=(sub||'').toLowerCase(), run=!type||type==='run';
   // Unkeyed and frozen strings, before the generic interval test ("long interval" contains
@@ -269,9 +282,9 @@ function runSessionCode(sub, key, type){
   if(s.indexOf('long slow')>=0||/\blsd\b/.test(s)) return 'LSD';
   return 'RUN';
 }
-function dayCode(day){
+function dayCode(day: any){
   if(!day||day.rest) return {top:'',topColor:'#5f5f62',bot:'REST',botColor:'#5f5f62'};
-  var liftSections=(day.sections||[]).some(function(s){return !s.core&&!s.hip&&(s.items||[]).length;});
+  var liftSections=(day.sections||[]).some(function(s: any){return !s.core&&!s.hip&&(s.items||[]).length;});
   var c=day.cardio, ctype=(c&&c.type||'').toLowerCase();
   var top=ctype==='run'?'RUN':ctype==='bike'?'BIKE':ctype==='swim'?'SWIM':'';
   var topColor=ctype==='run'?'#5e8c54':(ctype==='bike'||ctype==='swim')?'#3f6e96':'#5f5f62';
@@ -281,7 +294,8 @@ function dayCode(day){
   else { bot=liftFocusCode(day.title); botColor='#bc6a43'; }
   return {top:top,topColor:topColor,bot:bot,botColor:botColor};
 }
-function _onGold(hex){
+function _onGold(hex: any){
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ '#
   return {'#5e8c54':'#1c5f2c','#3f6e96':'#0a3a66','#bc6a43':'#7a3410','#5f5f62':'#3a2c08','#a6822f':'#7a4d00'}[hex]||'#3a2c08';
 }
 // ── V146: week-strip positioning ──────────────────────────────────────────────
@@ -293,7 +307,7 @@ function _onGold(hex){
 // Cold boot gets a one-time scoot: strip starts at week 1 and travels to the current
 // week with the highlight counting up behind it. Every later render sets the position
 // instantly — a greeting that fires on every set you log is a tic, not a greeting.
-let _wkScootDone=false, _wkScootRaf=0, _wkScootTmr=0, _wkScootEl=null;
+let _wkScootDone=false, _wkScootRaf=0, _wkScootTmr=0, _wkScootEl: any=null;
 function _wkReduceMotion(){
   try{ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
   catch(e){ return false; }
@@ -302,7 +316,7 @@ function _wkReduceMotion(){
 // ends. offsetLeft is NOT usable here — .week-scroll has no position set, so its
 // offsetParent is an ancestor and the number would be measured from the wrong origin.
 // The rect delta is origin-independent and correct regardless of where the chip sits.
-function _wkStripTarget(el,btn){
+function _wkStripTarget(el: any,btn: any){
   if(!el||!btn||!el.clientWidth) return null;
   const l=btn.getBoundingClientRect().left-el.getBoundingClientRect().left+el.scrollLeft;
   const max=Math.max(0,el.scrollWidth-el.clientWidth);
@@ -321,15 +335,16 @@ function _wkScootCancel(){
 // current-week chip was driven to -24px and sat clipped against the left edge for ~200ms.
 // This curve accelerates from rest and the overshoot is now applied as a capped pixel
 // amount in _wkScoot rather than baked into the easing as a ratio of distance.
-function _wkScootEase(t){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
+function _wkScootEase(t: any){ return t<0.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; }
 // V147 overshoot: a capped number of PIXELS past target, not a fraction of the distance.
 // Travel runs to `peak` for the first 76% of the duration, then eases back to `to`.
 // Deep in a program `peak` clamps to max scrollLeft and the bump flattens to a glide —
 // accepted; the alternative is hand-rolling scroll physics on a transform layer.
 const _WK_OVERSHOOT_PX=12, _WK_SPLIT=0.76;
-function _wkScoot(el,to,cur){
+function _wkScoot(el: any,to: any,cur: any){
   const btns=el.querySelectorAll('.week-btn');
   if(!btns.length) return;
+  // @ts-expect-error TS7006 Parameter 'n' implicitly has an 'any' type.
   const paint=n=>{ for(let i=0;i<btns.length;i++) btns[i].classList.toggle('active',(i+1)===n); };
   if(to<=0){ el.scrollLeft=0; paint(cur); return; }
   el.scrollLeft=0;
@@ -342,9 +357,10 @@ function _wkScoot(el,to,cur){
   // the left edge — on device the strip showed NO highlighted chip at all for ~217ms.
   // Deriving it from the same number that moves the strip makes desync impossible.
   const base=el.getBoundingClientRect().left+el.scrollLeft;
-  const off=[]; for(let i=0;i<btns.length;i++) off.push(btns[i].getBoundingClientRect().left-base);
+  const off: any[]=[]; for(let i=0;i<btns.length;i++) off.push(btns[i].getBoundingClientRect().left-base);
   const max=Math.max(0,el.scrollWidth-el.clientWidth);
   const peak=Math.min(max,to+Math.min(_WK_OVERSHOOT_PX,to*0.05));
+  // @ts-expect-error TS7006 Parameter 'sl' implicitly has an 'any' type.
   const chipAtLine=sl=>{
     const x=sl+16; let best=1,bd=Infinity;
     for(let i=0;i<off.length;i++){ const d=Math.abs(off[i]-x); if(d<bd){ bd=d; best=i+1; } }
@@ -352,7 +368,8 @@ function _wkScoot(el,to,cur){
   };
   paint(chipAtLine(0));
   _wkScootEl=el; el.classList.add('wk-scooting');
-  let t0=null;
+  let t0: any=null;
+  // @ts-expect-error TS7006 Parameter 'ts' implicitly has an 'any' type.
   const step=ts=>{
     if(t0===null) t0=ts;
     const p=Math.min(1,(ts-t0)/550);
@@ -372,9 +389,10 @@ function _wkScoot(el,to,cur){
 // e.g. "37 min run logged · RPE 7". The sport words are the hero's map; a missing RPE prints the
 // hero's dash. The journal prints the same strings, so the two never word a jog differently. A type
 // with no mins (a legacy lensed run that kept only its distance) has no line: the lens invents nothing.
-function restLogLines(rl){
+function restLogLines(rl: any){
   if(!rl||typeof rl!=='object') return [];
   const W={run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'};
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
   return Object.keys(rl).filter(t=>rl[t]&&+rl[t].mins>0).map(t=>rl[t].mins+' min '+(W[t]||t)+' logged · RPE '+(rl[t].rpe||'—'));
 }
 function renderWeekView(){
@@ -417,6 +435,7 @@ function renderWeekView(){
   try{
     if(Array.isArray(activeProg.overlays)){
       const _t=new Date(); _t.setHours(0,0,0,0);
+      // @ts-expect-error TS7006 Parameter 'ov' implicitly has an 'any' type.
       const _live=ov=>{
         if(!ov||!ov.from) return false;
         const _to=ov.to?_parseLocalDate(ov.to):null; if(_to&&_to<_t) return false;
@@ -425,6 +444,7 @@ function renderWeekView(){
       };
       // Injury outranks travel in the pill — one slot, and a throttled week must read
       // as intentional protection, never as a generic maintenance week.
+      // @ts-expect-error TS7006 Parameter 'ov' implicitly has an 'any' type.
       const _injOv=activeProg.overlays.find(ov=>_live(ov)&&ov.type==='injury'&&ov.patch&&ov.patch.injury);
       if(_injOv) _injWk=_injOv.patch.injury;
       // V175 (D30): read off the DAYS, not the overlay range. "Maintenance Week" is
@@ -439,23 +459,34 @@ function renderWeekView(){
   }catch(e){}
   if(_injWk){
     const _rl=(INJURY_REGIONS[_injWk.region]||{}).label||'Injury';
+    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
     _pill.textContent='Injury Week \u00b7 '+_rl;
+    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
     _pill.classList.add('phase-pill--injury');
   } else if(_isTravelWk){
+    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
     _pill.textContent='Maintenance Week';
+    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
     _pill.classList.add('phase-pill--recovery');
   } else if(_isTaper){
+    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
     _pill.innerHTML=(currentWeek===totalWeeks?asyIcon('🏁',13)+' Race Week':asyIcon('🏁',13)+' Race Taper');
+    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
     _pill.classList.add('phase-pill--recovery');
   } else if(_isRecov){
+    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
     _pill.textContent='↓ Recovery Week';
+    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
     _pill.classList.add('phase-pill--recovery');
   } else {
+    // @ts-expect-error TS18047 '_pill' is possibly 'null'.
     _pill.textContent=phaseLabel||'';
   }
   // Reset modifiers that don't apply to THIS render — week switching reuses the node,
   // so a stale class would tint a healthy week orange or an ordinary week red.
+  // @ts-expect-error TS18047 '_pill' is possibly 'null'.
   if(!_injWk) _pill.classList.remove('phase-pill--injury');
+  // @ts-expect-error TS18047 '_pill' is possibly 'null'.
   if(_injWk||(!_isTravelWk&&!_isTaper&&!_isRecov)) _pill.classList.remove('phase-pill--recovery');
   // ── INJURY WASH + SHORTCUT STATE ──
   // One flag drives both, so the tint and the button can never disagree about whether
@@ -477,6 +508,7 @@ function renderWeekView(){
   const wscroll=document.getElementById('weekScroll');
   // A scoot in flight is measuring and writing to nodes this render is about to destroy.
   _wkScootCancel();
+  // @ts-expect-error TS18047 'wscroll' is possibly 'null'.
   wscroll.innerHTML='';
   const actualWeek=calcCurrentWeek();
   let _actBtn=null;
@@ -485,6 +517,7 @@ function renderWeekView(){
     let _ovMark='';
     if(Array.isArray(activeProg.overlays)){
       const _today2=new Date();_today2.setHours(0,0,0,0);
+      // @ts-expect-error TS7006 Parameter 'ov' implicitly has an 'any' type.
       const _hit=activeProg.overlays.some(ov=>{
         if(!ov||!ov.from) return false;
         const _to=ov.to?_parseLocalDate(ov.to):null; if(_to&&_to<_today2) return false;
@@ -494,6 +527,7 @@ function renderWeekView(){
       if(_hit) _ovMark=' \u2726';
     }
     b.textContent='Wk '+w+(w===actualWeek?' \u25cf':'')+_ovMark;
+    // @ts-expect-error TS18047 'wscroll' is possibly 'null'.
     b.onclick=(wk=>()=>{_setCurrentWeek(wk);renderWeekView();})(w);wscroll.appendChild(b);
     if(w===currentWeek) _actBtn=b;
   }
@@ -501,11 +535,13 @@ function renderWeekView(){
   // LOOKING AT. Anchoring on today would scroll away from week 3 the moment you tapped it.
   const _wkTo=_wkStripTarget(wscroll,_actBtn);
   if(_wkTo!==null){
+    // @ts-expect-error TS18047 'wscroll' is possibly 'null'.
     if(_wkScootDone||_wkReduceMotion()){ wscroll.scrollLeft=_wkTo; _wkScootDone=true; }
     else { _wkScootDone=true; _wkScoot(wscroll,_wkTo,currentWeek); }
   }
   updateRandCounter();
   renderOverlayChip();
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   const sdi=document.getElementById('startDateInput');if(sdi) sdi.value=activeProg.startDate||'';
   const sdd=document.getElementById('startDateDisplay');
   if(sdd){
@@ -517,7 +553,9 @@ function renderWeekView(){
   // load-bearing (Mario's own Dec 5 → Dec 6 slip is the use case).
   { const _c=activeProg.cfg||{}; const _al=progAlignment(activeProg);
     const sw=document.querySelector('.wk-subrow .wk-startdate[aria-label="Program start date"]'); const rw=document.getElementById('raceDateWrap');
+    // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
     if(rw){ rw.style.display=_al?'flex':'none'; const ri=document.getElementById('raceDateInput'); if(ri) ri.value=_c.raceDate||''; const rd=document.getElementById('raceDateDisplay'); if(rd&&_al) rd.textContent=_fmtStartDay(_al.raceIso,true); }
+    // @ts-expect-error TS2339 Property 'style' does not exist on type 'Element'.
     if(sw) sw.style.display=_al?'none':'flex'; }
 
   const order=['mon','tue','wed','thu','fri','sat','sun'];
@@ -528,12 +566,16 @@ function renderWeekView(){
   let weekMon=null;
   if(activeProg.startDate){weekMon=getWeekMonday(activeProg.startDate);}
 
+  // @ts-expect-error TS18047 'list' is possibly 'null'.
   const list=document.getElementById('daysList');list.innerHTML='';
   if(!wkData){return;}
 
   const MOD={lift:['#bc6a43','rgba(188,106,67,0.15)'],run:['#5e8c54','rgba(94,140,84,0.15)'],bike:['#3f6e96','rgba(63,110,150,0.15)'],swim:['#3f6e96','rgba(63,110,150,0.15)'],hip:['#7e5e96','rgba(126,94,150,0.15)'],core:['#a6822f','rgba(166,130,47,0.15)'],rest:['#2c2c2e','rgba(24,23,18,0.05)']};
+  // @ts-expect-error TS7006 Parameter 'k' implicitly has an 'any' type.
   const modColor=k=>(MOD[k]?MOD[k][0]:'#3a3a3c');
+  // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
   const dayDateOf=d=>{ if(!weekMon) return null; const dd=new Date(weekMon); dd.setDate(weekMon.getDate()+(currentWeek-1)*7+dayOffset[d]); dd.setHours(0,0,0,0); return dd; };
+  // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
   const isTodayKey=d=>{ const dd=dayDateOf(d); return !!(dd&&dd.getTime()===now.getTime()); };
 
   // ── day strip (Mon\u2192Sun) ──
@@ -584,6 +626,7 @@ function renderWeekView(){
 
   let hero='';
   // Provenance and bonus work, surfaced on the hero so neither is a silent change.
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ su
   const _heroMovedFrom=(heroKey&&wkData[heroKey]&&wkData[heroKey].movedFrom)?(DAY_FULL[wkData[heroKey].movedFrom]||wkData[heroKey].movedFrom):null;
   const _heroCardio=(heroKey&&wkData[heroKey]&&wkData[heroKey].rest)?((getLogs()||{})[completedKey(currentWeek,heroKey)]||null):null;
   // V238 (D224 rest hero, H1 as restated in Amendment 1 A2): the entry comes through the getLogs lens,
@@ -595,6 +638,7 @@ function renderWeekView(){
   if(heroMode==='rest'){
     const tip=restDayTip();
     hero='<div class="wk-hero"><div class="wk-rest-pad">'
+      // @ts-expect-error TS2538 Type 'null' cannot be used as an index type.
       +'<div class="wk-hero-over">Today \u00b7 '+DAY_FULL[heroKey]+'</div>'
       +'<div class="wk-rest-title">REST DAY</div>'
       +'<div class="wk-rest-sub">Recovery is where the work sets in. Move easy, refuel, sleep.</div>'
@@ -609,15 +653,20 @@ function renderWeekView(){
       +'<div class="wk-tip-src">\u2014 '+tip.src+'</div></div>';
   } else if(heroKey){
     const day=wkData[heroKey];
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
     const over=(heroMode==='today'?'Today \u00b7 ':'Week '+currentWeek+' \u00b7 ')+DAY_FULL[heroKey]+(_heroMovedFrom?' \u00b7 moved from '+_heroMovedFrom:'');
+    // @ts-expect-error TS7006 Parameter 't' implicitly has an 'any' type.
     const tags=(day.tags||[]).filter(t=>t!=='rest').map(t=>{
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ li
       const col=MOD[t]?MOD[t][0]:'#181712';const dim=MOD[t]?MOD[t][1]:'rgba(24,23,18,0.15)';
+      // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ te
       return '<span class="wk-tag" style="color:'+col+';background:'+dim+'">'+((tagMeta[t]&&tagMeta[t].label)||t)+'</span>';
     }).join('');
     const summ=heroSummary(day);
     const est=sessionTimeEst(day);
     // V221 (D179): a day with a status is closed out. The hero says so in one line and its CTA
     // takes the open label (undo lives in the day's footer); a pending today keeps the start label.
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ co
     const _heroSt=({complete:'Done ✓ Closed out. Open the session to undo.',skipped:'Skipped ✕ The week moves on. Open the session to undo.'})[statusOf(currentWeek,heroKey)]||'';
     const cta=(heroMode==='today'&&!_heroSt)?'START SESSION':'OPEN SESSION';
     hero='<div class="wk-hero'+(heroMode==='today'?' is-today':'')+'">'
@@ -649,6 +698,7 @@ function renderWeekView(){
     +'</div>';
 
   const _wcTag=wildcardTagHTML(currentWeek,heroKey);   // V195 (D64)
+  // @ts-expect-error TS18047 'list' is possibly 'null'.
   list.innerHTML=strip+hero+_wcTag+stats;
 }
 
@@ -675,40 +725,40 @@ function liftRpeKeyHTML(){
 // which stamped one member's number over the rest). Nothing parses → no number, and the
 // header falls back to the section's own label rather than inventing one. There is no
 // fallback constant anywhere in this path.
-function _itemSets(d){
+function _itemSets(d: any){
   var s=String(d||''), m=s.match(/^(\d+)\s*[x\u00d7]/);
   if(m) return parseInt(m[1],10);
   m=s.match(/^(\d+)\s*sets?\b/i);
   return m?parseInt(m[1],10):null;
 }
-function _secRounds(sec){
+function _secRounds(sec: any){
   if(!sec) return null;
   if(sec.rounds===null) return null;
   if(typeof sec.rounds==='number'&&sec.rounds>0) return sec.rounds;
   var lr=String(sec.label||'').match(/(\d+)\s*round/i);
   if(lr) return parseInt(lr[1],10);
-  var c=(sec.items||[]).map(function(it){return _itemSets(it&&it.detail);})
-                       .filter(function(v){return v!=null;});
+  var c=(sec.items||[]).map(function(it: any){return _itemSets(it&&it.detail);})
+                       .filter(function(v: any){return v!=null;});
   return c.length?Math.min.apply(null,c):null;
 }
 // Display-only. The leading count comes OFF the rendered string and stays IN the data:
 // parseRx has five callers, and the add-sheet's day set-count (sessionAddSheet) sums
 // member details and is CORRECT today — it was the banner that was wrong, not them.
 // Stripping the count from the data would break a working reader to fix a broken one.
-function _stripLeadingSets(d){
+function _stripLeadingSets(d: any){
   return String(d||'')
     .replace(/^(\d+)\s*[x\u00d7]\s*/,'')
     .replace(/^(\d+)\s*sets?\s+of\s+/i,'')
     .replace(/^(\d+)\s*sets?\s*(?:\u2014|\u2013|-)\s*/i,'')
     .replace(/^(\d+)\s*sets?\b\s*/i,'');
 }
-function buildSectionsHTML(sections,baseIdx){
+function buildSectionsHTML(sections: any,baseIdx: any){
   const all=sections||[];
   const _base=baseIdx||0;
   // Only the MAIN lift (and the taper Primer) keeps a section label — every other block renders
   // as plain exercise rows. The conditioning round-protocol survives because it's drawn by the
   // superset-header inside the block, not by this outer label.
-  const renderSec=(sec,_si)=>{
+  const renderSec=(sec: any,_si: any)=>{
     const _secIdx=_base+_si;
     const showLabel=/^(main|primer)/i.test(sec.label||'');
     // A superset that has been skipped collapses to a single block-level stub. The whole
@@ -723,18 +773,21 @@ function buildSectionsHTML(sections,baseIdx){
       // The athlete's own additions render in their own block, in signal orange, so they
       // never masquerade as something the engine programmed.
       h+=`<div class="section-label" style="color:var(--signal)">${sec.label||'Added by you'}</div><div class="section-block">`;
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii);});
+      // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
+      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
       h+=`</div>`;
     } else if(sec.hip){
       // Broken out of the old bundled "Hip Abductor Circuit" box — each stability drill now
       // stands as its own logged card. The section still carries hip:true, so capRegionalFatigue
       // keeps shielding this prehab from deload/high-fatigue trimming.
       h+=`<div class="section-label" style="color:var(--hip)">${sec.label||'Hip stability'}</div><div class="section-block">`;
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii);});
+      // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
+      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
       h+=`</div>`;
     } else if(sec.core){
       h+=`<div class="core-block"><div class="core-header">${sec.coreHeader||'Core'}</div>`;
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii);});
+      // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
+      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
       h+=`</div>`;
     } else if((sec.superset||sec.type==='superset')&&(sec.items||[]).length>1){
       // V175 (D28): a section that holds ONE item is not a superset whatever its flag
@@ -748,7 +801,7 @@ function buildSectionsHTML(sections,baseIdx){
       // continues with what is left. At ONE survivor the round protocol means nothing,
       // so the block demotes to straight sets: rounds × (member reps) becomes the item's
       // own N×, stated on the card rather than implied by a header describing nothing.
-      const _live=(sec.items||[]).filter(function(it){return it&&!it._skipped;});
+      const _live=(sec.items||[]).filter(function(it: any){return it&&!it._skipped;});
       if(_live.length===1&&(sec.items||[]).length>1){
         const _sv=_live[0], _d=_sv.detail||'';
         // V190 (D39): with no honest round count there is nothing to multiply by, so the
@@ -756,8 +809,10 @@ function buildSectionsHTML(sections,baseIdx){
         const _mapped=(rounds==null||/^\d+\s*[x\xd7]/.test(_d))?_d
           :(_d?(rounds+'\xd7'+_d.replace(/^(\d+)\s*reps?\b/,'$1')):(rounds+' sets'));
         h+=`<div class="section-label" style="color:var(--muted)">${esc(sec.label||'Round')} \u2014 reduced to straight sets</div><div class="section-block">`;
-        sec.items.forEach((i2,_ii)=>{
+        sec.items.forEach((i2: any,_ii: any)=>{
+          // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
           if(i2._skipped){h+=buildExItem(i2,_secIdx,_ii);return;}
+          // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
           h+=buildExItem({...i2,detail:_mapped},_secIdx,_ii);
         });
         h+=`</div></div>`;
@@ -772,11 +827,12 @@ function buildSectionsHTML(sections,baseIdx){
         +`<button class="ss-minus" onclick="skipSuperset(${_secIdx})" aria-label="Skip this round">`+asyIcon('minus',15)+`</button></div>`;
       // The block owns the set dimension, so the rows inside state reps and effort only.
       // Data is untouched — this is the rendered string.
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii,rounds);});
+      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii,rounds);});
       h+=`</div>`;
     } else {
       h+=`<div class="section-block">`;
-      sec.items.forEach((i,_ii)=>{h+=buildExItem(i,_secIdx,_ii);});
+      // @ts-expect-error TS2554 Expected 4 arguments, but got 3.
+      sec.items.forEach((i: any,_ii: any)=>{h+=buildExItem(i,_secIdx,_ii);});
       h+=`</div>`;
     }
     h+=`</div>`;
@@ -786,7 +842,7 @@ function buildSectionsHTML(sections,baseIdx){
   // at full contrast. The old "Optional — if time supports" tail (conditioning,
   // carries, finishers, dynamic core sunk below a divider) has been removed — the
   // programmed volume is calibrated, so nothing is flagged as droppable anymore.
-  return all.map((sec,_si)=>renderSec(sec,_si)).join('');
+  return all.map((sec: any,_si: any)=>renderSec(sec,_si)).join('');
 }
 // Turn a prescription detail string ("4×7 — RPE 6", "3×10 each", "3×25 sec",
 // "3×8–10", "10 sets — max each set") into a per-set logging spec. Returns null when
@@ -796,7 +852,7 @@ function buildSectionsHTML(sections,baseIdx){
 // Every pattern below was taken from a string actually present in the library; none is
 // speculative. Only reached when the strict grammar above returns null, so no existing
 // parse can change.
-function _parseRxLoose(d, name){
+function _parseRxLoose(d: any, name: any){
   const perSide=/each/.test(d);
   // "5×max time" — N sets against an open target. The strict pattern needs a digit
   // after the ×, so this fell through.
@@ -815,11 +871,11 @@ function _parseRxLoose(d, name){
   // "20s on / 10s off" cannot be misread as a two-rung ladder.
   const mLadder=d.match(/^(\d+(?:\s*[\/,]\s*(?:\d+|amrap|max))+)/);
   if(mLadder){
-    const parts=mLadder[1].split(/[\/,]/).map(function(x){return x.trim();});
+    const parts=mLadder[1].split(/[\/,]/).map(function(x: any){return x.trim();});
     if(parts.length>=2 && parts.length<=20){
-      const targets=parts.map(function(x){return /^(amrap|max)$/.test(x)?null:+x;});
+      const targets=parts.map(function(x: any){return /^(amrap|max)$/.test(x)?null:+x;});
       const tok=/\bsec\b/.test(d)?'sec':(/\byd\b|\byards?\b/.test(d)?'yd':'');
-      const first=targets.filter(function(t){return t!=null;})[0]||0;
+      const first=targets.filter(function(t: any){return t!=null;})[0]||0;
       return {sets:targets.length, kind:tok==='sec'?'sec':(tok==='yd'?'dist':'reps'),
               unit:tok, step:tok==='sec'?5:1, target:first, targets:targets, perSide:perSide};
     }
@@ -847,7 +903,7 @@ function _parseRxLoose(d, name){
   if(mName) return {sets:1, kind:'reps', unit:'', step:1, target:+mName[1], perSide:perSide};
   return null;
 }
-function parseRx(detail,name){
+function parseRx(detail: any,name: any){
   const d=(detail||'').toLowerCase();
   // "N sets of X to Y" — a real rep target written in words, not an open prescription.
   // Emitted by the travel/loadCapped branch ("3 sets of 8 to 12 — RPE 8 (heaviest pair you
@@ -879,7 +935,7 @@ function parseRx(detail,name){
   if(unitTok==='yd') return {sets:sets, kind:'dist', unit:'yd', step:1, target:mid, perSide:perSide};
   return {sets:sets, kind:'reps', unit:'', step:1, target:mid, perSide:perSide};
 }
-function rxSuffix(rx){
+function rxSuffix(rx: any){
   if(!rx) return '';
   if(rx.kind==='sec') return rx.perSide?'sec/side':'sec';
   if(rx.kind==='dist') return rx.perSide?'yd/side':'yd';

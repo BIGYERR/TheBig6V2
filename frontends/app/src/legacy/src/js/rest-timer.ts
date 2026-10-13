@@ -1,17 +1,19 @@
 import { _curScreen, activeProg } from './rest-day-shell.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── Floating count-up rest stopwatch (PiP-style edge tab). Persists app-wide; runs through screen-lock. ──
-let _ruId=null,_ruRunning=false,_ruElapsed=0,_ruStart=0;
-let _rtSide='right',_rtExpanded=false,_rtIntroTO=null,_rtInited=false,_rtDragging=false,_rtIntroPending=false;
+let _ruId: any=null,_ruRunning=false,_ruElapsed=0,_ruStart=0;
+let _rtSide='right',_rtExpanded=false,_rtIntroTO: any=null,_rtInited=false,_rtDragging=false,_rtIntroPending=false;
 // Written from other files through these setters: an ES module cannot assign another module's binding (phase C).
-function _setRtIntroPending(v){ _rtIntroPending=v; }
+function _setRtIntroPending(v: any){ _rtIntroPending=v; }
 // V239 (D233, R1 as amended): inside the native app (window.iaIsland present) the rest clock is the wall clock
 // and the island mirrors every seam; on the PWA it stays performance.now() and the island is never called.
+// @ts-expect-error TS2339 Property 'iaIsland' does not exist on type 'Window & typeof globalThis'.
 function _ruClock(){return window.iaIsland?Date.now():performance.now();}
+// @ts-expect-error TS2339 Property 'iaIsland' does not exist on type 'Window & typeof globalThis'.
 function _ruIsland(){var I=window.iaIsland;if(!I)return;try{if(_ruRunning)I.run(_ruStart);else if(_ruElapsed>0)I.stop(_ruElapsed);else I.end();}catch(e){}}
 function _ruNow(){return _ruRunning?(_ruClock()-_ruStart):_ruElapsed;}
-function _rtPad(n){return(n<10?'0':'')+n;}
-function _rtStack(str){var h='';for(var i=0;i<str.length;i++){var c=str[i];h+='<span>'+(c===':'?'<span style="opacity:.7">:</span>':c)+'</span>';}return h;}
+function _rtPad(n: any){return(n<10?'0':'')+n;}
+function _rtStack(str: any){var h='';for(var i=0;i<str.length;i++){var c=str[i];h+='<span>'+(c===':'?'<span style="opacity:.7">:</span>':c)+'</span>';}return h;}
 function _ruRender(){
   var ms=_ruNow();if(ms<0)ms=0;
   var cs=Math.floor(ms/10)%100,ts=Math.floor(ms/1000),m=Math.floor(ts/60),s=ts%60;
@@ -39,11 +41,16 @@ function _rtPlayIntro(){
   if(_rtIntroTO)clearTimeout(_rtIntroTO);
   _rtIntroTO=setTimeout(function(){
     _rtIntroTO=null;
+    // @ts-expect-error TS18047 'card' is possibly 'null'.
     card.style.animation='';
     _rtSetExpanded(false);
+    // @ts-expect-error TS18047 'tab' is possibly 'null'.
     tab.style.transformOrigin='right center';
+    // @ts-expect-error TS18047 'tab' is possibly 'null'.
     tab.style.animation='none';void tab.offsetWidth;
+    // @ts-expect-error TS18047 'tab' is possibly 'null'.
     tab.style.animation='rtPillSettle .34s cubic-bezier(.34,1.4,.5,1) 1 both';
+    // @ts-expect-error TS18047 'tab' is possibly 'null'.
     setTimeout(function(){tab.style.animation='';tab.style.transformOrigin='';},420);
   },2200);
 }
@@ -52,17 +59,21 @@ function _rtApplySide(){
   if(!anchor)return;
   if(_rtSide==='right'){
     anchor.style.right='0';anchor.style.left='auto';
+    // @ts-expect-error TS18047 'tab' is possibly 'null'.
     tab.style.borderRadius='14px 0 0 14px';tab.style.borderRight='none';tab.style.borderLeft='1.5px solid var(--signal)';
+    // @ts-expect-error TS18047 'card' is possibly 'null'.
     card.style.borderRadius='12px 0 0 12px';card.style.borderRight='none';card.style.borderLeft='2px solid var(--signal)';
     if(chev)chev.innerHTML='&#8249;';if(nub){nub.style.left='18px';nub.style.right='auto';}
   }else{
     anchor.style.left='0';anchor.style.right='auto';
+    // @ts-expect-error TS18047 'tab' is possibly 'null'.
     tab.style.borderRadius='0 14px 14px 0';tab.style.borderLeft='none';tab.style.borderRight='1.5px solid var(--signal)';
+    // @ts-expect-error TS18047 'card' is possibly 'null'.
     card.style.borderRadius='0 12px 12px 0';card.style.borderLeft='none';card.style.borderRight='2px solid var(--signal)';
     if(chev)chev.innerHTML='&#8250;';if(nub){nub.style.right='18px';nub.style.left='auto';}
   }
 }
-function _rtSetExpanded(v){
+function _rtSetExpanded(v: any){
   _rtExpanded=v;
   var tab=document.getElementById('rtTab'),card=document.getElementById('rtCard');
   if(tab)tab.style.display=v?'none':'flex';
@@ -74,16 +85,18 @@ function rtCollapse(){_rtDismissIntro();_rtSetExpanded(false);}
 function rtToggleBtn(){var wasIntro=!!_rtIntroTO;_rtDismissIntro();ruToggle();if(wasIntro)rtCollapse();}
 function rtResetBtn(){var wasIntro=!!_rtIntroTO;_rtDismissIntro();ruReset();if(wasIntro)rtCollapse();}
 
-function _rtWireDrag(handle,isTab){
+function _rtWireDrag(handle: any,isTab: any){
   var sx=0,sy=0,sTop=0,moved=false,dragging=false;
-  handle.addEventListener('pointerdown',function(e){
+  handle.addEventListener('pointerdown',function(e: any){
     if(e.target.closest('.rt-btn,.rt-reset,.rt-collapse'))return;
     var anchor=document.getElementById('rtAnchor');
+    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
     dragging=true;_rtDragging=true;moved=false;sx=e.clientX;sy=e.clientY;sTop=anchor.offsetTop;
     if(e.cancelable)e.preventDefault();
+    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
     anchor.style.transition='none';try{handle.setPointerCapture(e.pointerId);}catch(_){}
   });
-  handle.addEventListener('pointermove',function(e){
+  handle.addEventListener('pointermove',function(e: any){
     if(!dragging)return;
     if(e.cancelable)e.preventDefault();
     var anchor=document.getElementById('rtAnchor'),frame=document.getElementById('restFloat');
@@ -91,11 +104,16 @@ function _rtWireDrag(handle,isTab){
     if(Math.abs(dx)>5||Math.abs(dy)>5)moved=true;
     // v0.239.1 (D235.1): below the 5 px threshold nothing is written, so a jittery tap leaves the timer docked.
     if(!moved)return;
+    // @ts-expect-error TS18047 'frame' is possibly 'null'.
     var fb=frame.getBoundingClientRect();
+    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
     var maxT=window.innerHeight-anchor.offsetHeight-8;
+    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
     anchor.style.top=Math.max(8,Math.min(maxT,sTop+dy))+'px';
+    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
     var w=anchor.offsetWidth;
     var x=Math.max(0,Math.min(fb.width-w,e.clientX-fb.left-w/2));
+    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
     anchor.style.left=x+'px';anchor.style.right='auto';
   });
   // v0.239.1 (D235.2): one end-of-drag path for pointerup and pointercancel. It ends the drag, restores the
@@ -103,15 +121,18 @@ function _rtWireDrag(handle,isTab){
   function snap(){
     dragging=false;_rtDragging=false;
     var anchor=document.getElementById('rtAnchor'),frame=document.getElementById('restFloat');
+    // @ts-expect-error TS18047 'anchor' is possibly 'null'.
     anchor.style.transition='left .18s cubic-bezier(.34,1.3,.5,1),right .18s cubic-bezier(.34,1.3,.5,1)';
     if(moved){
+      // @ts-expect-error TS18047 'anchor' is possibly 'null'.
       var center=anchor.offsetLeft+anchor.offsetWidth/2,fb=frame.getBoundingClientRect();
       _rtSide=(center<fb.width/2)?'left':'right';
+      // @ts-expect-error TS18047 'anchor' is possibly 'null'.
       anchor.style.left='';_rtApplySide();
     }
     return moved;
   }
-  handle.addEventListener('pointerup',function(e){
+  handle.addEventListener('pointerup',function(e: any){
     if(!dragging)return;
     if(snap())return;
     if(isTab){_rtDismissIntro();rtExpand();}

@@ -1,5 +1,5 @@
 // The rest timer's logic, kept apart from Angular so the app's node --test suite reads it as it is (architecture phase
-// E, step 2: the floating rest timer moves from the legacy script's rest-timer.js to the RestTimer component). Each rule
+// E, step 2: the floating rest timer moves from the legacy script's rest-timer.ts to the RestTimer component). Each rule
 // is the legacy script's: a stopwatch on the wall clock in the native app (so the iOS Live Activity reads the same
 // start) and on performance.now() in a browser, the m:ss readout and its hundredths, the side the tab docks to, and
 // what the Live Activity is told.

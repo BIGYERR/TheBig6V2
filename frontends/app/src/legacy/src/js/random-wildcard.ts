@@ -1,10 +1,10 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { completedKey, esc, getWildcardDone, saveWildcardDone } from './storage.js';
+import { completedKey, esc, getWildcardDone, saveWildcardDone } from './storage.ts';
 import { _setCurrentRandIdx, activeProg, showToast } from './rest-day-shell.ts';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
-import { _setCurrentRandDayKey, _setLastRandIdx, lastRandIdx } from './wizard.js';
-import { buildSectionsHTML, dayBeforeStart, renderWeekView } from './week-view-sections.js';
-import { computeStreak, popFire } from './popups-streaks-reminders.js';
+import { _setCurrentRandDayKey, _setLastRandIdx, lastRandIdx } from './wizard.ts';
+import { buildSectionsHTML, dayBeforeStart, renderWeekView } from './week-view-sections.ts';
+import { computeStreak, popFire } from './popups-streaks-reminders.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // RANDOM POOLS - 30+ per goal
@@ -173,13 +173,16 @@ let randFilter='mine';
 
 function getActivePool(){
   const goal=activeProg?.goal||'balanced';
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ st
   if(randFilter==='mine') return RAND_POOLS[goal]||RAND_POOLS.balanced;
   return Object.values(RAND_POOLS).flat();
 }
 
 function openRandom(){
   buildRandFilterBar();reroll();
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('randOverlay').classList.add('open');
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('randOverlay').scrollTop=0;
 }
 
@@ -187,13 +190,14 @@ function buildRandFilterBar(){
   // V195 (D64): the parenthetical named a pool that does not exist. getActivePool falls
   // back to RAND_POOLS.balanced for every goal RAND_POOLS has no key for, so the label
   // was describing a draw the athlete was not getting. The pool gap itself is D66.
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('randFilterBar').innerHTML=[
     {id:'mine',label:'My Goal'},
     {id:'all',label:'See All'},
   ].map(f=>`<button class="rand-filter-btn${randFilter===f.id?' active':''}" onclick="setRandFilter('${f.id}')">${f.label}</button>`).join('');
 }
 
-function setRandFilter(f){randFilter=f;buildRandFilterBar();reroll();}
+function setRandFilter(f: any){randFilter=f;buildRandFilterBar();reroll();}
 
 function reroll(){
   const pool=getActivePool();
@@ -202,12 +206,15 @@ function reroll(){
   _setLastRandIdx(idx);_setCurrentRandIdx(idx);
   const w=pool[idx];
   const done=getWildcardDone();
+  // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
   const alreadyDone=done.some(d=>d.title===w.title);
   const now=new Date();
   const dowToKey={0:'sun',1:'mon',2:'tue',3:'wed',4:'thu',5:'fri',6:'sat'};
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
   _setCurrentRandDayKey(dowToKey[now.getDay()]||'mon');
   const goal=activeProg?.goal||'balanced';
   const colors={strength:'var(--lift)',hypertrophy:'var(--hip)',fatloss:'var(--run)',athletic:'var(--bike)',balanced:'var(--accent)',endurance:'var(--run)',support_strength:'var(--lift)',support_athletic:'var(--bike)',support_prevention:'var(--hip)'};
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ st
   const color=colors[goal];
   let html=`<div style="text-align:center;padding:4px 0 16px">
     <div class="rand-badge" style="background:${color}22;color:${color}">${alreadyDone?'Done Before ✓':'Wildcard'}</div>
@@ -219,10 +226,12 @@ function reroll(){
     const labelCls=ctype.includes('swim')?'cardio-label-swim':ctype.includes('run')?'cardio-label-run':ctype.includes('bike')?'cardio-label-bike':'cardio-label-general';
     html+=`<div class="${blockCls}"><div class="cardio-type-label ${labelCls}">${w.cardio.type}</div><div class="cardio-detail">${w.cardio.detail}</div></div>`;
   }
+  // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
   html+=buildSectionsHTML(w.sections);
   if(w.note) html+=`<div class="note-block">${w.note}</div>`;
   if(alreadyDone) html+=`<div class="wildcard-done-block">✓ You've done this one before</div>`;
   else html+=`<button class="wildcard-complete-btn" onclick="completeWildcard('${(w.title||'').replace(/'/g,"\\'")}')">${asyIcon('✅',14)} Complete — Mark Done</button>`;
+  // @ts-expect-error TS2531 Object is possibly 'null'.
   document.getElementById('randBody').innerHTML=html;
 }
 
@@ -240,7 +249,7 @@ function reroll(){
 // The day is resolved from the DATE, with the same arithmetic scheduledDays uses. Off
 // the calendar of the block, the Wildcard still logs to the counter and refuses to stamp
 // any day at all rather than stamping the wrong one.
-function wildcardDayFor(now){
+function wildcardDayFor(now: any){
   if(!activeProg||!activeProg.startDate||!activeProg.weeks) return null;
   const d=new Date(now||new Date()); d.setHours(0,0,0,0);
   const mon=getWeekMonday(activeProg.startDate);
@@ -259,21 +268,23 @@ function wildcardDayFor(now){
 // Pre-V195 entries have no week/dayKey and simply render no mark.
 function wildcardDaySet(){
   const m={};
+  // @ts-expect-error TS7006 Parameter 'x' implicitly has an 'any' type.
   getWildcardDone().forEach(x=>{ if(x&&x.week&&x.dayKey) m[completedKey(x.week,x.dayKey)]=x; });
   return m;
 }
-function wildcardOn(week,dayKey){
+function wildcardOn(week: any,dayKey: any){
   if(!week||!dayKey) return null;
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
   return wildcardDaySet()[completedKey(week,dayKey)]||null;
 }
 // Flame plus a W, signal orange, inline SVG from the icon table. Never emoji.
-function wildcardMarkHTML(size){
+function wildcardMarkHTML(size: any){
   size=size||14;
   return '<span class="wc-mark" aria-label="Wildcard done">'+asyIcon('flame',size)+'<span class="wc-mark-w">W</span></span>';
 }
 // The tag names the prescribed session out loud. That is the guardrail: the athlete has
 // to be able to see that the session they were given is still waiting.
-function wildcardTagHTML(week,dayKey){
+function wildcardTagHTML(week: any,dayKey: any){
   const wc=wildcardOn(week,dayKey); if(!wc) return '';
   const day=activeProg&&activeProg.weeks&&activeProg.weeks[week]?activeProg.weeks[week][dayKey]:null;
   const sub=(day&&day.rest)
@@ -286,16 +297,17 @@ function wildcardTagHTML(week,dayKey){
 // Its own dispatcher. fireCompletionPopup escalates to the season banner on the final
 // scheduled day, and that banner claims the block is finished — a Wildcard may never
 // say that, claim a PR, or claim progress.
-function fireWildcardPopup(isTraining){
+function fireWildcardPopup(isTraining: any){
   popFire('workout',{
     kicker:'WILDCARD DONE',
     msg:'You showed up. That is the whole game.',
     sub:isTraining?('Streak: '+computeStreak()+'.'):'Streak holds.'
   });
 }
-function completeWildcard(title){
+function completeWildcard(title: any){
   const done=getWildcardDone();
   const slot=wildcardDayFor(new Date());
+  // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
   if(!done.some(d=>d.title===title)) done.push({title,ts:Date.now(),week:slot?slot.week:null,dayKey:slot?slot.dayKey:null});
   saveWildcardDone(done);
   const day=(slot&&activeProg&&activeProg.weeks&&activeProg.weeks[slot.week])?activeProg.weeks[slot.week][slot.dayKey]:null;
@@ -304,6 +316,7 @@ function completeWildcard(title){
   if(activeProg) renderWeekView();
   setTimeout(()=>fireWildcardPopup(isTraining),380);
 }
+// @ts-expect-error TS2531 Object is possibly 'null'.
 function closeRandom(){document.getElementById('randOverlay').classList.remove('open');}
 
 let resetPending=false;
@@ -319,7 +332,9 @@ function resetWildcardCounter(){
 function updateRandCounter(){
   const done=getWildcardDone();
   const goal=activeProg?.goal||'balanced';
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ st
   const pool=RAND_POOLS[goal]||RAND_POOLS.balanced;
+  // @ts-expect-error TS7006 Parameter 'd' implicitly has an 'any' type.
   const myDone=done.filter(d=>pool.some(w=>w.title===d.title)).length;
   const el=document.getElementById('randCounter');if(el) el.textContent=myDone+'/'+pool.length;
   if(!resetPending){const rb=document.getElementById('resetRandBtn');if(rb){rb.textContent='↺ Reset';rb.style.color='';}}

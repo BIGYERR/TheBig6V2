@@ -1,13 +1,13 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
-import { esc, getDayHistFor, getExWeightsFor, getLogsFor, getPrograms } from './storage.js';
+import { esc, getDayHistFor, getExWeightsFor, getLogsFor, getPrograms } from './storage.ts';
 import {
   _setConfirmProgId, _setConfirmTier, _setProgressViewId, activeProgId, confirmProgId, confirmTier, showScreen,
 } from './rest-day-shell.ts';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
 import { PACE_CHART } from '../../../../../../core/src/engine/cardio-progression.ts';
-import { _epley } from './day-detail.js';
-import { renderProgressScreen } from './lift-ledger-progress-screen.js';
+import { _epley } from './day-detail.ts';
+import { renderProgressScreen } from './lift-ledger-progress-screen.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 
@@ -38,7 +38,7 @@ function showProgressScreen() {
 // which keeps D3 intact \u2014 no old number ever reaches a prescription directly.
 var SEED_WINDOW_DAYS = 21;
 var SEED_MIN_RUNS = 3;
-function _mileFromRecoverySec(recSec){
+function _mileFromRecoverySec(recSec: any){
   const rows=(typeof PACE_CHART!=='undefined')?PACE_CHART:null;
   if(!rows||!rows.length||!(recSec>0)) return null;
   if(recSec<=rows[0].recovery) return rows[0].mile;
@@ -53,24 +53,29 @@ function _mileFromRecoverySec(recSec){
   }
   return last.mile;
 }
-function seedFromPriorPrograms(now){
+function seedFromPriorPrograms(now?: any){
   now = (typeof now==='number'&&now>0) ? now : Date.now();
   const cut = now - SEED_WINDOW_DAYS*86400000;
-  let best=null;
+  let best: any=null;
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   (getPrograms()||[]).forEach(p=>{
     if(!p||!p.id) return;
     const logs=getLogsFor(p.id), hist=getDayHistFor(p.id);
     const tw=p.totalWeeks||99;
-    const paces=[]; let latest=0, maxDist=0;
+    const paces: any[]=[]; let latest=0, maxDist=0;
     Object.entries(logs||{}).forEach(([key,e])=>{
+      // @ts-expect-error TS2339 Property 'ts' does not exist on type '{}'.
       if(!e||!(e.ts>0)||e.ts<cut||e.ts>now) return;   // D5 window, both boundaries
+      // @ts-expect-error TS2339 Property 'run_dist' does not exist on type '{}'.
       if(e.run_dist&&+e.run_dist>0) maxDist=Math.max(maxDist,+e.run_dist);
       // V238 (D224 max readers, Amendment 1 A3): a rest-day jog inside the ts window is its own
       // candidate for the longest run, never summed with the day's session. The pace seeds stay
       // blind: a jog has no pace.
+      // @ts-expect-error TS2339 Property 'restLog' does not exist on type '{}'.
       const _jd=+((e.restLog||{}).run||{}).dist; if(_jd>0) maxDist=Math.max(maxDist,_jd);
       const r=_recoveryPaceEntry(key,e,hist,tw);       // V155 predicate, reused
       if(!r) return;
+      // @ts-expect-error TS2339 Property 'ts' does not exist on type '{}'.
       paces.push(r.sec); if(e.ts>latest) latest=e.ts;
     });
     if(paces.length<SEED_MIN_RUNS) return;             // both seeds or nothing
@@ -82,14 +87,14 @@ function seedFromPriorPrograms(now){
   });
   return best;
 }
-function _paceStrToSec(t){ // "10:26/mi" or "10:26" -> seconds, else null
+function _paceStrToSec(t: any){ // "10:26/mi" or "10:26" -> seconds, else null
   if(!t) return null; const m=String(t).trim().match(/^(\d+):(\d{2})/);
   return m ? (+m[1])*60+(+m[2]) : null;
 }
 // V156: the V155 inclusion predicate, extracted verbatim so the wizard seed and the
 // chart cannot drift apart. Returns {w, sec, tgt} for a qualifying recovery-run log
 // entry, null otherwise. Every term is the V155 term; nothing added, nothing relaxed.
-function _recoveryPaceEntry(key, e, hist, totalWeeks){
+function _recoveryPaceEntry(key: any, e: any, hist: any, totalWeeks: any){
   if(!e || !e.run_pace) return null;
   if(e.swapTo) return null;                     // swapped session: not the prescribed run
   const m=key.match(/^w(\d+)_(.+)$/); if(!m) return null;
@@ -104,16 +109,18 @@ function _recoveryPaceEntry(key, e, hist, totalWeeks){
   const sec=_paceStrToSec(e.run_pace); if(!sec) return null;
   return {w, sec, tgt:(c.dose && c.dose.tgt>0)?c.dose.tgt:null};
 }
-function recoveryPaceWeekly(logs, hist, totalWeeks){
-  const wk={}, tgts=[];
+function recoveryPaceWeekly(logs: any, hist: any, totalWeeks: any){
+  const wk={}, tgts: any[]=[];
   Object.entries(logs||{}).forEach(([key,e])=>{
     const r=_recoveryPaceEntry(key, e, hist, totalWeeks);
     if(!r) return;
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     (wk[r.w]=wk[r.w]||[]).push(r.sec);
     if(r.tgt) tgts.push(r.tgt);
   });
   const weekly={};
-  Object.entries(wk).forEach(([w,arr])=>{ weekly[+w]=arr.reduce((a,b)=>a+b,0)/arr.length; });
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
+  Object.entries(wk).forEach(([w,arr])=>{ weekly[+w]=arr.reduce((a: any,b: any)=>a+b,0)/arr.length; });
   const tgt=tgts.length?tgts.reduce((a,b)=>a+b,0)/tgts.length:null;
   return {weekly, tgt, nWeeks:Object.keys(weekly).length};
 }
@@ -121,8 +128,9 @@ function recoveryPaceWeekly(logs, hist, totalWeeks){
 // pace needs an inverted axis (up = faster), a non-zero floor and m:ss labels, and
 // threading three options through shared code puts four existing charts in the blast
 // radius for zero visual gain. Same card chrome, same dot/dash grammar.
-function _fmtPaceShort(sec){ return _clkMS(sec); }   // D126 (V204)
-function buildPaceChart(title, weeks, data, tgt, color){
+function _fmtPaceShort(sec: any){ return _clkMS(sec); }   // D126 (V204)
+function buildPaceChart(title: any, weeks: any, data: any, tgt: any, color: any){
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const valid=data.filter(v=>v!==null);
   if(valid.length<2) return '';                 // one dot is not a trend
   const all=valid.concat(tgt?[tgt]:[]);
@@ -132,6 +140,7 @@ function buildPaceChart(title, weeks, data, tgt, color){
   const plotW=W-padL-padR, plotH=H-padT-padB;
   const n=weeks.length, xStep=plotW/Math.max(n-1,1);
   // INVERTED: faster (smaller sec) plots HIGHER, so improvement reads upward.
+  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
   const Y=v=>padT+((v-lo)/(hi-lo))*plotH;
   const yLabels=[lo,(lo+hi)/2,hi];
   let svg='';
@@ -143,8 +152,8 @@ function buildPaceChart(title, weeks, data, tgt, color){
     svg+='<line x1="'+padL+'" y1="'+ty.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+ty.toFixed(1)+'" stroke="'+color+'" stroke-width="1" stroke-dasharray="2,4" opacity="0.55"/>'
        +'<text x="'+(W-padR-2)+'" y="'+(ty-3).toFixed(1)+'" font-size="7.5" fill="'+color+'" text-anchor="end" opacity="0.85">PLAN '+_fmtPaceShort(tgt)+'/mi</text>';
   }
-  let path='', prev=null, dots='', lastPt=null;
-  data.forEach((v,i)=>{
+  let path='', prev: any=null, dots='', lastPt=null;
+  data.forEach((v: any,i: any)=>{
     if(v===null){ prev=null; return; }
     const x=padL+i*xStep, y=Y(v);
     if(prev) path+=' M'+prev.x.toFixed(1)+','+prev.y.toFixed(1)+' L'+x.toFixed(1)+','+y.toFixed(1);
@@ -153,9 +162,10 @@ function buildPaceChart(title, weeks, data, tgt, color){
   });
   if(path) svg+='<path d="'+path+'" stroke="'+color+'" stroke-width="1.5" stroke-dasharray="1,3" fill="none"/>';
   svg+=dots;
+  // @ts-expect-error TS2339 Property 'x' does not exist on type 'never'.
   if(lastPt) svg+='<text x="'+lastPt.x.toFixed(1)+'" y="'+(lastPt.y-8).toFixed(1)+'" font-size="8" font-weight="700" fill="'+color+'" text-anchor="middle">'+_fmtPaceShort(lastPt.v)+'</text>';
   const xLabelStep=n<=8?1:n<=16?2:4;
-  weeks.forEach((w,i)=>{ if(i%xLabelStep!==0) return;
+  weeks.forEach((w: any,i: any)=>{ if(i%xLabelStep!==0) return;
     svg+='<text x="'+(padL+i*xStep).toFixed(1)+'" y="'+(H-padB+14)+'" font-size="8" fill="rgba(24,23,18,0.35)" text-anchor="middle" font-family="Helvetica Neue,Helvetica,Geist,sans-serif">W'+w+'</text>';
   });
   svg+='<text x="'+(padL+plotW/2).toFixed(1)+'" y="'+(H-4)+'" font-size="8" fill="rgba(24,23,18,0.45)" text-anchor="middle">higher = faster easy pace \u00b7 dashed = plan target</text>';
@@ -167,7 +177,7 @@ function buildPaceChart(title, weeks, data, tgt, color){
 // V156: program selector chips for the Progress screen. One program's charts render
 // at a time (lazy — heaviest DOM in the app). Active first, then other live programs,
 // then archived with a badge. Hidden entirely when only one program exists.
-function _progChipsHTML(programs, vid){
+function _progChipsHTML(programs: any, vid: any){
   if(!programs || programs.length<2) {
     const only=programs&&programs[0];
     return (only&&only.archived)?_restoreBarHTML(only):'';
@@ -182,6 +192,7 @@ function _progChipsHTML(programs, vid){
     const label=(p.archived?asyIcon('history',13)+' ':'')+(p.name||'Program');
     return `<button onclick="setProgressView('${p.id}')" style="flex:0 0 auto;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.04em;padding:8px 12px;border-radius:16px;cursor:pointer;white-space:nowrap;border:1px solid ${sel?'var(--accent)':'var(--border)'};background:${sel?'var(--accent)':'var(--surface)'};color:${sel?'var(--on-ink)':'var(--muted)'}">${label}</button>`;
   }).join('');
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   const viewed=programs.find(p=>p.id===vid);
   return `<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch">${chips}</div>`
     +((viewed&&viewed.archived)?_restoreBarHTML(viewed):'');
@@ -191,16 +202,16 @@ function _progChipsHTML(programs, vid){
 // is archive-then-delete and the destructive control never sits next to a live program.
 // The confirm is INLINE rather than a jump to the Programs screen — askPurge()'s tier-2
 // card renders inside progCardActions, which is not on this surface.
-function _purgeWarnsCrossProg(id){
+function _purgeWarnsCrossProg(id: any){
   // V168 D3 makes other programs read this one's ia_exw_ for their reuse pills. Purging
   // it silently blanks loads elsewhere, so the confirm has to say so. Cheap proxy: this
   // program holds loaded-lift history AND at least one other program exists.
   try{
-    if(getPrograms().filter(function(x){return x.id!==id;}).length===0) return false;
+    if(getPrograms().filter(function(x: any){return x.id!==id;}).length===0) return false;
     return Object.keys(getExWeightsFor(id)||{}).length>0;
   }catch(e){ return false; }
 }
-function _restoreBarHTML(p){
+function _restoreBarHTML(p: any){
   if(confirmProgId===p.id&&confirmTier===2){
     const _x=_purgeWarnsCrossProg(p.id)
       ?'<br><span style="color:var(--muted)">Other programs are using these loads as starting points \u2014 those will go blank.</span>'
@@ -219,9 +230,9 @@ function _restoreBarHTML(p){
     <button class="prog-action-btn" aria-label="Delete this program forever" title="Delete forever" style="flex:0 0 auto;color:var(--red);padding:8px 10px;display:inline-flex;align-items:center" onclick="askPurgeFromProgress('${p.id}')">${asyIcon('trash',16)}</button>
   </div>`;
 }
-function askPurgeFromProgress(id){_setConfirmProgId(id);_setConfirmTier(2);renderProgressScreen();}
+function askPurgeFromProgress(id: any){_setConfirmProgId(id);_setConfirmTier(2);renderProgressScreen();}
 function cancelProgressConfirm(){_setConfirmProgId(null);_setConfirmTier(0);renderProgressScreen();}
-function setProgressView(id){_setProgressViewId(id);renderProgressScreen();}
+function setProgressView(id: any){_setProgressViewId(id);renderProgressScreen();}
 // ══ V165 — PROGRESS SCREEN REBUILD (D1/D2/D3/D5/D7/D8/D9/D10-A/D6) ══════════
 // Six modules replace the V164 run/lift chart stack. Swim and bike dot charts are
 // untouched: D7 named a run-and-lift set, and deleting a sport's only chart would
@@ -249,7 +260,7 @@ var EASY_MIN_RUNS = 6;   // coverage gate: below this the module draws an empty 
 // Forward read of PACE_CHART (mile equivalent -> half finish, seconds). The exact
 // mirror of _mileFromRecoverySec, which walks the same table the other way. Chaining
 // the two is a table lookup, not a model: zero invented constants.
-function _halfFromMileSec(mileSec){
+function _halfFromMileSec(mileSec: any){
   const rows=(typeof PACE_CHART!=='undefined')?PACE_CHART:null;
   if(!rows||!rows.length||!(mileSec>0)) return null;
   if(mileSec<=rows[0].mile) return rows[0].halfBest;
@@ -267,10 +278,11 @@ function _halfFromMileSec(mileSec){
 
 // Current week for ANY program. calcCurrentWeek() only knows activeProg, but Progress
 // is per-program (V156 G1), so a viewed program needs its own reckoning.
-function _progWeekNow(p){
+function _progWeekNow(p: any){
   if(!p||!p.startDate) return 0;
   const mon=getWeekMonday(p.startDate);
   const today=new Date(); today.setHours(0,0,0,0);
+  // @ts-expect-error TS2362 The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type
   const diff=Math.floor((today-mon)/86400000);
   if(diff<0) return 0;
   return Math.min(p.totalWeeks||6, Math.floor(diff/7)+1);
@@ -279,7 +291,7 @@ function _progWeekNow(p){
 // D6: the week to withhold from accumulating metrics, or 0 for none. A program with
 // no start date has no "now", so nothing is excluded. The final week is never cut —
 // once the block is over there is no in-progress week left to protect.
-function _cutWeek(p){
+function _cutWeek(p: any){
   const w=_progWeekNow(p);
   if(!(w>0)) return 0;
   return (w>=(p.totalWeeks||6)) ? 0 : w;
@@ -288,7 +300,7 @@ function _cutWeek(p){
 // Intensity class from the frozen ia_hist_ subtype string the engine already writes.
 // Order is load-bearing: "Easy Run — Long" is a long run, so /long/ must be tested
 // before /easy/. Benchmark runs are tests, not training, and classify to null.
-function _runClass(subtype){
+function _runClass(subtype: any){
   const s=String(subtype||'');
   if(!s) return null;
   if(/benchmark/i.test(s)) return null;
@@ -312,7 +324,7 @@ const RUN_CLASS_COLOR = {Recovery:'var(--run)', Easy:'var(--run)', Long:'var(--b
 // ── Module 1: LONG RUN LADDER ───────────────────────────────────────────────
 // Longest SINGLE run per week (not weekly volume — the ladder answers "can I cover
 // the distance", which is a single-effort question). D6 excluded: accumulating series.
-function ladderWeekly(logs, totalWeeks, cut, skip1){
+function ladderWeekly(logs: any, totalWeeks: any, cut: any, skip1: any){
   const wk={};
   Object.entries(logs||{}).forEach(([key,e])=>{
     if(!e) return;
@@ -323,8 +335,10 @@ function ladderWeekly(logs, totalWeeks, cut, skip1){
     // V238 (D224 max readers, Amendment 1 A5): the rest-day jog is one more candidate for the
     // week's longest single run, never added to the day's session: a double day's longest run is
     // max(session, jog).
+    // @ts-expect-error TS2339 Property 'run_dist' does not exist on type '{}'.
     const d=+e.run_dist, j=+((e.restLog||{}).run||{}).dist;
     const top=Math.max(d>0?d:0, j>0?j:0); if(!(top>0)) return;
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     wk[w]=Math.max(wk[w]||0, top);
   });
   return wk;
@@ -334,10 +348,12 @@ function ladderWeekly(logs, totalWeeks, cut, skip1){
 // Per-observation: the current week is KEPT (D6). Every logged run with a pace and a
 // resolvable class becomes one dot. Swapped sessions are excluded on the same grounds
 // V155 excludes them — a swapped session is not the prescribed run.
-function runsByClass(logs, hist, totalWeeks){
+function runsByClass(logs: any, hist: any, totalWeeks: any){
   const out={};
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{
   RUN_CLASS_ORDER.forEach(c=>out[c]=[]);
   Object.entries(logs||{}).forEach(([key,e])=>{
+    // @ts-expect-error TS2339 Property 'run_pace' does not exist on type '{}'.
     if(!e||!e.run_pace||e.swapTo) return;
     const m=key.match(/^w(\d+)_(.+)$/); if(!m) return;
     const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
@@ -345,7 +361,9 @@ function runsByClass(logs, hist, totalWeeks){
     if(!snap||!snap.cardio) return;                // no freeze -> excluded, never guessed
     if(String(snap.cardio.type||'').toLowerCase()!=='run') return;
     const cls=_runClass(snap.cardio.subtype); if(!cls) return;
+    // @ts-expect-error TS2339 Property 'run_pace' does not exist on type '{}'.
     const sec=_paceStrToSec(e.run_pace); if(!sec) return;
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type '"Tempo" | "Recovery" | "Interval" | "L
     out[cls].push({w, sec});
   });
   return out;
@@ -356,10 +374,12 @@ function runsByClass(logs, hist, totalWeeks){
 // pace is the only free variable. Weekly MEAN, never best — a best-of would reward
 // running easy days hot, the exact thing V155 was ruled against. Current week kept:
 // a mean does not understate on a partial week the way a sum does.
-function easyEffortWeekly(logs, hist, totalWeeks){
+function easyEffortWeekly(logs: any, hist: any, totalWeeks: any){
   const wk={}; let n=0;
   Object.entries(logs||{}).forEach(([key,e])=>{
+    // @ts-expect-error TS2339 Property 'run_pace' does not exist on type '{}'.
     if(!e||!e.run_pace||e.swapTo) return;
+    // @ts-expect-error TS2339 Property 'rpe' does not exist on type '{}'.
     const rpe=+e.rpe; if(!(rpe>=EASY_RPE_LO&&rpe<=EASY_RPE_HI)) return;
     const m=key.match(/^w(\d+)_(.+)$/); if(!m) return;
     const w=+m[1]; if(!(w>=1&&w<=totalWeeks)) return;
@@ -368,11 +388,14 @@ function easyEffortWeekly(logs, hist, totalWeeks){
     if(String(snap.cardio.type||'').toLowerCase()!=='run') return;
     const cls=_runClass(snap.cardio.subtype);
     if(cls!=='Recovery'&&cls!=='Easy') return;
+    // @ts-expect-error TS2339 Property 'run_pace' does not exist on type '{}'.
     const sec=_paceStrToSec(e.run_pace); if(!sec) return;
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     (wk[w]=wk[w]||[]).push(sec); n++;
   });
   const weekly={};
-  Object.entries(wk).forEach(([w,arr])=>{ weekly[+w]=arr.reduce((a,b)=>a+b,0)/arr.length; });
+  // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
+  Object.entries(wk).forEach(([w,arr])=>{ weekly[+w]=arr.reduce((a: any,b: any)=>a+b,0)/arr.length; });
   return {weekly, nRuns:n, nWeeks:Object.keys(weekly).length};
 }
 
@@ -381,10 +404,12 @@ function easyEffortWeekly(logs, hist, totalWeeks){
 // distance-dosed runs (a time-dosed run has no written mileage, and deriving one from
 // pace x time would be inventing a prescription). Summing all logged miles against a
 // partial set of prescriptions would manufacture a surplus. D6 excluded: weekly sum.
-function plannedVsLogged(logs, hist, totalWeeks, cut, skip1){
+function plannedVsLogged(logs: any, hist: any, totalWeeks: any, cut: any, skip1: any){
   const wk={};
   Object.entries(hist||{}).forEach(([key,snap])=>{
+    // @ts-expect-error TS2339 Property 'cardio' does not exist on type '{}'.
     if(!snap||!snap.cardio) return;
+    // @ts-expect-error TS2339 Property 'cardio' does not exist on type '{}'.
     const c=snap.cardio;
     if(String(c.type||'').toLowerCase()!=='run') return;
     const dose=c.dose; if(!dose||!(+dose.mi>0)) return;
@@ -395,7 +420,9 @@ function plannedVsLogged(logs, hist, totalWeeks, cut, skip1){
     const e=(logs||{})[key];
     if(e&&e.swapTo) return;                        // swapped away: not this prescription
     const act=(e&&+e.run_dist>0)?+e.run_dist:0;
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     if(!wk[w]) wk[w]={presc:0, act:0};
+    // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'number' can't be used to index type '{
     wk[w].presc+=+dose.mi; wk[w].act+=act;
   });
   return wk;
@@ -405,14 +432,17 @@ function plannedVsLogged(logs, hist, totalWeeks, cut, skip1){
 // Best e1RM per movement against a baseline the athlete actually supplied. Both sides
 // run through _epley() so a working triple is never measured against an intake single.
 const _LEDGER_MAIN = [
+  // @ts-expect-error TS7006 Parameter 'n' implicitly has an 'any' type.
   {k:'squat',    label:'Squat',    test:n=>(n.includes('back squat')||n.includes('front squat')||n.includes('box squat'))&&!n.includes('goblet')&&!n.includes('jump')},
+  // @ts-expect-error TS7006 Parameter 'n' implicitly has an 'any' type.
   {k:'bench',    label:'Bench',    test:n=>n.includes('bench')&&!n.includes('db')&&!n.includes('dumbbell')&&!n.includes('bench dip')},
+  // @ts-expect-error TS7006 Parameter 'n' implicitly has an 'any' type.
   {k:'deadlift', label:'Deadlift', test:n=>n.includes('deadlift')&&!n.includes('single-leg')&&!n.includes('romanian')}
 ];
 // Best estimated max from one stored entry. Prefers the per-set ladder (setsW/setsDone,
 // V105/V117) because the top e1RM is not always the top weight — 225x5 beats 245x1.
 // Falls back to entry.weight x parsed setsReps, then to the bare weight as a single.
-function _entryBestE1RM(en){
+function _entryBestE1RM(en: any){
   if(!en) return 0;
   let best=0;
   const sw=en.setsW||[], sd=en.setsDone||[];
@@ -426,23 +456,30 @@ function _entryBestE1RM(en){
   const reps=m?+m[1]:1;
   return _epley(w, reps>0?reps:1);
 }
-function ledgerRows(exw, cfg){
-  const mains=[], accessories=[];
+function ledgerRows(exw: any, cfg: any){
+  const mains: any[]=[], accessories: any[]=[];
   Object.values(exw||{}).forEach(ex=>{
+    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     const entries=(ex.entries||[]).filter(e=>+e.weight>0);
     if(!entries.length) return;
+    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     const n=(ex.name||'').toLowerCase();
     const hit=_LEDGER_MAIN.find(L=>L.test(n));
     let cur=0, curEn=null;
+    // @ts-expect-error TS7006 Parameter 'en' implicitly has an 'any' type.
     entries.forEach(en=>{ const v=_entryBestE1RM(en); if(v>cur){cur=v; curEn=en;} });
     if(!(cur>0)) return;
+    // @ts-expect-error TS18046 'ex' is of type 'unknown'.
     const row={name:ex.name||'', entries, cur, curEn};
     if(hit){
       const typed=+((cfg||{})[hit.k==='deadlift'?'deadlift':hit.k])||0;
       // NEVER DEFAULT_1RM — see the hard rule at the top of this block.
-      const first=entries.slice().sort((a,b)=>(a.week-b.week)||((a.ts||0)-(b.ts||0)))[0];
+      const first=entries.slice().sort((a: any,b: any)=>(a.week-b.week)||((a.ts||0)-(b.ts||0)))[0];
+      // @ts-expect-error TS2339 Property 'base' does not exist on type '{ name: any; entries: any; cur: number; curEn: null; }'.
       row.base   = typed>0 ? typed : _entryBestE1RM(first);
+      // @ts-expect-error TS2339 Property 'baseSrc' does not exist on type '{ name: any; entries: any; cur: number; curEn: null; }'.
       row.baseSrc= typed>0 ? 'intake 1RM' : 'W'+((first&&first.week)||1)+' logged';
+      // @ts-expect-error TS2339 Property 'label' does not exist on type '{ name: any; entries: any; cur: number; curEn: null; }'.
       row.label  = hit.label;
       mains.push(row);
     } else accessories.push(row);
