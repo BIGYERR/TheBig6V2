@@ -1,5 +1,5 @@
 import { esc, snapshotDay } from './storage.js';
-import { activeProgId, currentDayKey, currentWeek } from './rest-day-shell.js';
+import { activeProgId, currentDayKey, currentWeek } from './rest-day-shell.ts';
 import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
 import { EQUIP_TOKENS } from '../../../../../../core/src/engine/exercise-kinds.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';

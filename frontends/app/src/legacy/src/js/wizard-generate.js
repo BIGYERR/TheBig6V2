@@ -1,5 +1,5 @@
 import { getPrograms, savePrograms } from './storage.js';
-import { _setCurrentWeek, showScreen, showToast } from './rest-day-shell.js';
+import { _setCurrentWeek, showScreen, showToast } from './rest-day-shell.ts';
 import { LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
 import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.ts';
 import { WD, _applyWizardStart, _rsRace, renderWizardStep, resolveStartDate } from './wizard.js';

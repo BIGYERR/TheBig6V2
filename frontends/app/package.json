@@ -22,7 +22,7 @@
     "pretest": "npm run typecheck",
     "test:unit": "node ../../tools/run.mjs unit -- node --test --test-reporter=spec 'test/unit/**/*.test.ts'",
     "test:integration": "node ../../tools/run.mjs integration -- node --test --test-reporter=spec 'test/integration/**/*.test.ts'",
-    "typecheck": "node ../../tools/run.mjs typecheck -- tsc -p tsconfig.node.json",
+    "typecheck": "node ../../tools/run.mjs typecheck -- sh -c 'tsc -p tsconfig.node.json && tsc -p tsconfig.legacy.json'",
     "logs": "node ../../tools/logs.mjs",
     "ng": "ng",
     "lint": "node ../../tools/run.mjs lint -- ng lint",

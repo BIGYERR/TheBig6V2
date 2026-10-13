@@ -22,9 +22,13 @@
 // build then takes those spaces out (collapseTypes), so the page carries the JavaScript as it was written before its
 // types: the same tokens, and the same text but for comments (tools/same-script.mjs proves it against any earlier page).
 //
-// order.json is the one list of pieces. Every entry is a file under html/, css/ or js/ with that folder's extension,
-// or engine/ with .ts, named in lower case words joined by dashes, listed once; every such file in those folders (and
-// every .ts file in core/src/engine but its index.ts) must be listed, so no source file can sit outside the build. buildIndex() is exported for the dev container (backend/scripts/dev-watch.ts),
+// The app's own files follow the engine into TypeScript the same way (phase E's logic move, from v0.239.43): a js/ piece
+// may be js/<name>.ts beside the others' js/<name>.js, and the build strips its types as it strips the engine's.
+//
+// order.json is the one list of pieces. Every entry is a file under html/, css/ or js/ with that folder's extension
+// (or .ts under js/), or engine/ with .ts, named in lower case words joined by dashes, listed once; every such file in
+// those folders (and every .ts file in core/src/engine but its index.ts) must be listed, so no source file can sit
+// outside the build. buildIndex() is exported for the dev container (backend/scripts/dev-watch.ts),
 // which builds the page it serves from the same sources and never writes the repo root. Nothing is read or written
 // unless this file is run as a script; writePages() is exported for the tests' global setup and the backend.
 import { createHash } from 'node:crypto';
@@ -45,8 +49,8 @@ export const PAGES_DIR = join(APP, '..', '..', 'dist-github-pages');
 export const ICON = join(APP, '..', '..', 'apple-touch-icon.png');
 
 const FOLDERS = ['html', 'css', 'js'];
-/** html/<name>.html, css/<name>.css, js/<name>.js, engine/<name>.ts; <name> is lower case words joined by dashes. */
-const PIECE_RE = /^(?:(html|css|js)\/[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*\.\1|engine\/[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*\.ts)$/;
+/** html/<name>.html, css/<name>.css, js/<name>.js or js/<name>.ts, engine/<name>.ts; <name> is lower case words joined by dashes. */
+const PIECE_RE = /^(?:(html|css|js)\/[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*\.\1|(?:engine|js)\/[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*\.ts)$/;
 
 /**
  * core/src/engine beside a sources folder: the repo's core/ when `srcDir` is the repo's sources, and a copy's when it
@@ -181,9 +185,20 @@ export function pieceBytes(srcDir, piece) {
   if (piece.endsWith('.js')) return Buffer.from(moduleParts(bytes.toString('utf8')).body, 'utf8');
   if (piece.endsWith('.ts')) {
     const body = moduleParts(bytes.toString('utf8')).body;
-    return Buffer.from(collapseTypes(body, stripTypes(body, piece)), 'utf8');
+    return Buffer.from(withoutMarkers(collapseTypes(body, stripTypes(body, piece))), 'utf8');
   }
   return bytes;
+}
+
+/**
+ * The page's text of a TypeScript piece without the type checker's own lines: a `// @ts-expect-error TS<code> ...` line
+ * that tools/ts-expect.mjs wrote above a check the code cannot meet yet goes with the types, so the page reads the
+ * JavaScript as it was written. A marker written by hand, with words of its own, stays as the comment it is.
+ * @param {string} text
+ * @returns {string}
+ */
+export function withoutMarkers(text) {
+  return text.replace(/^[ \t]*\/\/ @ts-expect-error TS\d+ [^\n]*\n/gm, '');
 }
 
 /**
@@ -207,7 +222,7 @@ export function readOrder(srcDir = SOURCES) {
   for (const folder of FOLDERS) {
     const files = existsSync(join(srcDir, folder)) ? readdirSync(join(srcDir, folder)) : [];
     for (const file of files) {
-      if (file.endsWith(`.${folder}`) && !listed.has(`${folder}/${file}`)) {
+      if ((file.endsWith(`.${folder}`) || (folder === 'js' && file.endsWith('.ts'))) && !listed.has(`${folder}/${file}`)) {
         throw new Error(`${folder}/${file} is not in order.json, so the build would leave it out`);
       }
     }

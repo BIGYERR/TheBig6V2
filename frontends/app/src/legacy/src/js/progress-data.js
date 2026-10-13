@@ -2,7 +2,7 @@ import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { esc, getDayHistFor, getExWeightsFor, getLogsFor, getPrograms } from './storage.js';
 import {
   _setConfirmProgId, _setConfirmTier, _setProgressViewId, activeProgId, confirmProgId, confirmTier, showScreen,
-} from './rest-day-shell.js';
+} from './rest-day-shell.ts';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';
 import { PACE_CHART } from '../../../../../../core/src/engine/cardio-progression.ts';

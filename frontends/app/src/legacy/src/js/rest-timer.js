@@ -1,4 +1,4 @@
-import { _curScreen, activeProg } from './rest-day-shell.js';
+import { _curScreen, activeProg } from './rest-day-shell.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── Floating count-up rest stopwatch (PiP-style edge tab). Persists app-wide; runs through screen-lock. ──
 let _ruId=null,_ruRunning=false,_ruElapsed=0,_ruStart=0;

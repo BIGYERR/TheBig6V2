@@ -1,6 +1,6 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { getPrograms } from './storage.js';
-import { _setCalcLift, activeProg, calcLift, showScreen, showToast } from './rest-day-shell.js';
+import { _setCalcLift, activeProg, calcLift, showScreen, showToast } from './rest-day-shell.ts';
 import { DEFAULT_1RM, LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
 import {
   ALL_DAYS_ORDER, _ISO_ORDER, _isoOf, _parseLocalDate, getWeekMonday,

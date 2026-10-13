@@ -2,7 +2,7 @@ import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { completedKey, esc, getCompleted, getLogs, logKey } from './storage.js';
 import {
   _setCurrentWeek, activeProg, currentWeek, openRestSheet, restDayEligible, showToast,
-} from './rest-day-shell.js';
+} from './rest-day-shell.ts';
 import { ALL_DAYS_ORDER, _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL, _fmtStartDay } from './wizard.js';
 import { INJURY_REGIONS } from '../../../../../../core/src/engine/injury.ts';

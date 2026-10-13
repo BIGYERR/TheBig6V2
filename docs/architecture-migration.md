@@ -373,6 +373,11 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   resolves each name in the file that declares it. A takeover rebinds the declaration through a seam the bundle adds
   (`__iaTakeOver`), so every legacy caller reaches the component, as replacing the global did. The page and the sources
   are unchanged.
+- **The legacy logic into TypeScript (v0.239.43 on):** each app file turns TypeScript where it lies (`js/<name>.ts`,
+  still a piece of the page), by the phase D method: `tools/ts-expect.mjs` types an untyped name `any` where it is
+  declared and marks every other error with a `// @ts-expect-error` line the build strips, so no token changes, and
+  `tools/same-script.mjs` proves it (`docs/decisions/app-typescript.md`). `frontends/app/tsconfig.legacy.json` checks
+  them in the app's type check. Done: `rest-day-shell`, `update-check`, `bug-report-init` (v0.239.43).
 - **Left for phase E's "done when":** the rest sheet (its own build, v0.240.0); then the legacy logic itself, still
   JavaScript reached through `LegacyBridge` by name (280 legacy names used, 227 of them functions called, and 29
   functions taken over, counted at v0.239.41): it moves into TypeScript by the phase D method (types first, the same

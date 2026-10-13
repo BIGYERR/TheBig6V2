@@ -3,7 +3,7 @@ import { getActiveProgId, getPrograms, savePrograms } from './storage.js';
 import {
   _setActiveProg, _setCurrentWeek, activeProg, activeProgId, confirmProgId, confirmTier, editProgId, openProgIds,
   showToast,
-} from './rest-day-shell.js';
+} from './rest-day-shell.ts';
 import { DEFAULT_1RM, LIFTING_FOCUS_TO_GOAL } from '../../../../../../core/src/engine/exercise-library.ts';
 import { ALL_DAYS_ORDER, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { _fmtMileAnchor } from '../../../../../../core/src/engine/clock-format.ts';

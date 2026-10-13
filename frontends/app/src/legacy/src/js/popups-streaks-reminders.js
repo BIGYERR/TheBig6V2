@@ -1,6 +1,6 @@
 import { ASY_ICON_PATHS, asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { completedKey, getCompleted, saveCompleted, snapshotDay } from './storage.js';
-import { activeProg, activeProgId, showToast } from './rest-day-shell.js';
+import { activeProg, activeProgId, showToast } from './rest-day-shell.ts';
 import { ALL_DAYS_ORDER, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL } from './wizard.js';
 import { wildcardOn } from './random-wildcard.js';

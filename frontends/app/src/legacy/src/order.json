@@ -13,7 +13,7 @@
   "html/overlays.html",
   "engine/icons.ts",
   "js/storage.js",
-  "js/rest-day-shell.js",
+  "js/rest-day-shell.ts",
   "engine/exercise-library.ts",
   "engine/exercise-kinds.ts",
   "engine/calendar.ts",
@@ -48,9 +48,9 @@
   "js/progress-data.js",
   "js/progress-charts.js",
   "js/lift-ledger-progress-screen.js",
-  "js/bug-report-init.js",
+  "js/bug-report-init.ts",
   "js/popups-streaks-reminders.js",
-  "js/update-check.js",
+  "js/update-check.ts",
   "html/screens-late.html",
   "html/popups.html"
 ]

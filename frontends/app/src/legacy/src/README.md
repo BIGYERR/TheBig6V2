@@ -69,6 +69,17 @@ imports one of these. The engine is type-checked strictly on its own (`core/tsco
 a type is written onto the code as it ran and never by changing the code, which is the next pass's work, under the
 tests (`docs/decisions/engine-typescript.md`).
 
+## The app's own files turn TypeScript in place (architecture phase E)
+
+An app file turns TypeScript where it lies: `git mv js/<name>.js js/<name>.ts`, `order.json` names it `js/<name>.ts`, and
+`npm run build:index` rewrites the import blocks of every file that imports it. `node tools/ts-expect.mjs <name>` then
+makes it check clean under `frontends/app/tsconfig.legacy.json` (strict, `npm run typecheck` in the app) without one
+token of its code changing: a parameter or variable that nothing typed yet is typed `any` where it is declared, and
+every other error gets a `// @ts-expect-error TS<code> <message>` line above it, which the build strips with the
+types. `node tools/engine-move.mjs js/<name> <ref>` sets the blanks as for an engine file, and
+`node tools/same-script.mjs` proves the page's tokens. Each marker is type debt named where it lies; taking one out is
+the next pass's work, under the tests (`docs/decisions/app-typescript.md`).
+
 ## The files, in build order
 
 | File | What it holds |
@@ -87,7 +98,7 @@ tests (`docs/decisions/engine-typescript.md`).
 | `html/overlays.html` | detail, add, swap nudge, RPE info, random, rest, change, goal and mile sheets, rest float, the `<script>` open tag |
 | `engine/icons.ts` | the Asylum icon set as inline SVG (`ASY_ICON_PATHS`), the emoji each stands in for, `asyIcon` |
 | `js/storage.js` | `esc`, `ia_` program, log and history storage, set drafts, day history snapshots |
-| `js/rest-day-shell.js` | rest-day sheet and moves (`ia_moves_`), collisions, eligibility; global UI state (`activeProgId`, `currentWeek`, ...), `showScreen`, tab bar, toast |
+| `js/rest-day-shell.ts` | rest-day sheet and moves (`ia_moves_`), collisions, eligibility; global UI state (`activeProgId`, `currentWeek`, ...), `showScreen`, tab bar, toast |
 | `engine/exercise-library.ts` | `EXLIB`, carry and press sides, `REP_AFFINITY`, minimum experience, station class, supersets, renames, `exStoreKey` and `EX_KEY_ALIAS`, `seededRand`, swap universe; `LIFTING_FOCUS_TO_GOAL`, `DEFAULT_1RM` |
 | `engine/exercise-kinds.ts` | timed, rep-only and loaded movements (`isTimeExercise`, `isRepExercise`, `isTrackableWeight`), the equipment tokens, `roundWeight` |
 | `engine/calendar.ts` | the day orders (`ALL_DAYS_ORDER`, `_ISO_ORDER`), local dates (`_isoOf`, `_parseLocalDate`), `getWeekMonday` |
@@ -122,9 +133,9 @@ tests (`docs/decisions/engine-typescript.md`).
 | `js/progress-data.js` | progress screen entry, recovery pace trend, wizard seed, progress chips, ladder, class, easy, drift and ledger data |
 | `js/progress-charts.js` | chart builders, easy-zone charts |
 | `js/lift-ledger-progress-screen.js` | lift ledger model and cards; `renderProgressScreen`, dot charts |
-| `js/bug-report-init.js` | bug report, `init` |
+| `js/bug-report-init.ts` | bug report, `init` |
 | `js/popups-streaks-reminders.js` | reinforcement pop-ups; streaks, stats, reminders |
-| `js/update-check.js` | version label, update banner and check, and the boot statements that end the script (they call `init`) |
+| `js/update-check.ts` | version label, update banner and check, and the boot statements that end the script (they call `init`) |
 | `html/screens-late.html` | `</script>`, progress and bug screens, tab bar |
 | `html/popups.html` | reinforcement popup, confetti, `</body></html>` |
 

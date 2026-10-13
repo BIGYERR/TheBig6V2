@@ -1,7 +1,7 @@
 import {
   completedKey, getCompleted, getLogs, getPrograms, logKey, saveCompleted, saveLogs, savePrograms, snapshotDay,
 } from './storage.js';
-import { _setActiveProg, activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.js';
+import { _setActiveProg, activeProg, activeProgId, currentDayKey, currentWeek, showToast } from './rest-day-shell.ts';
 import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { markSwapOffered } from './swaps-edits.js';
 import { renderWeekView } from './week-view-sections.js';

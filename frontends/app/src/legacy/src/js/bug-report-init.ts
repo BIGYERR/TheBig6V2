@@ -1,5 +1,5 @@
 import { getActiveProgId, getPrograms } from './storage.js';
-import { activeProg, currentWeek, showScreen, showToast } from './rest-day-shell.js';
+import { activeProg, currentWeek, showScreen, showToast } from './rest-day-shell.ts';
 import { foldExAliasKeys } from '../../../../../../core/src/engine/exercise-library.ts';
 import { renderWeekView } from './week-view-sections.js';
 import { getExWeights, saveExWeights } from './log-entries.js';
@@ -7,7 +7,7 @@ import { _ruIsland } from './rest-timer.js';
 import { renderProgList } from './programs.js';
 import { loadActiveProgram } from './program-manage.js';
 import { maybeShowReminder } from './popups-streaks-reminders.js';
-import { IA_VERSION, iaVersionLabel } from './update-check.js';
+import { IA_VERSION, iaVersionLabel } from './update-check.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 // BUG REPORT — posts to Web3Forms (static-site friendly; no backend).
@@ -20,8 +20,10 @@ async function submitBug(){
   const status=document.getElementById('bugStatus');
   const btn=document.getElementById('bugSubmit');
   if(!ta||!status) return;
+  // @ts-expect-error TS2339 Property 'value' does not exist on type 'HTMLElement'.
   const txt=(ta.value||'').trim();
   if(!txt){status.style.color='var(--muted)';status.textContent='Type what went wrong first.';return;}
+  // @ts-expect-error TS2367 This comparison appears to be unintentional because the types '"0d660f2b-c9d3-4a37-b944-21150f8fb40c"' 
   if(BUG_FORM_KEY==='YOUR_WEB3FORMS_ACCESS_KEY'){status.style.color='var(--red)';status.textContent='Bug form not configured yet — add your Web3Forms key.';return;}
   let ctx='';
   try{
@@ -36,6 +38,7 @@ async function submitBug(){
       +(ap?('program: '+(ap.name||'?')+' / goal '+(ap.goal||'?')+' / wk '+currentWeek+' / id '+(ap.id||'?')):'program: none');
   }catch(e){}
   const _lbl=btn?btn.textContent:'';
+  // @ts-expect-error TS2339 Property 'disabled' does not exist on type 'HTMLElement'.
   if(btn){btn.disabled=true;btn.textContent='Sending…';btn.style.opacity='0.6';}
   status.style.color='var(--muted)';status.textContent='';
   try{
@@ -45,11 +48,13 @@ async function submitBug(){
       body:JSON.stringify({access_key:BUG_FORM_KEY,subject:'The Asylum — Bug Report',from_name:'Asylum Bug Reporter',message:txt+ctx})
     });
     let j={};try{j=await r.json();}catch(e){}
+    // @ts-expect-error TS2339 Property 'success' does not exist on type '{}'.
     if(r.ok&&j&&j.success){ta.value='';status.style.color='var(--green)';status.textContent='Sent ✓ — thanks, I got it.';showToast('Bug sent ✓');}
     else{status.style.color='var(--red)';status.textContent='Could not send — try again in a sec.';}
   }catch(e){
     status.style.color='var(--red)';status.textContent='Network error — try again.';
   }finally{
+    // @ts-expect-error TS2339 Property 'disabled' does not exist on type 'HTMLElement'.
     if(btn){btn.disabled=false;btn.textContent=_lbl;btn.style.opacity='1';}
   }
 }
@@ -65,6 +70,7 @@ function init(){
   const aid=getActiveProgId();const programs=getPrograms();
   // V221 D178: boot switches through the loader, so a fallback pick is written back to ia_active.
   // The alias fold rides in as the loader's pre-refresh step: after activeProgId, before refreshProgram.
+  // @ts-expect-error TS7006 Parameter 'p' implicitly has an 'any' type.
   if(aid&&programs.length){const stored=programs.find(p=>p.id===aid&&!p.archived)||programs.find(p=>!p.archived);if(stored&&loadActiveProgram(stored.id,()=>{try{const _x=getExWeights();if(foldExAliasKeys(_x))saveExWeights(_x);}catch(e){}})){showScreen('screenWeek');renderWeekView();setTimeout(maybeShowReminder,600);return;}}
   // V221 D178: a pointer that resolved to nothing loadable (every program archived, or none
   // stored) is cleared through the loader before Home, so ia_active never names a program that

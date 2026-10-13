@@ -1,4 +1,4 @@
-import { init } from './bug-report-init.js';
+import { init } from './bug-report-init.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 /* ═══════════════════════════════════════════
@@ -7,11 +7,12 @@ import { init } from './bug-report-init.js';
    own version from its own DOM; the check re-fetches index.html with no-store
    and reads the same meta from the fresh bytes. No service worker involved.
 ═══════════════════════════════════════════ */
+// @ts-expect-error TS2339 Property 'content' does not exist on type 'Element | {}'.
 const IA_VERSION = (document.querySelector('meta[name="ia-version"]')||{}).content || '0';
 // v0.239.1 (D236.1): the version as people read it, 'v' plus MAJOR.MINOR.PATCH. One leading v or V is dropped
 // first, so the label never reads vv. A pre-semver integer N reads 0.N.0 (239 prints v0.239.0); anything else
 // prints as given after one v, so the label never throws. IA_VERSION stays the raw meta for the update check.
-function iaVersionLabel(ver){
+function iaVersionLabel(ver: any){
   var s=String(ver),t=/^[vV]/.test(s)?s.slice(1):s;
   return /^(0|[1-9][0-9]*)$/.test(t)?'v0.'+t+'.0':'v'+t;
 }

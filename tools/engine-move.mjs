@@ -2,7 +2,9 @@
 // Architecture phase D: after an engine file has moved to core/src/engine/<name>.ts and gained its types, make the page
 // carry it as the JavaScript it was, text for text, but for the comments the move added:
 //
-//   node tools/engine-move.mjs <name> <ref>     e.g. node tools/engine-move.mjs engine-c v0.239.3
+//   node tools/engine-move.mjs <name> <ref>       e.g. node tools/engine-move.mjs engine-c v0.239.3
+//   node tools/engine-move.mjs js/<name> <ref>    an app file turned TypeScript in place (phase E's logic move,
+//                                                 frontends/app/src/legacy/src/js/<name>.ts, from v0.239.43)
 //
 // The build strips the types and takes the blanks they leave out (frontends/app/scripts/build-index.mjs, collapseTypes),
 // so the page reads the code as the TypeScript lays it out between its types. An annotation written with a blank of its
@@ -19,12 +21,14 @@ import { REPO } from './runlog.mjs';
 
 const { collapseTypes, moduleParts, stripTypes } = await import(pathToFileURL(join(REPO, 'frontends', 'app', 'scripts', 'build-index.mjs')).href);
 
-const [name, ref] = process.argv.slice(2);
-if (!name || !ref) {
-  console.error('usage: node tools/engine-move.mjs <name> <ref>');
+const [arg, ref] = process.argv.slice(2);
+if (!arg || !ref) {
+  console.error('usage: node tools/engine-move.mjs <name> <ref>, or js/<name> <ref> for an app file');
   process.exit(2);
 }
-const file = join(REPO, 'core', 'src', 'engine', `${name}.ts`);
+const app = arg.startsWith('js/');
+const name = app ? arg.slice('js/'.length) : arg;
+const file = app ? join(REPO, 'frontends', 'app', 'src', 'legacy', 'src', 'js', `${name}.ts`) : join(REPO, 'core', 'src', 'engine', `${name}.ts`);
 let was;
 try {
   was = moduleParts(execFileSync('git', ['-C', REPO, 'show', `${ref}:frontends/app/src/legacy/src/js/${name}.js`], { encoding: 'utf8', maxBuffer: 64 << 20, stdio: ['ignore', 'pipe', 'ignore'] })).body;

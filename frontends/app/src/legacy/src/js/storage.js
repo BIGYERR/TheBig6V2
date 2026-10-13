@@ -1,4 +1,4 @@
-import { activeProg, activeProgId, currentDayKey, currentWeek } from './rest-day-shell.js';
+import { activeProg, activeProgId, currentDayKey, currentWeek } from './rest-day-shell.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 
 

@@ -3,7 +3,7 @@ import {
   _setActiveProg, _setActiveProgId, _setConfirmProgId, _setConfirmTier, _setCurrentDayKey, _setCurrentWeek,
   _setEditProgId, _setProgressViewId, activeProg, activeProgId, applyRestDayMoves, progressViewId, showScreen,
   showToast,
-} from './rest-day-shell.js';
+} from './rest-day-shell.ts';
 import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { applyDayEdits, applySessionSwaps, getDayEdits, getSwaps, pruneDayEdits } from './swaps-edits.js';
 import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';

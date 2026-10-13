@@ -1,6 +1,6 @@
 // The bug report's logic (src/app/screens/bug-report/bug-report-model.ts, architecture phase E step 1), against the
 // legacy script it replaces: the context block, the body posted to Web3Forms, and how a send ends. Every expected string
-// is typed here from the legacy submitBug (frontends/app/src/legacy/src/js/bug-report-init.js), never asked of the model.
+// is typed here from the legacy submitBug (frontends/app/src/legacy/src/js/bug-report-init.ts), never asked of the model.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { BUG_FORM_KEY, BUG_FORM_URL, BUG_SENT_TOAST, BUG_STATUS, bugContextText, bugPayload, submitBugReport } from '../../src/app/screens/bug-report/bug-report-model.ts';

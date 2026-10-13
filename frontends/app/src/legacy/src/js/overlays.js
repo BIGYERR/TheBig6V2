@@ -1,6 +1,6 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { getPrograms, savePrograms } from './storage.js';
-import { _setActiveProg, activeProg, showToast } from './rest-day-shell.js';
+import { _setActiveProg, activeProg, showToast } from './rest-day-shell.ts';
 import { _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { INJURY_REGIONS, injuryPlan } from '../../../../../../core/src/engine/injury.ts';
 import { buildProgram } from '../../../../../../core/src/engine/budget-engine-d.ts';

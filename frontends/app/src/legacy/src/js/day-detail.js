@@ -3,7 +3,7 @@ import { clearSetDraft, completedKey, getCompleted, getLogs, getPrograms, logKey
 import {
   _setCurrentDayKey, _setStaleWarnShown, _setStaleWarnSrc, activeProg, activeProgId, currentDayKey, currentWeek,
   showToast,
-} from './rest-day-shell.js';
+} from './rest-day-shell.ts';
 import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
 import { DAY_FULL } from './wizard.js';
 import { wildcardTagHTML } from './random-wildcard.js';

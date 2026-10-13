@@ -1,6 +1,6 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { completedKey, esc, getWildcardDone, saveWildcardDone } from './storage.js';
-import { _setCurrentRandIdx, activeProg, showToast } from './rest-day-shell.js';
+import { _setCurrentRandIdx, activeProg, showToast } from './rest-day-shell.ts';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { _setCurrentRandDayKey, _setLastRandIdx, lastRandIdx } from './wizard.js';
 import { buildSectionsHTML, dayBeforeStart, renderWeekView } from './week-view-sections.js';

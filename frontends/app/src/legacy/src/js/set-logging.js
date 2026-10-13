@@ -3,7 +3,7 @@ import { esc, getDayHist, getExWeightsFor, getLogs, getPrograms, readSetDraft, w
 import {
   _setStaleWarnShown, _setStaleWarnSrc, _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, currentDayKey,
   currentWeek,
-} from './rest-day-shell.js';
+} from './rest-day-shell.ts';
 import { exStoreKey, foldExAliasKeys } from '../../../../../../core/src/engine/exercise-library.ts';
 import { isRepExercise, isTimeExercise, isTrackableWeight } from '../../../../../../core/src/engine/exercise-kinds.ts';
 import { _clkMS } from '../../../../../../core/src/engine/clock-format.ts';

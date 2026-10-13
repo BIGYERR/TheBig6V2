@@ -32,8 +32,13 @@ function classic(text: string): string {
 }
 /** The engine's TypeScript (architecture phase D): order.json's engine/<name>.ts is core/src/engine/<name>.ts. */
 const LIVE_ENGINE = join(REPO, 'core', 'src', 'engine');
-/** A TypeScript file as the page carries it: Node's own stripper, called here, then the build's collapse of the blanks. */
-const stripped = (code: string) => collapseTypes(code, stripTypeScriptTypes(code, { mode: 'strip' }));
+/**
+ * A TypeScript file as the page carries it: Node's own stripper, called here, then the build's collapse of the blanks,
+ * then without the lines tools/ts-expect.mjs writes above a check the code cannot meet yet (`// @ts-expect-error TS<n> `,
+ * the form typed here by hand), which go with the types.
+ */
+const stripped = (code: string) =>
+  collapseTypes(code, stripTypeScriptTypes(code, { mode: 'strip' })).split('\n').filter((l) => !/^[ \t]*\/\/ @ts-expect-error TS\d+ /.test(l)).join('\n');
 const pieceOnPage = (piece: string) => {
   const bytes = readFileSync(piece.startsWith('engine/') ? join(LIVE_ENGINE, piece.slice('engine/'.length)) : join(LIVE_SOURCES, piece));
   if (piece.endsWith('.ts')) return Buffer.from(stripped(classic(bytes.toString('utf8'))), 'utf8');
@@ -243,5 +248,16 @@ describe('build-index on fixture sources', () => {
     rmSync(join(engine, 'stray.ts'));
     writeFileSync(join(engine, 'index.ts'), "export { pace } from './pace.ts';\n");
     assert.doesNotThrow(() => readOrder(dir), 'the engine\'s index.ts is the package entry, never a piece');
+  });
+
+  it('builds an app file turned TypeScript in place: its types out, the type checker\'s marker lines out, a hand marker kept', () => {
+    const { dir } = fixture();
+    rmSync(join(dir, 'js', 'app.js'));
+    writeFileSync(join(dir, 'js', 'app.ts'), "function go(n: any): string {\n  // @ts-expect-error TS2339 Property 'x' does not exist on type '{}'.\n  const v = ({}).x;\n  // @ts-expect-error kept: a finding, written by hand\n  return 'x' + v + n;\n}\n");
+    writeFileSync(join(dir, 'order.json'), JSON.stringify(['html/top.html', 'css/base.css', 'html/body.html', 'js/app.ts', 'html/end.html']));
+    assert.equal(buildIndex(dir).toString('utf8'), '<!doctype html>\n<html><head><style>body{color:red}\n</style></head><body><script>'
+      + "function go(n) {\n  const v = ({}).x;\n  // @ts-expect-error kept: a finding, written by hand\n  return 'x' + v + n;\n}\n</script></body></html>\n");
+    writeFileSync(join(dir, 'js', 'stray.ts'), 'export {};\n');
+    assert.throws(() => readOrder(dir), /js\/stray\.ts is not in order\.json/);
   });
 });
