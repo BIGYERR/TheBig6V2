@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
-import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 import { EMPTY_HTML, type ListedProgram, type ProgramCard, programList } from './program-list-model';
 import { ProgramDetail } from './program-detail';
-import { type DetailChip, programDetail, type ProgramDetailView, type ProgSel } from './program-detail-model';
+import { programDetail, type ProgramDetailView } from './program-detail-model';
 
 /**
  * The home screen's program list (architecture phase E, step 4), in place of the legacy renderProgList inside
@@ -105,14 +105,14 @@ export class ProgramList {
 
   /** Reads the legacy store and state into the view. */
   private read(): void {
-    const icon = (key: string, size: number) => this.bridge.call<string>('asyIcon', key, size);
-    this.programs = this.bridge.call<ListedProgram[]>('getPrograms');
+    const icon = (key: string, size: number) => this.bridge.call('asyIcon', key, size);
+    this.programs = this.bridge.call('getPrograms');
     const v = programList(this.programs, {
-      activeId: this.bridge.call<string | null>('getActiveProgId'),
-      openIds: this.bridge.global<Set<string>>('openProgIds'),
-      editId: this.bridge.global<string | null>('editProgId'),
-      confirmId: this.bridge.global<string | null>('confirmProgId'),
-      confirmTier: this.bridge.global<number>('confirmTier'),
+      activeId: this.bridge.call('getActiveProgId'),
+      openIds: (this.bridge.global('openProgIds') as Set<string>),
+      editId: this.bridge.global('editProgId'),
+      confirmId: this.bridge.global('confirmProgId'),
+      confirmTier: this.bridge.global('confirmTier'),
     }, icon);
     this.empty.set(v.empty);
     this.cards.set(v.cards);
@@ -126,13 +126,13 @@ export class ProgramList {
   }
 
   protected toggle(id: string): void {
-    const open = this.bridge.global<Set<string>>('openProgIds');
+    const open = this.bridge.global('openProgIds');
     if (open.has(id)) open.delete(id);
     else open.add(id);
     this.render();
   }
 
-  protected call(name: string, ...args: unknown[]): void {
+  protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
     this.bridge.call(name, ...args);
   }
 
@@ -145,7 +145,7 @@ export class ProgramList {
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
   protected icon(key: string, size: number): SafeHtml {
-    return this.markup(this.bridge.call<string>('asyIcon', key, size));
+    return this.markup(this.bridge.call('asyIcon', key, size));
   }
   protected emptyHtml(why: 'none' | 'archived'): SafeHtml {
     return this.markup(EMPTY_HTML[why]);
@@ -153,8 +153,8 @@ export class ProgramList {
   /** The legacy progDetailHTML's reads: the selections, the day and goal names, and the run paces when the run reads the chart. */
   private detail(p: ListedProgram): ProgramDetailView {
     const b = this.bridge;
-    const s = b.call<ProgSel>('progSelData', p);
-    const paces = s.runAnchor ? { chips: b.call<DetailChip[]>('runAnchorChips', s.runAnchor), sentence: b.call<string>('runAnchorSentence', s.runAnchor) } : null;
+    const s = b.call('progSelData', p);
+    const paces = s.runAnchor ? { chips: b.call('runAnchorChips', s.runAnchor), sentence: b.call('runAnchorSentence', s.runAnchor) } : null;
     return programDetail(p.id, s, { dayNames: b.global('_DAYF'), goalLabels: b.global('_GOAL_LABELS') }, paces);
   }
   protected archiveQuestion(name: string): SafeHtml {

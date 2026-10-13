@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
-import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 import type { ProgramDetailView } from './program-detail-model';
 
 /**
@@ -46,9 +46,9 @@ export class ProgramDetail {
     return h;
   }
   protected icon(key: string, size: number): SafeHtml {
-    return this.html(this.bridge.call<string>('asyIcon', key, size));
+    return this.html(this.bridge.call('asyIcon', key, size));
   }
-  protected call(name: string, ...args: unknown[]): void {
+  protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
     this.bridge.call(name, ...args);
   }
 }

@@ -1,6 +1,6 @@
 import { ApplicationRef, ChangeDetectionStrategy, Component, type ElementRef, inject, signal, viewChild } from '@angular/core';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
-import { type Countdown, MILE_INTRO, mileField, mileLocked, mileLockFacts } from './mile-sheet-model';
+import { MILE_INTRO, mileField, mileLocked, mileLockFacts } from './mile-sheet-model';
 import { MileSheetState } from './mile-sheet-state';
 
 /** A stored program, as far as the pencil reads it. */
@@ -63,15 +63,15 @@ export class MileSheet {
 
   /** The legacy openMileSheet: the lock in a program's last three weeks, the edit sheet before them. */
   private open(progId: string): void {
-    const p = this.bridge.call<MileProgram[]>('getPrograms').find((x) => x.id === progId);
+    const p = (this.bridge.call('getPrograms') as MileProgram[]).find((x) => x.id === progId);
     if (!p) return;
     const tw = p.totalWeeks || 6;
-    const week = this.bridge.call<number>('_goalCurWeek', p);
+    const week = this.bridge.call('_goalCurWeek', p);
     if (mileLocked(week, tw)) {
       this.state.lock.set(mileLockFacts(p.cfg?.raceDate, week, tw, {
-        countdown: (iso) => this.bridge.call<Countdown | null>('raceCountdown', iso),
-        words: (cd) => this.bridge.call<{ card: string } | null>('raceCountdownWords', cd),
-        day: (iso) => this.bridge.call<string>('_fmtStartDay', iso, true),
+        countdown: (iso) => this.bridge.call('raceCountdown', iso),
+        words: (cd) => this.bridge.call('raceCountdownWords', cd),
+        day: (iso) => this.bridge.call('_fmtStartDay', iso, true),
       }));
       this.appRef.tick();
       this.show('mileLockOverlay');

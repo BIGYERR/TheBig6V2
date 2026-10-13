@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
-import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 import {
-  alignedPips, baselineSuffix, type CardioDraft, type CardioField, type CardioGoalDraft, type CardioReads, cardioStep, type CardioStep, type GoalChoice, localIso,
+  alignedPips, baselineSuffix, type CardioDraft, type CardioField, type CardioGoalDraft, type CardioReads, cardioStep, type CardioStep, localIso,
   mileAdvisory, prepareCardioDraft, raceButtonStyle, type Seed, seedView, swimAdvisory, unitButtonStyle,
 } from './cardio-goal-model';
 import {
-  type Choice, daysView, equipmentChoices, LIFT_LABELS, type LiftOption, liftingView, nameSummary, primaryChoices, profileView,
+  type Choice, daysView, equipmentChoices, LIFT_LABELS, liftingView, nameSummary, primaryChoices, profileView,
   unitStyle, type WizardDraft, wizardShell, WIZARD_STEPS,
 } from './wizard-model';
 
@@ -403,20 +403,20 @@ export class Wizard {
     return h;
   }
   protected lockTitle(): SafeHtml {
-    return this.html(this.bridge.call<string>('asyIcon', '🔒', 13) + ' You\'re at your minimum training days');
+    return this.html(this.bridge.call('asyIcon', '🔒', 13) + ' You\'re at your minimum training days');
   }
   /** The legacy Lift Only card: no cardio, no goals, then the step again. */
   protected liftOnly(): void {
-    const d = this.bridge.global<WizardDraft>('WD');
+    const d = this.bridge.global('WD');
     d.cardioTypes = [];
     d.cardioGoals = {};
     this.render();
   }
   protected setName(e: Event): void {
-    this.bridge.global<WizardDraft>('WD').name = (e.target as HTMLInputElement).value;
+    (this.bridge.global('WD') as WizardDraft).name = (e.target as HTMLInputElement).value;
   }
   protected setStart(e: Event): void {
-    this.bridge.global<WizardDraft>('WD').startDate = (e.target as HTMLInputElement).value;
+    (this.bridge.global('WD') as WizardDraft).startDate = (e.target as HTMLInputElement).value;
     this.updateStart();
   }
 
@@ -424,7 +424,7 @@ export class Wizard {
   protected edit(field: CardioField, sport: string, key: string, e: Event): void {
     const v = (e.target as HTMLInputElement).value;
     const b = this.bridge;
-    const g = (b.global<CardioDraft>('WD').cardioGoals[sport] as CardioGoalDraft);
+    const g = ((b.global('WD') as CardioDraft).cardioGoals[sport] as CardioGoalDraft);
     g[key] = v;
     if (field === 'swimTarget') {
       b.call('updatePaceTime', 'swim');
@@ -450,7 +450,7 @@ export class Wizard {
   }
   /** The race date buttons: a date (today when none is picked yet), or none and no week count, then the step again. */
   protected raceDate(targeted: boolean): void {
-    const d = this.bridge.global<CardioDraft>('WD');
+    const d = this.bridge.global('WD');
     d.eventTargeted = targeted;
     if (targeted) {
       if (!d.raceDate) d.raceDate = localIso(new Date());
@@ -461,37 +461,37 @@ export class Wizard {
     this.render();
   }
   protected setRaceDate(e: Event): void {
-    this.bridge.global<CardioDraft>('WD').raceDate = (e.target as HTMLInputElement).value;
+    (this.bridge.global('WD') as CardioDraft).raceDate = (e.target as HTMLInputElement).value;
     this.bridge.call('updateRaceDateFeedback');
   }
 
   /** A seed banner line: the chart icon, then its words (the program's name read as markup, as the legacy banner read it). */
   protected seedLine(size: number, words: string): SafeHtml {
-    return this.html(this.bridge.call<string>('asyIcon', 'chart', size) + words);
+    return this.html(this.bridge.call('asyIcon', 'chart', size) + words);
   }
 
   protected icon(name: string, size: number): SafeHtml {
     const key = name + '/' + size;
     let h = this.icons.get(key);
     if (!h) {
-      h = this.sanitizer.bypassSecurityTrustHtml(this.bridge.call<string>('asyIcon', name, size));
+      h = this.sanitizer.bypassSecurityTrustHtml(this.bridge.call('asyIcon', name, size));
       this.icons.set(key, h);
     }
     return h;
   }
-  protected call(name: string, ...args: unknown[]): void {
+  protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
     this.bridge.call(name, ...args);
   }
   /** A card's choice, as the legacy handler wrote it: the draft's field, then the step again. */
   protected set(key: 'primaryPath' | 'experience' | 'ageBracket' | 'equipment' | 'liftingFocus', id: string): void {
-    this.bridge.global<WizardDraft>('WD')[key] = id;
+    this.bridge.global('WD')[key] = id;
     this.render();
   }
 
   /** The legacy renderWizardStep: the shell and the step, drawn at once. */
   private render(): void {
-    const step = this.bridge.global<number>('wizardStep');
-    const draft = this.bridge.global<WizardDraft>('WD');
+    const step = this.bridge.global('wizardStep');
+    const draft = this.bridge.global('WD') as WizardDraft;
     const name = WIZARD_STEPS[step]!;
     this.shell.set(wizardShell(step, draft.primaryPath));
     this.view.set(
@@ -499,7 +499,7 @@ export class Wizard {
         : name === 'profile' ? { step: 'profile', profile: profileView(draft) }
           : name === 'equipment' ? { step: 'equipment', choices: equipmentChoices(draft) }
             : name === 'cardio_goal' ? { step: 'cardio_goal', cardio: this.cardio() }
-              : name === 'lifting_focus' ? { step: 'lifting_focus', lifting: liftingView(draft, this.bridge.global<{ body: LiftOption[]; event: LiftOption[] }>('LIFTING_OPTIONS')) }
+              : name === 'lifting_focus' ? { step: 'lifting_focus', lifting: liftingView(draft, this.bridge.global('LIFTING_OPTIONS')) }
                 : name === 'days' ? { step: 'days', days: this.days(draft) }
                   : { step: 'name', name: this.name(draft) },
     );
@@ -511,22 +511,22 @@ export class Wizard {
   /** The cardio goal step: the draft prepared as the legacy step prepared it, then its reads from the legacy helpers. */
   private cardio(): CardioStep {
     const b = this.bridge;
-    const draft = b.global<CardioDraft>('WD');
+    const draft = b.global('WD') as CardioDraft;
     const today = localIso(new Date());
-    const hybridExcluded = b.global<ReadonlySet<string>>('HYBRID_EXCLUDED_GOALS');
+    const hybridExcluded = b.global('HYBRID_EXCLUDED_GOALS');
     prepareCardioDraft(draft, hybridExcluded, today);
     const reads: CardioReads = {
-      goalsByType: b.global<Record<string, GoalChoice[]>>('CARDIO_GOALS_BY_TYPE'),
+      goalsByType: b.global('CARDIO_GOALS_BY_TYPE'),
       hybridExcluded,
-      swimDist: b.global<Record<string, number>>('SWIM_GOAL_DIST'),
-      icon: (key, size) => b.call<string>('asyIcon', key, size),
-      clock: (secs) => b.call<string>('_clkMS', secs),
-      paceTarget: (g) => b.call<{ tTotalSecs?: number; tPacePerMile?: number }>('paceGoalTarget', g),
-      seed: () => seedView(draft as CardioDraft & { _seedDismissed?: boolean; _seed?: Seed | null; _seedApplied?: boolean }, () => b.call<Seed | null>('seedFromPriorPrograms'), (sec) => b.call<string | null>('_fmtPaceMi', sec)),
+      swimDist: b.global('SWIM_GOAL_DIST'),
+      icon: (key, size) => b.call('asyIcon', key, size),
+      clock: (secs) => b.call('_clkMS', secs),
+      paceTarget: (g) => (b.call('paceGoalTarget', g as LegacyArgs<'paceGoalTarget'>[0]) as { tTotalSecs?: number; tPacePerMile?: number }),
+      seed: () => seedView(draft as CardioDraft & { _seedDismissed?: boolean; _seed?: Seed | null; _seedApplied?: boolean }, () => (b.call('seedFromPriorPrograms') as Seed | null), (sec) => (b.call('_fmtPaceMi', sec) as string | null)),
       swimAdvisory: () => swimAdvisory(b.call('_swimEntryState')),
-      mileHelp: () => b.call<string>('_mileFieldHelp'),
+      mileHelp: () => b.call('_mileFieldHelp'),
       mileAdvisory: () => mileAdvisory(b.call('_mileEntryState')),
-      progLen: () => b.call<string>('progLenLineHTML'),
+      progLen: () => b.call('progLenLineHTML'),
       today,
     };
     return cardioStep(draft, reads);
@@ -535,9 +535,9 @@ export class Wizard {
   /** The days step's reads: the advisories, the floor and the goals' names, from their legacy helpers. */
   private days(draft: WizardDraft): ReturnType<typeof daysView> {
     return daysView(draft, {
-      advisories: this.bridge.call<string[]>('getDayAdvisories'),
-      minDays: this.bridge.call<number>('getMinTrainDays'),
-      goalLabel: (id) => this.bridge.call<string>('goalLabel', id),
+      advisories: this.bridge.call('getDayAdvisories'),
+      minDays: this.bridge.call('getMinTrainDays'),
+      goalLabel: (id) => this.bridge.call('goalLabel', id),
     });
   }
 
@@ -546,35 +546,35 @@ export class Wizard {
     const b = this.bridge;
     const types = draft.cardioTypes || [];
     const goals = draft.cardioGoals || {};
-    const internalGoal = b.global<Record<string, string>>('LIFTING_FOCUS_TO_GOAL')[draft.liftingFocus || ''] || draft.liftingFocus;
+    const internalGoal = b.global('LIFTING_FOCUS_TO_GOAL')[draft.liftingFocus || ''] || draft.liftingFocus;
     const liftLabel = LIFT_LABELS[draft.liftingFocus || ''] || draft.liftingFocus;
     const sport: Record<string, [string, string]> = { run: ['🏃', 'Run'], bike: ['🚴', 'Bike'], swim: ['🏊', 'Swim'] };
     const cardio = types.length
-      ? types.map((t) => b.call<string>('asyIcon', sport[t]![0], 15) + ' ' + sport[t]![1] + (goals[t] && goals[t]!.label ? ': ' + goals[t]!.label : '')).join(' + ')
+      ? types.map((t) => b.call('asyIcon', sport[t]![0], 15) + ' ' + sport[t]![1] + (goals[t] && goals[t]!.label ? ': ' + goals[t]!.label : '')).join(' + ')
       : 'Lift only';
-    const pin = b.call<{ tw?: number } | null>('wizardTestPin');
+    const pin = b.call('wizardTestPin');
     const weeks = (pin || {}).tw || (types.length
-      ? b.call<{ weeks: number }>('calcProgramLength', types, { ...goals, _experience: draft.experience, _ageBracket: draft.ageBracket, _eventTargeted: draft.eventTargeted }, internalGoal).weeks
+      ? (b.call('calcProgramLength', types as LegacyArgs<'calcProgramLength'>[0], { ...goals, _experience: draft.experience, _ageBracket: draft.ageBracket, _eventTargeted: draft.eventTargeted } as LegacyArgs<'calcProgramLength'>[1], internalGoal) as { weeks: number }).weeks
       : 6);
-    if (!draft.name) draft.name = liftLabel + ' Block ' + (b.call<unknown[]>('getPrograms').length + 1);
-    if (!draft.startDate) draft.startDate = b.call<string>('_isoToday');
+    if (!draft.name) draft.name = liftLabel + ' Block ' + (b.call('getPrograms').length + 1);
+    if (!draft.startDate) draft.startDate = b.call('_isoToday');
     const sr = b.call('resolveStartDate', draft.startDate, draft.restDays || [], b.call('_rsRace', draft));
-    const al = b.call<{ start: string; underFloor?: boolean; tw: number; openWeek: number; futureWeeks?: number } | null>('wizardAlignment');
+    const al = b.call('wizardAlignment');
     let raceRow: string | null = null;
     if (draft.primaryPath === 'event' && draft.raceDate) {
-      const cd = b.call<{ days: number } | null>('raceCountdown', draft.raceDate);
-      const w = b.call<{ card: string; copy: string } | null>('raceCountdownWords', cd);
-      raceRow = b.call<string>('_fmtStartDay', draft.raceDate, true) + (!w ? '' : cd!.days <= 0 ? ' (' + w.copy + ')' : ' (' + w.card + ' away)');
+      const cd = b.call('raceCountdown', draft.raceDate);
+      const w = b.call('raceCountdownWords', cd);
+      raceRow = b.call('_fmtStartDay', draft.raceDate, true) + (!w ? '' : cd!.days <= 0 ? ' (' + w.copy + ')' : ' (' + w.card + ' away)');
     } else if (draft.primaryPath === 'event') {
       raceRow = 'No date set — no taper';
     }
-    this.nameInput = { weeks, cardio, raceRow, startSummary: b.call<string>('startSummaryVal', sr), aligned: null, resolveCopy: '' };
+    this.nameInput = { weeks, cardio, raceRow, startSummary: b.call('startSummaryVal', sr), aligned: null, resolveCopy: '' };
     this.rows.set(nameSummary(draft, this.nameInput));
-    this.resolveCopy.set(al ? '' : b.call<string>('startResolveCopy', sr));
+    this.resolveCopy.set(al ? '' : b.call('startResolveCopy', sr));
     return {
       name: draft.name,
       startDate: draft.startDate,
-      aligned: al ? { start: b.call<string>('_fmtStartDay', al.start, true), warn: !!al.underFloor, copy: b.call<string>('alignedStartCopy', al), pips: alignedPips(al) } : null,
+      aligned: al ? { start: b.call('_fmtStartDay', al.start, true), warn: !!al.underFloor, copy: b.call('alignedStartCopy', al), pips: alignedPips(al) } : null,
       rows: [],
     };
   }
@@ -585,10 +585,10 @@ export class Wizard {
     if (!v || v.step !== 'name' || !this.nameInput) return;
     const b = this.bridge;
     if (b.call('wizardAlignment')) return;
-    const draft = b.global<WizardDraft>('WD');
+    const draft = b.global('WD') as WizardDraft;
     const sr = b.call('resolveStartDate', draft.startDate, draft.restDays || [], b.call('_rsRace', draft));
-    this.resolveCopy.set(b.call<string>('startResolveCopy', sr));
-    this.nameInput = { ...this.nameInput, startSummary: b.call<string>('startSummaryVal', sr) };
+    this.resolveCopy.set(b.call('startResolveCopy', sr));
+    this.nameInput = { ...this.nameInput, startSummary: b.call('startSummaryVal', sr) };
     this.rows.set(nameSummary(draft, this.nameInput));
     this.cdr.detectChanges();
   }

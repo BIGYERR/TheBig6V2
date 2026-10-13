@@ -6,10 +6,10 @@ import { describe, it } from 'node:test';
 import { entry, seams, topLevel } from '../../scripts/legacy-bundle.mjs';
 
 describe('the legacy bundle', () => {
-  it('reads a file\'s top-level names: declared, not imported; functions and lets mutable, consts not; its exports', () => {
+  it('reads a file\'s top-level names: declared, not imported; functions and lets mutable, consts not; lets writable; its exports', () => {
     const src = "import { x } from './x.js';\nfunction f(){ return x; }\nlet a = 1;\nvar b = 2;\nconst c = 3;\nclass K {}\nexport { f };\n";
     const t = topLevel('js/a.js', src);
-    assert.deepEqual([t.declared.sort(), t.mutable.sort(), [...t.exported], t.implicit], [['K', 'a', 'b', 'c', 'f'], ['a', 'b', 'f'], ['f'], []]);
+    assert.deepEqual([t.declared.sort(), t.mutable.sort(), t.writable.sort(), [...t.exported], t.implicit], [['K', 'a', 'b', 'c', 'f'], ['a', 'b', 'f'], ['a', 'b'], ['f'], []]);
   });
 
   it('reads an engine file through its types, and finds a write to a name nothing declares', () => {

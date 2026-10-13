@@ -7,10 +7,10 @@ import { DotChart } from './charts/dot-chart';
 import { LedgerCards } from './charts/ledger-cards';
 import { ProgramChips } from './program-chips';
 import { type ChipsView, chipsView } from './program-chips-model';
-import type { LedgerModel, LedgerView } from './charts/ledger-model';
+import type { LedgerView } from './charts/ledger-model';
 import type { DotSpec } from './charts/dot-chart-model';
 import {
-  CALC_LIFTS, chartChunks, type DayLog, estimate1RM, type ExRow, journalWeeks, type ProgressProgram, viewedProgram, weeklySums,
+  CALC_LIFTS, chartChunks, estimate1RM, journalWeeks, viewedProgram, weeklySums,
 } from './progress-model';
 
 /** A journal entry with its markup made ready for the page. */
@@ -143,9 +143,9 @@ export class ProgressScreen {
     if (est === null) {
       this.result.set(null);
     } else {
-      const prog = this.bridge.global<{ cfg?: { unit?: string } } | null>('activeProg');
-      const unit = (prog && prog.cfg && prog.cfg.unit) || this.bridge.global<{ unit?: string }>('WD').unit || 'lbs';
-      this.result.set({ lift: this.bridge.global<string>('calcLift'), est, unit });
+      const prog = this.bridge.global('activeProg');
+      const unit = (prog && prog.cfg && prog.cfg.unit) || (this.bridge.global('WD') as { unit?: string }).unit || 'lbs';
+      this.result.set({ lift: this.bridge.global('calcLift'), est, unit });
     }
     this.cdr.detectChanges();
   }
@@ -154,37 +154,37 @@ export class ProgressScreen {
     return this.sanitizer.bypassSecurityTrustHtml(s);
   }
   private icon(name: string, size: number): string {
-    return this.bridge.call<string>('asyIcon', name, size);
+    return this.bridge.call('asyIcon', name, size);
   }
 
   /** The legacy renderProgressScreen, drawn at once. */
   private render(): void {
     const b = this.bridge;
-    const all = b.call<ProgressProgram[]>('getPrograms');
+    const all = b.call('getPrograms');
     if (!document.getElementById('progressBody') || !all.length) return;
-    const { prog, reset } = viewedProgram(all, b.global<string | null>('progressViewId'), b.global<string | null>('activeProgId'), !!b.global('activeProg'));
+    const { prog, reset } = viewedProgram(all, b.global('progressViewId'), b.global('activeProgId'), !!b.global('activeProg'));
     if (reset) b.call('_setProgressViewId', null);
     if (!prog) return;
     const vid = prog.id;
     const chips = chipsView(all, vid, {
-      activeId: b.global<string | null>('activeProgId'),
-      confirmId: b.global<string | null>('confirmProgId'),
-      confirmTier: b.global<number>('confirmTier'),
-      warnsCrossProg: (id) => b.call<boolean>('_purgeWarnsCrossProg', id),
+      activeId: b.global('activeProgId'),
+      confirmId: b.global('confirmProgId'),
+      confirmTier: b.global('confirmTier'),
+      warnsCrossProg: (id) => b.call('_purgeWarnsCrossProg', id),
       icon: (n, s) => this.icon(n, s),
     });
     const trash = this.icon('trash', 16);
 
-    const exw = b.call<Record<string, ExRow>>('getExWeightsFor', vid);
-    const folded = b.call<boolean>('foldExAliasKeys', exw);
-    const deduped = b.call<boolean>('dedupeExDayEntries', exw);
+    const exw = b.call('getExWeightsFor', vid);
+    const folded = b.call('foldExAliasKeys', exw);
+    const deduped = b.call('dedupeExDayEntries', exw);
     if (folded || deduped) b.call('saveExWeightsFor', vid, exw);
 
-    const logs = b.call<Record<string, DayLog>>('getLogsFor', vid);
+    const logs = b.call('getLogsFor', vid);
     const cfg = prog.cfg || {};
     const totalWeeks = prog.totalWeeks || 6;
-    const sums = weeklySums(logs, b.call<Record<string, ExRow>>('getExWeightsFor', vid), totalWeeks);
-    this.lift.set(b.global<string>('calcLift'));
+    const sums = weeklySums(logs, b.call('getExWeightsFor', vid), totalWeeks);
+    this.lift.set(b.global('calcLift'));
     this.result.set(null);
     const emptyIcon = this.html(this.icon('📊', 44));
 
@@ -199,9 +199,9 @@ export class ProgressScreen {
     const charts = chartChunks({
       logs, hist, sums, totalWeeks, cfg,
       cardioTypes: cfg.cardioTypes || [],
-      cut: b.call<number>('_cutWeek', prog),
-      skip1: b.call<boolean>('_partialWeek1', prog),
-      raceMi: b.global<Record<string, number>>('RACE_DIST_MI')[goalId] || 0,
+      cut: b.call('_cutWeek', prog),
+      skip1: b.call('_partialWeek1', prog),
+      raceMi: (b.global('RACE_DIST_MI') as Record<string, number>)[goalId] || 0,
     }, {
       icon: (n, s) => this.icon(n, s),
       ladderWeekly: (...a) => b.call('ladderWeekly', ...a),
@@ -211,22 +211,22 @@ export class ProgressScreen {
       recoveryPaceWeekly: (...a) => b.call('recoveryPaceWeekly', ...a),
       plannedVsLogged: (...a) => b.call('plannedVsLogged', ...a),
       exWeights: () => b.call('getExWeightsFor', vid),
-      ledgerModel: (...a) => b.call<LedgerModel>('ledgerModel', ...a),
+      ledgerModel: (...a) => b.call('ledgerModel', ...a),
       run: {
-        pace: (sec) => b.call<string>('_fmtPaceShort', sec),
+        pace: (sec) => b.call('_fmtPaceShort', sec),
         icon: (n, s) => this.icon(n, s),
-        mileFromRecovery: (sec) => b.call<number | null>('_mileFromRecoverySec', sec),
-        halfFromMile: (sec) => b.call<number | null>('_halfFromMileSec', sec),
-        easyRpeLo: b.global<number>('EASY_RPE_LO'),
-        easyRpeHi: b.global<number>('EASY_RPE_HI'),
-        easyMinRuns: b.global<number>('EASY_MIN_RUNS'),
-        easyZoneMinRuns: b.global<number>('EASY_ZONE_MIN_RUNS'),
+        mileFromRecovery: (sec) => b.call('_mileFromRecoverySec', sec),
+        halfFromMile: (sec) => b.call('_halfFromMileSec', sec),
+        easyRpeLo: b.global('EASY_RPE_LO'),
+        easyRpeHi: b.global('EASY_RPE_HI'),
+        easyMinRuns: b.global('EASY_MIN_RUNS'),
+        easyZoneMinRuns: b.global('EASY_ZONE_MIN_RUNS'),
       },
     });
-    const labels = b.global<Record<number, string>>('RPE_LABELS');
-    const weeks = journalWeeks(b.call<Record<string, DayLog>>('getLogsFor', vid), {
+    const labels = b.global('RPE_LABELS');
+    const weeks = journalWeeks(b.call('getLogsFor', vid), {
       rpeLabel: (r) => labels[r],
-      jogLines: (rl) => b.call<string[]>('restLogLines', rl),
+      jogLines: (rl) => b.call('restLogLines', rl),
       icon: (n, s) => this.icon(n, s),
     });
     const journal = weeks.length

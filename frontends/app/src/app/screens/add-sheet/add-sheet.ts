@@ -1,11 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
-import { type AddInput, type AddSheetView, addSheetView, workingSets } from './add-sheet-model';
-
-/** A program as far as the sheet reads it. */
-type Program = Record<string, unknown>;
-interface SheetDay { title?: string; sections?: Parameters<typeof workingSets>[0] }
+import { type AddSheetView, addSheetView, workingSets } from './add-sheet-model';
 
 /**
  * The add-an-exercise sheet (architecture phase E, step 6), in place of the legacy openAddSheet inside #addOverlay. The
@@ -75,7 +71,7 @@ export class AddSheet {
 
   protected warning(which: 'more' | 'off'): SafeHtml {
     const text = which === 'more' ? " MORE OF WHAT YOU'RE ALREADY DOING" : ' NOT WHAT TODAY IS FOR';
-    return this.sanitizer.bypassSecurityTrustHtml(this.bridge.call<string>('asyIcon', 'warning', 13) + text);
+    return this.sanitizer.bypassSecurityTrustHtml(this.bridge.call('asyIcon', 'warning', 13) + text);
   }
 
   protected pick(name: string): void {
@@ -87,23 +83,23 @@ export class AddSheet {
   }
 
   private open(): void {
-    const day = this.bridge.call<SheetDay | null>('_liveDay');
-    const prog = this.bridge.global<Program | null>('activeProg');
+    const day = this.bridge.call('_liveDay');
+    const prog = this.bridge.global('activeProg');
     if (!day || !prog) {
       this.bridge.call('showToast', 'Nothing to add to here');
       return;
     }
-    const week = this.bridge.global<number>('currentWeek');
-    const c = this.bridge.call<AddInput['candidates']>('addCandidates', day, week, prog);
-    const parseRx = (detail: string, name: string) => this.bridge.call<{ sets: number; open?: boolean } | null>('parseRx', detail, name);
-    const PATTERN_REGION = this.bridge.global<Record<string, string>>('_PATTERN_REGION');
+    const week = this.bridge.global('currentWeek');
+    const c = this.bridge.call('addCandidates', day, week, prog);
+    const parseRx = (detail: string, name: string) => this.bridge.call('parseRx', detail, name);
+    const PATTERN_REGION = this.bridge.global('_PATTERN_REGION');
     this.view.set(addSheetView({
       title: day.title,
       week,
       setCount: workingSets(day.sections, parseRx),
       candidates: c,
-      addedSets: (n) => parseRx(this.bridge.call<string>('addedDetailFor', day, n, week, prog), n)?.sets ?? null,
-      regionOf: (n) => PATTERN_REGION[this.bridge.call<string>('_pattern', n)] ?? null,
+      addedSets: (n) => parseRx(this.bridge.call('addedDetailFor', day, n, week, prog), n)?.sets ?? null,
+      regionOf: (n) => PATTERN_REGION[(this.bridge.call('_pattern', n) as string)] ?? null,
     }));
     this.cdr.detectChanges();
     const o = document.getElementById('addOverlay');

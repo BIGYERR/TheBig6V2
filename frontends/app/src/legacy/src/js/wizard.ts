@@ -218,7 +218,7 @@ function _applyWizardStart(prog: any, wd: any){
   return r;
 }
 
-let WD: { restDays: any[]; [k: string]: any } = {
+let WD: { restDays: any[]; primaryPath?: any; cardioTypes?: any; cardioGoals?: any; eventTargeted?: any; liftingFocus?: any; experience?: any; ageBracket?: any; equipment?: any; unit?: any; days?: any; bench?: any; squat?: any; deadlift?: any; name?: any; startDate?: any; raceDate?: any; raceDateWeeks?: any; _raceDateCappedWeeks?: any; _seed?: any; _seedApplied?: any; _seedDismissed?: any; _testWeek?: any } = {
   // Primary path
   primaryPath: 'body',       // 'event' | 'body' | 'both'
   // Cardio

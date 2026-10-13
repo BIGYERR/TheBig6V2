@@ -192,7 +192,7 @@ export class RestTimer {
   private updateRestFloat(): void {
     const frame = document.getElementById('restFloat');
     if (!frame) return;
-    const show = showsOn(!!this.bridge.global('activeProg'), this.bridge.global<string>('_curScreen'));
+    const show = showsOn(!!this.bridge.global('activeProg'), this.bridge.global('_curScreen'));
     frame.style.display = show ? 'block' : 'none';
     if (!show) return;
     this.init();

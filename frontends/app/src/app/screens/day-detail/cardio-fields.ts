@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
-import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 import type { CardioFields as Fields } from './cardio-fields-model';
 
 /**
@@ -120,12 +120,12 @@ export class CardioFields {
     const key = icon + words;
     let h = this.safe.get(key);
     if (!h) {
-      h = this.sanitizer.bypassSecurityTrustHtml(this.bridge.call<string>('asyIcon', icon, 15) + words);
+      h = this.sanitizer.bypassSecurityTrustHtml(this.bridge.call('asyIcon', icon, 15) + words);
       this.safe.set(key, h);
     }
     return h;
   }
-  protected call(name: string, ...args: unknown[]): void {
+  protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
     this.bridge.call(name, ...args);
   }
 }

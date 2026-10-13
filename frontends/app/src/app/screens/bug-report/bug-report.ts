@@ -36,7 +36,7 @@ export class BugReport {
   protected readonly text = signal('');
   protected readonly sending = signal(false);
   protected readonly status = signal<{ text: string; color: string }>({ text: '', color: 'var(--muted)' });
-  protected readonly versionLabel = 'BUILD ' + this.bridge.call<string>('iaVersionLabel', this.bridge.global<string>('IA_VERSION'));
+  protected readonly versionLabel = 'BUILD ' + this.bridge.call('iaVersionLabel', this.bridge.global('IA_VERSION'));
 
   protected async send(): Promise<void> {
     const txt = this.text().trim();
@@ -46,9 +46,9 @@ export class BugReport {
     }
     let ctx = '';
     try {
-      const program = this.bridge.global<{ name?: string; goal?: string; id?: string } | null>('activeProg');
+      const program = this.bridge.global('activeProg');
       ctx = bugContextText({
-        build: this.bridge.call<string>('iaVersionLabel', this.bridge.global<string>('IA_VERSION')),
+        build: this.bridge.call('iaVersionLabel', this.bridge.global('IA_VERSION')),
         time: new Date().toISOString(),
         ua: navigator.userAgent,
         width: window.innerWidth,
@@ -56,7 +56,7 @@ export class BugReport {
         standalone: !!(window.matchMedia && window.matchMedia('(display-mode: standalone)').matches),
         url: location.href,
         program,
-        week: this.bridge.global<number>('currentWeek'),
+        week: this.bridge.global('currentWeek'),
       });
     } catch {
       // The legacy script sent the report with no context when reading it failed; so does this.

@@ -84,3 +84,42 @@ screen shows or what is stored.
   entry's list, `.js` against `.ts`). The six local comparisons matched (119 states) and the e2e ran 69/69 at 0 px.
 - **Does not change:** the page (only its version meta); the Angular build's behaviour; any program; any stored key or
   value.
+
+## The bridge typed from the legacy sources (Post-v0.239.44, no build)
+
+- **Date:** 2026-10-12. **Decided by:** the session (tooling and code layout; Mario's standing answer covers the order).
+  **Shipped:** no version: the page is byte for byte v0.239.44's, and the Angular build runs the same program (below),
+  so nothing new reaches a phone (standing ruling 1, applied to a pass that changes types only).
+- **What:** `scripts/legacy-bundle.mjs`'s new `legacyTypes()` asks TypeScript for the declarations of every code piece,
+  each seen as the bundle sees it (every top-level name exported, in memory; nothing is written beside the sources), and
+  writes them with `npm run sync` into `src/legacy/generated/types/` (generated, ignored by git), with
+  `legacy-api.d.ts`: `LegacyApi`, each top-level name typed as the file the bridge resolves it to declares it (the later
+  file where two do: `_isoToday` is overlays'), and `LegacyWritable`, the `let`s and `var`s. `LegacyBridge` takes only
+  those names: `call(name, ...args)` checks the arguments and types the result from the source, `global(name)` returns
+  the declared type (a browser global, `window`, still resolves), `set` takes only a `let` or `var` and a value of its
+  type, and `provide` only a function and a replacement of the same type. The components' template wrappers
+  (`call(name, ...args)`, eleven of them) take the same types, so Angular's strict templates check every template call.
+- **What it found,** each fixed by a type, never by code: 242 type arguments at call sites (`call<string>('asyIcon', …)`)
+  were the components' unchecked guesses and are gone, the source's types in their place; where a component reads a
+  value through its own model type (the wizard's draft, four lookup tables, the program list), the guess became an
+  `as` assertion, which TypeScript now checks against the declared type. Five legacy functions are called with fewer
+  arguments than they declare (`persistLogFields`, `iaWheelInit` and `hideRpeInfo` from component code, `saveExWeight`
+  and `deleteProg` from templates): their trailing parameters are typed optional where they are declared, which retired the seven legacy
+  markers on those short calls (629 marker lines to 622). `WD` is typed with its fields (each `any`, `restDays` an array) instead of an index
+  signature, and `MOD_PAL` as `Record<string, [string, string]>`. `setDate` in This Week takes only the two setters it
+  is wired to. 23 type imports and three local types that only fed the removed guesses are gone.
+- **Kept string-typed:** `BridgeLike`, the narrow bridge the session sheet's read helpers take, because the repo's tests
+  drive those helpers against the single-file app and cannot depend on the app's generated types; the four places a
+  component hands its bridge to them cast it.
+- **The proof:** the page: `tools/same-script.mjs` against v0.239.43, the same tokens, and `git diff index.html` empty.
+  The Angular build: built unminified from v0.239.44's sources and from these, `main.js` differs only in a doc comment
+  that moved onto the new overload and in three `ngDevMode` debug line numbers (code a production build removes);
+  minified, the two are the same 173,359 tokens with only binding names chosen differently, and `legacy/legacy.js`,
+  `legacy/app.js` and the styles are byte for byte the same. Two builds of one tree are byte for byte the same, so the
+  renaming comes from the input's text, not from chance.
+- **Tests:** `frontends/app/test/integration/legacy-bundle.test.ts` gains "the legacy types" (2): every top-level name
+  typed from the file the bridge resolves it to, and nothing else, with `LegacyWritable` exactly the `let`s and `var`s;
+  and a fixture compiled against the generated types, which reaches a declared function and refuses an undeclared name
+  and a write to a `const` (each refusal an `@ts-expect-error`, so a type that let one through fails the compile).
+  `test/unit/legacy-bundle.test.ts` reads `topLevel`'s writable names. The app's type check is the rest of the proof:
+  every bridge call in the components is now checked.

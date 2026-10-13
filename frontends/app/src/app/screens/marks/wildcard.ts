@@ -16,7 +16,7 @@ export class WildcardMark {
   private readonly bridge = inject(LegacyBridge);
   private readonly sanitizer = inject(DomSanitizer);
   readonly size = input(14);
-  protected readonly inner = computed(() => this.sanitizer.bypassSecurityTrustHtml(this.bridge.call<string>('asyIcon', 'flame', this.size()) + '<span class="wc-mark-w">W</span>'));
+  protected readonly inner = computed(() => this.sanitizer.bypassSecurityTrustHtml(this.bridge.call('asyIcon', 'flame', this.size()) + '<span class="wc-mark-w">W</span>'));
 }
 
 /**

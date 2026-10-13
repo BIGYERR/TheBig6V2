@@ -1,6 +1,6 @@
 import { afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef, Component, type ElementRef, inject, signal, viewChild } from '@angular/core';
 import { Platform } from '../core/platform';
-import { LegacyBridge } from './legacy-bridge';
+import { type LegacyArgs, LegacyBridge, type LegacyFunction } from './legacy-bridge';
 import type { LegacyModules } from '../../legacy/generated/legacy-bundle';
 import { LEGACY_REST_OVERLAY, LEGACY_SCRIPT_URL } from '../../legacy/generated/legacy-markup';
 import { BugReport } from '../screens/bug-report/bug-report';
@@ -88,7 +88,7 @@ export class LegacyHost {
     afterNextRender(() => void this.mount());
   }
 
-  protected call(name: string, ...args: unknown[]): void {
+  protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
     this.bridge.call(name, ...args);
   }
 

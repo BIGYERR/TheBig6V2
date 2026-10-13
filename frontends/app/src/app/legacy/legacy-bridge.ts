@@ -1,15 +1,31 @@
 import { Injectable, signal } from '@angular/core';
+import type { LegacyApi, LegacyWritable } from '../../legacy/generated/legacy-api';
 import type { LegacyModule, LegacyModules } from '../../legacy/generated/legacy-bundle';
 import { LEGACY_SHA256, LEGACY_VERSION } from '../../legacy/generated/legacy-markup';
 
 /** A name the legacy files declare at their top level: a plain identifier. */
 const NAME = /^[A-Za-z_$][\w$]*$/;
 
+export type { LegacyApi, LegacyWritable };
+
+/** A legacy top-level name that is a function. */
+export type LegacyFunction = { [K in keyof LegacyApi]: LegacyApi[K] extends (...args: never[]) => unknown ? K : never }[keyof LegacyApi];
+
+/** The arguments a legacy function takes, and what it returns, as its source declares them. */
+export type LegacyArgs<K extends LegacyFunction> = LegacyApi[K] extends (...args: infer A) => unknown ? A : never;
+export type LegacyReturn<K extends LegacyFunction> = LegacyApi[K] extends (...args: never[]) => infer R ? R : never;
+
+/** A name the browser defines that no legacy file declares, which the bridge reads as the browser's own global. */
+export type BrowserGlobal = Exclude<keyof typeof globalThis, keyof LegacyApi>;
+
 /**
  * Typed access to the legacy app for the Angular components that replace it. Since phase E step 34 the legacy app runs as
  * the ES modules its source files are (public/legacy/legacy.js, scripts/legacy-bundle.mjs), not as the page's classic
  * script: a name resolves to the file that declares it (the later file, where two declare one, as the
  * classic script's global scope resolved it), and a name no file declares to the browser's own global (`window`).
+ * Every name is checked against `LegacyApi`, generated from the legacy files' own TypeScript (`npm run sync`), so a
+ * component can only reach a name a file declares, call a function with the arguments it takes, write a `let`, or take
+ * over a function with one of the same type.
  */
 @Injectable({ providedIn: 'root' })
 export class LegacyBridge {
@@ -65,14 +81,16 @@ export class LegacyBridge {
   }
 
   /** Reads a legacy top-level binding by name, its current value (a function, a `let`, a `const`), or a browser global. */
-  global<T = unknown>(name: string): T {
+  global<K extends keyof LegacyApi>(name: K): LegacyApi[K];
+  global<K extends BrowserGlobal>(name: K): (typeof globalThis)[K];
+  global(name: string): unknown {
     this.check('read', name);
     const m = this.owners.get(name);
-    return (m ? m[name] : (globalThis as Record<string, unknown>)[name]) as T;
+    return m ? m[name] : (globalThis as Record<string, unknown>)[name];
   }
 
   /** Writes a legacy top-level `let` or `var` (`_swapCtx`) through its module's seam. */
-  set(name: string, value: unknown): void {
+  set<K extends LegacyWritable>(name: K, value: LegacyApi[K]): void {
     this.check('write', name);
     const m = this.owners.get(name);
     if (!m || !m.__iaSet(name, value)) throw new Error(`legacy ${name} is not a top-level let to write`);
@@ -82,7 +100,7 @@ export class LegacyBridge {
    * Hands a legacy function to Angular: every legacy call of `name`, from any file, reaches `fn` from now on (the
    * module's seam rebinds the declaration, and each importer sees the new binding), and so does an inline handler.
    */
-  provide(name: string, fn: (...args: never[]) => unknown): void {
+  provide<K extends LegacyFunction>(name: K, fn: LegacyApi[K]): void {
     this.check('provide', name);
     const m = this.owners.get(name);
     if (!m || typeof m[name] !== 'function' || !m.__iaTakeOver(name, fn)) throw new Error(`legacy ${name} is not a function to take over`);
@@ -100,9 +118,9 @@ export class LegacyBridge {
   }
 
   /** Calls a legacy function by name; throws if the app has not booted or the name is not a function. */
-  call<T = unknown>(name: string, ...args: unknown[]): T {
-    const fn = this.global(name);
+  call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): LegacyReturn<K> {
+    const fn: unknown = this.global(name);
     if (typeof fn !== 'function') throw new Error(`legacy ${name} is not a function`);
-    return (fn as (...a: unknown[]) => T)(...args);
+    return (fn as (...a: unknown[]) => LegacyReturn<K>)(...args);
   }
 }

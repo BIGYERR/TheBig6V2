@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
-import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 import { type BodyBlock, detailBody, e1rmCard, type FootButton, hasLogged, liftsFirst, loggedCount, logNudge, rangeNudge, statusFoot } from './day-detail-model';
-import { type BenchEntry, benchNotes, modTags, type TagChip, wildcardSub } from './sheet-marks-model';
+import { benchNotes, modTags, type TagChip, wildcardSub } from './sheet-marks-model';
 import { E1rmCard } from './e1rm-card';
 import { CardioCard } from './cardio-card';
 import { cardioCard, type CardioRx } from './cardio-card-model';
@@ -12,8 +12,8 @@ import { SessionSections } from './session-sections';
 import { cardioFields, type Dose } from './cardio-fields-model';
 import { fieldReads } from './cardio-fields-reads';
 import { type ExSection, sectionsView } from './session-sections-model';
-import { sectionReads } from './session-sections-reads';
-import { type LogEntry, sessionLog, type SessionLogData } from './session-log-model';
+import { type BridgeLike, sectionReads } from './session-sections-reads';
+import { sessionLog, type SessionLogData } from './session-log-model';
 
 /** A scheduled day, as far as the sheet reads it. */
 interface DetailDay {
@@ -113,7 +113,7 @@ export class DayDetail {
   /** The legacy renderStatusFoot: the foot drawn again for the day's status, once the sheet has been drawn. */
   private renderFoot(dayKey: string, title: string): void {
     if (!this.view()) return;
-    this.foot.set({ dayKey, title: title || '', buttons: statusFoot(this.bridge.call<string | undefined>('statusOf', this.bridge.global<number>('currentWeek'), dayKey)) });
+    this.foot.set({ dayKey, title: title || '', buttons: statusFoot(this.bridge.call('statusOf', this.bridge.global('currentWeek'), dayKey)) });
     this.cdr.detectChanges();
   }
 
@@ -126,7 +126,7 @@ export class DayDetail {
     }
   }
 
-  protected call(name: string, ...args: unknown[]): void {
+  protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
     this.bridge.call(name, ...args);
   }
 
@@ -142,26 +142,26 @@ export class DayDetail {
   }
   /** The travel tag's backpack and word, and the log nudge's notebook and line. */
   protected travelInner(): SafeHtml {
-    return this.html(this.bridge.call<string>('asyIcon', 'backpack', 11) + '<span>Travel</span>');
+    return this.html(this.bridge.call('asyIcon', 'backpack', 11) + '<span>Travel</span>');
   }
   protected nudgeLine(): SafeHtml {
-    return this.html(this.bridge.call<string>('asyIcon', 'notebook', 14) + ' You logged this one but never marked it.');
+    return this.html(this.bridge.call('asyIcon', 'notebook', 14) + ' You logged this one but never marked it.');
   }
 
   /** The legacy buildLogHTML's reads: the day's entry, then the log drawn from it through the legacy helpers. */
   private log(dayKey: string, cardio: { type?: string; subtype?: string } | undefined): SessionLogData {
     const b = this.bridge;
-    const entry = b.call<Record<string, LogEntry | undefined>>('getLogs')[b.call<string>('logKey', b.global<number>('currentWeek'), dayKey)] || {};
+    const entry = b.call('getLogs')[b.call('logKey', b.global('currentWeek'), dayKey)] || {};
     return sessionLog(entry, cardio, {
-      rpeLabels: b.global<Record<number, string>>('RPE_LABELS'),
+      rpeLabels: b.global('RPE_LABELS'),
       dose: (c) => b.call('doseFromCardio', c),
       setDoseFull: (d) => b.call('_setCurLogDoseFull', d),
       setSub: (s) => b.call('_setCurLogSub', s),
       setDose: (d) => b.call('_setCurLogDose', d),
-      fields: (sport, e, dose, sub) => cardioFields(sport, e, dose as Dose | null, sub, fieldReads(b)),
-      live: (e, sport) => b.call<boolean>('cardioEntryLive', e, sport),
-      noteText: (active, planned, e) => b.call<string>('cardioSwapNoteText', active, planned, e),
-      logLabel: (live) => b.call<string>('cardioLogLabel', live),
+      fields: (sport, e, dose, sub) => cardioFields(sport, e, dose as Dose | null, sub, fieldReads(b as unknown as BridgeLike)),
+      live: (e, sport) => b.call('cardioEntryLive', e, sport),
+      noteText: (active, planned, e) => b.call('cardioSwapNoteText', active, planned, e),
+      logLabel: (live) => b.call('cardioLogLabel', live),
     });
   }
 
@@ -170,34 +170,34 @@ export class DayDetail {
     const b = this.bridge;
     b.call('_setStaleWarnShown', false);
     b.call('_setStaleWarnSrc', '');
-    const prog = b.global<{ cfg?: { unit?: string }; primaryPath?: string; liftingFocus?: string } | null>('activeProg');
+    const prog = b.global('activeProg');
     (globalThis as Record<string, unknown>)['_unitLabel'] = prog && prog.cfg && prog.cfg.unit === 'kg' ? 'kg' : 'lbs';
     const ov = document.getElementById('detailOverlay');
     const fresh = !(ov && ov.classList.contains('open') && b.global('currentDayKey') === dayKey);
     const keep = fresh ? 0 : ov!.scrollTop;
     b.call('_setCurrentDayKey', dayKey);
-    const week = b.global<number>('currentWeek');
-    const comp = b.call<Record<string, { title?: string; status?: string } | undefined>>('getCompleted')[b.call<string>('completedKey', week, dayKey)];
-    const progress = b.call<{ done: number; total: number }>('sessionLogProgress', day);
-    const tags = { chips: modTags(day.tags, b.global('MOD_PAL'), b.global('tagMeta')), travel: !!b.call('dayIsTravel', day) };
+    const week = b.global('currentWeek');
+    const comp = b.call('getCompleted')[b.call('completedKey', week, dayKey)];
+    const progress = b.call('sessionLogProgress', day);
+    const tags = { chips: modTags(day.tags, b.global('MOD_PAL') as Record<string, readonly [string, string] | undefined>, b.global('tagMeta')), travel: !!b.call('dayIsTravel', day) };
     b.call('ruResetIfIdle');
 
     const secs = day.sections || [];
     const status = comp ? comp.status || 'complete' : null;
-    const le = b.call<Record<string, Record<string, unknown> | undefined>>('getLogs')[b.call<string>('logKey', week, dayKey)];
-    const store = this.safeRead(() => b.call<Record<string, { entries?: { weight?: string | number; setsDone?: (string | number)[] }[] } | undefined>>('getExWeights'), {});
+    const le = b.call('getLogs')[b.call('logKey', week, dayKey)];
+    const store = this.safeRead(() => b.call('getExWeights'), {});
     const lastOf = (name: string | undefined) => {
-      const row = store[b.call<string>('exStoreKey', name)];
+      const row = store[b.call('exStoreKey', name)];
       return ((row && row.entries) || []).slice(-1)[0];
     };
     const mainName = this.safeRead(() => (secs[0] as { items: { name?: string }[] }).items[0]!.name, undefined);
     const unit = (globalThis as Record<string, unknown>)['_unitLabel'] as string || 'lbs';
     const items = secs.flatMap((sec) => ((sec as { items?: { name?: string; detail?: string }[] }).items || []));
     const body = detailBody({
-      main: secs.length ? sectionsView([secs[0] as ExSection], 0, sectionReads(b)) : [],
+      main: secs.length ? sectionsView([secs[0] as ExSection], 0, sectionReads(b as unknown as BridgeLike)) : [],
       e1rm: day.testLift ? e1rmCard(String(day.testLift), unit, this.safeRead(() => lastOf(mainName), undefined)) : null,
-      rest: secs.length ? sectionsView(secs.slice(1) as ExSection[], 1, sectionReads(b)) : [],
-      cardio: cardioCard(day.cardio as CardioRx | undefined, day.cardio ? benchNotes(day.cardio as { subtype?: string; week?: number }, (wk) => b.call<BenchEntry | null>('_benchmarkEntryFor', wk), (s) => b.call<string>('_clkMS', s)) : []),
+      rest: secs.length ? sectionsView(secs.slice(1) as ExSection[], 1, sectionReads(b as unknown as BridgeLike)) : [],
+      cardio: cardioCard(day.cardio as CardioRx | undefined, day.cardio ? benchNotes(day.cardio as { subtype?: string; week?: number }, (wk) => b.call('_benchmarkEntryFor', wk), (s) => b.call('_clkMS', s)) : []),
       note: day.note,
       nudge: this.safeRead(() => rangeNudge(items, lastOf), null),
       wildcard: wildcardSub(b.call('wildcardOn', week, dayKey), this.safeRead(() => (prog as { weeks?: Record<number, Record<string, { rest?: unknown; title?: string } | null>> } | null)!.weeks![week]![dayKey] ?? null, null)),
@@ -205,7 +205,7 @@ export class DayDetail {
       logNudge: !status && hasLogged(le) ? logNudge(dayKey, day.title) : null,
     }, liftsFirst(secs.length > 0, prog?.primaryPath, prog?.liftingFocus), secs.length > 0);
     this.view.set({
-      over: 'Week ' + week + ' · ' + b.global<Record<string, string>>('DAY_FULL')[dayKey],
+      over: 'Week ' + week + ' · ' + (b.global('DAY_FULL') as Record<string, string>)[dayKey],
       title: (comp && comp.title) || day.title || 'Training',
       tags,
       counter: loggedCount(progress),
@@ -220,7 +220,7 @@ export class DayDetail {
       const free = id === 'log_rpe' || id === 'log_notes';
       if (el) {
         el.addEventListener('input', () => {
-          if (free || b.call<boolean>('cardioLive', dayKey)) b.call('persistLogFields', dayKey);
+          if (free || b.call('cardioLive', dayKey)) b.call('persistLogFields', dayKey);
           b.call('updateDoseDerived');
         });
       }

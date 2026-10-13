@@ -66,16 +66,16 @@ export class PopUp {
   }
 
   private fire(tier: string, opts?: PopOptions): void {
-    const POP_CFG = this.bridge.global<Record<string, PopTier>>('POP_CFG');
-    const ICONS = this.bridge.global<Record<string, string>>('ASY_ICON_PATHS');
+    const POP_CFG = this.bridge.global('POP_CFG') as Record<string, PopTier>;
+    const ICONS = this.bridge.global('ASY_ICON_PATHS');
     const v = popView(tier, opts, {
       tier: (name) => POP_CFG[name],
       isIcon: (name) => Object.prototype.hasOwnProperty.call(ICONS, name),
-      pick: (t, week, dayKey) => this.bridge.call<string>('popPick', t, week, dayKey),
-      dismissText: () => this.bridge.call<string>('popDismissText'),
+      pick: (t, week, dayKey) => this.bridge.call('popPick', t, week, dayKey),
+      dismissText: () => this.bridge.call('popDismissText'),
     });
     const icon = this.icon().nativeElement;
-    if (v.icon.svg) icon.innerHTML = this.bridge.call<string>('asyIcon', v.icon.name, 52);
+    if (v.icon.svg) icon.innerHTML = this.bridge.call('asyIcon', v.icon.name, 52);
     else icon.textContent = v.icon.name;
     this.kicker.set(v.kicker);
     this.kickerClass.set(v.kickerClass);
@@ -97,7 +97,7 @@ export class PopUp {
   private burst(count: number): void {
     const box = document.getElementById('popConfetti');
     if (!box) return;
-    for (const c of confetti(count, Math.random, this.bridge.global<string[]>('POP_KNICKS'))) {
+    for (const c of confetti(count, Math.random, this.bridge.global('POP_KNICKS'))) {
       const p = document.createElement('i');
       p.style.left = c.left;
       p.style.animationDuration = c.duration;

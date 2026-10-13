@@ -175,10 +175,8 @@ function openDetail(dayKey: any,day: any){
   ['log_rpe','log_run_dist','log_run_pace','log_run_mins','log_run_rep_time','log_bike_mins','log_swim_yards','log_notes'].forEach(function(id){
     var el=document.getElementById(id);
     var free=(id==='log_rpe'||id==='log_notes');
-    // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
     if(el) el.addEventListener('input',function(){ if(free||cardioLive(dayKey)) persistLogFields(dayKey); updateDoseDerived(); });
   });
-  // @ts-expect-error TS2554 Expected 1 arguments, but got 0.
   iaWheelInit();         // V182 (D3): wheels drive the hidden nodes wired just above
   updateDoseDerived();   // V148: initial paint of the derived readout
   if(_dOv){
@@ -233,7 +231,7 @@ function stepExVal(exKey: any, delta: any) {
   input.value = next;
 }
 // `quiet` is the live-after-log path: same write, no toast. Not a second writer.
-function saveExWeight(exKey: any, exName: any, setsReps: any, quiet: any) {
+function saveExWeight(exKey: any, exName: any, setsReps: any, quiet?: any) {
   const unit = activeProg?.cfg?.unit || 'lbs';
   // Per-set actual reps (or seconds/yards) — read every row, empty falls back to its
   // prescribed placeholder so an untouched set logs as prescribed.

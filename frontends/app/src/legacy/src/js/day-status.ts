@@ -60,7 +60,7 @@ function closeDetail(){document.getElementById('detailOverlay').classList.remove
 // Single, app-wide RPE reference — opened from the ⓘ button in the day header, so the
 // effort scale lives in one place instead of being reprinted inside every workout.
 function showRpeInfo(){const o=document.getElementById('rpeInfoOverlay');if(o)o.classList.add('show');}
-function hideRpeInfo(e: any){const o=document.getElementById('rpeInfoOverlay');if(!o)return;if(e&&e.currentTarget!==e.target)return;o.classList.remove('show');}
+function hideRpeInfo(e?: any){const o=document.getElementById('rpeInfoOverlay');if(!o)return;if(e&&e.currentTarget!==e.target)return;o.classList.remove('show');}
 function toggleComplete(wk: any,dayKey: any,title: any){
   snapshotDay(wk,dayKey);
   const c=getCompleted();const k=completedKey(wk,dayKey);
@@ -172,7 +172,7 @@ function cardioLive(dayKey: any){
 // after the write. V236 (D219): the slider value is stored only once #log_rpe carries
 // data-touched="1" (set by updateRPEDisplay); untouched, the entry's own rpe is carried,
 // '' for a new entry, so the thumb resting at 5 is never a number.
-function persistLogFields(dayKey: any, commit: any){
+function persistLogFields(dayKey: any, commit?: any){
   // Writing a log entry marks the day touched for the freeze all on its own, with or
   // without a status tap — so the snapshot has to happen here too, not just in
   // handleDayStatus. snapshotDay is first-touch-wins, so the double call is a no-op.
@@ -269,7 +269,6 @@ function setCardioSwap(sport: any){
   // leaving sport, before anything moves.
   const leaving=wrap.dataset.active||planned;
   iaWheelFlush(wrap);
-  // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
   persistLogFields(currentDayKey);
   const logs=getLogs();const key=logKey(currentWeek,currentDayKey);
   const e=logs[key]||{};
@@ -312,13 +311,10 @@ function setCardioSwap(sport: any){
   // persist only once the card is LIVE; on a DRAFT the node and the readout are all that move.
   ['log_run_dist','log_run_pace','log_run_mins','log_run_rep_time','log_bike_mins','log_swim_yards'].forEach(function(id){
     const el=document.getElementById(id);
-    // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
     if(el) el.addEventListener('input',function(){ if(cardioLive(currentDayKey)) persistLogFields(currentDayKey); updateDoseDerived(); });
   });
-  // @ts-expect-error TS2554 Expected 1 arguments, but got 0.
   iaWheelInit();         // V182 (D3): swap injects fresh markup, so re-seed the wheels
   updateDoseDerived();
-  // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
   persistLogFields(currentDayKey);
 }
 function copyExport(){

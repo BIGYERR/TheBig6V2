@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, input, linkedSignal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
-import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 import type { LogEntry, SessionLogData } from './session-log-model';
 import { CardioFields } from './cardio-fields';
-import { cardioFields, type Dose } from './cardio-fields-model';
+import { cardioFields } from './cardio-fields-model';
 import { fieldReads } from './cardio-fields-reads';
+import type { BridgeLike } from './session-sections-reads';
 
 /** The cardio fields the legacy sheet wired to save as they change, once the card holds a logged number. */
 const CARDIO_FIELD_IDS = ['log_run_dist', 'log_run_pace', 'log_run_mins', 'log_run_rep_time', 'log_bike_mins', 'log_swim_yards'];
@@ -82,10 +83,10 @@ export class SessionLog {
     const leaving = wrap.dataset['active'] || planned;
     b.call('iaWheelFlush', wrap);
     b.call('persistLogFields', b.global('currentDayKey'));
-    const logs = b.call<Record<string, LogEntry | undefined>>('getLogs');
-    const key = b.call<string>('logKey', b.global('currentWeek'), b.global('currentDayKey'));
+    const logs = b.call('getLogs');
+    const key = b.call('logKey', b.global('currentWeek'), b.global('currentDayKey'));
     const e: LogEntry = logs[key] || {};
-    const park = b.global<Record<string, string[] | undefined>>('CARDIO_PARK_FIELDS');
+    const park = b.global('CARDIO_PARK_FIELDS') as Record<string, string[] | undefined>;
     if (sport !== leaving) {
       const P: Record<string, Record<string, unknown>> = Object.assign({}, (e['parked'] as Record<string, Record<string, unknown>>) || {});
       const out: Record<string, string> = {};
@@ -107,7 +108,7 @@ export class SessionLog {
     }
     wrap.dataset['active'] = sport;
     b.call('_setCurLogDose', sport === planned ? b.global('_curLogDoseFull') : null);
-    this.fieldsNow.set(cardioFields(sport, e, b.global<Dose | null>('_curLogDose'), b.global<string>('_curLogSub'), fieldReads(b)));
+    this.fieldsNow.set(cardioFields(sport, e, b.global('_curLogDose'), b.global('_curLogSub'), fieldReads(b as unknown as BridgeLike)));
     this.cdr.detectChanges();
     wrap.querySelectorAll<HTMLElement>('#cardioPicker button[data-sport]').forEach((btn) => {
       const on = btn.dataset['sport'] === sport;
@@ -119,7 +120,7 @@ export class SessionLog {
     if (note) {
       if (sport !== planned) {
         note.style.display = 'block';
-        note.textContent = b.call<string>('cardioSwapNoteText', sport, planned, e);
+        note.textContent = b.call('cardioSwapNoteText', sport, planned, e);
       } else {
         note.style.display = 'none';
         note.textContent = '';
@@ -129,7 +130,7 @@ export class SessionLog {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener('input', () => {
-          if (b.call<boolean>('cardioLive', b.global('currentDayKey'))) b.call('persistLogFields', b.global('currentDayKey'));
+          if (b.call('cardioLive', b.global('currentDayKey'))) b.call('persistLogFields', b.global('currentDayKey'));
           b.call('updateDoseDerived');
         });
       }
@@ -141,7 +142,7 @@ export class SessionLog {
   protected readonly markup = computed(() => {
     const { view } = this.log();
     const h = (s: string): SafeHtml => this.sanitizer.bypassSecurityTrustHtml(s);
-    const icon = (key: string, size: number) => this.bridge.call<string>('asyIcon', key, size);
+    const icon = (key: string, size: number) => this.bridge.call('asyIcon', key, size);
     return {
       link: h(icon('history', 13) + ' Did a different activity?'),
       chips: (view.cardio?.chips || []).map((ch) => h(icon(ch.sport, 15) + '<span>' + ch.label + '</span>')),
@@ -150,7 +151,7 @@ export class SessionLog {
     };
   });
 
-  protected call(name: string, ...args: unknown[]): void {
+  protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
     this.bridge.call(name, ...args);
   }
 

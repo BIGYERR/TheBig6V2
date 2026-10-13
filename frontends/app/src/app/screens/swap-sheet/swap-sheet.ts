@@ -1,12 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
-import { type SwapInput, type SwapSheetView, swapSheetView } from './swap-sheet-model';
-
-/** A program as far as the sheet reads it: the day's sections, by week and day. */
-interface SheetProgram {
-  weeks?: Record<string, Record<string, { sections?: SwapInput['section'][] } | undefined> | undefined>;
-}
+import { type SwapSheetView, swapSheetView } from './swap-sheet-model';
 
 /**
  * The exercise swap sheet (architecture phase E, step 5), in place of the legacy openSwapSheet inside #swapOverlay. The
@@ -70,7 +65,7 @@ export class SwapSheet {
   }
 
   protected warning(): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(this.bridge.call<string>('asyIcon', 'warning', 13) + ' DIFFERENT JOB, SAME DAY');
+    return this.sanitizer.bypassSecurityTrustHtml(this.bridge.call('asyIcon', 'warning', 13) + ' DIFFERENT JOB, SAME DAY');
   }
 
   protected pick(name: string): void {
@@ -83,9 +78,9 @@ export class SwapSheet {
   }
 
   private open(secIdx: number, itemIdx: number): void {
-    const prog = this.bridge.global<SheetProgram | null>('activeProg');
-    const week = this.bridge.global<number>('currentWeek');
-    const dayKey = this.bridge.global<string>('currentDayKey');
+    const prog = this.bridge.global('activeProg');
+    const week = this.bridge.global('currentWeek');
+    const dayKey = this.bridge.global('currentDayKey');
     const day = prog && prog.weeks && prog.weeks[week] && prog.weeks[week][dayKey];
     const sec = day && day.sections && day.sections[secIdx];
     const item = sec && sec.items && (sec.items[itemIdx] as { name: string; detail?: string } | undefined);
@@ -94,10 +89,10 @@ export class SwapSheet {
       return;
     }
     this.bridge.set('_swapCtx', { secIdx, itemIdx, name: item.name, detail: item.detail || '' });
-    const c = this.bridge.call<SwapInput['candidates']>('swapCandidates', item.name, day, week, prog);
-    const fam = !c.pattern ? this.bridge.call<string | null>('_auxFamily', item.name) : null;
+    const c = this.bridge.call('swapCandidates', item.name, day, week, prog);
+    const fam = !c.pattern ? this.bridge.call('_auxFamily', item.name) : null;
     if (fam) {
-      c.tier1 = this.bridge.call<string[]>('auxSwapCandidates', item.name, day, prog);
+      c.tier1 = this.bridge.call('auxSwapCandidates', item.name, day, prog);
       c.tier2 = [];
     }
     this.view.set(swapSheetView({
@@ -106,9 +101,9 @@ export class SwapSheet {
       itemIdx,
       section: sec!,
       candidates: c,
-      familyLabel: fam ? this.bridge.global<Record<string, string>>('_AUX_FAMILY_LABEL')[fam] ?? null : null,
-      compoundTier: this.bridge.call<number>('_compoundTier', item.name),
-      loadNote: (outName, cand) => this.bridge.call<string>('swapLoadNote', outName, cand),
+      familyLabel: fam ? this.bridge.global('_AUX_FAMILY_LABEL')[fam] ?? null : null,
+      compoundTier: this.bridge.call('_compoundTier', item.name),
+      loadNote: (outName, cand) => this.bridge.call('swapLoadNote', outName, cand),
     }));
     this.cdr.detectChanges();
     const o = document.getElementById('swapOverlay');

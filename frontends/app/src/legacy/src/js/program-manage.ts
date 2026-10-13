@@ -369,7 +369,7 @@ function askPurge(id: any){_setConfirmProgId(id);_setConfirmTier(2);renderProgLi
 function cancelConfirm(){_setConfirmProgId(null);_setConfirmTier(0);renderProgList();}
 // fromProgress is optional: the Programs-list call site passes nothing, so its
 // behaviour is byte-identical to V168.
-function deleteProg(id: any,fromProgress: any){
+function deleteProg(id: any,fromProgress?: any){
   let programs=getPrograms();
   // V221 D178: save before the handoff (archiveProg's order). The loader persists the next
   // program's backfill; saving the stale array after it would overwrite that write.

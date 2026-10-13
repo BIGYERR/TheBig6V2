@@ -213,7 +213,7 @@ function iaWheelFlush(root: any){
 }
 // Idempotent: safe to call after any re-render. Seeds each column from the hidden
 // input's current value and paints the selected row without committing.
-function iaWheelInit(root: any){
+function iaWheelInit(root?: any){
   var scope=root||document;
   var wheels=scope.querySelectorAll('.iaw');
   for(var n=0;n<wheels.length;n++){ (function(w){
@@ -381,7 +381,7 @@ function buildExportHTML(){
 }
 
 // ── Session-sheet helpers (V18.3) ──
-const MOD_PAL={test:['#CF4E1A','rgba(207,78,26,0.15)'],peak:['#CF4E1A','rgba(207,78,26,0.15)'],lift:['#bc6a43','rgba(188,106,67,0.15)'],run:['#5e8c54','rgba(94,140,84,0.15)'],bike:['#3f6e96','rgba(63,110,150,0.15)'],swim:['#3f6e96','rgba(63,110,150,0.15)'],hip:['#7e5e96','rgba(126,94,150,0.15)'],core:['#a6822f','rgba(166,130,47,0.15)']};
+const MOD_PAL: Record<string, [string, string]>={test:['#CF4E1A','rgba(207,78,26,0.15)'],peak:['#CF4E1A','rgba(207,78,26,0.15)'],lift:['#bc6a43','rgba(188,106,67,0.15)'],run:['#5e8c54','rgba(94,140,84,0.15)'],bike:['#3f6e96','rgba(63,110,150,0.15)'],swim:['#3f6e96','rgba(63,110,150,0.15)'],hip:['#7e5e96','rgba(126,94,150,0.15)'],core:['#a6822f','rgba(166,130,47,0.15)']};
 // Fallback for a tag with no palette entry. The old value was near-black text on a
 // translucent-black chip — 1.01:1 on the dark day header, i.e. invisible. Any tag added
 // to the engine without a MOD_PAL entry hit this. On-ink instead: 7.6:1 on the dark

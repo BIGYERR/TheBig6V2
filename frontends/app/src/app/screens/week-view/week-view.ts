@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, type ElementRef, inject, signal, viewChild } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
-import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 import { wildcardSub } from '../day-detail/sheet-marks-model';
 import { WildcardMark, WildcardTag } from '../marks/wildcard';
-import { type DayLog, type Overlay, type WeekDay, type WeekProgram, type WeekView as View, weekView } from './week-view-model';
+import { type Overlay, type WeekDay, type WeekView as View, weekView } from './week-view-model';
 
 /** The screen before any program is drawn, as the legacy markup stood. */
 const BLANK: View = {
@@ -138,10 +138,10 @@ export class WeekView {
   }
   /** The travel tag's backpack and word. */
   protected travelInner(): SafeHtml {
-    return this.html(this.bridge.call<string>('asyIcon', 'backpack', 11) + '<span>Travel</span>');
+    return this.html(this.bridge.call('asyIcon', 'backpack', 11) + '<span>Travel</span>');
   }
 
-  protected call(name: string, ...args: unknown[]): void {
+  protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
     this.bridge.call(name, ...args);
   }
   protected setWeek(w: number): void {
@@ -149,52 +149,52 @@ export class WeekView {
     this.render();
   }
   protected restSheet(key: string, mode: string): void {
-    this.bridge.call('openRestSheet', this.bridge.global<number>('currentWeek'), key, mode);
+    this.bridge.call('openRestSheet', this.bridge.global('currentWeek'), key, mode);
   }
-  protected setDate(fn: string, e: Event): void {
+  protected setDate(fn: 'setProgStart' | 'setProgRace', e: Event): void {
     this.bridge.call(fn, (e.target as HTMLInputElement).value);
   }
 
   /** The legacy renderWeekView: drawn at once, then the strip placed on the week in view. */
   private render(): void {
     const b = this.bridge;
-    const prog = b.global<WeekProgram | null>('activeProg');
+    const prog = b.global('activeProg');
     if (!prog) return;
     b.call('_wkScootCancel');
-    const week = b.global<number>('currentWeek');
+    const week = b.global('currentWeek');
     const totalWeeks = prog.totalWeeks || 6;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const regions = b.global<Record<string, { label?: string }>>('INJURY_REGIONS');
+    const regions = b.global('INJURY_REGIONS');
     const v = weekView({
       prog, week, today,
-      actualWeek: b.call<number>('calcCurrentWeek'),
-      weekMon: prog.startDate ? b.call<Date>('getWeekMonday', prog.startDate) : null,
+      actualWeek: b.call('calcCurrentWeek'),
+      weekMon: prog.startDate ? b.call('getWeekMonday', prog.startDate) : null,
       completed: b.call('getCompleted'),
-      logs: b.call<Record<string, DayLog>>('getLogs'),
-      dayFull: b.global<Record<string, string>>('DAY_FULL'),
+      logs: b.call('getLogs'),
+      dayFull: b.global('DAY_FULL'),
     }, {
       weekRange: (ov: Overlay) => b.call('overlayWeekRange', prog, ov, totalWeeks),
       parseDate: (iso) => b.call('_parseLocalDate', iso),
-      isTravel: (day: WeekDay | undefined) => b.call<boolean>('dayIsTravel', day),
-      beforeStart: (w, d) => b.call<boolean>('dayBeforeStart', prog, w, d),
+      isTravel: (day: WeekDay | undefined) => b.call('dayIsTravel', day),
+      beforeStart: (w, d) => b.call('dayBeforeStart', prog, w, d),
       regionLabel: (r) => (regions[r] || {}).label,
-      icon: (n, s) => b.call<string>('asyIcon', n, s),
+      icon: (n, s) => b.call('asyIcon', n, s),
       dayCode: (day) => b.call('dayCode', day),
-      onGold: (hex) => b.call<string>('_onGold', hex),
-      wildcardOn: (w, d) => b.call<boolean>('wildcardOn', w, d),
-      statusOf: (w, d) => b.call<string | undefined>('statusOf', w, d),
-      heroSummary: (day) => b.call<string>('heroSummary', day),
-      sessionTime: (day) => b.call<number>('sessionTimeEst', day),
+      onGold: (hex) => b.call('_onGold', hex),
+      wildcardOn: (w, d) => b.call('wildcardOn', w, d),
+      statusOf: (w, d) => b.call('statusOf', w, d),
+      heroSummary: (day) => b.call('heroSummary', day),
+      sessionTime: (day) => b.call('sessionTimeEst', day),
       restTip: () => b.call('restDayTip'),
-      restLines: (rl) => b.call<string[]>('restLogLines', rl),
-      streak: () => b.call<number>('computeStreak'),
+      restLines: (rl) => b.call('restLogLines', rl),
+      streak: () => b.call('computeStreak'),
       wildcardSub: (w, k) => wildcardSub(b.call('wildcardOn', w, k), (prog && prog.weeks && prog.weeks[w] ? prog.weeks[w]![k as string] : null) as { rest?: unknown; title?: string } | null),
-      liveInjury: () => ((b.call<{ patch?: { injury?: { region: string } } } | null>('_liveInjuryOverlay') || {}).patch || {}).injury || null,
+      liveInjury: () => ((b.call('_liveInjuryOverlay') || {}).patch || {}).injury || null,
       alignment: () => b.call('progAlignment', prog),
-      raceDay: (iso) => b.call<string>('_fmtStartDay', iso, true),
-      completedKey: (w, d) => b.call<string>('completedKey', w, d),
-      logKey: (w, d) => b.call<string>('logKey', w, d),
+      raceDay: (iso) => b.call('_fmtStartDay', iso, true),
+      completedKey: (w, d) => b.call('completedKey', w, d),
+      logKey: (w, d) => b.call('logKey', w, d),
     });
     this.view.set(v);
     this.startDisplay.set(v.race.aligned ? 'none' : 'flex');
@@ -212,9 +212,9 @@ export class WeekView {
     const el = this.weekScroll()?.nativeElement;
     if (!el) return;
     const btn = el.querySelectorAll('.week-btn')[week - 1] || null;
-    const to = b.call<number | null>('_wkStripTarget', el, btn);
+    const to = b.call('_wkStripTarget', el, btn);
     if (to === null) return;
-    if (b.global<boolean>('_wkScootDone') || b.call<boolean>('_wkReduceMotion')) {
+    if (b.global('_wkScootDone') || b.call('_wkReduceMotion')) {
       el.scrollLeft = to;
       b.set('_wkScootDone', true);
     } else {

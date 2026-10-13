@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 import { ProgramList } from '../program-list/program-list';
 
 /**
@@ -27,7 +27,7 @@ import { ProgramList } from '../program-list/program-list';
 export class HomeScreen {
   private readonly bridge = inject(LegacyBridge);
 
-  protected call(name: string, ...args: unknown[]): void {
+  protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
     this.bridge.call(name, ...args);
   }
 }

@@ -333,7 +333,6 @@ function doseRep(delta: any){
   // @ts-expect-error TS2322 Type 'number' is not assignable to type 'string'.
   const s=document.getElementById('doseRepVal'); if(s) s.textContent=v;
   // V236 (D218): on a DRAFT card the stepper is form only; the Log tap commits it.
-  // @ts-expect-error TS2554 Expected 2 arguments, but got 1.
   if(cardioLive(currentDayKey)) persistLogFields(currentDayKey);
   updateDoseDerived();
 }

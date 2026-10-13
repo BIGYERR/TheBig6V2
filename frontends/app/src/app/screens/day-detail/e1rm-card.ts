@@ -55,11 +55,11 @@ export class E1rmCard {
     if (!(v > 0)) return;
     const b = this.bridge;
     const lift = this.card().lift;
-    const programs = b.call<MaxProgram[]>('getPrograms');
-    const p = programs.filter((x) => x && x.id === b.global<string | null>('activeProgId'))[0];
+    const programs = b.call('getPrograms') as MaxProgram[];
+    const p = programs.filter((x) => x && x.id === (b.global('activeProgId') as string | null))[0];
     if (p && p.cfg) {
       p.cfg[lift] = v;
-      const active = b.global<MaxProgram | null>('activeProg');
+      const active = b.global('activeProg');
       if (active && active.cfg) active.cfg[lift] = v;
       b.call('savePrograms', programs);
     }

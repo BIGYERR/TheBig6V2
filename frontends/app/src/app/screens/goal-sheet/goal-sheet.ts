@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
-import { type GoalChoice, type GoalDraft, type GoalSheetView, goalSheetView } from './goal-sheet-model';
+import { type GoalSheetView, goalSheetView } from './goal-sheet-model';
 
 /** A stored program, as far as the sheet reads it. */
 interface GoalProgram {
@@ -75,7 +75,7 @@ export class GoalSheet {
   constructor() {
     this.bridge.provide('renderGoalSheet', () => this.render());
     this.bridge.provide('_goalRefreshCommit', () => {
-      this.ok.set(this.bridge.call<boolean>('_goalInputsValid'));
+      this.ok.set(this.bridge.call('_goalInputsValid'));
       this.cdr.detectChanges();
     });
   }
@@ -98,28 +98,28 @@ export class GoalSheet {
 
   /** The legacy renderGoalSheet: drawn at once, the commit button's state with it. */
   private render(): void {
-    const draft = this.bridge.global<GoalDraft>('_goalDraft');
-    const p = this.bridge.call<GoalProgram[]>('getPrograms').find((x) => x.id === draft.progId);
+    const draft = this.bridge.global('_goalDraft');
+    const p = (this.bridge.call('getPrograms') as GoalProgram[]).find((x) => x.id === draft.progId);
     if (!p) {
       this.view.set(null);
     } else {
       const sport = draft.sport || '';
-      const labels = this.bridge.global<Record<string, string>>('_CARDIO_LABELS');
-      const week = this.bridge.call<number>('_goalCurWeek', p);
+      const labels = this.bridge.global('_CARDIO_LABELS') as Record<string, string>;
+      const week = this.bridge.call('_goalCurWeek', p);
       this.view.set(goalSheetView({
         draft,
         sportLabel: labels[sport] || sport,
         current: (p.cfg && p.cfg.cardioGoals && p.cfg.cardioGoals[sport]) || null,
         path: p.cfg && p.cfg.primaryPath,
-        choices: this.bridge.global<Record<string, GoalChoice[]>>('CARDIO_GOALS_BY_TYPE')[sport] || [],
-        excluded: this.bridge.global<Set<string>>('HYBRID_EXCLUDED_GOALS'),
-        rank: this.bridge.global<Record<string, number>>('_GOAL_RANK'),
-        needsInputs: this.bridge.global<Set<string>>('_GOAL_REQ_INPUTS'),
+        choices: this.bridge.global('CARDIO_GOALS_BY_TYPE')[sport] || [],
+        excluded: this.bridge.global('HYBRID_EXCLUDED_GOALS'),
+        rank: this.bridge.global('_GOAL_RANK'),
+        needsInputs: this.bridge.global('_GOAL_REQ_INPUTS'),
         started: !!p.startDate && week > 1,
         week,
       }));
     }
-    this.ok.set(this.bridge.call<boolean>('_goalInputsValid'));
+    this.ok.set(this.bridge.call('_goalInputsValid'));
     this.cdr.detectChanges();
   }
 }

@@ -1,7 +1,7 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
-import { type ChangeSheetView, changeSheetView, type DraftKey, type OverlayDraft, type PreviewOverlay, type SheetAction } from './change-sheet-model';
+import { type ChangeSheetView, changeSheetView, type DraftKey, type PreviewOverlay, type SheetAction } from './change-sheet-model';
 
 /**
  * The injury and travel sheet (architecture phase E, step 10; its frame and Back button since step 22), in place of the
@@ -95,15 +95,15 @@ export class ChangeSheet {
 
   /** The legacy renderOverlaySheet: drawn at once. */
   private render(): void {
-    const prog = this.bridge.global<{ totalWeeks?: number } | null>('activeProg');
+    const prog = this.bridge.global('activeProg');
     const tw = (prog && prog.totalWeeks) || 0;
-    this.view.set(changeSheetView(this.bridge.global<OverlayDraft>('_ovDraft'), this.bridge.global<Record<string, { label: string }>>('INJURY_REGIONS'), {
-      fmtDate: (iso) => this.bridge.call<string>('_fmtDate', iso),
-      fmtDateWd: (iso) => this.bridge.call<string>('_fmtDateWd', iso),
-      dayCount: (from, to) => this.bridge.call<number>('_dayCount', from, to),
-      dayCountWord: (n) => this.bridge.call<string>('_dayCountWord', n),
+    this.view.set(changeSheetView(this.bridge.global('_ovDraft'), this.bridge.global('INJURY_REGIONS'), {
+      fmtDate: (iso) => this.bridge.call('_fmtDate', iso),
+      fmtDateWd: (iso) => this.bridge.call('_fmtDateWd', iso),
+      dayCount: (from, to) => this.bridge.call('_dayCount', from, to),
+      dayCountWord: (n) => this.bridge.call('_dayCountWord', n),
       inProgram: (ov: PreviewOverlay) => !!this.bridge.call('overlayWeekRange', prog, ov, tw),
-      backCopy: (ov: PreviewOverlay) => this.bridge.call<string>('overlayBackCopy', prog, ov),
+      backCopy: (ov: PreviewOverlay) => this.bridge.call('overlayBackCopy', prog, ov),
     }));
     this.cdr.detectChanges();
   }

@@ -40,7 +40,7 @@ export class SwapNudge {
     this.bridge.set('_nudgeCtx', { from, to });
     const o = document.getElementById('swapNudgeOverlay');
     if (!o) return;
-    this.text.set(nudgeText(from, to, this.bridge.call<string | null>('_pattern', from)));
+    this.text.set(nudgeText(from, to, this.bridge.call('_pattern', from)));
     this.cdr.detectChanges();
     o.classList.add('show');
   }

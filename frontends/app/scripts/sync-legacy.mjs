@@ -13,19 +13,20 @@
 //           the Angular shell does not draw (the page's whole body markup stays in split()'s result)
 //   script  the one inline <script>, but its last line     -> public/legacy/app.js (read by npm run lint:legacy)
 // and, from the page's source files themselves, the legacy app as ES modules -> public/legacy/legacy.js, the module
-// script the Angular shell runs (scripts/legacy-bundle.mjs, since v0.239.42; its types in src/legacy/generated). The
+// script the Angular shell runs (scripts/legacy-bundle.mjs, since v0.239.42), and its types: each file's declarations
+// (src/legacy/generated/types/) and LegacyApi, every name the bridge reaches, typed (src/legacy/generated/legacy-api.d.ts). The
 // script's last line boots the page (init() once the document has loaded); the Angular shell calls init() itself, once
 // its components are in place (src/app/legacy/legacy-host.ts), so neither copy carries it.
 // The split follows the HTML parser's own rule: a script ends at the first "</script>". Each piece is asserted to
 // occur exactly once; anything else fails loudly rather than producing a quietly different app.
 // split() and render() are exported for test/; nothing is read or written unless this file is run as a script.
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync, copyFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { metaVersion } from './version.mjs';
 import { ICON, buildIndex } from './build-index.mjs';
-import { BOOT_LINE, legacyBundle } from './legacy-bundle.mjs';
+import { BOOT_LINE, legacyBundle, legacyTypes } from './legacy-bundle.mjs';
 
 export { BOOT_LINE };
 
@@ -137,8 +138,16 @@ async function main() {
   const bundle = await legacyBundle();
   files[join(PUB, 'legacy', 'legacy.js')] = bundle.js;
   files[join(GEN, 'legacy-bundle.d.ts')] = bundle.dts;
+  for (const [path, body] of legacyTypes()) files[path] = body;
   const check = process.argv.includes('--check');
   const stale = [];
+  // A declaration left from a file that is gone is stale too, and goes.
+  const listed = (dir) => (existsSync(dir) ? readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? listed(join(dir, e.name)) : [join(dir, e.name)])) : []);
+  for (const path of listed(join(GEN, 'types'))) {
+    if (path in files) continue;
+    stale.push(path);
+    if (!check) rmSync(path);
+  }
   for (const [path, body] of Object.entries(files)) {
     const current = existsSync(path) ? readFileSync(path, 'utf8') : null;
     if (current === body) continue;

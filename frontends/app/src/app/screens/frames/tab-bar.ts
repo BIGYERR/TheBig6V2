@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
 
 /**
  * The tab bar's buttons (architecture phase E, step 21), in place of the legacy buttons inside #tabBar. Each still goes
@@ -20,7 +20,7 @@ import { LegacyBridge } from '../../legacy/legacy-bridge';
 export class TabBar {
   private readonly bridge = inject(LegacyBridge);
 
-  protected call(name: string, ...args: unknown[]): void {
+  protected call<K extends LegacyFunction>(name: K, ...args: LegacyArgs<K>): void {
     this.bridge.call(name, ...args);
   }
 }

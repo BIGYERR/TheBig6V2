@@ -3,9 +3,9 @@ import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
 import { SessionSections } from '../day-detail/session-sections';
 import { type ExSection, sectionsView, type SectionView } from '../day-detail/session-sections-model';
-import { sectionReads } from '../day-detail/session-sections-reads';
+import { type BridgeLike, sectionReads } from '../day-detail/session-sections-reads';
 import {
-  dayKeyOf, type DoneWildcard, RAND_FILTERS, randCount, randDraw, type RandFilter, randPool, type RandView, randView, type RandWorkout,
+  dayKeyOf, RAND_FILTERS, randCount, randDraw, type RandFilter, randPool, type RandView, randView, type RandWorkout,
 } from './random-workout-model';
 
 /**
@@ -93,10 +93,10 @@ export class RandomWorkout {
   }
 
   private goal(): string {
-    return this.bridge.global<{ goal?: string } | null>('activeProg')?.goal || 'balanced';
+    return this.bridge.global('activeProg')?.goal || 'balanced';
   }
   private pools(): Record<string, RandWorkout[]> {
-    return this.bridge.global<Record<string, RandWorkout[]>>('RAND_POOLS');
+    return this.bridge.global('RAND_POOLS');
   }
 
   /** The legacy openRandom: the filter bar and a fresh draw, then the sheet opens at its top. */
@@ -112,22 +112,22 @@ export class RandomWorkout {
   /** The legacy reroll: draws a workout other than the last, records the draw, and draws the sheet at once. */
   private reroll(): void {
     const pool = randPool(this.pools(), this.goal(), this.filter());
-    const idx = randDraw(pool.length, this.bridge.global<number>('lastRandIdx'), Math.random);
+    const idx = randDraw(pool.length, this.bridge.global('lastRandIdx'), Math.random);
     this.bridge.call('_setLastRandIdx', idx);
     this.bridge.call('_setCurrentRandIdx', idx);
     const w = pool[idx]!;
-    const done = this.bridge.call<DoneWildcard[]>('getWildcardDone');
+    const done = this.bridge.call('getWildcardDone');
     this.bridge.call('_setCurrentRandDayKey', dayKeyOf(new Date()));
     this.view.set(randView(w, done, this.goal()));
-    this.sections.set(sectionsView(w.sections as ExSection[] | undefined, undefined, sectionReads(this.bridge)));
-    this.completeLabel.set(this.sanitizer.bypassSecurityTrustHtml(this.bridge.call<string>('asyIcon', '✅', 14) + ' Complete — Mark Done'));
+    this.sections.set(sectionsView(w.sections as ExSection[] | undefined, undefined, sectionReads(this.bridge as unknown as BridgeLike)));
+    this.completeLabel.set(this.sanitizer.bypassSecurityTrustHtml(this.bridge.call('asyIcon', '✅', 14) + ' Complete — Mark Done'));
     this.cdr.detectChanges();
   }
 
   /** The legacy updateRandCounter: This Week's counter, and the reset button back to itself unless a reset is pending. */
   private updateCounter(): void {
     const el = document.getElementById('randCounter');
-    if (el) el.textContent = randCount(this.bridge.call<DoneWildcard[]>('getWildcardDone'), this.pools(), this.goal());
+    if (el) el.textContent = randCount(this.bridge.call('getWildcardDone'), this.pools(), this.goal());
     this.cdr.detectChanges();
   }
 }
