@@ -10,6 +10,7 @@ import { type LogEntry, sessionLog, type SessionLogData } from '../../frontends/
 import { type ExSection, type ExView, sectionsView, type SectionView } from '../../frontends/app/src/app/screens/day-detail/session-sections-model.ts';
 import { sectionReads } from '../../frontends/app/src/app/screens/day-detail/session-sections-reads.ts';
 import { benchNotes, modTags, wildcardSub } from '../../frontends/app/src/app/screens/day-detail/sheet-marks-model.ts';
+import { cardioFields, type CardioFields as CardioFieldsView, type Dose, type FieldReads, type PlanStrip, type RepStepper, type WheelView } from '../../frontends/app/src/app/screens/day-detail/cardio-fields-model.ts';
 
 const BENCH = '<div class="cardio-note"><b>RETEST:</b> strip</div>';
 /** The strip as the model's lines, for the same stand-in. */
@@ -24,6 +25,65 @@ function cardMarkup(c: CardioCardView | null): string {
     : `<div class="cardio-detail">${c.detail}</div>`;
   return `<div class="${c.blockCls}"><div class="cardio-type-label ${c.labelCls}">${c.label}</div>` + body
     + (c.note ? `<div class="cardio-note">${c.note}</div>` : '') + c.bench.map((n) => '<div class="cardio-note">' + (n.lead ? '<b>' + n.lead + '</b>' : '') + n.text + '</div>').join('') + '</div>';
+}
+
+
+/** The cardio fields written out as the legacy cardioFieldHTML wrote them, with the app's own icons and escape. */
+function fieldsMarkupFor(icon: (key: string, size: number) => string, esc: (x: string) => string): (f: CardioFieldsView) => string {
+  const wheel = (w: WheelView) => '<div class="iaw-cell iaw-f' + w.ncols + '"><div class="iaw-cap">' + w.cap + '</div>'
+    + '<div class="iaw" data-kind="' + w.kind + '" data-for="' + w.hiddenId + '"' + (w.plan === null ? '' : ' data-plan="' + w.plan.replace(/"/g, '&quot;') + '"') + '><div class="iaw-shade"></div><div class="iaw-band"></div>'
+    + w.cols.map((c) => '<div class="iaw-col" data-ci="' + c.ci + '" data-wrap="' + (c.wrap ? '1' : '') + '" data-len="' + c.len + '"><div class="iaw-pad"></div>'
+      + c.items.map((it) => '<div class="iaw-it' + (it.nil ? ' nil' : '') + '" data-v="' + it.v + '">' + it.face + '</div>').join('') + '<div class="iaw-pad"></div></div>').join('')
+    + '</div><input type="hidden" id="' + w.hiddenId + '" value="' + w.value.replace(/"/g, '&quot;') + '"></div>';
+  const strip = (s: PlanStrip) => '<div class="plan-strip' + (s.bike ? ' bike-strip' : '') + '"><span class="ps-lbl">' + s.label + '</span><span class="ps-val">' + esc(s.value) + '</span></div>';
+  const stepper = (st: RepStepper) => `<label>Reps completed</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="exset-ctl" style="flex:0 0 150px">
+            <button type="button" class="exset-btn" onclick="doseRep(-1)">−</button>
+            <div class="exset-val" id="doseRepVal">${st.shown}</div>
+            <button type="button" class="exset-btn" onclick="doseRep(1)">+</button>
+          </div>
+          <span class="reps-of">${st.of}</span>
+        </div>
+        <input type="hidden" id="log_run_reps" value="${st.stored}">`;
+  function fieldsMarkup(f: CardioFieldsView): string {
+    switch (f.kind) {
+      case 'time':
+      case 'dist':
+        return strip(f.strip) + `<label>${icon('run', 15)} Log the run</label>
+        <div class="iaw-wrap iaw-solo">${wheel(f.first)}</div>
+        <div class="f-sub">Shows the plan. Move it to match the watch.</div>
+        <div class="iaw-wrap iaw-solo">${wheel(f.second)}</div>
+        <div class="f-sub">Off the watch.</div>
+        <div id="doseDerived"></div>`;
+      case 'reps_dist':
+        return strip(f.strip) + `<div class="log-field" style="margin-bottom:10px">${stepper(f.stepper)}</div>
+        <div class="iaw-wrap" style="max-width:190px">${wheel(f.wheel)}</div>
+        <div class="f-sub">what the watch showed on most reps</div>
+        <div id="doseDerived"></div>`;
+      case 'reps_time':
+        return strip(f.strip) + `<div class="log-field" style="margin-bottom:10px">${stepper(f.stepper)}</div>
+        <label>Miles in the work reps</label>
+        <div class="iaw-wrap iaw-solo">${wheel(f.wheel)}</div>
+        <div class="f-sub">Leave out the easy jog between reps.</div>
+        <div id="doseDerived"></div>`;
+      case 'run':
+        return `<label>${icon('run', 15)} Run — actual distance & pace</label>${f.speedHint ? '<div class="f-sub" style="margin-bottom:6px">Whole session off the watch — warm up, efforts and recoveries all count.</div>' : ''}
+        <div class="iaw-wrap">
+          ${wheel(f.dist)}
+          ${wheel(f.pace)}
+        </div>`;
+      case 'bike':
+        return (f.strip ? strip(f.strip) : '') + `<label>${icon('bike', 15)} Log the ride</label>
+        <div class="iaw-wrap iaw-solo">${wheel(f.wheel)}</div>`;
+      case 'swim':
+        return `<label>${icon('swim', 15)} Swim — actual yardage</label>
+        <input type="number" id="log_swim_yards" placeholder="yards" value="${f.yards}" min="0" step="25" class="input-field">`;
+      default:
+        return '';
+    }
+  }
+  return fieldsMarkup;
 }
 
 describe('the cardio card (buildCardioHTML, phase E step 25)', () => {
@@ -54,6 +114,7 @@ describe('the session log (buildLogHTML, phase E step 27)', () => {
   const IA = loadApp();
   const W = IA.window;
   const icon = (key: string, size: number): string => W['asyIcon'](key, size);
+  const fieldsMarkup = fieldsMarkupFor(icon, (x) => W['esc'](x));
 
   /** The log written out as buildLogHTML wrote it. */
   function logMarkup(d: SessionLogData): string {
@@ -72,7 +133,7 @@ describe('the session log (buildLogHTML, phase E step 27)', () => {
         </div>
       </div>
       ${c ? `<div class="log-field" id="cardioSwapWrap" data-planned="${c.planned}" data-active="${c.active}" data-logged="${c.logged ? '1' : '0'}">
-        <div id="cardioFields">${d.fields}</div>
+        <div id="cardioFields">${fieldsMarkup(d.fields)}</div>
         <button type="button" id="cardioSwapLink" onclick="toggleCardioPicker()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;padding:6px 0 0;display:inline-flex;align-items:center;gap:5px;text-decoration:underline;text-underline-offset:2px">${icon('history', 13)} Did a different activity?</button>
         <div id="cardioPicker" style="display:${c.swapped ? 'block' : 'none'};margin-top:8px">
           <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px">Logged as</div>
@@ -126,7 +187,7 @@ describe('the session log (buildLogHTML, phase E step 27)', () => {
         setDoseFull: (d) => W['_setCurLogDoseFull'](d),
         setSub: (s) => W['_setCurLogSub'](s),
         setDose: (d) => W['_setCurLogDose'](d),
-        fields: (sport, e, dose, sub) => W['cardioFieldHTML'](sport, e, dose, sub),
+        fields: (sport, e, dose, sub) => cardioFields(sport, e, dose as Dose | null, sub, { spec: IA.eval('_IAW_SPEC'), sessionCode: (s, k, sp) => W['runSessionCode'](s, k, sp), pace: (sec) => W['_fmtPaceMi'](sec) }),
         live: (e, sport) => W['cardioEntryLive'](e, sport),
         noteText: (active, planned, e) => W['cardioSwapNoteText'](active, planned, e),
         logLabel: (live) => W['cardioLogLabel'](live),
@@ -396,4 +457,39 @@ describe('the sheet\'s marks (modTagsHTML, travelTagHTML, wildcardTagHTML, _benc
     }
     assert.equal(strip({ subtype: 'Long Run' }), W['_benchStripHTML']({ subtype: 'Long Run' }));
   });
+});
+
+describe('the cardio fields and their wheels (cardioFieldHTML, _doseStripHTML and iaWheelHTML, phase E step 32)', () => {
+  // The booted app's own builders against the model's fields written out in the legacy markup, for every dose kind,
+  // the plain run, the ride with and without a dose, the swim and another sport, blank and logged.
+  const IA = loadApp();
+  pinClock(IA, '2026-10-12T15:00:00Z');
+  const W = IA.window;
+  const icon = (key: string, size: number): string => W['asyIcon'](key, size);
+  const esc = (x: string): string => W['esc'](x);
+  const reads: FieldReads = { spec: IA.eval('_IAW_SPEC'), sessionCode: (s, k, sp) => W['runSessionCode'](s, k, sp), pace: (sec) => W['_fmtPaceMi'](sec) };
+  const fieldsMarkup = fieldsMarkupFor(icon, esc);
+  const doses: [string, Record<string, unknown> | null][] = [
+    ['none', null],
+    ['a time dose', { k: 'time', mins: 25, tgt: 800, cap: 760, key: 'recovery' }],
+    ['a distance dose', { k: 'dist', mi: 3.1, tgt: 800 }],
+    ['a distance dose with no pace', { k: 'dist', mi: 13.1 }],
+    ['400s', { k: 'reps_dist', reps: 8, m: 400, tgt: 450, key: 'intervals' }],
+    ['timed reps', { k: 'reps_time', reps: 6, mins: 3, tgt: 480 }],
+    ['an unknown kind', { k: 'mystery', mins: 5 }],
+  ];
+  const entries: [string, Record<string, unknown>][] = [
+    ['blank', {}],
+    ['logged', { run_mins: '29.5', run_dist: '3.10', run_pace: '9:30', run_reps: 7, run_rep_time: '1:52', bike_mins: '45', swim_yards: '1500' }],
+    ['the stamp of the plan', { run_dist: '3.1', run_reps: '' }],
+    ['a quote in a field', { run_dist: '3"1', run_mins: 0 }],
+  ];
+  for (const sport of ['run', 'bike', 'swim', 'rower']) {
+    test(`${sport}: every dose and entry`, () => {
+      for (const [dl, dose] of doses) for (const [el, entry] of entries) for (const sub of ['', 'Speed Run — Intervals', 'Long Run']) {
+        const want = W['cardioFieldHTML'](sport, entry, dose, sub) as string;
+        assert.equal(fieldsMarkup(cardioFields(sport, entry, dose as Dose | null, sub, reads)), want, `${sport}, ${dl}, ${el}, "${sub}"`);
+      }
+    });
+  }
 });

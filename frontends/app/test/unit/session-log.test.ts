@@ -13,7 +13,7 @@ function reads(calls: string[]): SessionLogReads {
     setDoseFull: (d) => calls.push('full ' + JSON.stringify(d)),
     setSub: (s) => calls.push('sub ' + s),
     setDose: (d) => calls.push('dose ' + JSON.stringify(d)),
-    fields: (sport, _e, dose, sub) => `[fields ${sport} ${JSON.stringify(dose)} ${sub}]`,
+    fields: (sport, _e, dose, sub) => ({ kind: 'swim', yards: `[fields ${sport} ${JSON.stringify(dose)} ${sub}]` }),
     live: (e, sport) => sport === 'run' ? !!e['run_dist'] : !!e[sport + '_mins'],
     noteText: (active, planned) => `[note ${active} over ${planned}]`,
     logLabel: (live) => (live ? 'Logged ✓' : 'Log'),
@@ -31,7 +31,7 @@ describe('the session log', () => {
   it('draws a lifting day: the slider at 5 saying "Move slider" until an RPE is logged, no cardio, the notes as written', () => {
     const calls: string[] = [];
     const blank = sessionLog({}, null, reads(calls));
-    assert.deepEqual(blank, { view: { rpeValue: '5', rpeText: 'Move slider', cardio: null, notes: '' }, fields: '' });
+    assert.deepEqual(blank, { view: { rpeValue: '5', rpeText: 'Move slider', cardio: null, notes: '' }, fields: { kind: 'none' } });
     assert.deepEqual(calls, ['full null', 'sub ', 'dose null']);
     const logged = sessionLog({ rpe: 7, notes: 'Good &amp; <b>fast</b>' }, null, reads([]));
     assert.deepEqual([logged.view.rpeValue, logged.view.rpeText, logged.view.notes], ['7', '7 — Hard', 'Good &amp; <b>fast</b>']);
@@ -42,7 +42,7 @@ describe('the session log', () => {
     const calls: string[] = [];
     const d = sessionLog({ run_dist: '3.1' }, { type: 'run', subtype: 'Long Run' }, reads(calls));
     assert.deepEqual(calls, ['full {"dose":"run"}', 'sub Long Run', 'dose {"dose":"run"}']);
-    assert.equal(d.fields, '[fields run {"dose":"run"} Long Run]');
+    assert.deepEqual(d.fields, { kind: 'swim', yards: '[fields run {"dose":"run"} Long Run]' });
     assert.deepEqual(d.view.cardio, {
       planned: 'run', active: 'run', logged: true, swapped: false,
       chips: [
@@ -58,7 +58,7 @@ describe('the session log', () => {
     const calls: string[] = [];
     const d = sessionLog({ swapTo: 'bike', bike_mins: '40', run_dist: '2' }, { type: 'run' }, reads(calls));
     assert.deepEqual(calls, ['full {"dose":"run"}', 'sub ', 'dose null']);
-    assert.equal(d.fields, '[fields bike null ]');
+    assert.deepEqual(d.fields, { kind: 'swim', yards: '[fields bike null ]' });
     const c = d.view.cardio!;
     assert.deepEqual([c.active, c.swapped, c.logged, c.note, c.logLabel], ['bike', true, true, '[note bike over run]', 'Logged ✓']);
     assert.deepEqual(c.chips.map((ch) => [ch.label, ch.style === chipStyle(true)]), [['Run · planned', false], ['Bike', true], ['Swim', false]]);

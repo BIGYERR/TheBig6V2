@@ -6,7 +6,7 @@ import { describe, it } from 'node:test';
 import { type BodyBlock, detailBody, e1rmCard, epley, hasLogged, liftsFirst, loggedCount, logNudge, rangeNudge, statusFoot } from '../../src/app/screens/day-detail/day-detail-model.ts';
 
 const CARD = { blockCls: 'run-block', labelCls: 'cardio-label-run', label: 'Run', segments: null, total: null, detail: '3 mi', note: null, bench: [] };
-const LOG = { view: { rpeValue: '5', rpeText: 'Move slider', cardio: null, notes: '' }, fields: '' };
+const LOG = { view: { rpeValue: '5', rpeText: 'Move slider', cardio: null, notes: '' }, fields: { kind: 'none' as const } };
 /** A stand-in section list, named by the words it carries. */
 const secs = (t: string) => [{ kind: 'skippedRound' as const, secIdx: 0, text: t }];
 const P = { main: secs('<M>'), e1rm: null, rest: secs('<R>'), cardio: CARD, note: undefined, nudge: null, wildcard: null, log: LOG, logNudge: null };

@@ -645,3 +645,30 @@ what is stored.
   a Wildcard, on a travel day and with all three, and the name step's pips near and far (6 states), and the cardio step
   again (15 drafts, 28 interactions, its seed banner among them). 69/69 at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.40 moves the session log's cardio fields and their wheels
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.40.
+- **Moved:** the legacy `cardioFieldHTML`, `_doseStripHTML` and `iaWheelHTML`: `day-detail/cardio-fields.ts`,
+  `cardio-fields-model.ts` and `cardio-fields-reads.ts`. On a planned run, the plan strip, then the fixed dimension's
+  wheel showing the plan and the free one's (a time or distance dose; the distance the plan stamped reads as blank), or
+  the reps stepper with the rep time or work miles wheel (a rep dose); the plain run's distance and pace wheels (with
+  the speed day's hint); the ride's time wheel under its strip; the swim's yards. Each wheel is the legacy markup as a
+  template (its columns, a wrapping column five times over, its faces, its hidden field), so the legacy `iaWheelInit`
+  gives it its motion and `updateDoseDerived` and `doseRep` their readouts, by the same classes, ids and data
+  attributes. The sport picker's `setCardioSwap` is the SessionLog component's, taken over through
+  `LegacyBridge.provide` because it redrew the fields: it commits the form, parks the leaving sport's numbers and brings
+  the arriving sport's back, sets the dose, draws the fields for the new sport, updates the chips and the note, wires
+  and wheels the new fields and saves, in the legacy order. With it no legacy markup builder draws inside a screen;
+  what remains are the legacy copy sentences (the program length, the start and race sentences, the run paces' source,
+  the hero summary), inserted as the words they are.
+- **Tests:** `tests/integration/session-sheet.test.ts` gains 4 (one per sport: run, ride, swim, another): the booted app's
+  `cardioFieldHTML` against the model's fields written out in the legacy markup, byte for byte, over seven doses (none,
+  time, distance with and without a pace, 400s, timed reps, an unknown kind), four entries (blank, logged, the plan's
+  stamp, a quote in a field) and three session types; the log's oracle now draws its fields through the model too.
+  `frontends/app/test/unit/cardio-fields.test.ts` (5). The local comparison of the log grew wheel scrolls (the time
+  and distance wheels of a time dose, the ride's time wheel, the pace wheel after a swap to a run) and matched all 31
+  states and taps in markup, hidden fields, stores, dose and pixels; a one-pixel glyph difference after one scroll came
+  and went, and the reference page against itself shows the same pixel, so it is the browser's. 69/69 at 0 px on both
+  builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

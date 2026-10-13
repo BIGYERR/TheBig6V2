@@ -1,7 +1,9 @@
 // The session sheet's log (the legacy buildLogHTML), kept apart from Angular so the app's node --test suite reads it as
 // it is (architecture phase E: the log moves into the SessionLog component). Each word and style is the legacy
-// builder's. The cardio fields themselves (the wheels and the dose form) are still the legacy cardioFieldHTML's markup,
-// and the legacy setCardioSwap, toggleCardioPicker, cardioLive and updateRPEDisplay still change the section in place.
+// builder's. The cardio fields (the dose form and the wheels) are cardio-fields-model's since step 32; the legacy
+// toggleCardioPicker, cardioLive and updateRPEDisplay still change the section in place, and the sport picker's
+// setCardioSwap is the SessionLog component's since step 32.
+import type { CardioFields } from './cardio-fields-model.ts';
 
 /** A day's log entry, as far as the section reads it. */
 export interface LogEntry {
@@ -46,10 +48,10 @@ export interface SessionLogView {
   notes: string;
 }
 
-/** One draw of the log: the section's view, and the cardio fields as the legacy cardioFieldHTML drew them. */
+/** One draw of the log: the section's view, and the cardio fields for the sport the log holds. */
 export interface SessionLogData {
   view: SessionLogView;
-  fields: string;
+  fields: CardioFields;
 }
 
 /** What the section reads from the legacy script, and the legacy dose it sets for the fields' live readouts. */
@@ -61,8 +63,8 @@ export interface SessionLogReads {
   setDoseFull: (dose: unknown) => void;
   setSub: (sub: string) => void;
   setDose: (dose: unknown) => void;
-  /** The legacy cardioFieldHTML: the fields for a sport, its dose and subtype. */
-  fields: (sport: string, e: LogEntry, dose: unknown, sub: string) => string;
+  /** The fields for a sport, its dose and subtype (cardio-fields-model's cardioFields over the legacy reads). */
+  fields: (sport: string, e: LogEntry, dose: unknown, sub: string) => CardioFields;
   /** The legacy cardioEntryLive: whether the entry holds a number for the sport. */
   live: (e: LogEntry, sport: string) => boolean;
   /** The legacy cardioSwapNoteText. */
@@ -99,7 +101,7 @@ export function sessionLog(entry: LogEntry, cardio: { type?: string; subtype?: s
   r.setDoseFull(dose);
   r.setSub(sub);
   r.setDose(plan.swapped ? null : dose);
-  return { view: sessionLogView(entry, plan, r), fields: plan.hasCardio ? r.fields(plan.active, entry, plan.swapped ? null : dose, sub) : '' };
+  return { view: sessionLogView(entry, plan, r), fields: plan.hasCardio ? r.fields(plan.active, entry, plan.swapped ? null : dose, sub) : { kind: 'none' } };
 }
 
 /** The section's words and states, as the legacy buildLogHTML drew them. */

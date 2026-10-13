@@ -9,6 +9,8 @@ import { cardioCard, type CardioRx } from './cardio-card-model';
 import { WildcardTag } from '../marks/wildcard';
 import { SessionLog } from './session-log';
 import { SessionSections } from './session-sections';
+import { cardioFields, type Dose } from './cardio-fields-model';
+import { fieldReads } from './cardio-fields-reads';
 import { type ExSection, sectionsView } from './session-sections-model';
 import { sectionReads } from './session-sections-reads';
 import { type LogEntry, sessionLog, type SessionLogData } from './session-log-model';
@@ -156,7 +158,7 @@ export class DayDetail {
       setDoseFull: (d) => b.call('_setCurLogDoseFull', d),
       setSub: (s) => b.call('_setCurLogSub', s),
       setDose: (d) => b.call('_setCurLogDose', d),
-      fields: (sport, e, dose, sub) => b.call<string>('cardioFieldHTML', sport, e, dose, sub),
+      fields: (sport, e, dose, sub) => cardioFields(sport, e, dose as Dose | null, sub, fieldReads(b)),
       live: (e, sport) => b.call<boolean>('cardioEntryLive', e, sport),
       noteText: (active, planned, e) => b.call<string>('cardioSwapNoteText', active, planned, e),
       logLabel: (live) => b.call<string>('cardioLogLabel', live),
