@@ -6,6 +6,9 @@ import { E1rmCard } from './e1rm-card';
 import { CardioCard } from './cardio-card';
 import { cardioCard, type CardioRx } from './cardio-card-model';
 import { SessionLog } from './session-log';
+import { SessionSections } from './session-sections';
+import { type ExSection, sectionsView } from './session-sections-model';
+import { sectionReads } from './session-sections-reads';
 import { type LogEntry, sessionLog, type SessionLogData } from './session-log-model';
 
 /** A scheduled day, as far as the sheet reads it. */
@@ -35,10 +38,10 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
  * openDetail that filled it. It takes over openDetail through LegacyBridge.provide, so every open and every re-render
  * (a skip, a swap, an add, a KB size, the nudge) reaches it. The header (the week and day, the title, the tags, the
  * logged count, Back, RPE and the add button) and the frame are the component's, drawn anew on each call as the legacy
- * writes did. The body is a list of blocks: the legacy builders' markup (the sections and their set logging, the note,
- * the log nudge), each laid in a box that makes none of its own, the test-week 1RM calculator (E1rmCard) and the
- * range-top nudge since step 24, the cardio card (CardioCard) since step 25, and the session log (SessionLog) since
- * step 27. The foot (Done and Skip, each undoing itself) is the
+ * writes did. The body is a list of blocks: the legacy builders' markup (the note, the
+ * Wildcard tag, the log nudge), each laid in a box that makes none of its own, the test-week 1RM calculator (E1rmCard)
+ * and the range-top nudge since step 24, the cardio card (CardioCard) since step 25, the session log (SessionLog)
+ * since step 27, and the sections with their exercise cards and set rows (SessionSections) since step 28. The foot (Done and Skip, each undoing itself) is the
  * component's since step 23: it takes over renderStatusFoot, which the legacy handleDayStatus calls on every status
  * change. After each draw the legacy wiring runs as before: the log fields save as they change, the wheels start, the derived dose
  * paints. A re-render keeps the reader where they were; a fresh open starts at the top.
@@ -46,7 +49,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
 @Component({
   selector: 'ia-day-detail',
   host: { style: 'display: contents' },
-  imports: [CardioCard, E1rmCard, SessionLog],
+  imports: [CardioCard, E1rmCard, SessionLog, SessionSections],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   @for (v of views(); track v) {
@@ -68,6 +71,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
     <div class="detail-body" id="detailBody">
       @for (blk of v.body; track $index) {
         @switch (blk.kind) {
+          @case ('sections') { <ia-session-sections [sections]="blk.sections" /> }
           @case ('html') { <div style="display:contents" [innerHTML]="blk.html"></div> }
           @case ('e1rm') { <ia-e1rm-card [card]="blk.card" /> }
           @case ('cardio') { <ia-cardio-card [card]="blk.card" /> }
@@ -165,9 +169,9 @@ export class DayDetail {
     const unit = (globalThis as Record<string, unknown>)['_unitLabel'] as string || 'lbs';
     const items = secs.flatMap((sec) => ((sec as { items?: { name?: string; detail?: string }[] }).items || []));
     const body = detailBody({
-      main: secs.length ? b.call<string>('buildSectionsHTML', [secs[0]], 0) : '',
+      main: secs.length ? sectionsView([secs[0] as ExSection], 0, sectionReads(b)) : [],
       e1rm: day.testLift ? e1rmCard(String(day.testLift), unit, this.safeRead(() => lastOf(mainName), undefined)) : null,
-      rest: secs.length ? b.call<string>('buildSectionsHTML', secs.slice(1), 1) : '',
+      rest: secs.length ? sectionsView(secs.slice(1) as ExSection[], 1, sectionReads(b)) : [],
       cardio: cardioCard(day.cardio as CardioRx | undefined, day.cardio ? b.call<string>('_benchStripHTML', day.cardio) : ''),
       note: day.note,
       nudge: this.safeRead(() => rangeNudge(items, lastOf), null),

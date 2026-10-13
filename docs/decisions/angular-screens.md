@@ -556,3 +556,32 @@ what is stored.
   swap back with its parked numbers, Log on an empty and a full card, typing notes, the RPE card), matching the
   section's markup, the stored logs, the dose, the slider's touched mark, the open sheets, the toast and the pixels.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.36 moves the session sheet's sections and set rows
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.36.
+- **Moved:** the legacy `buildSectionsHTML` and `buildExItem`: `day-detail/session-sections.ts`,
+  `session-sections-model.ts` and `session-sections-reads.ts` (the reads through the bridge, kept free of Angular so
+  the tests drive them against the booted app). The sections: the Main and Primer labels, the athlete's added block
+  and the hip block under their own labels, the core block, a round headed by its count or its label, reduced to
+  straight sets when one movement is left, struck through when skipped. Each card: the name and its swap and skip
+  controls, the prescription (a round's rows stating reps only), the added and swapped chips, the set rows with their
+  targets, steppers, deltas and load cells, the Top set foot, the load field, the reuse pill with its once-per-sheet
+  stale warning, the fill-every-set pill and Log. The reads and render-time writes are the legacy ones in the legacy
+  order (the rx cache, the stale warning's flag and source). The legacy set handlers stay legacy and still change the
+  cards in place by id, so the cards keep the legacy ids, classes and data attributes and are drawn afresh with each
+  new list. Random Workout draws its sections with the same component.
+- **Also:** the cards' fields and the wizard's cardio step fields (both redrawn on every render) take their starting
+  values as the `value` attribute, as the legacy markup wrote them, instead of the live value: setting the live value
+  moved the caret to the end, so a field focused without a tap and typed into read "81" where the legacy page read
+  "18". The local comparison found it; no shipped flow focused one of these fields that way.
+- **Tests:** `tests/integration/session-sheet.test.ts` gains two: every lifting day of Mario's program, in pounds and
+  kilograms, each with loads logged today, loads from last week, drafts, swaps and stale loads from another program,
+  and a day edited every way (a skipped exercise, a skipped round, a round down to one, an added block, a hip block, a
+  core block, a round with no count, a note row), the booted app's `buildSectionsHTML` against the model's sections
+  written out in the legacy markup, byte for byte, with the rx cache and the stale warning left the same; each test
+  also requires the markup it claims to cover to appear. `frontends/app/test/unit/session-sections.test.ts` (8). A
+  local comparison drew 9 days in both builds (pounds, kilograms, a crafted day) and ran 12 taps (stepping, typing a
+  rep, a load cell and the load, the reuse and fill pills, Log, skip and put back, a swap), matching the markup, the
+  stores, the render-time state, the open sheets and the pixels. 69/69 at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

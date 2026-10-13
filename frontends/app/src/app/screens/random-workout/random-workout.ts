@@ -1,6 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
+import { SessionSections } from '../day-detail/session-sections';
+import { type ExSection, sectionsView, type SectionView } from '../day-detail/session-sections-model';
+import { sectionReads } from '../day-detail/session-sections-reads';
 import {
   dayKeyOf, type DoneWildcard, RAND_FILTERS, randCount, randDraw, type RandFilter, randPool, type RandView, randView, type RandWorkout,
 } from './random-workout-model';
@@ -10,12 +13,13 @@ import {
  * buildRandFilterBar, reroll, resetWildcardCounter and updateRandCounter that drew it. It takes over openRandom and
  * updateRandCounter (which This Week also calls) through LegacyBridge.provide. The draw keeps the legacy order of
  * Math.random calls and still records itself through the legacy _setLastRandIdx, _setCurrentRandIdx and
- * _setCurrentRandDayKey; the sections are still the legacy buildSectionsHTML's markup, laid in a box that makes none
- * of its own. Completing is still the legacy completeWildcard, and closing the legacy closeRandom.
+ * _setCurrentRandDayKey; the sections are the session sheet's SessionSections (the legacy buildSectionsHTML's until
+ * step 28). Completing is still the legacy completeWildcard, and closing the legacy closeRandom.
  */
 @Component({
   selector: 'ia-random-workout',
   host: { style: 'display: contents' },
+  imports: [SessionSections],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
   <div class="rand-header">
@@ -32,7 +36,7 @@ import {
       @if (v.cardio; as c) {
         <div [class]="c.blockCls"><div [class]="'cardio-type-label ' + c.labelCls">{{ c.type }}</div><div class="cardio-detail">{{ c.detail }}</div></div>
       }
-      <div style="display:contents" [innerHTML]="sections()"></div>
+      <ia-session-sections [sections]="sections()" />
       @if (v.note) {
         <div class="note-block">{{ v.note }}</div>
       }
@@ -52,7 +56,7 @@ export class RandomWorkout {
   protected readonly filters = RAND_FILTERS;
   protected readonly filter = signal<RandFilter>('mine');
   protected readonly view = signal<RandView | null>(null);
-  protected readonly sections = signal<SafeHtml>('');
+  protected readonly sections = signal<SectionView[]>([]);
   protected readonly completeLabel = signal<SafeHtml>('');
   protected readonly resetPending = signal(false);
 
@@ -115,7 +119,7 @@ export class RandomWorkout {
     const done = this.bridge.call<DoneWildcard[]>('getWildcardDone');
     this.bridge.call('_setCurrentRandDayKey', dayKeyOf(new Date()));
     this.view.set(randView(w, done, this.goal()));
-    this.sections.set(this.sanitizer.bypassSecurityTrustHtml(this.bridge.call<string>('buildSectionsHTML', w.sections)));
+    this.sections.set(sectionsView(w.sections as ExSection[] | undefined, undefined, sectionReads(this.bridge)));
     this.completeLabel.set(this.sanitizer.bypassSecurityTrustHtml(this.bridge.call<string>('asyIcon', '✅', 14) + ' Complete — Mark Done'));
     this.cdr.detectChanges();
   }

@@ -7,9 +7,11 @@ import { type BodyBlock, detailBody, e1rmCard, epley, hasLogged, liftsFirst, log
 
 const CARD = { blockCls: 'run-block', labelCls: 'cardio-label-run', label: 'Run', segments: null, total: null, detail: '3 mi', note: null, bench: '' };
 const LOG = { view: { rpeValue: '5', rpeText: 'Move slider', cardio: null, notes: '' }, fields: '' };
-const P = { main: '<M>', e1rm: null, rest: '<R>', cardio: CARD, note: undefined, nudge: null, wildcardTag: '', log: LOG, logNudge: '' };
+/** A stand-in section list, named by the words it carries. */
+const secs = (t: string) => [{ kind: 'skippedRound' as const, secIdx: 0, text: t }];
+const P = { main: secs('<M>'), e1rm: null, rest: secs('<R>'), cardio: CARD, note: undefined, nudge: null, wildcardTag: '', log: LOG, logNudge: '' };
 /** A block as a line: markup as itself, the other blocks by name. */
-const line = (b: BodyBlock) => (b.kind === 'html' ? b.html : b.kind);
+const line = (b: BodyBlock) => (b.kind === 'html' ? b.html : b.kind === 'sections' ? b.sections.map((x) => (x.kind === 'skippedRound' ? x.text : '')).join('') : b.kind);
 
 describe('the session sheet', () => {
   it('puts lifting first only when lifting is the priority', () => {
@@ -22,11 +24,11 @@ describe('the session sheet', () => {
   it('orders the body: the Wildcard tag, the range nudge, the work (the calculator after the main), the note, the log, the log nudge', () => {
     assert.deepEqual(detailBody(P, true, true).map(line), ['<M>', '<R>', 'cardio', 'log']);
     assert.deepEqual(detailBody(P, false, true).map(line), ['cardio', '<M>', '<R>', 'log']);
-    assert.deepEqual(detailBody({ ...P, main: 'unused' }, false, false).map(line), ['cardio', 'log'], 'a day with no sections is its cardio');
+    assert.deepEqual(detailBody({ ...P, main: secs('unused') }, false, false).map(line), ['cardio', 'log'], 'a day with no sections is its cardio');
     const card = { lift: 'bench', liftLabel: 'bench', unit: 'lbs', weight: '', reps: 3 };
     const all = detailBody({ ...P, e1rm: card, note: 'Easy <b>day</b>', nudge: { shown: ['Row'], extra: '' }, wildcardTag: '<W>', logNudge: '<N>' }, true, true);
     assert.deepEqual(all.map(line), ['<W>', 'nudge', '<M>', 'e1rm', '<R>', 'cardio', '<div class="note-block">Easy <b>day</b></div>', 'log', '<N>']);
-    assert.deepEqual(detailBody({ ...P, cardio: null, rest: '' }, true, true).map(line), ['<M>', 'log'], 'a builder with nothing adds no block');
+    assert.deepEqual(detailBody({ ...P, cardio: null, rest: [] }, true, true).map(line), ['<M>', 'log'], 'a builder with nothing adds no block');
   });
 
   it('estimates a test max by Epley, a single being itself', () => {

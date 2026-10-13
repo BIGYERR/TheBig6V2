@@ -3,6 +3,7 @@
 // the legacy builders' markup; this decides their order and the header's words, as the legacy openDetail did.
 import type { CardioCardView } from './cardio-card-model.ts';
 import type { SessionLogData } from './session-log-model.ts';
+import type { SectionView } from './session-sections-model.ts';
 
 /** The test-lift 1RM calculator's starting state: the lift, its name, the unit, and the logged test set if any. */
 export interface E1rmCard {
@@ -21,12 +22,12 @@ export interface RangeNudge {
   extra: string;
 }
 
-/** The body's pieces: the legacy builders' markup ('' when a builder has nothing), the calculator and the nudge. */
+/** The body's pieces: the sections, the calculator, the cardio card, the nudge, the log, and the legacy markup left. */
 export interface BodyParts {
-  /** The main section's markup and the rest's (the calculator sits between them). */
-  main: string;
+  /** The main section and the rest (the calculator sits between them). */
+  main: SectionView[];
   e1rm: E1rmCard | null;
-  rest: string;
+  rest: SectionView[];
   cardio: CardioCardView | null;
   note: string | undefined;
   nudge: RangeNudge | null;
@@ -36,8 +37,9 @@ export interface BodyParts {
   logNudge: string;
 }
 
-/** One block of the body: a legacy builder's markup, the 1RM calculator, the range-top nudge, the cardio card or the log. */
+/** One block of the body: sections, a legacy builder's markup, the 1RM calculator, the range-top nudge, the cardio card or the log. */
 export type BodyBlock =
+  | { kind: 'sections'; sections: SectionView[] }
   | { kind: 'html'; html: string }
   | { kind: 'e1rm'; card: E1rmCard }
   | { kind: 'nudge'; nudge: RangeNudge }
@@ -55,7 +57,8 @@ export function liftsFirst(hasSections: boolean, primaryPath: string | undefined
 /** The body in the legacy order: the Wildcard tag, the range nudge, the work, the note, the log, the log nudge. */
 export function detailBody(p: BodyParts, first: boolean, hasSections: boolean): BodyBlock[] {
   const html = (h: string): BodyBlock[] => (h ? [{ kind: 'html', html: h }] : []);
-  const lifts: BodyBlock[] = hasSections ? [...html(p.main), ...(p.e1rm ? [{ kind: 'e1rm' as const, card: p.e1rm }] : []), ...html(p.rest)] : [];
+  const secs = (v: SectionView[]): BodyBlock[] => (v.length ? [{ kind: 'sections', sections: v }] : []);
+  const lifts: BodyBlock[] = hasSections ? [...secs(p.main), ...(p.e1rm ? [{ kind: 'e1rm' as const, card: p.e1rm }] : []), ...secs(p.rest)] : [];
   const cardio: BodyBlock[] = p.cardio ? [{ kind: 'cardio', card: p.cardio }] : [];
   const blocks: BodyBlock[] = first ? [...lifts, ...cardio] : [...cardio, ...lifts];
   if (p.note) blocks.push(...html('<div class="note-block">' + p.note + '</div>'));

@@ -152,7 +152,7 @@ type StepView =
                             <div style="margin-top:10px">
                               <div class="input-label" style="margin-bottom:6px">Distance</div>
                               <div style="display:flex;gap:0;align-items:stretch">
-                                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1;background:var(--surface2);color:var(--muted)" [value]="f.dist" readonly>
+                                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1;background:var(--surface2);color:var(--muted)" [attr.value]="f.dist" readonly>
                                 <div style="display:flex;gap:0;border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;overflow:hidden;flex-shrink:0">
                                   <button (click)="call('setSwimUnit', 'yd')" [attr.style]="unitBtn(f.unit === 'yd', false)">yd</button>
                                   <button (click)="call('setSwimUnit', 'm')" [attr.style]="unitBtn(f.unit === 'm', true)">m</button>
@@ -180,7 +180,7 @@ type StepView =
                             <div style="margin-top:10px">
                               <div class="input-label" style="margin-bottom:6px">Target distance</div>
                               <div style="display:flex;gap:0;align-items:stretch">
-                                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1" placeholder="e.g. 1.5" [value]="f.dist" (input)="edit('runDist', 'run', 'targetDist', $event)" min="0.1" step="0.1">
+                                <input type="number" class="input-field" style="border-radius:4px 0 0 8px;flex:1" placeholder="e.g. 1.5" [attr.value]="f.dist" (input)="edit('runDist', 'run', 'targetDist', $event)" min="0.1" step="0.1">
                                 <div style="display:flex;gap:0;border:1px solid var(--border2);border-left:none;border-radius:0 8px 8px 0;overflow:hidden;flex-shrink:0">
                                   <button (click)="call('setPaceUnit', 'mi')" [attr.style]="unitBtn(f.unit === 'mi', false)">mi</button>
                                   <button (click)="call('setPaceUnit', 'km')" [attr.style]="unitBtn(f.unit === 'km', true)">km</button>
@@ -197,7 +197,7 @@ type StepView =
                             <div class="input-group" style="margin-top:8px">
                               <div class="input-label">How far can you currently run? (optional)</div>
                               <div style="display:flex;gap:8px;align-items:center">
-                                <input type="number" class="input-field" style="flex:1" placeholder="e.g. 1.5" [value]="f.baseline" (input)="edit('paceBaseline', 'run', 'baselineDist', $event)" min="0" step="0.1">
+                                <input type="number" class="input-field" style="flex:1" placeholder="e.g. 1.5" [attr.value]="f.baseline" (input)="edit('paceBaseline', 'run', 'baselineDist', $event)" min="0" step="0.1">
                                 <span style="font-size:13px;color:var(--muted);flex-shrink:0">{{ f.unit }}</span>
                               </div>
                             </div>
@@ -207,7 +207,7 @@ type StepView =
                             <div class="input-group" style="margin-top:10px">
                               <div class="input-label">{{ f.question + ' (optional)' }}</div>
                               <div style="display:flex;gap:8px;align-items:center">
-                                <input type="number" class="input-field" style="flex:1" [attr.placeholder]="f.placeholder" [value]="f.baseline" (input)="edit('baseline', s.id, 'baselineDist', $event)" min="0" [attr.step]="f.step">
+                                <input type="number" class="input-field" style="flex:1" [attr.placeholder]="f.placeholder" [attr.value]="f.baseline" (input)="edit('baseline', s.id, 'baselineDist', $event)" min="0" [attr.step]="f.step">
                                 <span style="font-size:13px;color:var(--muted);flex-shrink:0">{{ f.unitWord }}</span>
                               </div>
                             </div>
@@ -234,7 +234,7 @@ type StepView =
                       @if (r.targeted) {
                         <div>
                           <div style="font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px">Race date</div>
-                          <input type="date" id="raceDateInput" [value]="r.value" [attr.min]="r.min" (input)="setRaceDate($event)" style="width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:4px;color:var(--text);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:0.04em;padding:13px 14px;outline:none;box-sizing:border-box;color-scheme:dark;-webkit-appearance:none;cursor:pointer">
+                          <input type="date" id="raceDateInput" [attr.value]="r.value" [attr.min]="r.min" (input)="setRaceDate($event)" style="width:100%;background:var(--surface2);border:1.5px solid var(--accent);border-radius:4px;color:var(--text);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:0.04em;padding:13px 14px;outline:none;box-sizing:border-box;color-scheme:dark;-webkit-appearance:none;cursor:pointer">
                           <div id="raceDateFeedback" style="margin-top:8px"></div>
                           <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Tap to open the calendar. The final weeks taper so you arrive fresh.</div>
                         </div>
@@ -331,21 +331,21 @@ type StepView =
   <ng-template #pair let-p let-sport="sport">
     <div style="display:flex;align-items:center;gap:6px">
       <div style="flex:1;text-align:center">
-        <input type="number" class="input-field" style="text-align:center" placeholder="min" [value]="p.mins" (input)="edit(p.field, sport, p.minsKey, $event)" [attr.min]="p.lo" [attr.max]="p.hi">
+        <input type="number" class="input-field" style="text-align:center" placeholder="min" [attr.value]="p.mins" (input)="edit(p.field, sport, p.minsKey, $event)" [attr.min]="p.lo" [attr.max]="p.hi">
         <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">minutes</div>
       </div>
       <div style="font-size:24px;color:var(--muted);font-weight:300;flex-shrink:0;padding-bottom:14px">:</div>
       <div style="flex:1;text-align:center">
-        <input type="number" class="input-field" style="text-align:center" placeholder="sec" [value]="p.secs" (input)="edit(p.field, sport, p.secsKey, $event)" min="0" max="59">
+        <input type="number" class="input-field" style="text-align:center" placeholder="sec" [attr.value]="p.secs" (input)="edit(p.field, sport, p.secsKey, $event)" min="0" max="59">
         <div style="font-size:10px;color:var(--muted);margin-top:3px;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase">seconds</div>
       </div>
     </div>
   </ng-template>
   <ng-template #flatPair let-mins="mins" let-secs="secs" let-minsKey="minsKey" let-secsKey="secsKey">
     <div style="display:flex;align-items:center;gap:6px">
-      <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="min" [value]="mins" (input)="edit('swimBase', 'swim', minsKey, $event)" min="0" max="99">
+      <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="min" [attr.value]="mins" (input)="edit('swimBase', 'swim', minsKey, $event)" min="0" max="99">
       <div style="font-size:20px;color:var(--muted);font-weight:300;flex-shrink:0">:</div>
-      <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="sec" [value]="secs" (input)="edit('swimBase', 'swim', secsKey, $event)" min="0" max="59">
+      <input type="number" class="input-field" style="text-align:center;flex:1" placeholder="sec" [attr.value]="secs" (input)="edit('swimBase', 'swim', secsKey, $event)" min="0" max="59">
     </div>
   </ng-template>
   <ng-template #mile let-m>
