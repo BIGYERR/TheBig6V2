@@ -5,13 +5,14 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { type BodyBlock, detailBody, e1rmCard, epley, hasLogged, liftsFirst, loggedCount, logNudge, rangeNudge, statusFoot } from '../../src/app/screens/day-detail/day-detail-model.ts';
 
-const CARD = { blockCls: 'run-block', labelCls: 'cardio-label-run', label: 'Run', segments: null, total: null, detail: '3 mi', note: null, bench: '' };
+const CARD = { blockCls: 'run-block', labelCls: 'cardio-label-run', label: 'Run', segments: null, total: null, detail: '3 mi', note: null, bench: [] };
 const LOG = { view: { rpeValue: '5', rpeText: 'Move slider', cardio: null, notes: '' }, fields: '' };
 /** A stand-in section list, named by the words it carries. */
 const secs = (t: string) => [{ kind: 'skippedRound' as const, secIdx: 0, text: t }];
-const P = { main: secs('<M>'), e1rm: null, rest: secs('<R>'), cardio: CARD, note: undefined, nudge: null, wildcardTag: '', log: LOG, logNudge: '' };
+const P = { main: secs('<M>'), e1rm: null, rest: secs('<R>'), cardio: CARD, note: undefined, nudge: null, wildcard: null, log: LOG, logNudge: null };
 /** A block as a line: markup as itself, the other blocks by name. */
-const line = (b: BodyBlock) => (b.kind === 'html' ? b.html : b.kind === 'sections' ? b.sections.map((x) => (x.kind === 'skippedRound' ? x.text : '')).join('') : b.kind);
+const line = (b: BodyBlock) => (b.kind === 'note' ? 'note ' + b.html : b.kind === 'wildcard' ? 'wildcard ' + b.sub : b.kind === 'logNudge' ? 'logNudge ' + b.dayKey + ' ' + b.title
+  : b.kind === 'sections' ? b.sections.map((x) => (x.kind === 'skippedRound' ? x.text : '')).join('') : b.kind);
 
 describe('the session sheet', () => {
   it('puts lifting first only when lifting is the priority', () => {
@@ -26,8 +27,8 @@ describe('the session sheet', () => {
     assert.deepEqual(detailBody(P, false, true).map(line), ['cardio', '<M>', '<R>', 'log']);
     assert.deepEqual(detailBody({ ...P, main: secs('unused') }, false, false).map(line), ['cardio', 'log'], 'a day with no sections is its cardio');
     const card = { lift: 'bench', liftLabel: 'bench', unit: 'lbs', weight: '', reps: 3 };
-    const all = detailBody({ ...P, e1rm: card, note: 'Easy <b>day</b>', nudge: { shown: ['Row'], extra: '' }, wildcardTag: '<W>', logNudge: '<N>' }, true, true);
-    assert.deepEqual(all.map(line), ['<W>', 'nudge', '<M>', 'e1rm', '<R>', 'cardio', '<div class="note-block">Easy <b>day</b></div>', 'log', '<N>']);
+    const all = detailBody({ ...P, e1rm: card, note: 'Easy <b>day</b>', nudge: { shown: ['Row'], extra: '' }, wildcard: 'Push is still on the board.', logNudge: { dayKey: 'fri', title: 'Push' } }, true, true);
+    assert.deepEqual(all.map(line), ['wildcard Push is still on the board.', 'nudge', '<M>', 'e1rm', '<R>', 'cardio', 'note Easy <b>day</b>', 'log', 'logNudge fri Push']);
     assert.deepEqual(detailBody({ ...P, cardio: null, rest: [] }, true, true).map(line), ['<M>', 'log'], 'a builder with nothing adds no block');
   });
 
@@ -55,7 +56,7 @@ describe('the session sheet', () => {
 
   it('nudges a day with a note or a run, ride or swim figure, and nothing else', () => {
     assert.deepEqual([hasLogged(undefined), hasLogged({}), hasLogged({ notes: '   ' }), hasLogged({ rpe: 7 }), hasLogged({ notes: 'ok' }), hasLogged({ run_rep_time: '1:30' }), hasLogged({ swim_yards: 500 })], [false, false, false, false, true, true, true]);
-    assert.equal(logNudge('fri', "Push (it's light)", '[nb]'), '<div class="log-nudge"><span>[nb] You logged this one but never marked it.</span><button class="log-nudge-btn" onclick="handleDayStatus(\'fri\',\'Push (it\\\'s light)\',\'complete\')">Mark Done ✓</button></div>');
+    assert.deepEqual([logNudge('fri', "Push (it's light)"), logNudge('sat', undefined)], [{ dayKey: 'fri', title: "Push (it's light)" }, { dayKey: 'sat', title: '' }]);
   });
 
   it('counts what is logged, and hides the count with nothing to log', () => {

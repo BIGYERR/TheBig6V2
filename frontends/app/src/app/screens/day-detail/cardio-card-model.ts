@@ -1,7 +1,8 @@
 // The session sheet's cardio card, kept apart from Angular so the app's node --test suite reads it as it is
 // (architecture phase E, step 25: the card moves from the legacy buildCardioHTML to the CardioCard component). The
-// prescription's words are the engine's markup and stay markup; the benchmark retest strip is still the legacy
-// _benchStripHTML's.
+// prescription's words are the engine's markup and stay markup; the benchmark retest strip is sheet-marks-model's
+// benchNotes (the legacy _benchStripHTML's until step 30).
+import type { BenchNote } from './sheet-marks-model.ts';
 
 /** A day's cardio, as far as the card reads it. */
 export interface CardioRx {
@@ -24,13 +25,13 @@ export interface CardioCardView {
   /** The detail's markup, its line breaks as breaks. */
   detail: string;
   note: string | null;
-  bench: string;
+  bench: BenchNote[];
 }
 
 const NAMES: Record<string, string> = { run: 'Run', bike: 'Bike / Spin', swim: 'Swim' };
 
 /** The legacy buildCardioHTML, as a view; nothing for a day with no cardio. */
-export function cardioCard(c: CardioRx | null | undefined, bench: string): CardioCardView | null {
+export function cardioCard(c: CardioRx | null | undefined, bench: BenchNote[]): CardioCardView | null {
   if (!c) return null;
   const t = (c.type || '').toLowerCase();
   const kind = t === 'swim' || t === 'run' || t === 'bike' ? t : null;

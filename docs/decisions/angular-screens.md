@@ -604,3 +604,24 @@ what is stored.
   shut and open, and tapped a goal pencil, the mile pencil, copy and a card's toggle: the markup, the sheets opened,
   the store and the pixels matched. 69/69 at 0 px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.38 moves the session sheet's small marks
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.38.
+- **Moved:** the session sheet's last legacy markup but the cardio fields: the header's tags (the legacy
+  `modTagsHTML`, each tag in its palette color) and the travel tag (`travelTagHTML`), the Wildcard tag
+  (`wildcardTagHTML`, its words read off the active program's day), the note, the "logged but never marked" nudge
+  (its Mark Done calling the legacy `handleDayStatus`), and the retest strip on a benchmark retest (`_benchStripHTML`,
+  its lines in the CardioCard template). `day-detail/sheet-marks-model.ts` holds the words; the data (the palette and
+  labels, the travel overlay, the Wildcards done, the benchmark runs logged) stays the legacy script's. The sheet's body
+  has no raw-markup block left; the note is the engine's markup in its own box, as before.
+- **Also:** `frontends/app/test/integration/pwa-local-log.test.ts` waits for the log line it reads (up to 2 s) instead
+  of a fixed 20 ms; the local check failed on it once while the machine was busy, and alone it passed 5 of 5.
+- **Tests:** `tests/integration/session-sheet.test.ts` gains 4: every tag set on Mario's program and an unknown tag
+  against `modTagsHTML`; the travel tag on and off against `travelTagHTML`; the Wildcard tag on a training day, a rest
+  day, a day with no title and days with none against `wildcardTagHTML` (and the mark the sheet draws against
+  `wildcardMarkHTML`); the retest strip with no week 1, week 1 only, and faster, even and slower retests against
+  `_benchStripHTML`. `frontends/app/test/unit/sheet-marks.test.ts` (3). A local comparison opened 9 sheets in both builds
+  (plain, travel, two Wildcards, a note, the nudge, three retest strips) and tapped Mark Done: markup, stores, sheets,
+  toast and pixels matched, each scenario drawing its mark. 69/69 at 0 px on both builds.
+- **Does not change:** the single-file page (only its version meta); any program; any stored key or value.

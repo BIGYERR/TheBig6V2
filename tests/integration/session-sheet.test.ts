@@ -9,8 +9,11 @@ import { cardioCard, type CardioCardView, type CardioRx } from '../../frontends/
 import { type LogEntry, sessionLog, type SessionLogData } from '../../frontends/app/src/app/screens/day-detail/session-log-model.ts';
 import { type ExSection, type ExView, sectionsView, type SectionView } from '../../frontends/app/src/app/screens/day-detail/session-sections-model.ts';
 import { sectionReads } from '../../frontends/app/src/app/screens/day-detail/session-sections-reads.ts';
+import { benchNotes, modTags, wildcardSub } from '../../frontends/app/src/app/screens/day-detail/sheet-marks-model.ts';
 
 const BENCH = '<div class="cardio-note"><b>RETEST:</b> strip</div>';
+/** The strip as the model's lines, for the same stand-in. */
+const BENCH_NOTES = [{ lead: 'RETEST:', text: ' strip' }];
 
 /** The card written out as buildCardioHTML wrote it. */
 function cardMarkup(c: CardioCardView | null): string {
@@ -20,7 +23,7 @@ function cardMarkup(c: CardioCardView | null): string {
       + (c.total ? `<div class="swim-total">${c.total}</div>` : '')
     : `<div class="cardio-detail">${c.detail}</div>`;
   return `<div class="${c.blockCls}"><div class="cardio-type-label ${c.labelCls}">${c.label}</div>` + body
-    + (c.note ? `<div class="cardio-note">${c.note}</div>` : '') + c.bench + '</div>';
+    + (c.note ? `<div class="cardio-note">${c.note}</div>` : '') + c.bench.map((n) => '<div class="cardio-note">' + (n.lead ? '<b>' + n.lead + '</b>' : '') + n.text + '</div>').join('') + '</div>';
 }
 
 describe('the cardio card (buildCardioHTML, phase E step 25)', () => {
@@ -39,7 +42,7 @@ describe('the cardio card (buildCardioHTML, phase E step 25)', () => {
   for (const [label, rx] of cases) {
     test(label, () => {
       const want = legacy(rx);
-      assert.equal(cardMarkup(cardioCard(rx, rx ? BENCH : '')), want);
+      assert.equal(cardMarkup(cardioCard(rx, rx ? BENCH_NOTES : [])), want);
       assert.equal(want === '', rx === null);
     });
   }
@@ -306,3 +309,91 @@ describe('the sections and their exercise cards (buildSectionsHTML and buildExIt
   });
 });
 
+describe('the sheet\'s marks (modTagsHTML, travelTagHTML, wildcardTagHTML, _benchStripHTML, phase E step 30)', () => {
+  // The booted app's own builders against the model's marks written out in the legacy markup. The stores they read
+  // (Wildcards done, overlays, logs and frozen days) are written or stood in for below.
+  const IA = loadApp();
+  pinClock(IA, '2026-10-12T15:00:00Z');
+  const W = IA.window;
+  const icon = (key: string, size: number): string => W['asyIcon'](key, size);
+  const esc = (x: string): string => W['esc'](x);
+  const prog = IA.buildProgram(IA.fixtures.HALF_MANNY) as unknown as { weeks: Record<number, Record<string, { title?: string; rest?: boolean; tags?: string[]; cardio?: { subtype?: string } } | null>> };
+
+  test('every day\'s tags, and a tag with no color or label', () => {
+    const seen = new Set<string>();
+    const sets: string[][] = [['odd', 'rest', 'run'], []];
+    for (const wk of Object.values(prog.weeks)) for (const day of Object.values(wk)) if (day && !seen.has(JSON.stringify(day.tags))) { seen.add(JSON.stringify(day.tags)); sets.push(day.tags || []); }
+    assert.ok(sets.length >= 6, `found ${sets.length} tag sets`);
+    for (const tags of sets) {
+      const got = modTags(tags, IA.eval('MOD_PAL'), IA.eval('tagMeta')).map((t) => `<span class="wk-tag" style="color:${t.color};background:${t.bg}">${t.label}</span>`).join('');
+      assert.equal(got, W['modTagsHTML'](tags), JSON.stringify(tags));
+    }
+  });
+
+  test('the travel tag on a travel day only', () => {
+    const real = W['dayOverlayInfo'];
+    try {
+      for (const [info, travel] of [[null, false], [{ type: 'substitute', patch: { equipment: 'bodyweight' } }, true], [{ type: 'substitute', patch: { equipment: 'commercial' } }, false], [{ type: 'protect', patch: {} }, false]] as const) {
+        IA.eval('dayOverlayInfo = function(){ return globalThis.__info; }');
+        W['__info'] = info;
+        assert.equal(W['dayIsTravel']({}) ? `<span class="wk-tag wk-travel">${icon('backpack', 11)}<span>Travel</span></span>` : '', W['travelTagHTML']({}));
+        assert.equal(!!W['dayIsTravel']({}), travel);
+      }
+    } finally {
+      W['dayOverlayInfo'] = real;
+    }
+  });
+
+  test('the Wildcard tag on a training day, a rest day, a day with no title, and none where no Wildcard was done', () => {
+    IA.localStorage.setItem('ia_programs', JSON.stringify([{ ...prog, id: 'p_marks' }]));
+    IA.localStorage.setItem('ia_active', 'p_marks');
+    IA.eval('showToast=function(){};activeProgId=null;activeProg=null;init();');
+    const active = IA.eval('activeProg') as typeof prog;
+    active.weeks[2]!['sat'] = { ...(active.weeks[2]!['sat'] || {}), rest: true, title: 'Rest' };
+    active.weeks[3]!['mon'] = { ...(active.weeks[3]!['mon'] || {}), title: '' };
+    const real = W['wildcardDaySet'];
+    try {
+      IA.eval("wildcardDaySet = function(){ const o={}; for (const [w,d] of [[1,'mon'],[2,'sat'],[3,'mon']]) o[completedKey(w,d)]={title:'Wild'}; return o; }");
+      for (const [w, d] of [[1, 'mon'], [2, 'sat'], [3, 'mon'], [1, 'tue'], [0, 'mon']] as const) {
+        const sub = wildcardSub(W['wildcardOn'](w, d), active.weeks[w] ? active.weeks[w]![d] : null);
+        const got = sub === null ? '' : '<div class="wc-tag">' + W['wildcardMarkHTML'](16) + '<div class="wc-tag-txt"><div class="wc-tag-lbl">WILDCARD DONE</div><div class="wc-tag-sub">' + esc(sub) + '</div></div></div>';
+        assert.equal(got, W['wildcardTagHTML'](w, d), `week ${w} ${d}`);
+      }
+      assert.equal(W['wildcardMarkHTML'](16), `<span class="wc-mark" aria-label="Wildcard done">${icon('flame', 16)}<span class="wc-mark-w">W</span></span>`, 'the mark the sheet draws itself');
+    } finally {
+      W['wildcardDaySet'] = real;
+    }
+  });
+
+  test('the retest strip: not a retest, no week 1, week 1 only, and faster, even and slower retests', () => {
+    const retest = { type: 'run', subtype: 'Benchmark Run — Retest', week: 6 };
+    const bench = { type: 'run', subtype: 'Benchmark Run' };
+    const setRuns = (runs: [number, string, number | null][]) => {
+      const logs: Record<string, unknown> = {};
+      const hist: Record<string, unknown> = {};
+      for (const [w, mi, mins] of runs) {
+        const key = W['logKey'](w, 'sat');
+        logs[key] = { run_dist: mi, run_mins: mins == null ? '' : String(mins) };
+        hist[key] = { cardio: w === 1 ? bench : retest };
+      }
+      IA.localStorage.setItem('ia_logs_p_marks', JSON.stringify(logs));
+      IA.localStorage.setItem('ia_hist_p_marks', JSON.stringify(hist));
+    };
+    const strip = (c: { subtype?: string; week?: number }) => benchNotes(c, (wk) => W['_benchmarkEntryFor'](wk), (s) => W['_clkMS'](s))
+      .map((n) => '<div class="cardio-note">' + (n.lead ? '<b>' + n.lead + '</b>' : '') + n.text + '</div>').join('');
+    const cases: [string, [number, string, number | null][], string][] = [
+      ['no week 1', [], 'No week 1 benchmark'],
+      ['week 1 only', [[1, '2.5', 20]], 'WEEK 1 BASELINE'],
+      ['faster', [[1, '2.5', 20], [6, '2.7', 20]], 'FASTER'],
+      ['even', [[1, '2.5', 20], [6, '2.51', 20]], 'Even with week 1'],
+      ['slower', [[1, '2.5', 20], [6, '2.3', null]], 'slower'],
+    ];
+    for (const [what, runs, needle] of cases) {
+      setRuns(runs);
+      const want = W['_benchStripHTML'](retest) as string;
+      assert.equal(strip(retest), want, what);
+      assert.ok(want.includes(needle), `${what} drew ${needle}`);
+    }
+    assert.equal(strip({ subtype: 'Long Run' }), W['_benchStripHTML']({ subtype: 'Long Run' }));
+  });
+});

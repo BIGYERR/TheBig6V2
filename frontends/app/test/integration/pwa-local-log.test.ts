@@ -21,19 +21,23 @@ describe('pwa-local request log', () => {
     base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   });
   after(() => server.close());
+  /** Waits until the log holds `n` lines: a line is written once its response has gone, which a busy machine delays. */
+  const logged = async (n: number) => {
+    for (let t = 0; lines.length < n && t < 200; t++) await new Promise((r) => setTimeout(r, 10));
+  };
 
   const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1';
 
   it('logs a served page with its status, time and the device that asked', async () => {
     await (await fetch(`${base}/`, { headers: { 'user-agent': IPHONE } })).text();
-    await new Promise((r) => setTimeout(r, 20));
+    await logged(1);
     assert.match(lines.at(-1)!, /^GET \/ 200 \d+ ms 127\.0\.0\.1 iPhone$/);
   });
 
   it('logs refusals too', async () => {
     await (await fetch(`${base}/missing.png`)).text();
     await (await fetch(`${base}/`, { method: 'POST' })).text();
-    await new Promise((r) => setTimeout(r, 20));
+    await logged(3);
     assert.match(lines.at(-2)!, /^GET \/missing\.png 404 \d+ ms 127\.0\.0\.1 other$/);
     assert.match(lines.at(-1)!, /^POST \/ 405 \d+ ms 127\.0\.0\.1 other$/);
   });

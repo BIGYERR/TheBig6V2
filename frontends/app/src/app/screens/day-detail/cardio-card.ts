@@ -4,8 +4,8 @@ import type { CardioCardView } from './cardio-card-model';
 
 /**
  * The session sheet's cardio card (architecture phase E, step 25), in place of the legacy buildCardioHTML markup: the
- * sport and session, the swim segments with their total or the prescription, the note, and the retest strip (still the
- * legacy _benchStripHTML's markup). The prescription's words are the engine's markup, as before.
+ * sport and session, the swim segments with their total or the prescription, the note, and the retest strip (its lines
+ * from sheet-marks-model's benchNotes since step 30). The prescription's words are the engine's markup, as before.
  */
 @Component({
   selector: 'ia-cardio-card',
@@ -14,7 +14,7 @@ import type { CardioCardView } from './cardio-card-model';
   template: `
   @let c = card();
   @let m = markup();
-  <div [class]="c.blockCls"><div [class]="'cardio-type-label ' + c.labelCls" [innerHTML]="m.label"></div>@if (m.segments; as segs) {@for (sg of segs; track $index) {<div class="swim-seg"><div class="swim-seg-label" [innerHTML]="sg.label"></div><div class="swim-seg-body" [innerHTML]="sg.text"></div></div>}@if (c.total) {<div class="swim-total">{{ c.total }}</div>}} @else {<div class="cardio-detail" [innerHTML]="m.detail"></div>}@if (m.note) {<div class="cardio-note" [innerHTML]="m.note"></div>}@if (m.bench) {<div style="display:contents" [innerHTML]="m.bench"></div>}</div>
+  <div [class]="c.blockCls"><div [class]="'cardio-type-label ' + c.labelCls" [innerHTML]="m.label"></div>@if (m.segments; as segs) {@for (sg of segs; track $index) {<div class="swim-seg"><div class="swim-seg-label" [innerHTML]="sg.label"></div><div class="swim-seg-body" [innerHTML]="sg.text"></div></div>}@if (c.total) {<div class="swim-total">{{ c.total }}</div>}} @else {<div class="cardio-detail" [innerHTML]="m.detail"></div>}@if (m.note) {<div class="cardio-note" [innerHTML]="m.note"></div>}@for (n of c.bench; track $index) {<div class="cardio-note">@if (n.lead) {<b>{{ n.lead }}</b>}{{ n.text }}</div>}</div>
   `,
 })
 export class CardioCard {
@@ -28,7 +28,6 @@ export class CardioCard {
       segments: c.segments ? c.segments.map((sg) => ({ label: h(sg.label), text: h(sg.text) })) : null,
       detail: h(c.detail),
       note: c.note ? h(c.note) : null,
-      bench: c.bench ? h(c.bench) : null,
     };
   });
 }

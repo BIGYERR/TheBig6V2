@@ -29,18 +29,28 @@ export interface BodyParts {
   e1rm: E1rmCard | null;
   rest: SectionView[];
   cardio: CardioCardView | null;
+  /** The day's note, as the engine's markup. */
   note: string | undefined;
   nudge: RangeNudge | null;
-  wildcardTag: string;
+  /** The words under WILDCARD DONE, when a Wildcard was done in the day's place. */
+  wildcard: string | null;
   log: SessionLogData;
   /** The "logged but never marked" nudge, when the day has a log and no status. */
-  logNudge: string;
+  logNudge: LogNudge | null;
 }
 
-/** One block of the body: sections, a legacy builder's markup, the 1RM calculator, the range-top nudge, the cardio card or the log. */
+/** The "logged but never marked" nudge: the day it marks done, and its title. */
+export interface LogNudge {
+  dayKey: string;
+  title: string;
+}
+
+/** One block of the body: the Wildcard tag, the range nudge, sections, the 1RM calculator, the cardio card, the note, the log or the log nudge. */
 export type BodyBlock =
+  | { kind: 'wildcard'; sub: string }
   | { kind: 'sections'; sections: SectionView[] }
-  | { kind: 'html'; html: string }
+  | { kind: 'note'; html: string }
+  | ({ kind: 'logNudge' } & LogNudge)
   | { kind: 'e1rm'; card: E1rmCard }
   | { kind: 'nudge'; nudge: RangeNudge }
   | { kind: 'cardio'; card: CardioCardView }
@@ -56,15 +66,14 @@ export function liftsFirst(hasSections: boolean, primaryPath: string | undefined
 
 /** The body in the legacy order: the Wildcard tag, the range nudge, the work, the note, the log, the log nudge. */
 export function detailBody(p: BodyParts, first: boolean, hasSections: boolean): BodyBlock[] {
-  const html = (h: string): BodyBlock[] => (h ? [{ kind: 'html', html: h }] : []);
   const secs = (v: SectionView[]): BodyBlock[] => (v.length ? [{ kind: 'sections', sections: v }] : []);
   const lifts: BodyBlock[] = hasSections ? [...secs(p.main), ...(p.e1rm ? [{ kind: 'e1rm' as const, card: p.e1rm }] : []), ...secs(p.rest)] : [];
   const cardio: BodyBlock[] = p.cardio ? [{ kind: 'cardio', card: p.cardio }] : [];
   const blocks: BodyBlock[] = first ? [...lifts, ...cardio] : [...cardio, ...lifts];
-  if (p.note) blocks.push(...html('<div class="note-block">' + p.note + '</div>'));
+  if (p.note) blocks.push({ kind: 'note', html: p.note });
   if (p.nudge) blocks.unshift({ kind: 'nudge', nudge: p.nudge });
-  if (p.wildcardTag) blocks.unshift(...html(p.wildcardTag));
-  return [...blocks, { kind: 'log', log: p.log }, ...html(p.logNudge)];
+  if (p.wildcard !== null) blocks.unshift({ kind: 'wildcard', sub: p.wildcard });
+  return [...blocks, { kind: 'log', log: p.log }, ...(p.logNudge ? [{ kind: 'logNudge' as const, ...p.logNudge }] : [])];
 }
 
 /** The legacy _epley: a single is itself; otherwise weight × (1 + reps/30), rounded; nothing without a weight. */
@@ -109,10 +118,9 @@ export function hasLogged(le: Record<string, unknown> | undefined): boolean {
   return !!((typeof notes === 'string' && notes.trim()) || le['run_dist'] || le['run_pace'] || le['run_mins'] || le['run_reps'] || le['run_rep_time'] || le['bike_mins'] || le['swim_yards']);
 }
 
-/** The "logged but never marked" nudge's markup, its button marking the day done. */
-export function logNudge(dayKey: string, title: string | undefined, icon: string): string {
-  const esc = (title || '').replace(/'/g, "\\'");
-  return '<div class="log-nudge"><span>' + icon + ' You logged this one but never marked it.</span><button class="log-nudge-btn" onclick="handleDayStatus(\'' + dayKey + '\',\'' + esc + '\',\'complete\')">Mark Done ✓</button></div>';
+/** The "logged but never marked" nudge: its button marks the day done under the day's title. */
+export function logNudge(dayKey: string, title: string | undefined): LogNudge {
+  return { dayKey, title: title || '' };
 }
 
 /** The header's logged count, or none when the day has nothing to log. */

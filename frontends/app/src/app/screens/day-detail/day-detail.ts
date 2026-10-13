@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { LegacyBridge } from '../../legacy/legacy-bridge';
 import { type BodyBlock, detailBody, e1rmCard, type FootButton, hasLogged, liftsFirst, loggedCount, logNudge, rangeNudge, statusFoot } from './day-detail-model';
+import { type BenchEntry, benchNotes, modTags, type TagChip, wildcardSub } from './sheet-marks-model';
 import { E1rmCard } from './e1rm-card';
 import { CardioCard } from './cardio-card';
 import { cardioCard, type CardioRx } from './cardio-card-model';
@@ -25,9 +26,10 @@ interface DetailDay {
 interface DetailView {
   over: string;
   title: string;
-  tags: SafeHtml;
+  /** The header's tags, and the travel tag on a travel day. */
+  tags: { chips: TagChip[]; travel: boolean };
   counter: string | null;
-  body: (BodyBlock | { kind: 'html'; html: SafeHtml })[];
+  body: BodyBlock[];
 }
 
 /** The fields the legacy sheet wired to save as they change. */
@@ -64,7 +66,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
       <div class="dh-over"><span class="dh-over-txt" id="detailDayName">{{ v.over }}</span></div>
       <div class="dh-title" id="detailDayTitle">{{ v.title }}</div>
       <div class="dh-tagrow">
-        <div class="dh-tags" id="detailTags" [innerHTML]="v.tags"></div>
+        <div class="dh-tags" id="detailTags">@for (t of v.tags.chips; track $index) {<span class="wk-tag" [style.color]="t.color" [style.background]="t.bg">{{ t.label }}</span>}@if (v.tags.travel) {<span class="wk-tag wk-travel" [innerHTML]="travelInner()"></span>}</div>
         <button class="dh-addbtn" id="detailAddBtn" (click)="call('openAddSheet')" aria-label="Add an exercise to this day"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Exercise</button>
       </div>
     </div>
@@ -72,7 +74,9 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
       @for (blk of v.body; track $index) {
         @switch (blk.kind) {
           @case ('sections') { <ia-session-sections [sections]="blk.sections" /> }
-          @case ('html') { <div style="display:contents" [innerHTML]="blk.html"></div> }
+          @case ('wildcard') { <div class="wc-tag"><span class="wc-mark" aria-label="Wildcard done" [innerHTML]="markInner()"></span><div class="wc-tag-txt"><div class="wc-tag-lbl">WILDCARD DONE</div><div class="wc-tag-sub">{{ blk.sub }}</div></div></div> }
+          @case ('note') { <div class="note-block" [innerHTML]="html(blk.html)"></div> }
+          @case ('logNudge') { <div class="log-nudge"><span [innerHTML]="nudgeLine()"></span><button class="log-nudge-btn" (click)="call('handleDayStatus', blk.dayKey, blk.title, 'complete')">Mark Done ✓</button></div> }
           @case ('e1rm') { <ia-e1rm-card [card]="blk.card" /> }
           @case ('cardio') { <ia-cardio-card [card]="blk.card" /> }
           @case ('log') { <ia-session-log [log]="blk.log" /> }
@@ -123,6 +127,27 @@ export class DayDetail {
     this.bridge.call(name, ...args);
   }
 
+  private readonly safe = new Map<string, SafeHtml>();
+  /** Markup from the program or a legacy helper, made ready for the page once per string. */
+  protected html(s: string): SafeHtml {
+    let h = this.safe.get(s);
+    if (!h) {
+      h = this.sanitizer.bypassSecurityTrustHtml(s);
+      this.safe.set(s, h);
+    }
+    return h;
+  }
+  /** The travel tag's backpack and word, the Wildcard mark's flame and W, and the log nudge's notebook and line. */
+  protected travelInner(): SafeHtml {
+    return this.html(this.bridge.call<string>('asyIcon', 'backpack', 11) + '<span>Travel</span>');
+  }
+  protected markInner(): SafeHtml {
+    return this.html(this.bridge.call<string>('asyIcon', 'flame', 16) + '<span class="wc-mark-w">W</span>');
+  }
+  protected nudgeLine(): SafeHtml {
+    return this.html(this.bridge.call<string>('asyIcon', 'notebook', 14) + ' You logged this one but never marked it.');
+  }
+
   /** The legacy buildLogHTML's reads: the day's entry, then the log drawn from it through the legacy helpers. */
   private log(dayKey: string, cardio: { type?: string; subtype?: string } | undefined): SessionLogData {
     const b = this.bridge;
@@ -154,7 +179,7 @@ export class DayDetail {
     const week = b.global<number>('currentWeek');
     const comp = b.call<Record<string, { title?: string; status?: string } | undefined>>('getCompleted')[b.call<string>('completedKey', week, dayKey)];
     const progress = b.call<{ done: number; total: number }>('sessionLogProgress', day);
-    const tags = b.call<string>('modTagsHTML', day.tags) + b.call<string>('travelTagHTML', day);
+    const tags = { chips: modTags(day.tags, b.global('MOD_PAL'), b.global('tagMeta')), travel: !!b.call('dayIsTravel', day) };
     b.call('ruResetIfIdle');
 
     const secs = day.sections || [];
@@ -172,19 +197,19 @@ export class DayDetail {
       main: secs.length ? sectionsView([secs[0] as ExSection], 0, sectionReads(b)) : [],
       e1rm: day.testLift ? e1rmCard(String(day.testLift), unit, this.safeRead(() => lastOf(mainName), undefined)) : null,
       rest: secs.length ? sectionsView(secs.slice(1) as ExSection[], 1, sectionReads(b)) : [],
-      cardio: cardioCard(day.cardio as CardioRx | undefined, day.cardio ? b.call<string>('_benchStripHTML', day.cardio) : ''),
+      cardio: cardioCard(day.cardio as CardioRx | undefined, day.cardio ? benchNotes(day.cardio as { subtype?: string; week?: number }, (wk) => b.call<BenchEntry | null>('_benchmarkEntryFor', wk), (s) => b.call<string>('_clkMS', s)) : []),
       note: day.note,
       nudge: this.safeRead(() => rangeNudge(items, lastOf), null),
-      wildcardTag: b.call<string>('wildcardTagHTML', week, dayKey),
+      wildcard: wildcardSub(b.call('wildcardOn', week, dayKey), this.safeRead(() => (prog as { weeks?: Record<number, Record<string, { rest?: unknown; title?: string } | null>> } | null)!.weeks![week]![dayKey] ?? null, null)),
       log: this.log(dayKey, day.cardio as { type?: string; subtype?: string } | undefined),
-      logNudge: !status && hasLogged(le) ? logNudge(dayKey, day.title, b.call<string>('asyIcon', 'notebook', 14)) : '',
+      logNudge: !status && hasLogged(le) ? logNudge(dayKey, day.title) : null,
     }, liftsFirst(secs.length > 0, prog?.primaryPath, prog?.liftingFocus), secs.length > 0);
     this.view.set({
       over: 'Week ' + week + ' · ' + b.global<Record<string, string>>('DAY_FULL')[dayKey],
       title: (comp && comp.title) || day.title || 'Training',
-      tags: this.sanitizer.bypassSecurityTrustHtml(tags),
+      tags,
       counter: loggedCount(progress),
-      body: body.map((blk) => (blk.kind === 'html' ? { kind: 'html' as const, html: this.sanitizer.bypassSecurityTrustHtml(blk.html) } : blk)),
+      body,
     });
     this.foot.set(null);
     this.cdr.detectChanges();
