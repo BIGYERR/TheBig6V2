@@ -51,7 +51,7 @@ describe('sync-legacy on the live page', () => {
     const pick = (suffix: string): string => files.find(([path]) => path.endsWith(suffix))![1];
     const sha = createHash('sha256').update(relabelled).digest('hex');
     assert.deepEqual(JSON.parse(pick('legacy-manifest.json')), { version: '0.239.1', sha256: sha });
-    assert.ok(pick('legacy-markup.ts').includes(`export const LEGACY_SCRIPT_URL = "legacy/app.js?v=0.239.1-${sha.slice(0, 12)}";`));
+    assert.ok(pick('legacy-markup.ts').includes(`export const LEGACY_SCRIPT_URL = "legacy/legacy.js?v=0.239.1-${sha.slice(0, 12)}";`));
   });
 });
 

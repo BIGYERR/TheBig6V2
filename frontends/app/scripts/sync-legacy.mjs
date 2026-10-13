@@ -11,9 +11,11 @@
 //   style   the one <style> block                         -> src/legacy/generated/legacy.css
 //   markup  the rest sheet's markup, the one legacy markup -> src/legacy/generated/legacy-markup.ts
 //           the Angular shell does not draw (the page's whole body markup stays in split()'s result)
-//   script  the one inline <script>, but its last line     -> public/legacy/app.js
-// The script's last line boots the page (init() once the document has loaded); the Angular shell calls init() itself,
-// once its components are in place (src/app/legacy/legacy-host.ts), so the copy it loads ends one line earlier.
+//   script  the one inline <script>, but its last line     -> public/legacy/app.js (read by npm run lint:legacy)
+// and, from the page's source files themselves, the legacy app as ES modules -> public/legacy/legacy.js, the module
+// script the Angular shell runs (scripts/legacy-bundle.mjs, since v0.239.42; its types in src/legacy/generated). The
+// script's last line boots the page (init() once the document has loaded); the Angular shell calls init() itself, once
+// its components are in place (src/app/legacy/legacy-host.ts), so neither copy carries it.
 // The split follows the HTML parser's own rule: a script ends at the first "</script>". Each piece is asserted to
 // occur exactly once; anything else fails loudly rather than producing a quietly different app.
 // split() and render() are exported for test/; nothing is read or written unless this file is run as a script.
@@ -23,6 +25,9 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { metaVersion } from './version.mjs';
 import { ICON, buildIndex } from './build-index.mjs';
+import { BOOT_LINE, legacyBundle } from './legacy-bundle.mjs';
+
+export { BOOT_LINE };
 
 const APP = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const GEN = join(APP, 'src', 'legacy', 'generated');
@@ -75,8 +80,6 @@ export function split(html) {
   return { headRest, css, js, markup: before + after, version };
 }
 
-/** The page's own boot, the script's last line. */
-export const BOOT_LINE = "if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}";
 /** The open tag of the one legacy overlay whose markup the Angular shell still takes from the page. */
 export const REST_OVERLAY_OPEN = '<div class="rand-overlay" id="restOverlay">';
 
@@ -116,7 +119,7 @@ export function render(src) {
     `// ${banner}\n` +
     `export const LEGACY_VERSION = ${JSON.stringify(parts.version)};\n` +
     `export const LEGACY_SHA256 = ${JSON.stringify(sha256)};\n` +
-    `export const LEGACY_SCRIPT_URL = ${JSON.stringify(`legacy/app.js?v=${parts.version}-${sha256.slice(0, 12)}`)};\n` +
+    `export const LEGACY_SCRIPT_URL = ${JSON.stringify(`legacy/legacy.js?v=${parts.version}-${sha256.slice(0, 12)}`)};\n` +
     `export const LEGACY_REST_OVERLAY = ${JSON.stringify(innerOf(parts.markup, REST_OVERLAY_OPEN))};\n`;
 
   return {
@@ -128,9 +131,12 @@ export function render(src) {
   };
 }
 
-function main() {
+async function main() {
   const src = buildIndex().toString('utf8');
   const files = render(src);
+  const bundle = await legacyBundle();
+  files[join(PUB, 'legacy', 'legacy.js')] = bundle.js;
+  files[join(GEN, 'legacy-bundle.d.ts')] = bundle.dts;
   const check = process.argv.includes('--check');
   const stale = [];
   for (const [path, body] of Object.entries(files)) {
@@ -155,10 +161,8 @@ function main() {
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  try {
-    main();
-  } catch (err) {
+  main().catch((err) => {
     console.error(`sync-legacy: ${err.message}`);
     process.exit(1);
-  }
+  });
 }

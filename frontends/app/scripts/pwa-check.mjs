@@ -47,13 +47,12 @@ export function checkPwaBuild({ pageFile, out, name, baseHref, rerun }) {
     if (!existsSync(join(out, ref.split(/[?#]/)[0]))) fail(`${name}index.html loads ${ref}, which is not in ${name}; ${rerun}`);
   }
 
-  // The app script is the page's inline <script>, byte for byte, and the bundle asks for this version of it.
-  const appJsPath = join(out, 'legacy', 'app.js');
-  if (!existsSync(appJsPath)) fail(`no ${name}legacy/app.js; ${rerun}`);
-  if (countOf(root, `<script>${readFileSync(appJsPath, 'utf8')}</script>`) !== 1) {
-    fail(`${name}legacy/app.js is not the page's script; ${rerun}`);
-  }
-  const scriptUrl = `legacy/app.js?v=${version}-${sha256.slice(0, 12)}`;
+  // The legacy app is legacy/legacy.js, the page's source files as ES modules (scripts/legacy-bundle.mjs, since v0.239.42;
+  // the classic legacy/app.js is no longer loaded), and the main bundle asks for this page's version of it.
+  const legacyPath = join(out, 'legacy', 'legacy.js');
+  if (!existsSync(legacyPath)) fail(`no ${name}legacy/legacy.js; ${rerun}`);
+  if (!readFileSync(legacyPath, 'utf8').includes('__iaLegacyReady')) fail(`${name}legacy/legacy.js is not the legacy modules' script; ${rerun}`);
+  const scriptUrl = `legacy/legacy.js?v=${version}-${sha256.slice(0, 12)}`;
   const bundles = readdirSync(out).filter((f) => /^main-[A-Z0-9]+\.js$/.test(f));
   if (bundles.length !== 1) fail(`expected one main-*.js in ${name}, found ${bundles.length}; ${rerun}`);
   if (!readFileSync(join(out, bundles[0]), 'utf8').includes(scriptUrl)) {

@@ -694,3 +694,40 @@ what is stored.
   loudly). A local boot of both builds, empty and with a program, drew the same screens with no page error. 69/69 at 0
   px on both builds.
 - **Does not change:** the single-file page (only its version meta); any program; any stored key or value.
+
+## Release scope: v0.239.42 runs the legacy app as ES modules in the Angular build
+
+- **Date:** 2026-10-12. **Picked by:** Mario's standing answer (PATCH, in order). **Shipped:** v0.239.42.
+- **Moved:** how the Angular build runs the legacy app. `scripts/legacy-bundle.mjs` (run by `npm run sync`) bundles the
+  page's source files (the app's JS and the engine's TypeScript), in the page's order, as the ES modules they already
+  are (phase C), into `public/legacy/legacy.js` (minified), a module script `LegacyHost` adds to the page, which hands
+  its modules to the host as it runs. A script element, not an `import()` of a lazy chunk: the first version imported
+  a chunk, and the e2e's relaunch step showed This Week 12 px off the reference, because an `import()` lets the page's
+  load event pass before the legacy boot has drawn, and the browser restores a reloaded page's scroll position at that
+  event; a script element delays the load event as the page's own script does, and the step matched again. To the bundle
+  only, never the sources or the page, it adds each file's top-level names as exports and two seams: `__iaTakeOver(name,
+  fn)` rebinds one of the file's top-level functions (a function declaration is a mutable binding, and every importer
+  sees the new one), and `__iaSet(name, value)` writes a top-level `let` or `var`. It drops the page's boot line and fails
+  on an implicit global (a module's strict mode refuses one; none was found). `LegacyBridge` resolves a name in the file
+  that declares it (the later file where two do, as the classic script's global scope did), takes over through the
+  seam, writes through the seam, and falls back to the browser's own globals (`window`). The legacy functions go on the
+  global object, and the other top-level names get live accessors there, for the inline handlers and handler strings
+  the legacy app still writes (the rest sheet, the pop-up's actions, a start sentence's offer); a name the browser
+  already defines keeps the browser's.
+- **Also:** `scripts/pwa-check.mjs`, the check `npm run pwa-local` and `npm run pwa-pages` run on a web build, compared
+  `legacy/app.js` with the page's script byte for byte; v0.239.41's dropped boot line broke that comparison, which no
+  test or CI step runs on a real build. It now proves the main bundle loads this page's version of `legacy/legacy.js`
+  (its URL carries the version and the page's sha256, as `app.js`'s did) and that the file is the legacy modules'
+  script; the real local build passes it.
+- **Tests:** `frontends/app/test/unit/legacy-bundle.test.ts` (5): a file's top-level names (declared, mutable,
+  exported, implicit) from JS and from TypeScript, the seams' text (their parameters named so no legacy name can shadow
+  them: the first draft's `f` would have, and the test found it), a real takeover and write bundled by esbuild and run
+  (the importer and the declaring module both see the new function), and the entry's order.
+  `frontends/app/test/integration/legacy-bundle.test.ts` (3): the real bundle holds every code piece in the page's
+  order, carries no boot line, finds no implicit global, and has a seam for every takeover and write read off the
+  components' source. `pwa-local.test.ts`'s check tests follow the new proof. The six local comparisons (the cardio
+  step, the log, the sections, the sheet's marks, This Week, the program list) ran against the module build and
+  matched in all 119 states and taps; two of them had stubbed legacy functions by replacing their globals, which no
+  longer reaches legacy callers, so they now seed real data (a travel overlay key, Wildcard records). 69/69 at 0 px.
+- **Does not change:** the single-file page (only its version meta); the source files; any program; any stored key or
+  value.

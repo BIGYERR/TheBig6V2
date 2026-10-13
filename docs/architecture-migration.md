@@ -367,10 +367,17 @@ then it stays its own package, because Cordova keeps its platform and plugin lis
   is Angular components over the legacy data readers; This Week (v0.239.25); the wizard's shell and first three steps (v0.239.26), its lifting focus, days and name steps (v0.239.27); the session sheet's frame and header (v0.239.28, its body still
   the legacy builders'); the app's frames: Programs, generating, Progress, the tab bar (v0.239.29); the goal, mile lock and injury/travel
   sheets' frames (v0.239.30); the session sheet's status foot (v0.239.31); its 1RM calculator and range-top nudge (v0.239.32); its cardio card (v0.239.33); the wizard's cardio goal step (v0.239.34): the whole wizard is Angular; the session sheet's log (v0.239.35); its sections and exercise cards, also drawn in Random Workout (v0.239.36): every screen and sheet is Angular, over the legacy logic and handlers; a program card's detail (v0.239.37); the session sheet's tags, Wildcard tag, note, log nudge and retest strip (v0.239.38); This Week's marks and the wizard's seed banner, advisories and start pips (v0.239.39); the session log's cardio fields and wheels, with the sport picker's swap (v0.239.40): no legacy markup builder draws inside a screen any more; the page's skeleton is the shell's template, and the legacy boot runs after the components (v0.239.41).
-- **Left for phase E's "done when":** the rest sheet (its own build, v0.240.0); then the legacy logic itself, which still
-  runs as the page's classic script under `LegacyBridge` (280 legacy names used, 227 of them functions called, and 29 functions taken over, counted at v0.239.41): it moves into TypeScript
-  modules the components import, by the phase D method (types first, the same tokens proved by `tools/same-script.mjs`),
-  then the bridge's calls become imports and the takeovers become the modules' own seams, file by file.
+- **The legacy logic as ES modules (v0.239.42):** the Angular build no longer runs the page's classic script; it imports
+  the legacy source files as the ES modules they are (`scripts/legacy-bundle.mjs`, `public/legacy/legacy.js`, a module
+  script that hands them over as it runs, so the load event waits for the boot as it does for the page's script), and `LegacyBridge`
+  resolves each name in the file that declares it. A takeover rebinds the declaration through a seam the bundle adds
+  (`__iaTakeOver`), so every legacy caller reaches the component, as replacing the global did. The page and the sources
+  are unchanged.
+- **Left for phase E's "done when":** the rest sheet (its own build, v0.240.0); then the legacy logic itself, still
+  JavaScript reached through `LegacyBridge` by name (280 legacy names used, 227 of them functions called, and 29
+  functions taken over, counted at v0.239.41): it moves into TypeScript by the phase D method (types first, the same
+  tokens proved by `tools/same-script.mjs`), then the bridge's calls become typed imports, file by file, and
+  `frontends/app/src/app/legacy/` empties.
 - Suggested order:
   1. bug report (small, proves the pattern);
   2. rest timer;

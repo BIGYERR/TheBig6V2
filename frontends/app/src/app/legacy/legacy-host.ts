@@ -1,6 +1,7 @@
 import { afterNextRender, ChangeDetectionStrategy, ChangeDetectorRef, Component, type ElementRef, inject, signal, viewChild } from '@angular/core';
 import { Platform } from '../core/platform';
 import { LegacyBridge } from './legacy-bridge';
+import type { LegacyModules } from '../../legacy/generated/legacy-bundle';
 import { LEGACY_REST_OVERLAY, LEGACY_SCRIPT_URL } from '../../legacy/generated/legacy-markup';
 import { BugReport } from '../screens/bug-report/bug-report';
 import { RestTimer } from '../screens/rest-timer/rest-timer';
@@ -26,14 +27,17 @@ import { Wizard } from '../screens/wizard/wizard';
 
 /**
  * The Iron Asylum app: the page's skeleton (its screens, sheets, toast, rest timer, tab bar and pop-up, in the page's
- * order, with the page's classes, ids and taps) and each one's component, over the legacy script built from the page
- * (src/legacy/src, by scripts/build-index.mjs). Since phase E step 33 the skeleton is this template, not the page's markup
+ * order, with the page's classes, ids and taps) and each one's component, over the legacy app's source files
+ * (src/legacy/src and core/src/engine). Since phase E step 33 the skeleton is this template, not the page's markup
  * written in; only the rest sheet's markup is still the page's (it moves with its own build, v0.240.0), written into its
- * element before the script runs so its inline handlers stay. Order matters: the skeleton is drawn, the script runs as a
- * classic script (so its top-level functions stay globals for those handlers and for LegacyBridge) without its boot line,
- * the components are drawn at once (each takes over the legacy functions it replaces, through LegacyBridge.provide), and
- * only then does the legacy init() run, so the boot draws once, onto the components, as the single-file page draws onto
- * its own markup. The legacy navigation (showScreen, the tab bar) still shows and hides the screens by their classes.
+ * element first so its inline handlers stay. Since step 34 the legacy app runs as the ES modules its files are
+ * (public/legacy/legacy.js, a module script built by scripts/legacy-bundle.mjs), not as the page's classic script. Order
+ * matters: the skeleton is drawn, the module script runs (without the page's boot line) and hands its modules over,
+ * their functions go on the global object for the inline handlers, the components are drawn at once (each takes over the
+ * legacy functions it replaces, through LegacyBridge.provide), and only then does the legacy init() run, so the boot
+ * draws once, onto the components, as the single-file page draws onto its own markup, and all of it before the page's
+ * load event, as the page's own script runs before it. The legacy navigation (showScreen, the tab bar) still shows and
+ * hides the screens by their classes.
  */
 @Component({
   selector: 'ia-legacy-host',
@@ -93,13 +97,29 @@ export class LegacyHost {
     // Written through the element, not an [innerHTML] binding, so Angular's sanitizer keeps its inline handlers.
     this.rest().nativeElement.innerHTML = LEGACY_REST_OVERLAY;
     await new Promise<void>((resolve, reject) => {
+      const g = globalThis as { __iaLegacyReady?: (modules: LegacyModules) => void };
+      // The module script calls this as it runs, so the boot finishes inside it, before the page's load event.
+      g.__iaLegacyReady = (modules) => {
+        delete g.__iaLegacyReady;
+        try {
+          this.boot(modules);
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      };
       const script = document.createElement('script');
+      script.type = 'module';
       script.src = LEGACY_SCRIPT_URL;
-      script.onload = () => resolve();
       script.onerror = () => reject(new Error(`failed to load ${LEGACY_SCRIPT_URL}`));
       document.body.appendChild(script);
     });
-    this.bridge.markBooted();
+  }
+
+  /** Opens the bridge on the legacy modules, draws the components, and runs the legacy init(). */
+  private boot(modules: LegacyModules): void {
+    this.bridge.markBooted(modules);
+    this.bridge.installGlobals();
     this.booted.set(true);
     this.cdr.detectChanges();
     this.bridge.call('init');

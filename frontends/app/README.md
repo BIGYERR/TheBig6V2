@@ -80,10 +80,15 @@ for byte, and checks that each one occurs exactly once:
 | `<head>` metas, links, title (`ia-version` included) | `src/legacy/generated/index.html` | Angular's index page |
 | the one `<style>` block | `src/legacy/generated/legacy.css` | global stylesheet |
 | the rest sheet's markup (the one legacy markup the shell does not draw) | `src/legacy/generated/legacy-markup.ts` | written into `#restOverlay` by `LegacyHost` |
-| the one inline `<script>`, but its last line (the page's boot) | `public/legacy/app.js` | loaded by `LegacyHost` as a classic script |
+| the one inline `<script>`, but its last line (the page's boot) | `public/legacy/app.js` | read by `npm run lint:legacy` only |
+| the page's source files as ES modules (`scripts/legacy-bundle.mjs`) | `public/legacy/legacy.js` (types in `src/legacy/generated/legacy-bundle.d.ts`) | run by `LegacyHost` as a module script |
 
-The generated `app.js` is byte-identical to what `tests/harness.js` extracts and the tests boot, but for its last line,
-`if(document.readyState==='loading'){...}else{init();}`, which `LegacyHost` runs itself (v0.239.41).
+Since v0.239.42 the Angular build runs the legacy app as the ES modules its source files already are (phase C), not as
+the page's classic script: `scripts/legacy-bundle.mjs` bundles them with esbuild in the page's order and adds, to the
+bundle only, every file's top-level names as exports and two seams per file (`__iaTakeOver` rebinds a top-level
+function, so a component takes over a legacy function for every caller; `__iaSet` writes a top-level `let`). It drops
+the page's boot line (`LegacyHost` runs `init()` itself) and fails on any implicit global, which a module refuses. The
+page and the sources do not change.
 
 At runtime, `ia-root` renders `ia-legacy-host` (`src/app/legacy/legacy-host.ts`), which (since v0.239.41):
 1. draws the page's skeleton (its screens, sheets, toast, rest timer, tab bar and pop-up, in the page's order, with the
@@ -91,8 +96,11 @@ At runtime, `ia-root` renders `ia-legacy-host` (`src/app/legacy/legacy-host.ts`)
 2. waits for Cordova's `deviceready` inside the native app (`src/app/core/platform.ts`; a browser skips this);
 3. writes the rest sheet's markup into `#restOverlay` (not through `[innerHTML]`, so its inline `onclick` handlers
    survive);
-4. loads `legacy/app.js` as a classic script, so its top-level functions stay globals for those handlers and for
-   `LegacyBridge`;
+4. runs `legacy/legacy.js`, the legacy modules, as a module script (since v0.239.42; it loaded `legacy/app.js` as a
+   classic script before), which hands them over as it runs; opens `LegacyBridge` on them; and gives the global scope
+   the legacy functions (and live accessors for the other top-level names) for the inline handlers and handler strings
+   the legacy app still writes. A script element, not an `import()`, so the page's load event waits for the boot, as it
+   waits for the page's own script (the browser restores a reloaded page's scroll position at that event);
 5. draws every screen's component in its element, each taking over the legacy functions it replaces;
 6. runs the legacy `init()`, which draws the boot onto the components, as the page draws it onto its own markup.
 

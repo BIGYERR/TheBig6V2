@@ -108,7 +108,7 @@ describe('sync-legacy render', () => {
     const ts = byName('/legacy-markup.ts');
     assert.ok(ts.includes('export const LEGACY_VERSION = "7";'));
     assert.ok(ts.includes(`export const LEGACY_SHA256 = "${sha}";`));
-    assert.ok(ts.includes(`legacy/app.js?v=7-${sha.slice(0, 12)}`));
+    assert.ok(ts.includes(`legacy/legacy.js?v=7-${sha.slice(0, 12)}`));
     assert.deepEqual(JSON.parse(byName('/legacy-manifest.json')), { version: '7', sha256: sha });
   });
 
@@ -118,7 +118,7 @@ describe('sync-legacy render', () => {
     const pick = (suffix: string): string => dotted.find(([path]) => path.endsWith(suffix))![1];
     const s = createHash('sha256').update(page).digest('hex');
     assert.ok(pick('/legacy-markup.ts').includes('export const LEGACY_VERSION = "0.239.1";'));
-    assert.ok(pick('/legacy-markup.ts').includes(`legacy/app.js?v=0.239.1-${s.slice(0, 12)}`));
+    assert.ok(pick('/legacy-markup.ts').includes(`legacy/legacy.js?v=0.239.1-${s.slice(0, 12)}`));
     assert.deepEqual(JSON.parse(pick('/legacy-manifest.json')), { version: '0.239.1', sha256: s });
     assert.ok(pick('/generated/index.html').includes(`(ia-version 0.239.1, sha256 ${s})`));
   });
