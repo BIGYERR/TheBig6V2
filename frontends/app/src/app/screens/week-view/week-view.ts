@@ -75,7 +75,7 @@ const BLANK: View = {
       @switch (d.hero.kind) {
         @case ('rest') {
           @if (d.hero.kind === 'rest') {
-            <div class="wk-hero"><div class="wk-rest-pad"><div class="wk-hero-over">{{ d.hero.over }}</div><div class="wk-rest-title">REST DAY</div><div class="wk-rest-sub">Recovery is where the work sets in. Move easy, refuel, sleep.</div>@for (l of d.hero.lines; track $index) {<div class="wk-rest-logged">{{ l }}</div>}<div class="wk-rest-acts"><button class="wk-rest-act" (click)="restSheet(d.hero.key, 'move')">Training anyway?</button><button class="wk-rest-act" (click)="restSheet(d.hero.key, 'cardio')">{{ d.hero.logLabel }}</button></div></div></div>
+            <div class="wk-hero"><div class="wk-rest-pad"><div class="wk-hero-over">{{ d.hero.over }}</div><div class="wk-rest-title">REST DAY</div><div class="wk-rest-sub">Recovery is where the work sets in. Move easy, refuel, sleep.</div>@for (l of d.hero.lines; track $index) {<div class="wk-rest-logged">{{ l }}</div>}<div class="wk-rest-acts">@if (d.hero.anyway) {<button class="wk-rest-act" (click)="restSheet(d.hero.key, 'move')">Training anyway?</button>}<button class="wk-rest-act" (click)="restSheet(d.hero.key, 'cardio')">{{ d.hero.logLabel }}</button></div></div></div>
             <div class="wk-tip"><div class="wk-tip-lbl">{{ d.hero.tip.label }}</div><div class="wk-tip-txt">{{ d.hero.tip.text }}</div><div class="wk-tip-src">{{ '— ' + d.hero.tip.src }}</div></div>
           }
         }

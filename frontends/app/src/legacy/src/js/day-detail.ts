@@ -7,7 +7,7 @@ import {
 import { exStoreKey } from '../../../../../../core/src/engine/exercise-library.ts';
 import { DAY_FULL } from './wizard.ts';
 import { wildcardTagHTML } from './random-wildcard.ts';
-import { buildSectionsHTML } from './week-view-sections.ts';
+import { buildSectionsHTML, restLogLines } from './week-view-sections.ts';
 import { buildCardioHTML, refreshSetSummary, setWeightVals, toStoreW } from './set-logging.ts';
 import { getExWeights, isKBExercise, logExerciseWeight, updateDoseDerived } from './log-entries.ts';
 import { buildLogHTML, iaWheelInit, modTagsHTML, sessionLogProgress } from './wheel-log.ts';
@@ -104,6 +104,16 @@ function rangeTopNudgeHTML(day: any){
   return '<div class="prog-nudge"><b>Time to add weight.</b> Last session you hit the top of the range on every set of '
     +shown+extra+'. Go up in weight today and start back at the bottom of the range.</div>';
 }
+// v0.240.0 (D231 item 4): a session card on a day that also holds a jog says so above the work, one sentence per type
+// as the hero and the journal print it, and edits it in the rest sheet, which opens over the card on its cardio view.
+function restAlsoHTML(w: any,dayKey: any){
+  const e=getLogs()[completedKey(w,dayKey)];
+  const lines=restLogLines(e&&e.restLog);
+  if(!lines.length) return '';
+  return '<div class="also-block"><div class="also-lbl">ALSO ON '+String((DAY_FULL as Record<string, string>)[dayKey]||dayKey).toUpperCase()+'</div>'
+    +lines.map((l: any)=>'<div class="also-line">'+l+'</div>').join('')
+    +'<button class="also-btn" onclick="openRestSheet('+w+',\''+dayKey+'\',\'cardio\')">Edit cardio</button></div>';
+}
 function openDetail(dayKey: any,day: any){
   _setStaleWarnShown(false); _setStaleWarnSrc('');
   // @ts-expect-error TS2339 Property '_unitLabel' does not exist on type 'Window & typeof globalThis'.
@@ -155,6 +165,7 @@ function openDetail(dayKey: any,day: any){
   if(day.note) html+='<div class="note-block">'+day.note+'</div>';
   const _rtNudge=rangeTopNudgeHTML(day); if(_rtNudge) html=_rtNudge+html;
   const _wcTag=wildcardTagHTML(currentWeek,dayKey); if(_wcTag) html=_wcTag+html;   // V195 (D64)
+  const _also=restAlsoHTML(currentWeek,dayKey); if(_also) html=_also+html;   // v0.240.0 (D231 item 4)
   html+=buildLogHTML(dayKey, day.cardio);
   const curStatus=comp?(comp.status||'complete'):null;
   const escTitle=(day.title||'').replace(/'/g,"\\'");

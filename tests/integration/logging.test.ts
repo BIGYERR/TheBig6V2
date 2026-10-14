@@ -1279,8 +1279,9 @@ const RL: Record<string, Record<string, Record<string, number>>> = {
 };
 const TOP_ABSENT = ['rpe', 'run_dist', 'bike_mins', 'swim_yards', 'rest_cardio', 'rest_type', 'rest_mins'];
 const SESS: Record<string, Roll[]> = { dist: [[0, '5'], [1, '2'], [2, '0']], dist2: [[0, '2'], [1, '0'], [2, '0']], bike45: [[0, '0'], [1, '45'], [2, '0']] };
-const LINE = (mins: number, word: string, rpe: number | string) => mins + ' min ' + word + ' logged · RPE ' + rpe; // the hero sentence
-const JOG_LINE_RE = /^\d+ min (run|ride|swim|row|walk) logged · RPE (\d+|—)$/;
+// the hero sentence; from v0.240.0 (D229) the distance follows logged when the record holds one
+const LINE = (mins: number, word: string, rpe: number | string, dist?: string) => mins + ' min ' + word + ' logged' + (dist ? ' · ' + dist : '') + ' · RPE ' + rpe;
+const JOG_LINE_RE = /^(\d+ min (run|ride|swim|row|walk) logged( · [\d.]+ (mi|yd|m))?|[\d.]+ (mi|yd|m) (run|ride|swim|row) logged) · RPE (\d+|—)$/;
 const LABEL_WORDS = ['Very Easy', 'Easy', 'Moderate', 'Somewhat Hard', 'Hard', 'Hard+', 'Very Hard', 'Very Hard+', 'Max Effort', 'All Out'];
 const near = (a: unknown, b: number) => typeof a === 'number' && Number.isFinite(a) && Math.abs(a - b) < 1e-9;
 const canon = (v: any): any => (Array.isArray(v) ? v.map(canon) : v && typeof v === 'object' ? Object.keys(v).sort().reduce((o, k) => { o[k] = canon(v[k]); return o; }, {} as Record<string, any>) : v);
@@ -1510,8 +1511,8 @@ test('Progress sums the jog with the session, the plan drift ignores it, and the
   assert.ok(mv.offered && mv.moved && near(ladder(1), 3.7), 'ladder under a lift ' + ladder(1));
 });
 
-test('the journal prints a jog as the hero sentence, never an RPE label; an old cross-type jog prints its minutes; rows sort by time', () => {
-  const runLine = LINE(37, 'run', 7);
+test('the journal prints a jog as the hero sentence with its distance, never an RPE label; an old cross-type jog prints its minutes and its distance; rows sort by time', () => {
+  const runLine = LINE(37, 'run', 7, '3.7 mi');
   let mv = drive(HALF, 1, 'wed', JOG.run, 'tue');
   C.tap('wed', 'complete');
   let r = rowOf(journal(progress()), 1, 'Wed');
@@ -1522,7 +1523,8 @@ test('the journal prints a jog as the hero sentence, never an RPE label; an old 
   C.setLog(1, 'wed', { rest_cardio: true, rest_type: 'bike', rest_mins: 20, rpe: 5, run_dist: 3.7, bike_mins: 20 });
   r = rowOf(journal(progress()), 1, 'Wed');
   assert.ok(r);
-  assert.deepEqual([jogLinesOf(r), headOf(r), labelHits(r)], [[LINE(20, 'ride', 5)], [], []], J(r.segs));
+  // v0.240.0 (D229, D224-journal restated): the run's distance alone now prints its own line, after the ride's (the lens's key order)
+  assert.deepEqual([jogLinesOf(r), headOf(r), labelHits(r)], [[LINE(20, 'ride', 5), '3.7 mi run logged · RPE —'], [], []], J(r.segs));
   // a walk-only program
   drive(HALF, 1, 'wed', JOG.walk, null);
   const ph = progress();
@@ -1620,10 +1622,11 @@ test('a day swapped away from its sport is never offered to the rest sheet; swap
   }
 });
 
-test('Log more on a rest day never overwrites: a second run adds minutes and miles and keeps the higher RPE; a ride sits beside it', () => {
+// v0.240.0 (D228 item 4, D226 amended): the sheet reopens on the record and Log writes the face over it (V238 summed: 57 / 5.7).
+test('Log on a rest day writes the face over the type\'s record: a second run replaces the first; a ride sits beside it', () => {
   const ARMS: [string, Program, number, DayKey, Jog[], Record<string, Record<string, number>>][] = [
-    ['run then run, higher first', HALF, 1, 'wed', [JOG.run, { type: 'run', mins: 20, dist: '2', rpe: 5 }], { run: { mins: 57, dist: 5.7, rpe: 7 } }],
-    ['run then run, higher last', HALF, 1, 'wed', [{ type: 'run', mins: 37, dist: '3.7', rpe: 5 }, { type: 'run', mins: 20, dist: '2', rpe: 9 }], { run: { mins: 57, dist: 5.7, rpe: 9 } }],
+    ['run then run, higher first', HALF, 1, 'wed', [JOG.run, { type: 'run', mins: 20, dist: '2', rpe: 5 }], { run: { mins: 20, dist: 2, rpe: 5 } }],
+    ['run then run, higher last', HALF, 1, 'wed', [{ type: 'run', mins: 37, dist: '3.7', rpe: 5 }, { type: 'run', mins: 20, dist: '2', rpe: 9 }], { run: { mins: 20, dist: 2, rpe: 9 } }],
     ['run then ride', MULTI, BIKE_CELL!.w, BIKE_CELL!.rest, [JOG.run, { type: 'bike', mins: 20, dist: '', rpe: 5 }], { run: { mins: 37, dist: 3.7, rpe: 7 }, bike: { mins: 20, rpe: 5 } }],
   ];
   for (const [nm, prog, w, d, steps, want] of ARMS) {
@@ -1647,14 +1650,14 @@ test('a jog stored in the older flat shape reads as a rest log everywhere, and n
   const TS = C.at(1, 'wed', 9);
   const LEG2 = { rest_cardio: true, rest_type: 'run', rest_mins: 37, rpe: 7, run_dist: 3.7, sets: SETS, week: 1, ts: TS };
   const LENS2 = { restLog: { run: { mins: 37, dist: 3.7, rpe: 7 } }, sets: SETS, week: 1, ts: TS };
-  const runLine = LINE(37, 'run', 7);
+  const runLine = LINE(37, 'run', 7, '3.7 mi');
   C.use(HALF); C.setNow(C.at(1, 'wed')); C.setLog(1, 'wed', LEG1);
   const raw0 = C.logs();
   assert.equal(CJ((C.ev('getLogs()') || {}).w1_wed), CJ(LENS1), 'getLogs');
   assert.equal(CJ((C.ev('getLogsFor(' + J(C.id) + ')') || {}).w1_wed), CJ(LENS1), 'getLogsFor');
   assert.equal(milesTile(1), '3.7');
   const hr = heroOf(1, 'wed');
-  assert.deepEqual([hr.rest, hr.lines, hr.btn], [true, [runLine], 'Log more']);
+  assert.deepEqual([hr.rest, hr.lines, hr.btn], [true, [runLine], 'Edit cardio']);
   const ph = progress();
   const cr = chartVal('Weekly Running Mileage', 1);
   const ca = chartVal('Average Session RPE', 1);
@@ -1683,13 +1686,14 @@ test('a jog stored in the older flat shape reads as a rest log everywhere, and n
   assert.equal(J((A.w1_sun || {}).sets), J(SETS));
 });
 
-test('the rest hero prints one line per logged type with Log more, and Log cardio when nothing is logged', () => {
+// v0.240.0 (D224-hero restated): each line carries its distance (D229), and the button reads Edit cardio (D228 item 8).
+test('the rest hero prints one line per logged type, with its distance, under Edit cardio, and Log cardio when nothing is logged', () => {
   const CASES: [string, object | null, string[], string][] = [
     ['none', null, [], 'Log cardio'],
-    ['a rest log', { restLog: { run: { mins: 37, dist: 3.7, rpe: 7 } }, week: 1, ts: C.at(1, 'wed', 9) }, [LINE(37, 'run', 7)], 'Log more'],
-    ['an older single jog', { rest_cardio: true, rest_type: 'run', rest_mins: 37, rpe: 7, run_dist: 3.7 }, [LINE(37, 'run', 7)], 'Log more'],
-    ['an older ride then run', { rest_cardio: true, rest_type: 'run', rest_mins: 20, rpe: 5, bike_mins: 37, run_dist: 2 }, [LINE(20, 'run', 5), LINE(37, 'ride', '—')], 'Log more'],
-    ['an older ride then ride', { rest_cardio: true, rest_type: 'bike', rest_mins: 20, rpe: 5, bike_mins: 57 }, [LINE(57, 'ride', 5)], 'Log more'],
+    ['a rest log', { restLog: { run: { mins: 37, dist: 3.7, rpe: 7 } }, week: 1, ts: C.at(1, 'wed', 9) }, [LINE(37, 'run', 7, '3.7 mi')], 'Edit cardio'],
+    ['an older single jog', { rest_cardio: true, rest_type: 'run', rest_mins: 37, rpe: 7, run_dist: 3.7 }, [LINE(37, 'run', 7, '3.7 mi')], 'Edit cardio'],
+    ['an older ride then run', { rest_cardio: true, rest_type: 'run', rest_mins: 20, rpe: 5, bike_mins: 37, run_dist: 2 }, [LINE(20, 'run', 5, '2 mi'), LINE(37, 'ride', '—')], 'Edit cardio'],
+    ['an older ride then ride', { rest_cardio: true, rest_type: 'bike', rest_mins: 20, rpe: 5, bike_mins: 57 }, [LINE(57, 'ride', 5)], 'Edit cardio'],
   ];
   for (const [nm, entry, lines, btn] of CASES) {
     C.use(HALF); C.setNow(C.at(1, 'wed'));

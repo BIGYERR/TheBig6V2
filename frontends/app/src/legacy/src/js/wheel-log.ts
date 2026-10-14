@@ -403,4 +403,4 @@ function sessionLogProgress(day: any){
 }
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
-export { buildLogHTML, cardioFieldHTML, iaWheelFlush, iaWheelInit, modTagsHTML, sessionLogProgress };
+export { buildLogHTML, cardioFieldHTML, iaWheelFlush, iaWheelHTML, iaWheelInit, modTagsHTML, sessionLogProgress };

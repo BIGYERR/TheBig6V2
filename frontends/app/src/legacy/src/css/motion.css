@@ -3,10 +3,12 @@
 .screen.active{animation:scrIn .30s cubic-bezier(.32,.72,0,1);}
 @keyframes scrIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 /* detail + random overlays present as slide-up sheets */
-.overlay,.rand-overlay{display:block !important;transform:translateY(100%);visibility:hidden;will-change:transform;
+.overlay,.rand-overlay{display:block !important;transform:translateY(100%);visibility:hidden;will-change:transform;pointer-events:none;
   transition:transform .36s cubic-bezier(.32,.72,0,1), visibility 0s linear .36s;}
-.overlay.open,.rand-overlay.open{transform:translateY(0);visibility:visible;
+.overlay.open,.rand-overlay.open{transform:translateY(0);visibility:visible;pointer-events:auto;
   transition:transform .40s cubic-bezier(.32,.72,0,1), visibility 0s linear 0s;}
+/* v0.240.0 (D230): a sheet takes touches only while it is open. pointer-events is not in the transition list, so a
+   closing sheet stops taking them the moment open is removed, through its slide-out and after. */
 /* celebration popup: scale-in with a touch of bounce */
 @keyframes popIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:none;}}
 .pop-overlay.show{animation:fadeBg .22s ease;}

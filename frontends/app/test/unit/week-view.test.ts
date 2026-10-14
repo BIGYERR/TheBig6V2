@@ -75,10 +75,17 @@ describe('This Week', () => {
     assert.deepEqual(pre, { pre: true, label: 'MON', num: '5' });
   });
 
-  it('makes today\'s rest day the hero, with its jog lines and the tip', () => {
+  it('makes today\'s rest day the hero, with its jog lines, Edit cardio and the tip', () => {
     const v = weekView(input({ logs: { w1_wed: { restLog: { walk: { mins: 20 } } } } }), deps());
-    assert.deepEqual(v.days!.hero, { kind: 'rest', key: 'wed', over: 'Today · Wednesday', lines: ['20 min walk logged'], logLabel: 'Log more', tip: { label: 'Fuel', text: 'Eat.', src: 'NSW' } });
+    // v0.240.0 (D228 item 8): Edit cardio once a jog line prints (V238: Log more).
+    assert.deepEqual(v.days!.hero, { kind: 'rest', key: 'wed', over: 'Today · Wednesday', lines: ['20 min walk logged'], logLabel: 'Edit cardio', anyway: true, tip: { label: 'Fuel', text: 'Eat.', src: 'NSW' } });
     assert.equal(v.days!.wildcard, 'sub 1 wed');
+  });
+
+  it('offers no "Training anyway?" on a rest day whose session moved away, and Log cardio with no jog (v0.240.0, D231)', () => {
+    const moved: WeekProgram = { ...PROG, weeks: { ...PROG.weeks, 1: { ...PROG.weeks[1]!, wed: { rest: true, moved: true } } } };
+    const v = weekView(input({ prog: moved }), deps());
+    assert.deepEqual(v.days!.hero, { kind: 'rest', key: 'wed', over: 'Today · Wednesday', lines: [], logLabel: 'Log cardio', anyway: false, tip: { label: 'Fuel', text: 'Eat.', src: 'NSW' } });
   });
 
   it('makes today\'s session the hero with START SESSION, and a closed day OPEN SESSION with its status', () => {

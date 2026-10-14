@@ -10,6 +10,8 @@ export interface WeekDay {
   title?: string;
   tags?: string[];
   movedFrom?: string;
+  /** A day whose session moved away: a rest day that takes a jog and never a move (v0.240.0, D231). */
+  moved?: boolean;
   sections?: unknown[];
   cardio?: unknown;
 }
@@ -90,7 +92,7 @@ export type CellCenter = { kind: 'num'; text: string } | { kind: 'check' } | { k
 
 /** The big card under the strip: today's rest, a session today or a week browsed, or none. */
 export type Hero =
-  | { kind: 'rest'; key: string; over: string; lines: string[]; logLabel: string; tip: { label: string; text: string; src: string } }
+  | { kind: 'rest'; key: string; over: string; lines: string[]; logLabel: string; anyway: boolean; tip: { label: string; text: string; src: string } }
   | {
     kind: 'day'; key: string; today: boolean; over: string; title: string; time: string;
     tags: { label: string; style: string }[]; travel: boolean; summary: string; status: string; cta: string;
@@ -272,7 +274,8 @@ export function weekView(i: WeekInput, d: WeekDeps): WeekView {
   const lines = restLog && restLog.restLog ? d.restLines(restLog.restLog) : [];
   let hero: Hero;
   if (mode === 'rest') {
-    hero = { kind: 'rest', key: heroKey!, over: 'Today · ' + i.dayFull[heroKey!], lines, logLabel: lines.length ? 'Log more' : 'Log cardio', tip: d.restTip() };
+    // v0.240.0: Edit cardio once a jog line prints (D228 item 8); no "Training anyway?" on a day whose session moved away (D231 item 3).
+    hero = { kind: 'rest', key: heroKey!, over: 'Today · ' + i.dayFull[heroKey!], lines, logLabel: lines.length ? 'Edit cardio' : 'Log cardio', anyway: !heroDay!.moved, tip: d.restTip() };
   } else if (heroKey) {
     const day = heroDay!;
     const status = HERO_STATUS[d.statusOf(week, heroKey) || ''] || '';

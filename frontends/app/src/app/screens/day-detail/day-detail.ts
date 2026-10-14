@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import { DomSanitizer, type SafeHtml } from '@angular/platform-browser';
 import { type LegacyArgs, LegacyBridge, type LegacyFunction } from '../../legacy/legacy-bridge';
-import { type BodyBlock, detailBody, e1rmCard, type FootButton, hasLogged, liftsFirst, loggedCount, logNudge, rangeNudge, statusFoot } from './day-detail-model';
+import { alsoJog, type BodyBlock, detailBody, e1rmCard, type FootButton, hasLogged, liftsFirst, loggedCount, logNudge, rangeNudge, statusFoot } from './day-detail-model';
 import { benchNotes, modTags, type TagChip, wildcardSub } from './sheet-marks-model';
 import { E1rmCard } from './e1rm-card';
 import { CardioCard } from './cardio-card';
@@ -77,6 +77,7 @@ const LOG_FIELDS = ['log_rpe', 'log_run_dist', 'log_run_pace', 'log_run_mins', '
       @for (blk of v.body; track $index) {
         @switch (blk.kind) {
           @case ('sections') { <ia-session-sections [sections]="blk.sections" /> }
+          @case ('also') { <div class="also-block"><div class="also-lbl">{{ blk.label }}</div>@for (l of blk.lines; track $index) {<div class="also-line">{{ l }}</div>}<button class="also-btn" (click)="call('openRestSheet', blk.week, blk.dayKey, 'cardio')">Edit cardio</button></div> }
           @case ('wildcard') { <ia-wildcard-tag [sub]="blk.sub" /> }
           @case ('note') { <div class="note-block" [innerHTML]="html(blk.html)"></div> }
           @case ('logNudge') { <div class="log-nudge"><span [innerHTML]="nudgeLine()"></span><button class="log-nudge-btn" (click)="call('handleDayStatus', blk.dayKey, blk.title, 'complete')">Mark Done ✓</button></div> }
@@ -203,6 +204,7 @@ export class DayDetail {
       wildcard: wildcardSub(b.call('wildcardOn', week, dayKey), this.safeRead(() => (prog as { weeks?: Record<number, Record<string, { rest?: unknown; title?: string } | null>> } | null)!.weeks![week]![dayKey] ?? null, null)),
       log: this.log(dayKey, day.cardio as { type?: string; subtype?: string } | undefined),
       logNudge: !status && hasLogged(le) ? logNudge(dayKey, day.title) : null,
+      also: this.safeRead(() => alsoJog((b.global('DAY_FULL') as Record<string, string>)[dayKey] || dayKey, b.call('restLogLines', b.call('getLogs')[b.call('completedKey', week, dayKey)]?.restLog), week, dayKey), null),
     }, liftsFirst(secs.length > 0, prog?.primaryPath, prog?.liftingFocus), secs.length > 0);
     this.view.set({
       over: 'Week ' + week + ' · ' + (b.global('DAY_FULL') as Record<string, string>)[dayKey],

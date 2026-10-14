@@ -1,34 +1,89 @@
-import { completedKey, getCompleted, getLogs, getPrograms, saveLogs, savePrograms } from './storage.ts';
+import { completedKey, esc, getCompleted, getLogs, getPrograms, saveLogs, savePrograms } from './storage.ts';
 import { getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL } from './wizard.ts';
 import { _pattern } from '../../../../../../core/src/engine/region-caps.ts';
 import { _PATTERN_REGION } from '../../../../../../core/src/engine/budget-engine-d.ts';
-import { dayBeforeStart, renderWeekView } from './week-view-sections.ts';
+import { REST_WORD, dayBeforeStart, renderWeekView, restLogHead, restLogLines } from './week-view-sections.ts';
 import { CARDIO_PARK_FIELDS } from './log-entries.ts';
+import { iaWheelFlush, iaWheelHTML, iaWheelInit } from './wheel-log.ts';
 import { updateRestFloat } from './rest-timer.ts';
+import { openDetail } from './day-detail.ts';
 import { renderProgList } from './programs.ts';
 import { showProgressScreen } from './progress-data.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 // ── REST-DAY SHEET ───────────────────────────────────────────────────────────
-const _restDraft: Record<string, any>={w:null,day:null,view:'menu',pick:null,type:null,mins:30,dist:'',rpe:5};
+// v0.240.0 (D228 item 2): no defaults. The face starts empty (the wheels' zero faces, no chip) and is seeded only from
+// the athlete's own record (_restSeed): a prefill is a placeholder, never a stored value (Mario).
+const _restDraft: Record<string, any>={w:null,day:null,view:'menu',pick:null,type:null,mins:'',dist:'',rpe:null,armed:false};
 function openRestSheet(w: any,dayKey: any,view?: any){
   if(!activeProg){showToast('No active program. Tap Set Active or build a new one.');return;}
-  if(!restDayEligible(w,dayKey)){showToast('That rest day has not come around yet');return;}
-  _restDraft.w=w; _restDraft.day=dayKey; _restDraft.view=view||'menu'; _restDraft.pick=null;
-  const types=(activeProg.cfg&&activeProg.cfg.cardioTypes)||[];
-  _restDraft.type=types[0]||'run'; _restDraft.mins=30; _restDraft.dist=''; _restDraft.rpe=5;
+  // v0.240.0 (D231 item 1): the sheet opens on every jog-eligible day; the menu and the move only where a move may land.
+  if(!restJogEligible(w,dayKey)){showToast('That rest day has not come around yet');return;}
+  const canMove=restDayEligible(w,dayKey);
+  _restDraft.w=w; _restDraft.day=dayKey; _restDraft.view=canMove?(view||'menu'):'cardio'; _restDraft.pick=null; _restDraft.armed=false;
+  // v0.240.0 (D228 item 1): the selected type is the first one holding a record, else the program's first sport.
+  const types=(activeProg.cfg&&activeProg.cfg.cardioTypes)||[], held=_restHeld(w,dayKey);
+  _restDraft.type=Object.keys(held).find(t=>_restIsRec(held[t]))||types[0]||'run';
+  _restSeed();
   renderRestSheet();
   const o=document.getElementById('restOverlay'); o!.classList.add('open'); o!.scrollTop=0;
 }
 function closeRestSheet(){document.getElementById('restOverlay')!.classList.remove('open');}
-function _rdSet(k: any,v: any){_restDraft[k]=v;renderRestSheet();}
+function _rdSet(k: any,v: any){ if(k==='type'){ _rdType(v); return; } _restDraft[k]=v;renderRestSheet();}
+// v0.240.0 (D228 item 1): a modality chip re-seeds the face from that type's record, never from a roll that was not logged.
+function _rdType(t: any){ _restDraft.type=t; _restDraft.armed=false; _restSeed(); renderRestSheet(); }
+// A chip tap takes any wheel still settling first; tapping the selected chip deselects it (D228 item 4).
+function _rdRpe(v: any){
+  const body=document.getElementById('restBody'); if(body) iaWheelFlush(body);
+  _restDraft.rpe=(_restDraft.rpe!=null&&+_restDraft.rpe===v)?null:v; renderRestSheet();
+}
+// The day's restLog through the getLogs lens, or {}.
+function _restHeld(w: any,dk: any){ const e=getLogs()[completedKey(w,dk)]; return (e&&e.restLog&&typeof e.restLog==='object')?e.restLog:{}; }
+// A record is a type holding a time or a distance.
+function _restIsRec(r: any){ return !!(r&&typeof r==='object'&&(+r.mins>0||+r.dist>0)); }
+// The selected type's record, or null.
+function _restRec(){ const r=_restHeld(_restDraft.w,_restDraft.day)[_restDraft.type]; return _restIsRec(r)?r:null; }
+// The face from the record: the record is shown, not a prefill (D228 item 1).
+function _restSeed(){
+  const r=_restRec();
+  _restDraft.mins=(r&&+r.mins>0)?String(r.mins):'';
+  _restDraft.dist=(r&&_restDraft.type!=='walk'&&+r.dist>0)?String(r.dist):'';
+  _restDraft.rpe=(r&&r.rpe!=null&&r.rpe!==''&&isFinite(+r.rpe))?+r.rpe:null;
+}
+function _restNum(v: any){ const n=parseFloat(String(v==null?'':v)); return n>0?n:0; }
+// D228 item 3: the face equals the record, every number compared as a number.
+function _restSame(r: any){
+  const rp=(v: any)=>(v==null||v===''||!isFinite(+v))?null:+v;
+  return _restNum(_restDraft.mins)===_restNum(r.mins)
+    && (_restDraft.type==='walk'||_restNum(_restDraft.dist)===_restNum(r.dist))
+    && rp(_restDraft.rpe)===rp(r.rpe);
+}
+// The button is a regime, as on the card: Logged ✓ while the face is the record, Log it once anything differs.
+function _restRegime(){
+  const b=document.getElementById('restLogBtn'); if(!b) return;
+  const r=_restRec(); b.textContent=(r&&_restSame(r))?'Logged \u2713':'Log it';
+}
+// A wheel commit writes its hidden node and fires input; the face follows it, and the button with it.
+function _restInput(ev: any){
+  const id=ev&&ev.target&&ev.target.id;
+  if(id==='rest_mins') _restDraft.mins=ev.target.value;
+  else if(id==='rest_dist') _restDraft.dist=ev.target.value;
+  else return;
+  _restRegime();
+}
 function renderRestSheet(){
   const body=document.getElementById('restBody'); if(!body) return;
   const w=_restDraft.w, dk=_restDraft.day;
   // @ts-expect-error TS7053 Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ su
   const dayName=DAY_FULL[dk]||dk;
   if(_restDraft.view==='move')      body.innerHTML=_renderRestMove(w,dk,dayName);
-  else if(_restDraft.view==='cardio') body.innerHTML=_renderRestCardio(w,dk,dayName);
+  else if(_restDraft.view==='cardio'){
+    body.innerHTML=_renderRestCardio(w,dk,dayName);
+    // D229 item 2: the sheet's own wheels, initialised after every render; the face follows their commits.
+    iaWheelInit(body);
+    // @ts-expect-error TS2339 Property '_rdIn' does not exist on type 'HTMLElement'.
+    if(!body._rdIn){ body._rdIn=true; body.addEventListener('input',_restInput); }
+  }
   else body.innerHTML=
      '<div class="ov-kicker">'+dayName.toUpperCase()+' \u00b7 REST DAY</div>'
     +'<div class="ov-title">Not resting?</div>'
@@ -41,6 +96,12 @@ function _renderRestMove(w: any,dk: any,dayName: any){
   const head='<div class="ov-kicker">'+dayName.toUpperCase()+' \u00b7 TRAINING ANYWAY</div>'
     +'<div class="ov-title">Move a session here</div>'
     +'<div class="ov-intro">Nothing gets added. Whatever you pick moves to '+dayName+', and its old day becomes your rest.</div>';
+  // v0.240.0 (D232): a jog already on the day is said before the list, each line the sentence without "logged".
+  const jog=restLogLines(_restHeld(w,dk));
+  const already=jog.length
+    ? '<div class="ov-effect"><div class="ov-effect-ttl">Already logged here</div><div class="ov-effect-sub">'
+      +jog.map((l: any)=>l.replace(' logged','')+'<br>').join('')+'Move a session in and '+dayName+' is a double day. Your call.</div></div>'
+    : '';
   if(!cands.length) return head
     +'<div class="ov-effect"><div class="ov-effect-ttl">Nothing left to move</div><div class="ov-effect-sub">Every session this week is logged or done. Take the rest, or log some cardio instead.</div></div>'
     +'<button class="ov-apply" onclick="_rdSet(\'view\',\'cardio\')">Log cardio instead</button>';
@@ -59,35 +120,46 @@ function _renderRestMove(w: any,dk: any,dayName: any){
         +'<div class="ov-effect-sub">You have '+reg+' work on '+names+' too. Stack it here and something gives. Your call.</div></div>';
     }
   }
-  return head+'<div class="ov-eq-lbl">NOT LOGGED THIS WEEK</div>'+rows+warn
+  return head+already+'<div class="ov-eq-lbl">NOT LOGGED THIS WEEK</div>'+rows+warn
     +(_restDraft.pick?'<button class="ov-apply" onclick="applyRestMove()">Move it here</button>':'');
 }
 function _renderRestCardio(w: any,dk: any,dayName: any){
   const types=((activeProg.cfg&&activeProg.cfg.cardioTypes)||[]).slice();
   if(!types.includes('walk')) types.push('walk');   // walk is what most rest-day movement is
+  const held=_restHeld(w,dk), t=_restDraft.type, rec=_restRec();
+  // A type holding a record always has its chip, ahead of walk.
+  Object.keys(held).forEach(x=>{ if(_restIsRec(held[x])&&!types.includes(x)) types.splice(types.length-1,0,x); });
   const LBL: Record<string, string>={run:'Run',bike:'Bike',swim:'Swim',row:'Row',walk:'Walk'};
-  // @ts-expect-error TS7006 Parameter 't' implicitly has an 'any' type.
-  const chips=types.map(t=>'<div class="rd-chip'+(_restDraft.type===t?' sel':'')+'" onclick="_rdSet(\'type\',\''+t+'\')">'+(LBL[t]||t)+'</div>').join('');
+  // v0.240.0 (D228 item 1): a chip whose type holds a record prints a check.
+  const chips=types.map((x: any)=>'<div class="rd-chip'+(t===x?' sel':'')+'" onclick="_rdType(\''+x+'\')">'+(LBL[x]||x)+(_restIsRec(held[x])?' \u2713':'')+'</div>').join('');
   // RPE, not a separate easy/hard vocabulary — the whole app prescribes in RPE, so the
   // log should speak it too. Word anchors because RPE on a run is less instinctive.
   const RPE=[[5,'Easy','Conversational, full sentences'],[7,'Steady','Working, sentences getting short'],[9,'Hard','That\u2019s a training day, not a rest day']];
-  const rpeRows=RPE.map(([v,n,d])=>'<div class="rd-chip wide'+(_restDraft.rpe===v?' sel':'')+'" onclick="_rdSet(\'rpe\','+v+')"><b>RPE '+v+(v===9?'+':'')+'</b> \u00b7 '+n+'<span>'+d+'</span></div>').join('');
-  const distLbl=_restDraft.type==='swim'?'Distance (yards)':'Distance (miles)';
-  const showDist=_restDraft.type!=='walk';
+  const rpeRows=RPE.map(([v,n,d])=>'<div class="rd-chip wide'+(_restDraft.rpe!=null&&+_restDraft.rpe===v?' sel':'')+'" onclick="_rdRpe('+v+')"><b>RPE '+v+(v===9?'+':'')+'</b> \u00b7 '+n+'<span>'+d+'</span></div>').join('');
+  // v0.240.0 (D229 item 2): controls by type, on the sheet's own hidden ids. Run and bike: the time wheel and the miles
+  // wheel. Row: the time wheel and a meters box. Swim: the time wheel and the card's yards box. Walk: the time wheel.
+  const lbl=(x: any)=>'<div class="ov-eq-lbl" style="margin-top:14px">'+x+'</div>';
+  let ctl=lbl('TIME')+'<div class="iaw-wrap iaw-solo">'+iaWheelHTML('hms','rest_mins',_restDraft.mins)+'</div>';
+  if(t==='run'||t==='bike') ctl+=lbl('DISTANCE')+'<div class="iaw-wrap iaw-solo">'+iaWheelHTML('dist','rest_dist',_restDraft.dist)+'</div>';
+  else if(t==='row'||t==='swim') ctl+=lbl(t==='row'?'DISTANCE (METERS)':'DISTANCE (YARDS)')
+    +'<div class="rd-row"><input class="rd-input" type="number" inputmode="numeric" min="0"'+(t==='swim'?' step="25"':'')+' id="rest_dist" value="'+esc(_restDraft.dist)+'" placeholder="'+(t==='row'?'meters':'yards')+'"></div>';
   const note=_restDraft.rpe>=9
     ? '<div class="ov-effect" style="border-color:var(--accent)"><div class="ov-effect-ttl" style="color:var(--accent)">Noted</div><div class="ov-effect-sub">Hard effort is not a rest day, it is a training day. Logging it as it happened. Keep an eye on how tomorrow feels.</div></div>'
     : '';
+  const word=REST_WORD[t]||t;
   return '<div class="ov-kicker">'+dayName.toUpperCase()+' \u00b7 LOG CARDIO</div>'
-    +'<div class="ov-title">What did you do?</div>'
-    +'<div class="ov-intro">Easy work on a rest day is recovery, not extra load. This will not touch your program.</div>'
+    +(rec
+      ? '<div class="ov-title">Your '+word+' on '+dayName+'</div>'
+        +'<div class="ov-intro">This is what you logged. Roll it to fix it, or clear it if it did not happen.</div>'
+      : '<div class="ov-title">What did you do?</div>'
+        +'<div class="ov-intro">Easy work on a rest day is recovery, not extra load. This will not touch your program.</div>')
     +'<div class="ov-eq-lbl">MODALITY</div><div class="rd-row">'+chips+'</div>'
-    +'<div class="ov-eq-lbl" style="margin-top:14px">TIME</div>'
-    +'<div class="rd-row"><input class="rd-input" type="number" inputmode="numeric" min="1" max="600" value="'+_restDraft.mins+'" onchange="_restDraft.mins=+this.value||0" placeholder="minutes"><span class="rd-unit">min</span></div>'
-    +(showDist?'<div class="ov-eq-lbl" style="margin-top:14px">'+distLbl+' <span style="text-transform:none;letter-spacing:0;opacity:.75">optional</span></div>'
-      +'<div class="rd-row"><input class="rd-input" type="number" inputmode="decimal" step="0.1" min="0" value="'+_restDraft.dist+'" onchange="_restDraft.dist=this.value" placeholder="'+(_restDraft.type==='swim'?'yards':'miles')+'"></div>':'')
+    +ctl
     +'<div class="ov-eq-lbl" style="margin-top:14px">HOW HARD</div>'+rpeRows
     +note
-    +'<button class="ov-apply" onclick="applyRestCardio()">Log it</button>';
+    +'<button class="ov-apply" id="restLogBtn" onclick="applyRestCardio()">'+(rec&&_restSame(rec)?'Logged \u2713':'Log it')+'</button>'
+    // D228 item 6: Clear, two taps, only where the selected type holds a record.
+    +(rec?'<button class="ov-clear" id="restClearBtn" onclick="clearRestCardio()">'+(_restDraft.armed?'Tap again to clear':'Clear this '+word)+'</button>':'');
 }
 function applyRestMove(){
   const {w,day,pick}=_restDraft;
@@ -103,30 +175,51 @@ function applyRestMove(){
   showToast('Moved. '+(DAY_FULL[pick]||pick)+' is your rest now \u2713');
 }
 function applyRestCardio(){
-  const {w,day,type,mins,dist,rpe}=_restDraft;
-  const m=+mins||0;
-  if(m<=0){showToast('How long did you go?');return;}
+  // v0.240.0 (D228 item 4): a wheel still settling writes its face first, as Done does (D179).
+  const body=document.getElementById('restBody'); if(body) iaWheelFlush(body);
+  const {w,day,type}=_restDraft, rec=_restRec();
+  // D228 item 3: Logged ✓ with the face unchanged closes the sheet and writes nothing.
+  if(rec&&_restSame(rec)){ closeRestSheet(); return; }
+  const m=_restNum(_restDraft.mins), d=type==='walk'?0:_restNum(_restDraft.dist);
+  // D228 item 5: nothing is ever written for an empty face; a record rolled to zero is removed only by Clear.
+  if(m<=0&&d<=0){ showToast(rec?'To remove it, use Clear.':(type==='walk'?'Nothing to log yet. Add a time.':'Nothing to log yet. Add a time or a distance.')); return; }
+  // V238 (D223): the jog is its own record on the day, restLog[type] = {mins?, dist?, rpe?}, numbers, writing no
+  // key a session reads. v0.240.0 (D228 item 4, D226 amended; D229): Log writes the face over the type's record:
+  // the time when above zero, the distance when above zero (never on walk), the RPE when a chip is selected; another
+  // type keeps its own key. week and ts are stamped the way writeSetDraft stamps them.
   const logs=getLogs(); const k=completedKey(w,day);
-  const e=Object.assign({},logs[k]||{});
-  // V238 (D223 items 1-2, Amendment 1 A6, D226): the jog is its own record on the day,
-  // restLog[type] = {mins, dist?, rpe}, numbers. It writes no top-level key a session reads:
-  // rest_cardio, rest_type, rest_mins, rpe and the run_dist/bike_mins/swim_yards sum are retired,
-  // so a session moved onto the day opens empty and its rebuild carries the jog. dist is stored
-  // only when the box took one (parseFloat > 0), never on walk. "Log more" never overwrites: the
-  // same type adds mins and dist and keeps the higher RPE; another type gets its own key. week
-  // and ts are stamped the way writeSetDraft stamps them.
-  const rl=Object.assign({},e.restLog||{}), was=rl[type]||{}, o: Record<string, any>={};
-  // @ts-expect-error TS7006 Parameter 'v' implicitly has an 'any' type.
-  const fin=v=>(v!=null&&v!==''&&isFinite(+v))?+v:null;
-  const d=parseFloat(dist), dd=(type!=='walk'&&d>0)?d:0, wd=(+was.dist>0)?+was.dist:0;
-  o.mins=((+was.mins>0)?+was.mins:0)+m;
-  if(type!=='walk'&&wd+dd>0) o.dist=wd+dd;
-  const r0=fin(was.rpe), r1=fin(rpe);
-  if(r0!=null||r1!=null) o.rpe=Math.max(r0==null?-Infinity:r0, r1==null?-Infinity:r1);
+  const e=Object.assign({},logs[k]||{}), rl=Object.assign({},e.restLog||{}), o: Record<string, any>={};
+  if(m>0) o.mins=m;
+  if(d>0) o.dist=d;
+  if(_restDraft.rpe!=null&&_restDraft.rpe!==''&&isFinite(+_restDraft.rpe)) o.rpe=+_restDraft.rpe;
   rl[type]=o; e.restLog=rl; e.week=w; e.ts=Date.now();
   logs[k]=e; saveLogs(logs);
-  closeRestSheet(); renderWeekView();
-  showToast(m+' min logged \u2713');
+  closeRestSheet(); renderWeekView(); _restDetailRefresh(w,day);
+  showToast(restLogHead(type,o)+' logged \u2713');
+}
+// v0.240.0 (D228 item 6): Clear, two taps. The first arms it and writes nothing. The second removes the type's
+// record; restLog goes when it empties; the day key goes when nothing but week and ts is left (an emptied record
+// would still freeze the day and turn Progress); anything else on the entry is left byte for byte.
+function clearRestCardio(){
+  if(!_restDraft.armed){ _restDraft.armed=true; const b=document.getElementById('restClearBtn'); if(b) b.textContent='Tap again to clear'; return; }
+  _restDraft.armed=false;
+  const {w,day,type}=_restDraft;
+  const logs=getLogs(), k=completedKey(w,day), e=logs[k];
+  if(e&&e.restLog&&e.restLog[type]){
+    const n: Record<string, any>=Object.assign({},e), rl=Object.assign({},e.restLog);
+    delete rl[type];
+    if(Object.keys(rl).length) n.restLog=rl; else delete n.restLog;
+    if(Object.keys(n).every(x=>x==='week'||x==='ts')) delete logs[k]; else logs[k]=n;
+    saveLogs(logs);
+  }
+  closeRestSheet(); renderWeekView(); _restDetailRefresh(w,day);
+  const word=REST_WORD[type]||type;
+  showToast(word.charAt(0).toUpperCase()+word.slice(1)+' cleared');
+}
+// D231 item 4: a Log or a Clear opened from a double day's session card re-renders the card, so its block is current.
+function _restDetailRefresh(w: any,day: any){
+  const o=document.getElementById('detailOverlay');
+  if(o&&o.classList.contains('open')&&w===currentWeek&&day===currentDayKey&&activeProg.weeks[w]&&activeProg.weeks[w][day]) openDetail(day,activeProg.weeks[w][day]);
 }
 // ── REST-DAY SESSIONS — storage, move engine, and guards ─────────────────────
 // Two things an athlete can do on a rest day, and they behave differently on purpose.
@@ -197,6 +290,21 @@ function restMoveCollisions(w: any,destDay: any,srcDay: any){
 // Future rest days are excluded on purpose: logging cardio you have not done yet is a
 // prescription, not a log, and moving a session onto next Wednesday is just rescheduling
 // the program, which is a different feature.
+// v0.240.0 (D231 item 1): jog-eligible: inside the program, the date has come, and the day is a rest day or already
+// holds a jog (a double day). restDayEligible below stays the move's test (a rest day, not moved away).
+function restJogEligible(w: any,dayKey: any){
+  if(!activeProg||!activeProg.startDate) return false;
+  if(dayBeforeStart(activeProg,w,dayKey)) return false;
+  const day=activeProg.weeks&&activeProg.weeks[w]&&activeProg.weeks[w][dayKey];
+  if(!day) return false;
+  if(!day.rest&&!Object.keys(_restHeld(w,dayKey)).length) return false;
+  const order=['mon','tue','wed','thu','fri','sat','sun'];
+  const idx=order.indexOf(dayKey); if(idx<0) return false;
+  const mon=getWeekMonday(activeProg.startDate);
+  const d=new Date(mon); d.setDate(mon.getDate()+(w-1)*7+idx); d.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  return d<=today;
+}
 function restDayEligible(w: any,dayKey: any){
   if(!activeProg||!activeProg.startDate) return false;
   if(dayBeforeStart(activeProg,w,dayKey)) return false;       // V174 (D24)
@@ -282,6 +390,5 @@ export {
   _curScreen, _setActiveProg, _setActiveProgId, _setCalcLift, _setConfirmProgId, _setConfirmTier, _setCurrentDayKey,
   _setCurrentRandIdx, _setCurrentWeek, _setEditProgId, _setProgressViewId, _setStaleWarnShown, _setStaleWarnSrc,
   _staleWarnShown, _staleWarnSrc, activeProg, activeProgId, applyRestDayMoves, calcLift, confirmProgId, confirmTier,
-  currentDayKey, currentWeek, editProgId, openProgIds, openRestSheet, progressViewId, restDayEligible, showScreen,
-  showToast,
+  currentDayKey, currentWeek, editProgId, openProgIds, openRestSheet, progressViewId, showScreen, showToast,
 };

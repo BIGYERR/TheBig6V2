@@ -3,7 +3,7 @@
 // never marked" nudge and the logged count. Every expected value is typed here from the legacy code.
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { type BodyBlock, detailBody, e1rmCard, epley, hasLogged, liftsFirst, loggedCount, logNudge, rangeNudge, statusFoot } from '../../src/app/screens/day-detail/day-detail-model.ts';
+import { alsoJog, type BodyBlock, detailBody, e1rmCard, epley, hasLogged, liftsFirst, loggedCount, logNudge, rangeNudge, statusFoot } from '../../src/app/screens/day-detail/day-detail-model.ts';
 
 const CARD = { blockCls: 'run-block', labelCls: 'cardio-label-run', label: 'Run', segments: null, total: null, detail: '3 mi', note: null, bench: [] };
 const LOG = { view: { rpeValue: '5', rpeText: 'Move slider', cardio: null, notes: '' }, fields: { kind: 'none' as const } };
@@ -11,7 +11,7 @@ const LOG = { view: { rpeValue: '5', rpeText: 'Move slider', cardio: null, notes
 const secs = (t: string) => [{ kind: 'skippedRound' as const, secIdx: 0, text: t }];
 const P = { main: secs('<M>'), e1rm: null, rest: secs('<R>'), cardio: CARD, note: undefined, nudge: null, wildcard: null, log: LOG, logNudge: null };
 /** A block as a line: markup as itself, the other blocks by name. */
-const line = (b: BodyBlock) => (b.kind === 'note' ? 'note ' + b.html : b.kind === 'wildcard' ? 'wildcard ' + b.sub : b.kind === 'logNudge' ? 'logNudge ' + b.dayKey + ' ' + b.title
+const line = (b: BodyBlock) => (b.kind === 'also' ? 'also ' + b.label : b.kind === 'note' ? 'note ' + b.html : b.kind === 'wildcard' ? 'wildcard ' + b.sub : b.kind === 'logNudge' ? 'logNudge ' + b.dayKey + ' ' + b.title
   : b.kind === 'sections' ? b.sections.map((x) => (x.kind === 'skippedRound' ? x.text : '')).join('') : b.kind);
 
 describe('the session sheet', () => {
@@ -30,6 +30,14 @@ describe('the session sheet', () => {
     const all = detailBody({ ...P, e1rm: card, note: 'Easy <b>day</b>', nudge: { shown: ['Row'], extra: '' }, wildcard: 'Push is still on the board.', logNudge: { dayKey: 'fri', title: 'Push' } }, true, true);
     assert.deepEqual(all.map(line), ['wildcard Push is still on the board.', 'nudge', '<M>', 'e1rm', '<R>', 'cardio', 'note Easy <b>day</b>', 'log', 'logNudge fri Push']);
     assert.deepEqual(detailBody({ ...P, cardio: null, rest: [] }, true, true).map(line), ['<M>', 'log'], 'a builder with nothing adds no block');
+  });
+
+  it('puts a double day\'s jog above everything, labelled with the day, one sentence per type, and none without a line (v0.240.0, D231)', () => {
+    const jog = alsoJog('Wednesday', ['30 min run logged · 3.1 mi · RPE 5', '20 min walk logged · RPE 5'], 2, 'wed');
+    assert.deepEqual(jog, { label: 'ALSO ON WEDNESDAY', lines: ['30 min run logged · 3.1 mi · RPE 5', '20 min walk logged · RPE 5'], week: 2, dayKey: 'wed' });
+    assert.equal(alsoJog('Wednesday', [], 2, 'wed'), null);
+    const all = detailBody({ ...P, also: jog, wildcard: 'Push is still on the board.', nudge: { shown: ['Row'], extra: '' } }, true, true);
+    assert.deepEqual(all.map(line), ['also ALSO ON WEDNESDAY', 'wildcard Push is still on the board.', 'nudge', '<M>', '<R>', 'cardio', 'log']);
   });
 
   it('estimates a test max by Epley, a single being itself', () => {

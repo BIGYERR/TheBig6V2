@@ -1,8 +1,6 @@
 import { asyIcon } from '../../../../../../core/src/engine/icons.ts';
 import { completedKey, esc, getCompleted, getLogs, logKey } from './storage.ts';
-import {
-  _setCurrentWeek, activeProg, currentWeek, openRestSheet, restDayEligible, showToast,
-} from './rest-day-shell.ts';
+import { _setCurrentWeek, activeProg, currentWeek, openRestSheet, showToast } from './rest-day-shell.ts';
 import { ALL_DAYS_ORDER, _parseLocalDate, getWeekMonday } from '../../../../../../core/src/engine/calendar.ts';
 import { DAY_FULL, _fmtStartDay } from './wizard.ts';
 import { INJURY_REGIONS } from '../../../../../../core/src/engine/injury.ts';
@@ -235,8 +233,9 @@ function openDayKey(d: any){
   if(!day) return;
   if(dayBeforeStart(activeProg,currentWeek,d)){ showToast('Before your start date'); return; }   // V174 (D24)
   // Rest days used to dead-end here. Today's and past rest days now open the rest sheet
-  // so an unplanned session or a bonus run has somewhere to go; future ones stay inert.
-  if(day.rest){ if(restDayEligible(currentWeek,d)) openRestSheet(currentWeek,d); return; }
+  // so an unplanned session or a bonus run has somewhere to go. v0.240.0 (D231 item 2): a future
+  // one asks the sheet too, which answers with its toast instead of silence.
+  if(day.rest){ openRestSheet(currentWeek,d); return; }
   openDetail(d,day);
 }
 // ── Day codes for the week strip (cardio modality above, focus below). ──
@@ -381,10 +380,24 @@ function _wkScoot(el: any,to: any,cur: any){
 // e.g. "37 min run logged · RPE 7". The sport words are the hero's map; a missing RPE prints the
 // hero's dash. The journal prints the same strings, so the two never word a jog differently. A type
 // with no mins (a legacy lensed run that kept only its distance) has no line: the lens invents nothing.
+// v0.240.0 (D229): the sport words and distance units a rest-day record speaks in. Walk carries no distance (A6).
+const REST_WORD: Record<string, string>={run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'};
+const REST_UNIT: Record<string, string>={run:'mi',bike:'mi',swim:'yd',row:'m'};
+// A record's distance in its sport's unit, or 0 (walk and unknown types never carry one).
+function restDist(t: any,r: any){ return (REST_UNIT[t]&&r&&+r.dist>0)?Math.round(+r.dist*100)/100:0; }
+// The head of a record's sentence: the time when it holds one (whole minutes; the stored seconds stay), else the distance.
+function restLogHead(t: any,r: any){
+  const m=(r&&+r.mins>0)?Math.round(+r.mins):0, d=restDist(t,r);
+  return m>0?m+' min '+(REST_WORD[t]||t):d+' '+REST_UNIT[t]+' '+(REST_WORD[t]||t);
+}
+// v0.240.0 (D229 item 4): one line per type that holds a time or a distance, in key order: the head, logged, the
+// distance after the time when it holds both, the RPE last. A line without a distance is byte-identical to V238's.
 function restLogLines(rl: any){
   if(!rl||typeof rl!=='object') return [];
-  const W: Record<string, string>={run:'run',bike:'ride',swim:'swim',row:'row',walk:'walk'};
-  return Object.keys(rl).filter(t=>rl[t]&&+rl[t].mins>0).map(t=>rl[t].mins+' min '+(W[t]||t)+' logged · RPE '+(rl[t].rpe||'—'));
+  return Object.keys(rl).filter(t=>rl[t]&&(+rl[t].mins>0||restDist(t,rl[t])>0)).map(t=>{
+    const r=rl[t], d=restDist(t,r);
+    return restLogHead(t,r)+' logged'+(+r.mins>0&&d>0?' · '+d+' '+REST_UNIT[t]:'')+' · RPE '+(r.rpe||'—');
+  });
 }
 function renderWeekView(){
   if(!activeProg) return;
@@ -606,8 +619,8 @@ function renderWeekView(){
   const _heroMovedFrom=(heroKey&&wkData[heroKey]&&wkData[heroKey].movedFrom)?(DAY_FULL[wkData[heroKey].movedFrom]||wkData[heroKey].movedFrom):null;
   const _heroCardio=(heroKey&&wkData[heroKey]&&wkData[heroKey].rest)?((getLogs()||{})[completedKey(currentWeek,heroKey)]||null):null;
   // V238 (D224 rest hero, H1 as restated in Amendment 1 A2): the entry comes through the getLogs lens,
-  // so a V237 rest entry reads as restLog too. One line per restLog type that holds mins, in key
-  // order, same sentence and class as before; Log more below stays keyed on a line being there.
+  // so a V237 rest entry reads as restLog too. One line per restLog type that holds a time or (v0.240.0,
+  // D229) a distance, in key order; Edit cardio below is keyed on a line being there (v0.240.0, D228 item 8).
   const _rcLine=(_heroCardio&&_heroCardio.restLog)
     ? restLogLines(_heroCardio.restLog).map(s=>'<div class="wk-rest-logged">'+s+'</div>').join('')
     : '';
@@ -620,8 +633,9 @@ function renderWeekView(){
       +'<div class="wk-rest-sub">Recovery is where the work sets in. Move easy, refuel, sleep.</div>'
       +_rcLine
       +'<div class="wk-rest-acts">'
-        +'<button class="wk-rest-act" onclick="openRestSheet('+currentWeek+',\''+heroKey+'\',\'move\')">Training anyway?</button>'
-        +'<button class="wk-rest-act" onclick="openRestSheet('+currentWeek+',\''+heroKey+'\',\'cardio\')">'+(_rcLine?'Log more':'Log cardio')+'</button>'
+        // v0.240.0 (D231 item 3): a day whose session moved away takes a jog and never a move.
+        +(heroKey&&wkData[heroKey].moved?'':'<button class="wk-rest-act" onclick="openRestSheet('+currentWeek+',\''+heroKey+'\',\'move\')">Training anyway?</button>')
+        +'<button class="wk-rest-act" onclick="openRestSheet('+currentWeek+',\''+heroKey+'\',\'cardio\')">'+(_rcLine?'Edit cardio':'Log cardio')+'</button>'
       +'</div>'
       +'</div></div>'
       +'<div class="wk-tip"><div class="wk-tip-lbl">'+tip.label+'</div>'
@@ -911,6 +925,6 @@ function rxSuffix(rx: any){
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  _partialWeek1, _progDayDate, _stripLeadingSets, buildSectionsHTML, calcCurrentWeek, dayBeforeStart, dayOffset,
-  parseRx, renderWeekView, restLogLines, runSessionCode, rxSuffix, tagMeta,
+  REST_WORD, _partialWeek1, _progDayDate, _stripLeadingSets, buildSectionsHTML, calcCurrentWeek, dayBeforeStart,
+  dayOffset, parseRx, renderWeekView, restLogHead, restLogLines, runSessionCode, rxSuffix, tagMeta,
 };

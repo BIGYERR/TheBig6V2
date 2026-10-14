@@ -37,6 +37,21 @@ export interface BodyParts {
   log: SessionLogData;
   /** The "logged but never marked" nudge, when the day has a log and no status. */
   logNudge: LogNudge | null;
+  /** A double day's jog, above everything (v0.240.0, D231 item 4). */
+  also?: AlsoJog | null;
+}
+
+/** A double day's jog (v0.240.0, D231 item 4): its label, one sentence per type, and the day the rest sheet opens on. */
+export interface AlsoJog {
+  label: string;
+  lines: string[];
+  week: number;
+  dayKey: string;
+}
+
+/** The jog block for a day whose entry holds one: `ALSO ON <DAY>` over the hero's sentences; none without a line. */
+export function alsoJog(dayName: string, lines: readonly string[], week: number, dayKey: string): AlsoJog | null {
+  return lines.length ? { label: 'ALSO ON ' + dayName.toUpperCase(), lines: [...lines], week, dayKey } : null;
 }
 
 /** The "logged but never marked" nudge: the day it marks done, and its title. */
@@ -45,8 +60,9 @@ export interface LogNudge {
   title: string;
 }
 
-/** One block of the body: the Wildcard tag, the range nudge, sections, the 1RM calculator, the cardio card, the note, the log or the log nudge. */
+/** One block of the body: a double day's jog, the Wildcard tag, the range nudge, sections, the 1RM calculator, the cardio card, the note, the log or the log nudge. */
 export type BodyBlock =
+  | ({ kind: 'also' } & AlsoJog)
   | { kind: 'wildcard'; sub: string }
   | { kind: 'sections'; sections: SectionView[] }
   | { kind: 'note'; html: string }
@@ -64,7 +80,7 @@ export function liftsFirst(hasSections: boolean, primaryPath: string | undefined
   return hasSections && !(primaryPath === 'event' || /^support_/.test(String(liftingFocus || '')));
 }
 
-/** The body in the legacy order: the Wildcard tag, the range nudge, the work, the note, the log, the log nudge. */
+/** The body in the legacy order: a double day's jog, the Wildcard tag, the range nudge, the work, the note, the log, the log nudge. */
 export function detailBody(p: BodyParts, first: boolean, hasSections: boolean): BodyBlock[] {
   const secs = (v: SectionView[]): BodyBlock[] => (v.length ? [{ kind: 'sections', sections: v }] : []);
   const lifts: BodyBlock[] = hasSections ? [...secs(p.main), ...(p.e1rm ? [{ kind: 'e1rm' as const, card: p.e1rm }] : []), ...secs(p.rest)] : [];
@@ -73,6 +89,7 @@ export function detailBody(p: BodyParts, first: boolean, hasSections: boolean): 
   if (p.note) blocks.push({ kind: 'note', html: p.note });
   if (p.nudge) blocks.unshift({ kind: 'nudge', nudge: p.nudge });
   if (p.wildcard !== null) blocks.unshift({ kind: 'wildcard', sub: p.wildcard });
+  if (p.also) blocks.unshift({ kind: 'also', ...p.also });
   return [...blocks, { kind: 'log', log: p.log }, ...(p.logNudge ? [{ kind: 'logNudge' as const, ...p.logNudge }] : [])];
 }
 

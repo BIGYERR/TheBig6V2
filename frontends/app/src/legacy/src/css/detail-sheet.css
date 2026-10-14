@@ -85,6 +85,10 @@
 .export-btn{margin-top:8px;width:100%;font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:10px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;}
 .status-row{display:flex;gap:8px;margin-top:8px;}
 .log-nudge{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:rgba(24,23,18,0.12);border:1px solid rgba(24,23,18,0.5);border-radius:4px;padding:11px 14px;margin:10px 0 2px;font-size:13px;color:var(--text);line-height:1.4;}
+.also-block{background:rgba(24,23,18,0.06);border:1px solid var(--border2);border-radius:4px;padding:11px 14px;margin:10px 0 2px;}
+.also-lbl{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:0.12em;color:var(--muted);}
+.also-line{font-size:13px;color:var(--run);margin-top:6px;font-weight:500;}
+.also-btn{margin-top:10px;font-family:var(--font-display);font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:9px 14px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;}
 .log-nudge-btn{font-family:var(--font-display);font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:9px 14px;border-radius:4px;border:none;background:var(--accent);color:var(--on-ink);cursor:pointer;white-space:nowrap;transition:transform .08s;}
 .log-nudge-btn:active{transform:scale(0.97);}
 /* V181 (D1/D2): two-state day status. One primary (Done), one small exception (Skip); both toggle. */
