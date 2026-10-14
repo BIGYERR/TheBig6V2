@@ -93,15 +93,20 @@ cmd_setup() {
 app_page_blob() {
   local ref="$1" tmp
   if git cat-file -e "$ref:frontends/app/scripts/build-index.mjs" 2>/dev/null; then
-    tmp="$(mktemp -d)"
+    # Its real path: macOS hands out /var/folders/..., a symlink, and a run here should walk the path Linux CI walks.
+    tmp="$(cd "$(mktemp -d)" && pwd -P)" || die "cannot make a temporary folder"
     # git archive takes paths from the current folder (backend/); from the top they name the repo's layout. The
     # engine's files are TypeScript in core/src/engine from architecture phase D on, built into the same page.
     local core=""
     git cat-file -e "$ref:core/src" 2>/dev/null && core="core/src"
     git -C "$(git rev-parse --show-toplevel)" archive "$ref" frontends/app/scripts/build-index.mjs frontends/app/src/legacy/src $core |
       tar -x -C "$tmp" || die "cannot extract the app's source files at $ref"
-    node --input-type=module -e "process.stdout.write((await import(process.argv[1])).buildIndex())" \
-      "$tmp/frontends/app/scripts/build-index.mjs" > "$tmp/index.html" || die "the app's source files at $ref do not build"
+    # The builder's path goes in the environment, never in argv[1]: build-index.mjs runs its own command line when
+    # argv[1] is its own path, which is what `node -e ... <path>` makes it wherever no symlink sits in the temp path
+    # (Linux /tmp; macOS hid it behind /var -> /private/var), and that writes files the archive does not hold.
+    IA_BUILD_INDEX="$tmp/frontends/app/scripts/build-index.mjs" \
+      node --input-type=module -e "process.stdout.write((await import(process.env.IA_BUILD_INDEX)).buildIndex())" \
+      > "$tmp/index.html" || die "the app's source files at $ref do not build"
     [ -s "$tmp/index.html" ] || die "the page built at $ref is empty"
     git hash-object -w "$tmp/index.html" || die "cannot store the page built at $ref"
     rm -rf "$tmp"

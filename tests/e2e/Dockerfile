@@ -14,7 +14,7 @@ COPY frontends/app/package.json frontends/app/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
 FROM deps AS build
-COPY frontends/app/angular.json frontends/app/tsconfig.json frontends/app/tsconfig.app.json ./
+COPY frontends/app/angular.json frontends/app/tsconfig.json frontends/app/tsconfig.app.json frontends/app/tsconfig.legacy.json ./
 COPY frontends/app/scripts/ ./scripts/
 COPY frontends/app/src/ ./src/
 COPY core/src/ /repo/core/src/

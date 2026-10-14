@@ -2,7 +2,7 @@
 // runs and the docker image, and heroku.sh's deploy tree carries the page built from the commit it deploys, with its icon.
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { after, before, describe, test } from 'node:test';
@@ -83,11 +83,12 @@ describe('heroku deploy tree', { skip: !existsSync(join(BACKEND, '..', '.git')) 
       try {
         return git('rev-parse', '--verify', `${ref}:index.html`);
       } catch {
-        const out = mkdtempSync(join(tmpdir(), 'ia-deploy-page-'));
+        const out = realpathSync(mkdtempSync(join(tmpdir(), 'ia-deploy-page-')));   // the real path, as Linux CI has it
         // The engine's files are TypeScript in core/src/engine from architecture phase D on, built into the same page.
         const core = (() => { try { git('cat-file', '-e', `${ref}:core/src`); return ' core/src'; } catch { return ''; } })();
         execFileSync('sh', ['-c', `git -C "${top}" archive ${ref} frontends/app/scripts/build-index.mjs frontends/app/src/legacy/src${core} | tar -x -C "${out}"`], { env });
-        const built = execFileSync(process.execPath, ['--input-type=module', '-e', 'process.stdout.write((await import(process.argv[1])).buildIndex())', join(out, 'frontends/app/scripts/build-index.mjs')]);
+        // The builder's path in the environment, as heroku.sh passes it: as argv[1] it would run its own command line.
+        const built = execFileSync(process.execPath, ['--input-type=module', '-e', 'process.stdout.write((await import(process.env.IA_BUILD_INDEX)).buildIndex())'], { env: { ...env, IA_BUILD_INDEX: join(out, 'frontends/app/scripts/build-index.mjs') } });
         rmSync(out, { recursive: true, force: true });
         return execFileSync('git', ['-C', BACKEND, 'hash-object', '--stdin'], { input: built, encoding: 'utf8', env }).trim();
       }
