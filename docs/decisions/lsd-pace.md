@@ -54,3 +54,22 @@ card shares). Tests: none yet; the build writes them.
   stores `run_mins` alone. HALF_MANNY (NRC) does not move; standing ruling 5 applies if it does.
 - **Before builder:** measure runs r2's P-LSDPACE-6 list on the current tree, with the Angular cardio fields model in
   scope beside the legacy form, and a fresh coach re-checks r2 against it (the ruling was cut on V238).
+
+## P-LSDPACE re-check r3: measure m3 on v0.240.0, and P-LSDPACE-3 back to Mario (2026-10-16, not built)
+
+- **Date:** 2026-10-16. **Ruled by:** coach (the main session in the coach hat) on measure m3. **Amends:** r2 and the
+  entry above. **Status:** one call with Mario, the reach of P-LSDPACE-3.
+- **The re-check, whole:** `tests/measure/queue_rulings/coach_lsd_pace_r3.md`; the measure `tests/measure/lsd-pace_recheck.md`
+  with its scripts `lsd-pace_recount.js` and `lsd-pace_time-only.ts` and their `.out.txt` outputs.
+- **What m3 found:** the card premise holds (16,492/16,492). Every pace-family goal walks with the clock, not only the
+  pace goal (6,916/16,492 faster than the own row, at most 28 s/mi). 120/9,424 long runs change tier on the own row. The
+  hero estimate drops on 13,469/16,492 LSD days unless it reads the dose. The D189 note never sits on an LSD (0/240).
+  HALF_MANNY's digest and the 864 lattice do not move; 2 of 10 program snapshots do. And the stamp is wider than r2
+  named: the one writer stores the plan's miles on every time-only dist log (10/10 days, NRC long runs included) and a
+  pace from the plan's minutes on every miles-only time log (12/12, NRC recovery runs included, where that pace reaches
+  the recovery pace chart and the next program's seed); with the stamp gone and D202's plan face kept, a run done as
+  prescribed stores its prescribed value only by a roll away and back.
+- **What changes in the ruling:** P-LSDPACE-1, -2, -4 and -5 stand (P-LSDPACE-4 now covers every pace-family goal).
+  P-LSDPACE-3 is re-ruled, coach's recommendation: the stamp goes on doses that print no pace (`noPace`, the NSW LSD),
+  whose miles wheel then opens on its zero face with the plan on the strip; every other dose keeps V148 and D202. If
+  Mario holds to every card instead, D202 is replaced app-wide and the CLAUDE.md doctrine line is reworded.

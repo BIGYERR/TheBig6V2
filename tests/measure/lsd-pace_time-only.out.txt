@@ -1,0 +1,99 @@
+page ia-version 0.240.0
+
+## pace 1.5 mi 12:00 (seed 76308): W1 run days with a dist or time dose: thu time NSW Long Interval, fri dist NSW Long Slow Distance, sat dist NSW Long Slow Distance
+  thu NSW Long Interval dose {"k":"time","mins":15,"tgt":566,"key":"chi"}
+    gesture: miles only 3.00 | strip "Run — LI · Planned 15 min @ 9:26/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">5:00/mi<small>assuming planned 15 min · 4:26/mi faster than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.00" run_mins "" run_pace "5:00/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[],\"Tempo\":[{\"w\":1,\"sec\":300}],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+  fri NSW Long Slow Distance dose {"k":"dist","mi":2.1,"tgt":677,"key":"easy"}
+    gesture: time only 0:36:00 | strip "Run — LSD · Planned 2.1 mi @ 11:17/mi <svg width="15" height="15" viewBox="0 0 24 24" fill" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">17:09/mi<small>assuming planned 2.1 mi · 5:52/mi slower than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "2.1" run_mins "36.00" run_pace "17:09/mi" | live true | MILES tile 2.1 | Progress W1 2.1 | plannedVsLogged W1 {"presc":2.1,"act":2.1} | ladder W1 2.1 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":1029}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+  sat NSW Long Slow Distance dose {"k":"dist","mi":3,"tgt":677,"key":"long"}
+    gesture: time only 0:36:00 | strip "Run — LSD · Planned 3 mi @ 11:17/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">12:00/mi<small>assuming planned 3 mi · 43s/mi slower than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3" run_mins "36.00" run_pace "12:00/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {"presc":3,"act":3} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":720}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+
+## mile 8:00 (seed 76308): W1 run days with a dist or time dose: thu time NSW Long Interval, fri dist NSW Long Slow Distance, sat dist NSW Long Slow Distance
+  thu NSW Long Interval dose {"k":"time","mins":15,"tgt":566,"key":"chi"}
+    gesture: miles only 3.00 | strip "Run — LI · Planned 15 min @ 9:26/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">5:00/mi<small>assuming planned 15 min · 4:26/mi faster than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.00" run_mins "" run_pace "5:00/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[],\"Tempo\":[{\"w\":1,\"sec\":300}],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+  fri NSW Long Slow Distance dose {"k":"dist","mi":2.1,"tgt":677,"key":"easy"}
+    gesture: time only 0:36:00 | strip "Run — LSD · Planned 2.1 mi @ 11:17/mi <svg width="15" height="15" viewBox="0 0 24 24" fill" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">17:09/mi<small>assuming planned 2.1 mi · 5:52/mi slower than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "2.1" run_mins "36.00" run_pace "17:09/mi" | live true | MILES tile 2.1 | Progress W1 2.1 | plannedVsLogged W1 {"presc":2.1,"act":2.1} | ladder W1 2.1 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":1029}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+  sat NSW Long Slow Distance dose {"k":"dist","mi":3,"tgt":677,"key":"long"}
+    gesture: time only 0:36:00 | strip "Run — LSD · Planned 3 mi @ 11:17/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">12:00/mi<small>assuming planned 3 mi · 43s/mi slower than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3" run_mins "36.00" run_pace "12:00/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {"presc":3,"act":3} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":720}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+
+## 1.5 mi under 10 (seed 76308): W1 run days with a dist or time dose: thu time NSW Long Interval, fri dist NSW Long Slow Distance, sat dist NSW Long Slow Distance
+  thu NSW Long Interval dose {"k":"time","mins":15,"tgt":566,"key":"chi"}
+    gesture: miles only 3.00 | strip "Run — LI · Planned 15 min @ 9:26/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">5:00/mi<small>assuming planned 15 min · 4:26/mi faster than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.00" run_mins "" run_pace "5:00/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[],\"Tempo\":[{\"w\":1,\"sec\":300}],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+  fri NSW Long Slow Distance dose {"k":"dist","mi":2.1,"tgt":677,"key":"easy"}
+    gesture: time only 0:36:00 | strip "Run — LSD · Planned 2.1 mi @ 11:17/mi <svg width="15" height="15" viewBox="0 0 24 24" fill" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">17:09/mi<small>assuming planned 2.1 mi · 5:52/mi slower than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "2.1" run_mins "36.00" run_pace "17:09/mi" | live true | MILES tile 2.1 | Progress W1 2.1 | plannedVsLogged W1 {"presc":2.1,"act":2.1} | ladder W1 2.1 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":1029}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+  sat NSW Long Slow Distance dose {"k":"dist","mi":3,"tgt":677,"key":"long"}
+    gesture: time only 0:36:00 | strip "Run — LSD · Planned 3 mi @ 11:17/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">12:00/mi<small>assuming planned 3 mi · 43s/mi slower than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3" run_mins "36.00" run_pace "12:00/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {"presc":3,"act":3} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":720}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+
+## PRT STAND (seed 24865): W1 run days with a dist or time dose: thu time NSW Long Interval, fri dist NSW Long Slow Distance, sat dist NSW Long Slow Distance
+  thu NSW Long Interval dose {"k":"time","mins":15,"tgt":550,"key":"chi"}
+    gesture: miles only 3.00 | strip "Run — LI · Planned 15 min @ 9:10/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">5:00/mi<small>assuming planned 15 min · 4:10/mi faster than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.00" run_mins "" run_pace "5:00/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[],\"Tempo\":[{\"w\":1,\"sec\":300}],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+  fri NSW Long Slow Distance dose {"k":"dist","mi":2.1,"tgt":659,"key":"easy"}
+    gesture: time only 0:36:00 | strip "Run — LSD · Planned 2.1 mi @ 10:59/mi <svg width="15" height="15" viewBox="0 0 24 24" fill" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">17:09/mi<small>assuming planned 2.1 mi · 6:10/mi slower than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "2.1" run_mins "36.00" run_pace "17:09/mi" | live true | MILES tile 2.1 | Progress W1 2.1 | plannedVsLogged W1 {"presc":2.1,"act":2.1} | ladder W1 2.1 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":1029}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+  sat NSW Long Slow Distance dose {"k":"dist","mi":3,"tgt":659,"key":"long"}
+    gesture: time only 0:36:00 | strip "Run — LSD · Planned 3 mi @ 10:59/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">12:00/mi<small>assuming planned 3 mi · 1:01/mi slower than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3" run_mins "36.00" run_pace "12:00/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {"presc":3,"act":3} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":720}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+
+## HALF_MANNY (NRC half) (seed 76308): W1 run days with a dist or time dose: fri time NRC Recovery Run, sat dist NRC Long Run
+  fri NRC Recovery Run dose {"k":"time","mins":25,"tgt":800}
+    gesture: miles only 3.00 | strip "Run · Planned 25 min @ 13:20/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="none" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">8:20/mi<small>assuming planned 25 min · 5:00/mi faster than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.00" run_mins "" run_pace "8:20/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{\"1\":500},\"tgt\":800,\"nWeeks\":1}","runsByClass":"{\"Recovery\":[{\"w\":1,\"sec\":500}],\"Easy\":[],\"Long\":[],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"{\"w\":1,\"sec\":500,\"tgt\":800}"}
+  sat NRC Long Run dose {"k":"dist","mi":3.1,"tgt":800}
+    gesture: time only 0:36:00 | strip "Run · Planned 3.1 mi @ 13:20/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="none" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">11:37/mi<small>assuming planned 3.1 mi · 1:43/mi faster than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.1" run_mins "36.00" run_pace "11:37/mi" | live true | MILES tile 3.1 | Progress W1 3.1 | plannedVsLogged W1 {"presc":3.1,"act":3.1} | ladder W1 3.1 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":697}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+
+## NRC 10K (seed 76308): W1 run days with a dist or time dose: fri time NRC Recovery Run, sat dist NRC Long Run
+  fri NRC Recovery Run dose {"k":"time","mins":25,"tgt":660}
+    gesture: miles only 3.00 | strip "Run · Planned 25 min @ 11:00/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="none" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">8:20/mi<small>assuming planned 25 min · 2:40/mi faster than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.00" run_mins "" run_pace "8:20/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{\"1\":500},\"tgt\":660,\"nWeeks\":1}","runsByClass":"{\"Recovery\":[{\"w\":1,\"sec\":500}],\"Easy\":[],\"Long\":[],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"{\"w\":1,\"sec\":500,\"tgt\":660}"}
+  sat NRC Long Run dose {"k":"dist","mi":3.1,"tgt":660}
+    gesture: time only 0:36:00 | strip "Run · Planned 3.1 mi @ 11:00/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="none" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">11:37/mi<small>assuming planned 3.1 mi · 37s/mi slower than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.1" run_mins "36.00" run_pace "11:37/mi" | live true | MILES tile 3.1 | Progress W1 3.1 | plannedVsLogged W1 {"presc":3.1,"act":3.1} | ladder W1 3.1 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":697}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+
+## NRC 5K (seed 76308): W1 run days with a dist or time dose: fri time NRC Recovery Run, sat dist NRC Long Run
+  fri NRC Recovery Run dose {"k":"time","mins":7,"tgt":660}
+    gesture: miles only 3.00 | strip "Run · Planned 7 min @ 11:00/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="none"" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">2:20/mi<small>assuming planned 7 min · 8:40/mi faster than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.00" run_mins "" run_pace "2:20/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{\"1\":140},\"tgt\":660,\"nWeeks\":1}","runsByClass":"{\"Recovery\":[{\"w\":1,\"sec\":140}],\"Easy\":[],\"Long\":[],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"{\"w\":1,\"sec\":140,\"tgt\":660}"}
+  sat NRC Long Run dose {"k":"dist","mi":1,"tgt":660}
+    gesture: time only 0:36:00 | strip "Run · Planned 1 mi @ 11:00/mi <svg width="15" height="15" viewBox="0 0 24 24" fill="none" " | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">36:00/mi<small>assuming planned 1 mi · 25:00/mi slower than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "1" run_mins "36.00" run_pace "36:00/mi" | live true | MILES tile 1 | Progress W1 1 | plannedVsLogged W1 {"presc":1,"act":1} | ladder W1 1 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[{\"w\":1,\"sec\":2160}],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+
+## run_base (seed 76308): W1 run days with a dist or time dose: mon time NSW Benchmark Run, sat time NSW Easy Run
+  mon NSW Benchmark Run dose {"k":"time","mins":20,"key":"bench"}
+    gesture: miles only 3.00 | strip "Run — TEST · Planned 20 min <svg width="15" height="15" viewBox="0 0 24 24" fill="none" st" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">6:40/mi<small>assuming planned 20 min</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.00" run_mins "" run_pace "6:40/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[],\"Long\":[],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+  sat NSW Easy Run dose {"k":"time","mins":25,"tgt":660,"key":"easy"}
+    gesture: miles only 3.00 | strip "Run — EASY · Planned 25 min @ 11:00/mi <svg width="15" height="15" viewBox="0 0 24 24" fil" | readout "<div class="derived"><span class="d-lbl">Pace — derived</span><span class="d-val">8:20/mi<small>assuming planned 25 min · 2:40/mi faster than target</small></span></div>" | toast "Run logged ✓"
+    stored: run_dist "3.00" run_mins "" run_pace "8:20/mi" | live true | MILES tile 3 | Progress W1 3 | plannedVsLogged W1 {} | ladder W1 3 | seed maxDist null
+    pace readers: {"recoveryPaceWeekly":"{\"weekly\":{},\"tgt\":null,\"nWeeks\":0}","runsByClass":"{\"Recovery\":[],\"Easy\":[{\"w\":1,\"sec\":500}],\"Long\":[],\"Tempo\":[],\"Interval\":[]}","easyEffortWeekly":"{\"weekly\":{},\"nRuns\":0,\"nWeeks\":0}","recoveryEntry":"null"}
+
+errors during the run: none
