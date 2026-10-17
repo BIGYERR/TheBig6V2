@@ -14,3 +14,13 @@ Reading, to be confirmed by coach r2 and played back to Mario:
   The athlete enters miles and pace. Nothing in those fields is recommended by the app. The logged data still populates
   the app's records and charts.
 - The reported card was on Mario's own program "PRT TING" (an NSW test goal; config not in the repo as of this note).
+
+## Mario's answers to coach r2's three calls (2026-10-16, chat; each was coach's recommendation)
+
+- Log form (r2's A/B): "Miles + time". The form keeps the time and miles wheels; the pace derives from them.
+- P-LSDPACE-3, stop storing planned miles never rolled, on every run card: "Yes, stop it".
+- P-LSDPACE-5, run_base easy runs: "Keep the ceiling".
+
+The decision record is `docs/decisions/lsd-pace.md`. Premises re-read on v0.240.0 the same day: the LSD copy still prints
+at `core/src/engine/nsw-cardio.ts:964` and `:1003`, and the stamp still writes at
+`frontends/app/src/legacy/src/js/day-status.ts:221` through `doseDerived`'s fallback to `dose.mi`.
