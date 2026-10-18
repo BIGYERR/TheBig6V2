@@ -4,6 +4,8 @@
   "scripts": {
     "emulator-ios": "node ../../tools/run.mjs build-ios-emulator -- node scripts/ios.mjs emulator",
     "device-ios": "node ../../tools/run.mjs build-ios-device -- node scripts/ios.mjs device",
+    "build-ios": "node ../../tools/run.mjs build-ios-simulator -- node scripts/ios.mjs build",
+    "version-ios": "node scripts/ios.mjs version",
     "pwa-pages": "node ../../tools/run.mjs build-pwa-pages -- node scripts/pwa-pages.mjs",
     "pwa-pages:check": "node scripts/pwa-pages.mjs --check",
     "pwa-local": "node ../../tools/run.mjs server-pwa-local -- node scripts/pwa-local.mjs",

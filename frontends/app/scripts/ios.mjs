@@ -7,6 +7,8 @@
 //   npm run device-ios                          build signed for the connected iPhone, install, launch
 //   npm run device-ios -- --udid <id>           pick a device when more than one is connected
 //   npm run device-ios -- --team <id>           Apple team ID (default: IOS_TEAM_ID, or the first team Xcode knows)
+//   npm run build-ios                           build for the simulator and stop (the compile proof; CI's native job)
+//   npm run version-ios                         write the page's ia-version into config.xml and stop (a release commit)
 //   npm run xcode-ios                           open the native project in Xcode
 //   add --no-web to skip the Angular build and reuse www/ as it is
 //
@@ -160,17 +162,42 @@ function pickSimulator(name) {
   return matches.find((d) => d.state === 'Booted') ?? matches.sort((a, b) => b.runtime.localeCompare(a.runtime))[0];
 }
 
-function simulator() {
+/** The unsigned simulator build: the Angular app, config.xml's version, the Cordova platform, then Xcode. */
+function buildForSimulator(label) {
   const version = prepare();
   rmSync(join(BUILD_ROOT, 'Debug-iphonesimulator'), { recursive: true, force: true });
   step('building with Xcode for the simulator');
   // cordova-ios 8 deploys simulator builds to DSTROOT ($(SRCROOT)/build by default); point it outside iCloud.
-  buildStep('emulator', 'npx', [
+  buildStep(label, 'npx', [
     'cordova', 'build', 'ios', '--emulator', '--debug', '--no-telemetry', `--buildFlag=DSTROOT=${BUILD_ROOT}`,
   ]);
   const app = findApp(join(BUILD_ROOT, 'Debug-iphonesimulator'));
   if (!app) fail(`the build reported success but no .app is in ${join(BUILD_ROOT, 'Debug-iphonesimulator')}`);
+  return { version, app };
+}
 
+/**
+ * The compile proof and nothing more: the simulator build, no simulator booted, nothing installed. What the
+ * pipeline's native job runs on a macOS runner on every push to dev (npm run build-ios), so a plugin, a Cordova or an
+ * Xcode change that breaks the native app turns CI red; locally it is the fastest native build (a few minutes).
+ */
+function buildOnly() {
+  const { version, app } = buildForSimulator('build');
+  console.log(`\nios: The Asylum ${version} built for the simulator: ${app}`);
+}
+
+/**
+ * Writes the page's ia-version into config.xml and stops (what a release commit carries; the app lane's
+ * test/unit/native-version.test.ts holds the two equal). Syncs the legacy bundle first, since the version is read
+ * off its generated manifest.
+ */
+function versionOnly() {
+  run(process.execPath, [join(APP, 'scripts', 'sync-legacy.mjs')]);
+  syncNativeVersion();
+}
+
+function simulator() {
+  const { version, app } = buildForSimulator('emulator');
   const sim = pickSimulator(flag('sim') || DEFAULT_SIM);
   const { bundleId } = readConfig();
   step(`launching on ${sim.name} (${sim.udid})`);
@@ -346,5 +373,7 @@ function openXcode() {
 if (process.platform !== 'darwin') fail('iOS builds need macOS with Xcode.');
 if (mode === 'emulator') simulator();
 else if (mode === 'device') device();
+else if (mode === 'build') buildOnly();
+else if (mode === 'version') versionOnly();
 else if (mode === 'open') openXcode();
-else fail('usage: node scripts/ios.mjs <emulator|device|open> [--sim <name>] [--udid <id>] [--team <id>] [--no-web]');
+else fail('usage: node scripts/ios.mjs <emulator|device|build|version|open> [--sim <name>] [--udid <id>] [--team <id>] [--no-web]');

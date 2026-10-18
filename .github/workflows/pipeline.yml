@@ -158,6 +158,36 @@ jobs:
           path: temp/
           retention-days: 30
 
+  # The native app's compile proof: the Angular app, the Cordova iOS platform and an unsigned Xcode build for the
+  # simulator, on a macOS runner (the 60-second check cannot build iOS; the app lane only holds config.xml's version to
+  # the page's). Nothing is booted, installed or signed; signing and TestFlight are a later pass.
+  native:
+    name: native (iOS simulator)
+    if: github.event_name != 'push' || github.ref == 'refs/heads/dev'
+    runs-on: macos-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Xcode and the iOS simulator runtimes this runner carries
+        run: |
+          xcodebuild -version
+          xcrun simctl list runtimes | grep iOS
+      - name: The app builds for the iOS simulator (frontends/app/scripts/ios.mjs build; Cordova and Xcode, unsigned, nothing launched)
+        working-directory: frontends/app
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build-ios
+      - name: Keep the Xcode log and the run log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-run-log
+          path: temp/
+          retention-days: 30
+
   pages:
     name: Pages (dist-github-pages)
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
