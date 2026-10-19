@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.240.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.240.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -16640,7 +16640,8 @@ function refreshProgram(prog){
 // refreshProgram (boot passes its ex-weight alias fold there, the order boot always had).
 function loadActiveProgram(id,beforeRefresh){if(id===null){localStorage.removeItem('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
 // V221 D178: Set Active is the one switch; a switch is complete when This Week shows the new block.
-function setActive(id){if(!loadActiveProgram(id))return;renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
+// v0.240.1 (D238): a switch marks the new program's past unmarked days as asked (markPastAsked).
+function setActive(id){if(!loadActiveProgram(id))return;markPastAsked();renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
 function startRename(id){_setEditProgId(id);renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
 function cancelRename(){_setEditProgId(null);renderProgList();}
 function commitRename(id){
@@ -16669,7 +16670,8 @@ function _handoffActiveFrom(id,programs){
     // V221 D178: both arms switch through the loader. Next program: the loader sets
     // currentWeek=calcCurrentWeek() and currentDayKey=null, the values this arm set. None left:
     // the loader's null clear removes ia_active and nulls activeProgId and activeProg.
-    if(nx)loadActiveProgram(nx.id);
+    // v0.240.1 (D238): handing active on is a switch, so the next program's past unmarked days are marked as asked.
+    if(nx){ if(loadActiveProgram(nx.id)) markPastAsked(); }
     else loadActiveProgram(null);
   }
 }
@@ -18654,6 +18656,15 @@ function fireCompletionPopup(week,dayKey){
 // Day-after reminder: most recent strictly-past pending non-rest day not yet reminded.
 function remindedSet(){ try{return JSON.parse(localStorage.getItem('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
 function markReminded(week,d){ const m=remindedSet(); m[completedKey(week,d)]=true; try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
+// v0.240.1 (D238, P-REMINDSWITCH): nothing records when a program became active, so a program switched to would ask
+// about every day spent on another one. The switch marks each past unmarked training day as asked. The record is not
+// written: the days stay unmarked, and the streak reads them as transparent. Today and later are asked as before.
+function markPastAsked(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const m=remindedSet(); let n=0;
+  scheduledDays(today).forEach(x=>{ if(x.date<today&&!statusOf(x.week,x.d)&&!m[completedKey(x.week,x.d)]){ m[completedKey(x.week,x.d)]=true; n++; } });
+  if(n) try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{}
+}
 function _todayStamp(){ const t=new Date(); return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate(); }
 function maybeShowReminder(){
   if(!activeProg?.startDate) return;

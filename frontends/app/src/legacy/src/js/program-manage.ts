@@ -12,6 +12,7 @@ import { entryDay } from './log-entries.ts';
 import { progTestPin, renderProgList } from './programs.ts';
 import { _isoToday, applyOverlays, overlayWeekRange, paceShiftMap } from './overlays.ts';
 import { renderProgressScreen } from './lift-ledger-progress-screen.ts';
+import { markPastAsked } from './popups-streaks-reminders.ts';
 // end of the module imports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 function refreshProgram(prog: any){
   if(!prog || !prog.cfg) return prog;
@@ -304,7 +305,8 @@ function refreshProgram(prog: any){
 // refreshProgram (boot passes its ex-weight alias fold there, the order boot always had).
 function loadActiveProgram(id: any,beforeRefresh?: any){if(id===null){localStorage.removeItem('ia_active');_setActiveProgId(null);_setActiveProg(null);_setCurrentDayKey(null);_setCurrentWeek(1);return true;}const stored=getPrograms().find(p=>p.id===id);if(!stored)return false;if(stored.archived){showToast('Restore this program first');return false;}setActiveProgId(id);_setActiveProgId(id);if(beforeRefresh)beforeRefresh();_setActiveProg(refreshProgram(stored));_setCurrentWeek(calcCurrentWeek());_setCurrentDayKey(null);return true;}
 // V221 D178: Set Active is the one switch; a switch is complete when This Week shows the new block.
-function setActive(id: any){if(!loadActiveProgram(id))return;renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
+// v0.240.1 (D238): a switch marks the new program's past unmarked days as asked (markPastAsked).
+function setActive(id: any){if(!loadActiveProgram(id))return;markPastAsked();renderProgList();showScreen('screenWeek');renderWeekView();showToast('Active program updated');}
 // @ts-expect-error TS2551 Property 'select' does not exist on type 'HTMLElement'. Did you mean 'onselect'?
 function startRename(id: any){_setEditProgId(id);renderProgList();const inp=document.getElementById('renameInput_'+id);if(inp){inp.focus();inp.select();}}
 function cancelRename(){_setEditProgId(null);renderProgList();}
@@ -336,7 +338,8 @@ function _handoffActiveFrom(id: any,programs: any){
     // V221 D178: both arms switch through the loader. Next program: the loader sets
     // currentWeek=calcCurrentWeek() and currentDayKey=null, the values this arm set. None left:
     // the loader's null clear removes ia_active and nulls activeProgId and activeProg.
-    if(nx)loadActiveProgram(nx.id);
+    // v0.240.1 (D238): handing active on is a switch, so the next program's past unmarked days are marked as asked.
+    if(nx){ if(loadActiveProgram(nx.id)) markPastAsked(); }
     else loadActiveProgram(null);
   }
 }

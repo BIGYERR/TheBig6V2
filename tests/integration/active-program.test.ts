@@ -1,6 +1,8 @@
 // The active program: one program is active, one place says so, one button makes it so. Ruling D178 (P-ACTIVE, V221,
 // with its amendment and re-ruling: a stale pointer at boot, the legacy delete backfill). The record is in the handoff
-// and tests/measure/v221_rulings/p_active_ruling.md.
+// and tests/measure/v221_rulings/p_active_ruling.md. D238 (P-REMINDSWITCH, v0.240.1, docs/decisions/active-program.md): a
+// switch marks the new program's past unmarked training days as asked, so the reminder never asks about a day spent on
+// another program; the record is not written. Two tests below guard what must not change (they say so in their names).
 //
 // Oracle, typed by hand: the invariant "ia_active === activeProgId === activeProg.id, or all three null" after every
 // path, and the id each path must land on; the toast and card copy; the week a switch lands on and the stored test
@@ -346,4 +348,76 @@ test('building a program in the wizard makes it active, on week 1 of This Week, 
     assert.equal(ev('currentWeek'), 1, nm + ': week 1');
     assert.equal(ev('_curScreen'), 'screenWeek', nm + ': This Week');
   }
+});
+
+// ── D238 (P-REMINDSWITCH): a switch marks the new program's past unmarked days as asked ─────────────────────────────
+// Oracle, typed by hand: the clock is Sunday 2026-10-11 and both programs start Monday 2026-09-07, so the past is weeks
+// 1 to 5 up to Saturday 2026-10-10. A training day is a non-rest day of the stored grid (the program's input, not the
+// reminder's reading of it); its date is the start plus (week - 1) * 7 plus its offset in the week.
+const RDAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
+const pastTraining = (p: Program) => {
+  assert.equal(p.startDate, START);
+  assert.equal((p as unknown as { blockOpen?: string }).blockOpen, undefined, p.id + ': no block-open date to exclude');
+  const out: string[] = [];
+  for (let w = 1; w <= 5; w++) RDAYS.forEach((d, i) => {
+    const day = (p.weeks as any)[w] && (p.weeks as any)[w][d];
+    if (!day || day.rest) return;
+    if (addDays(monOf(START), (w - 1) * 7 + i) < DAY0) out.push('w' + w + '_' + d);
+  });
+  return out;
+};
+const P1_PAST = pastTraining(cP[1]);
+const asked = (LS: StorageStub, id: string) => { const s = LS.getItem('ia_reminded_' + id); return s === null ? null : Object.keys(JSON.parse(s)).sort(); };
+
+test('the reminder oracle agrees with itself: P1 has past training days in each of weeks 1 to 5, none dated today', () => {
+  assert.ok(P1_PAST.length >= 20, String(P1_PAST.length));
+  [1, 2, 3, 4, 5].forEach(w => assert.ok(P1_PAST.some(k => k.startsWith('w' + w + '_')), 'week ' + w));
+  assert.ok(!P1_PAST.includes('w5_sun'), 'Sunday 2026-10-11 is today, not the past');
+});
+
+test('Set Active marks every past unmarked training day of the program it switches to as asked, and writes no record', () => {
+  const w = cWorld(C_JSON, 'P0');
+  const done = P1_PAST[3], skip = P1_PAST[7];
+  const comp = JSON.stringify({ [done]: { title: 'X', ts: 1, status: 'complete' }, [skip]: { title: 'Y', ts: 2, status: 'skipped' } });
+  w.LS.setItem('ia_comp_P1', comp);
+  assert.equal(w.run('init()'), '');
+  assert.equal(w.run('setActive("P1")'), '');
+  assert.deepEqual(asked(w.LS, 'P1'), P1_PAST.filter(k => k !== done && k !== skip).sort());
+  assert.equal(w.LS.getItem('ia_comp_P1'), comp, 'the record is byte for byte what it was');
+  assert.equal(asked(w.LS, 'P0'), null, 'the program switched away from is not touched');
+});
+
+test('after Set Active the reminder asks nothing that day, then asks about the first day missed after the switch', () => {
+  const w = cWorld(C_JSON, 'P0');
+  assert.equal(w.run('init()') + w.run('setActive("P1")'), '');
+  assert.equal(w.run('maybeShowReminder()'), '');
+  assert.equal(w.LS.getItem('ia_remind_last_P1'), null, 'no reminder on Sunday 2026-10-11');
+  pinClock(w.I, new Date(2026, 9, 13, 10, 0, 0));   // Tuesday 2026-10-13: Monday 2026-10-12 (W6 Monday) went unmarked
+  assert.equal(w.run('maybeShowReminder()'), '');
+  assert.equal(w.LS.getItem('ia_remind_last_P1'), '2026-10-13', 'a reminder on Tuesday');
+  assert.deepEqual(asked(w.LS, 'P1'), P1_PAST.concat(['w6_mon']).sort(), 'it asked about Monday, Wk 6');
+});
+
+test('archiving the active program marks the past unmarked days of the program it hands active to', () => {
+  const w = cWorld(C_JSON, 'P0');
+  assert.equal(w.run('init()') + w.run('archiveProg("P0")'), '');
+  assertTriple(triple(w.LS, w.ev), 'P1', 'the handoff');
+  assert.deepEqual(asked(w.LS, 'P1'), P1_PAST.slice().sort());
+});
+
+test('guard, must not change: opening the app marks nothing, and its reminder still asks about the last unmarked day', () => {
+  const w = cWorld(C_JSON, 'P0');
+  assert.equal(w.run('init()'), '');
+  assert.equal(asked(w.LS, 'P0'), null, 'boot marks nothing');
+  const last = pastTraining(cP[0]).filter(k => k.startsWith('w5_')).pop();
+  assert.equal(last, 'w5_sat', 'Saturday 2026-10-10 is P0\'s last training day before today');
+  assert.equal(w.run('maybeShowReminder()'), '');
+  assert.deepEqual(asked(w.LS, 'P0'), ['w5_sat']);
+});
+
+test('guard, must not change: Set Active on an archived program is refused and marks nothing', () => {
+  const w = cWorld(C_JSON, 'P0');
+  assert.equal(w.run('init()') + w.run('setActive("P2")'), '');
+  assert.equal(asked(w.LS, 'P2'), null);
+  assert.equal(asked(w.LS, 'P0'), null);
 });

@@ -301,6 +301,15 @@ function fireCompletionPopup(week: any,dayKey: any){
 // Day-after reminder: most recent strictly-past pending non-rest day not yet reminded.
 function remindedSet(){ try{return JSON.parse(localStorage.getItem('ia_reminded_'+activeProgId)||'{}');}catch{return{};} }
 function markReminded(week: any,d: any){ const m=remindedSet(); m[completedKey(week,d)]=true; try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{} }
+// v0.240.1 (D238, P-REMINDSWITCH): nothing records when a program became active, so a program switched to would ask
+// about every day spent on another one. The switch marks each past unmarked training day as asked. The record is not
+// written: the days stay unmarked, and the streak reads them as transparent. Today and later are asked as before.
+function markPastAsked(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const m=remindedSet(); let n=0;
+  scheduledDays(today).forEach(x=>{ if(x.date<today&&!statusOf(x.week,x.d)&&!m[completedKey(x.week,x.d)]){ m[completedKey(x.week,x.d)]=true; n++; } });
+  if(n) try{localStorage.setItem('ia_reminded_'+activeProgId,JSON.stringify(m));}catch{}
+}
 function _todayStamp(){ const t=new Date(); return t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate(); }
 function maybeShowReminder(){
   if(!activeProg?.startDate) return;
@@ -355,6 +364,6 @@ function resolveReminder(week: any,dayKey: any,title: any,status: any){
 
 // the module exports (scripts/module-blocks.mjs writes them; build-index.mjs strips them)
 export {
-  completedCount, computeStreak, finalScheduledDay, fireCompletionPopup, maybeShowReminder, popFire, releaseSeasonShown,
-  statusOf,
+  completedCount, computeStreak, finalScheduledDay, fireCompletionPopup, markPastAsked, maybeShowReminder, popFire,
+  releaseSeasonShown, statusOf,
 };
