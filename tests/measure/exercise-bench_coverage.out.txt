@@ -1,0 +1,381 @@
+PROGRAMS 504 (per tier {"bodyweight":84,"minimal":84,"home_basic":84,"home_full":84,"commercial":84,"crossfit":84}) = 6 tiers x 7 focuses x 3 exp x 2 cardio (run half, bike base) x 2 seeds, healthy
+Per block: programs reaching it per tier (of 84), then each name with prints per tier [bw min hb hf com cf].
+
+## Accessory   reach 48/48/48/48/48/48   distinct names 20
+   by focus (run/bike, of 36): strength 36/36, hypertrophy 0/0, fatloss 0/0, balanced 36/36, support_strength 36/36, support_athletic 0/0, support_prevention 36/36
+   Diamond pushups                                0 263 256 175 175 174
+   Kettlebell single-arm press                    0 204 191 121 121 117
+   Dumbbell decline press                         0 56 56 146 146 144
+   Dumbbell lateral raise                         0 180 180 52 52 52
+   Dumbbell Arnold press                          0 30 30 99 99 98
+   Pushups (slow tempo)                           0 73 71 64 64 64
+   Pike pushups (feet elevated)                   200 0 0 0 0 0
+   Wall walks                                     187 0 0 0 0 0
+   Dumbbell bench press                           0 36 36 36 36 36
+   Barbell push press                             0 0 0 60 60 60
+   Dumbbell floor press                           0 30 30 36 36 36
+   Pushups (slow 3s eccentric)                    143 0 0 0 0 0
+   Wide-stance pushups                            126 0 0 0 0 0
+   Close-grip pushups                             117 0 0 0 0 0
+   Barbell overhead press                         0 0 0 30 30 30
+   Landmine rotational press                      0 0 0 24 24 24
+   Prone Y-T-W raises                             56 0 0 0 0 0
+   Incline pushups (hands on bed)                 36 0 0 0 0 0
+   Pike pushups                                   21 0 0 0 0 0
+   Decline pushups (feet elevated)                12 0 0 0 0 0
+## Calves   reach 6/6/6/6/6/6   distinct names 3
+   by focus (run/bike, of 36): strength 0/0, hypertrophy 12/24, fatloss 0/0, balanced 0/0, support_strength 0/0, support_athletic 0/0, support_prevention 0/0
+   Dumbbell standing calf raise                   0 52 46 46 23 46
+   Single-leg calf raise (bodyweight)             50 0 0 0 0 0
+   Machine seated calf raise                      0 0 0 0 23 0
+## Chest + knee   reach 48/48/48/48/48/48   distinct names 15
+   by focus (run/bike, of 36): strength 24/24, hypertrophy 0/0, fatloss 24/24, balanced 24/24, support_strength 24/24, support_athletic 24/24, support_prevention 24/24
+   Spanish squat hold (KB)                        0 280 277 270 270 268
+   Wall sit                                       296 111 111 112 112 110
+   Dumbbell decline press                         0 55 48 72 72 72
+   Dumbbell bench press                           0 36 34 21 21 21
+   Pushups (slow tempo)                           0 38 36 19 19 19
+   Dumbbell incline press                         0 30 23 22 22 22
+   Dumbbell floor press                           0 15 15 28 28 28
+   Single-leg wall sit                            112 0 0 0 0 0
+   Dips                                           0 21 19 19 19 19
+   Close-grip pushups                             94 0 0 0 0 0
+   Terminal knee extension (band)                 0 14 14 14 14 14
+   Diamond pushups                                0 10 10 16 16 16
+   Wide-stance pushups                            57 0 0 0 0 0
+   Pushups (slow 3s eccentric)                    29 0 0 0 0 0
+   Decline pushups (feet elevated)                23 0 0 0 0 0
+## Chest volume   reach 8/12/12/12/12/12   distinct names 4
+   by focus (run/bike, of 36): strength 0/0, hypertrophy 34/34, fatloss 0/0, balanced 0/0, support_strength 0/0, support_athletic 0/0, support_prevention 0/0
+   Diamond pushups                                0 51 51 51 51 51
+   Pushups (slow tempo)                           51 51 51 0 0 0
+   Dips                                           0 0 0 51 51 51
+   Pushups (slow 3s eccentric)                    16 0 0 0 0 0
+## Conditioning   reach 24/24/24/24/24/24   distinct names 8
+   by focus (run/bike, of 36): strength 0/0, hypertrophy 0/0, fatloss 36/36, balanced 0/0, support_strength 0/0, support_athletic 36/36, support_prevention 0/0
+   Jump squats                                    38 100 100 100 100 100
+   Mountain climbers                              8 62 57 58 58 57
+   Ball slams                                     0 49 47 48 48 47
+   Burpees                                        66 25 23 23 22 22
+   Broad jumps                                    31 28 26 26 25 25
+   Kettlebell swing                               0 16 16 16 16 16
+   Skater bounds                                  66 0 0 0 0 0
+   High knees                                     52 0 0 0 0 0
+## Core: Anti-Extension   reach 42/42/42/42/42/42   distinct names 5
+   by focus (run/bike, of 36): strength 0/36, hypertrophy 0/36, fatloss 0/36, balanced 0/36, support_strength 0/36, support_athletic 0/36, support_prevention 0/36
+   Ab wheel rollouts                              114 114 114 114 114 114
+   Superman                                       22 22 22 22 22 22
+   RKC plank                                      18 18 18 18 18 18
+   Bird dogs                                      14 14 14 14 14 14
+   Plank hold                                     12 12 12 12 12 12
+## Core: Anti-Rotation   reach 84/84/84/84/84/84   distinct names 7
+   by focus (run/bike, of 36): strength 36/36, hypertrophy 36/36, fatloss 36/36, balanced 36/36, support_strength 36/36, support_athletic 36/36, support_prevention 36/36
+   Plank shoulder taps                            318 114 180 180 180 180
+   Side plank                                     292 176 156 151 151 151
+   Bird dogs                                      308 198 116 116 116 116
+   Farmer carry                                   0 84 132 132 132 132
+   Suitcase carry                                 0 126 122 116 116 116
+   Pallof press                                   0 0 150 146 146 146
+   Dumbbell renegade rows                         0 176 38 40 40 40
+## Core: Dynamic Bracing   reach 42/42/42/42/42/42   distinct names 4
+   by focus (run/bike, of 36): strength 0/36, hypertrophy 0/36, fatloss 0/36, balanced 0/36, support_strength 0/36, support_athletic 0/36, support_prevention 0/36
+   Hanging leg raises                             68 68 68 68 68 68
+   Toes-to-bar                                    50 50 50 50 50 50
+   Garhammer raises                               48 48 48 45 45 45
+   Hanging knee raises                            34 34 34 34 34 34
+## Core: Rotational Power   reach 84/84/84/84/84/84   distinct names 7
+   by focus (run/bike, of 36): strength 36/36, hypertrophy 36/36, fatloss 36/36, balanced 36/36, support_strength 36/36, support_athletic 36/36, support_prevention 36/36
+   Standing torso rotations (slow)                334 334 406 181 106 180
+   Side plank thread-the-needle                   372 372 230 126 177 109
+   Windshield wipers                              363 364 170 221 86 143
+   Band woodchopper (door anchor)                 0 0 240 194 122 238
+   Landmine rotations                             0 0 0 304 136 128
+   Medicine ball rotary toss                      0 0 0 0 212 228
+   Cable woodchoppers                             0 0 0 0 182 0
+## Explosive finisher   reach 72/72/72/48/48/0   distinct names 8
+   by focus (run/bike, of 36): strength 18/18, hypertrophy 18/18, fatloss 30/30, balanced 30/30, support_strength 30/30, support_athletic 0/0, support_prevention 30/30
+   Mountain climbers                              8 256 256 148 148 0
+   Jump squats                                    40 158 158 104 104 0
+   Ball slams                                     0 138 138 84 84 0
+   Burpees                                        138 40 40 40 40 0
+   Skater bounds                                  256 0 0 0 0 0
+   Broad jumps                                    48 48 48 48 48 0
+   High knees                                     158 0 0 0 0 0
+   Kettlebell swing                               0 8 8 8 8 0
+## Foot & ankle   reach 42/42/42/42/42/42   distinct names 4
+   by focus (run/bike, of 36): strength 36/0, hypertrophy 36/0, fatloss 36/0, balanced 36/0, support_strength 36/0, support_athletic 36/0, support_prevention 36/0
+   Single-leg bent-knee soleus raise              336 315 315 315 315 315
+   Tibialis raise (wall lean)                     399 294 294 294 294 294
+   Standing ankle CARs                            357 252 252 252 252 252
+   Banded dorsiflexion                            0 231 231 231 231 231
+## Foot & ankle — mobility only   reach 42/42/42/42/42/42   distinct names 2
+   by focus (run/bike, of 36): strength 36/0, hypertrophy 36/0, fatloss 36/0, balanced 36/0, support_strength 36/0, support_athletic 36/0, support_prevention 36/0
+   Standing ankle CARs                            42 42 42 42 42 42
+   Toe yoga (splay + big-toe lifts)               42 42 42 42 42 42
+## Hip stability   reach 84/84/84/84/84/84   distinct names 14
+   by focus (run/bike, of 36): strength 36/36, hypertrophy 36/36, fatloss 36/36, balanced 36/36, support_strength 36/36, support_athletic 36/36, support_prevention 36/36
+   Hip 90/90 stretch                              518 350 350 350 350 350
+   Banded side steps                              0 392 392 392 392 392
+   Seated banded hip flexion                      0 350 350 350 350 350
+   Clamshells w/ band                             0 308 308 308 308 308
+   Hip airplane (light KB)                        0 294 294 294 294 294
+   Banded monster walks                           0 266 266 266 266 266
+   IT band stretch                                182 182 182 182 182 182
+   Worlds greatest stretch                        168 168 168 168 168 168
+   Weighted 90/90 hip switch                      0 168 168 168 168 168
+   Clamshells (bodyweight)                        630 0 0 0 0 0
+   Standing band hip abduction                    0 126 126 126 126 126
+   Side-lying leg raises                          420 0 0 0 0 0
+   Standing hip abduction                         350 0 0 0 0 0
+   Fire hydrants                                  336 0 0 0 0 0
+## Knee stability   reach 36/36/36/36/36/36   distinct names 4
+   by focus (run/bike, of 36): strength 0/36, hypertrophy 0/36, fatloss 0/36, balanced 0/36, support_strength 0/36, support_athletic 0/36, support_prevention 0/0
+   Spanish squat hold (KB)                        0 216 216 216 216 216
+   Wall sit                                       224 64 64 64 64 64
+   Single-leg wall sit                            64 0 0 0 0 0
+   Terminal knee extension (band)                 0 8 8 8 8 8
+## Leg superset A   reach 72/72/72/72/72/72   distinct names 14
+   by focus (run/bike, of 36): strength 36/36, hypertrophy 36/36, fatloss 36/36, balanced 36/36, support_strength 36/36, support_athletic 36/36, support_prevention 0/0
+   Dumbbell goblet side lunge                     0 294 294 246 246 246
+   Spanish squat hold (KB)                        0 252 252 252 252 252
+   Dumbbell Bulgarian split squat                 0 20 20 222 222 222
+   Wall sit                                       264 60 60 60 60 60
+   Reverse lunge (KB)                             0 222 222 0 0 0
+   Landmine reverse lunge                         0 0 0 80 80 80
+   Walking lunge                                  216 0 0 0 0 0
+   Walking lunge (KB)                             0 32 32 44 44 44
+   Step-ups (chair)                               194 0 0 0 0 0
+   Reverse lunge                                  182 0 0 0 0 0
+   Step-ups (KB)                                  0 44 44 20 20 20
+   Single-leg wall sit                            60 0 0 0 0 0
+   Terminal knee extension (band)                 0 12 12 12 12 12
+   Bulgarian split squat (foot on chair)          20 0 0 0 0 0
+## Leg superset B   reach 72/72/72/72/72/72   distinct names 19
+   by focus (run/bike, of 36): strength 36/36, hypertrophy 36/36, fatloss 36/36, balanced 36/36, support_strength 36/36, support_athletic 36/36, support_prevention 0/0
+   Kettlebell single-leg deadlift                 0 172 172 126 260 260
+   Kettlebell swing                               0 160 160 100 218 218
+   Bodyweight back extension                      292 252 249 0 0 0
+   Single-leg hip thrust                          0 0 0 408 36 249
+   Dumbbell split-stance deadlift                 0 0 0 190 194 190
+   Double Kettlebell deadlift                     0 284 284 0 0 0
+   Nordic hamstring curl (anchored)               120 198 195 0 0 0
+   45° back extension                             0 0 0 0 195 195
+   Single-leg glute bridge                        364 0 0 0 0 0
+   Single-leg Romanian deadlift (bodyweight)      318 0 0 0 0 0
+   Single-leg glute bridge (weighted)             0 148 148 0 0 0
+   Glute-ham raise                                0 0 0 0 148 148
+   Kettlebell Romanian deadlift                   0 128 128 0 0 0
+   Single-leg hip thrust (shoulders on bed)       246 0 0 0 0 0
+   Cable pull-through                             0 0 0 0 213 0
+   Zercher single-leg deadlift                    0 0 0 70 70 70
+   Barbell hip thrust                             0 0 0 184 0 0
+   Barbell Romanian deadlift                      0 0 0 172 0 0
+   Barbell good mornings                          0 0 0 86 2 6
+## Light finisher   reach 24/24/24/24/24/24   distinct names 14
+   by focus (run/bike, of 36): strength 0/0, hypertrophy 0/0, fatloss 36/36, balanced 0/0, support_strength 0/0, support_athletic 36/36, support_prevention 0/0
+   Broad jumps                                    96 97 97 97 97 97
+   Burpees                                        24 80 80 80 80 80
+   Jump squats                                    100 64 64 57 57 57
+   Mountain climbers                              44 22 22 22 22 22
+   Ball slams                                     0 24 24 24 24 24
+   High knees                                     50 0 0 0 0 0
+   Kettlebell swing                               0 8 8 10 10 10
+   Skater bounds                                  25 0 0 0 0 0
+   Barbell good mornings                          0 0 0 8 8 8
+   Kettlebell single-leg deadlift                 0 0 0 5 5 5
+   Double Kettlebell deadlift                     0 6 6 0 0 0
+   Kettlebell Romanian deadlift                   0 2 2 0 0 0
+   Dumbbell Romanian deadlift                     0 2 2 0 0 0
+   Dumbbell split-stance deadlift                 0 0 0 1 1 1
+## Loaded carry finisher   reach 0/72/72/72/72/72   distinct names 3
+   by focus (run/bike, of 36): strength 30/30, hypertrophy 0/0, fatloss 30/30, balanced 30/30, support_strength 30/30, support_athletic 30/30, support_prevention 30/30
+   Farmer carry                                   0 251 243 243 243 243
+   Suitcase carry                                 0 241 241 241 241 241
+   Overhead carry                                 0 120 120 120 120 120
+## Main — Archer pushups   reach 19/0/0/0/0/0   distinct names 3
+   Archer pushups                                 88 0 0 0 0 0
+   Wall walks                                     39 0 0 0 0 0
+   Pike pushups (feet elevated)                   30 0 0 0 0 0
+## Main — Assisted pistol squat   reach 20/0/0/0/0/0   distinct names 1
+   Assisted pistol squat                          85 0 0 0 0 0
+## Main — Back squat   reach 0/0/0/56/56/56   distinct names 1
+   Back squat                                     0 0 0 244 244 244
+## Main — Barbell Romanian deadlift   reach 0/0/0/72/72/72   distinct names 1
+   Barbell Romanian deadlift                      0 0 0 324 324 324
+## Main — Barbell bench press   reach 0/0/0/20/20/20   distinct names 2
+   Barbell bench press                            0 0 0 40 40 40
+   Dumbbell lateral raise                         0 0 0 40 40 40
+## Main — Barbell box squat   reach 0/0/0/24/24/24   distinct names 1
+   Barbell box squat                              0 0 0 68 68 68
+## Main — Bulgarian split squat (foot on chair)   reach 68/0/0/0/0/0   distinct names 1
+   Bulgarian split squat (foot on chair)          356 0 0 0 0 0
+## Main — Close-grip bench press   reach 0/0/0/42/42/42   distinct names 3
+   Close-grip bench press                         0 0 0 244 244 244
+   Dumbbell Arnold press                          0 0 0 122 122 122
+   Barbell push press                             0 0 0 60 60 60
+## Main — Close-grip pushups   reach 10/0/0/0/0/0   distinct names 2
+   Close-grip pushups                             20 0 0 0 0 0
+   Wall walks                                     20 0 0 0 0 0
+## Main — Deadlift   reach 0/0/0/20/20/20   distinct names 1
+   Deadlift                                       0 0 0 40 40 40
+## Main — Decline pushups   reach 0/84/84/0/0/0   distinct names 4
+   Decline pushups                                0 588 588 0 0 0
+   Kettlebell single-arm press                    0 304 304 0 0 0
+   Dumbbell lateral raise                         0 234 234 0 0 0
+   Dumbbell Arnold press                          0 50 50 0 0 0
+## Main — Decline pushups (feet elevated)   reach 68/0/0/0/0/0   distinct names 4
+   Decline pushups (feet elevated)                286 0 0 0 0 0
+   Wall walks                                     89 0 0 0 0 0
+   Pike pushups                                   80 0 0 0 0 0
+   Pike pushups (feet elevated)                   74 0 0 0 0 0
+## Main — Diamond pushups   reach 43/50/50/0/0/0   distinct names 5
+   Diamond pushups                                221 140 140 0 0 0
+   Kettlebell single-arm press                    0 140 140 0 0 0
+   Pike pushups (feet elevated)                   79 0 0 0 0 0
+   Prone Y-T-W raises                             74 0 0 0 0 0
+   Pike pushups                                   30 0 0 0 0 0
+## Main — Dumbbell Romanian deadlift   reach 0/72/72/0/0/0   distinct names 1
+   Dumbbell Romanian deadlift                     0 324 324 0 0 0
+## Main — Dumbbell bench press   reach 0/20/20/84/72/84   distinct names 6
+   Dumbbell bench press                           0 40 40 728 484 728
+   Dumbbell Arnold press                          0 40 40 294 234 294
+   Kettlebell single-arm press                    0 0 0 244 60 244
+   Landmine rotational press                      0 0 0 90 90 90
+   Barbell overhead press                         0 0 0 60 60 60
+   Dumbbell lateral raise                         0 0 0 40 40 40
+## Main — Dumbbell decline press   reach 0/42/42/0/0/0   distinct names 3
+   Dumbbell decline press                         0 244 244 0 0 0
+   Kettlebell single-arm press                    0 122 122 0 0 0
+   Dumbbell Arnold press                          0 60 60 0 0 0
+## Main — Dumbbell goblet squat   reach 0/84/84/0/0/0   distinct names 1
+   Dumbbell goblet squat                          0 368 368 0 0 0
+## Main — Dumbbell incline press   reach 0/62/62/60/60/60   distinct names 7
+   Dumbbell incline press                         0 324 324 340 230 340
+   Dumbbell lateral raise                         0 122 122 50 50 50
+   Dumbbell Arnold press                          0 136 136 40 40 40
+   Kettlebell single-arm press                    0 0 0 74 30 74
+   Barbell push press                             0 0 0 40 40 40
+   Landmine rotational press                      0 0 0 40 40 40
+   Barbell overhead press                         0 0 0 50 0 50
+## Main — Feet-elevated inverted row (under a table)   reach 48/0/0/0/0/0   distinct names 1
+   Feet-elevated inverted row (under a table)     356 0 0 0 0 0
+## Main — Front squat   reach 0/0/0/84/84/84   distinct names 1
+   Front squat                                    0 0 0 464 464 464
+## Main — Incline barbell press   reach 0/0/0/62/62/62   distinct names 4
+   Incline barbell press                          0 0 0 324 324 324
+   Kettlebell single-arm press                    0 0 0 122 122 122
+   Dumbbell lateral raise                         0 0 0 100 100 100
+   Barbell overhead press                         0 0 0 34 34 34
+## Main — Incline pushups (hands on bed)   reach 52/0/0/0/0/0   distinct names 4
+   Incline pushups (hands on bed)                 379 0 0 0 0 0
+   Pike pushups (feet elevated)                   236 0 0 0 0 0
+   Wall walks                                     83 0 0 0 0 0
+   Pike pushups                                   60 0 0 0 0 0
+## Main — Inverted row (knees bent, under a table)   reach 24/0/0/0/0/0   distinct names 1
+   Inverted row (knees bent, under a table)       128 0 0 0 0 0
+## Main — Inverted row (under a table)   reach 62/0/0/0/0/0   distinct names 1
+   Inverted row (under a table)                   384 0 0 0 0 0
+## Main — Kettlebell goblet squat   reach 0/50/50/0/0/0   distinct names 1
+   Kettlebell goblet squat                        0 100 100 0 0 0
+## Main — Kettlebell single-leg deadlift   reach 0/72/72/0/0/0   distinct names 1
+   Kettlebell single-leg deadlift                 0 324 324 0 0 0
+## Main — Kettlebell swing   reach 0/60/60/0/0/0   distinct names 1
+   Kettlebell swing                               0 220 220 0 0 0
+## Main — Machine chest press   reach 0/0/0/0/72/0   distinct names 5
+   Machine chest press                            0 0 0 0 414 0
+   Kettlebell single-arm press                    0 0 0 0 244 0
+   Dumbbell Arnold press                          0 0 0 0 60 0
+   Barbell push press                             0 0 0 0 60 0
+   Barbell overhead press                         0 0 0 0 50 0
+## Main — Paused back squat   reach 0/0/0/24/24/24   distinct names 1
+   Paused back squat                              0 0 0 92 92 92
+## Main — Pike pushups   reach 0/30/30/0/0/0   distinct names 2
+   Pike pushups                                   0 60 60 0 0 0
+   Dumbbell lateral raise                         0 60 60 0 0 0
+## Main — Pushup variation (weighted)   reach 0/60/60/0/0/0   distinct names 4
+   Pushup variation (weighted)                    0 260 260 0 0 0
+   Dumbbell lateral raise                         0 110 110 0 0 0
+   Dumbbell Arnold press                          0 100 100 0 0 0
+   Kettlebell single-arm press                    0 50 50 0 0 0
+## Main — Pushups (slow 3s eccentric)   reach 72/0/0/0/0/0   distinct names 5
+   Pushups (slow 3s eccentric)                    504 0 0 0 0 0
+   Wall walks                                     290 0 0 0 0 0
+   Pike pushups                                   90 0 0 0 0 0
+   Pike pushups (feet elevated)                   75 0 0 0 0 0
+   Prone Y-T-W raises                             25 0 0 0 0 0
+## Main — Pushups (slow tempo)   reach 0/40/40/30/0/30   distinct names 4
+   Pushups (slow tempo)                           0 80 80 60 0 60
+   Barbell push press                             0 0 0 60 0 60
+   Dumbbell lateral raise                         0 40 40 0 0 0
+   Kettlebell single-arm press                    0 40 40 0 0 0
+## Main — Single-leg squat (assisted)   reach 0/60/60/0/0/0   distinct names 1
+   Single-leg squat (assisted)                    0 230 230 0 0 0
+## Main — Split squat   reach 71/0/0/0/0/0   distinct names 1
+   Split squat                                    357 0 0 0 0 0
+## Main — Squat (slow 3s tempo)   reach 35/0/0/0/0/0   distinct names 1
+   Squat (slow 3s tempo)                          70 0 0 0 0 0
+## Main — Step-ups (KB)   reach 0/60/60/0/0/0   distinct names 1
+   Step-ups (KB)                                  0 170 170 0 0 0
+## Main — Sumo deadlift   reach 0/0/0/72/72/72   distinct names 1
+   Sumo deadlift                                  0 0 0 284 284 284
+## Main — Trap bar deadlift   reach 0/0/0/60/60/60   distinct names 1
+   Trap bar deadlift                              0 0 0 220 220 220
+## Main — Wide-stance pushups   reach 54/0/0/0/0/0   distinct names 5
+   Wide-stance pushups                            238 0 0 0 0 0
+   Prone Y-T-W raises                             78 0 0 0 0 0
+   Pike pushups (feet elevated)                   75 0 0 0 0 0
+   Wall walks                                     70 0 0 0 0 0
+   Pike pushups                                   15 0 0 0 0 0
+## Power — explosive first   reach 12/12/12/12/12/84   distinct names 16
+   by focus (run/bike, of 36): strength 6/6, hypertrophy 6/6, fatloss 6/6, balanced 6/6, support_strength 6/6, support_athletic 36/36, support_prevention 6/6
+   Pogo hops                                      19 19 19 21 21 118
+   Kettlebell swing                               0 14 14 11 11 144
+   Jump squats                                    6 24 24 20 20 80
+   Power clean (light & explosive)                0 0 0 24 24 82
+   Dumbbell snatch                                0 0 0 0 0 88
+   Wall ball shots                                0 0 0 0 0 86
+   Trap bar jump                                  0 0 0 15 15 44
+   Lateral bounds                                 16 28 28 0 0 0
+   Broad jumps                                    20 6 6 6 6 24
+   Rotational jump to single-leg landing          12 0 0 8 8 36
+   Depth fall to single-leg bounds                0 0 0 6 6 32
+   Tuck jumps                                     11 11 11 0 0 0
+   Box jumps                                      0 0 0 5 5 20
+   Skater bounds                                  28 0 0 0 0 0
+   Single-arm KB snatch                           0 14 14 0 0 0
+   Split-squat jumps                              4 0 0 0 0 0
+
+## HALF_MANNY, the blocks above, week by week
+W1 MON Strength Support {Speed Run — Intervals} :: Core — Anti-Rotation[Suitcase carry, Bird dogs]
+W1 TUE Leg Strength + Mobility :: Hip stability[Seated banded hip flexion, Hip airplane (light KB), Hip 90/90 stretch] | Foot & ankle[Single-leg bent-knee soleus raise, Standing ankle CARs] | Loaded carry finisher[Suitcase carry]
+W1 FRI Recovery Lift {Recovery Run} :: Core — Rotational Power[Medicine ball rotary toss, Landmine rotations]
+W1 SAT Full Body Support {Long Run} :: Power — explosive first[Kettlebell swing]
+W2 MON Strength Support {Speed Run — Intervals} :: Core — Rotational Power[Medicine ball rotary toss]
+W2 TUE Leg Strength + Mobility :: Hip stability[Standing band hip abduction, Hip airplane (light KB), Hip 90/90 stretch] | Foot & ankle[Single-leg bent-knee soleus raise, Standing ankle CARs] | Loaded carry finisher[Suitcase carry]
+W2 FRI Recovery Lift {Recovery Run} :: Core — Anti-Rotation[Side plank, Plank shoulder taps]
+W3 MON Strength Support {Speed Run — Hills} :: Core — Anti-Rotation[Side plank, Plank shoulder taps]
+W3 TUE Leg Strength + Mobility :: Hip stability[Banded monster walks, Standing band hip abduction, Hip 90/90 stretch] | Foot & ankle[Banded dorsiflexion, Single-leg bent-knee soleus raise] | Loaded carry finisher[Suitcase carry]
+W3 FRI Recovery Lift {Recovery Run} :: Core — Rotational Power[Standing torso rotations (slow), Side plank thread-the-needle]
+W4 TUE Leg Strength + Mobility :: Hip stability[Banded side steps, Banded monster walks, IT band stretch] | Foot & ankle[Banded dorsiflexion, Standing ankle CARs]
+W5 MON Strength Support {Speed Run — Intervals} :: Core — Anti-Rotation[Pallof press]
+W5 TUE Leg Strength + Mobility :: Hip stability[Banded side steps, Banded monster walks, IT band stretch] | Foot & ankle[Standing ankle CARs, Banded dorsiflexion] | Loaded carry finisher[Suitcase carry]
+W5 FRI Recovery Lift {Recovery Run} :: Core — Rotational Power[Band woodchopper (door anchor), Windshield wipers]
+W6 MON Strength Support {Speed Run — Intervals} :: Core — Rotational Power[Band woodchopper (door anchor)]
+W6 TUE Leg Strength + Mobility :: Hip stability[Banded side steps, Clamshells w/ band, Weighted 90/90 hip switch] | Foot & ankle[Single-leg bent-knee soleus raise, Tibialis raise (wall lean)] | Loaded carry finisher[Suitcase carry]
+W6 FRI Recovery Lift {Recovery Run} :: Core — Anti-Rotation[Farmer carry, Suitcase carry]
+W7 MON Strength Support {Speed Run — Intervals} :: Core — Anti-Rotation[Farmer carry, Suitcase carry]
+W7 TUE Leg Strength + Mobility :: Hip stability[Clamshells w/ band, Banded side steps, Worlds greatest stretch] | Foot & ankle[Tibialis raise (wall lean), Standing ankle CARs] | Loaded carry finisher[Overhead carry]
+W7 FRI Recovery Lift {Recovery Run} :: Core — Rotational Power[Medicine ball rotary toss, Landmine rotations]
+W8 TUE Leg Strength + Mobility :: Hip stability[Clamshells w/ band, Seated banded hip flexion, Worlds greatest stretch] | Foot & ankle[Standing ankle CARs, Single-leg bent-knee soleus raise]
+W9 MON Strength Support {Speed Run — Intervals} :: Core — Anti-Rotation[Bird dogs, Side plank]
+W9 TUE Leg Strength + Mobility :: Hip stability[Clamshells w/ band, Banded monster walks, IT band stretch] | Foot & ankle[Banded dorsiflexion, Single-leg bent-knee soleus raise] | Loaded carry finisher[Farmer carry]
+W9 FRI Recovery Lift {Recovery Run} :: Core — Rotational Power[Standing torso rotations (slow), Side plank thread-the-needle]
+W10 MON Strength Support {Speed Run — Intervals} :: Core — Rotational Power[Standing torso rotations (slow)]
+W10 TUE Leg Strength + Mobility :: Hip stability[Clamshells w/ band, Banded monster walks, IT band stretch] | Foot & ankle[Standing ankle CARs, Tibialis raise (wall lean)] | Loaded carry finisher[Farmer carry]
+W10 FRI Recovery Lift {Recovery Run} :: Core — Anti-Rotation[Plank shoulder taps, Pallof press]
+W11 MON Strength Support {Speed Run — Intervals} :: Core — Anti-Rotation[Plank shoulder taps]
+W11 TUE Leg Strength + Mobility :: Hip stability[Seated banded hip flexion, Hip airplane (light KB), Weighted 90/90 hip switch] | Foot & ankle[Tibialis raise (wall lean), Single-leg bent-knee soleus raise] | Loaded carry finisher[Overhead carry]
+W11 FRI Recovery Lift {Recovery Run} :: Delt finisher[Dumbbell front raise] | Core — Rotational Power[Band woodchopper (door anchor)]
+W12 TUE Leg Strength + Mobility :: Hip stability[Banded side steps, Hip airplane (light KB), Worlds greatest stretch] | Foot & ankle[Single-leg bent-knee soleus raise, Tibialis raise (wall lean)]
+W13 TUE Leg Strength + Mobility :: Foot & ankle[Banded dorsiflexion, Tibialis raise (wall lean)]
+W14 TUE Leg Strength + Mobility :: Foot & ankle — mobility only[Standing ankle CARs, Toe yoga (splay + big-toe lifts)]
