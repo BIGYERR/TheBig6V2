@@ -45,6 +45,9 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
   // Injury overlay plan (null when healthy). Read by scheme() for the RPE 7 clamp on
   // capped patterns and by the pool-override block below for protect-tier substitutions.
   const _inj = injuryPlan(cfg);
+  // D239 Amendment 1: the plan's drop list comes out of the prehab pools before the draw, so an injured athlete's hip
+  // and foot & ankle blocks keep their full count instead of losing a drawn drill to applyInjuryFilter afterwards.
+  const _prehabKeep = (n: string): boolean => !(_inj && _inj.dropNames && _inj.dropNames.test(n));
   // V153 (F2): set by buildSections from opts.hotNext at entry, read by scheme(). A
   // closure variable rather than a scheme() parameter because scheme has ~30 call sites
   // and _inj/strengthSupport already travel this exact road. Days build serially, so a
@@ -832,7 +835,7 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
       // 2×20 tibialis raises; what the block buys in weeks 13–14 is tissue readiness in the
       // structures that fail late in a half. Hip stability stays dropped: banded abduction
       // carries real glute-med fatigue and dropping it here was a deliberate call.
-      if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,isRace));
+      if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,isRace,_prehabKeep));
       return s;
     }
     if(role==='push'||role==='push_light'){
@@ -1220,10 +1223,10 @@ function engineC_kinematics(cfg: Cfg, A: EngineATimeline, B: EngineBCardio): Eng
         s.push({label:'Calves',items:[{name:calf,detail:hsets+'×15–20'}]});
         s.push({label:'Leg isolation',superset:_laItems.length>1,rounds:hsets,items:_laItems});
       }
-      if(includeHip)s.push(buildHipSection(seed+w,isBW));
+      if(includeHip)s.push(buildHipSection(seed+w,isBW,_prehabKeep));
       // V178 (D3): foot & ankle rides with hip stability for runners. An ankle-region injury
       // plan owns that joint through the rehab section, so the prehab block steps aside.
-      if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW));
+      if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,false,_prehabKeep));
       // Loaded carry surfaces beyond the full day: a grip/posterior/core finisher on legs day,
       // a fresh pick so it doesn't echo the full day's carry. Gated on session length to respect
       // shorter workouts.

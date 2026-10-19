@@ -15,7 +15,8 @@ handoff: V178 (the Darren fold, D1 to D6) and V192 (D41 to D43). Tests: none yet
   suits, ask where in doubt, and mind the doubles. **Ruled by:** coach, in the main session, on measure m1 below; Mario concurred 2026-10-18 ("Concur, all 26"),
   with the Russian twist added over coach's call.
   **D-codes:** assigned from the registry when Mario concurs. **Bump:** not picked yet (a ruling that changes what a
-  program prescribes is MINOR; Mario picks before the build). **Shipped:** not yet.
+  program prescribes is MINOR; Mario picked it for slice 1). **Shipped:** slice 1 (#1 to #13) in v0.241.0 as D239;
+  slice 2 (#14 to #26) queued.
 - **Measure m1:** `tests/measure/exercise-bench_coverage.js` (report beside it, `.out.txt`): 504 healthy programs, 6
   tiers x 7 lifting focuses x 3 experiences x 2 cardio (run half, bike base) x 2 seeds, on v0.240.0 (v0.240.1, shipped the same day by another session, touched no engine file). For every block a
   movement could join it prints how many programs reach it, per tier and per focus, and every name it prints today
@@ -177,3 +178,74 @@ From a source-surgery copy, coach prints THE HALF MANNY's new digest and every c
 lattice sweep's moved cells, before builder writes anything. Each admitted name needs a test that it prints on the
 tiers above and nowhere else, carries its dose and side, is timed or counted as its dose says, and drops under the
 injury plans named.
+
+## D239 P-BENCH-PREHAB: slice 1, the thirteen prehab movements (ruled 2026-10-18, building as v0.241.0)
+
+- **Date:** 2026-10-18. **Ruled by:** coach, on P-BENCH-1 #1 to #13 as Mario concurred, with the integration measure
+  below. **Bump:** MINOR, v0.241.0 (Mario, 2026-10-18). **D-code:** D239, the registry's next free number on HEAD
+  55a10bf (v0.240.1). **Shipped:** v0.241.0 (2026-10-18), with Amendment 1.
+- **What the integration measure found** (the 13 names read through every rule that judges a name, on v0.240.1):
+  1. `_pattern` would file three of them as training patterns: `Split-squat heel-raise hold` and `Cossack squat shift`
+     as `squat` (the trailing `/squat/` catch-all), `Glute bridge hold` as `hip_ext`. That counts them as leg volume
+     and lets a pattern drop or cap reach them. V178 rule: prehab is exempt by an explicit rule, not by falling through.
+  2. The mobility piece of the hip block has always cost nothing in the session budget (every member matches the
+     stretch rule). `Cossack squat shift` and `Pigeon lift-offs` do not match it; priced at their sets they change 707
+     of 1,728 lattice programs (a bodyweight leg day loses its leg isolation, for one).
+  3. The dose sweeps would rewrite five of the doses: the loaded tiers' rep-range grammar (`Pigeon lift-offs 2×8 each`
+     becomes `2×6–10 each @ RPE 7`, `Knee-to-wall ankle rocks` likewise) and the bodyweight sweep's effort copy
+     (`Towel scrunches`, `Tiptoe walks`, `Cossack squat shift` become `2 sets — RPE 8`). A mobility drill and a foot
+     drill take no effort target.
+- **The ruling, whole:**
+  - **Pools and doses:** P-BENCH-1 #1 to #13 exactly as tabled above: `EXLIB.foot_ankle` gains #1 to #7,
+    `EXLIB.foot_ankle_bw` gains #1, #4, #5, #6, #7; `EXLIB.hip_stability` and the bodyweight stability list in
+    `buildHipSection` gain #8, #9, #10; `EXLIB.hip_mobility` gains #11, #12, #13; each dose in its block's detail table.
+  - **`_pattern`:** the V178 prehab exemption line names `balance hold`, `pass-around`, `heel-raise hold`, `ankle rock`,
+    `towel scrunch`, `tiptoe walk`, `glute bridge hold`, `cossack`, `hip flexor stretch`, `pigeon`. (The two planks
+    already leave at the core line's `plank`; the KB tib raise at `tibialis`.)
+  - **The budget:** the mobility piece stays free: the session cost's stretch rule in `budget-engine-d.ts` gains
+    `cossack|pigeon`. The long-run tier B counter's copy of the rule stays as it is: a hip block never lands on a tier B
+    day (0 of 1,728 lattice programs move when that copy is changed), so the edit would be untestable.
+  - **The doses stay as written:** `_BW_KEEP_FIXED` gains `ankle rock|towel scrunch|tiptoe walk|cossack|pigeon`.
+  - **Injury plans, by the plan's own shape (protect drops, workaround keeps unless the load is the injury):**
+    knee/protect drops `Cossack squat shift` and `Split-squat heel-raise hold` (it already drops the knee-cap
+    isometrics, wall sit and Spanish squat); hip/protect drops `Copenhagen plank (bent knee)`, `Cossack squat shift`
+    and `Glute bridge hold` (it already drops hip extension); hip/workaround drops `Copenhagen plank (bent knee)` (the
+    adductor is the likeliest injured tissue in a hip plan). An ankle plan already steps the whole foot & ankle block
+    aside. P-BENCH-1 said "knee injury plan drops" Cossack; this narrows it to protect, where the plan drops squats.
+  - **Unchanged:** race week's fixed pair (`Standing ankle CARs`, `Toe yoga`); the taper keeps drawing foot & ankle
+    (V179) and drops hip stability; foot & ankle stays runner only; the hip block still draws two stability drills and
+    one mobility piece.
+- **Before and after (the source-surgery copy, `base_v0.240.1.html` vs the copy, scratch):** THE HALF MANNY
+  2d35e8f743680cfa → **b7ca51befcf96a9e** (self-stable). 12 days change, all Tuesdays, and only their Hip stability and
+  Foot & ankle sections. W1 is unchanged; W6 Tuesday's foot block, before `Single-leg bent-knee soleus raise 2×12 each,
+  slow | Tibialis raise (wall lean) 2×20`, after `Single-leg balance hold (eyes closed) 2×30 sec each | Single-leg KB
+  pass-around 2×5 each direction, each leg`; W13 Tuesday's, after `Split-squat heel-raise hold 2×30 sec each |
+  Kettlebell tibialis raise (seated) 2×15`. On the FULL lattice x run/bike (1,728 programs) every program moves; 0
+  violations of tier, runner, race week, injury or dose; the 13 print 84 to 784 times per tier.
+- **One knock-on, classified (after Amendment 1, against v0.240.1):** 112 items outside the prehab blocks are added
+  and 0 lost on the 1,728 programs, every one on the bodyweight tier (a leg isolation, a calves block, a superset's
+  second item, the armor circuit's fourth item that the budget used to cut). Cause: D195-B prices the rails at half by `EXLIB.hip_stability`, so the three shared
+  names cost half on bodyweight while the four bodyweight-only names (`Side-lying leg raises`, `Clamshells
+  (bodyweight)`, `Fire hydrants`, `Standing hip abduction`) still cost full. Found, not fixed (§12).
+- **Watch:** the hip block's "two glute med drills" promise was already diluted by V178's airplane and hip flexion; with
+  the Copenhagen and the bridge hold, a loaded tier's block draws no abductor 1 time in 6 (was 1 in 15).
+- **Tests** (`tests/integration/exercise-bench.test.ts`, `tests/unit/exercise-bench.test.ts`): each name prints with its
+  dose on the tiers above and nowhere else; the two KB names never on bodyweight; no foot name on a bike program; race
+  week keeps its pair; each injury drop next to a healthy twin that prints the name; `_pattern` is null for all 13;
+  a hand session at the cap keeps every item with the Cossack or the pigeon as its mobility piece; THE HALF MANNY's
+  digest and cards in the program-output snapshot; the lattice snapshots regenerated by this ruling.
+
+### D239 Amendment 1: the injury drops come out of the pool before the draw (coach, 2026-10-18, during the build)
+
+- **Premise refuted by the sweeps:** the ruling said the hip block "still draws two stability drills and one mobility
+  piece". With the drops applied after the draw (by `applyInjuryFilter`, like every other drop), a block that drew a
+  dropped name printed short: 720 short blocks on knee/protect and 452 on hip/workaround across the 1,728 lattice
+  programs, and the freed budget let other items print (floor (b)'s back extension on one home_full knee/protect
+  cell, 84 → 85 in the armor circuit sweep).
+- **Amended:** `buildHipSection` and `buildFootAnkleSection` take the plan's drop list (`_prehabKeep` in Engine C, from
+  `injuryPlan(cfg).dropNames`) and filter their pools before the draw, so an injured athlete's prehab blocks keep their
+  count: 0 short blocks after. Healthy programs are untouched (THE HALF MANNY stays b7ca51befcf96a9e); 408 injured
+  programs move (knee/protect 192, hip/workaround 216, and hip/protect off the lattice). Only the D239 names are in any
+  plan's drop list among the prehab pools, so nothing older moves. Race week's fixed pair is not filtered.
+- **Tests:** the injury-drop test in `tests/integration/exercise-bench.test.ts`, and a guard that no injured
+  athlete's hip block prints under three items or foot block under two.

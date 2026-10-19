@@ -223,7 +223,8 @@ function capSessionBudget(sections: Section[], cardio: SessionView | null | unde
   // Test-only bypass, per-pass since V123. See recoveryDeload for why.
   if(typeof globalThis!=='undefined' && (globalThis.__CAP_OFF || globalThis.__BUDGET_OFF)) return sections;
   if(!Array.isArray(sections)||!sections.length) return sections;
-  const _isStretch: (n: string | null | undefined) => boolean=n=>/stretch|mobility|90\/90|foam|worlds greatest/i.test(n||'');
+  // D239: the hip block's mobility piece stays free; the Cossack shift and pigeon lift-offs are mobility pieces.
+  const _isStretch: (n: string | null | undefined) => boolean=n=>/stretch|mobility|90\/90|foam|worlds greatest|cossack|pigeon/i.test(n||'');
   const _isHalf: (n: string | null | undefined) => boolean=n=>/carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises/i.test(n||'');
   const _prehabHalf=new Set([].concat(EXLIB.hip_stability,EXLIB.knee_stability,EXLIB.foot_ankle,EXLIB.foot_ankle_bw)); const _cost: (it: Item) => number=it=>{ if(!it||_isStretch(it.name)) return 0; const s=_setCount(it.detail); return (_isHalf(it.name)||_prehabHalf.has(it.name))?s*0.5:s; };
   const _total: (list: Section[]) => number=list=>list.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+_cost(it),0),0);

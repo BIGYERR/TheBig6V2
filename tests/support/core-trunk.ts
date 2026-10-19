@@ -139,7 +139,7 @@ function protectTrunkRows(IA: App): { rows: TrunkRow[]; doubled: string[] } {
 
 // ── D50: the trunk floor, with the session cost model typed by hand ─────────────────────────────────────────────────
 const HALF = /carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises/i;
-const STRETCH = /stretch|mobility|90\/90|foam|worlds greatest/i;
+const STRETCH = /stretch|mobility|90\/90|foam|worlds greatest|cossack|pigeon/i;   // D239: the hip block's mobility pieces are free too
 const handSets = (det: unknown): number => {
   const m = String(det || '').match(/(\d+)\s*[×x]/);
   return m ? Math.max(1, parseInt(m[1], 10)) : 3;

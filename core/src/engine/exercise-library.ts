@@ -80,15 +80,22 @@ const EXLIB: Record<string, string[]>={
   // classify null in _pattern — prehab, cap-exempt — and carry fixed details in
   // buildHipSection. 'Standing clamshell' from the same source IS 'Standing band hip
   // abduction' and was folded as a no-op.
-  hip_stability:["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion"],
-  hip_mobility:["Hip 90/90 stretch","IT band stretch","Worlds greatest stretch","Weighted 90/90 hip switch"], // V178: loaded 90/90 transition (plate on the front knee). The 'with row' flourish was dropped — 'row' would have scored it as pull volume.
+  // D239 (P-BENCH): the Copenhagen plank (the bench had no adductor work), the side plank
+  // with the top leg raised (glute med) and the glute bridge hold; three mobility pieces, the
+  // Cossack shift (V192 kept it out of the lunge pool as mobility), the half-kneeling hip
+  // flexor stretch and pigeon lift-offs. All prehab: _pattern null, doses fixed.
+  hip_stability:["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion","Copenhagen plank (bent knee)","Side plank (top leg raised)","Glute bridge hold"],
+  hip_mobility:["Hip 90/90 stretch","IT band stretch","Worlds greatest stretch","Weighted 90/90 hip switch","Cossack squat shift","Half-kneeling hip flexor stretch","Pigeon lift-offs"], // V178: loaded 90/90 transition (plate on the front knee). The 'with row' flourish was dropped — 'row' would have scored it as pull volume.
   // V178 (D3): FOOT & ANKLE prehab pool. The calves pool loads gastroc/soleus in plantar
   // flexion only; nothing in the file trained the tibialis, dorsiflexion, the bent-knee
   // soleus in isolation, or ankle range. For a runner the soleus is what fails at mile
   // ten. Rides the same rail as hip stability (leg day, hip:true flag → cap-exempt,
   // prehab-protected under injury sweeps), runner-only, every week INCLUDING race week.
-  foot_ankle:['Tibialis raise (wall lean)','Banded dorsiflexion','Single-leg bent-knee soleus raise','Standing ankle CARs'],
-  foot_ankle_bw:['Tibialis raise (wall lean)','Single-leg bent-knee soleus raise','Standing ankle CARs'],
+  // D239 (P-BENCH): single-leg balance (the bench had none), its loaded rung, the loaded
+  // tib raise, the split-squat calf isometric, dorsiflexion range, foot intrinsics and calf
+  // endurance in gait. The two KB names are loaded-tier only.
+  foot_ankle:['Tibialis raise (wall lean)','Banded dorsiflexion','Single-leg bent-knee soleus raise','Standing ankle CARs','Single-leg balance hold (eyes closed)','Single-leg KB pass-around','Kettlebell tibialis raise (seated)','Split-squat heel-raise hold','Knee-to-wall ankle rocks','Towel scrunches','Tiptoe walks'],
+  foot_ankle_bw:['Tibialis raise (wall lean)','Single-leg bent-knee soleus raise','Standing ankle CARs','Single-leg balance hold (eyes closed)','Split-squat heel-raise hold','Knee-to-wall ankle rocks','Towel scrunches','Tiptoe walks'],
   // Cuff / scapular rehab. Pain-free-range external rotation, low-load horizontal
   // abduction and scapular control — the drills that actually rehabilitate a protect-
   // tier shoulder, as opposed to simply avoiding it. Deliberately contains no pressing,

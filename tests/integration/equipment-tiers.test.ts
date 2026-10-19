@@ -349,8 +349,9 @@ test('no tier prints, keeps in its swap universe or offers on its swap sheet a t
   assert.equal(IS.sheet.crash, 0);
 });
 
-test('HALF_MANNY\'s swap universe holds 86 names: commercial owns everything, so the lens removes none', () => {
-  assert.equal((IA.buildProgram(fixtures.HALF_MANNY)._swapUniverse || []).length, 86);
+test('HALF_MANNY\'s swap universe holds 99 names: commercial owns everything, so the lens removes none', () => {
+  // 86 until D239 added the thirteen prehab names (v0.241.0); HALF_MANNY is CrossFit, which owns them all.
+  assert.equal((IA.buildProgram(fixtures.HALF_MANNY)._swapUniverse || []).length, 99);
 });
 
 test('the swap sheet withholds the front squat under every shoulder and elbow plan, and offers it with none', () => {

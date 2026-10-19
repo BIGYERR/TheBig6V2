@@ -71,7 +71,8 @@ function injuryPlan(cfg: Cfg | null | undefined): InjuryPlan | null{
       // Loaded knee flexion under high eccentric tension flares an angry knee even
       // though the pattern reads hamstring — Nordic/GHR sit out in protect. Knee-cap
       // isometrics (wall sit, Spanish squat, TKE) are quad loading and sit out too.
-      P.dropNames=/nordic|glute-ham|\bghr\b|wall sit|spanish squat|terminal knee|knee extension|pistol/i;
+      // D239: so does the split-squat heel-raise hold, and the Cossack shift's deep knee bend.
+      P.dropNames=/nordic|glute-ham|\bghr\b|wall sit|spanish squat|terminal knee|knee extension|pistol|cossack|heel-raise hold/i;
       P.cardioMode='noimpact';
     } else {
       P.cap=new Set(['squat','lunge','leg_iso']);
@@ -93,11 +94,13 @@ function injuryPlan(cfg: Cfg | null | undefined): InjuryPlan | null{
     if(T==='protect'){
       P.drop=new Set(['hinge','lunge','hip_ext']);
       P.cap=new Set(['squat']);
-      P.dropNames=/swing|pull-through|pull through/i;
+      // D239: the prehab block's adductor plank, end-range Cossack and bridge hold sit out with hip extension.
+      P.dropNames=/swing|pull-through|pull through|copenhagen|cossack|glute bridge hold/i;
       P.cardioMode='noimpact_swim';
     } else {
       P.cap=new Set(['hinge','lunge','hip_ext','squat']);
-      P.dropNames=/swing/i;
+      // D239: the adductor is the likeliest injured tissue in a hip plan, so the Copenhagen sits out here too.
+      P.dropNames=/swing|copenhagen/i;
       P.cardioMode='easy';
     }
   } else if(R==='lowback'){

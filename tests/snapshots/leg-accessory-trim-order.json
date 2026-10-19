@@ -1,15 +1,15 @@
 {
   "configs": 1728,
   "dayCells": 95232,
-  "changedByTheOrder": 3189,
+  "changedByTheOrder": 3211,
   "labelDelta": {
-    "Calves": 1896,
-    "Leg isolation": -1236
+    "Calves": 1894,
+    "Leg isolation": -1201
   },
-  "calvesRises": 1896,
+  "calvesRises": 1894,
   "costMaxDelta": 3,
-  "overCap": 8146,
-  "overCapUntouched": 5618,
+  "overCap": 6332,
+  "overCapUntouched": 4189,
   "overCapCrossedByTheOrder": 27,
   "posteriorFreeCausedCells": 0,
   "posteriorFreeCells": 0

@@ -10,21 +10,25 @@ export interface CorePillars {
   rotational_power: { name: string; items: Item[] };
 }
 
-function buildHipSection(seed: number,bodyweight: boolean): Section{
+function buildHipSection(seed: number,bodyweight: boolean,keep?: (n: string) => boolean): Section{
   // Reliable stability dose: the section always draws 2 loaded/active glute-med drills plus
   // 1 mobility piece, so a leg day can never come up all-stretches with zero abductor work.
   // Bodyweight tier ("Room only") swaps banded drills for equipment-free glute-med equivalents.
-  const stabPool=bodyweight
-    ? ['Side-lying leg raises','Clamshells (bodyweight)','Fire hydrants','Standing hip abduction']
-    : EXLIB.hip_stability;
+  // D239 Amendment 1: keep is the injury plan's drop list, applied before the draw (all names when healthy).
+  const _keep=(n: string): boolean => !keep||keep(n);
+  const stabPool=(bodyweight
+    ? ['Side-lying leg raises','Clamshells (bodyweight)','Fire hydrants','Standing hip abduction','Copenhagen plank (bent knee)','Side plank (top leg raised)','Glute bridge hold']
+    : EXLIB.hip_stability).filter(_keep);
   const stab=pick(stabPool,2,seed);
-  const mob=pick(EXLIB.hip_mobility,1,seed+7);
+  const mob=pick(EXLIB.hip_mobility.filter(_keep),1,seed+7);
   const selected=[...stab,...mob];
   const details: Record<string, string>={
     "Clamshells w/ band":"2×15 each","Banded side steps":"2×20 each","Banded monster walks":"2×15 each","Standing band hip abduction":"2×15 each",
     "Hip airplane (light KB)":"2×6 each, slow","Seated banded hip flexion":"2×15 each","Weighted 90/90 hip switch":"2×6 each",
     "Side-lying leg raises":"2×15 each","Clamshells (bodyweight)":"2×20 each","Fire hydrants":"2×15 each","Standing hip abduction":"2×20 each",
-    "Hip 90/90 stretch":"2×45 sec each","IT band stretch":"2×30 sec each","Worlds greatest stretch":"5 each side"
+    "Hip 90/90 stretch":"2×45 sec each","IT band stretch":"2×30 sec each","Worlds greatest stretch":"5 each side",
+    "Copenhagen plank (bent knee)":"2×20 sec each","Side plank (top leg raised)":"2×20 sec each","Glute bridge hold":"2×30 sec",
+    "Cossack squat shift":"2×6 each side, slow","Half-kneeling hip flexor stretch":"2×45 sec each","Pigeon lift-offs":"2×8 each"
   };
   return {label:'Hip stability',hip:true,items:selected.map(n=>({name:n,detail:details[n]||'2×15'}))};
 }
@@ -33,11 +37,14 @@ function buildHipSection(seed: number,bodyweight: boolean): Section{
 // Two drills a day, fixed prescription, seeded off the hip section's seed so the two
 // prehab blocks never share a draw. Carries hip:true on purpose: every cap exemption,
 // injury-sweep protection and render rule keyed on that flag applies unchanged.
-function buildFootAnkleSection(seed: number,bodyweight: boolean,raceWeek?: boolean): Section{
+function buildFootAnkleSection(seed: number,bodyweight: boolean,raceWeek?: boolean,keep?: (n: string) => boolean): Section{
   const details: Record<string, string>={
     'Tibialis raise (wall lean)':'2×20','Banded dorsiflexion':'2×15 each',
     'Single-leg bent-knee soleus raise':'2×12 each, slow','Standing ankle CARs':'2×5 each direction',
-    'Toe yoga (splay + big-toe lifts)':'2×10 each foot'
+    'Toe yoga (splay + big-toe lifts)':'2×10 each foot',
+    'Single-leg balance hold (eyes closed)':'2×30 sec each','Single-leg KB pass-around':'2×5 each direction, each leg',
+    'Kettlebell tibialis raise (seated)':'2×15','Split-squat heel-raise hold':'2×30 sec each','Knee-to-wall ankle rocks':'2×10 each',
+    'Towel scrunches':'2×20 each foot','Tiptoe walks':'2×30 yards'
   };
   // V180 (D8, Mario's concur): race week is dynamic mobility only. A random draw could hand
   // the athlete single-leg soleus raises on T-5 — loaded work, and the wrong side of the
@@ -46,7 +53,7 @@ function buildFootAnkleSection(seed: number,bodyweight: boolean,raceWeek?: boole
     const rw=['Standing ankle CARs','Toe yoga (splay + big-toe lifts)'];
     return {label:'Foot & ankle — mobility only',hip:true,items:rw.map(n=>({name:n,detail:details[n]}))};
   }
-  const pool=bodyweight?EXLIB.foot_ankle_bw:EXLIB.foot_ankle;
+  const pool=(bodyweight?EXLIB.foot_ankle_bw:EXLIB.foot_ankle).filter(n=>!keep||keep(n));   // D239 Amendment 1
   const sel=pick(pool,2,seed+13);
   return {label:'Foot & ankle',hip:true,items:sel.map(n=>({name:n,detail:details[n]||'2×15'}))};
 }

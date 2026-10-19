@@ -212,11 +212,14 @@ const TUE_9 = [
   'Main — Front squat :: Front squat 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest',
   'Leg superset A (SS 3) :: Dumbbell Bulgarian split squat 3×8–12 each @ RPE 8 | Terminal knee extension (band) 3×25 sec',
   'Leg superset B (SS 3) :: Kettlebell single-leg deadlift 3×6–10 @ RPE 8 | 45° back extension 3 sets — RPE 8 (stop 2 reps short of failure)',
-  'Hip stability :: Seated banded hip flexion 2×15 each | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each',
-  'Foot & ankle :: Tibialis raise (wall lean) 2×20 | Standing ankle CARs 2×5 each direction',
+  // D239 (v0.241.0) moved these two prehab blocks, nothing else on the card.
+  'Hip stability :: Glute bridge hold 2×30 sec | Hip airplane (light KB) 2×6 each, slow | Weighted 90/90 hip switch 2×6 each',
+  'Foot & ankle :: Split-squat heel-raise hold 2×30 sec each | Single-leg KB pass-around 2×5 each direction, each leg',
   'Loaded carry finisher :: Overhead carry 3×40 yards each, heavy',
 ];
-const TUE_9_WITHOUT = [TUE_9[0], 'Leg superset A :: Dumbbell Bulgarian split squat 3×8–12 each @ RPE 8',
+// D239: without the lens the day now keeps the Terminal knee extension it used to cut: the two new holds cost half
+// under the older hold rule (_isHalf's \bhold\b) where the drills they replaced cost full.
+const TUE_9_WITHOUT = [TUE_9[0], TUE_9[1],
   'Leg superset B :: Kettlebell single-leg deadlift 3×6–10 @ RPE 8', TUE_9[3], TUE_9[4]];
 const INC = 'Main — Incline barbell press :: Incline barbell press 4×3 — RPE 8.5 (leave ~2 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest | Barbell overhead press 3×6–10 @ RPE 8';
 const CK = 'Chest + knee (SS 3) :: Dumbbell incline press 3×10–15 @ RPE 8 | Terminal knee extension (band) 3×25 sec';
@@ -228,7 +231,7 @@ test('the cost lens prices the prehab rails at half, so PRT TING keeps what the 
   // D195-B-a: a-digest, a-tue, a-mon
   const C = SB.twice(null, SB.PRT);
   assert.ok(C.self, 'PRT TING equals itself');
-  assert.equal(C.dig, '1119727db3f37832');
+  assert.equal(C.dig, 'f61dab1548de2a20');   // 1119727db3f37832 until D239
   assert.deepEqual(SB.cardLines(C.prog.weeks[9].tue), TUE_9);
   assert.deepEqual(SB.cardLines(C.prog.weeks[9].mon), MON_9);
 });
@@ -237,7 +240,7 @@ test('without the cost lens PRT TING is the program the ruling measured before i
   // D195-B-a: a-cells, and the before half of a-v230/a-before on the app without the lens
   const N = SB.twice(SB.noCostLens(), SB.PRT), C = SB.twice(null, SB.PRT);
   assert.ok(N.self);
-  assert.equal(N.dig, '3a053a2ac8cb2b44');
+  assert.equal(N.dig, 'c6f054bee6f8b22b');   // 3a053a2ac8cb2b44 until D239
   assert.deepEqual(SB.cardLines(N.prog.weeks[9].tue), TUE_9_WITHOUT);
   assert.deepEqual(SB.cardLines(N.prog.weeks[9].mon), MON_9_WITHOUT);
   const differ: string[] = [];
@@ -249,24 +252,26 @@ test('without the cost lens PRT TING is the program the ruling measured before i
 
 test("the cost lens alone is PRT TING whole, and moves no byte of HALF_MANNY", () => {
   // D195-B-a: a-cfB; D195-B-c: c-cfB, c-bytes (B alone = the app without D195-A; neither = without A and B)
-  assert.equal(SB.twice(SB.noHipExtA(), SB.PRT).dig, '1119727db3f37832');
+  assert.equal(SB.twice(SB.noHipExtA(), SB.PRT).dig, 'f61dab1548de2a20');
   const B = SB.twice(SB.noHipExtA(), fixtures.HALF_MANNY), V = SB.twice(SB.noD195(), fixtures.HALF_MANNY);
   assert.ok(B.self && V.self);
-  assert.equal(B.dig, '0ac7da6b1691a8e1');
-  assert.equal(V.dig, '0ac7da6b1691a8e1');
+  assert.equal(B.dig, 'b1b15c80f1a703f1');   // 0ac7da6b1691a8e1 until D239
+  assert.equal(V.dig, 'b1b15c80f1a703f1');
   assert.equal(SB.dayJ(B.prog.weeks), SB.dayJ(V.prog.weeks));
   assert.equal(SB.weekKeys(V.prog).length * 7, 98);
 });
 
-test('on a sample of the shard the lens only adds back what the budget had cut, plus the two ruled changes', () => {
-  // D195-B-b on 12 shard configs and the typed B-3 and B-2 cells (the 650 are in the sweep)
+test('on a sample of the shard the lens only adds back what the budget had cut, plus the ruled B-2 change', () => {
+  // D195-B-b on 12 shard configs and the typed B-3 and B-2 cells (the 650 are in the sweep). D239 (v0.241.0) moved the
+  // B-3 cell's prehab draw, and without the lens that day now keeps the Glute-ham raise and its partner, so the one
+  // removal D195-B printed there (the good morning re-picked away) no longer happens: the lens removes nothing.
   assert.equal(countIn(SB.BUDGET_OFF_SWITCH), 1);
   const rows = SB.costLensShard().filter((_, i) => i % 54 === 0).concat([SB.B3, SB.B2]);
   const r = SB.costLensDiff(rows);
   assert.deepEqual(r.crashed, []);
   assert.equal(r.built, 14);
   assert.ok(r.boDiff > 0 && r.changed > 0 && r.added > 0);
-  assert.deepEqual(r.removed.map((x) => [x.row.tag, x.w, x.d, x.lab, x.n]), [[SB.B3.tag, SB.B3.w, SB.B3.d, SB.B3.label, SB.B3.gone]]);
+  assert.deepEqual(r.removed.map((x) => [x.row.tag, x.w, x.d, x.lab, x.n]), []);
   assert.equal(r.addedOff, r.added, 'added items the budget-off card does not carry: ' + r.novel.join('; '));
   assert.deepEqual(r.details.filter((x) => !x.isB2).map((x) => x.s), []);
   assert.equal(r.b2, 1);
@@ -274,7 +279,7 @@ test('on a sample of the shard the lens only adds back what the budget had cut, 
   const b3 = r.b3;
   assert.ok(b3, 'the B-3 cell changed');
   const secA = b3.a.filter((x) => x[2] === SB.B3.label).map((x) => x[0]), secB = b3.b.filter((x) => x[2] === SB.B3.label).map((x) => x[0]);
-  assert.deepEqual(secA, [SB.B3.gone]);
+  assert.deepEqual(secA.slice().sort(), [SB.B3.partner, SB.B3.restored].sort(), 'without the lens the cell keeps the Glute-ham raise and its partner');
   assert.deepEqual(secB.slice().sort(), [SB.B3.partner, SB.B3.restored].sort());
   assert.ok(SB.HINGE_HAND.test(SB.B3.gone) && SB.HINGE_HAND.test(SB.B3.partner));
   assert.ok(b3.bo.map((x) => x[0]).includes(SB.B3.restored));

@@ -141,11 +141,12 @@ test('every program in the shard equals itself on a second page, with and withou
   }
 });
 
-test('the lens removes one item on the whole shard: B-3, a superset partner re-picked beside the restored Glute-ham raise', () => {
-  // b-removed, b-B3
-  assert.deepEqual(R.removed.map((x) => [x.row.tag, x.w, x.d, x.lab, x.n]), [[SB.B3.tag, SB.B3.w, SB.B3.d, SB.B3.label, SB.B3.gone]]);
+test('the lens removes nothing on the whole shard: since D239 the B-3 cell keeps the Glute-ham raise and its partner without it', () => {
+  // b-removed, b-B3. Until D239 (v0.241.0) the lens removed one item here, B-3: the good morning re-picked away beside
+  // the restored Glute-ham raise. D239 moved the cell's prehab draw and the day no longer cuts the raise without the lens.
+  assert.deepEqual(R.removed.map((x) => [x.row.tag, x.w, x.d, x.lab, x.n]), []);
   const secA = R.b3!.a.filter((x) => x[2] === SB.B3.label).map((x) => x[0]), secB = R.b3!.b.filter((x) => x[2] === SB.B3.label).map((x) => x[0]);
-  assert.deepEqual(secA, [SB.B3.gone]);
+  assert.deepEqual(secA.slice().sort(), [SB.B3.partner, SB.B3.restored].sort());
   assert.deepEqual(secB.slice().sort(), [SB.B3.partner, SB.B3.restored].sort());
   assert.ok(SB.HINGE_HAND.test(SB.B3.gone) && SB.HINGE_HAND.test(SB.B3.partner));
   assert.ok(R.b3!.bo.map((x) => x[0]).includes(SB.B3.restored));

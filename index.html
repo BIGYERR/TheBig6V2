@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F4F1E8">
-<meta name="ia-version" content="0.240.1"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
+<meta name="ia-version" content="0.241.0"><!-- SINGLE SOURCE OF TRUTH for the update check and the version label. The version is MAJOR.MINOR.PATCH, and Mario picks PATCH, MINOR or MAJOR every release. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Asylum">
@@ -1832,15 +1832,22 @@ const EXLIB={
   // classify null in _pattern — prehab, cap-exempt — and carry fixed details in
   // buildHipSection. 'Standing clamshell' from the same source IS 'Standing band hip
   // abduction' and was folded as a no-op.
-  hip_stability:["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion"],
-  hip_mobility:["Hip 90/90 stretch","IT band stretch","Worlds greatest stretch","Weighted 90/90 hip switch"], // V178: loaded 90/90 transition (plate on the front knee). The 'with row' flourish was dropped — 'row' would have scored it as pull volume.
+  // D239 (P-BENCH): the Copenhagen plank (the bench had no adductor work), the side plank
+  // with the top leg raised (glute med) and the glute bridge hold; three mobility pieces, the
+  // Cossack shift (V192 kept it out of the lunge pool as mobility), the half-kneeling hip
+  // flexor stretch and pigeon lift-offs. All prehab: _pattern null, doses fixed.
+  hip_stability:["Clamshells w/ band","Banded side steps","Banded monster walks","Standing band hip abduction","Hip airplane (light KB)","Seated banded hip flexion","Copenhagen plank (bent knee)","Side plank (top leg raised)","Glute bridge hold"],
+  hip_mobility:["Hip 90/90 stretch","IT band stretch","Worlds greatest stretch","Weighted 90/90 hip switch","Cossack squat shift","Half-kneeling hip flexor stretch","Pigeon lift-offs"], // V178: loaded 90/90 transition (plate on the front knee). The 'with row' flourish was dropped — 'row' would have scored it as pull volume.
   // V178 (D3): FOOT & ANKLE prehab pool. The calves pool loads gastroc/soleus in plantar
   // flexion only; nothing in the file trained the tibialis, dorsiflexion, the bent-knee
   // soleus in isolation, or ankle range. For a runner the soleus is what fails at mile
   // ten. Rides the same rail as hip stability (leg day, hip:true flag → cap-exempt,
   // prehab-protected under injury sweeps), runner-only, every week INCLUDING race week.
-  foot_ankle:['Tibialis raise (wall lean)','Banded dorsiflexion','Single-leg bent-knee soleus raise','Standing ankle CARs'],
-  foot_ankle_bw:['Tibialis raise (wall lean)','Single-leg bent-knee soleus raise','Standing ankle CARs'],
+  // D239 (P-BENCH): single-leg balance (the bench had none), its loaded rung, the loaded
+  // tib raise, the split-squat calf isometric, dorsiflexion range, foot intrinsics and calf
+  // endurance in gait. The two KB names are loaded-tier only.
+  foot_ankle:['Tibialis raise (wall lean)','Banded dorsiflexion','Single-leg bent-knee soleus raise','Standing ankle CARs','Single-leg balance hold (eyes closed)','Single-leg KB pass-around','Kettlebell tibialis raise (seated)','Split-squat heel-raise hold','Knee-to-wall ankle rocks','Towel scrunches','Tiptoe walks'],
+  foot_ankle_bw:['Tibialis raise (wall lean)','Single-leg bent-knee soleus raise','Standing ankle CARs','Single-leg balance hold (eyes closed)','Split-squat heel-raise hold','Knee-to-wall ankle rocks','Towel scrunches','Tiptoe walks'],
   // Cuff / scapular rehab. Pain-free-range external rotation, low-load horizontal
   // abduction and scapular control — the drills that actually rehabilitate a protect-
   // tier shoulder, as opposed to simply avoiding it. Deliberately contains no pressing,
@@ -6712,21 +6719,25 @@ function runAnchorInfo(cfg){
 
 /** The four core pillars' drills: anti-extension in a static and a loaded tier, the other three in one list each. */
 
-function buildHipSection(seed,bodyweight){
+function buildHipSection(seed,bodyweight,keep){
   // Reliable stability dose: the section always draws 2 loaded/active glute-med drills plus
   // 1 mobility piece, so a leg day can never come up all-stretches with zero abductor work.
   // Bodyweight tier ("Room only") swaps banded drills for equipment-free glute-med equivalents.
-  const stabPool=bodyweight
-    ? ['Side-lying leg raises','Clamshells (bodyweight)','Fire hydrants','Standing hip abduction']
-    : EXLIB.hip_stability;
+  // D239 Amendment 1: keep is the injury plan's drop list, applied before the draw (all names when healthy).
+  const _keep=(n) => !keep||keep(n);
+  const stabPool=(bodyweight
+    ? ['Side-lying leg raises','Clamshells (bodyweight)','Fire hydrants','Standing hip abduction','Copenhagen plank (bent knee)','Side plank (top leg raised)','Glute bridge hold']
+    : EXLIB.hip_stability).filter(_keep);
   const stab=pick(stabPool,2,seed);
-  const mob=pick(EXLIB.hip_mobility,1,seed+7);
+  const mob=pick(EXLIB.hip_mobility.filter(_keep),1,seed+7);
   const selected=[...stab,...mob];
   const details={
     "Clamshells w/ band":"2×15 each","Banded side steps":"2×20 each","Banded monster walks":"2×15 each","Standing band hip abduction":"2×15 each",
     "Hip airplane (light KB)":"2×6 each, slow","Seated banded hip flexion":"2×15 each","Weighted 90/90 hip switch":"2×6 each",
     "Side-lying leg raises":"2×15 each","Clamshells (bodyweight)":"2×20 each","Fire hydrants":"2×15 each","Standing hip abduction":"2×20 each",
-    "Hip 90/90 stretch":"2×45 sec each","IT band stretch":"2×30 sec each","Worlds greatest stretch":"5 each side"
+    "Hip 90/90 stretch":"2×45 sec each","IT band stretch":"2×30 sec each","Worlds greatest stretch":"5 each side",
+    "Copenhagen plank (bent knee)":"2×20 sec each","Side plank (top leg raised)":"2×20 sec each","Glute bridge hold":"2×30 sec",
+    "Cossack squat shift":"2×6 each side, slow","Half-kneeling hip flexor stretch":"2×45 sec each","Pigeon lift-offs":"2×8 each"
   };
   return {label:'Hip stability',hip:true,items:selected.map(n=>({name:n,detail:details[n]||'2×15'}))};
 }
@@ -6735,11 +6746,14 @@ function buildHipSection(seed,bodyweight){
 // Two drills a day, fixed prescription, seeded off the hip section's seed so the two
 // prehab blocks never share a draw. Carries hip:true on purpose: every cap exemption,
 // injury-sweep protection and render rule keyed on that flag applies unchanged.
-function buildFootAnkleSection(seed,bodyweight,raceWeek){
+function buildFootAnkleSection(seed,bodyweight,raceWeek,keep){
   const details={
     'Tibialis raise (wall lean)':'2×20','Banded dorsiflexion':'2×15 each',
     'Single-leg bent-knee soleus raise':'2×12 each, slow','Standing ankle CARs':'2×5 each direction',
-    'Toe yoga (splay + big-toe lifts)':'2×10 each foot'
+    'Toe yoga (splay + big-toe lifts)':'2×10 each foot',
+    'Single-leg balance hold (eyes closed)':'2×30 sec each','Single-leg KB pass-around':'2×5 each direction, each leg',
+    'Kettlebell tibialis raise (seated)':'2×15','Split-squat heel-raise hold':'2×30 sec each','Knee-to-wall ankle rocks':'2×10 each',
+    'Towel scrunches':'2×20 each foot','Tiptoe walks':'2×30 yards'
   };
   // V180 (D8, Mario's concur): race week is dynamic mobility only. A random draw could hand
   // the athlete single-leg soleus raises on T-5 — loaded work, and the wrong side of the
@@ -6748,7 +6762,7 @@ function buildFootAnkleSection(seed,bodyweight,raceWeek){
     const rw=['Standing ankle CARs','Toe yoga (splay + big-toe lifts)'];
     return {label:'Foot & ankle — mobility only',hip:true,items:rw.map(n=>({name:n,detail:details[n]}))};
   }
-  const pool=bodyweight?EXLIB.foot_ankle_bw:EXLIB.foot_ankle;
+  const pool=(bodyweight?EXLIB.foot_ankle_bw:EXLIB.foot_ankle).filter(n=>!keep||keep(n));   // D239 Amendment 1
   const sel=pick(pool,2,seed+13);
   return {label:'Foot & ankle',hip:true,items:sel.map(n=>({name:n,detail:details[n]||'2×15'}))};
 }
@@ -7187,7 +7201,7 @@ function _powerAllowed(name, experience, injury, ageBracket){
   const ageCap = _POWER_AGE_MAX_COST[ageBracket||'18-35'] || 2.0;
   return c <= Math.min(expCap, ageCap);
 }
-const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation/i;
+const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation|ankle rock|towel scrunch|tiptoe walk|cossack|pigeon/i;   // D239: the slice 1 prehab doses are fixed
 function _bwSetsFromDetail(detail, wk, exp, prev){
   const m=/^(\d+)\s*[×x]/.exec(detail||'');
   const sets=m?Math.min(4,Math.max(2,+m[1])):3;
@@ -8435,7 +8449,8 @@ function injuryPlan(cfg){
       // Loaded knee flexion under high eccentric tension flares an angry knee even
       // though the pattern reads hamstring — Nordic/GHR sit out in protect. Knee-cap
       // isometrics (wall sit, Spanish squat, TKE) are quad loading and sit out too.
-      P.dropNames=/nordic|glute-ham|\bghr\b|wall sit|spanish squat|terminal knee|knee extension|pistol/i;
+      // D239: so does the split-squat heel-raise hold, and the Cossack shift's deep knee bend.
+      P.dropNames=/nordic|glute-ham|\bghr\b|wall sit|spanish squat|terminal knee|knee extension|pistol|cossack|heel-raise hold/i;
       P.cardioMode='noimpact';
     } else {
       P.cap=new Set(['squat','lunge','leg_iso']);
@@ -8457,11 +8472,13 @@ function injuryPlan(cfg){
     if(T==='protect'){
       P.drop=new Set(['hinge','lunge','hip_ext']);
       P.cap=new Set(['squat']);
-      P.dropNames=/swing|pull-through|pull through/i;
+      // D239: the prehab block's adductor plank, end-range Cossack and bridge hold sit out with hip extension.
+      P.dropNames=/swing|pull-through|pull through|copenhagen|cossack|glute bridge hold/i;
       P.cardioMode='noimpact_swim';
     } else {
       P.cap=new Set(['hinge','lunge','hip_ext','squat']);
-      P.dropNames=/swing/i;
+      // D239: the adductor is the likeliest injured tissue in a hip plan, so the Copenhagen sits out here too.
+      P.dropNames=/swing|copenhagen/i;
       P.cardioMode='easy';
     }
   } else if(R==='lowback'){
@@ -8668,6 +8685,9 @@ function engineC_kinematics(cfg, A, B){
   // Injury overlay plan (null when healthy). Read by scheme() for the RPE 7 clamp on
   // capped patterns and by the pool-override block below for protect-tier substitutions.
   const _inj = injuryPlan(cfg);
+  // D239 Amendment 1: the plan's drop list comes out of the prehab pools before the draw, so an injured athlete's hip
+  // and foot & ankle blocks keep their full count instead of losing a drawn drill to applyInjuryFilter afterwards.
+  const _prehabKeep = (n) => !(_inj && _inj.dropNames && _inj.dropNames.test(n));
   // V153 (F2): set by buildSections from opts.hotNext at entry, read by scheme(). A
   // closure variable rather than a scheme() parameter because scheme has ~30 call sites
   // and _inj/strengthSupport already travel this exact road. Days build serially, so a
@@ -9455,7 +9475,7 @@ function engineC_kinematics(cfg, A, B){
       // 2×20 tibialis raises; what the block buys in weeks 13–14 is tissue readiness in the
       // structures that fail late in a half. Hip stability stays dropped: banded abduction
       // carries real glute-med fatigue and dropping it here was a deliberate call.
-      if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,isRace));
+      if(role==='legs'&&includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,isRace,_prehabKeep));
       return s;
     }
     if(role==='push'||role==='push_light'){
@@ -9843,10 +9863,10 @@ function engineC_kinematics(cfg, A, B){
         s.push({label:'Calves',items:[{name:calf,detail:hsets+'×15–20'}]});
         s.push({label:'Leg isolation',superset:_laItems.length>1,rounds:hsets,items:_laItems});
       }
-      if(includeHip)s.push(buildHipSection(seed+w,isBW));
+      if(includeHip)s.push(buildHipSection(seed+w,isBW,_prehabKeep));
       // V178 (D3): foot & ankle rides with hip stability for runners. An ankle-region injury
       // plan owns that joint through the rehab section, so the prehab block steps aside.
-      if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW));
+      if(includeHip&&(cfg.cardioTypes||[]).indexOf('run')>=0&&!(cfg.injury&&cfg.injury.region==='ankle'))s.push(buildFootAnkleSection(seed+w,isBW,false,_prehabKeep));
       // Loaded carry surfaces beyond the full day: a grip/posterior/core finisher on legs day,
       // a fresh pick so it doesn't echo the full day's carry. Gated on session length to respect
       // shorter workouts.
@@ -10186,7 +10206,10 @@ function _pattern(name){
   // V178: hip/foot prehab and the renegade row are exempt. 'Renegade rows' would otherwise
   // score as a row; 'Standing ankle CARs' / 'soleus raise' would otherwise be invisible
   // by accident rather than by rule. Named here so the exemption is deliberate.
-  if(/renegade|hip airplane|hip flexion|tibialis|dorsiflex|soleus raise|ankle car|90\/90/.test(N)) return null;
+  // D239 (P-BENCH): the slice 1 prehab names. Three of them would otherwise be read as training
+  // patterns: 'Split-squat heel-raise hold' and 'Cossack squat shift' by the /squat/ catch-all,
+  // 'Glute bridge hold' by the hip_ext rule. The two new planks already left at the core line.
+  if(/renegade|hip airplane|hip flexion|tibialis|dorsiflex|soleus raise|ankle car|90\/90|balance hold|pass-around|heel-raise hold|ankle rock|towel scrunch|tiptoe walk|glute bridge hold|cossack|hip flexor stretch|pigeon/.test(N)) return null;
   // Wall slides are scap/rear-delt work, not a press. Classified on introduction (V127) so
   // the movement is never invisible to capRegionalFatigue or deconflictAdjacentDupes — the
   // mistake Ball slams is still living with. Must precede the wall-walk rule: both contain
@@ -11046,7 +11069,8 @@ function capSessionBudget(sections, cardio){
   // Test-only bypass, per-pass since V123. See recoveryDeload for why.
   if(typeof globalThis!=='undefined' && (globalThis.__CAP_OFF || globalThis.__BUDGET_OFF)) return sections;
   if(!Array.isArray(sections)||!sections.length) return sections;
-  const _isStretch=n=>/stretch|mobility|90\/90|foam|worlds greatest/i.test(n||'');
+  // D239: the hip block's mobility piece stays free; the Cossack shift and pigeon lift-offs are mobility pieces.
+  const _isStretch=n=>/stretch|mobility|90\/90|foam|worlds greatest|cossack|pigeon/i.test(n||'');
   const _isHalf=n=>/carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises/i.test(n||'');
   const _prehabHalf=new Set([].concat(EXLIB.hip_stability,EXLIB.knee_stability,EXLIB.foot_ankle,EXLIB.foot_ankle_bw)); const _cost=it=>{ if(!it||_isStretch(it.name)) return 0; const s=_setCount(it.detail); return (_isHalf(it.name)||_prehabHalf.has(it.name))?s*0.5:s; };
   const _total=list=>list.reduce((a,s)=>a+((s&&s.items)||[]).reduce((b,it)=>b+_cost(it),0),0);

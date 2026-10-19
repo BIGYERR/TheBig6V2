@@ -15,12 +15,12 @@
     }
   },
   "injuredLatticeDigests": {
-    "knee_wa": "39679fdc5762f2b5",
-    "ankle_wa": "24fea086fe087454",
-    "hip_wa": "6c73687da203475a",
-    "lowback_wa": "d6e7e7178c37c073",
-    "shoulder_wa": "7cd72ca7e37a6f29",
-    "elbow_wa": "9a1b2079ac9cf7bd",
-    "mario_noinj": "d59b65f1d978a263"
+    "knee_wa": "5f739bfeffb89a08",
+    "ankle_wa": "3b2f6d3a7d5287be",
+    "hip_wa": "f8aba5a248d6631c",
+    "lowback_wa": "239eb324c7ba24b7",
+    "shoulder_wa": "dc3e8b34cc0f3ffc",
+    "elbow_wa": "30ec1a92761049fd",
+    "mario_noinj": "9c0a21e2cef5b8e9"
   }
 }

@@ -191,7 +191,7 @@ const eZeroP = (o: Pick<ECell, 'labels' | 'names'>): boolean => eLegCell(o) && !
 // The budget's cost rule by hand: stretch is free, holds and carries are half, everything else its set count, and a
 // detail with no N× reads as three.
 const eSets = (d: unknown): number => { const m = String(d || '').match(/(\d+)\s*[×x]/); return m ? Math.max(1, parseInt(m[1], 10)) : 3; };
-const eStretch = (n: string): boolean => /stretch|mobility|90\/90|foam|worlds greatest/i.test(n || '');
+const eStretch = (n: string): boolean => /stretch|mobility|90\/90|foam|worlds greatest|cossack|pigeon/i.test(n || '');   // D239: mobility pieces are free
 const eHalf = (n: string): boolean => /carry|wall sit|\bhold\b|plank|pallof|dead bug|bird dog|hang|l-sit|wiper|hollow|clamshell|side steps|side-lying|leg raises/i.test(n || '');
 const eCost = (cell: ECell): number => cell.items.reduce((a, it) => a + (eStretch(it.n) ? 0 : eHalf(it.n) ? eSets(it.d) * 0.5 : eSets(it.d)), 0);
 /** Hand: hsets is 4 for an advanced athlete and 3 otherwise, so one Calves item costs at most 4 sets. */

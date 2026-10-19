@@ -175,7 +175,10 @@ function _pattern(name: string | null | undefined): Pattern | null{
   // V178: hip/foot prehab and the renegade row are exempt. 'Renegade rows' would otherwise
   // score as a row; 'Standing ankle CARs' / 'soleus raise' would otherwise be invisible
   // by accident rather than by rule. Named here so the exemption is deliberate.
-  if(/renegade|hip airplane|hip flexion|tibialis|dorsiflex|soleus raise|ankle car|90\/90/.test(N)) return null;
+  // D239 (P-BENCH): the slice 1 prehab names. Three of them would otherwise be read as training
+  // patterns: 'Split-squat heel-raise hold' and 'Cossack squat shift' by the /squat/ catch-all,
+  // 'Glute bridge hold' by the hip_ext rule. The two new planks already left at the core line.
+  if(/renegade|hip airplane|hip flexion|tibialis|dorsiflex|soleus raise|ankle car|90\/90|balance hold|pass-around|heel-raise hold|ankle rock|towel scrunch|tiptoe walk|glute bridge hold|cossack|hip flexor stretch|pigeon/.test(N)) return null;
   // Wall slides are scap/rear-delt work, not a press. Classified on introduction (V127) so
   // the movement is never invisible to capRegionalFatigue or deconflictAdjacentDupes — the
   // mistake Ball slams is still living with. Must precede the wall-walk rule: both contain

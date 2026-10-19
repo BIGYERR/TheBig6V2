@@ -33,11 +33,11 @@
       },
       "tiers": {
         "bodyweight": {
-          "sections": 10236,
-          "items": 17802,
+          "sections": 10242,
+          "items": 17822,
           "coreSections": 692,
           "thinCore": 373,
-          "prehab": 3996,
+          "prehab": 4004,
           "prehabInHipSections": 3072,
           "prehabOutsideD85Names": 330
         },
@@ -91,8 +91,8 @@
         "perTier": {
           "bodyweight": {
             "opt": 54,
-            "non": 758,
-            "nonEx": 542,
+            "non": 752,
+            "nonEx": 536,
             "ruled": 216
           },
           "minimal": {
@@ -129,7 +129,7 @@
         "perClass": {
           "Arms finisher": 18,
           "Biceps": 267,
-          "Calves": 1227,
+          "Calves": 1221,
           "Delts": 130,
           "Delts finisher": 36,
           "Leg isolation": 1296,
@@ -238,10 +238,10 @@
   "costLens": {
     "configs": 650,
     "dayCells": 37240,
-    "budgetOffDiffers": 4591,
-    "changedByLens": 2416,
-    "itemsAdded": 3290,
-    "itemsRemoved": 1,
+    "budgetOffDiffers": 4097,
+    "changedByLens": 1918,
+    "itemsAdded": 2546,
+    "itemsRemoved": 0,
     "detailChanges": 1
   }
 }

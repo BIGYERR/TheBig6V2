@@ -3,7 +3,7 @@
 // counterfactuals, the coach's lattice constructor).
 //
 // HAND ORACLES (typed here, never asked of the app): the ruling's strings (the fourth item and its detail, the Tuesday
-// calf and carry strings), HALF_MANNY's swap universe (86 names) and its W1 to W12 Tuesday circuits (typed once off
+// calf and carry strings), HALF_MANNY's swap universe (99 names since D239) and its W1 to W12 Tuesday circuits (typed once off
 // V230, unchanged since), the three hand legs days and their hand-worked trims, the two typed cells' cards (coach's
 // prints), g215's knee protect lattice and the floor (b) line.
 import { progDigest } from './app.ts';
@@ -35,6 +35,10 @@ const UNIVERSE = [
   'Standing ankle CARs', 'Standing band hip abduction', 'Step-ups (KB)', 'Suitcase carry', 'Sumo deadlift', 'Terminal knee extension (band)',
   'Tibialis raise (wall lean)', 'Trap bar deadlift', 'Walking lunge (KB)', 'Wall sit', 'Weighted 90/90 hip switch', 'Weighted chinups',
   'Worlds greatest stretch',
+  // D239 (v0.241.0): the thirteen prehab names its pools register.
+  'Copenhagen plank (bent knee)', 'Side plank (top leg raised)', 'Glute bridge hold', 'Cossack squat shift', 'Half-kneeling hip flexor stretch',
+  'Pigeon lift-offs', 'Single-leg balance hold (eyes closed)', 'Single-leg KB pass-around', 'Kettlebell tibialis raise (seated)',
+  'Split-squat heel-raise hold', 'Knee-to-wall ankle rocks', 'Towel scrunches', 'Tiptoe walks',
 ];
 /** HALF_MANNY's runner armor circuit on W1 to W12 Tuesday before the fourth item: lunge, hold, hinge ([name, detail]). */
 const TUE: Record<number, Pair[]> = {
@@ -103,8 +107,9 @@ const CARD_F1 = [
   'Main — Back squat :: Back squat 3×12 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest',
   'Leg circuit — runner armor (SS 2) :: Step-ups (KB) 2×8–12 each @ RPE 6–7 | Wall sit 2×25 sec | Kettlebell swing 2×8 | Single-leg hip thrust 2×6–10 each @ RPE 6–7',
   'Calf — achilles armor :: Dumbbell standing calf raise 2×12–15 each, slow 3-sec lower',
-  'Hip stability :: Clamshells w/ band 2×15 each | Banded side steps 2×15–20 each @ RPE 6–7 | IT band stretch 2×30 sec each',
-  'Foot & ankle :: Tibialis raise (wall lean) 2×20 | Single-leg bent-knee soleus raise 2×12 each, slow',
+  // D239 (v0.241.0) moved the cell's two prehab blocks, nothing else.
+  'Hip stability :: Glute bridge hold 2×30 sec | Banded side steps 2×15–20 each @ RPE 6–7 | IT band stretch 2×30 sec each',
+  'Foot & ankle :: Knee-to-wall ankle rocks 2×10 each | Towel scrunches 2×20 each foot',
   'Core — Anti-Rotation :: Side plank 3×30–45 sec each | Plank shoulder taps 3×12 each',
 ];
 /** The same cell without D195 (parts A and B): the circuit's three, and no carry (coach's print of V230). */
@@ -114,13 +119,16 @@ const CARD_FH = [
   'Main — Back squat :: Back squat 3×10 — RPE 6.5 (leave ~4 reps in reserve), ramp up with 2–3 warmup sets, 2–3 min rest',
   'Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Wall sit 2×25 sec | Barbell good mornings 2×6–10 @ RPE 7',
   'Calf — achilles armor :: Machine seated calf raise 2×12–15 each, slow 3-sec lower',
-  'Hip stability :: Banded monster walks 2×12–15 each @ RPE 7 | Banded side steps 2×15–20 each @ RPE 7 | IT band stretch 2×30 sec each',
+  // D239 (v0.241.0) moved the cell's hip block, nothing else.
+  'Hip stability :: Side plank (top leg raised) 2×20 sec each | Banded side steps 2×15–20 each @ RPE 7 | Pigeon lift-offs 2×8 each',
   'Foot & ankle :: Standing ankle CARs 2×5 each direction | Banded dorsiflexion 2×15 each',
   'Core — Rotational Power :: Landmine rotations 2×8–12 each @ RPE 7',
 ];
-/** Without D195 the regional move cap cut the hold and the calf from this card (one V230 build, typed). */
+/** Without D195 the regional move cap cut the hold and the calf from this card (one V230 build, typed). Since D239
+ * (v0.241.0) only the hold: the cell's new hip block costs a set less under the older hold rule (a plank is half), so
+ * the calf fits. */
 const CARD_FH_THREE = [CARD_FH[0], 'Leg circuit — runner armor (SS 2) :: Dumbbell Bulgarian split squat 2×8–12 each @ RPE 7 | Barbell good mornings 2×6–10 @ RPE 7',
-  CARD_FH[3], CARD_FH[4], CARD_FH[5]];
+  CARD_FH[2], CARD_FH[3], CARD_FH[4], CARD_FH[5]];
 
 // ── floor (b), g215's knee protect lattice ──────────────────────────────────────────────────────────────────────
 const FB_TIERS = ['commercial', 'crossfit', 'home_full', 'home_basic', 'bodyweight'];

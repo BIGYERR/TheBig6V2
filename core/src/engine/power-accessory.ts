@@ -217,7 +217,7 @@ function _powerAllowed(name: string, experience: string | null | undefined, inju
   const ageCap = _POWER_AGE_MAX_COST[ageBracket||'18-35'] || 2.0;
   return c <= Math.min(expCap, ageCap);
 }
-const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation/i;
+const _BW_KEEP_FIXED=/wall sit|wall slide|plank|hold|hang|stretch|90\/90|clamshell|snow angel|y-t-w|superman|jump|bound|pogo|tibialis|dorsiflex|soleus|ankle car|hip airplane|hip flexion|renegade|burpee|climber|high knee|skater|crawl|inchworm|carry|sprint|shuttle|dead bug|bird dog|pallof|windshield|hollow|leg raise|knee raise|sit-up|situp|v-up|russian twist|woodchop|rotational|anti-rotation|ankle rock|towel scrunch|tiptoe walk|cossack|pigeon/i;   // D239: the slice 1 prehab doses are fixed
 function _bwSetsFromDetail(detail: string | null | undefined, wk?: number, exp?: string | null, prev?: boolean): string{
   const m=/^(\d+)\s*[×x]/.exec(detail||'');
   const sets=m?Math.min(4,Math.max(2,+m[1])):3;

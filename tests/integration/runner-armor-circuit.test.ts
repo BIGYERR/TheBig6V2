@@ -60,22 +60,22 @@ test('the Tuesday calf and carry strings read YYY-YYY-YYY--- over the 14 weeks',
   assert.equal(carry, RA.CARRY_STR);
 });
 
-test("HALF_MANNY's swap universe is the 86 names, with the fourth item and without it", () => {
-  // D195-A-a: a-uni
+test("HALF_MANNY's swap universe is the 99 names, with the fourth item and without it", () => {
+  // D195-A-a: a-uni (86 names; D239 adds the thirteen prehab names its pools register)
   for (const prog of [p, q]) {
     const U = Array.from(prog._swapUniverse || []);
-    assert.equal(U.length, 86);
+    assert.equal(U.length, 99);
     assert.deepEqual(U.slice().sort(), RA.UNIVERSE.slice().sort());
   }
 });
 
-test('part A without part B is f5ed630033ebe3db, part B without part A is 0ac7da6b1691a8e1 (the ruling printed both)', () => {
-  // D195-A-a: a-cfA, a-cfB
+test('part A without part B is 3e88e365246858f3, part B without part A is b1b15c80f1a703f1 (the ruling printed both, moved by D239)', () => {
+  // D195-A-a: a-cfA, a-cfB. D239 (v0.241.0) moved both: its prehab draws reach every Tuesday (were f5ed630033ebe3db, 0ac7da6b1691a8e1).
   const A = SB.twice(SB.noCostLens(), fixtures.HALF_MANNY);
   assert.ok(A.self);
-  assert.equal(A.dig, 'f5ed630033ebe3db');
-  assert.equal(N.dig, '0ac7da6b1691a8e1');
-  assert.equal(Array.from(A.prog._swapUniverse || []).length, 86);
+  assert.equal(A.dig, '3e88e365246858f3');
+  assert.equal(N.dig, 'b1b15c80f1a703f1');
+  assert.equal(Array.from(A.prog._swapUniverse || []).length, 99);
 });
 
 // ── the regional trim (A3c, A5) ──────────────────────────────────────────────────────────────────────────────────
@@ -166,7 +166,7 @@ test('the two typed cells print the cards coach printed: a four-item circuit wit
   assert.equal(RA.circuitItems(b)!.length, 3);
 });
 
-test('without D195 the same two cells print the cards before it: three items, no carry, and on the second the hold and calf cut', () => {
+test('without D195 the same two cells print the cards before it: three items, no carry, and on the second the hold cut (the calf too, until D239)', () => {
   // D195-A-d: d-inst (the before cards, read on the app with parts A and B taken out)
   const f = SB.noD195();
   assert.deepEqual(SB.cardLines(SB.twice(f, RA.CELL_F1.cfg).prog.weeks[RA.CELL_F1.w][RA.CELL_F1.d]), RA.CARD_F1_THREE);
